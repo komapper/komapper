@@ -1,0 +1,14 @@
+{
+  "extends": [
+    "config:base",
+    ":dependencyDashboard",
+    ":prHourlyLimitNone",
+    ":rebaseStalePrs"
+  ],
+  "labels": [
+    "dependencies"
+  ],
+  "reviewers": [
+    "nakamura-to"
+  ]
+}
