@@ -25,21 +25,32 @@ internal class EntityVisitor : KSEmptyVisitor<Unit, EntityVisitResult>() {
 }
 
 internal class EntityFactory(private val classDeclaration: KSClassDeclaration) {
+    init {
+        val modifiers = classDeclaration.modifiers
+        if (!modifiers.contains(Modifier.DATA)) {
+            report("@KmEntity must be applied to data class.", classDeclaration)
+        }
+        if (modifiers.contains(Modifier.PRIVATE)) {
+            report("@KmEntity cannot be applied to private data class.", classDeclaration)
+        }
+        if (classDeclaration.typeParameters.isNotEmpty()) {
+            report("@KmEntity annotated class must not have type parameters.", classDeclaration)
+        }
+    }
+
     fun create(): Entity {
-        validateKSClassDeclaration(classDeclaration)
-        val tableName = getTableName(classDeclaration)
+        val tableName = getTableName()
         val allProperties = createAllProperties()
         val idProperties = allProperties.filter { it.kind is PropertyKind.Id }
         val versionProperty: Property? = allProperties.firstOrNull { it.kind is PropertyKind.Version }
         val createdAtProperty: Property? = allProperties.firstOrNull { it.kind is PropertyKind.CreatedAt }
         val updatedAtProperty: Property? = allProperties.firstOrNull { it.kind is PropertyKind.UpdatedAt }
         val ignoredProperties = allProperties.filter { it.kind is PropertyKind.Ignore }
-        val properties = allProperties - ignoredProperties
-        val idGenerator: IdGenerator? = createIdGenerator(properties)
+        val idGenerator: IdGenerator? = createIdGenerator(allProperties)
         return Entity(
             classDeclaration,
             tableName,
-            properties.toList(),
+            (allProperties - ignoredProperties).toList(),
             idProperties.toList(),
             versionProperty,
             createdAtProperty,
@@ -67,19 +78,6 @@ internal class EntityFactory(private val classDeclaration: KSClassDeclaration) {
             }?.also {
                 validateProperties(it)
             } ?: emptySequence()
-    }
-
-    private fun validateKSClassDeclaration(classDeclaration: KSClassDeclaration) {
-        val modifiers = classDeclaration.modifiers
-        if (!modifiers.contains(Modifier.DATA)) {
-            report("@KmEntity must be applied to data class.", classDeclaration)
-        }
-        if (modifiers.contains(Modifier.PRIVATE)) {
-            report("@KmEntity cannot be applied to private data class.", classDeclaration)
-        }
-        if (classDeclaration.typeParameters.isNotEmpty()) {
-            report("@KmEntity annotated class must not have type parameters.", classDeclaration)
-        }
     }
 
     private fun validateProperty(property: Property) {
@@ -163,23 +161,23 @@ internal class EntityFactory(private val classDeclaration: KSClassDeclaration) {
 
     private fun validateProperties(properties: Sequence<Property>) {
         if (properties.anyDuplicates { it.kind is PropertyKind.Version }) {
-            report("Multiple @KmVersion cannot coexist in a single class.")
+            report("Multiple @KmVersion cannot coexist in a single class.", classDeclaration)
         }
         if (properties.anyDuplicates { it.kind is PropertyKind.CreatedAt }) {
-            report("Multiple @KmCreatedAt cannot coexist in a single class.")
+            report("Multiple @KmCreatedAt cannot coexist in a single class.", classDeclaration)
         }
         if (properties.anyDuplicates { it.kind is PropertyKind.UpdatedAt }) {
-            report("Multiple @KmUpdatedAt cannot coexist in a single class.")
+            report("Multiple @KmUpdatedAt cannot coexist in a single class.", classDeclaration)
         }
         if (properties.all { it.kind is PropertyKind.Ignore }) {
             report("Any persistent properties are not found.", classDeclaration)
         }
     }
 
-    private fun getTableName(declaration: KSClassDeclaration): String {
-        return declaration.findAnnotation("KmTable")
+    private fun getTableName(): String {
+        return classDeclaration.findAnnotation("KmTable")
             ?.findValue("name")?.toString()
-            ?: declaration.simpleName.asString().toUpperCase()
+            ?: classDeclaration.simpleName.asString().toUpperCase()
     }
 
     private fun getColumnName(parameter: KSValueParameter): String {
@@ -197,30 +195,20 @@ internal class EntityFactory(private val classDeclaration: KSClassDeclaration) {
         for (a in parameter.annotations) {
             when (a.shortName.asString()) {
                 "KmId" -> id = PropertyKind.Id(a)
-                "KmVersion" -> {
-                    version = PropertyKind.Version(a)
-                }
-                "KmCreatedAt" -> {
-                    createdAt = PropertyKind.CreatedAt(a)
-                }
-                "KmUpdatedAt" -> {
-                    updatedAt = PropertyKind.UpdatedAt(a)
-                }
-                "KmIgnore" -> {
-                    ignore = PropertyKind.Ignore(a)
-                }
+                "KmVersion" -> version = PropertyKind.Version(a)
+                "KmCreatedAt" -> createdAt = PropertyKind.CreatedAt(a)
+                "KmUpdatedAt" -> updatedAt = PropertyKind.UpdatedAt(a)
+                "KmIgnore" -> ignore = PropertyKind.Ignore(a)
             }
         }
         val kinds = listOfNotNull(id, version, createdAt, updatedAt, ignore)
-        if (kinds.isEmpty()) {
-            return null
+        if (kinds.size > 1) {
+            val iterator = kinds.iterator()
+            val a1 = iterator.next().annotation
+            val a2 = iterator.next().annotation
+            report("$a1 and $a2 cannot coexist on the same parameter.", parameter)
         }
-        if (kinds.size == 1) {
-            return kinds.first()
-        }
-        val a1 = kinds[0].annotation
-        val a2 = kinds[1].annotation
-        report("$a1 and $a2 cannot coexist on the same parameter.", parameter)
+        return kinds.firstOrNull()
     }
 
     private fun createIdGeneratorKind(parameter: KSValueParameter, propertyKind: PropertyKind?): IdGeneratorKind? {
@@ -239,30 +227,25 @@ internal class EntityFactory(private val classDeclaration: KSClassDeclaration) {
             }
         }
         val idGeneratorKinds = listOfNotNull(identity, sequence)
-        if (idGeneratorKinds.isEmpty()) {
-            return null
+        if (idGeneratorKinds.size > 1) {
+            val iterator = idGeneratorKinds.iterator()
+            val a1 = iterator.next().annotation
+            val a2 = iterator.next().annotation
+            report("$a1 and $a2 cannot coexist on the same parameter.", parameter)
         }
-        if (idGeneratorKinds.size == 1) {
-            val kind = idGeneratorKinds.first()
-            if (propertyKind !is PropertyKind.Id) {
-                report("${kind.annotation} and @KmId must coexist on the same parameter.", parameter)
-            }
-            return kind
+        val idGeneratorKind = idGeneratorKinds.firstOrNull() ?: return null
+        if (propertyKind !is PropertyKind.Id) {
+            report("${idGeneratorKind.annotation} and @KmId must coexist on the same parameter.", parameter)
         }
-        val a1 = idGeneratorKinds[0].annotation
-        val a2 = idGeneratorKinds[1].annotation
-        report("$a1 and $a2 cannot coexist on the same parameter.", parameter)
+        return idGeneratorKind
     }
 
     private fun createIdGenerator(properties: Sequence<Property>): IdGenerator? {
         val idGeneratorProperties = properties.filter { it.idGeneratorKind != null }.toList()
-        if (idGeneratorProperties.isEmpty()) {
-            return null
-        }
-        val property = idGeneratorProperties.first()
         if (idGeneratorProperties.size > 1) {
-            report("Multiple Generators cannot coexist in a single class.", property.parameter)
+            report("Multiple Generators cannot coexist in a single class.", classDeclaration)
         }
+        val property = idGeneratorProperties.firstOrNull() ?: return null
         return IdGenerator(property)
     }
 }
