@@ -1,37 +1,18 @@
-## Welcome to GitHub Pages
+## Kotlin SQL Mapper
 
-You can use the [editor on GitHub](https://github.com/komapper/komapper/edit/main/docs/index.md) to maintain and preview the content for your website in Markdown files.
+Komapper is a simple database access library for Kotlin.
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+Supported databases are as follows:
 
-### Markdown
+- H2 1.4.199 or above
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+## Strengths
 
-```markdown
-Syntax highlighted code block
+- Generate meta-models at compile-time using [google/ksp](https://github.com/google/ksp).
+- Flexible and natural syntax for criteria queries.
+- SQL templates, called “two-way SQL”.
 
-# Header 1
-## Header 2
-### Header 3
+## Twitter
 
-- Bulleted
-- List
-
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
-```
-
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
-
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/komapper/komapper/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://support.github.com/contact) and we’ll help you sort it out.
+Author: @nakamura_to  
+hashtag: #komapper
