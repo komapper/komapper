@@ -24,33 +24,18 @@ internal class EntityVisitor : KSEmptyVisitor<Unit, EntityVisitResult>() {
     }
 }
 
-class EntityFactory(private val classDeclaration: KSClassDeclaration) {
+internal class EntityFactory(private val classDeclaration: KSClassDeclaration) {
     fun create(): Entity {
         validateKSClassDeclaration(classDeclaration)
-        val tableName = tableName(classDeclaration)
-        val map = classDeclaration.getDeclaredProperties().associateBy { it.simpleName }
-        val allProperties = classDeclaration.primaryConstructor?.parameters
-            ?.asSequence()
-            ?.map { parameter ->
-                val declaration = map[parameter.name]
-                    ?: report("The corresponding property is not found.", parameter)
-                val columnName = columnName(parameter)
-                val type = parameter.type.resolve()
-                val typeName = (type.declaration.qualifiedName ?: type.declaration.simpleName).asString()
-                val nullability = type.nullability
-                val kind = propertyKind(parameter)
-                val generatorKind = idGeneratorKind(parameter, kind)
-                Property(parameter, declaration, columnName, typeName, nullability, kind, generatorKind)
-            }?.also {
-                validateProperties(it)
-            } ?: emptySequence()
+        val tableName = getTableName(classDeclaration)
+        val allProperties = createAllProperties()
         val idProperties = allProperties.filter { it.kind is PropertyKind.Id }
         val versionProperty: Property? = allProperties.firstOrNull { it.kind is PropertyKind.Version }
         val createdAtProperty: Property? = allProperties.firstOrNull { it.kind is PropertyKind.CreatedAt }
         val updatedAtProperty: Property? = allProperties.firstOrNull { it.kind is PropertyKind.UpdatedAt }
         val ignoredProperties = allProperties.filter { it.kind is PropertyKind.Ignore }
         val properties = allProperties - ignoredProperties
-        val idGenerator: IdGenerator? = idGenerator(allProperties)
+        val idGenerator: IdGenerator? = createIdGenerator(properties)
         return Entity(
             classDeclaration,
             tableName,
@@ -61,6 +46,27 @@ class EntityFactory(private val classDeclaration: KSClassDeclaration) {
             updatedAtProperty,
             idGenerator
         )
+    }
+
+    private fun createAllProperties(): Sequence<Property> {
+        val propertyDeclarationMap = classDeclaration.getDeclaredProperties().associateBy { it.simpleName }
+        return classDeclaration.primaryConstructor?.parameters
+            ?.asSequence()
+            ?.map { parameter ->
+                val declaration = propertyDeclarationMap[parameter.name]
+                    ?: report("The corresponding property is not found.", parameter)
+                val columnName = getColumnName(parameter)
+                val type = parameter.type.resolve()
+                val typeName = (type.declaration.qualifiedName ?: type.declaration.simpleName).asString()
+                val nullability = type.nullability
+                val kind = createPropertyKind(parameter)
+                val generatorKind = createIdGeneratorKind(parameter, kind)
+                Property(parameter, declaration, columnName, typeName, nullability, kind, generatorKind).also {
+                    validateProperty(it)
+                }
+            }?.also {
+                validateProperties(it)
+            } ?: emptySequence()
     }
 
     private fun validateKSClassDeclaration(classDeclaration: KSClassDeclaration) {
@@ -76,6 +82,85 @@ class EntityFactory(private val classDeclaration: KSClassDeclaration) {
         }
     }
 
+    private fun validateProperty(property: Property) {
+        if (property.isPrivate()) {
+            report("The parameter must not be private.", property.parameter)
+        }
+        validatePropertyKind(property)
+        validateIdGeneratorKind(property)
+    }
+
+    private fun validatePropertyKind(property: Property) {
+        val parameter = property.parameter
+        when (property.kind) {
+            is PropertyKind.Version -> {
+                when (property.typeName) {
+                    "kotlin.Int" -> Unit
+                    "kotlin.Long" -> Unit
+                    else -> report(
+                        "@KmVersion cannot apply to ${parameter.type} type. " +
+                            "Either Int or Long is available.",
+                        parameter
+                    )
+                }
+            }
+            is PropertyKind.CreatedAt -> {
+                when (property.typeName) {
+                    "java.time.LocalDateTime" -> Unit
+                    else -> report(
+                        "@KmCreatedAt cannot apply to ${parameter.type} type. " +
+                            "java.time.LocalDateTime is available.",
+                        parameter
+                    )
+                }
+            }
+            is PropertyKind.UpdatedAt -> {
+                when (property.typeName) {
+                    "java.time.LocalDateTime" -> Unit
+                    else -> report(
+                        "@KmUpdatedAt cannot apply to ${parameter.type} type. " +
+                            "java.time.LocalDateTime is available.",
+                        parameter
+                    )
+                }
+            }
+            is PropertyKind.Ignore -> {
+                if (!property.parameter.hasDefault) {
+                    report("@KmIgnore annotated parameter must have default value.", parameter)
+                }
+            }
+            else -> Unit
+        }
+    }
+
+    private fun validateIdGeneratorKind(property: Property) {
+        val parameter = property.parameter
+        when (property.idGeneratorKind) {
+            is IdGeneratorKind.Identity -> {
+                when (property.typeName) {
+                    "kotlin.Int" -> Unit
+                    "kotlin.Long" -> Unit
+                    else -> report(
+                        "@KmIdentityGenerator cannot apply to ${parameter.type} type. " +
+                            "Either Int or Long is available.",
+                        parameter
+                    )
+                }
+            }
+            is IdGeneratorKind.Sequence -> {
+                when (property.typeName) {
+                    "kotlin.Int" -> Unit
+                    "kotlin.Long" -> Unit
+                    else -> report(
+                        "@KmSequenceGenerator cannot apply to ${parameter.type} type. " +
+                            "Either Int or Long is available.",
+                        parameter
+                    )
+                }
+            }
+        }
+    }
+
     private fun validateProperties(properties: Sequence<Property>) {
         if (properties.anyDuplicates { it.kind is PropertyKind.Version }) {
             report("Multiple @KmVersion cannot coexist in a single class.")
@@ -86,40 +171,24 @@ class EntityFactory(private val classDeclaration: KSClassDeclaration) {
         if (properties.anyDuplicates { it.kind is PropertyKind.UpdatedAt }) {
             report("Multiple @KmUpdatedAt cannot coexist in a single class.")
         }
-        val persistentProperties = properties.filter { it.kind !is PropertyKind.Ignore }
-        if (persistentProperties.none()) {
+        if (properties.all { it.kind is PropertyKind.Ignore }) {
             report("Any persistent properties are not found.", classDeclaration)
         }
-        persistentProperties.firstOrNull { it.isPrivate() }?.let {
-            report("The parameter must not be private.", it.parameter)
-        }
     }
 
-    private fun tableName(declaration: KSClassDeclaration): String {
-        return declaration.annotations
-            .asSequence()
-            .filter { it.shortName.asString() == "KmTable" }
-            .map { annotation ->
-                annotation.arguments
-                    .filter { it.name?.asString() == "name" }
-                    .map { it.value?.toString() }
-                    .firstOrNull()
-            }.firstOrNull() ?: declaration.simpleName.asString().toUpperCase()
+    private fun getTableName(declaration: KSClassDeclaration): String {
+        return declaration.findAnnotation("KmTable")
+            ?.findValue("name")?.toString()
+            ?: declaration.simpleName.asString().toUpperCase()
     }
 
-    private fun columnName(parameter: KSValueParameter): String {
-        return parameter.annotations
-            .asSequence()
-            .filter { it.shortName.asString() == "KmColumn" }
-            .map { annotation ->
-                annotation.arguments
-                    .filter { it.name?.asString() == "name" }
-                    .map { it.value?.toString() }
-                    .firstOrNull()
-            }.firstOrNull() ?: parameter.toString().toUpperCase()
+    private fun getColumnName(parameter: KSValueParameter): String {
+        return parameter.findAnnotation("KmColumn")
+            ?.findValue("name")?.toString()
+            ?: parameter.toString().toUpperCase()
     }
 
-    private fun propertyKind(parameter: KSValueParameter): PropertyKind? {
+    private fun createPropertyKind(parameter: KSValueParameter): PropertyKind? {
         var id: PropertyKind.Id? = null
         var version: PropertyKind.Version? = null
         var createdAt: PropertyKind.CreatedAt? = null
@@ -147,20 +216,26 @@ class EntityFactory(private val classDeclaration: KSClassDeclaration) {
             return null
         }
         if (kinds.size == 1) {
-            return kinds.first().also { it.check(parameter) }
+            return kinds.first()
         }
         val a1 = kinds[0].annotation
         val a2 = kinds[1].annotation
         report("$a1 and $a2 cannot coexist on the same parameter.", parameter)
     }
 
-    private fun idGeneratorKind(parameter: KSValueParameter, propertyKind: PropertyKind?): IdGeneratorKind? {
+    private fun createIdGeneratorKind(parameter: KSValueParameter, propertyKind: PropertyKind?): IdGeneratorKind? {
         var identity: IdGeneratorKind.Identity? = null
         var sequence: IdGeneratorKind.Sequence? = null
         for (a in parameter.annotations) {
             when (a.shortName.asString()) {
                 "KmIdentityGenerator" -> identity = IdGeneratorKind.Identity(a)
-                "KmSequenceGenerator" -> sequence = IdGeneratorKind.Sequence(a)
+                "KmSequenceGenerator" -> sequence = let {
+                    val name = a.findValue("name")
+                        ?: report("@KmSequenceGenerator.name is not found.", a)
+                    val incrementBy = a.findValue("incrementBy")
+                        ?: report("@KmSequenceGenerator.incrementBy is not found.", a)
+                    IdGeneratorKind.Sequence(a, name, incrementBy)
+                }
             }
         }
         val idGeneratorKinds = listOfNotNull(identity, sequence)
@@ -168,7 +243,7 @@ class EntityFactory(private val classDeclaration: KSClassDeclaration) {
             return null
         }
         if (idGeneratorKinds.size == 1) {
-            val kind = idGeneratorKinds.first().also { it.check(parameter) }
+            val kind = idGeneratorKinds.first()
             if (propertyKind !is PropertyKind.Id) {
                 report("${kind.annotation} and @KmId must coexist on the same parameter.", parameter)
             }
@@ -179,7 +254,7 @@ class EntityFactory(private val classDeclaration: KSClassDeclaration) {
         report("$a1 and $a2 cannot coexist on the same parameter.", parameter)
     }
 
-    private fun idGenerator(properties: Sequence<Property>): IdGenerator? {
+    private fun createIdGenerator(properties: Sequence<Property>): IdGenerator? {
         val idGeneratorProperties = properties.filter { it.idGeneratorKind != null }.toList()
         if (idGeneratorProperties.isEmpty()) {
             return null

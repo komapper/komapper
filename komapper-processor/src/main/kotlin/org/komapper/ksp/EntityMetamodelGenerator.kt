@@ -3,7 +3,7 @@ package org.komapper.ksp
 import com.google.devtools.ksp.symbol.Nullability
 import java.io.PrintWriter
 
-class EntityMetamodelGenerator(
+internal class EntityMetamodelGenerator(
     private val entity: Entity,
     private val packageName: String,
     private val entityTypeName: String,

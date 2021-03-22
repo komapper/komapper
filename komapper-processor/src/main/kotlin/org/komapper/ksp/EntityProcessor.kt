@@ -12,7 +12,7 @@ import java.io.PrintWriter
 class EntityProcessor : SymbolProcessor {
     private lateinit var codeGenerator: CodeGenerator
     private lateinit var logger: KSPLogger
-    var invoked = false
+    private var invoked = false
 
     override fun init(
         options: Map<String, String>,

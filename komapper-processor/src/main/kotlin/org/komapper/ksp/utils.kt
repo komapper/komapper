@@ -1,5 +1,7 @@
 package org.komapper.ksp
 
+import com.google.devtools.ksp.symbol.KSAnnotated
+import com.google.devtools.ksp.symbol.KSAnnotation
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSNode
 import com.google.devtools.ksp.visitor.KSEmptyVisitor
@@ -29,4 +31,15 @@ private class CompanionObjectVisitor : KSEmptyVisitor<Unit, Boolean>() {
     override fun visitClassDeclaration(classDeclaration: KSClassDeclaration, data: Unit): Boolean {
         return classDeclaration.isCompanionObject && classDeclaration.simpleName.asString() == "Companion"
     }
+}
+
+internal fun KSAnnotation.findValue(name: String): Any? {
+    return this.arguments
+        .filter { it.name?.asString() == name }
+        .map { it.value }
+        .firstOrNull()
+}
+
+internal fun KSAnnotated.findAnnotation(shortName: String): KSAnnotation? {
+    return this.annotations.firstOrNull { it.shortName.asString() == shortName }
 }

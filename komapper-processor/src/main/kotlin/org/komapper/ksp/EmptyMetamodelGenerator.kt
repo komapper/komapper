@@ -3,7 +3,7 @@ package org.komapper.ksp
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import java.io.PrintWriter
 
-class EmptyMetamodelGenerator(
+internal class EmptyMetamodelGenerator(
     private val classDeclaration: KSClassDeclaration,
     private val packageName: String,
     private val simpleQualifiedName: String,

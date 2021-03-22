@@ -6,13 +6,9 @@ import com.tschuchort.compiletesting.SourceFile
 import com.tschuchort.compiletesting.SourceFile.Companion.kotlin
 import com.tschuchort.compiletesting.kspIncremental
 import com.tschuchort.compiletesting.symbolProcessors
-import org.intellij.lang.annotations.Language
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
-import kotlin.io.path.ExperimentalPathApi
-import kotlin.io.path.readText
 
 class EntityProcessorTest {
 
@@ -21,17 +17,170 @@ class EntityProcessorTest {
     val temporaryFolder: TemporaryFolder = TemporaryFolder()
 
     @Test
-    fun `@KmId and @KmVersion cannot coexist`() {
+    fun `@KmEntity must be applied to data class`() {
         val result = compile(
             kotlin(
                 "source.kt",
                 """
                 package test
+                import org.komapper.core.*
+                @KmEntity
+                class Dept(
+                    val id: Int
+                )
+                """
+            )
+        )
+        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
+        assertThat(result.messages).contains("@KmEntity must be applied to data class.")
+    }
 
-                import org.komapper.core.KmEntity
-                import org.komapper.core.KmId
-                import org.komapper.core.KmVersion
-                
+    @Test
+    fun `@KmEntity cannot be applied to private data class`() {
+        val result = compile(
+            kotlin(
+                "source.kt",
+                """
+                package test
+                import org.komapper.core.*
+                @KmEntity
+                private data class Dept(
+                    val id: Int
+                )
+                """
+            )
+        )
+        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
+        assertThat(result.messages).contains("@KmEntity cannot be applied to private data class.")
+    }
+
+    @Test
+    fun `@KmEntity annotated class must not have type parameters`() {
+        val result = compile(
+            kotlin(
+                "source.kt",
+                """
+                package test
+                import org.komapper.core.*
+                @KmEntity
+                data class Dept<T>(
+                    val id: T
+                )
+                """
+            )
+        )
+        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
+        assertThat(result.messages).contains("@KmEntity annotated class must not have type parameters.")
+    }
+
+    @Test
+    fun `Multiple @KmVersion cannot coexist in a single class`() {
+        val result = compile(
+            kotlin(
+                "source.kt",
+                """
+                package test
+                import org.komapper.core.*
+                @KmEntity
+                data class Dept(
+                    @KmVersion val aaa: Int,
+                    @KmVersion val bbb: Int
+                )
+                """
+            )
+        )
+        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
+        assertThat(result.messages).contains("Multiple @KmVersion cannot coexist in a single class.")
+    }
+
+    @Test
+    fun `Multiple @KmCreatedAt cannot coexist in a single class`() {
+        val result = compile(
+            kotlin(
+                "source.kt",
+                """
+                package test
+                import org.komapper.core.*
+                import java.time.LocalDateTime
+                @KmEntity
+                data class Dept(
+                    @KmCreatedAt val aaa: LocalDateTime,
+                    @KmCreatedAt val bbb: LocalDateTime
+                )
+                """
+            )
+        )
+        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
+        assertThat(result.messages).contains("Multiple @KmCreatedAt cannot coexist in a single class.")
+    }
+
+    @Test
+    fun `Multiple @KmUpdatedAt cannot coexist in a single class`() {
+        val result = compile(
+            kotlin(
+                "source.kt",
+                """
+                package test
+                import org.komapper.core.*import java.time.LocalDateTime
+                @KmEntity
+                data class Dept(
+                    @KmUpdatedAt val aaa: LocalDateTime,
+                    @KmUpdatedAt val bbb: LocalDateTime
+                )
+                """
+            )
+        )
+        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
+        assertThat(result.messages).contains("Multiple @KmUpdatedAt cannot coexist in a single class.")
+    }
+
+    @Test
+    fun `Any persistent properties are not found`() {
+        val result = compile(
+            kotlin(
+                "source.kt",
+                """
+                package test
+                import org.komapper.core.*
+                @KmEntity
+                data class Dept(
+                    @KmIgnore val aaa: Int = 0,
+                    @KmIgnore val bbb: Int = 0
+                )
+                """
+            )
+        )
+        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
+        assertThat(result.messages).contains("Any persistent properties are not found.")
+    }
+
+    @Test
+    fun `The parameter must not be private`() {
+        val result = compile(
+            kotlin(
+                "source.kt",
+                """
+                package test
+                import org.komapper.core.*
+                @KmEntity
+                data class Dept(
+                    private val aaa: Int
+                )
+                """
+            )
+        )
+        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
+        assertThat(result.messages).contains("The parameter must not be private.")
+    }
+
+    @Test
+    fun `@KmId and @KmVersion cannot coexist on the same parameter`() {
+        val result = compile(
+            kotlin(
+                "source.kt",
+                """
+                package test
+                import org.komapper.core.*
                 @KmEntity
                 data class Dept(
                     @KmId @KmVersion val id: Int
@@ -50,12 +199,7 @@ class EntityProcessorTest {
                 "source.kt",
                 """
                 package test
-
-                import org.komapper.core.KmEntity
-                import org.komapper.core.KmId
-                import org.komapper.core.KmIdentityGenerator
-                import org.komapper.core.KmVersion
-                
+                import org.komapper.core.*
                 @KmEntity
                 data class Dept(
                     @KmIdentityGenerator val id: Int
@@ -67,253 +211,195 @@ class EntityProcessorTest {
         assertThat(result.messages).contains("@KmIdentityGenerator and @KmId must coexist on the same parameter.")
     }
 
-    @ExperimentalPathApi
     @Test
-    @Ignore
-    fun test() {
+    fun `@KmIdentityGenerator and @KmSequenceGenerator cannot coexist on the same parameter`() {
         val result = compile(
             kotlin(
                 "source.kt",
                 """
                 package test
-
-                import org.komapper.core.KmEntity
-                import org.komapper.core.KmId
-                import org.komapper.core.KmVersion
-                
-                @KmEntity
-                data class Emp(
-                    @KmId val id: Int,
-                    val name: String,
-                    @KmVersion val version: Int
-                    ) {}
-                """
-            )
-        )
-        assertContent(
-            "test/Emp_.kt",
-            """
-                package test
-
-                import java.time.Clock
-                import org.komapper.core.metamodel.EntityMetamodel
-                import org.komapper.core.metamodel.PropertyDescriptor
-                import org.komapper.core.metamodel.PropertyMetamodel
-
-                @Suppress("ClassName")
-                class Emp_ : EntityMetamodel<Emp> {
-                    private object EntityDescriptor {
-                        val id = PropertyDescriptor<Emp, kotlin.Int>(kotlin.Int::class, "ID", { it.id }) { (e, v) -> e.copy(id = v) }
-                        val name = PropertyDescriptor<Emp, kotlin.String>(kotlin.String::class, "NAME", { it.name }) { (e, v) -> e.copy(name = v) }
-                        val version = PropertyDescriptor<Emp, kotlin.Int>(kotlin.Int::class, "VERSION", { it.version }) { (e, v) -> e.copy(version = v) }
-                    }
-                    val id by lazy { PropertyMetamodel(this, EntityDescriptor.id) }
-                    val name by lazy { PropertyMetamodel(this, EntityDescriptor.name) }
-                    val version by lazy { PropertyMetamodel(this, EntityDescriptor.version) }
-                    override fun tableName() = "EMP"
-                    override fun identityProperties(): List<PropertyMetamodel<Emp, *>> = listOf(id)
-                    override fun versionProperty(): PropertyMetamodel<Emp, *>? = version
-                    override fun allProperties(): List<PropertyMetamodel<Emp, *>> = listOf(id, name, version)
-                    override fun instantiate(a: Array<Any?>) = Emp(a[0] as kotlin.Int, a[1] as kotlin.String, a[2] as kotlin.Int)
-                    override fun incrementVersion(e: Emp): Emp = version.set(e to version.get(e)!!.inc())
-                    override fun setCreationClock(e: Emp, c: Clock): Emp = e
-                    override fun setUpdateClock(e: Emp, c: Clock): Emp = e
-                }
-
-                """
-        )
-        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.OK)
-    }
-
-    @ExperimentalPathApi
-    @Test
-    @Ignore
-    fun nestedClass() {
-        val result = compile(
-            kotlin(
-                "source.kt",
-                """
-                package test
-
-                import org.komapper.core.KmEntity
-                import org.komapper.core.KmId
-                import org.komapper.core.KmVersion
-                
-                class Hoge {
-                    @KmEntity
-                    data class Emp(
-                        @KmId val id: Int,
-                        val name: String,
-                        @KmVersion val version: Int
-                        ) {}
-                    }
-                """
-            )
-        )
-        assertContent(
-            "test/Hoge_Emp_.kt",
-            """
-                package test
-
-                import java.time.Clock
-                import org.komapper.core.metamodel.EntityMetamodel
-                import org.komapper.core.metamodel.PropertyDescriptor
-                import org.komapper.core.metamodel.PropertyMetamodel
-
-                @Suppress("ClassName")
-                class Hoge_Emp_ : EntityMetamodel<Hoge.Emp> {
-                    private object EntityDescriptor {
-                        val id = PropertyDescriptor<Hoge.Emp, kotlin.Int>(kotlin.Int::class, "ID", { it.id }) { (e, v) -> e.copy(id = v) }
-                        val name = PropertyDescriptor<Hoge.Emp, kotlin.String>(kotlin.String::class, "NAME", { it.name }) { (e, v) -> e.copy(name = v) }
-                        val version = PropertyDescriptor<Hoge.Emp, kotlin.Int>(kotlin.Int::class, "VERSION", { it.version }) { (e, v) -> e.copy(version = v) }
-                    }
-                    val id by lazy { PropertyMetamodel(this, EntityDescriptor.id) }
-                    val name by lazy { PropertyMetamodel(this, EntityDescriptor.name) }
-                    val version by lazy { PropertyMetamodel(this, EntityDescriptor.version) }
-                    override fun tableName() = "EMP"
-                    override fun identityProperties(): List<PropertyMetamodel<Hoge.Emp, *>> = listOf(id)
-                    override fun versionProperty(): PropertyMetamodel<Hoge.Emp, *>? = version
-                    override fun allProperties(): List<PropertyMetamodel<Hoge.Emp, *>> = listOf(id, name, version)
-                    override fun instantiate(a: Array<Any?>) = Hoge.Emp(a[0] as kotlin.Int, a[1] as kotlin.String, a[2] as kotlin.Int)
-                    override fun incrementVersion(e: Hoge.Emp): Hoge.Emp = version.set(e to version.get(e)!!.inc())
-                    override fun setCreationClock(e: Hoge.Emp, c: Clock): Hoge.Emp = e
-                    override fun setUpdateClock(e: Hoge.Emp, c: Clock): Hoge.Emp = e
-                }
-
-                """
-        )
-        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.OK)
-    }
-
-    @ExperimentalPathApi
-    @Test
-    @Ignore
-    fun companionObject() {
-        val result = compile(
-            kotlin(
-                "source.kt",
-                """
-                package test
-
-                import org.komapper.core.KmEntity
-                import org.komapper.core.KmId
-                import org.komapper.core.KmVersion
-                
-                @KmEntity
-                data class Emp(
-                    @KmId val id: Int,
-                    val name: String,
-                    @KmVersion val version: Int
-                ) {
-                    companion object {}
-                }
-                """
-            )
-        )
-        assertContent(
-            "test/Emp_.kt",
-            """
-                package test
-
-                import java.time.Clock
-                import org.komapper.core.metamodel.EntityMetamodel
-                import org.komapper.core.metamodel.PropertyDescriptor
-                import org.komapper.core.metamodel.PropertyMetamodel
-
-                @Suppress("ClassName")
-                class Emp_ : EntityMetamodel<Emp> {
-                    private object EntityDescriptor {
-                        val id = PropertyDescriptor<Emp, kotlin.Int>(kotlin.Int::class, "ID", { it.id }) { (e, v) -> e.copy(id = v) }
-                        val name = PropertyDescriptor<Emp, kotlin.String>(kotlin.String::class, "NAME", { it.name }) { (e, v) -> e.copy(name = v) }
-                        val version = PropertyDescriptor<Emp, kotlin.Int>(kotlin.Int::class, "VERSION", { it.version }) { (e, v) -> e.copy(version = v) }
-                    }
-                    val id by lazy { PropertyMetamodel(this, EntityDescriptor.id) }
-                    val name by lazy { PropertyMetamodel(this, EntityDescriptor.name) }
-                    val version by lazy { PropertyMetamodel(this, EntityDescriptor.version) }
-                    override fun tableName() = "EMP"
-                    override fun identityProperties(): List<PropertyMetamodel<Emp, *>> = listOf(id)
-                    override fun versionProperty(): PropertyMetamodel<Emp, *>? = version
-                    override fun allProperties(): List<PropertyMetamodel<Emp, *>> = listOf(id, name, version)
-                    override fun instantiate(a: Array<Any?>) = Emp(a[0] as kotlin.Int, a[1] as kotlin.String, a[2] as kotlin.Int)
-                    override fun incrementVersion(e: Emp): Emp = version.set(e to version.get(e)!!.inc())
-                    override fun setCreationClock(e: Emp, c: Clock): Emp = e
-                    override fun setUpdateClock(e: Emp, c: Clock): Emp = e
-                }
-
-                fun Emp.Companion.metamodel() = Emp_()
-
-                """
-        )
-        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.OK)
-    }
-
-    @ExperimentalPathApi
-    @Test
-    @Ignore
-    fun clock() {
-        val result = compile(
-            kotlin(
-                "source.kt",
-                """
-                package test
-
-                import java.time.LocalDateTime
-                import org.komapper.core.KmCreatedAt
-                import org.komapper.core.KmEntity
-                import org.komapper.core.KmId
-                import org.komapper.core.KmUpdatedAt
-                
+                import org.komapper.core.*
                 @KmEntity
                 data class Dept(
-                    @KmId val id: Int,
-                    @KmCreatedAt val createdAt: LocalDateTime,
-                    @KmUpdatedAt val updatedAt: LocalDateTime
+                    @KmIdentityGenerator @KmSequenceGenerator("ID", 100) val id: Int
                 )
                 """
             )
         )
-        assertContent(
-            "test/Dept_.kt",
-            """
-                package test
-
-                import java.time.Clock
-                import org.komapper.core.metamodel.EntityMetamodel
-                import org.komapper.core.metamodel.PropertyDescriptor
-                import org.komapper.core.metamodel.PropertyMetamodel
-                
-                @Suppress("ClassName")
-                class Dept_ : EntityMetamodel<Dept> {
-                    private object EntityDescriptor {
-                        val id = PropertyDescriptor<Dept, kotlin.Int>(kotlin.Int::class, "ID", { it.id }) { (e, v) -> e.copy(id = v) }
-                        val createdAt = PropertyDescriptor<Dept, java.time.LocalDateTime>(java.time.LocalDateTime::class, "CREATEDAT", { it.createdAt }) { (e, v) -> e.copy(createdAt = v) }
-                        val updatedAt = PropertyDescriptor<Dept, java.time.LocalDateTime>(java.time.LocalDateTime::class, "UPDATEDAT", { it.updatedAt }) { (e, v) -> e.copy(updatedAt = v) }
-                    }
-                    val id by lazy { PropertyMetamodel(this, EntityDescriptor.id) }
-                    val createdAt by lazy { PropertyMetamodel(this, EntityDescriptor.createdAt) }
-                    val updatedAt by lazy { PropertyMetamodel(this, EntityDescriptor.updatedAt) }
-                    override fun tableName() = "DEPT"
-                    override fun identityProperties(): List<PropertyMetamodel<Dept, *>> = listOf(id)
-                    override fun versionProperty(): PropertyMetamodel<Dept, *>? = null
-                    override fun allProperties(): List<PropertyMetamodel<Dept, *>> = listOf(id, createdAt, updatedAt)
-                    override fun instantiate(a: Array<Any?>) = Dept(a[0] as kotlin.Int, a[1] as java.time.LocalDateTime, a[2] as java.time.LocalDateTime)
-                    override fun incrementVersion(e: Dept): Dept = e
-                    override fun setCreationClock(e: Dept, c: Clock): Dept = createdAt.set(e to java.time.LocalDateTime.now(c))
-                    override fun setUpdateClock(e: Dept, c: Clock): Dept = updatedAt.set(e to java.time.LocalDateTime.now(c))
-                }
-
-                """
-        )
-        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.OK)
+        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
+        assertThat(result.messages).contains("@KmIdentityGenerator and @KmSequenceGenerator cannot coexist on the same parameter.")
     }
 
-    @ExperimentalPathApi
-    private fun assertContent(path: String, @Language("kotlin") content: String) {
-        val kotlinDir = temporaryFolder.root.toPath().resolve("ksp/sources/kotlin")
-        val file = kotlinDir.resolve(path)
-        val actual = file.readText()
-        val expected = content.trimIndent()
-        assertThat(actual).isEqualTo(expected)
+    @Test
+    fun `Multiple Generators cannot coexist in a single class`() {
+        val result = compile(
+            kotlin(
+                "source.kt",
+                """
+                package test
+                import org.komapper.core.*
+                @KmEntity
+                data class Dept(
+                    @KmId @KmIdentityGenerator val id1: Int,
+                    @KmId @KmSequenceGenerator("ID", 100) val id2: Int
+                )
+                """
+            )
+        )
+        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
+        assertThat(result.messages).contains("Multiple Generators cannot coexist in a single class.")
+    }
+
+    @Test
+    fun `@KmVersion cannot apply to String type`() {
+        val result = compile(
+            kotlin(
+                "source.kt",
+                """
+                package test
+                import org.komapper.core.*
+                @KmEntity
+                data class Dept(
+                    @KmVersion val aaa: String
+                )
+                """
+            )
+        )
+        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
+        assertThat(result.messages).contains("@KmVersion cannot apply to String type.")
+    }
+
+    @Test
+    fun `@KmCreatedAt cannot apply to String type`() {
+        val result = compile(
+            kotlin(
+                "source.kt",
+                """
+                package test
+                import org.komapper.core.*
+                @KmEntity
+                data class Dept(
+                    @KmCreatedAt val aaa: String
+                )
+                """
+            )
+        )
+        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
+        assertThat(result.messages).contains("@KmCreatedAt cannot apply to String type.")
+    }
+
+    @Test
+    fun `@KmUpdatedAt cannot apply to String type`() {
+        val result = compile(
+            kotlin(
+                "source.kt",
+                """
+                package test
+                import org.komapper.core.*
+                @KmEntity
+                data class Dept(
+                    @KmUpdatedAt val aaa: String
+                )
+                """
+            )
+        )
+        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
+        assertThat(result.messages).contains("@KmUpdatedAt cannot apply to String type.")
+    }
+
+    @Test
+    fun `@KmIgnore annotated parameter must have default value`() {
+        val result = compile(
+            kotlin(
+                "source.kt",
+                """
+                package test
+                import org.komapper.core.*
+                @KmEntity
+                data class Dept(
+                    @KmIgnore val aaa: String
+                )
+                """
+            )
+        )
+        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
+        assertThat(result.messages).contains("@KmIgnore annotated parameter must have default value.")
+    }
+
+    @Test
+    fun `@KmIdentityGenerator cannot apply to String type`() {
+        val result = compile(
+            kotlin(
+                "source.kt",
+                """
+                package test
+                import org.komapper.core.*
+                @KmEntity
+                data class Dept(
+                    @KmId @KmIdentityGenerator val id: String
+                )
+                """
+            )
+        )
+        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
+        assertThat(result.messages).contains("@KmIdentityGenerator cannot apply to String type.")
+    }
+
+    @Test
+    fun `@KmSequenceGenerator cannot apply to String type`() {
+        val result = compile(
+            kotlin(
+                "source.kt",
+                """
+                package test
+                import org.komapper.core.*
+                @KmEntity
+                data class Dept(
+                    @KmId @KmSequenceGenerator("ID", 100) val id: String
+                )
+                """
+            )
+        )
+        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
+        assertThat(result.messages).contains("@KmSequenceGenerator cannot apply to String type.")
+    }
+
+    @Test
+    fun `@KmSequenceGenerator name is not found`() {
+        val result = compile(
+            kotlin(
+                "source.kt",
+                """
+                package test
+                import org.komapper.core.*
+                @KmEntity
+                data class Dept(
+                    @KmId @KmSequenceGenerator() val id: Int
+                )
+                """
+            )
+        )
+        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
+        assertThat(result.messages).contains("@KmSequenceGenerator.name is not found.")
+    }
+
+    @Test
+    fun `@KmSequenceGenerator incrementBy is not found`() {
+        val result = compile(
+            kotlin(
+                "source.kt",
+                """
+                package test
+                import org.komapper.core.*
+                @KmEntity
+                data class Dept(
+                    @KmId @KmSequenceGenerator("ID_SEQ") val id: Int
+                )
+                """
+            )
+        )
+        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
+        assertThat(result.messages).contains("@KmSequenceGenerator.incrementBy is not found.")
     }
 
     private fun prepareCompilation(vararg sourceFiles: SourceFile): KotlinCompilation {
@@ -324,7 +410,7 @@ class EntityProcessorTest {
                 symbolProcessors = listOf(EntityProcessor())
                 sources = sourceFiles.asList()
                 verbose = false
-                kspIncremental = true
+                kspIncremental = false
             }
     }
 
