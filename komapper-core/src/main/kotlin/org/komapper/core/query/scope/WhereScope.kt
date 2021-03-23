@@ -5,6 +5,7 @@ import org.komapper.core.metamodel.PropertyMetamodel
 import org.komapper.core.query.context.WhereContext
 import org.komapper.core.query.data.Criterion
 import org.komapper.core.query.data.Operand
+import org.komapper.core.query.option.LikeOption
 
 @Scope
 class WhereScope internal constructor(private val context: WhereContext) {
@@ -102,6 +103,38 @@ class WhereScope internal constructor(private val context: WhereContext) {
         context.add(Criterion::GraterEq, this, operand)
     }
 
+    infix fun <T : CharSequence> PropertyMetamodel<*, T>.like(operand: Any?) {
+        if (operand == null) return
+        context.add(Criterion::Like, this, operand, LikeOption.None)
+    }
+
+    infix fun <T : CharSequence> PropertyMetamodel<*, T>.like(operand: LikeOperand) {
+        val value = operand.value ?: return
+        val option = createLikeOption(operand)
+        context.add(Criterion::Like, this, value, option)
+    }
+
+    infix fun <T : CharSequence> PropertyMetamodel<*, T>.notLike(operand: Any?) {
+        if (operand == null) return
+        context.add(Criterion::NotLike, this, operand, LikeOption.None)
+    }
+
+    infix fun <T : CharSequence> PropertyMetamodel<*, T>.notLike(operand: LikeOperand) {
+        val value = operand.value ?: return
+        val option = createLikeOption(operand)
+        context.add(Criterion::NotLike, this, value, option)
+    }
+
+    private fun createLikeOption(operand: LikeOperand): LikeOption {
+        return when (operand) {
+            is LikeOperand.Normal -> LikeOption.None
+            is LikeOperand.Escape -> LikeOption.Escape(operand.escapeChar)
+            is LikeOperand.Prefix -> LikeOption.Prefix(operand.escapeChar)
+            is LikeOperand.Infix -> LikeOption.Infix(operand.escapeChar)
+            is LikeOperand.Suffix -> LikeOption.Suffix(operand.escapeChar)
+        }
+    }
+
     infix fun <T : Any> PropertyMetamodel<*, T>.inList(values: List<T?>) {
         val o1 = Operand.Property(this)
         val o2 = values.map { Operand.Parameter(this, it) }
@@ -132,5 +165,21 @@ class WhereScope internal constructor(private val context: WhereContext) {
         val scope = WhereScope(subContext)
         declaration(scope)
         context.add(operator(criteria))
+    }
+
+    fun <T : CharSequence> T?.escape(): LikeOperand {
+        return LikeOperand.Escape(this)
+    }
+
+    fun <T : CharSequence> T?.asPrefix(): LikeOperand {
+        return LikeOperand.Prefix(this)
+    }
+
+    fun <T : CharSequence> T?.asInfix(): LikeOperand {
+        return LikeOperand.Infix(this)
+    }
+
+    fun <T : CharSequence> T?.asSuffix(): LikeOperand {
+        return LikeOperand.Suffix(this)
     }
 }

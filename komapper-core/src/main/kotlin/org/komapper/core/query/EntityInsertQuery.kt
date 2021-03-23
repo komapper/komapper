@@ -44,9 +44,8 @@ internal class EntityInsertQueryImpl<ENTITY>(private val entityMetamodel: Entity
         return command.execute()
     }
 
-    override fun toSql(config: DefaultDatabaseConfig): String {
-        val statement = buildStatement(config, entity)
-        return statement.sql
+    override fun toStatement(config: DefaultDatabaseConfig): Statement {
+        return buildStatement(config, entity)
     }
 
     private fun buildStatement(config: DefaultDatabaseConfig, entity: ENTITY): Statement {

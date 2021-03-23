@@ -11,6 +11,7 @@ import org.komapper.core.query.context.SelectContext
 import org.komapper.core.query.data.Criterion
 import org.komapper.core.query.data.Operand
 import org.komapper.core.query.data.SortItem
+import org.komapper.core.query.option.LikeOption
 
 internal class SelectStatementBuilder<ENTITY>(val config: DefaultDatabaseConfig, val context: SelectContext<ENTITY>) {
     private val aliasManager = AliasManager(context)
@@ -91,19 +92,21 @@ internal class SelectStatementBuilder<ENTITY>(val config: DefaultDatabaseConfig,
         return alias + "." + propertyMetamodel.columnName
     }
 
-    private fun visitCriterion(index: Int, criterion: Criterion) {
-        when (criterion) {
-            is Criterion.Eq -> binaryOperation(criterion.left, criterion.right, "=")
-            is Criterion.NotEq -> binaryOperation(criterion.left, criterion.right, "<>")
-            is Criterion.Less -> binaryOperation(criterion.left, criterion.right, "<")
-            is Criterion.LessEq -> binaryOperation(criterion.left, criterion.right, "<=")
-            is Criterion.Grater -> binaryOperation(criterion.left, criterion.right, ">")
-            is Criterion.GraterEq -> binaryOperation(criterion.left, criterion.right, ">=")
-            is Criterion.InList -> inListOperation(criterion.left, criterion.right)
-            is Criterion.NotInList -> inListOperation(criterion.left, criterion.right, true)
-            is Criterion.And -> logicalBinaryOperation("and", criterion.criteria, index)
-            is Criterion.Or -> logicalBinaryOperation("or", criterion.criteria, index)
-            is Criterion.Not -> notOperation(criterion.criteria)
+    private fun visitCriterion(index: Int, c: Criterion) {
+        when (c) {
+            is Criterion.Eq -> binaryOperation(c.left, c.right, "=")
+            is Criterion.NotEq -> binaryOperation(c.left, c.right, "<>")
+            is Criterion.Less -> binaryOperation(c.left, c.right, "<")
+            is Criterion.LessEq -> binaryOperation(c.left, c.right, "<=")
+            is Criterion.Grater -> binaryOperation(c.left, c.right, ">")
+            is Criterion.GraterEq -> binaryOperation(c.left, c.right, ">=")
+            is Criterion.Like -> likeOperation(c.left, c.right, c.option)
+            is Criterion.NotLike -> likeOperation(c.left, c.right, c.option, true)
+            is Criterion.InList -> inListOperation(c.left, c.right)
+            is Criterion.NotInList -> inListOperation(c.left, c.right, true)
+            is Criterion.And -> logicalBinaryOperation("and", c.criteria, index)
+            is Criterion.Or -> logicalBinaryOperation("or", c.criteria, index)
+            is Criterion.Not -> notOperation(c.criteria)
         }
     }
 
@@ -111,6 +114,42 @@ internal class SelectStatementBuilder<ENTITY>(val config: DefaultDatabaseConfig,
         visitOperand(left)
         buf.append(" $operator ")
         visitOperand(right)
+    }
+
+    private fun likeOperation(left: Operand, right: Operand, option: LikeOption, not: Boolean = false) {
+        visitOperand(left)
+        if (not) {
+            buf.append(" not")
+        }
+        buf.append(" like ")
+        visitLikeOperand(right, option)
+    }
+
+    private fun visitLikeOperand(operand: Operand, option: LikeOption) {
+        fun bind(value: Any?, mapper: (CharSequence) -> String, escape: (CharSequence) -> (CharSequence)) {
+            if (value == null) {
+                buf.bind(Value(null, String::class))
+            } else {
+                val text = mapper(escape(value.toString()))
+                buf.bind(Value(text.toString(), String::class))
+            }
+        }
+        when (operand) {
+            is Operand.Property -> {
+                buf.append(columnName(operand.metamodel))
+            }
+            is Operand.Parameter -> {
+                val value = operand.value
+                val escape = config.dialect::escape
+                when (option) {
+                    is LikeOption.None -> bind(value, { it.toString() }, { it })
+                    is LikeOption.Escape -> bind(value, { it.toString() }, escape)
+                    is LikeOption.Prefix -> bind(value, { "$it%" }, escape)
+                    is LikeOption.Infix -> bind(value, { "%$it%" }, escape)
+                    is LikeOption.Suffix -> bind(value, { "%$it" }, escape)
+                }
+            }
+        }
     }
 
     private fun inListOperation(left: Operand, right: List<Operand>, not: Boolean = false) {

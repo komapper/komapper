@@ -16,7 +16,7 @@ class EntitySelectQueryTest {
         val query = EntityQuery.from(a).where { a.id eq 1 }
         assertEquals(
             "select t0_.ID, t0_.STREET, t0_.VERSION from ADDRESS t0_ where t0_.ID = ?",
-            query.toSql(config)
+            query.toStatement(config).sql
         )
     }
 
@@ -29,7 +29,7 @@ class EntitySelectQueryTest {
         }.where { a.id eq 1 }
         assertEquals(
             "select t0_.ID, t0_.STREET, t0_.VERSION from ADDRESS t0_ inner join EMP t1_ on (t0_.ID = t1_.ADDRESS_ID) where t0_.ID = ?",
-            query.toSql(config)
+            query.toStatement(config).sql
         )
     }
 
@@ -42,7 +42,7 @@ class EntitySelectQueryTest {
         }.where { a.id eq 1 }
         assertEquals(
             "select t0_.ID, t0_.STREET, t0_.VERSION from ADDRESS t0_ left outer join EMP t1_ on (t0_.ID = t1_.ADDRESS_ID) where t0_.ID = ?",
-            query.toSql(config)
+            query.toStatement(config).sql
         )
     }
 
@@ -52,7 +52,7 @@ class EntitySelectQueryTest {
         val query = EntityQuery.delete(a, Address(1, "street", 0))
         assertEquals(
             "delete from ADDRESS t0_ where t0_.ID = ? and t0_.VERSION = ?",
-            query.toSql(config)
+            query.toStatement(config).sql
         )
     }
 
@@ -62,7 +62,7 @@ class EntitySelectQueryTest {
         val query = EntityQuery.update(a, Address(1, "street", 0))
         assertEquals(
             "update ADDRESS t0_ set t0_.STREET = ?, t0_.VERSION = ? + 1 where t0_.ID = ? and t0_.VERSION = ?",
-            query.toSql(config)
+            query.toStatement(config).sql
         )
     }
 
@@ -72,7 +72,7 @@ class EntitySelectQueryTest {
         val query = EntityQuery.insert(a, Address(1, "street", 0))
         assertEquals(
             "insert into ADDRESS (ID, STREET, VERSION) values (?, ?, ?)",
-            query.toSql(config)
+            query.toStatement(config).sql
         )
     }
 
@@ -86,7 +86,7 @@ class EntitySelectQueryTest {
         ) {
             Address(asInt("id"), asString(""), asInt("version"))
         }
-        assertEquals("select id, street, version from Address where id = ?", query.toSql(config))
+        assertEquals("select id, street, version from Address where id = ?", query.toStatement(config).sql)
     }
 
     @Test
@@ -99,14 +99,14 @@ class EntitySelectQueryTest {
             params,
             { Address(asInt("id"), asString(""), asInt("version")) }
         ) { seq -> seq.map { it.id }.first() }
-        assertEquals("select id, street, version from Address where id = ?", query.toSql(config))
+        assertEquals("select id, street, version from Address where id = ?", query.toStatement(config).sql)
     }
 
     @Test
     fun script() {
         val script = "insert into Address (id, street, version) values (2, 'Kyoto', 0)"
         val query = ScriptQuery.create(script)
-        assertEquals(script, query.toSql(config))
+        assertEquals(script, query.toStatement(config).sql)
     }
 
     @Test
@@ -122,7 +122,7 @@ class EntitySelectQueryTest {
         val query = EntityQuery.from(a).where(w3)
         assertEquals(
             "select t0_.ID, t0_.STREET, t0_.VERSION from ADDRESS t0_ where t0_.ID = ? and t0_.STREET = ?",
-            query.toSql(config)
+            query.toStatement(config).sql
         )
     }
 }

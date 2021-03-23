@@ -13,14 +13,14 @@ interface ScriptQuery : Query<Unit> {
 }
 
 internal class ScriptQueryImpl(private val sql: String) : ScriptQuery {
+    private val statement = Statement(sql, emptyList(), sql)
 
     override fun run(config: DefaultDatabaseConfig) {
-        val statement = Statement(sql, emptyList(), sql)
         val command = ScriptCommand(config, statement)
         return command.execute()
     }
 
-    override fun toSql(config: DefaultDatabaseConfig): String {
-        return sql
+    override fun toStatement(config: DefaultDatabaseConfig): Statement {
+        return statement
     }
 }

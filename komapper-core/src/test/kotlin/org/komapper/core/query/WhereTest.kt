@@ -18,7 +18,7 @@ internal class WhereTest {
         }
         assertEquals(
             "select t0_.ID, t0_.STREET, t0_.VERSION from ADDRESS t0_ where t0_.ID = ? and t0_.ID = t0_.VERSION and ? = t0_.ID",
-            query.toSql(config)
+            query.toStatement(config).sql
         )
     }
 
@@ -30,7 +30,7 @@ internal class WhereTest {
         }
         assertEquals(
             "select t0_.ID, t0_.STREET, t0_.VERSION from ADDRESS t0_",
-            query.toSql(config)
+            query.toStatement(config).sql
         )
     }
 
@@ -44,7 +44,79 @@ internal class WhereTest {
         }
         assertEquals(
             "select t0_.ID, t0_.STREET, t0_.VERSION from ADDRESS t0_ where t0_.ID <> ? and t0_.ID <> t0_.VERSION and ? <> t0_.ID",
-            query.toSql(config)
+            query.toStatement(config).sql
+        )
+    }
+
+    @Test
+    fun like() {
+        val a = Address.metamodel()
+        val query = EntityQuery.from(a).where {
+            a.street like "%abc"
+        }
+        assertEquals(
+            "select t0_.ID, t0_.STREET, t0_.VERSION from ADDRESS t0_ where t0_.STREET like '%abc'",
+            query.toStatement(config).log
+        )
+    }
+
+    @Test
+    fun like_escape() {
+        val a = Address.metamodel()
+        val query = EntityQuery.from(a).where {
+            a.street like "%abc".escape()
+        }
+        assertEquals(
+            "select t0_.ID, t0_.STREET, t0_.VERSION from ADDRESS t0_ where t0_.STREET like '\\%abc'",
+            query.toStatement(config).log
+        )
+    }
+
+    @Test
+    fun like_prefix() {
+        val a = Address.metamodel()
+        val query = EntityQuery.from(a).where {
+            a.street like "ab%c".asPrefix()
+        }
+        assertEquals(
+            "select t0_.ID, t0_.STREET, t0_.VERSION from ADDRESS t0_ where t0_.STREET like 'ab\\%c%'",
+            query.toStatement(config).log
+        )
+    }
+
+    @Test
+    fun like_infix() {
+        val a = Address.metamodel()
+        val query = EntityQuery.from(a).where {
+            a.street like "ab%c".asInfix()
+        }
+        assertEquals(
+            "select t0_.ID, t0_.STREET, t0_.VERSION from ADDRESS t0_ where t0_.STREET like '%ab\\%c%'",
+            query.toStatement(config).log
+        )
+    }
+
+    @Test
+    fun like_suffix() {
+        val a = Address.metamodel()
+        val query = EntityQuery.from(a).where {
+            a.street like "ab%c".asSuffix()
+        }
+        assertEquals(
+            "select t0_.ID, t0_.STREET, t0_.VERSION from ADDRESS t0_ where t0_.STREET like '%ab\\%c'",
+            query.toStatement(config).log
+        )
+    }
+
+    @Test
+    fun notLike() {
+        val a = Address.metamodel()
+        val query = EntityQuery.from(a).where {
+            a.street notLike "%abc"
+        }
+        assertEquals(
+            "select t0_.ID, t0_.STREET, t0_.VERSION from ADDRESS t0_ where t0_.STREET not like '%abc'",
+            query.toStatement(config).log
         )
     }
 
@@ -56,7 +128,7 @@ internal class WhereTest {
         }
         assertEquals(
             "select t0_.ID, t0_.STREET, t0_.VERSION from ADDRESS t0_ where t0_.ID in (?, ?, ?)",
-            query.toSql(config)
+            query.toStatement(config).sql
         )
     }
 
@@ -68,7 +140,7 @@ internal class WhereTest {
         }
         assertEquals(
             "select t0_.ID, t0_.STREET, t0_.VERSION from ADDRESS t0_ where t0_.ID not in (?, ?, ?)",
-            query.toSql(config)
+            query.toStatement(config).sql
         )
     }
 
@@ -84,7 +156,7 @@ internal class WhereTest {
         }
         assertEquals(
             "select t0_.ID, t0_.STREET, t0_.VERSION from ADDRESS t0_ where t0_.ID = ? and (t0_.STREET = ? and t0_.VERSION = ?)",
-            query.toSql(config)
+            query.toStatement(config).sql
         )
     }
 
@@ -100,7 +172,7 @@ internal class WhereTest {
         }
         assertEquals(
             "select t0_.ID, t0_.STREET, t0_.VERSION from ADDRESS t0_ where t0_.ID = ? or (t0_.STREET = ? and t0_.VERSION = ?)",
-            query.toSql(config)
+            query.toStatement(config).sql
         )
     }
 
@@ -116,7 +188,7 @@ internal class WhereTest {
         }
         assertEquals(
             "select t0_.ID, t0_.STREET, t0_.VERSION from ADDRESS t0_ where t0_.ID = ? and not (t0_.STREET = ? and t0_.VERSION = ?)",
-            query.toSql(config)
+            query.toStatement(config).sql
         )
     }
 }

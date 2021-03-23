@@ -19,11 +19,6 @@ internal class EntityUpdateQueryImpl<ENTITY>(
     EntityUpdateQuery<ENTITY> {
     private val context: UpdateContext<ENTITY> = UpdateContext(entityMetamodel)
 
-    override fun toSql(config: DefaultDatabaseConfig): String {
-        val statement = buildStatement(config, entity)
-        return statement.sql
-    }
-
     override fun run(config: DefaultDatabaseConfig): ENTITY {
         // TODO
         val clock = Clock.fixed(Instant.now(), ZoneId.systemDefault())
@@ -32,6 +27,10 @@ internal class EntityUpdateQueryImpl<ENTITY>(
         val statement = builder.build()
         val command = EntityUpdateCommand(entityMetamodel, newEntity, config, statement)
         return command.execute()
+    }
+
+    override fun toStatement(config: DefaultDatabaseConfig): Statement {
+        return buildStatement(config, entity)
     }
 
     private fun buildStatement(config: DefaultDatabaseConfig, entity: ENTITY): Statement {

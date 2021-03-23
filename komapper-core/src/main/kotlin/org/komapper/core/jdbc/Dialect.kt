@@ -31,6 +31,7 @@ interface Dialect {
     fun quote(name: String): String
     fun supportsMerge(): Boolean
     fun supportsUpsert(): Boolean
+    // TODO
     fun escape(text: CharSequence): CharSequence
 }
 

@@ -19,9 +19,8 @@ internal class EntityDeleteQueryImpl<ENTITY>(private val entityMetamodel: Entity
         command.execute()
     }
 
-    override fun toSql(config: DefaultDatabaseConfig): String {
-        val statement = buildStatement(config)
-        return statement.sql
+    override fun toStatement(config: DefaultDatabaseConfig): Statement {
+        return buildStatement(config)
     }
 
     private fun buildStatement(config: DefaultDatabaseConfig): Statement {
