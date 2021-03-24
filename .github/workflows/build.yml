@@ -71,7 +71,7 @@ jobs:
             ${{ runner.os }}-gradle-
 
       - name: Publish packages
-        run: ./gradlew publishToSonatype closeSonatypeStagingRepository
+        run: ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository
         env:
           ORG_GRADLE_PROJECT_signingKey: ${{ secrets.SIGNING_KEY }}
           ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.SIGNING_PASSWORD }}
