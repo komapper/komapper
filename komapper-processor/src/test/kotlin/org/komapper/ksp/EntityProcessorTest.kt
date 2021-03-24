@@ -14,7 +14,7 @@ class EntityProcessorTest {
 
     @TempDir
     @JvmField
-    var temporaryFolder: Path? = null
+    var tempDir: Path? = null
 
     @Test
     fun `@KmEntity must be applied to data class`() {
@@ -423,7 +423,7 @@ class EntityProcessorTest {
     private fun prepareCompilation(vararg sourceFiles: SourceFile): KotlinCompilation {
         return KotlinCompilation()
             .apply {
-                workingDir = temporaryFolder!!.toFile()
+                workingDir = tempDir!!.toFile()
                 inheritClassPath = true
                 symbolProcessors = listOf(EntityProcessor())
                 sources = sourceFiles.asList()
