@@ -1,7 +1,7 @@
 Komapper: Kotlin SQL Mapper
 ===========================
 
-[![Build](https://github.com/nakamura-to/komapper/actions/workflows/build.yml/badge.svg)](https://github.com/nakamura-to/komapper/actions/workflows/build.yml)
+[![Build](https://github.com/komapper/komapper/actions/workflows/build.yml/badge.svg)](https://github.com/komapper/komapper/actions/workflows/build.yml)
 
 Komapper is a simple database access library for Kotlin.
 
@@ -14,6 +14,8 @@ Supported databases are as follows:
 - Generate meta-models at compile-time using [google/ksp](https://github.com/google/ksp).
 - Flexible and natural syntax for criteria queries.
 - SQL templates, called “two-way SQL”.
+
+## Install
 
 ## Status
 
