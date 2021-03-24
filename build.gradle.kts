@@ -94,14 +94,15 @@ configure(subprojects.filter { it.name != "example" }) {
     }
 
     configure<SigningExtension> {
-//        val signingKey: String? by project
-//        val signingPassword: String? by project
-//        useInMemoryPgpKeys(signingKey, signingPassword)
+        val signingKey: String? by project
+        val signingPassword: String? by project
+        useInMemoryPgpKeys(signingKey, signingPassword)
         val publishing = convention.findByType(PublishingExtension::class)!!
         sign(publishing.publications)
         isRequired = isReleaseVersion
     }
 }
+
 rootProject.apply {
 
     release {
