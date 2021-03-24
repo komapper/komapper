@@ -8,19 +8,20 @@ import com.google.devtools.ksp.symbol.KSPropertyDeclaration
 import com.google.devtools.ksp.symbol.KSValueParameter
 import com.google.devtools.ksp.symbol.Nullability
 
-internal sealed class EntityVisitResult {
-    abstract val declaration: KSClassDeclaration
+internal sealed class EntityVisitorResult {
+    data class Success(val entity: Entity) : EntityVisitorResult()
 
-    data class Success(val entity: Entity) : EntityVisitResult() {
-        override val declaration = entity.declaration
-    }
-
-    data class Failure(
-        override val declaration: KSClassDeclaration,
+    data class Error(
         val message: String,
-        val node: KSNode?
+        val node: KSNode,
+        val declaration: KSClassDeclaration
     ) :
-        EntityVisitResult()
+        EntityVisitorResult()
+
+    data class Fatal(
+        val message: String,
+        val node: KSNode
+    ) : EntityVisitorResult()
 }
 
 internal data class Entity(

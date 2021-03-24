@@ -36,6 +36,24 @@ class EntityProcessorTest {
     }
 
     @Test
+    fun `@KmEntity cannot be applied to this element`() {
+        val result = compile(
+            kotlin(
+                "source.kt",
+                """
+                package test
+                import org.komapper.core.*
+                class Dept(
+                    @KmEntity val id: Int
+                )
+                """
+            )
+        )
+        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
+        assertThat(result.messages).contains("@KmEntity cannot be applied to this element.")
+    }
+
+    @Test
     fun `@KmEntity cannot be applied to private data class`() {
         val result = compile(
             kotlin(

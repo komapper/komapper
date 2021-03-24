@@ -7,19 +7,25 @@ import com.google.devtools.ksp.symbol.KSValueParameter
 import com.google.devtools.ksp.symbol.Modifier
 import com.google.devtools.ksp.visitor.KSEmptyVisitor
 
-internal class EntityVisitor : KSEmptyVisitor<Unit, EntityVisitResult>() {
+internal class EntityVisitor : KSEmptyVisitor<Unit, EntityVisitorResult>() {
 
-    override fun defaultHandler(node: KSNode, data: Unit): EntityVisitResult {
-        error("The node must be KSClassDeclaration.")
+    override fun defaultHandler(node: KSNode, data: Unit): EntityVisitorResult {
+        return EntityVisitorResult.Fatal("@KmEntity cannot be applied to this element.", node)
     }
 
-    override fun visitClassDeclaration(classDeclaration: KSClassDeclaration, data: Unit): EntityVisitResult {
-        val factory = EntityFactory(classDeclaration)
+    override fun visitClassDeclaration(classDeclaration: KSClassDeclaration, data: Unit): EntityVisitorResult {
         return try {
+            val factory = EntityFactory(classDeclaration)
             val entity = factory.create()
-            EntityVisitResult.Success(entity)
+            EntityVisitorResult.Success(entity)
         } catch (e: Exit) {
-            EntityVisitResult.Failure(classDeclaration, e.message, e.node)
+            val report = e.report
+            when (e.level) {
+                Level.ERROR ->
+                    EntityVisitorResult.Error(report.message, report.node, classDeclaration)
+                Level.FATAL ->
+                    EntityVisitorResult.Fatal(report.message, report.node)
+            }
         }
     }
 }
@@ -31,7 +37,11 @@ internal class EntityFactory(private val classDeclaration: KSClassDeclaration) {
             report("@KmEntity must be applied to data class.", classDeclaration)
         }
         if (modifiers.contains(Modifier.PRIVATE)) {
-            report("@KmEntity cannot be applied to private data class.", classDeclaration)
+            report(
+                "@KmEntity cannot be applied to private data class.",
+                classDeclaration,
+                Level.FATAL
+            )
         }
         if (classDeclaration.typeParameters.isNotEmpty()) {
             report("@KmEntity annotated class must not have type parameters.", classDeclaration)
@@ -248,4 +258,14 @@ internal class EntityFactory(private val classDeclaration: KSClassDeclaration) {
         val property = idGeneratorProperties.firstOrNull() ?: return null
         return IdGenerator(property)
     }
+}
+
+private enum class Level { ERROR, FATAL }
+
+private data class Report(val message: String, val node: KSNode)
+
+private class Exit(val level: Level, val report: Report) : Exception()
+
+private fun report(message: String, node: KSNode, level: Level = Level.ERROR): Nothing {
+    throw Exit(level, Report(message, node))
 }

@@ -1,6 +1,5 @@
 package org.komapper.ksp
 
-import com.google.devtools.ksp.isPrivate
 import com.google.devtools.ksp.processing.CodeGenerator
 import com.google.devtools.ksp.processing.Dependencies
 import com.google.devtools.ksp.processing.KSPLogger
@@ -31,31 +30,33 @@ class EntityProcessor : SymbolProcessor {
         val symbols = resolver.getSymbolsWithAnnotation("org.komapper.core.KmEntity")
         for (symbol in symbols) {
             val result = symbol.accept(EntityVisitor(), Unit)
-            if (result is EntityVisitResult.Failure) {
-                // log before continue
-                logger.error(result.message, result.node)
+            val (entity, declaration) = when (result) {
+                is EntityVisitorResult.Success ->
+                    result.entity to result.entity.declaration
+                is EntityVisitorResult.Error -> {
+                    logger.error(result.message, result.node)
+                    null to result.declaration
+                }
+                is EntityVisitorResult.Fatal -> {
+                    logger.error(result.message, result.node)
+                    continue
+                }
             }
-            if (result.declaration.isPrivate()) {
-                continue
-            }
-            val packageName = result.declaration.packageName.asString()
-            val entityQualifiedName = result.declaration.qualifiedName?.asString() ?: ""
+            val packageName = declaration.packageName.asString()
+            val entityQualifiedName = declaration.qualifiedName?.asString() ?: ""
             val entityTypeName = entityQualifiedName.removePrefix("$packageName.")
             val simpleName = entityTypeName.replace(".", "_") + "_"
-            val file = result.declaration.containingFile!!
+            val file = declaration.containingFile!!
             codeGenerator.createNewFile(Dependencies(false, file), packageName, simpleName).use { out ->
                 PrintWriter(out).use {
-                    val runnable = when (result) {
-                        is EntityVisitResult.Success -> {
-                            EntityMetamodelGenerator(
-                                result.entity, packageName, entityTypeName, simpleName, it
-                            )
-                        }
-                        is EntityVisitResult.Failure -> {
-                            EmptyMetamodelGenerator(
-                                result.declaration, packageName, entityTypeName, simpleName, it
-                            )
-                        }
+                    val runnable = if (entity != null) {
+                        EntityMetamodelGenerator(
+                            entity, packageName, entityTypeName, simpleName, it
+                        )
+                    } else {
+                        EmptyMetamodelGenerator(
+                            declaration, packageName, entityTypeName, simpleName, it
+                        )
                     }
                     runnable.run()
                 }
