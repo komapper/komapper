@@ -56,7 +56,6 @@ subprojects {
         "testRuntimeOnly"("org.junit.jupiter:junit-jupiter-engine:5.7.1")
         "testRuntimeOnly"("org.junit.vintage:junit-vintage-engine:5.7.1")
     }
-
 }
 
 configure(subprojects.filter { it.name != "example" }) {
