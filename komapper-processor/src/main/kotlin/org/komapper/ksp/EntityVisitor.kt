@@ -19,7 +19,7 @@ internal class EntityVisitor : KSEmptyVisitor<Unit, EntityVisitResult>() {
             val entity = factory.create()
             EntityVisitResult.Success(entity)
         } catch (e: Exit) {
-            EntityVisitResult.Failure(classDeclaration, e)
+            EntityVisitResult.Failure(classDeclaration, e.message, e.node)
         }
     }
 }

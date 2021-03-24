@@ -3,6 +3,7 @@ package org.komapper.ksp
 import com.google.devtools.ksp.isPrivate
 import com.google.devtools.ksp.symbol.KSAnnotation
 import com.google.devtools.ksp.symbol.KSClassDeclaration
+import com.google.devtools.ksp.symbol.KSNode
 import com.google.devtools.ksp.symbol.KSPropertyDeclaration
 import com.google.devtools.ksp.symbol.KSValueParameter
 import com.google.devtools.ksp.symbol.Nullability
@@ -16,7 +17,8 @@ internal sealed class EntityVisitResult {
 
     data class Failure(
         override val declaration: KSClassDeclaration,
-        val exit: Exit
+        val message: String,
+        val node: KSNode?
     ) :
         EntityVisitResult()
 }

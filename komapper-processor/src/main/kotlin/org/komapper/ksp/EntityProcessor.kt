@@ -32,9 +32,8 @@ class EntityProcessor : SymbolProcessor {
         for (symbol in symbols) {
             val result = symbol.accept(EntityVisitor(), Unit)
             if (result is EntityVisitResult.Failure) {
-                val exit = result.exit
                 // log before continue
-                logger.error(exit.message, exit.node)
+                logger.error(result.message, result.node)
             }
             if (result.declaration.isPrivate()) {
                 continue
