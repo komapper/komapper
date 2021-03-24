@@ -2,9 +2,11 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 
 plugins {
+    base
     kotlin("jvm") version "1.4.30" apply false
     id("org.jlleitschuh.gradle.ktlint") version "10.0.0"
     id("io.github.gradle-nexus.publish-plugin") version "1.0.0"
+    id("net.researchgate.release") version "2.8.1"
 }
 
 val isReleaseVersion = !version.toString().endsWith("SNAPSHOT")
@@ -102,6 +104,10 @@ configure(subprojects.filter {it.name != "example"}) {
     }
 }
 rootProject.apply {
+
+    release {
+        newVersionCommitMessage = "[Gradle Release Plugin] - [skip ci] new version commit: "
+    }
 
     nexusPublishing {
         repositories {
