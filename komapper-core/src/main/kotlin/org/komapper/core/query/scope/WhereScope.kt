@@ -135,6 +135,18 @@ class WhereScope internal constructor(private val context: WhereContext) {
         }
     }
 
+    infix fun <T : Comparable<T>> PropertyMetamodel<*, T>.between(range: ClosedRange<T>) {
+        val left = Operand.Property(this)
+        val right = Operand.Parameter(this, range.start) to Operand.Parameter(this, range.endInclusive)
+        context.add(Criterion.Between(left, right))
+    }
+
+    infix fun <T : Comparable<T>> PropertyMetamodel<*, T>.notBetween(range: ClosedRange<T>) {
+        val left = Operand.Property(this)
+        val right = Operand.Parameter(this, range.start) to Operand.Parameter(this, range.endInclusive)
+        context.add(Criterion.NotBetween(left, right))
+    }
+
     infix fun <T : Any> PropertyMetamodel<*, T>.inList(values: List<T?>) {
         val o1 = Operand.Property(this)
         val o2 = values.map { Operand.Parameter(this, it) }

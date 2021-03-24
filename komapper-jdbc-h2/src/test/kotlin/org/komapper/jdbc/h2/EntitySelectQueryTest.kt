@@ -178,6 +178,28 @@ class EntitySelectQueryTest(private val db: Database) {
     }
 
     @Test
+    fun between() {
+        val a = Address.metamodel()
+        val idList = db.list {
+            EntityQuery.from(a).where {
+                a.addressId between 5..10
+            }.orderBy(a.addressId)
+        }
+        assertEquals((5..10).toList(), idList.map { it.addressId })
+    }
+
+    @Test
+    fun notBetween() {
+        val a = Address.metamodel()
+        val idList = db.list {
+            EntityQuery.from(a).where {
+                a.addressId notBetween 5..10
+            }.orderBy(a.addressId)
+        }
+        val ids = (1..4) + (11..15)
+        assertEquals(ids.toList(), idList.map { it.addressId })
+    }
+    @Test
     fun not() {
         val a = Address.metamodel()
         val idList = db.list {

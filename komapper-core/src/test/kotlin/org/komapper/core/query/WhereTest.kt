@@ -121,6 +121,30 @@ internal class WhereTest {
     }
 
     @Test
+    fun between() {
+        val a = Address.metamodel()
+        val query = EntityQuery.from(a).where {
+            a.id between 1..3
+        }
+        assertEquals(
+            "select t0_.ID, t0_.STREET, t0_.VERSION from ADDRESS t0_ where t0_.ID between ? and ?",
+            query.toStatement(config).sql
+        )
+    }
+
+    @Test
+    fun notBetween() {
+        val a = Address.metamodel()
+        val query = EntityQuery.from(a).where {
+            a.id notBetween 1..3
+        }
+        assertEquals(
+            "select t0_.ID, t0_.STREET, t0_.VERSION from ADDRESS t0_ where t0_.ID not between ? and ?",
+            query.toStatement(config).sql
+        )
+    }
+
+    @Test
     fun inList() {
         val a = Address.metamodel()
         val query = EntityQuery.from(a).where {

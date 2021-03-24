@@ -102,6 +102,8 @@ internal class SelectStatementBuilder<ENTITY>(val config: DefaultDatabaseConfig,
             is Criterion.GraterEq -> binaryOperation(c.left, c.right, ">=")
             is Criterion.Like -> likeOperation(c.left, c.right, c.option)
             is Criterion.NotLike -> likeOperation(c.left, c.right, c.option, true)
+            is Criterion.Between -> betweenOperation(c.left, c.right)
+            is Criterion.NotBetween -> betweenOperation(c.left, c.right, true)
             is Criterion.InList -> inListOperation(c.left, c.right)
             is Criterion.NotInList -> inListOperation(c.left, c.right, true)
             is Criterion.And -> logicalBinaryOperation("and", c.criteria, index)
@@ -123,6 +125,18 @@ internal class SelectStatementBuilder<ENTITY>(val config: DefaultDatabaseConfig,
         }
         buf.append(" like ")
         visitLikeOperand(right, option)
+    }
+
+    private fun betweenOperation(left: Operand, right: Pair<Operand, Operand>, not: Boolean = false) {
+        visitOperand(left)
+        if (not) {
+            buf.append(" not")
+        }
+        buf.append(" between ")
+        val (start, end) = right
+        visitOperand(start)
+        buf.append(" and ")
+        visitOperand(end)
     }
 
     private fun visitLikeOperand(operand: Operand, option: LikeOption) {
