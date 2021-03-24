@@ -56,10 +56,10 @@ subprojects {
         "testRuntimeOnly"("org.junit.jupiter:junit-jupiter-engine:5.7.1")
         "testRuntimeOnly"("org.junit.vintage:junit-vintage-engine:5.7.1")
     }
-    
+
 }
 
-configure(subprojects.filter {it.name != "example"}) {
+configure(subprojects.filter { it.name != "example" }) {
 
     configure<PublishingExtension> {
         publications {
@@ -107,6 +107,9 @@ rootProject.apply {
 
     release {
         newVersionCommitMessage = "[Gradle Release Plugin] - [skip ci] new version commit: "
+        with(propertyMissing("git") as net.researchgate.release.GitAdapter.GitConfig) {
+            requireBranch = "main"
+        }
     }
 
     nexusPublishing {
