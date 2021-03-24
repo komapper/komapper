@@ -6,15 +6,15 @@ import com.tschuchort.compiletesting.SourceFile
 import com.tschuchort.compiletesting.SourceFile.Companion.kotlin
 import com.tschuchort.compiletesting.kspIncremental
 import com.tschuchort.compiletesting.symbolProcessors
-import org.junit.Rule
-import org.junit.Test
-import org.junit.rules.TemporaryFolder
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.io.TempDir
+import java.nio.file.Path
 
 class EntityProcessorTest {
 
-    @Rule
+    @TempDir
     @JvmField
-    val temporaryFolder: TemporaryFolder = TemporaryFolder()
+    var temporaryFolder: Path? = null
 
     @Test
     fun `@KmEntity must be applied to data class`() {
@@ -423,7 +423,7 @@ class EntityProcessorTest {
     private fun prepareCompilation(vararg sourceFiles: SourceFile): KotlinCompilation {
         return KotlinCompilation()
             .apply {
-                workingDir = temporaryFolder.root
+                workingDir = temporaryFolder!!.toFile()
                 inheritClassPath = true
                 symbolProcessors = listOf(EntityProcessor())
                 sources = sourceFiles.asList()
