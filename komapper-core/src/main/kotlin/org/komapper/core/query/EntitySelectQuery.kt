@@ -34,6 +34,7 @@ interface EntitySelectQuery<ENTITY> : Query<List<ENTITY>> {
     fun forUpdate(): EntitySelectQuery<ENTITY>
 }
 
+// TODO is this necessary?
 interface EntitySelectQuery1<ENTITY> : EntitySelectQuery<ENTITY> {
 
     override fun where(declaration: WhereDeclaration): EntitySelectQuery1<ENTITY>
@@ -67,23 +68,6 @@ interface EntitySelectSubQuery<ENTITY> {
     fun select(propertyMetamodel: PropertyMetamodel<*, *>): SingleProjection
 }
 
-interface EntitySelectSubQuery1<ENTITY> : EntitySelectSubQuery<ENTITY> {
-    override fun <OTHER_ENTITY> innerJoin(
-        entityMetamodel: EntityMetamodel<OTHER_ENTITY>,
-        declaration: JoinDeclaration<OTHER_ENTITY>
-    ): EntitySelectSubQuery1<ENTITY>
-
-    override fun <OTHER_ENTITY> leftJoin(
-        entityMetamodel: EntityMetamodel<OTHER_ENTITY>,
-        declaration: JoinDeclaration<OTHER_ENTITY>
-    ): EntitySelectSubQuery1<ENTITY>
-
-    override fun where(declaration: WhereDeclaration): EntitySelectSubQuery1<ENTITY>
-    override fun orderBy(vararg sortItems: PropertyMetamodel<*, *>): EntitySelectSubQuery1<ENTITY>
-    override fun offset(value: Int): EntitySelectSubQuery1<ENTITY>
-    override fun limit(value: Int): EntitySelectSubQuery1<ENTITY>
-}
-
 sealed class SingleProjection {
     internal data class ContextHolder(val context: SelectContext<*>) : SingleProjection()
 }
@@ -94,8 +78,7 @@ internal class EntitySelectQueryImpl<ENTITY>(
 ) :
     EntitySelectQuery<ENTITY>,
     EntitySelectQuery1<ENTITY>,
-    EntitySelectSubQuery<ENTITY>,
-    EntitySelectSubQuery1<ENTITY> {
+    EntitySelectSubQuery<ENTITY> {
 
     override fun <OTHER_ENTITY> innerJoin(
         entityMetamodel: EntityMetamodel<OTHER_ENTITY>,
