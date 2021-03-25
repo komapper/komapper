@@ -1,11 +1,11 @@
 package org.komapper.core.query.command
 
-import org.komapper.core.DefaultDatabaseConfig
+import org.komapper.core.DatabaseConfig
 import org.komapper.core.data.Statement
 import org.komapper.core.jdbc.Executor
 
 internal class ScriptCommand(
-    config: DefaultDatabaseConfig,
+    config: DatabaseConfig,
     override val statement: Statement
 ) : Command<Unit> {
 

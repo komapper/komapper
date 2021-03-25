@@ -1,6 +1,6 @@
 package org.komapper.core.jdbc
 
-import org.komapper.core.DefaultDatabaseConfig
+import org.komapper.core.DatabaseConfig
 import org.komapper.core.UniqueConstraintException
 import org.komapper.core.data.Statement
 import org.komapper.core.data.Value
@@ -10,7 +10,7 @@ import java.sql.ResultSet
 import java.sql.SQLException
 
 internal class Executor(
-    private val config: DefaultDatabaseConfig,
+    private val config: DatabaseConfig,
     private val prepare: (Connection, String) -> PreparedStatement = { con, sql ->
         con.prepareStatement(sql)
     }

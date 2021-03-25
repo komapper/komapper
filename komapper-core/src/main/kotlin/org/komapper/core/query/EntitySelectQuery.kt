@@ -1,19 +1,14 @@
 package org.komapper.core.query
 
-import org.komapper.core.DefaultDatabaseConfig
+import org.komapper.core.DatabaseConfig
 import org.komapper.core.data.Statement
 import org.komapper.core.metamodel.EntityMetamodel
 import org.komapper.core.metamodel.PropertyMetamodel
 import org.komapper.core.query.builder.EntitySelectStatementBuilder
 import org.komapper.core.query.command.EntitySelectCommand
 import org.komapper.core.query.context.EntitySelectContext
-import org.komapper.core.query.context.JoinContext
-import org.komapper.core.query.context.JoinKind
-import org.komapper.core.query.data.SortItem
 import org.komapper.core.query.scope.JoinDeclaration
-import org.komapper.core.query.scope.JoinScope
 import org.komapper.core.query.scope.WhereDeclaration
-import org.komapper.core.query.scope.WhereScope
 
 interface EntitySelectQuery<ENTITY> : Query<List<ENTITY>> {
 
@@ -68,10 +63,6 @@ interface EntitySelectSubQuery<ENTITY> {
     fun select(propertyMetamodel: PropertyMetamodel<*, *>): SingleProjection
 }
 
-sealed class SingleProjection {
-    internal data class ContextHolder(val context: EntitySelectContext<*>) : SingleProjection()
-}
-
 internal class EntitySelectQueryImpl<ENTITY>(
     private val entityMetamodel: EntityMetamodel<ENTITY>,
     private val context: EntitySelectContext<ENTITY> = EntitySelectContext(entityMetamodel)
@@ -80,31 +71,21 @@ internal class EntitySelectQueryImpl<ENTITY>(
     EntitySelectQuery1<ENTITY>,
     EntitySelectSubQuery<ENTITY> {
 
+    private val support: SelectQuerySupport<ENTITY> = SelectQuerySupport(context)
+
     override fun <OTHER_ENTITY> innerJoin(
         entityMetamodel: EntityMetamodel<OTHER_ENTITY>,
         declaration: JoinDeclaration<OTHER_ENTITY>
     ): EntitySelectQueryImpl<ENTITY> {
-        return join(entityMetamodel, declaration, JoinKind.INNER)
+        support.innerJoin(entityMetamodel, declaration)
+        return this
     }
 
     override fun <OTHER_ENTITY> leftJoin(
         entityMetamodel: EntityMetamodel<OTHER_ENTITY>,
         declaration: JoinDeclaration<OTHER_ENTITY>
     ): EntitySelectQueryImpl<ENTITY> {
-        return join(entityMetamodel, declaration, JoinKind.LEFT_OUTER)
-    }
-
-    private fun <OTHER_ENTITY> join(
-        entityMetamodel: EntityMetamodel<OTHER_ENTITY>,
-        declaration: JoinDeclaration<OTHER_ENTITY>,
-        kind: JoinKind
-    ): EntitySelectQueryImpl<ENTITY> {
-        val join = JoinContext(entityMetamodel, kind)
-        val scope = JoinScope(join)
-        declaration(scope)
-        if (join.isNotEmpty()) {
-            context.joins.add(join)
-        }
+        support.leftJoin(entityMetamodel, declaration)
         return this
     }
 
@@ -126,33 +107,27 @@ internal class EntitySelectQueryImpl<ENTITY>(
     }
 
     override fun where(declaration: WhereDeclaration): EntitySelectQueryImpl<ENTITY> {
-        val scope = WhereScope(context.where)
-        declaration(scope)
+        support.where(declaration)
         return this
     }
 
     override fun orderBy(vararg sortItems: PropertyMetamodel<*, *>): EntitySelectQueryImpl<ENTITY> {
-        for (item in sortItems) {
-            when (item) {
-                is SortItem -> context.orderBy.add(item)
-                else -> context.orderBy.add(SortItem.Asc(item))
-            }
-        }
+        support.orderBy(*sortItems)
         return this
     }
 
     override fun offset(value: Int): EntitySelectQueryImpl<ENTITY> {
-        context.offset = value
+        support.offset(value)
         return this
     }
 
     override fun limit(value: Int): EntitySelectQueryImpl<ENTITY> {
-        context.limit = value
+        support.limit(value)
         return this
     }
 
     override fun forUpdate(): EntitySelectQueryImpl<ENTITY> {
-        context.forUpdate.option = ForUpdateOption.BASIC
+        support.forUpdate()
         return this
     }
 
@@ -161,17 +136,17 @@ internal class EntitySelectQueryImpl<ENTITY>(
         return SingleProjection.ContextHolder(context)
     }
 
-    override fun run(config: DefaultDatabaseConfig): List<ENTITY> {
+    override fun run(config: DatabaseConfig): List<ENTITY> {
         val statement = buildStatement(config)
         val command = EntitySelectCommand(entityMetamodel, context, config, statement)
         return command.execute()
     }
 
-    override fun toStatement(config: DefaultDatabaseConfig): Statement {
+    override fun toStatement(config: DatabaseConfig): Statement {
         return buildStatement(config)
     }
 
-    private fun buildStatement(config: DefaultDatabaseConfig): Statement {
+    private fun buildStatement(config: DatabaseConfig): Statement {
         val builder = EntitySelectStatementBuilder(config, context)
         return builder.build()
     }

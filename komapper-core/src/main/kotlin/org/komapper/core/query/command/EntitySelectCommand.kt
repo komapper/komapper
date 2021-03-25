@@ -1,6 +1,6 @@
 package org.komapper.core.query.command
 
-import org.komapper.core.DefaultDatabaseConfig
+import org.komapper.core.DatabaseConfig
 import org.komapper.core.data.Statement
 import org.komapper.core.jdbc.Executor
 import org.komapper.core.metamodel.EntityMetamodel
@@ -11,7 +11,7 @@ import java.sql.ResultSet
 internal class EntitySelectCommand<ENTITY>(
     private val entityMetamodel: EntityMetamodel<ENTITY>,
     private val context: EntitySelectContext<ENTITY>,
-    private val config: DefaultDatabaseConfig,
+    private val config: DatabaseConfig,
     override val statement: Statement
 ) : Command<List<ENTITY>> {
 

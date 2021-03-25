@@ -1,6 +1,6 @@
 package org.komapper.core.query.command
 
-import org.komapper.core.DefaultDatabaseConfig
+import org.komapper.core.DatabaseConfig
 import org.komapper.core.OptimisticLockException
 import org.komapper.core.data.Statement
 import org.komapper.core.jdbc.Executor
@@ -9,7 +9,7 @@ import org.komapper.core.metamodel.EntityMetamodel
 internal class EntityDeleteCommand<ENTITY>(
     private val entityMetamodel: EntityMetamodel<ENTITY>,
     private val entity: ENTITY,
-    config: DefaultDatabaseConfig,
+    config: DatabaseConfig,
     override val statement: Statement
 ) : Command<Unit> {
 

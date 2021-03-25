@@ -2,24 +2,34 @@ package org.komapper.jdbc.h2
 
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.Database
-import org.komapper.core.query.EntityQuery
-import org.komapper.core.query.EntitySubQuery
+import org.komapper.core.query.SqlQuery
 import org.komapper.core.query.desc
-import org.komapper.core.query.scope.WhereDeclaration
-import org.komapper.core.query.scope.WhereScope.Companion.plus
 
 @ExtendWith(Env::class)
-class EntitySelectQueryTest(private val db: Database) {
+class SqlSelectQueryTest(private val db: Database) {
+
+    @Test
+    fun find() {
+        val a = Address.metamodel()
+        val address = db.find(a) { a.addressId eq 1 }
+        Assertions.assertNotNull(address)
+    }
+
+    @Test
+    fun find_multipleCondition() {
+        val a = Address.metamodel()
+        val address = db.find(a) { a.addressId eq 1; a.version eq 1 }
+        Assertions.assertNotNull(address)
+    }
 
     @Test
     fun first() {
         val a = Address.metamodel()
         val address = db.first {
-            EntityQuery.from(a).where { a.addressId eq 1 }
+            SqlQuery.from(a).where { a.addressId eq 1 }
         }
         Assertions.assertNotNull(address)
     }
@@ -28,15 +38,43 @@ class EntitySelectQueryTest(private val db: Database) {
     fun list() {
         val a = Address.metamodel()
         val addressList = db.list {
-            EntityQuery.from(a).where { a.addressId eq 1 }
+            SqlQuery.from(a).where { a.addressId eq 1 }
         }
         Assertions.assertNotNull(addressList)
     }
 
     @Test
+    fun list_single() {
+        val a = Address.metamodel()
+        val streetList = db.list {
+            SqlQuery.from(a)
+                .where {
+                    a.addressId inList listOf(1, 2)
+                }
+                .orderBy(a.addressId)
+                .select(a.street)
+        }
+        assertEquals(listOf("STREET 1", "STREET 2"), streetList)
+    }
+
+    @Test
+    fun list_pair() {
+        val a = Address.metamodel()
+        val pairList = db.list {
+            SqlQuery.from(a)
+                .where {
+                    a.addressId inList listOf(1, 2)
+                }
+                .orderBy(a.addressId)
+                .select(a.addressId, a.street)
+        }
+        assertEquals(listOf(1 to "STREET 1", 2 to "STREET 2"), pairList)
+    }
+
+    @Test
     fun passQuery() {
         val a = Address.metamodel()
-        val query = EntityQuery.from(a)
+        val query = SqlQuery.from(a)
             .where { a.addressId greaterEq 1 }
             .orderBy(a.addressId.desc())
             .limit(2)
@@ -56,7 +94,7 @@ class EntitySelectQueryTest(private val db: Database) {
         val a = Address.metamodel()
         val e = Employee.metamodel()
         val list = db.list {
-            EntityQuery.from(a).innerJoin(e) {
+            SqlQuery.from(a).innerJoin(e) {
                 a.addressId eq e.addressId
             }.where {
                 a.addressId eq 1
@@ -66,61 +104,10 @@ class EntitySelectQueryTest(private val db: Database) {
     }
 
     @Test
-    fun association_many_to_one() {
-        val e = Employee.metamodel()
-        val d = Department.metamodel()
-        val list = db.list {
-            EntityQuery.from(e).innerJoin(d) {
-                e.departmentId eq d.departmentId
-            }.associate(e, d) { employee, department ->
-                employee.copy(department = department)
-            }
-        }
-        assertEquals(14, list.size)
-        assertTrue(list.all { it.department != null })
-    }
-
-    @Test
-    fun association_one_to_many() {
-        val d = Department.metamodel()
-        val e = Employee.metamodel()
-        val list = db.list {
-            EntityQuery.from(d).innerJoin(e) {
-                d.departmentId eq e.departmentId
-            }.associate(d, e) { department, employee ->
-                val list = department.employeeList + employee
-                department.copy(employeeList = list)
-            }
-        }
-        assertEquals(3, list.size)
-        val department1 = list.first { it.departmentId == 1 }
-        val department2 = list.first { it.departmentId == 2 }
-        val department3 = list.first { it.departmentId == 3 }
-        assertEquals(3, department1.employeeList.size)
-        assertEquals(5, department2.employeeList.size)
-        assertEquals(6, department3.employeeList.size)
-    }
-
-    @Test
-    fun association_one_to_one() {
-        val a = Address.metamodel()
-        val e = Employee.metamodel()
-        val list = db.list {
-            EntityQuery.from(e).innerJoin(a) {
-                e.addressId eq a.addressId
-            }.associate(e, a) { employee, address ->
-                employee.copy(address = address)
-            }
-        }
-        assertEquals(14, list.size)
-        println(list)
-    }
-
-    @Test
     fun offset() {
         val a = Address.metamodel()
         val list = db.list {
-            EntityQuery.from(a).offset(10)
+            SqlQuery.from(a).offset(10)
         }
         assertEquals(5, list.size)
     }
@@ -129,7 +116,7 @@ class EntitySelectQueryTest(private val db: Database) {
     fun limit() {
         val a = Address.metamodel()
         val list = db.list {
-            EntityQuery.from(a).limit(3)
+            SqlQuery.from(a).limit(3)
         }
         assertEquals(3, list.size)
     }
@@ -138,7 +125,7 @@ class EntitySelectQueryTest(private val db: Database) {
     fun offset_limit() {
         val a = Address.metamodel()
         val list = db.list {
-            EntityQuery.from(a)
+            SqlQuery.from(a)
                 .orderBy(a.addressId)
                 .offset(10)
                 .limit(3)
@@ -149,66 +136,7 @@ class EntitySelectQueryTest(private val db: Database) {
         assertEquals(13, list[2].addressId)
     }
 
-    @Test
-    fun where_compose() {
-        val a = Address.metamodel()
-        val list = db.list {
-            val w1: WhereDeclaration = {
-                a.addressId eq 1
-            }
-            val w2: WhereDeclaration = {
-                a.version eq 1
-            }
-            EntityQuery.from(a).where(w1 + w2)
-        }
-        assertEquals(1, list.size)
-    }
-
-    @Test
-    fun isNull() {
-        val e = Employee.metamodel()
-        val list = db.list {
-            EntityQuery.from(e).where {
-                e.managerId.isNull()
-            }
-        }
-        assertEquals(listOf(9), list.map { it.employeeId })
-    }
-
-    @Test
-    fun isNotNull() {
-        val e = Employee.metamodel()
-        val list = db.list {
-            EntityQuery.from(e).where {
-                e.managerId.isNotNull()
-            }
-        }
-        assertTrue(9 !in list.map { it.employeeId })
-    }
-
-    @Test
-    fun between() {
-        val a = Address.metamodel()
-        val idList = db.list {
-            EntityQuery.from(a).where {
-                a.addressId between 5..10
-            }.orderBy(a.addressId)
-        }
-        assertEquals((5..10).toList(), idList.map { it.addressId })
-    }
-
-    @Test
-    fun notBetween() {
-        val a = Address.metamodel()
-        val idList = db.list {
-            EntityQuery.from(a).where {
-                a.addressId notBetween 5..10
-            }.orderBy(a.addressId)
-        }
-        val ids = (1..4) + (11..15)
-        assertEquals(ids.toList(), idList.map { it.addressId })
-    }
-
+    /*
     @Test
     fun inList() {
         val a = Address.metamodel()
@@ -311,70 +239,14 @@ class EntitySelectQueryTest(private val db: Database) {
         val list = db.list(query)
         assertEquals(9, list.size)
     }
-
-    @Test
-    fun not() {
-        val a = Address.metamodel()
-        val idList = db.list {
-            EntityQuery.from(a).where {
-                a.addressId greater 5
-                not {
-                    a.addressId greaterEq 10
-                }
-            }.orderBy(a.addressId)
-        }.map { it.addressId }
-        assertEquals((6..9).toList(), idList)
-    }
-
-    @Test
-    fun and() {
-        val a = Address.metamodel()
-        val list = db.list {
-            EntityQuery.from(a).where {
-                a.addressId greater 1
-                and {
-                    a.addressId greater 1
-                }
-            }.orderBy(a.addressId.desc())
-                .limit(2)
-                .offset(5)
-        }
-        assertEquals(
-            listOf(
-                Address(10, "STREET 10", 1),
-                Address(9, "STREET 9", 1)
-            ),
-            list
-        )
-    }
-
-    @Test
-    fun or() {
-        val a = Address.metamodel()
-        val list = db.list {
-            EntityQuery.from(a).where {
-                a.addressId greaterEq 1
-                or {
-                    a.addressId greaterEq 1
-                }
-            }.orderBy(a.addressId.desc())
-                .limit(2)
-                .offset(5)
-        }
-        assertEquals(
-            listOf(
-                Address(10, "STREET 10", 1),
-                Address(9, "STREET 9", 1)
-            ),
-            list
-        )
-    }
+    
+     */
 
     @Test
     fun forUpdate() {
         val a = Address.metamodel()
         val list = db.list {
-            EntityQuery.from(a).where { a.addressId greaterEq 1 }
+            SqlQuery.from(a).where { a.addressId greaterEq 1 }
                 .orderBy(a.addressId.desc())
                 .limit(2)
                 .offset(5)

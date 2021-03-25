@@ -1,12 +1,12 @@
 package org.komapper.core.query.command
 
-import org.komapper.core.DefaultDatabaseConfig
+import org.komapper.core.DatabaseConfig
 import org.komapper.core.data.Statement
 import org.komapper.core.jdbc.Executor
 import org.komapper.core.query.Row
 
 internal class TemplateSelectCommand<T, R>(
-    private val config: DefaultDatabaseConfig,
+    private val config: DatabaseConfig,
     override val statement: Statement,
     private val provider: Row.() -> T,
     private val transformer: (Sequence<T>) -> R

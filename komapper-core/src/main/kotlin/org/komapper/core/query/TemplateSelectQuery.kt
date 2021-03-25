@@ -1,6 +1,6 @@
 package org.komapper.core.query
 
-import org.komapper.core.DefaultDatabaseConfig
+import org.komapper.core.DatabaseConfig
 import org.komapper.core.data.Statement
 import org.komapper.core.query.command.TemplateSelectCommand
 import org.komapper.core.template.DefaultStatementBuilder
@@ -14,17 +14,17 @@ internal class TemplateSelectQueryImpl<T, R>(
     private val transformer: (Sequence<T>) -> R
 ) : TemplateSelectQuery<T, R> {
 
-    override fun run(config: DefaultDatabaseConfig): R {
+    override fun run(config: DatabaseConfig): R {
         val statement = buildStatement(config)
         val command = TemplateSelectCommand(config, statement, provider, transformer)
         return command.execute()
     }
 
-    override fun toStatement(config: DefaultDatabaseConfig): Statement {
+    override fun toStatement(config: DatabaseConfig): Statement {
         return buildStatement(config)
     }
 
-    private fun buildStatement(config: DefaultDatabaseConfig): Statement {
+    private fun buildStatement(config: DatabaseConfig): Statement {
         val builder = DefaultStatementBuilder(
             config.dialect::formatValue,
             config.sqlNodeFactory,

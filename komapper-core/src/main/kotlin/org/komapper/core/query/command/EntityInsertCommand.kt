@@ -1,6 +1,6 @@
 package org.komapper.core.query.command
 
-import org.komapper.core.DefaultDatabaseConfig
+import org.komapper.core.DatabaseConfig
 import org.komapper.core.data.Statement
 import org.komapper.core.jdbc.Executor
 import org.komapper.core.metamodel.Assignment
@@ -9,7 +9,7 @@ import org.komapper.core.metamodel.EntityMetamodel
 internal class EntityInsertCommand<ENTITY>(
     @Suppress("unused") private val entityMetamodel: EntityMetamodel<ENTITY>,
     private val entity: ENTITY,
-    private val config: DefaultDatabaseConfig,
+    private val config: DatabaseConfig,
     override val statement: Statement
 ) : Command<ENTITY> {
 

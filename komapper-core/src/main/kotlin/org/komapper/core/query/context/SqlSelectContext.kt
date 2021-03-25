@@ -3,7 +3,7 @@ package org.komapper.core.query.context
 import org.komapper.core.metamodel.EntityMetamodel
 import org.komapper.core.metamodel.PropertyMetamodel
 
-internal class EntitySelectContext<ENTITY>(override val entityMetamodel: EntityMetamodel<ENTITY>) : SelectContext<ENTITY> {
+internal class SqlSelectContext<ENTITY>(override val entityMetamodel: EntityMetamodel<ENTITY>) : SelectContext<ENTITY> {
     override val projections = mutableListOf<PropertyMetamodel<*, *>>()
     override val joins = JoinsContext()
     override val where = WhereContext()
@@ -11,18 +11,14 @@ internal class EntitySelectContext<ENTITY>(override val entityMetamodel: EntityM
     override var offset: Int = -1
     override var limit: Int = -1
     override val forUpdate = ForUpdateContext()
-    val associatorMap = AssociatorMap()
 
     override fun getEntityMetamodels(): List<EntityMetamodel<*>> {
         return listOf(entityMetamodel) + joins.map { it.entityMetamodel }
     }
 
+    // TODO
     override fun getProjectionEntityMetamodels(): List<EntityMetamodel<*>> {
-        val list = listOf(entityMetamodel) + associatorMap.flatMap {
-            val (e1, e2) = it.key
-            listOf(e1, e2)
-        }
-        return list.distinct()
+        return listOf(entityMetamodel)
     }
 
     override fun getProjectionPropertyMetamodels(): List<PropertyMetamodel<*, *>> {

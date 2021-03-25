@@ -1,6 +1,6 @@
 package org.komapper.core.query
 
-import org.komapper.core.DefaultDatabaseConfig
+import org.komapper.core.DatabaseConfig
 import org.komapper.core.data.Statement
 import org.komapper.core.jdbc.Executor
 import org.komapper.core.metamodel.Assignment
@@ -18,7 +18,7 @@ internal class EntityInsertQueryImpl<ENTITY>(private val entityMetamodel: Entity
     EntityInsertQuery<ENTITY> {
     private val context: EntityInsertContext<ENTITY> = EntityInsertContext(entityMetamodel)
 
-    override fun run(config: DefaultDatabaseConfig): ENTITY {
+    override fun run(config: DatabaseConfig): ENTITY {
         val assignment = entityMetamodel.idAssignment()
         val newEntity = if (assignment is Assignment.Sequence<ENTITY, *>) {
             val sequenceName = assignment.name
@@ -44,11 +44,11 @@ internal class EntityInsertQueryImpl<ENTITY>(private val entityMetamodel: Entity
         return command.execute()
     }
 
-    override fun toStatement(config: DefaultDatabaseConfig): Statement {
+    override fun toStatement(config: DatabaseConfig): Statement {
         return buildStatement(config, entity)
     }
 
-    private fun buildStatement(config: DefaultDatabaseConfig, entity: ENTITY): Statement {
+    private fun buildStatement(config: DatabaseConfig, entity: ENTITY): Statement {
         val builder = EntityInsertStatementBuilder(config, context, entity)
         return builder.build()
     }

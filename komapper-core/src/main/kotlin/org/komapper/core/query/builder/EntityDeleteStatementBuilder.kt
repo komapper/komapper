@@ -1,6 +1,6 @@
 package org.komapper.core.query.builder
 
-import org.komapper.core.DefaultDatabaseConfig
+import org.komapper.core.DatabaseConfig
 import org.komapper.core.data.Statement
 import org.komapper.core.data.StatementBuffer
 import org.komapper.core.data.Value
@@ -9,7 +9,7 @@ import org.komapper.core.metamodel.PropertyMetamodel
 import org.komapper.core.query.context.EntityDeleteContext
 
 internal class EntityDeleteStatementBuilder<ENTITY>(
-    val config: DefaultDatabaseConfig,
+    val config: DatabaseConfig,
     val context: EntityDeleteContext<ENTITY>,
     val entity: ENTITY
 ) {

@@ -4,6 +4,7 @@ import org.komapper.core.metamodel.EntityMetamodel
 import org.komapper.core.query.EntityQuery
 import org.komapper.core.query.Query
 import org.komapper.core.query.ScriptQuery
+import org.komapper.core.query.SqlQuery
 import org.komapper.core.query.scope.WhereDeclaration
 import java.sql.Blob
 import java.sql.Clob
@@ -33,7 +34,7 @@ class Database(val config: DefaultDatabaseConfig) {
     }
 
     fun <ENTITY> findOrNull(metamodel: EntityMetamodel<ENTITY>, declaration: WhereDeclaration): ENTITY? {
-        val query = EntityQuery.from(metamodel).where(declaration).limit(1)
+        val query = SqlQuery.from(metamodel).where(declaration).limit(1)
         return run(query).firstOrNull()
     }
 

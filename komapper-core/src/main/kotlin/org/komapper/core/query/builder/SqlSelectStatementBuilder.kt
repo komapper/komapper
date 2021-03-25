@@ -3,11 +3,11 @@ package org.komapper.core.query.builder
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.data.Statement
 import org.komapper.core.data.StatementBuffer
-import org.komapper.core.query.context.EntitySelectContext
+import org.komapper.core.query.context.SqlSelectContext
 
-internal class EntitySelectStatementBuilder<ENTITY>(
+internal class SqlSelectStatementBuilder<ENTITY>(
     val config: DatabaseConfig,
-    val context: EntitySelectContext<ENTITY>,
+    val context: SqlSelectContext<ENTITY>,
     aliasManager: AliasManager = AliasManager(context)
 ) {
     private val buf = StatementBuffer(config.dialect::formatValue)

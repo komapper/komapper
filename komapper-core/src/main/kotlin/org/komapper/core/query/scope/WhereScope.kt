@@ -176,6 +176,7 @@ class WhereScope internal constructor(private val context: WhereContext) {
         val left = Operand.Property(this)
         val right = when (projection) {
             is SingleProjection.ContextHolder -> projection.context
+            else -> TODO()
         }
         context.add(Criterion.InSubQuery(left, right))
     }
@@ -194,6 +195,7 @@ class WhereScope internal constructor(private val context: WhereContext) {
         val left = Operand.Property(this)
         val right = when (projection) {
             is SingleProjection.ContextHolder -> projection.context
+            else -> TODO()
         }
         context.add(Criterion.NotInSubQuery(left, right))
     }
