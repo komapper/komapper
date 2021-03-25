@@ -23,7 +23,7 @@ internal class SelectStatementBuilder<ENTITY>(
 
     fun build(): Statement {
         buf.append("select ")
-        val properties = context.getProjectionTargets().flatMap { it.properties() }
+        val properties = context.getProjectionPropertyMetamodels()
         properties.joinTo(buf) { columnName(it) }
         buf.append(" from ")
         buf.append(tableName(context.entityMetamodel))
@@ -112,6 +112,8 @@ internal class SelectStatementBuilder<ENTITY>(
             is Criterion.NotBetween -> betweenOperation(c.left, c.right, true)
             is Criterion.InList -> inListOperation(c.left, c.right)
             is Criterion.NotInList -> inListOperation(c.left, c.right, true)
+            is Criterion.InSubQuery -> inSubQueryOperation(c.left, c.right)
+            is Criterion.NotInSubQuery -> inSubQueryOperation(c.left, c.right, true)
             is Criterion.Exists -> existsOperation(c.context)
             is Criterion.NotExists -> existsOperation(c.context, true)
             is Criterion.And -> logicalBinaryOperation("and", c.criteria, index)
@@ -202,13 +204,25 @@ internal class SelectStatementBuilder<ENTITY>(
         buf.append(")")
     }
 
-    private fun existsOperation(context: SelectContext<*>, not: Boolean = false) {
+    private fun inSubQueryOperation(left: Operand, right: SelectContext<*>, not: Boolean = false) {
+        visitOperand(left)
+        if (not) {
+            buf.append(" not")
+        }
+        buf.append(" in (")
+        val childAliasManager = AliasManager(right, aliasManager)
+        val builder = SelectStatementBuilder(config, right, childAliasManager)
+        buf.append(builder.build())
+        buf.append(")")
+    }
+
+    private fun existsOperation(subContext: SelectContext<*>, not: Boolean = false) {
         if (not) {
             buf.append("not ")
         }
         buf.append("exists (")
-        val childAliasManager = AliasManager(context, aliasManager)
-        val builder = SelectStatementBuilder(config, context, childAliasManager)
+        val childAliasManager = AliasManager(subContext, aliasManager)
+        val builder = SelectStatementBuilder(config, subContext, childAliasManager)
         buf.append(builder.build())
         buf.append(")")
     }

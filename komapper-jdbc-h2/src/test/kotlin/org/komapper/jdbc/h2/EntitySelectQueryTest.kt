@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.Database
 import org.komapper.core.query.EntityQuery
+import org.komapper.core.query.EntitySubQuery
 import org.komapper.core.query.desc
 import org.komapper.core.query.scope.WhereDeclaration
 import org.komapper.core.query.scope.WhereScope.Companion.plus
@@ -223,6 +224,79 @@ class EntitySelectQueryTest(private val db: Database) {
     }
 
     @Test
+    fun inList() {
+        val a = Address.metamodel()
+        val list = db.list {
+            EntityQuery.from(a).where {
+                a.addressId inList listOf(9, 10)
+            }.orderBy(a.addressId.desc())
+        }
+        assertEquals(
+            listOf(
+                Address(10, "STREET 10", 1),
+                Address(9, "STREET 9", 1)
+            ),
+            list
+        )
+    }
+
+    @Test
+    fun notInList() {
+        val a = Address.metamodel()
+        val list = db.list {
+            EntityQuery.from(a).where {
+                a.addressId notInList (1..9).toList()
+            }.orderBy(a.addressId)
+        }
+        assertEquals((10..15).toList(), list.map { it.addressId })
+    }
+
+    @Test
+    fun in_empty() {
+        val a = Address.metamodel()
+        val list = db.list {
+            EntityQuery.from(a).where {
+                a.addressId inList emptyList()
+            }.orderBy(a.addressId.desc())
+        }
+        assertTrue(list.isEmpty())
+    }
+
+    @Test
+    fun inList_SubQuery() {
+        val e = Employee.metamodel()
+        val a = Address.metamodel()
+        val query =
+            EntityQuery.from(e).where {
+                e.addressId inList {
+                    EntitySubQuery.from(a).where {
+                        e.addressId eq a.addressId
+                        e.employeeName like "%S%"
+                    }.select(a.addressId)
+                }
+            }
+        val list = db.list(query)
+        assertEquals(5, list.size)
+    }
+
+    @Test
+    fun notInList_SubQuery() {
+        val e = Employee.metamodel()
+        val a = Address.metamodel()
+        val query =
+            EntityQuery.from(e).where {
+                e.addressId notInList {
+                    EntitySubQuery.from(a).where {
+                        e.addressId eq a.addressId
+                        e.employeeName like "%S%"
+                    }.select(a.addressId)
+                }
+            }
+        val list = db.list(query)
+        assertEquals(9, list.size)
+    }
+
+    @Test
     fun exists() {
         val e = Employee.metamodel()
         val a = Address.metamodel()
@@ -378,52 +452,6 @@ fun noArg() {
 
 
 
-@Test
-fun `in`() {
-
-    val list = db.select<Address> {
-        where {
-            `in`(Address::addressId, listOf(9, 10))
-        }
-        orderBy {
-            desc(Address::addressId)
-        }
-    }
-    assertEquals(
-        listOf(
-            Address(10, "STREET 10", 1),
-            Address(9, "STREET 9", 1)
-        ), list
-    )
-}
-
-@Test
-fun notIn() {
-
-    val idList = db.select<Address> {
-        where {
-            notIn(Address::addressId, (1..9).toList())
-        }
-        orderBy {
-            asc(Address::addressId)
-        }
-    }.map { it.addressId }
-    assertEquals((10..15).toList(), idList)
-}
-
-@Test
-fun in_empty() {
-
-    val list = db.select<Address> {
-        where {
-            `in`(Address::addressId, emptyList())
-        }
-        orderBy {
-            desc(Address::addressId)
-        }
-    }
-    assertTrue(list.isEmpty())
-}
 
 @Test
 fun in2() {

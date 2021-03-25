@@ -181,6 +181,21 @@ internal class WhereTest {
     }
 
     @Test
+    fun inList_subQuery() {
+        val a = Address.metamodel()
+        val e = Emp.metamodel()
+        val query = EntityQuery.from(a).where {
+            a.id inList {
+                EntitySubQuery.from(e).select(e.id)
+            }
+        }
+        assertEquals(
+            "select t0_.ID, t0_.STREET, t0_.VERSION from ADDRESS t0_ where t0_.ID in (select t1_.ID from EMP t1_)",
+            query.toStatement(config).sql
+        )
+    }
+
+    @Test
     fun notInList() {
         val a = Address.metamodel()
         val query = EntityQuery.from(a).where {

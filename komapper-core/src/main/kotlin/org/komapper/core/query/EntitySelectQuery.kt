@@ -64,6 +64,28 @@ interface EntitySelectSubQuery<ENTITY> {
     fun orderBy(vararg sortItems: PropertyMetamodel<*, *>): EntitySelectSubQuery<ENTITY>
     fun offset(value: Int): EntitySelectSubQuery<ENTITY>
     fun limit(value: Int): EntitySelectSubQuery<ENTITY>
+    fun select(propertyMetamodel: PropertyMetamodel<*, *>): SingleProjection
+}
+
+interface EntitySelectSubQuery1<ENTITY> : EntitySelectSubQuery<ENTITY> {
+    override fun <OTHER_ENTITY> innerJoin(
+        entityMetamodel: EntityMetamodel<OTHER_ENTITY>,
+        declaration: JoinDeclaration<OTHER_ENTITY>
+    ): EntitySelectSubQuery1<ENTITY>
+
+    override fun <OTHER_ENTITY> leftJoin(
+        entityMetamodel: EntityMetamodel<OTHER_ENTITY>,
+        declaration: JoinDeclaration<OTHER_ENTITY>
+    ): EntitySelectSubQuery1<ENTITY>
+
+    override fun where(declaration: WhereDeclaration): EntitySelectSubQuery1<ENTITY>
+    override fun orderBy(vararg sortItems: PropertyMetamodel<*, *>): EntitySelectSubQuery1<ENTITY>
+    override fun offset(value: Int): EntitySelectSubQuery1<ENTITY>
+    override fun limit(value: Int): EntitySelectSubQuery1<ENTITY>
+}
+
+sealed class SingleProjection {
+    internal data class ContextHolder(val context: SelectContext<*>) : SingleProjection()
 }
 
 internal class EntitySelectQueryImpl<ENTITY>(
@@ -72,7 +94,8 @@ internal class EntitySelectQueryImpl<ENTITY>(
 ) :
     EntitySelectQuery<ENTITY>,
     EntitySelectQuery1<ENTITY>,
-    EntitySelectSubQuery<ENTITY> {
+    EntitySelectSubQuery<ENTITY>,
+    EntitySelectSubQuery1<ENTITY> {
 
     override fun <OTHER_ENTITY> innerJoin(
         entityMetamodel: EntityMetamodel<OTHER_ENTITY>,
@@ -148,6 +171,11 @@ internal class EntitySelectQueryImpl<ENTITY>(
     override fun forUpdate(): EntitySelectQueryImpl<ENTITY> {
         context.forUpdate.option = ForUpdateOption.BASIC
         return this
+    }
+
+    override fun select(propertyMetamodel: PropertyMetamodel<*, *>): SingleProjection {
+        context.projections.add(propertyMetamodel)
+        return SingleProjection.ContextHolder(context)
     }
 
     override fun run(config: DefaultDatabaseConfig): List<ENTITY> {

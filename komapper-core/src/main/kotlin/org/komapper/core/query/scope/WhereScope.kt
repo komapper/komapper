@@ -5,6 +5,7 @@ import org.komapper.core.metamodel.EntityMetamodel
 import org.komapper.core.metamodel.PropertyMetamodel
 import org.komapper.core.query.EntitySelectQueryImpl
 import org.komapper.core.query.EntitySelectSubQuery
+import org.komapper.core.query.SingleProjection
 import org.komapper.core.query.context.SelectContext
 import org.komapper.core.query.context.WhereContext
 import org.komapper.core.query.data.Criterion
@@ -167,10 +168,34 @@ class WhereScope internal constructor(private val context: WhereContext) {
         context.add(Criterion.InList(o1, o2))
     }
 
+    infix fun <T : Any> PropertyMetamodel<*, T>.inList(block: () -> SingleProjection) {
+        this.inList(block())
+    }
+
+    infix fun <T : Any> PropertyMetamodel<*, T>.inList(projection: SingleProjection) {
+        val left = Operand.Property(this)
+        val right = when (projection) {
+            is SingleProjection.ContextHolder -> projection.context
+        }
+        context.add(Criterion.InSubQuery(left, right))
+    }
+
     infix fun <T : Any> PropertyMetamodel<*, T>.notInList(values: List<T?>) {
         val o1 = Operand.Property(this)
         val o2 = values.map { Operand.Parameter(this, it) }
         context.add(Criterion.NotInList(o1, o2))
+    }
+
+    infix fun <T : Any> PropertyMetamodel<*, T>.notInList(block: () -> SingleProjection) {
+        this.notInList(block())
+    }
+
+    infix fun <T : Any> PropertyMetamodel<*, T>.notInList(projection: SingleProjection) {
+        val left = Operand.Property(this)
+        val right = when (projection) {
+            is SingleProjection.ContextHolder -> projection.context
+        }
+        context.add(Criterion.NotInSubQuery(left, right))
     }
 
     fun <ENTITY> exists(entityMetamodel: EntityMetamodel<ENTITY>): EntitySelectSubQuery<ENTITY> {

@@ -40,7 +40,7 @@ internal class EntitySelectCommand<ENTITY>(
     }
 
     private fun fetchAllEntities(rs: ResultSet): List<Map<EntityKey, Any>> {
-        val entityMetamodels = context.getProjectionTargets()
+        val entityMetamodels = context.getProjectionEntityMetamodels()
         val rows = mutableListOf<Map<EntityKey, Any>>()
         while (rs.next()) {
             val row = mutableMapOf<EntityKey, Any>()
