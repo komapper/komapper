@@ -223,6 +223,36 @@ class EntitySelectQueryTest(private val db: Database) {
     }
 
     @Test
+    fun exists() {
+        val e = Employee.metamodel()
+        val a = Address.metamodel()
+        val query =
+            EntityQuery.from(e).where {
+                exists(a).where {
+                    e.addressId eq a.addressId
+                    e.employeeName like "%S%"
+                }
+            }
+        val list = db.list(query)
+        assertEquals(5, list.size)
+    }
+
+    @Test
+    fun notExists() {
+        val e = Employee.metamodel()
+        val a = Address.metamodel()
+        val query =
+            EntityQuery.from(e).where {
+                notExists(a).where {
+                    e.addressId eq a.addressId
+                    e.employeeName like "%S%"
+                }
+            }
+        val list = db.list(query)
+        assertEquals(9, list.size)
+    }
+
+    @Test
     fun not() {
         val a = Address.metamodel()
         val idList = db.list {
@@ -685,39 +715,7 @@ fun nestedEmbedded() {
     assertEquals(6, list.size)
 }
 
-@Test
-fun exists() {
-    val criteriaQuery =
-        select<Employee> { e ->
-            where {
-                exists<Address> { a ->
-                    where {
-                        eq(e[Employee::addressId], a[Address::addressId])
-                        like(e[Employee::employeeName], "%S%")
-                    }
-                }
-            }
-        }
-    val list = db.select(criteriaQuery)
-    assertEquals(5, list.size)
-}
 
-@Test
-fun notExists() {
-    val criteriaQuery =
-        select<Employee> { e ->
-            where {
-                notExists<Address> { a ->
-                    where {
-                        eq(e[Employee::addressId], a[Address::addressId])
-                        like(e[Employee::employeeName], "%S%")
-                    }
-                }
-            }
-        }
-    val list = db.select(criteriaQuery)
-    assertEquals(9, list.size)
-}
 
  */
 }

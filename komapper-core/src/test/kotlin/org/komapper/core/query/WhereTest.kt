@@ -193,6 +193,36 @@ internal class WhereTest {
     }
 
     @Test
+    fun exists() {
+        val a = Address.metamodel()
+        val e = Emp.metamodel()
+        val query = EntityQuery.from(a).where {
+            exists(e).where {
+                a.id eq e.addressId
+            }
+        }
+        assertEquals(
+            "select t0_.ID, t0_.STREET, t0_.VERSION from ADDRESS t0_ where exists (select t1_.ID, t1_.ADDRESS_ID, t1_.VERSION from EMP t1_ where t0_.ID = t1_.ADDRESS_ID)",
+            query.toStatement(config).sql
+        )
+    }
+
+    @Test
+    fun notExists() {
+        val a = Address.metamodel()
+        val e = Emp.metamodel()
+        val query = EntityQuery.from(a).where {
+            notExists(e).where {
+                a.id eq e.addressId
+            }
+        }
+        assertEquals(
+            "select t0_.ID, t0_.STREET, t0_.VERSION from ADDRESS t0_ where not exists (select t1_.ID, t1_.ADDRESS_ID, t1_.VERSION from EMP t1_ where t0_.ID = t1_.ADDRESS_ID)",
+            query.toStatement(config).sql
+        )
+    }
+
+    @Test
     fun and() {
         val a = Address.metamodel()
         val query = EntityQuery.from(a).where {

@@ -13,8 +13,12 @@ import org.komapper.core.query.data.Operand
 import org.komapper.core.query.data.SortItem
 import org.komapper.core.query.option.LikeOption
 
-internal class SelectStatementBuilder<ENTITY>(val config: DefaultDatabaseConfig, val context: SelectContext<ENTITY>) {
-    private val aliasManager = AliasManager(context)
+internal class SelectStatementBuilder<ENTITY>(
+    val config: DefaultDatabaseConfig,
+    val context: SelectContext<ENTITY>,
+    private val aliasManager: AliasManager = AliasManager(context)
+) {
+
     private val buf = StatementBuffer(config.dialect::formatValue)
 
     fun build(): Statement {
@@ -108,6 +112,8 @@ internal class SelectStatementBuilder<ENTITY>(val config: DefaultDatabaseConfig,
             is Criterion.NotBetween -> betweenOperation(c.left, c.right, true)
             is Criterion.InList -> inListOperation(c.left, c.right)
             is Criterion.NotInList -> inListOperation(c.left, c.right, true)
+            is Criterion.Exists -> existsOperation(c.context)
+            is Criterion.NotExists -> existsOperation(c.context, true)
             is Criterion.And -> logicalBinaryOperation("and", c.criteria, index)
             is Criterion.Or -> logicalBinaryOperation("or", c.criteria, index)
             is Criterion.Not -> notOperation(c.criteria)
@@ -193,6 +199,17 @@ internal class SelectStatementBuilder<ENTITY>(val config: DefaultDatabaseConfig,
             }
             buf.cutBack(2)
         }
+        buf.append(")")
+    }
+
+    private fun existsOperation(context: SelectContext<*>, not: Boolean = false) {
+        if (not) {
+            buf.append("not ")
+        }
+        buf.append("exists (")
+        val childAliasManager = AliasManager(context, aliasManager)
+        val builder = SelectStatementBuilder(config, context, childAliasManager)
+        buf.append(builder.build())
         buf.append(")")
     }
 

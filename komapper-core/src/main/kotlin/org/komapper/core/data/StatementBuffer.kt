@@ -36,7 +36,7 @@ internal class StatementBuffer(
     }
 
     fun append(statement: Statement): StatementBuffer {
-        this.sql.append(statement.sql)
+        sql.append(statement.sql)
         values.addAll(statement.values)
         log.append(statement.log)
         return this

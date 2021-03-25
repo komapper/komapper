@@ -49,10 +49,30 @@ interface EntitySelectQuery1<ENTITY> : EntitySelectQuery<ENTITY> {
     ): EntitySelectQuery1<ENTITY>
 }
 
-internal class EntitySelectQueryImpl<ENTITY>(private val entityMetamodel: EntityMetamodel<ENTITY>) :
-    EntitySelectQuery<ENTITY>,
-    EntitySelectQuery1<ENTITY> {
+interface EntitySelectSubQuery<ENTITY> {
+    fun <OTHER_ENTITY> innerJoin(
+        entityMetamodel: EntityMetamodel<OTHER_ENTITY>,
+        declaration: JoinDeclaration<OTHER_ENTITY>
+    ): EntitySelectSubQuery<ENTITY>
+
+    fun <OTHER_ENTITY> leftJoin(
+        entityMetamodel: EntityMetamodel<OTHER_ENTITY>,
+        declaration: JoinDeclaration<OTHER_ENTITY>
+    ): EntitySelectSubQuery<ENTITY>
+
+    fun where(declaration: WhereDeclaration): EntitySelectSubQuery<ENTITY>
+    fun orderBy(vararg sortItems: PropertyMetamodel<*, *>): EntitySelectSubQuery<ENTITY>
+    fun offset(value: Int): EntitySelectSubQuery<ENTITY>
+    fun limit(value: Int): EntitySelectSubQuery<ENTITY>
+}
+
+internal class EntitySelectQueryImpl<ENTITY>(
+    private val entityMetamodel: EntityMetamodel<ENTITY>,
     private val context: SelectContext<ENTITY> = SelectContext(entityMetamodel)
+) :
+    EntitySelectQuery<ENTITY>,
+    EntitySelectQuery1<ENTITY>,
+    EntitySelectSubQuery<ENTITY> {
 
     override fun <OTHER_ENTITY> innerJoin(
         entityMetamodel: EntityMetamodel<OTHER_ENTITY>,
