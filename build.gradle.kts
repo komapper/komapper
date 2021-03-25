@@ -3,7 +3,7 @@ import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 
 plugins {
     base
-    kotlin("jvm") version "1.4.30" apply false
+    kotlin("jvm") version "1.4.31" apply false
     id("org.jlleitschuh.gradle.ktlint") version "10.0.0"
     id("io.github.gradle-nexus.publish-plugin") version "1.0.0"
     id("net.researchgate.release") version "2.8.1"

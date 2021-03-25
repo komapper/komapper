@@ -1,7 +1,7 @@
 plugins {
     application
     idea
-    id("com.google.devtools.ksp") version "1.4.30-1.0.0-alpha05"
+    id("com.google.devtools.ksp") version "1.4.31-1.0.0-alpha06"
 }
 
 sourceSets {
