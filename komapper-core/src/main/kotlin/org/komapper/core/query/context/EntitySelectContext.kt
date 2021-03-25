@@ -3,7 +3,7 @@ package org.komapper.core.query.context
 import org.komapper.core.metamodel.EntityMetamodel
 import org.komapper.core.metamodel.PropertyMetamodel
 
-internal class SelectContext<ENTITY>(val entityMetamodel: EntityMetamodel<ENTITY>) : Context<ENTITY> {
+internal class EntitySelectContext<ENTITY>(val entityMetamodel: EntityMetamodel<ENTITY>) : Context<ENTITY> {
     val projections = mutableListOf<PropertyMetamodel<*, *>>()
     val joins = JoinsContext()
     val associatorMap = AssociatorMap()

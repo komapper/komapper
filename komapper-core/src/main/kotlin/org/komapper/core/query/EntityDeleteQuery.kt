@@ -3,15 +3,15 @@ package org.komapper.core.query
 import org.komapper.core.DefaultDatabaseConfig
 import org.komapper.core.data.Statement
 import org.komapper.core.metamodel.EntityMetamodel
-import org.komapper.core.query.builder.DeleteStatementBuilder
+import org.komapper.core.query.builder.EntityDeleteStatementBuilder
 import org.komapper.core.query.command.EntityDeleteCommand
-import org.komapper.core.query.context.DeleteContext
+import org.komapper.core.query.context.EntityDeleteContext
 
 interface EntityDeleteQuery<ENTITY> : Query<Unit>
 
 internal class EntityDeleteQueryImpl<ENTITY>(private val entityMetamodel: EntityMetamodel<ENTITY>, private val entity: ENTITY) :
     EntityDeleteQuery<ENTITY> {
-    private val context: DeleteContext<ENTITY> = DeleteContext(entityMetamodel)
+    private val context: EntityDeleteContext<ENTITY> = EntityDeleteContext(entityMetamodel)
 
     override fun run(config: DefaultDatabaseConfig) {
         val statement = buildStatement(config)
@@ -24,7 +24,7 @@ internal class EntityDeleteQueryImpl<ENTITY>(private val entityMetamodel: Entity
     }
 
     private fun buildStatement(config: DefaultDatabaseConfig): Statement {
-        val builder = DeleteStatementBuilder(config, context, entity)
+        val builder = EntityDeleteStatementBuilder(config, context, entity)
         return builder.build()
     }
 }

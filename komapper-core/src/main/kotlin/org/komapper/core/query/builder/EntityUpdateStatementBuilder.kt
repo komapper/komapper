@@ -6,15 +6,16 @@ import org.komapper.core.data.StatementBuffer
 import org.komapper.core.data.Value
 import org.komapper.core.metamodel.EntityMetamodel
 import org.komapper.core.metamodel.PropertyMetamodel
-import org.komapper.core.query.context.UpdateContext
+import org.komapper.core.query.context.EntityUpdateContext
 
-internal class UpdateStatementBuilder<ENTITY>(
+internal class EntityUpdateStatementBuilder<ENTITY>(
     val config: DefaultDatabaseConfig,
-    val context: UpdateContext<ENTITY>,
+    val context: EntityUpdateContext<ENTITY>,
     val entity: ENTITY
 ) {
     private val aliasManager = AliasManager(context)
     private val buf = StatementBuffer(config.dialect::formatValue)
+    private val support = BuilderSupport(config, aliasManager, buf)
 
     fun build(): Statement {
         val identityProperties = context.entityMetamodel.idProperties()
@@ -60,12 +61,10 @@ internal class UpdateStatementBuilder<ENTITY>(
     }
 
     private fun tableName(entityMetamodel: EntityMetamodel<*>): String {
-        val alias = aliasManager.getAlias(entityMetamodel) ?: error("no alias")
-        return entityMetamodel.tableName() + " " + alias
+        return support.tableName(entityMetamodel)
     }
 
     private fun columnName(propertyMetamodel: PropertyMetamodel<*, *>): String {
-        val alias = aliasManager.getAlias(propertyMetamodel) ?: error("no alias")
-        return alias + "." + propertyMetamodel.columnName
+        return support.columnName(propertyMetamodel)
     }
 }

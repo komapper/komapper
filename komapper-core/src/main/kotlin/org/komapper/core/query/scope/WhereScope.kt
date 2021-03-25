@@ -6,7 +6,7 @@ import org.komapper.core.metamodel.PropertyMetamodel
 import org.komapper.core.query.EntitySelectQueryImpl
 import org.komapper.core.query.EntitySelectSubQuery
 import org.komapper.core.query.SingleProjection
-import org.komapper.core.query.context.SelectContext
+import org.komapper.core.query.context.EntitySelectContext
 import org.komapper.core.query.context.WhereContext
 import org.komapper.core.query.data.Criterion
 import org.komapper.core.query.data.Operand
@@ -199,13 +199,13 @@ class WhereScope internal constructor(private val context: WhereContext) {
     }
 
     fun <ENTITY> exists(entityMetamodel: EntityMetamodel<ENTITY>): EntitySelectSubQuery<ENTITY> {
-        val subContext = SelectContext(entityMetamodel)
+        val subContext = EntitySelectContext(entityMetamodel)
         context.add(Criterion.Exists(subContext))
         return EntitySelectQueryImpl(entityMetamodel, subContext)
     }
 
     fun <ENTITY> notExists(entityMetamodel: EntityMetamodel<ENTITY>): EntitySelectSubQuery<ENTITY> {
-        val subContext = SelectContext(entityMetamodel)
+        val subContext = EntitySelectContext(entityMetamodel)
         context.add(Criterion.NotExists(subContext))
         return EntitySelectQueryImpl(entityMetamodel, subContext)
     }

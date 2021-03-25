@@ -5,12 +5,12 @@ import org.komapper.core.data.Statement
 import org.komapper.core.jdbc.Executor
 import org.komapper.core.metamodel.EntityMetamodel
 import org.komapper.core.metamodel.PropertyMetamodel
-import org.komapper.core.query.context.SelectContext
+import org.komapper.core.query.context.EntitySelectContext
 import java.sql.ResultSet
 
 internal class EntitySelectCommand<ENTITY>(
     private val entityMetamodel: EntityMetamodel<ENTITY>,
-    private val context: SelectContext<ENTITY>,
+    private val context: EntitySelectContext<ENTITY>,
     private val config: DefaultDatabaseConfig,
     override val statement: Statement
 ) : Command<List<ENTITY>> {

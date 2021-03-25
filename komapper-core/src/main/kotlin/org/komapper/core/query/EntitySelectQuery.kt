@@ -4,11 +4,11 @@ import org.komapper.core.DefaultDatabaseConfig
 import org.komapper.core.data.Statement
 import org.komapper.core.metamodel.EntityMetamodel
 import org.komapper.core.metamodel.PropertyMetamodel
-import org.komapper.core.query.builder.SelectStatementBuilder
+import org.komapper.core.query.builder.EntitySelectStatementBuilder
 import org.komapper.core.query.command.EntitySelectCommand
+import org.komapper.core.query.context.EntitySelectContext
 import org.komapper.core.query.context.JoinContext
 import org.komapper.core.query.context.JoinKind
-import org.komapper.core.query.context.SelectContext
 import org.komapper.core.query.data.SortItem
 import org.komapper.core.query.scope.JoinDeclaration
 import org.komapper.core.query.scope.JoinScope
@@ -69,12 +69,12 @@ interface EntitySelectSubQuery<ENTITY> {
 }
 
 sealed class SingleProjection {
-    internal data class ContextHolder(val context: SelectContext<*>) : SingleProjection()
+    internal data class ContextHolder(val context: EntitySelectContext<*>) : SingleProjection()
 }
 
 internal class EntitySelectQueryImpl<ENTITY>(
     private val entityMetamodel: EntityMetamodel<ENTITY>,
-    private val context: SelectContext<ENTITY> = SelectContext(entityMetamodel)
+    private val context: EntitySelectContext<ENTITY> = EntitySelectContext(entityMetamodel)
 ) :
     EntitySelectQuery<ENTITY>,
     EntitySelectQuery1<ENTITY>,
@@ -172,7 +172,7 @@ internal class EntitySelectQueryImpl<ENTITY>(
     }
 
     private fun buildStatement(config: DefaultDatabaseConfig): Statement {
-        val builder = SelectStatementBuilder(config, context)
+        val builder = EntitySelectStatementBuilder(config, context)
         return builder.build()
     }
 }

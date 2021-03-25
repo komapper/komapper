@@ -5,9 +5,9 @@ import org.komapper.core.data.Statement
 import org.komapper.core.jdbc.Executor
 import org.komapper.core.metamodel.Assignment
 import org.komapper.core.metamodel.EntityMetamodel
-import org.komapper.core.query.builder.InsertStatementBuilder
+import org.komapper.core.query.builder.EntityInsertStatementBuilder
 import org.komapper.core.query.command.EntityInsertCommand
-import org.komapper.core.query.context.InsertContext
+import org.komapper.core.query.context.EntityInsertContext
 import java.time.Clock
 import java.time.Instant
 import java.time.ZoneId
@@ -16,7 +16,7 @@ interface EntityInsertQuery<ENTITY> : Query<ENTITY>
 
 internal class EntityInsertQueryImpl<ENTITY>(private val entityMetamodel: EntityMetamodel<ENTITY>, private val entity: ENTITY) :
     EntityInsertQuery<ENTITY> {
-    private val context: InsertContext<ENTITY> = InsertContext(entityMetamodel)
+    private val context: EntityInsertContext<ENTITY> = EntityInsertContext(entityMetamodel)
 
     override fun run(config: DefaultDatabaseConfig): ENTITY {
         val assignment = entityMetamodel.idAssignment()
@@ -49,7 +49,7 @@ internal class EntityInsertQueryImpl<ENTITY>(private val entityMetamodel: Entity
     }
 
     private fun buildStatement(config: DefaultDatabaseConfig, entity: ENTITY): Statement {
-        val builder = InsertStatementBuilder(config, context, entity)
+        val builder = EntityInsertStatementBuilder(config, context, entity)
         return builder.build()
     }
 }

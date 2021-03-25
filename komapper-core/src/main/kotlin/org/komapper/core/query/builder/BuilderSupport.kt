@@ -1,102 +1,32 @@
 package org.komapper.core.query.builder
 
-import org.komapper.core.DefaultDatabaseConfig
-import org.komapper.core.data.Statement
+import org.komapper.core.DatabaseConfig
 import org.komapper.core.data.StatementBuffer
 import org.komapper.core.data.Value
 import org.komapper.core.metamodel.EntityMetamodel
 import org.komapper.core.metamodel.PropertyMetamodel
-import org.komapper.core.query.context.JoinKind
-import org.komapper.core.query.context.SelectContext
+import org.komapper.core.query.context.EntitySelectContext
 import org.komapper.core.query.data.Criterion
 import org.komapper.core.query.data.Operand
-import org.komapper.core.query.data.SortItem
 import org.komapper.core.query.option.LikeOption
 
-internal class SelectStatementBuilder<ENTITY>(
-    val config: DefaultDatabaseConfig,
-    val context: SelectContext<ENTITY>,
-    private val aliasManager: AliasManager = AliasManager(context)
+internal class BuilderSupport(
+    private val config: DatabaseConfig,
+    private val aliasManager: AliasManager,
+    private val buf: StatementBuffer
 ) {
 
-    private val buf = StatementBuffer(config.dialect::formatValue)
-
-    fun build(): Statement {
-        buf.append("select ")
-        val properties = context.getProjectionPropertyMetamodels()
-        properties.joinTo(buf) { columnName(it) }
-        buf.append(" from ")
-        buf.append(tableName(context.entityMetamodel))
-        if (context.joins.isNotEmpty()) {
-            for (join in context.joins) {
-                if (join.kind === JoinKind.INNER) {
-                    buf.append(" inner join ")
-                } else if (join.kind === JoinKind.LEFT_OUTER) {
-                    buf.append(" left outer join ")
-                }
-                buf.append(tableName(join.entityMetamodel))
-                if (join.isNotEmpty()) {
-                    buf.append(" on (")
-                    for ((index, criterion) in join.withIndex()) {
-                        visitCriterion(index, criterion)
-                        buf.append(" and ")
-                    }
-                    buf.cutBack(5)
-                    buf.append(")")
-                }
-            }
-        }
-        if (context.where.isNotEmpty()) {
-            buf.append(" where ")
-            for ((index, criterion) in context.where.withIndex()) {
-                visitCriterion(index, criterion)
-                buf.append(" and ")
-            }
-            buf.cutBack(5)
-        }
-        if (context.orderBy.isNotEmpty()) {
-            buf.append(" order by ")
-            for (item in context.orderBy) {
-                buf.append(columnName(item.propertyMetamodel))
-                val sort = when (item) {
-                    is SortItem.Asc<*, *> -> "asc"
-                    is SortItem.Desc<*, *> -> "desc"
-                }
-                buf.append(" $sort, ")
-            }
-            buf.cutBack(2)
-        }
-
-        if (context.offset >= 0) {
-            buf.append(" offset ")
-            buf.append(context.offset)
-            buf.append(" rows")
-        }
-
-        if (context.limit > 0) {
-            buf.append(" fetch first ")
-            buf.append(context.limit)
-            buf.append(" rows only")
-        }
-
-        if (context.forUpdate.option != null) {
-            buf.append(" for update")
-        }
-
-        return buf.toStatement()
-    }
-
-    private fun tableName(entityMetamodel: EntityMetamodel<*>): String {
+    fun tableName(entityMetamodel: EntityMetamodel<*>): String {
         val alias = aliasManager.getAlias(entityMetamodel) ?: error("no alias")
         return entityMetamodel.tableName() + " " + alias
     }
 
-    private fun columnName(propertyMetamodel: PropertyMetamodel<*, *>): String {
+    fun columnName(propertyMetamodel: PropertyMetamodel<*, *>): String {
         val alias = aliasManager.getAlias(propertyMetamodel) ?: error("no alias")
         return alias + "." + propertyMetamodel.columnName
     }
 
-    private fun visitCriterion(index: Int, c: Criterion) {
+    fun visitCriterion(index: Int, c: Criterion) {
         when (c) {
             is Criterion.Eq -> binaryOperation(c.left, c.right, "=")
             is Criterion.NotEq -> binaryOperation(c.left, c.right, "<>")
@@ -204,25 +134,25 @@ internal class SelectStatementBuilder<ENTITY>(
         buf.append(")")
     }
 
-    private fun inSubQueryOperation(left: Operand, right: SelectContext<*>, not: Boolean = false) {
+    private fun inSubQueryOperation(left: Operand, right: EntitySelectContext<*>, not: Boolean = false) {
         visitOperand(left)
         if (not) {
             buf.append(" not")
         }
         buf.append(" in (")
         val childAliasManager = AliasManager(right, aliasManager)
-        val builder = SelectStatementBuilder(config, right, childAliasManager)
+        val builder = EntitySelectStatementBuilder(config, right, childAliasManager)
         buf.append(builder.build())
         buf.append(")")
     }
 
-    private fun existsOperation(subContext: SelectContext<*>, not: Boolean = false) {
+    private fun existsOperation(subContext: EntitySelectContext<*>, not: Boolean = false) {
         if (not) {
             buf.append("not ")
         }
         buf.append("exists (")
         val childAliasManager = AliasManager(subContext, aliasManager)
-        val builder = SelectStatementBuilder(config, subContext, childAliasManager)
+        val builder = EntitySelectStatementBuilder(config, subContext, childAliasManager)
         buf.append(builder.build())
         buf.append(")")
     }

@@ -7,11 +7,11 @@ import org.komapper.core.data.Value
 import org.komapper.core.metamodel.Assignment
 import org.komapper.core.metamodel.EntityMetamodel
 import org.komapper.core.metamodel.PropertyMetamodel
-import org.komapper.core.query.context.InsertContext
+import org.komapper.core.query.context.EntityInsertContext
 
-internal class InsertStatementBuilder<ENTITY>(
+internal class EntityInsertStatementBuilder<ENTITY>(
     val config: DefaultDatabaseConfig,
-    val context: InsertContext<ENTITY>,
+    val context: EntityInsertContext<ENTITY>,
     val entity: ENTITY
 ) {
     private val buf = StatementBuffer(config.dialect::formatValue)
