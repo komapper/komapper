@@ -103,6 +103,16 @@ class WhereScope internal constructor(private val context: WhereContext) {
         context.add(Criterion::GraterEq, this, operand)
     }
 
+    fun <T : Any> PropertyMetamodel<*, T>.isNull() {
+        val left = Operand.Property(this)
+        context.add(Criterion.IsNull(left))
+    }
+
+    fun <T : Any> PropertyMetamodel<*, T>.isNotNull() {
+        val left = Operand.Property(this)
+        context.add(Criterion.IsNotNull(left))
+    }
+
     infix fun <T : CharSequence> PropertyMetamodel<*, T>.like(operand: Any?) {
         if (operand == null) return
         context.add(Criterion::Like, this, operand, LikeOption.None)

@@ -100,6 +100,8 @@ internal class SelectStatementBuilder<ENTITY>(val config: DefaultDatabaseConfig,
             is Criterion.LessEq -> binaryOperation(c.left, c.right, "<=")
             is Criterion.Grater -> binaryOperation(c.left, c.right, ">")
             is Criterion.GraterEq -> binaryOperation(c.left, c.right, ">=")
+            is Criterion.IsNull -> isNullOperation(c.left)
+            is Criterion.IsNotNull -> isNullOperation(c.left, true)
             is Criterion.Like -> likeOperation(c.left, c.right, c.option)
             is Criterion.NotLike -> likeOperation(c.left, c.right, c.option, true)
             is Criterion.Between -> betweenOperation(c.left, c.right)
@@ -116,6 +118,16 @@ internal class SelectStatementBuilder<ENTITY>(val config: DefaultDatabaseConfig,
         visitOperand(left)
         buf.append(" $operator ")
         visitOperand(right)
+    }
+
+    private fun isNullOperation(left: Operand, not: Boolean = false) {
+        visitOperand(left)
+        val predicate = if (not) {
+            " is not null"
+        } else {
+            " is null"
+        }
+        buf.append(predicate)
     }
 
     private fun likeOperation(left: Operand, right: Operand, option: LikeOption, not: Boolean = false) {

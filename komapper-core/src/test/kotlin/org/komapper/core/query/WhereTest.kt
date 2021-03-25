@@ -49,6 +49,30 @@ internal class WhereTest {
     }
 
     @Test
+    fun isNull() {
+        val a = Address.metamodel()
+        val query = EntityQuery.from(a).where {
+            a.street.isNull()
+        }
+        assertEquals(
+            "select t0_.ID, t0_.STREET, t0_.VERSION from ADDRESS t0_ where t0_.STREET is null",
+            query.toStatement(config).sql
+        )
+    }
+
+    @Test
+    fun isNotNull() {
+        val a = Address.metamodel()
+        val query = EntityQuery.from(a).where {
+            a.street.isNotNull()
+        }
+        assertEquals(
+            "select t0_.ID, t0_.STREET, t0_.VERSION from ADDRESS t0_ where t0_.STREET is not null",
+            query.toStatement(config).sql
+        )
+    }
+
+    @Test
     fun like() {
         val a = Address.metamodel()
         val query = EntityQuery.from(a).where {

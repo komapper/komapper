@@ -178,6 +178,28 @@ class EntitySelectQueryTest(private val db: Database) {
     }
 
     @Test
+    fun isNull() {
+        val e = Employee.metamodel()
+        val list = db.list {
+            EntityQuery.from(e).where {
+                e.managerId.isNull()
+            }
+        }
+        assertEquals(listOf(9), list.map { it.employeeId })
+    }
+
+    @Test
+    fun isNotNull() {
+        val e = Employee.metamodel()
+        val list = db.list {
+            EntityQuery.from(e).where {
+                e.managerId.isNotNull()
+            }
+        }
+        assertTrue(9 !in list.map { it.employeeId })
+    }
+
+    @Test
     fun between() {
         val a = Address.metamodel()
         val idList = db.list {
@@ -199,6 +221,7 @@ class EntitySelectQueryTest(private val db: Database) {
         val ids = (1..4) + (11..15)
         assertEquals(ids.toList(), idList.map { it.addressId })
     }
+
     @Test
     fun not() {
         val a = Address.metamodel()
@@ -494,27 +517,6 @@ fun between() {
     assertEquals((5..10).toList(), idList)
 }
 
-@Test
-fun isNull() {
-
-    val idList = db.select<Employee> { e ->
-        where {
-            eq(e[Employee::managerId], null)
-        }
-    }.map { it.employeeId }
-    assertEquals(listOf(9), idList)
-}
-
-@Test
-fun isNotNull() {
-
-    val idList = db.select<Employee> {
-        where {
-            ne(Employee::managerId, null)
-        }
-    }.map { it.employeeId }
-    assertTrue(9 !in idList)
-}
 
 @Test
 fun join() {

@@ -9,6 +9,8 @@ internal sealed class Criterion {
     data class LessEq(val left: Operand, val right: Operand) : Criterion()
     data class Grater(val left: Operand, val right: Operand) : Criterion()
     data class GraterEq(val left: Operand, val right: Operand) : Criterion()
+    data class IsNull(val left: Operand) : Criterion()
+    data class IsNotNull(val left: Operand) : Criterion()
     data class Like(val left: Operand, val right: Operand, val option: LikeOption) : Criterion()
     data class NotLike(val left: Operand, val right: Operand, val option: LikeOption) : Criterion()
     data class Between(val left: Operand, val right: Pair<Operand, Operand>) : Criterion()
