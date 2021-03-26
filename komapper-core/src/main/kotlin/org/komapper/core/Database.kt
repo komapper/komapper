@@ -2,8 +2,8 @@ package org.komapper.core
 
 import org.komapper.core.metamodel.EntityMetamodel
 import org.komapper.core.query.EntityQuery
-import org.komapper.core.query.Query
-import org.komapper.core.query.ScriptQuery
+import org.komapper.core.query.Queryable
+import org.komapper.core.query.ScriptQueryable
 import org.komapper.core.query.SqlQuery
 import org.komapper.core.query.scope.WhereDeclaration
 import java.sql.Blob
@@ -38,28 +38,28 @@ class Database(val config: DefaultDatabaseConfig) {
         return run(query).firstOrNull()
     }
 
-    fun <ENTITY> first(block: () -> Query<List<ENTITY>>): ENTITY {
+    fun <ENTITY> first(block: () -> Queryable<List<ENTITY>>): ENTITY {
         return firstOrNull(block) ?: error("result is empty.")
     }
 
-    fun <ENTITY> firstOrNull(block: () -> Query<List<ENTITY>>): ENTITY? {
+    fun <ENTITY> firstOrNull(block: () -> Queryable<List<ENTITY>>): ENTITY? {
         return run(block()).firstOrNull()
     }
 
-    fun <ENTITY> first(query: Query<List<ENTITY>>): ENTITY {
-        return firstOrNull(query) ?: error("result is empty.")
+    fun <ENTITY> first(queryable: Queryable<List<ENTITY>>): ENTITY {
+        return firstOrNull(queryable) ?: error("result is empty.")
     }
 
-    fun <ENTITY> firstOrNull(query: Query<List<ENTITY>>): ENTITY? {
-        return run(query).firstOrNull()
+    fun <ENTITY> firstOrNull(queryable: Queryable<List<ENTITY>>): ENTITY? {
+        return run(queryable).firstOrNull()
     }
 
-    fun <ENTITY> list(block: () -> Query<List<ENTITY>>): List<ENTITY> {
+    fun <ENTITY> list(block: () -> Queryable<List<ENTITY>>): List<ENTITY> {
         return run(block())
     }
 
-    fun <ENTITY> list(query: Query<List<ENTITY>>): List<ENTITY> {
-        return run(query)
+    fun <ENTITY> list(queryable: Queryable<List<ENTITY>>): List<ENTITY> {
+        return run(queryable)
     }
 
     fun <ENTITY> insert(metamodel: EntityMetamodel<ENTITY>, entity: ENTITY): ENTITY {
@@ -77,21 +77,21 @@ class Database(val config: DefaultDatabaseConfig) {
         run(query)
     }
 
-    fun execute(block: () -> Query<Int>): Int {
+    fun execute(block: () -> Queryable<Int>): Int {
         return run(block())
     }
 
-    fun execute(query: Query<Int>): Int {
-        return run(query)
+    fun execute(queryable: Queryable<Int>): Int {
+        return run(queryable)
     }
 
     fun script(sql: CharSequence) {
-        val query = ScriptQuery.create(sql.toString())
+        val query = ScriptQueryable.create(sql.toString())
         run(query)
     }
 
-    private fun <T> run(query: Query<T>): T {
-        return query.run(config)
+    private fun <T> run(queryable: Queryable<T>): T {
+        return queryable.run(config)
     }
 
     class Factory(val config: DefaultDatabaseConfig) {

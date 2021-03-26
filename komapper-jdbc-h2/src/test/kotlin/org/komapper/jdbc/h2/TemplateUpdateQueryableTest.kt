@@ -7,7 +7,7 @@ import org.komapper.core.Database
 import org.komapper.core.query.TemplateQuery
 
 @ExtendWith(Env::class)
-class TemplateUpdateQueryTest(private val db: Database) {
+class TemplateUpdateQueryableTest(private val db: Database) {
 
     @Test
     fun test() {

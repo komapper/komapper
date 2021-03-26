@@ -4,7 +4,7 @@ import org.komapper.core.metamodel.EntityMetamodel
 
 object SqlQuery {
 
-    fun <ENTITY> from(entityMetamodel: EntityMetamodel<ENTITY>): SqlSelectQuery<ENTITY> {
-        return SqlSelectQueryImpl(entityMetamodel)
+    fun <ENTITY> from(entityMetamodel: EntityMetamodel<ENTITY>): SqlSelectQueryable<ENTITY> {
+        return SqlSelectQueryableImpl(entityMetamodel)
     }
 }

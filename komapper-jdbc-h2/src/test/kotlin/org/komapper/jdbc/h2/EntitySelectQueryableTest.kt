@@ -13,7 +13,7 @@ import org.komapper.core.query.scope.WhereDeclaration
 import org.komapper.core.query.scope.WhereScope.Companion.plus
 
 @ExtendWith(Env::class)
-class EntitySelectQueryTest(private val db: Database) {
+class EntitySelectQueryableTest(private val db: Database) {
 
     @Test
     fun first() {

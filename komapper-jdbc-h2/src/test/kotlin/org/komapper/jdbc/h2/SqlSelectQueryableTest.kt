@@ -14,7 +14,7 @@ import org.komapper.core.query.min
 import org.komapper.core.query.sum
 
 @ExtendWith(Env::class)
-class SqlSelectQueryTest(private val db: Database) {
+class SqlSelectQueryableTest(private val db: Database) {
 
     @Test
     fun find() {

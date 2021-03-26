@@ -15,35 +15,35 @@ import org.komapper.core.query.scope.HavingScope
 import org.komapper.core.query.scope.JoinDeclaration
 import org.komapper.core.query.scope.WhereDeclaration
 
-interface SqlSelectQuery<ENTITY> : Query<List<ENTITY>> {
+interface SqlSelectQueryable<ENTITY> : Queryable<List<ENTITY>> {
 
     fun <OTHER_ENTITY> innerJoin(
         entityMetamodel: EntityMetamodel<OTHER_ENTITY>,
         declaration: JoinDeclaration<OTHER_ENTITY>
-    ): SqlSelectQuery<ENTITY>
+    ): SqlSelectQueryable<ENTITY>
 
     fun <OTHER_ENTITY> leftJoin(
         entityMetamodel: EntityMetamodel<OTHER_ENTITY>,
         declaration: JoinDeclaration<OTHER_ENTITY>
-    ): SqlSelectQuery<ENTITY>
+    ): SqlSelectQueryable<ENTITY>
 
-    fun where(declaration: WhereDeclaration): SqlSelectQuery<ENTITY>
-    fun groupBy(vararg items: ColumnInfo<*>): SqlSelectQuery<ENTITY>
-    fun having(declaration: HavingDeclaration): SqlSelectQuery<ENTITY>
-    fun orderBy(vararg items: ColumnInfo< *>): SqlSelectQuery<ENTITY>
-    fun offset(value: Int): SqlSelectQuery<ENTITY>
-    fun limit(value: Int): SqlSelectQuery<ENTITY>
-    fun forUpdate(): SqlSelectQuery<ENTITY>
-    fun <T : Any> select(columnInfo: ColumnInfo<T>): SqlSelectQuery1<ENTITY, T>
+    fun where(declaration: WhereDeclaration): SqlSelectQueryable<ENTITY>
+    fun groupBy(vararg items: ColumnInfo<*>): SqlSelectQueryable<ENTITY>
+    fun having(declaration: HavingDeclaration): SqlSelectQueryable<ENTITY>
+    fun orderBy(vararg items: ColumnInfo< *>): SqlSelectQueryable<ENTITY>
+    fun offset(value: Int): SqlSelectQueryable<ENTITY>
+    fun limit(value: Int): SqlSelectQueryable<ENTITY>
+    fun forUpdate(): SqlSelectQueryable<ENTITY>
+    fun <T : Any> select(columnInfo: ColumnInfo<T>): SqlSelectQueryable1<ENTITY, T>
     fun <A : Any, B : Any> select(
         columnInfo1: ColumnInfo<A>,
         columnInfo2: ColumnInfo<B>
-    ): SqlSelectQuery2<ENTITY, A, B>
+    ): SqlSelectQueryable2<ENTITY, A, B>
 }
 
-interface SqlSelectQuery1<ENTITY, T> : Query<List<T>>
+interface SqlSelectQueryable1<ENTITY, T> : Queryable<List<T>>
 
-interface SqlSelectQuery2<ENTITY, A, B> : Query<List<Pair<A, B>>>
+interface SqlSelectQueryable2<ENTITY, A, B> : Queryable<List<Pair<A, B>>>
 
 interface SqlSelectSubQuery<ENTITY> {
     fun <OTHER_ENTITY> innerJoin(
@@ -57,7 +57,7 @@ interface SqlSelectSubQuery<ENTITY> {
     ): SqlSelectSubQuery<ENTITY>
 
     fun where(declaration: WhereDeclaration): SqlSelectSubQuery<ENTITY>
-    fun groupBy(vararg items: ColumnInfo<*>): SqlSelectQuery<ENTITY>
+    fun groupBy(vararg items: ColumnInfo<*>): SqlSelectQueryable<ENTITY>
     fun having(declaration: HavingDeclaration): SqlSelectSubQuery<ENTITY>
     fun orderBy(vararg items: ColumnInfo<*>): SqlSelectSubQuery<ENTITY>
     fun offset(value: Int): SqlSelectSubQuery<ENTITY>
@@ -65,11 +65,11 @@ interface SqlSelectSubQuery<ENTITY> {
     fun select(columnInfo: ColumnInfo<*>): SingleColumnProjection
 }
 
-internal class SqlSelectQueryImpl<ENTITY>(
+internal class SqlSelectQueryableImpl<ENTITY>(
     private val entityMetamodel: EntityMetamodel<ENTITY>,
     private val context: SqlSelectContext<ENTITY> = SqlSelectContext(entityMetamodel)
 ) :
-    SqlSelectQuery<ENTITY>,
+    SqlSelectQueryable<ENTITY>,
     SqlSelectSubQuery<ENTITY> {
 
     private val support: SelectQuerySupport<ENTITY> = SelectQuerySupport(context)
@@ -77,7 +77,7 @@ internal class SqlSelectQueryImpl<ENTITY>(
     override fun <OTHER_ENTITY> innerJoin(
         entityMetamodel: EntityMetamodel<OTHER_ENTITY>,
         declaration: JoinDeclaration<OTHER_ENTITY>
-    ): SqlSelectQueryImpl<ENTITY> {
+    ): SqlSelectQueryableImpl<ENTITY> {
         support.innerJoin(entityMetamodel, declaration)
         return this
     }
@@ -85,44 +85,44 @@ internal class SqlSelectQueryImpl<ENTITY>(
     override fun <OTHER_ENTITY> leftJoin(
         entityMetamodel: EntityMetamodel<OTHER_ENTITY>,
         declaration: JoinDeclaration<OTHER_ENTITY>
-    ): SqlSelectQueryImpl<ENTITY> {
+    ): SqlSelectQueryableImpl<ENTITY> {
         support.leftJoin(entityMetamodel, declaration)
         return this
     }
 
-    override fun where(declaration: WhereDeclaration): SqlSelectQueryImpl<ENTITY> {
+    override fun where(declaration: WhereDeclaration): SqlSelectQueryableImpl<ENTITY> {
         support.where(declaration)
         return this
     }
 
-    override fun groupBy(vararg items: ColumnInfo<*>): SqlSelectQueryImpl<ENTITY> {
+    override fun groupBy(vararg items: ColumnInfo<*>): SqlSelectQueryableImpl<ENTITY> {
         context.groupBy.addAll(items)
         return this
     }
 
-    override fun having(declaration: HavingDeclaration): SqlSelectQueryImpl<ENTITY> {
+    override fun having(declaration: HavingDeclaration): SqlSelectQueryableImpl<ENTITY> {
         val support = FilterScopeSupport(context.having)
         val scope = HavingScope(support)
         declaration(scope)
         return this
     }
 
-    override fun orderBy(vararg items: ColumnInfo<*>): SqlSelectQueryImpl<ENTITY> {
+    override fun orderBy(vararg items: ColumnInfo<*>): SqlSelectQueryableImpl<ENTITY> {
         support.orderBy(*items)
         return this
     }
 
-    override fun offset(value: Int): SqlSelectQueryImpl<ENTITY> {
+    override fun offset(value: Int): SqlSelectQueryableImpl<ENTITY> {
         support.offset(value)
         return this
     }
 
-    override fun limit(value: Int): SqlSelectQueryImpl<ENTITY> {
+    override fun limit(value: Int): SqlSelectQueryableImpl<ENTITY> {
         support.limit(value)
         return this
     }
 
-    override fun forUpdate(): SqlSelectQueryImpl<ENTITY> {
+    override fun forUpdate(): SqlSelectQueryableImpl<ENTITY> {
         support.forUpdate()
         return this
     }
@@ -132,18 +132,18 @@ internal class SqlSelectQueryImpl<ENTITY>(
         return SingleColumnProjection(context)
     }
 
-    override fun <T : Any> select(columnInfo: ColumnInfo<T>): SingleProjectionQuery<ENTITY, T> {
+    override fun <T : Any> select(columnInfo: ColumnInfo<T>): SingleProjectionQueryable<ENTITY, T> {
         context.columns.add(columnInfo)
-        return SingleProjectionQuery(context, columnInfo)
+        return SingleProjectionQueryable(context, columnInfo)
     }
 
     override fun <A : Any, B : Any> select(
         columnInfo1: ColumnInfo<A>,
         columnInfo2: ColumnInfo<B>
-    ): PairProjectionQuery<ENTITY, A, B> {
+    ): PairProjectionQueryable<ENTITY, A, B> {
         context.columns.add(columnInfo1)
         context.columns.add(columnInfo2)
-        return PairProjectionQuery(context, columnInfo1 to columnInfo2)
+        return PairProjectionQueryable(context, columnInfo1 to columnInfo2)
     }
 
     override fun run(config: DatabaseConfig): List<ENTITY> {
@@ -162,10 +162,10 @@ internal class SqlSelectQueryImpl<ENTITY>(
     }
 }
 
-internal class SingleProjectionQuery<ENTITY, T : Any>(
+internal class SingleProjectionQueryable<ENTITY, T : Any>(
     private val context: SqlSelectContext<ENTITY>,
     private val columnInfo: ColumnInfo<T>
-) : SqlSelectQuery1<ENTITY, T> {
+) : SqlSelectQueryable1<ENTITY, T> {
 
     override fun run(config: DatabaseConfig): List<T> {
         val statement = buildStatement(config)
@@ -183,10 +183,10 @@ internal class SingleProjectionQuery<ENTITY, T : Any>(
     }
 }
 
-internal class PairProjectionQuery<ENTITY, A : Any, B : Any>(
+internal class PairProjectionQueryable<ENTITY, A : Any, B : Any>(
     private val context: SqlSelectContext<ENTITY>,
     private val pair: Pair<ColumnInfo<A>, ColumnInfo<B>>
-) : SqlSelectQuery2<ENTITY, A, B> {
+) : SqlSelectQueryable2<ENTITY, A, B> {
 
     override fun run(config: DatabaseConfig): List<Pair<A, B>> {
         val statement = buildStatement(config)

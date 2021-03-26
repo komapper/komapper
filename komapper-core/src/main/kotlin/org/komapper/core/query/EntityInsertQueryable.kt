@@ -12,10 +12,10 @@ import java.time.Clock
 import java.time.Instant
 import java.time.ZoneId
 
-interface EntityInsertQuery<ENTITY> : Query<ENTITY>
+interface EntityInsertQueryable<ENTITY> : Queryable<ENTITY>
 
-internal class EntityInsertQueryImpl<ENTITY>(private val entityMetamodel: EntityMetamodel<ENTITY>, private val entity: ENTITY) :
-    EntityInsertQuery<ENTITY> {
+internal class EntityInsertQueryableImpl<ENTITY>(private val entityMetamodel: EntityMetamodel<ENTITY>, private val entity: ENTITY) :
+    EntityInsertQueryable<ENTITY> {
     private val context: EntityInsertContext<ENTITY> = EntityInsertContext(entityMetamodel)
 
     override fun run(config: DatabaseConfig): ENTITY {

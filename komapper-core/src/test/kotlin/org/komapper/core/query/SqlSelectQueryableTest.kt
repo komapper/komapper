@@ -3,23 +3,52 @@ package org.komapper.core.query
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.komapper.core.DefaultDatabaseConfig
-import org.komapper.core.query.scope.WhereDeclaration
-import org.komapper.core.query.scope.WhereScope.Companion.plus
 
-class EntitySelectQueryTest {
+class SqlSelectQueryableTest {
 
     private val config = DefaultDatabaseConfig(EmptyDialect(), "")
 
     @Test
-    fun entity_from() {
+    fun from() {
         val a = Address.metamodel()
-        val query = EntityQuery.from(a).where { a.id eq 1 }
+        val query = SqlQuery.from(a).where { a.id eq 1 }
         assertEquals(
             "select t0_.ID, t0_.STREET, t0_.VERSION from ADDRESS t0_ where t0_.ID = ?",
             query.toStatement(config).sql
         )
     }
 
+    @Test
+    fun aggregation_sum() {
+        val a = Address.metamodel()
+        val query = SqlQuery.from(a).where { a.id eq 1 }.select(sum(a.id))
+        assertEquals(
+            "select sum(t0_.ID) from ADDRESS t0_ where t0_.ID = ?",
+            query.toStatement(config).sql
+        )
+    }
+
+    @Test
+    fun aggregation_countAsterisk() {
+        val a = Address.metamodel()
+        val query = SqlQuery.from(a).where { a.id eq 1 }.select(count())
+        assertEquals(
+            "select count(*) from ADDRESS t0_ where t0_.ID = ?",
+            query.toStatement(config).sql
+        )
+    }
+
+    @Test
+    fun aggregation_count() {
+        val a = Address.metamodel()
+        val query = SqlQuery.from(a).where { a.id eq 1 }.select(count(a.id))
+        assertEquals(
+            "select count(t0_.ID) from ADDRESS t0_ where t0_.ID = ?",
+            query.toStatement(config).sql
+        )
+    }
+
+/*
     @Test
     fun entity_innerJoin() {
         val a = Address.metamodel()
@@ -125,4 +154,6 @@ class EntitySelectQueryTest {
             query.toStatement(config).sql
         )
     }
+    
+ */
 }

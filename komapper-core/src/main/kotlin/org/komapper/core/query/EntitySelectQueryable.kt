@@ -10,54 +10,54 @@ import org.komapper.core.query.context.EntitySelectContext
 import org.komapper.core.query.scope.JoinDeclaration
 import org.komapper.core.query.scope.WhereDeclaration
 
-interface EntitySelectQuery<ENTITY> : Query<List<ENTITY>> {
+interface EntitySelectQueryable<ENTITY> : Queryable<List<ENTITY>> {
 
     fun <OTHER_ENTITY> innerJoin(
         entityMetamodel: EntityMetamodel<OTHER_ENTITY>,
         declaration: JoinDeclaration<OTHER_ENTITY>
-    ): EntitySelectQuery1<ENTITY>
+    ): EntitySelectQueryable1<ENTITY>
 
     fun <OTHER_ENTITY> leftJoin(
         entityMetamodel: EntityMetamodel<OTHER_ENTITY>,
         declaration: JoinDeclaration<OTHER_ENTITY>
-    ): EntitySelectQuery1<ENTITY>
+    ): EntitySelectQueryable1<ENTITY>
 
-    fun where(declaration: WhereDeclaration): EntitySelectQuery<ENTITY>
-    fun orderBy(vararg items: ColumnInfo<*>): EntitySelectQuery<ENTITY>
-    fun offset(value: Int): EntitySelectQuery<ENTITY>
-    fun limit(value: Int): EntitySelectQuery<ENTITY>
-    fun forUpdate(): EntitySelectQuery<ENTITY>
+    fun where(declaration: WhereDeclaration): EntitySelectQueryable<ENTITY>
+    fun orderBy(vararg items: ColumnInfo<*>): EntitySelectQueryable<ENTITY>
+    fun offset(value: Int): EntitySelectQueryable<ENTITY>
+    fun limit(value: Int): EntitySelectQueryable<ENTITY>
+    fun forUpdate(): EntitySelectQueryable<ENTITY>
 }
 
 // TODO is this necessary?
-interface EntitySelectQuery1<ENTITY> : EntitySelectQuery<ENTITY> {
+interface EntitySelectQueryable1<ENTITY> : EntitySelectQueryable<ENTITY> {
 
-    override fun where(declaration: WhereDeclaration): EntitySelectQuery1<ENTITY>
-    override fun orderBy(vararg items: ColumnInfo<*>): EntitySelectQuery1<ENTITY>
-    override fun offset(value: Int): EntitySelectQuery1<ENTITY>
-    override fun limit(value: Int): EntitySelectQuery1<ENTITY>
-    override fun forUpdate(): EntitySelectQuery1<ENTITY>
+    override fun where(declaration: WhereDeclaration): EntitySelectQueryable1<ENTITY>
+    override fun orderBy(vararg items: ColumnInfo<*>): EntitySelectQueryable1<ENTITY>
+    override fun offset(value: Int): EntitySelectQueryable1<ENTITY>
+    override fun limit(value: Int): EntitySelectQueryable1<ENTITY>
+    override fun forUpdate(): EntitySelectQueryable1<ENTITY>
 
     fun <T, S> associate(
         e1: EntityMetamodel<T>,
         e2: EntityMetamodel<S>,
         associator: Associator<T, S>
-    ): EntitySelectQuery1<ENTITY>
+    ): EntitySelectQueryable1<ENTITY>
 }
 
-internal class EntitySelectQueryImpl<ENTITY>(
+internal class EntitySelectQueryableImpl<ENTITY>(
     private val entityMetamodel: EntityMetamodel<ENTITY>,
     private val context: EntitySelectContext<ENTITY> = EntitySelectContext(entityMetamodel)
 ) :
-    EntitySelectQuery<ENTITY>,
-    EntitySelectQuery1<ENTITY> {
+    EntitySelectQueryable<ENTITY>,
+    EntitySelectQueryable1<ENTITY> {
 
     private val support: SelectQuerySupport<ENTITY> = SelectQuerySupport(context)
 
     override fun <OTHER_ENTITY> innerJoin(
         entityMetamodel: EntityMetamodel<OTHER_ENTITY>,
         declaration: JoinDeclaration<OTHER_ENTITY>
-    ): EntitySelectQueryImpl<ENTITY> {
+    ): EntitySelectQueryableImpl<ENTITY> {
         support.innerJoin(entityMetamodel, declaration)
         return this
     }
@@ -65,7 +65,7 @@ internal class EntitySelectQueryImpl<ENTITY>(
     override fun <OTHER_ENTITY> leftJoin(
         entityMetamodel: EntityMetamodel<OTHER_ENTITY>,
         declaration: JoinDeclaration<OTHER_ENTITY>
-    ): EntitySelectQueryImpl<ENTITY> {
+    ): EntitySelectQueryableImpl<ENTITY> {
         support.leftJoin(entityMetamodel, declaration)
         return this
     }
@@ -74,7 +74,7 @@ internal class EntitySelectQueryImpl<ENTITY>(
         e1: EntityMetamodel<T>,
         e2: EntityMetamodel<S>,
         associator: Associator<T, S>
-    ): EntitySelectQueryImpl<ENTITY> {
+    ): EntitySelectQueryableImpl<ENTITY> {
         val entityMetamodels = context.getEntityMetamodels()
         if (entityMetamodels.none { it == e1 }) {
             error("The e1 is not found. Use e1 in the join clause.")
@@ -87,27 +87,27 @@ internal class EntitySelectQueryImpl<ENTITY>(
         return this
     }
 
-    override fun where(declaration: WhereDeclaration): EntitySelectQueryImpl<ENTITY> {
+    override fun where(declaration: WhereDeclaration): EntitySelectQueryableImpl<ENTITY> {
         support.where(declaration)
         return this
     }
 
-    override fun orderBy(vararg items: ColumnInfo<*>): EntitySelectQueryImpl<ENTITY> {
+    override fun orderBy(vararg items: ColumnInfo<*>): EntitySelectQueryableImpl<ENTITY> {
         support.orderBy(*items)
         return this
     }
 
-    override fun offset(value: Int): EntitySelectQueryImpl<ENTITY> {
+    override fun offset(value: Int): EntitySelectQueryableImpl<ENTITY> {
         support.offset(value)
         return this
     }
 
-    override fun limit(value: Int): EntitySelectQueryImpl<ENTITY> {
+    override fun limit(value: Int): EntitySelectQueryableImpl<ENTITY> {
         support.limit(value)
         return this
     }
 
-    override fun forUpdate(): EntitySelectQueryImpl<ENTITY> {
+    override fun forUpdate(): EntitySelectQueryableImpl<ENTITY> {
         support.forUpdate()
         return this
     }

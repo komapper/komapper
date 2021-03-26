@@ -2,21 +2,21 @@ package org.komapper.core.query
 
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.data.Statement
-import org.komapper.core.query.command.TemplateSelectCommand
+import org.komapper.core.query.command.TemplateUpdateCommand
 import org.komapper.core.template.DefaultStatementBuilder
 
-interface TemplateSelectQuery<T, R> : Query<R>
+interface TemplateUpdateQueryable : Queryable<Int>
+interface TemplateInsertQueryable : Queryable<Int>
+interface TemplateDeleteQueryable : Queryable<Int>
 
-internal class TemplateSelectQueryImpl<T, R>(
+internal class TemplateUpdateQueryableImpl(
     private val sql: String,
-    private val params: Any = object {},
-    private val provider: Row.() -> T,
-    private val transformer: (Sequence<T>) -> R
-) : TemplateSelectQuery<T, R> {
+    private val params: Any = object {}
+) : TemplateUpdateQueryable, TemplateInsertQueryable, TemplateDeleteQueryable {
 
-    override fun run(config: DatabaseConfig): R {
+    override fun run(config: DatabaseConfig): Int {
         val statement = buildStatement(config)
-        val command = TemplateSelectCommand(config, statement, provider, transformer)
+        val command = TemplateUpdateCommand(config, statement)
         return command.execute()
     }
 

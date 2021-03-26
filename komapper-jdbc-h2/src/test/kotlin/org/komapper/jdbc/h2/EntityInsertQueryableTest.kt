@@ -9,7 +9,7 @@ import org.komapper.core.Database
 import org.komapper.core.UniqueConstraintException
 
 @ExtendWith(Env::class)
-class EntityInsertQueryTest(private val db: Database) {
+class EntityInsertQueryableTest(private val db: Database) {
     @Test
     fun test() {
         val a = Address.metamodel()

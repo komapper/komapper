@@ -3,7 +3,7 @@ package org.komapper.core.query.scope
 import org.komapper.core.metamodel.ColumnInfo
 import org.komapper.core.metamodel.EntityMetamodel
 import org.komapper.core.query.SingleColumnProjection
-import org.komapper.core.query.SqlSelectQueryImpl
+import org.komapper.core.query.SqlSelectQueryableImpl
 import org.komapper.core.query.SqlSelectSubQuery
 import org.komapper.core.query.context.FilterContext
 import org.komapper.core.query.context.SqlSelectContext
@@ -190,13 +190,13 @@ internal class FilterScopeSupport(private val context: FilterContext) : FilterSc
     override fun <ENTITY> exists(entityMetamodel: EntityMetamodel<ENTITY>): SqlSelectSubQuery<ENTITY> {
         val subContext = SqlSelectContext(entityMetamodel)
         context.add(Criterion.Exists(subContext))
-        return SqlSelectQueryImpl(entityMetamodel, subContext)
+        return SqlSelectQueryableImpl(entityMetamodel, subContext)
     }
 
     override fun <ENTITY> notExists(entityMetamodel: EntityMetamodel<ENTITY>): SqlSelectSubQuery<ENTITY> {
         val subContext = SqlSelectContext(entityMetamodel)
         context.add(Criterion.NotExists(subContext))
-        return SqlSelectQueryImpl(entityMetamodel, subContext)
+        return SqlSelectQueryableImpl(entityMetamodel, subContext)
     }
 
     override fun <T : CharSequence> T?.escape(): LikeOperand {
