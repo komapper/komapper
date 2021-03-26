@@ -110,8 +110,8 @@ class EntityDeleteQueryableTest(private val db: Database) {
     fun testEntity() {
         val a = Address.metamodel()
         val query = EntityQuery.from(a).where { a.addressId eq 15 }
-        val address = db.first { query }
+        val address = db.execute(query.first())
         db.delete(a, address)
-        assertEquals(emptyList<Address>(), db.list { query })
+        assertEquals(emptyList<Address>(), db.execute(query))
     }
 }

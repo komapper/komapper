@@ -67,14 +67,14 @@ fun main() {
         check(addressB == foundB1)
 
         // READ: select using template
-        val foundB2 = db.first {
+        val foundB2 = db.execute {
             data class Params(val street: String)
 
             @Language("sql")
             val sql = "select ADDRESS_ID, STREET, VERSION from Address where street = /*street*/'test'"
             TemplateQuery.select(sql, Params("street B")) {
                 Address(asInt("ADDRESS_ID"), asString("STREET"), asInt("VERSION"))
-            }
+            }.first()
         }
         check(addressB == foundB2)
 
@@ -82,9 +82,7 @@ fun main() {
         db.delete(a, addressB)
 
         // READ: select all
-        val addressList = db.list {
-            EntityQuery.from(a).orderBy(a.id)
-        }
+        val addressList = db.execute(EntityQuery.from(a).orderBy(a.id))
         check(addressList.isEmpty())
     }
 }

@@ -8,7 +8,7 @@ import org.komapper.core.Database
 import org.komapper.core.query.TemplateQuery
 
 @ExtendWith(Env::class)
-internal class ScriptQueryableTest(private val db: Database) {
+internal class ScriptQueryTest(private val db: Database) {
 
     @Test
     fun test() {
@@ -19,13 +19,13 @@ internal class ScriptQueryableTest(private val db: Database) {
             """
         db.script(script)
 
-        val value = db.first {
-            @Language("sql")
-            val sql = "select value from execute_table"
+        @Language("sql")
+        val sql = "select value from execute_table"
+        val value = db.execute(
             TemplateQuery.select(sql) {
                 asString("value")
-            }
-        }
+            }.first()
+        )
         Assertions.assertEquals("test", value)
     }
 }

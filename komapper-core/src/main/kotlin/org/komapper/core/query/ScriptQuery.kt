@@ -4,15 +4,13 @@ import org.komapper.core.DatabaseConfig
 import org.komapper.core.data.Statement
 import org.komapper.core.query.command.ScriptCommand
 
-interface ScriptQueryable : Queryable<Unit> {
-    companion object {
-        fun create(sql: String): ScriptQueryable {
-            return ScriptQueryableImpl(sql)
-        }
+object ScriptQuery {
+    fun execute(sql: String): Queryable<Unit> {
+        return ScriptQueryableImpl(sql)
     }
 }
 
-internal class ScriptQueryableImpl(private val sql: String) : ScriptQueryable {
+private class ScriptQueryableImpl(sql: String) : Queryable<Unit> {
     private val statement = Statement(sql, emptyList(), sql)
 
     override fun run(config: DatabaseConfig) {

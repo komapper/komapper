@@ -77,7 +77,7 @@ class TransactionTest {
     fun select() {
         val a = Address.metamodel()
         val list = db.transaction.required {
-            db.list { EntityQuery.from(a) }
+            db.execute(EntityQuery.from(a))
         }
         assertEquals(15, list.size)
         assertEquals(Address(1, "STREET 1", 1), list[0])
@@ -88,11 +88,11 @@ class TransactionTest {
         val a = Address.metamodel()
         val query = EntityQuery.from(a).where { a.addressId eq 15 }
         db.transaction.required {
-            val address = db.first(query)
+            val address = db.execute(query.first())
             db.delete(a, address)
         }
         db.transaction.required {
-            val address = db.firstOrNull(query)
+            val address = db.execute(query.firstOrNull())
             assertNull(address)
         }
     }
@@ -103,14 +103,14 @@ class TransactionTest {
         val query = EntityQuery.from(a).where { a.addressId eq 15 }
         try {
             db.transaction.required {
-                val address = db.first(query)
+                val address = db.execute(query.first())
                 db.delete(a, address)
                 throw Exception()
             }
         } catch (ignored: Exception) {
         }
         db.transaction.required {
-            val address = db.first(query)
+            val address = db.execute(query.first())
             assertNotNull(address)
         }
     }
@@ -120,14 +120,14 @@ class TransactionTest {
         val a = Address.metamodel()
         val query = EntityQuery.from(a).where { a.addressId eq 15 }
         db.transaction.required {
-            val address = db.first(query)
+            val address = db.execute(query.first())
             db.delete(a, address)
             assertFalse(isRollbackOnly())
             setRollbackOnly()
             assertTrue(isRollbackOnly())
         }
         db.transaction.required {
-            val address = db.first(query)
+            val address = db.execute(query.first())
             assertNotNull(address)
         }
     }
@@ -137,11 +137,11 @@ class TransactionTest {
         val a = Address.metamodel()
         val query = EntityQuery.from(a).where { a.addressId eq 15 }
         db.transaction.required(TransactionIsolationLevel.SERIALIZABLE) {
-            val address = db.first(query)
+            val address = db.execute(query.first())
             db.delete(a, address)
         }
         db.transaction.required {
-            val address = db.firstOrNull(query)
+            val address = db.execute(query.firstOrNull())
             assertNull(address)
         }
     }
@@ -151,15 +151,15 @@ class TransactionTest {
         val a = Address.metamodel()
         val query = EntityQuery.from(a).where { a.addressId eq 15 }
         db.transaction.required {
-            val address = db.first(query)
+            val address = db.execute(query.first())
             db.delete(a, address)
             required {
-                val address2 = db.firstOrNull(query)
+                val address2 = db.execute(query.firstOrNull())
                 assertNull(address2)
             }
         }
         db.transaction.required {
-            val address = db.firstOrNull(query)
+            val address = db.execute(query.firstOrNull())
             assertNull(address)
         }
     }
@@ -169,13 +169,13 @@ class TransactionTest {
         val a = Address.metamodel()
         val query = EntityQuery.from(a).where { a.addressId eq 15 }
         db.transaction.requiresNew {
-            val address = db.first(query)
+            val address = db.execute(query.first())
             db.delete(a, address)
-            val address2 = db.firstOrNull(query)
+            val address2 = db.execute(query.firstOrNull())
             assertNull(address2)
         }
         db.transaction.required {
-            val address = db.firstOrNull(query)
+            val address = db.execute(query.firstOrNull())
             assertNull(address)
         }
     }
@@ -185,15 +185,15 @@ class TransactionTest {
         val a = Address.metamodel()
         val query = EntityQuery.from(a).where { a.addressId eq 15 }
         db.transaction.required {
-            val address = db.first(query)
+            val address = db.execute(query.first())
             db.delete(a, address)
             requiresNew {
-                val address2 = db.firstOrNull(query)
+                val address2 = db.execute(query.firstOrNull())
                 assertNotNull(address2)
             }
         }
         db.transaction.required {
-            val address = db.firstOrNull(query)
+            val address = db.execute(query.firstOrNull())
             assertNull(address)
         }
     }
@@ -203,11 +203,11 @@ class TransactionTest {
         val a = Address.metamodel()
         val query = EntityQuery.from(a).where { a.addressId eq 15 }
         db.transaction {
-            val address = db.first(query)
+            val address = db.execute(query.first())
             db.delete(a, address)
         }
         db.transaction {
-            val address = db.firstOrNull(query)
+            val address = db.execute(query.firstOrNull())
             assertNull(address)
         }
     }

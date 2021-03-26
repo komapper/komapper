@@ -3,7 +3,8 @@ package org.komapper.core.query.context
 import org.komapper.core.metamodel.ColumnInfo
 import org.komapper.core.metamodel.EntityMetamodel
 
-internal class EntitySelectContext<ENTITY>(override val entityMetamodel: EntityMetamodel<ENTITY>) : SelectContext<ENTITY> {
+internal class EntitySelectContext<ENTITY>(override val entityMetamodel: EntityMetamodel<ENTITY>) :
+    SelectContext<ENTITY> {
     override val columns = mutableListOf<ColumnInfo<*>>()
     override val joins = JoinsContext()
     override val where = FilterContext()

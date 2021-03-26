@@ -3,7 +3,7 @@ package org.komapper.core
 import org.komapper.core.metamodel.EntityMetamodel
 import org.komapper.core.query.EntityQuery
 import org.komapper.core.query.Queryable
-import org.komapper.core.query.ScriptQueryable
+import org.komapper.core.query.ScriptQuery
 import org.komapper.core.query.SqlQuery
 import org.komapper.core.query.scope.WhereDeclaration
 import java.sql.Blob
@@ -34,73 +34,39 @@ class Database(val config: DefaultDatabaseConfig) {
     }
 
     fun <ENTITY> findOrNull(metamodel: EntityMetamodel<ENTITY>, declaration: WhereDeclaration): ENTITY? {
-        val query = SqlQuery.from(metamodel).where(declaration).limit(1)
-        return run(query).firstOrNull()
-    }
-
-    fun <ENTITY> first(block: () -> Queryable<List<ENTITY>>): ENTITY {
-        return firstOrNull(block) ?: error("result is empty.")
-    }
-
-    fun <ENTITY> firstOrNull(block: () -> Queryable<List<ENTITY>>): ENTITY? {
-        return run(block()).firstOrNull()
-    }
-
-    fun <ENTITY> first(queryable: Queryable<List<ENTITY>>): ENTITY {
-        return firstOrNull(queryable) ?: error("result is empty.")
-    }
-
-    fun <ENTITY> firstOrNull(queryable: Queryable<List<ENTITY>>): ENTITY? {
-        return run(queryable).firstOrNull()
-    }
-
-    fun <ENTITY> list(block: () -> Queryable<List<ENTITY>>): List<ENTITY> {
-        return run(block())
-    }
-
-    fun <ENTITY> list(queryable: Queryable<List<ENTITY>>): List<ENTITY> {
-        return run(queryable)
+        val queryable = SqlQuery.from(metamodel).where(declaration).limit(1).firstOrNull()
+        return executeQueryable(queryable)
     }
 
     fun <ENTITY> insert(metamodel: EntityMetamodel<ENTITY>, entity: ENTITY): ENTITY {
-        val query = EntityQuery.insert(metamodel, entity)
-        return run(query)
+        val queryable = EntityQuery.insert(metamodel, entity)
+        return executeQueryable(queryable)
     }
 
     fun <ENTITY> update(metamodel: EntityMetamodel<ENTITY>, entity: ENTITY): ENTITY {
-        val query = EntityQuery.update(metamodel, entity)
-        return run(query)
+        val queryable = EntityQuery.update(metamodel, entity)
+        return executeQueryable(queryable)
     }
 
     fun <ENTITY> delete(metamodel: EntityMetamodel<ENTITY>, entity: ENTITY) {
-        val query = EntityQuery.delete(metamodel, entity)
-        run(query)
-    }
-
-    fun execute(block: () -> Queryable<Int>): Int {
-        return run(block())
-    }
-
-    fun execute(queryable: Queryable<Int>): Int {
-        return run(queryable)
+        val queryable = EntityQuery.delete(metamodel, entity)
+        executeQueryable(queryable)
     }
 
     fun script(sql: CharSequence) {
-        val query = ScriptQueryable.create(sql.toString())
-        run(query)
+        val queryable = ScriptQuery.execute(sql.toString())
+        executeQueryable(queryable)
     }
 
-    // TODO
-    fun <T> runQuery(queryable: Queryable<T>): T {
-        return run(queryable)
+    fun <T> execute(block: () -> Queryable<T>): T {
+        return executeQueryable(block())
     }
 
-    // TODO
-    fun <T> runQuery(block: () -> Queryable<T>): T {
-        return run(block())
+    fun <T> execute(queryable: Queryable<T>): T {
+        return executeQueryable(queryable)
     }
 
-    private fun <T> run(queryable: Queryable<T>): T {
+    private fun <T> executeQueryable(queryable: Queryable<T>): T {
         return queryable.run(config)
     }
 

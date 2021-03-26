@@ -21,13 +21,13 @@ class TemplateSelectQueryableTest(private val db: Database) {
 
     @Test
     fun test() {
-        val list = db.list {
-            @Language("sql")
-            val template = "select * from address"
+        @Language("sql")
+        val template = "select * from address"
+        val list = db.execute(
             TemplateQuery.select(template) {
                 asAddress()
             }
-        }
+        )
         Assertions.assertEquals(15, list.size)
         Assertions.assertEquals(
             Address(
@@ -41,10 +41,10 @@ class TemplateSelectQueryableTest(private val db: Database) {
 
     @Test
     fun sequence() {
-        val list = db.list {
+        val list = db.execute {
             @Language("sql")
             val sql = "select * from address"
-            TemplateQuery.select(sql, provider = asAddress) { it.toList() }
+            TemplateQuery.select(sql, provider = asAddress).transform { it.toList() }
         }
         Assertions.assertEquals(15, list.size)
         Assertions.assertEquals(
@@ -59,10 +59,9 @@ class TemplateSelectQueryableTest(private val db: Database) {
 
     @Test
     fun condition_objectExpression() {
-        val list = db.list {
-            @Language("sql")
-            val template = "select * from address where street = /*street*/'test'"
-
+        @Language("sql")
+        val template = "select * from address where street = /*street*/'test'"
+        val list = db.execute(
             TemplateQuery.select(
                 template,
                 object {
@@ -72,7 +71,7 @@ class TemplateSelectQueryableTest(private val db: Database) {
             ) {
                 asAddress()
             }
-        }
+        )
         Assertions.assertEquals(1, list.size)
         Assertions.assertEquals(
             Address(
@@ -86,16 +85,15 @@ class TemplateSelectQueryableTest(private val db: Database) {
 
     @Test
     fun condition_dataClass() {
-        val list = db.list {
-            data class Condition(val street: String)
+        data class Condition(val street: String)
 
-            @Language("sql")
-            val template = "select * from address where street = /*street*/'test'"
-
+        @Language("sql")
+        val template = "select * from address where street = /*street*/'test'"
+        val list = db.execute(
             TemplateQuery.select(template, Condition("STREET 10")) {
                 asAddress()
             }
-        }
+        )
         Assertions.assertEquals(1, list.size)
         Assertions.assertEquals(
             Address(
@@ -109,10 +107,9 @@ class TemplateSelectQueryableTest(private val db: Database) {
 
     @Test
     fun `in`() {
-        val list = db.list {
-            @Language("sql")
-            val template = "select * from address where address_id in /*list*/(0)"
-
+        @Language("sql")
+        val template = "select * from address where address_id in /*list*/(0)"
+        val list = db.execute(
             TemplateQuery.select(
                 template,
                 object {
@@ -120,7 +117,7 @@ class TemplateSelectQueryableTest(private val db: Database) {
                     val list = listOf(1, 2)
                 }
             ) { asAddress() }
-        }
+        )
         Assertions.assertEquals(2, list.size)
         Assertions.assertEquals(
             Address(
@@ -142,9 +139,10 @@ class TemplateSelectQueryableTest(private val db: Database) {
 
     @Test
     fun in2() {
+        val template = "select * from address where (address_id, street) in /*pairs*/(0, '')"
+
         @Language("sql")
-        val list = db.list {
-            val template = "select * from address where (address_id, street) in /*pairs*/(0, '')"
+        val list = db.execute(
             TemplateQuery.select(
                 template,
                 object {
@@ -152,7 +150,7 @@ class TemplateSelectQueryableTest(private val db: Database) {
                     val pairs = listOf(1 to "STREET 1", 2 to "STREET 2")
                 }
             ) { asAddress() }
-        }
+        )
         Assertions.assertEquals(2, list.size)
         Assertions.assertEquals(
             Address(
@@ -174,9 +172,10 @@ class TemplateSelectQueryableTest(private val db: Database) {
 
     @Test
     fun in3() {
+        val template = "select * from address where (address_id, street, version) in /*triples*/(0, '', 0)"
+
         @Language("sql")
-        val list = db.list {
-            val template = "select * from address where (address_id, street, version) in /*triples*/(0, '', 0)"
+        val list = db.execute(
             TemplateQuery.select(
                 template,
                 object {
@@ -187,7 +186,7 @@ class TemplateSelectQueryableTest(private val db: Database) {
                     )
                 }
             ) { asAddress() }
-        }
+        )
         Assertions.assertEquals(2, list.size)
         Assertions.assertEquals(
             Address(

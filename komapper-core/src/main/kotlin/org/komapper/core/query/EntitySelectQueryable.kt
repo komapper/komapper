@@ -101,18 +101,18 @@ internal class EntitySelectQueryableImpl<ENTITY>(
         return this
     }
 
-    private fun buildStatement(config: DatabaseConfig): Statement {
-        val builder = EntitySelectStatementBuilder(config, context)
-        return builder.build()
+    override fun run(config: DatabaseConfig): List<ENTITY> {
+        val transformable = Transformable { it.toList() }
+        return transformable.run(config)
     }
 
     override fun toStatement(config: DatabaseConfig): Statement {
         return buildStatement(config)
     }
 
-    override fun run(config: DatabaseConfig): List<ENTITY> {
-        val transformable = Transformable { it.toList() }
-        return transformable.run(config)
+    private fun buildStatement(config: DatabaseConfig): Statement {
+        val builder = EntitySelectStatementBuilder(config, context)
+        return builder.build()
     }
 
     override fun first(): Queryable<ENTITY> {

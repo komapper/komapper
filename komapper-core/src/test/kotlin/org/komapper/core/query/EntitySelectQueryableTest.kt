@@ -90,22 +90,24 @@ class EntitySelectQueryableTest {
     }
 
     @Test
-    fun template_mapSequence() {
+    fun template_transform() {
         val params = object {
             val id = 1
         }
-        val query = TemplateQuery.select(
-            "select id, street, version from Address where id = /*id*/0",
-            params,
-            { Address(asInt("id"), asString(""), asInt("version")) }
-        ) { seq -> seq.map { it.id }.first() }
+        val query = TemplateQuery
+            .select(
+                "select id, street, version from Address where id = /*id*/0",
+                params
+            ) {
+                Address(asInt("id"), asString(""), asInt("version"))
+            }.transform { seq -> seq.map { it.id }.first() }
         assertEquals("select id, street, version from Address where id = ?", query.toStatement(config).sql)
     }
 
     @Test
     fun script() {
         val script = "insert into Address (id, street, version) values (2, 'Kyoto', 0)"
-        val query = ScriptQueryable.create(script)
+        val query = ScriptQuery.execute(script)
         assertEquals(script, query.toStatement(config).sql)
     }
 

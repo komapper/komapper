@@ -18,10 +18,10 @@ class EntityUpdateQueryableTest(private val db: Database) {
     fun test() {
         val a = Address.metamodel()
         val query = EntityQuery.from(a).where { a.addressId eq 15 }
-        val address = db.first { query }
+        val address = db.execute { query.first() }
         val newAddress = address.copy(street = "NY street")
         db.update(a, newAddress)
-        val address2 = db.firstOrNull { query }
+        val address2 = db.execute { query.firstOrNull() }
         assertEquals(
             Address(
                 15,
@@ -158,7 +158,7 @@ class EntityUpdateQueryableTest(private val db: Database) {
     @Test
     fun optimisticLockException() {
         val a = Address.metamodel()
-        val address = db.first { EntityQuery.from(a).where { a.addressId eq 15 } }
+        val address = db.execute { EntityQuery.from(a).where { a.addressId eq 15 }.first() }
         db.update(a, address)
         assertThrows<OptimisticLockException> {
             db.update(a, address)
@@ -168,10 +168,10 @@ class EntityUpdateQueryableTest(private val db: Database) {
     @Test
     fun criteria() {
         val a = Address.metamodel()
-        val selectQuery = EntityQuery.from(a).where { a.addressId eq 15 }
-        val address1 = db.first { selectQuery }.copy(street = "new street")
+        val selectQuery = EntityQuery.from(a).where { a.addressId eq 15 }.first()
+        val address1 = db.execute(selectQuery).copy(street = "new street")
         val address2 = db.update(a, address1)
-        val address3 = db.first { selectQuery }
+        val address3 = db.execute(selectQuery)
         assertEquals(Address(15, "new street", 2), address2)
         assertEquals(address2, address3)
     }

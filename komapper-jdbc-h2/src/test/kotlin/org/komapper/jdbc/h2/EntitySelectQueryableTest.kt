@@ -18,8 +18,8 @@ class EntitySelectQueryableTest(private val db: Database) {
     @Test
     fun first() {
         val a = Address.metamodel()
-        val address = db.first {
-            EntityQuery.from(a).where { a.addressId eq 1 }
+        val address = db.execute {
+            EntityQuery.from(a).where { a.addressId eq 1 }.first()
         }
         Assertions.assertNotNull(address)
     }
@@ -27,7 +27,7 @@ class EntitySelectQueryableTest(private val db: Database) {
     @Test
     fun list() {
         val a = Address.metamodel()
-        val addressList = db.list {
+        val addressList = db.execute {
             EntityQuery.from(a).where { a.addressId eq 1 }
         }
         Assertions.assertNotNull(addressList)
@@ -41,7 +41,7 @@ class EntitySelectQueryableTest(private val db: Database) {
             .orderBy(a.addressId.desc())
             .limit(2)
             .offset(5)
-        val list = db.list(query)
+        val list = db.execute(query)
         assertEquals(
             listOf(
                 Address(10, "STREET 10", 1),
@@ -55,7 +55,7 @@ class EntitySelectQueryableTest(private val db: Database) {
     fun join() {
         val a = Address.metamodel()
         val e = Employee.metamodel()
-        val list = db.list {
+        val list = db.execute {
             EntityQuery.from(a).innerJoin(e) {
                 a.addressId eq e.addressId
             }.where {
@@ -69,7 +69,7 @@ class EntitySelectQueryableTest(private val db: Database) {
     fun association_many_to_one() {
         val e = Employee.metamodel()
         val d = Department.metamodel()
-        val list = db.list {
+        val list = db.execute {
             EntityQuery.from(e).innerJoin(d) {
                 e.departmentId eq d.departmentId
             }.associate(e, d) { employee, department ->
@@ -84,7 +84,7 @@ class EntitySelectQueryableTest(private val db: Database) {
     fun association_one_to_many() {
         val d = Department.metamodel()
         val e = Employee.metamodel()
-        val list = db.list {
+        val list = db.execute {
             EntityQuery.from(d).innerJoin(e) {
                 d.departmentId eq e.departmentId
             }.associate(d, e) { department, employee ->
@@ -105,13 +105,13 @@ class EntitySelectQueryableTest(private val db: Database) {
     fun association_one_to_one() {
         val a = Address.metamodel()
         val e = Employee.metamodel()
-        val list = db.list {
+        val list = db.execute(
             EntityQuery.from(e).innerJoin(a) {
                 e.addressId eq a.addressId
             }.associate(e, a) { employee, address ->
                 employee.copy(address = address)
             }
-        }
+        )
         assertEquals(14, list.size)
         println(list)
     }
@@ -119,30 +119,26 @@ class EntitySelectQueryableTest(private val db: Database) {
     @Test
     fun offset() {
         val a = Address.metamodel()
-        val list = db.list {
-            EntityQuery.from(a).offset(10)
-        }
+        val list = db.execute(EntityQuery.from(a).offset(10))
         assertEquals(5, list.size)
     }
 
     @Test
     fun limit() {
         val a = Address.metamodel()
-        val list = db.list {
-            EntityQuery.from(a).limit(3)
-        }
+        val list = db.execute(EntityQuery.from(a).limit(3))
         assertEquals(3, list.size)
     }
 
     @Test
     fun offset_limit() {
         val a = Address.metamodel()
-        val list = db.list {
+        val list = db.execute(
             EntityQuery.from(a)
                 .orderBy(a.addressId)
                 .offset(10)
                 .limit(3)
-        }
+        )
         assertEquals(3, list.size)
         assertEquals(11, list[0].addressId)
         assertEquals(12, list[1].addressId)
@@ -152,59 +148,57 @@ class EntitySelectQueryableTest(private val db: Database) {
     @Test
     fun where_compose() {
         val a = Address.metamodel()
-        val list = db.list {
-            val w1: WhereDeclaration = {
-                a.addressId eq 1
-            }
-            val w2: WhereDeclaration = {
-                a.version eq 1
-            }
-            EntityQuery.from(a).where(w1 + w2)
+        val w1: WhereDeclaration = {
+            a.addressId eq 1
         }
+        val w2: WhereDeclaration = {
+            a.version eq 1
+        }
+        val list = db.execute(EntityQuery.from(a).where(w1 + w2))
         assertEquals(1, list.size)
     }
 
     @Test
     fun isNull() {
         val e = Employee.metamodel()
-        val list = db.list {
+        val list = db.execute(
             EntityQuery.from(e).where {
                 e.managerId.isNull()
             }
-        }
+        )
         assertEquals(listOf(9), list.map { it.employeeId })
     }
 
     @Test
     fun isNotNull() {
         val e = Employee.metamodel()
-        val list = db.list {
+        val list = db.execute(
             EntityQuery.from(e).where {
                 e.managerId.isNotNull()
             }
-        }
+        )
         assertTrue(9 !in list.map { it.employeeId })
     }
 
     @Test
     fun between() {
         val a = Address.metamodel()
-        val idList = db.list {
+        val idList = db.execute(
             EntityQuery.from(a).where {
                 a.addressId between 5..10
             }.orderBy(a.addressId)
-        }
+        )
         assertEquals((5..10).toList(), idList.map { it.addressId })
     }
 
     @Test
     fun notBetween() {
         val a = Address.metamodel()
-        val idList = db.list {
+        val idList = db.execute(
             EntityQuery.from(a).where {
                 a.addressId notBetween 5..10
             }.orderBy(a.addressId)
-        }
+        )
         val ids = (1..4) + (11..15)
         assertEquals(ids.toList(), idList.map { it.addressId })
     }
@@ -212,11 +206,11 @@ class EntitySelectQueryableTest(private val db: Database) {
     @Test
     fun inList() {
         val a = Address.metamodel()
-        val list = db.list {
+        val list = db.execute(
             EntityQuery.from(a).where {
                 a.addressId inList listOf(9, 10)
             }.orderBy(a.addressId.desc())
-        }
+        )
         assertEquals(
             listOf(
                 Address(10, "STREET 10", 1),
@@ -229,22 +223,22 @@ class EntitySelectQueryableTest(private val db: Database) {
     @Test
     fun notInList() {
         val a = Address.metamodel()
-        val list = db.list {
+        val list = db.execute(
             EntityQuery.from(a).where {
                 a.addressId notInList (1..9).toList()
             }.orderBy(a.addressId)
-        }
+        )
         assertEquals((10..15).toList(), list.map { it.addressId })
     }
 
     @Test
     fun in_empty() {
         val a = Address.metamodel()
-        val list = db.list {
+        val list = db.execute(
             EntityQuery.from(a).where {
                 a.addressId inList emptyList()
             }.orderBy(a.addressId.desc())
-        }
+        )
         assertTrue(list.isEmpty())
     }
 
@@ -261,7 +255,7 @@ class EntitySelectQueryableTest(private val db: Database) {
                     }.select(a.addressId)
                 }
             }
-        val list = db.list(query)
+        val list = db.execute(query)
         assertEquals(5, list.size)
     }
 
@@ -278,7 +272,7 @@ class EntitySelectQueryableTest(private val db: Database) {
                     }.select(a.addressId)
                 }
             }
-        val list = db.list(query)
+        val list = db.execute(query)
         assertEquals(9, list.size)
     }
 
@@ -293,7 +287,7 @@ class EntitySelectQueryableTest(private val db: Database) {
                     e.employeeName like "%S%"
                 }
             }
-        val list = db.list(query)
+        val list = db.execute(query)
         assertEquals(5, list.size)
     }
 
@@ -308,28 +302,28 @@ class EntitySelectQueryableTest(private val db: Database) {
                     e.employeeName like "%S%"
                 }
             }
-        val list = db.list(query)
+        val list = db.execute(query)
         assertEquals(9, list.size)
     }
 
     @Test
     fun not() {
         val a = Address.metamodel()
-        val idList = db.list {
+        val idList = db.execute(
             EntityQuery.from(a).where {
                 a.addressId greater 5
                 not {
                     a.addressId greaterEq 10
                 }
             }.orderBy(a.addressId)
-        }.map { it.addressId }
+        ).map { it.addressId }
         assertEquals((6..9).toList(), idList)
     }
 
     @Test
     fun and() {
         val a = Address.metamodel()
-        val list = db.list {
+        val list = db.execute(
             EntityQuery.from(a).where {
                 a.addressId greater 1
                 and {
@@ -338,7 +332,7 @@ class EntitySelectQueryableTest(private val db: Database) {
             }.orderBy(a.addressId.desc())
                 .limit(2)
                 .offset(5)
-        }
+        )
         assertEquals(
             listOf(
                 Address(10, "STREET 10", 1),
@@ -351,7 +345,7 @@ class EntitySelectQueryableTest(private val db: Database) {
     @Test
     fun or() {
         val a = Address.metamodel()
-        val list = db.list {
+        val list = db.execute(
             EntityQuery.from(a).where {
                 a.addressId greaterEq 1
                 or {
@@ -360,7 +354,7 @@ class EntitySelectQueryableTest(private val db: Database) {
             }.orderBy(a.addressId.desc())
                 .limit(2)
                 .offset(5)
-        }
+        )
         assertEquals(
             listOf(
                 Address(10, "STREET 10", 1),
@@ -373,13 +367,13 @@ class EntitySelectQueryableTest(private val db: Database) {
     @Test
     fun forUpdate() {
         val a = Address.metamodel()
-        val list = db.list {
+        val list = db.execute(
             EntityQuery.from(a).where { a.addressId greaterEq 1 }
                 .orderBy(a.addressId.desc())
                 .limit(2)
                 .offset(5)
                 .forUpdate()
-        }
+        )
         assertEquals(
             listOf(
                 Address(10, "STREET 10", 1),
