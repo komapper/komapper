@@ -1,6 +1,8 @@
 package org.komapper.core.query.scope
 
 import org.komapper.core.Scope
+import org.komapper.core.query.context.FilterContext
+import org.komapper.core.query.data.Criterion
 
 @Scope
 class HavingScope internal constructor(
@@ -14,5 +16,26 @@ class HavingScope internal constructor(
                 other(this)
             }
         }
+    }
+
+    fun and(declaration: HavingDeclaration) {
+        addCriteria(declaration, Criterion::And)
+    }
+
+    fun or(declaration: HavingDeclaration) {
+        addCriteria(declaration, Criterion::Or)
+    }
+
+    fun not(declaration: HavingDeclaration) {
+        addCriteria(declaration, Criterion::Not)
+    }
+
+    private fun addCriteria(declaration: HavingDeclaration, operator: (List<Criterion>) -> Criterion) {
+        val criteria = mutableListOf<Criterion>()
+        val subContext = FilterContext(criteria)
+        val support = FilterScopeSupport(subContext)
+        val scope = HavingScope(support)
+        declaration(scope)
+        support.add(operator(criteria))
     }
 }

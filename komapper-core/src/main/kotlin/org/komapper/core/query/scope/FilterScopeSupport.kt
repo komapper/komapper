@@ -2,16 +2,20 @@ package org.komapper.core.query.scope
 
 import org.komapper.core.metamodel.ColumnInfo
 import org.komapper.core.metamodel.EntityMetamodel
-import org.komapper.core.query.EntitySelectQueryImpl
-import org.komapper.core.query.EntitySelectSubQuery
-import org.komapper.core.query.SingleProjection
-import org.komapper.core.query.context.EntitySelectContext
+import org.komapper.core.query.SingleColumnProjection
+import org.komapper.core.query.SqlSelectQueryImpl
+import org.komapper.core.query.SqlSelectSubQuery
 import org.komapper.core.query.context.FilterContext
+import org.komapper.core.query.context.SqlSelectContext
 import org.komapper.core.query.data.Criterion
 import org.komapper.core.query.data.Operand
 import org.komapper.core.query.option.LikeOption
 
 internal class FilterScopeSupport(private val context: FilterContext) : FilterScope {
+
+    internal fun add(criterion: Criterion) {
+        context.add(criterion)
+    }
 
     override infix fun <T : Any> ColumnInfo<T>.eq(operand: ColumnInfo<T>) {
         context.add(Criterion::Eq, this, operand)
@@ -157,16 +161,13 @@ internal class FilterScopeSupport(private val context: FilterContext) : FilterSc
         context.add(Criterion.InList(o1, o2))
     }
 
-    override infix fun <T : Any> ColumnInfo<T>.inList(block: () -> SingleProjection) {
+    override infix fun <T : Any> ColumnInfo<T>.inList(block: () -> SingleColumnProjection) {
         this.inList(block())
     }
 
-    override infix fun <T : Any> ColumnInfo<T>.inList(projection: SingleProjection) {
+    override infix fun <T : Any> ColumnInfo<T>.inList(projection: SingleColumnProjection) {
         val left = Operand.Column(this)
-        val right = when (projection) {
-            is SingleProjection.ContextHolder -> projection.context
-            else -> TODO()
-        }
+        val right = projection.context
         context.add(Criterion.InSubQuery(left, right))
     }
 
@@ -176,50 +177,26 @@ internal class FilterScopeSupport(private val context: FilterContext) : FilterSc
         context.add(Criterion.NotInList(o1, o2))
     }
 
-    override infix fun <T : Any> ColumnInfo<T>.notInList(block: () -> SingleProjection) {
+    override infix fun <T : Any> ColumnInfo<T>.notInList(block: () -> SingleColumnProjection) {
         this.notInList(block())
     }
 
-    override infix fun <T : Any> ColumnInfo<T>.notInList(projection: SingleProjection) {
+    override infix fun <T : Any> ColumnInfo<T>.notInList(projection: SingleColumnProjection) {
         val left = Operand.Column(this)
-        val right = when (projection) {
-            is SingleProjection.ContextHolder -> projection.context
-            else -> TODO()
-        }
+        val right = projection.context
         context.add(Criterion.NotInSubQuery(left, right))
     }
 
-    override fun <ENTITY> exists(entityMetamodel: EntityMetamodel<ENTITY>): EntitySelectSubQuery<ENTITY> {
-        val subContext = EntitySelectContext(entityMetamodel)
+    override fun <ENTITY> exists(entityMetamodel: EntityMetamodel<ENTITY>): SqlSelectSubQuery<ENTITY> {
+        val subContext = SqlSelectContext(entityMetamodel)
         context.add(Criterion.Exists(subContext))
-        return EntitySelectQueryImpl(entityMetamodel, subContext)
+        return SqlSelectQueryImpl(entityMetamodel, subContext)
     }
 
-    override fun <ENTITY> notExists(entityMetamodel: EntityMetamodel<ENTITY>): EntitySelectSubQuery<ENTITY> {
-        val subContext = EntitySelectContext(entityMetamodel)
+    override fun <ENTITY> notExists(entityMetamodel: EntityMetamodel<ENTITY>): SqlSelectSubQuery<ENTITY> {
+        val subContext = SqlSelectContext(entityMetamodel)
         context.add(Criterion.NotExists(subContext))
-        return EntitySelectQueryImpl(entityMetamodel, subContext)
-    }
-
-    override fun and(declaration: WhereDeclaration) {
-        addCriteria(declaration, Criterion::And)
-    }
-
-    override fun or(declaration: WhereDeclaration) {
-        addCriteria(declaration, Criterion::Or)
-    }
-
-    override fun not(declaration: WhereDeclaration) {
-        addCriteria(declaration, Criterion::Not)
-    }
-
-    private fun addCriteria(declaration: WhereDeclaration, operator: (List<Criterion>) -> Criterion) {
-        val criteria = mutableListOf<Criterion>()
-        val subContext = FilterContext(criteria)
-        val support = FilterScopeSupport(subContext)
-        val scope = WhereScope(support)
-        declaration(scope)
-        context.add(operator(criteria))
+        return SqlSelectQueryImpl(entityMetamodel, subContext)
     }
 
     override fun <T : CharSequence> T?.escape(): LikeOperand {

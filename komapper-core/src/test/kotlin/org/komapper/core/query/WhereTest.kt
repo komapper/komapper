@@ -186,7 +186,7 @@ internal class WhereTest {
         val e = Emp.metamodel()
         val query = EntityQuery.from(a).where {
             a.id inList {
-                EntitySubQuery.from(e).select(e.id)
+                SubQuery.from(e).select(e.id)
             }
         }
         assertEquals(

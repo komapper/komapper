@@ -4,7 +4,6 @@ import org.komapper.core.DatabaseConfig
 import org.komapper.core.data.Statement
 import org.komapper.core.metamodel.ColumnInfo
 import org.komapper.core.metamodel.EntityMetamodel
-import org.komapper.core.metamodel.PropertyMetamodel
 import org.komapper.core.query.builder.SqlSelectStatementBuilder
 import org.komapper.core.query.command.PairColumnsSqlSelectCommand
 import org.komapper.core.query.command.SingleColumnSqlSelectCommand
@@ -29,9 +28,9 @@ interface SqlSelectQuery<ENTITY> : Query<List<ENTITY>> {
     ): SqlSelectQuery<ENTITY>
 
     fun where(declaration: WhereDeclaration): SqlSelectQuery<ENTITY>
-    fun groupBy(vararg columns: ColumnInfo<*>): SqlSelectQuery<ENTITY>
+    fun groupBy(vararg items: ColumnInfo<*>): SqlSelectQuery<ENTITY>
     fun having(declaration: HavingDeclaration): SqlSelectQuery<ENTITY>
-    fun orderBy(vararg columns: ColumnInfo< *>): SqlSelectQuery<ENTITY>
+    fun orderBy(vararg items: ColumnInfo< *>): SqlSelectQuery<ENTITY>
     fun offset(value: Int): SqlSelectQuery<ENTITY>
     fun limit(value: Int): SqlSelectQuery<ENTITY>
     fun forUpdate(): SqlSelectQuery<ENTITY>
@@ -58,12 +57,12 @@ interface SqlSelectSubQuery<ENTITY> {
     ): SqlSelectSubQuery<ENTITY>
 
     fun where(declaration: WhereDeclaration): SqlSelectSubQuery<ENTITY>
-    fun groupBy(vararg columns: ColumnInfo<*>): SqlSelectQuery<ENTITY>
+    fun groupBy(vararg items: ColumnInfo<*>): SqlSelectQuery<ENTITY>
     fun having(declaration: HavingDeclaration): SqlSelectSubQuery<ENTITY>
-    fun orderBy(vararg columns: ColumnInfo<*>): SqlSelectSubQuery<ENTITY>
+    fun orderBy(vararg items: ColumnInfo<*>): SqlSelectSubQuery<ENTITY>
     fun offset(value: Int): SqlSelectSubQuery<ENTITY>
     fun limit(value: Int): SqlSelectSubQuery<ENTITY>
-    fun select(propertyMetamodel: PropertyMetamodel<*, *>): SingleProjection
+    fun select(columnInfo: ColumnInfo<*>): SingleColumnProjection
 }
 
 internal class SqlSelectQueryImpl<ENTITY>(
@@ -96,8 +95,8 @@ internal class SqlSelectQueryImpl<ENTITY>(
         return this
     }
 
-    override fun groupBy(vararg columns: ColumnInfo<*>): SqlSelectQueryImpl<ENTITY> {
-        context.groupBy.addAll(columns)
+    override fun groupBy(vararg items: ColumnInfo<*>): SqlSelectQueryImpl<ENTITY> {
+        context.groupBy.addAll(items)
         return this
     }
 
@@ -108,8 +107,8 @@ internal class SqlSelectQueryImpl<ENTITY>(
         return this
     }
 
-    override fun orderBy(vararg columns: ColumnInfo<*>): SqlSelectQueryImpl<ENTITY> {
-        support.orderBy(*columns)
+    override fun orderBy(vararg items: ColumnInfo<*>): SqlSelectQueryImpl<ENTITY> {
+        support.orderBy(*items)
         return this
     }
 
@@ -128,8 +127,9 @@ internal class SqlSelectQueryImpl<ENTITY>(
         return this
     }
 
-    override fun select(propertyMetamodel: PropertyMetamodel<*, *>): SingleProjection {
-        TODO("Not yet implemented")
+    override fun select(columnInfo: ColumnInfo<*>): SingleColumnProjection {
+        context.columns.add(columnInfo)
+        return SingleColumnProjection(context)
     }
 
     override fun <T : Any> select(columnInfo: ColumnInfo<T>): SingleProjectionQuery<ENTITY, T> {

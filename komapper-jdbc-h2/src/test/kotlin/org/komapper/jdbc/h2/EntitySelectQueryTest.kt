@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.Database
 import org.komapper.core.query.EntityQuery
-import org.komapper.core.query.EntitySubQuery
+import org.komapper.core.query.SubQuery
 import org.komapper.core.query.desc
 import org.komapper.core.query.scope.WhereDeclaration
 import org.komapper.core.query.scope.WhereScope.Companion.plus
@@ -255,7 +255,7 @@ class EntitySelectQueryTest(private val db: Database) {
         val query =
             EntityQuery.from(e).where {
                 e.addressId inList {
-                    EntitySubQuery.from(a).where {
+                    SubQuery.from(a).where {
                         e.addressId eq a.addressId
                         e.employeeName like "%S%"
                     }.select(a.addressId)
@@ -272,7 +272,7 @@ class EntitySelectQueryTest(private val db: Database) {
         val query =
             EntityQuery.from(e).where {
                 e.addressId notInList {
-                    EntitySubQuery.from(a).where {
+                    SubQuery.from(a).where {
                         e.addressId eq a.addressId
                         e.employeeName like "%S%"
                     }.select(a.addressId)

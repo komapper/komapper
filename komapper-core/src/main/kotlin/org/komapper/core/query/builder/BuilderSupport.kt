@@ -6,7 +6,7 @@ import org.komapper.core.data.Value
 import org.komapper.core.metamodel.ColumnInfo
 import org.komapper.core.metamodel.TableInfo
 import org.komapper.core.query.AggregateFunction
-import org.komapper.core.query.context.EntitySelectContext
+import org.komapper.core.query.context.SqlSelectContext
 import org.komapper.core.query.data.Criterion
 import org.komapper.core.query.data.Operand
 import org.komapper.core.query.option.LikeOption
@@ -164,25 +164,25 @@ internal class BuilderSupport(
         buf.append(")")
     }
 
-    private fun inSubQueryOperation(left: Operand, right: EntitySelectContext<*>, not: Boolean = false) {
+    private fun inSubQueryOperation(left: Operand, right: SqlSelectContext<*>, not: Boolean = false) {
         visitOperand(left)
         if (not) {
             buf.append(" not")
         }
         buf.append(" in (")
         val childAliasManager = AliasManager(right, aliasManager)
-        val builder = EntitySelectStatementBuilder(config, right, childAliasManager)
+        val builder = SqlSelectStatementBuilder(config, right, childAliasManager)
         buf.append(builder.build())
         buf.append(")")
     }
 
-    private fun existsOperation(subContext: EntitySelectContext<*>, not: Boolean = false) {
+    private fun existsOperation(subContext: SqlSelectContext<*>, not: Boolean = false) {
         if (not) {
             buf.append("not ")
         }
         buf.append("exists (")
         val childAliasManager = AliasManager(subContext, aliasManager)
-        val builder = EntitySelectStatementBuilder(config, subContext, childAliasManager)
+        val builder = SqlSelectStatementBuilder(config, subContext, childAliasManager)
         buf.append(builder.build())
         buf.append(")")
     }

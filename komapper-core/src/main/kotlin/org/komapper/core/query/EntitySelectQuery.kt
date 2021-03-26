@@ -23,7 +23,7 @@ interface EntitySelectQuery<ENTITY> : Query<List<ENTITY>> {
     ): EntitySelectQuery1<ENTITY>
 
     fun where(declaration: WhereDeclaration): EntitySelectQuery<ENTITY>
-    fun orderBy(vararg sortItems: ColumnInfo<*>): EntitySelectQuery<ENTITY>
+    fun orderBy(vararg items: ColumnInfo<*>): EntitySelectQuery<ENTITY>
     fun offset(value: Int): EntitySelectQuery<ENTITY>
     fun limit(value: Int): EntitySelectQuery<ENTITY>
     fun forUpdate(): EntitySelectQuery<ENTITY>
@@ -33,7 +33,7 @@ interface EntitySelectQuery<ENTITY> : Query<List<ENTITY>> {
 interface EntitySelectQuery1<ENTITY> : EntitySelectQuery<ENTITY> {
 
     override fun where(declaration: WhereDeclaration): EntitySelectQuery1<ENTITY>
-    override fun orderBy(vararg sortItems: ColumnInfo<*>): EntitySelectQuery1<ENTITY>
+    override fun orderBy(vararg items: ColumnInfo<*>): EntitySelectQuery1<ENTITY>
     override fun offset(value: Int): EntitySelectQuery1<ENTITY>
     override fun limit(value: Int): EntitySelectQuery1<ENTITY>
     override fun forUpdate(): EntitySelectQuery1<ENTITY>
@@ -45,31 +45,12 @@ interface EntitySelectQuery1<ENTITY> : EntitySelectQuery<ENTITY> {
     ): EntitySelectQuery1<ENTITY>
 }
 
-interface EntitySelectSubQuery<ENTITY> {
-    fun <OTHER_ENTITY> innerJoin(
-        entityMetamodel: EntityMetamodel<OTHER_ENTITY>,
-        declaration: JoinDeclaration<OTHER_ENTITY>
-    ): EntitySelectSubQuery<ENTITY>
-
-    fun <OTHER_ENTITY> leftJoin(
-        entityMetamodel: EntityMetamodel<OTHER_ENTITY>,
-        declaration: JoinDeclaration<OTHER_ENTITY>
-    ): EntitySelectSubQuery<ENTITY>
-
-    fun where(declaration: WhereDeclaration): EntitySelectSubQuery<ENTITY>
-    fun orderBy(vararg sortItems: ColumnInfo<*>): EntitySelectSubQuery<ENTITY>
-    fun offset(value: Int): EntitySelectSubQuery<ENTITY>
-    fun limit(value: Int): EntitySelectSubQuery<ENTITY>
-    fun select(columnInfo: ColumnInfo<*>): SingleProjection
-}
-
 internal class EntitySelectQueryImpl<ENTITY>(
     private val entityMetamodel: EntityMetamodel<ENTITY>,
     private val context: EntitySelectContext<ENTITY> = EntitySelectContext(entityMetamodel)
 ) :
     EntitySelectQuery<ENTITY>,
-    EntitySelectQuery1<ENTITY>,
-    EntitySelectSubQuery<ENTITY> {
+    EntitySelectQuery1<ENTITY> {
 
     private val support: SelectQuerySupport<ENTITY> = SelectQuerySupport(context)
 
@@ -111,8 +92,8 @@ internal class EntitySelectQueryImpl<ENTITY>(
         return this
     }
 
-    override fun orderBy(vararg sortItems: ColumnInfo<*>): EntitySelectQueryImpl<ENTITY> {
-        support.orderBy(*sortItems)
+    override fun orderBy(vararg items: ColumnInfo<*>): EntitySelectQueryImpl<ENTITY> {
+        support.orderBy(*items)
         return this
     }
 
@@ -129,11 +110,6 @@ internal class EntitySelectQueryImpl<ENTITY>(
     override fun forUpdate(): EntitySelectQueryImpl<ENTITY> {
         support.forUpdate()
         return this
-    }
-
-    override fun select(columnInfo: ColumnInfo<*>): SingleProjection {
-        context.columns.add(columnInfo)
-        return SingleProjection.ContextHolder(context)
     }
 
     override fun run(config: DatabaseConfig): List<ENTITY> {
