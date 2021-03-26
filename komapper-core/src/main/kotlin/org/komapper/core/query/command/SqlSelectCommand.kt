@@ -32,34 +32,37 @@ internal class SqlSelectCommand<ENTITY>(
     }
 }
 
-internal class SingleColumnSqlSelectCommand<T : Any>(
+internal class SingleColumnSqlSelectCommand<T : Any, R>(
     private val columnInfo: ColumnInfo<T>,
     private val config: DatabaseConfig,
-    override val statement: Statement
-) : Command<List<T>> {
+    override val statement: Statement,
+    private val transformer: (Sequence<T>) -> R
+) : Command<R> {
 
     private val executor: Executor = Executor(config)
 
-    override fun execute(): List<T> {
+    override fun execute(): R {
         return executor.executeQuery(
             statement,
             { rs ->
                 val value = config.dialect.getValue(rs, 1, columnInfo.klass)
                 columnInfo.klass.cast(value)
-            }
-        ) { it.toList() }
+            },
+            transformer
+        )
     }
 }
 
-internal class PairColumnsSqlSelectCommand<A : Any, B : Any>(
+internal class PairColumnsSqlSelectCommand<A : Any, B : Any, R>(
     private val pair: Pair<ColumnInfo<A>, ColumnInfo<B>>,
     private val config: DatabaseConfig,
-    override val statement: Statement
-) : Command<List<Pair<A, B>>> {
+    override val statement: Statement,
+    private val transformer: (Sequence<Pair<A,B>>) -> R
+) : Command<R> {
 
     private val executor: Executor = Executor(config)
 
-    override fun execute(): List<Pair<A, B>> {
+    override fun execute(): R {
         return executor.executeQuery(
             statement,
             { rs ->
@@ -67,7 +70,8 @@ internal class PairColumnsSqlSelectCommand<A : Any, B : Any>(
                 val a = config.dialect.getValue(rs, 1, first.klass)
                 val b = config.dialect.getValue(rs, 2, second.klass)
                 first.klass.cast(a) to second.klass.cast(b)
-            }
-        ) { it.toList() }
+            },
+            transformer
+        )
     }
 }

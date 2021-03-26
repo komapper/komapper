@@ -90,9 +90,20 @@ class Database(val config: DefaultDatabaseConfig) {
         run(query)
     }
 
+    // TODO
+    fun <T> runQuery(queryable: Queryable<T>): T {
+        return run(queryable)
+    }
+
+    // TODO
+    fun <T> runQuery(block: () -> Queryable<T>): T {
+        return run(block())
+    }
+
     private fun <T> run(queryable: Queryable<T>): T {
         return queryable.run(config)
     }
+
 
     class Factory(val config: DefaultDatabaseConfig) {
         /**

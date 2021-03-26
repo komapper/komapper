@@ -49,7 +49,7 @@ class SqlSelectQueryableTest(private val db: Database) {
     }
 
     @Test
-    fun list_single() {
+    fun list_select_single() {
         val a = Address.metamodel()
         val streetList = db.list {
             SqlQuery.from(a)
@@ -63,7 +63,23 @@ class SqlSelectQueryableTest(private val db: Database) {
     }
 
     @Test
-    fun list_pair() {
+    fun list_select_single_transform() {
+        val a = Address.metamodel()
+        val value = db.runQuery {
+            SqlQuery.from(a)
+                .where {
+                    a.addressId inList listOf(1, 2)
+                }
+                .orderBy(a.addressId)
+                .select(a.street) {
+                    it.first()
+                }
+        }
+        assertEquals("STREET 1" , value)
+    }
+    
+    @Test
+    fun list_select_pair() {
         val a = Address.metamodel()
         val pairList = db.list {
             SqlQuery.from(a)

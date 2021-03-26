@@ -30,20 +30,25 @@ interface SqlSelectQueryable<ENTITY> : Queryable<List<ENTITY>> {
     fun where(declaration: WhereDeclaration): SqlSelectQueryable<ENTITY>
     fun groupBy(vararg items: ColumnInfo<*>): SqlSelectQueryable<ENTITY>
     fun having(declaration: HavingDeclaration): SqlSelectQueryable<ENTITY>
-    fun orderBy(vararg items: ColumnInfo< *>): SqlSelectQueryable<ENTITY>
+    fun orderBy(vararg items: ColumnInfo<*>): SqlSelectQueryable<ENTITY>
     fun offset(value: Int): SqlSelectQueryable<ENTITY>
     fun limit(value: Int): SqlSelectQueryable<ENTITY>
     fun forUpdate(): SqlSelectQueryable<ENTITY>
-    fun <T : Any> select(columnInfo: ColumnInfo<T>): SqlSelectQueryable1<ENTITY, T>
+    fun <T : Any> select(columnInfo: ColumnInfo<T>): Queryable<List<T>>
+    fun <T : Any, R> select(columnInfo: ColumnInfo<T>, transformer: (Sequence<T>) -> R): Queryable<R>
+
     fun <A : Any, B : Any> select(
         columnInfo1: ColumnInfo<A>,
         columnInfo2: ColumnInfo<B>
-    ): SqlSelectQueryable2<ENTITY, A, B>
+    ): Queryable<List<Pair<A, B>>>
+
+    fun <A : Any, B : Any, R> select(
+        columnInfo1: ColumnInfo<A>,
+        columnInfo2: ColumnInfo<B>,
+        transformer: (Sequence<Pair<A, B>>) -> R
+    ): Queryable<R>
+
 }
-
-interface SqlSelectQueryable1<ENTITY, T> : Queryable<List<T>>
-
-interface SqlSelectQueryable2<ENTITY, A, B> : Queryable<List<Pair<A, B>>>
 
 interface SqlSelectSubQuery<ENTITY> {
     fun <OTHER_ENTITY> innerJoin(
@@ -132,18 +137,33 @@ internal class SqlSelectQueryableImpl<ENTITY>(
         return SingleColumnProjection(context)
     }
 
-    override fun <T : Any> select(columnInfo: ColumnInfo<T>): SingleProjectionQueryable<ENTITY, T> {
+    override fun <T : Any> select(columnInfo: ColumnInfo<T>): Queryable<List<T>> {
         context.columns.add(columnInfo)
-        return SingleProjectionQueryable(context, columnInfo)
+        return SingleColumnQueryable(columnInfo) { it.toList() }
+    }
+
+    override fun <T : Any, R> select(columnInfo: ColumnInfo<T>, transformer: (Sequence<T>) -> R): Queryable<R> {
+        context.columns.add(columnInfo)
+        return SingleColumnQueryable(columnInfo, transformer)
     }
 
     override fun <A : Any, B : Any> select(
         columnInfo1: ColumnInfo<A>,
         columnInfo2: ColumnInfo<B>
-    ): PairProjectionQueryable<ENTITY, A, B> {
+    ): Queryable<List<Pair<A, B>>> {
         context.columns.add(columnInfo1)
         context.columns.add(columnInfo2)
-        return PairProjectionQueryable(context, columnInfo1 to columnInfo2)
+        return PairColumnsQueryable(columnInfo1 to columnInfo2) { it.toList() }
+    }
+
+    override fun <A : Any, B : Any, R> select(
+        columnInfo1: ColumnInfo<A>,
+        columnInfo2: ColumnInfo<B>,
+        transformer: (Sequence<Pair<A, B>>) -> R
+    ): Queryable<R> {
+        context.columns.add(columnInfo1)
+        context.columns.add(columnInfo2)
+        return PairColumnsQueryable(columnInfo1 to columnInfo2, transformer)
     }
 
     override fun run(config: DatabaseConfig): List<ENTITY> {
@@ -160,46 +180,32 @@ internal class SqlSelectQueryableImpl<ENTITY>(
         val builder = SqlSelectStatementBuilder(config, context)
         return builder.build()
     }
-}
 
-internal class SingleProjectionQueryable<ENTITY, T : Any>(
-    private val context: SqlSelectContext<ENTITY>,
-    private val columnInfo: ColumnInfo<T>
-) : SqlSelectQueryable1<ENTITY, T> {
+    inner class SingleColumnQueryable<T : Any, R>(
+        private val columnInfo: ColumnInfo<T>,
+        private val transformer: (Sequence<T>) -> R
+    ) : Queryable<R> {
 
-    override fun run(config: DatabaseConfig): List<T> {
-        val statement = buildStatement(config)
-        val command = SingleColumnSqlSelectCommand(columnInfo, config, statement)
-        return command.execute()
+        override fun run(config: DatabaseConfig): R {
+            val statement = buildStatement(config)
+            val command = SingleColumnSqlSelectCommand(columnInfo, config, statement, transformer)
+            return command.execute()
+        }
+
+        override fun toStatement(config: DatabaseConfig): Statement = buildStatement(config)
     }
 
-    override fun toStatement(config: DatabaseConfig): Statement {
-        return buildStatement(config)
-    }
+    inner class PairColumnsQueryable<A : Any, B : Any, R>(
+        private val pair: Pair<ColumnInfo<A>, ColumnInfo<B>>,
+        private val transformer: (Sequence<Pair<A, B>>) -> R
+    ) : Queryable<R> {
 
-    private fun buildStatement(config: DatabaseConfig): Statement {
-        val builder = SqlSelectStatementBuilder(config, context)
-        return builder.build()
-    }
-}
+        override fun run(config: DatabaseConfig): R {
+            val statement = buildStatement(config)
+            val command = PairColumnsSqlSelectCommand(pair, config, statement, transformer)
+            return command.execute()
+        }
 
-internal class PairProjectionQueryable<ENTITY, A : Any, B : Any>(
-    private val context: SqlSelectContext<ENTITY>,
-    private val pair: Pair<ColumnInfo<A>, ColumnInfo<B>>
-) : SqlSelectQueryable2<ENTITY, A, B> {
-
-    override fun run(config: DatabaseConfig): List<Pair<A, B>> {
-        val statement = buildStatement(config)
-        val command = PairColumnsSqlSelectCommand(pair, config, statement)
-        return command.execute()
-    }
-
-    override fun toStatement(config: DatabaseConfig): Statement {
-        return buildStatement(config)
-    }
-
-    private fun buildStatement(config: DatabaseConfig): Statement {
-        val builder = SqlSelectStatementBuilder(config, context)
-        return builder.build()
+        override fun toStatement(config: DatabaseConfig): Statement = buildStatement(config)
     }
 }
