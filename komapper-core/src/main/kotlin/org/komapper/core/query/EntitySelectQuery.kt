@@ -4,7 +4,6 @@ import org.komapper.core.DatabaseConfig
 import org.komapper.core.data.Statement
 import org.komapper.core.metamodel.ColumnInfo
 import org.komapper.core.metamodel.EntityMetamodel
-import org.komapper.core.metamodel.PropertyMetamodel
 import org.komapper.core.query.builder.EntitySelectStatementBuilder
 import org.komapper.core.query.command.EntitySelectCommand
 import org.komapper.core.query.context.EntitySelectContext
@@ -24,7 +23,7 @@ interface EntitySelectQuery<ENTITY> : Query<List<ENTITY>> {
     ): EntitySelectQuery1<ENTITY>
 
     fun where(declaration: WhereDeclaration): EntitySelectQuery<ENTITY>
-    fun orderBy(vararg sortItems: PropertyMetamodel<*, *>): EntitySelectQuery<ENTITY>
+    fun orderBy(vararg sortItems: ColumnInfo<*>): EntitySelectQuery<ENTITY>
     fun offset(value: Int): EntitySelectQuery<ENTITY>
     fun limit(value: Int): EntitySelectQuery<ENTITY>
     fun forUpdate(): EntitySelectQuery<ENTITY>
@@ -34,7 +33,7 @@ interface EntitySelectQuery<ENTITY> : Query<List<ENTITY>> {
 interface EntitySelectQuery1<ENTITY> : EntitySelectQuery<ENTITY> {
 
     override fun where(declaration: WhereDeclaration): EntitySelectQuery1<ENTITY>
-    override fun orderBy(vararg sortItems: PropertyMetamodel<*, *>): EntitySelectQuery1<ENTITY>
+    override fun orderBy(vararg sortItems: ColumnInfo<*>): EntitySelectQuery1<ENTITY>
     override fun offset(value: Int): EntitySelectQuery1<ENTITY>
     override fun limit(value: Int): EntitySelectQuery1<ENTITY>
     override fun forUpdate(): EntitySelectQuery1<ENTITY>
@@ -58,7 +57,7 @@ interface EntitySelectSubQuery<ENTITY> {
     ): EntitySelectSubQuery<ENTITY>
 
     fun where(declaration: WhereDeclaration): EntitySelectSubQuery<ENTITY>
-    fun orderBy(vararg sortItems: PropertyMetamodel<*, *>): EntitySelectSubQuery<ENTITY>
+    fun orderBy(vararg sortItems: ColumnInfo<*>): EntitySelectSubQuery<ENTITY>
     fun offset(value: Int): EntitySelectSubQuery<ENTITY>
     fun limit(value: Int): EntitySelectSubQuery<ENTITY>
     fun select(columnInfo: ColumnInfo<*>): SingleProjection
@@ -112,7 +111,7 @@ internal class EntitySelectQueryImpl<ENTITY>(
         return this
     }
 
-    override fun orderBy(vararg sortItems: PropertyMetamodel<*, *>): EntitySelectQueryImpl<ENTITY> {
+    override fun orderBy(vararg sortItems: ColumnInfo<*>): EntitySelectQueryImpl<ENTITY> {
         support.orderBy(*sortItems)
         return this
     }

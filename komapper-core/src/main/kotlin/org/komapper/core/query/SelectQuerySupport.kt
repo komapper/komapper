@@ -1,7 +1,7 @@
 package org.komapper.core.query
 
+import org.komapper.core.metamodel.ColumnInfo
 import org.komapper.core.metamodel.EntityMetamodel
-import org.komapper.core.metamodel.PropertyMetamodel
 import org.komapper.core.query.context.JoinContext
 import org.komapper.core.query.context.JoinKind
 import org.komapper.core.query.context.SelectContext
@@ -49,7 +49,7 @@ internal class SelectQuerySupport<ENTITY>(
         declaration(scope)
     }
 
-    fun orderBy(vararg sortItems: PropertyMetamodel<*, *>) {
+    fun orderBy(vararg sortItems: ColumnInfo<*>) {
         for (item in sortItems) {
             when (item) {
                 is SortItem -> context.orderBy.add(item)

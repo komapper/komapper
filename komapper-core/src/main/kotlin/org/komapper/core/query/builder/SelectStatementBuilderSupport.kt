@@ -62,10 +62,10 @@ internal class SelectStatementBuilderSupport<ENTITY>(
         if (context.orderBy.isNotEmpty()) {
             buf.append(" order by ")
             for (item in context.orderBy) {
-                buf.append(columnName(item.propertyMetamodel))
+                buf.append(columnName(item.columnInfo))
                 val sort = when (item) {
-                    is SortItem.Asc<*, *> -> "asc"
-                    is SortItem.Desc<*, *> -> "desc"
+                    is SortItem.Asc<*> -> "asc"
+                    is SortItem.Desc<*> -> "desc"
                 }
                 buf.append(" $sort, ")
             }

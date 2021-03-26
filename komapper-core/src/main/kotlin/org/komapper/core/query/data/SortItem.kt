@@ -1,15 +1,15 @@
 package org.komapper.core.query.data
 
-import org.komapper.core.metamodel.PropertyMetamodel
+import org.komapper.core.metamodel.ColumnInfo
 
-internal sealed class SortItem<E, T : Any> : PropertyMetamodel<E, T> {
-    abstract val propertyMetamodel: PropertyMetamodel<E, T>
+internal sealed class SortItem<T : Any> : ColumnInfo<T> {
+    abstract val columnInfo: ColumnInfo<T>
 
-    data class Asc<E, T : Any>(override val propertyMetamodel: PropertyMetamodel<E, T>) :
-        SortItem<E, T>(),
-        PropertyMetamodel<E, T> by propertyMetamodel
+    data class Asc<T : Any>(override val columnInfo: ColumnInfo<T>) :
+        SortItem<T>(),
+        ColumnInfo<T> by columnInfo
 
-    data class Desc<E, T : Any>(override val propertyMetamodel: PropertyMetamodel<E, T>) :
-        SortItem<E, T>(),
-        PropertyMetamodel<E, T> by propertyMetamodel
+    data class Desc<T : Any>(override val columnInfo: ColumnInfo<T>) :
+        SortItem<T>(),
+        ColumnInfo<T> by columnInfo
 }

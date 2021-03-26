@@ -31,7 +31,7 @@ interface SqlSelectQuery<ENTITY> : Query<List<ENTITY>> {
     fun where(declaration: WhereDeclaration): SqlSelectQuery<ENTITY>
     fun groupBy(vararg columns: ColumnInfo<*>): SqlSelectQuery<ENTITY>
     fun having(declaration: HavingDeclaration): SqlSelectQuery<ENTITY>
-    fun orderBy(vararg sortItems: PropertyMetamodel<*, *>): SqlSelectQuery<ENTITY>
+    fun orderBy(vararg columns: ColumnInfo< *>): SqlSelectQuery<ENTITY>
     fun offset(value: Int): SqlSelectQuery<ENTITY>
     fun limit(value: Int): SqlSelectQuery<ENTITY>
     fun forUpdate(): SqlSelectQuery<ENTITY>
@@ -60,7 +60,7 @@ interface SqlSelectSubQuery<ENTITY> {
     fun where(declaration: WhereDeclaration): SqlSelectSubQuery<ENTITY>
     fun groupBy(vararg columns: ColumnInfo<*>): SqlSelectQuery<ENTITY>
     fun having(declaration: HavingDeclaration): SqlSelectSubQuery<ENTITY>
-    fun orderBy(vararg sortItems: PropertyMetamodel<*, *>): SqlSelectSubQuery<ENTITY>
+    fun orderBy(vararg columns: ColumnInfo<*>): SqlSelectSubQuery<ENTITY>
     fun offset(value: Int): SqlSelectSubQuery<ENTITY>
     fun limit(value: Int): SqlSelectSubQuery<ENTITY>
     fun select(propertyMetamodel: PropertyMetamodel<*, *>): SingleProjection
@@ -108,8 +108,8 @@ internal class SqlSelectQueryImpl<ENTITY>(
         return this
     }
 
-    override fun orderBy(vararg sortItems: PropertyMetamodel<*, *>): SqlSelectQueryImpl<ENTITY> {
-        support.orderBy(*sortItems)
+    override fun orderBy(vararg columns: ColumnInfo<*>): SqlSelectQueryImpl<ENTITY> {
+        support.orderBy(*columns)
         return this
     }
 
