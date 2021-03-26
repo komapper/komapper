@@ -18,8 +18,8 @@ internal class Executor(
 
     fun <T> executeQuery(
         statement: Statement,
-        handler: (rs: ResultSet) -> List<T>
-    ): List<T> {
+        handler: (rs: ResultSet) -> T
+    ): T {
         config.connection.use { con ->
             log(statement)
             prepare(con, statement.sql).use { ps ->

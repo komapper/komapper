@@ -6,7 +6,7 @@ import org.komapper.core.jdbc.Executor
 
 internal class TemplateUpdateCommand(
     private val config: DatabaseConfig,
-    override val statement: Statement
+    private val statement: Statement
 ) : Command<Int> {
 
     private val executor: Executor = Executor(config)

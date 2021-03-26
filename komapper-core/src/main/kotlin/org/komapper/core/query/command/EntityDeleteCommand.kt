@@ -10,7 +10,7 @@ internal class EntityDeleteCommand<ENTITY>(
     private val entityMetamodel: EntityMetamodel<ENTITY>,
     private val entity: ENTITY,
     config: DatabaseConfig,
-    override val statement: Statement
+    private val statement: Statement
 ) : Command<Unit> {
 
     private val executor: Executor = Executor(config)

@@ -7,7 +7,7 @@ import org.komapper.core.query.Row
 
 internal class TemplateSelectCommand<T, R>(
     private val config: DatabaseConfig,
-    override val statement: Statement,
+    private val statement: Statement,
     private val provider: Row.() -> T,
     private val transformer: (Sequence<T>) -> R
 ) : Command<R> {

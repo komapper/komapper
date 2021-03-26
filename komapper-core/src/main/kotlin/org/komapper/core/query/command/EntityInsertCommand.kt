@@ -10,7 +10,7 @@ internal class EntityInsertCommand<ENTITY>(
     @Suppress("unused") private val entityMetamodel: EntityMetamodel<ENTITY>,
     private val entity: ENTITY,
     private val config: DatabaseConfig,
-    override val statement: Statement
+    private val statement: Statement
 ) : Command<ENTITY> {
 
     private val executor: Executor = Executor(config) { con, sql ->

@@ -1,8 +1,5 @@
 package org.komapper.core.query.command
 
-import org.komapper.core.data.Statement
-
-internal interface Command<T> {
-    val statement: Statement
+internal fun interface Command<T> {
     fun execute(): T
 }

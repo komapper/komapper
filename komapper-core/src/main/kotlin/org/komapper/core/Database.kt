@@ -104,7 +104,6 @@ class Database(val config: DefaultDatabaseConfig) {
         return queryable.run(config)
     }
 
-
     class Factory(val config: DefaultDatabaseConfig) {
         /**
          * Creates Array objects.

@@ -2,6 +2,7 @@ package org.komapper.jdbc.h2
 
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.Database
@@ -40,9 +41,45 @@ class SqlSelectQueryableTest(private val db: Database) {
     }
 
     @Test
+    fun runQuery() {
+        val a = Address.metamodel()
+        val list = db.runQuery {
+            SqlQuery.from(a)
+        }
+        assertEquals(15, list.size)
+    }
+
+    @Test
+    fun runQuery_first() {
+        val a = Address.metamodel()
+        val address = db.runQuery {
+            SqlQuery.from(a).where { a.addressId eq 1 }.first()
+        }
+        Assertions.assertNotNull(address)
+    }
+
+    @Test
+    fun runQuery_firstOrNull() {
+        val a = Address.metamodel()
+        val address = db.runQuery {
+            SqlQuery.from(a).where { a.addressId eq 99 }.firstOrNull()
+        }
+        assertNull(address)
+    }
+
+    @Test
+    fun runQuery_transform() {
+        val a = Address.metamodel()
+        val count = db.runQuery {
+            SqlQuery.from(a).transform { it.count() }
+        }
+        assertEquals(15, count)
+    }
+
+    @Test
     fun list() {
         val a = Address.metamodel()
-        val addressList = db.list {
+        val addressList = db.runQuery {
             SqlQuery.from(a).where { a.addressId eq 1 }
         }
         Assertions.assertNotNull(addressList)
@@ -63,7 +100,7 @@ class SqlSelectQueryableTest(private val db: Database) {
     }
 
     @Test
-    fun list_select_single_transform() {
+    fun list_select_first() {
         val a = Address.metamodel()
         val value = db.runQuery {
             SqlQuery.from(a)
@@ -71,13 +108,12 @@ class SqlSelectQueryableTest(private val db: Database) {
                     a.addressId inList listOf(1, 2)
                 }
                 .orderBy(a.addressId)
-                .select(a.street) {
-                    it.first()
-                }
+                .select(a.street)
+                .first()
         }
-        assertEquals("STREET 1" , value)
+        assertEquals("STREET 1", value)
     }
-    
+
     @Test
     fun list_select_pair() {
         val a = Address.metamodel()

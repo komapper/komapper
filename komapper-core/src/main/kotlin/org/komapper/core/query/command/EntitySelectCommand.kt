@@ -8,16 +8,17 @@ import org.komapper.core.metamodel.PropertyMetamodel
 import org.komapper.core.query.context.EntitySelectContext
 import java.sql.ResultSet
 
-internal class EntitySelectCommand<ENTITY>(
+internal class EntitySelectCommand<ENTITY, R>(
     private val entityMetamodel: EntityMetamodel<ENTITY>,
     private val context: EntitySelectContext<ENTITY>,
     private val config: DatabaseConfig,
-    override val statement: Statement
-) : Command<List<ENTITY>> {
+    private val statement: Statement,
+    private val transformer: (Sequence<ENTITY>) -> R
+) : Command<R> {
 
     private val executor: Executor = Executor(config)
 
-    override fun execute(): List<ENTITY> {
+    override fun execute(): R {
         return executor.executeQuery(statement) { rs ->
             // hold only unique entities
             val pool: MutableMap<EntityKey, Any> = mutableMapOf()
@@ -35,7 +36,9 @@ internal class EntitySelectCommand<ENTITY>(
             }.map {
                 @Suppress("UNCHECKED_CAST")
                 it.value as ENTITY
-            }.toList()
+            }.let {
+                transformer(it)
+            }
         }
     }
 

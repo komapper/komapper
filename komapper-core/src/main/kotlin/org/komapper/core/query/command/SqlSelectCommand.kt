@@ -8,15 +8,16 @@ import org.komapper.core.metamodel.EntityMetamodel
 import org.komapper.core.metamodel.PropertyMetamodel
 import kotlin.reflect.cast
 
-internal class SqlSelectCommand<ENTITY>(
+internal class SqlSelectCommand<ENTITY, R>(
     private val entityMetamodel: EntityMetamodel<ENTITY>,
     private val config: DatabaseConfig,
-    override val statement: Statement
-) : Command<List<ENTITY>> {
+    private val statement: Statement,
+    private val transformer: (Sequence<ENTITY>) -> R
+) : Command<R> {
 
     private val executor: Executor = Executor(config)
 
-    override fun execute(): List<ENTITY> {
+    override fun execute(): R {
         return executor.executeQuery(
             statement,
             { rs ->
@@ -27,15 +28,16 @@ internal class SqlSelectCommand<ENTITY>(
                     valueMap[p] = value
                 }
                 checkNotNull(entityMetamodel.instantiate(valueMap))
-            }
-        ) { it.toList() }
+            },
+            transformer
+        )
     }
 }
 
 internal class SingleColumnSqlSelectCommand<T : Any, R>(
     private val columnInfo: ColumnInfo<T>,
     private val config: DatabaseConfig,
-    override val statement: Statement,
+    private val statement: Statement,
     private val transformer: (Sequence<T>) -> R
 ) : Command<R> {
 
@@ -56,8 +58,8 @@ internal class SingleColumnSqlSelectCommand<T : Any, R>(
 internal class PairColumnsSqlSelectCommand<A : Any, B : Any, R>(
     private val pair: Pair<ColumnInfo<A>, ColumnInfo<B>>,
     private val config: DatabaseConfig,
-    override val statement: Statement,
-    private val transformer: (Sequence<Pair<A,B>>) -> R
+    private val statement: Statement,
+    private val transformer: (Sequence<Pair<A, B>>) -> R
 ) : Command<R> {
 
     private val executor: Executor = Executor(config)

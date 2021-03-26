@@ -6,7 +6,7 @@ import org.komapper.core.jdbc.Executor
 
 internal class ScriptCommand(
     config: DatabaseConfig,
-    override val statement: Statement
+    private val statement: Statement
 ) : Command<Unit> {
 
     private val executor: Executor = Executor(config)

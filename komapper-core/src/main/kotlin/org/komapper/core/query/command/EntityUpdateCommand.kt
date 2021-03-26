@@ -10,7 +10,7 @@ internal class EntityUpdateCommand<ENTITY>(
     private val entityMetamodel: EntityMetamodel<ENTITY>,
     private val entity: ENTITY,
     config: DatabaseConfig,
-    override val statement: Statement
+    private val statement: Statement
 ) : Command<ENTITY> {
 
     private val executor: Executor = Executor(config)

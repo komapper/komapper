@@ -28,8 +28,8 @@ internal class EntityInsertQueryableImpl<ENTITY>(private val entityMetamodel: En
                 val executor = Executor(config)
                 executor.executeQuery(statement) { rs ->
                     // TODO
-                    if (rs.next()) listOf(rs.getLong(1)) else error("no result")
-                }.first()
+                    if (rs.next()) rs.getLong(1) else error("no result")
+                }
             }
         } else {
             entity

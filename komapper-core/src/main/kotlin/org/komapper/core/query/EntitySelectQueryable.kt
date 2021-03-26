@@ -10,47 +10,36 @@ import org.komapper.core.query.context.EntitySelectContext
 import org.komapper.core.query.scope.JoinDeclaration
 import org.komapper.core.query.scope.WhereDeclaration
 
-interface EntitySelectQueryable<ENTITY> : Queryable<List<ENTITY>> {
+interface EntitySelectQueryable<ENTITY> : ListQueryable<ENTITY> {
 
     fun <OTHER_ENTITY> innerJoin(
         entityMetamodel: EntityMetamodel<OTHER_ENTITY>,
         declaration: JoinDeclaration<OTHER_ENTITY>
-    ): EntitySelectQueryable1<ENTITY>
+    ): EntitySelectQueryable<ENTITY>
 
     fun <OTHER_ENTITY> leftJoin(
         entityMetamodel: EntityMetamodel<OTHER_ENTITY>,
         declaration: JoinDeclaration<OTHER_ENTITY>
-    ): EntitySelectQueryable1<ENTITY>
+    ): EntitySelectQueryable<ENTITY>
 
     fun where(declaration: WhereDeclaration): EntitySelectQueryable<ENTITY>
     fun orderBy(vararg items: ColumnInfo<*>): EntitySelectQueryable<ENTITY>
     fun offset(value: Int): EntitySelectQueryable<ENTITY>
     fun limit(value: Int): EntitySelectQueryable<ENTITY>
     fun forUpdate(): EntitySelectQueryable<ENTITY>
-}
-
-// TODO is this necessary?
-interface EntitySelectQueryable1<ENTITY> : EntitySelectQueryable<ENTITY> {
-
-    override fun where(declaration: WhereDeclaration): EntitySelectQueryable1<ENTITY>
-    override fun orderBy(vararg items: ColumnInfo<*>): EntitySelectQueryable1<ENTITY>
-    override fun offset(value: Int): EntitySelectQueryable1<ENTITY>
-    override fun limit(value: Int): EntitySelectQueryable1<ENTITY>
-    override fun forUpdate(): EntitySelectQueryable1<ENTITY>
 
     fun <T, S> associate(
         e1: EntityMetamodel<T>,
         e2: EntityMetamodel<S>,
         associator: Associator<T, S>
-    ): EntitySelectQueryable1<ENTITY>
+    ): EntitySelectQueryable<ENTITY>
 }
 
 internal class EntitySelectQueryableImpl<ENTITY>(
     private val entityMetamodel: EntityMetamodel<ENTITY>,
     private val context: EntitySelectContext<ENTITY> = EntitySelectContext(entityMetamodel)
 ) :
-    EntitySelectQueryable<ENTITY>,
-    EntitySelectQueryable1<ENTITY> {
+    EntitySelectQueryable<ENTITY> {
 
     private val support: SelectQuerySupport<ENTITY> = SelectQuerySupport(context)
 
@@ -112,18 +101,39 @@ internal class EntitySelectQueryableImpl<ENTITY>(
         return this
     }
 
-    override fun run(config: DatabaseConfig): List<ENTITY> {
-        val statement = buildStatement(config)
-        val command = EntitySelectCommand(entityMetamodel, context, config, statement)
-        return command.execute()
+    private fun buildStatement(config: DatabaseConfig): Statement {
+        val builder = EntitySelectStatementBuilder(config, context)
+        return builder.build()
     }
 
     override fun toStatement(config: DatabaseConfig): Statement {
         return buildStatement(config)
     }
 
-    private fun buildStatement(config: DatabaseConfig): Statement {
-        val builder = EntitySelectStatementBuilder(config, context)
-        return builder.build()
+    override fun run(config: DatabaseConfig): List<ENTITY> {
+        val transformable = Transformable { it.toList() }
+        return transformable.run(config)
+    }
+
+    override fun first(): Queryable<ENTITY> {
+        return Transformable { it.first() }
+    }
+
+    override fun firstOrNull(): Queryable<ENTITY?> {
+        return Transformable { it.firstOrNull() }
+    }
+
+    override fun <R> transform(transformer: (Sequence<ENTITY>) -> R): Queryable<R> {
+        return Transformable(transformer)
+    }
+
+    private inner class Transformable<R>(val transformer: (Sequence<ENTITY>) -> R) : Queryable<R> {
+        override fun run(config: DatabaseConfig): R {
+            val statement = buildStatement(config)
+            val command = EntitySelectCommand(entityMetamodel, context, config, statement, transformer)
+            return command.execute()
+        }
+
+        override fun toStatement(config: DatabaseConfig): Statement = buildStatement(config)
     }
 }
