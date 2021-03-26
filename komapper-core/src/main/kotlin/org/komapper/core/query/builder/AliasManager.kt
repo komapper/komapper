@@ -1,12 +1,12 @@
 package org.komapper.core.query.builder
 
-import org.komapper.core.metamodel.EntityMetamodel
-import org.komapper.core.metamodel.PropertyMetamodel
+import org.komapper.core.metamodel.ColumnInfo
+import org.komapper.core.metamodel.TableInfo
 import org.komapper.core.query.context.Context
 
 internal class AliasManager(context: Context<*>, private val parent: AliasManager? = null) {
-    private val entityAliasMap: MutableMap<EntityMetamodel<*>, String> = mutableMapOf()
-    private val propertyAliasMap: MutableMap<PropertyMetamodel<*, *>, String> = mutableMapOf()
+    private val tableAliasMap: MutableMap<TableInfo, String> = mutableMapOf()
+    private val columnAliasMap: MutableMap<ColumnInfo<*>, String> = mutableMapOf()
     private val index: Int
 
     init {
@@ -14,27 +14,27 @@ internal class AliasManager(context: Context<*>, private val parent: AliasManage
         for (e in context.getEntityMetamodels()) {
             val alias = "t" + i + "_"
             i++
-            entityAliasMap[e] = alias
+            tableAliasMap[e] = alias
             for (p in e.properties()) {
-                propertyAliasMap[p] = alias
+                columnAliasMap[p] = alias
             }
         }
         this.index = i
     }
 
-    fun getAlias(entityMetamodel: EntityMetamodel<*>): String? {
+    fun getAlias(tableInfo: TableInfo): String? {
         return getAlias(
-            entityMetamodel,
+            tableInfo,
             { parent, key -> parent.getAlias(key) },
-            { key -> entityAliasMap[key] }
+            { key -> tableAliasMap[key] }
         )
     }
 
-    fun getAlias(propertyMetamodel: PropertyMetamodel<*, *>): String? {
+    fun getAlias(columnInfo: ColumnInfo<*>): String? {
         return getAlias(
-            propertyMetamodel,
+            columnInfo,
             { parent, key -> parent.getAlias(key) },
-            { key -> propertyAliasMap[key] }
+            { key -> columnAliasMap[key] }
         )
     }
 

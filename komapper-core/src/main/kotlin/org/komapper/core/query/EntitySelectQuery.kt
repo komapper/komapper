@@ -2,6 +2,7 @@ package org.komapper.core.query
 
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.data.Statement
+import org.komapper.core.metamodel.ColumnInfo
 import org.komapper.core.metamodel.EntityMetamodel
 import org.komapper.core.metamodel.PropertyMetamodel
 import org.komapper.core.query.builder.EntitySelectStatementBuilder
@@ -60,7 +61,7 @@ interface EntitySelectSubQuery<ENTITY> {
     fun orderBy(vararg sortItems: PropertyMetamodel<*, *>): EntitySelectSubQuery<ENTITY>
     fun offset(value: Int): EntitySelectSubQuery<ENTITY>
     fun limit(value: Int): EntitySelectSubQuery<ENTITY>
-    fun select(propertyMetamodel: PropertyMetamodel<*, *>): SingleProjection
+    fun select(columnInfo: ColumnInfo<*>): SingleProjection
 }
 
 internal class EntitySelectQueryImpl<ENTITY>(
@@ -131,8 +132,8 @@ internal class EntitySelectQueryImpl<ENTITY>(
         return this
     }
 
-    override fun select(propertyMetamodel: PropertyMetamodel<*, *>): SingleProjection {
-        context.projections.add(propertyMetamodel)
+    override fun select(columnInfo: ColumnInfo<*>): SingleProjection {
+        context.columns.add(columnInfo)
         return SingleProjection.ContextHolder(context)
     }
 

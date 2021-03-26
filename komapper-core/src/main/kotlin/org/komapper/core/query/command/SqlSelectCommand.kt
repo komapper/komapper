@@ -3,6 +3,7 @@ package org.komapper.core.query.command
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.data.Statement
 import org.komapper.core.jdbc.Executor
+import org.komapper.core.metamodel.ColumnInfo
 import org.komapper.core.metamodel.EntityMetamodel
 import org.komapper.core.metamodel.PropertyMetamodel
 import kotlin.reflect.cast
@@ -31,8 +32,8 @@ internal class SqlSelectCommand<ENTITY>(
     }
 }
 
-internal class SingleSqlSelectCommand<T : Any>(
-    private val propertyMetamodel: PropertyMetamodel<*, T>,
+internal class SingleColumnSqlSelectCommand<T : Any>(
+    private val columnInfo: ColumnInfo<T>,
     private val config: DatabaseConfig,
     override val statement: Statement
 ) : Command<List<T>> {
@@ -43,15 +44,15 @@ internal class SingleSqlSelectCommand<T : Any>(
         return executor.executeQuery(
             statement,
             { rs ->
-                val value = config.dialect.getValue(rs, 1, propertyMetamodel.klass)
-                propertyMetamodel.klass.cast(value)
+                val value = config.dialect.getValue(rs, 1, columnInfo.klass)
+                columnInfo.klass.cast(value)
             }
         ) { it.toList() }
     }
 }
 
-internal class PairSqlSelectCommand<A : Any, B : Any>(
-    private val pair: Pair<PropertyMetamodel<*, A>, PropertyMetamodel<*, B>>,
+internal class PairColumnsSqlSelectCommand<A : Any, B : Any>(
+    private val pair: Pair<ColumnInfo<A>, ColumnInfo<B>>,
     private val config: DatabaseConfig,
     override val statement: Statement
 ) : Command<List<Pair<A, B>>> {

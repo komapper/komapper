@@ -6,7 +6,12 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.Database
 import org.komapper.core.query.SqlQuery
+import org.komapper.core.query.avg
+import org.komapper.core.query.count
 import org.komapper.core.query.desc
+import org.komapper.core.query.max
+import org.komapper.core.query.min
+import org.komapper.core.query.sum
 
 @ExtendWith(Env::class)
 class SqlSelectQueryTest(private val db: Database) {
@@ -259,6 +264,89 @@ class SqlSelectQueryTest(private val db: Database) {
             ),
             list
         )
+    }
+
+    @Test
+    fun aggregate_avg() {
+        val a = Address.metamodel()
+        val avg = db.first {
+            SqlQuery.from(a).select(avg(a.addressId))
+        }
+        assertEquals(8.0, avg, 0.0)
+    }
+
+    @Test
+    fun aggregate_countAsterisk() {
+        val a = Address.metamodel()
+        val count = db.first {
+            SqlQuery.from(a).select(count())
+        }
+        assertEquals(15, count)
+    }
+
+    @Test
+    fun aggregate_count() {
+        val a = Address.metamodel()
+        val count = db.first {
+            SqlQuery.from(a).select(count(a.street))
+        }
+        assertEquals(15, count)
+    }
+
+    @Test
+    fun aggregate_sum() {
+        val a = Address.metamodel()
+        val sum = db.first {
+            SqlQuery.from(a).select(sum(a.addressId))
+        }
+        assertEquals(120, sum)
+    }
+
+    @Test
+    fun aggregate_max() {
+        val a = Address.metamodel()
+        val max = db.first {
+            SqlQuery.from(a).select(max(a.addressId))
+        }
+        assertEquals(15, max)
+    }
+
+    @Test
+    fun aggregate_min() {
+        val a = Address.metamodel()
+        val min = db.first {
+            SqlQuery.from(a).select(min(a.addressId))
+        }
+        assertEquals(1, min)
+    }
+
+    @Test
+    fun having() {
+        val e = Employee.metamodel()
+        val list = db.list {
+            SqlQuery.from(e)
+                .groupBy(e.departmentId)
+                .having {
+                    count(e.employeeId) greaterEq 4L
+                }
+                .orderBy(e.departmentId)
+                .select(e.departmentId, count(e.employeeId))
+        }
+        assertEquals(listOf(2 to 5L, 3 to 6L), list)
+    }
+
+    @Test
+    fun having_empty_groupBy() {
+        val e = Employee.metamodel()
+        val list = db.list {
+            SqlQuery.from(e)
+                .having {
+                    count(e.employeeId) greaterEq 4L
+                }
+                .orderBy(e.departmentId)
+                .select(e.departmentId, count(e.employeeId))
+        }
+        assertEquals(listOf(2 to 5L, 3 to 6L), list)
     }
 
 /*

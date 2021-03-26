@@ -2,13 +2,17 @@ package org.komapper.core.query
 
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.data.Statement
+import org.komapper.core.metamodel.ColumnInfo
 import org.komapper.core.metamodel.EntityMetamodel
 import org.komapper.core.metamodel.PropertyMetamodel
 import org.komapper.core.query.builder.SqlSelectStatementBuilder
-import org.komapper.core.query.command.PairSqlSelectCommand
-import org.komapper.core.query.command.SingleSqlSelectCommand
+import org.komapper.core.query.command.PairColumnsSqlSelectCommand
+import org.komapper.core.query.command.SingleColumnSqlSelectCommand
 import org.komapper.core.query.command.SqlSelectCommand
 import org.komapper.core.query.context.SqlSelectContext
+import org.komapper.core.query.scope.FilterScopeSupport
+import org.komapper.core.query.scope.HavingDeclaration
+import org.komapper.core.query.scope.HavingScope
 import org.komapper.core.query.scope.JoinDeclaration
 import org.komapper.core.query.scope.WhereDeclaration
 
@@ -25,14 +29,16 @@ interface SqlSelectQuery<ENTITY> : Query<List<ENTITY>> {
     ): SqlSelectQuery<ENTITY>
 
     fun where(declaration: WhereDeclaration): SqlSelectQuery<ENTITY>
+    fun groupBy(vararg columns: ColumnInfo<*>): SqlSelectQuery<ENTITY>
+    fun having(declaration: HavingDeclaration): SqlSelectQuery<ENTITY>
     fun orderBy(vararg sortItems: PropertyMetamodel<*, *>): SqlSelectQuery<ENTITY>
     fun offset(value: Int): SqlSelectQuery<ENTITY>
     fun limit(value: Int): SqlSelectQuery<ENTITY>
     fun forUpdate(): SqlSelectQuery<ENTITY>
-    fun <T : Any> select(p: PropertyMetamodel<*, T>): SqlSelectQuery1<ENTITY, T>
+    fun <T : Any> select(columnInfo: ColumnInfo<T>): SqlSelectQuery1<ENTITY, T>
     fun <A : Any, B : Any> select(
-        p1: PropertyMetamodel<*, A>,
-        p2: PropertyMetamodel<*, B>
+        columnInfo1: ColumnInfo<A>,
+        columnInfo2: ColumnInfo<B>
     ): SqlSelectQuery2<ENTITY, A, B>
 }
 
@@ -52,6 +58,8 @@ interface SqlSelectSubQuery<ENTITY> {
     ): SqlSelectSubQuery<ENTITY>
 
     fun where(declaration: WhereDeclaration): SqlSelectSubQuery<ENTITY>
+    fun groupBy(vararg columns: ColumnInfo<*>): SqlSelectQuery<ENTITY>
+    fun having(declaration: HavingDeclaration): SqlSelectSubQuery<ENTITY>
     fun orderBy(vararg sortItems: PropertyMetamodel<*, *>): SqlSelectSubQuery<ENTITY>
     fun offset(value: Int): SqlSelectSubQuery<ENTITY>
     fun limit(value: Int): SqlSelectSubQuery<ENTITY>
@@ -88,6 +96,18 @@ internal class SqlSelectQueryImpl<ENTITY>(
         return this
     }
 
+    override fun groupBy(vararg columns: ColumnInfo<*>): SqlSelectQueryImpl<ENTITY> {
+        context.groupBy.addAll(columns)
+        return this
+    }
+
+    override fun having(declaration: HavingDeclaration): SqlSelectQueryImpl<ENTITY> {
+        val support = FilterScopeSupport(context.having)
+        val scope = HavingScope(support)
+        declaration(scope)
+        return this
+    }
+
     override fun orderBy(vararg sortItems: PropertyMetamodel<*, *>): SqlSelectQueryImpl<ENTITY> {
         support.orderBy(*sortItems)
         return this
@@ -112,18 +132,18 @@ internal class SqlSelectQueryImpl<ENTITY>(
         TODO("Not yet implemented")
     }
 
-    override fun <T : Any> select(p: PropertyMetamodel<*, T>): SingleProjectionQuery<ENTITY, T> {
-        context.projections.add(p)
-        return SingleProjectionQuery(context, p)
+    override fun <T : Any> select(columnInfo: ColumnInfo<T>): SingleProjectionQuery<ENTITY, T> {
+        context.columns.add(columnInfo)
+        return SingleProjectionQuery(context, columnInfo)
     }
 
     override fun <A : Any, B : Any> select(
-        p1: PropertyMetamodel<*, A>,
-        p2: PropertyMetamodel<*, B>
+        columnInfo1: ColumnInfo<A>,
+        columnInfo2: ColumnInfo<B>
     ): PairProjectionQuery<ENTITY, A, B> {
-        context.projections.add(p1)
-        context.projections.add(p2)
-        return PairProjectionQuery(context, p1 to p2)
+        context.columns.add(columnInfo1)
+        context.columns.add(columnInfo2)
+        return PairProjectionQuery(context, columnInfo1 to columnInfo2)
     }
 
     override fun run(config: DatabaseConfig): List<ENTITY> {
@@ -144,12 +164,12 @@ internal class SqlSelectQueryImpl<ENTITY>(
 
 internal class SingleProjectionQuery<ENTITY, T : Any>(
     private val context: SqlSelectContext<ENTITY>,
-    private val propertyMetamodel: PropertyMetamodel<*, T>
+    private val columnInfo: ColumnInfo<T>
 ) : SqlSelectQuery1<ENTITY, T> {
 
     override fun run(config: DatabaseConfig): List<T> {
         val statement = buildStatement(config)
-        val command = SingleSqlSelectCommand(propertyMetamodel, config, statement)
+        val command = SingleColumnSqlSelectCommand(columnInfo, config, statement)
         return command.execute()
     }
 
@@ -165,12 +185,12 @@ internal class SingleProjectionQuery<ENTITY, T : Any>(
 
 internal class PairProjectionQuery<ENTITY, A : Any, B : Any>(
     private val context: SqlSelectContext<ENTITY>,
-    private val pair: Pair<PropertyMetamodel<*, A>, PropertyMetamodel<*, B>>
+    private val pair: Pair<ColumnInfo<A>, ColumnInfo<B>>
 ) : SqlSelectQuery2<ENTITY, A, B> {
 
     override fun run(config: DatabaseConfig): List<Pair<A, B>> {
         val statement = buildStatement(config)
-        val command = PairSqlSelectCommand(pair, config, statement)
+        val command = PairColumnsSqlSelectCommand(pair, config, statement)
         return command.execute()
     }
 

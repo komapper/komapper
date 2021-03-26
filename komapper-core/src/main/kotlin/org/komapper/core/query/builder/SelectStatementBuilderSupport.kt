@@ -2,8 +2,8 @@ package org.komapper.core.query.builder
 
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.data.StatementBuffer
-import org.komapper.core.metamodel.EntityMetamodel
-import org.komapper.core.metamodel.PropertyMetamodel
+import org.komapper.core.metamodel.ColumnInfo
+import org.komapper.core.metamodel.TableInfo
 import org.komapper.core.query.context.JoinKind
 import org.komapper.core.query.context.SelectContext
 import org.komapper.core.query.data.Criterion
@@ -19,8 +19,8 @@ internal class SelectStatementBuilderSupport<ENTITY>(
 
     fun selectClause() {
         buf.append("select ")
-        val properties = context.getProjectionPropertyMetamodels()
-        properties.joinTo(buf) { columnName(it) }
+        val columns = context.getProjectionColumns()
+        columns.joinTo(buf) { columnName(it) }
     }
 
     fun fromClause() {
@@ -92,15 +92,15 @@ internal class SelectStatementBuilderSupport<ENTITY>(
         }
     }
 
-    private fun tableName(entityMetamodel: EntityMetamodel<*>): String {
-        return support.tableName(entityMetamodel)
+    fun tableName(tableInfo: TableInfo): String {
+        return support.tableName(tableInfo)
     }
 
-    private fun columnName(propertyMetamodel: PropertyMetamodel<*, *>): String {
-        return support.columnName(propertyMetamodel)
+    fun columnName(columnInfo: ColumnInfo<*>): String {
+        return support.columnName(columnInfo)
     }
 
-    private fun visitCriterion(index: Int, c: Criterion) {
+    fun visitCriterion(index: Int, c: Criterion) {
         return support.visitCriterion(index, c)
     }
 }

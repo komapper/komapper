@@ -19,6 +19,6 @@ class JoinScope<ENTITY> internal constructor(private val context: JoinContext<EN
     }
 
     infix fun <T : Any> PropertyMetamodel<*, T>.eq(right: PropertyMetamodel<ENTITY, T>) {
-        context.add(Criterion.Eq(Operand.Property(this), Operand.Property(right)))
+        context.add(Criterion.Eq(Operand.Column(this), Operand.Column(right)))
     }
 }

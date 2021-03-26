@@ -5,8 +5,8 @@ import org.komapper.core.data.Statement
 import org.komapper.core.data.StatementBuffer
 import org.komapper.core.data.Value
 import org.komapper.core.metamodel.Assignment
-import org.komapper.core.metamodel.EntityMetamodel
-import org.komapper.core.metamodel.PropertyMetamodel
+import org.komapper.core.metamodel.ColumnInfo
+import org.komapper.core.metamodel.TableInfo
 import org.komapper.core.query.context.EntityInsertContext
 
 internal class EntityInsertStatementBuilder<ENTITY>(
@@ -44,11 +44,11 @@ internal class EntityInsertStatementBuilder<ENTITY>(
         return buf.toStatement()
     }
 
-    private fun tableName(entityMetamodel: EntityMetamodel<*>): String {
-        return entityMetamodel.tableName()
+    private fun tableName(tableInfo: TableInfo): String {
+        return tableInfo.tableName()
     }
 
-    private fun columnName(propertyMetamodel: PropertyMetamodel<*, *>): String {
-        return propertyMetamodel.columnName
+    private fun columnName(columnInfo: ColumnInfo<*>): String {
+        return columnInfo.columnName
     }
 }

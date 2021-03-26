@@ -6,6 +6,7 @@ import org.komapper.core.query.context.JoinContext
 import org.komapper.core.query.context.JoinKind
 import org.komapper.core.query.context.SelectContext
 import org.komapper.core.query.data.SortItem
+import org.komapper.core.query.scope.FilterScopeSupport
 import org.komapper.core.query.scope.JoinDeclaration
 import org.komapper.core.query.scope.JoinScope
 import org.komapper.core.query.scope.WhereDeclaration
@@ -43,7 +44,8 @@ internal class SelectQuerySupport<ENTITY>(
     }
 
     fun where(declaration: WhereDeclaration) {
-        val scope = WhereScope(context.where)
+        val support = FilterScopeSupport(context.where)
+        val scope = WhereScope(support)
         declaration(scope)
     }
 

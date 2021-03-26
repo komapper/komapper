@@ -3,8 +3,9 @@ package org.komapper.core.query.builder
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.data.StatementBuffer
 import org.komapper.core.data.Value
-import org.komapper.core.metamodel.EntityMetamodel
-import org.komapper.core.metamodel.PropertyMetamodel
+import org.komapper.core.metamodel.ColumnInfo
+import org.komapper.core.metamodel.TableInfo
+import org.komapper.core.query.AggregateFunction
 import org.komapper.core.query.context.EntitySelectContext
 import org.komapper.core.query.data.Criterion
 import org.komapper.core.query.data.Operand
@@ -16,14 +17,43 @@ internal class BuilderSupport(
     private val buf: StatementBuffer
 ) {
 
-    fun tableName(entityMetamodel: EntityMetamodel<*>): String {
-        val alias = aliasManager.getAlias(entityMetamodel) ?: error("no alias")
-        return entityMetamodel.tableName() + " " + alias
+    fun tableName(tableInfo: TableInfo): String {
+        val alias = aliasManager.getAlias(tableInfo) ?: error("no alias")
+        return tableInfo.tableName() + " " + alias
     }
 
-    fun columnName(propertyMetamodel: PropertyMetamodel<*, *>): String {
-        val alias = aliasManager.getAlias(propertyMetamodel) ?: error("no alias")
-        return alias + "." + propertyMetamodel.columnName
+    fun columnName(columnInfo: ColumnInfo<*>): String {
+        return when (columnInfo) {
+            is AggregateFunction.Avg -> {
+                val name = columnName(columnInfo.c)
+                "avg($name)"
+            }
+            is AggregateFunction.CountAsterisk -> {
+                "count(*)"
+            }
+            is AggregateFunction.Count -> {
+                val name = columnName(columnInfo.c)
+                "count($name)"
+            }
+            is AggregateFunction.Max -> {
+                val name = columnName(columnInfo.c)
+                "max($name)"
+            }
+            is AggregateFunction.Min -> {
+                val name = columnName(columnInfo.c)
+                "min($name)"
+            }
+            is AggregateFunction.Sum -> {
+                val name = columnName(columnInfo.c)
+                "sum($name)"
+            }
+            else -> aliasedColumnName(columnInfo)
+        }
+    }
+
+    private fun aliasedColumnName(columnInfo: ColumnInfo<*>): String {
+        val alias = aliasManager.getAlias(columnInfo) ?: error("no alias")
+        return alias + "." + columnInfo.columnName
     }
 
     fun visitCriterion(index: Int, c: Criterion) {
@@ -99,8 +129,8 @@ internal class BuilderSupport(
             }
         }
         when (operand) {
-            is Operand.Property -> {
-                buf.append(columnName(operand.metamodel))
+            is Operand.Column -> {
+                buf.append(columnName(operand.columnInfo))
             }
             is Operand.Parameter -> {
                 val value = operand.value
@@ -190,11 +220,11 @@ internal class BuilderSupport(
 
     private fun visitOperand(operand: Operand) {
         when (operand) {
-            is Operand.Property -> {
-                buf.append(columnName(operand.metamodel))
+            is Operand.Column -> {
+                buf.append(columnName(operand.columnInfo))
             }
             is Operand.Parameter -> {
-                buf.bind(Value(operand.value, operand.metamodel.klass))
+                buf.bind(Value(operand.value, operand.columnInfo.klass))
             }
         }
     }

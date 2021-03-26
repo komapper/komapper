@@ -2,10 +2,8 @@ package org.komapper.core.metamodel
 
 import kotlin.reflect.KClass
 
-interface PropertyMetamodel<E, T : Any> {
+interface PropertyMetamodel<E, T : Any> : ColumnInfo<T> {
     val owner: EntityMetamodel<E>
-    val klass: KClass<T>
-    val columnName: String
     val get: (E) -> T?
     val getWithUncheckedCast: (Any) -> T?
     val set: (Pair<E, T>) -> E

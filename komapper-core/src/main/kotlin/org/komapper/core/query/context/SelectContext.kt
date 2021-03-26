@@ -1,13 +1,13 @@
 package org.komapper.core.query.context
 
+import org.komapper.core.metamodel.ColumnInfo
 import org.komapper.core.metamodel.EntityMetamodel
-import org.komapper.core.metamodel.PropertyMetamodel
 
 internal interface SelectContext<ENTITY> : Context<ENTITY> {
     val entityMetamodel: EntityMetamodel<ENTITY>
-    val projections: MutableList<PropertyMetamodel<*, *>>
+    val columns: MutableList<ColumnInfo<*>>
     val joins: JoinsContext
-    val where: WhereContext
+    val where: FilterContext
     val orderBy: OrderByContext
     var offset: Int
     var limit: Int
@@ -15,5 +15,5 @@ internal interface SelectContext<ENTITY> : Context<ENTITY> {
 
     override fun getEntityMetamodels(): List<EntityMetamodel<*>>
     fun getProjectionEntityMetamodels(): List<EntityMetamodel<*>>
-    fun getProjectionPropertyMetamodels(): List<PropertyMetamodel<*, *>>
+    fun getProjectionColumns(): List<ColumnInfo<*>>
 }

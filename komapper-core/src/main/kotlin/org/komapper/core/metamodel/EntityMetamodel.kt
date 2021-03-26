@@ -2,8 +2,7 @@ package org.komapper.core.metamodel
 
 import java.time.Clock
 
-interface EntityMetamodel<ENTITY> {
-    fun tableName(): String
+interface EntityMetamodel<ENTITY> : TableInfo {
     fun idAssignment(): Assignment<ENTITY>?
     fun idProperties(): List<PropertyMetamodel<ENTITY, *>>
     fun versionProperty(): PropertyMetamodel<ENTITY, *>?
