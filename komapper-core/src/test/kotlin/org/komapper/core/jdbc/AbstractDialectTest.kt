@@ -3,6 +3,7 @@ package org.komapper.core.jdbc
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import org.komapper.core.config.AbstractDialect
 import java.sql.SQLException
 import kotlin.reflect.KClass
 

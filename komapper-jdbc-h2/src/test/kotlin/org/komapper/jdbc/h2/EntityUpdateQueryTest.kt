@@ -11,7 +11,7 @@ import org.komapper.core.DatabaseConfig
 import org.komapper.core.EntityQuery
 import org.komapper.core.OptimisticLockException
 import org.komapper.core.UniqueConstraintException
-import org.komapper.core.time.ClockProvider
+import org.komapper.core.config.ClockProvider
 import java.time.Clock
 import java.time.Instant
 import java.time.LocalDateTime

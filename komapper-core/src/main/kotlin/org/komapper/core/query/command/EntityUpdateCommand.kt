@@ -2,8 +2,8 @@ package org.komapper.core.query.command
 
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.OptimisticLockException
+import org.komapper.core.config.Dialect
 import org.komapper.core.data.Statement
-import org.komapper.core.jdbc.Dialect
 import org.komapper.core.jdbc.JdbcExecutor
 import org.komapper.core.metamodel.EntityMetamodel
 

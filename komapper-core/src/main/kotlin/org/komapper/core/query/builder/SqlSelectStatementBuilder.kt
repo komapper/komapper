@@ -1,8 +1,8 @@
 package org.komapper.core.query.builder
 
+import org.komapper.core.config.Dialect
 import org.komapper.core.data.Statement
 import org.komapper.core.data.StatementBuffer
-import org.komapper.core.jdbc.Dialect
 import org.komapper.core.metamodel.ColumnInfo
 import org.komapper.core.query.AggregateFunction
 import org.komapper.core.query.context.SqlSelectContext

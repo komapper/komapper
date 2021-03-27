@@ -1,9 +1,11 @@
 package org.komapper.core.tx
 
-import org.komapper.core.Scope
+interface UserTransaction {
+    operator fun <R> invoke(
+        isolationLevel: TransactionIsolationLevel? = null,
+        block: TransactionScope.() -> R
+    ): R
 
-@Scope
-interface TransactionScope {
     fun <R> required(
         isolationLevel: TransactionIsolationLevel? = null,
         block: TransactionScope.() -> R
@@ -13,7 +15,4 @@ interface TransactionScope {
         isolationLevel: TransactionIsolationLevel? = null,
         block: TransactionScope.() -> R
     ): R
-
-    fun setRollbackOnly()
-    fun isRollbackOnly(): Boolean
 }

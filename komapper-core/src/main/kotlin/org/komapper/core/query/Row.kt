@@ -1,6 +1,6 @@
 package org.komapper.core.query
 
-import org.komapper.core.jdbc.Dialect
+import org.komapper.core.config.Dialect
 import java.sql.ResultSet
 import java.time.LocalDateTime
 import kotlin.reflect.KClass

@@ -1,4 +1,4 @@
-package org.komapper.core.jdbc
+package org.komapper.core.config
 
 import org.komapper.core.expr.DefaultExprEnvironment
 import org.komapper.core.expr.DefaultExprEvaluator
@@ -6,6 +6,29 @@ import org.komapper.core.expr.ExprEnvironment
 import org.komapper.core.expr.ExprEvaluator
 import org.komapper.core.expr.ExprNodeFactory
 import org.komapper.core.expr.NoCacheExprNodeFactory
+import org.komapper.core.jdbc.AnyType
+import org.komapper.core.jdbc.ArrayType
+import org.komapper.core.jdbc.BigDecimalType
+import org.komapper.core.jdbc.BigIntegerType
+import org.komapper.core.jdbc.BlobType
+import org.komapper.core.jdbc.BooleanType
+import org.komapper.core.jdbc.ByteArrayType
+import org.komapper.core.jdbc.ByteType
+import org.komapper.core.jdbc.ClobType
+import org.komapper.core.jdbc.DataType
+import org.komapper.core.jdbc.DoubleType
+import org.komapper.core.jdbc.EnumType
+import org.komapper.core.jdbc.FloatType
+import org.komapper.core.jdbc.IntType
+import org.komapper.core.jdbc.LocalDateTimeType
+import org.komapper.core.jdbc.LocalDateType
+import org.komapper.core.jdbc.LocalTimeType
+import org.komapper.core.jdbc.LongType
+import org.komapper.core.jdbc.NClobType
+import org.komapper.core.jdbc.OffsetDateTimeType
+import org.komapper.core.jdbc.SQLXMLType
+import org.komapper.core.jdbc.ShortType
+import org.komapper.core.jdbc.StringType
 import org.komapper.core.template.NoCacheSqlNodeFactory
 import org.komapper.core.template.SqlNodeFactory
 import java.math.BigDecimal
@@ -110,8 +133,7 @@ abstract class AbstractDialect : Dialect {
         type == String::class -> StringType
         type == SQLXML::class -> SQLXMLType
         else -> error(
-            "The dataType is not found for the type \"${type.qualifiedName}\"." +
-                "Are you forgetting to specify @Embedded to the property?"
+            "The dataType is not found for the type \"${type.qualifiedName}\"."
         )
     }
 

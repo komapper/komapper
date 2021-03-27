@@ -1,4 +1,4 @@
-package org.komapper.core.time
+package org.komapper.core.config
 
 import java.time.Clock
 import java.time.Instant

@@ -147,15 +147,17 @@ internal class Env :
     AfterTestExecutionCallback,
     ParameterResolver {
 
-    private val config = object : H2DatabaseConfig("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1") {
-        override val batchSize = 2
+    private val config = object : H2DatabaseConfig("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1", enableTransaction = true) {
+        override val jdbcConfig = super.jdbcConfig.copy(batchSize = 2)
     }
 
     private val db = Database(config)
+    private val txManager = db.config.session.getTransactionManager()
 
-    override fun beforeTestExecution(context: ExtensionContext?) =
-        db.script(
-            """
+    override fun beforeTestExecution(context: ExtensionContext?) {
+        db.transaction {
+            db.script(
+                """
             CREATE SEQUENCE SEQUENCE_STRATEGY_ID START WITH 1 INCREMENT BY 100;
             CREATE SEQUENCE MY_SEQUENCE_STRATEGY_ID START WITH 1 INCREMENT BY 100;
             CREATE SEQUENCE PERSON_ID_SEQUENCE START WITH 1 INCREMENT BY 100;
@@ -283,13 +285,19 @@ internal class Env :
             INSERT INTO NO_ID VALUES (1, 1);
 
             INSERT INTO ID_GENERATOR VALUES('TABLE_STRATEGY_ID', 1);
-            """.trimIndent()
-        )
+                """.trimIndent()
+            )
+        }
+        txManager.begin()
+    }
 
     override fun afterTestExecution(context: ExtensionContext?) {
-        db.config.connection.use { con ->
-            con.createStatement().use { stmt ->
-                stmt.execute("DROP ALL OBJECTS")
+        txManager.rollback()
+        db.transaction {
+            db.config.session.getConnection().use { con ->
+                con.createStatement().use { stmt ->
+                    stmt.execute("DROP ALL OBJECTS")
+                }
             }
         }
     }

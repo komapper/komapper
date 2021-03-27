@@ -1,6 +1,6 @@
 package org.komapper.jdbc.h2
 
-import org.komapper.core.jdbc.AbstractDialect
+import org.komapper.core.config.AbstractDialect
 import java.sql.SQLException
 
 open class H2Dialect(val version: Version = Version.V1_4) : AbstractDialect() {

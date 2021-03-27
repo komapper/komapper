@@ -15,6 +15,7 @@ import org.komapper.core.EntityQuery
 import org.komapper.core.KmEntity
 import org.komapper.core.KmId
 import org.komapper.core.KmTable
+import org.komapper.core.jdbc.SimpleDataSource
 import org.komapper.core.tx.TransactionIsolationLevel
 import java.sql.Blob
 import java.sql.Clob
@@ -23,8 +24,8 @@ import java.sql.SQLXML
 
 class TransactionTest {
 
-    private val config = H2DatabaseConfig("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1")
-
+    private val dataSource = SimpleDataSource("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1")
+    private val config = H2DatabaseConfig(dataSource, enableTransaction = true)
     private val db = Database(config)
 
     @BeforeEach
@@ -55,7 +56,7 @@ class TransactionTest {
             INSERT INTO ADDRESS VALUES(15,'STREET 15',1);
         """.trimIndent()
 
-        config.dataSource.connection.use { con ->
+        dataSource.connection.use { con ->
             con.createStatement().use { stmt ->
                 stmt.execute(sql)
             }
@@ -66,7 +67,7 @@ class TransactionTest {
     fun after() {
         @Language("sql")
         val sql = "DROP ALL OBJECTS"
-        config.dataSource.connection.use { con ->
+        dataSource.connection.use { con ->
             con.createStatement().use { stmt ->
                 stmt.execute(sql)
             }

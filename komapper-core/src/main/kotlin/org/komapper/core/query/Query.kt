@@ -1,9 +1,9 @@
 package org.komapper.core.query
 
 import org.komapper.core.DatabaseConfig
+import org.komapper.core.config.Dialect
+import org.komapper.core.config.EmptyDialect
 import org.komapper.core.data.Statement
-import org.komapper.core.jdbc.Dialect
-import org.komapper.core.jdbc.EmptyDialect
 
 interface Query<T> {
     fun run(config: DatabaseConfig): T

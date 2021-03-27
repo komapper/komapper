@@ -20,7 +20,7 @@ internal class JdbcExecutor(
         statement: Statement,
         handler: (rs: ResultSet) -> T
     ): T {
-        config.connection.use { con ->
+        config.session.getConnection().use { con ->
             log(statement)
             prepare(con, statement.sql).use { ps ->
                 ps.setUp()
@@ -37,7 +37,7 @@ internal class JdbcExecutor(
         provider: (ResultSet) -> T,
         transformer: (Sequence<T>) -> R
     ): R {
-        config.connection.use { con ->
+        config.session.getConnection().use { con ->
             log(statement)
             prepare(con, statement.sql).use { ps ->
                 ps.setUp()
@@ -61,7 +61,7 @@ internal class JdbcExecutor(
 
     fun <T> executeUpdate(statement: Statement, block: (PreparedStatement, Int) -> T): T {
         return executeWithExceptionCheck {
-            config.connection.use { con ->
+            config.session.getConnection().use { con ->
                 log(statement)
                 prepare(con, statement.sql).use { ps ->
                     ps.setUp()
@@ -74,7 +74,7 @@ internal class JdbcExecutor(
 
     fun execute(statement: Statement) {
         executeWithExceptionCheck {
-            config.connection.use { con ->
+            config.session.getConnection().use { con ->
                 log(statement)
                 con.createStatement().use { s ->
                     s.setUp()
@@ -99,9 +99,10 @@ internal class JdbcExecutor(
     private fun log(statement: Statement) = config.logger.logStatement(statement)
 
     private fun java.sql.Statement.setUp() {
-        config.fetchSize?.let { if (it > 0) this.fetchSize = it }
-        config.maxRows?.let { if (it > 0) this.maxRows = it }
-        config.queryTimeoutSeconds?.let { if (it > 0) this.queryTimeout = it }
+        val jdbcConfig = config.jdbcConfig
+        jdbcConfig.fetchSize?.let { if (it > 0) this.fetchSize = it }
+        jdbcConfig.maxRows?.let { if (it > 0) this.maxRows = it }
+        jdbcConfig.queryTimeoutSeconds?.let { if (it > 0) this.queryTimeout = it }
     }
 
     private fun PreparedStatement.bind(values: List<Value>) {
