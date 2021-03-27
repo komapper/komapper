@@ -7,7 +7,7 @@ import com.google.devtools.ksp.symbol.KSValueParameter
 import com.google.devtools.ksp.symbol.Modifier
 import com.google.devtools.ksp.visitor.KSEmptyVisitor
 
-internal class EntityVisitor : KSEmptyVisitor<Unit, EntityVisitorResult>() {
+internal class EntityVisitor(private val config: Config) : KSEmptyVisitor<Unit, EntityVisitorResult>() {
 
     override fun defaultHandler(node: KSNode, data: Unit): EntityVisitorResult {
         return EntityVisitorResult.Fatal("@KmEntity cannot be applied to this element.", node)
@@ -15,7 +15,7 @@ internal class EntityVisitor : KSEmptyVisitor<Unit, EntityVisitorResult>() {
 
     override fun visitClassDeclaration(classDeclaration: KSClassDeclaration, data: Unit): EntityVisitorResult {
         return try {
-            val factory = EntityFactory(classDeclaration)
+            val factory = EntityFactory(config, classDeclaration)
             val entity = factory.create()
             EntityVisitorResult.Success(entity)
         } catch (e: Exit) {
@@ -30,7 +30,12 @@ internal class EntityVisitor : KSEmptyVisitor<Unit, EntityVisitorResult>() {
     }
 }
 
-internal class EntityFactory(private val classDeclaration: KSClassDeclaration) {
+internal class EntityFactory(
+    config: Config,
+    private val classDeclaration: KSClassDeclaration
+) {
+    private val namingStrategy: NamingStrategy = config.namingStrategy
+
     init {
         val modifiers = classDeclaration.modifiers
         if (!modifiers.contains(Modifier.DATA)) {
@@ -49,7 +54,7 @@ internal class EntityFactory(private val classDeclaration: KSClassDeclaration) {
     }
 
     fun create(): Entity {
-        val tableName = getTableName()
+        val tableName = namingStrategy.convertToTableName(classDeclaration)
         val allProperties = createAllProperties()
         val idProperties = allProperties.filter { it.kind is PropertyKind.Id }
         val versionProperty: Property? = allProperties.firstOrNull { it.kind is PropertyKind.Version }
@@ -76,7 +81,7 @@ internal class EntityFactory(private val classDeclaration: KSClassDeclaration) {
             ?.map { parameter ->
                 val declaration = propertyDeclarationMap[parameter.name]
                     ?: report("The corresponding property is not found.", parameter)
-                val columnName = getColumnName(parameter)
+                val columnName = namingStrategy.toColumnName(parameter)
                 val type = parameter.type.resolve()
                 val typeName = (type.declaration.qualifiedName ?: type.declaration.simpleName).asString()
                 val nullability = type.nullability
@@ -182,18 +187,6 @@ internal class EntityFactory(private val classDeclaration: KSClassDeclaration) {
         if (properties.all { it.kind is PropertyKind.Ignore }) {
             report("Any persistent properties are not found.", classDeclaration)
         }
-    }
-
-    private fun getTableName(): String {
-        return classDeclaration.findAnnotation("KmTable")
-            ?.findValue("name")?.toString()
-            ?: classDeclaration.simpleName.asString().toUpperCase()
-    }
-
-    private fun getColumnName(parameter: KSValueParameter): String {
-        return parameter.findAnnotation("KmColumn")
-            ?.findValue("name")?.toString()
-            ?: parameter.toString().toUpperCase()
     }
 
     private fun createPropertyKind(parameter: KSValueParameter): PropertyKind? {

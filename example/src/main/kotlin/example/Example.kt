@@ -18,12 +18,9 @@ data class Address(
     @KmId @KmIdentityGenerator @KmColumn(name = "ADDRESS_ID")
     val id: Int = 0,
     val street: String,
-    @KmVersion
-    val version: Int = 0,
-    @KmCreatedAt @KmColumn("CREATED_AT")
-    val createdAt: LocalDateTime? = null,
-    @KmUpdatedAt @KmColumn("UPDATED_AT")
-    val updatedAt: LocalDateTime? = null,
+    @KmVersion val version: Int = 0,
+    @KmCreatedAt val createdAt: LocalDateTime? = null,
+    @KmUpdatedAt val updatedAt: LocalDateTime? = null,
 )
 
 fun main() {

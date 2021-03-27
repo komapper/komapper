@@ -11,6 +11,7 @@ import java.io.PrintWriter
 class EntityProcessor : SymbolProcessor {
     private lateinit var codeGenerator: CodeGenerator
     private lateinit var logger: KSPLogger
+    private lateinit var config: Config
     private var invoked = false
 
     override fun init(
@@ -21,6 +22,7 @@ class EntityProcessor : SymbolProcessor {
     ) {
         this.codeGenerator = codeGenerator
         this.logger = logger
+        this.config = Config.create(options)
     }
 
     override fun process(resolver: Resolver): List<KSAnnotated> {
@@ -29,7 +31,7 @@ class EntityProcessor : SymbolProcessor {
         }
         val symbols = resolver.getSymbolsWithAnnotation("org.komapper.core.KmEntity")
         for (symbol in symbols) {
-            val result = symbol.accept(EntityVisitor(), Unit)
+            val result = symbol.accept(EntityVisitor(config), Unit)
             val (entity, declaration) = when (result) {
                 is EntityVisitorResult.Success ->
                     result.entity to result.entity.declaration
@@ -45,7 +47,7 @@ class EntityProcessor : SymbolProcessor {
             val packageName = declaration.packageName.asString()
             val entityQualifiedName = declaration.qualifiedName?.asString() ?: ""
             val entityTypeName = entityQualifiedName.removePrefix("$packageName.")
-            val simpleName = entityTypeName.replace(".", "_") + "_"
+            val simpleName = config.prefix + entityTypeName.replace(".", "_") + config.suffix
             val file = declaration.containingFile!!
             codeGenerator.createNewFile(Dependencies(false, file), packageName, simpleName).use { out ->
                 PrintWriter(out).use {

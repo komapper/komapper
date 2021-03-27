@@ -24,3 +24,7 @@ dependencies {
 application {
     mainClass.set("example.ExampleKt")
 }
+
+ksp {
+    arg("komapper.suffix", "_")
+}
