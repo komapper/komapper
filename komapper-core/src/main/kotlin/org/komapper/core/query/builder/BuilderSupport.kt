@@ -18,7 +18,7 @@ internal class BuilderSupport(
 ) {
 
     fun tableName(tableInfo: TableInfo): String {
-        val alias = aliasManager.getAlias(tableInfo) ?: error("no alias")
+        val alias = aliasManager.getAlias(tableInfo) ?: error("no alias for '${tableInfo.tableName()}'")
         return tableInfo.tableName() + " " + alias
     }
 
@@ -52,7 +52,7 @@ internal class BuilderSupport(
     }
 
     private fun aliasedColumnName(columnInfo: ColumnInfo<*>): String {
-        val alias = aliasManager.getAlias(columnInfo) ?: error("no alias")
+        val alias = aliasManager.getAlias(columnInfo) ?: error("no alias for '${columnInfo.columnName}'")
         return alias + "." + columnInfo.columnName
     }
 

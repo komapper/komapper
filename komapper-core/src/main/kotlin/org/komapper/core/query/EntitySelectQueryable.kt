@@ -35,28 +35,28 @@ interface EntitySelectQueryable<ENTITY> : ListQueryable<ENTITY> {
     ): EntitySelectQueryable<ENTITY>
 }
 
-internal class EntitySelectQueryableImpl<ENTITY>(
+internal data class EntitySelectQueryableImpl<ENTITY>(
     private val entityMetamodel: EntityMetamodel<ENTITY>,
     private val context: EntitySelectContext<ENTITY> = EntitySelectContext(entityMetamodel)
 ) :
     EntitySelectQueryable<ENTITY> {
 
-    private val support: SelectQuerySupport<ENTITY> = SelectQuerySupport(context)
+    private val support: SelectQuerySupport<ENTITY, EntitySelectContext<ENTITY>> = SelectQuerySupport(context)
 
     override fun <OTHER_ENTITY> innerJoin(
         entityMetamodel: EntityMetamodel<OTHER_ENTITY>,
         declaration: JoinDeclaration<OTHER_ENTITY>
     ): EntitySelectQueryableImpl<ENTITY> {
-        support.innerJoin(entityMetamodel, declaration)
-        return this
+        val newContext = support.innerJoin(entityMetamodel, declaration)
+        return copy(context = newContext)
     }
 
     override fun <OTHER_ENTITY> leftJoin(
         entityMetamodel: EntityMetamodel<OTHER_ENTITY>,
         declaration: JoinDeclaration<OTHER_ENTITY>
     ): EntitySelectQueryableImpl<ENTITY> {
-        support.leftJoin(entityMetamodel, declaration)
-        return this
+        val newContext = support.leftJoin(entityMetamodel, declaration)
+        return copy(context = newContext)
     }
 
     override fun <T, S> associate(
@@ -72,33 +72,33 @@ internal class EntitySelectQueryableImpl<ENTITY>(
             error("The e2 is not found. Use e2 in the join clause.")
         }
         @Suppress("UNCHECKED_CAST")
-        context.associatorMap[e1 to e2] = associator as Associator<Any, Any>
-        return this
+        val newContext = context.putAssociator(e1 to e2, associator as Associator<Any, Any>)
+        return copy(context = newContext)
     }
 
     override fun where(declaration: WhereDeclaration): EntitySelectQueryableImpl<ENTITY> {
-        support.where(declaration)
-        return this
+        val newContext = support.where(declaration)
+        return copy(context = newContext)
     }
 
     override fun orderBy(vararg items: ColumnInfo<*>): EntitySelectQueryableImpl<ENTITY> {
-        support.orderBy(*items)
-        return this
+        val newContext = support.orderBy(*items)
+        return copy(context = newContext)
     }
 
     override fun offset(value: Int): EntitySelectQueryableImpl<ENTITY> {
-        support.offset(value)
-        return this
+        val newContext = support.offset(value)
+        return copy(context = newContext)
     }
 
     override fun limit(value: Int): EntitySelectQueryableImpl<ENTITY> {
-        support.limit(value)
-        return this
+        val newContext = support.limit(value)
+        return copy(context = newContext)
     }
 
     override fun forUpdate(): EntitySelectQueryableImpl<ENTITY> {
-        support.forUpdate()
-        return this
+        val newContext = support.forUpdate()
+        return copy(context = newContext)
     }
 
     override fun run(config: DatabaseConfig): List<ENTITY> {

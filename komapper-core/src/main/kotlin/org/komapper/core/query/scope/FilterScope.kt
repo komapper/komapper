@@ -1,9 +1,7 @@
 package org.komapper.core.query.scope
 
 import org.komapper.core.metamodel.ColumnInfo
-import org.komapper.core.metamodel.EntityMetamodel
-import org.komapper.core.query.SingleColumnProjection
-import org.komapper.core.query.SqlSelectSubQuery
+import org.komapper.core.query.Projection
 
 interface FilterScope {
     infix fun <T : Any> ColumnInfo<T>.eq(operand: ColumnInfo<T>)
@@ -58,17 +56,19 @@ interface FilterScope {
 
     infix fun <T : Any> ColumnInfo<T>.inList(values: List<T?>)
 
-    infix fun <T : Any> ColumnInfo<T>.inList(block: () -> SingleColumnProjection)
+    infix fun <T : Any> ColumnInfo<T>.inList(block: () -> Projection)
 
-    infix fun <T : Any> ColumnInfo<T>.inList(projection: SingleColumnProjection)
+    infix fun <T : Any> ColumnInfo<T>.inList(projection: Projection)
 
     infix fun <T : Any> ColumnInfo<T>.notInList(values: List<T?>)
 
-    infix fun <T : Any> ColumnInfo<T>.notInList(block: () -> SingleColumnProjection)
+    infix fun <T : Any> ColumnInfo<T>.notInList(block: () -> Projection)
 
-    infix fun <T : Any> ColumnInfo<T>.notInList(projection: SingleColumnProjection)
-    fun <ENTITY> exists(entityMetamodel: EntityMetamodel<ENTITY>): SqlSelectSubQuery<ENTITY>
-    fun <ENTITY> notExists(entityMetamodel: EntityMetamodel<ENTITY>): SqlSelectSubQuery<ENTITY>
+    infix fun <T : Any> ColumnInfo<T>.notInList(projection: Projection)
+    fun exists(block: () -> Projection)
+    fun exists(projection: Projection)
+    fun notExists(block: () -> Projection)
+    fun notExists(projection: Projection)
     fun <T : CharSequence> T?.escape(): LikeOperand
     fun <T : CharSequence> T?.asPrefix(): LikeOperand
     fun <T : CharSequence> T?.asInfix(): LikeOperand

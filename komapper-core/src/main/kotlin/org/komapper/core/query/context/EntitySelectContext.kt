@@ -2,17 +2,52 @@ package org.komapper.core.query.context
 
 import org.komapper.core.metamodel.ColumnInfo
 import org.komapper.core.metamodel.EntityMetamodel
+import org.komapper.core.query.Associator
+import org.komapper.core.query.data.Criterion
 
-internal class EntitySelectContext<ENTITY>(override val entityMetamodel: EntityMetamodel<ENTITY>) :
-    SelectContext<ENTITY> {
-    override val columns = mutableListOf<ColumnInfo<*>>()
-    override val joins = JoinsContext()
-    override val where = FilterContext()
-    override val orderBy = OrderByContext()
-    override var offset: Int = -1
-    override var limit: Int = -1
-    override val forUpdate = ForUpdateContext()
-    val associatorMap = AssociatorMap()
+internal data class EntitySelectContext<ENTITY>(
+    override val entityMetamodel: EntityMetamodel<ENTITY>,
+    override val columns: List<ColumnInfo<*>> = listOf(),
+    override val joins: List<Join<*>> = listOf(),
+    override val where: List<Criterion> = listOf(),
+    override val orderBy: List<ColumnInfo<*>> = listOf(),
+    override val offset: Int = -1,
+    override val limit: Int = -1,
+    override val forUpdate: ForUpdate = ForUpdate(),
+    val associatorMap: Map<Association, Associator<Any, Any>> = mapOf()
+) : SelectContext<ENTITY, EntitySelectContext<ENTITY>> {
+
+    override fun addColumn(columnInfo: ColumnInfo<*>): EntitySelectContext<ENTITY> {
+        return copy(columns = columns + columnInfo)
+    }
+
+    override fun addJoin(join: Join<*>): EntitySelectContext<ENTITY> {
+        return copy(joins = this.joins + join)
+    }
+
+    override fun addWhere(where: List<Criterion>): EntitySelectContext<ENTITY> {
+        return copy(where = this.where + where)
+    }
+
+    override fun addOrderBy(orderBy: List<ColumnInfo<*>>): EntitySelectContext<ENTITY> {
+        return copy(orderBy = this.orderBy + orderBy)
+    }
+
+    override fun setLimit(limit: Int): EntitySelectContext<ENTITY> {
+        return copy(limit = limit)
+    }
+
+    override fun setOffset(offset: Int): EntitySelectContext<ENTITY> {
+        return copy(offset = offset)
+    }
+
+    override fun setForUpdate(forUpdate: ForUpdate): EntitySelectContext<ENTITY> {
+        return copy(forUpdate = forUpdate)
+    }
+
+    fun putAssociator(association: Association, associator: Associator<Any, Any>): EntitySelectContext<ENTITY> {
+        return copy(associatorMap = this.associatorMap + (association to associator))
+    }
 
     override fun getEntityMetamodels(): List<EntityMetamodel<*>> {
         return listOf(entityMetamodel) + joins.map { it.entityMetamodel }

@@ -282,9 +282,11 @@ class EntitySelectQueryableTest(private val db: Database) {
         val a = Address.metamodel()
         val query =
             EntityQuery.from(e).where {
-                exists(a).where {
-                    e.addressId eq a.addressId
-                    e.employeeName like "%S%"
+                exists {
+                    SubQuery.from(a).where {
+                        e.addressId eq a.addressId
+                        e.employeeName like "%S%"
+                    }.select(a.addressId)
                 }
             }
         val list = db.execute(query)
@@ -297,9 +299,11 @@ class EntitySelectQueryableTest(private val db: Database) {
         val a = Address.metamodel()
         val query =
             EntityQuery.from(e).where {
-                notExists(a).where {
-                    e.addressId eq a.addressId
-                    e.employeeName like "%S%"
+                notExists {
+                    SubQuery.from(a).where {
+                        e.addressId eq a.addressId
+                        e.employeeName like "%S%"
+                    }.select(a.addressId)
                 }
             }
         val list = db.execute(query)

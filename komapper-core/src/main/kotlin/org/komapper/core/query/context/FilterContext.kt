@@ -5,7 +5,7 @@ import org.komapper.core.query.data.Criterion
 import org.komapper.core.query.data.Operand
 import org.komapper.core.query.option.LikeOption
 
-internal class FilterContext(private val criteria: MutableList<Criterion> = mutableListOf()) :
+internal class FilterContext(internal val criteria: MutableList<Criterion> = mutableListOf()) :
     Collection<Criterion> by criteria {
 
     fun add(criterion: Criterion) {

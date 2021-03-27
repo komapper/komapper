@@ -11,7 +11,7 @@ import org.komapper.core.query.data.SortItem
 
 internal class SelectStatementBuilderSupport<ENTITY>(
     private val config: DatabaseConfig,
-    private val context: SelectContext<ENTITY>,
+    private val context: SelectContext<ENTITY, *>,
     aliasManager: AliasManager = AliasManager(context),
     private val buf: StatementBuffer
 ) {
@@ -34,9 +34,9 @@ internal class SelectStatementBuilderSupport<ENTITY>(
                     buf.append(" left outer join ")
                 }
                 buf.append(tableName(join.entityMetamodel))
-                if (join.isNotEmpty()) {
+                if (join.on.isNotEmpty()) {
                     buf.append(" on (")
-                    for ((index, criterion) in join.withIndex()) {
+                    for ((index, criterion) in join.on.withIndex()) {
                         visitCriterion(index, criterion)
                         buf.append(" and ")
                     }
@@ -62,12 +62,16 @@ internal class SelectStatementBuilderSupport<ENTITY>(
         if (context.orderBy.isNotEmpty()) {
             buf.append(" order by ")
             for (item in context.orderBy) {
-                buf.append(columnName(item.columnInfo))
-                val sort = when (item) {
-                    is SortItem.Asc<*> -> "asc"
-                    is SortItem.Desc<*> -> "desc"
+                val (columnInfo, sort) = when (item) {
+                    is SortItem.Asc<*> -> item.columnInfo to "asc"
+                    is SortItem.Desc<*> -> item.columnInfo to "desc"
+                    else -> item to null
                 }
-                buf.append(" $sort, ")
+                buf.append(columnName(columnInfo))
+                if (sort != null) {
+                    buf.append(" $sort")
+                }
+                buf.append(", ")
             }
             buf.cutBack(2)
         }

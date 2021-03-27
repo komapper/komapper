@@ -212,12 +212,12 @@ internal class WhereTest {
         val a = Address.metamodel()
         val e = Emp.metamodel()
         val query = EntityQuery.from(a).where {
-            exists(e).where {
-                a.id eq e.addressId
+            exists {
+                SubQuery.from(e).where { a.id eq e.addressId }.select(e.id)
             }
         }
         assertEquals(
-            "select t0_.ID, t0_.STREET, t0_.VERSION from ADDRESS t0_ where exists (select t1_.ID, t1_.ADDRESS_ID, t1_.VERSION from EMP t1_ where t0_.ID = t1_.ADDRESS_ID)",
+            "select t0_.ID, t0_.STREET, t0_.VERSION from ADDRESS t0_ where exists (select t1_.ID from EMP t1_ where t0_.ID = t1_.ADDRESS_ID)",
             query.toStatement(config).sql
         )
     }
@@ -227,12 +227,14 @@ internal class WhereTest {
         val a = Address.metamodel()
         val e = Emp.metamodel()
         val query = EntityQuery.from(a).where {
-            notExists(e).where {
-                a.id eq e.addressId
+            notExists {
+                SubQuery.from(e).where {
+                    a.id eq e.addressId
+                }.select(e.id)
             }
         }
         assertEquals(
-            "select t0_.ID, t0_.STREET, t0_.VERSION from ADDRESS t0_ where not exists (select t1_.ID, t1_.ADDRESS_ID, t1_.VERSION from EMP t1_ where t0_.ID = t1_.ADDRESS_ID)",
+            "select t0_.ID, t0_.STREET, t0_.VERSION from ADDRESS t0_ where not exists (select t1_.ID from EMP t1_ where t0_.ID = t1_.ADDRESS_ID)",
             query.toStatement(config).sql
         )
     }

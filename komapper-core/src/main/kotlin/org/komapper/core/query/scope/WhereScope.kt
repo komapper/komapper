@@ -1,12 +1,11 @@
 package org.komapper.core.query.scope
 
 import org.komapper.core.Scope
-import org.komapper.core.query.context.FilterContext
 import org.komapper.core.query.data.Criterion
 
 @Scope
 class WhereScope internal constructor(
-    private val support: FilterScopeSupport
+    private val support: FilterScopeSupport = FilterScopeSupport()
 ) : FilterScope by support {
 
     companion object {
@@ -17,6 +16,8 @@ class WhereScope internal constructor(
             }
         }
     }
+
+    internal val criteria: List<Criterion> get() = support.context.criteria
 
     fun and(declaration: WhereDeclaration) {
         addCriteria(declaration, Criterion::And)
@@ -31,11 +32,9 @@ class WhereScope internal constructor(
     }
 
     private fun addCriteria(declaration: WhereDeclaration, operator: (List<Criterion>) -> Criterion) {
-        val criteria = mutableListOf<Criterion>()
-        val subContext = FilterContext(criteria)
-        val subSupport = FilterScopeSupport(subContext)
-        val scope = WhereScope(subSupport)
-        declaration(scope)
+        val childScope = WhereScope()
+        declaration(childScope)
+        val criteria = childScope.criteria.toList()
         support.add(operator(criteria))
     }
 }

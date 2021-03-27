@@ -7,7 +7,7 @@ import org.komapper.core.query.data.Criterion
 import org.komapper.core.query.data.Operand
 
 @Scope
-class JoinScope<ENTITY> internal constructor(private val context: JoinContext<ENTITY>) {
+class JoinScope<ENTITY> internal constructor(private val context: JoinContext) {
 
     companion object {
         operator fun <ENTITY> JoinDeclaration<ENTITY>.plus(other: JoinDeclaration<ENTITY>): JoinDeclaration<ENTITY> {
