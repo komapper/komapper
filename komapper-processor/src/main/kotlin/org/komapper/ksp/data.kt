@@ -70,6 +70,6 @@ internal sealed class IdGeneratorKind {
 }
 
 internal data class IdGenerator(val property: Property) {
-    val name = "${property}__generator"
+    val name = "__${property}Generator"
     val kind = property.idGeneratorKind
 }

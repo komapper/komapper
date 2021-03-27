@@ -3,6 +3,17 @@ package org.komapper.ksp
 import com.google.devtools.ksp.symbol.Nullability
 import java.io.PrintWriter
 
+private const val Assignment = "org.komapper.core.metamodel.Assignment"
+private const val EntityMetamodel = "org.komapper.core.metamodel.EntityMetamodel"
+private const val IdentityGeneratorDescriptor = "org.komapper.core.metamodel.IdentityGeneratorDescriptor"
+private const val SequenceGeneratorDescriptor = "org.komapper.core.metamodel.SequenceGeneratorDescriptor"
+private const val PropertyDescriptor = "org.komapper.core.metamodel.PropertyDescriptor"
+private const val PropertyMetamodel = "org.komapper.core.metamodel.PropertyMetamodel"
+private const val PropertyMetamodelImpl = "org.komapper.core.metamodel.PropertyMetamodelImpl"
+private const val Clock = "java.time.Clock"
+private const val LocalDateTime = "java.time.LocalDateTime"
+private const val EntityDescriptor = "__EntityDescriptor"
+
 internal class EntityMetamodelGenerator(
     private val entity: Entity,
     private val packageName: String,
@@ -13,68 +24,117 @@ internal class EntityMetamodelGenerator(
     override fun run() {
         w.println("package $packageName")
         w.println()
-        w.println("import java.time.Clock")
-        w.println("import org.komapper.core.metamodel.*")
-        w.println()
         w.println("@Suppress(\"ClassName\")")
-        w.println("class $simpleName : EntityMetamodel<$entityTypeName> {")
+        w.println("class $simpleName : $EntityMetamodel<$entityTypeName> {")
 
-        w.println("    private object EntityDescriptor {")
+        entityDescriptor()
+
+        propertyMetamodels()
+
+        tableName()
+        idAssignment()
+        idProperties()
+        versionProperty()
+        properties()
+        instantiate()
+        incrementVersion()
+        updateCreatedAt()
+        updateUpdatedAt()
+
+        w.println("}")
+
+        companionMetamodel()
+    }
+
+    private fun entityDescriptor() {
+        w.println("    private object $EntityDescriptor {")
         val idGenerator = entity.idGenerator
         if (idGenerator != null) {
             when (val kind = idGenerator.kind) {
                 is IdGeneratorKind.Identity -> {
-                    w.println("        val ${idGenerator.name} = IdentityGeneratorDescriptor<$entityTypeName, ${idGenerator.property.typeName}>(${idGenerator.property.typeName}::class)")
+                    w.println("        val ${idGenerator.name} = $IdentityGeneratorDescriptor<$entityTypeName, ${idGenerator.property.typeName}>(${idGenerator.property.typeName}::class)")
                 }
                 is IdGeneratorKind.Sequence -> {
-                    w.println("        val ${idGenerator.name} = SequenceGeneratorDescriptor<$entityTypeName, ${idGenerator.property.typeName}>(${idGenerator.property.typeName}::class, \"${kind.name}\", ${kind.incrementBy})")
+                    w.println("        val ${idGenerator.name} = $SequenceGeneratorDescriptor<$entityTypeName, ${idGenerator.property.typeName}>(${idGenerator.property.typeName}::class, \"${kind.name}\", ${kind.incrementBy})")
                 }
             }
         }
         for (p in entity.properties) {
-            w.println("        val $p = PropertyDescriptor<$entityTypeName, ${p.typeName}>(${p.typeName}::class, \"${p.columnName}\", { it.$p }) { e, v -> e.copy($p = v) }")
+            w.println("        val $p = $PropertyDescriptor<$entityTypeName, ${p.typeName}>(${p.typeName}::class, \"${p.columnName}\", { it.$p }) { e, v -> e.copy($p = v) }")
         }
         w.println("    }")
+    }
 
+    private fun propertyMetamodels() {
         for (p in entity.properties) {
-            w.println("    val $p by lazy { PropertyMetamodelImpl(this, EntityDescriptor.$p) }")
+            w.println("    val $p by lazy { $PropertyMetamodelImpl(this, $EntityDescriptor.$p) }")
         }
+    }
+
+    private fun tableName() {
         w.println("    override fun tableName() = \"${entity.tableName}\"")
-        w.print("    override fun idAssignment(): Assignment<$entityTypeName>? = ")
+    }
+
+    private fun idAssignment() {
+        val idGenerator = entity.idGenerator
+        w.print("    override fun idAssignment(): $Assignment<$entityTypeName>? = ")
         if (idGenerator != null) {
-            w.println("EntityDescriptor.${idGenerator.property}__generator.createAssignment(${idGenerator.property}.setter)")
+            w.println("$EntityDescriptor.${idGenerator.name}.createAssignment(${idGenerator.property}.setter)")
         } else {
             w.println("null")
         }
+    }
+
+    private fun idProperties() {
         val idNameList = entity.idProperties.joinToString { it.toString() }
-        w.println("    override fun idProperties(): List<PropertyMetamodel<$entityTypeName, *>> = listOf($idNameList)")
-        w.println("    override fun versionProperty(): PropertyMetamodel<$entityTypeName, *>? = ${entity.versionProperty}")
+        w.println("    override fun idProperties(): List<$PropertyMetamodel<$entityTypeName, *>> = listOf($idNameList)")
+    }
+
+    private fun versionProperty() {
+        w.println("    override fun versionProperty(): $PropertyMetamodel<$entityTypeName, *>? = ${entity.versionProperty}")
+    }
+
+    private fun properties() {
         val allNameList = entity.properties.joinToString(",\n        ", prefix = "\n        ") { it.toString() }
-        w.println("    override fun properties(): List<PropertyMetamodel<$entityTypeName, *>> = listOf($allNameList)")
+        w.println("    override fun properties(): List<$PropertyMetamodel<$entityTypeName, *>> = listOf($allNameList)")
+    }
+
+    private fun instantiate() {
         val argList = entity.properties.joinToString(",\n        ", prefix = "\n        ") { p ->
             val nullability = if (p.nullability == Nullability.NULLABLE) "?" else ""
-            "$p = m[$p] as ${p.typeName}$nullability"
+            "$p = __m[$p] as ${p.typeName}$nullability"
         }
-        w.println("    override fun instantiate(m: Map<PropertyMetamodel<*, *>, Any?>) = $entityTypeName($argList)")
-        val incrementVersionBody = if (entity.versionProperty == null) {
-            "e"
+        w.println("    override fun instantiate(__m: Map<$PropertyMetamodel<*, *>, Any?>) = $entityTypeName($argList)")
+    }
+
+    private fun incrementVersion() {
+        val body = if (entity.versionProperty == null) {
+            "__e"
         } else {
-            "${entity.versionProperty}.setter(e, ${entity.versionProperty}.getter(e)!!.inc())"
+            "${entity.versionProperty}.setter(__e, ${entity.versionProperty}.getter(__e)!!.inc())"
         }
-        w.println("    override fun incrementVersion(e: $entityTypeName): $entityTypeName = $incrementVersionBody")
-        val setCreationClockBody = if (entity.createdAtProperty == null) {
-            "e"
+        w.println("    override fun incrementVersion(__e: $entityTypeName): $entityTypeName = $body")
+    }
+
+    private fun updateCreatedAt() {
+        val body = if (entity.createdAtProperty == null) {
+            "__e"
         } else {
-            "${entity.createdAtProperty}.setter(e, java.time.LocalDateTime.now(c))"
+            "${entity.createdAtProperty}.setter(__e, $LocalDateTime.now(__c))"
         }
-        w.println("    override fun updateCreatedAt(e: $entityTypeName, c: Clock): $entityTypeName = $setCreationClockBody")
-        val setUpdateClockBody = if (entity.updatedAtProperty == null) {
-            "e"
+        w.println("    override fun updateCreatedAt(__e: $entityTypeName, __c: $Clock): $entityTypeName = $body")
+    }
+
+    private fun updateUpdatedAt() {
+        val body = if (entity.updatedAtProperty == null) {
+            "__e"
         } else {
-            "${entity.updatedAtProperty}.setter(e, java.time.LocalDateTime.now(c))"
+            "${entity.updatedAtProperty}.setter(__e, $LocalDateTime.now(__c))"
         }
-        w.println("    override fun updateUpdatedAt(e: $entityTypeName, c: Clock): $entityTypeName = $setUpdateClockBody")
-        w.println("}")
+        w.println("    override fun updateUpdatedAt(__e: $entityTypeName, __c: $Clock): $entityTypeName = $body")
+    }
+
+    private fun companionMetamodel() {
         if (entity.declaration.hasCompanionObject()) {
             w.println("")
             w.println("fun $entityTypeName.Companion.metamodel() = $simpleName()")

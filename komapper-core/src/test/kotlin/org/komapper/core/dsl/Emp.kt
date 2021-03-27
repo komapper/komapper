@@ -37,12 +37,12 @@ class Emp_ : EntityMetamodel<Emp> {
     override fun idProperties(): List<PropertyMetamodel<Emp, *>> = listOf(id)
     override fun versionProperty(): PropertyMetamodel<Emp, *>? = version
     override fun properties(): List<PropertyMetamodel<Emp, *>> = listOf(id, addressId, version)
-    override fun instantiate(m: Map<PropertyMetamodel<*, *>, Any?>) =
-        Emp(m[id] as Int, m[addressId] as Int, m[version] as Int)
+    override fun instantiate(__m: Map<PropertyMetamodel<*, *>, Any?>) =
+        Emp(__m[id] as Int, __m[addressId] as Int, __m[version] as Int)
 
-    override fun incrementVersion(e: Emp): Emp = version.setter(e, version.getter(e)!!.inc())
-    override fun updateCreatedAt(e: Emp, c: Clock): Emp = e
-    override fun updateUpdatedAt(e: Emp, c: Clock): Emp = e
+    override fun incrementVersion(__e: Emp): Emp = version.setter(__e, version.getter(__e)!!.inc())
+    override fun updateCreatedAt(__e: Emp, __c: Clock): Emp = __e
+    override fun updateUpdatedAt(__e: Emp, __c: Clock): Emp = __e
 }
 
 fun Emp.Companion.metamodel() = Emp_()

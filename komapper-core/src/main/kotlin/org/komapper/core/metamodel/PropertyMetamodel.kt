@@ -24,11 +24,16 @@ class PropertyMetamodelImpl<E, T : Any>(
     override val setter: (E, T) -> E get() = descriptor.setter
 }
 
+@Suppress("unused")
 class EmptyPropertyMetamodel<E, T : Any> : PropertyMetamodel<E, T> {
-    override val owner: EntityMetamodel<E> get() = error("error")
-    override val klass: KClass<T> get() = error("error")
-    override val columnName: String get() = error("error")
-    override val getter: (E) -> T? get() = error("error")
-    override val getterWithUncheckedCast: (Any) -> T? get() = error("error")
-    override val setter: (E, T) -> E get() = error("error")
+    override val owner: EntityMetamodel<E> get() = fail()
+    override val klass: KClass<T> get() = fail()
+    override val columnName: String get() = fail()
+    override val getter: (E) -> T? get() = fail()
+    override val getterWithUncheckedCast: (Any) -> T? get() = fail()
+    override val setter: (E, T) -> E get() = fail()
+
+    private fun fail(): Nothing {
+        error("Fix a compile error.")
+    }
 }

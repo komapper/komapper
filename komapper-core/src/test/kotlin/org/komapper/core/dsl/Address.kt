@@ -37,12 +37,12 @@ class Address_ : EntityMetamodel<Address> {
     override fun idProperties(): List<PropertyMetamodel<Address, *>> = listOf(id)
     override fun versionProperty(): PropertyMetamodel<Address, *> = version
     override fun properties(): List<PropertyMetamodel<Address, *>> = listOf(id, street, version)
-    override fun instantiate(m: Map<PropertyMetamodel<*, *>, Any?>) =
-        Address(m[id] as Int, m[street] as String, m[version] as Int)
+    override fun instantiate(__m: Map<PropertyMetamodel<*, *>, Any?>) =
+        Address(__m[id] as Int, __m[street] as String, __m[version] as Int)
 
-    override fun incrementVersion(e: Address): Address = version.setter(e, version.getter(e)!!.inc())
-    override fun updateCreatedAt(e: Address, c: Clock): Address = e
-    override fun updateUpdatedAt(e: Address, c: Clock): Address = e
+    override fun incrementVersion(__e: Address): Address = version.setter(__e, version.getter(__e)!!.inc())
+    override fun updateCreatedAt(__e: Address, __c: Clock): Address = __e
+    override fun updateUpdatedAt(__e: Address, __c: Clock): Address = __e
 }
 
 fun Address.Companion.metamodel() = Address_()

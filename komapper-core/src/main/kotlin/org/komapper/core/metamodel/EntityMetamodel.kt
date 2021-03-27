@@ -7,20 +7,25 @@ interface EntityMetamodel<ENTITY> : TableInfo {
     fun idProperties(): List<PropertyMetamodel<ENTITY, *>>
     fun versionProperty(): PropertyMetamodel<ENTITY, *>?
     fun properties(): List<PropertyMetamodel<ENTITY, *>>
-    fun instantiate(m: Map<PropertyMetamodel<*, *>, Any?>): ENTITY
-    fun incrementVersion(e: ENTITY): ENTITY
-    fun updateCreatedAt(e: ENTITY, c: Clock): ENTITY
-    fun updateUpdatedAt(e: ENTITY, c: Clock): ENTITY
+    fun instantiate(__m: Map<PropertyMetamodel<*, *>, Any?>): ENTITY
+    fun incrementVersion(__e: ENTITY): ENTITY
+    fun updateCreatedAt(__e: ENTITY, __c: Clock): ENTITY
+    fun updateUpdatedAt(__e: ENTITY, __c: Clock): ENTITY
 }
 
+@Suppress("unused")
 abstract class EmptyEntityMetamodel<ENTITY> : EntityMetamodel<ENTITY> {
-    override fun tableName(): String = error("error")
-    override fun idAssignment(): Assignment<ENTITY>? = error("error")
-    override fun idProperties(): List<PropertyMetamodel<ENTITY, *>> = error("error")
-    override fun versionProperty(): PropertyMetamodel<ENTITY, *>? = error("error")
-    override fun properties(): List<PropertyMetamodel<ENTITY, *>> = error("error")
-    override fun instantiate(m: Map<PropertyMetamodel<*, *>, Any?>): ENTITY = error("error")
-    override fun incrementVersion(e: ENTITY): ENTITY = error("error")
-    override fun updateCreatedAt(e: ENTITY, c: Clock): ENTITY = error("error")
-    override fun updateUpdatedAt(e: ENTITY, c: Clock): ENTITY = error("error")
+    override fun tableName(): String = fail()
+    override fun idAssignment(): Assignment<ENTITY>? = fail()
+    override fun idProperties(): List<PropertyMetamodel<ENTITY, *>> = fail()
+    override fun versionProperty(): PropertyMetamodel<ENTITY, *>? = fail()
+    override fun properties(): List<PropertyMetamodel<ENTITY, *>> = fail()
+    override fun instantiate(__m: Map<PropertyMetamodel<*, *>, Any?>): ENTITY = fail()
+    override fun incrementVersion(__e: ENTITY): ENTITY = fail()
+    override fun updateCreatedAt(__e: ENTITY, __c: Clock): ENTITY = fail()
+    override fun updateUpdatedAt(__e: ENTITY, __c: Clock): ENTITY = fail()
+
+    private fun fail(): Nothing {
+        error("Fix a compile error.")
+    }
 }
