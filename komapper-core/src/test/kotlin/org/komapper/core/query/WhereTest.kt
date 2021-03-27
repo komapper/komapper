@@ -2,6 +2,8 @@ package org.komapper.core.query
 
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import org.komapper.core.EntityQuery
+import org.komapper.core.Subquery
 
 internal class WhereTest {
 
@@ -183,7 +185,7 @@ internal class WhereTest {
         val e = Emp.metamodel()
         val query = EntityQuery.from(a).where {
             a.id inList {
-                SubQuery.from(e).select(e.id)
+                Subquery.from(e).select(e.id)
             }
         }
         assertEquals(
@@ -210,7 +212,7 @@ internal class WhereTest {
         val e = Emp.metamodel()
         val query = EntityQuery.from(a).where {
             exists {
-                SubQuery.from(e).where { a.id eq e.addressId }.select(e.id)
+                Subquery.from(e).where { a.id eq e.addressId }.select(e.id)
             }
         }
         assertEquals(
@@ -225,7 +227,7 @@ internal class WhereTest {
         val e = Emp.metamodel()
         val query = EntityQuery.from(a).where {
             notExists {
-                SubQuery.from(e).where {
+                Subquery.from(e).where {
                     a.id eq e.addressId
                 }.select(e.id)
             }

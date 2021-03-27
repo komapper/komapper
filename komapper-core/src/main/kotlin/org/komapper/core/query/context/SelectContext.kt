@@ -14,7 +14,8 @@ internal interface SelectContext<ENTITY, CONTEXT : SelectContext<ENTITY, CONTEXT
     val limit: Int
     val forUpdate: ForUpdate
 
-    fun addColumn(columnInfo: ColumnInfo<*>): CONTEXT
+    fun addColumn(column: ColumnInfo<*>): CONTEXT
+    fun addColumns(columns: List<ColumnInfo<*>>): CONTEXT
     fun addJoin(join: Join<*>): CONTEXT
     fun addWhere(where: List<Criterion>): CONTEXT
     fun addOrderBy(orderBy: List<ColumnInfo<*>>): CONTEXT

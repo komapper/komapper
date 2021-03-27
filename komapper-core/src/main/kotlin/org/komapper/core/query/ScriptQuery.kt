@@ -5,13 +5,7 @@ import org.komapper.core.data.Statement
 import org.komapper.core.jdbc.Dialect
 import org.komapper.core.query.command.ScriptCommand
 
-object ScriptQuery {
-    fun execute(sql: String): Query<Unit> {
-        return ScriptQueryImpl(sql)
-    }
-}
-
-private class ScriptQueryImpl(sql: String) : Query<Unit> {
+internal data class ScriptQuery(val sql: String) : Query<Unit> {
     private val statement = Statement(sql, emptyList(), sql)
 
     override fun run(config: DatabaseConfig) {

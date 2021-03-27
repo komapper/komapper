@@ -2,13 +2,13 @@ package example
 
 import org.intellij.lang.annotations.Language
 import org.komapper.core.Database
+import org.komapper.core.EntityQuery
 import org.komapper.core.KmColumn
 import org.komapper.core.KmEntity
 import org.komapper.core.KmId
 import org.komapper.core.KmIdentityGenerator
 import org.komapper.core.KmVersion
-import org.komapper.core.query.EntityQuery
-import org.komapper.core.query.TemplateQuery
+import org.komapper.core.TemplateQuery
 import org.komapper.jdbc.h2.H2DatabaseConfig
 
 @KmEntity

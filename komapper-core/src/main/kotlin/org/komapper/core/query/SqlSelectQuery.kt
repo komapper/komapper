@@ -43,32 +43,11 @@ interface SqlSelectQuery<ENTITY> : ListQuery<ENTITY> {
     ): ListQuery<Pair<A, B>>
 }
 
-interface SqlSelectSubQuery<ENTITY> {
-    fun <OTHER_ENTITY> innerJoin(
-        entityMetamodel: EntityMetamodel<OTHER_ENTITY>,
-        declaration: JoinDeclaration<OTHER_ENTITY>
-    ): SqlSelectSubQuery<ENTITY>
-
-    fun <OTHER_ENTITY> leftJoin(
-        entityMetamodel: EntityMetamodel<OTHER_ENTITY>,
-        declaration: JoinDeclaration<OTHER_ENTITY>
-    ): SqlSelectSubQuery<ENTITY>
-
-    fun where(declaration: WhereDeclaration): SqlSelectSubQuery<ENTITY>
-    fun groupBy(vararg items: ColumnInfo<*>): SqlSelectQuery<ENTITY>
-    fun having(declaration: HavingDeclaration): SqlSelectSubQuery<ENTITY>
-    fun orderBy(vararg items: ColumnInfo<*>): SqlSelectSubQuery<ENTITY>
-    fun offset(value: Int): SqlSelectSubQuery<ENTITY>
-    fun limit(value: Int): SqlSelectSubQuery<ENTITY>
-    fun select(columnInfo: ColumnInfo<*>): Projection
-}
-
 internal data class SqlSelectQueryImpl<ENTITY>(
     private val entityMetamodel: EntityMetamodel<ENTITY>,
     private val context: SqlSelectContext<ENTITY> = SqlSelectContext(entityMetamodel)
 ) :
-    SqlSelectQuery<ENTITY>,
-    SqlSelectSubQuery<ENTITY> {
+    SqlSelectQuery<ENTITY> {
 
     private val support: SelectQuerySupport<ENTITY, SqlSelectContext<ENTITY>> = SelectQuerySupport(context)
 
@@ -125,11 +104,6 @@ internal data class SqlSelectQueryImpl<ENTITY>(
         return copy(context = newContext)
     }
 
-    override fun select(columnInfo: ColumnInfo<*>): Projection {
-        val newContext = context.addColumn(columnInfo)
-        return Projection.SingleColumn(newContext)
-    }
-
     override fun <T : Any> select(columnInfo: ColumnInfo<T>): ListQuery<T> {
         val newContext = context.addColumn(columnInfo)
         return SingleColumnQuery(newContext, columnInfo, this::buildStatement)
@@ -139,8 +113,7 @@ internal data class SqlSelectQueryImpl<ENTITY>(
         columnInfo1: ColumnInfo<A>,
         columnInfo2: ColumnInfo<B>
     ): ListQuery<Pair<A, B>> {
-        // TODO
-        val newContext = context.addColumn(columnInfo1).addColumn(columnInfo2)
+        val newContext = context.addColumns(listOf(columnInfo1, columnInfo2))
         return PairColumnsQuery(newContext, columnInfo1 to columnInfo2, this::buildStatement)
     }
 

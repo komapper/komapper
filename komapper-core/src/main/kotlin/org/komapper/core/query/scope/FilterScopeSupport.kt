@@ -2,6 +2,7 @@ package org.komapper.core.query.scope
 
 import org.komapper.core.metamodel.ColumnInfo
 import org.komapper.core.query.Projection
+import org.komapper.core.query.SingleColumnProjection
 import org.komapper.core.query.context.FilterContext
 import org.komapper.core.query.data.Criterion
 import org.komapper.core.query.data.Operand
@@ -157,13 +158,13 @@ internal class FilterScopeSupport(internal val context: FilterContext = FilterCo
         context.add(Criterion.InList(o1, o2))
     }
 
-    override infix fun <T : Any> ColumnInfo<T>.inList(block: () -> Projection) {
+    override infix fun <T : Any> ColumnInfo<T>.inList(block: () -> SingleColumnProjection) {
         this.inList(block())
     }
 
-    override infix fun <T : Any> ColumnInfo<T>.inList(projection: Projection) {
+    override infix fun <T : Any> ColumnInfo<T>.inList(projection: SingleColumnProjection) {
         val left = Operand.Column(this)
-        val right = projection.context
+        val right = projection.contextHolder.context
         context.add(Criterion.InSubQuery(left, right))
     }
 
@@ -173,13 +174,13 @@ internal class FilterScopeSupport(internal val context: FilterContext = FilterCo
         context.add(Criterion.NotInList(o1, o2))
     }
 
-    override infix fun <T : Any> ColumnInfo<T>.notInList(block: () -> Projection) {
+    override infix fun <T : Any> ColumnInfo<T>.notInList(block: () -> SingleColumnProjection) {
         this.notInList(block())
     }
 
-    override infix fun <T : Any> ColumnInfo<T>.notInList(projection: Projection) {
+    override infix fun <T : Any> ColumnInfo<T>.notInList(projection: SingleColumnProjection) {
         val left = Operand.Column(this)
-        val right = projection.context
+        val right = projection.contextHolder.context
         context.add(Criterion.NotInSubQuery(left, right))
     }
 
@@ -188,7 +189,7 @@ internal class FilterScopeSupport(internal val context: FilterContext = FilterCo
     }
 
     override fun exists(projection: Projection) {
-        val subContext = projection.context
+        val subContext = projection.contextHolder.context
         context.add(Criterion.Exists(subContext))
     }
 
@@ -197,7 +198,7 @@ internal class FilterScopeSupport(internal val context: FilterContext = FilterCo
     }
 
     override fun notExists(projection: Projection) {
-        val subContext = projection.context
+        val subContext = projection.contextHolder.context
         context.add(Criterion.NotExists(subContext))
     }
 

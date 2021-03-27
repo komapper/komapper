@@ -4,33 +4,9 @@ import org.komapper.core.DatabaseConfig
 import org.komapper.core.data.Statement
 import org.komapper.core.jdbc.Dialect
 import org.komapper.core.query.command.TemplateSelectCommand
-import org.komapper.core.query.command.TemplateUpdateCommand
 import org.komapper.core.template.DefaultStatementBuilder
 
-object TemplateQuery {
-
-    fun <T> select(
-        sql: String,
-        params: Any = object {},
-        provider: Row.() -> T
-    ): ListQuery<T> {
-        return TemplateSelectQueryImpl(sql, params, provider)
-    }
-
-    fun update(sql: String, params: Any = object {},): Query<Int> {
-        return TemplateUpdateQueryImpl(sql, params)
-    }
-
-    fun insert(sql: String, params: Any = object {},): Query<Int> {
-        return TemplateUpdateQueryImpl(sql, params)
-    }
-
-    fun delete(sql: String, params: Any = object {},): Query<Int> {
-        return TemplateUpdateQueryImpl(sql, params)
-    }
-}
-
-private class TemplateSelectQueryImpl<T>(
+internal data class TemplateSelectQuery<T>(
     private val sql: String,
     private val params: Any = object {},
     private val provider: Row.() -> T
@@ -74,30 +50,5 @@ private class TemplateSelectQueryImpl<T>(
         }
 
         override fun peek(dialect: Dialect): Statement = buildStatement(dialect)
-    }
-}
-
-private class TemplateUpdateQueryImpl(
-    private val sql: String,
-    private val params: Any = object {}
-) : Query<Int> {
-
-    override fun run(config: DatabaseConfig): Int {
-        val statement = buildStatement(config.dialect)
-        val command = TemplateUpdateCommand(config, statement)
-        return command.execute()
-    }
-
-    override fun peek(dialect: Dialect): Statement {
-        return buildStatement(dialect)
-    }
-
-    private fun buildStatement(dialect: Dialect): Statement {
-        val builder = DefaultStatementBuilder(
-            dialect::formatValue,
-            dialect.sqlNodeFactory,
-            dialect.exprEvaluator
-        )
-        return builder.build(sql, params)
     }
 }

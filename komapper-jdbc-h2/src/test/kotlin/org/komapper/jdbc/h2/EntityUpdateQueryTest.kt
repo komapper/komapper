@@ -7,9 +7,9 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.Database
+import org.komapper.core.EntityQuery
 import org.komapper.core.OptimisticLockException
 import org.komapper.core.UniqueConstraintException
-import org.komapper.core.query.EntityQuery
 
 @ExtendWith(Env::class)
 class EntityUpdateQueryTest(private val db: Database) {

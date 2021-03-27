@@ -2,6 +2,9 @@ package org.komapper.core.query
 
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import org.komapper.core.EntityQuery
+import org.komapper.core.ScriptQuery
+import org.komapper.core.TemplateQuery
 import org.komapper.core.query.scope.WhereDeclaration
 import org.komapper.core.query.scope.WhereScope.Companion.plus
 

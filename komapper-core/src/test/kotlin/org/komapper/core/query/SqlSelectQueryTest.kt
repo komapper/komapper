@@ -2,6 +2,7 @@ package org.komapper.core.query
 
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import org.komapper.core.SqlQuery
 
 class SqlSelectQueryTest {
 

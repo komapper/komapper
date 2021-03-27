@@ -1,10 +1,7 @@
 package org.komapper.core
 
 import org.komapper.core.metamodel.EntityMetamodel
-import org.komapper.core.query.EntityQuery
 import org.komapper.core.query.Query
-import org.komapper.core.query.ScriptQuery
-import org.komapper.core.query.SqlQuery
 import org.komapper.core.query.scope.WhereDeclaration
 import java.sql.Blob
 import java.sql.Clob

@@ -3,6 +3,7 @@ package org.komapper.core.query
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import org.komapper.core.EntityQuery
 
 class JoinTest {
 

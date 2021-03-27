@@ -6,8 +6,8 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.Database
-import org.komapper.core.query.EntityQuery
-import org.komapper.core.query.SubQuery
+import org.komapper.core.EntityQuery
+import org.komapper.core.Subquery
 import org.komapper.core.query.desc
 import org.komapper.core.query.scope.WhereDeclaration
 import org.komapper.core.query.scope.WhereScope.Companion.plus
@@ -249,7 +249,7 @@ class EntitySelectQueryTest(private val db: Database) {
         val query =
             EntityQuery.from(e).where {
                 e.addressId inList {
-                    SubQuery.from(a).where {
+                    Subquery.from(a).where {
                         e.addressId eq a.addressId
                         e.employeeName like "%S%"
                     }.select(a.addressId)
@@ -266,7 +266,7 @@ class EntitySelectQueryTest(private val db: Database) {
         val query =
             EntityQuery.from(e).where {
                 e.addressId notInList {
-                    SubQuery.from(a).where {
+                    Subquery.from(a).where {
                         e.addressId eq a.addressId
                         e.employeeName like "%S%"
                     }.select(a.addressId)
@@ -283,10 +283,10 @@ class EntitySelectQueryTest(private val db: Database) {
         val query =
             EntityQuery.from(e).where {
                 exists {
-                    SubQuery.from(a).where {
+                    Subquery.from(a).where {
                         e.addressId eq a.addressId
                         e.employeeName like "%S%"
-                    }.select(a.addressId)
+                    }
                 }
             }
         val list = db.execute(query)
@@ -300,10 +300,10 @@ class EntitySelectQueryTest(private val db: Database) {
         val query =
             EntityQuery.from(e).where {
                 notExists {
-                    SubQuery.from(a).where {
+                    Subquery.from(a).where {
                         e.addressId eq a.addressId
                         e.employeeName like "%S%"
-                    }.select(a.addressId)
+                    }
                 }
             }
         val list = db.execute(query)

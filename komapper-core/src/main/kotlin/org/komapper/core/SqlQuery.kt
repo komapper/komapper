@@ -1,6 +1,8 @@
-package org.komapper.core.query
+package org.komapper.core
 
 import org.komapper.core.metamodel.EntityMetamodel
+import org.komapper.core.query.SqlSelectQuery
+import org.komapper.core.query.SqlSelectQueryImpl
 
 object SqlQuery {
 

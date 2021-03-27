@@ -2,6 +2,7 @@ package org.komapper.core.query.scope
 
 import org.komapper.core.metamodel.ColumnInfo
 import org.komapper.core.query.Projection
+import org.komapper.core.query.SingleColumnProjection
 
 interface FilterScope {
     infix fun <T : Any> ColumnInfo<T>.eq(operand: ColumnInfo<T>)
@@ -56,15 +57,15 @@ interface FilterScope {
 
     infix fun <T : Any> ColumnInfo<T>.inList(values: List<T?>)
 
-    infix fun <T : Any> ColumnInfo<T>.inList(block: () -> Projection)
+    infix fun <T : Any> ColumnInfo<T>.inList(block: () -> SingleColumnProjection)
 
-    infix fun <T : Any> ColumnInfo<T>.inList(projection: Projection)
+    infix fun <T : Any> ColumnInfo<T>.inList(projection: SingleColumnProjection)
 
     infix fun <T : Any> ColumnInfo<T>.notInList(values: List<T?>)
 
-    infix fun <T : Any> ColumnInfo<T>.notInList(block: () -> Projection)
+    infix fun <T : Any> ColumnInfo<T>.notInList(block: () -> SingleColumnProjection)
 
-    infix fun <T : Any> ColumnInfo<T>.notInList(projection: Projection)
+    infix fun <T : Any> ColumnInfo<T>.notInList(projection: SingleColumnProjection)
     fun exists(block: () -> Projection)
     fun exists(projection: Projection)
     fun notExists(block: () -> Projection)

@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.Database
-import org.komapper.core.query.SqlQuery
+import org.komapper.core.SqlQuery
 import org.komapper.core.query.avg
 import org.komapper.core.query.count
 import org.komapper.core.query.desc

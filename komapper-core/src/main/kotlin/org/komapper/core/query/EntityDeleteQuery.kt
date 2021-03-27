@@ -8,10 +8,8 @@ import org.komapper.core.query.builder.EntityDeleteStatementBuilder
 import org.komapper.core.query.command.EntityDeleteCommand
 import org.komapper.core.query.context.EntityDeleteContext
 
-interface EntityDeleteQuery<ENTITY> : Query<Unit>
-
-internal class EntityDeleteQueryImpl<ENTITY>(private val entityMetamodel: EntityMetamodel<ENTITY>, private val entity: ENTITY) :
-    EntityDeleteQuery<ENTITY> {
+internal data class EntityDeleteQuery<ENTITY>(private val entityMetamodel: EntityMetamodel<ENTITY>, private val entity: ENTITY) :
+    Query<Unit> {
     private val context: EntityDeleteContext<ENTITY> = EntityDeleteContext(entityMetamodel)
 
     override fun run(config: DatabaseConfig) {

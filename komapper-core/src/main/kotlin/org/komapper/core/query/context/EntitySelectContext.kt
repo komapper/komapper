@@ -17,8 +17,12 @@ internal data class EntitySelectContext<ENTITY>(
     val associatorMap: Map<Association, Associator<Any, Any>> = mapOf()
 ) : SelectContext<ENTITY, EntitySelectContext<ENTITY>> {
 
-    override fun addColumn(columnInfo: ColumnInfo<*>): EntitySelectContext<ENTITY> {
-        return copy(columns = columns + columnInfo)
+    override fun addColumn(column: ColumnInfo<*>): EntitySelectContext<ENTITY> {
+        return copy(columns = this.columns + column)
+    }
+
+    override fun addColumns(columns: List<ColumnInfo<*>>): EntitySelectContext<ENTITY> {
+        return copy(columns = this.columns + columns)
     }
 
     override fun addJoin(join: Join<*>): EntitySelectContext<ENTITY> {

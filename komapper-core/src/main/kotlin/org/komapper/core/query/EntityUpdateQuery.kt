@@ -11,13 +11,11 @@ import java.time.Clock
 import java.time.Instant
 import java.time.ZoneId
 
-interface EntityUpdateQuery<ENTITY> : Query<ENTITY>
-
-internal class EntityUpdateQueryImpl<ENTITY>(
+internal data class EntityUpdateQuery<ENTITY>(
     private val entityMetamodel: EntityMetamodel<ENTITY>,
     private val entity: ENTITY
 ) :
-    EntityUpdateQuery<ENTITY> {
+    Query<ENTITY> {
     private val context: EntityUpdateContext<ENTITY> = EntityUpdateContext(entityMetamodel)
 
     override fun run(config: DatabaseConfig): ENTITY {

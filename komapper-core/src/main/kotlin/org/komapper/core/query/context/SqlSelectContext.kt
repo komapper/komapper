@@ -17,8 +17,12 @@ internal data class SqlSelectContext<ENTITY>(
     val having: List<Criterion> = listOf()
 ) : SelectContext<ENTITY, SqlSelectContext<ENTITY>> {
 
-    override fun addColumn(columnInfo: ColumnInfo<*>): SqlSelectContext<ENTITY> {
-        return copy(columns = columns + columnInfo)
+    override fun addColumn(column: ColumnInfo<*>): SqlSelectContext<ENTITY> {
+        return copy(columns = this.columns + column)
+    }
+
+    override fun addColumns(columns: List<ColumnInfo<*>>): SqlSelectContext<ENTITY> {
+        return copy(columns = this.columns + columns)
     }
 
     override fun addJoin(join: Join<*>): SqlSelectContext<ENTITY> {

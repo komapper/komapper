@@ -13,7 +13,7 @@ import org.komapper.core.query.scope.JoinScope
 import org.komapper.core.query.scope.WhereDeclaration
 import org.komapper.core.query.scope.WhereScope
 
-internal class SelectQuerySupport<ENTITY, CONTEXT : SelectContext<ENTITY, CONTEXT>>(
+internal data class SelectQuerySupport<ENTITY, CONTEXT : SelectContext<ENTITY, CONTEXT>>(
     private val context: CONTEXT
 ) {
 

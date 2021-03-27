@@ -5,8 +5,8 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.Database
+import org.komapper.core.TemplateQuery
 import org.komapper.core.query.Row
-import org.komapper.core.query.TemplateQuery
 
 @ExtendWith(Env::class)
 class TemplateSelectQueryTest(private val db: Database) {
