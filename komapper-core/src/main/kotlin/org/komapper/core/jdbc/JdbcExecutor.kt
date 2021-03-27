@@ -9,7 +9,7 @@ import java.sql.PreparedStatement
 import java.sql.ResultSet
 import java.sql.SQLException
 
-internal class Executor(
+internal class JdbcExecutor(
     private val config: DatabaseConfig,
     private val prepare: (Connection, String) -> PreparedStatement = { con, sql ->
         con.prepareStatement(sql)
@@ -60,7 +60,7 @@ internal class Executor(
     }
 
     fun <T> executeUpdate(statement: Statement, block: (PreparedStatement, Int) -> T): T {
-        return tryExecute {
+        return executeWithExceptionCheck {
             config.connection.use { con ->
                 log(statement)
                 prepare(con, statement.sql).use { ps ->
@@ -73,7 +73,7 @@ internal class Executor(
     }
 
     fun execute(statement: Statement) {
-        tryExecute {
+        executeWithExceptionCheck {
             config.connection.use { con ->
                 log(statement)
                 con.createStatement().use { s ->
@@ -84,7 +84,7 @@ internal class Executor(
         }
     }
 
-    private fun <T> tryExecute(block: () -> T): T {
+    private fun <T> executeWithExceptionCheck(block: () -> T): T {
         return try {
             block()
         } catch (e: SQLException) {

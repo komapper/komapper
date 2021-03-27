@@ -2,7 +2,7 @@ package org.komapper.core.query.command
 
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.data.Statement
-import org.komapper.core.jdbc.Executor
+import org.komapper.core.jdbc.JdbcExecutor
 import org.komapper.core.metamodel.EntityMetamodel
 import org.komapper.core.metamodel.PropertyMetamodel
 import org.komapper.core.query.context.EntitySelectContext
@@ -16,7 +16,7 @@ internal class EntitySelectCommand<ENTITY, R>(
     private val transformer: (Sequence<ENTITY>) -> R
 ) : Command<R> {
 
-    private val executor: Executor = Executor(config)
+    private val executor: JdbcExecutor = JdbcExecutor(config)
 
     override fun execute(): R {
         return executor.executeQuery(statement) { rs ->

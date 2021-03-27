@@ -2,7 +2,7 @@ package org.komapper.core.query.command
 
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.data.Statement
-import org.komapper.core.jdbc.Executor
+import org.komapper.core.jdbc.JdbcExecutor
 import org.komapper.core.metamodel.ColumnInfo
 import org.komapper.core.metamodel.EntityMetamodel
 import org.komapper.core.metamodel.PropertyMetamodel
@@ -15,7 +15,7 @@ internal class SqlSelectCommand<ENTITY, R>(
     private val transformer: (Sequence<ENTITY>) -> R
 ) : Command<R> {
 
-    private val executor: Executor = Executor(config)
+    private val executor: JdbcExecutor = JdbcExecutor(config)
 
     override fun execute(): R {
         return executor.executeQuery(
@@ -41,7 +41,7 @@ internal class SingleColumnSqlSelectCommand<T : Any, R>(
     private val transformer: (Sequence<T>) -> R
 ) : Command<R> {
 
-    private val executor: Executor = Executor(config)
+    private val executor: JdbcExecutor = JdbcExecutor(config)
 
     override fun execute(): R {
         return executor.executeQuery(
@@ -62,7 +62,7 @@ internal class PairColumnsSqlSelectCommand<A : Any, B : Any, R>(
     private val transformer: (Sequence<Pair<A, B>>) -> R
 ) : Command<R> {
 
-    private val executor: Executor = Executor(config)
+    private val executor: JdbcExecutor = JdbcExecutor(config)
 
     override fun execute(): R {
         return executor.executeQuery(

@@ -3,7 +3,7 @@ package org.komapper.core.query.command
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.OptimisticLockException
 import org.komapper.core.data.Statement
-import org.komapper.core.jdbc.Executor
+import org.komapper.core.jdbc.JdbcExecutor
 import org.komapper.core.metamodel.EntityMetamodel
 
 internal class EntityDeleteCommand<ENTITY>(
@@ -13,7 +13,7 @@ internal class EntityDeleteCommand<ENTITY>(
     private val statement: Statement
 ) : Command<Unit> {
 
-    private val executor: Executor = Executor(config)
+    private val executor: JdbcExecutor = JdbcExecutor(config)
 
     override fun execute() {
         executor.executeUpdate(statement) { _, count ->

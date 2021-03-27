@@ -2,18 +2,23 @@ package org.komapper.core.query.command
 
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.data.Statement
-import org.komapper.core.jdbc.Executor
+import org.komapper.core.jdbc.Dialect
+import org.komapper.core.jdbc.JdbcExecutor
 import org.komapper.core.metamodel.Assignment
 import org.komapper.core.metamodel.EntityMetamodel
+import java.sql.PreparedStatement
+import java.time.Clock
+import java.time.Instant
+import java.time.ZoneId
 
 internal class EntityInsertCommand<ENTITY>(
     @Suppress("unused") private val entityMetamodel: EntityMetamodel<ENTITY>,
     private val entity: ENTITY,
     private val config: DatabaseConfig,
-    private val statement: Statement
+    private val statementBuilder: (Dialect, ENTITY) -> Statement
 ) : Command<ENTITY> {
 
-    private val executor: Executor = Executor(config) { con, sql ->
+    private val executor: JdbcExecutor = JdbcExecutor(config) { con, sql ->
         val assignment = entityMetamodel.idAssignment()
         if (assignment is Assignment.Identity<*, *>) {
             con.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS)
@@ -23,21 +28,54 @@ internal class EntityInsertCommand<ENTITY>(
     }
 
     override fun execute(): ENTITY {
+        val newEntity = preInsert()
+        val statement = buildStatement(newEntity)
         return executor.executeUpdate(statement) { ps, _ ->
-            val assignment = entityMetamodel.idAssignment()
-            if (assignment is Assignment.Identity<ENTITY, *>) {
-                assignment.assign(entity) {
-                    ps.generatedKeys.use { rs ->
-                        if (rs.next()) {
-                            rs.getLong(1)
-                        } else {
-                            TODO()
-                        }
+            postInsert(newEntity, ps)
+        }
+    }
+
+    private fun preInsert(): ENTITY {
+        val assignment = entityMetamodel.idAssignment()
+        return if (assignment is Assignment.Sequence<ENTITY, *>) {
+            val sequenceName = assignment.name
+            assignment.assign(entity, config.name) {
+                val sql = config.dialect.getSequenceSql(sequenceName)
+                val statement = Statement(sql)
+                val executor = JdbcExecutor(config)
+                executor.executeQuery(statement) { rs ->
+                    // TODO
+                    if (rs.next()) rs.getLong(1) else error("no result")
+                }
+            }
+        } else {
+            entity
+        }.let { newEntity ->
+            val clock = Clock.fixed(Instant.now(), ZoneId.systemDefault())
+            entityMetamodel.updateCreatedAt(newEntity, clock).let {
+                entityMetamodel.updateUpdatedAt(it, clock)
+            }
+        }
+    }
+
+    private fun buildStatement(entity: ENTITY): Statement {
+        return statementBuilder(config.dialect, entity)
+    }
+
+    private fun postInsert(entity: ENTITY, ps: PreparedStatement): ENTITY {
+        val assignment = entityMetamodel.idAssignment()
+        return if (assignment is Assignment.Identity<ENTITY, *>) {
+            assignment.assign(entity) {
+                ps.generatedKeys.use { rs ->
+                    if (rs.next()) {
+                        rs.getLong(1)
+                    } else {
+                        TODO()
                     }
                 }
-            } else {
-                entity
             }
+        } else {
+            entity
         }
     }
 }

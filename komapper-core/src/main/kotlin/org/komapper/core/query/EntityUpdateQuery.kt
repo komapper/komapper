@@ -7,9 +7,6 @@ import org.komapper.core.metamodel.EntityMetamodel
 import org.komapper.core.query.builder.EntityUpdateStatementBuilder
 import org.komapper.core.query.command.EntityUpdateCommand
 import org.komapper.core.query.context.EntityUpdateContext
-import java.time.Clock
-import java.time.Instant
-import java.time.ZoneId
 
 internal data class EntityUpdateQuery<ENTITY>(
     private val entityMetamodel: EntityMetamodel<ENTITY>,
@@ -19,12 +16,7 @@ internal data class EntityUpdateQuery<ENTITY>(
     private val context: EntityUpdateContext<ENTITY> = EntityUpdateContext(entityMetamodel)
 
     override fun run(config: DatabaseConfig): ENTITY {
-        // TODO
-        val clock = Clock.fixed(Instant.now(), ZoneId.systemDefault())
-        val newEntity = entityMetamodel.updateUpdatedAt(entity, clock)
-        val builder = EntityUpdateStatementBuilder(config.dialect, context, newEntity)
-        val statement = builder.build()
-        val command = EntityUpdateCommand(entityMetamodel, newEntity, config, statement)
+        val command = EntityUpdateCommand(entityMetamodel, entity, config, this::buildStatement)
         return command.execute()
     }
 

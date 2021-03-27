@@ -2,14 +2,14 @@ package org.komapper.core.query.command
 
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.data.Statement
-import org.komapper.core.jdbc.Executor
+import org.komapper.core.jdbc.JdbcExecutor
 
 internal class ScriptCommand(
     config: DatabaseConfig,
     private val statement: Statement
 ) : Command<Unit> {
 
-    private val executor: Executor = Executor(config)
+    private val executor: JdbcExecutor = JdbcExecutor(config)
 
     override fun execute() {
         executor.execute(statement)
