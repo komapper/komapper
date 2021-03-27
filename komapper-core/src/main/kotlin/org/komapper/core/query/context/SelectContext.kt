@@ -23,7 +23,6 @@ internal interface SelectContext<ENTITY, CONTEXT : SelectContext<ENTITY, CONTEXT
     fun setOffset(offset: Int): CONTEXT
     fun setForUpdate(forUpdate: ForUpdate): CONTEXT
 
-    override fun getEntityMetamodels(): List<EntityMetamodel<*>>
-    fun getProjectionEntityMetamodels(): List<EntityMetamodel<*>>
+    override fun getReferencingEntityMetamodels(): List<EntityMetamodel<*>>
     fun getProjectionColumns(): List<ColumnInfo<*>>
 }

@@ -11,7 +11,7 @@ internal class AliasManager(context: Context<*>, private val parent: AliasManage
 
     init {
         var i = parent?.index ?: 0
-        for (e in context.getEntityMetamodels()) {
+        for (e in context.getReferencingEntityMetamodels()) {
             val alias = "t" + i + "_"
             i++
             tableAliasMap[e] = alias

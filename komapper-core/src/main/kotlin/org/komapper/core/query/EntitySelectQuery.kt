@@ -65,7 +65,7 @@ internal data class EntitySelectQueryImpl<ENTITY>(
         e2: EntityMetamodel<S>,
         associator: Associator<T, S>
     ): EntitySelectQueryImpl<ENTITY> {
-        val entityMetamodels = context.getEntityMetamodels()
+        val entityMetamodels = context.getReferencingEntityMetamodels()
         if (entityMetamodels.none { it == e1 }) {
             error("The e1 is not found. Use e1 in the join clause.")
         }

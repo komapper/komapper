@@ -29,7 +29,6 @@ internal class EntityUpdateStatementBuilder<ENTITY>(
             buf.append(" = ")
             val value = Value(p.get(entity), p.klass)
             buf.bind(value)
-            // TODO
             if (p === versionProperty) {
                 buf.append(" + 1")
             }

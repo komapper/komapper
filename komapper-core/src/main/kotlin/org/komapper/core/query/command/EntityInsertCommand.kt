@@ -44,13 +44,13 @@ internal class EntityInsertCommand<ENTITY>(
                 val statement = Statement(sql)
                 val executor = JdbcExecutor(config)
                 executor.executeQuery(statement) { rs ->
-                    // TODO
-                    if (rs.next()) rs.getLong(1) else error("no result")
+                    if (rs.next()) rs.getLong(1) else error("No result: ${statement.sql}")
                 }
             }
         } else {
             entity
         }.let { newEntity ->
+            // TODO
             val clock = Clock.fixed(Instant.now(), ZoneId.systemDefault())
             entityMetamodel.updateCreatedAt(newEntity, clock).let {
                 entityMetamodel.updateUpdatedAt(it, clock)
@@ -67,11 +67,7 @@ internal class EntityInsertCommand<ENTITY>(
         return if (assignment is Assignment.Identity<ENTITY, *>) {
             assignment.assign(entity) {
                 ps.generatedKeys.use { rs ->
-                    if (rs.next()) {
-                        rs.getLong(1)
-                    } else {
-                        TODO()
-                    }
+                    if (rs.next()) rs.getLong(1) else error("No result: Statement.generatedKeys")
                 }
             }
         } else {

@@ -10,7 +10,7 @@ import org.komapper.core.query.data.Criterion
 import org.komapper.core.query.data.SortItem
 
 internal class SelectStatementBuilderSupport<ENTITY>(
-    private val dialect: Dialect,
+    dialect: Dialect,
     private val context: SelectContext<ENTITY, *>,
     aliasManager: AliasManager = AliasManager(context),
     private val buf: StatementBuffer

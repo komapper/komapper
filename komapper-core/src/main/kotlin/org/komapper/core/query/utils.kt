@@ -16,7 +16,3 @@ fun <T : Any> ColumnInfo<T>.asc(): ColumnInfo<T> {
     }
     return SortItem.Asc(this)
 }
-
-enum class ForUpdateOption {
-    BASIC
-}

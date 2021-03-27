@@ -35,8 +35,6 @@ interface Dialect {
     val sqlNodeFactory: SqlNodeFactory
 
     fun getValue(rs: ResultSet, index: Int, valueClass: KClass<*>): Any?
-
-    // TODO
     fun getValue(rs: ResultSet, columnLabel: String, valueClass: KClass<*>): Any?
     fun setValue(ps: PreparedStatement, index: Int, value: Any?, valueClass: KClass<*>)
     fun formatValue(value: Any?, valueClass: KClass<*>): String
@@ -45,9 +43,7 @@ interface Dialect {
     fun quote(name: String): String
     fun supportsMerge(): Boolean
     fun supportsUpsert(): Boolean
-
-    // TODO
-    fun escape(text: CharSequence): CharSequence
+    fun escape(text: String): String
 }
 
 abstract class AbstractDialect : Dialect {
@@ -129,7 +125,7 @@ abstract class AbstractDialect : Dialect {
 
     override fun supportsUpsert(): Boolean = false
 
-    override fun escape(text: CharSequence): CharSequence {
+    override fun escape(text: String): String {
         val matcher = escapePattern.matcher(text)
         return matcher.replaceAll("""\\$0""")
     }

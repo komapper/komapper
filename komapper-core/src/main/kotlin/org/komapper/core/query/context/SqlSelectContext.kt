@@ -53,18 +53,13 @@ internal data class SqlSelectContext<ENTITY>(
         return copy(forUpdate = forUpdate)
     }
 
-    override fun getEntityMetamodels(): List<EntityMetamodel<*>> {
+    override fun getReferencingEntityMetamodels(): List<EntityMetamodel<*>> {
         return listOf(entityMetamodel) + joins.map { it.entityMetamodel }
-    }
-
-    // TODO
-    override fun getProjectionEntityMetamodels(): List<EntityMetamodel<*>> {
-        return listOf(entityMetamodel)
     }
 
     override fun getProjectionColumns(): List<ColumnInfo<*>> {
         if (columns.isEmpty()) {
-            return getProjectionEntityMetamodels().flatMap { it.properties() }
+            return entityMetamodel.properties()
         }
         return columns
     }

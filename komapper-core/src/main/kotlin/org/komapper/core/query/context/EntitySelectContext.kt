@@ -53,11 +53,11 @@ internal data class EntitySelectContext<ENTITY>(
         return copy(associatorMap = this.associatorMap + (association to associator))
     }
 
-    override fun getEntityMetamodels(): List<EntityMetamodel<*>> {
+    override fun getReferencingEntityMetamodels(): List<EntityMetamodel<*>> {
         return listOf(entityMetamodel) + joins.map { it.entityMetamodel }
     }
 
-    override fun getProjectionEntityMetamodels(): List<EntityMetamodel<*>> {
+    fun getProjectionEntityMetamodels(): List<EntityMetamodel<*>> {
         val list = listOf(entityMetamodel) + associatorMap.flatMap {
             val (e1, e2) = it.key
             listOf(e1, e2)

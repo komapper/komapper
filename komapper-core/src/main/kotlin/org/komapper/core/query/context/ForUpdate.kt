@@ -1,7 +1,7 @@
 package org.komapper.core.query.context
 
-import org.komapper.core.query.ForUpdateOption
+import org.komapper.core.query.option.ForUpdateOption
 
-data class ForUpdate(
+internal data class ForUpdate(
     val option: ForUpdateOption? = null
 )

@@ -120,12 +120,12 @@ internal class BuilderSupport(
     }
 
     private fun visitLikeOperand(operand: Operand, option: LikeOption) {
-        fun bind(value: Any?, mapper: (CharSequence) -> String, escape: (CharSequence) -> (CharSequence)) {
+        fun bind(value: Any?, mapper: (String) -> String, escape: (String) -> String) {
             if (value == null) {
                 buf.bind(Value(null, String::class))
             } else {
                 val text = mapper(escape(value.toString()))
-                buf.bind(Value(text.toString(), String::class))
+                buf.bind(Value(text, String::class))
             }
         }
         when (operand) {
@@ -136,8 +136,8 @@ internal class BuilderSupport(
                 val value = operand.value
                 val escape = dialect::escape
                 when (option) {
-                    is LikeOption.None -> bind(value, { it.toString() }, { it })
-                    is LikeOption.Escape -> bind(value, { it.toString() }, escape)
+                    is LikeOption.None -> bind(value, { it }, { it })
+                    is LikeOption.Escape -> bind(value, { it }, escape)
                     is LikeOption.Prefix -> bind(value, { "$it%" }, escape)
                     is LikeOption.Infix -> bind(value, { "%$it%" }, escape)
                     is LikeOption.Suffix -> bind(value, { "%$it" }, escape)

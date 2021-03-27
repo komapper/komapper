@@ -509,7 +509,7 @@ class ExprEvaluatorTest {
         fun memberExtensionFunction() {
             val ctx = mapOf("s" to Value("abc"))
             val result = evaluator.eval("s.asPrefix()", ctx)
-            assertEquals(Value("abc%", CharSequence::class), result)
+            assertEquals(Value("abc%", String::class), result)
         }
 
         @Test

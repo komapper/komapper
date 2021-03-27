@@ -8,6 +8,7 @@ import org.komapper.core.query.context.JoinContext
 import org.komapper.core.query.context.JoinKind
 import org.komapper.core.query.context.SelectContext
 import org.komapper.core.query.data.SortItem
+import org.komapper.core.query.option.ForUpdateOption
 import org.komapper.core.query.scope.JoinDeclaration
 import org.komapper.core.query.scope.JoinScope
 import org.komapper.core.query.scope.WhereDeclaration

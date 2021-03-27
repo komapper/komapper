@@ -11,7 +11,7 @@ interface ExprEnvironment {
     val topLevelFunctionExtensions: List<KFunction<*>>
 }
 
-open class DefaultExprEnvironment(val escape: (CharSequence) -> CharSequence) : ExprEnvironment {
+open class DefaultExprEnvironment(val escape: (String) -> String) : ExprEnvironment {
 
     override val ctx: Map<String, Value> = emptyMap()
 
@@ -30,19 +30,19 @@ open class DefaultExprEnvironment(val escape: (CharSequence) -> CharSequence) : 
         CharSequence::none
     ).onEach { it.isAccessible = true }
 
-    open fun CharSequence?.escape(): CharSequence? {
+    open fun String?.escape(): String? {
         return this?.let { escape(it) }
     }
 
-    open fun CharSequence?.asPrefix(): CharSequence? {
+    open fun String?.asPrefix(): String? {
         return this?.let { "${escape(it)}%" }
     }
 
-    open fun CharSequence?.asInfix(): CharSequence? {
+    open fun String?.asInfix(): String? {
         return this?.let { "%${escape(it)}%" }
     }
 
-    open fun CharSequence?.asSuffix(): CharSequence? {
+    open fun String?.asSuffix(): String? {
         return this?.let { "%${escape(it)}" }
     }
 }
