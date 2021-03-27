@@ -3,11 +3,8 @@ package org.komapper.core.query
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import org.komapper.core.DefaultDatabaseConfig
 
 class JoinTest {
-
-    private val config = DefaultDatabaseConfig(EmptyDialect(), "")
 
     @Test
     fun association_invalid_e1() {

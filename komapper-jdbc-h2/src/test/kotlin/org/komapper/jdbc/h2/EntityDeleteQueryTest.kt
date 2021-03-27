@@ -9,7 +9,7 @@ import org.komapper.core.OptimisticLockException
 import org.komapper.core.query.EntityQuery
 
 @ExtendWith(Env::class)
-class EntityDeleteQueryableTest(private val db: Database) {
+class EntityDeleteQueryTest(private val db: Database) {
 
     /*
     @Suppress("IMPLICIT_CAST_TO_ANY", "UNCHECKED_CAST")

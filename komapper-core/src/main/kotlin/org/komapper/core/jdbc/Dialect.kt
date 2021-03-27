@@ -1,5 +1,13 @@
 package org.komapper.core.jdbc
 
+import org.komapper.core.expr.DefaultExprEnvironment
+import org.komapper.core.expr.DefaultExprEvaluator
+import org.komapper.core.expr.ExprEnvironment
+import org.komapper.core.expr.ExprEvaluator
+import org.komapper.core.expr.ExprNodeFactory
+import org.komapper.core.expr.NoCacheExprNodeFactory
+import org.komapper.core.template.NoCacheSqlNodeFactory
+import org.komapper.core.template.SqlNodeFactory
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.sql.Blob
@@ -21,7 +29,13 @@ interface Dialect {
     val openQuote: String
     val closeQuote: String
     val escapePattern: Pattern
+    val exprNodeFactory: ExprNodeFactory
+    val exprEnvironment: ExprEnvironment
+    val exprEvaluator: ExprEvaluator
+    val sqlNodeFactory: SqlNodeFactory
+
     fun getValue(rs: ResultSet, index: Int, valueClass: KClass<*>): Any?
+
     // TODO
     fun getValue(rs: ResultSet, columnLabel: String, valueClass: KClass<*>): Any?
     fun setValue(ps: PreparedStatement, index: Int, value: Any?, valueClass: KClass<*>)
@@ -31,6 +45,7 @@ interface Dialect {
     fun quote(name: String): String
     fun supportsMerge(): Boolean
     fun supportsUpsert(): Boolean
+
     // TODO
     fun escape(text: CharSequence): CharSequence
 }
@@ -40,6 +55,17 @@ abstract class AbstractDialect : Dialect {
     override val openQuote: String = "\""
     override val closeQuote: String = "\""
     override val escapePattern: Pattern = Pattern.compile("""[\\_%]""")
+    override val exprNodeFactory: ExprNodeFactory by lazy { NoCacheExprNodeFactory() }
+    override val exprEnvironment: ExprEnvironment by lazy {
+        DefaultExprEnvironment(this::escape)
+    }
+    override val exprEvaluator: ExprEvaluator by lazy {
+        DefaultExprEvaluator(
+            exprNodeFactory,
+            exprEnvironment
+        )
+    }
+    override val sqlNodeFactory: SqlNodeFactory by lazy { NoCacheSqlNodeFactory() }
 
     override fun getValue(rs: ResultSet, index: Int, valueClass: KClass<*>): Any? {
         val dataType = getDataType(valueClass)
@@ -106,5 +132,16 @@ abstract class AbstractDialect : Dialect {
     override fun escape(text: CharSequence): CharSequence {
         val matcher = escapePattern.matcher(text)
         return matcher.replaceAll("""\\$0""")
+    }
+}
+
+class EmptyDialect : AbstractDialect() {
+
+    override fun isUniqueConstraintViolation(exception: SQLException): Boolean {
+        throw UnsupportedOperationException()
+    }
+
+    override fun getSequenceSql(sequenceName: String): String {
+        throw UnsupportedOperationException()
     }
 }

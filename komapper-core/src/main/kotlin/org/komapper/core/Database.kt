@@ -2,7 +2,7 @@ package org.komapper.core
 
 import org.komapper.core.metamodel.EntityMetamodel
 import org.komapper.core.query.EntityQuery
-import org.komapper.core.query.Queryable
+import org.komapper.core.query.Query
 import org.komapper.core.query.ScriptQuery
 import org.komapper.core.query.SqlQuery
 import org.komapper.core.query.scope.WhereDeclaration
@@ -35,39 +35,39 @@ class Database(val config: DefaultDatabaseConfig) {
 
     fun <ENTITY> findOrNull(metamodel: EntityMetamodel<ENTITY>, declaration: WhereDeclaration): ENTITY? {
         val queryable = SqlQuery.from(metamodel).where(declaration).limit(1).firstOrNull()
-        return executeQueryable(queryable)
+        return runQuery(queryable)
     }
 
     fun <ENTITY> insert(metamodel: EntityMetamodel<ENTITY>, entity: ENTITY): ENTITY {
         val queryable = EntityQuery.insert(metamodel, entity)
-        return executeQueryable(queryable)
+        return runQuery(queryable)
     }
 
     fun <ENTITY> update(metamodel: EntityMetamodel<ENTITY>, entity: ENTITY): ENTITY {
         val queryable = EntityQuery.update(metamodel, entity)
-        return executeQueryable(queryable)
+        return runQuery(queryable)
     }
 
     fun <ENTITY> delete(metamodel: EntityMetamodel<ENTITY>, entity: ENTITY) {
         val queryable = EntityQuery.delete(metamodel, entity)
-        executeQueryable(queryable)
+        runQuery(queryable)
     }
 
     fun script(sql: CharSequence) {
         val queryable = ScriptQuery.execute(sql.toString())
-        executeQueryable(queryable)
+        runQuery(queryable)
     }
 
-    fun <T> execute(block: () -> Queryable<T>): T {
-        return executeQueryable(block())
+    fun <T> execute(block: () -> Query<T>): T {
+        return runQuery(block())
     }
 
-    fun <T> execute(queryable: Queryable<T>): T {
-        return executeQueryable(queryable)
+    fun <T> execute(query: Query<T>): T {
+        return runQuery(query)
     }
 
-    private fun <T> executeQueryable(queryable: Queryable<T>): T {
-        return queryable.run(config)
+    private fun <T> runQuery(query: Query<T>): T {
+        return query.run(config)
     }
 
     class Factory(val config: DefaultDatabaseConfig) {

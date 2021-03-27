@@ -12,7 +12,7 @@ import org.komapper.core.UniqueConstraintException
 import org.komapper.core.query.EntityQuery
 
 @ExtendWith(Env::class)
-class EntityUpdateQueryableTest(private val db: Database) {
+class EntityUpdateQueryTest(private val db: Database) {
 
     @Test
     fun test() {

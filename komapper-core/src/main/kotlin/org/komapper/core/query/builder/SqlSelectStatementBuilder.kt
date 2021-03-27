@@ -1,20 +1,20 @@
 package org.komapper.core.query.builder
 
-import org.komapper.core.DatabaseConfig
 import org.komapper.core.data.Statement
 import org.komapper.core.data.StatementBuffer
+import org.komapper.core.jdbc.Dialect
 import org.komapper.core.metamodel.ColumnInfo
 import org.komapper.core.query.AggregateFunction
 import org.komapper.core.query.context.SqlSelectContext
 import org.komapper.core.query.data.Criterion
 
 internal class SqlSelectStatementBuilder<ENTITY>(
-    val config: DatabaseConfig,
+    val dialect: Dialect,
     val context: SqlSelectContext<ENTITY>,
     aliasManager: AliasManager = AliasManager(context)
 ) {
-    private val buf = StatementBuffer(config.dialect::formatValue)
-    private val support = SelectStatementBuilderSupport(config, context, aliasManager, buf)
+    private val buf = StatementBuffer(dialect::formatValue)
+    private val support = SelectStatementBuilderSupport(dialect, context, aliasManager, buf)
 
     fun build(): Statement {
         selectClause()

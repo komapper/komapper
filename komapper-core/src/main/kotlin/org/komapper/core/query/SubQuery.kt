@@ -5,6 +5,6 @@ import org.komapper.core.metamodel.EntityMetamodel
 object SubQuery {
 
     fun <ENTITY> from(entityMetamodel: EntityMetamodel<ENTITY>): SqlSelectSubQuery<ENTITY> {
-        return SqlSelectQueryableImpl(entityMetamodel)
+        return SqlSelectQueryImpl(entityMetamodel)
     }
 }

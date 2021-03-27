@@ -1,21 +1,21 @@
 package org.komapper.core.query.builder
 
-import org.komapper.core.DatabaseConfig
 import org.komapper.core.data.Statement
 import org.komapper.core.data.StatementBuffer
 import org.komapper.core.data.Value
+import org.komapper.core.jdbc.Dialect
 import org.komapper.core.metamodel.ColumnInfo
 import org.komapper.core.metamodel.TableInfo
 import org.komapper.core.query.context.EntityDeleteContext
 
 internal class EntityDeleteStatementBuilder<ENTITY>(
-    val config: DatabaseConfig,
+    val dialect: Dialect,
     val context: EntityDeleteContext<ENTITY>,
     val entity: ENTITY
 ) {
     private val aliasManager = AliasManager(context)
-    private val buf = StatementBuffer(config.dialect::formatValue)
-    private val support = BuilderSupport(config, aliasManager, buf)
+    private val buf = StatementBuffer(dialect::formatValue)
+    private val support = BuilderSupport(dialect, aliasManager, buf)
 
     fun build(): Statement {
         buf.append("delete from ")

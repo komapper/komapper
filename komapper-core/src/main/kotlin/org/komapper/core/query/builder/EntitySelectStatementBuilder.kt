@@ -1,17 +1,17 @@
 package org.komapper.core.query.builder
 
-import org.komapper.core.DatabaseConfig
 import org.komapper.core.data.Statement
 import org.komapper.core.data.StatementBuffer
+import org.komapper.core.jdbc.Dialect
 import org.komapper.core.query.context.EntitySelectContext
 
 internal class EntitySelectStatementBuilder<ENTITY>(
-    val config: DatabaseConfig,
+    val dialect: Dialect,
     val context: EntitySelectContext<ENTITY>,
     aliasManager: AliasManager = AliasManager(context)
 ) {
-    private val buf = StatementBuffer(config.dialect::formatValue)
-    private val support = SelectStatementBuilderSupport(config, context, aliasManager, buf)
+    private val buf = StatementBuffer(dialect::formatValue)
+    private val support = SelectStatementBuilderSupport(dialect, context, aliasManager, buf)
 
     fun build(): Statement {
         selectClause()

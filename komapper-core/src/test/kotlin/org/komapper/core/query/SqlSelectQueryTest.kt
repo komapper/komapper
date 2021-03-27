@@ -2,11 +2,8 @@ package org.komapper.core.query
 
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import org.komapper.core.DefaultDatabaseConfig
 
-class SqlSelectQueryableTest {
-
-    private val config = DefaultDatabaseConfig(EmptyDialect(), "")
+class SqlSelectQueryTest {
 
     @Test
     fun from() {
@@ -14,7 +11,7 @@ class SqlSelectQueryableTest {
         val query = SqlQuery.from(a).where { a.id eq 1 }
         assertEquals(
             "select t0_.ID, t0_.STREET, t0_.VERSION from ADDRESS t0_ where t0_.ID = ?",
-            query.toStatement(config).sql
+            query.peek().sql
         )
     }
 
@@ -24,7 +21,7 @@ class SqlSelectQueryableTest {
         val query = SqlQuery.from(a).where { a.id eq 1 }.select(sum(a.id))
         assertEquals(
             "select sum(t0_.ID) from ADDRESS t0_ where t0_.ID = ?",
-            query.toStatement(config).sql
+            query.peek().sql
         )
     }
 
@@ -34,7 +31,7 @@ class SqlSelectQueryableTest {
         val query = SqlQuery.from(a).where { a.id eq 1 }.select(count())
         assertEquals(
             "select count(*) from ADDRESS t0_ where t0_.ID = ?",
-            query.toStatement(config).sql
+            query.peek().sql
         )
     }
 
@@ -44,7 +41,7 @@ class SqlSelectQueryableTest {
         val query = SqlQuery.from(a).where { a.id eq 1 }.select(count(a.id))
         assertEquals(
             "select count(t0_.ID) from ADDRESS t0_ where t0_.ID = ?",
-            query.toStatement(config).sql
+            query.peek().sql
         )
     }
 

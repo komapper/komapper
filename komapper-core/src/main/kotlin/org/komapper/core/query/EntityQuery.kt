@@ -4,19 +4,19 @@ import org.komapper.core.metamodel.EntityMetamodel
 
 object EntityQuery {
 
-    fun <ENTITY> from(entityMetamodel: EntityMetamodel<ENTITY>): EntitySelectQueryable<ENTITY> {
-        return EntitySelectQueryableImpl(entityMetamodel)
+    fun <ENTITY> from(entityMetamodel: EntityMetamodel<ENTITY>): EntitySelectQuery<ENTITY> {
+        return EntitySelectQueryImpl(entityMetamodel)
     }
 
-    fun <ENTITY> insert(entityMetamodel: EntityMetamodel<ENTITY>, entity: ENTITY): EntityInsertQueryable<ENTITY> {
-        return EntityInsertQueryableImpl(entityMetamodel, entity)
+    fun <ENTITY> insert(entityMetamodel: EntityMetamodel<ENTITY>, entity: ENTITY): EntityInsertQuery<ENTITY> {
+        return EntityInsertQueryImpl(entityMetamodel, entity)
     }
 
-    fun <ENTITY> update(entityMetamodel: EntityMetamodel<ENTITY>, entity: ENTITY): EntityUpdateQueryable<ENTITY> {
-        return EntityUpdateQueryableImpl(entityMetamodel, entity)
+    fun <ENTITY> update(entityMetamodel: EntityMetamodel<ENTITY>, entity: ENTITY): EntityUpdateQuery<ENTITY> {
+        return EntityUpdateQueryImpl(entityMetamodel, entity)
     }
 
-    fun <ENTITY> delete(entityMetamodel: EntityMetamodel<ENTITY>, entity: ENTITY): EntityDeleteQueryable<ENTITY> {
-        return EntityDeleteQueryableImpl(entityMetamodel, entity)
+    fun <ENTITY> delete(entityMetamodel: EntityMetamodel<ENTITY>, entity: ENTITY): EntityDeleteQuery<ENTITY> {
+        return EntityDeleteQueryImpl(entityMetamodel, entity)
     }
 }

@@ -1,8 +1,8 @@
 package org.komapper.core.query.builder
 
-import org.komapper.core.DatabaseConfig
 import org.komapper.core.data.StatementBuffer
 import org.komapper.core.data.Value
+import org.komapper.core.jdbc.Dialect
 import org.komapper.core.metamodel.ColumnInfo
 import org.komapper.core.metamodel.TableInfo
 import org.komapper.core.query.AggregateFunction
@@ -12,7 +12,7 @@ import org.komapper.core.query.data.Operand
 import org.komapper.core.query.option.LikeOption
 
 internal class BuilderSupport(
-    private val config: DatabaseConfig,
+    private val dialect: Dialect,
     private val aliasManager: AliasManager,
     private val buf: StatementBuffer
 ) {
@@ -134,7 +134,7 @@ internal class BuilderSupport(
             }
             is Operand.Parameter -> {
                 val value = operand.value
-                val escape = config.dialect::escape
+                val escape = dialect::escape
                 when (option) {
                     is LikeOption.None -> bind(value, { it.toString() }, { it })
                     is LikeOption.Escape -> bind(value, { it.toString() }, escape)
@@ -171,7 +171,7 @@ internal class BuilderSupport(
         }
         buf.append(" in (")
         val childAliasManager = AliasManager(right, aliasManager)
-        val builder = SqlSelectStatementBuilder(config, right, childAliasManager)
+        val builder = SqlSelectStatementBuilder(dialect, right, childAliasManager)
         buf.append(builder.build())
         buf.append(")")
     }
@@ -182,7 +182,7 @@ internal class BuilderSupport(
         }
         buf.append("exists (")
         val childAliasManager = AliasManager(subContext, aliasManager)
-        val builder = SqlSelectStatementBuilder(config, subContext, childAliasManager)
+        val builder = SqlSelectStatementBuilder(dialect, subContext, childAliasManager)
         buf.append(builder.build())
         buf.append(")")
     }

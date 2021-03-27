@@ -1,7 +1,7 @@
 package org.komapper.core.query.builder
 
-import org.komapper.core.DatabaseConfig
 import org.komapper.core.data.StatementBuffer
+import org.komapper.core.jdbc.Dialect
 import org.komapper.core.metamodel.ColumnInfo
 import org.komapper.core.metamodel.TableInfo
 import org.komapper.core.query.context.JoinKind
@@ -10,12 +10,12 @@ import org.komapper.core.query.data.Criterion
 import org.komapper.core.query.data.SortItem
 
 internal class SelectStatementBuilderSupport<ENTITY>(
-    private val config: DatabaseConfig,
+    private val dialect: Dialect,
     private val context: SelectContext<ENTITY, *>,
     aliasManager: AliasManager = AliasManager(context),
     private val buf: StatementBuffer
 ) {
-    private val support = BuilderSupport(config, aliasManager, buf)
+    private val support = BuilderSupport(dialect, aliasManager, buf)
 
     fun selectClause() {
         buf.append("select ")

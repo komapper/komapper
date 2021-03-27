@@ -9,7 +9,7 @@ import org.komapper.core.query.Row
 import org.komapper.core.query.TemplateQuery
 
 @ExtendWith(Env::class)
-class TemplateSelectQueryableTest(private val db: Database) {
+class TemplateSelectQueryTest(private val db: Database) {
 
     val asAddress: Row.() -> Address = {
         Address(

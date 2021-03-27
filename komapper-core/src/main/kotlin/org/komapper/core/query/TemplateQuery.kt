@@ -2,6 +2,7 @@ package org.komapper.core.query
 
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.data.Statement
+import org.komapper.core.jdbc.Dialect
 import org.komapper.core.query.command.TemplateSelectCommand
 import org.komapper.core.query.command.TemplateUpdateCommand
 import org.komapper.core.template.DefaultStatementBuilder
@@ -12,90 +13,90 @@ object TemplateQuery {
         sql: String,
         params: Any = object {},
         provider: Row.() -> T
-    ): ListQueryable<T> {
-        return TemplateSelectQueryableImpl(sql, params, provider)
+    ): ListQuery<T> {
+        return TemplateSelectQueryImpl(sql, params, provider)
     }
 
-    fun update(sql: String, params: Any = object {},): Queryable<Int> {
-        return TemplateUpdateQueryableImpl(sql, params)
+    fun update(sql: String, params: Any = object {},): Query<Int> {
+        return TemplateUpdateQueryImpl(sql, params)
     }
 
-    fun insert(sql: String, params: Any = object {},): Queryable<Int> {
-        return TemplateUpdateQueryableImpl(sql, params)
+    fun insert(sql: String, params: Any = object {},): Query<Int> {
+        return TemplateUpdateQueryImpl(sql, params)
     }
 
-    fun delete(sql: String, params: Any = object {},): Queryable<Int> {
-        return TemplateUpdateQueryableImpl(sql, params)
+    fun delete(sql: String, params: Any = object {},): Query<Int> {
+        return TemplateUpdateQueryImpl(sql, params)
     }
 }
 
-private class TemplateSelectQueryableImpl<T>(
+private class TemplateSelectQueryImpl<T>(
     private val sql: String,
     private val params: Any = object {},
     private val provider: Row.() -> T
-) : ListQueryable<T> {
+) : ListQuery<T> {
 
     override fun run(config: DatabaseConfig): List<T> {
         val transformable = Transformable { it.toList() }
         return transformable.run(config)
     }
 
-    override fun toStatement(config: DatabaseConfig): Statement {
-        return buildStatement(config)
+    override fun peek(dialect: Dialect): Statement {
+        return buildStatement(dialect)
     }
 
-    private fun buildStatement(config: DatabaseConfig): Statement {
+    private fun buildStatement(dialect: Dialect): Statement {
         val builder = DefaultStatementBuilder(
-            config.dialect::formatValue,
-            config.sqlNodeFactory,
-            config.exprEvaluator
+            dialect::formatValue,
+            dialect.sqlNodeFactory,
+            dialect.exprEvaluator
         )
         return builder.build(sql, params)
     }
 
-    override fun first(): Queryable<T> {
+    override fun first(): Query<T> {
         return Transformable { it.first() }
     }
 
-    override fun firstOrNull(): Queryable<T?> {
+    override fun firstOrNull(): Query<T?> {
         return Transformable { it.firstOrNull() }
     }
 
-    override fun <R> transform(transformer: (Sequence<T>) -> R): Queryable<R> {
+    override fun <R> transform(transformer: (Sequence<T>) -> R): Query<R> {
         return Transformable(transformer)
     }
 
-    private inner class Transformable<R>(val transformer: (Sequence<T>) -> R) : Queryable<R> {
+    private inner class Transformable<R>(val transformer: (Sequence<T>) -> R) : Query<R> {
         override fun run(config: DatabaseConfig): R {
-            val statement = buildStatement(config)
+            val statement = buildStatement(config.dialect)
             val command = TemplateSelectCommand(config, statement, provider, transformer)
             return command.execute()
         }
 
-        override fun toStatement(config: DatabaseConfig): Statement = buildStatement(config)
+        override fun peek(dialect: Dialect): Statement = buildStatement(dialect)
     }
 }
 
-private class TemplateUpdateQueryableImpl(
+private class TemplateUpdateQueryImpl(
     private val sql: String,
     private val params: Any = object {}
-) : Queryable<Int> {
+) : Query<Int> {
 
     override fun run(config: DatabaseConfig): Int {
-        val statement = buildStatement(config)
+        val statement = buildStatement(config.dialect)
         val command = TemplateUpdateCommand(config, statement)
         return command.execute()
     }
 
-    override fun toStatement(config: DatabaseConfig): Statement {
-        return buildStatement(config)
+    override fun peek(dialect: Dialect): Statement {
+        return buildStatement(dialect)
     }
 
-    private fun buildStatement(config: DatabaseConfig): Statement {
+    private fun buildStatement(dialect: Dialect): Statement {
         val builder = DefaultStatementBuilder(
-            config.dialect::formatValue,
-            config.sqlNodeFactory,
-            config.exprEvaluator
+            dialect::formatValue,
+            dialect.sqlNodeFactory,
+            dialect.exprEvaluator
         )
         return builder.build(sql, params)
     }

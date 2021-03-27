@@ -2,6 +2,7 @@ package org.komapper.core.query
 
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.data.Statement
+import org.komapper.core.jdbc.Dialect
 import org.komapper.core.jdbc.Executor
 import org.komapper.core.metamodel.Assignment
 import org.komapper.core.metamodel.EntityMetamodel
@@ -12,10 +13,10 @@ import java.time.Clock
 import java.time.Instant
 import java.time.ZoneId
 
-interface EntityInsertQueryable<ENTITY> : Queryable<ENTITY>
+interface EntityInsertQuery<ENTITY> : Query<ENTITY>
 
-internal class EntityInsertQueryableImpl<ENTITY>(private val entityMetamodel: EntityMetamodel<ENTITY>, private val entity: ENTITY) :
-    EntityInsertQueryable<ENTITY> {
+internal class EntityInsertQueryImpl<ENTITY>(private val entityMetamodel: EntityMetamodel<ENTITY>, private val entity: ENTITY) :
+    EntityInsertQuery<ENTITY> {
     private val context: EntityInsertContext<ENTITY> = EntityInsertContext(entityMetamodel)
 
     override fun run(config: DatabaseConfig): ENTITY {
@@ -39,17 +40,17 @@ internal class EntityInsertQueryableImpl<ENTITY>(private val entityMetamodel: En
                 entityMetamodel.updateUpdatedAt(it, clock)
             }
         }
-        val statement = buildStatement(config, newEntity)
+        val statement = buildStatement(config.dialect, newEntity)
         val command = EntityInsertCommand(entityMetamodel, newEntity, config, statement)
         return command.execute()
     }
 
-    override fun toStatement(config: DatabaseConfig): Statement {
-        return buildStatement(config, entity)
+    override fun peek(dialect: Dialect): Statement {
+        return buildStatement(dialect, entity)
     }
 
-    private fun buildStatement(config: DatabaseConfig, entity: ENTITY): Statement {
-        val builder = EntityInsertStatementBuilder(config, context, entity)
+    private fun buildStatement(dialect: Dialect, entity: ENTITY): Statement {
+        val builder = EntityInsertStatementBuilder(dialect, context, entity)
         return builder.build()
     }
 }

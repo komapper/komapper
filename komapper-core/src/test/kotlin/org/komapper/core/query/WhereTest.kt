@@ -2,11 +2,8 @@ package org.komapper.core.query
 
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import org.komapper.core.DefaultDatabaseConfig
 
 internal class WhereTest {
-
-    private val config = DefaultDatabaseConfig(EmptyDialect(), "")
 
     @Test
     fun eq() {
@@ -18,7 +15,7 @@ internal class WhereTest {
         }
         assertEquals(
             "select t0_.ID, t0_.STREET, t0_.VERSION from ADDRESS t0_ where t0_.ID = ? and t0_.ID = t0_.VERSION and ? = t0_.ID",
-            query.toStatement(config).sql
+            query.peek().sql
         )
     }
 
@@ -30,7 +27,7 @@ internal class WhereTest {
         }
         assertEquals(
             "select t0_.ID, t0_.STREET, t0_.VERSION from ADDRESS t0_",
-            query.toStatement(config).sql
+            query.peek().sql
         )
     }
 
@@ -44,7 +41,7 @@ internal class WhereTest {
         }
         assertEquals(
             "select t0_.ID, t0_.STREET, t0_.VERSION from ADDRESS t0_ where t0_.ID <> ? and t0_.ID <> t0_.VERSION and ? <> t0_.ID",
-            query.toStatement(config).sql
+            query.peek().sql
         )
     }
 
@@ -56,7 +53,7 @@ internal class WhereTest {
         }
         assertEquals(
             "select t0_.ID, t0_.STREET, t0_.VERSION from ADDRESS t0_ where t0_.STREET is null",
-            query.toStatement(config).sql
+            query.peek().sql
         )
     }
 
@@ -68,7 +65,7 @@ internal class WhereTest {
         }
         assertEquals(
             "select t0_.ID, t0_.STREET, t0_.VERSION from ADDRESS t0_ where t0_.STREET is not null",
-            query.toStatement(config).sql
+            query.peek().sql
         )
     }
 
@@ -80,7 +77,7 @@ internal class WhereTest {
         }
         assertEquals(
             "select t0_.ID, t0_.STREET, t0_.VERSION from ADDRESS t0_ where t0_.STREET like '%abc'",
-            query.toStatement(config).log
+            query.peek().log
         )
     }
 
@@ -92,7 +89,7 @@ internal class WhereTest {
         }
         assertEquals(
             "select t0_.ID, t0_.STREET, t0_.VERSION from ADDRESS t0_ where t0_.STREET like '\\%abc'",
-            query.toStatement(config).log
+            query.peek().log
         )
     }
 
@@ -104,7 +101,7 @@ internal class WhereTest {
         }
         assertEquals(
             "select t0_.ID, t0_.STREET, t0_.VERSION from ADDRESS t0_ where t0_.STREET like 'ab\\%c%'",
-            query.toStatement(config).log
+            query.peek().log
         )
     }
 
@@ -116,7 +113,7 @@ internal class WhereTest {
         }
         assertEquals(
             "select t0_.ID, t0_.STREET, t0_.VERSION from ADDRESS t0_ where t0_.STREET like '%ab\\%c%'",
-            query.toStatement(config).log
+            query.peek().log
         )
     }
 
@@ -128,7 +125,7 @@ internal class WhereTest {
         }
         assertEquals(
             "select t0_.ID, t0_.STREET, t0_.VERSION from ADDRESS t0_ where t0_.STREET like '%ab\\%c'",
-            query.toStatement(config).log
+            query.peek().log
         )
     }
 
@@ -140,7 +137,7 @@ internal class WhereTest {
         }
         assertEquals(
             "select t0_.ID, t0_.STREET, t0_.VERSION from ADDRESS t0_ where t0_.STREET not like '%abc'",
-            query.toStatement(config).log
+            query.peek().log
         )
     }
 
@@ -152,7 +149,7 @@ internal class WhereTest {
         }
         assertEquals(
             "select t0_.ID, t0_.STREET, t0_.VERSION from ADDRESS t0_ where t0_.ID between ? and ?",
-            query.toStatement(config).sql
+            query.peek().sql
         )
     }
 
@@ -164,7 +161,7 @@ internal class WhereTest {
         }
         assertEquals(
             "select t0_.ID, t0_.STREET, t0_.VERSION from ADDRESS t0_ where t0_.ID not between ? and ?",
-            query.toStatement(config).sql
+            query.peek().sql
         )
     }
 
@@ -176,7 +173,7 @@ internal class WhereTest {
         }
         assertEquals(
             "select t0_.ID, t0_.STREET, t0_.VERSION from ADDRESS t0_ where t0_.ID in (?, ?, ?)",
-            query.toStatement(config).sql
+            query.peek().sql
         )
     }
 
@@ -191,7 +188,7 @@ internal class WhereTest {
         }
         assertEquals(
             "select t0_.ID, t0_.STREET, t0_.VERSION from ADDRESS t0_ where t0_.ID in (select t1_.ID from EMP t1_)",
-            query.toStatement(config).sql
+            query.peek().sql
         )
     }
 
@@ -203,7 +200,7 @@ internal class WhereTest {
         }
         assertEquals(
             "select t0_.ID, t0_.STREET, t0_.VERSION from ADDRESS t0_ where t0_.ID not in (?, ?, ?)",
-            query.toStatement(config).sql
+            query.peek().sql
         )
     }
 
@@ -218,7 +215,7 @@ internal class WhereTest {
         }
         assertEquals(
             "select t0_.ID, t0_.STREET, t0_.VERSION from ADDRESS t0_ where exists (select t1_.ID from EMP t1_ where t0_.ID = t1_.ADDRESS_ID)",
-            query.toStatement(config).sql
+            query.peek().sql
         )
     }
 
@@ -235,7 +232,7 @@ internal class WhereTest {
         }
         assertEquals(
             "select t0_.ID, t0_.STREET, t0_.VERSION from ADDRESS t0_ where not exists (select t1_.ID from EMP t1_ where t0_.ID = t1_.ADDRESS_ID)",
-            query.toStatement(config).sql
+            query.peek().sql
         )
     }
 
@@ -251,7 +248,7 @@ internal class WhereTest {
         }
         assertEquals(
             "select t0_.ID, t0_.STREET, t0_.VERSION from ADDRESS t0_ where t0_.ID = ? and (t0_.STREET = ? and t0_.VERSION = ?)",
-            query.toStatement(config).sql
+            query.peek().sql
         )
     }
 
@@ -267,7 +264,7 @@ internal class WhereTest {
         }
         assertEquals(
             "select t0_.ID, t0_.STREET, t0_.VERSION from ADDRESS t0_ where t0_.ID = ? or (t0_.STREET = ? and t0_.VERSION = ?)",
-            query.toStatement(config).sql
+            query.peek().sql
         )
     }
 
@@ -283,7 +280,7 @@ internal class WhereTest {
         }
         assertEquals(
             "select t0_.ID, t0_.STREET, t0_.VERSION from ADDRESS t0_ where t0_.ID = ? and not (t0_.STREET = ? and t0_.VERSION = ?)",
-            query.toStatement(config).sql
+            query.peek().sql
         )
     }
 }

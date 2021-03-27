@@ -1,20 +1,20 @@
 package org.komapper.core.query.builder
 
-import org.komapper.core.DatabaseConfig
 import org.komapper.core.data.Statement
 import org.komapper.core.data.StatementBuffer
 import org.komapper.core.data.Value
+import org.komapper.core.jdbc.Dialect
 import org.komapper.core.metamodel.Assignment
 import org.komapper.core.metamodel.ColumnInfo
 import org.komapper.core.metamodel.TableInfo
 import org.komapper.core.query.context.EntityInsertContext
 
 internal class EntityInsertStatementBuilder<ENTITY>(
-    val config: DatabaseConfig,
+    val dialect: Dialect,
     val context: EntityInsertContext<ENTITY>,
     val entity: ENTITY
 ) {
-    private val buf = StatementBuffer(config.dialect::formatValue)
+    private val buf = StatementBuffer(dialect::formatValue)
 
     fun build(): Statement {
         val entityMetamodel = context.entityMetamodel
