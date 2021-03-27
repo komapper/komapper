@@ -5,6 +5,6 @@ import kotlin.reflect.KClass
 class PropertyDescriptor<E, T : Any>(
     val klass: KClass<T>,
     val columnName: String,
-    val get: (E) -> T?,
-    val set: (Pair<E, T>) -> E
+    val getter: (E) -> T?,
+    val setter: (E, T) -> E
 )

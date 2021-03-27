@@ -13,7 +13,7 @@ interface EntityMetamodel<ENTITY> : TableInfo {
     fun updateUpdatedAt(e: ENTITY, c: Clock): ENTITY
 }
 
-abstract class EmptyMetamodel<ENTITY> : EntityMetamodel<ENTITY> {
+abstract class EmptyEntityMetamodel<ENTITY> : EntityMetamodel<ENTITY> {
     override fun tableName(): String = error("error")
     override fun idAssignment(): Assignment<ENTITY>? = error("error")
     override fun idProperties(): List<PropertyMetamodel<ENTITY, *>> = error("error")

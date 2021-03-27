@@ -22,11 +22,11 @@ data class Address(
 @Suppress("ClassName")
 class Address_ : EntityMetamodel<Address> {
     private object EntityDescriptor {
-        val id = PropertyDescriptor<Address, Int>(Int::class, "ID", { it.id }) { (e, v) -> e.copy(id = v) }
+        val id = PropertyDescriptor<Address, Int>(Int::class, "ID", { it.id }) { e, v -> e.copy(id = v) }
         val street =
-            PropertyDescriptor<Address, String>(String::class, "STREET", { it.street }) { (e, v) -> e.copy(street = v) }
+            PropertyDescriptor<Address, String>(String::class, "STREET", { it.street }) { e, v -> e.copy(street = v) }
         val version =
-            PropertyDescriptor<Address, Int>(Int::class, "VERSION", { it.version }) { (e, v) -> e.copy(version = v) }
+            PropertyDescriptor<Address, Int>(Int::class, "VERSION", { it.version }) { e, v -> e.copy(version = v) }
     }
 
     val id by lazy { PropertyMetamodelImpl(this, EntityDescriptor.id) }
@@ -40,7 +40,7 @@ class Address_ : EntityMetamodel<Address> {
     override fun instantiate(m: Map<PropertyMetamodel<*, *>, Any?>) =
         Address(m[id] as Int, m[street] as String, m[version] as Int)
 
-    override fun incrementVersion(e: Address): Address = version.set(e to version.get(e)!!.inc())
+    override fun incrementVersion(e: Address): Address = version.setter(e, version.getter(e)!!.inc())
     override fun updateCreatedAt(e: Address, c: Clock): Address = e
     override fun updateUpdatedAt(e: Address, c: Clock): Address = e
 }

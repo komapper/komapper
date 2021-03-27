@@ -32,7 +32,7 @@ internal class EntityMetamodelGenerator(
             }
         }
         for (p in entity.properties) {
-            w.println("        val $p = PropertyDescriptor<$entityTypeName, ${p.typeName}>(${p.typeName}::class, \"${p.columnName}\", { it.$p }) { (e, v) -> e.copy($p = v) }")
+            w.println("        val $p = PropertyDescriptor<$entityTypeName, ${p.typeName}>(${p.typeName}::class, \"${p.columnName}\", { it.$p }) { e, v -> e.copy($p = v) }")
         }
         w.println("    }")
 
@@ -42,7 +42,7 @@ internal class EntityMetamodelGenerator(
         w.println("    override fun tableName() = \"${entity.tableName}\"")
         w.print("    override fun idAssignment(): Assignment<$entityTypeName>? = ")
         if (idGenerator != null) {
-            w.println("EntityDescriptor.${idGenerator.property}__generator.createAssignment(${idGenerator.property}.set)")
+            w.println("EntityDescriptor.${idGenerator.property}__generator.createAssignment(${idGenerator.property}.setter)")
         } else {
             w.println("null")
         }
@@ -59,19 +59,19 @@ internal class EntityMetamodelGenerator(
         val incrementVersionBody = if (entity.versionProperty == null) {
             "e"
         } else {
-            "${entity.versionProperty}.set(e to ${entity.versionProperty}.get(e)!!.inc())"
+            "${entity.versionProperty}.setter(e, ${entity.versionProperty}.getter(e)!!.inc())"
         }
         w.println("    override fun incrementVersion(e: $entityTypeName): $entityTypeName = $incrementVersionBody")
         val setCreationClockBody = if (entity.createdAtProperty == null) {
             "e"
         } else {
-            "${entity.createdAtProperty}.set(e to java.time.LocalDateTime.now(c))"
+            "${entity.createdAtProperty}.setter(e, java.time.LocalDateTime.now(c))"
         }
         w.println("    override fun updateCreatedAt(e: $entityTypeName, c: Clock): $entityTypeName = $setCreationClockBody")
         val setUpdateClockBody = if (entity.updatedAtProperty == null) {
             "e"
         } else {
-            "${entity.updatedAtProperty}.set(e to java.time.LocalDateTime.now(c))"
+            "${entity.updatedAtProperty}.setter(e, java.time.LocalDateTime.now(c))"
         }
         w.println("    override fun updateUpdatedAt(e: $entityTypeName, c: Clock): $entityTypeName = $setUpdateClockBody")
         w.println("}")

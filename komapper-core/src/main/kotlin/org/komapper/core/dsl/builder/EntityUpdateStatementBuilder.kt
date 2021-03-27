@@ -27,7 +27,7 @@ internal class EntityUpdateStatementBuilder<ENTITY>(
         for (p in properties - identityProperties) {
             buf.append(columnName(p))
             buf.append(" = ")
-            val value = Value(p.get(entity), p.klass)
+            val value = Value(p.getter(entity), p.klass)
             buf.bind(value)
             if (p === versionProperty) {
                 buf.append(" + 1")
@@ -41,7 +41,7 @@ internal class EntityUpdateStatementBuilder<ENTITY>(
                 for (p in identityProperties) {
                     buf.append(columnName(p))
                     buf.append(" = ")
-                    val value = Value(p.get(entity), p.klass)
+                    val value = Value(p.getter(entity), p.klass)
                     buf.bind(value)
                     buf.append(" and ")
                 }
@@ -52,7 +52,7 @@ internal class EntityUpdateStatementBuilder<ENTITY>(
             if (versionProperty != null) {
                 buf.append(columnName(versionProperty))
                 buf.append(" = ")
-                val value = Value(versionProperty.get(entity), versionProperty.klass)
+                val value = Value(versionProperty.getter(entity), versionProperty.klass)
                 buf.bind(value)
             }
         }

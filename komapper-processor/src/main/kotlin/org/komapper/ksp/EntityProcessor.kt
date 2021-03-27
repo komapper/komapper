@@ -54,7 +54,7 @@ class EntityProcessor : SymbolProcessor {
                             entity, packageName, entityTypeName, simpleName, it
                         )
                     } else {
-                        EmptyMetamodelGenerator(
+                        EmptyEntityMetamodelGenerator(
                             declaration, packageName, entityTypeName, simpleName, it
                         )
                     }

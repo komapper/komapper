@@ -3,7 +3,7 @@ package org.komapper.ksp
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import java.io.PrintWriter
 
-internal class EmptyMetamodelGenerator(
+internal class EmptyEntityMetamodelGenerator(
     private val classDeclaration: KSClassDeclaration,
     private val packageName: String,
     private val simpleQualifiedName: String,
@@ -16,7 +16,7 @@ internal class EmptyMetamodelGenerator(
         w.println("import org.komapper.core.metamodel.*")
         w.println()
         w.println("@Suppress(\"ClassName\")")
-        w.println("class $fileName : EmptyMetamodel<$simpleQualifiedName>() {")
+        w.println("class $fileName : EmptyEntityMetamodel<$simpleQualifiedName>() {")
         val parameters = classDeclaration.primaryConstructor?.parameters
         if (parameters != null) {
             for (p in parameters) {

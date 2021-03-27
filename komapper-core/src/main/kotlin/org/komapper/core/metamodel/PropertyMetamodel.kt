@@ -4,9 +4,9 @@ import kotlin.reflect.KClass
 
 interface PropertyMetamodel<E, T : Any> : ColumnInfo<T> {
     val owner: EntityMetamodel<E>
-    val get: (E) -> T?
-    val getWithUncheckedCast: (Any) -> T?
-    val set: (Pair<E, T>) -> E
+    val getter: (E) -> T?
+    val getterWithUncheckedCast: (Any) -> T?
+    val setter: (E, T) -> E
 }
 
 class PropertyMetamodelImpl<E, T : Any>(
@@ -15,20 +15,20 @@ class PropertyMetamodelImpl<E, T : Any>(
 ) : PropertyMetamodel<E, T> {
     override val klass: KClass<T> get() = descriptor.klass
     override val columnName: String get() = descriptor.columnName
-    override val get: (E) -> T? get() = descriptor.get
-    override val getWithUncheckedCast: (Any) -> T?
+    override val getter: (E) -> T? get() = descriptor.getter
+    override val getterWithUncheckedCast: (Any) -> T?
         get() = {
             @Suppress("UNCHECKED_CAST")
-            descriptor.get(it as E)
+            descriptor.getter(it as E)
         }
-    override val set: (Pair<E, T>) -> E get() = descriptor.set
+    override val setter: (E, T) -> E get() = descriptor.setter
 }
 
 class EmptyPropertyMetamodel<E, T : Any> : PropertyMetamodel<E, T> {
     override val owner: EntityMetamodel<E> get() = error("error")
     override val klass: KClass<T> get() = error("error")
     override val columnName: String get() = error("error")
-    override val get: (E) -> T? get() = error("error")
-    override val getWithUncheckedCast: (Any) -> T? get() = error("error")
-    override val set: (Pair<E, T>) -> E get() = error("error")
+    override val getter: (E) -> T? get() = error("error")
+    override val getterWithUncheckedCast: (Any) -> T? get() = error("error")
+    override val setter: (E, T) -> E get() = error("error")
 }

@@ -22,11 +22,11 @@ data class Emp(
 @Suppress("ClassName")
 class Emp_ : EntityMetamodel<Emp> {
     private object EntityDescriptor {
-        val id = PropertyDescriptor<Emp, Int>(Int::class, "ID", { it.id }) { (e, v) -> e.copy(id = v) }
+        val id = PropertyDescriptor<Emp, Int>(Int::class, "ID", { it.id }) { e, v -> e.copy(id = v) }
         val addressId =
-            PropertyDescriptor<Emp, Int>(Int::class, "ADDRESS_ID", { it.addressId }) { (e, v) -> e.copy(addressId = v) }
+            PropertyDescriptor<Emp, Int>(Int::class, "ADDRESS_ID", { it.addressId }) { e, v -> e.copy(addressId = v) }
         val version =
-            PropertyDescriptor<Emp, Int>(Int::class, "VERSION", { it.version }) { (e, v) -> e.copy(version = v) }
+            PropertyDescriptor<Emp, Int>(Int::class, "VERSION", { it.version }) { e, v -> e.copy(version = v) }
     }
 
     val id by lazy { PropertyMetamodelImpl(this, EntityDescriptor.id) }
@@ -40,7 +40,7 @@ class Emp_ : EntityMetamodel<Emp> {
     override fun instantiate(m: Map<PropertyMetamodel<*, *>, Any?>) =
         Emp(m[id] as Int, m[addressId] as Int, m[version] as Int)
 
-    override fun incrementVersion(e: Emp): Emp = version.set(e to version.get(e)!!.inc())
+    override fun incrementVersion(e: Emp): Emp = version.setter(e, version.getter(e)!!.inc())
     override fun updateCreatedAt(e: Emp, c: Clock): Emp = e
     override fun updateUpdatedAt(e: Emp, c: Clock): Emp = e
 }

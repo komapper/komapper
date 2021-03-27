@@ -28,7 +28,7 @@ internal class EntityDeleteStatementBuilder<ENTITY>(
                 for (p in identityProperties) {
                     buf.append(columnName(p))
                     buf.append(" = ")
-                    val value = Value(p.get(entity), p.klass)
+                    val value = Value(p.getter(entity), p.klass)
                     buf.bind(value)
                     buf.append(" and ")
                 }
@@ -36,7 +36,7 @@ internal class EntityDeleteStatementBuilder<ENTITY>(
             if (versionProperty != null) {
                 buf.append(columnName(versionProperty))
                 buf.append(" = ")
-                val value = Value(versionProperty.get(entity), versionProperty.klass)
+                val value = Value(versionProperty.getter(entity), versionProperty.klass)
                 buf.bind(value)
             }
         }

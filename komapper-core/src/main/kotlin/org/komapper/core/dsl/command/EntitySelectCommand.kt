@@ -57,7 +57,7 @@ internal class EntitySelectCommand<ENTITY, R>(
                 }
                 val entity = checkNotNull(entityMetamodel.instantiate(valueMap))
                 val idValues = entityMetamodel.idProperties()
-                    .map { it.getWithUncheckedCast(entity) }
+                    .map { it.getterWithUncheckedCast(entity) }
                     .map { checkNotNull(it) }
                 val key = EntityKey(entityMetamodel, idValues)
                 row[key] = entity

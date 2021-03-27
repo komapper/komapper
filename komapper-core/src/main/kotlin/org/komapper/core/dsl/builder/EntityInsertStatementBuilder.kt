@@ -34,7 +34,7 @@ internal class EntityInsertStatementBuilder<ENTITY>(
             ) {
                 Value(null, p.klass)
             } else {
-                Value(p.get(entity), p.klass)
+                Value(p.getter(entity), p.klass)
             }
             buf.bind(value)
             buf.append(", ")

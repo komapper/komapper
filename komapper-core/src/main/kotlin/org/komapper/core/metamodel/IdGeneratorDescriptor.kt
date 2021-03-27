@@ -6,7 +6,7 @@ import kotlin.concurrent.withLock
 import kotlin.reflect.KClass
 
 interface IdGeneratorDescriptor<E, T> {
-    fun createAssignment(setter: (Pair<E, T>) -> E): Assignment<E>
+    fun createAssignment(setter: (E, T) -> E): Assignment<E>
 }
 
 class IdentityGeneratorDescriptor<E, T : Any>(
@@ -18,7 +18,7 @@ class IdentityGeneratorDescriptor<E, T : Any>(
         return value.convert(klass)
     }
 
-    override fun createAssignment(setter: (Pair<E, T>) -> E): Assignment<E> {
+    override fun createAssignment(setter: (E, T) -> E): Assignment<E> {
         return Assignment.Identity(this::generate, setter)
     }
 }
@@ -39,7 +39,7 @@ class SequenceGeneratorDescriptor<E, T : Any>(
         return value.convert(klass)
     }
 
-    override fun createAssignment(setter: (Pair<E, T>) -> E): Assignment<E> {
+    override fun createAssignment(setter: (E, T) -> E): Assignment<E> {
         return Assignment.Sequence(name, this::generate, setter)
     }
 
@@ -70,24 +70,24 @@ fun interface NextValue {
 sealed class Assignment<E> {
     class Identity<E, T>(
         private val generator: (NextValue) -> T,
-        private val setter: (Pair<E, T>) -> E
+        private val setter: (E, T) -> E
     ) :
         Assignment<E>() {
         fun assign(entity: E, nextValue: NextValue): E {
             val value = generator(nextValue)
-            return setter(entity to value)
+            return setter(entity, value)
         }
     }
 
     class Sequence<E, T>(
         val name: String,
         private val generator: (key: String, NextValue) -> T,
-        private val setter: (Pair<E, T>) -> E
+        private val setter: (E, T) -> E
     ) :
         Assignment<E>() {
         fun assign(entity: E, key: String, nextValue: NextValue): E {
             val value = generator(key, nextValue)
-            return setter(entity to value)
+            return setter(entity, value)
         }
     }
 }
