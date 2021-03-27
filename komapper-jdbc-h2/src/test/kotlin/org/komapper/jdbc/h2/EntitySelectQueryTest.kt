@@ -8,9 +8,9 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.Database
 import org.komapper.core.EntityQuery
 import org.komapper.core.Subquery
-import org.komapper.core.query.desc
-import org.komapper.core.query.scope.WhereDeclaration
-import org.komapper.core.query.scope.WhereScope.Companion.plus
+import org.komapper.core.dsl.query.desc
+import org.komapper.core.dsl.scope.WhereDeclaration
+import org.komapper.core.dsl.scope.WhereScope.Companion.plus
 
 @ExtendWith(Env::class)
 class EntitySelectQueryTest(private val db: Database) {

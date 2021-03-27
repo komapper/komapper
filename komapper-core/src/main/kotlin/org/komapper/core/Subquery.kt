@@ -1,8 +1,8 @@
 package org.komapper.core
 
+import org.komapper.core.dsl.query.SelectSubquery
+import org.komapper.core.dsl.query.SelectSubqueryImpl
 import org.komapper.core.metamodel.EntityMetamodel
-import org.komapper.core.query.SelectSubquery
-import org.komapper.core.query.SelectSubqueryImpl
 
 object Subquery {
 

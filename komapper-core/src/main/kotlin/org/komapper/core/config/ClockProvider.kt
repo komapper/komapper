@@ -8,8 +8,8 @@ fun interface ClockProvider {
     fun now(): Clock
 }
 
-class DefaultClockProvider : ClockProvider {
+class DefaultClockProvider(val zoneId: ZoneId = ZoneId.systemDefault()) : ClockProvider {
     override fun now(): Clock {
-        return Clock.fixed(Instant.now(), ZoneId.systemDefault())
+        return Clock.fixed(Instant.now(), zoneId)
     }
 }

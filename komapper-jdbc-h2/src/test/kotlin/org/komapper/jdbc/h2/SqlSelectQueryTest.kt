@@ -7,12 +7,12 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.Database
 import org.komapper.core.SqlQuery
-import org.komapper.core.query.avg
-import org.komapper.core.query.count
-import org.komapper.core.query.desc
-import org.komapper.core.query.max
-import org.komapper.core.query.min
-import org.komapper.core.query.sum
+import org.komapper.core.dsl.query.avg
+import org.komapper.core.dsl.query.count
+import org.komapper.core.dsl.query.desc
+import org.komapper.core.dsl.query.max
+import org.komapper.core.dsl.query.min
+import org.komapper.core.dsl.query.sum
 
 @ExtendWith(Env::class)
 class SqlSelectQueryTest(private val db: Database) {

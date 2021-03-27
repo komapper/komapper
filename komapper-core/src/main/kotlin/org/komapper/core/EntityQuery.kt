@@ -1,12 +1,12 @@
 package org.komapper.core
 
+import org.komapper.core.dsl.query.EntityDeleteQuery
+import org.komapper.core.dsl.query.EntityInsertQuery
+import org.komapper.core.dsl.query.EntitySelectQuery
+import org.komapper.core.dsl.query.EntitySelectQueryImpl
+import org.komapper.core.dsl.query.EntityUpdateQuery
+import org.komapper.core.dsl.query.Query
 import org.komapper.core.metamodel.EntityMetamodel
-import org.komapper.core.query.EntityDeleteQuery
-import org.komapper.core.query.EntityInsertQuery
-import org.komapper.core.query.EntitySelectQuery
-import org.komapper.core.query.EntitySelectQueryImpl
-import org.komapper.core.query.EntityUpdateQuery
-import org.komapper.core.query.Query
 
 object EntityQuery {
 

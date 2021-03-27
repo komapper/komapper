@@ -1,8 +1,8 @@
 package org.komapper.core
 
+import org.komapper.core.dsl.query.Query
+import org.komapper.core.dsl.scope.WhereDeclaration
 import org.komapper.core.metamodel.EntityMetamodel
-import org.komapper.core.query.Query
-import org.komapper.core.query.scope.WhereDeclaration
 import java.sql.Blob
 import java.sql.Clob
 import java.sql.NClob
@@ -17,7 +17,7 @@ import java.sql.SQLXML
 class Database(val config: DatabaseConfig) {
 
     /**
-     * A transaction scope initiator.
+     * An interface for transaction scope.
      */
     val transaction get() = config.session.getUserTransaction()
 

@@ -1,10 +1,10 @@
 package org.komapper.core
 
-import org.komapper.core.query.ListQuery
-import org.komapper.core.query.Query
-import org.komapper.core.query.Row
-import org.komapper.core.query.TemplateSelectQuery
-import org.komapper.core.query.TemplateUpdateQuery
+import org.komapper.core.dsl.query.ListQuery
+import org.komapper.core.dsl.query.Query
+import org.komapper.core.dsl.query.Row
+import org.komapper.core.dsl.query.TemplateSelectQuery
+import org.komapper.core.dsl.query.TemplateUpdateQuery
 
 object TemplateQuery {
 
