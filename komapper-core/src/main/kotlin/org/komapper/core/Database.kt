@@ -14,7 +14,7 @@ import java.sql.SQLXML
  * @property config the database configuration
  * @constructor creates a database instance
  */
-class Database(val config: DefaultDatabaseConfig) {
+class Database(val config: DatabaseConfig) {
 
     /**
      * A transaction scope initiator.
@@ -67,7 +67,7 @@ class Database(val config: DefaultDatabaseConfig) {
         return query.run(config)
     }
 
-    class Factory(val config: DefaultDatabaseConfig) {
+    class Factory(val config: DatabaseConfig) {
         /**
          * Creates Array objects.
          *

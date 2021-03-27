@@ -6,10 +6,17 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.Database
+import org.komapper.core.DatabaseConfig
 import org.komapper.core.UniqueConstraintException
+import org.komapper.core.time.ClockProvider
+import java.time.Clock
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneId
 
 @ExtendWith(Env::class)
 class EntityInsertQueryTest(private val db: Database) {
+
     @Test
     fun test() {
         val a = Address.metamodel()
@@ -26,8 +33,31 @@ class EntityInsertQueryTest(private val db: Database) {
         val person2 = db.insert(p, person1)
         assertNotNull(person2.createdAt)
         assertNotNull(person2.updatedAt)
+        assertEquals(person2.createdAt, person2.updatedAt)
         val person3 = db.find(p) { p.personId to 1 }
         assertEquals(person2, person3)
+    }
+
+    @Test
+    fun createdAt_customize() {
+        val instant = Instant.parse("2021-01-01T00:00:00Z")
+        val zoneId = ZoneId.of("UTC")
+
+        val p = Person.metamodel()
+        val config = object : DatabaseConfig by db.config {
+            override val clockProvider = ClockProvider {
+                Clock.fixed(instant, zoneId)
+            }
+        }
+        val myDb = Database(config)
+        val person1 = Person(1, "ABC")
+        val person2 = myDb.insert(p, person1)
+        val person3 = db.find(p) { p.personId to 1 }
+        assertNotNull(person2.createdAt)
+        assertNotNull(person2.updatedAt)
+        assertEquals(person2.createdAt, person2.updatedAt)
+        assertEquals(person3, person2)
+        assertEquals(LocalDateTime.ofInstant(instant, zoneId), person2.createdAt)
     }
 
     /*

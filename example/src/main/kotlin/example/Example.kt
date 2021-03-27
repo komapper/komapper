@@ -1,27 +1,30 @@
 package example
 
-import org.intellij.lang.annotations.Language
 import org.komapper.core.Database
 import org.komapper.core.EntityQuery
 import org.komapper.core.KmColumn
+import org.komapper.core.KmCreatedAt
 import org.komapper.core.KmEntity
 import org.komapper.core.KmId
 import org.komapper.core.KmIdentityGenerator
+import org.komapper.core.KmUpdatedAt
 import org.komapper.core.KmVersion
 import org.komapper.core.TemplateQuery
 import org.komapper.jdbc.h2.H2DatabaseConfig
+import java.time.LocalDateTime
 
 @KmEntity
 data class Address(
-    @KmId
-    @KmIdentityGenerator
-    @KmColumn(name = "ADDRESS_ID")
+    @KmId @KmIdentityGenerator @KmColumn(name = "ADDRESS_ID")
     val id: Int = 0,
     val street: String,
-    @KmVersion val version: Int = 0
-) {
-    companion object
-}
+    @KmVersion
+    val version: Int = 0,
+    @KmCreatedAt @KmColumn("CREATED_AT")
+    val createdAt: LocalDateTime? = null,
+    @KmUpdatedAt @KmColumn("UPDATED_AT")
+    val updatedAt: LocalDateTime? = null,
+)
 
 fun main() {
     // create a Database instance
@@ -29,19 +32,20 @@ fun main() {
 
     // set up schema
     db.transaction {
-        @Language("sql")
         val sql = """
             CREATE TABLE ADDRESS(
                 ADDRESS_ID INTEGER NOT NULL PRIMARY KEY AUTO_INCREMENT,
                 STREET VARCHAR(20) UNIQUE,
-                VERSION INTEGER
+                VERSION INTEGER,
+                CREATED_AT TIMESTAMP,
+                UPDATED_AT TIMESTAMP
             );
         """.trimIndent()
         db.script(sql)
     }
 
     // create a metamodel
-    val a = Address.metamodel()
+    val a = Address_()
 
     // execute simple CRUD operations as a transaction
     db.transaction {
@@ -70,10 +74,22 @@ fun main() {
         val foundB2 = db.execute {
             data class Params(val street: String)
 
-            @Language("sql")
-            val sql = "select ADDRESS_ID, STREET, VERSION from Address where street = /*street*/'test'"
+            val sql = """
+                select
+                    ADDRESS_ID, STREET, VERSION, CREATED_AT, UPDATED_AT
+                from
+                    Address
+                where
+                    street = /*street*/'test'
+            """.trimIndent()
             TemplateQuery.select(sql, Params("street B")) {
-                Address(asInt("ADDRESS_ID"), asString("STREET"), asInt("VERSION"))
+                Address(
+                    asInt("ADDRESS_ID"),
+                    asString("STREET"),
+                    asInt("VERSION"),
+                    asLocalDateTime("CREATED_AT"),
+                    asLocalDateTime("UPDATED_AT")
+                )
             }.first()
         }
         check(addressB == foundB2)
@@ -82,7 +98,9 @@ fun main() {
         db.delete(a, addressB)
 
         // READ: select all
-        val addressList = db.execute(EntityQuery.from(a).orderBy(a.id))
+        val addressList = db.execute {
+            EntityQuery.from(a).orderBy(a.id)
+        }
         check(addressList.isEmpty())
     }
 }

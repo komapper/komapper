@@ -4,6 +4,8 @@ import org.komapper.core.jdbc.Dialect
 import org.komapper.core.jdbc.SimpleDataSource
 import org.komapper.core.logging.Logger
 import org.komapper.core.logging.StdoutLogger
+import org.komapper.core.time.ClockProvider
+import org.komapper.core.time.DefaultClockProvider
 import org.komapper.core.tx.TransactionIsolationLevel
 import org.komapper.core.tx.TransactionManager
 import org.komapper.core.tx.TransactionScopeInitiator
@@ -29,6 +31,7 @@ interface DatabaseConfig {
     val dataSource: DataSource
     val name: String
     val logger: Logger
+    val clockProvider: ClockProvider
     val isolationLevel: TransactionIsolationLevel?
     val batchSize: Int
     val fetchSize: Int?
@@ -50,6 +53,7 @@ open class DefaultDatabaseConfig(override val dialect: Dialect, override val dat
 
     override val name: String = System.identityHashCode(object {}).toString()
     override val logger: Logger by lazy { StdoutLogger() }
+    override val clockProvider = DefaultClockProvider()
     override val isolationLevel: TransactionIsolationLevel? = null
     override val batchSize: Int = 10
     override val fetchSize: Int? = null

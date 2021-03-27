@@ -7,9 +7,6 @@ import org.komapper.core.jdbc.JdbcExecutor
 import org.komapper.core.metamodel.Assignment
 import org.komapper.core.metamodel.EntityMetamodel
 import java.sql.PreparedStatement
-import java.time.Clock
-import java.time.Instant
-import java.time.ZoneId
 
 internal class EntityInsertCommand<ENTITY>(
     @Suppress("unused") private val entityMetamodel: EntityMetamodel<ENTITY>,
@@ -50,8 +47,7 @@ internal class EntityInsertCommand<ENTITY>(
         } else {
             entity
         }.let { newEntity ->
-            // TODO
-            val clock = Clock.fixed(Instant.now(), ZoneId.systemDefault())
+            val clock = config.clockProvider.now()
             entityMetamodel.updateCreatedAt(newEntity, clock).let {
                 entityMetamodel.updateUpdatedAt(it, clock)
             }

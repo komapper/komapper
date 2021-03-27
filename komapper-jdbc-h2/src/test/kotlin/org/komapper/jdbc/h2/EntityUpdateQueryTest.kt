@@ -7,9 +7,15 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.Database
+import org.komapper.core.DatabaseConfig
 import org.komapper.core.EntityQuery
 import org.komapper.core.OptimisticLockException
 import org.komapper.core.UniqueConstraintException
+import org.komapper.core.time.ClockProvider
+import java.time.Clock
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneId
 
 @ExtendWith(Env::class)
 class EntityUpdateQueryTest(private val db: Database) {
@@ -45,6 +51,27 @@ class EntityUpdateQueryTest(private val db: Database) {
         assertNotNull(person4.updatedAt)
         assertNotEquals(person2.updatedAt, person4.updatedAt)
         assertEquals(person3.updatedAt, person4.updatedAt)
+    }
+
+    @Test
+    fun updatedAt_customize() {
+        val instant = Instant.parse("2021-01-01T00:00:00Z")
+        val zoneId = ZoneId.of("UTC")
+
+        val p = Person.metamodel()
+        val person1 = Person(1, "ABC")
+        db.insert(p, person1)
+        val person2 = db.find(p) { p.personId eq 1 }
+        val config = object : DatabaseConfig by db.config {
+            override val clockProvider = ClockProvider {
+                Clock.fixed(instant, zoneId)
+            }
+        }
+        val myDb = Database(config)
+        val person3 = myDb.update(p, person2.copy(name = "DEF"))
+        val person4 = db.find(p) { p.personId eq 1 }
+        assertEquals(person3.updatedAt, person4.updatedAt)
+        assertEquals(LocalDateTime.ofInstant(instant, zoneId), person4.updatedAt)
     }
 
     /*

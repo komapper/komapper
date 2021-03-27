@@ -6,9 +6,6 @@ import org.komapper.core.data.Statement
 import org.komapper.core.jdbc.Dialect
 import org.komapper.core.jdbc.JdbcExecutor
 import org.komapper.core.metamodel.EntityMetamodel
-import java.time.Clock
-import java.time.Instant
-import java.time.ZoneId
 
 internal class EntityUpdateCommand<ENTITY>(
     private val entityMetamodel: EntityMetamodel<ENTITY>,
@@ -20,7 +17,7 @@ internal class EntityUpdateCommand<ENTITY>(
     private val executor: JdbcExecutor = JdbcExecutor(config)
 
     override fun execute(): ENTITY {
-        val clock = Clock.fixed(Instant.now(), ZoneId.systemDefault())
+        val clock = config.clockProvider.now()
         val newEntity = entityMetamodel.updateUpdatedAt(entity, clock)
         val statement = statementBuilder(config.dialect, newEntity)
         return executor.executeUpdate(statement) { _, count ->
