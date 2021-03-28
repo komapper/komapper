@@ -19,14 +19,14 @@ internal class EntityDeleteStatementBuilder<ENTITY>(
 
     fun build(): Statement {
         buf.append("delete from ")
-        buf.append(tableName(context.entityMetamodel))
+        visitTableInfo(context.entityMetamodel)
         val identityProperties = context.entityMetamodel.idProperties()
         val versionProperty = context.entityMetamodel.versionProperty()
         if (identityProperties.isNotEmpty() || versionProperty != null) {
             buf.append(" where ")
             if (identityProperties.isNotEmpty()) {
                 for (p in identityProperties) {
-                    buf.append(columnName(p))
+                    visitColumnInfo(p)
                     buf.append(" = ")
                     val value = Value(p.getter(entity), p.klass)
                     buf.bind(value)
@@ -34,7 +34,7 @@ internal class EntityDeleteStatementBuilder<ENTITY>(
                 }
             }
             if (versionProperty != null) {
-                buf.append(columnName(versionProperty))
+                visitColumnInfo(versionProperty)
                 buf.append(" = ")
                 val value = Value(versionProperty.getter(entity), versionProperty.klass)
                 buf.bind(value)
@@ -43,11 +43,11 @@ internal class EntityDeleteStatementBuilder<ENTITY>(
         return buf.toStatement()
     }
 
-    private fun tableName(tableInfo: TableInfo): String {
-        return support.aliasTableName(tableInfo)
+    private fun visitTableInfo(tableInfo: TableInfo) {
+        support.visitTableInfo(tableInfo)
     }
 
-    private fun columnName(columnInfo: ColumnInfo<*>): String {
-        return support.aliasColumnName(columnInfo)
+    private fun visitColumnInfo(columnInfo: ColumnInfo<*>) {
+        support.visitColumnInfo(columnInfo)
     }
 }

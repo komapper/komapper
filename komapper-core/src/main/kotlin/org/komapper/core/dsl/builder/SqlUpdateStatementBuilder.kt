@@ -18,7 +18,7 @@ internal class SqlUpdateStatementBuilder<ENTITY>(
 
     fun build(): Statement {
         buf.append("update ")
-        buf.append(tableName(context.entityMetamodel))
+        visitTableInfo(context.entityMetamodel)
         buf.append(" set ")
         for ((left, right) in context.set) {
             visitOperand(left)
@@ -38,8 +38,8 @@ internal class SqlUpdateStatementBuilder<ENTITY>(
         return buf.toStatement()
     }
 
-    private fun tableName(tableInfo: TableInfo): String {
-        return support.aliasTableName(tableInfo)
+    private fun visitTableInfo(tableInfo: TableInfo) {
+        support.visitTableInfo(tableInfo)
     }
 
     private fun visitCriterion(index: Int, c: Criterion) {

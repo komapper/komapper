@@ -22,10 +22,10 @@ internal class EntityUpdateStatementBuilder<ENTITY>(
         val versionProperty = context.entityMetamodel.versionProperty()
         val properties = context.entityMetamodel.properties()
         buf.append("update ")
-        buf.append(tableName(context.entityMetamodel))
+        visitTableInfo(context.entityMetamodel)
         buf.append(" set ")
         for (p in properties - identityProperties) {
-            buf.append(columnName(p))
+            visitColumnInfo(p)
             buf.append(" = ")
             val value = Value(p.getter(entity), p.klass)
             buf.bind(value)
@@ -39,7 +39,7 @@ internal class EntityUpdateStatementBuilder<ENTITY>(
             buf.append(" where ")
             if (identityProperties.isNotEmpty()) {
                 for (p in identityProperties) {
-                    buf.append(columnName(p))
+                    visitColumnInfo(p)
                     buf.append(" = ")
                     val value = Value(p.getter(entity), p.klass)
                     buf.bind(value)
@@ -50,7 +50,7 @@ internal class EntityUpdateStatementBuilder<ENTITY>(
                 }
             }
             if (versionProperty != null) {
-                buf.append(columnName(versionProperty))
+                visitColumnInfo(versionProperty)
                 buf.append(" = ")
                 val value = Value(versionProperty.getter(entity), versionProperty.klass)
                 buf.bind(value)
@@ -59,11 +59,11 @@ internal class EntityUpdateStatementBuilder<ENTITY>(
         return buf.toStatement()
     }
 
-    private fun tableName(tableInfo: TableInfo): String {
-        return support.aliasTableName(tableInfo)
+    private fun visitTableInfo(tableInfo: TableInfo) {
+        support.visitTableInfo(tableInfo)
     }
 
-    private fun columnName(columnInfo: ColumnInfo<*>): String {
-        return support.aliasColumnName(columnInfo)
+    private fun visitColumnInfo(columnInfo: ColumnInfo<*>) {
+        support.visitColumnInfo(columnInfo)
     }
 }

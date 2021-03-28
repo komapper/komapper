@@ -17,7 +17,7 @@ internal class SqlDeleteStatementBuilder<ENTITY>(
 
     fun build(): Statement {
         buf.append("delete from ")
-        buf.append(tableName(context.entityMetamodel))
+        visitTableInfo(context.entityMetamodel)
         if (context.where.isNotEmpty()) {
             buf.append(" where ")
             for ((index, criterion) in context.where.withIndex()) {
@@ -29,8 +29,8 @@ internal class SqlDeleteStatementBuilder<ENTITY>(
         return buf.toStatement()
     }
 
-    private fun tableName(tableInfo: TableInfo): String {
-        return support.aliasTableName(tableInfo)
+    private fun visitTableInfo(tableInfo: TableInfo) {
+        support.visitTableInfo(tableInfo)
     }
 
     private fun visitCriterion(index: Int, c: Criterion) {

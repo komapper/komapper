@@ -20,12 +20,20 @@ internal class SelectStatementBuilderSupport<ENTITY>(
     fun selectClause() {
         buf.append("select ")
         val columns = context.getProjectionColumns()
-        columns.joinTo(buf) { columnName(it) }
+        if (columns.isEmpty()) {
+            buf.append("*")
+        } else {
+            for (c in context.getProjectionColumns()) {
+                visitColumnInfo(c)
+                buf.append(", ")
+            }
+            buf.cutBack(2)
+        }
     }
 
     fun fromClause() {
         buf.append(" from ")
-        buf.append(tableName(context.entityMetamodel))
+        visitTableInfo(context.entityMetamodel)
         if (context.joins.isNotEmpty()) {
             for (join in context.joins) {
                 if (join.kind === JoinKind.INNER) {
@@ -33,7 +41,7 @@ internal class SelectStatementBuilderSupport<ENTITY>(
                 } else if (join.kind === JoinKind.LEFT_OUTER) {
                     buf.append(" left outer join ")
                 }
-                buf.append(tableName(join.entityMetamodel))
+                visitTableInfo(join.entityMetamodel)
                 if (join.on.isNotEmpty()) {
                     buf.append(" on (")
                     for ((index, criterion) in join.on.withIndex()) {
@@ -67,7 +75,7 @@ internal class SelectStatementBuilderSupport<ENTITY>(
                     is SortItem.Desc<*> -> item.columnInfo to "desc"
                     else -> item to null
                 }
-                buf.append(columnName(columnInfo))
+                visitColumnInfo(columnInfo)
                 if (sort != null) {
                     buf.append(" $sort")
                 }
@@ -96,12 +104,12 @@ internal class SelectStatementBuilderSupport<ENTITY>(
         }
     }
 
-    fun tableName(tableInfo: TableInfo): String {
-        return support.aliasTableName(tableInfo)
+    fun visitTableInfo(tableInfo: TableInfo) {
+        support.visitTableInfo(tableInfo)
     }
 
-    fun columnName(columnInfo: ColumnInfo<*>): String {
-        return support.aliasColumnName(columnInfo)
+    fun visitColumnInfo(columnInfo: ColumnInfo<*>) {
+        support.visitColumnInfo(columnInfo)
     }
 
     fun visitCriterion(index: Int, c: Criterion) {

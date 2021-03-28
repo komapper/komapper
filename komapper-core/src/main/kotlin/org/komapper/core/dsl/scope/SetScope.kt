@@ -24,4 +24,10 @@ class SetScope internal constructor(
         val right = Operand.Parameter(this, value)
         context.add(left to right)
     }
+
+    infix fun <T : Any> ColumnInfo<T>.set(operand: ColumnInfo<T>) {
+        val left = Operand.Column(this)
+        val right = Operand.Column(operand)
+        context.add(left to right)
+    }
 }

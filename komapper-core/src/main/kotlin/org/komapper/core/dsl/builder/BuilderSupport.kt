@@ -6,8 +6,10 @@ import org.komapper.core.data.Value
 import org.komapper.core.dsl.context.SqlSelectContext
 import org.komapper.core.dsl.data.Criterion
 import org.komapper.core.dsl.data.Operand
+import org.komapper.core.dsl.expr.AggregateFunction
+import org.komapper.core.dsl.expr.ArithmeticExpr
+import org.komapper.core.dsl.expr.StringFunction
 import org.komapper.core.dsl.option.LikeOption
-import org.komapper.core.dsl.query.AggregateFunction
 import org.komapper.core.dsl.util.getName
 import org.komapper.core.metamodel.ColumnInfo
 import org.komapper.core.metamodel.TableInfo
@@ -18,42 +20,109 @@ internal class BuilderSupport(
     private val buf: StatementBuffer
 ) {
 
-    fun aliasTableName(tableInfo: TableInfo): String {
+    fun visitTableInfo(tableInfo: TableInfo) {
         val name = tableInfo.getName(dialect::quote)
         val alias = aliasManager.getAlias(tableInfo) ?: error("no alias for '${tableInfo.tableName()}'")
-        return "$name $alias"
+        buf.append("$name $alias")
     }
 
-    fun aliasColumnName(columnInfo: ColumnInfo<*>): String {
-        return when (columnInfo) {
-            is AggregateFunction.Avg -> {
-                val name = aliasColumnName(columnInfo.c)
-                "avg($name)"
+    fun visitColumnInfo(columnInfo: ColumnInfo<*>) {
+        when (columnInfo) {
+            is AggregateFunction -> {
+                visitAggregateFunction(columnInfo)
             }
-            is AggregateFunction.CountAsterisk -> {
-                "count(*)"
+            is ArithmeticExpr -> {
+                visitArithmeticExpr(columnInfo)
             }
-            is AggregateFunction.Count -> {
-                val name = aliasColumnName(columnInfo.c)
-                "count($name)"
-            }
-            is AggregateFunction.Max -> {
-                val name = aliasColumnName(columnInfo.c)
-                "max($name)"
-            }
-            is AggregateFunction.Min -> {
-                val name = aliasColumnName(columnInfo.c)
-                "min($name)"
-            }
-            is AggregateFunction.Sum -> {
-                val name = aliasColumnName(columnInfo.c)
-                "sum($name)"
+            is StringFunction -> {
+                visitStringFunction(columnInfo)
             }
             else -> {
                 val name = columnInfo.getName(dialect::quote)
                 val alias = aliasManager.getAlias(columnInfo) ?: error("no alias for $name")
-                return "$alias.$name"
+                buf.append("$alias.$name")
             }
+        }
+    }
+
+    private fun visitAggregateFunction(function: AggregateFunction<*>) {
+        when (function) {
+            is AggregateFunction.Avg -> {
+                buf.append("avg(")
+                visitColumnInfo(function.c)
+                buf.append(")")
+            }
+            is AggregateFunction.CountAsterisk -> {
+                buf.append("count(*)")
+            }
+            is AggregateFunction.Count -> {
+                buf.append("count(")
+                visitColumnInfo(function.c)
+                buf.append(")")
+            }
+            is AggregateFunction.Max -> {
+                buf.append("max(")
+                visitColumnInfo(function.c)
+                buf.append(")")
+            }
+            is AggregateFunction.Min<*> -> {
+                buf.append("min(")
+                visitColumnInfo(function.c)
+                buf.append(")")
+            }
+            is AggregateFunction.Sum<*> -> {
+                buf.append("sum(")
+                visitColumnInfo(function.c)
+                buf.append(")")
+            }
+        }
+    }
+
+    private fun visitArithmeticExpr(expr: ArithmeticExpr<*>) {
+        buf.append("(")
+        when (expr) {
+            is ArithmeticExpr.Plus<*> -> {
+                visitOperand(expr.left)
+                buf.append(" + ")
+                visitOperand(expr.right)
+            }
+            is ArithmeticExpr.Minus<*> -> {
+                visitOperand(expr.left)
+                buf.append(" - ")
+                visitOperand(expr.right)
+            }
+            is ArithmeticExpr.Times<*> -> {
+                visitOperand(expr.left)
+                buf.append(" * ")
+                visitOperand(expr.right)
+            }
+            is ArithmeticExpr.Div<*> -> {
+                visitOperand(expr.left)
+                buf.append(" / ")
+                visitOperand(expr.right)
+            }
+            is ArithmeticExpr.Rem<*> -> {
+                visitOperand(expr.left)
+                buf.append(" % ")
+                visitOperand(expr.right)
+            }
+        }.also {
+            buf.append(")")
+        }
+    }
+
+    private fun visitStringFunction(function: StringFunction) {
+        buf.append("(")
+        when (function) {
+            is StringFunction.Concat -> {
+                buf.append("concat(")
+                visitOperand(function.left)
+                buf.append(", ")
+                visitOperand(function.right)
+                buf.append(")")
+            }
+        }.also {
+            buf.append(")")
         }
     }
 
@@ -131,7 +200,7 @@ internal class BuilderSupport(
         }
         when (operand) {
             is Operand.Column -> {
-                buf.append(aliasColumnName(operand.columnInfo))
+                visitColumnInfo(operand.columnInfo)
             }
             is Operand.Parameter -> {
                 val value = operand.value
@@ -222,7 +291,7 @@ internal class BuilderSupport(
     fun visitOperand(operand: Operand) {
         when (operand) {
             is Operand.Column -> {
-                buf.append(aliasColumnName(operand.columnInfo))
+                visitColumnInfo(operand.columnInfo)
             }
             is Operand.Parameter -> {
                 buf.bind(Value(operand.value, operand.columnInfo.klass))

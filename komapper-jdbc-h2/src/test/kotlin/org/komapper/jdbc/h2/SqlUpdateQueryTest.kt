@@ -5,6 +5,8 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.Database
 import org.komapper.core.dsl.SqlQuery
+import org.komapper.core.dsl.concat
+import org.komapper.core.dsl.plus
 
 @ExtendWith(Env::class)
 class SqlUpdateQueryTest(private val db: Database) {
@@ -22,5 +24,35 @@ class SqlUpdateQueryTest(private val db: Database) {
         assertEquals(1, count)
         val address = db.find(a) { a.addressId eq 1 }
         assertEquals("STREET 16", address.street)
+    }
+
+    @Test
+    fun arithmetic_add() {
+        val a = Address.metamodel()
+        val count = db.execute {
+            SqlQuery.update(a).set {
+                a.version set (10 + a.version + 10)
+            }.where {
+                a.addressId eq 1
+            }
+        }
+        assertEquals(1, count)
+        val address = db.find(a) { a.addressId eq 1 }
+        assertEquals(21, address.version)
+    }
+
+    @Test
+    fun string_concat() {
+        val a = Address.metamodel()
+        val count = db.execute {
+            SqlQuery.update(a).set {
+                a.street set ("[" concat a.street concat "]")
+            }.where {
+                a.addressId eq 1
+            }
+        }
+        assertEquals(1, count)
+        val address = db.find(a) { a.addressId eq 1 }
+        assertEquals("[STREET 1]", address.street)
     }
 }
