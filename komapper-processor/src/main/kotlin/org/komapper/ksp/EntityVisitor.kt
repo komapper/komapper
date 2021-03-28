@@ -120,9 +120,10 @@ internal class EntityFactory(
             is PropertyKind.CreatedAt -> {
                 when (property.typeName) {
                     "java.time.LocalDateTime" -> Unit
+                    "java.time.OffsetDateTime" -> Unit
                     else -> report(
                         "@KmCreatedAt cannot apply to ${parameter.type} type. " +
-                            "java.time.LocalDateTime is available.",
+                            "Either LocalDateTime or OffsetDateTime is available.",
                         parameter
                     )
                 }
@@ -130,9 +131,10 @@ internal class EntityFactory(
             is PropertyKind.UpdatedAt -> {
                 when (property.typeName) {
                     "java.time.LocalDateTime" -> Unit
+                    "java.time.OffsetDateTime" -> Unit
                     else -> report(
                         "@KmUpdatedAt cannot apply to ${parameter.type} type. " +
-                            "java.time.LocalDateTime is available.",
+                            "Either LocalDateTime or OffsetDateTime is available.",
                         parameter
                     )
                 }

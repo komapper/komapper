@@ -21,6 +21,7 @@ import org.komapper.core.KmVersion
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.OffsetDateTime
 
 @KmEntity
 data class Address(
@@ -76,6 +77,16 @@ data class Person(
     companion object
 }
 
+@KmEntity @KmTable("PERSON")
+data class Human(
+    @KmId @KmColumn("PERSON_ID") val humanId: Int,
+    val name: String,
+    @KmCreatedAt val createdAt: OffsetDateTime? = null,
+    @KmUpdatedAt val updatedAt: OffsetDateTime? = null
+) {
+    companion object
+}
+
 data class EmployeeDetail(
     val hiredate: LocalDate,
     val salary: BigDecimal
@@ -121,11 +132,6 @@ data class Common(
     val createdAt: LocalDateTime = LocalDateTime.of(2000, 1, 1, 0, 0, 0),
     val updatedAt: LocalDateTime = LocalDateTime.of(2000, 1, 1, 0, 0, 0),
     val version: Int = 0
-)
-
-data class Human(
-    val name: String,
-    val common: Common
 )
 
 @KmEntity

@@ -27,7 +27,7 @@ class EntityInsertQueryTest(private val db: Database) {
     }
 
     @Test
-    fun createdAt() {
+    fun createdAt_localDateTime() {
         val p = Person.metamodel()
         val person1 = Person(1, "ABC")
         val person2 = db.insert(p, person1)
@@ -36,6 +36,18 @@ class EntityInsertQueryTest(private val db: Database) {
         assertEquals(person2.createdAt, person2.updatedAt)
         val person3 = db.find(p) { p.personId to 1 }
         assertEquals(person2, person3)
+    }
+
+    @Test
+    fun createdAt_offsetDateTime() {
+        val h = Human.metamodel()
+        val human1 = Human(1, "ABC")
+        val human2 = db.insert(h, human1)
+        assertNotNull(human2.createdAt)
+        assertNotNull(human2.updatedAt)
+        assertEquals(human2.createdAt, human2.updatedAt)
+        val human3 = db.find(h) { h.humanId to 1 }
+        assertEquals(human2, human3)
     }
 
     @Test

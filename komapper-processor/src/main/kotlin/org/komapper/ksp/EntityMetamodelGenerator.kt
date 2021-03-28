@@ -11,7 +11,6 @@ private const val PropertyDescriptor = "org.komapper.core.metamodel.PropertyDesc
 private const val PropertyMetamodel = "org.komapper.core.metamodel.PropertyMetamodel"
 private const val PropertyMetamodelImpl = "org.komapper.core.metamodel.PropertyMetamodelImpl"
 private const val Clock = "java.time.Clock"
-private const val LocalDateTime = "java.time.LocalDateTime"
 private const val EntityDescriptor = "__EntityDescriptor"
 
 internal class EntityMetamodelGenerator(
@@ -117,19 +116,21 @@ internal class EntityMetamodelGenerator(
     }
 
     private fun updateCreatedAt() {
-        val body = if (entity.createdAtProperty == null) {
+        val property = entity.createdAtProperty
+        val body = if (property == null) {
             "__e"
         } else {
-            "${entity.createdAtProperty}.setter(__e, $LocalDateTime.now(__c))"
+            "$property.setter(__e, ${property.typeName}.now(__c))"
         }
         w.println("    override fun updateCreatedAt(__e: $entityTypeName, __c: $Clock): $entityTypeName = $body")
     }
 
     private fun updateUpdatedAt() {
-        val body = if (entity.updatedAtProperty == null) {
+        val property = entity.updatedAtProperty
+        val body = if (property == null) {
             "__e"
         } else {
-            "${entity.updatedAtProperty}.setter(__e, $LocalDateTime.now(__c))"
+            "$property.setter(__e, ${property.typeName}.now(__c))"
         }
         w.println("    override fun updateUpdatedAt(__e: $entityTypeName, __c: $Clock): $entityTypeName = $body")
     }
