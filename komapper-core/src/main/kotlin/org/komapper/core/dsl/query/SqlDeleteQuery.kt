@@ -4,11 +4,10 @@ import org.komapper.core.DatabaseConfig
 import org.komapper.core.config.Dialect
 import org.komapper.core.data.Statement
 import org.komapper.core.dsl.builder.SqlDeleteStatementBuilder
-import org.komapper.core.dsl.command.SqlDeleteCommand
 import org.komapper.core.dsl.context.SqlDeleteContext
 import org.komapper.core.dsl.scope.WhereDeclaration
 import org.komapper.core.dsl.scope.WhereScope
-import org.komapper.core.metamodel.EntityMetamodel
+import org.komapper.core.jdbc.JdbcExecutor
 
 interface SqlDeleteQuery : Query<Int> {
     fun where(declaration: WhereDeclaration): SqlDeleteQuery
@@ -20,21 +19,22 @@ interface SqlDeleteQuery : Query<Int> {
 }
 
 internal data class SqlDeleteQueryImpl<ENTITY>(
-    private val entityMetamodel: EntityMetamodel<ENTITY>,
-    private val context: SqlDeleteContext<ENTITY> = SqlDeleteContext<ENTITY>(entityMetamodel)
+    private val context: SqlDeleteContext<ENTITY>
 ) : SqlDeleteQuery {
 
     override fun where(declaration: WhereDeclaration): SqlDeleteQueryImpl<ENTITY> {
         val scope = WhereScope()
         declaration(scope)
         val newContext = context.addWhere(scope.criteria.toList())
-        return SqlDeleteQueryImpl(entityMetamodel, newContext)
+        return SqlDeleteQueryImpl(newContext)
     }
 
     override fun run(config: DatabaseConfig): Int {
         val statement = buildStatement(config.dialect, context)
-        val command = SqlDeleteCommand(config, statement)
-        return command.execute()
+        val executor = JdbcExecutor(config)
+        return executor.executeUpdate(statement) { _, count ->
+            count
+        }
     }
 
     override fun toStatement(dialect: Dialect): Statement {

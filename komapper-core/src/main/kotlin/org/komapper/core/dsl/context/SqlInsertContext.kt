@@ -8,7 +8,7 @@ internal data class SqlInsertContext<ENTITY>(
     val values: List<Pair<Operand.Column, Operand.Parameter>> = listOf()
 ) : Context<ENTITY> {
 
-    override fun getReferencingEntityMetamodels(): List<EntityMetamodel<*>> {
+    override fun getAliasableEntityMetamodels(): List<EntityMetamodel<*>> {
         return listOf(entityMetamodel)
     }
 

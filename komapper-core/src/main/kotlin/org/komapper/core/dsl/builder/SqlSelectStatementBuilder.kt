@@ -3,14 +3,15 @@ package org.komapper.core.dsl.builder
 import org.komapper.core.config.Dialect
 import org.komapper.core.data.Statement
 import org.komapper.core.data.StatementBuffer
+import org.komapper.core.dsl.context.Projection
 import org.komapper.core.dsl.context.SqlSelectContext
 import org.komapper.core.dsl.data.Criterion
 import org.komapper.core.dsl.expr.AggregateFunction
 import org.komapper.core.metamodel.ColumnInfo
 
-internal class SqlSelectStatementBuilder<ENTITY>(
+internal class SqlSelectStatementBuilder(
     val dialect: Dialect,
-    val context: SqlSelectContext<ENTITY>,
+    val context: SqlSelectContext<*>,
     aliasManager: AliasManager = AliasManager(context)
 ) {
     private val buf = StatementBuffer(dialect::formatValue)
@@ -42,7 +43,10 @@ internal class SqlSelectStatementBuilder<ENTITY>(
 
     private fun groupByClause() {
         if (context.groupBy.isEmpty()) {
-            val columns = context.getProjectionColumns()
+            val columns = when (val projection = context.projection) {
+                is Projection.Columns -> projection.values
+                is Projection.Tables -> projection.values.flatMap { it.properties() }
+            }
             val aggregateFunctions = columns.filter { it is AggregateFunction }
             val groupByItems = columns - aggregateFunctions
             if (aggregateFunctions.isNotEmpty() && groupByItems.isNotEmpty()) {

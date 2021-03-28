@@ -57,16 +57,6 @@ data class SequenceStrategy(
     companion object
 }
 
-data class MultiSequenceStrategy(
-    val id: Int,
-    val value: Long
-)
-
-data class Quotes(
-    val id: Int,
-    val value: String
-)
-
 @KmEntity
 data class Person(
     @KmId @KmColumn("PERSON_ID") val personId: Int,
@@ -86,11 +76,6 @@ data class Human(
 ) {
     companion object
 }
-
-data class EmployeeDetail(
-    val hiredate: LocalDate,
-    val salary: BigDecimal
-)
 
 @KmEntity
 data class Employee(

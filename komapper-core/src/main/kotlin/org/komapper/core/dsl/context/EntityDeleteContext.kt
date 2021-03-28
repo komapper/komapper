@@ -4,7 +4,7 @@ import org.komapper.core.metamodel.EntityMetamodel
 
 internal data class EntityDeleteContext<ENTITY>(val entityMetamodel: EntityMetamodel<ENTITY>) : Context<ENTITY> {
 
-    override fun getReferencingEntityMetamodels(): List<EntityMetamodel<*>> {
+    override fun getAliasableEntityMetamodels(): List<EntityMetamodel<*>> {
         return listOf(entityMetamodel)
     }
 }

@@ -3,7 +3,7 @@ package org.komapper.core.dsl.query
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.config.Dialect
 import org.komapper.core.data.Statement
-import org.komapper.core.dsl.command.TemplateUpdateCommand
+import org.komapper.core.jdbc.JdbcExecutor
 import org.komapper.core.template.DefaultStatementBuilder
 
 internal data class TemplateUpdateQuery(
@@ -13,8 +13,8 @@ internal data class TemplateUpdateQuery(
 
     override fun run(config: DatabaseConfig): Int {
         val statement = buildStatement(config.dialect)
-        val command = TemplateUpdateCommand(config, statement)
-        return command.execute()
+        val executor = JdbcExecutor(config)
+        return executor.executeUpdate(statement) { _, count -> count }
     }
 
     override fun toStatement(dialect: Dialect): Statement {

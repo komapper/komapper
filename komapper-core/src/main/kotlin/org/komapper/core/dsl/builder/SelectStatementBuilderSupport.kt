@@ -3,15 +3,16 @@ package org.komapper.core.dsl.builder
 import org.komapper.core.config.Dialect
 import org.komapper.core.data.StatementBuffer
 import org.komapper.core.dsl.context.JoinKind
+import org.komapper.core.dsl.context.Projection
 import org.komapper.core.dsl.context.SelectContext
 import org.komapper.core.dsl.data.Criterion
 import org.komapper.core.dsl.data.SortItem
 import org.komapper.core.metamodel.ColumnInfo
 import org.komapper.core.metamodel.TableInfo
 
-internal class SelectStatementBuilderSupport<ENTITY>(
+internal class SelectStatementBuilderSupport(
     dialect: Dialect,
-    private val context: SelectContext<ENTITY, *>,
+    private val context: SelectContext<*, *>,
     aliasManager: AliasManager = AliasManager(context),
     private val buf: StatementBuffer
 ) {
@@ -19,21 +20,20 @@ internal class SelectStatementBuilderSupport<ENTITY>(
 
     fun selectClause() {
         buf.append("select ")
-        val columns = context.getProjectionColumns()
-        if (columns.isEmpty()) {
-            buf.append("*")
-        } else {
-            for (c in context.getProjectionColumns()) {
-                visitColumnInfo(c)
-                buf.append(", ")
-            }
-            buf.cutBack(2)
+        val columns = when (val projection = context.projection) {
+            is Projection.Columns -> projection.values
+            is Projection.Tables -> projection.values.flatMap { it.properties() }
         }
+        for (c in columns) {
+            visitColumnInfo(c)
+            buf.append(", ")
+        }
+        buf.cutBack(2)
     }
 
     fun fromClause() {
         buf.append(" from ")
-        visitTableInfo(context.entityMetamodel)
+        visitTableInfo(context.from)
         if (context.joins.isNotEmpty()) {
             for (join in context.joins) {
                 if (join.kind === JoinKind.INNER) {

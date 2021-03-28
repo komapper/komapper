@@ -4,9 +4,9 @@ import org.komapper.core.dsl.context.FilterContext
 import org.komapper.core.dsl.data.Criterion
 import org.komapper.core.dsl.data.Operand
 import org.komapper.core.dsl.operand.LikeOperand
-import org.komapper.core.dsl.operand.SingleColumnProjection
-import org.komapper.core.dsl.operand.SubqueryProjection
 import org.komapper.core.dsl.option.LikeOption
+import org.komapper.core.dsl.query.SingleColumnSqlSubqueryResult
+import org.komapper.core.dsl.query.SqlSubqueryResult
 import org.komapper.core.metamodel.ColumnInfo
 
 internal class FilterScopeSupport(internal val context: FilterContext = FilterContext()) : FilterScope {
@@ -159,11 +159,11 @@ internal class FilterScopeSupport(internal val context: FilterContext = FilterCo
         context.add(Criterion.InList(o1, o2))
     }
 
-    override infix fun <T : Any> ColumnInfo<T>.inList(block: () -> SingleColumnProjection) {
+    override infix fun <T : Any> ColumnInfo<T>.inList(block: () -> SingleColumnSqlSubqueryResult) {
         this.inList(block())
     }
 
-    override infix fun <T : Any> ColumnInfo<T>.inList(projection: SingleColumnProjection) {
+    override infix fun <T : Any> ColumnInfo<T>.inList(projection: SingleColumnSqlSubqueryResult) {
         val left = Operand.Column(this)
         val right = projection.contextHolder.context
         context.add(Criterion.InSubQuery(left, right))
@@ -175,31 +175,31 @@ internal class FilterScopeSupport(internal val context: FilterContext = FilterCo
         context.add(Criterion.NotInList(o1, o2))
     }
 
-    override infix fun <T : Any> ColumnInfo<T>.notInList(block: () -> SingleColumnProjection) {
+    override infix fun <T : Any> ColumnInfo<T>.notInList(block: () -> SingleColumnSqlSubqueryResult) {
         this.notInList(block())
     }
 
-    override infix fun <T : Any> ColumnInfo<T>.notInList(projection: SingleColumnProjection) {
+    override infix fun <T : Any> ColumnInfo<T>.notInList(projection: SingleColumnSqlSubqueryResult) {
         val left = Operand.Column(this)
         val right = projection.contextHolder.context
         context.add(Criterion.NotInSubQuery(left, right))
     }
 
-    override fun exists(block: () -> SubqueryProjection) {
+    override fun exists(block: () -> SqlSubqueryResult) {
         this.exists(block())
     }
 
-    override fun exists(projection: SubqueryProjection) {
-        val subContext = projection.contextHolder.context
+    override fun exists(result: SqlSubqueryResult) {
+        val subContext = result.contextHolder.context
         context.add(Criterion.Exists(subContext))
     }
 
-    override fun notExists(block: () -> SubqueryProjection) {
+    override fun notExists(block: () -> SqlSubqueryResult) {
         this.notExists(block())
     }
 
-    override fun notExists(projection: SubqueryProjection) {
-        val subContext = projection.contextHolder.context
+    override fun notExists(result: SqlSubqueryResult) {
+        val subContext = result.contextHolder.context
         context.add(Criterion.NotExists(subContext))
     }
 

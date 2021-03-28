@@ -6,24 +6,25 @@ import org.komapper.core.metamodel.ColumnInfo
 import org.komapper.core.metamodel.EntityMetamodel
 
 internal data class EntitySelectContext<ENTITY>(
-    override val entityMetamodel: EntityMetamodel<ENTITY>,
-    override val columns: List<ColumnInfo<*>> = listOf(),
+    override val from: EntityMetamodel<ENTITY>,
     override val joins: List<Join<*>> = listOf(),
     override val where: List<Criterion> = listOf(),
     override val orderBy: List<ColumnInfo<*>> = listOf(),
     override val offset: Int = -1,
     override val limit: Int = -1,
     override val forUpdate: ForUpdate = ForUpdate(),
-    val associatorMap: Map<Association, Associator<Any, Any>> = mapOf()
+    val associatorMap: Map<Association, Associator<Any, Any>> = mapOf(),
+    override val projection: Projection =
+        Projection.Tables(
+            (
+                listOf(from) + associatorMap.flatMap {
+                    val (e1, e2) = it.key
+                    listOf(e1, e2)
+                }
+                ).distinct()
+        ),
+
 ) : SelectContext<ENTITY, EntitySelectContext<ENTITY>> {
-
-    override fun addColumn(column: ColumnInfo<*>): EntitySelectContext<ENTITY> {
-        return copy(columns = this.columns + column)
-    }
-
-    override fun addColumns(columns: List<ColumnInfo<*>>): EntitySelectContext<ENTITY> {
-        return copy(columns = this.columns + columns)
-    }
 
     override fun addJoin(join: Join<*>): EntitySelectContext<ENTITY> {
         return copy(joins = this.joins + join)
@@ -50,25 +51,12 @@ internal data class EntitySelectContext<ENTITY>(
     }
 
     fun putAssociator(association: Association, associator: Associator<Any, Any>): EntitySelectContext<ENTITY> {
-        return copy(associatorMap = this.associatorMap + (association to associator))
-    }
-
-    override fun getReferencingEntityMetamodels(): List<EntityMetamodel<*>> {
-        return listOf(entityMetamodel) + joins.map { it.entityMetamodel }
-    }
-
-    fun getProjectionEntityMetamodels(): List<EntityMetamodel<*>> {
-        val list = listOf(entityMetamodel) + associatorMap.flatMap {
-            val (e1, e2) = it.key
-            listOf(e1, e2)
+        val (e1, e2) = association
+        val list = listOf(e1, e2)
+        val newProjection = when (projection) {
+            is Projection.Columns -> Projection.Tables(list)
+            is Projection.Tables -> Projection.Tables((projection.values + list).distinct())
         }
-        return list.distinct()
-    }
-
-    override fun getProjectionColumns(): List<ColumnInfo<*>> {
-        if (columns.isEmpty()) {
-            return getProjectionEntityMetamodels().flatMap { it.properties() }
-        }
-        return columns
+        return copy(projection = newProjection, associatorMap = this.associatorMap + (association to associator))
     }
 }

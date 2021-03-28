@@ -5,8 +5,7 @@ import org.komapper.core.metamodel.ColumnInfo
 import org.komapper.core.metamodel.EntityMetamodel
 
 internal data class SqlSelectContext<ENTITY>(
-    override val entityMetamodel: EntityMetamodel<ENTITY>,
-    override val columns: List<ColumnInfo<*>> = listOf(),
+    override val from: EntityMetamodel<ENTITY>,
     override val joins: List<Join<*>> = listOf(),
     override val where: List<Criterion> = listOf(),
     override val orderBy: List<ColumnInfo<*>> = listOf(),
@@ -14,15 +13,25 @@ internal data class SqlSelectContext<ENTITY>(
     override val limit: Int = -1,
     override val forUpdate: ForUpdate = ForUpdate(),
     val groupBy: List<ColumnInfo<*>> = listOf(),
-    val having: List<Criterion> = listOf()
+    val having: List<Criterion> = listOf(),
+    override val projection: Projection =
+        Projection.Tables(listOf(from) + joins.map { it.entityMetamodel }),
 ) : SelectContext<ENTITY, SqlSelectContext<ENTITY>> {
 
-    override fun addColumn(column: ColumnInfo<*>): SqlSelectContext<ENTITY> {
-        return copy(columns = this.columns + column)
+    fun setColumn(column: ColumnInfo<*>): SqlSelectContext<ENTITY> {
+        return copy(projection = Projection.Columns(listOf(column)))
     }
 
-    override fun addColumns(columns: List<ColumnInfo<*>>): SqlSelectContext<ENTITY> {
-        return copy(columns = this.columns + columns)
+    fun setColumns(columns: List<ColumnInfo<*>>): SqlSelectContext<ENTITY> {
+        return copy(projection = Projection.Columns(columns))
+    }
+
+    fun setTable(entityMetamodel: EntityMetamodel<*>): SqlSelectContext<ENTITY> {
+        return copy(projection = Projection.Tables(listOf(entityMetamodel)))
+    }
+
+    fun setTables(entityMetamodels: List<EntityMetamodel<*>>): SqlSelectContext<ENTITY> {
+        return copy(projection = Projection.Tables(entityMetamodels))
     }
 
     override fun addJoin(join: Join<*>): SqlSelectContext<ENTITY> {
@@ -51,16 +60,5 @@ internal data class SqlSelectContext<ENTITY>(
 
     override fun setForUpdate(forUpdate: ForUpdate): SqlSelectContext<ENTITY> {
         return copy(forUpdate = forUpdate)
-    }
-
-    override fun getReferencingEntityMetamodels(): List<EntityMetamodel<*>> {
-        return listOf(entityMetamodel) + joins.map { it.entityMetamodel }
-    }
-
-    override fun getProjectionColumns(): List<ColumnInfo<*>> {
-        if (columns.isEmpty()) {
-            return entityMetamodel.properties()
-        }
-        return columns
     }
 }

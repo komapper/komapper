@@ -4,13 +4,12 @@ import org.komapper.core.DatabaseConfig
 import org.komapper.core.config.Dialect
 import org.komapper.core.data.Statement
 import org.komapper.core.dsl.builder.SqlUpdateStatementBuilder
-import org.komapper.core.dsl.command.SqlUpdateCommand
 import org.komapper.core.dsl.context.SqlUpdateContext
 import org.komapper.core.dsl.scope.SetDeclaration
 import org.komapper.core.dsl.scope.SetScope
 import org.komapper.core.dsl.scope.WhereDeclaration
 import org.komapper.core.dsl.scope.WhereScope
-import org.komapper.core.metamodel.EntityMetamodel
+import org.komapper.core.jdbc.JdbcExecutor
 
 interface SqlUpdateQuery : Query<Int> {
     fun set(declaration: SetDeclaration): SqlUpdateQuery
@@ -23,28 +22,29 @@ interface SqlUpdateQuery : Query<Int> {
 }
 
 internal data class SqlUpdateQueryImpl<ENTITY>(
-    private val entityMetamodel: EntityMetamodel<ENTITY>,
-    private val context: SqlUpdateContext<ENTITY> = SqlUpdateContext(entityMetamodel)
+    private val context: SqlUpdateContext<ENTITY>
 ) : SqlUpdateQuery {
 
     override fun set(declaration: SetDeclaration): SqlUpdateQueryImpl<ENTITY> {
         val scope = SetScope()
         declaration(scope)
         val newContext = context.addSet(scope.context.toList())
-        return SqlUpdateQueryImpl(entityMetamodel, newContext)
+        return SqlUpdateQueryImpl(newContext)
     }
 
     override fun where(declaration: WhereDeclaration): SqlUpdateQueryImpl<ENTITY> {
         val scope = WhereScope()
         declaration(scope)
         val newContext = context.addWhere(scope.criteria.toList())
-        return SqlUpdateQueryImpl(entityMetamodel, newContext)
+        return SqlUpdateQueryImpl(newContext)
     }
 
     override fun run(config: DatabaseConfig): Int {
         val statement = buildStatement(config.dialect)
-        val command = SqlUpdateCommand(config, statement)
-        return command.execute()
+        val executor = JdbcExecutor(config)
+        return executor.executeUpdate(statement) { _, count ->
+            count
+        }
     }
 
     override fun toStatement(dialect: Dialect): Statement {

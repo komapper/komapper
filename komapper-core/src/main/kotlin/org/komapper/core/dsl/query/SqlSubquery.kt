@@ -1,10 +1,6 @@
 package org.komapper.core.dsl.query
 
 import org.komapper.core.dsl.context.SqlSelectContext
-import org.komapper.core.dsl.operand.ContextHolder
-import org.komapper.core.dsl.operand.SingleColumnProjection
-import org.komapper.core.dsl.operand.SingleColumnProjectionImpl
-import org.komapper.core.dsl.operand.SubqueryProjection
 import org.komapper.core.dsl.scope.HavingDeclaration
 import org.komapper.core.dsl.scope.HavingScope
 import org.komapper.core.dsl.scope.JoinDeclaration
@@ -12,32 +8,31 @@ import org.komapper.core.dsl.scope.WhereDeclaration
 import org.komapper.core.metamodel.ColumnInfo
 import org.komapper.core.metamodel.EntityMetamodel
 
-interface SelectSubquery<ENTITY> : SubqueryProjection {
+interface SqlSubquery<ENTITY> : SqlSubqueryResult {
     fun <OTHER_ENTITY> innerJoin(
         entityMetamodel: EntityMetamodel<OTHER_ENTITY>,
         declaration: JoinDeclaration<OTHER_ENTITY>
-    ): SelectSubquery<ENTITY>
+    ): SqlSubquery<ENTITY>
 
     fun <OTHER_ENTITY> leftJoin(
         entityMetamodel: EntityMetamodel<OTHER_ENTITY>,
         declaration: JoinDeclaration<OTHER_ENTITY>
-    ): SelectSubquery<ENTITY>
+    ): SqlSubquery<ENTITY>
 
-    fun where(declaration: WhereDeclaration): SelectSubquery<ENTITY>
-    fun groupBy(vararg items: ColumnInfo<*>): SelectSubquery<ENTITY>
-    fun having(declaration: HavingDeclaration): SelectSubquery<ENTITY>
-    fun orderBy(vararg items: ColumnInfo<*>): SelectSubquery<ENTITY>
-    fun offset(value: Int): SelectSubquery<ENTITY>
-    fun limit(value: Int): SelectSubquery<ENTITY>
-    fun forUpdate(): SelectSubquery<ENTITY>
-    fun select(columnInfo: ColumnInfo<*>): SingleColumnProjection
+    fun where(declaration: WhereDeclaration): SqlSubquery<ENTITY>
+    fun groupBy(vararg items: ColumnInfo<*>): SqlSubquery<ENTITY>
+    fun having(declaration: HavingDeclaration): SqlSubquery<ENTITY>
+    fun orderBy(vararg items: ColumnInfo<*>): SqlSubquery<ENTITY>
+    fun offset(value: Int): SqlSubquery<ENTITY>
+    fun limit(value: Int): SqlSubquery<ENTITY>
+    fun forUpdate(): SqlSubquery<ENTITY>
+    fun select(columnInfo: ColumnInfo<*>): SingleColumnSqlSubqueryResult
 }
 
-internal data class SelectSubqueryImpl<ENTITY>(
-    private val entityMetamodel: EntityMetamodel<ENTITY>,
-    private val context: SqlSelectContext<ENTITY> = SqlSelectContext(entityMetamodel)
+internal data class SqlSubqueryImpl<ENTITY>(
+    private val context: SqlSelectContext<ENTITY>
 ) :
-    SelectSubquery<ENTITY> {
+    SqlSubquery<ENTITY> {
 
     override val contextHolder = ContextHolder(context)
 
@@ -46,7 +41,7 @@ internal data class SelectSubqueryImpl<ENTITY>(
     override fun <OTHER_ENTITY> innerJoin(
         entityMetamodel: EntityMetamodel<OTHER_ENTITY>,
         declaration: JoinDeclaration<OTHER_ENTITY>
-    ): SelectSubqueryImpl<ENTITY> {
+    ): SqlSubqueryImpl<ENTITY> {
         val newContext = support.innerJoin(entityMetamodel, declaration)
         return copy(context = newContext)
     }
@@ -54,50 +49,50 @@ internal data class SelectSubqueryImpl<ENTITY>(
     override fun <OTHER_ENTITY> leftJoin(
         entityMetamodel: EntityMetamodel<OTHER_ENTITY>,
         declaration: JoinDeclaration<OTHER_ENTITY>
-    ): SelectSubqueryImpl<ENTITY> {
+    ): SqlSubqueryImpl<ENTITY> {
         val newContext = support.leftJoin(entityMetamodel, declaration)
         return copy(context = newContext)
     }
 
-    override fun where(declaration: WhereDeclaration): SelectSubqueryImpl<ENTITY> {
+    override fun where(declaration: WhereDeclaration): SqlSubqueryImpl<ENTITY> {
         val newContext = support.where(declaration)
         return copy(context = newContext)
     }
 
-    override fun groupBy(vararg items: ColumnInfo<*>): SelectSubqueryImpl<ENTITY> {
+    override fun groupBy(vararg items: ColumnInfo<*>): SqlSubqueryImpl<ENTITY> {
         val newContext = context.copy(groupBy = items.toList())
         return copy(context = newContext)
     }
 
-    override fun having(declaration: HavingDeclaration): SelectSubqueryImpl<ENTITY> {
+    override fun having(declaration: HavingDeclaration): SqlSubqueryImpl<ENTITY> {
         val scope = HavingScope()
         declaration(scope)
         val newContext = context.addHaving(scope.criteria.toList())
         return copy(context = newContext)
     }
 
-    override fun orderBy(vararg items: ColumnInfo<*>): SelectSubqueryImpl<ENTITY> {
+    override fun orderBy(vararg items: ColumnInfo<*>): SqlSubqueryImpl<ENTITY> {
         val newContext = support.orderBy(*items)
         return copy(context = newContext)
     }
 
-    override fun offset(value: Int): SelectSubqueryImpl<ENTITY> {
+    override fun offset(value: Int): SqlSubqueryImpl<ENTITY> {
         val newContext = support.offset(value)
         return copy(context = newContext)
     }
 
-    override fun limit(value: Int): SelectSubqueryImpl<ENTITY> {
+    override fun limit(value: Int): SqlSubqueryImpl<ENTITY> {
         val newContext = support.limit(value)
         return copy(context = newContext)
     }
 
-    override fun forUpdate(): SelectSubqueryImpl<ENTITY> {
+    override fun forUpdate(): SqlSubqueryImpl<ENTITY> {
         val newContext = support.forUpdate()
         return copy(context = newContext)
     }
 
-    override fun select(columnInfo: ColumnInfo<*>): SingleColumnProjection {
-        val newContext = context.addColumn(columnInfo)
-        return SingleColumnProjectionImpl(ContextHolder(newContext))
+    override fun select(columnInfo: ColumnInfo<*>): SingleColumnSqlSubqueryResult {
+        val newContext = context.setColumn(columnInfo)
+        return SingleColumnSqlSubqueryResultImpl(ContextHolder(newContext))
     }
 }

@@ -8,7 +8,7 @@ internal data class SqlDeleteContext<ENTITY>(
     val where: List<Criterion> = listOf()
 ) : Context<ENTITY> {
 
-    override fun getReferencingEntityMetamodels(): List<EntityMetamodel<*>> {
+    override fun getAliasableEntityMetamodels(): List<EntityMetamodel<*>> {
         return listOf(entityMetamodel)
     }
 

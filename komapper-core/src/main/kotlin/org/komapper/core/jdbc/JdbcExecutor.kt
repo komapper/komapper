@@ -2,6 +2,7 @@ package org.komapper.core.jdbc
 
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.UniqueConstraintException
+import org.komapper.core.config.Dialect
 import org.komapper.core.data.Statement
 import org.komapper.core.data.Value
 import java.sql.Connection
@@ -34,7 +35,7 @@ internal class JdbcExecutor(
 
     fun <T, R> executeQuery(
         statement: Statement,
-        provider: (ResultSet) -> T,
+        provider: (Dialect, ResultSet) -> T,
         transformer: (Sequence<T>) -> R
     ): R {
         config.session.getConnection().use { con ->
@@ -50,7 +51,7 @@ internal class JdbcExecutor(
                         }
 
                         override fun next(): T {
-                            return provider(rs).also { hasNext = rs.next() }
+                            return provider(config.dialect, rs).also { hasNext = rs.next() }
                         }
                     }
                     return transformer(iterator.asSequence())

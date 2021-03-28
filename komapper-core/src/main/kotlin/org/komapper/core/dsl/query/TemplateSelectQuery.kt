@@ -3,7 +3,7 @@ package org.komapper.core.dsl.query
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.config.Dialect
 import org.komapper.core.data.Statement
-import org.komapper.core.dsl.command.TemplateSelectCommand
+import org.komapper.core.jdbc.JdbcExecutor
 import org.komapper.core.template.DefaultStatementBuilder
 
 internal data class TemplateSelectQuery<T>(
@@ -13,42 +13,48 @@ internal data class TemplateSelectQuery<T>(
 ) : ListQuery<T> {
 
     override fun run(config: DatabaseConfig): List<T> {
-        val transformable = Transformable { it.toList() }
-        return transformable.run(config)
+        val terminal = Terminal { it.toList() }
+        return terminal.run(config)
     }
 
     override fun toStatement(dialect: Dialect): Statement {
-        return buildStatement(dialect)
-    }
-
-    private fun buildStatement(dialect: Dialect): Statement {
-        val builder = DefaultStatementBuilder(
-            dialect::formatValue,
-            dialect.sqlNodeFactory,
-            dialect.exprEvaluator
-        )
-        return builder.build(sql, params)
+        val terminal = Terminal { it.toList() }
+        return terminal.toStatement(dialect)
     }
 
     override fun first(): Query<T> {
-        return Transformable { it.first() }
+        return Terminal { it.first() }
     }
 
     override fun firstOrNull(): Query<T?> {
-        return Transformable { it.firstOrNull() }
+        return Terminal { it.firstOrNull() }
     }
 
     override fun <R> transform(transformer: (Sequence<T>) -> R): Query<R> {
-        return Transformable(transformer)
+        return Terminal(transformer)
     }
 
-    private inner class Transformable<R>(val transformer: (Sequence<T>) -> R) : Query<R> {
+    private inner class Terminal<R>(val transformer: (Sequence<T>) -> R) : Query<R> {
         override fun run(config: DatabaseConfig): R {
-            val statement = buildStatement(config.dialect)
-            val command = TemplateSelectCommand(config, statement, provider, transformer)
-            return command.execute()
+            val statement = toStatement(config.dialect)
+            val executor = JdbcExecutor(config)
+            return executor.executeQuery(
+                statement,
+                { dialect, rs ->
+                    val row = Row(dialect, rs)
+                    provider(row)
+                },
+                transformer
+            )
         }
 
-        override fun toStatement(dialect: Dialect): Statement = buildStatement(dialect)
+        override fun toStatement(dialect: Dialect): Statement {
+            val builder = DefaultStatementBuilder(
+                dialect::formatValue,
+                dialect.sqlNodeFactory,
+                dialect.exprEvaluator
+            )
+            return builder.build(sql, params)
+        }
     }
 }

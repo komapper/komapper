@@ -4,11 +4,11 @@ import org.komapper.core.DatabaseConfig
 import org.komapper.core.config.Dialect
 import org.komapper.core.data.Statement
 import org.komapper.core.dsl.builder.SqlInsertStatementBuilder
-import org.komapper.core.dsl.command.SqlInsertCommand
 import org.komapper.core.dsl.context.SqlInsertContext
 import org.komapper.core.dsl.scope.ValuesDeclaration
 import org.komapper.core.dsl.scope.ValuesScope
-import org.komapper.core.metamodel.EntityMetamodel
+import org.komapper.core.jdbc.JdbcExecutor
+import org.komapper.core.metamodel.Assignment
 
 interface SqlInsertQuery : Query<Pair<Int, Long?>> {
     fun values(declaration: ValuesDeclaration): SqlInsertQuery
@@ -20,29 +20,46 @@ interface SqlInsertQuery : Query<Pair<Int, Long?>> {
 }
 
 internal data class SqlInsertQueryImpl<ENTITY>(
-    private val entityMetamodel: EntityMetamodel<ENTITY>,
-    private val context: SqlInsertContext<ENTITY> = SqlInsertContext(entityMetamodel)
+    private val context: SqlInsertContext<ENTITY>
 ) : SqlInsertQuery {
 
     override fun values(declaration: ValuesDeclaration): SqlInsertQueryImpl<ENTITY> {
         val scope = ValuesScope()
         declaration(scope)
         val newContext = context.addValues(scope.context.toList())
-        return SqlInsertQueryImpl(entityMetamodel, newContext)
+        return SqlInsertQueryImpl(newContext)
     }
 
     override fun run(config: DatabaseConfig): Pair<Int, Long?> {
-        val statement = buildStatement(config.dialect, context)
-        val command = SqlInsertCommand(entityMetamodel, config, statement)
-        return command.execute()
+        val executor = JdbcExecutor(config) { con, sql ->
+            val assignment = context.entityMetamodel.idAssignment()
+            if (assignment is Assignment.Identity<*, *>) {
+                con.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS)
+            } else {
+                con.prepareStatement(sql)
+            }
+        }
+
+        val statement = buildStatement(config.dialect)
+        return executor.executeUpdate(statement) { ps, count ->
+            val assignment = context.entityMetamodel.idAssignment()
+            val id = if (assignment is Assignment.Identity<ENTITY, *>) {
+                ps.generatedKeys.use { rs ->
+                    if (rs.next()) rs.getLong(1) else error("No result: Statement.generatedKeys")
+                }
+            } else {
+                null
+            }
+            count to id
+        }
     }
 
     override fun toStatement(dialect: Dialect): Statement {
-        return buildStatement(dialect, context)
+        return buildStatement(dialect)
     }
 
-    private fun buildStatement(dialect: Dialect, c: SqlInsertContext<ENTITY>): Statement {
-        val builder = SqlInsertStatementBuilder(dialect, c)
+    private fun buildStatement(dialect: Dialect): Statement {
+        val builder = SqlInsertStatementBuilder(dialect, context)
         return builder.build()
     }
 }

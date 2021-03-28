@@ -1,12 +1,13 @@
 package org.komapper.core.dsl
 
-import org.komapper.core.dsl.query.SelectSubquery
-import org.komapper.core.dsl.query.SelectSubqueryImpl
+import org.komapper.core.dsl.context.SqlSelectContext
+import org.komapper.core.dsl.query.SqlSubquery
+import org.komapper.core.dsl.query.SqlSubqueryImpl
 import org.komapper.core.metamodel.EntityMetamodel
 
 object Subquery {
 
-    fun <ENTITY> from(entityMetamodel: EntityMetamodel<ENTITY>): SelectSubquery<ENTITY> {
-        return SelectSubqueryImpl(entityMetamodel)
+    fun <ENTITY> from(entityMetamodel: EntityMetamodel<ENTITY>): SqlSubquery<ENTITY> {
+        return SqlSubqueryImpl(SqlSelectContext(entityMetamodel))
     }
 }

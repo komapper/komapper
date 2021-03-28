@@ -1,8 +1,8 @@
 package org.komapper.core.dsl.scope
 
 import org.komapper.core.dsl.operand.LikeOperand
-import org.komapper.core.dsl.operand.SingleColumnProjection
-import org.komapper.core.dsl.operand.SubqueryProjection
+import org.komapper.core.dsl.query.SingleColumnSqlSubqueryResult
+import org.komapper.core.dsl.query.SqlSubqueryResult
 import org.komapper.core.metamodel.ColumnInfo
 
 interface FilterScope {
@@ -58,19 +58,19 @@ interface FilterScope {
 
     infix fun <T : Any> ColumnInfo<T>.inList(values: List<T?>)
 
-    infix fun <T : Any> ColumnInfo<T>.inList(block: () -> SingleColumnProjection)
+    infix fun <T : Any> ColumnInfo<T>.inList(block: () -> SingleColumnSqlSubqueryResult)
 
-    infix fun <T : Any> ColumnInfo<T>.inList(projection: SingleColumnProjection)
+    infix fun <T : Any> ColumnInfo<T>.inList(projection: SingleColumnSqlSubqueryResult)
 
     infix fun <T : Any> ColumnInfo<T>.notInList(values: List<T?>)
 
-    infix fun <T : Any> ColumnInfo<T>.notInList(block: () -> SingleColumnProjection)
+    infix fun <T : Any> ColumnInfo<T>.notInList(block: () -> SingleColumnSqlSubqueryResult)
 
-    infix fun <T : Any> ColumnInfo<T>.notInList(projection: SingleColumnProjection)
-    fun exists(block: () -> SubqueryProjection)
-    fun exists(projection: SubqueryProjection)
-    fun notExists(block: () -> SubqueryProjection)
-    fun notExists(projection: SubqueryProjection)
+    infix fun <T : Any> ColumnInfo<T>.notInList(projection: SingleColumnSqlSubqueryResult)
+    fun exists(block: () -> SqlSubqueryResult)
+    fun exists(result: SqlSubqueryResult)
+    fun notExists(block: () -> SqlSubqueryResult)
+    fun notExists(result: SqlSubqueryResult)
     fun <T : CharSequence> T?.escape(): LikeOperand
     fun <T : CharSequence> T?.asPrefix(): LikeOperand
     fun <T : CharSequence> T?.asInfix(): LikeOperand

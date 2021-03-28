@@ -10,7 +10,7 @@ internal data class SqlUpdateContext<ENTITY>(
     val where: List<Criterion> = listOf()
 ) : Context<ENTITY> {
 
-    override fun getReferencingEntityMetamodels(): List<EntityMetamodel<*>> {
+    override fun getAliasableEntityMetamodels(): List<EntityMetamodel<*>> {
         return listOf(entityMetamodel)
     }
 
