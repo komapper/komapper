@@ -19,7 +19,8 @@ Supported databases are as follows:
 
 In Development
 
-## Criteria Query
+## Example
+### Criteria Query
 
 ```kotlin
 // metamodels
