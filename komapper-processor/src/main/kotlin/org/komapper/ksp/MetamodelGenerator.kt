@@ -1,10 +1,13 @@
 package org.komapper.ksp
 
+import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.Nullability
 import java.io.PrintWriter
 
 private const val Assignment = "org.komapper.core.metamodel.Assignment"
 private const val EntityMetamodel = "org.komapper.core.metamodel.EntityMetamodel"
+private const val EmptyEntityMetamodel = "org.komapper.core.metamodel.EmptyEntityMetamodel"
+private const val EmptyPropertyMetamodel = "org.komapper.core.metamodel.EmptyPropertyMetamodel"
 private const val IdentityGeneratorDescriptor = "org.komapper.core.metamodel.IdentityGeneratorDescriptor"
 private const val SequenceGeneratorDescriptor = "org.komapper.core.metamodel.SequenceGeneratorDescriptor"
 private const val PropertyDescriptor = "org.komapper.core.metamodel.PropertyDescriptor"
@@ -94,8 +97,8 @@ internal class EntityMetamodelGenerator(
     }
 
     private fun properties() {
-        val allNameList = entity.properties.joinToString(",\n        ", prefix = "\n        ") { it.toString() }
-        w.println("    override fun properties(): List<$PropertyMetamodel<$entityTypeName, *>> = listOf($allNameList)")
+        val nameList = entity.properties.joinToString(",\n        ", prefix = "\n        ") { it.toString() }
+        w.println("    override fun properties(): List<$PropertyMetamodel<$entityTypeName, *>> = listOf($nameList)")
     }
 
     private fun instantiate() {
@@ -139,6 +142,32 @@ internal class EntityMetamodelGenerator(
         if (entity.declaration.hasCompanionObject()) {
             w.println("")
             w.println("fun $entityTypeName.Companion.metamodel() = $simpleName()")
+        }
+    }
+}
+
+internal class EmptyEntityMetamodelGenerator(
+    private val classDeclaration: KSClassDeclaration,
+    private val packageName: String,
+    private val simpleQualifiedName: String,
+    private val fileName: String,
+    private val w: PrintWriter
+) : Runnable {
+    override fun run() {
+        w.println("package $packageName")
+        w.println()
+        w.println("@Suppress(\"ClassName\")")
+        w.println("class $fileName : $EmptyEntityMetamodel<$simpleQualifiedName>() {")
+        val parameters = classDeclaration.primaryConstructor?.parameters
+        if (parameters != null) {
+            for (p in parameters) {
+                w.println("    val $p = $EmptyPropertyMetamodel<$simpleQualifiedName, ${p.type.resolve().declaration.qualifiedName?.asString()}>()")
+            }
+        }
+        w.println("}")
+        if (classDeclaration.hasCompanionObject()) {
+            w.println("")
+            w.println("fun $simpleQualifiedName.Companion.metamodel() = $fileName()")
         }
     }
 }
