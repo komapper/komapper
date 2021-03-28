@@ -219,7 +219,7 @@ internal class BuilderSupport(
         }
     }
 
-    private fun visitOperand(operand: Operand) {
+    fun visitOperand(operand: Operand) {
         when (operand) {
             is Operand.Column -> {
                 buf.append(aliasColumnName(operand.columnInfo))
