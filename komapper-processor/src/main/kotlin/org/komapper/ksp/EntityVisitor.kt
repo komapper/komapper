@@ -71,7 +71,9 @@ internal class EntityFactory(
             createdAtProperty,
             updatedAtProperty,
             idGenerator
-        )
+        ).also {
+            validateEntity(it)
+        }
     }
 
     private fun createAllProperties(): Sequence<Property> {
@@ -252,6 +254,18 @@ internal class EntityFactory(
         }
         val property = idGeneratorProperties.firstOrNull() ?: return null
         return IdGenerator(property)
+    }
+
+    private fun validateEntity(entity: Entity) {
+        if (entity.declaration.simpleName.asString().startsWith("__")) {
+            report("The class name cannot start with '__'.", entity.declaration)
+        }
+        for (p in entity.properties) {
+            val name = (p.parameter.name ?: p.declaration.simpleName).asString()
+            if (name.startsWith("__")) {
+                report("The parameter name cannot start with '__'.", p.parameter)
+            }
+        }
     }
 }
 

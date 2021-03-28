@@ -16,6 +16,42 @@ class EntityProcessorTest {
     @JvmField
     var tempDir: Path? = null
 
+    @Test fun `The class name cannot start with '__'`() {
+        val result = compile(
+            kotlin(
+                "source.kt",
+                """
+                package test
+                import org.komapper.core.*
+                @KmEntity
+                data class __Dept(
+                    val id: Int
+                )
+                """
+            )
+        )
+        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
+        assertThat(result.messages).contains("The class name cannot start with '__'.")
+    }
+
+    @Test fun `The parameter name cannot start with '__'`() {
+        val result = compile(
+            kotlin(
+                "source.kt",
+                """
+                package test
+                import org.komapper.core.*
+                @KmEntity
+                data class Dept(
+                    val __id: Int
+                )
+                """
+            )
+        )
+        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
+        assertThat(result.messages).contains("The parameter name cannot start with '__'.")
+    }
+
     @Test
     fun `@KmEntity must be applied to data class`() {
         val result = compile(
