@@ -60,7 +60,7 @@ internal class EntityUpdateStatementBuilder<ENTITY>(
     }
 
     private fun tableName(tableInfo: TableInfo): String {
-        return support.tableName(tableInfo)
+        return support.aliasTableName(tableInfo)
     }
 
     private fun columnName(columnInfo: ColumnInfo<*>): String {

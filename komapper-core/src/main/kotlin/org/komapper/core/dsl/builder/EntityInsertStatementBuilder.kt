@@ -45,7 +45,7 @@ internal class EntityInsertStatementBuilder<ENTITY>(
     }
 
     private fun tableName(tableInfo: TableInfo): String {
-        return tableInfo.tableName()
+        return tableInfo.getName()
     }
 
     private fun columnName(columnInfo: ColumnInfo<*>): String {

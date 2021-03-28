@@ -26,7 +26,7 @@ internal sealed class EntityVisitorResult {
 
 internal data class Entity(
     val declaration: KSClassDeclaration,
-    val tableName: String,
+    val table: Table,
     val properties: List<Property>,
     val idProperties: List<Property>,
     val versionProperty: Property?,
@@ -35,10 +35,16 @@ internal data class Entity(
     val idGenerator: IdGenerator?
 )
 
+internal data class Table(
+    val name: String,
+    val catalog: String,
+    val schema: String,
+)
+
 internal data class Property(
     val parameter: KSValueParameter,
     val declaration: KSPropertyDeclaration,
-    val columnName: String,
+    val column: Column,
     val typeName: String,
     val nullability: Nullability,
     val kind: PropertyKind?,
@@ -50,6 +56,8 @@ internal data class Property(
         return parameter.toString()
     }
 }
+
+internal data class Column(val name: String)
 
 internal sealed class PropertyKind {
     abstract val annotation: KSAnnotation

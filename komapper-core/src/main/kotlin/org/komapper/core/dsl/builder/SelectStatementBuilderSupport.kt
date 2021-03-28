@@ -97,7 +97,7 @@ internal class SelectStatementBuilderSupport<ENTITY>(
     }
 
     fun tableName(tableInfo: TableInfo): String {
-        return support.tableName(tableInfo)
+        return support.aliasTableName(tableInfo)
     }
 
     fun columnName(columnInfo: ColumnInfo<*>): String {

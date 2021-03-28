@@ -20,7 +20,8 @@ data class Emp(
 }
 
 @Suppress("ClassName")
-class Emp_ : EntityMetamodel<Emp> {
+class Emp_(val __tableName: String = "EMP", val __catalogName: String = "", val __schemaName: String = "") :
+    EntityMetamodel<Emp> {
     private object EntityDescriptor {
         val id = PropertyDescriptor<Emp, Int>(Int::class, "ID", { it.id }) { e, v -> e.copy(id = v) }
         val addressId =
@@ -33,6 +34,8 @@ class Emp_ : EntityMetamodel<Emp> {
     val addressId by lazy { PropertyMetamodelImpl(this, EntityDescriptor.addressId) }
     val version by lazy { PropertyMetamodelImpl(this, EntityDescriptor.version) }
     override fun tableName() = "EMP"
+    override fun catalogName() = ""
+    override fun schemaName() = ""
     override fun idAssignment(): Assignment<Emp>? = null
     override fun idProperties(): List<PropertyMetamodel<Emp, *>> = listOf(id)
     override fun versionProperty(): PropertyMetamodel<Emp, *>? = version
@@ -43,6 +46,12 @@ class Emp_ : EntityMetamodel<Emp> {
     override fun incrementVersion(__e: Emp): Emp = version.setter(__e, version.getter(__e)!!.inc())
     override fun updateCreatedAt(__e: Emp, __c: Clock): Emp = __e
     override fun updateUpdatedAt(__e: Emp, __c: Clock): Emp = __e
+
+    companion object {
+        fun overrideTable(__tableName: String) = Address_(__tableName = __tableName)
+        fun overrideCatalog(__catalogName: String) = Address_(__catalogName = __catalogName)
+        fun overrideSchema(__schemaName: String) = Address_(__schemaName = __schemaName)
+    }
 }
 
 fun Emp.Companion.metamodel() = Emp_()

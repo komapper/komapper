@@ -1,22 +1,8 @@
 package org.komapper.ksp
 
-import com.google.devtools.ksp.symbol.KSClassDeclaration
-import com.google.devtools.ksp.symbol.KSValueParameter
 import java.nio.CharBuffer
 
 interface NamingStrategy {
-
-    fun convertToTableName(classDeclaration: KSClassDeclaration): String {
-        return classDeclaration.findAnnotation("KmTable")
-            ?.findValue("name")?.toString()
-            ?: apply(classDeclaration.simpleName.asString())
-    }
-
-    fun toColumnName(parameter: KSValueParameter): String {
-        return parameter.findAnnotation("KmColumn")
-            ?.findValue("name")?.toString()
-            ?: apply(parameter.toString())
-    }
 
     fun apply(name: String): String
 }

@@ -14,7 +14,7 @@ annotation class KmVersion
 
 @Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.SOURCE)
-annotation class KmTable(val name: String)
+annotation class KmTable(val name: String = "", val catalog: String = "", val schema: String = "")
 
 @Target(AnnotationTarget.VALUE_PARAMETER)
 @Retention(AnnotationRetention.SOURCE)

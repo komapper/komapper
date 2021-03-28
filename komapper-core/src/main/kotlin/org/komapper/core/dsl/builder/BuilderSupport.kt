@@ -17,9 +17,10 @@ internal class BuilderSupport(
     private val buf: StatementBuffer
 ) {
 
-    fun tableName(tableInfo: TableInfo): String {
+    fun aliasTableName(tableInfo: TableInfo): String {
+        val name = tableInfo.getName()
         val alias = aliasManager.getAlias(tableInfo) ?: error("no alias for '${tableInfo.tableName()}'")
-        return tableInfo.tableName() + " " + alias
+        return "$name $alias"
     }
 
     fun columnName(columnInfo: ColumnInfo<*>): String {

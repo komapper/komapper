@@ -54,7 +54,7 @@ internal class EntityFactory(
     }
 
     fun create(): Entity {
-        val tableName = namingStrategy.convertToTableName(classDeclaration)
+        val table = getTable()
         val allProperties = createAllProperties()
         val idProperties = allProperties.filter { it.kind is PropertyKind.Id }
         val versionProperty: Property? = allProperties.firstOrNull { it.kind is PropertyKind.Version }
@@ -64,7 +64,7 @@ internal class EntityFactory(
         val idGenerator: IdGenerator? = createIdGenerator(allProperties)
         return Entity(
             classDeclaration,
-            tableName,
+            table,
             (allProperties - ignoredProperties).toList(),
             idProperties.toList(),
             versionProperty,
@@ -76,6 +76,23 @@ internal class EntityFactory(
         }
     }
 
+    private fun getTable(): Table {
+        val annotation = classDeclaration.findAnnotation("KmTable")
+        val name = annotation?.findValue("name")?.toString().let {
+            if (it == "") null else it
+        } ?: namingStrategy.apply(classDeclaration.simpleName.asString())
+        val catalog = annotation?.findValue("catalog")?.toString() ?: ""
+        val schema = annotation?.findValue("schema")?.toString() ?: ""
+        return Table(name, catalog, schema)
+    }
+
+    private fun getColumn(parameter: KSValueParameter): Column {
+        val name = parameter.findAnnotation("KmColumn")
+            ?.findValue("name")?.toString()
+            ?: namingStrategy.apply(parameter.toString())
+        return Column(name)
+    }
+
     private fun createAllProperties(): Sequence<Property> {
         val propertyDeclarationMap = classDeclaration.getDeclaredProperties().associateBy { it.simpleName }
         return classDeclaration.primaryConstructor?.parameters
@@ -83,13 +100,13 @@ internal class EntityFactory(
             ?.map { parameter ->
                 val declaration = propertyDeclarationMap[parameter.name]
                     ?: report("The corresponding property is not found.", parameter)
-                val columnName = namingStrategy.toColumnName(parameter)
+                val column = getColumn(parameter)
                 val type = parameter.type.resolve()
                 val typeName = (type.declaration.qualifiedName ?: type.declaration.simpleName).asString()
                 val nullability = type.nullability
                 val kind = createPropertyKind(parameter)
                 val generatorKind = createIdGeneratorKind(parameter, kind)
-                Property(parameter, declaration, columnName, typeName, nullability, kind, generatorKind).also {
+                Property(parameter, declaration, column, typeName, nullability, kind, generatorKind).also {
                     validateProperty(it)
                 }
             }?.also {

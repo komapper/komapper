@@ -27,13 +27,22 @@ internal class EntityMetamodelGenerator(
         w.println("package $packageName")
         w.println()
         w.println("@Suppress(\"ClassName\")")
-        w.println("class $simpleName : $EntityMetamodel<$entityTypeName> {")
+
+        val paramList = listOf(
+            "val __tableName: String = \"${entity.table.name}\"",
+            "val __catalogName: String = \"${entity.table.catalog}\"",
+            "val __schemaName: String = \"${entity.table.schema}\""
+        ).joinToString(", ")
+        w.println("class $simpleName($paramList) : $EntityMetamodel<$entityTypeName> {")
 
         entityDescriptor()
 
         propertyMetamodels()
 
         tableName()
+        catalogName()
+        schemaName()
+
         idAssignment()
         idProperties()
         versionProperty()
@@ -42,10 +51,11 @@ internal class EntityMetamodelGenerator(
         incrementVersion()
         updateCreatedAt()
         updateUpdatedAt()
+        companionObject()
 
         w.println("}")
 
-        companionMetamodel()
+        utils()
     }
 
     private fun entityDescriptor() {
@@ -62,7 +72,7 @@ internal class EntityMetamodelGenerator(
             }
         }
         for (p in entity.properties) {
-            w.println("        val $p = $PropertyDescriptor<$entityTypeName, ${p.typeName}>(${p.typeName}::class, \"${p.columnName}\", { it.$p }) { e, v -> e.copy($p = v) }")
+            w.println("        val $p = $PropertyDescriptor<$entityTypeName, ${p.typeName}>(${p.typeName}::class, \"${p.column.name}\", { it.$p }) { e, v -> e.copy($p = v) }")
         }
         w.println("    }")
     }
@@ -74,7 +84,15 @@ internal class EntityMetamodelGenerator(
     }
 
     private fun tableName() {
-        w.println("    override fun tableName() = \"${entity.tableName}\"")
+        w.println("    override fun tableName() = __tableName")
+    }
+
+    private fun catalogName() {
+        w.println("    override fun catalogName() = __catalogName")
+    }
+
+    private fun schemaName() {
+        w.println("    override fun schemaName() = __schemaName")
     }
 
     private fun idAssignment() {
@@ -138,7 +156,15 @@ internal class EntityMetamodelGenerator(
         w.println("    override fun updateUpdatedAt(__e: $entityTypeName, __c: $Clock): $entityTypeName = $body")
     }
 
-    private fun companionMetamodel() {
+    private fun companionObject() {
+        w.println("    companion object {")
+        w.println("        fun overrideTable(__tableName: String) = $simpleName(__tableName = __tableName)")
+        w.println("        fun overrideCatalog(__catalogName: String) = $simpleName(__catalogName = __catalogName)")
+        w.println("        fun overrideSchema(__schemaName: String) = $simpleName(__schemaName = __schemaName)")
+        w.println("    }")
+    }
+
+    private fun utils() {
         if (entity.declaration.hasCompanionObject()) {
             w.println("")
             w.println("fun $entityTypeName.Companion.metamodel() = $simpleName()")
