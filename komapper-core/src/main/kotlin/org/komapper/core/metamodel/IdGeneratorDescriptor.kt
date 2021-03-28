@@ -26,7 +26,9 @@ class IdentityGeneratorDescriptor<E, T : Any>(
 class SequenceGeneratorDescriptor<E, T : Any>(
     private val klass: KClass<T>,
     private val name: String,
-    private val incrementBy: Int
+    private val incrementBy: Int,
+    private val catalogName: String,
+    private val schemaName: String
 ) : IdGeneratorDescriptor<E, T> {
 
     private val contexts = ConcurrentHashMap<String, GenerationContext>()
@@ -40,7 +42,7 @@ class SequenceGeneratorDescriptor<E, T : Any>(
     }
 
     override fun createAssignment(setter: (E, T) -> E): Assignment<E> {
-        return Assignment.Sequence(name, this::generate, setter)
+        return Assignment.Sequence(name, catalogName, schemaName, this::generate, setter)
     }
 
     class GenerationContext(private val incrementBy: Int, private val nextValue: NextValue) {
@@ -81,6 +83,8 @@ sealed class Assignment<E> {
 
     class Sequence<E, T>(
         val name: String,
+        val catalogName: String,
+        val schemaName: String,
         private val generator: (key: String, NextValue) -> T,
         private val setter: (E, T) -> E
     ) :

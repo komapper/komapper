@@ -25,7 +25,7 @@ class MiscTest {
         val query = EntityQuery.from(m)
         val sql = query.peek().sql
         println(sql)
-        assertTrue(sql.contains(" catalog.schema.catalog_and_schema "))
+        assertTrue(sql.contains(""" "catalog"."schema"."CATALOG_AND_SCHEMA" """))
     }
 
     @KmEntity
@@ -40,7 +40,7 @@ class MiscTest {
         val query = EntityQuery.from(m)
         val sql = query.peek().sql
         println(sql)
-        assertTrue(sql.contains(" catalog.catalog_only "))
+        assertTrue(sql.contains(""" "catalog"."CATALOG_ONLY" """))
     }
 
     @KmEntity
@@ -55,7 +55,7 @@ class MiscTest {
         val query = EntityQuery.from(m)
         val sql = query.peek().sql
         println(sql)
-        assertTrue(sql.contains(" schema.schema_only "))
+        assertTrue(sql.contains(""" "schema"."SCHEMA_ONLY" """))
     }
 
     @KmEntity
@@ -70,6 +70,6 @@ class MiscTest {
         val query = EntityQuery.from(m)
         val sql = query.peek().sql
         println(sql)
-        assertTrue(sql.contains(" blank_name "))
+        assertTrue(sql.contains(""" "BLANK_NAME" """))
     }
 }

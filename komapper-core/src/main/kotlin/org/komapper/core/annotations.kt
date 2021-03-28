@@ -34,7 +34,12 @@ annotation class KmIgnore
 
 @Target(AnnotationTarget.VALUE_PARAMETER)
 @Retention(AnnotationRetention.SOURCE)
-annotation class KmSequenceGenerator(val name: String, val incrementBy: Int)
+annotation class KmSequenceGenerator(
+    val name: String,
+    val incrementBy: Int,
+    val catalog: String = "",
+    val schema: String = ""
+)
 
 @Target(AnnotationTarget.VALUE_PARAMETER)
 @Retention(AnnotationRetention.SOURCE)

@@ -3,6 +3,7 @@ package org.komapper.core.dsl.command
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.config.Dialect
 import org.komapper.core.data.Statement
+import org.komapper.core.dsl.util.getName
 import org.komapper.core.jdbc.JdbcExecutor
 import org.komapper.core.metamodel.Assignment
 import org.komapper.core.metamodel.EntityMetamodel
@@ -35,7 +36,7 @@ internal class EntityInsertCommand<ENTITY>(
     private fun preInsert(): ENTITY {
         val assignment = entityMetamodel.idAssignment()
         return if (assignment is Assignment.Sequence<ENTITY, *>) {
-            val sequenceName = assignment.name
+            val sequenceName = assignment.getName(config.dialect::quote)
             assignment.assign(entity, config.name) {
                 val sql = config.dialect.getSequenceSql(sequenceName)
                 val statement = Statement(sql)

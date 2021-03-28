@@ -20,3 +20,7 @@ dependencies {
     implementation("com.h2database:h2:1.4.200")
     kspTest(project(":komapper-processor"))
 }
+
+ksp {
+    arg("komapper.namingStrategy", "UPPER_SNAKE_CASE")
+}

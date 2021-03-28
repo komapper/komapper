@@ -67,7 +67,14 @@ internal class EntityMetamodelGenerator(
                     w.println("        val ${idGenerator.name} = $IdentityGeneratorDescriptor<$entityTypeName, ${idGenerator.property.typeName}>(${idGenerator.property.typeName}::class)")
                 }
                 is IdGeneratorKind.Sequence -> {
-                    w.println("        val ${idGenerator.name} = $SequenceGeneratorDescriptor<$entityTypeName, ${idGenerator.property.typeName}>(${idGenerator.property.typeName}::class, \"${kind.name}\", ${kind.incrementBy})")
+                    val paramList = listOf(
+                        "${idGenerator.property.typeName}::class",
+                        "\"${kind.name}\"",
+                        "${kind.incrementBy}",
+                        "\"${kind.catalog}\"",
+                        "\"${kind.schema}\""
+                    ).joinToString(", ")
+                    w.println("        val ${idGenerator.name} = $SequenceGeneratorDescriptor<$entityTypeName, ${idGenerator.property.typeName}>($paramList)")
                 }
             }
         }

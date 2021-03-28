@@ -18,7 +18,7 @@ internal class BuilderSupport(
 ) {
 
     fun aliasTableName(tableInfo: TableInfo): String {
-        val name = tableInfo.getName()
+        val name = tableInfo.getName(dialect::quote)
         val alias = aliasManager.getAlias(tableInfo) ?: error("no alias for '${tableInfo.tableName()}'")
         return "$name $alias"
     }
@@ -49,8 +49,9 @@ internal class BuilderSupport(
                 "sum($name)"
             }
             else -> {
-                val alias = aliasManager.getAlias(columnInfo) ?: error("no alias for '${columnInfo.columnName}'")
-                return alias + "." + columnInfo.columnName
+                val name = columnInfo.getName(dialect::quote)
+                val alias = aliasManager.getAlias(columnInfo) ?: error("no alias for $name")
+                return "$alias.$name"
             }
         }
     }

@@ -26,5 +26,5 @@ application {
 }
 
 ksp {
-    arg("komapper.suffix", "_")
+    arg("komapper.namingStrategy", "UPPER_SNAKE_CASE")
 }

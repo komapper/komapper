@@ -45,10 +45,10 @@ internal class EntityInsertStatementBuilder<ENTITY>(
     }
 
     private fun tableName(tableInfo: TableInfo): String {
-        return tableInfo.getName()
+        return tableInfo.getName(dialect::quote)
     }
 
     private fun columnName(columnInfo: ColumnInfo<*>): String {
-        return columnInfo.columnName
+        return columnInfo.getName(dialect::quote)
     }
 }

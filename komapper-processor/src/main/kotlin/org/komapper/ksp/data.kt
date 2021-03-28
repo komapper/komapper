@@ -73,7 +73,13 @@ internal sealed class IdGeneratorKind {
     abstract val annotation: KSAnnotation
 
     data class Identity(override val annotation: KSAnnotation) : IdGeneratorKind()
-    data class Sequence(override val annotation: KSAnnotation, val name: Any, val incrementBy: Any) :
+    data class Sequence(
+        override val annotation: KSAnnotation,
+        val name: String,
+        val incrementBy: Any,
+        val catalog: String,
+        val schema: String
+    ) :
         IdGeneratorKind()
 }
 

@@ -88,7 +88,7 @@ internal class EntityFactory(
 
     private fun getColumn(parameter: KSValueParameter): Column {
         val name = parameter.findAnnotation("KmColumn")
-            ?.findValue("name")?.toString()
+            ?.findValue("name")?.toString()?.trim()
             ?: namingStrategy.apply(parameter.toString())
         return Column(name)
     }
@@ -242,11 +242,13 @@ internal class EntityFactory(
             when (a.shortName.asString()) {
                 "KmIdentityGenerator" -> identity = IdGeneratorKind.Identity(a)
                 "KmSequenceGenerator" -> sequence = let {
-                    val name = a.findValue("name")
+                    val name = a.findValue("name")?.toString()?.trim()
                         ?: report("@KmSequenceGenerator.name is not found.", a)
                     val incrementBy = a.findValue("incrementBy")
                         ?: report("@KmSequenceGenerator.incrementBy is not found.", a)
-                    IdGeneratorKind.Sequence(a, name, incrementBy)
+                    val catalog = a.findValue("catalog")?.toString()?.trim() ?: ""
+                    val schema = a.findValue("schema")?.toString()?.trim() ?: ""
+                    IdGeneratorKind.Sequence(a, name, incrementBy, catalog, schema)
                 }
             }
         }
