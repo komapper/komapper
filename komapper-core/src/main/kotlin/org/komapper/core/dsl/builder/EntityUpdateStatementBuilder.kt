@@ -64,6 +64,6 @@ internal class EntityUpdateStatementBuilder<ENTITY>(
     }
 
     private fun columnName(columnInfo: ColumnInfo<*>): String {
-        return support.columnName(columnInfo)
+        return support.aliasColumnName(columnInfo)
     }
 }

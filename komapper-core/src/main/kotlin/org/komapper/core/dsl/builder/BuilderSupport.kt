@@ -23,38 +23,36 @@ internal class BuilderSupport(
         return "$name $alias"
     }
 
-    fun columnName(columnInfo: ColumnInfo<*>): String {
+    fun aliasColumnName(columnInfo: ColumnInfo<*>): String {
         return when (columnInfo) {
             is AggregateFunction.Avg -> {
-                val name = columnName(columnInfo.c)
+                val name = aliasColumnName(columnInfo.c)
                 "avg($name)"
             }
             is AggregateFunction.CountAsterisk -> {
                 "count(*)"
             }
             is AggregateFunction.Count -> {
-                val name = columnName(columnInfo.c)
+                val name = aliasColumnName(columnInfo.c)
                 "count($name)"
             }
             is AggregateFunction.Max -> {
-                val name = columnName(columnInfo.c)
+                val name = aliasColumnName(columnInfo.c)
                 "max($name)"
             }
             is AggregateFunction.Min -> {
-                val name = columnName(columnInfo.c)
+                val name = aliasColumnName(columnInfo.c)
                 "min($name)"
             }
             is AggregateFunction.Sum -> {
-                val name = columnName(columnInfo.c)
+                val name = aliasColumnName(columnInfo.c)
                 "sum($name)"
             }
-            else -> aliasedColumnName(columnInfo)
+            else -> {
+                val alias = aliasManager.getAlias(columnInfo) ?: error("no alias for '${columnInfo.columnName}'")
+                return alias + "." + columnInfo.columnName
+            }
         }
-    }
-
-    private fun aliasedColumnName(columnInfo: ColumnInfo<*>): String {
-        val alias = aliasManager.getAlias(columnInfo) ?: error("no alias for '${columnInfo.columnName}'")
-        return alias + "." + columnInfo.columnName
     }
 
     fun visitCriterion(index: Int, c: Criterion) {
@@ -131,7 +129,7 @@ internal class BuilderSupport(
         }
         when (operand) {
             is Operand.Column -> {
-                buf.append(columnName(operand.columnInfo))
+                buf.append(aliasColumnName(operand.columnInfo))
             }
             is Operand.Parameter -> {
                 val value = operand.value
@@ -222,7 +220,7 @@ internal class BuilderSupport(
     private fun visitOperand(operand: Operand) {
         when (operand) {
             is Operand.Column -> {
-                buf.append(columnName(operand.columnInfo))
+                buf.append(aliasColumnName(operand.columnInfo))
             }
             is Operand.Parameter -> {
                 buf.bind(Value(operand.value, operand.columnInfo.klass))

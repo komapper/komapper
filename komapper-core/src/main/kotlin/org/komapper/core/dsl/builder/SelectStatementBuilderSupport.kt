@@ -101,7 +101,7 @@ internal class SelectStatementBuilderSupport<ENTITY>(
     }
 
     fun columnName(columnInfo: ColumnInfo<*>): String {
-        return support.columnName(columnInfo)
+        return support.aliasColumnName(columnInfo)
     }
 
     fun visitCriterion(index: Int, c: Criterion) {
