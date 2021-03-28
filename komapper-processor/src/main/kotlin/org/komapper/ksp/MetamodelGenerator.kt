@@ -29,9 +29,9 @@ internal class EntityMetamodelGenerator(
         w.println("@Suppress(\"ClassName\")")
 
         val paramList = listOf(
-            "val __tableName: String = \"${entity.table.name}\"",
-            "val __catalogName: String = \"${entity.table.catalog}\"",
-            "val __schemaName: String = \"${entity.table.schema}\""
+            "private val __tableName: String = \"${entity.table.name}\"",
+            "private val __catalogName: String = \"${entity.table.catalog}\"",
+            "private val __schemaName: String = \"${entity.table.schema}\""
         ).joinToString(", ")
         w.println("class $simpleName($paramList) : $EntityMetamodel<$entityTypeName> {")
 
