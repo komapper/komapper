@@ -12,6 +12,11 @@ import org.komapper.core.metamodel.EntityMetamodel
 
 interface SqlInsertQuery : Query<Pair<Int, Long?>> {
     fun values(declaration: ValuesDeclaration): SqlInsertQuery
+
+    override fun peek(dialect: Dialect, block: (Statement) -> Unit): SqlInsertQuery {
+        super.peek(dialect, block)
+        return this
+    }
 }
 
 internal data class SqlInsertQueryImpl<ENTITY>(
@@ -32,7 +37,7 @@ internal data class SqlInsertQueryImpl<ENTITY>(
         return command.execute()
     }
 
-    override fun peek(dialect: Dialect): Statement {
+    override fun toStatement(dialect: Dialect): Statement {
         return buildStatement(dialect, context)
     }
 

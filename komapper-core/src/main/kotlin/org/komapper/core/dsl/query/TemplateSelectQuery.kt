@@ -17,7 +17,7 @@ internal data class TemplateSelectQuery<T>(
         return transformable.run(config)
     }
 
-    override fun peek(dialect: Dialect): Statement {
+    override fun toStatement(dialect: Dialect): Statement {
         return buildStatement(dialect)
     }
 
@@ -49,6 +49,6 @@ internal data class TemplateSelectQuery<T>(
             return command.execute()
         }
 
-        override fun peek(dialect: Dialect): Statement = buildStatement(dialect)
+        override fun toStatement(dialect: Dialect): Statement = buildStatement(dialect)
     }
 }

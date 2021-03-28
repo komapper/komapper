@@ -122,8 +122,13 @@ internal data class SqlSelectQueryImpl<ENTITY>(
         return transformable.run(config)
     }
 
-    override fun peek(dialect: Dialect): Statement {
+    override fun toStatement(dialect: Dialect): Statement {
         return buildStatement(dialect, context)
+    }
+
+    override fun peek(dialect: Dialect, block: (Statement) -> Unit): SqlSelectQueryImpl<ENTITY> {
+        super.peek(dialect, block)
+        return this
     }
 
     private fun buildStatement(dialect: Dialect, c: SqlSelectContext<ENTITY>): Statement {
@@ -152,7 +157,7 @@ internal data class SqlSelectQueryImpl<ENTITY>(
             return command.execute()
         }
 
-        override fun peek(dialect: Dialect): Statement = buildStatement(dialect, context)
+        override fun toStatement(dialect: Dialect): Statement = buildStatement(dialect, context)
     }
 }
 
@@ -167,7 +172,7 @@ private class SingleColumnQuery<ENTITY, T : Any>(
         return transformable.run(config)
     }
 
-    override fun peek(dialect: Dialect): Statement = statementBuilder(dialect, context)
+    override fun toStatement(dialect: Dialect): Statement = statementBuilder(dialect, context)
 
     override fun first(): Query<T> {
         return Transformable { it.first() }
@@ -188,7 +193,7 @@ private class SingleColumnQuery<ENTITY, T : Any>(
             return command.execute()
         }
 
-        override fun peek(dialect: Dialect): Statement = statementBuilder(dialect, context)
+        override fun toStatement(dialect: Dialect): Statement = statementBuilder(dialect, context)
     }
 }
 
@@ -203,7 +208,7 @@ private class PairColumnsQuery<ENTITY, A : Any, B : Any>(
         return transformable.run(config)
     }
 
-    override fun peek(dialect: Dialect): Statement = statementBuilder(dialect, context)
+    override fun toStatement(dialect: Dialect): Statement = statementBuilder(dialect, context)
 
     override fun first(): Query<Pair<A, B>> {
         return Transformable { it.first() }
@@ -224,6 +229,6 @@ private class PairColumnsQuery<ENTITY, A : Any, B : Any>(
             return command.execute()
         }
 
-        override fun peek(dialect: Dialect): Statement = statementBuilder(dialect, context)
+        override fun toStatement(dialect: Dialect): Statement = statementBuilder(dialect, context)
     }
 }

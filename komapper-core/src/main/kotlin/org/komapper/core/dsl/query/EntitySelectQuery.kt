@@ -29,6 +29,11 @@ interface EntitySelectQuery<ENTITY> : ListQuery<ENTITY> {
     fun limit(value: Int): EntitySelectQuery<ENTITY>
     fun forUpdate(): EntitySelectQuery<ENTITY>
 
+    override fun peek(dialect: Dialect, block: (Statement) -> Unit): EntitySelectQuery<ENTITY> {
+        super.peek(dialect, block)
+        return this
+    }
+
     fun <T, S> associate(
         e1: EntityMetamodel<T>,
         e2: EntityMetamodel<S>,
@@ -107,7 +112,7 @@ internal data class EntitySelectQueryImpl<ENTITY>(
         return transformable.run(config)
     }
 
-    override fun peek(dialect: Dialect): Statement {
+    override fun toStatement(dialect: Dialect): Statement {
         return buildStatement(dialect)
     }
 
@@ -135,6 +140,6 @@ internal data class EntitySelectQueryImpl<ENTITY>(
             return command.execute()
         }
 
-        override fun peek(dialect: Dialect): Statement = buildStatement(dialect)
+        override fun toStatement(dialect: Dialect): Statement = buildStatement(dialect)
     }
 }

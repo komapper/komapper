@@ -21,7 +21,7 @@ internal data class EntityDeleteQuery<ENTITY>(
         command.execute()
     }
 
-    override fun peek(dialect: Dialect): Statement {
+    override fun toStatement(dialect: Dialect): Statement {
         return buildStatement(dialect)
     }
 

@@ -17,7 +17,7 @@ internal data class TemplateUpdateQuery(
         return command.execute()
     }
 
-    override fun peek(dialect: Dialect): Statement {
+    override fun toStatement(dialect: Dialect): Statement {
         return buildStatement(dialect)
     }
 

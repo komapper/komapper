@@ -20,7 +20,7 @@ internal data class EntityUpdateQuery<ENTITY>(
         return command.execute()
     }
 
-    override fun peek(dialect: Dialect): Statement {
+    override fun toStatement(dialect: Dialect): Statement {
         return buildStatement(dialect, entity)
     }
 

@@ -15,6 +15,11 @@ import org.komapper.core.metamodel.EntityMetamodel
 interface SqlUpdateQuery : Query<Int> {
     fun set(declaration: SetDeclaration): SqlUpdateQuery
     fun where(declaration: WhereDeclaration): SqlUpdateQuery
+
+    override fun peek(dialect: Dialect, block: (Statement) -> Unit): SqlUpdateQuery {
+        super.peek(dialect, block)
+        return this
+    }
 }
 
 internal data class SqlUpdateQueryImpl<ENTITY>(
@@ -42,7 +47,7 @@ internal data class SqlUpdateQueryImpl<ENTITY>(
         return command.execute()
     }
 
-    override fun peek(dialect: Dialect): Statement {
+    override fun toStatement(dialect: Dialect): Statement {
         return buildStatement(dialect)
     }
 

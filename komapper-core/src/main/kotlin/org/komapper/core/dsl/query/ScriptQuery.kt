@@ -13,7 +13,7 @@ internal data class ScriptQuery(val sql: String) : Query<Unit> {
         return command.execute()
     }
 
-    override fun peek(dialect: Dialect): Statement {
+    override fun toStatement(dialect: Dialect): Statement {
         return statement
     }
 }

@@ -12,6 +12,11 @@ import org.komapper.core.metamodel.EntityMetamodel
 
 interface SqlDeleteQuery : Query<Int> {
     fun where(declaration: WhereDeclaration): SqlDeleteQuery
+
+    override fun peek(dialect: Dialect, block: (Statement) -> Unit): SqlDeleteQuery {
+        super.peek(dialect, block)
+        return this
+    }
 }
 
 internal data class SqlDeleteQueryImpl<ENTITY>(
@@ -32,7 +37,7 @@ internal data class SqlDeleteQueryImpl<ENTITY>(
         return command.execute()
     }
 
-    override fun peek(dialect: Dialect): Statement {
+    override fun toStatement(dialect: Dialect): Statement {
         return buildStatement(dialect, context)
     }
 

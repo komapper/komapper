@@ -23,7 +23,7 @@ class MiscTest {
     fun catalogAndSchema() {
         val m = MiscTest_CatalogAndSchema_()
         val query = EntityQuery.from(m)
-        val sql = query.peek().sql
+        val sql = query.toStatement().sql
         println(sql)
         assertTrue(sql.contains(""" "catalog"."schema"."CATALOG_AND_SCHEMA" """))
     }
@@ -38,7 +38,7 @@ class MiscTest {
     fun catalogOnly() {
         val m = MiscTest_CatalogOnly_()
         val query = EntityQuery.from(m)
-        val sql = query.peek().sql
+        val sql = query.toStatement().sql
         println(sql)
         assertTrue(sql.contains(""" "catalog"."CATALOG_ONLY" """))
     }
@@ -53,7 +53,7 @@ class MiscTest {
     fun schemaOnly() {
         val m = MiscTest_SchemaOnly_()
         val query = EntityQuery.from(m)
-        val sql = query.peek().sql
+        val sql = query.toStatement().sql
         println(sql)
         assertTrue(sql.contains(""" "schema"."SCHEMA_ONLY" """))
     }
@@ -68,7 +68,7 @@ class MiscTest {
     fun emptyTable() {
         val m = MiscTest_BlankName_()
         val query = EntityQuery.from(m)
-        val sql = query.peek().sql
+        val sql = query.toStatement().sql
         println(sql)
         assertTrue(sql.contains(""" "BLANK_NAME" """))
     }

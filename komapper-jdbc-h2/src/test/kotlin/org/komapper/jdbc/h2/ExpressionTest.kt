@@ -24,7 +24,7 @@ class ExpressionTest(private val db: Database) {
                 }
                 .select(1 + a.addressId + 1)
                 .also {
-                    println(it.peek())
+                    println(it.toStatement())
                 }.first()
         }
         assertEquals(12, result)
@@ -40,7 +40,7 @@ class ExpressionTest(private val db: Database) {
                 }
                 .select(50 - a.addressId - 40)
                 .also {
-                    println(it.peek())
+                    println(it.toStatement())
                 }.first()
         }
         assertEquals(0, result)
@@ -56,7 +56,7 @@ class ExpressionTest(private val db: Database) {
                 }
                 .select(100 / a.addressId / 2)
                 .also {
-                    println(it.peek())
+                    println(it.toStatement())
                 }.first()
         }
         assertEquals(5, result)
@@ -72,7 +72,7 @@ class ExpressionTest(private val db: Database) {
                 }
                 .select(15 % a.addressId % 2)
                 .also {
-                    println(it.peek())
+                    println(it.toStatement())
                 }.first()
         }
         assertEquals(1, result)
@@ -88,7 +88,7 @@ class ExpressionTest(private val db: Database) {
                 }
                 .select("[" concat a.street concat "]")
                 .also {
-                    println(it.peek())
+                    println(it.toStatement())
                 }.first()
         }
         assertEquals("[STREET 10]", result)
