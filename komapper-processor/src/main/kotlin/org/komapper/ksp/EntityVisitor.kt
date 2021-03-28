@@ -78,11 +78,11 @@ internal class EntityFactory(
 
     private fun getTable(): Table {
         val annotation = classDeclaration.findAnnotation("KmTable")
-        val name = annotation?.findValue("name")?.toString().let {
-            if (it == "") null else it
+        val name = annotation?.findValue("name")?.toString()?.trim().let {
+            if (it.isNullOrBlank()) null else it
         } ?: namingStrategy.apply(classDeclaration.simpleName.asString())
-        val catalog = annotation?.findValue("catalog")?.toString() ?: ""
-        val schema = annotation?.findValue("schema")?.toString() ?: ""
+        val catalog = annotation?.findValue("catalog")?.toString()?.trim() ?: ""
+        val schema = annotation?.findValue("schema")?.toString()?.trim() ?: ""
         return Table(name, catalog, schema)
     }
 

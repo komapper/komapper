@@ -24,7 +24,8 @@ class MiscTest {
         val m = MiscTest_CatalogAndSchema_()
         val query = EntityQuery.from(m)
         val sql = query.peek().sql
-        assertTrue(sql.contains("catalog.schema.catalog_and_schema"))
+        println(sql)
+        assertTrue(sql.contains(" catalog.schema.catalog_and_schema "))
     }
 
     @KmEntity
@@ -38,7 +39,8 @@ class MiscTest {
         val m = MiscTest_CatalogOnly_()
         val query = EntityQuery.from(m)
         val sql = query.peek().sql
-        assertTrue(sql.contains("catalog.catalog_only"))
+        println(sql)
+        assertTrue(sql.contains(" catalog.catalog_only "))
     }
 
     @KmEntity
@@ -52,6 +54,22 @@ class MiscTest {
         val m = MiscTest_SchemaOnly_()
         val query = EntityQuery.from(m)
         val sql = query.peek().sql
-        assertTrue(sql.contains("schema.schema_only"))
+        println(sql)
+        assertTrue(sql.contains(" schema.schema_only "))
+    }
+
+    @KmEntity
+    @KmTable("    ")
+    data class BlankName(
+        @KmId val id: Int,
+    )
+
+    @Test
+    fun emptyTable() {
+        val m = MiscTest_BlankName_()
+        val query = EntityQuery.from(m)
+        val sql = query.peek().sql
+        println(sql)
+        assertTrue(sql.contains(" blank_name "))
     }
 }
