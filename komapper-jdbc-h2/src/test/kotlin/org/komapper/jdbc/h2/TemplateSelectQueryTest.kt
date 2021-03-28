@@ -13,9 +13,9 @@ class TemplateSelectQueryTest(private val db: Database) {
 
     val asAddress: Row.() -> Address = {
         Address(
-            asInt("address_id"),
-            asString("street"),
-            asInt("version")
+            asInt("address_id")!!,
+            asString("street")!!,
+            asInt("version")!!
         )
     }
 

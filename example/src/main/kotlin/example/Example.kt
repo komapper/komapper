@@ -81,9 +81,9 @@ fun main() {
             """.trimIndent()
             TemplateQuery.select(sql, Params("street B")) {
                 Address(
-                    asInt("ADDRESS_ID"),
-                    asString("STREET"),
-                    asInt("VERSION"),
+                    asInt("ADDRESS_ID")!!,
+                    asString("STREET")!!,
+                    asInt("VERSION")!!,
                     asLocalDateTime("CREATED_AT"),
                     asLocalDateTime("UPDATED_AT")
                 )
