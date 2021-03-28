@@ -1,4 +1,4 @@
-package org.komapper.core
+package org.komapper.core.dsl
 
 import org.komapper.core.dsl.query.SqlSelectQuery
 import org.komapper.core.dsl.query.SqlSelectQueryImpl

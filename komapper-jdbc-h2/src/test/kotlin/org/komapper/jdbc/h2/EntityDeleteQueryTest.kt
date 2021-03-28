@@ -5,8 +5,8 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.Database
-import org.komapper.core.EntityQuery
 import org.komapper.core.OptimisticLockException
+import org.komapper.core.dsl.EntityQuery
 
 @ExtendWith(Env::class)
 class EntityDeleteQueryTest(private val db: Database) {

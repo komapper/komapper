@@ -6,13 +6,13 @@ import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.Database
-import org.komapper.core.SqlQuery
-import org.komapper.core.dsl.query.avg
-import org.komapper.core.dsl.query.count
-import org.komapper.core.dsl.query.desc
-import org.komapper.core.dsl.query.max
-import org.komapper.core.dsl.query.min
-import org.komapper.core.dsl.query.sum
+import org.komapper.core.dsl.SqlQuery
+import org.komapper.core.dsl.avg
+import org.komapper.core.dsl.count
+import org.komapper.core.dsl.desc
+import org.komapper.core.dsl.max
+import org.komapper.core.dsl.min
+import org.komapper.core.dsl.sum
 
 @ExtendWith(Env::class)
 class SqlSelectQueryTest(private val db: Database) {

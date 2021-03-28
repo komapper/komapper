@@ -8,6 +8,7 @@ import org.komapper.core.dsl.data.Criterion
 import org.komapper.core.dsl.data.Operand
 import org.komapper.core.dsl.option.LikeOption
 import org.komapper.core.dsl.query.AggregateFunction
+import org.komapper.core.dsl.util.getName
 import org.komapper.core.metamodel.ColumnInfo
 import org.komapper.core.metamodel.TableInfo
 

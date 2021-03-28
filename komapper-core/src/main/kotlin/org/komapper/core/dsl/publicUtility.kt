@@ -1,6 +1,7 @@
-package org.komapper.core.dsl.query
+package org.komapper.core.dsl
 
 import org.komapper.core.dsl.data.SortItem
+import org.komapper.core.dsl.query.AggregateFunction
 import org.komapper.core.metamodel.ColumnInfo
 
 fun <T : Any> ColumnInfo<T>.desc(): ColumnInfo<T> {

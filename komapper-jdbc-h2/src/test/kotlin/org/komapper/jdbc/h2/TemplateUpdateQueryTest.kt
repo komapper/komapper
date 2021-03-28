@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.Database
-import org.komapper.core.TemplateQuery
+import org.komapper.core.dsl.TemplateQuery
 
 @ExtendWith(Env::class)
 class TemplateUpdateQueryTest(private val db: Database) {

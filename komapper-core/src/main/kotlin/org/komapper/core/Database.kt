@@ -1,5 +1,8 @@
 package org.komapper.core
 
+import org.komapper.core.dsl.EntityQuery
+import org.komapper.core.dsl.ScriptQuery
+import org.komapper.core.dsl.SqlQuery
 import org.komapper.core.dsl.query.Query
 import org.komapper.core.dsl.scope.WhereDeclaration
 import org.komapper.core.metamodel.EntityMetamodel

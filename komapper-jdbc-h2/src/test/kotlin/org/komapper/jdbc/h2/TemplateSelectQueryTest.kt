@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.Database
-import org.komapper.core.TemplateQuery
+import org.komapper.core.dsl.TemplateQuery
 import org.komapper.core.dsl.query.Row
 
 @ExtendWith(Env::class)

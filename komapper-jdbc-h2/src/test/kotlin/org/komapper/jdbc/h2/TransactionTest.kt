@@ -11,10 +11,10 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.komapper.core.Database
-import org.komapper.core.EntityQuery
 import org.komapper.core.KmEntity
 import org.komapper.core.KmId
 import org.komapper.core.KmTable
+import org.komapper.core.dsl.EntityQuery
 import org.komapper.core.jdbc.SimpleDataSource
 import org.komapper.core.tx.TransactionIsolationLevel
 import java.sql.Blob

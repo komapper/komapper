@@ -1,7 +1,6 @@
 package example
 
 import org.komapper.core.Database
-import org.komapper.core.EntityQuery
 import org.komapper.core.KmColumn
 import org.komapper.core.KmCreatedAt
 import org.komapper.core.KmEntity
@@ -9,7 +8,8 @@ import org.komapper.core.KmId
 import org.komapper.core.KmIdentityGenerator
 import org.komapper.core.KmUpdatedAt
 import org.komapper.core.KmVersion
-import org.komapper.core.TemplateQuery
+import org.komapper.core.dsl.EntityQuery
+import org.komapper.core.dsl.TemplateQuery
 import org.komapper.jdbc.h2.H2DatabaseConfig
 import java.time.LocalDateTime
 
