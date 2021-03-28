@@ -7,7 +7,7 @@ Komapper is a simple database access library for Kotlin.
 
 Supported databases are as follows:
 
-- H2 1.4.199 or above
+- H2 1.4.200 or above
 
 ## Strengths
 
@@ -15,96 +15,49 @@ Supported databases are as follows:
 - Flexible and natural syntax for criteria queries.
 - SQL templates, called “two-way SQL”.
 
-## Install
-
 ## Status
 
 In Development
 
-## Example
+## Criteria Query
 
 ```kotlin
-@KmEntity
-data class Address(
-    @KmId
-    @KmIdentityGenerator
-    @KmColumn(name = "ADDRESS_ID")
-    val id: Int = 0,
-    val street: String,
-    @KmVersion val version: Int = 0
-) {
-    companion object
-}
+// metamodels
+val e = Employee_()
+val d = Department_()
 
-fun main() {
-    // create a Database instance
-    val db = Database(H2DatabaseConfig("jdbc:h2:mem:example;DB_CLOSE_DELAY=-1"))
-
-    // set up schema
-    db.transaction {
-        @Language("sql")
-        val sql = """
-            CREATE TABLE ADDRESS(
-                ADDRESS_ID INTEGER NOT NULL PRIMARY KEY AUTO_INCREMENT,
-                STREET VARCHAR(20) UNIQUE,
-                VERSION INTEGER
-            );
-        """.trimIndent()
-        db.script(sql)
-    }
-
-    // create a metamodel
-    val a = Address.metamodel()
-
-    // execute simple CRUD operations as a transaction
-    db.transaction {
-        // CREATE
-        val addressA = db.insert(a, Address(street = "street A"))
-        println(addressA)
-
-        // READ: select by id
-        val foundA = db.find(a) {
-            a.id eq addressA.id
-        }
-        check(addressA == foundA)
-
-        // UPDATE
-        val addressB = db.update(a, addressA.copy(street = "street B"))
-        println(addressB)
-
-        // READ: select by street and version
-        val foundB1 = db.find(a) {
-            a.street eq "street B"
-            a.version eq 1
-        }
-        check(addressB == foundB1)
-
-        // READ: select using template
-        val foundB2 = db.first {
-            data class Params(val street: String)
-
-            @Language("sql")
-            val sql = "select ADDRESS_ID, STREET, VERSION from Address where street = /*street*/'test'"
-            TemplateQuery.select(sql, Params("street B")) {
-                Address(asInt("ADDRESS_ID"), asString("STREET"), asInt("VERSION"))
-            }
-        }
-        check(addressB == foundB2)
-
-        // DELETE
-        db.delete(a, addressB)
-
-        // READ: select all
-        val addressList = db.list {
-            EntityQuery.from(a).orderBy(a.id)
-        }
-        check(addressList.isEmpty())
+// execute query
+val list = db.execute {
+    EntityQuery.from(e).innerJoin(d) {
+        e.departmentId eq d.departmentId
+    }.where {
+        d.departmentName inList listOf("RESEARCH", "SALES")
+    }.associate(e, d) { employee, department ->
+        employee.copy(department = department)
     }
 }
 
-fun check(value: Boolean) {
-    if (!value) error("failed.")
+// print
+for (employee in list) {
+    println(employee.department?.departmentName)
 }
+```
+
+The above query issues the following SQL statement:
+
+```sql
+select
+    t0_."EMPLOYEE_ID", t0_."EMPLOYEE_NO", t0_."EMPLOYEE_NAME",
+    t0_."MANAGER_ID", t0_."HIREDATE",
+    t0_."SALARY", t0_."DEPARTMENT_ID", t0_."ADDRESS_ID", t0_."VERSION",
+    t1_."DEPARTMENT_ID", t1_."DEPARTMENT_NO", t1_."DEPARTMENT_NAME",
+    t1_."LOCATION", t1_."VERSION"
+from
+    "EMPLOYEE" t0_
+inner join
+    "DEPARTMENT" t1_ on (t0_."DEPARTMENT_ID" = t1_."DEPARTMENT_ID")
+where
+    t1_."DEPARTMENT_NAME" in (?, ?)
 ```
 
 ## Twitter
