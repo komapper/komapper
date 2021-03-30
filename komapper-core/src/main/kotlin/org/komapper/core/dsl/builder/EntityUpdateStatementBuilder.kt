@@ -29,13 +29,14 @@ internal class EntityUpdateStatementBuilder<ENTITY>(
             buf.append(" = ")
             val value = Value(p.getter(entity), p.klass)
             buf.bind(value)
-            if (p === versionProperty) {
+            if (p == versionProperty) {
                 buf.append(" + 1")
             }
             buf.append(", ")
         }
         buf.cutBack(2)
-        if (identityProperties.isNotEmpty() || versionProperty != null) {
+        val versionRequired = versionProperty != null && !context.options.ignoreVersion
+        if (identityProperties.isNotEmpty() || versionRequired) {
             buf.append(" where ")
             if (identityProperties.isNotEmpty()) {
                 for (p in identityProperties) {
@@ -45,11 +46,12 @@ internal class EntityUpdateStatementBuilder<ENTITY>(
                     buf.bind(value)
                     buf.append(" and ")
                 }
-                if (versionProperty == null) {
+                if (!versionRequired) {
                     buf.cutBack(5)
                 }
             }
-            if (versionProperty != null) {
+            if (versionRequired) {
+                checkNotNull(versionProperty)
                 visitColumnInfo(versionProperty)
                 buf.append(" = ")
                 val value = Value(versionProperty.getter(entity), versionProperty.klass)

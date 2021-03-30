@@ -49,7 +49,7 @@ open class DefaultDatabaseConfig(
     override val name: String = System.identityHashCode(object {}).toString()
     override val logger: Logger = StdOutLogger()
     override val clockProvider = DefaultClockProvider()
-    override val jdbcConfig: JdbcConfig = JdbcConfig()
+    override val jdbcConfig: JdbcConfig = JdbcConfig(batchSize = 10)
     override val session: Session by lazy {
         if (enableTransaction) {
             TransactionalSession(dataSource, logger)

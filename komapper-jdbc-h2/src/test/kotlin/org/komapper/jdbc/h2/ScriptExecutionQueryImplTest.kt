@@ -8,7 +8,7 @@ import org.komapper.core.Database
 import org.komapper.core.dsl.TemplateQuery
 
 @ExtendWith(Env::class)
-internal class ScriptQueryTest(private val db: Database) {
+internal class ScriptExecutionQueryImplTest(private val db: Database) {
 
     @Test
     fun test() {

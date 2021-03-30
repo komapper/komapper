@@ -52,6 +52,8 @@ internal data class Property(
 ) {
     fun isPrivate() = declaration.isPrivate()
 
+    fun hasDefault() = parameter.hasDefault
+
     override fun toString(): String {
         return parameter.toString()
     }

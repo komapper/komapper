@@ -2,6 +2,7 @@ package org.komapper.jdbc.h2
 
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.Database
 import org.komapper.core.dsl.SqlQuery
@@ -54,5 +55,31 @@ class SqlUpdateQueryTest(private val db: Database) {
         assertEquals(1, count)
         val address = db.find(a) { a.addressId eq 1 }
         assertEquals("[STREET 1]", address.street)
+    }
+
+    @Test
+    fun allowEmptyWhereClause_default() {
+        val e = Employee.metamodel()
+        val ex = assertThrows<IllegalStateException> {
+            @Suppress("UNUSED_VARIABLE")
+            val count = db.execute {
+                SqlQuery.update(e).set {
+                    e.employeeName set "ABC"
+                }
+            }
+        }
+        assertEquals("Empty where clause is not allowed.", ex.message)
+    }
+
+    @Test
+    fun allowEmptyWhereClause_true() {
+        val e = Employee.metamodel()
+        val count = db.execute {
+            SqlQuery.update(e).options { allowEmptyWhereClause = true }
+                .set {
+                    e.employeeName set "ABC"
+                }
+        }
+        assertEquals(14, count)
     }
 }

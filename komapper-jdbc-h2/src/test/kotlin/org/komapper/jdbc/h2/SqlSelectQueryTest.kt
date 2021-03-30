@@ -332,6 +332,23 @@ class SqlSelectQueryTest(private val db: Database) {
         assertEquals(listOf(2 to 5L, 3 to 6L), list)
     }
 
+    @Test
+    fun options() {
+        val e = Employee.metamodel()
+        val emp = db.execute(
+            SqlQuery.from(e)
+                .options {
+                    fetchSize = 10
+                    maxRows = 100
+                    queryTimeoutSeconds = 1000
+                    allowEmptyWhereClause = true
+                }
+                .where {
+                    e.employeeId eq 1
+                }.first()
+        )
+        println(emp)
+    }
 /*
 @Test
 fun inList() {

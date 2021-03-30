@@ -7,8 +7,16 @@ package org.komapper.core.config
  * @property queryTimeoutSeconds the query timeout. See [PreparedStatement.setQueryTimeout].
  */
 data class JdbcConfig(
-    val batchSize: Int = 10,
+    val batchSize: Int? = null,
     val fetchSize: Int? = null,
     val maxRows: Int? = null,
     val queryTimeoutSeconds: Int? = null
-)
+) {
+    infix operator fun plus(other: JdbcConfig): JdbcConfig {
+        return JdbcConfig(
+            other.fetchSize ?: this.fetchSize,
+            other.maxRows ?: this.maxRows,
+            other.queryTimeoutSeconds ?: this.queryTimeoutSeconds
+        )
+    }
+}

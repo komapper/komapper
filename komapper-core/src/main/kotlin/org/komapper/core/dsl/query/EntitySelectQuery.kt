@@ -6,6 +6,8 @@ import org.komapper.core.data.Statement
 import org.komapper.core.dsl.builder.EntitySelectStatementBuilder
 import org.komapper.core.dsl.context.EntitySelectContext
 import org.komapper.core.dsl.context.Projection
+import org.komapper.core.dsl.scope.EntitySelectOptionsDeclaration
+import org.komapper.core.dsl.scope.EntitySelectOptionsScope
 import org.komapper.core.dsl.scope.JoinDeclaration
 import org.komapper.core.dsl.scope.WhereDeclaration
 import org.komapper.core.jdbc.JdbcExecutor
@@ -30,6 +32,7 @@ interface EntitySelectQuery<ENTITY> : ListQuery<ENTITY> {
     fun offset(value: Int): EntitySelectQuery<ENTITY>
     fun limit(value: Int): EntitySelectQuery<ENTITY>
     fun forUpdate(): EntitySelectQuery<ENTITY>
+    fun options(declaration: EntitySelectOptionsDeclaration): EntitySelectQuery<ENTITY>
 
     override fun peek(dialect: Dialect, block: (Statement) -> Unit): EntitySelectQuery<ENTITY> {
         super.peek(dialect, block)
@@ -108,6 +111,13 @@ internal data class EntitySelectQueryImpl<ENTITY>(
         return copy(context = newContext)
     }
 
+    override fun options(declaration: EntitySelectOptionsDeclaration): EntitySelectQuery<ENTITY> {
+        val scope = EntitySelectOptionsScope(context.options)
+        declaration(scope)
+        val newContext = context.copy(options = scope.options)
+        return copy(context = newContext)
+    }
+
     override fun run(config: DatabaseConfig): List<ENTITY> {
         val terminal = Terminal { it.toList() }
         return terminal.run(config)
@@ -131,9 +141,13 @@ internal data class EntitySelectQueryImpl<ENTITY>(
     }
 
     private inner class Terminal<R>(val transformer: (Sequence<ENTITY>) -> R) : Query<R> {
+
         override fun run(config: DatabaseConfig): R {
+            if (context.options.allowEmptyWhereClause == false && context.where.isEmpty()) {
+                error("Empty where clause is not allowed.")
+            }
             val statement = toStatement(config.dialect)
-            val executor = JdbcExecutor(config)
+            val executor = JdbcExecutor(config, context.options)
             return executor.executeQuery(statement) { rs ->
                 // hold only unique entities
                 val pool: MutableMap<EntityKey, Any> = mutableMapOf()

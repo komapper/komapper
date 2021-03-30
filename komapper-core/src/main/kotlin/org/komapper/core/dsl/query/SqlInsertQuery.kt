@@ -5,6 +5,8 @@ import org.komapper.core.config.Dialect
 import org.komapper.core.data.Statement
 import org.komapper.core.dsl.builder.SqlInsertStatementBuilder
 import org.komapper.core.dsl.context.SqlInsertContext
+import org.komapper.core.dsl.scope.SqlInsertOptionsDeclaration
+import org.komapper.core.dsl.scope.SqlInsertOptionsScope
 import org.komapper.core.dsl.scope.ValuesDeclaration
 import org.komapper.core.dsl.scope.ValuesScope
 import org.komapper.core.jdbc.JdbcExecutor
@@ -12,6 +14,7 @@ import org.komapper.core.metamodel.Assignment
 
 interface SqlInsertQuery : Query<Pair<Int, Long?>> {
     fun values(declaration: ValuesDeclaration): SqlInsertQuery
+    fun options(declaration: SqlInsertOptionsDeclaration): SqlInsertQuery
 
     override fun peek(dialect: Dialect, block: (Statement) -> Unit): SqlInsertQuery {
         super.peek(dialect, block)
@@ -27,11 +30,18 @@ internal data class SqlInsertQueryImpl<ENTITY>(
         val scope = ValuesScope()
         declaration(scope)
         val newContext = context.addValues(scope.context.toList())
-        return SqlInsertQueryImpl(newContext)
+        return copy(context = newContext)
+    }
+
+    override fun options(declaration: SqlInsertOptionsDeclaration): SqlInsertQueryImpl<ENTITY> {
+        val scope = SqlInsertOptionsScope(context.options)
+        declaration(scope)
+        val newContext = context.copy(options = scope.options)
+        return copy(context = newContext)
     }
 
     override fun run(config: DatabaseConfig): Pair<Int, Long?> {
-        val executor = JdbcExecutor(config) { con, sql ->
+        val executor = JdbcExecutor(config, context.options) { con, sql ->
             val assignment = context.entityMetamodel.idAssignment()
             if (assignment is Assignment.Identity<*, *>) {
                 con.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS)

@@ -1,5 +1,7 @@
 package org.komapper.core.dsl.context
 
+import org.komapper.core.config.EntitySelectOptions
+import org.komapper.core.config.OptionsImpl
 import org.komapper.core.dsl.data.Criterion
 import org.komapper.core.dsl.query.Associator
 import org.komapper.core.metamodel.ColumnInfo
@@ -23,6 +25,7 @@ internal data class EntitySelectContext<ENTITY>(
                 }
                 ).distinct()
         ),
+    val options: EntitySelectOptions = OptionsImpl(allowEmptyWhereClause = true)
 
 ) : SelectContext<ENTITY, EntitySelectContext<ENTITY>> {
 

@@ -7,6 +7,8 @@ import org.komapper.core.dsl.builder.SqlUpdateStatementBuilder
 import org.komapper.core.dsl.context.SqlUpdateContext
 import org.komapper.core.dsl.scope.SetDeclaration
 import org.komapper.core.dsl.scope.SetScope
+import org.komapper.core.dsl.scope.SqlUpdateOptionsDeclaration
+import org.komapper.core.dsl.scope.SqlUpdateOptionsScope
 import org.komapper.core.dsl.scope.WhereDeclaration
 import org.komapper.core.dsl.scope.WhereScope
 import org.komapper.core.jdbc.JdbcExecutor
@@ -14,6 +16,7 @@ import org.komapper.core.jdbc.JdbcExecutor
 interface SqlUpdateQuery : Query<Int> {
     fun set(declaration: SetDeclaration): SqlUpdateQuery
     fun where(declaration: WhereDeclaration): SqlUpdateQuery
+    fun options(declaration: SqlUpdateOptionsDeclaration): SqlUpdateQuery
 
     override fun peek(dialect: Dialect, block: (Statement) -> Unit): SqlUpdateQuery {
         super.peek(dialect, block)
@@ -29,19 +32,29 @@ internal data class SqlUpdateQueryImpl<ENTITY>(
         val scope = SetScope()
         declaration(scope)
         val newContext = context.addSet(scope.context.toList())
-        return SqlUpdateQueryImpl(newContext)
+        return copy(context = newContext)
     }
 
     override fun where(declaration: WhereDeclaration): SqlUpdateQueryImpl<ENTITY> {
         val scope = WhereScope()
         declaration(scope)
         val newContext = context.addWhere(scope.criteria.toList())
-        return SqlUpdateQueryImpl(newContext)
+        return copy(context = newContext)
+    }
+
+    override fun options(declaration: SqlUpdateOptionsDeclaration): SqlUpdateQueryImpl<ENTITY> {
+        val scope = SqlUpdateOptionsScope(context.options)
+        declaration(scope)
+        val newContext = context.copy(options = scope.options)
+        return copy(context = newContext)
     }
 
     override fun run(config: DatabaseConfig): Int {
+        if (context.options.allowEmptyWhereClause == false && context.where.isEmpty()) {
+            error("Empty where clause is not allowed.")
+        }
         val statement = buildStatement(config.dialect)
-        val executor = JdbcExecutor(config)
+        val executor = JdbcExecutor(config, context.options)
         return executor.executeUpdate(statement) { _, count ->
             count
         }

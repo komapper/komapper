@@ -22,7 +22,8 @@ internal class EntityDeleteStatementBuilder<ENTITY>(
         visitTableInfo(context.entityMetamodel)
         val identityProperties = context.entityMetamodel.idProperties()
         val versionProperty = context.entityMetamodel.versionProperty()
-        if (identityProperties.isNotEmpty() || versionProperty != null) {
+        val versionRequired = versionProperty != null && !context.options.ignoreVersion
+        if (identityProperties.isNotEmpty() || versionRequired) {
             buf.append(" where ")
             if (identityProperties.isNotEmpty()) {
                 for (p in identityProperties) {
@@ -32,8 +33,12 @@ internal class EntityDeleteStatementBuilder<ENTITY>(
                     buf.bind(value)
                     buf.append(" and ")
                 }
+                if (!versionRequired) {
+                    buf.cutBack(5)
+                }
             }
-            if (versionProperty != null) {
+            if (versionRequired) {
+                checkNotNull(versionProperty)
                 visitColumnInfo(versionProperty)
                 buf.append(" = ")
                 val value = Value(versionProperty.getter(entity), versionProperty.klass)

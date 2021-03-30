@@ -3,6 +3,7 @@ package org.komapper.core.jdbc
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.UniqueConstraintException
 import org.komapper.core.config.Dialect
+import org.komapper.core.config.Options
 import org.komapper.core.data.Statement
 import org.komapper.core.data.Value
 import java.sql.Connection
@@ -12,6 +13,7 @@ import java.sql.SQLException
 
 internal class JdbcExecutor(
     private val config: DatabaseConfig,
+    private val options: Options,
     private val prepare: (Connection, String) -> PreparedStatement = { con, sql ->
         con.prepareStatement(sql)
     }
@@ -100,10 +102,10 @@ internal class JdbcExecutor(
     private fun log(statement: Statement) = config.logger.logStatement(statement)
 
     private fun java.sql.Statement.setUp() {
-        val jdbcConfig = config.jdbcConfig
-        jdbcConfig.fetchSize?.let { if (it > 0) this.fetchSize = it }
-        jdbcConfig.maxRows?.let { if (it > 0) this.maxRows = it }
-        jdbcConfig.queryTimeoutSeconds?.let { if (it > 0) this.queryTimeout = it }
+        val mergedConfig = config.jdbcConfig + options.asJdbcConfig()
+        mergedConfig.fetchSize?.let { if (it > 0) this.fetchSize = it }
+        mergedConfig.maxRows?.let { if (it > 0) this.maxRows = it }
+        mergedConfig.queryTimeoutSeconds?.let { if (it > 0) this.queryTimeout = it }
     }
 
     private fun PreparedStatement.bind(values: List<Value>) {

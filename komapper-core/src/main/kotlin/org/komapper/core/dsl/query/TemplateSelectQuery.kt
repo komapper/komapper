@@ -2,15 +2,30 @@ package org.komapper.core.dsl.query
 
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.config.Dialect
+import org.komapper.core.config.OptionsImpl
+import org.komapper.core.config.TemplateSelectOptions
 import org.komapper.core.data.Statement
+import org.komapper.core.dsl.scope.TemplateSelectOptionsDeclaration
+import org.komapper.core.dsl.scope.TemplateSelectOptionsScope
 import org.komapper.core.jdbc.JdbcExecutor
 import org.komapper.core.template.DefaultStatementBuilder
 
-internal data class TemplateSelectQuery<T>(
+interface TemplateSelectQuery<T> : ListQuery<T> {
+    fun options(declaration: TemplateSelectOptionsDeclaration): TemplateSelectQuery<T>
+}
+
+internal data class TemplateSelectQueryImpl<T>(
     private val sql: String,
     private val params: Any = object {},
-    private val provider: Row.() -> T
-) : ListQuery<T> {
+    private val provider: Row.() -> T,
+    private val options: TemplateSelectOptions = OptionsImpl()
+) : TemplateSelectQuery<T> {
+
+    override fun options(declaration: TemplateSelectOptionsDeclaration): TemplateSelectQueryImpl<T> {
+        val scope = TemplateSelectOptionsScope(options)
+        declaration(scope)
+        return copy(options = scope.options)
+    }
 
     override fun run(config: DatabaseConfig): List<T> {
         val terminal = Terminal { it.toList() }
@@ -37,7 +52,7 @@ internal data class TemplateSelectQuery<T>(
     private inner class Terminal<R>(val transformer: (Sequence<T>) -> R) : Query<R> {
         override fun run(config: DatabaseConfig): R {
             val statement = toStatement(config.dialect)
-            val executor = JdbcExecutor(config)
+            val executor = JdbcExecutor(config, options)
             return executor.executeQuery(
                 statement,
                 { dialect, rs ->

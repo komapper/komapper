@@ -1,5 +1,7 @@
 package org.komapper.core.dsl.context
 
+import org.komapper.core.config.OptionsImpl
+import org.komapper.core.config.SqlSelectOptions
 import org.komapper.core.dsl.data.Criterion
 import org.komapper.core.metamodel.ColumnInfo
 import org.komapper.core.metamodel.EntityMetamodel
@@ -16,6 +18,7 @@ internal data class SqlSelectContext<ENTITY>(
     val having: List<Criterion> = listOf(),
     override val projection: Projection =
         Projection.Tables(listOf(from) + joins.map { it.entityMetamodel }),
+    val options: SqlSelectOptions = OptionsImpl(allowEmptyWhereClause = true)
 ) : SelectContext<ENTITY, SqlSelectContext<ENTITY>> {
 
     fun setColumn(column: ColumnInfo<*>): SqlSelectContext<ENTITY> {

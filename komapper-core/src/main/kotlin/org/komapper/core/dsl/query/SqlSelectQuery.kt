@@ -8,6 +8,8 @@ import org.komapper.core.dsl.context.SqlSelectContext
 import org.komapper.core.dsl.scope.HavingDeclaration
 import org.komapper.core.dsl.scope.HavingScope
 import org.komapper.core.dsl.scope.JoinDeclaration
+import org.komapper.core.dsl.scope.SqlSelectOptionsDeclaration
+import org.komapper.core.dsl.scope.SqlSelectOptionsScope
 import org.komapper.core.dsl.scope.WhereDeclaration
 import org.komapper.core.jdbc.JdbcExecutor
 import org.komapper.core.metamodel.ColumnInfo
@@ -33,6 +35,7 @@ interface SqlSelectQuery<ENTITY> : ListQuery<ENTITY> {
     fun offset(value: Int): SqlSelectQuery<ENTITY>
     fun limit(value: Int): SqlSelectQuery<ENTITY>
     fun forUpdate(): SqlSelectQuery<ENTITY>
+    fun options(declaration: SqlSelectOptionsDeclaration): SqlSelectQuery<ENTITY>
 
     fun <A, B> select(
         e1: EntityMetamodel<A>,
@@ -118,6 +121,13 @@ internal data class SqlSelectQueryImpl<ENTITY>(
 
     override fun forUpdate(): SqlSelectQueryImpl<ENTITY> {
         val newContext = support.forUpdate()
+        return copy(context = newContext)
+    }
+
+    override fun options(declaration: SqlSelectOptionsDeclaration): SqlSelectQuery<ENTITY> {
+        val scope = SqlSelectOptionsScope(context.options)
+        declaration(scope)
+        val newContext = context.copy(options = scope.options)
         return copy(context = newContext)
     }
 
@@ -254,8 +264,11 @@ private class Terminal<T, R>(
 ) : Query<R> {
 
     override fun run(config: DatabaseConfig): R {
+        if (context.options.allowEmptyWhereClause == false && context.where.isEmpty()) {
+            error("Empty where clause is not allowed.")
+        }
         val statement = toStatement(config.dialect)
-        val executor = JdbcExecutor(config)
+        val executor = JdbcExecutor(config, context.options)
         return executor.executeQuery(statement, provider, transformer)
     }
 
