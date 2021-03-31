@@ -51,10 +51,10 @@ infix operator fun <T : Number> ColumnInfo<T>.plus(value: T): ColumnInfo<T> {
     return ArithmeticExpr.Plus(this, left, right)
 }
 
-infix operator fun <T : Number> T.plus(columnInfo: ColumnInfo<T>): ColumnInfo<T> {
-    val left = Operand.Parameter(columnInfo, this)
-    val right = Operand.Column(columnInfo)
-    return ArithmeticExpr.Plus(columnInfo, left, right)
+infix operator fun <T : Number> ColumnInfo<T>.plus(other: ColumnInfo<T>): ColumnInfo<T> {
+    val left = Operand.Column(this)
+    val right = Operand.Column(other)
+    return ArithmeticExpr.Plus(this, left, right)
 }
 
 infix operator fun <T : Number> ColumnInfo<T>.minus(value: T): ColumnInfo<T> {
@@ -63,10 +63,10 @@ infix operator fun <T : Number> ColumnInfo<T>.minus(value: T): ColumnInfo<T> {
     return ArithmeticExpr.Minus(this, left, right)
 }
 
-infix operator fun <T : Number> T.minus(columnInfo: ColumnInfo<T>): ColumnInfo<T> {
-    val left = Operand.Parameter(columnInfo, this)
-    val right = Operand.Column(columnInfo)
-    return ArithmeticExpr.Minus(columnInfo, left, right)
+infix operator fun <T : Number> ColumnInfo<T>.minus(other: ColumnInfo<T>): ColumnInfo<T> {
+    val left = Operand.Column(this)
+    val right = Operand.Column(other)
+    return ArithmeticExpr.Minus(this, left, right)
 }
 
 infix operator fun <T : Number> ColumnInfo<T>.times(value: T): ColumnInfo<T> {
@@ -75,10 +75,10 @@ infix operator fun <T : Number> ColumnInfo<T>.times(value: T): ColumnInfo<T> {
     return ArithmeticExpr.Times(this, left, right)
 }
 
-infix operator fun <T : Number> T.times(columnInfo: ColumnInfo<T>): ColumnInfo<T> {
-    val left = Operand.Parameter(columnInfo, this)
-    val right = Operand.Column(columnInfo)
-    return ArithmeticExpr.Times(columnInfo, left, right)
+infix operator fun <T : Number> ColumnInfo<T>.times(other: ColumnInfo<T>): ColumnInfo<T> {
+    val left = Operand.Column(this)
+    val right = Operand.Column(other)
+    return ArithmeticExpr.Times(this, left, right)
 }
 
 infix operator fun <T : Number> ColumnInfo<T>.div(value: T): ColumnInfo<T> {
@@ -87,10 +87,10 @@ infix operator fun <T : Number> ColumnInfo<T>.div(value: T): ColumnInfo<T> {
     return ArithmeticExpr.Div(this, left, right)
 }
 
-infix operator fun <T : Number> T.div(columnInfo: ColumnInfo<T>): ColumnInfo<T> {
-    val left = Operand.Parameter(columnInfo, this)
-    val right = Operand.Column(columnInfo)
-    return ArithmeticExpr.Div(columnInfo, left, right)
+infix operator fun <T : Number> ColumnInfo<T>.div(other: ColumnInfo<T>): ColumnInfo<T> {
+    val left = Operand.Column(this)
+    val right = Operand.Column(other)
+    return ArithmeticExpr.Div(this, left, right)
 }
 
 infix operator fun <T : Number> ColumnInfo<T>.rem(value: T): ColumnInfo<T> {
@@ -99,20 +99,26 @@ infix operator fun <T : Number> ColumnInfo<T>.rem(value: T): ColumnInfo<T> {
     return ArithmeticExpr.Rem(this, left, right)
 }
 
-infix operator fun <T : Number> T.rem(columnInfo: ColumnInfo<T>): ColumnInfo<T> {
-    val left = Operand.Parameter(columnInfo, this)
-    val right = Operand.Column(columnInfo)
-    return ArithmeticExpr.Rem(columnInfo, left, right)
-}
-
-infix fun ColumnInfo<String>.concat(value: String): ColumnInfo<String> {
+infix operator fun <T : Number> ColumnInfo<T>.rem(other: ColumnInfo<T>): ColumnInfo<T> {
     val left = Operand.Column(this)
-    val right = Operand.Parameter(this, value)
-    return StringFunction.Concat(this, left, right)
+    val right = Operand.Column(other)
+    return ArithmeticExpr.Rem(this, left, right)
 }
 
-infix fun String.concat(columnInfo: ColumnInfo<String>): ColumnInfo<String> {
-    val left = Operand.Parameter(columnInfo, this)
-    val right = Operand.Column(columnInfo)
-    return StringFunction.Concat(columnInfo, left, right)
+fun concat(left: ColumnInfo<String>, right: String): ColumnInfo<String> {
+    val o1 = Operand.Column(left)
+    val o2 = Operand.Parameter(left, right)
+    return StringFunction.Concat(left, o1, o2)
+}
+
+fun concat(left: String, right: ColumnInfo<String>): ColumnInfo<String> {
+    val o1 = Operand.Parameter(right, left)
+    val o2 = Operand.Column(right)
+    return StringFunction.Concat(right, o1, o2)
+}
+
+fun concat(left: ColumnInfo<String>, right: ColumnInfo<String>): ColumnInfo<String> {
+    val o1 = Operand.Column(left)
+    val o2 = Operand.Column(right)
+    return StringFunction.Concat(right, o1, o2)
 }

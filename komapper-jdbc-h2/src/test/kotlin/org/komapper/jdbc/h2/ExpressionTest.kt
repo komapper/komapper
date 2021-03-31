@@ -22,12 +22,28 @@ class ExpressionTest(private val db: Database) {
                 .where {
                     a.addressId eq 10
                 }
-                .select(1 + a.addressId + 1)
+                .select(a.addressId + 1)
                 .also {
                     println(it.toStatement())
                 }.first()
         }
-        assertEquals(12, result)
+        assertEquals(11, result)
+    }
+
+    @Test
+    fun plus_other_column() {
+        val a = Address_()
+        val result = db.execute {
+            SqlQuery.from(a)
+                .where {
+                    a.addressId eq 10
+                }
+                .select(a.addressId + a.addressId)
+                .also {
+                    println(it.toStatement())
+                }.first()
+        }
+        assertEquals(20, result)
     }
 
     @Test
@@ -38,7 +54,23 @@ class ExpressionTest(private val db: Database) {
                 .where {
                     a.addressId eq 10
                 }
-                .select(50 - a.addressId - 40)
+                .select(a.addressId - 10)
+                .also {
+                    println(it.toStatement())
+                }.first()
+        }
+        assertEquals(0, result)
+    }
+
+    @Test
+    fun minus_other_column() {
+        val a = Address_()
+        val result = db.execute {
+            SqlQuery.from(a)
+                .where {
+                    a.addressId eq 10
+                }
+                .select(a.addressId - a.addressId)
                 .also {
                     println(it.toStatement())
                 }.first()
@@ -54,12 +86,28 @@ class ExpressionTest(private val db: Database) {
                 .where {
                     a.addressId eq 10
                 }
-                .select(100 / a.addressId / 2)
+                .select(a.addressId / 2)
                 .also {
                     println(it.toStatement())
                 }.first()
         }
         assertEquals(5, result)
+    }
+
+    @Test
+    fun div_other_column() {
+        val a = Address_()
+        val result = db.execute {
+            SqlQuery.from(a)
+                .where {
+                    a.addressId eq 10
+                }
+                .select(a.addressId / a.addressId)
+                .also {
+                    println(it.toStatement())
+                }.first()
+        }
+        assertEquals(1, result)
     }
 
     @Test
@@ -70,12 +118,28 @@ class ExpressionTest(private val db: Database) {
                 .where {
                     a.addressId eq 10
                 }
-                .select(15 % a.addressId % 2)
+                .select(a.addressId % 3)
                 .also {
                     println(it.toStatement())
                 }.first()
         }
         assertEquals(1, result)
+    }
+
+    @Test
+    fun rem_other_column() {
+        val a = Address_()
+        val result = db.execute {
+            SqlQuery.from(a)
+                .where {
+                    a.addressId eq 10
+                }
+                .select(a.addressId % a.addressId)
+                .also {
+                    println(it.toStatement())
+                }.first()
+        }
+        assertEquals(0, result)
     }
 
     @Test
@@ -86,11 +150,27 @@ class ExpressionTest(private val db: Database) {
                 .where {
                     a.addressId eq 10
                 }
-                .select("[" concat a.street concat "]")
+                .select(concat(concat("[", a.street), "]"))
                 .also {
                     println(it.toStatement())
                 }.first()
         }
         assertEquals("[STREET 10]", result)
+    }
+
+    @Test
+    fun concat_other_column() {
+        val a = Address_()
+        val result = db.execute {
+            SqlQuery.from(a)
+                .where {
+                    a.addressId eq 10
+                }
+                .select(concat(concat(a.street, a.street), a.street))
+                .also {
+                    println(it.toStatement())
+                }.first()
+        }
+        assertEquals("STREET 10STREET 10STREET 10", result)
     }
 }

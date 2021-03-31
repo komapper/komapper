@@ -32,14 +32,14 @@ class SqlUpdateQueryTest(private val db: Database) {
         val a = Address.metamodel()
         val count = db.execute {
             SqlQuery.update(a) {
-                a.version set (10 + a.version + 10)
+                a.version set (a.version + 10)
             }.where {
                 a.addressId eq 1
             }
         }
         assertEquals(1, count)
         val address = db.find(a) { a.addressId eq 1 }
-        assertEquals(21, address.version)
+        assertEquals(11, address.version)
     }
 
     @Test
@@ -47,7 +47,7 @@ class SqlUpdateQueryTest(private val db: Database) {
         val a = Address.metamodel()
         val count = db.execute {
             SqlQuery.update(a) {
-                a.street set ("[" concat a.street concat "]")
+                a.street set (concat(concat("[", a.street), "]"))
             }.where {
                 a.addressId eq 1
             }
