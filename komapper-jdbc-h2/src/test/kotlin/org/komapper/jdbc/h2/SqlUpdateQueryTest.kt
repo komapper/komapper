@@ -16,7 +16,7 @@ class SqlUpdateQueryTest(private val db: Database) {
     fun test() {
         val a = Address.metamodel()
         val count = db.execute {
-            SqlQuery.update(a).set {
+            SqlQuery.update(a) {
                 a.street set "STREET 16"
             }.where {
                 a.addressId eq 1
@@ -31,7 +31,7 @@ class SqlUpdateQueryTest(private val db: Database) {
     fun arithmetic_add() {
         val a = Address.metamodel()
         val count = db.execute {
-            SqlQuery.update(a).set {
+            SqlQuery.update(a) {
                 a.version set (10 + a.version + 10)
             }.where {
                 a.addressId eq 1
@@ -46,7 +46,7 @@ class SqlUpdateQueryTest(private val db: Database) {
     fun string_concat() {
         val a = Address.metamodel()
         val count = db.execute {
-            SqlQuery.update(a).set {
+            SqlQuery.update(a) {
                 a.street set ("[" concat a.street concat "]")
             }.where {
                 a.addressId eq 1
@@ -63,7 +63,7 @@ class SqlUpdateQueryTest(private val db: Database) {
         val ex = assertThrows<IllegalStateException> {
             @Suppress("UNUSED_VARIABLE")
             val count = db.execute {
-                SqlQuery.update(e).set {
+                SqlQuery.update(e) {
                     e.employeeName set "ABC"
                 }
             }
@@ -75,10 +75,9 @@ class SqlUpdateQueryTest(private val db: Database) {
     fun allowEmptyWhereClause_true() {
         val e = Employee.metamodel()
         val count = db.execute {
-            SqlQuery.update(e).options { allowEmptyWhereClause = true }
-                .set {
-                    e.employeeName set "ABC"
-                }
+            SqlQuery.update(e) {
+                e.employeeName set "ABC"
+            }.options { allowEmptyWhereClause = true }
         }
         assertEquals(14, count)
     }

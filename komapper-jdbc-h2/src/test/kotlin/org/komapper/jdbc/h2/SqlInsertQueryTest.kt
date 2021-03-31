@@ -15,7 +15,7 @@ class SqlInsertQueryTest(private val db: Database) {
     fun test() {
         val a = Address.metamodel()
         val (count, id) = db.execute {
-            SqlQuery.insert(a).values {
+            SqlQuery.insert(a) {
                 a.addressId set 19
                 a.street set "STREET 16"
                 a.version set 0
@@ -29,7 +29,7 @@ class SqlInsertQueryTest(private val db: Database) {
     fun generatedKeys() {
         val a = IdentityStrategy.metamodel()
         val (count, id) = db.execute {
-            SqlQuery.insert(a).values {
+            SqlQuery.insert(a) {
                 a.id set 10
                 a.value set "test"
             }

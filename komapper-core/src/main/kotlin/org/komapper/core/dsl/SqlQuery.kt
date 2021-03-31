@@ -12,6 +12,8 @@ import org.komapper.core.dsl.query.SqlSelectQuery
 import org.komapper.core.dsl.query.SqlSelectQueryImpl
 import org.komapper.core.dsl.query.SqlUpdateQuery
 import org.komapper.core.dsl.query.SqlUpdateQueryImpl
+import org.komapper.core.dsl.scope.SetDeclaration
+import org.komapper.core.dsl.scope.ValuesDeclaration
 import org.komapper.core.metamodel.EntityMetamodel
 
 object SqlQuery {
@@ -20,12 +22,12 @@ object SqlQuery {
         return SqlSelectQueryImpl(SqlSelectContext(entityMetamodel))
     }
 
-    fun <ENTITY> insert(entityMetamodel: EntityMetamodel<ENTITY>): SqlInsertQuery {
-        return SqlInsertQueryImpl(SqlInsertContext(entityMetamodel))
+    fun <ENTITY> insert(entityMetamodel: EntityMetamodel<ENTITY>, declaration: ValuesDeclaration): SqlInsertQuery {
+        return SqlInsertQueryImpl(SqlInsertContext(entityMetamodel)).values(declaration)
     }
 
-    fun <ENTITY> update(entityMetamodel: EntityMetamodel<ENTITY>): SqlUpdateQuery {
-        return SqlUpdateQueryImpl(SqlUpdateContext(entityMetamodel))
+    fun <ENTITY> update(entityMetamodel: EntityMetamodel<ENTITY>, declaration: SetDeclaration): SqlUpdateQuery {
+        return SqlUpdateQueryImpl(SqlUpdateContext(entityMetamodel)).set(declaration)
     }
 
     fun <ENTITY> delete(entityMetamodel: EntityMetamodel<ENTITY>): SqlDeleteQuery {
