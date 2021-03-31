@@ -3,26 +3,28 @@ package org.komapper.ksp
 import com.google.devtools.ksp.isPrivate
 import com.google.devtools.ksp.symbol.KSAnnotation
 import com.google.devtools.ksp.symbol.KSClassDeclaration
-import com.google.devtools.ksp.symbol.KSNode
 import com.google.devtools.ksp.symbol.KSPropertyDeclaration
 import com.google.devtools.ksp.symbol.KSValueParameter
 import com.google.devtools.ksp.symbol.Nullability
 
-internal sealed class EntityVisitorResult {
-    data class Success(val entity: Entity) : EntityVisitorResult()
+data class EntityDefinitionSource(
+    val defDeclaration: KSClassDeclaration,
+    val entityDeclaration: KSClassDeclaration
+)
 
-    data class Error(
-        val message: String,
-        val node: KSNode,
-        val declaration: KSClassDeclaration
-    ) :
-        EntityVisitorResult()
+internal data class EntityDef(
+    val definitionSource: EntityDefinitionSource,
+    val table: Table,
+    val properties: List<PropertyDef>,
+)
 
-    data class Fatal(
-        val message: String,
-        val node: KSNode
-    ) : EntityVisitorResult()
-}
+internal data class PropertyDef(
+    val parameter: KSValueParameter,
+    val declaration: KSPropertyDeclaration,
+    val column: Column,
+    val kind: PropertyKind?,
+    val idGeneratorKind: IdGeneratorKind?
+)
 
 internal data class Entity(
     val declaration: KSClassDeclaration,
@@ -33,12 +35,6 @@ internal data class Entity(
     val createdAtProperty: Property?,
     val updatedAtProperty: Property?,
     val idGenerator: IdGenerator?
-)
-
-internal data class Table(
-    val name: String,
-    val catalog: String,
-    val schema: String,
 )
 
 internal data class Property(
@@ -52,14 +48,10 @@ internal data class Property(
 ) {
     fun isPrivate() = declaration.isPrivate()
 
-    fun hasDefault() = parameter.hasDefault
-
     override fun toString(): String {
         return parameter.toString()
     }
 }
-
-internal data class Column(val name: String)
 
 internal sealed class PropertyKind {
     abstract val annotation: KSAnnotation
@@ -89,3 +81,11 @@ internal data class IdGenerator(val property: Property) {
     val name = "__${property}Generator"
     val kind = property.idGeneratorKind
 }
+
+internal data class Table(
+    val name: String,
+    val catalog: String,
+    val schema: String,
+)
+
+internal data class Column(val name: String)

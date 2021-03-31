@@ -1,5 +1,7 @@
 package org.komapper.core
 
+import kotlin.reflect.KClass
+
 @Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.SOURCE)
 annotation class KmEntity
@@ -44,6 +46,10 @@ annotation class KmSequenceGenerator(
 @Target(AnnotationTarget.VALUE_PARAMETER)
 @Retention(AnnotationRetention.SOURCE)
 annotation class KmIdentityGenerator
+
+@Target(AnnotationTarget.CLASS)
+@Retention(AnnotationRetention.SOURCE)
+annotation class KmEntityDef(val entity: KClass<*>)
 
 @DslMarker
 internal annotation class Scope

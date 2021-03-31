@@ -3,7 +3,7 @@ package example
 import org.komapper.core.Database
 import org.komapper.core.KmColumn
 import org.komapper.core.KmCreatedAt
-import org.komapper.core.KmEntity
+import org.komapper.core.KmEntityDef
 import org.komapper.core.KmId
 import org.komapper.core.KmIdentityGenerator
 import org.komapper.core.KmUpdatedAt
@@ -13,14 +13,21 @@ import org.komapper.core.dsl.TemplateQuery
 import org.komapper.jdbc.h2.H2DatabaseConfig
 import java.time.LocalDateTime
 
-@KmEntity
 data class Address(
-    @KmId @KmIdentityGenerator @KmColumn(name = "ADDRESS_ID")
     val id: Int = 0,
     val street: String,
-    @KmVersion val version: Int = 0,
-    @KmCreatedAt val createdAt: LocalDateTime? = null,
-    @KmUpdatedAt val updatedAt: LocalDateTime? = null,
+    val version: Int = 0,
+    val createdAt: LocalDateTime? = null,
+    val updatedAt: LocalDateTime? = null,
+)
+
+@KmEntityDef(Address::class)
+private data class AddressDef(
+    @KmId @KmIdentityGenerator @KmColumn(name = "ADDRESS_ID")
+    val id: String,
+    @KmVersion val version: String,
+    @KmCreatedAt val createdAt: String,
+    @KmUpdatedAt val updatedAt: String,
 )
 
 fun main() {

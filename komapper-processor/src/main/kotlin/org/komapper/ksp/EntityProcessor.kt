@@ -1,14 +1,13 @@
 package org.komapper.ksp
 
 import com.google.devtools.ksp.processing.CodeGenerator
-import com.google.devtools.ksp.processing.Dependencies
 import com.google.devtools.ksp.processing.KSPLogger
 import com.google.devtools.ksp.processing.Resolver
 import com.google.devtools.ksp.processing.SymbolProcessor
 import com.google.devtools.ksp.symbol.KSAnnotated
-import java.io.PrintWriter
 
 class EntityProcessor : SymbolProcessor {
+
     private lateinit var codeGenerator: CodeGenerator
     private lateinit var logger: KSPLogger
     private lateinit var config: Config
@@ -29,42 +28,33 @@ class EntityProcessor : SymbolProcessor {
         if (invoked) {
             return emptyList()
         }
-        val symbols = resolver.getSymbolsWithAnnotation("org.komapper.core.KmEntity")
-        for (symbol in symbols) {
-            val result = symbol.accept(EntityVisitor(config), Unit)
-            val (entity, declaration) = when (result) {
-                is EntityVisitorResult.Success ->
-                    result.entity to result.entity.declaration
-                is EntityVisitorResult.Error -> {
-                    logger.error(result.message, result.node)
-                    null to result.declaration
-                }
-                is EntityVisitorResult.Fatal -> {
-                    logger.error(result.message, result.node)
-                    continue
-                }
-            }
-            val packageName = declaration.packageName.asString()
-            val entityQualifiedName = declaration.qualifiedName?.asString() ?: ""
-            val entityTypeName = entityQualifiedName.removePrefix("$packageName.")
-            val simpleName = config.prefix + entityTypeName.replace(".", "_") + config.suffix
-            val file = declaration.containingFile!!
-            codeGenerator.createNewFile(Dependencies(false, file), packageName, simpleName).use { out ->
-                PrintWriter(out).use {
-                    val runnable = if (entity != null) {
-                        EntityMetamodelGenerator(
-                            entity, packageName, entityTypeName, simpleName, it
-                        )
-                    } else {
-                        EmptyEntityMetamodelGenerator(
-                            declaration, packageName, entityTypeName, simpleName, it
-                        )
+        val pairs = listOf(
+            "org.komapper.core.KmEntityDef" to SeparateDefinitionSourceResolver(),
+            "org.komapper.core.KmEntity" to SelfDefinitionSourceResolver()
+        )
+        for ((annotation, definitionSourceResolver) in pairs) {
+            val symbols = resolver.getSymbolsWithAnnotation(annotation)
+            val analyzer = EntityAnalyzer(config, definitionSourceResolver)
+            for (symbol in symbols) {
+                val model = when (val result = analyzer.analyze(symbol)) {
+                    is EntityAnalyzerResult.Success -> result.model
+                    is EntityAnalyzerResult.Failure -> {
+                        log(result.exit)
+                        result.model
                     }
-                    runnable.run()
+                    is EntityAnalyzerResult.Error -> {
+                        log(result.exit)
+                        continue
+                    }
                 }
+                model.generateMetamodel(codeGenerator)
             }
         }
         invoked = true
         return emptyList()
+    }
+
+    private fun log(exit: Exit) {
+        logger.error(exit.report.message, exit.report.node)
     }
 }

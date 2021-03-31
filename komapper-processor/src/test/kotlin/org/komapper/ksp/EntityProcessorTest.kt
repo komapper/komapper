@@ -16,6 +16,50 @@ class EntityProcessorTest {
     @JvmField
     var tempDir: Path? = null
 
+    @Test fun `Duplicated definitions are found`() {
+        val result = compile(
+            kotlin(
+                "source.kt",
+                """
+                package test
+                import org.komapper.core.*
+                @KmEntity
+                data class Dept(
+                    val id: Int
+                )
+                @KmEntityDef(entity = Dept::class)
+                data class DeptDef(
+                    val id: Int
+                )
+                """
+            )
+        )
+        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
+        assertThat(result.messages).contains("Duplicated definitions are found.")
+    }
+
+    @Test fun `The same name property is not found in the entity`() {
+        val result = compile(
+            kotlin(
+                "source.kt",
+                """
+                package test
+                import org.komapper.core.*
+                data class Dept(
+                    val id: Int
+                )
+                @KmEntityDef(entity = Dept::class)
+                data class DeptDef(
+                    val id: Int,
+                    val version: Int
+                )
+                """
+            )
+        )
+        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
+        assertThat(result.messages).contains("The same name property is not found in the entity.")
+    }
+
     @Test fun `The class name cannot start with '__'`() {
         val result = compile(
             kotlin(
@@ -34,7 +78,28 @@ class EntityProcessorTest {
         assertThat(result.messages).contains("The class name cannot start with '__'.")
     }
 
-    @Test fun `The parameter name cannot start with '__'`() {
+    @Test fun `The class name cannot start with '__', @KmEntityDef`() {
+        val result = compile(
+            kotlin(
+                "source.kt",
+                """
+                package test
+                import org.komapper.core.*
+                data class __Dept(
+                    val id: Int
+                )
+                @KmEntityDef(entity = __Dept::class)
+                data class DeptDef(
+                    val id: Int
+                )
+                """
+            )
+        )
+        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
+        assertThat(result.messages).contains("The class name cannot start with '__'.")
+    }
+
+    @Test fun `The property name cannot start with '__'`() {
         val result = compile(
             kotlin(
                 "source.kt",
@@ -49,11 +114,33 @@ class EntityProcessorTest {
             )
         )
         assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertThat(result.messages).contains("The parameter name cannot start with '__'.")
+        assertThat(result.messages).contains("The property name cannot start with '__'.")
+    }
+
+    @Test fun `The property name cannot start with '__', @KmEntityDef`() {
+        val result = compile(
+            kotlin(
+                "source.kt",
+                """
+                package test
+                import org.komapper.core.*
+                data class Dept(
+                    val id: Int,
+                    val __name: String
+                )
+                @KmEntityDef(entity = Dept::class)
+                data class DeptDef(
+                    val id: Int
+                )
+                """
+            )
+        )
+        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
+        assertThat(result.messages).contains("The property name cannot start with '__'.")
     }
 
     @Test
-    fun `@KmEntity must be applied to data class`() {
+    fun `The entity class must be a data class`() {
         val result = compile(
             kotlin(
                 "source.kt",
@@ -68,7 +155,29 @@ class EntityProcessorTest {
             )
         )
         assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertThat(result.messages).contains("@KmEntity must be applied to data class.")
+        assertThat(result.messages).contains("The entity class must be a data class.")
+    }
+
+    @Test
+    fun `The entity class must be a data class, @KmEntityDef`() {
+        val result = compile(
+            kotlin(
+                "source.kt",
+                """
+                package test
+                import org.komapper.core.*
+                class Dept(
+                    val id: Int
+                )
+                @KmEntityDef(entity = Dept::class)
+                data class DeptDef(
+                    val id: Int
+                )
+                """
+            )
+        )
+        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
+        assertThat(result.messages).contains("The entity class must be a data class.")
     }
 
     @Test
@@ -90,7 +199,28 @@ class EntityProcessorTest {
     }
 
     @Test
-    fun `@KmEntity cannot be applied to private data class`() {
+    fun `@KmEntityDef cannot be applied to this element`() {
+        val result = compile(
+            kotlin(
+                "source.kt",
+                """
+                package test
+                import org.komapper.core.*
+                data class Dept(
+                    val id: Int
+                )
+                class DeptDef(
+                    @KmEntityDef(entity = Dept::class) val id: Int
+                )
+                """
+            )
+        )
+        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
+        assertThat(result.messages).contains("@KmEntityDef cannot be applied to this element.")
+    }
+
+    @Test
+    fun `The entity class must not be private`() {
         val result = compile(
             kotlin(
                 "source.kt",
@@ -105,11 +235,33 @@ class EntityProcessorTest {
             )
         )
         assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertThat(result.messages).contains("@KmEntity cannot be applied to private data class.")
+        assertThat(result.messages).contains("The entity class must not be private.")
     }
 
     @Test
-    fun `@KmEntity annotated class must not have type parameters`() {
+    fun `The entity class must not be private, @KmEntityDef`() {
+        val result = compile(
+            kotlin(
+                "source.kt",
+                """
+                package test
+                import org.komapper.core.*
+                private data class Dept(
+                    val id: Int
+                )
+                @KmEntityDef(entity = Dept::class)
+                data class DeptDef(
+                    val id: Int
+                )
+                """
+            )
+        )
+        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
+        assertThat(result.messages).contains("The entity class must not be private.")
+    }
+
+    @Test
+    fun `The entity class must not have type parameters`() {
         val result = compile(
             kotlin(
                 "source.kt",
@@ -124,7 +276,29 @@ class EntityProcessorTest {
             )
         )
         assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertThat(result.messages).contains("@KmEntity annotated class must not have type parameters.")
+        assertThat(result.messages).contains("The entity class must not have type parameters.")
+    }
+
+    @Test
+    fun `The entity class must not have type parameters, @KmEntityDef`() {
+        val result = compile(
+            kotlin(
+                "source.kt",
+                """
+                package test
+                import org.komapper.core.*
+                data class Dept<T>(
+                    val id: T
+                )
+                @KmEntityDef(entity = Dept::class)
+                data class DeptDef<T>(
+                    val id: T
+                )
+                """
+            )
+        )
+        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
+        assertThat(result.messages).contains("The entity class must not have type parameters.")
     }
 
     @Test
@@ -209,7 +383,7 @@ class EntityProcessorTest {
     }
 
     @Test
-    fun `The parameter must not be private`() {
+    fun `The property must not be private`() {
         val result = compile(
             kotlin(
                 "source.kt",
@@ -224,11 +398,11 @@ class EntityProcessorTest {
             )
         )
         assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertThat(result.messages).contains("The parameter must not be private.")
+        assertThat(result.messages).contains("The property must not be private.")
     }
 
     @Test
-    fun `@KmId and @KmVersion cannot coexist on the same parameter`() {
+    fun `@KmId and @KmVersion cannot coexist on the same property`() {
         val result = compile(
             kotlin(
                 "source.kt",
@@ -243,11 +417,11 @@ class EntityProcessorTest {
             )
         )
         assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertThat(result.messages).contains("@KmId and @KmVersion cannot coexist on the same parameter.")
+        assertThat(result.messages).contains("@KmId and @KmVersion cannot coexist on the same property.")
     }
 
     @Test
-    fun `@KmIdentityGenerator and @KmId must coexist`() {
+    fun `@KmIdentityGenerator and @KmId must coexist on the same property`() {
         val result = compile(
             kotlin(
                 "source.kt",
@@ -262,11 +436,11 @@ class EntityProcessorTest {
             )
         )
         assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertThat(result.messages).contains("@KmIdentityGenerator and @KmId must coexist on the same parameter.")
+        assertThat(result.messages).contains("@KmIdentityGenerator and @KmId must coexist on the same property.")
     }
 
     @Test
-    fun `@KmIdentityGenerator and @KmSequenceGenerator cannot coexist on the same parameter`() {
+    fun `@KmIdentityGenerator and @KmSequenceGenerator cannot coexist on the same property`() {
         val result = compile(
             kotlin(
                 "source.kt",
@@ -281,11 +455,11 @@ class EntityProcessorTest {
             )
         )
         assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertThat(result.messages).contains("@KmIdentityGenerator and @KmSequenceGenerator cannot coexist on the same parameter.")
+        assertThat(result.messages).contains("@KmIdentityGenerator and @KmSequenceGenerator cannot coexist on the same property.")
     }
 
     @Test
-    fun `Multiple Generators cannot coexist in a single class`() {
+    fun `Multiple generator properties cannot coexist in a single class`() {
         val result = compile(
             kotlin(
                 "source.kt",
@@ -301,11 +475,11 @@ class EntityProcessorTest {
             )
         )
         assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertThat(result.messages).contains("Multiple Generators cannot coexist in a single class.")
+        assertThat(result.messages).contains("Multiple generator properties cannot coexist in a single class.")
     }
 
     @Test
-    fun `@KmVersion cannot apply to String type`() {
+    fun `The version property must either be Int or Long type`() {
         val result = compile(
             kotlin(
                 "source.kt",
@@ -320,11 +494,11 @@ class EntityProcessorTest {
             )
         )
         assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertThat(result.messages).contains("@KmVersion cannot apply to String type.")
+        assertThat(result.messages).contains("The version property must be either Int or Long type.")
     }
 
     @Test
-    fun `@KmCreatedAt cannot apply to String type`() {
+    fun `The createdAt property must be either LocalDateTime or OffsetDateTime type`() {
         val result = compile(
             kotlin(
                 "source.kt",
@@ -339,11 +513,11 @@ class EntityProcessorTest {
             )
         )
         assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertThat(result.messages).contains("@KmCreatedAt cannot apply to String type.")
+        assertThat(result.messages).contains("The createdAt property must be either LocalDateTime or OffsetDateTime type.")
     }
 
     @Test
-    fun `@KmUpdatedAt cannot apply to String type`() {
+    fun `The updatedAt property must be either LocalDateTime or OffsetDateTime type`() {
         val result = compile(
             kotlin(
                 "source.kt",
@@ -358,11 +532,11 @@ class EntityProcessorTest {
             )
         )
         assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertThat(result.messages).contains("@KmUpdatedAt cannot apply to String type.")
+        assertThat(result.messages).contains("The updatedAt property must be either LocalDateTime or OffsetDateTime type.")
     }
 
     @Test
-    fun `@KmIgnore annotated parameter must have default value`() {
+    fun `The ignored property must have a default value`() {
         val result = compile(
             kotlin(
                 "source.kt",
@@ -377,11 +551,11 @@ class EntityProcessorTest {
             )
         )
         assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertThat(result.messages).contains("@KmIgnore annotated parameter must have default value.")
+        assertThat(result.messages).contains("The ignored property must have a default value.")
     }
 
     @Test
-    fun `@KmIdentityGenerator cannot apply to String type`() {
+    fun `The identity generator property must be either Int or Long type`() {
         val result = compile(
             kotlin(
                 "source.kt",
@@ -396,11 +570,11 @@ class EntityProcessorTest {
             )
         )
         assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertThat(result.messages).contains("@KmIdentityGenerator cannot apply to String type.")
+        assertThat(result.messages).contains("The identity generator property must be either Int or Long type.")
     }
 
     @Test
-    fun `@KmSequenceGenerator cannot apply to String type`() {
+    fun `The sequence generator property must be either Int or Long type`() {
         val result = compile(
             kotlin(
                 "source.kt",
@@ -415,7 +589,7 @@ class EntityProcessorTest {
             )
         )
         assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertThat(result.messages).contains("@KmSequenceGenerator cannot apply to String type.")
+        assertThat(result.messages).contains("The sequence generator property must be either Int or Long type.")
     }
 
     @Test

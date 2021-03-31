@@ -1,6 +1,6 @@
 package org.komapper.ksp
 
-data class Config(
+internal data class Config(
     val prefix: String,
     val suffix: String,
     val namingStrategy: NamingStrategy

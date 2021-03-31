@@ -2,12 +2,12 @@ package org.komapper.ksp
 
 import java.nio.CharBuffer
 
-interface NamingStrategy {
+internal interface NamingStrategy {
 
     fun apply(name: String): String
 }
 
-object CamelToLowerSnakeCase : NamingStrategy {
+internal object CamelToLowerSnakeCase : NamingStrategy {
 
     private val camelToSnakeCase = CamelToSnakeCase(Char::toLowerCase)
 
@@ -16,7 +16,7 @@ object CamelToLowerSnakeCase : NamingStrategy {
     }
 }
 
-object CamelToUpperSnakeCase : NamingStrategy {
+internal object CamelToUpperSnakeCase : NamingStrategy {
 
     private val camelToSnakeCase = CamelToSnakeCase(Char::toUpperCase)
 
@@ -46,7 +46,7 @@ private class CamelToSnakeCase(private val mapper: (Char) -> Char) {
     }
 }
 
-object Implicit : NamingStrategy {
+internal object Implicit : NamingStrategy {
     override fun apply(name: String): String {
         return name
     }

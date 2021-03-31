@@ -11,16 +11,19 @@ internal fun <T> Sequence<T>.anyDuplicates(predicate: (T) -> Boolean): Boolean {
 }
 
 internal fun KSClassDeclaration.hasCompanionObject(): Boolean {
-    return declarations.any { it.accept(CompanionObjectVisitor(), Unit) }
-}
+    return declarations.any {
+        it.accept(
+            object : KSEmptyVisitor<Unit, Boolean>() {
+                override fun defaultHandler(node: KSNode, data: Unit): Boolean {
+                    return false
+                }
 
-private class CompanionObjectVisitor : KSEmptyVisitor<Unit, Boolean>() {
-    override fun defaultHandler(node: KSNode, data: Unit): Boolean {
-        return false
-    }
-
-    override fun visitClassDeclaration(classDeclaration: KSClassDeclaration, data: Unit): Boolean {
-        return classDeclaration.isCompanionObject && classDeclaration.simpleName.asString() == "Companion"
+                override fun visitClassDeclaration(classDeclaration: KSClassDeclaration, data: Unit): Boolean {
+                    return classDeclaration.isCompanionObject && classDeclaration.simpleName.asString() == "Companion"
+                }
+            },
+            Unit
+        )
     }
 }
 
