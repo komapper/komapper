@@ -168,6 +168,18 @@ class SqlSelectQueryTest(private val db: Database) {
     }
 
     @Test
+    fun innerJoin_single() {
+        val a = Address.metamodel()
+        val e = Employee.metamodel()
+        val list: List<Employee> = db.execute(
+            SqlQuery.from(a).innerJoin(e) {
+                a.addressId eq e.addressId
+            }.select(e)
+        )
+        assertEquals(14, list.size)
+    }
+
+    @Test
     fun innerJoin_pair() {
         val a = Address.metamodel()
         val e = Employee.metamodel()

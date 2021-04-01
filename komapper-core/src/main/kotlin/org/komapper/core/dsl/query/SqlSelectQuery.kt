@@ -37,6 +37,10 @@ interface SqlSelectQuery<ENTITY> : ListQuery<ENTITY> {
     fun forUpdate(): SqlSelectQuery<ENTITY>
     fun options(declaration: SqlSelectOptionsDeclaration): SqlSelectQuery<ENTITY>
 
+    fun <A> select(
+        e: EntityMetamodel<A>
+    ): ListQuery<A>
+
     fun <A, B> select(
         e1: EntityMetamodel<A>,
         e2: EntityMetamodel<B>
@@ -135,6 +139,18 @@ internal data class SqlSelectQueryImpl<ENTITY>(
         declaration(scope)
         val newContext = context.copy(options = scope.options)
         return copy(context = newContext)
+    }
+
+    override fun <A> select(
+        e: EntityMetamodel<A>,
+    ): ListQuery<A> {
+        val entityMetamodels = context.getAliasableEntityMetamodels()
+        if (entityMetamodels.none { it == e }) error(entityMetamodelNotFound("e"))
+        val newContext = context.setTable(e)
+        return Transformable(newContext) { dialect, rs ->
+            val m = EntityMapper(dialect, rs)
+            m.execute(e)
+        }
     }
 
     override fun <A, B> select(
