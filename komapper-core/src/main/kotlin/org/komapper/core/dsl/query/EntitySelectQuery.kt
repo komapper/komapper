@@ -8,7 +8,7 @@ import org.komapper.core.dsl.context.EntitySelectContext
 import org.komapper.core.dsl.context.Projection
 import org.komapper.core.dsl.scope.EntitySelectOptionsDeclaration
 import org.komapper.core.dsl.scope.EntitySelectOptionsScope
-import org.komapper.core.dsl.scope.JoinDeclaration
+import org.komapper.core.dsl.scope.OnDeclaration
 import org.komapper.core.dsl.scope.WhereDeclaration
 import org.komapper.core.jdbc.JdbcExecutor
 import org.komapper.core.metamodel.ColumnInfo
@@ -19,12 +19,12 @@ interface EntitySelectQuery<ENTITY> : ListQuery<ENTITY> {
 
     fun <OTHER_ENTITY> innerJoin(
         entityMetamodel: EntityMetamodel<OTHER_ENTITY>,
-        declaration: JoinDeclaration<OTHER_ENTITY>
+        on: OnDeclaration<OTHER_ENTITY>
     ): EntitySelectQuery<ENTITY>
 
     fun <OTHER_ENTITY> leftJoin(
         entityMetamodel: EntityMetamodel<OTHER_ENTITY>,
-        declaration: JoinDeclaration<OTHER_ENTITY>
+        on: OnDeclaration<OTHER_ENTITY>
     ): EntitySelectQuery<ENTITY>
 
     fun where(declaration: WhereDeclaration): EntitySelectQuery<ENTITY>
@@ -55,17 +55,17 @@ internal data class EntitySelectQueryImpl<ENTITY>(
 
     override fun <OTHER_ENTITY> innerJoin(
         entityMetamodel: EntityMetamodel<OTHER_ENTITY>,
-        declaration: JoinDeclaration<OTHER_ENTITY>
+        on: OnDeclaration<OTHER_ENTITY>
     ): EntitySelectQueryImpl<ENTITY> {
-        val newContext = support.innerJoin(entityMetamodel, declaration)
+        val newContext = support.innerJoin(entityMetamodel, on)
         return copy(context = newContext)
     }
 
     override fun <OTHER_ENTITY> leftJoin(
         entityMetamodel: EntityMetamodel<OTHER_ENTITY>,
-        declaration: JoinDeclaration<OTHER_ENTITY>
+        on: OnDeclaration<OTHER_ENTITY>
     ): EntitySelectQueryImpl<ENTITY> {
-        val newContext = support.leftJoin(entityMetamodel, declaration)
+        val newContext = support.leftJoin(entityMetamodel, on)
         return copy(context = newContext)
     }
 

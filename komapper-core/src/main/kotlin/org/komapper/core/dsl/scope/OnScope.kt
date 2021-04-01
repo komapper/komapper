@@ -1,16 +1,16 @@
 package org.komapper.core.dsl.scope
 
 import org.komapper.core.Scope
-import org.komapper.core.dsl.context.JoinContext
+import org.komapper.core.dsl.context.OnContext
 import org.komapper.core.dsl.data.Criterion
 import org.komapper.core.dsl.data.Operand
 import org.komapper.core.metamodel.PropertyMetamodel
 
 @Scope
-class JoinScope<ENTITY> internal constructor(private val context: JoinContext) {
+class OnScope<ENTITY> internal constructor(private val context: OnContext) {
 
     companion object {
-        operator fun <ENTITY> JoinDeclaration<ENTITY>.plus(other: JoinDeclaration<ENTITY>): JoinDeclaration<ENTITY> {
+        operator fun <ENTITY> OnDeclaration<ENTITY>.plus(other: OnDeclaration<ENTITY>): OnDeclaration<ENTITY> {
             return {
                 this@plus(this)
                 other(this)
