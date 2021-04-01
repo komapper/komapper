@@ -19,14 +19,8 @@ internal class EntityAnalyzer(
             val model = EntityModel(config, definitionSource, entity)
             EntityAnalyzerResult.Success(model)
         } catch (e: Exit) {
-            when (e.level) {
-                Level.FAILURE -> {
-                    val model = EntityModel(config, definitionSource)
-                    EntityAnalyzerResult.Failure(model, e)
-                }
-                Level.ERROR ->
-                    EntityAnalyzerResult.Error(e)
-            }
+            val model = EntityModel(config, definitionSource)
+            EntityAnalyzerResult.Failure(model, e)
         }
     }
 }
