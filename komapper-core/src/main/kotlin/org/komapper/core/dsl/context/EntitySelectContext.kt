@@ -48,10 +48,11 @@ internal data class EntitySelectContext<ENTITY>(
     }
 
     fun putAssociator(association: Association, associator: Associator<Any, Any>): EntitySelectContext<ENTITY> {
-        val set = setOf(association.first, association.second)
         val newProjection = when (projection) {
             is Projection.Columns -> error("cannot happen.")
-            is Projection.Tables -> Projection.Tables((projection.values + set))
+            is Projection.Tables -> Projection.Tables(
+                projection.values + setOf(association.first, association.second)
+            )
         }
         return copy(projection = newProjection, associatorMap = this.associatorMap + (association to associator))
     }

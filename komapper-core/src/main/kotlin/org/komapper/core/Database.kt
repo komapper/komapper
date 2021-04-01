@@ -3,6 +3,7 @@ package org.komapper.core
 import org.komapper.core.dsl.EntityQuery
 import org.komapper.core.dsl.ScriptQuery
 import org.komapper.core.dsl.SqlQuery
+import org.komapper.core.dsl.query.ListQuery
 import org.komapper.core.dsl.query.Query
 import org.komapper.core.dsl.scope.WhereDeclaration
 import org.komapper.core.metamodel.EntityMetamodel
@@ -30,12 +31,20 @@ class Database(val config: DatabaseConfig) {
     val factory = Factory(config)
 
     fun <ENTITY> find(metamodel: EntityMetamodel<ENTITY>, declaration: WhereDeclaration): ENTITY {
-        return findOrNull(metamodel, declaration) ?: error("not found.")
+        val query = createFindQuery(metamodel, declaration).first()
+        return runQuery(query)
     }
 
     fun <ENTITY> findOrNull(metamodel: EntityMetamodel<ENTITY>, declaration: WhereDeclaration): ENTITY? {
-        val queryable = SqlQuery.from(metamodel).where(declaration).limit(1).firstOrNull()
-        return runQuery(queryable)
+        val query = createFindQuery(metamodel, declaration).firstOrNull()
+        return runQuery(query)
+    }
+
+    private fun <ENTITY> createFindQuery(
+        metamodel: EntityMetamodel<ENTITY>,
+        declaration: WhereDeclaration
+    ): ListQuery<ENTITY> {
+        return SqlQuery.from(metamodel).where(declaration).limit(1)
     }
 
     fun <ENTITY> insert(metamodel: EntityMetamodel<ENTITY>, entity: ENTITY): ENTITY {

@@ -161,6 +161,7 @@ open class DefaultStatementBuilder(
                         val (r) = eval(it.location, it.expression, state.ctx)
                         r == true
                     }
+                    @Suppress("LiftReturnOrAssignment")
                     if (elseIfDirective != null) {
                         return elseIfDirective.nodeList
                     } else {

@@ -141,11 +141,11 @@ object BlobType : AbstractDataType<Blob>(Types.BLOB) {
 
 object BooleanType : AbstractDataType<Boolean>(Types.BOOLEAN) {
 
-    override fun doGetValue(rs: ResultSet, index: Int): Boolean? {
+    override fun doGetValue(rs: ResultSet, index: Int): Boolean {
         return rs.getBoolean(index)
     }
 
-    override fun doGetValue(rs: ResultSet, columnLabel: String): Boolean? {
+    override fun doGetValue(rs: ResultSet, columnLabel: String): Boolean {
         return rs.getBoolean(columnLabel)
     }
 
@@ -160,11 +160,11 @@ object BooleanType : AbstractDataType<Boolean>(Types.BOOLEAN) {
 
 object ByteType : AbstractDataType<Byte>(Types.SMALLINT) {
 
-    override fun doGetValue(rs: ResultSet, index: Int): Byte? {
+    override fun doGetValue(rs: ResultSet, index: Int): Byte {
         return rs.getByte(index)
     }
 
-    override fun doGetValue(rs: ResultSet, columnLabel: String): Byte? {
+    override fun doGetValue(rs: ResultSet, columnLabel: String): Byte {
         return rs.getByte(columnLabel)
     }
 
@@ -204,11 +204,11 @@ object ClobType : AbstractDataType<Clob>(Types.CLOB) {
 
 object DoubleType : AbstractDataType<Double>(Types.DOUBLE) {
 
-    override fun doGetValue(rs: ResultSet, index: Int): Double? {
+    override fun doGetValue(rs: ResultSet, index: Int): Double {
         return rs.getDouble(index)
     }
 
-    override fun doGetValue(rs: ResultSet, columnLabel: String): Double? {
+    override fun doGetValue(rs: ResultSet, columnLabel: String): Double {
         return rs.getDouble(columnLabel)
     }
 
@@ -246,11 +246,11 @@ class EnumType(private val kClass: KClass<Enum<*>>) : DataType<Enum<*>> {
 
 object FloatType : AbstractDataType<Float>(Types.FLOAT) {
 
-    override fun doGetValue(rs: ResultSet, index: Int): Float? {
+    override fun doGetValue(rs: ResultSet, index: Int): Float {
         return rs.getFloat(index)
     }
 
-    override fun doGetValue(rs: ResultSet, columnLabel: String): Float? {
+    override fun doGetValue(rs: ResultSet, columnLabel: String): Float {
         return rs.getFloat(columnLabel)
     }
 
@@ -261,11 +261,11 @@ object FloatType : AbstractDataType<Float>(Types.FLOAT) {
 
 object IntType : AbstractDataType<Int>(Types.INTEGER) {
 
-    override fun doGetValue(rs: ResultSet, index: Int): Int? {
+    override fun doGetValue(rs: ResultSet, index: Int): Int {
         return rs.getInt(index)
     }
 
-    override fun doGetValue(rs: ResultSet, columnLabel: String): Int? {
+    override fun doGetValue(rs: ResultSet, columnLabel: String): Int {
         return rs.getInt(columnLabel)
     }
 
@@ -333,11 +333,11 @@ object LocalTimeType : AbstractDataType<LocalTime>(Types.TIME) {
 
 object LongType : AbstractDataType<Long>(Types.BIGINT) {
 
-    override fun doGetValue(rs: ResultSet, index: Int): Long? {
+    override fun doGetValue(rs: ResultSet, index: Int): Long {
         return rs.getLong(index)
     }
 
-    override fun doGetValue(rs: ResultSet, columnLabel: String): Long? {
+    override fun doGetValue(rs: ResultSet, columnLabel: String): Long {
         return rs.getLong(columnLabel)
     }
 
@@ -382,11 +382,11 @@ object OffsetDateTimeType : AbstractDataType<OffsetDateTime>(Types.TIMESTAMP_WIT
 
 object ShortType : AbstractDataType<Short>(Types.SMALLINT) {
 
-    override fun doGetValue(rs: ResultSet, index: Int): Short? {
+    override fun doGetValue(rs: ResultSet, index: Int): Short {
         return rs.getShort(index)
     }
 
-    override fun doGetValue(rs: ResultSet, columnLabel: String): Short? {
+    override fun doGetValue(rs: ResultSet, columnLabel: String): Short {
         return rs.getShort(columnLabel)
     }
 

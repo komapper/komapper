@@ -39,7 +39,7 @@ internal data class SqlDeleteQueryImpl<ENTITY>(
     }
 
     override fun run(config: DatabaseConfig): Int {
-        if (context.options.allowEmptyWhereClause == false && context.where.isEmpty()) {
+        if (!context.options.allowEmptyWhereClause && context.where.isEmpty()) {
             error("Empty where clause is not allowed.")
         }
         val statement = buildStatement(config.dialect, context)

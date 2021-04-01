@@ -25,6 +25,13 @@ class SqlSelectQueryTest(private val db: Database) {
     }
 
     @Test
+    fun findOrNull() {
+        val a = Address.metamodel()
+        val address = db.findOrNull(a) { a.addressId eq -1 }
+        assertNull(address)
+    }
+
+    @Test
     fun find_multipleCondition() {
         val a = Address.metamodel()
         val address = db.find(a) { a.addressId eq 1; a.version eq 1 }

@@ -104,7 +104,7 @@ internal class SelectStatementBuilderSupport(
         }
     }
 
-    fun visitTableInfo(tableInfo: TableInfo) {
+    private fun visitTableInfo(tableInfo: TableInfo) {
         support.visitTableInfo(tableInfo)
     }
 

@@ -47,7 +47,7 @@ internal class SqlSelectStatementBuilder(
                 is Projection.Columns -> projection.values
                 is Projection.Tables -> projection.values.flatMap { it.properties() }
             }
-            val aggregateFunctions = columns.filter { it is AggregateFunction }
+            val aggregateFunctions = columns.filterIsInstance<AggregateFunction<*>>()
             val groupByItems = columns - aggregateFunctions
             if (aggregateFunctions.isNotEmpty() && groupByItems.isNotEmpty()) {
                 buf.append(" group by ")

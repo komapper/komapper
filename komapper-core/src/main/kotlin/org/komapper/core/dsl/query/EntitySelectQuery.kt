@@ -145,7 +145,7 @@ internal data class EntitySelectQueryImpl<ENTITY>(
     private inner class Terminal<R>(val transformer: (Sequence<ENTITY>) -> R) : Query<R> {
 
         override fun run(config: DatabaseConfig): R {
-            if (context.options.allowEmptyWhereClause == false && context.where.isEmpty()) {
+            if (!context.options.allowEmptyWhereClause && context.where.isEmpty()) {
                 error("Empty where clause is not allowed.")
             }
             val statement = toStatement(config.dialect)

@@ -2,9 +2,9 @@ package org.komapper.core.config
 
 /**
  * @property batchSize the batch size. This value is used for batch commands.
- * @property fetchSize the fetch size. See [PreparedStatement.setFetchSize].
- * @property maxRows the max rows. See [PreparedStatement.setMaxRows].
- * @property queryTimeoutSeconds the query timeout. See [PreparedStatement.setQueryTimeout].
+ * @property fetchSize the fetch size. See [java.sql.PreparedStatement.setFetchSize].
+ * @property maxRows the max rows. See [java.sql.PreparedStatement.setMaxRows].
+ * @property queryTimeoutSeconds the query timeout. See [java.sql.PreparedStatement.setQueryTimeout].
  */
 data class JdbcConfig(
     val batchSize: Int? = null,

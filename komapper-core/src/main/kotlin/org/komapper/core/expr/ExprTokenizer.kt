@@ -32,7 +32,6 @@ import org.komapper.core.expr.ExprTokenType.STRING
 import org.komapper.core.expr.ExprTokenType.TRUE
 import org.komapper.core.expr.ExprTokenType.VALUE
 import org.komapper.core.expr.ExprTokenType.WHITESPACE
-import java.lang.Math.min
 import java.nio.CharBuffer
 
 class ExprTokenizer(private val expression: String) {
@@ -59,7 +58,7 @@ class ExprTokenizer(private val expression: String) {
     }
 
     private fun read() {
-        val length = min(buf.remaining(), LOOKAHEAD_SIZE)
+        val length = buf.remaining().coerceAtMost(LOOKAHEAD_SIZE)
         buf.get(lookahead, 0, length)
         when (length) {
             5 -> readFiveChars(lookahead)

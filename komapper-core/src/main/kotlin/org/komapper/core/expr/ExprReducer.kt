@@ -9,7 +9,7 @@ abstract class ExprReducer(val priority: Int, val location: ExprLocation) {
         deque.poll() ?: throw ExprException("The operand is not found at $location")
 }
 
-class PropertyReducer(location: ExprLocation, val name: String, val safeCall: Boolean) :
+class PropertyReducer(location: ExprLocation, val name: String, private val safeCall: Boolean) :
     ExprReducer(100, location) {
     override fun reduce(deque: Deque<ExprNode>): ExprNode {
         val receiver = pop(deque)
@@ -17,7 +17,7 @@ class PropertyReducer(location: ExprLocation, val name: String, val safeCall: Bo
     }
 }
 
-class FunctionReducer(location: ExprLocation, val name: String, val safeCall: Boolean) :
+class FunctionReducer(location: ExprLocation, val name: String, private val safeCall: Boolean) :
     ExprReducer(100, location) {
     override fun reduce(deque: Deque<ExprNode>): ExprNode {
         val args = pop(deque)

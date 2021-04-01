@@ -33,7 +33,6 @@ import org.komapper.core.template.SqlTokenType.SPACE
 import org.komapper.core.template.SqlTokenType.UNION
 import org.komapper.core.template.SqlTokenType.WHERE
 import org.komapper.core.template.SqlTokenType.WORD
-import java.lang.Math.min
 import java.nio.CharBuffer
 
 class SqlTokenizer(private val sql: String) {
@@ -66,7 +65,7 @@ class SqlTokenizer(private val sql: String) {
     }
 
     private fun read() {
-        val length = min(buf.remaining(), LOOKAHEAD_SIZE)
+        val length = buf.remaining().coerceAtMost(LOOKAHEAD_SIZE)
         buf.get(lookahead, 0, length)
         when (length) {
             10 -> readTenChars(lookahead)
