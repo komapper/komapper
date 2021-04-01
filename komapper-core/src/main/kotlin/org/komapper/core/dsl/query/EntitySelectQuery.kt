@@ -178,7 +178,7 @@ internal data class EntitySelectQueryImpl<ENTITY>(
 
         private fun fetchAllEntities(dialect: Dialect, rs: ResultSet): List<Map<EntityKey, Any>> {
             val entityMetamodels = when (val projection = context.projection) {
-                is Projection.Columns -> TODO()
+                is Projection.Columns -> error("cannot happen")
                 is Projection.Tables -> projection.values
             }
             val rows = mutableListOf<Map<EntityKey, Any>>()

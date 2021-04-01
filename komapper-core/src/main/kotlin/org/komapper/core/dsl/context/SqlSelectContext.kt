@@ -17,7 +17,7 @@ internal data class SqlSelectContext<ENTITY>(
     val groupBy: List<ColumnInfo<*>> = listOf(),
     val having: List<Criterion> = listOf(),
     override val projection: Projection =
-        Projection.Tables(listOf(from) + joins.map { it.entityMetamodel }),
+        Projection.Tables(setOf(from) + joins.map { it.entityMetamodel }),
     val options: SqlSelectOptions = OptionsImpl(allowEmptyWhereClause = true)
 ) : SelectContext<ENTITY, SqlSelectContext<ENTITY>> {
 
@@ -30,11 +30,11 @@ internal data class SqlSelectContext<ENTITY>(
     }
 
     fun setTable(entityMetamodel: EntityMetamodel<*>): SqlSelectContext<ENTITY> {
-        return copy(projection = Projection.Tables(listOf(entityMetamodel)))
+        return copy(projection = Projection.Tables(setOf(entityMetamodel)))
     }
 
     fun setTables(entityMetamodels: List<EntityMetamodel<*>>): SqlSelectContext<ENTITY> {
-        return copy(projection = Projection.Tables(entityMetamodels))
+        return copy(projection = Projection.Tables(entityMetamodels.toSet()))
     }
 
     override fun addJoin(join: Join<*>): SqlSelectContext<ENTITY> {
