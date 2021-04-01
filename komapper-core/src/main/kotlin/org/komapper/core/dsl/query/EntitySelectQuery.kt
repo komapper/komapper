@@ -51,6 +51,12 @@ internal data class EntitySelectQueryImpl<ENTITY>(
 ) :
     EntitySelectQuery<ENTITY> {
 
+    companion object Message {
+        fun entityMetamodelNotFound(parameterName: String): String {
+            return "The '$parameterName' metamodel is not found. Bind it to this query in advance using the from or join clause."
+        }
+    }
+
     private val support: SelectQuerySupport<ENTITY, EntitySelectContext<ENTITY>> = SelectQuerySupport(context)
 
     override fun <OTHER_ENTITY> innerJoin(
@@ -75,12 +81,8 @@ internal data class EntitySelectQueryImpl<ENTITY>(
         associator: Associator<T, S>
     ): EntitySelectQueryImpl<ENTITY> {
         val entityMetamodels = context.getAliasableEntityMetamodels()
-        if (entityMetamodels.none { it == e1 }) {
-            error("The e1 is not found. Use e1 in the join clause.")
-        }
-        if (entityMetamodels.none { it == e2 }) {
-            error("The e2 is not found. Use e2 in the join clause.")
-        }
+        if (entityMetamodels.none { it == e1 }) error(entityMetamodelNotFound("e1"))
+        if (entityMetamodels.none { it == e2 }) error(entityMetamodelNotFound("e2"))
         @Suppress("UNCHECKED_CAST")
         val newContext = context.putAssociator(e1 to e2, associator as Associator<Any, Any>)
         return copy(context = newContext)

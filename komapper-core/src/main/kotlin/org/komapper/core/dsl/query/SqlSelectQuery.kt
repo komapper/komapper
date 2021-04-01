@@ -69,6 +69,12 @@ internal data class SqlSelectQueryImpl<ENTITY>(
 ) :
     SqlSelectQuery<ENTITY> {
 
+    companion object Message {
+        fun entityMetamodelNotFound(parameterName: String): String {
+            return "The '$parameterName' metamodel is not found. Bind it to this query in advance using the from or join clause."
+        }
+    }
+
     private val support: SelectQuerySupport<ENTITY, SqlSelectContext<ENTITY>> = SelectQuerySupport(context)
 
     override fun <OTHER_ENTITY> innerJoin(
@@ -135,7 +141,9 @@ internal data class SqlSelectQueryImpl<ENTITY>(
         e1: EntityMetamodel<A>,
         e2: EntityMetamodel<B>
     ): ListQuery<Pair<A, B>> {
-        // TODO check
+        val entityMetamodels = context.getAliasableEntityMetamodels()
+        if (entityMetamodels.none { it == e1 }) error(entityMetamodelNotFound("e1"))
+        if (entityMetamodels.none { it == e2 }) error(entityMetamodelNotFound("e2"))
         val newContext = context.setTables(listOf(e1, e2))
         return Transformable(newContext) { dialect, rs ->
             val m = EntityMapper(dialect, rs)
@@ -148,7 +156,10 @@ internal data class SqlSelectQueryImpl<ENTITY>(
         e2: EntityMetamodel<B>,
         e3: EntityMetamodel<C>
     ): ListQuery<Triple<A, B, C>> {
-        // TODO check
+        val entityMetamodels = context.getAliasableEntityMetamodels()
+        if (entityMetamodels.none { it == e1 }) error(entityMetamodelNotFound("e1"))
+        if (entityMetamodels.none { it == e2 }) error(entityMetamodelNotFound("e2"))
+        if (entityMetamodels.none { it == e3 }) error(entityMetamodelNotFound("e3"))
         val newContext = context.setTables(listOf(e1, e2, e3))
         return Transformable(newContext) { dialect, rs ->
             val m = EntityMapper(dialect, rs)
@@ -157,7 +168,6 @@ internal data class SqlSelectQueryImpl<ENTITY>(
     }
 
     override fun <A : Any> select(columnInfo: ColumnInfo<A>): ListQuery<A> {
-        // TODO check
         val newContext = context.setColumn(columnInfo)
         return Transformable(newContext) { dialect, rs ->
             val m = PropertyMapper(dialect, rs)
@@ -166,7 +176,6 @@ internal data class SqlSelectQueryImpl<ENTITY>(
     }
 
     override fun <A : Any, B : Any> select(c1: ColumnInfo<A>, c2: ColumnInfo<B>): ListQuery<Pair<A, B>> {
-        // TODO check
         val newContext = context.setColumns(listOf(c1, c2))
         return Transformable(newContext) { dialect, rs ->
             val m = PropertyMapper(dialect, rs)
@@ -179,7 +188,6 @@ internal data class SqlSelectQueryImpl<ENTITY>(
         c2: ColumnInfo<B>,
         c3: ColumnInfo<C>
     ): ListQuery<Triple<A, B, C>> {
-        // TODO check
         val newContext = context.setColumns(listOf(c1, c2, c3))
         return Transformable(newContext) { dialect, rs: ResultSet ->
             val m = PropertyMapper(dialect, rs)
