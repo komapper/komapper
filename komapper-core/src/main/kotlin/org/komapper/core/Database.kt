@@ -62,6 +62,21 @@ class Database(val config: DatabaseConfig) {
         runQuery(queryable)
     }
 
+    fun <ENTITY> batchInsert(metamodel: EntityMetamodel<ENTITY>, entities: List<ENTITY>): List<ENTITY> {
+        val queryable = EntityQuery.batchInsert(metamodel, entities)
+        return runQuery(queryable)
+    }
+
+    fun <ENTITY> batchUpdate(metamodel: EntityMetamodel<ENTITY>, entities: List<ENTITY>): List<ENTITY> {
+        val queryable = EntityQuery.batchUpdate(metamodel, entities)
+        return runQuery(queryable)
+    }
+
+    fun <ENTITY> batchDelete(metamodel: EntityMetamodel<ENTITY>, entities: List<ENTITY>) {
+        val queryable = EntityQuery.batchDelete(metamodel, entities)
+        runQuery(queryable)
+    }
+
     fun script(sql: CharSequence) {
         val queryable = ScriptQuery.execute(sql.toString())
         runQuery(queryable)

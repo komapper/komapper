@@ -6,8 +6,8 @@ import org.komapper.core.data.Statement
 import org.komapper.core.dsl.builder.EntitySelectStatementBuilder
 import org.komapper.core.dsl.context.EntitySelectContext
 import org.komapper.core.dsl.context.Projection
-import org.komapper.core.dsl.scope.EntitySelectOptionsDeclaration
-import org.komapper.core.dsl.scope.EntitySelectOptionsScope
+import org.komapper.core.dsl.scope.EntitySelectOptionDeclaration
+import org.komapper.core.dsl.scope.EntitySelectOptionScope
 import org.komapper.core.dsl.scope.OnDeclaration
 import org.komapper.core.dsl.scope.WhereDeclaration
 import org.komapper.core.jdbc.JdbcExecutor
@@ -32,7 +32,7 @@ interface EntitySelectQuery<ENTITY> : ListQuery<ENTITY> {
     fun offset(value: Int): EntitySelectQuery<ENTITY>
     fun limit(value: Int): EntitySelectQuery<ENTITY>
     fun forUpdate(): EntitySelectQuery<ENTITY>
-    fun options(declaration: EntitySelectOptionsDeclaration): EntitySelectQuery<ENTITY>
+    fun option(declaration: EntitySelectOptionDeclaration): EntitySelectQuery<ENTITY>
 
     override fun peek(dialect: Dialect, block: (Statement) -> Unit): EntitySelectQuery<ENTITY> {
         super.peek(dialect, block)
@@ -47,7 +47,8 @@ interface EntitySelectQuery<ENTITY> : ListQuery<ENTITY> {
 }
 
 internal data class EntitySelectQueryImpl<ENTITY>(
-    private val context: EntitySelectContext<ENTITY>
+    private val context: EntitySelectContext<ENTITY>,
+    private val option: EntitySelectOption = QueryOptionImpl(allowEmptyWhereClause = true)
 ) :
     EntitySelectQuery<ENTITY> {
 
@@ -113,11 +114,10 @@ internal data class EntitySelectQueryImpl<ENTITY>(
         return copy(context = newContext)
     }
 
-    override fun options(declaration: EntitySelectOptionsDeclaration): EntitySelectQuery<ENTITY> {
-        val scope = EntitySelectOptionsScope(context.options)
+    override fun option(declaration: EntitySelectOptionDeclaration): EntitySelectQuery<ENTITY> {
+        val scope = EntitySelectOptionScope(option)
         declaration(scope)
-        val newContext = context.copy(options = scope.options)
-        return copy(context = newContext)
+        return copy(option = scope.asOption())
     }
 
     override fun run(config: DatabaseConfig): List<ENTITY> {
@@ -145,11 +145,11 @@ internal data class EntitySelectQueryImpl<ENTITY>(
     private inner class Terminal<R>(val transformer: (Sequence<ENTITY>) -> R) : Query<R> {
 
         override fun run(config: DatabaseConfig): R {
-            if (!context.options.allowEmptyWhereClause && context.where.isEmpty()) {
+            if (!option.allowEmptyWhereClause && context.where.isEmpty()) {
                 error("Empty where clause is not allowed.")
             }
             val statement = toStatement(config.dialect)
-            val executor = JdbcExecutor(config, context.options)
+            val executor = JdbcExecutor(config, option.asJdbcOption())
             return executor.executeQuery(statement) { rs ->
                 // hold only unique entities
                 val pool: MutableMap<EntityKey, Any> = mutableMapOf()
@@ -163,7 +163,7 @@ internal data class EntitySelectQueryImpl<ENTITY>(
                     associate(entityKeys, pool)
                 }
                 pool.asSequence().filter {
-                    it.key.entityMetamodel == context.from
+                    it.key.entityMetamodel == context.entityMetamodel
                 }.map {
                     @Suppress("UNCHECKED_CAST")
                     it.value as ENTITY

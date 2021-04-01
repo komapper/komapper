@@ -2,29 +2,27 @@ package org.komapper.core.dsl.query
 
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.config.Dialect
-import org.komapper.core.config.OptionsImpl
-import org.komapper.core.config.TemplateSelectOptions
 import org.komapper.core.data.Statement
-import org.komapper.core.dsl.scope.TemplateSelectOptionsDeclaration
-import org.komapper.core.dsl.scope.TemplateSelectOptionsScope
+import org.komapper.core.dsl.scope.TemplateSelectOptionDeclaration
+import org.komapper.core.dsl.scope.TemplateSelectOptionScope
 import org.komapper.core.jdbc.JdbcExecutor
 import org.komapper.core.template.DefaultStatementBuilder
 
 interface TemplateSelectQuery<T> : ListQuery<T> {
-    fun options(declaration: TemplateSelectOptionsDeclaration): TemplateSelectQuery<T>
+    fun option(declaration: TemplateSelectOptionDeclaration): TemplateSelectQuery<T>
 }
 
 internal data class TemplateSelectQueryImpl<T>(
     private val sql: String,
     private val params: Any = object {},
     private val provider: Row.() -> T,
-    private val options: TemplateSelectOptions = OptionsImpl()
+    private val option: TemplateSelectOption = QueryOptionImpl()
 ) : TemplateSelectQuery<T> {
 
-    override fun options(declaration: TemplateSelectOptionsDeclaration): TemplateSelectQueryImpl<T> {
-        val scope = TemplateSelectOptionsScope(options)
+    override fun option(declaration: TemplateSelectOptionDeclaration): TemplateSelectQueryImpl<T> {
+        val scope = TemplateSelectOptionScope(option)
         declaration(scope)
-        return copy(options = scope.options)
+        return copy(option = scope.asOption())
     }
 
     override fun run(config: DatabaseConfig): List<T> {
@@ -52,7 +50,7 @@ internal data class TemplateSelectQueryImpl<T>(
     private inner class Terminal<R>(val transformer: (Sequence<T>) -> R) : Query<R> {
         override fun run(config: DatabaseConfig): R {
             val statement = toStatement(config.dialect)
-            val executor = JdbcExecutor(config, options)
+            val executor = JdbcExecutor(config, option.asJdbcOption())
             return executor.executeQuery(
                 statement,
                 { dialect, rs ->

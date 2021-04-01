@@ -139,7 +139,7 @@ internal class Env :
     ParameterResolver {
 
     private val config = object : H2DatabaseConfig("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1", enableTransaction = true) {
-        override val jdbcConfig = super.jdbcConfig.copy(batchSize = 2)
+        override val jdbcOption = super.jdbcOption.copy(batchSize = 2)
     }
 
     private val db = Database(config)

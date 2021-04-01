@@ -1,13 +1,11 @@
 package org.komapper.core.dsl.context
 
-import org.komapper.core.config.OptionsImpl
-import org.komapper.core.config.SqlSelectOptions
 import org.komapper.core.dsl.data.Criterion
 import org.komapper.core.metamodel.ColumnInfo
 import org.komapper.core.metamodel.EntityMetamodel
 
 internal data class SqlSelectContext<ENTITY>(
-    override val from: EntityMetamodel<ENTITY>,
+    override val entityMetamodel: EntityMetamodel<ENTITY>,
     override val joins: List<Join<*>> = listOf(),
     override val where: List<Criterion> = listOf(),
     override val orderBy: List<ColumnInfo<*>> = listOf(),
@@ -17,8 +15,7 @@ internal data class SqlSelectContext<ENTITY>(
     val groupBy: List<ColumnInfo<*>> = listOf(),
     val having: List<Criterion> = listOf(),
     override val projection: Projection =
-        Projection.Tables(setOf(from) + joins.map { it.entityMetamodel }),
-    val options: SqlSelectOptions = OptionsImpl(allowEmptyWhereClause = true)
+        Projection.Tables(setOf(entityMetamodel) + joins.map { it.entityMetamodel }),
 ) : SelectContext<ENTITY, SqlSelectContext<ENTITY>> {
 
     fun setColumn(column: ColumnInfo<*>): SqlSelectContext<ENTITY> {

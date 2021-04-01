@@ -1,14 +1,12 @@
 package org.komapper.core.dsl.context
 
-import org.komapper.core.config.EntitySelectOptions
-import org.komapper.core.config.OptionsImpl
 import org.komapper.core.dsl.data.Criterion
 import org.komapper.core.dsl.query.Associator
 import org.komapper.core.metamodel.ColumnInfo
 import org.komapper.core.metamodel.EntityMetamodel
 
 internal data class EntitySelectContext<ENTITY>(
-    override val from: EntityMetamodel<ENTITY>,
+    override val entityMetamodel: EntityMetamodel<ENTITY>,
     override val joins: List<Join<*>> = listOf(),
     override val where: List<Criterion> = listOf(),
     override val orderBy: List<ColumnInfo<*>> = listOf(),
@@ -17,9 +15,8 @@ internal data class EntitySelectContext<ENTITY>(
     override val forUpdate: ForUpdate = ForUpdate(),
     val associatorMap: Map<Association, Associator<Any, Any>> = mapOf(),
     override val projection: Projection = Projection.Tables(
-        setOf(from) + associatorMap.keys.flatMap { setOf(it.first, it.second) }
-    ),
-    val options: EntitySelectOptions = OptionsImpl(allowEmptyWhereClause = true)
+        setOf(entityMetamodel) + associatorMap.keys.flatMap { setOf(it.first, it.second) }
+    )
 
 ) : SelectContext<ENTITY, EntitySelectContext<ENTITY>> {
 

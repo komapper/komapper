@@ -77,7 +77,7 @@ class SqlUpdateQueryTest(private val db: Database) {
         val count = db.execute {
             SqlQuery.update(e) {
                 e.employeeName set "ABC"
-            }.options { allowEmptyWhereClause = true }
+            }.option { allowEmptyWhereClause = true }
         }
         assertEquals(14, count)
     }

@@ -5,7 +5,7 @@ import java.sql.SQLException
 /**
  * Thrown if an optimistic lock is failed.
  */
-class OptimisticLockException : Exception()
+class OptimisticLockException(message: String) : Exception(message)
 
 /**
  * Thrown if an unique constraint is violated.

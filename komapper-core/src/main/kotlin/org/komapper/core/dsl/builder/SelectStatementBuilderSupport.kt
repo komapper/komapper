@@ -33,7 +33,7 @@ internal class SelectStatementBuilderSupport(
 
     fun fromClause() {
         buf.append(" from ")
-        visitTableInfo(context.from)
+        visitTableInfo(context.entityMetamodel)
         if (context.joins.isNotEmpty()) {
             for (join in context.joins) {
                 if (join.kind === JoinKind.INNER) {

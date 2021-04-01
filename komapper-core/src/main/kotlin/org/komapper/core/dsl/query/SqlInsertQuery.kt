@@ -5,16 +5,16 @@ import org.komapper.core.config.Dialect
 import org.komapper.core.data.Statement
 import org.komapper.core.dsl.builder.SqlInsertStatementBuilder
 import org.komapper.core.dsl.context.SqlInsertContext
-import org.komapper.core.dsl.scope.SqlInsertOptionsDeclaration
-import org.komapper.core.dsl.scope.SqlInsertOptionsScope
+import org.komapper.core.dsl.scope.SqlInsertOptionDeclaration
+import org.komapper.core.dsl.scope.SqlInsertOptionScope
 import org.komapper.core.dsl.scope.ValuesDeclaration
 import org.komapper.core.dsl.scope.ValuesScope
 import org.komapper.core.jdbc.JdbcExecutor
 import org.komapper.core.metamodel.Assignment
 
-interface SqlInsertQuery : Query<Pair<Int, Long?>> {
+interface SqlInsertQuery : Query<Pair<Int, LongArray>> {
     fun values(declaration: ValuesDeclaration): SqlInsertQuery
-    fun options(declaration: SqlInsertOptionsDeclaration): SqlInsertQuery
+    fun option(declaration: SqlInsertOptionDeclaration): SqlInsertQuery
 
     override fun peek(dialect: Dialect, block: (Statement) -> Unit): SqlInsertQuery {
         super.peek(dialect, block)
@@ -23,7 +23,8 @@ interface SqlInsertQuery : Query<Pair<Int, Long?>> {
 }
 
 internal data class SqlInsertQueryImpl<ENTITY>(
-    private val context: SqlInsertContext<ENTITY>
+    private val context: SqlInsertContext<ENTITY>,
+    private val option: SqlInsertOption = QueryOptionImpl()
 ) : SqlInsertQuery {
 
     override fun values(declaration: ValuesDeclaration): SqlInsertQueryImpl<ENTITY> {
@@ -33,15 +34,15 @@ internal data class SqlInsertQueryImpl<ENTITY>(
         return copy(context = newContext)
     }
 
-    override fun options(declaration: SqlInsertOptionsDeclaration): SqlInsertQueryImpl<ENTITY> {
-        val scope = SqlInsertOptionsScope(context.options)
+    override fun option(declaration: SqlInsertOptionDeclaration): SqlInsertQueryImpl<ENTITY> {
+        val scope = SqlInsertOptionScope(option)
         declaration(scope)
-        val newContext = context.copy(options = scope.options)
-        return copy(context = newContext)
+        return copy(option = scope.asOption())
     }
 
-    override fun run(config: DatabaseConfig): Pair<Int, Long?> {
-        val executor = JdbcExecutor(config, context.options) { con, sql ->
+    override fun run(config: DatabaseConfig): Pair<Int, LongArray> {
+        val statement = buildStatement(config.dialect)
+        val executor = JdbcExecutor(config, option.asJdbcOption()) { con, sql ->
             val assignment = context.entityMetamodel.idAssignment()
             if (assignment is Assignment.Identity<*, *>) {
                 con.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS)
@@ -49,19 +50,7 @@ internal data class SqlInsertQueryImpl<ENTITY>(
                 con.prepareStatement(sql)
             }
         }
-
-        val statement = buildStatement(config.dialect)
-        return executor.executeUpdate(statement) { ps, count ->
-            val assignment = context.entityMetamodel.idAssignment()
-            val id = if (assignment is Assignment.Identity<ENTITY, *>) {
-                ps.generatedKeys.use { rs ->
-                    if (rs.next()) rs.getLong(1) else error("No result: Statement.generatedKeys")
-                }
-            } else {
-                null
-            }
-            count to id
-        }
+        return executor.executeUpdate(statement)
     }
 
     override fun toStatement(dialect: Dialect): Statement {

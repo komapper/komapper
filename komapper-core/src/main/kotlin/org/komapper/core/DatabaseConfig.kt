@@ -4,7 +4,7 @@ import org.komapper.core.config.ClockProvider
 import org.komapper.core.config.DefaultClockProvider
 import org.komapper.core.config.DefaultSession
 import org.komapper.core.config.Dialect
-import org.komapper.core.config.JdbcConfig
+import org.komapper.core.config.JdbcOption
 import org.komapper.core.config.Logger
 import org.komapper.core.config.Session
 import org.komapper.core.config.StdOutLogger
@@ -19,7 +19,7 @@ import javax.sql.DataSource
  * @property dialect the dialect
  * @property logger the logger
  * @property clockProvider the clock provider
- * @property jdbcConfig the jdbc configuration
+ * @property jdbcOption the jdbc configuration
  * @property session the session
  */
 interface DatabaseConfig {
@@ -27,7 +27,7 @@ interface DatabaseConfig {
     val dialect: Dialect
     val logger: Logger
     val clockProvider: ClockProvider
-    val jdbcConfig: JdbcConfig
+    val jdbcOption: JdbcOption
     val session: Session
 }
 
@@ -49,7 +49,7 @@ open class DefaultDatabaseConfig(
     override val name: String = System.identityHashCode(object {}).toString()
     override val logger: Logger = StdOutLogger()
     override val clockProvider = DefaultClockProvider()
-    override val jdbcConfig: JdbcConfig = JdbcConfig(batchSize = 10)
+    override val jdbcOption: JdbcOption = JdbcOption(batchSize = 10)
     override val session: Session by lazy {
         if (enableTransaction) {
             TransactionalSession(dataSource, logger)

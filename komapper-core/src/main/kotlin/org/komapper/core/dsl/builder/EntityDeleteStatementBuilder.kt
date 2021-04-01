@@ -5,13 +5,15 @@ import org.komapper.core.data.Statement
 import org.komapper.core.data.StatementBuffer
 import org.komapper.core.data.Value
 import org.komapper.core.dsl.context.EntityDeleteContext
+import org.komapper.core.dsl.query.EntityDeleteOption
 import org.komapper.core.metamodel.ColumnInfo
 import org.komapper.core.metamodel.TableInfo
 
 internal class EntityDeleteStatementBuilder<ENTITY>(
     val dialect: Dialect,
     val context: EntityDeleteContext<ENTITY>,
-    val entity: ENTITY
+    val entity: ENTITY,
+    val option: EntityDeleteOption
 ) {
     private val aliasManager = AliasManager(context)
     private val buf = StatementBuffer(dialect::formatValue)
@@ -22,7 +24,7 @@ internal class EntityDeleteStatementBuilder<ENTITY>(
         visitTableInfo(context.entityMetamodel)
         val identityProperties = context.entityMetamodel.idProperties()
         val versionProperty = context.entityMetamodel.versionProperty()
-        val versionRequired = versionProperty != null && !context.options.ignoreVersion
+        val versionRequired = versionProperty != null && !option.ignoreVersion
         if (identityProperties.isNotEmpty() || versionRequired) {
             buf.append(" where ")
             if (identityProperties.isNotEmpty()) {

@@ -8,8 +8,8 @@ import org.komapper.core.dsl.context.SqlSelectContext
 import org.komapper.core.dsl.scope.HavingDeclaration
 import org.komapper.core.dsl.scope.HavingScope
 import org.komapper.core.dsl.scope.OnDeclaration
-import org.komapper.core.dsl.scope.SqlSelectOptionsDeclaration
-import org.komapper.core.dsl.scope.SqlSelectOptionsScope
+import org.komapper.core.dsl.scope.SqlSelectOptionDeclaration
+import org.komapper.core.dsl.scope.SqlSelectOptionScope
 import org.komapper.core.dsl.scope.WhereDeclaration
 import org.komapper.core.jdbc.JdbcExecutor
 import org.komapper.core.metamodel.ColumnInfo
@@ -35,7 +35,7 @@ interface SqlSelectQuery<ENTITY> : ListQuery<ENTITY> {
     fun offset(value: Int): SqlSelectQuery<ENTITY>
     fun limit(value: Int): SqlSelectQuery<ENTITY>
     fun forUpdate(): SqlSelectQuery<ENTITY>
-    fun options(declaration: SqlSelectOptionsDeclaration): SqlSelectQuery<ENTITY>
+    fun option(declaration: SqlSelectOptionDeclaration): SqlSelectQuery<ENTITY>
 
     fun <A> select(
         e: EntityMetamodel<A>
@@ -69,7 +69,8 @@ interface SqlSelectQuery<ENTITY> : ListQuery<ENTITY> {
 }
 
 internal data class SqlSelectQueryImpl<ENTITY>(
-    private val context: SqlSelectContext<ENTITY>
+    private val context: SqlSelectContext<ENTITY>,
+    private val option: SqlSelectOption = QueryOptionImpl(allowEmptyWhereClause = true)
 ) :
     SqlSelectQuery<ENTITY> {
 
@@ -134,11 +135,10 @@ internal data class SqlSelectQueryImpl<ENTITY>(
         return copy(context = newContext)
     }
 
-    override fun options(declaration: SqlSelectOptionsDeclaration): SqlSelectQuery<ENTITY> {
-        val scope = SqlSelectOptionsScope(context.options)
+    override fun option(declaration: SqlSelectOptionDeclaration): SqlSelectQuery<ENTITY> {
+        val scope = SqlSelectOptionScope(option)
         declaration(scope)
-        val newContext = context.copy(options = scope.options)
-        return copy(context = newContext)
+        return copy(option = scope.asOption())
     }
 
     override fun <A> select(
@@ -147,7 +147,7 @@ internal data class SqlSelectQueryImpl<ENTITY>(
         val entityMetamodels = context.getAliasableEntityMetamodels()
         if (entityMetamodels.none { it == e }) error(entityMetamodelNotFound("e"))
         val newContext = context.setTable(e)
-        return Transformable(newContext) { dialect, rs ->
+        return Transformable(newContext, option) { dialect, rs ->
             val m = EntityMapper(dialect, rs)
             m.execute(e)
         }
@@ -161,7 +161,7 @@ internal data class SqlSelectQueryImpl<ENTITY>(
         if (entityMetamodels.none { it == e1 }) error(entityMetamodelNotFound("e1"))
         if (entityMetamodels.none { it == e2 }) error(entityMetamodelNotFound("e2"))
         val newContext = context.setTables(listOf(e1, e2))
-        return Transformable(newContext) { dialect, rs ->
+        return Transformable(newContext, option) { dialect, rs ->
             val m = EntityMapper(dialect, rs)
             m.execute(e1) to m.execute(e2)
         }
@@ -177,7 +177,7 @@ internal data class SqlSelectQueryImpl<ENTITY>(
         if (entityMetamodels.none { it == e2 }) error(entityMetamodelNotFound("e2"))
         if (entityMetamodels.none { it == e3 }) error(entityMetamodelNotFound("e3"))
         val newContext = context.setTables(listOf(e1, e2, e3))
-        return Transformable(newContext) { dialect, rs ->
+        return Transformable(newContext, option) { dialect, rs ->
             val m = EntityMapper(dialect, rs)
             Triple(m.execute(e1), m.execute(e2), m.execute(e3))
         }
@@ -185,7 +185,7 @@ internal data class SqlSelectQueryImpl<ENTITY>(
 
     override fun <A : Any> select(columnInfo: ColumnInfo<A>): ListQuery<A> {
         val newContext = context.setColumn(columnInfo)
-        return Transformable(newContext) { dialect, rs ->
+        return Transformable(newContext, option) { dialect, rs ->
             val m = PropertyMapper(dialect, rs)
             m.execute(columnInfo)
         }
@@ -193,7 +193,7 @@ internal data class SqlSelectQueryImpl<ENTITY>(
 
     override fun <A : Any, B : Any> select(c1: ColumnInfo<A>, c2: ColumnInfo<B>): ListQuery<Pair<A, B>> {
         val newContext = context.setColumns(listOf(c1, c2))
-        return Transformable(newContext) { dialect, rs ->
+        return Transformable(newContext, option) { dialect, rs ->
             val m = PropertyMapper(dialect, rs)
             m.execute(c1) to m.execute(c2)
         }
@@ -205,7 +205,7 @@ internal data class SqlSelectQueryImpl<ENTITY>(
         c3: ColumnInfo<C>
     ): ListQuery<Triple<A, B, C>> {
         val newContext = context.setColumns(listOf(c1, c2, c3))
-        return Transformable(newContext) { dialect, rs: ResultSet ->
+        return Transformable(newContext, option) { dialect, rs: ResultSet ->
             val m = PropertyMapper(dialect, rs)
             Triple(m.execute(c1), m.execute(c2), m.execute(c3))
         }
@@ -243,14 +243,15 @@ internal data class SqlSelectQueryImpl<ENTITY>(
     private fun <R> createTerminal(c: SqlSelectContext<ENTITY>, transformer: (Sequence<ENTITY>) -> R): Query<R> {
         val provider: (Dialect, ResultSet) -> ENTITY = { dialect, rs ->
             val mapper = EntityMapper(dialect, rs)
-            mapper.execute(c.from)
+            mapper.execute(c.entityMetamodel)
         }
-        return Terminal(c, provider, transformer)
+        return Terminal(c, option, provider, transformer)
     }
 }
 
 private class Transformable<T>(
     private val context: SqlSelectContext<*>,
+    private val option: SqlSelectOption,
     private val provider: (Dialect, ResultSet) -> T
 ) : ListQuery<T> {
 
@@ -277,22 +278,23 @@ private class Transformable<T>(
     }
 
     private fun <R> createTerminal(transformer: (Sequence<T>) -> R): Query<R> {
-        return Terminal(context, provider, transformer)
+        return Terminal(context, option, provider, transformer)
     }
 }
 
 private class Terminal<T, R>(
     private val context: SqlSelectContext<*>,
+    private val option: SqlSelectOption,
     private val provider: (Dialect, ResultSet) -> T,
     val transformer: (Sequence<T>) -> R
 ) : Query<R> {
 
     override fun run(config: DatabaseConfig): R {
-        if (!context.options.allowEmptyWhereClause && context.where.isEmpty()) {
+        if (!option.allowEmptyWhereClause && context.where.isEmpty()) {
             error("Empty where clause is not allowed.")
         }
         val statement = toStatement(config.dialect)
-        val executor = JdbcExecutor(config, context.options)
+        val executor = JdbcExecutor(config, option.asJdbcOption())
         return executor.executeQuery(statement, provider, transformer)
     }
 

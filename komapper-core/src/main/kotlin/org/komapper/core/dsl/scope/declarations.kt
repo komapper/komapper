@@ -6,17 +6,21 @@ typealias HavingDeclaration = HavingScope.() -> Unit
 typealias ValuesDeclaration = ValuesScope.() -> Unit
 typealias SetDeclaration = SetScope.() -> Unit
 
-typealias EntitySelectOptionsDeclaration = EntitySelectOptionsScope.() -> Unit
-typealias EntityDeleteOptionsDeclaration = EntityDeleteOptionsScope.() -> Unit
-typealias EntityInsertOptionsDeclaration = EntityInsertOptionsScope.() -> Unit
-typealias EntityUpdateOptionsDeclaration = EntityUpdateOptionsScope.() -> Unit
+typealias EntityBatchDeleteOptionDeclaration = EntityBatchDeleteOptionScope.() -> Unit
+typealias EntityBatchInsertOptionDeclaration = EntityBatchInsertOptionScope.() -> Unit
+typealias EntityBatchUpdateOptionDeclaration = EntityBatchUpdateOptionScope.() -> Unit
 
-typealias SqlSelectOptionsDeclaration = SqlSelectOptionsScope.() -> Unit
-typealias SqlDeleteOptionsDeclaration = SqlDeleteOptionsScope.() -> Unit
-typealias SqlInsertOptionsDeclaration = SqlInsertOptionsScope.() -> Unit
-typealias SqlUpdateOptionsDeclaration = SqlUpdateOptionsScope.() -> Unit
+typealias EntitySelectOptionDeclaration = EntitySelectOptionScope.() -> Unit
+typealias EntityDeleteOptionDeclaration = EntityDeleteOptionScope.() -> Unit
+typealias EntityInsertOptionDeclaration = EntityInsertOptionScope.() -> Unit
+typealias EntityUpdateOptionDeclaration = EntityUpdateOptionScope.() -> Unit
 
-typealias TemplateSelectOptionsDeclaration = TemplateSelectOptionsScope.() -> Unit
-typealias TemplateUpdateOptionsDeclaration = TemplateUpdateOptionsScope.() -> Unit
+typealias SqlSelectOptionDeclaration = SqlSelectOptionScope.() -> Unit
+typealias SqlDeleteOptionDeclaration = SqlDeleteOptionScope.() -> Unit
+typealias SqlInsertOptionDeclaration = SqlInsertOptionScope.() -> Unit
+typealias SqlUpdateOptionDeclaration = SqlUpdateOptionScope.() -> Unit
 
-typealias ScriptExecutionOptionsDeclaration = ScriptExecutionOptionsScope.() -> Unit
+typealias TemplateSelectOptionDeclaration = TemplateSelectOptionScope.() -> Unit
+typealias TemplateUpdateOptionDeclaration = TemplateUpdateOptionScope.() -> Unit
+
+typealias ScriptExecutionOptionDeclaration = ScriptExecutionOptionScope.() -> Unit

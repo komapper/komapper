@@ -5,15 +5,15 @@ import org.komapper.core.config.Dialect
 import org.komapper.core.data.Statement
 import org.komapper.core.dsl.builder.SqlDeleteStatementBuilder
 import org.komapper.core.dsl.context.SqlDeleteContext
-import org.komapper.core.dsl.scope.SqlDeleteOptionsDeclaration
-import org.komapper.core.dsl.scope.SqlDeleteOptionsScope
+import org.komapper.core.dsl.scope.SqlDeleteOptionDeclaration
+import org.komapper.core.dsl.scope.SqlDeleteOptionScope
 import org.komapper.core.dsl.scope.WhereDeclaration
 import org.komapper.core.dsl.scope.WhereScope
 import org.komapper.core.jdbc.JdbcExecutor
 
 interface SqlDeleteQuery : Query<Int> {
     fun where(declaration: WhereDeclaration): SqlDeleteQuery
-    fun options(declaration: SqlDeleteOptionsDeclaration): SqlDeleteQuery
+    fun option(declaration: SqlDeleteOptionDeclaration): SqlDeleteQuery
     override fun peek(dialect: Dialect, block: (Statement) -> Unit): SqlDeleteQuery {
         super.peek(dialect, block)
         return this
@@ -21,7 +21,8 @@ interface SqlDeleteQuery : Query<Int> {
 }
 
 internal data class SqlDeleteQueryImpl<ENTITY>(
-    private val context: SqlDeleteContext<ENTITY>
+    private val context: SqlDeleteContext<ENTITY>,
+    private val option: SqlDeleteOption = QueryOptionImpl()
 ) : SqlDeleteQuery {
 
     override fun where(declaration: WhereDeclaration): SqlDeleteQueryImpl<ENTITY> {
@@ -31,22 +32,20 @@ internal data class SqlDeleteQueryImpl<ENTITY>(
         return copy(context = newContext)
     }
 
-    override fun options(declaration: SqlDeleteOptionsDeclaration): SqlDeleteQueryImpl<ENTITY> {
-        val scope = SqlDeleteOptionsScope(context.options)
+    override fun option(declaration: SqlDeleteOptionDeclaration): SqlDeleteQueryImpl<ENTITY> {
+        val scope = SqlDeleteOptionScope(option)
         declaration(scope)
-        val newContext = context.copy(options = scope.options)
-        return copy(context = newContext)
+        return copy(option = scope.asOption())
     }
 
     override fun run(config: DatabaseConfig): Int {
-        if (!context.options.allowEmptyWhereClause && context.where.isEmpty()) {
+        if (!option.allowEmptyWhereClause && context.where.isEmpty()) {
             error("Empty where clause is not allowed.")
         }
         val statement = buildStatement(config.dialect, context)
-        val executor = JdbcExecutor(config, context.options)
-        return executor.executeUpdate(statement) { _, count ->
-            count
-        }
+        val executor = JdbcExecutor(config, option.asJdbcOption())
+        val (count) = executor.executeUpdate(statement)
+        return count
     }
 
     override fun toStatement(dialect: Dialect): Statement {

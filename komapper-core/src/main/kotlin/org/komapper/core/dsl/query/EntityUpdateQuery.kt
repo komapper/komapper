@@ -1,51 +1,48 @@
 package org.komapper.core.dsl.query
 
 import org.komapper.core.DatabaseConfig
-import org.komapper.core.OptimisticLockException
 import org.komapper.core.config.Dialect
 import org.komapper.core.data.Statement
-import org.komapper.core.dsl.builder.EntityUpdateStatementBuilder
 import org.komapper.core.dsl.context.EntityUpdateContext
-import org.komapper.core.dsl.scope.EntityUpdateOptionsDeclaration
-import org.komapper.core.dsl.scope.EntityUpdateOptionsScope
-import org.komapper.core.jdbc.JdbcExecutor
+import org.komapper.core.dsl.scope.EntityUpdateOptionDeclaration
+import org.komapper.core.dsl.scope.EntityUpdateOptionScope
 
-internal interface EntityUpdateQuery<ENTITY> : Query<ENTITY> {
-    fun options(declaration: EntityUpdateOptionsDeclaration): EntityUpdateQuery<ENTITY>
+interface EntityUpdateQuery<ENTITY> : Query<ENTITY> {
+    fun option(declaration: EntityUpdateOptionDeclaration): EntityUpdateQuery<ENTITY>
 }
 
 internal data class EntityUpdateQueryImpl<ENTITY>(
     private val context: EntityUpdateContext<ENTITY>,
-    private val entity: ENTITY
+    private val entity: ENTITY,
+    private val option: EntityUpdateOption = QueryOptionImpl()
 ) :
     EntityUpdateQuery<ENTITY> {
 
-    override fun options(declaration: EntityUpdateOptionsDeclaration): EntityUpdateQuery<ENTITY> {
-        val scope = EntityUpdateOptionsScope(context.options)
+    private val support: EntityUpdateQuerySupport<ENTITY> = EntityUpdateQuerySupport(context, option)
+
+    override fun option(declaration: EntityUpdateOptionDeclaration): EntityUpdateQueryImpl<ENTITY> {
+        val scope = EntityUpdateOptionScope(option)
         declaration(scope)
-        val newContext = context.copy(options = scope.options)
-        return copy(context = newContext)
+        return copy(option = scope.asOption())
     }
 
     override fun run(config: DatabaseConfig): ENTITY {
-        val clock = config.clockProvider.now()
-        val newEntity = context.entityMetamodel.updateUpdatedAt(entity, clock)
+        val newEntity = preUpdate(config, entity)
         val statement = buildStatement(config.dialect, newEntity)
-        val executor = JdbcExecutor(config, context.options)
-        return executor.executeUpdate(statement) { _, count ->
-            if (!context.options.ignoreVersion &&
-                !context.options.suppressOptimisticLockException &&
-                context.entityMetamodel.versionProperty() != null &&
-                count != 1
-            ) {
-                throw OptimisticLockException()
-            }
-            if (!context.options.ignoreVersion) {
-                context.entityMetamodel.incrementVersion(newEntity)
-            } else {
-                newEntity
-            }
-        }
+        val (count) = update(config, statement)
+        return postUpdate(newEntity, count)
+    }
+
+    private fun preUpdate(config: DatabaseConfig, entity: ENTITY): ENTITY {
+        return support.preUpdate(config, entity)
+    }
+
+    private fun update(config: DatabaseConfig, statement: Statement): Pair<Int, LongArray> {
+        return support.update(config) { it.executeUpdate(statement) }
+    }
+
+    private fun postUpdate(entity: ENTITY, count: Int): ENTITY {
+        return support.postUpdate(entity, count)
     }
 
     override fun toStatement(dialect: Dialect): Statement {
@@ -53,7 +50,6 @@ internal data class EntityUpdateQueryImpl<ENTITY>(
     }
 
     private fun buildStatement(dialect: Dialect, entity: ENTITY): Statement {
-        val builder = EntityUpdateStatementBuilder(dialect, context, entity)
-        return builder.build()
+        return support.buildStatement(dialect, entity)
     }
 }

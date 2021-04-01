@@ -35,7 +35,7 @@ class SqlDeleteQueryTest(private val db: Database) {
     fun allowEmptyWhereClause_true() {
         val e = Employee.metamodel()
         val count = db.execute {
-            SqlQuery.delete(e).options { allowEmptyWhereClause = true }
+            SqlQuery.delete(e).option { allowEmptyWhereClause = true }
         }
         assertEquals(14, count)
     }

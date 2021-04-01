@@ -7,8 +7,8 @@ import org.komapper.core.dsl.builder.SqlUpdateStatementBuilder
 import org.komapper.core.dsl.context.SqlUpdateContext
 import org.komapper.core.dsl.scope.SetDeclaration
 import org.komapper.core.dsl.scope.SetScope
-import org.komapper.core.dsl.scope.SqlUpdateOptionsDeclaration
-import org.komapper.core.dsl.scope.SqlUpdateOptionsScope
+import org.komapper.core.dsl.scope.SqlUpdateOptionDeclaration
+import org.komapper.core.dsl.scope.SqlUpdateOptionScope
 import org.komapper.core.dsl.scope.WhereDeclaration
 import org.komapper.core.dsl.scope.WhereScope
 import org.komapper.core.jdbc.JdbcExecutor
@@ -16,7 +16,7 @@ import org.komapper.core.jdbc.JdbcExecutor
 interface SqlUpdateQuery : Query<Int> {
     fun set(declaration: SetDeclaration): SqlUpdateQuery
     fun where(declaration: WhereDeclaration): SqlUpdateQuery
-    fun options(declaration: SqlUpdateOptionsDeclaration): SqlUpdateQuery
+    fun option(declaration: SqlUpdateOptionDeclaration): SqlUpdateQuery
 
     override fun peek(dialect: Dialect, block: (Statement) -> Unit): SqlUpdateQuery {
         super.peek(dialect, block)
@@ -25,7 +25,8 @@ interface SqlUpdateQuery : Query<Int> {
 }
 
 internal data class SqlUpdateQueryImpl<ENTITY>(
-    private val context: SqlUpdateContext<ENTITY>
+    private val context: SqlUpdateContext<ENTITY>,
+    private val option: SqlUpdateOption = QueryOptionImpl()
 ) : SqlUpdateQuery {
 
     override fun set(declaration: SetDeclaration): SqlUpdateQueryImpl<ENTITY> {
@@ -42,22 +43,20 @@ internal data class SqlUpdateQueryImpl<ENTITY>(
         return copy(context = newContext)
     }
 
-    override fun options(declaration: SqlUpdateOptionsDeclaration): SqlUpdateQueryImpl<ENTITY> {
-        val scope = SqlUpdateOptionsScope(context.options)
+    override fun option(declaration: SqlUpdateOptionDeclaration): SqlUpdateQueryImpl<ENTITY> {
+        val scope = SqlUpdateOptionScope(option)
         declaration(scope)
-        val newContext = context.copy(options = scope.options)
-        return copy(context = newContext)
+        return copy(option = scope.asOption())
     }
 
     override fun run(config: DatabaseConfig): Int {
-        if (!context.options.allowEmptyWhereClause && context.where.isEmpty()) {
+        if (!option.allowEmptyWhereClause && context.where.isEmpty()) {
             error("Empty where clause is not allowed.")
         }
         val statement = buildStatement(config.dialect)
-        val executor = JdbcExecutor(config, context.options)
-        return executor.executeUpdate(statement) { _, count ->
-            count
-        }
+        val executor = JdbcExecutor(config, option.asJdbcOption())
+        val (count) = executor.executeUpdate(statement)
+        return count
     }
 
     override fun toStatement(dialect: Dialect): Statement {

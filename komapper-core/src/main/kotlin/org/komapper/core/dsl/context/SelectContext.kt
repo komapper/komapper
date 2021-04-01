@@ -5,7 +5,6 @@ import org.komapper.core.metamodel.ColumnInfo
 import org.komapper.core.metamodel.EntityMetamodel
 
 internal interface SelectContext<ENTITY, CONTEXT : SelectContext<ENTITY, CONTEXT>> : Context<ENTITY> {
-    val from: EntityMetamodel<ENTITY>
     val joins: List<Join<*>>
     val where: List<Criterion>
     val orderBy: List<ColumnInfo<*>>
@@ -22,6 +21,6 @@ internal interface SelectContext<ENTITY, CONTEXT : SelectContext<ENTITY, CONTEXT
     fun setForUpdate(forUpdate: ForUpdate): CONTEXT
 
     override fun getAliasableEntityMetamodels(): List<EntityMetamodel<*>> {
-        return listOf(from) + joins.map { it.entityMetamodel }
+        return listOf(entityMetamodel) + joins.map { it.entityMetamodel }
     }
 }

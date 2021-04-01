@@ -5,13 +5,15 @@ import org.komapper.core.data.Statement
 import org.komapper.core.data.StatementBuffer
 import org.komapper.core.data.Value
 import org.komapper.core.dsl.context.EntityUpdateContext
+import org.komapper.core.dsl.query.EntityUpdateOption
 import org.komapper.core.metamodel.ColumnInfo
 import org.komapper.core.metamodel.TableInfo
 
 internal class EntityUpdateStatementBuilder<ENTITY>(
     val dialect: Dialect,
     val context: EntityUpdateContext<ENTITY>,
-    val entity: ENTITY
+    val entity: ENTITY,
+    val option: EntityUpdateOption
 ) {
     private val aliasManager = AliasManager(context)
     private val buf = StatementBuffer(dialect::formatValue)
@@ -35,7 +37,7 @@ internal class EntityUpdateStatementBuilder<ENTITY>(
             buf.append(", ")
         }
         buf.cutBack(2)
-        val versionRequired = versionProperty != null && !context.options.ignoreVersion
+        val versionRequired = versionProperty != null && !option.ignoreVersion
         if (identityProperties.isNotEmpty() || versionRequired) {
             buf.append(" where ")
             if (identityProperties.isNotEmpty()) {

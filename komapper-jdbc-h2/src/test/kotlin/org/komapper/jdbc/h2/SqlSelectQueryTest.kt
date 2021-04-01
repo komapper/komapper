@@ -356,7 +356,7 @@ class SqlSelectQueryTest(private val db: Database) {
         val e = Employee.metamodel()
         val emp = db.execute(
             SqlQuery.from(e)
-                .options {
+                .option {
                     fetchSize = 10
                     maxRows = 100
                     queryTimeoutSeconds = 1000
