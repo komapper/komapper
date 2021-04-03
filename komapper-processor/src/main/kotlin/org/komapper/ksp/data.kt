@@ -34,7 +34,6 @@ internal data class Entity(
     val versionProperty: Property?,
     val createdAtProperty: Property?,
     val updatedAtProperty: Property?,
-    val idGenerator: IdGenerator?
 )
 
 internal data class Property(

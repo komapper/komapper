@@ -8,8 +8,8 @@ private const val Assignment = "org.komapper.core.metamodel.Assignment"
 private const val EntityMetamodel = "org.komapper.core.metamodel.EntityMetamodel"
 private const val EmptyEntityMetamodel = "org.komapper.core.metamodel.EmptyEntityMetamodel"
 private const val EmptyPropertyMetamodel = "org.komapper.core.metamodel.EmptyPropertyMetamodel"
-private const val IdentityGeneratorDescriptor = "org.komapper.core.metamodel.IdentityGeneratorDescriptor"
-private const val SequenceGeneratorDescriptor = "org.komapper.core.metamodel.SequenceGeneratorDescriptor"
+private const val Identity = "org.komapper.core.metamodel.IdGeneratorDescriptor.Identity"
+private const val Sequence = "org.komapper.core.metamodel.IdGeneratorDescriptor.Sequence"
 private const val PropertyDescriptor = "org.komapper.core.metamodel.PropertyDescriptor"
 private const val PropertyMetamodel = "org.komapper.core.metamodel.PropertyMetamodel"
 private const val PropertyMetamodelImpl = "org.komapper.core.metamodel.PropertyMetamodelImpl"
@@ -60,26 +60,25 @@ internal class EntityMetamodelGenerator(
 
     private fun entityDescriptor() {
         w.println("    private object $EntityDescriptor {")
-        val idGenerator = entity.idGenerator
-        if (idGenerator != null) {
-            when (val kind = idGenerator.kind) {
+        for (p in entity.properties) {
+            val nullable = if (p.nullability == Nullability.NULLABLE) "true" else "false"
+            val idGenerator = when (val kind = p.idGeneratorKind) {
                 is IdGeneratorKind.Identity -> {
-                    w.println("        val ${idGenerator.name} = $IdentityGeneratorDescriptor<$entityTypeName, ${idGenerator.property.typeName}>(${idGenerator.property.typeName}::class)")
+                    "$Identity<$entityTypeName, ${p.typeName}>(${p.typeName}::class)"
                 }
                 is IdGeneratorKind.Sequence -> {
                     val paramList = listOf(
-                        "${idGenerator.property.typeName}::class",
+                        "${p.typeName}::class",
                         "\"${kind.name}\"",
                         "${kind.incrementBy}",
                         "\"${kind.catalog}\"",
                         "\"${kind.schema}\""
                     ).joinToString(", ")
-                    w.println("        val ${idGenerator.name} = $SequenceGeneratorDescriptor<$entityTypeName, ${idGenerator.property.typeName}>($paramList)")
+                    "$Sequence<$entityTypeName, ${p.typeName}>($paramList)"
                 }
+                else -> "null"
             }
-        }
-        for (p in entity.properties) {
-            w.println("        val $p = $PropertyDescriptor<$entityTypeName, ${p.typeName}>(${p.typeName}::class, \"${p.column.name}\", { it.$p }) { e, v -> e.copy($p = v) }")
+            w.println("        val $p = $PropertyDescriptor<$entityTypeName, ${p.typeName}>(${p.typeName}::class, \"${p.column.name}\", { it.$p }, { e, v -> e.copy($p = v) }, $nullable, $idGenerator)")
         }
         w.println("    }")
     }
@@ -103,10 +102,10 @@ internal class EntityMetamodelGenerator(
     }
 
     private fun idAssignment() {
-        val idGenerator = entity.idGenerator
+        val p = entity.properties.firstOrNull { it.idGeneratorKind != null }
         w.print("    override fun idAssignment(): $Assignment<$entityTypeName>? = ")
-        if (idGenerator != null) {
-            w.println("$EntityDescriptor.${idGenerator.name}.createAssignment(${idGenerator.property}.setter)")
+        if (p != null) {
+            w.println("$p.idAssignment")
         } else {
             w.println("null")
         }

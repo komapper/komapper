@@ -9,8 +9,8 @@ import org.komapper.core.dsl.data.Operand
 import org.komapper.core.dsl.expr.AggregateFunction
 import org.komapper.core.dsl.expr.ArithmeticExpr
 import org.komapper.core.dsl.expr.StringFunction
+import org.komapper.core.dsl.getName
 import org.komapper.core.dsl.option.LikeOption
-import org.komapper.core.dsl.util.getName
 import org.komapper.core.metamodel.ColumnInfo
 import org.komapper.core.metamodel.TableInfo
 

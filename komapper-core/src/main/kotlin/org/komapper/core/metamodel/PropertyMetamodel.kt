@@ -7,6 +7,9 @@ interface PropertyMetamodel<E, T : Any> : ColumnInfo<T> {
     val getter: (E) -> T?
     val getterWithUncheckedCast: (Any) -> T?
     val setter: (E, T) -> E
+    val nullable: Boolean
+    val idGenerator: IdGeneratorDescriptor<E, T>?
+    val idAssignment: Assignment<E>?
 }
 
 class PropertyMetamodelImpl<E, T : Any>(
@@ -22,6 +25,9 @@ class PropertyMetamodelImpl<E, T : Any>(
             descriptor.getter(it as E)
         }
     override val setter: (E, T) -> E get() = descriptor.setter
+    override val nullable: Boolean = descriptor.nullable
+    override val idGenerator: IdGeneratorDescriptor<E, T>? = descriptor.idGenerator
+    override val idAssignment: Assignment<E>? = descriptor.idAssignment
 }
 
 @Suppress("unused")
@@ -32,6 +38,9 @@ class EmptyPropertyMetamodel<E, T : Any> : PropertyMetamodel<E, T> {
     override val getter: (E) -> T? get() = fail()
     override val getterWithUncheckedCast: (Any) -> T? get() = fail()
     override val setter: (E, T) -> E get() = fail()
+    override val nullable: Boolean get() = fail()
+    override val idGenerator: IdGeneratorDescriptor<E, T> get() = fail()
+    override val idAssignment: Assignment<E> get() = fail()
 
     private fun fail(): Nothing {
         error("Fix a compile error.")

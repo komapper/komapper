@@ -14,7 +14,6 @@ internal class EntityFactory(config: Config, private val entityDef: EntityDef) {
         val createdAtProperty: Property? = allProperties.firstOrNull { it.kind is PropertyKind.CreatedAt }
         val updatedAtProperty: Property? = allProperties.firstOrNull { it.kind is PropertyKind.UpdatedAt }
         val ignoredProperties = allProperties.filter { it.kind is PropertyKind.Ignore }
-        val idGenerator = createIdGenerator(allProperties)
         val properties = allProperties - ignoredProperties
         if (properties.none()) {
             report("Any persistent properties are not found.", entityDef.definitionSource.entityDeclaration)
@@ -26,8 +25,7 @@ internal class EntityFactory(config: Config, private val entityDef: EntityDef) {
             idProperties.toList(),
             versionProperty,
             createdAtProperty,
-            updatedAtProperty,
-            idGenerator
+            updatedAtProperty
         ).also {
             validateEntity(it)
         }
@@ -142,21 +140,16 @@ internal class EntityFactory(config: Config, private val entityDef: EntityDef) {
         }
     }
 
-    private fun createIdGenerator(properties: Sequence<Property>): IdGenerator? {
-        val idGeneratorProperties = properties.filter { it.idGeneratorKind != null }.toList()
-        if (idGeneratorProperties.size > 1) {
-            report("Multiple generator properties cannot coexist in a single class.", entityDef.definitionSource.entityDeclaration)
-        }
-        val property = idGeneratorProperties.firstOrNull() ?: return null
-        return IdGenerator(property)
-    }
-
     private fun validateAllProperties(properties: Sequence<Property>) {
         val propertyDefMap = entityDef.properties.associateBy { it.declaration.simpleName }
         val propertyMap = properties.associateBy { it.declaration.simpleName }
         for ((key, value) in propertyDefMap) {
             propertyMap[key]
                 ?: report("The same name property is not found in the entity.", value.parameter)
+        }
+        val idGeneratorProperties = properties.filter { it.idGeneratorKind != null }.toList()
+        if (idGeneratorProperties.size > 1) {
+            report("Multiple generator properties cannot coexist in a single class.", entityDef.definitionSource.entityDeclaration)
         }
     }
 

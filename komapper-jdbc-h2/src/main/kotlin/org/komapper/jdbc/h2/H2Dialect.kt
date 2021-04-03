@@ -1,6 +1,7 @@
 package org.komapper.jdbc.h2
 
 import org.komapper.core.config.AbstractDialect
+import org.komapper.core.dsl.builder.SchemaStatementBuilder
 import java.sql.SQLException
 
 open class H2Dialect(val version: Version = Version.V1_4) : AbstractDialect() {
@@ -24,4 +25,8 @@ open class H2Dialect(val version: Version = Version.V1_4) : AbstractDialect() {
     override fun supportsMerge(): Boolean = true
 
     override fun supportsUpsert(): Boolean = false
+
+    override fun getSchemaStatementBuilder(): SchemaStatementBuilder {
+        return H2SchemaStatementBuilder(this)
+    }
 }

@@ -3,24 +3,15 @@ package org.komapper.core.jdbc
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
-import org.komapper.core.config.AbstractDialect
-import java.sql.SQLException
+import org.komapper.core.config.EmptyDialect
 import kotlin.reflect.KClass
 
 internal class AbstractDialectTest {
 
-    class MyDialect : AbstractDialect() {
+    class MyDialect : EmptyDialect() {
 
         public override fun getDataType(type: KClass<*>): DataType<*> {
             return super.getDataType(type)
-        }
-
-        override fun getSequenceSql(sequenceName: String): String {
-            throw UnsupportedOperationException()
-        }
-
-        override fun isUniqueConstraintViolation(exception: SQLException): Boolean {
-            throw UnsupportedOperationException()
         }
     }
 

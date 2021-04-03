@@ -1,5 +1,6 @@
 package org.komapper.core.config
 
+import org.komapper.core.dsl.builder.SchemaStatementBuilder
 import org.komapper.core.expr.DefaultExprEnvironment
 import org.komapper.core.expr.DefaultExprEvaluator
 import org.komapper.core.expr.ExprEnvironment
@@ -67,6 +68,7 @@ interface Dialect {
     fun supportsMerge(): Boolean
     fun supportsUpsert(): Boolean
     fun escape(text: String): String
+    fun getSchemaStatementBuilder(): SchemaStatementBuilder
 }
 
 abstract class AbstractDialect : Dialect {
@@ -153,13 +155,17 @@ abstract class AbstractDialect : Dialect {
     }
 }
 
-class EmptyDialect : AbstractDialect() {
+open class EmptyDialect : AbstractDialect() {
 
     override fun isUniqueConstraintViolation(exception: SQLException): Boolean {
         throw UnsupportedOperationException()
     }
 
     override fun getSequenceSql(sequenceName: String): String {
+        throw UnsupportedOperationException()
+    }
+
+    override fun getSchemaStatementBuilder(): SchemaStatementBuilder {
         throw UnsupportedOperationException()
     }
 }

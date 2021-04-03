@@ -5,7 +5,7 @@ import org.komapper.core.config.Dialect
 import org.komapper.core.data.Statement
 import org.komapper.core.dsl.builder.EntityInsertStatementBuilder
 import org.komapper.core.dsl.context.EntityInsertContext
-import org.komapper.core.dsl.util.getName
+import org.komapper.core.dsl.getName
 import org.komapper.core.jdbc.JdbcExecutor
 import org.komapper.core.metamodel.Assignment
 

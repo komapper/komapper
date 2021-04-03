@@ -5,7 +5,7 @@ import org.komapper.core.data.Statement
 import org.komapper.core.data.StatementBuffer
 import org.komapper.core.data.Value
 import org.komapper.core.dsl.context.EntityInsertContext
-import org.komapper.core.dsl.util.getName
+import org.komapper.core.dsl.getName
 import org.komapper.core.metamodel.Assignment
 import org.komapper.core.metamodel.ColumnInfo
 import org.komapper.core.metamodel.TableInfo

@@ -5,7 +5,29 @@ import org.komapper.core.dsl.data.SortItem
 import org.komapper.core.dsl.expr.AggregateFunction
 import org.komapper.core.dsl.expr.ArithmeticExpr
 import org.komapper.core.dsl.expr.StringFunction
+import org.komapper.core.metamodel.Assignment
 import org.komapper.core.metamodel.ColumnInfo
+import org.komapper.core.metamodel.IdGeneratorDescriptor
+import org.komapper.core.metamodel.TableInfo
+
+fun TableInfo.getName(mapper: (String) -> String): String {
+    return listOf(this.catalogName(), this.schemaName(), this.tableName())
+        .filter { it.isNotBlank() }.joinToString(".", transform = mapper)
+}
+
+fun IdGeneratorDescriptor.Sequence<*, *>.getName(mapper: (String) -> String): String {
+    return listOf(this.catalogName, this.schemaName, this.name)
+        .filter { it.isNotBlank() }.joinToString(".", transform = mapper)
+}
+
+fun Assignment.Sequence<*, *>.getName(mapper: (String) -> String): String {
+    return listOf(this.catalogName, this.schemaName, this.name)
+        .filter { it.isNotBlank() }.joinToString(".", transform = mapper)
+}
+
+fun ColumnInfo<*>.getName(mapper: (String) -> String): String {
+    return mapper(this.columnName)
+}
 
 fun <T : Any> ColumnInfo<T>.desc(): ColumnInfo<T> {
     if (this is SortItem.Desc) {

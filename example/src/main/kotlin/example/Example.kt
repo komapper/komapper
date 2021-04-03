@@ -3,13 +3,15 @@ package example
 import org.komapper.core.Database
 import org.komapper.core.KmColumn
 import org.komapper.core.KmCreatedAt
+import org.komapper.core.KmEntity
 import org.komapper.core.KmEntityDef
 import org.komapper.core.KmId
 import org.komapper.core.KmIdentityGenerator
+import org.komapper.core.KmSequenceGenerator
 import org.komapper.core.KmUpdatedAt
 import org.komapper.core.KmVersion
 import org.komapper.core.dsl.EntityQuery
-import org.komapper.core.dsl.ScriptQuery
+import org.komapper.core.dsl.SchemaQuery
 import org.komapper.core.dsl.TemplateQuery
 import org.komapper.jdbc.h2.H2DatabaseConfig
 import java.time.LocalDateTime
@@ -31,29 +33,23 @@ private data class AddressDef(
     @KmUpdatedAt val updatedAt: String,
 )
 
+@KmEntity
+data class Emp(@KmId @KmSequenceGenerator("hoge", incrementBy = 1) val id: Int)
+
 fun main() {
     // create a Database instance
     val db = Database(H2DatabaseConfig("jdbc:h2:mem:example;DB_CLOSE_DELAY=-1", enableTransaction = true))
-
-    // set up schema
-    db.transaction {
-        val sql = """
-            CREATE TABLE ADDRESS(
-                ADDRESS_ID INTEGER NOT NULL PRIMARY KEY AUTO_INCREMENT,
-                STREET VARCHAR(20) UNIQUE,
-                VERSION INTEGER,
-                CREATED_AT TIMESTAMP,
-                UPDATED_AT TIMESTAMP
-            );
-        """.trimIndent()
-        db.execute { ScriptQuery.execute(sql) }
-    }
 
     // create a metamodel
     val a = Address_()
 
     // execute simple CRUD operations as a transaction
     db.transaction {
+        // create a schema
+        db.execute {
+            SchemaQuery.create(a, Emp_())
+        }
+
         // CREATE
         val addressA = db.execute {
             EntityQuery.insert(a, Address(street = "street A"))

@@ -5,59 +5,59 @@ import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 import kotlin.reflect.KClass
 
-interface IdGeneratorDescriptor<E, T> {
-    fun createAssignment(setter: (E, T) -> E): Assignment<E>
-}
+sealed class IdGeneratorDescriptor<E, T> {
+    abstract fun createAssignment(setter: (E, T) -> E): Assignment<E>
 
-class IdentityGeneratorDescriptor<E, T : Any>(
-    private val klass: KClass<T>
-) : IdGeneratorDescriptor<E, T> {
+    class Identity<E, T : Any>(
+        private val klass: KClass<T>
+    ) : IdGeneratorDescriptor<E, T>() {
 
-    private fun generate(nextValue: NextValue): T {
-        val value = nextValue.get()
-        return value.convert(klass)
-    }
-
-    override fun createAssignment(setter: (E, T) -> E): Assignment<E> {
-        return Assignment.Identity(this::generate, setter)
-    }
-}
-
-class SequenceGeneratorDescriptor<E, T : Any>(
-    private val klass: KClass<T>,
-    private val name: String,
-    private val incrementBy: Int,
-    private val catalogName: String,
-    private val schemaName: String
-) : IdGeneratorDescriptor<E, T> {
-
-    private val contexts = ConcurrentHashMap<String, GenerationContext>()
-
-    private fun generate(key: String, nextValue: NextValue): T {
-        val context = contexts.computeIfAbsent(key) {
-            GenerationContext(incrementBy, nextValue)
+        private fun generate(nextValue: NextValue): T {
+            val value = nextValue.get()
+            return value.convert(klass)
         }
-        val value = context.next()
-        return value.convert(klass)
+
+        override fun createAssignment(setter: (E, T) -> E): Assignment<E> {
+            return Assignment.Identity(this::generate, setter)
+        }
     }
 
-    override fun createAssignment(setter: (E, T) -> E): Assignment<E> {
-        return Assignment.Sequence(name, catalogName, schemaName, this::generate, setter)
-    }
+    class Sequence<E, T : Any>(
+        private val klass: KClass<T>,
+        val name: String,
+        val incrementBy: Int,
+        val catalogName: String,
+        val schemaName: String
+    ) : IdGeneratorDescriptor<E, T>() {
 
-    class GenerationContext(private val incrementBy: Int, private val nextValue: NextValue) {
-        private val lock = ReentrantLock()
-        private var base = 0L
-        private var step = Long.MAX_VALUE
+        private val contexts = ConcurrentHashMap<String, GenerationContext>()
 
-        fun next(): Long {
-            return lock.withLock {
-                if (step < incrementBy) {
-                    base + step++
-                } else {
-                    nextValue.get().also {
-                        base = it
-                        step = 1
+        private fun generate(key: String, nextValue: NextValue): T {
+            val context = contexts.computeIfAbsent(key) {
+                GenerationContext(incrementBy, nextValue)
+            }
+            val value = context.next()
+            return value.convert(klass)
+        }
+
+        override fun createAssignment(setter: (E, T) -> E): Assignment<E> {
+            return Assignment.Sequence(name, catalogName, schemaName, this::generate, setter)
+        }
+
+        class GenerationContext(private val incrementBy: Int, private val nextValue: NextValue) {
+            private val lock = ReentrantLock()
+            private var base = 0L
+            private var step = Long.MAX_VALUE
+
+            fun next(): Long {
+                return lock.withLock {
+                    if (step < incrementBy) {
+                        base + step++
+                    } else {
+                        nextValue.get().also {
+                            base = it
+                            step = 1
+                        }
                     }
                 }
             }
