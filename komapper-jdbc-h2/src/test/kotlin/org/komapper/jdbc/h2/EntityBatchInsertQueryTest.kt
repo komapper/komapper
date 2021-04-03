@@ -20,8 +20,10 @@ class EntityBatchInsertQueryTest(private val db: Database) {
             Address(17, "STREET 17", 0),
             Address(18, "STREET 18", 0)
         )
-        val results = db.batchInsert(a, addressList)
-        val list = db.execute(EntityQuery.from(a).where { a.addressId inList listOf(16, 17, 18) })
+        val results = db.execute { EntityQuery.batchInsert(a, addressList) }
+        val list = db.execute {
+            EntityQuery.from(a).where { a.addressId inList listOf(16, 17, 18) }
+        }
         assertEquals(list, results)
     }
 
@@ -33,8 +35,8 @@ class EntityBatchInsertQueryTest(private val db: Database) {
             IdentityStrategy(null, "BBB"),
             IdentityStrategy(null, "CCC")
         )
-        val results = db.batchInsert(i, strategies)
-        val list = db.execute(EntityQuery.from(i).orderBy(i.id))
+        val results = db.execute { EntityQuery.batchInsert(i, strategies) }
+        val list = db.execute { EntityQuery.from(i).orderBy(i.id) }
         assertEquals(list, results)
         for (result in results) {
             assertNotNull(result.id)
@@ -50,7 +52,7 @@ class EntityBatchInsertQueryTest(private val db: Database) {
             Person(2, "B"),
             Person(3, "C")
         )
-        val results = db.batchInsert(p, personList)
+        val results = db.execute { EntityQuery.batchInsert(p, personList) }
         for (result in results) {
             assertNotNull(result.createdAt)
             assertNotNull(result.updatedAt)
@@ -61,14 +63,16 @@ class EntityBatchInsertQueryTest(private val db: Database) {
     fun uniqueConstraintException() {
         val a = Address.metamodel()
         assertThrows<UniqueConstraintException> {
-            db.batchInsert(
-                a,
-                listOf(
-                    Address(16, "STREET 16", 0),
-                    Address(17, "STREET 17", 0),
-                    Address(18, "STREET 1", 0)
+            db.execute {
+                EntityQuery.batchInsert(
+                    a,
+                    listOf(
+                        Address(16, "STREET 16", 0),
+                        Address(17, "STREET 17", 0),
+                        Address(18, "STREET 1", 0)
+                    )
                 )
-            )
+            }.let { }
         }
     }
 }

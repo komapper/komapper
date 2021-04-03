@@ -34,11 +34,6 @@ interface EntitySelectQuery<ENTITY> : ListQuery<ENTITY> {
     fun forUpdate(): EntitySelectQuery<ENTITY>
     fun option(declaration: EntitySelectOptionDeclaration): EntitySelectQuery<ENTITY>
 
-    override fun peek(dialect: Dialect, block: (Statement) -> Unit): EntitySelectQuery<ENTITY> {
-        super.peek(dialect, block)
-        return this
-    }
-
     fun <T, S> associate(
         e1: EntityMetamodel<T>,
         e2: EntityMetamodel<S>,
@@ -120,14 +115,14 @@ internal data class EntitySelectQueryImpl<ENTITY>(
         return copy(option = scope.asOption())
     }
 
-    override fun run(config: DatabaseConfig): List<ENTITY> {
+    override fun execute(config: DatabaseConfig): List<ENTITY> {
         val terminal = Terminal { it.toList() }
-        return terminal.run(config)
+        return terminal.execute(config)
     }
 
-    override fun toStatement(dialect: Dialect): Statement {
+    override fun statement(dialect: Dialect): Statement {
         val terminal = Terminal { it.toList() }
-        return terminal.toStatement(dialect)
+        return terminal.statement(dialect)
     }
 
     override fun first(): Query<ENTITY> {
@@ -144,11 +139,11 @@ internal data class EntitySelectQueryImpl<ENTITY>(
 
     private inner class Terminal<R>(val transformer: (Sequence<ENTITY>) -> R) : Query<R> {
 
-        override fun run(config: DatabaseConfig): R {
+        override fun execute(config: DatabaseConfig): R {
             if (!option.allowEmptyWhereClause && context.where.isEmpty()) {
                 error("Empty where clause is not allowed.")
             }
-            val statement = toStatement(config.dialect)
+            val statement = statement(config.dialect)
             val executor = JdbcExecutor(config, option.asJdbcOption())
             return executor.executeQuery(statement) { rs ->
                 // hold only unique entities
@@ -173,7 +168,7 @@ internal data class EntitySelectQueryImpl<ENTITY>(
             }
         }
 
-        override fun toStatement(dialect: Dialect): Statement {
+        override fun statement(dialect: Dialect): Statement {
             val builder = EntitySelectStatementBuilder(dialect, context)
             return builder.build()
         }

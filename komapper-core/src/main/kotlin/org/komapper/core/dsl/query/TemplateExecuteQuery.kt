@@ -8,30 +8,30 @@ import org.komapper.core.dsl.scope.TemplateUpdateOptionScope
 import org.komapper.core.jdbc.JdbcExecutor
 import org.komapper.core.template.DefaultStatementBuilder
 
-interface TemplateUpdateQuery : Query<Int> {
-    fun option(declaration: TemplateUpdateOptionDeclaration): TemplateUpdateQuery
+interface TemplateExecuteQuery : Query<Int> {
+    fun option(declaration: TemplateUpdateOptionDeclaration): TemplateExecuteQuery
 }
 
-internal data class TemplateUpdateQueryImpl(
+internal data class TemplateExecuteQueryImpl(
     private val sql: String,
     private val params: Any = object {},
     private val option: TemplateUpdateOption = QueryOptionImpl()
-) : TemplateUpdateQuery {
+) : TemplateExecuteQuery {
 
-    override fun option(declaration: TemplateUpdateOptionDeclaration): TemplateUpdateQueryImpl {
+    override fun option(declaration: TemplateUpdateOptionDeclaration): TemplateExecuteQueryImpl {
         val scope = TemplateUpdateOptionScope(option)
         declaration(scope)
         return copy(option = scope.asOption())
     }
 
-    override fun run(config: DatabaseConfig): Int {
+    override fun execute(config: DatabaseConfig): Int {
         val statement = buildStatement(config.dialect)
         val executor = JdbcExecutor(config, option.asJdbcOption())
         val (count) = executor.executeUpdate(statement)
         return count
     }
 
-    override fun toStatement(dialect: Dialect): Statement {
+    override fun statement(dialect: Dialect): Statement {
         return buildStatement(dialect)
     }
 

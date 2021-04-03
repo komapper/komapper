@@ -5,7 +5,7 @@ import org.komapper.core.dsl.query.SqlSubquery
 import org.komapper.core.dsl.query.SqlSubqueryImpl
 import org.komapper.core.metamodel.EntityMetamodel
 
-object Subquery {
+object Subquery : Dsl {
 
     fun <ENTITY> from(entityMetamodel: EntityMetamodel<ENTITY>): SqlSubquery<ENTITY> {
         return SqlSubqueryImpl(SqlSelectContext(entityMetamodel))

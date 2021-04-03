@@ -7,6 +7,7 @@ import org.komapper.core.Database
 import org.komapper.core.KmEntity
 import org.komapper.core.KmId
 import org.komapper.core.KmTable
+import org.komapper.core.dsl.EntityQuery
 import java.io.Serializable
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -38,8 +39,10 @@ class DataTypeTest(val db: Database) {
             1,
             AnyPerson("ABC")
         )
-        db.insert(m, data)
-        val data2 = db.find(m) { m.id eq 1 }
+        db.execute { EntityQuery.insert(m, data) }
+        val data2 = db.execute {
+            EntityQuery.first(m).where { m.id eq 1 }
+        }
         Assertions.assertEquals(data, data2)
     }
 
@@ -53,8 +56,10 @@ class DataTypeTest(val db: Database) {
     fun bigDecimal() {
         val m = BigDecimalTest.metamodel()
         val data = BigDecimalTest(1, BigDecimal.TEN)
-        db.insert(m, data)
-        val data2 = db.find(m) { m.id eq 1 }
+        db.execute { EntityQuery.insert(m, data) }
+        val data2 = db.execute {
+            EntityQuery.first(m).where { m.id eq 1 }
+        }
         Assertions.assertEquals(data, data2)
     }
 
@@ -68,8 +73,10 @@ class DataTypeTest(val db: Database) {
     fun bigInteger() {
         val m = BigIntegerTest.metamodel()
         val data = BigIntegerTest(1, BigInteger.TEN)
-        db.insert(m, data)
-        val data2 = db.find(m) { m.id eq 1 }
+        db.execute { EntityQuery.insert(m, data) }
+        val data2 = db.execute {
+            EntityQuery.first(m).where { m.id eq 1 }
+        }
         Assertions.assertEquals(data, data2)
     }
 
@@ -83,8 +90,10 @@ class DataTypeTest(val db: Database) {
     fun boolean() {
         val m = BooleanTest.metamodel()
         val data = BooleanTest(1, true)
-        db.insert(m, data)
-        val data2 = db.find(m) { m.id eq 1 }
+        db.execute { EntityQuery.insert(m, data) }
+        val data2 = db.execute {
+            EntityQuery.first(m).where { m.id eq 1 }
+        }
         Assertions.assertEquals(data, data2)
     }
 
@@ -98,8 +107,10 @@ class DataTypeTest(val db: Database) {
     fun byte() {
         val m = ByteTest.metamodel()
         val data = ByteTest(1, 10)
-        db.insert(m, data)
-        val data2 = db.find(m) { m.id eq 1 }
+        db.execute { EntityQuery.insert(m, data) }
+        val data2 = db.execute {
+            EntityQuery.first(m).where { m.id eq 1 }
+        }
         Assertions.assertEquals(data, data2)
     }
 
@@ -114,8 +125,10 @@ class DataTypeTest(val db: Database) {
     fun byteArray() {
         val m = ByteArrayTest.metamodel()
         val data = ByteArrayTest(1, byteArrayOf(10, 20, 30))
-        db.insert(m, data)
-        val data2 = db.find(m) { m.id eq 1 }
+        db.execute { EntityQuery.insert(m, data) }
+        val data2 = db.execute {
+            EntityQuery.first(m).where { m.id eq 1 }
+        }
         Assertions.assertEquals(data.id, data2.id)
         Assertions.assertArrayEquals(data.value, data2.value)
     }
@@ -130,8 +143,10 @@ class DataTypeTest(val db: Database) {
     fun double() {
         val m = DoubleTest.metamodel()
         val data = DoubleTest(1, 10.0)
-        db.insert(m, data)
-        val data2 = db.find(m) { m.id eq 1 }
+        db.execute { EntityQuery.insert(m, data) }
+        val data2 = db.execute {
+            EntityQuery.first(m).where { m.id eq 1 }
+        }
         Assertions.assertEquals(data, data2)
     }
 
@@ -153,8 +168,10 @@ class DataTypeTest(val db: Database) {
             1,
             Direction.EAST
         )
-        db.insert(m, data)
-        val data2 = db.find(m) { m.id eq 1 }
+        db.execute { EntityQuery.insert(m, data) }
+        val data2 = db.execute {
+            EntityQuery.first(m).where { m.id eq 1 }
+        }
         Assertions.assertEquals(data, data2)
     }
 
@@ -168,8 +185,10 @@ class DataTypeTest(val db: Database) {
     fun float() {
         val m = FloatTest.metamodel()
         val data = FloatTest(1, 10.0f)
-        db.insert(m, data)
-        val data2 = db.find(m) { m.id eq 1 }
+        db.execute { EntityQuery.insert(m, data) }
+        val data2 = db.execute {
+            EntityQuery.first(m).where { m.id eq 1 }
+        }
         Assertions.assertEquals(data, data2)
     }
 
@@ -183,8 +202,10 @@ class DataTypeTest(val db: Database) {
     fun int() {
         val m = IntTest.metamodel()
         val data = IntTest(1, 10)
-        db.insert(m, data)
-        val data2 = db.find(m) { m.id eq 1 }
+        db.execute { EntityQuery.insert(m, data) }
+        val data2 = db.execute {
+            EntityQuery.first(m).where { m.id eq 1 }
+        }
         Assertions.assertEquals(data, data2)
     }
 
@@ -201,8 +222,10 @@ class DataTypeTest(val db: Database) {
             1,
             LocalDateTime.of(2019, 6, 1, 12, 11, 10)
         )
-        db.insert(m, data)
-        val data2 = db.find(m) { m.id eq 1 }
+        db.execute { EntityQuery.insert(m, data) }
+        val data2 = db.execute {
+            EntityQuery.first(m).where { m.id eq 1 }
+        }
         Assertions.assertEquals(data, data2)
     }
 
@@ -219,8 +242,10 @@ class DataTypeTest(val db: Database) {
             1,
             LocalDate.of(2019, 6, 1)
         )
-        db.insert(m, data)
-        val data2 = db.find(m) { m.id eq 1 }
+        db.execute { EntityQuery.insert(m, data) }
+        val data2 = db.execute {
+            EntityQuery.first(m).where { m.id eq 1 }
+        }
         Assertions.assertEquals(data, data2)
     }
 
@@ -234,8 +259,10 @@ class DataTypeTest(val db: Database) {
     fun localTime() {
         val m = LocalTimeTest.metamodel()
         val data = LocalTimeTest(1, LocalTime.of(12, 11, 10))
-        db.insert(m, data)
-        val data2 = db.find(m) { m.id eq 1 }
+        db.execute { EntityQuery.insert(m, data) }
+        val data2 = db.execute {
+            EntityQuery.first(m).where { m.id eq 1 }
+        }
         Assertions.assertEquals(data, data2)
     }
 
@@ -249,8 +276,10 @@ class DataTypeTest(val db: Database) {
     fun long() {
         val m = LongTest.metamodel()
         val data = LongTest(1, 10L)
-        db.insert(m, data)
-        val data2 = db.find(m) { m.id eq 1 }
+        db.execute { EntityQuery.insert(m, data) }
+        val data2 = db.execute {
+            EntityQuery.first(m).where { m.id eq 1 }
+        }
         Assertions.assertEquals(data, data2)
     }
 
@@ -267,8 +296,10 @@ class DataTypeTest(val db: Database) {
         val offset = ZoneOffset.ofHours(9)
         val value = OffsetDateTime.of(dateTime, offset)
         val data = OffsetDateTimeTest(1, value)
-        db.insert(m, data)
-        val data2 = db.find(m) { m.id eq 1 }
+        db.execute { EntityQuery.insert(m, data) }
+        val data2 = db.execute {
+            EntityQuery.first(m).where { m.id eq 1 }
+        }
         Assertions.assertEquals(data, data2)
     }
 
@@ -282,8 +313,10 @@ class DataTypeTest(val db: Database) {
     fun short() {
         val m = ShortTest.metamodel()
         val data = ShortTest(1, 10)
-        db.insert(m, data)
-        val data2 = db.find(m) { m.id eq 1 }
+        db.execute { EntityQuery.insert(m, data) }
+        val data2 = db.execute {
+            EntityQuery.first(m).where { m.id eq 1 }
+        }
         Assertions.assertEquals(data, data2)
     }
 
@@ -297,8 +330,10 @@ class DataTypeTest(val db: Database) {
     fun string() {
         val m = StringTest.metamodel()
         val data = StringTest(1, "ABC")
-        db.insert(m, data)
-        val data2 = db.find(m) { m.id eq 1 }
+        db.execute { EntityQuery.insert(m, data) }
+        val data2 = db.execute {
+            EntityQuery.first(m).where { m.id eq 1 }
+        }
         Assertions.assertEquals(data, data2)
     }
 }

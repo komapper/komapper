@@ -14,10 +14,6 @@ import org.komapper.core.jdbc.JdbcExecutor
 interface SqlDeleteQuery : Query<Int> {
     fun where(declaration: WhereDeclaration): SqlDeleteQuery
     fun option(declaration: SqlDeleteOptionDeclaration): SqlDeleteQuery
-    override fun peek(dialect: Dialect, block: (Statement) -> Unit): SqlDeleteQuery {
-        super.peek(dialect, block)
-        return this
-    }
 }
 
 internal data class SqlDeleteQueryImpl<ENTITY>(
@@ -38,7 +34,7 @@ internal data class SqlDeleteQueryImpl<ENTITY>(
         return copy(option = scope.asOption())
     }
 
-    override fun run(config: DatabaseConfig): Int {
+    override fun execute(config: DatabaseConfig): Int {
         if (!option.allowEmptyWhereClause && context.where.isEmpty()) {
             error("Empty where clause is not allowed.")
         }
@@ -48,7 +44,7 @@ internal data class SqlDeleteQueryImpl<ENTITY>(
         return count
     }
 
-    override fun toStatement(dialect: Dialect): Statement {
+    override fun statement(dialect: Dialect): Statement {
         return buildStatement(dialect, context)
     }
 

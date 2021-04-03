@@ -9,6 +9,7 @@ import org.komapper.core.KmIdentityGenerator
 import org.komapper.core.KmUpdatedAt
 import org.komapper.core.KmVersion
 import org.komapper.core.dsl.EntityQuery
+import org.komapper.core.dsl.ScriptQuery
 import org.komapper.core.dsl.TemplateQuery
 import org.komapper.jdbc.h2.H2DatabaseConfig
 import java.time.LocalDateTime
@@ -32,7 +33,7 @@ private data class AddressDef(
 
 fun main() {
     // create a Database instance
-    val db = Database(H2DatabaseConfig("jdbc:h2:mem:example;DB_CLOSE_DELAY=-1"))
+    val db = Database(H2DatabaseConfig("jdbc:h2:mem:example;DB_CLOSE_DELAY=-1", enableTransaction = true))
 
     // set up schema
     db.transaction {
@@ -45,7 +46,7 @@ fun main() {
                 UPDATED_AT TIMESTAMP
             );
         """.trimIndent()
-        db.script(sql)
+        db.execute { ScriptQuery.execute(sql) }
     }
 
     // create a metamodel
@@ -54,23 +55,31 @@ fun main() {
     // execute simple CRUD operations as a transaction
     db.transaction {
         // CREATE
-        val addressA = db.insert(a, Address(street = "street A"))
+        val addressA = db.execute {
+            EntityQuery.insert(a, Address(street = "street A"))
+        }
         println(addressA)
 
         // READ: select by id
-        val foundA = db.find(a) {
-            a.id eq addressA.id
+        val foundA = db.execute {
+            EntityQuery.first(a).where {
+                a.id eq addressA.id
+            }
         }
         check(addressA == foundA)
 
         // UPDATE
-        val addressB = db.update(a, addressA.copy(street = "street B"))
+        val addressB = db.execute {
+            EntityQuery.update(a, addressA.copy(street = "street B"))
+        }
         println(addressB)
 
         // READ: select by street and version
-        val foundB1 = db.find(a) {
-            a.street eq "street B"
-            a.version eq 1
+        val foundB1 = db.execute {
+            EntityQuery.first(a).where {
+                a.street eq "street B"
+                a.version eq 1
+            }
         }
         check(addressB == foundB1)
 
@@ -99,7 +108,9 @@ fun main() {
         check(addressB == foundB2)
 
         // DELETE
-        db.delete(a, addressB)
+        db.execute {
+            EntityQuery.delete(a, addressB)
+        }
 
         // READ: select all
         val addressList = db.execute {

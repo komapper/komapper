@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.Database
+import org.komapper.core.dsl.EntityQuery
 import org.komapper.core.dsl.SqlQuery
 import org.komapper.core.dsl.concat
 import org.komapper.core.dsl.plus
@@ -23,7 +24,11 @@ class SqlUpdateQueryTest(private val db: Database) {
             }
         }
         assertEquals(1, count)
-        val address = db.find(a) { a.addressId eq 1 }
+        val address = db.execute {
+            EntityQuery.first(a).where {
+                a.addressId eq 1
+            }
+        }
         assertEquals("STREET 16", address.street)
     }
 
@@ -38,7 +43,11 @@ class SqlUpdateQueryTest(private val db: Database) {
             }
         }
         assertEquals(1, count)
-        val address = db.find(a) { a.addressId eq 1 }
+        val address = db.execute {
+            EntityQuery.first(a).where {
+                a.addressId eq 1
+            }
+        }
         assertEquals(11, address.version)
     }
 
@@ -53,7 +62,11 @@ class SqlUpdateQueryTest(private val db: Database) {
             }
         }
         assertEquals(1, count)
-        val address = db.find(a) { a.addressId eq 1 }
+        val address = db.execute {
+            EntityQuery.first(a).where {
+                a.addressId eq 1
+            }
+        }
         assertEquals("[STREET 1]", address.street)
     }
 

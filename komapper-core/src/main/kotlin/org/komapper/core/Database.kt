@@ -1,12 +1,6 @@
 package org.komapper.core
 
-import org.komapper.core.dsl.EntityQuery
-import org.komapper.core.dsl.ScriptQuery
-import org.komapper.core.dsl.SqlQuery
-import org.komapper.core.dsl.query.ListQuery
 import org.komapper.core.dsl.query.Query
-import org.komapper.core.dsl.scope.WhereDeclaration
-import org.komapper.core.metamodel.EntityMetamodel
 import java.sql.Blob
 import java.sql.Clob
 import java.sql.NClob
@@ -30,68 +24,12 @@ class Database(val config: DatabaseConfig) {
      */
     val factory = Factory(config)
 
-    fun <ENTITY> find(metamodel: EntityMetamodel<ENTITY>, declaration: WhereDeclaration): ENTITY {
-        val query = createFindQuery(metamodel, declaration).first()
-        return runQuery(query)
-    }
-
-    fun <ENTITY> findOrNull(metamodel: EntityMetamodel<ENTITY>, declaration: WhereDeclaration): ENTITY? {
-        val query = createFindQuery(metamodel, declaration).firstOrNull()
-        return runQuery(query)
-    }
-
-    private fun <ENTITY> createFindQuery(
-        metamodel: EntityMetamodel<ENTITY>,
-        declaration: WhereDeclaration
-    ): ListQuery<ENTITY> {
-        return SqlQuery.from(metamodel).where(declaration).limit(1)
-    }
-
-    fun <ENTITY> insert(metamodel: EntityMetamodel<ENTITY>, entity: ENTITY): ENTITY {
-        val queryable = EntityQuery.insert(metamodel, entity)
-        return runQuery(queryable)
-    }
-
-    fun <ENTITY> update(metamodel: EntityMetamodel<ENTITY>, entity: ENTITY): ENTITY {
-        val queryable = EntityQuery.update(metamodel, entity)
-        return runQuery(queryable)
-    }
-
-    fun <ENTITY> delete(metamodel: EntityMetamodel<ENTITY>, entity: ENTITY) {
-        val queryable = EntityQuery.delete(metamodel, entity)
-        runQuery(queryable)
-    }
-
-    fun <ENTITY> batchInsert(metamodel: EntityMetamodel<ENTITY>, entities: List<ENTITY>): List<ENTITY> {
-        val queryable = EntityQuery.batchInsert(metamodel, entities)
-        return runQuery(queryable)
-    }
-
-    fun <ENTITY> batchUpdate(metamodel: EntityMetamodel<ENTITY>, entities: List<ENTITY>): List<ENTITY> {
-        val queryable = EntityQuery.batchUpdate(metamodel, entities)
-        return runQuery(queryable)
-    }
-
-    fun <ENTITY> batchDelete(metamodel: EntityMetamodel<ENTITY>, entities: List<ENTITY>) {
-        val queryable = EntityQuery.batchDelete(metamodel, entities)
-        runQuery(queryable)
-    }
-
-    fun script(sql: CharSequence) {
-        val queryable = ScriptQuery.execute(sql.toString())
-        runQuery(queryable)
-    }
-
+    /**
+     * Execute a query.
+     * @param block the Query provider
+     */
     fun <T> execute(block: () -> Query<T>): T {
-        return runQuery(block())
-    }
-
-    fun <T> execute(query: Query<T>): T {
-        return runQuery(query)
-    }
-
-    private fun <T> runQuery(query: Query<T>): T {
-        return query.run(config)
+        return block().execute(config)
     }
 
     class Factory(val config: DatabaseConfig) {

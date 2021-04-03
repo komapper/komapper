@@ -1,11 +1,11 @@
 package org.komapper.core.dsl
 
 import org.komapper.core.dsl.query.Query
-import org.komapper.core.dsl.query.ScriptExecutionQueryImpl
+import org.komapper.core.dsl.query.ScriptExecuteQueryImpl
 
-object ScriptQuery {
+object ScriptQuery : Dsl {
 
     fun execute(sql: String): Query<Unit> {
-        return ScriptExecutionQueryImpl(sql)
+        return ScriptExecuteQueryImpl(sql)
     }
 }

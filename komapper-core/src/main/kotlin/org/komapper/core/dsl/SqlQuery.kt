@@ -16,7 +16,7 @@ import org.komapper.core.dsl.scope.SetDeclaration
 import org.komapper.core.dsl.scope.ValuesDeclaration
 import org.komapper.core.metamodel.EntityMetamodel
 
-object SqlQuery {
+object SqlQuery : Dsl {
 
     fun <ENTITY> from(entityMetamodel: EntityMetamodel<ENTITY>): SqlSelectQuery<ENTITY> {
         return SqlSelectQueryImpl(SqlSelectContext(entityMetamodel))

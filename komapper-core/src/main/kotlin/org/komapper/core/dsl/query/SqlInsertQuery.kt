@@ -15,11 +15,6 @@ import org.komapper.core.metamodel.Assignment
 interface SqlInsertQuery : Query<Pair<Int, LongArray>> {
     fun values(declaration: ValuesDeclaration): SqlInsertQuery
     fun option(declaration: SqlInsertOptionDeclaration): SqlInsertQuery
-
-    override fun peek(dialect: Dialect, block: (Statement) -> Unit): SqlInsertQuery {
-        super.peek(dialect, block)
-        return this
-    }
 }
 
 internal data class SqlInsertQueryImpl<ENTITY>(
@@ -40,7 +35,7 @@ internal data class SqlInsertQueryImpl<ENTITY>(
         return copy(option = scope.asOption())
     }
 
-    override fun run(config: DatabaseConfig): Pair<Int, LongArray> {
+    override fun execute(config: DatabaseConfig): Pair<Int, LongArray> {
         val statement = buildStatement(config.dialect)
         val executor = JdbcExecutor(config, option.asJdbcOption()) { con, sql ->
             val assignment = context.entityMetamodel.idAssignment()
@@ -53,7 +48,7 @@ internal data class SqlInsertQueryImpl<ENTITY>(
         return executor.executeUpdate(statement)
     }
 
-    override fun toStatement(dialect: Dialect): Statement {
+    override fun statement(dialect: Dialect): Statement {
         return buildStatement(dialect)
     }
 

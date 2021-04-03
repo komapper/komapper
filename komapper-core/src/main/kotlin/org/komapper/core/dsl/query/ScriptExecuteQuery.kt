@@ -7,29 +7,29 @@ import org.komapper.core.dsl.scope.ScriptExecutionOptionDeclaration
 import org.komapper.core.dsl.scope.ScriptExecutionOptionScope
 import org.komapper.core.jdbc.JdbcExecutor
 
-interface ScriptExecutionQuery : Query<Unit> {
-    fun option(declaration: ScriptExecutionOptionDeclaration): ScriptExecutionQuery
+interface ScriptExecuteQuery : Query<Unit> {
+    fun option(declaration: ScriptExecutionOptionDeclaration): ScriptExecuteQuery
 }
 
-internal data class ScriptExecutionQueryImpl(
+internal data class ScriptExecuteQueryImpl(
     val sql: String,
     val option: ScriptExecutionOption = QueryOptionImpl()
 ) :
-    ScriptExecutionQuery {
+    ScriptExecuteQuery {
     private val statement = Statement(sql, emptyList(), sql)
 
-    override fun option(declaration: ScriptExecutionOptionDeclaration): ScriptExecutionQueryImpl {
+    override fun option(declaration: ScriptExecutionOptionDeclaration): ScriptExecuteQueryImpl {
         val scope = ScriptExecutionOptionScope(option)
         declaration(scope)
         return copy(option = scope.option)
     }
 
-    override fun run(config: DatabaseConfig) {
+    override fun execute(config: DatabaseConfig) {
         val executor = JdbcExecutor(config, option.asJdbcOption())
         return executor.execute(statement)
     }
 
-    override fun toStatement(dialect: Dialect): Statement {
+    override fun statement(dialect: Dialect): Statement {
         return statement
     }
 }

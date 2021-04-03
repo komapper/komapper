@@ -25,14 +25,14 @@ internal data class TemplateSelectQueryImpl<T>(
         return copy(option = scope.asOption())
     }
 
-    override fun run(config: DatabaseConfig): List<T> {
+    override fun execute(config: DatabaseConfig): List<T> {
         val terminal = Terminal { it.toList() }
-        return terminal.run(config)
+        return terminal.execute(config)
     }
 
-    override fun toStatement(dialect: Dialect): Statement {
+    override fun statement(dialect: Dialect): Statement {
         val terminal = Terminal { it.toList() }
-        return terminal.toStatement(dialect)
+        return terminal.statement(dialect)
     }
 
     override fun first(): Query<T> {
@@ -48,8 +48,8 @@ internal data class TemplateSelectQueryImpl<T>(
     }
 
     private inner class Terminal<R>(val transformer: (Sequence<T>) -> R) : Query<R> {
-        override fun run(config: DatabaseConfig): R {
-            val statement = toStatement(config.dialect)
+        override fun execute(config: DatabaseConfig): R {
+            val statement = statement(config.dialect)
             val executor = JdbcExecutor(config, option.asJdbcOption())
             return executor.executeQuery(
                 statement,
@@ -61,7 +61,7 @@ internal data class TemplateSelectQueryImpl<T>(
             )
         }
 
-        override fun toStatement(dialect: Dialect): Statement {
+        override fun statement(dialect: Dialect): Statement {
             val builder = DefaultStatementBuilder(
                 dialect::formatValue,
                 dialect.sqlNodeFactory,

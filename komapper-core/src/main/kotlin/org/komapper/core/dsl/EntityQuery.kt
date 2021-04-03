@@ -12,6 +12,9 @@ import org.komapper.core.dsl.query.EntityBatchUpdateQuery
 import org.komapper.core.dsl.query.EntityBatchUpdateQueryImpl
 import org.komapper.core.dsl.query.EntityDeleteQuery
 import org.komapper.core.dsl.query.EntityDeleteQueryImpl
+import org.komapper.core.dsl.query.EntityFindQuery
+import org.komapper.core.dsl.query.EntityFirstOrNullQuery
+import org.komapper.core.dsl.query.EntityFirstQuery
 import org.komapper.core.dsl.query.EntityInsertQuery
 import org.komapper.core.dsl.query.EntityInsertQueryImpl
 import org.komapper.core.dsl.query.EntitySelectQuery
@@ -20,7 +23,17 @@ import org.komapper.core.dsl.query.EntityUpdateQuery
 import org.komapper.core.dsl.query.EntityUpdateQueryImpl
 import org.komapper.core.metamodel.EntityMetamodel
 
-object EntityQuery {
+object EntityQuery : Dsl {
+
+    fun <ENTITY> first(entityMetamodel: EntityMetamodel<ENTITY>): EntityFindQuery<ENTITY> {
+        val selectQuery = EntitySelectQueryImpl(EntitySelectContext(entityMetamodel)).limit(1)
+        return EntityFirstQuery(selectQuery)
+    }
+
+    fun <ENTITY> firstOrNull(entityMetamodel: EntityMetamodel<ENTITY>): EntityFindQuery<ENTITY?> {
+        val selectQuery = EntitySelectQueryImpl(EntitySelectContext(entityMetamodel)).limit(1)
+        return EntityFirstOrNullQuery(selectQuery)
+    }
 
     fun <ENTITY> from(entityMetamodel: EntityMetamodel<ENTITY>): EntitySelectQuery<ENTITY> {
         return EntitySelectQueryImpl(EntitySelectContext(entityMetamodel))

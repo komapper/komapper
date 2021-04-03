@@ -26,7 +26,7 @@ internal data class EntityBatchDeleteQueryImpl<ENTITY>(
         return copy(option = scope.asOption())
     }
 
-    override fun run(config: DatabaseConfig) {
+    override fun execute(config: DatabaseConfig) {
         val statements = entities.map { buildStatement(config.dialect, it) }
         val (counts) = delete(config, statements)
         postDelete(counts)
@@ -42,7 +42,7 @@ internal data class EntityBatchDeleteQueryImpl<ENTITY>(
         }
     }
 
-    override fun toStatement(dialect: Dialect): Statement {
+    override fun statement(dialect: Dialect): Statement {
         return buildStatement(dialect, entities.first())
     }
 

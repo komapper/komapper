@@ -17,11 +17,6 @@ interface SqlUpdateQuery : Query<Int> {
     fun set(declaration: SetDeclaration): SqlUpdateQuery
     fun where(declaration: WhereDeclaration): SqlUpdateQuery
     fun option(declaration: SqlUpdateOptionDeclaration): SqlUpdateQuery
-
-    override fun peek(dialect: Dialect, block: (Statement) -> Unit): SqlUpdateQuery {
-        super.peek(dialect, block)
-        return this
-    }
 }
 
 internal data class SqlUpdateQueryImpl<ENTITY>(
@@ -49,7 +44,7 @@ internal data class SqlUpdateQueryImpl<ENTITY>(
         return copy(option = scope.asOption())
     }
 
-    override fun run(config: DatabaseConfig): Int {
+    override fun execute(config: DatabaseConfig): Int {
         if (!option.allowEmptyWhereClause && context.where.isEmpty()) {
             error("Empty where clause is not allowed.")
         }
@@ -59,7 +54,7 @@ internal data class SqlUpdateQueryImpl<ENTITY>(
         return count
     }
 
-    override fun toStatement(dialect: Dialect): Statement {
+    override fun statement(dialect: Dialect): Statement {
         return buildStatement(dialect)
     }
 

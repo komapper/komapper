@@ -18,27 +18,6 @@ import org.komapper.core.dsl.sum
 class SqlSelectQueryTest(private val db: Database) {
 
     @Test
-    fun find() {
-        val a = Address.metamodel()
-        val address = db.find(a) { a.addressId eq 1 }
-        assertNotNull(address)
-    }
-
-    @Test
-    fun findOrNull() {
-        val a = Address.metamodel()
-        val address = db.findOrNull(a) { a.addressId eq -1 }
-        assertNull(address)
-    }
-
-    @Test
-    fun find_multipleCondition() {
-        val a = Address.metamodel()
-        val address = db.find(a) { a.addressId eq 1; a.version eq 1 }
-        assertNotNull(address)
-    }
-
-    @Test
     fun execute() {
         val a = Address.metamodel()
         val list = db.execute {
@@ -77,14 +56,14 @@ class SqlSelectQueryTest(private val db: Database) {
     @Test
     fun execute_selectSingle() {
         val a = Address.metamodel()
-        val streetList = db.execute(
+        val streetList = db.execute {
             SqlQuery.from(a)
                 .where {
                     a.addressId inList listOf(1, 2)
                 }
                 .orderBy(a.addressId)
                 .select(a.street)
-        )
+        }
         assertEquals(listOf("STREET 1", "STREET 2"), streetList)
     }
 
@@ -106,28 +85,28 @@ class SqlSelectQueryTest(private val db: Database) {
     @Test
     fun execute_selectPair() {
         val a = Address.metamodel()
-        val pairList = db.execute(
+        val pairList = db.execute {
             SqlQuery.from(a)
                 .where {
                     a.addressId inList listOf(1, 2)
                 }
                 .orderBy(a.addressId)
                 .select(a.addressId, a.street)
-        )
+        }
         assertEquals(listOf(1 to "STREET 1", 2 to "STREET 2"), pairList)
     }
 
     @Test
     fun execute_selectTriple() {
         val a = Address.metamodel()
-        val tripleList = db.execute(
+        val tripleList = db.execute {
             SqlQuery.from(a)
                 .where {
                     a.addressId inList listOf(1, 2)
                 }
                 .orderBy(a.addressId)
                 .select(a.addressId, a.street, a.version)
-        )
+        }
         assertEquals(
             listOf(
                 Triple(1, "STREET 1", 1),
@@ -145,7 +124,7 @@ class SqlSelectQueryTest(private val db: Database) {
             .orderBy(a.addressId.desc())
             .limit(2)
             .offset(5)
-        val list = db.execute(query)
+        val list = db.execute { query }
         assertEquals(
             listOf(
                 Address(10, "STREET 10", 1),
@@ -159,11 +138,11 @@ class SqlSelectQueryTest(private val db: Database) {
     fun innerJoin() {
         val a = Address.metamodel()
         val e = Employee.metamodel()
-        val list = db.execute(
+        val list = db.execute {
             SqlQuery.from(a).innerJoin(e) {
                 a.addressId eq e.addressId
             }
-        )
+        }
         assertEquals(14, list.size)
     }
 
@@ -171,11 +150,11 @@ class SqlSelectQueryTest(private val db: Database) {
     fun innerJoin_single() {
         val a = Address.metamodel()
         val e = Employee.metamodel()
-        val list: List<Employee> = db.execute(
+        val list: List<Employee> = db.execute {
             SqlQuery.from(a).innerJoin(e) {
                 a.addressId eq e.addressId
             }.select(e)
-        )
+        }
         assertEquals(14, list.size)
     }
 
@@ -183,11 +162,11 @@ class SqlSelectQueryTest(private val db: Database) {
     fun innerJoin_pair() {
         val a = Address.metamodel()
         val e = Employee.metamodel()
-        val list = db.execute(
+        val list = db.execute {
             SqlQuery.from(a).innerJoin(e) {
                 a.addressId eq e.addressId
             }.select(a, e)
-        )
+        }
         assertEquals(14, list.size)
         val (address, employee) = list[0]
         assertNotNull(address)
@@ -199,14 +178,14 @@ class SqlSelectQueryTest(private val db: Database) {
         val a = Address.metamodel()
         val e = Employee.metamodel()
         val d = Department.metamodel()
-        val list = db.execute(
+        val list = db.execute {
             SqlQuery.from(a)
                 .innerJoin(e) {
                     a.addressId eq e.addressId
                 }.innerJoin(d) {
                     e.departmentId eq d.departmentId
                 }.select(a, e, d)
-        )
+        }
         assertEquals(14, list.size)
         val (address, employee, department) = list[0]
         assertNotNull(address)
@@ -218,37 +197,37 @@ class SqlSelectQueryTest(private val db: Database) {
     fun leftJoin() {
         val a = Address.metamodel()
         val e = Employee.metamodel()
-        val list = db.execute(
+        val list = db.execute {
             SqlQuery.from(a).leftJoin(e) {
                 a.addressId eq e.addressId
             }
-        )
+        }
         assertEquals(15, list.size)
     }
 
     @Test
     fun offset() {
         val a = Address.metamodel()
-        val list = db.execute(SqlQuery.from(a).offset(10))
+        val list = db.execute { SqlQuery.from(a).offset(10) }
         assertEquals(5, list.size)
     }
 
     @Test
     fun limit() {
         val a = Address.metamodel()
-        val list = db.execute(SqlQuery.from(a).limit(3))
+        val list = db.execute { SqlQuery.from(a).limit(3) }
         assertEquals(3, list.size)
     }
 
     @Test
     fun offset_limit() {
         val a = Address.metamodel()
-        val list = db.execute(
+        val list = db.execute {
             SqlQuery.from(a)
                 .orderBy(a.addressId)
                 .offset(10)
                 .limit(3)
-        )
+        }
         assertEquals(3, list.size)
         assertEquals(11, list[0].addressId)
         assertEquals(12, list[1].addressId)
@@ -258,13 +237,13 @@ class SqlSelectQueryTest(private val db: Database) {
     @Test
     fun forUpdate() {
         val a = Address.metamodel()
-        val list = db.execute(
+        val list = db.execute {
             SqlQuery.from(a).where { a.addressId greaterEq 1 }
                 .orderBy(a.addressId.desc())
                 .limit(2)
                 .offset(5)
                 .forUpdate()
-        )
+        }
         assertEquals(
             listOf(
                 Address(10, "STREET 10", 1),
@@ -304,28 +283,28 @@ class SqlSelectQueryTest(private val db: Database) {
     @Test
     fun aggregate_sum() {
         val a = Address.metamodel()
-        val sum = db.execute(SqlQuery.from(a).select(sum(a.addressId)).first())
+        val sum = db.execute { SqlQuery.from(a).select(sum(a.addressId)).first() }
         assertEquals(120, sum)
     }
 
     @Test
     fun aggregate_max() {
         val a = Address.metamodel()
-        val max = db.execute(SqlQuery.from(a).select(max(a.addressId)).first())
+        val max = db.execute { SqlQuery.from(a).select(max(a.addressId)).first() }
         assertEquals(15, max)
     }
 
     @Test
     fun aggregate_min() {
         val a = Address.metamodel()
-        val min = db.execute(SqlQuery.from(a).select(min(a.addressId)).first())
+        val min = db.execute { SqlQuery.from(a).select(min(a.addressId)).first() }
         assertEquals(1, min)
     }
 
     @Test
     fun having() {
         val e = Employee.metamodel()
-        val list = db.execute(
+        val list = db.execute {
             SqlQuery.from(e)
                 .groupBy(e.departmentId)
                 .having {
@@ -333,28 +312,28 @@ class SqlSelectQueryTest(private val db: Database) {
                 }
                 .orderBy(e.departmentId)
                 .select(e.departmentId, count(e.employeeId))
-        )
+        }
         assertEquals(listOf(2 to 5L, 3 to 6L), list)
     }
 
     @Test
     fun having_empty_groupBy() {
         val e = Employee.metamodel()
-        val list = db.execute(
+        val list = db.execute {
             SqlQuery.from(e)
                 .having {
                     count(e.employeeId) greaterEq 4L
                 }
                 .orderBy(e.departmentId)
                 .select(e.departmentId, count(e.employeeId))
-        )
+        }
         assertEquals(listOf(2 to 5L, 3 to 6L), list)
     }
 
     @Test
-    fun options() {
+    fun option() {
         val e = Employee.metamodel()
-        val emp = db.execute(
+        val emp = db.execute {
             SqlQuery.from(e)
                 .option {
                     fetchSize = 10
@@ -365,7 +344,7 @@ class SqlSelectQueryTest(private val db: Database) {
                 .where {
                     e.employeeId eq 1
                 }.first()
-        )
+        }
         println(emp)
     }
 /*

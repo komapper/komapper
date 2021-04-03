@@ -24,7 +24,7 @@ class ExpressionTest(private val db: Database) {
                 }
                 .select(a.addressId + 1)
                 .also {
-                    println(it.toStatement())
+                    println(it.statement())
                 }.first()
         }
         assertEquals(11, result)
@@ -40,7 +40,7 @@ class ExpressionTest(private val db: Database) {
                 }
                 .select(a.addressId + a.addressId)
                 .also {
-                    println(it.toStatement())
+                    println(it.statement())
                 }.first()
         }
         assertEquals(20, result)
@@ -56,7 +56,7 @@ class ExpressionTest(private val db: Database) {
                 }
                 .select(a.addressId - 10)
                 .also {
-                    println(it.toStatement())
+                    println(it.statement())
                 }.first()
         }
         assertEquals(0, result)
@@ -72,7 +72,7 @@ class ExpressionTest(private val db: Database) {
                 }
                 .select(a.addressId - a.addressId)
                 .also {
-                    println(it.toStatement())
+                    println(it.statement())
                 }.first()
         }
         assertEquals(0, result)
@@ -88,7 +88,7 @@ class ExpressionTest(private val db: Database) {
                 }
                 .select(a.addressId / 2)
                 .also {
-                    println(it.toStatement())
+                    println(it.statement())
                 }.first()
         }
         assertEquals(5, result)
@@ -104,7 +104,7 @@ class ExpressionTest(private val db: Database) {
                 }
                 .select(a.addressId / a.addressId)
                 .also {
-                    println(it.toStatement())
+                    println(it.statement())
                 }.first()
         }
         assertEquals(1, result)
@@ -120,7 +120,7 @@ class ExpressionTest(private val db: Database) {
                 }
                 .select(a.addressId % 3)
                 .also {
-                    println(it.toStatement())
+                    println(it.statement())
                 }.first()
         }
         assertEquals(1, result)
@@ -136,7 +136,7 @@ class ExpressionTest(private val db: Database) {
                 }
                 .select(a.addressId % a.addressId)
                 .also {
-                    println(it.toStatement())
+                    println(it.statement())
                 }.first()
         }
         assertEquals(0, result)
@@ -152,7 +152,7 @@ class ExpressionTest(private val db: Database) {
                 }
                 .select(concat(concat("[", a.street), "]"))
                 .also {
-                    println(it.toStatement())
+                    println(it.statement())
                 }.first()
         }
         assertEquals("[STREET 10]", result)
@@ -168,7 +168,7 @@ class ExpressionTest(private val db: Database) {
                 }
                 .select(concat(concat(a.street, a.street), a.street))
                 .also {
-                    println(it.toStatement())
+                    println(it.statement())
                 }.first()
         }
         assertEquals("STREET 10STREET 10STREET 10", result)
