@@ -16,29 +16,6 @@ import org.komapper.core.dsl.scope.WhereScope.Companion.plus
 class EntitySelectQueryTest(private val db: Database) {
 
     @Test
-    fun first() {
-        val a = Address.metamodel()
-        val address = db.execute { EntityQuery.first(a).where { a.addressId eq 1 } }
-        Assertions.assertNotNull(address)
-    }
-
-    @Test
-    fun firstOrNull() {
-        val a = Address.metamodel()
-        val address = db.execute { EntityQuery.firstOrNull(a).where { a.addressId eq -1 } }
-        Assertions.assertNull(address)
-    }
-
-    @Test
-    fun first_multipleCondition() {
-        val a = Address.metamodel()
-        val address = db.execute {
-            EntityQuery.first(a).where { a.addressId eq 1; a.version eq 1 }
-        }
-        Assertions.assertNotNull(address)
-    }
-
-    @Test
     fun list() {
         val a = Address.metamodel()
         val addressList = db.execute {

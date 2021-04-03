@@ -13,26 +13,33 @@ import org.komapper.core.dsl.query.EntityBatchUpdateQueryImpl
 import org.komapper.core.dsl.query.EntityDeleteQuery
 import org.komapper.core.dsl.query.EntityDeleteQueryImpl
 import org.komapper.core.dsl.query.EntityFindQuery
-import org.komapper.core.dsl.query.EntityFirstOrNullQuery
-import org.komapper.core.dsl.query.EntityFirstQuery
+import org.komapper.core.dsl.query.EntityFindQueryImpl
 import org.komapper.core.dsl.query.EntityInsertQuery
 import org.komapper.core.dsl.query.EntityInsertQueryImpl
 import org.komapper.core.dsl.query.EntitySelectQuery
 import org.komapper.core.dsl.query.EntitySelectQueryImpl
 import org.komapper.core.dsl.query.EntityUpdateQuery
 import org.komapper.core.dsl.query.EntityUpdateQueryImpl
+import org.komapper.core.dsl.query.ListQuery
+import org.komapper.core.dsl.query.Query
 import org.komapper.core.metamodel.EntityMetamodel
 
 object EntityQuery : Dsl {
 
-    fun <ENTITY> first(entityMetamodel: EntityMetamodel<ENTITY>): EntityFindQuery<ENTITY> {
-        val selectQuery = EntitySelectQueryImpl(EntitySelectContext(entityMetamodel)).limit(1)
-        return EntityFirstQuery(selectQuery)
+    fun <ENTITY> first(entityMetamodel: EntityMetamodel<ENTITY>): EntityFindQuery<ENTITY, ENTITY> {
+        return createFindQuery(entityMetamodel) { it.first() }
     }
 
-    fun <ENTITY> firstOrNull(entityMetamodel: EntityMetamodel<ENTITY>): EntityFindQuery<ENTITY?> {
+    fun <ENTITY> firstOrNull(entityMetamodel: EntityMetamodel<ENTITY>): EntityFindQuery<ENTITY, ENTITY?> {
+        return createFindQuery(entityMetamodel) { it.firstOrNull() }
+    }
+
+    private fun <ENTITY, R> createFindQuery(
+        entityMetamodel: EntityMetamodel<ENTITY>,
+        transformer: (ListQuery<ENTITY>) -> Query<R>
+    ): EntityFindQuery<ENTITY, R> {
         val selectQuery = EntitySelectQueryImpl(EntitySelectContext(entityMetamodel)).limit(1)
-        return EntityFirstOrNullQuery(selectQuery)
+        return EntityFindQueryImpl(selectQuery, transformer)
     }
 
     fun <ENTITY> from(entityMetamodel: EntityMetamodel<ENTITY>): EntitySelectQuery<ENTITY> {

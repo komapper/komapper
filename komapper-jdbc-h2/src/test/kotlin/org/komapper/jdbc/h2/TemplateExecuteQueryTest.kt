@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.Database
-import org.komapper.core.dsl.EntityQuery
+import org.komapper.core.dsl.SqlQuery
 import org.komapper.core.dsl.TemplateQuery
 
 @ExtendWith(Env::class)
@@ -21,7 +21,7 @@ class TemplateExecuteQueryTest(private val db: Database) {
         assertEquals(1, count)
         val a = Address.metamodel()
         val address = db.execute {
-            EntityQuery.first(a).where {
+            SqlQuery.first(a).where {
                 a.addressId eq 15
             }
         }
