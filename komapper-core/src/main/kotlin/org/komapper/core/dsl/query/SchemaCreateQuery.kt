@@ -19,13 +19,17 @@ internal data class SchemaCreateQueryImpl(
         return copy(entityMetamodels = entityMetamodels.toList())
     }
 
-    override fun execute(config: DatabaseConfig) {
-        val statement = statement(config.dialect)
+    override fun run(config: DatabaseConfig) {
+        val statement = buildStatement(config.dialect)
         val executor = JdbcExecutor(config, JdbcOption())
         executor.execute(statement)
     }
 
-    override fun statement(dialect: Dialect): Statement {
+    override fun dryRun(dialect: Dialect): Statement {
+        return buildStatement(dialect)
+    }
+
+    private fun buildStatement(dialect: Dialect): Statement {
         val builder = dialect.getSchemaStatementBuilder()
         return builder.create(entityMetamodels)
     }

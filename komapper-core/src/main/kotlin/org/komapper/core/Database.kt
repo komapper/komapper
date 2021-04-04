@@ -29,7 +29,7 @@ class Database(val config: DatabaseConfig) {
      * @param block the Query provider
      */
     fun <T> execute(block: () -> Query<T>): T {
-        return block().execute(config)
+        return block().run(config)
     }
 
     class Factory(val config: DatabaseConfig) {

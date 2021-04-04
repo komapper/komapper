@@ -46,11 +46,11 @@ internal data class SqlFindQueryImpl<ENTITY, R>(
         return copy(query = newQuery)
     }
 
-    override fun execute(config: DatabaseConfig): R {
-        return transformer(query).execute(config)
+    override fun run(config: DatabaseConfig): R {
+        return transformer(query).run(config)
     }
 
-    override fun statement(dialect: Dialect): Statement {
-        return query.statement(dialect)
+    override fun dryRun(dialect: Dialect): Statement {
+        return query.dryRun(dialect)
     }
 }

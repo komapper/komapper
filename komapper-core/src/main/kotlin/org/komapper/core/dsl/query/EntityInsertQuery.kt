@@ -26,7 +26,7 @@ internal data class EntityInsertQueryImpl<ENTITY>(
         return copy(option = scope.asOption())
     }
 
-    override fun execute(config: DatabaseConfig): ENTITY {
+    override fun run(config: DatabaseConfig): ENTITY {
         val newEntity = preInsert(config)
         val statement = buildStatement(config.dialect, newEntity)
         val (_, generatedKeys) = insert(config, statement)
@@ -50,7 +50,7 @@ internal data class EntityInsertQueryImpl<ENTITY>(
         }
     }
 
-    override fun statement(dialect: Dialect): Statement {
+    override fun dryRun(dialect: Dialect): Statement {
         return buildStatement(dialect, entity)
     }
 

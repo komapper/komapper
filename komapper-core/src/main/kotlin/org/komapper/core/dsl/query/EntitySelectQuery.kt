@@ -115,14 +115,14 @@ internal data class EntitySelectQueryImpl<ENTITY>(
         return copy(option = scope.asOption())
     }
 
-    override fun execute(config: DatabaseConfig): List<ENTITY> {
+    override fun run(config: DatabaseConfig): List<ENTITY> {
         val terminal = Terminal { it.toList() }
-        return terminal.execute(config)
+        return terminal.run(config)
     }
 
-    override fun statement(dialect: Dialect): Statement {
+    override fun dryRun(dialect: Dialect): Statement {
         val terminal = Terminal { it.toList() }
-        return terminal.statement(dialect)
+        return terminal.dryRun(dialect)
     }
 
     override fun first(): Query<ENTITY> {
@@ -139,11 +139,11 @@ internal data class EntitySelectQueryImpl<ENTITY>(
 
     private inner class Terminal<R>(val transformer: (Sequence<ENTITY>) -> R) : Query<R> {
 
-        override fun execute(config: DatabaseConfig): R {
+        override fun run(config: DatabaseConfig): R {
             if (!option.allowEmptyWhereClause && context.where.isEmpty()) {
                 error("Empty where clause is not allowed.")
             }
-            val statement = statement(config.dialect)
+            val statement = buildStatement(config.dialect)
             val executor = JdbcExecutor(config, option.asJdbcOption())
             return executor.executeQuery(statement) { rs ->
                 // hold only unique entities
@@ -168,7 +168,11 @@ internal data class EntitySelectQueryImpl<ENTITY>(
             }
         }
 
-        override fun statement(dialect: Dialect): Statement {
+        override fun dryRun(dialect: Dialect): Statement {
+            return buildStatement(dialect)
+        }
+
+        private fun buildStatement(dialect: Dialect): Statement {
             val builder = EntitySelectStatementBuilder(dialect, context)
             return builder.build()
         }

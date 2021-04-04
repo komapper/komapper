@@ -24,12 +24,12 @@ internal data class ScriptExecuteQueryImpl(
         return copy(option = scope.option)
     }
 
-    override fun execute(config: DatabaseConfig) {
+    override fun run(config: DatabaseConfig) {
         val executor = JdbcExecutor(config, option.asJdbcOption())
         return executor.execute(statement)
     }
 
-    override fun statement(dialect: Dialect): Statement {
+    override fun dryRun(dialect: Dialect): Statement {
         return statement
     }
 }

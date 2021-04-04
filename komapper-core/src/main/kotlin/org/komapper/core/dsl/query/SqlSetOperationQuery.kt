@@ -62,14 +62,14 @@ internal data class SetOperationQueryImpl<T>(
         return copy(option = scope.asOption())
     }
 
-    override fun execute(config: DatabaseConfig): List<T> {
+    override fun run(config: DatabaseConfig): List<T> {
         val terminal = createTerminal { it.toList() }
-        return terminal.execute(config)
+        return terminal.run(config)
     }
 
-    override fun statement(dialect: Dialect): Statement {
+    override fun dryRun(dialect: Dialect): Statement {
         val terminal = createTerminal { it.toList() }
-        return terminal.statement(dialect)
+        return terminal.dryRun(dialect)
     }
 
     override fun first(): Query<T> {
@@ -95,11 +95,11 @@ internal data class SetOperationQueryImpl<T>(
         val transformer: (Sequence<T>) -> R
     ) : Query<R> {
 
-        override fun execute(config: DatabaseConfig): R {
+        override fun run(config: DatabaseConfig): R {
             if (!option.allowEmptyWhereClause) {
                 checkWhereClauses(context.component)
             }
-            val statement = statement(config.dialect)
+            val statement = buildStatement(config.dialect)
             val executor = JdbcExecutor(config, option.asJdbcOption())
             return executor.executeQuery(statement, provider, transformer)
         }
@@ -118,7 +118,11 @@ internal data class SetOperationQueryImpl<T>(
             }
         }
 
-        override fun statement(dialect: Dialect): Statement {
+        override fun dryRun(dialect: Dialect): Statement {
+            return buildStatement(dialect)
+        }
+
+        private fun buildStatement(dialect: Dialect): Statement {
             val builder = SqlSetOperationStatementBuilder(dialect, context)
             return builder.build()
         }

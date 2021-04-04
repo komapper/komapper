@@ -24,14 +24,14 @@ internal data class TemplateExecuteQueryImpl(
         return copy(option = scope.asOption())
     }
 
-    override fun execute(config: DatabaseConfig): Int {
+    override fun run(config: DatabaseConfig): Int {
         val statement = buildStatement(config.dialect)
         val executor = JdbcExecutor(config, option.asJdbcOption())
         val (count) = executor.executeUpdate(statement)
         return count
     }
 
-    override fun statement(dialect: Dialect): Statement {
+    override fun dryRun(dialect: Dialect): Statement {
         return buildStatement(dialect)
     }
 

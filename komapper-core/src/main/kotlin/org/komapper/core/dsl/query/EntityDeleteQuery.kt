@@ -26,7 +26,7 @@ internal data class EntityDeleteQueryImpl<ENTITY>(
         return copy(option = scope.asOption())
     }
 
-    override fun execute(config: DatabaseConfig) {
+    override fun run(config: DatabaseConfig) {
         val statement = buildStatement(config.dialect)
         val (count) = delete(config, statement)
         postDelete(count)
@@ -40,7 +40,7 @@ internal data class EntityDeleteQueryImpl<ENTITY>(
         support.postDelete(count)
     }
 
-    override fun statement(dialect: Dialect): Statement {
+    override fun dryRun(dialect: Dialect): Statement {
         return buildStatement(dialect)
     }
 

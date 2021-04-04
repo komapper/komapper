@@ -26,7 +26,7 @@ internal data class EntityBatchUpdateQueryImpl<ENTITY>(
         return copy(option = scope.asOption())
     }
 
-    override fun execute(config: DatabaseConfig): List<ENTITY> {
+    override fun run(config: DatabaseConfig): List<ENTITY> {
         val newEntities = preUpdate(config)
         val statements = newEntities.map { buildStatement(config.dialect, it) }
         val (counts) = update(config, statements)
@@ -53,7 +53,7 @@ internal data class EntityBatchUpdateQueryImpl<ENTITY>(
         }
     }
 
-    override fun statement(dialect: Dialect): Statement {
+    override fun dryRun(dialect: Dialect): Statement {
         return buildStatement(dialect, entities.first())
     }
 

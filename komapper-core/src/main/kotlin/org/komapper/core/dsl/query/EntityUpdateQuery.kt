@@ -26,7 +26,7 @@ internal data class EntityUpdateQueryImpl<ENTITY>(
         return copy(option = scope.asOption())
     }
 
-    override fun execute(config: DatabaseConfig): ENTITY {
+    override fun run(config: DatabaseConfig): ENTITY {
         val newEntity = preUpdate(config, entity)
         val statement = buildStatement(config.dialect, newEntity)
         val (count) = update(config, statement)
@@ -45,7 +45,7 @@ internal data class EntityUpdateQueryImpl<ENTITY>(
         return support.postUpdate(entity, count)
     }
 
-    override fun statement(dialect: Dialect): Statement {
+    override fun dryRun(dialect: Dialect): Statement {
         return buildStatement(dialect, entity)
     }
 

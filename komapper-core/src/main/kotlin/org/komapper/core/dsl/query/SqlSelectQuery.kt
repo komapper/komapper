@@ -243,14 +243,14 @@ internal data class SqlSelectQueryImpl<ENTITY>(
         }
     }
 
-    override fun execute(config: DatabaseConfig): List<ENTITY> {
+    override fun run(config: DatabaseConfig): List<ENTITY> {
         val terminal = createTerminal(context) { it.toList() }
-        return terminal.execute(config)
+        return terminal.run(config)
     }
 
-    override fun statement(dialect: Dialect): Statement {
+    override fun dryRun(dialect: Dialect): Statement {
         val terminal = createTerminal(context) { it.toList() }
-        return terminal.statement(dialect)
+        return terminal.dryRun(dialect)
     }
 
     override fun first(): Query<ENTITY> {
@@ -305,14 +305,14 @@ internal data class SqlSelectQueryImpl<ENTITY>(
             return SetOperationQueryImpl(context, provider = provider)
         }
 
-        override fun execute(config: DatabaseConfig): List<T> {
+        override fun run(config: DatabaseConfig): List<T> {
             val terminal = createTerminal { it.toList() }
-            return terminal.execute(config)
+            return terminal.run(config)
         }
 
-        override fun statement(dialect: Dialect): Statement {
+        override fun dryRun(dialect: Dialect): Statement {
             val terminal = createTerminal { it.toList() }
-            return terminal.statement(dialect)
+            return terminal.dryRun(dialect)
         }
 
         override fun first(): Query<T> {
@@ -339,16 +339,20 @@ internal data class SqlSelectQueryImpl<ENTITY>(
         val transformer: (Sequence<T>) -> R
     ) : Query<R> {
 
-        override fun execute(config: DatabaseConfig): R {
+        override fun run(config: DatabaseConfig): R {
             if (!option.allowEmptyWhereClause && context.where.isEmpty()) {
                 error("Empty where clause is not allowed.")
             }
-            val statement = statement(config.dialect)
+            val statement = buildStatement(config.dialect)
             val executor = JdbcExecutor(config, option.asJdbcOption())
             return executor.executeQuery(statement, provider, transformer)
         }
 
-        override fun statement(dialect: Dialect): Statement {
+        override fun dryRun(dialect: Dialect): Statement {
+            return buildStatement(dialect)
+        }
+
+        private fun buildStatement(dialect: Dialect): Statement {
             val builder = SqlSelectStatementBuilder(dialect, context)
             return builder.build()
         }

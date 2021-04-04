@@ -7,44 +7,44 @@ import org.komapper.core.data.Statement
 import org.komapper.core.dsl.context.SqlSetOperationComponent
 
 interface Query<T> {
-    fun execute(config: DatabaseConfig): T
-    fun statement(dialect: Dialect = EmptyDialect()): Statement
+    fun run(config: DatabaseConfig): T
+    fun dryRun(dialect: Dialect = EmptyDialect()): Statement
 
     fun <S> map(transformer: (T) -> S): Query<S> {
         return object : Query<S> {
-            override fun execute(config: DatabaseConfig): S {
-                val value = this@Query.execute(config)
+            override fun run(config: DatabaseConfig): S {
+                val value = this@Query.run(config)
                 return transformer(value)
             }
 
-            override fun statement(dialect: Dialect): Statement {
-                return this@Query.statement(dialect)
+            override fun dryRun(dialect: Dialect): Statement {
+                return this@Query.dryRun(dialect)
             }
         }
     }
 
     fun <R> flatMap(transformer: (T) -> Query<R>): Query<R> {
         return object : Query<R> {
-            override fun execute(config: DatabaseConfig): R {
-                val result = this@Query.execute(config)
-                return transformer(result).execute(config)
+            override fun run(config: DatabaseConfig): R {
+                val result = this@Query.run(config)
+                return transformer(result).run(config)
             }
 
-            override fun statement(dialect: Dialect): Statement {
-                return this@Query.statement(dialect)
+            override fun dryRun(dialect: Dialect): Statement {
+                return this@Query.dryRun(dialect)
             }
         }
     }
 
     infix operator fun <S> plus(other: Query<S>): Query<S> {
         return object : Query<S> {
-            override fun execute(config: DatabaseConfig): S {
-                this@Query.execute(config)
-                return other.execute(config)
+            override fun run(config: DatabaseConfig): S {
+                this@Query.run(config)
+                return other.run(config)
             }
 
-            override fun statement(dialect: Dialect): Statement {
-                return this@Query.statement(dialect) + other.statement(dialect)
+            override fun dryRun(dialect: Dialect): Statement {
+                return this@Query.dryRun(dialect) + other.dryRun(dialect)
             }
         }
     }
@@ -52,10 +52,10 @@ interface Query<T> {
     companion object Empty : Query<Unit> {
         private val emptyStatement = Statement("")
 
-        override fun execute(config: DatabaseConfig) {
+        override fun run(config: DatabaseConfig) {
         }
 
-        override fun statement(dialect: Dialect): Statement {
+        override fun dryRun(dialect: Dialect): Statement {
             return emptyStatement
         }
     }

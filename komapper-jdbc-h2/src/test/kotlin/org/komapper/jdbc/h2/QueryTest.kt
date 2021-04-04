@@ -23,7 +23,7 @@ class QueryTest(private val db: Database) {
         val q3 = EntityQuery.from(a).where { a.addressId inList listOf(16, 17) }
         val list = db.execute { q1 + q2 + q3 }
         assertEquals(2, list.size)
-        println((q1 + q2 + q3).statement())
+        println((q1 + q2 + q3).dryRun())
     }
 
     @Test

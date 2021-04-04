@@ -34,7 +34,7 @@ internal data class SqlDeleteQueryImpl<ENTITY>(
         return copy(option = scope.asOption())
     }
 
-    override fun execute(config: DatabaseConfig): Int {
+    override fun run(config: DatabaseConfig): Int {
         if (!option.allowEmptyWhereClause && context.where.isEmpty()) {
             error("Empty where clause is not allowed.")
         }
@@ -44,7 +44,7 @@ internal data class SqlDeleteQueryImpl<ENTITY>(
         return count
     }
 
-    override fun statement(dialect: Dialect): Statement {
+    override fun dryRun(dialect: Dialect): Statement {
         return buildStatement(dialect, context)
     }
 
