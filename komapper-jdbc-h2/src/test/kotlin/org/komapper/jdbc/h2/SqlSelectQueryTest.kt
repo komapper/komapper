@@ -347,6 +347,7 @@ class SqlSelectQueryTest(private val db: Database) {
         }
         println(emp)
     }
+
 /*
 @Test
 fun inList() {

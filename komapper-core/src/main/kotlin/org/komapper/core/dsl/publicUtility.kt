@@ -1,6 +1,7 @@
 package org.komapper.core.dsl
 
 import org.komapper.core.dsl.data.Operand
+import org.komapper.core.dsl.data.SortIndex
 import org.komapper.core.dsl.data.SortItem
 import org.komapper.core.dsl.expr.AggregateFunction
 import org.komapper.core.dsl.expr.ArithmeticExpr
@@ -36,11 +37,19 @@ fun <T : Any> ColumnInfo<T>.desc(): ColumnInfo<T> {
     return SortItem.Desc(this)
 }
 
+fun desc(index: Number): Number {
+    return SortIndex.Desc(index)
+}
+
 fun <T : Any> ColumnInfo<T>.asc(): ColumnInfo<T> {
     if (this is SortItem.Asc) {
         return this
     }
     return SortItem.Asc(this)
+}
+
+fun asc(index: Number): Number {
+    return SortIndex.Asc(index)
 }
 
 fun <T : Any> avg(c: ColumnInfo<T>): ColumnInfo<Double> {

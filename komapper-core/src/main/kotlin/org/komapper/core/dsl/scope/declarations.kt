@@ -19,6 +19,7 @@ typealias SqlSelectOptionDeclaration = SqlSelectOptionScope.() -> Unit
 typealias SqlDeleteOptionDeclaration = SqlDeleteOptionScope.() -> Unit
 typealias SqlInsertOptionDeclaration = SqlInsertOptionScope.() -> Unit
 typealias SqlUpdateOptionDeclaration = SqlUpdateOptionScope.() -> Unit
+typealias SqlSetOperationOptionDeclaration = SqlSetOperationOptionScope.() -> Unit
 
 typealias TemplateSelectOptionDeclaration = TemplateSelectOptionScope.() -> Unit
 typealias TemplateUpdateOptionDeclaration = TemplateUpdateOptionScope.() -> Unit

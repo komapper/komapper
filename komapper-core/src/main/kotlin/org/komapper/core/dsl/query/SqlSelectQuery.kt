@@ -5,6 +5,9 @@ import org.komapper.core.config.Dialect
 import org.komapper.core.data.Statement
 import org.komapper.core.dsl.builder.SqlSelectStatementBuilder
 import org.komapper.core.dsl.context.SqlSelectContext
+import org.komapper.core.dsl.context.SqlSetOperationComponent
+import org.komapper.core.dsl.context.SqlSetOperationContext
+import org.komapper.core.dsl.context.SqlSetOperationKind
 import org.komapper.core.dsl.scope.HavingDeclaration
 import org.komapper.core.dsl.scope.HavingScope
 import org.komapper.core.dsl.scope.OnDeclaration
@@ -16,7 +19,7 @@ import org.komapper.core.metamodel.ColumnInfo
 import org.komapper.core.metamodel.EntityMetamodel
 import java.sql.ResultSet
 
-interface SqlSelectQuery<ENTITY> : ListQuery<ENTITY> {
+interface SqlSelectQuery<ENTITY> : SqlSetOperandQuery<ENTITY> {
 
     fun <OTHER_ENTITY> innerJoin(
         entityMetamodel: EntityMetamodel<OTHER_ENTITY>,
@@ -39,33 +42,33 @@ interface SqlSelectQuery<ENTITY> : ListQuery<ENTITY> {
 
     fun <A> select(
         e: EntityMetamodel<A>
-    ): ListQuery<A>
+    ): SqlSetOperandQuery<A>
 
     fun <A, B> select(
         e1: EntityMetamodel<A>,
         e2: EntityMetamodel<B>
-    ): ListQuery<Pair<A, B>>
+    ): SqlSetOperandQuery<Pair<A, B>>
 
     fun <A, B, C> select(
         e1: EntityMetamodel<A>,
         e2: EntityMetamodel<B>,
         e3: EntityMetamodel<C>
-    ): ListQuery<Triple<A, B, C>>
+    ): SqlSetOperandQuery<Triple<A, B, C>>
 
     fun <A : Any> select(
         columnInfo: ColumnInfo<A>
-    ): ListQuery<A>
+    ): SqlSetOperandQuery<A>
 
     fun <A : Any, B : Any> select(
         c1: ColumnInfo<A>,
         c2: ColumnInfo<B>
-    ): ListQuery<Pair<A, B>>
+    ): SqlSetOperandQuery<Pair<A, B>>
 
     fun <A : Any, B : Any, C : Any> select(
         c1: ColumnInfo<A>,
         c2: ColumnInfo<B>,
         c3: ColumnInfo<C>
-    ): ListQuery<Triple<A, B, C>>
+    ): SqlSetOperandQuery<Triple<A, B, C>>
 }
 
 internal data class SqlSelectQueryImpl<ENTITY>(
@@ -81,6 +84,7 @@ internal data class SqlSelectQueryImpl<ENTITY>(
     }
 
     private val support: SelectQuerySupport<ENTITY, SqlSelectContext<ENTITY>> = SelectQuerySupport(context)
+    override val setOperationComponent: SqlSetOperationComponent<ENTITY> = SqlSetOperationComponent.Leaf(context)
 
     override fun <OTHER_ENTITY> innerJoin(
         entityMetamodel: EntityMetamodel<OTHER_ENTITY>,
@@ -135,15 +139,43 @@ internal data class SqlSelectQueryImpl<ENTITY>(
         return copy(context = newContext)
     }
 
-    override fun option(declaration: SqlSelectOptionDeclaration): SqlSelectQuery<ENTITY> {
+    override fun option(declaration: SqlSelectOptionDeclaration): SqlSelectQueryImpl<ENTITY> {
         val scope = SqlSelectOptionScope(option)
         declaration(scope)
         return copy(option = scope.asOption())
     }
 
+    override fun except(other: SqlSetOperandQuery<ENTITY>): SqlSetOperationQuery<ENTITY> {
+        return setOperation(SqlSetOperationKind.EXCEPT, other)
+    }
+
+    override fun intersect(other: SqlSetOperandQuery<ENTITY>): SqlSetOperationQuery<ENTITY> {
+        return setOperation(SqlSetOperationKind.INTERSECT, other)
+    }
+
+    override fun union(other: SqlSetOperandQuery<ENTITY>): SqlSetOperationQuery<ENTITY> {
+        return setOperation(SqlSetOperationKind.UNION, other)
+    }
+
+    override fun unionAll(other: SqlSetOperandQuery<ENTITY>): SqlSetOperationQuery<ENTITY> {
+        return setOperation(SqlSetOperationKind.UNION_ALL, other)
+    }
+
+    private fun setOperation(
+        kind: SqlSetOperationKind,
+        other: SqlSetOperandQuery<ENTITY>
+    ): SqlSetOperationQuery<ENTITY> {
+        val component = SqlSetOperationComponent.Composite(kind, setOperationComponent, other.setOperationComponent)
+        val setOperatorContext = SqlSetOperationContext(component)
+        return SetOperationQueryImpl(setOperatorContext) { dialect, rs ->
+            val m = EntityMapper(dialect, rs)
+            m.execute(context.entityMetamodel)
+        }
+    }
+
     override fun <A> select(
         e: EntityMetamodel<A>,
-    ): ListQuery<A> {
+    ): SqlSetOperandQuery<A> {
         val entityMetamodels = context.getAliasableEntityMetamodels()
         if (entityMetamodels.none { it == e }) error(entityMetamodelNotFound("e"))
         val newContext = context.setTable(e)
@@ -156,7 +188,7 @@ internal data class SqlSelectQueryImpl<ENTITY>(
     override fun <A, B> select(
         e1: EntityMetamodel<A>,
         e2: EntityMetamodel<B>
-    ): ListQuery<Pair<A, B>> {
+    ): SqlSetOperandQuery<Pair<A, B>> {
         val entityMetamodels = context.getAliasableEntityMetamodels()
         if (entityMetamodels.none { it == e1 }) error(entityMetamodelNotFound("e1"))
         if (entityMetamodels.none { it == e2 }) error(entityMetamodelNotFound("e2"))
@@ -171,7 +203,7 @@ internal data class SqlSelectQueryImpl<ENTITY>(
         e1: EntityMetamodel<A>,
         e2: EntityMetamodel<B>,
         e3: EntityMetamodel<C>
-    ): ListQuery<Triple<A, B, C>> {
+    ): SqlSetOperandQuery<Triple<A, B, C>> {
         val entityMetamodels = context.getAliasableEntityMetamodels()
         if (entityMetamodels.none { it == e1 }) error(entityMetamodelNotFound("e1"))
         if (entityMetamodels.none { it == e2 }) error(entityMetamodelNotFound("e2"))
@@ -183,7 +215,7 @@ internal data class SqlSelectQueryImpl<ENTITY>(
         }
     }
 
-    override fun <A : Any> select(columnInfo: ColumnInfo<A>): ListQuery<A> {
+    override fun <A : Any> select(columnInfo: ColumnInfo<A>): SqlSetOperandQuery<A> {
         val newContext = context.setColumn(columnInfo)
         return Transformable(newContext, option) { dialect, rs ->
             val m = PropertyMapper(dialect, rs)
@@ -191,7 +223,7 @@ internal data class SqlSelectQueryImpl<ENTITY>(
         }
     }
 
-    override fun <A : Any, B : Any> select(c1: ColumnInfo<A>, c2: ColumnInfo<B>): ListQuery<Pair<A, B>> {
+    override fun <A : Any, B : Any> select(c1: ColumnInfo<A>, c2: ColumnInfo<B>): SqlSetOperandQuery<Pair<A, B>> {
         val newContext = context.setColumns(listOf(c1, c2))
         return Transformable(newContext, option) { dialect, rs ->
             val m = PropertyMapper(dialect, rs)
@@ -203,7 +235,7 @@ internal data class SqlSelectQueryImpl<ENTITY>(
         c1: ColumnInfo<A>,
         c2: ColumnInfo<B>,
         c3: ColumnInfo<C>
-    ): ListQuery<Triple<A, B, C>> {
+    ): SqlSetOperandQuery<Triple<A, B, C>> {
         val newContext = context.setColumns(listOf(c1, c2, c3))
         return Transformable(newContext, option) { dialect, rs: ResultSet ->
             val m = PropertyMapper(dialect, rs)
@@ -242,59 +274,83 @@ internal data class SqlSelectQueryImpl<ENTITY>(
         }
         return Terminal(c, option, provider, transformer)
     }
-}
 
-private class Transformable<T>(
-    private val context: SqlSelectContext<*>,
-    private val option: SqlSelectOption,
-    private val provider: (Dialect, ResultSet) -> T
-) : ListQuery<T> {
+    private data class Transformable<T>(
+        private val context: SqlSelectContext<*>,
+        private val option: SqlSelectOption,
+        private val provider: (Dialect, ResultSet) -> T
+    ) : SqlSetOperandQuery<T> {
 
-    override fun execute(config: DatabaseConfig): List<T> {
-        val terminal = createTerminal { it.toList() }
-        return terminal.execute(config)
-    }
+        override val setOperationComponent = SqlSetOperationComponent.Leaf<T>(context)
 
-    override fun statement(dialect: Dialect): Statement {
-        val terminal = createTerminal { it.toList() }
-        return terminal.statement(dialect)
-    }
-
-    override fun first(): Query<T> {
-        return createTerminal { it.first() }
-    }
-
-    override fun firstOrNull(): Query<T?> {
-        return createTerminal { it.firstOrNull() }
-    }
-
-    override fun <R> transform(transformer: (Sequence<T>) -> R): Query<R> {
-        return createTerminal(transformer)
-    }
-
-    private fun <R> createTerminal(transformer: (Sequence<T>) -> R): Query<R> {
-        return Terminal(context, option, provider, transformer)
-    }
-}
-
-private class Terminal<T, R>(
-    private val context: SqlSelectContext<*>,
-    private val option: SqlSelectOption,
-    private val provider: (Dialect, ResultSet) -> T,
-    val transformer: (Sequence<T>) -> R
-) : Query<R> {
-
-    override fun execute(config: DatabaseConfig): R {
-        if (!option.allowEmptyWhereClause && context.where.isEmpty()) {
-            error("Empty where clause is not allowed.")
+        override fun except(other: SqlSetOperandQuery<T>): SqlSetOperationQuery<T> {
+            return setOperation(SqlSetOperationKind.EXCEPT, other)
         }
-        val statement = statement(config.dialect)
-        val executor = JdbcExecutor(config, option.asJdbcOption())
-        return executor.executeQuery(statement, provider, transformer)
+
+        override fun intersect(other: SqlSetOperandQuery<T>): SqlSetOperationQuery<T> {
+            return setOperation(SqlSetOperationKind.INTERSECT, other)
+        }
+
+        override fun union(other: SqlSetOperandQuery<T>): SqlSetOperationQuery<T> {
+            return setOperation(SqlSetOperationKind.UNION, other)
+        }
+
+        override fun unionAll(other: SqlSetOperandQuery<T>): SqlSetOperationQuery<T> {
+            return setOperation(SqlSetOperationKind.UNION_ALL, other)
+        }
+
+        private fun setOperation(kind: SqlSetOperationKind, other: SqlSetOperandQuery<T>): SqlSetOperationQuery<T> {
+            val component = SqlSetOperationComponent.Composite(kind, setOperationComponent, other.setOperationComponent)
+            val context = SqlSetOperationContext(component)
+            return SetOperationQueryImpl(context, provider = provider)
+        }
+
+        override fun execute(config: DatabaseConfig): List<T> {
+            val terminal = createTerminal { it.toList() }
+            return terminal.execute(config)
+        }
+
+        override fun statement(dialect: Dialect): Statement {
+            val terminal = createTerminal { it.toList() }
+            return terminal.statement(dialect)
+        }
+
+        override fun first(): Query<T> {
+            return createTerminal { it.first() }
+        }
+
+        override fun firstOrNull(): Query<T?> {
+            return createTerminal { it.firstOrNull() }
+        }
+
+        override fun <R> transform(transformer: (Sequence<T>) -> R): Query<R> {
+            return createTerminal(transformer)
+        }
+
+        private fun <R> createTerminal(transformer: (Sequence<T>) -> R): Query<R> {
+            return Terminal(context, option, provider, transformer)
+        }
     }
 
-    override fun statement(dialect: Dialect): Statement {
-        val builder = SqlSelectStatementBuilder(dialect, context)
-        return builder.build()
+    private class Terminal<T, R>(
+        private val context: SqlSelectContext<*>,
+        private val option: SqlSelectOption,
+        private val provider: (Dialect, ResultSet) -> T,
+        val transformer: (Sequence<T>) -> R
+    ) : Query<R> {
+
+        override fun execute(config: DatabaseConfig): R {
+            if (!option.allowEmptyWhereClause && context.where.isEmpty()) {
+                error("Empty where clause is not allowed.")
+            }
+            val statement = statement(config.dialect)
+            val executor = JdbcExecutor(config, option.asJdbcOption())
+            return executor.executeQuery(statement, provider, transformer)
+        }
+
+        override fun statement(dialect: Dialect): Statement {
+            val builder = SqlSelectStatementBuilder(dialect, context)
+            return builder.build()
+        }
     }
 }

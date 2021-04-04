@@ -4,6 +4,7 @@ import org.komapper.core.DatabaseConfig
 import org.komapper.core.config.Dialect
 import org.komapper.core.config.EmptyDialect
 import org.komapper.core.data.Statement
+import org.komapper.core.dsl.context.SqlSetOperationComponent
 
 interface Query<T> {
     fun execute(config: DatabaseConfig): T
@@ -64,4 +65,13 @@ interface ListQuery<T> : Query<List<T>> {
     fun first(): Query<T>
     fun firstOrNull(): Query<T?>
     fun <R> transform(transformer: (Sequence<T>) -> R): Query<R>
+}
+
+interface SqlSetOperandQuery<T> : ListQuery<T> {
+    val setOperationComponent: SqlSetOperationComponent<T>
+
+    infix fun except(other: SqlSetOperandQuery<T>): SqlSetOperationQuery<T>
+    infix fun intersect(other: SqlSetOperandQuery<T>): SqlSetOperationQuery<T>
+    infix fun union(other: SqlSetOperandQuery<T>): SqlSetOperationQuery<T>
+    infix fun unionAll(other: SqlSetOperandQuery<T>): SqlSetOperationQuery<T>
 }

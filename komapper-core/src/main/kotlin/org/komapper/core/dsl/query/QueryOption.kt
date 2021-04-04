@@ -47,6 +47,8 @@ internal interface SqlUpdateOption : WhereOption
 
 internal interface SqlSelectOption : SelectOption, WhereOption
 
+internal interface SqlSetOperationOption : SelectOption, WhereOption
+
 internal interface TemplateSelectOption : SelectOption
 
 internal interface TemplateUpdateOption : QueryOption
@@ -72,6 +74,7 @@ internal data class QueryOptionImpl(
     SqlInsertOption,
     SqlSelectOption,
     SqlUpdateOption,
+    SqlSetOperationOption,
     TemplateSelectOption,
     TemplateUpdateOption,
     ScriptExecutionOption {
