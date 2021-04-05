@@ -36,6 +36,19 @@ interface Query<T> {
         }
     }
 
+    fun <R> flatZip(transformer: (T) -> Query<R>): Query<Pair<T, R>> {
+        return object : Query<Pair<T, R>> {
+            override fun run(config: DatabaseConfig): Pair<T, R> {
+                val result = this@Query.run(config)
+                return result to transformer(result).run(config)
+            }
+
+            override fun dryRun(dialect: Dialect): Statement {
+                return this@Query.dryRun(dialect)
+            }
+        }
+    }
+
     infix operator fun <S> plus(other: Query<S>): Query<S> {
         return object : Query<S> {
             override fun run(config: DatabaseConfig): S {
