@@ -10,19 +10,6 @@ interface Query<T> {
     fun run(config: DatabaseConfig): T
     fun dryRun(dialect: Dialect = EmptyDialect()): Statement
 
-    fun <S> map(transformer: (T) -> S): Query<S> {
-        return object : Query<S> {
-            override fun run(config: DatabaseConfig): S {
-                val value = this@Query.run(config)
-                return transformer(value)
-            }
-
-            override fun dryRun(dialect: Dialect): Statement {
-                return this@Query.dryRun(dialect)
-            }
-        }
-    }
-
     fun <R> flatMap(transformer: (T) -> Query<R>): Query<R> {
         return object : Query<R> {
             override fun run(config: DatabaseConfig): R {
