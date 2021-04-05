@@ -24,7 +24,7 @@ internal data class SqlDeleteQueryImpl<ENTITY>(
     override fun where(declaration: WhereDeclaration): SqlDeleteQueryImpl<ENTITY> {
         val scope = WhereScope()
         declaration(scope)
-        val newContext = context.addWhere(scope.criteria.toList())
+        val newContext = context.addWhere(scope.toList())
         return copy(context = newContext)
     }
 

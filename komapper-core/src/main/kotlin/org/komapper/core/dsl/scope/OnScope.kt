@@ -1,13 +1,15 @@
 package org.komapper.core.dsl.scope
 
 import org.komapper.core.Scope
-import org.komapper.core.dsl.context.OnContext
 import org.komapper.core.dsl.data.Criterion
 import org.komapper.core.dsl.data.Operand
 import org.komapper.core.metamodel.PropertyMetamodel
 
 @Scope
-class OnScope<ENTITY> internal constructor(private val context: OnContext) {
+class OnScope<ENTITY> internal constructor(
+    private val context: MutableList<Criterion> = mutableListOf()
+) :
+    List<Criterion> by context {
 
     companion object {
         operator fun <ENTITY> OnDeclaration<ENTITY>.plus(other: OnDeclaration<ENTITY>): OnDeclaration<ENTITY> {

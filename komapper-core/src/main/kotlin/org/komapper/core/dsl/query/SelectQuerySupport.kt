@@ -3,7 +3,6 @@ package org.komapper.core.dsl.query
 import org.komapper.core.dsl.context.ForUpdate
 import org.komapper.core.dsl.context.Join
 import org.komapper.core.dsl.context.JoinKind
-import org.komapper.core.dsl.context.OnContext
 import org.komapper.core.dsl.context.SelectContext
 import org.komapper.core.dsl.data.SortItem
 import org.komapper.core.dsl.option.ForUpdateOption
@@ -37,11 +36,10 @@ internal data class SelectQuerySupport<ENTITY, CONTEXT : SelectContext<ENTITY, C
         declaration: OnDeclaration<OTHER_ENTITY>,
         kind: JoinKind
     ): CONTEXT {
-        val onContext = OnContext()
-        val scope = OnScope<OTHER_ENTITY>(onContext)
+        val scope = OnScope<OTHER_ENTITY>()
         declaration(scope)
-        if (onContext.isNotEmpty()) {
-            val join = Join(entityMetamodel, kind, onContext.toList())
+        if (scope.isNotEmpty()) {
+            val join = Join(entityMetamodel, kind, scope.toList())
             return context.addJoin(join)
         }
         return context
@@ -50,7 +48,7 @@ internal data class SelectQuerySupport<ENTITY, CONTEXT : SelectContext<ENTITY, C
     fun where(declaration: WhereDeclaration): CONTEXT {
         val scope = WhereScope()
         declaration(scope)
-        return context.addWhere(scope.criteria.toList())
+        return context.addWhere(scope.toList())
     }
 
     fun orderBy(vararg sortItems: ColumnInfo<*>): CONTEXT {

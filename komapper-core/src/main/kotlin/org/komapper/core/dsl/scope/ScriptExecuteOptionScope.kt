@@ -5,7 +5,7 @@ import org.komapper.core.dsl.query.QueryOptionImpl
 import org.komapper.core.dsl.query.ScriptExecutionOption
 
 @Scope
-class ScriptExecutionOptionScope internal constructor(
+class ScriptExecuteOptionScope internal constructor(
     internal var option: ScriptExecutionOption
 ) {
 

@@ -24,4 +24,4 @@ typealias SqlSetOperationOptionDeclaration = SqlSetOperationOptionScope.() -> Un
 typealias TemplateSelectOptionDeclaration = TemplateSelectOptionScope.() -> Unit
 typealias TemplateUpdateOptionDeclaration = TemplateUpdateOptionScope.() -> Unit
 
-typealias ScriptExecutionOptionDeclaration = ScriptExecutionOptionScope.() -> Unit
+typealias ScriptExecutionOptionDeclaration = ScriptExecuteOptionScope.() -> Unit

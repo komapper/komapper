@@ -67,7 +67,7 @@ internal data class SqlSubqueryImpl<ENTITY>(
     override fun having(declaration: HavingDeclaration): SqlSubqueryImpl<ENTITY> {
         val scope = HavingScope()
         declaration(scope)
-        val newContext = context.addHaving(scope.criteria.toList())
+        val newContext = context.addHaving(scope.toList())
         return copy(context = newContext)
     }
 

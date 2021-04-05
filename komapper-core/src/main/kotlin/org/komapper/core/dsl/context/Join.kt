@@ -8,3 +8,7 @@ internal data class Join<ENTITY>(
     val kind: JoinKind,
     val on: List<Criterion>
 )
+
+internal enum class JoinKind {
+    INNER, LEFT_OUTER
+}

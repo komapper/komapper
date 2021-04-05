@@ -6,7 +6,8 @@ import org.komapper.core.dsl.data.Criterion
 @Scope
 class HavingScope internal constructor(
     private val support: FilterScopeSupport = FilterScopeSupport()
-) : FilterScope by support {
+) : FilterScope by support,
+    List<Criterion> by support {
 
     companion object {
         operator fun HavingDeclaration.plus(other: HavingDeclaration): HavingDeclaration {
@@ -16,8 +17,6 @@ class HavingScope internal constructor(
             }
         }
     }
-
-    internal val criteria: List<Criterion> get() = support.context.criteria
 
     fun and(declaration: HavingDeclaration) {
         addCriteria(declaration, Criterion::And)
@@ -34,7 +33,7 @@ class HavingScope internal constructor(
     private fun addCriteria(declaration: HavingDeclaration, operator: (List<Criterion>) -> Criterion) {
         val childScope = HavingScope()
         declaration(childScope)
-        val criteria = childScope.criteria.toList()
+        val criteria = childScope.toList()
         support.add(operator(criteria))
     }
 }

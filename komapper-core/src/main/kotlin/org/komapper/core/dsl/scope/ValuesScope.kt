@@ -1,14 +1,13 @@
 package org.komapper.core.dsl.scope
 
 import org.komapper.core.Scope
-import org.komapper.core.dsl.context.ValuesContext
 import org.komapper.core.dsl.data.Operand
 import org.komapper.core.metamodel.ColumnInfo
 
 @Scope
 class ValuesScope internal constructor(
-    internal val context: ValuesContext = ValuesContext()
-) {
+    private val context: MutableList<Pair<Operand.Column, Operand.Parameter>> = mutableListOf()
+) : List<Pair<Operand.Column, Operand.Parameter>> by context {
 
     companion object {
         operator fun ValuesDeclaration.plus(other: ValuesDeclaration): ValuesDeclaration {

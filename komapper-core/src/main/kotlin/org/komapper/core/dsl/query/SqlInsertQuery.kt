@@ -25,7 +25,7 @@ internal data class SqlInsertQueryImpl<ENTITY>(
     override fun values(declaration: ValuesDeclaration): SqlInsertQueryImpl<ENTITY> {
         val scope = ValuesScope()
         declaration(scope)
-        val newContext = context.addValues(scope.context.toList())
+        val newContext = context.addValues(scope.toList())
         return copy(context = newContext)
     }
 
