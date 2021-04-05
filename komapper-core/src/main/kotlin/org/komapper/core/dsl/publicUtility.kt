@@ -1,8 +1,8 @@
 package org.komapper.core.dsl
 
-import org.komapper.core.dsl.data.Operand
-import org.komapper.core.dsl.data.SortIndex
-import org.komapper.core.dsl.data.SortItem
+import org.komapper.core.dsl.element.Operand
+import org.komapper.core.dsl.element.SortIndex
+import org.komapper.core.dsl.element.SortItem
 import org.komapper.core.dsl.expr.AggregateFunction
 import org.komapper.core.dsl.expr.ArithmeticExpr
 import org.komapper.core.dsl.expr.StringFunction

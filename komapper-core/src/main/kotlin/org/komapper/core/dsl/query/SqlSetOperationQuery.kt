@@ -7,7 +7,7 @@ import org.komapper.core.dsl.builder.SqlSetOperationStatementBuilder
 import org.komapper.core.dsl.context.SqlSetOperationComponent
 import org.komapper.core.dsl.context.SqlSetOperationContext
 import org.komapper.core.dsl.context.SqlSetOperationKind
-import org.komapper.core.dsl.data.SortIndex
+import org.komapper.core.dsl.element.SortIndex
 import org.komapper.core.dsl.scope.SqlSetOperationOptionDeclaration
 import org.komapper.core.dsl.scope.SqlSetOperationOptionScope
 import org.komapper.core.jdbc.JdbcExecutor

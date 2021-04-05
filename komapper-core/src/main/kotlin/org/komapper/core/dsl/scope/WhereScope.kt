@@ -1,7 +1,7 @@
 package org.komapper.core.dsl.scope
 
 import org.komapper.core.Scope
-import org.komapper.core.dsl.data.Criterion
+import org.komapper.core.dsl.element.Criterion
 
 @Scope
 class WhereScope internal constructor(

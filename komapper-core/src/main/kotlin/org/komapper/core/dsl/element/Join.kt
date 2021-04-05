@@ -1,6 +1,5 @@
-package org.komapper.core.dsl.context
+package org.komapper.core.dsl.element
 
-import org.komapper.core.dsl.data.Criterion
 import org.komapper.core.metamodel.EntityMetamodel
 
 internal data class Join<ENTITY>(

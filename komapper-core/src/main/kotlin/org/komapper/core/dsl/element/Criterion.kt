@@ -1,4 +1,4 @@
-package org.komapper.core.dsl.data
+package org.komapper.core.dsl.element
 
 import org.komapper.core.dsl.context.SqlSelectContext
 import org.komapper.core.dsl.option.LikeOption

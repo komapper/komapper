@@ -1,6 +1,6 @@
 package org.komapper.core.dsl.context
 
-import org.komapper.core.dsl.data.Criterion
+import org.komapper.core.dsl.element.Criterion
 import org.komapper.core.metamodel.EntityMetamodel
 
 internal data class SqlDeleteContext<ENTITY>(

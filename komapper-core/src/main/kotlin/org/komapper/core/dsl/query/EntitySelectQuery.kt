@@ -5,7 +5,8 @@ import org.komapper.core.config.Dialect
 import org.komapper.core.data.Statement
 import org.komapper.core.dsl.builder.EntitySelectStatementBuilder
 import org.komapper.core.dsl.context.EntitySelectContext
-import org.komapper.core.dsl.context.Projection
+import org.komapper.core.dsl.element.Associator
+import org.komapper.core.dsl.element.Projection
 import org.komapper.core.dsl.scope.EntitySelectOptionDeclaration
 import org.komapper.core.dsl.scope.EntitySelectOptionScope
 import org.komapper.core.dsl.scope.OnDeclaration

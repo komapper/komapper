@@ -4,7 +4,7 @@ import org.komapper.core.config.Dialect
 import org.komapper.core.data.Statement
 import org.komapper.core.data.StatementBuffer
 import org.komapper.core.dsl.context.SqlDeleteContext
-import org.komapper.core.dsl.data.Criterion
+import org.komapper.core.dsl.element.Criterion
 import org.komapper.core.metamodel.TableInfo
 
 internal class SqlDeleteStatementBuilder<ENTITY>(

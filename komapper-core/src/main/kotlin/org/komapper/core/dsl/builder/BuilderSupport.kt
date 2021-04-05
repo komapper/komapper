@@ -4,8 +4,8 @@ import org.komapper.core.config.Dialect
 import org.komapper.core.data.StatementBuffer
 import org.komapper.core.data.Value
 import org.komapper.core.dsl.context.SqlSelectContext
-import org.komapper.core.dsl.data.Criterion
-import org.komapper.core.dsl.data.Operand
+import org.komapper.core.dsl.element.Criterion
+import org.komapper.core.dsl.element.Operand
 import org.komapper.core.dsl.expr.AggregateFunction
 import org.komapper.core.dsl.expr.ArithmeticExpr
 import org.komapper.core.dsl.expr.StringFunction

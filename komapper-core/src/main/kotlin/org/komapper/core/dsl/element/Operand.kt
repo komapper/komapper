@@ -1,4 +1,4 @@
-package org.komapper.core.dsl.data
+package org.komapper.core.dsl.element
 
 import org.komapper.core.metamodel.ColumnInfo
 

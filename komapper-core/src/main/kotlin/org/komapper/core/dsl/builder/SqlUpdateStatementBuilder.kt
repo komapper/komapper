@@ -4,8 +4,8 @@ import org.komapper.core.config.Dialect
 import org.komapper.core.data.Statement
 import org.komapper.core.data.StatementBuffer
 import org.komapper.core.dsl.context.SqlUpdateContext
-import org.komapper.core.dsl.data.Criterion
-import org.komapper.core.dsl.data.Operand
+import org.komapper.core.dsl.element.Criterion
+import org.komapper.core.dsl.element.Operand
 import org.komapper.core.metamodel.TableInfo
 
 internal class SqlUpdateStatementBuilder<ENTITY>(

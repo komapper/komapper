@@ -2,11 +2,11 @@ package org.komapper.core.dsl.builder
 
 import org.komapper.core.config.Dialect
 import org.komapper.core.data.StatementBuffer
-import org.komapper.core.dsl.context.JoinKind
-import org.komapper.core.dsl.context.Projection
 import org.komapper.core.dsl.context.SelectContext
-import org.komapper.core.dsl.data.Criterion
-import org.komapper.core.dsl.data.SortItem
+import org.komapper.core.dsl.element.Criterion
+import org.komapper.core.dsl.element.JoinKind
+import org.komapper.core.dsl.element.Projection
+import org.komapper.core.dsl.element.SortItem
 import org.komapper.core.metamodel.ColumnInfo
 import org.komapper.core.metamodel.TableInfo
 

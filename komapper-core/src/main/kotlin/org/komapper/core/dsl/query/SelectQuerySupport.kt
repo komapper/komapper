@@ -1,10 +1,10 @@
 package org.komapper.core.dsl.query
 
-import org.komapper.core.dsl.context.ForUpdate
-import org.komapper.core.dsl.context.Join
-import org.komapper.core.dsl.context.JoinKind
 import org.komapper.core.dsl.context.SelectContext
-import org.komapper.core.dsl.data.SortItem
+import org.komapper.core.dsl.element.ForUpdate
+import org.komapper.core.dsl.element.Join
+import org.komapper.core.dsl.element.JoinKind
+import org.komapper.core.dsl.element.SortItem
 import org.komapper.core.dsl.option.ForUpdateOption
 import org.komapper.core.dsl.scope.OnDeclaration
 import org.komapper.core.dsl.scope.OnScope

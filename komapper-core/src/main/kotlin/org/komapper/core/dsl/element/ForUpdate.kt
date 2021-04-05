@@ -1,4 +1,4 @@
-package org.komapper.core.dsl.context
+package org.komapper.core.dsl.element
 
 import org.komapper.core.dsl.option.ForUpdateOption
 

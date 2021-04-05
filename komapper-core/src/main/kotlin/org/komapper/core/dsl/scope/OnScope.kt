@@ -1,8 +1,8 @@
 package org.komapper.core.dsl.scope
 
 import org.komapper.core.Scope
-import org.komapper.core.dsl.data.Criterion
-import org.komapper.core.dsl.data.Operand
+import org.komapper.core.dsl.element.Criterion
+import org.komapper.core.dsl.element.Operand
 import org.komapper.core.metamodel.PropertyMetamodel
 
 @Scope

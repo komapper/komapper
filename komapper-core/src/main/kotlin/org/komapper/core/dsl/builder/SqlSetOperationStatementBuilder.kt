@@ -7,7 +7,7 @@ import org.komapper.core.dsl.context.SqlSelectContext
 import org.komapper.core.dsl.context.SqlSetOperationComponent
 import org.komapper.core.dsl.context.SqlSetOperationContext
 import org.komapper.core.dsl.context.SqlSetOperationKind
-import org.komapper.core.dsl.data.SortIndex
+import org.komapper.core.dsl.element.SortIndex
 
 internal class SqlSetOperationStatementBuilder(
     private val dialect: Dialect,

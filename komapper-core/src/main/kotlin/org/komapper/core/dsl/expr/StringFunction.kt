@@ -1,6 +1,6 @@
 package org.komapper.core.dsl.expr
 
-import org.komapper.core.dsl.data.Operand
+import org.komapper.core.dsl.element.Operand
 import org.komapper.core.metamodel.ColumnInfo
 
 internal sealed class StringFunction : ColumnInfo<String> {
