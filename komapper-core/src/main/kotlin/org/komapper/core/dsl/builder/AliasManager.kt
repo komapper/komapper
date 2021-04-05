@@ -1,54 +1,31 @@
 package org.komapper.core.dsl.builder
 
 import org.komapper.core.dsl.context.Context
-import org.komapper.core.metamodel.ColumnInfo
 import org.komapper.core.metamodel.TableInfo
 
 internal class AliasManager(context: Context<*>, private val parent: AliasManager? = null) {
-    private val tableAliasMap: MutableMap<TableInfo, String> = mutableMapOf()
-    private val columnAliasMap: MutableMap<ColumnInfo<*>, String> = mutableMapOf()
+    private val aliasMap: Map<TableInfo, String>
     private val index: Int
 
     init {
+        val map: MutableMap<TableInfo, String> = mutableMapOf()
         var i = parent?.index ?: 0
         for (e in context.getAliasableEntityMetamodels()) {
             val alias = "t" + i + "_"
             i++
-            tableAliasMap[e] = alias
-            for (p in e.properties()) {
-                columnAliasMap[p] = alias
-            }
+            map[e] = alias
         }
+        this.aliasMap = map.toMap()
         this.index = i
     }
 
     fun getAlias(tableInfo: TableInfo): String? {
-        return getAlias(
-            tableInfo,
-            { parent, key -> parent.getAlias(key) },
-            { key -> tableAliasMap[key] }
-        )
-    }
-
-    fun getAlias(columnInfo: ColumnInfo<*>): String? {
-        return getAlias(
-            columnInfo,
-            { parent, key -> parent.getAlias(key) },
-            { key -> columnAliasMap[key] }
-        )
-    }
-
-    private fun <KEY> getAlias(
-        key: KEY,
-        getParentAlias: (AliasManager, KEY) -> String?,
-        getCurrentAlias: (KEY) -> String?
-    ): String? {
         if (parent != null) {
-            val alias = getParentAlias(parent, key)
+            val alias = parent.getAlias(tableInfo)
             if (alias != null) {
                 return alias
             }
         }
-        return getCurrentAlias(key)
+        return aliasMap[tableInfo]
     }
 }

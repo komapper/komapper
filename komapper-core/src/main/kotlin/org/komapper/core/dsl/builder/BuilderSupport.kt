@@ -22,7 +22,7 @@ internal class BuilderSupport(
 
     fun visitTableInfo(tableInfo: TableInfo) {
         val name = tableInfo.getName(dialect::quote)
-        val alias = aliasManager.getAlias(tableInfo) ?: error("no alias for '${tableInfo.tableName()}'")
+        val alias = aliasManager.getAlias(tableInfo) ?: error("Alias is not found. table=$name")
         buf.append("$name $alias")
     }
 
@@ -39,7 +39,9 @@ internal class BuilderSupport(
             }
             else -> {
                 val name = columnInfo.getName(dialect::quote)
-                val alias = aliasManager.getAlias(columnInfo) ?: error("no alias for $name")
+                val tableInfo = columnInfo.owner
+                val alias = aliasManager.getAlias(tableInfo)
+                    ?: error("Alias is not found. table=${tableInfo.getName(dialect::quote)}, column=$name")
                 buf.append("$alias.$name")
             }
         }

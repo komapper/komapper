@@ -1,6 +1,7 @@
 package org.komapper.core.dsl.element
 
 import org.komapper.core.metamodel.ColumnInfo
+import org.komapper.core.metamodel.TableInfo
 import kotlin.reflect.KClass
 
 internal sealed class SortIndex : Number(), ColumnInfo<Number> {
@@ -34,6 +35,8 @@ internal sealed class SortIndex : Number(), ColumnInfo<Number> {
         return index.toShort()
     }
 
+    override val owner: TableInfo
+        get() = throw UnsupportedOperationException()
     override val klass: KClass<Number>
         get() = throw UnsupportedOperationException()
     override val columnName: String

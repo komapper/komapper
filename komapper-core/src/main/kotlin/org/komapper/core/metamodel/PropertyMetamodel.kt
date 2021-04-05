@@ -3,7 +3,7 @@ package org.komapper.core.metamodel
 import kotlin.reflect.KClass
 
 interface PropertyMetamodel<E, T : Any> : ColumnInfo<T> {
-    val owner: EntityMetamodel<E>
+    override val owner: EntityMetamodel<E>
     val getter: (E) -> T?
     val getterWithUncheckedCast: (Any) -> T?
     val setter: (E, T) -> E
