@@ -12,6 +12,7 @@ import org.komapper.core.dsl.concat
 import org.komapper.core.dsl.count
 import org.komapper.core.dsl.desc
 import org.komapper.core.dsl.max
+import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.min
 import org.komapper.core.dsl.sum
 
@@ -118,7 +119,7 @@ class SqlSelectQueryTest(private val db: Database) {
     }
 
     @Test
-    fun execute_selectRecord() {
+    fun propertyRecord() {
         val a = Address.metamodel()
         val list = db.execute {
             SqlQuery.from(a)
@@ -139,6 +140,26 @@ class SqlSelectQueryTest(private val db: Database) {
         assertEquals("STREET 2", record1[a.street])
         assertEquals(1, record1[a.version])
         assertEquals("STREET 2 test", record1[concat(a.street, " test")])
+    }
+
+    @Test
+    fun entityRecord() {
+        val a = Address.metamodel()
+        val array: Array<EntityMetamodel<*>> = arrayOf(a)
+        val list = db.execute {
+            SqlQuery.from(a)
+                .where {
+                    a.addressId inList listOf(1, 2)
+                }
+                .orderBy(a.addressId)
+                .select(a, a, a, a)
+        }
+        assertEquals(2, list.size)
+        val address = list[0][a]
+        assertNotNull(address)
+//        val record0 = list[0]
+//        val result = record0.contains(a.addressId)
+//        println(result)
     }
 
     @Test

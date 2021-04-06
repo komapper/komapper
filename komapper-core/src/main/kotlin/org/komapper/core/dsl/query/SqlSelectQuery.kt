@@ -55,6 +55,10 @@ interface SqlSelectQuery<ENTITY> : SqlSetOperandQuery<ENTITY> {
         e3: EntityMetamodel<C>
     ): SqlSetOperandQuery<Triple<A?, B?, C?>>
 
+    fun select(
+        vararg entityMetamodels: EntityMetamodel<*>,
+    ): SqlSetOperandQuery<EntityRecord>
+
     fun <A : Any> select(
         p: PropertyExpression<A>
     ): SqlSetOperandQuery<A?>
@@ -72,11 +76,7 @@ interface SqlSelectQuery<ENTITY> : SqlSetOperandQuery<ENTITY> {
 
     fun select(
         vararg propertyExpressions: PropertyExpression<*>,
-    ): SqlSetOperandQuery<Record>
-
-    fun select(
-        propertyExpressions: List<PropertyExpression<*>>,
-    ): SqlSetOperandQuery<Record>
+    ): SqlSetOperandQuery<PropertyRecord>
 }
 
 internal data class SqlSelectQueryImpl<ENTITY>(
@@ -224,6 +224,16 @@ internal data class SqlSelectQueryImpl<ENTITY>(
         }
     }
 
+    override fun select(vararg entityMetamodels: EntityMetamodel<*>): SqlSetOperandQuery<EntityRecord> {
+        val list = entityMetamodels.toList()
+        val newContext = context.setEntities(list)
+        return Transformable(newContext, option) { dialect, rs: ResultSet ->
+            val mapper = EntityMapper(dialect, rs)
+            val map = list.associateWith { mapper.execute(it) }
+            EntityRecordImpl(map)
+        }
+    }
+
     override fun <A : Any> select(p: PropertyExpression<A>): SqlSetOperandQuery<A?> {
         val newContext = context.setProperty(p)
         return Transformable(newContext, option) { dialect, rs ->
@@ -232,7 +242,10 @@ internal data class SqlSelectQueryImpl<ENTITY>(
         }
     }
 
-    override fun <A : Any, B : Any> select(p1: PropertyExpression<A>, p2: PropertyExpression<B>): SqlSetOperandQuery<Pair<A?, B?>> {
+    override fun <A : Any, B : Any> select(
+        p1: PropertyExpression<A>,
+        p2: PropertyExpression<B>
+    ): SqlSetOperandQuery<Pair<A?, B?>> {
         val newContext = context.setProperties(listOf(p1, p2))
         return Transformable(newContext, option) { dialect, rs ->
             val m = PropertyMapper(dialect, rs)
@@ -252,20 +265,13 @@ internal data class SqlSelectQueryImpl<ENTITY>(
         }
     }
 
-    override fun select(vararg propertyExpressions: PropertyExpression<*>): SqlSetOperandQuery<Record> {
-        return selectAsRecord(propertyExpressions.toList())
-    }
-
-    override fun select(propertyExpressions: List<PropertyExpression<*>>): SqlSetOperandQuery<Record> {
-        return selectAsRecord(propertyExpressions)
-    }
-
-    private fun selectAsRecord(propertyExpressions: List<PropertyExpression<*>>): SqlSetOperandQuery<Record> {
-        val newContext = context.setProperties(propertyExpressions)
+    override fun select(vararg propertyExpressions: PropertyExpression<*>): SqlSetOperandQuery<PropertyRecord> {
+        val list = propertyExpressions.toList()
+        val newContext = context.setProperties(list)
         return Transformable(newContext, option) { dialect, rs: ResultSet ->
             val mapper = PropertyMapper(dialect, rs)
-            val map = propertyExpressions.associateWith { mapper.execute(it) }
-            RecordImpl(map)
+            val map = list.associateWith { mapper.execute(it) }
+            PropertyRecordImpl(map)
         }
     }
 

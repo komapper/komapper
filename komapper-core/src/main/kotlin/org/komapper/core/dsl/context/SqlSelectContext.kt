@@ -35,7 +35,7 @@ internal data class SqlSelectContext<ENTITY>(
     }
 
     fun setEntities(entityMetamodels: List<EntityMetamodel<*>>): SqlSelectContext<ENTITY> {
-        return copy(projection = Projection.Entities(entityMetamodels.distinct()))
+        return copy(projection = Projection.Entities(entityMetamodels))
     }
 
     override fun addJoin(join: Join<*>): SqlSelectContext<ENTITY> {
