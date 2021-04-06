@@ -4,8 +4,8 @@ import org.komapper.core.DatabaseConfig
 import org.komapper.core.config.Dialect
 import org.komapper.core.config.JdbcOption
 import org.komapper.core.data.Statement
+import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.jdbc.JdbcExecutor
-import org.komapper.core.metamodel.EntityMetamodel
 
 interface SchemaDropQuery : Query<Unit> {
     fun drop(): SchemaDropQuery

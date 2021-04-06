@@ -1,15 +1,14 @@
 package org.komapper.core.dsl.context
 
 import org.komapper.core.dsl.element.Criterion
-import org.komapper.core.metamodel.EntityMetamodel
-import org.komapper.core.metamodel.Table
+import org.komapper.core.dsl.metamodel.EntityMetamodel
 
 internal data class SqlDeleteContext<ENTITY>(
     override val entityMetamodel: EntityMetamodel<ENTITY>,
     val where: List<Criterion> = listOf()
 ) : Context<ENTITY> {
 
-    override fun getTables(): List<Table> {
+    override fun getEntityExpressions(): List<EntityMetamodel<*>> {
         return listOf(entityMetamodel)
     }
 

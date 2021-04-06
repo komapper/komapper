@@ -1,9 +1,9 @@
 package org.komapper.core.dsl
 
 import org.komapper.core.dsl.context.SqlSelectContext
+import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.query.SqlSubquery
 import org.komapper.core.dsl.query.SqlSubqueryImpl
-import org.komapper.core.metamodel.EntityMetamodel
 
 object Subquery : Dsl {
 

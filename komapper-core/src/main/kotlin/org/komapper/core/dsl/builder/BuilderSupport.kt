@@ -7,12 +7,11 @@ import org.komapper.core.dsl.context.SqlSelectContext
 import org.komapper.core.dsl.element.Criterion
 import org.komapper.core.dsl.element.Operand
 import org.komapper.core.dsl.expr.AggregateFunction
-import org.komapper.core.dsl.expr.ArithmeticExpr
+import org.komapper.core.dsl.expr.ArithmeticExpression
+import org.komapper.core.dsl.expr.EntityExpression
+import org.komapper.core.dsl.expr.PropertyExpression
 import org.komapper.core.dsl.expr.StringFunction
-import org.komapper.core.dsl.getName
 import org.komapper.core.dsl.option.LikeOption
-import org.komapper.core.metamodel.Column
-import org.komapper.core.metamodel.Table
 
 internal class BuilderSupport(
     private val dialect: Dialect,
@@ -20,28 +19,28 @@ internal class BuilderSupport(
     private val buf: StatementBuffer
 ) {
 
-    fun visitTable(table: Table) {
-        val name = table.getName(dialect::quote)
-        val alias = aliasManager.getAlias(table) ?: error("Alias is not found. table=$name")
+    fun visitEntityExpression(expression: EntityExpression) {
+        val name = expression.getCanonicalTableName(dialect::quote)
+        val alias = aliasManager.getAlias(expression) ?: error("Alias is not found. table=$name")
         buf.append("$name $alias")
     }
 
-    fun visitColumn(column: Column<*>) {
-        when (column) {
+    fun visitPropertyExpression(expression: PropertyExpression<*>) {
+        when (expression) {
             is AggregateFunction -> {
-                visitAggregateFunction(column)
+                visitAggregateFunction(expression)
             }
-            is ArithmeticExpr -> {
-                visitArithmeticExpr(column)
+            is ArithmeticExpression -> {
+                visitArithmeticExpr(expression)
             }
             is StringFunction -> {
-                visitStringFunction(column)
+                visitStringFunction(expression)
             }
             else -> {
-                val name = column.getName(dialect::quote)
-                val table = column.owner
-                val alias = aliasManager.getAlias(table)
-                    ?: error("Alias is not found. table=${table.getName(dialect::quote)}, column=$name")
+                val name = expression.getCanonicalColumnName(dialect::quote)
+                val owner = expression.owner
+                val alias = aliasManager.getAlias(owner)
+                    ?: error("Alias is not found. table=${owner.getCanonicalTableName(dialect::quote)}, column=$name")
                 buf.append("$alias.$name")
             }
         }
@@ -51,7 +50,7 @@ internal class BuilderSupport(
         when (function) {
             is AggregateFunction.Avg -> {
                 buf.append("avg(")
-                visitColumn(function.c)
+                visitPropertyExpression(function.expression)
                 buf.append(")")
             }
             is AggregateFunction.CountAsterisk -> {
@@ -59,54 +58,54 @@ internal class BuilderSupport(
             }
             is AggregateFunction.Count -> {
                 buf.append("count(")
-                visitColumn(function.c)
+                visitPropertyExpression(function.expression)
                 buf.append(")")
             }
             is AggregateFunction.Max -> {
                 buf.append("max(")
-                visitColumn(function.c)
+                visitPropertyExpression(function.expression)
                 buf.append(")")
             }
             is AggregateFunction.Min<*> -> {
                 buf.append("min(")
-                visitColumn(function.c)
+                visitPropertyExpression(function.expression)
                 buf.append(")")
             }
             is AggregateFunction.Sum<*> -> {
                 buf.append("sum(")
-                visitColumn(function.c)
+                visitPropertyExpression(function.expression)
                 buf.append(")")
             }
         }
     }
 
-    private fun visitArithmeticExpr(expr: ArithmeticExpr<*>) {
+    private fun visitArithmeticExpr(expression: ArithmeticExpression<*>) {
         buf.append("(")
-        when (expr) {
-            is ArithmeticExpr.Plus<*> -> {
-                visitOperand(expr.left)
+        when (expression) {
+            is ArithmeticExpression.Plus<*> -> {
+                visitOperand(expression.left)
                 buf.append(" + ")
-                visitOperand(expr.right)
+                visitOperand(expression.right)
             }
-            is ArithmeticExpr.Minus<*> -> {
-                visitOperand(expr.left)
+            is ArithmeticExpression.Minus<*> -> {
+                visitOperand(expression.left)
                 buf.append(" - ")
-                visitOperand(expr.right)
+                visitOperand(expression.right)
             }
-            is ArithmeticExpr.Times<*> -> {
-                visitOperand(expr.left)
+            is ArithmeticExpression.Times<*> -> {
+                visitOperand(expression.left)
                 buf.append(" * ")
-                visitOperand(expr.right)
+                visitOperand(expression.right)
             }
-            is ArithmeticExpr.Div<*> -> {
-                visitOperand(expr.left)
+            is ArithmeticExpression.Div<*> -> {
+                visitOperand(expression.left)
                 buf.append(" / ")
-                visitOperand(expr.right)
+                visitOperand(expression.right)
             }
-            is ArithmeticExpr.Rem<*> -> {
-                visitOperand(expr.left)
+            is ArithmeticExpression.Rem<*> -> {
+                visitOperand(expression.left)
                 buf.append(" % ")
-                visitOperand(expr.right)
+                visitOperand(expression.right)
             }
         }.also {
             buf.append(")")
@@ -201,8 +200,8 @@ internal class BuilderSupport(
             }
         }
         when (operand) {
-            is Operand.Column -> {
-                visitColumn(operand.column)
+            is Operand.Property -> {
+                visitPropertyExpression(operand.expression)
             }
             is Operand.Parameter -> {
                 val value = operand.value
@@ -292,11 +291,11 @@ internal class BuilderSupport(
 
     fun visitOperand(operand: Operand) {
         when (operand) {
-            is Operand.Column -> {
-                visitColumn(operand.column)
+            is Operand.Property -> {
+                visitPropertyExpression(operand.expression)
             }
             is Operand.Parameter -> {
-                buf.bind(Value(operand.value, operand.column.klass))
+                buf.bind(Value(operand.value, operand.expression.klass))
             }
         }
     }

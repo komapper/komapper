@@ -7,7 +7,7 @@ import org.komapper.core.dsl.context.SqlSelectContext
 import org.komapper.core.dsl.element.Criterion
 import org.komapper.core.dsl.element.Projection
 import org.komapper.core.dsl.expr.AggregateFunction
-import org.komapper.core.metamodel.Column
+import org.komapper.core.dsl.expr.PropertyExpression
 
 internal class SqlSelectStatementBuilder(
     val dialect: Dialect,
@@ -44,15 +44,15 @@ internal class SqlSelectStatementBuilder(
     private fun groupByClause() {
         if (context.groupBy.isEmpty()) {
             val columns = when (val projection = context.projection) {
-                is Projection.Columns -> projection.values
-                is Projection.Tables -> projection.values.flatMap { it.properties() }
+                is Projection.Properties -> projection.values
+                is Projection.Entities -> projection.values.flatMap { it.properties() }
             }
             val aggregateFunctions = columns.filterIsInstance<AggregateFunction<*>>()
             val groupByItems = columns - aggregateFunctions
             if (aggregateFunctions.isNotEmpty() && groupByItems.isNotEmpty()) {
                 buf.append(" group by ")
                 for (item in groupByItems) {
-                    visitColumn(item)
+                    column(item)
                     buf.append(", ")
                 }
                 buf.cutBack(2)
@@ -60,7 +60,7 @@ internal class SqlSelectStatementBuilder(
         } else {
             buf.append(" group by ")
             for (item in context.groupBy) {
-                visitColumn(item)
+                column(item)
                 buf.append(", ")
             }
             buf.cutBack(2)
@@ -90,11 +90,11 @@ internal class SqlSelectStatementBuilder(
         support.forUpdateClause()
     }
 
-    private fun visitColumn(column: Column<*>) {
-        support.visitColumn(column)
+    private fun column(expression: PropertyExpression<*>) {
+        support.column(expression)
     }
 
     private fun visitCriterion(index: Int, c: Criterion) {
-        return support.visitCriterion(index, c)
+        support.visitCriterion(index, c)
     }
 }

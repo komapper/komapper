@@ -4,14 +4,14 @@ import org.komapper.core.dsl.context.SelectContext
 import org.komapper.core.dsl.element.ForUpdate
 import org.komapper.core.dsl.element.Join
 import org.komapper.core.dsl.element.JoinKind
-import org.komapper.core.dsl.element.SortItem
+import org.komapper.core.dsl.expr.NamedSortItem
+import org.komapper.core.dsl.expr.PropertyExpression
+import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.option.ForUpdateOption
 import org.komapper.core.dsl.scope.OnDeclaration
 import org.komapper.core.dsl.scope.OnScope
 import org.komapper.core.dsl.scope.WhereDeclaration
 import org.komapper.core.dsl.scope.WhereScope
-import org.komapper.core.metamodel.Column
-import org.komapper.core.metamodel.EntityMetamodel
 
 internal data class SelectQuerySupport<ENTITY, CONTEXT : SelectContext<ENTITY, CONTEXT>>(
     private val context: CONTEXT
@@ -51,11 +51,11 @@ internal data class SelectQuerySupport<ENTITY, CONTEXT : SelectContext<ENTITY, C
         return context.addWhere(scope.toList())
     }
 
-    fun orderBy(vararg sortItems: Column<*>): CONTEXT {
-        val items = sortItems.map {
+    fun orderBy(vararg properties: PropertyExpression<*>): CONTEXT {
+        val items = properties.map {
             when (it) {
-                is SortItem -> it
-                else -> SortItem.Asc(it)
+                is NamedSortItem -> it
+                else -> NamedSortItem.Asc(it)
             }
         }
         return context.addOrderBy(items)

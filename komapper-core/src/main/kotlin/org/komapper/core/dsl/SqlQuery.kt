@@ -4,6 +4,7 @@ import org.komapper.core.dsl.context.SqlDeleteContext
 import org.komapper.core.dsl.context.SqlInsertContext
 import org.komapper.core.dsl.context.SqlSelectContext
 import org.komapper.core.dsl.context.SqlUpdateContext
+import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.query.ListQuery
 import org.komapper.core.dsl.query.Query
 import org.komapper.core.dsl.query.SqlDeleteQuery
@@ -18,7 +19,6 @@ import org.komapper.core.dsl.query.SqlUpdateQuery
 import org.komapper.core.dsl.query.SqlUpdateQueryImpl
 import org.komapper.core.dsl.scope.SetDeclaration
 import org.komapper.core.dsl.scope.ValuesDeclaration
-import org.komapper.core.metamodel.EntityMetamodel
 
 object SqlQuery : Dsl {
 

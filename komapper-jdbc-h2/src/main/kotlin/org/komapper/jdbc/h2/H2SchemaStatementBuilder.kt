@@ -2,10 +2,8 @@ package org.komapper.jdbc.h2
 
 import org.komapper.core.data.Statement
 import org.komapper.core.dsl.builder.SchemaStatementBuilder
-import org.komapper.core.dsl.getName
-import org.komapper.core.metamodel.Assignment
-import org.komapper.core.metamodel.EntityMetamodel
-import org.komapper.core.metamodel.IdGeneratorDescriptor
+import org.komapper.core.dsl.metamodel.Assignment
+import org.komapper.core.dsl.metamodel.EntityMetamodel
 import java.io.PrintWriter
 import java.io.StringWriter
 import java.math.BigDecimal
@@ -56,12 +54,12 @@ open class H2SchemaStatementBuilder(private val dialect: H2Dialect) : SchemaStat
 
     private fun createTable(e: EntityMetamodel<*>) {
         val w = PrintWriter(sql)
-        w.println("create table if not exists ${e.getName(dialect::quote)} (")
+        w.println("create table if not exists ${e.getCanonicalTableName(dialect::quote)} (")
         val columns = e.properties().joinToString(",\n    ", prefix = "    ") { p ->
-            val columnName = p.getName(dialect::quote)
+            val columnName = p.getCanonicalColumnName(dialect::quote)
             val dataType = getDataType(p.klass)
             val notNull = if (p.nullable) "" else " not null"
-            val identity = if (p.idGenerator is IdGeneratorDescriptor.Identity<*, *>) " auto_increment" else ""
+            val identity = if (p.idAssignment is Assignment.Identity<*, *>) " auto_increment" else ""
             val pk = if (p in e.idProperties()) " primary key" else ""
             "$columnName $dataType$notNull$identity$pk"
         }
@@ -71,22 +69,22 @@ open class H2SchemaStatementBuilder(private val dialect: H2Dialect) : SchemaStat
 
     private fun createSequence(e: EntityMetamodel<*>) {
         val w = PrintWriter(sql)
-        val idGenerator = e.properties().map { it.idGenerator }.firstOrNull { it != null }
-        if (idGenerator is IdGeneratorDescriptor.Sequence<*, *>) {
-            w.println("create sequence if not exists ${idGenerator.getName(dialect::quote)} start with 1 increment by ${idGenerator.incrementBy};")
+        val idAssignment = e.properties().map { it.idAssignment }.firstOrNull { it != null }
+        if (idAssignment is Assignment.Sequence<*, *>) {
+            w.println("create sequence if not exists ${idAssignment.getCanonicalSequenceName(dialect::quote)} start with 1 increment by ${idAssignment.incrementBy};")
         }
     }
 
     private fun dropTable(e: EntityMetamodel<*>) {
         val w = PrintWriter(sql)
-        w.println("drop table if exists ${e.getName(dialect::quote)};")
+        w.println("drop table if exists ${e.getCanonicalTableName(dialect::quote)};")
     }
 
     private fun dropSequence(e: EntityMetamodel<*>) {
         val w = PrintWriter(sql)
-        val idGenerator = e.properties().map { it.idGenerator }.firstOrNull { it != null }
-        if (idGenerator is IdGeneratorDescriptor.Sequence<*, *>) {
-            w.println("drop sequence if exists ${idGenerator.getName(dialect::quote)};")
+        val idAssignment = e.properties().map { it.idAssignment }.firstOrNull { it != null }
+        if (idAssignment is Assignment.Sequence<*, *>) {
+            w.println("drop sequence if exists ${idAssignment.getCanonicalSequenceName(dialect::quote)};")
         }
     }
 

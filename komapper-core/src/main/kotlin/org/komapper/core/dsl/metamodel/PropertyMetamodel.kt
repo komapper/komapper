@@ -1,14 +1,14 @@
-package org.komapper.core.metamodel
+package org.komapper.core.dsl.metamodel
 
+import org.komapper.core.dsl.expr.PropertyExpression
 import kotlin.reflect.KClass
 
-interface PropertyMetamodel<E, T : Any> : Column<T> {
+interface PropertyMetamodel<E, T : Any> : PropertyExpression<T> {
     override val owner: EntityMetamodel<E>
     val getter: (E) -> T?
     val getterWithUncheckedCast: (Any) -> T?
     val setter: (E, T) -> E
     val nullable: Boolean
-    val idGenerator: IdGeneratorDescriptor<E, T>?
     val idAssignment: Assignment<E>?
 }
 
@@ -26,7 +26,6 @@ class PropertyMetamodelImpl<E, T : Any>(
         }
     override val setter: (E, T) -> E get() = descriptor.setter
     override val nullable: Boolean = descriptor.nullable
-    override val idGenerator: IdGeneratorDescriptor<E, T>? = descriptor.idGenerator
     override val idAssignment: Assignment<E>? = descriptor.idAssignment
 }
 
@@ -39,7 +38,6 @@ class EmptyPropertyMetamodel<E, T : Any> : PropertyMetamodel<E, T> {
     override val getterWithUncheckedCast: (Any) -> T? get() = fail()
     override val setter: (E, T) -> E get() = fail()
     override val nullable: Boolean get() = fail()
-    override val idGenerator: IdGeneratorDescriptor<E, T> get() = fail()
     override val idAssignment: Assignment<E> get() = fail()
 
     private fun fail(): Nothing {

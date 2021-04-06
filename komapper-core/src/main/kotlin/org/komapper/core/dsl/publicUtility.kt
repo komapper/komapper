@@ -1,155 +1,133 @@
 package org.komapper.core.dsl
 
 import org.komapper.core.dsl.element.Operand
-import org.komapper.core.dsl.element.SortIndex
-import org.komapper.core.dsl.element.SortItem
 import org.komapper.core.dsl.expr.AggregateFunction
-import org.komapper.core.dsl.expr.ArithmeticExpr
+import org.komapper.core.dsl.expr.ArithmeticExpression
+import org.komapper.core.dsl.expr.IndexedSortItem
+import org.komapper.core.dsl.expr.NamedSortItem
+import org.komapper.core.dsl.expr.PropertyExpression
 import org.komapper.core.dsl.expr.StringFunction
-import org.komapper.core.metamodel.Assignment
-import org.komapper.core.metamodel.Column
-import org.komapper.core.metamodel.IdGeneratorDescriptor
-import org.komapper.core.metamodel.Table
 
-fun Table.getName(mapper: (String) -> String): String {
-    return listOf(this.catalogName(), this.schemaName(), this.tableName())
-        .filter { it.isNotBlank() }.joinToString(".", transform = mapper)
-}
-
-fun IdGeneratorDescriptor.Sequence<*, *>.getName(mapper: (String) -> String): String {
-    return listOf(this.catalogName, this.schemaName, this.name)
-        .filter { it.isNotBlank() }.joinToString(".", transform = mapper)
-}
-
-fun Assignment.Sequence<*, *>.getName(mapper: (String) -> String): String {
-    return listOf(this.catalogName, this.schemaName, this.name)
-        .filter { it.isNotBlank() }.joinToString(".", transform = mapper)
-}
-
-fun Column<*>.getName(mapper: (String) -> String): String {
-    return mapper(this.columnName)
-}
-
-fun <T : Any> Column<T>.desc(): Column<T> {
-    if (this is SortItem.Desc) {
+fun <T : Any> PropertyExpression<T>.desc(): PropertyExpression<T> {
+    if (this is NamedSortItem.Desc) {
         return this
     }
-    return SortItem.Desc(this)
+    return NamedSortItem.Desc(this)
 }
 
 fun desc(index: Number): Number {
-    return SortIndex.Desc(index)
+    return IndexedSortItem.Desc(index)
 }
 
-fun <T : Any> Column<T>.asc(): Column<T> {
-    if (this is SortItem.Asc) {
+fun <T : Any> PropertyExpression<T>.asc(): PropertyExpression<T> {
+    if (this is NamedSortItem.Asc) {
         return this
     }
-    return SortItem.Asc(this)
+    return NamedSortItem.Asc(this)
 }
 
 fun asc(index: Number): Number {
-    return SortIndex.Asc(index)
+    return IndexedSortItem.Asc(index)
 }
 
-fun <T : Any> avg(c: Column<T>): Column<Double> {
+fun <T : Any> avg(c: PropertyExpression<T>): PropertyExpression<Double> {
     return AggregateFunction.Avg(c)
 }
 
-fun count(): Column<Long> {
+fun count(): PropertyExpression<Long> {
     return AggregateFunction.CountAsterisk
 }
 
-fun <T : Any> count(column: Column<T>): Column<Long> {
-    return AggregateFunction.Count(column)
+fun <T : Any> count(property: PropertyExpression<T>): PropertyExpression<Long> {
+    return AggregateFunction.Count(property)
 }
 
-fun <T : Any> max(column: Column<T>): Column<T> {
-    return AggregateFunction.Max(column)
+fun <T : Any> max(property: PropertyExpression<T>): PropertyExpression<T> {
+    return AggregateFunction.Max(property)
 }
 
-fun <T : Any> min(column: Column<T>): Column<T> {
-    return AggregateFunction.Min(column)
+fun <T : Any> min(property: PropertyExpression<T>): PropertyExpression<T> {
+    return AggregateFunction.Min(property)
 }
 
-fun <T : Any> sum(column: Column<T>): Column<T> {
-    return AggregateFunction.Sum(column)
+fun <T : Any> sum(property: PropertyExpression<T>): PropertyExpression<T> {
+    return AggregateFunction.Sum(property)
 }
 
-infix operator fun <T : Number> Column<T>.plus(value: T): Column<T> {
-    val left = Operand.Column(this)
+infix operator fun <T : Number> PropertyExpression<T>.plus(value: T): PropertyExpression<T> {
+    val left = Operand.Property(this)
     val right = Operand.Parameter(this, value)
-    return ArithmeticExpr.Plus(this, left, right)
+    return ArithmeticExpression.Plus(this, left, right)
 }
 
-infix operator fun <T : Number> Column<T>.plus(other: Column<T>): Column<T> {
-    val left = Operand.Column(this)
-    val right = Operand.Column(other)
-    return ArithmeticExpr.Plus(this, left, right)
+infix operator fun <T : Number> PropertyExpression<T>.plus(other: PropertyExpression<T>): PropertyExpression<T> {
+    val left = Operand.Property(this)
+    val right = Operand.Property(other)
+    return ArithmeticExpression.Plus(this, left, right)
 }
 
-infix operator fun <T : Number> Column<T>.minus(value: T): Column<T> {
-    val left = Operand.Column(this)
+infix operator fun <T : Number> PropertyExpression<T>.minus(value: T): PropertyExpression<T> {
+    val left = Operand.Property(this)
     val right = Operand.Parameter(this, value)
-    return ArithmeticExpr.Minus(this, left, right)
+    return ArithmeticExpression.Minus(this, left, right)
 }
 
-infix operator fun <T : Number> Column<T>.minus(other: Column<T>): Column<T> {
-    val left = Operand.Column(this)
-    val right = Operand.Column(other)
-    return ArithmeticExpr.Minus(this, left, right)
+infix operator fun <T : Number> PropertyExpression<T>.minus(other: PropertyExpression<T>): PropertyExpression<T> {
+    val left = Operand.Property(this)
+    val right = Operand.Property(other)
+    return ArithmeticExpression.Minus(this, left, right)
 }
 
-infix operator fun <T : Number> Column<T>.times(value: T): Column<T> {
-    val left = Operand.Column(this)
+infix operator fun <T : Number> PropertyExpression<T>.times(value: T): PropertyExpression<T> {
+    val left = Operand.Property(this)
     val right = Operand.Parameter(this, value)
-    return ArithmeticExpr.Times(this, left, right)
+    return ArithmeticExpression.Times(this, left, right)
 }
 
-infix operator fun <T : Number> Column<T>.times(other: Column<T>): Column<T> {
-    val left = Operand.Column(this)
-    val right = Operand.Column(other)
-    return ArithmeticExpr.Times(this, left, right)
+infix operator fun <T : Number> PropertyExpression<T>.times(other: PropertyExpression<T>): PropertyExpression<T> {
+    val left = Operand.Property(this)
+    val right = Operand.Property(other)
+    return ArithmeticExpression.Times(this, left, right)
 }
 
-infix operator fun <T : Number> Column<T>.div(value: T): Column<T> {
-    val left = Operand.Column(this)
+infix operator fun <T : Number> PropertyExpression<T>.div(value: T): PropertyExpression<T> {
+    val left = Operand.Property(this)
     val right = Operand.Parameter(this, value)
-    return ArithmeticExpr.Div(this, left, right)
+    return ArithmeticExpression.Div(this, left, right)
 }
 
-infix operator fun <T : Number> Column<T>.div(other: Column<T>): Column<T> {
-    val left = Operand.Column(this)
-    val right = Operand.Column(other)
-    return ArithmeticExpr.Div(this, left, right)
+infix operator fun <T : Number> PropertyExpression<T>.div(other: PropertyExpression<T>): PropertyExpression<T> {
+    val left = Operand.Property(this)
+    val right = Operand.Property(other)
+    return ArithmeticExpression.Div(this, left, right)
 }
 
-infix operator fun <T : Number> Column<T>.rem(value: T): Column<T> {
-    val left = Operand.Column(this)
+infix operator fun <T : Number> PropertyExpression<T>.rem(value: T): PropertyExpression<T> {
+    val left = Operand.Property(this)
     val right = Operand.Parameter(this, value)
-    return ArithmeticExpr.Rem(this, left, right)
+    return ArithmeticExpression.Rem(this, left, right)
 }
 
-infix operator fun <T : Number> Column<T>.rem(other: Column<T>): Column<T> {
-    val left = Operand.Column(this)
-    val right = Operand.Column(other)
-    return ArithmeticExpr.Rem(this, left, right)
+infix operator fun <T : Number> PropertyExpression<T>.rem(other: PropertyExpression<T>): PropertyExpression<T> {
+    val left = Operand.Property(this)
+    val right = Operand.Property(other)
+    return ArithmeticExpression.Rem(this, left, right)
 }
 
-fun concat(left: Column<String>, right: String): Column<String> {
-    val o1 = Operand.Column(left)
+fun concat(left: PropertyExpression<String>, right: String): PropertyExpression<String> {
+    val o1 = Operand.Property(left)
     val o2 = Operand.Parameter(left, right)
     return StringFunction.Concat(left, o1, o2)
 }
 
-fun concat(left: String, right: Column<String>): Column<String> {
+fun concat(left: String, right: PropertyExpression<String>): PropertyExpression<String> {
     val o1 = Operand.Parameter(right, left)
-    val o2 = Operand.Column(right)
+    val o2 = Operand.Property(right)
     return StringFunction.Concat(right, o1, o2)
 }
 
-fun concat(left: Column<String>, right: Column<String>): Column<String> {
-    val o1 = Operand.Column(left)
-    val o2 = Operand.Column(right)
+fun concat(left: PropertyExpression<String>, right: PropertyExpression<String>): PropertyExpression<String> {
+    val o1 = Operand.Property(left)
+    val o2 = Operand.Property(right)
     return StringFunction.Concat(right, o1, o2)
 }

@@ -5,9 +5,9 @@ import org.komapper.core.data.Statement
 import org.komapper.core.data.StatementBuffer
 import org.komapper.core.data.Value
 import org.komapper.core.dsl.context.EntityDeleteContext
+import org.komapper.core.dsl.expr.EntityExpression
+import org.komapper.core.dsl.expr.PropertyExpression
 import org.komapper.core.dsl.query.EntityDeleteOption
-import org.komapper.core.metamodel.Column
-import org.komapper.core.metamodel.Table
 
 internal class EntityDeleteStatementBuilder<ENTITY>(
     val dialect: Dialect,
@@ -21,7 +21,7 @@ internal class EntityDeleteStatementBuilder<ENTITY>(
 
     fun build(): Statement {
         buf.append("delete from ")
-        visitTable(context.entityMetamodel)
+        table(context.entityMetamodel)
         val identityProperties = context.entityMetamodel.idProperties()
         val versionProperty = context.entityMetamodel.versionProperty()
         val versionRequired = versionProperty != null && !option.ignoreVersion
@@ -29,7 +29,7 @@ internal class EntityDeleteStatementBuilder<ENTITY>(
             buf.append(" where ")
             if (identityProperties.isNotEmpty()) {
                 for (p in identityProperties) {
-                    visitColumn(p)
+                    column(p)
                     buf.append(" = ")
                     val value = Value(p.getter(entity), p.klass)
                     buf.bind(value)
@@ -41,7 +41,7 @@ internal class EntityDeleteStatementBuilder<ENTITY>(
             }
             if (versionRequired) {
                 checkNotNull(versionProperty)
-                visitColumn(versionProperty)
+                column(versionProperty)
                 buf.append(" = ")
                 val value = Value(versionProperty.getter(entity), versionProperty.klass)
                 buf.bind(value)
@@ -50,11 +50,11 @@ internal class EntityDeleteStatementBuilder<ENTITY>(
         return buf.toStatement()
     }
 
-    private fun visitTable(table: Table) {
-        support.visitTable(table)
+    private fun table(expression: EntityExpression) {
+        support.visitEntityExpression(expression)
     }
 
-    private fun visitColumn(column: Column<*>) {
-        support.visitColumn(column)
+    private fun column(expression: PropertyExpression<*>) {
+        support.visitPropertyExpression(expression)
     }
 }

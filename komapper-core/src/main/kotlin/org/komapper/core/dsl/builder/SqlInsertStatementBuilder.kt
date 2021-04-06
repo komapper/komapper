@@ -5,10 +5,9 @@ import org.komapper.core.data.Statement
 import org.komapper.core.data.StatementBuffer
 import org.komapper.core.data.Value
 import org.komapper.core.dsl.context.SqlInsertContext
-import org.komapper.core.dsl.getName
-import org.komapper.core.metamodel.Assignment
-import org.komapper.core.metamodel.Column
-import org.komapper.core.metamodel.Table
+import org.komapper.core.dsl.expr.EntityExpression
+import org.komapper.core.dsl.expr.PropertyExpression
+import org.komapper.core.dsl.metamodel.Assignment
 
 internal class SqlInsertStatementBuilder<ENTITY>(
     val dialect: Dialect,
@@ -19,21 +18,21 @@ internal class SqlInsertStatementBuilder<ENTITY>(
     fun build(): Statement {
         val entityMetamodel = context.entityMetamodel
         buf.append("insert into ")
-        buf.append(tableName(entityMetamodel))
+        buf.append(table(entityMetamodel))
         buf.append(" (")
         for (column in context.values.map { it.first }) {
-            buf.append(columnName(column.column))
+            buf.append(column(column.expression))
             buf.append(", ")
         }
         buf.cutBack(2)
         buf.append(") values (")
         for (parameter in context.values.map { it.second }) {
-            val value = if (parameter.column in entityMetamodel.idProperties() &&
+            val value = if (parameter.expression in entityMetamodel.idProperties() &&
                 entityMetamodel.idAssignment() is Assignment.Identity<ENTITY, *>
             ) {
-                Value(null, parameter.column.klass)
+                Value(null, parameter.expression.klass)
             } else {
-                Value(parameter.value, parameter.column.klass)
+                Value(parameter.value, parameter.expression.klass)
             }
             buf.bind(value)
             buf.append(", ")
@@ -43,11 +42,11 @@ internal class SqlInsertStatementBuilder<ENTITY>(
         return buf.toStatement()
     }
 
-    private fun tableName(table: Table): String {
-        return table.getName(dialect::quote)
+    private fun table(expression: EntityExpression): String {
+        return expression.getCanonicalTableName(dialect::quote)
     }
 
-    private fun columnName(column: Column<*>): String {
-        return column.getName(dialect::quote)
+    private fun column(expression: PropertyExpression<*>): String {
+        return expression.getCanonicalColumnName(dialect::quote)
     }
 }

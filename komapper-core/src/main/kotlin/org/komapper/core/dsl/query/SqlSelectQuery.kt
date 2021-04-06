@@ -8,6 +8,8 @@ import org.komapper.core.dsl.context.SqlSelectContext
 import org.komapper.core.dsl.context.SqlSetOperationComponent
 import org.komapper.core.dsl.context.SqlSetOperationContext
 import org.komapper.core.dsl.context.SqlSetOperationKind
+import org.komapper.core.dsl.expr.PropertyExpression
+import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.scope.HavingDeclaration
 import org.komapper.core.dsl.scope.HavingScope
 import org.komapper.core.dsl.scope.OnDeclaration
@@ -15,8 +17,6 @@ import org.komapper.core.dsl.scope.SqlSelectOptionDeclaration
 import org.komapper.core.dsl.scope.SqlSelectOptionScope
 import org.komapper.core.dsl.scope.WhereDeclaration
 import org.komapper.core.jdbc.JdbcExecutor
-import org.komapper.core.metamodel.Column
-import org.komapper.core.metamodel.EntityMetamodel
 import java.sql.ResultSet
 
 interface SqlSelectQuery<ENTITY> : SqlSetOperandQuery<ENTITY> {
@@ -32,9 +32,9 @@ interface SqlSelectQuery<ENTITY> : SqlSetOperandQuery<ENTITY> {
     ): SqlSelectQuery<ENTITY>
 
     fun where(declaration: WhereDeclaration): SqlSelectQuery<ENTITY>
-    fun groupBy(vararg items: Column<*>): SqlSelectQuery<ENTITY>
+    fun groupBy(vararg properties: PropertyExpression<*>): SqlSelectQuery<ENTITY>
     fun having(declaration: HavingDeclaration): SqlSelectQuery<ENTITY>
-    fun orderBy(vararg items: Column<*>): SqlSelectQuery<ENTITY>
+    fun orderBy(vararg properties: PropertyExpression<*>): SqlSelectQuery<ENTITY>
     fun offset(value: Int): SqlSelectQuery<ENTITY>
     fun limit(value: Int): SqlSelectQuery<ENTITY>
     fun forUpdate(): SqlSelectQuery<ENTITY>
@@ -56,18 +56,18 @@ interface SqlSelectQuery<ENTITY> : SqlSetOperandQuery<ENTITY> {
     ): SqlSetOperandQuery<Triple<A, B, C>>
 
     fun <A : Any> select(
-        column: Column<A>
+        p: PropertyExpression<A>
     ): SqlSetOperandQuery<A>
 
     fun <A : Any, B : Any> select(
-        c1: Column<A>,
-        c2: Column<B>
+        p1: PropertyExpression<A>,
+        p2: PropertyExpression<B>
     ): SqlSetOperandQuery<Pair<A, B>>
 
     fun <A : Any, B : Any, C : Any> select(
-        c1: Column<A>,
-        c2: Column<B>,
-        c3: Column<C>
+        p1: PropertyExpression<A>,
+        p2: PropertyExpression<B>,
+        p3: PropertyExpression<C>
     ): SqlSetOperandQuery<Triple<A, B, C>>
 }
 
@@ -107,8 +107,8 @@ internal data class SqlSelectQueryImpl<ENTITY>(
         return copy(context = newContext)
     }
 
-    override fun groupBy(vararg items: Column<*>): SqlSelectQueryImpl<ENTITY> {
-        val newContext = context.copy(groupBy = items.toList())
+    override fun groupBy(vararg properties: PropertyExpression<*>): SqlSelectQueryImpl<ENTITY> {
+        val newContext = context.copy(groupBy = properties.toList())
         return copy(context = newContext)
     }
 
@@ -119,8 +119,8 @@ internal data class SqlSelectQueryImpl<ENTITY>(
         return copy(context = newContext)
     }
 
-    override fun orderBy(vararg items: Column<*>): SqlSelectQueryImpl<ENTITY> {
-        val newContext = support.orderBy(*items)
+    override fun orderBy(vararg properties: PropertyExpression<*>): SqlSelectQueryImpl<ENTITY> {
+        val newContext = support.orderBy(*properties)
         return copy(context = newContext)
     }
 
@@ -176,9 +176,9 @@ internal data class SqlSelectQueryImpl<ENTITY>(
     override fun <A> select(
         e: EntityMetamodel<A>,
     ): SqlSetOperandQuery<A> {
-        val entityMetamodels = context.getTables()
+        val entityMetamodels = context.getEntityExpressions()
         if (entityMetamodels.none { it == e }) error(entityMetamodelNotFound("e"))
-        val newContext = context.setTable(e)
+        val newContext = context.setEntity(e)
         return Transformable(newContext, option) { dialect, rs ->
             val m = EntityMapper(dialect, rs)
             m.execute(e)
@@ -189,10 +189,10 @@ internal data class SqlSelectQueryImpl<ENTITY>(
         e1: EntityMetamodel<A>,
         e2: EntityMetamodel<B>
     ): SqlSetOperandQuery<Pair<A, B>> {
-        val entityMetamodels = context.getTables()
+        val entityMetamodels = context.getEntityExpressions()
         if (entityMetamodels.none { it == e1 }) error(entityMetamodelNotFound("e1"))
         if (entityMetamodels.none { it == e2 }) error(entityMetamodelNotFound("e2"))
-        val newContext = context.setTables(listOf(e1, e2))
+        val newContext = context.setEntities(listOf(e1, e2))
         return Transformable(newContext, option) { dialect, rs ->
             val m = EntityMapper(dialect, rs)
             m.execute(e1) to m.execute(e2)
@@ -204,42 +204,42 @@ internal data class SqlSelectQueryImpl<ENTITY>(
         e2: EntityMetamodel<B>,
         e3: EntityMetamodel<C>
     ): SqlSetOperandQuery<Triple<A, B, C>> {
-        val entityMetamodels = context.getTables()
+        val entityMetamodels = context.getEntityExpressions()
         if (entityMetamodels.none { it == e1 }) error(entityMetamodelNotFound("e1"))
         if (entityMetamodels.none { it == e2 }) error(entityMetamodelNotFound("e2"))
         if (entityMetamodels.none { it == e3 }) error(entityMetamodelNotFound("e3"))
-        val newContext = context.setTables(listOf(e1, e2, e3))
+        val newContext = context.setEntities(listOf(e1, e2, e3))
         return Transformable(newContext, option) { dialect, rs ->
             val m = EntityMapper(dialect, rs)
             Triple(m.execute(e1), m.execute(e2), m.execute(e3))
         }
     }
 
-    override fun <A : Any> select(column: Column<A>): SqlSetOperandQuery<A> {
-        val newContext = context.setColumn(column)
+    override fun <A : Any> select(p: PropertyExpression<A>): SqlSetOperandQuery<A> {
+        val newContext = context.setProperty(p)
         return Transformable(newContext, option) { dialect, rs ->
             val m = PropertyMapper(dialect, rs)
-            m.execute(column)
+            m.execute(p)
         }
     }
 
-    override fun <A : Any, B : Any> select(c1: Column<A>, c2: Column<B>): SqlSetOperandQuery<Pair<A, B>> {
-        val newContext = context.setColumns(listOf(c1, c2))
+    override fun <A : Any, B : Any> select(p1: PropertyExpression<A>, p2: PropertyExpression<B>): SqlSetOperandQuery<Pair<A, B>> {
+        val newContext = context.setProperties(listOf(p1, p2))
         return Transformable(newContext, option) { dialect, rs ->
             val m = PropertyMapper(dialect, rs)
-            m.execute(c1) to m.execute(c2)
+            m.execute(p1) to m.execute(p2)
         }
     }
 
     override fun <A : Any, B : Any, C : Any> select(
-        c1: Column<A>,
-        c2: Column<B>,
-        c3: Column<C>
+        p1: PropertyExpression<A>,
+        p2: PropertyExpression<B>,
+        p3: PropertyExpression<C>
     ): SqlSetOperandQuery<Triple<A, B, C>> {
-        val newContext = context.setColumns(listOf(c1, c2, c3))
+        val newContext = context.setProperties(listOf(p1, p2, p3))
         return Transformable(newContext, option) { dialect, rs: ResultSet ->
             val m = PropertyMapper(dialect, rs)
-            Triple(m.execute(c1), m.execute(c2), m.execute(c3))
+            Triple(m.execute(p1), m.execute(p2), m.execute(p3))
         }
     }
 

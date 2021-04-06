@@ -1,12 +1,12 @@
 package org.komapper.core.dsl.query
 
 import org.komapper.core.dsl.context.SqlSelectContext
+import org.komapper.core.dsl.expr.PropertyExpression
+import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.scope.HavingDeclaration
 import org.komapper.core.dsl.scope.HavingScope
 import org.komapper.core.dsl.scope.OnDeclaration
 import org.komapper.core.dsl.scope.WhereDeclaration
-import org.komapper.core.metamodel.Column
-import org.komapper.core.metamodel.EntityMetamodel
 
 interface SqlSubquery<ENTITY> : SqlSubqueryResult {
     fun <OTHER_ENTITY> innerJoin(
@@ -20,13 +20,13 @@ interface SqlSubquery<ENTITY> : SqlSubqueryResult {
     ): SqlSubquery<ENTITY>
 
     fun where(declaration: WhereDeclaration): SqlSubquery<ENTITY>
-    fun groupBy(vararg items: Column<*>): SqlSubquery<ENTITY>
+    fun groupBy(vararg properties: PropertyExpression<*>): SqlSubquery<ENTITY>
     fun having(declaration: HavingDeclaration): SqlSubquery<ENTITY>
-    fun orderBy(vararg items: Column<*>): SqlSubquery<ENTITY>
+    fun orderBy(vararg properties: PropertyExpression<*>): SqlSubquery<ENTITY>
     fun offset(value: Int): SqlSubquery<ENTITY>
     fun limit(value: Int): SqlSubquery<ENTITY>
     fun forUpdate(): SqlSubquery<ENTITY>
-    fun select(column: Column<*>): SingleColumnSqlSubqueryResult
+    fun select(property: PropertyExpression<*>): SingleColumnSqlSubqueryResult
 }
 
 internal data class SqlSubqueryImpl<ENTITY>(
@@ -59,8 +59,8 @@ internal data class SqlSubqueryImpl<ENTITY>(
         return copy(context = newContext)
     }
 
-    override fun groupBy(vararg items: Column<*>): SqlSubqueryImpl<ENTITY> {
-        val newContext = context.copy(groupBy = items.toList())
+    override fun groupBy(vararg properties: PropertyExpression<*>): SqlSubqueryImpl<ENTITY> {
+        val newContext = context.copy(groupBy = properties.toList())
         return copy(context = newContext)
     }
 
@@ -71,8 +71,8 @@ internal data class SqlSubqueryImpl<ENTITY>(
         return copy(context = newContext)
     }
 
-    override fun orderBy(vararg items: Column<*>): SqlSubqueryImpl<ENTITY> {
-        val newContext = support.orderBy(*items)
+    override fun orderBy(vararg properties: PropertyExpression<*>): SqlSubqueryImpl<ENTITY> {
+        val newContext = support.orderBy(*properties)
         return copy(context = newContext)
     }
 
@@ -91,8 +91,8 @@ internal data class SqlSubqueryImpl<ENTITY>(
         return copy(context = newContext)
     }
 
-    override fun select(column: Column<*>): SingleColumnSqlSubqueryResult {
-        val newContext = context.setColumn(column)
+    override fun select(property: PropertyExpression<*>): SingleColumnSqlSubqueryResult {
+        val newContext = context.setProperty(property)
         return SingleColumnSqlSubqueryResultImpl(ContextHolder(newContext))
     }
 }

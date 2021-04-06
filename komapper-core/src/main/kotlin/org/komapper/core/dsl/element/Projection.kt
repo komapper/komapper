@@ -1,9 +1,9 @@
 package org.komapper.core.dsl.element
 
-import org.komapper.core.metamodel.Column
-import org.komapper.core.metamodel.EntityMetamodel
+import org.komapper.core.dsl.expr.PropertyExpression
+import org.komapper.core.dsl.metamodel.EntityMetamodel
 
 internal sealed class Projection {
-    data class Columns(val values: List<Column<*>>) : Projection()
-    data class Tables(val values: Set<EntityMetamodel<*>>) : Projection()
+    data class Properties(val values: List<PropertyExpression<*>>) : Projection()
+    data class Entities(val values: List<EntityMetamodel<*>>) : Projection()
 }

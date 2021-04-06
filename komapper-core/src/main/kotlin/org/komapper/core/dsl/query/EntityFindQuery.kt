@@ -3,13 +3,13 @@ package org.komapper.core.dsl.query
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.config.Dialect
 import org.komapper.core.data.Statement
+import org.komapper.core.dsl.expr.PropertyExpression
 import org.komapper.core.dsl.scope.EntitySelectOptionDeclaration
 import org.komapper.core.dsl.scope.WhereDeclaration
-import org.komapper.core.metamodel.Column
 
 interface EntityFindQuery<ENTITY, R> : Query<R> {
     fun where(declaration: WhereDeclaration): EntityFindQuery<ENTITY, R>
-    fun orderBy(vararg items: Column<*>): EntityFindQuery<ENTITY, R>
+    fun orderBy(vararg items: PropertyExpression<*>): EntityFindQuery<ENTITY, R>
     fun offset(value: Int): EntityFindQuery<ENTITY, R>
     fun limit(value: Int): EntityFindQuery<ENTITY, R>
     fun forUpdate(): EntityFindQuery<ENTITY, R>
@@ -27,7 +27,7 @@ internal data class EntityFindQueryImpl<ENTITY, R>(
         return copy(query = newQuery)
     }
 
-    override fun orderBy(vararg items: Column<*>): EntityFindQueryImpl<ENTITY, R> {
+    override fun orderBy(vararg items: PropertyExpression<*>): EntityFindQueryImpl<ENTITY, R> {
         val newQuery = query.orderBy(*items)
         return copy(query = newQuery)
     }

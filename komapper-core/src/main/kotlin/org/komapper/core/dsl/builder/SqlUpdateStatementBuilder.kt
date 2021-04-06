@@ -6,7 +6,7 @@ import org.komapper.core.data.StatementBuffer
 import org.komapper.core.dsl.context.SqlUpdateContext
 import org.komapper.core.dsl.element.Criterion
 import org.komapper.core.dsl.element.Operand
-import org.komapper.core.metamodel.Table
+import org.komapper.core.dsl.expr.EntityExpression
 
 internal class SqlUpdateStatementBuilder<ENTITY>(
     val dialect: Dialect,
@@ -18,7 +18,7 @@ internal class SqlUpdateStatementBuilder<ENTITY>(
 
     fun build(): Statement {
         buf.append("update ")
-        visitTable(context.entityMetamodel)
+        table(context.entityMetamodel)
         buf.append(" set ")
         for ((left, right) in context.set) {
             visitOperand(left)
@@ -38,8 +38,8 @@ internal class SqlUpdateStatementBuilder<ENTITY>(
         return buf.toStatement()
     }
 
-    private fun visitTable(table: Table) {
-        support.visitTable(table)
+    private fun table(expression: EntityExpression) {
+        support.visitEntityExpression(expression)
     }
 
     private fun visitCriterion(index: Int, c: Criterion) {

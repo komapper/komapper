@@ -4,13 +4,13 @@ import org.komapper.core.dsl.element.Criterion
 import org.komapper.core.dsl.element.ForUpdate
 import org.komapper.core.dsl.element.Join
 import org.komapper.core.dsl.element.Projection
-import org.komapper.core.metamodel.Column
-import org.komapper.core.metamodel.Table
+import org.komapper.core.dsl.expr.NamedSortItem
+import org.komapper.core.dsl.metamodel.EntityMetamodel
 
 internal interface SelectContext<ENTITY, CONTEXT : SelectContext<ENTITY, CONTEXT>> : Context<ENTITY> {
     val joins: List<Join<*>>
     val where: List<Criterion>
-    val orderBy: List<Column<*>>
+    val orderBy: List<NamedSortItem<*>>
     val offset: Int
     val limit: Int
     val forUpdate: ForUpdate
@@ -18,12 +18,12 @@ internal interface SelectContext<ENTITY, CONTEXT : SelectContext<ENTITY, CONTEXT
 
     fun addJoin(join: Join<*>): CONTEXT
     fun addWhere(where: List<Criterion>): CONTEXT
-    fun addOrderBy(orderBy: List<Column<*>>): CONTEXT
+    fun addOrderBy(orderBy: List<NamedSortItem<*>>): CONTEXT
     fun setLimit(limit: Int): CONTEXT
     fun setOffset(offset: Int): CONTEXT
     fun setForUpdate(forUpdate: ForUpdate): CONTEXT
 
-    override fun getTables(): List<Table> {
+    override fun getEntityExpressions(): List<EntityMetamodel<*>> {
         return listOf(entityMetamodel) + joins.map { it.entityMetamodel }
     }
 }

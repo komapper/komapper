@@ -5,9 +5,8 @@ import org.komapper.core.config.Dialect
 import org.komapper.core.data.Statement
 import org.komapper.core.dsl.builder.EntityInsertStatementBuilder
 import org.komapper.core.dsl.context.EntityInsertContext
-import org.komapper.core.dsl.getName
+import org.komapper.core.dsl.metamodel.Assignment
 import org.komapper.core.jdbc.JdbcExecutor
-import org.komapper.core.metamodel.Assignment
 
 internal class EntityInsertQuerySupport<ENTITY>(
     private val context: EntityInsertContext<ENTITY>,
@@ -17,8 +16,8 @@ internal class EntityInsertQuerySupport<ENTITY>(
     fun preInsert(config: DatabaseConfig, entity: ENTITY): ENTITY {
         val assignment = context.entityMetamodel.idAssignment()
         return if (assignment is Assignment.Sequence<ENTITY, *>) {
-            val sequenceName = assignment.getName(config.dialect::quote)
             assignment.assign(entity, config.name) {
+                val sequenceName = assignment.getCanonicalSequenceName(config.dialect::quote)
                 val sql = config.dialect.getSequenceSql(sequenceName)
                 val statement = Statement(sql)
                 val executor = JdbcExecutor(config, option.asJdbcOption())
@@ -51,7 +50,7 @@ internal class EntityInsertQuerySupport<ENTITY>(
     fun postInsert(entity: ENTITY, generatedKey: Long): ENTITY {
         val assignment = context.entityMetamodel.idAssignment()
         return if (assignment is Assignment.Identity<ENTITY, *>) {
-            assignment.assign(entity) { generatedKey }
+            assignment.assign(entity, generatedKey)
         } else {
             entity
         }

@@ -3,7 +3,7 @@ package org.komapper.core.dsl.scope
 import org.komapper.core.Scope
 import org.komapper.core.dsl.element.Criterion
 import org.komapper.core.dsl.element.Operand
-import org.komapper.core.metamodel.PropertyMetamodel
+import org.komapper.core.dsl.metamodel.PropertyMetamodel
 
 @Scope
 class OnScope<ENTITY> internal constructor(
@@ -21,6 +21,6 @@ class OnScope<ENTITY> internal constructor(
     }
 
     infix fun <T : Any> PropertyMetamodel<*, T>.eq(right: PropertyMetamodel<ENTITY, T>) {
-        context.add(Criterion.Eq(Operand.Column(this), Operand.Column(right)))
+        context.add(Criterion.Eq(Operand.Property(this), Operand.Property(right)))
     }
 }

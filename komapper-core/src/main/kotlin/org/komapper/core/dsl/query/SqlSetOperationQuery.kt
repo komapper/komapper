@@ -7,7 +7,7 @@ import org.komapper.core.dsl.builder.SqlSetOperationStatementBuilder
 import org.komapper.core.dsl.context.SqlSetOperationComponent
 import org.komapper.core.dsl.context.SqlSetOperationContext
 import org.komapper.core.dsl.context.SqlSetOperationKind
-import org.komapper.core.dsl.element.SortIndex
+import org.komapper.core.dsl.expr.IndexedSortItem
 import org.komapper.core.dsl.scope.SqlSetOperationOptionDeclaration
 import org.komapper.core.dsl.scope.SqlSetOperationOptionScope
 import org.komapper.core.jdbc.JdbcExecutor
@@ -49,10 +49,10 @@ internal data class SetOperationQueryImpl<T>(
     }
 
     override fun orderBy(vararg indexes: Number): SetOperationQueryImpl<T> {
-        val sortIndexes = indexes.map {
-            if (it is SortIndex) it else SortIndex.Asc(it)
+        val items = indexes.map {
+            if (it is IndexedSortItem) it else IndexedSortItem.Asc(it)
         }
-        val newContext = context.copy(orderBy = context.orderBy + sortIndexes)
+        val newContext = context.copy(orderBy = context.orderBy + items)
         return copy(context = newContext)
     }
 

@@ -5,12 +5,12 @@ import org.komapper.core.config.Dialect
 import org.komapper.core.data.Statement
 import org.komapper.core.dsl.builder.SqlInsertStatementBuilder
 import org.komapper.core.dsl.context.SqlInsertContext
+import org.komapper.core.dsl.metamodel.Assignment
 import org.komapper.core.dsl.scope.SqlInsertOptionDeclaration
 import org.komapper.core.dsl.scope.SqlInsertOptionScope
 import org.komapper.core.dsl.scope.ValuesDeclaration
 import org.komapper.core.dsl.scope.ValuesScope
 import org.komapper.core.jdbc.JdbcExecutor
-import org.komapper.core.metamodel.Assignment
 
 interface SqlInsertQuery : Query<Pair<Int, LongArray>> {
     fun values(declaration: ValuesDeclaration): SqlInsertQuery

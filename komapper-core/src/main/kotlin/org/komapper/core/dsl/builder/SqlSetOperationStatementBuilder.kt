@@ -7,7 +7,7 @@ import org.komapper.core.dsl.context.SqlSelectContext
 import org.komapper.core.dsl.context.SqlSetOperationComponent
 import org.komapper.core.dsl.context.SqlSetOperationContext
 import org.komapper.core.dsl.context.SqlSetOperationKind
-import org.komapper.core.dsl.element.SortIndex
+import org.komapper.core.dsl.expr.IndexedSortItem
 
 internal class SqlSetOperationStatementBuilder(
     private val dialect: Dialect,
@@ -21,13 +21,11 @@ internal class SqlSetOperationStatementBuilder(
         if (context.orderBy.isNotEmpty()) {
             buf.append(" order by ")
             for (item in context.orderBy) {
-                val sort = when (item) {
-                    is SortIndex.Asc -> "${item.index} asc"
-                    is SortIndex.Desc -> "${item.index} desc"
-                    else -> error("no sort information.")
+                val (index, sort) = when (item) {
+                    is IndexedSortItem.Asc -> item.index to "asc"
+                    is IndexedSortItem.Desc -> item.index to "desc"
                 }
-                buf.append(sort)
-                buf.append(", ")
+                buf.append("$index $sort, ")
             }
             buf.cutBack(2)
         }

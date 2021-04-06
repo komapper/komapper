@@ -4,6 +4,7 @@ import org.komapper.core.dsl.context.EntityDeleteContext
 import org.komapper.core.dsl.context.EntityInsertContext
 import org.komapper.core.dsl.context.EntitySelectContext
 import org.komapper.core.dsl.context.EntityUpdateContext
+import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.query.EntityBatchDeleteQuery
 import org.komapper.core.dsl.query.EntityBatchDeleteQueryImpl
 import org.komapper.core.dsl.query.EntityBatchInsertQuery
@@ -22,7 +23,6 @@ import org.komapper.core.dsl.query.EntityUpdateQuery
 import org.komapper.core.dsl.query.EntityUpdateQueryImpl
 import org.komapper.core.dsl.query.ListQuery
 import org.komapper.core.dsl.query.Query
-import org.komapper.core.metamodel.EntityMetamodel
 
 object EntityQuery : Dsl {
 

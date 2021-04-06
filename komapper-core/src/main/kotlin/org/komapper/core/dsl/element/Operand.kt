@@ -1,6 +1,8 @@
 package org.komapper.core.dsl.element
 
+import org.komapper.core.dsl.expr.PropertyExpression
+
 internal sealed class Operand {
-    data class Parameter(val column: org.komapper.core.metamodel.Column<*>, val value: Any?) : Operand()
-    data class Column(val column: org.komapper.core.metamodel.Column<*>) : Operand()
+    data class Parameter(val expression: PropertyExpression<*>, val value: Any?) : Operand()
+    data class Property(val expression: PropertyExpression<*>) : Operand()
 }

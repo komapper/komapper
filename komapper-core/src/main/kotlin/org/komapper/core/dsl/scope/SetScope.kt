@@ -2,12 +2,12 @@ package org.komapper.core.dsl.scope
 
 import org.komapper.core.Scope
 import org.komapper.core.dsl.element.Operand
-import org.komapper.core.metamodel.Column
+import org.komapper.core.dsl.expr.PropertyExpression
 
 @Scope
 class SetScope internal constructor(
-    private val context: MutableList<Pair<Operand.Column, Operand>> = mutableListOf()
-) : List<Pair<Operand.Column, Operand>> by context {
+    private val context: MutableList<Pair<Operand.Property, Operand>> = mutableListOf()
+) : List<Pair<Operand.Property, Operand>> by context {
 
     companion object {
         operator fun ValuesDeclaration.plus(other: ValuesDeclaration): ValuesDeclaration {
@@ -18,15 +18,15 @@ class SetScope internal constructor(
         }
     }
 
-    infix fun <T : Any> Column<T>.set(value: T?) {
-        val left = Operand.Column(this)
+    infix fun <T : Any> PropertyExpression<T>.set(value: T?) {
+        val left = Operand.Property(this)
         val right = Operand.Parameter(this, value)
         context.add(left to right)
     }
 
-    infix fun <T : Any> Column<T>.set(operand: Column<T>) {
-        val left = Operand.Column(this)
-        val right = Operand.Column(operand)
+    infix fun <T : Any> PropertyExpression<T>.set(operand: PropertyExpression<T>) {
+        val left = Operand.Property(this)
+        val right = Operand.Property(operand)
         context.add(left to right)
     }
 }

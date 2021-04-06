@@ -1,31 +1,31 @@
 package org.komapper.core.dsl.builder
 
 import org.komapper.core.dsl.context.Context
-import org.komapper.core.metamodel.Table
+import org.komapper.core.dsl.expr.EntityExpression
 
 internal class AliasManager(context: Context<*>, private val parent: AliasManager? = null) {
-    private val aliasMap: Map<Table, String>
+    private val aliasMap: Map<EntityExpression, String>
     private val index: Int
 
     init {
-        val map: MutableMap<Table, String> = mutableMapOf()
+        val map: MutableMap<EntityExpression, String> = mutableMapOf()
         var i = parent?.index ?: 0
-        for (table in context.getTables()) {
-            val alias = "t" + i + "_"
+        for (expression in context.getEntityExpressions()) {
+            val alias = "t${i}_"
             i++
-            map[table] = alias
+            map[expression] = alias
         }
         this.aliasMap = map.toMap()
         this.index = i
     }
 
-    fun getAlias(table: Table): String? {
+    fun getAlias(expression: EntityExpression): String? {
         if (parent != null) {
-            val alias = parent.getAlias(table)
+            val alias = parent.getAlias(expression)
             if (alias != null) {
                 return alias
             }
         }
-        return aliasMap[table]
+        return aliasMap[expression]
     }
 }

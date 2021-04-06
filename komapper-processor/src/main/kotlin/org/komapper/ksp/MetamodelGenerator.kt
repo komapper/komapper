@@ -4,15 +4,15 @@ import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.Nullability
 import java.io.PrintWriter
 
-private const val Assignment = "org.komapper.core.metamodel.Assignment"
-private const val EntityMetamodel = "org.komapper.core.metamodel.EntityMetamodel"
-private const val EmptyEntityMetamodel = "org.komapper.core.metamodel.EmptyEntityMetamodel"
-private const val EmptyPropertyMetamodel = "org.komapper.core.metamodel.EmptyPropertyMetamodel"
-private const val Identity = "org.komapper.core.metamodel.IdGeneratorDescriptor.Identity"
-private const val Sequence = "org.komapper.core.metamodel.IdGeneratorDescriptor.Sequence"
-private const val PropertyDescriptor = "org.komapper.core.metamodel.PropertyDescriptor"
-private const val PropertyMetamodel = "org.komapper.core.metamodel.PropertyMetamodel"
-private const val PropertyMetamodelImpl = "org.komapper.core.metamodel.PropertyMetamodelImpl"
+private const val Assignment = "org.komapper.core.dsl.metamodel.Assignment"
+private const val EntityMetamodel = "org.komapper.core.dsl.metamodel.EntityMetamodel"
+private const val EmptyEntityMetamodel = "org.komapper.core.dsl.metamodel.EmptyEntityMetamodel"
+private const val EmptyPropertyMetamodel = "org.komapper.core.dsl.metamodel.EmptyPropertyMetamodel"
+private const val Identity = "org.komapper.core.dsl.metamodel.Assignment.Identity"
+private const val Sequence = "org.komapper.core.dsl.metamodel.Assignment.Sequence"
+private const val PropertyDescriptor = "org.komapper.core.dsl.metamodel.PropertyDescriptor"
+private const val PropertyMetamodel = "org.komapper.core.dsl.metamodel.PropertyMetamodel"
+private const val PropertyMetamodelImpl = "org.komapper.core.dsl.metamodel.PropertyMetamodelImpl"
 private const val Clock = "java.time.Clock"
 private const val EntityDescriptor = "__EntityDescriptor"
 
@@ -61,24 +61,27 @@ internal class EntityMetamodelGenerator(
     private fun entityDescriptor() {
         w.println("    private object $EntityDescriptor {")
         for (p in entity.properties) {
+            val getter = "{ it.$p }"
+            val setter = "{ e, v -> e.copy($p = v) }"
             val nullable = if (p.nullability == Nullability.NULLABLE) "true" else "false"
-            val idGenerator = when (val kind = p.idGeneratorKind) {
+            val assignment = when (val kind = p.idGeneratorKind) {
                 is IdGeneratorKind.Identity -> {
-                    "$Identity<$entityTypeName, ${p.typeName}>(${p.typeName}::class)"
+                    "$Identity<$entityTypeName, ${p.typeName}>(${p.typeName}::class, $setter)"
                 }
                 is IdGeneratorKind.Sequence -> {
                     val paramList = listOf(
                         "${p.typeName}::class",
+                        setter,
                         "\"${kind.name}\"",
-                        "${kind.incrementBy}",
                         "\"${kind.catalog}\"",
-                        "\"${kind.schema}\""
+                        "\"${kind.schema}\"",
+                        "${kind.incrementBy}",
                     ).joinToString(", ")
                     "$Sequence<$entityTypeName, ${p.typeName}>($paramList)"
                 }
                 else -> "null"
             }
-            w.println("        val $p = $PropertyDescriptor<$entityTypeName, ${p.typeName}>(${p.typeName}::class, \"${p.column.name}\", { it.$p }, { e, v -> e.copy($p = v) }, $nullable, $idGenerator)")
+            w.println("        val $p = $PropertyDescriptor<$entityTypeName, ${p.typeName}>(${p.typeName}::class, \"${p.column.name}\", $getter, $setter, $nullable, $assignment)")
         }
         w.println("    }")
     }

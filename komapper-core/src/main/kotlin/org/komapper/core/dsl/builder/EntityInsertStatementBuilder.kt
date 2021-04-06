@@ -5,10 +5,9 @@ import org.komapper.core.data.Statement
 import org.komapper.core.data.StatementBuffer
 import org.komapper.core.data.Value
 import org.komapper.core.dsl.context.EntityInsertContext
-import org.komapper.core.dsl.getName
-import org.komapper.core.metamodel.Assignment
-import org.komapper.core.metamodel.Column
-import org.komapper.core.metamodel.Table
+import org.komapper.core.dsl.expr.EntityExpression
+import org.komapper.core.dsl.expr.PropertyExpression
+import org.komapper.core.dsl.metamodel.Assignment
 
 internal class EntityInsertStatementBuilder<ENTITY>(
     val dialect: Dialect,
@@ -21,10 +20,10 @@ internal class EntityInsertStatementBuilder<ENTITY>(
         val entityMetamodel = context.entityMetamodel
         val properties = entityMetamodel.properties()
         buf.append("insert into ")
-        buf.append(tableName(entityMetamodel))
+        buf.append(table(entityMetamodel))
         buf.append(" (")
         for (p in properties) {
-            buf.append(columnName(p))
+            buf.append(column(p))
             buf.append(", ")
         }
         buf.cutBack(2)
@@ -45,11 +44,11 @@ internal class EntityInsertStatementBuilder<ENTITY>(
         return buf.toStatement()
     }
 
-    private fun tableName(table: Table): String {
-        return table.getName(dialect::quote)
+    private fun table(expression: EntityExpression): String {
+        return expression.getCanonicalTableName(dialect::quote)
     }
 
-    private fun columnName(column: Column<*>): String {
-        return column.getName(dialect::quote)
+    private fun column(expression: PropertyExpression<*>): String {
+        return expression.getCanonicalColumnName(dialect::quote)
     }
 }

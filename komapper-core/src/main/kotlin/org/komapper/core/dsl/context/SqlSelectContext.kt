@@ -4,37 +4,38 @@ import org.komapper.core.dsl.element.Criterion
 import org.komapper.core.dsl.element.ForUpdate
 import org.komapper.core.dsl.element.Join
 import org.komapper.core.dsl.element.Projection
-import org.komapper.core.metamodel.Column
-import org.komapper.core.metamodel.EntityMetamodel
+import org.komapper.core.dsl.expr.NamedSortItem
+import org.komapper.core.dsl.expr.PropertyExpression
+import org.komapper.core.dsl.metamodel.EntityMetamodel
 
 internal data class SqlSelectContext<ENTITY>(
     override val entityMetamodel: EntityMetamodel<ENTITY>,
     override val joins: List<Join<*>> = listOf(),
     override val where: List<Criterion> = listOf(),
-    override val orderBy: List<Column<*>> = listOf(),
+    override val orderBy: List<NamedSortItem<*>> = listOf(),
     override val offset: Int = -1,
     override val limit: Int = -1,
     override val forUpdate: ForUpdate = ForUpdate(),
-    val groupBy: List<Column<*>> = listOf(),
+    val groupBy: List<PropertyExpression<*>> = listOf(),
     val having: List<Criterion> = listOf(),
     override val projection: Projection =
-        Projection.Tables(setOf(entityMetamodel) + joins.map { it.entityMetamodel }),
+        Projection.Entities((listOf(entityMetamodel) + joins.map { it.entityMetamodel }).distinct()),
 ) : SelectContext<ENTITY, SqlSelectContext<ENTITY>> {
 
-    fun setColumn(column: Column<*>): SqlSelectContext<ENTITY> {
-        return copy(projection = Projection.Columns(listOf(column)))
+    fun setProperty(property: PropertyExpression<*>): SqlSelectContext<ENTITY> {
+        return copy(projection = Projection.Properties(listOf(property)))
     }
 
-    fun setColumns(columns: List<Column<*>>): SqlSelectContext<ENTITY> {
-        return copy(projection = Projection.Columns(columns))
+    fun setProperties(properties: List<PropertyExpression<*>>): SqlSelectContext<ENTITY> {
+        return copy(projection = Projection.Properties(properties))
     }
 
-    fun setTable(entityMetamodel: EntityMetamodel<*>): SqlSelectContext<ENTITY> {
-        return copy(projection = Projection.Tables(setOf(entityMetamodel)))
+    fun setEntity(entityMetamodel: EntityMetamodel<*>): SqlSelectContext<ENTITY> {
+        return copy(projection = Projection.Entities(listOf(entityMetamodel)))
     }
 
-    fun setTables(entityMetamodels: List<EntityMetamodel<*>>): SqlSelectContext<ENTITY> {
-        return copy(projection = Projection.Tables(entityMetamodels.toSet()))
+    fun setEntities(entityMetamodels: List<EntityMetamodel<*>>): SqlSelectContext<ENTITY> {
+        return copy(projection = Projection.Entities(entityMetamodels))
     }
 
     override fun addJoin(join: Join<*>): SqlSelectContext<ENTITY> {
@@ -49,7 +50,7 @@ internal data class SqlSelectContext<ENTITY>(
         return copy(having = this.having + having)
     }
 
-    override fun addOrderBy(orderBy: List<Column<*>>): SqlSelectContext<ENTITY> {
+    override fun addOrderBy(orderBy: List<NamedSortItem<*>>): SqlSelectContext<ENTITY> {
         return copy(orderBy = this.orderBy + orderBy)
     }
 

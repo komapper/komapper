@@ -1,6 +1,6 @@
 package org.komapper.core.dsl.element
 
-import org.komapper.core.metamodel.EntityMetamodel
+import org.komapper.core.dsl.metamodel.EntityMetamodel
 
 internal data class Join<ENTITY>(
     val entityMetamodel: EntityMetamodel<ENTITY>,

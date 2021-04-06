@@ -1,9 +1,9 @@
 package org.komapper.core.dsl.context
 
-import org.komapper.core.metamodel.EntityMetamodel
-import org.komapper.core.metamodel.Table
+import org.komapper.core.dsl.expr.EntityExpression
+import org.komapper.core.dsl.metamodel.EntityMetamodel
 
 internal interface Context<ENTITY> {
     val entityMetamodel: EntityMetamodel<ENTITY>
-    fun getTables(): List<Table>
+    fun getEntityExpressions(): List<EntityExpression>
 }

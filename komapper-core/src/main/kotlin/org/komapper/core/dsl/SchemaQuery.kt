@@ -1,10 +1,10 @@
 package org.komapper.core.dsl
 
+import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.query.Query
 import org.komapper.core.dsl.query.SchemaCreateQueryImpl
 import org.komapper.core.dsl.query.SchemaDropAllQueryImpl
 import org.komapper.core.dsl.query.SchemaDropQueryImpl
-import org.komapper.core.metamodel.EntityMetamodel
 
 object SchemaQuery : Dsl {
 

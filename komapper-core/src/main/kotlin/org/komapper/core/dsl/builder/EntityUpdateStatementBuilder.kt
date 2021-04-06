@@ -5,9 +5,9 @@ import org.komapper.core.data.Statement
 import org.komapper.core.data.StatementBuffer
 import org.komapper.core.data.Value
 import org.komapper.core.dsl.context.EntityUpdateContext
+import org.komapper.core.dsl.expr.EntityExpression
+import org.komapper.core.dsl.expr.PropertyExpression
 import org.komapper.core.dsl.query.EntityUpdateOption
-import org.komapper.core.metamodel.Column
-import org.komapper.core.metamodel.Table
 
 internal class EntityUpdateStatementBuilder<ENTITY>(
     val dialect: Dialect,
@@ -24,10 +24,10 @@ internal class EntityUpdateStatementBuilder<ENTITY>(
         val versionProperty = context.entityMetamodel.versionProperty()
         val properties = context.entityMetamodel.properties()
         buf.append("update ")
-        visitTable(context.entityMetamodel)
+        table(context.entityMetamodel)
         buf.append(" set ")
         for (p in properties - identityProperties) {
-            visitColumn(p)
+            column(p)
             buf.append(" = ")
             val value = Value(p.getter(entity), p.klass)
             buf.bind(value)
@@ -42,7 +42,7 @@ internal class EntityUpdateStatementBuilder<ENTITY>(
             buf.append(" where ")
             if (identityProperties.isNotEmpty()) {
                 for (p in identityProperties) {
-                    visitColumn(p)
+                    column(p)
                     buf.append(" = ")
                     val value = Value(p.getter(entity), p.klass)
                     buf.bind(value)
@@ -54,7 +54,7 @@ internal class EntityUpdateStatementBuilder<ENTITY>(
             }
             if (versionRequired) {
                 checkNotNull(versionProperty)
-                visitColumn(versionProperty)
+                column(versionProperty)
                 buf.append(" = ")
                 val value = Value(versionProperty.getter(entity), versionProperty.klass)
                 buf.bind(value)
@@ -63,11 +63,11 @@ internal class EntityUpdateStatementBuilder<ENTITY>(
         return buf.toStatement()
     }
 
-    private fun visitTable(table: Table) {
-        support.visitTable(table)
+    private fun table(expression: EntityExpression) {
+        support.visitEntityExpression(expression)
     }
 
-    private fun visitColumn(column: Column<*>) {
-        support.visitColumn(column)
+    private fun column(expression: PropertyExpression<*>) {
+        support.visitPropertyExpression(expression)
     }
 }

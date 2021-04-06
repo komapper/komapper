@@ -6,20 +6,20 @@ import org.komapper.core.dsl.element.Criterion
 import org.komapper.core.dsl.element.ForUpdate
 import org.komapper.core.dsl.element.Join
 import org.komapper.core.dsl.element.Projection
-import org.komapper.core.metamodel.Column
-import org.komapper.core.metamodel.EntityMetamodel
+import org.komapper.core.dsl.expr.NamedSortItem
+import org.komapper.core.dsl.metamodel.EntityMetamodel
 
 internal data class EntitySelectContext<ENTITY>(
     override val entityMetamodel: EntityMetamodel<ENTITY>,
     override val joins: List<Join<*>> = listOf(),
     override val where: List<Criterion> = listOf(),
-    override val orderBy: List<Column<*>> = listOf(),
+    override val orderBy: List<NamedSortItem<*>> = listOf(),
     override val offset: Int = -1,
     override val limit: Int = -1,
     override val forUpdate: ForUpdate = ForUpdate(),
     val associatorMap: Map<Association, Associator<Any, Any>> = mapOf(),
-    override val projection: Projection = Projection.Tables(
-        setOf(entityMetamodel) + associatorMap.keys.flatMap { setOf(it.first, it.second) }
+    override val projection: Projection = Projection.Entities(
+        (listOf(entityMetamodel) + associatorMap.keys.flatMap { listOf(it.first, it.second) }).distinct()
     )
 
 ) : SelectContext<ENTITY, EntitySelectContext<ENTITY>> {
@@ -32,7 +32,7 @@ internal data class EntitySelectContext<ENTITY>(
         return copy(where = this.where + where)
     }
 
-    override fun addOrderBy(orderBy: List<Column<*>>): EntitySelectContext<ENTITY> {
+    override fun addOrderBy(orderBy: List<NamedSortItem<*>>): EntitySelectContext<ENTITY> {
         return copy(orderBy = this.orderBy + orderBy)
     }
 
@@ -50,8 +50,8 @@ internal data class EntitySelectContext<ENTITY>(
 
     fun putAssociator(association: Association, associator: Associator<Any, Any>): EntitySelectContext<ENTITY> {
         val newProjection = when (projection) {
-            is Projection.Columns -> error("cannot happen.")
-            is Projection.Tables -> Projection.Tables(
+            is Projection.Properties -> error("cannot happen.")
+            is Projection.Entities -> Projection.Entities(
                 projection.values + setOf(association.first, association.second)
             )
         }

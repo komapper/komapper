@@ -6,9 +6,9 @@ import org.komapper.core.dsl.context.SelectContext
 import org.komapper.core.dsl.element.Criterion
 import org.komapper.core.dsl.element.JoinKind
 import org.komapper.core.dsl.element.Projection
-import org.komapper.core.dsl.element.SortItem
-import org.komapper.core.metamodel.Column
-import org.komapper.core.metamodel.Table
+import org.komapper.core.dsl.expr.EntityExpression
+import org.komapper.core.dsl.expr.NamedSortItem
+import org.komapper.core.dsl.expr.PropertyExpression
 
 internal class SelectStatementBuilderSupport(
     dialect: Dialect,
@@ -21,11 +21,11 @@ internal class SelectStatementBuilderSupport(
     fun selectClause() {
         buf.append("select ")
         val columns = when (val projection = context.projection) {
-            is Projection.Columns -> projection.values
-            is Projection.Tables -> projection.values.flatMap { it.properties() }
+            is Projection.Properties -> projection.values
+            is Projection.Entities -> projection.values.flatMap { it.properties() }
         }
         for (c in columns) {
-            visitColumn(c)
+            column(c)
             buf.append(", ")
         }
         buf.cutBack(2)
@@ -33,7 +33,7 @@ internal class SelectStatementBuilderSupport(
 
     fun fromClause() {
         buf.append(" from ")
-        visitTable(context.entityMetamodel)
+        table(context.entityMetamodel)
         if (context.joins.isNotEmpty()) {
             for (join in context.joins) {
                 if (join.kind === JoinKind.INNER) {
@@ -41,7 +41,7 @@ internal class SelectStatementBuilderSupport(
                 } else if (join.kind === JoinKind.LEFT_OUTER) {
                     buf.append(" left outer join ")
                 }
-                visitTable(join.entityMetamodel)
+                table(join.entityMetamodel)
                 if (join.on.isNotEmpty()) {
                     buf.append(" on (")
                     for ((index, criterion) in join.on.withIndex()) {
@@ -70,16 +70,12 @@ internal class SelectStatementBuilderSupport(
         if (context.orderBy.isNotEmpty()) {
             buf.append(" order by ")
             for (item in context.orderBy) {
-                val (columnInfo, sort) = when (item) {
-                    is SortItem.Asc<*> -> item.column to "asc"
-                    is SortItem.Desc<*> -> item.column to "desc"
-                    else -> item to null
+                val (expression, sort) = when (item) {
+                    is NamedSortItem.Asc<*> -> item.expression to "asc"
+                    is NamedSortItem.Desc<*> -> item.expression to "desc"
                 }
-                visitColumn(columnInfo)
-                if (sort != null) {
-                    buf.append(" $sort")
-                }
-                buf.append(", ")
+                column(expression)
+                buf.append(" $sort, ")
             }
             buf.cutBack(2)
         }
@@ -104,15 +100,15 @@ internal class SelectStatementBuilderSupport(
         }
     }
 
-    private fun visitTable(table: Table) {
-        support.visitTable(table)
+    private fun table(expression: EntityExpression) {
+        support.visitEntityExpression(expression)
     }
 
-    fun visitColumn(column: Column<*>) {
-        support.visitColumn(column)
+    fun column(expression: PropertyExpression<*>) {
+        support.visitPropertyExpression(expression)
     }
 
     fun visitCriterion(index: Int, c: Criterion) {
-        return support.visitCriterion(index, c)
+        support.visitCriterion(index, c)
     }
 }

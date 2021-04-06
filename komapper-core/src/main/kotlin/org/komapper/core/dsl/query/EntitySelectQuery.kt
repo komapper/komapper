@@ -7,13 +7,13 @@ import org.komapper.core.dsl.builder.EntitySelectStatementBuilder
 import org.komapper.core.dsl.context.EntitySelectContext
 import org.komapper.core.dsl.element.Associator
 import org.komapper.core.dsl.element.Projection
+import org.komapper.core.dsl.expr.PropertyExpression
+import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.scope.EntitySelectOptionDeclaration
 import org.komapper.core.dsl.scope.EntitySelectOptionScope
 import org.komapper.core.dsl.scope.OnDeclaration
 import org.komapper.core.dsl.scope.WhereDeclaration
 import org.komapper.core.jdbc.JdbcExecutor
-import org.komapper.core.metamodel.Column
-import org.komapper.core.metamodel.EntityMetamodel
 import java.sql.ResultSet
 
 interface EntitySelectQuery<ENTITY> : ListQuery<ENTITY> {
@@ -29,7 +29,7 @@ interface EntitySelectQuery<ENTITY> : ListQuery<ENTITY> {
     ): EntitySelectQuery<ENTITY>
 
     fun where(declaration: WhereDeclaration): EntitySelectQuery<ENTITY>
-    fun orderBy(vararg items: Column<*>): EntitySelectQuery<ENTITY>
+    fun orderBy(vararg properties: PropertyExpression<*>): EntitySelectQuery<ENTITY>
     fun offset(value: Int): EntitySelectQuery<ENTITY>
     fun limit(value: Int): EntitySelectQuery<ENTITY>
     fun forUpdate(): EntitySelectQuery<ENTITY>
@@ -77,7 +77,7 @@ internal data class EntitySelectQueryImpl<ENTITY>(
         e2: EntityMetamodel<S>,
         associator: Associator<T, S>
     ): EntitySelectQueryImpl<ENTITY> {
-        val entityMetamodels = context.getTables()
+        val entityMetamodels = context.getEntityExpressions()
         if (entityMetamodels.none { it == e1 }) error(entityMetamodelNotFound("e1"))
         if (entityMetamodels.none { it == e2 }) error(entityMetamodelNotFound("e2"))
         @Suppress("UNCHECKED_CAST")
@@ -90,8 +90,8 @@ internal data class EntitySelectQueryImpl<ENTITY>(
         return copy(context = newContext)
     }
 
-    override fun orderBy(vararg items: Column<*>): EntitySelectQueryImpl<ENTITY> {
-        val newContext = support.orderBy(*items)
+    override fun orderBy(vararg properties: PropertyExpression<*>): EntitySelectQueryImpl<ENTITY> {
+        val newContext = support.orderBy(*properties)
         return copy(context = newContext)
     }
 
@@ -180,8 +180,8 @@ internal data class EntitySelectQueryImpl<ENTITY>(
 
         private fun fetchAllEntities(dialect: Dialect, rs: ResultSet): List<Map<EntityKey, Any>> {
             val entityMetamodels = when (val projection = context.projection) {
-                is Projection.Columns -> error("cannot happen")
-                is Projection.Tables -> projection.values
+                is Projection.Properties -> error("cannot happen")
+                is Projection.Entities -> projection.values
             }
             val rows = mutableListOf<Map<EntityKey, Any>>()
             while (rs.next()) {

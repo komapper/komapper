@@ -1,8 +1,8 @@
 package org.komapper.core.dsl.query
 
 import org.komapper.core.config.Dialect
-import org.komapper.core.metamodel.EntityMetamodel
-import org.komapper.core.metamodel.PropertyMetamodel
+import org.komapper.core.dsl.metamodel.EntityMetamodel
+import org.komapper.core.dsl.metamodel.PropertyMetamodel
 import java.sql.ResultSet
 
 internal class EntityMapper(val dialect: Dialect, val resultSet: ResultSet) {
