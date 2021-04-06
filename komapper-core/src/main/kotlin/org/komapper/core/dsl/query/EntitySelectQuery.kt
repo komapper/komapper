@@ -184,7 +184,7 @@ internal data class EntitySelectQueryImpl<ENTITY>(
                 val row = mutableMapOf<EntityKey, Any>()
                 val mapper = EntityMapper(dialect, rs)
                 for (entityMetamodel in entityMetamodels) {
-                    val entity = mapper.execute(entityMetamodel) as Any
+                    val entity = mapper.execute(entityMetamodel) ?: continue
                     val idValues = entityMetamodel.idProperties()
                         .map { it.getterWithUncheckedCast(entity) }
                         .map { checkNotNull(it) }

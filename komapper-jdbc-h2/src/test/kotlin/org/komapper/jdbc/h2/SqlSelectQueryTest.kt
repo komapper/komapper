@@ -13,7 +13,6 @@ import org.komapper.core.dsl.count
 import org.komapper.core.dsl.desc
 import org.komapper.core.dsl.max
 import org.komapper.core.dsl.min
-import org.komapper.core.dsl.plus
 import org.komapper.core.dsl.sum
 
 @ExtendWith(Env::class)
@@ -173,15 +172,36 @@ class SqlSelectQueryTest(private val db: Database) {
     }
 
     @Test
-    fun innerJoin_single() {
+    fun leftJoin_single() {
         val a = Address.metamodel()
         val e = Employee.metamodel()
-        val list: List<Employee> = db.execute {
-            SqlQuery.from(a).innerJoin(e) {
-                a.addressId eq e.addressId
-            }.select(e)
+        val list: List<Employee?> = db.execute {
+            SqlQuery.from(a)
+                .leftJoin(e) {
+                    a.addressId eq e.addressId
+                }
+                .orderBy(a.addressId)
+                .select(e)
         }
-        assertEquals(14, list.size)
+        assertEquals(15, list.size)
+        assertNull(list[14])
+    }
+
+    @Test
+    fun leftJoin_pair() {
+        val a = Address.metamodel()
+        val e = Employee.metamodel()
+        val list: List<Pair<Address?, Employee?>> = db.execute {
+            SqlQuery.from(a)
+                .leftJoin(e) {
+                    a.addressId eq e.addressId
+                }
+                .orderBy(a.addressId)
+                .select(a, e)
+        }
+        assertEquals(15, list.size)
+        assertNotNull(list[14].first)
+        assertNull(list[14].second)
     }
 
     @Test
@@ -285,7 +305,7 @@ class SqlSelectQueryTest(private val db: Database) {
         val avg = db.execute {
             SqlQuery.from(a).select(avg(a.addressId)).first()
         }
-        assertEquals(8.0, avg, 0.0)
+        assertEquals(8.0, avg!!, 0.0)
     }
 
     @Test
