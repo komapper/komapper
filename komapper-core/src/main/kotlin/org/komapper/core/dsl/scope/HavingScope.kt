@@ -7,7 +7,7 @@ import org.komapper.core.dsl.element.Criterion
 class HavingScope internal constructor(
     private val support: FilterScopeSupport = FilterScopeSupport()
 ) : FilterScope by support,
-    List<Criterion> by support {
+    Collection<Criterion> by support {
 
     companion object {
         operator fun HavingDeclaration.plus(other: HavingDeclaration): HavingDeclaration {

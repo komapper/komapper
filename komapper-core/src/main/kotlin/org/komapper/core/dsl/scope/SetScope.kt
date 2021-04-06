@@ -7,7 +7,7 @@ import org.komapper.core.dsl.expr.PropertyExpression
 @Scope
 class SetScope internal constructor(
     private val context: MutableList<Pair<Operand.Property, Operand>> = mutableListOf()
-) : List<Pair<Operand.Property, Operand>> by context {
+) : Collection<Pair<Operand.Property, Operand>> by context {
 
     companion object {
         operator fun ValuesDeclaration.plus(other: ValuesDeclaration): ValuesDeclaration {

@@ -7,7 +7,7 @@ import org.komapper.core.dsl.element.Criterion
 class WhereScope internal constructor(
     private val support: FilterScopeSupport = FilterScopeSupport()
 ) : FilterScope by support,
-    List<Criterion> by support {
+    Collection<Criterion> by support {
 
     companion object {
         operator fun WhereDeclaration.plus(other: WhereDeclaration): WhereDeclaration {
