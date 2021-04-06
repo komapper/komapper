@@ -8,10 +8,12 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.Database
 import org.komapper.core.dsl.SqlQuery
 import org.komapper.core.dsl.avg
+import org.komapper.core.dsl.concat
 import org.komapper.core.dsl.count
 import org.komapper.core.dsl.desc
 import org.komapper.core.dsl.max
 import org.komapper.core.dsl.min
+import org.komapper.core.dsl.plus
 import org.komapper.core.dsl.sum
 
 @ExtendWith(Env::class)
@@ -114,6 +116,30 @@ class SqlSelectQueryTest(private val db: Database) {
             ),
             tripleList
         )
+    }
+
+    @Test
+    fun execute_selectRecord() {
+        val a = Address.metamodel()
+        val list = db.execute {
+            SqlQuery.from(a)
+                .where {
+                    a.addressId inList listOf(1, 2)
+                }
+                .orderBy(a.addressId)
+                .select(a.addressId, a.street, a.version, concat(a.street, " test"))
+        }
+        assertEquals(2, list.size)
+        val record0 = list[0]
+        assertEquals(1, record0[a.addressId])
+        assertEquals("STREET 1", record0[a.street])
+        assertEquals(1, record0[a.version])
+        assertEquals("STREET 1 test", record0[concat(a.street, " test")])
+        val record1 = list[1]
+        assertEquals(2, record1[a.addressId])
+        assertEquals("STREET 2", record1[a.street])
+        assertEquals(1, record1[a.version])
+        assertEquals("STREET 2 test", record1[concat(a.street, " test")])
     }
 
     @Test
