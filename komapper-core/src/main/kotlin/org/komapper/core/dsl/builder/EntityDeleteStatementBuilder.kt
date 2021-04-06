@@ -6,8 +6,8 @@ import org.komapper.core.data.StatementBuffer
 import org.komapper.core.data.Value
 import org.komapper.core.dsl.context.EntityDeleteContext
 import org.komapper.core.dsl.query.EntityDeleteOption
-import org.komapper.core.metamodel.ColumnInfo
-import org.komapper.core.metamodel.TableInfo
+import org.komapper.core.metamodel.Column
+import org.komapper.core.metamodel.Table
 
 internal class EntityDeleteStatementBuilder<ENTITY>(
     val dialect: Dialect,
@@ -21,7 +21,7 @@ internal class EntityDeleteStatementBuilder<ENTITY>(
 
     fun build(): Statement {
         buf.append("delete from ")
-        visitTableInfo(context.entityMetamodel)
+        visitTable(context.entityMetamodel)
         val identityProperties = context.entityMetamodel.idProperties()
         val versionProperty = context.entityMetamodel.versionProperty()
         val versionRequired = versionProperty != null && !option.ignoreVersion
@@ -29,7 +29,7 @@ internal class EntityDeleteStatementBuilder<ENTITY>(
             buf.append(" where ")
             if (identityProperties.isNotEmpty()) {
                 for (p in identityProperties) {
-                    visitColumnInfo(p)
+                    visitColumn(p)
                     buf.append(" = ")
                     val value = Value(p.getter(entity), p.klass)
                     buf.bind(value)
@@ -41,7 +41,7 @@ internal class EntityDeleteStatementBuilder<ENTITY>(
             }
             if (versionRequired) {
                 checkNotNull(versionProperty)
-                visitColumnInfo(versionProperty)
+                visitColumn(versionProperty)
                 buf.append(" = ")
                 val value = Value(versionProperty.getter(entity), versionProperty.klass)
                 buf.bind(value)
@@ -50,11 +50,11 @@ internal class EntityDeleteStatementBuilder<ENTITY>(
         return buf.toStatement()
     }
 
-    private fun visitTableInfo(tableInfo: TableInfo) {
-        support.visitTableInfo(tableInfo)
+    private fun visitTable(table: Table) {
+        support.visitTable(table)
     }
 
-    private fun visitColumnInfo(columnInfo: ColumnInfo<*>) {
-        support.visitColumnInfo(columnInfo)
+    private fun visitColumn(column: Column<*>) {
+        support.visitColumn(column)
     }
 }

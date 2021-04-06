@@ -6,7 +6,7 @@ import org.komapper.core.dsl.operand.LikeOperand
 import org.komapper.core.dsl.option.LikeOption
 import org.komapper.core.dsl.query.SingleColumnSqlSubqueryResult
 import org.komapper.core.dsl.query.SqlSubqueryResult
-import org.komapper.core.metamodel.ColumnInfo
+import org.komapper.core.metamodel.Column
 
 internal class FilterScopeSupport(
     private val context: MutableList<Criterion> = mutableListOf()
@@ -18,24 +18,24 @@ internal class FilterScopeSupport(
 
     private fun <T : Any> add(
         operator: (Operand, Operand) -> Criterion,
-        left: ColumnInfo<T>,
-        right: ColumnInfo<T>
+        left: Column<T>,
+        right: Column<T>
     ) {
         context.add(operator(Operand.Column(left), Operand.Column(right)))
     }
 
-    private fun <T : Any> add(operator: (Operand, Operand) -> Criterion, left: ColumnInfo<T>, right: T) {
+    private fun <T : Any> add(operator: (Operand, Operand) -> Criterion, left: Column<T>, right: T) {
         context.add(operator(Operand.Column(left), Operand.Parameter(left, right)))
     }
 
-    private fun <T : Any> add(operator: (Operand, Operand) -> Criterion, left: T, right: ColumnInfo<T>) {
+    private fun <T : Any> add(operator: (Operand, Operand) -> Criterion, left: T, right: Column<T>) {
         context.add(operator(Operand.Parameter(right, left), Operand.Column(right)))
     }
 
     private fun <T : Any> add(
         operator: (Operand, Operand, LikeOption) -> Criterion,
-        left: ColumnInfo<T>,
-        right: ColumnInfo<T>,
+        left: Column<T>,
+        right: Column<T>,
         option: LikeOption
     ) {
         context.add(operator(Operand.Column(left), Operand.Column(right), option))
@@ -43,7 +43,7 @@ internal class FilterScopeSupport(
 
     private fun <T : Any> add(
         operator: (Operand, Operand, LikeOption) -> Criterion,
-        left: ColumnInfo<T>,
+        left: Column<T>,
         right: Any,
         option: LikeOption
     ) {
@@ -53,123 +53,123 @@ internal class FilterScopeSupport(
     private fun <T : Any> add(
         operator: (Operand, Operand, LikeOption) -> Criterion,
         left: Any,
-        right: ColumnInfo<T>,
+        right: Column<T>,
         option: LikeOption
     ) {
         context.add(operator(Operand.Parameter(right, left), Operand.Column(right), option))
     }
 
-    override infix fun <T : Any> ColumnInfo<T>.eq(operand: ColumnInfo<T>) {
+    override infix fun <T : Any> Column<T>.eq(operand: Column<T>) {
         add(Criterion::Eq, this, operand)
     }
 
-    override infix fun <T : Any> ColumnInfo<T>.eq(operand: T?) {
+    override infix fun <T : Any> Column<T>.eq(operand: T?) {
         if (operand == null) return
         add(Criterion::Eq, this, operand)
     }
 
-    override infix fun <T : Any> T?.eq(operand: ColumnInfo<T>) {
+    override infix fun <T : Any> T?.eq(operand: Column<T>) {
         if (this == null) return
         add(Criterion::Eq, this, operand)
     }
 
-    override infix fun <T : Any> ColumnInfo<T>.notEq(operand: ColumnInfo<T>) {
+    override infix fun <T : Any> Column<T>.notEq(operand: Column<T>) {
         add(Criterion::NotEq, this, operand)
     }
 
-    override infix fun <T : Any> ColumnInfo<T>.notEq(operand: T?) {
+    override infix fun <T : Any> Column<T>.notEq(operand: T?) {
         if (operand == null) return
         add(Criterion::NotEq, this, operand)
     }
 
-    override infix fun <T : Any> T?.notEq(operand: ColumnInfo<T>) {
+    override infix fun <T : Any> T?.notEq(operand: Column<T>) {
         if (this == null) return
         add(Criterion::NotEq, this, operand)
     }
 
-    override infix fun <T : Any> ColumnInfo<T>.less(operand: ColumnInfo<T>) {
+    override infix fun <T : Any> Column<T>.less(operand: Column<T>) {
         add(Criterion::Less, this, operand)
     }
 
-    override infix fun <T : Any> ColumnInfo<T>.less(operand: T?) {
+    override infix fun <T : Any> Column<T>.less(operand: T?) {
         if (operand == null) return
         add(Criterion::Less, this, operand)
     }
 
-    override infix fun <T : Any> T?.less(operand: ColumnInfo<T>) {
+    override infix fun <T : Any> T?.less(operand: Column<T>) {
         if (this == null) return
         add(Criterion::Less, this, operand)
     }
 
-    override infix fun <T : Any> ColumnInfo<T>.lessEq(operand: ColumnInfo<T>) {
+    override infix fun <T : Any> Column<T>.lessEq(operand: Column<T>) {
         add(Criterion::LessEq, this, operand)
     }
 
-    override infix fun <T : Any> ColumnInfo<T>.lessEq(operand: T?) {
+    override infix fun <T : Any> Column<T>.lessEq(operand: T?) {
         if (operand == null) return
         add(Criterion::LessEq, this, operand)
     }
 
-    override infix fun <T : Any> T?.lessEq(operand: ColumnInfo<T>) {
+    override infix fun <T : Any> T?.lessEq(operand: Column<T>) {
         if (this == null) return
         add(Criterion::LessEq, this, operand)
     }
 
-    override infix fun <T : Any> ColumnInfo<T>.greater(operand: ColumnInfo<T>) {
+    override infix fun <T : Any> Column<T>.greater(operand: Column<T>) {
         add(Criterion::Grater, this, operand)
     }
 
-    override infix fun <T : Any> ColumnInfo<T>.greater(operand: T?) {
+    override infix fun <T : Any> Column<T>.greater(operand: T?) {
         if (operand == null) return
         add(Criterion::Grater, this, operand)
     }
 
-    override infix fun <T : Any> T?.greater(operand: ColumnInfo<T>) {
+    override infix fun <T : Any> T?.greater(operand: Column<T>) {
         if (this == null) return
         add(Criterion::GraterEq, this, operand)
     }
 
-    override infix fun <T : Any> ColumnInfo<T>.greaterEq(operand: ColumnInfo<T>) {
+    override infix fun <T : Any> Column<T>.greaterEq(operand: Column<T>) {
         add(Criterion::GraterEq, this, operand)
     }
 
-    override infix fun <T : Any> ColumnInfo<T>.greaterEq(operand: T?) {
+    override infix fun <T : Any> Column<T>.greaterEq(operand: T?) {
         if (operand == null) return
         add(Criterion::GraterEq, this, operand)
     }
 
-    override infix fun <T : Any> T?.greaterEq(operand: ColumnInfo<T>) {
+    override infix fun <T : Any> T?.greaterEq(operand: Column<T>) {
         if (this == null) return
         add(Criterion::GraterEq, this, operand)
     }
 
-    override fun <T : Any> ColumnInfo<T>.isNull() {
+    override fun <T : Any> Column<T>.isNull() {
         val left = Operand.Column(this)
         add(Criterion.IsNull(left))
     }
 
-    override fun <T : Any> ColumnInfo<T>.isNotNull() {
+    override fun <T : Any> Column<T>.isNotNull() {
         val left = Operand.Column(this)
         add(Criterion.IsNotNull(left))
     }
 
-    override infix fun <T : CharSequence> ColumnInfo<T>.like(operand: Any?) {
+    override infix fun <T : CharSequence> Column<T>.like(operand: Any?) {
         if (operand == null) return
         add(Criterion::Like, this, operand, LikeOption.None)
     }
 
-    override infix fun <T : CharSequence> ColumnInfo<T>.like(operand: LikeOperand) {
+    override infix fun <T : CharSequence> Column<T>.like(operand: LikeOperand) {
         val value = operand.value ?: return
         val option = createLikeOption(operand)
         add(Criterion::Like, this, value, option)
     }
 
-    override infix fun <T : CharSequence> ColumnInfo<T>.notLike(operand: Any?) {
+    override infix fun <T : CharSequence> Column<T>.notLike(operand: Any?) {
         if (operand == null) return
         add(Criterion::NotLike, this, operand, LikeOption.None)
     }
 
-    override infix fun <T : CharSequence> ColumnInfo<T>.notLike(operand: LikeOperand) {
+    override infix fun <T : CharSequence> Column<T>.notLike(operand: LikeOperand) {
         val value = operand.value ?: return
         val option = createLikeOption(operand)
         add(Criterion::NotLike, this, value, option)
@@ -185,45 +185,45 @@ internal class FilterScopeSupport(
         }
     }
 
-    override infix fun <T : Comparable<T>> ColumnInfo<T>.between(range: ClosedRange<T>) {
+    override infix fun <T : Comparable<T>> Column<T>.between(range: ClosedRange<T>) {
         val left = Operand.Column(this)
         val right = Operand.Parameter(this, range.start) to Operand.Parameter(this, range.endInclusive)
         add(Criterion.Between(left, right))
     }
 
-    override infix fun <T : Comparable<T>> ColumnInfo<T>.notBetween(range: ClosedRange<T>) {
+    override infix fun <T : Comparable<T>> Column<T>.notBetween(range: ClosedRange<T>) {
         val left = Operand.Column(this)
         val right = Operand.Parameter(this, range.start) to Operand.Parameter(this, range.endInclusive)
         add(Criterion.NotBetween(left, right))
     }
 
-    override infix fun <T : Any> ColumnInfo<T>.inList(values: List<T?>) {
+    override infix fun <T : Any> Column<T>.inList(values: List<T?>) {
         val o1 = Operand.Column(this)
         val o2 = values.map { Operand.Parameter(this, it) }
         add(Criterion.InList(o1, o2))
     }
 
-    override infix fun <T : Any> ColumnInfo<T>.inList(block: () -> SingleColumnSqlSubqueryResult) {
+    override infix fun <T : Any> Column<T>.inList(block: () -> SingleColumnSqlSubqueryResult) {
         this.inList(block())
     }
 
-    override infix fun <T : Any> ColumnInfo<T>.inList(projection: SingleColumnSqlSubqueryResult) {
+    override infix fun <T : Any> Column<T>.inList(projection: SingleColumnSqlSubqueryResult) {
         val left = Operand.Column(this)
         val right = projection.contextHolder.context
         add(Criterion.InSubQuery(left, right))
     }
 
-    override infix fun <T : Any> ColumnInfo<T>.notInList(values: List<T?>) {
+    override infix fun <T : Any> Column<T>.notInList(values: List<T?>) {
         val o1 = Operand.Column(this)
         val o2 = values.map { Operand.Parameter(this, it) }
         add(Criterion.NotInList(o1, o2))
     }
 
-    override infix fun <T : Any> ColumnInfo<T>.notInList(block: () -> SingleColumnSqlSubqueryResult) {
+    override infix fun <T : Any> Column<T>.notInList(block: () -> SingleColumnSqlSubqueryResult) {
         this.notInList(block())
     }
 
-    override infix fun <T : Any> ColumnInfo<T>.notInList(projection: SingleColumnSqlSubqueryResult) {
+    override infix fun <T : Any> Column<T>.notInList(projection: SingleColumnSqlSubqueryResult) {
         val left = Operand.Column(this)
         val right = projection.contextHolder.context
         add(Criterion.NotInSubQuery(left, right))

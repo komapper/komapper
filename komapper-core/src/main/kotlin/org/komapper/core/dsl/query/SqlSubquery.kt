@@ -5,7 +5,7 @@ import org.komapper.core.dsl.scope.HavingDeclaration
 import org.komapper.core.dsl.scope.HavingScope
 import org.komapper.core.dsl.scope.OnDeclaration
 import org.komapper.core.dsl.scope.WhereDeclaration
-import org.komapper.core.metamodel.ColumnInfo
+import org.komapper.core.metamodel.Column
 import org.komapper.core.metamodel.EntityMetamodel
 
 interface SqlSubquery<ENTITY> : SqlSubqueryResult {
@@ -20,13 +20,13 @@ interface SqlSubquery<ENTITY> : SqlSubqueryResult {
     ): SqlSubquery<ENTITY>
 
     fun where(declaration: WhereDeclaration): SqlSubquery<ENTITY>
-    fun groupBy(vararg items: ColumnInfo<*>): SqlSubquery<ENTITY>
+    fun groupBy(vararg items: Column<*>): SqlSubquery<ENTITY>
     fun having(declaration: HavingDeclaration): SqlSubquery<ENTITY>
-    fun orderBy(vararg items: ColumnInfo<*>): SqlSubquery<ENTITY>
+    fun orderBy(vararg items: Column<*>): SqlSubquery<ENTITY>
     fun offset(value: Int): SqlSubquery<ENTITY>
     fun limit(value: Int): SqlSubquery<ENTITY>
     fun forUpdate(): SqlSubquery<ENTITY>
-    fun select(columnInfo: ColumnInfo<*>): SingleColumnSqlSubqueryResult
+    fun select(column: Column<*>): SingleColumnSqlSubqueryResult
 }
 
 internal data class SqlSubqueryImpl<ENTITY>(
@@ -59,7 +59,7 @@ internal data class SqlSubqueryImpl<ENTITY>(
         return copy(context = newContext)
     }
 
-    override fun groupBy(vararg items: ColumnInfo<*>): SqlSubqueryImpl<ENTITY> {
+    override fun groupBy(vararg items: Column<*>): SqlSubqueryImpl<ENTITY> {
         val newContext = context.copy(groupBy = items.toList())
         return copy(context = newContext)
     }
@@ -71,7 +71,7 @@ internal data class SqlSubqueryImpl<ENTITY>(
         return copy(context = newContext)
     }
 
-    override fun orderBy(vararg items: ColumnInfo<*>): SqlSubqueryImpl<ENTITY> {
+    override fun orderBy(vararg items: Column<*>): SqlSubqueryImpl<ENTITY> {
         val newContext = support.orderBy(*items)
         return copy(context = newContext)
     }
@@ -91,8 +91,8 @@ internal data class SqlSubqueryImpl<ENTITY>(
         return copy(context = newContext)
     }
 
-    override fun select(columnInfo: ColumnInfo<*>): SingleColumnSqlSubqueryResult {
-        val newContext = context.setColumn(columnInfo)
+    override fun select(column: Column<*>): SingleColumnSqlSubqueryResult {
+        val newContext = context.setColumn(column)
         return SingleColumnSqlSubqueryResultImpl(ContextHolder(newContext))
     }
 }

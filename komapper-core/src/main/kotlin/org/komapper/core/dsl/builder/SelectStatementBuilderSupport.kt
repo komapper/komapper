@@ -7,8 +7,8 @@ import org.komapper.core.dsl.element.Criterion
 import org.komapper.core.dsl.element.JoinKind
 import org.komapper.core.dsl.element.Projection
 import org.komapper.core.dsl.element.SortItem
-import org.komapper.core.metamodel.ColumnInfo
-import org.komapper.core.metamodel.TableInfo
+import org.komapper.core.metamodel.Column
+import org.komapper.core.metamodel.Table
 
 internal class SelectStatementBuilderSupport(
     dialect: Dialect,
@@ -25,7 +25,7 @@ internal class SelectStatementBuilderSupport(
             is Projection.Tables -> projection.values.flatMap { it.properties() }
         }
         for (c in columns) {
-            visitColumnInfo(c)
+            visitColumn(c)
             buf.append(", ")
         }
         buf.cutBack(2)
@@ -33,7 +33,7 @@ internal class SelectStatementBuilderSupport(
 
     fun fromClause() {
         buf.append(" from ")
-        visitTableInfo(context.entityMetamodel)
+        visitTable(context.entityMetamodel)
         if (context.joins.isNotEmpty()) {
             for (join in context.joins) {
                 if (join.kind === JoinKind.INNER) {
@@ -41,7 +41,7 @@ internal class SelectStatementBuilderSupport(
                 } else if (join.kind === JoinKind.LEFT_OUTER) {
                     buf.append(" left outer join ")
                 }
-                visitTableInfo(join.entityMetamodel)
+                visitTable(join.entityMetamodel)
                 if (join.on.isNotEmpty()) {
                     buf.append(" on (")
                     for ((index, criterion) in join.on.withIndex()) {
@@ -71,11 +71,11 @@ internal class SelectStatementBuilderSupport(
             buf.append(" order by ")
             for (item in context.orderBy) {
                 val (columnInfo, sort) = when (item) {
-                    is SortItem.Asc<*> -> item.columnInfo to "asc"
-                    is SortItem.Desc<*> -> item.columnInfo to "desc"
+                    is SortItem.Asc<*> -> item.column to "asc"
+                    is SortItem.Desc<*> -> item.column to "desc"
                     else -> item to null
                 }
-                visitColumnInfo(columnInfo)
+                visitColumn(columnInfo)
                 if (sort != null) {
                     buf.append(" $sort")
                 }
@@ -104,12 +104,12 @@ internal class SelectStatementBuilderSupport(
         }
     }
 
-    private fun visitTableInfo(tableInfo: TableInfo) {
-        support.visitTableInfo(tableInfo)
+    private fun visitTable(table: Table) {
+        support.visitTable(table)
     }
 
-    fun visitColumnInfo(columnInfo: ColumnInfo<*>) {
-        support.visitColumnInfo(columnInfo)
+    fun visitColumn(column: Column<*>) {
+        support.visitColumn(column)
     }
 
     fun visitCriterion(index: Int, c: Criterion) {

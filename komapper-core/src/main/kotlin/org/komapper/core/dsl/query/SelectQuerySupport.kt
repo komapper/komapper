@@ -10,7 +10,7 @@ import org.komapper.core.dsl.scope.OnDeclaration
 import org.komapper.core.dsl.scope.OnScope
 import org.komapper.core.dsl.scope.WhereDeclaration
 import org.komapper.core.dsl.scope.WhereScope
-import org.komapper.core.metamodel.ColumnInfo
+import org.komapper.core.metamodel.Column
 import org.komapper.core.metamodel.EntityMetamodel
 
 internal data class SelectQuerySupport<ENTITY, CONTEXT : SelectContext<ENTITY, CONTEXT>>(
@@ -51,7 +51,7 @@ internal data class SelectQuerySupport<ENTITY, CONTEXT : SelectContext<ENTITY, C
         return context.addWhere(scope.toList())
     }
 
-    fun orderBy(vararg sortItems: ColumnInfo<*>): CONTEXT {
+    fun orderBy(vararg sortItems: Column<*>): CONTEXT {
         val items = sortItems.map {
             when (it) {
                 is SortItem -> it

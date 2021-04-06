@@ -7,7 +7,7 @@ import org.komapper.core.dsl.context.SqlSelectContext
 import org.komapper.core.dsl.element.Criterion
 import org.komapper.core.dsl.element.Projection
 import org.komapper.core.dsl.expr.AggregateFunction
-import org.komapper.core.metamodel.ColumnInfo
+import org.komapper.core.metamodel.Column
 
 internal class SqlSelectStatementBuilder(
     val dialect: Dialect,
@@ -52,7 +52,7 @@ internal class SqlSelectStatementBuilder(
             if (aggregateFunctions.isNotEmpty() && groupByItems.isNotEmpty()) {
                 buf.append(" group by ")
                 for (item in groupByItems) {
-                    visitColumnInfo(item)
+                    visitColumn(item)
                     buf.append(", ")
                 }
                 buf.cutBack(2)
@@ -60,7 +60,7 @@ internal class SqlSelectStatementBuilder(
         } else {
             buf.append(" group by ")
             for (item in context.groupBy) {
-                visitColumnInfo(item)
+                visitColumn(item)
                 buf.append(", ")
             }
             buf.cutBack(2)
@@ -90,8 +90,8 @@ internal class SqlSelectStatementBuilder(
         support.forUpdateClause()
     }
 
-    private fun visitColumnInfo(columnInfo: ColumnInfo<*>) {
-        support.visitColumnInfo(columnInfo)
+    private fun visitColumn(column: Column<*>) {
+        support.visitColumn(column)
     }
 
     private fun visitCriterion(index: Int, c: Criterion) {

@@ -1,12 +1,13 @@
 package org.komapper.core.dsl.context
 
 import org.komapper.core.metamodel.EntityMetamodel
+import org.komapper.core.metamodel.Table
 
 internal data class EntityDeleteContext<ENTITY>(
     override val entityMetamodel: EntityMetamodel<ENTITY>
 ) : Context<ENTITY> {
 
-    override fun getAliasableEntityMetamodels(): List<EntityMetamodel<*>> {
+    override fun getTables(): List<Table> {
         return listOf(entityMetamodel)
     }
 }

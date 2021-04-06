@@ -1,8 +1,6 @@
 package org.komapper.core.dsl.element
 
-import org.komapper.core.metamodel.ColumnInfo
-
 internal sealed class Operand {
-    data class Parameter(val columnInfo: ColumnInfo<*>, val value: Any?) : Operand()
-    data class Column(val columnInfo: ColumnInfo<*>) : Operand()
+    data class Parameter(val column: org.komapper.core.metamodel.Column<*>, val value: Any?) : Operand()
+    data class Column(val column: org.komapper.core.metamodel.Column<*>) : Operand()
 }

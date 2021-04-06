@@ -1,10 +1,10 @@
 package org.komapper.core.dsl.context
 
-import org.komapper.core.metamodel.ColumnInfo
+import org.komapper.core.metamodel.Column
 
 internal data class SqlSetOperationContext<T>(
     val component: SqlSetOperationComponent<T>,
-    val orderBy: List<ColumnInfo<*>> = listOf()
+    val orderBy: List<Column<*>> = listOf()
 )
 
 sealed class SqlSetOperationComponent<T> {

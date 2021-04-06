@@ -11,8 +11,8 @@ import org.komapper.core.dsl.expr.ArithmeticExpr
 import org.komapper.core.dsl.expr.StringFunction
 import org.komapper.core.dsl.getName
 import org.komapper.core.dsl.option.LikeOption
-import org.komapper.core.metamodel.ColumnInfo
-import org.komapper.core.metamodel.TableInfo
+import org.komapper.core.metamodel.Column
+import org.komapper.core.metamodel.Table
 
 internal class BuilderSupport(
     private val dialect: Dialect,
@@ -20,28 +20,28 @@ internal class BuilderSupport(
     private val buf: StatementBuffer
 ) {
 
-    fun visitTableInfo(tableInfo: TableInfo) {
-        val name = tableInfo.getName(dialect::quote)
-        val alias = aliasManager.getAlias(tableInfo) ?: error("Alias is not found. table=$name")
+    fun visitTable(table: Table) {
+        val name = table.getName(dialect::quote)
+        val alias = aliasManager.getAlias(table) ?: error("Alias is not found. table=$name")
         buf.append("$name $alias")
     }
 
-    fun visitColumnInfo(columnInfo: ColumnInfo<*>) {
-        when (columnInfo) {
+    fun visitColumn(column: Column<*>) {
+        when (column) {
             is AggregateFunction -> {
-                visitAggregateFunction(columnInfo)
+                visitAggregateFunction(column)
             }
             is ArithmeticExpr -> {
-                visitArithmeticExpr(columnInfo)
+                visitArithmeticExpr(column)
             }
             is StringFunction -> {
-                visitStringFunction(columnInfo)
+                visitStringFunction(column)
             }
             else -> {
-                val name = columnInfo.getName(dialect::quote)
-                val tableInfo = columnInfo.owner
-                val alias = aliasManager.getAlias(tableInfo)
-                    ?: error("Alias is not found. table=${tableInfo.getName(dialect::quote)}, column=$name")
+                val name = column.getName(dialect::quote)
+                val table = column.owner
+                val alias = aliasManager.getAlias(table)
+                    ?: error("Alias is not found. table=${table.getName(dialect::quote)}, column=$name")
                 buf.append("$alias.$name")
             }
         }
@@ -51,7 +51,7 @@ internal class BuilderSupport(
         when (function) {
             is AggregateFunction.Avg -> {
                 buf.append("avg(")
-                visitColumnInfo(function.c)
+                visitColumn(function.c)
                 buf.append(")")
             }
             is AggregateFunction.CountAsterisk -> {
@@ -59,22 +59,22 @@ internal class BuilderSupport(
             }
             is AggregateFunction.Count -> {
                 buf.append("count(")
-                visitColumnInfo(function.c)
+                visitColumn(function.c)
                 buf.append(")")
             }
             is AggregateFunction.Max -> {
                 buf.append("max(")
-                visitColumnInfo(function.c)
+                visitColumn(function.c)
                 buf.append(")")
             }
             is AggregateFunction.Min<*> -> {
                 buf.append("min(")
-                visitColumnInfo(function.c)
+                visitColumn(function.c)
                 buf.append(")")
             }
             is AggregateFunction.Sum<*> -> {
                 buf.append("sum(")
-                visitColumnInfo(function.c)
+                visitColumn(function.c)
                 buf.append(")")
             }
         }
@@ -202,7 +202,7 @@ internal class BuilderSupport(
         }
         when (operand) {
             is Operand.Column -> {
-                visitColumnInfo(operand.columnInfo)
+                visitColumn(operand.column)
             }
             is Operand.Parameter -> {
                 val value = operand.value
@@ -293,10 +293,10 @@ internal class BuilderSupport(
     fun visitOperand(operand: Operand) {
         when (operand) {
             is Operand.Column -> {
-                visitColumnInfo(operand.columnInfo)
+                visitColumn(operand.column)
             }
             is Operand.Parameter -> {
-                buf.bind(Value(operand.value, operand.columnInfo.klass))
+                buf.bind(Value(operand.value, operand.column.klass))
             }
         }
     }

@@ -1,10 +1,10 @@
 package org.komapper.core.dsl.element
 
-import org.komapper.core.metamodel.ColumnInfo
-import org.komapper.core.metamodel.TableInfo
+import org.komapper.core.metamodel.Column
+import org.komapper.core.metamodel.Table
 import kotlin.reflect.KClass
 
-internal sealed class SortIndex : Number(), ColumnInfo<Number> {
+internal sealed class SortIndex : Number(), Column<Number> {
     abstract val index: Number
 
     override fun toByte(): Byte {
@@ -35,7 +35,7 @@ internal sealed class SortIndex : Number(), ColumnInfo<Number> {
         return index.toShort()
     }
 
-    override val owner: TableInfo
+    override val owner: Table
         get() = throw UnsupportedOperationException()
     override val klass: KClass<Number>
         get() = throw UnsupportedOperationException()

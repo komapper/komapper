@@ -6,14 +6,14 @@ import org.komapper.core.dsl.element.Criterion
 import org.komapper.core.dsl.element.ForUpdate
 import org.komapper.core.dsl.element.Join
 import org.komapper.core.dsl.element.Projection
-import org.komapper.core.metamodel.ColumnInfo
+import org.komapper.core.metamodel.Column
 import org.komapper.core.metamodel.EntityMetamodel
 
 internal data class EntitySelectContext<ENTITY>(
     override val entityMetamodel: EntityMetamodel<ENTITY>,
     override val joins: List<Join<*>> = listOf(),
     override val where: List<Criterion> = listOf(),
-    override val orderBy: List<ColumnInfo<*>> = listOf(),
+    override val orderBy: List<Column<*>> = listOf(),
     override val offset: Int = -1,
     override val limit: Int = -1,
     override val forUpdate: ForUpdate = ForUpdate(),
@@ -32,7 +32,7 @@ internal data class EntitySelectContext<ENTITY>(
         return copy(where = this.where + where)
     }
 
-    override fun addOrderBy(orderBy: List<ColumnInfo<*>>): EntitySelectContext<ENTITY> {
+    override fun addOrderBy(orderBy: List<Column<*>>): EntitySelectContext<ENTITY> {
         return copy(orderBy = this.orderBy + orderBy)
     }
 

@@ -12,7 +12,7 @@ import org.komapper.core.dsl.scope.EntitySelectOptionScope
 import org.komapper.core.dsl.scope.OnDeclaration
 import org.komapper.core.dsl.scope.WhereDeclaration
 import org.komapper.core.jdbc.JdbcExecutor
-import org.komapper.core.metamodel.ColumnInfo
+import org.komapper.core.metamodel.Column
 import org.komapper.core.metamodel.EntityMetamodel
 import java.sql.ResultSet
 
@@ -29,7 +29,7 @@ interface EntitySelectQuery<ENTITY> : ListQuery<ENTITY> {
     ): EntitySelectQuery<ENTITY>
 
     fun where(declaration: WhereDeclaration): EntitySelectQuery<ENTITY>
-    fun orderBy(vararg items: ColumnInfo<*>): EntitySelectQuery<ENTITY>
+    fun orderBy(vararg items: Column<*>): EntitySelectQuery<ENTITY>
     fun offset(value: Int): EntitySelectQuery<ENTITY>
     fun limit(value: Int): EntitySelectQuery<ENTITY>
     fun forUpdate(): EntitySelectQuery<ENTITY>
@@ -77,7 +77,7 @@ internal data class EntitySelectQueryImpl<ENTITY>(
         e2: EntityMetamodel<S>,
         associator: Associator<T, S>
     ): EntitySelectQueryImpl<ENTITY> {
-        val entityMetamodels = context.getAliasableEntityMetamodels()
+        val entityMetamodels = context.getTables()
         if (entityMetamodels.none { it == e1 }) error(entityMetamodelNotFound("e1"))
         if (entityMetamodels.none { it == e2 }) error(entityMetamodelNotFound("e2"))
         @Suppress("UNCHECKED_CAST")
@@ -90,7 +90,7 @@ internal data class EntitySelectQueryImpl<ENTITY>(
         return copy(context = newContext)
     }
 
-    override fun orderBy(vararg items: ColumnInfo<*>): EntitySelectQueryImpl<ENTITY> {
+    override fun orderBy(vararg items: Column<*>): EntitySelectQueryImpl<ENTITY> {
         val newContext = support.orderBy(*items)
         return copy(context = newContext)
     }

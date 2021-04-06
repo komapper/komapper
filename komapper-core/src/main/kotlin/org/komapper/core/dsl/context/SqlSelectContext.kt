@@ -4,28 +4,28 @@ import org.komapper.core.dsl.element.Criterion
 import org.komapper.core.dsl.element.ForUpdate
 import org.komapper.core.dsl.element.Join
 import org.komapper.core.dsl.element.Projection
-import org.komapper.core.metamodel.ColumnInfo
+import org.komapper.core.metamodel.Column
 import org.komapper.core.metamodel.EntityMetamodel
 
 internal data class SqlSelectContext<ENTITY>(
     override val entityMetamodel: EntityMetamodel<ENTITY>,
     override val joins: List<Join<*>> = listOf(),
     override val where: List<Criterion> = listOf(),
-    override val orderBy: List<ColumnInfo<*>> = listOf(),
+    override val orderBy: List<Column<*>> = listOf(),
     override val offset: Int = -1,
     override val limit: Int = -1,
     override val forUpdate: ForUpdate = ForUpdate(),
-    val groupBy: List<ColumnInfo<*>> = listOf(),
+    val groupBy: List<Column<*>> = listOf(),
     val having: List<Criterion> = listOf(),
     override val projection: Projection =
         Projection.Tables(setOf(entityMetamodel) + joins.map { it.entityMetamodel }),
 ) : SelectContext<ENTITY, SqlSelectContext<ENTITY>> {
 
-    fun setColumn(column: ColumnInfo<*>): SqlSelectContext<ENTITY> {
+    fun setColumn(column: Column<*>): SqlSelectContext<ENTITY> {
         return copy(projection = Projection.Columns(listOf(column)))
     }
 
-    fun setColumns(columns: List<ColumnInfo<*>>): SqlSelectContext<ENTITY> {
+    fun setColumns(columns: List<Column<*>>): SqlSelectContext<ENTITY> {
         return copy(projection = Projection.Columns(columns))
     }
 
@@ -49,7 +49,7 @@ internal data class SqlSelectContext<ENTITY>(
         return copy(having = this.having + having)
     }
 
-    override fun addOrderBy(orderBy: List<ColumnInfo<*>>): SqlSelectContext<ENTITY> {
+    override fun addOrderBy(orderBy: List<Column<*>>): SqlSelectContext<ENTITY> {
         return copy(orderBy = this.orderBy + orderBy)
     }
 

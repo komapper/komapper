@@ -3,6 +3,7 @@ package org.komapper.core.dsl.context
 import org.komapper.core.dsl.element.Criterion
 import org.komapper.core.dsl.element.Operand
 import org.komapper.core.metamodel.EntityMetamodel
+import org.komapper.core.metamodel.Table
 
 internal data class SqlUpdateContext<ENTITY>(
     override val entityMetamodel: EntityMetamodel<ENTITY>,
@@ -10,7 +11,7 @@ internal data class SqlUpdateContext<ENTITY>(
     val where: List<Criterion> = listOf()
 ) : Context<ENTITY> {
 
-    override fun getAliasableEntityMetamodels(): List<EntityMetamodel<*>> {
+    override fun getTables(): List<Table> {
         return listOf(entityMetamodel)
     }
 

@@ -2,7 +2,7 @@ package org.komapper.core.dsl.scope
 
 import org.komapper.core.Scope
 import org.komapper.core.dsl.element.Operand
-import org.komapper.core.metamodel.ColumnInfo
+import org.komapper.core.metamodel.Column
 
 @Scope
 class ValuesScope internal constructor(
@@ -18,7 +18,7 @@ class ValuesScope internal constructor(
         }
     }
 
-    infix fun <T : Any> ColumnInfo<T>.set(value: T?) {
+    infix fun <T : Any> Column<T>.set(value: T?) {
         val left = Operand.Column(this)
         val right = Operand.Parameter(this, value)
         context.add(left to right)

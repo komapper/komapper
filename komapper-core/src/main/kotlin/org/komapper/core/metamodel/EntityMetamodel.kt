@@ -2,11 +2,11 @@ package org.komapper.core.metamodel
 
 import java.time.Clock
 
-interface EntityMetamodel<ENTITY> : TableInfo {
-    fun idAssignment(): Assignment<ENTITY>?
+interface EntityMetamodel<ENTITY> : Table {
+    override fun idAssignment(): Assignment<ENTITY>?
     fun idProperties(): List<PropertyMetamodel<ENTITY, *>>
     fun versionProperty(): PropertyMetamodel<ENTITY, *>?
-    fun properties(): List<PropertyMetamodel<ENTITY, *>>
+    override fun properties(): List<PropertyMetamodel<ENTITY, *>>
     fun instantiate(__m: Map<PropertyMetamodel<*, *>, Any?>): ENTITY
     fun incrementVersion(__e: ENTITY): ENTITY
     fun updateCreatedAt(__e: ENTITY, __c: Clock): ENTITY

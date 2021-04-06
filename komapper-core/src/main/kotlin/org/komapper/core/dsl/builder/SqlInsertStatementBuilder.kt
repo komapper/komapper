@@ -7,8 +7,8 @@ import org.komapper.core.data.Value
 import org.komapper.core.dsl.context.SqlInsertContext
 import org.komapper.core.dsl.getName
 import org.komapper.core.metamodel.Assignment
-import org.komapper.core.metamodel.ColumnInfo
-import org.komapper.core.metamodel.TableInfo
+import org.komapper.core.metamodel.Column
+import org.komapper.core.metamodel.Table
 
 internal class SqlInsertStatementBuilder<ENTITY>(
     val dialect: Dialect,
@@ -22,18 +22,18 @@ internal class SqlInsertStatementBuilder<ENTITY>(
         buf.append(tableName(entityMetamodel))
         buf.append(" (")
         for (column in context.values.map { it.first }) {
-            buf.append(columnName(column.columnInfo))
+            buf.append(columnName(column.column))
             buf.append(", ")
         }
         buf.cutBack(2)
         buf.append(") values (")
         for (parameter in context.values.map { it.second }) {
-            val value = if (parameter.columnInfo in entityMetamodel.idProperties() &&
+            val value = if (parameter.column in entityMetamodel.idProperties() &&
                 entityMetamodel.idAssignment() is Assignment.Identity<ENTITY, *>
             ) {
-                Value(null, parameter.columnInfo.klass)
+                Value(null, parameter.column.klass)
             } else {
-                Value(parameter.value, parameter.columnInfo.klass)
+                Value(parameter.value, parameter.column.klass)
             }
             buf.bind(value)
             buf.append(", ")
@@ -43,11 +43,11 @@ internal class SqlInsertStatementBuilder<ENTITY>(
         return buf.toStatement()
     }
 
-    private fun tableName(tableInfo: TableInfo): String {
-        return tableInfo.getName(dialect::quote)
+    private fun tableName(table: Table): String {
+        return table.getName(dialect::quote)
     }
 
-    private fun columnName(columnInfo: ColumnInfo<*>): String {
-        return columnInfo.getName(dialect::quote)
+    private fun columnName(column: Column<*>): String {
+        return column.getName(dialect::quote)
     }
 }

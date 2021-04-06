@@ -5,7 +5,7 @@ import org.komapper.core.data.Statement
 import org.komapper.core.data.StatementBuffer
 import org.komapper.core.dsl.context.SqlDeleteContext
 import org.komapper.core.dsl.element.Criterion
-import org.komapper.core.metamodel.TableInfo
+import org.komapper.core.metamodel.Table
 
 internal class SqlDeleteStatementBuilder<ENTITY>(
     val dialect: Dialect,
@@ -17,7 +17,7 @@ internal class SqlDeleteStatementBuilder<ENTITY>(
 
     fun build(): Statement {
         buf.append("delete from ")
-        visitTableInfo(context.entityMetamodel)
+        visitTable(context.entityMetamodel)
         if (context.where.isNotEmpty()) {
             buf.append(" where ")
             for ((index, criterion) in context.where.withIndex()) {
@@ -29,8 +29,8 @@ internal class SqlDeleteStatementBuilder<ENTITY>(
         return buf.toStatement()
     }
 
-    private fun visitTableInfo(tableInfo: TableInfo) {
-        support.visitTableInfo(tableInfo)
+    private fun visitTable(table: Table) {
+        support.visitTable(table)
     }
 
     private fun visitCriterion(index: Int, c: Criterion) {

@@ -7,8 +7,8 @@ import org.komapper.core.data.Value
 import org.komapper.core.dsl.context.EntityInsertContext
 import org.komapper.core.dsl.getName
 import org.komapper.core.metamodel.Assignment
-import org.komapper.core.metamodel.ColumnInfo
-import org.komapper.core.metamodel.TableInfo
+import org.komapper.core.metamodel.Column
+import org.komapper.core.metamodel.Table
 
 internal class EntityInsertStatementBuilder<ENTITY>(
     val dialect: Dialect,
@@ -45,11 +45,11 @@ internal class EntityInsertStatementBuilder<ENTITY>(
         return buf.toStatement()
     }
 
-    private fun tableName(tableInfo: TableInfo): String {
-        return tableInfo.getName(dialect::quote)
+    private fun tableName(table: Table): String {
+        return table.getName(dialect::quote)
     }
 
-    private fun columnName(columnInfo: ColumnInfo<*>): String {
-        return columnInfo.getName(dialect::quote)
+    private fun columnName(column: Column<*>): String {
+        return column.getName(dialect::quote)
     }
 }
