@@ -18,7 +18,7 @@ internal data class EntitySelectContext<ENTITY>(
     override val limit: Int = -1,
     override val forUpdate: ForUpdate = ForUpdate(),
     val associatorMap: Map<Association, Associator<Any, Any>> = mapOf(),
-    override val projection: Projection = Projection.Entities(
+    override val projection: Projection.Entities = Projection.Entities(
         (listOf(entityMetamodel) + associatorMap.keys.flatMap { listOf(it.first, it.second) }).distinct()
     )
 
@@ -49,12 +49,9 @@ internal data class EntitySelectContext<ENTITY>(
     }
 
     fun putAssociator(association: Association, associator: Associator<Any, Any>): EntitySelectContext<ENTITY> {
-        val newProjection = when (projection) {
-            is Projection.Properties -> error("cannot happen.")
-            is Projection.Entities -> Projection.Entities(
-                projection.values + setOf(association.first, association.second)
-            )
-        }
+        val newProjection = Projection.Entities(
+            (projection.values + listOf(association.first, association.second)).distinct()
+        )
         return copy(projection = newProjection, associatorMap = this.associatorMap + (association to associator))
     }
 }

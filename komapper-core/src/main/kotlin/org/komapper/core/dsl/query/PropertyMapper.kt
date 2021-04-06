@@ -8,8 +8,8 @@ import kotlin.reflect.cast
 internal class PropertyMapper(val dialect: Dialect, val resultSet: ResultSet) {
     private var index = 0
 
-    fun <T : Any> execute(c: PropertyExpression<T>): T {
-        val value = dialect.getValue(resultSet, ++index, c.klass)
-        return c.klass.cast(value)
+    fun <T : Any> execute(propertyExpression: PropertyExpression<T>): T {
+        val value = dialect.getValue(resultSet, ++index, propertyExpression.klass)
+        return propertyExpression.klass.cast(value)
     }
 }

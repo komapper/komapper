@@ -6,7 +6,6 @@ import org.komapper.core.data.Statement
 import org.komapper.core.dsl.builder.EntitySelectStatementBuilder
 import org.komapper.core.dsl.context.EntitySelectContext
 import org.komapper.core.dsl.element.Associator
-import org.komapper.core.dsl.element.Projection
 import org.komapper.core.dsl.expr.PropertyExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.scope.EntitySelectOptionDeclaration
@@ -179,10 +178,7 @@ internal data class EntitySelectQueryImpl<ENTITY>(
         }
 
         private fun fetchAllEntities(dialect: Dialect, rs: ResultSet): List<Map<EntityKey, Any>> {
-            val entityMetamodels = when (val projection = context.projection) {
-                is Projection.Properties -> error("cannot happen")
-                is Projection.Entities -> projection.values
-            }
+            val entityMetamodels = context.projection.values
             val rows = mutableListOf<Map<EntityKey, Any>>()
             while (rs.next()) {
                 val row = mutableMapOf<EntityKey, Any>()

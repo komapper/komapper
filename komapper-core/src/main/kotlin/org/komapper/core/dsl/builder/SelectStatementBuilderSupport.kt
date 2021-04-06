@@ -5,7 +5,6 @@ import org.komapper.core.data.StatementBuffer
 import org.komapper.core.dsl.context.SelectContext
 import org.komapper.core.dsl.element.Criterion
 import org.komapper.core.dsl.element.JoinKind
-import org.komapper.core.dsl.element.Projection
 import org.komapper.core.dsl.expr.EntityExpression
 import org.komapper.core.dsl.expr.NamedSortItem
 import org.komapper.core.dsl.expr.PropertyExpression
@@ -20,12 +19,8 @@ internal class SelectStatementBuilderSupport(
 
     fun selectClause() {
         buf.append("select ")
-        val columns = when (val projection = context.projection) {
-            is Projection.Properties -> projection.values
-            is Projection.Entities -> projection.values.flatMap { it.properties() }
-        }
-        for (c in columns) {
-            column(c)
+        for (p in context.projection.propertyExpressions()) {
+            column(p)
             buf.append(", ")
         }
         buf.cutBack(2)

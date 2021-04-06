@@ -5,7 +5,6 @@ import org.komapper.core.data.Statement
 import org.komapper.core.data.StatementBuffer
 import org.komapper.core.dsl.context.SqlSelectContext
 import org.komapper.core.dsl.element.Criterion
-import org.komapper.core.dsl.element.Projection
 import org.komapper.core.dsl.expr.AggregateFunction
 import org.komapper.core.dsl.expr.PropertyExpression
 
@@ -43,12 +42,9 @@ internal class SqlSelectStatementBuilder(
 
     private fun groupByClause() {
         if (context.groupBy.isEmpty()) {
-            val columns = when (val projection = context.projection) {
-                is Projection.Properties -> projection.values
-                is Projection.Entities -> projection.values.flatMap { it.properties() }
-            }
-            val aggregateFunctions = columns.filterIsInstance<AggregateFunction<*>>()
-            val groupByItems = columns - aggregateFunctions
+            val propertyExpressions = context.projection.propertyExpressions()
+            val aggregateFunctions = propertyExpressions.filterIsInstance<AggregateFunction<*>>()
+            val groupByItems = propertyExpressions - aggregateFunctions
             if (aggregateFunctions.isNotEmpty() && groupByItems.isNotEmpty()) {
                 buf.append(" group by ")
                 for (item in groupByItems) {
