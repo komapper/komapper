@@ -302,7 +302,7 @@ internal data class SqlSelectQueryImpl<ENTITY : Any>(
     private fun <R> createTerminal(c: SqlSelectContext<ENTITY>, transformer: (Sequence<ENTITY>) -> R): Query<R> {
         val provider: (Dialect, ResultSet) -> ENTITY = { dialect, rs ->
             val mapper = EntityMapper(dialect, rs)
-            val entity = mapper.execute(c.entityMetamodel)
+            val entity = mapper.execute(c.entityMetamodel, true)
             checkNotNull(entity)
         }
         return Terminal(c, option, provider, transformer)
