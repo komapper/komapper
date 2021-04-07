@@ -1,33 +1,37 @@
 package org.komapper.core.dsl
 
 import org.komapper.core.dsl.element.Operand
+import org.komapper.core.dsl.element.SortItem
 import org.komapper.core.dsl.expr.AggregateFunction
+import org.komapper.core.dsl.expr.AliasExpression
 import org.komapper.core.dsl.expr.ArithmeticExpression
-import org.komapper.core.dsl.expr.IndexedSortItem
-import org.komapper.core.dsl.expr.NamedSortItem
 import org.komapper.core.dsl.expr.PropertyExpression
 import org.komapper.core.dsl.expr.StringFunction
 
-fun <T : Any> PropertyExpression<T>.desc(): PropertyExpression<T> {
-    if (this is NamedSortItem.Desc) {
-        return this
-    }
-    return NamedSortItem.Desc(this)
-}
-
-fun desc(index: Number): Number {
-    return IndexedSortItem.Desc(index)
-}
-
 fun <T : Any> PropertyExpression<T>.asc(): PropertyExpression<T> {
-    if (this is NamedSortItem.Asc) {
+    if (this is SortItem.Property.Asc) {
         return this
     }
-    return NamedSortItem.Asc(this)
+    return SortItem.Property.Asc(this)
 }
 
-fun asc(index: Number): Number {
-    return IndexedSortItem.Asc(index)
+fun <T : Any> PropertyExpression<T>.desc(): PropertyExpression<T> {
+    if (this is SortItem.Property.Desc) {
+        return this
+    }
+    return SortItem.Property.Desc(this)
+}
+
+fun asc(alias: CharSequence): CharSequence {
+    return SortItem.Alias.Asc(alias.toString())
+}
+
+fun desc(alias: CharSequence): CharSequence {
+    return SortItem.Alias.Desc(alias.toString())
+}
+
+infix fun <T : Any> PropertyExpression<T>.alias(alias: String): PropertyExpression<T> {
+    return AliasExpression(this, alias)
 }
 
 fun <T : Any> avg(c: PropertyExpression<T>): PropertyExpression<Double> {

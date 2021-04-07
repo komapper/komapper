@@ -5,17 +5,18 @@ import org.komapper.core.data.StatementBuffer
 import org.komapper.core.dsl.context.SelectContext
 import org.komapper.core.dsl.element.Criterion
 import org.komapper.core.dsl.element.JoinKind
+import org.komapper.core.dsl.element.SortItem
 import org.komapper.core.dsl.expr.EntityExpression
-import org.komapper.core.dsl.expr.NamedSortItem
 import org.komapper.core.dsl.expr.PropertyExpression
 
 internal class SelectStatementBuilderSupport(
     dialect: Dialect,
     private val context: SelectContext<*, *>,
-    aliasManager: AliasManager = AliasManager(context),
+    aliasManager: AliasManager = AliasManagerImpl(context),
     private val buf: StatementBuffer
 ) {
     private val support = BuilderSupport(dialect, aliasManager, buf)
+    private val orderBySupport = OrderByBuilderSupport(dialect, context.orderBy, aliasManager, buf)
 
     fun selectClause() {
         buf.append("select ")
@@ -62,18 +63,7 @@ internal class SelectStatementBuilderSupport(
     }
 
     fun orderByClause() {
-        if (context.orderBy.isNotEmpty()) {
-            buf.append(" order by ")
-            for (item in context.orderBy) {
-                val (expression, sort) = when (item) {
-                    is NamedSortItem.Asc<*> -> item.expression to "asc"
-                    is NamedSortItem.Desc<*> -> item.expression to "desc"
-                }
-                column(expression)
-                buf.append(" $sort, ")
-            }
-            buf.cutBack(2)
-        }
+        orderBySupport.orderByClause()
     }
 
     fun offsetLimitClause() {
@@ -105,5 +95,45 @@ internal class SelectStatementBuilderSupport(
 
     fun visitCriterion(index: Int, c: Criterion) {
         support.visitCriterion(index, c)
+    }
+}
+
+internal class OrderByBuilderSupport(
+    private val dialect: Dialect,
+    private val orderBy: List<SortItem>,
+    aliasManager: AliasManager,
+    private val buf: StatementBuffer
+) {
+    private val support = BuilderSupport(dialect, aliasManager, buf)
+
+    fun orderByClause() {
+        if (orderBy.isNotEmpty()) {
+            buf.append(" order by ")
+            for (item in orderBy) {
+                when (item) {
+                    is SortItem.Property<*> -> {
+                        val (expression, sort) = when (item) {
+                            is SortItem.Property.Asc<*> -> item.expression to "asc"
+                            is SortItem.Property.Desc<*> -> item.expression to "desc"
+                        }
+                        column(expression)
+                        buf.append(" $sort")
+                    }
+                    is SortItem.Alias -> {
+                        val (alias, sort) = when (item) {
+                            is SortItem.Alias.Asc -> item.alias to "asc"
+                            is SortItem.Alias.Desc -> item.alias to "desc"
+                        }
+                        buf.append("${dialect.quote(alias)} $sort")
+                    }
+                }
+                buf.append(", ")
+            }
+            buf.cutBack(2)
+        }
+    }
+
+    fun column(expression: PropertyExpression<*>) {
+        support.visitPropertyExpression(expression)
     }
 }

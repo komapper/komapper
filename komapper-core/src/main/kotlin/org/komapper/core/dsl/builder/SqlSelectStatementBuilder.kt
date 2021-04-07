@@ -11,7 +11,7 @@ import org.komapper.core.dsl.expr.PropertyExpression
 internal class SqlSelectStatementBuilder(
     val dialect: Dialect,
     val context: SqlSelectContext<*>,
-    aliasManager: AliasManager = AliasManager(context)
+    aliasManager: AliasManager = AliasManagerImpl(context)
 ) {
     private val buf = StatementBuffer(dialect::formatValue)
     private val support = SelectStatementBuilderSupport(dialect, context, aliasManager, buf)

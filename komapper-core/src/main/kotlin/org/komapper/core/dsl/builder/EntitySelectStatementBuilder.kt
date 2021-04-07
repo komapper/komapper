@@ -8,7 +8,7 @@ import org.komapper.core.dsl.context.EntitySelectContext
 internal class EntitySelectStatementBuilder<ENTITY : Any>(
     val dialect: Dialect,
     val context: EntitySelectContext<ENTITY>,
-    aliasManager: AliasManager = AliasManager(context)
+    aliasManager: AliasManager = AliasManagerImpl(context)
 ) {
     private val buf = StatementBuffer(dialect::formatValue)
     private val support = SelectStatementBuilderSupport(dialect, context, aliasManager, buf)

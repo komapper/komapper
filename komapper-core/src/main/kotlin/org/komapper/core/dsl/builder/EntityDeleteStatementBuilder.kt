@@ -15,7 +15,7 @@ internal class EntityDeleteStatementBuilder<ENTITY : Any>(
     val entity: ENTITY,
     val option: EntityDeleteOption
 ) {
-    private val aliasManager = AliasManager(context)
+    private val aliasManager = AliasManagerImpl(context)
     private val buf = StatementBuffer(dialect::formatValue)
     private val support = BuilderSupport(dialect, aliasManager, buf)
 

@@ -11,7 +11,7 @@ internal class SqlDeleteStatementBuilder<ENTITY : Any>(
     val dialect: Dialect,
     val context: SqlDeleteContext<ENTITY>
 ) {
-    private val aliasManager = AliasManager(context)
+    private val aliasManager = AliasManagerImpl(context)
     private val buf = StatementBuffer(dialect::formatValue)
     private val support = BuilderSupport(dialect, aliasManager, buf)
 

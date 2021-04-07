@@ -29,7 +29,7 @@ interface EntitySelectQuery<ENTITY : Any> : ListQuery<ENTITY> {
     ): EntitySelectQuery<ENTITY>
 
     fun where(declaration: WhereDeclaration): EntitySelectQuery<ENTITY>
-    fun orderBy(vararg properties: PropertyExpression<*>): EntitySelectQuery<ENTITY>
+    fun orderBy(vararg expressions: PropertyExpression<*>): EntitySelectQuery<ENTITY>
     fun offset(value: Int): EntitySelectQuery<ENTITY>
     fun limit(value: Int): EntitySelectQuery<ENTITY>
     fun forUpdate(): EntitySelectQuery<ENTITY>
@@ -90,8 +90,8 @@ internal data class EntitySelectQueryImpl<ENTITY : Any>(
         return copy(context = newContext)
     }
 
-    override fun orderBy(vararg properties: PropertyExpression<*>): EntitySelectQueryImpl<ENTITY> {
-        val newContext = support.orderBy(*properties)
+    override fun orderBy(vararg expressions: PropertyExpression<*>): EntitySelectQueryImpl<ENTITY> {
+        val newContext = support.orderBy(*expressions)
         return copy(context = newContext)
     }
 

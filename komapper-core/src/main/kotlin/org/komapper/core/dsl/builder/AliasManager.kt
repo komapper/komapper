@@ -3,9 +3,14 @@ package org.komapper.core.dsl.builder
 import org.komapper.core.dsl.context.Context
 import org.komapper.core.dsl.expr.EntityExpression
 
-internal class AliasManager(context: Context<*>, private val parent: AliasManager? = null) {
+interface AliasManager {
+    val index: Int
+    fun getAlias(expression: EntityExpression<*>): String?
+}
+
+internal class AliasManagerImpl(context: Context<*>, private val parent: AliasManager? = null) : AliasManager {
     private val aliasMap: Map<EntityExpression<*>, String>
-    private val index: Int
+    override val index: Int
 
     init {
         val map: MutableMap<EntityExpression<*>, String> = mutableMapOf()
@@ -19,7 +24,7 @@ internal class AliasManager(context: Context<*>, private val parent: AliasManage
         this.index = i
     }
 
-    fun getAlias(expression: EntityExpression<*>): String? {
+    override fun getAlias(expression: EntityExpression<*>): String? {
         if (parent != null) {
             val alias = parent.getAlias(expression)
             if (alias != null) {
@@ -28,4 +33,9 @@ internal class AliasManager(context: Context<*>, private val parent: AliasManage
         }
         return aliasMap[expression]
     }
+}
+
+class EmptyAliasManager : AliasManager {
+    override val index: Int = 0
+    override fun getAlias(expression: EntityExpression<*>): String = ""
 }

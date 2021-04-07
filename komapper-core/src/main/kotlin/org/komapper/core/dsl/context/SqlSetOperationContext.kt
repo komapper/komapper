@@ -1,10 +1,10 @@
 package org.komapper.core.dsl.context
 
-import org.komapper.core.dsl.expr.IndexedSortItem
+import org.komapper.core.dsl.element.SortItem
 
 internal data class SqlSetOperationContext<T>(
     val component: SqlSetOperationComponent<T>,
-    val orderBy: List<IndexedSortItem> = listOf()
+    val orderBy: List<SortItem> = listOf()
 )
 
 sealed class SqlSetOperationComponent<T> {

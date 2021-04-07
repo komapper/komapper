@@ -32,9 +32,9 @@ interface SqlSelectQuery<ENTITY : Any> : SqlSetOperandQuery<ENTITY> {
     ): SqlSelectQuery<ENTITY>
 
     fun where(declaration: WhereDeclaration): SqlSelectQuery<ENTITY>
-    fun groupBy(vararg properties: PropertyExpression<*>): SqlSelectQuery<ENTITY>
+    fun groupBy(vararg expressions: PropertyExpression<*>): SqlSelectQuery<ENTITY>
     fun having(declaration: HavingDeclaration): SqlSelectQuery<ENTITY>
-    fun orderBy(vararg properties: PropertyExpression<*>): SqlSelectQuery<ENTITY>
+    fun orderBy(vararg expressions: PropertyExpression<*>): SqlSelectQuery<ENTITY>
     fun offset(value: Int): SqlSelectQuery<ENTITY>
     fun limit(value: Int): SqlSelectQuery<ENTITY>
     fun forUpdate(): SqlSelectQuery<ENTITY>
@@ -115,8 +115,8 @@ internal data class SqlSelectQueryImpl<ENTITY : Any>(
         return copy(context = newContext)
     }
 
-    override fun groupBy(vararg properties: PropertyExpression<*>): SqlSelectQueryImpl<ENTITY> {
-        val newContext = context.copy(groupBy = properties.toList())
+    override fun groupBy(vararg expressions: PropertyExpression<*>): SqlSelectQueryImpl<ENTITY> {
+        val newContext = context.copy(groupBy = expressions.toList())
         return copy(context = newContext)
     }
 
@@ -127,8 +127,8 @@ internal data class SqlSelectQueryImpl<ENTITY : Any>(
         return copy(context = newContext)
     }
 
-    override fun orderBy(vararg properties: PropertyExpression<*>): SqlSelectQueryImpl<ENTITY> {
-        val newContext = support.orderBy(*properties)
+    override fun orderBy(vararg expressions: PropertyExpression<*>): SqlSelectQueryImpl<ENTITY> {
+        val newContext = support.orderBy(*expressions)
         return copy(context = newContext)
     }
 

@@ -6,6 +6,7 @@ import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.Database
 import org.komapper.core.dsl.SqlQuery
+import org.komapper.core.dsl.alias
 import org.komapper.core.dsl.desc
 
 @ExtendWith(Env::class)
@@ -16,7 +17,7 @@ class SqlSetOperationQueryTest(private val db: Database) {
         val e = Employee.metamodel()
         val q1 = SqlQuery.from(e).where { e.employeeId inList listOf(1, 2, 3, 4, 5) }
         val q2 = SqlQuery.from(e).where { e.employeeId inList listOf(2, 4, 6, 8) }
-        val query = (q1 except q2).orderBy(1)
+        val query = (q1 except q2).orderBy(e.employeeId)
         val list = db.execute { query }
         assertEquals(3, list.size)
         val e1 = list[0]
@@ -32,7 +33,7 @@ class SqlSetOperationQueryTest(private val db: Database) {
         val e = Employee.metamodel()
         val q1 = SqlQuery.from(e).where { e.employeeId inList listOf(1, 2, 3, 4, 5) }
         val q2 = SqlQuery.from(e).where { e.employeeId inList listOf(2, 4, 6, 8) }
-        val query = (q1 intersect q2).orderBy(1)
+        val query = (q1 intersect q2).orderBy(e.employeeId)
         val list = db.execute { query }
         assertEquals(2, list.size)
         val e1 = list[0]
@@ -47,7 +48,7 @@ class SqlSetOperationQueryTest(private val db: Database) {
         val q1 = SqlQuery.from(e).where { e.employeeId eq 1 }
         val q2 = SqlQuery.from(e).where { e.employeeId eq 1 }
         val q3 = SqlQuery.from(e).where { e.employeeId eq 5 }
-        val query = (q1 union q2 union q3).orderBy(desc(1))
+        val query = (q1 union q2 union q3).orderBy(e.employeeId.desc())
         val list = db.execute { query }
         assertEquals(2, list.size)
         val e1 = list[0]
@@ -61,10 +62,14 @@ class SqlSetOperationQueryTest(private val db: Database) {
         val e = Employee.metamodel()
         val a = Address.metamodel()
         val d = Department.metamodel()
-        val q1 = SqlQuery.from(e).where { e.employeeId eq 1 }.select(e.employeeId, e.employeeName)
-        val q2 = SqlQuery.from(a).where { a.addressId eq 2 }.select(a.addressId, a.street)
-        val q3 = SqlQuery.from(d).where { d.departmentId eq 3 }.select(d.departmentId, d.departmentName)
-        val query = (q1 union q2 union q3).orderBy(1, desc(2))
+        val q1 =
+            SqlQuery.from(e).where { e.employeeId eq 1 }
+                .select(e.employeeId alias "ID", e.employeeName alias "NAME")
+        val q2 = SqlQuery.from(a).where { a.addressId eq 2 }
+            .select(a.addressId alias "ID", a.street alias "NAME")
+        val q3 = SqlQuery.from(d).where { d.departmentId eq 3 }
+            .select(d.departmentId alias "ID", d.departmentName alias "NAME")
+        val query = (q1 union q2 union q3).orderBy("ID", desc("NAME"))
         val list = db.execute { query }
         assertEquals(3, list.size)
         assertEquals(1 to "SMITH", list[0])
@@ -78,7 +83,7 @@ class SqlSetOperationQueryTest(private val db: Database) {
         val q1 = SqlQuery.from(e).where { e.employeeId eq 1 }
         val q2 = SqlQuery.from(e).where { e.employeeId eq 1 }
         val q3 = SqlQuery.from(e).where { e.employeeId eq 5 }
-        val query = (q1 unionAll q2 unionAll q3).orderBy(desc(1))
+        val query = (q1 unionAll q2 unionAll q3).orderBy(e.employeeId.desc())
         val list = db.execute { query }
         assertEquals(3, list.size)
         val e1 = list[0]

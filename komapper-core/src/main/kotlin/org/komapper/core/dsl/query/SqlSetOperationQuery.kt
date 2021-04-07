@@ -7,14 +7,16 @@ import org.komapper.core.dsl.builder.SqlSetOperationStatementBuilder
 import org.komapper.core.dsl.context.SqlSetOperationComponent
 import org.komapper.core.dsl.context.SqlSetOperationContext
 import org.komapper.core.dsl.context.SqlSetOperationKind
-import org.komapper.core.dsl.expr.IndexedSortItem
+import org.komapper.core.dsl.element.SortItem
+import org.komapper.core.dsl.expr.PropertyExpression
 import org.komapper.core.dsl.scope.SqlSetOperationOptionDeclaration
 import org.komapper.core.dsl.scope.SqlSetOperationOptionScope
 import org.komapper.core.jdbc.JdbcExecutor
 import java.sql.ResultSet
 
 interface SqlSetOperationQuery<T> : SqlSetOperandQuery<T> {
-    fun orderBy(vararg indexes: Number): SqlSetOperationQuery<T>
+    fun orderBy(vararg aliases: CharSequence): SqlSetOperationQuery<T>
+    fun orderBy(vararg expressions: PropertyExpression<*>): SqlSetOperationQuery<T>
     fun option(declaration: SqlSetOperationOptionDeclaration): SqlSetOperationQuery<T>
 }
 
@@ -48,10 +50,21 @@ internal data class SetOperationQueryImpl<T>(
         return copy(context = newContext)
     }
 
-    override fun orderBy(vararg indexes: Number): SetOperationQueryImpl<T> {
-        val items = indexes.map {
-            if (it is IndexedSortItem) it else IndexedSortItem.Asc(it)
+    override fun orderBy(vararg aliases: CharSequence): SetOperationQueryImpl<T> {
+        val items = aliases.map {
+            if (it is SortItem) it else SortItem.Alias.Asc(it.toString())
         }
+        return orderBy(items)
+    }
+
+    override fun orderBy(vararg expressions: PropertyExpression<*>): SetOperationQueryImpl<T> {
+        val items = expressions.map {
+            if (it is SortItem) it else SortItem.Property.Asc(it)
+        }
+        return orderBy(items)
+    }
+
+    private fun orderBy(items: List<SortItem>): SetOperationQueryImpl<T> {
         val newContext = context.copy(orderBy = context.orderBy + items)
         return copy(context = newContext)
     }

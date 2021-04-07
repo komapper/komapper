@@ -20,9 +20,9 @@ interface SqlSubquery<ENTITY : Any> : SqlSubqueryResult {
     ): SqlSubquery<ENTITY>
 
     fun where(declaration: WhereDeclaration): SqlSubquery<ENTITY>
-    fun groupBy(vararg properties: PropertyExpression<*>): SqlSubquery<ENTITY>
+    fun groupBy(vararg expressions: PropertyExpression<*>): SqlSubquery<ENTITY>
     fun having(declaration: HavingDeclaration): SqlSubquery<ENTITY>
-    fun orderBy(vararg properties: PropertyExpression<*>): SqlSubquery<ENTITY>
+    fun orderBy(vararg expressions: PropertyExpression<*>): SqlSubquery<ENTITY>
     fun offset(value: Int): SqlSubquery<ENTITY>
     fun limit(value: Int): SqlSubquery<ENTITY>
     fun forUpdate(): SqlSubquery<ENTITY>
@@ -59,8 +59,8 @@ internal data class SqlSubqueryImpl<ENTITY : Any>(
         return copy(context = newContext)
     }
 
-    override fun groupBy(vararg properties: PropertyExpression<*>): SqlSubqueryImpl<ENTITY> {
-        val newContext = context.copy(groupBy = properties.toList())
+    override fun groupBy(vararg expressions: PropertyExpression<*>): SqlSubqueryImpl<ENTITY> {
+        val newContext = context.copy(groupBy = expressions.toList())
         return copy(context = newContext)
     }
 
@@ -71,8 +71,8 @@ internal data class SqlSubqueryImpl<ENTITY : Any>(
         return copy(context = newContext)
     }
 
-    override fun orderBy(vararg properties: PropertyExpression<*>): SqlSubqueryImpl<ENTITY> {
-        val newContext = support.orderBy(*properties)
+    override fun orderBy(vararg expressions: PropertyExpression<*>): SqlSubqueryImpl<ENTITY> {
+        val newContext = support.orderBy(*expressions)
         return copy(context = newContext)
     }
 

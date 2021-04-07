@@ -7,6 +7,7 @@ import org.komapper.core.dsl.context.SqlSelectContext
 import org.komapper.core.dsl.element.Criterion
 import org.komapper.core.dsl.element.Operand
 import org.komapper.core.dsl.expr.AggregateFunction
+import org.komapper.core.dsl.expr.AliasExpression
 import org.komapper.core.dsl.expr.ArithmeticExpression
 import org.komapper.core.dsl.expr.EntityExpression
 import org.komapper.core.dsl.expr.PropertyExpression
@@ -33,6 +34,9 @@ internal class BuilderSupport(
             is ArithmeticExpression -> {
                 visitArithmeticExpr(expression)
             }
+            is AliasExpression -> {
+                visitAsExpression(expression)
+            }
             is StringFunction -> {
                 visitStringFunction(expression)
             }
@@ -41,7 +45,11 @@ internal class BuilderSupport(
                 val owner = expression.owner
                 val alias = aliasManager.getAlias(owner)
                     ?: error("Alias is not found. table=${owner.getCanonicalTableName(dialect::quote)}, column=$name")
-                buf.append("$alias.$name")
+                if (alias.isBlank()) {
+                    buf.append(name)
+                } else {
+                    buf.append("$alias.$name")
+                }
             }
         }
     }
@@ -110,6 +118,11 @@ internal class BuilderSupport(
         }.also {
             buf.append(")")
         }
+    }
+
+    private fun visitAsExpression(expression: AliasExpression<*>) {
+        visitPropertyExpression(expression.expression)
+        buf.append(" as ${dialect.quote(expression.alias)}")
     }
 
     private fun visitStringFunction(function: StringFunction) {
@@ -241,7 +254,7 @@ internal class BuilderSupport(
             buf.append(" not")
         }
         buf.append(" in (")
-        val childAliasManager = AliasManager(right, aliasManager)
+        val childAliasManager = AliasManagerImpl(right, aliasManager)
         val builder = SqlSelectStatementBuilder(dialect, right, childAliasManager)
         buf.append(builder.build())
         buf.append(")")
@@ -252,7 +265,7 @@ internal class BuilderSupport(
             buf.append("not ")
         }
         buf.append("exists (")
-        val childAliasManager = AliasManager(subContext, aliasManager)
+        val childAliasManager = AliasManagerImpl(subContext, aliasManager)
         val builder = SqlSelectStatementBuilder(dialect, subContext, childAliasManager)
         buf.append(builder.build())
         buf.append(")")

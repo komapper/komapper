@@ -7,7 +7,6 @@ import org.komapper.core.dsl.context.SqlSelectContext
 import org.komapper.core.dsl.context.SqlSetOperationComponent
 import org.komapper.core.dsl.context.SqlSetOperationContext
 import org.komapper.core.dsl.context.SqlSetOperationKind
-import org.komapper.core.dsl.expr.IndexedSortItem
 
 internal class SqlSetOperationStatementBuilder(
     private val dialect: Dialect,
@@ -15,20 +14,12 @@ internal class SqlSetOperationStatementBuilder(
 ) {
 
     private val buf = StatementBuffer(dialect::formatValue)
+    private val aliasManager = EmptyAliasManager()
+    private val support = OrderByBuilderSupport(dialect, context.orderBy, aliasManager, buf)
 
     fun build(): Statement {
         visitSetOperationComponent(context.component)
-        if (context.orderBy.isNotEmpty()) {
-            buf.append(" order by ")
-            for (item in context.orderBy) {
-                val (index, sort) = when (item) {
-                    is IndexedSortItem.Asc -> item.index to "asc"
-                    is IndexedSortItem.Desc -> item.index to "desc"
-                }
-                buf.append("$index $sort, ")
-            }
-            buf.cutBack(2)
-        }
+        support.orderByClause()
         return buf.toStatement()
     }
 
@@ -52,6 +43,8 @@ internal class SqlSetOperationStatementBuilder(
     private fun visitSelectContext(selectContext: SqlSelectContext<*>) {
         val builder = SqlSelectStatementBuilder(dialect, selectContext)
         val statement = builder.build()
+        buf.append("(")
         buf.append(statement)
+        buf.append(")")
     }
 }

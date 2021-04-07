@@ -4,7 +4,7 @@ import org.komapper.core.dsl.element.Criterion
 import org.komapper.core.dsl.element.ForUpdate
 import org.komapper.core.dsl.element.Join
 import org.komapper.core.dsl.element.Projection
-import org.komapper.core.dsl.expr.NamedSortItem
+import org.komapper.core.dsl.element.SortItem
 import org.komapper.core.dsl.expr.PropertyExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 
@@ -12,7 +12,7 @@ internal data class SqlSelectContext<ENTITY : Any>(
     override val entityMetamodel: EntityMetamodel<ENTITY>,
     override val joins: List<Join<*>> = listOf(),
     override val where: List<Criterion> = listOf(),
-    override val orderBy: List<NamedSortItem<*>> = listOf(),
+    override val orderBy: List<SortItem> = listOf(),
     override val offset: Int = -1,
     override val limit: Int = -1,
     override val forUpdate: ForUpdate = ForUpdate(),
@@ -50,7 +50,7 @@ internal data class SqlSelectContext<ENTITY : Any>(
         return copy(having = this.having + having)
     }
 
-    override fun addOrderBy(orderBy: List<NamedSortItem<*>>): SqlSelectContext<ENTITY> {
+    override fun addOrderBy(orderBy: List<SortItem>): SqlSelectContext<ENTITY> {
         return copy(orderBy = this.orderBy + orderBy)
     }
 
