@@ -42,18 +42,12 @@ interface SqlSelectQuery<ENTITY : Any> : SqlSetOperandQuery<ENTITY> {
 
     fun <A : Any> select(
         e: EntityMetamodel<A>
-    ): SqlSetOperandQuery<A?>
+    ): SqlSetOperandQuery<Pair<ENTITY, A?>>
 
     fun <A : Any, B : Any> select(
         e1: EntityMetamodel<A>,
         e2: EntityMetamodel<B>
-    ): SqlSetOperandQuery<Pair<A?, B?>>
-
-    fun <A : Any, B : Any, C : Any> select(
-        e1: EntityMetamodel<A>,
-        e2: EntityMetamodel<B>,
-        e3: EntityMetamodel<C>
-    ): SqlSetOperandQuery<Triple<A?, B?, C?>>
+    ): SqlSetOperandQuery<Triple<ENTITY, A?, B?>>
 
     fun select(
         vararg entityMetamodels: EntityMetamodel<*>,
@@ -184,43 +178,29 @@ internal data class SqlSelectQueryImpl<ENTITY : Any>(
 
     override fun <A : Any> select(
         e: EntityMetamodel<A>,
-    ): SqlSetOperandQuery<A?> {
+    ): SqlSetOperandQuery<Pair<ENTITY, A?>> {
         val entityExpressions = context.getEntityExpressions()
         if (e !in entityExpressions) error(entityMetamodelNotFound("e"))
-        val newContext = context.setEntity(e)
+        val newContext = context.setEntities(listOf(context.entityMetamodel, e))
         return Transformable(newContext, option) { dialect, rs ->
             val m = EntityMapper(dialect, rs)
-            m.execute(e)
+            val base = checkNotNull(m.execute(context.entityMetamodel, true))
+            base to m.execute(e)
         }
     }
 
     override fun <A : Any, B : Any> select(
         e1: EntityMetamodel<A>,
         e2: EntityMetamodel<B>
-    ): SqlSetOperandQuery<Pair<A?, B?>> {
+    ): SqlSetOperandQuery<Triple<ENTITY, A?, B?>> {
         val entityExpressions = context.getEntityExpressions()
         if (e1 !in entityExpressions) error(entityMetamodelNotFound("e1"))
         if (e2 !in entityExpressions) error(entityMetamodelNotFound("e2"))
-        val newContext = context.setEntities(listOf(e1, e2))
+        val newContext = context.setEntities(listOf(context.entityMetamodel, e1, e2))
         return Transformable(newContext, option) { dialect, rs ->
             val m = EntityMapper(dialect, rs)
-            m.execute(e1) to m.execute(e2)
-        }
-    }
-
-    override fun <A : Any, B : Any, C : Any> select(
-        e1: EntityMetamodel<A>,
-        e2: EntityMetamodel<B>,
-        e3: EntityMetamodel<C>
-    ): SqlSetOperandQuery<Triple<A?, B?, C?>> {
-        val entityExpressions = context.getEntityExpressions()
-        if (e1 !in entityExpressions) error(entityMetamodelNotFound("e1"))
-        if (e2 !in entityExpressions) error(entityMetamodelNotFound("e2"))
-        if (e3 !in entityExpressions) error(entityMetamodelNotFound("e3"))
-        val newContext = context.setEntities(listOf(e1, e2, e3))
-        return Transformable(newContext, option) { dialect, rs ->
-            val m = EntityMapper(dialect, rs)
-            Triple(m.execute(e1), m.execute(e2), m.execute(e3))
+            val base = checkNotNull(m.execute(context.entityMetamodel, true))
+            Triple(base, m.execute(e1), m.execute(e2))
         }
     }
 

@@ -3,6 +3,7 @@ package org.komapper.jdbc.h2
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.Database
@@ -103,29 +104,27 @@ class SqlSelectQuerySelectTest(private val db: Database) {
     fun selectEntity() {
         val a = Address.metamodel()
         val e = Employee.metamodel()
-        val list: List<Employee?> = db.execute {
+        val list: List<Address> = db.execute {
             SqlQuery.from(a)
                 .leftJoin(e) {
                     a.addressId eq e.addressId
                 }
                 .orderBy(a.addressId)
-                .select(e)
         }
         assertEquals(15, list.size)
-        assertNull(list[14])
     }
 
     @Test
     fun selectEntitiesAsPair_leftJoin() {
         val a = Address.metamodel()
         val e = Employee.metamodel()
-        val list: List<Pair<Address?, Employee?>> = db.execute {
+        val list: List<Pair<Address, Employee?>> = db.execute {
             SqlQuery.from(a)
                 .leftJoin(e) {
                     a.addressId eq e.addressId
                 }
                 .orderBy(a.addressId)
-                .select(a, e)
+                .select(e)
         }
         assertEquals(15, list.size)
         assertNotNull(list[14].first)
@@ -136,15 +135,13 @@ class SqlSelectQuerySelectTest(private val db: Database) {
     fun selectEntitiesAsPair_innerJoin() {
         val a = Address.metamodel()
         val e = Employee.metamodel()
-        val list = db.execute {
+        val list: List<Pair<Address, Employee?>> = db.execute {
             SqlQuery.from(a).innerJoin(e) {
                 a.addressId eq e.addressId
-            }.select(a, e)
+            }.select(e)
         }
         assertEquals(14, list.size)
-        val (address, employee) = list[0]
-        assertNotNull(address)
-        assertNotNull(employee)
+        assertTrue(list.all { (_, employee) -> employee != null })
     }
 
     @Test
@@ -158,13 +155,10 @@ class SqlSelectQuerySelectTest(private val db: Database) {
                     a.addressId eq e.addressId
                 }.innerJoin(d) {
                     e.departmentId eq d.departmentId
-                }.select(a, e, d)
+                }.select(e, d)
         }
         assertEquals(14, list.size)
-        val (address, employee, department) = list[0]
-        assertNotNull(address)
-        assertNotNull(employee)
-        assertNotNull(department)
+        assertTrue(list.all { (_, employee, department) -> employee != null && department != null })
     }
 
     @Test
@@ -176,7 +170,7 @@ class SqlSelectQuerySelectTest(private val db: Database) {
                     a.addressId inList listOf(1, 2)
                 }
                 .orderBy(a.addressId)
-                .select(a, a, a, a)
+                .select(a, a, a)
         }
         assertEquals(2, list.size)
         val record0 = list[0]
