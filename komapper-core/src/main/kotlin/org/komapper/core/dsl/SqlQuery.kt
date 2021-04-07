@@ -22,15 +22,15 @@ import org.komapper.core.dsl.scope.ValuesDeclaration
 
 object SqlQuery : Dsl {
 
-    fun <ENTITY> first(entityMetamodel: EntityMetamodel<ENTITY>): SqlFindQuery<ENTITY, ENTITY> {
+    fun <ENTITY : Any> first(entityMetamodel: EntityMetamodel<ENTITY>): SqlFindQuery<ENTITY, ENTITY> {
         return createFindQuery(entityMetamodel) { it.first() }
     }
 
-    fun <ENTITY> firstOrNull(entityMetamodel: EntityMetamodel<ENTITY>): SqlFindQuery<ENTITY, ENTITY?> {
+    fun <ENTITY : Any> firstOrNull(entityMetamodel: EntityMetamodel<ENTITY>): SqlFindQuery<ENTITY, ENTITY?> {
         return createFindQuery(entityMetamodel) { it.firstOrNull() }
     }
 
-    private fun <ENTITY, R> createFindQuery(
+    private fun <ENTITY : Any, R> createFindQuery(
         entityMetamodel: EntityMetamodel<ENTITY>,
         transformer: (ListQuery<ENTITY>) -> Query<R>
     ): SqlFindQuery<ENTITY, R> {
@@ -38,19 +38,19 @@ object SqlQuery : Dsl {
         return SqlFindQueryImpl(selectQuery, transformer)
     }
 
-    fun <ENTITY> from(entityMetamodel: EntityMetamodel<ENTITY>): SqlSelectQuery<ENTITY> {
+    fun <ENTITY : Any> from(entityMetamodel: EntityMetamodel<ENTITY>): SqlSelectQuery<ENTITY> {
         return SqlSelectQueryImpl(SqlSelectContext(entityMetamodel))
     }
 
-    fun <ENTITY> insert(entityMetamodel: EntityMetamodel<ENTITY>, declaration: ValuesDeclaration): SqlInsertQuery {
+    fun <ENTITY : Any> insert(entityMetamodel: EntityMetamodel<ENTITY>, declaration: ValuesDeclaration): SqlInsertQuery {
         return SqlInsertQueryImpl(SqlInsertContext(entityMetamodel)).values(declaration)
     }
 
-    fun <ENTITY> update(entityMetamodel: EntityMetamodel<ENTITY>, declaration: SetDeclaration): SqlUpdateQuery {
+    fun <ENTITY : Any> update(entityMetamodel: EntityMetamodel<ENTITY>, declaration: SetDeclaration): SqlUpdateQuery {
         return SqlUpdateQueryImpl(SqlUpdateContext(entityMetamodel)).set(declaration)
     }
 
-    fun <ENTITY> delete(entityMetamodel: EntityMetamodel<ENTITY>): SqlDeleteQuery {
+    fun <ENTITY : Any> delete(entityMetamodel: EntityMetamodel<ENTITY>): SqlDeleteQuery {
         return SqlDeleteQueryImpl(SqlDeleteContext(entityMetamodel))
     }
 }

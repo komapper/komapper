@@ -7,7 +7,7 @@ import org.komapper.core.dsl.builder.EntityDeleteStatementBuilder
 import org.komapper.core.dsl.context.EntityDeleteContext
 import org.komapper.core.jdbc.JdbcExecutor
 
-internal class EntityDeleteQuerySupport<ENTITY>(
+internal class EntityDeleteQuerySupport<ENTITY : Any>(
     val context: EntityDeleteContext<ENTITY>,
     val option: EntityDeleteOption
 ) {

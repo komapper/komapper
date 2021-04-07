@@ -39,6 +39,7 @@ internal class EntityMetamodelGenerator(
 
         propertyMetamodels()
 
+        klass()
         tableName()
         catalogName()
         schemaName()
@@ -90,6 +91,10 @@ internal class EntityMetamodelGenerator(
         for (p in entity.properties) {
             w.println("    val $p by lazy { $PropertyMetamodelImpl(this, $EntityDescriptor.$p) }")
         }
+    }
+
+    private fun klass() {
+        w.println("    override fun klass() = $entityTypeName::class")
     }
 
     private fun tableName() {

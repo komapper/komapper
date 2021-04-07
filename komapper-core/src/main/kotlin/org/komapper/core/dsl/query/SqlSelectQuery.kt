@@ -19,14 +19,14 @@ import org.komapper.core.dsl.scope.WhereDeclaration
 import org.komapper.core.jdbc.JdbcExecutor
 import java.sql.ResultSet
 
-interface SqlSelectQuery<ENTITY> : SqlSetOperandQuery<ENTITY> {
+interface SqlSelectQuery<ENTITY : Any> : SqlSetOperandQuery<ENTITY> {
 
-    fun <OTHER_ENTITY> innerJoin(
+    fun <OTHER_ENTITY : Any> innerJoin(
         entityMetamodel: EntityMetamodel<OTHER_ENTITY>,
         on: OnDeclaration<OTHER_ENTITY>
     ): SqlSelectQuery<ENTITY>
 
-    fun <OTHER_ENTITY> leftJoin(
+    fun <OTHER_ENTITY : Any> leftJoin(
         entityMetamodel: EntityMetamodel<OTHER_ENTITY>,
         on: OnDeclaration<OTHER_ENTITY>
     ): SqlSelectQuery<ENTITY>
@@ -40,16 +40,16 @@ interface SqlSelectQuery<ENTITY> : SqlSetOperandQuery<ENTITY> {
     fun forUpdate(): SqlSelectQuery<ENTITY>
     fun option(declaration: SqlSelectOptionDeclaration): SqlSelectQuery<ENTITY>
 
-    fun <A> select(
+    fun <A : Any> select(
         e: EntityMetamodel<A>
     ): SqlSetOperandQuery<A?>
 
-    fun <A, B> select(
+    fun <A : Any, B : Any> select(
         e1: EntityMetamodel<A>,
         e2: EntityMetamodel<B>
     ): SqlSetOperandQuery<Pair<A?, B?>>
 
-    fun <A, B, C> select(
+    fun <A : Any, B : Any, C : Any> select(
         e1: EntityMetamodel<A>,
         e2: EntityMetamodel<B>,
         e3: EntityMetamodel<C>
@@ -79,7 +79,7 @@ interface SqlSelectQuery<ENTITY> : SqlSetOperandQuery<ENTITY> {
     ): SqlSetOperandQuery<PropertyRecord>
 }
 
-internal data class SqlSelectQueryImpl<ENTITY>(
+internal data class SqlSelectQueryImpl<ENTITY : Any>(
     private val context: SqlSelectContext<ENTITY>,
     private val option: SqlSelectOption = QueryOptionImpl(allowEmptyWhereClause = true)
 ) :
@@ -94,7 +94,7 @@ internal data class SqlSelectQueryImpl<ENTITY>(
     private val support: SelectQuerySupport<ENTITY, SqlSelectContext<ENTITY>> = SelectQuerySupport(context)
     override val setOperationComponent: SqlSetOperationComponent<ENTITY> = SqlSetOperationComponent.Leaf(context)
 
-    override fun <OTHER_ENTITY> innerJoin(
+    override fun <OTHER_ENTITY : Any> innerJoin(
         entityMetamodel: EntityMetamodel<OTHER_ENTITY>,
         on: OnDeclaration<OTHER_ENTITY>
     ): SqlSelectQueryImpl<ENTITY> {
@@ -102,7 +102,7 @@ internal data class SqlSelectQueryImpl<ENTITY>(
         return copy(context = newContext)
     }
 
-    override fun <OTHER_ENTITY> leftJoin(
+    override fun <OTHER_ENTITY : Any> leftJoin(
         entityMetamodel: EntityMetamodel<OTHER_ENTITY>,
         on: OnDeclaration<OTHER_ENTITY>
     ): SqlSelectQueryImpl<ENTITY> {
@@ -182,7 +182,7 @@ internal data class SqlSelectQueryImpl<ENTITY>(
         }
     }
 
-    override fun <A> select(
+    override fun <A : Any> select(
         e: EntityMetamodel<A>,
     ): SqlSetOperandQuery<A?> {
         val entityMetamodels = context.getEntityExpressions()
@@ -194,7 +194,7 @@ internal data class SqlSelectQueryImpl<ENTITY>(
         }
     }
 
-    override fun <A, B> select(
+    override fun <A : Any, B : Any> select(
         e1: EntityMetamodel<A>,
         e2: EntityMetamodel<B>
     ): SqlSetOperandQuery<Pair<A?, B?>> {
@@ -208,7 +208,7 @@ internal data class SqlSelectQueryImpl<ENTITY>(
         }
     }
 
-    override fun <A, B, C> select(
+    override fun <A : Any, B : Any, C : Any> select(
         e1: EntityMetamodel<A>,
         e2: EntityMetamodel<B>,
         e3: EntityMetamodel<C>

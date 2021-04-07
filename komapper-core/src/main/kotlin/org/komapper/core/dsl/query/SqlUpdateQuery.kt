@@ -19,7 +19,7 @@ interface SqlUpdateQuery : Query<Int> {
     fun option(declaration: SqlUpdateOptionDeclaration): SqlUpdateQuery
 }
 
-internal data class SqlUpdateQueryImpl<ENTITY>(
+internal data class SqlUpdateQueryImpl<ENTITY : Any>(
     private val context: SqlUpdateContext<ENTITY>,
     private val option: SqlUpdateOption = QueryOptionImpl()
 ) : SqlUpdateQuery {

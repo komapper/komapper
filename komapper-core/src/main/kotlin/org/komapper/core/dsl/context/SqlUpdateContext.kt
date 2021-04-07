@@ -4,7 +4,7 @@ import org.komapper.core.dsl.element.Criterion
 import org.komapper.core.dsl.element.Operand
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 
-internal data class SqlUpdateContext<ENTITY>(
+internal data class SqlUpdateContext<ENTITY : Any>(
     override val entityMetamodel: EntityMetamodel<ENTITY>,
     val set: List<Pair<Operand.Property, Operand>> = listOf(),
     val where: List<Criterion> = listOf()

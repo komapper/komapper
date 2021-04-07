@@ -7,7 +7,7 @@ import org.komapper.core.dsl.element.Projection
 import org.komapper.core.dsl.expr.NamedSortItem
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 
-internal interface SelectContext<ENTITY, CONTEXT : SelectContext<ENTITY, CONTEXT>> : Context<ENTITY> {
+internal interface SelectContext<ENTITY : Any, CONTEXT : SelectContext<ENTITY, CONTEXT>> : Context<ENTITY> {
     val joins: List<Join<*>>
     val where: List<Criterion>
     val orderBy: List<NamedSortItem<*>>

@@ -2,7 +2,7 @@ package org.komapper.core.dsl.element
 
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 
-internal data class Join<ENTITY>(
+internal data class Join<ENTITY : Any>(
     val entityMetamodel: EntityMetamodel<ENTITY>,
     val kind: JoinKind,
     val on: List<Criterion>

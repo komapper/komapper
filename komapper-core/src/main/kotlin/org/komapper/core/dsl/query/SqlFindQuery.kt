@@ -7,7 +7,7 @@ import org.komapper.core.dsl.expr.PropertyExpression
 import org.komapper.core.dsl.scope.SqlSelectOptionDeclaration
 import org.komapper.core.dsl.scope.WhereDeclaration
 
-interface SqlFindQuery<ENTITY, R> : Query<R> {
+interface SqlFindQuery<ENTITY : Any, R> : Query<R> {
     fun where(declaration: WhereDeclaration): SqlFindQuery<ENTITY, R>
     fun orderBy(vararg items: PropertyExpression<*>): SqlFindQuery<ENTITY, R>
     fun offset(value: Int): SqlFindQuery<ENTITY, R>
@@ -15,7 +15,7 @@ interface SqlFindQuery<ENTITY, R> : Query<R> {
     fun option(declaration: SqlSelectOptionDeclaration): SqlFindQuery<ENTITY, R>
 }
 
-internal data class SqlFindQueryImpl<ENTITY, R>(
+internal data class SqlFindQueryImpl<ENTITY : Any, R>(
     private val query: SqlSelectQuery<ENTITY>,
     private val transformer: (ListQuery<ENTITY>) -> Query<R>
 ) :

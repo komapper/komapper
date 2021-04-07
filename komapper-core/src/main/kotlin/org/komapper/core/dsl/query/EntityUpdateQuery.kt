@@ -7,11 +7,11 @@ import org.komapper.core.dsl.context.EntityUpdateContext
 import org.komapper.core.dsl.scope.EntityUpdateOptionDeclaration
 import org.komapper.core.dsl.scope.EntityUpdateOptionScope
 
-interface EntityUpdateQuery<ENTITY> : Query<ENTITY> {
+interface EntityUpdateQuery<ENTITY : Any> : Query<ENTITY> {
     fun option(declaration: EntityUpdateOptionDeclaration): EntityUpdateQuery<ENTITY>
 }
 
-internal data class EntityUpdateQueryImpl<ENTITY>(
+internal data class EntityUpdateQueryImpl<ENTITY : Any>(
     private val context: EntityUpdateContext<ENTITY>,
     private val entity: ENTITY,
     private val option: EntityUpdateOption = QueryOptionImpl()

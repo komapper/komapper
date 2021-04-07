@@ -7,11 +7,11 @@ import org.komapper.core.dsl.context.EntityDeleteContext
 import org.komapper.core.dsl.scope.EntityDeleteOptionDeclaration
 import org.komapper.core.dsl.scope.EntityDeleteOptionScope
 
-interface EntityDeleteQuery<ENTITY> : Query<Unit> {
+interface EntityDeleteQuery<ENTITY : Any> : Query<Unit> {
     fun option(declaration: EntityDeleteOptionDeclaration): EntityDeleteQuery<ENTITY>
 }
 
-internal data class EntityDeleteQueryImpl<ENTITY>(
+internal data class EntityDeleteQueryImpl<ENTITY : Any>(
     private val context: EntityDeleteContext<ENTITY>,
     private val entity: ENTITY,
     private val option: EntityDeleteOption = QueryOptionImpl()

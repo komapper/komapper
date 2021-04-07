@@ -3,7 +3,7 @@ package org.komapper.core.dsl.context
 import org.komapper.core.dsl.element.Operand
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 
-internal data class SqlInsertContext<ENTITY>(
+internal data class SqlInsertContext<ENTITY : Any>(
     override val entityMetamodel: EntityMetamodel<ENTITY>,
     val values: List<Pair<Operand.Property, Operand.Parameter>> = listOf()
 ) : Context<ENTITY> {

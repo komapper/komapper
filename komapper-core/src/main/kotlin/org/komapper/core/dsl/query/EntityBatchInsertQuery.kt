@@ -7,11 +7,11 @@ import org.komapper.core.dsl.context.EntityInsertContext
 import org.komapper.core.dsl.scope.EntityBatchInsertOptionDeclaration
 import org.komapper.core.dsl.scope.EntityBatchInsertOptionScope
 
-interface EntityBatchInsertQuery<ENTITY> : Query<List<ENTITY>> {
+interface EntityBatchInsertQuery<ENTITY : Any> : Query<List<ENTITY>> {
     fun option(declaration: EntityBatchInsertOptionDeclaration): EntityBatchInsertQuery<ENTITY>
 }
 
-internal data class EntityBatchInsertQueryImpl<ENTITY>(
+internal data class EntityBatchInsertQueryImpl<ENTITY : Any>(
     private val context: EntityInsertContext<ENTITY>,
     private val entities: List<ENTITY>,
     private val option: EntityBatchInsertOption = QueryOptionImpl()

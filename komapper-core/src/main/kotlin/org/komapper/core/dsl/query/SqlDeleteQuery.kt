@@ -16,7 +16,7 @@ interface SqlDeleteQuery : Query<Int> {
     fun option(declaration: SqlDeleteOptionDeclaration): SqlDeleteQuery
 }
 
-internal data class SqlDeleteQueryImpl<ENTITY>(
+internal data class SqlDeleteQueryImpl<ENTITY : Any>(
     private val context: SqlDeleteContext<ENTITY>,
     private val option: SqlDeleteOption = QueryOptionImpl()
 ) : SqlDeleteQuery {

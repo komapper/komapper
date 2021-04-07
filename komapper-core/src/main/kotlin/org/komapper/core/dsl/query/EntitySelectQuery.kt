@@ -14,15 +14,16 @@ import org.komapper.core.dsl.scope.OnDeclaration
 import org.komapper.core.dsl.scope.WhereDeclaration
 import org.komapper.core.jdbc.JdbcExecutor
 import java.sql.ResultSet
+import kotlin.reflect.cast
 
-interface EntitySelectQuery<ENTITY> : ListQuery<ENTITY> {
+interface EntitySelectQuery<ENTITY : Any> : ListQuery<ENTITY> {
 
-    fun <OTHER_ENTITY> innerJoin(
+    fun <OTHER_ENTITY : Any> innerJoin(
         entityMetamodel: EntityMetamodel<OTHER_ENTITY>,
         on: OnDeclaration<OTHER_ENTITY>
     ): EntitySelectQuery<ENTITY>
 
-    fun <OTHER_ENTITY> leftJoin(
+    fun <OTHER_ENTITY : Any> leftJoin(
         entityMetamodel: EntityMetamodel<OTHER_ENTITY>,
         on: OnDeclaration<OTHER_ENTITY>
     ): EntitySelectQuery<ENTITY>
@@ -34,14 +35,14 @@ interface EntitySelectQuery<ENTITY> : ListQuery<ENTITY> {
     fun forUpdate(): EntitySelectQuery<ENTITY>
     fun option(declaration: EntitySelectOptionDeclaration): EntitySelectQuery<ENTITY>
 
-    fun <T, S> associate(
+    fun <T : Any, S : Any> associate(
         e1: EntityMetamodel<T>,
         e2: EntityMetamodel<S>,
         associator: Associator<T, S>
     ): EntitySelectQuery<ENTITY>
 }
 
-internal data class EntitySelectQueryImpl<ENTITY>(
+internal data class EntitySelectQueryImpl<ENTITY : Any>(
     private val context: EntitySelectContext<ENTITY>,
     private val option: EntitySelectOption = QueryOptionImpl(allowEmptyWhereClause = true)
 ) :
@@ -55,7 +56,7 @@ internal data class EntitySelectQueryImpl<ENTITY>(
 
     private val support: SelectQuerySupport<ENTITY, EntitySelectContext<ENTITY>> = SelectQuerySupport(context)
 
-    override fun <OTHER_ENTITY> innerJoin(
+    override fun <OTHER_ENTITY : Any> innerJoin(
         entityMetamodel: EntityMetamodel<OTHER_ENTITY>,
         on: OnDeclaration<OTHER_ENTITY>
     ): EntitySelectQueryImpl<ENTITY> {
@@ -63,7 +64,7 @@ internal data class EntitySelectQueryImpl<ENTITY>(
         return copy(context = newContext)
     }
 
-    override fun <OTHER_ENTITY> leftJoin(
+    override fun <OTHER_ENTITY : Any> leftJoin(
         entityMetamodel: EntityMetamodel<OTHER_ENTITY>,
         on: OnDeclaration<OTHER_ENTITY>
     ): EntitySelectQueryImpl<ENTITY> {
@@ -71,7 +72,7 @@ internal data class EntitySelectQueryImpl<ENTITY>(
         return copy(context = newContext)
     }
 
-    override fun <T, S> associate(
+    override fun <T : Any, S : Any> associate(
         e1: EntityMetamodel<T>,
         e2: EntityMetamodel<S>,
         associator: Associator<T, S>
@@ -160,8 +161,7 @@ internal data class EntitySelectQueryImpl<ENTITY>(
                 pool.asSequence().filter {
                     it.key.entityMetamodel == context.entityMetamodel
                 }.map {
-                    @Suppress("UNCHECKED_CAST")
-                    it.value as ENTITY
+                    context.entityMetamodel.klass().cast(it.value)
                 }.let {
                     transformer(it)
                 }

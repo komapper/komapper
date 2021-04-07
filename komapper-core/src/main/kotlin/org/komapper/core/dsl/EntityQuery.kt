@@ -26,15 +26,15 @@ import org.komapper.core.dsl.query.Query
 
 object EntityQuery : Dsl {
 
-    fun <ENTITY> first(entityMetamodel: EntityMetamodel<ENTITY>): EntityFindQuery<ENTITY, ENTITY> {
+    fun <ENTITY : Any> first(entityMetamodel: EntityMetamodel<ENTITY>): EntityFindQuery<ENTITY, ENTITY> {
         return createFindQuery(entityMetamodel) { it.first() }
     }
 
-    fun <ENTITY> firstOrNull(entityMetamodel: EntityMetamodel<ENTITY>): EntityFindQuery<ENTITY, ENTITY?> {
+    fun <ENTITY : Any> firstOrNull(entityMetamodel: EntityMetamodel<ENTITY>): EntityFindQuery<ENTITY, ENTITY?> {
         return createFindQuery(entityMetamodel) { it.firstOrNull() }
     }
 
-    private fun <ENTITY, R> createFindQuery(
+    private fun <ENTITY : Any, R> createFindQuery(
         entityMetamodel: EntityMetamodel<ENTITY>,
         transformer: (ListQuery<ENTITY>) -> Query<R>
     ): EntityFindQuery<ENTITY, R> {
@@ -42,23 +42,23 @@ object EntityQuery : Dsl {
         return EntityFindQueryImpl(selectQuery, transformer)
     }
 
-    fun <ENTITY> from(entityMetamodel: EntityMetamodel<ENTITY>): EntitySelectQuery<ENTITY> {
+    fun <ENTITY : Any> from(entityMetamodel: EntityMetamodel<ENTITY>): EntitySelectQuery<ENTITY> {
         return EntitySelectQueryImpl(EntitySelectContext(entityMetamodel))
     }
 
-    fun <ENTITY> insert(entityMetamodel: EntityMetamodel<ENTITY>, entity: ENTITY): EntityInsertQuery<ENTITY> {
+    fun <ENTITY : Any> insert(entityMetamodel: EntityMetamodel<ENTITY>, entity: ENTITY): EntityInsertQuery<ENTITY> {
         return EntityInsertQueryImpl(EntityInsertContext(entityMetamodel), entity)
     }
 
-    fun <ENTITY> update(entityMetamodel: EntityMetamodel<ENTITY>, entity: ENTITY): EntityUpdateQuery<ENTITY> {
+    fun <ENTITY : Any> update(entityMetamodel: EntityMetamodel<ENTITY>, entity: ENTITY): EntityUpdateQuery<ENTITY> {
         return EntityUpdateQueryImpl(EntityUpdateContext(entityMetamodel), entity)
     }
 
-    fun <ENTITY> delete(entityMetamodel: EntityMetamodel<ENTITY>, entity: ENTITY): EntityDeleteQuery<ENTITY> {
+    fun <ENTITY : Any> delete(entityMetamodel: EntityMetamodel<ENTITY>, entity: ENTITY): EntityDeleteQuery<ENTITY> {
         return EntityDeleteQueryImpl(EntityDeleteContext(entityMetamodel), entity)
     }
 
-    fun <ENTITY> batchInsert(
+    fun <ENTITY : Any> batchInsert(
         entityMetamodel: EntityMetamodel<ENTITY>,
         entities: List<ENTITY>
     ): EntityBatchInsertQuery<ENTITY> {
@@ -66,7 +66,7 @@ object EntityQuery : Dsl {
         return EntityBatchInsertQueryImpl(EntityInsertContext(entityMetamodel), entities)
     }
 
-    fun <ENTITY> batchUpdate(
+    fun <ENTITY : Any> batchUpdate(
         entityMetamodel: EntityMetamodel<ENTITY>,
         entities: List<ENTITY>
     ): EntityBatchUpdateQuery<ENTITY> {
@@ -74,7 +74,7 @@ object EntityQuery : Dsl {
         return EntityBatchUpdateQueryImpl(EntityUpdateContext(entityMetamodel), entities)
     }
 
-    fun <ENTITY> batchDelete(
+    fun <ENTITY : Any> batchDelete(
         entityMetamodel: EntityMetamodel<ENTITY>,
         entities: List<ENTITY>
     ): EntityBatchDeleteQuery<ENTITY> {

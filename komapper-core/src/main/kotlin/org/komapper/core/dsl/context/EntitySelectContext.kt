@@ -9,7 +9,7 @@ import org.komapper.core.dsl.element.Projection
 import org.komapper.core.dsl.expr.NamedSortItem
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 
-internal data class EntitySelectContext<ENTITY>(
+internal data class EntitySelectContext<ENTITY : Any>(
     override val entityMetamodel: EntityMetamodel<ENTITY>,
     override val joins: List<Join<*>> = listOf(),
     override val where: List<Criterion> = listOf(),

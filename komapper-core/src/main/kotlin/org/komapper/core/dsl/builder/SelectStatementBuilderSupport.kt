@@ -95,7 +95,7 @@ internal class SelectStatementBuilderSupport(
         }
     }
 
-    private fun table(expression: EntityExpression) {
+    private fun table(expression: EntityExpression<*>) {
         support.visitEntityExpression(expression)
     }
 

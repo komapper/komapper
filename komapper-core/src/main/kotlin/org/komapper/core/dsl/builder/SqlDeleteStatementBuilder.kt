@@ -7,7 +7,7 @@ import org.komapper.core.dsl.context.SqlDeleteContext
 import org.komapper.core.dsl.element.Criterion
 import org.komapper.core.dsl.expr.EntityExpression
 
-internal class SqlDeleteStatementBuilder<ENTITY>(
+internal class SqlDeleteStatementBuilder<ENTITY : Any>(
     val dialect: Dialect,
     val context: SqlDeleteContext<ENTITY>
 ) {
@@ -29,7 +29,7 @@ internal class SqlDeleteStatementBuilder<ENTITY>(
         return buf.toStatement()
     }
 
-    private fun table(expression: EntityExpression) {
+    private fun table(expression: EntityExpression<*>) {
         support.visitEntityExpression(expression)
     }
 

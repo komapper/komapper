@@ -5,7 +5,7 @@ import org.komapper.core.data.Statement
 import org.komapper.core.data.StatementBuffer
 import org.komapper.core.dsl.context.EntitySelectContext
 
-internal class EntitySelectStatementBuilder<ENTITY>(
+internal class EntitySelectStatementBuilder<ENTITY : Any>(
     val dialect: Dialect,
     val context: EntitySelectContext<ENTITY>,
     aliasManager: AliasManager = AliasManager(context)

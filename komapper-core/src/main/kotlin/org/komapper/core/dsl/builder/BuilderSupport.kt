@@ -19,7 +19,7 @@ internal class BuilderSupport(
     private val buf: StatementBuffer
 ) {
 
-    fun visitEntityExpression(expression: EntityExpression) {
+    fun visitEntityExpression(expression: EntityExpression<*>) {
         val name = expression.getCanonicalTableName(dialect::quote)
         val alias = aliasManager.getAlias(expression) ?: error("Alias is not found. table=$name")
         buf.append("$name $alias")

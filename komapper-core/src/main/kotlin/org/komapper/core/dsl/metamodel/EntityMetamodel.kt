@@ -3,7 +3,7 @@ package org.komapper.core.dsl.metamodel
 import org.komapper.core.dsl.expr.EntityExpression
 import java.time.Clock
 
-interface EntityMetamodel<ENTITY> : EntityExpression {
+interface EntityMetamodel<ENTITY : Any> : EntityExpression<ENTITY> {
     fun idAssignment(): Assignment<ENTITY>?
     fun idProperties(): List<PropertyMetamodel<ENTITY, *>>
     fun versionProperty(): PropertyMetamodel<ENTITY, *>?
@@ -15,7 +15,7 @@ interface EntityMetamodel<ENTITY> : EntityExpression {
 }
 
 @Suppress("unused")
-abstract class EmptyEntityMetamodel<ENTITY> : EntityMetamodel<ENTITY> {
+abstract class EmptyEntityMetamodel<ENTITY : Any> : EntityMetamodel<ENTITY> {
     override fun tableName(): String = fail()
     override fun catalogName(): String = fail()
     override fun schemaName(): String = fail()

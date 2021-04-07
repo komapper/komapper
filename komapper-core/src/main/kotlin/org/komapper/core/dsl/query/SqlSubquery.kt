@@ -8,13 +8,13 @@ import org.komapper.core.dsl.scope.HavingScope
 import org.komapper.core.dsl.scope.OnDeclaration
 import org.komapper.core.dsl.scope.WhereDeclaration
 
-interface SqlSubquery<ENTITY> : SqlSubqueryResult {
-    fun <OTHER_ENTITY> innerJoin(
+interface SqlSubquery<ENTITY : Any> : SqlSubqueryResult {
+    fun <OTHER_ENTITY : Any> innerJoin(
         entityMetamodel: EntityMetamodel<OTHER_ENTITY>,
         on: OnDeclaration<OTHER_ENTITY>
     ): SqlSubquery<ENTITY>
 
-    fun <OTHER_ENTITY> leftJoin(
+    fun <OTHER_ENTITY : Any> leftJoin(
         entityMetamodel: EntityMetamodel<OTHER_ENTITY>,
         on: OnDeclaration<OTHER_ENTITY>
     ): SqlSubquery<ENTITY>
@@ -29,7 +29,7 @@ interface SqlSubquery<ENTITY> : SqlSubqueryResult {
     fun select(property: PropertyExpression<*>): SingleColumnSqlSubqueryResult
 }
 
-internal data class SqlSubqueryImpl<ENTITY>(
+internal data class SqlSubqueryImpl<ENTITY : Any>(
     private val context: SqlSelectContext<ENTITY>
 ) :
     SqlSubquery<ENTITY> {
@@ -38,7 +38,7 @@ internal data class SqlSubqueryImpl<ENTITY>(
 
     private val support: SelectQuerySupport<ENTITY, SqlSelectContext<ENTITY>> = SelectQuerySupport(context)
 
-    override fun <OTHER_ENTITY> innerJoin(
+    override fun <OTHER_ENTITY : Any> innerJoin(
         entityMetamodel: EntityMetamodel<OTHER_ENTITY>,
         on: OnDeclaration<OTHER_ENTITY>
     ): SqlSubqueryImpl<ENTITY> {
@@ -46,7 +46,7 @@ internal data class SqlSubqueryImpl<ENTITY>(
         return copy(context = newContext)
     }
 
-    override fun <OTHER_ENTITY> leftJoin(
+    override fun <OTHER_ENTITY : Any> leftJoin(
         entityMetamodel: EntityMetamodel<OTHER_ENTITY>,
         on: OnDeclaration<OTHER_ENTITY>
     ): SqlSubqueryImpl<ENTITY> {

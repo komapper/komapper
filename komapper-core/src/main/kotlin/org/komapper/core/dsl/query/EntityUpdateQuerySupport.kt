@@ -7,7 +7,7 @@ import org.komapper.core.dsl.builder.EntityUpdateStatementBuilder
 import org.komapper.core.dsl.context.EntityUpdateContext
 import org.komapper.core.jdbc.JdbcExecutor
 
-internal class EntityUpdateQuerySupport<ENTITY>(
+internal class EntityUpdateQuerySupport<ENTITY : Any>(
     private val context: EntityUpdateContext<ENTITY>,
     private val option: EntityUpdateOption
 ) {

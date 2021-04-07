@@ -8,7 +8,7 @@ import org.komapper.core.dsl.context.EntityInsertContext
 import org.komapper.core.dsl.metamodel.Assignment
 import org.komapper.core.jdbc.JdbcExecutor
 
-internal class EntityInsertQuerySupport<ENTITY>(
+internal class EntityInsertQuerySupport<ENTITY : Any>(
     private val context: EntityInsertContext<ENTITY>,
     private val option: EntityInsertOption
 ) {

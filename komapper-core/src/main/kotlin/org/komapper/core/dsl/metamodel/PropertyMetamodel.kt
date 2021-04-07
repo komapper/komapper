@@ -3,7 +3,7 @@ package org.komapper.core.dsl.metamodel
 import org.komapper.core.dsl.expr.PropertyExpression
 import kotlin.reflect.KClass
 
-interface PropertyMetamodel<E, T : Any> : PropertyExpression<T> {
+interface PropertyMetamodel<E : Any, T : Any> : PropertyExpression<T> {
     override val owner: EntityMetamodel<E>
     val getter: (E) -> T?
     val getterWithUncheckedCast: (Any) -> T?
@@ -12,7 +12,7 @@ interface PropertyMetamodel<E, T : Any> : PropertyExpression<T> {
     val idAssignment: Assignment<E>?
 }
 
-class PropertyMetamodelImpl<E, T : Any>(
+class PropertyMetamodelImpl<E : Any, T : Any>(
     override val owner: EntityMetamodel<E>,
     private val descriptor: PropertyDescriptor<E, T>
 ) : PropertyMetamodel<E, T> {
@@ -30,7 +30,7 @@ class PropertyMetamodelImpl<E, T : Any>(
 }
 
 @Suppress("unused")
-class EmptyPropertyMetamodel<E, T : Any> : PropertyMetamodel<E, T> {
+class EmptyPropertyMetamodel<E : Any, T : Any> : PropertyMetamodel<E, T> {
     override val owner: EntityMetamodel<E> get() = fail()
     override val klass: KClass<T> get() = fail()
     override val columnName: String get() = fail()

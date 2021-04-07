@@ -7,11 +7,11 @@ import org.komapper.core.dsl.context.EntityDeleteContext
 import org.komapper.core.dsl.scope.EntityBatchDeleteOptionDeclaration
 import org.komapper.core.dsl.scope.EntityBatchDeleteOptionScope
 
-interface EntityBatchDeleteQuery<ENTITY> : Query<Unit> {
+interface EntityBatchDeleteQuery<ENTITY : Any> : Query<Unit> {
     fun option(declaration: EntityBatchDeleteOptionDeclaration): EntityBatchDeleteQuery<ENTITY>
 }
 
-internal data class EntityBatchDeleteQueryImpl<ENTITY>(
+internal data class EntityBatchDeleteQueryImpl<ENTITY : Any>(
     private val context: EntityDeleteContext<ENTITY>,
     private val entities: List<ENTITY>,
     private val option: EntityBatchDeleteOption = QueryOptionImpl()

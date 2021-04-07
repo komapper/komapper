@@ -8,7 +8,7 @@ import java.sql.ResultSet
 internal class EntityMapper(val dialect: Dialect, val resultSet: ResultSet) {
     private val propertyMapper = PropertyMapper(dialect, resultSet)
 
-    fun <E> execute(e: EntityMetamodel<E>): E? {
+    fun <E : Any> execute(e: EntityMetamodel<E>): E? {
         val valueMap = mutableMapOf<PropertyMetamodel<*, *>, Any?>()
         for (p in e.properties()) {
             val value = propertyMapper.execute(p)

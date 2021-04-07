@@ -9,7 +9,7 @@ import org.komapper.core.dsl.expr.EntityExpression
 import org.komapper.core.dsl.expr.PropertyExpression
 import org.komapper.core.dsl.query.EntityUpdateOption
 
-internal class EntityUpdateStatementBuilder<ENTITY>(
+internal class EntityUpdateStatementBuilder<ENTITY : Any>(
     val dialect: Dialect,
     val context: EntityUpdateContext<ENTITY>,
     val entity: ENTITY,
@@ -63,7 +63,7 @@ internal class EntityUpdateStatementBuilder<ENTITY>(
         return buf.toStatement()
     }
 
-    private fun table(expression: EntityExpression) {
+    private fun table(expression: EntityExpression<*>) {
         support.visitEntityExpression(expression)
     }
 

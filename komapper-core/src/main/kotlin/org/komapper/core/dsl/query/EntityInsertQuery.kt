@@ -7,11 +7,11 @@ import org.komapper.core.dsl.context.EntityInsertContext
 import org.komapper.core.dsl.scope.EntityInsertOptionDeclaration
 import org.komapper.core.dsl.scope.EntityInsertOptionScope
 
-interface EntityInsertQuery<ENTITY> : Query<ENTITY> {
+interface EntityInsertQuery<ENTITY : Any> : Query<ENTITY> {
     fun option(declaration: EntityInsertOptionDeclaration): EntityInsertQuery<ENTITY>
 }
 
-internal data class EntityInsertQueryImpl<ENTITY>(
+internal data class EntityInsertQueryImpl<ENTITY : Any>(
     private val context: EntityInsertContext<ENTITY>,
     private val entity: ENTITY,
     private val option: EntityInsertOption = QueryOptionImpl()

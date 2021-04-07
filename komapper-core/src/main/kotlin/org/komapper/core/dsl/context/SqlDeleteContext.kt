@@ -3,7 +3,7 @@ package org.komapper.core.dsl.context
 import org.komapper.core.dsl.element.Criterion
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 
-internal data class SqlDeleteContext<ENTITY>(
+internal data class SqlDeleteContext<ENTITY : Any>(
     override val entityMetamodel: EntityMetamodel<ENTITY>,
     val where: List<Criterion> = listOf()
 ) : Context<ENTITY> {

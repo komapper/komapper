@@ -9,7 +9,7 @@ import org.komapper.core.dsl.expr.EntityExpression
 import org.komapper.core.dsl.expr.PropertyExpression
 import org.komapper.core.dsl.metamodel.Assignment
 
-internal class EntityInsertStatementBuilder<ENTITY>(
+internal class EntityInsertStatementBuilder<ENTITY : Any>(
     val dialect: Dialect,
     val context: EntityInsertContext<ENTITY>,
     val entity: ENTITY
@@ -44,7 +44,7 @@ internal class EntityInsertStatementBuilder<ENTITY>(
         return buf.toStatement()
     }
 
-    private fun table(expression: EntityExpression): String {
+    private fun table(expression: EntityExpression<*>): String {
         return expression.getCanonicalTableName(dialect::quote)
     }
 

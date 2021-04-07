@@ -1,6 +1,9 @@
 package org.komapper.core.dsl.expr
 
-interface EntityExpression {
+import kotlin.reflect.KClass
+
+interface EntityExpression<T : Any> {
+    fun klass(): KClass<T>
     fun tableName(): String
     fun catalogName(): String
     fun schemaName(): String

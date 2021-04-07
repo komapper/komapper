@@ -17,7 +17,7 @@ interface SqlInsertQuery : Query<Pair<Int, LongArray>> {
     fun option(declaration: SqlInsertOptionDeclaration): SqlInsertQuery
 }
 
-internal data class SqlInsertQueryImpl<ENTITY>(
+internal data class SqlInsertQueryImpl<ENTITY : Any>(
     private val context: SqlInsertContext<ENTITY>,
     private val option: SqlInsertOption = QueryOptionImpl()
 ) : SqlInsertQuery {

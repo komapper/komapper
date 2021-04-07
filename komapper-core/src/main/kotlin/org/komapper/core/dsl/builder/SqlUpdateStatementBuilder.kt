@@ -8,7 +8,7 @@ import org.komapper.core.dsl.element.Criterion
 import org.komapper.core.dsl.element.Operand
 import org.komapper.core.dsl.expr.EntityExpression
 
-internal class SqlUpdateStatementBuilder<ENTITY>(
+internal class SqlUpdateStatementBuilder<ENTITY : Any>(
     val dialect: Dialect,
     val context: SqlUpdateContext<ENTITY>,
 ) {
@@ -38,7 +38,7 @@ internal class SqlUpdateStatementBuilder<ENTITY>(
         return buf.toStatement()
     }
 
-    private fun table(expression: EntityExpression) {
+    private fun table(expression: EntityExpression<*>) {
         support.visitEntityExpression(expression)
     }
 

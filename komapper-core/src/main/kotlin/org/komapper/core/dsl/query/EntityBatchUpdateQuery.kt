@@ -7,11 +7,11 @@ import org.komapper.core.dsl.context.EntityUpdateContext
 import org.komapper.core.dsl.scope.EntityBatchUpdateOptionDeclaration
 import org.komapper.core.dsl.scope.EntityBatchUpdateOptionScope
 
-interface EntityBatchUpdateQuery<ENTITY> : Query<List<ENTITY>> {
+interface EntityBatchUpdateQuery<ENTITY : Any> : Query<List<ENTITY>> {
     fun option(declaration: EntityBatchUpdateOptionDeclaration): EntityBatchUpdateQuery<ENTITY>
 }
 
-internal data class EntityBatchUpdateQueryImpl<ENTITY>(
+internal data class EntityBatchUpdateQueryImpl<ENTITY : Any>(
     private val context: EntityUpdateContext<ENTITY>,
     private val entities: List<ENTITY>,
     private val option: EntityBatchUpdateOption = QueryOptionImpl()
