@@ -187,7 +187,7 @@ internal data class EntitySelectQueryImpl<ENTITY : Any>(
                     val entity = mapper.execute(entityMetamodel) ?: continue
                     val idValues = entityMetamodel.idProperties()
                         .map { it.getterWithUncheckedCast(entity) }
-                        .map { checkNotNull(it) }
+                        .map { it ?: error("The id value must not be null. entity=$entity") }
                     val key = EntityKey(entityMetamodel, idValues)
                     row[key] = entity
                 }
