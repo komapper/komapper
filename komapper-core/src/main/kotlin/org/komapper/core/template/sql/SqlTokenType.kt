@@ -1,4 +1,4 @@
-package org.komapper.core.template
+package org.komapper.core.template.sql
 
 enum class SqlTokenType {
     QUOTE,

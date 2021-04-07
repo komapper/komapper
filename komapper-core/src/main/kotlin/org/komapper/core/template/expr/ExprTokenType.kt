@@ -1,4 +1,4 @@
-package org.komapper.core.expr
+package org.komapper.core.template.expr
 
 enum class ExprTokenType {
     WHITESPACE,

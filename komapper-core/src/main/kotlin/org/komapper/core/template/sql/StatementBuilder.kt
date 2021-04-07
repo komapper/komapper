@@ -1,10 +1,10 @@
-package org.komapper.core.template
+package org.komapper.core.template.sql
 
 import org.komapper.core.data.Statement
 import org.komapper.core.data.StatementBuffer
 import org.komapper.core.data.Value
-import org.komapper.core.expr.ExprEvaluator
-import org.komapper.core.expr.ExprException
+import org.komapper.core.template.expr.ExprEvaluator
+import org.komapper.core.template.expr.ExprException
 import kotlin.reflect.KClass
 import kotlin.reflect.KVisibility
 import kotlin.reflect.full.memberProperties

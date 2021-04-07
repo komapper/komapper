@@ -1,6 +1,6 @@
-package org.komapper.core.template
+package org.komapper.core.template.sql
 
-import org.komapper.core.template.SqlLocation as Loc
+import org.komapper.core.template.sql.SqlLocation as Loc
 
 sealed class SqlNode {
     abstract fun toText(): String

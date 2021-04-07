@@ -6,7 +6,7 @@ import org.komapper.core.data.Statement
 import org.komapper.core.dsl.scope.TemplateUpdateOptionDeclaration
 import org.komapper.core.dsl.scope.TemplateUpdateOptionScope
 import org.komapper.core.jdbc.JdbcExecutor
-import org.komapper.core.template.DefaultStatementBuilder
+import org.komapper.core.template.sql.DefaultStatementBuilder
 
 interface TemplateExecuteQuery : Query<Int> {
     fun option(declaration: TemplateUpdateOptionDeclaration): TemplateExecuteQuery

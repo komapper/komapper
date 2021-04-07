@@ -1,4 +1,4 @@
-package org.komapper.core.template
+package org.komapper.core.template.sql
 
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -6,9 +6,9 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.komapper.core.data.Value
-import org.komapper.core.expr.DefaultExprEnvironment
-import org.komapper.core.expr.DefaultExprEvaluator
-import org.komapper.core.expr.NoCacheExprNodeFactory
+import org.komapper.core.template.expr.DefaultExprEnvironment
+import org.komapper.core.template.expr.DefaultExprEvaluator
+import org.komapper.core.template.expr.NoCacheExprNodeFactory
 
 class DefaultStatementBuilderTest {
 

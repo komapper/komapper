@@ -1,12 +1,6 @@
 package org.komapper.core.config
 
 import org.komapper.core.dsl.builder.SchemaStatementBuilder
-import org.komapper.core.expr.DefaultExprEnvironment
-import org.komapper.core.expr.DefaultExprEvaluator
-import org.komapper.core.expr.ExprEnvironment
-import org.komapper.core.expr.ExprEvaluator
-import org.komapper.core.expr.ExprNodeFactory
-import org.komapper.core.expr.NoCacheExprNodeFactory
 import org.komapper.core.jdbc.AnyType
 import org.komapper.core.jdbc.ArrayType
 import org.komapper.core.jdbc.BigDecimalType
@@ -30,8 +24,14 @@ import org.komapper.core.jdbc.OffsetDateTimeType
 import org.komapper.core.jdbc.SQLXMLType
 import org.komapper.core.jdbc.ShortType
 import org.komapper.core.jdbc.StringType
-import org.komapper.core.template.NoCacheSqlNodeFactory
-import org.komapper.core.template.SqlNodeFactory
+import org.komapper.core.template.expr.DefaultExprEnvironment
+import org.komapper.core.template.expr.DefaultExprEvaluator
+import org.komapper.core.template.expr.ExprEnvironment
+import org.komapper.core.template.expr.ExprEvaluator
+import org.komapper.core.template.expr.ExprNodeFactory
+import org.komapper.core.template.expr.NoCacheExprNodeFactory
+import org.komapper.core.template.sql.NoCacheSqlNodeFactory
+import org.komapper.core.template.sql.SqlNodeFactory
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.sql.Blob

@@ -1,24 +1,24 @@
-package org.komapper.core.expr
+package org.komapper.core.template.expr
 
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import org.komapper.core.expr.ExprTokenType.AND
-import org.komapper.core.expr.ExprTokenType.BIG_DECIMAL
-import org.komapper.core.expr.ExprTokenType.CLASS_REF
-import org.komapper.core.expr.ExprTokenType.DOUBLE
-import org.komapper.core.expr.ExprTokenType.EOE
-import org.komapper.core.expr.ExprTokenType.FALSE
-import org.komapper.core.expr.ExprTokenType.FLOAT
-import org.komapper.core.expr.ExprTokenType.INT
-import org.komapper.core.expr.ExprTokenType.LONG
-import org.komapper.core.expr.ExprTokenType.NULL
-import org.komapper.core.expr.ExprTokenType.PROPERTY
-import org.komapper.core.expr.ExprTokenType.SAFE_CALL_PROPERTY
-import org.komapper.core.expr.ExprTokenType.STRING
-import org.komapper.core.expr.ExprTokenType.TRUE
-import org.komapper.core.expr.ExprTokenType.VALUE
-import org.komapper.core.expr.ExprTokenType.WHITESPACE
+import org.komapper.core.template.expr.ExprTokenType.AND
+import org.komapper.core.template.expr.ExprTokenType.BIG_DECIMAL
+import org.komapper.core.template.expr.ExprTokenType.CLASS_REF
+import org.komapper.core.template.expr.ExprTokenType.DOUBLE
+import org.komapper.core.template.expr.ExprTokenType.EOE
+import org.komapper.core.template.expr.ExprTokenType.FALSE
+import org.komapper.core.template.expr.ExprTokenType.FLOAT
+import org.komapper.core.template.expr.ExprTokenType.INT
+import org.komapper.core.template.expr.ExprTokenType.LONG
+import org.komapper.core.template.expr.ExprTokenType.NULL
+import org.komapper.core.template.expr.ExprTokenType.PROPERTY
+import org.komapper.core.template.expr.ExprTokenType.SAFE_CALL_PROPERTY
+import org.komapper.core.template.expr.ExprTokenType.STRING
+import org.komapper.core.template.expr.ExprTokenType.TRUE
+import org.komapper.core.template.expr.ExprTokenType.VALUE
+import org.komapper.core.template.expr.ExprTokenType.WHITESPACE
 
 class ExprTokenizerTest {
 

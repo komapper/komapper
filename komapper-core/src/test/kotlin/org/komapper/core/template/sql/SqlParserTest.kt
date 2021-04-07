@@ -1,4 +1,4 @@
-package org.komapper.core.template
+package org.komapper.core.template.sql
 
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
