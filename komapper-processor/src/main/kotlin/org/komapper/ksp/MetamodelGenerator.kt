@@ -23,17 +23,21 @@ internal class EntityMetamodelGenerator(
     private val simpleName: String,
     private val w: PrintWriter
 ) : Runnable {
+
+    private val constructorParamList = listOf(
+        "table: String = \"${entity.table.name}\"",
+        "catalog: String = \"${entity.table.catalog}\"",
+        "schema: String = \"${entity.table.schema}\""
+    ).joinToString(", ")
+
     override fun run() {
         w.println("package $packageName")
         w.println()
-        w.println("@Suppress(\"ClassName\")")
-
-        val paramList = listOf(
-            "private val __tableName: String = \"${entity.table.name}\"",
-            "private val __catalogName: String = \"${entity.table.catalog}\"",
-            "private val __schemaName: String = \"${entity.table.schema}\""
-        ).joinToString(", ")
-        w.println("class $simpleName($paramList) : $EntityMetamodel<$entityTypeName> {")
+        w.println("@Suppress(\"ClassName\", \"PrivatePropertyName\")")
+        w.println("class $simpleName($constructorParamList) : $EntityMetamodel<$entityTypeName> {")
+        w.println("    private val __tableName = table")
+        w.println("    private val __catalogName = catalog")
+        w.println("    private val __schemaName = schema")
 
         entityDescriptor()
 
@@ -52,7 +56,6 @@ internal class EntityMetamodelGenerator(
         incrementVersion()
         updateCreatedAt()
         updateUpdatedAt()
-        companionObject()
 
         w.println("}")
 
@@ -170,18 +173,10 @@ internal class EntityMetamodelGenerator(
         w.println("    override fun updateUpdatedAt(__e: $entityTypeName, __c: $Clock): $entityTypeName = $body")
     }
 
-    private fun companionObject() {
-        w.println("    companion object {")
-        w.println("        fun overrideTable(__tableName: String) = $simpleName(__tableName = __tableName)")
-        w.println("        fun overrideCatalog(__catalogName: String) = $simpleName(__catalogName = __catalogName)")
-        w.println("        fun overrideSchema(__schemaName: String) = $simpleName(__schemaName = __schemaName)")
-        w.println("    }")
-    }
-
     private fun utils() {
         if (entity.declaration.hasCompanionObject()) {
             w.println("")
-            w.println("fun $entityTypeName.Companion.metamodel() = $simpleName()")
+            w.println("fun $entityTypeName.Companion.metamodel($constructorParamList) = $simpleName(table, catalog, schema)")
         }
     }
 }
