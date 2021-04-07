@@ -1,6 +1,6 @@
 package org.komapper.core.dsl.element
 
-import org.komapper.core.dsl.expr.PropertyExpression
+import org.komapper.core.dsl.expression.PropertyExpression
 
 internal sealed class SortItem {
     internal sealed class Property<T : Any> : PropertyExpression<T>, SortItem() {

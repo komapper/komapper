@@ -5,8 +5,8 @@ import org.komapper.core.data.Statement
 import org.komapper.core.data.StatementBuffer
 import org.komapper.core.data.Value
 import org.komapper.core.dsl.context.EntityDeleteContext
-import org.komapper.core.dsl.expr.EntityExpression
-import org.komapper.core.dsl.expr.PropertyExpression
+import org.komapper.core.dsl.expression.EntityExpression
+import org.komapper.core.dsl.expression.PropertyExpression
 import org.komapper.core.dsl.query.EntityDeleteOption
 
 internal class EntityDeleteStatementBuilder<ENTITY : Any>(

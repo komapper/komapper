@@ -6,12 +6,12 @@ import org.komapper.core.data.Value
 import org.komapper.core.dsl.context.SqlSelectContext
 import org.komapper.core.dsl.element.Criterion
 import org.komapper.core.dsl.element.Operand
-import org.komapper.core.dsl.expr.AggregateFunction
-import org.komapper.core.dsl.expr.AliasExpression
-import org.komapper.core.dsl.expr.ArithmeticExpression
-import org.komapper.core.dsl.expr.EntityExpression
-import org.komapper.core.dsl.expr.PropertyExpression
-import org.komapper.core.dsl.expr.StringFunction
+import org.komapper.core.dsl.expression.AggregateFunction
+import org.komapper.core.dsl.expression.AliasExpression
+import org.komapper.core.dsl.expression.ArithmeticExpression
+import org.komapper.core.dsl.expression.EntityExpression
+import org.komapper.core.dsl.expression.PropertyExpression
+import org.komapper.core.dsl.expression.StringFunction
 import org.komapper.core.dsl.option.LikeOption
 
 internal class BuilderSupport(
@@ -32,7 +32,7 @@ internal class BuilderSupport(
                 visitAggregateFunction(expression)
             }
             is ArithmeticExpression -> {
-                visitArithmeticExpr(expression)
+                visitArithmeticExpression(expression)
             }
             is AliasExpression -> {
                 visitAsExpression(expression)
@@ -87,7 +87,7 @@ internal class BuilderSupport(
         }
     }
 
-    private fun visitArithmeticExpr(expression: ArithmeticExpression<*>) {
+    private fun visitArithmeticExpression(expression: ArithmeticExpression<*>) {
         buf.append("(")
         when (expression) {
             is ArithmeticExpression.Plus<*> -> {

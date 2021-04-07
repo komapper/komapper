@@ -6,9 +6,9 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.komapper.core.data.Value
-import org.komapper.core.template.expr.DefaultExprEnvironment
-import org.komapper.core.template.expr.DefaultExprEvaluator
-import org.komapper.core.template.expr.NoCacheExprNodeFactory
+import org.komapper.core.template.expression.DefaultExprEnvironment
+import org.komapper.core.template.expression.DefaultExprEvaluator
+import org.komapper.core.template.expression.NoCacheExprNodeFactory
 
 class DefaultStatementBuilderTest {
 

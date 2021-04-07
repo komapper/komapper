@@ -1,6 +1,6 @@
 package org.komapper.core.dsl.metamodel
 
-import org.komapper.core.dsl.expr.EntityExpression
+import org.komapper.core.dsl.expression.EntityExpression
 import java.time.Clock
 
 interface EntityMetamodel<ENTITY : Any> : EntityExpression<ENTITY> {

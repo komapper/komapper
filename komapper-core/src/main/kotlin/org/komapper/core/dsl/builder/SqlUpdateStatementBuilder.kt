@@ -6,7 +6,7 @@ import org.komapper.core.data.StatementBuffer
 import org.komapper.core.dsl.context.SqlUpdateContext
 import org.komapper.core.dsl.element.Criterion
 import org.komapper.core.dsl.element.Operand
-import org.komapper.core.dsl.expr.EntityExpression
+import org.komapper.core.dsl.expression.EntityExpression
 
 internal class SqlUpdateStatementBuilder<ENTITY : Any>(
     val dialect: Dialect,

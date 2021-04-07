@@ -1,4 +1,4 @@
-package org.komapper.core.dsl.expr
+package org.komapper.core.dsl.expression
 
 import org.komapper.core.dsl.element.Operand
 

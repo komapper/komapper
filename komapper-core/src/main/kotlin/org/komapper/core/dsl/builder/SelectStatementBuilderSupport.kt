@@ -6,8 +6,8 @@ import org.komapper.core.dsl.context.SelectContext
 import org.komapper.core.dsl.element.Criterion
 import org.komapper.core.dsl.element.JoinKind
 import org.komapper.core.dsl.element.SortItem
-import org.komapper.core.dsl.expr.EntityExpression
-import org.komapper.core.dsl.expr.PropertyExpression
+import org.komapper.core.dsl.expression.EntityExpression
+import org.komapper.core.dsl.expression.PropertyExpression
 
 internal class SelectStatementBuilderSupport(
     dialect: Dialect,

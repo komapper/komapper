@@ -2,7 +2,7 @@ package org.komapper.core.dsl.scope
 
 import org.komapper.core.Scope
 import org.komapper.core.dsl.element.Operand
-import org.komapper.core.dsl.expr.PropertyExpression
+import org.komapper.core.dsl.expression.PropertyExpression
 
 @Scope
 class SetScope internal constructor(

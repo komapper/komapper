@@ -1,6 +1,6 @@
 package org.komapper.core.dsl.scope
 
-import org.komapper.core.dsl.expr.PropertyExpression
+import org.komapper.core.dsl.expression.PropertyExpression
 import org.komapper.core.dsl.operand.LikeOperand
 import org.komapper.core.dsl.query.SingleColumnSqlSubqueryResult
 import org.komapper.core.dsl.query.SqlSubqueryResult

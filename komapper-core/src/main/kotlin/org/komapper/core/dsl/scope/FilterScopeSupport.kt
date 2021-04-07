@@ -2,7 +2,7 @@ package org.komapper.core.dsl.scope
 
 import org.komapper.core.dsl.element.Criterion
 import org.komapper.core.dsl.element.Operand
-import org.komapper.core.dsl.expr.PropertyExpression
+import org.komapper.core.dsl.expression.PropertyExpression
 import org.komapper.core.dsl.operand.LikeOperand
 import org.komapper.core.dsl.option.LikeOption
 import org.komapper.core.dsl.query.SingleColumnSqlSubqueryResult

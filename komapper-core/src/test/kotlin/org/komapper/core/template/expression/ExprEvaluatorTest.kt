@@ -1,4 +1,4 @@
-package org.komapper.core.template.expr
+package org.komapper.core.template.expression
 
 import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Assertions.assertEquals

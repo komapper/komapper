@@ -1,7 +1,7 @@
 package org.komapper.core.dsl.query
 
 import org.komapper.core.config.Dialect
-import org.komapper.core.dsl.expr.PropertyExpression
+import org.komapper.core.dsl.expression.PropertyExpression
 import java.sql.ResultSet
 import kotlin.reflect.cast
 

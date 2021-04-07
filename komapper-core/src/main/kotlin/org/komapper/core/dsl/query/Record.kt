@@ -1,6 +1,6 @@
 package org.komapper.core.dsl.query
 
-import org.komapper.core.dsl.expr.PropertyExpression
+import org.komapper.core.dsl.expression.PropertyExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import kotlin.reflect.cast
 

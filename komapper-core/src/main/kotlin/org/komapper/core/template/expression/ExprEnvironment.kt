@@ -1,4 +1,4 @@
-package org.komapper.core.template.expr
+package org.komapper.core.template.expression
 
 import org.komapper.core.data.Value
 import kotlin.reflect.KFunction

@@ -1,4 +1,4 @@
-package org.komapper.core.dsl.expr
+package org.komapper.core.dsl.expression
 
 internal class AliasExpression<T : Any>(
     val expression: PropertyExpression<T>,

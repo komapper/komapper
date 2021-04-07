@@ -5,8 +5,8 @@ import org.komapper.core.data.Statement
 import org.komapper.core.data.StatementBuffer
 import org.komapper.core.dsl.context.SqlSelectContext
 import org.komapper.core.dsl.element.Criterion
-import org.komapper.core.dsl.expr.AggregateFunction
-import org.komapper.core.dsl.expr.PropertyExpression
+import org.komapper.core.dsl.expression.AggregateFunction
+import org.komapper.core.dsl.expression.PropertyExpression
 
 internal class SqlSelectStatementBuilder(
     val dialect: Dialect,

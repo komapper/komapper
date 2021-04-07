@@ -5,7 +5,7 @@ import org.komapper.core.data.Statement
 import org.komapper.core.data.StatementBuffer
 import org.komapper.core.dsl.context.SqlDeleteContext
 import org.komapper.core.dsl.element.Criterion
-import org.komapper.core.dsl.expr.EntityExpression
+import org.komapper.core.dsl.expression.EntityExpression
 
 internal class SqlDeleteStatementBuilder<ENTITY : Any>(
     val dialect: Dialect,

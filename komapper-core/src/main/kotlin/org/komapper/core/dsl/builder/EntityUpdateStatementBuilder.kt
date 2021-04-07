@@ -5,8 +5,8 @@ import org.komapper.core.data.Statement
 import org.komapper.core.data.StatementBuffer
 import org.komapper.core.data.Value
 import org.komapper.core.dsl.context.EntityUpdateContext
-import org.komapper.core.dsl.expr.EntityExpression
-import org.komapper.core.dsl.expr.PropertyExpression
+import org.komapper.core.dsl.expression.EntityExpression
+import org.komapper.core.dsl.expression.PropertyExpression
 import org.komapper.core.dsl.query.EntityUpdateOption
 
 internal class EntityUpdateStatementBuilder<ENTITY : Any>(

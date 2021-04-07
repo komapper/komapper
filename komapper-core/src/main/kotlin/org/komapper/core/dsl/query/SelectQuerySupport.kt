@@ -5,7 +5,7 @@ import org.komapper.core.dsl.element.ForUpdate
 import org.komapper.core.dsl.element.Join
 import org.komapper.core.dsl.element.JoinKind
 import org.komapper.core.dsl.element.SortItem
-import org.komapper.core.dsl.expr.PropertyExpression
+import org.komapper.core.dsl.expression.PropertyExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.option.ForUpdateOption
 import org.komapper.core.dsl.scope.OnDeclaration

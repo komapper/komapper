@@ -2,11 +2,11 @@ package org.komapper.core.dsl
 
 import org.komapper.core.dsl.element.Operand
 import org.komapper.core.dsl.element.SortItem
-import org.komapper.core.dsl.expr.AggregateFunction
-import org.komapper.core.dsl.expr.AliasExpression
-import org.komapper.core.dsl.expr.ArithmeticExpression
-import org.komapper.core.dsl.expr.PropertyExpression
-import org.komapper.core.dsl.expr.StringFunction
+import org.komapper.core.dsl.expression.AggregateFunction
+import org.komapper.core.dsl.expression.AliasExpression
+import org.komapper.core.dsl.expression.ArithmeticExpression
+import org.komapper.core.dsl.expression.PropertyExpression
+import org.komapper.core.dsl.expression.StringFunction
 
 fun <T : Any> PropertyExpression<T>.asc(): PropertyExpression<T> {
     if (this is SortItem.Property.Asc) {

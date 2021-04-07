@@ -1,6 +1,6 @@
 package org.komapper.core.dsl.metamodel
 
-import org.komapper.core.dsl.expr.PropertyExpression
+import org.komapper.core.dsl.expression.PropertyExpression
 import kotlin.reflect.KClass
 
 interface PropertyMetamodel<E : Any, T : Any> : PropertyExpression<T> {

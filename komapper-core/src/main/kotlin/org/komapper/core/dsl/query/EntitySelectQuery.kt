@@ -6,7 +6,7 @@ import org.komapper.core.data.Statement
 import org.komapper.core.dsl.builder.EntitySelectStatementBuilder
 import org.komapper.core.dsl.context.EntitySelectContext
 import org.komapper.core.dsl.element.Associator
-import org.komapper.core.dsl.expr.PropertyExpression
+import org.komapper.core.dsl.expression.PropertyExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.scope.EntitySelectOptionDeclaration
 import org.komapper.core.dsl.scope.EntitySelectOptionScope

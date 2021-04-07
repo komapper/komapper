@@ -1,7 +1,7 @@
 package org.komapper.core.dsl.builder
 
 import org.komapper.core.dsl.context.Context
-import org.komapper.core.dsl.expr.EntityExpression
+import org.komapper.core.dsl.expression.EntityExpression
 
 interface AliasManager {
     val index: Int
