@@ -2,6 +2,7 @@ package org.komapper.core.dsl.context
 
 import org.komapper.core.dsl.element.Criterion
 import org.komapper.core.dsl.element.Operand
+import org.komapper.core.dsl.expr.EntityExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 
 internal data class SqlUpdateContext<ENTITY : Any>(
@@ -10,8 +11,8 @@ internal data class SqlUpdateContext<ENTITY : Any>(
     val where: List<Criterion> = listOf()
 ) : Context<ENTITY> {
 
-    override fun getEntityExpressions(): List<EntityMetamodel<*>> {
-        return listOf(entityMetamodel)
+    override fun getEntityExpressions(): Set<EntityExpression<*>> {
+        return setOf(entityMetamodel)
     }
 
     fun addSet(set: List<Pair<Operand.Property, Operand>>): SqlUpdateContext<ENTITY> {

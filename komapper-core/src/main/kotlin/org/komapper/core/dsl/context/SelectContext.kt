@@ -23,7 +23,7 @@ internal interface SelectContext<ENTITY : Any, CONTEXT : SelectContext<ENTITY, C
     fun setOffset(offset: Int): CONTEXT
     fun setForUpdate(forUpdate: ForUpdate): CONTEXT
 
-    override fun getEntityExpressions(): List<EntityMetamodel<*>> {
-        return listOf(entityMetamodel) + joins.map { it.entityMetamodel }
+    override fun getEntityExpressions(): Set<EntityMetamodel<*>> {
+        return setOf(entityMetamodel) + joins.map { it.entityMetamodel }
     }
 }

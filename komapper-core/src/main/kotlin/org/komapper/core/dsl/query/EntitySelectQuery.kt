@@ -77,9 +77,9 @@ internal data class EntitySelectQueryImpl<ENTITY : Any>(
         e2: EntityMetamodel<S>,
         associator: Associator<T, S>
     ): EntitySelectQueryImpl<ENTITY> {
-        val entityMetamodels = context.getEntityExpressions()
-        if (entityMetamodels.none { it == e1 }) error(entityMetamodelNotFound("e1"))
-        if (entityMetamodels.none { it == e2 }) error(entityMetamodelNotFound("e2"))
+        val entityExpressions = context.getEntityExpressions()
+        if (e1 !in entityExpressions) error(entityMetamodelNotFound("e1"))
+        if (e2 !in entityExpressions) error(entityMetamodelNotFound("e2"))
         @Suppress("UNCHECKED_CAST")
         val newContext = context.putAssociator(e1 to e2, associator as Associator<Any, Any>)
         return copy(context = newContext)

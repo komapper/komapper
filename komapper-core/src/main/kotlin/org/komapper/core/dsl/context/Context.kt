@@ -5,5 +5,5 @@ import org.komapper.core.dsl.metamodel.EntityMetamodel
 
 internal interface Context<ENTITY : Any> {
     val entityMetamodel: EntityMetamodel<ENTITY>
-    fun getEntityExpressions(): List<EntityExpression<*>>
+    fun getEntityExpressions(): Set<EntityExpression<*>>
 }

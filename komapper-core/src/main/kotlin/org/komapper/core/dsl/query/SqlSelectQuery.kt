@@ -185,8 +185,8 @@ internal data class SqlSelectQueryImpl<ENTITY : Any>(
     override fun <A : Any> select(
         e: EntityMetamodel<A>,
     ): SqlSetOperandQuery<A?> {
-        val entityMetamodels = context.getEntityExpressions()
-        if (entityMetamodels.none { it == e }) error(entityMetamodelNotFound("e"))
+        val entityExpressions = context.getEntityExpressions()
+        if (e !in entityExpressions) error(entityMetamodelNotFound("e"))
         val newContext = context.setEntity(e)
         return Transformable(newContext, option) { dialect, rs ->
             val m = EntityMapper(dialect, rs)
@@ -198,9 +198,9 @@ internal data class SqlSelectQueryImpl<ENTITY : Any>(
         e1: EntityMetamodel<A>,
         e2: EntityMetamodel<B>
     ): SqlSetOperandQuery<Pair<A?, B?>> {
-        val entityMetamodels = context.getEntityExpressions()
-        if (entityMetamodels.none { it == e1 }) error(entityMetamodelNotFound("e1"))
-        if (entityMetamodels.none { it == e2 }) error(entityMetamodelNotFound("e2"))
+        val entityExpressions = context.getEntityExpressions()
+        if (e1 !in entityExpressions) error(entityMetamodelNotFound("e1"))
+        if (e2 !in entityExpressions) error(entityMetamodelNotFound("e2"))
         val newContext = context.setEntities(listOf(e1, e2))
         return Transformable(newContext, option) { dialect, rs ->
             val m = EntityMapper(dialect, rs)
@@ -213,10 +213,10 @@ internal data class SqlSelectQueryImpl<ENTITY : Any>(
         e2: EntityMetamodel<B>,
         e3: EntityMetamodel<C>
     ): SqlSetOperandQuery<Triple<A?, B?, C?>> {
-        val entityMetamodels = context.getEntityExpressions()
-        if (entityMetamodels.none { it == e1 }) error(entityMetamodelNotFound("e1"))
-        if (entityMetamodels.none { it == e2 }) error(entityMetamodelNotFound("e2"))
-        if (entityMetamodels.none { it == e3 }) error(entityMetamodelNotFound("e3"))
+        val entityExpressions = context.getEntityExpressions()
+        if (e1 !in entityExpressions) error(entityMetamodelNotFound("e1"))
+        if (e2 !in entityExpressions) error(entityMetamodelNotFound("e2"))
+        if (e3 !in entityExpressions) error(entityMetamodelNotFound("e3"))
         val newContext = context.setEntities(listOf(e1, e2, e3))
         return Transformable(newContext, option) { dialect, rs ->
             val m = EntityMapper(dialect, rs)
