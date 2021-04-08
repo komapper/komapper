@@ -20,6 +20,10 @@ internal sealed class Criterion {
     data class NotInList(val left: Operand, val right: List<Operand>) : Criterion()
     data class InSubQuery(val left: Operand, val right: SqlSelectContext<*>) : Criterion()
     data class NotInSubQuery(val left: Operand, val right: SqlSelectContext<*>) : Criterion()
+    data class InList2(val left: Pair<Operand, Operand>, val right: List<Pair<Operand, Operand>>) : Criterion()
+    data class NotInList2(val left: Pair<Operand, Operand>, val right: List<Pair<Operand, Operand>>) : Criterion()
+    data class InSubQuery2(val left: Pair<Operand, Operand>, val right: SqlSelectContext<*>) : Criterion()
+    data class NotInSubQuery2(val left: Pair<Operand, Operand>, val right: SqlSelectContext<*>) : Criterion()
     data class Exists(val context: SqlSelectContext<*>) : Criterion()
     data class NotExists(val context: SqlSelectContext<*>) : Criterion()
 

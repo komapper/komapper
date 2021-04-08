@@ -22,7 +22,7 @@ internal class BuilderSupport(
 
     fun visitEntityExpression(expression: EntityExpression<*>) {
         val name = expression.getCanonicalTableName(dialect::quote)
-        val alias = aliasManager.getAlias(expression) ?: error("Alias is not found. table=$name")
+        val alias = aliasManager.getAlias(expression) ?: error("Alias is not found. table=$name, ,sql=$buf")
         buf.append("$name $alias")
     }
 
@@ -44,7 +44,7 @@ internal class BuilderSupport(
                 val name = expression.getCanonicalColumnName(dialect::quote)
                 val owner = expression.owner
                 val alias = aliasManager.getAlias(owner)
-                    ?: error("Alias is not found. table=${owner.getCanonicalTableName(dialect::quote)}, column=$name")
+                    ?: error("Alias is not found. table=${owner.getCanonicalTableName(dialect::quote)}, column=$name ,sql=$buf")
                 if (alias.isBlank()) {
                     buf.append(name)
                 } else {
@@ -156,8 +156,12 @@ internal class BuilderSupport(
             is Criterion.NotBetween -> betweenOperation(c.left, c.right, true)
             is Criterion.InList -> inListOperation(c.left, c.right)
             is Criterion.NotInList -> inListOperation(c.left, c.right, true)
+            is Criterion.InList2 -> inList2Operation(c.left, c.right)
+            is Criterion.NotInList2 -> inList2Operation(c.left, c.right, true)
             is Criterion.InSubQuery -> inSubQueryOperation(c.left, c.right)
             is Criterion.NotInSubQuery -> inSubQueryOperation(c.left, c.right, true)
+            is Criterion.InSubQuery2 -> inSubQuery2Operation(c.left, c.right)
+            is Criterion.NotInSubQuery2 -> inSubQuery2Operation(c.left, c.right, true)
             is Criterion.Exists -> existsOperation(c.context)
             is Criterion.NotExists -> existsOperation(c.context, true)
             is Criterion.And -> logicalBinaryOperation("and", c.criteria, index)
@@ -248,8 +252,50 @@ internal class BuilderSupport(
         buf.append(")")
     }
 
+    private fun inList2Operation(left: Pair<Operand, Operand>, right: List<Pair<Operand, Operand>>, not: Boolean = false) {
+        buf.append("(")
+        visitOperand(left.first)
+        buf.append(", ")
+        visitOperand(left.second)
+        buf.append(")")
+        if (not) {
+            buf.append(" not")
+        }
+        buf.append(" in (")
+        if (right.isEmpty()) {
+            buf.append("null")
+        } else {
+            for ((first, second) in right) {
+                buf.append("(")
+                visitOperand(first)
+                buf.append(", ")
+                visitOperand(second)
+                buf.append(")")
+                buf.append(", ")
+            }
+            buf.cutBack(2)
+        }
+        buf.append(")")
+    }
+
     private fun inSubQueryOperation(left: Operand, right: SqlSelectContext<*>, not: Boolean = false) {
         visitOperand(left)
+        if (not) {
+            buf.append(" not")
+        }
+        buf.append(" in (")
+        val childAliasManager = AliasManagerImpl(right, aliasManager)
+        val builder = SqlSelectStatementBuilder(dialect, right, childAliasManager)
+        buf.append(builder.build())
+        buf.append(")")
+    }
+
+    private fun inSubQuery2Operation(left: Pair<Operand, Operand>, right: SqlSelectContext<*>, not: Boolean = false) {
+        buf.append("(")
+        visitOperand(left.first)
+        buf.append(", ")
+        visitOperand(left.second)
+        buf.append(")")
         if (not) {
             buf.append(" not")
         }

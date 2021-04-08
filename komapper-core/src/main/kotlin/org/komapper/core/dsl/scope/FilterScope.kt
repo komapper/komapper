@@ -2,8 +2,9 @@ package org.komapper.core.dsl.scope
 
 import org.komapper.core.dsl.expression.PropertyExpression
 import org.komapper.core.dsl.operand.LikeOperand
-import org.komapper.core.dsl.query.SingleColumnSqlSubqueryResult
-import org.komapper.core.dsl.query.SqlSubqueryResult
+import org.komapper.core.dsl.query.OneProperty
+import org.komapper.core.dsl.query.SqlSubqueryProjection
+import org.komapper.core.dsl.query.TwoProperties
 
 interface FilterScope {
     infix fun <T : Any> PropertyExpression<T>.eq(operand: PropertyExpression<T>)
@@ -41,7 +42,9 @@ interface FilterScope {
     infix fun <T : Any> PropertyExpression<T>.greaterEq(operand: T?)
 
     infix fun <T : Any> T?.greaterEq(operand: PropertyExpression<T>)
+
     fun <T : Any> PropertyExpression<T>.isNull()
+
     fun <T : Any> PropertyExpression<T>.isNotNull()
 
     infix fun <T : CharSequence> PropertyExpression<T>.like(operand: Any?)
@@ -58,21 +61,29 @@ interface FilterScope {
 
     infix fun <T : Any> PropertyExpression<T>.inList(values: List<T?>)
 
-    infix fun <T : Any> PropertyExpression<T>.inList(block: () -> SingleColumnSqlSubqueryResult)
-
-    infix fun <T : Any> PropertyExpression<T>.inList(projection: SingleColumnSqlSubqueryResult)
+    infix fun <T : Any> PropertyExpression<T>.inList(block: () -> OneProperty)
 
     infix fun <T : Any> PropertyExpression<T>.notInList(values: List<T?>)
 
-    infix fun <T : Any> PropertyExpression<T>.notInList(block: () -> SingleColumnSqlSubqueryResult)
+    infix fun <T : Any> PropertyExpression<T>.notInList(block: () -> OneProperty)
 
-    infix fun <T : Any> PropertyExpression<T>.notInList(projection: SingleColumnSqlSubqueryResult)
-    fun exists(block: () -> SqlSubqueryResult)
-    fun exists(result: SqlSubqueryResult)
-    fun notExists(block: () -> SqlSubqueryResult)
-    fun notExists(result: SqlSubqueryResult)
+    infix fun <A : Any, B : Any> Pair<PropertyExpression<A>, PropertyExpression<B>>.inList2(values: List<Pair<A?, B?>>)
+
+    infix fun <A : Any, B : Any> Pair<PropertyExpression<A>, PropertyExpression<B>>.inList2(block: () -> TwoProperties)
+
+    infix fun <A : Any, B : Any> Pair<PropertyExpression<A>, PropertyExpression<B>>.notInList2(values: List<Pair<A?, B?>>)
+
+    infix fun <A : Any, B : Any> Pair<PropertyExpression<A>, PropertyExpression<B>>.notInList2(block: () -> TwoProperties)
+
+    fun exists(block: () -> SqlSubqueryProjection)
+
+    fun notExists(block: () -> SqlSubqueryProjection)
+
     fun <T : CharSequence> T?.escape(): LikeOperand
+
     fun <T : CharSequence> T?.asPrefix(): LikeOperand
+
     fun <T : CharSequence> T?.asInfix(): LikeOperand
+
     fun <T : CharSequence> T?.asSuffix(): LikeOperand
 }

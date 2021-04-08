@@ -5,8 +5,9 @@ import org.komapper.core.dsl.element.Operand
 import org.komapper.core.dsl.expression.PropertyExpression
 import org.komapper.core.dsl.operand.LikeOperand
 import org.komapper.core.dsl.option.LikeOption
-import org.komapper.core.dsl.query.SingleColumnSqlSubqueryResult
-import org.komapper.core.dsl.query.SqlSubqueryResult
+import org.komapper.core.dsl.query.OneProperty
+import org.komapper.core.dsl.query.SqlSubqueryProjection
+import org.komapper.core.dsl.query.TwoProperties
 
 internal class FilterScopeSupport(
     private val context: MutableList<Criterion> = mutableListOf()
@@ -203,11 +204,8 @@ internal class FilterScopeSupport(
         add(Criterion.InList(o1, o2))
     }
 
-    override infix fun <T : Any> PropertyExpression<T>.inList(block: () -> SingleColumnSqlSubqueryResult) {
-        this.inList(block())
-    }
-
-    override infix fun <T : Any> PropertyExpression<T>.inList(projection: SingleColumnSqlSubqueryResult) {
+    override infix fun <T : Any> PropertyExpression<T>.inList(block: () -> OneProperty) {
+        val projection = block()
         val left = Operand.Property(this)
         val right = projection.contextHolder.context
         add(Criterion.InSubQuery(left, right))
@@ -219,31 +217,48 @@ internal class FilterScopeSupport(
         add(Criterion.NotInList(o1, o2))
     }
 
-    override infix fun <T : Any> PropertyExpression<T>.notInList(block: () -> SingleColumnSqlSubqueryResult) {
-        this.notInList(block())
-    }
-
-    override infix fun <T : Any> PropertyExpression<T>.notInList(projection: SingleColumnSqlSubqueryResult) {
+    override infix fun <T : Any> PropertyExpression<T>.notInList(block: () -> OneProperty) {
+        val projection = block()
         val left = Operand.Property(this)
         val right = projection.contextHolder.context
         add(Criterion.NotInSubQuery(left, right))
     }
 
-    override fun exists(block: () -> SqlSubqueryResult) {
-        this.exists(block())
+    override infix fun <A : Any, B : Any> Pair<PropertyExpression<A>, PropertyExpression<B>>.inList2(values: List<Pair<A?, B?>>) {
+        val left = Operand.Property(this.first) to Operand.Property(this.second)
+        val right = values.map { Operand.Parameter(this.first, it.first) to Operand.Parameter(this.second, it.second) }
+        add(Criterion.InList2(left, right))
     }
 
-    override fun exists(result: SqlSubqueryResult) {
-        val subContext = result.contextHolder.context
+    override infix fun <A : Any, B : Any> Pair<PropertyExpression<A>, PropertyExpression<B>>.inList2(block: () -> TwoProperties) {
+        val projection = block()
+        val left = Operand.Property(this.first) to Operand.Property(this.second)
+        val right = projection.contextHolder.context
+        add(Criterion.InSubQuery2(left, right))
+    }
+
+    override infix fun <A : Any, B : Any> Pair<PropertyExpression<A>, PropertyExpression<B>>.notInList2(values: List<Pair<A?, B?>>) {
+        val left = Operand.Property(this.first) to Operand.Property(this.second)
+        val right = values.map { Operand.Parameter(this.first, it.first) to Operand.Parameter(this.second, it.second) }
+        add(Criterion.NotInList2(left, right))
+    }
+
+    override infix fun <A : Any, B : Any> Pair<PropertyExpression<A>, PropertyExpression<B>>.notInList2(block: () -> TwoProperties) {
+        val projection = block()
+        val left = Operand.Property(this.first) to Operand.Property(this.second)
+        val right = projection.contextHolder.context
+        add(Criterion.NotInSubQuery2(left, right))
+    }
+
+    override fun exists(block: () -> SqlSubqueryProjection) {
+        val projection = block()
+        val subContext = projection.contextHolder.context
         add(Criterion.Exists(subContext))
     }
 
-    override fun notExists(block: () -> SqlSubqueryResult) {
-        this.notExists(block())
-    }
-
-    override fun notExists(result: SqlSubqueryResult) {
-        val subContext = result.contextHolder.context
+    override fun notExists(block: () -> SqlSubqueryProjection) {
+        val projection = block()
+        val subContext = projection.contextHolder.context
         add(Criterion.NotExists(subContext))
     }
 

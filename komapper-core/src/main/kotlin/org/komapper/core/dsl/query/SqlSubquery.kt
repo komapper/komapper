@@ -8,7 +8,7 @@ import org.komapper.core.dsl.scope.HavingScope
 import org.komapper.core.dsl.scope.OnDeclaration
 import org.komapper.core.dsl.scope.WhereDeclaration
 
-interface SqlSubquery<ENTITY : Any> : SqlSubqueryResult {
+interface SqlSubquery<ENTITY : Any> : SqlSubqueryProjection {
     fun <OTHER_ENTITY : Any> innerJoin(
         entityMetamodel: EntityMetamodel<OTHER_ENTITY>,
         on: OnDeclaration<OTHER_ENTITY>
@@ -26,7 +26,8 @@ interface SqlSubquery<ENTITY : Any> : SqlSubqueryResult {
     fun offset(value: Int): SqlSubquery<ENTITY>
     fun limit(value: Int): SqlSubquery<ENTITY>
     fun forUpdate(): SqlSubquery<ENTITY>
-    fun select(property: PropertyExpression<*>): SingleColumnSqlSubqueryResult
+    fun select(p: PropertyExpression<*>): OneProperty
+    fun select(p1: PropertyExpression<*>, p2: PropertyExpression<*>): TwoProperties
 }
 
 internal data class SqlSubqueryImpl<ENTITY : Any>(
@@ -91,8 +92,13 @@ internal data class SqlSubqueryImpl<ENTITY : Any>(
         return copy(context = newContext)
     }
 
-    override fun select(property: PropertyExpression<*>): SingleColumnSqlSubqueryResult {
-        val newContext = context.setProperty(property)
-        return SingleColumnSqlSubqueryResultImpl(ContextHolder(newContext))
+    override fun select(p: PropertyExpression<*>): OneProperty {
+        val newContext = context.setProperty(p)
+        return SqlSubqueryProjectionImpl(ContextHolder(newContext))
+    }
+
+    override fun select(p1: PropertyExpression<*>, p2: PropertyExpression<*>): TwoProperties {
+        val newContext = context.setProperties(listOf(p1, p2))
+        return SqlSubqueryProjectionImpl(ContextHolder(newContext))
     }
 }

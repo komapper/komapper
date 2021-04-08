@@ -105,10 +105,11 @@ class EntitySelectQueryWhereTest(private val db: Database) {
         val query =
             EntityQuery.from(e).where {
                 e.addressId inList {
-                    Subquery.from(a).where {
-                        e.addressId eq a.addressId
-                        e.employeeName like "%S%"
-                    }.select(a.addressId)
+                    Subquery.from(a)
+                        .where {
+                            e.addressId eq a.addressId
+                            e.employeeName like "%S%"
+                        }.select(a.addressId)
                 }
             }
         val list = db.execute { query }
@@ -126,6 +127,73 @@ class EntitySelectQueryWhereTest(private val db: Database) {
                         e.addressId eq a.addressId
                         e.employeeName like "%S%"
                     }.select(a.addressId)
+                }
+            }
+        val list = db.execute { query }
+        assertEquals(9, list.size)
+    }
+
+    @Test
+    fun inList2() {
+        val a = Address.metamodel()
+        val list = db.execute {
+            EntityQuery.from(a).where {
+                a.addressId to a.version inList2 listOf(9 to 1, 10 to 1)
+            }.orderBy(a.addressId.desc())
+        }
+        assertEquals(
+            listOf(
+                Address(10, "STREET 10", 1),
+                Address(9, "STREET 9", 1)
+            ),
+            list
+        )
+    }
+
+    @Test
+    fun notInList2() {
+        val seq = sequence {
+            var i = 0
+            while (++i < 10) yield(i to 1)
+        }
+        val a = Address.metamodel()
+        val list = db.execute {
+            EntityQuery.from(a).where {
+                a.addressId to a.version notInList2 seq.toList()
+            }.orderBy(a.addressId)
+        }
+        assertEquals((10..15).toList(), list.map { it.addressId })
+    }
+
+    @Test
+    fun inList2_SubQuery() {
+        val e = Employee.metamodel()
+        val a = Address.metamodel()
+        val query =
+            EntityQuery.from(e).where {
+                e.addressId to e.version inList2 {
+                    Subquery.from(a)
+                        .where {
+                            e.addressId eq a.addressId
+                            e.employeeName like "%S%"
+                        }.select(a.addressId, a.version)
+                }
+            }
+        val list = db.execute { query }
+        assertEquals(5, list.size)
+    }
+
+    @Test
+    fun notInList_SubQuery2() {
+        val e = Employee.metamodel()
+        val a = Address.metamodel()
+        val query =
+            EntityQuery.from(e).where {
+                e.addressId to e.version notInList2 {
+                    Subquery.from(a).where {
+                        e.addressId eq a.addressId
+                        e.employeeName like "%S%"
+                    }.select(a.addressId, a.version)
                 }
             }
         val list = db.execute { query }
