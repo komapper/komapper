@@ -1,7 +1,6 @@
 package org.komapper.core.jdbc
 
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.komapper.core.config.EmptyDialect
 import kotlin.reflect.KClass
@@ -15,17 +14,7 @@ internal class AbstractDialectTest {
         }
     }
 
-    enum class Direction {
-        NORTH, SOUTH, WEST, EAST
-    }
-
     private val dialect = MyDialect()
-
-    @Test
-    fun getDataType() {
-        val dataType = dialect.getDataType(Direction::class)
-        assertTrue(EnumType::class.isInstance(dataType))
-    }
 
     @Test
     fun quote() {

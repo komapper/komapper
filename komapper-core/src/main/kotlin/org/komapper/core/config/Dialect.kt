@@ -12,7 +12,6 @@ import org.komapper.core.jdbc.ByteType
 import org.komapper.core.jdbc.ClobType
 import org.komapper.core.jdbc.DataType
 import org.komapper.core.jdbc.DoubleType
-import org.komapper.core.jdbc.EnumType
 import org.komapper.core.jdbc.FloatType
 import org.komapper.core.jdbc.IntType
 import org.komapper.core.jdbc.LocalDateTimeType
@@ -47,7 +46,6 @@ import java.time.LocalTime
 import java.time.OffsetDateTime
 import java.util.regex.Pattern
 import kotlin.reflect.KClass
-import kotlin.reflect.full.isSubclassOf
 
 interface Dialect {
     val openQuote: String
@@ -111,29 +109,28 @@ abstract class AbstractDialect : Dialect {
     }
 
     @Suppress("UNCHECKED_CAST")
-    protected open fun getDataType(type: KClass<*>): DataType<*> = when {
-        type == Any::class -> AnyType
-        type == java.sql.Array::class -> ArrayType
-        type == BigDecimal::class -> BigDecimalType
-        type == BigInteger::class -> BigIntegerType
-        type == Blob::class -> BlobType
-        type == Boolean::class -> BooleanType
-        type == Byte::class -> ByteType
-        type == ByteArray::class -> ByteArrayType
-        type == Double::class -> DoubleType
-        type == Clob::class -> ClobType
-        type.isSubclassOf(Enum::class) -> EnumType(type as KClass<Enum<*>>)
-        type == Float::class -> FloatType
-        type == Int::class -> IntType
-        type == LocalDateTime::class -> LocalDateTimeType
-        type == LocalDate::class -> LocalDateType
-        type == LocalTime::class -> LocalTimeType
-        type == Long::class -> LongType
-        type == NClob::class -> NClobType
-        type == OffsetDateTime::class -> OffsetDateTimeType
-        type == Short::class -> ShortType
-        type == String::class -> StringType
-        type == SQLXML::class -> SQLXMLType
+    protected open fun getDataType(type: KClass<*>): DataType<*> = when (type) {
+        Any::class -> AnyType
+        java.sql.Array::class -> ArrayType
+        BigDecimal::class -> BigDecimalType
+        BigInteger::class -> BigIntegerType
+        Blob::class -> BlobType
+        Boolean::class -> BooleanType
+        Byte::class -> ByteType
+        ByteArray::class -> ByteArrayType
+        Double::class -> DoubleType
+        Clob::class -> ClobType
+        Float::class -> FloatType
+        Int::class -> IntType
+        LocalDateTime::class -> LocalDateTimeType
+        LocalDate::class -> LocalDateType
+        LocalTime::class -> LocalTimeType
+        Long::class -> LongType
+        NClob::class -> NClobType
+        OffsetDateTime::class -> OffsetDateTimeType
+        Short::class -> ShortType
+        String::class -> StringType
+        SQLXML::class -> SQLXMLType
         else -> error(
             "The dataType is not found for the type \"${type.qualifiedName}\"."
         )

@@ -150,31 +150,6 @@ class DataTypeTest(val db: Database) {
         Assertions.assertEquals(data, data2)
     }
 
-    @Suppress("unused")
-    enum class Direction {
-        NORTH, SOUTH, WEST, EAST
-    }
-
-    @KmEntity
-    @KmTable("ENUM_TEST")
-    data class EnumTest(@KmId val id: Int, val value: Direction) {
-        companion object
-    }
-
-    @Test
-    fun enum() {
-        val m = EnumTest.metamodel()
-        val data = EnumTest(
-            1,
-            Direction.EAST
-        )
-        db.execute { EntityQuery.insert(m, data) }
-        val data2 = db.execute {
-            EntityQuery.first(m).where { m.id eq 1 }
-        }
-        Assertions.assertEquals(data, data2)
-    }
-
     @KmEntity
     @KmTable("FLOAT_TEST")
     data class FloatTest(@KmId val id: Int, val value: Float) {
