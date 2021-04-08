@@ -2,7 +2,7 @@ package org.komapper.core.data
 
 import kotlin.reflect.KClass
 
-internal class StatementBuffer(
+class StatementBuffer(
     val formatter: (Any?, KClass<*>) -> String,
     capacity: Int = 200
 ) : Appendable {

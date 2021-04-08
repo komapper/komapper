@@ -6,7 +6,6 @@ import org.komapper.core.data.Statement
 import org.komapper.core.dsl.scope.TemplateUpdateOptionDeclaration
 import org.komapper.core.dsl.scope.TemplateUpdateOptionScope
 import org.komapper.core.jdbc.JdbcExecutor
-import org.komapper.core.template.sql.DefaultStatementBuilder
 
 interface TemplateExecuteQuery : Query<Int> {
     fun option(declaration: TemplateUpdateOptionDeclaration): TemplateExecuteQuery
@@ -36,11 +35,7 @@ internal data class TemplateExecuteQueryImpl(
     }
 
     private fun buildStatement(dialect: Dialect): Statement {
-        val builder = DefaultStatementBuilder(
-            dialect::formatValue,
-            dialect.sqlNodeFactory,
-            dialect.exprEvaluator
-        )
+        val builder = dialect.templateStatementBuilder
         return builder.build(sql, params)
     }
 }

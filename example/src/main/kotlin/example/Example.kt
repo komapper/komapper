@@ -10,7 +10,6 @@ import org.komapper.annotation.KmVersion
 import org.komapper.core.Database
 import org.komapper.core.dsl.EntityQuery
 import org.komapper.core.dsl.SchemaQuery
-import org.komapper.core.dsl.TemplateQuery
 import org.komapper.jdbc.h2.H2DatabaseConfig
 import java.time.LocalDateTime
 
@@ -73,30 +72,6 @@ fun main() {
             }
         }
         check(addressB == foundB1)
-
-        // READ: select using template
-        val foundB2 = db.execute {
-            data class Params(val street: String)
-
-            val sql = """
-                select
-                    ADDRESS_ID, STREET, VERSION, CREATED_AT, UPDATED_AT
-                from
-                    Address
-                where
-                    street = /*street*/'test'
-            """.trimIndent()
-            TemplateQuery.select(sql, Params("street B")) {
-                Address(
-                    asInt("ADDRESS_ID")!!,
-                    asString("STREET")!!,
-                    asInt("VERSION")!!,
-                    asLocalDateTime("CREATED_AT"),
-                    asLocalDateTime("UPDATED_AT")
-                )
-            }.first()
-        }
-        check(addressB == foundB2)
 
         // DELETE
         db.execute {

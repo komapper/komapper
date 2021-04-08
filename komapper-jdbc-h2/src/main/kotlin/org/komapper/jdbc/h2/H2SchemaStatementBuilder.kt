@@ -17,7 +17,6 @@ import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.OffsetDateTime
 import kotlin.reflect.KClass
-import kotlin.reflect.full.isSubclassOf
 
 open class H2SchemaStatementBuilder(private val dialect: H2Dialect) : SchemaStatementBuilder {
 
@@ -97,29 +96,28 @@ open class H2SchemaStatementBuilder(private val dialect: H2Dialect) : SchemaStat
     }
 
     @Suppress("MemberVisibilityCanBePrivate")
-    protected fun getDataType(klass: KClass<*>): String = when {
-        klass == Any::class -> "other"
-        klass == java.sql.Array::class -> "array"
-        klass == BigDecimal::class -> "bigint"
-        klass == BigInteger::class -> "bigint"
-        klass == Blob::class -> "blob"
-        klass == Boolean::class -> "bool"
-        klass == Byte::class -> "tinyint"
-        klass == ByteArray::class -> "binary"
-        klass == Double::class -> "double"
-        klass == Clob::class -> "clob"
-        klass.isSubclassOf(Enum::class) -> "varchar(500)"
-        klass == Float::class -> "float"
-        klass == Int::class -> "integer"
-        klass == LocalDateTime::class -> "timestamp"
-        klass == LocalDate::class -> "date"
-        klass == LocalTime::class -> "time"
-        klass == Long::class -> "bigint"
-        klass == NClob::class -> "nclob"
-        klass == OffsetDateTime::class -> "timestamp with time zone"
-        klass == Short::class -> "smallint"
-        klass == String::class -> "varchar(500)"
-        klass == SQLXML::class -> "clob"
+    protected fun getDataType(klass: KClass<*>): String = when (klass) {
+        Any::class -> "other"
+        java.sql.Array::class -> "array"
+        BigDecimal::class -> "bigint"
+        BigInteger::class -> "bigint"
+        Blob::class -> "blob"
+        Boolean::class -> "bool"
+        Byte::class -> "tinyint"
+        ByteArray::class -> "binary"
+        Double::class -> "double"
+        Clob::class -> "clob"
+        Float::class -> "float"
+        Int::class -> "integer"
+        LocalDateTime::class -> "timestamp"
+        LocalDate::class -> "date"
+        LocalTime::class -> "time"
+        Long::class -> "bigint"
+        NClob::class -> "nclob"
+        OffsetDateTime::class -> "timestamp with time zone"
+        Short::class -> "smallint"
+        String::class -> "varchar(500)"
+        SQLXML::class -> "clob"
         else -> error(
             "The dataType is not found for the klass \"${klass.qualifiedName}\"."
         )

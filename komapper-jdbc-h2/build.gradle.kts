@@ -19,6 +19,7 @@ dependencies {
     api(project(":komapper-core"))
     implementation("com.h2database:h2:1.4.200")
     testImplementation(project(":komapper-annotation"))
+    testImplementation(project(":komapper-template"))
     kspTest(project(":komapper-processor"))
 }
 

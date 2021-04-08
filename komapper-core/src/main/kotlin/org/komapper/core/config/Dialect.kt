@@ -1,6 +1,8 @@
 package org.komapper.core.config
 
 import org.komapper.core.dsl.builder.SchemaStatementBuilder
+import org.komapper.core.dsl.spi.TemplateStatementBuilder
+import org.komapper.core.dsl.spi.TemplateStatementBuilderFactory
 import org.komapper.core.jdbc.AnyType
 import org.komapper.core.jdbc.ArrayType
 import org.komapper.core.jdbc.BigDecimalType
@@ -23,14 +25,6 @@ import org.komapper.core.jdbc.OffsetDateTimeType
 import org.komapper.core.jdbc.SQLXMLType
 import org.komapper.core.jdbc.ShortType
 import org.komapper.core.jdbc.StringType
-import org.komapper.core.template.expression.DefaultExprEnvironment
-import org.komapper.core.template.expression.DefaultExprEvaluator
-import org.komapper.core.template.expression.ExprEnvironment
-import org.komapper.core.template.expression.ExprEvaluator
-import org.komapper.core.template.expression.ExprNodeFactory
-import org.komapper.core.template.expression.NoCacheExprNodeFactory
-import org.komapper.core.template.sql.NoCacheSqlNodeFactory
-import org.komapper.core.template.sql.SqlNodeFactory
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.sql.Blob
@@ -44,6 +38,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.OffsetDateTime
+import java.util.ServiceLoader
 import java.util.regex.Pattern
 import kotlin.reflect.KClass
 
@@ -51,10 +46,7 @@ interface Dialect {
     val openQuote: String
     val closeQuote: String
     val escapePattern: Pattern
-    val exprNodeFactory: ExprNodeFactory
-    val exprEnvironment: ExprEnvironment
-    val exprEvaluator: ExprEvaluator
-    val sqlNodeFactory: SqlNodeFactory
+    val templateStatementBuilder: TemplateStatementBuilder
 
     fun getValue(rs: ResultSet, index: Int, valueClass: KClass<*>): Any?
     fun getValue(rs: ResultSet, columnLabel: String, valueClass: KClass<*>): Any?
@@ -74,17 +66,15 @@ abstract class AbstractDialect : Dialect {
     override val openQuote: String = "\""
     override val closeQuote: String = "\""
     override val escapePattern: Pattern = Pattern.compile("""[\\_%]""")
-    override val exprNodeFactory: ExprNodeFactory by lazy { NoCacheExprNodeFactory() }
-    override val exprEnvironment: ExprEnvironment by lazy {
-        DefaultExprEnvironment(this::escape)
+    override val templateStatementBuilder: TemplateStatementBuilder by lazy {
+        val loader = ServiceLoader.load(TemplateStatementBuilderFactory::class.java)
+        val factory = loader.firstOrNull()
+            ?: error(
+                "TemplateStatementBuilderFactory is not found. " +
+                    "Add komapper-template dependency or override the templateStatementBuilder property."
+            )
+        factory.create(this)
     }
-    override val exprEvaluator: ExprEvaluator by lazy {
-        DefaultExprEvaluator(
-            exprNodeFactory,
-            exprEnvironment
-        )
-    }
-    override val sqlNodeFactory: SqlNodeFactory by lazy { NoCacheSqlNodeFactory() }
 
     override fun getValue(rs: ResultSet, index: Int, valueClass: KClass<*>): Any? {
         val dataType = getDataType(valueClass)
@@ -153,6 +143,9 @@ abstract class AbstractDialect : Dialect {
 }
 
 open class EmptyDialect : AbstractDialect() {
+
+    override val templateStatementBuilder: TemplateStatementBuilder
+        get() = throw UnsupportedOperationException()
 
     override fun isUniqueConstraintViolation(exception: SQLException): Boolean {
         throw UnsupportedOperationException()

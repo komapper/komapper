@@ -6,7 +6,6 @@ import org.komapper.core.data.Statement
 import org.komapper.core.dsl.scope.TemplateSelectOptionDeclaration
 import org.komapper.core.dsl.scope.TemplateSelectOptionScope
 import org.komapper.core.jdbc.JdbcExecutor
-import org.komapper.core.template.sql.DefaultStatementBuilder
 
 interface TemplateSelectQuery<T> : ListQuery<T> {
     fun option(declaration: TemplateSelectOptionDeclaration): TemplateSelectQuery<T>
@@ -66,11 +65,7 @@ internal data class TemplateSelectQueryImpl<T>(
         }
 
         private fun buildStatement(dialect: Dialect): Statement {
-            val builder = DefaultStatementBuilder(
-                dialect::formatValue,
-                dialect.sqlNodeFactory,
-                dialect.exprEvaluator
-            )
+            val builder = dialect.templateStatementBuilder
             return builder.build(sql, params)
         }
     }
