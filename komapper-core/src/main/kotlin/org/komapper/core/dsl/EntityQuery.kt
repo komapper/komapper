@@ -26,6 +26,12 @@ import org.komapper.core.dsl.query.Query
 
 object EntityQuery : Dsl {
 
+    private object Messages {
+        const val mustNotBeEmpty = "The entity list must not be empty."
+        const val idPropertyRequired = "The entity metamodel must have one or more id properties."
+        const val idValueRequired = "The entity must have one or more id value."
+    }
+
     fun <ENTITY : Any> first(entityMetamodel: EntityMetamodel<ENTITY>): EntityFindQuery<ENTITY, ENTITY> {
         return createFindQuery(entityMetamodel) { it.first() }
     }
@@ -47,14 +53,17 @@ object EntityQuery : Dsl {
     }
 
     fun <ENTITY : Any> insert(entityMetamodel: EntityMetamodel<ENTITY>, entity: ENTITY): EntityInsertQuery<ENTITY> {
+        require(hasIdProperty(entityMetamodel)) { Messages.idPropertyRequired }
         return EntityInsertQueryImpl(EntityInsertContext(entityMetamodel), entity)
     }
 
     fun <ENTITY : Any> update(entityMetamodel: EntityMetamodel<ENTITY>, entity: ENTITY): EntityUpdateQuery<ENTITY> {
+        require(hasIdValue(entityMetamodel, entity)) { Messages.idValueRequired }
         return EntityUpdateQueryImpl(EntityUpdateContext(entityMetamodel), entity)
     }
 
     fun <ENTITY : Any> delete(entityMetamodel: EntityMetamodel<ENTITY>, entity: ENTITY): EntityDeleteQuery<ENTITY> {
+        require(hasIdValue(entityMetamodel, entity)) { Messages.idValueRequired }
         return EntityDeleteQueryImpl(EntityDeleteContext(entityMetamodel), entity)
     }
 
@@ -62,7 +71,8 @@ object EntityQuery : Dsl {
         entityMetamodel: EntityMetamodel<ENTITY>,
         entities: List<ENTITY>
     ): EntityBatchInsertQuery<ENTITY> {
-        require(entities.isNotEmpty()) { "The 'entities' list must not be empty." }
+        require(entities.isNotEmpty()) { Messages.mustNotBeEmpty }
+        require(hasIdProperty(entityMetamodel)) { Messages.idPropertyRequired }
         return EntityBatchInsertQueryImpl(EntityInsertContext(entityMetamodel), entities)
     }
 
@@ -70,7 +80,8 @@ object EntityQuery : Dsl {
         entityMetamodel: EntityMetamodel<ENTITY>,
         entities: List<ENTITY>
     ): EntityBatchUpdateQuery<ENTITY> {
-        require(entities.isNotEmpty()) { "The 'entities' list must not be empty." }
+        require(entities.isNotEmpty()) { Messages.mustNotBeEmpty }
+        require(entities.all { hasIdValue(entityMetamodel, it) }) { Messages.idValueRequired }
         return EntityBatchUpdateQueryImpl(EntityUpdateContext(entityMetamodel), entities)
     }
 
@@ -78,7 +89,17 @@ object EntityQuery : Dsl {
         entityMetamodel: EntityMetamodel<ENTITY>,
         entities: List<ENTITY>
     ): EntityBatchDeleteQuery<ENTITY> {
-        require(entities.isNotEmpty()) { "The 'entities' list must not be empty." }
+        require(entities.isNotEmpty()) { Messages.mustNotBeEmpty }
+        require(entities.all { hasIdValue(entityMetamodel, it) }) { Messages.idValueRequired }
         return EntityBatchDeleteQueryImpl(EntityDeleteContext(entityMetamodel), entities)
+    }
+
+    private fun <ENTITY : Any> hasIdProperty(entityMetamodel: EntityMetamodel<ENTITY>): Boolean {
+        return entityMetamodel.idProperties().isNotEmpty()
+    }
+
+    private fun <ENTITY : Any> hasIdValue(entityMetamodel: EntityMetamodel<ENTITY>, entity: ENTITY): Boolean {
+        return hasIdProperty(entityMetamodel) &&
+            entityMetamodel.idProperties().map { it.getter(entity) }.all { it != null }
     }
 }
