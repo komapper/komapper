@@ -3,11 +3,9 @@ package example
 import org.komapper.core.Database
 import org.komapper.core.KmColumn
 import org.komapper.core.KmCreatedAt
-import org.komapper.core.KmEntity
 import org.komapper.core.KmEntityDef
 import org.komapper.core.KmId
 import org.komapper.core.KmIdentityGenerator
-import org.komapper.core.KmSequenceGenerator
 import org.komapper.core.KmUpdatedAt
 import org.komapper.core.KmVersion
 import org.komapper.core.dsl.EntityQuery
@@ -33,9 +31,6 @@ private data class AddressDef(
     @KmUpdatedAt val updatedAt: String,
 )
 
-@KmEntity
-data class Emp(@KmId @KmSequenceGenerator("hoge", incrementBy = 1) val id: Int)
-
 fun main() {
     // create a Database instance
     val db = Database(H2DatabaseConfig("jdbc:h2:mem:example;DB_CLOSE_DELAY=-1", enableTransaction = true))
@@ -47,7 +42,7 @@ fun main() {
     db.transaction {
         // create a schema
         db.execute {
-            SchemaQuery.create(a, Emp_())
+            SchemaQuery.create(a)
         }
 
         // CREATE
