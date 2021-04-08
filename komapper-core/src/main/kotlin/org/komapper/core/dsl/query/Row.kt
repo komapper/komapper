@@ -3,6 +3,7 @@ package org.komapper.core.dsl.query
 import org.komapper.core.config.Dialect
 import java.math.BigDecimal
 import java.math.BigInteger
+import java.sql.Array
 import java.sql.Blob
 import java.sql.Clob
 import java.sql.NClob
@@ -15,100 +16,121 @@ import java.time.OffsetDateTime
 import kotlin.reflect.KClass
 import kotlin.reflect.cast
 
-class Row(
+interface Row {
+    fun asAny(columnLabel: String): Any?
+    fun asArray(columnLabel: String): Array?
+    fun asBigDecimal(columnLabel: String): BigDecimal?
+    fun asBigInteger(columnLabel: String): BigInteger?
+    fun asBlob(columnLabel: String): Blob?
+    fun asBoolean(columnLabel: String): Boolean?
+    fun asByte(columnLabel: String): Byte?
+    fun asByteArray(columnLabel: String): ByteArray?
+    fun asClob(columnLabel: String): Clob?
+    fun asDouble(columnLabel: String): Double?
+    fun asFloat(columnLabel: String): Float?
+    fun asInt(columnLabel: String): Int?
+    fun asLocalDateTime(columnLabel: String): LocalDateTime?
+    fun asLocalDate(columnLabel: String): LocalDate?
+    fun asLocalTime(columnLabel: String): LocalTime?
+    fun asLong(columnLabel: String): Long?
+    fun asNClob(columnLabel: String): NClob?
+    fun asOffsetDateTime(columnLabel: String): OffsetDateTime?
+    fun asShort(columnLabel: String): Short?
+    fun asString(columnLabel: String): String?
+    fun asSQLXML(columnLabel: String): SQLXML?
+    fun <T : Any> asT(columnLabel: String, klass: KClass<T>): T?
+}
+
+class RowImpl(
     private val dialect: Dialect,
     private val rs: ResultSet
-) {
+) : Row {
 
-    fun asAny(columnLabel: String): Any? {
+    override fun asAny(columnLabel: String): Any? {
         return asT(columnLabel, Any::class)
     }
 
-    fun asArray(columnLabel: String): java.sql.Array? {
-        return asT(columnLabel, java.sql.Array::class)
+    override fun asArray(columnLabel: String): Array? {
+        return asT(columnLabel, Array::class)
     }
 
-    fun asBigDecimal(columnLabel: String): BigDecimal? {
+    override fun asBigDecimal(columnLabel: String): BigDecimal? {
         return asT(columnLabel, BigDecimal::class)
     }
 
-    fun asBigInteger(columnLabel: String): BigInteger? {
+    override fun asBigInteger(columnLabel: String): BigInteger? {
         return asT(columnLabel, BigInteger::class)
     }
 
-    fun asBlob(columnLabel: String): Blob? {
+    override fun asBlob(columnLabel: String): Blob? {
         return asT(columnLabel, Blob::class)
     }
 
-    fun asBoolean(columnLabel: String): Boolean? {
+    override fun asBoolean(columnLabel: String): Boolean? {
         return asT(columnLabel, Boolean::class)
     }
 
-    fun asByte(columnLabel: String): Byte? {
+    override fun asByte(columnLabel: String): Byte? {
         return asT(columnLabel, Byte::class)
     }
 
-    fun asByteArray(columnLabel: String): ByteArray? {
+    override fun asByteArray(columnLabel: String): ByteArray? {
         return asT(columnLabel, ByteArray::class)
     }
 
-    fun asClob(columnLabel: String): Clob? {
+    override fun asClob(columnLabel: String): Clob? {
         return asT(columnLabel, Clob::class)
     }
 
-    fun asDouble(columnLabel: String): Double? {
+    override fun asDouble(columnLabel: String): Double? {
         return asT(columnLabel, Double::class)
     }
 
-    fun <E : Enum<E>> asEnum(columnLabel: String, klass: KClass<E>): E? {
-        return asT(columnLabel, klass)
-    }
-
-    fun asFloat(columnLabel: String): Float? {
+    override fun asFloat(columnLabel: String): Float? {
         return asT(columnLabel, Float::class)
     }
 
-    fun asInt(columnLabel: String): Int? {
+    override fun asInt(columnLabel: String): Int? {
         return asT(columnLabel, Int::class)
     }
 
-    fun asLocalDateTime(columnLabel: String): LocalDateTime? {
+    override fun asLocalDateTime(columnLabel: String): LocalDateTime? {
         return asT(columnLabel, LocalDateTime::class)
     }
 
-    fun asLocalDate(columnLabel: String): LocalDate? {
+    override fun asLocalDate(columnLabel: String): LocalDate? {
         return asT(columnLabel, LocalDate::class)
     }
 
-    fun asLocalTime(columnLabel: String): LocalTime? {
+    override fun asLocalTime(columnLabel: String): LocalTime? {
         return asT(columnLabel, LocalTime::class)
     }
 
-    fun asLong(columnLabel: String): Long? {
+    override fun asLong(columnLabel: String): Long? {
         return asT(columnLabel, Long::class)
     }
 
-    fun asNClob(columnLabel: String): NClob? {
+    override fun asNClob(columnLabel: String): NClob? {
         return asT(columnLabel, NClob::class)
     }
 
-    fun asOffsetDateTime(columnLabel: String): OffsetDateTime? {
+    override fun asOffsetDateTime(columnLabel: String): OffsetDateTime? {
         return asT(columnLabel, OffsetDateTime::class)
     }
 
-    fun asShort(columnLabel: String): Short? {
+    override fun asShort(columnLabel: String): Short? {
         return asT(columnLabel, Short::class)
     }
 
-    fun asString(columnLabel: String): String? {
+    override fun asString(columnLabel: String): String? {
         return asT(columnLabel, String::class)
     }
 
-    fun asSQLXML(columnLabel: String): SQLXML? {
+    override fun asSQLXML(columnLabel: String): SQLXML? {
         return asT(columnLabel, SQLXML::class)
     }
 
-    private fun <T : Any> asT(columnLabel: String, klass: KClass<T>): T? {
+    override fun <T : Any> asT(columnLabel: String, klass: KClass<T>): T? {
         return dialect.getValue(rs, columnLabel, klass)?.let { klass.cast(it) }
     }
 }

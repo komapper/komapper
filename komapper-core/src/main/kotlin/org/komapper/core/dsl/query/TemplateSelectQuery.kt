@@ -54,7 +54,7 @@ internal data class TemplateSelectQueryImpl<T>(
             return executor.executeQuery(
                 statement,
                 { dialect, rs ->
-                    val row = Row(dialect, rs)
+                    val row = RowImpl(dialect, rs)
                     provider(row)
                 },
                 transformer
