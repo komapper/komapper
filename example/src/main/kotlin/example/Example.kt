@@ -1,13 +1,13 @@
 package example
 
+import org.komapper.annotation.KmColumn
+import org.komapper.annotation.KmCreatedAt
+import org.komapper.annotation.KmEntityDef
+import org.komapper.annotation.KmId
+import org.komapper.annotation.KmIdentityGenerator
+import org.komapper.annotation.KmUpdatedAt
+import org.komapper.annotation.KmVersion
 import org.komapper.core.Database
-import org.komapper.core.KmColumn
-import org.komapper.core.KmCreatedAt
-import org.komapper.core.KmEntityDef
-import org.komapper.core.KmId
-import org.komapper.core.KmIdentityGenerator
-import org.komapper.core.KmUpdatedAt
-import org.komapper.core.KmVersion
 import org.komapper.core.dsl.EntityQuery
 import org.komapper.core.dsl.SchemaQuery
 import org.komapper.core.dsl.TemplateQuery

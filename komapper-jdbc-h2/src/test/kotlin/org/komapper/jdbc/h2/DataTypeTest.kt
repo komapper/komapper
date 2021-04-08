@@ -3,10 +3,10 @@ package org.komapper.jdbc.h2
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.komapper.annotation.KmEntity
+import org.komapper.annotation.KmId
+import org.komapper.annotation.KmTable
 import org.komapper.core.Database
-import org.komapper.core.KmEntity
-import org.komapper.core.KmId
-import org.komapper.core.KmTable
 import org.komapper.core.dsl.EntityQuery
 import java.io.Serializable
 import java.math.BigDecimal

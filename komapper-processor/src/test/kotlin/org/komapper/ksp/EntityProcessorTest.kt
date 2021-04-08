@@ -22,7 +22,7 @@ class EntityProcessorTest {
                 "source.kt",
                 """
                 package test
-                import org.komapper.core.*
+                import org.komapper.annotation.*
                 @KmEntity
                 data class Dept(
                     val id: Int
@@ -44,7 +44,7 @@ class EntityProcessorTest {
                 "source.kt",
                 """
                 package test
-                import org.komapper.core.*
+                import org.komapper.annotation.*
                 data class Dept(
                     val id: Int
                 )
@@ -66,7 +66,7 @@ class EntityProcessorTest {
                 "source.kt",
                 """
                 package test
-                import org.komapper.core.*
+                import org.komapper.annotation.*
                 @KmEntity
                 data class __Dept(
                     val id: Int
@@ -84,7 +84,7 @@ class EntityProcessorTest {
                 "source.kt",
                 """
                 package test
-                import org.komapper.core.*
+                import org.komapper.annotation.*
                 data class __Dept(
                     val id: Int
                 )
@@ -105,7 +105,7 @@ class EntityProcessorTest {
                 "source.kt",
                 """
                 package test
-                import org.komapper.core.*
+                import org.komapper.annotation.*
                 @KmEntity
                 data class Dept(
                     val __id: Int
@@ -123,7 +123,7 @@ class EntityProcessorTest {
                 "source.kt",
                 """
                 package test
-                import org.komapper.core.*
+                import org.komapper.annotation.*
                 data class Dept(
                     val id: Int,
                     val __name: String
@@ -146,7 +146,7 @@ class EntityProcessorTest {
                 "source.kt",
                 """
                 package test
-                import org.komapper.core.*
+                import org.komapper.annotation.*
                 @KmEntity
                 class Dept(
                     val id: Int
@@ -165,7 +165,7 @@ class EntityProcessorTest {
                 "source.kt",
                 """
                 package test
-                import org.komapper.core.*
+                import org.komapper.annotation.*
                 class Dept(
                     val id: Int
                 )
@@ -187,7 +187,7 @@ class EntityProcessorTest {
                 "source.kt",
                 """
                 package test
-                import org.komapper.core.*
+                import org.komapper.annotation.*
                 class Dept(
                     @KmEntity val id: Int
                 )
@@ -205,7 +205,7 @@ class EntityProcessorTest {
                 "source.kt",
                 """
                 package test
-                import org.komapper.core.*
+                import org.komapper.annotation.*
                 data class Dept(
                     val id: Int
                 )
@@ -226,7 +226,7 @@ class EntityProcessorTest {
                 "source.kt",
                 """
                 package test
-                import org.komapper.core.*
+                import org.komapper.annotation.*
                 @KmEntity
                 private data class Dept(
                     val id: Int
@@ -245,7 +245,7 @@ class EntityProcessorTest {
                 "source.kt",
                 """
                 package test
-                import org.komapper.core.*
+                import org.komapper.annotation.*
                 private data class Dept(
                     val id: Int
                 )
@@ -267,7 +267,7 @@ class EntityProcessorTest {
                 "source.kt",
                 """
                 package test
-                import org.komapper.core.*
+                import org.komapper.annotation.*
                 @KmEntity
                 data class Dept<T>(
                     val id: T
@@ -286,7 +286,7 @@ class EntityProcessorTest {
                 "source.kt",
                 """
                 package test
-                import org.komapper.core.*
+                import org.komapper.annotation.*
                 data class Dept<T>(
                     val id: T
                 )
@@ -308,7 +308,7 @@ class EntityProcessorTest {
                 "source.kt",
                 """
                 package test
-                import org.komapper.core.*
+                import org.komapper.annotation.*
                 @KmEntity
                 data class Dept(
                     @KmVersion val aaa: Int,
@@ -328,7 +328,7 @@ class EntityProcessorTest {
                 "source.kt",
                 """
                 package test
-                import org.komapper.core.*
+                import org.komapper.annotation.*
                 import java.time.LocalDateTime
                 @KmEntity
                 data class Dept(
@@ -349,7 +349,7 @@ class EntityProcessorTest {
                 "source.kt",
                 """
                 package test
-                import org.komapper.core.*import java.time.LocalDateTime
+                import org.komapper.annotation.*import java.time.LocalDateTime
                 @KmEntity
                 data class Dept(
                     @KmUpdatedAt val aaa: LocalDateTime,
@@ -369,7 +369,7 @@ class EntityProcessorTest {
                 "source.kt",
                 """
                 package test
-                import org.komapper.core.*
+                import org.komapper.annotation.*
                 @KmEntity
                 data class Dept(
                     @KmIgnore val aaa: Int = 0,
@@ -389,7 +389,7 @@ class EntityProcessorTest {
                 "source.kt",
                 """
                 package test
-                import org.komapper.core.*
+                import org.komapper.annotation.*
                 @KmEntity
                 data class Dept(
                     private val aaa: Int
@@ -408,7 +408,7 @@ class EntityProcessorTest {
                 "source.kt",
                 """
                 package test
-                import org.komapper.core.*
+                import org.komapper.annotation.*
                 @KmEntity
                 data class Dept(
                     @KmId @KmVersion val id: Int
@@ -427,7 +427,7 @@ class EntityProcessorTest {
                 "source.kt",
                 """
                 package test
-                import org.komapper.core.*
+                import org.komapper.annotation.*
                 @KmEntity
                 data class Dept(
                     @KmIdentityGenerator val id: Int
@@ -446,7 +446,7 @@ class EntityProcessorTest {
                 "source.kt",
                 """
                 package test
-                import org.komapper.core.*
+                import org.komapper.annotation.*
                 @KmEntity
                 data class Dept(
                     @KmIdentityGenerator @KmSequenceGenerator("ID", 100) val id: Int
@@ -465,7 +465,7 @@ class EntityProcessorTest {
                 "source.kt",
                 """
                 package test
-                import org.komapper.core.*
+                import org.komapper.annotation.*
                 @KmEntity
                 data class Dept(
                     @KmId @KmIdentityGenerator val id1: Int,
@@ -485,7 +485,7 @@ class EntityProcessorTest {
                 "source.kt",
                 """
                 package test
-                import org.komapper.core.*
+                import org.komapper.annotation.*
                 @KmEntity
                 data class Dept(
                     @KmVersion val aaa: String
@@ -504,7 +504,7 @@ class EntityProcessorTest {
                 "source.kt",
                 """
                 package test
-                import org.komapper.core.*
+                import org.komapper.annotation.*
                 @KmEntity
                 data class Dept(
                     @KmCreatedAt val aaa: String
@@ -523,7 +523,7 @@ class EntityProcessorTest {
                 "source.kt",
                 """
                 package test
-                import org.komapper.core.*
+                import org.komapper.annotation.*
                 @KmEntity
                 data class Dept(
                     @KmUpdatedAt val aaa: String
@@ -542,7 +542,7 @@ class EntityProcessorTest {
                 "source.kt",
                 """
                 package test
-                import org.komapper.core.*
+                import org.komapper.annotation.*
                 @KmEntity
                 data class Dept(
                     @KmIgnore val aaa: String
@@ -561,7 +561,7 @@ class EntityProcessorTest {
                 "source.kt",
                 """
                 package test
-                import org.komapper.core.*
+                import org.komapper.annotation.*
                 @KmEntity
                 data class Dept(
                     @KmId @KmIdentityGenerator val id: String
@@ -580,7 +580,7 @@ class EntityProcessorTest {
                 "source.kt",
                 """
                 package test
-                import org.komapper.core.*
+                import org.komapper.annotation.*
                 @KmEntity
                 data class Dept(
                     @KmId @KmSequenceGenerator("ID", 100) val id: String
@@ -599,7 +599,7 @@ class EntityProcessorTest {
                 "source.kt",
                 """
                 package test
-                import org.komapper.core.*
+                import org.komapper.annotation.*
                 @KmEntity
                 data class Dept(
                     @KmId @KmSequenceGenerator() val id: Int
@@ -618,7 +618,7 @@ class EntityProcessorTest {
                 "source.kt",
                 """
                 package test
-                import org.komapper.core.*
+                import org.komapper.annotation.*
                 @KmEntity
                 data class Dept(
                     @KmId @KmSequenceGenerator("ID_SEQ") val id: Int

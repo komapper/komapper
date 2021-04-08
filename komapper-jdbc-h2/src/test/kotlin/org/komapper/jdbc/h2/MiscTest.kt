@@ -2,11 +2,11 @@ package org.komapper.jdbc.h2
 
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
-import org.komapper.core.KmColumn
-import org.komapper.core.KmEntity
-import org.komapper.core.KmId
-import org.komapper.core.KmTable
-import org.komapper.core.KmVersion
+import org.komapper.annotation.KmColumn
+import org.komapper.annotation.KmEntity
+import org.komapper.annotation.KmId
+import org.komapper.annotation.KmTable
+import org.komapper.annotation.KmVersion
 import org.komapper.core.dsl.EntityQuery
 
 class MiscTest {

@@ -18,6 +18,7 @@ idea.module {
 dependencies {
     api(project(":komapper-core"))
     implementation("com.h2database:h2:1.4.200")
+    testImplementation(project(":komapper-annotation"))
     kspTest(project(":komapper-processor"))
 }
 
