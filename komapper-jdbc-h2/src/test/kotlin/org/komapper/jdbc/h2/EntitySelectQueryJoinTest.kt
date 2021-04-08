@@ -35,6 +35,20 @@ class EntitySelectQueryJoinTest(private val db: Database) {
     }
 
     @Test
+    fun innerJoin_multiConditions() {
+        val employee = Employee.metamodel()
+        val manager = Employee.metamodel()
+        val list = db.execute {
+            EntityQuery.from(employee).innerJoin(manager) {
+                employee.managerId eq manager.employeeId
+                manager.managerId.isNull()
+            }
+        }
+        println(list)
+        assertEquals(3, list.size)
+    }
+
+    @Test
     fun association_many_to_one() {
         val e = Employee.metamodel()
         val d = Department.metamodel()
