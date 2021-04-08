@@ -10,6 +10,7 @@ import org.komapper.core.dsl.metamodel.EntityMetamodel
 
 internal data class SqlSelectContext<ENTITY : Any>(
     override val entityMetamodel: EntityMetamodel<ENTITY>,
+    val distinct: Boolean = false,
     override val joins: List<Join<*>> = listOf(),
     override val where: List<Criterion> = listOf(),
     override val orderBy: List<SortItem> = listOf(),

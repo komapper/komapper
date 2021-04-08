@@ -29,7 +29,7 @@ internal class SqlSelectStatementBuilder(
     }
 
     private fun selectClause() {
-        support.selectClause()
+        support.selectClause(context.distinct)
     }
 
     private fun fromClause() {

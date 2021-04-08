@@ -18,8 +18,11 @@ internal class SelectStatementBuilderSupport(
     private val support = BuilderSupport(dialect, aliasManager, buf)
     private val orderBySupport = OrderByBuilderSupport(dialect, context.orderBy, aliasManager, buf)
 
-    fun selectClause() {
+    fun selectClause(distinct: Boolean = false) {
         buf.append("select ")
+        if (distinct) {
+            buf.append("distinct ")
+        }
         for (p in context.projection.propertyExpressions()) {
             column(p)
             buf.append(", ")

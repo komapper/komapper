@@ -21,6 +21,8 @@ import java.sql.ResultSet
 
 interface SqlSelectQuery<ENTITY : Any> : SqlSetOperandQuery<ENTITY> {
 
+    fun distinct(): SqlSelectQuery<ENTITY>
+
     fun <OTHER_ENTITY : Any> innerJoin(
         entityMetamodel: EntityMetamodel<OTHER_ENTITY>,
         on: OnDeclaration<OTHER_ENTITY>
@@ -87,6 +89,11 @@ internal data class SqlSelectQueryImpl<ENTITY : Any>(
 
     private val support: SelectQuerySupport<ENTITY, SqlSelectContext<ENTITY>> = SelectQuerySupport(context)
     override val setOperationComponent: SqlSetOperationComponent<ENTITY> = SqlSetOperationComponent.Leaf(context)
+
+    override fun distinct(): SqlSelectQueryImpl<ENTITY> {
+        val newContext = context.copy(distinct = true)
+        return copy(context = newContext)
+    }
 
     override fun <OTHER_ENTITY : Any> innerJoin(
         entityMetamodel: EntityMetamodel<OTHER_ENTITY>,
