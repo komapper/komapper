@@ -1,8 +1,7 @@
-package org.komapper.core.config
+package org.komapper.core
 
+import org.komapper.core.dsl.builder.DryRunSchemaStatementBuilder
 import org.komapper.core.dsl.builder.SchemaStatementBuilder
-import org.komapper.core.dsl.spi.TemplateStatementBuilder
-import org.komapper.core.dsl.spi.TemplateStatementBuilderFactory
 import org.komapper.core.jdbc.AnyType
 import org.komapper.core.jdbc.ArrayType
 import org.komapper.core.jdbc.BigDecimalType
@@ -38,7 +37,6 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.OffsetDateTime
-import java.util.ServiceLoader
 import java.util.regex.Pattern
 import kotlin.reflect.KClass
 
@@ -46,7 +44,6 @@ interface Dialect {
     val openQuote: String
     val closeQuote: String
     val escapePattern: Pattern
-    val templateStatementBuilder: TemplateStatementBuilder
     val schemaStatementBuilder: SchemaStatementBuilder
 
     fun getValue(rs: ResultSet, index: Int, valueClass: KClass<*>): Any?
@@ -66,15 +63,6 @@ abstract class AbstractDialect : Dialect {
     override val openQuote: String = "\""
     override val closeQuote: String = "\""
     override val escapePattern: Pattern = Pattern.compile("""[\\_%]""")
-    override val templateStatementBuilder: TemplateStatementBuilder by lazy {
-        val loader = ServiceLoader.load(TemplateStatementBuilderFactory::class.java)
-        val factory = loader.firstOrNull()
-            ?: error(
-                "TemplateStatementBuilderFactory is not found. " +
-                    "Add komapper-template dependency or override the templateStatementBuilder property."
-            )
-        factory.create(this)
-    }
 
     override fun getValue(rs: ResultSet, index: Int, valueClass: KClass<*>): Any? {
         val dataType = getDataType(valueClass)
@@ -142,10 +130,9 @@ abstract class AbstractDialect : Dialect {
     }
 }
 
-open class EmptyDialect : AbstractDialect() {
+internal object DryRunDialect : AbstractDialect() {
 
-    override val schemaStatementBuilder: SchemaStatementBuilder
-        get() = throw UnsupportedOperationException()
+    override val schemaStatementBuilder = DryRunSchemaStatementBuilder
 
     override fun isUniqueConstraintViolation(exception: SQLException): Boolean {
         throw UnsupportedOperationException()

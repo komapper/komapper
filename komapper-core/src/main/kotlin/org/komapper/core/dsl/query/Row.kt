@@ -1,6 +1,6 @@
 package org.komapper.core.dsl.query
 
-import org.komapper.core.config.Dialect
+import org.komapper.core.Dialect
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.sql.Array

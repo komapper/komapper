@@ -1,11 +1,10 @@
 package org.komapper.core.dsl.query
 
 import org.komapper.core.DatabaseConfig
-import org.komapper.core.config.Dialect
+import org.komapper.core.JdbcExecutor
 import org.komapper.core.data.Statement
 import org.komapper.core.dsl.builder.EntityUpdateStatementBuilder
 import org.komapper.core.dsl.context.EntityUpdateContext
-import org.komapper.core.jdbc.JdbcExecutor
 
 internal class EntityUpdateQuerySupport<ENTITY : Any>(
     private val context: EntityUpdateContext<ENTITY>,
@@ -33,8 +32,8 @@ internal class EntityUpdateQuerySupport<ENTITY : Any>(
         }
     }
 
-    fun buildStatement(dialect: Dialect, entity: ENTITY): Statement {
-        val builder = EntityUpdateStatementBuilder(dialect, context, entity, option)
+    fun buildStatement(config: DatabaseConfig, entity: ENTITY): Statement {
+        val builder = EntityUpdateStatementBuilder(config.dialect, context, entity, option)
         return builder.build()
     }
 }

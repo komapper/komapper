@@ -1,6 +1,6 @@
 package org.komapper.core.dsl.query
 
-import org.komapper.core.config.Dialect
+import org.komapper.core.Dialect
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.metamodel.PropertyMetamodel
 import java.sql.ResultSet

@@ -1,5 +1,7 @@
 package org.komapper.core.dsl
 
+import org.komapper.core.DatabaseConfig
+import org.komapper.core.data.Statement
 import org.komapper.core.dsl.element.Operand
 import org.komapper.core.dsl.element.SortItem
 import org.komapper.core.dsl.expression.AggregateFunction
@@ -7,6 +9,46 @@ import org.komapper.core.dsl.expression.AliasExpression
 import org.komapper.core.dsl.expression.ArithmeticExpression
 import org.komapper.core.dsl.expression.PropertyExpression
 import org.komapper.core.dsl.expression.StringFunction
+import org.komapper.core.dsl.query.Query
+
+fun <T, R> Query<T>.flatMap(transformer: (T) -> Query<R>): Query<R> {
+    return object : Query<R> {
+        override fun run(config: DatabaseConfig): R {
+            val result = this@flatMap.run(config)
+            return transformer(result).run(config)
+        }
+
+        override fun dryRun(config: DatabaseConfig): Statement {
+            return this@flatMap.dryRun(config)
+        }
+    }
+}
+
+fun <T, R> Query<T>.flatZip(transformer: (T) -> Query<R>): Query<Pair<T, R>> {
+    return object : Query<Pair<T, R>> {
+        override fun run(config: DatabaseConfig): Pair<T, R> {
+            val result = this@flatZip.run(config)
+            return result to transformer(result).run(config)
+        }
+
+        override fun dryRun(config: DatabaseConfig): Statement {
+            return this@flatZip.dryRun(config)
+        }
+    }
+}
+
+infix operator fun <T, S> Query<T>.plus(other: Query<S>): Query<S> {
+    return object : Query<S> {
+        override fun run(config: DatabaseConfig): S {
+            this@plus.run(config)
+            return other.run(config)
+        }
+
+        override fun dryRun(config: DatabaseConfig): Statement {
+            return this@plus.dryRun(config) + other.dryRun(config)
+        }
+    }
+}
 
 fun <T : Any> PropertyExpression<T>.asc(): PropertyExpression<T> {
     if (this is SortItem.Property.Asc) {

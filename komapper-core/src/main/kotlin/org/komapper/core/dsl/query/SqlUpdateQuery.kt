@@ -1,7 +1,7 @@
 package org.komapper.core.dsl.query
 
 import org.komapper.core.DatabaseConfig
-import org.komapper.core.config.Dialect
+import org.komapper.core.JdbcExecutor
 import org.komapper.core.data.Statement
 import org.komapper.core.dsl.builder.SqlUpdateStatementBuilder
 import org.komapper.core.dsl.context.SqlUpdateContext
@@ -11,7 +11,6 @@ import org.komapper.core.dsl.scope.SqlUpdateOptionDeclaration
 import org.komapper.core.dsl.scope.SqlUpdateOptionScope
 import org.komapper.core.dsl.scope.WhereDeclaration
 import org.komapper.core.dsl.scope.WhereScope
-import org.komapper.core.jdbc.JdbcExecutor
 
 interface SqlUpdateQuery : Query<Int> {
     fun set(declaration: SetDeclaration): SqlUpdateQuery
@@ -48,18 +47,18 @@ internal data class SqlUpdateQueryImpl<ENTITY : Any>(
         if (!option.allowEmptyWhereClause && context.where.isEmpty()) {
             error("Empty where clause is not allowed.")
         }
-        val statement = buildStatement(config.dialect)
+        val statement = buildStatement(config)
         val executor = JdbcExecutor(config, option.asJdbcOption())
         val (count) = executor.executeUpdate(statement)
         return count
     }
 
-    override fun dryRun(dialect: Dialect): Statement {
-        return buildStatement(dialect)
+    override fun dryRun(config: DatabaseConfig): Statement {
+        return buildStatement(config)
     }
 
-    private fun buildStatement(dialect: Dialect): Statement {
-        val builder = SqlUpdateStatementBuilder(dialect, context)
+    private fun buildStatement(config: DatabaseConfig): Statement {
+        val builder = SqlUpdateStatementBuilder(config.dialect, context)
         return builder.build()
     }
 }

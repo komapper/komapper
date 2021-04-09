@@ -1,11 +1,10 @@
 package org.komapper.core.dsl.query
 
 import org.komapper.core.DatabaseConfig
-import org.komapper.core.config.Dialect
+import org.komapper.core.JdbcExecutor
 import org.komapper.core.data.Statement
 import org.komapper.core.dsl.scope.TemplateSelectOptionDeclaration
 import org.komapper.core.dsl.scope.TemplateSelectOptionScope
-import org.komapper.core.jdbc.JdbcExecutor
 
 interface TemplateSelectQuery<T> : ListQuery<T> {
     fun option(declaration: TemplateSelectOptionDeclaration): TemplateSelectQuery<T>
@@ -29,9 +28,9 @@ internal data class TemplateSelectQueryImpl<T>(
         return terminal.run(config)
     }
 
-    override fun dryRun(dialect: Dialect): Statement {
+    override fun dryRun(config: DatabaseConfig): Statement {
         val terminal = Terminal { it.toList() }
-        return terminal.dryRun(dialect)
+        return terminal.dryRun(config)
     }
 
     override fun first(): Query<T> {
@@ -48,7 +47,7 @@ internal data class TemplateSelectQueryImpl<T>(
 
     private inner class Terminal<R>(val transformer: (Sequence<T>) -> R) : Query<R> {
         override fun run(config: DatabaseConfig): R {
-            val statement = buildStatement(config.dialect)
+            val statement = buildStatement(config)
             val executor = JdbcExecutor(config, option.asJdbcOption())
             return executor.executeQuery(
                 statement,
@@ -60,12 +59,12 @@ internal data class TemplateSelectQueryImpl<T>(
             )
         }
 
-        override fun dryRun(dialect: Dialect): Statement {
-            return buildStatement(dialect)
+        override fun dryRun(config: DatabaseConfig): Statement {
+            return buildStatement(config)
         }
 
-        private fun buildStatement(dialect: Dialect): Statement {
-            val builder = dialect.templateStatementBuilder
+        private fun buildStatement(config: DatabaseConfig): Statement {
+            val builder = config.templateStatementBuilder
             return builder.build(sql, params)
         }
     }

@@ -1,15 +1,10 @@
 package org.komapper.core
 
-import org.komapper.core.config.ClockProvider
-import org.komapper.core.config.DefaultClockProvider
-import org.komapper.core.config.DefaultSession
-import org.komapper.core.config.Dialect
-import org.komapper.core.config.JdbcOption
-import org.komapper.core.config.Logger
-import org.komapper.core.config.Session
-import org.komapper.core.config.StdOutLogger
-import org.komapper.core.config.TransactionalSession
+import org.komapper.core.data.JdbcOption
+import org.komapper.core.dsl.spi.TemplateStatementBuilder
+import org.komapper.core.dsl.spi.TemplateStatementBuilderFactory
 import org.komapper.core.jdbc.SimpleDataSource
+import java.util.ServiceLoader
 import javax.sql.DataSource
 
 /**
@@ -28,7 +23,20 @@ interface DatabaseConfig {
     val logger: Logger
     val clockProvider: ClockProvider
     val jdbcOption: JdbcOption
-    val session: Session
+    val session: DatabaseSession
+    val templateStatementBuilder: TemplateStatementBuilder
+}
+
+abstract class AbstractDatabaseConfig : DatabaseConfig {
+    override val templateStatementBuilder: TemplateStatementBuilder by lazy {
+        val loader = ServiceLoader.load(TemplateStatementBuilderFactory::class.java)
+        val factory = loader.firstOrNull()
+            ?: error(
+                "TemplateStatementBuilderFactory is not found. " +
+                    "Add komapper-template dependency or override the templateStatementBuilder property."
+            )
+        factory.create(dialect)
+    }
 }
 
 open class DefaultDatabaseConfig(
@@ -36,8 +44,9 @@ open class DefaultDatabaseConfig(
     override val dialect: Dialect,
     enableTransaction: Boolean = false
 ) :
-    DatabaseConfig {
+    AbstractDatabaseConfig() {
 
+    @Suppress("unused")
     constructor(
         dialect: Dialect,
         url: String,
@@ -50,11 +59,25 @@ open class DefaultDatabaseConfig(
     override val logger: Logger = StdOutLogger()
     override val clockProvider = DefaultClockProvider()
     override val jdbcOption: JdbcOption = JdbcOption(batchSize = 10)
-    override val session: Session by lazy {
+    override val session: DatabaseSession by lazy {
         if (enableTransaction) {
-            TransactionalSession(dataSource, logger)
+            TransactionalDatabaseSession(dataSource, logger)
         } else {
-            DefaultSession(dataSource)
+            DefaultDatabaseSession(dataSource)
         }
     }
+}
+
+object DryRunDatabaseConfig : AbstractDatabaseConfig() {
+    override val name: String
+        get() = throw UnsupportedOperationException()
+    override val dialect: Dialect = DryRunDialect
+    override val logger: Logger
+        get() = throw UnsupportedOperationException()
+    override val clockProvider: ClockProvider
+        get() = throw UnsupportedOperationException()
+    override val jdbcOption: JdbcOption
+        get() = throw UnsupportedOperationException()
+    override val session: DatabaseSession
+        get() = throw UnsupportedOperationException()
 }

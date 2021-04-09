@@ -1,7 +1,8 @@
 package org.komapper.core.dsl.query
 
 import org.komapper.core.DatabaseConfig
-import org.komapper.core.config.Dialect
+import org.komapper.core.Dialect
+import org.komapper.core.JdbcExecutor
 import org.komapper.core.data.Statement
 import org.komapper.core.dsl.builder.EntitySelectStatementBuilder
 import org.komapper.core.dsl.context.EntitySelectContext
@@ -12,7 +13,6 @@ import org.komapper.core.dsl.scope.EntitySelectOptionDeclaration
 import org.komapper.core.dsl.scope.EntitySelectOptionScope
 import org.komapper.core.dsl.scope.OnDeclaration
 import org.komapper.core.dsl.scope.WhereDeclaration
-import org.komapper.core.jdbc.JdbcExecutor
 import java.sql.ResultSet
 import kotlin.reflect.cast
 
@@ -121,9 +121,9 @@ internal data class EntitySelectQueryImpl<ENTITY : Any>(
         return terminal.run(config)
     }
 
-    override fun dryRun(dialect: Dialect): Statement {
+    override fun dryRun(config: DatabaseConfig): Statement {
         val terminal = Terminal { it.toList() }
-        return terminal.dryRun(dialect)
+        return terminal.dryRun(config)
     }
 
     override fun first(): Query<ENTITY> {
@@ -144,7 +144,7 @@ internal data class EntitySelectQueryImpl<ENTITY : Any>(
             if (!option.allowEmptyWhereClause && context.where.isEmpty()) {
                 error("Empty where clause is not allowed.")
             }
-            val statement = buildStatement(config.dialect)
+            val statement = buildStatement(config)
             val executor = JdbcExecutor(config, option.asJdbcOption())
             return executor.executeQuery(statement) { rs ->
                 // hold only unique entities
@@ -168,12 +168,12 @@ internal data class EntitySelectQueryImpl<ENTITY : Any>(
             }
         }
 
-        override fun dryRun(dialect: Dialect): Statement {
-            return buildStatement(dialect)
+        override fun dryRun(config: DatabaseConfig): Statement {
+            return buildStatement(config)
         }
 
-        private fun buildStatement(dialect: Dialect): Statement {
-            val builder = EntitySelectStatementBuilder(dialect, context)
+        private fun buildStatement(config: DatabaseConfig): Statement {
+            val builder = EntitySelectStatementBuilder(config.dialect, context)
             return builder.build()
         }
 

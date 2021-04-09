@@ -1,7 +1,6 @@
 package org.komapper.core.dsl.query
 
 import org.komapper.core.DatabaseConfig
-import org.komapper.core.config.Dialect
 import org.komapper.core.data.Statement
 import org.komapper.core.dsl.context.EntityDeleteContext
 import org.komapper.core.dsl.scope.EntityBatchDeleteOptionDeclaration
@@ -27,7 +26,7 @@ internal data class EntityBatchDeleteQueryImpl<ENTITY : Any>(
     }
 
     override fun run(config: DatabaseConfig) {
-        val statements = entities.map { buildStatement(config.dialect, it) }
+        val statements = entities.map { buildStatement(config, it) }
         val (counts) = delete(config, statements)
         postDelete(counts)
     }
@@ -42,11 +41,11 @@ internal data class EntityBatchDeleteQueryImpl<ENTITY : Any>(
         }
     }
 
-    override fun dryRun(dialect: Dialect): Statement {
-        return buildStatement(dialect, entities.first())
+    override fun dryRun(config: DatabaseConfig): Statement {
+        return buildStatement(config, entities.first())
     }
 
-    private fun buildStatement(dialect: Dialect, entity: ENTITY): Statement {
-        return support.buildStatement(dialect, entity)
+    private fun buildStatement(config: DatabaseConfig, entity: ENTITY): Statement {
+        return support.buildStatement(config, entity)
     }
 }

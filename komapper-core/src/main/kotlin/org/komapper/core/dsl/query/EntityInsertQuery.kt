@@ -1,7 +1,6 @@
 package org.komapper.core.dsl.query
 
 import org.komapper.core.DatabaseConfig
-import org.komapper.core.config.Dialect
 import org.komapper.core.data.Statement
 import org.komapper.core.dsl.context.EntityInsertContext
 import org.komapper.core.dsl.scope.EntityInsertOptionDeclaration
@@ -28,7 +27,7 @@ internal data class EntityInsertQueryImpl<ENTITY : Any>(
 
     override fun run(config: DatabaseConfig): ENTITY {
         val newEntity = preInsert(config)
-        val statement = buildStatement(config.dialect, newEntity)
+        val statement = buildStatement(config, newEntity)
         val (_, generatedKeys) = insert(config, statement)
         return postInsert(newEntity, generatedKeys)
     }
@@ -50,11 +49,11 @@ internal data class EntityInsertQueryImpl<ENTITY : Any>(
         }
     }
 
-    override fun dryRun(dialect: Dialect): Statement {
-        return buildStatement(dialect, entity)
+    override fun dryRun(config: DatabaseConfig): Statement {
+        return buildStatement(config, entity)
     }
 
-    private fun buildStatement(dialect: Dialect, entity: ENTITY): Statement {
-        return support.buildStatement(dialect, entity)
+    private fun buildStatement(config: DatabaseConfig, entity: ENTITY): Statement {
+        return support.buildStatement(config, entity)
     }
 }

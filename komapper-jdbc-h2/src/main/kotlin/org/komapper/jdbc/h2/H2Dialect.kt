@@ -1,6 +1,6 @@
 package org.komapper.jdbc.h2
 
-import org.komapper.core.config.AbstractDialect
+import org.komapper.core.AbstractDialect
 import org.komapper.core.dsl.builder.SchemaStatementBuilder
 import java.sql.SQLException
 

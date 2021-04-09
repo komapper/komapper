@@ -6,6 +6,9 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.Database
 import org.komapper.core.dsl.EntityQuery
 import org.komapper.core.dsl.SqlQuery
+import org.komapper.core.dsl.flatMap
+import org.komapper.core.dsl.flatZip
+import org.komapper.core.dsl.plus
 
 @ExtendWith(Env::class)
 class QueryTest(private val db: Database) {

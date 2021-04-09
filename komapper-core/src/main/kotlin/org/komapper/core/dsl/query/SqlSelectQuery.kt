@@ -1,7 +1,8 @@
 package org.komapper.core.dsl.query
 
 import org.komapper.core.DatabaseConfig
-import org.komapper.core.config.Dialect
+import org.komapper.core.Dialect
+import org.komapper.core.JdbcExecutor
 import org.komapper.core.data.Statement
 import org.komapper.core.dsl.builder.SqlSelectStatementBuilder
 import org.komapper.core.dsl.context.SqlSelectContext
@@ -16,7 +17,6 @@ import org.komapper.core.dsl.scope.OnDeclaration
 import org.komapper.core.dsl.scope.SqlSelectOptionDeclaration
 import org.komapper.core.dsl.scope.SqlSelectOptionScope
 import org.komapper.core.dsl.scope.WhereDeclaration
-import org.komapper.core.jdbc.JdbcExecutor
 import java.sql.ResultSet
 
 interface SqlSelectQuery<ENTITY : Any> : SqlSetOperandQuery<ENTITY> {
@@ -267,9 +267,9 @@ internal data class SqlSelectQueryImpl<ENTITY : Any>(
         return terminal.run(config)
     }
 
-    override fun dryRun(dialect: Dialect): Statement {
+    override fun dryRun(config: DatabaseConfig): Statement {
         val terminal = createTerminal(context) { it.toList() }
-        return terminal.dryRun(dialect)
+        return terminal.dryRun(config)
     }
 
     override fun first(): Query<ENTITY> {
@@ -330,9 +330,9 @@ internal data class SqlSelectQueryImpl<ENTITY : Any>(
             return terminal.run(config)
         }
 
-        override fun dryRun(dialect: Dialect): Statement {
+        override fun dryRun(config: DatabaseConfig): Statement {
             val terminal = createTerminal { it.toList() }
-            return terminal.dryRun(dialect)
+            return terminal.dryRun(config)
         }
 
         override fun first(): Query<T> {
@@ -363,17 +363,17 @@ internal data class SqlSelectQueryImpl<ENTITY : Any>(
             if (!option.allowEmptyWhereClause && context.where.isEmpty()) {
                 error("Empty where clause is not allowed.")
             }
-            val statement = buildStatement(config.dialect)
+            val statement = buildStatement(config)
             val executor = JdbcExecutor(config, option.asJdbcOption())
             return executor.executeQuery(statement, provider, transformer)
         }
 
-        override fun dryRun(dialect: Dialect): Statement {
-            return buildStatement(dialect)
+        override fun dryRun(config: DatabaseConfig): Statement {
+            return buildStatement(config)
         }
 
-        private fun buildStatement(dialect: Dialect): Statement {
-            val builder = SqlSelectStatementBuilder(dialect, context)
+        private fun buildStatement(config: DatabaseConfig): Statement {
+            val builder = SqlSelectStatementBuilder(config.dialect, context)
             return builder.build()
         }
     }

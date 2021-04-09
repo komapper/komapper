@@ -1,6 +1,6 @@
 package org.komapper.template
 
-import org.komapper.core.config.Dialect
+import org.komapper.core.Dialect
 import org.komapper.core.dsl.spi.TemplateStatementBuilder
 import org.komapper.core.dsl.spi.TemplateStatementBuilderFactory
 import org.komapper.template.expression.CacheExprNodeFactory

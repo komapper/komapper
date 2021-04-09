@@ -1,4 +1,4 @@
-package org.komapper.core.config
+package org.komapper.core
 
 import org.komapper.core.data.Statement
 

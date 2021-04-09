@@ -1,9 +1,6 @@
-package org.komapper.core.jdbc
+package org.komapper.core
 
-import org.komapper.core.DatabaseConfig
-import org.komapper.core.UniqueConstraintException
-import org.komapper.core.config.Dialect
-import org.komapper.core.config.JdbcOption
+import org.komapper.core.data.JdbcOption
 import org.komapper.core.data.Statement
 import org.komapper.core.data.Value
 import java.sql.Connection

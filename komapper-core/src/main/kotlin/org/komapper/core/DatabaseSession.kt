@@ -1,4 +1,4 @@
-package org.komapper.core.config
+package org.komapper.core
 
 import org.komapper.core.tx.DefaultTransactionManager
 import org.komapper.core.tx.DefaultUserTransaction
@@ -10,13 +10,13 @@ import org.komapper.core.tx.UserTransaction
 import java.sql.Connection
 import javax.sql.DataSource
 
-interface Session {
+interface DatabaseSession {
     fun getConnection(): Connection
     fun getUserTransaction(): UserTransaction
     fun getTransactionManager(): TransactionManager
 }
 
-class DefaultSession(private val dataSource: DataSource) : Session {
+class DefaultDatabaseSession(private val dataSource: DataSource) : DatabaseSession {
     override fun getConnection(): Connection {
         return dataSource.connection
     }
@@ -30,11 +30,11 @@ class DefaultSession(private val dataSource: DataSource) : Session {
     }
 }
 
-class TransactionalSession(
+class TransactionalDatabaseSession(
     private val dataSource: DataSource,
     private val logger: Logger,
     private val isolationLevel: TransactionIsolationLevel? = null
-) : Session {
+) : DatabaseSession {
 
     private val txManager: TransactionManager by lazy {
         DefaultTransactionManager(dataSource, logger)

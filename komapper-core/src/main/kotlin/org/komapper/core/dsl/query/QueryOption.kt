@@ -1,6 +1,6 @@
 package org.komapper.core.dsl.query
 
-import org.komapper.core.config.JdbcOption
+import org.komapper.core.data.JdbcOption
 
 internal interface QueryOption {
     val queryTimeoutSeconds: Int?

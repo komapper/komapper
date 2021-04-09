@@ -1,7 +1,6 @@
 package org.komapper.core.dsl.query
 
 import org.komapper.core.DatabaseConfig
-import org.komapper.core.config.Dialect
 import org.komapper.core.data.Statement
 import org.komapper.core.dsl.context.EntityUpdateContext
 import org.komapper.core.dsl.scope.EntityBatchUpdateOptionDeclaration
@@ -28,7 +27,7 @@ internal data class EntityBatchUpdateQueryImpl<ENTITY : Any>(
 
     override fun run(config: DatabaseConfig): List<ENTITY> {
         val newEntities = preUpdate(config)
-        val statements = newEntities.map { buildStatement(config.dialect, it) }
+        val statements = newEntities.map { buildStatement(config, it) }
         val (counts) = update(config, statements)
         return postUpdate(newEntities, counts)
     }
@@ -53,11 +52,11 @@ internal data class EntityBatchUpdateQueryImpl<ENTITY : Any>(
         }
     }
 
-    override fun dryRun(dialect: Dialect): Statement {
-        return buildStatement(dialect, entities.first())
+    override fun dryRun(config: DatabaseConfig): Statement {
+        return buildStatement(config, entities.first())
     }
 
-    private fun buildStatement(dialect: Dialect, entity: ENTITY): Statement {
-        return support.buildStatement(dialect, entity)
+    private fun buildStatement(config: DatabaseConfig, entity: ENTITY): Statement {
+        return support.buildStatement(config, entity)
     }
 }

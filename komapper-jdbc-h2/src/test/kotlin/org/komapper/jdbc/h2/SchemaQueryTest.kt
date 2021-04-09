@@ -46,6 +46,7 @@ class SchemaQueryTest(private val db: Database) {
         db.execute {
             SchemaQuery.create(metamodels)
         }
+        SchemaQuery.create(metamodels).dryRun()
     }
 
     @Test

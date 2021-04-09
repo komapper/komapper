@@ -1,7 +1,8 @@
 package org.komapper.core.dsl.query
 
 import org.komapper.core.DatabaseConfig
-import org.komapper.core.config.Dialect
+import org.komapper.core.Dialect
+import org.komapper.core.JdbcExecutor
 import org.komapper.core.data.Statement
 import org.komapper.core.dsl.builder.SqlSetOperationStatementBuilder
 import org.komapper.core.dsl.context.SqlSetOperationComponent
@@ -11,7 +12,6 @@ import org.komapper.core.dsl.element.SortItem
 import org.komapper.core.dsl.expression.PropertyExpression
 import org.komapper.core.dsl.scope.SqlSetOperationOptionDeclaration
 import org.komapper.core.dsl.scope.SqlSetOperationOptionScope
-import org.komapper.core.jdbc.JdbcExecutor
 import java.sql.ResultSet
 
 interface SqlSetOperationQuery<T> : SqlSetOperandQuery<T> {
@@ -80,9 +80,9 @@ internal data class SetOperationQueryImpl<T>(
         return terminal.run(config)
     }
 
-    override fun dryRun(dialect: Dialect): Statement {
+    override fun dryRun(config: DatabaseConfig): Statement {
         val terminal = createTerminal { it.toList() }
-        return terminal.dryRun(dialect)
+        return terminal.dryRun(config)
     }
 
     override fun first(): Query<T> {
@@ -112,7 +112,7 @@ internal data class SetOperationQueryImpl<T>(
             if (!option.allowEmptyWhereClause) {
                 checkWhereClauses(context.component)
             }
-            val statement = buildStatement(config.dialect)
+            val statement = buildStatement(config)
             val executor = JdbcExecutor(config, option.asJdbcOption())
             return executor.executeQuery(statement, provider, transformer)
         }
@@ -131,12 +131,12 @@ internal data class SetOperationQueryImpl<T>(
             }
         }
 
-        override fun dryRun(dialect: Dialect): Statement {
-            return buildStatement(dialect)
+        override fun dryRun(config: DatabaseConfig): Statement {
+            return buildStatement(config)
         }
 
-        private fun buildStatement(dialect: Dialect): Statement {
-            val builder = SqlSetOperationStatementBuilder(dialect, context)
+        private fun buildStatement(config: DatabaseConfig): Statement {
+            val builder = SqlSetOperationStatementBuilder(config.dialect, context)
             return builder.build()
         }
     }

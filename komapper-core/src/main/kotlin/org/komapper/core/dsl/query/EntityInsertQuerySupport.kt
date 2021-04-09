@@ -1,12 +1,11 @@
 package org.komapper.core.dsl.query
 
 import org.komapper.core.DatabaseConfig
-import org.komapper.core.config.Dialect
+import org.komapper.core.JdbcExecutor
 import org.komapper.core.data.Statement
 import org.komapper.core.dsl.builder.EntityInsertStatementBuilder
 import org.komapper.core.dsl.context.EntityInsertContext
 import org.komapper.core.dsl.metamodel.Assignment
-import org.komapper.core.jdbc.JdbcExecutor
 
 internal class EntityInsertQuerySupport<ENTITY : Any>(
     private val context: EntityInsertContext<ENTITY>,
@@ -56,8 +55,8 @@ internal class EntityInsertQuerySupport<ENTITY : Any>(
         }
     }
 
-    fun buildStatement(dialect: Dialect, entity: ENTITY): Statement {
-        val builder = EntityInsertStatementBuilder(dialect, context, entity)
+    fun buildStatement(config: DatabaseConfig, entity: ENTITY): Statement {
+        val builder = EntityInsertStatementBuilder(config.dialect, context, entity)
         return builder.build()
     }
 }

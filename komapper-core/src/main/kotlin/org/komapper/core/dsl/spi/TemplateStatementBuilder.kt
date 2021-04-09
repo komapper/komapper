@@ -1,6 +1,6 @@
 package org.komapper.core.dsl.spi
 
-import org.komapper.core.config.Dialect
+import org.komapper.core.Dialect
 import org.komapper.core.data.Statement
 
 interface TemplateStatementBuilder {

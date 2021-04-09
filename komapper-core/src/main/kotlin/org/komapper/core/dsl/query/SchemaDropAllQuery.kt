@@ -1,10 +1,9 @@
 package org.komapper.core.dsl.query
 
 import org.komapper.core.DatabaseConfig
-import org.komapper.core.config.Dialect
-import org.komapper.core.config.JdbcOption
+import org.komapper.core.JdbcExecutor
+import org.komapper.core.data.JdbcOption
 import org.komapper.core.data.Statement
-import org.komapper.core.jdbc.JdbcExecutor
 
 interface SchemaDropAllQuery : Query<Unit> {
     fun dropAll(): SchemaDropAllQuery
@@ -17,17 +16,17 @@ internal class SchemaDropAllQueryImpl : SchemaDropAllQuery {
     }
 
     override fun run(config: DatabaseConfig) {
-        val statement = buildStatement(config.dialect)
+        val statement = buildStatement(config)
         val executor = JdbcExecutor(config, JdbcOption())
         executor.execute(statement)
     }
 
-    override fun dryRun(dialect: Dialect): Statement {
-        return buildStatement(dialect)
+    override fun dryRun(config: DatabaseConfig): Statement {
+        return buildStatement(config)
     }
 
-    private fun buildStatement(dialect: Dialect): Statement {
-        val builder = dialect.schemaStatementBuilder
+    private fun buildStatement(config: DatabaseConfig): Statement {
+        val builder = config.dialect.schemaStatementBuilder
         return builder.dropAll()
     }
 }

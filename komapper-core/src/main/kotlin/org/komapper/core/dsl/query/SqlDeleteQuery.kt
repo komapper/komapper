@@ -1,7 +1,7 @@
 package org.komapper.core.dsl.query
 
 import org.komapper.core.DatabaseConfig
-import org.komapper.core.config.Dialect
+import org.komapper.core.JdbcExecutor
 import org.komapper.core.data.Statement
 import org.komapper.core.dsl.builder.SqlDeleteStatementBuilder
 import org.komapper.core.dsl.context.SqlDeleteContext
@@ -9,7 +9,6 @@ import org.komapper.core.dsl.scope.SqlDeleteOptionDeclaration
 import org.komapper.core.dsl.scope.SqlDeleteOptionScope
 import org.komapper.core.dsl.scope.WhereDeclaration
 import org.komapper.core.dsl.scope.WhereScope
-import org.komapper.core.jdbc.JdbcExecutor
 
 interface SqlDeleteQuery : Query<Int> {
     fun where(declaration: WhereDeclaration): SqlDeleteQuery
@@ -38,18 +37,18 @@ internal data class SqlDeleteQueryImpl<ENTITY : Any>(
         if (!option.allowEmptyWhereClause && context.where.isEmpty()) {
             error("Empty where clause is not allowed.")
         }
-        val statement = buildStatement(config.dialect, context)
+        val statement = buildStatement(config, context)
         val executor = JdbcExecutor(config, option.asJdbcOption())
         val (count) = executor.executeUpdate(statement)
         return count
     }
 
-    override fun dryRun(dialect: Dialect): Statement {
-        return buildStatement(dialect, context)
+    override fun dryRun(config: DatabaseConfig): Statement {
+        return buildStatement(config, context)
     }
 
-    private fun buildStatement(dialect: Dialect, c: SqlDeleteContext<ENTITY>): Statement {
-        val builder = SqlDeleteStatementBuilder(dialect, c)
+    private fun buildStatement(config: DatabaseConfig, c: SqlDeleteContext<ENTITY>): Statement {
+        val builder = SqlDeleteStatementBuilder(config.dialect, c)
         return builder.build()
     }
 }

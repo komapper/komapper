@@ -6,11 +6,11 @@ import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
+import org.komapper.core.ClockProvider
 import org.komapper.core.Database
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.OptimisticLockException
 import org.komapper.core.UniqueConstraintException
-import org.komapper.core.config.ClockProvider
 import org.komapper.core.dsl.EntityQuery
 import java.time.Clock
 import java.time.Instant
