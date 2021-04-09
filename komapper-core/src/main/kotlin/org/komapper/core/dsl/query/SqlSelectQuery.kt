@@ -89,6 +89,7 @@ internal data class SqlSelectQueryImpl<ENTITY : Any>(
 
     private val support: SelectQuerySupport<ENTITY, SqlSelectContext<ENTITY>> = SelectQuerySupport(context)
     override val setOperationComponent: SqlSetOperationComponent<ENTITY> = SqlSetOperationComponent.Leaf(context)
+    override val subqueryContext = SubqueryContext.SqlSelect(context)
 
     override fun distinct(): SqlSelectQueryImpl<ENTITY> {
         val newContext = context.copy(distinct = true)
@@ -295,13 +296,14 @@ internal data class SqlSelectQueryImpl<ENTITY : Any>(
         return Terminal(c, option, provider, transformer)
     }
 
-    private data class Transformable<T>(
+    internal data class Transformable<T>(
         private val context: SqlSelectContext<*>,
         private val option: SqlSelectOption,
         private val provider: (Dialect, ResultSet) -> T
     ) : SqlSetOperandQuery<T> {
 
         override val setOperationComponent = SqlSetOperationComponent.Leaf<T>(context)
+        override val subqueryContext = SubqueryContext.SqlSelect(context)
 
         override fun except(other: SqlSetOperandQuery<T>): SqlSetOperationQuery<T> {
             return setOperation(SqlSetOperationKind.EXCEPT, other)
@@ -352,7 +354,7 @@ internal data class SqlSelectQueryImpl<ENTITY : Any>(
         }
     }
 
-    private class Terminal<T, R>(
+    internal class Terminal<T, R>(
         private val context: SqlSelectContext<*>,
         private val option: SqlSelectOption,
         private val provider: (Dialect, ResultSet) -> T,

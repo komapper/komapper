@@ -5,9 +5,9 @@ import org.komapper.core.dsl.expression.EntityExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 
 internal data class SqlDeleteContext<ENTITY : Any>(
-    override val entityMetamodel: EntityMetamodel<ENTITY>,
+    val entityMetamodel: EntityMetamodel<ENTITY>,
     val where: List<Criterion> = listOf()
-) : Context<ENTITY> {
+) : Context {
 
     override fun getEntityExpressions(): Set<EntityExpression<*>> {
         return setOf(entityMetamodel)

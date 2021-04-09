@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.Database
 import org.komapper.core.dsl.EntityQuery
-import org.komapper.core.dsl.Subquery
 import org.komapper.core.dsl.desc
 
 @ExtendWith(Env::class)
@@ -125,7 +124,7 @@ class EntitySelectQueryWhereTest(private val db: Database) {
         val query =
             EntityQuery.from(e).where {
                 e.addressId inList {
-                    Subquery.from(a)
+                    EntityQuery.from(a)
                         .where {
                             e.addressId eq a.addressId
                             e.employeeName like "%S%"
@@ -143,7 +142,7 @@ class EntitySelectQueryWhereTest(private val db: Database) {
         val query =
             EntityQuery.from(e).where {
                 e.addressId notInList {
-                    Subquery.from(a).where {
+                    EntityQuery.from(a).where {
                         e.addressId eq a.addressId
                         e.employeeName like "%S%"
                     }.select(a.addressId)
@@ -192,7 +191,7 @@ class EntitySelectQueryWhereTest(private val db: Database) {
         val query =
             EntityQuery.from(e).where {
                 e.addressId to e.version inList2 {
-                    Subquery.from(a)
+                    EntityQuery.from(a)
                         .where {
                             e.addressId eq a.addressId
                             e.employeeName like "%S%"
@@ -210,7 +209,7 @@ class EntitySelectQueryWhereTest(private val db: Database) {
         val query =
             EntityQuery.from(e).where {
                 e.addressId to e.version notInList2 {
-                    Subquery.from(a).where {
+                    EntityQuery.from(a).where {
                         e.addressId eq a.addressId
                         e.employeeName like "%S%"
                     }.select(a.addressId, a.version)
@@ -227,7 +226,7 @@ class EntitySelectQueryWhereTest(private val db: Database) {
         val query =
             EntityQuery.from(e).where {
                 exists {
-                    Subquery.from(a).where {
+                    EntityQuery.from(a).where {
                         e.addressId eq a.addressId
                         e.employeeName like "%S%"
                     }
@@ -244,7 +243,7 @@ class EntitySelectQueryWhereTest(private val db: Database) {
         val query =
             EntityQuery.from(e).where {
                 notExists {
-                    Subquery.from(a).where {
+                    EntityQuery.from(a).where {
                         e.addressId eq a.addressId
                         e.employeeName like "%S%"
                     }

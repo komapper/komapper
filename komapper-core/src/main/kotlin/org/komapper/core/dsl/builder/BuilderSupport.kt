@@ -1,9 +1,9 @@
 package org.komapper.core.dsl.builder
 
 import org.komapper.core.Dialect
+import org.komapper.core.data.Statement
 import org.komapper.core.data.StatementBuffer
 import org.komapper.core.data.Value
-import org.komapper.core.dsl.context.SqlSelectContext
 import org.komapper.core.dsl.element.Criterion
 import org.komapper.core.dsl.element.Operand
 import org.komapper.core.dsl.expression.AggregateFunction
@@ -13,6 +13,7 @@ import org.komapper.core.dsl.expression.EntityExpression
 import org.komapper.core.dsl.expression.PropertyExpression
 import org.komapper.core.dsl.expression.StringFunction
 import org.komapper.core.dsl.option.LikeOption
+import org.komapper.core.dsl.query.SubqueryContext
 
 internal class BuilderSupport(
     private val dialect: Dialect,
@@ -252,7 +253,11 @@ internal class BuilderSupport(
         buf.append(")")
     }
 
-    private fun inList2Operation(left: Pair<Operand, Operand>, right: List<Pair<Operand, Operand>>, not: Boolean = false) {
+    private fun inList2Operation(
+        left: Pair<Operand, Operand>,
+        right: List<Pair<Operand, Operand>>,
+        not: Boolean = false
+    ) {
         buf.append("(")
         visitOperand(left.first)
         buf.append(", ")
@@ -278,19 +283,18 @@ internal class BuilderSupport(
         buf.append(")")
     }
 
-    private fun inSubQueryOperation(left: Operand, right: SqlSelectContext<*>, not: Boolean = false) {
+    private fun inSubQueryOperation(left: Operand, right: SubqueryContext, not: Boolean = false) {
         visitOperand(left)
         if (not) {
             buf.append(" not")
         }
         buf.append(" in (")
-        val childAliasManager = AliasManagerImpl(right, aliasManager)
-        val builder = SqlSelectStatementBuilder(dialect, right, childAliasManager)
-        buf.append(builder.build())
+        val statement = buildSubqueryStatement(right)
+        buf.append(statement)
         buf.append(")")
     }
 
-    private fun inSubQuery2Operation(left: Pair<Operand, Operand>, right: SqlSelectContext<*>, not: Boolean = false) {
+    private fun inSubQuery2Operation(left: Pair<Operand, Operand>, right: SubqueryContext, not: Boolean = false) {
         buf.append("(")
         visitOperand(left.first)
         buf.append(", ")
@@ -300,21 +304,41 @@ internal class BuilderSupport(
             buf.append(" not")
         }
         buf.append(" in (")
-        val childAliasManager = AliasManagerImpl(right, aliasManager)
-        val builder = SqlSelectStatementBuilder(dialect, right, childAliasManager)
-        buf.append(builder.build())
+        val statement = buildSubqueryStatement(right)
+        buf.append(statement)
         buf.append(")")
     }
 
-    private fun existsOperation(subContext: SqlSelectContext<*>, not: Boolean = false) {
+    private fun existsOperation(subqueryContext: SubqueryContext, not: Boolean = false) {
         if (not) {
             buf.append("not ")
         }
         buf.append("exists (")
-        val childAliasManager = AliasManagerImpl(subContext, aliasManager)
-        val builder = SqlSelectStatementBuilder(dialect, subContext, childAliasManager)
-        buf.append(builder.build())
+        val statement = buildSubqueryStatement(subqueryContext)
+        buf.append(statement)
         buf.append(")")
+    }
+
+    private fun buildSubqueryStatement(subqueryContext: SubqueryContext): Statement {
+        return when (subqueryContext) {
+            is SubqueryContext.EntitySelect -> {
+                val context = subqueryContext.context
+                val childAliasManager = AliasManagerImpl(context, aliasManager)
+                val builder = EntitySelectStatementBuilder(dialect, context, childAliasManager)
+                builder.build()
+            }
+            is SubqueryContext.SqlSelect -> {
+                val context = subqueryContext.context
+                val childAliasManager = AliasManagerImpl(context, aliasManager)
+                val builder = SqlSelectStatementBuilder(dialect, context, childAliasManager)
+                builder.build()
+            }
+            is SubqueryContext.SqlSetOperation -> {
+                val context = subqueryContext.context
+                val builder = SqlSetOperationStatementBuilder(dialect, context, aliasManager)
+                builder.build()
+            }
+        }
     }
 
     private fun logicalBinaryOperation(operator: String, criteria: List<Criterion>, index: Int) {

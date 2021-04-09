@@ -6,10 +6,10 @@ import org.komapper.core.dsl.expression.EntityExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 
 internal data class SqlUpdateContext<ENTITY : Any>(
-    override val entityMetamodel: EntityMetamodel<ENTITY>,
+    val entityMetamodel: EntityMetamodel<ENTITY>,
     val set: List<Pair<Operand.Property, Operand>> = listOf(),
     val where: List<Criterion> = listOf()
-) : Context<ENTITY> {
+) : Context {
 
     override fun getEntityExpressions(): Set<EntityExpression<*>> {
         return setOf(entityMetamodel)

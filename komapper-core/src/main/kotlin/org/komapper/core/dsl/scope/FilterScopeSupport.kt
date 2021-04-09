@@ -5,9 +5,7 @@ import org.komapper.core.dsl.element.Operand
 import org.komapper.core.dsl.expression.PropertyExpression
 import org.komapper.core.dsl.operand.LikeOperand
 import org.komapper.core.dsl.option.LikeOption
-import org.komapper.core.dsl.query.OneProperty
-import org.komapper.core.dsl.query.SqlSubqueryProjection
-import org.komapper.core.dsl.query.TwoProperties
+import org.komapper.core.dsl.query.Subquery
 
 internal class FilterScopeSupport(
     private val context: MutableList<Criterion> = mutableListOf()
@@ -204,10 +202,10 @@ internal class FilterScopeSupport(
         add(Criterion.InList(o1, o2))
     }
 
-    override infix fun <T : Any> PropertyExpression<T>.inList(block: () -> OneProperty) {
-        val projection = block()
+    override infix fun <T : Any> PropertyExpression<T>.inList(block: () -> Subquery<T?>) {
+        val subquery = block()
         val left = Operand.Property(this)
-        val right = projection.contextHolder.context
+        val right = subquery.subqueryContext
         add(Criterion.InSubQuery(left, right))
     }
 
@@ -217,10 +215,10 @@ internal class FilterScopeSupport(
         add(Criterion.NotInList(o1, o2))
     }
 
-    override infix fun <T : Any> PropertyExpression<T>.notInList(block: () -> OneProperty) {
-        val projection = block()
+    override infix fun <T : Any> PropertyExpression<T>.notInList(block: () -> Subquery<T?>) {
+        val subquery = block()
         val left = Operand.Property(this)
-        val right = projection.contextHolder.context
+        val right = subquery.subqueryContext
         add(Criterion.NotInSubQuery(left, right))
     }
 
@@ -230,10 +228,10 @@ internal class FilterScopeSupport(
         add(Criterion.InList2(left, right))
     }
 
-    override infix fun <A : Any, B : Any> Pair<PropertyExpression<A>, PropertyExpression<B>>.inList2(block: () -> TwoProperties) {
-        val projection = block()
+    override infix fun <A : Any, B : Any> Pair<PropertyExpression<A>, PropertyExpression<B>>.inList2(block: () -> Subquery<Pair<A?, B?>>) {
+        val subquery = block()
         val left = Operand.Property(this.first) to Operand.Property(this.second)
-        val right = projection.contextHolder.context
+        val right = subquery.subqueryContext
         add(Criterion.InSubQuery2(left, right))
     }
 
@@ -243,23 +241,21 @@ internal class FilterScopeSupport(
         add(Criterion.NotInList2(left, right))
     }
 
-    override infix fun <A : Any, B : Any> Pair<PropertyExpression<A>, PropertyExpression<B>>.notInList2(block: () -> TwoProperties) {
-        val projection = block()
+    override infix fun <A : Any, B : Any> Pair<PropertyExpression<A>, PropertyExpression<B>>.notInList2(block: () -> Subquery<Pair<A?, B?>>) {
+        val subquery = block()
         val left = Operand.Property(this.first) to Operand.Property(this.second)
-        val right = projection.contextHolder.context
+        val right = subquery.subqueryContext
         add(Criterion.NotInSubQuery2(left, right))
     }
 
-    override fun exists(block: () -> SqlSubqueryProjection) {
-        val projection = block()
-        val subContext = projection.contextHolder.context
-        add(Criterion.Exists(subContext))
+    override fun exists(block: () -> Subquery<*>) {
+        val subquery = block()
+        add(Criterion.Exists(subquery.subqueryContext))
     }
 
-    override fun notExists(block: () -> SqlSubqueryProjection) {
-        val projection = block()
-        val subContext = projection.contextHolder.context
-        add(Criterion.NotExists(subContext))
+    override fun notExists(block: () -> Subquery<*>) {
+        val subquery = block()
+        add(Criterion.NotExists(subquery.subqueryContext))
     }
 
     override fun <T : CharSequence> T?.escape(): LikeOperand {

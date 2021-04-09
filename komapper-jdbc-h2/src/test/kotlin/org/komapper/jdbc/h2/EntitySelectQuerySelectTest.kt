@@ -1,0 +1,30 @@
+package org.komapper.jdbc.h2
+
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
+import org.komapper.core.Database
+import org.komapper.core.dsl.EntityQuery
+
+@ExtendWith(Env::class)
+class EntitySelectQuerySelectTest(private val db: Database) {
+
+    @Test
+    fun single() {
+        val a = Address.metamodel()
+        val street = db.execute {
+            EntityQuery.from(a).where { a.addressId eq 1 }.select(a.street).first()
+        }
+        assertEquals("STREET 1", street)
+    }
+
+    @Test
+    fun pair() {
+        val a = Address.metamodel()
+        val (id, street) = db.execute {
+            EntityQuery.from(a).where { a.addressId eq 1 }.select(a.addressId, a.street).first()
+        }
+        assertEquals(1, id)
+        assertEquals("STREET 1", street)
+    }
+}

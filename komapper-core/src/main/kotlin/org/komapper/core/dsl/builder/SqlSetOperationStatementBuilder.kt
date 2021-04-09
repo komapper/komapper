@@ -10,12 +10,12 @@ import org.komapper.core.dsl.context.SqlSetOperationKind
 
 internal class SqlSetOperationStatementBuilder(
     private val dialect: Dialect,
-    private val context: SqlSetOperationContext<*>
+    private val context: SqlSetOperationContext<*>,
+    private val aliasManager: AliasManager
 ) {
 
     private val buf = StatementBuffer(dialect::formatValue)
-    private val aliasManager = EmptyAliasManager()
-    private val support = OrderByBuilderSupport(dialect, context.orderBy, aliasManager, buf)
+    private val support = OrderByBuilderSupport(dialect, context.orderBy, EmptyAliasManager(), buf)
 
     fun build(): Statement {
         visitSetOperationComponent(context.component)
@@ -41,7 +41,8 @@ internal class SqlSetOperationStatementBuilder(
     }
 
     private fun visitSelectContext(selectContext: SqlSelectContext<*>) {
-        val builder = SqlSelectStatementBuilder(dialect, selectContext)
+        val childAliasManager = AliasManagerImpl(selectContext, aliasManager)
+        val builder = SqlSelectStatementBuilder(dialect, selectContext, childAliasManager)
         val statement = builder.build()
         buf.append("(")
         buf.append(statement)

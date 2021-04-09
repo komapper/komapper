@@ -4,6 +4,7 @@ import org.komapper.core.DatabaseConfig
 import org.komapper.core.Dialect
 import org.komapper.core.JdbcExecutor
 import org.komapper.core.data.Statement
+import org.komapper.core.dsl.builder.AliasManagerImpl
 import org.komapper.core.dsl.builder.SqlSetOperationStatementBuilder
 import org.komapper.core.dsl.context.SqlSetOperationComponent
 import org.komapper.core.dsl.context.SqlSetOperationContext
@@ -27,6 +28,7 @@ internal data class SetOperationQueryImpl<T>(
 ) : SqlSetOperationQuery<T> {
 
     override val setOperationComponent = context.component
+    override val subqueryContext = SubqueryContext.SqlSetOperation(context)
 
     override fun except(other: SqlSetOperandQuery<T>): SetOperationQueryImpl<T> {
         return setOperation(SqlSetOperationKind.EXCEPT, other)
@@ -136,7 +138,8 @@ internal data class SetOperationQueryImpl<T>(
         }
 
         private fun buildStatement(config: DatabaseConfig): Statement {
-            val builder = SqlSetOperationStatementBuilder(config.dialect, context)
+            val aliasManager = AliasManagerImpl(context)
+            val builder = SqlSetOperationStatementBuilder(config.dialect, context, aliasManager)
             return builder.build()
         }
     }

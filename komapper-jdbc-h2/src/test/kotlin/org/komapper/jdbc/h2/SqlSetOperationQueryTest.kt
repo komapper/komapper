@@ -8,6 +8,7 @@ import org.komapper.core.Database
 import org.komapper.core.dsl.SqlQuery
 import org.komapper.core.dsl.alias
 import org.komapper.core.dsl.desc
+import org.komapper.core.dsl.plus
 
 @ExtendWith(Env::class)
 class SqlSetOperationQueryTest(private val db: Database) {
@@ -55,6 +56,19 @@ class SqlSetOperationQueryTest(private val db: Database) {
         val e2 = list[1]
         assertEquals(5, e1.employeeId)
         assertEquals(1, e2.employeeId)
+    }
+
+    @Test
+    fun union_subquery() {
+        val e = Employee.metamodel()
+        val q1 = SqlQuery.from(e).where { e.employeeId eq 1 }.select(e.employeeId)
+        val q2 = SqlQuery.from(e).where { e.employeeId eq 6 }.select(e.employeeId)
+        val subquery = q1 union q2
+        val query = SqlQuery.from(e).where {
+            e.managerId inList { subquery }
+        }
+        val list = db.execute { query }
+        assertEquals(5, list.size)
     }
 
     @Test

@@ -5,9 +5,9 @@ import org.komapper.core.dsl.expression.EntityExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 
 internal data class SqlInsertContext<ENTITY : Any>(
-    override val entityMetamodel: EntityMetamodel<ENTITY>,
+    val entityMetamodel: EntityMetamodel<ENTITY>,
     val values: List<Pair<Operand.Property, Operand.Parameter>> = listOf()
-) : Context<ENTITY> {
+) : Context {
 
     override fun getEntityExpressions(): Set<EntityExpression<*>> {
         return setOf(entityMetamodel)
