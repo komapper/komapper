@@ -30,7 +30,7 @@ internal data class SchemaCreateQueryImpl(
     }
 
     private fun buildStatement(dialect: Dialect): Statement {
-        val builder = dialect.getSchemaStatementBuilder()
+        val builder = dialect.schemaStatementBuilder
         return builder.create(entityMetamodels)
     }
 }

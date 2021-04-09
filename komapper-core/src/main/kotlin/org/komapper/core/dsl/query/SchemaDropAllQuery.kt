@@ -27,7 +27,7 @@ internal class SchemaDropAllQueryImpl : SchemaDropAllQuery {
     }
 
     private fun buildStatement(dialect: Dialect): Statement {
-        val builder = dialect.getSchemaStatementBuilder()
+        val builder = dialect.schemaStatementBuilder
         return builder.dropAll()
     }
 }

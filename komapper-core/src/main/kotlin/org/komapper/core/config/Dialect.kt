@@ -47,6 +47,7 @@ interface Dialect {
     val closeQuote: String
     val escapePattern: Pattern
     val templateStatementBuilder: TemplateStatementBuilder
+    val schemaStatementBuilder: SchemaStatementBuilder
 
     fun getValue(rs: ResultSet, index: Int, valueClass: KClass<*>): Any?
     fun getValue(rs: ResultSet, columnLabel: String, valueClass: KClass<*>): Any?
@@ -58,7 +59,6 @@ interface Dialect {
     fun supportsMerge(): Boolean
     fun supportsUpsert(): Boolean
     fun escape(text: String): String
-    fun getSchemaStatementBuilder(): SchemaStatementBuilder
 }
 
 abstract class AbstractDialect : Dialect {
@@ -144,7 +144,7 @@ abstract class AbstractDialect : Dialect {
 
 open class EmptyDialect : AbstractDialect() {
 
-    override val templateStatementBuilder: TemplateStatementBuilder
+    override val schemaStatementBuilder: SchemaStatementBuilder
         get() = throw UnsupportedOperationException()
 
     override fun isUniqueConstraintViolation(exception: SQLException): Boolean {
@@ -152,10 +152,6 @@ open class EmptyDialect : AbstractDialect() {
     }
 
     override fun getSequenceSql(sequenceName: String): String {
-        throw UnsupportedOperationException()
-    }
-
-    override fun getSchemaStatementBuilder(): SchemaStatementBuilder {
         throw UnsupportedOperationException()
     }
 }
