@@ -174,6 +174,36 @@ internal class FilterScopeSupport(
         add(Criterion::NotLike, this, value, option)
     }
 
+    override fun <T : CharSequence> PropertyExpression<T>.startsWith(operand: Any?) {
+        if (operand == null) return
+        add(Criterion::Like, this, operand, LikeOption.Prefix())
+    }
+
+    override fun <T : CharSequence> PropertyExpression<T>.notStartsWith(operand: Any?) {
+        if (operand == null) return
+        add(Criterion::NotLike, this, operand, LikeOption.Prefix())
+    }
+
+    override fun <T : CharSequence> PropertyExpression<T>.contains(operand: Any?) {
+        if (operand == null) return
+        add(Criterion::Like, this, operand, LikeOption.Infix())
+    }
+
+    override fun <T : CharSequence> PropertyExpression<T>.notContains(operand: Any?) {
+        if (operand == null) return
+        add(Criterion::NotLike, this, operand, LikeOption.Infix())
+    }
+
+    override fun <T : CharSequence> PropertyExpression<T>.endsWith(operand: Any?) {
+        if (operand == null) return
+        add(Criterion::Like, this, operand, LikeOption.Suffix())
+    }
+
+    override fun <T : CharSequence> PropertyExpression<T>.notEndsWith(operand: Any?) {
+        if (operand == null) return
+        add(Criterion::NotLike, this, operand, LikeOption.Suffix())
+    }
+
     private fun createLikeOption(operand: LikeOperand): LikeOption {
         return when (operand) {
             is LikeOperand.Normal -> LikeOption.None

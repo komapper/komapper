@@ -53,6 +53,18 @@ interface FilterScope {
 
     infix fun <T : CharSequence> PropertyExpression<T>.notLike(operand: LikeOperand)
 
+    infix fun <T : CharSequence> PropertyExpression<T>.startsWith(operand: Any?)
+
+    infix fun <T : CharSequence> PropertyExpression<T>.notStartsWith(operand: Any?)
+
+    infix fun <T : CharSequence> PropertyExpression<T>.contains(operand: Any?)
+
+    infix fun <T : CharSequence> PropertyExpression<T>.notContains(operand: Any?)
+
+    infix fun <T : CharSequence> PropertyExpression<T>.endsWith(operand: Any?)
+
+    infix fun <T : CharSequence> PropertyExpression<T>.notEndsWith(operand: Any?)
+
     infix fun <T : Comparable<T>> PropertyExpression<T>.between(range: ClosedRange<T>)
 
     infix fun <T : Comparable<T>> PropertyExpression<T>.notBetween(range: ClosedRange<T>)

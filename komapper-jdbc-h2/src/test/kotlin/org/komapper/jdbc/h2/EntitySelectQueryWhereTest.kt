@@ -81,6 +81,72 @@ class EntitySelectQueryWhereTest(private val db: Database) {
     }
 
     @Test
+    fun startsWith() {
+        val a = Address.metamodel()
+        val list = db.execute {
+            EntityQuery.from(a).where {
+                a.street startsWith "STREET 1"
+            }.orderBy(a.addressId)
+        }
+        assertEquals(listOf(1) + (10..15), list.map { it.addressId })
+    }
+
+    @Test
+    fun notStartsWith() {
+        val a = Address.metamodel()
+        val list = db.execute {
+            EntityQuery.from(a).where {
+                a.street notStartsWith "STREET 1"
+            }.orderBy(a.addressId)
+        }
+        assertEquals((2..9).toList(), list.map { it.addressId })
+    }
+
+    @Test
+    fun contains() {
+        val a = Address.metamodel()
+        val list = db.execute {
+            EntityQuery.from(a).where {
+                a.street contains "T 1"
+            }.orderBy(a.addressId)
+        }
+        assertEquals(listOf(1) + (10..15), list.map { it.addressId })
+    }
+
+    @Test
+    fun notContains() {
+        val a = Address.metamodel()
+        val list = db.execute {
+            EntityQuery.from(a).where {
+                a.street notContains "T 1"
+            }.orderBy(a.addressId)
+        }
+        assertEquals((2..9).toList(), list.map { it.addressId })
+    }
+
+    @Test
+    fun endsWith() {
+        val a = Address.metamodel()
+        val list = db.execute {
+            EntityQuery.from(a).where {
+                a.street endsWith "1"
+            }.orderBy(a.addressId)
+        }
+        assertEquals(listOf(1, 11), list.map { it.addressId })
+    }
+
+    @Test
+    fun notEndsWith() {
+        val a = Address.metamodel()
+        val list = db.execute {
+            EntityQuery.from(a).where {
+                a.street notEndsWith "1"
+            }.orderBy(a.addressId)
+        }
+        assertEquals(((2..10) + (12..15)).toList(), list.map { it.addressId })
+    }
+
+    @Test
     fun inList() {
         val a = Address.metamodel()
         val list = db.execute {
