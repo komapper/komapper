@@ -7,6 +7,8 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.Database
 import org.komapper.core.dsl.EntityQuery
 import org.komapper.core.dsl.desc
+import org.komapper.core.dsl.scope.WhereDeclaration
+import org.komapper.core.dsl.scope.WhereScope.Companion.plus
 
 @ExtendWith(Env::class)
 class EntitySelectQueryWhereTest(private val db: Database) {
@@ -311,16 +313,16 @@ class EntitySelectQueryWhereTest(private val db: Database) {
         )
     }
 
-//    @Test
-//    fun composition() {
-//        val a = Address.metamodel()
-//        val w1: WhereDeclaration = {
-//            a.addressId eq 1
-//        }
-//        val w2: WhereDeclaration = {
-//            a.version eq 1
-//        }
-//        val list = db.execute { EntityQuery.from(a).where(w1 + w2) }
-//        assertEquals(1, list.size)
-//    }
+    @Test
+    fun composition() {
+        val a = Address.metamodel()
+        val w1: WhereDeclaration = {
+            a.addressId eq 1
+        }
+        val w2: WhereDeclaration = {
+            a.version eq 1
+        }
+        val list = db.execute { EntityQuery.from(a).where(w1 + w2) }
+        assertEquals(1, list.size)
+    }
 }
