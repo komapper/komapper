@@ -69,7 +69,7 @@ internal class SqlInsertStatementBuilder<ENTITY : Any>(
         return expression.getCanonicalColumnName(dialect::quote)
     }
 
-    private fun buildSubqueryStatement(subqueryContext: SubqueryContext): Statement {
+    private fun buildSubqueryStatement(subqueryContext: SubqueryContext<*>): Statement {
         return support.buildSubqueryStatement(subqueryContext)
     }
 }

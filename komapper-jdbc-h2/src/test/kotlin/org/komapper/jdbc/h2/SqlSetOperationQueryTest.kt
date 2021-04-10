@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.Database
+import org.komapper.core.dsl.EntityQuery
 import org.komapper.core.dsl.SqlQuery
 import org.komapper.core.dsl.alias
 import org.komapper.core.dsl.desc
@@ -48,7 +49,7 @@ class SqlSetOperationQueryTest(private val db: Database) {
         val e = Employee.metamodel()
         val q1 = SqlQuery.from(e).where { e.employeeId eq 1 }
         val q2 = SqlQuery.from(e).where { e.employeeId eq 1 }
-        val q3 = SqlQuery.from(e).where { e.employeeId eq 5 }
+        val q3 = EntityQuery.from(e).where { e.employeeId eq 5 }
         val query = (q1 union q2 union q3).orderBy(e.employeeId.desc())
         val list = db.execute { query }
         assertEquals(2, list.size)

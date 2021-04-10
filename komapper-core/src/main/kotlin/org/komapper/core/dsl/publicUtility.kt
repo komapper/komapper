@@ -8,6 +8,7 @@ import org.komapper.core.dsl.expression.AggregateFunction
 import org.komapper.core.dsl.expression.AliasExpression
 import org.komapper.core.dsl.expression.ArithmeticExpression
 import org.komapper.core.dsl.expression.PropertyExpression
+import org.komapper.core.dsl.expression.ScalarExpression
 import org.komapper.core.dsl.expression.StringFunction
 import org.komapper.core.dsl.query.Query
 
@@ -76,27 +77,27 @@ infix fun <T : Any> PropertyExpression<T>.alias(alias: String): PropertyExpressi
     return AliasExpression(this, alias)
 }
 
-fun <T : Any> avg(c: PropertyExpression<T>): PropertyExpression<Double> {
+fun <T : Any> avg(c: PropertyExpression<T>): ScalarExpression<Double> {
     return AggregateFunction.Avg(c)
 }
 
-fun count(): PropertyExpression<Long> {
+fun count(): ScalarExpression<Long> {
     return AggregateFunction.CountAsterisk
 }
 
-fun <T : Any> count(property: PropertyExpression<T>): PropertyExpression<Long> {
+fun <T : Any> count(property: PropertyExpression<T>): ScalarExpression<Long> {
     return AggregateFunction.Count(property)
 }
 
-fun <T : Any> max(property: PropertyExpression<T>): PropertyExpression<T> {
+fun <T : Any> max(property: PropertyExpression<T>): ScalarExpression<T> {
     return AggregateFunction.Max(property)
 }
 
-fun <T : Any> min(property: PropertyExpression<T>): PropertyExpression<T> {
+fun <T : Any> min(property: PropertyExpression<T>): ScalarExpression<T> {
     return AggregateFunction.Min(property)
 }
 
-fun <T : Any> sum(property: PropertyExpression<T>): PropertyExpression<T> {
+fun <T : Any> sum(property: PropertyExpression<T>): ScalarExpression<T> {
     return AggregateFunction.Sum(property)
 }
 

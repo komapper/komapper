@@ -6,11 +6,11 @@ import org.komapper.core.JdbcExecutor
 import org.komapper.core.data.Statement
 import org.komapper.core.dsl.builder.SqlSelectStatementBuilder
 import org.komapper.core.dsl.context.SqlSelectContext
-import org.komapper.core.dsl.context.SqlSetOperationComponent
 import org.komapper.core.dsl.context.SqlSetOperationContext
 import org.komapper.core.dsl.context.SqlSetOperationKind
 import org.komapper.core.dsl.context.SubqueryContext
 import org.komapper.core.dsl.expression.PropertyExpression
+import org.komapper.core.dsl.expression.ScalarExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.scope.HavingDeclaration
 import org.komapper.core.dsl.scope.HavingScope
@@ -20,7 +20,7 @@ import org.komapper.core.dsl.scope.SqlSelectOptionScope
 import org.komapper.core.dsl.scope.WhereDeclaration
 import java.sql.ResultSet
 
-interface SqlSelectQuery<ENTITY : Any> : SqlSetOperandQuery<ENTITY> {
+interface SqlSelectQuery<ENTITY : Any> : Subquery<ENTITY> {
 
     fun distinct(): SqlSelectQuery<ENTITY>
 
@@ -45,35 +45,39 @@ interface SqlSelectQuery<ENTITY : Any> : SqlSetOperandQuery<ENTITY> {
 
     fun <A : Any> select(
         e: EntityMetamodel<A>
-    ): SqlSetOperandQuery<Pair<ENTITY, A?>>
+    ): Subquery<Pair<ENTITY, A?>>
 
     fun <A : Any, B : Any> select(
         e1: EntityMetamodel<A>,
         e2: EntityMetamodel<B>
-    ): SqlSetOperandQuery<Triple<ENTITY, A?, B?>>
+    ): Subquery<Triple<ENTITY, A?, B?>>
 
     fun select(
         vararg entityMetamodels: EntityMetamodel<*>,
-    ): SqlSetOperandQuery<EntityRecord>
+    ): Subquery<EntityRecord>
 
     fun <A : Any> select(
         p: PropertyExpression<A>
-    ): SqlSetOperandQuery<A?>
+    ): Subquery<A?>
+
+    fun <A : Any> select(
+        p: ScalarExpression<A>
+    ): ScalarQuery<A?, A>
 
     fun <A : Any, B : Any> select(
         p1: PropertyExpression<A>,
         p2: PropertyExpression<B>
-    ): SqlSetOperandQuery<Pair<A?, B?>>
+    ): Subquery<Pair<A?, B?>>
 
     fun <A : Any, B : Any, C : Any> select(
         p1: PropertyExpression<A>,
         p2: PropertyExpression<B>,
         p3: PropertyExpression<C>
-    ): SqlSetOperandQuery<Triple<A?, B?, C?>>
+    ): Subquery<Triple<A?, B?, C?>>
 
     fun select(
         vararg propertyExpressions: PropertyExpression<*>,
-    ): SqlSetOperandQuery<PropertyRecord>
+    ): Subquery<PropertyRecord>
 }
 
 internal data class SqlSelectQueryImpl<ENTITY : Any>(
@@ -89,8 +93,8 @@ internal data class SqlSelectQueryImpl<ENTITY : Any>(
     }
 
     private val support: SelectQuerySupport<ENTITY, SqlSelectContext<ENTITY>> = SelectQuerySupport(context)
-    override val setOperationComponent: SqlSetOperationComponent<ENTITY> = SqlSetOperationComponent.Leaf(context)
-    override val subqueryContext = SubqueryContext.SqlSelect(context)
+
+    override val subqueryContext = SubqueryContext.SqlSelect<ENTITY>(context)
 
     override fun distinct(): SqlSelectQueryImpl<ENTITY> {
         val newContext = context.copy(distinct = true)
@@ -156,38 +160,25 @@ internal data class SqlSelectQueryImpl<ENTITY : Any>(
         return copy(option = scope.asOption())
     }
 
-    override fun except(other: SqlSetOperandQuery<ENTITY>): SqlSetOperationQuery<ENTITY> {
-        return setOperation(SqlSetOperationKind.EXCEPT, other)
+    override fun except(other: Subquery<ENTITY>): SqlSetOperationQuery<ENTITY> {
+        return support.except(this, other)
     }
 
-    override fun intersect(other: SqlSetOperandQuery<ENTITY>): SqlSetOperationQuery<ENTITY> {
-        return setOperation(SqlSetOperationKind.INTERSECT, other)
+    override fun intersect(other: Subquery<ENTITY>): SqlSetOperationQuery<ENTITY> {
+        return support.intersect(this, other)
     }
 
-    override fun union(other: SqlSetOperandQuery<ENTITY>): SqlSetOperationQuery<ENTITY> {
-        return setOperation(SqlSetOperationKind.UNION, other)
+    override fun union(other: Subquery<ENTITY>): SqlSetOperationQuery<ENTITY> {
+        return support.union(this, other)
     }
 
-    override fun unionAll(other: SqlSetOperandQuery<ENTITY>): SqlSetOperationQuery<ENTITY> {
-        return setOperation(SqlSetOperationKind.UNION_ALL, other)
-    }
-
-    private fun setOperation(
-        kind: SqlSetOperationKind,
-        other: SqlSetOperandQuery<ENTITY>
-    ): SqlSetOperationQuery<ENTITY> {
-        val component = SqlSetOperationComponent.Composite(kind, setOperationComponent, other.setOperationComponent)
-        val setOperatorContext = SqlSetOperationContext(component)
-        return SetOperationQueryImpl(setOperatorContext) { dialect, rs ->
-            val m = EntityMapper(dialect, rs)
-            val entity = m.execute(context.entityMetamodel)
-            checkNotNull(entity)
-        }
+    override fun unionAll(other: Subquery<ENTITY>): SqlSetOperationQuery<ENTITY> {
+        return support.unionAll(this, other)
     }
 
     override fun <A : Any> select(
         e: EntityMetamodel<A>,
-    ): SqlSetOperandQuery<Pair<ENTITY, A?>> {
+    ): Subquery<Pair<ENTITY, A?>> {
         val entityExpressions = context.getEntityExpressions()
         if (e !in entityExpressions) error(entityMetamodelNotFound("e"))
         val newContext = context.setEntities(listOf(context.entityMetamodel, e))
@@ -201,7 +192,7 @@ internal data class SqlSelectQueryImpl<ENTITY : Any>(
     override fun <A : Any, B : Any> select(
         e1: EntityMetamodel<A>,
         e2: EntityMetamodel<B>
-    ): SqlSetOperandQuery<Triple<ENTITY, A?, B?>> {
+    ): Subquery<Triple<ENTITY, A?, B?>> {
         val entityExpressions = context.getEntityExpressions()
         if (e1 !in entityExpressions) error(entityMetamodelNotFound("e1"))
         if (e2 !in entityExpressions) error(entityMetamodelNotFound("e2"))
@@ -213,7 +204,7 @@ internal data class SqlSelectQueryImpl<ENTITY : Any>(
         }
     }
 
-    override fun select(vararg entityMetamodels: EntityMetamodel<*>): SqlSetOperandQuery<EntityRecord> {
+    override fun select(vararg entityMetamodels: EntityMetamodel<*>): Subquery<EntityRecord> {
         val list = entityMetamodels.toList()
         val newContext = context.setEntities(list)
         return Transformable(newContext, option) { dialect, rs: ResultSet ->
@@ -223,7 +214,7 @@ internal data class SqlSelectQueryImpl<ENTITY : Any>(
         }
     }
 
-    override fun <A : Any> select(p: PropertyExpression<A>): SqlSetOperandQuery<A?> {
+    override fun <A : Any> select(p: PropertyExpression<A>): Subquery<A?> {
         val newContext = context.setProperty(p)
         return Transformable(newContext, option) { dialect, rs ->
             val m = PropertyMapper(dialect, rs)
@@ -231,10 +222,19 @@ internal data class SqlSelectQueryImpl<ENTITY : Any>(
         }
     }
 
+    override fun <A : Any> select(p: ScalarExpression<A>): ScalarQuery<A?, A> {
+        val newContext = context.setProperty(p)
+        val query = Transformable(newContext, option) { dialect, rs ->
+            val m = PropertyMapper(dialect, rs)
+            m.execute(p)
+        }
+        return ScalarQueryImpl(query, p)
+    }
+
     override fun <A : Any, B : Any> select(
         p1: PropertyExpression<A>,
         p2: PropertyExpression<B>
-    ): SqlSetOperandQuery<Pair<A?, B?>> {
+    ): Subquery<Pair<A?, B?>> {
         val newContext = context.setProperties(listOf(p1, p2))
         return Transformable(newContext, option) { dialect, rs ->
             val m = PropertyMapper(dialect, rs)
@@ -246,7 +246,7 @@ internal data class SqlSelectQueryImpl<ENTITY : Any>(
         p1: PropertyExpression<A>,
         p2: PropertyExpression<B>,
         p3: PropertyExpression<C>
-    ): SqlSetOperandQuery<Triple<A?, B?, C?>> {
+    ): Subquery<Triple<A?, B?, C?>> {
         val newContext = context.setProperties(listOf(p1, p2, p3))
         return Transformable(newContext, option) { dialect, rs: ResultSet ->
             val m = PropertyMapper(dialect, rs)
@@ -254,7 +254,7 @@ internal data class SqlSelectQueryImpl<ENTITY : Any>(
         }
     }
 
-    override fun select(vararg propertyExpressions: PropertyExpression<*>): SqlSetOperandQuery<PropertyRecord> {
+    override fun select(vararg propertyExpressions: PropertyExpression<*>): Subquery<PropertyRecord> {
         val list = propertyExpressions.toList()
         val newContext = context.setProperties(list)
         return Transformable(newContext, option) { dialect, rs: ResultSet ->
@@ -301,31 +301,29 @@ internal data class SqlSelectQueryImpl<ENTITY : Any>(
         private val context: SqlSelectContext<*>,
         private val option: SqlSelectOption,
         private val provider: (Dialect, ResultSet) -> T
-    ) : SqlSetOperandQuery<T> {
+    ) : Subquery<T> {
 
-        override val setOperationComponent = SqlSetOperationComponent.Leaf<T>(context)
-        override val subqueryContext = SubqueryContext.SqlSelect(context)
+        override val subqueryContext = SubqueryContext.SqlSelect<T>(context)
 
-        override fun except(other: SqlSetOperandQuery<T>): SqlSetOperationQuery<T> {
+        override fun except(other: Subquery<T>): SqlSetOperationQuery<T> {
             return setOperation(SqlSetOperationKind.EXCEPT, other)
         }
 
-        override fun intersect(other: SqlSetOperandQuery<T>): SqlSetOperationQuery<T> {
+        override fun intersect(other: Subquery<T>): SqlSetOperationQuery<T> {
             return setOperation(SqlSetOperationKind.INTERSECT, other)
         }
 
-        override fun union(other: SqlSetOperandQuery<T>): SqlSetOperationQuery<T> {
+        override fun union(other: Subquery<T>): SqlSetOperationQuery<T> {
             return setOperation(SqlSetOperationKind.UNION, other)
         }
 
-        override fun unionAll(other: SqlSetOperandQuery<T>): SqlSetOperationQuery<T> {
+        override fun unionAll(other: Subquery<T>): SqlSetOperationQuery<T> {
             return setOperation(SqlSetOperationKind.UNION_ALL, other)
         }
 
-        private fun setOperation(kind: SqlSetOperationKind, other: SqlSetOperandQuery<T>): SqlSetOperationQuery<T> {
-            val component = SqlSetOperationComponent.Composite(kind, setOperationComponent, other.setOperationComponent)
-            val context = SqlSetOperationContext(component)
-            return SetOperationQueryImpl(context, provider = provider)
+        private fun setOperation(kind: SqlSetOperationKind, other: Subquery<T>): SqlSetOperationQuery<T> {
+            val setOperationContext = SqlSetOperationContext(kind, subqueryContext, other.subqueryContext)
+            return SetOperationQueryImpl(setOperationContext, provider = provider)
         }
 
         override fun run(config: DatabaseConfig): List<T> {

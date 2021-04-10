@@ -14,6 +14,7 @@ import org.komapper.core.dsl.expression.EntityExpression
 import org.komapper.core.dsl.expression.PropertyExpression
 import org.komapper.core.dsl.expression.StringFunction
 import org.komapper.core.dsl.option.LikeOption
+import org.komapper.core.dsl.query.ScalarQuery
 
 internal class BuilderSupport(
     private val dialect: Dialect,
@@ -32,11 +33,14 @@ internal class BuilderSupport(
             is AggregateFunction -> {
                 visitAggregateFunction(expression)
             }
+            is AliasExpression -> {
+                visitAliasExpression(expression)
+            }
             is ArithmeticExpression -> {
                 visitArithmeticExpression(expression)
             }
-            is AliasExpression -> {
-                visitAsExpression(expression)
+            is ScalarQuery<*, *> -> {
+                visitSingleProjectionQuery(expression)
             }
             is StringFunction -> {
                 visitStringFunction(expression)
@@ -88,6 +92,11 @@ internal class BuilderSupport(
         }
     }
 
+    private fun visitAliasExpression(expression: AliasExpression<*>) {
+        visitPropertyExpression(expression.expression)
+        buf.append(" as ${dialect.quote(expression.alias)}")
+    }
+
     private fun visitArithmeticExpression(expression: ArithmeticExpression<*>) {
         buf.append("(")
         when (expression) {
@@ -121,9 +130,11 @@ internal class BuilderSupport(
         }
     }
 
-    private fun visitAsExpression(expression: AliasExpression<*>) {
-        visitPropertyExpression(expression.expression)
-        buf.append(" as ${dialect.quote(expression.alias)}")
+    private fun visitSingleProjectionQuery(expression: ScalarQuery<*, *>) {
+        buf.append("(")
+        val statement = buildSubqueryStatement(expression.subqueryContext)
+        buf.append(statement)
+        buf.append(")")
     }
 
     private fun visitStringFunction(function: StringFunction) {
@@ -283,7 +294,7 @@ internal class BuilderSupport(
         buf.append(")")
     }
 
-    private fun inSubQueryOperation(left: Operand, right: SubqueryContext, not: Boolean = false) {
+    private fun inSubQueryOperation(left: Operand, right: SubqueryContext<*>, not: Boolean = false) {
         visitOperand(left)
         if (not) {
             buf.append(" not")
@@ -294,7 +305,7 @@ internal class BuilderSupport(
         buf.append(")")
     }
 
-    private fun inSubQuery2Operation(left: Pair<Operand, Operand>, right: SubqueryContext, not: Boolean = false) {
+    private fun inSubQuery2Operation(left: Pair<Operand, Operand>, right: SubqueryContext<*>, not: Boolean = false) {
         buf.append("(")
         visitOperand(left.first)
         buf.append(", ")
@@ -309,7 +320,7 @@ internal class BuilderSupport(
         buf.append(")")
     }
 
-    private fun existsOperation(subqueryContext: SubqueryContext, not: Boolean = false) {
+    private fun existsOperation(subqueryContext: SubqueryContext<*>, not: Boolean = false) {
         if (not) {
             buf.append("not ")
         }
@@ -319,21 +330,21 @@ internal class BuilderSupport(
         buf.append(")")
     }
 
-    fun buildSubqueryStatement(subqueryContext: SubqueryContext): Statement {
+    fun buildSubqueryStatement(subqueryContext: SubqueryContext<*>): Statement {
         return when (subqueryContext) {
-            is SubqueryContext.EntitySelect -> {
+            is SubqueryContext.EntitySelect<*> -> {
                 val context = subqueryContext.context
                 val childAliasManager = AliasManagerImpl(context, aliasManager)
                 val builder = EntitySelectStatementBuilder(dialect, context, childAliasManager)
                 builder.build()
             }
-            is SubqueryContext.SqlSelect -> {
+            is SubqueryContext.SqlSelect<*> -> {
                 val context = subqueryContext.context
                 val childAliasManager = AliasManagerImpl(context, aliasManager)
                 val builder = SqlSelectStatementBuilder(dialect, context, childAliasManager)
                 builder.build()
             }
-            is SubqueryContext.SqlSetOperation -> {
+            is SubqueryContext.SqlSetOperation<*> -> {
                 val context = subqueryContext.context
                 val builder = SqlSetOperationStatementBuilder(dialect, context, aliasManager)
                 builder.build()

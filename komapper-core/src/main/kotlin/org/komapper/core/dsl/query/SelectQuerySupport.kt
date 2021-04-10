@@ -1,6 +1,8 @@
 package org.komapper.core.dsl.query
 
 import org.komapper.core.dsl.context.SelectContext
+import org.komapper.core.dsl.context.SqlSetOperationContext
+import org.komapper.core.dsl.context.SqlSetOperationKind
 import org.komapper.core.dsl.element.ForUpdate
 import org.komapper.core.dsl.element.Join
 import org.komapper.core.dsl.element.JoinKind
@@ -72,5 +74,34 @@ internal data class SelectQuerySupport<ENTITY : Any, CONTEXT : SelectContext<ENT
     fun forUpdate(): CONTEXT {
         val forUpdate = ForUpdate(ForUpdateOption.BASIC)
         return context.setForUpdate(forUpdate)
+    }
+
+    fun except(left: Subquery<ENTITY>, right: Subquery<ENTITY>): SqlSetOperationQuery<ENTITY> {
+        return setOperation(SqlSetOperationKind.EXCEPT, left, right)
+    }
+
+    fun intersect(left: Subquery<ENTITY>, right: Subquery<ENTITY>): SqlSetOperationQuery<ENTITY> {
+        return setOperation(SqlSetOperationKind.INTERSECT, left, right)
+    }
+
+    fun union(left: Subquery<ENTITY>, right: Subquery<ENTITY>): SqlSetOperationQuery<ENTITY> {
+        return setOperation(SqlSetOperationKind.UNION, left, right)
+    }
+
+    fun unionAll(left: Subquery<ENTITY>, right: Subquery<ENTITY>): SqlSetOperationQuery<ENTITY> {
+        return setOperation(SqlSetOperationKind.UNION_ALL, left, right)
+    }
+
+    private fun setOperation(
+        kind: SqlSetOperationKind,
+        left: Subquery<ENTITY>,
+        right: Subquery<ENTITY>
+    ): SqlSetOperationQuery<ENTITY> {
+        val setOperatorContext = SqlSetOperationContext(kind, left.subqueryContext, right.subqueryContext)
+        return SetOperationQueryImpl(setOperatorContext) { dialect, rs ->
+            val m = EntityMapper(dialect, rs)
+            val entity = m.execute(context.entityMetamodel)
+            checkNotNull(entity)
+        }
     }
 }

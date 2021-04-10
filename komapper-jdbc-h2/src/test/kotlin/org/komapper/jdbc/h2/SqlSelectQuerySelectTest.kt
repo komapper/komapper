@@ -9,6 +9,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.Database
 import org.komapper.core.dsl.SqlQuery
 import org.komapper.core.dsl.concat
+import org.komapper.core.dsl.count
 
 @ExtendWith(Env::class)
 class SqlSelectQuerySelectTest(private val db: Database) {
@@ -176,5 +177,18 @@ class SqlSelectQuerySelectTest(private val db: Database) {
         val record0 = list[0]
         val address = record0[a]
         assertNotNull(address)
+    }
+
+    @Test
+    fun selectProperty2() {
+        val d = Department.metamodel()
+        val e = Employee.metamodel()
+        val subquery = SqlQuery.from(e).where { d.departmentId eq e.departmentId }.select(count())
+        val list = db.execute {
+            SqlQuery.from(d)
+                .orderBy(d.departmentId)
+                .select(d.departmentName, subquery)
+        }
+        println(list)
     }
 }

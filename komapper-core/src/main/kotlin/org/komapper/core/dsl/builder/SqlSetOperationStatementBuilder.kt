@@ -3,10 +3,11 @@ package org.komapper.core.dsl.builder
 import org.komapper.core.Dialect
 import org.komapper.core.data.Statement
 import org.komapper.core.data.StatementBuffer
+import org.komapper.core.dsl.context.EntitySelectContext
 import org.komapper.core.dsl.context.SqlSelectContext
-import org.komapper.core.dsl.context.SqlSetOperationComponent
 import org.komapper.core.dsl.context.SqlSetOperationContext
 import org.komapper.core.dsl.context.SqlSetOperationKind
+import org.komapper.core.dsl.context.SubqueryContext
 
 internal class SqlSetOperationStatementBuilder(
     private val dialect: Dialect,
@@ -18,26 +19,36 @@ internal class SqlSetOperationStatementBuilder(
     private val support = OrderByBuilderSupport(dialect, context.orderBy, EmptyAliasManager, buf)
 
     fun build(): Statement {
-        visitSetOperationComponent(context.component)
+        visitSetOperationComponent(SubqueryContext.SqlSetOperation(context))
         support.orderByClause()
         return buf.toStatement()
     }
 
-    private fun visitSetOperationComponent(component: SqlSetOperationComponent<*>) {
+    private fun visitSetOperationComponent(component: SubqueryContext<*>) {
         when (component) {
-            is SqlSetOperationComponent.Leaf -> visitSelectContext(component.context)
-            is SqlSetOperationComponent.Composite -> {
-                visitSetOperationComponent(component.left)
-                val operator = when (component.kind) {
+            is SubqueryContext.EntitySelect -> visitEntityContext(component.context)
+            is SubqueryContext.SqlSelect -> visitSelectContext(component.context)
+            is SubqueryContext.SqlSetOperation -> {
+                visitSetOperationComponent(component.context.left)
+                val operator = when (component.context.kind) {
                     SqlSetOperationKind.INTERSECT -> "intersect"
                     SqlSetOperationKind.EXCEPT -> "except"
                     SqlSetOperationKind.UNION -> "union"
                     SqlSetOperationKind.UNION_ALL -> "union all"
                 }
                 buf.append(" $operator ")
-                visitSetOperationComponent(component.right)
+                visitSetOperationComponent(component.context.right)
             }
         }
+    }
+
+    private fun visitEntityContext(selectContext: EntitySelectContext<*>) {
+        val childAliasManager = AliasManagerImpl(selectContext, aliasManager)
+        val builder = EntitySelectStatementBuilder(dialect, selectContext, childAliasManager)
+        val statement = builder.build()
+        buf.append("(")
+        buf.append(statement)
+        buf.append(")")
     }
 
     private fun visitSelectContext(selectContext: SqlSelectContext<*>) {

@@ -6,7 +6,6 @@ import org.komapper.core.JdbcExecutor
 import org.komapper.core.data.Statement
 import org.komapper.core.dsl.builder.AliasManagerImpl
 import org.komapper.core.dsl.builder.SqlSetOperationStatementBuilder
-import org.komapper.core.dsl.context.SqlSetOperationComponent
 import org.komapper.core.dsl.context.SqlSetOperationContext
 import org.komapper.core.dsl.context.SqlSetOperationKind
 import org.komapper.core.dsl.context.SubqueryContext
@@ -16,7 +15,7 @@ import org.komapper.core.dsl.scope.SqlSetOperationOptionDeclaration
 import org.komapper.core.dsl.scope.SqlSetOperationOptionScope
 import java.sql.ResultSet
 
-interface SqlSetOperationQuery<T> : SqlSetOperandQuery<T> {
+interface SqlSetOperationQuery<T> : Subquery<T> {
     fun orderBy(vararg aliases: CharSequence): SqlSetOperationQuery<T>
     fun orderBy(vararg expressions: PropertyExpression<*>): SqlSetOperationQuery<T>
     fun option(declaration: SqlSetOperationOptionDeclaration): SqlSetOperationQuery<T>
@@ -28,28 +27,31 @@ internal data class SetOperationQueryImpl<T>(
     private val provider: (Dialect, ResultSet) -> T
 ) : SqlSetOperationQuery<T> {
 
-    override val setOperationComponent = context.component
     override val subqueryContext = SubqueryContext.SqlSetOperation(context)
 
-    override fun except(other: SqlSetOperandQuery<T>): SetOperationQueryImpl<T> {
+    override fun except(other: Subquery<T>): SetOperationQueryImpl<T> {
         return setOperation(SqlSetOperationKind.EXCEPT, other)
     }
 
-    override fun intersect(other: SqlSetOperandQuery<T>): SetOperationQueryImpl<T> {
+    override fun intersect(other: Subquery<T>): SetOperationQueryImpl<T> {
         return setOperation(SqlSetOperationKind.INTERSECT, other)
     }
 
-    override fun union(other: SqlSetOperandQuery<T>): SetOperationQueryImpl<T> {
+    override fun union(other: Subquery<T>): SetOperationQueryImpl<T> {
         return setOperation(SqlSetOperationKind.UNION, other)
     }
 
-    override fun unionAll(other: SqlSetOperandQuery<T>): SetOperationQueryImpl<T> {
+    override fun unionAll(other: Subquery<T>): SetOperationQueryImpl<T> {
         return setOperation(SqlSetOperationKind.UNION_ALL, other)
     }
 
-    private fun setOperation(kind: SqlSetOperationKind, other: SqlSetOperandQuery<T>): SetOperationQueryImpl<T> {
-        val component = SqlSetOperationComponent.Composite(kind, setOperationComponent, other.setOperationComponent)
-        val newContext = context.copy(component = component)
+    private fun setOperation(kind: SqlSetOperationKind, other: Subquery<T>): SetOperationQueryImpl<T> {
+        val newContext =
+            context.copy(
+                kind = kind,
+                left = SubqueryContext.SqlSetOperation(context),
+                right = other.subqueryContext
+            )
         return copy(context = newContext)
     }
 
@@ -113,23 +115,29 @@ internal data class SetOperationQueryImpl<T>(
 
         override fun run(config: DatabaseConfig): R {
             if (!option.allowEmptyWhereClause) {
-                checkWhereClauses(context.component)
+                checkWhereClauses(context.left)
+                checkWhereClauses(context.right)
             }
             val statement = buildStatement(config)
             val executor = JdbcExecutor(config, option.asJdbcOption())
             return executor.executeQuery(statement, provider, transformer)
         }
 
-        private fun checkWhereClauses(component: SqlSetOperationComponent<*>) {
-            when (component) {
-                is SqlSetOperationComponent.Leaf -> {
-                    if (component.context.where.isEmpty()) {
+        private fun checkWhereClauses(subqueryContext: SubqueryContext<*>) {
+            when (subqueryContext) {
+                is SubqueryContext.EntitySelect -> {
+                    if (subqueryContext.context.where.isEmpty()) {
                         error("Empty where clause is not allowed.")
                     }
                 }
-                is SqlSetOperationComponent.Composite -> {
-                    checkWhereClauses(component.left)
-                    checkWhereClauses(component.right)
+                is SubqueryContext.SqlSelect -> {
+                    if (subqueryContext.context.where.isEmpty()) {
+                        error("Empty where clause is not allowed.")
+                    }
+                }
+                is SubqueryContext.SqlSetOperation -> {
+                    checkWhereClauses(subqueryContext.context.left)
+                    checkWhereClauses(subqueryContext.context.right)
                 }
             }
         }

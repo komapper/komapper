@@ -7,6 +7,8 @@ import org.komapper.core.data.Statement
 import org.komapper.core.dsl.builder.EntitySelectStatementBuilder
 import org.komapper.core.dsl.context.EntitySelectContext
 import org.komapper.core.dsl.context.SqlSelectContext
+import org.komapper.core.dsl.context.SqlSetOperationContext
+import org.komapper.core.dsl.context.SqlSetOperationKind
 import org.komapper.core.dsl.context.SubqueryContext
 import org.komapper.core.dsl.element.Associator
 import org.komapper.core.dsl.element.Projection
@@ -68,7 +70,7 @@ internal data class EntitySelectQueryImpl<ENTITY : Any>(
     }
 
     private val support: SelectQuerySupport<ENTITY, EntitySelectContext<ENTITY>> = SelectQuerySupport(context)
-    override val subqueryContext = SubqueryContext.EntitySelect(context)
+    override val subqueryContext = SubqueryContext.EntitySelect<ENTITY>(context)
 
     override fun <OTHER_ENTITY : Any> innerJoin(
         entityMetamodel: EntityMetamodel<OTHER_ENTITY>,
@@ -130,6 +132,22 @@ internal data class EntitySelectQueryImpl<ENTITY : Any>(
         return copy(option = scope.asOption())
     }
 
+    override fun except(other: Subquery<ENTITY>): SqlSetOperationQuery<ENTITY> {
+        return support.except(this, other)
+    }
+
+    override fun intersect(other: Subquery<ENTITY>): SqlSetOperationQuery<ENTITY> {
+        return support.intersect(this, other)
+    }
+
+    override fun union(other: Subquery<ENTITY>): SqlSetOperationQuery<ENTITY> {
+        return support.union(this, other)
+    }
+
+    override fun unionAll(other: Subquery<ENTITY>): SqlSetOperationQuery<ENTITY> {
+        return support.unionAll(this, other)
+    }
+
     override fun <A : Any> select(p: PropertyMetamodel<ENTITY, A>): Subquery<A?> {
         return Transformable(listOf(p)) { dialect, rs ->
             val m = PropertyMapper(dialect, rs)
@@ -174,7 +192,7 @@ internal data class EntitySelectQueryImpl<ENTITY : Any>(
         private val provider: (Dialect, ResultSet) -> T
     ) : Subquery<T> {
 
-        val sqlSelectContext = SqlSelectContext(
+        val sqlSelectContext: SqlSelectContext<ENTITY> = SqlSelectContext(
             entityMetamodel = context.entityMetamodel,
             distinct = true,
             joins = context.joins,
@@ -186,7 +204,28 @@ internal data class EntitySelectQueryImpl<ENTITY : Any>(
             projection = Projection.Properties(propertyExpressions)
         )
 
-        override val subqueryContext: SubqueryContext = SubqueryContext.SqlSelect(sqlSelectContext)
+        override val subqueryContext = SubqueryContext.SqlSelect<T>(sqlSelectContext)
+
+        override fun except(other: Subquery<T>): SqlSetOperationQuery<T> {
+            return setOperation(SqlSetOperationKind.EXCEPT, other)
+        }
+
+        override fun intersect(other: Subquery<T>): SqlSetOperationQuery<T> {
+            return setOperation(SqlSetOperationKind.INTERSECT, other)
+        }
+
+        override fun union(other: Subquery<T>): SqlSetOperationQuery<T> {
+            return setOperation(SqlSetOperationKind.UNION, other)
+        }
+
+        override fun unionAll(other: Subquery<T>): SqlSetOperationQuery<T> {
+            return setOperation(SqlSetOperationKind.UNION_ALL, other)
+        }
+
+        private fun setOperation(kind: SqlSetOperationKind, other: Subquery<T>): SqlSetOperationQuery<T> {
+            val setOperationContext = SqlSetOperationContext(kind, subqueryContext, other.subqueryContext)
+            return SetOperationQueryImpl(setOperationContext, provider = provider)
+        }
 
         override fun run(config: DatabaseConfig): List<T> {
             val terminal = createTerminal { it.toList() }

@@ -2,7 +2,7 @@ package org.komapper.core.dsl.expression
 
 import kotlin.reflect.KClass
 
-internal sealed class AggregateFunction<T : Any> : PropertyExpression<T> {
+internal sealed class AggregateFunction<T : Any> : ScalarExpression<T> {
     internal data class Avg(val expression: PropertyExpression<*>) : PropertyExpression<Double>, AggregateFunction<Double>() {
         override val owner: EntityExpression<*> get() = expression.owner
         override val klass: KClass<Double> get() = Double::class
