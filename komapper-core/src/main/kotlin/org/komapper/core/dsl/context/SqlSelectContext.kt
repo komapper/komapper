@@ -10,7 +10,7 @@ import org.komapper.core.dsl.metamodel.EntityMetamodel
 
 internal data class SqlSelectContext<ENTITY : Any>(
     override val entityMetamodel: EntityMetamodel<ENTITY>,
-    val distinct: Boolean = false,
+    override val projection: Projection = Projection.Entities(listOf(entityMetamodel)),
     override val joins: List<Join<*>> = listOf(),
     override val where: List<Criterion> = listOf(),
     override val orderBy: List<SortItem> = listOf(),
@@ -19,24 +19,15 @@ internal data class SqlSelectContext<ENTITY : Any>(
     override val forUpdate: ForUpdate = ForUpdate(),
     val groupBy: List<PropertyExpression<*>> = listOf(),
     val having: List<Criterion> = listOf(),
-    override val projection: Projection =
-        Projection.Entities((listOf(entityMetamodel) + joins.map { it.entityMetamodel }).distinct()),
+    val distinct: Boolean = false,
 ) : SelectContext<ENTITY, SqlSelectContext<ENTITY>> {
 
-    fun setProperty(property: PropertyExpression<*>): SqlSelectContext<ENTITY> {
-        return copy(projection = Projection.Properties(listOf(property)))
+    fun setProperties(vararg properties: PropertyExpression<*>): SqlSelectContext<ENTITY> {
+        return copy(projection = Projection.Properties(properties.toList()))
     }
 
-    fun setProperties(properties: List<PropertyExpression<*>>): SqlSelectContext<ENTITY> {
-        return copy(projection = Projection.Properties(properties))
-    }
-
-    fun setEntity(entityMetamodel: EntityMetamodel<*>): SqlSelectContext<ENTITY> {
-        return copy(projection = Projection.Entities(listOf(entityMetamodel)))
-    }
-
-    fun setEntities(entityMetamodels: List<EntityMetamodel<*>>): SqlSelectContext<ENTITY> {
-        return copy(projection = Projection.Entities(entityMetamodels))
+    fun setEntities(vararg entityMetamodels: EntityMetamodel<*>): SqlSelectContext<ENTITY> {
+        return copy(projection = Projection.Entities(entityMetamodels.toList()))
     }
 
     override fun addJoin(join: Join<*>): SqlSelectContext<ENTITY> {
@@ -45,10 +36,6 @@ internal data class SqlSelectContext<ENTITY : Any>(
 
     override fun addWhere(where: List<Criterion>): SqlSelectContext<ENTITY> {
         return copy(where = this.where + where)
-    }
-
-    fun addHaving(having: List<Criterion>): SqlSelectContext<ENTITY> {
-        return copy(having = this.having + having)
     }
 
     override fun addOrderBy(orderBy: List<SortItem>): SqlSelectContext<ENTITY> {

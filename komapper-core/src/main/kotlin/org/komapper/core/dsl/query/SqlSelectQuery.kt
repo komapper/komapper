@@ -123,14 +123,14 @@ internal data class SqlSelectQueryImpl<ENTITY : Any>(
     }
 
     override fun groupBy(vararg expressions: PropertyExpression<*>): SqlSelectQueryImpl<ENTITY> {
-        val newContext = context.copy(groupBy = expressions.toList())
+        val newContext = context.copy(groupBy = context.groupBy + expressions.toList())
         return copy(context = newContext)
     }
 
     override fun having(declaration: HavingDeclaration): SqlSelectQueryImpl<ENTITY> {
         val scope = HavingScope()
         declaration(scope)
-        val newContext = context.addHaving(scope.toList())
+        val newContext = context.copy(having = context.having + scope.toList())
         return copy(context = newContext)
     }
 
@@ -181,7 +181,7 @@ internal data class SqlSelectQueryImpl<ENTITY : Any>(
     ): Subquery<Pair<ENTITY, A?>> {
         val entityExpressions = context.getEntityExpressions()
         if (e !in entityExpressions) error(entityMetamodelNotFound("e"))
-        val newContext = context.setEntities(listOf(context.entityMetamodel, e))
+        val newContext = context.setEntities(context.entityMetamodel, e)
         return Transformable(newContext, option) { dialect, rs ->
             val m = EntityMapper(dialect, rs)
             val base = checkNotNull(m.execute(context.entityMetamodel, true))
@@ -196,7 +196,7 @@ internal data class SqlSelectQueryImpl<ENTITY : Any>(
         val entityExpressions = context.getEntityExpressions()
         if (e1 !in entityExpressions) error(entityMetamodelNotFound("e1"))
         if (e2 !in entityExpressions) error(entityMetamodelNotFound("e2"))
-        val newContext = context.setEntities(listOf(context.entityMetamodel, e1, e2))
+        val newContext = context.setEntities(context.entityMetamodel, e1, e2)
         return Transformable(newContext, option) { dialect, rs ->
             val m = EntityMapper(dialect, rs)
             val base = checkNotNull(m.execute(context.entityMetamodel, true))
@@ -206,7 +206,7 @@ internal data class SqlSelectQueryImpl<ENTITY : Any>(
 
     override fun select(vararg entityMetamodels: EntityMetamodel<*>): Subquery<EntityRecord> {
         val list = entityMetamodels.toList()
-        val newContext = context.setEntities(list)
+        val newContext = context.setEntities(*list.toTypedArray())
         return Transformable(newContext, option) { dialect, rs: ResultSet ->
             val mapper = EntityMapper(dialect, rs)
             val map = list.associateWith { mapper.execute(it) }
@@ -215,7 +215,7 @@ internal data class SqlSelectQueryImpl<ENTITY : Any>(
     }
 
     override fun <A : Any> select(p: PropertyExpression<A>): Subquery<A?> {
-        val newContext = context.setProperty(p)
+        val newContext = context.setProperties(p)
         return Transformable(newContext, option) { dialect, rs ->
             val m = PropertyMapper(dialect, rs)
             m.execute(p)
@@ -223,7 +223,7 @@ internal data class SqlSelectQueryImpl<ENTITY : Any>(
     }
 
     override fun <A : Any> select(p: ScalarExpression<A>): ScalarQuery<A?, A> {
-        val newContext = context.setProperty(p)
+        val newContext = context.setProperties(p)
         val query = Transformable(newContext, option) { dialect, rs ->
             val m = PropertyMapper(dialect, rs)
             m.execute(p)
@@ -235,7 +235,7 @@ internal data class SqlSelectQueryImpl<ENTITY : Any>(
         p1: PropertyExpression<A>,
         p2: PropertyExpression<B>
     ): Subquery<Pair<A?, B?>> {
-        val newContext = context.setProperties(listOf(p1, p2))
+        val newContext = context.setProperties(p1, p2)
         return Transformable(newContext, option) { dialect, rs ->
             val m = PropertyMapper(dialect, rs)
             m.execute(p1) to m.execute(p2)
@@ -247,7 +247,7 @@ internal data class SqlSelectQueryImpl<ENTITY : Any>(
         p2: PropertyExpression<B>,
         p3: PropertyExpression<C>
     ): Subquery<Triple<A?, B?, C?>> {
-        val newContext = context.setProperties(listOf(p1, p2, p3))
+        val newContext = context.setProperties(p1, p2, p3)
         return Transformable(newContext, option) { dialect, rs: ResultSet ->
             val m = PropertyMapper(dialect, rs)
             Triple(m.execute(p1), m.execute(p2), m.execute(p3))
@@ -256,7 +256,7 @@ internal data class SqlSelectQueryImpl<ENTITY : Any>(
 
     override fun select(vararg propertyExpressions: PropertyExpression<*>): Subquery<PropertyRecord> {
         val list = propertyExpressions.toList()
-        val newContext = context.setProperties(list)
+        val newContext = context.setProperties(*list.toTypedArray())
         return Transformable(newContext, option) { dialect, rs: ResultSet ->
             val mapper = PropertyMapper(dialect, rs)
             val map = list.associateWith { mapper.execute(it) }

@@ -11,17 +11,14 @@ import org.komapper.core.dsl.metamodel.EntityMetamodel
 
 internal data class EntitySelectContext<ENTITY : Any>(
     override val entityMetamodel: EntityMetamodel<ENTITY>,
+    override val projection: Projection.Entities = Projection.Entities(listOf(entityMetamodel)),
     override val joins: List<Join<*>> = listOf(),
     override val where: List<Criterion> = listOf(),
     override val orderBy: List<SortItem> = listOf(),
     override val offset: Int = -1,
     override val limit: Int = -1,
     override val forUpdate: ForUpdate = ForUpdate(),
-    val associatorMap: Map<Association, Associator<Any, Any>> = mapOf(),
-    override val projection: Projection.Entities = Projection.Entities(
-        (listOf(entityMetamodel) + associatorMap.keys.flatMap { listOf(it.first, it.second) }).distinct()
-    )
-
+    val associatorMap: Map<Association, Associator<Any, Any>> = mapOf()
 ) : SelectContext<ENTITY, EntitySelectContext<ENTITY>> {
 
     override fun addJoin(join: Join<*>): EntitySelectContext<ENTITY> {
