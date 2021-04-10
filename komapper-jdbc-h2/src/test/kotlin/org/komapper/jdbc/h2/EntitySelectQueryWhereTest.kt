@@ -130,7 +130,7 @@ class EntitySelectQueryWhereTest(private val db: Database) {
                         .where {
                             e.addressId eq a.addressId
                             e.employeeName like "%S%"
-                        }.select(a.addressId)
+                        }.asSqlQuery().select(a.addressId)
                 }
             }
         val list = db.execute { query }
@@ -147,7 +147,7 @@ class EntitySelectQueryWhereTest(private val db: Database) {
                     EntityQuery.from(a).where {
                         e.addressId eq a.addressId
                         e.employeeName like "%S%"
-                    }.select(a.addressId)
+                    }.asSqlQuery().select(a.addressId)
                 }
             }
         val list = db.execute { query }
@@ -197,7 +197,7 @@ class EntitySelectQueryWhereTest(private val db: Database) {
                         .where {
                             e.addressId eq a.addressId
                             e.employeeName like "%S%"
-                        }.select(a.addressId, a.version)
+                        }.asSqlQuery().select(a.addressId, a.version)
                 }
             }
         val list = db.execute { query }
@@ -214,7 +214,7 @@ class EntitySelectQueryWhereTest(private val db: Database) {
                     EntityQuery.from(a).where {
                         e.addressId eq a.addressId
                         e.employeeName like "%S%"
-                    }.select(a.addressId, a.version)
+                    }.asSqlQuery().select(a.addressId, a.version)
                 }
             }
         val list = db.execute { query }

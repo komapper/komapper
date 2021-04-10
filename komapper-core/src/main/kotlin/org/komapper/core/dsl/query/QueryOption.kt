@@ -31,7 +31,9 @@ internal interface EntityInsertOption : QueryOption
 
 internal interface EntityUpdateOption : VersionOption
 
-internal interface EntitySelectOption : SelectOption, WhereOption
+internal interface EntitySelectOption : SelectOption, WhereOption {
+    fun asSqlSelectOption(): SqlSelectOption
+}
 
 internal interface EntityBatchDeleteOption : EntityDeleteOption, BatchOption
 
@@ -85,5 +87,8 @@ internal data class QueryOptionImpl(
             maxRows = maxRows,
             queryTimeoutSeconds = queryTimeoutSeconds
         )
+    }
+    override fun asSqlSelectOption(): SqlSelectOption {
+        return this
     }
 }

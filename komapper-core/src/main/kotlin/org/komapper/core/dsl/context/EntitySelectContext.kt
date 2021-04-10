@@ -54,4 +54,16 @@ internal data class EntitySelectContext<ENTITY : Any>(
         )
         return copy(projection = newProjection, associatorMap = this.associatorMap + (association to associator))
     }
+
+    fun asSqlSelectContext(): SqlSelectContext<ENTITY> {
+        return SqlSelectContext(
+            entityMetamodel = entityMetamodel,
+            joins = joins,
+            where = where,
+            orderBy = orderBy,
+            offset = offset,
+            limit = limit,
+            forUpdate = forUpdate
+        )
+    }
 }
