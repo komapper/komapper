@@ -7,6 +7,7 @@ import org.komapper.core.data.Statement
 import org.komapper.core.dsl.builder.EntitySelectStatementBuilder
 import org.komapper.core.dsl.context.EntitySelectContext
 import org.komapper.core.dsl.context.SqlSelectContext
+import org.komapper.core.dsl.context.SubqueryContext
 import org.komapper.core.dsl.element.Associator
 import org.komapper.core.dsl.element.Projection
 import org.komapper.core.dsl.expression.PropertyExpression

@@ -18,7 +18,7 @@ class QueryTest(private val db: Database) {
         val a = Address.metamodel()
         val address = Address(16, "STREET 16", 0)
         val q1 = EntityQuery.insert(a, address)
-        val q2 = SqlQuery.insert(a) {
+        val q2 = SqlQuery.insert(a).values {
             a.addressId set 17
             a.street set "STREET 17"
             a.version set 0

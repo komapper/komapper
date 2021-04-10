@@ -15,7 +15,7 @@ internal class SqlSetOperationStatementBuilder(
 ) {
 
     private val buf = StatementBuffer(dialect::formatValue)
-    private val support = OrderByBuilderSupport(dialect, context.orderBy, EmptyAliasManager(), buf)
+    private val support = OrderByBuilderSupport(dialect, context.orderBy, EmptyAliasManager, buf)
 
     fun build(): Statement {
         visitSetOperationComponent(context.component)

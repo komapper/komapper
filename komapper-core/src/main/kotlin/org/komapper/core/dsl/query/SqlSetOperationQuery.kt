@@ -9,6 +9,7 @@ import org.komapper.core.dsl.builder.SqlSetOperationStatementBuilder
 import org.komapper.core.dsl.context.SqlSetOperationComponent
 import org.komapper.core.dsl.context.SqlSetOperationContext
 import org.komapper.core.dsl.context.SqlSetOperationKind
+import org.komapper.core.dsl.context.SubqueryContext
 import org.komapper.core.dsl.element.SortItem
 import org.komapper.core.dsl.expression.PropertyExpression
 import org.komapper.core.dsl.scope.SqlSetOperationOptionDeclaration

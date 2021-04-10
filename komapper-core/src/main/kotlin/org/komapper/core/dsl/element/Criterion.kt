@@ -1,7 +1,7 @@
 package org.komapper.core.dsl.element
 
+import org.komapper.core.dsl.context.SubqueryContext
 import org.komapper.core.dsl.option.LikeOption
-import org.komapper.core.dsl.query.SubqueryContext
 
 internal sealed class Criterion {
     data class Eq(val left: Operand, val right: Operand) : Criterion()

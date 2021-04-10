@@ -4,6 +4,7 @@ import org.komapper.core.Dialect
 import org.komapper.core.data.Statement
 import org.komapper.core.data.StatementBuffer
 import org.komapper.core.data.Value
+import org.komapper.core.dsl.context.SubqueryContext
 import org.komapper.core.dsl.element.Criterion
 import org.komapper.core.dsl.element.Operand
 import org.komapper.core.dsl.expression.AggregateFunction
@@ -13,7 +14,6 @@ import org.komapper.core.dsl.expression.EntityExpression
 import org.komapper.core.dsl.expression.PropertyExpression
 import org.komapper.core.dsl.expression.StringFunction
 import org.komapper.core.dsl.option.LikeOption
-import org.komapper.core.dsl.query.SubqueryContext
 
 internal class BuilderSupport(
     private val dialect: Dialect,
@@ -319,7 +319,7 @@ internal class BuilderSupport(
         buf.append(")")
     }
 
-    private fun buildSubqueryStatement(subqueryContext: SubqueryContext): Statement {
+    fun buildSubqueryStatement(subqueryContext: SubqueryContext): Statement {
         return when (subqueryContext) {
             is SubqueryContext.EntitySelect -> {
                 val context = subqueryContext.context

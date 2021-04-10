@@ -11,14 +11,14 @@ import org.komapper.core.dsl.query.SqlDeleteQuery
 import org.komapper.core.dsl.query.SqlDeleteQueryImpl
 import org.komapper.core.dsl.query.SqlFindQuery
 import org.komapper.core.dsl.query.SqlFindQueryImpl
-import org.komapper.core.dsl.query.SqlInsertQuery
+import org.komapper.core.dsl.query.SqlInsertQueryBuilder
+import org.komapper.core.dsl.query.SqlInsertQueryBuilderImpl
 import org.komapper.core.dsl.query.SqlInsertQueryImpl
 import org.komapper.core.dsl.query.SqlSelectQuery
 import org.komapper.core.dsl.query.SqlSelectQueryImpl
 import org.komapper.core.dsl.query.SqlUpdateQuery
 import org.komapper.core.dsl.query.SqlUpdateQueryImpl
 import org.komapper.core.dsl.scope.SetDeclaration
-import org.komapper.core.dsl.scope.ValuesDeclaration
 
 object SqlQuery : Dsl {
 
@@ -42,8 +42,9 @@ object SqlQuery : Dsl {
         return SqlSelectQueryImpl(SqlSelectContext(entityMetamodel))
     }
 
-    fun <ENTITY : Any> insert(entityMetamodel: EntityMetamodel<ENTITY>, declaration: ValuesDeclaration): SqlInsertQuery {
-        return SqlInsertQueryImpl(SqlInsertContext(entityMetamodel)).values(declaration)
+    fun <ENTITY : Any> insert(entityMetamodel: EntityMetamodel<ENTITY>): SqlInsertQueryBuilder<ENTITY> {
+        val query = SqlInsertQueryImpl(SqlInsertContext(entityMetamodel))
+        return SqlInsertQueryBuilderImpl(query)
     }
 
     fun <ENTITY : Any> update(entityMetamodel: EntityMetamodel<ENTITY>, declaration: SetDeclaration): SqlUpdateQuery {

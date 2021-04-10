@@ -35,7 +35,7 @@ internal class AliasManagerImpl(context: Context, private val parent: AliasManag
     }
 }
 
-class EmptyAliasManager : AliasManager {
+internal object EmptyAliasManager : AliasManager {
     override val index: Int = 0
     override fun getAlias(expression: EntityExpression<*>): String = ""
 }
