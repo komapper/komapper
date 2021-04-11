@@ -4,7 +4,7 @@ interface UserTransaction {
     operator fun <R> invoke(
         isolationLevel: TransactionIsolationLevel? = null,
         block: TransactionScope.() -> R
-    ): R
+    ): R = required(isolationLevel, block)
 
     fun <R> required(
         isolationLevel: TransactionIsolationLevel? = null,

@@ -1,10 +1,16 @@
 package org.komapper.core.tx
 
-class Transaction(connectionProvider: () -> TransactionConnection) {
+interface Transaction {
+    val connection: TransactionConnection
+    var isRollbackOnly: Boolean
+    fun isInitialized(): Boolean
+}
+
+internal class TransactionImpl(connectionProvider: () -> TransactionConnection) : Transaction {
     private val id = System.identityHashCode(this).toString()
     private val connectionDelegate = lazy(connectionProvider)
-    internal val connection: TransactionConnection by connectionDelegate
-    internal var isRollbackOnly: Boolean = false
-    internal fun isInitialized() = connectionDelegate.isInitialized()
+    override val connection: TransactionConnection by connectionDelegate
+    override var isRollbackOnly: Boolean = false
+    override fun isInitialized() = connectionDelegate.isInitialized()
     override fun toString() = id
 }

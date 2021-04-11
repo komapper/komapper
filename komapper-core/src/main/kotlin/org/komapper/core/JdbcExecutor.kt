@@ -21,7 +21,7 @@ internal class JdbcExecutor(
         statement: Statement,
         handler: (rs: ResultSet) -> T
     ): T {
-        config.session.getConnection().use { con ->
+        config.session.connection.use { con ->
             log(statement)
             prepare(con, statement.sql).use { ps ->
                 ps.setUp()
@@ -38,7 +38,7 @@ internal class JdbcExecutor(
         provider: (Dialect, ResultSet) -> T,
         transformer: (Sequence<T>) -> R
     ): R {
-        config.session.getConnection().use { con ->
+        config.session.connection.use { con ->
             log(statement)
             prepare(con, statement.sql).use { ps ->
                 ps.setUp()
@@ -62,7 +62,7 @@ internal class JdbcExecutor(
 
     fun executeUpdate(statement: Statement): Pair<Int, LongArray> {
         return executeWithExceptionCheck {
-            config.session.getConnection().use { con ->
+            config.session.connection.use { con ->
                 log(statement)
                 prepare(con, statement.sql).use { ps ->
                     ps.setUp()
@@ -78,7 +78,7 @@ internal class JdbcExecutor(
     fun executeBatch(statements: List<Statement>): Pair<IntArray, LongArray> {
         require(statements.isNotEmpty())
         return executeWithExceptionCheck {
-            config.session.getConnection().use { con ->
+            config.session.connection.use { con ->
                 val firstStatement = statements.first()
                 log(firstStatement)
                 prepare(con, firstStatement.sql).use { ps ->
@@ -110,7 +110,7 @@ internal class JdbcExecutor(
 
     fun execute(statement: Statement) {
         executeWithExceptionCheck {
-            config.session.getConnection().use { con ->
+            config.session.connection.use { con ->
                 log(statement)
                 con.createStatement().use { s ->
                     s.setUp()

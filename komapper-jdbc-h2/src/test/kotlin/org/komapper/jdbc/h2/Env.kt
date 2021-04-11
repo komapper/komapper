@@ -145,7 +145,7 @@ internal class Env :
     }
 
     private val db = Database(config)
-    private val txManager = db.config.session.getTransactionManager()
+    private val txManager = db.config.session.transactionManager ?: error("Enable transaction.")
 
     override fun beforeTestExecution(context: ExtensionContext?) {
         db.transaction {
@@ -290,7 +290,7 @@ internal class Env :
     override fun afterTestExecution(context: ExtensionContext?) {
         txManager.rollback()
         db.transaction {
-            db.config.session.getConnection().use { con ->
+            db.config.session.connection.use { con ->
                 con.createStatement().use { stmt ->
                     stmt.execute("DROP ALL OBJECTS")
                 }

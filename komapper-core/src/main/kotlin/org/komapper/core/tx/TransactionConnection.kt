@@ -3,15 +3,22 @@ package org.komapper.core.tx
 import java.sql.Connection
 import java.sql.SQLException
 
-class TransactionConnection(
+interface TransactionConnection : Connection {
+    fun initialize()
+    fun reset()
+    fun dispose()
+    override fun close()
+}
+
+internal class TransactionConnectionImpl(
     private val connection: Connection,
     private val isolationLevel: TransactionIsolationLevel?
-) : Connection by connection {
+) : Connection by connection, TransactionConnection {
 
     private var isolation: Int = 0
     private var autoCommitState: Boolean = false
 
-    fun initialize() {
+    override fun initialize() {
         isolation = connection.transactionIsolation
         if (isolationLevel != null) {
             connection.transactionIsolation = isolationLevel.value
@@ -22,7 +29,7 @@ class TransactionConnection(
         }
     }
 
-    fun reset() {
+    override fun reset() {
         if (isolationLevel != null && isolation != Connection.TRANSACTION_NONE) {
             connection.transactionIsolation = isolation
         }
@@ -31,9 +38,11 @@ class TransactionConnection(
         }
     }
 
-    fun dispose() = try {
-        connection.close()
-    } catch (ignored: SQLException) {
+    override fun dispose() {
+        try {
+            connection.close()
+        } catch (ignored: SQLException) {
+        }
     }
 
     // do nothing

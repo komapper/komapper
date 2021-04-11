@@ -17,7 +17,7 @@ class Database(val config: DatabaseConfig) {
     /**
      * An interface for transaction scope.
      */
-    val transaction get() = config.session.getUserTransaction()
+    val transaction get() = config.session.userTransaction ?: error("Enable transaction.")
 
     /**
      * A data type factory.
@@ -39,35 +39,35 @@ class Database(val config: DatabaseConfig) {
          * @param typeName the SQL name of the type the elements of the array map to
          * @param elements the elements that populate the returned object
          */
-        fun createArrayOf(typeName: String, elements: List<*>): java.sql.Array = config.session.getConnection().use {
+        fun createArrayOf(typeName: String, elements: List<*>): java.sql.Array = config.session.connection.use {
             it.createArrayOf(typeName, elements.toTypedArray())
         }
 
         /**
          * Creates a Blob object.
          */
-        fun createBlob(): Blob = config.session.getConnection().use {
+        fun createBlob(): Blob = config.session.connection.use {
             it.createBlob()
         }
 
         /**
          * Creates a Clob object.
          */
-        fun createClob(): Clob = config.session.getConnection().use {
+        fun createClob(): Clob = config.session.connection.use {
             it.createClob()
         }
 
         /**
          * Creates a NClob object.
          */
-        fun createNClob(): NClob = config.session.getConnection().use {
+        fun createNClob(): NClob = config.session.connection.use {
             it.createNClob()
         }
 
         /**
          * Creates a SQLXML object.
          */
-        fun createSQLXML(): SQLXML = config.session.getConnection().use {
+        fun createSQLXML(): SQLXML = config.session.connection.use {
             it.createSQLXML()
         }
     }
