@@ -11,9 +11,9 @@ import org.komapper.core.dsl.expression.AggregateFunction
 import org.komapper.core.dsl.expression.AliasExpression
 import org.komapper.core.dsl.expression.ArithmeticExpression
 import org.komapper.core.dsl.expression.EntityExpression
+import org.komapper.core.dsl.expression.EscapeExpression
 import org.komapper.core.dsl.expression.PropertyExpression
 import org.komapper.core.dsl.expression.StringFunction
-import org.komapper.core.dsl.option.LikeOption
 import org.komapper.core.dsl.query.ScalarQuery
 
 internal class BuilderSupport(
@@ -162,8 +162,8 @@ internal class BuilderSupport(
             is Criterion.GraterEq -> binaryOperation(c.left, c.right, ">=")
             is Criterion.IsNull -> isNullOperation(c.left)
             is Criterion.IsNotNull -> isNullOperation(c.left, true)
-            is Criterion.Like -> likeOperation(c.left, c.right, c.option)
-            is Criterion.NotLike -> likeOperation(c.left, c.right, c.option, true)
+            is Criterion.Like -> likeOperation(c.left, c.right)
+            is Criterion.NotLike -> likeOperation(c.left, c.right, true)
             is Criterion.Between -> betweenOperation(c.left, c.right)
             is Criterion.NotBetween -> betweenOperation(c.left, c.right, true)
             is Criterion.InList -> inListOperation(c.left, c.right)
@@ -198,13 +198,47 @@ internal class BuilderSupport(
         buf.append(predicate)
     }
 
-    private fun likeOperation(left: Operand, right: Operand, option: LikeOption, not: Boolean = false) {
+    private fun likeOperation(left: Operand, right: Operand, not: Boolean = false) {
         visitOperand(left)
         if (not) {
             buf.append(" not")
         }
         buf.append(" like ")
-        visitLikeOperand(right, option)
+        visitLikeRightOperand(right)
+    }
+
+    private fun visitLikeRightOperand(operand: Operand) {
+        when (operand) {
+            is Operand.Property -> {
+                visitPropertyExpression(operand.expression)
+            }
+            is Operand.Parameter -> {
+                when (val value = operand.value) {
+                    is EscapeExpression -> {
+                        val newValue = visitEscapeExpression(value, dialect::escape)
+                        visitParameter(Operand.Parameter(operand.expression, newValue))
+                        buf.append(" escape '${dialect.escapeChar}'")
+                    }
+                    else -> visitParameter(operand)
+                }
+            }
+        }
+    }
+
+    private fun visitEscapeExpression(expression: EscapeExpression, escape: (String) -> String): String {
+        val buf = StringBuilder(expression.length + 10)
+        fun visit(e: EscapeExpression) {
+            when (e) {
+                is EscapeExpression.Text -> buf.append(e.value)
+                is EscapeExpression.Escape -> buf.append(escape(e.value.toString()))
+                is EscapeExpression.Composite -> {
+                    visit(e.left)
+                    visit(e.right)
+                }
+            }
+        }
+        visit(expression)
+        return buf.toString()
     }
 
     private fun betweenOperation(left: Operand, right: Pair<Operand, Operand>, not: Boolean = false) {
@@ -217,33 +251,6 @@ internal class BuilderSupport(
         visitOperand(start)
         buf.append(" and ")
         visitOperand(end)
-    }
-
-    private fun visitLikeOperand(operand: Operand, option: LikeOption) {
-        fun bind(value: Any?, mapper: (String) -> String, escape: (String) -> String) {
-            if (value == null) {
-                buf.bind(Value(null, String::class))
-            } else {
-                val text = mapper(escape(value.toString()))
-                buf.bind(Value(text, String::class))
-            }
-        }
-        when (operand) {
-            is Operand.Property -> {
-                visitPropertyExpression(operand.expression)
-            }
-            is Operand.Parameter -> {
-                val value = operand.value
-                val escape = dialect::escape
-                when (option) {
-                    is LikeOption.None -> bind(value, { it }, { it })
-                    is LikeOption.Escape -> bind(value, { it }, escape)
-                    is LikeOption.Prefix -> bind(value, { "$it%" }, escape)
-                    is LikeOption.Infix -> bind(value, { "%$it%" }, escape)
-                    is LikeOption.Suffix -> bind(value, { "%$it" }, escape)
-                }
-            }
-        }
     }
 
     private fun inListOperation(left: Operand, right: List<Operand>, not: Boolean = false) {
@@ -389,8 +396,12 @@ internal class BuilderSupport(
                 visitPropertyExpression(operand.expression)
             }
             is Operand.Parameter -> {
-                buf.bind(Value(operand.value, operand.expression.klass))
+                visitParameter(operand)
             }
         }
+    }
+
+    private fun visitParameter(parameter: Operand.Parameter) {
+        buf.bind(Value(parameter.value, parameter.expression.klass))
     }
 }

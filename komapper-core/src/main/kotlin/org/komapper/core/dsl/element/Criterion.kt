@@ -1,7 +1,6 @@
 package org.komapper.core.dsl.element
 
 import org.komapper.core.dsl.context.SubqueryContext
-import org.komapper.core.dsl.option.LikeOption
 
 internal sealed class Criterion {
     data class Eq(val left: Operand, val right: Operand) : Criterion()
@@ -12,8 +11,8 @@ internal sealed class Criterion {
     data class GraterEq(val left: Operand, val right: Operand) : Criterion()
     data class IsNull(val left: Operand) : Criterion()
     data class IsNotNull(val left: Operand) : Criterion()
-    data class Like(val left: Operand, val right: Operand, val option: LikeOption) : Criterion()
-    data class NotLike(val left: Operand, val right: Operand, val option: LikeOption) : Criterion()
+    data class Like(val left: Operand, val right: Operand) : Criterion()
+    data class NotLike(val left: Operand, val right: Operand) : Criterion()
     data class Between(val left: Operand, val right: Pair<Operand, Operand>) : Criterion()
     data class NotBetween(val left: Operand, val right: Pair<Operand, Operand>) : Criterion()
     data class InList(val left: Operand, val right: List<Operand>) : Criterion()

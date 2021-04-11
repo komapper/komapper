@@ -3,8 +3,6 @@ package org.komapper.core.dsl.scope
 import org.komapper.core.dsl.element.Criterion
 import org.komapper.core.dsl.element.Operand
 import org.komapper.core.dsl.expression.PropertyExpression
-import org.komapper.core.dsl.operand.LikeOperand
-import org.komapper.core.dsl.option.LikeOption
 import org.komapper.core.dsl.query.Subquery
 
 internal class FilterScopeSupport(
@@ -31,31 +29,12 @@ internal class FilterScopeSupport(
         context.add(operator(Operand.Parameter(right, left), Operand.Property(right)))
     }
 
-    private fun <T : Any> add(
-        operator: (Operand, Operand, LikeOption) -> Criterion,
-        left: PropertyExpression<T>,
-        right: PropertyExpression<T>,
-        option: LikeOption
-    ) {
-        context.add(operator(Operand.Property(left), Operand.Property(right), option))
+    private fun <T : CharSequence> addLikeOperator(left: PropertyExpression<T>, right: CharSequence) {
+        context.add(Criterion.Like(Operand.Property(left), Operand.Parameter(left, right)))
     }
 
-    private fun <T : Any> add(
-        operator: (Operand, Operand, LikeOption) -> Criterion,
-        left: PropertyExpression<T>,
-        right: Any,
-        option: LikeOption
-    ) {
-        context.add(operator(Operand.Property(left), Operand.Parameter(left, right), option))
-    }
-
-    private fun <T : Any> add(
-        operator: (Operand, Operand, LikeOption) -> Criterion,
-        left: Any,
-        right: PropertyExpression<T>,
-        option: LikeOption
-    ) {
-        context.add(operator(Operand.Parameter(right, left), Operand.Property(right), option))
+    private fun <T : CharSequence> addNotLikeOperator(left: PropertyExpression<T>, right: CharSequence) {
+        context.add(Criterion.NotLike(Operand.Property(left), Operand.Parameter(left, right)))
     }
 
     override infix fun <T : Any> PropertyExpression<T>.eq(operand: PropertyExpression<T>) {
@@ -152,66 +131,44 @@ internal class FilterScopeSupport(
         add(Criterion.IsNotNull(left))
     }
 
-    override infix fun <T : CharSequence> PropertyExpression<T>.like(operand: Any?) {
+    override infix fun <T : CharSequence> PropertyExpression<T>.like(operand: CharSequence?) {
         if (operand == null) return
-        add(Criterion::Like, this, operand, LikeOption.None)
+        addLikeOperator(this, operand)
     }
 
-    override infix fun <T : CharSequence> PropertyExpression<T>.like(operand: LikeOperand) {
-        val value = operand.value ?: return
-        val option = createLikeOption(operand)
-        add(Criterion::Like, this, value, option)
-    }
-
-    override infix fun <T : CharSequence> PropertyExpression<T>.notLike(operand: Any?) {
+    override infix fun <T : CharSequence> PropertyExpression<T>.notLike(operand: CharSequence?) {
         if (operand == null) return
-        add(Criterion::NotLike, this, operand, LikeOption.None)
+        addNotLikeOperator(this, operand)
     }
 
-    override infix fun <T : CharSequence> PropertyExpression<T>.notLike(operand: LikeOperand) {
-        val value = operand.value ?: return
-        val option = createLikeOption(operand)
-        add(Criterion::NotLike, this, value, option)
-    }
-
-    override fun <T : CharSequence> PropertyExpression<T>.startsWith(operand: Any?) {
+    override fun <T : CharSequence> PropertyExpression<T>.startsWith(operand: CharSequence?) {
         if (operand == null) return
-        add(Criterion::Like, this, operand, LikeOption.Prefix())
+        addLikeOperator(this, escape(operand) + text("%"))
     }
 
-    override fun <T : CharSequence> PropertyExpression<T>.notStartsWith(operand: Any?) {
+    override fun <T : CharSequence> PropertyExpression<T>.notStartsWith(operand: CharSequence?) {
         if (operand == null) return
-        add(Criterion::NotLike, this, operand, LikeOption.Prefix())
+        addNotLikeOperator(this, escape(operand) + text("%"))
     }
 
-    override fun <T : CharSequence> PropertyExpression<T>.contains(operand: Any?) {
+    override fun <T : CharSequence> PropertyExpression<T>.contains(operand: CharSequence?) {
         if (operand == null) return
-        add(Criterion::Like, this, operand, LikeOption.Infix())
+        addLikeOperator(this, text("%") + escape(operand) + text("%"))
     }
 
-    override fun <T : CharSequence> PropertyExpression<T>.notContains(operand: Any?) {
+    override fun <T : CharSequence> PropertyExpression<T>.notContains(operand: CharSequence?) {
         if (operand == null) return
-        add(Criterion::NotLike, this, operand, LikeOption.Infix())
+        addNotLikeOperator(this, text("%") + escape(operand) + text("%"))
     }
 
-    override fun <T : CharSequence> PropertyExpression<T>.endsWith(operand: Any?) {
+    override fun <T : CharSequence> PropertyExpression<T>.endsWith(operand: CharSequence?) {
         if (operand == null) return
-        add(Criterion::Like, this, operand, LikeOption.Suffix())
+        addLikeOperator(this, text("%") + escape(operand))
     }
 
-    override fun <T : CharSequence> PropertyExpression<T>.notEndsWith(operand: Any?) {
+    override fun <T : CharSequence> PropertyExpression<T>.notEndsWith(operand: CharSequence?) {
         if (operand == null) return
-        add(Criterion::NotLike, this, operand, LikeOption.Suffix())
-    }
-
-    private fun createLikeOption(operand: LikeOperand): LikeOption {
-        return when (operand) {
-            is LikeOperand.Normal -> LikeOption.None
-            is LikeOperand.Escape -> LikeOption.Escape(operand.escapeChar)
-            is LikeOperand.Prefix -> LikeOption.Prefix(operand.escapeChar)
-            is LikeOperand.Infix -> LikeOption.Infix(operand.escapeChar)
-            is LikeOperand.Suffix -> LikeOption.Suffix(operand.escapeChar)
-        }
+        addNotLikeOperator(this, text("%") + escape(operand))
     }
 
     override infix fun <T : Comparable<T>> PropertyExpression<T>.between(range: ClosedRange<T>) {
@@ -286,21 +243,5 @@ internal class FilterScopeSupport(
     override fun notExists(block: () -> Subquery<*>) {
         val subquery = block()
         add(Criterion.NotExists(subquery.subqueryContext))
-    }
-
-    override fun <T : CharSequence> T?.escape(): LikeOperand {
-        return LikeOperand.Escape(this)
-    }
-
-    override fun <T : CharSequence> T?.asPrefix(): LikeOperand {
-        return LikeOperand.Prefix(this)
-    }
-
-    override fun <T : CharSequence> T?.asInfix(): LikeOperand {
-        return LikeOperand.Infix(this)
-    }
-
-    override fun <T : CharSequence> T?.asSuffix(): LikeOperand {
-        return LikeOperand.Suffix(this)
     }
 }

@@ -43,6 +43,7 @@ import kotlin.reflect.KClass
 interface Dialect {
     val openQuote: String
     val closeQuote: String
+    val escapeChar: Char
     val escapePattern: Pattern
     val schemaStatementBuilder: SchemaStatementBuilder
 
@@ -62,7 +63,8 @@ abstract class AbstractDialect : Dialect {
 
     override val openQuote: String = "\""
     override val closeQuote: String = "\""
-    override val escapePattern: Pattern = Pattern.compile("""[\\_%]""")
+    override val escapeChar: Char = '\\'
+    override val escapePattern: Pattern = Pattern.compile("""[${escapeChar}${escapeChar}_%]""")
 
     override fun getValue(rs: ResultSet, index: Int, valueClass: KClass<*>): Any? {
         val dataType = getDataType(valueClass)

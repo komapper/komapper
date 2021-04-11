@@ -1,7 +1,7 @@
 package org.komapper.core.dsl.scope
 
+import org.komapper.core.dsl.expression.EscapeExpression
 import org.komapper.core.dsl.expression.PropertyExpression
-import org.komapper.core.dsl.operand.LikeOperand
 import org.komapper.core.dsl.query.Subquery
 
 interface FilterScope {
@@ -45,25 +45,21 @@ interface FilterScope {
 
     fun <T : Any> PropertyExpression<T>.isNotNull()
 
-    infix fun <T : CharSequence> PropertyExpression<T>.like(operand: Any?)
+    infix fun <T : CharSequence> PropertyExpression<T>.like(operand: CharSequence?)
 
-    infix fun <T : CharSequence> PropertyExpression<T>.like(operand: LikeOperand)
+    infix fun <T : CharSequence> PropertyExpression<T>.notLike(operand: CharSequence?)
 
-    infix fun <T : CharSequence> PropertyExpression<T>.notLike(operand: Any?)
+    infix fun <T : CharSequence> PropertyExpression<T>.startsWith(operand: CharSequence?)
 
-    infix fun <T : CharSequence> PropertyExpression<T>.notLike(operand: LikeOperand)
+    infix fun <T : CharSequence> PropertyExpression<T>.notStartsWith(operand: CharSequence?)
 
-    infix fun <T : CharSequence> PropertyExpression<T>.startsWith(operand: Any?)
+    infix fun <T : CharSequence> PropertyExpression<T>.contains(operand: CharSequence?)
 
-    infix fun <T : CharSequence> PropertyExpression<T>.notStartsWith(operand: Any?)
+    infix fun <T : CharSequence> PropertyExpression<T>.notContains(operand: CharSequence?)
 
-    infix fun <T : CharSequence> PropertyExpression<T>.contains(operand: Any?)
+    infix fun <T : CharSequence> PropertyExpression<T>.endsWith(operand: CharSequence?)
 
-    infix fun <T : CharSequence> PropertyExpression<T>.notContains(operand: Any?)
-
-    infix fun <T : CharSequence> PropertyExpression<T>.endsWith(operand: Any?)
-
-    infix fun <T : CharSequence> PropertyExpression<T>.notEndsWith(operand: Any?)
+    infix fun <T : CharSequence> PropertyExpression<T>.notEndsWith(operand: CharSequence?)
 
     infix fun <T : Comparable<T>> PropertyExpression<T>.between(range: ClosedRange<T>)
 
@@ -89,11 +85,13 @@ interface FilterScope {
 
     fun notExists(block: () -> Subquery<*>)
 
-    fun <T : CharSequence> T?.escape(): LikeOperand
+    fun text(value: CharSequence): EscapeExpression {
+        if (value is EscapeExpression) return value
+        return EscapeExpression.Text(value)
+    }
 
-    fun <T : CharSequence> T?.asPrefix(): LikeOperand
-
-    fun <T : CharSequence> T?.asInfix(): LikeOperand
-
-    fun <T : CharSequence> T?.asSuffix(): LikeOperand
+    fun escape(value: CharSequence): EscapeExpression {
+        if (value is EscapeExpression) return value
+        return EscapeExpression.Escape(value)
+    }
 }

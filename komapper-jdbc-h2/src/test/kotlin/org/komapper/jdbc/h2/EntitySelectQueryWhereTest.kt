@@ -7,6 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.Database
 import org.komapper.core.dsl.EntityQuery
 import org.komapper.core.dsl.desc
+import org.komapper.core.dsl.plus
 import org.komapper.core.dsl.scope.WhereDeclaration
 import org.komapper.core.dsl.scope.WhereScope.Companion.plus
 
@@ -70,6 +71,19 @@ class EntitySelectQueryWhereTest(private val db: Database) {
     }
 
     @Test
+    fun like_escape() {
+        val a = Address.metamodel()
+        val insertQuery = EntityQuery.insert(a, Address(16, "\\STREET _16%", 1))
+        val selectQuery = EntityQuery.from(a).where {
+            a.street like escape("\\S") + text("%") + escape("T _16%")
+        }.orderBy(a.addressId)
+        val list = db.execute {
+            insertQuery + selectQuery
+        }
+        assertEquals(listOf(16), list.map { it.addressId })
+    }
+
+    @Test
     fun notLike() {
         val a = Address.metamodel()
         val list = db.execute {
@@ -81,6 +95,19 @@ class EntitySelectQueryWhereTest(private val db: Database) {
     }
 
     @Test
+    fun notLike_escape() {
+        val a = Address.metamodel()
+        val insertQuery = EntityQuery.insert(a, Address(16, "\\STREET _16%", 1))
+        val selectQuery = EntityQuery.from(a).where {
+            a.street notLike escape("\\S") + text("%") + escape("T _16%")
+        }.orderBy(a.addressId)
+        val list = db.execute {
+            insertQuery + selectQuery
+        }
+        assertEquals((1..15).toList(), list.map { it.addressId })
+    }
+
+    @Test
     fun startsWith() {
         val a = Address.metamodel()
         val list = db.execute {
@@ -89,6 +116,17 @@ class EntitySelectQueryWhereTest(private val db: Database) {
             }.orderBy(a.addressId)
         }
         assertEquals(listOf(1) + (10..15), list.map { it.addressId })
+    }
+
+    @Test
+    fun startsWith_escape() {
+        val a = Address.metamodel()
+        val insertQuery = EntityQuery.insert(a, Address(16, "STREET 1%6", 1))
+        val selectQuery = EntityQuery.from(a).where {
+            a.street startsWith "STREET 1%"
+        }.orderBy(a.addressId)
+        val list = db.execute { insertQuery + selectQuery }
+        assertEquals(listOf(16), list.map { it.addressId })
     }
 
     @Test
