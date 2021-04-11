@@ -8,6 +8,7 @@ import org.komapper.annotation.KmId
 import org.komapper.annotation.KmTable
 import org.komapper.core.Database
 import org.komapper.core.dsl.EntityQuery
+import org.komapper.core.dsl.execute
 import java.io.Serializable
 import java.math.BigDecimal
 import java.math.BigInteger

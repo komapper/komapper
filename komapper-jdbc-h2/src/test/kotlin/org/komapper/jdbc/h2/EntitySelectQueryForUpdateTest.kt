@@ -6,6 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.Database
 import org.komapper.core.dsl.EntityQuery
 import org.komapper.core.dsl.desc
+import org.komapper.core.dsl.execute
 import org.komapper.core.dsl.scope.WhereScope.Companion.plus
 
 @ExtendWith(Env::class)

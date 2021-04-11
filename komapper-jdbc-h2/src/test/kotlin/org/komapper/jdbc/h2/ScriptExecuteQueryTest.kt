@@ -6,6 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.Database
 import org.komapper.core.dsl.ScriptQuery
 import org.komapper.core.dsl.TemplateQuery
+import org.komapper.core.dsl.execute
 
 @ExtendWith(Env::class)
 internal class ScriptExecuteQueryTest(private val db: Database) {

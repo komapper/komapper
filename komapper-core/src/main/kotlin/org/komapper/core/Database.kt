@@ -1,6 +1,5 @@
 package org.komapper.core
 
-import org.komapper.core.dsl.query.Query
 import java.sql.Blob
 import java.sql.Clob
 import java.sql.NClob
@@ -23,14 +22,6 @@ class Database(val config: DatabaseConfig) {
      * A data type factory.
      */
     val factory = Factory(config)
-
-    /**
-     * Execute a query.
-     * @param block the Query provider
-     */
-    fun <T> execute(block: () -> Query<T>): T {
-        return block().run(config)
-    }
 
     class Factory(val config: DatabaseConfig) {
         /**

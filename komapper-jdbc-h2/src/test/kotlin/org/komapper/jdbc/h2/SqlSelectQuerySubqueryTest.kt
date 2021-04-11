@@ -6,6 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.Database
 import org.komapper.core.dsl.SqlQuery
 import org.komapper.core.dsl.count
+import org.komapper.core.dsl.execute
 import org.komapper.core.dsl.max
 
 @ExtendWith(Env::class)

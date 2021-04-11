@@ -19,6 +19,7 @@ import org.komapper.annotation.KmUpdatedAt
 import org.komapper.annotation.KmVersion
 import org.komapper.core.Database
 import org.komapper.core.dsl.ScriptQuery
+import org.komapper.core.dsl.execute
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.LocalDateTime

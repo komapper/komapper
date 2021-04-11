@@ -7,6 +7,7 @@ import org.komapper.core.Database
 import org.komapper.core.dsl.SqlQuery
 import org.komapper.core.dsl.avg
 import org.komapper.core.dsl.count
+import org.komapper.core.dsl.execute
 import org.komapper.core.dsl.max
 import org.komapper.core.dsl.min
 import org.komapper.core.dsl.sum

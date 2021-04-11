@@ -7,6 +7,7 @@ import org.komapper.core.Database
 import org.komapper.core.dsl.SqlQuery
 import org.komapper.core.dsl.concat
 import org.komapper.core.dsl.div
+import org.komapper.core.dsl.execute
 import org.komapper.core.dsl.minus
 import org.komapper.core.dsl.plus
 import org.komapper.core.dsl.rem

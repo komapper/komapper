@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.Database
 import org.komapper.core.dsl.EntityQuery
+import org.komapper.core.dsl.execute
 
 @ExtendWith(Env::class)
 class EntitySelectQueryOffsetLimitTest(private val db: Database) {

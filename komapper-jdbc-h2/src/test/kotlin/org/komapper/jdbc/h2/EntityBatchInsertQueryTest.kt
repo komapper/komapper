@@ -8,6 +8,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.Database
 import org.komapper.core.UniqueConstraintException
 import org.komapper.core.dsl.EntityQuery
+import org.komapper.core.dsl.execute
 
 @ExtendWith(Env::class)
 class EntityBatchInsertQueryTest(private val db: Database) {

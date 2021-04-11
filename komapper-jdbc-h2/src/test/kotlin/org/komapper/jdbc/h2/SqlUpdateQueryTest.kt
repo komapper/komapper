@@ -7,6 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.Database
 import org.komapper.core.dsl.SqlQuery
 import org.komapper.core.dsl.concat
+import org.komapper.core.dsl.execute
 import org.komapper.core.dsl.plus
 
 @ExtendWith(Env::class)

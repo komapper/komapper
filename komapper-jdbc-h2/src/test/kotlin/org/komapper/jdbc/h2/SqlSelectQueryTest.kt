@@ -8,6 +8,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.Database
 import org.komapper.core.dsl.SqlQuery
 import org.komapper.core.dsl.count
+import org.komapper.core.dsl.execute
 
 @ExtendWith(Env::class)
 class SqlSelectQueryTest(private val db: Database) {

@@ -9,6 +9,7 @@ import org.komapper.annotation.KmSequenceGenerator
 import org.komapper.annotation.KmTable
 import org.komapper.core.Database
 import org.komapper.core.dsl.SchemaQuery
+import org.komapper.core.dsl.execute
 
 @ExtendWith(Env::class)
 class SchemaQueryTest(private val db: Database) {

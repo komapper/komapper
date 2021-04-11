@@ -10,6 +10,7 @@ import org.komapper.annotation.KmVersion
 import org.komapper.core.Database
 import org.komapper.core.dsl.EntityQuery
 import org.komapper.core.dsl.SchemaQuery
+import org.komapper.core.dsl.execute
 import org.komapper.jdbc.h2.H2DatabaseConfig
 import java.time.LocalDateTime
 

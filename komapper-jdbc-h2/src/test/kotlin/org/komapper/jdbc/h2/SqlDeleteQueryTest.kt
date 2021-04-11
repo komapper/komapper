@@ -6,6 +6,7 @@ import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.Database
 import org.komapper.core.dsl.SqlQuery
+import org.komapper.core.dsl.execute
 
 @ExtendWith(Env::class)
 class SqlDeleteQueryTest(private val db: Database) {

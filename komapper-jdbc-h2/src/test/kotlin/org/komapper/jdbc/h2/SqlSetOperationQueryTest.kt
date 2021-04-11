@@ -9,6 +9,7 @@ import org.komapper.core.dsl.EntityQuery
 import org.komapper.core.dsl.SqlQuery
 import org.komapper.core.dsl.alias
 import org.komapper.core.dsl.desc
+import org.komapper.core.dsl.execute
 import org.komapper.core.dsl.plus
 
 @ExtendWith(Env::class)

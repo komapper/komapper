@@ -1,5 +1,6 @@
 package org.komapper.core.dsl
 
+import org.komapper.core.Database
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.data.Statement
 import org.komapper.core.dsl.element.Operand
@@ -11,6 +12,15 @@ import org.komapper.core.dsl.expression.PropertyExpression
 import org.komapper.core.dsl.expression.ScalarExpression
 import org.komapper.core.dsl.expression.StringFunction
 import org.komapper.core.dsl.query.Query
+import org.komapper.core.dsl.query.QueryScope
+
+/**
+ * Execute a query.
+ * @param block the Query provider
+ */
+fun <T> Database.execute(block: QueryScope.() -> Query<T>): T {
+    return block(QueryScope).run(this.config)
+}
 
 fun <T, R> Query<T>.flatMap(transformer: (T) -> Query<R>): Query<R> {
     return object : Query<R> {
