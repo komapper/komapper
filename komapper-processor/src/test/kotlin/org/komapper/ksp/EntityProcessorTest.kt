@@ -16,6 +16,26 @@ class EntityProcessorTest {
     @JvmField
     var tempDir: Path? = null
 
+    @Test fun `The parent declaration of the entity class must be public`() {
+        val result = compile(
+            kotlin(
+                "source.kt",
+                """
+                package test
+                import org.komapper.annotation.*
+                internal class Parent { 
+                    @KmEntity
+                    data class Dept(
+                        val id: Int
+                    )
+                }
+                """
+            )
+        )
+        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
+        assertThat(result.messages).contains("The parent declaration of the entity class must be public.")
+    }
+
     @Test fun `Duplicated definitions are found`() {
         val result = compile(
             kotlin(

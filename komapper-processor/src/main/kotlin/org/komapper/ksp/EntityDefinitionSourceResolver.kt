@@ -1,7 +1,9 @@
 package org.komapper.ksp
 
 import com.google.devtools.ksp.isPrivate
+import com.google.devtools.ksp.isPublic
 import com.google.devtools.ksp.symbol.KSClassDeclaration
+import com.google.devtools.ksp.symbol.KSDeclaration
 import com.google.devtools.ksp.symbol.KSNode
 import com.google.devtools.ksp.symbol.KSType
 import com.google.devtools.ksp.symbol.Modifier
@@ -71,4 +73,13 @@ private fun validateEntityDeclaration(entityDeclaration: KSClassDeclaration) {
     if (entityDeclaration.isPrivate()) {
         report("The entity class must not be private.", entityDeclaration)
     }
+    validateParentDeclaration(entityDeclaration.parentDeclaration)
+}
+
+private fun validateParentDeclaration(declaration: KSDeclaration?) {
+    if (declaration == null) return
+    if (!declaration.isPublic()) {
+        report("The parent declaration of the entity class must be public.", declaration)
+    }
+    validateParentDeclaration(declaration.parentDeclaration)
 }
