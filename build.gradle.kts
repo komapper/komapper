@@ -1,10 +1,8 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 
 plugins {
-    base
-    kotlin("jvm") version "1.4.32" apply false
-    id("org.jlleitschuh.gradle.ktlint") version "10.0.0"
+    kotlin("jvm") version "1.4.32"
+    id("com.diffplug.spotless") version "5.11.1"
     id("io.github.gradle-nexus.publish-plugin") version "1.0.0"
     id("net.researchgate.release") version "2.8.1"
 }
@@ -12,6 +10,25 @@ plugins {
 val isReleaseVersion = !version.toString().endsWith("SNAPSHOT")
 
 allprojects {
+    apply(plugin = "com.diffplug.spotless")
+
+    configure<com.diffplug.gradle.spotless.SpotlessExtension> {
+        kotlin {
+            ratchetFrom("origin/main")
+            targetExclude("*/build/**")
+            ktlint("0.41.0")
+        }
+        kotlinGradle {
+            ktlint("0.41.0")
+        }
+    }
+
+    tasks {
+        build {
+            dependsOn(spotlessApply)
+        }
+    }
+
     repositories {
         mavenCentral()
         jcenter()
@@ -21,28 +38,8 @@ allprojects {
 
 subprojects {
     apply(plugin = "org.jetbrains.kotlin.jvm")
-    apply(plugin = "org.jlleitschuh.gradle.ktlint")
     apply(plugin = "maven-publish")
     apply(plugin = "signing")
-
-    ktlint {
-        version.set("0.41.0")
-        verbose.set(true)
-        outputToConsole.set(true)
-        coloredOutput.set(true)
-        reporters {
-            reporter(ReporterType.JSON)
-        }
-        filter {
-            exclude { element -> element.file.path.contains("generated/") }
-        }
-    }
-
-    tasks {
-        build {
-            dependsOn(ktlintFormat)
-        }
-    }
 
     tasks.withType<Test> {
         useJUnitPlatform()
