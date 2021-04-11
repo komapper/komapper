@@ -85,7 +85,7 @@ internal class EntityMetamodelGenerator(
                 }
                 else -> "null"
             }
-            w.println("        val $p = $PropertyDescriptor<$entityTypeName, ${p.typeName}>(${p.typeName}::class, \"${p.column.name}\", $getter, $setter, $nullable, $assignment)")
+            w.println("        val $p = $PropertyDescriptor<$entityTypeName, ${p.typeName}>(${p.typeName}::class, \"$p\", \"${p.column.name}\", $getter, $setter, $nullable, $assignment)")
         }
         w.println("    }")
     }

@@ -6,6 +6,7 @@ import kotlin.reflect.KClass
 
 internal class EnumTypeTest {
 
+    @Suppress("unused")
     enum class Direction {
         NORTH, SOUTH, WEST, EAST
     }

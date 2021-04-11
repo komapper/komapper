@@ -26,6 +26,7 @@ internal data class EntityBatchUpdateQueryImpl<ENTITY : Any>(
     }
 
     override fun run(config: DatabaseConfig): List<ENTITY> {
+        if (entities.isEmpty()) return emptyList()
         val newEntities = preUpdate(config)
         val statements = newEntities.map { buildStatement(config, it) }
         val (counts) = update(config, statements)

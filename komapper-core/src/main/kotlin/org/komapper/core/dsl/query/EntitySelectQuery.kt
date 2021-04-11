@@ -55,6 +55,10 @@ internal data class EntitySelectQueryImpl<ENTITY : Any>(
         fun entityMetamodelNotFound(parameterName: String): String {
             return "The '$parameterName' metamodel is not found. Bind it to this query in advance using the from or join clause."
         }
+
+        fun idPropertyRequired(parameterName: String): String {
+            return "The '$parameterName' metamodel must have one or more id properties."
+        }
     }
 
     private val support: SelectQuerySupport<ENTITY, EntitySelectContext<ENTITY>> = SelectQuerySupport(context)
@@ -81,9 +85,11 @@ internal data class EntitySelectQueryImpl<ENTITY : Any>(
         e2: EntityMetamodel<S>,
         associator: Associator<T, S>
     ): EntitySelectQueryImpl<ENTITY> {
+        require(e1.idProperties().isNotEmpty()) { idPropertyRequired("e1") }
+        require(e2.idProperties().isNotEmpty()) { idPropertyRequired("e2") }
         val entityExpressions = context.getEntityExpressions()
-        if (e1 !in entityExpressions) error(entityMetamodelNotFound("e1"))
-        if (e2 !in entityExpressions) error(entityMetamodelNotFound("e2"))
+        require(e1 in entityExpressions) { entityMetamodelNotFound("e1") }
+        require(e2 in entityExpressions) { entityMetamodelNotFound("e2") }
         @Suppress("UNCHECKED_CAST")
         val newContext = context.putAssociator(e1 to e2, associator as Associator<Any, Any>)
         return copy(context = newContext)
@@ -210,8 +216,10 @@ internal data class EntitySelectQueryImpl<ENTITY : Any>(
                 for (entityMetamodel in entityMetamodels) {
                     val entity = mapper.execute(entityMetamodel) ?: continue
                     val idValues = entityMetamodel.idProperties()
-                        .map { it.getterWithUncheckedCast(entity) }
-                        .map { it ?: error("The id value must not be null. entity=$entity") }
+                        .map { p ->
+                            p.getterWithUncheckedCast(entity)
+                                ?: error("The id value must not be null. entity=$entity, property=${p.name}")
+                        }
                     val key = EntityKey(entityMetamodel, idValues)
                     row[key] = entity
                 }

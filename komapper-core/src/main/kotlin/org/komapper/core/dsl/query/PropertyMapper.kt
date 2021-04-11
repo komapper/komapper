@@ -5,7 +5,7 @@ import org.komapper.core.dsl.expression.PropertyExpression
 import java.sql.ResultSet
 import kotlin.reflect.cast
 
-internal class PropertyMapper(val dialect: Dialect, val resultSet: ResultSet) {
+internal class PropertyMapper(val dialect: Dialect, private val resultSet: ResultSet) {
     private var index = 0
 
     fun <T : Any> execute(propertyExpression: PropertyExpression<T>): T? {

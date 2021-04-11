@@ -5,7 +5,7 @@ import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.metamodel.PropertyMetamodel
 import java.sql.ResultSet
 
-internal class EntityMapper(val dialect: Dialect, val resultSet: ResultSet) {
+internal class EntityMapper(val dialect: Dialect, resultSet: ResultSet) {
     private val propertyMapper = PropertyMapper(dialect, resultSet)
 
     fun <E : Any> execute(e: EntityMetamodel<E>, forceMapping: Boolean = false): E? {

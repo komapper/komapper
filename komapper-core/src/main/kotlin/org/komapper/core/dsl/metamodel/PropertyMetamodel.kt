@@ -17,6 +17,7 @@ class PropertyMetamodelImpl<E : Any, T : Any>(
     private val descriptor: PropertyDescriptor<E, T>
 ) : PropertyMetamodel<E, T> {
     override val klass: KClass<T> get() = descriptor.klass
+    override val name: String get() = descriptor.name
     override val columnName: String get() = descriptor.columnName
     override val getter: (E) -> T? get() = descriptor.getter
     override val getterWithUncheckedCast: (Any) -> T?
@@ -33,6 +34,7 @@ class PropertyMetamodelImpl<E : Any, T : Any>(
 class EmptyPropertyMetamodel<E : Any, T : Any> : PropertyMetamodel<E, T> {
     override val owner: EntityMetamodel<E> get() = fail()
     override val klass: KClass<T> get() = fail()
+    override val name: String get() = fail()
     override val columnName: String get() = fail()
     override val getter: (E) -> T? get() = fail()
     override val getterWithUncheckedCast: (Any) -> T? get() = fail()

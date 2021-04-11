@@ -26,6 +26,7 @@ internal data class EntityBatchInsertQueryImpl<ENTITY : Any>(
     }
 
     override fun run(config: DatabaseConfig): List<ENTITY> {
+        if (entities.isEmpty()) return emptyList()
         val newEntities = preInsert(config)
         val statements = newEntities.map { buildStatement(config, it) }
         val (_, generatedKeys) = insert(config, statements)

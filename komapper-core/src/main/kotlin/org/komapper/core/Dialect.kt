@@ -64,7 +64,12 @@ abstract class AbstractDialect : Dialect {
     override val openQuote: String = "\""
     override val closeQuote: String = "\""
     override val escapeChar: Char = '\\'
-    override val escapePattern: Pattern = Pattern.compile("""[${escapeChar}${escapeChar}_%]""")
+    override val escapePattern: Pattern
+        get() {
+            @Suppress("RegExpDuplicateCharacterInClass")
+            val regex = "[${escapeChar}${escapeChar}_%]"
+            return Pattern.compile(regex)
+        }
 
     override fun getValue(rs: ResultSet, index: Int, valueClass: KClass<*>): Any? {
         val dataType = getDataType(valueClass)

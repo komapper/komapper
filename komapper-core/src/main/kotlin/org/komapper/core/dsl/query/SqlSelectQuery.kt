@@ -90,6 +90,9 @@ internal data class SqlSelectQueryImpl<ENTITY : Any>(
         fun entityMetamodelNotFound(parameterName: String): String {
             return "The '$parameterName' metamodel is not found. Bind it to this query in advance using the from or join clause."
         }
+        fun entityMetamodelNotFound(parameterName: String, index: Int): String {
+            return "The '$parameterName' metamodel(index=$index) is not found. Bind it to this query in advance using the from or join clause."
+        }
     }
 
     private val support: SelectQuerySupport<ENTITY, SqlSelectContext<ENTITY>> = SelectQuerySupport(context)
@@ -176,9 +179,9 @@ internal data class SqlSelectQueryImpl<ENTITY : Any>(
         return support.unionAll(this, other)
     }
 
-    override fun <A : Any> select(
-        e: EntityMetamodel<A>,
-    ): Subquery<Pair<ENTITY, A?>> {
+    override fun <B : Any> select(
+        e: EntityMetamodel<B>,
+    ): Subquery<Pair<ENTITY, B?>> {
         val entityExpressions = context.getEntityExpressions()
         if (e !in entityExpressions) error(entityMetamodelNotFound("e"))
         val newContext = context.setEntities(context.entityMetamodel, e)
@@ -189,10 +192,10 @@ internal data class SqlSelectQueryImpl<ENTITY : Any>(
         }
     }
 
-    override fun <A : Any, B : Any> select(
-        e1: EntityMetamodel<A>,
-        e2: EntityMetamodel<B>
-    ): Subquery<Triple<ENTITY, A?, B?>> {
+    override fun <B : Any, C : Any> select(
+        e1: EntityMetamodel<B>,
+        e2: EntityMetamodel<C>
+    ): Subquery<Triple<ENTITY, B?, C?>> {
         val entityExpressions = context.getEntityExpressions()
         if (e1 !in entityExpressions) error(entityMetamodelNotFound("e1"))
         if (e2 !in entityExpressions) error(entityMetamodelNotFound("e2"))
@@ -205,11 +208,15 @@ internal data class SqlSelectQueryImpl<ENTITY : Any>(
     }
 
     override fun select(vararg entityMetamodels: EntityMetamodel<*>): Subquery<EntityRecord> {
-        val list = entityMetamodels.toList()
+        val entityExpressions = context.getEntityExpressions()
+        for ((i, e) in entityMetamodels.withIndex()) {
+            if (e !in entityExpressions) error(entityMetamodelNotFound("e", i))
+        }
+        val list = listOf(context.entityMetamodel) + entityMetamodels.toList()
         val newContext = context.setEntities(*list.toTypedArray())
         return Transformable(newContext, option) { dialect, rs: ResultSet ->
-            val mapper = EntityMapper(dialect, rs)
-            val map = list.associateWith { mapper.execute(it) }
+            val m = EntityMapper(dialect, rs)
+            val map = list.associateWith { m.execute(it) }
             EntityRecordImpl(map)
         }
     }

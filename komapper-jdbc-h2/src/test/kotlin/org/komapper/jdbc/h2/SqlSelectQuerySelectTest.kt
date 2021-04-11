@@ -166,18 +166,27 @@ class SqlSelectQuerySelectTest(private val db: Database) {
     @Test
     fun selectEntitiesAsRecord() {
         val a = Address.metamodel()
+        val e = Employee.metamodel()
+        val d = Department.metamodel()
         val list = db.execute {
             SqlQuery.from(a)
                 .where {
                     a.addressId inList listOf(1, 2)
                 }
+                .innerJoin(e) {
+                    a.addressId eq e.addressId
+                }
+                .innerJoin(d) {
+                    e.departmentId eq d.departmentId
+                }
                 .orderBy(a.addressId)
-                .select(a, a, a)
+                .select(a, e, d)
         }
         assertEquals(2, list.size)
         val record0 = list[0]
-        val address = record0[a]
-        assertNotNull(address)
+        assertTrue(record0[a] is Address)
+        assertTrue(record0[e] is Employee)
+        assertTrue(record0[d] is Department)
     }
 
     @Test

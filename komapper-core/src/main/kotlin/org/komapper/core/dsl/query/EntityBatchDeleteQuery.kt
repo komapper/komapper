@@ -26,6 +26,7 @@ internal data class EntityBatchDeleteQueryImpl<ENTITY : Any>(
     }
 
     override fun run(config: DatabaseConfig) {
+        if (entities.isEmpty()) return
         val statements = entities.map { buildStatement(config, it) }
         val (counts) = delete(config, statements)
         postDelete(counts)

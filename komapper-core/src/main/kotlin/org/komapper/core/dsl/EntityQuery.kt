@@ -27,16 +27,18 @@ import org.komapper.core.dsl.query.Query
 object EntityQuery : Dsl {
 
     private object Messages {
-        const val mustNotBeEmpty = "The entity list must not be empty."
         const val idPropertyRequired = "The entity metamodel must have one or more id properties."
         const val idValueRequired = "The entity must have one or more id value."
+        fun idValueRequired(index: Int) = "The entity(index=$index) must have one or more id value."
     }
 
     fun <ENTITY : Any> first(entityMetamodel: EntityMetamodel<ENTITY>): EntityFindQuery<ENTITY, ENTITY> {
+        require(hasIdProperty(entityMetamodel)) { Messages.idPropertyRequired }
         return createFindQuery(entityMetamodel) { it.first() }
     }
 
     fun <ENTITY : Any> firstOrNull(entityMetamodel: EntityMetamodel<ENTITY>): EntityFindQuery<ENTITY, ENTITY?> {
+        require(hasIdProperty(entityMetamodel)) { Messages.idPropertyRequired }
         return createFindQuery(entityMetamodel) { it.firstOrNull() }
     }
 
@@ -49,6 +51,7 @@ object EntityQuery : Dsl {
     }
 
     fun <ENTITY : Any> from(entityMetamodel: EntityMetamodel<ENTITY>): EntitySelectQuery<ENTITY> {
+        require(hasIdProperty(entityMetamodel)) { Messages.idPropertyRequired }
         return EntitySelectQueryImpl(EntitySelectContext(entityMetamodel))
     }
 
@@ -71,7 +74,6 @@ object EntityQuery : Dsl {
         entityMetamodel: EntityMetamodel<ENTITY>,
         entities: List<ENTITY>
     ): EntityBatchInsertQuery<ENTITY> {
-        require(entities.isNotEmpty()) { Messages.mustNotBeEmpty }
         require(hasIdProperty(entityMetamodel)) { Messages.idPropertyRequired }
         return EntityBatchInsertQueryImpl(EntityInsertContext(entityMetamodel), entities)
     }
@@ -80,8 +82,10 @@ object EntityQuery : Dsl {
         entityMetamodel: EntityMetamodel<ENTITY>,
         entities: List<ENTITY>
     ): EntityBatchUpdateQuery<ENTITY> {
-        require(entities.isNotEmpty()) { Messages.mustNotBeEmpty }
-        require(entities.all { hasIdValue(entityMetamodel, it) }) { Messages.idValueRequired }
+        require(hasIdProperty(entityMetamodel)) { Messages.idPropertyRequired }
+        for ((i, entity) in entities.withIndex()) {
+            require(hasIdValue(entityMetamodel, entity)) { Messages.idValueRequired(i) }
+        }
         return EntityBatchUpdateQueryImpl(EntityUpdateContext(entityMetamodel), entities)
     }
 
@@ -89,8 +93,10 @@ object EntityQuery : Dsl {
         entityMetamodel: EntityMetamodel<ENTITY>,
         entities: List<ENTITY>
     ): EntityBatchDeleteQuery<ENTITY> {
-        require(entities.isNotEmpty()) { Messages.mustNotBeEmpty }
-        require(entities.all { hasIdValue(entityMetamodel, it) }) { Messages.idValueRequired }
+        require(hasIdProperty(entityMetamodel)) { Messages.idPropertyRequired }
+        for ((i, entity) in entities.withIndex()) {
+            require(hasIdValue(entityMetamodel, entity)) { Messages.idValueRequired(i) }
+        }
         return EntityBatchDeleteQueryImpl(EntityDeleteContext(entityMetamodel), entities)
     }
 
@@ -99,7 +105,6 @@ object EntityQuery : Dsl {
     }
 
     private fun <ENTITY : Any> hasIdValue(entityMetamodel: EntityMetamodel<ENTITY>, entity: ENTITY): Boolean {
-        return hasIdProperty(entityMetamodel) &&
-            entityMetamodel.idProperties().map { it.getter(entity) }.all { it != null }
+        return entityMetamodel.idProperties().map { it.getter(entity) }.all { it != null }
     }
 }
