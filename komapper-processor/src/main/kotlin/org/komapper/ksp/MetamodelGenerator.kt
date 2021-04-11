@@ -3,6 +3,7 @@ package org.komapper.ksp
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.Nullability
 import java.io.PrintWriter
+import java.time.ZonedDateTime
 
 private const val Assignment = "org.komapper.core.dsl.metamodel.Assignment"
 private const val EntityMetamodel = "org.komapper.core.dsl.metamodel.EntityMetamodel"
@@ -33,6 +34,7 @@ internal class EntityMetamodelGenerator(
     override fun run() {
         w.println("package $packageName")
         w.println()
+        w.println("// generated at ${ZonedDateTime.now()}")
         w.println("@Suppress(\"ClassName\", \"PrivatePropertyName\")")
         w.println("class $simpleName($constructorParamList) : $EntityMetamodel<$entityTypeName> {")
         w.println("    private val __tableName = table")
@@ -191,6 +193,7 @@ internal class EmptyEntityMetamodelGenerator(
     override fun run() {
         w.println("package $packageName")
         w.println()
+        w.println("// generated at ${ZonedDateTime.now()}")
         w.println("@Suppress(\"ClassName\")")
         w.println("class $fileName : $EmptyEntityMetamodel<$simpleQualifiedName>() {")
         val parameters = classDeclaration.primaryConstructor?.parameters
