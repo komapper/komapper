@@ -24,7 +24,7 @@ internal class BuilderSupport(
 
     fun visitEntityExpression(expression: EntityExpression<*>) {
         val name = expression.getCanonicalTableName(dialect::quote)
-        val alias = aliasManager.getAlias(expression) ?: error("Alias is not found. table=$name, ,sql=$buf")
+        val alias = aliasManager.getAlias(expression) ?: error("Alias is not found. table=$name ,sql=$buf")
         buf.append("$name $alias")
     }
 
@@ -125,9 +125,8 @@ internal class BuilderSupport(
                 buf.append(" % ")
                 visitOperand(expression.right)
             }
-        }.also {
-            buf.append(")")
         }
+        buf.append(")")
     }
 
     private fun visitSingleProjectionQuery(expression: ScalarQuery<*, *>) {
@@ -147,9 +146,8 @@ internal class BuilderSupport(
                 visitOperand(function.right)
                 buf.append(")")
             }
-        }.also {
-            buf.append(")")
         }
+        buf.append(")")
     }
 
     fun visitCriterion(index: Int, c: Criterion) {
