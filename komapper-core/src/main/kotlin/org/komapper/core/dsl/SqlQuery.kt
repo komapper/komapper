@@ -47,7 +47,10 @@ object SqlQuery : Dsl {
         return SqlInsertQueryBuilderImpl(query)
     }
 
-    fun <ENTITY : Any> update(entityMetamodel: EntityMetamodel<ENTITY>, declaration: SetDeclaration): SqlUpdateQuery {
+    fun <ENTITY : Any> update(
+        entityMetamodel: EntityMetamodel<ENTITY>,
+        declaration: SetDeclaration<ENTITY>
+    ): SqlUpdateQuery<ENTITY> {
         return SqlUpdateQueryImpl(SqlUpdateContext(entityMetamodel)).set(declaration)
     }
 

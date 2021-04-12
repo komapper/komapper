@@ -12,19 +12,19 @@ import org.komapper.core.dsl.scope.SqlUpdateOptionScope
 import org.komapper.core.dsl.scope.WhereDeclaration
 import org.komapper.core.dsl.scope.WhereScope
 
-interface SqlUpdateQuery : Query<Int> {
-    fun set(declaration: SetDeclaration): SqlUpdateQuery
-    fun where(declaration: WhereDeclaration): SqlUpdateQuery
-    fun option(declaration: SqlUpdateOptionDeclaration): SqlUpdateQuery
+interface SqlUpdateQuery<ENTITY : Any> : Query<Int> {
+    fun set(declaration: SetDeclaration<ENTITY>): SqlUpdateQuery<ENTITY>
+    fun where(declaration: WhereDeclaration): SqlUpdateQuery<ENTITY>
+    fun option(declaration: SqlUpdateOptionDeclaration): SqlUpdateQuery<ENTITY>
 }
 
 internal data class SqlUpdateQueryImpl<ENTITY : Any>(
     private val context: SqlUpdateContext<ENTITY>,
     private val option: SqlUpdateOption = QueryOptionImpl()
-) : SqlUpdateQuery {
+) : SqlUpdateQuery<ENTITY> {
 
-    override fun set(declaration: SetDeclaration): SqlUpdateQueryImpl<ENTITY> {
-        val scope = SetScope()
+    override fun set(declaration: SetDeclaration<ENTITY>): SqlUpdateQueryImpl<ENTITY> {
+        val scope = SetScope<ENTITY>()
         declaration(scope)
         val newContext = context.addSet(scope.toList())
         return copy(context = newContext)

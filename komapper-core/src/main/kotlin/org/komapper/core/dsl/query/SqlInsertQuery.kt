@@ -13,7 +13,7 @@ import org.komapper.core.dsl.scope.ValuesDeclaration
 import org.komapper.core.dsl.scope.ValuesScope
 
 interface SqlInsertQuery<ENTITY : Any> : Query<Pair<Int, LongArray>> {
-    fun values(declaration: ValuesDeclaration): SqlInsertQuery<ENTITY>
+    fun values(declaration: ValuesDeclaration<ENTITY>): SqlInsertQuery<ENTITY>
     fun <T : Any> select(block: () -> Subquery<T>): SqlInsertQuery<ENTITY>
     fun option(declaration: SqlInsertOptionDeclaration): SqlInsertQuery<ENTITY>
 }
@@ -23,8 +23,8 @@ internal data class SqlInsertQueryImpl<ENTITY : Any>(
     private val option: SqlInsertOption = QueryOptionImpl()
 ) : SqlInsertQuery<ENTITY> {
 
-    override fun values(declaration: ValuesDeclaration): SqlInsertQueryImpl<ENTITY> {
-        val scope = ValuesScope()
+    override fun values(declaration: ValuesDeclaration<ENTITY>): SqlInsertQueryImpl<ENTITY> {
+        val scope = ValuesScope<ENTITY>()
         declaration(scope)
         val values = when (val values = context.values) {
             is Values.Pairs -> Values.Pairs(values.pairs + scope.toList())
@@ -71,12 +71,12 @@ internal data class SqlInsertQueryImpl<ENTITY : Any>(
 }
 
 interface SqlInsertQueryBuilder<T : Any> {
-    fun values(declaration: ValuesDeclaration): SqlInsertQuery<T>
+    fun values(declaration: ValuesDeclaration<T>): SqlInsertQuery<T>
     fun select(block: () -> Subquery<T>): SqlInsertQuery<T>
 }
 
 internal class SqlInsertQueryBuilderImpl<T : Any>(val query: SqlInsertQuery<T>) : SqlInsertQueryBuilder<T> {
-    override fun values(declaration: ValuesDeclaration): SqlInsertQuery<T> {
+    override fun values(declaration: ValuesDeclaration<T>): SqlInsertQuery<T> {
         return query.values(declaration)
     }
 
