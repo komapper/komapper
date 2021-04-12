@@ -16,7 +16,7 @@ import org.komapper.core.dsl.expression.PropertyExpression
 import org.komapper.core.dsl.expression.StringFunction
 import org.komapper.core.dsl.query.ScalarQuery
 
-internal class BuilderSupport(
+class BuilderSupport(
     private val dialect: Dialect,
     private val aliasManager: AliasManager,
     private val buf: StatementBuffer
@@ -25,7 +25,11 @@ internal class BuilderSupport(
     fun visitEntityExpression(expression: EntityExpression<*>) {
         val name = expression.getCanonicalTableName(dialect::quote)
         val alias = aliasManager.getAlias(expression) ?: error("Alias is not found. table=$name ,sql=$buf")
-        buf.append("$name $alias")
+        if (alias.isEmpty()) {
+            buf.append("$name")
+        } else {
+            buf.append("$name $alias")
+        }
     }
 
     fun visitPropertyExpression(expression: PropertyExpression<*>) {

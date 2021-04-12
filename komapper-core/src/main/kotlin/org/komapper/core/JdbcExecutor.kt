@@ -8,7 +8,7 @@ import java.sql.PreparedStatement
 import java.sql.ResultSet
 import java.sql.SQLException
 
-internal class JdbcExecutor(
+class JdbcExecutor(
     private val config: DatabaseConfig,
     jdbcOption: JdbcOption,
     private val prepare: (Connection, String) -> PreparedStatement = { con, sql ->

@@ -7,6 +7,8 @@ interface EntityMetamodel<ENTITY : Any> : EntityExpression<ENTITY> {
     fun idAssignment(): Assignment<ENTITY>?
     fun idProperties(): List<PropertyMetamodel<ENTITY, *>>
     fun versionProperty(): PropertyMetamodel<ENTITY, *>?
+    fun createdAtProperty(): PropertyMetamodel<ENTITY, *>?
+    fun updatedAtProperty(): PropertyMetamodel<ENTITY, *>?
     fun properties(): List<PropertyMetamodel<ENTITY, *>>
     fun instantiate(__m: Map<PropertyMetamodel<*, *>, Any?>): ENTITY
     fun incrementVersion(__e: ENTITY): ENTITY
@@ -22,6 +24,8 @@ abstract class EmptyEntityMetamodel<ENTITY : Any> : EntityMetamodel<ENTITY> {
     override fun idAssignment(): Assignment<ENTITY>? = fail()
     override fun idProperties(): List<PropertyMetamodel<ENTITY, *>> = fail()
     override fun versionProperty(): PropertyMetamodel<ENTITY, *>? = fail()
+    override fun createdAtProperty(): PropertyMetamodel<ENTITY, *>? = fail()
+    override fun updatedAtProperty(): PropertyMetamodel<ENTITY, *>? = fail()
     override fun properties(): List<PropertyMetamodel<ENTITY, *>> = fail()
     override fun instantiate(__m: Map<PropertyMetamodel<*, *>, Any?>): ENTITY = fail()
     override fun incrementVersion(__e: ENTITY): ENTITY = fail()

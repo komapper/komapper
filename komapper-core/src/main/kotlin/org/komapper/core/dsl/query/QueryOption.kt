@@ -2,60 +2,60 @@ package org.komapper.core.dsl.query
 
 import org.komapper.core.data.JdbcOption
 
-internal interface QueryOption {
+interface QueryOption {
     val queryTimeoutSeconds: Int?
     fun asJdbcOption(): JdbcOption
 }
 
-internal interface VersionOption : QueryOption {
+interface VersionOption : QueryOption {
     val ignoreVersion: Boolean
     val suppressOptimisticLockException: Boolean
 }
 
-internal interface BatchOption : QueryOption {
+interface BatchOption : QueryOption {
     val batchSize: Int?
 }
 
-internal interface SelectOption : QueryOption {
+interface SelectOption : QueryOption {
     val fetchSize: Int?
     val maxRows: Int?
 }
 
-internal interface WhereOption : QueryOption {
+interface WhereOption : QueryOption {
     val allowEmptyWhereClause: Boolean
 }
 
-internal interface EntityDeleteOption : VersionOption
+interface EntityDeleteOption : VersionOption
 
-internal interface EntityInsertOption : QueryOption
+interface EntityInsertOption : QueryOption
 
-internal interface EntityUpdateOption : VersionOption
+interface EntityUpdateOption : VersionOption
 
-internal interface EntitySelectOption : SelectOption, WhereOption {
+interface EntitySelectOption : SelectOption, WhereOption {
     fun asSqlSelectOption(): SqlSelectOption
 }
 
-internal interface EntityBatchDeleteOption : EntityDeleteOption, BatchOption
+interface EntityBatchDeleteOption : EntityDeleteOption, BatchOption
 
-internal interface EntityBatchInsertOption : EntityInsertOption, BatchOption
+interface EntityBatchInsertOption : EntityInsertOption, BatchOption
 
-internal interface EntityBatchUpdateOption : EntityUpdateOption, BatchOption
+interface EntityBatchUpdateOption : EntityUpdateOption, BatchOption
 
-internal interface SqlDeleteOption : WhereOption
+interface SqlDeleteOption : WhereOption
 
-internal interface SqlInsertOption : QueryOption
+interface SqlInsertOption : QueryOption
 
-internal interface SqlUpdateOption : WhereOption
+interface SqlUpdateOption : WhereOption
 
-internal interface SqlSelectOption : SelectOption, WhereOption
+interface SqlSelectOption : SelectOption, WhereOption
 
-internal interface SqlSetOperationOption : SelectOption, WhereOption
+interface SqlSetOperationOption : SelectOption, WhereOption
 
-internal interface TemplateSelectOption : SelectOption
+interface TemplateSelectOption : SelectOption
 
-internal interface TemplateUpdateOption : QueryOption
+interface TemplateUpdateOption : QueryOption
 
-internal interface ScriptExecutionOption : QueryOption
+interface ScriptExecutionOption : QueryOption
 
 internal data class QueryOptionImpl(
     override val batchSize: Int? = null,

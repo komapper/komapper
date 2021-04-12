@@ -25,8 +25,4 @@ open class H2Dialect(val version: Version = Version.V1_4) : AbstractDialect() {
     override fun getSequenceSql(sequenceName: String): String {
         return "call next value for $sequenceName"
     }
-
-    override fun supportsMerge(): Boolean = true
-
-    override fun supportsUpsert(): Boolean = false
 }

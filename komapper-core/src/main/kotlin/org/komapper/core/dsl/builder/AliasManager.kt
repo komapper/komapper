@@ -8,7 +8,7 @@ interface AliasManager {
     fun getAlias(expression: EntityExpression<*>): String?
 }
 
-internal class AliasManagerImpl(context: Context, private val parent: AliasManager? = null) : AliasManager {
+class AliasManagerImpl(context: Context, private val parent: AliasManager? = null) : AliasManager {
     private val aliasMap: Map<EntityExpression<*>, String>
     override val index: Int
 
@@ -35,7 +35,7 @@ internal class AliasManagerImpl(context: Context, private val parent: AliasManag
     }
 }
 
-internal object EmptyAliasManager : AliasManager {
+object EmptyAliasManager : AliasManager {
     override val index: Int = 0
     override fun getAlias(expression: EntityExpression<*>): String = ""
 }

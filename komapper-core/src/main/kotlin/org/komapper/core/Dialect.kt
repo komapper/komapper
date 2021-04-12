@@ -54,8 +54,6 @@ interface Dialect {
     fun isUniqueConstraintViolation(exception: SQLException): Boolean
     fun getSequenceSql(sequenceName: String): String
     fun quote(name: String): String
-    fun supportsMerge(): Boolean
-    fun supportsUpsert(): Boolean
     fun escape(text: String): String
 }
 
@@ -126,10 +124,6 @@ abstract class AbstractDialect : Dialect {
 
     override fun quote(name: String): String =
         name.split('.').joinToString(".") { openQuote + it + closeQuote }
-
-    override fun supportsMerge(): Boolean = false
-
-    override fun supportsUpsert(): Boolean = false
 
     override fun escape(text: String): String {
         val matcher = escapePattern.matcher(text)

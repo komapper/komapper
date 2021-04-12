@@ -53,6 +53,8 @@ internal class EntityMetamodelGenerator(
         idAssignment()
         idProperties()
         versionProperty()
+        createdAtProperty()
+        updatedAtProperty()
         properties()
         instantiate()
         incrementVersion()
@@ -131,6 +133,14 @@ internal class EntityMetamodelGenerator(
 
     private fun versionProperty() {
         w.println("    override fun versionProperty(): $PropertyMetamodel<$entityTypeName, *>? = ${entity.versionProperty}")
+    }
+
+    private fun createdAtProperty() {
+        w.println("    override fun createdAtProperty(): $PropertyMetamodel<$entityTypeName, *>? = ${entity.createdAtProperty}")
+    }
+
+    private fun updatedAtProperty() {
+        w.println("    override fun updatedAtProperty(): $PropertyMetamodel<$entityTypeName, *>? = ${entity.updatedAtProperty}")
     }
 
     private fun properties() {

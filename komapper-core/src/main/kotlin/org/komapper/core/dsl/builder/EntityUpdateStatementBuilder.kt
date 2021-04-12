@@ -20,13 +20,14 @@ internal class EntityUpdateStatementBuilder<ENTITY : Any>(
     private val support = BuilderSupport(dialect, aliasManager, buf)
 
     fun build(): Statement {
-        val identityProperties = context.entityMetamodel.idProperties()
+        val idProperties = context.entityMetamodel.idProperties()
         val versionProperty = context.entityMetamodel.versionProperty()
+        val createdAtProperty = context.entityMetamodel.createdAtProperty()
         val properties = context.entityMetamodel.properties()
         buf.append("update ")
         table(context.entityMetamodel)
         buf.append(" set ")
-        for (p in properties - identityProperties) {
+        for (p in (properties - idProperties).filter { it != createdAtProperty }) {
             column(p)
             buf.append(" = ")
             val value = Value(p.getter(entity), p.klass)
@@ -38,10 +39,10 @@ internal class EntityUpdateStatementBuilder<ENTITY : Any>(
         }
         buf.cutBack(2)
         val versionRequired = versionProperty != null && !option.ignoreVersion
-        if (identityProperties.isNotEmpty() || versionRequired) {
+        if (idProperties.isNotEmpty() || versionRequired) {
             buf.append(" where ")
-            if (identityProperties.isNotEmpty()) {
-                for (p in identityProperties) {
+            if (idProperties.isNotEmpty()) {
+                for (p in idProperties) {
                     column(p)
                     buf.append(" = ")
                     val value = Value(p.getter(entity), p.klass)

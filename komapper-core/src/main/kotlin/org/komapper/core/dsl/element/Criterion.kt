@@ -2,7 +2,7 @@ package org.komapper.core.dsl.element
 
 import org.komapper.core.dsl.context.SubqueryContext
 
-internal sealed class Criterion {
+sealed class Criterion {
     data class Eq(val left: Operand, val right: Operand) : Criterion()
     data class NotEq(val left: Operand, val right: Operand) : Criterion()
     data class Less(val left: Operand, val right: Operand) : Criterion()
