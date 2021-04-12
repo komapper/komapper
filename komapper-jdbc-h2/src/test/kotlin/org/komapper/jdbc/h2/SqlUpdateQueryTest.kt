@@ -90,7 +90,7 @@ class SqlUpdateQueryTest(private val db: Database) {
         val count = db.execute {
             SqlQuery.update(e) {
                 e.employeeName set "ABC"
-            }.option { allowEmptyWhereClause = true }
+            }.option { it.copy(allowEmptyWhereClause = true) }
         }
         assertEquals(14, count)
     }

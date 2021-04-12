@@ -1,6 +1,7 @@
 package org.komapper.core.dsl.query
 
 import org.komapper.core.OptimisticLockException
+import org.komapper.core.dsl.option.VersionOption
 
 fun checkOptimisticLock(
     option: VersionOption,

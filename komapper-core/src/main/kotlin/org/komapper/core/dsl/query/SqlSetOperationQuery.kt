@@ -11,19 +11,19 @@ import org.komapper.core.dsl.context.SqlSetOperationKind
 import org.komapper.core.dsl.context.SubqueryContext
 import org.komapper.core.dsl.element.SortItem
 import org.komapper.core.dsl.expression.PropertyExpression
-import org.komapper.core.dsl.scope.SqlSetOperationOptionDeclaration
-import org.komapper.core.dsl.scope.SqlSetOperationOptionScope
+import org.komapper.core.dsl.option.QueryOptionConfigurator
+import org.komapper.core.dsl.option.SqlSetOperationOption
 import java.sql.ResultSet
 
 interface SqlSetOperationQuery<T> : Subquery<T> {
     fun orderBy(vararg aliases: CharSequence): SqlSetOperationQuery<T>
     fun orderBy(vararg expressions: PropertyExpression<*>): SqlSetOperationQuery<T>
-    fun option(declaration: SqlSetOperationOptionDeclaration): SqlSetOperationQuery<T>
+    fun option(configurator: QueryOptionConfigurator<SqlSetOperationOption>): SqlSetOperationQuery<T>
 }
 
 internal data class SetOperationQueryImpl<T>(
     private val context: SqlSetOperationContext<T>,
-    private val option: SqlSetOperationOption = QueryOptionImpl(allowEmptyWhereClause = true),
+    private val option: SqlSetOperationOption = SqlSetOperationOption(),
     private val provider: (Dialect, ResultSet) -> T
 ) : SqlSetOperationQuery<T> {
 
@@ -74,10 +74,8 @@ internal data class SetOperationQueryImpl<T>(
         return copy(context = newContext)
     }
 
-    override fun option(declaration: SqlSetOperationOptionDeclaration): SetOperationQueryImpl<T> {
-        val scope = SqlSetOperationOptionScope(option)
-        declaration(scope)
-        return copy(option = scope.asOption())
+    override fun option(configurator: QueryOptionConfigurator<SqlSetOperationOption>): SetOperationQueryImpl<T> {
+        return copy(option = configurator.apply(option))
     }
 
     override fun run(config: DatabaseConfig): List<T> {

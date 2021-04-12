@@ -3,26 +3,24 @@ package org.komapper.core.dsl.query
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.data.Statement
 import org.komapper.core.dsl.context.EntityDeleteContext
-import org.komapper.core.dsl.scope.EntityBatchDeleteOptionDeclaration
-import org.komapper.core.dsl.scope.EntityBatchDeleteOptionScope
+import org.komapper.core.dsl.option.EntityBatchDeleteOption
+import org.komapper.core.dsl.option.QueryOptionConfigurator
 
 interface EntityBatchDeleteQuery<ENTITY : Any> : Query<Unit> {
-    fun option(declaration: EntityBatchDeleteOptionDeclaration): EntityBatchDeleteQuery<ENTITY>
+    fun option(configurator: QueryOptionConfigurator<EntityBatchDeleteOption>): EntityBatchDeleteQuery<ENTITY>
 }
 
 internal data class EntityBatchDeleteQueryImpl<ENTITY : Any>(
     private val context: EntityDeleteContext<ENTITY>,
     private val entities: List<ENTITY>,
-    private val option: EntityBatchDeleteOption = QueryOptionImpl()
+    private val option: EntityBatchDeleteOption = EntityBatchDeleteOption()
 ) :
     EntityBatchDeleteQuery<ENTITY> {
 
     private val support: EntityDeleteQuerySupport<ENTITY> = EntityDeleteQuerySupport(context, option)
 
-    override fun option(declaration: EntityBatchDeleteOptionDeclaration): EntityBatchDeleteQueryImpl<ENTITY> {
-        val scope = EntityBatchDeleteOptionScope(option)
-        declaration(scope)
-        return copy(option = scope.asOption())
+    override fun option(configurator: QueryOptionConfigurator<EntityBatchDeleteOption>): EntityBatchDeleteQueryImpl<ENTITY> {
+        return copy(option = configurator.apply(option))
     }
 
     override fun run(config: DatabaseConfig) {

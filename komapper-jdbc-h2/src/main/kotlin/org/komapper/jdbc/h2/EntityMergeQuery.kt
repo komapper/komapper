@@ -3,13 +3,12 @@ package org.komapper.jdbc.h2
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.data.Statement
 import org.komapper.core.dsl.metamodel.PropertyMetamodel
+import org.komapper.core.dsl.option.QueryOptionConfigurator
 import org.komapper.core.dsl.query.Query
-
-typealias EntityMergeOptionDeclaration = (EntityMergeOption) -> EntityMergeOption
 
 interface EntityMergeQuery<ENTITY : Any> : Query<Pair<Int, LongArray>> {
     fun on(vararg keys: PropertyMetamodel<ENTITY, *>): EntityMergeQuery<ENTITY>
-    fun option(declaration: EntityMergeOptionDeclaration): EntityMergeQuery<ENTITY>
+    fun option(configurator: QueryOptionConfigurator<EntityMergeOption>): EntityMergeQuery<ENTITY>
 }
 
 internal data class EntityMergeQueryImpl<ENTITY : Any>(
@@ -25,9 +24,8 @@ internal data class EntityMergeQueryImpl<ENTITY : Any>(
         return copy(context = newContext)
     }
 
-    override fun option(declaration: EntityMergeOptionDeclaration): EntityMergeQueryImpl<ENTITY> {
-        val newOption = declaration(option)
-        return copy(option = newOption)
+    override fun option(configurator: QueryOptionConfigurator<EntityMergeOption>): EntityMergeQueryImpl<ENTITY> {
+        return copy(option = configurator.apply(option))
     }
 
     override fun run(config: DatabaseConfig): Pair<Int, LongArray> {

@@ -5,10 +5,11 @@ import org.komapper.core.JdbcExecutor
 import org.komapper.core.data.Statement
 import org.komapper.core.dsl.builder.EntityUpdateStatementBuilder
 import org.komapper.core.dsl.context.EntityUpdateContext
+import org.komapper.core.dsl.option.VersionOption
 
 internal class EntityUpdateQuerySupport<ENTITY : Any>(
     private val context: EntityUpdateContext<ENTITY>,
-    private val option: EntityUpdateOption
+    private val option: VersionOption
 ) {
 
     fun preUpdate(config: DatabaseConfig, entity: ENTITY): ENTITY {

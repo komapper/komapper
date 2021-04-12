@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.Database
 import org.komapper.core.dsl.SqlQuery
-import org.komapper.core.dsl.count
 import org.komapper.core.dsl.execute
 
 @ExtendWith(Env::class)
@@ -55,10 +54,12 @@ class SqlSelectQueryTest(private val db: Database) {
         val emp = db.execute {
             SqlQuery.from(e)
                 .option {
-                    fetchSize = 10
-                    maxRows = 100
-                    queryTimeoutSeconds = 1000
-                    allowEmptyWhereClause = true
+                    it.copy(
+                        fetchSize = 10,
+                        maxRows = 100,
+                        queryTimeoutSeconds = 1000,
+                        allowEmptyWhereClause = true,
+                    )
                 }
                 .where {
                     e.employeeId eq 1

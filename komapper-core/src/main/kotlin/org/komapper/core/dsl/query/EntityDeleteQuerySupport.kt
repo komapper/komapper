@@ -5,10 +5,11 @@ import org.komapper.core.JdbcExecutor
 import org.komapper.core.data.Statement
 import org.komapper.core.dsl.builder.EntityDeleteStatementBuilder
 import org.komapper.core.dsl.context.EntityDeleteContext
+import org.komapper.core.dsl.option.VersionOption
 
 internal class EntityDeleteQuerySupport<ENTITY : Any>(
     val context: EntityDeleteContext<ENTITY>,
-    val option: EntityDeleteOption
+    val option: VersionOption
 ) {
 
     fun <T> delete(config: DatabaseConfig, execute: (JdbcExecutor) -> T): T {

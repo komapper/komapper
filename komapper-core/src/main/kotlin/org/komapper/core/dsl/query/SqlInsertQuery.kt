@@ -7,20 +7,20 @@ import org.komapper.core.dsl.builder.SqlInsertStatementBuilder
 import org.komapper.core.dsl.context.SqlInsertContext
 import org.komapper.core.dsl.element.Values
 import org.komapper.core.dsl.metamodel.Assignment
-import org.komapper.core.dsl.scope.SqlInsertOptionDeclaration
-import org.komapper.core.dsl.scope.SqlInsertOptionScope
+import org.komapper.core.dsl.option.QueryOptionConfigurator
+import org.komapper.core.dsl.option.SqlInsertOption
 import org.komapper.core.dsl.scope.ValuesDeclaration
 import org.komapper.core.dsl.scope.ValuesScope
 
 interface SqlInsertQuery<ENTITY : Any> : Query<Pair<Int, LongArray>> {
     fun values(declaration: ValuesDeclaration<ENTITY>): SqlInsertQuery<ENTITY>
     fun <T : Any> select(block: () -> Subquery<T>): SqlInsertQuery<ENTITY>
-    fun option(declaration: SqlInsertOptionDeclaration): SqlInsertQuery<ENTITY>
+    fun option(configurator: QueryOptionConfigurator<SqlInsertOption>): SqlInsertQuery<ENTITY>
 }
 
 internal data class SqlInsertQueryImpl<ENTITY : Any>(
     private val context: SqlInsertContext<ENTITY>,
-    private val option: SqlInsertOption = QueryOptionImpl()
+    private val option: SqlInsertOption = SqlInsertOption()
 ) : SqlInsertQuery<ENTITY> {
 
     override fun values(declaration: ValuesDeclaration<ENTITY>): SqlInsertQueryImpl<ENTITY> {
@@ -41,10 +41,8 @@ internal data class SqlInsertQueryImpl<ENTITY : Any>(
         return copy(context = newContext)
     }
 
-    override fun option(declaration: SqlInsertOptionDeclaration): SqlInsertQueryImpl<ENTITY> {
-        val scope = SqlInsertOptionScope(option)
-        declaration(scope)
-        return copy(option = scope.asOption())
+    override fun option(configurator: QueryOptionConfigurator<SqlInsertOption>): SqlInsertQueryImpl<ENTITY> {
+        return copy(option = configurator.apply(option))
     }
 
     override fun run(config: DatabaseConfig): Pair<Int, LongArray> {

@@ -12,11 +12,11 @@ import org.komapper.core.dsl.context.SubqueryContext
 import org.komapper.core.dsl.expression.PropertyExpression
 import org.komapper.core.dsl.expression.ScalarExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
+import org.komapper.core.dsl.option.QueryOptionConfigurator
+import org.komapper.core.dsl.option.SqlSelectOption
 import org.komapper.core.dsl.scope.HavingDeclaration
 import org.komapper.core.dsl.scope.HavingScope
 import org.komapper.core.dsl.scope.OnDeclaration
-import org.komapper.core.dsl.scope.SqlSelectOptionDeclaration
-import org.komapper.core.dsl.scope.SqlSelectOptionScope
 import org.komapper.core.dsl.scope.WhereDeclaration
 import java.sql.ResultSet
 
@@ -41,7 +41,7 @@ interface SqlSelectQuery<ENTITY : Any> : Subquery<ENTITY> {
     fun offset(value: Int): SqlSelectQuery<ENTITY>
     fun limit(value: Int): SqlSelectQuery<ENTITY>
     fun forUpdate(): SqlSelectQuery<ENTITY>
-    fun option(declaration: SqlSelectOptionDeclaration): SqlSelectQuery<ENTITY>
+    fun option(configurator: QueryOptionConfigurator<SqlSelectOption>): SqlSelectQuery<ENTITY>
 
     fun <A : Any> select(
         e: EntityMetamodel<A>
@@ -82,7 +82,7 @@ interface SqlSelectQuery<ENTITY : Any> : Subquery<ENTITY> {
 
 internal data class SqlSelectQueryImpl<ENTITY : Any>(
     private val context: SqlSelectContext<ENTITY>,
-    private val option: SqlSelectOption = QueryOptionImpl(allowEmptyWhereClause = true)
+    private val option: SqlSelectOption = SqlSelectOption()
 ) :
     SqlSelectQuery<ENTITY> {
 
@@ -157,10 +157,8 @@ internal data class SqlSelectQueryImpl<ENTITY : Any>(
         return copy(context = newContext)
     }
 
-    override fun option(declaration: SqlSelectOptionDeclaration): SqlSelectQueryImpl<ENTITY> {
-        val scope = SqlSelectOptionScope(option)
-        declaration(scope)
-        return copy(option = scope.asOption())
+    override fun option(configurator: QueryOptionConfigurator<SqlSelectOption>): SqlSelectQueryImpl<ENTITY> {
+        return copy(option = configurator.apply(option))
     }
 
     override fun except(other: Subquery<ENTITY>): SqlSetOperationQuery<ENTITY> {

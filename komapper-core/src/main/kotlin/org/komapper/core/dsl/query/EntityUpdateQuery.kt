@@ -3,26 +3,24 @@ package org.komapper.core.dsl.query
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.data.Statement
 import org.komapper.core.dsl.context.EntityUpdateContext
-import org.komapper.core.dsl.scope.EntityUpdateOptionDeclaration
-import org.komapper.core.dsl.scope.EntityUpdateOptionScope
+import org.komapper.core.dsl.option.EntityUpdateOption
+import org.komapper.core.dsl.option.QueryOptionConfigurator
 
 interface EntityUpdateQuery<ENTITY : Any> : Query<ENTITY> {
-    fun option(declaration: EntityUpdateOptionDeclaration): EntityUpdateQuery<ENTITY>
+    fun option(configurator: QueryOptionConfigurator<EntityUpdateOption>): EntityUpdateQuery<ENTITY>
 }
 
 internal data class EntityUpdateQueryImpl<ENTITY : Any>(
     private val context: EntityUpdateContext<ENTITY>,
     private val entity: ENTITY,
-    private val option: EntityUpdateOption = QueryOptionImpl()
+    private val option: EntityUpdateOption = EntityUpdateOption()
 ) :
     EntityUpdateQuery<ENTITY> {
 
     private val support: EntityUpdateQuerySupport<ENTITY> = EntityUpdateQuerySupport(context, option)
 
-    override fun option(declaration: EntityUpdateOptionDeclaration): EntityUpdateQueryImpl<ENTITY> {
-        val scope = EntityUpdateOptionScope(option)
-        declaration(scope)
-        return copy(option = scope.asOption())
+    override fun option(configurator: QueryOptionConfigurator<EntityUpdateOption>): EntityUpdateQueryImpl<ENTITY> {
+        return copy(option = configurator.apply(option))
     }
 
     override fun run(config: DatabaseConfig): ENTITY {

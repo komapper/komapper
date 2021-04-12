@@ -80,7 +80,7 @@ class EntityBatchDeleteQueryTest(private val db: Database) {
                     addressList[2].copy(version = 1)
                 )
             ).option {
-                suppressOptimisticLockException = true
+                it.copy(suppressOptimisticLockException = true)
             }
         }
     }

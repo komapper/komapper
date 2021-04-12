@@ -10,7 +10,6 @@ import org.komapper.core.dsl.SqlQuery
 import org.komapper.core.dsl.alias
 import org.komapper.core.dsl.desc
 import org.komapper.core.dsl.execute
-import org.komapper.core.dsl.plus
 
 @ExtendWith(Env::class)
 class SqlSetOperationQueryTest(private val db: Database) {
@@ -115,7 +114,7 @@ class SqlSetOperationQueryTest(private val db: Database) {
         val e = Employee.metamodel()
         val q1 = SqlQuery.from(e).where { e.employeeId eq 1 }
         val q2 = SqlQuery.from(e)
-        val query = (q1 union q2).option { allowEmptyWhereClause = false }
+        val query = (q1 union q2).option { it.copy(allowEmptyWhereClause = false) }
         val ex = assertThrows<IllegalStateException> {
             db.execute { query }.let { }
         }

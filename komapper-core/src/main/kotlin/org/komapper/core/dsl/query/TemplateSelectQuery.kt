@@ -3,24 +3,22 @@ package org.komapper.core.dsl.query
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.JdbcExecutor
 import org.komapper.core.data.Statement
-import org.komapper.core.dsl.scope.TemplateSelectOptionDeclaration
-import org.komapper.core.dsl.scope.TemplateSelectOptionScope
+import org.komapper.core.dsl.option.QueryOptionConfigurator
+import org.komapper.core.dsl.option.TemplateSelectOption
 
 interface TemplateSelectQuery<T> : ListQuery<T> {
-    fun option(declaration: TemplateSelectOptionDeclaration): TemplateSelectQuery<T>
+    fun option(configurator: QueryOptionConfigurator<TemplateSelectOption>): TemplateSelectQuery<T>
 }
 
 internal data class TemplateSelectQueryImpl<T>(
     private val sql: String,
     private val params: Any = object {},
     private val provider: Row.() -> T,
-    private val option: TemplateSelectOption = QueryOptionImpl()
+    private val option: TemplateSelectOption = TemplateSelectOption()
 ) : TemplateSelectQuery<T> {
 
-    override fun option(declaration: TemplateSelectOptionDeclaration): TemplateSelectQueryImpl<T> {
-        val scope = TemplateSelectOptionScope(option)
-        declaration(scope)
-        return copy(option = scope.asOption())
+    override fun option(configurator: QueryOptionConfigurator<TemplateSelectOption>): TemplateSelectQueryImpl<T> {
+        return copy(option = configurator.apply(option))
     }
 
     override fun run(config: DatabaseConfig): List<T> {

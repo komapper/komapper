@@ -5,22 +5,22 @@ import org.komapper.core.JdbcExecutor
 import org.komapper.core.data.Statement
 import org.komapper.core.dsl.builder.SqlUpdateStatementBuilder
 import org.komapper.core.dsl.context.SqlUpdateContext
+import org.komapper.core.dsl.option.QueryOptionConfigurator
+import org.komapper.core.dsl.option.SqlUpdateOption
 import org.komapper.core.dsl.scope.SetDeclaration
 import org.komapper.core.dsl.scope.SetScope
-import org.komapper.core.dsl.scope.SqlUpdateOptionDeclaration
-import org.komapper.core.dsl.scope.SqlUpdateOptionScope
 import org.komapper.core.dsl.scope.WhereDeclaration
 import org.komapper.core.dsl.scope.WhereScope
 
 interface SqlUpdateQuery<ENTITY : Any> : Query<Int> {
     fun set(declaration: SetDeclaration<ENTITY>): SqlUpdateQuery<ENTITY>
     fun where(declaration: WhereDeclaration): SqlUpdateQuery<ENTITY>
-    fun option(declaration: SqlUpdateOptionDeclaration): SqlUpdateQuery<ENTITY>
+    fun option(configurator: QueryOptionConfigurator<SqlUpdateOption>): SqlUpdateQuery<ENTITY>
 }
 
 internal data class SqlUpdateQueryImpl<ENTITY : Any>(
     private val context: SqlUpdateContext<ENTITY>,
-    private val option: SqlUpdateOption = QueryOptionImpl()
+    private val option: SqlUpdateOption = SqlUpdateOption()
 ) : SqlUpdateQuery<ENTITY> {
 
     override fun set(declaration: SetDeclaration<ENTITY>): SqlUpdateQueryImpl<ENTITY> {
@@ -37,10 +37,8 @@ internal data class SqlUpdateQueryImpl<ENTITY : Any>(
         return copy(context = newContext)
     }
 
-    override fun option(declaration: SqlUpdateOptionDeclaration): SqlUpdateQueryImpl<ENTITY> {
-        val scope = SqlUpdateOptionScope(option)
-        declaration(scope)
-        return copy(option = scope.asOption())
+    override fun option(configurator: QueryOptionConfigurator<SqlUpdateOption>): SqlUpdateQueryImpl<ENTITY> {
+        return copy(option = configurator.apply(option))
     }
 
     override fun run(config: DatabaseConfig): Int {

@@ -1,7 +1,7 @@
 package org.komapper.jdbc.h2
 
 import org.komapper.core.data.JdbcOption
-import org.komapper.core.dsl.query.VersionOption
+import org.komapper.core.dsl.option.VersionOption
 
 data class EntityMergeOption(
     override val queryTimeoutSeconds: Int? = null,
@@ -9,6 +9,6 @@ data class EntityMergeOption(
     override val suppressOptimisticLockException: Boolean = false
 ) : VersionOption {
     override fun asJdbcOption(): JdbcOption {
-        return JdbcOption(queryTimeoutSeconds)
+        return JdbcOption(queryTimeoutSeconds = queryTimeoutSeconds)
     }
 }

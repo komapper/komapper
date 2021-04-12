@@ -3,26 +3,24 @@ package org.komapper.core.dsl.query
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.data.Statement
 import org.komapper.core.dsl.context.EntityInsertContext
-import org.komapper.core.dsl.scope.EntityInsertOptionDeclaration
-import org.komapper.core.dsl.scope.EntityInsertOptionScope
+import org.komapper.core.dsl.option.EntityInsertOption
+import org.komapper.core.dsl.option.QueryOptionConfigurator
 
 interface EntityInsertQuery<ENTITY : Any> : Query<ENTITY> {
-    fun option(declaration: EntityInsertOptionDeclaration): EntityInsertQuery<ENTITY>
+    fun option(configurator: QueryOptionConfigurator<EntityInsertOption>): EntityInsertQuery<ENTITY>
 }
 
 internal data class EntityInsertQueryImpl<ENTITY : Any>(
     private val context: EntityInsertContext<ENTITY>,
     private val entity: ENTITY,
-    private val option: EntityInsertOption = QueryOptionImpl()
+    private val option: EntityInsertOption = EntityInsertOption()
 ) :
     EntityInsertQuery<ENTITY> {
 
     private val support: EntityInsertQuerySupport<ENTITY> = EntityInsertQuerySupport(context, option)
 
-    override fun option(declaration: EntityInsertOptionDeclaration): EntityInsertQueryImpl<ENTITY> {
-        val scope = EntityInsertOptionScope(option)
-        declaration(scope)
-        return copy(option = scope.asOption())
+    override fun option(configurator: QueryOptionConfigurator<EntityInsertOption>): EntityInsertQueryImpl<ENTITY> {
+        return copy(option = configurator.apply(option))
     }
 
     override fun run(config: DatabaseConfig): ENTITY {

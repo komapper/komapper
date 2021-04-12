@@ -10,8 +10,8 @@ import org.komapper.core.dsl.context.SubqueryContext
 import org.komapper.core.dsl.element.Associator
 import org.komapper.core.dsl.expression.PropertyExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
-import org.komapper.core.dsl.scope.EntitySelectOptionDeclaration
-import org.komapper.core.dsl.scope.EntitySelectOptionScope
+import org.komapper.core.dsl.option.EntitySelectOption
+import org.komapper.core.dsl.option.QueryOptionConfigurator
 import org.komapper.core.dsl.scope.OnDeclaration
 import org.komapper.core.dsl.scope.WhereDeclaration
 import java.sql.ResultSet
@@ -34,7 +34,7 @@ interface EntitySelectQuery<ENTITY : Any> : Subquery<ENTITY> {
     fun offset(value: Int): EntitySelectQuery<ENTITY>
     fun limit(value: Int): EntitySelectQuery<ENTITY>
     fun forUpdate(): EntitySelectQuery<ENTITY>
-    fun option(declaration: EntitySelectOptionDeclaration): EntitySelectQuery<ENTITY>
+    fun option(configurator: QueryOptionConfigurator<EntitySelectOption>): EntitySelectQuery<ENTITY>
 
     fun <T : Any, S : Any> associate(
         e1: EntityMetamodel<T>,
@@ -47,7 +47,7 @@ interface EntitySelectQuery<ENTITY : Any> : Subquery<ENTITY> {
 
 internal data class EntitySelectQueryImpl<ENTITY : Any>(
     private val context: EntitySelectContext<ENTITY>,
-    private val option: EntitySelectOption = QueryOptionImpl(allowEmptyWhereClause = true)
+    private val option: EntitySelectOption = EntitySelectOption()
 ) :
     EntitySelectQuery<ENTITY> {
 
@@ -120,10 +120,8 @@ internal data class EntitySelectQueryImpl<ENTITY : Any>(
         return copy(context = newContext)
     }
 
-    override fun option(declaration: EntitySelectOptionDeclaration): EntitySelectQuery<ENTITY> {
-        val scope = EntitySelectOptionScope(option)
-        declaration(scope)
-        return copy(option = scope.asOption())
+    override fun option(configurator: QueryOptionConfigurator<EntitySelectOption>): EntitySelectQuery<ENTITY> {
+        return copy(option = configurator.apply(option))
     }
 
     override fun except(other: Subquery<ENTITY>): SqlSetOperationQuery<ENTITY> {

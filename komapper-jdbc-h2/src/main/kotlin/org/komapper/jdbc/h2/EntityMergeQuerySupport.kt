@@ -4,7 +4,7 @@ import org.komapper.core.DatabaseConfig
 import org.komapper.core.JdbcExecutor
 import org.komapper.core.data.Statement
 import org.komapper.core.dsl.metamodel.Assignment
-import org.komapper.core.dsl.query.VersionOption
+import org.komapper.core.dsl.option.VersionOption
 import org.komapper.core.dsl.query.checkOptimisticLock
 
 internal class EntityMergeQuerySupport<ENTITY : Any>(

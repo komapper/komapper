@@ -1,8 +1,8 @@
 package org.komapper.jdbc.h2
 
 import org.komapper.core.data.JdbcOption
-import org.komapper.core.dsl.query.BatchOption
-import org.komapper.core.dsl.query.VersionOption
+import org.komapper.core.dsl.option.BatchOption
+import org.komapper.core.dsl.option.VersionOption
 
 data class EntityBatchMergeOption(
     override val batchSize: Int? = null,

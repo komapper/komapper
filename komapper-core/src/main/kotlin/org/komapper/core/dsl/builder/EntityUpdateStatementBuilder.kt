@@ -7,13 +7,13 @@ import org.komapper.core.data.Value
 import org.komapper.core.dsl.context.EntityUpdateContext
 import org.komapper.core.dsl.expression.EntityExpression
 import org.komapper.core.dsl.expression.PropertyExpression
-import org.komapper.core.dsl.query.EntityUpdateOption
+import org.komapper.core.dsl.option.VersionOption
 
 internal class EntityUpdateStatementBuilder<ENTITY : Any>(
     val dialect: Dialect,
     val context: EntityUpdateContext<ENTITY>,
     val entity: ENTITY,
-    val option: EntityUpdateOption
+    val option: VersionOption
 ) {
     private val aliasManager = AliasManagerImpl(context)
     private val buf = StatementBuffer(dialect::formatValue)

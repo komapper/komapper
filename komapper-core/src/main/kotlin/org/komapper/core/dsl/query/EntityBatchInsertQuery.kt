@@ -3,26 +3,24 @@ package org.komapper.core.dsl.query
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.data.Statement
 import org.komapper.core.dsl.context.EntityInsertContext
-import org.komapper.core.dsl.scope.EntityBatchInsertOptionDeclaration
-import org.komapper.core.dsl.scope.EntityBatchInsertOptionScope
+import org.komapper.core.dsl.option.EntityBatchInsertOption
+import org.komapper.core.dsl.option.QueryOptionConfigurator
 
 interface EntityBatchInsertQuery<ENTITY : Any> : Query<List<ENTITY>> {
-    fun option(declaration: EntityBatchInsertOptionDeclaration): EntityBatchInsertQuery<ENTITY>
+    fun option(configurator: QueryOptionConfigurator<EntityBatchInsertOption>): EntityBatchInsertQuery<ENTITY>
 }
 
 internal data class EntityBatchInsertQueryImpl<ENTITY : Any>(
     private val context: EntityInsertContext<ENTITY>,
     private val entities: List<ENTITY>,
-    private val option: EntityBatchInsertOption = QueryOptionImpl()
+    private val option: EntityBatchInsertOption = EntityBatchInsertOption()
 ) :
     EntityBatchInsertQuery<ENTITY> {
 
     private val support: EntityInsertQuerySupport<ENTITY> = EntityInsertQuerySupport(context, option)
 
-    override fun option(declaration: EntityBatchInsertOptionDeclaration): EntityBatchInsertQueryImpl<ENTITY> {
-        val scope = EntityBatchInsertOptionScope(option)
-        declaration(scope)
-        return copy(option = scope.asOption())
+    override fun option(configurator: QueryOptionConfigurator<EntityBatchInsertOption>): EntityBatchInsertQueryImpl<ENTITY> {
+        return copy(option = configurator.apply(option))
     }
 
     override fun run(config: DatabaseConfig): List<ENTITY> {

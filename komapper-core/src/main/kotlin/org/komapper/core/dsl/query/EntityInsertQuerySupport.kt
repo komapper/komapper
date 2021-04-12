@@ -6,10 +6,11 @@ import org.komapper.core.data.Statement
 import org.komapper.core.dsl.builder.EntityInsertStatementBuilder
 import org.komapper.core.dsl.context.EntityInsertContext
 import org.komapper.core.dsl.metamodel.Assignment
+import org.komapper.core.dsl.option.QueryOption
 
 internal class EntityInsertQuerySupport<ENTITY : Any>(
     private val context: EntityInsertContext<ENTITY>,
-    private val option: EntityInsertOption
+    private val option: QueryOption
 ) {
 
     fun preInsert(config: DatabaseConfig, entity: ENTITY): ENTITY {

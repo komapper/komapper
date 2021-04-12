@@ -9,7 +9,7 @@ import org.komapper.core.dsl.builder.EmptyAliasManager
 import org.komapper.core.dsl.expression.EntityExpression
 import org.komapper.core.dsl.expression.PropertyExpression
 import org.komapper.core.dsl.metamodel.Assignment
-import org.komapper.core.dsl.query.VersionOption
+import org.komapper.core.dsl.option.VersionOption
 
 class EntityMergeStatementBuilder<ENTITY : Any>(
     private val dialect: Dialect,

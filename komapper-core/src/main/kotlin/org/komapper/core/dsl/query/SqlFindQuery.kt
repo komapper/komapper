@@ -3,7 +3,8 @@ package org.komapper.core.dsl.query
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.data.Statement
 import org.komapper.core.dsl.expression.PropertyExpression
-import org.komapper.core.dsl.scope.SqlSelectOptionDeclaration
+import org.komapper.core.dsl.option.QueryOptionConfigurator
+import org.komapper.core.dsl.option.SqlSelectOption
 import org.komapper.core.dsl.scope.WhereDeclaration
 
 interface SqlFindQuery<ENTITY : Any, R> : Query<R> {
@@ -11,7 +12,7 @@ interface SqlFindQuery<ENTITY : Any, R> : Query<R> {
     fun orderBy(vararg items: PropertyExpression<*>): SqlFindQuery<ENTITY, R>
     fun offset(value: Int): SqlFindQuery<ENTITY, R>
     fun forUpdate(): SqlFindQuery<ENTITY, R>
-    fun option(declaration: SqlSelectOptionDeclaration): SqlFindQuery<ENTITY, R>
+    fun option(configurator: QueryOptionConfigurator<SqlSelectOption>): SqlFindQuery<ENTITY, R>
 }
 
 internal data class SqlFindQueryImpl<ENTITY : Any, R>(
@@ -40,8 +41,8 @@ internal data class SqlFindQueryImpl<ENTITY : Any, R>(
         return copy(query = newQuery)
     }
 
-    override fun option(declaration: SqlSelectOptionDeclaration): SqlFindQueryImpl<ENTITY, R> {
-        val newQuery = query.option(declaration)
+    override fun option(configurator: QueryOptionConfigurator<SqlSelectOption>): SqlFindQueryImpl<ENTITY, R> {
+        val newQuery = query.option(configurator)
         return copy(query = newQuery)
     }
 
