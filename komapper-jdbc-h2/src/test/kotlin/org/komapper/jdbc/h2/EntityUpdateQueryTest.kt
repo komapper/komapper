@@ -45,13 +45,13 @@ class EntityUpdateQueryTest(private val db: Database) {
         val person1 = Person(1, "ABC")
         db.execute { EntityQuery.insert(p, person1) }
         val person2 = db.execute {
-            EntityQuery.first(p).where {
+            EntityQuery.first(p) {
                 p.personId eq 1
             }
         }
         val person3 = db.execute { EntityQuery.update(p, person2.copy(name = "DEF")) }
         val person4 = db.execute {
-            EntityQuery.first(p).where {
+            EntityQuery.first(p) {
                 p.personId eq 1
             }
         }
@@ -71,7 +71,7 @@ class EntityUpdateQueryTest(private val db: Database) {
         val person1 = Person(1, "ABC")
         db.execute { EntityQuery.insert(p, person1) }
         val person2 = db.execute {
-            EntityQuery.first(p).where {
+            EntityQuery.first(p) {
                 p.personId eq 1
             }
         }
@@ -83,7 +83,7 @@ class EntityUpdateQueryTest(private val db: Database) {
         val myDb = Database(config)
         val person3 = myDb.execute { EntityQuery.update(p, person2.copy(name = "DEF")) }
         val person4 = db.execute {
-            EntityQuery.first(p).where {
+            EntityQuery.first(p) {
                 p.personId eq 1
             }
         }

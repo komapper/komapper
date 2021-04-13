@@ -22,7 +22,7 @@ class TemplateExecuteQueryTest(private val db: Database) {
         assertEquals(1, count)
         val a = Address.metamodel()
         val address = db.execute {
-            SqlQuery.first(a).where {
+            SqlQuery.first(a) {
                 a.addressId eq 15
             }
         }

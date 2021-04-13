@@ -24,7 +24,7 @@ class EntityMergeQueryTest(private val db: Database) {
         val (count, keys) = db.execute { query }
         assertEquals(1, count)
         assertEquals(0, keys.size)
-        val found = db.execute { EntityQuery.first(d).where { d.departmentId eq 5 } }
+        val found = db.execute { EntityQuery.first(d) { d.departmentId eq 5 } }
         assertNotNull(found)
     }
 
@@ -36,7 +36,7 @@ class EntityMergeQueryTest(private val db: Database) {
         val (count, keys) = db.execute { query }
         assertEquals(1, count)
         assertEquals(0, keys.size)
-        val found = db.execute { EntityQuery.first(d).where { d.departmentId eq 5 } }
+        val found = db.execute { EntityQuery.first(d) { d.departmentId eq 5 } }
         assertNotNull(found)
     }
 
@@ -48,7 +48,7 @@ class EntityMergeQueryTest(private val db: Database) {
         val (count, keys) = db.execute { query }
         assertEquals(1, count)
         assertEquals(0, keys.size)
-        val found = db.execute { EntityQuery.first(d).where { d.departmentId eq 1 } }
+        val found = db.execute { EntityQuery.first(d) { d.departmentId eq 1 } }
         assertEquals(50, found.departmentNo)
         assertEquals("PLANNING", found.departmentName)
         assertEquals("TOKYO", found.location)
@@ -63,7 +63,7 @@ class EntityMergeQueryTest(private val db: Database) {
         val (count, keys) = db.execute { query }
         assertEquals(1, count)
         assertEquals(0, keys.size)
-        val found = db.execute { EntityQuery.first(d).where { d.departmentNo eq 10 } }
+        val found = db.execute { EntityQuery.first(d) { d.departmentNo eq 10 } }
         assertEquals("PLANNING", found.departmentName)
         assertEquals("TOKYO", found.location)
     }
@@ -86,7 +86,7 @@ class EntityMergeQueryTest(private val db: Database) {
     @Test
     fun uniqueConstraintException() {
         val d = Department.metamodel()
-        val department = db.execute { EntityQuery.first(d).where { d.departmentId eq 1 } }
+        val department = db.execute { EntityQuery.first(d) { d.departmentId eq 1 } }
         assertThrows<UniqueConstraintException> {
             val department2 = department.copy(departmentId = 5)
             db.execute { H2EntityQuery.merge(d, department2) }.let { }
@@ -104,7 +104,7 @@ class EntityMergeQueryTest(private val db: Database) {
             H2EntityQuery.merge(d, department).option { it.copy(ignoreVersion = true) }
         }
         val department = db.execute {
-            EntityQuery.first(d).where { d.departmentId eq 1 }
+            EntityQuery.first(d) { d.departmentId eq 1 }
         }
         assertEquals(2, department.version)
     }

@@ -225,7 +225,7 @@ class TransactionTest {
             val data = ArrayTest(1, array)
             db.execute { EntityQuery.insert(meta, data) }
             val data2 = db.execute {
-                EntityQuery.first(meta).where { meta.id eq 1 }
+                EntityQuery.first(meta) { meta.id eq 1 }
             }
             assertEquals(data.id, data2.id)
             assertArrayEquals(data.value.array as Array<*>, data2.value.array as Array<*>)
@@ -248,7 +248,7 @@ class TransactionTest {
             val data = BlobTest(1, blob)
             db.execute { EntityQuery.insert(m, data) }
             val data2 = db.execute {
-                EntityQuery.first(m).where { m.id eq 1 }
+                EntityQuery.first(m) { m.id eq 1 }
             }
             assertEquals(data.id, data2.id)
             assertArrayEquals(data.value.getBytes(1, 3), data2.value.getBytes(1, 3))
@@ -270,7 +270,7 @@ class TransactionTest {
             val data = ClobTest(1, clob)
             db.execute { EntityQuery.insert(m, data) }
             val data2 = db.execute {
-                EntityQuery.first(m).where {
+                EntityQuery.first(m) {
                     m.id to 1
                 }
             }
@@ -294,7 +294,7 @@ class TransactionTest {
             val data = NClobTest(1, nclob)
             db.execute { EntityQuery.insert(m, data) }
             val data2 = db.execute {
-                EntityQuery.first(m).where {
+                EntityQuery.first(m) {
                     m.id eq 1
                 }
             }
@@ -318,7 +318,7 @@ class TransactionTest {
             val data = SqlXmlTest(1, sqlXml)
             db.execute { EntityQuery.insert(m, data) }
             val data2 = db.execute {
-                EntityQuery.first(m).where { m.id eq 1 }
+                EntityQuery.first(m) { m.id eq 1 }
             }
             assertEquals(data.id, data2.id)
             assertEquals(data.value.string, data2.value.string)

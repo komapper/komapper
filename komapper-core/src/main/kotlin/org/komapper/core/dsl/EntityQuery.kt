@@ -13,16 +13,14 @@ import org.komapper.core.dsl.query.EntityBatchUpdateQuery
 import org.komapper.core.dsl.query.EntityBatchUpdateQueryImpl
 import org.komapper.core.dsl.query.EntityDeleteQuery
 import org.komapper.core.dsl.query.EntityDeleteQueryImpl
-import org.komapper.core.dsl.query.EntityFindQuery
-import org.komapper.core.dsl.query.EntityFindQueryImpl
 import org.komapper.core.dsl.query.EntityInsertQuery
 import org.komapper.core.dsl.query.EntityInsertQueryImpl
 import org.komapper.core.dsl.query.EntitySelectQuery
 import org.komapper.core.dsl.query.EntitySelectQueryImpl
 import org.komapper.core.dsl.query.EntityUpdateQuery
 import org.komapper.core.dsl.query.EntityUpdateQueryImpl
-import org.komapper.core.dsl.query.ListQuery
 import org.komapper.core.dsl.query.Query
+import org.komapper.core.dsl.scope.WhereDeclaration
 
 object EntityQuery : Dsl {
 
@@ -32,22 +30,26 @@ object EntityQuery : Dsl {
         fun idValueRequired(index: Int) = "The entity(index=$index) must have one or more id value."
     }
 
-    fun <ENTITY : Any> first(entityMetamodel: EntityMetamodel<ENTITY>): EntityFindQuery<ENTITY, ENTITY> {
-        require(hasIdProperty(entityMetamodel)) { Messages.idPropertyRequired }
-        return createFindQuery(entityMetamodel) { it.first() }
-    }
-
-    fun <ENTITY : Any> firstOrNull(entityMetamodel: EntityMetamodel<ENTITY>): EntityFindQuery<ENTITY, ENTITY?> {
-        require(hasIdProperty(entityMetamodel)) { Messages.idPropertyRequired }
-        return createFindQuery(entityMetamodel) { it.firstOrNull() }
-    }
-
-    private fun <ENTITY : Any, R> createFindQuery(
+    fun <ENTITY : Any> first(
         entityMetamodel: EntityMetamodel<ENTITY>,
-        transformer: (ListQuery<ENTITY>) -> Query<R>
-    ): EntityFindQuery<ENTITY, R> {
-        val selectQuery = EntitySelectQueryImpl(EntitySelectContext(entityMetamodel)).limit(1)
-        return EntityFindQueryImpl(selectQuery, transformer)
+        declaration: WhereDeclaration
+    ): Query<ENTITY> {
+        require(hasIdProperty(entityMetamodel)) { Messages.idPropertyRequired }
+        return EntitySelectQueryImpl(EntitySelectContext(entityMetamodel))
+            .where(declaration)
+            .limit(1)
+            .first()
+    }
+
+    fun <ENTITY : Any> firstOrNull(
+        entityMetamodel: EntityMetamodel<ENTITY>,
+        declaration: WhereDeclaration
+    ): Query<ENTITY?> {
+        require(hasIdProperty(entityMetamodel)) { Messages.idPropertyRequired }
+        return EntitySelectQueryImpl(EntitySelectContext(entityMetamodel))
+            .where(declaration)
+            .limit(1)
+            .firstOrNull()
     }
 
     fun <ENTITY : Any> from(entityMetamodel: EntityMetamodel<ENTITY>): EntitySelectQuery<ENTITY> {

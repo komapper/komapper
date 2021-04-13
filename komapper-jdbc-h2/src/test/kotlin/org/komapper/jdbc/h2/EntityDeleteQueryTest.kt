@@ -16,7 +16,7 @@ class EntityDeleteQueryTest(private val db: Database) {
     fun optimisticLockException() {
         val a = Address.metamodel()
         val address = db.execute {
-            EntityQuery.first(a).where {
+            EntityQuery.first(a) {
                 a.addressId eq 15
             }
         }

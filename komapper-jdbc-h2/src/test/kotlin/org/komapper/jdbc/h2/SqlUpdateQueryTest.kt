@@ -25,7 +25,7 @@ class SqlUpdateQueryTest(private val db: Database) {
         }
         assertEquals(1, count)
         val address = db.execute {
-            SqlQuery.first(a).where {
+            SqlQuery.first(a) {
                 a.addressId eq 1
             }
         }
@@ -44,7 +44,7 @@ class SqlUpdateQueryTest(private val db: Database) {
         }
         assertEquals(1, count)
         val address = db.execute {
-            SqlQuery.first(a).where {
+            SqlQuery.first(a) {
                 a.addressId eq 1
             }
         }
@@ -63,7 +63,7 @@ class SqlUpdateQueryTest(private val db: Database) {
         }
         assertEquals(1, count)
         val address = db.execute {
-            SqlQuery.first(a).where {
+            SqlQuery.first(a) {
                 a.addressId eq 1
             }
         }

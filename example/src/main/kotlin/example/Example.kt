@@ -53,7 +53,7 @@ fun main() {
 
         // READ: select by id
         val foundA = db.execute {
-            EntityQuery.first(a).where {
+            EntityQuery.first(a) {
                 a.id eq addressA.id
             }
         }
@@ -67,7 +67,7 @@ fun main() {
 
         // READ: select by street and version
         val foundB1 = db.execute {
-            EntityQuery.first(a).where {
+            EntityQuery.first(a) {
                 a.street eq "street B"
                 a.version eq 1
             }

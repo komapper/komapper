@@ -67,4 +67,27 @@ class SqlSelectQueryTest(private val db: Database) {
         }
         println(emp)
     }
+
+    @Test
+    fun shortcut_first() {
+        val a = Address.metamodel()
+        val address = db.execute { SqlQuery.first(a) { a.addressId eq 1 } }
+        assertNotNull(address)
+    }
+
+    @Test
+    fun shortcut_firstOrNull() {
+        val a = Address.metamodel()
+        val address = db.execute { SqlQuery.firstOrNull(a) { a.addressId eq -1 } }
+        assertNull(address)
+    }
+
+    @Test
+    fun shortcut_first_multipleCondition() {
+        val a = Address.metamodel()
+        val address = db.execute {
+            SqlQuery.first(a) { a.addressId eq 1; a.version eq 1 }
+        }
+        assertNotNull(address)
+    }
 }

@@ -25,7 +25,7 @@ class EntityInsertQueryTest(private val db: Database) {
         val address = Address(16, "STREET 16", 0)
         db.execute { EntityQuery.insert(a, address) }
         val address2 = db.execute {
-            EntityQuery.first(a).where {
+            EntityQuery.first(a) {
                 a.addressId eq 16
             }
         }
@@ -41,7 +41,7 @@ class EntityInsertQueryTest(private val db: Database) {
         assertNotNull(person2.updatedAt)
         assertEquals(person2.createdAt, person2.updatedAt)
         val person3 = db.execute {
-            EntityQuery.first(p).where {
+            EntityQuery.first(p) {
                 p.personId to 1
             }
         }
@@ -57,7 +57,7 @@ class EntityInsertQueryTest(private val db: Database) {
         assertNotNull(human2.updatedAt)
         assertEquals(human2.createdAt, human2.updatedAt)
         val human3 = db.execute {
-            EntityQuery.first(h).where {
+            EntityQuery.first(h) {
                 h.humanId to 1
             }
         }
@@ -79,7 +79,7 @@ class EntityInsertQueryTest(private val db: Database) {
         val person1 = Person(1, "ABC")
         val person2 = myDb.execute { EntityQuery.insert(p, person1) }
         val person3 = db.execute {
-            EntityQuery.first(p).where {
+            EntityQuery.first(p) {
                 p.personId to 1
             }
         }
