@@ -14,7 +14,6 @@ allprojects {
 
     configure<com.diffplug.gradle.spotless.SpotlessExtension> {
         kotlin {
-            ratchetFrom("origin/main")
             targetExclude("*/build/**")
             ktlint("0.41.0")
         }
