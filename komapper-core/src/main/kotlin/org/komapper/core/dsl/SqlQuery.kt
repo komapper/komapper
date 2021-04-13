@@ -16,9 +16,9 @@ import org.komapper.core.dsl.query.SqlInsertQueryBuilderImpl
 import org.komapper.core.dsl.query.SqlInsertQueryImpl
 import org.komapper.core.dsl.query.SqlSelectQuery
 import org.komapper.core.dsl.query.SqlSelectQueryImpl
-import org.komapper.core.dsl.query.SqlUpdateQuery
+import org.komapper.core.dsl.query.SqlUpdateQueryBuilder
+import org.komapper.core.dsl.query.SqlUpdateQueryBuilderImpl
 import org.komapper.core.dsl.query.SqlUpdateQueryImpl
-import org.komapper.core.dsl.scope.SetDeclaration
 
 object SqlQuery : Dsl {
 
@@ -47,11 +47,9 @@ object SqlQuery : Dsl {
         return SqlInsertQueryBuilderImpl(query)
     }
 
-    fun <ENTITY : Any> update(
-        entityMetamodel: EntityMetamodel<ENTITY>,
-        declaration: SetDeclaration<ENTITY>
-    ): SqlUpdateQuery<ENTITY> {
-        return SqlUpdateQueryImpl(SqlUpdateContext(entityMetamodel)).set(declaration)
+    fun <ENTITY : Any> update(entityMetamodel: EntityMetamodel<ENTITY>): SqlUpdateQueryBuilder<ENTITY> {
+        val query = SqlUpdateQueryImpl(SqlUpdateContext(entityMetamodel))
+        return SqlUpdateQueryBuilderImpl(query)
     }
 
     fun <ENTITY : Any> delete(entityMetamodel: EntityMetamodel<ENTITY>): SqlDeleteQuery {

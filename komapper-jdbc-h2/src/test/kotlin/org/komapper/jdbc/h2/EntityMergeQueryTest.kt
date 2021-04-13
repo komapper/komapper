@@ -72,7 +72,7 @@ class EntityMergeQueryTest(private val db: Database) {
     fun optimisticLockException() {
         val d = Department.metamodel()
         db.execute {
-            SqlQuery.update(d) { d.version set d.version + 10 }.where { d.departmentId eq 1 }
+            SqlQuery.update(d).set { d.version set d.version + 10 }.where { d.departmentId eq 1 }
         }
         val department = Department(1, 50, "PLANNING", "TOKYO", 1)
         assertThrows<OptimisticLockException> {
@@ -97,7 +97,7 @@ class EntityMergeQueryTest(private val db: Database) {
     fun option_ignoreVersion() {
         val d = Department.metamodel()
         db.execute {
-            SqlQuery.update(d) { d.version set d.version + 10 }.where { d.departmentId eq 1 }
+            SqlQuery.update(d).set { d.version set d.version + 10 }.where { d.departmentId eq 1 }
         }
         db.execute {
             val department = Department(1, 50, "PLANNING", "TOKYO", 1)

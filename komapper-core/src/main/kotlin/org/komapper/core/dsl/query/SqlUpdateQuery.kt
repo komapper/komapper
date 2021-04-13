@@ -60,3 +60,15 @@ internal data class SqlUpdateQueryImpl<ENTITY : Any>(
         return builder.build()
     }
 }
+
+interface SqlUpdateQueryBuilder<T : Any> {
+    fun set(declaration: SetDeclaration<T>): SqlUpdateQuery<T>
+}
+
+internal class SqlUpdateQueryBuilderImpl<T : Any>(
+    private val query: SqlUpdateQuery<T>
+) : SqlUpdateQueryBuilder<T> {
+    override fun set(declaration: SetDeclaration<T>): SqlUpdateQuery<T> {
+        return query.set(declaration)
+    }
+}
