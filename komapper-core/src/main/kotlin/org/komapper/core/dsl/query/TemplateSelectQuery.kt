@@ -33,7 +33,7 @@ internal data class TemplateSelectQueryImpl<T>(
         return Terminal { it.firstOrNull() }
     }
 
-    override fun <R> transform(transformer: (Sequence<T>) -> R): Query<R> {
+    override fun <R> collect(transformer: (Sequence<T>) -> R): Query<R> {
         return Terminal(transformer)
     }
 

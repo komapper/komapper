@@ -162,7 +162,7 @@ internal data class EntitySelectQueryImpl<ENTITY : Any>(
         return Terminal { it.firstOrNull() }
     }
 
-    override fun <R> transform(transformer: (Sequence<ENTITY>) -> R): Query<R> {
+    override fun <R> collect(transformer: (Sequence<ENTITY>) -> R): Query<R> {
         return Terminal(transformer)
     }
 

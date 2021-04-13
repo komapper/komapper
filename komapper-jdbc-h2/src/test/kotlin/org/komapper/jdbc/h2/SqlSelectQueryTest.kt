@@ -40,10 +40,10 @@ class SqlSelectQueryTest(private val db: Database) {
     }
 
     @Test
-    fun transform() {
+    fun collect() {
         val a = Address.metamodel()
         val count = db.execute {
-            SqlQuery.from(a).transform { it.count() }
+            SqlQuery.from(a).collect { it.count() }
         }
         assertEquals(15, count)
     }

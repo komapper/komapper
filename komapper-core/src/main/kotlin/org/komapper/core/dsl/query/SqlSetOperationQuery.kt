@@ -96,7 +96,7 @@ internal data class SetOperationQueryImpl<T>(
         return createTerminal { it.firstOrNull() }
     }
 
-    override fun <R> transform(transformer: (Sequence<T>) -> R): Query<R> {
+    override fun <R> collect(transformer: (Sequence<T>) -> R): Query<R> {
         return createTerminal(transformer)
     }
 

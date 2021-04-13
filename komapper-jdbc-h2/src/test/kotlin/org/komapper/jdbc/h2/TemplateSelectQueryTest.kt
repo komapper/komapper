@@ -40,7 +40,7 @@ class TemplateSelectQueryTest(private val db: Database) {
     fun sequence() {
         val list = db.execute {
             val sql = "select * from address"
-            TemplateQuery.from(sql).select(asAddress).transform { it.toList() }
+            TemplateQuery.from(sql).select(asAddress).collect { it.toList() }
         }
         Assertions.assertEquals(15, list.size)
         Assertions.assertEquals(
