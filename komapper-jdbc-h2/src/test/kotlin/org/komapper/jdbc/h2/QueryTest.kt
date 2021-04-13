@@ -16,7 +16,7 @@ class QueryTest(private val db: Database) {
 
     @Test
     fun plus() {
-        val a = Address.metamodel()
+        val a = Address.alias
         val address = Address(16, "STREET 16", 0)
         val q1 = EntityQuery.insert(a, address)
         val q2 = SqlQuery.insert(a).values {
@@ -32,10 +32,10 @@ class QueryTest(private val db: Database) {
 
     @Test
     fun flatMap() {
-        val a = Address.metamodel()
+        val a = Address.alias
         val address = Address(16, "STREET 16", 0)
         val query = EntityQuery.insert(a, address).flatMap {
-            val e = Employee.metamodel()
+            val e = Employee.alias
             EntityQuery.from(e).where { e.addressId less it.addressId }
         }
         val list = db.execute { query }
@@ -44,10 +44,10 @@ class QueryTest(private val db: Database) {
 
     @Test
     fun flatZip() {
-        val a = Address.metamodel()
+        val a = Address.alias
         val address = Address(16, "STREET 16", 0)
         val query = EntityQuery.insert(a, address).flatZip {
-            val e = Employee.metamodel()
+            val e = Employee.alias
             EntityQuery.from(e).where { e.addressId less it.addressId }
         }
         val (address2, list) = db.execute { query }

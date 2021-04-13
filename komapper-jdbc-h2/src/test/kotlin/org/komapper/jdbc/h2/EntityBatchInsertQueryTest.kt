@@ -15,7 +15,7 @@ class EntityBatchInsertQueryTest(private val db: Database) {
 
     @Test
     fun test() {
-        val a = Address.metamodel()
+        val a = Address.alias
         val addressList = listOf(
             Address(16, "STREET 16", 0),
             Address(17, "STREET 17", 0),
@@ -30,7 +30,7 @@ class EntityBatchInsertQueryTest(private val db: Database) {
 
     @Test
     fun identity() {
-        val i = IdentityStrategy.metamodel()
+        val i = IdentityStrategy.alias
         val strategies = listOf(
             IdentityStrategy(null, "AAA"),
             IdentityStrategy(null, "BBB"),
@@ -47,7 +47,7 @@ class EntityBatchInsertQueryTest(private val db: Database) {
 
     @Test
     fun createdAt_updatedAt() {
-        val p = Person.metamodel()
+        val p = Person.alias
         val personList = listOf(
             Person(1, "A"),
             Person(2, "B"),
@@ -62,7 +62,7 @@ class EntityBatchInsertQueryTest(private val db: Database) {
 
     @Test
     fun uniqueConstraintException() {
-        val a = Address.metamodel()
+        val a = Address.alias
         assertThrows<UniqueConstraintException> {
             db.execute {
                 EntityQuery.batchInsert(

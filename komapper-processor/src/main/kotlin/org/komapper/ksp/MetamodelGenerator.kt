@@ -36,7 +36,7 @@ internal class EntityMetamodelGenerator(
         w.println()
         w.println("// generated at ${ZonedDateTime.now()}")
         w.println("@Suppress(\"ClassName\", \"PrivatePropertyName\")")
-        w.println("class $simpleName($constructorParamList) : $EntityMetamodel<$entityTypeName> {")
+        w.println("class $simpleName private constructor($constructorParamList) : $EntityMetamodel<$entityTypeName> {")
         w.println("    private val __tableName = table")
         w.println("    private val __catalogName = catalog")
         w.println("    private val __schemaName = schema")
@@ -60,6 +60,7 @@ internal class EntityMetamodelGenerator(
         incrementVersion()
         updateCreatedAt()
         updateUpdatedAt()
+        companionObject()
 
         w.println("}")
 
@@ -185,10 +186,18 @@ internal class EntityMetamodelGenerator(
         w.println("    override fun updateUpdatedAt(__e: $entityTypeName, __c: $Clock): $entityTypeName = $body")
     }
 
+    private fun companionObject() {
+        w.println("    companion object {")
+        w.println("        val alias = $simpleName()")
+        w.println("        fun newAlias($constructorParamList) = $simpleName(table, catalog, schema)")
+        w.println("    }")
+    }
+
     private fun utils() {
         if (entity.declaration.hasCompanionObject()) {
             w.println("")
-            w.println("fun $entityTypeName.Companion.metamodel($constructorParamList) = $simpleName(table, catalog, schema)")
+            w.println("val $entityTypeName.Companion.alias get() = $simpleName.alias")
+            w.println("fun $entityTypeName.Companion.newAlias($constructorParamList) = $simpleName.newAlias(table, catalog, schema)")
         }
     }
 }
@@ -200,6 +209,12 @@ internal class EmptyEntityMetamodelGenerator(
     private val fileName: String,
     private val w: PrintWriter
 ) : Runnable {
+    private val constructorParamList = listOf(
+        "table: String = \"\"",
+        "catalog: String = \"\"",
+        "schema: String = \"\""
+    ).joinToString(", ")
+
     override fun run() {
         w.println("package $packageName")
         w.println()
@@ -212,10 +227,15 @@ internal class EmptyEntityMetamodelGenerator(
                 w.println("    val $p = $EmptyPropertyMetamodel<$simpleQualifiedName, ${p.type.resolve().declaration.qualifiedName?.asString()}>()")
             }
         }
+        w.println("    companion object {")
+        w.println("        val alias = $fileName()")
+        w.println("        fun newAlias($constructorParamList) = $fileName()")
+        w.println("    }")
         w.println("}")
         if (classDeclaration.hasCompanionObject()) {
             w.println("")
-            w.println("fun $simpleQualifiedName.Companion.metamodel() = $fileName()")
+            w.println("val $simpleQualifiedName.Companion.alias get() = $fileName.alias")
+            w.println("fun $simpleQualifiedName.Companion.newAlias($constructorParamList) = $fileName.newAlias(table, catalog, schema)")
         }
     }
 }

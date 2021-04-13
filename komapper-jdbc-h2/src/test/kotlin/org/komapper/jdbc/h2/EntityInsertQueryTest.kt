@@ -21,7 +21,7 @@ class EntityInsertQueryTest(private val db: Database) {
 
     @Test
     fun test() {
-        val a = Address.metamodel()
+        val a = Address.alias
         val address = Address(16, "STREET 16", 0)
         db.execute { EntityQuery.insert(a, address) }
         val address2 = db.execute {
@@ -34,7 +34,7 @@ class EntityInsertQueryTest(private val db: Database) {
 
     @Test
     fun createdAt_localDateTime() {
-        val p = Person.metamodel()
+        val p = Person.alias
         val person1 = Person(1, "ABC")
         val person2 = db.execute { EntityQuery.insert(p, person1) }
         assertNotNull(person2.createdAt)
@@ -50,7 +50,7 @@ class EntityInsertQueryTest(private val db: Database) {
 
     @Test
     fun createdAt_offsetDateTime() {
-        val h = Human.metamodel()
+        val h = Human.alias
         val human1 = Human(1, "ABC")
         val human2 = db.execute { EntityQuery.insert(h, human1) }
         assertNotNull(human2.createdAt)
@@ -69,7 +69,7 @@ class EntityInsertQueryTest(private val db: Database) {
         val instant = Instant.parse("2021-01-01T00:00:00Z")
         val zoneId = ZoneId.of("UTC")
 
-        val p = Person.metamodel()
+        val p = Person.alias
         val config = object : DatabaseConfig by db.config {
             override val clockProvider = ClockProvider {
                 Clock.fixed(instant, zoneId)
@@ -92,7 +92,7 @@ class EntityInsertQueryTest(private val db: Database) {
 
     @Test
     fun uniqueConstraintException() {
-        val a = Address.metamodel()
+        val a = Address.alias
         val address = Address(1, "STREET 1", 0)
         assertThrows<UniqueConstraintException> {
             db.execute { EntityQuery.insert(a, address) }.let { }
@@ -102,7 +102,7 @@ class EntityInsertQueryTest(private val db: Database) {
     @Test
     fun identityGenerator() {
         for (i in 1..201) {
-            val m = IdentityStrategy.metamodel()
+            val m = IdentityStrategy.alias
             val strategy = IdentityStrategy(0, "test")
             val newStrategy = db.execute { EntityQuery.insert(m, strategy) }
             assertEquals(i, newStrategy.id)
@@ -112,7 +112,7 @@ class EntityInsertQueryTest(private val db: Database) {
     @Test
     fun sequenceGenerator() {
         for (i in 1..201) {
-            val m = SequenceStrategy.metamodel()
+            val m = SequenceStrategy.alias
             val strategy = SequenceStrategy(0, "test")
             val newStrategy = db.execute { EntityQuery.insert(m, strategy) }
             assertEquals(i, newStrategy.id)

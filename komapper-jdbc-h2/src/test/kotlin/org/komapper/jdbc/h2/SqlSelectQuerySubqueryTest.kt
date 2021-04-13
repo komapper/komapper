@@ -14,8 +14,8 @@ class SqlSelectQuerySubqueryTest(private val db: Database) {
 
     @Test
     fun subquery_selectClause() {
-        val d = Department.metamodel()
-        val e = Employee.metamodel()
+        val d = Department.alias
+        val e = Employee.alias
         val subquery = SqlQuery.from(e).where { d.departmentId eq e.departmentId }.select(count())
         val query = SqlQuery.from(d)
             .orderBy(d.departmentId)
@@ -27,8 +27,8 @@ class SqlSelectQuerySubqueryTest(private val db: Database) {
 
     @Test
     fun subquery_whereClause() {
-        val d = Department.metamodel()
-        val e = Employee.metamodel()
+        val d = Department.alias
+        val e = Employee.alias
         val subquery = SqlQuery.from(d)
             .where {
                 d.departmentName eq "SALES"

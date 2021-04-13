@@ -17,7 +17,7 @@ class SqlSelectQuerySelectTest(private val db: Database) {
 
     @Test
     fun selectProperty() {
-        val a = Address.metamodel()
+        val a = Address.alias
         val streetList = db.execute {
             SqlQuery.from(a)
                 .where {
@@ -31,7 +31,7 @@ class SqlSelectQuerySelectTest(private val db: Database) {
 
     @Test
     fun selectProperty_first() {
-        val a = Address.metamodel()
+        val a = Address.alias
         val value = db.execute {
             SqlQuery.from(a)
                 .where {
@@ -46,7 +46,7 @@ class SqlSelectQuerySelectTest(private val db: Database) {
 
     @Test
     fun selectPropertiesAsPair() {
-        val a = Address.metamodel()
+        val a = Address.alias
         val pairList = db.execute {
             SqlQuery.from(a)
                 .where {
@@ -60,7 +60,7 @@ class SqlSelectQuerySelectTest(private val db: Database) {
 
     @Test
     fun selectPropertiesAsTriple() {
-        val a = Address.metamodel()
+        val a = Address.alias
         val tripleList = db.execute {
             SqlQuery.from(a)
                 .where {
@@ -80,7 +80,7 @@ class SqlSelectQuerySelectTest(private val db: Database) {
 
     @Test
     fun selectPropertiesAsRecord() {
-        val a = Address.metamodel()
+        val a = Address.alias
         val list = db.execute {
             SqlQuery.from(a)
                 .where {
@@ -104,8 +104,8 @@ class SqlSelectQuerySelectTest(private val db: Database) {
 
     @Test
     fun selectEntity() {
-        val a = Address.metamodel()
-        val e = Employee.metamodel()
+        val a = Address.alias
+        val e = Employee.alias
         val list: List<Address> = db.execute {
             SqlQuery.from(a)
                 .leftJoin(e) {
@@ -118,8 +118,8 @@ class SqlSelectQuerySelectTest(private val db: Database) {
 
     @Test
     fun selectEntitiesAsPair_leftJoin() {
-        val a = Address.metamodel()
-        val e = Employee.metamodel()
+        val a = Address.alias
+        val e = Employee.alias
         val list: List<Pair<Address, Employee?>> = db.execute {
             SqlQuery.from(a)
                 .leftJoin(e) {
@@ -135,8 +135,8 @@ class SqlSelectQuerySelectTest(private val db: Database) {
 
     @Test
     fun selectEntitiesAsPair_innerJoin() {
-        val a = Address.metamodel()
-        val e = Employee.metamodel()
+        val a = Address.alias
+        val e = Employee.alias
         val list: List<Pair<Address, Employee?>> = db.execute {
             SqlQuery.from(a).innerJoin(e) {
                 a.addressId eq e.addressId
@@ -148,9 +148,9 @@ class SqlSelectQuerySelectTest(private val db: Database) {
 
     @Test
     fun selectEntitiesAsTriple() {
-        val a = Address.metamodel()
-        val e = Employee.metamodel()
-        val d = Department.metamodel()
+        val a = Address.alias
+        val e = Employee.alias
+        val d = Department.alias
         val list = db.execute {
             SqlQuery.from(a)
                 .innerJoin(e) {
@@ -165,9 +165,9 @@ class SqlSelectQuerySelectTest(private val db: Database) {
 
     @Test
     fun selectEntitiesAsRecord() {
-        val a = Address.metamodel()
-        val e = Employee.metamodel()
-        val d = Department.metamodel()
+        val a = Address.alias
+        val e = Employee.alias
+        val d = Department.alias
         val list = db.execute {
             SqlQuery.from(a)
                 .where {
@@ -191,8 +191,8 @@ class SqlSelectQuerySelectTest(private val db: Database) {
 
     @Test
     fun selectProperty2() {
-        val d = Department.metamodel()
-        val e = Employee.metamodel()
+        val d = Department.alias
+        val e = Employee.alias
         val subquery = SqlQuery.from(e).where { d.departmentId eq e.departmentId }.select(count())
         val list = db.execute {
             SqlQuery.from(d)

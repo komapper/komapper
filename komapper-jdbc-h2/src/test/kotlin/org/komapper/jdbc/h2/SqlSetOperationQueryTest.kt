@@ -16,7 +16,7 @@ class SqlSetOperationQueryTest(private val db: Database) {
 
     @Test
     fun except_entity() {
-        val e = Employee.metamodel()
+        val e = Employee.alias
         val q1 = SqlQuery.from(e).where { e.employeeId inList listOf(1, 2, 3, 4, 5) }
         val q2 = SqlQuery.from(e).where { e.employeeId inList listOf(2, 4, 6, 8) }
         val query = (q1 except q2).orderBy(e.employeeId)
@@ -32,7 +32,7 @@ class SqlSetOperationQueryTest(private val db: Database) {
 
     @Test
     fun intersect_entity() {
-        val e = Employee.metamodel()
+        val e = Employee.alias
         val q1 = SqlQuery.from(e).where { e.employeeId inList listOf(1, 2, 3, 4, 5) }
         val q2 = SqlQuery.from(e).where { e.employeeId inList listOf(2, 4, 6, 8) }
         val query = (q1 intersect q2).orderBy(e.employeeId)
@@ -46,7 +46,7 @@ class SqlSetOperationQueryTest(private val db: Database) {
 
     @Test
     fun union_entity() {
-        val e = Employee.metamodel()
+        val e = Employee.alias
         val q1 = SqlQuery.from(e).where { e.employeeId eq 1 }
         val q2 = SqlQuery.from(e).where { e.employeeId eq 1 }
         val q3 = EntityQuery.from(e).where { e.employeeId eq 5 }
@@ -61,7 +61,7 @@ class SqlSetOperationQueryTest(private val db: Database) {
 
     @Test
     fun union_subquery() {
-        val e = Employee.metamodel()
+        val e = Employee.alias
         val q1 = SqlQuery.from(e).where { e.employeeId eq 1 }.select(e.employeeId)
         val q2 = SqlQuery.from(e).where { e.employeeId eq 6 }.select(e.employeeId)
         val subquery = q1 union q2
@@ -74,9 +74,9 @@ class SqlSetOperationQueryTest(private val db: Database) {
 
     @Test
     fun union_columns() {
-        val e = Employee.metamodel()
-        val a = Address.metamodel()
-        val d = Department.metamodel()
+        val e = Employee.alias
+        val a = Address.alias
+        val d = Department.alias
         val q1 =
             SqlQuery.from(e).where { e.employeeId eq 1 }
                 .select(e.employeeId alias "ID", e.employeeName alias "NAME")
@@ -94,7 +94,7 @@ class SqlSetOperationQueryTest(private val db: Database) {
 
     @Test
     fun unionAll_entity() {
-        val e = Employee.metamodel()
+        val e = Employee.alias
         val q1 = SqlQuery.from(e).where { e.employeeId eq 1 }
         val q2 = SqlQuery.from(e).where { e.employeeId eq 1 }
         val q3 = SqlQuery.from(e).where { e.employeeId eq 5 }
@@ -111,7 +111,7 @@ class SqlSetOperationQueryTest(private val db: Database) {
 
     @Test
     fun emptyWhereClause() {
-        val e = Employee.metamodel()
+        val e = Employee.alias
         val q1 = SqlQuery.from(e).where { e.employeeId eq 1 }
         val q2 = SqlQuery.from(e)
         val query = (q1 union q2).option { it.copy(allowEmptyWhereClause = false) }

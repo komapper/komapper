@@ -12,8 +12,8 @@ class SqlSelectQueryJoinTest(private val db: Database) {
 
     @Test
     fun innerJoin() {
-        val a = Address.metamodel()
-        val e = Employee.metamodel()
+        val a = Address.alias
+        val e = Employee.alias
         val list = db.execute {
             SqlQuery.from(a).innerJoin(e) {
                 a.addressId eq e.addressId
@@ -24,8 +24,8 @@ class SqlSelectQueryJoinTest(private val db: Database) {
 
     @Test
     fun leftJoin() {
-        val a = Address.metamodel()
-        val e = Employee.metamodel()
+        val a = Address.alias
+        val e = Employee.alias
         val list = db.execute {
             SqlQuery.from(a).leftJoin(e) {
                 a.addressId eq e.addressId

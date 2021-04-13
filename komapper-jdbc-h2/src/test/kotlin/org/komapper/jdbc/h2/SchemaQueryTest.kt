@@ -40,7 +40,7 @@ class SchemaQueryTest(private val db: Database) {
         companion object
     }
 
-    private val metamodels = listOf(Aaa.metamodel(), Bbb.metamodel(), Ccc.metamodel())
+    private val metamodels = listOf(Aaa.alias, Bbb.alias, Ccc.alias)
 
     @Test
     fun create() {

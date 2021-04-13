@@ -17,7 +17,7 @@ class ExpressionTest(private val db: Database) {
 
     @Test
     fun plus() {
-        val a = Address_()
+        val a = Address.alias
         val result = db.execute {
             SqlQuery.from(a)
                 .where {
@@ -33,7 +33,7 @@ class ExpressionTest(private val db: Database) {
 
     @Test
     fun plus_other_column() {
-        val a = Address_()
+        val a = Address.alias
         val result = db.execute {
             SqlQuery.from(a)
                 .where {
@@ -49,7 +49,7 @@ class ExpressionTest(private val db: Database) {
 
     @Test
     fun minus() {
-        val a = Address_()
+        val a = Address.alias
         val result = db.execute {
             SqlQuery.from(a)
                 .where {
@@ -65,7 +65,7 @@ class ExpressionTest(private val db: Database) {
 
     @Test
     fun minus_other_column() {
-        val a = Address_()
+        val a = Address.alias
         val result = db.execute {
             SqlQuery.from(a)
                 .where {
@@ -81,7 +81,7 @@ class ExpressionTest(private val db: Database) {
 
     @Test
     fun div() {
-        val a = Address_()
+        val a = Address.alias
         val result = db.execute {
             SqlQuery.from(a)
                 .where {
@@ -97,7 +97,7 @@ class ExpressionTest(private val db: Database) {
 
     @Test
     fun div_other_column() {
-        val a = Address_()
+        val a = Address.alias
         val result = db.execute {
             SqlQuery.from(a)
                 .where {
@@ -113,7 +113,7 @@ class ExpressionTest(private val db: Database) {
 
     @Test
     fun rem() {
-        val a = Address_()
+        val a = Address.alias
         val result = db.execute {
             SqlQuery.from(a)
                 .where {
@@ -129,7 +129,7 @@ class ExpressionTest(private val db: Database) {
 
     @Test
     fun rem_other_column() {
-        val a = Address_()
+        val a = Address.alias
         val result = db.execute {
             SqlQuery.from(a)
                 .where {
@@ -145,7 +145,7 @@ class ExpressionTest(private val db: Database) {
 
     @Test
     fun concat() {
-        val a = Address_()
+        val a = Address.alias
         val result = db.execute {
             SqlQuery.from(a)
                 .where {
@@ -153,7 +153,6 @@ class ExpressionTest(private val db: Database) {
                 }
                 .select(concat(concat("[", a.street), "]"))
                 .also {
-                    val s = it.dryRun()
                     println(it.dryRun())
                 }.first()
         }
@@ -162,7 +161,7 @@ class ExpressionTest(private val db: Database) {
 
     @Test
     fun concat_other_column() {
-        val a = Address_()
+        val a = Address.alias
         val result = db.execute {
             SqlQuery.from(a)
                 .where {

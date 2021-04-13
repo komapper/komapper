@@ -35,7 +35,7 @@ class DataTypeTest(val db: Database) {
 
     @Test
     fun any() {
-        val m = AnyTest.metamodel()
+        val m = AnyTest.alias
         val data = AnyTest(
             1,
             AnyPerson("ABC")
@@ -55,7 +55,7 @@ class DataTypeTest(val db: Database) {
 
     @Test
     fun bigDecimal() {
-        val m = BigDecimalTest.metamodel()
+        val m = BigDecimalTest.alias
         val data = BigDecimalTest(1, BigDecimal.TEN)
         db.execute { EntityQuery.insert(m, data) }
         val data2 = db.execute {
@@ -72,7 +72,7 @@ class DataTypeTest(val db: Database) {
 
     @Test
     fun bigInteger() {
-        val m = BigIntegerTest.metamodel()
+        val m = BigIntegerTest.alias
         val data = BigIntegerTest(1, BigInteger.TEN)
         db.execute { EntityQuery.insert(m, data) }
         val data2 = db.execute {
@@ -89,7 +89,7 @@ class DataTypeTest(val db: Database) {
 
     @Test
     fun boolean() {
-        val m = BooleanTest.metamodel()
+        val m = BooleanTest.alias
         val data = BooleanTest(1, true)
         db.execute { EntityQuery.insert(m, data) }
         val data2 = db.execute {
@@ -106,7 +106,7 @@ class DataTypeTest(val db: Database) {
 
     @Test
     fun byte() {
-        val m = ByteTest.metamodel()
+        val m = ByteTest.alias
         val data = ByteTest(1, 10)
         db.execute { EntityQuery.insert(m, data) }
         val data2 = db.execute {
@@ -124,7 +124,7 @@ class DataTypeTest(val db: Database) {
 
     @Test
     fun byteArray() {
-        val m = ByteArrayTest.metamodel()
+        val m = ByteArrayTest.alias
         val data = ByteArrayTest(1, byteArrayOf(10, 20, 30))
         db.execute { EntityQuery.insert(m, data) }
         val data2 = db.execute {
@@ -142,7 +142,7 @@ class DataTypeTest(val db: Database) {
 
     @Test
     fun double() {
-        val m = DoubleTest.metamodel()
+        val m = DoubleTest.alias
         val data = DoubleTest(1, 10.0)
         db.execute { EntityQuery.insert(m, data) }
         val data2 = db.execute {
@@ -159,7 +159,7 @@ class DataTypeTest(val db: Database) {
 
     @Test
     fun float() {
-        val m = FloatTest.metamodel()
+        val m = FloatTest.alias
         val data = FloatTest(1, 10.0f)
         db.execute { EntityQuery.insert(m, data) }
         val data2 = db.execute {
@@ -176,7 +176,7 @@ class DataTypeTest(val db: Database) {
 
     @Test
     fun int() {
-        val m = IntTest.metamodel()
+        val m = IntTest.alias
         val data = IntTest(1, 10)
         db.execute { EntityQuery.insert(m, data) }
         val data2 = db.execute {
@@ -193,7 +193,7 @@ class DataTypeTest(val db: Database) {
 
     @Test
     fun localDateTime() {
-        val m = LocalDateTimeTest.metamodel()
+        val m = LocalDateTimeTest.alias
         val data = LocalDateTimeTest(
             1,
             LocalDateTime.of(2019, 6, 1, 12, 11, 10)
@@ -213,7 +213,7 @@ class DataTypeTest(val db: Database) {
 
     @Test
     fun localDate() {
-        val m = LocalDateTest.metamodel()
+        val m = LocalDateTest.alias
         val data = LocalDateTest(
             1,
             LocalDate.of(2019, 6, 1)
@@ -233,7 +233,7 @@ class DataTypeTest(val db: Database) {
 
     @Test
     fun localTime() {
-        val m = LocalTimeTest.metamodel()
+        val m = LocalTimeTest.alias
         val data = LocalTimeTest(1, LocalTime.of(12, 11, 10))
         db.execute { EntityQuery.insert(m, data) }
         val data2 = db.execute {
@@ -250,7 +250,7 @@ class DataTypeTest(val db: Database) {
 
     @Test
     fun long() {
-        val m = LongTest.metamodel()
+        val m = LongTest.alias
         val data = LongTest(1, 10L)
         db.execute { EntityQuery.insert(m, data) }
         val data2 = db.execute {
@@ -267,7 +267,7 @@ class DataTypeTest(val db: Database) {
 
     @Test
     fun offsetDateTime() {
-        val m = OffsetDateTimeTest.metamodel()
+        val m = OffsetDateTimeTest.alias
         val dateTime = LocalDateTime.of(2019, 6, 1, 12, 11, 10)
         val offset = ZoneOffset.ofHours(9)
         val value = OffsetDateTime.of(dateTime, offset)
@@ -287,7 +287,7 @@ class DataTypeTest(val db: Database) {
 
     @Test
     fun short() {
-        val m = ShortTest.metamodel()
+        val m = ShortTest.alias
         val data = ShortTest(1, 10)
         db.execute { EntityQuery.insert(m, data) }
         val data2 = db.execute {
@@ -304,7 +304,7 @@ class DataTypeTest(val db: Database) {
 
     @Test
     fun string() {
-        val m = StringTest.metamodel()
+        val m = StringTest.alias
         val data = StringTest(1, "ABC")
         db.execute { EntityQuery.insert(m, data) }
         val data2 = db.execute {

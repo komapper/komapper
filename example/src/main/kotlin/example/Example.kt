@@ -20,7 +20,9 @@ data class Address(
     val version: Int = 0,
     val createdAt: LocalDateTime? = null,
     val updatedAt: LocalDateTime? = null,
-)
+) {
+    companion object
+}
 
 @KmEntityDef(Address::class)
 private data class AddressDef(
@@ -35,8 +37,8 @@ fun main() {
     // create a Database instance
     val db = Database(H2DatabaseConfig("jdbc:h2:mem:example;DB_CLOSE_DELAY=-1", enableTransaction = true))
 
-    // create a metamodel
-    val a = Address_()
+    // get a metamodel
+    val a = Address.alias
 
     // execute simple CRUD operations as a transaction
     db.transaction {

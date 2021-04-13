@@ -12,7 +12,7 @@ class SqlInsertQueryTest(private val db: Database) {
 
     @Test
     fun test() {
-        val a = Address.metamodel()
+        val a = Address.alias
         val (count, keys) = db.execute {
             SqlQuery.insert(a).values {
                 a.addressId set 19
@@ -26,7 +26,7 @@ class SqlInsertQueryTest(private val db: Database) {
 
     @Test
     fun generatedKeys() {
-        val a = IdentityStrategy.metamodel()
+        val a = IdentityStrategy.alias
         val (count, keys) = db.execute {
             SqlQuery.insert(a).values {
                 a.id set 10
@@ -39,8 +39,8 @@ class SqlInsertQueryTest(private val db: Database) {
 
     @Test
     fun select() {
-        val a = Address.metamodel()
-        val aa = Address.metamodel(table = "ADDRESS_ARCHIVE")
+        val a = Address.alias
+        val aa = Address.newAlias(table = "ADDRESS_ARCHIVE")
         val (count) = db.execute {
             SqlQuery.insert(aa).select {
                 SqlQuery.from(a).where { a.addressId between 1..5 }

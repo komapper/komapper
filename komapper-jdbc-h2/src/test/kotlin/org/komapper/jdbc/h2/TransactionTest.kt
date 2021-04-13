@@ -74,7 +74,7 @@ class TransactionTest {
 
     @Test
     fun select() {
-        val a = Address.metamodel()
+        val a = Address.alias
         val list = db.transaction.required {
             db.execute { EntityQuery.from(a) }
         }
@@ -84,7 +84,7 @@ class TransactionTest {
 
     @Test
     fun commit() {
-        val a = Address.metamodel()
+        val a = Address.alias
         val query = EntityQuery.from(a).where { a.addressId eq 15 }
         db.transaction.required {
             val address = db.execute { query.first() }
@@ -98,7 +98,7 @@ class TransactionTest {
 
     @Test
     fun rollback() {
-        val a = Address.metamodel()
+        val a = Address.alias
         val query = EntityQuery.from(a).where { a.addressId eq 15 }
         try {
             db.transaction.required {
@@ -116,7 +116,7 @@ class TransactionTest {
 
     @Test
     fun setRollbackOnly() {
-        val a = Address.metamodel()
+        val a = Address.alias
         val query = EntityQuery.from(a).where { a.addressId eq 15 }
         db.transaction.required {
             val address = db.execute { query.first() }
@@ -133,7 +133,7 @@ class TransactionTest {
 
     @Test
     fun isolationLevel() {
-        val a = Address.metamodel()
+        val a = Address.alias
         val query = EntityQuery.from(a).where { a.addressId eq 15 }
         db.transaction.required(TransactionIsolationLevel.SERIALIZABLE) {
             val address = db.execute { query.first() }
@@ -147,7 +147,7 @@ class TransactionTest {
 
     @Test
     fun required_required() {
-        val a = Address.metamodel()
+        val a = Address.alias
         val query = EntityQuery.from(a).where { a.addressId eq 15 }
         db.transaction.required {
             val address = db.execute { query.first() }
@@ -165,7 +165,7 @@ class TransactionTest {
 
     @Test
     fun requiresNew() {
-        val a = Address.metamodel()
+        val a = Address.alias
         val query = EntityQuery.from(a).where { a.addressId eq 15 }
         db.transaction.requiresNew {
             val address = db.execute { query.first() }
@@ -181,7 +181,7 @@ class TransactionTest {
 
     @Test
     fun required_requiresNew() {
-        val a = Address.metamodel()
+        val a = Address.alias
         val query = EntityQuery.from(a).where { a.addressId eq 15 }
         db.transaction.required {
             val address = db.execute { query.first() }
@@ -199,7 +199,7 @@ class TransactionTest {
 
     @Test
     fun invoke() {
-        val a = Address.metamodel()
+        val a = Address.alias
         val query = EntityQuery.from(a).where { a.addressId eq 15 }
         db.transaction {
             val address = db.execute { query.first() }
@@ -220,7 +220,7 @@ class TransactionTest {
     @Test
     fun array() {
         db.transaction {
-            val meta = ArrayTest.metamodel()
+            val meta = ArrayTest.alias
             val array = db.factory.createArrayOf("INTEGER", listOf(10, 20, 30))
             val data = ArrayTest(1, array)
             db.execute { EntityQuery.insert(meta, data) }
@@ -241,7 +241,7 @@ class TransactionTest {
     @Test
     fun blob() {
         db.transaction {
-            val m = BlobTest.metamodel()
+            val m = BlobTest.alias
             val blob = db.factory.createBlob()
             val bytes = byteArrayOf(10, 20, 30)
             blob.setBytes(1, bytes)
@@ -264,7 +264,7 @@ class TransactionTest {
     @Test
     fun clob() {
         db.transaction {
-            val m = ClobTest.metamodel()
+            val m = ClobTest.alias
             val clob = db.factory.createClob()
             clob.setString(1, "ABC")
             val data = ClobTest(1, clob)
@@ -288,7 +288,7 @@ class TransactionTest {
     @Test
     fun nclob() {
         db.transaction {
-            val m = NClobTest.metamodel()
+            val m = NClobTest.alias
             val nclob = db.factory.createNClob()
             nclob.setString(1, "ABC")
             val data = NClobTest(1, nclob)
@@ -312,7 +312,7 @@ class TransactionTest {
     @Test
     fun sqlXml() {
         db.transaction {
-            val m = SqlXmlTest.metamodel()
+            val m = SqlXmlTest.alias
             val sqlXml = db.factory.createSQLXML()
             sqlXml.string = """<xml a="v">Text</xml>"""
             val data = SqlXmlTest(1, sqlXml)

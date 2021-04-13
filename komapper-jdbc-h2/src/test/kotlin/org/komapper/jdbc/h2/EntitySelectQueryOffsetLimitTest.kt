@@ -12,21 +12,21 @@ class EntitySelectQueryOffsetLimitTest(private val db: Database) {
 
     @Test
     fun offset() {
-        val a = Address.metamodel()
+        val a = Address.alias
         val list = db.execute { EntityQuery.from(a).offset(10) }
         assertEquals(5, list.size)
     }
 
     @Test
     fun limit() {
-        val a = Address.metamodel()
+        val a = Address.alias
         val list = db.execute { EntityQuery.from(a).limit(3) }
         assertEquals(3, list.size)
     }
 
     @Test
     fun offset_limit() {
-        val a = Address.metamodel()
+        val a = Address.alias
         val list = db.execute {
             EntityQuery.from(a)
                 .orderBy(a.addressId)

@@ -17,7 +17,7 @@ class SqlSelectQueryAggregateTest(private val db: Database) {
 
     @Test
     fun aggregate_avg() {
-        val a = Address.metamodel()
+        val a = Address.alias
         val avg = db.execute {
             SqlQuery.from(a).select(avg(a.addressId)).first()
         }
@@ -26,7 +26,7 @@ class SqlSelectQueryAggregateTest(private val db: Database) {
 
     @Test
     fun aggregate_countAsterisk() {
-        val a = Address.metamodel()
+        val a = Address.alias
         val count = db.execute {
             SqlQuery.from(a).select(count()).first()
         }
@@ -35,7 +35,7 @@ class SqlSelectQueryAggregateTest(private val db: Database) {
 
     @Test
     fun aggregate_count() {
-        val a = Address.metamodel()
+        val a = Address.alias
         val count = db.execute {
             SqlQuery.from(a).select(count(a.street)).first()
         }
@@ -44,28 +44,28 @@ class SqlSelectQueryAggregateTest(private val db: Database) {
 
     @Test
     fun aggregate_sum() {
-        val a = Address.metamodel()
+        val a = Address.alias
         val sum = db.execute { SqlQuery.from(a).select(sum(a.addressId)).first() }
         assertEquals(120, sum)
     }
 
     @Test
     fun aggregate_max() {
-        val a = Address.metamodel()
+        val a = Address.alias
         val max = db.execute { SqlQuery.from(a).select(max(a.addressId)).first() }
         assertEquals(15, max)
     }
 
     @Test
     fun aggregate_min() {
-        val a = Address.metamodel()
+        val a = Address.alias
         val min = db.execute { SqlQuery.from(a).select(min(a.addressId)).first() }
         assertEquals(1, min)
     }
 
     @Test
     fun having() {
-        val e = Employee.metamodel()
+        val e = Employee.alias
         val list = db.execute {
             SqlQuery.from(e)
                 .groupBy(e.departmentId)
@@ -80,7 +80,7 @@ class SqlSelectQueryAggregateTest(private val db: Database) {
 
     @Test
     fun having_empty_groupBy() {
-        val e = Employee.metamodel()
+        val e = Employee.alias
         val list = db.execute {
             SqlQuery.from(e)
                 .having {

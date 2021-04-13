@@ -12,8 +12,8 @@ class SqlSelectQueryDistinctTest(private val db: Database) {
 
     @Test
     fun distinct() {
-        val d = Department.metamodel()
-        val e = Employee.metamodel()
+        val d = Department.alias
+        val e = Employee.alias
         val query = SqlQuery.from(d).innerJoin(e) { d.departmentId eq e.departmentId }
         val list = db.execute { query }
         assertEquals(14, list.size)

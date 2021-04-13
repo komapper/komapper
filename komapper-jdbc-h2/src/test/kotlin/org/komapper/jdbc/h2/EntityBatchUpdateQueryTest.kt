@@ -17,7 +17,7 @@ class EntityBatchUpdateQueryTest(private val db: Database) {
 
     @Test
     fun test() {
-        val a = Address.metamodel()
+        val a = Address.alias
         val addressList = listOf(
             Address(16, "STREET 16", 0),
             Address(17, "STREET 17", 0),
@@ -42,7 +42,7 @@ class EntityBatchUpdateQueryTest(private val db: Database) {
 
     @Test
     fun updatedAt() {
-        val p = Person.metamodel()
+        val p = Person.alias
         val personList = listOf(
             Person(1, "A"),
             Person(2, "B"),
@@ -59,7 +59,7 @@ class EntityBatchUpdateQueryTest(private val db: Database) {
 
     @Test
     fun uniqueConstraintException() {
-        val a = Address.metamodel()
+        val a = Address.alias
         assertThrows<UniqueConstraintException> {
             db.execute {
                 EntityQuery.batchUpdate(
@@ -76,7 +76,7 @@ class EntityBatchUpdateQueryTest(private val db: Database) {
 
     @Test
     fun optimisticLockException() {
-        val a = Address.metamodel()
+        val a = Address.alias
         val ex = assertThrows<OptimisticLockException> {
             db.execute {
                 EntityQuery.batchUpdate(

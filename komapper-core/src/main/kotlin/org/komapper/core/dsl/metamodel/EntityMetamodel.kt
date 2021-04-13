@@ -2,6 +2,7 @@ package org.komapper.core.dsl.metamodel
 
 import org.komapper.core.dsl.expression.EntityExpression
 import java.time.Clock
+import kotlin.reflect.KClass
 
 interface EntityMetamodel<ENTITY : Any> : EntityExpression<ENTITY> {
     fun idAssignment(): Assignment<ENTITY>?
@@ -18,6 +19,7 @@ interface EntityMetamodel<ENTITY : Any> : EntityExpression<ENTITY> {
 
 @Suppress("unused")
 abstract class EmptyEntityMetamodel<ENTITY : Any> : EntityMetamodel<ENTITY> {
+    override fun klass(): KClass<ENTITY> = fail()
     override fun tableName(): String = fail()
     override fun catalogName(): String = fail()
     override fun schemaName(): String = fail()

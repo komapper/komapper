@@ -21,7 +21,7 @@ class MiscTest {
 
     @Test
     fun catalogAndSchema() {
-        val m = MiscTest_CatalogAndSchema_()
+        val m = MiscTest_CatalogAndSchema_.alias
         val query = EntityQuery.from(m)
         val sql = query.dryRun()
         println(sql)
@@ -36,7 +36,7 @@ class MiscTest {
 
     @Test
     fun catalogOnly() {
-        val m = MiscTest_CatalogOnly_()
+        val m = MiscTest_CatalogOnly_.alias
         val query = EntityQuery.from(m)
         val sql = query.dryRun()
         println(sql)
@@ -51,7 +51,7 @@ class MiscTest {
 
     @Test
     fun schemaOnly() {
-        val m = MiscTest_SchemaOnly_()
+        val m = MiscTest_SchemaOnly_.alias
         val query = EntityQuery.from(m)
         val sql = query.dryRun()
         println(sql)
@@ -66,7 +66,7 @@ class MiscTest {
 
     @Test
     fun emptyTable() {
-        val m = MiscTest_BlankName_()
+        val m = MiscTest_BlankName_.alias
         val query = EntityQuery.from(m)
         val sql = query.dryRun()
         println(sql)

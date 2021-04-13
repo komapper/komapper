@@ -12,7 +12,7 @@ class EntityBatchMergeTest(private val db: Database) {
 
     @Test
     fun batchMerge() {
-        val d = Department.metamodel()
+        val d = Department.alias
         val department1 = Department(5, 50, "PLANNING", "TOKYO", 1)
         val department2 = Department(6, 10, "DEVELOPMENT", "KYOTO", 1)
         val query = H2EntityQuery.batchMerge(d, listOf(department1, department2)).on(d.departmentNo)

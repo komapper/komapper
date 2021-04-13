@@ -13,8 +13,8 @@ class EntitySelectQueryJoinTest(private val db: Database) {
 
     @Test
     fun innerJoin() {
-        val a = Address.metamodel()
-        val e = Employee.metamodel()
+        val a = Address.alias
+        val e = Employee.alias
         val list = db.execute {
             EntityQuery.from(a).innerJoin(e) {
                 a.addressId eq e.addressId
@@ -25,8 +25,8 @@ class EntitySelectQueryJoinTest(private val db: Database) {
 
     @Test
     fun leftJoin() {
-        val a = Address.metamodel()
-        val e = Employee.metamodel()
+        val a = Address.alias
+        val e = Employee.alias
         val list = db.execute {
             EntityQuery.from(a).leftJoin(e) {
                 a.addressId eq e.addressId
@@ -37,8 +37,8 @@ class EntitySelectQueryJoinTest(private val db: Database) {
 
     @Test
     fun innerJoin_multiConditions() {
-        val employee = Employee.metamodel()
-        val manager = Employee.metamodel()
+        val employee = Employee.alias
+        val manager = Employee.newAlias()
         val list = db.execute {
             EntityQuery.from(employee).innerJoin(manager) {
                 employee.managerId eq manager.employeeId
@@ -51,8 +51,8 @@ class EntitySelectQueryJoinTest(private val db: Database) {
 
     @Test
     fun association_many_to_one() {
-        val e = Employee.metamodel()
-        val d = Department.metamodel()
+        val e = Employee.alias
+        val d = Department.alias
         val list = db.execute {
             EntityQuery.from(e).innerJoin(d) {
                 e.departmentId eq d.departmentId
@@ -66,8 +66,8 @@ class EntitySelectQueryJoinTest(private val db: Database) {
 
     @Test
     fun association_one_to_many() {
-        val d = Department.metamodel()
-        val e = Employee.metamodel()
+        val d = Department.alias
+        val e = Employee.alias
         val list = db.execute {
             EntityQuery.from(d).innerJoin(e) {
                 d.departmentId eq e.departmentId
@@ -87,8 +87,8 @@ class EntitySelectQueryJoinTest(private val db: Database) {
 
     @Test
     fun association_one_to_one() {
-        val a = Address.metamodel()
-        val e = Employee.metamodel()
+        val a = Address.alias
+        val e = Employee.alias
         val list = db.execute {
             EntityQuery.from(e).innerJoin(a) {
                 e.addressId eq a.addressId

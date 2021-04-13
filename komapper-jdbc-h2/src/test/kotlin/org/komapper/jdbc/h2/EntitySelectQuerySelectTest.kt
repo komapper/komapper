@@ -12,7 +12,7 @@ class EntitySelectQuerySelectTest(private val db: Database) {
 
     @Test
     fun single() {
-        val a = Address.metamodel()
+        val a = Address.alias
         val street = db.execute {
             EntityQuery.from(a).where { a.addressId eq 1 }
                 .asSqlQuery().select(a.street).first()
@@ -22,7 +22,7 @@ class EntitySelectQuerySelectTest(private val db: Database) {
 
     @Test
     fun pair() {
-        val a = Address.metamodel()
+        val a = Address.alias
         val (id, street) = db.execute {
             EntityQuery.from(a).where { a.addressId eq 1 }
                 .asSqlQuery().select(a.addressId, a.street).first()

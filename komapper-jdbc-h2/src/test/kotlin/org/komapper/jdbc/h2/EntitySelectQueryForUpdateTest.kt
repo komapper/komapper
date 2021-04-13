@@ -14,7 +14,7 @@ class EntitySelectQueryForUpdateTest(private val db: Database) {
 
     @Test
     fun forUpdate() {
-        val a = Address.metamodel()
+        val a = Address.alias
         val list = db.execute {
             EntityQuery.from(a).where { a.addressId greaterEq 1 }
                 .orderBy(a.addressId.desc())

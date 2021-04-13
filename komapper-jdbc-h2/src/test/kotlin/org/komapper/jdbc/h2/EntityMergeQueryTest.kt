@@ -18,7 +18,7 @@ class EntityMergeQueryTest(private val db: Database) {
 
     @Test
     fun insert() {
-        val d = Department.metamodel()
+        val d = Department.alias
         val department = Department(5, 50, "PLANNING", "TOKYO", 0)
         val query = H2EntityQuery.merge(d, department)
         val (count, keys) = db.execute { query }
@@ -30,7 +30,7 @@ class EntityMergeQueryTest(private val db: Database) {
 
     @Test
     fun insert_on() {
-        val d = Department.metamodel()
+        val d = Department.alias
         val department = Department(5, 50, "PLANNING", "TOKYO", 0)
         val query = H2EntityQuery.merge(d, department).on(d.departmentName)
         val (count, keys) = db.execute { query }
@@ -42,7 +42,7 @@ class EntityMergeQueryTest(private val db: Database) {
 
     @Test
     fun update() {
-        val d = Department.metamodel()
+        val d = Department.alias
         val department = Department(1, 50, "PLANNING", "TOKYO", 1)
         val query = H2EntityQuery.merge(d, department)
         val (count, keys) = db.execute { query }
@@ -57,7 +57,7 @@ class EntityMergeQueryTest(private val db: Database) {
 
     @Test
     fun update_on() {
-        val d = Department.metamodel()
+        val d = Department.alias
         val department = Department(5, 10, "PLANNING", "TOKYO", 1)
         val query = H2EntityQuery.merge(d, department).on(d.departmentNo)
         val (count, keys) = db.execute { query }
@@ -70,7 +70,7 @@ class EntityMergeQueryTest(private val db: Database) {
 
     @Test
     fun optimisticLockException() {
-        val d = Department.metamodel()
+        val d = Department.alias
         db.execute {
             SqlQuery.update(d).set { d.version set d.version + 10 }.where { d.departmentId eq 1 }
         }
@@ -85,7 +85,7 @@ class EntityMergeQueryTest(private val db: Database) {
 
     @Test
     fun uniqueConstraintException() {
-        val d = Department.metamodel()
+        val d = Department.alias
         val department = db.execute { EntityQuery.first(d) { d.departmentId eq 1 } }
         assertThrows<UniqueConstraintException> {
             val department2 = department.copy(departmentId = 5)
@@ -95,7 +95,7 @@ class EntityMergeQueryTest(private val db: Database) {
 
     @Test
     fun option_ignoreVersion() {
-        val d = Department.metamodel()
+        val d = Department.alias
         db.execute {
             SqlQuery.update(d).set { d.version set d.version + 10 }.where { d.departmentId eq 1 }
         }

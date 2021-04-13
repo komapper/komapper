@@ -23,7 +23,7 @@ class EntityUpdateQueryTest(private val db: Database) {
 
     @Test
     fun test() {
-        val a = Address.metamodel()
+        val a = Address.alias
         val query = EntityQuery.from(a).where { a.addressId eq 15 }
         val address = db.execute { query.first() }
         val newAddress = address.copy(street = "NY street")
@@ -41,7 +41,7 @@ class EntityUpdateQueryTest(private val db: Database) {
 
     @Test
     fun updatedAt() {
-        val p = Person.metamodel()
+        val p = Person.alias
         val person1 = Person(1, "ABC")
         db.execute { EntityQuery.insert(p, person1) }
         val person2 = db.execute {
@@ -67,7 +67,7 @@ class EntityUpdateQueryTest(private val db: Database) {
         val instant = Instant.parse("2021-01-01T00:00:00Z")
         val zoneId = ZoneId.of("UTC")
 
-        val p = Person.metamodel()
+        val p = Person.alias
         val person1 = Person(1, "ABC")
         db.execute { EntityQuery.insert(p, person1) }
         val person2 = db.execute {
@@ -93,7 +93,7 @@ class EntityUpdateQueryTest(private val db: Database) {
 
     @Test
     fun uniqueConstraintException() {
-        val a = Address.metamodel()
+        val a = Address.alias
         val address = Address(1, "STREET 2", 1)
         assertThrows<UniqueConstraintException> {
             db.execute { EntityQuery.update(a, address) }.let { }
@@ -102,7 +102,7 @@ class EntityUpdateQueryTest(private val db: Database) {
 
     @Test
     fun optimisticLockException() {
-        val a = Address.metamodel()
+        val a = Address.alias
         val address = db.execute { EntityQuery.from(a).where { a.addressId eq 15 }.first() }
         db.execute { EntityQuery.update(a, address) }
         assertThrows<OptimisticLockException> {
@@ -112,7 +112,7 @@ class EntityUpdateQueryTest(private val db: Database) {
 
     @Test
     fun criteria() {
-        val a = Address.metamodel()
+        val a = Address.alias
         val selectQuery = EntityQuery.from(a).where { a.addressId eq 15 }.first()
         val address1 = db.execute { selectQuery }.copy(street = "new street")
         val address2 = db.execute { EntityQuery.update(a, address1) }
