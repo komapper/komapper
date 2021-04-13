@@ -1,5 +1,7 @@
 package org.komapper.core.tx
 
+import java.util.UUID
+
 interface Transaction {
     val connection: TransactionConnection
     var isRollbackOnly: Boolean
@@ -7,10 +9,10 @@ interface Transaction {
 }
 
 internal class TransactionImpl(connectionProvider: () -> TransactionConnection) : Transaction {
-    private val id = System.identityHashCode(this).toString()
+    private val id = UUID.randomUUID()
     private val connectionDelegate = lazy(connectionProvider)
     override val connection: TransactionConnection by connectionDelegate
     override var isRollbackOnly: Boolean = false
     override fun isInitialized() = connectionDelegate.isInitialized()
-    override fun toString() = id
+    override fun toString() = id.toString()
 }
