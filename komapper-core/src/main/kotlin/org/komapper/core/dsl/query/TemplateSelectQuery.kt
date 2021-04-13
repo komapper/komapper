@@ -6,20 +6,14 @@ import org.komapper.core.data.Statement
 import org.komapper.core.dsl.option.QueryOptionConfigurator
 import org.komapper.core.dsl.option.TemplateSelectOption
 
-interface TemplateSelectQuery<T> : ListQuery<T> {
-    fun option(configurator: QueryOptionConfigurator<TemplateSelectOption>): TemplateSelectQuery<T>
-}
+interface TemplateSelectQuery<T> : ListQuery<T>
 
 internal data class TemplateSelectQueryImpl<T>(
     private val sql: String,
-    private val params: Any = object {},
+    private val params: Any,
     private val provider: Row.() -> T,
-    private val option: TemplateSelectOption = TemplateSelectOption()
+    private val option: TemplateSelectOption
 ) : TemplateSelectQuery<T> {
-
-    override fun option(configurator: QueryOptionConfigurator<TemplateSelectOption>): TemplateSelectQueryImpl<T> {
-        return copy(option = configurator.apply(option))
-    }
 
     override fun run(config: DatabaseConfig): List<T> {
         val terminal = Terminal { it.toList() }
@@ -65,5 +59,30 @@ internal data class TemplateSelectQueryImpl<T>(
             val builder = config.templateStatementBuilder
             return builder.build(sql, params)
         }
+    }
+}
+
+interface TemplateSelectQueryBuilder {
+    fun where(provider: () -> Any): TemplateSelectQueryBuilder
+    fun option(configurator: QueryOptionConfigurator<TemplateSelectOption>): TemplateSelectQueryBuilder
+    fun <T> select(provider: Row.() -> T): TemplateSelectQuery<T>
+}
+
+internal data class TemplateSelectQueryBuilderImpl(
+    private val sql: String,
+    private val params: Any = object {},
+    private val option: TemplateSelectOption = TemplateSelectOption()
+) : TemplateSelectQueryBuilder {
+
+    override fun option(configurator: QueryOptionConfigurator<TemplateSelectOption>): TemplateSelectQueryBuilder {
+        return copy(option = configurator.apply(option))
+    }
+
+    override fun where(provider: () -> Any): TemplateSelectQueryBuilder {
+        return copy(params = provider())
+    }
+
+    override fun <T> select(provider: Row.() -> T): TemplateSelectQuery<T> {
+        return TemplateSelectQueryImpl(sql, params, provider, option)
     }
 }

@@ -174,7 +174,7 @@ data class TemplateSelectOption(
     )
 }
 
-data class TemplateUpdateOption(
+data class TemplateExecuteOption(
     override val queryTimeoutSeconds: Int? = null
 ) : QueryOption {
     override fun asJdbcOption() = JdbcOption(
@@ -182,7 +182,7 @@ data class TemplateUpdateOption(
     )
 }
 
-data class ScriptExecutionOption(
+data class ScriptExecuteOption(
     override val queryTimeoutSeconds: Int? = null
 ) : QueryOption {
     override fun asJdbcOption() = JdbcOption(

@@ -14,10 +14,11 @@ class TemplateExecuteQueryTest(private val db: Database) {
     @Test
     fun test() {
         val count = db.execute {
-            data class Params(val id: Int, val street: String)
-
             val sql = "update address set street = /*street*/'' where address_id = /*id*/0"
-            TemplateQuery.execute(sql, Params(15, "NY street"))
+            TemplateQuery.execute(sql).params {
+                data class Params(val id: Int, val street: String)
+                Params(15, "NY street")
+            }
         }
         assertEquals(1, count)
         val a = Address.metamodel()

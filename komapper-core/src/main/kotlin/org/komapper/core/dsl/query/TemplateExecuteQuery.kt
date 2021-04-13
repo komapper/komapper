@@ -4,20 +4,25 @@ import org.komapper.core.DatabaseConfig
 import org.komapper.core.JdbcExecutor
 import org.komapper.core.data.Statement
 import org.komapper.core.dsl.option.QueryOptionConfigurator
-import org.komapper.core.dsl.option.TemplateUpdateOption
+import org.komapper.core.dsl.option.TemplateExecuteOption
 
 interface TemplateExecuteQuery : Query<Int> {
-    fun option(configurator: QueryOptionConfigurator<TemplateUpdateOption>): TemplateExecuteQuery
+    fun option(configurator: QueryOptionConfigurator<TemplateExecuteOption>): TemplateExecuteQuery
+    fun params(provider: () -> Any): TemplateExecuteQuery
 }
 
 internal data class TemplateExecuteQueryImpl(
     private val sql: String,
     private val params: Any = object {},
-    private val option: TemplateUpdateOption = TemplateUpdateOption()
+    private val option: TemplateExecuteOption = TemplateExecuteOption()
 ) : TemplateExecuteQuery {
 
-    override fun option(configurator: QueryOptionConfigurator<TemplateUpdateOption>): TemplateExecuteQueryImpl {
+    override fun option(configurator: QueryOptionConfigurator<TemplateExecuteOption>): TemplateExecuteQueryImpl {
         return copy(option = configurator.apply(option))
+    }
+
+    override fun params(provider: () -> Any): TemplateExecuteQuery {
+        return copy(params = provider())
     }
 
     override fun run(config: DatabaseConfig): Int {

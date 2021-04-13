@@ -22,8 +22,8 @@ class TemplateSelectQueryTest(private val db: Database) {
     @Test
     fun test() {
         val list = db.execute {
-            val template = "select * from address"
-            TemplateQuery.select(template, provider = asAddress)
+            val sql = "select * from address"
+            TemplateQuery.from(sql).select(asAddress)
         }
         Assertions.assertEquals(15, list.size)
         Assertions.assertEquals(
@@ -40,7 +40,7 @@ class TemplateSelectQueryTest(private val db: Database) {
     fun sequence() {
         val list = db.execute {
             val sql = "select * from address"
-            TemplateQuery.select(sql, provider = asAddress).transform { it.toList() }
+            TemplateQuery.from(sql).select(asAddress).transform { it.toList() }
         }
         Assertions.assertEquals(15, list.size)
         Assertions.assertEquals(
@@ -57,14 +57,12 @@ class TemplateSelectQueryTest(private val db: Database) {
     fun condition_objectExpression() {
         val list = db.execute {
             val sql = "select * from address where street = /*street*/'test'"
-            TemplateQuery.select(
-                sql,
+            TemplateQuery.from(sql).where {
                 object {
                     @Suppress("unused")
                     val street = "STREET 10"
-                },
-                asAddress
-            )
+                }
+            }.select(asAddress)
         }
         Assertions.assertEquals(1, list.size)
         Assertions.assertEquals(
@@ -80,11 +78,11 @@ class TemplateSelectQueryTest(private val db: Database) {
     @Test
     fun condition_dataClass() {
         val list = db.execute {
-            data class Condition(val street: String)
-
             val sql = "select * from address where street = /*street*/'test'"
-            val condition = Condition("STREET 10")
-            TemplateQuery.select(sql, condition, asAddress)
+            TemplateQuery.from(sql).where {
+                data class Condition(val street: String)
+                Condition("STREET 10")
+            }.select(asAddress)
         }
         Assertions.assertEquals(1, list.size)
         Assertions.assertEquals(
@@ -101,14 +99,12 @@ class TemplateSelectQueryTest(private val db: Database) {
     fun `in`() {
         val list = db.execute {
             val sql = "select * from address where address_id in /*list*/(0)"
-            TemplateQuery.select(
-                sql,
+            TemplateQuery.from(sql).where {
                 object {
                     @Suppress("unused")
                     val list = listOf(1, 2)
-                },
-                asAddress
-            )
+                }
+            }.select(asAddress)
         }
         Assertions.assertEquals(2, list.size)
         Assertions.assertEquals(
@@ -133,14 +129,12 @@ class TemplateSelectQueryTest(private val db: Database) {
     fun in2() {
         val list = db.execute {
             val sql = "select * from address where (address_id, street) in /*pairs*/(0, '')"
-            TemplateQuery.select(
-                sql,
+            TemplateQuery.from(sql).where {
                 object {
                     @Suppress("unused")
                     val pairs = listOf(1 to "STREET 1", 2 to "STREET 2")
-                },
-                asAddress
-            )
+                }
+            }.select(asAddress)
         }
         Assertions.assertEquals(2, list.size)
         Assertions.assertEquals(
@@ -165,17 +159,15 @@ class TemplateSelectQueryTest(private val db: Database) {
     fun in3() {
         val list = db.execute {
             val sql = "select * from address where (address_id, street, version) in /*triples*/(0, '', 0)"
-            TemplateQuery.select(
-                sql,
+            TemplateQuery.from(sql).where {
                 object {
                     @Suppress("unused")
                     val triples = listOf(
                         Triple(1, "STREET 1", 1),
                         Triple(2, "STREET 2", 1)
                     )
-                },
-                asAddress
-            )
+                }
+            }.select(asAddress)
         }
         Assertions.assertEquals(2, list.size)
         Assertions.assertEquals(

@@ -23,7 +23,7 @@ internal class ScriptExecuteQueryTest(private val db: Database) {
 
         val value = db.execute {
             val sql = "select value from execute_table"
-            TemplateQuery.select(sql) {
+            TemplateQuery.from(sql).select {
                 asString("value")
             }.first()
         }
