@@ -26,7 +26,7 @@ internal data class ScriptExecuteQueryImpl(
         return executor.execute(statement)
     }
 
-    override fun dryRun(config: DatabaseConfig): Statement {
-        return statement
+    override fun dryRun(config: DatabaseConfig): String {
+        return statement.sql
     }
 }

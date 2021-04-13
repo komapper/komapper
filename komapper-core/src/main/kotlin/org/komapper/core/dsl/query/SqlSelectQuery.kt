@@ -274,7 +274,7 @@ internal data class SqlSelectQueryImpl<ENTITY : Any>(
         return terminal.run(config)
     }
 
-    override fun dryRun(config: DatabaseConfig): Statement {
+    override fun dryRun(config: DatabaseConfig): String {
         val terminal = createTerminal(context) { it.toList() }
         return terminal.dryRun(config)
     }
@@ -336,7 +336,7 @@ internal data class SqlSelectQueryImpl<ENTITY : Any>(
             return terminal.run(config)
         }
 
-        override fun dryRun(config: DatabaseConfig): Statement {
+        override fun dryRun(config: DatabaseConfig): String {
             val terminal = createTerminal { it.toList() }
             return terminal.dryRun(config)
         }
@@ -374,8 +374,8 @@ internal data class SqlSelectQueryImpl<ENTITY : Any>(
             return executor.executeQuery(statement, provider, transformer)
         }
 
-        override fun dryRun(config: DatabaseConfig): Statement {
-            return buildStatement(config)
+        override fun dryRun(config: DatabaseConfig): String {
+            return buildStatement(config).sql
         }
 
         private fun buildStatement(config: DatabaseConfig): Statement {

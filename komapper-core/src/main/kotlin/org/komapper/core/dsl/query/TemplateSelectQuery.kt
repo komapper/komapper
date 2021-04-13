@@ -20,7 +20,7 @@ internal data class TemplateSelectQueryImpl<T>(
         return terminal.run(config)
     }
 
-    override fun dryRun(config: DatabaseConfig): Statement {
+    override fun dryRun(config: DatabaseConfig): String {
         val terminal = Terminal { it.toList() }
         return terminal.dryRun(config)
     }
@@ -51,8 +51,8 @@ internal data class TemplateSelectQueryImpl<T>(
             )
         }
 
-        override fun dryRun(config: DatabaseConfig): Statement {
-            return buildStatement(config)
+        override fun dryRun(config: DatabaseConfig): String {
+            return buildStatement(config).sql
         }
 
         private fun buildStatement(config: DatabaseConfig): Statement {

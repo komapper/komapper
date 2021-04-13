@@ -153,6 +153,7 @@ class ExpressionTest(private val db: Database) {
                 }
                 .select(concat(concat("[", a.street), "]"))
                 .also {
+                    val s = it.dryRun()
                     println(it.dryRun())
                 }.first()
         }

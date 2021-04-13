@@ -2,7 +2,6 @@ package org.komapper.core.dsl
 
 import org.komapper.core.Database
 import org.komapper.core.DatabaseConfig
-import org.komapper.core.data.Statement
 import org.komapper.core.dsl.element.Operand
 import org.komapper.core.dsl.element.SortItem
 import org.komapper.core.dsl.expression.AggregateFunction
@@ -29,7 +28,7 @@ fun <T, R> Query<T>.flatMap(transformer: (T) -> Query<R>): Query<R> {
             return transformer(result).run(config)
         }
 
-        override fun dryRun(config: DatabaseConfig): Statement {
+        override fun dryRun(config: DatabaseConfig): String {
             return this@flatMap.dryRun(config)
         }
     }
@@ -42,7 +41,7 @@ fun <T, R> Query<T>.flatZip(transformer: (T) -> Query<R>): Query<Pair<T, R>> {
             return result to transformer(result).run(config)
         }
 
-        override fun dryRun(config: DatabaseConfig): Statement {
+        override fun dryRun(config: DatabaseConfig): String {
             return this@flatZip.dryRun(config)
         }
     }
@@ -55,7 +54,7 @@ infix operator fun <T, S> Query<T>.plus(other: Query<S>): Query<S> {
             return other.run(config)
         }
 
-        override fun dryRun(config: DatabaseConfig): Statement {
+        override fun dryRun(config: DatabaseConfig): String {
             return this@plus.dryRun(config) + other.dryRun(config)
         }
     }

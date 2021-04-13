@@ -11,10 +11,6 @@ internal class AbstractDialectTest {
 
     class MyDialect : AbstractDialect() {
 
-        public override fun getDataType(type: KClass<*>): DataType<*> {
-            return super.getDataType(type)
-        }
-
         override val schemaStatementBuilder: SchemaStatementBuilder
             get() = throw UnsupportedOperationException()
 
@@ -23,6 +19,10 @@ internal class AbstractDialectTest {
         }
 
         override fun getSequenceSql(sequenceName: String): String {
+            throw UnsupportedOperationException()
+        }
+
+        override fun getDataType(type: KClass<*>): Pair<DataType<*>, String> {
             throw UnsupportedOperationException()
         }
     }

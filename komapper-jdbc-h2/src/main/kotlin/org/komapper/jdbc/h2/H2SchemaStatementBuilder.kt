@@ -6,17 +6,6 @@ import org.komapper.core.dsl.metamodel.Assignment
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import java.io.PrintWriter
 import java.io.StringWriter
-import java.math.BigDecimal
-import java.math.BigInteger
-import java.sql.Blob
-import java.sql.Clob
-import java.sql.NClob
-import java.sql.SQLXML
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.LocalTime
-import java.time.OffsetDateTime
-import kotlin.reflect.KClass
 
 open class H2SchemaStatementBuilder(private val dialect: H2Dialect) : SchemaStatementBuilder {
 
@@ -56,11 +45,11 @@ open class H2SchemaStatementBuilder(private val dialect: H2Dialect) : SchemaStat
         w.println("create table if not exists ${e.getCanonicalTableName(dialect::quote)} (")
         val columns = e.properties().joinToString(",\n    ", prefix = "    ") { p ->
             val columnName = p.getCanonicalColumnName(dialect::quote)
-            val dataType = getDataType(p.klass)
+            val (_, dataTypeName) = dialect.getDataType(p.klass)
             val notNull = if (p.nullable) "" else " not null"
             val identity = if (p.idAssignment is Assignment.Identity<*, *>) " auto_increment" else ""
             val pk = if (p in e.idProperties()) " primary key" else ""
-            "$columnName $dataType$notNull$identity$pk"
+            "$columnName $dataTypeName$notNull$identity$pk"
         }
         w.println(columns)
         w.println(");")
@@ -93,33 +82,5 @@ open class H2SchemaStatementBuilder(private val dialect: H2Dialect) : SchemaStat
             entityMetamodels.mapNotNull { it.idAssignment() }.filterIsInstance<Assignment.Sequence<*, *>>()
                 .map { it.schemaName }
         return (tableSchemaNames + sequenceSchemaNames).distinct().filter { it.isNotBlank() }
-    }
-
-    @Suppress("MemberVisibilityCanBePrivate")
-    protected fun getDataType(klass: KClass<*>): String = when (klass) {
-        Any::class -> "other"
-        java.sql.Array::class -> "array"
-        BigDecimal::class -> "bigint"
-        BigInteger::class -> "bigint"
-        Blob::class -> "blob"
-        Boolean::class -> "bool"
-        Byte::class -> "tinyint"
-        ByteArray::class -> "binary"
-        Double::class -> "double"
-        Clob::class -> "clob"
-        Float::class -> "float"
-        Int::class -> "integer"
-        LocalDateTime::class -> "timestamp"
-        LocalDate::class -> "date"
-        LocalTime::class -> "time"
-        Long::class -> "bigint"
-        NClob::class -> "nclob"
-        OffsetDateTime::class -> "timestamp with time zone"
-        Short::class -> "smallint"
-        String::class -> "varchar(500)"
-        SQLXML::class -> "clob"
-        else -> error(
-            "The dataType is not found for the klass \"${klass.qualifiedName}\"."
-        )
     }
 }

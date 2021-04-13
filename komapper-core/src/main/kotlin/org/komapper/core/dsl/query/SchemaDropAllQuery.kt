@@ -21,8 +21,8 @@ internal class SchemaDropAllQueryImpl : SchemaDropAllQuery {
         executor.execute(statement)
     }
 
-    override fun dryRun(config: DatabaseConfig): Statement {
-        return buildStatement(config)
+    override fun dryRun(config: DatabaseConfig): String {
+        return buildStatement(config).sql
     }
 
     private fun buildStatement(config: DatabaseConfig): Statement {

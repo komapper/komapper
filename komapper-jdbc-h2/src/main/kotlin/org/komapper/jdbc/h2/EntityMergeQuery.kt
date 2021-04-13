@@ -48,8 +48,8 @@ internal data class EntityMergeQueryImpl<ENTITY : Any>(
         support.postMerge(count)
     }
 
-    override fun dryRun(config: DatabaseConfig): Statement {
-        return buildStatement(config, entity)
+    override fun dryRun(config: DatabaseConfig): String {
+        return buildStatement(config, entity).sql
     }
 
     private fun buildStatement(config: DatabaseConfig, entity: ENTITY): Statement {

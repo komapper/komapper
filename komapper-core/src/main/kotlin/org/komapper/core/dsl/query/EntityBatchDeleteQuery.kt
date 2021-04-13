@@ -40,8 +40,8 @@ internal data class EntityBatchDeleteQueryImpl<ENTITY : Any>(
         }
     }
 
-    override fun dryRun(config: DatabaseConfig): Statement {
-        return buildStatement(config, entities.first())
+    override fun dryRun(config: DatabaseConfig): String {
+        return buildStatement(config, entities.first()).sql
     }
 
     private fun buildStatement(config: DatabaseConfig, entity: ENTITY): Statement {
