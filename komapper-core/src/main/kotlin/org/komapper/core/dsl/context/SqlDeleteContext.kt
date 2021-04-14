@@ -12,8 +12,4 @@ internal data class SqlDeleteContext<ENTITY : Any>(
     override fun getEntityExpressions(): Set<EntityExpression<*>> {
         return setOf(entityMetamodel)
     }
-
-    fun addWhere(where: List<Criterion>): SqlDeleteContext<ENTITY> {
-        return copy(where = this.where + where)
-    }
 }

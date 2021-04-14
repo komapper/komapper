@@ -24,16 +24,14 @@ internal data class SqlUpdateQueryImpl<ENTITY : Any>(
 ) : SqlUpdateQuery<ENTITY> {
 
     override fun set(declaration: SetDeclaration<ENTITY>): SqlUpdateQueryImpl<ENTITY> {
-        val scope = SetScope<ENTITY>()
-        declaration(scope)
-        val newContext = context.addSet(scope.toList())
+        val scope = SetScope<ENTITY>().apply(declaration)
+        val newContext = context.copy(set = context.set + scope)
         return copy(context = newContext)
     }
 
     override fun where(declaration: WhereDeclaration): SqlUpdateQueryImpl<ENTITY> {
-        val scope = WhereScope()
-        declaration(scope)
-        val newContext = context.addWhere(scope.toList())
+        val scope = WhereScope().apply(declaration)
+        val newContext = context.copy(where = context.where + scope)
         return copy(context = newContext)
     }
 

@@ -38,8 +38,7 @@ internal data class SelectQuerySupport<ENTITY : Any, CONTEXT : SelectContext<ENT
         declaration: OnDeclaration<OTHER_ENTITY>,
         kind: JoinKind
     ): CONTEXT {
-        val scope = OnScope<OTHER_ENTITY>()
-        declaration(scope)
+        val scope = OnScope<OTHER_ENTITY>().apply(declaration)
         if (scope.isNotEmpty()) {
             val join = Join(entityMetamodel, kind, scope.toList())
             return context.addJoin(join)
@@ -48,9 +47,8 @@ internal data class SelectQuerySupport<ENTITY : Any, CONTEXT : SelectContext<ENT
     }
 
     fun where(declaration: WhereDeclaration): CONTEXT {
-        val scope = WhereScope()
-        declaration(scope)
-        return context.addWhere(scope.toList())
+        val scope = WhereScope().apply(declaration)
+        return context.addWhere(scope)
     }
 
     fun orderBy(vararg expressions: PropertyExpression<*>): CONTEXT {

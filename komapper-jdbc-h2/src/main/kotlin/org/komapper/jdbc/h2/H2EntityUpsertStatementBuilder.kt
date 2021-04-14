@@ -9,7 +9,6 @@ import org.komapper.core.dsl.builder.EmptyAliasManager
 import org.komapper.core.dsl.builder.EntityUpsertStatementBuilder
 import org.komapper.core.dsl.context.DuplicateKeyType
 import org.komapper.core.dsl.context.EntityUpsertContext
-import org.komapper.core.dsl.element.Operand
 import org.komapper.core.dsl.expression.EntityExpression
 import org.komapper.core.dsl.expression.PropertyExpression
 import org.komapper.core.dsl.metamodel.Assignment
@@ -80,9 +79,5 @@ class H2EntityUpsertStatementBuilder<ENTITY : Any>(
 
     private fun column(expression: PropertyExpression<*>) {
         support.visitPropertyExpression(expression)
-    }
-
-    private fun visitOperand(operand: Operand) {
-        support.visitOperand(operand)
     }
 }

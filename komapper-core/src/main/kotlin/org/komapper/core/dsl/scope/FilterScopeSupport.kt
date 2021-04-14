@@ -7,7 +7,7 @@ import org.komapper.core.dsl.query.Subquery
 
 internal class FilterScopeSupport(
     private val context: MutableList<Criterion> = mutableListOf()
-) : FilterScope, Collection<Criterion> by context {
+) : FilterScope, List<Criterion> by context {
 
     internal fun add(criterion: Criterion) {
         context.add(criterion)

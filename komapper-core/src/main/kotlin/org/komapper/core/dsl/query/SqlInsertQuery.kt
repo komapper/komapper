@@ -24,10 +24,9 @@ internal data class SqlInsertQueryImpl<ENTITY : Any>(
 ) : SqlInsertQuery<ENTITY> {
 
     override fun values(declaration: ValuesDeclaration<ENTITY>): SqlInsertQueryImpl<ENTITY> {
-        val scope = ValuesScope<ENTITY>()
-        declaration(scope)
+        val scope = ValuesScope<ENTITY>().apply(declaration)
         val values = when (val values = context.values) {
-            is Values.Pairs -> Values.Pairs(values.pairs + scope.toList())
+            is Values.Pairs -> Values.Pairs(values.pairs + scope)
             is Values.Subquery -> Values.Pairs(scope.toList())
         }
         val newContext = context.copy(values = values)

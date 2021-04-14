@@ -126,14 +126,13 @@ internal data class SqlSelectQueryImpl<ENTITY : Any>(
     }
 
     override fun groupBy(vararg expressions: PropertyExpression<*>): SqlSelectQueryImpl<ENTITY> {
-        val newContext = context.copy(groupBy = context.groupBy + expressions.toList())
+        val newContext = context.copy(groupBy = context.groupBy + expressions)
         return copy(context = newContext)
     }
 
     override fun having(declaration: HavingDeclaration): SqlSelectQueryImpl<ENTITY> {
-        val scope = HavingScope()
-        declaration(scope)
-        val newContext = context.copy(having = context.having + scope.toList())
+        val scope = HavingScope().apply(declaration)
+        val newContext = context.copy(having = context.having + scope)
         return copy(context = newContext)
     }
 

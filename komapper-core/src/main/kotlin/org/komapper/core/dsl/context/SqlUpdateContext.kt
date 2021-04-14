@@ -14,12 +14,4 @@ internal data class SqlUpdateContext<ENTITY : Any>(
     override fun getEntityExpressions(): Set<EntityExpression<*>> {
         return setOf(entityMetamodel)
     }
-
-    fun addSet(set: List<Pair<Operand.Property, Operand>>): SqlUpdateContext<ENTITY> {
-        return copy(set = this.set + set)
-    }
-
-    fun addWhere(where: List<Criterion>): SqlUpdateContext<ENTITY> {
-        return copy(where = this.where + where)
-    }
 }

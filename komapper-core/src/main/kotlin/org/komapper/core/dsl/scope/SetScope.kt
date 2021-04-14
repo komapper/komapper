@@ -8,7 +8,7 @@ import org.komapper.core.dsl.metamodel.PropertyMetamodel
 @Scope
 class SetScope<ENTITY : Any> internal constructor(
     private val context: MutableList<Pair<Operand.Property, Operand>> = mutableListOf()
-) : Collection<Pair<Operand.Property, Operand>> by context {
+) : List<Pair<Operand.Property, Operand>> by context {
 
     companion object {
         operator fun <E : Any> ValuesDeclaration<E>.plus(other: ValuesDeclaration<E>): ValuesDeclaration<E> {

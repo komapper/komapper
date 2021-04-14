@@ -42,7 +42,7 @@ internal class TransactionScopeImpl(
 
     private fun <R> executeInNewTransaction(
         isolationLevel: TransactionIsolationLevel?,
-        block: TransactionScopeImpl.() -> R
+        block: TransactionScope.() -> R
     ): R {
         transactionManager.begin(isolationLevel ?: defaultIsolationLevel)
         try {
