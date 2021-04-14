@@ -23,4 +23,11 @@ class ValuesScope<ENTITY : Any> internal constructor(
         val right = Operand.Parameter(this, value)
         context.add(left to right)
     }
+
+    infix fun <T : Any> PropertyMetamodel<ENTITY, T>.setIfNotNull(value: T?) {
+        if (value == null) return
+        val left = Operand.Property(this)
+        val right = Operand.Parameter(this, value)
+        context.add(left to right)
+    }
 }

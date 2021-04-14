@@ -33,6 +33,27 @@ class SqlUpdateQueryTest(private val db: Database) {
     }
 
     @Test
+    fun setIfNotNull() {
+        val a = Address.alias
+        val count = db.execute {
+            SqlQuery.update(a).set {
+                a.street setIfNotNull null
+                a.version set 10
+            }.where {
+                a.addressId eq 1
+            }
+        }
+        assertEquals(1, count)
+        val address = db.execute {
+            SqlQuery.first(a) {
+                a.addressId eq 1
+            }
+        }
+        assertEquals("STREET 1", address.street)
+        assertEquals(10, address.version)
+    }
+
+    @Test
     fun arithmetic_add() {
         val a = Address.alias
         val count = db.execute {
