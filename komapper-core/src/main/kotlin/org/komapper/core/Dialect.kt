@@ -17,7 +17,6 @@ interface Dialect {
     val closeQuote: String
     val escapeChar: Char
     val escapePattern: Pattern
-    val schemaStatementBuilder: SchemaStatementBuilder
 
     fun getValue(rs: ResultSet, index: Int, valueClass: KClass<*>): Any?
     fun getValue(rs: ResultSet, columnLabel: String, valueClass: KClass<*>): Any?
@@ -27,6 +26,7 @@ interface Dialect {
     fun getSequenceSql(sequenceName: String): String
     fun quote(name: String): String
     fun escape(text: String): String
+    fun getSchemaStatementBuilder(): SchemaStatementBuilder
     fun <ENTITY : Any> getEntityUpsertStatementBuilder(
         context: EntityUpsertContext<ENTITY>,
         entity: ENTITY
@@ -85,8 +85,6 @@ abstract class AbstractDialect : Dialect {
 
 internal object DryRunDialect : AbstractDialect() {
 
-    override val schemaStatementBuilder = DryRunSchemaStatementBuilder
-
     override fun isUniqueConstraintViolation(exception: SQLException): Boolean {
         throw UnsupportedOperationException()
     }
@@ -97,6 +95,10 @@ internal object DryRunDialect : AbstractDialect() {
 
     override fun getDataType(type: KClass<*>): Pair<DataType<*>, String> {
         return AnyType to "other"
+    }
+
+    override fun getSchemaStatementBuilder(): SchemaStatementBuilder {
+        return DryRunSchemaStatementBuilder
     }
 
     override fun <ENTITY : Any> getEntityUpsertStatementBuilder(

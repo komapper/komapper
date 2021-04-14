@@ -48,10 +48,6 @@ open class H2Dialect(val version: Version = Version.V1_4) : AbstractDialect() {
         const val UNIQUE_CONSTRAINT_VIOLATION_ERROR_CODE = 23505
     }
 
-    override val schemaStatementBuilder: SchemaStatementBuilder by lazy {
-        H2SchemaStatementBuilder(this)
-    }
-
     override fun isUniqueConstraintViolation(exception: SQLException): Boolean {
         val cause = getCause(exception)
         return cause.errorCode == UNIQUE_CONSTRAINT_VIOLATION_ERROR_CODE
@@ -87,6 +83,10 @@ open class H2Dialect(val version: Version = Version.V1_4) : AbstractDialect() {
         else -> error(
             "The dataType is not found for the type \"${type.qualifiedName}\"."
         )
+    }
+
+    override fun getSchemaStatementBuilder(): SchemaStatementBuilder {
+        return H2SchemaStatementBuilder(this)
     }
 
     override fun <ENTITY : Any> getEntityUpsertStatementBuilder(

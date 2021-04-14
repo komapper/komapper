@@ -13,9 +13,6 @@ internal class AbstractDialectTest {
 
     class MyDialect : AbstractDialect() {
 
-        override val schemaStatementBuilder: SchemaStatementBuilder
-            get() = throw UnsupportedOperationException()
-
         override fun isUniqueConstraintViolation(exception: SQLException): Boolean {
             throw UnsupportedOperationException()
         }
@@ -25,6 +22,10 @@ internal class AbstractDialectTest {
         }
 
         override fun getDataType(type: KClass<*>): Pair<DataType<*>, String> {
+            throw UnsupportedOperationException()
+        }
+
+        override fun getSchemaStatementBuilder(): SchemaStatementBuilder {
             throw UnsupportedOperationException()
         }
 
