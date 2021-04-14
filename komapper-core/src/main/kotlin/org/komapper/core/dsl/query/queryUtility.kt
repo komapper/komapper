@@ -3,7 +3,7 @@ package org.komapper.core.dsl.query
 import org.komapper.core.OptimisticLockException
 import org.komapper.core.dsl.option.VersionOption
 
-fun checkOptimisticLock(
+internal fun checkOptimisticLock(
     option: VersionOption,
     count: Int,
     index: Int?

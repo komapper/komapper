@@ -6,29 +6,30 @@ import org.komapper.core.data.StatementBuffer
 import org.komapper.core.data.Value
 import org.komapper.core.dsl.builder.BuilderSupport
 import org.komapper.core.dsl.builder.EmptyAliasManager
+import org.komapper.core.dsl.builder.EntityUpsertStatementBuilder
+import org.komapper.core.dsl.context.DuplicateKeyType
+import org.komapper.core.dsl.context.EntityUpsertContext
+import org.komapper.core.dsl.element.Operand
 import org.komapper.core.dsl.expression.EntityExpression
 import org.komapper.core.dsl.expression.PropertyExpression
 import org.komapper.core.dsl.metamodel.Assignment
-import org.komapper.core.dsl.option.VersionOption
 
-class EntityMergeStatementBuilder<ENTITY : Any>(
+class H2EntityUpsertStatementBuilder<ENTITY : Any>(
     private val dialect: Dialect,
-    private val context: EntityMergeContext<ENTITY>,
-    private val entity: ENTITY,
-    private val option: VersionOption
-) {
+    private val context: EntityUpsertContext<ENTITY>,
+    private val entity: ENTITY
+) : EntityUpsertStatementBuilder<ENTITY> {
     private val buf = StatementBuffer(dialect::formatValue)
     private val support = BuilderSupport(dialect, EmptyAliasManager, buf)
 
-    fun build(): Statement {
+    override fun build(): Statement {
         val idProperties = context.entityMetamodel.idProperties()
-        val versionProperty = context.entityMetamodel.versionProperty()
         val createdAtProperty = context.entityMetamodel.createdAtProperty()
         val properties = context.entityMetamodel.properties()
         buf.append("merge into ")
         table(context.entityMetamodel)
         buf.append(" using dual on ")
-        for (p in context.on.ifEmpty { idProperties }) {
+        for (p in idProperties) {
             column(p)
             buf.append(" = ")
             val value = Value(p.getter(entity), p.klass)
@@ -56,25 +57,20 @@ class EntityMergeStatementBuilder<ENTITY : Any>(
         }
         buf.cutBack(2)
         buf.append(")")
-        buf.append(" when matched")
-        if (versionProperty != null && !option.ignoreVersion) {
-            buf.append(" and ")
-            column(versionProperty)
-            buf.append(" = ")
-            buf.bind(Value(versionProperty.getter(entity), versionProperty.klass))
-        }
-        buf.append(" then update set ")
-        for (p in (properties - idProperties).filter { it != createdAtProperty }) {
-            column(p)
-            buf.append(" = ")
-            val value = Value(p.getter(entity), p.klass)
-            buf.bind(value)
-            if (p == versionProperty) {
-                buf.append(" + 1 ")
+        if (context.duplicateKeyType == DuplicateKeyType.UPDATE) {
+            buf.append(" when matched then update set ")
+            val updateProperties = context.updateProperties.ifEmpty {
+                (properties - idProperties).filter { it != createdAtProperty }
             }
-            buf.append(", ")
+            for (p in updateProperties) {
+                column(p)
+                buf.append(" = ")
+                val value = Value(p.getter(entity), p.klass)
+                buf.bind(value)
+                buf.append(", ")
+            }
+            buf.cutBack(2)
         }
-        buf.cutBack(2)
         return buf.toStatement()
     }
 
@@ -84,5 +80,9 @@ class EntityMergeStatementBuilder<ENTITY : Any>(
 
     private fun column(expression: PropertyExpression<*>) {
         support.visitPropertyExpression(expression)
+    }
+
+    private fun visitOperand(operand: Operand) {
+        support.visitOperand(operand)
     }
 }

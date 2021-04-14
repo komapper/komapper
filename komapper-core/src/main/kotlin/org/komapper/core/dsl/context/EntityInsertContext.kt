@@ -10,4 +10,8 @@ internal data class EntityInsertContext<ENTITY : Any>(
     override fun getEntityExpressions(): Set<EntityExpression<*>> {
         return setOf(entityMetamodel)
     }
+
+    fun asEntityUpsertContext(duplicateKeyType: DuplicateKeyType): EntityUpsertContext<ENTITY> {
+        return EntityUpsertContext(entityMetamodel, duplicateKeyType)
+    }
 }

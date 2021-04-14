@@ -2,12 +2,15 @@ package org.komapper.core.dsl.query
 
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.data.Statement
+import org.komapper.core.dsl.context.DuplicateKeyType
 import org.komapper.core.dsl.context.EntityInsertContext
 import org.komapper.core.dsl.option.EntityBatchInsertOption
 import org.komapper.core.dsl.option.QueryOptionConfigurator
 
 interface EntityBatchInsertQuery<ENTITY : Any> : Query<List<ENTITY>> {
     fun option(configurator: QueryOptionConfigurator<EntityBatchInsertOption>): EntityBatchInsertQuery<ENTITY>
+    fun onDuplicateKeyUpdate(): EntityBatchUpsertQuery<ENTITY>
+    fun onDuplicateKeyIgnore(): Query<Pair<IntArray, LongArray>>
 }
 
 internal data class EntityBatchInsertQueryImpl<ENTITY : Any>(
@@ -21,6 +24,22 @@ internal data class EntityBatchInsertQueryImpl<ENTITY : Any>(
 
     override fun option(configurator: QueryOptionConfigurator<EntityBatchInsertOption>): EntityBatchInsertQueryImpl<ENTITY> {
         return copy(option = configurator.apply(option))
+    }
+
+    override fun onDuplicateKeyUpdate(): EntityBatchUpsertQuery<ENTITY> {
+        return EntityBatchUpsertQueryImpl(
+            context.asEntityUpsertContext(DuplicateKeyType.UPDATE),
+            entities,
+            option.asEntityBatchUpsertOption()
+        )
+    }
+
+    override fun onDuplicateKeyIgnore(): Query<Pair<IntArray, LongArray>> {
+        return EntityBatchUpsertQueryImpl(
+            context.asEntityUpsertContext(DuplicateKeyType.IGNORE),
+            entities,
+            option.asEntityBatchUpsertOption()
+        )
     }
 
     override fun run(config: DatabaseConfig): List<ENTITY> {

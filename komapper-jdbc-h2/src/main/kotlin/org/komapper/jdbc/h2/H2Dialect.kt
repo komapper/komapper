@@ -1,7 +1,9 @@
 package org.komapper.jdbc.h2
 
 import org.komapper.core.AbstractDialect
+import org.komapper.core.dsl.builder.EntityUpsertStatementBuilder
 import org.komapper.core.dsl.builder.SchemaStatementBuilder
+import org.komapper.core.dsl.context.EntityUpsertContext
 import org.komapper.core.jdbc.AnyType
 import org.komapper.core.jdbc.ArrayType
 import org.komapper.core.jdbc.BigDecimalType
@@ -85,5 +87,12 @@ open class H2Dialect(val version: Version = Version.V1_4) : AbstractDialect() {
         else -> error(
             "The dataType is not found for the type \"${type.qualifiedName}\"."
         )
+    }
+
+    override fun <ENTITY : Any> getEntityUpsertStatementBuilder(
+        context: EntityUpsertContext<ENTITY>,
+        entity: ENTITY
+    ): EntityUpsertStatementBuilder<ENTITY> {
+        return H2EntityUpsertStatementBuilder(this, context, entity)
     }
 }

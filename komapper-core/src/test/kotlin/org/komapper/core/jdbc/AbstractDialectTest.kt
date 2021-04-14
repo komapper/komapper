@@ -3,7 +3,9 @@ package org.komapper.core.jdbc
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.komapper.core.AbstractDialect
+import org.komapper.core.dsl.builder.EntityUpsertStatementBuilder
 import org.komapper.core.dsl.builder.SchemaStatementBuilder
+import org.komapper.core.dsl.context.EntityUpsertContext
 import java.sql.SQLException
 import kotlin.reflect.KClass
 
@@ -23,6 +25,13 @@ internal class AbstractDialectTest {
         }
 
         override fun getDataType(type: KClass<*>): Pair<DataType<*>, String> {
+            throw UnsupportedOperationException()
+        }
+
+        override fun <ENTITY : Any> getEntityUpsertStatementBuilder(
+            context: EntityUpsertContext<ENTITY>,
+            entity: ENTITY
+        ): EntityUpsertStatementBuilder<ENTITY> {
             throw UnsupportedOperationException()
         }
     }

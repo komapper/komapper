@@ -1,7 +1,9 @@
 package org.komapper.core
 
 import org.komapper.core.dsl.builder.DryRunSchemaStatementBuilder
+import org.komapper.core.dsl.builder.EntityUpsertStatementBuilder
 import org.komapper.core.dsl.builder.SchemaStatementBuilder
+import org.komapper.core.dsl.context.EntityUpsertContext
 import org.komapper.core.jdbc.AnyType
 import org.komapper.core.jdbc.DataType
 import java.sql.PreparedStatement
@@ -25,6 +27,10 @@ interface Dialect {
     fun getSequenceSql(sequenceName: String): String
     fun quote(name: String): String
     fun escape(text: String): String
+    fun <ENTITY : Any> getEntityUpsertStatementBuilder(
+        context: EntityUpsertContext<ENTITY>,
+        entity: ENTITY
+    ): EntityUpsertStatementBuilder<ENTITY>
 }
 
 abstract class AbstractDialect : Dialect {
@@ -91,5 +97,12 @@ internal object DryRunDialect : AbstractDialect() {
 
     override fun getDataType(type: KClass<*>): Pair<DataType<*>, String> {
         return AnyType to "other"
+    }
+
+    override fun <ENTITY : Any> getEntityUpsertStatementBuilder(
+        context: EntityUpsertContext<ENTITY>,
+        entity: ENTITY
+    ): EntityUpsertStatementBuilder<ENTITY> {
+        throw UnsupportedOperationException()
     }
 }

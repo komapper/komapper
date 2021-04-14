@@ -76,4 +76,76 @@ class EntityBatchInsertQueryTest(private val db: Database) {
             }.let { }
         }
     }
+
+    @Test
+    fun onDuplicateKeyUpdate() {
+        val d = Department.alias
+        val department1 = Department(5, 50, "PLANNING", "TOKYO", 1)
+        val department2 = Department(1, 60, "DEVELOPMENT", "KYOTO", 1)
+        val query = EntityQuery.batchInsert(d, listOf(department1, department2)).onDuplicateKeyUpdate()
+        val (counts, keys) = db.execute { query }
+        assertEquals(2, counts.size)
+        assertEquals(1, counts[0])
+        assertEquals(1, counts[1])
+        assertEquals(2, keys.size)
+        assertEquals(0, keys[0])
+        assertEquals(0, keys[1])
+        val list = db.execute {
+            EntityQuery.from(d).where { d.departmentId inList listOf(1, 5) }.orderBy(d.departmentId)
+        }
+        assertEquals(2, list.size)
+        assertEquals(
+            listOf("DEVELOPMENT" to "KYOTO", "PLANNING" to "TOKYO"),
+            list.map { it.departmentName to it.location }
+        )
+        println(list)
+    }
+
+    @Test
+    fun onDuplicateKeyUpdate_set() {
+        val d = Department.alias
+        val department1 = Department(5, 50, "PLANNING", "TOKYO", 1)
+        val department2 = Department(1, 60, "DEVELOPMENT", "KYOTO", 1)
+        val query = EntityQuery.batchInsert(d, listOf(department1, department2)).onDuplicateKeyUpdate().set(d.departmentName)
+        val (counts, keys) = db.execute { query }
+        assertEquals(2, counts.size)
+        assertEquals(1, counts[0])
+        assertEquals(1, counts[1])
+        assertEquals(2, keys.size)
+        assertEquals(0, keys[0])
+        assertEquals(0, keys[1])
+        val list = db.execute {
+            EntityQuery.from(d).where { d.departmentId inList listOf(1, 5) }.orderBy(d.departmentId)
+        }
+        assertEquals(2, list.size)
+        assertEquals(
+            listOf("DEVELOPMENT" to "NEW YORK", "PLANNING" to "TOKYO"),
+            list.map { it.departmentName to it.location }
+        )
+        println(list)
+    }
+
+    @Test
+    fun onDuplicateKeyIgnore() {
+        val d = Department.alias
+        val department1 = Department(5, 50, "PLANNING", "TOKYO", 1)
+        val department2 = Department(1, 60, "DEVELOPMENT", "KYOTO", 1)
+        val query = EntityQuery.batchInsert(d, listOf(department1, department2)).onDuplicateKeyIgnore()
+        val (counts, keys) = db.execute { query }
+        assertEquals(2, counts.size)
+        assertEquals(1, counts[0])
+        assertEquals(0, counts[1])
+        assertEquals(2, keys.size)
+        assertEquals(0, keys[0])
+        assertEquals(0, keys[1])
+        val list = db.execute {
+            EntityQuery.from(d).where { d.departmentId inList listOf(1, 5) }.orderBy(d.departmentId)
+        }
+        assertEquals(2, list.size)
+        assertEquals(
+            listOf("ACCOUNTING" to "NEW YORK", "PLANNING" to "TOKYO"),
+            list.map { it.departmentName to it.location }
+        )
+        println(list)
+    }
 }

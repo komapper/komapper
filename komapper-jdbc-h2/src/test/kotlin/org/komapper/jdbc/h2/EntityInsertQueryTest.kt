@@ -2,6 +2,7 @@ package org.komapper.jdbc.h2
 
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
@@ -117,5 +118,56 @@ class EntityInsertQueryTest(private val db: Database) {
             val newStrategy = db.execute { EntityQuery.insert(m, strategy) }
             assertEquals(i, newStrategy.id)
         }
+    }
+
+    @Test
+    fun onDuplicateKeyUpdate_insert() {
+        val d = Department.alias
+        val department = Department(5, 50, "PLANNING", "TOKYO", 0)
+        val query = EntityQuery.insert(d, department).onDuplicateKeyUpdate()
+        val (count, key) = db.execute { query }
+        assertEquals(1, count)
+        assertNull(key)
+        val found = db.execute { EntityQuery.first(d) { d.departmentId eq 5 } }
+        assertNotNull(found)
+    }
+
+    @Test
+    fun onDuplicateKeyUpdate_update() {
+        val d = Department.alias
+        val department = Department(1, 50, "PLANNING", "TOKYO", 1)
+        val query = EntityQuery.insert(d, department).onDuplicateKeyUpdate()
+        val (count, key) = db.execute { query }
+        assertEquals(1, count)
+        assertNull(key)
+        val found = db.execute { EntityQuery.first(d) { d.departmentId eq 1 } }
+        assertEquals(50, found.departmentNo)
+        assertEquals("PLANNING", found.departmentName)
+        assertEquals("TOKYO", found.location)
+        assertEquals(1, found.version)
+    }
+
+    @Test
+    fun onDuplicateKeyUpdate_set_update() {
+        val d = Department.alias
+        val department = Department(1, 50, "PLANNING", "TOKYO", 10)
+        val query = EntityQuery.insert(d, department).onDuplicateKeyUpdate().set(d.departmentName, d.location)
+        val (count, key) = db.execute { query }
+        assertEquals(1, count)
+        assertNull(key)
+        val found = db.execute { EntityQuery.first(d) { d.departmentId eq 1 } }
+        assertEquals(10, found.departmentNo)
+        assertEquals("PLANNING", found.departmentName)
+        assertEquals("TOKYO", found.location)
+        assertEquals(1, found.version)
+    }
+
+    @Test
+    fun onDuplicateKeyIgnore() {
+        val a = Address.alias
+        val address = Address(1, "STREET 1", 0)
+        val query = EntityQuery.insert(a, address).onDuplicateKeyIgnore()
+        val (count) = db.execute { query }
+        assertEquals(0, count)
     }
 }

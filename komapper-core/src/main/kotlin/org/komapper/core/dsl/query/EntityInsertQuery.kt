@@ -2,12 +2,15 @@ package org.komapper.core.dsl.query
 
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.data.Statement
+import org.komapper.core.dsl.context.DuplicateKeyType
 import org.komapper.core.dsl.context.EntityInsertContext
 import org.komapper.core.dsl.option.EntityInsertOption
 import org.komapper.core.dsl.option.QueryOptionConfigurator
 
 interface EntityInsertQuery<ENTITY : Any> : Query<ENTITY> {
     fun option(configurator: QueryOptionConfigurator<EntityInsertOption>): EntityInsertQuery<ENTITY>
+    fun onDuplicateKeyUpdate(): EntityUpsertQuery<ENTITY>
+    fun onDuplicateKeyIgnore(): Query<Pair<Int, Long?>>
 }
 
 internal data class EntityInsertQueryImpl<ENTITY : Any>(
@@ -21,6 +24,22 @@ internal data class EntityInsertQueryImpl<ENTITY : Any>(
 
     override fun option(configurator: QueryOptionConfigurator<EntityInsertOption>): EntityInsertQueryImpl<ENTITY> {
         return copy(option = configurator.apply(option))
+    }
+
+    override fun onDuplicateKeyUpdate(): EntityUpsertQuery<ENTITY> {
+        return EntityUpsertQueryImpl(
+            context.asEntityUpsertContext(DuplicateKeyType.UPDATE),
+            entity,
+            option.asEntityUpsertOption()
+        )
+    }
+
+    override fun onDuplicateKeyIgnore(): Query<Pair<Int, Long?>> {
+        return EntityUpsertQueryImpl(
+            context.asEntityUpsertContext(DuplicateKeyType.IGNORE),
+            entity,
+            option.asEntityUpsertOption()
+        )
     }
 
     override fun run(config: DatabaseConfig): ENTITY {
