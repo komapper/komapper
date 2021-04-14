@@ -1,6 +1,7 @@
 package org.komapper.jdbc.h2
 
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -16,7 +17,7 @@ class SqlInsertQueryTest(private val db: Database) {
     @Test
     fun test() {
         val a = Address.alias
-        val (count, keys) = db.execute {
+        val (count, key) = db.execute {
             SqlQuery.insert(a).values {
                 a.addressId set 19
                 a.street set "STREET 16"
@@ -24,13 +25,13 @@ class SqlInsertQueryTest(private val db: Database) {
             }
         }
         assertEquals(1, count)
-        assertEquals(0, keys.size)
+        assertNull(key)
     }
 
     @Test
     fun setIfNotNull() {
         val e = Employee.alias
-        val (count, keys) = db.execute {
+        val (count, key) = db.execute {
             SqlQuery.insert(e).values {
                 e.employeeId set 99
                 e.departmentId set 1
@@ -44,7 +45,7 @@ class SqlInsertQueryTest(private val db: Database) {
             }
         }
         assertEquals(1, count)
-        assertEquals(0, keys.size)
+        assertNull(key)
 
         val employee = db.execute { SqlQuery.first(e) { e.employeeId eq 99 } }
         assertNull(employee.managerId)
@@ -53,14 +54,14 @@ class SqlInsertQueryTest(private val db: Database) {
     @Test
     fun generatedKeys() {
         val a = IdentityStrategy.alias
-        val (count, keys) = db.execute {
+        val (count, key) = db.execute {
             SqlQuery.insert(a).values {
                 a.id set 10
                 a.value set "test"
             }
         }
         assertEquals(1, count)
-        assertEquals(1, keys.size)
+        assertNotNull(key)
     }
 
     @Test

@@ -12,7 +12,7 @@ import org.komapper.core.dsl.option.SqlInsertOption
 import org.komapper.core.dsl.scope.ValuesDeclaration
 import org.komapper.core.dsl.scope.ValuesScope
 
-interface SqlInsertQuery<ENTITY : Any> : Query<Pair<Int, LongArray>> {
+interface SqlInsertQuery<ENTITY : Any> : Query<Pair<Int, Long?>> {
     fun values(declaration: ValuesDeclaration<ENTITY>): SqlInsertQuery<ENTITY>
     fun <T : Any> select(block: () -> Subquery<T>): SqlInsertQuery<ENTITY>
     fun option(configurator: QueryOptionConfigurator<SqlInsertOption>): SqlInsertQuery<ENTITY>
@@ -45,7 +45,7 @@ internal data class SqlInsertQueryImpl<ENTITY : Any>(
         return copy(option = configurator.apply(option))
     }
 
-    override fun run(config: DatabaseConfig): Pair<Int, LongArray> {
+    override fun run(config: DatabaseConfig): Pair<Int, Long?> {
         val statement = buildStatement(config)
         val executor = JdbcExecutor(config, option.asJdbcOption()) { con, sql ->
             val assignment = context.entityMetamodel.idAssignment()
@@ -55,7 +55,8 @@ internal data class SqlInsertQueryImpl<ENTITY : Any>(
                 con.prepareStatement(sql)
             }
         }
-        return executor.executeUpdate(statement)
+        val (count, keys) = executor.executeUpdate(statement)
+        return count to keys.firstOrNull()
     }
 
     override fun dryRun(config: DatabaseConfig): String {
