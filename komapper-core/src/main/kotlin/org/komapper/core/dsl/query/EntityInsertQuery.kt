@@ -27,19 +27,13 @@ internal data class EntityInsertQueryImpl<ENTITY : Any>(
     }
 
     override fun onDuplicateKeyUpdate(): EntityUpsertQuery<ENTITY> {
-        return EntityUpsertQueryImpl(
-            context.asEntityUpsertContext(DuplicateKeyType.UPDATE),
-            entity,
-            option.asEntityUpsertOption()
-        )
+        val newContext = context.asEntityUpsertContext(DuplicateKeyType.UPDATE)
+        return EntityUpsertQueryImpl(newContext, entity, option)
     }
 
     override fun onDuplicateKeyIgnore(): Query<Pair<Int, Long?>> {
-        return EntityUpsertQueryImpl(
-            context.asEntityUpsertContext(DuplicateKeyType.IGNORE),
-            entity,
-            option.asEntityUpsertOption()
-        )
+        val newContext = context.asEntityUpsertContext(DuplicateKeyType.IGNORE)
+        return EntityUpsertQueryImpl(newContext, entity, option)
     }
 
     override fun run(config: DatabaseConfig): ENTITY {

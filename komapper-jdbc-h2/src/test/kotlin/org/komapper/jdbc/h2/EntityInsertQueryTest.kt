@@ -135,7 +135,7 @@ class EntityInsertQueryTest(private val db: Database) {
     @Test
     fun onDuplicateKeyUpdate_update() {
         val d = Department.alias
-        val department = Department(1, 50, "PLANNING", "TOKYO", 1)
+        val department = Department(1, 50, "PLANNING", "TOKYO", 10)
         val query = EntityQuery.insert(d, department).onDuplicateKeyUpdate()
         val (count, key) = db.execute { query }
         assertEquals(1, count)
@@ -144,11 +144,11 @@ class EntityInsertQueryTest(private val db: Database) {
         assertEquals(50, found.departmentNo)
         assertEquals("PLANNING", found.departmentName)
         assertEquals("TOKYO", found.location)
-        assertEquals(1, found.version)
+        assertEquals(10, found.version)
     }
 
     @Test
-    fun onDuplicateKeyUpdate_set_update() {
+    fun onDuplicateKeyUpdate_updateByProperties() {
         val d = Department.alias
         val department = Department(1, 50, "PLANNING", "TOKYO", 10)
         val query = EntityQuery.insert(d, department).onDuplicateKeyUpdate().set(d.departmentName, d.location)
@@ -159,6 +159,24 @@ class EntityInsertQueryTest(private val db: Database) {
         assertEquals(10, found.departmentNo)
         assertEquals("PLANNING", found.departmentName)
         assertEquals("TOKYO", found.location)
+        assertEquals(1, found.version)
+    }
+
+    @Test
+    fun onDuplicateKeyUpdate_updateByDeclaration() {
+        val d = Department.alias
+        val department = Department(1, 50, "PLANNING", "TOKYO", 10)
+        val query = EntityQuery.insert(d, department).onDuplicateKeyUpdate().set {
+            d.departmentName set "PLANNING2"
+            d.location set "TOKYO2"
+        }
+        val (count, key) = db.execute { query }
+        assertEquals(1, count)
+        assertNull(key)
+        val found = db.execute { EntityQuery.first(d) { d.departmentId eq 1 } }
+        assertEquals(10, found.departmentNo)
+        assertEquals("PLANNING2", found.departmentName)
+        assertEquals("TOKYO2", found.location)
         assertEquals(1, found.version)
     }
 

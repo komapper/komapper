@@ -21,7 +21,7 @@ class EntityBatchInsertQueryTest(private val db: Database) {
             Address(17, "STREET 17", 0),
             Address(18, "STREET 18", 0)
         )
-        val results = db.execute { EntityQuery.batchInsert(a, addressList) }
+        val results = db.execute { EntityQuery.insertBatch(a, addressList) }
         val list = db.execute {
             EntityQuery.from(a).where { a.addressId inList listOf(16, 17, 18) }
         }
@@ -36,7 +36,7 @@ class EntityBatchInsertQueryTest(private val db: Database) {
             IdentityStrategy(null, "BBB"),
             IdentityStrategy(null, "CCC")
         )
-        val results = db.execute { EntityQuery.batchInsert(i, strategies) }
+        val results = db.execute { EntityQuery.insertBatch(i, strategies) }
         val list = db.execute { EntityQuery.from(i).orderBy(i.id) }
         assertEquals(list, results)
         for (result in results) {
@@ -53,7 +53,7 @@ class EntityBatchInsertQueryTest(private val db: Database) {
             Person(2, "B"),
             Person(3, "C")
         )
-        val results = db.execute { EntityQuery.batchInsert(p, personList) }
+        val results = db.execute { EntityQuery.insertBatch(p, personList) }
         for (result in results) {
             assertNotNull(result.createdAt)
             assertNotNull(result.updatedAt)
@@ -65,7 +65,7 @@ class EntityBatchInsertQueryTest(private val db: Database) {
         val a = Address.alias
         assertThrows<UniqueConstraintException> {
             db.execute {
-                EntityQuery.batchInsert(
+                EntityQuery.insertBatch(
                     a,
                     listOf(
                         Address(16, "STREET 16", 0),
@@ -82,7 +82,7 @@ class EntityBatchInsertQueryTest(private val db: Database) {
         val d = Department.alias
         val department1 = Department(5, 50, "PLANNING", "TOKYO", 1)
         val department2 = Department(1, 60, "DEVELOPMENT", "KYOTO", 1)
-        val query = EntityQuery.batchInsert(d, listOf(department1, department2)).onDuplicateKeyUpdate()
+        val query = EntityQuery.insertBatch(d, listOf(department1, department2)).onDuplicateKeyUpdate()
         val (counts, keys) = db.execute { query }
         assertEquals(2, counts.size)
         assertEquals(1, counts[0])
@@ -106,7 +106,7 @@ class EntityBatchInsertQueryTest(private val db: Database) {
         val d = Department.alias
         val department1 = Department(5, 50, "PLANNING", "TOKYO", 1)
         val department2 = Department(1, 60, "DEVELOPMENT", "KYOTO", 1)
-        val query = EntityQuery.batchInsert(d, listOf(department1, department2)).onDuplicateKeyUpdate().set(d.departmentName)
+        val query = EntityQuery.insertBatch(d, listOf(department1, department2)).onDuplicateKeyUpdate().set(d.departmentName)
         val (counts, keys) = db.execute { query }
         assertEquals(2, counts.size)
         assertEquals(1, counts[0])
@@ -130,7 +130,7 @@ class EntityBatchInsertQueryTest(private val db: Database) {
         val d = Department.alias
         val department1 = Department(5, 50, "PLANNING", "TOKYO", 1)
         val department2 = Department(1, 60, "DEVELOPMENT", "KYOTO", 1)
-        val query = EntityQuery.batchInsert(d, listOf(department1, department2)).onDuplicateKeyIgnore()
+        val query = EntityQuery.insertBatch(d, listOf(department1, department2)).onDuplicateKeyIgnore()
         val (counts, keys) = db.execute { query }
         assertEquals(2, counts.size)
         assertEquals(1, counts[0])

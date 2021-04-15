@@ -27,26 +27,19 @@ internal data class EntityBatchInsertQueryImpl<ENTITY : Any>(
     }
 
     override fun onDuplicateKeyUpdate(): EntityBatchUpsertQuery<ENTITY> {
-        return EntityBatchUpsertQueryImpl(
-            context.asEntityUpsertContext(DuplicateKeyType.UPDATE),
-            entities,
-            option.asEntityBatchUpsertOption()
-        )
+        val newContext = context.asEntityUpsertContext(DuplicateKeyType.UPDATE)
+        return EntityBatchUpsertQueryImpl(newContext, entities, option)
     }
 
     override fun onDuplicateKeyIgnore(): Query<Pair<IntArray, LongArray>> {
-        return EntityBatchUpsertQueryImpl(
-            context.asEntityUpsertContext(DuplicateKeyType.IGNORE),
-            entities,
-            option.asEntityBatchUpsertOption()
-        )
+        val newContext = context.asEntityUpsertContext(DuplicateKeyType.IGNORE)
+        return EntityBatchUpsertQueryImpl(newContext, entities, option)
     }
 
     override fun run(config: DatabaseConfig): List<ENTITY> {
         if (entities.isEmpty()) return emptyList()
         val newEntities = preInsert(config)
-        val statements = newEntities.map { buildStatement(config, it) }
-        val (_, generatedKeys) = insert(config, statements)
+        val generatedKeys = insert(config, newEntities)
         return postInsert(newEntities, generatedKeys)
     }
 
@@ -54,8 +47,17 @@ internal data class EntityBatchInsertQueryImpl<ENTITY : Any>(
         return entities.map { support.preInsert(config, it) }
     }
 
-    private fun insert(config: DatabaseConfig, statements: List<Statement>): Pair<IntArray, LongArray> {
-        return support.insert(config) { it.executeBatch(statements) }
+    private fun insert(config: DatabaseConfig, entities: List<ENTITY>): LongArray {
+        val builder = config.dialect.getEntityMultiInsertStatementBuilder(context, entities)
+        return if (builder != null) {
+            val statement = builder.build()
+            val (_, keys) = support.insert(config) { it.executeUpdate(statement) }
+            keys
+        } else {
+            val statements = entities.map { buildStatement(config, it) }
+            val (_, keys) = support.insert(config) { it.executeBatch(statements) }
+            keys
+        }
     }
 
     private fun postInsert(entities: List<ENTITY>, generatedKeys: LongArray): List<ENTITY> {
@@ -70,6 +72,10 @@ internal data class EntityBatchInsertQueryImpl<ENTITY : Any>(
     }
 
     override fun dryRun(config: DatabaseConfig): String {
+        val builder = config.dialect.getEntityMultiInsertStatementBuilder(context, entities)
+        if (builder != null) {
+            return builder.build().sql
+        }
         return buildStatement(config, entities.first()).sql
     }
 

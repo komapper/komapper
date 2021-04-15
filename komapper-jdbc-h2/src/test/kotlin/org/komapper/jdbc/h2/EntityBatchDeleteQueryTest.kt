@@ -26,7 +26,7 @@ class EntityBatchDeleteQueryTest(private val db: Database) {
         }
         val query = EntityQuery.from(a).where { a.addressId inList listOf(16, 17, 18) }
         assertEquals(3, db.execute { query }.size)
-        db.execute { EntityQuery.batchDelete(a, addressList) }
+        db.execute { EntityQuery.deleteBatch(a, addressList) }
         assertTrue(db.execute { query }.isEmpty())
     }
 
@@ -45,7 +45,7 @@ class EntityBatchDeleteQueryTest(private val db: Database) {
         assertEquals(3, db.execute { query }.size)
         val ex = assertThrows<OptimisticLockException> {
             db.execute {
-                EntityQuery.batchDelete(
+                EntityQuery.deleteBatch(
                     a,
                     listOf(
                         addressList[0],
@@ -72,7 +72,7 @@ class EntityBatchDeleteQueryTest(private val db: Database) {
         val query = EntityQuery.from(a).where { a.addressId inList listOf(16, 17, 18) }
         assertEquals(3, db.execute { query }.size)
         db.execute {
-            EntityQuery.batchDelete(
+            EntityQuery.deleteBatch(
                 a,
                 listOf(
                     addressList[0],

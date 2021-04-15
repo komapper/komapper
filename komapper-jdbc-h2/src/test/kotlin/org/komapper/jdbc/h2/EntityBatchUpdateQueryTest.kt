@@ -29,7 +29,7 @@ class EntityBatchUpdateQueryTest(private val db: Database) {
         val query = EntityQuery.from(a).where { a.addressId inList listOf(16, 17, 18) }
         val before = db.execute { query }
         val updateList = before.map { it.copy(street = "[" + it.street + "]") }
-        val results = db.execute { EntityQuery.batchUpdate(a, updateList) }
+        val results = db.execute { EntityQuery.updateBatch(a, updateList) }
         val after = db.execute {
             EntityQuery.from(a).where { a.addressId inList listOf(16, 17, 18) }
         }
@@ -51,7 +51,7 @@ class EntityBatchUpdateQueryTest(private val db: Database) {
         for (person in personList) {
             db.execute { EntityQuery.insert(p, person) }
         }
-        val results = db.execute { EntityQuery.batchUpdate(p, personList) }
+        val results = db.execute { EntityQuery.updateBatch(p, personList) }
         personList.zip(results).forEach {
             assertNotEquals(it.first.updatedAt, it.second.updatedAt)
         }
@@ -62,7 +62,7 @@ class EntityBatchUpdateQueryTest(private val db: Database) {
         val a = Address.alias
         assertThrows<UniqueConstraintException> {
             db.execute {
-                EntityQuery.batchUpdate(
+                EntityQuery.updateBatch(
                     a,
                     listOf(
                         Address(1, "A", 1),
@@ -79,7 +79,7 @@ class EntityBatchUpdateQueryTest(private val db: Database) {
         val a = Address.alias
         val ex = assertThrows<OptimisticLockException> {
             db.execute {
-                EntityQuery.batchUpdate(
+                EntityQuery.updateBatch(
                     a,
                     listOf(
                         Address(1, "A", 1),

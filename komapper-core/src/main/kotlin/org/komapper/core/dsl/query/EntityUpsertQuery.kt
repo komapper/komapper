@@ -4,22 +4,29 @@ import org.komapper.core.DatabaseConfig
 import org.komapper.core.data.Statement
 import org.komapper.core.dsl.context.EntityUpsertContext
 import org.komapper.core.dsl.metamodel.PropertyMetamodel
-import org.komapper.core.dsl.option.EntityUpsertOption
+import org.komapper.core.dsl.option.QueryOption
+import org.komapper.core.dsl.scope.SetDeclaration
 
 interface EntityUpsertQuery<ENTITY : Any> : Query<Pair<Int, Long?>> {
     fun set(vararg propertyMetamodels: PropertyMetamodel<ENTITY, *>): Query<Pair<Int, Long?>>
+    fun set(declaration: SetDeclaration<ENTITY>): Query<Pair<Int, Long?>>
 }
 
 internal data class EntityUpsertQueryImpl<ENTITY : Any>(
     private val context: EntityUpsertContext<ENTITY>,
     private val entity: ENTITY,
-    private val option: EntityUpsertOption = EntityUpsertOption()
+    private val option: QueryOption
 ) : EntityUpsertQuery<ENTITY> {
 
     private val support: EntityUpsertQuerySupport<ENTITY> = EntityUpsertQuerySupport(context, option)
 
     override fun set(vararg propertyMetamodels: PropertyMetamodel<ENTITY, *>): Query<Pair<Int, Long?>> {
-        val newContext = context.copy(updateProperties = context.updateProperties + propertyMetamodels)
+        val newContext = support.set(propertyMetamodels.toList())
+        return copy(context = newContext)
+    }
+
+    override fun set(declaration: SetDeclaration<ENTITY>): Query<Pair<Int, Long?>> {
+        val newContext = support.set(declaration)
         return copy(context = newContext)
     }
 

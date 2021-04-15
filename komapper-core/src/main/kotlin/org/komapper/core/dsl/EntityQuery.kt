@@ -72,7 +72,7 @@ object EntityQuery : Dsl {
         return EntityDeleteQueryImpl(EntityDeleteContext(entityMetamodel), entity)
     }
 
-    fun <ENTITY : Any> batchInsert(
+    fun <ENTITY : Any> insertBatch(
         entityMetamodel: EntityMetamodel<ENTITY>,
         entities: List<ENTITY>
     ): EntityBatchInsertQuery<ENTITY> {
@@ -80,7 +80,7 @@ object EntityQuery : Dsl {
         return EntityBatchInsertQueryImpl(EntityInsertContext(entityMetamodel), entities)
     }
 
-    fun <ENTITY : Any> batchUpdate(
+    fun <ENTITY : Any> updateBatch(
         entityMetamodel: EntityMetamodel<ENTITY>,
         entities: List<ENTITY>
     ): EntityBatchUpdateQuery<ENTITY> {
@@ -91,7 +91,7 @@ object EntityQuery : Dsl {
         return EntityBatchUpdateQueryImpl(EntityUpdateContext(entityMetamodel), entities)
     }
 
-    fun <ENTITY : Any> batchDelete(
+    fun <ENTITY : Any> deleteBatch(
         entityMetamodel: EntityMetamodel<ENTITY>,
         entities: List<ENTITY>
     ): EntityBatchDeleteQuery<ENTITY> {

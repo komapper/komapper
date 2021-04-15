@@ -1,8 +1,11 @@
 package org.komapper.core
 
 import org.komapper.core.dsl.builder.DryRunSchemaStatementBuilder
+import org.komapper.core.dsl.builder.EntityMultiInsertStatementBuilder
+import org.komapper.core.dsl.builder.EntityMultiInsertStatementBuilderImpl
 import org.komapper.core.dsl.builder.EntityUpsertStatementBuilder
 import org.komapper.core.dsl.builder.SchemaStatementBuilder
+import org.komapper.core.dsl.context.EntityInsertContext
 import org.komapper.core.dsl.context.EntityUpsertContext
 import org.komapper.core.jdbc.AnyType
 import org.komapper.core.jdbc.DataType
@@ -31,6 +34,13 @@ interface Dialect {
         context: EntityUpsertContext<ENTITY>,
         entity: ENTITY
     ): EntityUpsertStatementBuilder<ENTITY>
+
+    fun <ENTITY : Any> getEntityMultiInsertStatementBuilder(
+        context: EntityInsertContext<ENTITY>,
+        entities: List<ENTITY>
+    ): EntityMultiInsertStatementBuilder<ENTITY>? {
+        return EntityMultiInsertStatementBuilderImpl(this, context, entities)
+    }
 }
 
 abstract class AbstractDialect : Dialect {

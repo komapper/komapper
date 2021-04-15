@@ -41,22 +41,9 @@ data class EntityInsertOption(
     override fun asJdbcOption() = JdbcOption(
         queryTimeoutSeconds = queryTimeoutSeconds
     )
-    fun asEntityUpsertOption() = EntityUpsertOption(
-        queryTimeoutSeconds = queryTimeoutSeconds
-    )
 }
 
 data class EntityUpdateOption(
-    override val queryTimeoutSeconds: Int? = null,
-    override val ignoreVersion: Boolean = false,
-    override val suppressOptimisticLockException: Boolean = false
-) : VersionOption {
-    override fun asJdbcOption() = JdbcOption(
-        queryTimeoutSeconds = queryTimeoutSeconds
-    )
-}
-
-data class EntityUpsertOption(
     override val queryTimeoutSeconds: Int? = null,
     override val ignoreVersion: Boolean = false,
     override val suppressOptimisticLockException: Boolean = false
@@ -108,27 +95,9 @@ data class EntityBatchInsertOption(
         batchSize = batchSize,
         queryTimeoutSeconds = queryTimeoutSeconds
     )
-    fun asEntityBatchUpsertOption() = EntityBatchUpsertOption(
-        batchSize = batchSize,
-        queryTimeoutSeconds = queryTimeoutSeconds,
-        ignoreVersion = ignoreVersion,
-        suppressOptimisticLockException = suppressOptimisticLockException
-    )
 }
 
 data class EntityBatchUpdateOption(
-    override val batchSize: Int? = null,
-    override val queryTimeoutSeconds: Int? = null,
-    override val ignoreVersion: Boolean = false,
-    override val suppressOptimisticLockException: Boolean = false,
-) : VersionOption, BatchOption {
-    override fun asJdbcOption() = JdbcOption(
-        batchSize = batchSize,
-        queryTimeoutSeconds = queryTimeoutSeconds
-    )
-}
-
-data class EntityBatchUpsertOption(
     override val batchSize: Int? = null,
     override val queryTimeoutSeconds: Int? = null,
     override val ignoreVersion: Boolean = false,
