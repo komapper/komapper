@@ -58,7 +58,7 @@ subprojects {
     }
 }
 
-configure(subprojects.filter { it.name != "example" }) {
+configure(subprojects - project("example") - project("integration-test")) {
 
     configure<PublishingExtension> {
         publications {
