@@ -14,7 +14,7 @@ class TemplateExecuteQueryTest(private val db: Database) {
     @Test
     fun test() {
         val count = db.execute {
-            val sql = "update address set street = /*street*/'' where address_id = /*id*/0"
+            val sql = "update ADDRESS set street = /*street*/'' where address_id = /*id*/0"
             TemplateQuery.execute(sql).params {
                 data class Params(val id: Int, val street: String)
                 Params(15, "NY street")

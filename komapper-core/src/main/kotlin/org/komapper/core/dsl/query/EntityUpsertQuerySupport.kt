@@ -48,14 +48,7 @@ internal class EntityUpsertQuerySupport<ENTITY : Any>(
     }
 
     fun <T> upsert(config: DatabaseConfig, execute: (JdbcExecutor) -> T): T {
-        val executor = JdbcExecutor(config, option.asJdbcOption()) { con, sql ->
-            val assignment = context.entityMetamodel.idAssignment()
-            if (assignment is Assignment.Identity<*, *>) {
-                con.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS)
-            } else {
-                con.prepareStatement(sql)
-            }
-        }
+        val executor = JdbcExecutor(config, option.asJdbcOption(), context.entityMetamodel.idAssignment())
         return execute(executor)
     }
 

@@ -27,6 +27,7 @@ interface Dialect {
     fun formatValue(value: Any?, valueClass: KClass<*>): String
     fun isUniqueConstraintViolation(exception: SQLException): Boolean
     fun getSequenceSql(sequenceName: String): String
+    fun getOffsetLimitSql(offset: Int, limit: Int): String
     fun quote(name: String): String
     fun escape(text: String): String
     fun getSchemaStatementBuilder(): SchemaStatementBuilder
@@ -83,6 +84,21 @@ abstract class AbstractDialect : Dialect {
 
     protected fun getCause(exception: SQLException): SQLException =
         exception.filterIsInstance(SQLException::class.java).first()
+
+    override fun getOffsetLimitSql(offset: Int, limit: Int): String {
+        val buf = StringBuilder(50)
+        if (offset >= 0) {
+            buf.append(" offset ")
+            buf.append(offset)
+            buf.append(" rows")
+        }
+        if (limit > 0) {
+            buf.append(" fetch first ")
+            buf.append(limit)
+            buf.append(" rows only")
+        }
+        return buf.toString()
+    }
 
     override fun quote(name: String): String =
         name.split('.').joinToString(".") { openQuote + it + closeQuote }

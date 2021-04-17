@@ -22,7 +22,7 @@ class TemplateSelectQueryTest(private val db: Database) {
     @Test
     fun test() {
         val list = db.execute {
-            val sql = "select * from address"
+            val sql = "select * from ADDRESS"
             TemplateQuery.from(sql).select(asAddress)
         }
         Assertions.assertEquals(15, list.size)
@@ -39,7 +39,7 @@ class TemplateSelectQueryTest(private val db: Database) {
     @Test
     fun sequence() {
         val list = db.execute {
-            val sql = "select * from address"
+            val sql = "select * from ADDRESS"
             TemplateQuery.from(sql).select(asAddress).collect { it.toList() }
         }
         Assertions.assertEquals(15, list.size)
@@ -56,7 +56,7 @@ class TemplateSelectQueryTest(private val db: Database) {
     @Test
     fun condition_objectExpression() {
         val list = db.execute {
-            val sql = "select * from address where street = /*street*/'test'"
+            val sql = "select * from ADDRESS where street = /*street*/'test'"
             TemplateQuery.from(sql).where {
                 object {
                     @Suppress("unused")
@@ -78,7 +78,7 @@ class TemplateSelectQueryTest(private val db: Database) {
     @Test
     fun condition_dataClass() {
         val list = db.execute {
-            val sql = "select * from address where street = /*street*/'test'"
+            val sql = "select * from ADDRESS where street = /*street*/'test'"
             TemplateQuery.from(sql).where {
                 data class Condition(val street: String)
                 Condition("STREET 10")
@@ -98,7 +98,7 @@ class TemplateSelectQueryTest(private val db: Database) {
     @Test
     fun `in`() {
         val list = db.execute {
-            val sql = "select * from address where address_id in /*list*/(0)"
+            val sql = "select * from ADDRESS where address_id in /*list*/(0)"
             TemplateQuery.from(sql).where {
                 object {
                     @Suppress("unused")
@@ -128,7 +128,7 @@ class TemplateSelectQueryTest(private val db: Database) {
     @Test
     fun in2() {
         val list = db.execute {
-            val sql = "select * from address where (address_id, street) in /*pairs*/(0, '')"
+            val sql = "select * from ADDRESS where (address_id, street) in /*pairs*/(0, '')"
             TemplateQuery.from(sql).where {
                 object {
                     @Suppress("unused")
@@ -158,7 +158,7 @@ class TemplateSelectQueryTest(private val db: Database) {
     @Test
     fun in3() {
         val list = db.execute {
-            val sql = "select * from address where (address_id, street, version) in /*triples*/(0, '', 0)"
+            val sql = "select * from ADDRESS where (address_id, street, version) in /*triples*/(0, '', 0)"
             TemplateQuery.from(sql).where {
                 object {
                     @Suppress("unused")

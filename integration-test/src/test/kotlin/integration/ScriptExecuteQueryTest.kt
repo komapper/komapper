@@ -15,6 +15,7 @@ internal class ScriptExecuteQueryTest(private val db: Database) {
     fun test() {
         db.execute {
             val script = """
+            drop table if exists execute_table;
             create table execute_table(value varchar(20));
             insert into execute_table(value) values('test');
             """

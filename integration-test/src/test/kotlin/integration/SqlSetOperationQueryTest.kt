@@ -14,6 +14,7 @@ import org.komapper.core.dsl.execute
 @ExtendWith(Env::class)
 class SqlSetOperationQueryTest(private val db: Database) {
 
+    @Run(unless = [Dbms.MYSQL])
     @Test
     fun except_entity() {
         val e = Employee.alias
@@ -30,6 +31,7 @@ class SqlSetOperationQueryTest(private val db: Database) {
         assertEquals(5, e3.employeeId)
     }
 
+    @Run(unless = [Dbms.MYSQL])
     @Test
     fun intersect_entity() {
         val e = Employee.alias

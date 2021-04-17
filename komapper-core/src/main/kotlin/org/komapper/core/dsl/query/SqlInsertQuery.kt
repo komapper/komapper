@@ -6,7 +6,6 @@ import org.komapper.core.data.Statement
 import org.komapper.core.dsl.builder.SqlInsertStatementBuilder
 import org.komapper.core.dsl.context.SqlInsertContext
 import org.komapper.core.dsl.element.Values
-import org.komapper.core.dsl.metamodel.Assignment
 import org.komapper.core.dsl.option.QueryOptionConfigurator
 import org.komapper.core.dsl.option.SqlInsertOption
 import org.komapper.core.dsl.scope.ValuesDeclaration
@@ -46,14 +45,7 @@ internal data class SqlInsertQueryImpl<ENTITY : Any>(
 
     override fun run(config: DatabaseConfig): Pair<Int, Long?> {
         val statement = buildStatement(config)
-        val executor = JdbcExecutor(config, option.asJdbcOption()) { con, sql ->
-            val assignment = context.entityMetamodel.idAssignment()
-            if (assignment is Assignment.Identity<*, *>) {
-                con.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS)
-            } else {
-                con.prepareStatement(sql)
-            }
-        }
+        val executor = JdbcExecutor(config, option.asJdbcOption(), context.entityMetamodel.idAssignment())
         val (count, keys) = executor.executeUpdate(statement)
         return count to keys.firstOrNull()
     }

@@ -10,7 +10,7 @@ import org.komapper.core.dsl.expression.EntityExpression
 import org.komapper.core.dsl.expression.PropertyExpression
 
 internal class SelectStatementBuilderSupport(
-    dialect: Dialect,
+    private val dialect: Dialect,
     private val context: SelectContext<*, *>,
     aliasManager: AliasManager = AliasManagerImpl(context),
     private val buf: StatementBuffer
@@ -70,16 +70,9 @@ internal class SelectStatementBuilderSupport(
     }
 
     fun offsetLimitClause() {
-        if (context.offset >= 0) {
-            buf.append(" offset ")
-            buf.append(context.offset)
-            buf.append(" rows")
-        }
-        if (context.limit > 0) {
-            buf.append(" fetch first ")
-            buf.append(context.limit)
-            buf.append(" rows only")
-        }
+        // TODO use place holder
+        val sql = dialect.getOffsetLimitSql(context.offset, context.limit)
+        buf.append(sql)
     }
 
     fun forUpdateClause() {

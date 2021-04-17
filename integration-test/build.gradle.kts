@@ -17,6 +17,7 @@ idea.module {
 
 dependencies {
     implementation(project(":komapper-jdbc-h2"))
+    implementation(project(":komapper-jdbc-mysql"))
     implementation(project(":komapper-jdbc-postgresql"))
     implementation(project(":komapper-annotation"))
     implementation(project(":komapper-template"))

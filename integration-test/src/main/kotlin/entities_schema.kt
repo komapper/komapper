@@ -15,7 +15,6 @@ data class Aaa(
 }
 
 @KmEntity
-@KmTable(schema = "test")
 data class Bbb(
     @KmId @KmIdentityGenerator val id: Int,
     val name: String?,
@@ -28,6 +27,15 @@ data class Ccc(
     @KmId @KmSequenceGenerator("CCC_SEQ", incrementBy = 50)
     val id: Int,
     val name: String,
+) {
+    companion object
+}
+
+@KmEntity
+@KmTable(schema = "test")
+data class Ddd(
+    @KmId @KmIdentityGenerator val id: Int,
+    val name: String?,
 ) {
     companion object
 }

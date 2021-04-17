@@ -13,6 +13,7 @@ include("komapper-processor")
 include("komapper-template")
 
 include("komapper-jdbc-h2")
+include("komapper-jdbc-mysql")
 include("komapper-jdbc-postgresql")
 
 include("example")
