@@ -28,7 +28,8 @@ internal class EntityMetamodelGenerator(
     private val constructorParamList = listOf(
         "table: String = \"${entity.table.name}\"",
         "catalog: String = \"${entity.table.catalog}\"",
-        "schema: String = \"${entity.table.schema}\""
+        "schema: String = \"${entity.table.schema}\"",
+        "alwaysQuote: Boolean = ${entity.table.alwaysQuote}"
     ).joinToString(", ")
 
     override fun run() {
@@ -40,6 +41,7 @@ internal class EntityMetamodelGenerator(
         w.println("    private val __tableName = table")
         w.println("    private val __catalogName = catalog")
         w.println("    private val __schemaName = schema")
+        w.println("    private val __alwaysQuote = alwaysQuote")
 
         entityDescriptor()
 
@@ -49,6 +51,7 @@ internal class EntityMetamodelGenerator(
         tableName()
         catalogName()
         schemaName()
+        alwaysQuote()
 
         idAssignment()
         idProperties()
@@ -70,6 +73,8 @@ internal class EntityMetamodelGenerator(
     private fun entityDescriptor() {
         w.println("    private object $EntityDescriptor {")
         for (p in entity.properties) {
+            val columnName = "\"${p.column.name}\""
+            val alwaysQuote = "${p.column.alwaysQuote}"
             val getter = "{ it.$p }"
             val setter = "{ e, v -> e.copy($p = v) }"
             val nullable = if (p.nullability == Nullability.NULLABLE) "true" else "false"
@@ -84,13 +89,14 @@ internal class EntityMetamodelGenerator(
                         "\"${kind.name}\"",
                         "\"${kind.catalog}\"",
                         "\"${kind.schema}\"",
+                        "${kind.alwaysQuote}",
                         "${kind.incrementBy}",
                     ).joinToString(", ")
                     "$Sequence<$entityTypeName, ${p.typeName}>($paramList)"
                 }
                 else -> "null"
             }
-            w.println("        val $p = $PropertyDescriptor<$entityTypeName, ${p.typeName}>(${p.typeName}::class, \"$p\", \"${p.column.name}\", $getter, $setter, $nullable, $assignment)")
+            w.println("        val $p = $PropertyDescriptor<$entityTypeName, ${p.typeName}>(${p.typeName}::class, \"$p\", $columnName, $alwaysQuote, $getter, $setter, $nullable, $assignment)")
         }
         w.println("    }")
     }
@@ -115,6 +121,10 @@ internal class EntityMetamodelGenerator(
 
     private fun schemaName() {
         w.println("    override fun schemaName() = __schemaName")
+    }
+
+    private fun alwaysQuote() {
+        w.println("    override fun alwaysQuote() = __alwaysQuote")
     }
 
     private fun idAssignment() {
@@ -189,7 +199,7 @@ internal class EntityMetamodelGenerator(
     private fun companionObject() {
         w.println("    companion object {")
         w.println("        val alias = $simpleName()")
-        w.println("        fun newAlias($constructorParamList) = $simpleName(table, catalog, schema)")
+        w.println("        fun newAlias($constructorParamList) = $simpleName(table, catalog, schema, alwaysQuote)")
         w.println("    }")
     }
 
@@ -197,7 +207,7 @@ internal class EntityMetamodelGenerator(
         if (entity.declaration.hasCompanionObject()) {
             w.println("")
             w.println("val $entityTypeName.Companion.alias get() = $simpleName.alias")
-            w.println("fun $entityTypeName.Companion.newAlias($constructorParamList) = $simpleName.newAlias(table, catalog, schema)")
+            w.println("fun $entityTypeName.Companion.newAlias($constructorParamList) = $simpleName.newAlias(table, catalog, schema, alwaysQuote)")
         }
     }
 }
@@ -212,7 +222,8 @@ internal class EmptyEntityMetamodelGenerator(
     private val constructorParamList = listOf(
         "table: String = \"\"",
         "catalog: String = \"\"",
-        "schema: String = \"\""
+        "schema: String = \"\"",
+        "alwaysQuote: Boolean = false"
     ).joinToString(", ")
 
     override fun run() {
@@ -235,7 +246,7 @@ internal class EmptyEntityMetamodelGenerator(
         if (classDeclaration.hasCompanionObject()) {
             w.println("")
             w.println("val $simpleQualifiedName.Companion.alias get() = $fileName.alias")
-            w.println("fun $simpleQualifiedName.Companion.newAlias($constructorParamList) = $fileName.newAlias(table, catalog, schema)")
+            w.println("fun $simpleQualifiedName.Companion.newAlias($constructorParamList) = $fileName.newAlias(table, catalog, schema, alwaysQuote)")
         }
     }
 }

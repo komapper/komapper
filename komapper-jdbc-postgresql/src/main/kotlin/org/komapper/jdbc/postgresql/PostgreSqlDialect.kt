@@ -47,14 +47,6 @@ open class PostgreSqlDialect(val version: Version = Version.V42_2) : AbstractDia
         const val UNIQUE_CONSTRAINT_VIOLATION_STATE_CODE = "23505"
     }
 
-    // TODO
-    override val openQuote: String
-        get() = ""
-
-    // TODO
-    override val closeQuote: String
-        get() = ""
-
     override fun isUniqueConstraintViolation(exception: SQLException): Boolean {
         val cause = getCause(exception)
         return cause.sqlState == UNIQUE_CONSTRAINT_VIOLATION_STATE_CODE

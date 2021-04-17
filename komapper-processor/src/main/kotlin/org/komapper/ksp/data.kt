@@ -71,20 +71,17 @@ internal sealed class IdGeneratorKind {
         val name: String,
         val incrementBy: Any,
         val catalog: String,
-        val schema: String
+        val schema: String,
+        val alwaysQuote: Boolean
     ) :
         IdGeneratorKind()
-}
-
-internal data class IdGenerator(val property: Property) {
-    val name = "__${property}Generator"
-    val kind = property.idGeneratorKind
 }
 
 internal data class Table(
     val name: String,
     val catalog: String,
     val schema: String,
+    val alwaysQuote: Boolean
 )
 
-internal data class Column(val name: String)
+internal data class Column(val name: String, val alwaysQuote: Boolean)

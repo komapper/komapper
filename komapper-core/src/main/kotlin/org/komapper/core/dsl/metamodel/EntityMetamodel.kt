@@ -23,6 +23,7 @@ abstract class EmptyEntityMetamodel<ENTITY : Any> : EntityMetamodel<ENTITY> {
     override fun tableName(): String = fail()
     override fun catalogName(): String = fail()
     override fun schemaName(): String = fail()
+    override fun alwaysQuote(): Boolean = fail()
     override fun idAssignment(): Assignment<ENTITY>? = fail()
     override fun idProperties(): List<PropertyMetamodel<ENTITY, *>> = fail()
     override fun versionProperty(): PropertyMetamodel<ENTITY, *>? = fail()

@@ -73,6 +73,6 @@ internal class EntityUpdateStatementBuilder<ENTITY : Any>(
     }
 
     private fun columnName(expression: PropertyExpression<*>): String {
-        return expression.getCanonicalColumnName(dialect::quote)
+        return expression.getCanonicalColumnName(dialect::enquote)
     }
 }

@@ -23,7 +23,7 @@ class BuilderSupport(
 ) {
 
     fun visitEntityExpression(expression: EntityExpression<*>) {
-        val name = expression.getCanonicalTableName(dialect::quote)
+        val name = expression.getCanonicalTableName(dialect::enquote)
         val alias = aliasManager.getAlias(expression) ?: error("Alias is not found. table=$name ,sql=$buf")
         if (alias.isEmpty()) {
             buf.append("$name")
@@ -50,10 +50,10 @@ class BuilderSupport(
                 visitStringFunction(expression)
             }
             else -> {
-                val name = expression.getCanonicalColumnName(dialect::quote)
+                val name = expression.getCanonicalColumnName(dialect::enquote)
                 val owner = expression.owner
                 val alias = aliasManager.getAlias(owner)
-                    ?: error("Alias is not found. table=${owner.getCanonicalTableName(dialect::quote)}, column=$name ,sql=$buf")
+                    ?: error("Alias is not found. table=${owner.getCanonicalTableName(dialect::enquote)}, column=$name ,sql=$buf")
                 if (alias.isBlank()) {
                     buf.append(name)
                 } else {
@@ -98,7 +98,7 @@ class BuilderSupport(
 
     private fun visitAliasExpression(expression: AliasExpression<*>) {
         visitPropertyExpression(expression.expression)
-        buf.append(" as ${dialect.quote(expression.alias)}")
+        buf.append(" as ${dialect.enquote(expression.alias)}")
     }
 
     private fun visitArithmeticExpression(expression: ArithmeticExpression<*>) {

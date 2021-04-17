@@ -23,14 +23,17 @@ internal class EntityDefFactory(
         } ?: namingStrategy.apply(definitionSource.entityDeclaration.simpleName.asString())
         val catalog = annotation?.findValue("catalog")?.toString()?.trim() ?: ""
         val schema = annotation?.findValue("schema")?.toString()?.trim() ?: ""
-        return Table(name, catalog, schema)
+        val alwaysQuote = annotation?.findValue("alwaysQuote")?.toString()?.let { it == "true" } ?: false
+        return Table(name, catalog, schema, alwaysQuote)
     }
 
     private fun getColumn(parameter: KSValueParameter): Column {
-        val name = parameter.findAnnotation("KmColumn")
-            ?.findValue("name")?.toString()?.trim()
-            ?: namingStrategy.apply(parameter.toString())
-        return Column(name)
+        val annotation = parameter.findAnnotation("KmColumn")
+        val name = annotation?.findValue("name")?.toString()?.trim().let {
+            if (it.isNullOrBlank()) null else it
+        } ?: namingStrategy.apply(parameter.toString())
+        val alwaysQuote = annotation?.findValue("alwaysQuote")?.toString()?.let { it == "true" } ?: false
+        return Column(name, alwaysQuote)
     }
 
     private fun createAllProperties(): List<PropertyDef> {
@@ -99,7 +102,8 @@ internal class EntityDefFactory(
                         ?: report("@KmSequenceGenerator.incrementBy is not found.", a)
                     val catalog = a.findValue("catalog")?.toString()?.trim() ?: ""
                     val schema = a.findValue("schema")?.toString()?.trim() ?: ""
-                    IdGeneratorKind.Sequence(a, name, incrementBy, catalog, schema)
+                    val alwaysQuote = a.findValue("alwaysQuote")?.toString()?.let { it == "true" } ?: false
+                    IdGeneratorKind.Sequence(a, name, incrementBy, catalog, schema, alwaysQuote)
                 }
             }
         }

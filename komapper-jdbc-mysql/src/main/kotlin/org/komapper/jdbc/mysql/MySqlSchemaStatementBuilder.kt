@@ -34,15 +34,15 @@ open class MySqlSchemaStatementBuilder(private val dialect: MySqlDialect) : Sche
         val w = PrintWriter(sql)
         val schemaNames = extractSchemaNames(entityMetamodels)
         for (name in schemaNames) {
-            w.println("create schema if not exists ${dialect.quote(name)};")
+            w.println("create schema if not exists ${dialect.enquote(name)};")
         }
     }
 
     private fun createTable(e: EntityMetamodel<*>) {
         val w = PrintWriter(sql)
-        w.println("create table if not exists ${e.getCanonicalTableName(dialect::quote)} (")
+        w.println("create table if not exists ${e.getCanonicalTableName(dialect::enquote)} (")
         val columns = e.properties().joinToString(",\n    ", prefix = "    ") { p ->
-            val columnName = p.getCanonicalColumnName(dialect::quote)
+            val columnName = p.getCanonicalColumnName(dialect::enquote)
             val (_, dataTypeName) = dialect.getDataType(p.klass)
             val notNull = if (p.nullable) "" else " not null"
             val identity = if (p.idAssignment is Assignment.Identity<*, *>) " auto_increment" else ""
@@ -55,7 +55,7 @@ open class MySqlSchemaStatementBuilder(private val dialect: MySqlDialect) : Sche
 
     private fun dropTable(e: EntityMetamodel<*>) {
         val w = PrintWriter(sql)
-        w.println("drop table if exists ${e.getCanonicalTableName(dialect::quote)};")
+        w.println("drop table if exists ${e.getCanonicalTableName(dialect::enquote)};")
     }
 
     private fun extractSchemaNames(entityMetamodels: List<EntityMetamodel<*>>): List<String> {

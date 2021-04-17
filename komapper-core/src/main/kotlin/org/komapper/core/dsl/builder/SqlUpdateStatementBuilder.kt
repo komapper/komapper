@@ -43,7 +43,7 @@ internal class SqlUpdateStatementBuilder<ENTITY : Any>(
     }
 
     private fun columnName(property: Operand.Property): String {
-        return property.expression.getCanonicalColumnName(dialect::quote)
+        return property.expression.getCanonicalColumnName(dialect::enquote)
     }
 
     private fun visitCriterion(index: Int, c: Criterion) {

@@ -23,6 +23,7 @@ sealed class Assignment<E> {
         val name: String,
         val catalogName: String,
         val schemaName: String,
+        val alwaysQuote: Boolean,
         val incrementBy: Int,
     ) :
         Assignment<E>() {
@@ -37,9 +38,14 @@ sealed class Assignment<E> {
             return setter(entity, value)
         }
 
-        fun getCanonicalSequenceName(mapper: (String) -> String): String {
+        fun getCanonicalSequenceName(enquote: (String) -> String): String {
+            val transform = if (alwaysQuote) {
+                enquote
+            } else {
+                { it }
+            }
             return listOf(catalogName, schemaName, name)
-                .filter { it.isNotBlank() }.joinToString(".", transform = mapper)
+                .filter { it.isNotBlank() }.joinToString(".", transform = transform)
         }
 
         private class GenerationContext(private val incrementBy: Int, private val nextValue: () -> Long) {

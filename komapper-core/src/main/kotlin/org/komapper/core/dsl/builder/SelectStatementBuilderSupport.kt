@@ -120,7 +120,7 @@ internal class OrderByBuilderSupport(
                             is SortItem.Alias.Asc -> item.alias to "asc"
                             is SortItem.Alias.Desc -> item.alias to "desc"
                         }
-                        buf.append("${dialect.quote(alias)} $sort")
+                        buf.append("${dialect.enquote(alias)} $sort")
                     }
                 }
                 buf.append(", ")

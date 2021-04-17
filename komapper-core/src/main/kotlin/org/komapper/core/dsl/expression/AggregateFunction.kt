@@ -8,6 +8,7 @@ internal sealed class AggregateFunction<T : Any> : ScalarExpression<T> {
         override val klass: KClass<Double> get() = Double::class
         override val name: String get() = expression.name
         override val columnName: String get() = expression.columnName
+        override val alwaysQuote: Boolean get() = expression.alwaysQuote
     }
 
     internal object CountAsterisk : PropertyExpression<Long>, AggregateFunction<Long>() {
@@ -15,6 +16,7 @@ internal sealed class AggregateFunction<T : Any> : ScalarExpression<T> {
         override val klass: KClass<Long> get() = Long::class
         override val name: String get() = throw UnsupportedOperationException()
         override val columnName: String get() = throw UnsupportedOperationException()
+        override val alwaysQuote: Boolean get() = throw UnsupportedOperationException()
     }
 
     internal data class Count(val expression: PropertyExpression<*>) : PropertyExpression<Long>, AggregateFunction<Long>() {
@@ -22,6 +24,7 @@ internal sealed class AggregateFunction<T : Any> : ScalarExpression<T> {
         override val klass: KClass<Long> get() = Long::class
         override val name: String get() = expression.name
         override val columnName: String get() = expression.columnName
+        override val alwaysQuote: Boolean get() = expression.alwaysQuote
     }
 
     internal data class Max<T : Any>(val expression: PropertyExpression<T>) : PropertyExpression<T> by expression, AggregateFunction<T>()

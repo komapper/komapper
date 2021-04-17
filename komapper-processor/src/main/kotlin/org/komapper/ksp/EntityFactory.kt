@@ -58,7 +58,7 @@ internal class EntityFactory(config: Config, private val entityDef: EntityDef) {
     private fun getColumn(propertyDef: PropertyDef?, parameter: KSValueParameter): Column {
         return if (propertyDef == null) {
             val name = parameter.name?.asString() ?: report("The name is not found.", parameter)
-            Column(namingStrategy.apply(name))
+            Column(namingStrategy.apply(name), false)
         } else {
             propertyDef.column
         }

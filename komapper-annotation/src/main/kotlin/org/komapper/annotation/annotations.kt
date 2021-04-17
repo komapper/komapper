@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package org.komapper.annotation
 
 import kotlin.reflect.KClass
@@ -16,11 +18,16 @@ annotation class KmVersion
 
 @Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.SOURCE)
-annotation class KmTable(val name: String = "", val catalog: String = "", val schema: String = "")
+annotation class KmTable(
+    val name: String = "",
+    val catalog: String = "",
+    val schema: String = "",
+    val alwaysQuote: Boolean = false
+)
 
 @Target(AnnotationTarget.VALUE_PARAMETER)
 @Retention(AnnotationRetention.SOURCE)
-annotation class KmColumn(val name: String)
+annotation class KmColumn(val name: String = "", val alwaysQuote: Boolean = false)
 
 @Target(AnnotationTarget.VALUE_PARAMETER)
 @Retention(AnnotationRetention.SOURCE)
@@ -40,7 +47,8 @@ annotation class KmSequenceGenerator(
     val name: String,
     val incrementBy: Int,
     val catalog: String = "",
-    val schema: String = ""
+    val schema: String = "",
+    val alwaysQuote: Boolean = false
 )
 
 @Target(AnnotationTarget.VALUE_PARAMETER)

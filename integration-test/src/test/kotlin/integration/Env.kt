@@ -63,7 +63,7 @@ internal class Env :
     override fun evaluateExecutionCondition(context: ExtensionContext): ConditionEvaluationResult? {
         return findAnnotation(context.element, Run::class.java)
             .map {
-                if (setting.dbms in it.onlyIf && setting.dbms !in it.unless) {
+                if (isRunnable(it)) {
                     ConditionEvaluationResult.enabled("runnable: ${setting.dbms}")
                 } else {
                     ConditionEvaluationResult.disabled("not runnable: ${setting.dbms}")
@@ -71,6 +71,19 @@ internal class Env :
             }.orElseGet {
                 ConditionEvaluationResult.enabled("@Run is not present")
             }
+    }
+
+    private fun isRunnable(run: Run): Boolean {
+        val dbms = setting.dbms
+        with(run) {
+            if (onlyIf.isNotEmpty()) {
+                return dbms in onlyIf
+            }
+            if (unless.isNotEmpty()) {
+                return dbms !in unless
+            }
+        }
+        return true
     }
 }
 

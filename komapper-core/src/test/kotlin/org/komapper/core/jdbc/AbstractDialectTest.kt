@@ -41,8 +41,7 @@ internal class AbstractDialectTest {
 
     @Test
     fun quote() {
-        assertEquals("\"aaa\"", dialect.quote("aaa"))
-        assertEquals("\"aaa\".\"bbb\".\"ccc\"", dialect.quote("aaa.bbb.ccc"))
+        assertEquals("\"aaa\"", dialect.enquote("aaa"))
     }
 
     @Test

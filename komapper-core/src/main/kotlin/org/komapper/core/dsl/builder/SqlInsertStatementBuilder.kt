@@ -66,11 +66,11 @@ internal class SqlInsertStatementBuilder<ENTITY : Any>(
     }
 
     private fun table(expression: EntityExpression<*>): String {
-        return expression.getCanonicalTableName(dialect::quote)
+        return expression.getCanonicalTableName(dialect::enquote)
     }
 
     private fun column(expression: PropertyExpression<*>): String {
-        return expression.getCanonicalColumnName(dialect::quote)
+        return expression.getCanonicalColumnName(dialect::enquote)
     }
 
     private fun buildSubqueryStatement(subqueryContext: SubqueryContext<*>): Statement {

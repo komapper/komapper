@@ -17,7 +17,7 @@ internal class EntityInsertQuerySupport<ENTITY : Any>(
         val assignment = context.entityMetamodel.idAssignment()
         return if (assignment is Assignment.Sequence<ENTITY, *>) {
             assignment.assign(entity, config.name) {
-                val sequenceName = assignment.getCanonicalSequenceName(config.dialect::quote)
+                val sequenceName = assignment.getCanonicalSequenceName(config.dialect::enquote)
                 val sql = config.dialect.getSequenceSql(sequenceName)
                 val statement = Statement(sql)
                 val executor = JdbcExecutor(config, option.asJdbcOption())

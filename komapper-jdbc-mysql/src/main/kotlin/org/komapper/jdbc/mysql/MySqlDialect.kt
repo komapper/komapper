@@ -47,14 +47,8 @@ open class MySqlDialect(val version: Version = Version.V8_0) : AbstractDialect()
         var UNIQUE_CONSTRAINT_VIOLATION_ERROR_CODES = setOf(1022, 1062)
     }
 
-    // TODO
-    override val openQuote: String
-        get() = ""
-
-    // TODO
-    override val closeQuote: String
-        get() = ""
-
+    override val openQuote: String = "`"
+    override val closeQuote: String = "`"
     override val escapeString: String = "\\\\"
 
     override fun isUniqueConstraintViolation(exception: SQLException): Boolean {

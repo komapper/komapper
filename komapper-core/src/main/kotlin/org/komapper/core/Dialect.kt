@@ -28,7 +28,7 @@ interface Dialect {
     fun isUniqueConstraintViolation(exception: SQLException): Boolean
     fun getSequenceSql(sequenceName: String): String
     fun getOffsetLimitSql(offset: Int, limit: Int): String
-    fun quote(name: String): String
+    fun enquote(name: String): String
     fun escape(text: String): String
     fun getSchemaStatementBuilder(): SchemaStatementBuilder
     fun <ENTITY : Any> getEntityUpsertStatementBuilder(
@@ -100,8 +100,9 @@ abstract class AbstractDialect : Dialect {
         return buf.toString()
     }
 
-    override fun quote(name: String): String =
-        name.split('.').joinToString(".") { openQuote + it + closeQuote }
+    override fun enquote(name: String): String {
+        return openQuote + name + closeQuote
+    }
 
     override fun escape(text: String): String {
         val matcher = escapePattern.matcher(text)

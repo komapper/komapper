@@ -1,11 +1,17 @@
 package integration
 
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
+import org.komapper.core.Database
 import org.komapper.core.dsl.EntityQuery
+import org.komapper.core.dsl.execute
 
-class MiscTest {
+@ExtendWith(Env::class)
+class QuoteTest(val db: Database) {
 
+    @Run(onlyIf = [Dbms.H2, Dbms.POSTGRESQL])
     @Test
     fun catalogAndSchema() {
         val m = CatalogAndSchema.alias
@@ -15,6 +21,7 @@ class MiscTest {
         assertTrue(sql.contains(""" "catalog"."schema"."CATALOG_AND_SCHEMA" """))
     }
 
+    @Run(onlyIf = [Dbms.H2, Dbms.POSTGRESQL])
     @Test
     fun catalogOnly() {
         val m = CatalogOnly.alias
@@ -24,6 +31,7 @@ class MiscTest {
         assertTrue(sql.contains(""" "catalog"."CATALOG_ONLY" """))
     }
 
+    @Run(onlyIf = [Dbms.H2, Dbms.POSTGRESQL])
     @Test
     fun schemaOnly() {
         val m = SchemaOnly.alias
@@ -33,6 +41,7 @@ class MiscTest {
         assertTrue(sql.contains(""" "schema"."SCHEMA_ONLY" """))
     }
 
+    @Run(onlyIf = [Dbms.H2, Dbms.POSTGRESQL])
     @Test
     fun blankName() {
         val m = BlankName.alias
@@ -40,5 +49,14 @@ class MiscTest {
         val sql = query.dryRun()
         println(sql)
         assertTrue(sql.contains(""" "BLANK_NAME" """))
+        assertTrue(sql.contains("ID"))
+    }
+
+    @Test
+    fun alwaysQuote() {
+        val m = Order.alias
+        db.execute { EntityQuery.insert(m, Order(1, "value")) }
+        val list = db.execute { EntityQuery.from(m) }
+        assertEquals(1, list.size)
     }
 }

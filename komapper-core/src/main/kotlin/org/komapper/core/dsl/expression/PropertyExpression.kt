@@ -7,8 +7,14 @@ interface PropertyExpression<T : Any> {
     val klass: KClass<T>
     val name: String
     val columnName: String
+    val alwaysQuote: Boolean
 
-    fun getCanonicalColumnName(mapper: (String) -> String): String {
-        return mapper(columnName)
+    fun getCanonicalColumnName(enquote: (String) -> String): String {
+        val transform = if (alwaysQuote) {
+            enquote
+        } else {
+            { it }
+        }
+        return transform(columnName)
     }
 }
