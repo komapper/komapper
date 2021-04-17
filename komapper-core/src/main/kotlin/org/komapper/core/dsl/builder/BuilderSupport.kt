@@ -219,7 +219,7 @@ class BuilderSupport(
                     is EscapeExpression -> {
                         val newValue = visitEscapeExpression(value, dialect::escape)
                         visitParameter(Operand.Parameter(operand.expression, newValue))
-                        buf.append(" escape '${dialect.escapeChar}'")
+                        buf.append(" escape '${dialect.escapeString}'")
                     }
                     else -> visitParameter(operand)
                 }

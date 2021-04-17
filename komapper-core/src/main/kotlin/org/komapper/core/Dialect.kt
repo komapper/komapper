@@ -18,7 +18,7 @@ import kotlin.reflect.KClass
 interface Dialect {
     val openQuote: String
     val closeQuote: String
-    val escapeChar: Char
+    val escapeString: String
     val escapePattern: Pattern
 
     fun getValue(rs: ResultSet, index: Int, valueClass: KClass<*>): Any?
@@ -48,11 +48,11 @@ abstract class AbstractDialect : Dialect {
 
     override val openQuote: String = "\""
     override val closeQuote: String = "\""
-    override val escapeChar: Char = '\\'
+    override val escapeString: String = "\\"
     override val escapePattern: Pattern
         get() {
             @Suppress("RegExpDuplicateCharacterInClass")
-            val regex = "[${escapeChar}${escapeChar}_%]"
+            val regex = "[${escapeString}${escapeString}_%]"
             return Pattern.compile(regex)
         }
 

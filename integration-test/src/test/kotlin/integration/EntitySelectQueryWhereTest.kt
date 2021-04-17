@@ -71,8 +71,6 @@ class EntitySelectQueryWhereTest(private val db: Database) {
         assertEquals((10..15).toList(), list.map { it.addressId })
     }
 
-    // TODO
-    @Run(unless = [Dbms.MYSQL])
     @Test
     fun like_escape() {
         val a = Address.alias
@@ -97,8 +95,6 @@ class EntitySelectQueryWhereTest(private val db: Database) {
         assertEquals((1..9).toList(), list.map { it.addressId })
     }
 
-    // TODO
-    @Run(unless = [Dbms.MYSQL])
     @Test
     fun notLike_escape() {
         val a = Address.alias
@@ -112,8 +108,6 @@ class EntitySelectQueryWhereTest(private val db: Database) {
         assertEquals((1..15).toList(), list.map { it.addressId })
     }
 
-    // TODO
-    @Run(unless = [Dbms.MYSQL])
     @Test
     fun startsWith() {
         val a = Address.alias
@@ -125,8 +119,6 @@ class EntitySelectQueryWhereTest(private val db: Database) {
         assertEquals(listOf(1) + (10..15), list.map { it.addressId })
     }
 
-    // TODO
-    @Run(unless = [Dbms.MYSQL])
     @Test
     fun startsWith_escape() {
         val a = Address.alias
@@ -138,8 +130,6 @@ class EntitySelectQueryWhereTest(private val db: Database) {
         assertEquals(listOf(16), list.map { it.addressId })
     }
 
-    // TODO
-    @Run(unless = [Dbms.MYSQL])
     @Test
     fun notStartsWith() {
         val a = Address.alias
@@ -151,8 +141,6 @@ class EntitySelectQueryWhereTest(private val db: Database) {
         assertEquals((2..9).toList(), list.map { it.addressId })
     }
 
-    // TODO
-    @Run(unless = [Dbms.MYSQL])
     @Test
     fun contains() {
         val a = Address.alias
@@ -164,8 +152,6 @@ class EntitySelectQueryWhereTest(private val db: Database) {
         assertEquals(listOf(1) + (10..15), list.map { it.addressId })
     }
 
-    // TODO
-    @Run(unless = [Dbms.MYSQL])
     @Test
     fun notContains() {
         val a = Address.alias
@@ -177,8 +163,6 @@ class EntitySelectQueryWhereTest(private val db: Database) {
         assertEquals((2..9).toList(), list.map { it.addressId })
     }
 
-    // TODO
-    @Run(unless = [Dbms.MYSQL])
     @Test
     fun endsWith() {
         val a = Address.alias
@@ -190,8 +174,6 @@ class EntitySelectQueryWhereTest(private val db: Database) {
         assertEquals(listOf(1, 11), list.map { it.addressId })
     }
 
-    // TODO
-    @Run(unless = [Dbms.MYSQL])
     @Test
     fun notEndsWith() {
         val a = Address.alias

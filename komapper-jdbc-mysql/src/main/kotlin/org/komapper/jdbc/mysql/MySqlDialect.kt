@@ -55,6 +55,8 @@ open class MySqlDialect(val version: Version = Version.V8_0) : AbstractDialect()
     override val closeQuote: String
         get() = ""
 
+    override val escapeString: String = "\\\\"
+
     override fun isUniqueConstraintViolation(exception: SQLException): Boolean {
         val cause = getCause(exception)
         return cause.errorCode in UNIQUE_CONSTRAINT_VIOLATION_ERROR_CODES
