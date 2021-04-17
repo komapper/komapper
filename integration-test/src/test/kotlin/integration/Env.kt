@@ -1,6 +1,8 @@
 package integration
 
+import org.junit.jupiter.api.extension.AfterAllCallback
 import org.junit.jupiter.api.extension.AfterTestExecutionCallback
+import org.junit.jupiter.api.extension.BeforeAllCallback
 import org.junit.jupiter.api.extension.BeforeTestExecutionCallback
 import org.junit.jupiter.api.extension.ConditionEvaluationResult
 import org.junit.jupiter.api.extension.ExecutionCondition
@@ -13,6 +15,8 @@ import org.komapper.core.dsl.ScriptQuery
 import org.komapper.core.dsl.execute
 
 internal class Env :
+    BeforeAllCallback,
+    AfterAllCallback,
     BeforeTestExecutionCallback,
     AfterTestExecutionCallback,
     ParameterResolver,
@@ -22,17 +26,23 @@ internal class Env :
     private val db = Database(setting.config)
     private val txManager = db.config.session.transactionManager ?: error("Enable transaction.")
 
-    override fun beforeTestExecution(context: ExtensionContext?) {
+    override fun beforeAll(context: ExtensionContext?) {
         db.transaction {
             db.execute {
                 ScriptQuery.execute(setting.createSql)
             }
         }
+    }
+
+    override fun beforeTestExecution(context: ExtensionContext?) {
         txManager.begin()
     }
 
     override fun afterTestExecution(context: ExtensionContext?) {
         txManager.rollback()
+    }
+
+    override fun afterAll(context: ExtensionContext?) {
         db.transaction {
             db.execute {
                 ScriptQuery.execute(setting.dropSql)
