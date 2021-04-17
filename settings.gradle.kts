@@ -6,11 +6,14 @@ pluginManagement {
 }
 
 rootProject.name = "komapper"
-include("example")
+
 include("komapper-core")
-include("komapper-jdbc-h2")
-// include("komapper-jdbc-postgresql")
-include("komapper-processor")
 include("komapper-annotation")
+include("komapper-processor")
 include("komapper-template")
+
+include("komapper-jdbc-h2")
+include("komapper-jdbc-postgresql")
+
+include("example")
 include("integration-test")

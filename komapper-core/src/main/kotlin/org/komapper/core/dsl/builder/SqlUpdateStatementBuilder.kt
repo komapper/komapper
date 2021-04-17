@@ -21,7 +21,7 @@ internal class SqlUpdateStatementBuilder<ENTITY : Any>(
         table(context.entityMetamodel)
         buf.append(" set ")
         for ((left, right) in context.set) {
-            visitOperand(left)
+            buf.append(columnName(left))
             buf.append(" = ")
             visitOperand(right)
             buf.append(", ")
@@ -40,6 +40,10 @@ internal class SqlUpdateStatementBuilder<ENTITY : Any>(
 
     private fun table(expression: EntityExpression<*>) {
         support.visitEntityExpression(expression)
+    }
+
+    private fun columnName(property: Operand.Property): String {
+        return property.expression.getCanonicalColumnName(dialect::quote)
     }
 
     private fun visitCriterion(index: Int, c: Criterion) {

@@ -17,6 +17,7 @@ idea.module {
 
 dependencies {
     implementation(project(":komapper-jdbc-h2"))
+    implementation(project(":komapper-jdbc-postgresql"))
     implementation(project(":komapper-annotation"))
     implementation(project(":komapper-template"))
     ksp(project(":komapper-processor"))
@@ -28,11 +29,15 @@ ksp {
 
 tasks {
     test {
-        val jdbcUrl: Any by project
-        val jdbcUser: Any by project
-        val jdbcPassword: Any by project
-        systemProperty("url", jdbcUrl)
-        systemProperty("user", jdbcUser)
-        systemProperty("password", jdbcPassword)
+        val jdbc: Any by project
+        val urlKey = "$jdbc.url"
+        val userKey = "$jdbc.user"
+        val passwordKey = "$jdbc.password"
+        val url = project.property(urlKey) ?: throw GradleException("The $urlKey property is not found.")
+        val user = project.property(userKey) ?: throw GradleException("The $userKey property is not found.")
+        val password = project.property(passwordKey) ?: throw GradleException("The $passwordKey property is not found.")
+        systemProperty("url", url)
+        systemProperty("user", user)
+        systemProperty("password", password)
     }
 }

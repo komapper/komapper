@@ -26,19 +26,23 @@ internal class SqlInsertStatementBuilder<ENTITY : Any>(
             is Values.Pairs -> {
                 buf.append(" (")
                 for (column in values.pairs.map { it.first }) {
+                    if (column.expression in entityMetamodel.idProperties() &&
+                        entityMetamodel.idAssignment() is Assignment.Identity<ENTITY, *>
+                    ) {
+                        continue
+                    }
                     buf.append(column(column.expression))
                     buf.append(", ")
                 }
                 buf.cutBack(2)
                 buf.append(") values (")
                 for (parameter in values.pairs.map { it.second }) {
-                    val value = if (parameter.expression in entityMetamodel.idProperties() &&
+                    if (parameter.expression in entityMetamodel.idProperties() &&
                         entityMetamodel.idAssignment() is Assignment.Identity<ENTITY, *>
                     ) {
-                        Value(null, parameter.expression.klass)
-                    } else {
-                        Value(parameter.value, parameter.expression.klass)
+                        continue
                     }
+                    val value = Value(parameter.value, parameter.expression.klass)
                     buf.bind(value)
                     buf.append(", ")
                 }

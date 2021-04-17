@@ -27,6 +27,7 @@ internal class EntityMultiInsertStatementBuilderImpl<ENTITY : Any>(
         buf.append(table(entityMetamodel))
         buf.append(" (")
         for (p in properties) {
+            if (p.idAssignment is Assignment.Identity<ENTITY, *>) continue
             buf.append(column(p))
             buf.append(", ")
         }
@@ -35,13 +36,8 @@ internal class EntityMultiInsertStatementBuilderImpl<ENTITY : Any>(
         for (entity in entities) {
             buf.append("(")
             for (p in properties) {
-                val value = if (p in entityMetamodel.idProperties() &&
-                    entityMetamodel.idAssignment() is Assignment.Identity<ENTITY, *>
-                ) {
-                    Value(null, p.klass)
-                } else {
-                    Value(p.getter(entity), p.klass)
-                }
+                if (p.idAssignment is Assignment.Identity<ENTITY, *>) continue
+                val value = Value(p.getter(entity), p.klass)
                 buf.bind(value)
                 buf.append(", ")
             }

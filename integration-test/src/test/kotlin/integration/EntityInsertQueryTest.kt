@@ -49,6 +49,8 @@ class EntityInsertQueryTest(private val db: Database) {
         assertEquals(person2, person3)
     }
 
+    // TODO
+    @Run(unless = [Dbms.POSTGRESQL])
     @Test
     fun createdAt_offsetDateTime() {
         val h = Human.alias

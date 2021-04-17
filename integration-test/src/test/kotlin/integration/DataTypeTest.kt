@@ -17,6 +17,7 @@ import java.time.ZoneOffset
 @ExtendWith(Env::class)
 class DataTypeTest(val db: Database) {
 
+    @Run(onlyIf = [Dbms.H2])
     @Test
     fun any() {
         val m = AnyTest.alias
@@ -170,6 +171,8 @@ class DataTypeTest(val db: Database) {
         Assertions.assertEquals(data, data2)
     }
 
+    // TODO
+    @Run(unless = [Dbms.POSTGRESQL])
     @Test
     fun offsetDateTime() {
         val m = OffsetDateTimeTest.alias

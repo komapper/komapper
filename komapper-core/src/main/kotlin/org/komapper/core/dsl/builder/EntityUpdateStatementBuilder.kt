@@ -28,7 +28,7 @@ internal class EntityUpdateStatementBuilder<ENTITY : Any>(
         table(context.entityMetamodel)
         buf.append(" set ")
         for (p in (properties - idProperties).filter { it != createdAtProperty }) {
-            column(p)
+            buf.append(columnName(p))
             buf.append(" = ")
             val value = Value(p.getter(entity), p.klass)
             buf.bind(value)
@@ -70,5 +70,9 @@ internal class EntityUpdateStatementBuilder<ENTITY : Any>(
 
     private fun column(expression: PropertyExpression<*>) {
         support.visitPropertyExpression(expression)
+    }
+
+    private fun columnName(expression: PropertyExpression<*>): String {
+        return expression.getCanonicalColumnName(dialect::quote)
     }
 }

@@ -16,7 +16,6 @@ class SchemaQueryTest(private val db: Database) {
         db.execute {
             SchemaQuery.create(metamodels)
         }
-        SchemaQuery.create(metamodels).dryRun()
     }
 
     @Test
@@ -29,6 +28,7 @@ class SchemaQueryTest(private val db: Database) {
         }
     }
 
+    @Run(onlyIf = [Dbms.H2])
     @Test
     fun dropAll() {
         db.execute {
