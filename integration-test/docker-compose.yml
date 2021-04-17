@@ -10,4 +10,14 @@ services:
       MYSQL_USER: integration_test
       MYSQL_PASSWORD: integration_test
     ports:
-      - "3306:3306"
+      - 3306:3306
+
+  postgres:
+    image: postgres:11.11
+    restart: always
+    environment:
+      POSTGRES_DB: integration_test
+      POSTGRES_USER: integration_test
+      POSTGRES_PASSWORD: integration_test
+    ports:
+      - 5432:5432
