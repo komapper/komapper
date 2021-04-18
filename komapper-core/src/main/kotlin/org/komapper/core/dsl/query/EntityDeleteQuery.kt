@@ -3,6 +3,7 @@ package org.komapper.core.dsl.query
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.data.Statement
 import org.komapper.core.dsl.context.EntityDeleteContext
+import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.option.EntityDeleteOption
 import org.komapper.core.dsl.option.QueryOptionConfigurator
 
@@ -10,16 +11,16 @@ interface EntityDeleteQuery<ENTITY : Any> : Query<Unit> {
     fun option(configurator: QueryOptionConfigurator<EntityDeleteOption>): EntityDeleteQuery<ENTITY>
 }
 
-internal data class EntityDeleteQueryImpl<ENTITY : Any>(
-    private val context: EntityDeleteContext<ENTITY>,
+internal data class EntityDeleteQueryImpl<ENTITY : Any, META : EntityMetamodel<ENTITY, META>>(
+    private val context: EntityDeleteContext<ENTITY, META>,
     private val entity: ENTITY,
     private val option: EntityDeleteOption = EntityDeleteOption()
 ) :
     EntityDeleteQuery<ENTITY> {
 
-    private val support: EntityDeleteQuerySupport<ENTITY> = EntityDeleteQuerySupport(context, option)
+    private val support: EntityDeleteQuerySupport<ENTITY, META> = EntityDeleteQuerySupport(context, option)
 
-    override fun option(configurator: QueryOptionConfigurator<EntityDeleteOption>): EntityDeleteQueryImpl<ENTITY> {
+    override fun option(configurator: QueryOptionConfigurator<EntityDeleteOption>): EntityDeleteQueryImpl<ENTITY, META> {
         return copy(option = configurator.apply(option))
     }
 

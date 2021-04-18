@@ -1,10 +1,12 @@
 package org.komapper.jdbc.mysql
 
 import org.komapper.core.AbstractDialect
+import org.komapper.core.dsl.builder.EntityMultiUpsertStatementBuilder
 import org.komapper.core.dsl.builder.EntityUpsertStatementBuilder
 import org.komapper.core.dsl.builder.OffsetLimitStatementBuilder
 import org.komapper.core.dsl.builder.SchemaStatementBuilder
 import org.komapper.core.dsl.context.EntityUpsertContext
+import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.jdbc.ArrayType
 import org.komapper.core.jdbc.BigDecimalType
 import org.komapper.core.jdbc.BigIntegerType
@@ -95,10 +97,17 @@ open class MySqlDialect(val version: Version = Version.V8_0) : AbstractDialect()
         return MySqlSchemaStatementBuilder(this)
     }
 
-    override fun <ENTITY : Any> getEntityUpsertStatementBuilder(
-        context: EntityUpsertContext<ENTITY>,
+    override fun <ENTITY : Any, META : EntityMetamodel<ENTITY, META>> getEntityUpsertStatementBuilder(
+        context: EntityUpsertContext<ENTITY, META>,
         entity: ENTITY
     ): EntityUpsertStatementBuilder<ENTITY> {
-        return MySqlEntityUpsertStatementBuilder(this, context, entity)
+        return MySqlEntityMultiUpsertStatementBuilder(this, context, listOf(entity))
+    }
+
+    override fun <ENTITY : Any, META : EntityMetamodel<ENTITY, META>> getEntityMultiUpsertStatementBuilder(
+        context: EntityUpsertContext<ENTITY, META>,
+        entities: List<ENTITY>
+    ): EntityMultiUpsertStatementBuilder<ENTITY>? {
+        return MySqlEntityMultiUpsertStatementBuilder(this, context, entities)
     }
 }

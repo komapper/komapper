@@ -3,12 +3,14 @@ package org.komapper.core
 import org.komapper.core.dsl.builder.DryRunSchemaStatementBuilder
 import org.komapper.core.dsl.builder.EntityMultiInsertStatementBuilder
 import org.komapper.core.dsl.builder.EntityMultiInsertStatementBuilderImpl
+import org.komapper.core.dsl.builder.EntityMultiUpsertStatementBuilder
 import org.komapper.core.dsl.builder.EntityUpsertStatementBuilder
 import org.komapper.core.dsl.builder.OffsetLimitStatementBuilder
 import org.komapper.core.dsl.builder.OffsetLimitStatementBuilderImpl
 import org.komapper.core.dsl.builder.SchemaStatementBuilder
 import org.komapper.core.dsl.context.EntityInsertContext
 import org.komapper.core.dsl.context.EntityUpsertContext
+import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.jdbc.AnyType
 import org.komapper.core.jdbc.DataType
 import java.sql.PreparedStatement
@@ -35,17 +37,20 @@ interface Dialect {
 
     fun getSchemaStatementBuilder(): SchemaStatementBuilder
 
-    fun <ENTITY : Any> getEntityUpsertStatementBuilder(
-        context: EntityUpsertContext<ENTITY>,
+    fun <ENTITY : Any, META : EntityMetamodel<ENTITY, META>> getEntityUpsertStatementBuilder(
+        context: EntityUpsertContext<ENTITY, META>,
         entity: ENTITY
     ): EntityUpsertStatementBuilder<ENTITY>
 
-    fun <ENTITY : Any> getEntityMultiInsertStatementBuilder(
-        context: EntityInsertContext<ENTITY>,
+    fun <ENTITY : Any, META : EntityMetamodel<ENTITY, META>> getEntityMultiInsertStatementBuilder(
+        context: EntityInsertContext<ENTITY, META>,
         entities: List<ENTITY>
-    ): EntityMultiInsertStatementBuilder<ENTITY>? {
-        return EntityMultiInsertStatementBuilderImpl(this, context, entities)
-    }
+    ): EntityMultiInsertStatementBuilder<ENTITY>?
+
+    fun <ENTITY : Any, META : EntityMetamodel<ENTITY, META>> getEntityMultiUpsertStatementBuilder(
+        context: EntityUpsertContext<ENTITY, META>,
+        entities: List<ENTITY>
+    ): EntityMultiUpsertStatementBuilder<ENTITY>?
 }
 
 abstract class AbstractDialect : Dialect {
@@ -102,6 +107,13 @@ abstract class AbstractDialect : Dialect {
     override fun getOffsetLimitStatementBuilder(offset: Int, limit: Int): OffsetLimitStatementBuilder {
         return OffsetLimitStatementBuilderImpl(this, offset, limit)
     }
+
+    override fun <ENTITY : Any, META : EntityMetamodel<ENTITY, META>> getEntityMultiInsertStatementBuilder(
+        context: EntityInsertContext<ENTITY, META>,
+        entities: List<ENTITY>
+    ): EntityMultiInsertStatementBuilder<ENTITY>? {
+        return EntityMultiInsertStatementBuilderImpl(this, context, entities)
+    }
 }
 
 internal object DryRunDialect : AbstractDialect() {
@@ -122,10 +134,17 @@ internal object DryRunDialect : AbstractDialect() {
         return DryRunSchemaStatementBuilder
     }
 
-    override fun <ENTITY : Any> getEntityUpsertStatementBuilder(
-        context: EntityUpsertContext<ENTITY>,
+    override fun <ENTITY : Any, META : EntityMetamodel<ENTITY, META>> getEntityUpsertStatementBuilder(
+        context: EntityUpsertContext<ENTITY, META>,
         entity: ENTITY
     ): EntityUpsertStatementBuilder<ENTITY> {
+        throw UnsupportedOperationException()
+    }
+
+    override fun <ENTITY : Any, META : EntityMetamodel<ENTITY, META>> getEntityMultiUpsertStatementBuilder(
+        context: EntityUpsertContext<ENTITY, META>,
+        entities: List<ENTITY>
+    ): EntityMultiUpsertStatementBuilder<ENTITY>? {
         throw UnsupportedOperationException()
     }
 }

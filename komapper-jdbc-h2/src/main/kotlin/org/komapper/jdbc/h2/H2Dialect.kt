@@ -1,9 +1,11 @@
 package org.komapper.jdbc.h2
 
 import org.komapper.core.AbstractDialect
+import org.komapper.core.dsl.builder.EntityMultiUpsertStatementBuilder
 import org.komapper.core.dsl.builder.EntityUpsertStatementBuilder
 import org.komapper.core.dsl.builder.SchemaStatementBuilder
 import org.komapper.core.dsl.context.EntityUpsertContext
+import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.jdbc.AnyType
 import org.komapper.core.jdbc.ArrayType
 import org.komapper.core.jdbc.BigDecimalType
@@ -89,10 +91,17 @@ open class H2Dialect(val version: Version = Version.V1_4) : AbstractDialect() {
         return H2SchemaStatementBuilder(this)
     }
 
-    override fun <ENTITY : Any> getEntityUpsertStatementBuilder(
-        context: EntityUpsertContext<ENTITY>,
+    override fun <ENTITY : Any, META : EntityMetamodel<ENTITY, META>> getEntityUpsertStatementBuilder(
+        context: EntityUpsertContext<ENTITY, META>,
         entity: ENTITY
     ): EntityUpsertStatementBuilder<ENTITY> {
-        return H2EntityUpsertStatementBuilder(this, context, entity)
+        return H2EntityMultiUpsertStatementBuilder(this, context, listOf(entity))
+    }
+
+    override fun <ENTITY : Any, META : EntityMetamodel<ENTITY, META>> getEntityMultiUpsertStatementBuilder(
+        context: EntityUpsertContext<ENTITY, META>,
+        entities: List<ENTITY>
+    ): EntityMultiUpsertStatementBuilder<ENTITY>? {
+        return H2EntityMultiUpsertStatementBuilder(this, context, entities)
     }
 }

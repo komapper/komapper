@@ -3,28 +3,22 @@ package org.komapper.core.dsl.query
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.data.Statement
 import org.komapper.core.dsl.context.EntityUpsertContext
-import org.komapper.core.dsl.metamodel.PropertyMetamodel
-import org.komapper.core.dsl.scope.SetDeclaration
+import org.komapper.core.dsl.metamodel.EntityMetamodel
+import org.komapper.core.dsl.scope.SetScope
 
-interface EntityUpsertQuery<ENTITY : Any> : Query<Pair<Int, Long?>> {
-    fun set(vararg propertyMetamodels: PropertyMetamodel<ENTITY, *>): Query<Pair<Int, Long?>>
-    fun set(declaration: SetDeclaration<ENTITY>): Query<Pair<Int, Long?>>
+interface EntityUpsertQuery<ENTITY : Any, META : EntityMetamodel<ENTITY, META>> : Query<Pair<Int, Long?>> {
+    fun set(declaration: SetScope<ENTITY>.(META) -> Unit): Query<Pair<Int, Long?>>
 }
 
-internal data class EntityUpsertQueryImpl<ENTITY : Any>(
-    private val context: EntityUpsertContext<ENTITY>,
+internal data class EntityUpsertQueryImpl<ENTITY : Any, META : EntityMetamodel<ENTITY, META>>(
+    private val context: EntityUpsertContext<ENTITY, META>,
     private val entity: ENTITY,
-    private val insertSupport: EntityInsertQuerySupport<ENTITY>
-) : EntityUpsertQuery<ENTITY> {
+    private val insertSupport: EntityInsertQuerySupport<ENTITY, META>
+) : EntityUpsertQuery<ENTITY, META> {
 
-    private val support: EntityUpsertQuerySupport<ENTITY> = EntityUpsertQuerySupport(context, insertSupport)
+    private val support: EntityUpsertQuerySupport<ENTITY, META> = EntityUpsertQuerySupport(context, insertSupport)
 
-    override fun set(vararg propertyMetamodels: PropertyMetamodel<ENTITY, *>): Query<Pair<Int, Long?>> {
-        val newContext = support.set(propertyMetamodels.toList())
-        return copy(context = newContext)
-    }
-
-    override fun set(declaration: SetDeclaration<ENTITY>): Query<Pair<Int, Long?>> {
+    override fun set(declaration: SetScope<ENTITY>.(META) -> Unit): Query<Pair<Int, Long?>> {
         val newContext = support.set(declaration)
         return copy(context = newContext)
     }

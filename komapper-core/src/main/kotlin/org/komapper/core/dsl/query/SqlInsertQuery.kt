@@ -7,6 +7,7 @@ import org.komapper.core.dsl.builder.SqlInsertStatementBuilder
 import org.komapper.core.dsl.context.SqlInsertContext
 import org.komapper.core.dsl.element.Values
 import org.komapper.core.dsl.metamodel.Assignment
+import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.option.QueryOptionConfigurator
 import org.komapper.core.dsl.option.SqlInsertOption
 import org.komapper.core.dsl.scope.ValuesDeclaration
@@ -18,12 +19,12 @@ interface SqlInsertQuery<ENTITY : Any> : Query<Pair<Int, Long?>> {
     fun option(configurator: QueryOptionConfigurator<SqlInsertOption>): SqlInsertQuery<ENTITY>
 }
 
-internal data class SqlInsertQueryImpl<ENTITY : Any>(
-    private val context: SqlInsertContext<ENTITY>,
+internal data class SqlInsertQueryImpl<ENTITY : Any, META : EntityMetamodel<ENTITY, META>>(
+    private val context: SqlInsertContext<ENTITY, META>,
     private val option: SqlInsertOption = SqlInsertOption()
 ) : SqlInsertQuery<ENTITY> {
 
-    override fun values(declaration: ValuesDeclaration<ENTITY>): SqlInsertQueryImpl<ENTITY> {
+    override fun values(declaration: ValuesDeclaration<ENTITY>): SqlInsertQueryImpl<ENTITY, META> {
         val scope = ValuesScope<ENTITY>().apply(declaration)
         val values = when (val values = context.values) {
             is Values.Pairs -> Values.Pairs(values.pairs + scope)
@@ -40,13 +41,13 @@ internal data class SqlInsertQueryImpl<ENTITY : Any>(
         return copy(context = newContext)
     }
 
-    override fun option(configurator: QueryOptionConfigurator<SqlInsertOption>): SqlInsertQueryImpl<ENTITY> {
+    override fun option(configurator: QueryOptionConfigurator<SqlInsertOption>): SqlInsertQueryImpl<ENTITY, META> {
         return copy(option = configurator.apply(option))
     }
 
     override fun run(config: DatabaseConfig): Pair<Int, Long?> {
         val statement = buildStatement(config)
-        val requiresGeneratedKeys = context.entityMetamodel.idAssignment() is Assignment.Identity<*, *>
+        val requiresGeneratedKeys = context.target.idAssignment() is Assignment.Identity<*, *>
         val executor = JdbcExecutor(config, option.asJdbcOption(), requiresGeneratedKeys)
         val (count, keys) = executor.executeUpdate(statement)
         return count to keys.firstOrNull()

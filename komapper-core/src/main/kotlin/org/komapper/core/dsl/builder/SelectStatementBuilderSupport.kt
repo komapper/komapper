@@ -11,7 +11,7 @@ import org.komapper.core.dsl.expression.PropertyExpression
 
 internal class SelectStatementBuilderSupport(
     private val dialect: Dialect,
-    private val context: SelectContext<*, *>,
+    private val context: SelectContext<*, *, *>,
     aliasManager: AliasManager = AliasManagerImpl(context),
     private val buf: StatementBuffer
 ) {
@@ -32,7 +32,7 @@ internal class SelectStatementBuilderSupport(
 
     fun fromClause() {
         buf.append(" from ")
-        table(context.entityMetamodel)
+        table(context.target)
         if (context.joins.isNotEmpty()) {
             for (join in context.joins) {
                 if (join.kind === JoinKind.INNER) {
@@ -44,7 +44,7 @@ internal class SelectStatementBuilderSupport(
                 if (join.on.isNotEmpty()) {
                     buf.append(" on (")
                     for ((index, criterion) in join.on.withIndex()) {
-                        visitCriterion(index, criterion)
+                        criterion(index, criterion)
                         buf.append(" and ")
                     }
                     buf.cutBack(5)
@@ -58,7 +58,7 @@ internal class SelectStatementBuilderSupport(
         if (context.where.isNotEmpty()) {
             buf.append(" where ")
             for ((index, criterion) in context.where.withIndex()) {
-                visitCriterion(index, criterion)
+                criterion(index, criterion)
                 buf.append(" and ")
             }
             buf.cutBack(5)
@@ -82,14 +82,14 @@ internal class SelectStatementBuilderSupport(
     }
 
     private fun table(expression: EntityExpression<*>) {
-        support.visitEntityExpression(expression)
+        support.visitEntityExpression(expression, TableNameType.NAME_AND_ALIAS)
     }
 
     fun column(expression: PropertyExpression<*>) {
         support.visitPropertyExpression(expression)
     }
 
-    fun visitCriterion(index: Int, c: Criterion) {
+    fun criterion(index: Int, c: Criterion) {
         support.visitCriterion(index, c)
     }
 }

@@ -4,29 +4,30 @@ import org.komapper.core.DatabaseConfig
 import org.komapper.core.data.Statement
 import org.komapper.core.dsl.context.DuplicateKeyType
 import org.komapper.core.dsl.context.EntityInsertContext
+import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.option.EntityInsertOption
 import org.komapper.core.dsl.option.QueryOptionConfigurator
 
-interface EntityInsertQuery<ENTITY : Any> : Query<ENTITY> {
-    fun option(configurator: QueryOptionConfigurator<EntityInsertOption>): EntityInsertQuery<ENTITY>
-    fun onDuplicateKeyUpdate(): EntityUpsertQuery<ENTITY>
+interface EntityInsertQuery<ENTITY : Any, META : EntityMetamodel<ENTITY, META>> : Query<ENTITY> {
+    fun option(configurator: QueryOptionConfigurator<EntityInsertOption>): EntityInsertQuery<ENTITY, META>
+    fun onDuplicateKeyUpdate(): EntityUpsertQuery<ENTITY, META>
     fun onDuplicateKeyIgnore(): Query<Pair<Int, Long?>>
 }
 
-internal data class EntityInsertQueryImpl<ENTITY : Any>(
-    private val context: EntityInsertContext<ENTITY>,
+internal data class EntityInsertQueryImpl<ENTITY : Any, META : EntityMetamodel<ENTITY, META>>(
+    private val context: EntityInsertContext<ENTITY, META>,
     private val entity: ENTITY,
     private val option: EntityInsertOption = EntityInsertOption()
 ) :
-    EntityInsertQuery<ENTITY> {
+    EntityInsertQuery<ENTITY, META> {
 
-    private val support: EntityInsertQuerySupport<ENTITY> = EntityInsertQuerySupport(context, option)
+    private val support: EntityInsertQuerySupport<ENTITY, META> = EntityInsertQuerySupport(context, option)
 
-    override fun option(configurator: QueryOptionConfigurator<EntityInsertOption>): EntityInsertQueryImpl<ENTITY> {
+    override fun option(configurator: QueryOptionConfigurator<EntityInsertOption>): EntityInsertQueryImpl<ENTITY, META> {
         return copy(option = configurator.apply(option))
     }
 
-    override fun onDuplicateKeyUpdate(): EntityUpsertQuery<ENTITY> {
+    override fun onDuplicateKeyUpdate(): EntityUpsertQuery<ENTITY, META> {
         val newContext = context.asEntityUpsertContext(DuplicateKeyType.UPDATE)
         return EntityUpsertQueryImpl(newContext, entity, support)
     }

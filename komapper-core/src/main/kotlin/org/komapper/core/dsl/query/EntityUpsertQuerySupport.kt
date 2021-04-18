@@ -4,23 +4,18 @@ import org.komapper.core.DatabaseConfig
 import org.komapper.core.JdbcExecutor
 import org.komapper.core.data.Statement
 import org.komapper.core.dsl.context.EntityUpsertContext
-import org.komapper.core.dsl.element.UpdateSet
-import org.komapper.core.dsl.metamodel.PropertyMetamodel
-import org.komapper.core.dsl.scope.SetDeclaration
+import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.scope.SetScope
 
-internal class EntityUpsertQuerySupport<ENTITY : Any>(
-    private val context: EntityUpsertContext<ENTITY>,
-    private val insertSupport: EntityInsertQuerySupport<ENTITY>
+internal class EntityUpsertQuerySupport<ENTITY : Any, META : EntityMetamodel<ENTITY, META>>(
+    private val context: EntityUpsertContext<ENTITY, META>,
+    private val insertSupport: EntityInsertQuerySupport<ENTITY, META>
 ) {
 
-    fun set(propertyMetamodels: List<PropertyMetamodel<ENTITY, *>>): EntityUpsertContext<ENTITY> {
-        return context.copy(updateSet = UpdateSet.Properties(propertyMetamodels))
-    }
-
-    fun set(declaration: SetDeclaration<ENTITY>): EntityUpsertContext<ENTITY> {
-        val scope = SetScope<ENTITY>().apply(declaration)
-        return context.copy(updateSet = UpdateSet.Pairs(scope.toList()))
+    fun set(declaration: SetScope<ENTITY>.(META) -> Unit): EntityUpsertContext<ENTITY, META> {
+        val scope = SetScope<ENTITY>()
+        declaration(scope, context.excluded)
+        return context.copy(assignmentOperands = scope.toList())
     }
 
     fun preUpsert(config: DatabaseConfig, entity: ENTITY): ENTITY {

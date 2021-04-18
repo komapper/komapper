@@ -30,8 +30,8 @@ object EntityQuery : Dsl {
         fun idValueRequired(index: Int) = "The entity(index=$index) must have one or more id value."
     }
 
-    fun <ENTITY : Any> first(
-        entityMetamodel: EntityMetamodel<ENTITY>,
+    fun <ENTITY : Any, META : EntityMetamodel<ENTITY, META>> first(
+        entityMetamodel: META,
         declaration: WhereDeclaration
     ): Query<ENTITY> {
         require(hasIdProperty(entityMetamodel)) { Messages.idPropertyRequired }
@@ -41,8 +41,8 @@ object EntityQuery : Dsl {
             .first()
     }
 
-    fun <ENTITY : Any> firstOrNull(
-        entityMetamodel: EntityMetamodel<ENTITY>,
+    fun <ENTITY : Any, META : EntityMetamodel<ENTITY, META>> firstOrNull(
+        entityMetamodel: META,
         declaration: WhereDeclaration
     ): Query<ENTITY?> {
         require(hasIdProperty(entityMetamodel)) { Messages.idPropertyRequired }
@@ -52,36 +52,47 @@ object EntityQuery : Dsl {
             .firstOrNull()
     }
 
-    fun <ENTITY : Any> from(entityMetamodel: EntityMetamodel<ENTITY>): EntitySelectQuery<ENTITY> {
+    fun <ENTITY : Any, META : EntityMetamodel<ENTITY, META>> from(
+        entityMetamodel: META
+    ): EntitySelectQuery<ENTITY> {
         require(hasIdProperty(entityMetamodel)) { Messages.idPropertyRequired }
         return EntitySelectQueryImpl(EntitySelectContext(entityMetamodel))
     }
 
-    fun <ENTITY : Any> insert(entityMetamodel: EntityMetamodel<ENTITY>, entity: ENTITY): EntityInsertQuery<ENTITY> {
+    fun <ENTITY : Any, META : EntityMetamodel<ENTITY, META>> insert(
+        entityMetamodel: META,
+        entity: ENTITY
+    ): EntityInsertQuery<ENTITY, META> {
         require(hasIdProperty(entityMetamodel)) { Messages.idPropertyRequired }
         return EntityInsertQueryImpl(EntityInsertContext(entityMetamodel), entity)
     }
 
-    fun <ENTITY : Any> update(entityMetamodel: EntityMetamodel<ENTITY>, entity: ENTITY): EntityUpdateQuery<ENTITY> {
+    fun <ENTITY : Any, META : EntityMetamodel<ENTITY, META>> update(
+        entityMetamodel: META,
+        entity: ENTITY
+    ): EntityUpdateQuery<ENTITY> {
         require(hasIdValue(entityMetamodel, entity)) { Messages.idValueRequired }
         return EntityUpdateQueryImpl(EntityUpdateContext(entityMetamodel), entity)
     }
 
-    fun <ENTITY : Any> delete(entityMetamodel: EntityMetamodel<ENTITY>, entity: ENTITY): EntityDeleteQuery<ENTITY> {
+    fun <ENTITY : Any, META : EntityMetamodel<ENTITY, META>> delete(
+        entityMetamodel: META,
+        entity: ENTITY
+    ): EntityDeleteQuery<ENTITY> {
         require(hasIdValue(entityMetamodel, entity)) { Messages.idValueRequired }
         return EntityDeleteQueryImpl(EntityDeleteContext(entityMetamodel), entity)
     }
 
-    fun <ENTITY : Any> insertBatch(
-        entityMetamodel: EntityMetamodel<ENTITY>,
+    fun <ENTITY : Any, META : EntityMetamodel<ENTITY, META>> insertBatch(
+        entityMetamodel: META,
         entities: List<ENTITY>
-    ): EntityBatchInsertQuery<ENTITY> {
+    ): EntityBatchInsertQuery<ENTITY, META> {
         require(hasIdProperty(entityMetamodel)) { Messages.idPropertyRequired }
         return EntityBatchInsertQueryImpl(EntityInsertContext(entityMetamodel), entities)
     }
 
-    fun <ENTITY : Any> updateBatch(
-        entityMetamodel: EntityMetamodel<ENTITY>,
+    fun <ENTITY : Any, META : EntityMetamodel<ENTITY, META>> updateBatch(
+        entityMetamodel: META,
         entities: List<ENTITY>
     ): EntityBatchUpdateQuery<ENTITY> {
         require(hasIdProperty(entityMetamodel)) { Messages.idPropertyRequired }
@@ -91,8 +102,8 @@ object EntityQuery : Dsl {
         return EntityBatchUpdateQueryImpl(EntityUpdateContext(entityMetamodel), entities)
     }
 
-    fun <ENTITY : Any> deleteBatch(
-        entityMetamodel: EntityMetamodel<ENTITY>,
+    fun <ENTITY : Any, META : EntityMetamodel<ENTITY, META>> deleteBatch(
+        entityMetamodel: META,
         entities: List<ENTITY>
     ): EntityBatchDeleteQuery<ENTITY> {
         require(hasIdProperty(entityMetamodel)) { Messages.idPropertyRequired }
@@ -102,11 +113,16 @@ object EntityQuery : Dsl {
         return EntityBatchDeleteQueryImpl(EntityDeleteContext(entityMetamodel), entities)
     }
 
-    private fun <ENTITY : Any> hasIdProperty(entityMetamodel: EntityMetamodel<ENTITY>): Boolean {
+    private fun <ENTITY : Any, META : EntityMetamodel<ENTITY, META>> hasIdProperty(
+        entityMetamodel: EntityMetamodel<ENTITY, META>
+    ): Boolean {
         return entityMetamodel.idProperties().isNotEmpty()
     }
 
-    private fun <ENTITY : Any> hasIdValue(entityMetamodel: EntityMetamodel<ENTITY>, entity: ENTITY): Boolean {
+    private fun <ENTITY : Any, META : EntityMetamodel<ENTITY, META>> hasIdValue(
+        entityMetamodel: META,
+        entity: ENTITY
+    ): Boolean {
         return entityMetamodel.idProperties().map { it.getter(entity) }.all { it != null }
     }
 }

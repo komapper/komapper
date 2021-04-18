@@ -3,6 +3,7 @@ package org.komapper.core.dsl.query
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.data.Statement
 import org.komapper.core.dsl.context.EntityUpdateContext
+import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.option.EntityUpdateOption
 import org.komapper.core.dsl.option.QueryOptionConfigurator
 
@@ -10,16 +11,16 @@ interface EntityUpdateQuery<ENTITY : Any> : Query<ENTITY> {
     fun option(configurator: QueryOptionConfigurator<EntityUpdateOption>): EntityUpdateQuery<ENTITY>
 }
 
-internal data class EntityUpdateQueryImpl<ENTITY : Any>(
-    private val context: EntityUpdateContext<ENTITY>,
+internal data class EntityUpdateQueryImpl<ENTITY : Any, META : EntityMetamodel<ENTITY, META>>(
+    private val context: EntityUpdateContext<ENTITY, META>,
     private val entity: ENTITY,
     private val option: EntityUpdateOption = EntityUpdateOption()
 ) :
     EntityUpdateQuery<ENTITY> {
 
-    private val support: EntityUpdateQuerySupport<ENTITY> = EntityUpdateQuerySupport(context, option)
+    private val support: EntityUpdateQuerySupport<ENTITY, META> = EntityUpdateQuerySupport(context, option)
 
-    override fun option(configurator: QueryOptionConfigurator<EntityUpdateOption>): EntityUpdateQueryImpl<ENTITY> {
+    override fun option(configurator: QueryOptionConfigurator<EntityUpdateOption>): EntityUpdateQueryImpl<ENTITY, META> {
         return copy(option = configurator.apply(option))
     }
 

@@ -5,6 +5,7 @@ import org.komapper.core.JdbcExecutor
 import org.komapper.core.data.Statement
 import org.komapper.core.dsl.builder.SqlDeleteStatementBuilder
 import org.komapper.core.dsl.context.SqlDeleteContext
+import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.option.QueryOptionConfigurator
 import org.komapper.core.dsl.option.SqlDeleteOption
 import org.komapper.core.dsl.scope.WhereDeclaration
@@ -15,18 +16,18 @@ interface SqlDeleteQuery : Query<Int> {
     fun option(configurator: QueryOptionConfigurator<SqlDeleteOption>): SqlDeleteQuery
 }
 
-internal data class SqlDeleteQueryImpl<ENTITY : Any>(
-    private val context: SqlDeleteContext<ENTITY>,
+internal data class SqlDeleteQueryImpl<ENTITY : Any, META : EntityMetamodel<ENTITY, META>>(
+    private val context: SqlDeleteContext<ENTITY, META>,
     private val option: SqlDeleteOption = SqlDeleteOption()
 ) : SqlDeleteQuery {
 
-    override fun where(declaration: WhereDeclaration): SqlDeleteQueryImpl<ENTITY> {
+    override fun where(declaration: WhereDeclaration): SqlDeleteQueryImpl<ENTITY, META> {
         val scope = WhereScope().apply(declaration)
         val newContext = context.copy(where = context.where + scope)
         return copy(context = newContext)
     }
 
-    override fun option(configurator: QueryOptionConfigurator<SqlDeleteOption>): SqlDeleteQueryImpl<ENTITY> {
+    override fun option(configurator: QueryOptionConfigurator<SqlDeleteOption>): SqlDeleteQueryImpl<ENTITY, META> {
         return copy(option = configurator.apply(option))
     }
 
@@ -44,7 +45,7 @@ internal data class SqlDeleteQueryImpl<ENTITY : Any>(
         return buildStatement(config, context).sql
     }
 
-    private fun buildStatement(config: DatabaseConfig, c: SqlDeleteContext<ENTITY>): Statement {
+    private fun buildStatement(config: DatabaseConfig, c: SqlDeleteContext<ENTITY, META>): Statement {
         val builder = SqlDeleteStatementBuilder(config.dialect, c)
         return builder.build()
     }

@@ -10,16 +10,18 @@ import org.komapper.core.dsl.element.Values
 import org.komapper.core.dsl.expression.EntityExpression
 import org.komapper.core.dsl.expression.PropertyExpression
 import org.komapper.core.dsl.metamodel.Assignment
+import org.komapper.core.dsl.metamodel.EntityMetamodel
 
-internal class SqlInsertStatementBuilder<ENTITY : Any>(
+internal class SqlInsertStatementBuilder<ENTITY : Any, META : EntityMetamodel<ENTITY, META>>(
     val dialect: Dialect,
-    val context: SqlInsertContext<ENTITY>
+    val context: SqlInsertContext<ENTITY, META>
 ) {
+    private val aliasManager = AliasManagerImpl(context)
     private val buf = StatementBuffer(dialect::formatValue)
-    private val support = BuilderSupport(dialect, EmptyAliasManager, buf)
+    private val support = BuilderSupport(dialect, aliasManager, buf)
 
     fun build(): Statement {
-        val entityMetamodel = context.entityMetamodel
+        val entityMetamodel = context.target
         buf.append("insert into ")
         buf.append(table(entityMetamodel))
         when (val values = context.values) {
@@ -51,7 +53,7 @@ internal class SqlInsertStatementBuilder<ENTITY : Any>(
             }
             is Values.Subquery -> {
                 buf.append(" (")
-                for (p in context.entityMetamodel.properties()) {
+                for (p in context.target.properties()) {
                     buf.append(column(p))
                     buf.append(", ")
                 }

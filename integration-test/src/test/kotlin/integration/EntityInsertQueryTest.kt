@@ -11,6 +11,7 @@ import org.komapper.core.Database
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.UniqueConstraintException
 import org.komapper.core.dsl.EntityQuery
+import org.komapper.core.dsl.concat
 import org.komapper.core.dsl.runQuery
 import org.komapper.jdbc.mysql.MySqlDialect
 import java.time.Clock
@@ -138,6 +139,9 @@ class EntityInsertQueryTest(private val db: Database) {
     @Test
     fun onDuplicateKeyUpdate_update() {
         val d = Department.alias
+        val found2 = db.runQuery { EntityQuery.first(d) { d.departmentId eq 1 } }
+        println(found2)
+
         val department = Department(1, 50, "PLANNING", "TOKYO", 10)
         val query = EntityQuery.insert(d, department).onDuplicateKeyUpdate()
         val (count, key) = db.runQuery { query }
@@ -155,31 +159,12 @@ class EntityInsertQueryTest(private val db: Database) {
     }
 
     @Test
-    fun onDuplicateKeyUpdate_updateByProperties() {
+    fun onDuplicateKeyUpdate_update_set() {
         val d = Department.alias
         val department = Department(1, 50, "PLANNING", "TOKYO", 10)
-        val query = EntityQuery.insert(d, department).onDuplicateKeyUpdate().set(d.departmentName, d.location)
-        val (count, key) = db.runQuery { query }
-        if (db.config.dialect is MySqlDialect) {
-            assertEquals(2, count)
-        } else {
-            assertEquals(1, count)
-        }
-        assertNull(key)
-        val found = db.runQuery { EntityQuery.first(d) { d.departmentId eq 1 } }
-        assertEquals(10, found.departmentNo)
-        assertEquals("PLANNING", found.departmentName)
-        assertEquals("TOKYO", found.location)
-        assertEquals(1, found.version)
-    }
-
-    @Test
-    fun onDuplicateKeyUpdate_updateByDeclaration() {
-        val d = Department.alias
-        val department = Department(1, 50, "PLANNING", "TOKYO", 10)
-        val query = EntityQuery.insert(d, department).onDuplicateKeyUpdate().set {
+        val query = EntityQuery.insert(d, department).onDuplicateKeyUpdate().set { excluded ->
             d.departmentName set "PLANNING2"
-            d.location set "TOKYO2"
+            d.location set concat(d.location, concat("_", excluded.location))
         }
         val (count, key) = db.runQuery { query }
         if (db.config.dialect is MySqlDialect) {
@@ -191,7 +176,7 @@ class EntityInsertQueryTest(private val db: Database) {
         val found = db.runQuery { EntityQuery.first(d) { d.departmentId eq 1 } }
         assertEquals(10, found.departmentNo)
         assertEquals("PLANNING2", found.departmentName)
-        assertEquals("TOKYO2", found.location)
+        assertEquals("NEW YORK_TOKYO", found.location)
         assertEquals(1, found.version)
     }
 

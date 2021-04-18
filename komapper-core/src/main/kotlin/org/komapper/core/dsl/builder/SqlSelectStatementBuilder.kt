@@ -10,7 +10,7 @@ import org.komapper.core.dsl.expression.PropertyExpression
 
 internal class SqlSelectStatementBuilder(
     val dialect: Dialect,
-    val context: SqlSelectContext<*>,
+    val context: SqlSelectContext<*, *>,
     aliasManager: AliasManager = AliasManagerImpl(context)
 ) {
     private val buf = StatementBuffer(dialect::formatValue)
@@ -67,7 +67,7 @@ internal class SqlSelectStatementBuilder(
         if (context.having.isNotEmpty()) {
             buf.append(" having ")
             for ((index, criterion) in context.having.withIndex()) {
-                visitCriterion(index, criterion)
+                criterion(index, criterion)
                 buf.append(" and ")
             }
             buf.cutBack(5)
@@ -90,7 +90,7 @@ internal class SqlSelectStatementBuilder(
         support.column(expression)
     }
 
-    private fun visitCriterion(index: Int, c: Criterion) {
-        support.visitCriterion(index, c)
+    private fun criterion(index: Int, c: Criterion) {
+        support.criterion(index, c)
     }
 }

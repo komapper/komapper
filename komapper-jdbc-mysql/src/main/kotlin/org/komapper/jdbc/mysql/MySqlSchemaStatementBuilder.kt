@@ -11,7 +11,7 @@ open class MySqlSchemaStatementBuilder(private val dialect: MySqlDialect) : Sche
 
     private val sql = StringWriter()
 
-    override fun create(entityMetamodels: List<EntityMetamodel<*>>): Statement {
+    override fun create(entityMetamodels: List<EntityMetamodel<*, *>>): Statement {
         createSchema(entityMetamodels)
         for (e in entityMetamodels) {
             createTable(e)
@@ -19,7 +19,7 @@ open class MySqlSchemaStatementBuilder(private val dialect: MySqlDialect) : Sche
         return Statement(sql.toString())
     }
 
-    override fun drop(entityMetamodels: List<EntityMetamodel<*>>): Statement {
+    override fun drop(entityMetamodels: List<EntityMetamodel<*, *>>): Statement {
         for (e in entityMetamodels) {
             dropTable(e)
         }
@@ -30,7 +30,7 @@ open class MySqlSchemaStatementBuilder(private val dialect: MySqlDialect) : Sche
         throw UnsupportedOperationException()
     }
 
-    private fun createSchema(entityMetamodels: List<EntityMetamodel<*>>) {
+    private fun createSchema(entityMetamodels: List<EntityMetamodel<*, *>>) {
         val w = PrintWriter(sql)
         val schemaNames = extractSchemaNames(entityMetamodels)
         for (name in schemaNames) {
@@ -38,7 +38,7 @@ open class MySqlSchemaStatementBuilder(private val dialect: MySqlDialect) : Sche
         }
     }
 
-    private fun createTable(e: EntityMetamodel<*>) {
+    private fun createTable(e: EntityMetamodel<*, *>) {
         val w = PrintWriter(sql)
         w.println("create table if not exists ${e.getCanonicalTableName(dialect::enquote)} (")
         val columns = e.properties().joinToString(",\n    ", prefix = "    ") { p ->
@@ -53,12 +53,12 @@ open class MySqlSchemaStatementBuilder(private val dialect: MySqlDialect) : Sche
         w.println(");")
     }
 
-    private fun dropTable(e: EntityMetamodel<*>) {
+    private fun dropTable(e: EntityMetamodel<*, *>) {
         val w = PrintWriter(sql)
         w.println("drop table if exists ${e.getCanonicalTableName(dialect::enquote)};")
     }
 
-    private fun extractSchemaNames(entityMetamodels: List<EntityMetamodel<*>>): List<String> {
+    private fun extractSchemaNames(entityMetamodels: List<EntityMetamodel<*, *>>): List<String> {
         val tableSchemaNames = entityMetamodels.map { it.schemaName() }
         val sequenceSchemaNames =
             entityMetamodels.mapNotNull { it.idAssignment() }.filterIsInstance<Assignment.Sequence<*, *>>()

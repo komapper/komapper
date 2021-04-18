@@ -16,8 +16,8 @@ internal data class SqlSetOperationContext<T>(
 
     private fun visitSubqueryContext(subqueryContext: SubqueryContext<*>): Set<EntityExpression<*>> {
         return when (subqueryContext) {
-            is SubqueryContext.EntitySelect -> setOf(subqueryContext.context.entityMetamodel)
-            is SubqueryContext.SqlSelect -> setOf(subqueryContext.context.entityMetamodel)
+            is SubqueryContext.EntitySelect -> setOf(subqueryContext.context.target)
+            is SubqueryContext.SqlSelect -> setOf(subqueryContext.context.target)
             is SubqueryContext.SqlSetOperation -> {
                 visitSubqueryContext(subqueryContext.context.left) + visitSubqueryContext(subqueryContext.context.right)
             }

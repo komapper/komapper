@@ -5,7 +5,7 @@ import org.komapper.core.dsl.metamodel.EntityMetamodel
 
 internal sealed class Projection {
     data class Properties(val values: List<PropertyExpression<*>>) : Projection()
-    data class Entities(val values: List<EntityMetamodel<*>>) : Projection()
+    data class Entities(val values: List<EntityMetamodel<*, *>>) : Projection()
 
     fun propertyExpressions(): List<PropertyExpression<*>> {
         return when (this) {

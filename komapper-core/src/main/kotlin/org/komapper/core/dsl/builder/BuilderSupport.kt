@@ -23,13 +23,22 @@ class BuilderSupport(
     private val escapeSequence: String? = null
 ) {
 
-    fun visitEntityExpression(expression: EntityExpression<*>) {
+    fun visitEntityExpression(expression: EntityExpression<*>, nameType: TableNameType) {
         val name = expression.getCanonicalTableName(dialect::enquote)
-        val alias = aliasManager.getAlias(expression) ?: error("Alias is not found. table=$name ,sql=$buf")
-        if (alias.isBlank()) {
-            buf.append(name)
-        } else {
-            buf.append("$name $alias")
+        when (nameType) {
+            TableNameType.NAME_ONLY -> buf.append(name)
+            TableNameType.ALIAS_ONLY -> {
+                val alias = aliasManager.getAlias(expression) ?: error("Alias is not found. table=$name ,sql=$buf")
+                buf.append(alias)
+            }
+            TableNameType.NAME_AND_ALIAS -> {
+                val alias = aliasManager.getAlias(expression) ?: error("Alias is not found. table=$name ,sql=$buf")
+                if (alias.isBlank()) {
+                    buf.append(name)
+                } else {
+                    buf.append("$name as $alias")
+                }
+            }
         }
     }
 

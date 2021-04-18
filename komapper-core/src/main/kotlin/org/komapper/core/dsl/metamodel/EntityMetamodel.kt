@@ -4,7 +4,7 @@ import org.komapper.core.dsl.expression.EntityExpression
 import java.time.Clock
 import kotlin.reflect.KClass
 
-interface EntityMetamodel<ENTITY : Any> : EntityExpression<ENTITY> {
+interface EntityMetamodel<ENTITY : Any, META : EntityMetamodel<ENTITY, META>> : EntityExpression<ENTITY> {
     fun idAssignment(): Assignment<ENTITY>?
     fun idProperties(): List<PropertyMetamodel<ENTITY, *>>
     fun versionProperty(): PropertyMetamodel<ENTITY, *>?
@@ -15,10 +15,12 @@ interface EntityMetamodel<ENTITY : Any> : EntityExpression<ENTITY> {
     fun incrementVersion(__e: ENTITY): ENTITY
     fun updateCreatedAt(__e: ENTITY, __c: Clock): ENTITY
     fun updateUpdatedAt(__e: ENTITY, __c: Clock): ENTITY
+    fun newMetamodel(table: String, catalog: String, schema: String, alwaysQuote: Boolean): META
 }
 
 @Suppress("unused")
-abstract class EmptyEntityMetamodel<ENTITY : Any> : EntityMetamodel<ENTITY> {
+abstract class EmptyEntityMetamodel<ENTITY : Any, META : EmptyEntityMetamodel<ENTITY, META>> :
+    EntityMetamodel<ENTITY, META> {
     override fun klass(): KClass<ENTITY> = fail()
     override fun tableName(): String = fail()
     override fun catalogName(): String = fail()
@@ -34,6 +36,7 @@ abstract class EmptyEntityMetamodel<ENTITY : Any> : EntityMetamodel<ENTITY> {
     override fun incrementVersion(__e: ENTITY): ENTITY = fail()
     override fun updateCreatedAt(__e: ENTITY, __c: Clock): ENTITY = fail()
     override fun updateUpdatedAt(__e: ENTITY, __c: Clock): ENTITY = fail()
+    override fun newMetamodel(table: String, catalog: String, schema: String, alwaysQuote: Boolean): META = fail()
 
     private fun fail(): Nothing {
         error("Fix a compile error.")

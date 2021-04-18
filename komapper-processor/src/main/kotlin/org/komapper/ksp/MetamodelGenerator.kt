@@ -37,7 +37,7 @@ internal class EntityMetamodelGenerator(
         w.println()
         w.println("// generated at ${ZonedDateTime.now()}")
         w.println("@Suppress(\"ClassName\", \"PrivatePropertyName\")")
-        w.println("class $simpleName private constructor($constructorParamList) : $EntityMetamodel<$entityTypeName> {")
+        w.println("class $simpleName private constructor($constructorParamList) : $EntityMetamodel<$entityTypeName, $simpleName> {")
         w.println("    private val __tableName = table")
         w.println("    private val __catalogName = catalog")
         w.println("    private val __schemaName = schema")
@@ -63,6 +63,9 @@ internal class EntityMetamodelGenerator(
         incrementVersion()
         updateCreatedAt()
         updateUpdatedAt()
+
+        newMetamodel()
+
         companionObject()
 
         w.println("}")
@@ -196,6 +199,11 @@ internal class EntityMetamodelGenerator(
         w.println("    override fun updateUpdatedAt(__e: $entityTypeName, __c: $Clock): $entityTypeName = $body")
     }
 
+    private fun newMetamodel() {
+        val paramList = "table: String, catalog: String, schema: String, alwaysQuote: Boolean"
+        w.println("    override fun newMetamodel($paramList) = $simpleName(table, catalog, schema, alwaysQuote)")
+    }
+
     private fun companionObject() {
         w.println("    companion object {")
         w.println("        val alias = $simpleName()")
@@ -231,7 +239,7 @@ internal class EmptyEntityMetamodelGenerator(
         w.println()
         w.println("// generated at ${ZonedDateTime.now()}")
         w.println("@Suppress(\"ClassName\")")
-        w.println("class $fileName : $EmptyEntityMetamodel<$simpleQualifiedName>() {")
+        w.println("class $fileName : $EmptyEntityMetamodel<$simpleQualifiedName, $fileName>() {")
         val parameters = classDeclaration.primaryConstructor?.parameters
         if (parameters != null) {
             for (p in parameters) {

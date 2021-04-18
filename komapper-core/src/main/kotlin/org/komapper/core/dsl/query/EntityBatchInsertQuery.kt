@@ -4,34 +4,35 @@ import org.komapper.core.DatabaseConfig
 import org.komapper.core.data.Statement
 import org.komapper.core.dsl.context.DuplicateKeyType
 import org.komapper.core.dsl.context.EntityInsertContext
+import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.option.EntityBatchInsertOption
 import org.komapper.core.dsl.option.QueryOptionConfigurator
 
-interface EntityBatchInsertQuery<ENTITY : Any> : Query<List<ENTITY>> {
-    fun option(configurator: QueryOptionConfigurator<EntityBatchInsertOption>): EntityBatchInsertQuery<ENTITY>
-    fun onDuplicateKeyUpdate(): EntityBatchUpsertQuery<ENTITY>
-    fun onDuplicateKeyIgnore(): Query<Pair<IntArray, LongArray>>
+interface EntityBatchInsertQuery<ENTITY : Any, META : EntityMetamodel<ENTITY, META>> : Query<List<ENTITY>> {
+    fun option(configurator: QueryOptionConfigurator<EntityBatchInsertOption>): EntityBatchInsertQuery<ENTITY, META>
+    fun onDuplicateKeyUpdate(): EntityBatchUpsertQuery<ENTITY, META>
+    fun onDuplicateKeyIgnore(): Query<LongArray>
 }
 
-internal data class EntityBatchInsertQueryImpl<ENTITY : Any>(
-    private val context: EntityInsertContext<ENTITY>,
+internal data class EntityBatchInsertQueryImpl<ENTITY : Any, META : EntityMetamodel<ENTITY, META>>(
+    private val context: EntityInsertContext<ENTITY, META>,
     private val entities: List<ENTITY>,
     private val option: EntityBatchInsertOption = EntityBatchInsertOption()
 ) :
-    EntityBatchInsertQuery<ENTITY> {
+    EntityBatchInsertQuery<ENTITY, META> {
 
-    private val support: EntityInsertQuerySupport<ENTITY> = EntityInsertQuerySupport(context, option)
+    private val support: EntityInsertQuerySupport<ENTITY, META> = EntityInsertQuerySupport(context, option)
 
-    override fun option(configurator: QueryOptionConfigurator<EntityBatchInsertOption>): EntityBatchInsertQueryImpl<ENTITY> {
+    override fun option(configurator: QueryOptionConfigurator<EntityBatchInsertOption>): EntityBatchInsertQueryImpl<ENTITY, META> {
         return copy(option = configurator.apply(option))
     }
 
-    override fun onDuplicateKeyUpdate(): EntityBatchUpsertQuery<ENTITY> {
+    override fun onDuplicateKeyUpdate(): EntityBatchUpsertQuery<ENTITY, META> {
         val newContext = context.asEntityUpsertContext(DuplicateKeyType.UPDATE)
         return EntityBatchUpsertQueryImpl(newContext, entities, support)
     }
 
-    override fun onDuplicateKeyIgnore(): Query<Pair<IntArray, LongArray>> {
+    override fun onDuplicateKeyIgnore(): Query<LongArray> {
         val newContext = context.asEntityUpsertContext(DuplicateKeyType.IGNORE)
         return EntityBatchUpsertQueryImpl(newContext, entities, support)
     }
@@ -56,6 +57,7 @@ internal data class EntityBatchInsertQueryImpl<ENTITY : Any>(
         } else {
             val statements = entities.map { buildStatement(config, it) }
             val (_, keys) = support.insert(config) { it.executeBatch(statements) }
+            // TODO
             keys
         }
     }

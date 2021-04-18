@@ -5,10 +5,11 @@ import org.komapper.core.JdbcExecutor
 import org.komapper.core.data.Statement
 import org.komapper.core.dsl.builder.EntityDeleteStatementBuilder
 import org.komapper.core.dsl.context.EntityDeleteContext
+import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.option.VersionOption
 
-internal class EntityDeleteQuerySupport<ENTITY : Any>(
-    val context: EntityDeleteContext<ENTITY>,
+internal class EntityDeleteQuerySupport<ENTITY : Any, META : EntityMetamodel<ENTITY, META>>(
+    val context: EntityDeleteContext<ENTITY, META>,
     val option: VersionOption
 ) {
 
@@ -18,7 +19,7 @@ internal class EntityDeleteQuerySupport<ENTITY : Any>(
     }
 
     fun postDelete(count: Int, index: Int? = null) {
-        if (context.entityMetamodel.versionProperty() != null) {
+        if (context.target.versionProperty() != null) {
             checkOptimisticLock(option, count, index)
         }
     }

@@ -15,26 +15,26 @@ import org.komapper.core.dsl.scope.OnScope
 import org.komapper.core.dsl.scope.WhereDeclaration
 import org.komapper.core.dsl.scope.WhereScope
 
-internal data class SelectQuerySupport<ENTITY : Any, CONTEXT : SelectContext<ENTITY, CONTEXT>>(
+internal data class SelectQuerySupport<ENTITY : Any, META : EntityMetamodel<ENTITY, META>, CONTEXT : SelectContext<ENTITY, META, CONTEXT>>(
     private val context: CONTEXT
 ) {
 
-    fun <OTHER_ENTITY : Any> innerJoin(
-        entityMetamodel: EntityMetamodel<OTHER_ENTITY>,
+    fun <OTHER_ENTITY : Any, OTHER_META : EntityMetamodel<OTHER_ENTITY, OTHER_META>> innerJoin(
+        entityMetamodel: OTHER_META,
         declaration: OnDeclaration<OTHER_ENTITY>
     ): CONTEXT {
         return join(entityMetamodel, declaration, JoinKind.INNER)
     }
 
-    fun <OTHER_ENTITY : Any> leftJoin(
-        entityMetamodel: EntityMetamodel<OTHER_ENTITY>,
+    fun <OTHER_ENTITY : Any, OTHER_META : EntityMetamodel<OTHER_ENTITY, OTHER_META>> leftJoin(
+        entityMetamodel: OTHER_META,
         declaration: OnDeclaration<OTHER_ENTITY>
     ): CONTEXT {
         return join(entityMetamodel, declaration, JoinKind.LEFT_OUTER)
     }
 
-    private fun <OTHER_ENTITY : Any> join(
-        entityMetamodel: EntityMetamodel<OTHER_ENTITY>,
+    private fun <OTHER_ENTITY : Any, OTHER_META : EntityMetamodel<OTHER_ENTITY, OTHER_META>> join(
+        entityMetamodel: OTHER_META,
         declaration: OnDeclaration<OTHER_ENTITY>,
         kind: JoinKind
     ): CONTEXT {
@@ -98,7 +98,7 @@ internal data class SelectQuerySupport<ENTITY : Any, CONTEXT : SelectContext<ENT
         val setOperatorContext = SqlSetOperationContext(kind, left.subqueryContext, right.subqueryContext)
         return SetOperationQueryImpl(setOperatorContext) { dialect, rs ->
             val m = EntityMapper(dialect, rs)
-            val entity = m.execute(context.entityMetamodel)
+            val entity = m.execute(context.target)
             checkNotNull(entity)
         }
     }

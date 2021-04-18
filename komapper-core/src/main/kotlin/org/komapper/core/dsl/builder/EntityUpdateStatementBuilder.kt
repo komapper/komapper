@@ -7,11 +7,12 @@ import org.komapper.core.data.Value
 import org.komapper.core.dsl.context.EntityUpdateContext
 import org.komapper.core.dsl.expression.EntityExpression
 import org.komapper.core.dsl.expression.PropertyExpression
+import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.option.VersionOption
 
-internal class EntityUpdateStatementBuilder<ENTITY : Any>(
+internal class EntityUpdateStatementBuilder<ENTITY : Any, META : EntityMetamodel<ENTITY, META>>(
     val dialect: Dialect,
-    val context: EntityUpdateContext<ENTITY>,
+    val context: EntityUpdateContext<ENTITY, META>,
     val entity: ENTITY,
     val option: VersionOption
 ) {
@@ -20,15 +21,15 @@ internal class EntityUpdateStatementBuilder<ENTITY : Any>(
     private val support = BuilderSupport(dialect, aliasManager, buf)
 
     fun build(): Statement {
-        val idProperties = context.entityMetamodel.idProperties()
-        val versionProperty = context.entityMetamodel.versionProperty()
-        val createdAtProperty = context.entityMetamodel.createdAtProperty()
-        val properties = context.entityMetamodel.properties()
+        val idProperties = context.target.idProperties()
+        val versionProperty = context.target.versionProperty()
+        val createdAtProperty = context.target.createdAtProperty()
+        val properties = context.target.properties()
         buf.append("update ")
-        table(context.entityMetamodel)
+        table(context.target)
         buf.append(" set ")
         for (p in (properties - idProperties).filter { it != createdAtProperty }) {
-            buf.append(columnName(p))
+            column(p)
             buf.append(" = ")
             val value = Value(p.getter(entity), p.klass)
             buf.bind(value)
@@ -65,14 +66,11 @@ internal class EntityUpdateStatementBuilder<ENTITY : Any>(
     }
 
     private fun table(expression: EntityExpression<*>) {
-        support.visitEntityExpression(expression)
+        support.visitEntityExpression(expression, TableNameType.NAME_ONLY)
     }
 
     private fun column(expression: PropertyExpression<*>) {
-        support.visitPropertyExpression(expression)
-    }
-
-    private fun columnName(expression: PropertyExpression<*>): String {
-        return expression.getCanonicalColumnName(dialect::enquote)
+        val name = expression.getCanonicalColumnName(dialect::enquote)
+        buf.append(name)
     }
 }

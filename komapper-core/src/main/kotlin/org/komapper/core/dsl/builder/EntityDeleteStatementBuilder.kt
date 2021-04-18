@@ -7,23 +7,25 @@ import org.komapper.core.data.Value
 import org.komapper.core.dsl.context.EntityDeleteContext
 import org.komapper.core.dsl.expression.EntityExpression
 import org.komapper.core.dsl.expression.PropertyExpression
+import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.option.VersionOption
 
-internal class EntityDeleteStatementBuilder<ENTITY : Any>(
+internal class EntityDeleteStatementBuilder<ENTITY : Any, META : EntityMetamodel<ENTITY, META>>(
     val dialect: Dialect,
-    val context: EntityDeleteContext<ENTITY>,
+    val context: EntityDeleteContext<ENTITY, META>,
     val entity: ENTITY,
     val option: VersionOption
 ) {
+
     private val aliasManager = AliasManagerImpl(context)
     private val buf = StatementBuffer(dialect::formatValue)
     private val support = BuilderSupport(dialect, aliasManager, buf)
 
     fun build(): Statement {
         buf.append("delete from ")
-        table(context.entityMetamodel)
-        val identityProperties = context.entityMetamodel.idProperties()
-        val versionProperty = context.entityMetamodel.versionProperty()
+        table(context.target)
+        val identityProperties = context.target.idProperties()
+        val versionProperty = context.target.versionProperty()
         val versionRequired = versionProperty != null && !option.ignoreVersion
         if (identityProperties.isNotEmpty() || versionRequired) {
             buf.append(" where ")
@@ -51,7 +53,7 @@ internal class EntityDeleteStatementBuilder<ENTITY : Any>(
     }
 
     private fun table(expression: EntityExpression<*>) {
-        support.visitEntityExpression(expression)
+        support.visitEntityExpression(expression, TableNameType.NAME_AND_ALIAS)
     }
 
     private fun column(expression: PropertyExpression<*>) {

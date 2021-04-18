@@ -3,9 +3,11 @@ package org.komapper.core.jdbc
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.komapper.core.AbstractDialect
+import org.komapper.core.dsl.builder.EntityMultiUpsertStatementBuilder
 import org.komapper.core.dsl.builder.EntityUpsertStatementBuilder
 import org.komapper.core.dsl.builder.SchemaStatementBuilder
 import org.komapper.core.dsl.context.EntityUpsertContext
+import org.komapper.core.dsl.metamodel.EntityMetamodel
 import java.sql.SQLException
 import kotlin.reflect.KClass
 
@@ -29,10 +31,17 @@ internal class AbstractDialectTest {
             throw UnsupportedOperationException()
         }
 
-        override fun <ENTITY : Any> getEntityUpsertStatementBuilder(
-            context: EntityUpsertContext<ENTITY>,
+        override fun <ENTITY : Any, META : EntityMetamodel<ENTITY, META>> getEntityUpsertStatementBuilder(
+            context: EntityUpsertContext<ENTITY, META>,
             entity: ENTITY
         ): EntityUpsertStatementBuilder<ENTITY> {
+            throw UnsupportedOperationException()
+        }
+
+        override fun <ENTITY : Any, META : EntityMetamodel<ENTITY, META>> getEntityMultiUpsertStatementBuilder(
+            context: EntityUpsertContext<ENTITY, META>,
+            entities: List<ENTITY>
+        ): EntityMultiUpsertStatementBuilder<ENTITY>? {
             throw UnsupportedOperationException()
         }
     }

@@ -3,6 +3,7 @@ package org.komapper.core.dsl.query
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.data.Statement
 import org.komapper.core.dsl.context.EntityUpdateContext
+import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.option.EntityBatchUpdateOption
 import org.komapper.core.dsl.option.QueryOptionConfigurator
 
@@ -10,16 +11,16 @@ interface EntityBatchUpdateQuery<ENTITY : Any> : Query<List<ENTITY>> {
     fun option(configurator: QueryOptionConfigurator<EntityBatchUpdateOption>): EntityBatchUpdateQuery<ENTITY>
 }
 
-internal data class EntityBatchUpdateQueryImpl<ENTITY : Any>(
-    private val context: EntityUpdateContext<ENTITY>,
+internal data class EntityBatchUpdateQueryImpl<ENTITY : Any, META : EntityMetamodel<ENTITY, META>>(
+    private val context: EntityUpdateContext<ENTITY, META>,
     private val entities: List<ENTITY>,
     private val option: EntityBatchUpdateOption = EntityBatchUpdateOption()
 ) :
     EntityBatchUpdateQuery<ENTITY> {
 
-    private val support: EntityUpdateQuerySupport<ENTITY> = EntityUpdateQuerySupport(context, option)
+    private val support: EntityUpdateQuerySupport<ENTITY, META> = EntityUpdateQuerySupport(context, option)
 
-    override fun option(configurator: QueryOptionConfigurator<EntityBatchUpdateOption>): EntityBatchUpdateQueryImpl<ENTITY> {
+    override fun option(configurator: QueryOptionConfigurator<EntityBatchUpdateOption>): EntityBatchUpdateQueryImpl<ENTITY, META> {
         return copy(option = configurator.apply(option))
     }
 

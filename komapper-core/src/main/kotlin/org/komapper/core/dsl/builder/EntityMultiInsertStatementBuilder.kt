@@ -8,20 +8,22 @@ import org.komapper.core.dsl.context.EntityInsertContext
 import org.komapper.core.dsl.expression.EntityExpression
 import org.komapper.core.dsl.expression.PropertyExpression
 import org.komapper.core.dsl.metamodel.Assignment
+import org.komapper.core.dsl.metamodel.EntityMetamodel
 
 interface EntityMultiInsertStatementBuilder<ENTITY : Any> {
     fun build(): Statement
 }
 
-internal class EntityMultiInsertStatementBuilderImpl<ENTITY : Any>(
+internal class EntityMultiInsertStatementBuilderImpl<ENTITY : Any, META : EntityMetamodel<ENTITY, META>>(
     val dialect: Dialect,
-    val context: EntityInsertContext<ENTITY>,
+    val context: EntityInsertContext<ENTITY, META>,
     val entities: List<ENTITY>
 ) : EntityMultiInsertStatementBuilder<ENTITY> {
+
     private val buf = StatementBuffer(dialect::formatValue)
 
     override fun build(): Statement {
-        val entityMetamodel = context.entityMetamodel
+        val entityMetamodel = context.target
         val properties = entityMetamodel.properties()
         buf.append("insert into ")
         buf.append(table(entityMetamodel))

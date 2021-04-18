@@ -6,15 +6,16 @@ import org.komapper.core.data.Statement
 import org.komapper.core.dsl.builder.EntityInsertStatementBuilder
 import org.komapper.core.dsl.context.EntityInsertContext
 import org.komapper.core.dsl.metamodel.Assignment
+import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.option.QueryOption
 
-internal class EntityInsertQuerySupport<ENTITY : Any>(
-    private val context: EntityInsertContext<ENTITY>,
+internal class EntityInsertQuerySupport<ENTITY : Any, META : EntityMetamodel<ENTITY, META>>(
+    private val context: EntityInsertContext<ENTITY, META>,
     private val option: QueryOption
 ) {
 
     fun preInsert(config: DatabaseConfig, entity: ENTITY): ENTITY {
-        val assignment = context.entityMetamodel.idAssignment()
+        val assignment = context.target.idAssignment()
         return if (assignment is Assignment.Sequence<ENTITY, *>) {
             assignment.assign(entity, config.name, config.dialect::enquote) { sequenceName ->
                 val sql = config.dialect.getSequenceSql(sequenceName)
@@ -28,20 +29,20 @@ internal class EntityInsertQuerySupport<ENTITY : Any>(
             entity
         }.let { newEntity ->
             val clock = config.clockProvider.now()
-            context.entityMetamodel.updateCreatedAt(newEntity, clock).let {
-                context.entityMetamodel.updateUpdatedAt(it, clock)
+            context.target.updateCreatedAt(newEntity, clock).let {
+                context.target.updateUpdatedAt(it, clock)
             }
         }
     }
 
     fun <T> insert(config: DatabaseConfig, execute: (JdbcExecutor) -> T): T {
-        val generatedKeysRequired = context.entityMetamodel.idAssignment() is Assignment.Identity<*, *>
+        val generatedKeysRequired = context.target.idAssignment() is Assignment.Identity<*, *>
         val executor = JdbcExecutor(config, option.asJdbcOption(), generatedKeysRequired)
         return execute(executor)
     }
 
     fun postInsert(entity: ENTITY, generatedKey: Long): ENTITY {
-        val assignment = context.entityMetamodel.idAssignment()
+        val assignment = context.target.idAssignment()
         return if (assignment is Assignment.Identity<ENTITY, *>) {
             assignment.assign(entity, generatedKey)
         } else {
