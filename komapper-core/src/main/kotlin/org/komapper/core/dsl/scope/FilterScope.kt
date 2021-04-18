@@ -94,4 +94,16 @@ interface FilterScope {
         if (value is EscapeExpression) return value
         return EscapeExpression.Escape(value)
     }
+
+    fun CharSequence.asPrefix(): CharSequence {
+        return escape(this) + text("%")
+    }
+
+    fun CharSequence.asInfix(): CharSequence {
+        return text("%") + escape(this) + text("%")
+    }
+
+    fun CharSequence.asSuffix(): CharSequence {
+        return text("%") + escape(this)
+    }
 }

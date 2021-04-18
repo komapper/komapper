@@ -8,6 +8,7 @@ import org.junit.jupiter.api.assertThrows
 import org.komapper.core.data.Value
 import org.komapper.template.expression.DefaultExprEnvironment
 import org.komapper.template.expression.DefaultExprEvaluator
+import org.komapper.template.expression.ExprContext
 import org.komapper.template.expression.NoCacheExprNodeFactory
 import org.komapper.template.sql.NoCacheSqlNodeFactory
 import org.komapper.template.sql.SqlException
@@ -19,7 +20,7 @@ class DefaultTemplateStatementBuilderTest {
         sqlNodeFactory = NoCacheSqlNodeFactory(),
         exprEvaluator = DefaultExprEvaluator(
             NoCacheExprNodeFactory(),
-            DefaultExprEnvironment { it }
+            DefaultExprEnvironment()
         )
     )
 
@@ -52,7 +53,7 @@ class DefaultTemplateStatementBuilderTest {
         @Test
         fun singleValue() {
             val template = "select name, age from person where name = /*name*/'test' and age > 1"
-            val sql = sqlBuilder.build(template, mapOf("name" to Value("aaa")))
+            val sql = sqlBuilder.build(template, ExprContext(mapOf("name" to Value("aaa"))))
             assertEquals("select name, age from person where name = ? and age > 1", sql.sql)
             assertEquals(listOf(Value("aaa")), sql.values)
         }
@@ -68,7 +69,7 @@ class DefaultTemplateStatementBuilderTest {
         @Test
         fun multipleValues() {
             val template = "select name, age from person where name in /*name*/('a', 'b') and age > 1"
-            val sql = sqlBuilder.build(template, mapOf("name" to Value(listOf("x", "y", "z"))))
+            val sql = sqlBuilder.build(template, ExprContext(mapOf("name" to Value(listOf("x", "y", "z")))))
             assertEquals("select name, age from person where name in (?, ?, ?) and age > 1", sql.sql)
             assertEquals(
                 listOf(
@@ -91,7 +92,7 @@ class DefaultTemplateStatementBuilderTest {
         @Test
         fun multipleValues_empty() {
             val template = "select name, age from person where name in /*name*/('a', 'b') and age > 1"
-            val sql = sqlBuilder.build(template, mapOf("name" to Value(emptyList<String>())))
+            val sql = sqlBuilder.build(template, ExprContext(mapOf("name" to Value(emptyList<String>()))))
             assertEquals("select name, age from person where name in (null) and age > 1", sql.sql)
             assertTrue(sql.values.isEmpty())
         }
@@ -100,7 +101,7 @@ class DefaultTemplateStatementBuilderTest {
         fun pairValues() {
             val sql = sqlBuilder.build(
                 "select name, age from person where (name, age) in /*pairs*/(('a', 'b'), ('c', 'd'))",
-                mapOf("pairs" to Value(listOf("x" to 1, "y" to 2, "z" to 3)))
+                ExprContext(mapOf("pairs" to Value(listOf("x" to 1, "y" to 2, "z" to 3))))
             )
             assertEquals("select name, age from person where (name, age) in ((?, ?), (?, ?), (?, ?))", sql.sql)
             assertEquals(
@@ -117,12 +118,14 @@ class DefaultTemplateStatementBuilderTest {
         fun tripleValues() {
             val sql = sqlBuilder.build(
                 "select name, age from person where (name, age, weight) in /*triples*/(('a', 'b', 'c'), ('d', 'e', 'f'))",
-                mapOf(
-                    "triples" to Value(
-                        listOf(
-                            Triple("x", 1, 10),
-                            Triple("y", 2, 20),
-                            Triple("z", 3, 30)
+                ExprContext(
+                    mapOf(
+                        "triples" to Value(
+                            listOf(
+                                Triple("x", 1, 10),
+                                Triple("y", 2, 20),
+                                Triple("z", 3, 30)
+                            )
                         )
                     )
                 )
@@ -148,21 +151,21 @@ class DefaultTemplateStatementBuilderTest {
         @Test
         fun `Include the 'order by' clause into the embedded value`() {
             val template = "select name, age from person where age > 1 /*# orderBy */"
-            val sql = sqlBuilder.build(template, mapOf("orderBy" to Value("order by name")))
+            val sql = sqlBuilder.build(template, ExprContext(mapOf("orderBy" to Value("order by name"))))
             assertEquals("select name, age from person where age > 1 order by name", sql.sql)
         }
 
         @Test
         fun `Exclude the 'order by' clause from the embedded value`() {
             val template = "select name, age from person where age > 1 order by /*# orderBy */"
-            val sql = sqlBuilder.build(template, mapOf("orderBy" to Value("name, age")))
+            val sql = sqlBuilder.build(template, ExprContext(mapOf("orderBy" to Value("name, age"))))
             assertEquals("select name, age from person where age > 1 order by name, age", sql.sql)
         }
 
         @Test
         fun `Remove the 'order by' clause automatically`() {
             val template = "select name, age from person where age > 1 order by /*# orderBy */"
-            val sql = sqlBuilder.build(template, mapOf("orderBy" to Value("")))
+            val sql = sqlBuilder.build(template, ExprContext(mapOf("orderBy" to Value(""))))
             assertEquals("select name, age from person where age > 1 ", sql.sql)
         }
     }
@@ -173,7 +176,7 @@ class DefaultTemplateStatementBuilderTest {
         @Test
         fun test() {
             val template = "select name, age from person where name = /*^name*/'test' and age > 1"
-            val sql = sqlBuilder.build(template, mapOf("name" to Value("aaa")))
+            val sql = sqlBuilder.build(template, ExprContext(mapOf("name" to Value("aaa"))))
             assertEquals("select name, age from person where name = 'aaa' and age > 1", sql.sql)
         }
     }
@@ -184,7 +187,7 @@ class DefaultTemplateStatementBuilderTest {
         fun if_true() {
             val template =
                 "select name, age from person where /*%if name != null*/name = /*name*/'test'/*%end*/ and 1 = 1"
-            val sql = sqlBuilder.build(template, mapOf("name" to Value("aaa")))
+            val sql = sqlBuilder.build(template, ExprContext(mapOf("name" to Value("aaa"))))
             assertEquals("select name, age from person where name = ? and 1 = 1", sql.sql)
             assertEquals(listOf(Value("aaa")), sql.values)
         }
@@ -220,7 +223,7 @@ class DefaultTemplateStatementBuilderTest {
         fun test() {
             val template =
                 "select name, age from person where /*%for i in list*/age = /*i*/0 /*%if i_has_next *//*# \"or\" */ /*%end*//*%end*/"
-            val sql = sqlBuilder.build(template, mapOf("list" to Value(listOf(1, 2, 3))))
+            val sql = sqlBuilder.build(template, ExprContext(mapOf("list" to Value(listOf(1, 2, 3)))))
             assertEquals("select name, age from person where age = ? or age = ? or age = ? ", sql.sql)
             assertEquals(
                 listOf(

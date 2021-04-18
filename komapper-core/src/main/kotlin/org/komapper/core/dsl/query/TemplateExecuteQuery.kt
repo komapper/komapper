@@ -38,6 +38,6 @@ internal data class TemplateExecuteQueryImpl(
 
     private fun buildStatement(config: DatabaseConfig): Statement {
         val builder = config.templateStatementBuilder
-        return builder.build(sql, params)
+        return builder.build(sql, params) { config.dialect.escape(it, option.escapeString) }
     }
 }

@@ -19,14 +19,15 @@ import org.komapper.core.dsl.query.ScalarQuery
 class BuilderSupport(
     private val dialect: Dialect,
     private val aliasManager: AliasManager,
-    private val buf: StatementBuffer
+    private val buf: StatementBuffer,
+    private val escapeSequence: String? = null
 ) {
 
     fun visitEntityExpression(expression: EntityExpression<*>) {
         val name = expression.getCanonicalTableName(dialect::enquote)
         val alias = aliasManager.getAlias(expression) ?: error("Alias is not found. table=$name ,sql=$buf")
         if (alias.isEmpty()) {
-            buf.append("$name")
+            buf.append(name)
         } else {
             buf.append("$name $alias")
         }
@@ -217,9 +218,11 @@ class BuilderSupport(
             is Operand.Parameter -> {
                 when (val value = operand.value) {
                     is EscapeExpression -> {
-                        val newValue = visitEscapeExpression(value, dialect::escape)
+                        val finalEscapeSequence = escapeSequence ?: dialect.escapeSequence
+                        val newValue = visitEscapeExpression(value) { dialect.escape(it, finalEscapeSequence) }
                         visitParameter(Operand.Parameter(operand.expression, newValue))
-                        buf.append(" escape '${dialect.escapeString}'")
+                        buf.append(" escape ")
+                        buf.bind(Value(finalEscapeSequence, String::class))
                     }
                     else -> visitParameter(operand)
                 }

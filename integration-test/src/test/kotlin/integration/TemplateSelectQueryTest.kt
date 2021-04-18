@@ -1,6 +1,6 @@
 package integration
 
-import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.Database
@@ -25,8 +25,8 @@ class TemplateSelectQueryTest(private val db: Database) {
             val sql = "select * from ADDRESS"
             TemplateQuery.from(sql).select(asAddress)
         }
-        Assertions.assertEquals(15, list.size)
-        Assertions.assertEquals(
+        assertEquals(15, list.size)
+        assertEquals(
             Address(
                 1,
                 "STREET 1",
@@ -42,8 +42,8 @@ class TemplateSelectQueryTest(private val db: Database) {
             val sql = "select * from ADDRESS"
             TemplateQuery.from(sql).select(asAddress).collect { it.toList() }
         }
-        Assertions.assertEquals(15, list.size)
-        Assertions.assertEquals(
+        assertEquals(15, list.size)
+        assertEquals(
             Address(
                 1,
                 "STREET 1",
@@ -64,8 +64,8 @@ class TemplateSelectQueryTest(private val db: Database) {
                 }
             }.select(asAddress)
         }
-        Assertions.assertEquals(1, list.size)
-        Assertions.assertEquals(
+        assertEquals(1, list.size)
+        assertEquals(
             Address(
                 10,
                 "STREET 10",
@@ -84,8 +84,8 @@ class TemplateSelectQueryTest(private val db: Database) {
                 Condition("STREET 10")
             }.select(asAddress)
         }
-        Assertions.assertEquals(1, list.size)
-        Assertions.assertEquals(
+        assertEquals(1, list.size)
+        assertEquals(
             Address(
                 10,
                 "STREET 10",
@@ -106,8 +106,8 @@ class TemplateSelectQueryTest(private val db: Database) {
                 }
             }.select(asAddress)
         }
-        Assertions.assertEquals(2, list.size)
-        Assertions.assertEquals(
+        assertEquals(2, list.size)
+        assertEquals(
             Address(
                 1,
                 "STREET 1",
@@ -115,7 +115,7 @@ class TemplateSelectQueryTest(private val db: Database) {
             ),
             list[0]
         )
-        Assertions.assertEquals(
+        assertEquals(
             Address(
                 2,
                 "STREET 2",
@@ -136,8 +136,8 @@ class TemplateSelectQueryTest(private val db: Database) {
                 }
             }.select(asAddress)
         }
-        Assertions.assertEquals(2, list.size)
-        Assertions.assertEquals(
+        assertEquals(2, list.size)
+        assertEquals(
             Address(
                 1,
                 "STREET 1",
@@ -145,7 +145,7 @@ class TemplateSelectQueryTest(private val db: Database) {
             ),
             list[0]
         )
-        Assertions.assertEquals(
+        assertEquals(
             Address(
                 2,
                 "STREET 2",
@@ -169,8 +169,8 @@ class TemplateSelectQueryTest(private val db: Database) {
                 }
             }.select(asAddress)
         }
-        Assertions.assertEquals(2, list.size)
-        Assertions.assertEquals(
+        assertEquals(2, list.size)
+        assertEquals(
             Address(
                 1,
                 "STREET 1",
@@ -178,7 +178,7 @@ class TemplateSelectQueryTest(private val db: Database) {
             ),
             list[0]
         )
-        Assertions.assertEquals(
+        assertEquals(
             Address(
                 2,
                 "STREET 2",
@@ -186,5 +186,34 @@ class TemplateSelectQueryTest(private val db: Database) {
             ),
             list[1]
         )
+    }
+
+    @Test
+    fun escape() {
+        val list = db.execute {
+            val sql =
+                """
+                select * from ADDRESS 
+                where street like concat(/* street.escape() */'test', '%')
+                order by address_id
+                """.trimIndent()
+            TemplateQuery.from(sql).where {
+                data class Condition(val street: String)
+                Condition("STREET 1")
+            }.select(asAddress)
+        }
+        assertEquals((listOf(1) + (10..15)).toList(), list.map { it.addressId })
+    }
+
+    @Test
+    fun asPrefix() {
+        val list = db.execute {
+            val sql = "select * from ADDRESS where street like /*street.asPrefix()*/'test' order by address_id"
+            TemplateQuery.from(sql).where {
+                data class Condition(val street: String)
+                Condition("STREET 1")
+            }.select(asAddress)
+        }
+        assertEquals((listOf(1) + (10..15)).toList(), list.map { it.addressId })
     }
 }

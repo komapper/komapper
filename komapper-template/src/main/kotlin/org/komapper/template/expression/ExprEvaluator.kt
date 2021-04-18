@@ -15,7 +15,7 @@ import kotlin.reflect.full.valueParameters
 import kotlin.reflect.jvm.jvmErasure
 
 interface ExprEvaluator {
-    fun eval(expression: String, ctx: Map<String, Value> = emptyMap()): Value
+    fun eval(expression: String, ctx: ExprContext = ExprContext()): Value
 }
 
 open class DefaultExprEvaluator(
@@ -33,12 +33,12 @@ open class DefaultExprEvaluator(
         data class EnumRef(override val clazz: Class<Enum<*>>) : ClassRef()
     }
 
-    override fun eval(expression: String, ctx: Map<String, Value>): Value {
+    override fun eval(expression: String, ctx: ExprContext): Value {
         val node = exprNodeFactory.get(expression)
         return visit(node, ctx)
     }
 
-    private fun visit(node: ExprNode, ctx: Map<String, Value>): Value = when (node) {
+    private fun visit(node: ExprNode, ctx: ExprContext): Value = when (node) {
         is ExprNode.Not -> perform(node.location, node.operand, ctx) { !it }
         is ExprNode.And -> perform(node.location, node.left, node.right, ctx) { x, y -> x && y }
         is ExprNode.Or -> perform(node.location, node.left, node.right, ctx) { x, y -> x || y }
@@ -67,7 +67,7 @@ open class DefaultExprEvaluator(
     private fun perform(
         location: ExprLocation,
         operand: ExprNode,
-        ctx: Map<String, Value>,
+        ctx: ExprContext,
         f: (Boolean) -> Boolean
     ): Value {
         fun checkNull(location: ExprLocation, value: Any?) {
@@ -93,7 +93,7 @@ open class DefaultExprEvaluator(
         location: ExprLocation,
         leftNode: ExprNode,
         rightNode: ExprNode,
-        ctx: Map<String, Value>,
+        ctx: ExprContext,
         f: (Boolean, Boolean) -> Boolean
     ): Value {
         fun checkNull(location: ExprLocation, value: Any?, which: String) {
@@ -122,7 +122,7 @@ open class DefaultExprEvaluator(
         location: ExprLocation,
         leftNode: ExprNode,
         rightNode: ExprNode,
-        ctx: Map<String, Value>,
+        ctx: ExprContext,
         f: (Any?, Any?) -> Boolean
     ): Value {
         val (left) = visit(leftNode, ctx)
@@ -135,7 +135,7 @@ open class DefaultExprEvaluator(
         location: ExprLocation,
         leftNode: ExprNode,
         rightNode: ExprNode,
-        ctx: Map<String, Value>,
+        ctx: ExprContext,
         f: (Comparable<Any>, Comparable<Any>) -> Boolean
     ): Value {
         fun checkNull(location: ExprLocation, value: Any?, which: String) {
@@ -162,7 +162,7 @@ open class DefaultExprEvaluator(
         }
     }
 
-    private fun visitClassRef(node: ExprNode.ClassRef, @Suppress("UNUSED_PARAMETER") ctx: Map<String, Value>): Value {
+    private fun visitClassRef(node: ExprNode.ClassRef, @Suppress("UNUSED_PARAMETER") ctx: ExprContext): Value {
         val clazz =
             try {
                 classResolver(node.name)
@@ -179,11 +179,11 @@ open class DefaultExprEvaluator(
         }
     }
 
-    private fun visitValue(node: ExprNode.Value, ctx: Map<String, Value>): Value {
-        return ctx[node.name] ?: exprEnvironment.ctx[node.name] ?: Value(null, Any::class)
+    private fun visitValue(node: ExprNode.Value, ctx: ExprContext): Value {
+        return ctx.valueMap[node.name] ?: exprEnvironment.ctx[node.name] ?: Value(null, Any::class)
     }
 
-    private fun visitProperty(node: ExprNode.Property, ctx: Map<String, Value>): Value {
+    private fun visitProperty(node: ExprNode.Property, ctx: ExprContext): Value {
         val (receiver, receiverType) = visit(node.receiver, ctx)
         if (receiver is ClassRef.EnumRef) {
             val enum = receiver.clazz.enumConstants.first { it.name == node.name }
@@ -213,7 +213,7 @@ open class DefaultExprEvaluator(
             ?: exprEnvironment.topLevelPropertyExtensions.find(::predicate)
     }
 
-    private fun visitFunction(node: ExprNode.Function, ctx: Map<String, Value>): Value {
+    private fun visitFunction(node: ExprNode.Function, ctx: ExprContext): Value {
         fun call(function: KFunction<*>, arguments: List<Any?>): Value {
             try {
                 return Value(function.call(*arguments.toTypedArray()), function.returnType.jvmErasure)
@@ -229,7 +229,7 @@ open class DefaultExprEvaluator(
                 ?.let { (function, arguments) -> call(function, arguments) }
                 ?: throw ExprException("The static function \"${node.name}\" is not found at ${node.location}")
         } else {
-            findFunction(node.name, receiverType, receiver, args)
+            findFunction(node.name, receiverType, receiver, args, ctx)
                 ?.let { (function, arguments) ->
                     if (receiver == null && node.safeCall) {
                         Value(null, function.returnType.jvmErasure)
@@ -268,7 +268,8 @@ open class DefaultExprEvaluator(
         name: String,
         receiverType: KClass<*>,
         receiver: Any?,
-        args: Any?
+        args: Any?,
+        ctx: ExprContext
     ): Pair<KFunction<*>, List<Any?>>? {
         fun Collection<KFunction<*>>.pick(arguments: List<Any?>): Pair<KFunction<*>, List<Any?>>? {
             return this.filter { function ->
@@ -287,6 +288,6 @@ open class DefaultExprEvaluator(
         }
         return receiverType.memberFunctions.pick(arguments)
             ?: exprEnvironment.topLevelFunctionExtensions.pick(arguments)
-            ?: exprEnvironment::class.memberExtensionFunctions.pick(listOf(exprEnvironment) + arguments)
+            ?: ctx.functionExtensions::class.memberExtensionFunctions.pick(listOf(ctx.functionExtensions) + arguments)
     }
 }

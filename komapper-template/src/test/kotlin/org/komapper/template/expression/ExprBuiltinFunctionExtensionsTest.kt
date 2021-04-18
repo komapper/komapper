@@ -3,9 +3,9 @@ package org.komapper.template.expression
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
-internal class ExprEnvironmentTest {
+internal class ExprBuiltinFunctionExtensionsTest {
 
-    private val extensions = DefaultExprEnvironment { it }
+    private val extensions = ExprBuiltinFunctionExtensions { it }
 
     @Test
     fun escape() {

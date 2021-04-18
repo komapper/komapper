@@ -6,7 +6,8 @@ import org.komapper.core.data.Statement
 interface TemplateStatementBuilder {
     fun build(
         template: CharSequence,
-        params: Any
+        params: Any,
+        escape: (String) -> String
     ): Statement
 }
 

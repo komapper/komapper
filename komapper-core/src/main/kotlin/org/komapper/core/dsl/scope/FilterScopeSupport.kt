@@ -143,32 +143,32 @@ internal class FilterScopeSupport(
 
     override fun <T : CharSequence> PropertyExpression<T>.startsWith(operand: CharSequence?) {
         if (operand == null) return
-        addLikeOperator(this, escape(operand) + text("%"))
+        addLikeOperator(this, operand.asPrefix())
     }
 
     override fun <T : CharSequence> PropertyExpression<T>.notStartsWith(operand: CharSequence?) {
         if (operand == null) return
-        addNotLikeOperator(this, escape(operand) + text("%"))
+        addNotLikeOperator(this, operand.asPrefix())
     }
 
     override fun <T : CharSequence> PropertyExpression<T>.contains(operand: CharSequence?) {
         if (operand == null) return
-        addLikeOperator(this, text("%") + escape(operand) + text("%"))
+        addLikeOperator(this, operand.asInfix())
     }
 
     override fun <T : CharSequence> PropertyExpression<T>.notContains(operand: CharSequence?) {
         if (operand == null) return
-        addNotLikeOperator(this, text("%") + escape(operand) + text("%"))
+        addNotLikeOperator(this, operand.asInfix())
     }
 
     override fun <T : CharSequence> PropertyExpression<T>.endsWith(operand: CharSequence?) {
         if (operand == null) return
-        addLikeOperator(this, text("%") + escape(operand))
+        addLikeOperator(this, operand.asSuffix())
     }
 
     override fun <T : CharSequence> PropertyExpression<T>.notEndsWith(operand: CharSequence?) {
         if (operand == null) return
-        addNotLikeOperator(this, text("%") + escape(operand))
+        addNotLikeOperator(this, operand.asSuffix())
     }
 
     override infix fun <T : Comparable<T>> PropertyExpression<T>.between(range: ClosedRange<T>) {

@@ -14,7 +14,7 @@ class DefaultTemplateStatementBuilderFactory : TemplateStatementBuilderFactory {
 
     override fun create(dialect: Dialect, cache: Boolean): TemplateStatementBuilder {
         val exprNodeFactory = if (cache) CacheExprNodeFactory() else NoCacheExprNodeFactory()
-        val exprEnvironment = DefaultExprEnvironment(dialect::escape)
+        val exprEnvironment = DefaultExprEnvironment()
         val exprEvaluator = DefaultExprEvaluator(exprNodeFactory, exprEnvironment)
         val sqlNodeFactory = if (cache) CacheSqlNodeFactory() else NoCacheSqlNodeFactory()
         return DefaultTemplateStatementBuilder(dialect::formatValue, sqlNodeFactory, exprEvaluator)

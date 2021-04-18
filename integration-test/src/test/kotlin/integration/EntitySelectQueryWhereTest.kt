@@ -72,12 +72,60 @@ class EntitySelectQueryWhereTest(private val db: Database) {
     }
 
     @Test
+    fun like_asPrefix() {
+        val a = Address.alias
+        val list = db.execute {
+            EntityQuery.from(a).where {
+                a.street like "STREET 1".asPrefix()
+            }.orderBy(a.addressId)
+        }
+        assertEquals(listOf(1) + (10..15), list.map { it.addressId })
+    }
+
+    @Test
+    fun like_asInfix() {
+        val a = Address.alias
+        val list = db.execute {
+            EntityQuery.from(a).where {
+                a.street like "T 1".asInfix()
+            }.orderBy(a.addressId)
+        }
+        assertEquals(listOf(1) + (10..15), list.map { it.addressId })
+    }
+
+    @Test
+    fun like_asSuffix() {
+        val a = Address.alias
+        val list = db.execute {
+            EntityQuery.from(a).where {
+                a.street like "1".asSuffix()
+            }.orderBy(a.addressId)
+        }
+        assertEquals(listOf(1, 11), list.map { it.addressId })
+    }
+
+    @Test
     fun like_escape() {
         val a = Address.alias
         val insertQuery = EntityQuery.insert(a, Address(16, "\\STREET _16%", 1))
         val selectQuery = EntityQuery.from(a).where {
             a.street like escape("\\S") + text("%") + escape("T _16%")
         }.orderBy(a.addressId)
+        val list = db.execute {
+            insertQuery + selectQuery
+        }
+        assertEquals(listOf(16), list.map { it.addressId })
+    }
+
+    @Test
+    fun like_escapeWithEscapeSequence() {
+        val a = Address.alias
+        val insertQuery = EntityQuery.insert(a, Address(16, "\\STREET _16%", 1))
+        val selectQuery = EntityQuery.from(a).where {
+            a.street like escape("\\S") + text("%") + escape("T _16%")
+        }.orderBy(a.addressId).option {
+            it.copy(escapeSequence = "|")
+        }
         val list = db.execute {
             insertQuery + selectQuery
         }
@@ -93,6 +141,39 @@ class EntitySelectQueryWhereTest(private val db: Database) {
             }.orderBy(a.addressId)
         }
         assertEquals((1..9).toList(), list.map { it.addressId })
+    }
+
+    @Test
+    fun notLike_asPrefix() {
+        val a = Address.alias
+        val list = db.execute {
+            EntityQuery.from(a).where {
+                a.street notLike "STREET 1".asPrefix()
+            }.orderBy(a.addressId)
+        }
+        assertEquals((2..9).toList(), list.map { it.addressId })
+    }
+
+    @Test
+    fun notLike_asInfix() {
+        val a = Address.alias
+        val list = db.execute {
+            EntityQuery.from(a).where {
+                a.street notLike "T 1".asInfix()
+            }.orderBy(a.addressId)
+        }
+        assertEquals((2..9).toList(), list.map { it.addressId })
+    }
+
+    @Test
+    fun notLike_asSuffix() {
+        val a = Address.alias
+        val list = db.execute {
+            EntityQuery.from(a).where {
+                a.street notLike "1".asSuffix()
+            }.orderBy(a.addressId)
+        }
+        assertEquals(((2..10) + (12..15)).toList(), list.map { it.addressId })
     }
 
     @Test

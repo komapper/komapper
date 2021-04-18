@@ -49,7 +49,6 @@ open class MySqlDialect(val version: Version = Version.V8_0) : AbstractDialect()
 
     override val openQuote: String = "`"
     override val closeQuote: String = "`"
-    override val escapeString: String = "\\\\"
 
     override fun isUniqueConstraintViolation(exception: SQLException): Boolean {
         val cause = getCause(exception)

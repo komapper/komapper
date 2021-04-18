@@ -46,6 +46,11 @@ internal class AbstractDialectTest {
 
     @Test
     fun escape() {
-        assertEquals("""a\%b\_c\\d""", dialect.escape("""a%b_c\d"""))
+        assertEquals("""a\%b\_c\\d|e""", dialect.escape("""a%b_c\d|e"""))
+    }
+
+    @Test
+    fun escapeWithEscapeString() {
+        assertEquals("""a|%b|_c\d||e""", dialect.escape("""a%b_c\d|e""", "|"))
     }
 }

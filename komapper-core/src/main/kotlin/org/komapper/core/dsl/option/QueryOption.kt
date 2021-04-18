@@ -23,6 +23,7 @@ interface SelectOption : QueryOption {
 
 interface WhereOption : QueryOption {
     val allowEmptyWhereClause: Boolean
+    val escapeSequence: String?
 }
 
 data class EntityDeleteOption(
@@ -57,7 +58,8 @@ data class EntitySelectOption(
     override val fetchSize: Int? = null,
     override val maxRows: Int? = null,
     override val queryTimeoutSeconds: Int? = null,
-    override val allowEmptyWhereClause: Boolean = true
+    override val allowEmptyWhereClause: Boolean = true,
+    override val escapeSequence: String? = null
 ) : SelectOption, WhereOption {
     override fun asJdbcOption() = JdbcOption(
         fetchSize = fetchSize,
@@ -111,7 +113,8 @@ data class EntityBatchUpdateOption(
 
 data class SqlDeleteOption(
     override val queryTimeoutSeconds: Int? = null,
-    override val allowEmptyWhereClause: Boolean = false
+    override val allowEmptyWhereClause: Boolean = false,
+    override val escapeSequence: String? = null
 ) : WhereOption {
     override fun asJdbcOption() = JdbcOption(
         queryTimeoutSeconds = queryTimeoutSeconds
@@ -128,7 +131,8 @@ data class SqlInsertOption(
 
 data class SqlUpdateOption(
     override val queryTimeoutSeconds: Int? = null,
-    override val allowEmptyWhereClause: Boolean = false
+    override val allowEmptyWhereClause: Boolean = false,
+    override val escapeSequence: String? = null
 ) :
     WhereOption {
     override fun asJdbcOption() = JdbcOption(
@@ -140,7 +144,8 @@ data class SqlSelectOption(
     override val queryTimeoutSeconds: Int? = null,
     override val fetchSize: Int? = null,
     override val maxRows: Int? = null,
-    override val allowEmptyWhereClause: Boolean = true
+    override val allowEmptyWhereClause: Boolean = true,
+    override val escapeSequence: String? = null,
 ) : SelectOption, WhereOption {
     override fun asJdbcOption() = JdbcOption(
         fetchSize = fetchSize,
@@ -153,7 +158,8 @@ data class SqlSetOperationOption(
     override val fetchSize: Int? = null,
     override val maxRows: Int? = null,
     override val queryTimeoutSeconds: Int? = null,
-    override val allowEmptyWhereClause: Boolean = true
+    override val allowEmptyWhereClause: Boolean = true,
+    override val escapeSequence: String? = null,
 ) : SelectOption, WhereOption {
     override fun asJdbcOption() = JdbcOption(
         fetchSize = fetchSize,
@@ -166,6 +172,7 @@ data class TemplateSelectOption(
     override val fetchSize: Int? = null,
     override val maxRows: Int? = null,
     override val queryTimeoutSeconds: Int? = null,
+    val escapeString: String? = null
 ) : SelectOption {
     override fun asJdbcOption() = JdbcOption(
         fetchSize = fetchSize,
@@ -175,7 +182,8 @@ data class TemplateSelectOption(
 }
 
 data class TemplateExecuteOption(
-    override val queryTimeoutSeconds: Int? = null
+    override val queryTimeoutSeconds: Int? = null,
+    val escapeString: String? = null
 ) : QueryOption {
     override fun asJdbcOption() = JdbcOption(
         queryTimeoutSeconds = queryTimeoutSeconds

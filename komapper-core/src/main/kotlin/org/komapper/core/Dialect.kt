@@ -18,8 +18,7 @@ import kotlin.reflect.KClass
 interface Dialect {
     val openQuote: String
     val closeQuote: String
-    val escapeString: String
-    val escapePattern: Pattern
+    val escapeSequence: String
 
     fun getValue(rs: ResultSet, index: Int, valueClass: KClass<*>): Any?
     fun getValue(rs: ResultSet, columnLabel: String, valueClass: KClass<*>): Any?
@@ -29,7 +28,7 @@ interface Dialect {
     fun getSequenceSql(sequenceName: String): String
     fun getOffsetLimitSql(offset: Int, limit: Int): String
     fun enquote(name: String): String
-    fun escape(text: String): String
+    fun escape(text: String, escapeSequence: String? = null): String
     fun getSchemaStatementBuilder(): SchemaStatementBuilder
     fun <ENTITY : Any> getEntityUpsertStatementBuilder(
         context: EntityUpsertContext<ENTITY>,
@@ -48,13 +47,7 @@ abstract class AbstractDialect : Dialect {
 
     override val openQuote: String = "\""
     override val closeQuote: String = "\""
-    override val escapeString: String = "\\"
-    override val escapePattern: Pattern
-        get() {
-            @Suppress("RegExpDuplicateCharacterInClass")
-            val regex = "[${escapeString}${escapeString}_%]"
-            return Pattern.compile(regex)
-        }
+    override val escapeSequence: String = "\\"
 
     override fun getValue(rs: ResultSet, index: Int, valueClass: KClass<*>): Any? {
         val (dataType) = getDataType(valueClass)
@@ -104,9 +97,16 @@ abstract class AbstractDialect : Dialect {
         return openQuote + name + closeQuote
     }
 
-    override fun escape(text: String): String {
+    override fun escape(text: String, escapeSequence: String?): String {
+        val literal = escapeSequence ?: this.escapeSequence
+        val escapePattern = createEscapePattern(literal)
         val matcher = escapePattern.matcher(text)
-        return matcher.replaceAll("""\\$0""")
+        return matcher.replaceAll("${Regex.escapeReplacement(literal)}$0")
+    }
+
+    protected open fun createEscapePattern(escapeSequence: String): Pattern {
+        val targetChars = "[${Regex.escape("$escapeSequence%_")}]"
+        return Pattern.compile(targetChars)
     }
 }
 

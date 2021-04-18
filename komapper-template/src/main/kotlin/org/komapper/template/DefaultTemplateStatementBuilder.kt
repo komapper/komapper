@@ -4,6 +4,7 @@ import org.komapper.core.data.Statement
 import org.komapper.core.data.StatementBuffer
 import org.komapper.core.data.Value
 import org.komapper.core.dsl.spi.TemplateStatementBuilder
+import org.komapper.template.expression.ExprContext
 import org.komapper.template.expression.ExprEvaluator
 import org.komapper.template.expression.ExprException
 import org.komapper.template.sql.SqlException
@@ -25,20 +26,21 @@ internal class DefaultTemplateStatementBuilder(
         """^(select|from|where|group by|having|order by|for update|option)\s""", RegexOption.IGNORE_CASE
     )
 
-    override fun build(template: CharSequence, params: Any): Statement {
-        val ctx = toMap(params)
+    override fun build(template: CharSequence, params: Any, escape: (String) -> String): Statement {
+        val ctx = createContext(params, escape)
         return build(template.toString(), ctx)
     }
 
-    private fun toMap(any: Any): Map<String, Value> {
-        return any::class.memberProperties
+    private fun createContext(any: Any, escape: (String) -> String): ExprContext {
+        val valueMap = any::class.memberProperties
             .filter { it.visibility == KVisibility.PUBLIC }
             .associate { it.name to Value(it.call(any), it.returnType.jvmErasure) }
+        return ExprContext(valueMap, escape)
     }
 
     fun build(
         sql: CharSequence,
-        ctx: Map<String, Value> = emptyMap()
+        ctx: ExprContext = ExprContext()
     ): Statement {
         val node = sqlNodeFactory.get(sql)
         val state = visit(State(ctx), node)
@@ -101,7 +103,7 @@ internal class DefaultTemplateStatementBuilder(
             visit(state, node.node).append(")")
         }
         is SqlNode.BindValueDirective -> {
-            val result = eval(node.location, node.expression, state.ctx)
+            val result = eval(node.location, node.expression, state.asExprContext())
             when (val obj = result.any) {
                 is Iterable<*> -> {
                     var counter = 0
@@ -135,7 +137,7 @@ internal class DefaultTemplateStatementBuilder(
             node.nodeList.fold(state, ::visit)
         }
         is SqlNode.EmbeddedValueDirective -> {
-            val (obj) = eval(node.location, node.expression, state.ctx)
+            val (obj) = eval(node.location, node.expression, state.asExprContext())
             val s = obj?.toString()
             if (!s.isNullOrEmpty()) {
                 state.available = true
@@ -144,19 +146,19 @@ internal class DefaultTemplateStatementBuilder(
             state
         }
         is SqlNode.LiteralValueDirective -> {
-            val (obj, type) = eval(node.location, node.expression, state.ctx)
+            val (obj, type) = eval(node.location, node.expression, state.asExprContext())
             val literal = formatter(obj, type)
             state.append(literal)
             node.nodeList.fold(state, ::visit)
         }
         is SqlNode.IfBlock -> {
             fun chooseNodeList(): List<SqlNode> {
-                val (result) = eval(node.ifDirective.location, node.ifDirective.expression, state.ctx)
+                val (result) = eval(node.ifDirective.location, node.ifDirective.expression, state.asExprContext())
                 if (result == true) {
                     return node.ifDirective.nodeList
                 } else {
                     val elseIfDirective = node.elseifDirectives.find {
-                        val (r) = eval(it.location, it.expression, state.ctx)
+                        val (r) = eval(it.location, it.expression, state.asExprContext())
                         r == true
                     }
                     @Suppress("LiftReturnOrAssignment")
@@ -178,27 +180,27 @@ internal class DefaultTemplateStatementBuilder(
         is SqlNode.ForBlock -> {
             val forDirective = node.forDirective
             val id = forDirective.identifier
-            val (expression) = eval(node.forDirective.location, node.forDirective.expression, state.ctx)
+            val (expression) = eval(node.forDirective.location, node.forDirective.expression, state.asExprContext())
             expression as? Iterable<*>
                 ?: throw SqlException("The expression ${forDirective.expression} is not Iterable at ${forDirective.location}")
             val it = expression.iterator()
             var s = state
-            val preserved = s.ctx[id]
+            val preserved = s.valueMap[id]
             var index = 0
             val idIndex = id + "_index"
             val idHasNext = id + "_has_next"
             while (it.hasNext()) {
                 val each = it.next()
-                s.ctx[id] = newValue(each)
-                s.ctx[idIndex] = Value(index++, Int::class)
-                s.ctx[idHasNext] = Value(it.hasNext(), Boolean::class)
+                s.valueMap[id] = newValue(each)
+                s.valueMap[idIndex] = Value(index++, Int::class)
+                s.valueMap[idHasNext] = Value(it.hasNext(), Boolean::class)
                 s = node.forDirective.nodeList.fold(s, ::visit)
             }
             if (preserved != null) {
-                s.ctx[id] = preserved
+                s.valueMap[id] = preserved
             }
-            s.ctx.remove(idIndex)
-            s.ctx.remove(idHasNext)
+            s.valueMap.remove(idIndex)
+            s.valueMap.remove(idHasNext)
             s
         }
         is SqlNode.IfDirective,
@@ -210,18 +212,22 @@ internal class DefaultTemplateStatementBuilder(
 
     private fun newValue(o: Any?) = Value(o, o?.let { it::class } ?: Any::class)
 
-    private fun eval(location: SqlLocation, expression: String, ctx: Map<String, Value>): Value = try {
+    private fun eval(location: SqlLocation, expression: String, ctx: ExprContext): Value = try {
         exprEvaluator.eval(expression, ctx)
     } catch (e: ExprException) {
         throw SqlException("The expression evaluation was failed at $location.", e)
     }
 
-    inner class State(ctx: Map<String, Value>) {
-        constructor(state: State) : this(state.ctx)
+    inner class State(private val ctx: ExprContext) {
+        constructor(state: State) : this(ExprContext(state.valueMap))
 
         private val buf = StatementBuffer(formatter)
-        val ctx: MutableMap<String, Value> = HashMap(ctx)
+        val valueMap: MutableMap<String, Value> = HashMap(ctx.valueMap)
         var available: Boolean = false
+
+        fun asExprContext(): ExprContext {
+            return ExprContext(valueMap, ctx.functionExtensions)
+        }
 
         fun append(state: State): State {
             buf.sql.append(state.buf.sql)
