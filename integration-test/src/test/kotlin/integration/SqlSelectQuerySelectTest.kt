@@ -10,7 +10,7 @@ import org.komapper.core.Database
 import org.komapper.core.dsl.SqlQuery
 import org.komapper.core.dsl.concat
 import org.komapper.core.dsl.count
-import org.komapper.core.dsl.execute
+import org.komapper.core.dsl.runQuery
 
 @ExtendWith(Env::class)
 class SqlSelectQuerySelectTest(private val db: Database) {
@@ -18,7 +18,7 @@ class SqlSelectQuerySelectTest(private val db: Database) {
     @Test
     fun selectProperty() {
         val a = Address.alias
-        val streetList = db.execute {
+        val streetList = db.runQuery {
             SqlQuery.from(a)
                 .where {
                     a.addressId inList listOf(1, 2)
@@ -32,7 +32,7 @@ class SqlSelectQuerySelectTest(private val db: Database) {
     @Test
     fun selectProperty_first() {
         val a = Address.alias
-        val value = db.execute {
+        val value = db.runQuery {
             SqlQuery.from(a)
                 .where {
                     a.addressId inList listOf(1, 2)
@@ -47,7 +47,7 @@ class SqlSelectQuerySelectTest(private val db: Database) {
     @Test
     fun selectPropertiesAsPair() {
         val a = Address.alias
-        val pairList = db.execute {
+        val pairList = db.runQuery {
             SqlQuery.from(a)
                 .where {
                     a.addressId inList listOf(1, 2)
@@ -61,7 +61,7 @@ class SqlSelectQuerySelectTest(private val db: Database) {
     @Test
     fun selectPropertiesAsTriple() {
         val a = Address.alias
-        val tripleList = db.execute {
+        val tripleList = db.runQuery {
             SqlQuery.from(a)
                 .where {
                     a.addressId inList listOf(1, 2)
@@ -81,7 +81,7 @@ class SqlSelectQuerySelectTest(private val db: Database) {
     @Test
     fun selectPropertiesAsRecord() {
         val a = Address.alias
-        val list = db.execute {
+        val list = db.runQuery {
             SqlQuery.from(a)
                 .where {
                     a.addressId inList listOf(1, 2)
@@ -106,7 +106,7 @@ class SqlSelectQuerySelectTest(private val db: Database) {
     fun selectEntity() {
         val a = Address.alias
         val e = Employee.alias
-        val list: List<Address> = db.execute {
+        val list: List<Address> = db.runQuery {
             SqlQuery.from(a)
                 .leftJoin(e) {
                     a.addressId eq e.addressId
@@ -120,7 +120,7 @@ class SqlSelectQuerySelectTest(private val db: Database) {
     fun selectEntitiesAsPair_leftJoin() {
         val a = Address.alias
         val e = Employee.alias
-        val list: List<Pair<Address, Employee?>> = db.execute {
+        val list: List<Pair<Address, Employee?>> = db.runQuery {
             SqlQuery.from(a)
                 .leftJoin(e) {
                     a.addressId eq e.addressId
@@ -137,7 +137,7 @@ class SqlSelectQuerySelectTest(private val db: Database) {
     fun selectEntitiesAsPair_innerJoin() {
         val a = Address.alias
         val e = Employee.alias
-        val list: List<Pair<Address, Employee?>> = db.execute {
+        val list: List<Pair<Address, Employee?>> = db.runQuery {
             SqlQuery.from(a).innerJoin(e) {
                 a.addressId eq e.addressId
             }.select(e)
@@ -151,7 +151,7 @@ class SqlSelectQuerySelectTest(private val db: Database) {
         val a = Address.alias
         val e = Employee.alias
         val d = Department.alias
-        val list = db.execute {
+        val list = db.runQuery {
             SqlQuery.from(a)
                 .innerJoin(e) {
                     a.addressId eq e.addressId
@@ -168,7 +168,7 @@ class SqlSelectQuerySelectTest(private val db: Database) {
         val a = Address.alias
         val e = Employee.alias
         val d = Department.alias
-        val list = db.execute {
+        val list = db.runQuery {
             SqlQuery.from(a)
                 .where {
                     a.addressId inList listOf(1, 2)
@@ -194,7 +194,7 @@ class SqlSelectQuerySelectTest(private val db: Database) {
         val d = Department.alias
         val e = Employee.alias
         val subquery = SqlQuery.from(e).where { d.departmentId eq e.departmentId }.select(count())
-        val list = db.execute {
+        val list = db.runQuery {
             SqlQuery.from(d)
                 .orderBy(d.departmentId)
                 .select(d.departmentName, subquery)

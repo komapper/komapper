@@ -12,7 +12,7 @@ import org.komapper.core.DatabaseConfig
 import org.komapper.core.OptimisticLockException
 import org.komapper.core.UniqueConstraintException
 import org.komapper.core.dsl.EntityQuery
-import org.komapper.core.dsl.execute
+import org.komapper.core.dsl.runQuery
 import java.time.Clock
 import java.time.Instant
 import java.time.LocalDateTime
@@ -25,10 +25,10 @@ class EntityUpdateQueryTest(private val db: Database) {
     fun test() {
         val a = Address.alias
         val query = EntityQuery.from(a).where { a.addressId eq 15 }
-        val address = db.execute { query.first() }
+        val address = db.runQuery { query.first() }
         val newAddress = address.copy(street = "NY street")
-        db.execute { EntityQuery.update(a, newAddress) }
-        val address2 = db.execute { query.firstOrNull() }
+        db.runQuery { EntityQuery.update(a, newAddress) }
+        val address2 = db.runQuery { query.firstOrNull() }
         assertEquals(
             Address(
                 15,
@@ -43,14 +43,14 @@ class EntityUpdateQueryTest(private val db: Database) {
     fun updatedAt() {
         val p = Person.alias
         val person1 = Person(1, "ABC")
-        db.execute { EntityQuery.insert(p, person1) }
-        val person2 = db.execute {
+        db.runQuery { EntityQuery.insert(p, person1) }
+        val person2 = db.runQuery {
             EntityQuery.first(p) {
                 p.personId eq 1
             }
         }
-        val person3 = db.execute { EntityQuery.update(p, person2.copy(name = "DEF")) }
-        val person4 = db.execute {
+        val person3 = db.runQuery { EntityQuery.update(p, person2.copy(name = "DEF")) }
+        val person4 = db.runQuery {
             EntityQuery.first(p) {
                 p.personId eq 1
             }
@@ -69,8 +69,8 @@ class EntityUpdateQueryTest(private val db: Database) {
 
         val p = Person.alias
         val person1 = Person(1, "ABC")
-        db.execute { EntityQuery.insert(p, person1) }
-        val person2 = db.execute {
+        db.runQuery { EntityQuery.insert(p, person1) }
+        val person2 = db.runQuery {
             EntityQuery.first(p) {
                 p.personId eq 1
             }
@@ -81,8 +81,8 @@ class EntityUpdateQueryTest(private val db: Database) {
             }
         }
         val myDb = Database(config)
-        val person3 = myDb.execute { EntityQuery.update(p, person2.copy(name = "DEF")) }
-        val person4 = db.execute {
+        val person3 = myDb.runQuery { EntityQuery.update(p, person2.copy(name = "DEF")) }
+        val person4 = db.runQuery {
             EntityQuery.first(p) {
                 p.personId eq 1
             }
@@ -96,17 +96,17 @@ class EntityUpdateQueryTest(private val db: Database) {
         val a = Address.alias
         val address = Address(1, "STREET 2", 1)
         assertThrows<UniqueConstraintException> {
-            db.execute { EntityQuery.update(a, address) }.let { }
+            db.runQuery { EntityQuery.update(a, address) }.let { }
         }
     }
 
     @Test
     fun optimisticLockException() {
         val a = Address.alias
-        val address = db.execute { EntityQuery.from(a).where { a.addressId eq 15 }.first() }
-        db.execute { EntityQuery.update(a, address) }
+        val address = db.runQuery { EntityQuery.from(a).where { a.addressId eq 15 }.first() }
+        db.runQuery { EntityQuery.update(a, address) }
         assertThrows<OptimisticLockException> {
-            db.execute { EntityQuery.update(a, address) }.let {}
+            db.runQuery { EntityQuery.update(a, address) }.let {}
         }
     }
 
@@ -114,9 +114,9 @@ class EntityUpdateQueryTest(private val db: Database) {
     fun criteria() {
         val a = Address.alias
         val selectQuery = EntityQuery.from(a).where { a.addressId eq 15 }.first()
-        val address1 = db.execute { selectQuery }.copy(street = "new street")
-        val address2 = db.execute { EntityQuery.update(a, address1) }
-        val address3 = db.execute { selectQuery }
+        val address1 = db.runQuery { selectQuery }.copy(street = "new street")
+        val address2 = db.runQuery { EntityQuery.update(a, address1) }
+        val address3 = db.runQuery { selectQuery }
         assertEquals(Address(15, "new street", 2), address2)
         assertEquals(address2, address3)
     }

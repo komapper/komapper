@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.Database
 import org.komapper.core.dsl.EntityQuery
-import org.komapper.core.dsl.execute
+import org.komapper.core.dsl.runQuery
 
 @ExtendWith(Env::class)
 class EntitySelectQueryJoinTest(private val db: Database) {
@@ -15,7 +15,7 @@ class EntitySelectQueryJoinTest(private val db: Database) {
     fun innerJoin() {
         val a = Address.alias
         val e = Employee.alias
-        val list = db.execute {
+        val list = db.runQuery {
             EntityQuery.from(a).innerJoin(e) {
                 a.addressId eq e.addressId
             }
@@ -27,7 +27,7 @@ class EntitySelectQueryJoinTest(private val db: Database) {
     fun leftJoin() {
         val a = Address.alias
         val e = Employee.alias
-        val list = db.execute {
+        val list = db.runQuery {
             EntityQuery.from(a).leftJoin(e) {
                 a.addressId eq e.addressId
             }
@@ -39,7 +39,7 @@ class EntitySelectQueryJoinTest(private val db: Database) {
     fun innerJoin_multiConditions() {
         val employee = Employee.alias
         val manager = Employee.newAlias()
-        val list = db.execute {
+        val list = db.runQuery {
             EntityQuery.from(employee).innerJoin(manager) {
                 employee.managerId eq manager.employeeId
                 manager.managerId.isNull()
@@ -53,7 +53,7 @@ class EntitySelectQueryJoinTest(private val db: Database) {
     fun association_many_to_one() {
         val e = Employee.alias
         val d = Department.alias
-        val list = db.execute {
+        val list = db.runQuery {
             EntityQuery.from(e).innerJoin(d) {
                 e.departmentId eq d.departmentId
             }.associate(e, d) { employee, department ->
@@ -68,7 +68,7 @@ class EntitySelectQueryJoinTest(private val db: Database) {
     fun association_one_to_many() {
         val d = Department.alias
         val e = Employee.alias
-        val list = db.execute {
+        val list = db.runQuery {
             EntityQuery.from(d).innerJoin(e) {
                 d.departmentId eq e.departmentId
             }.associate(d, e) { department, employee ->
@@ -89,7 +89,7 @@ class EntitySelectQueryJoinTest(private val db: Database) {
     fun association_one_to_one() {
         val a = Address.alias
         val e = Employee.alias
-        val list = db.execute {
+        val list = db.runQuery {
             EntityQuery.from(e).innerJoin(a) {
                 e.addressId eq a.addressId
             }.associate(e, a) { employee, address ->

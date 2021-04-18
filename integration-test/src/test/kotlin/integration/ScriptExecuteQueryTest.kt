@@ -6,14 +6,14 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.Database
 import org.komapper.core.dsl.ScriptQuery
 import org.komapper.core.dsl.TemplateQuery
-import org.komapper.core.dsl.execute
+import org.komapper.core.dsl.runQuery
 
 @ExtendWith(Env::class)
 internal class ScriptExecuteQueryTest(private val db: Database) {
 
     @Test
     fun test() {
-        db.execute {
+        db.runQuery {
             val script = """
             drop table if exists execute_table;
             create table execute_table(value varchar(20));
@@ -22,7 +22,7 @@ internal class ScriptExecuteQueryTest(private val db: Database) {
             ScriptQuery.execute(script)
         }
 
-        val value = db.execute {
+        val value = db.runQuery {
             val sql = "select value from execute_table"
             TemplateQuery.from(sql).select {
                 asString("value")

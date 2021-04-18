@@ -14,7 +14,7 @@ import org.komapper.annotation.KmId
 import org.komapper.annotation.KmTable
 import org.komapper.core.Database
 import org.komapper.core.dsl.EntityQuery
-import org.komapper.core.dsl.execute
+import org.komapper.core.dsl.runQuery
 import org.komapper.core.jdbc.SimpleDataSource
 import org.komapper.core.tx.TransactionIsolationLevel
 import java.sql.Blob
@@ -76,7 +76,7 @@ class TransactionTest {
     fun select() {
         val a = Address.alias
         val list = db.transaction.required {
-            db.execute { EntityQuery.from(a) }
+            db.runQuery { EntityQuery.from(a) }
         }
         assertEquals(15, list.size)
         assertEquals(Address(1, "STREET 1", 1), list[0])
@@ -87,11 +87,11 @@ class TransactionTest {
         val a = Address.alias
         val query = EntityQuery.from(a).where { a.addressId eq 15 }
         db.transaction.required {
-            val address = db.execute { query.first() }
-            db.execute { EntityQuery.delete(a, address) }
+            val address = db.runQuery { query.first() }
+            db.runQuery { EntityQuery.delete(a, address) }
         }
         db.transaction.required {
-            val address = db.execute { query.firstOrNull() }
+            val address = db.runQuery { query.firstOrNull() }
             assertNull(address)
         }
     }
@@ -102,14 +102,14 @@ class TransactionTest {
         val query = EntityQuery.from(a).where { a.addressId eq 15 }
         try {
             db.transaction.required {
-                val address = db.execute { query.first() }
-                db.execute { EntityQuery.delete(a, address) }
+                val address = db.runQuery { query.first() }
+                db.runQuery { EntityQuery.delete(a, address) }
                 throw Exception()
             }
         } catch (ignored: Exception) {
         }
         db.transaction.required {
-            val address = db.execute { query.first() }
+            val address = db.runQuery { query.first() }
             assertNotNull(address)
         }
     }
@@ -119,14 +119,14 @@ class TransactionTest {
         val a = Address.alias
         val query = EntityQuery.from(a).where { a.addressId eq 15 }
         db.transaction.required {
-            val address = db.execute { query.first() }
-            db.execute { EntityQuery.delete(a, address) }
+            val address = db.runQuery { query.first() }
+            db.runQuery { EntityQuery.delete(a, address) }
             assertFalse(isRollbackOnly())
             setRollbackOnly()
             assertTrue(isRollbackOnly())
         }
         db.transaction.required {
-            val address = db.execute { query.first() }
+            val address = db.runQuery { query.first() }
             assertNotNull(address)
         }
     }
@@ -136,11 +136,11 @@ class TransactionTest {
         val a = Address.alias
         val query = EntityQuery.from(a).where { a.addressId eq 15 }
         db.transaction.required(TransactionIsolationLevel.SERIALIZABLE) {
-            val address = db.execute { query.first() }
-            db.execute { EntityQuery.delete(a, address) }
+            val address = db.runQuery { query.first() }
+            db.runQuery { EntityQuery.delete(a, address) }
         }
         db.transaction.required {
-            val address = db.execute { query.firstOrNull() }
+            val address = db.runQuery { query.firstOrNull() }
             assertNull(address)
         }
     }
@@ -150,15 +150,15 @@ class TransactionTest {
         val a = Address.alias
         val query = EntityQuery.from(a).where { a.addressId eq 15 }
         db.transaction.required {
-            val address = db.execute { query.first() }
-            db.execute { EntityQuery.delete(a, address) }
+            val address = db.runQuery { query.first() }
+            db.runQuery { EntityQuery.delete(a, address) }
             required {
-                val address2 = db.execute { query.firstOrNull() }
+                val address2 = db.runQuery { query.firstOrNull() }
                 assertNull(address2)
             }
         }
         db.transaction.required {
-            val address = db.execute { query.firstOrNull() }
+            val address = db.runQuery { query.firstOrNull() }
             assertNull(address)
         }
     }
@@ -168,13 +168,13 @@ class TransactionTest {
         val a = Address.alias
         val query = EntityQuery.from(a).where { a.addressId eq 15 }
         db.transaction.requiresNew {
-            val address = db.execute { query.first() }
-            db.execute { EntityQuery.delete(a, address) }
-            val address2 = db.execute { query.firstOrNull() }
+            val address = db.runQuery { query.first() }
+            db.runQuery { EntityQuery.delete(a, address) }
+            val address2 = db.runQuery { query.firstOrNull() }
             assertNull(address2)
         }
         db.transaction.required {
-            val address = db.execute { query.firstOrNull() }
+            val address = db.runQuery { query.firstOrNull() }
             assertNull(address)
         }
     }
@@ -184,15 +184,15 @@ class TransactionTest {
         val a = Address.alias
         val query = EntityQuery.from(a).where { a.addressId eq 15 }
         db.transaction.required {
-            val address = db.execute { query.first() }
-            db.execute { EntityQuery.delete(a, address) }
+            val address = db.runQuery { query.first() }
+            db.runQuery { EntityQuery.delete(a, address) }
             requiresNew {
-                val address2 = db.execute { query.firstOrNull() }
+                val address2 = db.runQuery { query.firstOrNull() }
                 assertNotNull(address2)
             }
         }
         db.transaction.required {
-            val address = db.execute { query.firstOrNull() }
+            val address = db.runQuery { query.firstOrNull() }
             assertNull(address)
         }
     }
@@ -202,11 +202,11 @@ class TransactionTest {
         val a = Address.alias
         val query = EntityQuery.from(a).where { a.addressId eq 15 }
         db.transaction {
-            val address = db.execute { query.first() }
-            db.execute { EntityQuery.delete(a, address) }
+            val address = db.runQuery { query.first() }
+            db.runQuery { EntityQuery.delete(a, address) }
         }
         db.transaction {
-            val address = db.execute { query.firstOrNull() }
+            val address = db.runQuery { query.firstOrNull() }
             assertNull(address)
         }
     }
@@ -223,8 +223,8 @@ class TransactionTest {
             val meta = ArrayTest.alias
             val array = db.factory.createArrayOf("INTEGER", listOf(10, 20, 30))
             val data = ArrayTest(1, array)
-            db.execute { EntityQuery.insert(meta, data) }
-            val data2 = db.execute {
+            db.runQuery { EntityQuery.insert(meta, data) }
+            val data2 = db.runQuery {
                 EntityQuery.first(meta) { meta.id eq 1 }
             }
             assertEquals(data.id, data2.id)
@@ -246,8 +246,8 @@ class TransactionTest {
             val bytes = byteArrayOf(10, 20, 30)
             blob.setBytes(1, bytes)
             val data = BlobTest(1, blob)
-            db.execute { EntityQuery.insert(m, data) }
-            val data2 = db.execute {
+            db.runQuery { EntityQuery.insert(m, data) }
+            val data2 = db.runQuery {
                 EntityQuery.first(m) { m.id eq 1 }
             }
             assertEquals(data.id, data2.id)
@@ -268,8 +268,8 @@ class TransactionTest {
             val clob = db.factory.createClob()
             clob.setString(1, "ABC")
             val data = ClobTest(1, clob)
-            db.execute { EntityQuery.insert(m, data) }
-            val data2 = db.execute {
+            db.runQuery { EntityQuery.insert(m, data) }
+            val data2 = db.runQuery {
                 EntityQuery.first(m) {
                     m.id to 1
                 }
@@ -292,8 +292,8 @@ class TransactionTest {
             val nclob = db.factory.createNClob()
             nclob.setString(1, "ABC")
             val data = NClobTest(1, nclob)
-            db.execute { EntityQuery.insert(m, data) }
-            val data2 = db.execute {
+            db.runQuery { EntityQuery.insert(m, data) }
+            val data2 = db.runQuery {
                 EntityQuery.first(m) {
                     m.id eq 1
                 }
@@ -316,8 +316,8 @@ class TransactionTest {
             val sqlXml = db.factory.createSQLXML()
             sqlXml.string = """<xml a="v">Text</xml>"""
             val data = SqlXmlTest(1, sqlXml)
-            db.execute { EntityQuery.insert(m, data) }
-            val data2 = db.execute {
+            db.runQuery { EntityQuery.insert(m, data) }
+            val data2 = db.runQuery {
                 EntityQuery.first(m) { m.id eq 1 }
             }
             assertEquals(data.id, data2.id)

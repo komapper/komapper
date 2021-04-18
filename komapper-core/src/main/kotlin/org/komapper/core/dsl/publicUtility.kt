@@ -14,10 +14,10 @@ import org.komapper.core.dsl.query.Query
 import org.komapper.core.dsl.query.QueryScope
 
 /**
- * Execute a query.
+ * Run a query.
  * @param block the Query provider
  */
-fun <T> Database.execute(block: QueryScope.() -> Query<T>): T {
+fun <T> Database.runQuery(block: QueryScope.() -> Query<T>): T {
     return block(QueryScope).run(this.config)
 }
 

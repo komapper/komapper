@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.Database
 import org.komapper.core.dsl.EntityQuery
-import org.komapper.core.dsl.execute
+import org.komapper.core.dsl.runQuery
 
 @ExtendWith(Env::class)
 class EntitySelectQuerySelectTest(private val db: Database) {
@@ -13,7 +13,7 @@ class EntitySelectQuerySelectTest(private val db: Database) {
     @Test
     fun single() {
         val a = Address.alias
-        val street = db.execute {
+        val street = db.runQuery {
             EntityQuery.from(a).where { a.addressId eq 1 }
                 .asSqlQuery().select(a.street).first()
         }
@@ -23,7 +23,7 @@ class EntitySelectQuerySelectTest(private val db: Database) {
     @Test
     fun pair() {
         val a = Address.alias
-        val (id, street) = db.execute {
+        val (id, street) = db.runQuery {
             EntityQuery.from(a).where { a.addressId eq 1 }
                 .asSqlQuery().select(a.addressId, a.street).first()
         }

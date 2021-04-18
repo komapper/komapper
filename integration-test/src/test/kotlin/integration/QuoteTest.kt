@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.Database
 import org.komapper.core.dsl.EntityQuery
-import org.komapper.core.dsl.execute
+import org.komapper.core.dsl.runQuery
 
 @ExtendWith(Env::class)
 class QuoteTest(val db: Database) {
@@ -55,8 +55,8 @@ class QuoteTest(val db: Database) {
     @Test
     fun alwaysQuote() {
         val m = Order.alias
-        db.execute { EntityQuery.insert(m, Order(1, "value")) }
-        val list = db.execute { EntityQuery.from(m) }
+        db.runQuery { EntityQuery.insert(m, Order(1, "value")) }
+        val list = db.runQuery { EntityQuery.from(m) }
         assertEquals(1, list.size)
     }
 }

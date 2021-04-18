@@ -5,8 +5,8 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.Database
 import org.komapper.core.dsl.TemplateQuery
-import org.komapper.core.dsl.execute
 import org.komapper.core.dsl.query.Row
+import org.komapper.core.dsl.runQuery
 
 @ExtendWith(Env::class)
 class TemplateSelectQueryTest(private val db: Database) {
@@ -21,7 +21,7 @@ class TemplateSelectQueryTest(private val db: Database) {
 
     @Test
     fun test() {
-        val list = db.execute {
+        val list = db.runQuery {
             val sql = "select * from ADDRESS"
             TemplateQuery.from(sql).select(asAddress)
         }
@@ -38,7 +38,7 @@ class TemplateSelectQueryTest(private val db: Database) {
 
     @Test
     fun sequence() {
-        val list = db.execute {
+        val list = db.runQuery {
             val sql = "select * from ADDRESS"
             TemplateQuery.from(sql).select(asAddress).collect { it.toList() }
         }
@@ -55,7 +55,7 @@ class TemplateSelectQueryTest(private val db: Database) {
 
     @Test
     fun condition_objectExpression() {
-        val list = db.execute {
+        val list = db.runQuery {
             val sql = "select * from ADDRESS where street = /*street*/'test'"
             TemplateQuery.from(sql).where {
                 object {
@@ -77,7 +77,7 @@ class TemplateSelectQueryTest(private val db: Database) {
 
     @Test
     fun condition_dataClass() {
-        val list = db.execute {
+        val list = db.runQuery {
             val sql = "select * from ADDRESS where street = /*street*/'test'"
             TemplateQuery.from(sql).where {
                 data class Condition(val street: String)
@@ -97,7 +97,7 @@ class TemplateSelectQueryTest(private val db: Database) {
 
     @Test
     fun `in`() {
-        val list = db.execute {
+        val list = db.runQuery {
             val sql = "select * from ADDRESS where address_id in /*list*/(0)"
             TemplateQuery.from(sql).where {
                 object {
@@ -127,7 +127,7 @@ class TemplateSelectQueryTest(private val db: Database) {
 
     @Test
     fun in2() {
-        val list = db.execute {
+        val list = db.runQuery {
             val sql = "select * from ADDRESS where (address_id, street) in /*pairs*/(0, '')"
             TemplateQuery.from(sql).where {
                 object {
@@ -157,7 +157,7 @@ class TemplateSelectQueryTest(private val db: Database) {
 
     @Test
     fun in3() {
-        val list = db.execute {
+        val list = db.runQuery {
             val sql = "select * from ADDRESS where (address_id, street, version) in /*triples*/(0, '', 0)"
             TemplateQuery.from(sql).where {
                 object {
@@ -190,7 +190,7 @@ class TemplateSelectQueryTest(private val db: Database) {
 
     @Test
     fun escape() {
-        val list = db.execute {
+        val list = db.runQuery {
             val sql =
                 """
                 select * from ADDRESS 
@@ -207,7 +207,7 @@ class TemplateSelectQueryTest(private val db: Database) {
 
     @Test
     fun asPrefix() {
-        val list = db.execute {
+        val list = db.runQuery {
             val sql = "select * from ADDRESS where street like /*street.asPrefix()*/'test' order by address_id"
             TemplateQuery.from(sql).where {
                 data class Condition(val street: String)

@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.Database
 import org.komapper.core.dsl.SqlQuery
-import org.komapper.core.dsl.execute
+import org.komapper.core.dsl.runQuery
 
 @ExtendWith(Env::class)
 class SqlSelectQueryJoinTest(private val db: Database) {
@@ -14,7 +14,7 @@ class SqlSelectQueryJoinTest(private val db: Database) {
     fun innerJoin() {
         val a = Address.alias
         val e = Employee.alias
-        val list = db.execute {
+        val list = db.runQuery {
             SqlQuery.from(a).innerJoin(e) {
                 a.addressId eq e.addressId
             }
@@ -26,7 +26,7 @@ class SqlSelectQueryJoinTest(private val db: Database) {
     fun leftJoin() {
         val a = Address.alias
         val e = Employee.alias
-        val list = db.execute {
+        val list = db.runQuery {
             SqlQuery.from(a).leftJoin(e) {
                 a.addressId eq e.addressId
             }

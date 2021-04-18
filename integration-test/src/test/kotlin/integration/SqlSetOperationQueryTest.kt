@@ -9,7 +9,7 @@ import org.komapper.core.dsl.EntityQuery
 import org.komapper.core.dsl.SqlQuery
 import org.komapper.core.dsl.alias
 import org.komapper.core.dsl.desc
-import org.komapper.core.dsl.execute
+import org.komapper.core.dsl.runQuery
 
 @ExtendWith(Env::class)
 class SqlSetOperationQueryTest(private val db: Database) {
@@ -21,7 +21,7 @@ class SqlSetOperationQueryTest(private val db: Database) {
         val q1 = SqlQuery.from(e).where { e.employeeId inList listOf(1, 2, 3, 4, 5) }
         val q2 = SqlQuery.from(e).where { e.employeeId inList listOf(2, 4, 6, 8) }
         val query = (q1 except q2).orderBy(e.employeeId)
-        val list = db.execute { query }
+        val list = db.runQuery { query }
         assertEquals(3, list.size)
         val e1 = list[0]
         val e2 = list[1]
@@ -38,7 +38,7 @@ class SqlSetOperationQueryTest(private val db: Database) {
         val q1 = SqlQuery.from(e).where { e.employeeId inList listOf(1, 2, 3, 4, 5) }
         val q2 = SqlQuery.from(e).where { e.employeeId inList listOf(2, 4, 6, 8) }
         val query = (q1 intersect q2).orderBy(e.employeeId)
-        val list = db.execute { query }
+        val list = db.runQuery { query }
         assertEquals(2, list.size)
         val e1 = list[0]
         val e2 = list[1]
@@ -53,7 +53,7 @@ class SqlSetOperationQueryTest(private val db: Database) {
         val q2 = SqlQuery.from(e).where { e.employeeId eq 1 }
         val q3 = EntityQuery.from(e).where { e.employeeId eq 5 }
         val query = (q1 union q2 union q3).orderBy(e.employeeId.desc())
-        val list = db.execute { query }
+        val list = db.runQuery { query }
         assertEquals(2, list.size)
         val e1 = list[0]
         val e2 = list[1]
@@ -70,7 +70,7 @@ class SqlSetOperationQueryTest(private val db: Database) {
         val query = SqlQuery.from(e).where {
             e.managerId inList { subquery }
         }
-        val list = db.execute { query }
+        val list = db.runQuery { query }
         assertEquals(5, list.size)
     }
 
@@ -87,7 +87,7 @@ class SqlSetOperationQueryTest(private val db: Database) {
         val q3 = SqlQuery.from(d).where { d.departmentId eq 3 }
             .select(d.departmentId alias "ID", d.departmentName alias "NAME")
         val query = (q1 union q2 union q3).orderBy("ID", desc("NAME"))
-        val list = db.execute { query }
+        val list = db.runQuery { query }
         assertEquals(3, list.size)
         assertEquals(1 to "SMITH", list[0])
         assertEquals(2 to "STREET 2", list[1])
@@ -101,7 +101,7 @@ class SqlSetOperationQueryTest(private val db: Database) {
         val q2 = SqlQuery.from(e).where { e.employeeId eq 1 }
         val q3 = SqlQuery.from(e).where { e.employeeId eq 5 }
         val query = (q1 unionAll q2 unionAll q3).orderBy(e.employeeId.desc())
-        val list = db.execute { query }
+        val list = db.runQuery { query }
         assertEquals(3, list.size)
         val e1 = list[0]
         val e2 = list[1]
@@ -118,7 +118,7 @@ class SqlSetOperationQueryTest(private val db: Database) {
         val q2 = SqlQuery.from(e)
         val query = (q1 union q2).option { it.copy(allowEmptyWhereClause = false) }
         val ex = assertThrows<IllegalStateException> {
-            db.execute { query }.let { }
+            db.runQuery { query }.let { }
         }
         assertEquals("Empty where clause is not allowed.", ex.message)
     }

@@ -7,10 +7,10 @@ import org.komapper.core.Database
 import org.komapper.core.dsl.SqlQuery
 import org.komapper.core.dsl.concat
 import org.komapper.core.dsl.div
-import org.komapper.core.dsl.execute
 import org.komapper.core.dsl.minus
 import org.komapper.core.dsl.plus
 import org.komapper.core.dsl.rem
+import org.komapper.core.dsl.runQuery
 
 @ExtendWith(Env::class)
 class ExpressionTest(private val db: Database) {
@@ -18,7 +18,7 @@ class ExpressionTest(private val db: Database) {
     @Test
     fun plus() {
         val a = Address.alias
-        val result = db.execute {
+        val result = db.runQuery {
             SqlQuery.from(a)
                 .where {
                     a.addressId eq 10
@@ -34,7 +34,7 @@ class ExpressionTest(private val db: Database) {
     @Test
     fun plus_other_column() {
         val a = Address.alias
-        val result = db.execute {
+        val result = db.runQuery {
             SqlQuery.from(a)
                 .where {
                     a.addressId eq 10
@@ -50,7 +50,7 @@ class ExpressionTest(private val db: Database) {
     @Test
     fun minus() {
         val a = Address.alias
-        val result = db.execute {
+        val result = db.runQuery {
             SqlQuery.from(a)
                 .where {
                     a.addressId eq 10
@@ -66,7 +66,7 @@ class ExpressionTest(private val db: Database) {
     @Test
     fun minus_other_column() {
         val a = Address.alias
-        val result = db.execute {
+        val result = db.runQuery {
             SqlQuery.from(a)
                 .where {
                     a.addressId eq 10
@@ -82,7 +82,7 @@ class ExpressionTest(private val db: Database) {
     @Test
     fun div() {
         val a = Address.alias
-        val result = db.execute {
+        val result = db.runQuery {
             SqlQuery.from(a)
                 .where {
                     a.addressId eq 10
@@ -98,7 +98,7 @@ class ExpressionTest(private val db: Database) {
     @Test
     fun div_other_column() {
         val a = Address.alias
-        val result = db.execute {
+        val result = db.runQuery {
             SqlQuery.from(a)
                 .where {
                     a.addressId eq 10
@@ -114,7 +114,7 @@ class ExpressionTest(private val db: Database) {
     @Test
     fun rem() {
         val a = Address.alias
-        val result = db.execute {
+        val result = db.runQuery {
             SqlQuery.from(a)
                 .where {
                     a.addressId eq 10
@@ -130,7 +130,7 @@ class ExpressionTest(private val db: Database) {
     @Test
     fun rem_other_column() {
         val a = Address.alias
-        val result = db.execute {
+        val result = db.runQuery {
             SqlQuery.from(a)
                 .where {
                     a.addressId eq 10
@@ -146,7 +146,7 @@ class ExpressionTest(private val db: Database) {
     @Test
     fun concat() {
         val a = Address.alias
-        val result = db.execute {
+        val result = db.runQuery {
             SqlQuery.from(a)
                 .where {
                     a.addressId eq 10
@@ -162,7 +162,7 @@ class ExpressionTest(private val db: Database) {
     @Test
     fun concat_other_column() {
         val a = Address.alias
-        val result = db.execute {
+        val result = db.runQuery {
             SqlQuery.from(a)
                 .where {
                     a.addressId eq 10

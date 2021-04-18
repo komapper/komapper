@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.Database
 import org.komapper.core.dsl.SchemaQuery
-import org.komapper.core.dsl.execute
+import org.komapper.core.dsl.runQuery
 
 @ExtendWith(Env::class)
 class SchemaQueryTest(private val db: Database) {
@@ -13,17 +13,17 @@ class SchemaQueryTest(private val db: Database) {
 
     @Test
     fun create() {
-        db.execute {
+        db.runQuery {
             SchemaQuery.create(metamodels)
         }
     }
 
     @Test
     fun drop() {
-        db.execute {
+        db.runQuery {
             SchemaQuery.create(metamodels)
         }
-        db.execute {
+        db.runQuery {
             SchemaQuery.drop(metamodels)
         }
     }
@@ -31,10 +31,10 @@ class SchemaQueryTest(private val db: Database) {
     @Run(onlyIf = [Dbms.H2])
     @Test
     fun dropAll() {
-        db.execute {
+        db.runQuery {
             SchemaQuery.create(metamodels)
         }
-        db.execute {
+        db.runQuery {
             SchemaQuery.dropAll()
         }
     }

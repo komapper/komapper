@@ -7,7 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.Database
 import org.komapper.core.OptimisticLockException
 import org.komapper.core.dsl.EntityQuery
-import org.komapper.core.dsl.execute
+import org.komapper.core.dsl.runQuery
 
 @ExtendWith(Env::class)
 class EntityDeleteQueryTest(private val db: Database) {
@@ -15,14 +15,14 @@ class EntityDeleteQueryTest(private val db: Database) {
     @Test
     fun optimisticLockException() {
         val a = Address.alias
-        val address = db.execute {
+        val address = db.runQuery {
             EntityQuery.first(a) {
                 a.addressId eq 15
             }
         }
-        db.execute { EntityQuery.delete(a, address) }
+        db.runQuery { EntityQuery.delete(a, address) }
         assertThrows<OptimisticLockException> {
-            db.execute { EntityQuery.delete(a, address) }
+            db.runQuery { EntityQuery.delete(a, address) }
         }
     }
 
@@ -30,8 +30,8 @@ class EntityDeleteQueryTest(private val db: Database) {
     fun testEntity() {
         val a = Address.alias
         val query = EntityQuery.from(a).where { a.addressId eq 15 }
-        val address = db.execute { query.first() }
-        db.execute { EntityQuery.delete(a, address) }
-        assertEquals(emptyList<Address>(), db.execute { query })
+        val address = db.runQuery { query.first() }
+        db.runQuery { EntityQuery.delete(a, address) }
+        assertEquals(emptyList<Address>(), db.runQuery { query })
     }
 }

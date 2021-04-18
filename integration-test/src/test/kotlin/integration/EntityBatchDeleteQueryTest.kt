@@ -8,7 +8,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.Database
 import org.komapper.core.OptimisticLockException
 import org.komapper.core.dsl.EntityQuery
-import org.komapper.core.dsl.execute
+import org.komapper.core.dsl.runQuery
 
 @ExtendWith(Env::class)
 class EntityBatchDeleteQueryTest(private val db: Database) {
@@ -22,12 +22,12 @@ class EntityBatchDeleteQueryTest(private val db: Database) {
             Address(18, "STREET 18", 0)
         )
         for (address in addressList) {
-            db.execute { EntityQuery.insert(a, address) }
+            db.runQuery { EntityQuery.insert(a, address) }
         }
         val query = EntityQuery.from(a).where { a.addressId inList listOf(16, 17, 18) }
-        assertEquals(3, db.execute { query }.size)
-        db.execute { EntityQuery.deleteBatch(a, addressList) }
-        assertTrue(db.execute { query }.isEmpty())
+        assertEquals(3, db.runQuery { query }.size)
+        db.runQuery { EntityQuery.deleteBatch(a, addressList) }
+        assertTrue(db.runQuery { query }.isEmpty())
     }
 
     @Test
@@ -39,12 +39,12 @@ class EntityBatchDeleteQueryTest(private val db: Database) {
             Address(18, "STREET 18", 0)
         )
         for (address in addressList) {
-            db.execute { EntityQuery.insert(a, address) }
+            db.runQuery { EntityQuery.insert(a, address) }
         }
         val query = EntityQuery.from(a).where { a.addressId inList listOf(16, 17, 18) }
-        assertEquals(3, db.execute { query }.size)
+        assertEquals(3, db.runQuery { query }.size)
         val ex = assertThrows<OptimisticLockException> {
-            db.execute {
+            db.runQuery {
                 EntityQuery.deleteBatch(
                     a,
                     listOf(
@@ -67,11 +67,11 @@ class EntityBatchDeleteQueryTest(private val db: Database) {
             Address(18, "STREET 18", 0)
         )
         for (address in addressList) {
-            db.execute { EntityQuery.insert(a, address) }
+            db.runQuery { EntityQuery.insert(a, address) }
         }
         val query = EntityQuery.from(a).where { a.addressId inList listOf(16, 17, 18) }
-        assertEquals(3, db.execute { query }.size)
-        db.execute {
+        assertEquals(3, db.runQuery { query }.size)
+        db.runQuery {
             EntityQuery.deleteBatch(
                 a,
                 listOf(

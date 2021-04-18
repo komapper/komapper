@@ -12,7 +12,7 @@ import org.junit.jupiter.api.extension.ParameterResolver
 import org.junit.platform.commons.support.AnnotationSupport.findAnnotation
 import org.komapper.core.Database
 import org.komapper.core.dsl.ScriptQuery
-import org.komapper.core.dsl.execute
+import org.komapper.core.dsl.runQuery
 
 internal class Env :
     BeforeAllCallback,
@@ -28,7 +28,7 @@ internal class Env :
 
     override fun beforeAll(context: ExtensionContext?) {
         db.transaction {
-            db.execute {
+            db.runQuery {
                 ScriptQuery.execute(setting.createSql)
             }
         }
@@ -44,7 +44,7 @@ internal class Env :
 
     override fun afterAll(context: ExtensionContext?) {
         db.transaction {
-            db.execute {
+            db.runQuery {
                 ScriptQuery.execute(setting.dropSql)
             }
         }

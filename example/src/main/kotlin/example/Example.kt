@@ -10,7 +10,7 @@ import org.komapper.annotation.KmVersion
 import org.komapper.core.Database
 import org.komapper.core.dsl.EntityQuery
 import org.komapper.core.dsl.SchemaQuery
-import org.komapper.core.dsl.execute
+import org.komapper.core.dsl.runQuery
 import org.komapper.jdbc.h2.H2DatabaseConfig
 import java.time.LocalDateTime
 
@@ -43,18 +43,18 @@ fun main() {
     // execute simple CRUD operations as a transaction
     db.transaction {
         // create a schema
-        db.execute {
+        db.runQuery {
             SchemaQuery.create(a)
         }
 
         // CREATE
-        val addressA = db.execute {
+        val addressA = db.runQuery {
             EntityQuery.insert(a, Address(street = "street A"))
         }
         println(addressA)
 
         // READ: select by id
-        val foundA = db.execute {
+        val foundA = db.runQuery {
             EntityQuery.first(a) {
                 a.id eq addressA.id
             }
@@ -62,13 +62,13 @@ fun main() {
         check(addressA == foundA)
 
         // UPDATE
-        val addressB = db.execute {
+        val addressB = db.runQuery {
             EntityQuery.update(a, addressA.copy(street = "street B"))
         }
         println(addressB)
 
         // READ: select by street and version
-        val foundB1 = db.execute {
+        val foundB1 = db.runQuery {
             EntityQuery.first(a) {
                 a.street eq "street B"
                 a.version eq 1
@@ -77,12 +77,12 @@ fun main() {
         check(addressB == foundB1)
 
         // DELETE
-        db.execute {
+        db.runQuery {
             EntityQuery.delete(a, addressB)
         }
 
         // READ: select all
-        val addressList = db.execute {
+        val addressList = db.runQuery {
             EntityQuery.from(a).orderBy(a.id)
         }
         check(addressList.isEmpty())

@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.Database
 import org.komapper.core.dsl.SqlQuery
-import org.komapper.core.dsl.execute
+import org.komapper.core.dsl.runQuery
 
 @ExtendWith(Env::class)
 class SqlSelectQueryTest(private val db: Database) {
@@ -15,7 +15,7 @@ class SqlSelectQueryTest(private val db: Database) {
     @Test
     fun list() {
         val a = Address.alias
-        val list: List<Address> = db.execute {
+        val list: List<Address> = db.runQuery {
             SqlQuery.from(a)
         }
         assertEquals(15, list.size)
@@ -24,7 +24,7 @@ class SqlSelectQueryTest(private val db: Database) {
     @Test
     fun first() {
         val a = Address.alias
-        val address: Address = db.execute {
+        val address: Address = db.runQuery {
             SqlQuery.from(a).where { a.addressId eq 1 }.first()
         }
         assertNotNull(address)
@@ -33,7 +33,7 @@ class SqlSelectQueryTest(private val db: Database) {
     @Test
     fun firstOrNull() {
         val a = Address.alias
-        val address: Address? = db.execute {
+        val address: Address? = db.runQuery {
             SqlQuery.from(a).where { a.addressId eq 99 }.firstOrNull()
         }
         assertNull(address)
@@ -42,7 +42,7 @@ class SqlSelectQueryTest(private val db: Database) {
     @Test
     fun collect() {
         val a = Address.alias
-        val count = db.execute {
+        val count = db.runQuery {
             SqlQuery.from(a).collect { it.count() }
         }
         assertEquals(15, count)
@@ -51,7 +51,7 @@ class SqlSelectQueryTest(private val db: Database) {
     @Test
     fun option() {
         val e = Employee.alias
-        val emp = db.execute {
+        val emp = db.runQuery {
             SqlQuery.from(e)
                 .option {
                     it.copy(
@@ -71,21 +71,21 @@ class SqlSelectQueryTest(private val db: Database) {
     @Test
     fun shortcut_first() {
         val a = Address.alias
-        val address = db.execute { SqlQuery.first(a) { a.addressId eq 1 } }
+        val address = db.runQuery { SqlQuery.first(a) { a.addressId eq 1 } }
         assertNotNull(address)
     }
 
     @Test
     fun shortcut_firstOrNull() {
         val a = Address.alias
-        val address = db.execute { SqlQuery.firstOrNull(a) { a.addressId eq -1 } }
+        val address = db.runQuery { SqlQuery.firstOrNull(a) { a.addressId eq -1 } }
         assertNull(address)
     }
 
     @Test
     fun shortcut_first_multipleCondition() {
         val a = Address.alias
-        val address = db.execute {
+        val address = db.runQuery {
             SqlQuery.first(a) { a.addressId eq 1; a.version eq 1 }
         }
         assertNotNull(address)

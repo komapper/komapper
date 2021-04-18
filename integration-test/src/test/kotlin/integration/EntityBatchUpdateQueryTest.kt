@@ -10,7 +10,7 @@ import org.komapper.core.Database
 import org.komapper.core.OptimisticLockException
 import org.komapper.core.UniqueConstraintException
 import org.komapper.core.dsl.EntityQuery
-import org.komapper.core.dsl.execute
+import org.komapper.core.dsl.runQuery
 
 @ExtendWith(Env::class)
 class EntityBatchUpdateQueryTest(private val db: Database) {
@@ -24,13 +24,13 @@ class EntityBatchUpdateQueryTest(private val db: Database) {
             Address(18, "STREET 18", 0)
         )
         for (address in addressList) {
-            db.execute { EntityQuery.insert(a, address) }
+            db.runQuery { EntityQuery.insert(a, address) }
         }
         val query = EntityQuery.from(a).where { a.addressId inList listOf(16, 17, 18) }
-        val before = db.execute { query }
+        val before = db.runQuery { query }
         val updateList = before.map { it.copy(street = "[" + it.street + "]") }
-        val results = db.execute { EntityQuery.updateBatch(a, updateList) }
-        val after = db.execute {
+        val results = db.runQuery { EntityQuery.updateBatch(a, updateList) }
+        val after = db.runQuery {
             EntityQuery.from(a).where { a.addressId inList listOf(16, 17, 18) }
         }
         assertEquals(after, results)
@@ -49,9 +49,9 @@ class EntityBatchUpdateQueryTest(private val db: Database) {
             Person(3, "C")
         )
         for (person in personList) {
-            db.execute { EntityQuery.insert(p, person) }
+            db.runQuery { EntityQuery.insert(p, person) }
         }
-        val results = db.execute { EntityQuery.updateBatch(p, personList) }
+        val results = db.runQuery { EntityQuery.updateBatch(p, personList) }
         personList.zip(results).forEach {
             assertNotEquals(it.first.updatedAt, it.second.updatedAt)
         }
@@ -61,7 +61,7 @@ class EntityBatchUpdateQueryTest(private val db: Database) {
     fun uniqueConstraintException() {
         val a = Address.alias
         assertThrows<UniqueConstraintException> {
-            db.execute {
+            db.runQuery {
                 EntityQuery.updateBatch(
                     a,
                     listOf(
@@ -78,7 +78,7 @@ class EntityBatchUpdateQueryTest(private val db: Database) {
     fun optimisticLockException() {
         val a = Address.alias
         val ex = assertThrows<OptimisticLockException> {
-            db.execute {
+            db.runQuery {
                 EntityQuery.updateBatch(
                     a,
                     listOf(

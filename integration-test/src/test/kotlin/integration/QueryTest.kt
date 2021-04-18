@@ -6,10 +6,10 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.Database
 import org.komapper.core.dsl.EntityQuery
 import org.komapper.core.dsl.SqlQuery
-import org.komapper.core.dsl.execute
 import org.komapper.core.dsl.flatMap
 import org.komapper.core.dsl.flatZip
 import org.komapper.core.dsl.plus
+import org.komapper.core.dsl.runQuery
 
 @ExtendWith(Env::class)
 class QueryTest(private val db: Database) {
@@ -25,7 +25,7 @@ class QueryTest(private val db: Database) {
             a.version set 0
         }
         val q3 = EntityQuery.from(a).where { a.addressId inList listOf(16, 17) }
-        val list = db.execute { q1 + q2 + q3 }
+        val list = db.runQuery { q1 + q2 + q3 }
         assertEquals(2, list.size)
         println((q1 + q2 + q3).dryRun())
     }
@@ -38,7 +38,7 @@ class QueryTest(private val db: Database) {
             val e = Employee.alias
             EntityQuery.from(e).where { e.addressId less it.addressId }
         }
-        val list = db.execute { query }
+        val list = db.runQuery { query }
         assertEquals(14, list.size)
     }
 
@@ -50,7 +50,7 @@ class QueryTest(private val db: Database) {
             val e = Employee.alias
             EntityQuery.from(e).where { e.addressId less it.addressId }
         }
-        val (address2, list) = db.execute { query }
+        val (address2, list) = db.runQuery { query }
         assertEquals(address, address2)
         assertEquals(14, list.size)
     }

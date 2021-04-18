@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.Database
 import org.komapper.core.dsl.SqlQuery
-import org.komapper.core.dsl.execute
+import org.komapper.core.dsl.runQuery
 
 @ExtendWith(Env::class)
 class SqlSelectQueryDistinctTest(private val db: Database) {
@@ -15,11 +15,11 @@ class SqlSelectQueryDistinctTest(private val db: Database) {
         val d = Department.alias
         val e = Employee.alias
         val query = SqlQuery.from(d).innerJoin(e) { d.departmentId eq e.departmentId }
-        val list = db.execute { query }
+        val list = db.runQuery { query }
         assertEquals(14, list.size)
 
         val query2 = query.distinct()
-        val list2 = db.execute { query2 }
+        val list2 = db.runQuery { query2 }
         assertEquals(3, list2.size)
     }
 }

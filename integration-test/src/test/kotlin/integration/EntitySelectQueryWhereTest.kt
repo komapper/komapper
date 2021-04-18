@@ -7,8 +7,8 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.Database
 import org.komapper.core.dsl.EntityQuery
 import org.komapper.core.dsl.desc
-import org.komapper.core.dsl.execute
 import org.komapper.core.dsl.plus
+import org.komapper.core.dsl.runQuery
 import org.komapper.core.dsl.scope.WhereDeclaration
 import org.komapper.core.dsl.scope.WhereScope.Companion.plus
 
@@ -18,7 +18,7 @@ class EntitySelectQueryWhereTest(private val db: Database) {
     @Test
     fun isNull() {
         val e = Employee.alias
-        val list = db.execute {
+        val list = db.runQuery {
             EntityQuery.from(e).where {
                 e.managerId.isNull()
             }
@@ -29,7 +29,7 @@ class EntitySelectQueryWhereTest(private val db: Database) {
     @Test
     fun isNotNull() {
         val e = Employee.alias
-        val list = db.execute {
+        val list = db.runQuery {
             EntityQuery.from(e).where {
                 e.managerId.isNotNull()
             }
@@ -40,7 +40,7 @@ class EntitySelectQueryWhereTest(private val db: Database) {
     @Test
     fun between() {
         val a = Address.alias
-        val idList = db.execute {
+        val idList = db.runQuery {
             EntityQuery.from(a).where {
                 a.addressId between 5..10
             }.orderBy(a.addressId)
@@ -51,7 +51,7 @@ class EntitySelectQueryWhereTest(private val db: Database) {
     @Test
     fun notBetween() {
         val a = Address.alias
-        val idList = db.execute {
+        val idList = db.runQuery {
             EntityQuery.from(a).where {
                 a.addressId notBetween 5..10
             }.orderBy(a.addressId)
@@ -63,7 +63,7 @@ class EntitySelectQueryWhereTest(private val db: Database) {
     @Test
     fun like() {
         val a = Address.alias
-        val list = db.execute {
+        val list = db.runQuery {
             EntityQuery.from(a).where {
                 a.street like "STREET 1_"
             }.orderBy(a.addressId)
@@ -74,7 +74,7 @@ class EntitySelectQueryWhereTest(private val db: Database) {
     @Test
     fun like_asPrefix() {
         val a = Address.alias
-        val list = db.execute {
+        val list = db.runQuery {
             EntityQuery.from(a).where {
                 a.street like "STREET 1".asPrefix()
             }.orderBy(a.addressId)
@@ -85,7 +85,7 @@ class EntitySelectQueryWhereTest(private val db: Database) {
     @Test
     fun like_asInfix() {
         val a = Address.alias
-        val list = db.execute {
+        val list = db.runQuery {
             EntityQuery.from(a).where {
                 a.street like "T 1".asInfix()
             }.orderBy(a.addressId)
@@ -96,7 +96,7 @@ class EntitySelectQueryWhereTest(private val db: Database) {
     @Test
     fun like_asSuffix() {
         val a = Address.alias
-        val list = db.execute {
+        val list = db.runQuery {
             EntityQuery.from(a).where {
                 a.street like "1".asSuffix()
             }.orderBy(a.addressId)
@@ -111,7 +111,7 @@ class EntitySelectQueryWhereTest(private val db: Database) {
         val selectQuery = EntityQuery.from(a).where {
             a.street like escape("\\S") + text("%") + escape("T _16%")
         }.orderBy(a.addressId)
-        val list = db.execute {
+        val list = db.runQuery {
             insertQuery + selectQuery
         }
         assertEquals(listOf(16), list.map { it.addressId })
@@ -126,7 +126,7 @@ class EntitySelectQueryWhereTest(private val db: Database) {
         }.orderBy(a.addressId).option {
             it.copy(escapeSequence = "|")
         }
-        val list = db.execute {
+        val list = db.runQuery {
             insertQuery + selectQuery
         }
         assertEquals(listOf(16), list.map { it.addressId })
@@ -135,7 +135,7 @@ class EntitySelectQueryWhereTest(private val db: Database) {
     @Test
     fun notLike() {
         val a = Address.alias
-        val list = db.execute {
+        val list = db.runQuery {
             EntityQuery.from(a).where {
                 a.street notLike "STREET 1_"
             }.orderBy(a.addressId)
@@ -146,7 +146,7 @@ class EntitySelectQueryWhereTest(private val db: Database) {
     @Test
     fun notLike_asPrefix() {
         val a = Address.alias
-        val list = db.execute {
+        val list = db.runQuery {
             EntityQuery.from(a).where {
                 a.street notLike "STREET 1".asPrefix()
             }.orderBy(a.addressId)
@@ -157,7 +157,7 @@ class EntitySelectQueryWhereTest(private val db: Database) {
     @Test
     fun notLike_asInfix() {
         val a = Address.alias
-        val list = db.execute {
+        val list = db.runQuery {
             EntityQuery.from(a).where {
                 a.street notLike "T 1".asInfix()
             }.orderBy(a.addressId)
@@ -168,7 +168,7 @@ class EntitySelectQueryWhereTest(private val db: Database) {
     @Test
     fun notLike_asSuffix() {
         val a = Address.alias
-        val list = db.execute {
+        val list = db.runQuery {
             EntityQuery.from(a).where {
                 a.street notLike "1".asSuffix()
             }.orderBy(a.addressId)
@@ -183,7 +183,7 @@ class EntitySelectQueryWhereTest(private val db: Database) {
         val selectQuery = EntityQuery.from(a).where {
             a.street notLike escape("\\S") + text("%") + escape("T _16%")
         }.orderBy(a.addressId)
-        val list = db.execute {
+        val list = db.runQuery {
             insertQuery + selectQuery
         }
         assertEquals((1..15).toList(), list.map { it.addressId })
@@ -192,7 +192,7 @@ class EntitySelectQueryWhereTest(private val db: Database) {
     @Test
     fun startsWith() {
         val a = Address.alias
-        val list = db.execute {
+        val list = db.runQuery {
             EntityQuery.from(a).where {
                 a.street startsWith "STREET 1"
             }.orderBy(a.addressId)
@@ -207,14 +207,14 @@ class EntitySelectQueryWhereTest(private val db: Database) {
         val selectQuery = EntityQuery.from(a).where {
             a.street startsWith "STREET 1%"
         }.orderBy(a.addressId)
-        val list = db.execute { insertQuery + selectQuery }
+        val list = db.runQuery { insertQuery + selectQuery }
         assertEquals(listOf(16), list.map { it.addressId })
     }
 
     @Test
     fun notStartsWith() {
         val a = Address.alias
-        val list = db.execute {
+        val list = db.runQuery {
             EntityQuery.from(a).where {
                 a.street notStartsWith "STREET 1"
             }.orderBy(a.addressId)
@@ -225,7 +225,7 @@ class EntitySelectQueryWhereTest(private val db: Database) {
     @Test
     fun contains() {
         val a = Address.alias
-        val list = db.execute {
+        val list = db.runQuery {
             EntityQuery.from(a).where {
                 a.street contains "T 1"
             }.orderBy(a.addressId)
@@ -236,7 +236,7 @@ class EntitySelectQueryWhereTest(private val db: Database) {
     @Test
     fun notContains() {
         val a = Address.alias
-        val list = db.execute {
+        val list = db.runQuery {
             EntityQuery.from(a).where {
                 a.street notContains "T 1"
             }.orderBy(a.addressId)
@@ -247,7 +247,7 @@ class EntitySelectQueryWhereTest(private val db: Database) {
     @Test
     fun endsWith() {
         val a = Address.alias
-        val list = db.execute {
+        val list = db.runQuery {
             EntityQuery.from(a).where {
                 a.street endsWith "1"
             }.orderBy(a.addressId)
@@ -258,7 +258,7 @@ class EntitySelectQueryWhereTest(private val db: Database) {
     @Test
     fun notEndsWith() {
         val a = Address.alias
-        val list = db.execute {
+        val list = db.runQuery {
             EntityQuery.from(a).where {
                 a.street notEndsWith "1"
             }.orderBy(a.addressId)
@@ -269,7 +269,7 @@ class EntitySelectQueryWhereTest(private val db: Database) {
     @Test
     fun inList() {
         val a = Address.alias
-        val list = db.execute {
+        val list = db.runQuery {
             EntityQuery.from(a).where {
                 a.addressId inList listOf(9, 10)
             }.orderBy(a.addressId.desc())
@@ -286,7 +286,7 @@ class EntitySelectQueryWhereTest(private val db: Database) {
     @Test
     fun notInList() {
         val a = Address.alias
-        val list = db.execute {
+        val list = db.runQuery {
             EntityQuery.from(a).where {
                 a.addressId notInList (1..9).toList()
             }.orderBy(a.addressId)
@@ -297,7 +297,7 @@ class EntitySelectQueryWhereTest(private val db: Database) {
     @Test
     fun inList_empty() {
         val a = Address.alias
-        val list = db.execute {
+        val list = db.runQuery {
             EntityQuery.from(a).where {
                 a.addressId inList emptyList()
             }.orderBy(a.addressId.desc())
@@ -319,7 +319,7 @@ class EntitySelectQueryWhereTest(private val db: Database) {
                         }.asSqlQuery().select(a.addressId)
                 }
             }
-        val list = db.execute { query }
+        val list = db.runQuery { query }
         assertEquals(5, list.size)
     }
 
@@ -336,14 +336,14 @@ class EntitySelectQueryWhereTest(private val db: Database) {
                     }.asSqlQuery().select(a.addressId)
                 }
             }
-        val list = db.execute { query }
+        val list = db.runQuery { query }
         assertEquals(9, list.size)
     }
 
     @Test
     fun inList2() {
         val a = Address.alias
-        val list = db.execute {
+        val list = db.runQuery {
             EntityQuery.from(a).where {
                 a.addressId to a.version inList2 listOf(9 to 1, 10 to 1)
             }.orderBy(a.addressId.desc())
@@ -364,7 +364,7 @@ class EntitySelectQueryWhereTest(private val db: Database) {
             while (++i < 10) yield(i to 1)
         }
         val a = Address.alias
-        val list = db.execute {
+        val list = db.runQuery {
             EntityQuery.from(a).where {
                 a.addressId to a.version notInList2 seq.toList()
             }.orderBy(a.addressId)
@@ -386,7 +386,7 @@ class EntitySelectQueryWhereTest(private val db: Database) {
                         }.asSqlQuery().select(a.addressId, a.version)
                 }
             }
-        val list = db.execute { query }
+        val list = db.runQuery { query }
         assertEquals(5, list.size)
     }
 
@@ -403,7 +403,7 @@ class EntitySelectQueryWhereTest(private val db: Database) {
                     }.asSqlQuery().select(a.addressId, a.version)
                 }
             }
-        val list = db.execute { query }
+        val list = db.runQuery { query }
         assertEquals(9, list.size)
     }
 
@@ -420,7 +420,7 @@ class EntitySelectQueryWhereTest(private val db: Database) {
                     }
                 }
             }
-        val list = db.execute { query }
+        val list = db.runQuery { query }
         assertEquals(5, list.size)
     }
 
@@ -437,14 +437,14 @@ class EntitySelectQueryWhereTest(private val db: Database) {
                     }
                 }
             }
-        val list = db.execute { query }
+        val list = db.runQuery { query }
         assertEquals(9, list.size)
     }
 
     @Test
     fun not() {
         val a = Address.alias
-        val idList = db.execute {
+        val idList = db.runQuery {
             EntityQuery.from(a).where {
                 a.addressId greater 5
                 not {
@@ -458,7 +458,7 @@ class EntitySelectQueryWhereTest(private val db: Database) {
     @Test
     fun and() {
         val a = Address.alias
-        val list = db.execute {
+        val list = db.runQuery {
             EntityQuery.from(a).where {
                 a.addressId greater 1
                 and {
@@ -480,7 +480,7 @@ class EntitySelectQueryWhereTest(private val db: Database) {
     @Test
     fun or() {
         val a = Address.alias
-        val list = db.execute {
+        val list = db.runQuery {
             EntityQuery.from(a).where {
                 a.addressId greaterEq 1
                 or {
@@ -508,7 +508,7 @@ class EntitySelectQueryWhereTest(private val db: Database) {
         val w2: WhereDeclaration = {
             a.version eq 1
         }
-        val list = db.execute { EntityQuery.from(a).where(w1 + w2) }
+        val list = db.runQuery { EntityQuery.from(a).where(w1 + w2) }
         assertEquals(1, list.size)
     }
 }

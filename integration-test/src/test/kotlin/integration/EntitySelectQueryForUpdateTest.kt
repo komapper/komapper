@@ -6,8 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.Database
 import org.komapper.core.dsl.EntityQuery
 import org.komapper.core.dsl.desc
-import org.komapper.core.dsl.execute
-import org.komapper.core.dsl.scope.WhereScope.Companion.plus
+import org.komapper.core.dsl.runQuery
 
 @ExtendWith(Env::class)
 class EntitySelectQueryForUpdateTest(private val db: Database) {
@@ -15,7 +14,7 @@ class EntitySelectQueryForUpdateTest(private val db: Database) {
     @Test
     fun forUpdate() {
         val a = Address.alias
-        val list = db.execute {
+        val list = db.runQuery {
             EntityQuery.from(a).where { a.addressId greaterEq 1 }
                 .orderBy(a.addressId.desc())
                 .limit(2)
