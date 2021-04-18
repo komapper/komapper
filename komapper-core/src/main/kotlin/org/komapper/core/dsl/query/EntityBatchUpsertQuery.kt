@@ -4,7 +4,6 @@ import org.komapper.core.DatabaseConfig
 import org.komapper.core.data.Statement
 import org.komapper.core.dsl.context.EntityUpsertContext
 import org.komapper.core.dsl.metamodel.PropertyMetamodel
-import org.komapper.core.dsl.option.BatchOption
 
 interface EntityBatchUpsertQuery<ENTITY : Any> : Query<Pair<IntArray, LongArray>> {
     fun set(vararg propertyMetamodels: PropertyMetamodel<ENTITY, *>): Query<Pair<IntArray, LongArray>>
@@ -13,10 +12,10 @@ interface EntityBatchUpsertQuery<ENTITY : Any> : Query<Pair<IntArray, LongArray>
 internal data class EntityBatchUpsertQueryImpl<ENTITY : Any>(
     private val context: EntityUpsertContext<ENTITY>,
     private val entities: List<ENTITY>,
-    private val option: BatchOption
+    private val insertSupport: EntityInsertQuerySupport<ENTITY>
 ) : EntityBatchUpsertQuery<ENTITY> {
 
-    private val support: EntityUpsertQuerySupport<ENTITY> = EntityUpsertQuerySupport(context, option)
+    private val support: EntityUpsertQuerySupport<ENTITY> = EntityUpsertQuerySupport(context, insertSupport)
 
     override fun set(vararg propertyMetamodels: PropertyMetamodel<ENTITY, *>): Query<Pair<IntArray, LongArray>> {
         val newContext = support.set(propertyMetamodels.toList())

@@ -32,15 +32,13 @@ class MySqlEntityUpsertStatementBuilder<ENTITY : Any>(
         buf.append(" into ")
         table(context.entityMetamodel)
         buf.append(" ( ")
-        for (p in properties) {
-            if (p.idAssignment is Assignment.Identity<ENTITY, *>) continue
+        for (p in properties.filter { it.idAssignment !is Assignment.Identity<ENTITY, *> }) {
             column(p)
             buf.append(", ")
         }
         buf.cutBack(2)
         buf.append(") values (")
-        for (p in properties) {
-            if (p.idAssignment is Assignment.Identity<ENTITY, *>) continue
+        for (p in properties.filter { it.idAssignment !is Assignment.Identity<ENTITY, *> }) {
             val value = Value(p.getter(entity), p.klass)
             buf.bind(value)
             buf.append(", ")

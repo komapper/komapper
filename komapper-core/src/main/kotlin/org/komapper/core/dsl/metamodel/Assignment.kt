@@ -30,9 +30,12 @@ sealed class Assignment<E> {
 
         private val contextMap = ConcurrentHashMap<String, GenerationContext>()
 
-        fun assign(entity: E, key: String, sequenceNextValue: () -> Long): E {
+        fun assign(entity: E, key: String, enquote: (String) -> String, sequenceNextValue: (String) -> Long): E {
             val context = contextMap.computeIfAbsent(key) {
-                GenerationContext(incrementBy, sequenceNextValue)
+                val sequenceName = getCanonicalSequenceName(enquote)
+                GenerationContext(incrementBy) {
+                    sequenceNextValue(sequenceName)
+                }
             }
             val value = context.next().convert(klass)
             return setter(entity, value)
