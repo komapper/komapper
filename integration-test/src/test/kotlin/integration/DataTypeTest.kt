@@ -1,6 +1,7 @@
 package integration
 
 import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.Database
@@ -29,7 +30,7 @@ class DataTypeTest(val db: Database) {
         val data2 = db.execute {
             EntityQuery.first(m) { m.id eq 1 }
         }
-        Assertions.assertEquals(data, data2)
+        assertEquals(data, data2)
     }
 
     @Test
@@ -40,7 +41,7 @@ class DataTypeTest(val db: Database) {
         val data2 = db.execute {
             EntityQuery.first(m) { m.id eq 1 }
         }
-        Assertions.assertEquals(data, data2)
+        assertEquals(data, data2)
     }
 
     @Test
@@ -51,7 +52,7 @@ class DataTypeTest(val db: Database) {
         val data2 = db.execute {
             EntityQuery.first(m) { m.id eq 1 }
         }
-        Assertions.assertEquals(data, data2)
+        assertEquals(data, data2)
     }
 
     @Test
@@ -62,7 +63,7 @@ class DataTypeTest(val db: Database) {
         val data2 = db.execute {
             EntityQuery.first(m) { m.id eq 1 }
         }
-        Assertions.assertEquals(data, data2)
+        assertEquals(data, data2)
     }
 
     @Test
@@ -73,7 +74,7 @@ class DataTypeTest(val db: Database) {
         val data2 = db.execute {
             EntityQuery.first(m) { m.id eq 1 }
         }
-        Assertions.assertEquals(data, data2)
+        assertEquals(data, data2)
     }
 
     @Test
@@ -84,7 +85,7 @@ class DataTypeTest(val db: Database) {
         val data2 = db.execute {
             EntityQuery.first(m) { m.id eq 1 }
         }
-        Assertions.assertEquals(data.id, data2.id)
+        assertEquals(data.id, data2.id)
         Assertions.assertArrayEquals(data.value, data2.value)
     }
 
@@ -96,7 +97,7 @@ class DataTypeTest(val db: Database) {
         val data2 = db.execute {
             EntityQuery.first(m) { m.id eq 1 }
         }
-        Assertions.assertEquals(data, data2)
+        assertEquals(data, data2)
     }
 
     @Test
@@ -107,7 +108,7 @@ class DataTypeTest(val db: Database) {
         val data2 = db.execute {
             EntityQuery.first(m) { m.id eq 1 }
         }
-        Assertions.assertEquals(data, data2)
+        assertEquals(data, data2)
     }
 
     @Test
@@ -118,7 +119,7 @@ class DataTypeTest(val db: Database) {
         val data2 = db.execute {
             EntityQuery.first(m) { m.id eq 1 }
         }
-        Assertions.assertEquals(data, data2)
+        assertEquals(data, data2)
     }
 
     @Test
@@ -132,7 +133,7 @@ class DataTypeTest(val db: Database) {
         val data2 = db.execute {
             EntityQuery.first(m) { m.id eq 1 }
         }
-        Assertions.assertEquals(data, data2)
+        assertEquals(data, data2)
     }
 
     @Test
@@ -146,7 +147,7 @@ class DataTypeTest(val db: Database) {
         val data2 = db.execute {
             EntityQuery.first(m) { m.id eq 1 }
         }
-        Assertions.assertEquals(data, data2)
+        assertEquals(data, data2)
     }
 
     @Test
@@ -157,7 +158,7 @@ class DataTypeTest(val db: Database) {
         val data2 = db.execute {
             EntityQuery.first(m) { m.id eq 1 }
         }
-        Assertions.assertEquals(data, data2)
+        assertEquals(data, data2)
     }
 
     @Test
@@ -168,10 +169,9 @@ class DataTypeTest(val db: Database) {
         val data2 = db.execute {
             EntityQuery.first(m) { m.id eq 1 }
         }
-        Assertions.assertEquals(data, data2)
+        assertEquals(data, data2)
     }
 
-    // TODO
     @Run(unless = [Dbms.POSTGRESQL])
     @Test
     fun offsetDateTime() {
@@ -184,7 +184,24 @@ class DataTypeTest(val db: Database) {
         val data2 = db.execute {
             EntityQuery.first(m) { m.id eq 1 }
         }
-        Assertions.assertEquals(data, data2)
+        assertEquals(data, data2)
+    }
+
+    @Run(onlyIf = [Dbms.POSTGRESQL])
+    @Test
+    fun offsetDateTime_postgreSql() {
+        val m = OffsetDateTimeTest.alias
+        val dateTime = LocalDateTime.of(2019, 6, 1, 12, 11, 10)
+        val offset = ZoneOffset.ofHours(9)
+        val value = OffsetDateTime.of(dateTime, offset)
+        val data = OffsetDateTimeTest(1, value)
+        db.execute { EntityQuery.insert(m, data) }
+        val data2 = db.execute {
+            EntityQuery.first(m) { m.id eq 1 }
+        }
+        // https://www.postgresql.org/docs/11/datatype-datetime.html
+        val expected = dateTime.minusHours(9).atOffset(ZoneOffset.UTC)
+        assertEquals(expected, data2.value)
     }
 
     @Test
@@ -195,7 +212,7 @@ class DataTypeTest(val db: Database) {
         val data2 = db.execute {
             EntityQuery.first(m) { m.id eq 1 }
         }
-        Assertions.assertEquals(data, data2)
+        assertEquals(data, data2)
     }
 
     @Test
@@ -206,6 +223,6 @@ class DataTypeTest(val db: Database) {
         val data2 = db.execute {
             EntityQuery.first(m) { m.id eq 1 }
         }
-        Assertions.assertEquals(data, data2)
+        assertEquals(data, data2)
     }
 }
