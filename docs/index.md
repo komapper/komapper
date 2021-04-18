@@ -4,7 +4,9 @@ Komapper is a simple database access library for Kotlin.
 
 Supported databases are as follows:
 
-- H2 1.4.200 or above
+- PostgreSQL 11 and higher
+- MySQL 8.0 and higher
+- H2 1.4.200 and higher
 
 ## Strengths
 
@@ -21,9 +23,9 @@ In Development
 ### Criteria Query
 
 ```kotlin
-// metamodels
-val e = Employee_()
-val d = Department_()
+// get generated metamodels
+val e = Employee.alias
+val d = Department.alias
 
 // execute query
 val list = db.execute {
