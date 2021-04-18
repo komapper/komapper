@@ -9,6 +9,7 @@ import org.komapper.core.Database
 import org.komapper.core.UniqueConstraintException
 import org.komapper.core.dsl.EntityQuery
 import org.komapper.core.dsl.execute
+import org.komapper.jdbc.mysql.MySqlDialect
 
 @ExtendWith(Env::class)
 class EntityBatchInsertQueryTest(private val db: Database) {
@@ -85,9 +86,13 @@ class EntityBatchInsertQueryTest(private val db: Database) {
         val query = EntityQuery.insertBatch(d, listOf(department1, department2)).onDuplicateKeyUpdate()
         val (counts, keys) = db.execute { query }
         assertEquals(2, counts.size)
-// TODO
-//        assertEquals(1, counts[0])
-//        assertEquals(1, counts[1])
+        if (db.config.dialect is MySqlDialect) {
+            assertEquals(1, counts[0])
+            assertEquals(2, counts[1])
+        } else {
+            assertEquals(1, counts[0])
+            assertEquals(1, counts[1])
+        }
         assertEquals(2, keys.size)
         assertEquals(0, keys[0])
         assertEquals(0, keys[1])
@@ -107,12 +112,17 @@ class EntityBatchInsertQueryTest(private val db: Database) {
         val d = Department.alias
         val department1 = Department(5, 50, "PLANNING", "TOKYO", 1)
         val department2 = Department(1, 60, "DEVELOPMENT", "KYOTO", 1)
-        val query = EntityQuery.insertBatch(d, listOf(department1, department2)).onDuplicateKeyUpdate().set(d.departmentName)
+        val query =
+            EntityQuery.insertBatch(d, listOf(department1, department2)).onDuplicateKeyUpdate().set(d.departmentName)
         val (counts, keys) = db.execute { query }
         assertEquals(2, counts.size)
-// TODO
-//        assertEquals(1, counts[0])
-//        assertEquals(1, counts[1])
+        if (db.config.dialect is MySqlDialect) {
+            assertEquals(1, counts[0])
+            assertEquals(2, counts[1])
+        } else {
+            assertEquals(1, counts[0])
+            assertEquals(1, counts[1])
+        }
         assertEquals(2, keys.size)
         assertEquals(0, keys[0])
         assertEquals(0, keys[1])

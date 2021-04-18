@@ -12,6 +12,7 @@ import org.komapper.core.DatabaseConfig
 import org.komapper.core.UniqueConstraintException
 import org.komapper.core.dsl.EntityQuery
 import org.komapper.core.dsl.execute
+import org.komapper.jdbc.mysql.MySqlDialect
 import java.time.Clock
 import java.time.Instant
 import java.time.LocalDateTime
@@ -141,8 +142,11 @@ class EntityInsertQueryTest(private val db: Database) {
         val department = Department(1, 50, "PLANNING", "TOKYO", 10)
         val query = EntityQuery.insert(d, department).onDuplicateKeyUpdate()
         val (count, key) = db.execute { query }
-        // TODO
-        // assertEquals(1, count)
+        if (db.config.dialect is MySqlDialect) {
+            assertEquals(2, count)
+        } else {
+            assertEquals(1, count)
+        }
         assertNull(key)
         val found = db.execute { EntityQuery.first(d) { d.departmentId eq 1 } }
         assertEquals(50, found.departmentNo)
@@ -157,8 +161,11 @@ class EntityInsertQueryTest(private val db: Database) {
         val department = Department(1, 50, "PLANNING", "TOKYO", 10)
         val query = EntityQuery.insert(d, department).onDuplicateKeyUpdate().set(d.departmentName, d.location)
         val (count, key) = db.execute { query }
-        // TODO
-//        assertEquals(1, count)
+        if (db.config.dialect is MySqlDialect) {
+            assertEquals(2, count)
+        } else {
+            assertEquals(1, count)
+        }
         assertNull(key)
         val found = db.execute { EntityQuery.first(d) { d.departmentId eq 1 } }
         assertEquals(10, found.departmentNo)
@@ -176,8 +183,11 @@ class EntityInsertQueryTest(private val db: Database) {
             d.location set "TOKYO2"
         }
         val (count, key) = db.execute { query }
-        // TODO
-//        assertEquals(1, count)
+        if (db.config.dialect is MySqlDialect) {
+            assertEquals(2, count)
+        } else {
+            assertEquals(1, count)
+        }
         assertNull(key)
         val found = db.execute { EntityQuery.first(d) { d.departmentId eq 1 } }
         assertEquals(10, found.departmentNo)
