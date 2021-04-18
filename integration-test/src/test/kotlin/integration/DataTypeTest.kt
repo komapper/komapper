@@ -2,6 +2,7 @@ package integration
 
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.Database
@@ -172,7 +173,7 @@ class DataTypeTest(val db: Database) {
         assertEquals(data, data2)
     }
 
-    @Run(unless = [Dbms.POSTGRESQL])
+    @Run(onlyIf = [Dbms.H2])
     @Test
     fun offsetDateTime() {
         val m = OffsetDateTimeTest.alias
@@ -187,9 +188,9 @@ class DataTypeTest(val db: Database) {
         assertEquals(data, data2)
     }
 
-    @Run(onlyIf = [Dbms.POSTGRESQL])
+    @Run(unless = [Dbms.H2])
     @Test
-    fun offsetDateTime_postgreSql() {
+    fun offsetDateTime_unlessH2() {
         val m = OffsetDateTimeTest.alias
         val dateTime = LocalDateTime.of(2019, 6, 1, 12, 11, 10)
         val offset = ZoneOffset.ofHours(9)
@@ -199,9 +200,7 @@ class DataTypeTest(val db: Database) {
         val data2 = db.execute {
             EntityQuery.first(m) { m.id eq 1 }
         }
-        // https://www.postgresql.org/docs/11/datatype-datetime.html
-        val expected = dateTime.minusHours(9).atOffset(ZoneOffset.UTC)
-        assertEquals(expected, data2.value)
+        assertNotNull(data2)
     }
 
     @Test
