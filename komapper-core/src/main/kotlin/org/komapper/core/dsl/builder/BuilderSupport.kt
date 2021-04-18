@@ -26,7 +26,7 @@ class BuilderSupport(
     fun visitEntityExpression(expression: EntityExpression<*>) {
         val name = expression.getCanonicalTableName(dialect::enquote)
         val alias = aliasManager.getAlias(expression) ?: error("Alias is not found. table=$name ,sql=$buf")
-        if (alias.isEmpty()) {
+        if (alias.isBlank()) {
             buf.append(name)
         } else {
             buf.append("$name $alias")

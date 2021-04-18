@@ -24,7 +24,6 @@ class MySqlEntityUpsertStatementBuilder<ENTITY : Any>(
     private val support = BuilderSupport(dialect, EmptyAliasManager, buf)
 
     override fun build(): Statement {
-        val idProperties = context.entityMetamodel.idProperties()
         val properties = context.entityMetamodel.properties()
         buf.append("insert")
         if (context.duplicateKeyType == DuplicateKeyType.IGNORE) {

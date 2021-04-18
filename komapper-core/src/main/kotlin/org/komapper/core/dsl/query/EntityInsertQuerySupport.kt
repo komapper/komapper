@@ -36,7 +36,8 @@ internal class EntityInsertQuerySupport<ENTITY : Any>(
     }
 
     fun <T> insert(config: DatabaseConfig, execute: (JdbcExecutor) -> T): T {
-        val executor = JdbcExecutor(config, option.asJdbcOption(), context.entityMetamodel.idAssignment())
+        val generatedKeysRequired = context.entityMetamodel.idAssignment() is Assignment.Identity<*, *>
+        val executor = JdbcExecutor(config, option.asJdbcOption(), generatedKeysRequired)
         return execute(executor)
     }
 
