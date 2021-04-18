@@ -55,7 +55,12 @@ class StatementBuffer(
         return this
     }
 
-    fun toStatement() = Statement(sql.toString(), values, log.toString())
+    fun toStatement(): Statement {
+        if (sql.isEmpty() && values.isEmpty() && log.isEmpty()) {
+            return Statement.EMPTY
+        }
+        return Statement(sql.toString(), values, log.toString())
+    }
 
     override fun toString() = sql.toString()
 }

@@ -2,6 +2,7 @@ package org.komapper.jdbc.mysql
 
 import org.komapper.core.AbstractDialect
 import org.komapper.core.dsl.builder.EntityUpsertStatementBuilder
+import org.komapper.core.dsl.builder.OffsetLimitStatementBuilder
 import org.komapper.core.dsl.builder.SchemaStatementBuilder
 import org.komapper.core.dsl.context.EntityUpsertContext
 import org.komapper.core.jdbc.ArrayType
@@ -59,24 +60,6 @@ open class MySqlDialect(val version: Version = Version.V8_0) : AbstractDialect()
         throw UnsupportedOperationException()
     }
 
-    override fun getOffsetLimitSql(offset: Int, limit: Int): String {
-        if (offset < 0 && limit < 0) {
-            return ""
-        }
-        val buf = StringBuilder(50)
-        buf.append(" limit ")
-        if (offset >= 0) {
-            buf.append(offset)
-            buf.append(", ")
-        }
-        if (limit > 0) {
-            buf.append(limit)
-        } else {
-            buf.append(Long.MAX_VALUE)
-        }
-        return buf.toString()
-    }
-
     @Suppress("UNCHECKED_CAST")
     override fun getDataType(type: KClass<*>): Pair<DataType<*>, String> = when (type) {
         java.sql.Array::class -> ArrayType to "varbinary(500)"
@@ -102,6 +85,10 @@ open class MySqlDialect(val version: Version = Version.V8_0) : AbstractDialect()
         else -> error(
             "The dataType is not found for the type \"${type.qualifiedName}\"."
         )
+    }
+
+    override fun getOffsetLimitStatementBuilder(offset: Int, limit: Int): OffsetLimitStatementBuilder {
+        return MySqlOffsetLimitStatementBuilder(this, offset, limit)
     }
 
     override fun getSchemaStatementBuilder(): SchemaStatementBuilder {

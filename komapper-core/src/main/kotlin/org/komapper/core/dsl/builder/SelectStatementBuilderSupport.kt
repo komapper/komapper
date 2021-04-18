@@ -70,9 +70,9 @@ internal class SelectStatementBuilderSupport(
     }
 
     fun offsetLimitClause() {
-        // TODO use place holder
-        val sql = dialect.getOffsetLimitSql(context.offset, context.limit)
-        buf.append(sql)
+        val builder = dialect.getOffsetLimitStatementBuilder(context.offset, context.limit)
+        val statement = builder.build()
+        buf.append(statement)
     }
 
     fun forUpdateClause() {

@@ -4,6 +4,8 @@ import org.komapper.core.dsl.builder.DryRunSchemaStatementBuilder
 import org.komapper.core.dsl.builder.EntityMultiInsertStatementBuilder
 import org.komapper.core.dsl.builder.EntityMultiInsertStatementBuilderImpl
 import org.komapper.core.dsl.builder.EntityUpsertStatementBuilder
+import org.komapper.core.dsl.builder.OffsetLimitStatementBuilder
+import org.komapper.core.dsl.builder.OffsetLimitStatementBuilderImpl
 import org.komapper.core.dsl.builder.SchemaStatementBuilder
 import org.komapper.core.dsl.context.EntityInsertContext
 import org.komapper.core.dsl.context.EntityUpsertContext
@@ -26,10 +28,13 @@ interface Dialect {
     fun formatValue(value: Any?, valueClass: KClass<*>): String
     fun isUniqueConstraintViolation(exception: SQLException): Boolean
     fun getSequenceSql(sequenceName: String): String
-    fun getOffsetLimitSql(offset: Int, limit: Int): String
     fun enquote(name: String): String
     fun escape(text: String, escapeSequence: String? = null): String
+
+    fun getOffsetLimitStatementBuilder(offset: Int, limit: Int): OffsetLimitStatementBuilder
+
     fun getSchemaStatementBuilder(): SchemaStatementBuilder
+
     fun <ENTITY : Any> getEntityUpsertStatementBuilder(
         context: EntityUpsertContext<ENTITY>,
         entity: ENTITY
@@ -78,21 +83,6 @@ abstract class AbstractDialect : Dialect {
     protected fun getCause(exception: SQLException): SQLException =
         exception.filterIsInstance(SQLException::class.java).first()
 
-    override fun getOffsetLimitSql(offset: Int, limit: Int): String {
-        val buf = StringBuilder(50)
-        if (offset >= 0) {
-            buf.append(" offset ")
-            buf.append(offset)
-            buf.append(" rows")
-        }
-        if (limit > 0) {
-            buf.append(" fetch first ")
-            buf.append(limit)
-            buf.append(" rows only")
-        }
-        return buf.toString()
-    }
-
     override fun enquote(name: String): String {
         return openQuote + name + closeQuote
     }
@@ -107,6 +97,10 @@ abstract class AbstractDialect : Dialect {
     protected open fun createEscapePattern(escapeSequence: String): Pattern {
         val targetChars = "[${Regex.escape("$escapeSequence%_")}]"
         return Pattern.compile(targetChars)
+    }
+
+    override fun getOffsetLimitStatementBuilder(offset: Int, limit: Int): OffsetLimitStatementBuilder {
+        return OffsetLimitStatementBuilderImpl(this, offset, limit)
     }
 }
 
