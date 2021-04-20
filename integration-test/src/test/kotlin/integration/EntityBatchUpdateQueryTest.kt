@@ -1,6 +1,7 @@
 package integration
 
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertNotEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
@@ -90,5 +91,49 @@ class EntityBatchUpdateQueryTest(private val db: Database) {
             }.let { }
         }
         assertEquals("index=2, count=0", ex.message)
+    }
+
+    @Test
+    fun include() {
+        val d = Department.alias
+        val selectQuery = EntityQuery.from(d).where { d.departmentId inList listOf(1, 2) }
+        val before = db.runQuery { selectQuery }
+        val updateList = before.map {
+            it.copy(
+                departmentName = "[" + it.departmentName + "]",
+                location = "[" + it.location + "]"
+            )
+        }
+        db.runQuery { EntityQuery.updateBatch(d, updateList).include(d.departmentName) }
+        val after = db.runQuery { selectQuery }
+        for ((b, a) in before.zip(after)) {
+            assertTrue(b.version < a.version)
+            assertTrue(a.departmentName.startsWith("["))
+            assertTrue(a.departmentName.endsWith("]"))
+            assertFalse(a.location.startsWith("["))
+            assertFalse(a.location.endsWith("]"))
+        }
+    }
+
+    @Test
+    fun exclude() {
+        val d = Department.alias
+        val selectQuery = EntityQuery.from(d).where { d.departmentId inList listOf(1, 2) }
+        val before = db.runQuery { selectQuery }
+        val updateList = before.map {
+            it.copy(
+                departmentName = "[" + it.departmentName + "]",
+                location = "[" + it.location + "]"
+            )
+        }
+        db.runQuery { EntityQuery.updateBatch(d, updateList).exclude(d.location, d.version) }
+        val after = db.runQuery { selectQuery }
+        for ((b, a) in before.zip(after)) {
+            assertTrue(b.version < a.version)
+            assertTrue(a.departmentName.startsWith("["))
+            assertTrue(a.departmentName.endsWith("]"))
+            assertFalse(a.location.startsWith("["))
+            assertFalse(a.location.endsWith("]"))
+        }
     }
 }

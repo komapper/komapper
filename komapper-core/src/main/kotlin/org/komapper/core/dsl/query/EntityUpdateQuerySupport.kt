@@ -6,12 +6,21 @@ import org.komapper.core.data.Statement
 import org.komapper.core.dsl.builder.EntityUpdateStatementBuilder
 import org.komapper.core.dsl.context.EntityUpdateContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
+import org.komapper.core.dsl.metamodel.PropertyMetamodel
 import org.komapper.core.dsl.option.VersionOption
 
 internal class EntityUpdateQuerySupport<ENTITY : Any, META : EntityMetamodel<ENTITY, META>>(
     private val context: EntityUpdateContext<ENTITY, META>,
     private val option: VersionOption
 ) {
+
+    fun include(propertyMetamodels: List<PropertyMetamodel<ENTITY, *>>): EntityUpdateContext<ENTITY, META> {
+        return context.copy(includedProperties = propertyMetamodels)
+    }
+
+    fun exclude(propertyMetamodels: List<PropertyMetamodel<ENTITY, *>>): EntityUpdateContext<ENTITY, META> {
+        return context.copy(excludedProperties = propertyMetamodels)
+    }
 
     fun preUpdate(config: DatabaseConfig, entity: ENTITY): ENTITY {
         val clock = config.clockProvider.now()

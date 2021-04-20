@@ -21,14 +21,13 @@ internal class EntityUpdateStatementBuilder<ENTITY : Any, META : EntityMetamodel
     private val support = BuilderSupport(dialect, aliasManager, buf)
 
     fun build(): Statement {
-        val idProperties = context.target.idProperties()
-        val versionProperty = context.target.versionProperty()
-        val createdAtProperty = context.target.createdAtProperty()
-        val properties = context.target.properties()
+        val target = context.target
+        val idProperties = target.idProperties()
+        val versionProperty = target.versionProperty()
         buf.append("update ")
         table(context.target)
         buf.append(" set ")
-        for (p in (properties - idProperties).filter { it != createdAtProperty }) {
+        for (p in context.getTargetProperties()) {
             column(p)
             buf.append(" = ")
             val value = Value(p.getter(entity), p.klass)

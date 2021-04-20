@@ -4,11 +4,14 @@ import org.komapper.core.DatabaseConfig
 import org.komapper.core.data.Statement
 import org.komapper.core.dsl.context.EntityUpdateContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
+import org.komapper.core.dsl.metamodel.PropertyMetamodel
 import org.komapper.core.dsl.option.EntityUpdateOption
 import org.komapper.core.dsl.option.QueryOptionConfigurator
 
 interface EntityUpdateQuery<ENTITY : Any> : Query<ENTITY> {
     fun option(configurator: QueryOptionConfigurator<EntityUpdateOption>): EntityUpdateQuery<ENTITY>
+    fun include(vararg propertyMetamodels: PropertyMetamodel<ENTITY, *>): Query<ENTITY?>
+    fun exclude(vararg propertyMetamodels: PropertyMetamodel<ENTITY, *>): Query<ENTITY?>
 }
 
 internal data class EntityUpdateQueryImpl<ENTITY : Any, META : EntityMetamodel<ENTITY, META>>(
@@ -22,6 +25,32 @@ internal data class EntityUpdateQueryImpl<ENTITY : Any, META : EntityMetamodel<E
 
     override fun option(configurator: QueryOptionConfigurator<EntityUpdateOption>): EntityUpdateQueryImpl<ENTITY, META> {
         return copy(option = configurator.apply(option))
+    }
+
+    override fun include(vararg propertyMetamodels: PropertyMetamodel<ENTITY, *>): Query<ENTITY?> {
+        val newContext = support.include(propertyMetamodels.toList())
+        val query = copy(context = newContext)
+        return wrap(query)
+    }
+
+    override fun exclude(vararg propertyMetamodels: PropertyMetamodel<ENTITY, *>): Query<ENTITY?> {
+        val newContext = support.exclude(propertyMetamodels.toList())
+        val query = copy(context = newContext)
+        return wrap(query)
+    }
+
+    private fun wrap(original: EntityUpdateQueryImpl<ENTITY, META>): Query<ENTITY?> {
+        return object : Query<ENTITY?> {
+            override fun run(config: DatabaseConfig): ENTITY? {
+                if (original.context.getTargetProperties().isEmpty()) return null
+                return original.run(config)
+            }
+
+            override fun dryRun(config: DatabaseConfig): String {
+                if (original.context.getTargetProperties().isEmpty()) return ""
+                return original.dryRun(config)
+            }
+        }
     }
 
     override fun run(config: DatabaseConfig): ENTITY {

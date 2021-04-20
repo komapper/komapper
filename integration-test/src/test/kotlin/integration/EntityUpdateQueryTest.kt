@@ -3,6 +3,8 @@ package integration
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
@@ -119,5 +121,51 @@ class EntityUpdateQueryTest(private val db: Database) {
         val address3 = db.runQuery { selectQuery }
         assertEquals(Address(15, "new street", 2), address2)
         assertEquals(address2, address3)
+    }
+
+    @Test
+    fun include() {
+        val d = Department.alias
+        val findQuery = EntityQuery.first(d) { d.departmentId eq 1 }
+        val department = db.runQuery { findQuery }
+        val department2 = department.copy(departmentName = "ABC", location = "DEF")
+        db.runQuery { EntityQuery.update(d, department2).include(d.departmentName) }
+        val department3 = db.runQuery { findQuery }
+        assertEquals("ABC", department3.departmentName)
+        assertNotEquals("DEF", department3.location)
+        assertTrue(department2.version < department3.version)
+    }
+
+    @Test
+    fun include_emptyTargetProperties() {
+        val d = NoVersionDepartment.alias
+        val findQuery = EntityQuery.first(d) { d.departmentId eq 1 }
+        val department = db.runQuery { findQuery }
+        val department2 = department.copy(departmentName = "ABC", location = "DEF")
+        val result = db.runQuery { EntityQuery.update(d, department2).include(d.departmentId) }
+        assertNull(result)
+    }
+
+    @Test
+    fun exclude() {
+        val d = Department.alias
+        val findQuery = EntityQuery.first(d) { d.departmentId eq 1 }
+        val department = db.runQuery { findQuery }
+        val department2 = department.copy(departmentName = "ABC", location = "DEF")
+        db.runQuery { EntityQuery.update(d, department2).exclude(d.location) }
+        val department3 = db.runQuery { findQuery }
+        assertEquals("ABC", department3.departmentName)
+        assertNotEquals("DEF", department3.location)
+        assertTrue(department2.version < department3.version)
+    }
+
+    @Test
+    fun exclude_emptyTargetProperties() {
+        val d = NoVersionDepartment.alias
+        val findQuery = EntityQuery.first(d) { d.departmentId eq 1 }
+        val department = db.runQuery { findQuery }
+        val department2 = department.copy(departmentName = "ABC", location = "DEF")
+        val result = db.runQuery { EntityQuery.update(d, department2).exclude(d.departmentName, d.location, d.version, d.departmentNo) }
+        assertNull(result)
     }
 }

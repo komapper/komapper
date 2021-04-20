@@ -127,4 +127,17 @@ data class Department(
     companion object
 }
 
+@KmEntity
+@KmTable("DEPARTMENT")
+data class NoVersionDepartment(
+    @KmId @KmColumn("DEPARTMENT_ID") val departmentId: Int,
+    @KmColumn("DEPARTMENT_NO") val departmentNo: Int,
+    @KmColumn("DEPARTMENT_NAME") val departmentName: String,
+    val location: String,
+    val version: Int,
+    @KmIgnore val employeeList: List<Employee> = emptyList()
+) {
+    companion object
+}
+
 data class NoId(val value1: Int, val value2: Int)
