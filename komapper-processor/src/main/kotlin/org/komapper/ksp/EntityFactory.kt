@@ -163,5 +163,8 @@ internal class EntityFactory(config: Config, private val entityDef: EntityDef) {
                 report("The property name cannot start with '__'.", p.parameter)
             }
         }
+        if (entity.idProperties.isEmpty()) {
+            report("The entity class must have at least one id property.", entity.declaration)
+        }
     }
 }

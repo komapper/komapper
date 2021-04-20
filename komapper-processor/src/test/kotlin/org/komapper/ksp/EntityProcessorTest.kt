@@ -16,6 +16,24 @@ class EntityProcessorTest {
     @JvmField
     var tempDir: Path? = null
 
+    @Test fun `The entity class must have at least one id property`() {
+        val result = compile(
+            kotlin(
+                "source.kt",
+                """
+                package test
+                import org.komapper.annotation.*
+                @KmEntity
+                data class Dept(
+                    val id: Int
+                )
+                """
+            )
+        )
+        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
+        assertThat(result.messages).contains("The entity class must have at least one id property.")
+    }
+
     @Test fun `The parent declaration of the entity class must be public`() {
         val result = compile(
             kotlin(
