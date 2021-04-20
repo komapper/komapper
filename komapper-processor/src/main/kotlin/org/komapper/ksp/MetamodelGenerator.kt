@@ -106,7 +106,7 @@ internal class EntityMetamodelGenerator(
 
     private fun propertyMetamodels() {
         for (p in entity.properties) {
-            w.println("    val $p by lazy { $PropertyMetamodelImpl(this, $EntityDescriptor.$p) }")
+            w.println("    val $p: $PropertyMetamodel<$entityTypeName, ${p.typeName}> by lazy { $PropertyMetamodelImpl(this, $EntityDescriptor.$p) }")
         }
     }
 
