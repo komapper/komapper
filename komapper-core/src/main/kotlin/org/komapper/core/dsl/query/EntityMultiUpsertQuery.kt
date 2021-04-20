@@ -24,6 +24,7 @@ internal data class EntityMultiUpsertQueryImpl<ENTITY : Any, META : EntityMetamo
     }
 
     override fun run(config: DatabaseConfig): Int {
+        if (entities.isEmpty()) return 0
         val newEntities = entities.map { preUpsert(config, it) }
         return upsert(config, newEntities)
     }
@@ -40,6 +41,7 @@ internal data class EntityMultiUpsertQueryImpl<ENTITY : Any, META : EntityMetamo
     }
 
     override fun dryRun(config: DatabaseConfig): String {
+        if (entities.isEmpty()) return ""
         val statement = buildStatement(config, entities)
         return statement.sql
     }

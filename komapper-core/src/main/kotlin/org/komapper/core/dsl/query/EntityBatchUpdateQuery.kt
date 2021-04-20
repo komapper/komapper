@@ -53,6 +53,7 @@ internal data class EntityBatchUpdateQueryImpl<ENTITY : Any, META : EntityMetamo
     }
 
     override fun dryRun(config: DatabaseConfig): String {
+        if (entities.isEmpty()) return ""
         return buildStatement(config, entities.first()).sql
     }
 

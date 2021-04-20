@@ -67,6 +67,7 @@ internal data class EntityBatchInsertQueryImpl<ENTITY : Any, META : EntityMetamo
     }
 
     override fun dryRun(config: DatabaseConfig): String {
+        if (entities.isEmpty()) return ""
         val statement = buildStatement(config, entities.first())
         return statement.sql
     }

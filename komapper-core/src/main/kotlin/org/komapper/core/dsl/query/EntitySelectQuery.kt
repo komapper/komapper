@@ -55,10 +55,6 @@ internal data class EntitySelectQueryImpl<ENTITY : Any, META : EntityMetamodel<E
         fun entityMetamodelNotFound(parameterName: String): String {
             return "The '$parameterName' metamodel is not found. Bind it to this query in advance using the from or join clause."
         }
-
-        fun idPropertyRequired(parameterName: String): String {
-            return "The '$parameterName' metamodel must have one or more id properties."
-        }
     }
 
     private val support: SelectQuerySupport<ENTITY, META, EntitySelectContext<ENTITY, META>> = SelectQuerySupport(context)
@@ -85,8 +81,6 @@ internal data class EntitySelectQueryImpl<ENTITY : Any, META : EntityMetamodel<E
         e2: EntityMetamodel<S, *>,
         associator: Associator<T, S>
     ): EntitySelectQueryImpl<ENTITY, META> {
-        require(e1.idProperties().isNotEmpty()) { idPropertyRequired("e1") }
-        require(e2.idProperties().isNotEmpty()) { idPropertyRequired("e2") }
         val entityExpressions = context.getEntityExpressions()
         require(e1 in entityExpressions) { entityMetamodelNotFound("e1") }
         require(e2 in entityExpressions) { entityMetamodelNotFound("e2") }

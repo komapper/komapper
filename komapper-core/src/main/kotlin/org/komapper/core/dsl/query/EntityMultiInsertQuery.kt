@@ -66,6 +66,7 @@ internal data class EntityMultiInsertQueryImpl<ENTITY : Any, META : EntityMetamo
     }
 
     override fun dryRun(config: DatabaseConfig): String {
+        if (entities.isEmpty()) return ""
         val statement = buildStatement(config, entities)
         return statement.sql
     }

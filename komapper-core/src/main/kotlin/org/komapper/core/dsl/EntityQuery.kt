@@ -27,16 +27,14 @@ import org.komapper.core.dsl.scope.WhereDeclaration
 object EntityQuery : Dsl {
 
     private object Messages {
-        const val idPropertyRequired = "The entity metamodel must have one or more id properties."
-        const val idValueRequired = "The entity must have one or more id value."
-        fun idValueRequired(index: Int) = "The entity(index=$index) must have one or more id value."
+        const val idValueRequired = "The id value must not be null."
+        fun idValueRequired(index: Int) = "The id value must not be null. (index=$index)"
     }
 
     fun <ENTITY : Any, META : EntityMetamodel<ENTITY, META>> first(
         entityMetamodel: META,
         declaration: WhereDeclaration
     ): Query<ENTITY> {
-        require(hasIdProperty(entityMetamodel)) { Messages.idPropertyRequired }
         return EntitySelectQueryImpl(EntitySelectContext(entityMetamodel))
             .where(declaration)
             .limit(1)
@@ -47,7 +45,6 @@ object EntityQuery : Dsl {
         entityMetamodel: META,
         declaration: WhereDeclaration
     ): Query<ENTITY?> {
-        require(hasIdProperty(entityMetamodel)) { Messages.idPropertyRequired }
         return EntitySelectQueryImpl(EntitySelectContext(entityMetamodel))
             .where(declaration)
             .limit(1)
@@ -57,7 +54,6 @@ object EntityQuery : Dsl {
     fun <ENTITY : Any, META : EntityMetamodel<ENTITY, META>> from(
         entityMetamodel: META
     ): EntitySelectQuery<ENTITY> {
-        require(hasIdProperty(entityMetamodel)) { Messages.idPropertyRequired }
         return EntitySelectQueryImpl(EntitySelectContext(entityMetamodel))
     }
 
@@ -65,7 +61,6 @@ object EntityQuery : Dsl {
         entityMetamodel: META,
         entity: ENTITY
     ): EntityInsertQuery<ENTITY, META> {
-        require(hasIdProperty(entityMetamodel)) { Messages.idPropertyRequired }
         return EntityInsertQueryImpl(EntityInsertContext(entityMetamodel), entity)
     }
 
@@ -85,11 +80,17 @@ object EntityQuery : Dsl {
         return EntityDeleteQueryImpl(EntityDeleteContext(entityMetamodel), entity)
     }
 
+    fun <ENTITY : Any, META : EntityMetamodel<ENTITY, META>> insertMulti(
+        entityMetamodel: META,
+        entities: List<ENTITY>
+    ): EntityMultiInsertQuery<ENTITY, META> {
+        return EntityMultiInsertQueryImpl(EntityInsertContext(entityMetamodel), entities)
+    }
+
     fun <ENTITY : Any, META : EntityMetamodel<ENTITY, META>> insertBatch(
         entityMetamodel: META,
         entities: List<ENTITY>
     ): EntityBatchInsertQuery<ENTITY, META> {
-        require(hasIdProperty(entityMetamodel)) { Messages.idPropertyRequired }
         return EntityBatchInsertQueryImpl(EntityInsertContext(entityMetamodel), entities)
     }
 
@@ -97,7 +98,6 @@ object EntityQuery : Dsl {
         entityMetamodel: META,
         entities: List<ENTITY>
     ): EntityBatchUpdateQuery<ENTITY> {
-        require(hasIdProperty(entityMetamodel)) { Messages.idPropertyRequired }
         for ((i, entity) in entities.withIndex()) {
             require(hasIdValue(entityMetamodel, entity)) { Messages.idValueRequired(i) }
         }
@@ -108,31 +108,18 @@ object EntityQuery : Dsl {
         entityMetamodel: META,
         entities: List<ENTITY>
     ): EntityBatchDeleteQuery<ENTITY> {
-        require(hasIdProperty(entityMetamodel)) { Messages.idPropertyRequired }
         for ((i, entity) in entities.withIndex()) {
             require(hasIdValue(entityMetamodel, entity)) { Messages.idValueRequired(i) }
         }
         return EntityBatchDeleteQueryImpl(EntityDeleteContext(entityMetamodel), entities)
     }
 
-    fun <ENTITY : Any, META : EntityMetamodel<ENTITY, META>> insertMulti(
-        entityMetamodel: META,
-        entities: List<ENTITY>
-    ): EntityMultiInsertQuery<ENTITY, META> {
-        require(hasIdProperty(entityMetamodel)) { Messages.idPropertyRequired }
-        return EntityMultiInsertQueryImpl(EntityInsertContext(entityMetamodel), entities)
-    }
-
-    private fun <ENTITY : Any, META : EntityMetamodel<ENTITY, META>> hasIdProperty(
-        entityMetamodel: EntityMetamodel<ENTITY, META>
-    ): Boolean {
-        return entityMetamodel.idProperties().isNotEmpty()
-    }
-
     private fun <ENTITY : Any, META : EntityMetamodel<ENTITY, META>> hasIdValue(
         entityMetamodel: META,
         entity: ENTITY
     ): Boolean {
-        return entityMetamodel.idProperties().map { it.getter(entity) }.all { it != null }
+        val idProperties = entityMetamodel.idProperties()
+        return idProperties.isNotEmpty() &&
+            idProperties.map { it.getter(entity) }.all { it != null }
     }
 }

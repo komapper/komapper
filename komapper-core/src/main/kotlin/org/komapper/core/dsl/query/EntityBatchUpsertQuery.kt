@@ -24,6 +24,7 @@ internal data class EntityBatchUpsertQueryImpl<ENTITY : Any, META : EntityMetamo
     }
 
     override fun run(config: DatabaseConfig): Pair<IntArray, LongArray> {
+        if (entities.isEmpty()) return IntArray(0) to LongArray(0)
         val newEntities = entities.map { preUpsert(config, it) }
         return upsert(config, newEntities)
     }
@@ -38,6 +39,7 @@ internal data class EntityBatchUpsertQueryImpl<ENTITY : Any, META : EntityMetamo
     }
 
     override fun dryRun(config: DatabaseConfig): String {
+        if (entities.isEmpty()) return ""
         val statement = buildStatement(config, entities.first())
         return statement.sql
     }
