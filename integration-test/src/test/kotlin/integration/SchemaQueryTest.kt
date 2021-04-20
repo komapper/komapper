@@ -9,7 +9,7 @@ import org.komapper.core.dsl.runQuery
 @ExtendWith(Env::class)
 class SchemaQueryTest(private val db: Database) {
 
-    private val metamodels = listOf(Aaa.alias, Bbb.alias, Ccc.alias)
+    private val metamodels = listOf(Aaa.alias, Bbb.alias, Ccc.alias, CompositeKeyAddress.alias)
 
     @Test
     fun create() {

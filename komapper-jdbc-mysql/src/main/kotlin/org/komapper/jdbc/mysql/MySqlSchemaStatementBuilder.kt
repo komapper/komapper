@@ -40,16 +40,20 @@ open class MySqlSchemaStatementBuilder(private val dialect: MySqlDialect) : Sche
 
     private fun createTable(e: EntityMetamodel<*, *>) {
         val w = PrintWriter(sql)
-        w.println("create table if not exists ${e.getCanonicalTableName(dialect::enquote)} (")
-        val columns = e.properties().joinToString(",\n    ", prefix = "    ") { p ->
+        val tableName = e.getCanonicalTableName(dialect::enquote)
+        w.println("create table if not exists $tableName (")
+        val columns = e.properties().map { p ->
             val columnName = p.getCanonicalColumnName(dialect::enquote)
             val (_, dataTypeName) = dialect.getDataType(p.klass)
             val notNull = if (p.nullable) "" else " not null"
             val identity = if (p.idAssignment is Assignment.Identity<*, *>) " auto_increment" else ""
-            val pk = if (p in e.idProperties()) " primary key" else ""
-            "$columnName $dataTypeName$notNull$identity$pk"
+            "$columnName $dataTypeName$notNull$identity"
         }
-        w.println(columns)
+        for (column in columns) {
+            w.println("    $column,")
+        }
+        val pkList = e.idProperties().joinToString { it.getCanonicalColumnName(dialect::enquote) }
+        w.println("    constraint pk_$tableName primary key($pkList)")
         w.println(");")
     }
 

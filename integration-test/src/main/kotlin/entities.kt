@@ -24,12 +24,15 @@ data class Address(
     companion object
 }
 
+@KmEntity
 data class CompositeKeyAddress(
-    val addressId1: Int,
-    val addressId2: Int,
+    @KmId val addressId1: Int,
+    @KmId val addressId2: Int,
     val street: String,
     val version: Int
-)
+) {
+    companion object
+}
 
 @KmEntity
 @KmTable("IDENTITY_STRATEGY")

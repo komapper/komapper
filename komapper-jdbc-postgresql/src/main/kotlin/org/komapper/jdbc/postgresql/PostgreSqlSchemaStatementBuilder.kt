@@ -42,8 +42,9 @@ open class PostgreSqlSchemaStatementBuilder(private val dialect: PostgreSqlDiale
 
     private fun createTable(e: EntityMetamodel<*, *>) {
         val w = PrintWriter(sql)
-        w.println("create table if not exists ${e.getCanonicalTableName(dialect::enquote)} (")
-        val columns = e.properties().joinToString(",\n    ", prefix = "    ") { p ->
+        val tableName = e.getCanonicalTableName(dialect::enquote)
+        w.println("create table if not exists $tableName (")
+        val columns = e.properties().map { p ->
             val columnName = p.getCanonicalColumnName(dialect::enquote)
             val dataTypeName = if (p.idAssignment is Assignment.Identity<*, *>) {
                 when (p.klass) {
@@ -55,10 +56,13 @@ open class PostgreSqlSchemaStatementBuilder(private val dialect: PostgreSqlDiale
                 dialect.getDataType(p.klass).second
             }
             val notNull = if (p.nullable) "" else " not null"
-            val pk = if (p in e.idProperties()) " primary key" else ""
-            "$columnName $dataTypeName$notNull$pk"
+            "$columnName $dataTypeName$notNull"
         }
-        w.println(columns)
+        for (column in columns) {
+            w.println("    $column,")
+        }
+        val pkList = e.idProperties().joinToString { it.getCanonicalColumnName(dialect::enquote) }
+        w.println("    constraint pk_$tableName primary key($pkList)")
         w.println(");")
     }
 
