@@ -99,7 +99,7 @@ open class PostgreSqlDialect(val version: Version = Version.V42_2) : AbstractDia
     override fun <ENTITY : Any, META : EntityMetamodel<ENTITY, META>> getEntityMultiUpsertStatementBuilder(
         context: EntityUpsertContext<ENTITY, META>,
         entities: List<ENTITY>
-    ): EntityMultiUpsertStatementBuilder<ENTITY>? {
+    ): EntityMultiUpsertStatementBuilder<ENTITY> {
         return PostgreSqlEntityMultiUpsertStatementBuilder(this, context, entities)
     }
 }

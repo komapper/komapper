@@ -2,6 +2,7 @@ package org.komapper.core.dsl.query
 
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.data.Statement
+import org.komapper.core.dsl.builder.EntityInsertStatementBuilder
 import org.komapper.core.dsl.context.DuplicateKeyType
 import org.komapper.core.dsl.context.EntityInsertContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
@@ -39,8 +40,7 @@ internal data class EntityInsertQueryImpl<ENTITY : Any, META : EntityMetamodel<E
 
     override fun run(config: DatabaseConfig): ENTITY {
         val newEntity = preInsert(config)
-        val statement = buildStatement(config, newEntity)
-        val (_, generatedKeys) = insert(config, statement)
+        val (_, generatedKeys) = insert(config, newEntity)
         return postInsert(newEntity, generatedKeys)
     }
 
@@ -48,7 +48,8 @@ internal data class EntityInsertQueryImpl<ENTITY : Any, META : EntityMetamodel<E
         return support.preInsert(config, entity)
     }
 
-    private fun insert(config: DatabaseConfig, statement: Statement): Pair<Int, LongArray> {
+    private fun insert(config: DatabaseConfig, entity: ENTITY): Pair<Int, LongArray> {
+        val statement = buildStatement(config, entity)
         return support.insert(config) { it.executeUpdate(statement) }
     }
 
@@ -62,10 +63,12 @@ internal data class EntityInsertQueryImpl<ENTITY : Any, META : EntityMetamodel<E
     }
 
     override fun dryRun(config: DatabaseConfig): String {
-        return buildStatement(config, entity).sql
+        val statement = buildStatement(config, entity)
+        return statement.sql
     }
 
     private fun buildStatement(config: DatabaseConfig, entity: ENTITY): Statement {
-        return support.buildStatement(config, entity)
+        val builder = EntityInsertStatementBuilder(config.dialect, context, entity)
+        return builder.build()
     }
 }

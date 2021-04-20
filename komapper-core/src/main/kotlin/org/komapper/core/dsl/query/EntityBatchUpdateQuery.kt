@@ -27,8 +27,7 @@ internal data class EntityBatchUpdateQueryImpl<ENTITY : Any, META : EntityMetamo
     override fun run(config: DatabaseConfig): List<ENTITY> {
         if (entities.isEmpty()) return emptyList()
         val newEntities = preUpdate(config)
-        val statements = newEntities.map { buildStatement(config, it) }
-        val (counts) = update(config, statements)
+        val (counts) = update(config, newEntities)
         return postUpdate(newEntities, counts)
     }
 
@@ -36,7 +35,8 @@ internal data class EntityBatchUpdateQueryImpl<ENTITY : Any, META : EntityMetamo
         return entities.map { support.preUpdate(config, it) }
     }
 
-    private fun update(config: DatabaseConfig, statements: List<Statement>): Pair<IntArray, LongArray> {
+    private fun update(config: DatabaseConfig, entities: List<ENTITY>): Pair<IntArray, LongArray> {
+        val statements = entities.map { buildStatement(config, it) }
         return support.update(config) { it.executeBatch(statements) }
     }
 

@@ -26,8 +26,7 @@ internal data class EntityUpdateQueryImpl<ENTITY : Any, META : EntityMetamodel<E
 
     override fun run(config: DatabaseConfig): ENTITY {
         val newEntity = preUpdate(config, entity)
-        val statement = buildStatement(config, newEntity)
-        val (count) = update(config, statement)
+        val (count) = update(config, newEntity)
         return postUpdate(newEntity, count)
     }
 
@@ -35,7 +34,8 @@ internal data class EntityUpdateQueryImpl<ENTITY : Any, META : EntityMetamodel<E
         return support.preUpdate(config, entity)
     }
 
-    private fun update(config: DatabaseConfig, statement: Statement): Pair<Int, LongArray> {
+    private fun update(config: DatabaseConfig, entity: ENTITY): Pair<Int, LongArray> {
+        val statement = buildStatement(config, entity)
         return support.update(config) { it.executeUpdate(statement) }
     }
 
@@ -44,7 +44,8 @@ internal data class EntityUpdateQueryImpl<ENTITY : Any, META : EntityMetamodel<E
     }
 
     override fun dryRun(config: DatabaseConfig): String {
-        return buildStatement(config, entity).sql
+        val statement = buildStatement(config, entity)
+        return statement.sql
     }
 
     private fun buildStatement(config: DatabaseConfig, entity: ENTITY): Statement {

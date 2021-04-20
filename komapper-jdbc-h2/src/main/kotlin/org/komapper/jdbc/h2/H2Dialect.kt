@@ -101,7 +101,7 @@ open class H2Dialect(val version: Version = Version.V1_4) : AbstractDialect() {
     override fun <ENTITY : Any, META : EntityMetamodel<ENTITY, META>> getEntityMultiUpsertStatementBuilder(
         context: EntityUpsertContext<ENTITY, META>,
         entities: List<ENTITY>
-    ): EntityMultiUpsertStatementBuilder<ENTITY>? {
+    ): EntityMultiUpsertStatementBuilder<ENTITY> {
         return H2EntityMultiUpsertStatementBuilder(this, context, entities)
     }
 }

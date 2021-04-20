@@ -26,12 +26,12 @@ internal data class EntityBatchDeleteQueryImpl<ENTITY : Any, META : EntityMetamo
 
     override fun run(config: DatabaseConfig) {
         if (entities.isEmpty()) return
-        val statements = entities.map { buildStatement(config, it) }
-        val (counts) = delete(config, statements)
+        val (counts) = delete(config)
         postDelete(counts)
     }
 
-    private fun delete(config: DatabaseConfig, statements: List<Statement>): Pair<IntArray, LongArray> {
+    private fun delete(config: DatabaseConfig): Pair<IntArray, LongArray> {
+        val statements = entities.map { buildStatement(config, it) }
         return support.delete(config) { it.executeBatch(statements) }
     }
 

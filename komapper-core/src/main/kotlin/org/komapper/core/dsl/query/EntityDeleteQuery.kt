@@ -25,12 +25,12 @@ internal data class EntityDeleteQueryImpl<ENTITY : Any, META : EntityMetamodel<E
     }
 
     override fun run(config: DatabaseConfig) {
-        val statement = buildStatement(config)
-        val (count) = delete(config, statement)
+        val (count) = delete(config)
         postDelete(count)
     }
 
-    private fun delete(config: DatabaseConfig, statement: Statement): Pair<Int, LongArray> {
+    private fun delete(config: DatabaseConfig): Pair<Int, LongArray> {
+        val statement = buildStatement(config)
         return support.delete(config) { it.executeUpdate(statement) }
     }
 

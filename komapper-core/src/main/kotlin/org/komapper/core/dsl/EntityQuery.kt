@@ -15,6 +15,8 @@ import org.komapper.core.dsl.query.EntityDeleteQuery
 import org.komapper.core.dsl.query.EntityDeleteQueryImpl
 import org.komapper.core.dsl.query.EntityInsertQuery
 import org.komapper.core.dsl.query.EntityInsertQueryImpl
+import org.komapper.core.dsl.query.EntityMultiInsertQuery
+import org.komapper.core.dsl.query.EntityMultiInsertQueryImpl
 import org.komapper.core.dsl.query.EntitySelectQuery
 import org.komapper.core.dsl.query.EntitySelectQueryImpl
 import org.komapper.core.dsl.query.EntityUpdateQuery
@@ -111,6 +113,14 @@ object EntityQuery : Dsl {
             require(hasIdValue(entityMetamodel, entity)) { Messages.idValueRequired(i) }
         }
         return EntityBatchDeleteQueryImpl(EntityDeleteContext(entityMetamodel), entities)
+    }
+
+    fun <ENTITY : Any, META : EntityMetamodel<ENTITY, META>> insertMulti(
+        entityMetamodel: META,
+        entities: List<ENTITY>
+    ): EntityMultiInsertQuery<ENTITY, META> {
+        require(hasIdProperty(entityMetamodel)) { Messages.idPropertyRequired }
+        return EntityMultiInsertQueryImpl(EntityInsertContext(entityMetamodel), entities)
     }
 
     private fun <ENTITY : Any, META : EntityMetamodel<ENTITY, META>> hasIdProperty(

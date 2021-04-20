@@ -45,12 +45,12 @@ interface Dialect {
     fun <ENTITY : Any, META : EntityMetamodel<ENTITY, META>> getEntityMultiInsertStatementBuilder(
         context: EntityInsertContext<ENTITY, META>,
         entities: List<ENTITY>
-    ): EntityMultiInsertStatementBuilder<ENTITY>?
+    ): EntityMultiInsertStatementBuilder<ENTITY>
 
     fun <ENTITY : Any, META : EntityMetamodel<ENTITY, META>> getEntityMultiUpsertStatementBuilder(
         context: EntityUpsertContext<ENTITY, META>,
         entities: List<ENTITY>
-    ): EntityMultiUpsertStatementBuilder<ENTITY>?
+    ): EntityMultiUpsertStatementBuilder<ENTITY>
 }
 
 abstract class AbstractDialect : Dialect {
@@ -111,7 +111,7 @@ abstract class AbstractDialect : Dialect {
     override fun <ENTITY : Any, META : EntityMetamodel<ENTITY, META>> getEntityMultiInsertStatementBuilder(
         context: EntityInsertContext<ENTITY, META>,
         entities: List<ENTITY>
-    ): EntityMultiInsertStatementBuilder<ENTITY>? {
+    ): EntityMultiInsertStatementBuilder<ENTITY> {
         return EntityMultiInsertStatementBuilderImpl(this, context, entities)
     }
 }
@@ -144,7 +144,7 @@ internal object DryRunDialect : AbstractDialect() {
     override fun <ENTITY : Any, META : EntityMetamodel<ENTITY, META>> getEntityMultiUpsertStatementBuilder(
         context: EntityUpsertContext<ENTITY, META>,
         entities: List<ENTITY>
-    ): EntityMultiUpsertStatementBuilder<ENTITY>? {
+    ): EntityMultiUpsertStatementBuilder<ENTITY> {
         throw UnsupportedOperationException()
     }
 }

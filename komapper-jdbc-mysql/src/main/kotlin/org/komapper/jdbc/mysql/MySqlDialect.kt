@@ -107,7 +107,7 @@ open class MySqlDialect(val version: Version = Version.V8_0) : AbstractDialect()
     override fun <ENTITY : Any, META : EntityMetamodel<ENTITY, META>> getEntityMultiUpsertStatementBuilder(
         context: EntityUpsertContext<ENTITY, META>,
         entities: List<ENTITY>
-    ): EntityMultiUpsertStatementBuilder<ENTITY>? {
+    ): EntityMultiUpsertStatementBuilder<ENTITY> {
         return MySqlEntityMultiUpsertStatementBuilder(this, context, entities)
     }
 }

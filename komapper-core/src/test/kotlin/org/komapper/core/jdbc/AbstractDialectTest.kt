@@ -41,7 +41,7 @@ internal class AbstractDialectTest {
         override fun <ENTITY : Any, META : EntityMetamodel<ENTITY, META>> getEntityMultiUpsertStatementBuilder(
             context: EntityUpsertContext<ENTITY, META>,
             entities: List<ENTITY>
-        ): EntityMultiUpsertStatementBuilder<ENTITY>? {
+        ): EntityMultiUpsertStatementBuilder<ENTITY> {
             throw UnsupportedOperationException()
         }
     }

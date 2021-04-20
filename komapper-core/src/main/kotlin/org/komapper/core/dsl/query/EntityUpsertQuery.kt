@@ -39,10 +39,12 @@ internal data class EntityUpsertQueryImpl<ENTITY : Any, META : EntityMetamodel<E
     }
 
     override fun dryRun(config: DatabaseConfig): String {
-        return buildStatement(config, entity).sql
+        val statement = buildStatement(config, entity)
+        return statement.sql
     }
 
     private fun buildStatement(config: DatabaseConfig, entity: ENTITY): Statement {
-        return support.buildStatement(config, entity)
+        val builder = config.dialect.getEntityUpsertStatementBuilder(context, entity)
+        return builder.build()
     }
 }
