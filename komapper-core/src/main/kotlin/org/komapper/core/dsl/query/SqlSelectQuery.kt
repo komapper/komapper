@@ -43,13 +43,13 @@ interface SqlSelectQuery<ENTITY : Any> : Subquery<ENTITY> {
     fun forUpdate(): SqlSelectQuery<ENTITY>
     fun option(configurator: QueryOptionConfigurator<SqlSelectOption>): SqlSelectQuery<ENTITY>
 
-    fun <A : Any, AM : EntityMetamodel<A, AM>> select(
-        e: AM
+    fun <A : Any, A_META : EntityMetamodel<A, A_META>> select(
+        e: A_META
     ): Subquery<Pair<ENTITY, A?>>
 
-    fun <A : Any, B : Any, AM : EntityMetamodel<A, AM>, BM : EntityMetamodel<B, BM>> select(
-        e1: AM,
-        e2: BM
+    fun <A : Any, B : Any, A_META : EntityMetamodel<A, A_META>, B_META : EntityMetamodel<B, B_META>> select(
+        e1: A_META,
+        e2: B_META
     ): Subquery<Triple<ENTITY, A?, B?>>
 
     fun select(
@@ -177,9 +177,9 @@ internal data class SqlSelectQueryImpl<ENTITY : Any, META : EntityMetamodel<ENTI
         return support.unionAll(this, other)
     }
 
-    override fun <B : Any, BM : EntityMetamodel<B, BM>> select(
-        e: BM,
-    ): Subquery<Pair<ENTITY, B?>> {
+    override fun <A : Any, A_META : EntityMetamodel<A, A_META>> select(
+        e: A_META,
+    ): Subquery<Pair<ENTITY, A?>> {
         val entityExpressions = context.getEntityExpressions()
         if (e !in entityExpressions) error(entityMetamodelNotFound("e"))
         val newContext = context.setEntities(context.target, e)
@@ -190,10 +190,10 @@ internal data class SqlSelectQueryImpl<ENTITY : Any, META : EntityMetamodel<ENTI
         }
     }
 
-    override fun <B : Any, C : Any, BM : EntityMetamodel<B, BM>, CM : EntityMetamodel<C, CM>> select(
-        e1: BM,
-        e2: CM
-    ): Subquery<Triple<ENTITY, B?, C?>> {
+    override fun <A : Any, B : Any, A_META : EntityMetamodel<A, A_META>, B_META : EntityMetamodel<B, B_META>> select(
+        e1: A_META,
+        e2: B_META
+    ): Subquery<Triple<ENTITY, A?, B?>> {
         val entityExpressions = context.getEntityExpressions()
         if (e1 !in entityExpressions) error(entityMetamodelNotFound("e1"))
         if (e2 !in entityExpressions) error(entityMetamodelNotFound("e2"))
