@@ -2,7 +2,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("jvm") version "1.4.32"
-    id("com.diffplug.spotless") version "5.11.1"
+    id("com.diffplug.spotless") version "5.12.4"
     id("io.github.gradle-nexus.publish-plugin") version "1.0.0"
     id("net.researchgate.release") version "2.8.1"
 }
