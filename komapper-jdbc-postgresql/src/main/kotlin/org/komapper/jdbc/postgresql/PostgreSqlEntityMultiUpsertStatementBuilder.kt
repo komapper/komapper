@@ -17,9 +17,9 @@ import org.komapper.core.dsl.expression.PropertyExpression
 import org.komapper.core.dsl.metamodel.Assignment
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 
-class PostgreSqlEntityMultiUpsertStatementBuilder<ENTITY : Any, META : EntityMetamodel<ENTITY, META>>(
+class PostgreSqlEntityMultiUpsertStatementBuilder<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     private val dialect: Dialect,
-    private val context: EntityUpsertContext<ENTITY, META>,
+    private val context: EntityUpsertContext<ENTITY, ID, META>,
     private val entities: List<ENTITY>
 ) : EntityUpsertStatementBuilder<ENTITY>,
     EntityMultiUpsertStatementBuilder<ENTITY> {
@@ -98,8 +98,8 @@ class PostgreSqlEntityMultiUpsertStatementBuilder<ENTITY : Any, META : EntityMet
     }
 
     private class UpsertAliasManager(
-        target: EntityMetamodel<*, *>,
-        excluded: EntityMetamodel<*, *>
+        target: EntityMetamodel<*, *, *>,
+        excluded: EntityMetamodel<*, *, *>
     ) : AliasManager {
 
         private val aliasMap: Map<EntityExpression<*>, String> = mapOf(

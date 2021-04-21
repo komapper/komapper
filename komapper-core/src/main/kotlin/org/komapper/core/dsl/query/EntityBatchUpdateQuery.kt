@@ -8,56 +8,40 @@ import org.komapper.core.dsl.metamodel.PropertyMetamodel
 import org.komapper.core.dsl.option.EntityBatchUpdateOption
 import org.komapper.core.dsl.option.QueryOptionConfigurator
 
-interface EntityBatchUpdateQuery<ENTITY : Any> : Query<List<ENTITY>> {
+interface EntityBatchUpdateQuery<ENTITY : Any> : Query<Unit> {
     fun option(configurator: QueryOptionConfigurator<EntityBatchUpdateOption>): EntityBatchUpdateQuery<ENTITY>
-    fun include(vararg propertyMetamodels: PropertyMetamodel<ENTITY, *>): Query<List<ENTITY>>
-    fun exclude(vararg propertyMetamodels: PropertyMetamodel<ENTITY, *>): Query<List<ENTITY>>
+    fun include(vararg propertyMetamodels: PropertyMetamodel<ENTITY, *>): Query<Unit>
+    fun exclude(vararg propertyMetamodels: PropertyMetamodel<ENTITY, *>): Query<Unit>
 }
 
-internal data class EntityBatchUpdateQueryImpl<ENTITY : Any, META : EntityMetamodel<ENTITY, META>>(
-    private val context: EntityUpdateContext<ENTITY, META>,
+internal data class EntityBatchUpdateQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+    private val context: EntityUpdateContext<ENTITY, ID, META>,
     private val entities: List<ENTITY>,
     private val option: EntityBatchUpdateOption = EntityBatchUpdateOption()
 ) :
     EntityBatchUpdateQuery<ENTITY> {
 
-    private val support: EntityUpdateQuerySupport<ENTITY, META> = EntityUpdateQuerySupport(context, option)
+    private val support: EntityUpdateQuerySupport<ENTITY, ID, META> = EntityUpdateQuerySupport(context, option)
 
-    override fun option(configurator: QueryOptionConfigurator<EntityBatchUpdateOption>): EntityBatchUpdateQueryImpl<ENTITY, META> {
+    override fun option(configurator: QueryOptionConfigurator<EntityBatchUpdateOption>): EntityBatchUpdateQueryImpl<ENTITY, ID, META> {
         return copy(option = configurator.apply(option))
     }
 
-    override fun include(vararg propertyMetamodels: PropertyMetamodel<ENTITY, *>): Query<List<ENTITY>> {
+    override fun include(vararg propertyMetamodels: PropertyMetamodel<ENTITY, *>): Query<Unit> {
         val newContext = support.include(propertyMetamodels.toList())
-        val query = copy(context = newContext)
-        return wrap(query)
+        return copy(context = newContext)
     }
 
-    override fun exclude(vararg propertyMetamodels: PropertyMetamodel<ENTITY, *>): Query<List<ENTITY>> {
+    override fun exclude(vararg propertyMetamodels: PropertyMetamodel<ENTITY, *>): Query<Unit> {
         val newContext = support.exclude(propertyMetamodels.toList())
-        val query = copy(context = newContext)
-        return wrap(query)
+        return copy(context = newContext)
     }
 
-    private fun wrap(original: EntityBatchUpdateQueryImpl<ENTITY, META>): Query<List<ENTITY>> {
-        return object : Query<List<ENTITY>> {
-            override fun run(config: DatabaseConfig): List<ENTITY> {
-                if (original.context.getTargetProperties().isEmpty()) return emptyList()
-                return original.run(config)
-            }
-
-            override fun dryRun(config: DatabaseConfig): String {
-                if (original.context.getTargetProperties().isEmpty()) return ""
-                return original.dryRun(config)
-            }
-        }
-    }
-
-    override fun run(config: DatabaseConfig): List<ENTITY> {
-        if (entities.isEmpty()) return emptyList()
+    override fun run(config: DatabaseConfig) {
+        if (entities.isEmpty()) return
         val newEntities = preUpdate(config)
         val (counts) = update(config, newEntities)
-        return postUpdate(newEntities, counts)
+        postUpdate(newEntities, counts)
     }
 
     private fun preUpdate(config: DatabaseConfig): List<ENTITY> {
@@ -69,15 +53,15 @@ internal data class EntityBatchUpdateQueryImpl<ENTITY : Any, META : EntityMetamo
         return support.update(config) { it.executeBatch(statements) }
     }
 
-    private fun postUpdate(entities: List<ENTITY>, counts: IntArray): List<ENTITY> {
+    private fun postUpdate(entities: List<ENTITY>, counts: IntArray) {
         val iterator = counts.iterator()
-        return entities.mapIndexed { index, entity ->
+        entities.forEachIndexed { index, entity ->
             val count = if (iterator.hasNext()) {
                 iterator.nextInt()
             } else {
                 error("Count value is not found. index=$index")
             }
-            support.postUpdate(entity, count, index)
+            support.postUpdate(count, index)
         }
     }
 

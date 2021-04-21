@@ -31,7 +31,7 @@ object EntityQuery : Dsl {
         fun idValueRequired(index: Int) = "The id value must not be null. (index=$index)"
     }
 
-    fun <ENTITY : Any, META : EntityMetamodel<ENTITY, META>> first(
+    fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> first(
         entityMetamodel: META,
         declaration: WhereDeclaration
     ): Query<ENTITY> {
@@ -41,7 +41,7 @@ object EntityQuery : Dsl {
             .first()
     }
 
-    fun <ENTITY : Any, META : EntityMetamodel<ENTITY, META>> firstOrNull(
+    fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> firstOrNull(
         entityMetamodel: META,
         declaration: WhereDeclaration
     ): Query<ENTITY?> {
@@ -51,20 +51,20 @@ object EntityQuery : Dsl {
             .firstOrNull()
     }
 
-    fun <ENTITY : Any, META : EntityMetamodel<ENTITY, META>> from(
+    fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> from(
         entityMetamodel: META
     ): EntitySelectQuery<ENTITY> {
         return EntitySelectQueryImpl(EntitySelectContext(entityMetamodel))
     }
 
-    fun <ENTITY : Any, META : EntityMetamodel<ENTITY, META>> insert(
+    fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> insert(
         entityMetamodel: META,
         entity: ENTITY
-    ): EntityInsertQuery<ENTITY, META> {
+    ): EntityInsertQuery<ENTITY, ID, META> {
         return EntityInsertQueryImpl(EntityInsertContext(entityMetamodel), entity)
     }
 
-    fun <ENTITY : Any, META : EntityMetamodel<ENTITY, META>> update(
+    fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> update(
         entityMetamodel: META,
         entity: ENTITY
     ): EntityUpdateQuery<ENTITY> {
@@ -72,7 +72,7 @@ object EntityQuery : Dsl {
         return EntityUpdateQueryImpl(EntityUpdateContext(entityMetamodel), entity)
     }
 
-    fun <ENTITY : Any, META : EntityMetamodel<ENTITY, META>> delete(
+    fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> delete(
         entityMetamodel: META,
         entity: ENTITY
     ): EntityDeleteQuery<ENTITY> {
@@ -80,21 +80,21 @@ object EntityQuery : Dsl {
         return EntityDeleteQueryImpl(EntityDeleteContext(entityMetamodel), entity)
     }
 
-    fun <ENTITY : Any, META : EntityMetamodel<ENTITY, META>> insertMulti(
+    fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> insertMulti(
         entityMetamodel: META,
         entities: List<ENTITY>
-    ): EntityMultiInsertQuery<ENTITY, META> {
+    ): EntityMultiInsertQuery<ENTITY, ID, META> {
         return EntityMultiInsertQueryImpl(EntityInsertContext(entityMetamodel), entities)
     }
 
-    fun <ENTITY : Any, META : EntityMetamodel<ENTITY, META>> insertBatch(
+    fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> insertBatch(
         entityMetamodel: META,
         entities: List<ENTITY>
-    ): EntityBatchInsertQuery<ENTITY, META> {
+    ): EntityBatchInsertQuery<ENTITY, ID, META> {
         return EntityBatchInsertQueryImpl(EntityInsertContext(entityMetamodel), entities)
     }
 
-    fun <ENTITY : Any, META : EntityMetamodel<ENTITY, META>> updateBatch(
+    fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> updateBatch(
         entityMetamodel: META,
         entities: List<ENTITY>
     ): EntityBatchUpdateQuery<ENTITY> {
@@ -104,7 +104,7 @@ object EntityQuery : Dsl {
         return EntityBatchUpdateQueryImpl(EntityUpdateContext(entityMetamodel), entities)
     }
 
-    fun <ENTITY : Any, META : EntityMetamodel<ENTITY, META>> deleteBatch(
+    fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> deleteBatch(
         entityMetamodel: META,
         entities: List<ENTITY>
     ): EntityBatchDeleteQuery<ENTITY> {
@@ -114,7 +114,7 @@ object EntityQuery : Dsl {
         return EntityBatchDeleteQueryImpl(EntityDeleteContext(entityMetamodel), entities)
     }
 
-    private fun <ENTITY : Any, META : EntityMetamodel<ENTITY, META>> hasIdValue(
+    private fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> hasIdValue(
         entityMetamodel: META,
         entity: ENTITY
     ): Boolean {

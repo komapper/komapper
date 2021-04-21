@@ -22,11 +22,11 @@ class EntityBatchInsertQueryTest(private val db: Database) {
             Address(17, "STREET 17", 0),
             Address(18, "STREET 18", 0)
         )
-        val results = db.runQuery { EntityQuery.insertBatch(a, addressList) }
+        val ids = db.runQuery { EntityQuery.insertBatch(a, addressList) }
         val list = db.runQuery {
-            EntityQuery.from(a).where { a.addressId inList listOf(16, 17, 18) }
+            EntityQuery.from(a).where { a.addressId inList ids }
         }
-        assertEquals(list, results)
+        assertEquals(addressList, list)
     }
 
     @Test
@@ -37,12 +37,10 @@ class EntityBatchInsertQueryTest(private val db: Database) {
             IdentityStrategy(null, "BBB"),
             IdentityStrategy(null, "CCC")
         )
-        val results = db.runQuery { EntityQuery.insertBatch(i, strategies) }
-        val list = db.runQuery { EntityQuery.from(i).orderBy(i.id) }
-        assertEquals(list, results)
-        for (result in results) {
-            assertNotNull(result.id)
-            assertNotNull(result.id)
+        val ids = db.runQuery { EntityQuery.insertBatch(i, strategies) }
+        assertEquals(3, ids.size)
+        for (id in ids) {
+            assertNotNull(id)
         }
     }
 
@@ -54,10 +52,11 @@ class EntityBatchInsertQueryTest(private val db: Database) {
             Person(2, "B"),
             Person(3, "C")
         )
-        val results = db.runQuery { EntityQuery.insertBatch(p, personList) }
-        for (result in results) {
-            assertNotNull(result.createdAt)
-            assertNotNull(result.updatedAt)
+        val ids = db.runQuery { EntityQuery.insertBatch(p, personList) }
+        val list = db.runQuery { EntityQuery.from(p).where { p.personId inList ids } }
+        for (person in list) {
+            assertNotNull(person.createdAt)
+            assertNotNull(person.updatedAt)
         }
     }
 
@@ -84,13 +83,12 @@ class EntityBatchInsertQueryTest(private val db: Database) {
         val department1 = Department(5, 50, "PLANNING", "TOKYO", 1)
         val department2 = Department(1, 60, "DEVELOPMENT", "KYOTO", 1)
         val query = EntityQuery.insertBatch(d, listOf(department1, department2)).onDuplicateKeyUpdate()
-        val (counts, keys) = db.runQuery { query }
+        val counts = db.runQuery { query }
         if (db.config.dialect is MySqlDialect) {
             assertEquals(listOf(1, 2), counts.toList())
         } else {
             assertEquals(listOf(1, 1), counts.toList())
         }
-        assertEquals(listOf(0L, 0L), keys.toList())
         val list = db.runQuery {
             EntityQuery.from(d).where { d.departmentId inList listOf(1, 5) }.orderBy(d.departmentId)
         }
@@ -111,13 +109,12 @@ class EntityBatchInsertQueryTest(private val db: Database) {
             EntityQuery.insertBatch(d, listOf(department1, department2)).onDuplicateKeyUpdate().set { excluded ->
                 d.departmentName set excluded.departmentName
             }
-        val (counts, keys) = db.runQuery { query }
+        val counts = db.runQuery { query }
         if (db.config.dialect is MySqlDialect) {
             assertEquals(listOf(1, 2), counts.toList())
         } else {
             assertEquals(listOf(1, 1), counts.toList())
         }
-        assertEquals(listOf(0L, 0L), keys.toList())
         val list = db.runQuery {
             EntityQuery.from(d).where { d.departmentId inList listOf(1, 5) }.orderBy(d.departmentId)
         }
@@ -135,9 +132,8 @@ class EntityBatchInsertQueryTest(private val db: Database) {
         val department1 = Department(5, 50, "PLANNING", "TOKYO", 1)
         val department2 = Department(1, 60, "DEVELOPMENT", "KYOTO", 1)
         val query = EntityQuery.insertBatch(d, listOf(department1, department2)).onDuplicateKeyIgnore()
-        val (counts, keys) = db.runQuery { query }
+        val counts = db.runQuery { query }
         assertEquals(listOf(1, 0), counts.toList())
-        assertEquals(listOf(0L, 0L), keys.toList())
         val list = db.runQuery {
             EntityQuery.from(d).where { d.departmentId inList listOf(1, 5) }.orderBy(d.departmentId)
         }
@@ -158,8 +154,7 @@ class EntityBatchInsertQueryTest(private val db: Database) {
             IdentityStrategy(null, "CCC")
         )
         val query = EntityQuery.insertBatch(i, strategies).onDuplicateKeyUpdate()
-        val (counts, keys) = db.runQuery { query }
+        val counts = db.runQuery { query }
         assertEquals(listOf(1, 1, 1), counts.toList())
-        assertEquals(listOf(1L, 2L, 3L), keys.toList())
     }
 }

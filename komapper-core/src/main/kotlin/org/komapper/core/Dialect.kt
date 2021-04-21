@@ -37,18 +37,18 @@ interface Dialect {
 
     fun getSchemaStatementBuilder(): SchemaStatementBuilder
 
-    fun <ENTITY : Any, META : EntityMetamodel<ENTITY, META>> getEntityUpsertStatementBuilder(
-        context: EntityUpsertContext<ENTITY, META>,
+    fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> getEntityUpsertStatementBuilder(
+        context: EntityUpsertContext<ENTITY, ID, META>,
         entity: ENTITY
     ): EntityUpsertStatementBuilder<ENTITY>
 
-    fun <ENTITY : Any, META : EntityMetamodel<ENTITY, META>> getEntityMultiInsertStatementBuilder(
-        context: EntityInsertContext<ENTITY, META>,
+    fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> getEntityMultiInsertStatementBuilder(
+        context: EntityInsertContext<ENTITY, ID, META>,
         entities: List<ENTITY>
     ): EntityMultiInsertStatementBuilder<ENTITY>
 
-    fun <ENTITY : Any, META : EntityMetamodel<ENTITY, META>> getEntityMultiUpsertStatementBuilder(
-        context: EntityUpsertContext<ENTITY, META>,
+    fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> getEntityMultiUpsertStatementBuilder(
+        context: EntityUpsertContext<ENTITY, ID, META>,
         entities: List<ENTITY>
     ): EntityMultiUpsertStatementBuilder<ENTITY>
 }
@@ -108,8 +108,8 @@ abstract class AbstractDialect : Dialect {
         return OffsetLimitStatementBuilderImpl(this, offset, limit)
     }
 
-    override fun <ENTITY : Any, META : EntityMetamodel<ENTITY, META>> getEntityMultiInsertStatementBuilder(
-        context: EntityInsertContext<ENTITY, META>,
+    override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> getEntityMultiInsertStatementBuilder(
+        context: EntityInsertContext<ENTITY, ID, META>,
         entities: List<ENTITY>
     ): EntityMultiInsertStatementBuilder<ENTITY> {
         return EntityMultiInsertStatementBuilderImpl(this, context, entities)
@@ -134,15 +134,15 @@ internal object DryRunDialect : AbstractDialect() {
         return DryRunSchemaStatementBuilder
     }
 
-    override fun <ENTITY : Any, META : EntityMetamodel<ENTITY, META>> getEntityUpsertStatementBuilder(
-        context: EntityUpsertContext<ENTITY, META>,
+    override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> getEntityUpsertStatementBuilder(
+        context: EntityUpsertContext<ENTITY, ID, META>,
         entity: ENTITY
     ): EntityUpsertStatementBuilder<ENTITY> {
         throw UnsupportedOperationException()
     }
 
-    override fun <ENTITY : Any, META : EntityMetamodel<ENTITY, META>> getEntityMultiUpsertStatementBuilder(
-        context: EntityUpsertContext<ENTITY, META>,
+    override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> getEntityMultiUpsertStatementBuilder(
+        context: EntityUpsertContext<ENTITY, ID, META>,
         entities: List<ENTITY>
     ): EntityMultiUpsertStatementBuilder<ENTITY> {
         throw UnsupportedOperationException()

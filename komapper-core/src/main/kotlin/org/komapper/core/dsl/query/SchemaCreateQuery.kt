@@ -11,7 +11,7 @@ interface SchemaCreateQuery : Query<Unit> {
 }
 
 internal data class SchemaCreateQueryImpl(
-    val entityMetamodels: List<EntityMetamodel<*, *>> = emptyList()
+    val entityMetamodels: List<EntityMetamodel<*, *, *>> = emptyList()
 ) : SchemaCreateQuery {
 
     override fun create(): SchemaCreateQueryImpl {

@@ -8,19 +8,19 @@ import org.komapper.core.dsl.query.SchemaDropQueryImpl
 
 object SchemaQuery : Dsl {
 
-    fun create(vararg entityMetamodels: EntityMetamodel<*, *>): Query<Unit> {
+    fun create(vararg entityMetamodels: EntityMetamodel<*, *, *>): Query<Unit> {
         return SchemaCreateQueryImpl(entityMetamodels.toList())
     }
 
-    fun create(entityMetamodels: List<EntityMetamodel<*, *>>): Query<Unit> {
+    fun create(entityMetamodels: List<EntityMetamodel<*, *, *>>): Query<Unit> {
         return SchemaCreateQueryImpl(entityMetamodels)
     }
 
-    fun drop(vararg entityMetamodels: EntityMetamodel<*, *>): Query<Unit> {
+    fun drop(vararg entityMetamodels: EntityMetamodel<*, *, *>): Query<Unit> {
         return SchemaDropQueryImpl(entityMetamodels.toList())
     }
 
-    fun drop(entityMetamodels: List<EntityMetamodel<*, *>>): Query<Unit> {
+    fun drop(entityMetamodels: List<EntityMetamodel<*, *, *>>): Query<Unit> {
         return SchemaDropQueryImpl(entityMetamodels)
     }
 

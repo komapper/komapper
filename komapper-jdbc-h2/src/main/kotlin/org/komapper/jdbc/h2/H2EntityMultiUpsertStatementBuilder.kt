@@ -16,9 +16,9 @@ import org.komapper.core.dsl.expression.EntityExpression
 import org.komapper.core.dsl.expression.PropertyExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 
-internal class H2EntityMultiUpsertStatementBuilder<ENTITY : Any, META : EntityMetamodel<ENTITY, META>>(
+internal class H2EntityMultiUpsertStatementBuilder<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     private val dialect: Dialect,
-    private val context: EntityUpsertContext<ENTITY, META>,
+    private val context: EntityUpsertContext<ENTITY, ID, META>,
     entities: List<ENTITY>
 ) : EntityUpsertStatementBuilder<ENTITY>,
     EntityMultiUpsertStatementBuilder<ENTITY> {
@@ -77,7 +77,7 @@ internal class H2EntityMultiUpsertStatementBuilder<ENTITY : Any, META : EntityMe
         support.visitOperand(operand)
     }
 
-    private class UpsertAliasManager<ENTITY : Any, META : EntityMetamodel<ENTITY, META>>(
+    private class UpsertAliasManager<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
         val target: META,
         val excluded: META
     ) : AliasManager {
@@ -93,9 +93,9 @@ internal class H2EntityMultiUpsertStatementBuilder<ENTITY : Any, META : EntityMe
         }
     }
 
-    private class SourceStatementBuilder<ENTITY : Any, META : EntityMetamodel<ENTITY, META>>(
+    private class SourceStatementBuilder<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
         val dialect: Dialect,
-        val context: EntityUpsertContext<ENTITY, META>,
+        val context: EntityUpsertContext<ENTITY, ID, META>,
         val entities: List<ENTITY>
     ) {
 

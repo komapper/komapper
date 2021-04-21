@@ -11,16 +11,16 @@ interface EntityBatchDeleteQuery<ENTITY : Any> : Query<Unit> {
     fun option(configurator: QueryOptionConfigurator<EntityBatchDeleteOption>): EntityBatchDeleteQuery<ENTITY>
 }
 
-internal data class EntityBatchDeleteQueryImpl<ENTITY : Any, META : EntityMetamodel<ENTITY, META>>(
-    private val context: EntityDeleteContext<ENTITY, META>,
+internal data class EntityBatchDeleteQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+    private val context: EntityDeleteContext<ENTITY, ID, META>,
     private val entities: List<ENTITY>,
     private val option: EntityBatchDeleteOption = EntityBatchDeleteOption()
 ) :
     EntityBatchDeleteQuery<ENTITY> {
 
-    private val support: EntityDeleteQuerySupport<ENTITY, META> = EntityDeleteQuerySupport(context, option)
+    private val support: EntityDeleteQuerySupport<ENTITY, ID, META> = EntityDeleteQuerySupport(context, option)
 
-    override fun option(configurator: QueryOptionConfigurator<EntityBatchDeleteOption>): EntityBatchDeleteQueryImpl<ENTITY, META> {
+    override fun option(configurator: QueryOptionConfigurator<EntityBatchDeleteOption>): EntityBatchDeleteQueryImpl<ENTITY, ID, META> {
         return copy(option = configurator.apply(option))
     }
 

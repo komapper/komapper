@@ -8,10 +8,10 @@ import org.komapper.core.dsl.element.SortItem
 import org.komapper.core.dsl.expression.PropertyExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 
-internal data class SqlSelectContext<ENTITY : Any, META : EntityMetamodel<ENTITY, META>>(
+internal data class SqlSelectContext<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     override val target: META,
     override val projection: Projection = Projection.Entities(listOf(target)),
-    override val joins: List<Join<*, *>> = listOf(),
+    override val joins: List<Join<*, *, *>> = listOf(),
     override val where: List<Criterion> = listOf(),
     override val orderBy: List<SortItem> = listOf(),
     override val offset: Int = -1,
@@ -20,37 +20,37 @@ internal data class SqlSelectContext<ENTITY : Any, META : EntityMetamodel<ENTITY
     val groupBy: List<PropertyExpression<*>> = listOf(),
     val having: List<Criterion> = listOf(),
     val distinct: Boolean = false,
-) : SelectContext<ENTITY, META, SqlSelectContext<ENTITY, META>> {
+) : SelectContext<ENTITY, ID, META, SqlSelectContext<ENTITY, ID, META>> {
 
-    fun setProperties(vararg properties: PropertyExpression<*>): SqlSelectContext<ENTITY, META> {
+    fun setProperties(vararg properties: PropertyExpression<*>): SqlSelectContext<ENTITY, ID, META> {
         return copy(projection = Projection.Properties(properties.toList()))
     }
 
-    fun setEntities(vararg entityMetamodels: EntityMetamodel<*, *>): SqlSelectContext<ENTITY, META> {
+    fun setEntities(vararg entityMetamodels: EntityMetamodel<*, *, *>): SqlSelectContext<ENTITY, ID, META> {
         return copy(projection = Projection.Entities(entityMetamodels.toList()))
     }
 
-    override fun addJoin(join: Join<*, *>): SqlSelectContext<ENTITY, META> {
+    override fun addJoin(join: Join<*, *, *>): SqlSelectContext<ENTITY, ID, META> {
         return copy(joins = this.joins + join)
     }
 
-    override fun addWhere(where: List<Criterion>): SqlSelectContext<ENTITY, META> {
+    override fun addWhere(where: List<Criterion>): SqlSelectContext<ENTITY, ID, META> {
         return copy(where = this.where + where)
     }
 
-    override fun addOrderBy(orderBy: List<SortItem>): SqlSelectContext<ENTITY, META> {
+    override fun addOrderBy(orderBy: List<SortItem>): SqlSelectContext<ENTITY, ID, META> {
         return copy(orderBy = this.orderBy + orderBy)
     }
 
-    override fun setLimit(limit: Int): SqlSelectContext<ENTITY, META> {
+    override fun setLimit(limit: Int): SqlSelectContext<ENTITY, ID, META> {
         return copy(limit = limit)
     }
 
-    override fun setOffset(offset: Int): SqlSelectContext<ENTITY, META> {
+    override fun setOffset(offset: Int): SqlSelectContext<ENTITY, ID, META> {
         return copy(offset = offset)
     }
 
-    override fun setForUpdate(forUpdate: ForUpdate): SqlSelectContext<ENTITY, META> {
+    override fun setForUpdate(forUpdate: ForUpdate): SqlSelectContext<ENTITY, ID, META> {
         return copy(forUpdate = forUpdate)
     }
 }

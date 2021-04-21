@@ -4,7 +4,7 @@ import org.komapper.core.dsl.expression.EntityExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.metamodel.PropertyMetamodel
 
-internal data class EntityUpdateContext<ENTITY : Any, META : EntityMetamodel<ENTITY, META>>(
+internal data class EntityUpdateContext<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     val target: META,
     val includedProperties: List<PropertyMetamodel<ENTITY, *>> = emptyList(),
     val excludedProperties: List<PropertyMetamodel<ENTITY, *>> = emptyList()

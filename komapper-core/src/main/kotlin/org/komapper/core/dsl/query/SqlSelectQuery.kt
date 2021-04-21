@@ -24,12 +24,12 @@ interface SqlSelectQuery<ENTITY : Any> : Subquery<ENTITY> {
 
     fun distinct(): SqlSelectQuery<ENTITY>
 
-    fun <OTHER_ENTITY : Any, OTHER_META : EntityMetamodel<OTHER_ENTITY, OTHER_META>> innerJoin(
+    fun <OTHER_ENTITY : Any, OTHER_META : EntityMetamodel<OTHER_ENTITY, *, OTHER_META>> innerJoin(
         entityMetamodel: OTHER_META,
         on: OnDeclaration<OTHER_ENTITY>
     ): SqlSelectQuery<ENTITY>
 
-    fun <OTHER_ENTITY : Any, OTHER_META : EntityMetamodel<OTHER_ENTITY, OTHER_META>> leftJoin(
+    fun <OTHER_ENTITY : Any, OTHER_META : EntityMetamodel<OTHER_ENTITY, *, OTHER_META>> leftJoin(
         entityMetamodel: OTHER_META,
         on: OnDeclaration<OTHER_ENTITY>
     ): SqlSelectQuery<ENTITY>
@@ -43,17 +43,17 @@ interface SqlSelectQuery<ENTITY : Any> : Subquery<ENTITY> {
     fun forUpdate(): SqlSelectQuery<ENTITY>
     fun option(configurator: QueryOptionConfigurator<SqlSelectOption>): SqlSelectQuery<ENTITY>
 
-    fun <A : Any, A_META : EntityMetamodel<A, A_META>> select(
+    fun <A : Any, A_META : EntityMetamodel<A, *, A_META>> select(
         e: A_META
     ): Subquery<Pair<ENTITY, A?>>
 
-    fun <A : Any, B : Any, A_META : EntityMetamodel<A, A_META>, B_META : EntityMetamodel<B, B_META>> select(
+    fun <A : Any, B : Any, A_META : EntityMetamodel<A, *, A_META>, B_META : EntityMetamodel<B, *, B_META>> select(
         e1: A_META,
         e2: B_META
     ): Subquery<Triple<ENTITY, A?, B?>>
 
     fun select(
-        vararg entityMetamodels: EntityMetamodel<*, *>,
+        vararg entityMetamodels: EntityMetamodel<*, *, *>,
     ): Subquery<EntityRecord>
 
     fun <A : Any> select(
@@ -80,8 +80,8 @@ interface SqlSelectQuery<ENTITY : Any> : Subquery<ENTITY> {
     ): Subquery<PropertyRecord>
 }
 
-internal data class SqlSelectQueryImpl<ENTITY : Any, META : EntityMetamodel<ENTITY, META>>(
-    private val context: SqlSelectContext<ENTITY, META>,
+internal data class SqlSelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+    private val context: SqlSelectContext<ENTITY, ID, META>,
     private val option: SqlSelectOption = SqlSelectOption()
 ) :
     SqlSelectQuery<ENTITY> {
@@ -96,68 +96,69 @@ internal data class SqlSelectQueryImpl<ENTITY : Any, META : EntityMetamodel<ENTI
         }
     }
 
-    private val support: SelectQuerySupport<ENTITY, META, SqlSelectContext<ENTITY, META>> = SelectQuerySupport(context)
+    private val support: SelectQuerySupport<ENTITY, ID, META, SqlSelectContext<ENTITY, ID, META>> =
+        SelectQuerySupport(context)
 
     override val subqueryContext = SubqueryContext.SqlSelect<ENTITY>(context)
 
-    override fun distinct(): SqlSelectQueryImpl<ENTITY, META> {
+    override fun distinct(): SqlSelectQueryImpl<ENTITY, ID, META> {
         val newContext = context.copy(distinct = true)
         return copy(context = newContext)
     }
 
-    override fun <OTHER_ENTITY : Any, OTHER_META : EntityMetamodel<OTHER_ENTITY, OTHER_META>> innerJoin(
+    override fun <OTHER_ENTITY : Any, OTHER_META : EntityMetamodel<OTHER_ENTITY, *, OTHER_META>> innerJoin(
         entityMetamodel: OTHER_META,
         on: OnDeclaration<OTHER_ENTITY>
-    ): SqlSelectQueryImpl<ENTITY, META> {
+    ): SqlSelectQueryImpl<ENTITY, ID, META> {
         val newContext = support.innerJoin(entityMetamodel, on)
         return copy(context = newContext)
     }
 
-    override fun <OTHER_ENTITY : Any, OTHER_META : EntityMetamodel<OTHER_ENTITY, OTHER_META>> leftJoin(
+    override fun <OTHER_ENTITY : Any, OTHER_META : EntityMetamodel<OTHER_ENTITY, *, OTHER_META>> leftJoin(
         entityMetamodel: OTHER_META,
         on: OnDeclaration<OTHER_ENTITY>
-    ): SqlSelectQueryImpl<ENTITY, META> {
+    ): SqlSelectQueryImpl<ENTITY, ID, META> {
         val newContext = support.leftJoin(entityMetamodel, on)
         return copy(context = newContext)
     }
 
-    override fun where(declaration: WhereDeclaration): SqlSelectQueryImpl<ENTITY, META> {
+    override fun where(declaration: WhereDeclaration): SqlSelectQueryImpl<ENTITY, ID, META> {
         val newContext = support.where(declaration)
         return copy(context = newContext)
     }
 
-    override fun groupBy(vararg expressions: PropertyExpression<*>): SqlSelectQueryImpl<ENTITY, META> {
+    override fun groupBy(vararg expressions: PropertyExpression<*>): SqlSelectQueryImpl<ENTITY, ID, META> {
         val newContext = context.copy(groupBy = context.groupBy + expressions)
         return copy(context = newContext)
     }
 
-    override fun having(declaration: HavingDeclaration): SqlSelectQueryImpl<ENTITY, META> {
+    override fun having(declaration: HavingDeclaration): SqlSelectQueryImpl<ENTITY, ID, META> {
         val scope = HavingScope().apply(declaration)
         val newContext = context.copy(having = context.having + scope)
         return copy(context = newContext)
     }
 
-    override fun orderBy(vararg expressions: PropertyExpression<*>): SqlSelectQueryImpl<ENTITY, META> {
+    override fun orderBy(vararg expressions: PropertyExpression<*>): SqlSelectQueryImpl<ENTITY, ID, META> {
         val newContext = support.orderBy(*expressions)
         return copy(context = newContext)
     }
 
-    override fun offset(value: Int): SqlSelectQueryImpl<ENTITY, META> {
+    override fun offset(value: Int): SqlSelectQueryImpl<ENTITY, ID, META> {
         val newContext = support.offset(value)
         return copy(context = newContext)
     }
 
-    override fun limit(value: Int): SqlSelectQueryImpl<ENTITY, META> {
+    override fun limit(value: Int): SqlSelectQueryImpl<ENTITY, ID, META> {
         val newContext = support.limit(value)
         return copy(context = newContext)
     }
 
-    override fun forUpdate(): SqlSelectQueryImpl<ENTITY, META> {
+    override fun forUpdate(): SqlSelectQueryImpl<ENTITY, ID, META> {
         val newContext = support.forUpdate()
         return copy(context = newContext)
     }
 
-    override fun option(configurator: QueryOptionConfigurator<SqlSelectOption>): SqlSelectQueryImpl<ENTITY, META> {
+    override fun option(configurator: QueryOptionConfigurator<SqlSelectOption>): SqlSelectQueryImpl<ENTITY, ID, META> {
         return copy(option = configurator.apply(option))
     }
 
@@ -177,7 +178,7 @@ internal data class SqlSelectQueryImpl<ENTITY : Any, META : EntityMetamodel<ENTI
         return support.unionAll(this, other)
     }
 
-    override fun <A : Any, A_META : EntityMetamodel<A, A_META>> select(
+    override fun <A : Any, A_META : EntityMetamodel<A, *, A_META>> select(
         e: A_META,
     ): Subquery<Pair<ENTITY, A?>> {
         val entityExpressions = context.getEntityExpressions()
@@ -190,7 +191,7 @@ internal data class SqlSelectQueryImpl<ENTITY : Any, META : EntityMetamodel<ENTI
         }
     }
 
-    override fun <A : Any, B : Any, A_META : EntityMetamodel<A, A_META>, B_META : EntityMetamodel<B, B_META>> select(
+    override fun <A : Any, B : Any, A_META : EntityMetamodel<A, *, A_META>, B_META : EntityMetamodel<B, *, B_META>> select(
         e1: A_META,
         e2: B_META
     ): Subquery<Triple<ENTITY, A?, B?>> {
@@ -205,7 +206,7 @@ internal data class SqlSelectQueryImpl<ENTITY : Any, META : EntityMetamodel<ENTI
         }
     }
 
-    override fun select(vararg entityMetamodels: EntityMetamodel<*, *>): Subquery<EntityRecord> {
+    override fun select(vararg entityMetamodels: EntityMetamodel<*, *, *>): Subquery<EntityRecord> {
         val entityExpressions = context.getEntityExpressions()
         for ((i, e) in entityMetamodels.withIndex()) {
             if (e !in entityExpressions) error(entityMetamodelNotFound("e", i))
@@ -293,7 +294,10 @@ internal data class SqlSelectQueryImpl<ENTITY : Any, META : EntityMetamodel<ENTI
         return createTerminal(context, transformer)
     }
 
-    private fun <R> createTerminal(c: SqlSelectContext<ENTITY, META>, transformer: (Sequence<ENTITY>) -> R): Query<R> {
+    private fun <R> createTerminal(
+        c: SqlSelectContext<ENTITY, ID, META>,
+        transformer: (Sequence<ENTITY>) -> R
+    ): Query<R> {
         val provider: (Dialect, ResultSet) -> ENTITY = { dialect, rs ->
             val mapper = EntityMapper(dialect, rs)
             val entity = mapper.execute(c.target, true)
@@ -303,7 +307,7 @@ internal data class SqlSelectQueryImpl<ENTITY : Any, META : EntityMetamodel<ENTI
     }
 
     internal data class Collectable<T>(
-        private val context: SqlSelectContext<*, *>,
+        private val context: SqlSelectContext<*, *, *>,
         private val option: SqlSelectOption,
         private val provider: (Dialect, ResultSet) -> T
     ) : Subquery<T> {
@@ -359,7 +363,7 @@ internal data class SqlSelectQueryImpl<ENTITY : Any, META : EntityMetamodel<ENTI
     }
 
     internal class Terminal<T, R>(
-        private val context: SqlSelectContext<*, *>,
+        private val context: SqlSelectContext<*, *, *>,
         private val option: SqlSelectOption,
         private val provider: (Dialect, ResultSet) -> T,
         val transformer: (Sequence<T>) -> R

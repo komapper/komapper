@@ -19,12 +19,12 @@ interface SqlInsertQuery<ENTITY : Any> : Query<Pair<Int, Long?>> {
     fun option(configurator: QueryOptionConfigurator<SqlInsertOption>): SqlInsertQuery<ENTITY>
 }
 
-internal data class SqlInsertQueryImpl<ENTITY : Any, META : EntityMetamodel<ENTITY, META>>(
-    private val context: SqlInsertContext<ENTITY, META>,
+internal data class SqlInsertQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+    private val context: SqlInsertContext<ENTITY, ID, META>,
     private val option: SqlInsertOption = SqlInsertOption()
 ) : SqlInsertQuery<ENTITY> {
 
-    override fun values(declaration: ValuesDeclaration<ENTITY>): SqlInsertQueryImpl<ENTITY, META> {
+    override fun values(declaration: ValuesDeclaration<ENTITY>): SqlInsertQueryImpl<ENTITY, ID, META> {
         val scope = ValuesScope<ENTITY>().apply(declaration)
         val values = when (val values = context.values) {
             is Values.Pairs -> Values.Pairs(values.pairs + scope)
@@ -41,7 +41,7 @@ internal data class SqlInsertQueryImpl<ENTITY : Any, META : EntityMetamodel<ENTI
         return copy(context = newContext)
     }
 
-    override fun option(configurator: QueryOptionConfigurator<SqlInsertOption>): SqlInsertQueryImpl<ENTITY, META> {
+    override fun option(configurator: QueryOptionConfigurator<SqlInsertOption>): SqlInsertQueryImpl<ENTITY, ID, META> {
         return copy(option = configurator.apply(option))
     }
 

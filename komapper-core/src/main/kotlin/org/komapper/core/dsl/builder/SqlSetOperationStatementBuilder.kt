@@ -43,7 +43,7 @@ internal class SqlSetOperationStatementBuilder(
         }
     }
 
-    private fun visitEntityContext(selectContext: EntitySelectContext<*, *>) {
+    private fun visitEntityContext(selectContext: EntitySelectContext<*, *, *>) {
         val childAliasManager = AliasManagerImpl(selectContext, aliasManager)
         val builder = EntitySelectStatementBuilder(dialect, selectContext, childAliasManager)
         val statement = builder.build()
@@ -52,7 +52,7 @@ internal class SqlSetOperationStatementBuilder(
         buf.append(")")
     }
 
-    private fun visitSelectContext(selectContext: SqlSelectContext<*, *>) {
+    private fun visitSelectContext(selectContext: SqlSelectContext<*, *, *>) {
         val childAliasManager = AliasManagerImpl(selectContext, aliasManager)
         val builder = SqlSelectStatementBuilder(dialect, selectContext, childAliasManager)
         val statement = builder.build()

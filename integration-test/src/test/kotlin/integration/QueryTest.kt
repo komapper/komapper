@@ -36,7 +36,7 @@ class QueryTest(private val db: Database) {
         val address = Address(16, "STREET 16", 0)
         val query = EntityQuery.insert(a, address).flatMap {
             val e = Employee.alias
-            EntityQuery.from(e).where { e.addressId less it.addressId }
+            EntityQuery.from(e).where { e.addressId less it }
         }
         val list = db.runQuery { query }
         assertEquals(14, list.size)
@@ -48,10 +48,10 @@ class QueryTest(private val db: Database) {
         val address = Address(16, "STREET 16", 0)
         val query = EntityQuery.insert(a, address).flatZip {
             val e = Employee.alias
-            EntityQuery.from(e).where { e.addressId less it.addressId }
+            EntityQuery.from(e).where { e.addressId less it }
         }
-        val (address2, list) = db.runQuery { query }
-        assertEquals(address, address2)
+        val (id, list) = db.runQuery { query }
+        assertEquals(16, id)
         assertEquals(14, list.size)
     }
 }

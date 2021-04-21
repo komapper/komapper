@@ -11,16 +11,16 @@ interface EntityDeleteQuery<ENTITY : Any> : Query<Unit> {
     fun option(configurator: QueryOptionConfigurator<EntityDeleteOption>): EntityDeleteQuery<ENTITY>
 }
 
-internal data class EntityDeleteQueryImpl<ENTITY : Any, META : EntityMetamodel<ENTITY, META>>(
-    private val context: EntityDeleteContext<ENTITY, META>,
+internal data class EntityDeleteQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+    private val context: EntityDeleteContext<ENTITY, ID, META>,
     private val entity: ENTITY,
     private val option: EntityDeleteOption = EntityDeleteOption()
 ) :
     EntityDeleteQuery<ENTITY> {
 
-    private val support: EntityDeleteQuerySupport<ENTITY, META> = EntityDeleteQuerySupport(context, option)
+    private val support: EntityDeleteQuerySupport<ENTITY, ID, META> = EntityDeleteQuerySupport(context, option)
 
-    override fun option(configurator: QueryOptionConfigurator<EntityDeleteOption>): EntityDeleteQueryImpl<ENTITY, META> {
+    override fun option(configurator: QueryOptionConfigurator<EntityDeleteOption>): EntityDeleteQueryImpl<ENTITY, ID, META> {
         return copy(option = configurator.apply(option))
     }
 

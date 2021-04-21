@@ -11,7 +11,7 @@ interface SchemaDropQuery : Query<Unit> {
 }
 
 internal data class SchemaDropQueryImpl(
-    val entityMetamodels: List<EntityMetamodel<*, *>> = emptyList()
+    val entityMetamodels: List<EntityMetamodel<*, *, *>> = emptyList()
 ) : SchemaDropQuery {
 
     override fun drop(): SchemaDropQueryImpl {

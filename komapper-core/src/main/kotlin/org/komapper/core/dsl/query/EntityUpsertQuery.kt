@@ -6,28 +6,28 @@ import org.komapper.core.dsl.context.EntityUpsertContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.scope.SetScope
 
-interface EntityUpsertQuery<ENTITY : Any, META : EntityMetamodel<ENTITY, META>> : Query<Pair<Int, Long?>> {
-    fun set(declaration: SetScope<ENTITY>.(META) -> Unit): Query<Pair<Int, Long?>>
+interface EntityUpsertQuery<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> : Query<Int> {
+    fun set(declaration: SetScope<ENTITY>.(META) -> Unit): Query<Int>
 }
 
-internal data class EntityUpsertQueryImpl<ENTITY : Any, META : EntityMetamodel<ENTITY, META>>(
-    private val context: EntityUpsertContext<ENTITY, META>,
+internal data class EntityUpsertQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+    private val context: EntityUpsertContext<ENTITY, ID, META>,
     private val entity: ENTITY,
-    private val insertSupport: EntityInsertQuerySupport<ENTITY, META>
-) : EntityUpsertQuery<ENTITY, META> {
+    private val insertSupport: EntityInsertQuerySupport<ENTITY, ID, META>
+) : EntityUpsertQuery<ENTITY, ID, META> {
 
-    private val support: EntityUpsertQuerySupport<ENTITY, META> = EntityUpsertQuerySupport(context, insertSupport)
+    private val support: EntityUpsertQuerySupport<ENTITY, ID, META> = EntityUpsertQuerySupport(context, insertSupport)
 
-    override fun set(declaration: SetScope<ENTITY>.(META) -> Unit): Query<Pair<Int, Long?>> {
+    override fun set(declaration: SetScope<ENTITY>.(META) -> Unit): Query<Int> {
         val newContext = support.set(declaration)
         return copy(context = newContext)
     }
 
-    override fun run(config: DatabaseConfig): Pair<Int, Long?> {
+    override fun run(config: DatabaseConfig): Int {
         val newEntity = preUpsert(config, entity)
         val statement = buildStatement(config, newEntity)
-        val (count, keys) = upsert(config, statement)
-        return count to keys.firstOrNull()
+        val (count) = upsert(config, statement)
+        return count
     }
 
     private fun preUpsert(config: DatabaseConfig, entity: ENTITY): ENTITY {

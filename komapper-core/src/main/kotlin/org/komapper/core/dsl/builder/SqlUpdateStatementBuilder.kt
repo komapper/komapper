@@ -10,9 +10,9 @@ import org.komapper.core.dsl.expression.EntityExpression
 import org.komapper.core.dsl.expression.PropertyExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 
-internal class SqlUpdateStatementBuilder<ENTITY : Any, META : EntityMetamodel<ENTITY, META>>(
+internal class SqlUpdateStatementBuilder<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     val dialect: Dialect,
-    val context: SqlUpdateContext<ENTITY, META>,
+    val context: SqlUpdateContext<ENTITY, ID, META>,
 ) {
 
     private val aliasManager = AliasManagerImpl(context)

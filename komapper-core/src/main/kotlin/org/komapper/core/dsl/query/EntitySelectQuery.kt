@@ -19,12 +19,12 @@ import kotlin.reflect.cast
 
 interface EntitySelectQuery<ENTITY : Any> : Subquery<ENTITY> {
 
-    fun <OTHER_ENTITY : Any, OTHER_META : EntityMetamodel<OTHER_ENTITY, OTHER_META>> innerJoin(
+    fun <OTHER_ENTITY : Any, OTHER_META : EntityMetamodel<OTHER_ENTITY, *, OTHER_META>> innerJoin(
         entityMetamodel: OTHER_META,
         on: OnDeclaration<OTHER_ENTITY>
     ): EntitySelectQuery<ENTITY>
 
-    fun <OTHER_ENTITY : Any, OTHER_META : EntityMetamodel<OTHER_ENTITY, OTHER_META>> leftJoin(
+    fun <OTHER_ENTITY : Any, OTHER_META : EntityMetamodel<OTHER_ENTITY, *, OTHER_META>> leftJoin(
         entityMetamodel: OTHER_META,
         on: OnDeclaration<OTHER_ENTITY>
     ): EntitySelectQuery<ENTITY>
@@ -37,16 +37,16 @@ interface EntitySelectQuery<ENTITY : Any> : Subquery<ENTITY> {
     fun option(configurator: QueryOptionConfigurator<EntitySelectOption>): EntitySelectQuery<ENTITY>
 
     fun <T : Any, S : Any> associate(
-        e1: EntityMetamodel<T, *>,
-        e2: EntityMetamodel<S, *>,
+        e1: EntityMetamodel<T, *, *>,
+        e2: EntityMetamodel<S, *, *>,
         associator: Associator<T, S>
     ): EntitySelectQuery<ENTITY>
 
     fun asSqlQuery(): SqlSelectQuery<ENTITY>
 }
 
-internal data class EntitySelectQueryImpl<ENTITY : Any, META : EntityMetamodel<ENTITY, META>>(
-    private val context: EntitySelectContext<ENTITY, META>,
+internal data class EntitySelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+    private val context: EntitySelectContext<ENTITY, ID, META>,
     private val option: EntitySelectOption = EntitySelectOption()
 ) :
     EntitySelectQuery<ENTITY> {
@@ -57,30 +57,31 @@ internal data class EntitySelectQueryImpl<ENTITY : Any, META : EntityMetamodel<E
         }
     }
 
-    private val support: SelectQuerySupport<ENTITY, META, EntitySelectContext<ENTITY, META>> = SelectQuerySupport(context)
+    private val support: SelectQuerySupport<ENTITY, ID, META, EntitySelectContext<ENTITY, ID, META>> =
+        SelectQuerySupport(context)
     override val subqueryContext = SubqueryContext.EntitySelect<ENTITY>(context)
 
-    override fun <OTHER_ENTITY : Any, OTHER_META : EntityMetamodel<OTHER_ENTITY, OTHER_META>> innerJoin(
+    override fun <OTHER_ENTITY : Any, OTHER_META : EntityMetamodel<OTHER_ENTITY, *, OTHER_META>> innerJoin(
         entityMetamodel: OTHER_META,
         on: OnDeclaration<OTHER_ENTITY>
-    ): EntitySelectQueryImpl<ENTITY, META> {
+    ): EntitySelectQueryImpl<ENTITY, ID, META> {
         val newContext = support.innerJoin(entityMetamodel, on)
         return copy(context = newContext)
     }
 
-    override fun <OTHER_ENTITY : Any, OTHER_META : EntityMetamodel<OTHER_ENTITY, OTHER_META>> leftJoin(
+    override fun <OTHER_ENTITY : Any, OTHER_META : EntityMetamodel<OTHER_ENTITY, *, OTHER_META>> leftJoin(
         entityMetamodel: OTHER_META,
         on: OnDeclaration<OTHER_ENTITY>
-    ): EntitySelectQueryImpl<ENTITY, META> {
+    ): EntitySelectQueryImpl<ENTITY, ID, META> {
         val newContext = support.leftJoin(entityMetamodel, on)
         return copy(context = newContext)
     }
 
     override fun <T : Any, S : Any> associate(
-        e1: EntityMetamodel<T, *>,
-        e2: EntityMetamodel<S, *>,
+        e1: EntityMetamodel<T, *, *>,
+        e2: EntityMetamodel<S, *, *>,
         associator: Associator<T, S>
-    ): EntitySelectQueryImpl<ENTITY, META> {
+    ): EntitySelectQueryImpl<ENTITY, ID, META> {
         val entityExpressions = context.getEntityExpressions()
         require(e1 in entityExpressions) { entityMetamodelNotFound("e1") }
         require(e2 in entityExpressions) { entityMetamodelNotFound("e2") }
@@ -89,27 +90,27 @@ internal data class EntitySelectQueryImpl<ENTITY : Any, META : EntityMetamodel<E
         return copy(context = newContext)
     }
 
-    override fun where(declaration: WhereDeclaration): EntitySelectQueryImpl<ENTITY, META> {
+    override fun where(declaration: WhereDeclaration): EntitySelectQueryImpl<ENTITY, ID, META> {
         val newContext = support.where(declaration)
         return copy(context = newContext)
     }
 
-    override fun orderBy(vararg expressions: PropertyExpression<*>): EntitySelectQueryImpl<ENTITY, META> {
+    override fun orderBy(vararg expressions: PropertyExpression<*>): EntitySelectQueryImpl<ENTITY, ID, META> {
         val newContext = support.orderBy(*expressions)
         return copy(context = newContext)
     }
 
-    override fun offset(value: Int): EntitySelectQueryImpl<ENTITY, META> {
+    override fun offset(value: Int): EntitySelectQueryImpl<ENTITY, ID, META> {
         val newContext = support.offset(value)
         return copy(context = newContext)
     }
 
-    override fun limit(value: Int): EntitySelectQueryImpl<ENTITY, META> {
+    override fun limit(value: Int): EntitySelectQueryImpl<ENTITY, ID, META> {
         val newContext = support.limit(value)
         return copy(context = newContext)
     }
 
-    override fun forUpdate(): EntitySelectQueryImpl<ENTITY, META> {
+    override fun forUpdate(): EntitySelectQueryImpl<ENTITY, ID, META> {
         val newContext = support.forUpdate()
         return copy(context = newContext)
     }
@@ -173,7 +174,7 @@ internal data class EntitySelectQueryImpl<ENTITY : Any, META : EntityMetamodel<E
                 val pool: MutableMap<EntityKey, Any> = mutableMapOf()
                 val rows = fetchAllEntities(config.dialect, rs)
                 for (row in rows) {
-                    val entityKeys: MutableMap<EntityMetamodel<*, *>, EntityKey> = mutableMapOf()
+                    val entityKeys: MutableMap<EntityMetamodel<*, *, *>, EntityKey> = mutableMapOf()
                     for ((key, entity) in row) {
                         pool.putIfAbsent(key, entity)
                         entityKeys[key.entityMetamodel] = key
@@ -221,7 +222,7 @@ internal data class EntitySelectQueryImpl<ENTITY : Any, META : EntityMetamodel<E
         }
 
         private fun associate(
-            entityKeys: Map<EntityMetamodel<*, *>, EntityKey>,
+            entityKeys: Map<EntityMetamodel<*, *, *>, EntityKey>,
             pool: MutableMap<EntityKey, Any>
         ) {
             for ((association, associator) in context.associatorMap) {
@@ -240,6 +241,6 @@ internal data class EntitySelectQueryImpl<ENTITY : Any, META : EntityMetamodel<E
 }
 
 private data class EntityKey(
-    val entityMetamodel: EntityMetamodel<*, *>,
+    val entityMetamodel: EntityMetamodel<*, *, *>,
     val items: List<Any>
 )

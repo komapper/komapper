@@ -10,7 +10,7 @@ import org.komapper.core.dsl.expression.PropertyExpression
 
 internal class SqlSelectStatementBuilder(
     val dialect: Dialect,
-    val context: SqlSelectContext<*, *>,
+    val context: SqlSelectContext<*, *, *>,
     aliasManager: AliasManager = AliasManagerImpl(context)
 ) {
     private val buf = StatementBuffer(dialect::formatValue)

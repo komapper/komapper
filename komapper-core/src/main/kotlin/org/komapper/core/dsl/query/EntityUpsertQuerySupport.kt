@@ -6,12 +6,12 @@ import org.komapper.core.dsl.context.EntityUpsertContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.scope.SetScope
 
-internal class EntityUpsertQuerySupport<ENTITY : Any, META : EntityMetamodel<ENTITY, META>>(
-    private val context: EntityUpsertContext<ENTITY, META>,
-    private val insertSupport: EntityInsertQuerySupport<ENTITY, META>
+internal class EntityUpsertQuerySupport<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+    private val context: EntityUpsertContext<ENTITY, ID, META>,
+    private val insertSupport: EntityInsertQuerySupport<ENTITY, ID, META>
 ) {
 
-    fun set(declaration: SetScope<ENTITY>.(META) -> Unit): EntityUpsertContext<ENTITY, META> {
+    fun set(declaration: SetScope<ENTITY>.(META) -> Unit): EntityUpsertContext<ENTITY, ID, META> {
         val scope = SetScope<ENTITY>()
         declaration(scope, context.excluded)
         return context.copy(assignmentOperands = scope.toList())

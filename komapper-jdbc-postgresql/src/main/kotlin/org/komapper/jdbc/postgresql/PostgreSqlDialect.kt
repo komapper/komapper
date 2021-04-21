@@ -89,15 +89,15 @@ open class PostgreSqlDialect(val version: Version = Version.V42_2) : AbstractDia
         return PostgreSqlSchemaStatementBuilder(this)
     }
 
-    override fun <ENTITY : Any, META : EntityMetamodel<ENTITY, META>> getEntityUpsertStatementBuilder(
-        context: EntityUpsertContext<ENTITY, META>,
+    override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> getEntityUpsertStatementBuilder(
+        context: EntityUpsertContext<ENTITY, ID, META>,
         entity: ENTITY
     ): EntityUpsertStatementBuilder<ENTITY> {
         return PostgreSqlEntityMultiUpsertStatementBuilder(this, context, listOf(entity))
     }
 
-    override fun <ENTITY : Any, META : EntityMetamodel<ENTITY, META>> getEntityMultiUpsertStatementBuilder(
-        context: EntityUpsertContext<ENTITY, META>,
+    override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> getEntityMultiUpsertStatementBuilder(
+        context: EntityUpsertContext<ENTITY, ID, META>,
         entities: List<ENTITY>
     ): EntityMultiUpsertStatementBuilder<ENTITY> {
         return PostgreSqlEntityMultiUpsertStatementBuilder(this, context, entities)

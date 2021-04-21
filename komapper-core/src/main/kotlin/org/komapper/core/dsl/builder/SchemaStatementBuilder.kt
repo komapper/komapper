@@ -4,8 +4,8 @@ import org.komapper.core.data.Statement
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 
 interface SchemaStatementBuilder {
-    fun create(entityMetamodels: List<EntityMetamodel<*, *>>): Statement
-    fun drop(entityMetamodels: List<EntityMetamodel<*, *>>): Statement
+    fun create(entityMetamodels: List<EntityMetamodel<*, *, *>>): Statement
+    fun drop(entityMetamodels: List<EntityMetamodel<*, *, *>>): Statement
     fun dropAll(): Statement
 }
 
@@ -15,7 +15,7 @@ internal object DryRunSchemaStatementBuilder : SchemaStatementBuilder {
         "Not supported to invoke the dryRun function with the default value."
     )
 
-    override fun create(entityMetamodels: List<EntityMetamodel<*, *>>) = statement
-    override fun drop(entityMetamodels: List<EntityMetamodel<*, *>>) = statement
+    override fun create(entityMetamodels: List<EntityMetamodel<*, *, *>>) = statement
+    override fun drop(entityMetamodels: List<EntityMetamodel<*, *, *>>) = statement
     override fun dropAll() = statement
 }

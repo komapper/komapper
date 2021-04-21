@@ -16,8 +16,8 @@ interface PropertyRecord : Record<PropertyExpression<*>> {
     operator fun <T : Any> get(key: PropertyExpression<T>): T?
 }
 
-interface EntityRecord : Record<EntityMetamodel<*, *>> {
-    operator fun <T : Any> get(key: EntityMetamodel<T, *>): T?
+interface EntityRecord : Record<EntityMetamodel<*, *, *>> {
+    operator fun <T : Any> get(key: EntityMetamodel<T, *, *>): T?
 }
 
 internal abstract class AbstractRecord<K>(protected val map: Map<K, Any?>) : Record<K> {
@@ -46,10 +46,10 @@ internal class PropertyRecordImpl(
 }
 
 internal class EntityRecordImpl(
-    map: Map<EntityMetamodel<*, *>, Any?>
-) : AbstractRecord<EntityMetamodel<*, *>>(map), EntityRecord {
+    map: Map<EntityMetamodel<*, *, *>, Any?>
+) : AbstractRecord<EntityMetamodel<*, *, *>>(map), EntityRecord {
 
-    override fun <T : Any> get(key: EntityMetamodel<T, *>): T? {
+    override fun <T : Any> get(key: EntityMetamodel<T, *, *>): T? {
         val value = map[key]
         @Suppress("UNCHECKED_CAST")
         return if (value == null) null else value as T?

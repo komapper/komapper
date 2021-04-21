@@ -21,11 +21,11 @@ class EntityMultiInsertQueryTest(private val db: Database) {
             Address(17, "STREET 17", 0),
             Address(18, "STREET 18", 0)
         )
-        val results = db.runQuery { EntityQuery.insertMulti(a, addressList) }
+        val ids = db.runQuery { EntityQuery.insertMulti(a, addressList) }
         val list = db.runQuery {
-            EntityQuery.from(a).where { a.addressId inList listOf(16, 17, 18) }
+            EntityQuery.from(a).where { a.addressId inList ids }
         }
-        assertEquals(list, results)
+        assertEquals(addressList, list)
     }
 
     @Test
@@ -36,12 +36,10 @@ class EntityMultiInsertQueryTest(private val db: Database) {
             IdentityStrategy(null, "BBB"),
             IdentityStrategy(null, "CCC")
         )
-        val results = db.runQuery { EntityQuery.insertMulti(i, strategies) }
-        val list = db.runQuery { EntityQuery.from(i).orderBy(i.id) }
-        assertEquals(list, results)
-        for (result in results) {
-            assertNotNull(result.id)
-            assertNotNull(result.id)
+        val ids = db.runQuery { EntityQuery.insertMulti(i, strategies) }
+        assertEquals(3, ids.size)
+        for (id in ids) {
+            assertNotNull(id)
         }
     }
 
@@ -53,10 +51,11 @@ class EntityMultiInsertQueryTest(private val db: Database) {
             Person(2, "B"),
             Person(3, "C")
         )
-        val results = db.runQuery { EntityQuery.insertMulti(p, personList) }
-        for (result in results) {
-            assertNotNull(result.createdAt)
-            assertNotNull(result.updatedAt)
+        val ids = db.runQuery { EntityQuery.insertMulti(p, personList) }
+        val list = db.runQuery { EntityQuery.from(p).where { p.personId inList ids } }
+        for (person in list) {
+            assertNotNull(person.createdAt)
+            assertNotNull(person.updatedAt)
         }
     }
 

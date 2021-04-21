@@ -6,7 +6,7 @@ import org.komapper.core.dsl.expression.PropertyExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.metamodel.PropertyMetamodel
 
-data class EntityUpsertContext<ENTITY : Any, META : EntityMetamodel<ENTITY, META>>(
+data class EntityUpsertContext<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     val target: META,
     val excluded: META = target.newMetamodel(
         table = "excluded",
@@ -23,7 +23,7 @@ data class EntityUpsertContext<ENTITY : Any, META : EntityMetamodel<ENTITY, META
     }
 }
 
-private fun <ENTITY : Any, META : EntityMetamodel<ENTITY, META>> createAssignmentOperands(
+private fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> createAssignmentOperands(
     m1: META,
     m2: META
 ): List<Pair<PropertyExpression<*>, Operand>> {

@@ -32,12 +32,18 @@ internal class EntityMetamodelGenerator(
         "alwaysQuote: Boolean = ${entity.table.alwaysQuote}"
     ).joinToString(", ")
 
+    private val idTypeName: String = if (entity.idProperties.size == 1) {
+        entity.idProperties[0].typeName
+    } else {
+        "List<Any>"
+    }
+
     override fun run() {
         w.println("package $packageName")
         w.println()
         w.println("// generated at ${ZonedDateTime.now()}")
         w.println("@Suppress(\"ClassName\", \"PrivatePropertyName\")")
-        w.println("class $simpleName private constructor($constructorParamList) : $EntityMetamodel<$entityTypeName, $simpleName> {")
+        w.println("class $simpleName private constructor($constructorParamList) : $EntityMetamodel<$entityTypeName, $idTypeName, $simpleName> {")
         w.println("    private val __tableName = table")
         w.println("    private val __catalogName = catalog")
         w.println("    private val __schemaName = schema")
@@ -60,6 +66,7 @@ internal class EntityMetamodelGenerator(
         updatedAtProperty()
         properties()
         instantiate()
+        getId()
         incrementVersion()
         updateCreatedAt()
         updateUpdatedAt()
@@ -168,6 +175,16 @@ internal class EntityMetamodelGenerator(
             "$p = __m[$p] as ${p.typeName}$nullability"
         }
         w.println("    override fun instantiate(__m: Map<$PropertyMetamodel<*, *>, Any?>) = $entityTypeName($argList)")
+    }
+
+    private fun getId() {
+        val body = if (entity.idProperties.size == 1) {
+            val p = entity.idProperties[0]
+            "$p.getter(__e) ?: error(\"The id property '$p' must not null.\")"
+        } else {
+            "idProperties().map { it.getter(__e) ?: error(\"The id property '${'$'}{it.name}' must not null.\") }"
+        }
+        w.println("    override fun getId(__e: $entityTypeName): $idTypeName = $body")
     }
 
     private fun incrementVersion() {

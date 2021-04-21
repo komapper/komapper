@@ -10,9 +10,9 @@ import org.komapper.core.dsl.expression.PropertyExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.option.VersionOption
 
-internal class EntityUpdateStatementBuilder<ENTITY : Any, META : EntityMetamodel<ENTITY, META>>(
+internal class EntityUpdateStatementBuilder<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     val dialect: Dialect,
-    val context: EntityUpdateContext<ENTITY, META>,
+    val context: EntityUpdateContext<ENTITY, ID, META>,
     val entity: ENTITY,
     val option: VersionOption
 ) {

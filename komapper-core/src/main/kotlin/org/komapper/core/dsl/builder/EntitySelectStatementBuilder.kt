@@ -6,9 +6,9 @@ import org.komapper.core.data.StatementBuffer
 import org.komapper.core.dsl.context.EntitySelectContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 
-internal class EntitySelectStatementBuilder<ENTITY : Any, META : EntityMetamodel<ENTITY, META>>(
+internal class EntitySelectStatementBuilder<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     val dialect: Dialect,
-    val context: EntitySelectContext<ENTITY, META>,
+    val context: EntitySelectContext<ENTITY, ID, META>,
     aliasManager: AliasManager = AliasManagerImpl(context)
 ) {
     private val buf = StatementBuffer(dialect::formatValue)

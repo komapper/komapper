@@ -2,7 +2,6 @@ package integration
 
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
-import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
@@ -39,7 +38,8 @@ class EntityInsertQueryTest(private val db: Database) {
     fun createdAt_localDateTime() {
         val p = Person.alias
         val person1 = Person(1, "ABC")
-        val person2 = db.runQuery { EntityQuery.insert(p, person1) }
+        val id = db.runQuery { EntityQuery.insert(p, person1) }
+        val person2 = db.runQuery { EntityQuery.first(p) { p.personId eq id } }
         assertNotNull(person2.createdAt)
         assertNotNull(person2.updatedAt)
         assertEquals(person2.createdAt, person2.updatedAt)
@@ -56,7 +56,8 @@ class EntityInsertQueryTest(private val db: Database) {
     fun createdAt_offsetDateTime() {
         val h = Human.alias
         val human1 = Human(1, "ABC")
-        val human2 = db.runQuery { EntityQuery.insert(h, human1) }
+        val id = db.runQuery { EntityQuery.insert(h, human1) }
+        val human2 = db.runQuery { EntityQuery.first(h) { h.humanId eq id } }
         assertNotNull(human2.createdAt)
         assertNotNull(human2.updatedAt)
         assertEquals(human2.createdAt, human2.updatedAt)
@@ -81,16 +82,15 @@ class EntityInsertQueryTest(private val db: Database) {
         }
         val myDb = Database(config)
         val person1 = Person(1, "ABC")
-        val person2 = myDb.runQuery { EntityQuery.insert(p, person1) }
-        val person3 = db.runQuery {
+        val id = myDb.runQuery { EntityQuery.insert(p, person1) }
+        val person2 = db.runQuery {
             EntityQuery.first(p) {
-                p.personId to 1
+                p.personId to id
             }
         }
         assertNotNull(person2.createdAt)
         assertNotNull(person2.updatedAt)
         assertEquals(person2.createdAt, person2.updatedAt)
-        assertEquals(person3, person2)
         assertEquals(LocalDateTime.ofInstant(instant, zoneId), person2.createdAt)
     }
 
@@ -108,8 +108,8 @@ class EntityInsertQueryTest(private val db: Database) {
         for (i in 1..201) {
             val m = IdentityStrategy.alias
             val strategy = IdentityStrategy(0, "test")
-            val newStrategy = db.runQuery { EntityQuery.insert(m, strategy) }
-            assertEquals(i, newStrategy.id)
+            val id = db.runQuery { EntityQuery.insert(m, strategy) }
+            assertEquals(i, id)
         }
     }
 
@@ -119,8 +119,8 @@ class EntityInsertQueryTest(private val db: Database) {
         for (i in 1..201) {
             val m = SequenceStrategy.alias
             val strategy = SequenceStrategy(0, "test")
-            val newStrategy = db.runQuery { EntityQuery.insert(m, strategy) }
-            assertEquals(i, newStrategy.id)
+            val id = db.runQuery { EntityQuery.insert(m, strategy) }
+            assertEquals(i, id)
         }
     }
 
@@ -129,9 +129,8 @@ class EntityInsertQueryTest(private val db: Database) {
         val d = Department.alias
         val department = Department(5, 50, "PLANNING", "TOKYO", 0)
         val query = EntityQuery.insert(d, department).onDuplicateKeyUpdate()
-        val (count, key) = db.runQuery { query }
+        val count = db.runQuery { query }
         assertEquals(1, count)
-        assertNull(key)
         val found = db.runQuery { EntityQuery.first(d) { d.departmentId eq 5 } }
         assertNotNull(found)
     }
@@ -144,13 +143,12 @@ class EntityInsertQueryTest(private val db: Database) {
 
         val department = Department(1, 50, "PLANNING", "TOKYO", 10)
         val query = EntityQuery.insert(d, department).onDuplicateKeyUpdate()
-        val (count, key) = db.runQuery { query }
+        val count = db.runQuery { query }
         if (db.config.dialect is MySqlDialect) {
             assertEquals(2, count)
         } else {
             assertEquals(1, count)
         }
-        assertNull(key)
         val found = db.runQuery { EntityQuery.first(d) { d.departmentId eq 1 } }
         assertEquals(50, found.departmentNo)
         assertEquals("PLANNING", found.departmentName)
@@ -166,13 +164,12 @@ class EntityInsertQueryTest(private val db: Database) {
             d.departmentName set "PLANNING2"
             d.location set concat(d.location, concat("_", excluded.location))
         }
-        val (count, key) = db.runQuery { query }
+        val count = db.runQuery { query }
         if (db.config.dialect is MySqlDialect) {
             assertEquals(2, count)
         } else {
             assertEquals(1, count)
         }
-        assertNull(key)
         val found = db.runQuery { EntityQuery.first(d) { d.departmentId eq 1 } }
         assertEquals(10, found.departmentNo)
         assertEquals("PLANNING2", found.departmentName)
@@ -185,7 +182,7 @@ class EntityInsertQueryTest(private val db: Database) {
         val a = Address.alias
         val address = Address(1, "STREET 1", 0)
         val query = EntityQuery.insert(a, address).onDuplicateKeyIgnore()
-        val (count) = db.runQuery { query }
+        val count = db.runQuery { query }
         assertEquals(0, count)
     }
 }

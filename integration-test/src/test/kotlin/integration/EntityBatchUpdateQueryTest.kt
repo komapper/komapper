@@ -2,7 +2,6 @@ package integration
 
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
-import org.junit.jupiter.api.Assertions.assertNotEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -29,15 +28,14 @@ class EntityBatchUpdateQueryTest(private val db: Database) {
         }
         val query = EntityQuery.from(a).where { a.addressId inList listOf(16, 17, 18) }
         val before = db.runQuery { query }
-        val updateList = before.map { it.copy(street = "[" + it.street + "]") }
-        val results = db.runQuery { EntityQuery.updateBatch(a, updateList) }
-        val after = db.runQuery {
-            EntityQuery.from(a).where { a.addressId inList listOf(16, 17, 18) }
+        db.runQuery {
+            val updateList = before.map { it.copy(street = "[" + it.street + "]") }
+            EntityQuery.updateBatch(a, updateList)
         }
-        assertEquals(after, results)
-        for (result in results) {
-            assertTrue(result.street.startsWith("["))
-            assertTrue(result.street.endsWith("]"))
+        val after = db.runQuery { query }
+        for (each in after) {
+            assertTrue(each.street.startsWith("["))
+            assertTrue(each.street.endsWith("]"))
         }
     }
 
@@ -52,10 +50,9 @@ class EntityBatchUpdateQueryTest(private val db: Database) {
         for (person in personList) {
             db.runQuery { EntityQuery.insert(p, person) }
         }
-        val results = db.runQuery { EntityQuery.updateBatch(p, personList) }
-        personList.zip(results).forEach {
-            assertNotEquals(it.first.updatedAt, it.second.updatedAt)
-        }
+        db.runQuery { EntityQuery.updateBatch(p, personList) }
+        val list = db.runQuery { EntityQuery.from(p).where { p.personId inList listOf(1, 2, 3) } }
+        assertTrue(list.all { it.updatedAt != null })
     }
 
     @Test

@@ -8,8 +8,8 @@ import org.komapper.core.dsl.context.EntityDeleteContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.option.VersionOption
 
-internal class EntityDeleteQuerySupport<ENTITY : Any, META : EntityMetamodel<ENTITY, META>>(
-    val context: EntityDeleteContext<ENTITY, META>,
+internal class EntityDeleteQuerySupport<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+    val context: EntityDeleteContext<ENTITY, ID, META>,
     val option: VersionOption
 ) {
 

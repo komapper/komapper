@@ -3,7 +3,6 @@ package integration
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
-import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -14,6 +13,7 @@ import org.komapper.core.DatabaseConfig
 import org.komapper.core.OptimisticLockException
 import org.komapper.core.UniqueConstraintException
 import org.komapper.core.dsl.EntityQuery
+import org.komapper.core.dsl.plus
 import org.komapper.core.dsl.runQuery
 import java.time.Clock
 import java.time.Instant
@@ -44,24 +44,17 @@ class EntityUpdateQueryTest(private val db: Database) {
     @Test
     fun updatedAt() {
         val p = Person.alias
+        val findQuery = EntityQuery.first(p) { p.personId eq 1 }
         val person1 = Person(1, "ABC")
-        db.runQuery { EntityQuery.insert(p, person1) }
         val person2 = db.runQuery {
-            EntityQuery.first(p) {
-                p.personId eq 1
-            }
+            EntityQuery.insert(p, person1) + findQuery
         }
-        val person3 = db.runQuery { EntityQuery.update(p, person2.copy(name = "DEF")) }
-        val person4 = db.runQuery {
-            EntityQuery.first(p) {
-                p.personId eq 1
-            }
+        val person3 = db.runQuery {
+            EntityQuery.update(p, person2.copy(name = "DEF")) + findQuery
         }
         assertNotNull(person2.updatedAt)
         assertNotNull(person3.updatedAt)
-        assertNotNull(person4.updatedAt)
-        assertNotEquals(person2.updatedAt, person4.updatedAt)
-        assertEquals(person3.updatedAt, person4.updatedAt)
+        assertNotEquals(person2.updatedAt, person3.updatedAt)
     }
 
     @Test
@@ -83,14 +76,13 @@ class EntityUpdateQueryTest(private val db: Database) {
             }
         }
         val myDb = Database(config)
-        val person3 = myDb.runQuery { EntityQuery.update(p, person2.copy(name = "DEF")) }
-        val person4 = db.runQuery {
+        myDb.runQuery { EntityQuery.update(p, person2.copy(name = "DEF")) }
+        val person3 = db.runQuery {
             EntityQuery.first(p) {
                 p.personId eq 1
             }
         }
-        assertEquals(person3.updatedAt, person4.updatedAt)
-        assertEquals(LocalDateTime.ofInstant(instant, zoneId), person4.updatedAt)
+        assertEquals(LocalDateTime.ofInstant(instant, zoneId), person3.updatedAt)
     }
 
     @Test
@@ -113,17 +105,6 @@ class EntityUpdateQueryTest(private val db: Database) {
     }
 
     @Test
-    fun criteria() {
-        val a = Address.alias
-        val selectQuery = EntityQuery.from(a).where { a.addressId eq 15 }.first()
-        val address1 = db.runQuery { selectQuery }.copy(street = "new street")
-        val address2 = db.runQuery { EntityQuery.update(a, address1) }
-        val address3 = db.runQuery { selectQuery }
-        assertEquals(Address(15, "new street", 2), address2)
-        assertEquals(address2, address3)
-    }
-
-    @Test
     fun include() {
         val d = Department.alias
         val findQuery = EntityQuery.first(d) { d.departmentId eq 1 }
@@ -142,8 +123,9 @@ class EntityUpdateQueryTest(private val db: Database) {
         val findQuery = EntityQuery.first(d) { d.departmentId eq 1 }
         val department = db.runQuery { findQuery }
         val department2 = department.copy(departmentName = "ABC", location = "DEF")
-        val result = db.runQuery { EntityQuery.update(d, department2).include(d.departmentId) }
-        assertNull(result)
+        assertThrows<IllegalStateException> {
+            db.runQuery { EntityQuery.update(d, department2).include(d.departmentId) }
+        }
     }
 
     @Test
@@ -165,7 +147,10 @@ class EntityUpdateQueryTest(private val db: Database) {
         val findQuery = EntityQuery.first(d) { d.departmentId eq 1 }
         val department = db.runQuery { findQuery }
         val department2 = department.copy(departmentName = "ABC", location = "DEF")
-        val result = db.runQuery { EntityQuery.update(d, department2).exclude(d.departmentName, d.location, d.version, d.departmentNo) }
-        assertNull(result)
+        assertThrows<IllegalStateException> {
+            db.runQuery {
+                EntityQuery.update(d, department2).exclude(d.departmentName, d.location, d.version, d.departmentNo)
+            }
+        }
     }
 }

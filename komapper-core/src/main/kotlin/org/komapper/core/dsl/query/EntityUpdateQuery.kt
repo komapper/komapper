@@ -8,55 +8,39 @@ import org.komapper.core.dsl.metamodel.PropertyMetamodel
 import org.komapper.core.dsl.option.EntityUpdateOption
 import org.komapper.core.dsl.option.QueryOptionConfigurator
 
-interface EntityUpdateQuery<ENTITY : Any> : Query<ENTITY> {
+interface EntityUpdateQuery<ENTITY : Any> : Query<Unit> {
     fun option(configurator: QueryOptionConfigurator<EntityUpdateOption>): EntityUpdateQuery<ENTITY>
-    fun include(vararg propertyMetamodels: PropertyMetamodel<ENTITY, *>): Query<ENTITY?>
-    fun exclude(vararg propertyMetamodels: PropertyMetamodel<ENTITY, *>): Query<ENTITY?>
+    fun include(vararg propertyMetamodels: PropertyMetamodel<ENTITY, *>): Query<Unit>
+    fun exclude(vararg propertyMetamodels: PropertyMetamodel<ENTITY, *>): Query<Unit>
 }
 
-internal data class EntityUpdateQueryImpl<ENTITY : Any, META : EntityMetamodel<ENTITY, META>>(
-    private val context: EntityUpdateContext<ENTITY, META>,
+internal data class EntityUpdateQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+    private val context: EntityUpdateContext<ENTITY, ID, META>,
     private val entity: ENTITY,
     private val option: EntityUpdateOption = EntityUpdateOption()
 ) :
     EntityUpdateQuery<ENTITY> {
 
-    private val support: EntityUpdateQuerySupport<ENTITY, META> = EntityUpdateQuerySupport(context, option)
+    private val support: EntityUpdateQuerySupport<ENTITY, ID, META> = EntityUpdateQuerySupport(context, option)
 
-    override fun option(configurator: QueryOptionConfigurator<EntityUpdateOption>): EntityUpdateQueryImpl<ENTITY, META> {
+    override fun option(configurator: QueryOptionConfigurator<EntityUpdateOption>): EntityUpdateQueryImpl<ENTITY, ID, META> {
         return copy(option = configurator.apply(option))
     }
 
-    override fun include(vararg propertyMetamodels: PropertyMetamodel<ENTITY, *>): Query<ENTITY?> {
+    override fun include(vararg propertyMetamodels: PropertyMetamodel<ENTITY, *>): Query<Unit> {
         val newContext = support.include(propertyMetamodels.toList())
-        val query = copy(context = newContext)
-        return wrap(query)
+        return copy(context = newContext)
     }
 
-    override fun exclude(vararg propertyMetamodels: PropertyMetamodel<ENTITY, *>): Query<ENTITY?> {
+    override fun exclude(vararg propertyMetamodels: PropertyMetamodel<ENTITY, *>): Query<Unit> {
         val newContext = support.exclude(propertyMetamodels.toList())
-        val query = copy(context = newContext)
-        return wrap(query)
+        return copy(context = newContext)
     }
 
-    private fun wrap(original: EntityUpdateQueryImpl<ENTITY, META>): Query<ENTITY?> {
-        return object : Query<ENTITY?> {
-            override fun run(config: DatabaseConfig): ENTITY? {
-                if (original.context.getTargetProperties().isEmpty()) return null
-                return original.run(config)
-            }
-
-            override fun dryRun(config: DatabaseConfig): String {
-                if (original.context.getTargetProperties().isEmpty()) return ""
-                return original.dryRun(config)
-            }
-        }
-    }
-
-    override fun run(config: DatabaseConfig): ENTITY {
+    override fun run(config: DatabaseConfig) {
         val newEntity = preUpdate(config, entity)
         val (count) = update(config, newEntity)
-        return postUpdate(newEntity, count)
+        return postUpdate(count)
     }
 
     private fun preUpdate(config: DatabaseConfig, entity: ENTITY): ENTITY {
@@ -68,8 +52,8 @@ internal data class EntityUpdateQueryImpl<ENTITY : Any, META : EntityMetamodel<E
         return support.update(config) { it.executeUpdate(statement) }
     }
 
-    private fun postUpdate(entity: ENTITY, count: Int): ENTITY {
-        return support.postUpdate(entity, count)
+    private fun postUpdate(count: Int) {
+        return support.postUpdate(count)
     }
 
     override fun dryRun(config: DatabaseConfig): String {

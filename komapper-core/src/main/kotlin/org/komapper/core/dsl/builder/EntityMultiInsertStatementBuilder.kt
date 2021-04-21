@@ -14,9 +14,9 @@ interface EntityMultiInsertStatementBuilder<ENTITY : Any> {
     fun build(): Statement
 }
 
-internal class EntityMultiInsertStatementBuilderImpl<ENTITY : Any, META : EntityMetamodel<ENTITY, META>>(
+internal class EntityMultiInsertStatementBuilderImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     val dialect: Dialect,
-    val context: EntityInsertContext<ENTITY, META>,
+    val context: EntityInsertContext<ENTITY, ID, META>,
     val entities: List<ENTITY>
 ) : EntityMultiInsertStatementBuilder<ENTITY> {
 

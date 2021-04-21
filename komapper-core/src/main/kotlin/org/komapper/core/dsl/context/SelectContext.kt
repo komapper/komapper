@@ -10,19 +10,20 @@ import org.komapper.core.dsl.metamodel.EntityMetamodel
 
 internal interface SelectContext<
     ENTITY : Any,
-    META : EntityMetamodel<ENTITY, META>,
-    CONTEXT : SelectContext<ENTITY, META, CONTEXT>> : Context {
+    ID,
+    META : EntityMetamodel<ENTITY, ID, META>,
+    CONTEXT : SelectContext<ENTITY, ID, META, CONTEXT>> : Context {
 
     val target: META
     val projection: Projection
-    val joins: List<Join<*, *>>
+    val joins: List<Join<*, *, *>>
     val where: List<Criterion>
     val orderBy: List<SortItem>
     val offset: Int
     val limit: Int
     val forUpdate: ForUpdate
 
-    fun addJoin(join: Join<*, *>): CONTEXT
+    fun addJoin(join: Join<*, *, *>): CONTEXT
     fun addWhere(where: List<Criterion>): CONTEXT
     fun addOrderBy(orderBy: List<SortItem>): CONTEXT
     fun setLimit(limit: Int): CONTEXT

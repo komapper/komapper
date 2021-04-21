@@ -8,9 +8,9 @@ import org.komapper.core.dsl.element.Criterion
 import org.komapper.core.dsl.expression.EntityExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 
-internal class SqlDeleteStatementBuilder<ENTITY : Any, META : EntityMetamodel<ENTITY, META>>(
+internal class SqlDeleteStatementBuilder<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     val dialect: Dialect,
-    val context: SqlDeleteContext<ENTITY, META>
+    val context: SqlDeleteContext<ENTITY, ID, META>
 ) {
     private val aliasManager = AliasManagerImpl(context)
     private val buf = StatementBuffer(dialect::formatValue)

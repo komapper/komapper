@@ -6,27 +6,29 @@ import org.komapper.core.dsl.context.EntityUpsertContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.scope.SetScope
 
-interface EntityBatchUpsertQuery<ENTITY : Any, META : EntityMetamodel<ENTITY, META>> : Query<Pair<IntArray, LongArray>> {
-    fun set(declaration: SetScope<ENTITY>.(META) -> Unit): Query<Pair<IntArray, LongArray>>
+interface EntityBatchUpsertQuery<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> :
+    Query<IntArray> {
+    fun set(declaration: SetScope<ENTITY>.(META) -> Unit): Query<IntArray>
 }
 
-internal data class EntityBatchUpsertQueryImpl<ENTITY : Any, META : EntityMetamodel<ENTITY, META>>(
-    private val context: EntityUpsertContext<ENTITY, META>,
+internal data class EntityBatchUpsertQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+    private val context: EntityUpsertContext<ENTITY, ID, META>,
     private val entities: List<ENTITY>,
-    private val insertSupport: EntityInsertQuerySupport<ENTITY, META>
-) : EntityBatchUpsertQuery<ENTITY, META> {
+    private val insertSupport: EntityInsertQuerySupport<ENTITY, ID, META>
+) : EntityBatchUpsertQuery<ENTITY, ID, META> {
 
-    private val support: EntityUpsertQuerySupport<ENTITY, META> = EntityUpsertQuerySupport(context, insertSupport)
+    private val support: EntityUpsertQuerySupport<ENTITY, ID, META> = EntityUpsertQuerySupport(context, insertSupport)
 
-    override fun set(declaration: SetScope<ENTITY>.(META) -> Unit): Query<Pair<IntArray, LongArray>> {
+    override fun set(declaration: SetScope<ENTITY>.(META) -> Unit): Query<IntArray> {
         val newContext = support.set(declaration)
         return copy(context = newContext)
     }
 
-    override fun run(config: DatabaseConfig): Pair<IntArray, LongArray> {
-        if (entities.isEmpty()) return IntArray(0) to LongArray(0)
+    override fun run(config: DatabaseConfig): IntArray {
+        if (entities.isEmpty()) return IntArray(0)
         val newEntities = entities.map { preUpsert(config, it) }
-        return upsert(config, newEntities)
+        val (counts) = upsert(config, newEntities)
+        return counts
     }
 
     private fun preUpsert(config: DatabaseConfig, entity: ENTITY): ENTITY {

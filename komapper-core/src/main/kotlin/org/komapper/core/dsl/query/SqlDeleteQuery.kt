@@ -16,18 +16,18 @@ interface SqlDeleteQuery : Query<Int> {
     fun option(configurator: QueryOptionConfigurator<SqlDeleteOption>): SqlDeleteQuery
 }
 
-internal data class SqlDeleteQueryImpl<ENTITY : Any, META : EntityMetamodel<ENTITY, META>>(
-    private val context: SqlDeleteContext<ENTITY, META>,
+internal data class SqlDeleteQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+    private val context: SqlDeleteContext<ENTITY, ID, META>,
     private val option: SqlDeleteOption = SqlDeleteOption()
 ) : SqlDeleteQuery {
 
-    override fun where(declaration: WhereDeclaration): SqlDeleteQueryImpl<ENTITY, META> {
+    override fun where(declaration: WhereDeclaration): SqlDeleteQueryImpl<ENTITY, ID, META> {
         val scope = WhereScope().apply(declaration)
         val newContext = context.copy(where = context.where + scope)
         return copy(context = newContext)
     }
 
-    override fun option(configurator: QueryOptionConfigurator<SqlDeleteOption>): SqlDeleteQueryImpl<ENTITY, META> {
+    override fun option(configurator: QueryOptionConfigurator<SqlDeleteOption>): SqlDeleteQueryImpl<ENTITY, ID, META> {
         return copy(option = configurator.apply(option))
     }
 
@@ -45,7 +45,7 @@ internal data class SqlDeleteQueryImpl<ENTITY : Any, META : EntityMetamodel<ENTI
         return buildStatement(config, context).sql
     }
 
-    private fun buildStatement(config: DatabaseConfig, c: SqlDeleteContext<ENTITY, META>): Statement {
+    private fun buildStatement(config: DatabaseConfig, c: SqlDeleteContext<ENTITY, ID, META>): Statement {
         val builder = SqlDeleteStatementBuilder(config.dialect, c)
         return builder.build()
     }

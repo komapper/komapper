@@ -15,25 +15,25 @@ import org.komapper.core.dsl.scope.OnScope
 import org.komapper.core.dsl.scope.WhereDeclaration
 import org.komapper.core.dsl.scope.WhereScope
 
-internal data class SelectQuerySupport<ENTITY : Any, META : EntityMetamodel<ENTITY, META>, CONTEXT : SelectContext<ENTITY, META, CONTEXT>>(
+internal data class SelectQuerySupport<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>, CONTEXT : SelectContext<ENTITY, ID, META, CONTEXT>>(
     private val context: CONTEXT
 ) {
 
-    fun <OTHER_ENTITY : Any, OTHER_META : EntityMetamodel<OTHER_ENTITY, OTHER_META>> innerJoin(
+    fun <OTHER_ENTITY : Any, OTHER_META : EntityMetamodel<OTHER_ENTITY, *, OTHER_META>> innerJoin(
         entityMetamodel: OTHER_META,
         declaration: OnDeclaration<OTHER_ENTITY>
     ): CONTEXT {
         return join(entityMetamodel, declaration, JoinKind.INNER)
     }
 
-    fun <OTHER_ENTITY : Any, OTHER_META : EntityMetamodel<OTHER_ENTITY, OTHER_META>> leftJoin(
+    fun <OTHER_ENTITY : Any, OTHER_META : EntityMetamodel<OTHER_ENTITY, *, OTHER_META>> leftJoin(
         entityMetamodel: OTHER_META,
         declaration: OnDeclaration<OTHER_ENTITY>
     ): CONTEXT {
         return join(entityMetamodel, declaration, JoinKind.LEFT_OUTER)
     }
 
-    private fun <OTHER_ENTITY : Any, OTHER_META : EntityMetamodel<OTHER_ENTITY, OTHER_META>> join(
+    private fun <OTHER_ENTITY : Any, OTHER_META : EntityMetamodel<OTHER_ENTITY, *, OTHER_META>> join(
         entityMetamodel: OTHER_META,
         declaration: OnDeclaration<OTHER_ENTITY>,
         kind: JoinKind

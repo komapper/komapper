@@ -9,36 +9,36 @@ import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.option.EntityInsertOption
 import org.komapper.core.dsl.option.QueryOptionConfigurator
 
-interface EntityInsertQuery<ENTITY : Any, META : EntityMetamodel<ENTITY, META>> : Query<ENTITY> {
-    fun option(configurator: QueryOptionConfigurator<EntityInsertOption>): EntityInsertQuery<ENTITY, META>
-    fun onDuplicateKeyUpdate(): EntityUpsertQuery<ENTITY, META>
-    fun onDuplicateKeyIgnore(): Query<Pair<Int, Long?>>
+interface EntityInsertQuery<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> : Query<ID> {
+    fun option(configurator: QueryOptionConfigurator<EntityInsertOption>): EntityInsertQuery<ENTITY, ID, META>
+    fun onDuplicateKeyUpdate(): EntityUpsertQuery<ENTITY, ID, META>
+    fun onDuplicateKeyIgnore(): Query<Int>
 }
 
-internal data class EntityInsertQueryImpl<ENTITY : Any, META : EntityMetamodel<ENTITY, META>>(
-    private val context: EntityInsertContext<ENTITY, META>,
+internal data class EntityInsertQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+    private val context: EntityInsertContext<ENTITY, ID, META>,
     private val entity: ENTITY,
     private val option: EntityInsertOption = EntityInsertOption()
 ) :
-    EntityInsertQuery<ENTITY, META> {
+    EntityInsertQuery<ENTITY, ID, META> {
 
-    private val support: EntityInsertQuerySupport<ENTITY, META> = EntityInsertQuerySupport(context, option)
+    private val support: EntityInsertQuerySupport<ENTITY, ID, META> = EntityInsertQuerySupport(context, option)
 
-    override fun option(configurator: QueryOptionConfigurator<EntityInsertOption>): EntityInsertQueryImpl<ENTITY, META> {
+    override fun option(configurator: QueryOptionConfigurator<EntityInsertOption>): EntityInsertQueryImpl<ENTITY, ID, META> {
         return copy(option = configurator.apply(option))
     }
 
-    override fun onDuplicateKeyUpdate(): EntityUpsertQuery<ENTITY, META> {
+    override fun onDuplicateKeyUpdate(): EntityUpsertQuery<ENTITY, ID, META> {
         val newContext = context.asEntityUpsertContext(DuplicateKeyType.UPDATE)
         return EntityUpsertQueryImpl(newContext, entity, support)
     }
 
-    override fun onDuplicateKeyIgnore(): Query<Pair<Int, Long?>> {
+    override fun onDuplicateKeyIgnore(): Query<Int> {
         val newContext = context.asEntityUpsertContext(DuplicateKeyType.IGNORE)
         return EntityUpsertQueryImpl(newContext, entity, support)
     }
 
-    override fun run(config: DatabaseConfig): ENTITY {
+    override fun run(config: DatabaseConfig): ID {
         val newEntity = preInsert(config)
         val (_, generatedKeys) = insert(config, newEntity)
         return postInsert(newEntity, generatedKeys)
@@ -53,13 +53,14 @@ internal data class EntityInsertQueryImpl<ENTITY : Any, META : EntityMetamodel<E
         return support.insert(config) { it.executeUpdate(statement) }
     }
 
-    private fun postInsert(entity: ENTITY, generatedKeys: LongArray): ENTITY {
+    private fun postInsert(entity: ENTITY, generatedKeys: LongArray): ID {
         val key = generatedKeys.firstOrNull()
-        return if (key == null) {
+        val e = if (key == null) {
             entity
         } else {
             support.postInsert(entity, key)
         }
+        return context.target.getId(e)
     }
 
     override fun dryRun(config: DatabaseConfig): String {

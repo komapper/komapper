@@ -8,8 +8,8 @@ import org.komapper.core.dsl.metamodel.Assignment
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.option.QueryOption
 
-internal class EntityInsertQuerySupport<ENTITY : Any, META : EntityMetamodel<ENTITY, META>>(
-    private val context: EntityInsertContext<ENTITY, META>,
+internal class EntityInsertQuerySupport<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+    private val context: EntityInsertContext<ENTITY, ID, META>,
     private val option: QueryOption
 ) {
 

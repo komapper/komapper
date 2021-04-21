@@ -11,7 +11,7 @@ open class H2SchemaStatementBuilder(private val dialect: H2Dialect) : SchemaStat
 
     private val sql = StringWriter()
 
-    override fun create(entityMetamodels: List<EntityMetamodel<*, *>>): Statement {
+    override fun create(entityMetamodels: List<EntityMetamodel<*, *, *>>): Statement {
         createSchema(entityMetamodels)
         for (e in entityMetamodels) {
             createTable(e)
@@ -20,7 +20,7 @@ open class H2SchemaStatementBuilder(private val dialect: H2Dialect) : SchemaStat
         return Statement(sql.toString())
     }
 
-    override fun drop(entityMetamodels: List<EntityMetamodel<*, *>>): Statement {
+    override fun drop(entityMetamodels: List<EntityMetamodel<*, *, *>>): Statement {
         for (e in entityMetamodels) {
             dropTable(e)
             dropSequence(e)
@@ -32,7 +32,7 @@ open class H2SchemaStatementBuilder(private val dialect: H2Dialect) : SchemaStat
         return Statement("drop all objects;")
     }
 
-    private fun createSchema(entityMetamodels: List<EntityMetamodel<*, *>>) {
+    private fun createSchema(entityMetamodels: List<EntityMetamodel<*, *, *>>) {
         val w = PrintWriter(sql)
         val schemaNames = extractSchemaNames(entityMetamodels)
         for (name in schemaNames) {
@@ -40,7 +40,7 @@ open class H2SchemaStatementBuilder(private val dialect: H2Dialect) : SchemaStat
         }
     }
 
-    private fun createTable(e: EntityMetamodel<*, *>) {
+    private fun createTable(e: EntityMetamodel<*, *, *>) {
         val w = PrintWriter(sql)
         val tableName = e.getCanonicalTableName(dialect::enquote)
         w.println("create table if not exists $tableName (")
@@ -59,7 +59,7 @@ open class H2SchemaStatementBuilder(private val dialect: H2Dialect) : SchemaStat
         w.println(");")
     }
 
-    private fun createSequence(e: EntityMetamodel<*, *>) {
+    private fun createSequence(e: EntityMetamodel<*, *, *>) {
         val w = PrintWriter(sql)
         val idAssignment = e.properties().map { it.idAssignment }.firstOrNull { it != null }
         if (idAssignment is Assignment.Sequence<*, *>) {
@@ -67,12 +67,12 @@ open class H2SchemaStatementBuilder(private val dialect: H2Dialect) : SchemaStat
         }
     }
 
-    private fun dropTable(e: EntityMetamodel<*, *>) {
+    private fun dropTable(e: EntityMetamodel<*, *, *>) {
         val w = PrintWriter(sql)
         w.println("drop table if exists ${e.getCanonicalTableName(dialect::enquote)};")
     }
 
-    private fun dropSequence(e: EntityMetamodel<*, *>) {
+    private fun dropSequence(e: EntityMetamodel<*, *, *>) {
         val w = PrintWriter(sql)
         val idAssignment = e.properties().map { it.idAssignment }.firstOrNull { it != null }
         if (idAssignment is Assignment.Sequence<*, *>) {
@@ -80,7 +80,7 @@ open class H2SchemaStatementBuilder(private val dialect: H2Dialect) : SchemaStat
         }
     }
 
-    private fun extractSchemaNames(entityMetamodels: List<EntityMetamodel<*, *>>): List<String> {
+    private fun extractSchemaNames(entityMetamodels: List<EntityMetamodel<*, *, *>>): List<String> {
         val tableSchemaNames = entityMetamodels.map { it.schemaName() }
         val sequenceSchemaNames =
             entityMetamodels.mapNotNull { it.idAssignment() }.filterIsInstance<Assignment.Sequence<*, *>>()

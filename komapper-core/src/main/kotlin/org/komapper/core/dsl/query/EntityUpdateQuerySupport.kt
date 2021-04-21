@@ -9,17 +9,30 @@ import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.metamodel.PropertyMetamodel
 import org.komapper.core.dsl.option.VersionOption
 
-internal class EntityUpdateQuerySupport<ENTITY : Any, META : EntityMetamodel<ENTITY, META>>(
-    private val context: EntityUpdateContext<ENTITY, META>,
+internal class EntityUpdateQuerySupport<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+    private val context: EntityUpdateContext<ENTITY, ID, META>,
     private val option: VersionOption
 ) {
 
-    fun include(propertyMetamodels: List<PropertyMetamodel<ENTITY, *>>): EntityUpdateContext<ENTITY, META> {
-        return context.copy(includedProperties = propertyMetamodels)
+    fun include(propertyMetamodels: List<PropertyMetamodel<ENTITY, *>>): EntityUpdateContext<ENTITY, ID, META> {
+        return context.copy(includedProperties = propertyMetamodels).also {
+            checkContext(it)
+        }
     }
 
-    fun exclude(propertyMetamodels: List<PropertyMetamodel<ENTITY, *>>): EntityUpdateContext<ENTITY, META> {
-        return context.copy(excludedProperties = propertyMetamodels)
+    fun exclude(propertyMetamodels: List<PropertyMetamodel<ENTITY, *>>): EntityUpdateContext<ENTITY, ID, META> {
+        return context.copy(excludedProperties = propertyMetamodels).also {
+            checkContext(it)
+        }
+    }
+
+    private fun checkContext(context: EntityUpdateContext<ENTITY, ID, META>) {
+        if (context.getTargetProperties().isEmpty()) {
+            error(
+                "Illegal SQL will be generated. The set clause is empty. " +
+                    "Include or exclude appropriate properties."
+            )
+        }
     }
 
     fun preUpdate(config: DatabaseConfig, entity: ENTITY): ENTITY {
@@ -32,14 +45,9 @@ internal class EntityUpdateQuerySupport<ENTITY : Any, META : EntityMetamodel<ENT
         return execute(executor)
     }
 
-    fun postUpdate(entity: ENTITY, count: Int, index: Int? = null): ENTITY {
+    fun postUpdate(count: Int, index: Int? = null) {
         if (context.target.versionProperty() != null) {
             checkOptimisticLock(option, count, index)
-        }
-        return if (!option.ignoreVersion) {
-            context.target.incrementVersion(entity)
-        } else {
-            entity
         }
     }
 

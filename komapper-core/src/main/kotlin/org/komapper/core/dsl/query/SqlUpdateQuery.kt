@@ -19,24 +19,24 @@ interface SqlUpdateQuery<ENTITY : Any> : Query<Int> {
     fun option(configurator: QueryOptionConfigurator<SqlUpdateOption>): SqlUpdateQuery<ENTITY>
 }
 
-internal data class SqlUpdateQueryImpl<ENTITY : Any, META : EntityMetamodel<ENTITY, META>>(
-    private val context: SqlUpdateContext<ENTITY, META>,
+internal data class SqlUpdateQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+    private val context: SqlUpdateContext<ENTITY, ID, META>,
     private val option: SqlUpdateOption = SqlUpdateOption()
 ) : SqlUpdateQuery<ENTITY> {
 
-    override fun set(declaration: SetDeclaration<ENTITY>): SqlUpdateQueryImpl<ENTITY, META> {
+    override fun set(declaration: SetDeclaration<ENTITY>): SqlUpdateQueryImpl<ENTITY, ID, META> {
         val scope = SetScope<ENTITY>().apply(declaration)
         val newContext = context.copy(set = context.set + scope)
         return copy(context = newContext)
     }
 
-    override fun where(declaration: WhereDeclaration): SqlUpdateQueryImpl<ENTITY, META> {
+    override fun where(declaration: WhereDeclaration): SqlUpdateQueryImpl<ENTITY, ID, META> {
         val scope = WhereScope().apply(declaration)
         val newContext = context.copy(where = context.where + scope)
         return copy(context = newContext)
     }
 
-    override fun option(configurator: QueryOptionConfigurator<SqlUpdateOption>): SqlUpdateQueryImpl<ENTITY, META> {
+    override fun option(configurator: QueryOptionConfigurator<SqlUpdateOption>): SqlUpdateQueryImpl<ENTITY, ID, META> {
         return copy(option = configurator.apply(option))
     }
 

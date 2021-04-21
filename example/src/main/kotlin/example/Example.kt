@@ -48,18 +48,17 @@ fun main() {
         }
 
         // CREATE
-        val addressA = db.runQuery {
+        val id = db.runQuery {
             EntityQuery.insert(a, Address(street = "street A"))
         }
-        println(addressA)
 
         // READ: select by id
-        val foundA = db.runQuery {
+        val addressA = db.runQuery {
             EntityQuery.first(a) {
-                a.id eq addressA.id
+                a.id eq id
             }
         }
-        check(addressA == foundA)
+        println(addressA)
 
         // UPDATE
         val addressB = db.runQuery {
@@ -68,24 +67,24 @@ fun main() {
         println(addressB)
 
         // READ: select by street and version
-        val foundB1 = db.runQuery {
+        val addressC = db.runQuery {
             EntityQuery.first(a) {
                 a.street eq "street B"
                 a.version eq 1
             }
         }
-        check(addressB == foundB1)
+        println(addressC)
 
         // DELETE
         db.runQuery {
-            EntityQuery.delete(a, addressB)
+            EntityQuery.delete(a, addressC)
         }
 
         // READ: select all
-        val addressList = db.runQuery {
+        val list = db.runQuery {
             EntityQuery.from(a).orderBy(a.id)
         }
-        check(addressList.isEmpty())
+        check(list.isEmpty())
     }
 }
 

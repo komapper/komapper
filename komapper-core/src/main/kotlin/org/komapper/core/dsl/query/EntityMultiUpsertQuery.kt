@@ -6,17 +6,17 @@ import org.komapper.core.dsl.context.EntityUpsertContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.scope.SetScope
 
-interface EntityMultiUpsertQuery<ENTITY : Any, META : EntityMetamodel<ENTITY, META>> : Query<Int> {
+interface EntityMultiUpsertQuery<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> : Query<Int> {
     fun set(declaration: SetScope<ENTITY>.(META) -> Unit): Query<Int>
 }
 
-internal data class EntityMultiUpsertQueryImpl<ENTITY : Any, META : EntityMetamodel<ENTITY, META>>(
-    private val context: EntityUpsertContext<ENTITY, META>,
+internal data class EntityMultiUpsertQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+    private val context: EntityUpsertContext<ENTITY, ID, META>,
     private val entities: List<ENTITY>,
-    private val insertSupport: EntityInsertQuerySupport<ENTITY, META>
-) : EntityMultiUpsertQuery<ENTITY, META> {
+    private val insertSupport: EntityInsertQuerySupport<ENTITY, ID, META>
+) : EntityMultiUpsertQuery<ENTITY, ID, META> {
 
-    private val support: EntityUpsertQuerySupport<ENTITY, META> = EntityUpsertQuerySupport(context, insertSupport)
+    private val support: EntityUpsertQuerySupport<ENTITY, ID, META> = EntityUpsertQuerySupport(context, insertSupport)
 
     override fun set(declaration: SetScope<ENTITY>.(META) -> Unit): Query<Int> {
         val newContext = support.set(declaration)

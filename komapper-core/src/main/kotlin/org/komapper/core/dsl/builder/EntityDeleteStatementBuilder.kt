@@ -10,9 +10,9 @@ import org.komapper.core.dsl.expression.PropertyExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.option.VersionOption
 
-internal class EntityDeleteStatementBuilder<ENTITY : Any, META : EntityMetamodel<ENTITY, META>>(
+internal class EntityDeleteStatementBuilder<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     val dialect: Dialect,
-    val context: EntityDeleteContext<ENTITY, META>,
+    val context: EntityDeleteContext<ENTITY, ID, META>,
     val entity: ENTITY,
     val option: VersionOption
 ) {
