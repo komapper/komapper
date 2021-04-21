@@ -7,13 +7,13 @@ import java.time.ZonedDateTime
 
 private const val Assignment = "org.komapper.core.dsl.metamodel.Assignment"
 private const val EntityMetamodel = "org.komapper.core.dsl.metamodel.EntityMetamodel"
-private const val EmptyEntityMetamodel = "org.komapper.core.dsl.metamodel.EmptyEntityMetamodel"
-private const val EmptyPropertyMetamodel = "org.komapper.core.dsl.metamodel.EmptyPropertyMetamodel"
+private const val EntityMetamodelStub = "org.komapper.core.dsl.metamodel.EntityMetamodelStub"
 private const val Identity = "org.komapper.core.dsl.metamodel.Assignment.Identity"
 private const val Sequence = "org.komapper.core.dsl.metamodel.Assignment.Sequence"
 private const val PropertyDescriptor = "org.komapper.core.dsl.metamodel.PropertyDescriptor"
 private const val PropertyMetamodel = "org.komapper.core.dsl.metamodel.PropertyMetamodel"
 private const val PropertyMetamodelImpl = "org.komapper.core.dsl.metamodel.PropertyMetamodelImpl"
+private const val PropertyMetamodelStub = "org.komapper.core.dsl.metamodel.PropertyMetamodelStub"
 private const val Clock = "java.time.Clock"
 private const val EntityDescriptor = "__EntityDescriptor"
 
@@ -256,11 +256,12 @@ internal class EmptyEntityMetamodelGenerator(
         w.println()
         w.println("// generated at ${ZonedDateTime.now()}")
         w.println("@Suppress(\"ClassName\")")
-        w.println("class $fileName : $EmptyEntityMetamodel<$simpleQualifiedName, $fileName>() {")
+        w.println("class $fileName : $EntityMetamodelStub<$simpleQualifiedName, $fileName>() {")
         val parameters = classDeclaration.primaryConstructor?.parameters
         if (parameters != null) {
             for (p in parameters) {
-                w.println("    val $p = $EmptyPropertyMetamodel<$simpleQualifiedName, ${p.type.resolve().declaration.qualifiedName?.asString()}>()")
+                val typeName = p.type.resolve().declaration.qualifiedName?.asString()
+                w.println("    val $p: $PropertyMetamodel<$simpleQualifiedName, $typeName> = $PropertyMetamodelStub<$simpleQualifiedName, $typeName>()")
             }
         }
         w.println("    companion object {")

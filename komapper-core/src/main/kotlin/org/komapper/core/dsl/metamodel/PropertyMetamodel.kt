@@ -32,7 +32,7 @@ class PropertyMetamodelImpl<E : Any, T : Any>(
 }
 
 @Suppress("unused")
-class EmptyPropertyMetamodel<E : Any, T : Any> : PropertyMetamodel<E, T> {
+class PropertyMetamodelStub<E : Any, T : Any> : PropertyMetamodel<E, T> {
     override val owner: EntityMetamodel<E, *, *> get() = fail()
     override val klass: KClass<T> get() = fail()
     override val name: String get() = fail()
@@ -45,6 +45,6 @@ class EmptyPropertyMetamodel<E : Any, T : Any> : PropertyMetamodel<E, T> {
     override val idAssignment: Assignment<E> get() = fail()
 
     private fun fail(): Nothing {
-        error("Fix a compile error.")
+        error("Fix google/ksp compile errors.")
     }
 }

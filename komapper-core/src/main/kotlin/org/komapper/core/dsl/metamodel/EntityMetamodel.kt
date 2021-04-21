@@ -20,7 +20,7 @@ interface EntityMetamodel<ENTITY : Any, out ID, out META : EntityMetamodel<ENTIT
 }
 
 @Suppress("unused")
-abstract class EmptyEntityMetamodel<ENTITY : Any, META : EmptyEntityMetamodel<ENTITY, META>> :
+abstract class EntityMetamodelStub<ENTITY : Any, META : EntityMetamodelStub<ENTITY, META>> :
     EntityMetamodel<ENTITY, Any, META> {
     override fun klass(): KClass<ENTITY> = fail()
     override fun tableName(): String = fail()
@@ -41,6 +41,6 @@ abstract class EmptyEntityMetamodel<ENTITY : Any, META : EmptyEntityMetamodel<EN
     override fun newMetamodel(table: String, catalog: String, schema: String, alwaysQuote: Boolean): META = fail()
 
     private fun fail(): Nothing {
-        error("Fix a compile error.")
+        error("Fix google/ksp compile errors.")
     }
 }
