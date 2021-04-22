@@ -10,7 +10,7 @@ import org.komapper.core.dsl.option.QueryOption
 
 internal class EntityInsertQuerySupport<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityInsertContext<ENTITY, ID, META>,
-    private val option: QueryOption
+    val option: QueryOption
 ) {
 
     fun preInsert(config: DatabaseConfig, entity: ENTITY): ENTITY {
@@ -32,7 +32,8 @@ internal class EntityInsertQuerySupport<ENTITY : Any, ID, META : EntityMetamodel
         }
     }
 
-    fun <T> insert(config: DatabaseConfig, requiresGeneratedKeys: Boolean, execute: (JdbcExecutor) -> T): T {
+    fun <T> insert(config: DatabaseConfig, execute: (JdbcExecutor) -> T): T {
+        val requiresGeneratedKeys = context.target.idAssignment() is Assignment.Identity<*, *>
         val executor = JdbcExecutor(config, option.asJdbcOption(), requiresGeneratedKeys)
         return execute(executor)
     }

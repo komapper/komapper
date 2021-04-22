@@ -5,7 +5,6 @@ import org.komapper.core.data.Statement
 import org.komapper.core.dsl.builder.EntityInsertStatementBuilder
 import org.komapper.core.dsl.context.DuplicateKeyType
 import org.komapper.core.dsl.context.EntityInsertContext
-import org.komapper.core.dsl.metamodel.Assignment
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.metamodel.PropertyMetamodel
 import org.komapper.core.dsl.option.EntityInsertOption
@@ -51,9 +50,8 @@ internal data class EntityInsertQueryImpl<ENTITY : Any, ID, META : EntityMetamod
     }
 
     private fun insert(config: DatabaseConfig, entity: ENTITY): Pair<Int, LongArray> {
-        val requiresGeneratedKeys = context.target.idAssignment() is Assignment.Identity<*, *>
         val statement = buildStatement(config, entity)
-        return support.insert(config, requiresGeneratedKeys) { it.executeUpdate(statement) }
+        return support.insert(config) { it.executeUpdate(statement) }
     }
 
     private fun postInsert(entity: ENTITY, generatedKeys: LongArray): ID {

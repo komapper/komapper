@@ -5,7 +5,6 @@ import org.komapper.core.data.Statement
 import org.komapper.core.dsl.builder.EntityInsertStatementBuilder
 import org.komapper.core.dsl.context.DuplicateKeyType
 import org.komapper.core.dsl.context.EntityInsertContext
-import org.komapper.core.dsl.metamodel.Assignment
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.metamodel.PropertyMetamodel
 import org.komapper.core.dsl.option.EntityBatchInsertOption
@@ -52,9 +51,8 @@ internal data class EntityBatchInsertQueryImpl<ENTITY : Any, ID, META : EntityMe
     }
 
     private fun insert(config: DatabaseConfig, entities: List<ENTITY>): LongArray {
-        val requiresGeneratedKeys = context.target.idAssignment() is Assignment.Identity<*, *>
         val statements = entities.map { buildStatement(config, it) }
-        val (_, keys) = support.insert(config, requiresGeneratedKeys) { it.executeBatch(statements) }
+        val (_, keys) = support.insert(config) { it.executeBatch(statements) }
         return keys
     }
 

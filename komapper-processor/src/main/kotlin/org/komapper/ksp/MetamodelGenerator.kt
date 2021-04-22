@@ -224,7 +224,7 @@ internal class EntityMetamodelGenerator(
         val body = if (version == null) { "e" } else { "e.copy($version)" }
         w.println("    override fun postUpdate(e: $entityTypeName): $entityTypeName = $body")
     }
-    
+
     private fun newMetamodel() {
         val paramList = "table: String, catalog: String, schema: String, alwaysQuote: Boolean"
         w.println("    override fun newMetamodel($paramList) = $simpleName(table, catalog, schema, alwaysQuote)")
