@@ -37,7 +37,7 @@ internal class EntityUpdateQuerySupport<ENTITY : Any, ID, META : EntityMetamodel
 
     fun preUpdate(config: DatabaseConfig, entity: ENTITY): ENTITY {
         val clock = config.clockProvider.now()
-        return context.target.updateUpdatedAt(entity, clock)
+        return context.target.preUpdate(entity, clock)
     }
 
     fun <T> update(config: DatabaseConfig, execute: (JdbcExecutor) -> T): T {

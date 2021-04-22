@@ -11,11 +11,11 @@ interface EntityMetamodel<ENTITY : Any, out ID, out META : EntityMetamodel<ENTIT
     fun createdAtProperty(): PropertyMetamodel<ENTITY, *>?
     fun updatedAtProperty(): PropertyMetamodel<ENTITY, *>?
     fun properties(): List<PropertyMetamodel<ENTITY, *>>
-    fun instantiate(__m: Map<PropertyMetamodel<*, *>, Any?>): ENTITY
-    fun getId(__e: ENTITY): ID
-    fun incrementVersion(__e: ENTITY): ENTITY
-    fun updateCreatedAt(__e: ENTITY, __c: Clock): ENTITY
-    fun updateUpdatedAt(__e: ENTITY, __c: Clock): ENTITY
+    fun instantiate(m: Map<PropertyMetamodel<*, *>, Any?>): ENTITY
+    fun getId(e: ENTITY): ID
+    fun preInsert(e: ENTITY, c: Clock): ENTITY
+    fun preUpdate(e: ENTITY, c: Clock): ENTITY
+    fun postUpdate(e: ENTITY): ENTITY
     fun newMetamodel(table: String, catalog: String, schema: String, alwaysQuote: Boolean): META
 }
 
@@ -33,11 +33,11 @@ abstract class EntityMetamodelStub<ENTITY : Any, META : EntityMetamodelStub<ENTI
     override fun createdAtProperty(): PropertyMetamodel<ENTITY, *>? = fail()
     override fun updatedAtProperty(): PropertyMetamodel<ENTITY, *>? = fail()
     override fun properties(): List<PropertyMetamodel<ENTITY, *>> = fail()
-    override fun instantiate(__m: Map<PropertyMetamodel<*, *>, Any?>): ENTITY = fail()
-    override fun getId(__e: ENTITY): Any = fail()
-    override fun incrementVersion(__e: ENTITY): ENTITY = fail()
-    override fun updateCreatedAt(__e: ENTITY, __c: Clock): ENTITY = fail()
-    override fun updateUpdatedAt(__e: ENTITY, __c: Clock): ENTITY = fail()
+    override fun instantiate(m: Map<PropertyMetamodel<*, *>, Any?>): ENTITY = fail()
+    override fun getId(e: ENTITY): Any = fail()
+    override fun preInsert(e: ENTITY, c: Clock): ENTITY = fail()
+    override fun preUpdate(e: ENTITY, c: Clock): ENTITY = fail()
+    override fun postUpdate(e: ENTITY): ENTITY = fail()
     override fun newMetamodel(table: String, catalog: String, schema: String, alwaysQuote: Boolean): META = fail()
 
     private fun fail(): Nothing {

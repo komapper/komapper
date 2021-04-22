@@ -67,9 +67,9 @@ internal class EntityMetamodelGenerator(
         properties()
         instantiate()
         getId()
-        incrementVersion()
-        updateCreatedAt()
-        updateUpdatedAt()
+        preInsert()
+        preUpdate()
+        postUpdate()
 
         newMetamodel()
 
@@ -172,50 +172,59 @@ internal class EntityMetamodelGenerator(
     private fun instantiate() {
         val argList = entity.properties.joinToString(",\n        ", prefix = "\n        ") { p ->
             val nullability = if (p.nullability == Nullability.NULLABLE) "?" else ""
-            "$p = __m[$p] as ${p.typeName}$nullability"
+            "$p = m[this.$p] as ${p.typeName}$nullability"
         }
-        w.println("    override fun instantiate(__m: Map<$PropertyMetamodel<*, *>, Any?>) = $entityTypeName($argList)")
+        w.println("    override fun instantiate(m: Map<$PropertyMetamodel<*, *>, Any?>) = $entityTypeName($argList)")
     }
 
     private fun getId() {
         val body = if (entity.idProperties.size == 1) {
             val p = entity.idProperties[0]
-            "$p.getter(__e) ?: error(\"The id property '$p' must not null.\")"
+            val nullable = p.nullability == Nullability.NULLABLE
+            "e.$p" + if (nullable) " ?: error(\"The id property '$p' must not null.\")" else ""
         } else {
-            "idProperties().map { it.getter(__e) ?: error(\"The id property '${'$'}{it.name}' must not null.\") }"
+            val list = entity.idProperties.joinToString {
+                val nullable = it.nullability == Nullability.NULLABLE
+                "e.$it" + if (nullable) " ?: error(\"The id property '$it' must not null.\")" else ""
+            }
+            "listOf($list)"
         }
-        w.println("    override fun getId(__e: $entityTypeName): $idTypeName = $body")
+        w.println("    override fun getId(e: $entityTypeName): $idTypeName = $body")
     }
 
-    private fun incrementVersion() {
-        val body = if (entity.versionProperty == null) {
-            "__e"
-        } else {
-            "${entity.versionProperty}.setter(__e, ${entity.versionProperty}.getter(__e)!!.inc())"
+    private fun preInsert() {
+        val version = entity.versionProperty ?.let {
+            val nullable = it.nullability == Nullability.NULLABLE
+            "$it = e.$it${if (nullable) " ?: 0" else ""}"
         }
-        w.println("    override fun incrementVersion(__e: $entityTypeName): $entityTypeName = $body")
+        val createdAt = entity.createdAtProperty ?.let {
+            "$it = ${it.typeName}.now(c)"
+        }
+        val updatedAt = entity.updatedAtProperty ?.let {
+            "$it = ${it.typeName}.now(c)"
+        }
+        val paramList = listOfNotNull(version, createdAt, updatedAt).joinToString()
+        val body = if (paramList == "") { "e" } else { "e.copy($paramList)" }
+        w.println("    override fun preInsert(e: $entityTypeName, c: $Clock): $entityTypeName = $body")
     }
 
-    private fun updateCreatedAt() {
-        val property = entity.createdAtProperty
-        val body = if (property == null) {
-            "__e"
-        } else {
-            "$property.setter(__e, ${property.typeName}.now(__c))"
+    private fun preUpdate() {
+        val updatedAt = entity.updatedAtProperty ?.let {
+            "$it = ${it.typeName}.now(c)"
         }
-        w.println("    override fun updateCreatedAt(__e: $entityTypeName, __c: $Clock): $entityTypeName = $body")
+        val body = if (updatedAt == null) { "e" } else { "e.copy($updatedAt)" }
+        w.println("    override fun preUpdate(e: $entityTypeName, c: $Clock): $entityTypeName = $body")
     }
 
-    private fun updateUpdatedAt() {
-        val property = entity.updatedAtProperty
-        val body = if (property == null) {
-            "__e"
-        } else {
-            "$property.setter(__e, ${property.typeName}.now(__c))"
+    private fun postUpdate() {
+        val version = entity.versionProperty ?.let {
+            val nullable = it.nullability == Nullability.NULLABLE
+            "$it = e.$it${if (nullable) "?" else ""}.inc()${if (nullable) " ?: 0" else ""}"
         }
-        w.println("    override fun updateUpdatedAt(__e: $entityTypeName, __c: $Clock): $entityTypeName = $body")
+        val body = if (version == null) { "e" } else { "e.copy($version)" }
+        w.println("    override fun postUpdate(e: $entityTypeName): $entityTypeName = $body")
     }
-
+    
     private fun newMetamodel() {
         val paramList = "table: String, catalog: String, schema: String, alwaysQuote: Boolean"
         w.println("    override fun newMetamodel($paramList) = $simpleName(table, catalog, schema, alwaysQuote)")

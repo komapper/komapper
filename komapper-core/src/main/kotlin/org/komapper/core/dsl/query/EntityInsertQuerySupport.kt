@@ -28,9 +28,7 @@ internal class EntityInsertQuerySupport<ENTITY : Any, ID, META : EntityMetamodel
             entity
         }.let { newEntity ->
             val clock = config.clockProvider.now()
-            context.target.updateCreatedAt(newEntity, clock).let {
-                context.target.updateUpdatedAt(it, clock)
-            }
+            context.target.preInsert(newEntity, clock)
         }
     }
 
