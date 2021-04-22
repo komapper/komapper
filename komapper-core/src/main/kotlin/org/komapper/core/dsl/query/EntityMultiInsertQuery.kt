@@ -6,13 +6,14 @@ import org.komapper.core.dsl.context.DuplicateKeyType
 import org.komapper.core.dsl.context.EntityInsertContext
 import org.komapper.core.dsl.metamodel.Assignment
 import org.komapper.core.dsl.metamodel.EntityMetamodel
+import org.komapper.core.dsl.metamodel.PropertyMetamodel
 import org.komapper.core.dsl.option.EntityInsertOption
 import org.komapper.core.dsl.option.QueryOptionConfigurator
 
 interface EntityMultiInsertQuery<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> : Query<List<ID>> {
     fun option(configurator: QueryOptionConfigurator<EntityInsertOption>): EntityMultiInsertQuery<ENTITY, ID, META>
-    fun onDuplicateKeyUpdate(): EntityMultiUpsertQuery<ENTITY, ID, META>
-    fun onDuplicateKeyIgnore(): Query<Int>
+    fun onDuplicateKeyUpdate(vararg keys: PropertyMetamodel<ENTITY, *> = emptyArray()): EntityMultiUpsertQuery<ENTITY, ID, META>
+    fun onDuplicateKeyIgnore(vararg keys: PropertyMetamodel<ENTITY, *> = emptyArray()): Query<Int>
 }
 
 internal data class EntityMultiInsertQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
@@ -28,13 +29,13 @@ internal data class EntityMultiInsertQueryImpl<ENTITY : Any, ID, META : EntityMe
         return copy(option = configurator.apply(option))
     }
 
-    override fun onDuplicateKeyUpdate(): EntityMultiUpsertQuery<ENTITY, ID, META> {
-        val newContext = context.asEntityUpsertContext(DuplicateKeyType.UPDATE)
+    override fun onDuplicateKeyUpdate(vararg keys: PropertyMetamodel<ENTITY, *>): EntityMultiUpsertQuery<ENTITY, ID, META> {
+        val newContext = context.asEntityUpsertContext(keys.toList(), DuplicateKeyType.UPDATE)
         return EntityMultiUpsertQueryImpl(newContext, entities, support)
     }
 
-    override fun onDuplicateKeyIgnore(): Query<Int> {
-        val newContext = context.asEntityUpsertContext(DuplicateKeyType.IGNORE)
+    override fun onDuplicateKeyIgnore(vararg keys: PropertyMetamodel<ENTITY, *>): Query<Int> {
+        val newContext = context.asEntityUpsertContext(keys.toList(), DuplicateKeyType.IGNORE)
         return EntityMultiUpsertQueryImpl(newContext, entities, support)
     }
 

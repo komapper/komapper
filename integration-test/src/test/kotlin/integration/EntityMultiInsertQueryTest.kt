@@ -91,14 +91,30 @@ class EntityMultiInsertQueryTest(private val db: Database) {
             listOf("DEVELOPMENT" to "KYOTO", "PLANNING" to "TOKYO"),
             list.map { it.departmentName to it.location }
         )
-        println(list)
+    }
+
+    @Test
+    fun onDuplicateKeyUpdateWithKeys() {
+        val d = Department.alias
+        val department1 = Department(5, 50, "PLANNING", "TOKYO", 1)
+        val department2 = Department(10, 10, "DEVELOPMENT", "KYOTO", 1)
+        val query = EntityQuery.insertMulti(d, listOf(department1, department2)).onDuplicateKeyUpdate(d.departmentNo)
+        db.runQuery { query }
+        val list = db.runQuery {
+            EntityQuery.from(d).where { d.departmentNo inList listOf(10, 50) }.orderBy(d.departmentNo)
+        }
+        assertEquals(2, list.size)
+        assertEquals(
+            listOf("DEVELOPMENT" to "KYOTO", "PLANNING" to "TOKYO"),
+            list.map { it.departmentName to it.location }
+        )
     }
 
     @Test
     fun onDuplicateKeyUpdate_set() {
         val d = Department.alias
         val department1 = Department(5, 50, "PLANNING", "TOKYO", 1)
-        val department2 = Department(1, 60, "DEVELOPMENT", "KYOTO", 1)
+        val department2 = Department(1, 10, "DEVELOPMENT", "KYOTO", 1)
         val query =
             EntityQuery.insertMulti(d, listOf(department1, department2)).onDuplicateKeyUpdate().set { excluded ->
                 d.departmentName set excluded.departmentName
@@ -112,7 +128,28 @@ class EntityMultiInsertQueryTest(private val db: Database) {
             listOf("DEVELOPMENT" to "NEW YORK", "PLANNING" to "TOKYO"),
             list.map { it.departmentName to it.location }
         )
-        println(list)
+    }
+
+    @Test
+    fun onDuplicateKeyUpdateWithKey_set() {
+        val d = Department.alias
+        val department1 = Department(5, 50, "PLANNING", "TOKYO", 1)
+        val department2 = Department(10, 10, "DEVELOPMENT", "KYOTO", 1)
+        val query =
+            EntityQuery.insertMulti(d, listOf(department1, department2))
+                .onDuplicateKeyUpdate(d.departmentNo)
+                .set { excluded ->
+                    d.departmentName set excluded.departmentName
+                }
+        db.runQuery { query }
+        val list = db.runQuery {
+            EntityQuery.from(d).where { d.departmentNo inList listOf(10, 50) }.orderBy(d.departmentNo)
+        }
+        assertEquals(2, list.size)
+        assertEquals(
+            listOf("DEVELOPMENT" to "NEW YORK", "PLANNING" to "TOKYO"),
+            list.map { it.departmentName to it.location }
+        )
     }
 
     @Test
@@ -131,7 +168,25 @@ class EntityMultiInsertQueryTest(private val db: Database) {
             listOf("ACCOUNTING" to "NEW YORK", "PLANNING" to "TOKYO"),
             list.map { it.departmentName to it.location }
         )
-        println(list)
+    }
+
+    @Test
+    fun onDuplicateKeyIgnoreWithKeys() {
+        val d = Department.alias
+        val department1 = Department(5, 50, "PLANNING", "TOKYO", 1)
+        val department2 = Department(10, 10, "DEVELOPMENT", "KYOTO", 1)
+        val query = EntityQuery.insertMulti(d, listOf(department1, department2))
+            .onDuplicateKeyIgnore(d.departmentNo)
+        val count = db.runQuery { query }
+        assertEquals(1, count)
+        val list = db.runQuery {
+            EntityQuery.from(d).where { d.departmentNo inList listOf(10, 50) }.orderBy(d.departmentNo)
+        }
+        assertEquals(2, list.size)
+        assertEquals(
+            listOf("ACCOUNTING" to "NEW YORK", "PLANNING" to "TOKYO"),
+            list.map { it.departmentName to it.location }
+        )
     }
 
     @Test

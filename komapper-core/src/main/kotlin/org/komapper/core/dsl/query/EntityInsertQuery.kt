@@ -7,13 +7,14 @@ import org.komapper.core.dsl.context.DuplicateKeyType
 import org.komapper.core.dsl.context.EntityInsertContext
 import org.komapper.core.dsl.metamodel.Assignment
 import org.komapper.core.dsl.metamodel.EntityMetamodel
+import org.komapper.core.dsl.metamodel.PropertyMetamodel
 import org.komapper.core.dsl.option.EntityInsertOption
 import org.komapper.core.dsl.option.QueryOptionConfigurator
 
 interface EntityInsertQuery<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> : Query<ID> {
     fun option(configurator: QueryOptionConfigurator<EntityInsertOption>): EntityInsertQuery<ENTITY, ID, META>
-    fun onDuplicateKeyUpdate(): EntityUpsertQuery<ENTITY, ID, META>
-    fun onDuplicateKeyIgnore(): Query<Int>
+    fun onDuplicateKeyUpdate(vararg keys: PropertyMetamodel<ENTITY, *> = emptyArray()): EntityUpsertQuery<ENTITY, ID, META>
+    fun onDuplicateKeyIgnore(vararg keys: PropertyMetamodel<ENTITY, *> = emptyArray()): Query<Int>
 }
 
 internal data class EntityInsertQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
@@ -29,13 +30,13 @@ internal data class EntityInsertQueryImpl<ENTITY : Any, ID, META : EntityMetamod
         return copy(option = configurator.apply(option))
     }
 
-    override fun onDuplicateKeyUpdate(): EntityUpsertQuery<ENTITY, ID, META> {
-        val newContext = context.asEntityUpsertContext(DuplicateKeyType.UPDATE)
+    override fun onDuplicateKeyUpdate(vararg keys: PropertyMetamodel<ENTITY, *>): EntityUpsertQuery<ENTITY, ID, META> {
+        val newContext = context.asEntityUpsertContext(keys.toList(), DuplicateKeyType.UPDATE)
         return EntityUpsertQueryImpl(newContext, entity, support)
     }
 
-    override fun onDuplicateKeyIgnore(): Query<Int> {
-        val newContext = context.asEntityUpsertContext(DuplicateKeyType.IGNORE)
+    override fun onDuplicateKeyIgnore(vararg keys: PropertyMetamodel<ENTITY, *>): Query<Int> {
+        val newContext = context.asEntityUpsertContext(keys.toList(), DuplicateKeyType.IGNORE)
         return EntityUpsertQueryImpl(newContext, entity, support)
     }
 

@@ -38,10 +38,11 @@ internal class H2EntityMultiUpsertStatementBuilder<ENTITY : Any, ID, META : Enti
         buf.append(") as ")
         table(excluded, TableNameType.ALIAS_ONLY)
         buf.append(" on ")
-        for ((target, source) in target.idProperties().zip(excluded.idProperties())) {
-            column(target)
+        val propertyMap = context.excluded.properties().associateBy { it.name }
+        for (key in context.keys) {
+            column(key)
             buf.append(" = ")
-            column(source)
+            column(propertyMap[key.name]!!)
             buf.append(" and ")
         }
         buf.cutBack(5)
@@ -54,7 +55,7 @@ internal class H2EntityMultiUpsertStatementBuilder<ENTITY : Any, ID, META : Enti
         buf.append(")")
         if (context.duplicateKeyType == DuplicateKeyType.UPDATE) {
             buf.append(" when matched then update set ")
-            for ((left, right) in context.assignmentOperands) {
+            for ((left, right) in context.assignmentMap) {
                 column(left)
                 buf.append(" = ")
                 operand(right)
@@ -105,7 +106,7 @@ internal class H2EntityMultiUpsertStatementBuilder<ENTITY : Any, ID, META : Enti
             val properties = context.target.properties()
             buf.append("select ")
             for (p in properties) {
-                buf.append(columnName(p))
+                column(p)
                 buf.append(", ")
             }
             buf.cutBack(2)
@@ -122,7 +123,7 @@ internal class H2EntityMultiUpsertStatementBuilder<ENTITY : Any, ID, META : Enti
             buf.cutBack(2)
             buf.append(" as x (")
             for (p in properties) {
-                buf.append(columnName(p))
+                column(p)
                 buf.append(", ")
             }
             buf.cutBack(2)
@@ -130,8 +131,9 @@ internal class H2EntityMultiUpsertStatementBuilder<ENTITY : Any, ID, META : Enti
             return buf.toStatement()
         }
 
-        private fun columnName(expression: PropertyExpression<*>): String {
-            return expression.getCanonicalColumnName(dialect::enquote)
+        private fun column(expression: PropertyExpression<*>) {
+            val name = expression.getCanonicalColumnName(dialect::enquote)
+            buf.append(name)
         }
     }
 }

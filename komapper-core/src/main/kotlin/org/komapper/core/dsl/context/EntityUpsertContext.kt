@@ -14,25 +14,25 @@ data class EntityUpsertContext<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, 
         schema = "",
         alwaysQuote = false
     ),
+    val keys: List<PropertyExpression<*>> = emptyList(),
     val duplicateKeyType: DuplicateKeyType,
-    val assignmentOperands: List<Pair<PropertyExpression<*>, Operand>> =
-        createAssignmentOperands(target, excluded)
+    val assignmentMap: Map<PropertyExpression<*>, Operand> = createAssignmentMap(target, excluded)
 ) : Context {
     override fun getEntityExpressions(): Set<EntityExpression<*>> {
         return setOf(target)
     }
 }
 
-private fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> createAssignmentOperands(
+private fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> createAssignmentMap(
     m1: META,
     m2: META
-): List<Pair<PropertyExpression<*>, Operand>> {
+): Map<PropertyExpression<*>, Operand> {
     fun getTargetProperties(meta: META): List<PropertyMetamodel<ENTITY, *>> {
         return meta.properties().filter { it != meta.createdAtProperty() } - meta.idProperties()
     }
     return getTargetProperties(m1).zip(getTargetProperties(m2)).map { (p1, p2) ->
         p1 to Operand.Property(p2)
-    }
+    }.toMap()
 }
 
 enum class DuplicateKeyType {

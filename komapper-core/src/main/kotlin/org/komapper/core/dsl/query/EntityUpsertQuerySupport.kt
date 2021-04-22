@@ -14,7 +14,7 @@ internal class EntityUpsertQuerySupport<ENTITY : Any, ID, META : EntityMetamodel
     fun set(declaration: SetScope<ENTITY>.(META) -> Unit): EntityUpsertContext<ENTITY, ID, META> {
         val scope = SetScope<ENTITY>()
         declaration(scope, context.excluded)
-        return context.copy(assignmentOperands = scope.toList())
+        return context.copy(assignmentMap = scope.toMap())
     }
 
     fun preUpsert(config: DatabaseConfig, entity: ENTITY): ENTITY {

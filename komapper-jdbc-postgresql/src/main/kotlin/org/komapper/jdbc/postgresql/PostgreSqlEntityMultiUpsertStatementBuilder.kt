@@ -60,7 +60,7 @@ class PostgreSqlEntityMultiUpsertStatementBuilder<ENTITY : Any, ID, META : Entit
         }
         buf.cutBack(2)
         buf.append(" on conflict (")
-        for (p in target.idProperties()) {
+        for (p in context.keys) {
             column(p)
             buf.append(", ")
         }
@@ -72,7 +72,7 @@ class PostgreSqlEntityMultiUpsertStatementBuilder<ENTITY : Any, ID, META : Entit
             }
             DuplicateKeyType.UPDATE -> {
                 buf.append(" do update set ")
-                for ((left, right) in context.assignmentOperands) {
+                for ((left, right) in context.assignmentMap) {
                     column(left)
                     buf.append(" = ")
                     operand(right)

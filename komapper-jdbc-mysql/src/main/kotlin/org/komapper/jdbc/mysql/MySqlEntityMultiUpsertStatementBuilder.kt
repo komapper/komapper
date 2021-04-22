@@ -67,7 +67,7 @@ class MySqlEntityMultiUpsertStatementBuilder<ENTITY : Any, ID, META : EntityMeta
         table(excluded, TableNameType.ALIAS_ONLY)
         if (context.duplicateKeyType == DuplicateKeyType.UPDATE) {
             buf.append(" on duplicate key update ")
-            for ((left, right) in context.assignmentOperands) {
+            for ((left, right) in context.assignmentMap) {
                 column(left)
                 buf.append(" = ")
                 operand(right)

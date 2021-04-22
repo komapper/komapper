@@ -7,13 +7,14 @@ import org.komapper.core.dsl.context.DuplicateKeyType
 import org.komapper.core.dsl.context.EntityInsertContext
 import org.komapper.core.dsl.metamodel.Assignment
 import org.komapper.core.dsl.metamodel.EntityMetamodel
+import org.komapper.core.dsl.metamodel.PropertyMetamodel
 import org.komapper.core.dsl.option.EntityBatchInsertOption
 import org.komapper.core.dsl.option.QueryOptionConfigurator
 
 interface EntityBatchInsertQuery<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> : Query<List<ID>> {
     fun option(configurator: QueryOptionConfigurator<EntityBatchInsertOption>): EntityBatchInsertQuery<ENTITY, ID, META>
-    fun onDuplicateKeyUpdate(): EntityBatchUpsertQuery<ENTITY, ID, META>
-    fun onDuplicateKeyIgnore(): Query<IntArray>
+    fun onDuplicateKeyUpdate(vararg keys: PropertyMetamodel<ENTITY, *> = emptyArray()): EntityBatchUpsertQuery<ENTITY, ID, META>
+    fun onDuplicateKeyIgnore(vararg keys: PropertyMetamodel<ENTITY, *> = emptyArray()): Query<IntArray>
 }
 
 internal data class EntityBatchInsertQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
@@ -29,13 +30,13 @@ internal data class EntityBatchInsertQueryImpl<ENTITY : Any, ID, META : EntityMe
         return copy(option = configurator.apply(option))
     }
 
-    override fun onDuplicateKeyUpdate(): EntityBatchUpsertQuery<ENTITY, ID, META> {
-        val newContext = context.asEntityUpsertContext(DuplicateKeyType.UPDATE)
+    override fun onDuplicateKeyUpdate(vararg keys: PropertyMetamodel<ENTITY, *>): EntityBatchUpsertQuery<ENTITY, ID, META> {
+        val newContext = context.asEntityUpsertContext(keys.toList(), DuplicateKeyType.UPDATE)
         return EntityBatchUpsertQueryImpl(newContext, entities, support)
     }
 
-    override fun onDuplicateKeyIgnore(): Query<IntArray> {
-        val newContext = context.asEntityUpsertContext(DuplicateKeyType.IGNORE)
+    override fun onDuplicateKeyIgnore(vararg keys: PropertyMetamodel<ENTITY, *>): Query<IntArray> {
+        val newContext = context.asEntityUpsertContext(keys.toList(), DuplicateKeyType.IGNORE)
         return EntityBatchUpsertQueryImpl(newContext, entities, support)
     }
 
