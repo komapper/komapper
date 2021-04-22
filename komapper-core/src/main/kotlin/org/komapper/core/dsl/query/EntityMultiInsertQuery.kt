@@ -4,6 +4,7 @@ import org.komapper.core.DatabaseConfig
 import org.komapper.core.data.Statement
 import org.komapper.core.dsl.context.DuplicateKeyType
 import org.komapper.core.dsl.context.EntityInsertContext
+import org.komapper.core.dsl.metamodel.Assignment
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.option.EntityInsertOption
 import org.komapper.core.dsl.option.QueryOptionConfigurator
@@ -49,8 +50,9 @@ internal data class EntityMultiInsertQueryImpl<ENTITY : Any, ID, META : EntityMe
     }
 
     private fun insert(config: DatabaseConfig, entities: List<ENTITY>): LongArray {
+        val requiresGeneratedKeys = context.target.idAssignment() is Assignment.Identity<*, *>
         val statement = buildStatement(config, entities)
-        val (_, keys) = support.insert(config) { it.executeUpdate(statement) }
+        val (_, keys) = support.insert(config, requiresGeneratedKeys) { it.executeUpdate(statement) }
         return keys
     }
 
