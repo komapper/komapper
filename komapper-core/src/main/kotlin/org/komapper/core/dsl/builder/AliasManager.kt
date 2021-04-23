@@ -34,8 +34,3 @@ class AliasManagerImpl(context: Context, private val parent: AliasManager? = nul
         return aliasMap[expression]
     }
 }
-
-object EmptyAliasManager : AliasManager {
-    override val index: Int = 0
-    override fun getAlias(expression: EntityExpression<*>): String = ""
-}

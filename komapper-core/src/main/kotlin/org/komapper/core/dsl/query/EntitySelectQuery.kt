@@ -19,12 +19,12 @@ import kotlin.reflect.cast
 
 interface EntitySelectQuery<ENTITY : Any> : Subquery<ENTITY> {
 
-    fun <OTHER_ENTITY : Any, OTHER_META : EntityMetamodel<OTHER_ENTITY, *, OTHER_META>> innerJoin(
+    fun <OTHER_ENTITY : Any, OTHER_ID, OTHER_META : EntityMetamodel<OTHER_ENTITY, OTHER_ID, OTHER_META>> innerJoin(
         entityMetamodel: OTHER_META,
         on: OnDeclaration<OTHER_ENTITY>
     ): EntitySelectQuery<ENTITY>
 
-    fun <OTHER_ENTITY : Any, OTHER_META : EntityMetamodel<OTHER_ENTITY, *, OTHER_META>> leftJoin(
+    fun <OTHER_ENTITY : Any, OTHER_ID, OTHER_META : EntityMetamodel<OTHER_ENTITY, OTHER_ID, OTHER_META>> leftJoin(
         entityMetamodel: OTHER_META,
         on: OnDeclaration<OTHER_ENTITY>
     ): EntitySelectQuery<ENTITY>
@@ -61,7 +61,7 @@ internal data class EntitySelectQueryImpl<ENTITY : Any, ID, META : EntityMetamod
         SelectQuerySupport(context)
     override val subqueryContext = SubqueryContext.EntitySelect<ENTITY>(context)
 
-    override fun <OTHER_ENTITY : Any, OTHER_META : EntityMetamodel<OTHER_ENTITY, *, OTHER_META>> innerJoin(
+    override fun <OTHER_ENTITY : Any, OTHER_ID, OTHER_META : EntityMetamodel<OTHER_ENTITY, OTHER_ID, OTHER_META>> innerJoin(
         entityMetamodel: OTHER_META,
         on: OnDeclaration<OTHER_ENTITY>
     ): EntitySelectQueryImpl<ENTITY, ID, META> {
@@ -69,7 +69,7 @@ internal data class EntitySelectQueryImpl<ENTITY : Any, ID, META : EntityMetamod
         return copy(context = newContext)
     }
 
-    override fun <OTHER_ENTITY : Any, OTHER_META : EntityMetamodel<OTHER_ENTITY, *, OTHER_META>> leftJoin(
+    override fun <OTHER_ENTITY : Any, OTHER_ID, OTHER_META : EntityMetamodel<OTHER_ENTITY, OTHER_ID, OTHER_META>> leftJoin(
         entityMetamodel: OTHER_META,
         on: OnDeclaration<OTHER_ENTITY>
     ): EntitySelectQueryImpl<ENTITY, ID, META> {

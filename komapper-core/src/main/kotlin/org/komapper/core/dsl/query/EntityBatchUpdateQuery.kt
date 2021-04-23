@@ -55,7 +55,7 @@ internal data class EntityBatchUpdateQueryImpl<ENTITY : Any, ID, META : EntityMe
 
     private fun postUpdate(entities: List<ENTITY>, counts: IntArray) {
         val iterator = counts.iterator()
-        entities.forEachIndexed { index, entity ->
+        entities.forEachIndexed { index, _ ->
             val count = if (iterator.hasNext()) {
                 iterator.nextInt()
             } else {

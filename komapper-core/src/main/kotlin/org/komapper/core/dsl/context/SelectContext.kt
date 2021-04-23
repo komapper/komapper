@@ -31,6 +31,6 @@ internal interface SelectContext<
     fun setForUpdate(forUpdate: ForUpdate): CONTEXT
 
     override fun getEntityExpressions(): Set<EntityExpression<*>> {
-        return setOf(target) + joins.map { it.entityMetamodel }
+        return setOf(target) + joins.map { it.target }
     }
 }

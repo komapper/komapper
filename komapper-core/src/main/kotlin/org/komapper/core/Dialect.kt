@@ -103,6 +103,7 @@ abstract class AbstractDialect protected constructor(dataTypes: Set<DataType<*>>
         return matcher.replaceAll("${Regex.escapeReplacement(literal)}$0")
     }
 
+    @Suppress("RegExpDuplicateCharacterInClass")
     protected open fun createEscapePattern(escapeSequence: String): Pattern {
         val targetChars = "[${Regex.escape("$escapeSequence%_")}]"
         return Pattern.compile(targetChars)

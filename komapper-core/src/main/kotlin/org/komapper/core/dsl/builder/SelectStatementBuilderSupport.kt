@@ -40,7 +40,7 @@ internal class SelectStatementBuilderSupport(
                 } else if (join.kind === JoinKind.LEFT_OUTER) {
                     buf.append(" left outer join ")
                 }
-                table(join.entityMetamodel)
+                table(join.target)
                 if (join.on.isNotEmpty()) {
                     buf.append(" on (")
                     for ((index, criterion) in join.on.withIndex()) {

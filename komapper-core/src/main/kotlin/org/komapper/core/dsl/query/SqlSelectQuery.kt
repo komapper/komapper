@@ -24,12 +24,12 @@ interface SqlSelectQuery<ENTITY : Any> : Subquery<ENTITY> {
 
     fun distinct(): SqlSelectQuery<ENTITY>
 
-    fun <OTHER_ENTITY : Any, OTHER_META : EntityMetamodel<OTHER_ENTITY, *, OTHER_META>> innerJoin(
+    fun <OTHER_ENTITY : Any, OTHER_ID, OTHER_META : EntityMetamodel<OTHER_ENTITY, OTHER_ID, OTHER_META>> innerJoin(
         entityMetamodel: OTHER_META,
         on: OnDeclaration<OTHER_ENTITY>
     ): SqlSelectQuery<ENTITY>
 
-    fun <OTHER_ENTITY : Any, OTHER_META : EntityMetamodel<OTHER_ENTITY, *, OTHER_META>> leftJoin(
+    fun <OTHER_ENTITY : Any, OTHER_ID, OTHER_META : EntityMetamodel<OTHER_ENTITY, OTHER_ID, OTHER_META>> leftJoin(
         entityMetamodel: OTHER_META,
         on: OnDeclaration<OTHER_ENTITY>
     ): SqlSelectQuery<ENTITY>
@@ -106,7 +106,7 @@ internal data class SqlSelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<
         return copy(context = newContext)
     }
 
-    override fun <OTHER_ENTITY : Any, OTHER_META : EntityMetamodel<OTHER_ENTITY, *, OTHER_META>> innerJoin(
+    override fun <OTHER_ENTITY : Any, OTHER_ID, OTHER_META : EntityMetamodel<OTHER_ENTITY, OTHER_ID, OTHER_META>> innerJoin(
         entityMetamodel: OTHER_META,
         on: OnDeclaration<OTHER_ENTITY>
     ): SqlSelectQueryImpl<ENTITY, ID, META> {
@@ -114,7 +114,7 @@ internal data class SqlSelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<
         return copy(context = newContext)
     }
 
-    override fun <OTHER_ENTITY : Any, OTHER_META : EntityMetamodel<OTHER_ENTITY, *, OTHER_META>> leftJoin(
+    override fun <OTHER_ENTITY : Any, OTHER_ID, OTHER_META : EntityMetamodel<OTHER_ENTITY, OTHER_ID, OTHER_META>> leftJoin(
         entityMetamodel: OTHER_META,
         on: OnDeclaration<OTHER_ENTITY>
     ): SqlSelectQueryImpl<ENTITY, ID, META> {
@@ -366,7 +366,7 @@ internal data class SqlSelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<
         private val context: SqlSelectContext<*, *, *>,
         private val option: SqlSelectOption,
         private val provider: (Dialect, ResultSet) -> T,
-        val transformer: (Sequence<T>) -> R
+        private val transformer: (Sequence<T>) -> R
     ) : Query<R> {
 
         override fun run(config: DatabaseConfig): R {

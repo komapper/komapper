@@ -4,7 +4,7 @@ import org.komapper.core.dsl.expression.EntityExpression
 import java.time.Clock
 import kotlin.reflect.KClass
 
-interface EntityMetamodel<ENTITY : Any, out ID, out META : EntityMetamodel<ENTITY, ID, META>> : EntityExpression<ENTITY> {
+interface EntityMetamodel<ENTITY : Any, ID, out META : EntityMetamodel<ENTITY, ID, META>> : EntityExpression<ENTITY> {
     fun idAssignment(): Assignment<ENTITY>?
     fun idProperties(): List<PropertyMetamodel<ENTITY, *>>
     fun versionProperty(): PropertyMetamodel<ENTITY, *>?
