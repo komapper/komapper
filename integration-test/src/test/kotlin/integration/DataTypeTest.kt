@@ -1,5 +1,6 @@
 package integration
 
+import integration.setting.Dbms
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull

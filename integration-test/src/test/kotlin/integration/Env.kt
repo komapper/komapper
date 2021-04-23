@@ -1,12 +1,14 @@
 package integration
 
-import org.junit.jupiter.api.extension.AfterAllCallback
+import integration.setting.Dbms
+import integration.setting.Setting
 import org.junit.jupiter.api.extension.AfterTestExecutionCallback
 import org.junit.jupiter.api.extension.BeforeAllCallback
 import org.junit.jupiter.api.extension.BeforeTestExecutionCallback
 import org.junit.jupiter.api.extension.ConditionEvaluationResult
 import org.junit.jupiter.api.extension.ExecutionCondition
 import org.junit.jupiter.api.extension.ExtensionContext
+import org.junit.jupiter.api.extension.ExtensionContext.Namespace.GLOBAL
 import org.junit.jupiter.api.extension.ParameterContext
 import org.junit.jupiter.api.extension.ParameterResolver
 import org.junit.platform.commons.support.AnnotationSupport.findAnnotation
@@ -16,25 +18,42 @@ import org.komapper.core.dsl.runQuery
 
 internal class Env :
     BeforeAllCallback,
-    AfterAllCallback,
     BeforeTestExecutionCallback,
     AfterTestExecutionCallback,
     ParameterResolver,
-    ExecutionCondition {
+    ExecutionCondition,
+    ExtensionContext.Store.CloseableResource {
 
-    private val setting = getSetting()
+    companion object {
+        @Volatile
+        var initialized: Boolean = false
+    }
+
+    private val setting = Setting.get()
     private val db = Database(setting.config)
     private val txManager = db.config.session.transactionManager ?: error("Enable transaction.")
 
     override fun beforeAll(context: ExtensionContext?) {
-        db.transaction {
-            db.runQuery {
-                ScriptQuery.execute(setting.createSql)
+        if (!initialized) {
+            initialized = true
+            context?.root?.getStore(GLOBAL)?.put("drop all objects", this)
+            db.transaction {
+                db.runQuery {
+                    ScriptQuery.execute(setting.createSql)
+                }
             }
         }
     }
 
     override fun beforeTestExecution(context: ExtensionContext?) {
+        val resetSql = setting.resetSql
+        if (resetSql != null) {
+            db.transaction {
+                db.runQuery {
+                    ScriptQuery.execute(resetSql)
+                }
+            }
+        }
         txManager.begin()
     }
 
@@ -42,7 +61,7 @@ internal class Env :
         txManager.rollback()
     }
 
-    override fun afterAll(context: ExtensionContext?) {
+    override fun close() {
         db.transaction {
             db.runQuery {
                 ScriptQuery.execute(setting.dropSql)
