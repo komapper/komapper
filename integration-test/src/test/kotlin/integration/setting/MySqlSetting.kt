@@ -186,5 +186,7 @@ class MySqlSetting(url: String, user: String, password: String) : Setting {
         DROP TABLE IF EXISTS TABLE_STRATEGY2;
         DROP TABLE IF EXISTS TABLE_STRATEGY5;
     """.trimIndent()
-    override val resetSql: String? = null
+    override val resetSql: String = """
+        ALTER TABLE IDENTITY_STRATEGY AUTO_INCREMENT = 1
+    """.trimIndent()
 }
