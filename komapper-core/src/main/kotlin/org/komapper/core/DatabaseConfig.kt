@@ -1,10 +1,9 @@
 package org.komapper.core
 
 import org.komapper.core.data.JdbcOption
-import org.komapper.core.dsl.spi.TemplateStatementBuilder
-import org.komapper.core.dsl.spi.TemplateStatementBuilderFactory
 import org.komapper.core.jdbc.SimpleDataSource
 import org.komapper.core.spi.DatabaseSessionFactory
+import org.komapper.core.spi.TemplateStatementBuilderFactory
 import java.util.ServiceLoader
 import javax.sql.DataSource
 

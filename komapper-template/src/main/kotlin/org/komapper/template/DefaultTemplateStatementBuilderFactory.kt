@@ -1,8 +1,8 @@
 package org.komapper.template
 
 import org.komapper.core.Dialect
-import org.komapper.core.dsl.spi.TemplateStatementBuilder
-import org.komapper.core.dsl.spi.TemplateStatementBuilderFactory
+import org.komapper.core.TemplateStatementBuilder
+import org.komapper.core.spi.TemplateStatementBuilderFactory
 import org.komapper.template.expression.CacheExprNodeFactory
 import org.komapper.template.expression.DefaultExprEnvironment
 import org.komapper.template.expression.DefaultExprEvaluator
