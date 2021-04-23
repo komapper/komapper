@@ -28,26 +28,40 @@ import org.komapper.core.jdbc.OffsetDateTimeType
 import org.komapper.core.jdbc.SQLXMLType
 import org.komapper.core.jdbc.ShortType
 import org.komapper.core.jdbc.StringType
-import java.math.BigDecimal
-import java.math.BigInteger
-import java.sql.Blob
-import java.sql.Clob
-import java.sql.NClob
 import java.sql.SQLException
-import java.sql.SQLXML
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.LocalTime
-import java.time.OffsetDateTime
-import kotlin.reflect.KClass
 
-open class H2Dialect(val version: Version = Version.V1_4) : AbstractDialect() {
+open class H2Dialect(dataTypes: Set<DataType<*>> = emptySet(), val version: Version = Version.V1_4) :
+    AbstractDialect(defaultDataTypes + dataTypes) {
 
     companion object {
         enum class Version { V1_4 }
 
         /** the error code that represents unique violation  */
         const val UNIQUE_CONSTRAINT_VIOLATION_ERROR_CODE = 23505
+
+        val defaultDataTypes: Set<DataType<*>> = setOf(
+            AnyType("other"),
+            ArrayType("array"),
+            BigDecimalType("bigint"),
+            BigIntegerType("bigint"),
+            BlobType("blob"),
+            BooleanType("bool"),
+            ByteType("tinyint"),
+            ByteArrayType("binary"),
+            DoubleType("double"),
+            ClobType("clob"),
+            FloatType("float"),
+            IntType("integer"),
+            LocalDateTimeType("timestamp"),
+            LocalDateType("date"),
+            LocalTimeType("time"),
+            LongType("bigint"),
+            NClobType("nclob"),
+            OffsetDateTimeType("timestamp with time zone"),
+            ShortType("smallint"),
+            StringType("varchar(500)"),
+            SQLXMLType("clob")
+        )
     }
 
     override fun isUniqueConstraintViolation(exception: SQLException): Boolean {
@@ -57,34 +71,6 @@ open class H2Dialect(val version: Version = Version.V1_4) : AbstractDialect() {
 
     override fun getSequenceSql(sequenceName: String): String {
         return "call next value for $sequenceName"
-    }
-
-    @Suppress("UNCHECKED_CAST")
-    override fun getDataType(type: KClass<*>): Pair<DataType<*>, String> = when (type) {
-        Any::class -> AnyType to "other"
-        java.sql.Array::class -> ArrayType to "array"
-        BigDecimal::class -> BigDecimalType to "bigint"
-        BigInteger::class -> BigIntegerType to "bigint"
-        Blob::class -> BlobType to "blob"
-        Boolean::class -> BooleanType to "bool"
-        Byte::class -> ByteType to "tinyint"
-        ByteArray::class -> ByteArrayType to "binary"
-        Double::class -> DoubleType to "double"
-        Clob::class -> ClobType to "clob"
-        Float::class -> FloatType to "float"
-        Int::class -> IntType to "integer"
-        LocalDateTime::class -> LocalDateTimeType to "timestamp"
-        LocalDate::class -> LocalDateType to "date"
-        LocalTime::class -> LocalTimeType to "time"
-        Long::class -> LongType to "bigint"
-        NClob::class -> NClobType to "nclob"
-        OffsetDateTime::class -> OffsetDateTimeType to "timestamp with time zone"
-        Short::class -> ShortType to "smallint"
-        String::class -> StringType to "varchar(500)"
-        SQLXML::class -> SQLXMLType to "clob"
-        else -> error(
-            "The dataType is not found for the type \"${type.qualifiedName}\"."
-        )
     }
 
     override fun getSchemaStatementBuilder(): SchemaStatementBuilder {

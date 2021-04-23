@@ -53,7 +53,8 @@ open class PostgreSqlSchemaStatementBuilder(private val dialect: PostgreSqlDiale
                     else -> error("Illegal assignment type: ${p.klass.qualifiedName}")
                 }
             } else {
-                dialect.getDataType(p.klass).second
+                val dataType = dialect.getDataType(p.klass)
+                dataType.name
             }
             val notNull = if (p.nullable) "" else " not null"
             "$columnName $dataTypeName$notNull"

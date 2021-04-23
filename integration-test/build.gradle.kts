@@ -21,6 +21,7 @@ dependencies {
     implementation(project(":komapper-jdbc-postgresql"))
     implementation(project(":komapper-annotation"))
     implementation(project(":komapper-template"))
+    implementation("org.postgresql:postgresql:42.2.20")
     ksp(project(":komapper-processor"))
 }
 

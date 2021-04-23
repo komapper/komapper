@@ -2,6 +2,7 @@
 
 package org.komapper.annotation
 
+import org.komapper.core.jdbc.DataType
 import kotlin.reflect.KClass
 
 @Target(AnnotationTarget.CLASS)
@@ -58,3 +59,7 @@ annotation class KmIdentityGenerator
 @Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.SOURCE)
 annotation class KmEntityDef(val entity: KClass<*>)
+
+@Target(AnnotationTarget.VALUE_PARAMETER)
+@Retention(AnnotationRetention.SOURCE)
+annotation class KmDataType(val dataType: KClass<DataType<*>>)

@@ -28,26 +28,40 @@ import org.komapper.core.jdbc.OffsetDateTimeType
 import org.komapper.core.jdbc.SQLXMLType
 import org.komapper.core.jdbc.ShortType
 import org.komapper.core.jdbc.StringType
-import java.math.BigDecimal
-import java.math.BigInteger
-import java.sql.Blob
-import java.sql.Clob
-import java.sql.NClob
 import java.sql.SQLException
-import java.sql.SQLXML
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.LocalTime
-import java.time.OffsetDateTime
-import kotlin.reflect.KClass
 
-open class MySqlDialect(val version: Version = Version.V8_0) : AbstractDialect() {
+open class MySqlDialect(dataTypes: Set<DataType<*>> = emptySet(), val version: Version = Version.V8_0) : AbstractDialect(
+    defaultDataTypes + dataTypes
+) {
 
     companion object {
         enum class Version { V8_0 }
 
         /** the error code that represents unique violation  */
         var UNIQUE_CONSTRAINT_VIOLATION_ERROR_CODES = setOf(1022, 1062)
+
+        val defaultDataTypes: Set<DataType<*>> = setOf(
+            ArrayType("varbinary(500)"),
+            BigDecimalType("decimal"),
+            BigIntegerType("decimal"),
+            BlobType("blob"),
+            BooleanType("bit(1)"),
+            ByteType("tinyint"),
+            ByteArrayType("bytea"),
+            DoubleType("double precision"),
+            ClobType("text"),
+            FloatType("real"),
+            IntType("integer"),
+            LocalDateTimeType("timestamp(6)"),
+            LocalDateType("date"),
+            LocalTimeType("time"),
+            LongType("bigint"),
+            NClobType("text"),
+            OffsetDateTimeType("timestamp"),
+            ShortType("smallint"),
+            StringType("varchar(500)"),
+            SQLXMLType("text")
+        )
     }
 
     override val openQuote: String = "`"
@@ -60,33 +74,6 @@ open class MySqlDialect(val version: Version = Version.V8_0) : AbstractDialect()
 
     override fun getSequenceSql(sequenceName: String): String {
         throw UnsupportedOperationException()
-    }
-
-    @Suppress("UNCHECKED_CAST")
-    override fun getDataType(type: KClass<*>): Pair<DataType<*>, String> = when (type) {
-        java.sql.Array::class -> ArrayType to "varbinary(500)"
-        BigDecimal::class -> BigDecimalType to "decimal"
-        BigInteger::class -> BigIntegerType to "decimal"
-        Blob::class -> BlobType to "blob"
-        Boolean::class -> BooleanType to "bit(1)"
-        Byte::class -> ByteType to "tinyint"
-        ByteArray::class -> ByteArrayType to "bytea"
-        Double::class -> DoubleType to "double precision"
-        Clob::class -> ClobType to "text"
-        Float::class -> FloatType to "real"
-        Int::class -> IntType to "integer"
-        LocalDateTime::class -> LocalDateTimeType to "timestamp(6)"
-        LocalDate::class -> LocalDateType to "date"
-        LocalTime::class -> LocalTimeType to "time"
-        Long::class -> LongType to "bigint"
-        NClob::class -> NClobType to "text"
-        OffsetDateTime::class -> OffsetDateTimeType to "timestamp"
-        Short::class -> ShortType to "smallint"
-        String::class -> StringType to "varchar(500)"
-        SQLXML::class -> SQLXMLType to "text"
-        else -> error(
-            "The dataType is not found for the type \"${type.qualifiedName}\"."
-        )
     }
 
     override fun getOffsetLimitStatementBuilder(offset: Int, limit: Int): OffsetLimitStatementBuilder {

@@ -46,10 +46,10 @@ open class H2SchemaStatementBuilder(private val dialect: H2Dialect) : SchemaStat
         w.println("create table if not exists $tableName (")
         val columns = e.properties().map { p ->
             val columnName = p.getCanonicalColumnName(dialect::enquote)
-            val (_, dataTypeName) = dialect.getDataType(p.klass)
+            val dataType = dialect.getDataType(p.klass)
             val notNull = if (p.nullable) "" else " not null"
             val identity = if (p.idAssignment is Assignment.Identity<*, *>) " auto_increment" else ""
-            "$columnName $dataTypeName$notNull$identity"
+            "$columnName ${dataType.name}$notNull$identity"
         }
         for (column in columns) {
             w.println("    $column,")

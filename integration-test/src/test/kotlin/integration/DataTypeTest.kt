@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.Database
 import org.komapper.core.dsl.EntityQuery
+import org.komapper.core.dsl.TemplateQuery
 import org.komapper.core.dsl.runQuery
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -223,5 +224,32 @@ class DataTypeTest(val db: Database) {
             EntityQuery.first(m) { m.id eq 1 }
         }
         assertEquals(data, data2)
+    }
+
+    @Run(onlyIf = [Dbms.POSTGRESQL])
+    @Test
+    fun json_postgresql() {
+        val m = JsonTest.alias
+        val data = JsonTest(
+            1,
+            Json(
+                """
+            {"a": 100, "b": "Hello"}
+                """.trimIndent()
+            )
+        )
+        db.runQuery { EntityQuery.insert(m, data) }
+        val data2 = db.runQuery {
+            EntityQuery.first(m) { m.id eq 1 }
+        }
+        assertEquals(data, data2)
+
+        val result = db.runQuery {
+            TemplateQuery
+                .from("select value->'b' as x from json_test")
+                .select { asT("x", Json::class)!! }
+                .first()
+        }
+        assertEquals("\"Hello\"", result.data)
     }
 }

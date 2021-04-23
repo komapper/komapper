@@ -32,9 +32,7 @@ interface Dialect {
     fun getSequenceSql(sequenceName: String): String
     fun enquote(name: String): String
     fun escape(text: String, escapeSequence: String? = null): String
-
     fun getOffsetLimitStatementBuilder(offset: Int, limit: Int): OffsetLimitStatementBuilder
-
     fun getSchemaStatementBuilder(): SchemaStatementBuilder
 
     fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> getEntityUpsertStatementBuilder(
@@ -53,37 +51,43 @@ interface Dialect {
     ): EntityMultiUpsertStatementBuilder<ENTITY>
 }
 
-abstract class AbstractDialect : Dialect {
+abstract class AbstractDialect protected constructor(dataTypes: Set<DataType<*>> = emptySet()) : Dialect {
 
+    @Suppress("MemberVisibilityCanBePrivate")
+    protected val dataTypeMap: Map<KClass<*>, DataType<*>> = dataTypes.associateBy { it.klass }
     override val openQuote: String = "\""
     override val closeQuote: String = "\""
     override val escapeSequence: String = "\\"
 
     override fun getValue(rs: ResultSet, index: Int, valueClass: KClass<*>): Any? {
-        val (dataType) = getDataType(valueClass)
+        val dataType = getDataType(valueClass)
         return dataType.getValue(rs, index)
     }
 
     override fun getValue(rs: ResultSet, columnLabel: String, valueClass: KClass<*>): Any? {
-        val (dataType) = getDataType(valueClass)
+        val dataType = getDataType(valueClass)
         return dataType.getValue(rs, columnLabel)
     }
 
     override fun setValue(ps: PreparedStatement, index: Int, value: Any?, valueClass: KClass<*>) {
-        val (dataType) = getDataType(valueClass)
+        val dataType = getDataType(valueClass)
         @Suppress("UNCHECKED_CAST")
         dataType as DataType<Any>
         dataType.setValue(ps, index, value)
     }
 
     override fun formatValue(value: Any?, valueClass: KClass<*>): String {
-        val (dataType) = getDataType(valueClass)
+        val dataType = getDataType(valueClass)
         @Suppress("UNCHECKED_CAST")
         dataType as DataType<Any>
         return dataType.toString(value)
     }
 
-    abstract fun getDataType(type: KClass<*>): Pair<DataType<*>, String>
+    open fun getDataType(type: KClass<*>): DataType<*> {
+        return dataTypeMap[type] ?: error(
+            "The dataType is not found for the type \"${type.qualifiedName}\"."
+        )
+    }
 
     protected fun getCause(exception: SQLException): SQLException =
         exception.filterIsInstance(SQLException::class.java).first()
@@ -126,8 +130,8 @@ internal object DryRunDialect : AbstractDialect() {
         throw UnsupportedOperationException()
     }
 
-    override fun getDataType(type: KClass<*>): Pair<DataType<*>, String> {
-        return AnyType to "other"
+    override fun getDataType(type: KClass<*>): DataType<Any> {
+        return AnyType("other")
     }
 
     override fun getSchemaStatementBuilder(): SchemaStatementBuilder {

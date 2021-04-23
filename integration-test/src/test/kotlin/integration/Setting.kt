@@ -1,10 +1,19 @@
 package integration
 
 import org.komapper.core.DatabaseConfig
+import org.komapper.core.jdbc.DataType
+import org.komapper.core.jdbc.SimpleDataSource
+import org.komapper.core.jdbc.StringType
 import org.komapper.jdbc.h2.H2DatabaseConfig
 import org.komapper.jdbc.mysql.MySqlDatabaseConfig
 import org.komapper.jdbc.postgresql.PostgreSqlDatabaseConfig
+import org.komapper.jdbc.postgresql.PostgreSqlDialect
+import org.postgresql.util.PGobject
+import java.sql.PreparedStatement
+import java.sql.ResultSet
 import java.util.regex.Pattern
+import javax.sql.DataSource
+import kotlin.reflect.KClass
 
 interface Setting {
     val config: DatabaseConfig
@@ -339,8 +348,37 @@ class MySqlSetting(url: String, user: String, password: String) : Setting {
 }
 
 class PostgreSqlSetting(url: String, user: String, password: String) : Setting {
+    private val dataSource: DataSource = SimpleDataSource(url, user, password)
+
+    class JsonType : DataType<Json> {
+        private val stringType = StringType("")
+        override val klass: KClass<Json> = Json::class
+        override val name: String = "jsonb"
+
+        override fun getValue(rs: ResultSet, index: Int): Json? {
+            val data = stringType.getValue(rs, index)
+            return if (data == null) null else Json(data)
+        }
+
+        override fun getValue(rs: ResultSet, columnLabel: String): Json? {
+            val data = stringType.getValue(rs, columnLabel)
+            return if (data == null) null else Json(data)
+        }
+
+        override fun setValue(ps: PreparedStatement, index: Int, value: Json?) {
+            val pgobj = PGobject()
+            pgobj.value = value?.data
+            pgobj.type = "jsonb"
+            ps.setObject(index, pgobj)
+        }
+
+        override fun toString(value: Json?): String {
+            return stringType.toString(value?.data)
+        }
+    }
+
     override val config: DatabaseConfig =
-        object : PostgreSqlDatabaseConfig(url, user, password, enableTransaction = true) {
+        object : PostgreSqlDatabaseConfig(dataSource, PostgreSqlDialect(setOf(JsonType())), enableTransaction = true) {
             override val jdbcOption = super.jdbcOption.copy(batchSize = 2)
         }
     override val createSql: String = """
@@ -396,6 +434,8 @@ class PostgreSqlSetting(url: String, user: String, password: String) : Setting {
         CREATE TABLE OFFSET_DATE_TIME_TEST(ID INTEGER NOT NULL PRIMARY KEY, VALUE TIMESTAMP WITH TIME ZONE);
         CREATE TABLE SHORT_TEST(ID INTEGER NOT NULL PRIMARY KEY, VALUE SMALLINT);
         CREATE TABLE STRING_TEST(ID INTEGER NOT NULL PRIMARY KEY, VALUE VARCHAR(20));
+        
+        CREATE TABLE JSON_TEST(ID INTEGER NOT NULL PRIMARY KEY, VALUE JSONB);
         
         INSERT INTO DEPARTMENT VALUES(1,10,'ACCOUNTING','NEW YORK',1);
         INSERT INTO DEPARTMENT VALUES(2,20,'RESEARCH','DALLAS',1);
@@ -528,6 +568,8 @@ class PostgreSqlSetting(url: String, user: String, password: String) : Setting {
         DROP TABLE OFFSET_DATE_TIME_TEST;
         DROP TABLE SHORT_TEST;
         DROP TABLE STRING_TEST;
+        
+        DROP TABLE JSON_TEST;
 
         DROP SEQUENCE SEQUENCE_STRATEGY_ID;
         DROP SEQUENCE MY_SEQUENCE_STRATEGY_ID;

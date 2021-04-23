@@ -113,3 +113,11 @@ data class ShortTest(@KmId val id: Int, val value: Short) {
 data class StringTest(@KmId val id: Int, val value: String) {
     companion object
 }
+
+data class Json(val data: String)
+
+@KmEntity
+@KmTable("JSON_TEST")
+data class JsonTest(@KmId val id: Int, val value: Json) {
+    companion object
+}
