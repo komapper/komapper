@@ -1,4 +1,4 @@
-package org.komapper.core.tx
+package org.komapper.transaction
 
 import java.sql.Connection
 import java.sql.SQLException

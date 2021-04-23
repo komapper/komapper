@@ -4,6 +4,7 @@ import org.komapper.core.data.JdbcOption
 import org.komapper.core.dsl.spi.TemplateStatementBuilder
 import org.komapper.core.dsl.spi.TemplateStatementBuilderFactory
 import org.komapper.core.jdbc.SimpleDataSource
+import org.komapper.core.spi.DatabaseSessionFactory
 import java.util.ServiceLoader
 import javax.sql.DataSource
 
@@ -27,24 +28,11 @@ interface DatabaseConfig {
     val templateStatementBuilder: TemplateStatementBuilder
 }
 
-abstract class AbstractDatabaseConfig : DatabaseConfig {
-    override val templateStatementBuilder: TemplateStatementBuilder by lazy {
-        val loader = ServiceLoader.load(TemplateStatementBuilderFactory::class.java)
-        val factory = loader.firstOrNull()
-            ?: error(
-                "TemplateStatementBuilderFactory is not found. " +
-                    "Add komapper-template dependency or override the templateStatementBuilder property."
-            )
-        factory.create(dialect)
-    }
-}
-
 open class DefaultDatabaseConfig(
     dataSource: DataSource,
     override val dialect: Dialect,
     enableTransaction: Boolean = false
-) :
-    AbstractDatabaseConfig() {
+) : DatabaseConfig {
 
     @Suppress("unused")
     constructor(
@@ -61,14 +49,29 @@ open class DefaultDatabaseConfig(
     override val jdbcOption: JdbcOption = JdbcOption(batchSize = 10)
     override val session: DatabaseSession by lazy {
         if (enableTransaction) {
-            TransactionalDatabaseSession(dataSource, logger)
+            val loader = ServiceLoader.load(DatabaseSessionFactory::class.java)
+            val factory = loader.firstOrNull()
+                ?: error(
+                    "DatabaseSessionFactory is not found. " +
+                        "Add komapper-transaction dependency or override the templateStatementBuilder property."
+                )
+            factory.create(dataSource, logger)
         } else {
             DefaultDatabaseSession(dataSource)
         }
     }
+    override val templateStatementBuilder: TemplateStatementBuilder by lazy {
+        val loader = ServiceLoader.load(TemplateStatementBuilderFactory::class.java)
+        val factory = loader.firstOrNull()
+            ?: error(
+                "TemplateStatementBuilderFactory is not found. " +
+                    "Add komapper-template dependency or override the templateStatementBuilder property."
+            )
+        factory.create(dialect)
+    }
 }
 
-object DryRunDatabaseConfig : AbstractDatabaseConfig() {
+object DryRunDatabaseConfig : DatabaseConfig {
     override val name: String
         get() = throw UnsupportedOperationException()
     override val dialect: Dialect = DryRunDialect
@@ -79,5 +82,7 @@ object DryRunDatabaseConfig : AbstractDatabaseConfig() {
     override val jdbcOption: JdbcOption
         get() = throw UnsupportedOperationException()
     override val session: DatabaseSession
+        get() = throw UnsupportedOperationException()
+    override val templateStatementBuilder: TemplateStatementBuilder
         get() = throw UnsupportedOperationException()
 }

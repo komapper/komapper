@@ -18,3 +18,4 @@ include("komapper-jdbc-postgresql")
 
 include("example")
 include("integration-test")
+include("komapper-transaction")

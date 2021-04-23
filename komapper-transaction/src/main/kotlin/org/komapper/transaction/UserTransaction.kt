@@ -1,4 +1,4 @@
-package org.komapper.core.tx
+package org.komapper.transaction
 
 interface UserTransaction {
     operator fun <R> invoke(

@@ -19,6 +19,7 @@ idea.module {
 dependencies {
     implementation(project(":komapper-annotation"))
     implementation(project(":komapper-jdbc-h2"))
+    implementation(project(":komapper-transaction"))
     ksp(project(":komapper-processor"))
 }
 

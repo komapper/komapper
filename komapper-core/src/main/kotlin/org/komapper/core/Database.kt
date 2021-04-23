@@ -14,11 +14,6 @@ import java.sql.SQLXML
 class Database(val config: DatabaseConfig) {
 
     /**
-     * An interface for transaction scope.
-     */
-    val transaction get() = config.session.userTransaction ?: error("Enable transaction.")
-
-    /**
      * A data type factory.
      */
     val factory = Factory(config)

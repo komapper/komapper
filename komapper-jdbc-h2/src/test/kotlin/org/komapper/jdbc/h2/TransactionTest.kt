@@ -16,7 +16,8 @@ import org.komapper.core.Database
 import org.komapper.core.dsl.EntityQuery
 import org.komapper.core.dsl.runQuery
 import org.komapper.core.jdbc.SimpleDataSource
-import org.komapper.core.tx.TransactionIsolationLevel
+import org.komapper.transaction.TransactionIsolationLevel
+import org.komapper.transaction.transaction
 import java.sql.Blob
 import java.sql.Clob
 import java.sql.NClob

@@ -1,4 +1,4 @@
-package org.komapper.core.tx
+package org.komapper.transaction
 
 import org.komapper.core.Scope
 

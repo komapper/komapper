@@ -15,6 +15,8 @@ import org.junit.platform.commons.support.AnnotationSupport.findAnnotation
 import org.komapper.core.Database
 import org.komapper.core.dsl.ScriptQuery
 import org.komapper.core.dsl.runQuery
+import org.komapper.transaction.transaction
+import org.komapper.transaction.transactionManager
 
 internal class Env :
     BeforeAllCallback,
@@ -31,7 +33,7 @@ internal class Env :
 
     private val setting = Setting.get()
     private val db = Database(setting.config)
-    private val txManager = db.config.session.transactionManager ?: error("Enable transaction.")
+    private val txManager = db.config.session.transactionManager
 
     override fun beforeAll(context: ExtensionContext?) {
         if (!initialized) {
