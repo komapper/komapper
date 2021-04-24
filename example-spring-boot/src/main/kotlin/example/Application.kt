@@ -22,7 +22,7 @@ class Application(private val database: Database) {
     @RequestMapping("/")
     fun list(): List<Message> {
         val m = Message.alias
-        val query = EntityQuery.from(Message.alias).orderBy(m.id.desc())
+        val query = EntityQuery.from(m).orderBy(m.id.desc())
         return database.runQuery { query }
     }
 
