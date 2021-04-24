@@ -26,7 +26,7 @@ import java.sql.SQLXML
 class TransactionTest {
 
     private val dataSource = SimpleDataSource("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1")
-    private val config = H2DatabaseConfig(dataSource, enableTransaction = true)
+    private val config = H2DatabaseConfig(dataSource)
     private val db = Database(config)
 
     @BeforeEach

@@ -5,7 +5,7 @@ import org.komapper.jdbc.mysql.MySqlDatabaseConfig
 
 class MySqlSetting(url: String, user: String, password: String) : Setting {
     override val config: DatabaseConfig =
-        object : MySqlDatabaseConfig(url, user, password, enableTransaction = true) {
+        object : MySqlDatabaseConfig(url, user, password) {
             override val jdbcOption = super.jdbcOption.copy(batchSize = 2)
         }
     override val dbms: Dbms = Dbms.MYSQL

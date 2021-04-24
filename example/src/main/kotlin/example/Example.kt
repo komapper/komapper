@@ -36,7 +36,7 @@ private data class AddressDef(
 
 fun main() {
     // create a Database instance
-    val db = Database(H2DatabaseConfig("jdbc:h2:mem:example;DB_CLOSE_DELAY=-1", enableTransaction = true))
+    val db = Database(H2DatabaseConfig("jdbc:h2:mem:example;DB_CLOSE_DELAY=-1"))
 
     // get a metamodel
     val a = Address.alias

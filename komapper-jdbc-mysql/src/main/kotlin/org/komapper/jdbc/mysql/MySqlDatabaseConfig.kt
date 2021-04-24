@@ -6,15 +6,13 @@ import javax.sql.DataSource
 
 open class MySqlDatabaseConfig(
     dataSource: DataSource,
-    dialect: MySqlDialect = MySqlDialect(),
-    enableTransaction: Boolean = false
+    dialect: MySqlDialect = MySqlDialect()
 ) :
-    DefaultDatabaseConfig(dataSource, dialect, enableTransaction) {
+    DefaultDatabaseConfig(dataSource, dialect) {
 
     constructor(
         url: String,
         user: String = "",
         password: String = "",
-        enableTransaction: Boolean = false
-    ) : this(SimpleDataSource(url, user, password), enableTransaction = enableTransaction)
+    ) : this(SimpleDataSource(url, user, password))
 }

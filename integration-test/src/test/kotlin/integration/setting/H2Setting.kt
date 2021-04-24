@@ -5,7 +5,7 @@ import org.komapper.jdbc.h2.H2DatabaseConfig
 
 class H2Setting(url: String, user: String, password: String) : Setting {
     override val config: DatabaseConfig =
-        object : H2DatabaseConfig(url, user, password, enableTransaction = true) {
+        object : H2DatabaseConfig(url, user, password) {
             override val jdbcOption = super.jdbcOption.copy(batchSize = 2)
         }
     override val dbms: Dbms = Dbms.H2

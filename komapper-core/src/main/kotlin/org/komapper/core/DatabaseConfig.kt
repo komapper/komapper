@@ -29,8 +29,7 @@ interface DatabaseConfig {
 
 open class DefaultDatabaseConfig(
     dataSource: DataSource,
-    override val dialect: Dialect,
-    enableTransaction: Boolean = false
+    override val dialect: Dialect
 ) : DatabaseConfig {
 
     @Suppress("unused")
@@ -38,27 +37,19 @@ open class DefaultDatabaseConfig(
         dialect: Dialect,
         url: String,
         user: String = "",
-        password: String = "",
-        enableTransaction: Boolean = false
-    ) : this(SimpleDataSource(url, user, password), dialect, enableTransaction)
+        password: String = ""
+    ) : this(SimpleDataSource(url, user, password), dialect)
 
     override val name: String = System.identityHashCode(object {}).toString()
     override val logger: Logger = StdOutLogger()
     override val clockProvider = DefaultClockProvider()
     override val jdbcOption: JdbcOption = JdbcOption(batchSize = 10)
     override val session: DatabaseSession by lazy {
-        if (enableTransaction) {
-            val loader = ServiceLoader.load(DatabaseSessionFactory::class.java)
-            val factory = loader.firstOrNull()
-                ?: error(
-                    "DatabaseSessionFactory is not found. " +
-                        "Add komapper-transaction dependency or override the templateStatementBuilder property."
-                )
-            factory.create(dataSource, logger)
-        } else {
-            DefaultDatabaseSession(dataSource)
-        }
+        val loader = ServiceLoader.load(DatabaseSessionFactory::class.java)
+        val factory = loader.firstOrNull()
+        factory?.create(dataSource, logger) ?: DefaultDatabaseSession(dataSource)
     }
+
     override val templateStatementBuilder: TemplateStatementBuilder by lazy {
         val loader = ServiceLoader.load(TemplateStatementBuilderFactory::class.java)
         val factory = loader.firstOrNull()

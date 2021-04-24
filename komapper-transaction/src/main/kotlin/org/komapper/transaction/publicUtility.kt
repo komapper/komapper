@@ -9,7 +9,7 @@ val Database.transaction: UserTransaction
         return if (session is TransactionDatabaseSession) {
             session.userTransaction
         } else {
-            error("Enable transaction.")
+            error("Check the session property of DatabaseConfig.")
         }
     }
 
@@ -18,6 +18,6 @@ val DatabaseSession.transactionManager: TransactionManager
         return if (this is TransactionDatabaseSession) {
             this.transactionManager
         } else {
-            error("Enable transaction.")
+            error("Check the session property of DatabaseConfig.")
         }
     }

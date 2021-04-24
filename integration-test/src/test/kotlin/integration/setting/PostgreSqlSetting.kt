@@ -12,7 +12,7 @@ class PostgreSqlSetting(url: String, user: String, password: String) : Setting {
     private val dataSource: DataSource = SimpleDataSource(url, user, password)
     private val dataTypes: Set<DataType<*>> = setOf(PostgreSqlJsonType())
     override val config: DatabaseConfig =
-        object : PostgreSqlDatabaseConfig(dataSource, PostgreSqlDialect(dataTypes), enableTransaction = true) {
+        object : PostgreSqlDatabaseConfig(dataSource, PostgreSqlDialect(dataTypes)) {
             override val jdbcOption = super.jdbcOption.copy(batchSize = 2)
         }
     override val dbms: Dbms = Dbms.POSTGRESQL

@@ -6,15 +6,13 @@ import javax.sql.DataSource
 
 open class H2DatabaseConfig(
     dataSource: DataSource,
-    dialect: H2Dialect = H2Dialect(),
-    enableTransaction: Boolean = false
+    dialect: H2Dialect = H2Dialect()
 ) :
-    DefaultDatabaseConfig(dataSource, dialect, enableTransaction) {
+    DefaultDatabaseConfig(dataSource, dialect) {
 
     constructor(
         url: String,
         user: String = "",
         password: String = "",
-        enableTransaction: Boolean = false
-    ) : this(SimpleDataSource(url, user, password), enableTransaction = enableTransaction)
+    ) : this(SimpleDataSource(url, user, password))
 }
