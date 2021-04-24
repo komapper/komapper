@@ -29,4 +29,4 @@ include("example-basic")
 include("example-spring-boot")
 
 // TEST
-include("test-integration")
+include("integration-test")

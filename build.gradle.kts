@@ -60,7 +60,7 @@ subprojects {
 
 configure(
     subprojects.filter {
-        !it.name.startsWith("example") && !it.name.startsWith("test")
+        !it.name.startsWith("example") && !it.name.endsWith("test")
     }
 ) {
 
