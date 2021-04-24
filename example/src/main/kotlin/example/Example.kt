@@ -11,7 +11,6 @@ import org.komapper.core.Database
 import org.komapper.core.dsl.EntityQuery
 import org.komapper.core.dsl.SchemaQuery
 import org.komapper.core.dsl.runQuery
-import org.komapper.jdbc.h2.H2DatabaseConfig
 import org.komapper.transaction.transaction
 import java.time.LocalDateTime
 
@@ -36,7 +35,7 @@ private data class AddressDef(
 
 fun main() {
     // create a Database instance
-    val db = Database(H2DatabaseConfig("jdbc:h2:mem:example;DB_CLOSE_DELAY=-1"))
+    val db = Database("jdbc:h2:mem:example;DB_CLOSE_DELAY=-1")
 
     // get a metamodel
     val a = Address.alias

@@ -1,9 +1,11 @@
 package org.komapper.core
 
+import org.komapper.core.jdbc.DataType
 import java.sql.Blob
 import java.sql.Clob
 import java.sql.NClob
 import java.sql.SQLXML
+import javax.sql.DataSource
 
 /**
  * A database.
@@ -12,6 +14,25 @@ import java.sql.SQLXML
  * @constructor creates a database instance
  */
 class Database(val config: DatabaseConfig) {
+
+    constructor(
+        dataSource: DataSource,
+        dialect: Dialect,
+    ) : this(DefaultDatabaseConfig(dataSource, dialect))
+
+    constructor(
+        url: String,
+        user: String = "",
+        password: String = "",
+        dataTypes: Set<DataType<*>> = emptySet()
+    ) : this(DefaultDatabaseConfig(url, user, password, dataTypes))
+
+    constructor(
+        url: String,
+        user: String = "",
+        password: String = "",
+        dialect: Dialect
+    ) : this(DefaultDatabaseConfig(url, user, password, dialect))
 
     /**
      * A data type factory.

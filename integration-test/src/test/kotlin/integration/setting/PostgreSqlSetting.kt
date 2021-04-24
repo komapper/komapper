@@ -2,17 +2,11 @@ package integration.setting
 
 import integration.PostgreSqlJsonType
 import org.komapper.core.DatabaseConfig
-import org.komapper.core.jdbc.DataType
-import org.komapper.core.jdbc.SimpleDataSource
-import org.komapper.jdbc.postgresql.PostgreSqlDatabaseConfig
-import org.komapper.jdbc.postgresql.PostgreSqlDialect
-import javax.sql.DataSource
+import org.komapper.core.DefaultDatabaseConfig
 
 class PostgreSqlSetting(url: String, user: String, password: String) : Setting {
-    private val dataSource: DataSource = SimpleDataSource(url, user, password)
-    private val dataTypes: Set<DataType<*>> = setOf(PostgreSqlJsonType())
     override val config: DatabaseConfig =
-        object : PostgreSqlDatabaseConfig(dataSource, PostgreSqlDialect(dataTypes)) {
+        object : DefaultDatabaseConfig(url, user, password, setOf(PostgreSqlJsonType())) {
             override val jdbcOption = super.jdbcOption.copy(batchSize = 2)
         }
     override val dbms: Dbms = Dbms.POSTGRESQL

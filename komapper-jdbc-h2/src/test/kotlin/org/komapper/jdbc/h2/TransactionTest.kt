@@ -13,6 +13,7 @@ import org.komapper.annotation.KmEntity
 import org.komapper.annotation.KmId
 import org.komapper.annotation.KmTable
 import org.komapper.core.Database
+import org.komapper.core.DefaultDatabaseConfig
 import org.komapper.core.dsl.EntityQuery
 import org.komapper.core.dsl.runQuery
 import org.komapper.core.jdbc.SimpleDataSource
@@ -26,7 +27,7 @@ import java.sql.SQLXML
 class TransactionTest {
 
     private val dataSource = SimpleDataSource("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1")
-    private val config = H2DatabaseConfig(dataSource)
+    private val config = DefaultDatabaseConfig(dataSource, H2Dialect())
     private val db = Database(config)
 
     @BeforeEach

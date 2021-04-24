@@ -1,11 +1,11 @@
 package integration.setting
 
 import org.komapper.core.DatabaseConfig
-import org.komapper.jdbc.mysql.MySqlDatabaseConfig
+import org.komapper.core.DefaultDatabaseConfig
 
 class MySqlSetting(url: String, user: String, password: String) : Setting {
     override val config: DatabaseConfig =
-        object : MySqlDatabaseConfig(url, user, password) {
+        object : DefaultDatabaseConfig(url, user, password) {
             override val jdbcOption = super.jdbcOption.copy(batchSize = 2)
         }
     override val dbms: Dbms = Dbms.MYSQL
