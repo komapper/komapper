@@ -374,7 +374,7 @@ internal data class SqlSelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<
                 error("Empty where clause is not allowed.")
             }
             val statement = buildStatement(config)
-            val executor = JdbcExecutor(config, option.asJdbcOption())
+            val executor = JdbcExecutor(config, option)
             return executor.executeQuery(statement, provider, transformer)
         }
 

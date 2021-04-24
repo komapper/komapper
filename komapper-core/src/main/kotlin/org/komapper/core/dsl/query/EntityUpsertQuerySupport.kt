@@ -22,7 +22,7 @@ internal class EntityUpsertQuerySupport<ENTITY : Any, ID, META : EntityMetamodel
     }
 
     fun <T> upsert(config: DatabaseConfig, execute: (JdbcExecutor) -> T): T {
-        val executor = JdbcExecutor(config, insertSupport.option.asJdbcOption())
+        val executor = JdbcExecutor(config, insertSupport.option)
         return execute(executor)
     }
 }

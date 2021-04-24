@@ -45,7 +45,7 @@ internal data class SqlUpdateQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<
             error("Empty where clause is not allowed.")
         }
         val statement = buildStatement(config)
-        val executor = JdbcExecutor(config, option.asJdbcOption())
+        val executor = JdbcExecutor(config, option)
         val (count) = executor.executeUpdate(statement)
         return count
     }

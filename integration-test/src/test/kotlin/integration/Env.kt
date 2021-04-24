@@ -41,7 +41,9 @@ internal class Env :
             context?.root?.getStore(GLOBAL)?.put("drop all objects", this)
             db.transaction {
                 db.runQuery {
-                    ScriptQuery.execute(setting.createSql)
+                    ScriptQuery.execute(setting.createSql).option {
+                        it.copy(suppressLogging = true)
+                    }
                 }
             }
         }
@@ -52,7 +54,9 @@ internal class Env :
         if (resetSql != null) {
             db.transaction {
                 db.runQuery {
-                    ScriptQuery.execute(resetSql)
+                    ScriptQuery.execute(resetSql).option {
+                        it.copy(suppressLogging = true)
+                    }
                 }
             }
         }
@@ -66,7 +70,9 @@ internal class Env :
     override fun close() {
         db.transaction {
             db.runQuery {
-                ScriptQuery.execute(setting.dropSql)
+                ScriptQuery.execute(setting.dropSql).option {
+                    it.copy(suppressLogging = true)
+                }
             }
         }
     }

@@ -27,7 +27,7 @@ internal data class TemplateExecuteQueryImpl(
 
     override fun run(config: DatabaseConfig): Int {
         val statement = buildStatement(config)
-        val executor = JdbcExecutor(config, option.asJdbcOption())
+        val executor = JdbcExecutor(config, option)
         val (count) = executor.executeUpdate(statement)
         return count
     }

@@ -1,7 +1,7 @@
 package org.komapper.core
 
-import org.komapper.core.data.JdbcOption
 import org.komapper.core.data.Statement
+import org.komapper.core.dsl.option.QueryOption
 import java.sql.Connection
 import java.sql.PreparedStatement
 import java.sql.ResultSet
@@ -9,11 +9,11 @@ import java.sql.SQLException
 
 class JdbcExecutor(
     private val config: DatabaseConfig,
-    jdbcOption: JdbcOption,
+    private val option: QueryOption,
     private val requiresGeneratedKeys: Boolean = false
 ) {
 
-    private val jdbcOption = config.jdbcOption + jdbcOption
+    private val jdbcOption = config.jdbcOption + option.asJdbcOption()
 
     fun <T> executeQuery(
         statement: Statement,
@@ -128,8 +128,10 @@ class JdbcExecutor(
     }
 
     private fun log(statement: Statement) {
-        config.logger.log(LogCategory.SQL) { statement.sql }
-        config.logger.log(LogCategory.SQL_WITH_ARGS) { statement.sqlWithArgs }
+        if (!option.suppressLogging) {
+            config.logger.log(LogCategory.SQL) { statement.sql }
+            config.logger.log(LogCategory.SQL_WITH_ARGS) { statement.sqlWithArgs }
+        }
     }
 
     private fun Connection.prepare(statement: Statement): PreparedStatement {

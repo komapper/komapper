@@ -40,7 +40,7 @@ internal data class TemplateSelectQueryImpl<T>(
     private inner class Terminal<R>(val transformer: (Sequence<T>) -> R) : Query<R> {
         override fun run(config: DatabaseConfig): R {
             val statement = buildStatement(config)
-            val executor = JdbcExecutor(config, option.asJdbcOption())
+            val executor = JdbcExecutor(config, option)
             return executor.executeQuery(
                 statement,
                 { dialect, rs ->

@@ -168,7 +168,7 @@ internal data class EntitySelectQueryImpl<ENTITY : Any, ID, META : EntityMetamod
                 error("Empty where clause is not allowed.")
             }
             val statement = buildStatement(config)
-            val executor = JdbcExecutor(config, option.asJdbcOption())
+            val executor = JdbcExecutor(config, option)
             return executor.executeQuery(statement) { rs ->
                 // hold only unique entities
                 val pool: MutableMap<EntityKey, Any> = mutableMapOf()

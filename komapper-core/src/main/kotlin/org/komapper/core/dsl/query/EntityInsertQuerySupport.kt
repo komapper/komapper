@@ -19,7 +19,7 @@ internal class EntityInsertQuerySupport<ENTITY : Any, ID, META : EntityMetamodel
             assignment.assign(entity, config.name, config.dialect::enquote) { sequenceName ->
                 val sql = config.dialect.getSequenceSql(sequenceName)
                 val statement = Statement(sql)
-                val executor = JdbcExecutor(config, option.asJdbcOption())
+                val executor = JdbcExecutor(config, option)
                 executor.executeQuery(statement) { rs ->
                     if (rs.next()) rs.getLong(1) else error("No result: ${statement.sql}")
                 }
@@ -34,7 +34,7 @@ internal class EntityInsertQuerySupport<ENTITY : Any, ID, META : EntityMetamodel
 
     fun <T> insert(config: DatabaseConfig, execute: (JdbcExecutor) -> T): T {
         val requiresGeneratedKeys = context.target.idAssignment() is Assignment.AutoIncrement<*, *>
-        val executor = JdbcExecutor(config, option.asJdbcOption(), requiresGeneratedKeys)
+        val executor = JdbcExecutor(config, option, requiresGeneratedKeys)
         return execute(executor)
     }
 

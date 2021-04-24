@@ -14,7 +14,7 @@ internal class EntityDeleteQuerySupport<ENTITY : Any, ID, META : EntityMetamodel
 ) {
 
     fun <T> delete(config: DatabaseConfig, execute: (JdbcExecutor) -> T): T {
-        val executor = JdbcExecutor(config, option.asJdbcOption())
+        val executor = JdbcExecutor(config, option)
         return execute(executor)
     }
 

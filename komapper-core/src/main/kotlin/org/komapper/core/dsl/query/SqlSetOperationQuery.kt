@@ -117,7 +117,7 @@ internal data class SetOperationQueryImpl<T>(
                 checkWhereClauses(context.right)
             }
             val statement = buildStatement(config)
-            val executor = JdbcExecutor(config, option.asJdbcOption())
+            val executor = JdbcExecutor(config, option)
             return executor.executeQuery(statement, provider, transformer)
         }
 

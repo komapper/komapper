@@ -22,7 +22,7 @@ internal data class ScriptExecuteQueryImpl(
     }
 
     override fun run(config: DatabaseConfig) {
-        val executor = JdbcExecutor(config, option.asJdbcOption())
+        val executor = JdbcExecutor(config, option)
         return executor.execute(statement)
     }
 
