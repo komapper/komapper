@@ -270,7 +270,7 @@ internal class EntityMetamodelGenerator(
     }
 }
 
-internal class EmptyEntityMetamodelGenerator(
+internal class EntityMetamodelStubGenerator(
     private val classDeclaration: KSClassDeclaration,
     private val packageName: String,
     private val simpleQualifiedName: String,

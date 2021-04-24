@@ -25,7 +25,7 @@ internal class EntityModel(
                         entity, packageName, entityTypeName, simpleName, it
                     )
                 } else {
-                    EmptyEntityMetamodelGenerator(
+                    EntityMetamodelStubGenerator(
                         declaration, packageName, entityTypeName, simpleName, it
                     )
                 }
