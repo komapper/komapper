@@ -19,5 +19,7 @@ include("komapper-jdbc-h2")
 include("komapper-jdbc-mysql")
 include("komapper-jdbc-postgresql")
 
+include("komapper-extension-spring-boot")
+
 include("example")
 include("integration-test")

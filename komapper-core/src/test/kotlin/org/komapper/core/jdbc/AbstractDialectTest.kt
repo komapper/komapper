@@ -23,7 +23,7 @@ internal class AbstractDialectTest {
             throw UnsupportedOperationException()
         }
 
-        override fun getDataType(type: KClass<*>): DataType<*> {
+        override fun getDataType(klass: KClass<*>): DataType<*> {
             throw UnsupportedOperationException()
         }
 

@@ -4,11 +4,9 @@ import org.komapper.core.data.JdbcOption
 import org.komapper.core.jdbc.DataType
 import org.komapper.core.jdbc.SimpleDataSource
 import org.komapper.core.spi.DatabaseSessionFactory
-import org.komapper.core.spi.DialectFactory
 import org.komapper.core.spi.LoggerFactory
 import org.komapper.core.spi.TemplateStatementBuilderFactory
 import java.util.ServiceLoader
-import java.util.regex.Pattern
 import javax.sql.DataSource
 
 /**
@@ -41,7 +39,7 @@ open class DefaultDatabaseConfig(
         user: String = "",
         password: String = "",
         dataTypes: Set<DataType<*>> = emptySet()
-    ) : this(SimpleDataSource(url, user, password), loadDialect(url, dataTypes))
+    ) : this(SimpleDataSource(url, user, password), Dialect.load(url, dataTypes))
 
     constructor(
         url: String,
@@ -49,26 +47,6 @@ open class DefaultDatabaseConfig(
         password: String = "",
         dialect: Dialect
     ) : this(SimpleDataSource(url, user, password), dialect)
-
-    companion object {
-        private val jdbcUrlPattern = Pattern.compile("^jdbc:([^:]*):.*")
-
-        private fun loadDialect(url: String, dataTypes: Set<DataType<*>>): Dialect {
-            val subprotocol = extractJdbcSubprotocol(url)
-            val loader = ServiceLoader.load(DialectFactory::class.java)
-            val factory = loader.firstOrNull { it.supports(subprotocol) }
-                ?: error("The dialect is not found for the JDBC url. Add an appropriate dependency. url=$url, subprotocol='$subprotocol'")
-            return factory.create(dataTypes)
-        }
-
-        private fun extractJdbcSubprotocol(url: String): String {
-            val matcher = jdbcUrlPattern.matcher(url)
-            if (matcher.matches()) {
-                return matcher.group(1).toLowerCase()
-            }
-            error("The subprotocol in the JDBC URL is not found. url=$url")
-        }
-    }
 
     override val name: String = System.identityHashCode(object {}).toString()
     override val clockProvider = DefaultClockProvider()

@@ -13,9 +13,11 @@ import org.komapper.core.dsl.context.EntityUpsertContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.jdbc.AnyType
 import org.komapper.core.jdbc.DataType
+import org.komapper.core.spi.DialectFactory
 import java.sql.PreparedStatement
 import java.sql.ResultSet
 import java.sql.SQLException
+import java.util.ServiceLoader
 import java.util.regex.Pattern
 import kotlin.reflect.KClass
 
@@ -28,6 +30,7 @@ interface Dialect {
     fun getValue(rs: ResultSet, columnLabel: String, valueClass: KClass<*>): Any?
     fun setValue(ps: PreparedStatement, index: Int, value: Any?, valueClass: KClass<*>)
     fun formatValue(value: Any?, valueClass: KClass<*>): String
+    fun getDataType(klass: KClass<*>): DataType<*>
     fun isUniqueConstraintViolation(exception: SQLException): Boolean
     fun getSequenceSql(sequenceName: String): String
     fun enquote(name: String): String
@@ -49,6 +52,30 @@ interface Dialect {
         context: EntityUpsertContext<ENTITY, ID, META>,
         entities: List<ENTITY>
     ): EntityMultiUpsertStatementBuilder<ENTITY>
+
+    companion object {
+        private val jdbcUrlPattern = Pattern.compile("^jdbc:([^:]*):.*")
+
+        fun load(url: String, dataTypes: Set<DataType<*>>): Dialect {
+            val subprotocol = extractJdbcSubprotocol(url)
+            val loader = ServiceLoader.load(DialectFactory::class.java)
+            val factory = loader.firstOrNull { it.supports(subprotocol) }
+                ?: error(
+                    "The dialect is not found for the JDBC url. " +
+                        "Try to add the 'komapper-jdbc-$subprotocol' dependency. " +
+                        "url=$url, subprotocol='$subprotocol'"
+                )
+            return factory.create(dataTypes)
+        }
+
+        private fun extractJdbcSubprotocol(url: String): String {
+            val matcher = jdbcUrlPattern.matcher(url)
+            if (matcher.matches()) {
+                return matcher.group(1).toLowerCase()
+            }
+            error("The subprotocol in the JDBC URL is not found. url=$url")
+        }
+    }
 }
 
 abstract class AbstractDialect protected constructor(dataTypes: Set<DataType<*>> = emptySet()) : Dialect {
@@ -83,9 +110,9 @@ abstract class AbstractDialect protected constructor(dataTypes: Set<DataType<*>>
         return dataType.toString(value)
     }
 
-    open fun getDataType(type: KClass<*>): DataType<*> {
-        return dataTypeMap[type] ?: error(
-            "The dataType is not found for the type \"${type.qualifiedName}\"."
+    override fun getDataType(klass: KClass<*>): DataType<*> {
+        return dataTypeMap[klass] ?: error(
+            "The dataType is not found for the type \"${klass.qualifiedName}\"."
         )
     }
 
@@ -131,7 +158,7 @@ internal object DryRunDialect : AbstractDialect() {
         throw UnsupportedOperationException()
     }
 
-    override fun getDataType(type: KClass<*>): DataType<Any> {
+    override fun getDataType(klass: KClass<*>): DataType<Any> {
         return AnyType("other")
     }
 
