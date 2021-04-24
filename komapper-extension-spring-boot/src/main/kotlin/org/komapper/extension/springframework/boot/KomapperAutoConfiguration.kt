@@ -18,12 +18,19 @@ import javax.sql.DataSource
 @AutoConfigureAfter(DataSourceAutoConfiguration::class)
 open class KomapperAutoConfiguration {
 
+    companion object {
+        private const val DATASOURCE_URL_PROPERTY = "spring.datasource.url"
+    }
+
     @Suppress("unused")
     @Bean
     @ConditionalOnMissingBean
     open fun dialect(environment: Environment, dataTypes: Set<DataType<*>> = emptySet()): Dialect {
-        val url: String = environment.getProperty("spring.datasource.url")
-            ?: error("spring.datasource.url is not found.")
+        val url: String = environment.getProperty(DATASOURCE_URL_PROPERTY)
+            ?: error(
+                "$DATASOURCE_URL_PROPERTY is not found. " +
+                    "Specify it to the application.properties file or define the dialect bean manually."
+            )
         return Dialect.load(url, dataTypes)
     }
 

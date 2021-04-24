@@ -58,7 +58,11 @@ subprojects {
     }
 }
 
-configure(subprojects - project("example") - project("integration-test")) {
+configure(
+    subprojects.filter {
+        !it.name.startsWith("example") && !it.name.startsWith("test")
+    }
+) {
 
     configure<PublishingExtension> {
         publications {
