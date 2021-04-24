@@ -1,6 +1,6 @@
 package org.komapper.core.data
 
-data class Statement(val sql: String, val values: List<Value>, val log: String?) {
+data class Statement(val sql: String, val values: List<Value>, val sqlWithArgs: String) {
     constructor(sql: String) : this(sql, emptyList(), sql)
 
     companion object {
@@ -15,7 +15,7 @@ data class Statement(val sql: String, val values: List<Value>, val log: String?)
         val separator = if (this.sql.trimEnd().endsWith(";")) "" else ";"
         val sql = this.sql + separator + other.sql
         val values = this.values + other.values
-        val log = this.log + separator + other.log
-        return Statement(sql, values, log)
+        val sqlWithArgs = this.sqlWithArgs + separator + other.sqlWithArgs
+        return Statement(sql, values, sqlWithArgs)
     }
 }

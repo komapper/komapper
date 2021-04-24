@@ -1,16 +1,20 @@
 package org.komapper.core
 
-import org.komapper.core.data.Statement
-
 interface Logger {
-    fun logTxMessage(message: () -> String)
-    fun logStatement(statement: Statement)
+    fun log(category: LogCategory, message: () -> String)
 }
 
-open class StdOutLogger : Logger {
-    override fun logTxMessage(message: () -> String) = println(message())
-    override fun logStatement(statement: Statement) {
-        val log = statement.log ?: statement.sql
-        println(log)
+open class SqlStdOutLogger : Logger {
+    override fun log(category: LogCategory, message: () -> String) {
+        if (category == LogCategory.SQL) {
+            println(message())
+        }
     }
+}
+
+enum class LogCategory(val id: String) {
+    SQL("org.komapper.core.sql"),
+    SQL_WITH_ARGS("org.komapper.core.sqlWithArgs"),
+    TRANSACTION("org.komapper.transaction"),
+    OTHER("org.komapper.other")
 }

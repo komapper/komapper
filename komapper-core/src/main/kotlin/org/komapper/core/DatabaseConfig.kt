@@ -5,6 +5,7 @@ import org.komapper.core.jdbc.DataType
 import org.komapper.core.jdbc.SimpleDataSource
 import org.komapper.core.spi.DatabaseSessionFactory
 import org.komapper.core.spi.DialectFactory
+import org.komapper.core.spi.LoggerFactory
 import org.komapper.core.spi.TemplateStatementBuilderFactory
 import java.util.ServiceLoader
 import java.util.regex.Pattern
@@ -23,9 +24,9 @@ import javax.sql.DataSource
 interface DatabaseConfig {
     val name: String
     val dialect: Dialect
-    val logger: Logger
     val clockProvider: ClockProvider
     val jdbcOption: JdbcOption
+    val logger: Logger
     val session: DatabaseSession
     val templateStatementBuilder: TemplateStatementBuilder
 }
@@ -70,9 +71,14 @@ open class DefaultDatabaseConfig(
     }
 
     override val name: String = System.identityHashCode(object {}).toString()
-    override val logger: Logger = StdOutLogger()
     override val clockProvider = DefaultClockProvider()
     override val jdbcOption: JdbcOption = JdbcOption(batchSize = 10)
+    override val logger: Logger by lazy {
+        val loader = ServiceLoader.load(LoggerFactory::class.java)
+        val factory = loader.firstOrNull()
+        factory?.create() ?: SqlStdOutLogger()
+    }
+
     override val session: DatabaseSession by lazy {
         val loader = ServiceLoader.load(DatabaseSessionFactory::class.java)
         val factory = loader.firstOrNull()

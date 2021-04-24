@@ -128,7 +128,8 @@ class JdbcExecutor(
     }
 
     private fun log(statement: Statement) {
-        config.logger.logStatement(statement)
+        config.logger.log(LogCategory.SQL) { statement.sql }
+        config.logger.log(LogCategory.SQL_WITH_ARGS) { statement.sqlWithArgs }
     }
 
     private fun Connection.prepare(statement: Statement): PreparedStatement {

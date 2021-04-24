@@ -231,7 +231,7 @@ internal class DefaultTemplateStatementBuilder(
 
         fun append(state: State): State {
             buf.sql.append(state.buf.sql)
-            buf.log.append(state.buf.log)
+            buf.sqlWithArgs.append(state.buf.sqlWithArgs)
             buf.values.addAll(state.buf.values)
             return this
         }
