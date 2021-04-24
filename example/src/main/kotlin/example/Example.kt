@@ -1,10 +1,10 @@
 package example
 
+import org.komapper.annotation.KmAutoIncrement
 import org.komapper.annotation.KmColumn
 import org.komapper.annotation.KmCreatedAt
 import org.komapper.annotation.KmEntityDef
 import org.komapper.annotation.KmId
-import org.komapper.annotation.KmIdentityGenerator
 import org.komapper.annotation.KmUpdatedAt
 import org.komapper.annotation.KmVersion
 import org.komapper.core.Database
@@ -26,7 +26,7 @@ data class Address(
 
 @KmEntityDef(Address::class)
 private data class AddressDef(
-    @KmId @KmIdentityGenerator @KmColumn(name = "ADDRESS_ID")
+    @KmId @KmAutoIncrement @KmColumn(name = "ADDRESS_ID")
     val id: String,
     @KmVersion val version: String,
     @KmCreatedAt val createdAt: String,
@@ -53,41 +53,32 @@ fun main() {
         }
 
         // READ: select by id
-        val addressA = db.runQuery {
-            EntityQuery.first(a) {
-                a.id eq id
-            }
+        val address1 = db.runQuery {
+            EntityQuery.first(a) { a.id eq id }
         }
-        println(addressA)
+        println("address1=$address1")
 
         // UPDATE
-        val addressB = db.runQuery {
-            EntityQuery.update(a, addressA.copy(street = "street B"))
+        db.runQuery {
+            EntityQuery.update(a, address1.copy(street = "street B"))
         }
-        println(addressB)
 
-        // READ: select by street and version
-        val addressC = db.runQuery {
-            EntityQuery.first(a) {
-                a.street eq "street B"
-                a.version eq 1
-            }
+        // READ: select by street
+        val address2 = db.runQuery {
+            EntityQuery.first(a) { a.street eq "street B" }
         }
-        println(addressC)
+        println("address2=$address2")
 
         // DELETE
         db.runQuery {
-            EntityQuery.delete(a, addressC)
+            EntityQuery.delete(a, address2)
         }
 
         // READ: select all
         val list = db.runQuery {
             EntityQuery.from(a).orderBy(a.id)
         }
-        check(list.isEmpty())
+        println("list:$list")
+        check(list.isEmpty()) { "The list must be empty." }
     }
-}
-
-fun check(value: Boolean) {
-    if (!value) error("failed.")
 }

@@ -459,7 +459,7 @@ class EntityProcessorTest {
     }
 
     @Test
-    fun `@KmIdentityGenerator and @KmId must coexist on the same property`() {
+    fun `@KmAutoIncrement and @KmId must coexist on the same property`() {
         val result = compile(
             kotlin(
                 "source.kt",
@@ -468,17 +468,17 @@ class EntityProcessorTest {
                 import org.komapper.annotation.*
                 @KmEntity
                 data class Dept(
-                    @KmIdentityGenerator val id: Int
+                    @KmAutoIncrement val id: Int
                 )
                 """
             )
         )
         assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertThat(result.messages).contains("@KmIdentityGenerator and @KmId must coexist on the same property.")
+        assertThat(result.messages).contains("@KmAutoIncrement and @KmId must coexist on the same property.")
     }
 
     @Test
-    fun `@KmIdentityGenerator and @KmSequenceGenerator cannot coexist on the same property`() {
+    fun `@KmAutoIncrement and @KmSequence cannot coexist on the same property`() {
         val result = compile(
             kotlin(
                 "source.kt",
@@ -487,17 +487,17 @@ class EntityProcessorTest {
                 import org.komapper.annotation.*
                 @KmEntity
                 data class Dept(
-                    @KmIdentityGenerator @KmSequenceGenerator("ID", 100) val id: Int
+                    @KmAutoIncrement @KmSequence("ID", 1, 100) val id: Int
                 )
                 """
             )
         )
         assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertThat(result.messages).contains("@KmIdentityGenerator and @KmSequenceGenerator cannot coexist on the same property.")
+        assertThat(result.messages).contains("@KmAutoIncrement and @KmSequence cannot coexist on the same property.")
     }
 
     @Test
-    fun `Multiple generator properties cannot coexist in a single class`() {
+    fun `@KmAutoIncrement and @KmSequence cannot coexist in a single class`() {
         val result = compile(
             kotlin(
                 "source.kt",
@@ -506,14 +506,14 @@ class EntityProcessorTest {
                 import org.komapper.annotation.*
                 @KmEntity
                 data class Dept(
-                    @KmId @KmIdentityGenerator val id1: Int,
-                    @KmId @KmSequenceGenerator("ID", 100) val id2: Int
+                    @KmId @KmAutoIncrement val id1: Int,
+                    @KmId @KmSequence("ID", 1, 100) val id2: Int
                 )
                 """
             )
         )
         assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertThat(result.messages).contains("Multiple generator properties cannot coexist in a single class.")
+        assertThat(result.messages).contains("@KmAutoIncrement and @KmSequence cannot coexist in a single class.")
     }
 
     @Test
@@ -593,7 +593,7 @@ class EntityProcessorTest {
     }
 
     @Test
-    fun `The identity generator property must be either Int or Long type`() {
+    fun `The @KmAutoIncrement annotated property must be either Int or Long type`() {
         val result = compile(
             kotlin(
                 "source.kt",
@@ -602,17 +602,17 @@ class EntityProcessorTest {
                 import org.komapper.annotation.*
                 @KmEntity
                 data class Dept(
-                    @KmId @KmIdentityGenerator val id: String
+                    @KmId @KmAutoIncrement val id: String
                 )
                 """
             )
         )
         assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertThat(result.messages).contains("The identity generator property must be either Int or Long type.")
+        assertThat(result.messages).contains("The @KmAutoIncrement annotated property must be either Int or Long type.")
     }
 
     @Test
-    fun `The sequence generator property must be either Int or Long type`() {
+    fun `The @KmSequence annotated property must be either Int or Long type`() {
         val result = compile(
             kotlin(
                 "source.kt",
@@ -621,17 +621,17 @@ class EntityProcessorTest {
                 import org.komapper.annotation.*
                 @KmEntity
                 data class Dept(
-                    @KmId @KmSequenceGenerator("ID", 100) val id: String
+                    @KmId @KmSequence("ID", 1, 100) val id: String
                 )
                 """
             )
         )
         assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertThat(result.messages).contains("The sequence generator property must be either Int or Long type.")
+        assertThat(result.messages).contains("The @KmSequence annotated property must be either Int or Long type.")
     }
 
     @Test
-    fun `@KmSequenceGenerator name is not found`() {
+    fun `@KmSequence name is not found`() {
         val result = compile(
             kotlin(
                 "source.kt",
@@ -640,32 +640,13 @@ class EntityProcessorTest {
                 import org.komapper.annotation.*
                 @KmEntity
                 data class Dept(
-                    @KmId @KmSequenceGenerator() val id: Int
+                    @KmId @KmSequence() val id: Int
                 )
                 """
             )
         )
         assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertThat(result.messages).contains("@KmSequenceGenerator.name is not found.")
-    }
-
-    @Test
-    fun `@KmSequenceGenerator incrementBy is not found`() {
-        val result = compile(
-            kotlin(
-                "source.kt",
-                """
-                package test
-                import org.komapper.annotation.*
-                @KmEntity
-                data class Dept(
-                    @KmId @KmSequenceGenerator("ID_SEQ") val id: Int
-                )
-                """
-            )
-        )
-        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertThat(result.messages).contains("@KmSequenceGenerator.incrementBy is not found.")
+        assertThat(result.messages).contains("@KmSequence.name is not found.")
     }
 
     private fun prepareCompilation(vararg sourceFiles: SourceFile): KotlinCompilation {

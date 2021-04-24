@@ -6,7 +6,7 @@ import kotlin.concurrent.withLock
 import kotlin.reflect.KClass
 
 sealed class Assignment<E> {
-    class Identity<E, T : Any>(
+    class AutoIncrement<E, T : Any>(
         private val klass: KClass<T>,
         private val setter: (E, T) -> E
     ) :
@@ -24,6 +24,7 @@ sealed class Assignment<E> {
         val catalogName: String,
         val schemaName: String,
         val alwaysQuote: Boolean,
+        val startWith: Int,
         val incrementBy: Int,
     ) :
         Assignment<E>() {
@@ -33,7 +34,7 @@ sealed class Assignment<E> {
         fun assign(entity: E, key: String, enquote: (String) -> String, sequenceNextValue: (String) -> Long): E {
             val context = contextMap.computeIfAbsent(key) {
                 val sequenceName = getCanonicalSequenceName(enquote)
-                GenerationContext(incrementBy) {
+                GenerationContext(startWith, incrementBy) {
                     sequenceNextValue(sequenceName)
                 }
             }
@@ -51,9 +52,9 @@ sealed class Assignment<E> {
                 .filter { it.isNotBlank() }.joinToString(".", transform = transform)
         }
 
-        private class GenerationContext(private val incrementBy: Int, private val nextValue: () -> Long) {
+        private class GenerationContext(startWith: Int, val incrementBy: Int, val nextValue: () -> Long) {
             private val lock = ReentrantLock()
-            private var base = 0L
+            private var base = startWith.toLong()
             private var step = Long.MAX_VALUE
 
             fun next(): Long {

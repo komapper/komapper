@@ -46,8 +46,7 @@ internal class EntityFactory(config: Config, private val entityDef: EntityDef) {
                 val typeName = (type.declaration.qualifiedName ?: type.declaration.simpleName).asString()
                 val nullability = type.nullability
                 val kind = propertyDef?.kind
-                val generatorKind = propertyDef?.idGeneratorKind
-                Property(parameter, declaration, column, typeName, nullability, kind, generatorKind).also {
+                Property(parameter, declaration, column, typeName, nullability, kind).also {
                     validateProperty(it)
                 }
             }?.also {
@@ -69,12 +68,17 @@ internal class EntityFactory(config: Config, private val entityDef: EntityDef) {
             report("The property must not be private.", property.parameter)
         }
         validatePropertyKind(property)
-        validateIdGeneratorKind(property)
     }
 
     private fun validatePropertyKind(property: Property) {
         val parameter = property.parameter
-        when (property.kind) {
+        when (val kind = property.kind) {
+            is PropertyKind.Id -> {
+                val idKind = kind.idKind
+                if (idKind != null) {
+                    validateIdKind(property, idKind)
+                }
+            }
             is PropertyKind.Version -> {
                 when (property.typeName) {
                     "kotlin.Int" -> Unit
@@ -114,25 +118,25 @@ internal class EntityFactory(config: Config, private val entityDef: EntityDef) {
         }
     }
 
-    private fun validateIdGeneratorKind(property: Property) {
+    private fun validateIdKind(property: Property, idKind: IdKind) {
         val parameter = property.parameter
-        when (property.idGeneratorKind) {
-            is IdGeneratorKind.Identity -> {
+        when (idKind) {
+            is IdKind.AutoIncrement -> {
                 when (property.typeName) {
                     "kotlin.Int" -> Unit
                     "kotlin.Long" -> Unit
                     else -> report(
-                        "The identity generator property must be either Int or Long type.",
+                        "The @KmAutoIncrement annotated property must be either Int or Long type.",
                         parameter
                     )
                 }
             }
-            is IdGeneratorKind.Sequence -> {
+            is IdKind.Sequence -> {
                 when (property.typeName) {
                     "kotlin.Int" -> Unit
                     "kotlin.Long" -> Unit
                     else -> report(
-                        "The sequence generator property must be either Int or Long type.",
+                        "The @KmSequence annotated property must be either Int or Long type.",
                         parameter
                     )
                 }
@@ -147,9 +151,17 @@ internal class EntityFactory(config: Config, private val entityDef: EntityDef) {
             propertyMap[key]
                 ?: report("The same name property is not found in the entity.", value.parameter)
         }
-        val idGeneratorProperties = properties.filter { it.idGeneratorKind != null }.toList()
-        if (idGeneratorProperties.size > 1) {
-            report("Multiple generator properties cannot coexist in a single class.", entityDef.definitionSource.entityDeclaration)
+        val idKinds = properties.mapNotNull {
+            when (it.kind) {
+                is PropertyKind.Id -> it.kind.idKind
+                else -> null
+            }
+        }
+        if (idKinds.count() > 1) {
+            report(
+                "@KmAutoIncrement and @KmSequence cannot coexist in a single class.",
+                entityDef.definitionSource.entityDeclaration
+            )
         }
     }
 

@@ -46,7 +46,7 @@ open class MySqlSchemaStatementBuilder(private val dialect: MySqlDialect) : Sche
             val columnName = p.getCanonicalColumnName(dialect::enquote)
             val dataType = dialect.getDataType(p.klass)
             val notNull = if (p.nullable) "" else " not null"
-            val identity = if (p.idAssignment is Assignment.Identity<*, *>) " auto_increment" else ""
+            val identity = if (p.idAssignment is Assignment.AutoIncrement<*, *>) " auto_increment" else ""
             "$columnName ${dataType.name}$notNull$identity"
         }
         for (column in columns) {

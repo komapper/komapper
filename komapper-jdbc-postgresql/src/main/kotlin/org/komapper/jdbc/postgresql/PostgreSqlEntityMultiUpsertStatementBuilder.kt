@@ -36,7 +36,7 @@ class PostgreSqlEntityMultiUpsertStatementBuilder<ENTITY : Any, ID, META : Entit
         buf.append(" (")
         for (
             p in target.properties().filter {
-                it.idAssignment !is Assignment.Identity<ENTITY, *>
+                it.idAssignment !is Assignment.AutoIncrement<ENTITY, *>
             }
         ) {
             column(p)
@@ -48,7 +48,7 @@ class PostgreSqlEntityMultiUpsertStatementBuilder<ENTITY : Any, ID, META : Entit
             buf.append("(")
             for (
                 p in target.properties().filter {
-                    it.idAssignment !is Assignment.Identity<ENTITY, *>
+                    it.idAssignment !is Assignment.AutoIncrement<ENTITY, *>
                 }
             ) {
                 val value = Value(p.getter(entity), p.klass)

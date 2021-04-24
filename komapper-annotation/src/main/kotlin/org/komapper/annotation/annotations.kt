@@ -2,7 +2,6 @@
 
 package org.komapper.annotation
 
-import org.komapper.core.jdbc.DataType
 import kotlin.reflect.KClass
 
 @Target(AnnotationTarget.CLASS)
@@ -44,9 +43,10 @@ annotation class KmIgnore
 
 @Target(AnnotationTarget.VALUE_PARAMETER)
 @Retention(AnnotationRetention.SOURCE)
-annotation class KmSequenceGenerator(
+annotation class KmSequence(
     val name: String,
-    val incrementBy: Int,
+    val startWith: Int = 1,
+    val incrementBy: Int = 50,
     val catalog: String = "",
     val schema: String = "",
     val alwaysQuote: Boolean = false
@@ -54,12 +54,8 @@ annotation class KmSequenceGenerator(
 
 @Target(AnnotationTarget.VALUE_PARAMETER)
 @Retention(AnnotationRetention.SOURCE)
-annotation class KmIdentityGenerator
+annotation class KmAutoIncrement
 
 @Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.SOURCE)
 annotation class KmEntityDef(val entity: KClass<*>)
-
-@Target(AnnotationTarget.VALUE_PARAMETER)
-@Retention(AnnotationRetention.SOURCE)
-annotation class KmDataType(val dataType: KClass<DataType<*>>)

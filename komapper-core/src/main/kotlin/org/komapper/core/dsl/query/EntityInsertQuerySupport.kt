@@ -33,14 +33,14 @@ internal class EntityInsertQuerySupport<ENTITY : Any, ID, META : EntityMetamodel
     }
 
     fun <T> insert(config: DatabaseConfig, execute: (JdbcExecutor) -> T): T {
-        val requiresGeneratedKeys = context.target.idAssignment() is Assignment.Identity<*, *>
+        val requiresGeneratedKeys = context.target.idAssignment() is Assignment.AutoIncrement<*, *>
         val executor = JdbcExecutor(config, option.asJdbcOption(), requiresGeneratedKeys)
         return execute(executor)
     }
 
     fun postInsert(entity: ENTITY, generatedKey: Long): ENTITY {
         val assignment = context.target.idAssignment()
-        return if (assignment is Assignment.Identity<ENTITY, *>) {
+        return if (assignment is Assignment.AutoIncrement<ENTITY, *>) {
             assignment.assign(entity, generatedKey)
         } else {
             entity

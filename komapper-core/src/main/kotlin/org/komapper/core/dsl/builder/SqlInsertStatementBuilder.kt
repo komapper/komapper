@@ -29,7 +29,7 @@ internal class SqlInsertStatementBuilder<ENTITY : Any, ID, META : EntityMetamode
                 buf.append(" (")
                 for (column in values.pairs.map { it.first }) {
                     if (column.expression in entityMetamodel.idProperties() &&
-                        entityMetamodel.idAssignment() is Assignment.Identity<ENTITY, *>
+                        entityMetamodel.idAssignment() is Assignment.AutoIncrement<ENTITY, *>
                     ) {
                         continue
                     }
@@ -40,7 +40,7 @@ internal class SqlInsertStatementBuilder<ENTITY : Any, ID, META : EntityMetamode
                 buf.append(") values (")
                 for (parameter in values.pairs.map { it.second }) {
                     if (parameter.expression in entityMetamodel.idProperties() &&
-                        entityMetamodel.idAssignment() is Assignment.Identity<ENTITY, *>
+                        entityMetamodel.idAssignment() is Assignment.AutoIncrement<ENTITY, *>
                     ) {
                         continue
                     }

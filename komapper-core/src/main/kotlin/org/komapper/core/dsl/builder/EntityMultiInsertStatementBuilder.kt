@@ -28,7 +28,7 @@ internal class EntityMultiInsertStatementBuilderImpl<ENTITY : Any, ID, META : En
         buf.append("insert into ")
         buf.append(table(entityMetamodel))
         buf.append(" (")
-        for (p in properties.filter { it.idAssignment !is Assignment.Identity<ENTITY, *> }) {
+        for (p in properties.filter { it.idAssignment !is Assignment.AutoIncrement<ENTITY, *> }) {
             buf.append(column(p))
             buf.append(", ")
         }
@@ -36,7 +36,7 @@ internal class EntityMultiInsertStatementBuilderImpl<ENTITY : Any, ID, META : En
         buf.append(") values ")
         for (entity in entities) {
             buf.append("(")
-            for (p in properties.filter { it.idAssignment !is Assignment.Identity<ENTITY, *> }) {
+            for (p in properties.filter { it.idAssignment !is Assignment.AutoIncrement<ENTITY, *> }) {
                 val value = Value(p.getter(entity), p.klass)
                 buf.bind(value)
                 buf.append(", ")

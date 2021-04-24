@@ -44,9 +44,9 @@ internal class EntityDefFactory(
                 val declaration = propertyDeclarationMap[parameter.name]
                     ?: report("The corresponding property declaration is not found.", parameter)
                 val column = getColumn(parameter)
-                val kind = createPropertyKind(parameter)
-                val generatorKind = createIdGeneratorKind(parameter, kind)
-                PropertyDef(parameter, declaration, column, kind, generatorKind)
+                val idKind = createIdKind(parameter)
+                val kind = createPropertyKind(parameter, idKind)
+                PropertyDef(parameter, declaration, column, kind)
             }?.also {
                 validateProperties(it)
             }?.toList() ?: emptyList()
@@ -64,7 +64,35 @@ internal class EntityDefFactory(
         }
     }
 
-    private fun createPropertyKind(parameter: KSValueParameter): PropertyKind? {
+    private fun createIdKind(parameter: KSValueParameter): IdKind? {
+        var autoIncrement: IdKind.AutoIncrement? = null
+        var sequence: IdKind.Sequence? = null
+        for (a in parameter.annotations) {
+            when (a.shortName.asString()) {
+                "KmAutoIncrement" -> autoIncrement = IdKind.AutoIncrement(a)
+                "KmSequence" -> sequence = let {
+                    val name = a.findValue("name")?.toString()?.trim()
+                        ?: report("@KmSequence.name is not found.", a)
+                    val startWith = a.findValue("startWith") ?: 1
+                    val incrementBy = a.findValue("incrementBy") ?: 50
+                    val catalog = a.findValue("catalog")?.toString()?.trim() ?: ""
+                    val schema = a.findValue("schema")?.toString()?.trim() ?: ""
+                    val alwaysQuote = a.findValue("alwaysQuote")?.toString()?.let { it == "true" } ?: false
+                    IdKind.Sequence(a, name, startWith, incrementBy, catalog, schema, alwaysQuote)
+                }
+            }
+        }
+        val idKinds = listOfNotNull(autoIncrement, sequence)
+        if (idKinds.size > 1) {
+            val iterator = idKinds.iterator()
+            val a1 = iterator.next().annotation
+            val a2 = iterator.next().annotation
+            report("$a1 and $a2 cannot coexist on the same property.", parameter)
+        }
+        return idKinds.firstOrNull()
+    }
+
+    private fun createPropertyKind(parameter: KSValueParameter, idKind: IdKind?): PropertyKind? {
         var id: PropertyKind.Id? = null
         var version: PropertyKind.Version? = null
         var createdAt: PropertyKind.CreatedAt? = null
@@ -72,7 +100,7 @@ internal class EntityDefFactory(
         var ignore: PropertyKind.Ignore? = null
         for (a in parameter.annotations) {
             when (a.shortName.asString()) {
-                "KmId" -> id = PropertyKind.Id(a)
+                "KmId" -> id = PropertyKind.Id(a, idKind)
                 "KmVersion" -> version = PropertyKind.Version(a)
                 "KmCreatedAt" -> createdAt = PropertyKind.CreatedAt(a)
                 "KmUpdatedAt" -> updatedAt = PropertyKind.UpdatedAt(a)
@@ -86,38 +114,10 @@ internal class EntityDefFactory(
             val a2 = iterator.next().annotation
             report("$a1 and $a2 cannot coexist on the same property.", parameter)
         }
-        return kinds.firstOrNull()
-    }
-
-    private fun createIdGeneratorKind(parameter: KSValueParameter, propertyKind: PropertyKind?): IdGeneratorKind? {
-        var identity: IdGeneratorKind.Identity? = null
-        var sequence: IdGeneratorKind.Sequence? = null
-        for (a in parameter.annotations) {
-            when (a.shortName.asString()) {
-                "KmIdentityGenerator" -> identity = IdGeneratorKind.Identity(a)
-                "KmSequenceGenerator" -> sequence = let {
-                    val name = a.findValue("name")?.toString()?.trim()
-                        ?: report("@KmSequenceGenerator.name is not found.", a)
-                    val incrementBy = a.findValue("incrementBy")
-                        ?: report("@KmSequenceGenerator.incrementBy is not found.", a)
-                    val catalog = a.findValue("catalog")?.toString()?.trim() ?: ""
-                    val schema = a.findValue("schema")?.toString()?.trim() ?: ""
-                    val alwaysQuote = a.findValue("alwaysQuote")?.toString()?.let { it == "true" } ?: false
-                    IdGeneratorKind.Sequence(a, name, incrementBy, catalog, schema, alwaysQuote)
-                }
+        return kinds.firstOrNull().also { kind ->
+            if (idKind != null && kind !is PropertyKind.Id) {
+                report("${idKind.annotation} and @KmId must coexist on the same property.", parameter)
             }
         }
-        val idGeneratorKinds = listOfNotNull(identity, sequence)
-        if (idGeneratorKinds.size > 1) {
-            val iterator = idGeneratorKinds.iterator()
-            val a1 = iterator.next().annotation
-            val a2 = iterator.next().annotation
-            report("$a1 and $a2 cannot coexist on the same property.", parameter)
-        }
-        val idGeneratorKind = idGeneratorKinds.firstOrNull() ?: return null
-        if (propertyKind !is PropertyKind.Id) {
-            report("${idGeneratorKind.annotation} and @KmId must coexist on the same property.", parameter)
-        }
-        return idGeneratorKind
     }
 }

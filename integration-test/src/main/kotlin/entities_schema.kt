@@ -1,9 +1,9 @@
 package integration
 
+import org.komapper.annotation.KmAutoIncrement
 import org.komapper.annotation.KmEntity
 import org.komapper.annotation.KmId
-import org.komapper.annotation.KmIdentityGenerator
-import org.komapper.annotation.KmSequenceGenerator
+import org.komapper.annotation.KmSequence
 import org.komapper.annotation.KmTable
 
 @KmEntity
@@ -16,7 +16,7 @@ data class Aaa(
 
 @KmEntity
 data class Bbb(
-    @KmId @KmIdentityGenerator val id: Int,
+    @KmId @KmAutoIncrement val id: Int,
     val name: String?,
 ) {
     companion object
@@ -24,7 +24,7 @@ data class Bbb(
 
 @KmEntity
 data class Ccc(
-    @KmId @KmSequenceGenerator("CCC_SEQ", incrementBy = 50)
+    @KmId @KmSequence("CCC_SEQ", incrementBy = 50)
     val id: Int,
     val name: String,
 ) {
@@ -34,7 +34,7 @@ data class Ccc(
 @KmEntity
 @KmTable(schema = "test")
 data class Ddd(
-    @KmId @KmIdentityGenerator val id: Int,
+    @KmId @KmAutoIncrement val id: Int,
     val name: String?,
 ) {
     companion object

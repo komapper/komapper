@@ -8,7 +8,7 @@ import java.time.ZonedDateTime
 private const val Assignment = "org.komapper.core.dsl.metamodel.Assignment"
 private const val EntityMetamodel = "org.komapper.core.dsl.metamodel.EntityMetamodel"
 private const val EntityMetamodelStub = "org.komapper.core.dsl.metamodel.EntityMetamodelStub"
-private const val Identity = "org.komapper.core.dsl.metamodel.Assignment.Identity"
+private const val AutoIncrement = "org.komapper.core.dsl.metamodel.Assignment.AutoIncrement"
 private const val Sequence = "org.komapper.core.dsl.metamodel.Assignment.Sequence"
 private const val PropertyDescriptor = "org.komapper.core.dsl.metamodel.PropertyDescriptor"
 private const val PropertyMetamodel = "org.komapper.core.dsl.metamodel.PropertyMetamodel"
@@ -88,21 +88,27 @@ internal class EntityMetamodelGenerator(
             val getter = "{ it.$p }"
             val setter = "{ e, v -> e.copy($p = v) }"
             val nullable = if (p.nullability == Nullability.NULLABLE) "true" else "false"
-            val assignment = when (val kind = p.idGeneratorKind) {
-                is IdGeneratorKind.Identity -> {
-                    "$Identity<$entityTypeName, ${p.typeName}>(${p.typeName}::class, $setter)"
-                }
-                is IdGeneratorKind.Sequence -> {
-                    val paramList = listOf(
-                        "${p.typeName}::class",
-                        setter,
-                        "\"${kind.name}\"",
-                        "\"${kind.catalog}\"",
-                        "\"${kind.schema}\"",
-                        "${kind.alwaysQuote}",
-                        "${kind.incrementBy}",
-                    ).joinToString(", ")
-                    "$Sequence<$entityTypeName, ${p.typeName}>($paramList)"
+            val assignment = when (val kind = p.kind) {
+                is PropertyKind.Id -> {
+                    when (val idKind = kind.idKind) {
+                        is IdKind.AutoIncrement -> {
+                            "$AutoIncrement<$entityTypeName, ${p.typeName}>(${p.typeName}::class, $setter)"
+                        }
+                        is IdKind.Sequence -> {
+                            val paramList = listOf(
+                                "${p.typeName}::class",
+                                setter,
+                                "\"${idKind.name}\"",
+                                "\"${idKind.catalog}\"",
+                                "\"${idKind.schema}\"",
+                                "${idKind.alwaysQuote}",
+                                "${idKind.startWith}",
+                                "${idKind.incrementBy}",
+                            ).joinToString(", ")
+                            "$Sequence<$entityTypeName, ${p.typeName}>($paramList)"
+                        }
+                        else -> "null"
+                    }
                 }
                 else -> "null"
             }
@@ -138,7 +144,13 @@ internal class EntityMetamodelGenerator(
     }
 
     private fun idAssignment() {
-        val p = entity.properties.firstOrNull { it.idGeneratorKind != null }
+        val p = entity.properties.mapNotNull {
+            when (it.kind) {
+                is PropertyKind.Id ->
+                    if (it.kind.idKind != null) it else null
+                else -> null
+            }
+        }.firstOrNull()
         w.print("    override fun idAssignment(): $Assignment<$entityTypeName>? = ")
         if (p != null) {
             w.println("$p.idAssignment")
@@ -193,35 +205,47 @@ internal class EntityMetamodelGenerator(
     }
 
     private fun preInsert() {
-        val version = entity.versionProperty ?.let {
+        val version = entity.versionProperty?.let {
             val nullable = it.nullability == Nullability.NULLABLE
             "$it = e.$it${if (nullable) " ?: 0" else ""}"
         }
-        val createdAt = entity.createdAtProperty ?.let {
+        val createdAt = entity.createdAtProperty?.let {
             "$it = ${it.typeName}.now(c)"
         }
-        val updatedAt = entity.updatedAtProperty ?.let {
+        val updatedAt = entity.updatedAtProperty?.let {
             "$it = ${it.typeName}.now(c)"
         }
         val paramList = listOfNotNull(version, createdAt, updatedAt).joinToString()
-        val body = if (paramList == "") { "e" } else { "e.copy($paramList)" }
+        val body = if (paramList == "") {
+            "e"
+        } else {
+            "e.copy($paramList)"
+        }
         w.println("    override fun preInsert(e: $entityTypeName, c: $Clock): $entityTypeName = $body")
     }
 
     private fun preUpdate() {
-        val updatedAt = entity.updatedAtProperty ?.let {
+        val updatedAt = entity.updatedAtProperty?.let {
             "$it = ${it.typeName}.now(c)"
         }
-        val body = if (updatedAt == null) { "e" } else { "e.copy($updatedAt)" }
+        val body = if (updatedAt == null) {
+            "e"
+        } else {
+            "e.copy($updatedAt)"
+        }
         w.println("    override fun preUpdate(e: $entityTypeName, c: $Clock): $entityTypeName = $body")
     }
 
     private fun postUpdate() {
-        val version = entity.versionProperty ?.let {
+        val version = entity.versionProperty?.let {
             val nullable = it.nullability == Nullability.NULLABLE
             "$it = e.$it${if (nullable) "?" else ""}.inc()${if (nullable) " ?: 0" else ""}"
         }
-        val body = if (version == null) { "e" } else { "e.copy($version)" }
+        val body = if (version == null) {
+            "e"
+        } else {
+            "e.copy($version)"
+        }
         w.println("    override fun postUpdate(e: $entityTypeName): $entityTypeName = $body")
     }
 

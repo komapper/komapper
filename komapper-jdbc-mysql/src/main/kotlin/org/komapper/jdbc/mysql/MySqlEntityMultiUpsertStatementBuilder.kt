@@ -40,7 +40,7 @@ class MySqlEntityMultiUpsertStatementBuilder<ENTITY : Any, ID, META : EntityMeta
         buf.append(" (")
         for (
             p in target.properties().filter {
-                it.idAssignment !is Assignment.Identity<ENTITY, *>
+                it.idAssignment !is Assignment.AutoIncrement<ENTITY, *>
             }
         ) {
             column(p)
@@ -52,7 +52,7 @@ class MySqlEntityMultiUpsertStatementBuilder<ENTITY : Any, ID, META : EntityMeta
             buf.append("(")
             for (
                 p in target.properties().filter {
-                    it.idAssignment !is Assignment.Identity<ENTITY, *>
+                    it.idAssignment !is Assignment.AutoIncrement<ENTITY, *>
                 }
             ) {
                 val value = Value(p.getter(entity), p.klass)

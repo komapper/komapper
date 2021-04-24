@@ -46,7 +46,7 @@ open class PostgreSqlSchemaStatementBuilder(private val dialect: PostgreSqlDiale
         w.println("create table if not exists $tableName (")
         val columns = e.properties().map { p ->
             val columnName = p.getCanonicalColumnName(dialect::enquote)
-            val dataTypeName = if (p.idAssignment is Assignment.Identity<*, *>) {
+            val dataTypeName = if (p.idAssignment is Assignment.AutoIncrement<*, *>) {
                 when (p.klass) {
                     Int::class -> "serial"
                     Long::class -> "bigserial"
@@ -71,7 +71,7 @@ open class PostgreSqlSchemaStatementBuilder(private val dialect: PostgreSqlDiale
         val w = PrintWriter(sql)
         val idAssignment = e.properties().map { it.idAssignment }.firstOrNull { it != null }
         if (idAssignment is Assignment.Sequence<*, *>) {
-            w.println("create sequence if not exists ${idAssignment.getCanonicalSequenceName(dialect::enquote)} start with 1 increment by ${idAssignment.incrementBy};")
+            w.println("create sequence if not exists ${idAssignment.getCanonicalSequenceName(dialect::enquote)} start with ${idAssignment.startWith} increment by ${idAssignment.incrementBy};")
         }
     }
 

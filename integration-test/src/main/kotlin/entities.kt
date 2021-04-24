@@ -1,12 +1,12 @@
 package integration
 
+import org.komapper.annotation.KmAutoIncrement
 import org.komapper.annotation.KmColumn
 import org.komapper.annotation.KmCreatedAt
 import org.komapper.annotation.KmEntity
 import org.komapper.annotation.KmId
-import org.komapper.annotation.KmIdentityGenerator
 import org.komapper.annotation.KmIgnore
-import org.komapper.annotation.KmSequenceGenerator
+import org.komapper.annotation.KmSequence
 import org.komapper.annotation.KmTable
 import org.komapper.annotation.KmUpdatedAt
 import org.komapper.annotation.KmVersion
@@ -37,7 +37,7 @@ data class CompositeKeyAddress(
 @KmEntity
 @KmTable("IDENTITY_STRATEGY")
 data class IdentityStrategy(
-    @KmId @KmIdentityGenerator val id: Int?,
+    @KmId @KmAutoIncrement val id: Int?,
     val value: String
 ) {
     companion object
@@ -46,7 +46,7 @@ data class IdentityStrategy(
 @KmEntity
 @KmTable("SEQUENCE_STRATEGY")
 data class SequenceStrategy(
-    @KmId @KmSequenceGenerator(name = "SEQUENCE_STRATEGY_ID", incrementBy = 100) val id: Int,
+    @KmId @KmSequence(name = "SEQUENCE_STRATEGY_ID", incrementBy = 100) val id: Int,
     val value: String
 ) {
     companion object

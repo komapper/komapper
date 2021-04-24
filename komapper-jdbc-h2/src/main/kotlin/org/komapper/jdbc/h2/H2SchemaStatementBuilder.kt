@@ -48,7 +48,7 @@ open class H2SchemaStatementBuilder(private val dialect: H2Dialect) : SchemaStat
             val columnName = p.getCanonicalColumnName(dialect::enquote)
             val dataType = dialect.getDataType(p.klass)
             val notNull = if (p.nullable) "" else " not null"
-            val identity = if (p.idAssignment is Assignment.Identity<*, *>) " auto_increment" else ""
+            val identity = if (p.idAssignment is Assignment.AutoIncrement<*, *>) " auto_increment" else ""
             "$columnName ${dataType.name}$notNull$identity"
         }
         for (column in columns) {
@@ -63,7 +63,7 @@ open class H2SchemaStatementBuilder(private val dialect: H2Dialect) : SchemaStat
         val w = PrintWriter(sql)
         val idAssignment = e.properties().map { it.idAssignment }.firstOrNull { it != null }
         if (idAssignment is Assignment.Sequence<*, *>) {
-            w.println("create sequence if not exists ${idAssignment.getCanonicalSequenceName(dialect::enquote)} start with 1 increment by ${idAssignment.incrementBy};")
+            w.println("create sequence if not exists ${idAssignment.getCanonicalSequenceName(dialect::enquote)} start with ${idAssignment.startWith} increment by ${idAssignment.incrementBy};")
         }
     }
 

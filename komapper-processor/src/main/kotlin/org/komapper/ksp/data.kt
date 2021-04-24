@@ -23,7 +23,6 @@ internal data class PropertyDef(
     val declaration: KSPropertyDeclaration,
     val column: Column,
     val kind: PropertyKind?,
-    val idGeneratorKind: IdGeneratorKind?
 )
 
 internal data class Entity(
@@ -43,7 +42,6 @@ internal data class Property(
     val typeName: String,
     val nullability: Nullability,
     val kind: PropertyKind?,
-    val idGeneratorKind: IdGeneratorKind?
 ) {
     fun isPrivate() = declaration.isPrivate()
 
@@ -55,26 +53,30 @@ internal data class Property(
 internal sealed class PropertyKind {
     abstract val annotation: KSAnnotation
 
-    data class Id(override val annotation: KSAnnotation) : PropertyKind()
+    data class Id(override val annotation: KSAnnotation, val idKind: IdKind?) : PropertyKind()
     data class Version(override val annotation: KSAnnotation) : PropertyKind()
     data class UpdatedAt(override val annotation: KSAnnotation) : PropertyKind()
     data class CreatedAt(override val annotation: KSAnnotation) : PropertyKind()
     data class Ignore(override val annotation: KSAnnotation) : PropertyKind()
 }
 
-internal sealed class IdGeneratorKind {
+internal sealed class IdKind {
     abstract val annotation: KSAnnotation
 
-    data class Identity(override val annotation: KSAnnotation) : IdGeneratorKind()
+    data class AutoIncrement(
+        override val annotation: KSAnnotation
+    ) : IdKind()
+
     data class Sequence(
         override val annotation: KSAnnotation,
         val name: String,
+        val startWith: Any,
         val incrementBy: Any,
         val catalog: String,
         val schema: String,
         val alwaysQuote: Boolean
     ) :
-        IdGeneratorKind()
+        IdKind()
 }
 
 internal data class Table(
