@@ -3,26 +3,30 @@ package org.komapper.ksp
 internal data class Config(
     val prefix: String,
     val suffix: String,
-    val namingStrategy: NamingStrategy
+    val namingStrategy: NamingStrategy,
+    val checkCompanionObject: Boolean
 ) {
     companion object {
         private const val prefixKeyName = "komapper.prefix"
         private const val suffixKeyName = "komapper.suffix"
         private const val namingStrategyKeyName = "komapper.namingStrategy"
+        private const val checkCompanionObjectKeyName = "checkCompanionObject"
 
         fun create(options: Map<String, String>): Config {
-            val prefix = options[prefixKeyName] ?: ""
-            val suffix = options[suffixKeyName] ?: "_"
-            val namingStrategy = options[namingStrategyKeyName].let {
+            val prefix = options.getOrDefault(prefixKeyName, "")
+            val suffix = options.getOrDefault(suffixKeyName, "_")
+            val namingStrategy = options.getOrDefault(namingStrategyKeyName, "lower_snake_case").let {
                 when (it) {
-                    null -> CamelToLowerSnakeCase
                     "lower_snake_case" -> CamelToLowerSnakeCase
                     "UPPER_SNAKE_CASE" -> CamelToUpperSnakeCase
                     "implicit" -> Implicit
                     else -> error("'$it' is illegal value as a $namingStrategyKeyName option.")
                 }
             }
-            return Config(prefix, suffix, namingStrategy)
+            val checkCompanionObject = options.getOrDefault(checkCompanionObjectKeyName, "true").let {
+                it == "true"
+            }
+            return Config(prefix, suffix, namingStrategy, checkCompanionObject)
         }
     }
 }

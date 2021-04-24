@@ -1,8 +1,10 @@
 package org.komapper.ksp
 
+import com.google.devtools.ksp.processing.KSPLogger
 import com.google.devtools.ksp.symbol.KSAnnotated
 
 internal class EntityAnalyzer(
+    private val logger: KSPLogger,
     private val config: Config,
     private val definitionSourceResolver: EntityDefinitionSourceResolver
 ) {
@@ -15,7 +17,7 @@ internal class EntityAnalyzer(
         }
         return try {
             val entityDef = EntityDefFactory(config, definitionSource).create()
-            val entity = EntityFactory(config, entityDef).create()
+            val entity = EntityFactory(logger, config, entityDef).create()
             val model = EntityModel(config, definitionSource, entity)
             EntityAnalyzerResult.Success(model)
         } catch (e: Exit) {

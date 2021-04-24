@@ -16,6 +16,24 @@ class EntityProcessorTest {
     @JvmField
     var tempDir: Path? = null
 
+    @Test fun `We recommend to define a companion object in the entity class`() {
+        val result = compile(
+            kotlin(
+                "source.kt",
+                """
+                package test
+                import org.komapper.annotation.*
+                @KmEntity
+                data class Dept(
+                    @KmId val id: Int
+                )
+                """
+            )
+        )
+        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.OK)
+        assertThat(result.messages).contains("We recommend to define a companion object in the entity class.")
+    }
+
     @Test fun `The entity class must have at least one id property`() {
         val result = compile(
             kotlin(

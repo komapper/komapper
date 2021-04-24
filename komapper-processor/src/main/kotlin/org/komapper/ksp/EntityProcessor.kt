@@ -34,7 +34,7 @@ class EntityProcessor : SymbolProcessor {
         )
         for ((annotation, definitionSourceResolver) in pairs) {
             val symbols = resolver.getSymbolsWithAnnotation(annotation)
-            val analyzer = EntityAnalyzer(config, definitionSourceResolver)
+            val analyzer = EntityAnalyzer(logger, config, definitionSourceResolver)
             for (symbol in symbols) {
                 val model = when (val result = analyzer.analyze(symbol)) {
                     is EntityAnalyzerResult.Success -> result.model

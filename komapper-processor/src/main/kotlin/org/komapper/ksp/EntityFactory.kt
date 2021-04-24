@@ -1,11 +1,13 @@
 package org.komapper.ksp
 
 import com.google.devtools.ksp.getDeclaredProperties
+import com.google.devtools.ksp.processing.KSPLogger
 import com.google.devtools.ksp.symbol.KSValueParameter
 
-internal class EntityFactory(config: Config, private val entityDef: EntityDef) {
+internal class EntityFactory(private val logger: KSPLogger, config: Config, private val entityDef: EntityDef) {
 
     private val namingStrategy: NamingStrategy = config.namingStrategy
+    private val checkCompanionObject: Boolean = config.checkCompanionObject
 
     fun create(): Entity {
         val allProperties = createAllProperties()
@@ -177,6 +179,14 @@ internal class EntityFactory(config: Config, private val entityDef: EntityDef) {
         }
         if (entity.idProperties.isEmpty()) {
             report("The entity class must have at least one id property.", entity.declaration)
+        }
+        if (checkCompanionObject && !entity.declaration.hasCompanionObject()) {
+            logger.warn(
+                "We recommend to define a companion object in the entity class. " +
+                    "To suppress this warning message, configure as follows in your build file: " +
+                    "'ksp { arg(\"komapper.checkCompanionObject\", \"false\") }'",
+                entity.declaration
+            )
         }
     }
 }
