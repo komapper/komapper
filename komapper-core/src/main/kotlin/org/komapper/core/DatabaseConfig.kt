@@ -7,12 +7,13 @@ import org.komapper.core.spi.DatabaseSessionFactory
 import org.komapper.core.spi.LoggerFactory
 import org.komapper.core.spi.TemplateStatementBuilderFactory
 import java.util.ServiceLoader
+import java.util.UUID
 import javax.sql.DataSource
 
 /**
  * A database configuration.
  *
- * @property name the name of this configuration. The name is used as a key to manage sequence values. The name must be unique.
+ * @property id the id of this configuration. The id is used as a key to manage sequence values. The name must be unique.
  * @property dialect the dialect
  * @property logger the logger
  * @property clockProvider the clock provider
@@ -21,7 +22,7 @@ import javax.sql.DataSource
  */
 interface DatabaseConfig : DatabaseConfigHolder {
     override val config: DatabaseConfig get() = this
-    val name: String
+    val id: UUID
     val dialect: Dialect
     val clockProvider: ClockProvider
     val jdbcOption: JdbcOption
@@ -50,7 +51,7 @@ open class DefaultDatabaseConfig(
         dialect: Dialect
     ) : this(SimpleDataSource(url, user, password), dialect)
 
-    override val name: String = System.identityHashCode(object {}).toString()
+    override val id: UUID = UUID.randomUUID()
     override val clockProvider: ClockProvider = DefaultClockProvider()
     override val jdbcOption: JdbcOption = JdbcOption(batchSize = 10)
     override val logger: Logger by lazy {
@@ -81,7 +82,7 @@ open class DefaultDatabaseConfig(
 }
 
 object DryRunDatabaseConfig : DatabaseConfig {
-    override val name: String
+    override val id: UUID
         get() = throw UnsupportedOperationException()
     override val dialect: Dialect = DryRunDialect
     override val logger: Logger

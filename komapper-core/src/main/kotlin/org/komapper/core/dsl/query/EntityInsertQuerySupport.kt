@@ -16,7 +16,7 @@ internal class EntityInsertQuerySupport<ENTITY : Any, ID, META : EntityMetamodel
     fun preInsert(config: DatabaseConfig, entity: ENTITY): ENTITY {
         val assignment = context.target.idAssignment()
         return if (assignment is Assignment.Sequence<ENTITY, *>) {
-            assignment.assign(entity, config.name, config.dialect::enquote) { sequenceName ->
+            assignment.assign(entity, config.id, config.dialect::enquote) { sequenceName ->
                 val sql = config.dialect.getSequenceSql(sequenceName)
                 val statement = Statement(sql)
                 val executor = JdbcExecutor(config, option)

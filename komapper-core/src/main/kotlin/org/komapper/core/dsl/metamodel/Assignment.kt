@@ -1,5 +1,6 @@
 package org.komapper.core.dsl.metamodel
 
+import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
@@ -29,9 +30,9 @@ sealed class Assignment<E> {
     ) :
         Assignment<E>() {
 
-        private val contextMap = ConcurrentHashMap<String, GenerationContext>()
+        private val contextMap = ConcurrentHashMap<UUID, GenerationContext>()
 
-        fun assign(entity: E, key: String, enquote: (String) -> String, sequenceNextValue: (String) -> Long): E {
+        fun assign(entity: E, key: UUID, enquote: (String) -> String, sequenceNextValue: (String) -> Long): E {
             val context = contextMap.computeIfAbsent(key) {
                 val sequenceName = getCanonicalSequenceName(enquote)
                 GenerationContext(startWith, incrementBy) {
