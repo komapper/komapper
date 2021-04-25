@@ -5,8 +5,8 @@ import org.komapper.core.data.Statement
 import org.komapper.core.data.StatementBuffer
 import org.komapper.core.data.Value
 import org.komapper.core.dsl.context.EntityDeleteContext
-import org.komapper.core.dsl.expression.EntityExpression
-import org.komapper.core.dsl.expression.PropertyExpression
+import org.komapper.core.dsl.expression.ColumnExpression
+import org.komapper.core.dsl.expression.TableExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.option.VersionOption
 
@@ -17,7 +17,7 @@ internal class EntityDeleteStatementBuilder<ENTITY : Any, ID, META : EntityMetam
     val option: VersionOption
 ) {
 
-    private val aliasManager = AliasManagerImpl(context)
+    private val aliasManager = DefaultAliasManager(context)
     private val buf = StatementBuffer(dialect::formatValue)
     private val support = BuilderSupport(dialect, aliasManager, buf)
 
@@ -52,11 +52,11 @@ internal class EntityDeleteStatementBuilder<ENTITY : Any, ID, META : EntityMetam
         return buf.toStatement()
     }
 
-    private fun table(expression: EntityExpression<*>) {
-        support.visitEntityExpression(expression, TableNameType.NAME_AND_ALIAS)
+    private fun table(expression: TableExpression<*>) {
+        support.visitTableExpression(expression, TableNameType.NAME_AND_ALIAS)
     }
 
-    private fun column(expression: PropertyExpression<*>) {
-        support.visitPropertyExpression(expression)
+    private fun column(expression: ColumnExpression<*>) {
+        support.visitColumnExpression(expression)
     }
 }

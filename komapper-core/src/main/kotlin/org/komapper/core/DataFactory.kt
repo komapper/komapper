@@ -13,7 +13,7 @@ interface DataFactory {
     fun createSQLXML(): SQLXML
 }
 
-internal class DataFactoryImpl(private val session: DatabaseSession) : DataFactory {
+internal class DefaultDataFactory(private val session: DatabaseSession) : DataFactory {
 
     /**
      * Creates Array objects.

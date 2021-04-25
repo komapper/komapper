@@ -10,10 +10,10 @@ import org.komapper.core.dsl.element.Operand
 import org.komapper.core.dsl.expression.AggregateFunction
 import org.komapper.core.dsl.expression.AliasExpression
 import org.komapper.core.dsl.expression.ArithmeticExpression
-import org.komapper.core.dsl.expression.EntityExpression
+import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.expression.EscapeExpression
-import org.komapper.core.dsl.expression.PropertyExpression
 import org.komapper.core.dsl.expression.StringFunction
+import org.komapper.core.dsl.expression.TableExpression
 import org.komapper.core.dsl.query.ScalarQuery
 
 class BuilderSupport(
@@ -23,10 +23,12 @@ class BuilderSupport(
     private val escapeSequence: String? = null
 ) {
 
-    fun visitEntityExpression(expression: EntityExpression<*>, nameType: TableNameType) {
+    fun visitTableExpression(expression: TableExpression<*>, nameType: TableNameType) {
         val name = expression.getCanonicalTableName(dialect::enquote)
         when (nameType) {
-            TableNameType.NAME_ONLY -> buf.append(name)
+            TableNameType.NAME_ONLY -> {
+                buf.append(name)
+            }
             TableNameType.ALIAS_ONLY -> {
                 val alias = aliasManager.getAlias(expression) ?: error("Alias is not found. table=$name ,sql=$buf")
                 buf.append(alias)
@@ -42,7 +44,7 @@ class BuilderSupport(
         }
     }
 
-    fun visitPropertyExpression(expression: PropertyExpression<*>) {
+    fun visitColumnExpression(expression: ColumnExpression<*>) {
         when (expression) {
             is AggregateFunction -> {
                 visitAggregateFunction(expression)
@@ -77,7 +79,7 @@ class BuilderSupport(
         when (function) {
             is AggregateFunction.Avg -> {
                 buf.append("avg(")
-                visitPropertyExpression(function.expression)
+                visitColumnExpression(function.expression)
                 buf.append(")")
             }
             is AggregateFunction.CountAsterisk -> {
@@ -85,29 +87,29 @@ class BuilderSupport(
             }
             is AggregateFunction.Count -> {
                 buf.append("count(")
-                visitPropertyExpression(function.expression)
+                visitColumnExpression(function.expression)
                 buf.append(")")
             }
             is AggregateFunction.Max -> {
                 buf.append("max(")
-                visitPropertyExpression(function.expression)
+                visitColumnExpression(function.expression)
                 buf.append(")")
             }
             is AggregateFunction.Min<*> -> {
                 buf.append("min(")
-                visitPropertyExpression(function.expression)
+                visitColumnExpression(function.expression)
                 buf.append(")")
             }
             is AggregateFunction.Sum<*> -> {
                 buf.append("sum(")
-                visitPropertyExpression(function.expression)
+                visitColumnExpression(function.expression)
                 buf.append(")")
             }
         }
     }
 
     private fun visitAliasExpression(expression: AliasExpression<*>) {
-        visitPropertyExpression(expression.expression)
+        visitColumnExpression(expression.expression)
         buf.append(" as ${dialect.enquote(expression.alias)}")
     }
 
@@ -221,19 +223,19 @@ class BuilderSupport(
 
     private fun visitLikeRightOperand(operand: Operand) {
         when (operand) {
-            is Operand.Property -> {
-                visitPropertyExpression(operand.expression)
+            is Operand.Column -> {
+                visitColumnExpression(operand.expression)
             }
-            is Operand.Parameter -> {
+            is Operand.Argument -> {
                 when (val value = operand.value) {
                     is EscapeExpression -> {
                         val finalEscapeSequence = escapeSequence ?: dialect.escapeSequence
                         val newValue = visitEscapeExpression(value) { dialect.escape(it, finalEscapeSequence) }
-                        visitParameter(Operand.Parameter(operand.expression, newValue))
+                        visitArgument(Operand.Argument(operand.klass, newValue))
                         buf.append(" escape ")
                         buf.bind(Value(finalEscapeSequence, String::class))
                     }
-                    else -> visitParameter(operand)
+                    else -> visitArgument(operand)
                 }
             }
         }
@@ -355,13 +357,13 @@ class BuilderSupport(
         return when (subqueryContext) {
             is SubqueryContext.EntitySelect<*> -> {
                 val context = subqueryContext.context
-                val childAliasManager = AliasManagerImpl(context, aliasManager)
+                val childAliasManager = DefaultAliasManager(context, aliasManager)
                 val builder = EntitySelectStatementBuilder(dialect, context, childAliasManager)
                 builder.build()
             }
             is SubqueryContext.SqlSelect<*> -> {
                 val context = subqueryContext.context
-                val childAliasManager = AliasManagerImpl(context, aliasManager)
+                val childAliasManager = DefaultAliasManager(context, aliasManager)
                 val builder = SqlSelectStatementBuilder(dialect, context, childAliasManager)
                 builder.build()
             }
@@ -406,16 +408,16 @@ class BuilderSupport(
 
     fun visitOperand(operand: Operand) {
         when (operand) {
-            is Operand.Property -> {
-                visitPropertyExpression(operand.expression)
+            is Operand.Column -> {
+                visitColumnExpression(operand.expression)
             }
-            is Operand.Parameter -> {
-                visitParameter(operand)
+            is Operand.Argument -> {
+                visitArgument(operand)
             }
         }
     }
 
-    private fun visitParameter(parameter: Operand.Parameter) {
-        buf.bind(Value(parameter.value, parameter.expression.klass))
+    private fun visitArgument(argument: Operand.Argument) {
+        buf.bind(Value(argument.value, argument.klass))
     }
 }

@@ -8,7 +8,7 @@ import org.komapper.core.dsl.context.SqlSelectContext
 import org.komapper.core.dsl.context.SqlSetOperationContext
 import org.komapper.core.dsl.context.SqlSetOperationKind
 import org.komapper.core.dsl.context.SubqueryContext
-import org.komapper.core.dsl.expression.EntityExpression
+import org.komapper.core.dsl.expression.TableExpression
 
 internal class SqlSetOperationStatementBuilder(
     private val dialect: Dialect,
@@ -44,7 +44,7 @@ internal class SqlSetOperationStatementBuilder(
     }
 
     private fun visitEntityContext(selectContext: EntitySelectContext<*, *, *>) {
-        val childAliasManager = AliasManagerImpl(selectContext, aliasManager)
+        val childAliasManager = DefaultAliasManager(selectContext, aliasManager)
         val builder = EntitySelectStatementBuilder(dialect, selectContext, childAliasManager)
         val statement = builder.build()
         buf.append("(")
@@ -53,7 +53,7 @@ internal class SqlSetOperationStatementBuilder(
     }
 
     private fun visitSelectContext(selectContext: SqlSelectContext<*, *, *>) {
-        val childAliasManager = AliasManagerImpl(selectContext, aliasManager)
+        val childAliasManager = DefaultAliasManager(selectContext, aliasManager)
         val builder = SqlSelectStatementBuilder(dialect, selectContext, childAliasManager)
         val statement = builder.build()
         buf.append("(")
@@ -63,6 +63,6 @@ internal class SqlSetOperationStatementBuilder(
 
     private object SetOperationAliasManager : AliasManager {
         override val index: Int = 0
-        override fun getAlias(expression: EntityExpression<*>): String = ""
+        override fun getAlias(expression: TableExpression<*>): String = ""
     }
 }

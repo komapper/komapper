@@ -27,8 +27,7 @@ internal data class EntityUpsertQueryImpl<ENTITY : Any, ID, META : EntityMetamod
     override fun run(holder: DatabaseConfigHolder): Int {
         val config = holder.config
         val newEntity = preUpsert(config, entity)
-        val statement = buildStatement(config, newEntity)
-        val (count) = upsert(config, statement)
+        val (count) = upsert(config, newEntity)
         return count
     }
 
@@ -36,7 +35,8 @@ internal data class EntityUpsertQueryImpl<ENTITY : Any, ID, META : EntityMetamod
         return support.preUpsert(config, entity)
     }
 
-    private fun upsert(config: DatabaseConfig, statement: Statement): Pair<Int, LongArray> {
+    private fun upsert(config: DatabaseConfig, entity: ENTITY): Pair<Int, LongArray> {
+        val statement = buildStatement(config, entity)
         return support.upsert(config) { it.executeUpdate(statement) }
     }
 

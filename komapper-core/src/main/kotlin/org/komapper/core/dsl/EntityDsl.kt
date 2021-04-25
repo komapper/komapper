@@ -15,8 +15,8 @@ import org.komapper.core.dsl.query.EntityDeleteQuery
 import org.komapper.core.dsl.query.EntityDeleteQueryImpl
 import org.komapper.core.dsl.query.EntityInsertQuery
 import org.komapper.core.dsl.query.EntityInsertQueryImpl
-import org.komapper.core.dsl.query.EntityMultiInsertQuery
-import org.komapper.core.dsl.query.EntityMultiInsertQueryImpl
+import org.komapper.core.dsl.query.EntityMultipleInsertQuery
+import org.komapper.core.dsl.query.EntityMultipleInsertQueryImpl
 import org.komapper.core.dsl.query.EntitySelectQuery
 import org.komapper.core.dsl.query.EntitySelectQueryImpl
 import org.komapper.core.dsl.query.EntityUpdateQuery
@@ -32,93 +32,93 @@ object EntityDsl : Dsl {
     }
 
     fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> first(
-        entityMetamodel: META,
-        declaration: WhereDeclaration
+        metamodel: META,
+        where: WhereDeclaration
     ): Query<ENTITY> {
-        return EntitySelectQueryImpl(EntitySelectContext(entityMetamodel))
-            .where(declaration)
+        return EntitySelectQueryImpl(EntitySelectContext(metamodel))
+            .where(where)
             .limit(1)
             .first()
     }
 
     fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> firstOrNull(
-        entityMetamodel: META,
-        declaration: WhereDeclaration
+        metamodel: META,
+        where: WhereDeclaration
     ): Query<ENTITY?> {
-        return EntitySelectQueryImpl(EntitySelectContext(entityMetamodel))
-            .where(declaration)
+        return EntitySelectQueryImpl(EntitySelectContext(metamodel))
+            .where(where)
             .limit(1)
             .firstOrNull()
     }
 
     fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> from(
-        entityMetamodel: META
+        metamodel: META
     ): EntitySelectQuery<ENTITY> {
-        return EntitySelectQueryImpl(EntitySelectContext(entityMetamodel))
+        return EntitySelectQueryImpl(EntitySelectContext(metamodel))
     }
 
     fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> insert(
-        entityMetamodel: META,
+        metamodel: META,
         entity: ENTITY
     ): EntityInsertQuery<ENTITY, ID, META> {
-        return EntityInsertQueryImpl(EntityInsertContext(entityMetamodel), entity)
+        return EntityInsertQueryImpl(EntityInsertContext(metamodel), entity)
     }
 
     fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> update(
-        entityMetamodel: META,
+        metamodel: META,
         entity: ENTITY
     ): EntityUpdateQuery<ENTITY> {
-        require(hasIdValue(entityMetamodel, entity)) { Messages.idValueRequired }
-        return EntityUpdateQueryImpl(EntityUpdateContext(entityMetamodel), entity)
+        require(hasIdValue(metamodel, entity)) { Messages.idValueRequired }
+        return EntityUpdateQueryImpl(EntityUpdateContext(metamodel), entity)
     }
 
     fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> delete(
-        entityMetamodel: META,
+        metamodel: META,
         entity: ENTITY
     ): EntityDeleteQuery<ENTITY> {
-        require(hasIdValue(entityMetamodel, entity)) { Messages.idValueRequired }
-        return EntityDeleteQueryImpl(EntityDeleteContext(entityMetamodel), entity)
+        require(hasIdValue(metamodel, entity)) { Messages.idValueRequired }
+        return EntityDeleteQueryImpl(EntityDeleteContext(metamodel), entity)
     }
 
-    fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> insertMulti(
-        entityMetamodel: META,
+    fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> insertMultiple(
+        metamodel: META,
         entities: List<ENTITY>
-    ): EntityMultiInsertQuery<ENTITY, ID, META> {
-        return EntityMultiInsertQueryImpl(EntityInsertContext(entityMetamodel), entities)
+    ): EntityMultipleInsertQuery<ENTITY, ID, META> {
+        return EntityMultipleInsertQueryImpl(EntityInsertContext(metamodel), entities)
     }
 
     fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> insertBatch(
-        entityMetamodel: META,
+        metamodel: META,
         entities: List<ENTITY>
     ): EntityBatchInsertQuery<ENTITY, ID, META> {
-        return EntityBatchInsertQueryImpl(EntityInsertContext(entityMetamodel), entities)
+        return EntityBatchInsertQueryImpl(EntityInsertContext(metamodel), entities)
     }
 
     fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> updateBatch(
-        entityMetamodel: META,
+        metamodel: META,
         entities: List<ENTITY>
     ): EntityBatchUpdateQuery<ENTITY> {
         for ((i, entity) in entities.withIndex()) {
-            require(hasIdValue(entityMetamodel, entity)) { Messages.idValueRequired(i) }
+            require(hasIdValue(metamodel, entity)) { Messages.idValueRequired(i) }
         }
-        return EntityBatchUpdateQueryImpl(EntityUpdateContext(entityMetamodel), entities)
+        return EntityBatchUpdateQueryImpl(EntityUpdateContext(metamodel), entities)
     }
 
     fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> deleteBatch(
-        entityMetamodel: META,
+        metamodel: META,
         entities: List<ENTITY>
     ): EntityBatchDeleteQuery<ENTITY> {
         for ((i, entity) in entities.withIndex()) {
-            require(hasIdValue(entityMetamodel, entity)) { Messages.idValueRequired(i) }
+            require(hasIdValue(metamodel, entity)) { Messages.idValueRequired(i) }
         }
-        return EntityBatchDeleteQueryImpl(EntityDeleteContext(entityMetamodel), entities)
+        return EntityBatchDeleteQueryImpl(EntityDeleteContext(metamodel), entities)
     }
 
     private fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> hasIdValue(
-        entityMetamodel: META,
+        metamodel: META,
         entity: ENTITY
     ): Boolean {
-        val idProperties = entityMetamodel.idProperties()
+        val idProperties = metamodel.idProperties()
         return idProperties.isNotEmpty() &&
             idProperties.map { it.getter(entity) }.all { it != null }
     }

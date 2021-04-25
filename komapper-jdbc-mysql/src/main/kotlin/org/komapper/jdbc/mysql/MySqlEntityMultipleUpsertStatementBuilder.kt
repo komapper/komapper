@@ -1,4 +1,4 @@
-package org.komapper.jdbc.postgresql
+package org.komapper.jdbc.mysql
 
 import org.komapper.core.Dialect
 import org.komapper.core.data.Statement
@@ -6,33 +6,37 @@ import org.komapper.core.data.StatementBuffer
 import org.komapper.core.data.Value
 import org.komapper.core.dsl.builder.AliasManager
 import org.komapper.core.dsl.builder.BuilderSupport
-import org.komapper.core.dsl.builder.EntityMultiUpsertStatementBuilder
+import org.komapper.core.dsl.builder.EntityMultipleUpsertStatementBuilder
 import org.komapper.core.dsl.builder.EntityUpsertStatementBuilder
 import org.komapper.core.dsl.builder.TableNameType
 import org.komapper.core.dsl.context.DuplicateKeyType
 import org.komapper.core.dsl.context.EntityUpsertContext
 import org.komapper.core.dsl.element.Operand
-import org.komapper.core.dsl.expression.EntityExpression
-import org.komapper.core.dsl.expression.PropertyExpression
+import org.komapper.core.dsl.expression.ColumnExpression
+import org.komapper.core.dsl.expression.TableExpression
 import org.komapper.core.dsl.metamodel.Assignment
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 
-class PostgreSqlEntityMultiUpsertStatementBuilder<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+class MySqlEntityMultipleUpsertStatementBuilder<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     private val dialect: Dialect,
     private val context: EntityUpsertContext<ENTITY, ID, META>,
     private val entities: List<ENTITY>
 ) : EntityUpsertStatementBuilder<ENTITY>,
-    EntityMultiUpsertStatementBuilder<ENTITY> {
+    EntityMultipleUpsertStatementBuilder<ENTITY> {
 
     private val target = context.target
     private val excluded = context.excluded
-    private val aliasManager = UpsertAliasManager(target, excluded)
+    private val aliasManager = UpsertAliasManager(dialect, target, excluded)
     private val buf = StatementBuffer(dialect::formatValue)
     private val support = BuilderSupport(dialect, aliasManager, buf)
 
     override fun build(): Statement {
-        buf.append("insert into ")
-        table(target)
+        buf.append("insert")
+        if (context.duplicateKeyType == DuplicateKeyType.IGNORE) {
+            buf.append(" ignore")
+        }
+        buf.append(" into ")
+        table(target, TableNameType.NAME_ONLY)
         buf.append(" (")
         for (
             p in target.properties().filter {
@@ -59,36 +63,26 @@ class PostgreSqlEntityMultiUpsertStatementBuilder<ENTITY : Any, ID, META : Entit
             buf.append("), ")
         }
         buf.cutBack(2)
-        buf.append(" on conflict (")
-        for (p in context.keys) {
-            column(p)
-            buf.append(", ")
-        }
-        buf.cutBack(2)
-        buf.append(")")
-        when (context.duplicateKeyType) {
-            DuplicateKeyType.IGNORE -> {
-                buf.append(" do nothing")
+        buf.append(" as ")
+        table(excluded, TableNameType.ALIAS_ONLY)
+        if (context.duplicateKeyType == DuplicateKeyType.UPDATE) {
+            buf.append(" on duplicate key update ")
+            for ((left, right) in context.assignmentMap) {
+                column(left)
+                buf.append(" = ")
+                operand(right)
+                buf.append(", ")
             }
-            DuplicateKeyType.UPDATE -> {
-                buf.append(" do update set ")
-                for ((left, right) in context.assignmentMap) {
-                    column(left)
-                    buf.append(" = ")
-                    operand(right)
-                    buf.append(", ")
-                }
-                buf.cutBack(2)
-            }
+            buf.cutBack(2)
         }
         return buf.toStatement()
     }
 
-    private fun table(expression: EntityExpression<*>) {
-        support.visitEntityExpression(expression, TableNameType.NAME_AND_ALIAS)
+    private fun table(expression: TableExpression<*>, tableNameType: TableNameType) {
+        support.visitTableExpression(expression, tableNameType)
     }
 
-    private fun column(expression: PropertyExpression<*>) {
+    private fun column(expression: ColumnExpression<*>) {
         val name = expression.getCanonicalColumnName(dialect::enquote)
         buf.append(name)
     }
@@ -98,18 +92,19 @@ class PostgreSqlEntityMultiUpsertStatementBuilder<ENTITY : Any, ID, META : Entit
     }
 
     private class UpsertAliasManager(
-        target: EntityMetamodel<*, *, *>,
-        excluded: EntityMetamodel<*, *, *>
+        dialect: Dialect,
+        target: TableExpression<*>,
+        excluded: TableExpression<*>
     ) : AliasManager {
 
-        private val aliasMap: Map<EntityExpression<*>, String> = mapOf(
-            target to "t0_",
+        private val aliasMap: Map<TableExpression<*>, String> = mapOf(
+            target to target.getCanonicalTableName(dialect::enquote),
             excluded to excluded.tableName()
         )
 
-        override val index: Int = 1
+        override val index: Int = 0
 
-        override fun getAlias(expression: EntityExpression<*>): String? {
+        override fun getAlias(expression: TableExpression<*>): String? {
             return aliasMap[expression]
         }
     }

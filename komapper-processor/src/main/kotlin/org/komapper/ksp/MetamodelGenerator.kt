@@ -2,7 +2,6 @@ package org.komapper.ksp
 
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.Nullability
-import org.komapper.core.dsl.metamodel.EntityMetamodelImplementor
 import java.io.PrintWriter
 import java.time.ZonedDateTime
 
@@ -68,12 +67,12 @@ internal class EntityMetamodelGenerator(
         createdAtProperty()
         updatedAtProperty()
         properties()
-        instantiate()
         getId()
         preInsert()
         preUpdate()
         postUpdate()
 
+        newEntity()
         newMetamodel()
 
         companionObject()
@@ -184,14 +183,6 @@ internal class EntityMetamodelGenerator(
         w.println("    override fun properties(): List<$PropertyMetamodel<$entityTypeName, *>> = listOf($nameList)")
     }
 
-    private fun instantiate() {
-        val argList = entity.properties.joinToString(",\n        ", prefix = "\n        ") { p ->
-            val nullability = if (p.nullability == Nullability.NULLABLE) "?" else ""
-            "$p = m[this.$p] as ${p.typeName}$nullability"
-        }
-        w.println("    override fun instantiate(m: Map<$PropertyMetamodel<*, *>, Any?>) = $entityTypeName($argList)")
-    }
-
     private fun getId() {
         val body = if (entity.idProperties.size == 1) {
             val p = entity.idProperties[0]
@@ -250,6 +241,14 @@ internal class EntityMetamodelGenerator(
             "e.copy($version)"
         }
         w.println("    override fun postUpdate(e: $entityTypeName): $entityTypeName = $body")
+    }
+
+    private fun newEntity() {
+        val argList = entity.properties.joinToString(",\n        ", prefix = "\n        ") { p ->
+            val nullability = if (p.nullability == Nullability.NULLABLE) "?" else ""
+            "$p = m[this.$p] as ${p.typeName}$nullability"
+        }
+        w.println("    override fun newEntity(m: Map<$PropertyMetamodel<*, *>, Any?>) = $entityTypeName($argList)")
     }
 
     private fun newMetamodel() {

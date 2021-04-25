@@ -6,22 +6,22 @@ import org.komapper.core.data.StatementBuffer
 import org.komapper.core.data.Value
 import org.komapper.core.dsl.builder.AliasManager
 import org.komapper.core.dsl.builder.BuilderSupport
-import org.komapper.core.dsl.builder.EntityMultiUpsertStatementBuilder
+import org.komapper.core.dsl.builder.EntityMultipleUpsertStatementBuilder
 import org.komapper.core.dsl.builder.EntityUpsertStatementBuilder
 import org.komapper.core.dsl.builder.TableNameType
 import org.komapper.core.dsl.context.DuplicateKeyType
 import org.komapper.core.dsl.context.EntityUpsertContext
 import org.komapper.core.dsl.element.Operand
-import org.komapper.core.dsl.expression.EntityExpression
-import org.komapper.core.dsl.expression.PropertyExpression
+import org.komapper.core.dsl.expression.ColumnExpression
+import org.komapper.core.dsl.expression.TableExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 
-internal class H2EntityMultiUpsertStatementBuilder<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+internal class H2EntityMultipleUpsertStatementBuilder<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     private val dialect: Dialect,
     private val context: EntityUpsertContext<ENTITY, ID, META>,
     entities: List<ENTITY>
 ) : EntityUpsertStatementBuilder<ENTITY>,
-    EntityMultiUpsertStatementBuilder<ENTITY> {
+    EntityMultipleUpsertStatementBuilder<ENTITY> {
 
     private val target = context.target
     private val excluded = context.excluded
@@ -66,26 +66,26 @@ internal class H2EntityMultiUpsertStatementBuilder<ENTITY : Any, ID, META : Enti
         return buf.toStatement()
     }
 
-    private fun table(expression: EntityExpression<*>, tableNameType: TableNameType) {
-        support.visitEntityExpression(expression, tableNameType)
+    private fun table(expression: TableExpression<*>, tableNameType: TableNameType) {
+        support.visitTableExpression(expression, tableNameType)
     }
 
-    private fun column(expression: PropertyExpression<*>) {
-        support.visitPropertyExpression(expression)
+    private fun column(expression: ColumnExpression<*>) {
+        support.visitColumnExpression(expression)
     }
 
     private fun operand(operand: Operand) {
         support.visitOperand(operand)
     }
 
-    private class UpsertAliasManager<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
-        val target: META,
-        val excluded: META
+    private class UpsertAliasManager(
+        val target: TableExpression<*>,
+        val excluded: TableExpression<*>
     ) : AliasManager {
 
         override val index: Int = 0
 
-        override fun getAlias(expression: EntityExpression<*>): String {
+        override fun getAlias(expression: TableExpression<*>): String {
             return when (expression) {
                 target -> "t"
                 excluded -> excluded.tableName()
@@ -131,7 +131,7 @@ internal class H2EntityMultiUpsertStatementBuilder<ENTITY : Any, ID, META : Enti
             return buf.toStatement()
         }
 
-        private fun column(expression: PropertyExpression<*>) {
+        private fun column(expression: ColumnExpression<*>) {
             val name = expression.getCanonicalColumnName(dialect::enquote)
             buf.append(name)
         }

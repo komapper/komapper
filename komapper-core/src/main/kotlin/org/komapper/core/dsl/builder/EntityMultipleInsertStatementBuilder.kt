@@ -5,30 +5,30 @@ import org.komapper.core.data.Statement
 import org.komapper.core.data.StatementBuffer
 import org.komapper.core.data.Value
 import org.komapper.core.dsl.context.EntityInsertContext
-import org.komapper.core.dsl.expression.EntityExpression
-import org.komapper.core.dsl.expression.PropertyExpression
+import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.metamodel.Assignment
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 
-interface EntityMultiInsertStatementBuilder<ENTITY : Any> {
+interface EntityMultipleInsertStatementBuilder<ENTITY : Any> {
     fun build(): Statement
 }
 
-internal class EntityMultiInsertStatementBuilderImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+internal class EntityMultipleInsertStatementBuilderImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     val dialect: Dialect,
     val context: EntityInsertContext<ENTITY, ID, META>,
     val entities: List<ENTITY>
-) : EntityMultiInsertStatementBuilder<ENTITY> {
+) : EntityMultipleInsertStatementBuilder<ENTITY> {
 
     private val buf = StatementBuffer(dialect::formatValue)
 
     override fun build(): Statement {
-        val entityMetamodel = context.target
-        val properties = entityMetamodel.properties()
+        val properties = context.target.properties().filter {
+            it.idAssignment !is Assignment.AutoIncrement<ENTITY, *>
+        }
         buf.append("insert into ")
-        buf.append(table(entityMetamodel))
+        buf.append(table(context.target))
         buf.append(" (")
-        for (p in properties.filter { it.idAssignment !is Assignment.AutoIncrement<ENTITY, *> }) {
+        for (p in properties) {
             buf.append(column(p))
             buf.append(", ")
         }
@@ -36,7 +36,7 @@ internal class EntityMultiInsertStatementBuilderImpl<ENTITY : Any, ID, META : En
         buf.append(") values ")
         for (entity in entities) {
             buf.append("(")
-            for (p in properties.filter { it.idAssignment !is Assignment.AutoIncrement<ENTITY, *> }) {
+            for (p in properties) {
                 val value = Value(p.getter(entity), p.klass)
                 buf.bind(value)
                 buf.append(", ")
@@ -48,11 +48,11 @@ internal class EntityMultiInsertStatementBuilderImpl<ENTITY : Any, ID, META : En
         return buf.toStatement()
     }
 
-    private fun table(expression: EntityExpression<*>): String {
-        return expression.getCanonicalTableName(dialect::enquote)
+    private fun table(metamodel: EntityMetamodel<*, *, *>): String {
+        return metamodel.getCanonicalTableName(dialect::enquote)
     }
 
-    private fun column(expression: PropertyExpression<*>): String {
+    private fun column(expression: ColumnExpression<*>): String {
         return expression.getCanonicalColumnName(dialect::enquote)
     }
 }

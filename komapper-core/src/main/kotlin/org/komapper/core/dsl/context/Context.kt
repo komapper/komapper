@@ -1,7 +1,7 @@
 package org.komapper.core.dsl.context
 
-import org.komapper.core.dsl.expression.EntityExpression
+import org.komapper.core.dsl.metamodel.EntityMetamodel
 
 interface Context {
-    fun getEntityExpressions(): Set<EntityExpression<*>>
+    fun getEntityMetamodels(): Set<EntityMetamodel<*, *, *>>
 }

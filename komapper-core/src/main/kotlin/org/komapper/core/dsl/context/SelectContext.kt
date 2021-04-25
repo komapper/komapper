@@ -5,7 +5,6 @@ import org.komapper.core.dsl.element.ForUpdate
 import org.komapper.core.dsl.element.Join
 import org.komapper.core.dsl.element.Projection
 import org.komapper.core.dsl.element.SortItem
-import org.komapper.core.dsl.expression.EntityExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 
 internal interface SelectContext<
@@ -30,7 +29,7 @@ internal interface SelectContext<
     fun setOffset(offset: Int): CONTEXT
     fun setForUpdate(forUpdate: ForUpdate): CONTEXT
 
-    override fun getEntityExpressions(): Set<EntityExpression<*>> {
+    override fun getEntityMetamodels(): Set<EntityMetamodel<*, *, *>> {
         return setOf(target) + joins.map { it.target }
     }
 }

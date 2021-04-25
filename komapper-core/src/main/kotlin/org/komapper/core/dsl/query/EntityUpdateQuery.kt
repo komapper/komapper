@@ -7,12 +7,11 @@ import org.komapper.core.dsl.context.EntityUpdateContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.metamodel.PropertyMetamodel
 import org.komapper.core.dsl.option.EntityUpdateOption
-import org.komapper.core.dsl.option.QueryOptionConfigurator
 
 interface EntityUpdateQuery<ENTITY : Any> : Query<ENTITY> {
-    fun option(configurator: QueryOptionConfigurator<EntityUpdateOption>): EntityUpdateQuery<ENTITY>
-    fun include(vararg propertyMetamodels: PropertyMetamodel<ENTITY, *>): Query<ENTITY>
-    fun exclude(vararg propertyMetamodels: PropertyMetamodel<ENTITY, *>): Query<ENTITY>
+    fun option(configurator: (EntityUpdateOption) -> EntityUpdateOption): EntityUpdateQuery<ENTITY>
+    fun include(vararg properties: PropertyMetamodel<ENTITY, *>): Query<ENTITY>
+    fun exclude(vararg properties: PropertyMetamodel<ENTITY, *>): Query<ENTITY>
 }
 
 internal data class EntityUpdateQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
@@ -24,17 +23,17 @@ internal data class EntityUpdateQueryImpl<ENTITY : Any, ID, META : EntityMetamod
 
     private val support: EntityUpdateQuerySupport<ENTITY, ID, META> = EntityUpdateQuerySupport(context, option)
 
-    override fun option(configurator: QueryOptionConfigurator<EntityUpdateOption>): EntityUpdateQueryImpl<ENTITY, ID, META> {
-        return copy(option = configurator.apply(option))
+    override fun option(configurator: (EntityUpdateOption) -> EntityUpdateOption): EntityUpdateQueryImpl<ENTITY, ID, META> {
+        return copy(option = configurator(option))
     }
 
-    override fun include(vararg propertyMetamodels: PropertyMetamodel<ENTITY, *>): Query<ENTITY> {
-        val newContext = support.include(propertyMetamodels.toList())
+    override fun include(vararg properties: PropertyMetamodel<ENTITY, *>): Query<ENTITY> {
+        val newContext = support.include(properties.toList())
         return copy(context = newContext)
     }
 
-    override fun exclude(vararg propertyMetamodels: PropertyMetamodel<ENTITY, *>): Query<ENTITY> {
-        val newContext = support.exclude(propertyMetamodels.toList())
+    override fun exclude(vararg properties: PropertyMetamodel<ENTITY, *>): Query<ENTITY> {
+        val newContext = support.exclude(properties.toList())
         return copy(context = newContext)
     }
 

@@ -2,9 +2,8 @@ package org.komapper.core.dsl.query
 
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.DatabaseConfigHolder
-import org.komapper.core.JdbcExecutor
+import org.komapper.core.SqlExecutor
 import org.komapper.core.data.Statement
-import org.komapper.core.dsl.option.QueryOptionConfigurator
 import org.komapper.core.dsl.option.TemplateSelectOption
 
 interface TemplateSelectQuery<T> : ListQuery<T>
@@ -42,7 +41,7 @@ internal data class TemplateSelectQueryImpl<T>(
         override fun run(holder: DatabaseConfigHolder): R {
             val config = holder.config
             val statement = buildStatement(config)
-            val executor = JdbcExecutor(config, option)
+            val executor = SqlExecutor(config, option)
             return executor.executeQuery(
                 statement,
                 { dialect, rs ->
@@ -67,7 +66,7 @@ internal data class TemplateSelectQueryImpl<T>(
 
 interface TemplateSelectQueryBuilder {
     fun where(provider: () -> Any): TemplateSelectQueryBuilder
-    fun option(configurator: QueryOptionConfigurator<TemplateSelectOption>): TemplateSelectQueryBuilder
+    fun option(configurator: (TemplateSelectOption) -> TemplateSelectOption): TemplateSelectQueryBuilder
     fun <T> select(provider: Row.() -> T): TemplateSelectQuery<T>
 }
 
@@ -77,8 +76,8 @@ internal data class TemplateSelectQueryBuilderImpl(
     private val option: TemplateSelectOption = TemplateSelectOption()
 ) : TemplateSelectQueryBuilder {
 
-    override fun option(configurator: QueryOptionConfigurator<TemplateSelectOption>): TemplateSelectQueryBuilder {
-        return copy(option = configurator.apply(option))
+    override fun option(configurator: (TemplateSelectOption) -> TemplateSelectOption): TemplateSelectQueryBuilder {
+        return copy(option = configurator(option))
     }
 
     override fun where(provider: () -> Any): TemplateSelectQueryBuilder {

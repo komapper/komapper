@@ -6,8 +6,8 @@ import org.komapper.core.data.StatementBuffer
 import org.komapper.core.dsl.context.SqlUpdateContext
 import org.komapper.core.dsl.element.Criterion
 import org.komapper.core.dsl.element.Operand
-import org.komapper.core.dsl.expression.EntityExpression
-import org.komapper.core.dsl.expression.PropertyExpression
+import org.komapper.core.dsl.expression.ColumnExpression
+import org.komapper.core.dsl.expression.TableExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 
 internal class SqlUpdateStatementBuilder<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
@@ -15,13 +15,13 @@ internal class SqlUpdateStatementBuilder<ENTITY : Any, ID, META : EntityMetamode
     val context: SqlUpdateContext<ENTITY, ID, META>,
 ) {
 
-    private val aliasManager = AliasManagerImpl(context)
+    private val aliasManager = DefaultAliasManager(context)
     private val buf = StatementBuffer(dialect::formatValue)
     private val support = BuilderSupport(dialect, aliasManager, buf)
 
     fun build(): Statement {
         buf.append("update ")
-        table(context.entityMetamodel)
+        table(context.target)
         buf.append(" set ")
         for ((left, right) in context.set) {
             column(left)
@@ -41,11 +41,11 @@ internal class SqlUpdateStatementBuilder<ENTITY : Any, ID, META : EntityMetamode
         return buf.toStatement()
     }
 
-    private fun table(expression: EntityExpression<*>) {
-        support.visitEntityExpression(expression, TableNameType.NAME_AND_ALIAS)
+    private fun table(expression: TableExpression<*>) {
+        support.visitTableExpression(expression, TableNameType.NAME_AND_ALIAS)
     }
 
-    private fun column(expression: PropertyExpression<*>) {
+    private fun column(expression: ColumnExpression<*>) {
         val name = expression.getCanonicalColumnName(dialect::enquote)
         buf.append(name)
     }

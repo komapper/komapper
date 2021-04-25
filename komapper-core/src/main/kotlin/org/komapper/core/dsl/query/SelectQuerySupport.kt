@@ -7,7 +7,7 @@ import org.komapper.core.dsl.element.ForUpdate
 import org.komapper.core.dsl.element.Join
 import org.komapper.core.dsl.element.JoinKind
 import org.komapper.core.dsl.element.SortItem
-import org.komapper.core.dsl.expression.PropertyExpression
+import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.option.ForUpdateOption
 import org.komapper.core.dsl.scope.OnDeclaration
@@ -27,20 +27,20 @@ internal data class SelectQuerySupport<ENTITY : Any, ID, META : EntityMetamodel<
     }
 
     fun <OTHER_ENTITY : Any, OTHER_ID, OTHER_META : EntityMetamodel<OTHER_ENTITY, OTHER_ID, OTHER_META>> leftJoin(
-        entityMetamodel: OTHER_META,
+        metamodel: OTHER_META,
         declaration: OnDeclaration<OTHER_ENTITY>
     ): CONTEXT {
-        return join(entityMetamodel, declaration, JoinKind.LEFT_OUTER)
+        return join(metamodel, declaration, JoinKind.LEFT_OUTER)
     }
 
     private fun <OTHER_ENTITY : Any, OTHER_ID, OTHER_META : EntityMetamodel<OTHER_ENTITY, OTHER_ID, OTHER_META>> join(
-        entityMetamodel: OTHER_META,
+        metamodel: OTHER_META,
         declaration: OnDeclaration<OTHER_ENTITY>,
         kind: JoinKind
     ): CONTEXT {
         val scope = OnScope<OTHER_ENTITY>().apply(declaration)
         if (scope.isNotEmpty()) {
-            val join = Join(entityMetamodel, kind, scope.toList())
+            val join = Join(metamodel, kind, scope.toList())
             return context.addJoin(join)
         }
         return context
@@ -51,7 +51,7 @@ internal data class SelectQuerySupport<ENTITY : Any, ID, META : EntityMetamodel<
         return context.addWhere(scope)
     }
 
-    fun orderBy(vararg expressions: PropertyExpression<*>): CONTEXT {
+    fun orderBy(vararg expressions: ColumnExpression<*>): CONTEXT {
         val items = expressions.map {
             when (it) {
                 is SortItem -> it
@@ -61,12 +61,12 @@ internal data class SelectQuerySupport<ENTITY : Any, ID, META : EntityMetamodel<
         return context.addOrderBy(items)
     }
 
-    fun offset(value: Int): CONTEXT {
-        return context.setOffset(value)
+    fun offset(offset: Int): CONTEXT {
+        return context.setOffset(offset)
     }
 
-    fun limit(value: Int): CONTEXT {
-        return context.setLimit(value)
+    fun limit(limit: Int): CONTEXT {
+        return context.setLimit(limit)
     }
 
     fun forUpdate(): CONTEXT {

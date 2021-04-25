@@ -5,9 +5,6 @@ import javax.sql.DataSource
 
 /**
  * A database.
- *
- * @property config the database configuration
- * @constructor creates a database instance
  */
 interface Database : DatabaseConfigHolder {
     val dataFactory: DataFactory

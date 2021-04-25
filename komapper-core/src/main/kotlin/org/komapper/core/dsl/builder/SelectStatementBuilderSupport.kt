@@ -6,13 +6,13 @@ import org.komapper.core.dsl.context.SelectContext
 import org.komapper.core.dsl.element.Criterion
 import org.komapper.core.dsl.element.JoinKind
 import org.komapper.core.dsl.element.SortItem
-import org.komapper.core.dsl.expression.EntityExpression
-import org.komapper.core.dsl.expression.PropertyExpression
+import org.komapper.core.dsl.expression.ColumnExpression
+import org.komapper.core.dsl.expression.TableExpression
 
 internal class SelectStatementBuilderSupport(
     private val dialect: Dialect,
     private val context: SelectContext<*, *, *, *>,
-    aliasManager: AliasManager = AliasManagerImpl(context),
+    aliasManager: AliasManager = DefaultAliasManager(context),
     private val buf: StatementBuffer
 ) {
     private val support = BuilderSupport(dialect, aliasManager, buf)
@@ -23,8 +23,8 @@ internal class SelectStatementBuilderSupport(
         if (distinct) {
             buf.append("distinct ")
         }
-        for (p in context.projection.propertyExpressions()) {
-            column(p)
+        for (e in context.projection.expressions()) {
+            column(e)
             buf.append(", ")
         }
         buf.cutBack(2)
@@ -81,12 +81,12 @@ internal class SelectStatementBuilderSupport(
         }
     }
 
-    private fun table(expression: EntityExpression<*>) {
-        support.visitEntityExpression(expression, TableNameType.NAME_AND_ALIAS)
+    private fun table(expression: TableExpression<*>) {
+        support.visitTableExpression(expression, TableNameType.NAME_AND_ALIAS)
     }
 
-    fun column(expression: PropertyExpression<*>) {
-        support.visitPropertyExpression(expression)
+    fun column(expression: ColumnExpression<*>) {
+        support.visitColumnExpression(expression)
     }
 
     fun criterion(index: Int, c: Criterion) {
@@ -129,7 +129,7 @@ internal class OrderByBuilderSupport(
         }
     }
 
-    fun column(expression: PropertyExpression<*>) {
-        support.visitPropertyExpression(expression)
+    fun column(expression: ColumnExpression<*>) {
+        support.visitColumnExpression(expression)
     }
 }

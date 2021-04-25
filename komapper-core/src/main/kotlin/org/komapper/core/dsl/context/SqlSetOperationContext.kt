@@ -1,7 +1,7 @@
 package org.komapper.core.dsl.context
 
 import org.komapper.core.dsl.element.SortItem
-import org.komapper.core.dsl.expression.EntityExpression
+import org.komapper.core.dsl.metamodel.EntityMetamodel
 
 internal data class SqlSetOperationContext<T>(
     val kind: SqlSetOperationKind,
@@ -10,11 +10,11 @@ internal data class SqlSetOperationContext<T>(
     val orderBy: List<SortItem> = listOf()
 ) : Context {
 
-    override fun getEntityExpressions(): Set<EntityExpression<*>> {
+    override fun getEntityMetamodels(): Set<EntityMetamodel<*, *, *>> {
         return visitSubqueryContext(left) + visitSubqueryContext(right)
     }
 
-    private fun visitSubqueryContext(subqueryContext: SubqueryContext<*>): Set<EntityExpression<*>> {
+    private fun visitSubqueryContext(subqueryContext: SubqueryContext<*>): Set<EntityMetamodel<*, *, *>> {
         return when (subqueryContext) {
             is SubqueryContext.EntitySelect -> setOf(subqueryContext.context.target)
             is SubqueryContext.SqlSelect -> setOf(subqueryContext.context.target)

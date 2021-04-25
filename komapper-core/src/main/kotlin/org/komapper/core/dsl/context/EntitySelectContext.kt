@@ -11,7 +11,7 @@ import org.komapper.core.dsl.metamodel.EntityMetamodel
 
 internal data class EntitySelectContext<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     override val target: META,
-    override val projection: Projection.Entities = Projection.Entities(listOf(target)),
+    override val projection: Projection.Metamodels = Projection.Metamodels(listOf(target)),
     override val joins: List<Join<*, *, *>> = listOf(),
     override val where: List<Criterion> = listOf(),
     override val orderBy: List<SortItem> = listOf(),
@@ -49,8 +49,8 @@ internal data class EntitySelectContext<ENTITY : Any, ID, META : EntityMetamodel
         association: Association,
         associator: Associator<Any, Any>
     ): EntitySelectContext<ENTITY, ID, META> {
-        val newProjection = Projection.Entities(
-            (projection.values + listOf(association.first, association.second)).distinct()
+        val newProjection = Projection.Metamodels(
+            (projection.metamodels + listOf(association.first, association.second)).distinct()
         )
         return copy(projection = newProjection, associatorMap = this.associatorMap + (association to associator))
     }

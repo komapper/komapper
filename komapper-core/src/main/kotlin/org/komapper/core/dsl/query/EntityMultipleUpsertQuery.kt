@@ -7,15 +7,15 @@ import org.komapper.core.dsl.context.EntityUpsertContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.scope.SetScope
 
-interface EntityMultiUpsertQuery<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> : Query<Int> {
+interface EntityMultipleUpsertQuery<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> : Query<Int> {
     fun set(declaration: SetScope<ENTITY>.(META) -> Unit): Query<Int>
 }
 
-internal data class EntityMultiUpsertQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+internal data class EntityMultipleUpsertQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityUpsertContext<ENTITY, ID, META>,
     private val entities: List<ENTITY>,
     private val insertSupport: EntityInsertQuerySupport<ENTITY, ID, META>
-) : EntityMultiUpsertQuery<ENTITY, ID, META> {
+) : EntityMultipleUpsertQuery<ENTITY, ID, META> {
 
     private val support: EntityUpsertQuerySupport<ENTITY, ID, META> = EntityUpsertQuerySupport(context, insertSupport)
 
@@ -36,7 +36,7 @@ internal data class EntityMultiUpsertQueryImpl<ENTITY : Any, ID, META : EntityMe
     }
 
     private fun upsert(config: DatabaseConfig, entities: List<ENTITY>): Int {
-        val builder = config.dialect.getEntityMultiUpsertStatementBuilder(context, entities)
+        val builder = config.dialect.getEntityMultipleUpsertStatementBuilder(context, entities)
         val statement = builder.build()
         val (count) = support.upsert(config) { it.executeUpdate(statement) }
         return count
@@ -50,7 +50,7 @@ internal data class EntityMultiUpsertQueryImpl<ENTITY : Any, ID, META : EntityMe
     }
 
     private fun buildStatement(config: DatabaseConfig, entities: List<ENTITY>): Statement {
-        val builder = config.dialect.getEntityMultiUpsertStatementBuilder(context, entities)
+        val builder = config.dialect.getEntityMultipleUpsertStatementBuilder(context, entities)
         return builder.build()
     }
 }

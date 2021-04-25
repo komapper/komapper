@@ -5,14 +5,14 @@ import org.komapper.core.data.Statement
 import org.komapper.core.data.StatementBuffer
 import org.komapper.core.dsl.context.SqlDeleteContext
 import org.komapper.core.dsl.element.Criterion
-import org.komapper.core.dsl.expression.EntityExpression
+import org.komapper.core.dsl.expression.TableExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 
 internal class SqlDeleteStatementBuilder<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     val dialect: Dialect,
     val context: SqlDeleteContext<ENTITY, ID, META>
 ) {
-    private val aliasManager = AliasManagerImpl(context)
+    private val aliasManager = DefaultAliasManager(context)
     private val buf = StatementBuffer(dialect::formatValue)
     private val support = BuilderSupport(dialect, aliasManager, buf)
 
@@ -30,8 +30,8 @@ internal class SqlDeleteStatementBuilder<ENTITY : Any, ID, META : EntityMetamode
         return buf.toStatement()
     }
 
-    private fun table(expression: EntityExpression<*>) {
-        support.visitEntityExpression(expression, TableNameType.NAME_AND_ALIAS)
+    private fun table(expression: TableExpression<*>) {
+        support.visitTableExpression(expression, TableNameType.NAME_AND_ALIAS)
     }
 
     private fun criterion(index: Int, c: Criterion) {

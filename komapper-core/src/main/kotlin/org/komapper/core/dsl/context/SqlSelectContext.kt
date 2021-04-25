@@ -5,29 +5,29 @@ import org.komapper.core.dsl.element.ForUpdate
 import org.komapper.core.dsl.element.Join
 import org.komapper.core.dsl.element.Projection
 import org.komapper.core.dsl.element.SortItem
-import org.komapper.core.dsl.expression.PropertyExpression
+import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 
 internal data class SqlSelectContext<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     override val target: META,
-    override val projection: Projection = Projection.Entities(listOf(target)),
+    override val projection: Projection = Projection.Metamodels(listOf(target)),
     override val joins: List<Join<*, *, *>> = listOf(),
     override val where: List<Criterion> = listOf(),
     override val orderBy: List<SortItem> = listOf(),
     override val offset: Int = -1,
     override val limit: Int = -1,
     override val forUpdate: ForUpdate = ForUpdate(),
-    val groupBy: List<PropertyExpression<*>> = listOf(),
+    val groupBy: List<ColumnExpression<*>> = listOf(),
     val having: List<Criterion> = listOf(),
     val distinct: Boolean = false,
 ) : SelectContext<ENTITY, ID, META, SqlSelectContext<ENTITY, ID, META>> {
 
-    fun setProperties(vararg properties: PropertyExpression<*>): SqlSelectContext<ENTITY, ID, META> {
-        return copy(projection = Projection.Properties(properties.toList()))
+    fun setProjection(vararg expressions: ColumnExpression<*>): SqlSelectContext<ENTITY, ID, META> {
+        return copy(projection = Projection.Expressions(expressions.toList()))
     }
 
-    fun setEntities(vararg entityMetamodels: EntityMetamodel<*, *, *>): SqlSelectContext<ENTITY, ID, META> {
-        return copy(projection = Projection.Entities(entityMetamodels.toList()))
+    fun setProjection(vararg metamodels: EntityMetamodel<*, *, *>): SqlSelectContext<ENTITY, ID, META> {
+        return copy(projection = Projection.Metamodels(metamodels.toList()))
     }
 
     override fun addJoin(join: Join<*, *, *>): SqlSelectContext<ENTITY, ID, META> {

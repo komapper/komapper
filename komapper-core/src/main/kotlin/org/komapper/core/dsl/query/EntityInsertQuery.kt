@@ -9,10 +9,9 @@ import org.komapper.core.dsl.context.EntityInsertContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.metamodel.PropertyMetamodel
 import org.komapper.core.dsl.option.EntityInsertOption
-import org.komapper.core.dsl.option.QueryOptionConfigurator
 
 interface EntityInsertQuery<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> : Query<ENTITY> {
-    fun option(configurator: QueryOptionConfigurator<EntityInsertOption>): EntityInsertQuery<ENTITY, ID, META>
+    fun option(configurator: (EntityInsertOption) -> EntityInsertOption): EntityInsertQuery<ENTITY, ID, META>
     fun onDuplicateKeyUpdate(vararg keys: PropertyMetamodel<ENTITY, *> = emptyArray()): EntityUpsertQuery<ENTITY, ID, META>
     fun onDuplicateKeyIgnore(vararg keys: PropertyMetamodel<ENTITY, *> = emptyArray()): Query<Int>
 }
@@ -26,8 +25,8 @@ internal data class EntityInsertQueryImpl<ENTITY : Any, ID, META : EntityMetamod
 
     private val support: EntityInsertQuerySupport<ENTITY, ID, META> = EntityInsertQuerySupport(context, option)
 
-    override fun option(configurator: QueryOptionConfigurator<EntityInsertOption>): EntityInsertQueryImpl<ENTITY, ID, META> {
-        return copy(option = configurator.apply(option))
+    override fun option(configurator: (EntityInsertOption) -> EntityInsertOption): EntityInsertQueryImpl<ENTITY, ID, META> {
+        return copy(option = configurator(option))
     }
 
     override fun onDuplicateKeyUpdate(vararg keys: PropertyMetamodel<ENTITY, *>): EntityUpsertQuery<ENTITY, ID, META> {

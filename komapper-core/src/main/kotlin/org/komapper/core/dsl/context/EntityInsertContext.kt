@@ -1,6 +1,5 @@
 package org.komapper.core.dsl.context
 
-import org.komapper.core.dsl.expression.EntityExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.metamodel.PropertyMetamodel
 
@@ -8,7 +7,7 @@ data class EntityInsertContext<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, 
     val target: META
 ) : Context {
 
-    override fun getEntityExpressions(): Set<EntityExpression<*>> {
+    override fun getEntityMetamodels(): Set<EntityMetamodel<*, *, *>> {
         return setOf(target)
     }
 

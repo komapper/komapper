@@ -2,10 +2,9 @@ package org.komapper.core.dsl.expression
 
 import kotlin.reflect.KClass
 
-interface PropertyExpression<T : Any> {
-    val owner: EntityExpression<*>
+interface ColumnExpression<T : Any> {
+    val owner: TableExpression<*>
     val klass: KClass<T>
-    val name: String
     val columnName: String
     val alwaysQuote: Boolean
 

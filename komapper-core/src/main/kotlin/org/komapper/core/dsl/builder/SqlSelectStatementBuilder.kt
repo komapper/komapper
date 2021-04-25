@@ -6,12 +6,12 @@ import org.komapper.core.data.StatementBuffer
 import org.komapper.core.dsl.context.SqlSelectContext
 import org.komapper.core.dsl.element.Criterion
 import org.komapper.core.dsl.expression.AggregateFunction
-import org.komapper.core.dsl.expression.PropertyExpression
+import org.komapper.core.dsl.expression.ColumnExpression
 
 internal class SqlSelectStatementBuilder(
     val dialect: Dialect,
     val context: SqlSelectContext<*, *, *>,
-    aliasManager: AliasManager = AliasManagerImpl(context)
+    aliasManager: AliasManager = DefaultAliasManager(context)
 ) {
     private val buf = StatementBuffer(dialect::formatValue)
     private val support = SelectStatementBuilderSupport(dialect, context, aliasManager, buf)
@@ -42,9 +42,9 @@ internal class SqlSelectStatementBuilder(
 
     private fun groupByClause() {
         if (context.groupBy.isEmpty()) {
-            val propertyExpressions = context.projection.propertyExpressions()
-            val aggregateFunctions = propertyExpressions.filterIsInstance<AggregateFunction<*>>()
-            val groupByItems = propertyExpressions - aggregateFunctions
+            val expressions = context.projection.expressions()
+            val aggregateFunctions = expressions.filterIsInstance<AggregateFunction<*>>()
+            val groupByItems = expressions - aggregateFunctions
             if (aggregateFunctions.isNotEmpty() && groupByItems.isNotEmpty()) {
                 buf.append(" group by ")
                 for (item in groupByItems) {
@@ -86,7 +86,7 @@ internal class SqlSelectStatementBuilder(
         support.forUpdateClause()
     }
 
-    private fun column(expression: PropertyExpression<*>) {
+    private fun column(expression: ColumnExpression<*>) {
         support.column(expression)
     }
 

@@ -21,40 +21,40 @@ import org.komapper.core.dsl.scope.WhereDeclaration
 object SqlDsl : Dsl {
 
     fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> first(
-        entityMetamodel: META,
+        metamodel: META,
         declaration: WhereDeclaration
     ): Query<ENTITY> {
-        return SqlSelectQueryImpl(SqlSelectContext(entityMetamodel))
+        return SqlSelectQueryImpl(SqlSelectContext(metamodel))
             .where(declaration)
             .limit(1)
             .first()
     }
 
     fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> firstOrNull(
-        entityMetamodel: META,
+        metamodel: META,
         declaration: WhereDeclaration
     ): Query<ENTITY?> {
-        return SqlSelectQueryImpl(SqlSelectContext(entityMetamodel))
+        return SqlSelectQueryImpl(SqlSelectContext(metamodel))
             .where(declaration)
             .limit(1)
             .firstOrNull()
     }
 
-    fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> from(entityMetamodel: META): SqlSelectQuery<ENTITY> {
-        return SqlSelectQueryImpl(SqlSelectContext(entityMetamodel))
+    fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> from(metamodel: META): SqlSelectQuery<ENTITY> {
+        return SqlSelectQueryImpl(SqlSelectContext(metamodel))
     }
 
-    fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> insert(entityMetamodel: META): SqlInsertQueryBuilder<ENTITY> {
-        val query = SqlInsertQueryImpl(SqlInsertContext(entityMetamodel))
+    fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> insert(metamodel: META): SqlInsertQueryBuilder<ENTITY> {
+        val query = SqlInsertQueryImpl(SqlInsertContext(metamodel))
         return SqlInsertQueryBuilderImpl(query)
     }
 
-    fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> update(entityMetamodel: META): SqlUpdateQueryBuilder<ENTITY> {
-        val query = SqlUpdateQueryImpl(SqlUpdateContext(entityMetamodel))
+    fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> update(metamodel: META): SqlUpdateQueryBuilder<ENTITY> {
+        val query = SqlUpdateQueryImpl(SqlUpdateContext(metamodel))
         return SqlUpdateQueryBuilderImpl(query)
     }
 
-    fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> delete(entityMetamodel: META): SqlDeleteQuery {
-        return SqlDeleteQueryImpl(SqlDeleteContext(entityMetamodel))
+    fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> delete(metamodel: META): SqlDeleteQuery {
+        return SqlDeleteQueryImpl(SqlDeleteContext(metamodel))
     }
 }

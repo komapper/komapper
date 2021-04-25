@@ -2,27 +2,26 @@ package org.komapper.core.dsl.query
 
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.DatabaseConfigHolder
-import org.komapper.core.JdbcExecutor
+import org.komapper.core.SqlExecutor
 import org.komapper.core.data.Statement
-import org.komapper.core.dsl.option.QueryOptionConfigurator
 import org.komapper.core.dsl.option.SchemaDropAllOption
 
 interface SchemaDropAllQuery : Query<Unit> {
-    fun option(configurator: QueryOptionConfigurator<SchemaDropAllOption>): SchemaDropAllQuery
+    fun option(configurator: (SchemaDropAllOption) -> SchemaDropAllOption): SchemaDropAllQuery
 }
 
 internal data class SchemaDropAllQueryImpl(
     private val option: SchemaDropAllOption = SchemaDropAllOption()
 ) : SchemaDropAllQuery {
 
-    override fun option(configurator: QueryOptionConfigurator<SchemaDropAllOption>): SchemaDropAllQuery {
-        return copy(option = configurator.apply(option))
+    override fun option(configurator: (SchemaDropAllOption) -> SchemaDropAllOption): SchemaDropAllQuery {
+        return copy(option = configurator(option))
     }
 
     override fun run(holder: DatabaseConfigHolder) {
         val config = holder.config
         val statement = buildStatement(config)
-        val executor = JdbcExecutor(config, SchemaDropAllOption())
+        val executor = SqlExecutor(config, SchemaDropAllOption())
         executor.execute(statement)
     }
 

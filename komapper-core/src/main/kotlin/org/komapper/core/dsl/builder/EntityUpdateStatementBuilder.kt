@@ -5,8 +5,8 @@ import org.komapper.core.data.Statement
 import org.komapper.core.data.StatementBuffer
 import org.komapper.core.data.Value
 import org.komapper.core.dsl.context.EntityUpdateContext
-import org.komapper.core.dsl.expression.EntityExpression
-import org.komapper.core.dsl.expression.PropertyExpression
+import org.komapper.core.dsl.expression.ColumnExpression
+import org.komapper.core.dsl.expression.TableExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.option.VersionOption
 
@@ -16,7 +16,7 @@ internal class EntityUpdateStatementBuilder<ENTITY : Any, ID, META : EntityMetam
     val entity: ENTITY,
     val option: VersionOption
 ) {
-    private val aliasManager = AliasManagerImpl(context)
+    private val aliasManager = DefaultAliasManager(context)
     private val buf = StatementBuffer(dialect::formatValue)
     private val support = BuilderSupport(dialect, aliasManager, buf)
 
@@ -64,11 +64,11 @@ internal class EntityUpdateStatementBuilder<ENTITY : Any, ID, META : EntityMetam
         return buf.toStatement()
     }
 
-    private fun table(expression: EntityExpression<*>) {
-        support.visitEntityExpression(expression, TableNameType.NAME_ONLY)
+    private fun table(expression: TableExpression<*>) {
+        support.visitTableExpression(expression, TableNameType.NAME_ONLY)
     }
 
-    private fun column(expression: PropertyExpression<*>) {
+    private fun column(expression: ColumnExpression<*>) {
         val name = expression.getCanonicalColumnName(dialect::enquote)
         buf.append(name)
     }

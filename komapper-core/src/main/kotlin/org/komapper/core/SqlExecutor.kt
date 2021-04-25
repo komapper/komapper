@@ -7,7 +7,7 @@ import java.sql.PreparedStatement
 import java.sql.ResultSet
 import java.sql.SQLException
 
-class JdbcExecutor(
+class SqlExecutor(
     private val config: DatabaseConfig,
     private val option: QueryOption,
     private val requiresGeneratedKeys: Boolean = false

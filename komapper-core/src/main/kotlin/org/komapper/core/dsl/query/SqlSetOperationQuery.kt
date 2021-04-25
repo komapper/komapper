@@ -3,23 +3,22 @@ package org.komapper.core.dsl.query
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.DatabaseConfigHolder
 import org.komapper.core.Dialect
-import org.komapper.core.JdbcExecutor
+import org.komapper.core.SqlExecutor
 import org.komapper.core.data.Statement
-import org.komapper.core.dsl.builder.AliasManagerImpl
+import org.komapper.core.dsl.builder.DefaultAliasManager
 import org.komapper.core.dsl.builder.SqlSetOperationStatementBuilder
 import org.komapper.core.dsl.context.SqlSetOperationContext
 import org.komapper.core.dsl.context.SqlSetOperationKind
 import org.komapper.core.dsl.context.SubqueryContext
 import org.komapper.core.dsl.element.SortItem
-import org.komapper.core.dsl.expression.PropertyExpression
-import org.komapper.core.dsl.option.QueryOptionConfigurator
+import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.option.SqlSetOperationOption
 import java.sql.ResultSet
 
 interface SqlSetOperationQuery<T> : Subquery<T> {
     fun orderBy(vararg aliases: CharSequence): SqlSetOperationQuery<T>
-    fun orderBy(vararg expressions: PropertyExpression<*>): SqlSetOperationQuery<T>
-    fun option(configurator: QueryOptionConfigurator<SqlSetOperationOption>): SqlSetOperationQuery<T>
+    fun orderBy(vararg expressions: ColumnExpression<*>): SqlSetOperationQuery<T>
+    fun option(configurator: (SqlSetOperationOption) -> SqlSetOperationOption): SqlSetOperationQuery<T>
 }
 
 internal data class SetOperationQueryImpl<T>(
@@ -63,7 +62,7 @@ internal data class SetOperationQueryImpl<T>(
         return orderBy(items)
     }
 
-    override fun orderBy(vararg expressions: PropertyExpression<*>): SetOperationQueryImpl<T> {
+    override fun orderBy(vararg expressions: ColumnExpression<*>): SetOperationQueryImpl<T> {
         val items = expressions.map {
             if (it is SortItem) it else SortItem.Property.Asc(it)
         }
@@ -75,8 +74,8 @@ internal data class SetOperationQueryImpl<T>(
         return copy(context = newContext)
     }
 
-    override fun option(configurator: QueryOptionConfigurator<SqlSetOperationOption>): SetOperationQueryImpl<T> {
-        return copy(option = configurator.apply(option))
+    override fun option(configurator: (SqlSetOperationOption) -> SqlSetOperationOption): SetOperationQueryImpl<T> {
+        return copy(option = configurator(option))
     }
 
     override fun run(holder: DatabaseConfigHolder): List<T> {
@@ -119,7 +118,7 @@ internal data class SetOperationQueryImpl<T>(
             }
             val config = holder.config
             val statement = buildStatement(config)
-            val executor = JdbcExecutor(config, option)
+            val executor = SqlExecutor(config, option)
             return executor.executeQuery(statement, provider, transformer)
         }
 
@@ -148,7 +147,7 @@ internal data class SetOperationQueryImpl<T>(
         }
 
         private fun buildStatement(config: DatabaseConfig): Statement {
-            val aliasManager = AliasManagerImpl(context)
+            val aliasManager = DefaultAliasManager(context)
             val builder = SqlSetOperationStatementBuilder(config.dialect, context, aliasManager)
             return builder.build()
         }

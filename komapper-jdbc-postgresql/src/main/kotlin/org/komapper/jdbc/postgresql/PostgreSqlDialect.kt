@@ -1,7 +1,7 @@
 package org.komapper.jdbc.postgresql
 
 import org.komapper.core.AbstractDialect
-import org.komapper.core.dsl.builder.EntityMultiUpsertStatementBuilder
+import org.komapper.core.dsl.builder.EntityMultipleUpsertStatementBuilder
 import org.komapper.core.dsl.builder.EntityUpsertStatementBuilder
 import org.komapper.core.dsl.builder.SchemaStatementBuilder
 import org.komapper.core.dsl.context.EntityUpsertContext
@@ -79,13 +79,13 @@ open class PostgreSqlDialect(dataTypes: Set<DataType<*>> = emptySet(), val versi
         context: EntityUpsertContext<ENTITY, ID, META>,
         entity: ENTITY
     ): EntityUpsertStatementBuilder<ENTITY> {
-        return PostgreSqlEntityMultiUpsertStatementBuilder(this, context, listOf(entity))
+        return PostgreSqlEntityMultipleUpsertStatementBuilder(this, context, listOf(entity))
     }
 
-    override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> getEntityMultiUpsertStatementBuilder(
+    override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> getEntityMultipleUpsertStatementBuilder(
         context: EntityUpsertContext<ENTITY, ID, META>,
         entities: List<ENTITY>
-    ): EntityMultiUpsertStatementBuilder<ENTITY> {
-        return PostgreSqlEntityMultiUpsertStatementBuilder(this, context, entities)
+    ): EntityMultipleUpsertStatementBuilder<ENTITY> {
+        return PostgreSqlEntityMultipleUpsertStatementBuilder(this, context, entities)
     }
 }

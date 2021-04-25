@@ -10,7 +10,7 @@ internal class EntityInsertStatementBuilder<ENTITY : Any, ID, META : EntityMetam
     val context: EntityInsertContext<ENTITY, ID, META>,
     val entity: ENTITY
 ) {
-    private val builder = EntityMultiInsertStatementBuilderImpl(dialect, context, listOf(entity))
+    private val builder = EntityMultipleInsertStatementBuilderImpl(dialect, context, listOf(entity))
 
     fun build(): Statement {
         return builder.build()

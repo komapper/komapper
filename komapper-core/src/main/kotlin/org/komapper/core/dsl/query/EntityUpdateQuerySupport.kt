@@ -1,7 +1,7 @@
 package org.komapper.core.dsl.query
 
 import org.komapper.core.DatabaseConfig
-import org.komapper.core.JdbcExecutor
+import org.komapper.core.SqlExecutor
 import org.komapper.core.data.Statement
 import org.komapper.core.dsl.builder.EntityUpdateStatementBuilder
 import org.komapper.core.dsl.context.EntityUpdateContext
@@ -14,14 +14,14 @@ internal class EntityUpdateQuerySupport<ENTITY : Any, ID, META : EntityMetamodel
     private val option: VersionOption
 ) {
 
-    fun include(propertyMetamodels: List<PropertyMetamodel<ENTITY, *>>): EntityUpdateContext<ENTITY, ID, META> {
-        return context.copy(includedProperties = propertyMetamodels).also {
+    fun include(properties: List<PropertyMetamodel<ENTITY, *>>): EntityUpdateContext<ENTITY, ID, META> {
+        return context.copy(includedProperties = properties).also {
             checkContext(it)
         }
     }
 
-    fun exclude(propertyMetamodels: List<PropertyMetamodel<ENTITY, *>>): EntityUpdateContext<ENTITY, ID, META> {
-        return context.copy(excludedProperties = propertyMetamodels).also {
+    fun exclude(properties: List<PropertyMetamodel<ENTITY, *>>): EntityUpdateContext<ENTITY, ID, META> {
+        return context.copy(excludedProperties = properties).also {
             checkContext(it)
         }
     }
@@ -40,8 +40,8 @@ internal class EntityUpdateQuerySupport<ENTITY : Any, ID, META : EntityMetamodel
         return context.target.preUpdate(entity, clock)
     }
 
-    fun <T> update(config: DatabaseConfig, execute: (JdbcExecutor) -> T): T {
-        val executor = JdbcExecutor(config, option)
+    fun <T> update(config: DatabaseConfig, execute: (SqlExecutor) -> T): T {
+        val executor = SqlExecutor(config, option)
         return execute(executor)
     }
 

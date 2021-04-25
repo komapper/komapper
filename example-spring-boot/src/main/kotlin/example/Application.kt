@@ -1,7 +1,7 @@
 package example
 
 import org.komapper.annotation.KmAutoIncrement
-import org.komapper.annotation.KmEntity
+import org.komapper.annotation.KmEntityDef
 import org.komapper.annotation.KmId
 import org.komapper.core.Database
 import org.komapper.core.dsl.EntityDsl
@@ -38,10 +38,15 @@ fun main(args: Array<String>) {
     SpringApplication.run(Application::class.java, *args)
 }
 
-@KmEntity
 data class Message(
-    @KmId @KmAutoIncrement val id: Int? = null,
+    val id: Int? = null,
     val text: String
 ) {
     companion object
 }
+
+@Suppress("unused")
+@KmEntityDef(Message::class)
+private data class MessageDef(
+    @KmId @KmAutoIncrement val id: Int? = null,
+)

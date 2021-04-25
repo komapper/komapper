@@ -57,7 +57,7 @@ open class DefaultDatabaseConfig(
     override val logger: Logger by lazy {
         val loader = ServiceLoader.load(LoggerFactory::class.java)
         val factory = loader.firstOrNull()
-        factory?.create() ?: SqlStdOutLogger()
+        factory?.create() ?: StdOutSqlLogger()
     }
 
     override val session: DatabaseSession by lazy {
@@ -67,7 +67,7 @@ open class DefaultDatabaseConfig(
     }
 
     override val dataFactory: DataFactory by lazy {
-        DataFactoryImpl(session)
+        DefaultDataFactory(session)
     }
 
     override val templateStatementBuilder: TemplateStatementBuilder by lazy {

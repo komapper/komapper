@@ -1,13 +1,13 @@
 package org.komapper.core.dsl.query
 
-import org.komapper.core.dsl.expression.PropertyExpression
+import org.komapper.core.dsl.expression.ColumnExpression
 
-interface ScalarQuery<T, S : Any> : Subquery<T>, PropertyExpression<S>
+interface ScalarQuery<T, S : Any> : Subquery<T>, ColumnExpression<S>
 
 internal data class ScalarQueryImpl<T, S : Any>(
     val query: Subquery<T>,
-    val expression: PropertyExpression<S>
+    val expression: ColumnExpression<S>
 ) :
     ScalarQuery<T, S>,
     Subquery<T> by query,
-    PropertyExpression<S> by expression
+    ColumnExpression<S> by expression

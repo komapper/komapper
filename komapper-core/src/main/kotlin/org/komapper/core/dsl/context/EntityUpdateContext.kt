@@ -1,6 +1,5 @@
 package org.komapper.core.dsl.context
 
-import org.komapper.core.dsl.expression.EntityExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.metamodel.PropertyMetamodel
 
@@ -10,7 +9,7 @@ internal data class EntityUpdateContext<ENTITY : Any, ID, META : EntityMetamodel
     val excludedProperties: List<PropertyMetamodel<ENTITY, *>> = emptyList()
 ) : Context {
 
-    override fun getEntityExpressions(): Set<EntityExpression<*>> {
+    override fun getEntityMetamodels(): Set<EntityMetamodel<*, *, *>> {
         return setOf(target)
     }
 

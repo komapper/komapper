@@ -1,18 +1,18 @@
 package org.komapper.core.dsl.element
 
-import org.komapper.core.dsl.expression.PropertyExpression
+import org.komapper.core.dsl.expression.ColumnExpression
 
 internal sealed class SortItem {
-    internal sealed class Property<T : Any> : PropertyExpression<T>, SortItem() {
-        abstract val expression: PropertyExpression<T>
+    internal sealed class Property<T : Any> : ColumnExpression<T>, SortItem() {
+        abstract val expression: ColumnExpression<T>
 
-        data class Asc<T : Any>(override val expression: PropertyExpression<T>) :
+        data class Asc<T : Any>(override val expression: ColumnExpression<T>) :
             Property<T>(),
-            PropertyExpression<T> by expression
+            ColumnExpression<T> by expression
 
-        data class Desc<T : Any>(override val expression: PropertyExpression<T>) :
+        data class Desc<T : Any>(override val expression: ColumnExpression<T>) :
             Property<T>(),
-            PropertyExpression<T> by expression
+            ColumnExpression<T> by expression
     }
 
     internal sealed class Alias : CharSequence, SortItem() {

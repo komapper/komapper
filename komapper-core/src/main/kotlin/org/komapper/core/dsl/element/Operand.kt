@@ -1,8 +1,9 @@
 package org.komapper.core.dsl.element
 
-import org.komapper.core.dsl.expression.PropertyExpression
+import org.komapper.core.dsl.expression.ColumnExpression
+import kotlin.reflect.KClass
 
 sealed class Operand {
-    data class Property(val expression: PropertyExpression<*>) : Operand()
-    data class Parameter(val expression: PropertyExpression<*>, val value: Any?) : Operand()
+    data class Column(val expression: ColumnExpression<*>) : Operand()
+    data class Argument(val klass: KClass<*>, val value: Any?) : Operand()
 }

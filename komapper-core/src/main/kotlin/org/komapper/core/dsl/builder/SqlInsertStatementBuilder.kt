@@ -7,8 +7,7 @@ import org.komapper.core.data.Value
 import org.komapper.core.dsl.context.SqlInsertContext
 import org.komapper.core.dsl.context.SubqueryContext
 import org.komapper.core.dsl.element.Values
-import org.komapper.core.dsl.expression.EntityExpression
-import org.komapper.core.dsl.expression.PropertyExpression
+import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.metamodel.Assignment
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 
@@ -16,35 +15,35 @@ internal class SqlInsertStatementBuilder<ENTITY : Any, ID, META : EntityMetamode
     val dialect: Dialect,
     val context: SqlInsertContext<ENTITY, ID, META>
 ) {
-    private val aliasManager = AliasManagerImpl(context)
+    private val aliasManager = DefaultAliasManager(context)
     private val buf = StatementBuffer(dialect::formatValue)
     private val support = BuilderSupport(dialect, aliasManager, buf)
 
     fun build(): Statement {
-        val entityMetamodel = context.target
+        val target = context.target
         buf.append("insert into ")
-        buf.append(table(entityMetamodel))
+        buf.append(table(target))
         when (val values = context.values) {
             is Values.Pairs -> {
                 buf.append(" (")
-                for (column in values.pairs.map { it.first }) {
-                    if (column.expression in entityMetamodel.idProperties() &&
-                        entityMetamodel.idAssignment() is Assignment.AutoIncrement<ENTITY, *>
+                for (property in values.pairs.map { it.first }) {
+                    if (property in target.idProperties() &&
+                        property.idAssignment is Assignment.AutoIncrement<*, *>
                     ) {
                         continue
                     }
-                    buf.append(column(column.expression))
+                    buf.append(column(property))
                     buf.append(", ")
                 }
                 buf.cutBack(2)
                 buf.append(") values (")
-                for (parameter in values.pairs.map { it.second }) {
-                    if (parameter.expression in entityMetamodel.idProperties() &&
-                        entityMetamodel.idAssignment() is Assignment.AutoIncrement<ENTITY, *>
+                for ((property, argument) in values.pairs) {
+                    if (property in target.idProperties() &&
+                        property.idAssignment is Assignment.AutoIncrement<*, *>
                     ) {
                         continue
                     }
-                    val value = Value(parameter.value, parameter.expression.klass)
+                    val value = Value(argument.value, argument.klass)
                     buf.bind(value)
                     buf.append(", ")
                 }
@@ -67,11 +66,11 @@ internal class SqlInsertStatementBuilder<ENTITY : Any, ID, META : EntityMetamode
         return buf.toStatement()
     }
 
-    private fun table(expression: EntityExpression<*>): String {
-        return expression.getCanonicalTableName(dialect::enquote)
+    private fun table(metamodel: EntityMetamodel<*, *, *>): String {
+        return metamodel.getCanonicalTableName(dialect::enquote)
     }
 
-    private fun column(expression: PropertyExpression<*>): String {
+    private fun column(expression: ColumnExpression<*>): String {
         return expression.getCanonicalColumnName(dialect::enquote)
     }
 

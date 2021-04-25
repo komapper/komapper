@@ -1,7 +1,7 @@
 package org.komapper.core.dsl.query
 
 import org.komapper.core.DatabaseConfig
-import org.komapper.core.JdbcExecutor
+import org.komapper.core.SqlExecutor
 import org.komapper.core.dsl.context.EntityUpsertContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.scope.SetScope
@@ -21,8 +21,8 @@ internal class EntityUpsertQuerySupport<ENTITY : Any, ID, META : EntityMetamodel
         return insertSupport.preInsert(config, entity)
     }
 
-    fun <T> upsert(config: DatabaseConfig, execute: (JdbcExecutor) -> T): T {
-        val executor = JdbcExecutor(config, insertSupport.option)
+    fun <T> upsert(config: DatabaseConfig, execute: (SqlExecutor) -> T): T {
+        val executor = SqlExecutor(config, insertSupport.option)
         return execute(executor)
     }
 }

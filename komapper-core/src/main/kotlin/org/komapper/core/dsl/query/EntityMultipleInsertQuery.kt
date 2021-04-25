@@ -8,38 +8,37 @@ import org.komapper.core.dsl.context.EntityInsertContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.metamodel.PropertyMetamodel
 import org.komapper.core.dsl.option.EntityInsertOption
-import org.komapper.core.dsl.option.QueryOptionConfigurator
 
-interface EntityMultiInsertQuery<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> : Query<List<ID>> {
-    fun option(configurator: QueryOptionConfigurator<EntityInsertOption>): EntityMultiInsertQuery<ENTITY, ID, META>
-    fun onDuplicateKeyUpdate(vararg keys: PropertyMetamodel<ENTITY, *> = emptyArray()): EntityMultiUpsertQuery<ENTITY, ID, META>
+interface EntityMultipleInsertQuery<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> : Query<List<ENTITY>> {
+    fun option(configurator: (EntityInsertOption) -> EntityInsertOption): EntityMultipleInsertQuery<ENTITY, ID, META>
+    fun onDuplicateKeyUpdate(vararg keys: PropertyMetamodel<ENTITY, *> = emptyArray()): EntityMultipleUpsertQuery<ENTITY, ID, META>
     fun onDuplicateKeyIgnore(vararg keys: PropertyMetamodel<ENTITY, *> = emptyArray()): Query<Int>
 }
 
-internal data class EntityMultiInsertQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+internal data class EntityMultipleInsertQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityInsertContext<ENTITY, ID, META>,
     private val entities: List<ENTITY>,
     private val option: EntityInsertOption = EntityInsertOption()
 ) :
-    EntityMultiInsertQuery<ENTITY, ID, META> {
+    EntityMultipleInsertQuery<ENTITY, ID, META> {
 
     private val support: EntityInsertQuerySupport<ENTITY, ID, META> = EntityInsertQuerySupport(context, option)
 
-    override fun option(configurator: QueryOptionConfigurator<EntityInsertOption>): EntityMultiInsertQueryImpl<ENTITY, ID, META> {
-        return copy(option = configurator.apply(option))
+    override fun option(configurator: (EntityInsertOption) -> EntityInsertOption): EntityMultipleInsertQueryImpl<ENTITY, ID, META> {
+        return copy(option = configurator(option))
     }
 
-    override fun onDuplicateKeyUpdate(vararg keys: PropertyMetamodel<ENTITY, *>): EntityMultiUpsertQuery<ENTITY, ID, META> {
+    override fun onDuplicateKeyUpdate(vararg keys: PropertyMetamodel<ENTITY, *>): EntityMultipleUpsertQuery<ENTITY, ID, META> {
         val newContext = context.asEntityUpsertContext(keys.toList(), DuplicateKeyType.UPDATE)
-        return EntityMultiUpsertQueryImpl(newContext, entities, support)
+        return EntityMultipleUpsertQueryImpl(newContext, entities, support)
     }
 
     override fun onDuplicateKeyIgnore(vararg keys: PropertyMetamodel<ENTITY, *>): Query<Int> {
         val newContext = context.asEntityUpsertContext(keys.toList(), DuplicateKeyType.IGNORE)
-        return EntityMultiUpsertQueryImpl(newContext, entities, support)
+        return EntityMultipleUpsertQueryImpl(newContext, entities, support)
     }
 
-    override fun run(holder: DatabaseConfigHolder): List<ID> {
+    override fun run(holder: DatabaseConfigHolder): List<ENTITY> {
         if (entities.isEmpty()) return emptyList()
         val config = holder.config
         val newEntities = preInsert(config)
@@ -57,17 +56,15 @@ internal data class EntityMultiInsertQueryImpl<ENTITY : Any, ID, META : EntityMe
         return keys
     }
 
-    private fun postInsert(entities: List<ENTITY>, generatedKeys: LongArray): List<ID> {
+    private fun postInsert(entities: List<ENTITY>, generatedKeys: LongArray): List<ENTITY> {
         val iterator = generatedKeys.iterator()
-        return entities.asSequence().map {
+        return entities.map {
             if (iterator.hasNext()) {
                 support.postInsert(it, iterator.nextLong())
             } else {
                 it
             }
-        }.map {
-            context.target.getId(it)
-        }.toList()
+        }
     }
 
     override fun dryRun(holder: DatabaseConfigHolder): String {
@@ -78,7 +75,7 @@ internal data class EntityMultiInsertQueryImpl<ENTITY : Any, ID, META : EntityMe
     }
 
     private fun buildStatement(config: DatabaseConfig, entities: List<ENTITY>): Statement {
-        val builder = config.dialect.getEntityMultiInsertStatementBuilder(context, entities)
+        val builder = config.dialect.getEntityMultipleInsertStatementBuilder(context, entities)
         return builder.build()
     }
 }

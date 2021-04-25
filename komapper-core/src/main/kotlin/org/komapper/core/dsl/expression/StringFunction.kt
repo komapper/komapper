@@ -2,11 +2,11 @@ package org.komapper.core.dsl.expression
 
 import org.komapper.core.dsl.element.Operand
 
-internal sealed class StringFunction : PropertyExpression<String> {
+internal sealed class StringFunction : ColumnExpression<String> {
     internal data class Concat(
-        val expression: PropertyExpression<String>,
+        val expression: ColumnExpression<String>,
         val left: Operand,
         val right: Operand
     ) :
-        PropertyExpression<String> by expression, StringFunction()
+        ColumnExpression<String> by expression, StringFunction()
 }
