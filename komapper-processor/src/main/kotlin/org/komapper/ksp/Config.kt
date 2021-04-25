@@ -13,8 +13,8 @@ internal data class Config(
         private const val checkCompanionObjectKeyName = "checkCompanionObject"
 
         fun create(options: Map<String, String>): Config {
-            val prefix = options.getOrDefault(prefixKeyName, "")
-            val suffix = options.getOrDefault(suffixKeyName, "_")
+            val prefix = options.getOrDefault(prefixKeyName, "_")
+            val suffix = options.getOrDefault(suffixKeyName, "")
             val namingStrategy = options.getOrDefault(namingStrategyKeyName, "lower_snake_case").let {
                 when (it) {
                     "lower_snake_case" -> CamelToLowerSnakeCase

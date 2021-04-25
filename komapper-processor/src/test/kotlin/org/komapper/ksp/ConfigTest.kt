@@ -10,8 +10,8 @@ class ConfigTest {
     fun empty() {
         val options = emptyMap<String, String>()
         val config = Config.create(options)
-        assertEquals("", config.prefix)
-        assertEquals("_", config.suffix)
+        assertEquals("_", config.prefix)
+        assertEquals("", config.suffix)
         assertEquals(CamelToLowerSnakeCase, config.namingStrategy)
     }
 
