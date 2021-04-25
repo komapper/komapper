@@ -85,9 +85,9 @@ class EntityBatchInsertQueryTest(private val db: Database) {
         val query = EntityQuery.insertBatch(d, listOf(department1, department2)).onDuplicateKeyUpdate()
         val counts = db.runQuery { query }
         if (db.config.dialect is MySqlDialect) {
-            assertEquals(listOf(1, 2), counts.toList())
+            assertEquals(listOf(1, 2), counts)
         } else {
-            assertEquals(listOf(1, 1), counts.toList())
+            assertEquals(listOf(1, 1), counts)
         }
         val list = db.runQuery {
             EntityQuery.from(d).where { d.departmentId inList listOf(1, 5) }.orderBy(d.departmentId)
@@ -107,9 +107,9 @@ class EntityBatchInsertQueryTest(private val db: Database) {
         val query = EntityQuery.insertBatch(d, listOf(department1, department2)).onDuplicateKeyUpdate(d.departmentNo)
         val counts = db.runQuery { query }
         if (db.config.dialect is MySqlDialect) {
-            assertEquals(listOf(1, 2), counts.toList())
+            assertEquals(listOf(1, 2), counts)
         } else {
-            assertEquals(listOf(1, 1), counts.toList())
+            assertEquals(listOf(1, 1), counts)
         }
         val list = db.runQuery {
             EntityQuery.from(d).where { d.departmentNo inList listOf(10, 50) }.orderBy(d.departmentNo)
@@ -132,9 +132,9 @@ class EntityBatchInsertQueryTest(private val db: Database) {
             }
         val counts = db.runQuery { query }
         if (db.config.dialect is MySqlDialect) {
-            assertEquals(listOf(1, 2), counts.toList())
+            assertEquals(listOf(1, 2), counts)
         } else {
-            assertEquals(listOf(1, 1), counts.toList())
+            assertEquals(listOf(1, 1), counts)
         }
         val list = db.runQuery {
             EntityQuery.from(d).where { d.departmentId inList listOf(1, 5) }.orderBy(d.departmentId)
@@ -157,9 +157,9 @@ class EntityBatchInsertQueryTest(private val db: Database) {
             }
         val counts = db.runQuery { query }
         if (db.config.dialect is MySqlDialect) {
-            assertEquals(listOf(1, 2), counts.toList())
+            assertEquals(listOf(1, 2), counts)
         } else {
-            assertEquals(listOf(1, 1), counts.toList())
+            assertEquals(listOf(1, 1), counts)
         }
         val list = db.runQuery {
             EntityQuery.from(d).where { d.departmentNo inList listOf(10, 50) }.orderBy(d.departmentNo)
@@ -178,7 +178,7 @@ class EntityBatchInsertQueryTest(private val db: Database) {
         val department2 = Department(1, 60, "DEVELOPMENT", "KYOTO", 1)
         val query = EntityQuery.insertBatch(d, listOf(department1, department2)).onDuplicateKeyIgnore()
         val counts = db.runQuery { query }
-        assertEquals(listOf(1, 0), counts.toList())
+        assertEquals(listOf(1, 0), counts)
         val list = db.runQuery {
             EntityQuery.from(d).where { d.departmentId inList listOf(1, 5) }.orderBy(d.departmentId)
         }
@@ -196,7 +196,7 @@ class EntityBatchInsertQueryTest(private val db: Database) {
         val department2 = Department(10, 10, "DEVELOPMENT", "KYOTO", 1)
         val query = EntityQuery.insertBatch(d, listOf(department1, department2)).onDuplicateKeyIgnore(d.departmentNo)
         val counts = db.runQuery { query }
-        assertEquals(listOf(1, 0), counts.toList())
+        assertEquals(listOf(1, 0), counts)
         val list = db.runQuery {
             EntityQuery.from(d).where { d.departmentNo inList listOf(10, 50) }.orderBy(d.departmentNo)
         }
@@ -217,6 +217,6 @@ class EntityBatchInsertQueryTest(private val db: Database) {
         )
         val query = EntityQuery.insertBatch(i, strategies).onDuplicateKeyUpdate()
         val counts = db.runQuery { query }
-        assertEquals(listOf(1, 1, 1), counts.toList())
+        assertEquals(listOf(1, 1, 1), counts)
     }
 }

@@ -8,8 +8,8 @@ import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.scope.SetScope
 
 interface EntityBatchUpsertQuery<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> :
-    Query<IntArray> {
-    fun set(declaration: SetScope<ENTITY>.(META) -> Unit): Query<IntArray>
+    Query<List<Int>> {
+    fun set(declaration: SetScope<ENTITY>.(META) -> Unit): Query<List<Int>>
 }
 
 internal data class EntityBatchUpsertQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
@@ -20,17 +20,17 @@ internal data class EntityBatchUpsertQueryImpl<ENTITY : Any, ID, META : EntityMe
 
     private val support: EntityUpsertQuerySupport<ENTITY, ID, META> = EntityUpsertQuerySupport(context, insertSupport)
 
-    override fun set(declaration: SetScope<ENTITY>.(META) -> Unit): Query<IntArray> {
+    override fun set(declaration: SetScope<ENTITY>.(META) -> Unit): Query<List<Int>> {
         val newContext = support.set(declaration)
         return copy(context = newContext)
     }
 
-    override fun run(holder: DatabaseConfigHolder): IntArray {
-        if (entities.isEmpty()) return IntArray(0)
+    override fun run(holder: DatabaseConfigHolder): List<Int> {
+        if (entities.isEmpty()) return emptyList()
         val config = holder.config
         val newEntities = entities.map { preUpsert(config, it) }
         val (counts) = upsert(config, newEntities)
-        return counts
+        return counts.toList()
     }
 
     private fun preUpsert(config: DatabaseConfig, entity: ENTITY): ENTITY {

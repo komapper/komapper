@@ -14,7 +14,7 @@ import org.komapper.core.dsl.option.QueryOptionConfigurator
 interface EntityBatchInsertQuery<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> : Query<List<ID>> {
     fun option(configurator: QueryOptionConfigurator<EntityBatchInsertOption>): EntityBatchInsertQuery<ENTITY, ID, META>
     fun onDuplicateKeyUpdate(vararg keys: PropertyMetamodel<ENTITY, *> = emptyArray()): EntityBatchUpsertQuery<ENTITY, ID, META>
-    fun onDuplicateKeyIgnore(vararg keys: PropertyMetamodel<ENTITY, *> = emptyArray()): Query<IntArray>
+    fun onDuplicateKeyIgnore(vararg keys: PropertyMetamodel<ENTITY, *> = emptyArray()): Query<List<Int>>
 }
 
 internal data class EntityBatchInsertQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
@@ -35,7 +35,7 @@ internal data class EntityBatchInsertQueryImpl<ENTITY : Any, ID, META : EntityMe
         return EntityBatchUpsertQueryImpl(newContext, entities, support)
     }
 
-    override fun onDuplicateKeyIgnore(vararg keys: PropertyMetamodel<ENTITY, *>): Query<IntArray> {
+    override fun onDuplicateKeyIgnore(vararg keys: PropertyMetamodel<ENTITY, *>): Query<List<Int>> {
         val newContext = context.asEntityUpsertContext(keys.toList(), DuplicateKeyType.IGNORE)
         return EntityBatchUpsertQueryImpl(newContext, entities, support)
     }
