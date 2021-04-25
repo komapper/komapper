@@ -2,12 +2,14 @@ package org.komapper.ksp
 
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.Nullability
+import org.komapper.core.dsl.metamodel.EntityMetamodelImplementor
 import java.io.PrintWriter
 import java.time.ZonedDateTime
 
 private const val Assignment = "org.komapper.core.dsl.metamodel.Assignment"
 private const val EntityMetamodel = "org.komapper.core.dsl.metamodel.EntityMetamodel"
 private const val EntityMetamodelStub = "org.komapper.core.dsl.metamodel.EntityMetamodelStub"
+private const val EntityMetamodelImplementor = "org.komapper.core.dsl.metamodel.EntityMetamodelImplementor"
 private const val AutoIncrement = "org.komapper.core.dsl.metamodel.Assignment.AutoIncrement"
 private const val Sequence = "org.komapper.core.dsl.metamodel.Assignment.Sequence"
 private const val PropertyDescriptor = "org.komapper.core.dsl.metamodel.PropertyDescriptor"
@@ -43,6 +45,7 @@ internal class EntityMetamodelGenerator(
         w.println()
         w.println("// generated at ${ZonedDateTime.now()}")
         w.println("@Suppress(\"ClassName\", \"PrivatePropertyName\")")
+        w.println("@$EntityMetamodelImplementor")
         w.println("class $simpleName private constructor($constructorParamList) : $EntityMetamodel<$entityTypeName, $idTypeName, $simpleName> {")
         w.println("    private val __tableName = table")
         w.println("    private val __catalogName = catalog")
@@ -289,6 +292,7 @@ internal class EntityMetamodelStubGenerator(
         w.println()
         w.println("// generated at ${ZonedDateTime.now()}")
         w.println("@Suppress(\"ClassName\")")
+        w.println("@$EntityMetamodelImplementor")
         w.println("class $fileName : $EntityMetamodelStub<$simpleQualifiedName, $fileName>() {")
         val parameters = classDeclaration.primaryConstructor?.parameters
         if (parameters != null) {
