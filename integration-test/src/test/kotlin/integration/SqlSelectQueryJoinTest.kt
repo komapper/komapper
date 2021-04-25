@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.Database
-import org.komapper.core.dsl.SqlQuery
+import org.komapper.core.dsl.SqlDsl
 import org.komapper.core.dsl.runQuery
 
 @ExtendWith(Env::class)
@@ -15,7 +15,7 @@ class SqlSelectQueryJoinTest(private val db: Database) {
         val a = Address.alias
         val e = Employee.alias
         val list = db.runQuery {
-            SqlQuery.from(a).innerJoin(e) {
+            SqlDsl.from(a).innerJoin(e) {
                 a.addressId eq e.addressId
             }
         }
@@ -27,7 +27,7 @@ class SqlSelectQueryJoinTest(private val db: Database) {
         val a = Address.alias
         val e = Employee.alias
         val list = db.runQuery {
-            SqlQuery.from(a).leftJoin(e) {
+            SqlDsl.from(a).leftJoin(e) {
                 a.addressId eq e.addressId
             }
         }

@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.Database
-import org.komapper.core.dsl.SqlQuery
+import org.komapper.core.dsl.SqlDsl
 import org.komapper.core.dsl.concat
 import org.komapper.core.dsl.plus
 import org.komapper.core.dsl.runQuery
@@ -17,7 +17,7 @@ class SqlUpdateQueryTest(private val db: Database) {
     fun test() {
         val a = Address.alias
         val count = db.runQuery {
-            SqlQuery.update(a).set {
+            SqlDsl.update(a).set {
                 a.street set "STREET 16"
             }.where {
                 a.addressId eq 1
@@ -25,7 +25,7 @@ class SqlUpdateQueryTest(private val db: Database) {
         }
         assertEquals(1, count)
         val address = db.runQuery {
-            SqlQuery.first(a) {
+            SqlDsl.first(a) {
                 a.addressId eq 1
             }
         }
@@ -36,7 +36,7 @@ class SqlUpdateQueryTest(private val db: Database) {
     fun setIfNotNull() {
         val a = Address.alias
         val count = db.runQuery {
-            SqlQuery.update(a).set {
+            SqlDsl.update(a).set {
                 a.street setIfNotNull null
                 a.version set 10
             }.where {
@@ -45,7 +45,7 @@ class SqlUpdateQueryTest(private val db: Database) {
         }
         assertEquals(1, count)
         val address = db.runQuery {
-            SqlQuery.first(a) {
+            SqlDsl.first(a) {
                 a.addressId eq 1
             }
         }
@@ -57,7 +57,7 @@ class SqlUpdateQueryTest(private val db: Database) {
     fun arithmetic_add() {
         val a = Address.alias
         val count = db.runQuery {
-            SqlQuery.update(a).set {
+            SqlDsl.update(a).set {
                 a.version set (a.version + 10)
             }.where {
                 a.addressId eq 1
@@ -65,7 +65,7 @@ class SqlUpdateQueryTest(private val db: Database) {
         }
         assertEquals(1, count)
         val address = db.runQuery {
-            SqlQuery.first(a) {
+            SqlDsl.first(a) {
                 a.addressId eq 1
             }
         }
@@ -76,7 +76,7 @@ class SqlUpdateQueryTest(private val db: Database) {
     fun string_concat() {
         val a = Address.alias
         val count = db.runQuery {
-            SqlQuery.update(a).set {
+            SqlDsl.update(a).set {
                 a.street set (concat(concat("[", a.street), "]"))
             }.where {
                 a.addressId eq 1
@@ -84,7 +84,7 @@ class SqlUpdateQueryTest(private val db: Database) {
         }
         assertEquals(1, count)
         val address = db.runQuery {
-            SqlQuery.first(a) {
+            SqlDsl.first(a) {
                 a.addressId eq 1
             }
         }
@@ -97,7 +97,7 @@ class SqlUpdateQueryTest(private val db: Database) {
         val ex = assertThrows<IllegalStateException> {
             @Suppress("UNUSED_VARIABLE")
             val count = db.runQuery {
-                SqlQuery.update(e).set {
+                SqlDsl.update(e).set {
                     e.employeeName set "ABC"
                 }
             }
@@ -109,7 +109,7 @@ class SqlUpdateQueryTest(private val db: Database) {
     fun allowEmptyWhereClause_true() {
         val e = Employee.alias
         val count = db.runQuery {
-            SqlQuery.update(e).set {
+            SqlDsl.update(e).set {
                 e.employeeName set "ABC"
             }.option { it.copy(allowEmptyWhereClause = true) }
         }

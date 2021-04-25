@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.Database
-import org.komapper.core.dsl.SqlQuery
+import org.komapper.core.dsl.SqlDsl
 import org.komapper.core.dsl.avg
 import org.komapper.core.dsl.count
 import org.komapper.core.dsl.max
@@ -19,7 +19,7 @@ class SqlSelectQueryAggregateTest(private val db: Database) {
     fun aggregate_avg() {
         val a = Address.alias
         val avg = db.runQuery {
-            SqlQuery.from(a).select(avg(a.addressId)).first()
+            SqlDsl.from(a).select(avg(a.addressId)).first()
         }
         assertEquals(8.0, avg!!, 0.0)
     }
@@ -28,7 +28,7 @@ class SqlSelectQueryAggregateTest(private val db: Database) {
     fun aggregate_countAsterisk() {
         val a = Address.alias
         val count = db.runQuery {
-            SqlQuery.from(a).select(count()).first()
+            SqlDsl.from(a).select(count()).first()
         }
         assertEquals(15, count)
     }
@@ -37,7 +37,7 @@ class SqlSelectQueryAggregateTest(private val db: Database) {
     fun aggregate_count() {
         val a = Address.alias
         val count = db.runQuery {
-            SqlQuery.from(a).select(count(a.street)).first()
+            SqlDsl.from(a).select(count(a.street)).first()
         }
         assertEquals(15, count)
     }
@@ -45,21 +45,21 @@ class SqlSelectQueryAggregateTest(private val db: Database) {
     @Test
     fun aggregate_sum() {
         val a = Address.alias
-        val sum = db.runQuery { SqlQuery.from(a).select(sum(a.addressId)).first() }
+        val sum = db.runQuery { SqlDsl.from(a).select(sum(a.addressId)).first() }
         assertEquals(120, sum)
     }
 
     @Test
     fun aggregate_max() {
         val a = Address.alias
-        val max = db.runQuery { SqlQuery.from(a).select(max(a.addressId)).first() }
+        val max = db.runQuery { SqlDsl.from(a).select(max(a.addressId)).first() }
         assertEquals(15, max)
     }
 
     @Test
     fun aggregate_min() {
         val a = Address.alias
-        val min = db.runQuery { SqlQuery.from(a).select(min(a.addressId)).first() }
+        val min = db.runQuery { SqlDsl.from(a).select(min(a.addressId)).first() }
         assertEquals(1, min)
     }
 
@@ -67,7 +67,7 @@ class SqlSelectQueryAggregateTest(private val db: Database) {
     fun having() {
         val e = Employee.alias
         val list = db.runQuery {
-            SqlQuery.from(e)
+            SqlDsl.from(e)
                 .groupBy(e.departmentId)
                 .having {
                     count(e.employeeId) greaterEq 4L
@@ -82,7 +82,7 @@ class SqlSelectQueryAggregateTest(private val db: Database) {
     fun having_empty_groupBy() {
         val e = Employee.alias
         val list = db.runQuery {
-            SqlQuery.from(e)
+            SqlDsl.from(e)
                 .having {
                     count(e.employeeId) greaterEq 4L
                 }

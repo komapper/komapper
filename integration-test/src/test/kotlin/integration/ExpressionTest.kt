@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.Database
-import org.komapper.core.dsl.SqlQuery
+import org.komapper.core.dsl.SqlDsl
 import org.komapper.core.dsl.concat
 import org.komapper.core.dsl.div
 import org.komapper.core.dsl.minus
@@ -19,7 +19,7 @@ class ExpressionTest(private val db: Database) {
     fun plus() {
         val a = Address.alias
         val result = db.runQuery {
-            SqlQuery.from(a)
+            SqlDsl.from(a)
                 .where {
                     a.addressId eq 10
                 }
@@ -35,7 +35,7 @@ class ExpressionTest(private val db: Database) {
     fun plus_other_column() {
         val a = Address.alias
         val result = db.runQuery {
-            SqlQuery.from(a)
+            SqlDsl.from(a)
                 .where {
                     a.addressId eq 10
                 }
@@ -51,7 +51,7 @@ class ExpressionTest(private val db: Database) {
     fun minus() {
         val a = Address.alias
         val result = db.runQuery {
-            SqlQuery.from(a)
+            SqlDsl.from(a)
                 .where {
                     a.addressId eq 10
                 }
@@ -67,7 +67,7 @@ class ExpressionTest(private val db: Database) {
     fun minus_other_column() {
         val a = Address.alias
         val result = db.runQuery {
-            SqlQuery.from(a)
+            SqlDsl.from(a)
                 .where {
                     a.addressId eq 10
                 }
@@ -83,7 +83,7 @@ class ExpressionTest(private val db: Database) {
     fun div() {
         val a = Address.alias
         val result = db.runQuery {
-            SqlQuery.from(a)
+            SqlDsl.from(a)
                 .where {
                     a.addressId eq 10
                 }
@@ -99,7 +99,7 @@ class ExpressionTest(private val db: Database) {
     fun div_other_column() {
         val a = Address.alias
         val result = db.runQuery {
-            SqlQuery.from(a)
+            SqlDsl.from(a)
                 .where {
                     a.addressId eq 10
                 }
@@ -115,7 +115,7 @@ class ExpressionTest(private val db: Database) {
     fun rem() {
         val a = Address.alias
         val result = db.runQuery {
-            SqlQuery.from(a)
+            SqlDsl.from(a)
                 .where {
                     a.addressId eq 10
                 }
@@ -131,7 +131,7 @@ class ExpressionTest(private val db: Database) {
     fun rem_other_column() {
         val a = Address.alias
         val result = db.runQuery {
-            SqlQuery.from(a)
+            SqlDsl.from(a)
                 .where {
                     a.addressId eq 10
                 }
@@ -147,7 +147,7 @@ class ExpressionTest(private val db: Database) {
     fun concat() {
         val a = Address.alias
         val result = db.runQuery {
-            SqlQuery.from(a)
+            SqlDsl.from(a)
                 .where {
                     a.addressId eq 10
                 }
@@ -163,7 +163,7 @@ class ExpressionTest(private val db: Database) {
     fun concat_other_column() {
         val a = Address.alias
         val result = db.runQuery {
-            SqlQuery.from(a)
+            SqlDsl.from(a)
                 .where {
                     a.addressId eq 10
                 }

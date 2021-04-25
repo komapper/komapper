@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.Database
-import org.komapper.core.dsl.EntityQuery
+import org.komapper.core.dsl.EntityDsl
 import org.komapper.core.dsl.runQuery
 
 @ExtendWith(Env::class)
@@ -14,7 +14,7 @@ class EntitySelectQuerySelectTest(private val db: Database) {
     fun single() {
         val a = Address.alias
         val street = db.runQuery {
-            EntityQuery.from(a).where { a.addressId eq 1 }
+            EntityDsl.from(a).where { a.addressId eq 1 }
                 .asSqlQuery().select(a.street).first()
         }
         assertEquals("STREET 1", street)
@@ -24,7 +24,7 @@ class EntitySelectQuerySelectTest(private val db: Database) {
     fun pair() {
         val a = Address.alias
         val (id, street) = db.runQuery {
-            EntityQuery.from(a).where { a.addressId eq 1 }
+            EntityDsl.from(a).where { a.addressId eq 1 }
                 .asSqlQuery().select(a.addressId, a.street).first()
         }
         assertEquals(1, id)

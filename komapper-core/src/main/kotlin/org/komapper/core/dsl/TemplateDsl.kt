@@ -5,7 +5,7 @@ import org.komapper.core.dsl.query.TemplateExecuteQueryImpl
 import org.komapper.core.dsl.query.TemplateSelectQueryBuilder
 import org.komapper.core.dsl.query.TemplateSelectQueryBuilderImpl
 
-object TemplateQuery : Dsl {
+object TemplateDsl : Dsl {
 
     fun from(sql: String): TemplateSelectQueryBuilder {
         return TemplateSelectQueryBuilderImpl(sql)

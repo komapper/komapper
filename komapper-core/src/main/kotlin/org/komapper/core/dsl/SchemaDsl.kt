@@ -8,7 +8,7 @@ import org.komapper.core.dsl.query.SchemaDropAllQueryImpl
 import org.komapper.core.dsl.query.SchemaDropQuery
 import org.komapper.core.dsl.query.SchemaDropQueryImpl
 
-object SchemaQuery : Dsl {
+object SchemaDsl : Dsl {
 
     fun create(vararg entityMetamodels: EntityMetamodel<*, *, *>): SchemaCreateQuery {
         return SchemaCreateQueryImpl(entityMetamodels.toList())

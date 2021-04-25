@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.Database
-import org.komapper.core.dsl.SqlQuery
+import org.komapper.core.dsl.SqlDsl
 import org.komapper.core.dsl.count
 import org.komapper.core.dsl.max
 import org.komapper.core.dsl.runQuery
@@ -16,8 +16,8 @@ class SqlSelectQuerySubqueryTest(private val db: Database) {
     fun subquery_selectClause() {
         val d = Department.alias
         val e = Employee.alias
-        val subquery = SqlQuery.from(e).where { d.departmentId eq e.departmentId }.select(count())
-        val query = SqlQuery.from(d)
+        val subquery = SqlDsl.from(e).where { d.departmentId eq e.departmentId }.select(count())
+        val query = SqlDsl.from(d)
             .orderBy(d.departmentId)
             .select(d.departmentName, subquery)
         val list = db.runQuery { query }
@@ -29,11 +29,11 @@ class SqlSelectQuerySubqueryTest(private val db: Database) {
     fun subquery_whereClause() {
         val d = Department.alias
         val e = Employee.alias
-        val subquery = SqlQuery.from(d)
+        val subquery = SqlDsl.from(d)
             .where {
                 d.departmentName eq "SALES"
             }.select(max(d.departmentId))
-        val query = SqlQuery.from(e).where {
+        val query = SqlDsl.from(e).where {
             e.departmentId eq subquery
         }
         val list = db.runQuery { query }

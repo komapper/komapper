@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.Database
-import org.komapper.core.dsl.EntityQuery
+import org.komapper.core.dsl.EntityDsl
 import org.komapper.core.dsl.desc
 import org.komapper.core.dsl.runQuery
 
@@ -17,7 +17,7 @@ class EntitySelectQueryTest(private val db: Database) {
     fun list() {
         val a = Address.alias
         val list: List<Address> = db.runQuery {
-            EntityQuery.from(a).where { a.addressId eq 1 }
+            EntityDsl.from(a).where { a.addressId eq 1 }
         }
         assertNotNull(list)
     }
@@ -26,7 +26,7 @@ class EntitySelectQueryTest(private val db: Database) {
     fun first() {
         val a = Address.alias
         val address: Address = db.runQuery {
-            EntityQuery.from(a).where { a.addressId eq 1 }.first()
+            EntityDsl.from(a).where { a.addressId eq 1 }.first()
         }
         assertNotNull(address)
     }
@@ -35,7 +35,7 @@ class EntitySelectQueryTest(private val db: Database) {
     fun firstOrNull() {
         val a = Address.alias
         val address: Address? = db.runQuery {
-            EntityQuery.from(a).where { a.addressId eq 99 }.firstOrNull()
+            EntityDsl.from(a).where { a.addressId eq 99 }.firstOrNull()
         }
         assertNull(address)
     }
@@ -43,7 +43,7 @@ class EntitySelectQueryTest(private val db: Database) {
     @Test
     fun decoupling() {
         val a = Address.alias
-        val query = EntityQuery.from(a)
+        val query = EntityDsl.from(a)
             .where { a.addressId greaterEq 1 }
             .orderBy(a.addressId.desc())
             .limit(2)
@@ -61,14 +61,14 @@ class EntitySelectQueryTest(private val db: Database) {
     @Test
     fun shortcut_first() {
         val a = Address.alias
-        val address = db.runQuery { EntityQuery.first(a) { a.addressId eq 1 } }
+        val address = db.runQuery { EntityDsl.first(a) { a.addressId eq 1 } }
         assertNotNull(address)
     }
 
     @Test
     fun shortcut_firstOrNull() {
         val a = Address.alias
-        val address = db.runQuery { EntityQuery.firstOrNull(a) { a.addressId eq -1 } }
+        val address = db.runQuery { EntityDsl.firstOrNull(a) { a.addressId eq -1 } }
         assertNull(address)
     }
 
@@ -76,7 +76,7 @@ class EntitySelectQueryTest(private val db: Database) {
     fun shortcut_first_multipleCondition() {
         val a = Address.alias
         val address = db.runQuery {
-            EntityQuery.first(a) { a.addressId eq 1; a.version eq 1 }
+            EntityDsl.first(a) { a.addressId eq 1; a.version eq 1 }
         }
         assertNotNull(address)
     }

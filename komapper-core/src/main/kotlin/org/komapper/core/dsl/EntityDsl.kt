@@ -24,7 +24,7 @@ import org.komapper.core.dsl.query.EntityUpdateQueryImpl
 import org.komapper.core.dsl.query.Query
 import org.komapper.core.dsl.scope.WhereDeclaration
 
-object EntityQuery : Dsl {
+object EntityDsl : Dsl {
 
     private object Messages {
         const val idValueRequired = "The id value must not be null."

@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.Database
-import org.komapper.core.dsl.SqlQuery
+import org.komapper.core.dsl.SqlDsl
 import org.komapper.core.dsl.concat
 import org.komapper.core.dsl.count
 import org.komapper.core.dsl.runQuery
@@ -19,7 +19,7 @@ class SqlSelectQuerySelectTest(private val db: Database) {
     fun selectProperty() {
         val a = Address.alias
         val streetList = db.runQuery {
-            SqlQuery.from(a)
+            SqlDsl.from(a)
                 .where {
                     a.addressId inList listOf(1, 2)
                 }
@@ -33,7 +33,7 @@ class SqlSelectQuerySelectTest(private val db: Database) {
     fun selectProperty_first() {
         val a = Address.alias
         val value = db.runQuery {
-            SqlQuery.from(a)
+            SqlDsl.from(a)
                 .where {
                     a.addressId inList listOf(1, 2)
                 }
@@ -48,7 +48,7 @@ class SqlSelectQuerySelectTest(private val db: Database) {
     fun selectPropertiesAsPair() {
         val a = Address.alias
         val pairList = db.runQuery {
-            SqlQuery.from(a)
+            SqlDsl.from(a)
                 .where {
                     a.addressId inList listOf(1, 2)
                 }
@@ -62,7 +62,7 @@ class SqlSelectQuerySelectTest(private val db: Database) {
     fun selectPropertiesAsTriple() {
         val a = Address.alias
         val tripleList = db.runQuery {
-            SqlQuery.from(a)
+            SqlDsl.from(a)
                 .where {
                     a.addressId inList listOf(1, 2)
                 }
@@ -82,7 +82,7 @@ class SqlSelectQuerySelectTest(private val db: Database) {
     fun selectPropertiesAsRecord() {
         val a = Address.alias
         val list = db.runQuery {
-            SqlQuery.from(a)
+            SqlDsl.from(a)
                 .where {
                     a.addressId inList listOf(1, 2)
                 }
@@ -107,7 +107,7 @@ class SqlSelectQuerySelectTest(private val db: Database) {
         val a = Address.alias
         val e = Employee.alias
         val list: List<Address> = db.runQuery {
-            SqlQuery.from(a)
+            SqlDsl.from(a)
                 .leftJoin(e) {
                     a.addressId eq e.addressId
                 }
@@ -121,7 +121,7 @@ class SqlSelectQuerySelectTest(private val db: Database) {
         val a = Address.alias
         val e = Employee.alias
         val list: List<Pair<Address, Employee?>> = db.runQuery {
-            SqlQuery.from(a)
+            SqlDsl.from(a)
                 .leftJoin(e) {
                     a.addressId eq e.addressId
                 }
@@ -138,7 +138,7 @@ class SqlSelectQuerySelectTest(private val db: Database) {
         val a = Address.alias
         val e = Employee.alias
         val list: List<Pair<Address, Employee?>> = db.runQuery {
-            SqlQuery.from(a).innerJoin(e) {
+            SqlDsl.from(a).innerJoin(e) {
                 a.addressId eq e.addressId
             }.select(e)
         }
@@ -152,7 +152,7 @@ class SqlSelectQuerySelectTest(private val db: Database) {
         val e = Employee.alias
         val d = Department.alias
         val list = db.runQuery {
-            SqlQuery.from(a)
+            SqlDsl.from(a)
                 .innerJoin(e) {
                     a.addressId eq e.addressId
                 }.innerJoin(d) {
@@ -169,7 +169,7 @@ class SqlSelectQuerySelectTest(private val db: Database) {
         val e = Employee.alias
         val d = Department.alias
         val list = db.runQuery {
-            SqlQuery.from(a)
+            SqlDsl.from(a)
                 .where {
                     a.addressId inList listOf(1, 2)
                 }
@@ -193,9 +193,9 @@ class SqlSelectQuerySelectTest(private val db: Database) {
     fun selectProperty2() {
         val d = Department.alias
         val e = Employee.alias
-        val subquery = SqlQuery.from(e).where { d.departmentId eq e.departmentId }.select(count())
+        val subquery = SqlDsl.from(e).where { d.departmentId eq e.departmentId }.select(count())
         val list = db.runQuery {
-            SqlQuery.from(d)
+            SqlDsl.from(d)
                 .orderBy(d.departmentId)
                 .select(d.departmentName, subquery)
         }

@@ -13,7 +13,7 @@ import org.junit.jupiter.api.extension.ParameterContext
 import org.junit.jupiter.api.extension.ParameterResolver
 import org.junit.platform.commons.support.AnnotationSupport.findAnnotation
 import org.komapper.core.Database
-import org.komapper.core.dsl.ScriptQuery
+import org.komapper.core.dsl.ScriptDsl
 import org.komapper.core.dsl.runQuery
 import org.komapper.transaction.transaction
 import org.komapper.transaction.transactionManager
@@ -41,7 +41,7 @@ internal class Env :
             context?.root?.getStore(GLOBAL)?.put("drop all objects", this)
             db.transaction {
                 db.runQuery {
-                    ScriptQuery.execute(setting.createSql).option {
+                    ScriptDsl.execute(setting.createSql).option {
                         it.copy(suppressLogging = true)
                     }
                 }
@@ -54,7 +54,7 @@ internal class Env :
         if (resetSql != null) {
             db.transaction {
                 db.runQuery {
-                    ScriptQuery.execute(resetSql).option {
+                    ScriptDsl.execute(resetSql).option {
                         it.copy(suppressLogging = true)
                     }
                 }
@@ -70,7 +70,7 @@ internal class Env :
     override fun close() {
         db.transaction {
             db.runQuery {
-                ScriptQuery.execute(setting.dropSql).option {
+                ScriptDsl.execute(setting.dropSql).option {
                     it.copy(suppressLogging = true)
                 }
             }

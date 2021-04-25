@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.Database
-import org.komapper.core.dsl.SqlQuery
+import org.komapper.core.dsl.SqlDsl
 import org.komapper.core.dsl.runQuery
 
 @ExtendWith(Env::class)
@@ -15,7 +15,7 @@ class SqlDeleteQueryTest(private val db: Database) {
     fun test() {
         val a = Address.alias
         val count = db.runQuery {
-            SqlQuery.delete(a).where { a.addressId eq 15 }
+            SqlDsl.delete(a).where { a.addressId eq 15 }
         }
         assertEquals(1, count)
     }
@@ -26,7 +26,7 @@ class SqlDeleteQueryTest(private val db: Database) {
         val ex = assertThrows<IllegalStateException> {
             @Suppress("UNUSED_VARIABLE")
             val count = db.runQuery {
-                SqlQuery.delete(e)
+                SqlDsl.delete(e)
             }
         }
         assertEquals("Empty where clause is not allowed.", ex.message)
@@ -36,7 +36,7 @@ class SqlDeleteQueryTest(private val db: Database) {
     fun allowEmptyWhereClause_true() {
         val e = Employee.alias
         val count = db.runQuery {
-            SqlQuery.delete(e).option { it.copy(allowEmptyWhereClause = true) }
+            SqlDsl.delete(e).option { it.copy(allowEmptyWhereClause = true) }
         }
         assertEquals(14, count)
     }

@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.Database
-import org.komapper.core.dsl.SqlQuery
+import org.komapper.core.dsl.SqlDsl
 import org.komapper.core.dsl.runQuery
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -18,7 +18,7 @@ class SqlInsertQueryTest(private val db: Database) {
     fun test() {
         val a = Address.alias
         val (count, key) = db.runQuery {
-            SqlQuery.insert(a).values {
+            SqlDsl.insert(a).values {
                 a.addressId set 19
                 a.street set "STREET 16"
                 a.version set 0
@@ -32,7 +32,7 @@ class SqlInsertQueryTest(private val db: Database) {
     fun setIfNotNull() {
         val e = Employee.alias
         val (count, key) = db.runQuery {
-            SqlQuery.insert(e).values {
+            SqlDsl.insert(e).values {
                 e.employeeId set 99
                 e.departmentId set 1
                 e.addressId set 1
@@ -47,7 +47,7 @@ class SqlInsertQueryTest(private val db: Database) {
         assertEquals(1, count)
         assertNull(key)
 
-        val employee = db.runQuery { SqlQuery.first(e) { e.employeeId eq 99 } }
+        val employee = db.runQuery { SqlDsl.first(e) { e.employeeId eq 99 } }
         assertNull(employee.managerId)
     }
 
@@ -55,7 +55,7 @@ class SqlInsertQueryTest(private val db: Database) {
     fun generatedKeys() {
         val a = IdentityStrategy.alias
         val (count, key) = db.runQuery {
-            SqlQuery.insert(a).values {
+            SqlDsl.insert(a).values {
                 a.id set 10
                 a.value set "test"
             }
@@ -69,8 +69,8 @@ class SqlInsertQueryTest(private val db: Database) {
         val a = Address.alias
         val aa = Address.newAlias(table = "ADDRESS_ARCHIVE")
         val (count) = db.runQuery {
-            SqlQuery.insert(aa).select {
-                SqlQuery.from(a).where { a.addressId between 1..5 }
+            SqlDsl.insert(aa).select {
+                SqlDsl.from(a).where { a.addressId between 1..5 }
             }
         }
         assertEquals(5, count)

@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.Database
-import org.komapper.core.dsl.EntityQuery
+import org.komapper.core.dsl.EntityDsl
 import org.komapper.core.dsl.desc
 import org.komapper.core.dsl.runQuery
 
@@ -15,7 +15,7 @@ class EntitySelectQueryForUpdateTest(private val db: Database) {
     fun forUpdate() {
         val a = Address.alias
         val list = db.runQuery {
-            EntityQuery.from(a).where { a.addressId greaterEq 1 }
+            EntityDsl.from(a).where { a.addressId greaterEq 1 }
                 .orderBy(a.addressId.desc())
                 .limit(2)
                 .offset(5)

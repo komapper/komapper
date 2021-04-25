@@ -4,7 +4,7 @@ import org.komapper.annotation.KmAutoIncrement
 import org.komapper.annotation.KmEntity
 import org.komapper.annotation.KmId
 import org.komapper.core.Database
-import org.komapper.core.dsl.EntityQuery
+import org.komapper.core.dsl.EntityDsl
 import org.komapper.core.dsl.desc
 import org.komapper.core.dsl.runQuery
 import org.springframework.boot.SpringApplication
@@ -22,14 +22,14 @@ class Application(private val database: Database) {
     @RequestMapping("/")
     fun list(): List<Message> {
         val m = Message.alias
-        val query = EntityQuery.from(m).orderBy(m.id.desc())
+        val query = EntityDsl.from(m).orderBy(m.id.desc())
         return database.runQuery { query }
     }
 
     @RequestMapping(value = ["/"], params = ["text"])
     fun add(@RequestParam text: String): Message {
         val message = Message(text = text)
-        val query = EntityQuery.insert(Message.alias, message)
+        val query = EntityDsl.insert(Message.alias, message)
         return database.runQuery { query }
     }
 }

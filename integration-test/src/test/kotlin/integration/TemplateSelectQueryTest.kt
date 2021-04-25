@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.Database
-import org.komapper.core.dsl.TemplateQuery
+import org.komapper.core.dsl.TemplateDsl
 import org.komapper.core.dsl.query.Row
 import org.komapper.core.dsl.runQuery
 
@@ -23,7 +23,7 @@ class TemplateSelectQueryTest(private val db: Database) {
     fun test() {
         val list = db.runQuery {
             val sql = "select * from ADDRESS"
-            TemplateQuery.from(sql).select(asAddress)
+            TemplateDsl.from(sql).select(asAddress)
         }
         assertEquals(15, list.size)
         assertEquals(
@@ -40,7 +40,7 @@ class TemplateSelectQueryTest(private val db: Database) {
     fun sequence() {
         val list = db.runQuery {
             val sql = "select * from ADDRESS"
-            TemplateQuery.from(sql).select(asAddress).collect { it.toList() }
+            TemplateDsl.from(sql).select(asAddress).collect { it.toList() }
         }
         assertEquals(15, list.size)
         assertEquals(
@@ -57,7 +57,7 @@ class TemplateSelectQueryTest(private val db: Database) {
     fun condition_objectExpression() {
         val list = db.runQuery {
             val sql = "select * from ADDRESS where street = /*street*/'test'"
-            TemplateQuery.from(sql).where {
+            TemplateDsl.from(sql).where {
                 object {
                     @Suppress("unused")
                     val street = "STREET 10"
@@ -79,7 +79,7 @@ class TemplateSelectQueryTest(private val db: Database) {
     fun condition_dataClass() {
         val list = db.runQuery {
             val sql = "select * from ADDRESS where street = /*street*/'test'"
-            TemplateQuery.from(sql).where {
+            TemplateDsl.from(sql).where {
                 data class Condition(val street: String)
                 Condition("STREET 10")
             }.select(asAddress)
@@ -99,7 +99,7 @@ class TemplateSelectQueryTest(private val db: Database) {
     fun `in`() {
         val list = db.runQuery {
             val sql = "select * from ADDRESS where address_id in /*list*/(0)"
-            TemplateQuery.from(sql).where {
+            TemplateDsl.from(sql).where {
                 object {
                     @Suppress("unused")
                     val list = listOf(1, 2)
@@ -129,7 +129,7 @@ class TemplateSelectQueryTest(private val db: Database) {
     fun in2() {
         val list = db.runQuery {
             val sql = "select * from ADDRESS where (address_id, street) in /*pairs*/(0, '')"
-            TemplateQuery.from(sql).where {
+            TemplateDsl.from(sql).where {
                 object {
                     @Suppress("unused")
                     val pairs = listOf(1 to "STREET 1", 2 to "STREET 2")
@@ -159,7 +159,7 @@ class TemplateSelectQueryTest(private val db: Database) {
     fun in3() {
         val list = db.runQuery {
             val sql = "select * from ADDRESS where (address_id, street, version) in /*triples*/(0, '', 0)"
-            TemplateQuery.from(sql).where {
+            TemplateDsl.from(sql).where {
                 object {
                     @Suppress("unused")
                     val triples = listOf(
@@ -197,7 +197,7 @@ class TemplateSelectQueryTest(private val db: Database) {
                 where street like concat(/* street.escape() */'test', '%')
                 order by address_id
                 """.trimIndent()
-            TemplateQuery.from(sql).where {
+            TemplateDsl.from(sql).where {
                 data class Condition(val street: String)
                 Condition("STREET 1")
             }.select(asAddress)
@@ -209,7 +209,7 @@ class TemplateSelectQueryTest(private val db: Database) {
     fun asPrefix() {
         val list = db.runQuery {
             val sql = "select * from ADDRESS where street like /*street.asPrefix()*/'test' order by address_id"
-            TemplateQuery.from(sql).where {
+            TemplateDsl.from(sql).where {
                 data class Condition(val street: String)
                 Condition("STREET 1")
             }.select(asAddress)

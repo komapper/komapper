@@ -3,7 +3,7 @@ package integration
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.Database
-import org.komapper.core.dsl.SchemaQuery
+import org.komapper.core.dsl.SchemaDsl
 import org.komapper.core.dsl.runQuery
 
 @ExtendWith(Env::class)
@@ -14,17 +14,17 @@ class SchemaQueryTest(private val db: Database) {
     @Test
     fun create() {
         db.runQuery {
-            SchemaQuery.create(metamodels)
+            SchemaDsl.create(metamodels)
         }
     }
 
     @Test
     fun drop() {
         db.runQuery {
-            SchemaQuery.create(metamodels)
+            SchemaDsl.create(metamodels)
         }
         db.runQuery {
-            SchemaQuery.drop(metamodels)
+            SchemaDsl.drop(metamodels)
         }
     }
 }

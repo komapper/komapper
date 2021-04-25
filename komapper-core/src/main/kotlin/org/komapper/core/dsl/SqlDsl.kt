@@ -18,7 +18,7 @@ import org.komapper.core.dsl.query.SqlUpdateQueryBuilderImpl
 import org.komapper.core.dsl.query.SqlUpdateQueryImpl
 import org.komapper.core.dsl.scope.WhereDeclaration
 
-object SqlQuery : Dsl {
+object SqlDsl : Dsl {
 
     fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> first(
         entityMetamodel: META,

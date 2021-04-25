@@ -9,7 +9,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.Database
 import org.komapper.core.OptimisticLockException
 import org.komapper.core.UniqueConstraintException
-import org.komapper.core.dsl.EntityQuery
+import org.komapper.core.dsl.EntityDsl
 import org.komapper.core.dsl.runQuery
 
 @ExtendWith(Env::class)
@@ -24,13 +24,13 @@ class EntityBatchUpdateQueryTest(private val db: Database) {
             Address(18, "STREET 18", 0)
         )
         for (address in addressList) {
-            db.runQuery { EntityQuery.insert(a, address) }
+            db.runQuery { EntityDsl.insert(a, address) }
         }
-        val query = EntityQuery.from(a).where { a.addressId inList listOf(16, 17, 18) }
+        val query = EntityDsl.from(a).where { a.addressId inList listOf(16, 17, 18) }
         val before = db.runQuery { query }
         db.runQuery {
             val updateList = before.map { it.copy(street = "[" + it.street + "]") }
-            EntityQuery.updateBatch(a, updateList)
+            EntityDsl.updateBatch(a, updateList)
         }
         val after = db.runQuery { query }
         for (each in after) {
@@ -48,10 +48,10 @@ class EntityBatchUpdateQueryTest(private val db: Database) {
             Person(3, "C")
         )
         for (person in personList) {
-            db.runQuery { EntityQuery.insert(p, person) }
+            db.runQuery { EntityDsl.insert(p, person) }
         }
-        db.runQuery { EntityQuery.updateBatch(p, personList) }
-        val list = db.runQuery { EntityQuery.from(p).where { p.personId inList listOf(1, 2, 3) } }
+        db.runQuery { EntityDsl.updateBatch(p, personList) }
+        val list = db.runQuery { EntityDsl.from(p).where { p.personId inList listOf(1, 2, 3) } }
         assertTrue(list.all { it.updatedAt != null })
     }
 
@@ -60,7 +60,7 @@ class EntityBatchUpdateQueryTest(private val db: Database) {
         val a = Address.alias
         assertThrows<UniqueConstraintException> {
             db.runQuery {
-                EntityQuery.updateBatch(
+                EntityDsl.updateBatch(
                     a,
                     listOf(
                         Address(1, "A", 1),
@@ -77,7 +77,7 @@ class EntityBatchUpdateQueryTest(private val db: Database) {
         val a = Address.alias
         val ex = assertThrows<OptimisticLockException> {
             db.runQuery {
-                EntityQuery.updateBatch(
+                EntityDsl.updateBatch(
                     a,
                     listOf(
                         Address(1, "A", 1),
@@ -93,7 +93,7 @@ class EntityBatchUpdateQueryTest(private val db: Database) {
     @Test
     fun include() {
         val d = Department.alias
-        val selectQuery = EntityQuery.from(d).where { d.departmentId inList listOf(1, 2) }
+        val selectQuery = EntityDsl.from(d).where { d.departmentId inList listOf(1, 2) }
         val before = db.runQuery { selectQuery }
         val updateList = before.map {
             it.copy(
@@ -101,7 +101,7 @@ class EntityBatchUpdateQueryTest(private val db: Database) {
                 location = "[" + it.location + "]"
             )
         }
-        db.runQuery { EntityQuery.updateBatch(d, updateList).include(d.departmentName) }
+        db.runQuery { EntityDsl.updateBatch(d, updateList).include(d.departmentName) }
         val after = db.runQuery { selectQuery }
         for ((b, a) in before.zip(after)) {
             assertTrue(b.version < a.version)
@@ -115,7 +115,7 @@ class EntityBatchUpdateQueryTest(private val db: Database) {
     @Test
     fun exclude() {
         val d = Department.alias
-        val selectQuery = EntityQuery.from(d).where { d.departmentId inList listOf(1, 2) }
+        val selectQuery = EntityDsl.from(d).where { d.departmentId inList listOf(1, 2) }
         val before = db.runQuery { selectQuery }
         val updateList = before.map {
             it.copy(
@@ -123,7 +123,7 @@ class EntityBatchUpdateQueryTest(private val db: Database) {
                 location = "[" + it.location + "]"
             )
         }
-        db.runQuery { EntityQuery.updateBatch(d, updateList).exclude(d.location, d.version) }
+        db.runQuery { EntityDsl.updateBatch(d, updateList).exclude(d.location, d.version) }
         val after = db.runQuery { selectQuery }
         for ((b, a) in before.zip(after)) {
             assertTrue(b.version < a.version)
