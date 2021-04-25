@@ -51,7 +51,7 @@ open class DefaultDatabaseConfig(
     ) : this(SimpleDataSource(url, user, password), dialect)
 
     override val name: String = System.identityHashCode(object {}).toString()
-    override val clockProvider = DefaultClockProvider()
+    override val clockProvider: ClockProvider = DefaultClockProvider()
     override val jdbcOption: JdbcOption = JdbcOption(batchSize = 10)
     override val logger: Logger by lazy {
         val loader = ServiceLoader.load(LoggerFactory::class.java)

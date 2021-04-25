@@ -1,6 +1,10 @@
 package org.komapper.extension.springframework.boot
 
+import org.komapper.core.ClockProvider
 import org.komapper.core.Database
+import org.komapper.core.DatabaseConfig
+import org.komapper.core.DefaultClockProvider
+import org.komapper.core.DefaultDatabaseConfig
 import org.komapper.core.Dialect
 import org.komapper.core.jdbc.DataType
 import org.springframework.boot.autoconfigure.AutoConfigureAfter
@@ -13,6 +17,7 @@ import org.springframework.core.env.Environment
 import org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy
 import javax.sql.DataSource
 
+@Suppress("unused")
 @Configuration
 @ConditionalOnClass(Database::class)
 @AutoConfigureAfter(DataSourceAutoConfiguration::class)
@@ -22,7 +27,12 @@ open class KomapperAutoConfiguration {
         private const val DATASOURCE_URL_PROPERTY = "spring.datasource.url"
     }
 
-    @Suppress("unused")
+    @Bean
+    @ConditionalOnMissingBean
+    open fun clockProvider(): ClockProvider {
+        return DefaultClockProvider()
+    }
+
     @Bean
     @ConditionalOnMissingBean
     open fun dialect(environment: Environment, dataTypes: Set<DataType<*>> = emptySet()): Dialect {
@@ -34,15 +44,17 @@ open class KomapperAutoConfiguration {
         return Dialect.load(url, dataTypes)
     }
 
-    @Suppress("unused")
     @Bean
     @ConditionalOnMissingBean(Database::class)
-    open fun database(dataSource: DataSource, dialect: Dialect): Database {
+    open fun database(dataSource: DataSource, dialect: Dialect, clockProvider: ClockProvider): Database {
         val proxy = if (dataSource is TransactionAwareDataSourceProxy) {
             dataSource
         } else {
             TransactionAwareDataSourceProxy(dataSource)
         }
-        return Database.create(proxy, dialect)
+        val config = DefaultDatabaseConfig(proxy, dialect)
+        return Database.create(object : DatabaseConfig by config {
+            override val clockProvider: ClockProvider = clockProvider
+        })
     }
 }
