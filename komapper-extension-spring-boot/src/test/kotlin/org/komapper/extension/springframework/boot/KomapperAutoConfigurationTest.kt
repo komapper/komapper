@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.komapper.core.ClockProvider
 import org.komapper.core.Database
+import org.komapper.core.data.JdbcOption
 import org.komapper.core.jdbc.DataType
 import org.komapper.core.jdbc.StringType
 import org.komapper.jdbc.h2.H2Dialect
@@ -44,23 +45,29 @@ class KomapperAutoConfigurationTest {
         val sources = context.environment.propertySources
         sources.addFirst(MapPropertySource("test", source))
         context.register(
-            MyConfigure::class.java,
+            CustomConfigure::class.java,
             KomapperAutoConfiguration::class.java,
             DataSourceAutoConfiguration::class.java
         )
         context.refresh()
+
         val database = context.getBean(Database::class.java)
         assertNotNull(database)
+
         val dataType = database.config.dialect.getDataType(String::class)
         assertEquals("abc", dataType.name)
+
         val clock = database.config.clockProvider.now()
         val timestamp = LocalDateTime.now(clock)
         assertEquals(LocalDateTime.of(2021, 4, 25, 16, 17, 18), timestamp)
+
+        val jdbcOption = database.config.jdbcOption
+        assertEquals(1234, jdbcOption.queryTimeoutSeconds)
     }
 
     @Suppress("unused")
     @Configuration
-    open class MyConfigure {
+    open class CustomConfigure {
 
         @Bean
         open fun dataTypes(): Set<DataType<*>> {
@@ -73,6 +80,11 @@ class KomapperAutoConfigurationTest {
                 val timestamp = LocalDateTime.of(2021, 4, 25, 16, 17, 18)
                 Clock.fixed(timestamp.toInstant(ZoneOffset.UTC), ZoneId.of("UTC"))
             }
+        }
+
+        @Bean
+        open fun jdbcOption(): JdbcOption {
+            return JdbcOption(queryTimeoutSeconds = 1234)
         }
     }
 }
