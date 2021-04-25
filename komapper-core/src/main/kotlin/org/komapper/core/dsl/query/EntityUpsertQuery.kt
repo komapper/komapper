@@ -1,6 +1,7 @@
 package org.komapper.core.dsl.query
 
 import org.komapper.core.DatabaseConfig
+import org.komapper.core.DatabaseConfigHolder
 import org.komapper.core.data.Statement
 import org.komapper.core.dsl.context.EntityUpsertContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
@@ -23,7 +24,8 @@ internal data class EntityUpsertQueryImpl<ENTITY : Any, ID, META : EntityMetamod
         return copy(context = newContext)
     }
 
-    override fun run(config: DatabaseConfig): Int {
+    override fun run(holder: DatabaseConfigHolder): Int {
+        val config = holder.config
         val newEntity = preUpsert(config, entity)
         val statement = buildStatement(config, newEntity)
         val (count) = upsert(config, statement)
@@ -38,7 +40,8 @@ internal data class EntityUpsertQueryImpl<ENTITY : Any, ID, META : EntityMetamod
         return support.upsert(config) { it.executeUpdate(statement) }
     }
 
-    override fun dryRun(config: DatabaseConfig): String {
+    override fun dryRun(holder: DatabaseConfigHolder): String {
+        val config = holder.config
         val statement = buildStatement(config, entity)
         return statement.sql
     }

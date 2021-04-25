@@ -1,6 +1,7 @@
 package org.komapper.core.dsl.query
 
 import org.komapper.core.DatabaseConfig
+import org.komapper.core.DatabaseConfigHolder
 import org.komapper.core.JdbcExecutor
 import org.komapper.core.data.Statement
 import org.komapper.core.dsl.option.QueryOptionConfigurator
@@ -15,14 +16,14 @@ internal data class TemplateSelectQueryImpl<T>(
     private val option: TemplateSelectOption
 ) : TemplateSelectQuery<T> {
 
-    override fun run(config: DatabaseConfig): List<T> {
+    override fun run(holder: DatabaseConfigHolder): List<T> {
         val terminal = Terminal { it.toList() }
-        return terminal.run(config)
+        return terminal.run(holder)
     }
 
-    override fun dryRun(config: DatabaseConfig): String {
+    override fun dryRun(holder: DatabaseConfigHolder): String {
         val terminal = Terminal { it.toList() }
-        return terminal.dryRun(config)
+        return terminal.dryRun(holder)
     }
 
     override fun first(): Query<T> {
@@ -38,7 +39,8 @@ internal data class TemplateSelectQueryImpl<T>(
     }
 
     private inner class Terminal<R>(val transformer: (Sequence<T>) -> R) : Query<R> {
-        override fun run(config: DatabaseConfig): R {
+        override fun run(holder: DatabaseConfigHolder): R {
+            val config = holder.config
             val statement = buildStatement(config)
             val executor = JdbcExecutor(config, option)
             return executor.executeQuery(
@@ -51,7 +53,8 @@ internal data class TemplateSelectQueryImpl<T>(
             )
         }
 
-        override fun dryRun(config: DatabaseConfig): String {
+        override fun dryRun(holder: DatabaseConfigHolder): String {
+            val config = holder.config
             return buildStatement(config).sql
         }
 

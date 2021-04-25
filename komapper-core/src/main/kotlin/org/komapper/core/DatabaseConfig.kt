@@ -19,13 +19,15 @@ import javax.sql.DataSource
  * @property jdbcOption the jdbc configuration
  * @property session the session
  */
-interface DatabaseConfig {
+interface DatabaseConfig : DatabaseConfigHolder {
+    override val config: DatabaseConfig get() = this
     val name: String
     val dialect: Dialect
     val clockProvider: ClockProvider
     val jdbcOption: JdbcOption
     val logger: Logger
     val session: DatabaseSession
+    val dataFactory: DataFactory
     val templateStatementBuilder: TemplateStatementBuilder
 }
 
@@ -63,6 +65,10 @@ open class DefaultDatabaseConfig(
         factory?.create(dataSource, logger) ?: DefaultDatabaseSession(dataSource)
     }
 
+    override val dataFactory: DataFactory by lazy {
+        DataFactoryImpl(session)
+    }
+
     override val templateStatementBuilder: TemplateStatementBuilder by lazy {
         val loader = ServiceLoader.load(TemplateStatementBuilderFactory::class.java)
         val factory = loader.firstOrNull()
@@ -85,6 +91,8 @@ object DryRunDatabaseConfig : DatabaseConfig {
     override val jdbcOption: JdbcOption
         get() = throw UnsupportedOperationException()
     override val session: DatabaseSession
+        get() = throw UnsupportedOperationException()
+    override val dataFactory: DataFactory
         get() = throw UnsupportedOperationException()
     override val templateStatementBuilder: TemplateStatementBuilder
         get() = throw UnsupportedOperationException()

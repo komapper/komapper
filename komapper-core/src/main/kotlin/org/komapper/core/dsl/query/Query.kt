@@ -1,12 +1,12 @@
 package org.komapper.core.dsl.query
 
-import org.komapper.core.DatabaseConfig
+import org.komapper.core.DatabaseConfigHolder
 import org.komapper.core.DryRunDatabaseConfig
 import org.komapper.core.dsl.context.SubqueryContext
 
 interface Query<T> {
-    fun run(config: DatabaseConfig): T
-    fun dryRun(config: DatabaseConfig = DryRunDatabaseConfig): String
+    fun run(holder: DatabaseConfigHolder): T
+    fun dryRun(holder: DatabaseConfigHolder = DryRunDatabaseConfig): String
 }
 
 interface ListQuery<T> : Query<List<T>> {

@@ -81,7 +81,7 @@ class EntityInsertQueryTest(private val db: Database) {
                 Clock.fixed(instant, zoneId)
             }
         }
-        val myDb = Database(config)
+        val myDb = Database.create(config)
         val person1 = Person(1, "ABC")
         val id = myDb.runQuery { EntityQuery.insert(p, person1) }
         val person2 = db.runQuery {

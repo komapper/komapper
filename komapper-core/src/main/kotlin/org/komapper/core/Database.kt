@@ -1,10 +1,6 @@
 package org.komapper.core
 
 import org.komapper.core.jdbc.DataType
-import java.sql.Blob
-import java.sql.Clob
-import java.sql.NClob
-import java.sql.SQLXML
 import javax.sql.DataSource
 
 /**
@@ -13,69 +9,47 @@ import javax.sql.DataSource
  * @property config the database configuration
  * @constructor creates a database instance
  */
-class Database(val config: DatabaseConfig) {
+interface Database : DatabaseConfigHolder {
+    val dataFactory: DataFactory
 
-    constructor(
-        dataSource: DataSource,
-        dialect: Dialect,
-    ) : this(DefaultDatabaseConfig(dataSource, dialect))
-
-    constructor(
-        url: String,
-        user: String = "",
-        password: String = "",
-        dataTypes: Set<DataType<*>> = emptySet()
-    ) : this(DefaultDatabaseConfig(url, user, password, dataTypes))
-
-    constructor(
-        url: String,
-        user: String = "",
-        password: String = "",
-        dialect: Dialect
-    ) : this(DefaultDatabaseConfig(url, user, password, dialect))
-
-    /**
-     * A data type factory.
-     */
-    val factory = Factory(config)
-
-    class Factory(val config: DatabaseConfig) {
+    companion object {
         /**
-         * Creates Array objects.
-         *
-         * @param typeName the SQL name of the type the elements of the array map to
-         * @param elements the elements that populate the returned object
+         * @param config the database configuration
          */
-        fun createArrayOf(typeName: String, elements: List<*>): java.sql.Array = config.session.connection.use {
-            it.createArrayOf(typeName, elements.toTypedArray())
+        fun create(config: DatabaseConfig): Database {
+            return DatabaseImpl(config)
         }
 
-        /**
-         * Creates a Blob object.
-         */
-        fun createBlob(): Blob = config.session.connection.use {
-            it.createBlob()
+        fun create(
+            dataSource: DataSource,
+            dialect: Dialect,
+        ): Database {
+            return create(DefaultDatabaseConfig(dataSource, dialect))
         }
 
-        /**
-         * Creates a Clob object.
-         */
-        fun createClob(): Clob = config.session.connection.use {
-            it.createClob()
+        fun create(
+            url: String,
+            user: String = "",
+            password: String = "",
+            dataTypes: Set<DataType<*>> = emptySet()
+        ): Database {
+            return create(DefaultDatabaseConfig(url, user, password, dataTypes))
         }
 
-        /**
-         * Creates a NClob object.
-         */
-        fun createNClob(): NClob = config.session.connection.use {
-            it.createNClob()
-        }
-
-        /**
-         * Creates a SQLXML object.
-         */
-        fun createSQLXML(): SQLXML = config.session.connection.use {
-            it.createSQLXML()
+        fun create(
+            url: String,
+            user: String = "",
+            password: String = "",
+            dialect: Dialect
+        ): Database {
+            return create(DefaultDatabaseConfig(url, user, password, dialect))
         }
     }
+}
+
+internal class DatabaseImpl(
+    override val config: DatabaseConfig
+) : Database {
+    override val dataFactory: DataFactory
+        get() = config.dataFactory
 }

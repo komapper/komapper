@@ -43,6 +43,6 @@ open class KomapperAutoConfiguration {
         } else {
             TransactionAwareDataSourceProxy(dataSource)
         }
-        return Database(proxy, dialect)
+        return Database.create(proxy, dialect)
     }
 }

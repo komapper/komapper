@@ -75,7 +75,7 @@ class EntityUpdateQueryTest(private val db: Database) {
                 Clock.fixed(instant, zoneId)
             }
         }
-        val myDb = Database(config)
+        val myDb = Database.create(config)
         myDb.runQuery { EntityQuery.update(p, person2.copy(name = "DEF")) }
         val person3 = db.runQuery {
             EntityQuery.first(p) {

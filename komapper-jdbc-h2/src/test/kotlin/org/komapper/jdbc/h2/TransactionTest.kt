@@ -28,7 +28,7 @@ class TransactionTest {
 
     private val dataSource = SimpleDataSource("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1")
     private val config = DefaultDatabaseConfig(dataSource, H2Dialect())
-    private val db = Database(config)
+    private val db = Database.create(config)
 
     @BeforeEach
     fun before() {
@@ -223,7 +223,7 @@ class TransactionTest {
     fun array() {
         db.transaction {
             val meta = ArrayTest.alias
-            val array = db.factory.createArrayOf("INTEGER", listOf(10, 20, 30))
+            val array = db.dataFactory.createArrayOf("INTEGER", listOf(10, 20, 30))
             val data = ArrayTest(1, array)
             db.runQuery { EntityQuery.insert(meta, data) }
             val data2 = db.runQuery {
@@ -244,7 +244,7 @@ class TransactionTest {
     fun blob() {
         db.transaction {
             val m = BlobTest.alias
-            val blob = db.factory.createBlob()
+            val blob = db.dataFactory.createBlob()
             val bytes = byteArrayOf(10, 20, 30)
             blob.setBytes(1, bytes)
             val data = BlobTest(1, blob)
@@ -267,7 +267,7 @@ class TransactionTest {
     fun clob() {
         db.transaction {
             val m = ClobTest.alias
-            val clob = db.factory.createClob()
+            val clob = db.dataFactory.createClob()
             clob.setString(1, "ABC")
             val data = ClobTest(1, clob)
             db.runQuery { EntityQuery.insert(m, data) }
@@ -291,7 +291,7 @@ class TransactionTest {
     fun nclob() {
         db.transaction {
             val m = NClobTest.alias
-            val nclob = db.factory.createNClob()
+            val nclob = db.dataFactory.createNClob()
             nclob.setString(1, "ABC")
             val data = NClobTest(1, nclob)
             db.runQuery { EntityQuery.insert(m, data) }
@@ -315,7 +315,7 @@ class TransactionTest {
     fun sqlXml() {
         db.transaction {
             val m = SqlXmlTest.alias
-            val sqlXml = db.factory.createSQLXML()
+            val sqlXml = db.dataFactory.createSQLXML()
             sqlXml.string = """<xml a="v">Text</xml>"""
             val data = SqlXmlTest(1, sqlXml)
             db.runQuery { EntityQuery.insert(m, data) }

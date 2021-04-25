@@ -1,6 +1,7 @@
 package org.komapper.core.dsl.query
 
 import org.komapper.core.DatabaseConfig
+import org.komapper.core.DatabaseConfigHolder
 import org.komapper.core.data.Statement
 import org.komapper.core.dsl.builder.EntityInsertStatementBuilder
 import org.komapper.core.dsl.context.DuplicateKeyType
@@ -39,7 +40,8 @@ internal data class EntityInsertQueryImpl<ENTITY : Any, ID, META : EntityMetamod
         return EntityUpsertQueryImpl(newContext, entity, support)
     }
 
-    override fun run(config: DatabaseConfig): ID {
+    override fun run(holder: DatabaseConfigHolder): ID {
+        val config = holder.config
         val newEntity = preInsert(config)
         val (_, generatedKeys) = insert(config, newEntity)
         return postInsert(newEntity, generatedKeys)
@@ -64,7 +66,8 @@ internal data class EntityInsertQueryImpl<ENTITY : Any, ID, META : EntityMetamod
         return context.target.getId(e)
     }
 
-    override fun dryRun(config: DatabaseConfig): String {
+    override fun dryRun(holder: DatabaseConfigHolder): String {
+        val config = holder.config
         val statement = buildStatement(config, entity)
         return statement.sql
     }

@@ -1,6 +1,7 @@
 package org.komapper.core.dsl.query
 
 import org.komapper.core.DatabaseConfig
+import org.komapper.core.DatabaseConfigHolder
 import org.komapper.core.JdbcExecutor
 import org.komapper.core.data.Statement
 import org.komapper.core.dsl.builder.SqlDeleteStatementBuilder
@@ -31,17 +32,19 @@ internal data class SqlDeleteQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<
         return copy(option = configurator.apply(option))
     }
 
-    override fun run(config: DatabaseConfig): Int {
+    override fun run(holder: DatabaseConfigHolder): Int {
         if (!option.allowEmptyWhereClause && context.where.isEmpty()) {
             error("Empty where clause is not allowed.")
         }
+        val config = holder.config
         val statement = buildStatement(config, context)
         val executor = JdbcExecutor(config, option)
         val (count) = executor.executeUpdate(statement)
         return count
     }
 
-    override fun dryRun(config: DatabaseConfig): String {
+    override fun dryRun(holder: DatabaseConfigHolder): String {
+        val config = holder.config
         return buildStatement(config, context).sql
     }
 

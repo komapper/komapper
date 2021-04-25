@@ -32,7 +32,7 @@ internal class Env :
     }
 
     private val setting = Setting.get()
-    private val db = Database(setting.config)
+    private val db = Database.create(setting.config)
     private val txManager = db.config.session.transactionManager
 
     override fun beforeAll(context: ExtensionContext?) {

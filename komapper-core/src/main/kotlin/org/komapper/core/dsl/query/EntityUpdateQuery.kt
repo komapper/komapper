@@ -1,6 +1,7 @@
 package org.komapper.core.dsl.query
 
 import org.komapper.core.DatabaseConfig
+import org.komapper.core.DatabaseConfigHolder
 import org.komapper.core.data.Statement
 import org.komapper.core.dsl.context.EntityUpdateContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
@@ -37,7 +38,8 @@ internal data class EntityUpdateQueryImpl<ENTITY : Any, ID, META : EntityMetamod
         return copy(context = newContext)
     }
 
-    override fun run(config: DatabaseConfig) {
+    override fun run(holder: DatabaseConfigHolder) {
+        val config = holder.config
         val newEntity = preUpdate(config, entity)
         val (count) = update(config, newEntity)
         return postUpdate(count)
@@ -56,7 +58,8 @@ internal data class EntityUpdateQueryImpl<ENTITY : Any, ID, META : EntityMetamod
         return support.postUpdate(count)
     }
 
-    override fun dryRun(config: DatabaseConfig): String {
+    override fun dryRun(holder: DatabaseConfigHolder): String {
+        val config = holder.config
         val statement = buildStatement(config, entity)
         return statement.sql
     }

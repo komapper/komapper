@@ -1,6 +1,7 @@
 package org.komapper.core.dsl.query
 
 import org.komapper.core.DatabaseConfig
+import org.komapper.core.DatabaseConfigHolder
 import org.komapper.core.JdbcExecutor
 import org.komapper.core.data.Statement
 import org.komapper.core.dsl.builder.SqlInsertStatementBuilder
@@ -45,7 +46,8 @@ internal data class SqlInsertQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<
         return copy(option = configurator.apply(option))
     }
 
-    override fun run(config: DatabaseConfig): Pair<Int, Long?> {
+    override fun run(holder: DatabaseConfigHolder): Pair<Int, Long?> {
+        val config = holder.config
         val statement = buildStatement(config)
         val requiresGeneratedKeys = context.target.idAssignment() is Assignment.AutoIncrement<*, *>
         val executor = JdbcExecutor(config, option, requiresGeneratedKeys)
@@ -53,7 +55,8 @@ internal data class SqlInsertQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<
         return count to keys.firstOrNull()
     }
 
-    override fun dryRun(config: DatabaseConfig): String {
+    override fun dryRun(holder: DatabaseConfigHolder): String {
+        val config = holder.config
         return buildStatement(config).sql
     }
 

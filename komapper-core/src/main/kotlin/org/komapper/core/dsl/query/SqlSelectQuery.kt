@@ -1,6 +1,7 @@
 package org.komapper.core.dsl.query
 
 import org.komapper.core.DatabaseConfig
+import org.komapper.core.DatabaseConfigHolder
 import org.komapper.core.Dialect
 import org.komapper.core.JdbcExecutor
 import org.komapper.core.data.Statement
@@ -270,14 +271,14 @@ internal data class SqlSelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<
         }
     }
 
-    override fun run(config: DatabaseConfig): List<ENTITY> {
+    override fun run(holder: DatabaseConfigHolder): List<ENTITY> {
         val terminal = createTerminal(context) { it.toList() }
-        return terminal.run(config)
+        return terminal.run(holder)
     }
 
-    override fun dryRun(config: DatabaseConfig): String {
+    override fun dryRun(holder: DatabaseConfigHolder): String {
         val terminal = createTerminal(context) { it.toList() }
-        return terminal.dryRun(config)
+        return terminal.dryRun(holder)
     }
 
     override fun first(): Query<ENTITY> {
@@ -335,14 +336,14 @@ internal data class SqlSelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<
             return SetOperationQueryImpl(setOperationContext, provider = provider)
         }
 
-        override fun run(config: DatabaseConfig): List<T> {
+        override fun run(holder: DatabaseConfigHolder): List<T> {
             val terminal = createTerminal { it.toList() }
-            return terminal.run(config)
+            return terminal.run(holder)
         }
 
-        override fun dryRun(config: DatabaseConfig): String {
+        override fun dryRun(holder: DatabaseConfigHolder): String {
             val terminal = createTerminal { it.toList() }
-            return terminal.dryRun(config)
+            return terminal.dryRun(holder)
         }
 
         override fun first(): Query<T> {
@@ -369,16 +370,18 @@ internal data class SqlSelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<
         private val transformer: (Sequence<T>) -> R
     ) : Query<R> {
 
-        override fun run(config: DatabaseConfig): R {
+        override fun run(holder: DatabaseConfigHolder): R {
             if (!option.allowEmptyWhereClause && context.where.isEmpty()) {
                 error("Empty where clause is not allowed.")
             }
+            val config = holder.config
             val statement = buildStatement(config)
             val executor = JdbcExecutor(config, option)
             return executor.executeQuery(statement, provider, transformer)
         }
 
-        override fun dryRun(config: DatabaseConfig): String {
+        override fun dryRun(holder: DatabaseConfigHolder): String {
+            val config = holder.config
             return buildStatement(config).sql
         }
 
