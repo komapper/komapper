@@ -9,10 +9,10 @@ import org.komapper.core.dsl.metamodel.PropertyMetamodel
 import org.komapper.core.dsl.option.EntityUpdateOption
 import org.komapper.core.dsl.option.QueryOptionConfigurator
 
-interface EntityUpdateQuery<ENTITY : Any> : Query<Unit> {
+interface EntityUpdateQuery<ENTITY : Any> : Query<ENTITY> {
     fun option(configurator: QueryOptionConfigurator<EntityUpdateOption>): EntityUpdateQuery<ENTITY>
-    fun include(vararg propertyMetamodels: PropertyMetamodel<ENTITY, *>): Query<Unit>
-    fun exclude(vararg propertyMetamodels: PropertyMetamodel<ENTITY, *>): Query<Unit>
+    fun include(vararg propertyMetamodels: PropertyMetamodel<ENTITY, *>): Query<ENTITY>
+    fun exclude(vararg propertyMetamodels: PropertyMetamodel<ENTITY, *>): Query<ENTITY>
 }
 
 internal data class EntityUpdateQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
@@ -28,21 +28,21 @@ internal data class EntityUpdateQueryImpl<ENTITY : Any, ID, META : EntityMetamod
         return copy(option = configurator.apply(option))
     }
 
-    override fun include(vararg propertyMetamodels: PropertyMetamodel<ENTITY, *>): Query<Unit> {
+    override fun include(vararg propertyMetamodels: PropertyMetamodel<ENTITY, *>): Query<ENTITY> {
         val newContext = support.include(propertyMetamodels.toList())
         return copy(context = newContext)
     }
 
-    override fun exclude(vararg propertyMetamodels: PropertyMetamodel<ENTITY, *>): Query<Unit> {
+    override fun exclude(vararg propertyMetamodels: PropertyMetamodel<ENTITY, *>): Query<ENTITY> {
         val newContext = support.exclude(propertyMetamodels.toList())
         return copy(context = newContext)
     }
 
-    override fun run(holder: DatabaseConfigHolder) {
+    override fun run(holder: DatabaseConfigHolder): ENTITY {
         val config = holder.config
         val newEntity = preUpdate(config, entity)
         val (count) = update(config, newEntity)
-        return postUpdate(count)
+        return postUpdate(newEntity, count)
     }
 
     private fun preUpdate(config: DatabaseConfig, entity: ENTITY): ENTITY {
@@ -54,8 +54,8 @@ internal data class EntityUpdateQueryImpl<ENTITY : Any, ID, META : EntityMetamod
         return support.update(config) { it.executeUpdate(statement) }
     }
 
-    private fun postUpdate(count: Int) {
-        return support.postUpdate(count)
+    private fun postUpdate(entity: ENTITY, count: Int): ENTITY {
+        return support.postUpdate(entity, count)
     }
 
     override fun dryRun(holder: DatabaseConfigHolder): String {

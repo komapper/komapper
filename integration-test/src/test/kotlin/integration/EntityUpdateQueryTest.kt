@@ -124,7 +124,7 @@ class EntityUpdateQueryTest(private val db: Database) {
         val department = db.runQuery { findQuery }
         val department2 = department.copy(departmentName = "ABC", location = "DEF")
         assertThrows<IllegalStateException> {
-            db.runQuery { EntityQuery.update(d, department2).include(d.departmentId) }
+            db.runQuery { EntityQuery.update(d, department2).include(d.departmentId) }.let { }
         }
     }
 
@@ -150,7 +150,7 @@ class EntityUpdateQueryTest(private val db: Database) {
         assertThrows<IllegalStateException> {
             db.runQuery {
                 EntityQuery.update(d, department2).exclude(d.departmentName, d.location, d.version, d.departmentNo)
-            }
+            }.let { }
         }
     }
 }

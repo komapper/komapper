@@ -22,7 +22,7 @@ class EntityBatchInsertQueryTest(private val db: Database) {
             Address(17, "STREET 17", 0),
             Address(18, "STREET 18", 0)
         )
-        val ids = db.runQuery { EntityQuery.insertBatch(a, addressList) }
+        val ids = db.runQuery { EntityQuery.insertBatch(a, addressList) }.map { it.addressId }
         val list = db.runQuery {
             EntityQuery.from(a).where { a.addressId inList ids }
         }
@@ -52,7 +52,7 @@ class EntityBatchInsertQueryTest(private val db: Database) {
             Person(2, "B"),
             Person(3, "C")
         )
-        val ids = db.runQuery { EntityQuery.insertBatch(p, personList) }
+        val ids = db.runQuery { EntityQuery.insertBatch(p, personList) }.map { it.personId }
         val list = db.runQuery { EntityQuery.from(p).where { p.personId inList ids } }
         for (person in list) {
             assertNotNull(person.createdAt)

@@ -39,7 +39,7 @@ class EntityInsertQueryTest(private val db: Database) {
     fun createdAt_localDateTime() {
         val p = Person.alias
         val person1 = Person(1, "ABC")
-        val id = db.runQuery { EntityQuery.insert(p, person1) }
+        val id = db.runQuery { EntityQuery.insert(p, person1) }.personId
         val person2 = db.runQuery { EntityQuery.first(p) { p.personId eq id } }
         assertNotNull(person2.createdAt)
         assertNotNull(person2.updatedAt)
@@ -57,7 +57,7 @@ class EntityInsertQueryTest(private val db: Database) {
     fun createdAt_offsetDateTime() {
         val h = Human.alias
         val human1 = Human(1, "ABC")
-        val id = db.runQuery { EntityQuery.insert(h, human1) }
+        val id = db.runQuery { EntityQuery.insert(h, human1) }.humanId
         val human2 = db.runQuery { EntityQuery.first(h) { h.humanId eq id } }
         assertNotNull(human2.createdAt)
         assertNotNull(human2.updatedAt)
@@ -109,8 +109,8 @@ class EntityInsertQueryTest(private val db: Database) {
         for (i in 1..201) {
             val m = IdentityStrategy.alias
             val strategy = IdentityStrategy(0, "test")
-            val id = db.runQuery { EntityQuery.insert(m, strategy) }
-            assertEquals(i, id)
+            val result = db.runQuery { EntityQuery.insert(m, strategy) }
+            assertEquals(i, result.id)
         }
     }
 
@@ -120,8 +120,8 @@ class EntityInsertQueryTest(private val db: Database) {
         for (i in 1..201) {
             val m = SequenceStrategy.alias
             val strategy = SequenceStrategy(0, "test")
-            val id = db.runQuery { EntityQuery.insert(m, strategy) }
-            assertEquals(i, id)
+            val result = db.runQuery { EntityQuery.insert(m, strategy) }
+            assertEquals(i, result.id)
         }
     }
 

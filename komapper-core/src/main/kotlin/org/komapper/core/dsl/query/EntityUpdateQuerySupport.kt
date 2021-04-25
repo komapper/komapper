@@ -45,9 +45,14 @@ internal class EntityUpdateQuerySupport<ENTITY : Any, ID, META : EntityMetamodel
         return execute(executor)
     }
 
-    fun postUpdate(count: Int, index: Int? = null) {
+    fun postUpdate(entity: ENTITY, count: Int, index: Int? = null): ENTITY {
         if (context.target.versionProperty() != null) {
             checkOptimisticLock(option, count, index)
+        }
+        return if (!option.ignoreVersion) {
+            context.target.postUpdate(entity)
+        } else {
+            entity
         }
     }
 

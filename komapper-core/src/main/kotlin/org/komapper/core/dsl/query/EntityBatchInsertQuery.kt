@@ -11,7 +11,7 @@ import org.komapper.core.dsl.metamodel.PropertyMetamodel
 import org.komapper.core.dsl.option.EntityBatchInsertOption
 import org.komapper.core.dsl.option.QueryOptionConfigurator
 
-interface EntityBatchInsertQuery<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> : Query<List<ID>> {
+interface EntityBatchInsertQuery<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> : Query<List<ENTITY>> {
     fun option(configurator: QueryOptionConfigurator<EntityBatchInsertOption>): EntityBatchInsertQuery<ENTITY, ID, META>
     fun onDuplicateKeyUpdate(vararg keys: PropertyMetamodel<ENTITY, *> = emptyArray()): EntityBatchUpsertQuery<ENTITY, ID, META>
     fun onDuplicateKeyIgnore(vararg keys: PropertyMetamodel<ENTITY, *> = emptyArray()): Query<List<Int>>
@@ -40,7 +40,7 @@ internal data class EntityBatchInsertQueryImpl<ENTITY : Any, ID, META : EntityMe
         return EntityBatchUpsertQueryImpl(newContext, entities, support)
     }
 
-    override fun run(holder: DatabaseConfigHolder): List<ID> {
+    override fun run(holder: DatabaseConfigHolder): List<ENTITY> {
         if (entities.isEmpty()) return emptyList()
         val config = holder.config
         val newEntities = preInsert(config)
@@ -58,17 +58,15 @@ internal data class EntityBatchInsertQueryImpl<ENTITY : Any, ID, META : EntityMe
         return keys
     }
 
-    private fun postInsert(entities: List<ENTITY>, generatedKeys: LongArray): List<ID> {
+    private fun postInsert(entities: List<ENTITY>, generatedKeys: LongArray): List<ENTITY> {
         val iterator = generatedKeys.iterator()
-        return entities.asSequence().map {
+        return entities.map {
             if (iterator.hasNext()) {
                 support.postInsert(it, iterator.nextLong())
             } else {
                 it
             }
-        }.map {
-            context.target.getId(it)
-        }.toList()
+        }
     }
 
     override fun dryRun(holder: DatabaseConfigHolder): String {

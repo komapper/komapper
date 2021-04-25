@@ -48,13 +48,13 @@ fun main() {
         }
 
         // CREATE
-        val id = db.runQuery {
+        val newAddress = db.runQuery {
             EntityQuery.insert(a, Address(street = "street A"))
         }
 
         // READ: select by id
         val address1 = db.runQuery {
-            EntityQuery.first(a) { a.id eq id }
+            EntityQuery.first(a) { a.id eq newAddress.id }
         }
         println("address1=$address1")
 

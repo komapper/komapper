@@ -30,8 +30,7 @@ class Application(private val database: Database) {
     fun add(@RequestParam text: String): Message {
         val message = Message(text = text)
         val query = EntityQuery.insert(Message.alias, message)
-        val id = database.runQuery { query }
-        return message.copy(id = id)
+        return database.runQuery { query }
     }
 }
 
