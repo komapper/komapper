@@ -24,13 +24,14 @@ data class Address(
     companion object
 }
 
+@Suppress("unused")
 @KmEntityDef(Address::class)
 private data class AddressDef(
     @KmId @KmAutoIncrement @KmColumn(name = "ADDRESS_ID")
-    val id: String,
-    @KmVersion val version: String,
-    @KmCreatedAt val createdAt: String,
-    @KmUpdatedAt val updatedAt: String,
+    val id: Nothing,
+    @KmVersion val version: Nothing,
+    @KmCreatedAt val createdAt: Nothing,
+    @KmUpdatedAt val updatedAt: Nothing,
 )
 
 fun main() {

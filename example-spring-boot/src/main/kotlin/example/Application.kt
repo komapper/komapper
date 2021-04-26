@@ -51,5 +51,5 @@ data class Message(
 @Suppress("unused")
 @KmEntityDef(Message::class)
 private data class MessageDef(
-    @KmId @KmAutoIncrement val id: Int? = null,
+    @KmId @KmAutoIncrement val id: Nothing,
 )
