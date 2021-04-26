@@ -16,13 +16,13 @@ class EntityDeleteQueryTest(private val db: Database) {
     fun optimisticLockException() {
         val a = Address.alias
         val address = db.runQuery {
-            EntityDsl.first(a) {
+            EntityDsl.from(a).first {
                 a.addressId eq 15
             }
         }
-        db.runQuery { EntityDsl.delete(a, address) }
+        db.runQuery { EntityDsl.delete(a).single(address) }
         assertThrows<OptimisticLockException> {
-            db.runQuery { EntityDsl.delete(a, address) }
+            db.runQuery { EntityDsl.delete(a).single(address) }
         }
     }
 
@@ -31,7 +31,7 @@ class EntityDeleteQueryTest(private val db: Database) {
         val a = Address.alias
         val query = EntityDsl.from(a).where { a.addressId eq 15 }
         val address = db.runQuery { query.first() }
-        db.runQuery { EntityDsl.delete(a, address) }
+        db.runQuery { EntityDsl.delete(a).single(address) }
         assertEquals(emptyList<Address>(), db.runQuery { query })
     }
 }

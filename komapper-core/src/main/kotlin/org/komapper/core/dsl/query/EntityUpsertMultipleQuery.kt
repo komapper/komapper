@@ -2,27 +2,18 @@ package org.komapper.core.dsl.query
 
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.DatabaseConfigHolder
-import org.komapper.core.data.Statement
+import org.komapper.core.Statement
 import org.komapper.core.dsl.context.EntityUpsertContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
-import org.komapper.core.dsl.scope.SetScope
+import org.komapper.core.dsl.option.QueryOption
 
-interface EntityMultipleUpsertQuery<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> : Query<Int> {
-    fun set(declaration: SetScope<ENTITY>.(META) -> Unit): Query<Int>
-}
-
-internal data class EntityMultipleUpsertQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+internal data class EntityUpsertMultipleQuery<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityUpsertContext<ENTITY, ID, META>,
-    private val entities: List<ENTITY>,
-    private val insertSupport: EntityInsertQuerySupport<ENTITY, ID, META>
-) : EntityMultipleUpsertQuery<ENTITY, ID, META> {
+    private val option: QueryOption,
+    private val entities: List<ENTITY>
+) : Query<Int> {
 
-    private val support: EntityUpsertQuerySupport<ENTITY, ID, META> = EntityUpsertQuerySupport(context, insertSupport)
-
-    override fun set(declaration: SetScope<ENTITY>.(META) -> Unit): Query<Int> {
-        val newContext = support.set(declaration)
-        return copy(context = newContext)
-    }
+    private val support: EntityUpsertQuerySupport<ENTITY, ID, META> = EntityUpsertQuerySupport(context, option)
 
     override fun run(holder: DatabaseConfigHolder): Int {
         if (entities.isEmpty()) return 0
@@ -36,8 +27,7 @@ internal data class EntityMultipleUpsertQueryImpl<ENTITY : Any, ID, META : Entit
     }
 
     private fun upsert(config: DatabaseConfig, entities: List<ENTITY>): Int {
-        val builder = config.dialect.getEntityMultipleUpsertStatementBuilder(context, entities)
-        val statement = builder.build()
+        val statement = buildStatement(config, entities)
         val (count) = support.upsert(config) { it.executeUpdate(statement) }
         return count
     }
@@ -50,7 +40,6 @@ internal data class EntityMultipleUpsertQueryImpl<ENTITY : Any, ID, META : Entit
     }
 
     private fun buildStatement(config: DatabaseConfig, entities: List<ENTITY>): Statement {
-        val builder = config.dialect.getEntityMultipleUpsertStatementBuilder(context, entities)
-        return builder.build()
+        return support.buildStatement(config, entities)
     }
 }

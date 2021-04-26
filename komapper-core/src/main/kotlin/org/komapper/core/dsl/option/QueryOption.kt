@@ -1,6 +1,6 @@
 package org.komapper.core.dsl.option
 
-import org.komapper.core.data.JdbcOption
+import org.komapper.core.JdbcOption
 
 interface QueryOption {
     val queryTimeoutSeconds: Int?
@@ -36,6 +36,15 @@ data class EntityDeleteOption(
     override fun asJdbcOption() = JdbcOption(
         queryTimeoutSeconds = queryTimeoutSeconds
     )
+    fun asEntityBatchDeleteOption(batchSize: Int?): EntityBatchDeleteOption {
+        return EntityBatchDeleteOption(
+            batchSize = batchSize,
+            queryTimeoutSeconds = queryTimeoutSeconds,
+            suppressLogging = suppressLogging,
+            ignoreVersion = ignoreVersion,
+            suppressOptimisticLockException = suppressOptimisticLockException
+        )
+    }
 }
 
 data class EntityInsertOption(
@@ -45,6 +54,13 @@ data class EntityInsertOption(
     override fun asJdbcOption() = JdbcOption(
         queryTimeoutSeconds = queryTimeoutSeconds
     )
+    fun asEntityBatchInsertOption(batchSize: Int?): EntityBatchInsertOption {
+        return EntityBatchInsertOption(
+            batchSize = batchSize,
+            queryTimeoutSeconds = queryTimeoutSeconds,
+            suppressLogging = suppressLogging,
+        )
+    }
 }
 
 data class EntityUpdateOption(
@@ -56,6 +72,15 @@ data class EntityUpdateOption(
     override fun asJdbcOption() = JdbcOption(
         queryTimeoutSeconds = queryTimeoutSeconds
     )
+    fun asEntityBatchUpdateOption(batchSize: Int?): EntityBatchUpdateOption {
+        return EntityBatchUpdateOption(
+            batchSize = batchSize,
+            queryTimeoutSeconds = queryTimeoutSeconds,
+            suppressLogging = suppressLogging,
+            ignoreVersion = ignoreVersion,
+            suppressOptimisticLockException = suppressOptimisticLockException
+        )
+    }
 }
 
 data class EntitySelectOption(

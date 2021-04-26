@@ -56,7 +56,7 @@ class QuoteTest(val db: Database) {
     @Test
     fun alwaysQuote() {
         val m = Order.alias
-        db.runQuery { EntityDsl.insert(m, Order(1, "value")) }
+        db.runQuery { EntityDsl.insert(m).single(Order(1, "value")) }
         val list = db.runQuery { EntityDsl.from(m) }
         assertEquals(1, list.size)
     }

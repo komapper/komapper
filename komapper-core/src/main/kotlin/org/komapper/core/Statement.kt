@@ -1,4 +1,4 @@
-package org.komapper.core.data
+package org.komapper.core
 
 data class Statement(val sql: String, val values: List<Value>, val sqlWithArgs: String) {
     constructor(sql: String) : this(sql, emptyList(), sql)

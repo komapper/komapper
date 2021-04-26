@@ -46,6 +46,11 @@ internal data class SelectQuerySupport<ENTITY : Any, ID, META : EntityMetamodel<
         return context
     }
 
+    fun first(declaration: WhereDeclaration): CONTEXT {
+        val scope = WhereScope().apply(declaration)
+        return context.addWhere(scope)
+    }
+
     fun where(declaration: WhereDeclaration): CONTEXT {
         val scope = WhereScope().apply(declaration)
         return context.addWhere(scope)

@@ -2,28 +2,18 @@ package org.komapper.core.dsl.query
 
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.DatabaseConfigHolder
-import org.komapper.core.data.Statement
+import org.komapper.core.Statement
 import org.komapper.core.dsl.context.EntityUpsertContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
-import org.komapper.core.dsl.scope.SetScope
+import org.komapper.core.dsl.option.QueryOption
 
-interface EntityBatchUpsertQuery<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> :
-    Query<List<Int>> {
-    fun set(declaration: SetScope<ENTITY>.(META) -> Unit): Query<List<Int>>
-}
-
-internal data class EntityBatchUpsertQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+internal data class EntityUpsertBatchQuery<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityUpsertContext<ENTITY, ID, META>,
     private val entities: List<ENTITY>,
-    private val insertSupport: EntityInsertQuerySupport<ENTITY, ID, META>
-) : EntityBatchUpsertQuery<ENTITY, ID, META> {
+    private val option: QueryOption
+) : Query<List<Int>> {
 
-    private val support: EntityUpsertQuerySupport<ENTITY, ID, META> = EntityUpsertQuerySupport(context, insertSupport)
-
-    override fun set(declaration: SetScope<ENTITY>.(META) -> Unit): Query<List<Int>> {
-        val newContext = support.set(declaration)
-        return copy(context = newContext)
-    }
+    private val support: EntityUpsertQuerySupport<ENTITY, ID, META> = EntityUpsertQuerySupport(context, option)
 
     override fun run(holder: DatabaseConfigHolder): List<Int> {
         if (entities.isEmpty()) return emptyList()
@@ -50,7 +40,6 @@ internal data class EntityBatchUpsertQueryImpl<ENTITY : Any, ID, META : EntityMe
     }
 
     private fun buildStatement(config: DatabaseConfig, entity: ENTITY): Statement {
-        val builder = config.dialect.getEntityUpsertStatementBuilder(context, entity)
-        return builder.build()
+        return support.buildStatement(config, listOf(entity))
     }
 }

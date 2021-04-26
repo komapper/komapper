@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import org.komapper.core.data.Value
+import org.komapper.core.Value
 
 class ExprEvaluatorTest {
 

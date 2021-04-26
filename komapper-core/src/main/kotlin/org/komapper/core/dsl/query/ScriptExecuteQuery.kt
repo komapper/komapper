@@ -2,7 +2,7 @@ package org.komapper.core.dsl.query
 
 import org.komapper.core.DatabaseConfigHolder
 import org.komapper.core.SqlExecutor
-import org.komapper.core.data.Statement
+import org.komapper.core.Statement
 import org.komapper.core.dsl.option.ScriptExecuteOption
 
 interface ScriptExecuteQuery : Query<Unit> {

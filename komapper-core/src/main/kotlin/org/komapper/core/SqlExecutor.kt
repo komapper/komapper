@@ -1,6 +1,5 @@
 package org.komapper.core
 
-import org.komapper.core.data.Statement
 import org.komapper.core.dsl.option.QueryOption
 import java.sql.Connection
 import java.sql.PreparedStatement

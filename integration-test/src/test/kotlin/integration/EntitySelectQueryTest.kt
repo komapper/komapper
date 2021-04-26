@@ -61,14 +61,14 @@ class EntitySelectQueryTest(private val db: Database) {
     @Test
     fun shortcut_first() {
         val a = Address.alias
-        val address = db.runQuery { EntityDsl.first(a) { a.addressId eq 1 } }
+        val address = db.runQuery { EntityDsl.from(a).first { a.addressId eq 1 } }
         assertNotNull(address)
     }
 
     @Test
     fun shortcut_firstOrNull() {
         val a = Address.alias
-        val address = db.runQuery { EntityDsl.firstOrNull(a) { a.addressId eq -1 } }
+        val address = db.runQuery { EntityDsl.from(a).firstOrNull { a.addressId eq -1 } }
         assertNull(address)
     }
 
@@ -76,7 +76,7 @@ class EntitySelectQueryTest(private val db: Database) {
     fun shortcut_first_multipleCondition() {
         val a = Address.alias
         val address = db.runQuery {
-            EntityDsl.first(a) { a.addressId eq 1; a.version eq 1 }
+            EntityDsl.from(a).first { a.addressId eq 1; a.version eq 1 }
         }
         assertNotNull(address)
     }

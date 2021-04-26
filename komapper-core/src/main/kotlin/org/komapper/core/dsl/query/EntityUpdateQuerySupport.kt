@@ -2,38 +2,16 @@ package org.komapper.core.dsl.query
 
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.SqlExecutor
-import org.komapper.core.data.Statement
+import org.komapper.core.Statement
 import org.komapper.core.dsl.builder.EntityUpdateStatementBuilder
 import org.komapper.core.dsl.context.EntityUpdateContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
-import org.komapper.core.dsl.metamodel.PropertyMetamodel
 import org.komapper.core.dsl.option.VersionOption
 
 internal class EntityUpdateQuerySupport<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityUpdateContext<ENTITY, ID, META>,
     private val option: VersionOption
 ) {
-
-    fun include(properties: List<PropertyMetamodel<ENTITY, *>>): EntityUpdateContext<ENTITY, ID, META> {
-        return context.copy(includedProperties = properties).also {
-            checkContext(it)
-        }
-    }
-
-    fun exclude(properties: List<PropertyMetamodel<ENTITY, *>>): EntityUpdateContext<ENTITY, ID, META> {
-        return context.copy(excludedProperties = properties).also {
-            checkContext(it)
-        }
-    }
-
-    private fun checkContext(context: EntityUpdateContext<ENTITY, ID, META>) {
-        if (context.getTargetProperties().isEmpty()) {
-            error(
-                "Illegal SQL will be generated. The set clause is empty. " +
-                    "Include or exclude appropriate properties."
-            )
-        }
-    }
 
     fun preUpdate(config: DatabaseConfig, entity: ENTITY): ENTITY {
         val clock = config.clockProvider.now()
@@ -57,7 +35,7 @@ internal class EntityUpdateQuerySupport<ENTITY : Any, ID, META : EntityMetamodel
     }
 
     fun buildStatement(config: DatabaseConfig, entity: ENTITY): Statement {
-        val builder = EntityUpdateStatementBuilder(config.dialect, context, entity, option)
+        val builder = EntityUpdateStatementBuilder(config.dialect, context, option, entity)
         return builder.build()
     }
 }

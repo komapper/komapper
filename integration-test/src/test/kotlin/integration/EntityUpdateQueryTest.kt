@@ -29,7 +29,7 @@ class EntityUpdateQueryTest(private val db: Database) {
         val query = EntityDsl.from(a).where { a.addressId eq 15 }
         val address = db.runQuery { query.first() }
         val newAddress = address.copy(street = "NY street")
-        db.runQuery { EntityDsl.update(a, newAddress) }
+        db.runQuery { EntityDsl.update(a).single(newAddress) }
         val address2 = db.runQuery { query.firstOrNull() }
         assertEquals(
             Address(
@@ -44,13 +44,13 @@ class EntityUpdateQueryTest(private val db: Database) {
     @Test
     fun updatedAt() {
         val p = Person.alias
-        val findQuery = EntityDsl.first(p) { p.personId eq 1 }
+        val findQuery = EntityDsl.from(p).first { p.personId eq 1 }
         val person1 = Person(1, "ABC")
         val person2 = db.runQuery {
-            EntityDsl.insert(p, person1) + findQuery
+            EntityDsl.insert(p).single(person1) + findQuery
         }
         val person3 = db.runQuery {
-            EntityDsl.update(p, person2.copy(name = "DEF")) + findQuery
+            EntityDsl.update(p).single(person2.copy(name = "DEF")) + findQuery
         }
         assertNotNull(person2.updatedAt)
         assertNotNull(person3.updatedAt)
@@ -64,9 +64,9 @@ class EntityUpdateQueryTest(private val db: Database) {
 
         val p = Person.alias
         val person1 = Person(1, "ABC")
-        db.runQuery { EntityDsl.insert(p, person1) }
+        db.runQuery { EntityDsl.insert(p).single(person1) }
         val person2 = db.runQuery {
-            EntityDsl.first(p) {
+            EntityDsl.from(p).first {
                 p.personId eq 1
             }
         }
@@ -76,9 +76,9 @@ class EntityUpdateQueryTest(private val db: Database) {
             }
         }
         val myDb = Database.create(config)
-        myDb.runQuery { EntityDsl.update(p, person2.copy(name = "DEF")) }
+        myDb.runQuery { EntityDsl.update(p).single(person2.copy(name = "DEF")) }
         val person3 = db.runQuery {
-            EntityDsl.first(p) {
+            EntityDsl.from(p).first {
                 p.personId eq 1
             }
         }
@@ -90,7 +90,7 @@ class EntityUpdateQueryTest(private val db: Database) {
         val a = Address.alias
         val address = Address(1, "STREET 2", 1)
         assertThrows<UniqueConstraintException> {
-            db.runQuery { EntityDsl.update(a, address) }.let { }
+            db.runQuery { EntityDsl.update(a).single(address) }.let { }
         }
     }
 
@@ -98,19 +98,19 @@ class EntityUpdateQueryTest(private val db: Database) {
     fun optimisticLockException() {
         val a = Address.alias
         val address = db.runQuery { EntityDsl.from(a).where { a.addressId eq 15 }.first() }
-        db.runQuery { EntityDsl.update(a, address) }
+        db.runQuery { EntityDsl.update(a).single(address) }
         assertThrows<OptimisticLockException> {
-            db.runQuery { EntityDsl.update(a, address) }.let {}
+            db.runQuery { EntityDsl.update(a).single(address) }.let {}
         }
     }
 
     @Test
     fun include() {
         val d = Department.alias
-        val findQuery = EntityDsl.first(d) { d.departmentId eq 1 }
+        val findQuery = EntityDsl.from(d).first { d.departmentId eq 1 }
         val department = db.runQuery { findQuery }
         val department2 = department.copy(departmentName = "ABC", location = "DEF")
-        db.runQuery { EntityDsl.update(d, department2).include(d.departmentName) }
+        db.runQuery { EntityDsl.update(d).include(d.departmentName).single(department2) }
         val department3 = db.runQuery { findQuery }
         assertEquals("ABC", department3.departmentName)
         assertNotEquals("DEF", department3.location)
@@ -120,21 +120,21 @@ class EntityUpdateQueryTest(private val db: Database) {
     @Test
     fun include_emptyTargetProperties() {
         val d = NoVersionDepartment.alias
-        val findQuery = EntityDsl.first(d) { d.departmentId eq 1 }
+        val findQuery = EntityDsl.from(d).first { d.departmentId eq 1 }
         val department = db.runQuery { findQuery }
         val department2 = department.copy(departmentName = "ABC", location = "DEF")
         assertThrows<IllegalStateException> {
-            db.runQuery { EntityDsl.update(d, department2).include(d.departmentId) }.let { }
+            db.runQuery { EntityDsl.update(d).include(d.departmentId).single(department2) }.let { }
         }
     }
 
     @Test
     fun exclude() {
         val d = Department.alias
-        val findQuery = EntityDsl.first(d) { d.departmentId eq 1 }
+        val findQuery = EntityDsl.from(d).first { d.departmentId eq 1 }
         val department = db.runQuery { findQuery }
         val department2 = department.copy(departmentName = "ABC", location = "DEF")
-        db.runQuery { EntityDsl.update(d, department2).exclude(d.location) }
+        db.runQuery { EntityDsl.update(d).exclude(d.location).single(department2) }
         val department3 = db.runQuery { findQuery }
         assertEquals("ABC", department3.departmentName)
         assertNotEquals("DEF", department3.location)
@@ -144,12 +144,14 @@ class EntityUpdateQueryTest(private val db: Database) {
     @Test
     fun exclude_emptyTargetProperties() {
         val d = NoVersionDepartment.alias
-        val findQuery = EntityDsl.first(d) { d.departmentId eq 1 }
+        val findQuery = EntityDsl.from(d).first { d.departmentId eq 1 }
         val department = db.runQuery { findQuery }
         val department2 = department.copy(departmentName = "ABC", location = "DEF")
         assertThrows<IllegalStateException> {
             db.runQuery {
-                EntityDsl.update(d, department2).exclude(d.departmentName, d.location, d.version, d.departmentNo)
+                EntityDsl.update(d)
+                    .exclude(d.departmentName, d.location, d.version, d.departmentNo)
+                    .single(department2)
             }.let { }
         }
     }

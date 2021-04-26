@@ -4,7 +4,7 @@ import org.komapper.core.DatabaseConfig
 import org.komapper.core.DatabaseConfigHolder
 import org.komapper.core.Dialect
 import org.komapper.core.SqlExecutor
-import org.komapper.core.data.Statement
+import org.komapper.core.Statement
 import org.komapper.core.dsl.builder.DefaultAliasManager
 import org.komapper.core.dsl.builder.SqlSetOperationStatementBuilder
 import org.komapper.core.dsl.context.SqlSetOperationContext

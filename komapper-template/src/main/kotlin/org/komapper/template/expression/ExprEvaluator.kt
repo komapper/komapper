@@ -1,6 +1,6 @@
 package org.komapper.template.expression
 
-import org.komapper.core.data.Value
+import org.komapper.core.Value
 import org.komapper.core.template.expression.ExprLocation
 import kotlin.reflect.KClass
 import kotlin.reflect.KFunction

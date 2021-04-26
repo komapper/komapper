@@ -1,8 +1,8 @@
 package org.komapper.core.dsl.builder
 
 import org.komapper.core.Dialect
-import org.komapper.core.data.Statement
-import org.komapper.core.data.StatementBuffer
+import org.komapper.core.Statement
+import org.komapper.core.StatementBuffer
 import org.komapper.core.dsl.context.SqlUpdateContext
 import org.komapper.core.dsl.element.Criterion
 import org.komapper.core.dsl.element.Operand

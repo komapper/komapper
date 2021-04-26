@@ -1,12 +1,11 @@
 package org.komapper.jdbc.mysql
 
 import org.komapper.core.Dialect
-import org.komapper.core.data.Statement
-import org.komapper.core.data.StatementBuffer
-import org.komapper.core.data.Value
+import org.komapper.core.Statement
+import org.komapper.core.StatementBuffer
+import org.komapper.core.Value
 import org.komapper.core.dsl.builder.AliasManager
 import org.komapper.core.dsl.builder.BuilderSupport
-import org.komapper.core.dsl.builder.EntityMultipleUpsertStatementBuilder
 import org.komapper.core.dsl.builder.EntityUpsertStatementBuilder
 import org.komapper.core.dsl.builder.TableNameType
 import org.komapper.core.dsl.context.DuplicateKeyType
@@ -17,12 +16,11 @@ import org.komapper.core.dsl.expression.TableExpression
 import org.komapper.core.dsl.metamodel.Assignment
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 
-class MySqlEntityMultipleUpsertStatementBuilder<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+class MySqlEntityUpsertStatementBuilder<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     private val dialect: Dialect,
     private val context: EntityUpsertContext<ENTITY, ID, META>,
     private val entities: List<ENTITY>
-) : EntityUpsertStatementBuilder<ENTITY>,
-    EntityMultipleUpsertStatementBuilder<ENTITY> {
+) : EntityUpsertStatementBuilder<ENTITY> {
 
     private val target = context.target
     private val excluded = context.excluded

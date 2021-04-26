@@ -1,6 +1,6 @@
 package org.komapper.template.expression
 
-import org.komapper.core.data.Value
+import org.komapper.core.Value
 
 class ExprContext(val valueMap: Map<String, Value>, val functionExtensions: ExprBuiltinFunctionExtensions) {
     constructor(

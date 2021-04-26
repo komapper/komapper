@@ -2,7 +2,7 @@ package org.komapper.core.dsl.query
 
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.SqlExecutor
-import org.komapper.core.data.Statement
+import org.komapper.core.Statement
 import org.komapper.core.dsl.builder.EntityDeleteStatementBuilder
 import org.komapper.core.dsl.context.EntityDeleteContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
@@ -25,7 +25,7 @@ internal class EntityDeleteQuerySupport<ENTITY : Any, ID, META : EntityMetamodel
     }
 
     fun buildStatement(config: DatabaseConfig, entity: ENTITY): Statement {
-        val builder = EntityDeleteStatementBuilder(config.dialect, context, entity, option)
+        val builder = EntityDeleteStatementBuilder(config.dialect, context, option, entity)
         return builder.build()
     }
 }

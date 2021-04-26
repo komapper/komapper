@@ -1,9 +1,9 @@
 package org.komapper.template
 
+import org.komapper.core.Statement
+import org.komapper.core.StatementBuffer
 import org.komapper.core.TemplateStatementBuilder
-import org.komapper.core.data.Statement
-import org.komapper.core.data.StatementBuffer
-import org.komapper.core.data.Value
+import org.komapper.core.Value
 import org.komapper.template.expression.ExprContext
 import org.komapper.template.expression.ExprEvaluator
 import org.komapper.template.expression.ExprException

@@ -1,5 +1,6 @@
 package integration
 
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
@@ -11,7 +12,7 @@ import org.komapper.core.dsl.EntityDsl
 import org.komapper.core.dsl.runQuery
 
 @ExtendWith(Env::class)
-class EntityMultipleInsertQueryTest(private val db: Database) {
+class EntityInsertMultipleQueryTest(private val db: Database) {
 
     @Test
     fun test() {
@@ -21,7 +22,7 @@ class EntityMultipleInsertQueryTest(private val db: Database) {
             Address(17, "STREET 17", 0),
             Address(18, "STREET 18", 0)
         )
-        val ids = db.runQuery { EntityDsl.insertMultiple(a, addressList) }.map { it.addressId }
+        val ids = db.runQuery { EntityDsl.insert(a).multiple(addressList) }.map { it.addressId }
         val list = db.runQuery {
             EntityDsl.from(a).where { a.addressId inList ids }
         }
@@ -36,11 +37,10 @@ class EntityMultipleInsertQueryTest(private val db: Database) {
             IdentityStrategy(null, "BBB"),
             IdentityStrategy(null, "CCC")
         )
-        val ids = db.runQuery { EntityDsl.insertMultiple(i, strategies) }
-        assertEquals(3, ids.size)
-        for (id in ids) {
-            assertNotNull(id)
-        }
+        val results1 = db.runQuery { EntityDsl.insert(i).multiple(strategies) }
+        val results2 = db.runQuery { EntityDsl.from(i).orderBy(i.id) }
+        assertEquals(results1, results2)
+        Assertions.assertTrue(results1.all { it.id != null })
     }
 
     @Test
@@ -51,7 +51,7 @@ class EntityMultipleInsertQueryTest(private val db: Database) {
             Person(2, "B"),
             Person(3, "C")
         )
-        val ids = db.runQuery { EntityDsl.insertMultiple(p, personList) }.map { it.personId }
+        val ids = db.runQuery { EntityDsl.insert(p).multiple(personList) }.map { it.personId }
         val list = db.runQuery { EntityDsl.from(p).where { p.personId inList ids } }
         for (person in list) {
             assertNotNull(person.createdAt)
@@ -64,8 +64,9 @@ class EntityMultipleInsertQueryTest(private val db: Database) {
         val a = Address.alias
         assertThrows<UniqueConstraintException> {
             db.runQuery {
-                EntityDsl.insertMultiple(
-                    a,
+                EntityDsl.insert(
+                    a
+                ).multiple(
                     listOf(
                         Address(16, "STREET 16", 0),
                         Address(17, "STREET 17", 0),
@@ -81,7 +82,7 @@ class EntityMultipleInsertQueryTest(private val db: Database) {
         val d = Department.alias
         val department1 = Department(5, 50, "PLANNING", "TOKYO", 1)
         val department2 = Department(1, 60, "DEVELOPMENT", "KYOTO", 1)
-        val query = EntityDsl.insertMultiple(d, listOf(department1, department2)).onDuplicateKeyUpdate()
+        val query = EntityDsl.insert(d).onDuplicateKeyUpdate().multiple(listOf(department1, department2))
         db.runQuery { query }
         val list = db.runQuery {
             EntityDsl.from(d).where { d.departmentId inList listOf(1, 5) }.orderBy(d.departmentId)
@@ -98,7 +99,7 @@ class EntityMultipleInsertQueryTest(private val db: Database) {
         val d = Department.alias
         val department1 = Department(5, 50, "PLANNING", "TOKYO", 1)
         val department2 = Department(10, 10, "DEVELOPMENT", "KYOTO", 1)
-        val query = EntityDsl.insertMultiple(d, listOf(department1, department2)).onDuplicateKeyUpdate(d.departmentNo)
+        val query = EntityDsl.insert(d).onDuplicateKeyUpdate(d.departmentNo).multiple(listOf(department1, department2))
         db.runQuery { query }
         val list = db.runQuery {
             EntityDsl.from(d).where { d.departmentNo inList listOf(10, 50) }.orderBy(d.departmentNo)
@@ -116,9 +117,9 @@ class EntityMultipleInsertQueryTest(private val db: Database) {
         val department1 = Department(5, 50, "PLANNING", "TOKYO", 1)
         val department2 = Department(1, 10, "DEVELOPMENT", "KYOTO", 1)
         val query =
-            EntityDsl.insertMultiple(d, listOf(department1, department2)).onDuplicateKeyUpdate().set { excluded ->
+            EntityDsl.insert(d).onDuplicateKeyUpdate().set { excluded ->
                 d.departmentName set excluded.departmentName
-            }
+            }.multiple(listOf(department1, department2))
         db.runQuery { query }
         val list = db.runQuery {
             EntityDsl.from(d).where { d.departmentId inList listOf(1, 5) }.orderBy(d.departmentId)
@@ -136,11 +137,11 @@ class EntityMultipleInsertQueryTest(private val db: Database) {
         val department1 = Department(5, 50, "PLANNING", "TOKYO", 1)
         val department2 = Department(10, 10, "DEVELOPMENT", "KYOTO", 1)
         val query =
-            EntityDsl.insertMultiple(d, listOf(department1, department2))
+            EntityDsl.insert(d)
                 .onDuplicateKeyUpdate(d.departmentNo)
                 .set { excluded ->
                     d.departmentName set excluded.departmentName
-                }
+                }.multiple(listOf(department1, department2))
         db.runQuery { query }
         val list = db.runQuery {
             EntityDsl.from(d).where { d.departmentNo inList listOf(10, 50) }.orderBy(d.departmentNo)
@@ -157,7 +158,7 @@ class EntityMultipleInsertQueryTest(private val db: Database) {
         val d = Department.alias
         val department1 = Department(5, 50, "PLANNING", "TOKYO", 1)
         val department2 = Department(1, 60, "DEVELOPMENT", "KYOTO", 1)
-        val query = EntityDsl.insertMultiple(d, listOf(department1, department2)).onDuplicateKeyIgnore()
+        val query = EntityDsl.insert(d).onDuplicateKeyIgnore().multiple(listOf(department1, department2))
         val count = db.runQuery { query }
         assertEquals(1, count)
         val list = db.runQuery {
@@ -175,8 +176,9 @@ class EntityMultipleInsertQueryTest(private val db: Database) {
         val d = Department.alias
         val department1 = Department(5, 50, "PLANNING", "TOKYO", 1)
         val department2 = Department(10, 10, "DEVELOPMENT", "KYOTO", 1)
-        val query = EntityDsl.insertMultiple(d, listOf(department1, department2))
+        val query = EntityDsl.insert(d)
             .onDuplicateKeyIgnore(d.departmentNo)
+            .multiple(listOf(department1, department2))
         val count = db.runQuery { query }
         assertEquals(1, count)
         val list = db.runQuery {
@@ -197,7 +199,7 @@ class EntityMultipleInsertQueryTest(private val db: Database) {
             IdentityStrategy(null, "BBB"),
             IdentityStrategy(null, "CCC")
         )
-        val query = EntityDsl.insertMultiple(i, strategies).onDuplicateKeyUpdate()
+        val query = EntityDsl.insert(i).onDuplicateKeyUpdate().multiple(strategies)
         val count = db.runQuery { query }
         assertEquals(3, count)
     }

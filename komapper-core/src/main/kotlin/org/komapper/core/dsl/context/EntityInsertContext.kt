@@ -16,6 +16,7 @@ data class EntityInsertContext<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, 
         duplicateKeyType: DuplicateKeyType
     ): EntityUpsertContext<ENTITY, ID, META> {
         return EntityUpsertContext(
+            insertContext = this,
             target = target,
             keys = keys.ifEmpty { target.idProperties() },
             duplicateKeyType = duplicateKeyType

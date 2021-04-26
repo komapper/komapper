@@ -4,7 +4,7 @@ import org.komapper.core.DatabaseConfig
 import org.komapper.core.DatabaseConfigHolder
 import org.komapper.core.Dialect
 import org.komapper.core.SqlExecutor
-import org.komapper.core.data.Statement
+import org.komapper.core.Statement
 import org.komapper.core.dsl.builder.EntitySelectStatementBuilder
 import org.komapper.core.dsl.context.EntitySelectContext
 import org.komapper.core.dsl.context.SubqueryContext
@@ -29,6 +29,8 @@ interface EntitySelectQuery<ENTITY : Any> : Subquery<ENTITY> {
         on: OnDeclaration<OTHER_ENTITY>
     ): EntitySelectQuery<ENTITY>
 
+    fun first(declaration: WhereDeclaration): Query<ENTITY>
+    fun firstOrNull(declaration: WhereDeclaration): Query<ENTITY?>
     fun where(declaration: WhereDeclaration): EntitySelectQuery<ENTITY>
     fun orderBy(vararg expressions: ColumnExpression<*>): EntitySelectQuery<ENTITY>
     fun offset(offset: Int): EntitySelectQuery<ENTITY>
@@ -88,6 +90,16 @@ internal data class EntitySelectQueryImpl<ENTITY : Any, ID, META : EntityMetamod
         @Suppress("UNCHECKED_CAST")
         val newContext = context.putAssociator(metamodel1 to metamodel2, associator as Associator<Any, Any>)
         return copy(context = newContext)
+    }
+
+    override fun first(declaration: WhereDeclaration): Query<ENTITY> {
+        val newContext = support.first(declaration)
+        return copy(context = newContext).first()
+    }
+
+    override fun firstOrNull(declaration: WhereDeclaration): Query<ENTITY?> {
+        val newContext = support.first(declaration)
+        return copy(context = newContext).firstOrNull()
     }
 
     override fun where(declaration: WhereDeclaration): EntitySelectQueryImpl<ENTITY, ID, META> {

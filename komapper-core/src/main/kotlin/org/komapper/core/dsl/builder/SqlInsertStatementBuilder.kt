@@ -1,9 +1,9 @@
 package org.komapper.core.dsl.builder
 
 import org.komapper.core.Dialect
-import org.komapper.core.data.Statement
-import org.komapper.core.data.StatementBuffer
-import org.komapper.core.data.Value
+import org.komapper.core.Statement
+import org.komapper.core.StatementBuffer
+import org.komapper.core.Value
 import org.komapper.core.dsl.context.SqlInsertContext
 import org.komapper.core.dsl.context.SubqueryContext
 import org.komapper.core.dsl.element.Values

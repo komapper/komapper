@@ -29,9 +29,9 @@ class DataTypeTest(val db: Database) {
             1,
             AnyPerson("ABC")
         )
-        db.runQuery { EntityDsl.insert(m, data) }
+        db.runQuery { EntityDsl.insert(m).single(data) }
         val data2 = db.runQuery {
-            EntityDsl.first(m) { m.id eq 1 }
+            EntityDsl.from(m).first { m.id eq 1 }
         }
         assertEquals(data, data2)
     }
@@ -40,9 +40,9 @@ class DataTypeTest(val db: Database) {
     fun bigDecimal() {
         val m = BigDecimalTest.alias
         val data = BigDecimalTest(1, BigDecimal.TEN)
-        db.runQuery { EntityDsl.insert(m, data) }
+        db.runQuery { EntityDsl.insert(m).single(data) }
         val data2 = db.runQuery {
-            EntityDsl.first(m) { m.id eq 1 }
+            EntityDsl.from(m).first { m.id eq 1 }
         }
         assertEquals(data, data2)
     }
@@ -51,9 +51,9 @@ class DataTypeTest(val db: Database) {
     fun bigInteger() {
         val m = BigIntegerTest.alias
         val data = BigIntegerTest(1, BigInteger.TEN)
-        db.runQuery { EntityDsl.insert(m, data) }
+        db.runQuery { EntityDsl.insert(m).single(data) }
         val data2 = db.runQuery {
-            EntityDsl.first(m) { m.id eq 1 }
+            EntityDsl.from(m).first { m.id eq 1 }
         }
         assertEquals(data, data2)
     }
@@ -62,9 +62,9 @@ class DataTypeTest(val db: Database) {
     fun boolean() {
         val m = BooleanTest.alias
         val data = BooleanTest(1, true)
-        db.runQuery { EntityDsl.insert(m, data) }
+        db.runQuery { EntityDsl.insert(m).single(data) }
         val data2 = db.runQuery {
-            EntityDsl.first(m) { m.id eq 1 }
+            EntityDsl.from(m).first { m.id eq 1 }
         }
         assertEquals(data, data2)
     }
@@ -73,9 +73,9 @@ class DataTypeTest(val db: Database) {
     fun byte() {
         val m = ByteTest.alias
         val data = ByteTest(1, 10)
-        db.runQuery { EntityDsl.insert(m, data) }
+        db.runQuery { EntityDsl.insert(m).single(data) }
         val data2 = db.runQuery {
-            EntityDsl.first(m) { m.id eq 1 }
+            EntityDsl.from(m).first { m.id eq 1 }
         }
         assertEquals(data, data2)
     }
@@ -84,9 +84,9 @@ class DataTypeTest(val db: Database) {
     fun byteArray() {
         val m = ByteArrayTest.alias
         val data = ByteArrayTest(1, byteArrayOf(10, 20, 30))
-        db.runQuery { EntityDsl.insert(m, data) }
+        db.runQuery { EntityDsl.insert(m).single(data) }
         val data2 = db.runQuery {
-            EntityDsl.first(m) { m.id eq 1 }
+            EntityDsl.from(m).first { m.id eq 1 }
         }
         assertEquals(data.id, data2.id)
         Assertions.assertArrayEquals(data.value, data2.value)
@@ -96,9 +96,9 @@ class DataTypeTest(val db: Database) {
     fun double() {
         val m = DoubleTest.alias
         val data = DoubleTest(1, 10.0)
-        db.runQuery { EntityDsl.insert(m, data) }
+        db.runQuery { EntityDsl.insert(m).single(data) }
         val data2 = db.runQuery {
-            EntityDsl.first(m) { m.id eq 1 }
+            EntityDsl.from(m).first { m.id eq 1 }
         }
         assertEquals(data, data2)
     }
@@ -107,9 +107,9 @@ class DataTypeTest(val db: Database) {
     fun float() {
         val m = FloatTest.alias
         val data = FloatTest(1, 10.0f)
-        db.runQuery { EntityDsl.insert(m, data) }
+        db.runQuery { EntityDsl.insert(m).single(data) }
         val data2 = db.runQuery {
-            EntityDsl.first(m) { m.id eq 1 }
+            EntityDsl.from(m).first { m.id eq 1 }
         }
         assertEquals(data, data2)
     }
@@ -118,9 +118,9 @@ class DataTypeTest(val db: Database) {
     fun int() {
         val m = IntTest.alias
         val data = IntTest(1, 10)
-        db.runQuery { EntityDsl.insert(m, data) }
+        db.runQuery { EntityDsl.insert(m).single(data) }
         val data2 = db.runQuery {
-            EntityDsl.first(m) { m.id eq 1 }
+            EntityDsl.from(m).first { m.id eq 1 }
         }
         assertEquals(data, data2)
     }
@@ -132,9 +132,9 @@ class DataTypeTest(val db: Database) {
             1,
             LocalDateTime.of(2019, 6, 1, 12, 11, 10)
         )
-        db.runQuery { EntityDsl.insert(m, data) }
+        db.runQuery { EntityDsl.insert(m).single(data) }
         val data2 = db.runQuery {
-            EntityDsl.first(m) { m.id eq 1 }
+            EntityDsl.from(m).first { m.id eq 1 }
         }
         assertEquals(data, data2)
     }
@@ -146,9 +146,9 @@ class DataTypeTest(val db: Database) {
             1,
             LocalDate.of(2019, 6, 1)
         )
-        db.runQuery { EntityDsl.insert(m, data) }
+        db.runQuery { EntityDsl.insert(m).single(data) }
         val data2 = db.runQuery {
-            EntityDsl.first(m) { m.id eq 1 }
+            EntityDsl.from(m).first { m.id eq 1 }
         }
         assertEquals(data, data2)
     }
@@ -157,9 +157,9 @@ class DataTypeTest(val db: Database) {
     fun localTime() {
         val m = LocalTimeTest.alias
         val data = LocalTimeTest(1, LocalTime.of(12, 11, 10))
-        db.runQuery { EntityDsl.insert(m, data) }
+        db.runQuery { EntityDsl.insert(m).single(data) }
         val data2 = db.runQuery {
-            EntityDsl.first(m) { m.id eq 1 }
+            EntityDsl.from(m).first { m.id eq 1 }
         }
         assertEquals(data, data2)
     }
@@ -168,9 +168,9 @@ class DataTypeTest(val db: Database) {
     fun long() {
         val m = LongTest.alias
         val data = LongTest(1, 10L)
-        db.runQuery { EntityDsl.insert(m, data) }
+        db.runQuery { EntityDsl.insert(m).single(data) }
         val data2 = db.runQuery {
-            EntityDsl.first(m) { m.id eq 1 }
+            EntityDsl.from(m).first { m.id eq 1 }
         }
         assertEquals(data, data2)
     }
@@ -183,9 +183,9 @@ class DataTypeTest(val db: Database) {
         val offset = ZoneOffset.ofHours(9)
         val value = OffsetDateTime.of(dateTime, offset)
         val data = OffsetDateTimeTest(1, value)
-        db.runQuery { EntityDsl.insert(m, data) }
+        db.runQuery { EntityDsl.insert(m).single(data) }
         val data2 = db.runQuery {
-            EntityDsl.first(m) { m.id eq 1 }
+            EntityDsl.from(m).first { m.id eq 1 }
         }
         assertEquals(data, data2)
     }
@@ -198,9 +198,9 @@ class DataTypeTest(val db: Database) {
         val offset = ZoneOffset.ofHours(9)
         val value = OffsetDateTime.of(dateTime, offset)
         val data = OffsetDateTimeTest(1, value)
-        db.runQuery { EntityDsl.insert(m, data) }
+        db.runQuery { EntityDsl.insert(m).single(data) }
         val data2 = db.runQuery {
-            EntityDsl.first(m) { m.id eq 1 }
+            EntityDsl.from(m).first { m.id eq 1 }
         }
         assertNotNull(data2)
     }
@@ -209,9 +209,9 @@ class DataTypeTest(val db: Database) {
     fun short() {
         val m = ShortTest.alias
         val data = ShortTest(1, 10)
-        db.runQuery { EntityDsl.insert(m, data) }
+        db.runQuery { EntityDsl.insert(m).single(data) }
         val data2 = db.runQuery {
-            EntityDsl.first(m) { m.id eq 1 }
+            EntityDsl.from(m).first { m.id eq 1 }
         }
         assertEquals(data, data2)
     }
@@ -220,9 +220,9 @@ class DataTypeTest(val db: Database) {
     fun string() {
         val m = StringTest.alias
         val data = StringTest(1, "ABC")
-        db.runQuery { EntityDsl.insert(m, data) }
+        db.runQuery { EntityDsl.insert(m).single(data) }
         val data2 = db.runQuery {
-            EntityDsl.first(m) { m.id eq 1 }
+            EntityDsl.from(m).first { m.id eq 1 }
         }
         assertEquals(data, data2)
     }
@@ -239,9 +239,9 @@ class DataTypeTest(val db: Database) {
                 """.trimIndent()
             )
         )
-        db.runQuery { EntityDsl.insert(m, data) }
+        db.runQuery { EntityDsl.insert(m).single(data) }
         val data2 = db.runQuery {
-            EntityDsl.first(m) { m.id eq 1 }
+            EntityDsl.from(m).first { m.id eq 1 }
         }
         assertEquals(data, data2)
 

@@ -1,7 +1,24 @@
 package org.komapper.core.dsl.query
 
 import org.komapper.core.OptimisticLockException
+import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.option.VersionOption
+
+internal fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>
+EntityMetamodel<ENTITY, ID, META>.checkIdValueNotNull(entity: ENTITY) {
+    this.idProperties().forEach { p ->
+        p.getter(entity) ?: error("The id value must not null. name=${p.name}")
+    }
+}
+
+internal fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>
+EntityMetamodel<ENTITY, ID, META>.checkIdValueNotNull(entities: List<ENTITY>) {
+    entities.mapIndexed { index, entity ->
+        this.idProperties().forEach { p ->
+            p.getter(entity) ?: error("The id value must not null. index=$index, name=${p.name}")
+        }
+    }
+}
 
 internal fun checkOptimisticLock(
     option: VersionOption,

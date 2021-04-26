@@ -4,7 +4,7 @@ import org.komapper.core.DatabaseConfig
 import org.komapper.core.DatabaseConfigHolder
 import org.komapper.core.Dialect
 import org.komapper.core.SqlExecutor
-import org.komapper.core.data.Statement
+import org.komapper.core.Statement
 import org.komapper.core.dsl.builder.SqlSelectStatementBuilder
 import org.komapper.core.dsl.context.SqlSelectContext
 import org.komapper.core.dsl.context.SqlSetOperationContext
@@ -34,6 +34,8 @@ interface SqlSelectQuery<ENTITY : Any> : Subquery<ENTITY> {
         on: OnDeclaration<OTHER_ENTITY>
     ): SqlSelectQuery<ENTITY>
 
+    fun first(declaration: WhereDeclaration): Query<ENTITY>
+    fun firstOrNull(declaration: WhereDeclaration): Query<ENTITY?>
     fun where(declaration: WhereDeclaration): SqlSelectQuery<ENTITY>
     fun groupBy(vararg expressions: ColumnExpression<*>): SqlSelectQuery<ENTITY>
     fun having(declaration: HavingDeclaration): SqlSelectQuery<ENTITY>
@@ -121,6 +123,16 @@ internal data class SqlSelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<
     ): SqlSelectQueryImpl<ENTITY, ID, META> {
         val newContext = support.leftJoin(metamodel, on)
         return copy(context = newContext)
+    }
+
+    override fun first(declaration: WhereDeclaration): Query<ENTITY> {
+        val newContext = support.first(declaration)
+        return copy(context = newContext).first()
+    }
+
+    override fun firstOrNull(declaration: WhereDeclaration): Query<ENTITY?> {
+        val newContext = support.first(declaration)
+        return copy(context = newContext).firstOrNull()
     }
 
     override fun where(declaration: WhereDeclaration): SqlSelectQueryImpl<ENTITY, ID, META> {

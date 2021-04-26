@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import org.komapper.core.data.Value
+import org.komapper.core.Value
 import org.komapper.template.expression.DefaultExprEnvironment
 import org.komapper.template.expression.DefaultExprEvaluator
 import org.komapper.template.expression.ExprContext

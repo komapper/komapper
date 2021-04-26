@@ -8,10 +8,10 @@ import org.komapper.core.DatabaseSession
 import org.komapper.core.DefaultClockProvider
 import org.komapper.core.DefaultDataFactory
 import org.komapper.core.Dialect
+import org.komapper.core.JdbcOption
 import org.komapper.core.Logger
 import org.komapper.core.StdOutSqlLogger
 import org.komapper.core.TemplateStatementBuilder
-import org.komapper.core.data.JdbcOption
 import org.komapper.core.jdbc.DataType
 import org.komapper.core.spi.LoggerFactory
 import org.komapper.core.spi.TemplateStatementBuilderFactory

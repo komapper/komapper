@@ -1,9 +1,9 @@
 package org.komapper.core.dsl.builder
 
 import org.komapper.core.Dialect
-import org.komapper.core.data.Statement
-import org.komapper.core.data.StatementBuffer
-import org.komapper.core.data.Value
+import org.komapper.core.Statement
+import org.komapper.core.StatementBuffer
+import org.komapper.core.Value
 import org.komapper.core.dsl.context.EntityDeleteContext
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.expression.TableExpression
@@ -13,8 +13,8 @@ import org.komapper.core.dsl.option.VersionOption
 internal class EntityDeleteStatementBuilder<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     val dialect: Dialect,
     val context: EntityDeleteContext<ENTITY, ID, META>,
-    val entity: ENTITY,
-    val option: VersionOption
+    val option: VersionOption,
+    val entity: ENTITY
 ) {
 
     private val aliasManager = DefaultAliasManager(context)

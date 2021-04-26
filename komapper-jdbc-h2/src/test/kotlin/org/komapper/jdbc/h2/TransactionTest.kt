@@ -90,7 +90,7 @@ class TransactionTest {
         val query = EntityDsl.from(a).where { a.addressId eq 15 }
         db.transaction.required {
             val address = db.runQuery { query.first() }
-            db.runQuery { EntityDsl.delete(a, address) }
+            db.runQuery { EntityDsl.delete(a).single(address) }
         }
         db.transaction.required {
             val address = db.runQuery { query.firstOrNull() }
@@ -105,7 +105,7 @@ class TransactionTest {
         try {
             db.transaction.required {
                 val address = db.runQuery { query.first() }
-                db.runQuery { EntityDsl.delete(a, address) }
+                db.runQuery { EntityDsl.delete(a).single(address) }
                 throw Exception()
             }
         } catch (ignored: Exception) {
@@ -122,7 +122,7 @@ class TransactionTest {
         val query = EntityDsl.from(a).where { a.addressId eq 15 }
         db.transaction.required {
             val address = db.runQuery { query.first() }
-            db.runQuery { EntityDsl.delete(a, address) }
+            db.runQuery { EntityDsl.delete(a).single(address) }
             assertFalse(isRollbackOnly())
             setRollbackOnly()
             assertTrue(isRollbackOnly())
@@ -139,7 +139,7 @@ class TransactionTest {
         val query = EntityDsl.from(a).where { a.addressId eq 15 }
         db.transaction.required(TransactionIsolationLevel.SERIALIZABLE) {
             val address = db.runQuery { query.first() }
-            db.runQuery { EntityDsl.delete(a, address) }
+            db.runQuery { EntityDsl.delete(a).single(address) }
         }
         db.transaction.required {
             val address = db.runQuery { query.firstOrNull() }
@@ -153,7 +153,7 @@ class TransactionTest {
         val query = EntityDsl.from(a).where { a.addressId eq 15 }
         db.transaction.required {
             val address = db.runQuery { query.first() }
-            db.runQuery { EntityDsl.delete(a, address) }
+            db.runQuery { EntityDsl.delete(a).single(address) }
             required {
                 val address2 = db.runQuery { query.firstOrNull() }
                 assertNull(address2)
@@ -171,7 +171,7 @@ class TransactionTest {
         val query = EntityDsl.from(a).where { a.addressId eq 15 }
         db.transaction.requiresNew {
             val address = db.runQuery { query.first() }
-            db.runQuery { EntityDsl.delete(a, address) }
+            db.runQuery { EntityDsl.delete(a).single(address) }
             val address2 = db.runQuery { query.firstOrNull() }
             assertNull(address2)
         }
@@ -187,7 +187,7 @@ class TransactionTest {
         val query = EntityDsl.from(a).where { a.addressId eq 15 }
         db.transaction.required {
             val address = db.runQuery { query.first() }
-            db.runQuery { EntityDsl.delete(a, address) }
+            db.runQuery { EntityDsl.delete(a).single(address) }
             requiresNew {
                 val address2 = db.runQuery { query.firstOrNull() }
                 assertNotNull(address2)
@@ -205,7 +205,7 @@ class TransactionTest {
         val query = EntityDsl.from(a).where { a.addressId eq 15 }
         db.transaction {
             val address = db.runQuery { query.first() }
-            db.runQuery { EntityDsl.delete(a, address) }
+            db.runQuery { EntityDsl.delete(a).single(address) }
         }
         db.transaction {
             val address = db.runQuery { query.firstOrNull() }
@@ -225,9 +225,9 @@ class TransactionTest {
             val meta = ArrayTest.alias
             val array = db.dataFactory.createArrayOf("INTEGER", listOf(10, 20, 30))
             val data = ArrayTest(1, array)
-            db.runQuery { EntityDsl.insert(meta, data) }
+            db.runQuery { EntityDsl.insert(meta).single(data) }
             val data2 = db.runQuery {
-                EntityDsl.first(meta) { meta.id eq 1 }
+                EntityDsl.from(meta).first { meta.id eq 1 }
             }
             assertEquals(data.id, data2.id)
             assertArrayEquals(data.value.array as Array<*>, data2.value.array as Array<*>)
@@ -248,9 +248,9 @@ class TransactionTest {
             val bytes = byteArrayOf(10, 20, 30)
             blob.setBytes(1, bytes)
             val data = BlobTest(1, blob)
-            db.runQuery { EntityDsl.insert(m, data) }
+            db.runQuery { EntityDsl.insert(m).single(data) }
             val data2 = db.runQuery {
-                EntityDsl.first(m) { m.id eq 1 }
+                EntityDsl.from(m).first { m.id eq 1 }
             }
             assertEquals(data.id, data2.id)
             assertArrayEquals(data.value.getBytes(1, 3), data2.value.getBytes(1, 3))
@@ -270,9 +270,9 @@ class TransactionTest {
             val clob = db.dataFactory.createClob()
             clob.setString(1, "ABC")
             val data = ClobTest(1, clob)
-            db.runQuery { EntityDsl.insert(m, data) }
+            db.runQuery { EntityDsl.insert(m).single(data) }
             val data2 = db.runQuery {
-                EntityDsl.first(m) {
+                EntityDsl.from(m).first {
                     m.id to 1
                 }
             }
@@ -294,9 +294,9 @@ class TransactionTest {
             val nclob = db.dataFactory.createNClob()
             nclob.setString(1, "ABC")
             val data = NClobTest(1, nclob)
-            db.runQuery { EntityDsl.insert(m, data) }
+            db.runQuery { EntityDsl.insert(m).single(data) }
             val data2 = db.runQuery {
-                EntityDsl.first(m) {
+                EntityDsl.from(m).first {
                     m.id eq 1
                 }
             }
@@ -318,9 +318,9 @@ class TransactionTest {
             val sqlXml = db.dataFactory.createSQLXML()
             sqlXml.string = """<xml a="v">Text</xml>"""
             val data = SqlXmlTest(1, sqlXml)
-            db.runQuery { EntityDsl.insert(m, data) }
+            db.runQuery { EntityDsl.insert(m).single(data) }
             val data2 = db.runQuery {
-                EntityDsl.first(m) { m.id eq 1 }
+                EntityDsl.from(m).first { m.id eq 1 }
             }
             assertEquals(data.id, data2.id)
             assertEquals(data.value.string, data2.value.string)

@@ -47,7 +47,7 @@ class SqlInsertQueryTest(private val db: Database) {
         assertEquals(1, count)
         assertNull(key)
 
-        val employee = db.runQuery { SqlDsl.first(e) { e.employeeId eq 99 } }
+        val employee = db.runQuery { SqlDsl.from(e).first { e.employeeId eq 99 } }
         assertNull(employee.managerId)
     }
 

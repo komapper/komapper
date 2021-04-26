@@ -107,7 +107,7 @@ class EntitySelectQueryWhereTest(private val db: Database) {
     @Test
     fun like_escape() {
         val a = Address.alias
-        val insertQuery = EntityDsl.insert(a, Address(16, "\\STREET _16%", 1))
+        val insertQuery = EntityDsl.insert(a).single(Address(16, "\\STREET _16%", 1))
         val selectQuery = EntityDsl.from(a).where {
             a.street like escape("\\S") + text("%") + escape("T _16%")
         }.orderBy(a.addressId)
@@ -120,7 +120,7 @@ class EntitySelectQueryWhereTest(private val db: Database) {
     @Test
     fun like_escapeWithEscapeSequence() {
         val a = Address.alias
-        val insertQuery = EntityDsl.insert(a, Address(16, "\\STREET _16%", 1))
+        val insertQuery = EntityDsl.insert(a).single(Address(16, "\\STREET _16%", 1))
         val selectQuery = EntityDsl.from(a).where {
             a.street like escape("\\S") + text("%") + escape("T _16%")
         }.orderBy(a.addressId).option {
@@ -179,7 +179,7 @@ class EntitySelectQueryWhereTest(private val db: Database) {
     @Test
     fun notLike_escape() {
         val a = Address.alias
-        val insertQuery = EntityDsl.insert(a, Address(16, "\\STREET _16%", 1))
+        val insertQuery = EntityDsl.insert(a).single(Address(16, "\\STREET _16%", 1))
         val selectQuery = EntityDsl.from(a).where {
             a.street notLike escape("\\S") + text("%") + escape("T _16%")
         }.orderBy(a.addressId)
@@ -203,7 +203,7 @@ class EntitySelectQueryWhereTest(private val db: Database) {
     @Test
     fun startsWith_escape() {
         val a = Address.alias
-        val insertQuery = EntityDsl.insert(a, Address(16, "STREET 1%6", 1))
+        val insertQuery = EntityDsl.insert(a).single(Address(16, "STREET 1%6", 1))
         val selectQuery = EntityDsl.from(a).where {
             a.street startsWith "STREET 1%"
         }.orderBy(a.addressId)

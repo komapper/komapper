@@ -1,6 +1,6 @@
 package org.komapper.template.expression
 
-import org.komapper.core.data.Value
+import org.komapper.core.Value
 import kotlin.reflect.KFunction
 import kotlin.reflect.KProperty
 import kotlin.reflect.jvm.isAccessible

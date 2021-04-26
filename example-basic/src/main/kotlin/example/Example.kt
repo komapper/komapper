@@ -50,29 +50,29 @@ fun main() {
 
         // CREATE
         val newAddress = db.runQuery {
-            EntityDsl.insert(a, Address(street = "street A"))
+            EntityDsl.insert(a).single(Address(street = "street A"))
         }
 
         // READ: select by id
         val address1 = db.runQuery {
-            EntityDsl.first(a) { a.id eq newAddress.id }
+            EntityDsl.from(a).first { a.id eq newAddress.id }
         }
         println("address1=$address1")
 
         // UPDATE
         db.runQuery {
-            EntityDsl.update(a, address1.copy(street = "street B"))
+            EntityDsl.update(a).single(address1.copy(street = "street B"))
         }
 
         // READ: select by street
         val address2 = db.runQuery {
-            EntityDsl.first(a) { a.street eq "street B" }
+            EntityDsl.from(a).first { a.street eq "street B" }
         }
         println("address2=$address2")
 
         // DELETE
         db.runQuery {
-            EntityDsl.delete(a, address2)
+            EntityDsl.delete(a).single(address2)
         }
 
         // READ: select all

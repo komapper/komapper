@@ -2,40 +2,19 @@ package org.komapper.core.dsl.query
 
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.DatabaseConfigHolder
-import org.komapper.core.data.Statement
+import org.komapper.core.Statement
 import org.komapper.core.dsl.context.EntityUpdateContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
-import org.komapper.core.dsl.metamodel.PropertyMetamodel
 import org.komapper.core.dsl.option.EntityBatchUpdateOption
 
-interface EntityBatchUpdateQuery<ENTITY : Any> : Query<List<ENTITY>> {
-    fun option(configurator: (EntityBatchUpdateOption) -> EntityBatchUpdateOption): EntityBatchUpdateQuery<ENTITY>
-    fun include(vararg properties: PropertyMetamodel<ENTITY, *>): Query<List<ENTITY>>
-    fun exclude(vararg properties: PropertyMetamodel<ENTITY, *>): Query<List<ENTITY>>
-}
-
-internal data class EntityBatchUpdateQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+internal data class EntityUpdateBatchQuery<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityUpdateContext<ENTITY, ID, META>,
     private val entities: List<ENTITY>,
     private val option: EntityBatchUpdateOption = EntityBatchUpdateOption()
 ) :
-    EntityBatchUpdateQuery<ENTITY> {
+    Query<List<ENTITY>> {
 
     private val support: EntityUpdateQuerySupport<ENTITY, ID, META> = EntityUpdateQuerySupport(context, option)
-
-    override fun option(configurator: (EntityBatchUpdateOption) -> EntityBatchUpdateOption): EntityBatchUpdateQueryImpl<ENTITY, ID, META> {
-        return copy(option = configurator(option))
-    }
-
-    override fun include(vararg properties: PropertyMetamodel<ENTITY, *>): Query<List<ENTITY>> {
-        val newContext = support.include(properties.toList())
-        return copy(context = newContext)
-    }
-
-    override fun exclude(vararg properties: PropertyMetamodel<ENTITY, *>): Query<List<ENTITY>> {
-        val newContext = support.exclude(properties.toList())
-        return copy(context = newContext)
-    }
 
     override fun run(holder: DatabaseConfigHolder): List<ENTITY> {
         if (entities.isEmpty()) return emptyList()

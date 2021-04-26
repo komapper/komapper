@@ -1,14 +1,10 @@
 package org.komapper.core
 
 import org.komapper.core.dsl.builder.DryRunSchemaStatementBuilder
-import org.komapper.core.dsl.builder.EntityMultipleInsertStatementBuilder
-import org.komapper.core.dsl.builder.EntityMultipleInsertStatementBuilderImpl
-import org.komapper.core.dsl.builder.EntityMultipleUpsertStatementBuilder
 import org.komapper.core.dsl.builder.EntityUpsertStatementBuilder
 import org.komapper.core.dsl.builder.OffsetLimitStatementBuilder
 import org.komapper.core.dsl.builder.OffsetLimitStatementBuilderImpl
 import org.komapper.core.dsl.builder.SchemaStatementBuilder
-import org.komapper.core.dsl.context.EntityInsertContext
 import org.komapper.core.dsl.context.EntityUpsertContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.jdbc.AnyType
@@ -40,18 +36,8 @@ interface Dialect {
 
     fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> getEntityUpsertStatementBuilder(
         context: EntityUpsertContext<ENTITY, ID, META>,
-        entity: ENTITY
+        entities: List<ENTITY>
     ): EntityUpsertStatementBuilder<ENTITY>
-
-    fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> getEntityMultipleInsertStatementBuilder(
-        context: EntityInsertContext<ENTITY, ID, META>,
-        entities: List<ENTITY>
-    ): EntityMultipleInsertStatementBuilder<ENTITY>
-
-    fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> getEntityMultipleUpsertStatementBuilder(
-        context: EntityUpsertContext<ENTITY, ID, META>,
-        entities: List<ENTITY>
-    ): EntityMultipleUpsertStatementBuilder<ENTITY>
 
     companion object {
         private val jdbcUrlPattern = Pattern.compile("^jdbc:([^:]*):.*")
@@ -139,13 +125,6 @@ abstract class AbstractDialect protected constructor(dataTypes: Set<DataType<*>>
     override fun getOffsetLimitStatementBuilder(offset: Int, limit: Int): OffsetLimitStatementBuilder {
         return OffsetLimitStatementBuilderImpl(this, offset, limit)
     }
-
-    override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> getEntityMultipleInsertStatementBuilder(
-        context: EntityInsertContext<ENTITY, ID, META>,
-        entities: List<ENTITY>
-    ): EntityMultipleInsertStatementBuilder<ENTITY> {
-        return EntityMultipleInsertStatementBuilderImpl(this, context, entities)
-    }
 }
 
 internal object DryRunDialect : AbstractDialect() {
@@ -168,15 +147,8 @@ internal object DryRunDialect : AbstractDialect() {
 
     override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> getEntityUpsertStatementBuilder(
         context: EntityUpsertContext<ENTITY, ID, META>,
-        entity: ENTITY
-    ): EntityUpsertStatementBuilder<ENTITY> {
-        throw UnsupportedOperationException()
-    }
-
-    override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> getEntityMultipleUpsertStatementBuilder(
-        context: EntityUpsertContext<ENTITY, ID, META>,
         entities: List<ENTITY>
-    ): EntityMultipleUpsertStatementBuilder<ENTITY> {
+    ): EntityUpsertStatementBuilder<ENTITY> {
         throw UnsupportedOperationException()
     }
 }

@@ -11,7 +11,7 @@ import org.komapper.core.dsl.EntityDsl
 import org.komapper.core.dsl.runQuery
 
 @ExtendWith(Env::class)
-class EntityBatchDeleteQueryTest(private val db: Database) {
+class EntityDeleteBatchQueryTest(private val db: Database) {
 
     @Test
     fun test() {
@@ -22,11 +22,11 @@ class EntityBatchDeleteQueryTest(private val db: Database) {
             Address(18, "STREET 18", 0)
         )
         for (address in addressList) {
-            db.runQuery { EntityDsl.insert(a, address) }
+            db.runQuery { EntityDsl.insert(a).single(address) }
         }
         val query = EntityDsl.from(a).where { a.addressId inList listOf(16, 17, 18) }
         assertEquals(3, db.runQuery { query }.size)
-        db.runQuery { EntityDsl.deleteBatch(a, addressList) }
+        db.runQuery { EntityDsl.delete(a).batch(addressList) }
         assertTrue(db.runQuery { query }.isEmpty())
     }
 
@@ -39,14 +39,13 @@ class EntityBatchDeleteQueryTest(private val db: Database) {
             Address(18, "STREET 18", 0)
         )
         for (address in addressList) {
-            db.runQuery { EntityDsl.insert(a, address) }
+            db.runQuery { EntityDsl.insert(a).single(address) }
         }
         val query = EntityDsl.from(a).where { a.addressId inList listOf(16, 17, 18) }
         assertEquals(3, db.runQuery { query }.size)
         val ex = assertThrows<OptimisticLockException> {
             db.runQuery {
-                EntityDsl.deleteBatch(
-                    a,
+                EntityDsl.delete(a).batch(
                     listOf(
                         addressList[0],
                         addressList[1],
@@ -67,21 +66,22 @@ class EntityBatchDeleteQueryTest(private val db: Database) {
             Address(18, "STREET 18", 0)
         )
         for (address in addressList) {
-            db.runQuery { EntityDsl.insert(a, address) }
+            db.runQuery { EntityDsl.insert(a).single(address) }
         }
         val query = EntityDsl.from(a).where { a.addressId inList listOf(16, 17, 18) }
         assertEquals(3, db.runQuery { query }.size)
         db.runQuery {
-            EntityDsl.deleteBatch(
-                a,
-                listOf(
-                    addressList[0],
-                    addressList[1],
-                    addressList[2].copy(version = 1)
+            EntityDsl.delete(a)
+                .option {
+                    it.copy(suppressOptimisticLockException = true)
+                }
+                .batch(
+                    listOf(
+                        addressList[0],
+                        addressList[1],
+                        addressList[2].copy(version = 1)
+                    )
                 )
-            ).option {
-                it.copy(suppressOptimisticLockException = true)
-            }
         }
     }
 }

@@ -3,7 +3,7 @@ package org.komapper.core.dsl.query
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.DatabaseConfigHolder
 import org.komapper.core.SqlExecutor
-import org.komapper.core.data.Statement
+import org.komapper.core.Statement
 import org.komapper.core.dsl.builder.SqlInsertStatementBuilder
 import org.komapper.core.dsl.context.SqlInsertContext
 import org.komapper.core.dsl.element.Values
@@ -62,20 +62,5 @@ internal data class SqlInsertQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<
     private fun buildStatement(config: DatabaseConfig): Statement {
         val builder = SqlInsertStatementBuilder(config.dialect, context)
         return builder.build()
-    }
-}
-
-interface SqlInsertQueryBuilder<T : Any> {
-    fun values(declaration: ValuesDeclaration<T>): SqlInsertQuery<T>
-    fun select(block: () -> Subquery<T>): SqlInsertQuery<T>
-}
-
-internal class SqlInsertQueryBuilderImpl<T : Any>(val query: SqlInsertQuery<T>) : SqlInsertQueryBuilder<T> {
-    override fun values(declaration: ValuesDeclaration<T>): SqlInsertQuery<T> {
-        return query.values(declaration)
-    }
-
-    override fun select(block: () -> Subquery<T>): SqlInsertQuery<T> {
-        return query.select(block)
     }
 }

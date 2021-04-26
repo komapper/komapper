@@ -32,7 +32,7 @@ class Application(private val database: Database) {
         val message = Message(text = text)
         return database.runQuery {
             val m = Message.alias
-            EntityDsl.insert(m, message)
+            EntityDsl.insert(m).single(message)
         }
     }
 }

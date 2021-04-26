@@ -5,7 +5,6 @@ import org.komapper.core.dsl.context.SqlInsertContext
 import org.komapper.core.dsl.context.SqlSelectContext
 import org.komapper.core.dsl.context.SqlUpdateContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
-import org.komapper.core.dsl.query.Query
 import org.komapper.core.dsl.query.SqlDeleteQuery
 import org.komapper.core.dsl.query.SqlDeleteQueryImpl
 import org.komapper.core.dsl.query.SqlInsertQueryBuilder
@@ -16,29 +15,8 @@ import org.komapper.core.dsl.query.SqlSelectQueryImpl
 import org.komapper.core.dsl.query.SqlUpdateQueryBuilder
 import org.komapper.core.dsl.query.SqlUpdateQueryBuilderImpl
 import org.komapper.core.dsl.query.SqlUpdateQueryImpl
-import org.komapper.core.dsl.scope.WhereDeclaration
 
 object SqlDsl : Dsl {
-
-    fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> first(
-        metamodel: META,
-        declaration: WhereDeclaration
-    ): Query<ENTITY> {
-        return SqlSelectQueryImpl(SqlSelectContext(metamodel))
-            .where(declaration)
-            .limit(1)
-            .first()
-    }
-
-    fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> firstOrNull(
-        metamodel: META,
-        declaration: WhereDeclaration
-    ): Query<ENTITY?> {
-        return SqlSelectQueryImpl(SqlSelectContext(metamodel))
-            .where(declaration)
-            .limit(1)
-            .firstOrNull()
-    }
 
     fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> from(metamodel: META): SqlSelectQuery<ENTITY> {
         return SqlSelectQueryImpl(SqlSelectContext(metamodel))

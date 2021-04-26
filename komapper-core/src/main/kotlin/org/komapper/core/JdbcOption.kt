@@ -1,4 +1,4 @@
-package org.komapper.core.data
+package org.komapper.core
 
 /**
  * @property batchSize the batch size. This value is used for batch commands.

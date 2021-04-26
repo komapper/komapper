@@ -3,7 +3,7 @@ package org.komapper.core.dsl.query
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.DatabaseConfigHolder
 import org.komapper.core.SqlExecutor
-import org.komapper.core.data.Statement
+import org.komapper.core.Statement
 import org.komapper.core.dsl.builder.SqlUpdateStatementBuilder
 import org.komapper.core.dsl.context.SqlUpdateContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
@@ -59,17 +59,5 @@ internal data class SqlUpdateQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<
     private fun buildStatement(config: DatabaseConfig): Statement {
         val builder = SqlUpdateStatementBuilder(config.dialect, context)
         return builder.build()
-    }
-}
-
-interface SqlUpdateQueryBuilder<T : Any> {
-    fun set(declaration: SetDeclaration<T>): SqlUpdateQuery<T>
-}
-
-internal class SqlUpdateQueryBuilderImpl<T : Any>(
-    private val query: SqlUpdateQuery<T>
-) : SqlUpdateQueryBuilder<T> {
-    override fun set(declaration: SetDeclaration<T>): SqlUpdateQuery<T> {
-        return query.set(declaration)
     }
 }
