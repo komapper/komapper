@@ -21,16 +21,19 @@ class Application(private val database: Database) {
 
     @RequestMapping("/")
     fun list(): List<Message> {
-        val m = Message.alias
-        val query = EntityDsl.from(m).orderBy(m.id.desc())
-        return database.runQuery { query }
+        return database.runQuery {
+            val m = Message.alias
+            EntityDsl.from(m).orderBy(m.id.desc())
+        }
     }
 
     @RequestMapping(value = ["/"], params = ["text"])
     fun add(@RequestParam text: String): Message {
         val message = Message(text = text)
-        val query = EntityDsl.insert(Message.alias, message)
-        return database.runQuery { query }
+        return database.runQuery {
+            val m = Message.alias
+            EntityDsl.insert(m, message)
+        }
     }
 }
 
