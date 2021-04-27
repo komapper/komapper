@@ -7,13 +7,17 @@ pluginManagement {
 
 rootProject.name = "komapper"
 
-// CORE and OPTIONAL PLUGIN
+// CORE
 include("komapper-core")
+
+// KSP
+include("komapper-processor")
+
+// OPTIONAL
 include("komapper-annotation")
 include("komapper-template")
 include("komapper-transaction")
 include("komapper-logging-slf4j")
-include("komapper-processor")
 
 // JDBC
 include("komapper-jdbc-h2")
@@ -21,8 +25,8 @@ include("komapper-jdbc-mysql")
 include("komapper-jdbc-postgresql")
 
 // EXTENSION
-include("komapper-extension-spring-boot")
-include("komapper-extension-spring-boot-starter")
+include("komapper-ext-spring-boot")
+include("komapper-ext-spring-boot-starter")
 
 // EXAMPLE
 include("example-basic")

@@ -21,7 +21,7 @@ idea.module {
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation(project(":komapper-extension-spring-boot-starter"))
+    implementation(project(":komapper-ext-spring-boot-starter"))
     implementation(project(":komapper-jdbc-h2"))
     implementation("com.h2database:h2:1.4.200")
     ksp(project(":komapper-processor"))

@@ -58,11 +58,7 @@ subprojects {
     }
 }
 
-configure(
-    subprojects.filter {
-        !it.name.startsWith("example") && !it.name.endsWith("test")
-    }
-) {
+configure(subprojects.filter { it.name.startsWith("komapper") }) {
 
     configure<PublishingExtension> {
         publications {
