@@ -1,7 +1,7 @@
 package org.komapper.core.dsl.query
 
 import org.komapper.core.DatabaseConfig
-import org.komapper.core.SqlExecutor
+import org.komapper.core.JdbcExecutor
 import org.komapper.core.Statement
 import org.komapper.core.dsl.builder.EntityUpdateStatementBuilder
 import org.komapper.core.dsl.context.EntityUpdateContext
@@ -18,8 +18,8 @@ internal class EntityUpdateQuerySupport<ENTITY : Any, ID, META : EntityMetamodel
         return context.target.preUpdate(entity, clock)
     }
 
-    fun <T> update(config: DatabaseConfig, execute: (SqlExecutor) -> T): T {
-        val executor = SqlExecutor(config, option)
+    fun <T> update(config: DatabaseConfig, execute: (JdbcExecutor) -> T): T {
+        val executor = JdbcExecutor(config, option)
         return execute(executor)
     }
 

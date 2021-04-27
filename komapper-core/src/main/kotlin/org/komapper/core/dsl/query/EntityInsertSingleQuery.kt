@@ -10,7 +10,7 @@ import org.komapper.core.dsl.option.EntityInsertOption
 internal data class EntityInsertSingleQuery<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityInsertContext<ENTITY, ID, META>,
     private val entity: ENTITY,
-    private val option: EntityInsertOption = EntityInsertOption()
+    private val option: EntityInsertOption
 ) : Query<ENTITY> {
 
     private val support: EntityInsertQuerySupport<ENTITY, ID, META> = EntityInsertQuerySupport(context, option)

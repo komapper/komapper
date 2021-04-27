@@ -10,7 +10,7 @@ import org.komapper.core.dsl.option.EntityDeleteOption
 internal data class EntityDeleteSingleQuery<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityDeleteContext<ENTITY, ID, META>,
     private val entity: ENTITY,
-    private val option: EntityDeleteOption = EntityDeleteOption()
+    private val option: EntityDeleteOption
 ) : Query<Unit> {
 
     private val support: EntityDeleteQuerySupport<ENTITY, ID, META> = EntityDeleteQuerySupport(context, option)

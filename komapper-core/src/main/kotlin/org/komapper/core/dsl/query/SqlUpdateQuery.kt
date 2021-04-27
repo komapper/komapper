@@ -2,7 +2,7 @@ package org.komapper.core.dsl.query
 
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.DatabaseConfigHolder
-import org.komapper.core.SqlExecutor
+import org.komapper.core.JdbcExecutor
 import org.komapper.core.Statement
 import org.komapper.core.dsl.builder.SqlUpdateStatementBuilder
 import org.komapper.core.dsl.context.SqlUpdateContext
@@ -21,7 +21,7 @@ interface SqlUpdateQuery<ENTITY : Any> : Query<Int> {
 
 internal data class SqlUpdateQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: SqlUpdateContext<ENTITY, ID, META>,
-    private val option: SqlUpdateOption = SqlUpdateOption()
+    private val option: SqlUpdateOption = SqlUpdateOption.default
 ) : SqlUpdateQuery<ENTITY> {
 
     override fun set(declaration: SetDeclaration<ENTITY>): SqlUpdateQueryImpl<ENTITY, ID, META> {
@@ -46,7 +46,7 @@ internal data class SqlUpdateQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<
         }
         val config = holder.config
         val statement = buildStatement(config)
-        val executor = SqlExecutor(config, option)
+        val executor = JdbcExecutor(config, option)
         val (count) = executor.executeUpdate(statement)
         return count
     }

@@ -12,7 +12,7 @@ interface EntityDeleteQueryBuilder<ENTITY : Any> {
 
 internal data class EntityDeleteQueryBuilderImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityDeleteContext<ENTITY, ID, META>,
-    private val option: EntityDeleteOption = EntityDeleteOption()
+    private val option: EntityDeleteOption = EntityDeleteOption.default
 ) :
     EntityDeleteQueryBuilder<ENTITY> {
 

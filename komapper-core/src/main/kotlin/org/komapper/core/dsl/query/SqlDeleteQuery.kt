@@ -2,7 +2,7 @@ package org.komapper.core.dsl.query
 
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.DatabaseConfigHolder
-import org.komapper.core.SqlExecutor
+import org.komapper.core.JdbcExecutor
 import org.komapper.core.Statement
 import org.komapper.core.dsl.builder.SqlDeleteStatementBuilder
 import org.komapper.core.dsl.context.SqlDeleteContext
@@ -18,7 +18,7 @@ interface SqlDeleteQuery : Query<Int> {
 
 internal data class SqlDeleteQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: SqlDeleteContext<ENTITY, ID, META>,
-    private val option: SqlDeleteOption = SqlDeleteOption()
+    private val option: SqlDeleteOption = SqlDeleteOption.default
 ) : SqlDeleteQuery {
 
     override fun where(declaration: WhereDeclaration): SqlDeleteQueryImpl<ENTITY, ID, META> {
@@ -37,7 +37,7 @@ internal data class SqlDeleteQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<
         }
         val config = holder.config
         val statement = buildStatement(config, context)
-        val executor = SqlExecutor(config, option)
+        val executor = JdbcExecutor(config, option)
         val (count) = executor.executeUpdate(statement)
         return count
     }

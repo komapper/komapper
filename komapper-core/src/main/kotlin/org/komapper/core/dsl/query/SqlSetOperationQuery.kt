@@ -3,7 +3,7 @@ package org.komapper.core.dsl.query
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.DatabaseConfigHolder
 import org.komapper.core.Dialect
-import org.komapper.core.SqlExecutor
+import org.komapper.core.JdbcExecutor
 import org.komapper.core.Statement
 import org.komapper.core.dsl.builder.DefaultAliasManager
 import org.komapper.core.dsl.builder.SqlSetOperationStatementBuilder
@@ -23,7 +23,7 @@ interface SqlSetOperationQuery<T> : Subquery<T> {
 
 internal data class SetOperationQueryImpl<T>(
     private val context: SqlSetOperationContext<T>,
-    private val option: SqlSetOperationOption = SqlSetOperationOption(),
+    private val option: SqlSetOperationOption = SqlSetOperationOption.default,
     private val provider: (Dialect, ResultSet) -> T
 ) : SqlSetOperationQuery<T> {
 
@@ -118,7 +118,7 @@ internal data class SetOperationQueryImpl<T>(
             }
             val config = holder.config
             val statement = buildStatement(config)
-            val executor = SqlExecutor(config, option)
+            val executor = JdbcExecutor(config, option)
             return executor.executeQuery(statement, provider, transformer)
         }
 

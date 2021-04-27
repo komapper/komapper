@@ -3,7 +3,7 @@ package org.komapper.core.dsl.query
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.DatabaseConfigHolder
 import org.komapper.core.Dialect
-import org.komapper.core.SqlExecutor
+import org.komapper.core.JdbcExecutor
 import org.komapper.core.Statement
 import org.komapper.core.dsl.builder.SqlSelectStatementBuilder
 import org.komapper.core.dsl.context.SqlSelectContext
@@ -85,7 +85,7 @@ interface SqlSelectQuery<ENTITY : Any> : Subquery<ENTITY> {
 
 internal data class SqlSelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: SqlSelectContext<ENTITY, ID, META>,
-    private val option: SqlSelectOption = SqlSelectOption()
+    private val option: SqlSelectOption = SqlSelectOption.default
 ) :
     SqlSelectQuery<ENTITY> {
 
@@ -389,7 +389,7 @@ internal data class SqlSelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<
             }
             val config = holder.config
             val statement = buildStatement(config)
-            val executor = SqlExecutor(config, option)
+            val executor = JdbcExecutor(config, option)
             return executor.executeQuery(statement, provider, transformer)
         }
 

@@ -2,7 +2,7 @@ package org.komapper.core.dsl.query
 
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.DatabaseConfigHolder
-import org.komapper.core.SqlExecutor
+import org.komapper.core.JdbcExecutor
 import org.komapper.core.Statement
 import org.komapper.core.dsl.option.TemplateSelectOption
 
@@ -41,7 +41,7 @@ internal data class TemplateSelectQueryImpl<T>(
         override fun run(holder: DatabaseConfigHolder): R {
             val config = holder.config
             val statement = buildStatement(config)
-            val executor = SqlExecutor(config, option)
+            val executor = JdbcExecutor(config, option)
             return executor.executeQuery(
                 statement,
                 { dialect, rs ->
@@ -59,7 +59,7 @@ internal data class TemplateSelectQueryImpl<T>(
 
         private fun buildStatement(config: DatabaseConfig): Statement {
             val builder = config.templateStatementBuilder
-            return builder.build(sql, params) { config.dialect.escape(it, option.escapeString) }
+            return builder.build(sql, params) { config.dialect.escape(it, option.escapeSequence) }
         }
     }
 }

@@ -11,7 +11,7 @@ interface TemplateSelectQueryBuilder {
 internal data class TemplateSelectQueryBuilderImpl(
     private val sql: String,
     private val params: Any = object {},
-    private val option: TemplateSelectOption = TemplateSelectOption()
+    private val option: TemplateSelectOption = TemplateSelectOption.default
 ) : TemplateSelectQueryBuilder {
 
     override fun option(configurator: (TemplateSelectOption) -> TemplateSelectOption): TemplateSelectQueryBuilder {

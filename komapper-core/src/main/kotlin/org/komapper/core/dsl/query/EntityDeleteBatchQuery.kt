@@ -10,7 +10,7 @@ import org.komapper.core.dsl.option.EntityBatchDeleteOption
 internal data class EntityDeleteBatchQuery<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityDeleteContext<ENTITY, ID, META>,
     private val entities: List<ENTITY>,
-    private val option: EntityBatchDeleteOption = EntityBatchDeleteOption()
+    private val option: EntityBatchDeleteOption
 ) :
     Query<Unit> {
 

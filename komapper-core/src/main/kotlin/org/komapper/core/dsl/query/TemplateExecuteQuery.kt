@@ -2,7 +2,7 @@ package org.komapper.core.dsl.query
 
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.DatabaseConfigHolder
-import org.komapper.core.SqlExecutor
+import org.komapper.core.JdbcExecutor
 import org.komapper.core.Statement
 import org.komapper.core.dsl.option.TemplateExecuteOption
 
@@ -14,7 +14,7 @@ interface TemplateExecuteQuery : Query<Int> {
 internal data class TemplateExecuteQueryImpl(
     private val sql: String,
     private val params: Any = object {},
-    private val option: TemplateExecuteOption = TemplateExecuteOption()
+    private val option: TemplateExecuteOption = TemplateExecuteOption.default
 ) : TemplateExecuteQuery {
 
     override fun option(configurator: (TemplateExecuteOption) -> TemplateExecuteOption): TemplateExecuteQueryImpl {
@@ -28,7 +28,7 @@ internal data class TemplateExecuteQueryImpl(
     override fun run(holder: DatabaseConfigHolder): Int {
         val config = holder.config
         val statement = buildStatement(config)
-        val executor = SqlExecutor(config, option)
+        val executor = JdbcExecutor(config, option)
         val (count) = executor.executeUpdate(statement)
         return count
     }
@@ -40,6 +40,6 @@ internal data class TemplateExecuteQueryImpl(
 
     private fun buildStatement(config: DatabaseConfig): Statement {
         val builder = config.templateStatementBuilder
-        return builder.build(sql, params) { config.dialect.escape(it, option.escapeString) }
+        return builder.build(sql, params) { config.dialect.escape(it, option.escapeSequence) }
     }
 }

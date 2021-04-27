@@ -1,7 +1,7 @@
 package org.komapper.core.dsl.query
 
 import org.komapper.core.DatabaseConfig
-import org.komapper.core.SqlExecutor
+import org.komapper.core.JdbcExecutor
 import org.komapper.core.Statement
 import org.komapper.core.dsl.builder.EntityDeleteStatementBuilder
 import org.komapper.core.dsl.context.EntityDeleteContext
@@ -13,8 +13,8 @@ internal class EntityDeleteQuerySupport<ENTITY : Any, ID, META : EntityMetamodel
     val option: VersionOption
 ) {
 
-    fun <T> delete(config: DatabaseConfig, execute: (SqlExecutor) -> T): T {
-        val executor = SqlExecutor(config, option)
+    fun <T> delete(config: DatabaseConfig, execute: (JdbcExecutor) -> T): T {
+        val executor = JdbcExecutor(config, option)
         return execute(executor)
     }
 

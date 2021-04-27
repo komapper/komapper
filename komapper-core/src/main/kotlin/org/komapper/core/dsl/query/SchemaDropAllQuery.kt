@@ -2,7 +2,7 @@ package org.komapper.core.dsl.query
 
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.DatabaseConfigHolder
-import org.komapper.core.SqlExecutor
+import org.komapper.core.JdbcExecutor
 import org.komapper.core.Statement
 import org.komapper.core.dsl.option.SchemaDropAllOption
 
@@ -11,7 +11,7 @@ interface SchemaDropAllQuery : Query<Unit> {
 }
 
 internal data class SchemaDropAllQueryImpl(
-    private val option: SchemaDropAllOption = SchemaDropAllOption()
+    private val option: SchemaDropAllOption = SchemaDropAllOption.default
 ) : SchemaDropAllQuery {
 
     override fun option(configurator: (SchemaDropAllOption) -> SchemaDropAllOption): SchemaDropAllQuery {
@@ -21,7 +21,7 @@ internal data class SchemaDropAllQueryImpl(
     override fun run(holder: DatabaseConfigHolder) {
         val config = holder.config
         val statement = buildStatement(config)
-        val executor = SqlExecutor(config, SchemaDropAllOption())
+        val executor = JdbcExecutor(config, option)
         executor.execute(statement)
     }
 

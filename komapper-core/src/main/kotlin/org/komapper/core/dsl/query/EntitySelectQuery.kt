@@ -3,7 +3,7 @@ package org.komapper.core.dsl.query
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.DatabaseConfigHolder
 import org.komapper.core.Dialect
-import org.komapper.core.SqlExecutor
+import org.komapper.core.JdbcExecutor
 import org.komapper.core.Statement
 import org.komapper.core.dsl.builder.EntitySelectStatementBuilder
 import org.komapper.core.dsl.context.EntitySelectContext
@@ -49,7 +49,7 @@ interface EntitySelectQuery<ENTITY : Any> : Subquery<ENTITY> {
 
 internal data class EntitySelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntitySelectContext<ENTITY, ID, META>,
-    private val option: EntitySelectOption = EntitySelectOption()
+    private val option: EntitySelectOption = EntitySelectOption.default
 ) :
     EntitySelectQuery<ENTITY> {
 
@@ -181,7 +181,7 @@ internal data class EntitySelectQueryImpl<ENTITY : Any, ID, META : EntityMetamod
             }
             val config = holder.config
             val statement = buildStatement(config)
-            val executor = SqlExecutor(config, option)
+            val executor = JdbcExecutor(config, option)
             return executor.executeQuery(statement) { rs ->
                 // hold only unique entities
                 val pool: MutableMap<EntityKey, Any> = mutableMapOf()

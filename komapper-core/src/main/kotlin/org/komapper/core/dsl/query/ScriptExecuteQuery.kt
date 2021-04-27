@@ -1,7 +1,7 @@
 package org.komapper.core.dsl.query
 
 import org.komapper.core.DatabaseConfigHolder
-import org.komapper.core.SqlExecutor
+import org.komapper.core.JdbcExecutor
 import org.komapper.core.Statement
 import org.komapper.core.dsl.option.ScriptExecuteOption
 
@@ -11,7 +11,7 @@ interface ScriptExecuteQuery : Query<Unit> {
 
 internal data class ScriptExecuteQueryImpl(
     val sql: String,
-    val option: ScriptExecuteOption = ScriptExecuteOption()
+    val option: ScriptExecuteOption = ScriptExecuteOption.default
 ) :
     ScriptExecuteQuery {
     private val statement = Statement(sql, emptyList(), sql)
@@ -22,7 +22,7 @@ internal data class ScriptExecuteQueryImpl(
 
     override fun run(holder: DatabaseConfigHolder) {
         val config = holder.config
-        val executor = SqlExecutor(config, option)
+        val executor = JdbcExecutor(config, option)
         return executor.execute(statement)
     }
 

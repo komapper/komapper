@@ -15,11 +15,9 @@ interface EntityUpdateQueryBuilder<ENTITY : Any> {
 
 internal data class EntityUpdateQueryBuilderImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityUpdateContext<ENTITY, ID, META>,
-    private val option: EntityUpdateOption = EntityUpdateOption()
+    private val option: EntityUpdateOption = EntityUpdateOption.default
 ) :
     EntityUpdateQueryBuilder<ENTITY> {
-
-    private val support: EntityUpdateQuerySupport<ENTITY, ID, META> = EntityUpdateQuerySupport(context, option)
 
     override fun option(configurator: (EntityUpdateOption) -> EntityUpdateOption): EntityUpdateQueryBuilderImpl<ENTITY, ID, META> {
         return copy(option = configurator(option))

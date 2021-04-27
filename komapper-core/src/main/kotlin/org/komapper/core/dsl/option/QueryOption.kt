@@ -1,11 +1,18 @@
 package org.komapper.core.dsl.option
 
 import org.komapper.core.JdbcOption
+import org.komapper.core.JdbcOptionProvider
 
-interface QueryOption {
+interface QueryOption : JdbcOptionProvider {
     val queryTimeoutSeconds: Int?
     val suppressLogging: Boolean
-    fun asJdbcOption(): JdbcOption
+
+    override fun getJdbcOption(): JdbcOption {
+        return JdbcOption(
+            queryTimeoutSeconds = queryTimeoutSeconds,
+            suppressLogging = suppressLogging
+        )
+    }
 }
 
 interface VersionOption : QueryOption {
@@ -15,11 +22,24 @@ interface VersionOption : QueryOption {
 
 interface BatchOption : QueryOption {
     val batchSize: Int?
+
+    override fun getJdbcOption(): JdbcOption {
+        return super.getJdbcOption().copy(
+            batchSize = batchSize
+        )
+    }
 }
 
 interface SelectOption : QueryOption {
     val fetchSize: Int?
     val maxRows: Int?
+
+    override fun getJdbcOption(): JdbcOption {
+        return super.getJdbcOption().copy(
+            fetchSize = fetchSize,
+            maxRows = maxRows
+        )
+    }
 }
 
 interface WhereOption : QueryOption {
@@ -28,14 +48,21 @@ interface WhereOption : QueryOption {
 }
 
 data class EntityDeleteOption(
-    override val queryTimeoutSeconds: Int? = null,
-    override val suppressLogging: Boolean = false,
-    override val ignoreVersion: Boolean = false,
-    override val suppressOptimisticLockException: Boolean = false
+    override val ignoreVersion: Boolean,
+    override val queryTimeoutSeconds: Int?,
+    override val suppressLogging: Boolean,
+    override val suppressOptimisticLockException: Boolean
 ) : VersionOption {
-    override fun asJdbcOption() = JdbcOption(
-        queryTimeoutSeconds = queryTimeoutSeconds
-    )
+
+    companion object {
+        val default = EntityDeleteOption(
+            ignoreVersion = false,
+            queryTimeoutSeconds = null,
+            suppressLogging = false,
+            suppressOptimisticLockException = false
+        )
+    }
+
     fun asEntityBatchDeleteOption(batchSize: Int?): EntityBatchDeleteOption {
         return EntityBatchDeleteOption(
             batchSize = batchSize,
@@ -48,12 +75,17 @@ data class EntityDeleteOption(
 }
 
 data class EntityInsertOption(
-    override val queryTimeoutSeconds: Int? = null,
-    override val suppressLogging: Boolean = false,
+    override val queryTimeoutSeconds: Int?,
+    override val suppressLogging: Boolean,
 ) : QueryOption {
-    override fun asJdbcOption() = JdbcOption(
-        queryTimeoutSeconds = queryTimeoutSeconds
-    )
+
+    companion object {
+        val default = EntityInsertOption(
+            queryTimeoutSeconds = null,
+            suppressLogging = false
+        )
+    }
+
     fun asEntityBatchInsertOption(batchSize: Int?): EntityBatchInsertOption {
         return EntityBatchInsertOption(
             batchSize = batchSize,
@@ -64,204 +96,256 @@ data class EntityInsertOption(
 }
 
 data class EntityUpdateOption(
-    override val queryTimeoutSeconds: Int? = null,
-    override val suppressLogging: Boolean = false,
-    override val ignoreVersion: Boolean = false,
-    override val suppressOptimisticLockException: Boolean = false
+    override val ignoreVersion: Boolean,
+    override val queryTimeoutSeconds: Int?,
+    override val suppressLogging: Boolean,
+    override val suppressOptimisticLockException: Boolean
 ) : VersionOption {
-    override fun asJdbcOption() = JdbcOption(
-        queryTimeoutSeconds = queryTimeoutSeconds
-    )
+
+    companion object {
+        val default = EntityUpdateOption(
+            ignoreVersion = false,
+            queryTimeoutSeconds = null,
+            suppressLogging = false,
+            suppressOptimisticLockException = false
+        )
+    }
+
     fun asEntityBatchUpdateOption(batchSize: Int?): EntityBatchUpdateOption {
         return EntityBatchUpdateOption(
             batchSize = batchSize,
+            ignoreVersion = ignoreVersion,
             queryTimeoutSeconds = queryTimeoutSeconds,
             suppressLogging = suppressLogging,
-            ignoreVersion = ignoreVersion,
             suppressOptimisticLockException = suppressOptimisticLockException
         )
     }
 }
 
 data class EntitySelectOption(
-    override val suppressLogging: Boolean = false,
-    override val fetchSize: Int? = null,
-    override val maxRows: Int? = null,
-    override val queryTimeoutSeconds: Int? = null,
-    override val allowEmptyWhereClause: Boolean = true,
-    override val escapeSequence: String? = null
+    override val allowEmptyWhereClause: Boolean,
+    override val escapeSequence: String?,
+    override val fetchSize: Int?,
+    override val maxRows: Int?,
+    override val queryTimeoutSeconds: Int?,
+    override val suppressLogging: Boolean,
 ) : SelectOption, WhereOption {
-    override fun asJdbcOption() = JdbcOption(
-        fetchSize = fetchSize,
-        maxRows = maxRows,
-        queryTimeoutSeconds = queryTimeoutSeconds
-    )
+
+    companion object {
+        val default = EntitySelectOption(
+            allowEmptyWhereClause = true,
+            escapeSequence = null,
+            fetchSize = null,
+            maxRows = null,
+            queryTimeoutSeconds = null,
+            suppressLogging = false
+        )
+    }
 
     fun asSqlSelectOption() = SqlSelectOption(
+        allowEmptyWhereClause = allowEmptyWhereClause,
+        escapeSequence = escapeSequence,
         fetchSize = fetchSize,
         maxRows = maxRows,
         queryTimeoutSeconds = queryTimeoutSeconds,
-        allowEmptyWhereClause = allowEmptyWhereClause
+        suppressLogging = suppressLogging,
     )
 }
 
 data class EntityBatchDeleteOption(
-    override val queryTimeoutSeconds: Int? = null,
-    override val suppressLogging: Boolean = false,
-    override val batchSize: Int? = null,
-    override val ignoreVersion: Boolean = false,
-    override val suppressOptimisticLockException: Boolean = false
-) : VersionOption, BatchOption {
-    override fun asJdbcOption() = JdbcOption(
-        batchSize = batchSize,
-        queryTimeoutSeconds = queryTimeoutSeconds
-    )
-}
+    override val batchSize: Int?,
+    override val ignoreVersion: Boolean,
+    override val queryTimeoutSeconds: Int?,
+    override val suppressLogging: Boolean,
+    override val suppressOptimisticLockException: Boolean
+) : VersionOption, BatchOption
 
 data class EntityBatchInsertOption(
-    override val suppressLogging: Boolean = false,
-    override val batchSize: Int? = null,
-    override val queryTimeoutSeconds: Int? = null,
-    override val ignoreVersion: Boolean = false,
-    override val suppressOptimisticLockException: Boolean = false,
-) : VersionOption, BatchOption {
-    override fun asJdbcOption() = JdbcOption(
-        batchSize = batchSize,
-        queryTimeoutSeconds = queryTimeoutSeconds
-    )
-}
+    override val batchSize: Int?,
+    override val suppressLogging: Boolean,
+    override val queryTimeoutSeconds: Int?,
+) : BatchOption
 
 data class EntityBatchUpdateOption(
-    override val suppressLogging: Boolean = false,
-    override val batchSize: Int? = null,
-    override val queryTimeoutSeconds: Int? = null,
-    override val ignoreVersion: Boolean = false,
-    override val suppressOptimisticLockException: Boolean = false,
-) : VersionOption, BatchOption {
-    override fun asJdbcOption() = JdbcOption(
-        batchSize = batchSize,
-        queryTimeoutSeconds = queryTimeoutSeconds
-    )
-}
+    override val suppressLogging: Boolean,
+    override val batchSize: Int?,
+    override val queryTimeoutSeconds: Int?,
+    override val ignoreVersion: Boolean,
+    override val suppressOptimisticLockException: Boolean,
+) : VersionOption, BatchOption
 
 data class SqlDeleteOption(
-    override val queryTimeoutSeconds: Int? = null,
-    override val suppressLogging: Boolean = false,
-    override val allowEmptyWhereClause: Boolean = false,
-    override val escapeSequence: String? = null
+    override val allowEmptyWhereClause: Boolean,
+    override val escapeSequence: String?,
+    override val queryTimeoutSeconds: Int?,
+    override val suppressLogging: Boolean,
 ) : WhereOption {
-    override fun asJdbcOption() = JdbcOption(
-        queryTimeoutSeconds = queryTimeoutSeconds
-    )
+
+    companion object {
+        val default = SqlDeleteOption(
+            allowEmptyWhereClause = false,
+            escapeSequence = null,
+            queryTimeoutSeconds = null,
+            suppressLogging = false
+        )
+    }
 }
 
 data class SqlInsertOption(
-    override val queryTimeoutSeconds: Int? = null,
-    override val suppressLogging: Boolean = false,
+    override val queryTimeoutSeconds: Int?,
+    override val suppressLogging: Boolean,
 ) : QueryOption {
-    override fun asJdbcOption() = JdbcOption(
-        queryTimeoutSeconds = queryTimeoutSeconds
-    )
+
+    companion object {
+        val default = SqlInsertOption(
+            queryTimeoutSeconds = null,
+            suppressLogging = false
+        )
+    }
 }
 
 data class SqlUpdateOption(
-    override val queryTimeoutSeconds: Int? = null,
-    override val suppressLogging: Boolean = false,
-    override val allowEmptyWhereClause: Boolean = false,
-    override val escapeSequence: String? = null
+    override val allowEmptyWhereClause: Boolean,
+    override val escapeSequence: String?,
+    override val queryTimeoutSeconds: Int?,
+    override val suppressLogging: Boolean,
 ) :
     WhereOption {
-    override fun asJdbcOption() = JdbcOption(
-        queryTimeoutSeconds = queryTimeoutSeconds
-    )
+
+    companion object {
+        val default = SqlUpdateOption(
+            allowEmptyWhereClause = false,
+            escapeSequence = null,
+            queryTimeoutSeconds = null,
+            suppressLogging = false
+        )
+    }
 }
 
 data class SqlSelectOption(
-    override val queryTimeoutSeconds: Int? = null,
-    override val suppressLogging: Boolean = false,
-    override val fetchSize: Int? = null,
-    override val maxRows: Int? = null,
-    override val allowEmptyWhereClause: Boolean = true,
-    override val escapeSequence: String? = null,
+    override val allowEmptyWhereClause: Boolean,
+    override val escapeSequence: String?,
+    override val fetchSize: Int?,
+    override val maxRows: Int?,
+    override val queryTimeoutSeconds: Int?,
+    override val suppressLogging: Boolean,
 ) : SelectOption, WhereOption {
-    override fun asJdbcOption() = JdbcOption(
-        fetchSize = fetchSize,
-        maxRows = maxRows,
-        queryTimeoutSeconds = queryTimeoutSeconds
-    )
+
+    companion object {
+        val default = SqlSelectOption(
+            allowEmptyWhereClause = true,
+            escapeSequence = null,
+            fetchSize = null,
+            maxRows = null,
+            queryTimeoutSeconds = null,
+            suppressLogging = false
+        )
+    }
 }
 
 data class SqlSetOperationOption(
-    override val suppressLogging: Boolean = false,
-    override val fetchSize: Int? = null,
-    override val maxRows: Int? = null,
-    override val queryTimeoutSeconds: Int? = null,
-    override val allowEmptyWhereClause: Boolean = true,
-    override val escapeSequence: String? = null,
+    override val allowEmptyWhereClause: Boolean,
+    override val escapeSequence: String?,
+    override val fetchSize: Int?,
+    override val maxRows: Int?,
+    override val suppressLogging: Boolean,
+    override val queryTimeoutSeconds: Int?,
 ) : SelectOption, WhereOption {
-    override fun asJdbcOption() = JdbcOption(
-        fetchSize = fetchSize,
-        maxRows = maxRows,
-        queryTimeoutSeconds = queryTimeoutSeconds
-    )
+
+    companion object {
+        val default = SqlSetOperationOption(
+            allowEmptyWhereClause = true,
+            escapeSequence = null,
+            fetchSize = null,
+            maxRows = null,
+            suppressLogging = false,
+            queryTimeoutSeconds = null
+        )
+    }
 }
 
 data class TemplateSelectOption(
-    override val suppressLogging: Boolean = false,
-    override val fetchSize: Int? = null,
-    override val maxRows: Int? = null,
-    override val queryTimeoutSeconds: Int? = null,
-    val escapeString: String? = null
+    val escapeSequence: String?,
+    override val fetchSize: Int?,
+    override val maxRows: Int?,
+    override val queryTimeoutSeconds: Int?,
+    override val suppressLogging: Boolean,
 ) : SelectOption {
-    override fun asJdbcOption() = JdbcOption(
-        fetchSize = fetchSize,
-        maxRows = maxRows,
-        queryTimeoutSeconds = queryTimeoutSeconds
-    )
+
+    companion object {
+        val default = TemplateSelectOption(
+            escapeSequence = null,
+            fetchSize = null,
+            maxRows = null,
+            queryTimeoutSeconds = null,
+            suppressLogging = false
+        )
+    }
 }
 
 data class TemplateExecuteOption(
-    override val queryTimeoutSeconds: Int? = null,
-    override val suppressLogging: Boolean = false,
-    val escapeString: String? = null
+    val escapeSequence: String?,
+    override val queryTimeoutSeconds: Int?,
+    override val suppressLogging: Boolean,
 ) : QueryOption {
-    override fun asJdbcOption() = JdbcOption(
-        queryTimeoutSeconds = queryTimeoutSeconds
-    )
+
+    companion object {
+        val default = TemplateExecuteOption(
+            escapeSequence = null,
+            queryTimeoutSeconds = null,
+            suppressLogging = false
+        )
+    }
 }
 
 data class ScriptExecuteOption(
-    override val queryTimeoutSeconds: Int? = null,
-    override val suppressLogging: Boolean = false,
+    override val queryTimeoutSeconds: Int?,
+    override val suppressLogging: Boolean,
 ) : QueryOption {
-    override fun asJdbcOption() = JdbcOption(
-        queryTimeoutSeconds = queryTimeoutSeconds
-    )
+
+    companion object {
+        val default = ScriptExecuteOption(
+            queryTimeoutSeconds = null,
+            suppressLogging = false
+        )
+    }
 }
 
 data class SchemaCreateOption(
-    override val queryTimeoutSeconds: Int? = null,
-    override val suppressLogging: Boolean = false,
+    override val queryTimeoutSeconds: Int?,
+    override val suppressLogging: Boolean,
 ) : QueryOption {
-    override fun asJdbcOption() = JdbcOption(
-        queryTimeoutSeconds = queryTimeoutSeconds
-    )
+
+    companion object {
+        val default = SchemaCreateOption(
+            queryTimeoutSeconds = null,
+            suppressLogging = false
+        )
+    }
 }
 
 data class SchemaDropOption(
-    override val queryTimeoutSeconds: Int? = null,
-    override val suppressLogging: Boolean = false,
+    override val queryTimeoutSeconds: Int?,
+    override val suppressLogging: Boolean,
 ) : QueryOption {
-    override fun asJdbcOption() = JdbcOption(
-        queryTimeoutSeconds = queryTimeoutSeconds
-    )
+
+    companion object {
+        val default = SchemaDropOption(
+            queryTimeoutSeconds = null,
+            suppressLogging = false
+        )
+    }
 }
 
 data class SchemaDropAllOption(
-    override val queryTimeoutSeconds: Int? = null,
-    override val suppressLogging: Boolean = false,
+    override val queryTimeoutSeconds: Int?,
+    override val suppressLogging: Boolean,
 ) : QueryOption {
-    override fun asJdbcOption() = JdbcOption(
-        queryTimeoutSeconds = queryTimeoutSeconds
-    )
+
+    companion object {
+        val default = SchemaDropAllOption(
+            queryTimeoutSeconds = null,
+            suppressLogging = false
+        )
+    }
 }

@@ -17,7 +17,7 @@ interface EntityInsertQueryBuilder<ENTITY : Any, ID, META : EntityMetamodel<ENTI
 
 internal data class EntityInsertQueryBuilderImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityInsertContext<ENTITY, ID, META>,
-    private val option: EntityInsertOption = EntityInsertOption()
+    private val option: EntityInsertOption = EntityInsertOption.default
 ) :
     EntityInsertQueryBuilder<ENTITY, ID, META> {
 

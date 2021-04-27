@@ -9,7 +9,7 @@ import org.komapper.core.dsl.option.EntityUpdateOption
 
 internal data class EntityUpdateSingleQuery<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityUpdateContext<ENTITY, ID, META>,
-    private val option: EntityUpdateOption = EntityUpdateOption(),
+    private val option: EntityUpdateOption,
     private val entity: ENTITY
 ) : Query<ENTITY> {
 

@@ -10,7 +10,7 @@ import org.komapper.core.dsl.option.EntityInsertOption
 internal data class EntityInsertMultipleQuery<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityInsertContext<ENTITY, ID, META>,
     private val entities: List<ENTITY>,
-    private val option: EntityInsertOption = EntityInsertOption()
+    private val option: EntityInsertOption
 ) :
     Query<List<ENTITY>> {
 

@@ -1,18 +1,17 @@
 package org.komapper.core
 
-import org.komapper.core.dsl.option.QueryOption
 import java.sql.Connection
 import java.sql.PreparedStatement
 import java.sql.ResultSet
 import java.sql.SQLException
 
-class SqlExecutor(
+internal class JdbcExecutor(
     private val config: DatabaseConfig,
-    private val option: QueryOption,
+    jdbcOptionProvider: JdbcOptionProvider,
     private val requiresGeneratedKeys: Boolean = false
 ) {
 
-    private val jdbcOption = config.jdbcOption + option.asJdbcOption()
+    private val jdbcOption = config.jdbcOption + jdbcOptionProvider.getJdbcOption()
 
     fun <T> executeQuery(
         statement: Statement,
@@ -127,7 +126,8 @@ class SqlExecutor(
     }
 
     private fun log(statement: Statement) {
-        if (!option.suppressLogging) {
+        val suppressLogging = jdbcOption.suppressLogging ?: false
+        if (!suppressLogging) {
             config.logger.log(LogCategory.SQL) { statement.sql }
             config.logger.log(LogCategory.SQL_WITH_ARGS) { statement.sqlWithArgs }
         }
