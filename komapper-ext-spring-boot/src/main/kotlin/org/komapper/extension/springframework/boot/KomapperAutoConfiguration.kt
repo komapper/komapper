@@ -13,7 +13,9 @@ import org.komapper.core.Logger
 import org.komapper.core.StdOutSqlLogger
 import org.komapper.core.TemplateStatementBuilder
 import org.komapper.core.jdbc.DataType
+import org.komapper.core.spi.DefaultStatementInspector
 import org.komapper.core.spi.LoggerFactory
+import org.komapper.core.spi.StatementInspector
 import org.komapper.core.spi.TemplateStatementBuilderFactory
 import org.springframework.boot.autoconfigure.AutoConfigureAfter
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass
@@ -75,6 +77,13 @@ open class KomapperAutoConfiguration {
     }
 
     @Bean
+    @ConditionalOnMissingBean(StatementInspector::class)
+    open fun statementInspector(): StatementInspector {
+        val loader = ServiceLoader.load(StatementInspector::class.java)
+        return loader.firstOrNull() ?: DefaultStatementInspector()
+    }
+
+    @Bean
     @ConditionalOnMissingBean(DataFactory::class)
     open fun dataFactory(databaseSession: DatabaseSession): DataFactory {
         return DefaultDataFactory(databaseSession)
@@ -88,6 +97,7 @@ open class KomapperAutoConfiguration {
         jdbcOption: JdbcOption,
         logger: Logger,
         session: DatabaseSession,
+        statementInspector: StatementInspector,
         dataFactory: DataFactory,
         templateStatementBuilder: Optional<TemplateStatementBuilder>
     ): DatabaseConfig {
@@ -98,6 +108,7 @@ open class KomapperAutoConfiguration {
             override val jdbcOption = jdbcOption
             override val logger = logger
             override val session = session
+            override val statementInspector = statementInspector
             override val dataFactory = dataFactory
             override val templateStatementBuilder by lazy {
                 templateStatementBuilder.orElseGet {

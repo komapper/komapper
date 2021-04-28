@@ -34,3 +34,4 @@ include("example-spring-boot")
 
 // TEST
 include("integration-test")
+include("komapper-ext-sqlcommenter")

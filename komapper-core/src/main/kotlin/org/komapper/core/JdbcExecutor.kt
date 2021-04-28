@@ -17,6 +17,8 @@ internal class JdbcExecutor(
         statement: Statement,
         handler: (rs: ResultSet) -> T
     ): T {
+        @Suppress("NAME_SHADOWING")
+        val statement = inspect(statement)
         return config.session.connection.use { con ->
             log(statement)
             con.prepare(statement).use { ps ->
@@ -34,6 +36,8 @@ internal class JdbcExecutor(
         provider: (Dialect, ResultSet) -> T,
         transformer: (Sequence<T>) -> R
     ): R {
+        @Suppress("NAME_SHADOWING")
+        val statement = inspect(statement)
         return config.session.connection.use { con ->
             log(statement)
             con.prepare(statement).use { ps ->
@@ -54,6 +58,8 @@ internal class JdbcExecutor(
     }
 
     fun executeUpdate(statement: Statement): Pair<Int, LongArray> {
+        @Suppress("NAME_SHADOWING")
+        val statement = inspect(statement)
         return executeWithExceptionCheck {
             config.session.connection.use { con ->
                 log(statement)
@@ -70,6 +76,8 @@ internal class JdbcExecutor(
 
     fun executeBatch(statements: List<Statement>): Pair<IntArray, LongArray> {
         require(statements.isNotEmpty())
+        @Suppress("NAME_SHADOWING")
+        val statements = statements.map { inspect(it) }
         return executeWithExceptionCheck {
             config.session.connection.use { con ->
                 val firstStatement = statements.first()
@@ -102,6 +110,8 @@ internal class JdbcExecutor(
     }
 
     fun execute(statement: Statement) {
+        @Suppress("NAME_SHADOWING")
+        val statement = inspect(statement)
         executeWithExceptionCheck {
             config.session.connection.use { con ->
                 log(statement)
@@ -123,6 +133,10 @@ internal class JdbcExecutor(
                 throw e
             }
         }
+    }
+
+    private fun inspect(statement: Statement): Statement {
+        return config.statementInspector.inspect(statement)
     }
 
     private fun log(statement: Statement) {

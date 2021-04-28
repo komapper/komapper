@@ -22,6 +22,7 @@ idea.module {
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation(project(":komapper-ext-spring-boot-starter"))
+    implementation(project(":komapper-ext-sqlcommenter"))
     implementation(project(":komapper-jdbc-h2"))
     implementation("com.h2database:h2:1.4.200")
     ksp(project(":komapper-processor"))
@@ -32,5 +33,6 @@ ksp {
 }
 
 allOpen {
+    annotation("org.springframework.context.annotation.Configuration")
     annotation("org.springframework.transaction.annotation.Transactional")
 }

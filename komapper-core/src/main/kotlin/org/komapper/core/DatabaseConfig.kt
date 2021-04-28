@@ -3,7 +3,9 @@ package org.komapper.core
 import org.komapper.core.jdbc.DataType
 import org.komapper.core.jdbc.SimpleDataSource
 import org.komapper.core.spi.DatabaseSessionFactory
+import org.komapper.core.spi.DefaultStatementInspector
 import org.komapper.core.spi.LoggerFactory
+import org.komapper.core.spi.StatementInspector
 import org.komapper.core.spi.TemplateStatementBuilderFactory
 import java.util.ServiceLoader
 import java.util.UUID
@@ -27,6 +29,7 @@ interface DatabaseConfig : DatabaseConfigHolder {
     val jdbcOption: JdbcOption
     val logger: Logger
     val session: DatabaseSession
+    val statementInspector: StatementInspector
     val dataFactory: DataFactory
     val templateStatementBuilder: TemplateStatementBuilder
 }
@@ -65,6 +68,11 @@ open class DefaultDatabaseConfig(
         factory?.create(dataSource, logger) ?: DefaultDatabaseSession(dataSource)
     }
 
+    override val statementInspector: StatementInspector by lazy {
+        val loader = ServiceLoader.load(StatementInspector::class.java)
+        loader.firstOrNull() ?: DefaultStatementInspector()
+    }
+
     override val dataFactory: DataFactory by lazy {
         DefaultDataFactory(session)
     }
@@ -91,6 +99,8 @@ object DryRunDatabaseConfig : DatabaseConfig {
     override val jdbcOption: JdbcOption
         get() = throw UnsupportedOperationException()
     override val session: DatabaseSession
+        get() = throw UnsupportedOperationException()
+    override val statementInspector: StatementInspector
         get() = throw UnsupportedOperationException()
     override val dataFactory: DataFactory
         get() = throw UnsupportedOperationException()
