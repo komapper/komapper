@@ -45,7 +45,7 @@ open class KomapperAutoConfiguration {
         val url = environment.getProperty(DATASOURCE_URL_PROPERTY)
             ?: error(
                 "$DATASOURCE_URL_PROPERTY is not found. " +
-                    "Specify it to the application.properties file or define the dialect bean manually."
+                    "Specify it to the application.properties file or define the Dialect bean manually."
             )
         return Dialect.load(url, dataTypes)
     }
@@ -63,7 +63,7 @@ open class KomapperAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean(Logger::class)
+    @ConditionalOnMissingBean
     open fun logger(): Logger {
         val loader = ServiceLoader.load(LoggerFactory::class.java)
         val factory = loader.firstOrNull()
@@ -71,26 +71,26 @@ open class KomapperAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean(DatabaseSession::class)
+    @ConditionalOnMissingBean
     open fun databaseSession(dataSource: DataSource): DatabaseSession {
         return TransactionAwareDatabaseSession(dataSource)
     }
 
     @Bean
-    @ConditionalOnMissingBean(StatementInspector::class)
+    @ConditionalOnMissingBean
     open fun statementInspector(): StatementInspector {
         val loader = ServiceLoader.load(StatementInspector::class.java)
         return loader.firstOrNull() ?: DefaultStatementInspector()
     }
 
     @Bean
-    @ConditionalOnMissingBean(DataFactory::class)
+    @ConditionalOnMissingBean
     open fun dataFactory(databaseSession: DatabaseSession): DataFactory {
         return DefaultDataFactory(databaseSession)
     }
 
     @Bean
-    @ConditionalOnMissingBean(DatabaseConfig::class)
+    @ConditionalOnMissingBean
     open fun databaseConfig(
         dialect: Dialect,
         clockProvider: ClockProvider,
@@ -129,7 +129,7 @@ open class KomapperAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean(Database::class)
+    @ConditionalOnMissingBean
     open fun database(config: DatabaseConfig): Database {
         return Database.create(config)
     }
