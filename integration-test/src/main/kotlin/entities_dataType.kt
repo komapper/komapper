@@ -10,6 +10,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.OffsetDateTime
+import java.util.UUID
 
 @KmEntity
 @KmTable("ANY_PERSON")
@@ -119,5 +120,11 @@ data class Json(val data: String)
 @KmEntity
 @KmTable("JSON_TEST")
 data class JsonTest(@KmId val id: Int, val value: Json) {
+    companion object
+}
+
+@KmEntity
+@KmTable("UUID_TEST")
+data class UUIDTest(@KmId val id: Int, val value: UUID?) {
     companion object
 }

@@ -59,7 +59,8 @@ open class H2Dialect(dataTypes: Set<DataType<*>> = emptySet(), val version: Vers
             OffsetDateTimeType("timestamp with time zone"),
             ShortType("smallint"),
             StringType("varchar(500)"),
-            SQLXMLType("clob")
+            SQLXMLType("clob"),
+            H2UUIDType
         )
     }
 

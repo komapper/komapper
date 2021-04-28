@@ -57,7 +57,8 @@ open class PostgreSqlDialect(dataTypes: Set<DataType<*>> = emptySet(), val versi
             OffsetDateTimeType("timestamp with time zone"),
             ShortType("smallint"),
             StringType("varchar(500)"),
-            SQLXMLType("text")
+            SQLXMLType("text"),
+            PostgreSqlUUIDType
         )
     }
 

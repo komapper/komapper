@@ -17,6 +17,7 @@ import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
+import java.util.UUID
 
 @ExtendWith(Env::class)
 class DataTypeTest(val db: Database) {
@@ -252,5 +253,30 @@ class DataTypeTest(val db: Database) {
                 .first()
         }
         assertEquals("\"Hello\"", result.data)
+    }
+
+    @Run(onlyIf = [Dbms.POSTGRESQL, Dbms.H2])
+    @Test
+    fun uuid() {
+        val m = UUIDTest.alias
+        val value = UUID.randomUUID()
+        val data = UUIDTest(1, value)
+        db.runQuery { EntityDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            EntityDsl.from(m).first { m.id eq 1 }
+        }
+        assertEquals(data, data2)
+    }
+
+    @Run(onlyIf = [Dbms.POSTGRESQL, Dbms.H2])
+    @Test
+    fun uuid_null() {
+        val m = UUIDTest.alias
+        val data = UUIDTest(1, null)
+        db.runQuery { EntityDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            EntityDsl.from(m).first { m.id eq 1 }
+        }
+        assertEquals(data, data2)
     }
 }
