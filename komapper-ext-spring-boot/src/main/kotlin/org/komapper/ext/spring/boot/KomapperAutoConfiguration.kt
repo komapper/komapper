@@ -1,4 +1,4 @@
-package org.komapper.extension.springframework.boot
+package org.komapper.ext.spring.boot
 
 import org.komapper.core.ClockProvider
 import org.komapper.core.DataFactory

@@ -1,4 +1,4 @@
-package org.komapper.extension.springframework.boot
+package org.komapper.ext.spring.boot
 
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
