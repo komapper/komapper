@@ -27,6 +27,7 @@ include("komapper-jdbc-postgresql")
 // EXTENSION
 include("komapper-ext-spring-boot")
 include("komapper-ext-spring-boot-starter")
+include("komapper-ext-sqlcommenter")
 
 // EXAMPLE
 include("example-basic")
@@ -34,4 +35,3 @@ include("example-spring-boot")
 
 // TEST
 include("integration-test")
-include("komapper-ext-sqlcommenter")
