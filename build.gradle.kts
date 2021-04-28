@@ -13,10 +13,6 @@ allprojects {
     apply(plugin = "com.diffplug.spotless")
 
     configure<com.diffplug.gradle.spotless.SpotlessExtension> {
-        kotlin {
-            targetExclude("build/**")
-            ktlint("0.41.0")
-        }
         kotlinGradle {
             ktlint("0.41.0")
         }
@@ -34,22 +30,34 @@ allprojects {
     }
 }
 
-subprojects {
+val komapperLibProjects = subprojects.filter {
+    it.name.startsWith("komapper") && !it.name.endsWith("platform")
+}
+
+val platformProject = project("komapper-platform")
+
+val exampleProjects = subprojects.filter {
+    it.name.startsWith("example")
+}
+
+val testProjects = subprojects.filter {
+    it.name.endsWith("test")
+}
+
+configure(komapperLibProjects) {
     apply(plugin = "org.jetbrains.kotlin.jvm")
-    apply(plugin = "maven-publish")
-    apply(plugin = "signing")
-
-    tasks.withType<Test> {
-        useJUnitPlatform()
-    }
-
-    tasks.withType<KotlinCompile> {
-        kotlinOptions.jvmTarget = "11"
-    }
 
     configure<JavaPluginExtension> {
         withJavadocJar()
         withSourcesJar()
+    }
+}
+
+configure(komapperLibProjects + testProjects) {
+    apply(plugin = "org.jetbrains.kotlin.jvm")
+
+    tasks.withType<Test> {
+        useJUnitPlatform()
     }
 
     dependencies {
@@ -58,12 +66,33 @@ subprojects {
     }
 }
 
-configure(subprojects.filter { it.name.startsWith("komapper") }) {
+configure(komapperLibProjects + testProjects + exampleProjects) {
+    apply(plugin = "org.jetbrains.kotlin.jvm")
+
+    configure<com.diffplug.gradle.spotless.SpotlessExtension> {
+        kotlin {
+            targetExclude("build/**")
+            ktlint("0.41.0")
+        }
+    }
+
+    tasks.withType<KotlinCompile> {
+        kotlinOptions.jvmTarget = "11"
+    }
+}
+
+configure(komapperLibProjects + platformProject) {
+    apply(plugin = "maven-publish")
+    apply(plugin = "signing")
+    if (this == platformProject) {
+        apply(plugin = "java-platform")
+    }
+    val component = if (this == platformProject) "javaPlatform" else "java"
 
     configure<PublishingExtension> {
         publications {
             create<MavenPublication>("maven") {
-                from(components["java"])
+                from(components[component])
                 pom {
                     val projectUrl: String by project
                     name.set(project.name)

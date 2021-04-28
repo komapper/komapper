@@ -10,7 +10,6 @@ import org.komapper.core.Database
 import org.komapper.core.UniqueConstraintException
 import org.komapper.core.dsl.EntityDsl
 import org.komapper.core.dsl.runQuery
-import org.komapper.jdbc.mysql.MySqlDialect
 
 @ExtendWith(Env::class)
 class EntityInsertBatchQueryTest(private val db: Database) {
@@ -85,7 +84,7 @@ class EntityInsertBatchQueryTest(private val db: Database) {
         val department2 = Department(1, 60, "DEVELOPMENT", "KYOTO", 1)
         val query = EntityDsl.insert(d).onDuplicateKeyUpdate().batch(listOf(department1, department2))
         val counts = db.runQuery { query }
-        if (db.config.dialect is MySqlDialect) {
+        if (db.config.dialect.subprotocol == "mysql") {
             assertEquals(listOf(1, 2), counts)
         } else {
             assertEquals(listOf(1, 1), counts)
@@ -107,7 +106,7 @@ class EntityInsertBatchQueryTest(private val db: Database) {
         val department2 = Department(10, 10, "DEVELOPMENT", "KYOTO", 1)
         val query = EntityDsl.insert(d).onDuplicateKeyUpdate(d.departmentNo).batch(listOf(department1, department2))
         val counts = db.runQuery { query }
-        if (db.config.dialect is MySqlDialect) {
+        if (db.config.dialect.subprotocol == "mysql") {
             assertEquals(listOf(1, 2), counts)
         } else {
             assertEquals(listOf(1, 1), counts)
@@ -132,7 +131,7 @@ class EntityInsertBatchQueryTest(private val db: Database) {
                 d.departmentName set excluded.departmentName
             }.batch(listOf(department1, department2))
         val counts = db.runQuery { query }
-        if (db.config.dialect is MySqlDialect) {
+        if (db.config.dialect.subprotocol == "mysql") {
             assertEquals(listOf(1, 2), counts)
         } else {
             assertEquals(listOf(1, 1), counts)
@@ -157,7 +156,7 @@ class EntityInsertBatchQueryTest(private val db: Database) {
                 d.departmentName set excluded.departmentName
             }.batch(listOf(department1, department2))
         val counts = db.runQuery { query }
-        if (db.config.dialect is MySqlDialect) {
+        if (db.config.dialect.subprotocol == "mysql") {
             assertEquals(listOf(1, 2), counts)
         } else {
             assertEquals(listOf(1, 1), counts)

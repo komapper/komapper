@@ -18,6 +18,7 @@ import java.util.regex.Pattern
 import kotlin.reflect.KClass
 
 interface Dialect {
+    val subprotocol: String
     val openQuote: String
     val closeQuote: String
     val escapeSequence: String
@@ -128,6 +129,8 @@ abstract class AbstractDialect protected constructor(dataTypes: Set<DataType<*>>
 }
 
 internal object DryRunDialect : AbstractDialect() {
+
+    override val subprotocol: String = "dry_run"
 
     override fun isUniqueConstraintViolation(exception: SQLException): Boolean {
         throw UnsupportedOperationException()

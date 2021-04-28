@@ -17,8 +17,8 @@ idea.module {
 
 dependencies {
     api(project(":komapper-core"))
-    implementation("com.h2database:h2:1.4.200")
-    testImplementation(project(":komapper-annotation"))
+    runtimeOnly(libs.h2)
+    testCompileOnly(project(":komapper-annotation"))
     testImplementation(project(":komapper-template"))
     testImplementation(project(":komapper-transaction"))
     kspTest(project(":komapper-processor"))

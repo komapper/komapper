@@ -13,7 +13,6 @@ import org.komapper.core.UniqueConstraintException
 import org.komapper.core.dsl.EntityDsl
 import org.komapper.core.dsl.concat
 import org.komapper.core.dsl.runQuery
-import org.komapper.jdbc.mysql.MySqlDialect
 import java.time.Clock
 import java.time.Instant
 import java.time.LocalDateTime
@@ -153,7 +152,7 @@ class EntityInsertQueryTest(private val db: Database) {
         val department = Department(1, 50, "PLANNING", "TOKYO", 10)
         val query = EntityDsl.insert(d).onDuplicateKeyUpdate().single(department)
         val count = db.runQuery { query }
-        if (db.config.dialect is MySqlDialect) {
+        if (db.config.dialect.subprotocol == "mysql") {
             assertEquals(2, count)
         } else {
             assertEquals(1, count)
@@ -171,7 +170,7 @@ class EntityInsertQueryTest(private val db: Database) {
         val department = Department(6, 10, "PLANNING", "TOKYO", 10)
         val query = EntityDsl.insert(d).onDuplicateKeyUpdate(d.departmentNo).single(department)
         val count = db.runQuery { query }
-        if (db.config.dialect is MySqlDialect) {
+        if (db.config.dialect.subprotocol == "mysql") {
             assertEquals(2, count)
         } else {
             assertEquals(1, count)
@@ -193,7 +192,7 @@ class EntityInsertQueryTest(private val db: Database) {
             d.location set concat(d.location, concat("_", excluded.location))
         }.single(department)
         val count = db.runQuery { query }
-        if (db.config.dialect is MySqlDialect) {
+        if (db.config.dialect.subprotocol == "mysql") {
             assertEquals(2, count)
         } else {
             assertEquals(1, count)
@@ -216,7 +215,7 @@ class EntityInsertQueryTest(private val db: Database) {
                 d.location set concat(d.location, concat("_", excluded.location))
             }.single(department)
         val count = db.runQuery { query }
-        if (db.config.dialect is MySqlDialect) {
+        if (db.config.dialect.subprotocol == "mysql") {
             assertEquals(2, count)
         } else {
             assertEquals(1, count)

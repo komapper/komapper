@@ -1,9 +1,19 @@
+plugins {
+    id("org.springframework.boot") version "2.4.5"
+}
+
+apply(plugin = "io.spring.dependency-management")
+
 dependencies {
-    implementation("org.springframework:spring-jdbc:5.3.6")
-    implementation("org.springframework.boot:spring-boot-autoconfigure:2.4.5")
+    implementation("org.springframework:spring-jdbc")
+    implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation(project(":komapper-core"))
-    implementation(project(":komapper-logging-slf4j"))
+    testImplementation(project(":komapper-ext-slf4j"))
     testImplementation(project(":komapper-jdbc-h2"))
-    testImplementation("ch.qos.logback:logback-classic:1.2.3")
-    testImplementation("com.zaxxer:HikariCP:4.0.3")
+    testImplementation("ch.qos.logback:logback-classic")
+    testImplementation("com.zaxxer:HikariCP")
+}
+
+tasks.bootJar {
+    enabled = false
 }

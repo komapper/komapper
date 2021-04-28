@@ -35,6 +35,8 @@ open class H2Dialect(dataTypes: Set<DataType<*>> = emptySet(), val version: Vers
     companion object {
         enum class Version { V1_4 }
 
+        const val subprotocol = "h2"
+
         /** the error code that represents unique violation  */
         const val UNIQUE_CONSTRAINT_VIOLATION_ERROR_CODE = 23505
 
@@ -63,6 +65,8 @@ open class H2Dialect(dataTypes: Set<DataType<*>> = emptySet(), val version: Vers
             H2UUIDType
         )
     }
+
+    override val subprotocol: String = Companion.subprotocol
 
     override fun isUniqueConstraintViolation(exception: SQLException): Boolean {
         val cause = getCause(exception)

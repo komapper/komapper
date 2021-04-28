@@ -6,7 +6,7 @@ import org.komapper.core.spi.DialectFactory
 
 class PostgreSqlDialectFactory : DialectFactory {
     override fun supports(subprotocol: String): Boolean {
-        return subprotocol == "postgresql"
+        return subprotocol == PostgreSqlDialect.subprotocol
     }
 
     override fun create(dataTypes: Set<DataType<*>>): Dialect {

@@ -34,6 +34,8 @@ open class PostgreSqlDialect(dataTypes: Set<DataType<*>> = emptySet(), val versi
     companion object {
         enum class Version { V42_2 }
 
+        const val subprotocol = "postgresql"
+
         /** the state code that represents unique violation  */
         const val UNIQUE_CONSTRAINT_VIOLATION_STATE_CODE = "23505"
 
@@ -61,6 +63,8 @@ open class PostgreSqlDialect(dataTypes: Set<DataType<*>> = emptySet(), val versi
             PostgreSqlUUIDType
         )
     }
+
+    override val subprotocol: String = Companion.subprotocol
 
     override fun isUniqueConstraintViolation(exception: SQLException): Boolean {
         val cause = getCause(exception)

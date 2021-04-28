@@ -17,11 +17,7 @@ idea.module {
 }
 
 dependencies {
-    implementation(project(":komapper-annotation"))
-    implementation(project(":komapper-jdbc-h2"))
-    implementation(project(":komapper-logging-slf4j"))
-    implementation(project(":komapper-transaction"))
-    implementation("ch.qos.logback:logback-classic:1.2.3")
+    implementation(project(":komapper-starter"))
     ksp(project(":komapper-processor"))
 }
 

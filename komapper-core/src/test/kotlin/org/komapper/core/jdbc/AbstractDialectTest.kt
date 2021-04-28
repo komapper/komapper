@@ -14,6 +14,9 @@ internal class AbstractDialectTest {
 
     class MyDialect : AbstractDialect() {
 
+        override val subprotocol: String
+            get() = throw UnsupportedOperationException()
+
         override fun isUniqueConstraintViolation(exception: SQLException): Boolean {
             throw UnsupportedOperationException()
         }

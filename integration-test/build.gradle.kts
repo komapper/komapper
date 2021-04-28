@@ -16,16 +16,17 @@ idea.module {
 }
 
 dependencies {
-    implementation(project(":komapper-jdbc-h2"))
-    implementation(project(":komapper-jdbc-mysql"))
-    implementation(project(":komapper-jdbc-postgresql"))
-    implementation(project(":komapper-annotation"))
-    implementation(project(":komapper-logging-slf4j"))
-    implementation(project(":komapper-template"))
-    implementation(project(":komapper-transaction"))
-    implementation("ch.qos.logback:logback-classic:1.2.3")
-    implementation("org.postgresql:postgresql:42.2.20")
+    compileOnly(project(":komapper-annotation"))
     ksp(project(":komapper-processor"))
+    implementation(project(":komapper-transaction"))
+    implementation(libs.postgresql)
+
+    runtimeOnly(project(":komapper-jdbc-h2"))
+    runtimeOnly(project(":komapper-jdbc-mysql"))
+    runtimeOnly(project(":komapper-jdbc-postgresql"))
+    runtimeOnly(project(":komapper-template"))
+    runtimeOnly(project(":komapper-ext-slf4j"))
+    runtimeOnly(libs.logback.classic)
 }
 
 ksp {

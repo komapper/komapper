@@ -1,3 +1,3 @@
 dependencies {
-    implementation(project(":komapper-core"))
+    api(project(":komapper-core"))
 }

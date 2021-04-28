@@ -6,7 +6,7 @@ import org.komapper.core.spi.DialectFactory
 
 class MySqlDialectFactory : DialectFactory {
     override fun supports(subprotocol: String): Boolean {
-        return subprotocol == "mysql"
+        return subprotocol == MySqlDialect.subprotocol
     }
 
     override fun create(dataTypes: Set<DataType<*>>): Dialect {

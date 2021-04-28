@@ -36,6 +36,8 @@ open class MySqlDialect(dataTypes: Set<DataType<*>> = emptySet(), val version: V
     companion object {
         enum class Version { V8_0 }
 
+        const val subprotocol = "mysql"
+
         /** the error code that represents unique violation  */
         var UNIQUE_CONSTRAINT_VIOLATION_ERROR_CODES = setOf(1022, 1062)
 
@@ -63,6 +65,7 @@ open class MySqlDialect(dataTypes: Set<DataType<*>> = emptySet(), val version: V
         )
     }
 
+    override val subprotocol: String = Companion.subprotocol
     override val openQuote: String = "`"
     override val closeQuote: String = "`"
 

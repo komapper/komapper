@@ -12,6 +12,8 @@ import org.komapper.core.dsl.EntityDsl
 import org.komapper.core.dsl.SchemaDsl
 import org.komapper.core.dsl.runQuery
 import org.komapper.transaction.transaction
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import java.time.LocalDateTime
 
 data class Address(
@@ -33,6 +35,8 @@ private data class AddressDef(
     @KmCreatedAt val createdAt: Nothing,
     @KmUpdatedAt val updatedAt: Nothing,
 )
+
+val logger: Logger = LoggerFactory.getLogger("example")
 
 fun main() {
     // create a Database instance
@@ -57,7 +61,8 @@ fun main() {
         val address1 = db.runQuery {
             EntityDsl.from(a).first { a.id eq newAddress.id }
         }
-        println("address1=$address1")
+
+        logger.info("address1 = $address1")
 
         // UPDATE
         db.runQuery {
@@ -68,7 +73,11 @@ fun main() {
         val address2 = db.runQuery {
             EntityDsl.from(a).first { a.street eq "street B" }
         }
-        println("address2=$address2")
+
+        logger.info("address2 = $address2")
+        check(address1.id == address2.id)
+        check(address1.street != address2.street)
+        check(address1.version + 1 == address2.version)
 
         // DELETE
         db.runQuery {
@@ -76,10 +85,11 @@ fun main() {
         }
 
         // READ: select all
-        val list = db.runQuery {
+        val addressList = db.runQuery {
             EntityDsl.from(a).orderBy(a.id)
         }
-        println("list:$list")
-        check(list.isEmpty()) { "The list must be empty." }
+
+        logger.info("addressList = $addressList")
+        check(addressList.isEmpty()) { "The addressList must be empty." }
     }
 }

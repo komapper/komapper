@@ -1,4 +1,4 @@
 dependencies {
     api(project(":komapper-core"))
-    runtimeOnly(libs.postgresql)
+    api(libs.slf4j.api)
 }
