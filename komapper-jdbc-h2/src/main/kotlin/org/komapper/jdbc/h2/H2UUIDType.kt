@@ -1,12 +1,12 @@
 package org.komapper.jdbc.h2
 
 import org.komapper.core.jdbc.AbstractDataType
+import java.sql.JDBCType
 import java.sql.PreparedStatement
 import java.sql.ResultSet
-import java.sql.Types
 import java.util.UUID
 
-object H2UUIDType : AbstractDataType<UUID>(UUID::class, Types.OTHER) {
+object H2UUIDType : AbstractDataType<UUID>(UUID::class, JDBCType.OTHER) {
     override val name: String = "uuid"
 
     override fun doGetValue(rs: ResultSet, index: Int): UUID? {

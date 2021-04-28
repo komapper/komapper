@@ -5,11 +5,11 @@ import java.math.BigInteger
 import java.sql.Array
 import java.sql.Blob
 import java.sql.Clob
+import java.sql.JDBCType
 import java.sql.NClob
 import java.sql.PreparedStatement
 import java.sql.ResultSet
 import java.sql.SQLXML
-import java.sql.Types
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -28,7 +28,7 @@ interface DataType<T : Any> {
 
 abstract class AbstractDataType<T : Any>(
     override val klass: KClass<T>,
-    protected val sqlType: Int
+    protected val jdbcType: JDBCType
 ) : DataType<T> {
 
     override fun getValue(rs: ResultSet, index: Int): T? {
@@ -47,7 +47,7 @@ abstract class AbstractDataType<T : Any>(
 
     override fun setValue(ps: PreparedStatement, index: Int, value: T?) {
         if (value == null) {
-            ps.setNull(index, sqlType)
+            ps.setNull(index, jdbcType.vendorTypeNumber)
         } else {
             doSetValue(ps, index, value)
         }
@@ -65,7 +65,7 @@ abstract class AbstractDataType<T : Any>(
 }
 
 class AnyType(override val name: String) :
-    AbstractDataType<Any>(Any::class, Types.OTHER) {
+    AbstractDataType<Any>(Any::class, JDBCType.OTHER) {
 
     override fun doGetValue(rs: ResultSet, index: Int): Any? {
         return rs.getObject(index)
@@ -76,11 +76,11 @@ class AnyType(override val name: String) :
     }
 
     override fun doSetValue(ps: PreparedStatement, index: Int, value: Any) {
-        ps.setObject(index, value, sqlType)
+        ps.setObject(index, value, jdbcType.vendorTypeNumber)
     }
 }
 
-class ArrayType(override val name: String) : AbstractDataType<Array>(Array::class, Types.ARRAY) {
+class ArrayType(override val name: String) : AbstractDataType<Array>(Array::class, JDBCType.ARRAY) {
 
     override fun doGetValue(rs: ResultSet, index: Int): Array? {
         return rs.getArray(index)
@@ -96,7 +96,7 @@ class ArrayType(override val name: String) : AbstractDataType<Array>(Array::clas
 }
 
 class BigDecimalType(override val name: String) :
-    AbstractDataType<BigDecimal>(BigDecimal::class, Types.DECIMAL) {
+    AbstractDataType<BigDecimal>(BigDecimal::class, JDBCType.DECIMAL) {
 
     override fun doGetValue(rs: ResultSet, index: Int): BigDecimal? {
         return rs.getBigDecimal(index)
@@ -135,7 +135,7 @@ class BigIntegerType(override val name: String) : DataType<BigInteger> {
 }
 
 class BlobType(override val name: String) :
-    AbstractDataType<Blob>(Blob::class, Types.BLOB) {
+    AbstractDataType<Blob>(Blob::class, JDBCType.BLOB) {
 
     override fun doGetValue(rs: ResultSet, index: Int): Blob? {
         return rs.getBlob(index)
@@ -151,7 +151,7 @@ class BlobType(override val name: String) :
 }
 
 class BooleanType(override val name: String) :
-    AbstractDataType<Boolean>(Boolean::class, Types.BOOLEAN) {
+    AbstractDataType<Boolean>(Boolean::class, JDBCType.BOOLEAN) {
 
     override fun doGetValue(rs: ResultSet, index: Int): Boolean {
         return rs.getBoolean(index)
@@ -170,7 +170,7 @@ class BooleanType(override val name: String) :
     }
 }
 
-class ByteType(override val name: String) : AbstractDataType<Byte>(Byte::class, Types.SMALLINT) {
+class ByteType(override val name: String) : AbstractDataType<Byte>(Byte::class, JDBCType.SMALLINT) {
 
     override fun doGetValue(rs: ResultSet, index: Int): Byte {
         return rs.getByte(index)
@@ -186,7 +186,7 @@ class ByteType(override val name: String) : AbstractDataType<Byte>(Byte::class, 
 }
 
 class ByteArrayType(override val name: String) :
-    AbstractDataType<ByteArray>(ByteArray::class, Types.BINARY) {
+    AbstractDataType<ByteArray>(ByteArray::class, JDBCType.BINARY) {
 
     override fun doGetValue(rs: ResultSet, index: Int): ByteArray? {
         return rs.getBytes(index)
@@ -201,7 +201,7 @@ class ByteArrayType(override val name: String) :
     }
 }
 
-class ClobType(override val name: String) : AbstractDataType<Clob>(Clob::class, Types.CLOB) {
+class ClobType(override val name: String) : AbstractDataType<Clob>(Clob::class, JDBCType.CLOB) {
 
     override fun doGetValue(rs: ResultSet, index: Int): Clob? {
         return rs.getClob(index)
@@ -217,7 +217,7 @@ class ClobType(override val name: String) : AbstractDataType<Clob>(Clob::class, 
 }
 
 class DoubleType(override val name: String) :
-    AbstractDataType<Double>(Double::class, Types.DOUBLE) {
+    AbstractDataType<Double>(Double::class, JDBCType.DOUBLE) {
 
     override fun doGetValue(rs: ResultSet, index: Int): Double {
         return rs.getDouble(index)
@@ -259,7 +259,7 @@ class EnumType(override val klass: KClass<Enum<*>>, override val name: String) :
     }
 }
 
-class FloatType(override val name: String) : AbstractDataType<Float>(Float::class, Types.FLOAT) {
+class FloatType(override val name: String) : AbstractDataType<Float>(Float::class, JDBCType.FLOAT) {
 
     override fun doGetValue(rs: ResultSet, index: Int): Float {
         return rs.getFloat(index)
@@ -274,7 +274,7 @@ class FloatType(override val name: String) : AbstractDataType<Float>(Float::clas
     }
 }
 
-class IntType(override val name: String) : AbstractDataType<Int>(Int::class, Types.INTEGER) {
+class IntType(override val name: String) : AbstractDataType<Int>(Int::class, JDBCType.INTEGER) {
 
     override fun doGetValue(rs: ResultSet, index: Int): Int {
         return rs.getInt(index)
@@ -290,7 +290,7 @@ class IntType(override val name: String) : AbstractDataType<Int>(Int::class, Typ
 }
 
 class LocalDateTimeType(override val name: String) :
-    AbstractDataType<LocalDateTime>(LocalDateTime::class, Types.TIMESTAMP) {
+    AbstractDataType<LocalDateTime>(LocalDateTime::class, JDBCType.TIMESTAMP) {
 
     override fun doGetValue(rs: ResultSet, index: Int): LocalDateTime? {
         return rs.getObject(index, LocalDateTime::class.java)
@@ -310,7 +310,7 @@ class LocalDateTimeType(override val name: String) :
 }
 
 class LocalDateType(override val name: String) :
-    AbstractDataType<LocalDate>(LocalDate::class, Types.DATE) {
+    AbstractDataType<LocalDate>(LocalDate::class, JDBCType.DATE) {
 
     override fun doGetValue(rs: ResultSet, index: Int): LocalDate? {
         return rs.getObject(index, LocalDate::class.java)
@@ -330,7 +330,7 @@ class LocalDateType(override val name: String) :
 }
 
 class LocalTimeType(override val name: String) :
-    AbstractDataType<LocalTime>(LocalTime::class, Types.TIME) {
+    AbstractDataType<LocalTime>(LocalTime::class, JDBCType.TIME) {
 
     override fun doGetValue(rs: ResultSet, index: Int): LocalTime? {
         return rs.getObject(index, LocalTime::class.java)
@@ -349,7 +349,7 @@ class LocalTimeType(override val name: String) :
     }
 }
 
-class LongType(override val name: String) : AbstractDataType<Long>(Long::class, Types.BIGINT) {
+class LongType(override val name: String) : AbstractDataType<Long>(Long::class, JDBCType.BIGINT) {
 
     override fun doGetValue(rs: ResultSet, index: Int): Long {
         return rs.getLong(index)
@@ -364,7 +364,7 @@ class LongType(override val name: String) : AbstractDataType<Long>(Long::class, 
     }
 }
 
-class NClobType(override val name: String) : AbstractDataType<NClob>(NClob::class, Types.NCLOB) {
+class NClobType(override val name: String) : AbstractDataType<NClob>(NClob::class, JDBCType.NCLOB) {
 
     override fun doGetValue(rs: ResultSet, index: Int): NClob? {
         return rs.getNClob(index)
@@ -380,7 +380,7 @@ class NClobType(override val name: String) : AbstractDataType<NClob>(NClob::clas
 }
 
 class OffsetDateTimeType(override val name: String) :
-    AbstractDataType<OffsetDateTime>(OffsetDateTime::class, Types.TIMESTAMP_WITH_TIMEZONE) {
+    AbstractDataType<OffsetDateTime>(OffsetDateTime::class, JDBCType.TIMESTAMP_WITH_TIMEZONE) {
 
     override fun doGetValue(rs: ResultSet, index: Int): OffsetDateTime? {
         return rs.getObject(index, OffsetDateTime::class.java)
@@ -400,7 +400,7 @@ class OffsetDateTimeType(override val name: String) :
 }
 
 class ShortType(override val name: String) :
-    AbstractDataType<Short>(Short::class, Types.SMALLINT) {
+    AbstractDataType<Short>(Short::class, JDBCType.SMALLINT) {
 
     override fun doGetValue(rs: ResultSet, index: Int): Short {
         return rs.getShort(index)
@@ -416,7 +416,7 @@ class ShortType(override val name: String) :
 }
 
 class StringType(override val name: String) :
-    AbstractDataType<String>(String::class, Types.VARCHAR) {
+    AbstractDataType<String>(String::class, JDBCType.VARCHAR) {
 
     override fun doGetValue(rs: ResultSet, index: Int): String? {
         return rs.getString(index)
@@ -436,7 +436,7 @@ class StringType(override val name: String) :
 }
 
 class SQLXMLType(override val name: String) :
-    AbstractDataType<SQLXML>(SQLXML::class, Types.SQLXML) {
+    AbstractDataType<SQLXML>(SQLXML::class, JDBCType.SQLXML) {
 
     override fun doGetValue(rs: ResultSet, index: Int): SQLXML? {
         return rs.getSQLXML(index)
