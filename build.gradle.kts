@@ -30,7 +30,7 @@ allprojects {
     }
 }
 
-val komapperLibProjects = subprojects.filter {
+val libraryProjects = subprojects.filter {
     it.name.startsWith("komapper") && !it.name.endsWith("platform")
 }
 
@@ -44,7 +44,7 @@ val testProjects = subprojects.filter {
     it.name.endsWith("test")
 }
 
-configure(komapperLibProjects) {
+configure(libraryProjects) {
     apply(plugin = "org.jetbrains.kotlin.jvm")
 
     configure<JavaPluginExtension> {
@@ -53,7 +53,7 @@ configure(komapperLibProjects) {
     }
 }
 
-configure(komapperLibProjects + testProjects) {
+configure(libraryProjects + testProjects) {
     apply(plugin = "org.jetbrains.kotlin.jvm")
 
     tasks.withType<Test> {
@@ -66,7 +66,7 @@ configure(komapperLibProjects + testProjects) {
     }
 }
 
-configure(komapperLibProjects + testProjects + exampleProjects) {
+configure(libraryProjects + testProjects + exampleProjects) {
     apply(plugin = "org.jetbrains.kotlin.jvm")
 
     configure<com.diffplug.gradle.spotless.SpotlessExtension> {
@@ -81,7 +81,7 @@ configure(komapperLibProjects + testProjects + exampleProjects) {
     }
 }
 
-configure(komapperLibProjects + platformProject) {
+configure(libraryProjects + platformProject) {
     apply(plugin = "maven-publish")
     apply(plugin = "signing")
     if (this == platformProject) {
