@@ -21,7 +21,7 @@ dependencies {
     implementation(project(":komapper-transaction"))
     implementation(libs.postgresql)
 
-    runtimeOnly(project(":komapper-jdbc-h2"))
+    implementation(project(":komapper-jdbc-h2"))
     runtimeOnly(project(":komapper-jdbc-mysql"))
     runtimeOnly(project(":komapper-jdbc-postgresql"))
     runtimeOnly(project(":komapper-template"))
