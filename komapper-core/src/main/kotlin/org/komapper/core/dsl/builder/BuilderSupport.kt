@@ -22,6 +22,7 @@ class BuilderSupport(
     private val buf: StatementBuffer,
     private val escapeSequence: String? = null
 ) {
+    private val operation = CriterionOperation()
 
     fun visitTableExpression(expression: TableExpression<*>, nameType: TableNameType) {
         val name = expression.getCanonicalTableName(dialect::enquote)
@@ -152,207 +153,6 @@ class BuilderSupport(
         buf.append(")")
     }
 
-    private fun visitStringFunction(function: StringFunction) {
-        buf.append("(")
-        when (function) {
-            is StringFunction.Concat -> {
-                buf.append("concat(")
-                visitOperand(function.left)
-                buf.append(", ")
-                visitOperand(function.right)
-                buf.append(")")
-            }
-        }
-        buf.append(")")
-    }
-
-    fun visitCriterion(index: Int, c: Criterion) {
-        when (c) {
-            is Criterion.Eq -> binaryOperation(c.left, c.right, "=")
-            is Criterion.NotEq -> binaryOperation(c.left, c.right, "<>")
-            is Criterion.Less -> binaryOperation(c.left, c.right, "<")
-            is Criterion.LessEq -> binaryOperation(c.left, c.right, "<=")
-            is Criterion.Grater -> binaryOperation(c.left, c.right, ">")
-            is Criterion.GraterEq -> binaryOperation(c.left, c.right, ">=")
-            is Criterion.IsNull -> isNullOperation(c.left)
-            is Criterion.IsNotNull -> isNullOperation(c.left, true)
-            is Criterion.Like -> likeOperation(c.left, c.right)
-            is Criterion.NotLike -> likeOperation(c.left, c.right, true)
-            is Criterion.Between -> betweenOperation(c.left, c.right)
-            is Criterion.NotBetween -> betweenOperation(c.left, c.right, true)
-            is Criterion.InList -> inListOperation(c.left, c.right)
-            is Criterion.NotInList -> inListOperation(c.left, c.right, true)
-            is Criterion.InList2 -> inList2Operation(c.left, c.right)
-            is Criterion.NotInList2 -> inList2Operation(c.left, c.right, true)
-            is Criterion.InSubQuery -> inSubQueryOperation(c.left, c.right)
-            is Criterion.NotInSubQuery -> inSubQueryOperation(c.left, c.right, true)
-            is Criterion.InSubQuery2 -> inSubQuery2Operation(c.left, c.right)
-            is Criterion.NotInSubQuery2 -> inSubQuery2Operation(c.left, c.right, true)
-            is Criterion.Exists -> existsOperation(c.context)
-            is Criterion.NotExists -> existsOperation(c.context, true)
-            is Criterion.And -> logicalBinaryOperation("and", c.criteria, index)
-            is Criterion.Or -> logicalBinaryOperation("or", c.criteria, index)
-            is Criterion.Not -> notOperation(c.criteria)
-        }
-    }
-
-    private fun binaryOperation(left: Operand, right: Operand, operator: String) {
-        visitOperand(left)
-        buf.append(" $operator ")
-        visitOperand(right)
-    }
-
-    private fun isNullOperation(left: Operand, not: Boolean = false) {
-        visitOperand(left)
-        val predicate = if (not) {
-            " is not null"
-        } else {
-            " is null"
-        }
-        buf.append(predicate)
-    }
-
-    private fun likeOperation(left: Operand, right: Operand, not: Boolean = false) {
-        visitOperand(left)
-        if (not) {
-            buf.append(" not")
-        }
-        buf.append(" like ")
-        visitLikeRightOperand(right)
-    }
-
-    private fun visitLikeRightOperand(operand: Operand) {
-        when (operand) {
-            is Operand.Column -> {
-                visitColumnExpression(operand.expression)
-            }
-            is Operand.Argument -> {
-                when (val value = operand.value) {
-                    is EscapeExpression -> {
-                        val finalEscapeSequence = escapeSequence ?: dialect.escapeSequence
-                        val newValue = visitEscapeExpression(value) { dialect.escape(it, finalEscapeSequence) }
-                        visitArgument(Operand.Argument(operand.klass, newValue))
-                        buf.append(" escape ")
-                        buf.bind(Value(finalEscapeSequence, String::class))
-                    }
-                    else -> visitArgument(operand)
-                }
-            }
-        }
-    }
-
-    private fun visitEscapeExpression(expression: EscapeExpression, escape: (String) -> String): String {
-        val buf = StringBuilder(expression.length + 10)
-        fun visit(e: EscapeExpression) {
-            when (e) {
-                is EscapeExpression.Text -> buf.append(e.value)
-                is EscapeExpression.Escape -> buf.append(escape(e.value.toString()))
-                is EscapeExpression.Composite -> {
-                    visit(e.left)
-                    visit(e.right)
-                }
-            }
-        }
-        visit(expression)
-        return buf.toString()
-    }
-
-    private fun betweenOperation(left: Operand, right: Pair<Operand, Operand>, not: Boolean = false) {
-        visitOperand(left)
-        if (not) {
-            buf.append(" not")
-        }
-        buf.append(" between ")
-        val (start, end) = right
-        visitOperand(start)
-        buf.append(" and ")
-        visitOperand(end)
-    }
-
-    private fun inListOperation(left: Operand, right: List<Operand>, not: Boolean = false) {
-        visitOperand(left)
-        if (not) {
-            buf.append(" not")
-        }
-        buf.append(" in (")
-        if (right.isEmpty()) {
-            buf.append("null")
-        } else {
-            for (parameter in right) {
-                visitOperand(parameter)
-                buf.append(", ")
-            }
-            buf.cutBack(2)
-        }
-        buf.append(")")
-    }
-
-    private fun inList2Operation(
-        left: Pair<Operand, Operand>,
-        right: List<Pair<Operand, Operand>>,
-        not: Boolean = false
-    ) {
-        buf.append("(")
-        visitOperand(left.first)
-        buf.append(", ")
-        visitOperand(left.second)
-        buf.append(")")
-        if (not) {
-            buf.append(" not")
-        }
-        buf.append(" in (")
-        if (right.isEmpty()) {
-            buf.append("null")
-        } else {
-            for ((first, second) in right) {
-                buf.append("(")
-                visitOperand(first)
-                buf.append(", ")
-                visitOperand(second)
-                buf.append(")")
-                buf.append(", ")
-            }
-            buf.cutBack(2)
-        }
-        buf.append(")")
-    }
-
-    private fun inSubQueryOperation(left: Operand, right: SubqueryContext<*>, not: Boolean = false) {
-        visitOperand(left)
-        if (not) {
-            buf.append(" not")
-        }
-        buf.append(" in (")
-        val statement = buildSubqueryStatement(right)
-        buf.append(statement)
-        buf.append(")")
-    }
-
-    private fun inSubQuery2Operation(left: Pair<Operand, Operand>, right: SubqueryContext<*>, not: Boolean = false) {
-        buf.append("(")
-        visitOperand(left.first)
-        buf.append(", ")
-        visitOperand(left.second)
-        buf.append(")")
-        if (not) {
-            buf.append(" not")
-        }
-        buf.append(" in (")
-        val statement = buildSubqueryStatement(right)
-        buf.append(statement)
-        buf.append(")")
-    }
-
-    private fun existsOperation(subqueryContext: SubqueryContext<*>, not: Boolean = false) {
-        if (not) {
-            buf.append("not ")
-        }
-        buf.append("exists (")
-        val statement = buildSubqueryStatement(subqueryContext)
-        buf.append(statement)
-        buf.append(")")
-    }
-
     fun buildSubqueryStatement(subqueryContext: SubqueryContext<*>): Statement {
         return when (subqueryContext) {
             is SubqueryContext.EntitySelect<*> -> {
@@ -375,35 +175,18 @@ class BuilderSupport(
         }
     }
 
-    private fun logicalBinaryOperation(operator: String, criteria: List<Criterion>, index: Int) {
-        if (criteria.isNotEmpty()) {
-            if (index > 0) {
-                buf.cutBack(5)
+    private fun visitStringFunction(function: StringFunction) {
+        buf.append("(")
+        when (function) {
+            is StringFunction.Concat -> {
+                buf.append("concat(")
+                visitOperand(function.left)
+                buf.append(", ")
+                visitOperand(function.right)
+                buf.append(")")
             }
-            if (index != 0) {
-                buf.append(" $operator ")
-            }
-            buf.append("(")
-            for ((i, c) in criteria.withIndex()) {
-                visitCriterion(i, c)
-                buf.append(" and ")
-            }
-            buf.cutBack(5)
-            buf.append(")")
         }
-    }
-
-    private fun notOperation(criteria: List<Criterion>) {
-        if (criteria.isNotEmpty()) {
-            buf.append("not ")
-            buf.append("(")
-            for ((index, c) in criteria.withIndex()) {
-                visitCriterion(index, c)
-                buf.append(" and ")
-            }
-            buf.cutBack(5)
-            buf.append(")")
-        }
+        buf.append(")")
     }
 
     fun visitOperand(operand: Operand) {
@@ -419,5 +202,222 @@ class BuilderSupport(
 
     private fun visitArgument(argument: Operand.Argument) {
         buf.bind(Value(argument.value, argument.klass))
+    }
+
+    fun visitCriterion(index: Int, c: Criterion) {
+        when (c) {
+            is Criterion.Eq -> operation.binary(c.left, c.right, "=")
+            is Criterion.NotEq -> operation.binary(c.left, c.right, "<>")
+            is Criterion.Less -> operation.binary(c.left, c.right, "<")
+            is Criterion.LessEq -> operation.binary(c.left, c.right, "<=")
+            is Criterion.Grater -> operation.binary(c.left, c.right, ">")
+            is Criterion.GraterEq -> operation.binary(c.left, c.right, ">=")
+            is Criterion.IsNull -> operation.isNull(c.left)
+            is Criterion.IsNotNull -> operation.isNull(c.left, true)
+            is Criterion.Like -> operation.like(c.left, c.right)
+            is Criterion.NotLike -> operation.like(c.left, c.right, true)
+            is Criterion.Between -> operation.between(c.left, c.right)
+            is Criterion.NotBetween -> operation.between(c.left, c.right, true)
+            is Criterion.InList -> operation.inList(c.left, c.right)
+            is Criterion.NotInList -> operation.inList(c.left, c.right, true)
+            is Criterion.InList2 -> operation.inList2(c.left, c.right)
+            is Criterion.NotInList2 -> operation.inList2(c.left, c.right, true)
+            is Criterion.InSubQuery -> operation.inSubQuery(c.left, c.right)
+            is Criterion.NotInSubQuery -> operation.inSubQuery(c.left, c.right, true)
+            is Criterion.InSubQuery2 -> operation.inSubQuery2(c.left, c.right)
+            is Criterion.NotInSubQuery2 -> operation.inSubQuery2(c.left, c.right, true)
+            is Criterion.Exists -> operation.exists(c.context)
+            is Criterion.NotExists -> operation.exists(c.context, true)
+            is Criterion.And -> operation.logicalBinary("and", c.criteria, index)
+            is Criterion.Or -> operation.logicalBinary("or", c.criteria, index)
+            is Criterion.Not -> operation.not(c.criteria)
+        }
+    }
+
+    private inner class CriterionOperation {
+
+        fun binary(left: Operand, right: Operand, operator: String) {
+            visitOperand(left)
+            buf.append(" $operator ")
+            visitOperand(right)
+        }
+
+        fun isNull(left: Operand, not: Boolean = false) {
+            visitOperand(left)
+            val predicate = if (not) {
+                " is not null"
+            } else {
+                " is null"
+            }
+            buf.append(predicate)
+        }
+
+        fun like(left: Operand, right: Operand, not: Boolean = false) {
+            visitOperand(left)
+            if (not) {
+                buf.append(" not")
+            }
+            buf.append(" like ")
+            when (right) {
+                is Operand.Column -> {
+                    visitColumnExpression(right.expression)
+                }
+                is Operand.Argument -> {
+                    when (val value = right.value) {
+                        is EscapeExpression -> {
+                            val finalEscapeSequence = escapeSequence ?: dialect.escapeSequence
+                            val newValue = escape(value) { dialect.escape(it, finalEscapeSequence) }
+                            visitArgument(Operand.Argument(right.klass, newValue))
+                            buf.append(" escape ")
+                            buf.bind(Value(finalEscapeSequence, String::class))
+                        }
+                        else -> visitArgument(right)
+                    }
+                }
+            }
+        }
+
+        private fun escape(expression: EscapeExpression, escape: (String) -> String): String {
+            val buf = StringBuilder(expression.length + 10)
+            fun visit(e: EscapeExpression) {
+                when (e) {
+                    is EscapeExpression.Text -> buf.append(e.value)
+                    is EscapeExpression.Escape -> buf.append(escape(e.value.toString()))
+                    is EscapeExpression.Composite -> {
+                        visit(e.left)
+                        visit(e.right)
+                    }
+                }
+            }
+            visit(expression)
+            return buf.toString()
+        }
+
+        fun between(left: Operand, right: Pair<Operand, Operand>, not: Boolean = false) {
+            visitOperand(left)
+            if (not) {
+                buf.append(" not")
+            }
+            buf.append(" between ")
+            val (start, end) = right
+            visitOperand(start)
+            buf.append(" and ")
+            visitOperand(end)
+        }
+
+        fun inList(left: Operand, right: List<Operand>, not: Boolean = false) {
+            visitOperand(left)
+            if (not) {
+                buf.append(" not")
+            }
+            buf.append(" in (")
+            if (right.isEmpty()) {
+                buf.append("null")
+            } else {
+                for (parameter in right) {
+                    visitOperand(parameter)
+                    buf.append(", ")
+                }
+                buf.cutBack(2)
+            }
+            buf.append(")")
+        }
+
+        fun inList2(
+            left: Pair<Operand, Operand>,
+            right: List<Pair<Operand, Operand>>,
+            not: Boolean = false
+        ) {
+            buf.append("(")
+            visitOperand(left.first)
+            buf.append(", ")
+            visitOperand(left.second)
+            buf.append(")")
+            if (not) {
+                buf.append(" not")
+            }
+            buf.append(" in (")
+            if (right.isEmpty()) {
+                buf.append("null")
+            } else {
+                for ((first, second) in right) {
+                    buf.append("(")
+                    visitOperand(first)
+                    buf.append(", ")
+                    visitOperand(second)
+                    buf.append(")")
+                    buf.append(", ")
+                }
+                buf.cutBack(2)
+            }
+            buf.append(")")
+        }
+
+        fun inSubQuery(left: Operand, right: SubqueryContext<*>, not: Boolean = false) {
+            visitOperand(left)
+            if (not) {
+                buf.append(" not")
+            }
+            buf.append(" in (")
+            val statement = buildSubqueryStatement(right)
+            buf.append(statement)
+            buf.append(")")
+        }
+
+        fun inSubQuery2(left: Pair<Operand, Operand>, right: SubqueryContext<*>, not: Boolean = false) {
+            buf.append("(")
+            visitOperand(left.first)
+            buf.append(", ")
+            visitOperand(left.second)
+            buf.append(")")
+            if (not) {
+                buf.append(" not")
+            }
+            buf.append(" in (")
+            val statement = buildSubqueryStatement(right)
+            buf.append(statement)
+            buf.append(")")
+        }
+
+        fun exists(subqueryContext: SubqueryContext<*>, not: Boolean = false) {
+            if (not) {
+                buf.append("not ")
+            }
+            buf.append("exists (")
+            val statement = buildSubqueryStatement(subqueryContext)
+            buf.append(statement)
+            buf.append(")")
+        }
+
+        fun logicalBinary(operator: String, criteria: List<Criterion>, index: Int) {
+            if (criteria.isNotEmpty()) {
+                if (index > 0) {
+                    buf.cutBack(5)
+                }
+                if (index != 0) {
+                    buf.append(" $operator ")
+                }
+                buf.append("(")
+                for ((i, c) in criteria.withIndex()) {
+                    visitCriterion(i, c)
+                    buf.append(" and ")
+                }
+                buf.cutBack(5)
+                buf.append(")")
+            }
+        }
+
+        fun not(criteria: List<Criterion>) {
+            if (criteria.isNotEmpty()) {
+                buf.append("not ")
+                buf.append("(")
+                for ((index, c) in criteria.withIndex()) {
+                    visitCriterion(index, c)
+                    buf.append(" and ")
+                }
+                buf.cutBack(5)
+                buf.append(")")
+            }
+        }
     }
 }
