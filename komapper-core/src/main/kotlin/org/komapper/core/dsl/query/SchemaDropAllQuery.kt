@@ -6,15 +6,15 @@ import org.komapper.core.Statement
 import org.komapper.core.dsl.option.SchemaDropAllOption
 
 interface SchemaDropAllQuery : Query<Unit> {
-    fun option(configurator: (SchemaDropAllOption) -> SchemaDropAllOption): SchemaDropAllQuery
+    fun option(configure: (SchemaDropAllOption) -> SchemaDropAllOption): SchemaDropAllQuery
 }
 
 internal data class SchemaDropAllQueryImpl(
     private val option: SchemaDropAllOption = SchemaDropAllOption.default
 ) : SchemaDropAllQuery {
 
-    override fun option(configurator: (SchemaDropAllOption) -> SchemaDropAllOption): SchemaDropAllQuery {
-        return copy(option = configurator(option))
+    override fun option(configure: (SchemaDropAllOption) -> SchemaDropAllOption): SchemaDropAllQuery {
+        return copy(option = configure(option))
     }
 
     override fun run(config: DatabaseConfig) {

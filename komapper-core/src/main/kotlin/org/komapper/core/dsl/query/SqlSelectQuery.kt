@@ -42,7 +42,7 @@ interface SqlSelectQuery<ENTITY : Any> : Subquery<ENTITY> {
     fun offset(offset: Int): SqlSelectQuery<ENTITY>
     fun limit(limit: Int): SqlSelectQuery<ENTITY>
     fun forUpdate(): SqlSelectQuery<ENTITY>
-    fun option(configurator: (SqlSelectOption) -> SqlSelectOption): SqlSelectQuery<ENTITY>
+    fun option(configure: (SqlSelectOption) -> SqlSelectOption): SqlSelectQuery<ENTITY>
 
     fun <A : Any, A_ID, A_META : EntityMetamodel<A, A_ID, A_META>> select(
         metamodel: A_META
@@ -170,8 +170,8 @@ internal data class SqlSelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<
         return copy(context = newContext)
     }
 
-    override fun option(configurator: (SqlSelectOption) -> SqlSelectOption): SqlSelectQueryImpl<ENTITY, ID, META> {
-        return copy(option = configurator(option))
+    override fun option(configure: (SqlSelectOption) -> SqlSelectOption): SqlSelectQueryImpl<ENTITY, ID, META> {
+        return copy(option = configure(option))
     }
 
     override fun except(other: Subquery<ENTITY>): SqlSetOperationQuery<ENTITY> {
@@ -303,26 +303,26 @@ internal data class SqlSelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<
         return createTerminal(newContext) { it.firstOrNull() }
     }
 
-    override fun <R> collect(transformer: (Sequence<ENTITY>) -> R): Query<R> {
-        return createTerminal(context, transformer)
+    override fun <R> collect(transform: (Sequence<ENTITY>) -> R): Query<R> {
+        return createTerminal(context, transform)
     }
 
     private fun <R> createTerminal(
         c: SqlSelectContext<ENTITY, ID, META>,
-        transformer: (Sequence<ENTITY>) -> R
+        transform: (Sequence<ENTITY>) -> R
     ): Query<R> {
-        val provider: (Dialect, ResultSet) -> ENTITY = { dialect, rs ->
+        val provide: (Dialect, ResultSet) -> ENTITY = { dialect, rs ->
             val mapper = EntityMapper(dialect, rs)
             val entity = mapper.execute(c.target, true)
             checkNotNull(entity)
         }
-        return Terminal(c, option, provider, transformer)
+        return Terminal(c, option, provide, transform)
     }
 
     internal data class Collectable<T>(
         private val context: SqlSelectContext<*, *, *>,
         private val option: SqlSelectOption,
-        private val provider: (Dialect, ResultSet) -> T
+        private val provide: (Dialect, ResultSet) -> T
     ) : Subquery<T> {
 
         override val subqueryContext = SubqueryContext.SqlSelect<T>(context)
@@ -345,7 +345,7 @@ internal data class SqlSelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<
 
         private fun setOperation(kind: SqlSetOperationKind, other: Subquery<T>): SqlSetOperationQuery<T> {
             val setOperationContext = SqlSetOperationContext(kind, subqueryContext, other.subqueryContext)
-            return SetOperationQueryImpl(setOperationContext, provider = provider)
+            return SetOperationQueryImpl(setOperationContext, provide = provide)
         }
 
         override fun run(config: DatabaseConfig): List<T> {
@@ -366,20 +366,20 @@ internal data class SqlSelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<
             return createTerminal { it.firstOrNull() }
         }
 
-        override fun <R> collect(transformer: (Sequence<T>) -> R): Query<R> {
-            return createTerminal(transformer)
+        override fun <R> collect(transform: (Sequence<T>) -> R): Query<R> {
+            return createTerminal(transform)
         }
 
-        private fun <R> createTerminal(transformer: (Sequence<T>) -> R): Query<R> {
-            return Terminal(context, option, provider, transformer)
+        private fun <R> createTerminal(transform: (Sequence<T>) -> R): Query<R> {
+            return Terminal(context, option, provide, transform)
         }
     }
 
     internal class Terminal<T, R>(
         private val context: SqlSelectContext<*, *, *>,
         private val option: SqlSelectOption,
-        private val provider: (Dialect, ResultSet) -> T,
-        private val transformer: (Sequence<T>) -> R
+        private val provide: (Dialect, ResultSet) -> T,
+        private val transform: (Sequence<T>) -> R
     ) : Query<R> {
 
         override fun run(config: DatabaseConfig): R {
@@ -388,7 +388,7 @@ internal data class SqlSelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<
             }
             val statement = buildStatement(config)
             val executor = JdbcExecutor(config, option)
-            return executor.executeQuery(statement, provider, transformer)
+            return executor.executeQuery(statement, provide, transform)
         }
 
         override fun dryRun(config: DatabaseConfig): String {

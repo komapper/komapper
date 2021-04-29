@@ -6,8 +6,8 @@ import org.komapper.core.Statement
 import org.komapper.core.dsl.option.TemplateExecuteOption
 
 interface TemplateExecuteQuery : Query<Int> {
-    fun option(configurator: (TemplateExecuteOption) -> TemplateExecuteOption): TemplateExecuteQuery
-    fun params(provider: () -> Any): TemplateExecuteQuery
+    fun option(configure: (TemplateExecuteOption) -> TemplateExecuteOption): TemplateExecuteQuery
+    fun params(provide: () -> Any): TemplateExecuteQuery
 }
 
 internal data class TemplateExecuteQueryImpl(
@@ -16,12 +16,12 @@ internal data class TemplateExecuteQueryImpl(
     private val option: TemplateExecuteOption = TemplateExecuteOption.default
 ) : TemplateExecuteQuery {
 
-    override fun option(configurator: (TemplateExecuteOption) -> TemplateExecuteOption): TemplateExecuteQueryImpl {
-        return copy(option = configurator(option))
+    override fun option(configure: (TemplateExecuteOption) -> TemplateExecuteOption): TemplateExecuteQueryImpl {
+        return copy(option = configure(option))
     }
 
-    override fun params(provider: () -> Any): TemplateExecuteQuery {
-        return copy(params = provider())
+    override fun params(provide: () -> Any): TemplateExecuteQuery {
+        return copy(params = provide())
     }
 
     override fun run(config: DatabaseConfig): Int {

@@ -10,7 +10,7 @@ interface TemplateSelectQuery<T> : ListQuery<T>
 internal data class TemplateSelectQueryImpl<T>(
     private val sql: String,
     private val params: Any,
-    private val provider: Row.() -> T,
+    private val provide: Row.() -> T,
     private val option: TemplateSelectOption
 ) : TemplateSelectQuery<T> {
 
@@ -32,11 +32,11 @@ internal data class TemplateSelectQueryImpl<T>(
         return Terminal { it.firstOrNull() }
     }
 
-    override fun <R> collect(transformer: (Sequence<T>) -> R): Query<R> {
-        return Terminal(transformer)
+    override fun <R> collect(transform: (Sequence<T>) -> R): Query<R> {
+        return Terminal(transform)
     }
 
-    private inner class Terminal<R>(val transformer: (Sequence<T>) -> R) : Query<R> {
+    private inner class Terminal<R>(val transform: (Sequence<T>) -> R) : Query<R> {
         override fun run(config: DatabaseConfig): R {
             val statement = buildStatement(config)
             val executor = JdbcExecutor(config, option)
@@ -44,9 +44,9 @@ internal data class TemplateSelectQueryImpl<T>(
                 statement,
                 { dialect, rs ->
                     val row = RowImpl(dialect, rs)
-                    provider(row)
+                    provide(row)
                 },
-                transformer
+                transform
             )
         }
 

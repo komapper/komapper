@@ -23,7 +23,7 @@ interface SqlSetOperationQuery<T> : Subquery<T> {
 internal data class SetOperationQueryImpl<T>(
     private val context: SqlSetOperationContext<T>,
     private val option: SqlSetOperationOption = SqlSetOperationOption.default,
-    private val provider: (Dialect, ResultSet) -> T
+    private val provide: (Dialect, ResultSet) -> T
 ) : SqlSetOperationQuery<T> {
 
     override val subqueryContext = SubqueryContext.SqlSetOperation(context)
@@ -95,19 +95,19 @@ internal data class SetOperationQueryImpl<T>(
         return createTerminal { it.firstOrNull() }
     }
 
-    override fun <R> collect(transformer: (Sequence<T>) -> R): Query<R> {
-        return createTerminal(transformer)
+    override fun <R> collect(transform: (Sequence<T>) -> R): Query<R> {
+        return createTerminal(transform)
     }
 
-    private fun <R> createTerminal(transformer: (Sequence<T>) -> R): Query<R> {
-        return Terminal(context, option, provider, transformer)
+    private fun <R> createTerminal(transform: (Sequence<T>) -> R): Query<R> {
+        return Terminal(context, option, provide, transform)
     }
 
     private class Terminal<T, R>(
         private val context: SqlSetOperationContext<T>,
         private val option: SqlSetOperationOption,
-        private val provider: (Dialect, ResultSet) -> T,
-        val transformer: (Sequence<T>) -> R
+        private val provide: (Dialect, ResultSet) -> T,
+        val transform: (Sequence<T>) -> R
     ) : Query<R> {
 
         override fun run(config: DatabaseConfig): R {
@@ -117,7 +117,7 @@ internal data class SetOperationQueryImpl<T>(
             }
             val statement = buildStatement(config)
             val executor = JdbcExecutor(config, option)
-            return executor.executeQuery(statement, provider, transformer)
+            return executor.executeQuery(statement, provide, transform)
         }
 
         private fun checkWhereClauses(subqueryContext: SubqueryContext<*>) {

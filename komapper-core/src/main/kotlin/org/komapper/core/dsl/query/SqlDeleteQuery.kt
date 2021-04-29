@@ -12,7 +12,7 @@ import org.komapper.core.dsl.scope.WhereScope
 
 interface SqlDeleteQuery : Query<Int> {
     fun where(declaration: WhereDeclaration): SqlDeleteQuery
-    fun option(configurator: (SqlDeleteOption) -> SqlDeleteOption): SqlDeleteQuery
+    fun option(configure: (SqlDeleteOption) -> SqlDeleteOption): SqlDeleteQuery
 }
 
 internal data class SqlDeleteQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
@@ -26,8 +26,8 @@ internal data class SqlDeleteQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<
         return copy(context = newContext)
     }
 
-    override fun option(configurator: (SqlDeleteOption) -> SqlDeleteOption): SqlDeleteQueryImpl<ENTITY, ID, META> {
-        return copy(option = configurator(option))
+    override fun option(configure: (SqlDeleteOption) -> SqlDeleteOption): SqlDeleteQueryImpl<ENTITY, ID, META> {
+        return copy(option = configure(option))
     }
 
     override fun run(config: DatabaseConfig): Int {

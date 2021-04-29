@@ -35,7 +35,7 @@ interface EntitySelectQuery<ENTITY : Any> : Subquery<ENTITY> {
     fun offset(offset: Int): EntitySelectQuery<ENTITY>
     fun limit(limit: Int): EntitySelectQuery<ENTITY>
     fun forUpdate(): EntitySelectQuery<ENTITY>
-    fun option(configurator: (EntitySelectOption) -> EntitySelectOption): EntitySelectQuery<ENTITY>
+    fun option(configure: (EntitySelectOption) -> EntitySelectOption): EntitySelectQuery<ENTITY>
 
     fun <T : Any, S : Any> associate(
         metamodel1: EntityMetamodel<T, *, *>,
@@ -126,8 +126,8 @@ internal data class EntitySelectQueryImpl<ENTITY : Any, ID, META : EntityMetamod
         return copy(context = newContext)
     }
 
-    override fun option(configurator: (EntitySelectOption) -> EntitySelectOption): EntitySelectQuery<ENTITY> {
-        return copy(option = configurator(option))
+    override fun option(configure: (EntitySelectOption) -> EntitySelectOption): EntitySelectQuery<ENTITY> {
+        return copy(option = configure(option))
     }
 
     override fun except(other: Subquery<ENTITY>): SqlSetOperationQuery<ENTITY> {
@@ -168,11 +168,11 @@ internal data class EntitySelectQueryImpl<ENTITY : Any, ID, META : EntityMetamod
         return Terminal { it.firstOrNull() }
     }
 
-    override fun <R> collect(transformer: (Sequence<ENTITY>) -> R): Query<R> {
-        return Terminal(transformer)
+    override fun <R> collect(transform: (Sequence<ENTITY>) -> R): Query<R> {
+        return Terminal(transform)
     }
 
-    private inner class Terminal<R>(val transformer: (Sequence<ENTITY>) -> R) : Query<R> {
+    private inner class Terminal<R>(val transform: (Sequence<ENTITY>) -> R) : Query<R> {
 
         override fun run(config: DatabaseConfig): R {
             if (!option.allowEmptyWhereClause && context.where.isEmpty()) {
@@ -197,7 +197,7 @@ internal data class EntitySelectQueryImpl<ENTITY : Any, ID, META : EntityMetamod
                 }.map {
                     context.target.klass().cast(it.value)
                 }.let {
-                    transformer(it)
+                    transform(it)
                 }
             }
         }

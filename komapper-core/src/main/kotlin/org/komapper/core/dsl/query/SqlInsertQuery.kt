@@ -15,7 +15,7 @@ import org.komapper.core.dsl.scope.ValuesScope
 interface SqlInsertQuery<ENTITY : Any> : Query<Pair<Int, Long?>> {
     fun values(declaration: ValuesDeclaration<ENTITY>): SqlInsertQuery<ENTITY>
     fun <T : Any> select(block: () -> Subquery<T>): SqlInsertQuery<ENTITY>
-    fun option(configurator: (SqlInsertOption) -> SqlInsertOption): SqlInsertQuery<ENTITY>
+    fun option(configure: (SqlInsertOption) -> SqlInsertOption): SqlInsertQuery<ENTITY>
 }
 
 internal data class SqlInsertQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
@@ -40,8 +40,8 @@ internal data class SqlInsertQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<
         return copy(context = newContext)
     }
 
-    override fun option(configurator: (SqlInsertOption) -> SqlInsertOption): SqlInsertQueryImpl<ENTITY, ID, META> {
-        return copy(option = configurator(option))
+    override fun option(configure: (SqlInsertOption) -> SqlInsertOption): SqlInsertQueryImpl<ENTITY, ID, META> {
+        return copy(option = configure(option))
     }
 
     override fun run(config: DatabaseConfig): Pair<Int, Long?> {

@@ -7,7 +7,7 @@ import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.option.SchemaDropOption
 
 interface SchemaDropQuery : Query<Unit> {
-    fun option(configurator: (SchemaDropOption) -> SchemaDropOption): SchemaDropQuery
+    fun option(configure: (SchemaDropOption) -> SchemaDropOption): SchemaDropQuery
 }
 
 internal data class SchemaDropQueryImpl(
@@ -15,8 +15,8 @@ internal data class SchemaDropQueryImpl(
     val option: SchemaDropOption = SchemaDropOption.default
 ) : SchemaDropQuery {
 
-    override fun option(configurator: (SchemaDropOption) -> SchemaDropOption): SchemaDropQuery {
-        return copy(option = configurator(option))
+    override fun option(configure: (SchemaDropOption) -> SchemaDropOption): SchemaDropQuery {
+        return copy(option = configure(option))
     }
 
     override fun run(config: DatabaseConfig) {

@@ -5,7 +5,7 @@ import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.option.EntityDeleteOption
 
 interface EntityDeleteQueryBuilder<ENTITY : Any> {
-    fun option(configurator: (EntityDeleteOption) -> EntityDeleteOption): EntityDeleteQueryBuilder<ENTITY>
+    fun option(configure: (EntityDeleteOption) -> EntityDeleteOption): EntityDeleteQueryBuilder<ENTITY>
     fun single(entity: ENTITY): Query<Unit>
     fun batch(entities: List<ENTITY>, batchSize: Int? = null): Query<Unit>
 }
@@ -16,8 +16,8 @@ internal data class EntityDeleteQueryBuilderImpl<ENTITY : Any, ID, META : Entity
 ) :
     EntityDeleteQueryBuilder<ENTITY> {
 
-    override fun option(configurator: (EntityDeleteOption) -> EntityDeleteOption): EntityDeleteQueryBuilderImpl<ENTITY, ID, META> {
-        return copy(option = configurator(option))
+    override fun option(configure: (EntityDeleteOption) -> EntityDeleteOption): EntityDeleteQueryBuilderImpl<ENTITY, ID, META> {
+        return copy(option = configure(option))
     }
 
     override fun single(entity: ENTITY): Query<Unit> {

@@ -7,7 +7,7 @@ import org.komapper.core.dsl.metamodel.PropertyMetamodel
 import org.komapper.core.dsl.option.EntityInsertOption
 
 interface EntityInsertQueryBuilder<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> {
-    fun option(configurator: (EntityInsertOption) -> EntityInsertOption): EntityInsertQueryBuilder<ENTITY, ID, META>
+    fun option(configure: (EntityInsertOption) -> EntityInsertOption): EntityInsertQueryBuilder<ENTITY, ID, META>
     fun onDuplicateKeyUpdate(vararg keys: PropertyMetamodel<ENTITY, *> = emptyArray()): EntityUpsertQueryBuilder<ENTITY, ID, META>
     fun onDuplicateKeyIgnore(vararg keys: PropertyMetamodel<ENTITY, *> = emptyArray()): EntityUpsertQueryBuilder<ENTITY, ID, META>
     fun single(entity: ENTITY): Query<ENTITY>
@@ -21,8 +21,8 @@ internal data class EntityInsertQueryBuilderImpl<ENTITY : Any, ID, META : Entity
 ) :
     EntityInsertQueryBuilder<ENTITY, ID, META> {
 
-    override fun option(configurator: (EntityInsertOption) -> EntityInsertOption): EntityInsertQueryBuilderImpl<ENTITY, ID, META> {
-        return copy(option = configurator(option))
+    override fun option(configure: (EntityInsertOption) -> EntityInsertOption): EntityInsertQueryBuilderImpl<ENTITY, ID, META> {
+        return copy(option = configure(option))
     }
 
     override fun onDuplicateKeyUpdate(vararg keys: PropertyMetamodel<ENTITY, *>): EntityUpsertQueryBuilder<ENTITY, ID, META> {

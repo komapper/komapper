@@ -7,7 +7,7 @@ import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.option.SchemaCreateOption
 
 interface SchemaCreateQuery : Query<Unit> {
-    fun option(configurator: (SchemaCreateOption) -> SchemaCreateOption): SchemaCreateQuery
+    fun option(configure: (SchemaCreateOption) -> SchemaCreateOption): SchemaCreateQuery
 }
 
 internal data class SchemaCreateQueryImpl(
@@ -15,8 +15,8 @@ internal data class SchemaCreateQueryImpl(
     val option: SchemaCreateOption = SchemaCreateOption.default
 ) : SchemaCreateQuery {
 
-    override fun option(configurator: (SchemaCreateOption) -> SchemaCreateOption): SchemaCreateQuery {
-        return copy(option = configurator(option))
+    override fun option(configure: (SchemaCreateOption) -> SchemaCreateOption): SchemaCreateQuery {
+        return copy(option = configure(option))
     }
 
     override fun run(config: DatabaseConfig) {

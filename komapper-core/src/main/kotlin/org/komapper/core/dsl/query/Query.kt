@@ -12,7 +12,7 @@ interface Query<T> {
 interface ListQuery<T> : Query<List<T>> {
     fun first(): Query<T>
     fun firstOrNull(): Query<T?>
-    fun <R> collect(transformer: (Sequence<T>) -> R): Query<R>
+    fun <R> collect(transform: (Sequence<T>) -> R): Query<R>
 }
 
 interface Subquery<T> : ListQuery<T> {

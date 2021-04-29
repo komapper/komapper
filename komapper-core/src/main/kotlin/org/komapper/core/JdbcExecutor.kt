@@ -15,7 +15,7 @@ internal class JdbcExecutor(
 
     fun <T> executeQuery(
         statement: Statement,
-        handler: (rs: ResultSet) -> T
+        transform: (rs: ResultSet) -> T
     ): T {
         @Suppress("NAME_SHADOWING")
         val statement = inspect(statement)
@@ -25,7 +25,7 @@ internal class JdbcExecutor(
                 ps.setUp()
                 ps.bind(statement)
                 ps.executeQuery().use { rs ->
-                    handler(rs)
+                    transform(rs)
                 }
             }
         }
@@ -33,8 +33,8 @@ internal class JdbcExecutor(
 
     fun <T, R> executeQuery(
         statement: Statement,
-        provider: (Dialect, ResultSet) -> T,
-        transformer: (Sequence<T>) -> R
+        provide: (Dialect, ResultSet) -> T,
+        transform: (Sequence<T>) -> R
     ): R {
         @Suppress("NAME_SHADOWING")
         val statement = inspect(statement)
@@ -48,10 +48,10 @@ internal class JdbcExecutor(
                         var hasNext = rs.next()
                         override fun hasNext() = hasNext
                         override fun next(): T {
-                            return provider(config.dialect, rs).also { hasNext = rs.next() }
+                            return provide(config.dialect, rs).also { hasNext = rs.next() }
                         }
                     }
-                    transformer(iterator.asSequence())
+                    transform(iterator.asSequence())
                 }
             }
         }

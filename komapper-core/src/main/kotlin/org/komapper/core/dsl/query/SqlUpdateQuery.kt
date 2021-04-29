@@ -15,7 +15,7 @@ import org.komapper.core.dsl.scope.WhereScope
 interface SqlUpdateQuery<ENTITY : Any> : Query<Int> {
     fun set(declaration: SetDeclaration<ENTITY>): SqlUpdateQuery<ENTITY>
     fun where(declaration: WhereDeclaration): SqlUpdateQuery<ENTITY>
-    fun option(configurator: (SqlUpdateOption) -> SqlUpdateOption): SqlUpdateQuery<ENTITY>
+    fun option(configure: (SqlUpdateOption) -> SqlUpdateOption): SqlUpdateQuery<ENTITY>
 }
 
 internal data class SqlUpdateQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
@@ -35,8 +35,8 @@ internal data class SqlUpdateQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<
         return copy(context = newContext)
     }
 
-    override fun option(configurator: (SqlUpdateOption) -> SqlUpdateOption): SqlUpdateQueryImpl<ENTITY, ID, META> {
-        return copy(option = configurator(option))
+    override fun option(configure: (SqlUpdateOption) -> SqlUpdateOption): SqlUpdateQueryImpl<ENTITY, ID, META> {
+        return copy(option = configure(option))
     }
 
     override fun run(config: DatabaseConfig): Int {

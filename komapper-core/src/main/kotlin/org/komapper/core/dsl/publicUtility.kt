@@ -21,11 +21,11 @@ fun <T> Database.runQuery(block: QueryScope.() -> Query<T>): T {
     return block(QueryScope).run(this.config)
 }
 
-fun <T, R> Query<T>.flatMap(transformer: (T) -> Query<R>): Query<R> {
+fun <T, R> Query<T>.flatMap(transform: (T) -> Query<R>): Query<R> {
     return object : Query<R> {
         override fun run(config: DatabaseConfig): R {
             val result = this@flatMap.run(config)
-            return transformer(result).run(config)
+            return transform(result).run(config)
         }
 
         override fun dryRun(config: DatabaseConfig): String {
@@ -34,11 +34,11 @@ fun <T, R> Query<T>.flatMap(transformer: (T) -> Query<R>): Query<R> {
     }
 }
 
-fun <T, R> Query<T>.flatZip(transformer: (T) -> Query<R>): Query<Pair<T, R>> {
+fun <T, R> Query<T>.flatZip(transform: (T) -> Query<R>): Query<Pair<T, R>> {
     return object : Query<Pair<T, R>> {
         override fun run(config: DatabaseConfig): Pair<T, R> {
             val result = this@flatZip.run(config)
-            return result to transformer(result).run(config)
+            return result to transform(result).run(config)
         }
 
         override fun dryRun(config: DatabaseConfig): String {

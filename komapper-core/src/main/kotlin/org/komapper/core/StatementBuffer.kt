@@ -3,7 +3,7 @@ package org.komapper.core
 import kotlin.reflect.KClass
 
 class StatementBuffer(
-    val formatter: (Any?, KClass<*>) -> String,
+    val format: (Any?, KClass<*>) -> String,
     capacity: Int = 200
 ) : Appendable {
     val sql = StringBuilder(capacity)
@@ -44,7 +44,7 @@ class StatementBuffer(
 
     fun bind(value: Value): StatementBuffer {
         sql.append("?")
-        sqlWithArgs.append(formatter(value.any, value.klass))
+        sqlWithArgs.append(format(value.any, value.klass))
         values.add(value)
         return this
     }

@@ -6,7 +6,7 @@ import org.komapper.core.Statement
 import org.komapper.core.dsl.option.ScriptExecuteOption
 
 interface ScriptExecuteQuery : Query<Unit> {
-    fun option(configurator: (ScriptExecuteOption) -> ScriptExecuteOption): ScriptExecuteQuery
+    fun option(configure: (ScriptExecuteOption) -> ScriptExecuteOption): ScriptExecuteQuery
 }
 
 internal data class ScriptExecuteQueryImpl(
@@ -16,8 +16,8 @@ internal data class ScriptExecuteQueryImpl(
     ScriptExecuteQuery {
     private val statement = Statement(sql, emptyList(), sql)
 
-    override fun option(configurator: (ScriptExecuteOption) -> ScriptExecuteOption): ScriptExecuteQueryImpl {
-        return copy(option = configurator(option))
+    override fun option(configure: (ScriptExecuteOption) -> ScriptExecuteOption): ScriptExecuteQueryImpl {
+        return copy(option = configure(option))
     }
 
     override fun run(config: DatabaseConfig) {

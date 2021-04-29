@@ -6,7 +6,7 @@ import org.komapper.core.dsl.metamodel.PropertyMetamodel
 import org.komapper.core.dsl.option.EntityUpdateOption
 
 interface EntityUpdateQueryBuilder<ENTITY : Any> {
-    fun option(configurator: (EntityUpdateOption) -> EntityUpdateOption): EntityUpdateQueryBuilder<ENTITY>
+    fun option(configure: (EntityUpdateOption) -> EntityUpdateOption): EntityUpdateQueryBuilder<ENTITY>
     fun include(vararg properties: PropertyMetamodel<ENTITY, *>): EntityUpdateQueryBuilder<ENTITY>
     fun exclude(vararg properties: PropertyMetamodel<ENTITY, *>): EntityUpdateQueryBuilder<ENTITY>
     fun single(entity: ENTITY): Query<ENTITY>
@@ -19,8 +19,8 @@ internal data class EntityUpdateQueryBuilderImpl<ENTITY : Any, ID, META : Entity
 ) :
     EntityUpdateQueryBuilder<ENTITY> {
 
-    override fun option(configurator: (EntityUpdateOption) -> EntityUpdateOption): EntityUpdateQueryBuilderImpl<ENTITY, ID, META> {
-        return copy(option = configurator(option))
+    override fun option(configure: (EntityUpdateOption) -> EntityUpdateOption): EntityUpdateQueryBuilderImpl<ENTITY, ID, META> {
+        return copy(option = configure(option))
     }
 
     override fun include(vararg properties: PropertyMetamodel<ENTITY, *>): EntityUpdateQueryBuilderImpl<ENTITY, ID, META> {
