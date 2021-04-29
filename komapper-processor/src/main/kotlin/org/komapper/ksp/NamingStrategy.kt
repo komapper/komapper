@@ -9,7 +9,7 @@ internal interface NamingStrategy {
 
 internal object CamelToLowerSnakeCase : NamingStrategy {
 
-    private val camelToSnakeCase = CamelToSnakeCase(Char::toLowerCase)
+    private val camelToSnakeCase = CamelToSnakeCase(Char::lowercaseChar)
 
     override fun apply(name: String): String {
         return camelToSnakeCase.apply(name)
@@ -18,7 +18,7 @@ internal object CamelToLowerSnakeCase : NamingStrategy {
 
 internal object CamelToUpperSnakeCase : NamingStrategy {
 
-    private val camelToSnakeCase = CamelToSnakeCase(Char::toUpperCase)
+    private val camelToSnakeCase = CamelToSnakeCase(Char::uppercaseChar)
 
     override fun apply(name: String): String {
         return camelToSnakeCase.apply(name)

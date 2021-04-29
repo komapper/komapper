@@ -28,7 +28,7 @@ interface Setting {
         private fun extractSubprotocol(url: String): String? {
             val matcher = jdbcUrlPattern.matcher(url)
             if (matcher.matches()) {
-                return matcher.group(1).toLowerCase()
+                return matcher.group(1).lowercase()
             }
             return null
         }

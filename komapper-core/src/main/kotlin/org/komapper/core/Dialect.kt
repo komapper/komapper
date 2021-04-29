@@ -58,7 +58,7 @@ interface Dialect {
         private fun extractJdbcSubprotocol(url: String): String {
             val matcher = jdbcUrlPattern.matcher(url)
             if (matcher.matches()) {
-                return matcher.group(1).toLowerCase()
+                return matcher.group(1).lowercase()
             }
             error("The subprotocol in the JDBC URL is not found. url=$url")
         }

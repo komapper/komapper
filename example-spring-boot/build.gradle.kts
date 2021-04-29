@@ -1,8 +1,8 @@
 plugins {
     idea
     id("org.springframework.boot") version "2.4.5"
-    id("com.google.devtools.ksp") version "1.4.32-1.0.0-alpha08"
-    kotlin("plugin.allopen") version "1.4.32"
+    id("com.google.devtools.ksp") version "1.5.0-1.0.0-alpha09"
+    kotlin("plugin.allopen") version "1.5.0"
 }
 
 apply(plugin = "io.spring.dependency-management")
