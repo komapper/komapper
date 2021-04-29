@@ -1,4 +1,4 @@
-package org.komapper.ext.spring.boot
+package org.komapper.ext.spring.boot.autoconfigure
 
 import org.komapper.core.ClockProvider
 import org.komapper.core.DataFactory
@@ -41,13 +41,13 @@ open class KomapperAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    open fun dialect(environment: Environment, dataTypes: Set<DataType<*>> = emptySet()): Dialect {
+    open fun dialect(environment: Environment, dataTypes: Set<DataType<*>>?): Dialect {
         val url = environment.getProperty(DATASOURCE_URL_PROPERTY)
             ?: error(
                 "$DATASOURCE_URL_PROPERTY is not found. " +
-                    "Specify it to the application.properties file or define the Dialect bean manually."
+                        "Specify it to the application.properties file or define the Dialect bean manually."
             )
-        return Dialect.load(url, dataTypes)
+        return Dialect.load(url, dataTypes ?: emptySet())
     }
 
     @Bean
@@ -123,7 +123,7 @@ open class KomapperAutoConfiguration {
         val factory = loader.firstOrNull()
             ?: error(
                 "TemplateStatementBuilderFactory is not found. " +
-                    "Add komapper-template dependency or define the TemplateStatementBuilder bean."
+                        "Add komapper-template dependency or define the TemplateStatementBuilder bean."
             )
         return factory.create(dialect)
     }

@@ -1,1 +1,1 @@
-provides: komapper-ext-spring-boot
+provides: komapper-ext-spring-boot-autoconfigure

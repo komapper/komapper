@@ -1,4 +1,4 @@
-package org.komapper.ext.spring.boot
+package org.komapper.ext.spring.boot.autoconfigure
 
 import org.komapper.core.DatabaseSession
 import org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy
