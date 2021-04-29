@@ -27,7 +27,7 @@ include("komapper-jdbc-postgresql")
 
 // EXTENSION
 include("komapper-ext-slf4j")
-include("komapper-ext-spring-boot")
+include("komapper-ext-spring-boot-autoconfigure")
 include("komapper-ext-spring-boot-starter")
 include("komapper-ext-sqlcommenter")
 
