@@ -6,4 +6,6 @@ interface TemplateStatementBuilder {
         params: Any,
         escape: (String) -> String
     ): Statement
+
+    fun clearCache()
 }

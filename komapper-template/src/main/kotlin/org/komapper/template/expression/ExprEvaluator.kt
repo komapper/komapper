@@ -16,6 +16,7 @@ import kotlin.reflect.jvm.jvmErasure
 
 interface ExprEvaluator {
     fun eval(expression: String, ctx: ExprContext = ExprContext()): Value
+    fun clearCache()
 }
 
 open class DefaultExprEvaluator(
@@ -289,5 +290,9 @@ open class DefaultExprEvaluator(
         return receiverType.memberFunctions.pick(arguments)
             ?: exprEnvironment.topLevelFunctionExtensions.pick(arguments)
             ?: ctx.functionExtensions::class.memberExtensionFunctions.pick(listOf(ctx.functionExtensions) + arguments)
+    }
+
+    override fun clearCache() {
+        exprNodeFactory.clearCache()
     }
 }

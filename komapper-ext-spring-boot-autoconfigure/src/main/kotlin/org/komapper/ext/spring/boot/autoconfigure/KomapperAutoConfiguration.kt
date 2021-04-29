@@ -45,7 +45,7 @@ open class KomapperAutoConfiguration {
         val url = environment.getProperty(DATASOURCE_URL_PROPERTY)
             ?: error(
                 "$DATASOURCE_URL_PROPERTY is not found. " +
-                        "Specify it to the application.properties file or define the Dialect bean manually."
+                    "Specify it to the application.properties file or define the Dialect bean manually."
             )
         return Dialect.load(url, dataTypes ?: emptySet())
     }
@@ -123,7 +123,7 @@ open class KomapperAutoConfiguration {
         val factory = loader.firstOrNull()
             ?: error(
                 "TemplateStatementBuilderFactory is not found. " +
-                        "Add komapper-template dependency or define the TemplateStatementBuilder bean."
+                    "Add komapper-template dependency or define the TemplateStatementBuilder bean."
             )
         return factory.create(dialect)
     }

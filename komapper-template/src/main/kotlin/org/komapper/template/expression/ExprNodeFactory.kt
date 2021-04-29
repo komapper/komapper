@@ -4,7 +4,7 @@ import java.util.concurrent.ConcurrentHashMap
 
 interface ExprNodeFactory {
     fun get(expression: String): ExprNode
-    fun clear()
+    fun clearCache()
 }
 
 open class CacheExprNodeFactory : ExprNodeFactory {
@@ -15,10 +15,12 @@ open class CacheExprNodeFactory : ExprNodeFactory {
         ).parse()
     }
 
-    override fun clear() = cache.clear()
+    override fun clearCache() {
+        cache.clear()
+    }
 }
 
 open class NoCacheExprNodeFactory : ExprNodeFactory {
     override fun get(expression: String): ExprNode = ExprParser(expression).parse()
-    override fun clear() = Unit
+    override fun clearCache() = Unit
 }

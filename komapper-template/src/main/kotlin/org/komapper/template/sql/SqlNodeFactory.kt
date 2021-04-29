@@ -4,7 +4,7 @@ import java.util.concurrent.ConcurrentHashMap
 
 interface SqlNodeFactory {
     fun get(template: CharSequence): SqlNode
-    fun clear()
+    fun clearCache()
 }
 
 open class CacheSqlNodeFactory : SqlNodeFactory {
@@ -12,10 +12,12 @@ open class CacheSqlNodeFactory : SqlNodeFactory {
     override fun get(template: CharSequence): SqlNode =
         cache.computeIfAbsent(template.toString()) { SqlParser(it).parse() }
 
-    override fun clear() = cache.clear()
+    override fun clearCache() {
+        cache.clear()
+    }
 }
 
 open class NoCacheSqlNodeFactory : SqlNodeFactory {
     override fun get(template: CharSequence): SqlNode = SqlParser(template.toString()).parse()
-    override fun clear() = Unit
+    override fun clearCache() = Unit
 }

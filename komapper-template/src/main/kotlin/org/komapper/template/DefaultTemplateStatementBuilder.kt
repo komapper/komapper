@@ -218,6 +218,11 @@ internal class DefaultTemplateStatementBuilder(
         throw SqlException("The expression evaluation was failed at $location.", e)
     }
 
+    override fun clearCache() {
+        sqlNodeFactory.clearCache()
+        exprEvaluator.clearCache()
+    }
+
     inner class State(private val ctx: ExprContext) {
         constructor(state: State) : this(ExprContext(state.valueMap))
 

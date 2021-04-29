@@ -124,5 +124,7 @@ class KomapperAutoConfigurationTest {
         override fun build(template: CharSequence, params: Any, escape: (String) -> String): Statement {
             throw UnsupportedOperationException()
         }
+
+        override fun clearCache() = Unit
     }
 }
