@@ -1,7 +1,6 @@
 package org.komapper.core.dsl.query
 
 import org.komapper.core.DatabaseConfig
-import org.komapper.core.DatabaseConfigHolder
 import org.komapper.core.Statement
 import org.komapper.core.dsl.context.EntityInsertContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
@@ -16,9 +15,8 @@ internal data class EntityInsertMultipleQuery<ENTITY : Any, ID, META : EntityMet
 
     private val support: EntityInsertQuerySupport<ENTITY, ID, META> = EntityInsertQuerySupport(context, option)
 
-    override fun run(holder: DatabaseConfigHolder): List<ENTITY> {
+    override fun run(config: DatabaseConfig): List<ENTITY> {
         if (entities.isEmpty()) return emptyList()
-        val config = holder.config
         val newEntities = preInsert(config)
         val generatedKeys = insert(config, newEntities)
         return postInsert(newEntities, generatedKeys)
@@ -45,9 +43,8 @@ internal data class EntityInsertMultipleQuery<ENTITY : Any, ID, META : EntityMet
         }
     }
 
-    override fun dryRun(holder: DatabaseConfigHolder): String {
+    override fun dryRun(config: DatabaseConfig): String {
         if (entities.isEmpty()) return ""
-        val config = holder.config
         val statement = buildStatement(config, entities)
         return statement.sql
     }

@@ -1,7 +1,6 @@
 package org.komapper.core.dsl.query
 
 import org.komapper.core.DatabaseConfig
-import org.komapper.core.DatabaseConfigHolder
 import org.komapper.core.Dialect
 import org.komapper.core.JdbcExecutor
 import org.komapper.core.Statement
@@ -151,14 +150,14 @@ internal data class EntitySelectQueryImpl<ENTITY : Any, ID, META : EntityMetamod
         return SqlSelectQueryImpl(context.asSqlSelectContext(), option.asSqlSelectOption())
     }
 
-    override fun run(holder: DatabaseConfigHolder): List<ENTITY> {
+    override fun run(config: DatabaseConfig): List<ENTITY> {
         val terminal = Terminal { it.toList() }
-        return terminal.run(holder)
+        return terminal.run(config)
     }
 
-    override fun dryRun(holder: DatabaseConfigHolder): String {
+    override fun dryRun(config: DatabaseConfig): String {
         val terminal = Terminal { it.toList() }
-        return terminal.dryRun(holder)
+        return terminal.dryRun(config)
     }
 
     override fun first(): Query<ENTITY> {
@@ -175,11 +174,10 @@ internal data class EntitySelectQueryImpl<ENTITY : Any, ID, META : EntityMetamod
 
     private inner class Terminal<R>(val transformer: (Sequence<ENTITY>) -> R) : Query<R> {
 
-        override fun run(holder: DatabaseConfigHolder): R {
+        override fun run(config: DatabaseConfig): R {
             if (!option.allowEmptyWhereClause && context.where.isEmpty()) {
                 error("Empty where clause is not allowed.")
             }
-            val config = holder.config
             val statement = buildStatement(config)
             val executor = JdbcExecutor(config, option)
             return executor.executeQuery(statement) { rs ->
@@ -204,8 +202,7 @@ internal data class EntitySelectQueryImpl<ENTITY : Any, ID, META : EntityMetamod
             }
         }
 
-        override fun dryRun(holder: DatabaseConfigHolder): String {
-            val config = holder.config
+        override fun dryRun(config: DatabaseConfig): String {
             return buildStatement(config).sql
         }
 

@@ -6,7 +6,8 @@ import javax.sql.DataSource
 /**
  * A database.
  */
-interface Database : DatabaseConfigHolder {
+interface Database {
+    val config: DatabaseConfig
     val dataFactory: DataFactory
 
     companion object {

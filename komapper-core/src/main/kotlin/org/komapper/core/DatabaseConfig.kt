@@ -21,8 +21,7 @@ import javax.sql.DataSource
  * @property jdbcOption the jdbc configuration
  * @property session the session
  */
-interface DatabaseConfig : DatabaseConfigHolder {
-    override val config: DatabaseConfig get() = this
+interface DatabaseConfig {
     val id: UUID
     val dialect: Dialect
     val clockProvider: ClockProvider

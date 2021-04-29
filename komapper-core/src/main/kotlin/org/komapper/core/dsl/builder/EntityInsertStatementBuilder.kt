@@ -9,19 +9,15 @@ import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.metamodel.Assignment
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 
-interface EntityInsertStatementBuilder<ENTITY : Any> {
-    fun build(): Statement
-}
-
-internal class EntityInsertStatementBuilderImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+internal class EntityInsertStatementBuilder<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     val dialect: Dialect,
     val context: EntityInsertContext<ENTITY, ID, META>,
     val entities: List<ENTITY>
-) : EntityInsertStatementBuilder<ENTITY> {
+) {
 
     private val buf = StatementBuffer(dialect::formatValue)
 
-    override fun build(): Statement {
+    fun build(): Statement {
         val properties = context.target.properties().filter {
             it.idAssignment !is Assignment.AutoIncrement<ENTITY, *>
         }

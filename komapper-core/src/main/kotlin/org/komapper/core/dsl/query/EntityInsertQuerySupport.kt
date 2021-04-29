@@ -3,7 +3,7 @@ package org.komapper.core.dsl.query
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.JdbcExecutor
 import org.komapper.core.Statement
-import org.komapper.core.dsl.builder.EntityInsertStatementBuilderImpl
+import org.komapper.core.dsl.builder.EntityInsertStatementBuilder
 import org.komapper.core.dsl.context.EntityInsertContext
 import org.komapper.core.dsl.metamodel.Assignment
 import org.komapper.core.dsl.metamodel.EntityMetamodel
@@ -49,7 +49,7 @@ internal class EntityInsertQuerySupport<ENTITY : Any, ID, META : EntityMetamodel
     }
 
     fun buildStatement(config: DatabaseConfig, entities: List<ENTITY>): Statement {
-        val builder = EntityInsertStatementBuilderImpl(config.dialect, context, entities)
+        val builder = EntityInsertStatementBuilder(config.dialect, context, entities)
         return builder.build()
     }
 }

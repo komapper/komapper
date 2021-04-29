@@ -1,7 +1,6 @@
 package org.komapper.core.dsl.query
 
 import org.komapper.core.DatabaseConfig
-import org.komapper.core.DatabaseConfigHolder
 import org.komapper.core.Dialect
 import org.komapper.core.JdbcExecutor
 import org.komapper.core.Statement
@@ -78,14 +77,14 @@ internal data class SetOperationQueryImpl<T>(
         return copy(option = configurator(option))
     }
 
-    override fun run(holder: DatabaseConfigHolder): List<T> {
+    override fun run(config: DatabaseConfig): List<T> {
         val terminal = createTerminal { it.toList() }
-        return terminal.run(holder)
+        return terminal.run(config)
     }
 
-    override fun dryRun(holder: DatabaseConfigHolder): String {
+    override fun dryRun(config: DatabaseConfig): String {
         val terminal = createTerminal { it.toList() }
-        return terminal.dryRun(holder)
+        return terminal.dryRun(config)
     }
 
     override fun first(): Query<T> {
@@ -111,12 +110,11 @@ internal data class SetOperationQueryImpl<T>(
         val transformer: (Sequence<T>) -> R
     ) : Query<R> {
 
-        override fun run(holder: DatabaseConfigHolder): R {
+        override fun run(config: DatabaseConfig): R {
             if (!option.allowEmptyWhereClause) {
                 checkWhereClauses(context.left)
                 checkWhereClauses(context.right)
             }
-            val config = holder.config
             val statement = buildStatement(config)
             val executor = JdbcExecutor(config, option)
             return executor.executeQuery(statement, provider, transformer)
@@ -141,8 +139,7 @@ internal data class SetOperationQueryImpl<T>(
             }
         }
 
-        override fun dryRun(holder: DatabaseConfigHolder): String {
-            val config = holder.config
+        override fun dryRun(config: DatabaseConfig): String {
             return buildStatement(config).sql
         }
 

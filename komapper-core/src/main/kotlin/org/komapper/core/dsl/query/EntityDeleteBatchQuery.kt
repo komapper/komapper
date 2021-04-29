@@ -1,7 +1,6 @@
 package org.komapper.core.dsl.query
 
 import org.komapper.core.DatabaseConfig
-import org.komapper.core.DatabaseConfigHolder
 import org.komapper.core.Statement
 import org.komapper.core.dsl.context.EntityDeleteContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
@@ -16,9 +15,8 @@ internal data class EntityDeleteBatchQuery<ENTITY : Any, ID, META : EntityMetamo
 
     private val support: EntityDeleteQuerySupport<ENTITY, ID, META> = EntityDeleteQuerySupport(context, option)
 
-    override fun run(holder: DatabaseConfigHolder) {
+    override fun run(config: DatabaseConfig) {
         if (entities.isEmpty()) return
-        val config = holder.config
         val (counts) = delete(config)
         postDelete(counts)
     }
@@ -34,9 +32,8 @@ internal data class EntityDeleteBatchQuery<ENTITY : Any, ID, META : EntityMetamo
         }
     }
 
-    override fun dryRun(holder: DatabaseConfigHolder): String {
+    override fun dryRun(config: DatabaseConfig): String {
         if (entities.isEmpty()) return ""
-        val config = holder.config
         return buildStatement(config, entities.first()).sql
     }
 

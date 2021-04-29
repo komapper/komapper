@@ -1,7 +1,6 @@
 package org.komapper.core.dsl.query
 
 import org.komapper.core.DatabaseConfig
-import org.komapper.core.DatabaseConfigHolder
 import org.komapper.core.Statement
 import org.komapper.core.dsl.context.EntityInsertContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
@@ -15,8 +14,7 @@ internal data class EntityInsertSingleQuery<ENTITY : Any, ID, META : EntityMetam
 
     private val support: EntityInsertQuerySupport<ENTITY, ID, META> = EntityInsertQuerySupport(context, option)
 
-    override fun run(holder: DatabaseConfigHolder): ENTITY {
-        val config = holder.config
+    override fun run(config: DatabaseConfig): ENTITY {
         val newEntity = preInsert(config)
         val (_, generatedKeys) = insert(config, newEntity)
         return postInsert(newEntity, generatedKeys)
@@ -40,8 +38,7 @@ internal data class EntityInsertSingleQuery<ENTITY : Any, ID, META : EntityMetam
         }
     }
 
-    override fun dryRun(holder: DatabaseConfigHolder): String {
-        val config = holder.config
+    override fun dryRun(config: DatabaseConfig): String {
         val statement = buildStatement(config, entity)
         return statement.sql
     }
