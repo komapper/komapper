@@ -37,7 +37,7 @@ import java.util.LinkedList
 import kotlin.reflect.KClass
 import kotlin.reflect.full.isSubclassOf
 
-class SqlParser constructor(
+internal class SqlParser constructor(
     val sql: String,
     private val tokenizer: SqlTokenizer = SqlTokenizer(sql)
 ) {
@@ -183,11 +183,11 @@ class SqlParser constructor(
         reducers.push(ForDirectiveReducer(location, token, identifier, expression))
     }
 
-    private fun reduceUntil(kClass: KClass<out SqlReducer>) {
+    private fun reduceUntil(klass: KClass<out SqlReducer>) {
         val it = reducers.iterator()
         while (it.hasNext()) {
             val reducer = it.next()
-            if (reducer::class.isSubclassOf(kClass)) {
+            if (reducer::class.isSubclassOf(klass)) {
                 break
             }
             it.remove()

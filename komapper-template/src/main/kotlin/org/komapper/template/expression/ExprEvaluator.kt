@@ -1,7 +1,6 @@
 package org.komapper.template.expression
 
 import org.komapper.core.Value
-import org.komapper.core.template.expression.ExprLocation
 import kotlin.reflect.KClass
 import kotlin.reflect.KFunction
 import kotlin.reflect.KProperty
@@ -14,12 +13,12 @@ import kotlin.reflect.full.staticFunctions
 import kotlin.reflect.full.valueParameters
 import kotlin.reflect.jvm.jvmErasure
 
-interface ExprEvaluator {
+internal interface ExprEvaluator {
     fun eval(expression: String, ctx: ExprContext = ExprContext()): Value
     fun clearCache()
 }
 
-open class DefaultExprEvaluator(
+internal class DefaultExprEvaluator(
     private val exprNodeFactory: ExprNodeFactory,
     private val exprEnvironment: ExprEnvironment,
     private val classResolver: (String) -> Class<*> = { Class.forName(it) }
@@ -49,7 +48,7 @@ open class DefaultExprEvaluator(
         is ExprNode.Gt -> compare(node.location, node.left, node.right, ctx) { x, y -> x > y }
         is ExprNode.Le -> compare(node.location, node.left, node.right, ctx) { x, y -> x <= y }
         is ExprNode.Lt -> compare(node.location, node.left, node.right, ctx) { x, y -> x < y }
-        is ExprNode.Literal -> Value(node.value, node.kClass)
+        is ExprNode.Literal -> Value(node.value, node.klass)
         is ExprNode.Comma -> node.nodeList.map {
             visit(it, ctx)
         }.map { it.any }.toCollection(ArgList()).let {
@@ -170,13 +169,13 @@ open class DefaultExprEvaluator(
             } catch (cause: Exception) {
                 throw ExprException("Failed to resolve the class \"${node.name}\" at ${node.location}. The cause is $cause")
             }
-        val kClass = clazz.kotlin
+        val klass = clazz.kotlin
         @Suppress("UNCHECKED_CAST")
         return when {
-            kClass.objectInstance != null -> Value(kClass.objectInstance!!)
-            kClass.companionObjectInstance != null -> Value(kClass.companionObjectInstance!!)
-            clazz.isEnum -> Value(ClassRef.EnumRef(clazz as Class<Enum<*>>), kClass)
-            else -> error("The unsupported class \"${kClass.qualifiedName}\" is referenced.")
+            klass.objectInstance != null -> Value(klass.objectInstance!!)
+            klass.companionObjectInstance != null -> Value(klass.companionObjectInstance!!)
+            clazz.isEnum -> Value(ClassRef.EnumRef(clazz as Class<Enum<*>>), klass)
+            else -> error("The unsupported class \"${klass.qualifiedName}\" is referenced.")
         }
     }
 

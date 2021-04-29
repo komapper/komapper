@@ -35,7 +35,7 @@ import org.komapper.template.sql.SqlTokenType.WHERE
 import org.komapper.template.sql.SqlTokenType.WORD
 import java.nio.CharBuffer
 
-class SqlTokenizer(private val sql: String) {
+internal class SqlTokenizer(private val sql: String) {
 
     companion object {
         const val LOOKAHEAD_SIZE: Int = 10

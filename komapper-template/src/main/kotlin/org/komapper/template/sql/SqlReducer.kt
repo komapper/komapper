@@ -2,13 +2,13 @@ package org.komapper.template.sql
 
 import java.util.LinkedList
 
-abstract class SqlReducer {
+internal abstract class SqlReducer {
     protected val nodeList = LinkedList<SqlNode>()
     abstract fun reduce(): SqlNode
     open fun addNode(node: SqlNode) = nodeList.add(node)
 }
 
-class SetReducer(private val location: SqlLocation, private val keyword: String, private val left: SqlNode) :
+internal class SetReducer(private val location: SqlLocation, private val keyword: String, private val left: SqlNode) :
     SqlReducer() {
     override fun reduce(): SqlNode {
         val right = nodeList.poll() ?: throw SqlException("The right node is not found.")
@@ -16,61 +16,61 @@ class SetReducer(private val location: SqlLocation, private val keyword: String,
     }
 }
 
-class StatementReducer : SqlReducer() {
+internal class StatementReducer : SqlReducer() {
     override fun reduce(): SqlNode = SqlNode.Statement(nodeList)
 }
 
-class SelectReducer(private val location: SqlLocation, private val keyword: String) : SqlReducer() {
+internal class SelectReducer(private val location: SqlLocation, private val keyword: String) : SqlReducer() {
     override fun reduce(): SqlNode =
         SqlNode.Clause.Select(location, keyword, nodeList)
 }
 
-class FromReducer(private val location: SqlLocation, private val keyword: String) : SqlReducer() {
+internal class FromReducer(private val location: SqlLocation, private val keyword: String) : SqlReducer() {
     override fun reduce(): SqlNode =
         SqlNode.Clause.From(location, keyword, nodeList)
 }
 
-class WhereReducer(private val location: SqlLocation, private val keyword: String) : SqlReducer() {
+internal class WhereReducer(private val location: SqlLocation, private val keyword: String) : SqlReducer() {
     override fun reduce(): SqlNode =
         SqlNode.Clause.Where(location, keyword, nodeList)
 }
 
-class HavingReducer(private val location: SqlLocation, private val keyword: String) : SqlReducer() {
+internal class HavingReducer(private val location: SqlLocation, private val keyword: String) : SqlReducer() {
     override fun reduce(): SqlNode =
         SqlNode.Clause.Having(location, keyword, nodeList)
 }
 
-class GroupByReducer(private val location: SqlLocation, private val keyword: String) : SqlReducer() {
+internal class GroupByReducer(private val location: SqlLocation, private val keyword: String) : SqlReducer() {
     override fun reduce(): SqlNode =
         SqlNode.Clause.GroupBy(location, keyword, nodeList)
 }
 
-class OrderByReducer(private val location: SqlLocation, private val keyword: String) : SqlReducer() {
+internal class OrderByReducer(private val location: SqlLocation, private val keyword: String) : SqlReducer() {
     override fun reduce(): SqlNode =
         SqlNode.Clause.OrderBy(location, keyword, nodeList)
 }
 
-class ForUpdateReducer(private val location: SqlLocation, private val keyword: String) : SqlReducer() {
+internal class ForUpdateReducer(private val location: SqlLocation, private val keyword: String) : SqlReducer() {
     override fun reduce(): SqlNode =
         SqlNode.Clause.ForUpdate(location, keyword, nodeList)
 }
 
-class OptionReducer(private val location: SqlLocation, private val keyword: String) : SqlReducer() {
+internal class OptionReducer(private val location: SqlLocation, private val keyword: String) : SqlReducer() {
     override fun reduce(): SqlNode =
         SqlNode.Clause.Option(location, keyword, nodeList)
 }
 
-class AndReducer(private val location: SqlLocation, private val keyword: String) : SqlReducer() {
+internal class AndReducer(private val location: SqlLocation, private val keyword: String) : SqlReducer() {
     override fun reduce(): SqlNode =
         SqlNode.BiLogicalOp.And(location, keyword, nodeList)
 }
 
-class OrReducer(private val location: SqlLocation, private val keyword: String) : SqlReducer() {
+internal class OrReducer(private val location: SqlLocation, private val keyword: String) : SqlReducer() {
     override fun reduce(): SqlNode =
         SqlNode.BiLogicalOp.Or(location, keyword, nodeList)
 }
 
-class BindValueDirectiveReducer(
+internal class BindValueDirectiveReducer(
     private val location: SqlLocation,
     private val token: String,
     private val expression: String
@@ -88,7 +88,7 @@ class BindValueDirectiveReducer(
     }
 }
 
-class LiteralValueDirectiveReducer(
+internal class LiteralValueDirectiveReducer(
     private val location: SqlLocation,
     val token: String,
     private val expression: String
@@ -105,9 +105,9 @@ class LiteralValueDirectiveReducer(
     }
 }
 
-abstract class BlockReducer : SqlReducer()
+internal abstract class BlockReducer : SqlReducer()
 
-class IfBlockReducer(private val location: SqlLocation) : BlockReducer() {
+internal class IfBlockReducer(private val location: SqlLocation) : BlockReducer() {
 
     override fun addNode(node: SqlNode) = when (node) {
         is SqlNode.IfDirective,
@@ -161,7 +161,7 @@ class IfBlockReducer(private val location: SqlLocation) : BlockReducer() {
     }
 }
 
-class ForBlockReducer(private val location: SqlLocation) : BlockReducer() {
+internal class ForBlockReducer(private val location: SqlLocation) : BlockReducer() {
 
     override fun addNode(node: SqlNode) = when (node) {
         is SqlNode.ForDirective, is SqlNode.EndDirective -> super.addNode(node)
@@ -185,13 +185,13 @@ class ForBlockReducer(private val location: SqlLocation) : BlockReducer() {
     }
 }
 
-class IfDirectiveReducer(private val location: SqlLocation, private val token: String, private val expression: String) :
+internal class IfDirectiveReducer(private val location: SqlLocation, private val token: String, private val expression: String) :
     SqlReducer() {
     override fun reduce(): SqlNode =
         SqlNode.IfDirective(location, token, expression, nodeList)
 }
 
-class ElseifDirectiveReducer(
+internal class ElseifDirectiveReducer(
     private val location: SqlLocation,
     private val token: String,
     private val expression: String
@@ -201,12 +201,12 @@ class ElseifDirectiveReducer(
         SqlNode.ElseifDirective(location, token, expression, nodeList)
 }
 
-class ElseDirectiveReducer(private val location: SqlLocation, private val token: String) : SqlReducer() {
+internal class ElseDirectiveReducer(private val location: SqlLocation, private val token: String) : SqlReducer() {
     override fun reduce(): SqlNode =
         SqlNode.ElseDirective(location, token, nodeList)
 }
 
-class ForDirectiveReducer(
+internal class ForDirectiveReducer(
     private val location: SqlLocation,
     private val token: String,
     private val identifier: String,

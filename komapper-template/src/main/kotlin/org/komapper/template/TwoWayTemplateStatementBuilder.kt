@@ -16,7 +16,7 @@ import kotlin.reflect.KVisibility
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.jvm.jvmErasure
 
-internal class DefaultTemplateStatementBuilder(
+internal class TwoWayTemplateStatementBuilder(
     private val formatter: (Any?, KClass<*>) -> String,
     private val sqlNodeFactory: SqlNodeFactory,
     private val exprEvaluator: ExprEvaluator

@@ -1,6 +1,5 @@
 package org.komapper.template.expression
 
-import org.komapper.core.template.expression.ExprLocation
 import org.komapper.template.expression.ExprTokenType.AND
 import org.komapper.template.expression.ExprTokenType.BIG_DECIMAL
 import org.komapper.template.expression.ExprTokenType.CHAR
@@ -35,7 +34,7 @@ import org.komapper.template.expression.ExprTokenType.VALUE
 import org.komapper.template.expression.ExprTokenType.WHITESPACE
 import java.nio.CharBuffer
 
-class ExprTokenizer(private val expression: String) {
+internal class ExprTokenizer(private val expression: String) {
 
     companion object {
         const val LOOKAHEAD_SIZE: Int = 5

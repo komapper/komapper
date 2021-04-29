@@ -1,6 +1,6 @@
 package org.komapper.template.sql
 
-enum class SqlTokenType {
+internal enum class SqlTokenType {
     QUOTE,
     OPEN_PAREN,
     CLOSE_PAREN,

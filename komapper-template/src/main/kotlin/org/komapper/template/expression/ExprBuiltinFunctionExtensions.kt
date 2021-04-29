@@ -1,6 +1,6 @@
 package org.komapper.template.expression
 
-class ExprBuiltinFunctionExtensions(val escape: (String) -> String) {
+internal class ExprBuiltinFunctionExtensions(val escape: (String) -> String) {
 
     fun String?.escape(): String? {
         return this?.let { escape(it) }

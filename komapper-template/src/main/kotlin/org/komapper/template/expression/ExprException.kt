@@ -1,3 +1,3 @@
 package org.komapper.template.expression
 
-class ExprException(message: String) : Exception(message)
+internal class ExprException(message: String) : Exception(message)

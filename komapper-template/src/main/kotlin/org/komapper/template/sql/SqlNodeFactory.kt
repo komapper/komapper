@@ -2,22 +2,27 @@ package org.komapper.template.sql
 
 import java.util.concurrent.ConcurrentHashMap
 
-interface SqlNodeFactory {
+internal interface SqlNodeFactory {
     fun get(template: CharSequence): SqlNode
     fun clearCache()
 }
 
-open class CacheSqlNodeFactory : SqlNodeFactory {
+internal class CacheSqlNodeFactory : SqlNodeFactory {
     private val cache = ConcurrentHashMap<String, SqlNode>()
-    override fun get(template: CharSequence): SqlNode =
-        cache.computeIfAbsent(template.toString()) { SqlParser(it).parse() }
+
+    override fun get(template: CharSequence): SqlNode {
+        return cache.computeIfAbsent(template.toString()) { SqlParser(it).parse() }
+    }
 
     override fun clearCache() {
         cache.clear()
     }
 }
 
-open class NoCacheSqlNodeFactory : SqlNodeFactory {
-    override fun get(template: CharSequence): SqlNode = SqlParser(template.toString()).parse()
+internal class NoCacheSqlNodeFactory : SqlNodeFactory {
+    override fun get(template: CharSequence): SqlNode {
+        return SqlParser(template.toString()).parse()
+    }
+
     override fun clearCache() = Unit
 }

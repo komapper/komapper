@@ -13,9 +13,9 @@ import org.komapper.template.expression.NoCacheExprNodeFactory
 import org.komapper.template.sql.NoCacheSqlNodeFactory
 import org.komapper.template.sql.SqlException
 
-class DefaultTemplateStatementBuilderTest {
+class TwoWayTemplateStatementBuilderTest {
 
-    private val sqlBuilder = DefaultTemplateStatementBuilder(
+    private val sqlBuilder = TwoWayTemplateStatementBuilder(
         { value, _ -> if (value is CharSequence) "'$value'" else value.toString() },
         sqlNodeFactory = NoCacheSqlNodeFactory(),
         exprEvaluator = DefaultExprEvaluator(

@@ -36,7 +36,7 @@ import java.math.BigDecimal
 import java.util.Deque
 import java.util.LinkedList
 
-class ExprParser(
+internal class ExprParser(
     private val expression: String,
     private val tokenizer: ExprTokenizer = ExprTokenizer(expression)
 ) {

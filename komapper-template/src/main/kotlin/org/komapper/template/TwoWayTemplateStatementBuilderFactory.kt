@@ -10,13 +10,13 @@ import org.komapper.template.expression.NoCacheExprNodeFactory
 import org.komapper.template.sql.CacheSqlNodeFactory
 import org.komapper.template.sql.NoCacheSqlNodeFactory
 
-class DefaultTemplateStatementBuilderFactory : TemplateStatementBuilderFactory {
+class TwoWayTemplateStatementBuilderFactory : TemplateStatementBuilderFactory {
 
-    override fun create(dialect: Dialect, cache: Boolean): TemplateStatementBuilder {
-        val exprNodeFactory = if (cache) CacheExprNodeFactory() else NoCacheExprNodeFactory()
+    override fun create(dialect: Dialect, enableCache: Boolean): TemplateStatementBuilder {
+        val sqlNodeFactory = if (enableCache) CacheSqlNodeFactory() else NoCacheSqlNodeFactory()
+        val exprNodeFactory = if (enableCache) CacheExprNodeFactory() else NoCacheExprNodeFactory()
         val exprEnvironment = DefaultExprEnvironment()
         val exprEvaluator = DefaultExprEvaluator(exprNodeFactory, exprEnvironment)
-        val sqlNodeFactory = if (cache) CacheSqlNodeFactory() else NoCacheSqlNodeFactory()
-        return DefaultTemplateStatementBuilder(dialect::formatValue, sqlNodeFactory, exprEvaluator)
+        return TwoWayTemplateStatementBuilder(dialect::formatValue, sqlNodeFactory, exprEvaluator)
     }
 }

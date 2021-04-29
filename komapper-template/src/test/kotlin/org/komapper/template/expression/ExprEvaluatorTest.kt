@@ -11,9 +11,7 @@ class ExprEvaluatorTest {
 
     private val evaluator = DefaultExprEvaluator(
         NoCacheExprNodeFactory(),
-        object : DefaultExprEnvironment() {
-            override val ctx: Map<String, Value> = mapOf("global" to Value("hello"))
-        }
+        DefaultExprEnvironment(mapOf("global" to Value("hello")))
     )
 
     data class Person(val id: Int, val name: String, val age: Int?)

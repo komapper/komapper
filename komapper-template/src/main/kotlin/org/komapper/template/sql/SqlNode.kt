@@ -2,7 +2,7 @@ package org.komapper.template.sql
 
 import org.komapper.template.sql.SqlLocation as Loc
 
-sealed class SqlNode {
+internal sealed class SqlNode {
     abstract fun toText(): String
 
     data class Statement(val nodeList: List<SqlNode>) : SqlNode() {
