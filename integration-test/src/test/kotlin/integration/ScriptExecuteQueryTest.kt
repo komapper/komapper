@@ -24,8 +24,8 @@ internal class ScriptExecuteQueryTest(private val db: Database) {
 
         val value = db.runQuery {
             val sql = "select value from execute_table"
-            TemplateDsl.from(sql).select {
-                asString("value")
+            TemplateDsl.from(sql).select { row ->
+                row.asString("value")
             }.first()
         }
         Assertions.assertEquals("test", value)

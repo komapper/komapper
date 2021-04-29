@@ -249,7 +249,7 @@ class DataTypeTest(val db: Database) {
         val result = db.runQuery {
             TemplateDsl
                 .from("select value->'b' as x from json_test")
-                .select { asT("x", Json::class)!! }
+                .select { it.asT("x", Json::class)!! }
                 .first()
         }
         assertEquals("\"Hello\"", result.data)

@@ -10,7 +10,7 @@ interface TemplateSelectQuery<T> : ListQuery<T>
 internal data class TemplateSelectQueryImpl<T>(
     private val sql: String,
     private val params: Any,
-    private val provide: Row.() -> T,
+    private val provide: (Row) -> T,
     private val option: TemplateSelectOption
 ) : TemplateSelectQuery<T> {
 

@@ -11,29 +11,40 @@ import org.komapper.core.dsl.runQuery
 @ExtendWith(Env::class)
 class TemplateSelectQueryTest(private val db: Database) {
 
-    private val asAddress: Row.() -> Address = {
+    private val asAddress: (Row) -> Address = { row ->
         Address(
-            asInt("address_id")!!,
-            asString("street")!!,
-            asInt("version")!!
+            row.asInt("address_id")!!,
+            row.asString("street")!!,
+            row.asInt("version")!!
+        )
+    }
+
+    private val asAddressByIndex: (Row) -> Address = { row ->
+        Address(
+            row.asInt(1)!!,
+            row.asString(2)!!,
+            row.asInt(3)!!
         )
     }
 
     @Test
-    fun test() {
+    fun test_columnLabel() {
         val list = db.runQuery {
             val sql = "select * from ADDRESS"
             TemplateDsl.from(sql).select(asAddress)
         }
         assertEquals(15, list.size)
-        assertEquals(
-            Address(
-                1,
-                "STREET 1",
-                1
-            ),
-            list[0]
-        )
+        assertEquals(Address(1, "STREET 1", 1), list[0])
+    }
+
+    @Test
+    fun test_index() {
+        val list = db.runQuery {
+            val sql = "select * from ADDRESS"
+            TemplateDsl.from(sql).select(asAddressByIndex)
+        }
+        assertEquals(15, list.size)
+        assertEquals(Address(1, "STREET 1", 1), list[0])
     }
 
     @Test
