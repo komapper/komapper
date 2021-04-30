@@ -11,18 +11,18 @@ import org.komapper.core.dsl.metamodel.EntityMetamodel
 internal data class SqlSelectContext<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     override val target: META,
     override val projection: Projection = Projection.Metamodels(listOf(target)),
-    override val joins: List<Join<*, *, *>> = listOf(),
+    override val joins: List<Join<*, *>> = listOf(),
     override val where: List<Criterion> = listOf(),
     override val orderBy: List<SortItem> = listOf(),
     override val offset: Int = -1,
     override val limit: Int = -1,
     override val forUpdate: ForUpdate = ForUpdate(),
-    val groupBy: List<ColumnExpression<*>> = listOf(),
+    val groupBy: List<ColumnExpression<*, *>> = listOf(),
     val having: List<Criterion> = listOf(),
     val distinct: Boolean = false,
 ) : SelectContext<ENTITY, ID, META, SqlSelectContext<ENTITY, ID, META>> {
 
-    fun setProjection(vararg expressions: ColumnExpression<*>): SqlSelectContext<ENTITY, ID, META> {
+    fun setProjection(vararg expressions: ColumnExpression<*, *>): SqlSelectContext<ENTITY, ID, META> {
         return copy(projection = Projection.Expressions(expressions.toList()))
     }
 
@@ -30,7 +30,7 @@ internal data class SqlSelectContext<ENTITY : Any, ID, META : EntityMetamodel<EN
         return copy(projection = Projection.Metamodels(metamodels.toList()))
     }
 
-    override fun addJoin(join: Join<*, *, *>): SqlSelectContext<ENTITY, ID, META> {
+    override fun addJoin(join: Join<*, *>): SqlSelectContext<ENTITY, ID, META> {
         return copy(joins = this.joins + join)
     }
 

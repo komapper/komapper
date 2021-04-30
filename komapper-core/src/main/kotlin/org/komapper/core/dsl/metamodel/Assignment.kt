@@ -6,21 +6,25 @@ import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 import kotlin.reflect.KClass
 
-sealed class Assignment<E> {
-    class AutoIncrement<E, T : Any>(
-        private val klass: KClass<T>,
-        private val setter: (E, T) -> E
+sealed class Assignment<ENTITY> {
+    class AutoIncrement<ENTITY, EXTERIOR : Any, INTERIOR : Any>(
+        private val interiorClass: KClass<INTERIOR>,
+        private val wrap: (INTERIOR) -> EXTERIOR,
+        private val setter: (ENTITY, EXTERIOR) -> ENTITY,
     ) :
-        Assignment<E>() {
+        Assignment<ENTITY>() {
 
-        fun assign(entity: E, value: Long): E {
-            return setter(entity, value.convert(klass))
+        fun assign(entity: ENTITY, value: Long): ENTITY {
+            val interior = value.convert(interiorClass)
+            val exterior = wrap(interior)
+            return setter(entity, exterior)
         }
     }
 
-    class Sequence<E, T : Any>(
-        private val klass: KClass<T>,
-        private val setter: (E, T) -> E,
+    class Sequence<ENTITY, EXTERIOR : Any, INTERIOR : Any>(
+        private val interiorClass: KClass<INTERIOR>,
+        private val wrap: (INTERIOR) -> EXTERIOR,
+        private val setter: (ENTITY, EXTERIOR) -> ENTITY,
         val name: String,
         val catalogName: String,
         val schemaName: String,
@@ -28,19 +32,20 @@ sealed class Assignment<E> {
         val startWith: Int,
         val incrementBy: Int,
     ) :
-        Assignment<E>() {
+        Assignment<ENTITY>() {
 
         private val contextMap = ConcurrentHashMap<UUID, GenerationContext>()
 
-        fun assign(entity: E, key: UUID, enquote: (String) -> String, sequenceNextValue: (String) -> Long): E {
+        fun assign(entity: ENTITY, key: UUID, enquote: (String) -> String, sequenceNextValue: (String) -> Long): ENTITY {
             val context = contextMap.computeIfAbsent(key) {
                 val sequenceName = getCanonicalSequenceName(enquote)
                 GenerationContext(startWith, incrementBy) {
                     sequenceNextValue(sequenceName)
                 }
             }
-            val value = context.next().convert(klass)
-            return setter(entity, value)
+            val interior = context.next().convert(interiorClass)
+            val exterior = wrap(interior)
+            return setter(entity, exterior)
         }
 
         fun getCanonicalSequenceName(enquote: (String) -> String): String {

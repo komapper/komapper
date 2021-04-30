@@ -16,7 +16,7 @@ import java.sql.ResultSet
 
 interface SqlSetOperationQuery<T> : Subquery<T> {
     fun orderBy(vararg aliases: CharSequence): SqlSetOperationQuery<T>
-    fun orderBy(vararg expressions: ColumnExpression<*>): SqlSetOperationQuery<T>
+    fun orderBy(vararg expressions: ColumnExpression<*, *>): SqlSetOperationQuery<T>
     fun option(configurator: (SqlSetOperationOption) -> SqlSetOperationOption): SqlSetOperationQuery<T>
 }
 
@@ -61,7 +61,7 @@ internal data class SetOperationQueryImpl<T>(
         return orderBy(items)
     }
 
-    override fun orderBy(vararg expressions: ColumnExpression<*>): SetOperationQueryImpl<T> {
+    override fun orderBy(vararg expressions: ColumnExpression<*, *>): SetOperationQueryImpl<T> {
         val items = expressions.map {
             if (it is SortItem) it else SortItem.Property.Asc(it)
         }

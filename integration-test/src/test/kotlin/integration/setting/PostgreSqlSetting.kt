@@ -208,5 +208,6 @@ class PostgreSqlSetting(url: String, user: String, password: String) : Setting {
     """.trimIndent()
     override val resetSql: String = """
         ALTER SEQUENCE IDENTITY_STRATEGY_ID_SEQ RESTART WITH 1;
+        ALTER SEQUENCE SEQUENCE_STRATEGY_ID RESTART WITH 1
     """.trimIndent()
 }

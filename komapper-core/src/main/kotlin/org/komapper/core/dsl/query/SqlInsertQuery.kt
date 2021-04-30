@@ -46,7 +46,7 @@ internal data class SqlInsertQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<
 
     override fun run(config: DatabaseConfig): Pair<Int, Long?> {
         val statement = buildStatement(config)
-        val requiresGeneratedKeys = context.target.idAssignment() is Assignment.AutoIncrement<*, *>
+        val requiresGeneratedKeys = context.target.idAssignment() is Assignment.AutoIncrement<ENTITY, *, *>
         val executor = JdbcExecutor(config, option, requiresGeneratedKeys)
         val (count, keys) = executor.executeUpdate(statement)
         return count to keys.firstOrNull()

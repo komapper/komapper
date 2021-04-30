@@ -2,9 +2,12 @@ package org.komapper.core.dsl.expression
 
 import kotlin.reflect.KClass
 
-interface ColumnExpression<T : Any> {
+interface ColumnExpression<EXTERIOR : Any, INTERIOR : Any> {
     val owner: TableExpression<*>
-    val klass: KClass<T>
+    val exteriorClass: KClass<EXTERIOR>
+    val interiorClass: KClass<INTERIOR>
+    val wrap: (INTERIOR) -> EXTERIOR
+    val unwrap: (EXTERIOR) -> INTERIOR
     val columnName: String
     val alwaysQuote: Boolean
 

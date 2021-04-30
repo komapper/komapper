@@ -15,14 +15,14 @@ internal interface SelectContext<
 
     val target: META
     val projection: Projection
-    val joins: List<Join<*, *, *>>
+    val joins: List<Join<*, *>>
     val where: List<Criterion>
     val orderBy: List<SortItem>
     val offset: Int
     val limit: Int
     val forUpdate: ForUpdate
 
-    fun addJoin(join: Join<*, *, *>): CONTEXT
+    fun addJoin(join: Join<*, *>): CONTEXT
     fun addWhere(where: List<Criterion>): CONTEXT
     fun addOrderBy(orderBy: List<SortItem>): CONTEXT
     fun setLimit(limit: Int): CONTEXT

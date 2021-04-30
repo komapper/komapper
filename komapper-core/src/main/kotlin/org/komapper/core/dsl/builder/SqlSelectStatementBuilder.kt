@@ -43,7 +43,7 @@ internal class SqlSelectStatementBuilder(
     private fun groupByClause() {
         val groupByItems = context.groupBy.ifEmpty {
             val expressions = context.projection.expressions()
-            val aggregateFunctions = expressions.filterIsInstance<AggregateFunction<*>>()
+            val aggregateFunctions = expressions.filterIsInstance<AggregateFunction<*, *>>()
             val groupByItems = expressions - aggregateFunctions
             if (aggregateFunctions.isNotEmpty() && groupByItems.isNotEmpty()) {
                 groupByItems
@@ -84,7 +84,7 @@ internal class SqlSelectStatementBuilder(
         support.forUpdateClause()
     }
 
-    private fun column(expression: ColumnExpression<*>) {
+    private fun column(expression: ColumnExpression<*, *>) {
         support.column(expression)
     }
 

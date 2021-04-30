@@ -1,41 +1,55 @@
 package org.komapper.core.dsl.metamodel
 
+import org.komapper.core.Value
 import org.komapper.core.dsl.expression.ColumnExpression
 import kotlin.reflect.KClass
 
-interface PropertyMetamodel<E : Any, T : Any> : ColumnExpression<T> {
+interface PropertyMetamodel<ENTITY : Any, EXTERIOR : Any, INTERIOR : Any> : ColumnExpression<EXTERIOR, INTERIOR> {
     val name: String
-    val getter: (E) -> T?
-    val setter: (E, T) -> E
+    val getter: (ENTITY) -> EXTERIOR?
+    val setter: (ENTITY, EXTERIOR) -> ENTITY
     val nullable: Boolean
-    val idAssignment: Assignment<E>?
+    val idAssignment: Assignment<ENTITY>?
+
+    fun toValue(entity: ENTITY): Value {
+        val exterior = getter(entity)
+        val interior = if (exterior == null) null else unwrap(exterior)
+        return Value(interior, interiorClass)
+    }
 }
 
-class PropertyMetamodelImpl<E : Any, T : Any>(
-    override val owner: EntityMetamodel<E, *, *>,
-    private val descriptor: PropertyDescriptor<E, T>
-) : PropertyMetamodel<E, T> {
-    override val klass: KClass<T> get() = descriptor.klass
+class PropertyMetamodelImpl<ENTITY : Any, EXTERIOR : Any, INTERIOR : Any>(
+    override val owner: EntityMetamodel<ENTITY, *, *>,
+    private val descriptor: PropertyDescriptor<ENTITY, EXTERIOR, INTERIOR>
+) : PropertyMetamodel<ENTITY, EXTERIOR, INTERIOR> {
+    override val exteriorClass: KClass<EXTERIOR> get() = descriptor.klass
+    override val interiorClass: KClass<INTERIOR> = descriptor.interiorClass
     override val name: String get() = descriptor.name
     override val columnName: String get() = descriptor.columnName
     override val alwaysQuote: Boolean get() = descriptor.alwaysQuote
-    override val getter: (E) -> T? get() = descriptor.getter
-    override val setter: (E, T) -> E get() = descriptor.setter
+    override val getter: (ENTITY) -> EXTERIOR? get() = descriptor.getter
+    override val setter: (ENTITY, EXTERIOR) -> ENTITY get() = descriptor.setter
+    override val wrap: (INTERIOR) -> EXTERIOR get() = descriptor.compose
+    override val unwrap: (EXTERIOR) -> INTERIOR get() = descriptor.decompose
     override val nullable: Boolean = descriptor.nullable
-    override val idAssignment: Assignment<E>? = descriptor.idAssignment
+    override val idAssignment: Assignment<ENTITY>? = descriptor.idAssignment
 }
 
 @Suppress("unused")
-class PropertyMetamodelStub<E : Any, T : Any> : PropertyMetamodel<E, T> {
-    override val owner: EntityMetamodel<E, *, *> get() = fail()
-    override val klass: KClass<T> get() = fail()
+class PropertyMetamodelStub<ENTITY : Any, EXTERIOR : Any, INTERIOR : Any> :
+    PropertyMetamodel<ENTITY, EXTERIOR, INTERIOR> {
+    override val owner: EntityMetamodel<ENTITY, *, *> get() = fail()
+    override val exteriorClass: KClass<EXTERIOR> get() = fail()
+    override val interiorClass: KClass<INTERIOR> = fail()
     override val name: String get() = fail()
     override val columnName: String get() = fail()
     override val alwaysQuote: Boolean get() = fail()
-    override val getter: (E) -> T? get() = fail()
-    override val setter: (E, T) -> E get() = fail()
+    override val getter: (ENTITY) -> EXTERIOR? get() = fail()
+    override val setter: (ENTITY, EXTERIOR) -> ENTITY get() = fail()
+    override val wrap: (INTERIOR) -> EXTERIOR get() = fail()
+    override val unwrap: (EXTERIOR) -> INTERIOR get() = fail()
     override val nullable: Boolean get() = fail()
-    override val idAssignment: Assignment<E> get() = fail()
+    override val idAssignment: Assignment<ENTITY> get() = fail()
 
     private fun fail(): Nothing {
         error("Fix google/ksp compile errors.")

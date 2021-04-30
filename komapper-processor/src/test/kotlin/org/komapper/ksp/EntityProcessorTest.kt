@@ -16,7 +16,8 @@ class EntityProcessorTest {
     @JvmField
     var tempDir: Path? = null
 
-    @Test fun `We recommend to define a companion object in the entity class`() {
+    @Test
+    fun `We recommend to define a companion object in the entity class`() {
         val result = compile(
             kotlin(
                 "source.kt",
@@ -34,7 +35,8 @@ class EntityProcessorTest {
         assertThat(result.messages).contains("We recommend to define a companion object in the entity class.")
     }
 
-    @Test fun `The entity class must have at least one id property`() {
+    @Test
+    fun `The entity class must have at least one id property`() {
         val result = compile(
             kotlin(
                 "source.kt",
@@ -52,7 +54,8 @@ class EntityProcessorTest {
         assertThat(result.messages).contains("The entity class must have at least one id property.")
     }
 
-    @Test fun `The parent declaration of the entity class must be public`() {
+    @Test
+    fun `The parent declaration of the entity class must be public`() {
         val result = compile(
             kotlin(
                 "source.kt",
@@ -72,7 +75,8 @@ class EntityProcessorTest {
         assertThat(result.messages).contains("The parent declaration of the entity class must be public.")
     }
 
-    @Test fun `Duplicated definitions are found`() {
+    @Test
+    fun `Duplicated definitions are found`() {
         val result = compile(
             kotlin(
                 "source.kt",
@@ -94,7 +98,8 @@ class EntityProcessorTest {
         assertThat(result.messages).contains("Duplicated definitions are found.")
     }
 
-    @Test fun `The same name property is not found in the entity`() {
+    @Test
+    fun `The same name property is not found in the entity`() {
         val result = compile(
             kotlin(
                 "source.kt",
@@ -116,7 +121,8 @@ class EntityProcessorTest {
         assertThat(result.messages).contains("The same name property is not found in the entity.")
     }
 
-    @Test fun `The class name cannot start with '__'`() {
+    @Test
+    fun `The class name cannot start with '__'`() {
         val result = compile(
             kotlin(
                 "source.kt",
@@ -134,7 +140,8 @@ class EntityProcessorTest {
         assertThat(result.messages).contains("The class name cannot start with '__'.")
     }
 
-    @Test fun `The class name cannot start with '__', @KmEntityDef`() {
+    @Test
+    fun `The class name cannot start with '__', @KmEntityDef`() {
         val result = compile(
             kotlin(
                 "source.kt",
@@ -155,7 +162,8 @@ class EntityProcessorTest {
         assertThat(result.messages).contains("The class name cannot start with '__'.")
     }
 
-    @Test fun `The property name cannot start with '__'`() {
+    @Test
+    fun `The property name cannot start with '__'`() {
         val result = compile(
             kotlin(
                 "source.kt",
@@ -173,7 +181,8 @@ class EntityProcessorTest {
         assertThat(result.messages).contains("The property name cannot start with '__'.")
     }
 
-    @Test fun `The property name cannot start with '__', @KmEntityDef`() {
+    @Test
+    fun `The property name cannot start with '__', @KmEntityDef`() {
         val result = compile(
             kotlin(
                 "source.kt",
@@ -535,7 +544,7 @@ class EntityProcessorTest {
     }
 
     @Test
-    fun `The version property must either be Int or Long type`() {
+    fun `The type of @KmVersion annotated property must be either Int, Long or value class`() {
         val result = compile(
             kotlin(
                 "source.kt",
@@ -550,11 +559,34 @@ class EntityProcessorTest {
             )
         )
         assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertThat(result.messages).contains("The version property must be either Int or Long type.")
+        assertThat(result.messages).contains("The type of @KmVersion annotated property must be either Int, Long or value class.")
     }
 
     @Test
-    fun `The createdAt property must be either LocalDateTime or OffsetDateTime type`() {
+    fun `When the type of @KmVersion annotated property is value class, the type of the value class's own property must be either Int or Long`() {
+        val result = compile(
+            kotlin(
+                "source.kt",
+                """
+                package test
+                import org.komapper.annotation.*
+                @JvmInline
+                value class MyVersion(
+                    val version: String
+                )
+                @KmEntity
+                data class Dept(
+                    @KmVersion val version: MyVersion
+                )
+                """
+            )
+        )
+        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
+        assertThat(result.messages).contains("When the type of @KmVersion annotated property is value class, the type of the value class's own property must be either Int or Long.")
+    }
+
+    @Test
+    fun `The type of @KmCreatedAt annotated property must be either LocalDateTime or OffsetDateTime`() {
         val result = compile(
             kotlin(
                 "source.kt",
@@ -569,11 +601,34 @@ class EntityProcessorTest {
             )
         )
         assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertThat(result.messages).contains("The createdAt property must be either LocalDateTime or OffsetDateTime type.")
+        assertThat(result.messages).contains("The type of @KmCreatedAt annotated property must be either LocalDateTime or OffsetDateTime.")
     }
 
     @Test
-    fun `The updatedAt property must be either LocalDateTime or OffsetDateTime type`() {
+    fun `When the type of @KmCreatedAt annotated property is value class, the type of the value class's own property must be either LocalDateTime or OffsetDateTime`() {
+        val result = compile(
+            kotlin(
+                "source.kt",
+                """
+                package test
+                import org.komapper.annotation.*
+                @JvmInline
+                value class MyDateTime(
+                    val dataTime: String
+                )
+                @KmEntity
+                data class Dept(
+                    @KmCreatedAt val dataTime: MyDateTime
+                )
+                """
+            )
+        )
+        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
+        assertThat(result.messages).contains("When the type of @KmCreatedAt annotated property is value class, the type of the value class's own property must be either LocalDateTime or OffsetDateTime.")
+    }
+
+    @Test
+    fun `The type of @KmUpdatedAt annotated property must be either LocalDateTime or OffsetDateTime`() {
         val result = compile(
             kotlin(
                 "source.kt",
@@ -588,7 +643,30 @@ class EntityProcessorTest {
             )
         )
         assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertThat(result.messages).contains("The updatedAt property must be either LocalDateTime or OffsetDateTime type.")
+        assertThat(result.messages).contains("The type of @KmUpdatedAt annotated property must be either LocalDateTime or OffsetDateTime.")
+    }
+
+    @Test
+    fun `When the type of @KmUpdatedAt annotated property is value class, the type of the value class's own property must be either LocalDateTime or OffsetDateTime`() {
+        val result = compile(
+            kotlin(
+                "source.kt",
+                """
+                package test
+                import org.komapper.annotation.*
+                @JvmInline
+                value class MyDateTime(
+                    val dataTime: String
+                )
+                @KmEntity
+                data class Dept(
+                    @KmUpdatedAt val dataTime: MyDateTime
+                )
+                """
+            )
+        )
+        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
+        assertThat(result.messages).contains("When the type of @KmUpdatedAt annotated property is value class, the type of the value class's own property must be either LocalDateTime or OffsetDateTime.")
     }
 
     @Test
@@ -611,7 +689,7 @@ class EntityProcessorTest {
     }
 
     @Test
-    fun `The @KmAutoIncrement annotated property must be either Int or Long type`() {
+    fun `The type of @KmAutoIncrement annotated property must be either Int, Long or value class`() {
         val result = compile(
             kotlin(
                 "source.kt",
@@ -626,11 +704,11 @@ class EntityProcessorTest {
             )
         )
         assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertThat(result.messages).contains("The @KmAutoIncrement annotated property must be either Int or Long type.")
+        assertThat(result.messages).contains("The type of @KmAutoIncrement annotated property must be either Int, Long or value class.")
     }
 
     @Test
-    fun `The @KmSequence annotated property must be either Int or Long type`() {
+    fun `The type of @KmSequence annotated property must be either Int, Long or value class`() {
         val result = compile(
             kotlin(
                 "source.kt",
@@ -645,7 +723,53 @@ class EntityProcessorTest {
             )
         )
         assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertThat(result.messages).contains("The @KmSequence annotated property must be either Int or Long type.")
+        assertThat(result.messages).contains("The type of @KmSequence annotated property must be either Int, Long or value class.")
+    }
+
+    @Test
+    fun `When the type of @KmAutoIncrement annotated property is value class, the type of value class's own property must be either Int or Long`() {
+        val result = compile(
+            kotlin(
+                "source.kt",
+                """
+                package test
+                import org.komapper.annotation.*
+                @JvmInline
+                value class MyId(
+                    val id: String
+                )
+                @KmEntity
+                data class Dept(
+                    @KmId @KmAutoIncrement val id: MyId
+                )
+                """
+            )
+        )
+        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
+        assertThat(result.messages).contains("When the type of @KmAutoIncrement annotated property is value class, the type of the value class's own property must be either Int or Long.")
+    }
+
+    @Test
+    fun `When the type of @KmSequence annotated property is value class, the type of value class's own property must be either Int or Long`() {
+        val result = compile(
+            kotlin(
+                "source.kt",
+                """
+                package test
+                import org.komapper.annotation.*
+                @JvmInline
+                value class MyId(
+                    val id: String
+                )
+                @KmEntity
+                data class Dept(
+                    @KmId @KmSequence("my_seq") val id: MyId
+                )
+                """
+            )
+        )
+        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
+        assertThat(result.messages).contains("When the type of @KmSequence annotated property is value class, the type of the value class's own property must be either Int or Long.")
     }
 
     @Test
@@ -665,6 +789,50 @@ class EntityProcessorTest {
         )
         assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
         assertThat(result.messages).contains("@KmSequence.name is not found.")
+    }
+
+    @Test
+    fun `The value class property must not be private`() {
+        val result = compile(
+            kotlin(
+                "source.kt",
+                """
+                package test
+                import org.komapper.annotation.*
+                @JvmInline
+                value class Name(private val name: String)
+                @KmEntity
+                data class Dept(
+                    @KmId val id: Int,
+                    val name: Name,
+                )
+                """
+            )
+        )
+        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
+        assertThat(result.messages).contains("The value class's own property 'name' must not be private.")
+    }
+
+    @Test
+    fun `The value class property must not be nullable`() {
+        val result = compile(
+            kotlin(
+                "source.kt",
+                """
+                package test
+                import org.komapper.annotation.*
+                @JvmInline
+                value class Name(val name: String?)
+                @KmEntity
+                data class Dept(
+                    @KmId val id: Int,
+                    val name: Name,
+                )
+                """
+            )
+        )
+        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
+        assertThat(result.messages).contains("The value class's own property 'name' must not be nullable.")
     }
 
     private fun prepareCompilation(vararg sourceFiles: SourceFile): KotlinCompilation {

@@ -21,60 +21,60 @@ class OnScope<ENTITY : Any> internal constructor(
         }
     }
 
-    infix fun <T : Any> PropertyMetamodel<*, T>.eq(right: PropertyMetamodel<ENTITY, T>) {
+    infix fun <T : Any, S : Any> PropertyMetamodel<*, T, S>.eq(right: PropertyMetamodel<ENTITY, T, S>) {
         context.add(Criterion.Eq(Operand.Column(this), Operand.Column(right)))
     }
 
-    infix fun <T : Any> PropertyMetamodel<*, T>.eq(right: T) {
-        context.add(Criterion.Eq(Operand.Column(this), Operand.Argument(this.klass, right)))
+    infix fun <T : Any, S : Any> PropertyMetamodel<*, T, S>.eq(right: T) {
+        context.add(Criterion.Eq(Operand.Column(this), Operand.ExteriorArgument(this, right)))
     }
 
-    infix fun <T : Any> PropertyMetamodel<*, T>.notEq(right: PropertyMetamodel<ENTITY, T>) {
+    infix fun <T : Any, S : Any> PropertyMetamodel<*, T, S>.notEq(right: PropertyMetamodel<ENTITY, T, S>) {
         context.add(Criterion.NotEq(Operand.Column(this), Operand.Column(right)))
     }
 
-    infix fun <T : Any> PropertyMetamodel<*, T>.notEq(right: T) {
-        context.add(Criterion.NotEq(Operand.Column(this), Operand.Argument(this.klass, right)))
+    infix fun <T : Any, S : Any> PropertyMetamodel<*, T, S>.notEq(right: T) {
+        context.add(Criterion.NotEq(Operand.Column(this), Operand.ExteriorArgument(this, right)))
     }
 
-    infix fun <T : Any> PropertyMetamodel<*, T>.less(right: PropertyMetamodel<ENTITY, T>) {
+    infix fun <T : Any, S : Any> PropertyMetamodel<*, T, S>.less(right: PropertyMetamodel<ENTITY, T, S>) {
         context.add(Criterion.Less(Operand.Column(this), Operand.Column(right)))
     }
 
-    infix fun <T : Any> PropertyMetamodel<*, T>.less(right: T) {
-        context.add(Criterion.Less(Operand.Column(this), Operand.Argument(this.klass, right)))
+    infix fun <T : Any, S : Any> PropertyMetamodel<*, T, S>.less(right: T) {
+        context.add(Criterion.Less(Operand.Column(this), Operand.ExteriorArgument(this, right)))
     }
 
-    infix fun <T : Any> PropertyMetamodel<*, T>.lessEq(right: PropertyMetamodel<ENTITY, T>) {
+    infix fun <T : Any, S : Any> PropertyMetamodel<*, T, S>.lessEq(right: PropertyMetamodel<ENTITY, T, S>) {
         context.add(Criterion.LessEq(Operand.Column(this), Operand.Column(right)))
     }
 
-    infix fun <T : Any> PropertyMetamodel<*, T>.lessEq(right: T) {
-        context.add(Criterion.LessEq(Operand.Column(this), Operand.Argument(this.klass, right)))
+    infix fun <T : Any, S : Any> PropertyMetamodel<*, T, S>.lessEq(right: T) {
+        context.add(Criterion.LessEq(Operand.Column(this), Operand.ExteriorArgument(this, right)))
     }
 
-    infix fun <T : Any> PropertyMetamodel<*, T>.grater(right: PropertyMetamodel<ENTITY, T>) {
+    infix fun <T : Any, S : Any> PropertyMetamodel<*, T, S>.grater(right: PropertyMetamodel<ENTITY, T, S>) {
         context.add(Criterion.Grater(Operand.Column(this), Operand.Column(right)))
     }
 
-    infix fun <T : Any> PropertyMetamodel<*, T>.grater(right: T) {
-        context.add(Criterion.Grater(Operand.Column(this), Operand.Argument(this.klass, right)))
+    infix fun <T : Any, S : Any> PropertyMetamodel<*, T, S>.grater(right: T) {
+        context.add(Criterion.Grater(Operand.Column(this), Operand.ExteriorArgument(this, right)))
     }
 
-    infix fun <T : Any> PropertyMetamodel<*, T>.graterEq(right: PropertyMetamodel<ENTITY, T>) {
+    infix fun <T : Any, S : Any> PropertyMetamodel<*, T, S>.graterEq(right: PropertyMetamodel<ENTITY, T, S>) {
         context.add(Criterion.GraterEq(Operand.Column(this), Operand.Column(right)))
     }
 
-    infix fun <T : Any> PropertyMetamodel<*, T>.graterEq(right: T) {
-        context.add(Criterion.GraterEq(Operand.Column(this), Operand.Argument(this.klass, right)))
+    infix fun <T : Any, S : Any> PropertyMetamodel<*, T, S>.graterEq(right: T) {
+        context.add(Criterion.GraterEq(Operand.Column(this), Operand.ExteriorArgument(this, right)))
     }
 
-    fun <T : Any> ColumnExpression<T>.isNull() {
+    fun <T : Any, S : Any> ColumnExpression<T, S>.isNull() {
         val left = Operand.Column(this)
         context.add(Criterion.IsNull(left))
     }
 
-    fun <T : Any> ColumnExpression<T>.isNotNull() {
+    fun <T : Any, S : Any> ColumnExpression<T, S>.isNotNull() {
         val left = Operand.Column(this)
         context.add(Criterion.IsNotNull(left))
     }

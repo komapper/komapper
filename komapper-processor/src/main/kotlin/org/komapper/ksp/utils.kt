@@ -27,6 +27,10 @@ internal fun KSClassDeclaration.hasCompanionObject(): Boolean {
     }
 }
 
+internal fun KSClassDeclaration.isValueClass(): Boolean {
+    return this.findAnnotation("JvmInline") != null
+}
+
 internal fun KSAnnotation.findValue(name: String): Any? {
     return this.arguments
         .filter { it.name?.asString() == name }

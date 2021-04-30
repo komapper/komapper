@@ -144,5 +144,6 @@ class H2Setting(url: String, user: String, password: String) : Setting {
     override val dropSql: String = "DROP ALL OBJECTS"
     override val resetSql: String = """
         ALTER TABLE IDENTITY_STRATEGY ALTER COLUMN ID RESTART WITH 1;
+        ALTER SEQUENCE SEQUENCE_STRATEGY_ID RESTART WITH 1
     """.trimIndent()
 }

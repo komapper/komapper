@@ -3,16 +3,16 @@ package org.komapper.core.dsl.element
 import org.komapper.core.dsl.expression.ColumnExpression
 
 internal sealed class SortItem {
-    internal sealed class Property<T : Any> : ColumnExpression<T>, SortItem() {
-        abstract val expression: ColumnExpression<T>
+    internal sealed class Property<T : Any, S : Any> : ColumnExpression<T, S>, SortItem() {
+        abstract val expression: ColumnExpression<T, S>
 
-        data class Asc<T : Any>(override val expression: ColumnExpression<T>) :
-            Property<T>(),
-            ColumnExpression<T> by expression
+        data class Asc<T : Any, S : Any>(override val expression: ColumnExpression<T, S>) :
+            Property<T, S>(),
+            ColumnExpression<T, S> by expression
 
-        data class Desc<T : Any>(override val expression: ColumnExpression<T>) :
-            Property<T>(),
-            ColumnExpression<T> by expression
+        data class Desc<T : Any, S : Any>(override val expression: ColumnExpression<T, S>) :
+            Property<T, S>(),
+            ColumnExpression<T, S> by expression
     }
 
     internal sealed class Alias : CharSequence, SortItem() {

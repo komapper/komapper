@@ -3,7 +3,6 @@ package org.komapper.core.dsl.builder
 import org.komapper.core.Dialect
 import org.komapper.core.Statement
 import org.komapper.core.StatementBuffer
-import org.komapper.core.Value
 import org.komapper.core.dsl.context.EntityDeleteContext
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.expression.TableExpression
@@ -33,8 +32,7 @@ internal class EntityDeleteStatementBuilder<ENTITY : Any, ID, META : EntityMetam
                 for (p in identityProperties) {
                     column(p)
                     buf.append(" = ")
-                    val value = Value(p.getter(entity), p.klass)
-                    buf.bind(value)
+                    buf.bind(p.toValue(entity))
                     buf.append(" and ")
                 }
                 if (!versionRequired) {
@@ -45,8 +43,7 @@ internal class EntityDeleteStatementBuilder<ENTITY : Any, ID, META : EntityMetam
                 checkNotNull(versionProperty)
                 column(versionProperty)
                 buf.append(" = ")
-                val value = Value(versionProperty.getter(entity), versionProperty.klass)
-                buf.bind(value)
+                buf.bind(versionProperty.toValue(entity))
             }
         }
         return buf.toStatement()
@@ -56,7 +53,7 @@ internal class EntityDeleteStatementBuilder<ENTITY : Any, ID, META : EntityMetam
         support.visitTableExpression(expression, TableNameType.NAME_AND_ALIAS)
     }
 
-    private fun column(expression: ColumnExpression<*>) {
+    private fun column(expression: ColumnExpression<*, *>) {
         support.visitColumnExpression(expression)
     }
 }

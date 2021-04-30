@@ -7,20 +7,20 @@ import org.komapper.core.dsl.metamodel.PropertyMetamodel
 open class PostgreSqlSchemaStatementBuilder(dialect: PostgreSqlDialect) :
     AbstractSchemaStatementBuilder<PostgreSqlDialect>(dialect) {
 
-    override fun resolveDataTypeName(property: PropertyMetamodel<*, *>): String {
-        return if (property.idAssignment is Assignment.AutoIncrement<*, *>) {
-            when (property.klass) {
+    override fun resolveDataTypeName(property: PropertyMetamodel<*, *, *>): String {
+        return if (property.idAssignment is Assignment.AutoIncrement<*, *, *>) {
+            when (property.interiorClass) {
                 Int::class -> "serial"
                 Long::class -> "bigserial"
-                else -> error("Illegal assignment type: ${property.klass.qualifiedName}")
+                else -> error("Illegal assignment type: ${property.interiorClass.qualifiedName}")
             }
         } else {
-            val dataType = dialect.getDataType(property.klass)
+            val dataType = dialect.getDataType(property.interiorClass)
             dataType.name
         }
     }
 
-    override fun resolveIdentity(property: PropertyMetamodel<*, *>): String {
+    override fun resolveIdentity(property: PropertyMetamodel<*, *, *>): String {
         return ""
     }
 }

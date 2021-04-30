@@ -3,7 +3,6 @@ package org.komapper.jdbc.postgresql
 import org.komapper.core.Dialect
 import org.komapper.core.Statement
 import org.komapper.core.StatementBuffer
-import org.komapper.core.Value
 import org.komapper.core.dsl.builder.AliasManager
 import org.komapper.core.dsl.builder.BuilderSupport
 import org.komapper.core.dsl.builder.EntityUpsertStatementBuilder
@@ -34,7 +33,7 @@ class PostgreSqlEntityUpsertStatementBuilder<ENTITY : Any, ID, META : EntityMeta
         buf.append(" (")
         for (
             p in target.properties().filter {
-                it.idAssignment !is Assignment.AutoIncrement<ENTITY, *>
+                it.idAssignment !is Assignment.AutoIncrement<ENTITY, *, *>
             }
         ) {
             column(p)
@@ -46,11 +45,10 @@ class PostgreSqlEntityUpsertStatementBuilder<ENTITY : Any, ID, META : EntityMeta
             buf.append("(")
             for (
                 p in target.properties().filter {
-                    it.idAssignment !is Assignment.AutoIncrement<ENTITY, *>
+                    it.idAssignment !is Assignment.AutoIncrement<ENTITY, *, *>
                 }
             ) {
-                val value = Value(p.getter(entity), p.klass)
-                buf.bind(value)
+                buf.bind(p.toValue(entity))
                 buf.append(", ")
             }
             buf.cutBack(2)
@@ -86,7 +84,7 @@ class PostgreSqlEntityUpsertStatementBuilder<ENTITY : Any, ID, META : EntityMeta
         support.visitTableExpression(expression, TableNameType.NAME_AND_ALIAS)
     }
 
-    private fun column(expression: ColumnExpression<*>) {
+    private fun column(expression: ColumnExpression<*, *>) {
         val name = expression.getCanonicalColumnName(dialect::enquote)
         buf.append(name)
     }

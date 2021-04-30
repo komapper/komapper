@@ -85,7 +85,7 @@ internal class SelectStatementBuilderSupport(
         support.visitTableExpression(expression, TableNameType.NAME_AND_ALIAS)
     }
 
-    fun column(expression: ColumnExpression<*>) {
+    fun column(expression: ColumnExpression<*, *>) {
         support.visitColumnExpression(expression)
     }
 
@@ -107,10 +107,10 @@ internal class OrderByBuilderSupport(
             buf.append(" order by ")
             for (item in orderBy) {
                 when (item) {
-                    is SortItem.Property<*> -> {
+                    is SortItem.Property<*, *> -> {
                         val (expression, sort) = when (item) {
-                            is SortItem.Property.Asc<*> -> item.expression to "asc"
-                            is SortItem.Property.Desc<*> -> item.expression to "desc"
+                            is SortItem.Property.Asc<*, *> -> item.expression to "asc"
+                            is SortItem.Property.Desc<*, *> -> item.expression to "desc"
                         }
                         column(expression)
                         buf.append(" $sort")
@@ -129,7 +129,7 @@ internal class OrderByBuilderSupport(
         }
     }
 
-    fun column(expression: ColumnExpression<*>) {
+    fun column(expression: ColumnExpression<*, *>) {
         support.visitColumnExpression(expression)
     }
 }

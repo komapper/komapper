@@ -23,12 +23,12 @@ interface SqlSelectQuery<ENTITY : Any> : Subquery<ENTITY> {
 
     fun distinct(): SqlSelectQuery<ENTITY>
 
-    fun <OTHER_ENTITY : Any, OTHER_ID, OTHER_META : EntityMetamodel<OTHER_ENTITY, OTHER_ID, OTHER_META>> innerJoin(
+    fun <OTHER_ENTITY : Any, OTHER_META : EntityMetamodel<OTHER_ENTITY, *, OTHER_META>> innerJoin(
         metamodel: OTHER_META,
         on: OnDeclaration<OTHER_ENTITY>
     ): SqlSelectQuery<ENTITY>
 
-    fun <OTHER_ENTITY : Any, OTHER_ID, OTHER_META : EntityMetamodel<OTHER_ENTITY, OTHER_ID, OTHER_META>> leftJoin(
+    fun <OTHER_ENTITY : Any, OTHER_META : EntityMetamodel<OTHER_ENTITY, *, OTHER_META>> leftJoin(
         metamodel: OTHER_META,
         on: OnDeclaration<OTHER_ENTITY>
     ): SqlSelectQuery<ENTITY>
@@ -36,20 +36,20 @@ interface SqlSelectQuery<ENTITY : Any> : Subquery<ENTITY> {
     fun first(declaration: WhereDeclaration): Query<ENTITY>
     fun firstOrNull(declaration: WhereDeclaration): Query<ENTITY?>
     fun where(declaration: WhereDeclaration): SqlSelectQuery<ENTITY>
-    fun groupBy(vararg expressions: ColumnExpression<*>): SqlSelectQuery<ENTITY>
+    fun groupBy(vararg expressions: ColumnExpression<*, *>): SqlSelectQuery<ENTITY>
     fun having(declaration: HavingDeclaration): SqlSelectQuery<ENTITY>
-    fun orderBy(vararg expressions: ColumnExpression<*>): SqlSelectQuery<ENTITY>
+    fun orderBy(vararg expressions: ColumnExpression<*, *>): SqlSelectQuery<ENTITY>
     fun offset(offset: Int): SqlSelectQuery<ENTITY>
     fun limit(limit: Int): SqlSelectQuery<ENTITY>
     fun forUpdate(): SqlSelectQuery<ENTITY>
     fun option(configure: (SqlSelectOption) -> SqlSelectOption): SqlSelectQuery<ENTITY>
 
-    fun <A : Any, A_ID, A_META : EntityMetamodel<A, A_ID, A_META>> select(
+    fun <A : Any, A_META : EntityMetamodel<A, *, A_META>> select(
         metamodel: A_META
     ): Subquery<Pair<ENTITY, A?>>
 
-    fun <A : Any, A_ID, A_META : EntityMetamodel<A, A_ID, A_META>,
-        B : Any, B_ID, B_META : EntityMetamodel<B, B_ID, B_META>> select(
+    fun <A : Any, A_META : EntityMetamodel<A, *, A_META>,
+        B : Any, B_META : EntityMetamodel<B, *, B_META>> select(
         metamodel1: A_META,
         metamodel2: B_META
     ): Subquery<Triple<ENTITY, A?, B?>>
@@ -58,27 +58,27 @@ interface SqlSelectQuery<ENTITY : Any> : Subquery<ENTITY> {
         vararg metamodels: EntityMetamodel<*, *, *>,
     ): Subquery<EntityRecord>
 
-    fun <A : Any> select(
-        expression: ScalarExpression<A>
-    ): ScalarQuery<A?, A>
+    fun <T : Any, S : Any> select(
+        expression: ScalarExpression<T, S>
+    ): ScalarQuery<T?, T, S>
 
     fun <A : Any> select(
-        expression: ColumnExpression<A>
+        expression: ColumnExpression<A, *>
     ): Subquery<A?>
 
     fun <A : Any, B : Any> select(
-        expression1: ColumnExpression<A>,
-        expression2: ColumnExpression<B>
+        expression1: ColumnExpression<A, *>,
+        expression2: ColumnExpression<B, *>
     ): Subquery<Pair<A?, B?>>
 
     fun <A : Any, B : Any, C : Any> select(
-        expression1: ColumnExpression<A>,
-        expression2: ColumnExpression<B>,
-        expression3: ColumnExpression<C>
+        expression1: ColumnExpression<A, *>,
+        expression2: ColumnExpression<B, *>,
+        expression3: ColumnExpression<C, *>
     ): Subquery<Triple<A?, B?, C?>>
 
     fun select(
-        vararg expressions: ColumnExpression<*>,
+        vararg expressions: ColumnExpression<*, *>,
     ): Subquery<PropertyRecord>
 }
 
@@ -108,7 +108,7 @@ internal data class SqlSelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<
         return copy(context = newContext)
     }
 
-    override fun <OTHER_ENTITY : Any, OTHER_ID, OTHER_META : EntityMetamodel<OTHER_ENTITY, OTHER_ID, OTHER_META>> innerJoin(
+    override fun <OTHER_ENTITY : Any, OTHER_META : EntityMetamodel<OTHER_ENTITY, *, OTHER_META>> innerJoin(
         metamodel: OTHER_META,
         on: OnDeclaration<OTHER_ENTITY>
     ): SqlSelectQueryImpl<ENTITY, ID, META> {
@@ -116,7 +116,7 @@ internal data class SqlSelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<
         return copy(context = newContext)
     }
 
-    override fun <OTHER_ENTITY : Any, OTHER_ID, OTHER_META : EntityMetamodel<OTHER_ENTITY, OTHER_ID, OTHER_META>> leftJoin(
+    override fun <OTHER_ENTITY : Any, OTHER_META : EntityMetamodel<OTHER_ENTITY, *, OTHER_META>> leftJoin(
         metamodel: OTHER_META,
         on: OnDeclaration<OTHER_ENTITY>
     ): SqlSelectQueryImpl<ENTITY, ID, META> {
@@ -139,7 +139,7 @@ internal data class SqlSelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<
         return copy(context = newContext)
     }
 
-    override fun groupBy(vararg expressions: ColumnExpression<*>): SqlSelectQueryImpl<ENTITY, ID, META> {
+    override fun groupBy(vararg expressions: ColumnExpression<*, *>): SqlSelectQueryImpl<ENTITY, ID, META> {
         val newContext = context.copy(groupBy = context.groupBy + expressions)
         return copy(context = newContext)
     }
@@ -150,7 +150,7 @@ internal data class SqlSelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<
         return copy(context = newContext)
     }
 
-    override fun orderBy(vararg expressions: ColumnExpression<*>): SqlSelectQueryImpl<ENTITY, ID, META> {
+    override fun orderBy(vararg expressions: ColumnExpression<*, *>): SqlSelectQueryImpl<ENTITY, ID, META> {
         val newContext = support.orderBy(*expressions)
         return copy(context = newContext)
     }
@@ -190,7 +190,7 @@ internal data class SqlSelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<
         return support.unionAll(this, other)
     }
 
-    override fun <A : Any, A_ID, A_META : EntityMetamodel<A, A_ID, A_META>> select(
+    override fun <A : Any, A_META : EntityMetamodel<A, *, A_META>> select(
         metamodel: A_META,
     ): Subquery<Pair<ENTITY, A?>> {
         val metamodels = context.getEntityMetamodels()
@@ -203,8 +203,8 @@ internal data class SqlSelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<
         }
     }
 
-    override fun <A : Any, A_ID, A_META : EntityMetamodel<A, A_ID, A_META>,
-        B : Any, B_ID, B_META : EntityMetamodel<B, B_ID, B_META>> select(
+    override fun <A : Any, A_META : EntityMetamodel<A, *, A_META>,
+        B : Any, B_META : EntityMetamodel<B, *, B_META>> select(
         metamodel1: A_META,
         metamodel2: B_META
     ): Subquery<Triple<ENTITY, A?, B?>> {
@@ -233,7 +233,7 @@ internal data class SqlSelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<
         }
     }
 
-    override fun <A : Any> select(expression: ScalarExpression<A>): ScalarQuery<A?, A> {
+    override fun <T : Any, S : Any> select(expression: ScalarExpression<T, S>): ScalarQuery<T?, T, S> {
         val newContext = context.setProjection(expression)
         val query = Collectable(newContext, option) { dialect, rs ->
             val m = PropertyMapper(dialect, rs)
@@ -242,7 +242,7 @@ internal data class SqlSelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<
         return ScalarQueryImpl(query, expression)
     }
 
-    override fun <A : Any> select(expression: ColumnExpression<A>): Subquery<A?> {
+    override fun <A : Any> select(expression: ColumnExpression<A, *>): Subquery<A?> {
         val newContext = context.setProjection(expression)
         return Collectable(newContext, option) { dialect, rs ->
             val m = PropertyMapper(dialect, rs)
@@ -251,8 +251,8 @@ internal data class SqlSelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<
     }
 
     override fun <A : Any, B : Any> select(
-        expression1: ColumnExpression<A>,
-        expression2: ColumnExpression<B>
+        expression1: ColumnExpression<A, *>,
+        expression2: ColumnExpression<B, *>
     ): Subquery<Pair<A?, B?>> {
         val newContext = context.setProjection(expression1, expression2)
         return Collectable(newContext, option) { dialect, rs ->
@@ -262,9 +262,9 @@ internal data class SqlSelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<
     }
 
     override fun <A : Any, B : Any, C : Any> select(
-        expression1: ColumnExpression<A>,
-        expression2: ColumnExpression<B>,
-        expression3: ColumnExpression<C>
+        expression1: ColumnExpression<A, *>,
+        expression2: ColumnExpression<B, *>,
+        expression3: ColumnExpression<C, *>
     ): Subquery<Triple<A?, B?, C?>> {
         val newContext = context.setProjection(expression1, expression2, expression3)
         return Collectable(newContext, option) { dialect, rs: ResultSet ->
@@ -273,7 +273,7 @@ internal data class SqlSelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<
         }
     }
 
-    override fun select(vararg expressions: ColumnExpression<*>): Subquery<PropertyRecord> {
+    override fun select(vararg expressions: ColumnExpression<*, *>): Subquery<PropertyRecord> {
         val list = expressions.toList()
         val newContext = context.setProjection(*list.toTypedArray())
         return Collectable(newContext, option) { dialect, rs: ResultSet ->

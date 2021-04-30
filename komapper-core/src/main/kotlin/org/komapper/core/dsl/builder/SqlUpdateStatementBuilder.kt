@@ -45,7 +45,7 @@ internal class SqlUpdateStatementBuilder<ENTITY : Any, ID, META : EntityMetamode
         support.visitTableExpression(expression, TableNameType.NAME_AND_ALIAS)
     }
 
-    private fun column(expression: ColumnExpression<*>) {
+    private fun column(expression: ColumnExpression<*, *>) {
         val name = expression.getCanonicalColumnName(dialect::enquote)
         buf.append(name)
     }

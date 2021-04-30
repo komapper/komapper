@@ -1,6 +1,6 @@
 package org.komapper.core.dsl.expression
 
-internal class AliasExpression<T : Any>(
-    val expression: ColumnExpression<T>,
+internal class AliasExpression<T : Any, S : Any>(
+    val expression: ColumnExpression<T, S>,
     val alias: String
-) : ColumnExpression<T> by expression
+) : ColumnExpression<T, S> by expression
