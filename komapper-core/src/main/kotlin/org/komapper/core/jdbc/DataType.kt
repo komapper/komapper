@@ -166,7 +166,7 @@ class BooleanType(override val name: String) :
     }
 
     override fun doToString(value: Boolean): String {
-        return "'$value'"
+        return value.toString().uppercase()
     }
 }
 
