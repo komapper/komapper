@@ -22,7 +22,7 @@ internal class SqlInsertStatementBuilder<ENTITY : Any, ID, META : EntityMetamode
     fun build(): Statement {
         val target = context.target
         buf.append("insert into ")
-        buf.append(table(target))
+        table(target)
         when (val values = context.values) {
             is Values.Pairs -> {
                 buf.append(" (")
@@ -32,7 +32,7 @@ internal class SqlInsertStatementBuilder<ENTITY : Any, ID, META : EntityMetamode
                     ) {
                         continue
                     }
-                    buf.append(column(property))
+                    column(property)
                     buf.append(", ")
                 }
                 buf.cutBack(2)
@@ -51,33 +51,34 @@ internal class SqlInsertStatementBuilder<ENTITY : Any, ID, META : EntityMetamode
             }
             is Values.Subquery -> {
                 buf.append(" (")
-                for (p in context.target.properties()) {
-                    buf.append(column(p))
+                for (p in target.properties()) {
+                    column(p)
                     buf.append(", ")
                 }
                 buf.cutBack(2)
                 buf.append(") ")
-                val subqueryContext = values.context
-                val statement = buildSubqueryStatement(subqueryContext)
-                buf.append(statement)
+                subquery(values.context)
             }
         }
         return buf.toStatement()
     }
 
-    private fun table(metamodel: EntityMetamodel<*, *, *>): String {
-        return metamodel.getCanonicalTableName(dialect::enquote)
+    private fun table(metamodel: EntityMetamodel<*, *, *>) {
+        val name = metamodel.getCanonicalTableName(dialect::enquote)
+        buf.append(name)
     }
 
-    private fun column(expression: ColumnExpression<*, *>): String {
-        return expression.getCanonicalColumnName(dialect::enquote)
+    private fun column(expression: ColumnExpression<*, *>) {
+        val name = expression.getCanonicalColumnName(dialect::enquote)
+        buf.append(name)
     }
 
     private fun operand(operand: Operand) {
         support.visitOperand(operand)
     }
 
-    private fun buildSubqueryStatement(subqueryContext: SubqueryContext<*>): Statement {
-        return support.buildSubqueryStatement(subqueryContext)
+    private fun subquery(subqueryContext: SubqueryContext<*>) {
+        val statement = support.buildSubqueryStatement(subqueryContext)
+        buf.append(statement)
     }
 }
