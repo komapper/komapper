@@ -5,6 +5,7 @@ import org.komapper.core.Statement
 import org.komapper.core.StatementBuffer
 import org.komapper.core.dsl.context.SqlInsertContext
 import org.komapper.core.dsl.context.SubqueryContext
+import org.komapper.core.dsl.element.Operand
 import org.komapper.core.dsl.element.Values
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.metamodel.Assignment
@@ -36,13 +37,13 @@ internal class SqlInsertStatementBuilder<ENTITY : Any, ID, META : EntityMetamode
                 }
                 buf.cutBack(2)
                 buf.append(") values (")
-                for ((property, argument) in values.pairs) {
+                for ((property, operand) in values.pairs) {
                     if (property in target.idProperties() &&
                         property.idAssignment is Assignment.AutoIncrement<*, *, *>
                     ) {
                         continue
                     }
-                    buf.bind(argument.value)
+                    operand(operand)
                     buf.append(", ")
                 }
                 buf.cutBack(2)
@@ -70,6 +71,10 @@ internal class SqlInsertStatementBuilder<ENTITY : Any, ID, META : EntityMetamode
 
     private fun column(expression: ColumnExpression<*, *>): String {
         return expression.getCanonicalColumnName(dialect::enquote)
+    }
+
+    private fun operand(operand: Operand) {
+        support.visitOperand(operand)
     }
 
     private fun buildSubqueryStatement(subqueryContext: SubqueryContext<*>): Statement {

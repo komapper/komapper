@@ -29,9 +29,10 @@ import org.komapper.core.jdbc.ShortType
 import org.komapper.core.jdbc.StringType
 import java.sql.SQLException
 
-open class MySqlDialect(dataTypes: Set<DataType<*>> = emptySet(), val version: Version = Version.V8_0) : AbstractDialect(
-    defaultDataTypes + dataTypes
-) {
+open class MySqlDialect(dataTypes: Set<DataType<*>> = emptySet(), val version: Version = Version.V8_0) :
+    AbstractDialect(
+        defaultDataTypes + dataTypes
+    ) {
 
     companion object {
         enum class Version { V8_0 }
@@ -61,7 +62,7 @@ open class MySqlDialect(dataTypes: Set<DataType<*>> = emptySet(), val version: V
             OffsetDateTimeType("timestamp"),
             ShortType("smallint"),
             StringType("varchar(500)"),
-            SQLXMLType("text")
+            SQLXMLType("text"),
         )
     }
 

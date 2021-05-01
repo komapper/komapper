@@ -12,9 +12,11 @@ import org.komapper.core.dsl.expression.AliasExpression
 import org.komapper.core.dsl.expression.ArithmeticExpression
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.expression.EscapeExpression
+import org.komapper.core.dsl.expression.LiteralExpression
 import org.komapper.core.dsl.expression.StringFunction
 import org.komapper.core.dsl.expression.TableExpression
 import org.komapper.core.dsl.query.ScalarQuery
+import org.komapper.core.jdbc.DataType
 
 class BuilderSupport(
     private val dialect: Dialect,
@@ -61,6 +63,9 @@ class BuilderSupport(
             }
             is StringFunction -> {
                 visitStringFunction(expression)
+            }
+            is LiteralExpression<*> -> {
+                visitLiteralExpression(expression)
             }
             else -> {
                 val name = expression.getCanonicalColumnName(dialect::enquote)
@@ -187,6 +192,14 @@ class BuilderSupport(
             }
         }
         buf.append(")")
+    }
+
+    private fun visitLiteralExpression(expression: LiteralExpression<*>) {
+        val dataType = dialect.getDataType(expression.interiorClass)
+        @Suppress("UNCHECKED_CAST")
+        dataType as DataType<Any>
+        val string = dataType.toString(expression.value)
+        buf.append(string)
     }
 
     fun visitOperand(operand: Operand) {
