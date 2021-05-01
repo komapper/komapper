@@ -12,7 +12,7 @@ data class EntityInsertContext<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, 
     }
 
     fun asEntityUpsertContext(
-        keys: List<PropertyMetamodel<ENTITY, *>>,
+        keys: List<PropertyMetamodel<ENTITY, *, *>>,
         duplicateKeyType: DuplicateKeyType
     ): EntityUpsertContext<ENTITY, ID, META> {
         return EntityUpsertContext(

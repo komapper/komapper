@@ -7,8 +7,8 @@ import org.komapper.core.dsl.option.EntityUpdateOption
 
 interface EntityUpdateQueryBuilder<ENTITY : Any> {
     fun option(configure: (EntityUpdateOption) -> EntityUpdateOption): EntityUpdateQueryBuilder<ENTITY>
-    fun include(vararg properties: PropertyMetamodel<ENTITY, *>): EntityUpdateQueryBuilder<ENTITY>
-    fun exclude(vararg properties: PropertyMetamodel<ENTITY, *>): EntityUpdateQueryBuilder<ENTITY>
+    fun include(vararg properties: PropertyMetamodel<ENTITY, *, *>): EntityUpdateQueryBuilder<ENTITY>
+    fun exclude(vararg properties: PropertyMetamodel<ENTITY, *, *>): EntityUpdateQueryBuilder<ENTITY>
     fun single(entity: ENTITY): Query<ENTITY>
     fun batch(entities: List<ENTITY>, batchSize: Int? = null): Query<List<ENTITY>>
 }
@@ -23,14 +23,14 @@ internal data class EntityUpdateQueryBuilderImpl<ENTITY : Any, ID, META : Entity
         return copy(option = configure(option))
     }
 
-    override fun include(vararg properties: PropertyMetamodel<ENTITY, *>): EntityUpdateQueryBuilderImpl<ENTITY, ID, META> {
+    override fun include(vararg properties: PropertyMetamodel<ENTITY, *, *>): EntityUpdateQueryBuilderImpl<ENTITY, ID, META> {
         val newContext = context.copy(includedProperties = properties.toList()).also {
             checkContext(it)
         }
         return copy(context = newContext)
     }
 
-    override fun exclude(vararg properties: PropertyMetamodel<ENTITY, *>): EntityUpdateQueryBuilderImpl<ENTITY, ID, META> {
+    override fun exclude(vararg properties: PropertyMetamodel<ENTITY, *, *>): EntityUpdateQueryBuilderImpl<ENTITY, ID, META> {
         val newContext = context.copy(excludedProperties = properties.toList()).also {
             checkContext(it)
         }

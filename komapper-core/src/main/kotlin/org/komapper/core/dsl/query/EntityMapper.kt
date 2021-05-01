@@ -9,7 +9,7 @@ internal class EntityMapper(val dialect: Dialect, resultSet: ResultSet) {
     private val propertyMapper = PropertyMapper(dialect, resultSet)
 
     fun <E : Any> execute(metamodel: EntityMetamodel<E, *, *>, forceMapping: Boolean = false): E? {
-        val valueMap = mutableMapOf<PropertyMetamodel<*, *>, Any?>()
+        val valueMap = mutableMapOf<PropertyMetamodel<*, *, *>, Any?>()
         for (p in metamodel.properties()) {
             val value = propertyMapper.execute(p)
             valueMap[p] = value

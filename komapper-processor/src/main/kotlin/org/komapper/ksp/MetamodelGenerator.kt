@@ -85,20 +85,27 @@ internal class EntityMetamodelGenerator(
     private fun entityDescriptor() {
         w.println("    private object $EntityDescriptor {")
         for (p in entity.properties) {
+            val exteriorTypeName = p.typeName
+            val interiorTypeName = p.valueClass?.property?.typeName ?: p.typeName
+            val exteriorClass = "$exteriorTypeName::class"
+            val interiorClass = "$interiorTypeName::class"
             val columnName = "\"${p.column.name}\""
             val alwaysQuote = "${p.column.alwaysQuote}"
             val getter = "{ it.$p }"
             val setter = "{ e, v -> e.copy($p = v) }"
+            val wrap = if (p.valueClass == null) "{ it }" else "{ ${p.valueClass}(it) }"
+            val unwrap = if (p.valueClass == null) "{ it }" else "{ it.${p.valueClass.property} }"
             val nullable = if (p.nullability == Nullability.NULLABLE) "true" else "false"
             val assignment = when (val kind = p.kind) {
                 is PropertyKind.Id -> {
                     when (val idKind = kind.idKind) {
                         is IdKind.AutoIncrement -> {
-                            "$AutoIncrement<$entityTypeName, ${p.typeName}>(${p.typeName}::class, $setter)"
+                            "$AutoIncrement<$entityTypeName, $exteriorTypeName, $interiorTypeName>($interiorClass, $wrap, $setter)"
                         }
                         is IdKind.Sequence -> {
                             val paramList = listOf(
-                                "${p.typeName}::class",
+                                interiorClass,
+                                wrap,
                                 setter,
                                 "\"${idKind.name}\"",
                                 "\"${idKind.catalog}\"",
@@ -107,21 +114,27 @@ internal class EntityMetamodelGenerator(
                                 "${idKind.startWith}",
                                 "${idKind.incrementBy}",
                             ).joinToString(", ")
-                            "$Sequence<$entityTypeName, ${p.typeName}>($paramList)"
+                            "$Sequence<$entityTypeName, $exteriorTypeName, $interiorTypeName>($paramList)"
                         }
                         else -> "null"
                     }
                 }
                 else -> "null"
             }
-            w.println("        val $p = $PropertyDescriptor<$entityTypeName, ${p.typeName}>(${p.typeName}::class, \"$p\", $columnName, $alwaysQuote, $getter, $setter, $nullable, $assignment)")
+            val propertyDescriptor =
+                "$PropertyDescriptor<$entityTypeName, $exteriorTypeName, $interiorTypeName>"
+            w.println("        val $p = $propertyDescriptor($exteriorClass, $interiorClass, \"$p\", $columnName, $alwaysQuote, $getter, $setter, $wrap, $unwrap, $nullable, $assignment)")
         }
         w.println("    }")
     }
 
     private fun propertyMetamodels() {
         for (p in entity.properties) {
-            w.println("    val $p: $PropertyMetamodel<$entityTypeName, ${p.typeName}> by lazy { $PropertyMetamodelImpl(this, $EntityDescriptor.$p) }")
+            val exteriorTypeName = p.typeName
+            val interiorTypeName = p.valueClass?.property?.typeName ?: p.typeName
+            val propertyMetamodel =
+                "$PropertyMetamodel<$entityTypeName, $exteriorTypeName, $interiorTypeName>"
+            w.println("    val $p: $propertyMetamodel by lazy { $PropertyMetamodelImpl(this, $EntityDescriptor.$p) }")
         }
     }
 
@@ -163,24 +176,24 @@ internal class EntityMetamodelGenerator(
 
     private fun idProperties() {
         val idNameList = entity.idProperties.joinToString { it.toString() }
-        w.println("    override fun idProperties(): List<$PropertyMetamodel<$entityTypeName, *>> = listOf($idNameList)")
+        w.println("    override fun idProperties(): List<$PropertyMetamodel<$entityTypeName, *, *>> = listOf($idNameList)")
     }
 
     private fun versionProperty() {
-        w.println("    override fun versionProperty(): $PropertyMetamodel<$entityTypeName, *>? = ${entity.versionProperty}")
+        w.println("    override fun versionProperty(): $PropertyMetamodel<$entityTypeName, *, *>? = ${entity.versionProperty}")
     }
 
     private fun createdAtProperty() {
-        w.println("    override fun createdAtProperty(): $PropertyMetamodel<$entityTypeName, *>? = ${entity.createdAtProperty}")
+        w.println("    override fun createdAtProperty(): $PropertyMetamodel<$entityTypeName, *, *>? = ${entity.createdAtProperty}")
     }
 
     private fun updatedAtProperty() {
-        w.println("    override fun updatedAtProperty(): $PropertyMetamodel<$entityTypeName, *>? = ${entity.updatedAtProperty}")
+        w.println("    override fun updatedAtProperty(): $PropertyMetamodel<$entityTypeName, *, *>? = ${entity.updatedAtProperty}")
     }
 
     private fun properties() {
         val nameList = entity.properties.joinToString(",\n        ", prefix = "\n        ") { it.toString() }
-        w.println("    override fun properties(): List<$PropertyMetamodel<$entityTypeName, *>> = listOf($nameList)")
+        w.println("    override fun properties(): List<$PropertyMetamodel<$entityTypeName, *, *>> = listOf($nameList)")
     }
 
     private fun getId() {
@@ -201,13 +214,25 @@ internal class EntityMetamodelGenerator(
     private fun preInsert() {
         val version = entity.versionProperty?.let {
             val nullable = it.nullability == Nullability.NULLABLE
-            "$it = e.$it${if (nullable) " ?: 0" else ""}"
+            if (it.valueClass == null) {
+                "$it = e.$it${if (nullable) " ?: 0" else ""}"
+            } else {
+                "$it = e.$it${if (nullable) " ?: ${it.valueClass}(0)" else ""}"
+            }
         }
         val createdAt = entity.createdAtProperty?.let {
-            "$it = ${it.typeName}.now(c)"
+            if (it.valueClass == null) {
+                "$it = ${it.typeName}.now(c)"
+            } else {
+                "$it = ${it.typeName}(${it.valueClass.property.typeName}.now(c))"
+            }
         }
         val updatedAt = entity.updatedAtProperty?.let {
-            "$it = ${it.typeName}.now(c)"
+            if (it.valueClass == null) {
+                "$it = ${it.typeName}.now(c)"
+            } else {
+                "$it = ${it.typeName}(${it.valueClass.property.typeName}.now(c))"
+            }
         }
         val paramList = listOfNotNull(version, createdAt, updatedAt).joinToString()
         val body = if (paramList == "") {
@@ -220,7 +245,11 @@ internal class EntityMetamodelGenerator(
 
     private fun preUpdate() {
         val updatedAt = entity.updatedAtProperty?.let {
-            "$it = ${it.typeName}.now(c)"
+            if (it.valueClass == null) {
+                "$it = ${it.typeName}.now(c)"
+            } else {
+                "$it = ${it.typeName}(${it.valueClass.property.typeName}.now(c))"
+            }
         }
         val body = if (updatedAt == null) {
             "e"
@@ -233,7 +262,11 @@ internal class EntityMetamodelGenerator(
     private fun postUpdate() {
         val version = entity.versionProperty?.let {
             val nullable = it.nullability == Nullability.NULLABLE
-            "$it = e.$it${if (nullable) "?" else ""}.inc()${if (nullable) " ?: 0" else ""}"
+            if (it.valueClass == null) {
+                "$it = e.$it${if (nullable) "?" else ""}.inc()${if (nullable) " ?: 0" else ""}"
+            } else {
+                "$it = ${it.valueClass}(e.$it${if (nullable) "?" else ""}.${it.valueClass.property}.inc())"
+            }
         }
         val body = if (version == null) {
             "e"
@@ -248,7 +281,7 @@ internal class EntityMetamodelGenerator(
             val nullability = if (p.nullability == Nullability.NULLABLE) "?" else ""
             "$p = m[this.$p] as ${p.typeName}$nullability"
         }
-        w.println("    override fun newEntity(m: Map<$PropertyMetamodel<*, *>, Any?>) = $entityTypeName($argList)")
+        w.println("    override fun newEntity(m: Map<$PropertyMetamodel<*, *, *>, Any?>) = $entityTypeName($argList)")
     }
 
     private fun newMetamodel() {

@@ -19,21 +19,21 @@ internal data class SelectQuerySupport<ENTITY : Any, ID, META : EntityMetamodel<
     private val context: CONTEXT
 ) {
 
-    fun <OTHER_ENTITY : Any, OTHER_ID, OTHER_META : EntityMetamodel<OTHER_ENTITY, OTHER_ID, OTHER_META>> innerJoin(
+    fun <OTHER_ENTITY : Any, OTHER_META : EntityMetamodel<OTHER_ENTITY, *, OTHER_META>> innerJoin(
         entityMetamodel: OTHER_META,
         declaration: OnDeclaration<OTHER_ENTITY>
     ): CONTEXT {
         return join(entityMetamodel, declaration, JoinKind.INNER)
     }
 
-    fun <OTHER_ENTITY : Any, OTHER_ID, OTHER_META : EntityMetamodel<OTHER_ENTITY, OTHER_ID, OTHER_META>> leftJoin(
+    fun <OTHER_ENTITY : Any, OTHER_META : EntityMetamodel<OTHER_ENTITY, *, OTHER_META>> leftJoin(
         metamodel: OTHER_META,
         declaration: OnDeclaration<OTHER_ENTITY>
     ): CONTEXT {
         return join(metamodel, declaration, JoinKind.LEFT_OUTER)
     }
 
-    private fun <OTHER_ENTITY : Any, OTHER_ID, OTHER_META : EntityMetamodel<OTHER_ENTITY, OTHER_ID, OTHER_META>> join(
+    private fun <OTHER_ENTITY : Any, OTHER_META : EntityMetamodel<OTHER_ENTITY, *, OTHER_META>> join(
         metamodel: OTHER_META,
         declaration: OnDeclaration<OTHER_ENTITY>,
         kind: JoinKind
@@ -56,7 +56,7 @@ internal data class SelectQuerySupport<ENTITY : Any, ID, META : EntityMetamodel<
         return context.addWhere(scope)
     }
 
-    fun orderBy(vararg expressions: ColumnExpression<*>): CONTEXT {
+    fun orderBy(vararg expressions: ColumnExpression<*, *>): CONTEXT {
         val items = expressions.map {
             when (it) {
                 is SortItem -> it

@@ -3,7 +3,6 @@ package org.komapper.core.dsl.builder
 import org.komapper.core.Dialect
 import org.komapper.core.Statement
 import org.komapper.core.StatementBuffer
-import org.komapper.core.Value
 import org.komapper.core.dsl.context.SqlInsertContext
 import org.komapper.core.dsl.context.SubqueryContext
 import org.komapper.core.dsl.element.Values
@@ -28,7 +27,7 @@ internal class SqlInsertStatementBuilder<ENTITY : Any, ID, META : EntityMetamode
                 buf.append(" (")
                 for (property in values.pairs.map { it.first }) {
                     if (property in target.idProperties() &&
-                        property.idAssignment is Assignment.AutoIncrement<*, *>
+                        property.idAssignment is Assignment.AutoIncrement<*, *, *>
                     ) {
                         continue
                     }
@@ -39,12 +38,11 @@ internal class SqlInsertStatementBuilder<ENTITY : Any, ID, META : EntityMetamode
                 buf.append(") values (")
                 for ((property, argument) in values.pairs) {
                     if (property in target.idProperties() &&
-                        property.idAssignment is Assignment.AutoIncrement<*, *>
+                        property.idAssignment is Assignment.AutoIncrement<*, *, *>
                     ) {
                         continue
                     }
-                    val value = Value(argument.value, argument.klass)
-                    buf.bind(value)
+                    buf.bind(argument.value)
                     buf.append(", ")
                 }
                 buf.cutBack(2)
@@ -70,7 +68,7 @@ internal class SqlInsertStatementBuilder<ENTITY : Any, ID, META : EntityMetamode
         return metamodel.getCanonicalTableName(dialect::enquote)
     }
 
-    private fun column(expression: ColumnExpression<*>): String {
+    private fun column(expression: ColumnExpression<*, *>): String {
         return expression.getCanonicalColumnName(dialect::enquote)
     }
 

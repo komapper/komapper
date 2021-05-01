@@ -45,18 +45,18 @@ class BuilderSupport(
         }
     }
 
-    fun visitColumnExpression(expression: ColumnExpression<*>) {
+    fun visitColumnExpression(expression: ColumnExpression<*, *>) {
         when (expression) {
-            is AggregateFunction -> {
+            is AggregateFunction<*, *> -> {
                 visitAggregateFunction(expression)
             }
-            is AliasExpression -> {
+            is AliasExpression<*, *> -> {
                 visitAliasExpression(expression)
             }
-            is ArithmeticExpression -> {
+            is ArithmeticExpression<*, *> -> {
                 visitArithmeticExpression(expression)
             }
-            is ScalarQuery<*, *> -> {
+            is ScalarQuery<*, *, *> -> {
                 visitSingleProjectionQuery(expression)
             }
             is StringFunction -> {
@@ -76,7 +76,7 @@ class BuilderSupport(
         }
     }
 
-    private fun visitAggregateFunction(function: AggregateFunction<*>) {
+    private fun visitAggregateFunction(function: AggregateFunction<*, *>) {
         when (function) {
             is AggregateFunction.Avg -> {
                 buf.append("avg(")
@@ -91,17 +91,17 @@ class BuilderSupport(
                 visitColumnExpression(function.expression)
                 buf.append(")")
             }
-            is AggregateFunction.Max -> {
+            is AggregateFunction.Max<*, *> -> {
                 buf.append("max(")
                 visitColumnExpression(function.expression)
                 buf.append(")")
             }
-            is AggregateFunction.Min<*> -> {
+            is AggregateFunction.Min<*, *> -> {
                 buf.append("min(")
                 visitColumnExpression(function.expression)
                 buf.append(")")
             }
-            is AggregateFunction.Sum<*> -> {
+            is AggregateFunction.Sum<*, *> -> {
                 buf.append("sum(")
                 visitColumnExpression(function.expression)
                 buf.append(")")
@@ -109,35 +109,35 @@ class BuilderSupport(
         }
     }
 
-    private fun visitAliasExpression(expression: AliasExpression<*>) {
+    private fun visitAliasExpression(expression: AliasExpression<*, *>) {
         visitColumnExpression(expression.expression)
         buf.append(" as ${dialect.enquote(expression.alias)}")
     }
 
-    private fun visitArithmeticExpression(expression: ArithmeticExpression<*>) {
+    private fun visitArithmeticExpression(expression: ArithmeticExpression<*, *>) {
         buf.append("(")
         when (expression) {
-            is ArithmeticExpression.Plus<*> -> {
+            is ArithmeticExpression.Plus<*, *> -> {
                 visitOperand(expression.left)
                 buf.append(" + ")
                 visitOperand(expression.right)
             }
-            is ArithmeticExpression.Minus<*> -> {
+            is ArithmeticExpression.Minus<*, *> -> {
                 visitOperand(expression.left)
                 buf.append(" - ")
                 visitOperand(expression.right)
             }
-            is ArithmeticExpression.Times<*> -> {
+            is ArithmeticExpression.Times<*, *> -> {
                 visitOperand(expression.left)
                 buf.append(" * ")
                 visitOperand(expression.right)
             }
-            is ArithmeticExpression.Div<*> -> {
+            is ArithmeticExpression.Div<*, *> -> {
                 visitOperand(expression.left)
                 buf.append(" / ")
                 visitOperand(expression.right)
             }
-            is ArithmeticExpression.Rem<*> -> {
+            is ArithmeticExpression.Rem<*, *> -> {
                 visitOperand(expression.left)
                 buf.append(" % ")
                 visitOperand(expression.right)
@@ -146,7 +146,7 @@ class BuilderSupport(
         buf.append(")")
     }
 
-    private fun visitSingleProjectionQuery(expression: ScalarQuery<*, *>) {
+    private fun visitSingleProjectionQuery(expression: ScalarQuery<*, *, *>) {
         buf.append("(")
         val statement = buildSubqueryStatement(expression.subqueryContext)
         buf.append(statement)
@@ -175,7 +175,7 @@ class BuilderSupport(
         }
     }
 
-    private fun visitStringFunction(function: StringFunction) {
+    private fun visitStringFunction(function: StringFunction<*, *>) {
         buf.append("(")
         when (function) {
             is StringFunction.Concat -> {
@@ -194,14 +194,10 @@ class BuilderSupport(
             is Operand.Column -> {
                 visitColumnExpression(operand.expression)
             }
-            is Operand.Argument -> {
-                visitArgument(operand)
+            is Operand.Argument<*, *> -> {
+                buf.bind(operand.value)
             }
         }
-    }
-
-    private fun visitArgument(argument: Operand.Argument) {
-        buf.bind(Value(argument.value, argument.klass))
     }
 
     fun visitCriterion(index: Int, c: Criterion) {
@@ -252,29 +248,17 @@ class BuilderSupport(
             buf.append(predicate)
         }
 
-        fun like(left: Operand, right: Operand, not: Boolean = false) {
+        fun like(left: Operand, right: EscapeExpression, not: Boolean = false) {
             visitOperand(left)
             if (not) {
                 buf.append(" not")
             }
             buf.append(" like ")
-            when (right) {
-                is Operand.Column -> {
-                    visitColumnExpression(right.expression)
-                }
-                is Operand.Argument -> {
-                    when (val value = right.value) {
-                        is EscapeExpression -> {
-                            val finalEscapeSequence = escapeSequence ?: dialect.escapeSequence
-                            val newValue = escape(value) { dialect.escape(it, finalEscapeSequence) }
-                            visitArgument(Operand.Argument(right.klass, newValue))
-                            buf.append(" escape ")
-                            buf.bind(Value(finalEscapeSequence, String::class))
-                        }
-                        else -> visitArgument(right)
-                    }
-                }
-            }
+            val finalEscapeSequence = escapeSequence ?: dialect.escapeSequence
+            val newValue = escape(right) { dialect.escape(it, finalEscapeSequence) }
+            buf.bind(Value(newValue, String::class))
+            buf.append(" escape ")
+            buf.bind(Value(finalEscapeSequence, String::class))
         }
 
         private fun escape(expression: EscapeExpression, escape: (String) -> String): String {

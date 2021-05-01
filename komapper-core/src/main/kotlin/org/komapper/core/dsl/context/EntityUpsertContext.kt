@@ -13,17 +13,17 @@ data class EntityUpsertContext<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, 
         schema = "",
         alwaysQuote = false
     ),
-    val keys: List<PropertyMetamodel<ENTITY, *>> = emptyList(),
+    val keys: List<PropertyMetamodel<ENTITY, *, *>> = emptyList(),
     val duplicateKeyType: DuplicateKeyType,
-    val assignmentMap: Map<PropertyMetamodel<ENTITY, *>, Operand> = createAssignmentMap(target, excluded)
+    val assignmentMap: Map<PropertyMetamodel<ENTITY, *, *>, Operand> = createAssignmentMap(target, excluded)
 ) : Context {
 
     companion object {
         private fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> createAssignmentMap(
             m1: META,
             m2: META
-        ): Map<PropertyMetamodel<ENTITY, *>, Operand> {
-            fun getTargetProperties(meta: META): List<PropertyMetamodel<ENTITY, *>> {
+        ): Map<PropertyMetamodel<ENTITY, *, *>, Operand> {
+            fun getTargetProperties(meta: META): List<PropertyMetamodel<ENTITY, *, *>> {
                 return meta.properties().filter { it != meta.createdAtProperty() } - meta.idProperties()
             }
             return getTargetProperties(m1).zip(getTargetProperties(m2)).associate { (p1, p2) ->

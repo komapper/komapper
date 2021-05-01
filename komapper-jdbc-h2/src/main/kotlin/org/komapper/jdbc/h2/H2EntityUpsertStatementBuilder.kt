@@ -3,7 +3,6 @@ package org.komapper.jdbc.h2
 import org.komapper.core.Dialect
 import org.komapper.core.Statement
 import org.komapper.core.StatementBuffer
-import org.komapper.core.Value
 import org.komapper.core.dsl.builder.AliasManager
 import org.komapper.core.dsl.builder.BuilderSupport
 import org.komapper.core.dsl.builder.EntityUpsertStatementBuilder
@@ -68,7 +67,7 @@ internal class H2EntityUpsertStatementBuilder<ENTITY : Any, ID, META : EntityMet
         support.visitTableExpression(expression, tableNameType)
     }
 
-    private fun column(expression: ColumnExpression<*>) {
+    private fun column(expression: ColumnExpression<*, *>) {
         support.visitColumnExpression(expression)
     }
 
@@ -112,7 +111,7 @@ internal class H2EntityUpsertStatementBuilder<ENTITY : Any, ID, META : EntityMet
             for (entity in entities) {
                 buf.append("(")
                 for (p in properties) {
-                    buf.bind(Value(p.getter(entity), p.klass))
+                    buf.bind(p.toValue(entity))
                     buf.append(", ")
                 }
                 buf.cutBack(2)
@@ -129,7 +128,7 @@ internal class H2EntityUpsertStatementBuilder<ENTITY : Any, ID, META : EntityMet
             return buf.toStatement()
         }
 
-        private fun column(expression: ColumnExpression<*>) {
+        private fun column(expression: ColumnExpression<*, *>) {
             val name = expression.getCanonicalColumnName(dialect::enquote)
             buf.append(name)
         }

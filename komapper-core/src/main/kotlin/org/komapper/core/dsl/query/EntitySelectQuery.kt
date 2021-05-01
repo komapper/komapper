@@ -18,12 +18,12 @@ import kotlin.reflect.cast
 
 interface EntitySelectQuery<ENTITY : Any> : Subquery<ENTITY> {
 
-    fun <OTHER_ENTITY : Any, OTHER_ID, OTHER_META : EntityMetamodel<OTHER_ENTITY, OTHER_ID, OTHER_META>> innerJoin(
+    fun <OTHER_ENTITY : Any, OTHER_META : EntityMetamodel<OTHER_ENTITY, *, OTHER_META>> innerJoin(
         metamodel: OTHER_META,
         on: OnDeclaration<OTHER_ENTITY>
     ): EntitySelectQuery<ENTITY>
 
-    fun <OTHER_ENTITY : Any, OTHER_ID, OTHER_META : EntityMetamodel<OTHER_ENTITY, OTHER_ID, OTHER_META>> leftJoin(
+    fun <OTHER_ENTITY : Any, OTHER_META : EntityMetamodel<OTHER_ENTITY, *, OTHER_META>> leftJoin(
         metamodel: OTHER_META,
         on: OnDeclaration<OTHER_ENTITY>
     ): EntitySelectQuery<ENTITY>
@@ -31,7 +31,7 @@ interface EntitySelectQuery<ENTITY : Any> : Subquery<ENTITY> {
     fun first(declaration: WhereDeclaration): Query<ENTITY>
     fun firstOrNull(declaration: WhereDeclaration): Query<ENTITY?>
     fun where(declaration: WhereDeclaration): EntitySelectQuery<ENTITY>
-    fun orderBy(vararg expressions: ColumnExpression<*>): EntitySelectQuery<ENTITY>
+    fun orderBy(vararg expressions: ColumnExpression<*, *>): EntitySelectQuery<ENTITY>
     fun offset(offset: Int): EntitySelectQuery<ENTITY>
     fun limit(limit: Int): EntitySelectQuery<ENTITY>
     fun forUpdate(): EntitySelectQuery<ENTITY>
@@ -62,7 +62,7 @@ internal data class EntitySelectQueryImpl<ENTITY : Any, ID, META : EntityMetamod
         SelectQuerySupport(context)
     override val subqueryContext = SubqueryContext.EntitySelect<ENTITY>(context)
 
-    override fun <OTHER_ENTITY : Any, OTHER_ID, OTHER_META : EntityMetamodel<OTHER_ENTITY, OTHER_ID, OTHER_META>> innerJoin(
+    override fun <OTHER_ENTITY : Any, OTHER_META : EntityMetamodel<OTHER_ENTITY, *, OTHER_META>> innerJoin(
         metamodel: OTHER_META,
         on: OnDeclaration<OTHER_ENTITY>
     ): EntitySelectQueryImpl<ENTITY, ID, META> {
@@ -70,7 +70,7 @@ internal data class EntitySelectQueryImpl<ENTITY : Any, ID, META : EntityMetamod
         return copy(context = newContext)
     }
 
-    override fun <OTHER_ENTITY : Any, OTHER_ID, OTHER_META : EntityMetamodel<OTHER_ENTITY, OTHER_ID, OTHER_META>> leftJoin(
+    override fun <OTHER_ENTITY : Any, OTHER_META : EntityMetamodel<OTHER_ENTITY, *, OTHER_META>> leftJoin(
         metamodel: OTHER_META,
         on: OnDeclaration<OTHER_ENTITY>
     ): EntitySelectQueryImpl<ENTITY, ID, META> {
@@ -106,7 +106,7 @@ internal data class EntitySelectQueryImpl<ENTITY : Any, ID, META : EntityMetamod
         return copy(context = newContext)
     }
 
-    override fun orderBy(vararg expressions: ColumnExpression<*>): EntitySelectQueryImpl<ENTITY, ID, META> {
+    override fun orderBy(vararg expressions: ColumnExpression<*, *>): EntitySelectQueryImpl<ENTITY, ID, META> {
         val newContext = support.orderBy(*expressions)
         return copy(context = newContext)
     }

@@ -3,7 +3,6 @@ package org.komapper.core.dsl.builder
 import org.komapper.core.Dialect
 import org.komapper.core.Statement
 import org.komapper.core.StatementBuffer
-import org.komapper.core.Value
 import org.komapper.core.dsl.context.EntityUpdateContext
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.expression.TableExpression
@@ -30,8 +29,7 @@ internal class EntityUpdateStatementBuilder<ENTITY : Any, ID, META : EntityMetam
         for (p in context.getTargetProperties()) {
             column(p)
             buf.append(" = ")
-            val value = Value(p.getter(entity), p.klass)
-            buf.bind(value)
+            buf.bind(p.toValue(entity))
             if (p == versionProperty) {
                 buf.append(" + 1")
             }
@@ -45,8 +43,7 @@ internal class EntityUpdateStatementBuilder<ENTITY : Any, ID, META : EntityMetam
                 for (p in idProperties) {
                     column(p)
                     buf.append(" = ")
-                    val value = Value(p.getter(entity), p.klass)
-                    buf.bind(value)
+                    buf.bind(p.toValue(entity))
                     buf.append(" and ")
                 }
                 if (!versionRequired) {
@@ -57,8 +54,7 @@ internal class EntityUpdateStatementBuilder<ENTITY : Any, ID, META : EntityMetam
                 checkNotNull(versionProperty)
                 column(versionProperty)
                 buf.append(" = ")
-                val value = Value(versionProperty.getter(entity), versionProperty.klass)
-                buf.bind(value)
+                buf.bind(versionProperty.toValue(entity))
             }
         }
         return buf.toStatement()
@@ -68,7 +64,7 @@ internal class EntityUpdateStatementBuilder<ENTITY : Any, ID, META : EntityMetam
         support.visitTableExpression(expression, TableNameType.NAME_ONLY)
     }
 
-    private fun column(expression: ColumnExpression<*>) {
+    private fun column(expression: ColumnExpression<*, *>) {
         val name = expression.getCanonicalColumnName(dialect::enquote)
         buf.append(name)
     }

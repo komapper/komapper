@@ -2,7 +2,12 @@ package org.komapper.ksp
 
 import com.google.devtools.ksp.getDeclaredProperties
 import com.google.devtools.ksp.processing.KSPLogger
+import com.google.devtools.ksp.symbol.KSClassDeclaration
+import com.google.devtools.ksp.symbol.KSNode
+import com.google.devtools.ksp.symbol.KSType
 import com.google.devtools.ksp.symbol.KSValueParameter
+import com.google.devtools.ksp.symbol.Nullability
+import com.google.devtools.ksp.visitor.KSEmptyVisitor
 
 internal class EntityFactory(private val logger: KSPLogger, config: Config, private val entityDef: EntityDef) {
 
@@ -46,14 +51,41 @@ internal class EntityFactory(private val logger: KSPLogger, config: Config, priv
                 val column = getColumn(propertyDef, parameter)
                 val type = parameter.type.resolve()
                 val typeName = (type.declaration.qualifiedName ?: type.declaration.simpleName).asString()
+                val valueClass = createValueClass(type)
                 val nullability = type.nullability
                 val kind = propertyDef?.kind
-                Property(parameter, declaration, column, typeName, nullability, kind).also {
+                Property(parameter, declaration, column, typeName, valueClass, nullability, kind).also {
                     validateProperty(it)
                 }
             }?.also {
                 validateAllProperties(it)
             } ?: emptySequence()
+    }
+
+    private fun createValueClass(type: KSType): ValueClass? {
+        return type.declaration.accept(
+            object : KSEmptyVisitor<Unit, ValueClass?>() {
+                override fun defaultHandler(node: KSNode, data: Unit): ValueClass? {
+                    return null
+                }
+
+                override fun visitClassDeclaration(classDeclaration: KSClassDeclaration, data: Unit): ValueClass? {
+                    val parameter = classDeclaration.primaryConstructor?.parameters?.firstOrNull()
+                    val declaration = classDeclaration.getDeclaredProperties().firstOrNull()
+                    return if (classDeclaration.isValueClass() && parameter != null && declaration != null) {
+                        val interiorType = parameter.type.resolve()
+                        val typeName =
+                            (interiorType.declaration.qualifiedName ?: interiorType.declaration.simpleName).asString()
+                        val nullability = interiorType.nullability
+                        val property = ValueClassProperty(parameter, declaration, typeName, nullability)
+                        return ValueClass(classDeclaration, property)
+                    } else {
+                        null
+                    }
+                }
+            },
+            Unit
+        )
     }
 
     private fun getColumn(propertyDef: PropertyDef?, parameter: KSValueParameter): Column {
@@ -69,80 +101,116 @@ internal class EntityFactory(private val logger: KSPLogger, config: Config, priv
         if (property.isPrivate()) {
             report("The property must not be private.", property.parameter)
         }
-        validatePropertyKind(property)
-    }
-
-    private fun validatePropertyKind(property: Property) {
-        val parameter = property.parameter
+        if (property.valueClass != null) {
+            validateValueClassProperty(property, property.valueClass.property)
+        }
         when (val kind = property.kind) {
-            is PropertyKind.Id -> {
-                val idKind = kind.idKind
-                if (idKind != null) {
-                    validateIdKind(property, idKind)
-                }
-            }
-            is PropertyKind.Version -> {
-                when (property.typeName) {
-                    "kotlin.Int" -> Unit
-                    "kotlin.Long" -> Unit
-                    else -> report(
-                        "The version property must be either Int or Long type.",
-                        parameter
-                    )
-                }
-            }
-            is PropertyKind.CreatedAt -> {
-                when (property.typeName) {
-                    "java.time.LocalDateTime" -> Unit
-                    "java.time.OffsetDateTime" -> Unit
-                    else -> report(
-                        "The createdAt property must be either LocalDateTime or OffsetDateTime type.",
-                        parameter
-                    )
-                }
-            }
-            is PropertyKind.UpdatedAt -> {
-                when (property.typeName) {
-                    "java.time.LocalDateTime" -> Unit
-                    "java.time.OffsetDateTime" -> Unit
-                    else -> report(
-                        "The updatedAt property must be either LocalDateTime or OffsetDateTime type.",
-                        parameter
-                    )
-                }
-            }
-            is PropertyKind.Ignore -> {
-                if (!property.parameter.hasDefault) {
-                    report("The ignored property must have a default value.", parameter)
-                }
-            }
+            is PropertyKind.Id -> validateIdProperty(property, kind.idKind)
+            is PropertyKind.Version -> validateVersionProperty(property)
+            is PropertyKind.CreatedAt -> validateTimestampProperty(property, "@KmCreatedAt")
+            is PropertyKind.UpdatedAt -> validateTimestampProperty(property, "@KmUpdatedAt")
+            is PropertyKind.Ignore -> validateIgnoreProperty(property)
             else -> Unit
         }
     }
 
-    private fun validateIdKind(property: Property, idKind: IdKind) {
-        val parameter = property.parameter
+    private fun validateValueClassProperty(property: Property, valueClassProperty: ValueClassProperty) {
+        if (valueClassProperty.isPrivate()) {
+            report(
+                "The value class's own property '$valueClassProperty' must not be private.",
+                property.parameter
+            )
+        }
+        if (valueClassProperty.nullability == Nullability.NULLABLE) {
+            report(
+                "The value class's own property '$valueClassProperty' must not be nullable.",
+                property.parameter
+            )
+        }
+    }
+
+    private fun validateIdProperty(property: Property, idKind: IdKind?) {
+        if (idKind == null) return
+        fun validate(annotationName: String) {
+            when (property.typeName) {
+                "kotlin.Int" -> Unit
+                "kotlin.Long" -> Unit
+                else -> {
+                    if (property.valueClass == null) {
+                        report(
+                            "The type of $annotationName annotated property must be either Int, Long or value class.",
+                            property.parameter
+                        )
+                    } else {
+                        when (property.valueClass.property.typeName) {
+                            "kotlin.Int" -> Unit
+                            "kotlin.Long" -> Unit
+                            else -> report(
+                                "When the type of $annotationName annotated property is value class, the type of the value class's own property must be either Int or Long.",
+                                property.parameter
+                            )
+                        }
+                    }
+                }
+            }
+        }
         when (idKind) {
-            is IdKind.AutoIncrement -> {
-                when (property.typeName) {
-                    "kotlin.Int" -> Unit
-                    "kotlin.Long" -> Unit
-                    else -> report(
-                        "The @KmAutoIncrement annotated property must be either Int or Long type.",
-                        parameter
+            is IdKind.AutoIncrement -> validate("@KmAutoIncrement")
+            is IdKind.Sequence -> validate("@KmSequence")
+        }
+    }
+
+    private fun validateVersionProperty(property: Property) {
+        when (property.typeName) {
+            "kotlin.Int" -> Unit
+            "kotlin.Long" -> Unit
+            else -> {
+                if (property.valueClass == null) {
+                    report(
+                        "The type of @KmVersion annotated property must be either Int, Long or value class.",
+                        property.parameter
                     )
+                } else {
+                    when (property.valueClass.property.typeName) {
+                        "kotlin.Int" -> Unit
+                        "kotlin.Long" -> Unit
+                        else -> report(
+                            "When the type of @KmVersion annotated property is value class, the type of the value class's own property must be either Int or Long.",
+                            property.parameter
+                        )
+                    }
                 }
             }
-            is IdKind.Sequence -> {
-                when (property.typeName) {
-                    "kotlin.Int" -> Unit
-                    "kotlin.Long" -> Unit
-                    else -> report(
-                        "The @KmSequence annotated property must be either Int or Long type.",
-                        parameter
+        }
+    }
+
+    private fun validateTimestampProperty(property: Property, annotationName: String) {
+        when (property.typeName) {
+            "java.time.LocalDateTime" -> Unit
+            "java.time.OffsetDateTime" -> Unit
+            else -> {
+                if (property.valueClass == null) {
+                    report(
+                        "The type of $annotationName annotated property must be either LocalDateTime or OffsetDateTime.",
+                        property.parameter
                     )
+                } else {
+                    when (property.valueClass.property.typeName) {
+                        "java.time.LocalDateTime" -> Unit
+                        "java.time.OffsetDateTime" -> Unit
+                        else -> report(
+                            "When the type of $annotationName annotated property is value class, the type of the value class's own property must be either LocalDateTime or OffsetDateTime.",
+                            property.parameter
+                        )
+                    }
                 }
             }
+        }
+    }
+
+    private fun validateIgnoreProperty(property: Property) {
+        if (!property.parameter.hasDefault) {
+            report("The ignored property must have a default value.", property.parameter)
         }
     }
 
