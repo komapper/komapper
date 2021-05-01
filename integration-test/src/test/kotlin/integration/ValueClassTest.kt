@@ -152,6 +152,30 @@ class ValueClassTest(val db: Database) {
     }
 
     @Test
+    fun between() {
+        val a = VAddress.alias
+        val list = db.runQuery {
+            EntityDsl.from(a)
+                .where { a.addressId between IntId(6)..IntId(10) }
+                .orderBy(a.addressId)
+        }
+        assertEquals(5, list.size)
+        assertEquals((6..10).toList(), list.map { it.addressId.value })
+    }
+
+    @Test
+    fun notBetween() {
+        val a = VAddress.alias
+        val list = db.runQuery {
+            EntityDsl.from(a)
+                .where { a.addressId notBetween IntId(6)..IntId(10) }
+                .orderBy(a.addressId)
+        }
+        assertEquals(10, list.size)
+        assertEquals(((1..5) + (11..15)).toList(), list.map { it.addressId.value })
+    }
+
+    @Test
     fun select_single() {
         val a = VAddress.alias
         val result = db.runQuery {

@@ -12,7 +12,11 @@ import org.komapper.annotation.KmVersion
 import java.time.LocalDateTime
 
 @JvmInline
-value class IntId(val value: Int)
+value class IntId(val value: Int) : Comparable<IntId> {
+    override fun compareTo(other: IntId): Int {
+        return value.compareTo(other.value)
+    }
+}
 
 @JvmInline
 value class Street(val value: String)
