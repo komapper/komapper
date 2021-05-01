@@ -112,7 +112,7 @@ fun <T : Any, S : Any> sum(property: ColumnExpression<T, S>): ScalarExpression<T
 
 infix operator fun <T : Any, S : Number> ColumnExpression<T, S>.plus(value: T): ColumnExpression<T, S> {
     val left = Operand.Column(this)
-    val right = Operand.ExteriorArgument(this, value)
+    val right = Operand.Argument(this, value)
     return ArithmeticExpression.Plus(this, left, right)
 }
 
@@ -124,7 +124,7 @@ infix operator fun <T : Any, S : Number> ColumnExpression<T, S>.plus(other: Colu
 
 infix operator fun <T : Any, S : Number> ColumnExpression<T, S>.minus(value: T): ColumnExpression<T, S> {
     val left = Operand.Column(this)
-    val right = Operand.ExteriorArgument(this, value)
+    val right = Operand.Argument(this, value)
     return ArithmeticExpression.Minus(this, left, right)
 }
 
@@ -136,7 +136,7 @@ infix operator fun <T : Any, S : Number> ColumnExpression<T, S>.minus(other: Col
 
 infix operator fun <T : Any, S : Number> ColumnExpression<T, S>.times(value: T): ColumnExpression<T, S> {
     val left = Operand.Column(this)
-    val right = Operand.ExteriorArgument(this, value)
+    val right = Operand.Argument(this, value)
     return ArithmeticExpression.Times(this, left, right)
 }
 
@@ -148,7 +148,7 @@ infix operator fun <T : Any, S : Number> ColumnExpression<T, S>.times(other: Col
 
 infix operator fun <T : Any, S : Number> ColumnExpression<T, S>.div(value: T): ColumnExpression<T, S> {
     val left = Operand.Column(this)
-    val right = Operand.ExteriorArgument(this, value)
+    val right = Operand.Argument(this, value)
     return ArithmeticExpression.Div(this, left, right)
 }
 
@@ -160,7 +160,7 @@ infix operator fun <T : Any, S : Number> ColumnExpression<T, S>.div(other: Colum
 
 infix operator fun <T : Any, S : Number> ColumnExpression<T, S>.rem(value: T): ColumnExpression<T, S> {
     val left = Operand.Column(this)
-    val right = Operand.ExteriorArgument(this, value)
+    val right = Operand.Argument(this, value)
     return ArithmeticExpression.Rem(this, left, right)
 }
 
@@ -175,12 +175,12 @@ fun <T : Any> concat(
     right: T
 ): ColumnExpression<T, String> {
     val o1 = Operand.Column(left)
-    val o2 = Operand.ExteriorArgument(left, right)
+    val o2 = Operand.Argument(left, right)
     return StringFunction.Concat(left, o1, o2)
 }
 
 fun <T : Any> concat(left: T, right: ColumnExpression<T, String>): ColumnExpression<T, String> {
-    val o1 = Operand.ExteriorArgument(right, left)
+    val o1 = Operand.Argument(right, left)
     val o2 = Operand.Column(right)
     return StringFunction.Concat(right, o1, o2)
 }

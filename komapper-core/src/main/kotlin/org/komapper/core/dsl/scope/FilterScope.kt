@@ -95,15 +95,15 @@ interface FilterScope {
         return EscapeExpression.Escape(value)
     }
 
-    fun CharSequence.asPrefix(): CharSequence {
+    fun CharSequence.asPrefix(): EscapeExpression {
         return escape(this) + text("%")
     }
 
-    fun CharSequence.asInfix(): CharSequence {
+    fun CharSequence.asInfix(): EscapeExpression {
         return text("%") + escape(this) + text("%")
     }
 
-    fun CharSequence.asSuffix(): CharSequence {
+    fun CharSequence.asSuffix(): EscapeExpression {
         return text("%") + escape(this)
     }
 }

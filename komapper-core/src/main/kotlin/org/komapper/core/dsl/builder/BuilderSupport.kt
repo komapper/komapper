@@ -194,11 +194,8 @@ class BuilderSupport(
             is Operand.Column -> {
                 visitColumnExpression(operand.expression)
             }
-            is Operand.ExteriorArgument<*, *> -> {
-                buf.bind(operand.asValue())
-            }
-            is Operand.InteriorArgument<*, *> -> {
-                buf.bind(operand.asValue())
+            is Operand.Argument<*, *> -> {
+                buf.bind(operand.value)
             }
         }
     }
@@ -251,30 +248,17 @@ class BuilderSupport(
             buf.append(predicate)
         }
 
-        fun like(left: Operand, right: Operand, not: Boolean = false) {
+        fun like(left: Operand, right: EscapeExpression, not: Boolean = false) {
             visitOperand(left)
             if (not) {
                 buf.append(" not")
             }
             buf.append(" like ")
-            when (right) {
-                is Operand.Column -> {
-                    visitColumnExpression(right.expression)
-                }
-                is Operand.ExteriorArgument<*, *> -> visitOperand(right)
-                is Operand.InteriorArgument<*, *> -> {
-                    when (val value = right.value) {
-                        is EscapeExpression -> {
-                            val finalEscapeSequence = escapeSequence ?: dialect.escapeSequence
-                            val newValue = escape(value) { dialect.escape(it, finalEscapeSequence) }
-                            visitOperand(Operand.InteriorArgument(right.expression, newValue))
-                            buf.append(" escape ")
-                            buf.bind(Value(finalEscapeSequence, String::class))
-                        }
-                        else -> visitOperand(right)
-                    }
-                }
-            }
+            val finalEscapeSequence = escapeSequence ?: dialect.escapeSequence
+            val newValue = escape(right) { dialect.escape(it, finalEscapeSequence) }
+            buf.bind(Value(newValue, String::class))
+            buf.append(" escape ")
+            buf.bind(Value(finalEscapeSequence, String::class))
         }
 
         private fun escape(expression: EscapeExpression, escape: (String) -> String): String {

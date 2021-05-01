@@ -42,7 +42,7 @@ internal class SqlInsertStatementBuilder<ENTITY : Any, ID, META : EntityMetamode
                     ) {
                         continue
                     }
-                    buf.bind(argument.asValue())
+                    buf.bind(argument.value)
                     buf.append(", ")
                 }
                 buf.cutBack(2)

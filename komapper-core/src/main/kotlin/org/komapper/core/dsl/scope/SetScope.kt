@@ -20,7 +20,7 @@ class SetScope<ENTITY : Any> internal constructor(
     }
 
     infix fun <T : Any> PropertyMetamodel<ENTITY, T, *>.set(value: T?) {
-        val right = Operand.ExteriorArgument(this, value)
+        val right = Operand.Argument(this, value)
         context.add(this to right)
     }
 
@@ -31,7 +31,7 @@ class SetScope<ENTITY : Any> internal constructor(
 
     infix fun <T : Any, S : Any> PropertyMetamodel<ENTITY, T, S>.setIfNotNull(value: T?) {
         if (value == null) return
-        val right = Operand.ExteriorArgument(this, value)
+        val right = Operand.Argument(this, value)
         context.add(this to right)
     }
 }

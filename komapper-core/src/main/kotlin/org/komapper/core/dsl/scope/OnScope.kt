@@ -26,7 +26,7 @@ class OnScope<ENTITY : Any> internal constructor(
     }
 
     infix fun <T : Any, S : Any> PropertyMetamodel<*, T, S>.eq(right: T) {
-        context.add(Criterion.Eq(Operand.Column(this), Operand.ExteriorArgument(this, right)))
+        context.add(Criterion.Eq(Operand.Column(this), Operand.Argument(this, right)))
     }
 
     infix fun <T : Any, S : Any> PropertyMetamodel<*, T, S>.notEq(right: PropertyMetamodel<ENTITY, T, S>) {
@@ -34,7 +34,7 @@ class OnScope<ENTITY : Any> internal constructor(
     }
 
     infix fun <T : Any, S : Any> PropertyMetamodel<*, T, S>.notEq(right: T) {
-        context.add(Criterion.NotEq(Operand.Column(this), Operand.ExteriorArgument(this, right)))
+        context.add(Criterion.NotEq(Operand.Column(this), Operand.Argument(this, right)))
     }
 
     infix fun <T : Any, S : Any> PropertyMetamodel<*, T, S>.less(right: PropertyMetamodel<ENTITY, T, S>) {
@@ -42,7 +42,7 @@ class OnScope<ENTITY : Any> internal constructor(
     }
 
     infix fun <T : Any, S : Any> PropertyMetamodel<*, T, S>.less(right: T) {
-        context.add(Criterion.Less(Operand.Column(this), Operand.ExteriorArgument(this, right)))
+        context.add(Criterion.Less(Operand.Column(this), Operand.Argument(this, right)))
     }
 
     infix fun <T : Any, S : Any> PropertyMetamodel<*, T, S>.lessEq(right: PropertyMetamodel<ENTITY, T, S>) {
@@ -50,7 +50,7 @@ class OnScope<ENTITY : Any> internal constructor(
     }
 
     infix fun <T : Any, S : Any> PropertyMetamodel<*, T, S>.lessEq(right: T) {
-        context.add(Criterion.LessEq(Operand.Column(this), Operand.ExteriorArgument(this, right)))
+        context.add(Criterion.LessEq(Operand.Column(this), Operand.Argument(this, right)))
     }
 
     infix fun <T : Any, S : Any> PropertyMetamodel<*, T, S>.grater(right: PropertyMetamodel<ENTITY, T, S>) {
@@ -58,7 +58,7 @@ class OnScope<ENTITY : Any> internal constructor(
     }
 
     infix fun <T : Any, S : Any> PropertyMetamodel<*, T, S>.grater(right: T) {
-        context.add(Criterion.Grater(Operand.Column(this), Operand.ExteriorArgument(this, right)))
+        context.add(Criterion.Grater(Operand.Column(this), Operand.Argument(this, right)))
     }
 
     infix fun <T : Any, S : Any> PropertyMetamodel<*, T, S>.graterEq(right: PropertyMetamodel<ENTITY, T, S>) {
@@ -66,7 +66,7 @@ class OnScope<ENTITY : Any> internal constructor(
     }
 
     infix fun <T : Any, S : Any> PropertyMetamodel<*, T, S>.graterEq(right: T) {
-        context.add(Criterion.GraterEq(Operand.Column(this), Operand.ExteriorArgument(this, right)))
+        context.add(Criterion.GraterEq(Operand.Column(this), Operand.Argument(this, right)))
     }
 
     fun <T : Any, S : Any> ColumnExpression<T, S>.isNull() {

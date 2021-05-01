@@ -3,6 +3,7 @@ package org.komapper.core.dsl.scope
 import org.komapper.core.dsl.element.Criterion
 import org.komapper.core.dsl.element.Operand
 import org.komapper.core.dsl.expression.ColumnExpression
+import org.komapper.core.dsl.expression.EscapeExpression
 import org.komapper.core.dsl.query.Subquery
 
 internal class FilterScopeSupport(
@@ -26,7 +27,7 @@ internal class FilterScopeSupport(
         left: ColumnExpression<T, S>,
         right: T
     ) {
-        context.add(operator(Operand.Column(left), Operand.ExteriorArgument(left, right)))
+        context.add(operator(Operand.Column(left), Operand.Argument(left, right)))
     }
 
     private fun <T : Any, S : Any> add(
@@ -34,15 +35,15 @@ internal class FilterScopeSupport(
         left: T,
         right: ColumnExpression<T, S>
     ) {
-        context.add(operator(Operand.ExteriorArgument(right, left), Operand.Column(right)))
+        context.add(operator(Operand.Argument(right, left), Operand.Column(right)))
     }
 
-    private fun <T : Any, S : CharSequence> addLikeOperator(left: ColumnExpression<T, S>, right: CharSequence) {
-        context.add(Criterion.Like(Operand.Column(left), Operand.InteriorArgument(left, right)))
+    private fun <T : Any, S : CharSequence> addLikeOperator(left: ColumnExpression<T, S>, right: EscapeExpression) {
+        context.add(Criterion.Like(Operand.Column(left), right))
     }
 
-    private fun <T : Any, S : CharSequence> addNotLikeOperator(left: ColumnExpression<T, S>, right: CharSequence) {
-        context.add(Criterion.NotLike(Operand.Column(left), Operand.InteriorArgument(left, right)))
+    private fun <T : Any, S : CharSequence> addNotLikeOperator(left: ColumnExpression<T, S>, right: EscapeExpression) {
+        context.add(Criterion.NotLike(Operand.Column(left), right))
     }
 
     override infix fun <T : Any, S : Any> ColumnExpression<T, S>.eq(operand: ColumnExpression<T, S>) {
@@ -141,12 +142,12 @@ internal class FilterScopeSupport(
 
     override infix fun <T : Any, S : CharSequence> ColumnExpression<T, S>.like(operand: CharSequence?) {
         if (operand == null) return
-        addLikeOperator(this, operand)
+        addLikeOperator(this, text(operand))
     }
 
     override infix fun <T : Any, S : CharSequence> ColumnExpression<T, S>.notLike(operand: CharSequence?) {
         if (operand == null) return
-        addNotLikeOperator(this, operand)
+        addNotLikeOperator(this, text(operand))
     }
 
     override fun <T : Any, S : CharSequence> ColumnExpression<T, S>.startsWith(operand: CharSequence?) {
@@ -181,19 +182,19 @@ internal class FilterScopeSupport(
 
     override infix fun <T : Comparable<T>, S : Any> ColumnExpression<T, S>.between(range: ClosedRange<T>) {
         val left = Operand.Column(this)
-        val right = Operand.ExteriorArgument(this, range.start) to Operand.ExteriorArgument(this, range.endInclusive)
+        val right = Operand.Argument(this, range.start) to Operand.Argument(this, range.endInclusive)
         add(Criterion.Between(left, right))
     }
 
     override infix fun <T : Comparable<T>, S : Any> ColumnExpression<T, S>.notBetween(range: ClosedRange<T>) {
         val left = Operand.Column(this)
-        val right = Operand.ExteriorArgument(this, range.start) to Operand.ExteriorArgument(this, range.endInclusive)
+        val right = Operand.Argument(this, range.start) to Operand.Argument(this, range.endInclusive)
         add(Criterion.NotBetween(left, right))
     }
 
     override infix fun <T : Any, S : Any> ColumnExpression<T, S>.inList(values: List<T?>) {
         val o1 = Operand.Column(this)
-        val o2 = values.map { Operand.ExteriorArgument(this, it) }
+        val o2 = values.map { Operand.Argument(this, it) }
         add(Criterion.InList(o1, o2))
     }
 
@@ -206,7 +207,7 @@ internal class FilterScopeSupport(
 
     override infix fun <T : Any, S : Any> ColumnExpression<T, S>.notInList(values: List<T?>) {
         val o1 = Operand.Column(this)
-        val o2 = values.map { Operand.ExteriorArgument(this, it) }
+        val o2 = values.map { Operand.Argument(this, it) }
         add(Criterion.NotInList(o1, o2))
     }
 
@@ -220,7 +221,7 @@ internal class FilterScopeSupport(
     override infix fun <A : Any, B : Any> Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>.inList2(values: List<Pair<A?, B?>>) {
         val left = Operand.Column(this.first) to Operand.Column(this.second)
         val right = values.map {
-            Operand.ExteriorArgument(this.first, it.first) to Operand.ExteriorArgument(
+            Operand.Argument(this.first, it.first) to Operand.Argument(
                 this.second,
                 it.second
             )
@@ -238,7 +239,7 @@ internal class FilterScopeSupport(
     override infix fun <A : Any, B : Any> Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>.notInList2(values: List<Pair<A?, B?>>) {
         val left = Operand.Column(this.first) to Operand.Column(this.second)
         val right = values.map {
-            Operand.ExteriorArgument(this.first, it.first) to Operand.ExteriorArgument(
+            Operand.Argument(this.first, it.first) to Operand.Argument(
                 this.second,
                 it.second
             )
