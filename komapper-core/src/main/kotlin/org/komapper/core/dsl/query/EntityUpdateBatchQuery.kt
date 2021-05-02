@@ -4,12 +4,12 @@ import org.komapper.core.DatabaseConfig
 import org.komapper.core.Statement
 import org.komapper.core.dsl.context.EntityUpdateContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
-import org.komapper.core.dsl.option.EntityBatchUpdateOption
+import org.komapper.core.dsl.option.EntityUpdateBatchOption
 
 internal data class EntityUpdateBatchQuery<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityUpdateContext<ENTITY, ID, META>,
     private val entities: List<ENTITY>,
-    private val option: EntityBatchUpdateOption
+    private val option: EntityUpdateBatchOption
 ) :
     Query<List<ENTITY>> {
 
