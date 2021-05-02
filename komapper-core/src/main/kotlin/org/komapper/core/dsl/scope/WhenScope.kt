@@ -5,7 +5,7 @@ import org.komapper.core.dsl.element.Criterion
 
 @Scope
 class WhenScope internal constructor(
-    private val support: FilterScopeSupport = FilterScopeSupport()
+    private val support: FilterScopeSupport<WhenScope> = FilterScopeSupport { WhenScope() }
 ) : FilterScope by support,
     List<Criterion> by support {
 
@@ -19,21 +19,14 @@ class WhenScope internal constructor(
     }
 
     fun and(declaration: WhenDeclaration) {
-        addCriteria(declaration, Criterion::And)
+        support.addCriteria(declaration, Criterion::And)
     }
 
     fun or(declaration: WhenDeclaration) {
-        addCriteria(declaration, Criterion::Or)
+        support.addCriteria(declaration, Criterion::Or)
     }
 
     fun not(declaration: WhenDeclaration) {
-        addCriteria(declaration, Criterion::Not)
-    }
-
-    private fun addCriteria(declaration: WhenDeclaration, operator: (List<Criterion>) -> Criterion) {
-        val childScope = WhenScope()
-        declaration(childScope)
-        val criteria = childScope.toList()
-        support.add(operator(criteria))
+        support.addCriteria(declaration, Criterion::Not)
     }
 }
