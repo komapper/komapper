@@ -9,8 +9,10 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.Database
 import org.komapper.core.dsl.EntityDsl
 import org.komapper.core.dsl.SqlDsl
+import org.komapper.core.dsl.case
 import org.komapper.core.dsl.concat
 import org.komapper.core.dsl.count
+import org.komapper.core.dsl.expression.When
 import org.komapper.core.dsl.max
 import org.komapper.core.dsl.plus
 import org.komapper.core.dsl.runQuery
@@ -227,5 +229,29 @@ class ValueClassTest(val db: Database) {
             SqlDsl.from(a).orderBy(a.addressId).select(concat(Street("["), concat(a.street, Street("]")))).first()
         }
         assertEquals(Street("[STREET 1]"), result)
+    }
+
+    @Test
+    fun expression_case() {
+        val a = VAddress.alias
+        val caseExpression = case(
+            When(
+                { a.street eq Street("STREET 2"); a.addressId greater IntId(1) },
+                concat(a.street, Street("!!!"))
+            )
+        ) { a.street }
+        val list = db.runQuery {
+            SqlDsl.from(a).where { a.addressId inList listOf(IntId(1), IntId(2), IntId(3)) }
+                .orderBy(a.addressId)
+                .select(a.street, caseExpression)
+        }
+        assertEquals(
+            listOf(
+                Street("STREET 1") to Street("STREET 1"),
+                Street("STREET 2") to Street("STREET 2!!!"),
+                Street("STREET 3") to Street("STREET 3")
+            ),
+            list
+        )
     }
 }

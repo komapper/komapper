@@ -7,6 +7,10 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.Database
 import org.komapper.core.dsl.SqlDsl
+import org.komapper.core.dsl.case
+import org.komapper.core.dsl.concat
+import org.komapper.core.dsl.expression.When
+import org.komapper.core.dsl.literal
 import org.komapper.core.dsl.runQuery
 
 @ExtendWith(Env::class)
@@ -89,5 +93,69 @@ class SqlSelectQueryTest(private val db: Database) {
             SqlDsl.from(a).first { a.addressId eq 1; a.version eq 1 }
         }
         assertNotNull(address)
+    }
+
+    @Test
+    fun caseExpression() {
+        val a = Address.alias
+        val caseExpression = case(
+            When(
+                { a.street eq "STREET 2"; a.addressId greater 1 },
+                literal("HIT")
+            )
+        ) { literal("NO HIT") }
+        val list = db.runQuery {
+            SqlDsl.from(a).where { a.addressId inList listOf(1, 2, 3) }
+                .orderBy(a.addressId)
+                .select(a.street, caseExpression)
+        }
+        assertEquals(
+            listOf("STREET 1" to "NO HIT", "STREET 2" to "HIT", "STREET 3" to "NO HIT"),
+            list
+        )
+    }
+
+    @Test
+    fun caseExpression_multipleWhen() {
+        val a = Address.alias
+        val caseExpression = case(
+            When(
+                { a.street eq "STREET 2"; a.addressId greater 1 },
+                literal("HIT")
+            ),
+            When(
+                { a.street eq "STREET 3" },
+                concat(a.street, "!!!")
+            )
+        ) { literal("NO HIT") }
+        val list = db.runQuery {
+            SqlDsl.from(a).where { a.addressId inList listOf(1, 2, 3) }
+                .orderBy(a.addressId)
+                .select(a.street, caseExpression)
+        }
+        assertEquals(
+            listOf("STREET 1" to "NO HIT", "STREET 2" to "HIT", "STREET 3" to "STREET 3!!!"),
+            list
+        )
+    }
+
+    @Test
+    fun caseExpression_otherwiseNotSpecified() {
+        val a = Address.alias
+        val caseExpression = case(
+            When(
+                { a.street eq "STREET 2"; a.addressId greater 1 },
+                literal("HIT")
+            )
+        )
+        val list = db.runQuery {
+            SqlDsl.from(a).where { a.addressId inList listOf(1, 2, 3) }
+                .orderBy(a.addressId)
+                .select(a.street, caseExpression)
+        }
+        assertEquals(
+            listOf("STREET 1" to null, "STREET 2" to "HIT", "STREET 3" to null),
+            list
+        )
     }
 }
