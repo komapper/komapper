@@ -7,10 +7,16 @@ import org.komapper.core.Database
 import org.komapper.core.dsl.SqlDsl
 import org.komapper.core.dsl.concat
 import org.komapper.core.dsl.div
+import org.komapper.core.dsl.literal
+import org.komapper.core.dsl.lower
+import org.komapper.core.dsl.ltrim
 import org.komapper.core.dsl.minus
 import org.komapper.core.dsl.plus
 import org.komapper.core.dsl.rem
+import org.komapper.core.dsl.rtrim
 import org.komapper.core.dsl.runQuery
+import org.komapper.core.dsl.trim
+import org.komapper.core.dsl.upper
 
 @ExtendWith(Env::class)
 class ExpressionTest(private val db: Database) {
@@ -173,5 +179,50 @@ class ExpressionTest(private val db: Database) {
                 }.first()
         }
         assertEquals("STREET 10STREET 10STREET 10", result)
+    }
+
+    @Test
+    fun lowerFunction() {
+        val a = Address.alias
+        val result = db.runQuery {
+            SqlDsl.from(a).select(lower(literal("TEST"))).first()
+        }
+        assertEquals("test", result)
+    }
+
+    @Test
+    fun upperFunction() {
+        val a = Address.alias
+        val result = db.runQuery {
+            SqlDsl.from(a).select(upper(literal("test"))).first()
+        }
+        assertEquals("TEST", result)
+    }
+
+    @Test
+    fun trimFunction() {
+        val a = Address.alias
+        val result = db.runQuery {
+            SqlDsl.from(a).select(trim(literal(" test "))).first()
+        }
+        assertEquals("test", result)
+    }
+
+    @Test
+    fun ltrimFunction() {
+        val a = Address.alias
+        val result = db.runQuery {
+            SqlDsl.from(a).select(ltrim(literal(" test "))).first()
+        }
+        assertEquals("test ", result)
+    }
+
+    @Test
+    fun rtrimFunction() {
+        val a = Address.alias
+        val result = db.runQuery {
+            SqlDsl.from(a).select(rtrim(literal(" test "))).first()
+        }
+        assertEquals(" test", result)
     }
 }

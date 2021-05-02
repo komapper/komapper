@@ -2,11 +2,41 @@ package org.komapper.core.dsl.expression
 
 import org.komapper.core.dsl.element.Operand
 
-internal sealed class StringFunction<T : Any, S : CharSequence> : ColumnExpression<T, S> {
-    internal data class Concat<T : Any, S : CharSequence>(
-        val expression: ColumnExpression<T, S>,
+internal sealed class StringFunction<T : Any> : ColumnExpression<T, String> {
+    internal data class Concat<T : Any>(
+        val expression: ColumnExpression<T, String>,
         val left: Operand,
         val right: Operand
     ) :
-        ColumnExpression<T, S> by expression, StringFunction<T, S>()
+        ColumnExpression<T, String> by expression, StringFunction<T>()
+
+    internal data class Lower<T : Any>(
+        val expression: ColumnExpression<T, String>,
+        val operand: Operand
+    ) :
+        ColumnExpression<T, String> by expression, StringFunction<T>()
+
+    internal data class Ltrim<T : Any>(
+        val expression: ColumnExpression<T, String>,
+        val operand: Operand
+    ) :
+        ColumnExpression<T, String> by expression, StringFunction<T>()
+
+    internal data class Rtrim<T : Any>(
+        val expression: ColumnExpression<T, String>,
+        val operand: Operand
+    ) :
+        ColumnExpression<T, String> by expression, StringFunction<T>()
+
+    internal data class Trim<T : Any>(
+        val expression: ColumnExpression<T, String>,
+        val operand: Operand
+    ) :
+        ColumnExpression<T, String> by expression, StringFunction<T>()
+
+    internal data class Upper<T : Any>(
+        val expression: ColumnExpression<T, String>,
+        val operand: Operand
+    ) :
+        ColumnExpression<T, String> by expression, StringFunction<T>()
 }

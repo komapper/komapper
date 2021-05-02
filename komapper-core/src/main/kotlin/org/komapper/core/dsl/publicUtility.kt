@@ -201,6 +201,41 @@ fun <T : Any> concat(
     return StringFunction.Concat(right, o1, o2)
 }
 
+fun <T : Any> lower(
+    expression: ColumnExpression<T, String>
+): ColumnExpression<T, String> {
+    val operand = Operand.Column(expression)
+    return StringFunction.Lower(expression, operand)
+}
+
+fun <T : Any> upper(
+    expression: ColumnExpression<T, String>
+): ColumnExpression<T, String> {
+    val operand = Operand.Column(expression)
+    return StringFunction.Upper(expression, operand)
+}
+
+fun <T : Any> trim(
+    expression: ColumnExpression<T, String>
+): ColumnExpression<T, String> {
+    val operand = Operand.Column(expression)
+    return StringFunction.Trim(expression, operand)
+}
+
+fun <T : Any> ltrim(
+    expression: ColumnExpression<T, String>
+): ColumnExpression<T, String> {
+    val operand = Operand.Column(expression)
+    return StringFunction.Ltrim(expression, operand)
+}
+
+fun <T : Any> rtrim(
+    expression: ColumnExpression<T, String>
+): ColumnExpression<T, String> {
+    val operand = Operand.Column(expression)
+    return StringFunction.Rtrim(expression, operand)
+}
+
 fun <T : Any, S : Any> case(
     firstWhen: When<T, S>,
     vararg remainingWhen: When<T, S>,
