@@ -7,16 +7,16 @@ import org.komapper.core.dsl.builder.EntityInsertStatementBuilder
 import org.komapper.core.dsl.context.EntityInsertContext
 import org.komapper.core.dsl.metamodel.Assignment
 import org.komapper.core.dsl.metamodel.EntityMetamodel
-import org.komapper.core.dsl.option.QueryOption
+import org.komapper.core.dsl.option.InsertOption
 
 internal class EntityInsertQuerySupport<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityInsertContext<ENTITY, ID, META>,
-    val option: QueryOption
+    val option: InsertOption
 ) {
 
     fun preInsert(config: DatabaseConfig, entity: ENTITY): ENTITY {
         val assignment = context.target.idAssignment()
-        return if (assignment is Assignment.Sequence<ENTITY, *, *>) {
+        return if (!option.disableSequenceAssignment && assignment is Assignment.Sequence<ENTITY, *, *>) {
             assignment.assign(entity, config.id, config.dialect::enquote) { sequenceName ->
                 val sql = config.dialect.getSequenceSql(sequenceName)
                 val statement = Statement(sql)
