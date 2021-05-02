@@ -14,7 +14,7 @@ categories:
       - 'bug'
       - 'fix'
   - title: 'Maintenance'
-    label:
+    labels:
       - 'ci'
       - 'chore'
       - 'perf'
