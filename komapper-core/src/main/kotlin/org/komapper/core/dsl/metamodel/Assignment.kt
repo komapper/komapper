@@ -36,7 +36,12 @@ sealed class Assignment<ENTITY> {
 
         private val contextMap = ConcurrentHashMap<UUID, GenerationContext>()
 
-        fun assign(entity: ENTITY, key: UUID, enquote: (String) -> String, sequenceNextValue: (String) -> Long): ENTITY {
+        fun assign(
+            entity: ENTITY,
+            key: UUID,
+            enquote: (String) -> String,
+            sequenceNextValue: (String) -> Long
+        ): ENTITY {
             val context = contextMap.computeIfAbsent(key) {
                 val sequenceName = getCanonicalSequenceName(enquote)
                 GenerationContext(startWith, incrementBy) {
@@ -84,6 +89,7 @@ private fun <T : Any> Long.convert(klass: KClass<T>): T {
     return when (klass) {
         Int::class -> this.toInt()
         Long::class -> this
-        else -> error("Conversion target class must be either Int or Long.")
+        UInt::class -> this.toUInt()
+        else -> error("Conversion target class must be either Int, UInt or Long.")
     } as T
 }

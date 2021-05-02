@@ -1,8 +1,12 @@
 package integration
 
+import org.komapper.annotation.KmAutoIncrement
+import org.komapper.annotation.KmColumn
 import org.komapper.annotation.KmEntity
 import org.komapper.annotation.KmId
+import org.komapper.annotation.KmSequence
 import org.komapper.annotation.KmTable
+import org.komapper.annotation.KmVersion
 import java.io.Serializable
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -124,7 +128,66 @@ data class JsonTest(@KmId val id: Int, val value: Json) {
 }
 
 @KmEntity
+@KmTable("SHORT_TEST")
+data class UByteTest(@KmId val id: Int, val value: UByte?) {
+    companion object
+}
+
+@KmEntity
+@KmTable("LONG_TEST")
+data class UIntTest(@KmId val id: Int, val value: UInt?) {
+    companion object
+}
+
+@KmEntity
+@KmTable("INT_TEST")
+data class UShortTest(@KmId val id: Int, val value: UShort?) {
+    companion object
+}
+
+@KmEntity
 @KmTable("UUID_TEST")
 data class UUIDTest(@KmId val id: Int, val value: UUID?) {
+    companion object
+}
+
+@KmEntity
+@KmTable("ADDRESS")
+data class UnsignedAddress(
+    @KmId @KmColumn(name = "ADDRESS_ID") val addressId: UInt,
+    val street: String,
+    @KmVersion val version: UInt?
+) {
+    companion object
+}
+
+@JvmInline
+value class UIntVersion(val value: UInt)
+
+@KmEntity
+@KmTable("ADDRESS")
+data class UnsignedAddress2(
+    @KmId @KmColumn(name = "ADDRESS_ID") val addressId: UInt,
+    val street: String,
+    @KmVersion val version: UIntVersion?
+) {
+    companion object
+}
+
+@KmEntity
+@KmTable("IDENTITY_STRATEGY")
+data class UnsignedIdentityStrategy(
+    @KmId @KmAutoIncrement val id: UInt?,
+    val value: String
+) {
+    companion object
+}
+
+@KmEntity
+@KmTable("SEQUENCE_STRATEGY")
+data class UnsignedSequenceStrategy(
+    @KmId @KmSequence(name = "SEQUENCE_STRATEGY_ID", incrementBy = 100) val id: UInt,
+    val value: String
+) {
     companion object
 }

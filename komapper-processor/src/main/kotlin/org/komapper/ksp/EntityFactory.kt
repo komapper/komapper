@@ -1,6 +1,7 @@
 package org.komapper.ksp
 
 import com.google.devtools.ksp.getDeclaredProperties
+import com.google.devtools.ksp.isPublic
 import com.google.devtools.ksp.processing.KSPLogger
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSNode
@@ -51,10 +52,11 @@ internal class EntityFactory(private val logger: KSPLogger, config: Config, priv
                 val column = getColumn(propertyDef, parameter)
                 val type = parameter.type.resolve()
                 val typeName = (type.declaration.qualifiedName ?: type.declaration.simpleName).asString()
+                val literalTag = resolveLiteralTag(typeName)
                 val valueClass = createValueClass(type)
                 val nullability = type.nullability
                 val kind = propertyDef?.kind
-                Property(parameter, declaration, column, typeName, valueClass, nullability, kind).also {
+                Property(parameter, declaration, column, typeName, literalTag, valueClass, nullability, kind).also {
                     validateProperty(it)
                 }
             }?.also {
@@ -70,14 +72,17 @@ internal class EntityFactory(private val logger: KSPLogger, config: Config, priv
                 }
 
                 override fun visitClassDeclaration(classDeclaration: KSClassDeclaration, data: Unit): ValueClass? {
-                    val parameter = classDeclaration.primaryConstructor?.parameters?.firstOrNull()
+                    val constructor = classDeclaration.primaryConstructor
+                    val isPublic = constructor?.isPublic() ?: false
+                    val parameter = constructor?.parameters?.firstOrNull()
                     val declaration = classDeclaration.getDeclaredProperties().firstOrNull()
-                    return if (classDeclaration.isValueClass() && parameter != null && declaration != null) {
+                    return if (classDeclaration.isValueClass() && isPublic && parameter != null && declaration != null) {
                         val interiorType = parameter.type.resolve()
                         val typeName =
                             (interiorType.declaration.qualifiedName ?: interiorType.declaration.simpleName).asString()
+                        val literalTag = resolveLiteralTag(typeName)
                         val nullability = interiorType.nullability
-                        val property = ValueClassProperty(parameter, declaration, typeName, nullability)
+                        val property = ValueClassProperty(parameter, declaration, typeName, literalTag, nullability)
                         return ValueClass(classDeclaration, property)
                     } else {
                         null
@@ -86,6 +91,14 @@ internal class EntityFactory(private val logger: KSPLogger, config: Config, priv
             },
             Unit
         )
+    }
+
+    private fun resolveLiteralTag(typeName: String): String {
+        return when (typeName) {
+            "kotlin.Long" -> "L"
+            "kotlin.UInt" -> "u"
+            else -> ""
+        }
     }
 
     private fun getColumn(propertyDef: PropertyDef?, parameter: KSValueParameter): Column {
@@ -133,20 +146,18 @@ internal class EntityFactory(private val logger: KSPLogger, config: Config, priv
         if (idKind == null) return
         fun validate(annotationName: String) {
             when (property.typeName) {
-                "kotlin.Int" -> Unit
-                "kotlin.Long" -> Unit
+                "kotlin.Int", "kotlin.Long", "kotlin.UInt" -> Unit
                 else -> {
                     if (property.valueClass == null) {
                         report(
-                            "The type of $annotationName annotated property must be either Int, Long or value class.",
+                            "The type of $annotationName annotated property must be either Int, Long, UInt or value class.",
                             property.parameter
                         )
                     } else {
                         when (property.valueClass.property.typeName) {
-                            "kotlin.Int" -> Unit
-                            "kotlin.Long" -> Unit
+                            "kotlin.Int", "kotlin.Long", "kotlin.UInt" -> Unit
                             else -> report(
-                                "When the type of $annotationName annotated property is value class, the type of the value class's own property must be either Int or Long.",
+                                "When the type of $annotationName annotated property is value class, the type of the value class's own property must be either Int, Long or UInt.",
                                 property.parameter
                             )
                         }
@@ -162,20 +173,18 @@ internal class EntityFactory(private val logger: KSPLogger, config: Config, priv
 
     private fun validateVersionProperty(property: Property) {
         when (property.typeName) {
-            "kotlin.Int" -> Unit
-            "kotlin.Long" -> Unit
+            "kotlin.Int", "kotlin.Long", "kotlin.UInt" -> Unit
             else -> {
                 if (property.valueClass == null) {
                     report(
-                        "The type of @KmVersion annotated property must be either Int, Long or value class.",
+                        "The type of @KmVersion annotated property must be either Int, Long, UInt or value class.",
                         property.parameter
                     )
                 } else {
                     when (property.valueClass.property.typeName) {
-                        "kotlin.Int" -> Unit
-                        "kotlin.Long" -> Unit
+                        "kotlin.Int", "kotlin.Long", "kotlin.UInt" -> Unit
                         else -> report(
-                            "When the type of @KmVersion annotated property is value class, the type of the value class's own property must be either Int or Long.",
+                            "When the type of @KmVersion annotated property is value class, the type of the value class's own property must be either Int, Long or UInt.",
                             property.parameter
                         )
                     }
@@ -186,7 +195,7 @@ internal class EntityFactory(private val logger: KSPLogger, config: Config, priv
 
     private fun validateTimestampProperty(property: Property, annotationName: String) {
         when (property.typeName) {
-            "java.time.LocalDateTime" -> Unit
+            "java.time.LocalDateTime",
             "java.time.OffsetDateTime" -> Unit
             else -> {
                 if (property.valueClass == null) {
@@ -196,7 +205,7 @@ internal class EntityFactory(private val logger: KSPLogger, config: Config, priv
                     )
                 } else {
                     when (property.valueClass.property.typeName) {
-                        "java.time.LocalDateTime" -> Unit
+                        "java.time.LocalDateTime",
                         "java.time.OffsetDateTime" -> Unit
                         else -> report(
                             "When the type of $annotationName annotated property is value class, the type of the value class's own property must be either LocalDateTime or OffsetDateTime.",

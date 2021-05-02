@@ -27,6 +27,9 @@ import org.komapper.core.jdbc.OffsetDateTimeType
 import org.komapper.core.jdbc.SQLXMLType
 import org.komapper.core.jdbc.ShortType
 import org.komapper.core.jdbc.StringType
+import org.komapper.core.jdbc.UByteType
+import org.komapper.core.jdbc.UIntType
+import org.komapper.core.jdbc.UShortType
 import java.sql.SQLException
 
 open class H2Dialect(dataTypes: Set<DataType<*>> = emptySet(), val version: Version = Version.V1_4) :
@@ -62,6 +65,9 @@ open class H2Dialect(dataTypes: Set<DataType<*>> = emptySet(), val version: Vers
             ShortType("smallint"),
             StringType("varchar(500)"),
             SQLXMLType("clob"),
+            UByteType("smallint"),
+            UIntType("bigint"),
+            UShortType("integer"),
             H2UUIDType
         )
     }
