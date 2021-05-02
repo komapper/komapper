@@ -450,3 +450,57 @@ class SQLXMLType(override val name: String) :
         ps.setSQLXML(index, value)
     }
 }
+
+class UByteType(override val name: String) : AbstractDataType<UByte>(UByte::class, JDBCType.SMALLINT) {
+    override fun doGetValue(rs: ResultSet, index: Int): UByte {
+        val value = rs.getShort(index)
+        if (value < 0) error("Negative value isn't convertible to UByte. index=$index, value=$value")
+        return value.toUByte()
+    }
+
+    override fun doGetValue(rs: ResultSet, columnLabel: String): UByte {
+        val value = rs.getShort(columnLabel)
+        if (value < 0) error("Negative value isn't convertible to UByte. columnLabel=$columnLabel, value=$value")
+        return value.toUByte()
+    }
+
+    override fun doSetValue(ps: PreparedStatement, index: Int, value: UByte) {
+        ps.setShort(index, value.toShort())
+    }
+}
+
+class UIntType(override val name: String) : AbstractDataType<UInt>(UInt::class, JDBCType.BIGINT) {
+    override fun doGetValue(rs: ResultSet, index: Int): UInt {
+        val value = rs.getLong(index)
+        if (value < 0L) error("Negative value isn't convertible to UInt. index=$index, value=$value")
+        return value.toUInt()
+    }
+
+    override fun doGetValue(rs: ResultSet, columnLabel: String): UInt {
+        val value = rs.getLong(columnLabel)
+        if (value < 0L) error("Negative value isn't convertible to UInt. columnLabel=$columnLabel, value=$value")
+        return value.toUInt()
+    }
+
+    override fun doSetValue(ps: PreparedStatement, index: Int, value: UInt) {
+        ps.setLong(index, value.toLong())
+    }
+}
+
+class UShortType(override val name: String) : AbstractDataType<UShort>(UShort::class, JDBCType.INTEGER) {
+    override fun doGetValue(rs: ResultSet, index: Int): UShort {
+        val value = rs.getInt(index)
+        if (value < 0L) error("Negative value isn't convertible to UShort. index=$index, value=$value")
+        return value.toUShort()
+    }
+
+    override fun doGetValue(rs: ResultSet, columnLabel: String): UShort {
+        val value = rs.getInt(columnLabel)
+        if (value < 0L) error("Negative value isn't convertible to UShort. columnLabel=$columnLabel, value=$value")
+        return value.toUShort()
+    }
+
+    override fun doSetValue(ps: PreparedStatement, index: Int, value: UShort) {
+        ps.setInt(index, value.toInt())
+    }
+}

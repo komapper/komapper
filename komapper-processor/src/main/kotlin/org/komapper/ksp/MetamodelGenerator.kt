@@ -215,9 +215,11 @@ internal class EntityMetamodelGenerator(
         val version = entity.versionProperty?.let {
             val nullable = it.nullability == Nullability.NULLABLE
             if (it.valueClass == null) {
-                "$it = e.$it${if (nullable) " ?: 0" else ""}"
+                val tag = it.literalTag
+                "$it = e.$it${if (nullable) " ?: 0$tag" else ""}"
             } else {
-                "$it = e.$it${if (nullable) " ?: ${it.valueClass}(0)" else ""}"
+                val tag = it.valueClass.property.literalTag
+                "$it = e.$it${if (nullable) " ?: ${it.valueClass}(0$tag)" else ""}"
             }
         }
         val createdAt = entity.createdAtProperty?.let {
@@ -263,9 +265,11 @@ internal class EntityMetamodelGenerator(
         val version = entity.versionProperty?.let {
             val nullable = it.nullability == Nullability.NULLABLE
             if (it.valueClass == null) {
-                "$it = e.$it${if (nullable) "?" else ""}.inc()${if (nullable) " ?: 0" else ""}"
+                val tag = it.literalTag
+                "$it = e.$it${if (nullable) "?" else ""}.inc()${if (nullable) " ?: 0$tag" else ""}"
             } else {
-                "$it = ${it.valueClass}(e.$it${if (nullable) "?" else ""}.${it.valueClass.property}.inc())"
+                val tag = it.valueClass.property.literalTag
+                "$it = ${it.valueClass}(e.$it${if (nullable) "?" else ""}.${it.valueClass.property}${if (nullable) "?" else ""}.inc()${if (nullable) " ?: 0$tag" else ""})"
             }
         }
         val body = if (version == null) {

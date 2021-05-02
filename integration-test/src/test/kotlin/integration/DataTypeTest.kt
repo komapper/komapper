@@ -255,6 +255,158 @@ class DataTypeTest(val db: Database) {
         assertEquals("\"Hello\"", result.data)
     }
 
+    @Test
+    fun unsignedByte() {
+        val m = UByteTest.alias
+        val data = UByteTest(1, 10u)
+        db.runQuery { EntityDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            EntityDsl.from(m).first { m.id eq 1 }
+        }
+        assertEquals(data, data2)
+    }
+
+    @Test
+    fun unsignedByte_maxValue() {
+        val m = UByteTest.alias
+        val data = UByteTest(1, UByte.MAX_VALUE)
+        db.runQuery { EntityDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            EntityDsl.from(m).first { m.id eq 1 }
+        }
+        assertEquals(data, data2)
+    }
+
+    @Test
+    fun unsignedByte_null() {
+        val m = UByteTest.alias
+        val data = UByteTest(1, null)
+        db.runQuery { EntityDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            EntityDsl.from(m).first { m.id eq 1 }
+        }
+        assertEquals(data, data2)
+    }
+
+    @Test
+    fun unsignedInt() {
+        val m = UIntTest.alias
+        val data = UIntTest(1, 10u)
+        db.runQuery { EntityDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            EntityDsl.from(m).first { m.id eq 1 }
+        }
+        assertEquals(data, data2)
+    }
+
+    @Test
+    fun unsignedInt_maxValue() {
+        val m = UIntTest.alias
+        val data = UIntTest(1, UInt.MAX_VALUE)
+        db.runQuery { EntityDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            EntityDsl.from(m).first { m.id eq 1 }
+        }
+        assertEquals(data, data2)
+    }
+
+    @Test
+    fun unsignedInt_null() {
+        val m = UIntTest.alias
+        val data = UIntTest(1, null)
+        db.runQuery { EntityDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            EntityDsl.from(m).first { m.id eq 1 }
+        }
+        assertEquals(data, data2)
+    }
+
+    @Test
+    fun unsignedShort() {
+        val m = UShortTest.alias
+        val data = UShortTest(1, 10u)
+        db.runQuery { EntityDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            EntityDsl.from(m).first { m.id eq 1 }
+        }
+        assertEquals(data, data2)
+    }
+
+    @Test
+    fun unsigned_autoIncrement() {
+        val m = UnsignedIdentityStrategy.alias
+        val data = UnsignedIdentityStrategy(null, "test")
+        db.runQuery { EntityDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            EntityDsl.from(m).first { m.id eq 1u }
+        }
+        assertNotNull(data2)
+    }
+
+    @Run(unless = [Dbms.MYSQL])
+    @Test
+    fun unsigned_sequence() {
+        val m = UnsignedSequenceStrategy.alias
+        val data = UnsignedSequenceStrategy(0u, "test")
+        db.runQuery { EntityDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            EntityDsl.from(m).first { m.id eq 1u }
+        }
+        assertNotNull(data2)
+    }
+
+    @Test
+    fun unsigned_version() {
+        val m = UnsignedAddress.alias
+        val data = UnsignedAddress(16u, "STREET 16", 0u)
+        val data2 = db.runQuery { EntityDsl.insert(m).single(data) }
+        db.runQuery {
+            EntityDsl.update(m).single(data2.copy(street = "STREET 16 B"))
+        }
+        val data3 = db.runQuery {
+            EntityDsl.from(m).first { m.addressId eq 16u }
+        }
+        assertEquals(16u, data3.addressId)
+        assertEquals(1u, data3.version)
+    }
+
+    @Test
+    fun unsigned_version_valueClass() {
+        val m = UnsignedAddress2.alias
+        val data = UnsignedAddress2(16u, "STREET 16", null)
+        val data2 = db.runQuery { EntityDsl.insert(m).single(data) }
+        db.runQuery {
+            EntityDsl.update(m).single(data2.copy(street = "STREET 16 B"))
+        }
+        val data3 = db.runQuery {
+            EntityDsl.from(m).first { m.addressId eq 16u }
+        }
+        assertEquals(16u, data3.addressId)
+        assertEquals(UIntVersion(1u), data3.version)
+    }
+
+    @Test
+    fun unsignedShort_maxValue() {
+        val m = UShortTest.alias
+        val data = UShortTest(1, UShort.MAX_VALUE)
+        db.runQuery { EntityDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            EntityDsl.from(m).first { m.id eq 1 }
+        }
+        assertEquals(data, data2)
+    }
+
+    @Test
+    fun unsignedShort_null() {
+        val m = UShortTest.alias
+        val data = UShortTest(1, null)
+        db.runQuery { EntityDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            EntityDsl.from(m).first { m.id eq 1 }
+        }
+        assertEquals(data, data2)
+    }
+
     @Run(onlyIf = [Dbms.POSTGRESQL, Dbms.H2])
     @Test
     fun uuid() {

@@ -27,6 +27,9 @@ import org.komapper.core.jdbc.OffsetDateTimeType
 import org.komapper.core.jdbc.SQLXMLType
 import org.komapper.core.jdbc.ShortType
 import org.komapper.core.jdbc.StringType
+import org.komapper.core.jdbc.UByteType
+import org.komapper.core.jdbc.UIntType
+import org.komapper.core.jdbc.UShortType
 import java.sql.SQLException
 
 open class MySqlDialect(dataTypes: Set<DataType<*>> = emptySet(), val version: Version = Version.V8_0) :
@@ -63,6 +66,9 @@ open class MySqlDialect(dataTypes: Set<DataType<*>> = emptySet(), val version: V
             ShortType("smallint"),
             StringType("varchar(500)"),
             SQLXMLType("text"),
+            UByteType("smallint"),
+            UIntType("bigint"),
+            UShortType("integer"),
         )
     }
 

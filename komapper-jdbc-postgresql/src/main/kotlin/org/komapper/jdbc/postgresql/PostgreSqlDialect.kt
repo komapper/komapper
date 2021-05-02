@@ -26,6 +26,9 @@ import org.komapper.core.jdbc.OffsetDateTimeType
 import org.komapper.core.jdbc.SQLXMLType
 import org.komapper.core.jdbc.ShortType
 import org.komapper.core.jdbc.StringType
+import org.komapper.core.jdbc.UByteType
+import org.komapper.core.jdbc.UIntType
+import org.komapper.core.jdbc.UShortType
 import java.sql.SQLException
 
 open class PostgreSqlDialect(dataTypes: Set<DataType<*>> = emptySet(), val version: Version = Version.V42_2) :
@@ -60,6 +63,9 @@ open class PostgreSqlDialect(dataTypes: Set<DataType<*>> = emptySet(), val versi
             ShortType("smallint"),
             StringType("varchar(500)"),
             SQLXMLType("text"),
+            UByteType("smallint"),
+            UIntType("bigint"),
+            UShortType("integer"),
             PostgreSqlUUIDType
         )
     }

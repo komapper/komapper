@@ -544,7 +544,7 @@ class EntityProcessorTest {
     }
 
     @Test
-    fun `The type of @KmVersion annotated property must be either Int, Long or value class`() {
+    fun `The type of @KmVersion annotated property must be either Int, Long, UInt or value class`() {
         val result = compile(
             kotlin(
                 "source.kt",
@@ -559,11 +559,11 @@ class EntityProcessorTest {
             )
         )
         assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertThat(result.messages).contains("The type of @KmVersion annotated property must be either Int, Long or value class.")
+        assertThat(result.messages).contains("The type of @KmVersion annotated property must be either Int, Long, UInt or value class.")
     }
 
     @Test
-    fun `When the type of @KmVersion annotated property is value class, the type of the value class's own property must be either Int or Long`() {
+    fun `When the type of @KmVersion annotated property is value class, the type of the value class's own property must be either Int, Long or UInt`() {
         val result = compile(
             kotlin(
                 "source.kt",
@@ -582,7 +582,10 @@ class EntityProcessorTest {
             )
         )
         assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertThat(result.messages).contains("When the type of @KmVersion annotated property is value class, the type of the value class's own property must be either Int or Long.")
+        assertThat(result.messages).contains(
+            "When the type of @KmVersion annotated property is value class, " +
+                "the type of the value class's own property must be either Int, Long or UInt."
+        )
     }
 
     @Test
@@ -624,7 +627,10 @@ class EntityProcessorTest {
             )
         )
         assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertThat(result.messages).contains("When the type of @KmCreatedAt annotated property is value class, the type of the value class's own property must be either LocalDateTime or OffsetDateTime.")
+        assertThat(result.messages).contains(
+            "When the type of @KmCreatedAt annotated property is value class, " +
+                "the type of the value class's own property must be either LocalDateTime or OffsetDateTime."
+        )
     }
 
     @Test
@@ -666,7 +672,10 @@ class EntityProcessorTest {
             )
         )
         assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertThat(result.messages).contains("When the type of @KmUpdatedAt annotated property is value class, the type of the value class's own property must be either LocalDateTime or OffsetDateTime.")
+        assertThat(result.messages).contains(
+            "When the type of @KmUpdatedAt annotated property is value class, " +
+                "the type of the value class's own property must be either LocalDateTime or OffsetDateTime."
+        )
     }
 
     @Test
@@ -689,7 +698,7 @@ class EntityProcessorTest {
     }
 
     @Test
-    fun `The type of @KmAutoIncrement annotated property must be either Int, Long or value class`() {
+    fun `The type of @KmAutoIncrement annotated property must be either Int, Long, UInt or value class`() {
         val result = compile(
             kotlin(
                 "source.kt",
@@ -704,11 +713,11 @@ class EntityProcessorTest {
             )
         )
         assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertThat(result.messages).contains("The type of @KmAutoIncrement annotated property must be either Int, Long or value class.")
+        assertThat(result.messages).contains("The type of @KmAutoIncrement annotated property must be either Int, Long, UInt or value class.")
     }
 
     @Test
-    fun `The type of @KmSequence annotated property must be either Int, Long or value class`() {
+    fun `The type of @KmSequence annotated property must be either Int, Long, UInt or value class`() {
         val result = compile(
             kotlin(
                 "source.kt",
@@ -723,11 +732,11 @@ class EntityProcessorTest {
             )
         )
         assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertThat(result.messages).contains("The type of @KmSequence annotated property must be either Int, Long or value class.")
+        assertThat(result.messages).contains("The type of @KmSequence annotated property must be either Int, Long, UInt or value class.")
     }
 
     @Test
-    fun `When the type of @KmAutoIncrement annotated property is value class, the type of value class's own property must be either Int or Long`() {
+    fun `When the type of @KmAutoIncrement annotated property is value class, the type of value class's own property must be either Int, Long or UInt`() {
         val result = compile(
             kotlin(
                 "source.kt",
@@ -746,11 +755,11 @@ class EntityProcessorTest {
             )
         )
         assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertThat(result.messages).contains("When the type of @KmAutoIncrement annotated property is value class, the type of the value class's own property must be either Int or Long.")
+        assertThat(result.messages).contains("When the type of @KmAutoIncrement annotated property is value class, the type of the value class's own property must be either Int, Long or UInt.")
     }
 
     @Test
-    fun `When the type of @KmSequence annotated property is value class, the type of value class's own property must be either Int or Long`() {
+    fun `When the type of @KmSequence annotated property is value class, the type of value class's own property must be either Int, Long or UInt`() {
         val result = compile(
             kotlin(
                 "source.kt",
@@ -769,7 +778,10 @@ class EntityProcessorTest {
             )
         )
         assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertThat(result.messages).contains("When the type of @KmSequence annotated property is value class, the type of the value class's own property must be either Int or Long.")
+        assertThat(result.messages).contains(
+            "When the type of @KmSequence annotated property is value class, " +
+                "the type of the value class's own property must be either Int, Long or UInt."
+        )
     }
 
     @Test

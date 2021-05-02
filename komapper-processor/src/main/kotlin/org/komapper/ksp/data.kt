@@ -40,6 +40,7 @@ internal data class Property(
     val declaration: KSPropertyDeclaration,
     val column: Column,
     val typeName: String,
+    val literalTag: String,
     val valueClass: ValueClass?,
     val nullability: Nullability,
     val kind: PropertyKind?,
@@ -64,6 +65,7 @@ internal data class ValueClassProperty(
     val parameter: KSValueParameter,
     val declaration: KSPropertyDeclaration,
     val typeName: String,
+    val literalTag: String,
     val nullability: Nullability,
 ) {
     fun isPrivate() = declaration.isPrivate()
