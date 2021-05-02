@@ -4,12 +4,12 @@ import org.komapper.core.DatabaseConfig
 import org.komapper.core.Statement
 import org.komapper.core.dsl.context.EntityInsertContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
-import org.komapper.core.dsl.option.EntityBatchInsertOption
+import org.komapper.core.dsl.option.EntityInsertBatchOption
 
 internal data class EntityInsertBatchQuery<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityInsertContext<ENTITY, ID, META>,
     private val entities: List<ENTITY>,
-    private val option: EntityBatchInsertOption
+    private val option: EntityInsertBatchOption
 ) : Query<List<ENTITY>> {
 
     private val support: EntityInsertQuerySupport<ENTITY, ID, META> = EntityInsertQuerySupport(context, option)

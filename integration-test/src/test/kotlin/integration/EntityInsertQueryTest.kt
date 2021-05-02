@@ -124,6 +124,19 @@ class EntityInsertQueryTest(private val db: Database) {
         }
     }
 
+    @Run(unless = [Dbms.MYSQL])
+    @Test
+    fun sequenceGenerator_disableSequenceAssignment() {
+        val m = SequenceStrategy.alias
+        val strategy = SequenceStrategy(50, "test")
+        val result = db.runQuery {
+            EntityDsl.insert(m).option {
+                it.copy(disableSequenceAssignment = true)
+            }.single(strategy)
+        }
+        assertEquals(50, result.id)
+    }
+
     @Test
     fun onDuplicateKeyUpdate_insert() {
         val d = Department.alias

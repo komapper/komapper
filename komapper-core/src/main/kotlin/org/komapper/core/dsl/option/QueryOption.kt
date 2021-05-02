@@ -30,6 +30,10 @@ interface BatchOption : QueryOption {
     }
 }
 
+interface InsertOption : QueryOption {
+    val disableSequenceAssignment: Boolean
+}
+
 interface SelectOption : QueryOption {
     val fetchSize: Int?
     val maxRows: Int?
@@ -63,8 +67,8 @@ data class EntityDeleteOption(
         )
     }
 
-    fun asEntityBatchDeleteOption(batchSize: Int?): EntityBatchDeleteOption {
-        return EntityBatchDeleteOption(
+    fun asEntityBatchDeleteOption(batchSize: Int?): EntityDeleteBatchOption {
+        return EntityDeleteBatchOption(
             batchSize = batchSize,
             queryTimeoutSeconds = queryTimeoutSeconds,
             suppressLogging = suppressLogging,
@@ -75,20 +79,23 @@ data class EntityDeleteOption(
 }
 
 data class EntityInsertOption(
+    override val disableSequenceAssignment: Boolean,
     override val queryTimeoutSeconds: Int?,
     override val suppressLogging: Boolean,
-) : QueryOption {
+) : QueryOption, InsertOption {
 
     companion object {
         val default = EntityInsertOption(
+            disableSequenceAssignment = false,
             queryTimeoutSeconds = null,
             suppressLogging = false
         )
     }
 
-    fun asEntityBatchInsertOption(batchSize: Int?): EntityBatchInsertOption {
-        return EntityBatchInsertOption(
+    fun asEntityBatchInsertOption(batchSize: Int?): EntityInsertBatchOption {
+        return EntityInsertBatchOption(
             batchSize = batchSize,
+            disableSequenceAssignment = disableSequenceAssignment,
             queryTimeoutSeconds = queryTimeoutSeconds,
             suppressLogging = suppressLogging,
         )
@@ -111,8 +118,8 @@ data class EntityUpdateOption(
         )
     }
 
-    fun asEntityBatchUpdateOption(batchSize: Int?): EntityBatchUpdateOption {
-        return EntityBatchUpdateOption(
+    fun asEntityBatchUpdateOption(batchSize: Int?): EntityUpdateBatchOption {
+        return EntityUpdateBatchOption(
             batchSize = batchSize,
             ignoreVersion = ignoreVersion,
             queryTimeoutSeconds = queryTimeoutSeconds,
@@ -152,7 +159,7 @@ data class EntitySelectOption(
     )
 }
 
-data class EntityBatchDeleteOption(
+data class EntityDeleteBatchOption(
     override val batchSize: Int?,
     override val ignoreVersion: Boolean,
     override val queryTimeoutSeconds: Int?,
@@ -160,13 +167,14 @@ data class EntityBatchDeleteOption(
     override val suppressOptimisticLockException: Boolean
 ) : VersionOption, BatchOption
 
-data class EntityBatchInsertOption(
+data class EntityInsertBatchOption(
     override val batchSize: Int?,
+    override val disableSequenceAssignment: Boolean,
     override val suppressLogging: Boolean,
     override val queryTimeoutSeconds: Int?,
-) : BatchOption
+) : BatchOption, InsertOption
 
-data class EntityBatchUpdateOption(
+data class EntityUpdateBatchOption(
     override val suppressLogging: Boolean,
     override val batchSize: Int?,
     override val queryTimeoutSeconds: Int?,
