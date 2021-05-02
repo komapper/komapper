@@ -8,6 +8,7 @@ import org.komapper.core.dsl.expression.AggregateFunction
 import org.komapper.core.dsl.expression.AliasExpression
 import org.komapper.core.dsl.expression.ArithmeticExpression
 import org.komapper.core.dsl.expression.BooleanExpression
+import org.komapper.core.dsl.expression.CaseExpression
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.expression.IntExpression
 import org.komapper.core.dsl.expression.LiteralExpression
@@ -15,6 +16,7 @@ import org.komapper.core.dsl.expression.LongExpression
 import org.komapper.core.dsl.expression.ScalarExpression
 import org.komapper.core.dsl.expression.StringExpression
 import org.komapper.core.dsl.expression.StringFunction
+import org.komapper.core.dsl.expression.When
 import org.komapper.core.dsl.query.Query
 import org.komapper.core.dsl.query.QueryScope
 
@@ -197,6 +199,14 @@ fun <T : Any> concat(
     val o1 = Operand.Column(left)
     val o2 = Operand.Column(right)
     return StringFunction.Concat(right, o1, o2)
+}
+
+fun <T : Any, S : Any> case(
+    firstWhen: When<T, S>,
+    vararg remainingWhen: When<T, S>,
+    otherwise: (() -> ColumnExpression<T, S>)? = null
+): ColumnExpression<T, S> {
+    return CaseExpression(firstWhen, remainingWhen.toList(), otherwise?.invoke())
 }
 
 fun literal(value: Boolean): ColumnExpression<Boolean, Boolean> {

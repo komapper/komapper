@@ -4,13 +4,13 @@ import org.komapper.core.Scope
 import org.komapper.core.dsl.element.Criterion
 
 @Scope
-class WhereScope internal constructor(
-    private val support: FilterScopeSupport<WhereScope> = FilterScopeSupport { WhereScope() }
+class WhenScope internal constructor(
+    private val support: FilterScopeSupport<WhenScope> = FilterScopeSupport { WhenScope() }
 ) : FilterScope by support,
     List<Criterion> by support {
 
     companion object {
-        operator fun WhereDeclaration.plus(other: WhereDeclaration): WhereDeclaration {
+        operator fun WhenDeclaration.plus(other: WhenDeclaration): WhenDeclaration {
             return {
                 this@plus(this)
                 other(this)
@@ -18,15 +18,15 @@ class WhereScope internal constructor(
         }
     }
 
-    fun and(declaration: WhereDeclaration) {
+    fun and(declaration: WhenDeclaration) {
         support.addCriteria(declaration, Criterion::And)
     }
 
-    fun or(declaration: WhereDeclaration) {
+    fun or(declaration: WhenDeclaration) {
         support.addCriteria(declaration, Criterion::Or)
     }
 
-    fun not(declaration: WhereDeclaration) {
+    fun not(declaration: WhenDeclaration) {
         support.addCriteria(declaration, Criterion::Not)
     }
 }

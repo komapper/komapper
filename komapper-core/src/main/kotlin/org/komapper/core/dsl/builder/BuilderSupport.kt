@@ -10,6 +10,7 @@ import org.komapper.core.dsl.element.Operand
 import org.komapper.core.dsl.expression.AggregateFunction
 import org.komapper.core.dsl.expression.AliasExpression
 import org.komapper.core.dsl.expression.ArithmeticExpression
+import org.komapper.core.dsl.expression.CaseExpression
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.expression.EscapeExpression
 import org.komapper.core.dsl.expression.LiteralExpression
@@ -58,14 +59,17 @@ class BuilderSupport(
             is ArithmeticExpression<*, *> -> {
                 visitArithmeticExpression(expression)
             }
-            is ScalarQuery<*, *, *> -> {
-                visitSingleProjectionQuery(expression)
-            }
-            is StringFunction -> {
-                visitStringFunction(expression)
+            is CaseExpression<*, *> -> {
+                visitCaseExpression(expression)
             }
             is LiteralExpression<*> -> {
                 visitLiteralExpression(expression)
+            }
+            is ScalarQuery<*, *, *> -> {
+                visitScalarQuery(expression)
+            }
+            is StringFunction -> {
+                visitStringFunction(expression)
             }
             else -> {
                 val name = expression.getCanonicalColumnName(dialect::enquote)
@@ -151,7 +155,36 @@ class BuilderSupport(
         buf.append(")")
     }
 
-    private fun visitSingleProjectionQuery(expression: ScalarQuery<*, *, *>) {
+    private fun visitCaseExpression(expression: CaseExpression<*, *>) {
+        buf.append("case")
+        for (`when` in expression.whenList) {
+            if (`when`.criteria.isNotEmpty()) {
+                buf.append(" when ")
+                for ((index, criterion) in `when`.criteria.withIndex()) {
+                    visitCriterion(index, criterion)
+                    buf.append(" and ")
+                }
+                buf.cutBack(5)
+                buf.append(" then ")
+                visitOperand(`when`.thenOperand)
+            }
+        }
+        if (expression.otherwise != null) {
+            buf.append(" else ")
+            visitColumnExpression(expression.otherwise)
+        }
+        buf.append(" end")
+    }
+
+    private fun visitLiteralExpression(expression: LiteralExpression<*>) {
+        val dataType = dialect.getDataType(expression.interiorClass)
+        @Suppress("UNCHECKED_CAST")
+        dataType as DataType<Any>
+        val string = dataType.toString(expression.value)
+        buf.append(string)
+    }
+
+    private fun visitScalarQuery(expression: ScalarQuery<*, *, *>) {
         buf.append("(")
         val statement = buildSubqueryStatement(expression.subqueryContext)
         buf.append(statement)
@@ -192,14 +225,6 @@ class BuilderSupport(
             }
         }
         buf.append(")")
-    }
-
-    private fun visitLiteralExpression(expression: LiteralExpression<*>) {
-        val dataType = dialect.getDataType(expression.interiorClass)
-        @Suppress("UNCHECKED_CAST")
-        dataType as DataType<Any>
-        val string = dataType.toString(expression.value)
-        buf.append(string)
     }
 
     fun visitOperand(operand: Operand) {

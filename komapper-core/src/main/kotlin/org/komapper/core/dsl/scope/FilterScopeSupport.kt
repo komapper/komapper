@@ -6,9 +6,12 @@ import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.expression.EscapeExpression
 import org.komapper.core.dsl.query.Subquery
 
-internal class FilterScopeSupport(
-    private val context: MutableList<Criterion> = mutableListOf()
-) : FilterScope, List<Criterion> by context {
+internal class FilterScopeSupport<T>(
+    private val context: MutableList<Criterion> = mutableListOf(),
+    private val newScope: () -> T
+) : FilterScope, List<Criterion> by context
+        where T : FilterScope,
+              T : List<Criterion> {
 
     internal fun add(criterion: Criterion) {
         context.add(criterion)
@@ -262,5 +265,11 @@ internal class FilterScopeSupport(
     override fun notExists(block: () -> Subquery<*>) {
         val subquery = block()
         add(Criterion.NotExists(subquery.subqueryContext))
+    }
+
+    fun addCriteria(declaration: T.() -> Unit, operator: (List<Criterion>) -> Criterion) {
+        val scope = newScope().apply(declaration)
+        val criterion = operator(scope.toList())
+        add(criterion)
     }
 }
