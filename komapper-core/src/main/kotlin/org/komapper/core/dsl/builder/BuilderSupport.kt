@@ -213,7 +213,7 @@ class BuilderSupport(
         }
     }
 
-    private fun visitStringFunction(function: StringFunction<*, *>) {
+    private fun visitStringFunction(function: StringFunction<*>) {
         buf.append("(")
         when (function) {
             is StringFunction.Concat -> {
@@ -221,6 +221,32 @@ class BuilderSupport(
                 visitOperand(function.left)
                 buf.append(", ")
                 visitOperand(function.right)
+                buf.append(")")
+            }
+            is StringFunction.Lower -> {
+                buf.append("lower(")
+                visitOperand(function.operand)
+                buf.append(")")
+            }
+            is StringFunction.Ltrim -> {
+                buf.append("ltrim(")
+                visitOperand(function.operand)
+                buf.append(")")
+            }
+            is StringFunction.Rtrim -> {
+                buf.append("rtrim(")
+                visitOperand(function.operand)
+                buf.append(")")
+            }
+            is StringFunction.Trim -> {
+                buf.append("trim(")
+                visitOperand(function.operand)
+                buf.append(")")
+            }
+
+            is StringFunction.Upper -> {
+                buf.append("upper(")
+                visitOperand(function.operand)
                 buf.append(")")
             }
         }
