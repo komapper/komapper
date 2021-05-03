@@ -17,7 +17,7 @@ class EntityProcessorTest {
     var tempDir: Path? = null
 
     @Test
-    fun `We recommend to define a companion object in the entity class`() {
+    fun `Define a companion object in the class`() {
         val result = compile(
             kotlin(
                 "source.kt",
@@ -31,8 +31,8 @@ class EntityProcessorTest {
                 """
             )
         )
-        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.OK)
-        assertThat(result.messages).contains("We recommend to define a companion object in the entity class.")
+        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
+        assertThat(result.messages).contains("Define a companion object in the class.")
     }
 
     @Test
@@ -46,7 +46,7 @@ class EntityProcessorTest {
                 @KmEntity
                 data class Dept(
                     val id: Int
-                )
+                ) { companion object }
                 """
             )
         )
@@ -66,7 +66,7 @@ class EntityProcessorTest {
                     @KmEntity
                     data class Dept(
                         val id: Int
-                    )
+                    ) { companion object }
                 }
                 """
             )
@@ -86,11 +86,11 @@ class EntityProcessorTest {
                 @KmEntity
                 data class Dept(
                     val id: Int
-                )
+                ) { companion object }
                 @KmEntityDef(entity = Dept::class)
                 data class DeptDef(
                     val id: Int
-                )
+                ) { companion object }
                 """
             )
         )
@@ -113,7 +113,7 @@ class EntityProcessorTest {
                 data class DeptDef(
                     val id: Int,
                     val version: Int
-                )
+                ) { companion object }
                 """
             )
         )
@@ -132,7 +132,7 @@ class EntityProcessorTest {
                 @KmEntity
                 data class __Dept(
                     val id: Int
-                )
+                ) { companion object }
                 """
             )
         )
@@ -154,7 +154,7 @@ class EntityProcessorTest {
                 @KmEntityDef(entity = __Dept::class)
                 data class DeptDef(
                     val id: Int
-                )
+                ) { companion object }
                 """
             )
         )
@@ -173,7 +173,7 @@ class EntityProcessorTest {
                 @KmEntity
                 data class Dept(
                     val __id: Int
-                )
+                ) { companion object }
                 """
             )
         )
@@ -196,7 +196,7 @@ class EntityProcessorTest {
                 @KmEntityDef(entity = Dept::class)
                 data class DeptDef(
                     val id: Int
-                )
+                ) { companion object }
                 """
             )
         )
@@ -215,7 +215,7 @@ class EntityProcessorTest {
                 @KmEntity
                 class Dept(
                     val id: Int
-                )
+                ) { companion object }
                 """
             )
         )
@@ -237,7 +237,7 @@ class EntityProcessorTest {
                 @KmEntityDef(entity = Dept::class)
                 data class DeptDef(
                     val id: Int
-                )
+                ) { companion object }
                 """
             )
         )
@@ -255,7 +255,7 @@ class EntityProcessorTest {
                 import org.komapper.annotation.*
                 class Dept(
                     @KmEntity val id: Int
-                )
+                ) { companion object }
                 """
             )
         )
@@ -276,7 +276,7 @@ class EntityProcessorTest {
                 )
                 class DeptDef(
                     @KmEntityDef(entity = Dept::class) val id: Int
-                )
+                ) { companion object }
                 """
             )
         )
@@ -295,7 +295,7 @@ class EntityProcessorTest {
                 @KmEntity
                 private data class Dept(
                     val id: Int
-                )
+                ) { companion object }
                 """
             )
         )
@@ -317,7 +317,7 @@ class EntityProcessorTest {
                 @KmEntityDef(entity = Dept::class)
                 data class DeptDef(
                     val id: Int
-                )
+                ) { companion object }
                 """
             )
         )
@@ -336,7 +336,7 @@ class EntityProcessorTest {
                 @KmEntity
                 data class Dept<T>(
                     val id: T
-                )
+                ) { companion object }
                 """
             )
         )
@@ -358,7 +358,7 @@ class EntityProcessorTest {
                 @KmEntityDef(entity = Dept::class)
                 data class DeptDef<T>(
                     val id: T
-                )
+                ) { companion object }
                 """
             )
         )
@@ -378,7 +378,7 @@ class EntityProcessorTest {
                 data class Dept(
                     @KmVersion val aaa: Int,
                     @KmVersion val bbb: Int
-                )
+                ) { companion object }
                 """
             )
         )
@@ -399,7 +399,7 @@ class EntityProcessorTest {
                 data class Dept(
                     @KmCreatedAt val aaa: LocalDateTime,
                     @KmCreatedAt val bbb: LocalDateTime
-                )
+                ) { companion object }
                 """
             )
         )
@@ -419,7 +419,7 @@ class EntityProcessorTest {
                 data class Dept(
                     @KmUpdatedAt val aaa: LocalDateTime,
                     @KmUpdatedAt val bbb: LocalDateTime
-                )
+                ) { companion object }
                 """
             )
         )
@@ -439,7 +439,7 @@ class EntityProcessorTest {
                 data class Dept(
                     @KmIgnore val aaa: Int = 0,
                     @KmIgnore val bbb: Int = 0
-                )
+                ) { companion object }
                 """
             )
         )
@@ -458,7 +458,7 @@ class EntityProcessorTest {
                 @KmEntity
                 data class Dept(
                     private val aaa: Int
-                )
+                ) { companion object }
                 """
             )
         )
@@ -477,7 +477,7 @@ class EntityProcessorTest {
                 @KmEntity
                 data class Dept(
                     @KmId @KmVersion val id: Int
-                )
+                ) { companion object }
                 """
             )
         )
@@ -496,7 +496,7 @@ class EntityProcessorTest {
                 @KmEntity
                 data class Dept(
                     @KmAutoIncrement val id: Int
-                )
+                ) { companion object }
                 """
             )
         )
@@ -515,7 +515,7 @@ class EntityProcessorTest {
                 @KmEntity
                 data class Dept(
                     @KmAutoIncrement @KmSequence("ID", 1, 100) val id: Int
-                )
+                ) { companion object }
                 """
             )
         )
@@ -535,7 +535,7 @@ class EntityProcessorTest {
                 data class Dept(
                     @KmId @KmAutoIncrement val id1: Int,
                     @KmId @KmSequence("ID", 1, 100) val id2: Int
-                )
+                ) { companion object }
                 """
             )
         )
@@ -554,7 +554,7 @@ class EntityProcessorTest {
                 @KmEntity
                 data class Dept(
                     @KmVersion val aaa: String
-                )
+                ) { companion object }
                 """
             )
         )
@@ -577,7 +577,7 @@ class EntityProcessorTest {
                 @KmEntity
                 data class Dept(
                     @KmVersion val version: MyVersion
-                )
+                ) { companion object }
                 """
             )
         )
@@ -599,7 +599,7 @@ class EntityProcessorTest {
                 @KmEntity
                 data class Dept(
                     @KmCreatedAt val aaa: String
-                )
+                ) { companion object }
                 """
             )
         )
@@ -622,7 +622,7 @@ class EntityProcessorTest {
                 @KmEntity
                 data class Dept(
                     @KmCreatedAt val dataTime: MyDateTime
-                )
+                ) { companion object }
                 """
             )
         )
@@ -644,7 +644,7 @@ class EntityProcessorTest {
                 @KmEntity
                 data class Dept(
                     @KmUpdatedAt val aaa: String
-                )
+                ) { companion object }
                 """
             )
         )
@@ -667,7 +667,7 @@ class EntityProcessorTest {
                 @KmEntity
                 data class Dept(
                     @KmUpdatedAt val dataTime: MyDateTime
-                )
+                ) { companion object }
                 """
             )
         )
@@ -689,7 +689,7 @@ class EntityProcessorTest {
                 @KmEntity
                 data class Dept(
                     @KmIgnore val aaa: String
-                )
+                ) { companion object }
                 """
             )
         )
@@ -708,7 +708,7 @@ class EntityProcessorTest {
                 @KmEntity
                 data class Dept(
                     @KmId @KmAutoIncrement val id: String
-                )
+                ) { companion object }
                 """
             )
         )
@@ -727,7 +727,7 @@ class EntityProcessorTest {
                 @KmEntity
                 data class Dept(
                     @KmId @KmSequence("ID", 1, 100) val id: String
-                )
+                ) { companion object }
                 """
             )
         )
@@ -750,7 +750,7 @@ class EntityProcessorTest {
                 @KmEntity
                 data class Dept(
                     @KmId @KmAutoIncrement val id: MyId
-                )
+                ) { companion object }
                 """
             )
         )
@@ -773,7 +773,7 @@ class EntityProcessorTest {
                 @KmEntity
                 data class Dept(
                     @KmId @KmSequence("my_seq") val id: MyId
-                )
+                ) { companion object }
                 """
             )
         )
@@ -795,7 +795,7 @@ class EntityProcessorTest {
                 @KmEntity
                 data class Dept(
                     @KmId @KmSequence() val id: Int
-                )
+                ) { companion object }
                 """
             )
         )
@@ -817,7 +817,7 @@ class EntityProcessorTest {
                 data class Dept(
                     @KmId val id: Int,
                     val name: Name,
-                )
+                ) { companion object }
                 """
             )
         )
@@ -839,7 +839,7 @@ class EntityProcessorTest {
                 data class Dept(
                     @KmId val id: Int,
                     val name: Name,
-                )
+                ) { companion object }
                 """
             )
         )

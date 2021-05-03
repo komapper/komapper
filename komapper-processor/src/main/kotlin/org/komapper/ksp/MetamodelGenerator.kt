@@ -73,7 +73,7 @@ internal class EntityMetamodelGenerator(
         postUpdate()
 
         newEntity()
-        newMetamodel()
+        newMeta()
 
         companionObject()
 
@@ -288,29 +288,29 @@ internal class EntityMetamodelGenerator(
         w.println("    override fun newEntity(m: Map<$PropertyMetamodel<*, *, *>, Any?>) = $entityTypeName($argList)")
     }
 
-    private fun newMetamodel() {
+    private fun newMeta() {
         val paramList = "table: String, catalog: String, schema: String, alwaysQuote: Boolean"
-        w.println("    override fun newMetamodel($paramList) = $simpleName(table, catalog, schema, alwaysQuote)")
+        w.println("    override fun newMeta($paramList) = $simpleName(table, catalog, schema, alwaysQuote)")
     }
 
     private fun companionObject() {
         w.println("    companion object {")
-        w.println("        val alias = $simpleName()")
-        w.println("        fun newAlias($constructorParamList) = $simpleName(table, catalog, schema, alwaysQuote)")
+        w.println("        val meta = $simpleName()")
+        w.println("        fun newMeta($constructorParamList) = $simpleName(table, catalog, schema, alwaysQuote)")
         w.println("    }")
     }
 
     private fun utils() {
-        if (entity.declaration.hasCompanionObject()) {
-            w.println("")
-            w.println("val $entityTypeName.Companion.alias get() = $simpleName.alias")
-            w.println("fun $entityTypeName.Companion.newAlias($constructorParamList) = $simpleName.newAlias(table, catalog, schema, alwaysQuote)")
-        }
+        val companionObjectName = (entity.companionObject.qualifiedName ?: entity.companionObject.simpleName).asString()
+        w.println("")
+        w.println("val $companionObjectName.meta get() = $simpleName.meta")
+        w.println("fun $companionObjectName.newMeta($constructorParamList) = $simpleName.newMeta(table, catalog, schema, alwaysQuote)")
     }
 }
 
 internal class EntityMetamodelStubGenerator(
-    private val classDeclaration: KSClassDeclaration,
+    private val defDeclaration: KSClassDeclaration,
+    private val declaration: KSClassDeclaration,
     private val packageName: String,
     private val simpleQualifiedName: String,
     private val fileName: String,
@@ -330,7 +330,7 @@ internal class EntityMetamodelStubGenerator(
         w.println("@Suppress(\"ClassName\")")
         w.println("@$EntityMetamodelImplementor")
         w.println("class $fileName : $EntityMetamodelStub<$simpleQualifiedName, $fileName>() {")
-        val parameters = classDeclaration.primaryConstructor?.parameters
+        val parameters = declaration.primaryConstructor?.parameters
         if (parameters != null) {
             for (p in parameters) {
                 val typeName = p.type.resolve().declaration.qualifiedName?.asString()
@@ -338,14 +338,16 @@ internal class EntityMetamodelStubGenerator(
             }
         }
         w.println("    companion object {")
-        w.println("        val alias = $fileName()")
-        w.println("        fun newAlias($constructorParamList) = $fileName()")
+        w.println("        val meta = $fileName()")
+        w.println("        fun newMeta($constructorParamList) = $fileName()")
         w.println("    }")
         w.println("}")
-        if (classDeclaration.hasCompanionObject()) {
+        val companionObject = defDeclaration.getCompanionObject()
+        if (companionObject != null) {
+            val companionObjectName = (companionObject.qualifiedName ?: companionObject.simpleName).asString()
             w.println("")
-            w.println("val $simpleQualifiedName.Companion.alias get() = $fileName.alias")
-            w.println("fun $simpleQualifiedName.Companion.newAlias($constructorParamList) = $fileName.newAlias(table, catalog, schema, alwaysQuote)")
+            w.println("val $companionObjectName.meta get() = $fileName.meta")
+            w.println("fun $companionObjectName.newMeta($constructorParamList) = $fileName.newMeta(table, catalog, schema, alwaysQuote)")
         }
     }
 }

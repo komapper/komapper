@@ -16,6 +16,7 @@ internal data class EntityDef(
     val definitionSource: EntityDefinitionSource,
     val table: Table,
     val properties: List<PropertyDef>,
+    val companionObject: KSClassDeclaration
 )
 
 internal data class PropertyDef(
@@ -33,6 +34,7 @@ internal data class Entity(
     val versionProperty: Property?,
     val createdAtProperty: Property?,
     val updatedAtProperty: Property?,
+    val companionObject: KSClassDeclaration
 )
 
 internal data class Property(

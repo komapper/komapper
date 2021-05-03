@@ -15,7 +15,7 @@ class EntityDeleteBatchQueryTest(private val db: Database) {
 
     @Test
     fun test() {
-        val a = Address.alias
+        val a = Address.meta
         val addressList = listOf(
             Address(16, "STREET 16", 0),
             Address(17, "STREET 17", 0),
@@ -32,7 +32,7 @@ class EntityDeleteBatchQueryTest(private val db: Database) {
 
     @Test
     fun optimisticLockException() {
-        val a = Address.alias
+        val a = Address.meta
         val addressList = listOf(
             Address(16, "STREET 16", 0),
             Address(17, "STREET 17", 0),
@@ -59,7 +59,7 @@ class EntityDeleteBatchQueryTest(private val db: Database) {
 
     @Test
     fun suppressOptimisticLockException() {
-        val a = Address.alias
+        val a = Address.meta
         val addressList = listOf(
             Address(16, "STREET 16", 0),
             Address(17, "STREET 17", 0),

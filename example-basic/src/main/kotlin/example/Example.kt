@@ -22,19 +22,18 @@ data class Address(
     val version: Int = 0,
     val createdAt: LocalDateTime? = null,
     val updatedAt: LocalDateTime? = null,
-) {
-    companion object
-}
+)
 
-@Suppress("unused")
 @KmEntityDef(Address::class)
-private data class AddressDef(
+data class AddressDef(
     @KmId @KmAutoIncrement @KmColumn(name = "ADDRESS_ID")
     val id: Nothing,
     @KmVersion val version: Nothing,
     @KmCreatedAt val createdAt: Nothing,
     @KmUpdatedAt val updatedAt: Nothing,
-)
+) {
+    companion object
+}
 
 val logger: Logger = LoggerFactory.getLogger("example")
 
@@ -43,7 +42,7 @@ fun main() {
     val db = Database.create("jdbc:h2:mem:example;DB_CLOSE_DELAY=-1")
 
     // get a metamodel
-    val a = Address.alias
+    val a = AddressDef.meta
 
     // execute simple CRUD operations as a transaction
     db.transaction {

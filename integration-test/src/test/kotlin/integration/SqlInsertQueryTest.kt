@@ -16,7 +16,7 @@ class SqlInsertQueryTest(private val db: Database) {
 
     @Test
     fun test() {
-        val a = Address.alias
+        val a = Address.meta
         val (count, key) = db.runQuery {
             SqlDsl.insert(a).values {
                 a.addressId set 19
@@ -30,7 +30,7 @@ class SqlInsertQueryTest(private val db: Database) {
 
     @Test
     fun setIfNotNull() {
-        val e = Employee.alias
+        val e = Employee.meta
         val (count, key) = db.runQuery {
             SqlDsl.insert(e).values {
                 e.employeeId set 99
@@ -53,7 +53,7 @@ class SqlInsertQueryTest(private val db: Database) {
 
     @Test
     fun generatedKeys() {
-        val a = IdentityStrategy.alias
+        val a = IdentityStrategy.meta
         val (count, key) = db.runQuery {
             SqlDsl.insert(a).values {
                 a.id set 10
@@ -66,8 +66,8 @@ class SqlInsertQueryTest(private val db: Database) {
 
     @Test
     fun select() {
-        val a = Address.alias
-        val aa = Address.newAlias(table = "ADDRESS_ARCHIVE")
+        val a = Address.meta
+        val aa = Address.newMeta(table = "ADDRESS_ARCHIVE")
         val (count) = db.runQuery {
             SqlDsl.insert(aa).select {
                 SqlDsl.from(a).where { a.addressId between 1..5 }

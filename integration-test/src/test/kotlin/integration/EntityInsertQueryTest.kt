@@ -23,7 +23,7 @@ class EntityInsertQueryTest(private val db: Database) {
 
     @Test
     fun test() {
-        val a = Address.alias
+        val a = Address.meta
         val address = Address(16, "STREET 16", 0)
         db.runQuery { EntityDsl.insert(a).single(address) }
         val address2 = db.runQuery {
@@ -36,7 +36,7 @@ class EntityInsertQueryTest(private val db: Database) {
 
     @Test
     fun createdAt_localDateTime() {
-        val p = Person.alias
+        val p = Person.meta
         val person1 = Person(1, "ABC")
         val id = db.runQuery { EntityDsl.insert(p).single(person1) }.personId
         val person2 = db.runQuery { EntityDsl.from(p).first { p.personId eq id } }
@@ -54,7 +54,7 @@ class EntityInsertQueryTest(private val db: Database) {
     @Run(unless = [Dbms.POSTGRESQL])
     @Test
     fun createdAt_offsetDateTime() {
-        val h = Human.alias
+        val h = Human.meta
         val human1 = Human(1, "ABC")
         val id = db.runQuery { EntityDsl.insert(h).single(human1) }.humanId
         val human2 = db.runQuery { EntityDsl.from(h).first { h.humanId eq id } }
@@ -74,7 +74,7 @@ class EntityInsertQueryTest(private val db: Database) {
         val instant = Instant.parse("2021-01-01T00:00:00Z")
         val zoneId = ZoneId.of("UTC")
 
-        val p = Person.alias
+        val p = Person.meta
         val config = object : DatabaseConfig by db.config {
             override val clockProvider = ClockProvider {
                 Clock.fixed(instant, zoneId)
@@ -96,7 +96,7 @@ class EntityInsertQueryTest(private val db: Database) {
 
     @Test
     fun uniqueConstraintException() {
-        val a = Address.alias
+        val a = Address.meta
         val address = Address(1, "STREET 1", 0)
         assertThrows<UniqueConstraintException> {
             db.runQuery { EntityDsl.insert(a).single(address) }.let { }
@@ -106,7 +106,7 @@ class EntityInsertQueryTest(private val db: Database) {
     @Test
     fun identityGenerator() {
         for (i in 1..201) {
-            val m = IdentityStrategy.alias
+            val m = IdentityStrategy.meta
             val strategy = IdentityStrategy(0, "test")
             val result = db.runQuery { EntityDsl.insert(m).single(strategy) }
             assertEquals(i, result.id)
@@ -117,7 +117,7 @@ class EntityInsertQueryTest(private val db: Database) {
     @Test
     fun sequenceGenerator() {
         for (i in 1..201) {
-            val m = SequenceStrategy.alias
+            val m = SequenceStrategy.meta
             val strategy = SequenceStrategy(0, "test")
             val result = db.runQuery { EntityDsl.insert(m).single(strategy) }
             assertEquals(i, result.id)
@@ -127,7 +127,7 @@ class EntityInsertQueryTest(private val db: Database) {
     @Run(unless = [Dbms.MYSQL])
     @Test
     fun sequenceGenerator_disableSequenceAssignment() {
-        val m = SequenceStrategy.alias
+        val m = SequenceStrategy.meta
         val strategy = SequenceStrategy(50, "test")
         val result = db.runQuery {
             EntityDsl.insert(m).option {
@@ -139,7 +139,7 @@ class EntityInsertQueryTest(private val db: Database) {
 
     @Test
     fun onDuplicateKeyUpdate_insert() {
-        val d = Department.alias
+        val d = Department.meta
         val department = Department(5, 50, "PLANNING", "TOKYO", 0)
         val query = EntityDsl.insert(d).onDuplicateKeyUpdate().single(department)
         val count = db.runQuery { query }
@@ -150,7 +150,7 @@ class EntityInsertQueryTest(private val db: Database) {
 
     @Test
     fun onDuplicateKeyUpdateWithKeys_insert() {
-        val d = Department.alias
+        val d = Department.meta
         val department = Department(5, 50, "PLANNING", "TOKYO", 0)
         val query = EntityDsl.insert(d).onDuplicateKeyUpdate(d.departmentNo).single(department)
         val count = db.runQuery { query }
@@ -161,7 +161,7 @@ class EntityInsertQueryTest(private val db: Database) {
 
     @Test
     fun onDuplicateKeyUpdate_update() {
-        val d = Department.alias
+        val d = Department.meta
         val department = Department(1, 50, "PLANNING", "TOKYO", 10)
         val query = EntityDsl.insert(d).onDuplicateKeyUpdate().single(department)
         val count = db.runQuery { query }
@@ -179,7 +179,7 @@ class EntityInsertQueryTest(private val db: Database) {
 
     @Test
     fun onDuplicateKeyUpdateWithKeys_update() {
-        val d = Department.alias
+        val d = Department.meta
         val department = Department(6, 10, "PLANNING", "TOKYO", 10)
         val query = EntityDsl.insert(d).onDuplicateKeyUpdate(d.departmentNo).single(department)
         val count = db.runQuery { query }
@@ -198,7 +198,7 @@ class EntityInsertQueryTest(private val db: Database) {
 
     @Test
     fun onDuplicateKeyUpdate_update_set() {
-        val d = Department.alias
+        val d = Department.meta
         val department = Department(1, 50, "PLANNING", "TOKYO", 10)
         val query = EntityDsl.insert(d).onDuplicateKeyUpdate().set { excluded ->
             d.departmentName set "PLANNING2"
@@ -219,7 +219,7 @@ class EntityInsertQueryTest(private val db: Database) {
 
     @Test
     fun onDuplicateKeyUpdateWithKey_update_set() {
-        val d = Department.alias
+        val d = Department.meta
         val department = Department(5, 10, "PLANNING", "TOKYO", 10)
         val query = EntityDsl.insert(d)
             .onDuplicateKeyUpdate(d.departmentNo)
@@ -242,7 +242,7 @@ class EntityInsertQueryTest(private val db: Database) {
 
     @Test
     fun onDuplicateKeyIgnore() {
-        val a = Address.alias
+        val a = Address.meta
         val address = Address(1, "STREET 100", 0)
         val query = EntityDsl.insert(a).onDuplicateKeyIgnore().single(address)
         val count = db.runQuery { query }
@@ -251,7 +251,7 @@ class EntityInsertQueryTest(private val db: Database) {
 
     @Test
     fun onDuplicateKeyIgnoreWithKey() {
-        val a = Address.alias
+        val a = Address.meta
         val address = Address(100, "STREET 1", 0)
         val query = EntityDsl.insert(a).onDuplicateKeyIgnore(a.street).single(address)
         val count = db.runQuery { query }
@@ -260,7 +260,7 @@ class EntityInsertQueryTest(private val db: Database) {
 
     @Test
     fun onDuplicateKeyIgnoreWithKeys() {
-        val a = Address.alias
+        val a = Address.meta
         val address = Address(100, "STREET 1", 0)
         val query = EntityDsl.insert(a).onDuplicateKeyIgnore(a.street).single(address)
         val count = db.runQuery { query }

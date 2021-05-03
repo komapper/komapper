@@ -25,7 +25,7 @@ class EntityUpdateQueryTest(private val db: Database) {
 
     @Test
     fun test() {
-        val a = Address.alias
+        val a = Address.meta
         val query = EntityDsl.from(a).where { a.addressId eq 15 }
         val address = db.runQuery { query.first() }
         val newAddress = address.copy(street = "NY street")
@@ -43,7 +43,7 @@ class EntityUpdateQueryTest(private val db: Database) {
 
     @Test
     fun updatedAt() {
-        val p = Person.alias
+        val p = Person.meta
         val findQuery = EntityDsl.from(p).first { p.personId eq 1 }
         val person1 = Person(1, "ABC")
         val person2 = db.runQuery {
@@ -62,7 +62,7 @@ class EntityUpdateQueryTest(private val db: Database) {
         val instant = Instant.parse("2021-01-01T00:00:00Z")
         val zoneId = ZoneId.of("UTC")
 
-        val p = Person.alias
+        val p = Person.meta
         val person1 = Person(1, "ABC")
         db.runQuery { EntityDsl.insert(p).single(person1) }
         val person2 = db.runQuery {
@@ -87,7 +87,7 @@ class EntityUpdateQueryTest(private val db: Database) {
 
     @Test
     fun uniqueConstraintException() {
-        val a = Address.alias
+        val a = Address.meta
         val address = Address(1, "STREET 2", 1)
         assertThrows<UniqueConstraintException> {
             db.runQuery { EntityDsl.update(a).single(address) }.let { }
@@ -96,7 +96,7 @@ class EntityUpdateQueryTest(private val db: Database) {
 
     @Test
     fun optimisticLockException() {
-        val a = Address.alias
+        val a = Address.meta
         val address = db.runQuery { EntityDsl.from(a).where { a.addressId eq 15 }.first() }
         db.runQuery { EntityDsl.update(a).single(address) }
         assertThrows<OptimisticLockException> {
@@ -106,7 +106,7 @@ class EntityUpdateQueryTest(private val db: Database) {
 
     @Test
     fun include() {
-        val d = Department.alias
+        val d = Department.meta
         val findQuery = EntityDsl.from(d).first { d.departmentId eq 1 }
         val department = db.runQuery { findQuery }
         val department2 = department.copy(departmentName = "ABC", location = "DEF")
@@ -119,7 +119,7 @@ class EntityUpdateQueryTest(private val db: Database) {
 
     @Test
     fun include_emptyTargetProperties() {
-        val d = NoVersionDepartment.alias
+        val d = NoVersionDepartment.meta
         val findQuery = EntityDsl.from(d).first { d.departmentId eq 1 }
         val department = db.runQuery { findQuery }
         val department2 = department.copy(departmentName = "ABC", location = "DEF")
@@ -130,7 +130,7 @@ class EntityUpdateQueryTest(private val db: Database) {
 
     @Test
     fun exclude() {
-        val d = Department.alias
+        val d = Department.meta
         val findQuery = EntityDsl.from(d).first { d.departmentId eq 1 }
         val department = db.runQuery { findQuery }
         val department2 = department.copy(departmentName = "ABC", location = "DEF")
@@ -143,7 +143,7 @@ class EntityUpdateQueryTest(private val db: Database) {
 
     @Test
     fun exclude_emptyTargetProperties() {
-        val d = NoVersionDepartment.alias
+        val d = NoVersionDepartment.meta
         val findQuery = EntityDsl.from(d).first { d.departmentId eq 1 }
         val department = db.runQuery { findQuery }
         val department2 = department.copy(departmentName = "ABC", location = "DEF")

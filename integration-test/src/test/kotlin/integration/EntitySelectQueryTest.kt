@@ -15,7 +15,7 @@ class EntitySelectQueryTest(private val db: Database) {
 
     @Test
     fun list() {
-        val a = Address.alias
+        val a = Address.meta
         val list: List<Address> = db.runQuery {
             EntityDsl.from(a).where { a.addressId eq 1 }
         }
@@ -24,7 +24,7 @@ class EntitySelectQueryTest(private val db: Database) {
 
     @Test
     fun first() {
-        val a = Address.alias
+        val a = Address.meta
         val address: Address = db.runQuery {
             EntityDsl.from(a).where { a.addressId eq 1 }.first()
         }
@@ -33,7 +33,7 @@ class EntitySelectQueryTest(private val db: Database) {
 
     @Test
     fun firstOrNull() {
-        val a = Address.alias
+        val a = Address.meta
         val address: Address? = db.runQuery {
             EntityDsl.from(a).where { a.addressId eq 99 }.firstOrNull()
         }
@@ -42,7 +42,7 @@ class EntitySelectQueryTest(private val db: Database) {
 
     @Test
     fun decoupling() {
-        val a = Address.alias
+        val a = Address.meta
         val query = EntityDsl.from(a)
             .where { a.addressId greaterEq 1 }
             .orderBy(a.addressId.desc())
@@ -60,21 +60,21 @@ class EntitySelectQueryTest(private val db: Database) {
 
     @Test
     fun shortcut_first() {
-        val a = Address.alias
+        val a = Address.meta
         val address = db.runQuery { EntityDsl.from(a).first { a.addressId eq 1 } }
         assertNotNull(address)
     }
 
     @Test
     fun shortcut_firstOrNull() {
-        val a = Address.alias
+        val a = Address.meta
         val address = db.runQuery { EntityDsl.from(a).firstOrNull { a.addressId eq -1 } }
         assertNull(address)
     }
 
     @Test
     fun shortcut_first_multipleCondition() {
-        val a = Address.alias
+        val a = Address.meta
         val address = db.runQuery {
             EntityDsl.from(a).first { a.addressId eq 1; a.version eq 1 }
         }

@@ -12,21 +12,21 @@ class SqlSelectQueryOffsetLimitTest(private val db: Database) {
 
     @Test
     fun offset() {
-        val a = Address.alias
+        val a = Address.meta
         val list = db.runQuery { SqlDsl.from(a).offset(10) }
         assertEquals(5, list.size)
     }
 
     @Test
     fun limit() {
-        val a = Address.alias
+        val a = Address.meta
         val list = db.runQuery { SqlDsl.from(a).limit(3) }
         assertEquals(3, list.size)
     }
 
     @Test
     fun offset_limit() {
-        val a = Address.alias
+        val a = Address.meta
         val list = db.runQuery {
             SqlDsl.from(a)
                 .orderBy(a.addressId)

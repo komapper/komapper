@@ -16,7 +16,7 @@ class QueryTest(private val db: Database) {
 
     @Test
     fun plus() {
-        val a = Address.alias
+        val a = Address.meta
         val address = Address(16, "STREET 16", 0)
         val q1 = EntityDsl.insert(a).single(address)
         val q2 = SqlDsl.insert(a).values {
@@ -32,11 +32,11 @@ class QueryTest(private val db: Database) {
 
     @Test
     fun flatMap() {
-        val a = Address.alias
+        val a = Address.meta
         val address = Address(16, "STREET 16", 0)
         val query = EntityDsl.insert(a).single(address).flatMap {
             val addressId = it.addressId
-            val e = Employee.alias
+            val e = Employee.meta
             EntityDsl.from(e).where { e.addressId less addressId }
         }
         val list = db.runQuery { query }
@@ -45,11 +45,11 @@ class QueryTest(private val db: Database) {
 
     @Test
     fun flatZip() {
-        val a = Address.alias
+        val a = Address.meta
         val address = Address(16, "STREET 16", 0)
         val query = EntityDsl.insert(a).single(address).flatZip {
             val addressId = it.addressId
-            val e = Employee.alias
+            val e = Employee.meta
             EntityDsl.from(e).where { e.addressId less addressId }
         }
         val (newAddress, list) = db.runQuery { query }

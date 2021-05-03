@@ -1,6 +1,7 @@
 package org.komapper.ksp
 
 import com.google.devtools.ksp.getDeclaredProperties
+import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSValueParameter
 
 internal class EntityDefFactory(
@@ -13,7 +14,8 @@ internal class EntityDefFactory(
     fun create(): EntityDef {
         val table = getTable()
         val allProperties = createAllProperties()
-        return EntityDef(definitionSource, table, allProperties)
+        val companionObject = getCompanionObject()
+        return EntityDef(definitionSource, table, allProperties, companionObject)
     }
 
     private fun getTable(): Table {
@@ -119,5 +121,10 @@ internal class EntityDefFactory(
                 report("${idKind.annotation} and @KmId must coexist on the same property.", parameter)
             }
         }
+    }
+
+    private fun getCompanionObject(): KSClassDeclaration {
+        return defDeclaration.getCompanionObject()
+            ?: report("Define a companion object in the class.", defDeclaration)
     }
 }

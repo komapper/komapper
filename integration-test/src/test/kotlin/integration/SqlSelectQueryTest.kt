@@ -18,7 +18,7 @@ class SqlSelectQueryTest(private val db: Database) {
 
     @Test
     fun list() {
-        val a = Address.alias
+        val a = Address.meta
         val list: List<Address> = db.runQuery {
             SqlDsl.from(a)
         }
@@ -27,7 +27,7 @@ class SqlSelectQueryTest(private val db: Database) {
 
     @Test
     fun first() {
-        val a = Address.alias
+        val a = Address.meta
         val address: Address = db.runQuery {
             SqlDsl.from(a).where { a.addressId eq 1 }.first()
         }
@@ -36,7 +36,7 @@ class SqlSelectQueryTest(private val db: Database) {
 
     @Test
     fun firstOrNull() {
-        val a = Address.alias
+        val a = Address.meta
         val address: Address? = db.runQuery {
             SqlDsl.from(a).where { a.addressId eq 99 }.firstOrNull()
         }
@@ -45,7 +45,7 @@ class SqlSelectQueryTest(private val db: Database) {
 
     @Test
     fun collect() {
-        val a = Address.alias
+        val a = Address.meta
         val count = db.runQuery {
             SqlDsl.from(a).collect { it.count() }
         }
@@ -54,7 +54,7 @@ class SqlSelectQueryTest(private val db: Database) {
 
     @Test
     fun option() {
-        val e = Employee.alias
+        val e = Employee.meta
         val emp = db.runQuery {
             SqlDsl.from(e)
                 .option {
@@ -74,21 +74,21 @@ class SqlSelectQueryTest(private val db: Database) {
 
     @Test
     fun shortcut_first() {
-        val a = Address.alias
+        val a = Address.meta
         val address = db.runQuery { SqlDsl.from(a).first { a.addressId eq 1 } }
         assertNotNull(address)
     }
 
     @Test
     fun shortcut_firstOrNull() {
-        val a = Address.alias
+        val a = Address.meta
         val address = db.runQuery { SqlDsl.from(a).firstOrNull { a.addressId eq -1 } }
         assertNull(address)
     }
 
     @Test
     fun shortcut_first_multipleCondition() {
-        val a = Address.alias
+        val a = Address.meta
         val address = db.runQuery {
             SqlDsl.from(a).first { a.addressId eq 1; a.version eq 1 }
         }
@@ -97,7 +97,7 @@ class SqlSelectQueryTest(private val db: Database) {
 
     @Test
     fun caseExpression() {
-        val a = Address.alias
+        val a = Address.meta
         val caseExpression = case(
             When(
                 { a.street eq "STREET 2"; a.addressId greater 1 },
@@ -117,7 +117,7 @@ class SqlSelectQueryTest(private val db: Database) {
 
     @Test
     fun caseExpression_multipleWhen() {
-        val a = Address.alias
+        val a = Address.meta
         val caseExpression = case(
             When(
                 { a.street eq "STREET 2"; a.addressId greater 1 },
@@ -141,7 +141,7 @@ class SqlSelectQueryTest(private val db: Database) {
 
     @Test
     fun caseExpression_otherwiseNotSpecified() {
-        val a = Address.alias
+        val a = Address.meta
         val caseExpression = case(
             When(
                 { a.street eq "STREET 2"; a.addressId greater 1 },

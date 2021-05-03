@@ -14,8 +14,8 @@ class SqlSelectQuerySubqueryTest(private val db: Database) {
 
     @Test
     fun subquery_selectClause() {
-        val d = Department.alias
-        val e = Employee.alias
+        val d = Department.meta
+        val e = Employee.meta
         val subquery = SqlDsl.from(e).where { d.departmentId eq e.departmentId }.select(count())
         val query = SqlDsl.from(d)
             .orderBy(d.departmentId)
@@ -27,8 +27,8 @@ class SqlSelectQuerySubqueryTest(private val db: Database) {
 
     @Test
     fun subquery_whereClause() {
-        val d = Department.alias
-        val e = Employee.alias
+        val d = Department.meta
+        val e = Employee.meta
         val subquery = SqlDsl.from(d)
             .where {
                 d.departmentName eq "SALES"

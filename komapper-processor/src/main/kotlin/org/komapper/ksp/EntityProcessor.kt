@@ -13,6 +13,7 @@ class EntityProcessor : SymbolProcessor {
     private lateinit var config: Config
     private var invoked = false
 
+    @Suppress("OverridingDeprecatedMember")
     override fun init(
         options: Map<String, String>,
         kotlinVersion: KotlinVersion,
@@ -34,7 +35,7 @@ class EntityProcessor : SymbolProcessor {
         )
         for ((annotation, definitionSourceResolver) in pairs) {
             val symbols = resolver.getSymbolsWithAnnotation(annotation)
-            val analyzer = EntityAnalyzer(logger, config, definitionSourceResolver)
+            val analyzer = EntityAnalyzer(config, definitionSourceResolver)
             for (symbol in symbols) {
                 val model = when (val result = analyzer.analyze(symbol)) {
                     is EntityAnalyzerResult.Success -> result.model

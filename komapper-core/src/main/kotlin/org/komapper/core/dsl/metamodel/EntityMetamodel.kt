@@ -16,7 +16,7 @@ interface EntityMetamodel<ENTITY : Any, ID, out META : EntityMetamodel<ENTITY, I
     fun preUpdate(e: ENTITY, c: Clock): ENTITY
     fun postUpdate(e: ENTITY): ENTITY
     fun newEntity(m: Map<PropertyMetamodel<*, *, *>, Any?>): ENTITY
-    fun newMetamodel(table: String, catalog: String, schema: String, alwaysQuote: Boolean): META
+    fun newMeta(table: String, catalog: String, schema: String, alwaysQuote: Boolean): META
 }
 
 @Suppress("unused")
@@ -38,7 +38,7 @@ abstract class EntityMetamodelStub<ENTITY : Any, META : EntityMetamodelStub<ENTI
     override fun preInsert(e: ENTITY, c: Clock): ENTITY = fail()
     override fun preUpdate(e: ENTITY, c: Clock): ENTITY = fail()
     override fun postUpdate(e: ENTITY): ENTITY = fail()
-    override fun newMetamodel(table: String, catalog: String, schema: String, alwaysQuote: Boolean): META = fail()
+    override fun newMeta(table: String, catalog: String, schema: String, alwaysQuote: Boolean): META = fail()
 
     private fun fail(): Nothing {
         error("Fix google/ksp compile errors.")

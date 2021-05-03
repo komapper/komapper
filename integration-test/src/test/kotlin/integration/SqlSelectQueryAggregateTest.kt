@@ -17,7 +17,7 @@ class SqlSelectQueryAggregateTest(private val db: Database) {
 
     @Test
     fun aggregate_avg() {
-        val a = Address.alias
+        val a = Address.meta
         val avg = db.runQuery {
             SqlDsl.from(a).select(avg(a.addressId)).first()
         }
@@ -26,7 +26,7 @@ class SqlSelectQueryAggregateTest(private val db: Database) {
 
     @Test
     fun aggregate_countAsterisk() {
-        val a = Address.alias
+        val a = Address.meta
         val count = db.runQuery {
             SqlDsl.from(a).select(count()).first()
         }
@@ -35,7 +35,7 @@ class SqlSelectQueryAggregateTest(private val db: Database) {
 
     @Test
     fun aggregate_count() {
-        val a = Address.alias
+        val a = Address.meta
         val count = db.runQuery {
             SqlDsl.from(a).select(count(a.street)).first()
         }
@@ -44,28 +44,28 @@ class SqlSelectQueryAggregateTest(private val db: Database) {
 
     @Test
     fun aggregate_sum() {
-        val a = Address.alias
+        val a = Address.meta
         val sum = db.runQuery { SqlDsl.from(a).select(sum(a.addressId)).first() }
         assertEquals(120, sum)
     }
 
     @Test
     fun aggregate_max() {
-        val a = Address.alias
+        val a = Address.meta
         val max = db.runQuery { SqlDsl.from(a).select(max(a.addressId)).first() }
         assertEquals(15, max)
     }
 
     @Test
     fun aggregate_min() {
-        val a = Address.alias
+        val a = Address.meta
         val min = db.runQuery { SqlDsl.from(a).select(min(a.addressId)).first() }
         assertEquals(1, min)
     }
 
     @Test
     fun having() {
-        val e = Employee.alias
+        val e = Employee.meta
         val list = db.runQuery {
             SqlDsl.from(e)
                 .groupBy(e.departmentId)
@@ -80,7 +80,7 @@ class SqlSelectQueryAggregateTest(private val db: Database) {
 
     @Test
     fun having_empty_groupBy() {
-        val e = Employee.alias
+        val e = Employee.meta
         val list = db.runQuery {
             SqlDsl.from(e)
                 .having {

@@ -17,7 +17,7 @@ class EntityUpdateBatchQueryTest(private val db: Database) {
 
     @Test
     fun test() {
-        val a = Address.alias
+        val a = Address.meta
         val addressList = listOf(
             Address(16, "STREET 16", 0),
             Address(17, "STREET 17", 0),
@@ -41,7 +41,7 @@ class EntityUpdateBatchQueryTest(private val db: Database) {
 
     @Test
     fun updatedAt() {
-        val p = Person.alias
+        val p = Person.meta
         val personList = listOf(
             Person(1, "A"),
             Person(2, "B"),
@@ -57,7 +57,7 @@ class EntityUpdateBatchQueryTest(private val db: Database) {
 
     @Test
     fun uniqueConstraintException() {
-        val a = Address.alias
+        val a = Address.meta
         assertThrows<UniqueConstraintException> {
             db.runQuery {
                 EntityDsl.update(a).batch(
@@ -73,7 +73,7 @@ class EntityUpdateBatchQueryTest(private val db: Database) {
 
     @Test
     fun optimisticLockException() {
-        val a = Address.alias
+        val a = Address.meta
         val ex = assertThrows<OptimisticLockException> {
             db.runQuery {
                 EntityDsl.update(a).batch(
@@ -90,7 +90,7 @@ class EntityUpdateBatchQueryTest(private val db: Database) {
 
     @Test
     fun include() {
-        val d = Department.alias
+        val d = Department.meta
         val selectQuery = EntityDsl.from(d).where { d.departmentId inList listOf(1, 2) }
         val before = db.runQuery { selectQuery }
         val updateList = before.map {
@@ -112,7 +112,7 @@ class EntityUpdateBatchQueryTest(private val db: Database) {
 
     @Test
     fun exclude() {
-        val d = Department.alias
+        val d = Department.meta
         val selectQuery = EntityDsl.from(d).where { d.departmentId inList listOf(1, 2) }
         val before = db.runQuery { selectQuery }
         val updateList = before.map {

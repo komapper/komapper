@@ -22,7 +22,7 @@ class ValueClassTest(val db: Database) {
 
     @Test
     fun list() {
-        val a = VAddress.alias
+        val a = VAddress.meta
         val list: List<VAddress> = db.runQuery {
             EntityDsl.from(a).where { a.addressId eq IntId(1) }
         }
@@ -32,7 +32,7 @@ class ValueClassTest(val db: Database) {
 
     @Test
     fun first() {
-        val a = VAddress.alias
+        val a = VAddress.meta
         val address: VAddress = db.runQuery {
             EntityDsl.from(a).where { a.addressId eq IntId(1) }.first()
         }
@@ -42,7 +42,7 @@ class ValueClassTest(val db: Database) {
 
     @Test
     fun insert() {
-        val a = VAddress.alias
+        val a = VAddress.meta
         val address = VAddress(IntId(16), Street("STREET 16"), Version(0))
         db.runQuery { EntityDsl.insert(a).single(address) }
         val address2 = db.runQuery {
@@ -55,7 +55,7 @@ class ValueClassTest(val db: Database) {
 
     @Test
     fun insert_timestamp() {
-        val p = VPerson.alias
+        val p = VPerson.meta
         val person1 = VPerson(IntId(1), "ABC")
         val id = db.runQuery { EntityDsl.insert(p).single(person1) }.personId
         val person2 = db.runQuery { EntityDsl.from(p).first { p.personId eq id } }
@@ -72,7 +72,7 @@ class ValueClassTest(val db: Database) {
 
     @Test
     fun update() {
-        val a = VAddress.alias
+        val a = VAddress.meta
         val query = EntityDsl.from(a).where { a.addressId eq IntId(15) }
         val address = db.runQuery { query.first() }
         val newAddress = address.copy(street = Street("NY street"))
@@ -90,7 +90,7 @@ class ValueClassTest(val db: Database) {
 
     @Test
     fun updated_timestamp() {
-        val p = VPerson.alias
+        val p = VPerson.meta
         val findQuery = EntityDsl.from(p).first { p.personId eq IntId(1) }
         val person1 = VPerson(IntId(1), "ABC")
         val person2 = db.runQuery {
@@ -106,7 +106,7 @@ class ValueClassTest(val db: Database) {
 
     @Test
     fun delete() {
-        val a = VAddress.alias
+        val a = VAddress.meta
         val query = EntityDsl.from(a).where { a.addressId eq IntId(15) }
         val address = db.runQuery { query.first() }
         db.runQuery { EntityDsl.delete(a).single(address) }
@@ -116,7 +116,7 @@ class ValueClassTest(val db: Database) {
     @Test
     fun identityGenerator() {
         for (i in 1..201) {
-            val m = VIdentityStrategy.alias
+            val m = VIdentityStrategy.meta
             val strategy = VIdentityStrategy(IntId(0), "test")
             val result = db.runQuery { EntityDsl.insert(m).single(strategy) }
             assertEquals(IntId(i), result.id)
@@ -127,7 +127,7 @@ class ValueClassTest(val db: Database) {
     @Test
     fun sequenceGenerator() {
         for (i in 1..201) {
-            val m = VSequenceStrategy.alias
+            val m = VSequenceStrategy.meta
             val strategy = VSequenceStrategy(IntId(0), "test")
             val result = db.runQuery { EntityDsl.insert(m).single(strategy) }
             assertEquals(IntId(i), result.id)
@@ -136,7 +136,7 @@ class ValueClassTest(val db: Database) {
 
     @Test
     fun inList2() {
-        val a = VAddress.alias
+        val a = VAddress.meta
         val list: List<VAddress> = db.runQuery {
             EntityDsl.from(a).where { (a.addressId to a.street) inList2 listOf(IntId(1) to Street("STREET 1")) }
         }
@@ -145,7 +145,7 @@ class ValueClassTest(val db: Database) {
 
     @Test
     fun endsWith() {
-        val a = VAddress.alias
+        val a = VAddress.meta
         val list = db.runQuery {
             EntityDsl.from(a).where { a.street endsWith "1" }
         }
@@ -155,7 +155,7 @@ class ValueClassTest(val db: Database) {
 
     @Test
     fun between() {
-        val a = VAddress.alias
+        val a = VAddress.meta
         val list = db.runQuery {
             EntityDsl.from(a)
                 .where { a.addressId between IntId(6)..IntId(10) }
@@ -167,7 +167,7 @@ class ValueClassTest(val db: Database) {
 
     @Test
     fun notBetween() {
-        val a = VAddress.alias
+        val a = VAddress.meta
         val list = db.runQuery {
             EntityDsl.from(a)
                 .where { a.addressId notBetween IntId(6)..IntId(10) }
@@ -179,7 +179,7 @@ class ValueClassTest(val db: Database) {
 
     @Test
     fun select_single() {
-        val a = VAddress.alias
+        val a = VAddress.meta
         val result = db.runQuery {
             SqlDsl.from(a).orderBy(a.addressId).select(a.street).first()
         }
@@ -188,7 +188,7 @@ class ValueClassTest(val db: Database) {
 
     @Test
     fun select_pair() {
-        val a = VAddress.alias
+        val a = VAddress.meta
         val result = db.runQuery {
             SqlDsl.from(a).orderBy(a.addressId).select(a.addressId, a.street).first()
         }
@@ -197,7 +197,7 @@ class ValueClassTest(val db: Database) {
 
     @Test
     fun expression_count() {
-        val a = VAddress.alias
+        val a = VAddress.meta
         val count = db.runQuery {
             SqlDsl.from(a).select(count()).first()
         }
@@ -206,7 +206,7 @@ class ValueClassTest(val db: Database) {
 
     @Test
     fun expression_max() {
-        val a = VAddress.alias
+        val a = VAddress.meta
         val max = db.runQuery {
             SqlDsl.from(a).select(max(a.addressId)).first()
         }
@@ -215,7 +215,7 @@ class ValueClassTest(val db: Database) {
 
     @Test
     fun expression_plus() {
-        val a = VAddress.alias
+        val a = VAddress.meta
         val result = db.runQuery {
             SqlDsl.from(a).orderBy(a.addressId).select(a.addressId + IntId(100)).first()
         }
@@ -224,7 +224,7 @@ class ValueClassTest(val db: Database) {
 
     @Test
     fun expression_concat() {
-        val a = VAddress.alias
+        val a = VAddress.meta
         val result = db.runQuery {
             SqlDsl.from(a).orderBy(a.addressId).select(concat(Street("["), concat(a.street, Street("]")))).first()
         }
@@ -233,7 +233,7 @@ class ValueClassTest(val db: Database) {
 
     @Test
     fun expression_case() {
-        val a = VAddress.alias
+        val a = VAddress.meta
         val caseExpression = case(
             When(
                 { a.street eq Street("STREET 2"); a.addressId greater IntId(1) },

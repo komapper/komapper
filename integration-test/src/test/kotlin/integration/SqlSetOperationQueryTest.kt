@@ -18,7 +18,7 @@ class SqlSetOperationQueryTest(private val db: Database) {
     @Run(unless = [Dbms.MYSQL])
     @Test
     fun except_entity() {
-        val e = Employee.alias
+        val e = Employee.meta
         val q1 = SqlDsl.from(e).where { e.employeeId inList listOf(1, 2, 3, 4, 5) }
         val q2 = SqlDsl.from(e).where { e.employeeId inList listOf(2, 4, 6, 8) }
         val query = (q1 except q2).orderBy(e.employeeId)
@@ -35,7 +35,7 @@ class SqlSetOperationQueryTest(private val db: Database) {
     @Run(unless = [Dbms.MYSQL])
     @Test
     fun intersect_entity() {
-        val e = Employee.alias
+        val e = Employee.meta
         val q1 = SqlDsl.from(e).where { e.employeeId inList listOf(1, 2, 3, 4, 5) }
         val q2 = SqlDsl.from(e).where { e.employeeId inList listOf(2, 4, 6, 8) }
         val query = (q1 intersect q2).orderBy(e.employeeId)
@@ -49,7 +49,7 @@ class SqlSetOperationQueryTest(private val db: Database) {
 
     @Test
     fun union_entity() {
-        val e = Employee.alias
+        val e = Employee.meta
         val q1 = SqlDsl.from(e).where { e.employeeId eq 1 }
         val q2 = SqlDsl.from(e).where { e.employeeId eq 1 }
         val q3 = EntityDsl.from(e).where { e.employeeId eq 5 }
@@ -64,7 +64,7 @@ class SqlSetOperationQueryTest(private val db: Database) {
 
     @Test
     fun union_subquery() {
-        val e = Employee.alias
+        val e = Employee.meta
         val q1 = SqlDsl.from(e).where { e.employeeId eq 1 }.select(e.employeeId)
         val q2 = SqlDsl.from(e).where { e.employeeId eq 6 }.select(e.employeeId)
         val subquery = q1 union q2
@@ -77,9 +77,9 @@ class SqlSetOperationQueryTest(private val db: Database) {
 
     @Test
     fun union_columns() {
-        val e = Employee.alias
-        val a = Address.alias
-        val d = Department.alias
+        val e = Employee.meta
+        val a = Address.meta
+        val d = Department.meta
         val q1 =
             SqlDsl.from(e).where { e.employeeId eq 1 }
                 .select(e.employeeId alias "ID", e.employeeName alias "NAME")
@@ -97,7 +97,7 @@ class SqlSetOperationQueryTest(private val db: Database) {
 
     @Test
     fun unionAll_entity() {
-        val e = Employee.alias
+        val e = Employee.meta
         val q1 = SqlDsl.from(e).where { e.employeeId eq 1 }
         val q2 = SqlDsl.from(e).where { e.employeeId eq 1 }
         val q3 = SqlDsl.from(e).where { e.employeeId eq 5 }
@@ -114,7 +114,7 @@ class SqlSetOperationQueryTest(private val db: Database) {
 
     @Test
     fun emptyWhereClause() {
-        val e = Employee.alias
+        val e = Employee.meta
         val q1 = SqlDsl.from(e).where { e.employeeId eq 1 }
         val q2 = SqlDsl.from(e)
         val query = (q1 union q2).option { it.copy(allowEmptyWhereClause = false) }

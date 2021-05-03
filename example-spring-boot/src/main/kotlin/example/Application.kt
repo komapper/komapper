@@ -22,7 +22,7 @@ class Application(private val database: Database) {
     @RequestMapping("/")
     fun list(): List<Message> {
         return database.runQuery {
-            val m = Message.alias
+            val m = MessageDef.meta
             EntityDsl.from(m).orderBy(m.id.desc())
         }
     }
@@ -31,7 +31,7 @@ class Application(private val database: Database) {
     fun add(@RequestParam text: String): Message {
         val message = Message(text = text)
         return database.runQuery {
-            val m = Message.alias
+            val m = MessageDef.meta
             EntityDsl.insert(m).single(message)
         }
     }
@@ -44,12 +44,11 @@ fun main(args: Array<String>) {
 data class Message(
     val id: Int? = null,
     val text: String
+)
+
+@KmEntityDef(Message::class)
+data class MessageDef(
+    @KmId @KmAutoIncrement val id: Nothing,
 ) {
     companion object
 }
-
-@Suppress("unused")
-@KmEntityDef(Message::class)
-private data class MessageDef(
-    @KmId @KmAutoIncrement val id: Nothing,
-)

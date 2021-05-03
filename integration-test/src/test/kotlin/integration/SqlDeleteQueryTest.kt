@@ -13,7 +13,7 @@ class SqlDeleteQueryTest(private val db: Database) {
 
     @Test
     fun test() {
-        val a = Address.alias
+        val a = Address.meta
         val count = db.runQuery {
             SqlDsl.delete(a).where { a.addressId eq 15 }
         }
@@ -22,7 +22,7 @@ class SqlDeleteQueryTest(private val db: Database) {
 
     @Test
     fun allowEmptyWhereClause_default() {
-        val e = Employee.alias
+        val e = Employee.meta
         val ex = assertThrows<IllegalStateException> {
             @Suppress("UNUSED_VARIABLE")
             val count = db.runQuery {
@@ -34,7 +34,7 @@ class SqlDeleteQueryTest(private val db: Database) {
 
     @Test
     fun allowEmptyWhereClause_true() {
-        val e = Employee.alias
+        val e = Employee.meta
         val count = db.runQuery {
             SqlDsl.delete(e).option { it.copy(allowEmptyWhereClause = true) }
         }
