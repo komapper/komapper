@@ -334,7 +334,7 @@ internal class EntityMetamodelStubGenerator(
         if (parameters != null) {
             for (p in parameters) {
                 val typeName = p.type.resolve().declaration.qualifiedName?.asString()
-                w.println("    val $p: $PropertyMetamodel<$simpleQualifiedName, $typeName> = $PropertyMetamodelStub<$simpleQualifiedName, $typeName>()")
+                w.println("    val $p: $PropertyMetamodel<$simpleQualifiedName, $typeName, $typeName> = $PropertyMetamodelStub<$simpleQualifiedName, $typeName>()")
             }
         }
         w.println("    companion object {")
