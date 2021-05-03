@@ -30,7 +30,8 @@ jobs:
               repo: "komapper",
             });
             console.log(list)
-            return list.data[0].name
+            let version = list.data[0].name
+            return version.startsWith("v") ? version.substring(1) : version
 
       - name: Assign candidate version
         if: github.event.inputs.version == null
