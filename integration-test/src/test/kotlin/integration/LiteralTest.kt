@@ -14,7 +14,7 @@ class LiteralTest(val db: Database) {
 
     @Test
     fun test_boolean() {
-        val m = BooleanTest.alias
+        val m = BooleanTest.meta
         db.runQuery {
             SqlDsl.insert(m).values {
                 m.id set 1
@@ -29,7 +29,7 @@ class LiteralTest(val db: Database) {
 
     @Test
     fun test_int() {
-        val m = IntTest.alias
+        val m = IntTest.meta
         db.runQuery {
             SqlDsl.insert(m).values {
                 m.id set 1
@@ -44,7 +44,7 @@ class LiteralTest(val db: Database) {
 
     @Test
     fun test_long() {
-        val m = LongTest.alias
+        val m = LongTest.meta
         db.runQuery {
             SqlDsl.insert(m).values {
                 m.id set 1
@@ -59,7 +59,7 @@ class LiteralTest(val db: Database) {
 
     @Test
     fun test_string() {
-        val m = StringTest.alias
+        val m = StringTest.meta
         db.runQuery {
             SqlDsl.insert(m).values {
                 m.id set 1

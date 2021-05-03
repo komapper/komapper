@@ -14,7 +14,7 @@ class EntityDeleteQueryTest(private val db: Database) {
 
     @Test
     fun optimisticLockException() {
-        val a = Address.alias
+        val a = Address.meta
         val address = db.runQuery {
             EntityDsl.from(a).first {
                 a.addressId eq 15
@@ -28,7 +28,7 @@ class EntityDeleteQueryTest(private val db: Database) {
 
     @Test
     fun testEntity() {
-        val a = Address.alias
+        val a = Address.meta
         val query = EntityDsl.from(a).where { a.addressId eq 15 }
         val address = db.runQuery { query.first() }
         db.runQuery { EntityDsl.delete(a).single(address) }

@@ -64,7 +64,7 @@ class TransactionTest {
 
     @Test
     fun select() {
-        val a = Address.alias
+        val a = Address.meta
         val list = db.transaction.required {
             db.runQuery { EntityDsl.from(a) }
         }
@@ -74,7 +74,7 @@ class TransactionTest {
 
     @Test
     fun commit() {
-        val a = Address.alias
+        val a = Address.meta
         val query = EntityDsl.from(a).where { a.addressId eq 15 }
         db.transaction.required {
             val address = db.runQuery { query.first() }
@@ -88,7 +88,7 @@ class TransactionTest {
 
     @Test
     fun rollback() {
-        val a = Address.alias
+        val a = Address.meta
         val query = EntityDsl.from(a).where { a.addressId eq 15 }
         try {
             db.transaction.required {
@@ -106,7 +106,7 @@ class TransactionTest {
 
     @Test
     fun setRollbackOnly() {
-        val a = Address.alias
+        val a = Address.meta
         val query = EntityDsl.from(a).where { a.addressId eq 15 }
         db.transaction.required {
             val address = db.runQuery { query.first() }
@@ -123,7 +123,7 @@ class TransactionTest {
 
     @Test
     fun isolationLevel() {
-        val a = Address.alias
+        val a = Address.meta
         val query = EntityDsl.from(a).where { a.addressId eq 15 }
         db.transaction.required(TransactionIsolationLevel.SERIALIZABLE) {
             val address = db.runQuery { query.first() }
@@ -137,7 +137,7 @@ class TransactionTest {
 
     @Test
     fun required_required() {
-        val a = Address.alias
+        val a = Address.meta
         val query = EntityDsl.from(a).where { a.addressId eq 15 }
         db.transaction.required {
             val address = db.runQuery { query.first() }
@@ -155,7 +155,7 @@ class TransactionTest {
 
     @Test
     fun requiresNew() {
-        val a = Address.alias
+        val a = Address.meta
         val query = EntityDsl.from(a).where { a.addressId eq 15 }
         db.transaction.requiresNew {
             val address = db.runQuery { query.first() }
@@ -171,7 +171,7 @@ class TransactionTest {
 
     @Test
     fun required_requiresNew() {
-        val a = Address.alias
+        val a = Address.meta
         val query = EntityDsl.from(a).where { a.addressId eq 15 }
         db.transaction.required {
             val address = db.runQuery { query.first() }
@@ -189,7 +189,7 @@ class TransactionTest {
 
     @Test
     fun invoke() {
-        val a = Address.alias
+        val a = Address.meta
         val query = EntityDsl.from(a).where { a.addressId eq 15 }
         db.transaction {
             val address = db.runQuery { query.first() }

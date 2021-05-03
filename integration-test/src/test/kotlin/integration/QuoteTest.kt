@@ -15,7 +15,7 @@ class QuoteTest(val db: Database) {
     @Run(onlyIf = [Dbms.H2, Dbms.POSTGRESQL])
     @Test
     fun catalogAndSchema() {
-        val m = CatalogAndSchema.alias
+        val m = CatalogAndSchema.meta
         val query = EntityDsl.from(m)
         val sql = query.dryRun()
         println(sql)
@@ -25,7 +25,7 @@ class QuoteTest(val db: Database) {
     @Run(onlyIf = [Dbms.H2, Dbms.POSTGRESQL])
     @Test
     fun catalogOnly() {
-        val m = CatalogOnly.alias
+        val m = CatalogOnly.meta
         val query = EntityDsl.from(m)
         val sql = query.dryRun()
         println(sql)
@@ -35,7 +35,7 @@ class QuoteTest(val db: Database) {
     @Run(onlyIf = [Dbms.H2, Dbms.POSTGRESQL])
     @Test
     fun schemaOnly() {
-        val m = SchemaOnly.alias
+        val m = SchemaOnly.meta
         val query = EntityDsl.from(m)
         val sql = query.dryRun()
         println(sql)
@@ -45,7 +45,7 @@ class QuoteTest(val db: Database) {
     @Run(onlyIf = [Dbms.H2, Dbms.POSTGRESQL])
     @Test
     fun blankName() {
-        val m = BlankName.alias
+        val m = BlankName.meta
         val query = EntityDsl.from(m)
         val sql = query.dryRun()
         println(sql)
@@ -55,7 +55,7 @@ class QuoteTest(val db: Database) {
 
     @Test
     fun alwaysQuote() {
-        val m = Order.alias
+        val m = Order.meta
         db.runQuery { EntityDsl.insert(m).single(Order(1, "value")) }
         val list = db.runQuery { EntityDsl.from(m) }
         assertEquals(1, list.size)

@@ -13,7 +13,7 @@ class SqlSelectQueryForUpdateTest(private val db: Database) {
 
     @Test
     fun forUpdate() {
-        val a = Address.alias
+        val a = Address.meta
         val list = db.runQuery {
             SqlDsl.from(a).where { a.addressId greaterEq 1 }
                 .orderBy(a.addressId.desc())

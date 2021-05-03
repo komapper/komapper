@@ -16,7 +16,7 @@ class EntityInsertBatchQueryTest(private val db: Database) {
 
     @Test
     fun test() {
-        val a = Address.alias
+        val a = Address.meta
         val addressList = listOf(
             Address(16, "STREET 16", 0),
             Address(17, "STREET 17", 0),
@@ -31,7 +31,7 @@ class EntityInsertBatchQueryTest(private val db: Database) {
 
     @Test
     fun identity() {
-        val i = IdentityStrategy.alias
+        val i = IdentityStrategy.meta
         val strategies = listOf(
             IdentityStrategy(null, "AAA"),
             IdentityStrategy(null, "BBB"),
@@ -45,7 +45,7 @@ class EntityInsertBatchQueryTest(private val db: Database) {
 
     @Test
     fun createdAt_updatedAt() {
-        val p = Person.alias
+        val p = Person.meta
         val personList = listOf(
             Person(1, "A"),
             Person(2, "B"),
@@ -61,7 +61,7 @@ class EntityInsertBatchQueryTest(private val db: Database) {
 
     @Test
     fun uniqueConstraintException() {
-        val a = Address.alias
+        val a = Address.meta
         assertThrows<UniqueConstraintException> {
             db.runQuery {
                 EntityDsl.insert(
@@ -79,7 +79,7 @@ class EntityInsertBatchQueryTest(private val db: Database) {
 
     @Test
     fun onDuplicateKeyUpdate() {
-        val d = Department.alias
+        val d = Department.meta
         val department1 = Department(5, 50, "PLANNING", "TOKYO", 1)
         val department2 = Department(1, 60, "DEVELOPMENT", "KYOTO", 1)
         val query = EntityDsl.insert(d).onDuplicateKeyUpdate().batch(listOf(department1, department2))
@@ -101,7 +101,7 @@ class EntityInsertBatchQueryTest(private val db: Database) {
 
     @Test
     fun onDuplicateKeyUpdateWithKeys() {
-        val d = Department.alias
+        val d = Department.meta
         val department1 = Department(5, 50, "PLANNING", "TOKYO", 1)
         val department2 = Department(10, 10, "DEVELOPMENT", "KYOTO", 1)
         val query = EntityDsl.insert(d).onDuplicateKeyUpdate(d.departmentNo).batch(listOf(department1, department2))
@@ -123,7 +123,7 @@ class EntityInsertBatchQueryTest(private val db: Database) {
 
     @Test
     fun onDuplicateKeyUpdate_set() {
-        val d = Department.alias
+        val d = Department.meta
         val department1 = Department(5, 50, "PLANNING", "TOKYO", 1)
         val department2 = Department(1, 60, "DEVELOPMENT", "KYOTO", 1)
         val query =
@@ -148,7 +148,7 @@ class EntityInsertBatchQueryTest(private val db: Database) {
 
     @Test
     fun onDuplicateKeyUpdateWithKeys_set() {
-        val d = Department.alias
+        val d = Department.meta
         val department1 = Department(5, 50, "PLANNING", "TOKYO", 1)
         val department2 = Department(10, 10, "DEVELOPMENT", "KYOTO", 1)
         val query =
@@ -173,7 +173,7 @@ class EntityInsertBatchQueryTest(private val db: Database) {
 
     @Test
     fun onDuplicateKeyIgnore() {
-        val d = Department.alias
+        val d = Department.meta
         val department1 = Department(5, 50, "PLANNING", "TOKYO", 1)
         val department2 = Department(1, 60, "DEVELOPMENT", "KYOTO", 1)
         val query = EntityDsl.insert(d).onDuplicateKeyIgnore().batch(listOf(department1, department2))
@@ -191,7 +191,7 @@ class EntityInsertBatchQueryTest(private val db: Database) {
 
     @Test
     fun onDuplicateKeyIgnoreWithKeys() {
-        val d = Department.alias
+        val d = Department.meta
         val department1 = Department(5, 50, "PLANNING", "TOKYO", 1)
         val department2 = Department(10, 10, "DEVELOPMENT", "KYOTO", 1)
         val query = EntityDsl.insert(d).onDuplicateKeyIgnore(d.departmentNo).batch(listOf(department1, department2))
@@ -209,7 +209,7 @@ class EntityInsertBatchQueryTest(private val db: Database) {
 
     @Test
     fun identity_onDuplicateKeyUpdate() {
-        val i = IdentityStrategy.alias
+        val i = IdentityStrategy.meta
         val strategies = listOf(
             IdentityStrategy(null, "AAA"),
             IdentityStrategy(null, "BBB"),

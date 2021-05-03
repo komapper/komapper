@@ -12,8 +12,8 @@ class SqlSelectQueryDistinctTest(private val db: Database) {
 
     @Test
     fun distinct() {
-        val d = Department.alias
-        val e = Employee.alias
+        val d = Department.meta
+        val e = Employee.meta
         val query = SqlDsl.from(d).innerJoin(e) { d.departmentId eq e.departmentId }
         val list = db.runQuery { query }
         assertEquals(14, list.size)

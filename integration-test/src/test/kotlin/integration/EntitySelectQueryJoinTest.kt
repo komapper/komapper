@@ -13,8 +13,8 @@ class EntitySelectQueryJoinTest(private val db: Database) {
 
     @Test
     fun innerJoin() {
-        val a = Address.alias
-        val e = Employee.alias
+        val a = Address.meta
+        val e = Employee.meta
         val list = db.runQuery {
             EntityDsl.from(a).innerJoin(e) {
                 a.addressId eq e.addressId
@@ -25,8 +25,8 @@ class EntitySelectQueryJoinTest(private val db: Database) {
 
     @Test
     fun leftJoin() {
-        val a = Address.alias
-        val e = Employee.alias
+        val a = Address.meta
+        val e = Employee.meta
         val list = db.runQuery {
             EntityDsl.from(a).leftJoin(e) {
                 a.addressId eq e.addressId
@@ -37,8 +37,8 @@ class EntitySelectQueryJoinTest(private val db: Database) {
 
     @Test
     fun innerJoin_multiConditions() {
-        val employee = Employee.alias
-        val manager = Employee.newAlias()
+        val employee = Employee.meta
+        val manager = Employee.newMeta()
         val list = db.runQuery {
             EntityDsl.from(employee).innerJoin(manager) {
                 employee.managerId eq manager.employeeId
@@ -51,8 +51,8 @@ class EntitySelectQueryJoinTest(private val db: Database) {
 
     @Test
     fun association_many_to_one() {
-        val e = Employee.alias
-        val d = Department.alias
+        val e = Employee.meta
+        val d = Department.meta
         val list = db.runQuery {
             EntityDsl.from(e).innerJoin(d) {
                 e.departmentId eq d.departmentId
@@ -66,8 +66,8 @@ class EntitySelectQueryJoinTest(private val db: Database) {
 
     @Test
     fun association_one_to_many() {
-        val d = Department.alias
-        val e = Employee.alias
+        val d = Department.meta
+        val e = Employee.meta
         val list = db.runQuery {
             EntityDsl.from(d).innerJoin(e) {
                 d.departmentId eq e.departmentId
@@ -87,8 +87,8 @@ class EntitySelectQueryJoinTest(private val db: Database) {
 
     @Test
     fun association_one_to_one() {
-        val a = Address.alias
-        val e = Employee.alias
+        val a = Address.meta
+        val e = Employee.meta
         val list = db.runQuery {
             EntityDsl.from(e).innerJoin(a) {
                 e.addressId eq a.addressId

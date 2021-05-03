@@ -23,7 +23,7 @@ class ExpressionTest(private val db: Database) {
 
     @Test
     fun plus() {
-        val a = Address.alias
+        val a = Address.meta
         val result = db.runQuery {
             SqlDsl.from(a)
                 .where {
@@ -39,7 +39,7 @@ class ExpressionTest(private val db: Database) {
 
     @Test
     fun plus_other_column() {
-        val a = Address.alias
+        val a = Address.meta
         val result = db.runQuery {
             SqlDsl.from(a)
                 .where {
@@ -55,7 +55,7 @@ class ExpressionTest(private val db: Database) {
 
     @Test
     fun minus() {
-        val a = Address.alias
+        val a = Address.meta
         val result = db.runQuery {
             SqlDsl.from(a)
                 .where {
@@ -71,7 +71,7 @@ class ExpressionTest(private val db: Database) {
 
     @Test
     fun minus_other_column() {
-        val a = Address.alias
+        val a = Address.meta
         val result = db.runQuery {
             SqlDsl.from(a)
                 .where {
@@ -87,7 +87,7 @@ class ExpressionTest(private val db: Database) {
 
     @Test
     fun div() {
-        val a = Address.alias
+        val a = Address.meta
         val result = db.runQuery {
             SqlDsl.from(a)
                 .where {
@@ -103,7 +103,7 @@ class ExpressionTest(private val db: Database) {
 
     @Test
     fun div_other_column() {
-        val a = Address.alias
+        val a = Address.meta
         val result = db.runQuery {
             SqlDsl.from(a)
                 .where {
@@ -119,7 +119,7 @@ class ExpressionTest(private val db: Database) {
 
     @Test
     fun rem() {
-        val a = Address.alias
+        val a = Address.meta
         val result = db.runQuery {
             SqlDsl.from(a)
                 .where {
@@ -135,7 +135,7 @@ class ExpressionTest(private val db: Database) {
 
     @Test
     fun rem_other_column() {
-        val a = Address.alias
+        val a = Address.meta
         val result = db.runQuery {
             SqlDsl.from(a)
                 .where {
@@ -151,7 +151,7 @@ class ExpressionTest(private val db: Database) {
 
     @Test
     fun concat() {
-        val a = Address.alias
+        val a = Address.meta
         val result = db.runQuery {
             SqlDsl.from(a)
                 .where {
@@ -167,7 +167,7 @@ class ExpressionTest(private val db: Database) {
 
     @Test
     fun concat_other_column() {
-        val a = Address.alias
+        val a = Address.meta
         val result = db.runQuery {
             SqlDsl.from(a)
                 .where {
@@ -183,7 +183,7 @@ class ExpressionTest(private val db: Database) {
 
     @Test
     fun lowerFunction() {
-        val a = Address.alias
+        val a = Address.meta
         val result = db.runQuery {
             SqlDsl.from(a).select(lower(literal("TEST"))).first()
         }
@@ -192,7 +192,7 @@ class ExpressionTest(private val db: Database) {
 
     @Test
     fun upperFunction() {
-        val a = Address.alias
+        val a = Address.meta
         val result = db.runQuery {
             SqlDsl.from(a).select(upper(literal("test"))).first()
         }
@@ -201,7 +201,7 @@ class ExpressionTest(private val db: Database) {
 
     @Test
     fun trimFunction() {
-        val a = Address.alias
+        val a = Address.meta
         val result = db.runQuery {
             SqlDsl.from(a).select(trim(literal(" test "))).first()
         }
@@ -210,7 +210,7 @@ class ExpressionTest(private val db: Database) {
 
     @Test
     fun ltrimFunction() {
-        val a = Address.alias
+        val a = Address.meta
         val result = db.runQuery {
             SqlDsl.from(a).select(ltrim(literal(" test "))).first()
         }
@@ -219,7 +219,7 @@ class ExpressionTest(private val db: Database) {
 
     @Test
     fun rtrimFunction() {
-        val a = Address.alias
+        val a = Address.meta
         val result = db.runQuery {
             SqlDsl.from(a).select(rtrim(literal(" test "))).first()
         }

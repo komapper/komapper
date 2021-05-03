@@ -7,7 +7,7 @@ import org.komapper.core.dsl.metamodel.PropertyMetamodel
 data class EntityUpsertContext<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     val insertContext: EntityInsertContext<ENTITY, ID, META>,
     val target: META,
-    val excluded: META = target.newMetamodel(
+    val excluded: META = target.newMeta(
         table = "excluded",
         catalog = "",
         schema = "",

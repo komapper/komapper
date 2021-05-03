@@ -21,7 +21,7 @@ class TemplateExecuteQueryTest(private val db: Database) {
             }
         }
         assertEquals(1, count)
-        val a = Address.alias
+        val a = Address.meta
         val address = db.runQuery {
             SqlDsl.from(a).first {
                 a.addressId eq 15

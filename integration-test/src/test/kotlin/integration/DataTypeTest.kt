@@ -25,7 +25,7 @@ class DataTypeTest(val db: Database) {
     @Run(onlyIf = [Dbms.H2])
     @Test
     fun any() {
-        val m = AnyTest.alias
+        val m = AnyTest.meta
         val data = AnyTest(
             1,
             AnyPerson("ABC")
@@ -39,7 +39,7 @@ class DataTypeTest(val db: Database) {
 
     @Test
     fun bigDecimal() {
-        val m = BigDecimalTest.alias
+        val m = BigDecimalTest.meta
         val data = BigDecimalTest(1, BigDecimal.TEN)
         db.runQuery { EntityDsl.insert(m).single(data) }
         val data2 = db.runQuery {
@@ -50,7 +50,7 @@ class DataTypeTest(val db: Database) {
 
     @Test
     fun bigInteger() {
-        val m = BigIntegerTest.alias
+        val m = BigIntegerTest.meta
         val data = BigIntegerTest(1, BigInteger.TEN)
         db.runQuery { EntityDsl.insert(m).single(data) }
         val data2 = db.runQuery {
@@ -61,7 +61,7 @@ class DataTypeTest(val db: Database) {
 
     @Test
     fun boolean() {
-        val m = BooleanTest.alias
+        val m = BooleanTest.meta
         val data = BooleanTest(1, true)
         db.runQuery { EntityDsl.insert(m).single(data) }
         val data2 = db.runQuery {
@@ -72,7 +72,7 @@ class DataTypeTest(val db: Database) {
 
     @Test
     fun byte() {
-        val m = ByteTest.alias
+        val m = ByteTest.meta
         val data = ByteTest(1, 10)
         db.runQuery { EntityDsl.insert(m).single(data) }
         val data2 = db.runQuery {
@@ -83,7 +83,7 @@ class DataTypeTest(val db: Database) {
 
     @Test
     fun byteArray() {
-        val m = ByteArrayTest.alias
+        val m = ByteArrayTest.meta
         val data = ByteArrayTest(1, byteArrayOf(10, 20, 30))
         db.runQuery { EntityDsl.insert(m).single(data) }
         val data2 = db.runQuery {
@@ -95,7 +95,7 @@ class DataTypeTest(val db: Database) {
 
     @Test
     fun double() {
-        val m = DoubleTest.alias
+        val m = DoubleTest.meta
         val data = DoubleTest(1, 10.0)
         db.runQuery { EntityDsl.insert(m).single(data) }
         val data2 = db.runQuery {
@@ -106,7 +106,7 @@ class DataTypeTest(val db: Database) {
 
     @Test
     fun float() {
-        val m = FloatTest.alias
+        val m = FloatTest.meta
         val data = FloatTest(1, 10.0f)
         db.runQuery { EntityDsl.insert(m).single(data) }
         val data2 = db.runQuery {
@@ -117,7 +117,7 @@ class DataTypeTest(val db: Database) {
 
     @Test
     fun int() {
-        val m = IntTest.alias
+        val m = IntTest.meta
         val data = IntTest(1, 10)
         db.runQuery { EntityDsl.insert(m).single(data) }
         val data2 = db.runQuery {
@@ -128,7 +128,7 @@ class DataTypeTest(val db: Database) {
 
     @Test
     fun localDateTime() {
-        val m = LocalDateTimeTest.alias
+        val m = LocalDateTimeTest.meta
         val data = LocalDateTimeTest(
             1,
             LocalDateTime.of(2019, 6, 1, 12, 11, 10)
@@ -142,7 +142,7 @@ class DataTypeTest(val db: Database) {
 
     @Test
     fun localDate() {
-        val m = LocalDateTest.alias
+        val m = LocalDateTest.meta
         val data = LocalDateTest(
             1,
             LocalDate.of(2019, 6, 1)
@@ -156,7 +156,7 @@ class DataTypeTest(val db: Database) {
 
     @Test
     fun localTime() {
-        val m = LocalTimeTest.alias
+        val m = LocalTimeTest.meta
         val data = LocalTimeTest(1, LocalTime.of(12, 11, 10))
         db.runQuery { EntityDsl.insert(m).single(data) }
         val data2 = db.runQuery {
@@ -167,7 +167,7 @@ class DataTypeTest(val db: Database) {
 
     @Test
     fun long() {
-        val m = LongTest.alias
+        val m = LongTest.meta
         val data = LongTest(1, 10L)
         db.runQuery { EntityDsl.insert(m).single(data) }
         val data2 = db.runQuery {
@@ -179,7 +179,7 @@ class DataTypeTest(val db: Database) {
     @Run(onlyIf = [Dbms.H2])
     @Test
     fun offsetDateTime() {
-        val m = OffsetDateTimeTest.alias
+        val m = OffsetDateTimeTest.meta
         val dateTime = LocalDateTime.of(2019, 6, 1, 12, 11, 10)
         val offset = ZoneOffset.ofHours(9)
         val value = OffsetDateTime.of(dateTime, offset)
@@ -194,7 +194,7 @@ class DataTypeTest(val db: Database) {
     @Run(unless = [Dbms.H2])
     @Test
     fun offsetDateTime_unlessH2() {
-        val m = OffsetDateTimeTest.alias
+        val m = OffsetDateTimeTest.meta
         val dateTime = LocalDateTime.of(2019, 6, 1, 12, 11, 10)
         val offset = ZoneOffset.ofHours(9)
         val value = OffsetDateTime.of(dateTime, offset)
@@ -208,7 +208,7 @@ class DataTypeTest(val db: Database) {
 
     @Test
     fun short() {
-        val m = ShortTest.alias
+        val m = ShortTest.meta
         val data = ShortTest(1, 10)
         db.runQuery { EntityDsl.insert(m).single(data) }
         val data2 = db.runQuery {
@@ -219,7 +219,7 @@ class DataTypeTest(val db: Database) {
 
     @Test
     fun string() {
-        val m = StringTest.alias
+        val m = StringTest.meta
         val data = StringTest(1, "ABC")
         db.runQuery { EntityDsl.insert(m).single(data) }
         val data2 = db.runQuery {
@@ -231,7 +231,7 @@ class DataTypeTest(val db: Database) {
     @Run(onlyIf = [Dbms.POSTGRESQL])
     @Test
     fun json_postgresql() {
-        val m = JsonTest.alias
+        val m = JsonTest.meta
         val data = JsonTest(
             1,
             Json(
@@ -257,7 +257,7 @@ class DataTypeTest(val db: Database) {
 
     @Test
     fun unsignedByte() {
-        val m = UByteTest.alias
+        val m = UByteTest.meta
         val data = UByteTest(1, 10u)
         db.runQuery { EntityDsl.insert(m).single(data) }
         val data2 = db.runQuery {
@@ -268,7 +268,7 @@ class DataTypeTest(val db: Database) {
 
     @Test
     fun unsignedByte_maxValue() {
-        val m = UByteTest.alias
+        val m = UByteTest.meta
         val data = UByteTest(1, UByte.MAX_VALUE)
         db.runQuery { EntityDsl.insert(m).single(data) }
         val data2 = db.runQuery {
@@ -279,7 +279,7 @@ class DataTypeTest(val db: Database) {
 
     @Test
     fun unsignedByte_null() {
-        val m = UByteTest.alias
+        val m = UByteTest.meta
         val data = UByteTest(1, null)
         db.runQuery { EntityDsl.insert(m).single(data) }
         val data2 = db.runQuery {
@@ -290,7 +290,7 @@ class DataTypeTest(val db: Database) {
 
     @Test
     fun unsignedInt() {
-        val m = UIntTest.alias
+        val m = UIntTest.meta
         val data = UIntTest(1, 10u)
         db.runQuery { EntityDsl.insert(m).single(data) }
         val data2 = db.runQuery {
@@ -301,7 +301,7 @@ class DataTypeTest(val db: Database) {
 
     @Test
     fun unsignedInt_maxValue() {
-        val m = UIntTest.alias
+        val m = UIntTest.meta
         val data = UIntTest(1, UInt.MAX_VALUE)
         db.runQuery { EntityDsl.insert(m).single(data) }
         val data2 = db.runQuery {
@@ -312,7 +312,7 @@ class DataTypeTest(val db: Database) {
 
     @Test
     fun unsignedInt_null() {
-        val m = UIntTest.alias
+        val m = UIntTest.meta
         val data = UIntTest(1, null)
         db.runQuery { EntityDsl.insert(m).single(data) }
         val data2 = db.runQuery {
@@ -323,7 +323,7 @@ class DataTypeTest(val db: Database) {
 
     @Test
     fun unsignedShort() {
-        val m = UShortTest.alias
+        val m = UShortTest.meta
         val data = UShortTest(1, 10u)
         db.runQuery { EntityDsl.insert(m).single(data) }
         val data2 = db.runQuery {
@@ -334,7 +334,7 @@ class DataTypeTest(val db: Database) {
 
     @Test
     fun unsigned_autoIncrement() {
-        val m = UnsignedIdentityStrategy.alias
+        val m = UnsignedIdentityStrategy.meta
         val data = UnsignedIdentityStrategy(null, "test")
         db.runQuery { EntityDsl.insert(m).single(data) }
         val data2 = db.runQuery {
@@ -346,7 +346,7 @@ class DataTypeTest(val db: Database) {
     @Run(unless = [Dbms.MYSQL])
     @Test
     fun unsigned_sequence() {
-        val m = UnsignedSequenceStrategy.alias
+        val m = UnsignedSequenceStrategy.meta
         val data = UnsignedSequenceStrategy(0u, "test")
         db.runQuery { EntityDsl.insert(m).single(data) }
         val data2 = db.runQuery {
@@ -357,7 +357,7 @@ class DataTypeTest(val db: Database) {
 
     @Test
     fun unsigned_version() {
-        val m = UnsignedAddress.alias
+        val m = UnsignedAddress.meta
         val data = UnsignedAddress(16u, "STREET 16", 0u)
         val data2 = db.runQuery { EntityDsl.insert(m).single(data) }
         db.runQuery {
@@ -372,7 +372,7 @@ class DataTypeTest(val db: Database) {
 
     @Test
     fun unsigned_version_valueClass() {
-        val m = UnsignedAddress2.alias
+        val m = UnsignedAddress2.meta
         val data = UnsignedAddress2(16u, "STREET 16", null)
         val data2 = db.runQuery { EntityDsl.insert(m).single(data) }
         db.runQuery {
@@ -387,7 +387,7 @@ class DataTypeTest(val db: Database) {
 
     @Test
     fun unsignedShort_maxValue() {
-        val m = UShortTest.alias
+        val m = UShortTest.meta
         val data = UShortTest(1, UShort.MAX_VALUE)
         db.runQuery { EntityDsl.insert(m).single(data) }
         val data2 = db.runQuery {
@@ -398,7 +398,7 @@ class DataTypeTest(val db: Database) {
 
     @Test
     fun unsignedShort_null() {
-        val m = UShortTest.alias
+        val m = UShortTest.meta
         val data = UShortTest(1, null)
         db.runQuery { EntityDsl.insert(m).single(data) }
         val data2 = db.runQuery {
@@ -410,7 +410,7 @@ class DataTypeTest(val db: Database) {
     @Run(onlyIf = [Dbms.POSTGRESQL, Dbms.H2])
     @Test
     fun uuid() {
-        val m = UUIDTest.alias
+        val m = UUIDTest.meta
         val value = UUID.randomUUID()
         val data = UUIDTest(1, value)
         db.runQuery { EntityDsl.insert(m).single(data) }
@@ -423,7 +423,7 @@ class DataTypeTest(val db: Database) {
     @Run(onlyIf = [Dbms.POSTGRESQL, Dbms.H2])
     @Test
     fun uuid_null() {
-        val m = UUIDTest.alias
+        val m = UUIDTest.meta
         val data = UUIDTest(1, null)
         db.runQuery { EntityDsl.insert(m).single(data) }
         val data2 = db.runQuery {

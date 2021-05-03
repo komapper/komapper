@@ -43,7 +43,7 @@ fun main() {
     val db = Database.create("jdbc:h2:mem:example;DB_CLOSE_DELAY=-1")
 
     // get a metamodel
-    val a = Address.alias
+    val a = Address.meta
 
     // execute simple CRUD operations as a transaction
     db.transaction {

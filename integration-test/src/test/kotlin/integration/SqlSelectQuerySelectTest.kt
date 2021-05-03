@@ -17,7 +17,7 @@ class SqlSelectQuerySelectTest(private val db: Database) {
 
     @Test
     fun selectProperty() {
-        val a = Address.alias
+        val a = Address.meta
         val streetList = db.runQuery {
             SqlDsl.from(a)
                 .where {
@@ -31,7 +31,7 @@ class SqlSelectQuerySelectTest(private val db: Database) {
 
     @Test
     fun selectProperty_first() {
-        val a = Address.alias
+        val a = Address.meta
         val value = db.runQuery {
             SqlDsl.from(a)
                 .where {
@@ -46,7 +46,7 @@ class SqlSelectQuerySelectTest(private val db: Database) {
 
     @Test
     fun selectPropertiesAsPair() {
-        val a = Address.alias
+        val a = Address.meta
         val pairList = db.runQuery {
             SqlDsl.from(a)
                 .where {
@@ -60,7 +60,7 @@ class SqlSelectQuerySelectTest(private val db: Database) {
 
     @Test
     fun selectPropertiesAsTriple() {
-        val a = Address.alias
+        val a = Address.meta
         val tripleList = db.runQuery {
             SqlDsl.from(a)
                 .where {
@@ -80,7 +80,7 @@ class SqlSelectQuerySelectTest(private val db: Database) {
 
     @Test
     fun selectPropertiesAsRecord() {
-        val a = Address.alias
+        val a = Address.meta
         val list = db.runQuery {
             SqlDsl.from(a)
                 .where {
@@ -104,8 +104,8 @@ class SqlSelectQuerySelectTest(private val db: Database) {
 
     @Test
     fun selectEntity() {
-        val a = Address.alias
-        val e = Employee.alias
+        val a = Address.meta
+        val e = Employee.meta
         val list: List<Address> = db.runQuery {
             SqlDsl.from(a)
                 .leftJoin(e) {
@@ -118,8 +118,8 @@ class SqlSelectQuerySelectTest(private val db: Database) {
 
     @Test
     fun selectEntitiesAsPair_leftJoin() {
-        val a = Address.alias
-        val e = Employee.alias
+        val a = Address.meta
+        val e = Employee.meta
         val list: List<Pair<Address, Employee?>> = db.runQuery {
             SqlDsl.from(a)
                 .leftJoin(e) {
@@ -135,8 +135,8 @@ class SqlSelectQuerySelectTest(private val db: Database) {
 
     @Test
     fun selectEntitiesAsPair_innerJoin() {
-        val a = Address.alias
-        val e = Employee.alias
+        val a = Address.meta
+        val e = Employee.meta
         val list: List<Pair<Address, Employee?>> = db.runQuery {
             SqlDsl.from(a).innerJoin(e) {
                 a.addressId eq e.addressId
@@ -148,9 +148,9 @@ class SqlSelectQuerySelectTest(private val db: Database) {
 
     @Test
     fun selectEntitiesAsTriple() {
-        val a = Address.alias
-        val e = Employee.alias
-        val d = Department.alias
+        val a = Address.meta
+        val e = Employee.meta
+        val d = Department.meta
         val list = db.runQuery {
             SqlDsl.from(a)
                 .innerJoin(e) {
@@ -165,9 +165,9 @@ class SqlSelectQuerySelectTest(private val db: Database) {
 
     @Test
     fun selectEntitiesAsRecord() {
-        val a = Address.alias
-        val e = Employee.alias
-        val d = Department.alias
+        val a = Address.meta
+        val e = Employee.meta
+        val d = Department.meta
         val list = db.runQuery {
             SqlDsl.from(a)
                 .where {
@@ -191,8 +191,8 @@ class SqlSelectQuerySelectTest(private val db: Database) {
 
     @Test
     fun selectProperty2() {
-        val d = Department.alias
-        val e = Employee.alias
+        val d = Department.meta
+        val e = Employee.meta
         val subquery = SqlDsl.from(e).where { d.departmentId eq e.departmentId }.select(count())
         val list = db.runQuery {
             SqlDsl.from(d)

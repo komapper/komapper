@@ -22,7 +22,7 @@ class Application(private val database: Database) {
     @RequestMapping("/")
     fun list(): List<Message> {
         return database.runQuery {
-            val m = Message.alias
+            val m = Message.meta
             EntityDsl.from(m).orderBy(m.id.desc())
         }
     }
@@ -31,7 +31,7 @@ class Application(private val database: Database) {
     fun add(@RequestParam text: String): Message {
         val message = Message(text = text)
         return database.runQuery {
-            val m = Message.alias
+            val m = Message.meta
             EntityDsl.insert(m).single(message)
         }
     }

@@ -15,7 +15,7 @@ class SqlUpdateQueryTest(private val db: Database) {
 
     @Test
     fun test() {
-        val a = Address.alias
+        val a = Address.meta
         val count = db.runQuery {
             SqlDsl.update(a).set {
                 a.street set "STREET 16"
@@ -34,7 +34,7 @@ class SqlUpdateQueryTest(private val db: Database) {
 
     @Test
     fun setIfNotNull() {
-        val a = Address.alias
+        val a = Address.meta
         val count = db.runQuery {
             SqlDsl.update(a).set {
                 a.street setIfNotNull null
@@ -55,7 +55,7 @@ class SqlUpdateQueryTest(private val db: Database) {
 
     @Test
     fun arithmetic_add() {
-        val a = Address.alias
+        val a = Address.meta
         val count = db.runQuery {
             SqlDsl.update(a).set {
                 a.version set (a.version + 10)
@@ -74,7 +74,7 @@ class SqlUpdateQueryTest(private val db: Database) {
 
     @Test
     fun string_concat() {
-        val a = Address.alias
+        val a = Address.meta
         val count = db.runQuery {
             SqlDsl.update(a).set {
                 a.street set (concat(concat("[", a.street), "]"))
@@ -93,7 +93,7 @@ class SqlUpdateQueryTest(private val db: Database) {
 
     @Test
     fun allowEmptyWhereClause_default() {
-        val e = Employee.alias
+        val e = Employee.meta
         val ex = assertThrows<IllegalStateException> {
             @Suppress("UNUSED_VARIABLE")
             val count = db.runQuery {
@@ -107,7 +107,7 @@ class SqlUpdateQueryTest(private val db: Database) {
 
     @Test
     fun allowEmptyWhereClause_true() {
-        val e = Employee.alias
+        val e = Employee.meta
         val count = db.runQuery {
             SqlDsl.update(e).set {
                 e.employeeName set "ABC"
