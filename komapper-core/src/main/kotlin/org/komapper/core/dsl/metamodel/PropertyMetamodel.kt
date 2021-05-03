@@ -36,18 +36,18 @@ class PropertyMetamodelImpl<ENTITY : Any, EXTERIOR : Any, INTERIOR : Any>(
 }
 
 @Suppress("unused")
-class PropertyMetamodelStub<ENTITY : Any, EXTERIOR : Any, INTERIOR : Any> :
-    PropertyMetamodel<ENTITY, EXTERIOR, INTERIOR> {
+class PropertyMetamodelStub<ENTITY : Any, EXTERIOR : Any> :
+    PropertyMetamodel<ENTITY, EXTERIOR, EXTERIOR> {
     override val owner: EntityMetamodel<ENTITY, *, *> get() = fail()
     override val exteriorClass: KClass<EXTERIOR> get() = fail()
-    override val interiorClass: KClass<INTERIOR> = fail()
+    override val interiorClass: KClass<EXTERIOR> = fail()
     override val name: String get() = fail()
     override val columnName: String get() = fail()
     override val alwaysQuote: Boolean get() = fail()
     override val getter: (ENTITY) -> EXTERIOR? get() = fail()
     override val setter: (ENTITY, EXTERIOR) -> ENTITY get() = fail()
-    override val wrap: (INTERIOR) -> EXTERIOR get() = fail()
-    override val unwrap: (EXTERIOR) -> INTERIOR get() = fail()
+    override val wrap: (EXTERIOR) -> EXTERIOR get() = fail()
+    override val unwrap: (EXTERIOR) -> EXTERIOR get() = fail()
     override val nullable: Boolean get() = fail()
     override val idAssignment: Assignment<ENTITY> get() = fail()
 
