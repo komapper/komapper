@@ -6,13 +6,12 @@ import java.io.PrintWriter
 
 internal class EntityModel(
     private val config: Config,
-    definitionSource: EntityDefinitionSource,
+    private val definitionSource: EntityDefinitionSource,
     private val entity: Entity? = null,
 ) {
 
-    private val declaration = definitionSource.entityDeclaration
-
     fun generateMetamodel(codeGenerator: CodeGenerator) {
+        val declaration = definitionSource.entityDeclaration
         val packageName = declaration.packageName.asString()
         val entityQualifiedName = declaration.qualifiedName?.asString() ?: ""
         val entityTypeName = entityQualifiedName.removePrefix("$packageName.")
@@ -25,8 +24,9 @@ internal class EntityModel(
                         entity, packageName, entityTypeName, simpleName, it
                     )
                 } else {
+                    val defDeclaration = definitionSource.defDeclaration
                     EntityMetamodelStubGenerator(
-                        declaration, packageName, entityTypeName, simpleName, it
+                        defDeclaration, declaration, packageName, entityTypeName, simpleName, it
                     )
                 }
                 runnable.run()
