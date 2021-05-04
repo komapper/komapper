@@ -8,7 +8,7 @@ import com.google.devtools.ksp.symbol.KSAnnotated
 
 internal class EntityProcessor(
     options: Map<String, String>,
-    @Suppress("unused") 
+    @Suppress("unused")
     private val kotlinVersion: KotlinVersion,
     private val codeGenerator: CodeGenerator,
     private val logger: KSPLogger
