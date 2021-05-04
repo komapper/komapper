@@ -82,7 +82,7 @@ class EntityInsertBatchQueryTest(private val db: Database) {
         val d = Department.meta
         val department1 = Department(5, 50, "PLANNING", "TOKYO", 1)
         val department2 = Department(1, 60, "DEVELOPMENT", "KYOTO", 1)
-        val query = EntityDsl.insert(d).onDuplicateKeyUpdate().batch(listOf(department1, department2))
+        val query = EntityDsl.insert(d).onDuplicateKeyUpdate().batch(department1, department2)
         val counts = db.runQuery { query }
         if (db.config.dialect.subprotocol == "mysql") {
             assertEquals(listOf(1, 2), counts)
@@ -104,7 +104,7 @@ class EntityInsertBatchQueryTest(private val db: Database) {
         val d = Department.meta
         val department1 = Department(5, 50, "PLANNING", "TOKYO", 1)
         val department2 = Department(10, 10, "DEVELOPMENT", "KYOTO", 1)
-        val query = EntityDsl.insert(d).onDuplicateKeyUpdate(d.departmentNo).batch(listOf(department1, department2))
+        val query = EntityDsl.insert(d).onDuplicateKeyUpdate(d.departmentNo).batch(department1, department2)
         val counts = db.runQuery { query }
         if (db.config.dialect.subprotocol == "mysql") {
             assertEquals(listOf(1, 2), counts)
@@ -154,7 +154,7 @@ class EntityInsertBatchQueryTest(private val db: Database) {
         val query =
             EntityDsl.insert(d).onDuplicateKeyUpdate(d.departmentNo).set { excluded ->
                 d.departmentName set excluded.departmentName
-            }.batch(listOf(department1, department2))
+            }.batch(department1, department2)
         val counts = db.runQuery { query }
         if (db.config.dialect.subprotocol == "mysql") {
             assertEquals(listOf(1, 2), counts)

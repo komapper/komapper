@@ -12,7 +12,9 @@ interface EntityInsertQueryBuilder<ENTITY : Any, ID, META : EntityMetamodel<ENTI
     fun onDuplicateKeyIgnore(vararg keys: PropertyMetamodel<ENTITY, *, *> = emptyArray()): EntityUpsertQueryBuilder<ENTITY, ID, META>
     fun single(entity: ENTITY): Query<ENTITY>
     fun multiple(entities: List<ENTITY>): Query<List<ENTITY>>
+    fun multiple(vararg entities: ENTITY): Query<List<ENTITY>>
     fun batch(entities: List<ENTITY>, batchSize: Int? = null): Query<List<ENTITY>>
+    fun batch(vararg entities: ENTITY, batchSize: Int? = null): Query<List<ENTITY>>
 }
 
 internal data class EntityInsertQueryBuilderImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
@@ -49,7 +51,15 @@ internal data class EntityInsertQueryBuilderImpl<ENTITY : Any, ID, META : Entity
         return EntityInsertMultipleQuery(context, entities, option)
     }
 
+    override fun multiple(vararg entities: ENTITY): Query<List<ENTITY>> {
+        return multiple(entities.toList())
+    }
+
     override fun batch(entities: List<ENTITY>, batchSize: Int?): Query<List<ENTITY>> {
         return EntityInsertBatchQuery(context, entities, option.asEntityBatchInsertOption(batchSize))
+    }
+
+    override fun batch(vararg entities: ENTITY, batchSize: Int?): Query<List<ENTITY>> {
+        return batch(entities.toList())
     }
 }

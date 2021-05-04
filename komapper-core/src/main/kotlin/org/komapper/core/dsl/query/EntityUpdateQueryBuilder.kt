@@ -11,6 +11,7 @@ interface EntityUpdateQueryBuilder<ENTITY : Any> {
     fun exclude(vararg properties: PropertyMetamodel<ENTITY, *, *>): EntityUpdateQueryBuilder<ENTITY>
     fun single(entity: ENTITY): Query<ENTITY>
     fun batch(entities: List<ENTITY>, batchSize: Int? = null): Query<List<ENTITY>>
+    fun batch(vararg entities: ENTITY, batchSize: Int? = null): Query<List<ENTITY>>
 }
 
 internal data class EntityUpdateQueryBuilderImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
@@ -54,5 +55,9 @@ internal data class EntityUpdateQueryBuilderImpl<ENTITY : Any, ID, META : Entity
     override fun batch(entities: List<ENTITY>, batchSize: Int?): Query<List<ENTITY>> {
         context.target.checkIdValueNotNull(entities)
         return EntityUpdateBatchQuery(context, entities, option.asEntityBatchUpdateOption(batchSize))
+    }
+
+    override fun batch(vararg entities: ENTITY, batchSize: Int?): Query<List<ENTITY>> {
+        return batch(entities.toList())
     }
 }

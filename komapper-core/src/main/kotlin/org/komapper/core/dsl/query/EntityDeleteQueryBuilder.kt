@@ -8,6 +8,7 @@ interface EntityDeleteQueryBuilder<ENTITY : Any> {
     fun option(configure: (EntityDeleteOption) -> EntityDeleteOption): EntityDeleteQueryBuilder<ENTITY>
     fun single(entity: ENTITY): Query<Unit>
     fun batch(entities: List<ENTITY>, batchSize: Int? = null): Query<Unit>
+    fun batch(vararg entities: ENTITY, batchSize: Int? = null): Query<Unit>
 }
 
 internal data class EntityDeleteQueryBuilderImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
@@ -28,5 +29,9 @@ internal data class EntityDeleteQueryBuilderImpl<ENTITY : Any, ID, META : Entity
     override fun batch(entities: List<ENTITY>, batchSize: Int?): Query<Unit> {
         context.target.checkIdValueNotNull(entities)
         return EntityDeleteBatchQuery(context, entities, option.asEntityBatchDeleteOption(batchSize))
+    }
+
+    override fun batch(vararg entities: ENTITY, batchSize: Int?): Query<Unit> {
+        return batch(entities.toList())
     }
 }
