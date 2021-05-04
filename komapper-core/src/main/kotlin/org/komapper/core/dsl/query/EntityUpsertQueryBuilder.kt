@@ -9,7 +9,9 @@ interface EntityUpsertQueryBuilder<ENTITY : Any, ID, META : EntityMetamodel<ENTI
     fun set(declaration: SetScope<ENTITY>.(META) -> Unit): EntityUpsertQueryBuilder<ENTITY, ID, META>
     fun single(entity: ENTITY): Query<Int>
     fun multiple(entities: List<ENTITY>): Query<Int>
+    fun multiple(vararg entities: ENTITY): Query<Int>
     fun batch(entities: List<ENTITY>): Query<List<Int>>
+    fun batch(vararg entities: ENTITY): Query<List<Int>>
 }
 
 internal data class EntityUpsertQueryBuilderImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
@@ -32,7 +34,15 @@ internal data class EntityUpsertQueryBuilderImpl<ENTITY : Any, ID, META : Entity
         return EntityUpsertMultipleQuery(context, option, entities)
     }
 
+    override fun multiple(vararg entities: ENTITY): Query<Int> {
+        return multiple(entities.toList())
+    }
+
     override fun batch(entities: List<ENTITY>): Query<List<Int>> {
         return EntityUpsertBatchQuery(context, entities, option)
+    }
+
+    override fun batch(vararg entities: ENTITY): Query<List<Int>> {
+        return batch(entities.toList())
     }
 }
