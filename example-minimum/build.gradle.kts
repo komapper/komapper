@@ -17,12 +17,15 @@ idea.module {
 }
 
 dependencies {
-    implementation(project(":komapper-starter"))
+    compileOnly(project(":komapper-annotation"))
+    implementation(project(":komapper-core"))
+    implementation(project(":komapper-transaction"))
+    runtimeOnly(project(":komapper-jdbc-h2"))
     ksp(project(":komapper-processor"))
 }
 
 application {
-    mainClass.set("example.ExampleKt")
+    mainClass.set("example.ApplicationKt")
 }
 
 ksp {

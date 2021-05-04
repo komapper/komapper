@@ -10,7 +10,7 @@ import org.komapper.core.DefaultDataFactory
 import org.komapper.core.Dialect
 import org.komapper.core.JdbcOption
 import org.komapper.core.Logger
-import org.komapper.core.StdOutSqlLogger
+import org.komapper.core.StdOutLogger
 import org.komapper.core.TemplateStatementBuilder
 import org.komapper.core.jdbc.DataType
 import org.komapper.core.spi.DefaultStatementInspector
@@ -67,7 +67,7 @@ open class KomapperAutoConfiguration {
     open fun logger(): Logger {
         val loader = ServiceLoader.load(LoggerFactory::class.java)
         val factory = loader.firstOrNull()
-        return factory?.create() ?: StdOutSqlLogger()
+        return factory?.create() ?: StdOutLogger()
     }
 
     @Bean

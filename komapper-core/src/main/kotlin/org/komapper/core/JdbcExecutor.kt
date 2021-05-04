@@ -142,8 +142,8 @@ internal class JdbcExecutor(
     private fun log(statement: Statement) {
         val suppressLogging = jdbcOption.suppressLogging ?: false
         if (!suppressLogging) {
-            config.logger.log(LogCategory.SQL) { statement.sql }
-            config.logger.log(LogCategory.SQL_WITH_ARGS) { statement.sqlWithArgs }
+            config.logger.debug(LogCategory.SQL.value) { statement.sql }
+            config.logger.trace(LogCategory.SQL_WITH_ARGS.value) { statement.sqlWithArgs }
         }
     }
 

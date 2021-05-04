@@ -81,7 +81,7 @@ internal class TransactionManagerImpl(
             }
         }
         threadLocal.set(tx)
-        logger.log(LogCategory.TRANSACTION) { "The transaction \"$tx\" has begun." }
+        logger.trace(LogCategory.TRANSACTION.value) { "The transaction \"$tx\" has begun." }
     }
 
     override fun commit() {
@@ -93,7 +93,7 @@ internal class TransactionManagerImpl(
             val connection = tx.connection
             try {
                 connection.commit()
-                logger.log(LogCategory.TRANSACTION) { "The transaction \"$tx\" has committed." }
+                logger.trace(LogCategory.TRANSACTION.value) { "The transaction \"$tx\" has committed." }
             } catch (e: SQLException) {
                 rollbackInternal(tx)
                 throw e
@@ -135,7 +135,7 @@ internal class TransactionManagerImpl(
             val connection = tx.connection
             try {
                 connection.rollback()
-                logger.log(LogCategory.TRANSACTION) { "The transaction \"$tx\" has rolled back." }
+                logger.trace(LogCategory.TRANSACTION.value) { "The transaction \"$tx\" has rolled back." }
             } catch (ignored: SQLException) {
             } finally {
                 release(tx)
