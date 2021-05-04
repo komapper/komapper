@@ -12,11 +12,11 @@ interface Record<K> {
     operator fun iterator(): Iterator<Map.Entry<K, Any?>>
 }
 
-interface PropertyRecord : Record<ColumnExpression<*, *>> {
+interface Columns : Record<ColumnExpression<*, *>> {
     operator fun <T : Any> get(key: ColumnExpression<T, *>): T?
 }
 
-interface EntityRecord : Record<EntityMetamodel<*, *, *>> {
+interface Entities : Record<EntityMetamodel<*, *, *>> {
     operator fun <T : Any> get(key: EntityMetamodel<T, *, *>): T?
 }
 
@@ -35,9 +35,9 @@ internal abstract class AbstractRecord<K>(protected val map: Map<K, Any?>) : Rec
     override fun iterator() = map.iterator()
 }
 
-internal class PropertyRecordImpl(
+internal class ColumnsImpl(
     map: Map<ColumnExpression<*, *>, Any?>
-) : AbstractRecord<ColumnExpression<*, *>>(map), PropertyRecord {
+) : AbstractRecord<ColumnExpression<*, *>>(map), Columns {
 
     override fun <T : Any> get(key: ColumnExpression<T, *>): T? {
         val value = map[key]
@@ -45,9 +45,9 @@ internal class PropertyRecordImpl(
     }
 }
 
-internal class EntityRecordImpl(
+internal class EntitiesImpl(
     map: Map<EntityMetamodel<*, *, *>, Any?>
-) : AbstractRecord<EntityMetamodel<*, *, *>>(map), EntityRecord {
+) : AbstractRecord<EntityMetamodel<*, *, *>>(map), Entities {
 
     override fun <T : Any> get(key: EntityMetamodel<T, *, *>): T? {
         val value = map[key]
