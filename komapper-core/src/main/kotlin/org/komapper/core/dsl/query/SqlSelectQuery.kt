@@ -56,7 +56,7 @@ interface SqlSelectQuery<ENTITY : Any> : Subquery<ENTITY> {
 
     fun select(
         vararg metamodels: EntityMetamodel<*, *, *>,
-    ): Subquery<EntityRecord>
+    ): Subquery<Entities>
 
     fun <T : Any, S : Any> select(
         expression: ScalarExpression<T, S>
@@ -79,7 +79,7 @@ interface SqlSelectQuery<ENTITY : Any> : Subquery<ENTITY> {
 
     fun select(
         vararg expressions: ColumnExpression<*, *>,
-    ): Subquery<PropertyRecord>
+    ): Subquery<Columns>
 }
 
 internal data class SqlSelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
@@ -219,7 +219,7 @@ internal data class SqlSelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<
         }
     }
 
-    override fun select(vararg metamodels: EntityMetamodel<*, *, *>): Subquery<EntityRecord> {
+    override fun select(vararg metamodels: EntityMetamodel<*, *, *>): Subquery<Entities> {
         val contextModels = context.getEntityMetamodels()
         for ((i, metamodel) in metamodels.withIndex()) {
             if (metamodel !in contextModels) error(entityMetamodelNotFound("metamodels", i))
@@ -229,7 +229,7 @@ internal data class SqlSelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<
         return Collectable(newContext, option) { dialect, rs: ResultSet ->
             val m = EntityMapper(dialect, rs)
             val map = list.associateWith { m.execute(it) }
-            EntityRecordImpl(map)
+            EntitiesImpl(map)
         }
     }
 
@@ -273,13 +273,13 @@ internal data class SqlSelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<
         }
     }
 
-    override fun select(vararg expressions: ColumnExpression<*, *>): Subquery<PropertyRecord> {
+    override fun select(vararg expressions: ColumnExpression<*, *>): Subquery<Columns> {
         val list = expressions.toList()
         val newContext = context.setProjection(*list.toTypedArray())
         return Collectable(newContext, option) { dialect, rs: ResultSet ->
             val mapper = PropertyMapper(dialect, rs)
             val map = list.associateWith { mapper.execute(it) }
-            PropertyRecordImpl(map)
+            ColumnsImpl(map)
         }
     }
 
