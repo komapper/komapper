@@ -5,7 +5,7 @@ import com.tschuchort.compiletesting.KotlinCompilation
 import com.tschuchort.compiletesting.SourceFile
 import com.tschuchort.compiletesting.SourceFile.Companion.kotlin
 import com.tschuchort.compiletesting.kspIncremental
-import com.tschuchort.compiletesting.symbolProcessors
+import com.tschuchort.compiletesting.symbolProcessorProviders
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 import java.nio.file.Path
@@ -852,7 +852,7 @@ class EntityProcessorTest {
             .apply {
                 workingDir = tempDir!!.toFile()
                 inheritClassPath = true
-                symbolProcessors = listOf(EntityProcessor())
+                symbolProcessorProviders = listOf(EntityProcessorProvider())
                 sources = sourceFiles.asList()
                 verbose = false
                 kspIncremental = false

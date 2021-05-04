@@ -6,24 +6,16 @@ import com.google.devtools.ksp.processing.Resolver
 import com.google.devtools.ksp.processing.SymbolProcessor
 import com.google.devtools.ksp.symbol.KSAnnotated
 
-class EntityProcessor : SymbolProcessor {
+internal class EntityProcessor(
+    options: Map<String, String>,
+    @Suppress("unused") 
+    private val kotlinVersion: KotlinVersion,
+    private val codeGenerator: CodeGenerator,
+    private val logger: KSPLogger
+) : SymbolProcessor {
 
-    private lateinit var codeGenerator: CodeGenerator
-    private lateinit var logger: KSPLogger
-    private lateinit var config: Config
+    private var config: Config = Config.create(options)
     private var invoked = false
-
-    @Suppress("OverridingDeprecatedMember")
-    override fun init(
-        options: Map<String, String>,
-        kotlinVersion: KotlinVersion,
-        codeGenerator: CodeGenerator,
-        logger: KSPLogger
-    ) {
-        this.codeGenerator = codeGenerator
-        this.logger = logger
-        this.config = Config.create(options)
-    }
 
     override fun process(resolver: Resolver): List<KSAnnotated> {
         if (invoked) {
