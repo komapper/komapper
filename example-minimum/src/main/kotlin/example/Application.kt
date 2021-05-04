@@ -12,8 +12,6 @@ import org.komapper.core.dsl.EntityDsl
 import org.komapper.core.dsl.SchemaDsl
 import org.komapper.core.dsl.runQuery
 import org.komapper.transaction.transaction
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import java.time.LocalDateTime
 
 data class Address(
@@ -34,8 +32,6 @@ data class AddressDef(
 ) {
     companion object
 }
-
-val logger: Logger = LoggerFactory.getLogger("example")
 
 fun main() {
     // create a Database instance
@@ -61,7 +57,7 @@ fun main() {
             EntityDsl.from(a).first { a.id eq newAddress.id }
         }
 
-        logger.info("address1 = $address1")
+        println("address1 = $address1")
 
         // UPDATE
         db.runQuery {
@@ -73,7 +69,7 @@ fun main() {
             EntityDsl.from(a).first { a.street eq "street B" }
         }
 
-        logger.info("address2 = $address2")
+        println("address2 = $address2")
         check(address1.id == address2.id)
         check(address1.street != address2.street)
         check(address1.version + 1 == address2.version)
@@ -88,7 +84,7 @@ fun main() {
             EntityDsl.from(a).orderBy(a.id)
         }
 
-        logger.info("addressList = $addressList")
+        println("addressList = $addressList")
         check(addressList.isEmpty()) { "The addressList must be empty." }
     }
 }

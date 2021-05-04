@@ -58,7 +58,7 @@ open class DefaultDatabaseConfig(
     override val logger: Logger by lazy {
         val loader = ServiceLoader.load(LoggerFactory::class.java)
         val factory = loader.firstOrNull()
-        factory?.create() ?: StdOutSqlLogger()
+        factory?.create() ?: StdOutLogger()
     }
 
     override val session: DatabaseSession by lazy {

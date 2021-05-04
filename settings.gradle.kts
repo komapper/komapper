@@ -38,8 +38,9 @@ include("komapper-starter")
 include("komapper-platform")
 
 // EXAMPLE
-include("example-basic")
+include("example-minimum")
 include("example-spring-boot")
+include("example-starter")
 
 // TEST
 include("integration-test")
