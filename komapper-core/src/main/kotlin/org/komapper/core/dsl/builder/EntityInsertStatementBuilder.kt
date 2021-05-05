@@ -17,14 +17,15 @@ internal class EntityInsertStatementBuilder<ENTITY : Any, ID, META : EntityMetam
     private val buf = StatementBuffer(dialect::formatValue)
 
     fun build(): Statement {
-        val properties = context.target.properties().filter {
+        val target = context.target
+        val properties = target.properties().filter {
             it.idAssignment !is Assignment.AutoIncrement<ENTITY, *, *>
         }
         buf.append("insert into ")
-        buf.append(table(context.target))
+        table(target)
         buf.append(" (")
         for (p in properties) {
-            buf.append(column(p))
+            column(p)
             buf.append(", ")
         }
         buf.cutBack(2)
@@ -42,11 +43,13 @@ internal class EntityInsertStatementBuilder<ENTITY : Any, ID, META : EntityMetam
         return buf.toStatement()
     }
 
-    private fun table(metamodel: EntityMetamodel<*, *, *>): String {
-        return metamodel.getCanonicalTableName(dialect::enquote)
+    private fun table(metamodel: EntityMetamodel<*, *, *>) {
+        val name = metamodel.getCanonicalTableName(dialect::enquote)
+        buf.append(name)
     }
 
-    private fun column(expression: ColumnExpression<*, *>): String {
-        return expression.getCanonicalColumnName(dialect::enquote)
+    private fun column(expression: ColumnExpression<*, *>) {
+        val name = expression.getCanonicalColumnName(dialect::enquote)
+        buf.append(name)
     }
 }

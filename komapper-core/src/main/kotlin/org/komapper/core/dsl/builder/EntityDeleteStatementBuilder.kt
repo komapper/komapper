@@ -21,11 +21,12 @@ internal class EntityDeleteStatementBuilder<ENTITY : Any, ID, META : EntityMetam
     private val support = BuilderSupport(dialect, aliasManager, buf)
 
     fun build(): Statement {
-        buf.append("delete from ")
-        table(context.target)
-        val identityProperties = context.target.idProperties()
-        val versionProperty = context.target.versionProperty()
+        val target = context.target
+        val identityProperties = target.idProperties()
+        val versionProperty = target.versionProperty()
         val versionRequired = versionProperty != null && !option.ignoreVersion
+        buf.append("delete from ")
+        table(target)
         if (identityProperties.isNotEmpty() || versionRequired) {
             buf.append(" where ")
             if (identityProperties.isNotEmpty()) {

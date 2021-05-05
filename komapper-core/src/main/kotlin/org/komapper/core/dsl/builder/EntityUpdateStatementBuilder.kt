@@ -24,7 +24,7 @@ internal class EntityUpdateStatementBuilder<ENTITY : Any, ID, META : EntityMetam
         val idProperties = target.idProperties()
         val versionProperty = target.versionProperty()
         buf.append("update ")
-        table(context.target)
+        table(target)
         buf.append(" set ")
         for (p in context.getTargetProperties()) {
             column(p)
