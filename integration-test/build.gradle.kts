@@ -19,14 +19,14 @@ dependencies {
     compileOnly(project(":komapper-annotation"))
     ksp(project(":komapper-processor"))
     implementation(project(":komapper-transaction"))
-    implementation(libs.postgresql)
+    implementation("org.postgresql:postgresql:42.2.20")
 
     implementation(project(":komapper-jdbc-h2"))
     runtimeOnly(project(":komapper-jdbc-mysql"))
     runtimeOnly(project(":komapper-jdbc-postgresql"))
     runtimeOnly(project(":komapper-template"))
     runtimeOnly(project(":komapper-ext-slf4j"))
-    runtimeOnly(libs.logback.classic)
+    runtimeOnly("ch.qos.logback:logback-classic:1.2.3")
 }
 
 ksp {

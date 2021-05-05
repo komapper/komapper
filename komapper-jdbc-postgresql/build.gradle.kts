@@ -1,4 +1,4 @@
 dependencies {
     api(project(":komapper-core"))
-    runtimeOnly(libs.postgresql)
+    runtimeOnly("org.postgresql:postgresql:42.2.20")
 }
