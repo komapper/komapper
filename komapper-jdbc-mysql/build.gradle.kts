@@ -1,4 +1,4 @@
 dependencies {
     api(project(":komapper-core"))
-    runtimeOnly(libs.mysql)
+    runtimeOnly("mysql:mysql-connector-java:8.0.24")
 }

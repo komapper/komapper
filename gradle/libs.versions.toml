@@ -7,18 +7,6 @@ spring-jdbc = { module = "org.springframework:spring-jdbc", version.ref = "sprin
 spring-boot-autoconfigure = { module = "org.springframework.boot:spring-boot-autoconfigure", version.ref="spring-boot" }
 spring-boot-starter-plain = { module = "org.springframework.boot:spring-boot-starter", version.ref="spring-boot" }
 spring-boot-starter-jdbc = { module = "org.springframework.boot:spring-boot-starter-jdbc", version.ref="spring-boot" }
-slf4j-api = { module = "org.slf4j:slf4j-api", version = "1.7.30" }
-logback-classic = "ch.qos.logback:logback-classic:1.2.3"
-h2 = "com.h2database:h2:1.4.200"
-mysql = "mysql:mysql-connector-java:8.0.24"
-postgresql = "org.postgresql:postgresql:42.2.20"
-truth = "com.google.truth:truth:1.1.2"
-sqlcommenter = "com.google.cloud:sqlcommenter:1.1.0"
-opentelemetry-api = "io.opentelemetry:opentelemetry-api:0.12.0"
-symbol-processing-api = "com.google.devtools.ksp:symbol-processing-api:1.5.0-1.0.0-alpha09"
-symbol-processing-impl = "com.google.devtools.ksp:symbol-processing:1.5.0-1.0.0-alpha09"
-kotlin-compile-testing-ksp = "com.github.tschuchortdev:kotlin-compile-testing-ksp:1.4.0"
-hikariCP = "com.zaxxer:HikariCP:4.0.3"
 
 [bundles]
 ext-spring-boot-autoconfigure = ["spring-jdbc", "spring-boot-autoconfigure"]

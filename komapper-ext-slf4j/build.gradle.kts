@@ -1,4 +1,4 @@
 dependencies {
     api(project(":komapper-core"))
-    api(libs.slf4j.api)
+    api("org.slf4j:slf4j-api:1.7.30")
 }
