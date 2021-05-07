@@ -130,6 +130,7 @@ class EntityProcessorTest {
                 """
                 package test
                 import org.komapper.annotation.*
+                @Suppress("ClassName")
                 @KmEntity
                 data class __Dept(
                     val id: Int
@@ -149,6 +150,7 @@ class EntityProcessorTest {
                 """
                 package test
                 import org.komapper.annotation.*
+                @Suppress("ClassName")
                 data class __Dept(
                     val id: Int
                 )
