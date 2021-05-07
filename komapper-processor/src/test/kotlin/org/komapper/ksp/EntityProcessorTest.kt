@@ -1,11 +1,12 @@
 package org.komapper.ksp
 
-import com.google.common.truth.Truth.assertThat
 import com.tschuchort.compiletesting.KotlinCompilation
 import com.tschuchort.compiletesting.SourceFile
 import com.tschuchort.compiletesting.SourceFile.Companion.kotlin
 import com.tschuchort.compiletesting.kspIncremental
 import com.tschuchort.compiletesting.symbolProcessorProviders
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 import java.nio.file.Path
@@ -31,8 +32,8 @@ class EntityProcessorTest {
                 """
             )
         )
-        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertThat(result.messages).contains("Define a companion object in the class.")
+        assertEquals(result.exitCode, KotlinCompilation.ExitCode.COMPILATION_ERROR)
+        assertTrue(result.messages.contains("Define a companion object in the class."))
     }
 
     @Test
@@ -50,8 +51,8 @@ class EntityProcessorTest {
                 """
             )
         )
-        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertThat(result.messages).contains("The entity class must have at least one id property.")
+        assertEquals(result.exitCode, KotlinCompilation.ExitCode.COMPILATION_ERROR)
+        assertTrue(result.messages.contains("The entity class must have at least one id property."))
     }
 
     @Test
@@ -71,8 +72,8 @@ class EntityProcessorTest {
                 """
             )
         )
-        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertThat(result.messages).contains("The parent declaration of the entity class must be public.")
+        assertEquals(result.exitCode, KotlinCompilation.ExitCode.COMPILATION_ERROR)
+        assertTrue(result.messages.contains("The parent declaration of the entity class must be public."))
     }
 
     @Test
@@ -94,8 +95,8 @@ class EntityProcessorTest {
                 """
             )
         )
-        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertThat(result.messages).contains("Duplicated definitions are found.")
+        assertEquals(result.exitCode, KotlinCompilation.ExitCode.COMPILATION_ERROR)
+        assertTrue(result.messages.contains("Duplicated definitions are found."))
     }
 
     @Test
@@ -117,8 +118,8 @@ class EntityProcessorTest {
                 """
             )
         )
-        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertThat(result.messages).contains("The same name property is not found in the entity.")
+        assertEquals(result.exitCode, KotlinCompilation.ExitCode.COMPILATION_ERROR)
+        assertTrue(result.messages.contains("The same name property is not found in the entity."))
     }
 
     @Test
@@ -136,8 +137,8 @@ class EntityProcessorTest {
                 """
             )
         )
-        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertThat(result.messages).contains("The class name cannot start with '__'.")
+        assertEquals(result.exitCode, KotlinCompilation.ExitCode.COMPILATION_ERROR)
+        assertTrue(result.messages.contains("The class name cannot start with '__'."))
     }
 
     @Test
@@ -158,8 +159,8 @@ class EntityProcessorTest {
                 """
             )
         )
-        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertThat(result.messages).contains("The class name cannot start with '__'.")
+        assertEquals(result.exitCode, KotlinCompilation.ExitCode.COMPILATION_ERROR)
+        assertTrue(result.messages.contains("The class name cannot start with '__'."))
     }
 
     @Test
@@ -177,8 +178,8 @@ class EntityProcessorTest {
                 """
             )
         )
-        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertThat(result.messages).contains("The property name cannot start with '__'.")
+        assertEquals(result.exitCode, KotlinCompilation.ExitCode.COMPILATION_ERROR)
+        assertTrue(result.messages.contains("The property name cannot start with '__'."))
     }
 
     @Test
@@ -200,8 +201,8 @@ class EntityProcessorTest {
                 """
             )
         )
-        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertThat(result.messages).contains("The property name cannot start with '__'.")
+        assertEquals(result.exitCode, KotlinCompilation.ExitCode.COMPILATION_ERROR)
+        assertTrue(result.messages.contains("The property name cannot start with '__'."))
     }
 
     @Test
@@ -219,8 +220,8 @@ class EntityProcessorTest {
                 """
             )
         )
-        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertThat(result.messages).contains("The entity class must be a data class.")
+        assertEquals(result.exitCode, KotlinCompilation.ExitCode.COMPILATION_ERROR)
+        assertTrue(result.messages.contains("The entity class must be a data class."))
     }
 
     @Test
@@ -241,8 +242,8 @@ class EntityProcessorTest {
                 """
             )
         )
-        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertThat(result.messages).contains("The entity class must be a data class.")
+        assertEquals(result.exitCode, KotlinCompilation.ExitCode.COMPILATION_ERROR)
+        assertTrue(result.messages.contains("The entity class must be a data class."))
     }
 
     @Test
@@ -259,8 +260,8 @@ class EntityProcessorTest {
                 """
             )
         )
-        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertThat(result.messages).contains("@KmEntity cannot be applied to this element.")
+        assertEquals(result.exitCode, KotlinCompilation.ExitCode.COMPILATION_ERROR)
+        assertTrue(result.messages.contains("@KmEntity cannot be applied to this element."))
     }
 
     @Test
@@ -280,8 +281,8 @@ class EntityProcessorTest {
                 """
             )
         )
-        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertThat(result.messages).contains("@KmEntityDef cannot be applied to this element.")
+        assertEquals(result.exitCode, KotlinCompilation.ExitCode.COMPILATION_ERROR)
+        assertTrue(result.messages.contains("@KmEntityDef cannot be applied to this element."))
     }
 
     @Test
@@ -299,8 +300,8 @@ class EntityProcessorTest {
                 """
             )
         )
-        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertThat(result.messages).contains("The entity class must not be private.")
+        assertEquals(result.exitCode, KotlinCompilation.ExitCode.COMPILATION_ERROR)
+        assertTrue(result.messages.contains("The entity class must not be private."))
     }
 
     @Test
@@ -321,8 +322,8 @@ class EntityProcessorTest {
                 """
             )
         )
-        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertThat(result.messages).contains("The entity class must not be private.")
+        assertEquals(result.exitCode, KotlinCompilation.ExitCode.COMPILATION_ERROR)
+        assertTrue(result.messages.contains("The entity class must not be private."))
     }
 
     @Test
@@ -340,8 +341,8 @@ class EntityProcessorTest {
                 """
             )
         )
-        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertThat(result.messages).contains("The entity class must not have type parameters.")
+        assertEquals(result.exitCode, KotlinCompilation.ExitCode.COMPILATION_ERROR)
+        assertTrue(result.messages.contains("The entity class must not have type parameters."))
     }
 
     @Test
@@ -362,8 +363,8 @@ class EntityProcessorTest {
                 """
             )
         )
-        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertThat(result.messages).contains("The entity class must not have type parameters.")
+        assertEquals(result.exitCode, KotlinCompilation.ExitCode.COMPILATION_ERROR)
+        assertTrue(result.messages.contains("The entity class must not have type parameters."))
     }
 
     @Test
@@ -382,8 +383,8 @@ class EntityProcessorTest {
                 """
             )
         )
-        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertThat(result.messages).contains("Multiple @KmVersion cannot coexist in a single class.")
+        assertEquals(result.exitCode, KotlinCompilation.ExitCode.COMPILATION_ERROR)
+        assertTrue(result.messages.contains("Multiple @KmVersion cannot coexist in a single class."))
     }
 
     @Test
@@ -403,8 +404,8 @@ class EntityProcessorTest {
                 """
             )
         )
-        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertThat(result.messages).contains("Multiple @KmCreatedAt cannot coexist in a single class.")
+        assertEquals(result.exitCode, KotlinCompilation.ExitCode.COMPILATION_ERROR)
+        assertTrue(result.messages.contains("Multiple @KmCreatedAt cannot coexist in a single class."))
     }
 
     @Test
@@ -423,8 +424,8 @@ class EntityProcessorTest {
                 """
             )
         )
-        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertThat(result.messages).contains("Multiple @KmUpdatedAt cannot coexist in a single class.")
+        assertEquals(result.exitCode, KotlinCompilation.ExitCode.COMPILATION_ERROR)
+        assertTrue(result.messages.contains("Multiple @KmUpdatedAt cannot coexist in a single class."))
     }
 
     @Test
@@ -443,8 +444,8 @@ class EntityProcessorTest {
                 """
             )
         )
-        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertThat(result.messages).contains("Any persistent properties are not found.")
+        assertEquals(result.exitCode, KotlinCompilation.ExitCode.COMPILATION_ERROR)
+        assertTrue(result.messages.contains("Any persistent properties are not found."))
     }
 
     @Test
@@ -462,8 +463,8 @@ class EntityProcessorTest {
                 """
             )
         )
-        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertThat(result.messages).contains("The property must not be private.")
+        assertEquals(result.exitCode, KotlinCompilation.ExitCode.COMPILATION_ERROR)
+        assertTrue(result.messages.contains("The property must not be private."))
     }
 
     @Test
@@ -481,8 +482,8 @@ class EntityProcessorTest {
                 """
             )
         )
-        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertThat(result.messages).contains("@KmId and @KmVersion cannot coexist on the same property.")
+        assertEquals(result.exitCode, KotlinCompilation.ExitCode.COMPILATION_ERROR)
+        assertTrue(result.messages.contains("@KmId and @KmVersion cannot coexist on the same property."))
     }
 
     @Test
@@ -500,8 +501,8 @@ class EntityProcessorTest {
                 """
             )
         )
-        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertThat(result.messages).contains("@KmAutoIncrement and @KmId must coexist on the same property.")
+        assertEquals(result.exitCode, KotlinCompilation.ExitCode.COMPILATION_ERROR)
+        assertTrue(result.messages.contains("@KmAutoIncrement and @KmId must coexist on the same property."))
     }
 
     @Test
@@ -519,8 +520,8 @@ class EntityProcessorTest {
                 """
             )
         )
-        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertThat(result.messages).contains("@KmAutoIncrement and @KmSequence cannot coexist on the same property.")
+        assertEquals(result.exitCode, KotlinCompilation.ExitCode.COMPILATION_ERROR)
+        assertTrue(result.messages.contains("@KmAutoIncrement and @KmSequence cannot coexist on the same property."))
     }
 
     @Test
@@ -539,8 +540,8 @@ class EntityProcessorTest {
                 """
             )
         )
-        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertThat(result.messages).contains("@KmAutoIncrement and @KmSequence cannot coexist in a single class.")
+        assertEquals(result.exitCode, KotlinCompilation.ExitCode.COMPILATION_ERROR)
+        assertTrue(result.messages.contains("@KmAutoIncrement and @KmSequence cannot coexist in a single class."))
     }
 
     @Test
@@ -558,8 +559,8 @@ class EntityProcessorTest {
                 """
             )
         )
-        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertThat(result.messages).contains("The type of @KmVersion annotated property must be either Int, Long, UInt or value class.")
+        assertEquals(result.exitCode, KotlinCompilation.ExitCode.COMPILATION_ERROR)
+        assertTrue(result.messages.contains("The type of @KmVersion annotated property must be either Int, Long, UInt or value class."))
     }
 
     @Test
@@ -581,10 +582,12 @@ class EntityProcessorTest {
                 """
             )
         )
-        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertThat(result.messages).contains(
-            "When the type of @KmVersion annotated property is value class, " +
-                "the type of the value class's own property must be either Int, Long or UInt."
+        assertEquals(result.exitCode, KotlinCompilation.ExitCode.COMPILATION_ERROR)
+        assertTrue(
+            result.messages.contains(
+                "When the type of @KmVersion annotated property is value class, " +
+                    "the type of the value class's own property must be either Int, Long or UInt."
+            )
         )
     }
 
@@ -603,8 +606,8 @@ class EntityProcessorTest {
                 """
             )
         )
-        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertThat(result.messages).contains("The type of @KmCreatedAt annotated property must be either LocalDateTime or OffsetDateTime.")
+        assertEquals(result.exitCode, KotlinCompilation.ExitCode.COMPILATION_ERROR)
+        assertTrue(result.messages.contains("The type of @KmCreatedAt annotated property must be either LocalDateTime or OffsetDateTime."))
     }
 
     @Test
@@ -626,10 +629,12 @@ class EntityProcessorTest {
                 """
             )
         )
-        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertThat(result.messages).contains(
-            "When the type of @KmCreatedAt annotated property is value class, " +
-                "the type of the value class's own property must be either LocalDateTime or OffsetDateTime."
+        assertEquals(result.exitCode, KotlinCompilation.ExitCode.COMPILATION_ERROR)
+        assertTrue(
+            result.messages.contains(
+                "When the type of @KmCreatedAt annotated property is value class, " +
+                    "the type of the value class's own property must be either LocalDateTime or OffsetDateTime."
+            )
         )
     }
 
@@ -648,8 +653,8 @@ class EntityProcessorTest {
                 """
             )
         )
-        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertThat(result.messages).contains("The type of @KmUpdatedAt annotated property must be either LocalDateTime or OffsetDateTime.")
+        assertEquals(result.exitCode, KotlinCompilation.ExitCode.COMPILATION_ERROR)
+        assertTrue(result.messages.contains("The type of @KmUpdatedAt annotated property must be either LocalDateTime or OffsetDateTime."))
     }
 
     @Test
@@ -671,10 +676,12 @@ class EntityProcessorTest {
                 """
             )
         )
-        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertThat(result.messages).contains(
-            "When the type of @KmUpdatedAt annotated property is value class, " +
-                "the type of the value class's own property must be either LocalDateTime or OffsetDateTime."
+        assertEquals(result.exitCode, KotlinCompilation.ExitCode.COMPILATION_ERROR)
+        assertTrue(
+            result.messages.contains(
+                "When the type of @KmUpdatedAt annotated property is value class, " +
+                    "the type of the value class's own property must be either LocalDateTime or OffsetDateTime."
+            )
         )
     }
 
@@ -693,8 +700,8 @@ class EntityProcessorTest {
                 """
             )
         )
-        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertThat(result.messages).contains("The ignored property must have a default value.")
+        assertEquals(result.exitCode, KotlinCompilation.ExitCode.COMPILATION_ERROR)
+        assertTrue(result.messages.contains("The ignored property must have a default value."))
     }
 
     @Test
@@ -712,8 +719,8 @@ class EntityProcessorTest {
                 """
             )
         )
-        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertThat(result.messages).contains("The type of @KmAutoIncrement annotated property must be either Int, Long, UInt or value class.")
+        assertEquals(result.exitCode, KotlinCompilation.ExitCode.COMPILATION_ERROR)
+        assertTrue(result.messages.contains("The type of @KmAutoIncrement annotated property must be either Int, Long, UInt or value class."))
     }
 
     @Test
@@ -731,8 +738,8 @@ class EntityProcessorTest {
                 """
             )
         )
-        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertThat(result.messages).contains("The type of @KmSequence annotated property must be either Int, Long, UInt or value class.")
+        assertEquals(result.exitCode, KotlinCompilation.ExitCode.COMPILATION_ERROR)
+        assertTrue(result.messages.contains("The type of @KmSequence annotated property must be either Int, Long, UInt or value class."))
     }
 
     @Test
@@ -754,8 +761,8 @@ class EntityProcessorTest {
                 """
             )
         )
-        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertThat(result.messages).contains("When the type of @KmAutoIncrement annotated property is value class, the type of the value class's own property must be either Int, Long or UInt.")
+        assertEquals(result.exitCode, KotlinCompilation.ExitCode.COMPILATION_ERROR)
+        assertTrue(result.messages.contains("When the type of @KmAutoIncrement annotated property is value class, the type of the value class's own property must be either Int, Long or UInt."))
     }
 
     @Test
@@ -777,10 +784,12 @@ class EntityProcessorTest {
                 """
             )
         )
-        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertThat(result.messages).contains(
-            "When the type of @KmSequence annotated property is value class, " +
-                "the type of the value class's own property must be either Int, Long or UInt."
+        assertEquals(result.exitCode, KotlinCompilation.ExitCode.COMPILATION_ERROR)
+        assertTrue(
+            result.messages.contains(
+                "When the type of @KmSequence annotated property is value class, " +
+                    "the type of the value class's own property must be either Int, Long or UInt."
+            )
         )
     }
 
@@ -799,8 +808,8 @@ class EntityProcessorTest {
                 """
             )
         )
-        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertThat(result.messages).contains("@KmSequence.name is not found.")
+        assertEquals(result.exitCode, KotlinCompilation.ExitCode.COMPILATION_ERROR)
+        assertTrue(result.messages.contains("@KmSequence.name is not found."))
     }
 
     @Test
@@ -821,8 +830,8 @@ class EntityProcessorTest {
                 """
             )
         )
-        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertThat(result.messages).contains("The value class's own property 'name' must not be private.")
+        assertEquals(result.exitCode, KotlinCompilation.ExitCode.COMPILATION_ERROR)
+        assertTrue(result.messages.contains("The value class's own property 'name' must not be private."))
     }
 
     @Test
@@ -843,8 +852,8 @@ class EntityProcessorTest {
                 """
             )
         )
-        assertThat(result.exitCode).isEqualTo(KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertThat(result.messages).contains("The value class's own property 'name' must not be nullable.")
+        assertEquals(result.exitCode, KotlinCompilation.ExitCode.COMPILATION_ERROR)
+        assertTrue(result.messages.contains("The value class's own property 'name' must not be nullable."))
     }
 
     private fun prepareCompilation(vararg sourceFiles: SourceFile): KotlinCompilation {
