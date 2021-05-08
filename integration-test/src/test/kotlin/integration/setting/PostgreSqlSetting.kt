@@ -6,7 +6,7 @@ import org.komapper.core.DefaultDatabaseConfig
 
 class PostgreSqlSetting(url: String, user: String, password: String) : Setting {
     override val config: DatabaseConfig =
-        object : DefaultDatabaseConfig(url, user, password, setOf(PostgreSqlJsonType())) {
+        object : DefaultDatabaseConfig(url, user, password, listOf(PostgreSqlJsonType())) {
             override val jdbcOption = super.jdbcOption.copy(batchSize = 2)
         }
     override val dbms: Dbms = Dbms.POSTGRESQL

@@ -36,6 +36,8 @@ val libraryProjects = subprojects.filter {
 
 val platformProject = project("komapper-platform")
 
+val gradlePluginProject = project("gradle-plugin")
+
 val exampleProjects = subprojects.filter {
     it.name.startsWith("example")
 }
@@ -53,7 +55,7 @@ configure(libraryProjects) {
     }
 }
 
-configure(libraryProjects + testProjects) {
+configure(libraryProjects + gradlePluginProject + testProjects) {
     apply(plugin = "org.jetbrains.kotlin.jvm")
 
     tasks.withType<Test> {
@@ -66,7 +68,7 @@ configure(libraryProjects + testProjects) {
     }
 }
 
-configure(libraryProjects + testProjects + exampleProjects) {
+configure(libraryProjects + gradlePluginProject + testProjects + exampleProjects) {
     apply(plugin = "org.jetbrains.kotlin.jvm")
 
     configure<com.diffplug.gradle.spotless.SpotlessExtension> {

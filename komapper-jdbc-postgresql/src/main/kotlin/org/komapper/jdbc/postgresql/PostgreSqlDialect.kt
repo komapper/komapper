@@ -31,7 +31,7 @@ import org.komapper.core.jdbc.UIntType
 import org.komapper.core.jdbc.UShortType
 import java.sql.SQLException
 
-open class PostgreSqlDialect(dataTypes: Set<DataType<*>> = emptySet(), val version: Version = Version.V42_2) :
+open class PostgreSqlDialect(dataTypes: List<DataType<*>> = emptyList(), val version: Version = Version.V42_2) :
     AbstractDialect(defaultDataTypes + dataTypes) {
 
     companion object {
@@ -42,7 +42,7 @@ open class PostgreSqlDialect(dataTypes: Set<DataType<*>> = emptySet(), val versi
         /** the state code that represents unique violation  */
         const val UNIQUE_CONSTRAINT_VIOLATION_STATE_CODE = "23505"
 
-        val defaultDataTypes: Set<DataType<*>> = setOf(
+        val defaultDataTypes: List<DataType<*>> = listOf(
             ArrayType("array"),
             BigDecimalType("decimal"),
             BigIntegerType("decimal"),
@@ -90,5 +90,9 @@ open class PostgreSqlDialect(dataTypes: Set<DataType<*>> = emptySet(), val versi
         entities: List<ENTITY>
     ): EntityUpsertStatementBuilder<ENTITY> {
         return PostgreSqlEntityUpsertStatementBuilder(this, context, entities)
+    }
+
+    override fun getDefaultSchemaName(userName: String?): String? {
+        return null
     }
 }

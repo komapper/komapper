@@ -42,7 +42,7 @@ open class DefaultDatabaseConfig(
         url: String,
         user: String = "",
         password: String = "",
-        dataTypes: Set<DataType<*>> = emptySet()
+        dataTypes: List<DataType<*>> = emptyList()
     ) : this(SimpleDataSource(url, user, password), Dialect.load(url, dataTypes))
 
     constructor(

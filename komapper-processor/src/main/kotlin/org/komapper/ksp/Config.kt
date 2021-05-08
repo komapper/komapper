@@ -1,5 +1,10 @@
 package org.komapper.ksp
 
+import org.komapper.core.CamelToLowerSnakeCase
+import org.komapper.core.CamelToUpperSnakeCase
+import org.komapper.core.Implicit
+import org.komapper.core.NamingStrategy
+
 internal data class Config(
     val prefix: String,
     val suffix: String,

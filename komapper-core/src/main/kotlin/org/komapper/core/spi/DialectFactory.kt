@@ -5,5 +5,5 @@ import org.komapper.core.jdbc.DataType
 
 interface DialectFactory {
     fun supports(subprotocol: String): Boolean
-    fun create(dataTypes: Set<DataType<*>>): Dialect
+    fun create(dataTypes: List<DataType<*>>): Dialect
 }

@@ -93,8 +93,8 @@ class KomapperAutoConfigurationTest {
     open class CustomConfigure {
 
         @Bean
-        open fun dataTypes(): Set<DataType<*>> {
-            return setOf(StringType("abc"))
+        open fun dataTypes(): List<DataType<*>> {
+            return listOf(StringType("abc"))
         }
 
         @Bean

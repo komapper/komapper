@@ -8,6 +8,7 @@ import com.google.devtools.ksp.symbol.KSType
 import com.google.devtools.ksp.symbol.KSValueParameter
 import com.google.devtools.ksp.symbol.Nullability
 import com.google.devtools.ksp.visitor.KSEmptyVisitor
+import org.komapper.core.NamingStrategy
 
 internal class EntityFactory(config: Config, private val entityDef: EntityDef) {
 

@@ -41,13 +41,13 @@ open class KomapperAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    open fun dialect(environment: Environment, dataTypes: Set<DataType<*>>?): Dialect {
+    open fun dialect(environment: Environment, dataTypes: List<DataType<*>>?): Dialect {
         val url = environment.getProperty(DATASOURCE_URL_PROPERTY)
             ?: error(
                 "$DATASOURCE_URL_PROPERTY is not found. " +
                     "Specify it to the application.properties file or define the Dialect bean manually."
             )
-        return Dialect.load(url, dataTypes ?: emptySet())
+        return Dialect.load(url, dataTypes ?: emptyList())
     }
 
     @Bean

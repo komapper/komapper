@@ -17,8 +17,9 @@ import java.time.OffsetDateTime
 import kotlin.reflect.KClass
 
 interface DataType<T : Any> {
-    val klass: KClass<T>
     val name: String
+    val klass: KClass<T>
+    val jdbcType: JDBCType
 
     fun getValue(rs: ResultSet, index: Int): T?
     fun getValue(rs: ResultSet, columnLabel: String): T?
@@ -28,7 +29,7 @@ interface DataType<T : Any> {
 
 abstract class AbstractDataType<T : Any>(
     override val klass: KClass<T>,
-    protected val jdbcType: JDBCType
+    override val jdbcType: JDBCType
 ) : DataType<T> {
 
     override fun getValue(rs: ResultSet, index: Int): T? {
@@ -112,25 +113,24 @@ class BigDecimalType(override val name: String) :
 }
 
 class BigIntegerType(override val name: String) : DataType<BigInteger> {
-
+    private val dataType = BigDecimalType(name)
     override val klass: KClass<BigInteger> = BigInteger::class
-
-    private val jdbcType = BigDecimalType(name)
+    override val jdbcType = dataType.jdbcType
 
     override fun getValue(rs: ResultSet, index: Int): BigInteger? {
-        return jdbcType.getValue(rs, index)?.toBigInteger()
+        return dataType.getValue(rs, index)?.toBigInteger()
     }
 
     override fun getValue(rs: ResultSet, columnLabel: String): BigInteger? {
-        return jdbcType.getValue(rs, columnLabel)?.toBigInteger()
+        return dataType.getValue(rs, columnLabel)?.toBigInteger()
     }
 
     override fun setValue(ps: PreparedStatement, index: Int, value: BigInteger?) {
-        jdbcType.setValue(ps, index, value?.toBigDecimal())
+        dataType.setValue(ps, index, value?.toBigDecimal())
     }
 
     override fun toString(value: BigInteger?): String {
-        return jdbcType.toString(value?.toBigDecimal())
+        return dataType.toString(value?.toBigDecimal())
     }
 }
 
@@ -233,25 +233,25 @@ class DoubleType(override val name: String) :
 }
 
 class EnumType(override val klass: KClass<Enum<*>>, override val name: String) : DataType<Enum<*>> {
-
-    private val jdbcType = StringType(name)
+    private val dataType = StringType(name)
+    override val jdbcType = dataType.jdbcType
 
     override fun getValue(rs: ResultSet, index: Int): Enum<*>? {
-        val value = jdbcType.getValue(rs, index) ?: return null
+        val value = dataType.getValue(rs, index) ?: return null
         return toEnumConstant(value)
     }
 
     override fun getValue(rs: ResultSet, columnLabel: String): Enum<*>? {
-        val value = jdbcType.getValue(rs, columnLabel) ?: return null
+        val value = dataType.getValue(rs, columnLabel) ?: return null
         return toEnumConstant(value)
     }
 
     override fun setValue(ps: PreparedStatement, index: Int, value: Enum<*>?) {
-        jdbcType.setValue(ps, index, value?.name)
+        dataType.setValue(ps, index, value?.name)
     }
 
     override fun toString(value: Enum<*>?): String {
-        return jdbcType.toString(value?.name)
+        return dataType.toString(value?.name)
     }
 
     fun toEnumConstant(value: String): Enum<*> {
