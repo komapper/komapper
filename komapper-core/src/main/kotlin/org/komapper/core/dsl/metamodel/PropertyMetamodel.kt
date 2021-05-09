@@ -5,6 +5,7 @@ import org.komapper.core.dsl.expression.ColumnExpression
 import kotlin.reflect.KClass
 
 interface PropertyMetamodel<ENTITY : Any, EXTERIOR : Any, INTERIOR : Any> : ColumnExpression<EXTERIOR, INTERIOR> {
+    override val owner: EntityMetamodel<ENTITY, *, *>
     val name: String
     val getter: (ENTITY) -> EXTERIOR?
     val setter: (ENTITY, EXTERIOR) -> ENTITY
@@ -22,15 +23,15 @@ class PropertyMetamodelImpl<ENTITY : Any, EXTERIOR : Any, INTERIOR : Any>(
     override val owner: EntityMetamodel<ENTITY, *, *>,
     private val descriptor: PropertyDescriptor<ENTITY, EXTERIOR, INTERIOR>
 ) : PropertyMetamodel<ENTITY, EXTERIOR, INTERIOR> {
-    override val exteriorClass: KClass<EXTERIOR> get() = descriptor.klass
+    override val exteriorClass: KClass<EXTERIOR> get() = descriptor.exteriorClass
     override val interiorClass: KClass<INTERIOR> = descriptor.interiorClass
     override val name: String get() = descriptor.name
     override val columnName: String get() = descriptor.columnName
     override val alwaysQuote: Boolean get() = descriptor.alwaysQuote
     override val getter: (ENTITY) -> EXTERIOR? get() = descriptor.getter
     override val setter: (ENTITY, EXTERIOR) -> ENTITY get() = descriptor.setter
-    override val wrap: (INTERIOR) -> EXTERIOR get() = descriptor.compose
-    override val unwrap: (EXTERIOR) -> INTERIOR get() = descriptor.decompose
+    override val wrap: (INTERIOR) -> EXTERIOR get() = descriptor.wrap
+    override val unwrap: (EXTERIOR) -> INTERIOR get() = descriptor.unwrap
     override val nullable: Boolean = descriptor.nullable
     override val idAssignment: Assignment<ENTITY>? = descriptor.idAssignment
 }
