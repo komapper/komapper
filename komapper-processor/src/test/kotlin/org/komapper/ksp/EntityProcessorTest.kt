@@ -77,29 +77,6 @@ class EntityProcessorTest {
     }
 
     @Test
-    fun `Duplicated definitions are found`() {
-        val result = compile(
-            kotlin(
-                "source.kt",
-                """
-                package test
-                import org.komapper.annotation.*
-                @KmEntity
-                data class Dept(
-                    val id: Int
-                ) { companion object }
-                @KmEntityDef(entity = Dept::class)
-                data class DeptDef(
-                    val id: Int
-                ) { companion object }
-                """
-            )
-        )
-        assertEquals(result.exitCode, KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertTrue(result.messages.contains("Duplicated definitions are found."))
-    }
-
-    @Test
     fun `The same name property is not found in the entity`() {
         val result = compile(
             kotlin(
