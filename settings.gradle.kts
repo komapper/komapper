@@ -19,6 +19,7 @@ include("komapper-processor")
 // OPTIONAL
 include("komapper-template")
 include("komapper-transaction")
+include("komapper-codegen")
 
 // JDBC
 include("komapper-jdbc-h2")
@@ -36,6 +37,9 @@ include("komapper-starter")
 
 // PLATFORM
 include("komapper-platform")
+
+// GRADLE PLUGIN
+include("gradle-plugin")
 
 // EXAMPLE
 include("example-minimum")

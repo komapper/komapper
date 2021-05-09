@@ -3,6 +3,7 @@ package org.komapper.ksp
 import com.google.devtools.ksp.getDeclaredProperties
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSValueParameter
+import org.komapper.core.NamingStrategy
 
 internal class EntityDefFactory(
     config: Config,

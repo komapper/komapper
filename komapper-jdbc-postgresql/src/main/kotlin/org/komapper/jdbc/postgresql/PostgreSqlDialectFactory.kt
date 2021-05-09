@@ -9,7 +9,7 @@ class PostgreSqlDialectFactory : DialectFactory {
         return subprotocol == PostgreSqlDialect.subprotocol
     }
 
-    override fun create(dataTypes: Set<DataType<*>>): Dialect {
+    override fun create(dataTypes: List<DataType<*>>): Dialect {
         return PostgreSqlDialect(dataTypes)
     }
 }

@@ -18,6 +18,7 @@ import java.util.regex.Pattern
 import kotlin.reflect.KClass
 
 interface Dialect {
+    val dataTypes: List<DataType<*>>
     val subprotocol: String
     val openQuote: String
     val closeQuote: String
@@ -28,6 +29,7 @@ interface Dialect {
     fun setValue(ps: PreparedStatement, index: Int, value: Any?, valueClass: KClass<*>)
     fun formatValue(value: Any?, valueClass: KClass<*>): String
     fun getDataType(klass: KClass<*>): DataType<*>
+    fun tryGetDataType(name: String): DataType<*>?
     fun isUniqueConstraintViolation(exception: SQLException): Boolean
     fun getSequenceSql(sequenceName: String): String
     fun enquote(name: String): String
@@ -40,10 +42,12 @@ interface Dialect {
         entities: List<ENTITY>
     ): EntityUpsertStatementBuilder<ENTITY>
 
+    fun getDefaultSchemaName(userName: String?): String?
+
     companion object {
         private val jdbcUrlPattern = Pattern.compile("^jdbc:([^:]*):.*")
 
-        fun load(url: String, dataTypes: Set<DataType<*>>): Dialect {
+        fun load(url: String, dataTypes: List<DataType<*>>): Dialect {
             val subprotocol = extractJdbcSubprotocol(url)
             val loader = ServiceLoader.load(DialectFactory::class.java)
             val factory = loader.firstOrNull { it.supports(subprotocol) }
@@ -65,10 +69,11 @@ interface Dialect {
     }
 }
 
-abstract class AbstractDialect protected constructor(dataTypes: Set<DataType<*>> = emptySet()) : Dialect {
+abstract class AbstractDialect protected constructor(internalDataTypes: List<DataType<*>> = emptyList()) : Dialect {
 
     @Suppress("MemberVisibilityCanBePrivate")
-    protected val dataTypeMap: Map<KClass<*>, DataType<*>> = dataTypes.associateBy { it.klass }
+    protected val dataTypeMap: Map<KClass<*>, DataType<*>> = internalDataTypes.associateBy { it.klass }
+    override val dataTypes = internalDataTypes
     override val openQuote: String = "\""
     override val closeQuote: String = "\""
     override val escapeSequence: String = "\\"
@@ -103,6 +108,12 @@ abstract class AbstractDialect protected constructor(dataTypes: Set<DataType<*>>
         )
     }
 
+    override fun tryGetDataType(name: String): DataType<*>? {
+        return dataTypeMap.values.firstOrNull {
+            it.name.lowercase() == name.lowercase()
+        }
+    }
+
     protected fun getCause(exception: SQLException): SQLException =
         exception.filterIsInstance(SQLException::class.java).first()
 
@@ -125,6 +136,10 @@ abstract class AbstractDialect protected constructor(dataTypes: Set<DataType<*>>
 
     override fun getOffsetLimitStatementBuilder(offset: Int, limit: Int): OffsetLimitStatementBuilder {
         return OffsetLimitStatementBuilderImpl(this, offset, limit)
+    }
+
+    override fun getDefaultSchemaName(userName: String?): String? {
+        return userName
     }
 }
 

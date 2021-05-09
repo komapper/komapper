@@ -9,7 +9,7 @@ class H2DialectFactory : DialectFactory {
         return subprotocol == H2Dialect.subprotocol
     }
 
-    override fun create(dataTypes: Set<DataType<*>>): Dialect {
+    override fun create(dataTypes: List<DataType<*>>): Dialect {
         return H2Dialect(dataTypes)
     }
 }

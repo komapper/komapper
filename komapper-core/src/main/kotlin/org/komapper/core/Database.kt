@@ -29,7 +29,7 @@ interface Database {
             url: String,
             user: String = "",
             password: String = "",
-            dataTypes: Set<DataType<*>> = emptySet()
+            dataTypes: List<DataType<*>> = emptyList()
         ): Database {
             return create(DefaultDatabaseConfig(url, user, password, dataTypes))
         }

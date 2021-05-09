@@ -32,7 +32,7 @@ import org.komapper.core.jdbc.UIntType
 import org.komapper.core.jdbc.UShortType
 import java.sql.SQLException
 
-open class MySqlDialect(dataTypes: Set<DataType<*>> = emptySet(), val version: Version = Version.V8_0) :
+open class MySqlDialect(dataTypes: List<DataType<*>> = emptyList(), val version: Version = Version.V8_0) :
     AbstractDialect(
         defaultDataTypes + dataTypes
     ) {
@@ -45,7 +45,7 @@ open class MySqlDialect(dataTypes: Set<DataType<*>> = emptySet(), val version: V
         /** the error code that represents unique violation  */
         var UNIQUE_CONSTRAINT_VIOLATION_ERROR_CODES = setOf(1022, 1062)
 
-        val defaultDataTypes: Set<DataType<*>> = setOf(
+        val defaultDataTypes: List<DataType<*>> = listOf(
             ArrayType("varbinary(500)"),
             BigDecimalType("decimal"),
             BigIntegerType("decimal"),

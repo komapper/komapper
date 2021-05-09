@@ -32,7 +32,7 @@ import org.komapper.core.jdbc.UIntType
 import org.komapper.core.jdbc.UShortType
 import java.sql.SQLException
 
-open class H2Dialect(dataTypes: Set<DataType<*>> = emptySet(), val version: Version = Version.V1_4) :
+open class H2Dialect(dataTypes: List<DataType<*>> = emptyList(), val version: Version = Version.V1_4) :
     AbstractDialect(defaultDataTypes + dataTypes) {
 
     companion object {
@@ -43,7 +43,7 @@ open class H2Dialect(dataTypes: Set<DataType<*>> = emptySet(), val version: Vers
         /** the error code that represents unique violation  */
         const val UNIQUE_CONSTRAINT_VIOLATION_ERROR_CODE = 23505
 
-        val defaultDataTypes: Set<DataType<*>> = setOf(
+        val defaultDataTypes: List<DataType<*>> = listOf(
             AnyType("other"),
             ArrayType("array"),
             BigDecimalType("bigint"),
@@ -92,5 +92,9 @@ open class H2Dialect(dataTypes: Set<DataType<*>> = emptySet(), val version: Vers
         entities: List<ENTITY>
     ): EntityUpsertStatementBuilder<ENTITY> {
         return H2EntityUpsertStatementBuilder(this, context, entities)
+    }
+
+    override fun getDefaultSchemaName(userName: String?): String? {
+        return null
     }
 }
