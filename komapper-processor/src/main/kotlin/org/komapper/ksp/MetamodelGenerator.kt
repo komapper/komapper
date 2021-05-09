@@ -312,8 +312,8 @@ internal class EntityMetamodelStubGenerator(
     private val defDeclaration: KSClassDeclaration,
     private val declaration: KSClassDeclaration,
     private val packageName: String,
-    private val simpleQualifiedName: String,
-    private val fileName: String,
+    private val entityTypeName: String,
+    private val simpleName: String,
     private val w: PrintWriter
 ) : Runnable {
     private val constructorParamList = listOf(
@@ -329,25 +329,25 @@ internal class EntityMetamodelStubGenerator(
         w.println("// generated at ${ZonedDateTime.now()}")
         w.println("@Suppress(\"ClassName\")")
         w.println("@$EntityMetamodelImplementor")
-        w.println("class $fileName : $EntityMetamodelStub<$simpleQualifiedName, $fileName>() {")
+        w.println("class $simpleName : $EntityMetamodelStub<$entityTypeName, $simpleName>() {")
         val parameters = declaration.primaryConstructor?.parameters
         if (parameters != null) {
             for (p in parameters) {
                 val typeName = p.type.resolve().declaration.qualifiedName?.asString()
-                w.println("    val $p: $PropertyMetamodel<$simpleQualifiedName, $typeName, $typeName> = $PropertyMetamodelStub<$simpleQualifiedName, $typeName>()")
+                w.println("    val $p: $PropertyMetamodel<$entityTypeName, $typeName, $typeName> = $PropertyMetamodelStub<$entityTypeName, $typeName>()")
             }
         }
         w.println("    companion object {")
-        w.println("        val meta = $fileName()")
-        w.println("        fun newMeta($constructorParamList) = $fileName()")
+        w.println("        val meta = $simpleName()")
+        w.println("        fun newMeta($constructorParamList) = $simpleName()")
         w.println("    }")
         w.println("}")
         val companionObject = defDeclaration.getCompanionObject()
         if (companionObject != null) {
             val companionObjectName = (companionObject.qualifiedName ?: companionObject.simpleName).asString()
             w.println("")
-            w.println("val $companionObjectName.meta get() = $fileName.meta")
-            w.println("fun $companionObjectName.newMeta($constructorParamList) = $fileName.newMeta(table, catalog, schema, alwaysQuote)")
+            w.println("val $companionObjectName.meta get() = $simpleName.meta")
+            w.println("fun $companionObjectName.newMeta($constructorParamList) = $simpleName.newMeta(table, catalog, schema, alwaysQuote)")
         }
     }
 }

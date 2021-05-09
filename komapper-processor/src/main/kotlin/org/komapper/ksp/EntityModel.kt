@@ -15,7 +15,7 @@ internal class EntityModel(
         val packageName = declaration.packageName.asString()
         val entityQualifiedName = declaration.qualifiedName?.asString() ?: ""
         val entityTypeName = entityQualifiedName.removePrefix("$packageName.")
-        val simpleName = config.prefix + entityTypeName.replace(".", "_") + config.suffix
+        val simpleName = createSimpleName()
         val file = declaration.containingFile!!
         codeGenerator.createNewFile(Dependencies(false, file), packageName, simpleName).use { out ->
             PrintWriter(out).use {
@@ -32,5 +32,13 @@ internal class EntityModel(
                 runnable.run()
             }
         }
+    }
+
+    private fun createSimpleName(): String {
+        val defDeclaration = definitionSource.defDeclaration
+        val packageName = defDeclaration.packageName.asString()
+        val qualifiedName = defDeclaration.qualifiedName?.asString() ?: ""
+        val packageRemovedQualifiedName = qualifiedName.removePrefix("$packageName.")
+        return config.prefix + packageRemovedQualifiedName.replace(".", "_") + config.suffix
     }
 }

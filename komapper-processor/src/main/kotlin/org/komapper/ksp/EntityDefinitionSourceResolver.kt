@@ -35,13 +35,6 @@ internal class SeparateDefinitionSourceResolver : EntityDefinitionSourceResolver
             },
             Unit
         )
-        if (entityDeclaration.findAnnotation("KmEntity") != null) {
-            report(
-                "Duplicated definitions are found. " +
-                    "The referenced entity class is already annotated with @KmEntity.",
-                annotation
-            )
-        }
         validateEntityDeclaration(entityDeclaration)
         return EntityDefinitionSource(defDeclaration, entityDeclaration)
     }
