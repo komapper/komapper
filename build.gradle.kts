@@ -46,7 +46,7 @@ val testProjects = subprojects.filter {
     it.name.endsWith("test")
 }
 
-configure(libraryProjects) {
+configure(libraryProjects + gradlePluginProject) {
     apply(plugin = "org.jetbrains.kotlin.jvm")
 
     configure<JavaPluginExtension> {
@@ -83,18 +83,23 @@ configure(libraryProjects + gradlePluginProject + testProjects + exampleProjects
     }
 }
 
-configure(libraryProjects + platformProject) {
+configure(libraryProjects + platformProject + gradlePluginProject) {
     apply(plugin = "maven-publish")
     apply(plugin = "signing")
-    if (this == platformProject) {
-        apply(plugin = "java-platform")
+    if (this == platformProject) apply(plugin = "java-platform")
+    val publicationName = if (this == gradlePluginProject) "pluginMaven" else "maven"
+    val component = when (this) {
+        platformProject -> "javaPlatform"
+        gradlePluginProject -> null
+        else -> "java"
     }
-    val component = if (this == platformProject) "javaPlatform" else "java"
 
     configure<PublishingExtension> {
         publications {
-            create<MavenPublication>("maven") {
-                from(components[component])
+            create<MavenPublication>(publicationName) {
+                if (component != null) {
+                    from(components[component])
+                }
                 pom {
                     val projectUrl: String by project
                     name.set(project.name)
