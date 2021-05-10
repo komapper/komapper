@@ -33,57 +33,119 @@ class KomapperPluginTest {
         buildFile.writeText(
             """
             plugins { id("org.komapper.gradle") }
-            komapperCodeGen {
+            komapper {
+                generators {
+                    default {
+                    }
+                    register("h2") {
+                    }
+                    register("mysql") {
+                    }
+                }
             }
             """.trimIndent()
         )
         val result = GradleRunner.create()
             .withProjectDir(testProjectDir)
-            .withArguments("tasks", "--all")
+            .withArguments("tasks", "--all", "--stacktrace")
             .withPluginClasspath()
             .build()
         println(result.output)
-        assertTrue(result.output.contains("komapperCodeGen"))
+        assertTrue(result.output.contains("komapperGenerator"))
+        assertTrue(result.output.contains("komapperH2Generator"))
+        assertTrue(result.output.contains("komapperMysqlGenerator"))
         assertEquals(org.gradle.testkit.runner.TaskOutcome.SUCCESS, result.task(":tasks")?.outcome)
     }
 
     @Test
-    fun komapperGenerate() {
+    fun komapperGenerator() {
         buildFile.writeText(
             """
             import org.komapper.core.*
             import org.komapper.core.dsl.*
             plugins { id("org.komapper.gradle") }
-            komapperCodeGen {
-                val db = Database.create("jdbc:h2:mem:example;DB_CLOSE_DELAY=-1")
-                db.runQuery {
-                    ScriptDsl.execute(""${'"'}
-                        drop all objects;
-                        create table department(
-                            department_id integer not null primary key, 
-                            department_no integer not null,
-                            department_name varchar(20),
-                            location varchar(20) default 'tokyo', 
-                            version integer
-                         );
-                        create table employee(
-                            employee_id integer not null primary key, 
-                            employee_no integer not null,
-                            employee_name varchar(20)
-                        );
-                    ""${'"'}.trimIndent())
+            komapper {
+                generators {
+                    default {
+                        val db = Database.create("jdbc:h2:mem:example;DB_CLOSE_DELAY=-1")
+                        db.runQuery {
+                            ScriptDsl.execute(""${'"'}
+                                drop all objects;
+                                create table department(
+                                    department_id integer not null primary key, 
+                                    department_no integer not null,
+                                    department_name varchar(20),
+                                    location varchar(20) default 'tokyo', 
+                                    version integer
+                                 );
+                                create table employee(
+                                    employee_id integer not null primary key, 
+                                    employee_no integer not null,
+                                    employee_name varchar(20)
+                                );
+                            ""${'"'}.trimIndent())
+                        }
+                        database.set(db)
+                    }
                 }
-                database.set(db)
             }
             """.trimIndent()
         )
         val result = GradleRunner.create()
             .withProjectDir(testProjectDir)
-            .withArguments("komapperCodeGen", "--stacktrace")
+            .withArguments("komapperGenerator", "--stacktrace")
             .withPluginClasspath()
             .build()
         println(result.output)
-        assertEquals(org.gradle.testkit.runner.TaskOutcome.SUCCESS, result.task(":komapperCodeGen")?.outcome)
+        assertEquals(org.gradle.testkit.runner.TaskOutcome.SUCCESS, result.task(":komapperGenerator")?.outcome)
+        testProjectDir!!.toPath().resolve("src/main/kotlin/entities.kt").toFile().readText().let {
+            println(it)
+        }
+        testProjectDir!!.toPath().resolve("src/main/kotlin/entityDefinitions.kt").toFile().readText().let {
+            println(it)
+        }
+    }
+    @Test
+    fun komapperH2Generator() {
+        buildFile.writeText(
+            """
+            import org.komapper.core.*
+            import org.komapper.core.dsl.*
+            plugins { id("org.komapper.gradle") }
+            komapper {
+                generators {
+                    register("h2") {
+                        val db = Database.create("jdbc:h2:mem:example;DB_CLOSE_DELAY=-1")
+                        db.runQuery {
+                            ScriptDsl.execute(""${'"'}
+                                drop all objects;
+                                create table department(
+                                    department_id integer not null primary key, 
+                                    department_no integer not null,
+                                    department_name varchar(20),
+                                    location varchar(20) default 'tokyo', 
+                                    version integer
+                                 );
+                                create table employee(
+                                    employee_id integer not null primary key, 
+                                    employee_no integer not null,
+                                    employee_name varchar(20)
+                                );
+                            ""${'"'}.trimIndent())
+                        }
+                        database.set(db)
+                    }
+                }
+            }
+            """.trimIndent()
+        )
+        val result = GradleRunner.create()
+            .withProjectDir(testProjectDir)
+            .withArguments("komapperH2Generator", "--stacktrace")
+            .withPluginClasspath()
+            .build()
+        println(result.output)
+        assertEquals(org.gradle.testkit.runner.TaskOutcome.SUCCESS, result.task(":komapperH2Generator")?.outcome)
         testProjectDir!!.toPath().resolve("src/main/kotlin/entities.kt").toFile().readText().let {
             println(it)
         }
