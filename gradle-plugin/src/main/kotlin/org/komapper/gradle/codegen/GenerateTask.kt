@@ -1,4 +1,4 @@
-package org.komapper.gradle
+package org.komapper.gradle.codegen
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
@@ -10,11 +10,11 @@ import org.komapper.core.dsl.runQuery
 import org.komapper.core.jdbc.Table
 import javax.inject.Inject
 
-open class CodeGenerateTask @Inject internal constructor(private val extension: CodeGenExtension) : DefaultTask() {
+open class GenerateTask @Inject internal constructor(private val settings: Generator) : DefaultTask() {
 
     @TaskAction
     fun run() {
-        val database = extension.database.get()
+        val database = settings.database.get()
         val tables = read(database)
         generate(database, tables)
     }
@@ -22,29 +22,29 @@ open class CodeGenerateTask @Inject internal constructor(private val extension: 
     private fun read(database: Database): List<Table> {
         return database.runQuery {
             MetadataDsl.tables(
-                schemaPattern = extension.schemaPattern.orNull,
-                tableNamePattern = extension.tableNamePattern.orNull,
-                tableTypes = extension.tableTypes.get()
+                schemaPattern = settings.schemaPattern.orNull,
+                tableNamePattern = settings.tableNamePattern.orNull,
+                tableTypes = settings.tableTypes.get()
             )
         }
     }
 
     private fun generate(database: Database, tables: List<Table>) {
         val generator = CodeGenerator(
-            destinationDir = extension.destinationDir.get().asFile.toPath(),
-            packageName = extension.packageName.orNull,
-            prefix = extension.prefix.get(),
-            suffix = extension.suffix.get(),
+            destinationDir = settings.destinationDir.get().asFile.toPath(),
+            packageName = settings.packageName.orNull,
+            prefix = settings.prefix.get(),
+            suffix = settings.suffix.get(),
             tables = tables
         )
         generator.generateEntities(
             resolver = ClassResolver.create(database),
-            overwrite = extension.overwriteEntities.get()
+            overwrite = settings.overwriteEntities.get()
         )
         generator.generateDefinitions(
-            overwrite = extension.overwriteDefinitions.get(),
-            useCatalog = extension.useCatalog.get(),
-            useSchema = extension.useSchema.get()
+            overwrite = settings.overwriteDefinitions.get(),
+            useCatalog = settings.useCatalog.get(),
+            useSchema = settings.useSchema.get()
         )
     }
 }
