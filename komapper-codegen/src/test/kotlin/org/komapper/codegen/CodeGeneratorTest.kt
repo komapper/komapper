@@ -63,9 +63,11 @@ class CodeGeneratorTest {
         val expected = """
             package entity
 
-            import org.komapper.annotation.*
+            import org.komapper.annotation.KmEntityDef
+            import org.komapper.annotation.KmId
+            import org.komapper.annotation.KmTable
             
-            @KmEntityDef(Address::class) (
+            @KmEntityDef(Address::class)
             @KmTable("ADDRESS")
             data class AddressDef (
                 @KmId val addressId: Nothing,
@@ -73,9 +75,9 @@ class CodeGeneratorTest {
                 val version: Nothing,
             ) {
                 companion object
-            )
+            }
             
-            @KmEntityDef(Employee::class) (
+            @KmEntityDef(Employee::class)
             @KmTable("EMPLOYEE")
             data class EmployeeDef (
                 @KmId val employeeId: Nothing,
@@ -83,7 +85,7 @@ class CodeGeneratorTest {
                 val version: Nothing,
             ) {
                 companion object
-            )
+            }
             
         """.trimIndent()
         assertEquals(expected, file.readText())
