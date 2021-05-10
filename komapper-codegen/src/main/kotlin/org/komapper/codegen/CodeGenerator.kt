@@ -18,7 +18,7 @@ class CodeGenerator(
 
     fun generateEntities(
         fileName: String = "entities.kt",
-        overwrite: Boolean = true,
+        overwrite: Boolean = false,
         resolver: ClassResolver
     ) {
         val file = createFilePath(fileName)
@@ -59,14 +59,16 @@ class CodeGenerator(
         PrintWriter(file.writer()).use { p ->
             if (packageName != null) {
                 p.println("package $packageName")
+                p.println()
             }
-            p.println()
-            p.println("import org.komapper.annotation.*")
+            p.println("import org.komapper.annotation.KmEntityDef")
+            p.println("import org.komapper.annotation.KmId")
+            p.println("import org.komapper.annotation.KmTable")
             for (table in tables) {
                 p.println()
                 val tableName = table.name
                 val className = SnakeToUpperCamelCase.apply(tableName.name)
-                p.println("@KmEntityDef($className::class) (")
+                p.println("@KmEntityDef($className::class)")
                 val kmTableArgs = listOfNotNull(
                     tableName.name,
                     if (useCatalog) tableName.catalog else null,
@@ -81,7 +83,7 @@ class CodeGenerator(
                 }
                 p.println(") {")
                 p.println("    companion object")
-                p.println(")")
+                p.println("}")
             }
         }
     }
