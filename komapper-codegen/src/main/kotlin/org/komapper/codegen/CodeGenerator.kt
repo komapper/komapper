@@ -32,11 +32,11 @@ class CodeGenerator(
             }
             for (table in tables) {
                 p.println()
-                val className = SnakeToUpperCamelCase.apply(table.name.name)
+                val className = SnakeToUpperCamelCase.apply(table.name)
                 p.println("data class $prefix$className$suffix (")
                 for (column in table.columns) {
                     val propertyName = SnakeToLowerCamelCase.apply(column.name)
-                    val nullable = if (column.isNullable) "?" else ""
+                    val nullable = if (column.nullable) "?" else ""
                     val klass = resolver.resolve(column)
                     p.println("    val $propertyName: ${klass.qualifiedName}$nullable,")
                 }
@@ -67,13 +67,12 @@ class CodeGenerator(
             p.println("import org.komapper.annotation.KmTable")
             for (table in tables) {
                 p.println()
-                val tableName = table.name
-                val className = SnakeToUpperCamelCase.apply(tableName.name)
+                val className = SnakeToUpperCamelCase.apply(table.name)
                 p.println("@KmEntityDef($className::class)")
                 val kmTableArgs = listOfNotNull(
-                    tableName.name,
-                    if (useCatalog) tableName.catalog else null,
-                    if (useSchema) tableName.schema else null
+                    table.name,
+                    if (useCatalog) table.catalog else null,
+                    if (useSchema) table.schema else null
                 ).joinToString { "\"$it\"" }
                 p.println("@KmTable($kmTableArgs)")
                 p.println("data class $prefix$className${suffix}Def (")

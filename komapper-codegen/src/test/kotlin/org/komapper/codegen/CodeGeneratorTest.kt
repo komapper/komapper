@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 import org.komapper.core.jdbc.Column
 import org.komapper.core.jdbc.Table
-import org.komapper.core.jdbc.TableName
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.sql.Types
@@ -95,22 +94,22 @@ class CodeGeneratorTest {
     private fun createTables(): List<Table> {
         return listOf(
             Table(
-                TableName("ADDRESS"),
-                listOf(
+                name = "ADDRESS",
+                columns = listOf(
                     Column(name = "ADDRESS_ID", dataType = Types.INTEGER, typeName = "integer"),
-                    Column(name = "STREET", dataType = Types.VARCHAR, typeName = "varchar", isNullable = true),
+                    Column(name = "STREET", dataType = Types.VARCHAR, typeName = "varchar", nullable = true),
                     Column(name = "VERSION", dataType = Types.INTEGER, typeName = "integer"),
                 ),
-                listOf("ADDRESS_ID")
+                primaryKeys = listOf("ADDRESS_ID")
             ),
             Table(
-                TableName("EMPLOYEE"),
-                listOf(
+                name = "EMPLOYEE",
+                columns = listOf(
                     Column(name = "EMPLOYEE_ID", dataType = Types.INTEGER, typeName = "integer"),
                     Column(name = "NAME", dataType = Types.VARCHAR, typeName = "varchar"),
                     Column(name = "VERSION", dataType = Types.INTEGER, typeName = "integer"),
                 ),
-                listOf("EMPLOYEE_ID")
+                primaryKeys = listOf("EMPLOYEE_ID")
             )
         )
     }
