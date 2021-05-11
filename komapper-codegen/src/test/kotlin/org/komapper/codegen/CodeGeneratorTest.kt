@@ -5,10 +5,10 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 import org.komapper.core.jdbc.Column
 import org.komapper.core.jdbc.Table
-import org.komapper.core.jdbc.TableName
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.sql.Types
+import java.util.UUID
 import kotlin.io.path.readText
 
 class CodeGeneratorTest {
@@ -27,6 +27,7 @@ class CodeGeneratorTest {
         generator.generateEntities {
             when (it.typeName.lowercase()) {
                 "integer" -> Int::class
+                "uuid" -> UUID::class
                 else -> String::class
             }
         }
@@ -35,15 +36,15 @@ class CodeGeneratorTest {
             package entity
 
             data class Address (
-                val addressId: kotlin.Int,
-                val street: kotlin.String?,
-                val version: kotlin.Int,
+                val addressId: Int,
+                val street: String?,
+                val version: Int,
             )
 
             data class Employee (
-                val employeeId: kotlin.Int,
-                val name: kotlin.String,
-                val version: kotlin.Int,
+                val employeeId: java.util.UUID,
+                val name: String,
+                val version: Int,
             )
             
         """.trimIndent()
@@ -63,6 +64,7 @@ class CodeGeneratorTest {
         val expected = """
             package entity
 
+            import org.komapper.annotation.KmColumn
             import org.komapper.annotation.KmEntityDef
             import org.komapper.annotation.KmId
             import org.komapper.annotation.KmTable
@@ -70,9 +72,9 @@ class CodeGeneratorTest {
             @KmEntityDef(Address::class)
             @KmTable("ADDRESS")
             data class AddressDef (
-                @KmId val addressId: Nothing,
-                val street: Nothing,
-                val version: Nothing,
+                @KmId @KmColumn("ADDRESS_ID") val addressId: Nothing,
+                @KmColumn("STREET") val street: Nothing,
+                @KmColumn("VERSION") val version: Nothing,
             ) {
                 companion object
             }
@@ -80,9 +82,9 @@ class CodeGeneratorTest {
             @KmEntityDef(Employee::class)
             @KmTable("EMPLOYEE")
             data class EmployeeDef (
-                @KmId val employeeId: Nothing,
-                val name: Nothing,
-                val version: Nothing,
+                @KmId @KmColumn("EMPLOYEE_ID") val employeeId: Nothing,
+                @KmColumn("NAME") val name: Nothing,
+                @KmColumn("VERSION") val version: Nothing,
             ) {
                 companion object
             }
@@ -94,22 +96,22 @@ class CodeGeneratorTest {
     private fun createTables(): List<Table> {
         return listOf(
             Table(
-                TableName("ADDRESS"),
-                listOf(
+                name = "ADDRESS",
+                columns = listOf(
                     Column(name = "ADDRESS_ID", dataType = Types.INTEGER, typeName = "integer"),
-                    Column(name = "STREET", dataType = Types.VARCHAR, typeName = "varchar", isNullable = true),
+                    Column(name = "STREET", dataType = Types.VARCHAR, typeName = "varchar", nullable = true),
                     Column(name = "VERSION", dataType = Types.INTEGER, typeName = "integer"),
                 ),
-                listOf("ADDRESS_ID")
+                primaryKeys = listOf("ADDRESS_ID")
             ),
             Table(
-                TableName("EMPLOYEE"),
-                listOf(
-                    Column(name = "EMPLOYEE_ID", dataType = Types.INTEGER, typeName = "integer"),
+                name = "EMPLOYEE",
+                columns = listOf(
+                    Column(name = "EMPLOYEE_ID", dataType = Types.OTHER, typeName = "uuid"),
                     Column(name = "NAME", dataType = Types.VARCHAR, typeName = "varchar"),
                     Column(name = "VERSION", dataType = Types.INTEGER, typeName = "integer"),
                 ),
-                listOf("EMPLOYEE_ID")
+                primaryKeys = listOf("EMPLOYEE_ID")
             )
         )
     }
