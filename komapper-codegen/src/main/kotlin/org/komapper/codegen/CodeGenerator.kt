@@ -61,6 +61,7 @@ class CodeGenerator(
                 p.println("package $packageName")
                 p.println()
             }
+            p.println("import org.komapper.annotation.KmColumn")
             p.println("import org.komapper.annotation.KmEntityDef")
             p.println("import org.komapper.annotation.KmId")
             p.println("import org.komapper.annotation.KmTable")
@@ -79,7 +80,7 @@ class CodeGenerator(
                 for (column in table.columns) {
                     val propertyName = SnakeToLowerCamelCase.apply(column.name)
                     val id = if (column.name in table.primaryKeys) "@KmId " else ""
-                    p.println("    ${id}val $propertyName: Nothing,")
+                    p.println("    $id@KmColumn(\"${column.name}\") val $propertyName: Nothing,")
                 }
                 p.println(") {")
                 p.println("    companion object")

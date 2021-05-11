@@ -63,6 +63,7 @@ class CodeGeneratorTest {
         val expected = """
             package entity
 
+            import org.komapper.annotation.KmColumn
             import org.komapper.annotation.KmEntityDef
             import org.komapper.annotation.KmId
             import org.komapper.annotation.KmTable
@@ -70,9 +71,9 @@ class CodeGeneratorTest {
             @KmEntityDef(Address::class)
             @KmTable("ADDRESS")
             data class AddressDef (
-                @KmId val addressId: Nothing,
-                val street: Nothing,
-                val version: Nothing,
+                @KmId @KmColumn("ADDRESS_ID") val addressId: Nothing,
+                @KmColumn("STREET") val street: Nothing,
+                @KmColumn("VERSION") val version: Nothing,
             ) {
                 companion object
             }
@@ -80,9 +81,9 @@ class CodeGeneratorTest {
             @KmEntityDef(Employee::class)
             @KmTable("EMPLOYEE")
             data class EmployeeDef (
-                @KmId val employeeId: Nothing,
-                val name: Nothing,
-                val version: Nothing,
+                @KmId @KmColumn("EMPLOYEE_ID") val employeeId: Nothing,
+                @KmColumn("NAME") val name: Nothing,
+                @KmColumn("VERSION") val version: Nothing,
             ) {
                 companion object
             }
