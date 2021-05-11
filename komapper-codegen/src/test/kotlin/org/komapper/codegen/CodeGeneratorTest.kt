@@ -8,6 +8,7 @@ import org.komapper.core.jdbc.Table
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.sql.Types
+import java.util.UUID
 import kotlin.io.path.readText
 
 class CodeGeneratorTest {
@@ -26,6 +27,7 @@ class CodeGeneratorTest {
         generator.generateEntities {
             when (it.typeName.lowercase()) {
                 "integer" -> Int::class
+                "uuid" -> UUID::class
                 else -> String::class
             }
         }
@@ -34,15 +36,15 @@ class CodeGeneratorTest {
             package entity
 
             data class Address (
-                val addressId: kotlin.Int,
-                val street: kotlin.String?,
-                val version: kotlin.Int,
+                val addressId: Int,
+                val street: String?,
+                val version: Int,
             )
 
             data class Employee (
-                val employeeId: kotlin.Int,
-                val name: kotlin.String,
-                val version: kotlin.Int,
+                val employeeId: java.util.UUID,
+                val name: String,
+                val version: Int,
             )
             
         """.trimIndent()
@@ -105,7 +107,7 @@ class CodeGeneratorTest {
             Table(
                 name = "EMPLOYEE",
                 columns = listOf(
-                    Column(name = "EMPLOYEE_ID", dataType = Types.INTEGER, typeName = "integer"),
+                    Column(name = "EMPLOYEE_ID", dataType = Types.OTHER, typeName = "uuid"),
                     Column(name = "NAME", dataType = Types.VARCHAR, typeName = "varchar"),
                     Column(name = "VERSION", dataType = Types.INTEGER, typeName = "integer"),
                 ),

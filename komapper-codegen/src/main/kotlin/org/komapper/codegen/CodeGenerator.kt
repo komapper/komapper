@@ -38,7 +38,12 @@ class CodeGenerator(
                     val propertyName = SnakeToLowerCamelCase.apply(column.name)
                     val nullable = if (column.nullable) "?" else ""
                     val klass = resolver.resolve(column)
-                    p.println("    val $propertyName: ${klass.qualifiedName}$nullable,")
+                    val propertyClassName = if (klass.qualifiedName?.removePrefix("kotlin.") == klass.simpleName) {
+                        klass.simpleName
+                    } else {
+                        klass.qualifiedName
+                    }
+                    p.println("    val $propertyName: ${propertyClassName}$nullable,")
                 }
                 p.println(")")
             }
