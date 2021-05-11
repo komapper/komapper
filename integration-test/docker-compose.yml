@@ -13,7 +13,7 @@ services:
       - 3306:3306
 
   postgres:
-    image: postgres:11.11
+    image: postgres:13.2
     restart: always
     environment:
       POSTGRES_DB: integration_test
