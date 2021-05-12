@@ -4,11 +4,10 @@ import org.gradle.api.Project
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
-import org.gradle.api.tasks.Input
 import org.komapper.core.Database
 import javax.inject.Inject
 
-open class Generator @Inject constructor(@Input val name: String, project: Project) {
+open class Generator @Inject constructor(val name: String, project: Project) {
     private val objects = project.objects
     val database: Property<Database> = objects.property(Database::class.java)
     val schemaPattern: Property<String> = objects.property(String::class.java)
