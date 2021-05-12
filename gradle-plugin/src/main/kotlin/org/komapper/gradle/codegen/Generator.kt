@@ -21,6 +21,7 @@ open class Generator @Inject constructor(@Input val name: String, project: Proje
     val prefix: Property<String> = objects.property(String::class.java).value("")
     val suffix: Property<String> = objects.property(String::class.java).value("")
     val overwriteEntities: Property<Boolean> = objects.property(Boolean::class.java).value(false)
+    val declareAsNullable: Property<Boolean> = objects.property(Boolean::class.java).value(false)
     val overwriteDefinitions: Property<Boolean> = objects.property(Boolean::class.java).value(false)
     val useCatalog: Property<Boolean> = objects.property(Boolean::class.java).value(false)
     val useSchema: Property<Boolean> = objects.property(Boolean::class.java).value(false)

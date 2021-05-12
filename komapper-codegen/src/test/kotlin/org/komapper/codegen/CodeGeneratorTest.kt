@@ -52,6 +52,41 @@ class CodeGeneratorTest {
     }
 
     @Test
+    fun generateEntities_declareAsNullable() {
+        val destinationDir = tempDir!!.resolve(Paths.get("src", "kotlin", "main"))
+        val generator = CodeGenerator(
+            destinationDir = destinationDir,
+            packageName = "entity",
+            tables = createTables()
+        )
+        generator.generateEntities(declareAsNullable = true) {
+            when (it.typeName.lowercase()) {
+                "integer" -> Int::class
+                "uuid" -> UUID::class
+                else -> String::class
+            }
+        }
+        val file = destinationDir.resolve(Paths.get("entity", "entities.kt"))
+        val expected = """
+            package entity
+
+            data class Address (
+                val addressId: Int?,
+                val street: String?,
+                val version: Int?,
+            )
+
+            data class Employee (
+                val employeeId: java.util.UUID?,
+                val name: String?,
+                val version: Int?,
+            )
+            
+        """.trimIndent()
+        assertEquals(expected, file.readText())
+    }
+
+    @Test
     fun generateEntityDefinition() {
         val destinationDir = tempDir!!.resolve(Paths.get("src", "kotlin", "main"))
         val generator = CodeGenerator(
