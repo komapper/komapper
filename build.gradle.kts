@@ -83,23 +83,20 @@ configure(libraryProjects + gradlePluginProject + testProjects + exampleProjects
     }
 }
 
-configure(libraryProjects + platformProject + gradlePluginProject) {
+configure(libraryProjects + platformProject) {
     apply(plugin = "maven-publish")
     apply(plugin = "signing")
-    if (this == platformProject) apply(plugin = "java-platform")
-    val publicationName = if (this == gradlePluginProject) "pluginMaven" else "maven"
-    val component = when (this) {
-        platformProject -> "javaPlatform"
-        gradlePluginProject -> null
-        else -> "java"
+    val component = if (this == platformProject) {
+        apply(plugin = "java-platform")
+        "javaPlatform"
+    } else {
+        "java"
     }
 
     configure<PublishingExtension> {
         publications {
-            create<MavenPublication>(publicationName) {
-                if (component != null) {
-                    from(components[component])
-                }
+            create<MavenPublication>("maven") {
+                from(components[component])
                 pom {
                     val projectUrl: String by project
                     name.set(project.name)
