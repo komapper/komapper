@@ -40,8 +40,10 @@ internal class EntityMetamodelGenerator(
     }
 
     override fun run() {
-        w.println("package $packageName")
-        w.println()
+        if (packageName != "<root>") {
+            w.println("package $packageName")
+            w.println()
+        }
         w.println("// generated at ${ZonedDateTime.now()}")
         w.println("@Suppress(\"ClassName\", \"PrivatePropertyName\")")
         w.println("@$EntityMetamodelImplementor")
@@ -324,8 +326,10 @@ internal class EntityMetamodelStubGenerator(
     ).joinToString(", ")
 
     override fun run() {
-        w.println("package $packageName")
-        w.println()
+        if (packageName != "<root>") {
+            w.println("package $packageName")
+            w.println()
+        }
         w.println("// generated at ${ZonedDateTime.now()}")
         w.println("@Suppress(\"ClassName\")")
         w.println("@$EntityMetamodelImplementor")
