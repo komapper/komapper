@@ -39,7 +39,8 @@ open class GenerateTask @Inject internal constructor(private val settings: Gener
         )
         generator.generateEntities(
             resolver = ClassResolver.create(database),
-            overwrite = settings.overwriteEntities.get()
+            overwrite = settings.overwriteEntities.get(),
+            declareAsNullable = settings.declareAsNullable.get()
         )
         generator.generateDefinitions(
             overwrite = settings.overwriteDefinitions.get(),

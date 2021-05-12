@@ -19,6 +19,7 @@ class CodeGenerator(
     fun generateEntities(
         fileName: String = "entities.kt",
         overwrite: Boolean = false,
+        declareAsNullable: Boolean = false,
         resolver: ClassResolver
     ) {
         val file = createFilePath(fileName)
@@ -36,7 +37,7 @@ class CodeGenerator(
                 p.println("data class $prefix$className$suffix (")
                 for (column in table.columns) {
                     val propertyName = SnakeToLowerCamelCase.apply(column.name)
-                    val nullable = if (column.nullable) "?" else ""
+                    val nullable = if (declareAsNullable || column.nullable) "?" else ""
                     val klass = resolver.resolve(column)
                     val propertyClassName = if (klass.qualifiedName?.removePrefix("kotlin.") == klass.simpleName) {
                         klass.simpleName
