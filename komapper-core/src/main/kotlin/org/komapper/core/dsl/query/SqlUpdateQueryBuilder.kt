@@ -1,7 +1,9 @@
 package org.komapper.core.dsl.query
 
+import org.komapper.core.ThreadSafe
 import org.komapper.core.dsl.scope.SetDeclaration
 
+@ThreadSafe
 interface SqlUpdateQueryBuilder<T : Any> {
     fun set(declaration: SetDeclaration<T>): SqlUpdateQuery<T>
 }

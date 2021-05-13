@@ -1,5 +1,6 @@
 package org.komapper.core.jdbc
 
+import org.komapper.core.ThreadSafe
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.sql.Array
@@ -16,6 +17,7 @@ import java.time.LocalTime
 import java.time.OffsetDateTime
 import kotlin.reflect.KClass
 
+@ThreadSafe
 interface DataType<T : Any> {
     val name: String
     val klass: KClass<T>

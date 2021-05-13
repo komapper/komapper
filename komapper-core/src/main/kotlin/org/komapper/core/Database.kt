@@ -6,6 +6,7 @@ import javax.sql.DataSource
 /**
  * A database.
  */
+@ThreadSafe
 interface Database {
     val config: DatabaseConfig
     val dataFactory: DataFactory

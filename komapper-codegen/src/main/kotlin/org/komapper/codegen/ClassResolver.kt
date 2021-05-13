@@ -1,10 +1,12 @@
 package org.komapper.codegen
 
 import org.komapper.core.Database
+import org.komapper.core.ThreadSafe
 import org.komapper.core.jdbc.Column
 import org.komapper.core.jdbc.DataType
 import kotlin.reflect.KClass
 
+@ThreadSafe
 fun interface ClassResolver {
     fun resolve(column: Column): KClass<*>
 

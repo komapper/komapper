@@ -1,9 +1,11 @@
 package org.komapper.core.dsl.metamodel
 
+import org.komapper.core.ThreadSafe
 import org.komapper.core.dsl.expression.TableExpression
 import java.time.Clock
 import kotlin.reflect.KClass
 
+@ThreadSafe
 interface EntityMetamodel<ENTITY : Any, ID, out META : EntityMetamodel<ENTITY, ID, META>> : TableExpression<ENTITY> {
     fun idAssignment(): Assignment<ENTITY>?
     fun idProperties(): List<PropertyMetamodel<ENTITY, *, *>>

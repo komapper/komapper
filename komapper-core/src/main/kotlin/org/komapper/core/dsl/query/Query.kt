@@ -2,8 +2,10 @@ package org.komapper.core.dsl.query
 
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.DryRunDatabaseConfig
+import org.komapper.core.ThreadSafe
 import org.komapper.core.dsl.context.SubqueryContext
 
+@ThreadSafe
 interface Query<T> {
     fun run(config: DatabaseConfig): T
     fun dryRun(config: DatabaseConfig = DryRunDatabaseConfig): String

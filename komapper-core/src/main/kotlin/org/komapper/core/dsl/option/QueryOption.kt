@@ -2,7 +2,9 @@ package org.komapper.core.dsl.option
 
 import org.komapper.core.JdbcOption
 import org.komapper.core.JdbcOptionProvider
+import org.komapper.core.ThreadSafe
 
+@ThreadSafe
 interface QueryOption : JdbcOptionProvider {
     val queryTimeoutSeconds: Int?
     val suppressLogging: Boolean

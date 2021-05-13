@@ -21,6 +21,7 @@ import javax.sql.DataSource
  * @property jdbcOption the jdbc configuration
  * @property session the session
  */
+@ThreadSafe
 interface DatabaseConfig {
     val id: UUID
     val dialect: Dialect

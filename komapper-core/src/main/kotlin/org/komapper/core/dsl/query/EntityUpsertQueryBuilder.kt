@@ -1,10 +1,12 @@
 package org.komapper.core.dsl.query
 
+import org.komapper.core.ThreadSafe
 import org.komapper.core.dsl.context.EntityUpsertContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.option.EntityInsertOption
 import org.komapper.core.dsl.scope.SetScope
 
+@ThreadSafe
 interface EntityUpsertQueryBuilder<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> {
     fun set(declaration: SetScope<ENTITY>.(META) -> Unit): EntityUpsertQueryBuilder<ENTITY, ID, META>
     fun single(entity: ENTITY): Query<Int>

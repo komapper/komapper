@@ -1,5 +1,8 @@
 package org.komapper.core.jdbc
 
+import org.komapper.core.ThreadSafe
+
+@ThreadSafe
 data class Column(
     val name: String,
     val dataType: Int,

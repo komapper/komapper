@@ -7,6 +7,7 @@ package org.komapper.core
  * @property queryTimeoutSeconds the query timeout. See [java.sql.PreparedStatement.setQueryTimeout].
  * @property suppressLogging whether to suppress SQL logging.
  */
+@ThreadSafe
 data class JdbcOption(
     val batchSize: Int? = null,
     val fetchSize: Int? = null,
