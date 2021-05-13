@@ -1,5 +1,8 @@
 package org.komapper.transaction
 
+import org.komapper.core.ThreadSafe
+
+@ThreadSafe
 interface UserTransaction {
     operator fun <R> invoke(
         isolationLevel: TransactionIsolationLevel? = null,

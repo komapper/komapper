@@ -1,9 +1,11 @@
 package org.komapper.core.dsl.query
 
+import org.komapper.core.ThreadSafe
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import kotlin.reflect.cast
 
+@ThreadSafe
 interface Record<K> {
     val keys: Set<K>
     val values: Collection<Any?>

@@ -1,7 +1,9 @@
 package org.komapper.core.dsl.query
 
+import org.komapper.core.ThreadSafe
 import org.komapper.core.dsl.option.TemplateSelectOption
 
+@ThreadSafe
 interface TemplateSelectQueryBuilder {
     fun where(provide: () -> Any): TemplateSelectQueryBuilder
     fun option(configure: (TemplateSelectOption) -> TemplateSelectOption): TemplateSelectQueryBuilder

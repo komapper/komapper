@@ -4,6 +4,7 @@ import java.time.Clock
 import java.time.Instant
 import java.time.ZoneId
 
+@ThreadSafe
 fun interface ClockProvider {
     fun now(): Clock
 }

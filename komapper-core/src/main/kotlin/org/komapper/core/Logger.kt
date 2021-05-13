@@ -2,6 +2,7 @@ package org.komapper.core
 
 import java.time.LocalTime
 
+@ThreadSafe
 interface Logger {
     fun trace(category: String, message: () -> String)
     fun debug(category: String, message: () -> String)

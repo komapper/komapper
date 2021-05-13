@@ -5,6 +5,7 @@ import java.sql.Clob
 import java.sql.NClob
 import java.sql.SQLXML
 
+@ThreadSafe
 interface DataFactory {
     fun createArrayOf(typeName: String, elements: List<*>): java.sql.Array
     fun createBlob(): Blob

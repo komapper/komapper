@@ -3,6 +3,7 @@ package org.komapper.core
 import java.sql.Connection
 import javax.sql.DataSource
 
+@ThreadSafe
 interface DatabaseSession {
     val connection: Connection
 }

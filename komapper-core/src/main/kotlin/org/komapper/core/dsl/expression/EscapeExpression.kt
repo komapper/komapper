@@ -1,5 +1,8 @@
 package org.komapper.core.dsl.expression
 
+import org.komapper.core.ThreadSafe
+
+@ThreadSafe
 sealed class EscapeExpression : CharSequence {
     internal data class Text(val value: CharSequence) : EscapeExpression(), CharSequence by value
     internal data class Escape(val value: CharSequence) :

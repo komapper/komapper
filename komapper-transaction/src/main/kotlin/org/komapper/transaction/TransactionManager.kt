@@ -2,10 +2,12 @@ package org.komapper.transaction
 
 import org.komapper.core.LogCategory
 import org.komapper.core.Logger
+import org.komapper.core.ThreadSafe
 import java.sql.Connection
 import java.sql.SQLException
 import javax.sql.DataSource
 
+@ThreadSafe
 interface TransactionManager {
     val dataSource: DataSource
     val isActive: Boolean

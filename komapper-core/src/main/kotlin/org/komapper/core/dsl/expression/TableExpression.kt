@@ -1,7 +1,9 @@
 package org.komapper.core.dsl.expression
 
+import org.komapper.core.ThreadSafe
 import kotlin.reflect.KClass
 
+@ThreadSafe
 interface TableExpression<T : Any> {
     fun klass(): KClass<T>
     fun tableName(): String

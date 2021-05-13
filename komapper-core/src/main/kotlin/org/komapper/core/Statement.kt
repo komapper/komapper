@@ -1,5 +1,6 @@
 package org.komapper.core
 
+@ThreadSafe
 data class Statement(val sql: String, val values: List<Value>, val sqlWithArgs: String) {
     constructor(sql: String) : this(sql, emptyList(), sql)
 

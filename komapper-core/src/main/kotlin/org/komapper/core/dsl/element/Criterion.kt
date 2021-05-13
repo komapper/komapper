@@ -1,8 +1,10 @@
 package org.komapper.core.dsl.element
 
+import org.komapper.core.ThreadSafe
 import org.komapper.core.dsl.context.SubqueryContext
 import org.komapper.core.dsl.expression.EscapeExpression
 
+@ThreadSafe
 sealed class Criterion {
     data class Eq(val left: Operand, val right: Operand) : Criterion()
     data class NotEq(val left: Operand, val right: Operand) : Criterion()

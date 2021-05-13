@@ -1,11 +1,13 @@
 package org.komapper.core.dsl.metamodel
 
+import org.komapper.core.ThreadSafe
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 import kotlin.reflect.KClass
 
+@ThreadSafe
 sealed class Assignment<ENTITY> {
     class AutoIncrement<ENTITY, EXTERIOR : Any, INTERIOR : Any>(
         private val interiorClass: KClass<INTERIOR>,

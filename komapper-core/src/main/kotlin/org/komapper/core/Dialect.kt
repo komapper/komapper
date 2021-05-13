@@ -17,6 +17,7 @@ import java.util.ServiceLoader
 import java.util.regex.Pattern
 import kotlin.reflect.KClass
 
+@ThreadSafe
 interface Dialect {
     val dataTypes: List<DataType<*>>
     val subprotocol: String

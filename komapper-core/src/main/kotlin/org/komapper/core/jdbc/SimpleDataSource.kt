@@ -1,5 +1,6 @@
 package org.komapper.core.jdbc
 
+import org.komapper.core.ThreadSafe
 import java.io.PrintWriter
 import java.sql.Connection
 import java.sql.DriverManager
@@ -8,6 +9,7 @@ import java.util.logging.Logger
 import javax.sql.DataSource
 
 @Suppress("MemberVisibilityCanBePrivate")
+@ThreadSafe
 class SimpleDataSource(val url: String, val user: String = "", val password: String = "") : DataSource {
 
     override fun setLogWriter(out: PrintWriter?) {

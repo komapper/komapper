@@ -2,6 +2,7 @@ package org.komapper.core
 
 import java.nio.CharBuffer
 
+@ThreadSafe
 interface NamingStrategy {
 
     fun apply(name: String): String
