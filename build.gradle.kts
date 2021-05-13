@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 plugins {
     kotlin("jvm") version "1.5.0"
     id("com.diffplug.spotless") version "5.12.4"
@@ -76,10 +74,6 @@ configure(libraryProjects + gradlePluginProject + testProjects + exampleProjects
             targetExclude("build/**")
             ktlint("0.41.0")
         }
-    }
-
-    tasks.withType<KotlinCompile> {
-        kotlinOptions.jvmTarget = "11"
     }
 }
 
