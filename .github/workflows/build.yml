@@ -179,9 +179,9 @@ jobs:
           ORG_GRADLE_PROJECT_sonatypeUsername: ${{ secrets.SONATYPE_USERNAME }}
           ORG_GRADLE_PROJECT_sonatypePassword: ${{ secrets.SONATYPE_PASSWORD }}
 
-      - name: Publish plugin
-        if: endsWith(steps.set-version.outputs.version, 'SNAPSHOT') == false
-        run: ./gradlew publishPlugins -Pgradle.publish.key=${{ secrets.GRADLE_PUBLISH_KEY }} -Pgradle.publish.secret=${{ secrets.GRADLE_PUBLISH_SECRET }}
+#      - name: Publish plugin
+#        if: endsWith(steps.set-version.outputs.version, 'SNAPSHOT') == false
+#        run: ./gradlew publishPlugins -Pgradle.publish.key=${{ secrets.GRADLE_PUBLISH_KEY }} -Pgradle.publish.secret=${{ secrets.GRADLE_PUBLISH_SECRET }}
 
       - name: Upload reports
         if: failure()
