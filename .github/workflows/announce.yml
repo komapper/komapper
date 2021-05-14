@@ -14,5 +14,5 @@ jobs:
         with:
           twitter_consumer_key: ${{ secrets.TWITTER_API_KEY }}
           twitter_consumer_secret: ${{ secrets.TWITTER_API_SECRET_KEY }}
-          twitter_access_token_key: ${{ secrets.TWITTER_ACCESS_TOKEN_KEY }}
+          twitter_access_token_key: ${{ secrets.secrets.TWITTER_ACCESS_TOKEN }}
           twitter_access_token_secret: ${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }} 
