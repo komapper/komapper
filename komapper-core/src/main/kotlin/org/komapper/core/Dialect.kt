@@ -43,8 +43,6 @@ interface Dialect {
         entities: List<ENTITY>
     ): EntityUpsertStatementBuilder<ENTITY>
 
-    fun getDefaultSchemaName(userName: String?): String?
-
     companion object {
         private val jdbcUrlPattern = Pattern.compile("^jdbc:([^:]*):.*")
 
@@ -137,10 +135,6 @@ abstract class AbstractDialect protected constructor(internalDataTypes: List<Dat
 
     override fun getOffsetLimitStatementBuilder(offset: Int, limit: Int): OffsetLimitStatementBuilder {
         return OffsetLimitStatementBuilderImpl(this, offset, limit)
-    }
-
-    override fun getDefaultSchemaName(userName: String?): String? {
-        return userName
     }
 }
 
