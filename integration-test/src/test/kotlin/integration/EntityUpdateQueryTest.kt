@@ -54,7 +54,6 @@ class EntityUpdateQueryTest(private val db: Database) {
         }
         assertNotNull(person2.updatedAt)
         assertNotNull(person3.updatedAt)
-        assertNotEquals(person2.updatedAt, person3.updatedAt)
     }
 
     @Test
