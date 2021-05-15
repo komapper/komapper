@@ -91,8 +91,4 @@ open class PostgreSqlDialect(dataTypes: List<DataType<*>> = emptyList(), val ver
     ): EntityUpsertStatementBuilder<ENTITY> {
         return PostgreSqlEntityUpsertStatementBuilder(this, context, entities)
     }
-
-    override fun getDefaultSchemaName(userName: String?): String? {
-        return null
-    }
 }

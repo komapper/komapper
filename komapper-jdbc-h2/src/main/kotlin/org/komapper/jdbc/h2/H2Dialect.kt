@@ -93,8 +93,4 @@ open class H2Dialect(dataTypes: List<DataType<*>> = emptyList(), val version: Ve
     ): EntityUpsertStatementBuilder<ENTITY> {
         return H2EntityUpsertStatementBuilder(this, context, entities)
     }
-
-    override fun getDefaultSchemaName(userName: String?): String? {
-        return null
-    }
 }

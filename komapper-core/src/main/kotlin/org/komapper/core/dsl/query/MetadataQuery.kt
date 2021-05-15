@@ -1,7 +1,6 @@
 package org.komapper.core.dsl.query
 
 import org.komapper.core.DatabaseConfig
-import org.komapper.core.Dialect
 import org.komapper.core.jdbc.Column
 import org.komapper.core.jdbc.Table
 import java.sql.DatabaseMetaData
@@ -9,6 +8,7 @@ import java.sql.DatabaseMetaData
 interface MetadataQuery : Query<List<Table>>
 
 internal class MetadataQueryImpl(
+    private val catalog: String?,
     private val schemaName: String?,
     private val tableNamePattern: String?,
     private val tableTypes: List<String>
@@ -17,8 +17,8 @@ internal class MetadataQueryImpl(
     override fun run(config: DatabaseConfig): List<Table> {
         return config.session.connection.use { con ->
             val reader = MetadataReader(
-                config.dialect,
                 con.metaData,
+                catalog,
                 schemaName,
                 tableNamePattern,
                 tableTypes
@@ -33,8 +33,8 @@ internal class MetadataQueryImpl(
 }
 
 internal class MetadataReader(
-    private val dialect: Dialect,
     private val metaData: DatabaseMetaData,
+    private val catalog: String?,
     private val schemaPattern: String?,
     private val tableNamePattern: String?,
     private val tableTypes: List<String>
@@ -51,8 +51,8 @@ internal class MetadataReader(
     private fun getTables(): List<Table> {
         val tables: MutableList<Table> = mutableListOf()
         val rs = metaData.getTables(
-            null,
-            schemaPattern ?: dialect.getDefaultSchemaName(metaData.userName),
+            catalog,
+            schemaPattern,
             tableNamePattern,
             tableTypes.toTypedArray()
         )

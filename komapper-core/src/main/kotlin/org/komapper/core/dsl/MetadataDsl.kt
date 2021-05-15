@@ -6,10 +6,11 @@ import org.komapper.core.dsl.query.MetadataQueryImpl
 object MetadataDsl : Dsl {
 
     fun tables(
+        catalog: String? = null,
         schemaPattern: String? = null,
         tableNamePattern: String? = null,
         tableTypes: List<String> = listOf("TABLE")
     ): MetadataQuery {
-        return MetadataQueryImpl(schemaPattern, tableNamePattern, tableTypes)
+        return MetadataQueryImpl(catalog, schemaPattern, tableNamePattern, tableTypes)
     }
 }

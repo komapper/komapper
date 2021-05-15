@@ -10,6 +10,7 @@ import javax.inject.Inject
 open class Generator @Inject constructor(val name: String, project: Project) {
     private val objects = project.objects
     val database: Property<Database> = objects.property(Database::class.java)
+    val catalog: Property<String> = objects.property(String::class.java)
     val schemaPattern: Property<String> = objects.property(String::class.java)
     val tableNamePattern: Property<String> = objects.property(String::class.java)
     val tableTypes: ListProperty<String> = objects.listProperty(String::class.java).value(listOf("TABLE"))
