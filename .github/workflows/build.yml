@@ -34,13 +34,49 @@ jobs:
             ${{ runner.os }}-gradle-
 
       - name: Assemble and Check
-        run: ./gradlew assemble check
+        run: ./gradlew assemble check -x :integration-test:assemble -x :integration-test:check
 
       - name: Upload reports
         if: failure()
         uses: actions/upload-artifact@v2
         with:
           name: build
+          path: ./**/build/reports
+
+  h2:
+    runs-on: ubuntu-latest
+    needs: [ build ]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up JDK 8
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'zulu'
+          java-version: 8
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Cache Gradle
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Assemble and Check
+        run: ./gradlew :integration-test:assemble :integration-test:check -Pjdbc=h2
+
+      - name: Upload reports
+        if: failure()
+        uses: actions/upload-artifact@v2
+        with:
+          name: h2
           path: ./**/build/reports
 
   mysql:
@@ -139,7 +175,7 @@ jobs:
   publish:
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
-    needs: [ build, mysql, postgresql ]
+    needs: [ build, h2, mysql, postgresql ]
 
     steps:
       - name: Set up JDK 8
