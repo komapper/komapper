@@ -2,86 +2,108 @@ Komapper: Kotlin SQL Mapper
 ===========================
 
 [![Build](https://github.com/komapper/komapper/actions/workflows/build.yml/badge.svg)](https://github.com/komapper/komapper/actions/workflows/build.yml)
+[![Twitter](https://img.shields.io/badge/twitter-@komapper-pink.svg?style=flat)](https://twitter.com/komapper)
 
-Komapper is a simple database access library for Kotlin.
+Komapper is a simple database access library for Kotlin 1.5 and later.
 
-Supported databases are as follows:
+For more documentation, go to our site: https://www.komapper.org/docs/.
 
-- PostgreSQL 11 and higher
-- MySQL 8.0 and higher
-- H2 1.4.200 and higher
+## Features
 
-## Strengths
+- compile-time code generation using [Kotlin Symbol Processing API](https://github.com/google/ksp)
+- annotation-free data models
+- value class support
+- immutable and composable queries
+- upsert (insert-or-update) query support
 
-- Generate meta-models at compile-time using [google/ksp](https://github.com/google/ksp).
-- Flexible and natural syntax for criteria queries.
-- SQL templates, called “two-way SQL”.
-
-## Status
-
-In Development
-
-## Example
-### Criteria Query
+## Examples
+### Data model and definition
 
 ```kotlin
-// get generated metamodels
-val e = Employee.alias
-val d = Department.alias
+// Data model: this class doesn't require any annotations.
+data class Address(
+    val id: Int = 0,
+    val street: String,
+    val version: Int = 0,
+    val createdAt: LocalDateTime? = null,
+    val updatedAt: LocalDateTime? = null,
+)
 
-// execute query
-val list = db.execute {
-    EntityQuery.from(e).innerJoin(d) {
-        e.departmentId eq d.departmentId
-    }.where {
-        d.departmentName inList listOf("RESEARCH", "SALES")
-    }.associate(e, d) { employee, department ->
-        employee.copy(department = department)
-    }
+// Definition: this class maps the ADDRESS table and the Address class.
+@KmEntityDef(Address::class)
+data class AddressDef(
+    @KmId @KmAutoIncrement @KmColumn(name = "ADDRESS_ID")
+    val id: Nothing,
+    @KmVersion val version: Nothing,
+    @KmCreatedAt val createdAt: Nothing,
+    @KmUpdatedAt val updatedAt: Nothing,
+) {
+    companion object
 }
+```
 
-// print
-for (employee in list) {
-    println(employee.department?.departmentName)
+### Queries
+#### Select
+```kotlin
+val a = AddressDef.meta
+
+// select all
+EntityDsl.from(a)
+
+// select by id
+EntityDsl.from(a).first { a.id eq 1 }
+
+// select by multiple conditions
+EntityDsl.from(a).where { 
+    a.street like "A%"
+    a.createdAt greater LocalDateTime.of(2020, 1, 1, 0, 0)
+}.orderBy(a.id)
+
+// composable query
+val w1: WhereDeclaration = {
+    a.street like "A%"
 }
+val w2: WhereDeclaration = {
+    a.createdAt greater LocalDateTime.of(2020, 1, 1, 0, 0)
+}
+EntityDsl.from(a).where(w1 + w2).orderBy(a.id)
 ```
 
-The above query issues the following SQL statement:
+#### Insert
+```kotlin
+val a = AddressDef.meta
 
-```sql
-select
-    t0_."EMPLOYEE_ID", t0_."EMPLOYEE_NO", t0_."EMPLOYEE_NAME",
-    t0_."MANAGER_ID", t0_."HIREDATE",
-    t0_."SALARY", t0_."DEPARTMENT_ID", t0_."ADDRESS_ID", t0_."VERSION",
-    t1_."DEPARTMENT_ID", t1_."DEPARTMENT_NO", t1_."DEPARTMENT_NAME",
-    t1_."LOCATION", t1_."VERSION"
-from
-    "EMPLOYEE" t0_
-inner join
-    "DEPARTMENT" t1_ on (t0_."DEPARTMENT_ID" = t1_."DEPARTMENT_ID")
-where
-    t1_."DEPARTMENT_NAME" in (?, ?)
+// insert single entity
+EntityDsl.insert(a).single(Address(street = "STREET A"))
+
+// insert multiple entity at once
+EntityDsl.insert(a).multiple(
+    Address(street = "STREET A"),
+    Address(street = "STREET B"),
+)
+
+// insert or update single entity
+EntityDsl.insert(a).onDuplicateKeyUpdate(a.street).single(
+    Address(street = "STREET A")
+)
 ```
 
-## Twitter
+#### Update
+```kotlin
+val a = AddressDef.meta
 
-Author: @nakamura_to  
-hashtag: #komapper
-
-## License
-
+val address = ...
+        
+// update single entity
+EntityDsl.update(a).single(address)
 ```
-Copyright 2021 Toshihiro Nakamura
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
+#### Delete
+```kotlin
+val a = AddressDef.meta
 
-   http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+val address = ...
+        
+// delete single entity
+EntityDsl.delete(a).single(address)
 ```
