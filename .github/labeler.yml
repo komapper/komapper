@@ -1,3 +1,6 @@
+module/gradle-plugin:
+  - gradle-plugin/**/*
+
 module/annotation:
   - komapper-annotation/**/*
 
