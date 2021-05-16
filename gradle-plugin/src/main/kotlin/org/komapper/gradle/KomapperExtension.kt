@@ -19,6 +19,7 @@ open class KomapperExtension @Inject internal constructor(private val project: P
             }
         )
 
+    @Suppress("unused")
     fun generators(action: Action<in GeneratorContainer>) {
         action.execute(generators)
     }

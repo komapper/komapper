@@ -35,8 +35,6 @@ class KomapperPluginTest {
             plugins { id("org.komapper.gradle") }
             komapper {
                 generators {
-                    default {
-                    }
                     register("h2") {
                     }
                     register("mysql") {
@@ -58,34 +56,15 @@ class KomapperPluginTest {
     }
 
     @Test
-    fun komapperGenerator() {
+    fun dryRun() {
         buildFile.writeText(
             """
-            import org.komapper.core.*
-            import org.komapper.core.dsl.*
             plugins { id("org.komapper.gradle") }
             komapper {
                 generators {
-                    default {
-                        val db = Database.create("jdbc:h2:mem:example;DB_CLOSE_DELAY=-1")
-                        db.runQuery {
-                            ScriptDsl.execute(""${'"'}
-                                drop all objects;
-                                create table department(
-                                    department_id integer not null primary key, 
-                                    department_no integer not null,
-                                    department_name varchar(20),
-                                    location varchar(20) default 'tokyo', 
-                                    version integer
-                                 );
-                                create table employee(
-                                    employee_id integer not null primary key, 
-                                    employee_no integer not null,
-                                    employee_name varchar(20)
-                                );
-                            ""${'"'}.trimIndent())
-                        }
-                        database.set(db)
+                    register("h2") {
+                    }
+                    register("mysql") {
                     }
                 }
             }
@@ -93,18 +72,15 @@ class KomapperPluginTest {
         )
         val result = GradleRunner.create()
             .withProjectDir(testProjectDir)
-            .withArguments("komapperGenerator", "--stacktrace")
+            .withArguments("komapperGenerator", "--dry-run", "--stacktrace")
             .withPluginClasspath()
             .build()
         println(result.output)
-        assertEquals(org.gradle.testkit.runner.TaskOutcome.SUCCESS, result.task(":komapperGenerator")?.outcome)
-        testProjectDir!!.toPath().resolve("src/main/kotlin/entities.kt").toFile().readText().let {
-            println(it)
-        }
-        testProjectDir!!.toPath().resolve("src/main/kotlin/entityDefinitions.kt").toFile().readText().let {
-            println(it)
-        }
+        assertTrue(result.output.contains("komapperGenerator"))
+        assertTrue(result.output.contains("komapperH2Generator"))
+        assertTrue(result.output.contains("komapperMysqlGenerator"))
     }
+
     @Test
     fun komapperH2Generator() {
         buildFile.writeText(
@@ -146,11 +122,11 @@ class KomapperPluginTest {
             .build()
         println(result.output)
         assertEquals(org.gradle.testkit.runner.TaskOutcome.SUCCESS, result.task(":komapperH2Generator")?.outcome)
-        testProjectDir!!.toPath().resolve("src/main/kotlin/entities.kt").toFile().readText().let {
-            println(it)
-        }
-        testProjectDir!!.toPath().resolve("src/main/kotlin/entityDefinitions.kt").toFile().readText().let {
-            println(it)
-        }
+        val entitiesFile = testProjectDir!!.toPath().resolve("src/main/kotlin/entities.kt").toFile()
+        assertTrue(entitiesFile.exists())
+        println(entitiesFile.readText())
+        val definitionsFile = testProjectDir!!.toPath().resolve("src/main/kotlin/entityDefinitions.kt").toFile()
+        assertTrue(definitionsFile.exists())
+        println(definitionsFile.readText())
     }
 }
