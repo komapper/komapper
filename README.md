@@ -17,7 +17,7 @@ For more documentation, go to our site: https://www.komapper.org/docs/.
 - upsert (insert-or-update) query support
 
 ## Examples
-### Data model and definition
+### Data model and mapping definition
 
 ```kotlin
 // Data model: this class doesn't require any annotations.
@@ -29,7 +29,7 @@ data class Address(
     val updatedAt: LocalDateTime? = null,
 )
 
-// Definition: this class maps the ADDRESS table and the Address class.
+// Mapping definition: this class maps the ADDRESS table and the Address class.
 @KmEntityDef(Address::class)
 data class AddressDef(
     @KmId @KmAutoIncrement @KmColumn(name = "ADDRESS_ID")
@@ -45,6 +45,7 @@ data class AddressDef(
 ### Queries
 #### Select
 ```kotlin
+// get a generated metamodel
 val a = AddressDef.meta
 
 // select all
@@ -58,19 +59,11 @@ EntityDsl.from(a).where {
     a.street like "A%"
     a.createdAt greater LocalDateTime.of(2020, 1, 1, 0, 0)
 }.orderBy(a.id)
-
-// composable query
-val w1: WhereDeclaration = {
-    a.street like "A%"
-}
-val w2: WhereDeclaration = {
-    a.createdAt greater LocalDateTime.of(2020, 1, 1, 0, 0)
-}
-EntityDsl.from(a).where(w1 + w2).orderBy(a.id)
 ```
 
 #### Insert
 ```kotlin
+// get a generated metamodel
 val a = AddressDef.meta
 
 // insert single entity
@@ -90,6 +83,7 @@ EntityDsl.insert(a).onDuplicateKeyUpdate(a.street).single(
 
 #### Update
 ```kotlin
+// get a generated metamodel
 val a = AddressDef.meta
 
 val address = ...
@@ -100,6 +94,7 @@ EntityDsl.update(a).single(address)
 
 #### Delete
 ```kotlin
+// get a generated metamodel
 val a = AddressDef.meta
 
 val address = ...
