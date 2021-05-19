@@ -1,7 +1,9 @@
 package org.komapper.core.dsl.query
 
 import org.komapper.core.DatabaseConfig
+import org.komapper.core.Dialect
 import org.komapper.core.jdbc.Column
+import org.komapper.core.jdbc.PrimaryKey
 import org.komapper.core.jdbc.Table
 import java.sql.DatabaseMetaData
 
@@ -17,6 +19,7 @@ internal class MetadataQueryImpl(
     override fun run(config: DatabaseConfig): List<Table> {
         return config.session.connection.use { con ->
             val reader = MetadataReader(
+                config.dialect,
                 con.metaData,
                 catalog,
                 schemaName,
@@ -33,6 +36,7 @@ internal class MetadataQueryImpl(
 }
 
 internal class MetadataReader(
+    private val dialect: Dialect,
     private val metaData: DatabaseMetaData,
     private val catalog: String?,
     private val schemaPattern: String?,
@@ -41,9 +45,9 @@ internal class MetadataReader(
 ) {
     fun read(): List<Table> {
         return getTables().map { table ->
+            val primaryKeys = getPrimaryKeys(table)
             table.copy(
-                columns = getColumns(table),
-                primaryKeys = getPrimaryKeys(table)
+                columns = getColumns(table, primaryKeys)
             )
         }
     }
@@ -67,26 +71,31 @@ internal class MetadataReader(
         return tables
     }
 
-    private fun getColumns(table: Table): List<Column> {
+    private fun getColumns(table: Table, primaryKeys: List<PrimaryKey>): List<Column> {
         val columns: MutableList<Column> = mutableListOf()
         val rs = metaData.getColumns(
             table.catalog, table.schema, table.name, null
         )
+        val pkMap = primaryKeys.associateBy { it.name }
         while (rs.next()) {
+            val name = rs.getString("COLUMN_NAME")
+            val primaryKey = pkMap[name]
             val column = Column(
-                name = rs.getString("COLUMN_NAME"),
+                name = name,
                 dataType = rs.getInt("DATA_TYPE"),
                 typeName = rs.getString("TYPE_NAME"),
                 length = rs.getInt("COLUMN_SIZE"),
                 scale = rs.getInt("DECIMAL_DIGITS"),
                 nullable = rs.getBoolean("NULLABLE"),
+                isPrimaryKey = primaryKey != null,
+                isAutoIncrement = primaryKey?.isAutoIncrement == true
             )
             columns.add(column)
         }
         return columns
     }
 
-    private fun getPrimaryKeys(table: Table): List<String> {
+    private fun getPrimaryKeys(table: Table): List<PrimaryKey> {
         val keys = mutableListOf<String>()
         val rs = metaData.getPrimaryKeys(
             table.catalog, table.schema, table.name
@@ -94,6 +103,22 @@ internal class MetadataReader(
         while (rs.next()) {
             keys.add(rs.getString("COLUMN_NAME"))
         }
-        return keys
+        return if (keys.size == 1) {
+            val key = keys.first()
+            val isAutoIncrement = isAutoIncrement(table, key)
+            listOf(PrimaryKey(key, isAutoIncrement))
+        } else {
+            keys.map { PrimaryKey(it) }
+        }
+    }
+
+    private fun isAutoIncrement(table: Table, key: String): Boolean {
+        return metaData.connection.createStatement().use {
+            val columnName = dialect.enquote(key)
+            val tableName = table.getCanonicalTableName(dialect::enquote)
+            it.executeQuery("select $columnName from $tableName where 1 = 0").use { rs ->
+                rs.metaData.isAutoIncrement(1)
+            }
+        }
     }
 }

@@ -1,7 +1,8 @@
 package integration
 
-import integration.setting.Dbms
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.Database
@@ -11,23 +12,27 @@ import org.komapper.core.dsl.runQuery
 @ExtendWith(Env::class)
 class MetadataQueryTest(val db: Database) {
 
-    @Run(unless = [Dbms.POSTGRESQL])
     @Test
-    fun test_uppercase() {
-        val table = db.runQuery {
-            MetadataDsl.tables(tableNamePattern = "ADDRESS")
-        }.first()
-        println(table)
-        assertEquals(3, table.columns.size)
+    fun test() {
+        val tables = db.runQuery {
+            MetadataDsl.tables()
+        }
+        val address = tables.first { it.name.lowercase() == "address" }
+        assertEquals(3, address.columns.size)
     }
 
-    @Run(onlyIf = [Dbms.POSTGRESQL])
     @Test
-    fun test_lowercase() {
-        val table = db.runQuery {
-            MetadataDsl.tables(tableNamePattern = "address")
-        }.first()
-        println(table)
-        assertEquals(3, table.columns.size)
+    fun autoIncrement() {
+        val tables = db.runQuery {
+            MetadataDsl.tables()
+        }
+        val identityStrategy = tables.first { it.name.lowercase() == "identity_strategy" }
+        assertEquals(2, identityStrategy.columns.size)
+        val id = identityStrategy.columns.first { it.name.lowercase() == "id" }
+        assertTrue(id.isPrimaryKey)
+        assertTrue(id.isAutoIncrement)
+        val value = identityStrategy.columns.first { it.name.lowercase() == "value" }
+        assertFalse(value.isPrimaryKey)
+        assertFalse(value.isAutoIncrement)
     }
 }

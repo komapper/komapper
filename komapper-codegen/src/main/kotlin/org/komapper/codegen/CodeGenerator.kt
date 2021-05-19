@@ -67,10 +67,7 @@ class CodeGenerator(
                 p.println("package $packageName")
                 p.println()
             }
-            p.println("import org.komapper.annotation.KmColumn")
-            p.println("import org.komapper.annotation.KmEntityDef")
-            p.println("import org.komapper.annotation.KmId")
-            p.println("import org.komapper.annotation.KmTable")
+            p.println("import org.komapper.annotation.*")
             for (table in tables) {
                 p.println()
                 val className = SnakeToUpperCamelCase.apply(table.name)
@@ -84,8 +81,9 @@ class CodeGenerator(
                 p.println("data class $prefix$className${suffix}Def (")
                 for (column in table.columns) {
                     val propertyName = SnakeToLowerCamelCase.apply(column.name)
-                    val id = if (column.name in table.primaryKeys) "@KmId " else ""
-                    p.println("    $id@KmColumn(\"${column.name}\") val $propertyName: Nothing,")
+                    val id = if (column.isPrimaryKey) "@KmId " else ""
+                    val autoIncrement = if (column.isAutoIncrement) "@KmAutoIncrement " else ""
+                    p.println("    $id$autoIncrement@KmColumn(\"${column.name}\") val $propertyName: Nothing,")
                 }
                 p.println(") {")
                 p.println("    companion object")

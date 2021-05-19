@@ -99,15 +99,12 @@ class CodeGeneratorTest {
         val expected = """
             package entity
 
-            import org.komapper.annotation.KmColumn
-            import org.komapper.annotation.KmEntityDef
-            import org.komapper.annotation.KmId
-            import org.komapper.annotation.KmTable
+            import org.komapper.annotation.*
             
             @KmEntityDef(Address::class)
             @KmTable("ADDRESS")
             data class AddressDef (
-                @KmId @KmColumn("ADDRESS_ID") val addressId: Nothing,
+                @KmId @KmAutoIncrement @KmColumn("ADDRESS_ID") val addressId: Nothing,
                 @KmColumn("STREET") val street: Nothing,
                 @KmColumn("VERSION") val version: Nothing,
             ) {
@@ -133,20 +130,18 @@ class CodeGeneratorTest {
             Table(
                 name = "ADDRESS",
                 columns = listOf(
-                    Column(name = "ADDRESS_ID", dataType = Types.INTEGER, typeName = "integer"),
+                    Column(name = "ADDRESS_ID", dataType = Types.INTEGER, typeName = "integer", isPrimaryKey = true, isAutoIncrement = true),
                     Column(name = "STREET", dataType = Types.VARCHAR, typeName = "varchar", nullable = true),
                     Column(name = "VERSION", dataType = Types.INTEGER, typeName = "integer"),
                 ),
-                primaryKeys = listOf("ADDRESS_ID")
             ),
             Table(
                 name = "EMPLOYEE",
                 columns = listOf(
-                    Column(name = "EMPLOYEE_ID", dataType = Types.OTHER, typeName = "uuid"),
+                    Column(name = "EMPLOYEE_ID", dataType = Types.OTHER, typeName = "uuid", isPrimaryKey = true),
                     Column(name = "NAME", dataType = Types.VARCHAR, typeName = "varchar"),
                     Column(name = "VERSION", dataType = Types.INTEGER, typeName = "integer"),
                 ),
-                primaryKeys = listOf("EMPLOYEE_ID")
             )
         )
     }
