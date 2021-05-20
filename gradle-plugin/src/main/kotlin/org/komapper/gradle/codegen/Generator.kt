@@ -4,6 +4,7 @@ import org.gradle.api.Project
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
+import org.komapper.codegen.ClassResolver
 import org.komapper.core.Database
 import javax.inject.Inject
 
@@ -25,4 +26,7 @@ open class Generator @Inject constructor(val name: String, project: Project) {
     val overwriteDefinitions: Property<Boolean> = objects.property(Boolean::class.java).value(false)
     val useCatalog: Property<Boolean> = objects.property(Boolean::class.java).value(false)
     val useSchema: Property<Boolean> = objects.property(Boolean::class.java).value(false)
+    val classResolver: Property<ClassResolver> = objects.property(ClassResolver::class.java).apply {
+        set(database.map { ClassResolver.create(it.config.dialect.dataTypes) })
+    }
 }

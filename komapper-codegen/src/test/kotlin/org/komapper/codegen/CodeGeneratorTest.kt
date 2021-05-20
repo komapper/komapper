@@ -63,7 +63,7 @@ class CodeGeneratorTest {
             when (it.typeName.lowercase()) {
                 "integer" -> Int::class
                 "uuid" -> UUID::class
-                else -> String::class
+                else -> null
             }
         }
         val file = destinationDir.resolve(Paths.get("entity", "entities.kt"))
