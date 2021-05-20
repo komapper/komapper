@@ -38,7 +38,7 @@ class CodeGenerator(
                 for (column in table.columns) {
                     val propertyName = SnakeToLowerCamelCase.apply(column.name)
                     val nullable = if (declareAsNullable || column.nullable) "?" else ""
-                    val klass = resolver.resolve(column)
+                    val klass = resolver.resolve(column) ?: String::class
                     val propertyClassName = if (klass.qualifiedName?.removePrefix("kotlin.") == klass.simpleName) {
                         klass.simpleName
                     } else {
