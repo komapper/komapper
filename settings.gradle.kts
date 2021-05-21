@@ -1,15 +1,15 @@
 pluginManagement {
     val kspVersion: String by settings
+    val springBootVersion: String by settings
     repositories {
         gradlePluginPortal()
         google()
     }
     plugins {
         id("com.google.devtools.ksp") version kspVersion
+        id("org.springframework.boot") version springBootVersion
     }
 }
-
-enableFeaturePreview("VERSION_CATALOGS")
 
 rootProject.name = "komapper"
 

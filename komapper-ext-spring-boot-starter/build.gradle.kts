@@ -1,5 +1,7 @@
 dependencies {
-    api(libs.bundles.ext.spring.boot.starter)
+    val springBootVersion: String by project
+    api("org.springframework.boot:spring-boot-starter:$springBootVersion")
+    api("org.springframework.boot:spring-boot-starter-jdbc:$springBootVersion")
     api(project(":komapper-annotation"))
     api(project(":komapper-core"))
     api(project(":komapper-ext-sqlcommenter"))

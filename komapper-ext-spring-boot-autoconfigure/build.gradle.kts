@@ -1,5 +1,8 @@
 dependencies {
-    implementation(libs.bundles.ext.spring.boot.autoconfigure)
+    val springVersion: String by project
+    val springBootVersion: String by project
+    implementation("org.springframework:spring-jdbc:$springVersion")
+    implementation("org.springframework.boot:spring-boot-autoconfigure:$springBootVersion")
     implementation(project(":komapper-core"))
     testImplementation(project(":komapper-ext-slf4j"))
     testImplementation(project(":komapper-jdbc-h2"))
