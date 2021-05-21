@@ -1,7 +1,3 @@
-plugins {
-    kotlin("jvm")
-}
-
 dependencies {
     val kspVersion: String by project
     implementation(project(":komapper-core"))

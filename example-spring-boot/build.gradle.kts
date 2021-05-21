@@ -1,8 +1,8 @@
 plugins {
     idea
-    id("org.springframework.boot") version "2.5.0"
+    id("org.springframework.boot")
     id("com.google.devtools.ksp")
-    kotlin("plugin.allopen") version "1.5.0"
+    kotlin("plugin.allopen")
 }
 
 apply(plugin = "io.spring.dependency-management")
@@ -21,6 +21,7 @@ idea.module {
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation(project(":komapper-ext-spring-boot-starter"))
     ksp(project(":komapper-processor"))
 }
