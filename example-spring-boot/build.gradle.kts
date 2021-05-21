@@ -2,7 +2,7 @@ plugins {
     idea
     id("org.springframework.boot")
     id("com.google.devtools.ksp")
-    kotlin("plugin.allopen") version "1.5.0"
+    kotlin("plugin.allopen")
 }
 
 apply(plugin = "io.spring.dependency-management")

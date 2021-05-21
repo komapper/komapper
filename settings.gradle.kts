@@ -1,4 +1,5 @@
 pluginManagement {
+    val kotlinVersion: String by settings
     val kspVersion: String by settings
     val springBootVersion: String by settings
     repositories {
@@ -6,6 +7,8 @@ pluginManagement {
         google()
     }
     plugins {
+        kotlin("jvm") version kotlinVersion
+        kotlin("plugin.allopen") version kotlinVersion
         id("com.google.devtools.ksp") version kspVersion
         id("org.springframework.boot") version springBootVersion
     }
