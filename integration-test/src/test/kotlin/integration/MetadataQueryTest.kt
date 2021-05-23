@@ -5,9 +5,9 @@ import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.komapper.core.Database
-import org.komapper.core.dsl.MetadataDsl
-import org.komapper.core.dsl.runQuery
+import org.komapper.jdbc.Database
+import org.komapper.jdbc.dsl.MetadataDsl
+import org.komapper.jdbc.dsl.runQuery
 
 @ExtendWith(Env::class)
 class MetadataQueryTest(val db: Database) {

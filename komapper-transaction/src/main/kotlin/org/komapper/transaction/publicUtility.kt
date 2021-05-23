@@ -1,7 +1,7 @@
 package org.komapper.transaction
 
-import org.komapper.core.Database
-import org.komapper.core.DatabaseSession
+import org.komapper.jdbc.Database
+import org.komapper.jdbc.DatabaseSession
 
 val Database.transaction: UserTransaction
     get() {

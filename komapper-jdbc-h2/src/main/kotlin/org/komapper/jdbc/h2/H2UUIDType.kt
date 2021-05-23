@@ -1,6 +1,6 @@
 package org.komapper.jdbc.h2
 
-import org.komapper.core.jdbc.AbstractDataType
+import org.komapper.jdbc.AbstractDataType
 import java.sql.JDBCType
 import java.sql.PreparedStatement
 import java.sql.ResultSet

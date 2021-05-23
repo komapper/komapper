@@ -1,7 +1,7 @@
 package integration
 
-import org.komapper.core.jdbc.DataType
-import org.komapper.core.jdbc.StringType
+import org.komapper.jdbc.DataType
+import org.komapper.jdbc.StringType
 import org.postgresql.util.PGobject
 import java.sql.JDBCType
 import java.sql.PreparedStatement

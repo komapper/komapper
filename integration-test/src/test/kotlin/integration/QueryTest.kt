@@ -3,13 +3,13 @@ package integration
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.komapper.core.Database
-import org.komapper.core.dsl.EntityDsl
-import org.komapper.core.dsl.SqlDsl
-import org.komapper.core.dsl.flatMap
-import org.komapper.core.dsl.flatZip
-import org.komapper.core.dsl.plus
-import org.komapper.core.dsl.runQuery
+import org.komapper.jdbc.Database
+import org.komapper.jdbc.dsl.EntityDsl
+import org.komapper.jdbc.dsl.SqlDsl
+import org.komapper.jdbc.dsl.flatMap
+import org.komapper.jdbc.dsl.flatZip
+import org.komapper.jdbc.dsl.plus
+import org.komapper.jdbc.dsl.runQuery
 
 @ExtendWith(Env::class)
 class QueryTest(private val db: Database) {

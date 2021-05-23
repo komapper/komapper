@@ -2,6 +2,7 @@ package org.komapper.core.jdbc
 
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import org.komapper.jdbc.EnumType
 import kotlin.reflect.KClass
 
 internal class EnumTypeTest {

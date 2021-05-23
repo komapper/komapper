@@ -1,8 +1,8 @@
 package integration.setting
 
 import integration.PostgreSqlJsonType
-import org.komapper.core.DatabaseConfig
-import org.komapper.core.DefaultDatabaseConfig
+import org.komapper.jdbc.DatabaseConfig
+import org.komapper.jdbc.DefaultDatabaseConfig
 
 class PostgreSqlSetting(url: String, user: String, password: String) : Setting {
     override val config: DatabaseConfig =

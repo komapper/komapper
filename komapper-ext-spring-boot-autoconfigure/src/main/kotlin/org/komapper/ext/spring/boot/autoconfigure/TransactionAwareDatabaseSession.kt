@@ -1,6 +1,6 @@
 package org.komapper.ext.spring.boot.autoconfigure
 
-import org.komapper.core.DatabaseSession
+import org.komapper.jdbc.DatabaseSession
 import org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy
 import java.sql.Connection
 import javax.sql.DataSource

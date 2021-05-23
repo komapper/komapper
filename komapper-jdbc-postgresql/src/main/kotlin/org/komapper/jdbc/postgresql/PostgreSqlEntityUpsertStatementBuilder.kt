@@ -1,6 +1,5 @@
 package org.komapper.jdbc.postgresql
 
-import org.komapper.core.JdbcDialect
 import org.komapper.core.Statement
 import org.komapper.core.StatementBuffer
 import org.komapper.core.dsl.builder.AliasManager
@@ -14,6 +13,7 @@ import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.expression.TableExpression
 import org.komapper.core.dsl.metamodel.Assignment
 import org.komapper.core.dsl.metamodel.EntityMetamodel
+import org.komapper.jdbc.JdbcDialect
 
 class PostgreSqlEntityUpsertStatementBuilder<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     private val dialect: JdbcDialect,

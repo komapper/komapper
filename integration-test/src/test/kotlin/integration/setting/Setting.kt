@@ -1,6 +1,6 @@
 package integration.setting
 
-import org.komapper.core.DatabaseConfig
+import org.komapper.jdbc.DatabaseConfig
 import java.util.regex.Pattern
 
 interface Setting {

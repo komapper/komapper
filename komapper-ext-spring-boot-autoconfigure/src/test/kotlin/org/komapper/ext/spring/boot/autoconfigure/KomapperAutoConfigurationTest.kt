@@ -6,12 +6,12 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.komapper.core.ClockProvider
-import org.komapper.core.Database
 import org.komapper.core.JdbcOption
 import org.komapper.core.Statement
 import org.komapper.core.TemplateStatementBuilder
-import org.komapper.core.jdbc.DataType
-import org.komapper.core.jdbc.StringType
+import org.komapper.jdbc.DataType
+import org.komapper.jdbc.Database
+import org.komapper.jdbc.StringType
 import org.komapper.jdbc.h2.H2JdbcDialect
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
 import org.springframework.context.annotation.AnnotationConfigApplicationContext

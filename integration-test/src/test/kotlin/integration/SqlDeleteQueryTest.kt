@@ -4,9 +4,9 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
-import org.komapper.core.Database
-import org.komapper.core.dsl.SqlDsl
-import org.komapper.core.dsl.runQuery
+import org.komapper.jdbc.Database
+import org.komapper.jdbc.dsl.SqlDsl
+import org.komapper.jdbc.dsl.runQuery
 
 @ExtendWith(Env::class)
 class SqlDeleteQueryTest(private val db: Database) {

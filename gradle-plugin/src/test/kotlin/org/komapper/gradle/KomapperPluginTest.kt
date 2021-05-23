@@ -85,8 +85,8 @@ class KomapperPluginTest {
     fun komapperH2Generator() {
         buildFile.writeText(
             """
-            import org.komapper.core.*
-            import org.komapper.core.dsl.*
+            import org.komapper.jdbc.*
+            import org.komapper.jdbc.dsl.*
             plugins { id("org.komapper.gradle") }
             komapper {
                 generators {

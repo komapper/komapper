@@ -1,8 +1,8 @@
 package org.komapper.jdbc.h2
 
-import org.komapper.core.JdbcDialect
-import org.komapper.core.jdbc.DataType
-import org.komapper.core.spi.JdbcDialectFactory
+import org.komapper.jdbc.DataType
+import org.komapper.jdbc.JdbcDialect
+import org.komapper.jdbc.spi.JdbcDialectFactory
 
 class H2JdbcDialectFactory : JdbcDialectFactory {
     override fun supports(subprotocol: String): Boolean {

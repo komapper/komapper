@@ -6,11 +6,11 @@ import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.komapper.core.Database
-import org.komapper.core.dsl.SqlDsl
-import org.komapper.core.dsl.concat
-import org.komapper.core.dsl.count
-import org.komapper.core.dsl.runQuery
+import org.komapper.jdbc.Database
+import org.komapper.jdbc.dsl.SqlDsl
+import org.komapper.jdbc.dsl.concat
+import org.komapper.jdbc.dsl.count
+import org.komapper.jdbc.dsl.runQuery
 
 @ExtendWith(Env::class)
 class SqlSelectQuerySelectTest(private val db: Database) {

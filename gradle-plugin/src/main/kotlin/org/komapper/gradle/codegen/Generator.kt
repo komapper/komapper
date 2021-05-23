@@ -5,7 +5,7 @@ import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.komapper.codegen.ClassResolver
-import org.komapper.core.Database
+import org.komapper.jdbc.Database
 import javax.inject.Inject
 
 open class Generator @Inject constructor(val name: String, project: Project) {

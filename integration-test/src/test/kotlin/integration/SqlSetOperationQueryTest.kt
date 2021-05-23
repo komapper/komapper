@@ -5,12 +5,12 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
-import org.komapper.core.Database
-import org.komapper.core.dsl.EntityDsl
-import org.komapper.core.dsl.SqlDsl
-import org.komapper.core.dsl.alias
-import org.komapper.core.dsl.desc
-import org.komapper.core.dsl.runQuery
+import org.komapper.jdbc.Database
+import org.komapper.jdbc.dsl.EntityDsl
+import org.komapper.jdbc.dsl.SqlDsl
+import org.komapper.jdbc.dsl.alias
+import org.komapper.jdbc.dsl.desc
+import org.komapper.jdbc.dsl.runQuery
 
 @ExtendWith(Env::class)
 class SqlSetOperationQueryTest(private val db: Database) {

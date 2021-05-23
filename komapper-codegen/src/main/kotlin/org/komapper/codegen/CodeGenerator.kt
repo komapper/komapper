@@ -2,7 +2,7 @@ package org.komapper.codegen
 
 import org.komapper.core.SnakeToLowerCamelCase
 import org.komapper.core.SnakeToUpperCamelCase
-import org.komapper.core.jdbc.Table
+import org.komapper.jdbc.Table
 import java.io.PrintWriter
 import java.nio.file.Files
 import java.nio.file.Path

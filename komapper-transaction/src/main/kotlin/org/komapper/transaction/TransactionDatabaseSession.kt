@@ -1,7 +1,7 @@
 package org.komapper.transaction
 
-import org.komapper.core.DatabaseSession
 import org.komapper.core.Logger
+import org.komapper.jdbc.DatabaseSession
 import java.sql.Connection
 import javax.sql.DataSource
 
