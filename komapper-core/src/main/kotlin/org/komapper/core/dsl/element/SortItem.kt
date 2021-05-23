@@ -2,8 +2,8 @@ package org.komapper.core.dsl.element
 
 import org.komapper.core.dsl.expression.ColumnExpression
 
-internal sealed class SortItem {
-    internal sealed class Property<T : Any, S : Any> : ColumnExpression<T, S>, SortItem() {
+sealed class SortItem {
+    sealed class Property<T : Any, S : Any> : ColumnExpression<T, S>, SortItem() {
         abstract val expression: ColumnExpression<T, S>
 
         data class Asc<T : Any, S : Any>(override val expression: ColumnExpression<T, S>) :
@@ -15,7 +15,7 @@ internal sealed class SortItem {
             ColumnExpression<T, S> by expression
     }
 
-    internal sealed class Alias : CharSequence, SortItem() {
+    sealed class Alias : CharSequence, SortItem() {
         abstract val alias: String
         override val length get() = alias.length
         override fun get(index: Int) = alias[index]

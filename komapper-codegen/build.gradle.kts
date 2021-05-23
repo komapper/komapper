@@ -1,6 +1,6 @@
 dependencies {
-    api(project(":komapper-core"))
-    runtimeOnly(project(":komapper-jdbc-h2"))
-    runtimeOnly(project(":komapper-jdbc-mysql"))
-    runtimeOnly(project(":komapper-jdbc-postgresql"))
+    api(project(":komapper-jdbc"))
+    runtimeOnly(project(":komapper-jdbc-dialect-h2"))
+    runtimeOnly(project(":komapper-jdbc-dialect-mysql"))
+    runtimeOnly(project(":komapper-jdbc-dialect-postgresql"))
 }

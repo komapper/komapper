@@ -7,7 +7,7 @@ import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.metamodel.PropertyMetamodel
 
 @Scope
-class OnScope<ENTITY : Any> internal constructor(
+class OnScope<ENTITY : Any> (
     private val context: MutableList<Criterion> = mutableListOf()
 ) :
     Collection<Criterion> by context {

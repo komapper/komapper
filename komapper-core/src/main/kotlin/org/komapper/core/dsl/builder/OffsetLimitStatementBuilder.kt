@@ -9,7 +9,7 @@ interface OffsetLimitStatementBuilder {
     fun build(): Statement
 }
 
-internal class OffsetLimitStatementBuilderImpl(
+class OffsetLimitStatementBuilderImpl(
     private val dialect: Dialect,
     private val offset: Int,
     private val limit: Int

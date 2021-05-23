@@ -3,8 +3,8 @@ package org.komapper.codegen
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
-import org.komapper.core.jdbc.Column
-import org.komapper.core.jdbc.Table
+import org.komapper.core.Column
+import org.komapper.core.Table
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.sql.Types

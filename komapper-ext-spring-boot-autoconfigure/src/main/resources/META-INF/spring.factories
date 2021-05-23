@@ -1,3 +1,0 @@
-# Auto Configure
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-org.komapper.ext.spring.boot.autoconfigure.KomapperAutoConfiguration

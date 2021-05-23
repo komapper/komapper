@@ -1,16 +1,16 @@
 package org.komapper.core.dsl.option
 
-import org.komapper.core.JdbcOption
-import org.komapper.core.JdbcOptionProvider
+import org.komapper.core.ExecutionOption
+import org.komapper.core.ExecutionOptionProvider
 import org.komapper.core.ThreadSafe
 
 @ThreadSafe
-interface QueryOption : JdbcOptionProvider {
+interface QueryOption : ExecutionOptionProvider {
     val queryTimeoutSeconds: Int?
     val suppressLogging: Boolean
 
-    override fun getJdbcOption(): JdbcOption {
-        return JdbcOption(
+    override fun getExecutionOption(): ExecutionOption {
+        return ExecutionOption(
             queryTimeoutSeconds = queryTimeoutSeconds,
             suppressLogging = suppressLogging
         )
@@ -25,8 +25,8 @@ interface VersionOption : QueryOption {
 interface BatchOption : QueryOption {
     val batchSize: Int?
 
-    override fun getJdbcOption(): JdbcOption {
-        return super.getJdbcOption().copy(
+    override fun getExecutionOption(): ExecutionOption {
+        return super.getExecutionOption().copy(
             batchSize = batchSize
         )
     }
@@ -40,8 +40,8 @@ interface SelectOption : QueryOption {
     val fetchSize: Int?
     val maxRows: Int?
 
-    override fun getJdbcOption(): JdbcOption {
-        return super.getJdbcOption().copy(
+    override fun getExecutionOption(): ExecutionOption {
+        return super.getExecutionOption().copy(
             fetchSize = fetchSize,
             maxRows = maxRows
         )

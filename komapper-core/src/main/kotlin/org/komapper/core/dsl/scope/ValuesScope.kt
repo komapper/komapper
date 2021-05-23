@@ -6,7 +6,7 @@ import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.metamodel.PropertyMetamodel
 
 @Scope
-class ValuesScope<ENTITY : Any> internal constructor(
+class ValuesScope<ENTITY : Any>(
     private val context: MutableList<Pair<PropertyMetamodel<ENTITY, *, *>, Operand>> = mutableListOf()
 ) : List<Pair<PropertyMetamodel<ENTITY, *, *>, Operand>> by context {
 

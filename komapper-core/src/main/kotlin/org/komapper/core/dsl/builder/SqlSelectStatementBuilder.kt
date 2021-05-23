@@ -8,7 +8,7 @@ import org.komapper.core.dsl.element.Criterion
 import org.komapper.core.dsl.expression.AggregateFunction
 import org.komapper.core.dsl.expression.ColumnExpression
 
-internal class SqlSelectStatementBuilder(
+class SqlSelectStatementBuilder(
     val dialect: Dialect,
     val context: SqlSelectContext<*, *, *>,
     aliasManager: AliasManager = DefaultAliasManager(context)

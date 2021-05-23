@@ -40,8 +40,8 @@ val exampleProjects = subprojects.filter {
     it.name.startsWith("example")
 }
 
-val testProjects = subprojects.filter {
-    it.name.endsWith("test")
+val integrationTestProjects = subprojects.filter {
+    it.name.startsWith("integration-test")
 }
 
 configure(libraryProjects + gradlePluginProject) {
@@ -53,7 +53,7 @@ configure(libraryProjects + gradlePluginProject) {
     }
 }
 
-configure(libraryProjects + gradlePluginProject + testProjects) {
+configure(libraryProjects + gradlePluginProject + integrationTestProjects) {
     apply(plugin = "org.jetbrains.kotlin.jvm")
 
     tasks.withType<Test> {
@@ -66,7 +66,7 @@ configure(libraryProjects + gradlePluginProject + testProjects) {
     }
 }
 
-configure(libraryProjects + gradlePluginProject + testProjects + exampleProjects) {
+configure(libraryProjects + gradlePluginProject + integrationTestProjects + exampleProjects) {
     apply(plugin = "org.jetbrains.kotlin.jvm")
 
     configure<com.diffplug.gradle.spotless.SpotlessExtension> {

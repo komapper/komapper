@@ -64,7 +64,7 @@ abstract class AbstractSchemaStatementBuilder<D : Dialect>(protected val dialect
     }
 
     protected open fun resolveDataTypeName(property: PropertyMetamodel<*, *, *>): String {
-        return dialect.getDataType(property.interiorClass).name
+        return dialect.getDataTypeName(property.interiorClass)
     }
 
     protected open fun resolveIdentity(property: PropertyMetamodel<*, *, *>): String {
@@ -98,7 +98,7 @@ abstract class AbstractSchemaStatementBuilder<D : Dialect>(protected val dialect
     }
 }
 
-internal object DryRunSchemaStatementBuilder : SchemaStatementBuilder {
+object DryRunSchemaStatementBuilder : SchemaStatementBuilder {
 
     private val statement = Statement(
         "Not supported to invoke the dryRun function with the default value."

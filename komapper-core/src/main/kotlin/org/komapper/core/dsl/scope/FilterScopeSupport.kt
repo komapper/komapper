@@ -4,9 +4,9 @@ import org.komapper.core.dsl.element.Criterion
 import org.komapper.core.dsl.element.Operand
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.expression.EscapeExpression
-import org.komapper.core.dsl.query.Subquery
+import org.komapper.core.dsl.expression.SubqueryExpression
 
-internal class FilterScopeSupport<T>(
+class FilterScopeSupport<T>(
     private val context: MutableList<Criterion> = mutableListOf(),
     private val newScope: () -> T
 ) : FilterScope, List<Criterion> by context
@@ -201,7 +201,7 @@ internal class FilterScopeSupport<T>(
         add(Criterion.InList(o1, o2))
     }
 
-    override infix fun <T : Any, S : Any> ColumnExpression<T, S>.inList(block: () -> Subquery<T?>) {
+    override infix fun <T : Any, S : Any> ColumnExpression<T, S>.inList(block: () -> SubqueryExpression<T?>) {
         val subquery = block()
         val left = Operand.Column(this)
         val right = subquery.subqueryContext
@@ -214,7 +214,7 @@ internal class FilterScopeSupport<T>(
         add(Criterion.NotInList(o1, o2))
     }
 
-    override infix fun <T : Any, S : Any> ColumnExpression<T, S>.notInList(block: () -> Subquery<T?>) {
+    override infix fun <T : Any, S : Any> ColumnExpression<T, S>.notInList(block: () -> SubqueryExpression<T?>) {
         val subquery = block()
         val left = Operand.Column(this)
         val right = subquery.subqueryContext
@@ -232,7 +232,7 @@ internal class FilterScopeSupport<T>(
         add(Criterion.InList2(left, right))
     }
 
-    override infix fun <A : Any, B : Any> Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>.inList2(block: () -> Subquery<Pair<A?, B?>>) {
+    override infix fun <A : Any, B : Any> Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>.inList2(block: () -> SubqueryExpression<Pair<A?, B?>>) {
         val subquery = block()
         val left = Operand.Column(this.first) to Operand.Column(this.second)
         val right = subquery.subqueryContext
@@ -250,19 +250,19 @@ internal class FilterScopeSupport<T>(
         add(Criterion.NotInList2(left, right))
     }
 
-    override infix fun <A : Any, B : Any> Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>.notInList2(block: () -> Subquery<Pair<A?, B?>>) {
+    override infix fun <A : Any, B : Any> Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>.notInList2(block: () -> SubqueryExpression<Pair<A?, B?>>) {
         val subquery = block()
         val left = Operand.Column(this.first) to Operand.Column(this.second)
         val right = subquery.subqueryContext
         add(Criterion.NotInSubQuery2(left, right))
     }
 
-    override fun exists(block: () -> Subquery<*>) {
+    override fun exists(block: () -> SubqueryExpression<*>) {
         val subquery = block()
         add(Criterion.Exists(subquery.subqueryContext))
     }
 
-    override fun notExists(block: () -> Subquery<*>) {
+    override fun notExists(block: () -> SubqueryExpression<*>) {
         val subquery = block()
         add(Criterion.NotExists(subquery.subqueryContext))
     }

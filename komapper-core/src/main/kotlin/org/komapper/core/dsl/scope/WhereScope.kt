@@ -4,7 +4,7 @@ import org.komapper.core.Scope
 import org.komapper.core.dsl.element.Criterion
 
 @Scope
-class WhereScope internal constructor(
+class WhereScope(
     private val support: FilterScopeSupport<WhereScope> = FilterScopeSupport { WhereScope() }
 ) : FilterScope by support,
     List<Criterion> by support {
