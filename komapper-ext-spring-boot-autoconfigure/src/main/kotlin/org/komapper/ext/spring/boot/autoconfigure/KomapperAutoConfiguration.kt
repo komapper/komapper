@@ -2,7 +2,7 @@ package org.komapper.ext.spring.boot.autoconfigure
 
 import org.komapper.core.ClockProvider
 import org.komapper.core.DefaultClockProvider
-import org.komapper.core.JdbcOption
+import org.komapper.core.ExecutionOption
 import org.komapper.core.Logger
 import org.komapper.core.StdOutLogger
 import org.komapper.core.TemplateStatementBuilder
@@ -41,7 +41,7 @@ open class KomapperAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    open fun dialect(environment: Environment, dataTypes: List<DataType<*>>?): JdbcDialect {
+    open fun jdbcDialect(environment: Environment, dataTypes: List<DataType<*>>?): JdbcDialect {
         val url = environment.getProperty(DATASOURCE_URL_PROPERTY)
             ?: error(
                 "$DATASOURCE_URL_PROPERTY is not found. " +
@@ -58,8 +58,8 @@ open class KomapperAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    open fun jdbcOption(): JdbcOption {
-        return JdbcOption()
+    open fun executionOption(): ExecutionOption {
+        return ExecutionOption()
     }
 
     @Bean
@@ -94,7 +94,7 @@ open class KomapperAutoConfiguration {
     open fun databaseConfig(
         dialect: JdbcDialect,
         clockProvider: ClockProvider,
-        jdbcOption: JdbcOption,
+        executionOption: ExecutionOption,
         logger: Logger,
         session: DatabaseSession,
         statementInspector: StatementInspector,
@@ -105,7 +105,7 @@ open class KomapperAutoConfiguration {
             override val id = UUID.randomUUID()
             override val dialect = dialect
             override val clockProvider = clockProvider
-            override val jdbcOption = jdbcOption
+            override val executionOption = executionOption
             override val logger = logger
             override val session = session
             override val statementInspector = statementInspector

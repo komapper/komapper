@@ -22,6 +22,9 @@ module/ext-spring-boot-starter:
 module/ext-sqlcommenter:
   - komapper-ext-sqlcommenter/**/*
 
+module/jdbc:
+  - komapper-jdbc/**/*
+
 module/jdbc-h2:
   - komapper-jdbc-h2/**/*
 

@@ -6,7 +6,7 @@ import org.komapper.jdbc.DefaultDatabaseConfig
 class H2Setting(url: String, user: String, password: String) : Setting {
     override val config: DatabaseConfig =
         object : DefaultDatabaseConfig(url, user, password) {
-            override val jdbcOption = super.jdbcOption.copy(batchSize = 2)
+            override val executionOption = super.executionOption.copy(batchSize = 2)
         }
     override val dbms: Dbms = Dbms.H2
     override val createSql: String = """

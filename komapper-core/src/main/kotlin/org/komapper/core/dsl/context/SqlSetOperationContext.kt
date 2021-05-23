@@ -3,7 +3,7 @@ package org.komapper.core.dsl.context
 import org.komapper.core.dsl.element.SortItem
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 
-internal data class SqlSetOperationContext<T>(
+data class SqlSetOperationContext<T>(
     val kind: SqlSetOperationKind,
     val left: SubqueryContext<T>,
     val right: SubqueryContext<T>,

@@ -1,10 +1,10 @@
 package org.komapper.jdbc.dsl.query
 
-import org.komapper.jdbc.Column
+import org.komapper.core.Column
+import org.komapper.core.PrimaryKey
+import org.komapper.core.Table
 import org.komapper.jdbc.DatabaseConfig
 import org.komapper.jdbc.JdbcDialect
-import org.komapper.jdbc.PrimaryKey
-import org.komapper.jdbc.Table
 import java.sql.DatabaseMetaData
 
 interface MetadataQuery : Query<List<Table>>

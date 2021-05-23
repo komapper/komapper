@@ -29,6 +29,7 @@ include("komapper-transaction")
 include("komapper-codegen")
 
 // JDBC
+include("komapper-jdbc")
 include("komapper-jdbc-h2")
 include("komapper-jdbc-mysql")
 include("komapper-jdbc-postgresql")

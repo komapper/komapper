@@ -7,7 +7,7 @@ import org.komapper.core.dsl.element.Projection
 import org.komapper.core.dsl.element.SortItem
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 
-internal interface SelectContext<
+interface SelectContext<
     ENTITY : Any,
     ID,
     META : EntityMetamodel<ENTITY, ID, META>,

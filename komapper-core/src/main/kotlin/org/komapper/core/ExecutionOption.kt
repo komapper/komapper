@@ -2,21 +2,21 @@ package org.komapper.core
 
 /**
  * @property batchSize the batch size. This value is used for batch commands.
- * @property fetchSize the fetch size. See [java.sql.PreparedStatement.setFetchSize].
- * @property maxRows the max rows. See [java.sql.PreparedStatement.setMaxRows].
- * @property queryTimeoutSeconds the query timeout. See [java.sql.PreparedStatement.setQueryTimeout].
+ * @property fetchSize the fetch size.
+ * @property maxRows the max rows.
+ * @property queryTimeoutSeconds the query timeout.
  * @property suppressLogging whether to suppress SQL logging.
  */
 @ThreadSafe
-data class JdbcOption(
+data class ExecutionOption(
     val batchSize: Int? = null,
     val fetchSize: Int? = null,
     val maxRows: Int? = null,
     val queryTimeoutSeconds: Int? = null,
     val suppressLogging: Boolean? = null
 ) {
-    infix operator fun plus(other: JdbcOption): JdbcOption {
-        return JdbcOption(
+    infix operator fun plus(other: ExecutionOption): ExecutionOption {
+        return ExecutionOption(
             other.batchSize ?: this.batchSize,
             other.fetchSize ?: this.fetchSize,
             other.maxRows ?: this.maxRows,
@@ -26,6 +26,6 @@ data class JdbcOption(
     }
 }
 
-interface JdbcOptionProvider {
-    fun getJdbcOption(): JdbcOption
+interface ExecutionOptionProvider {
+    fun getExecutionOption(): ExecutionOption
 }

@@ -98,7 +98,7 @@ abstract class AbstractSchemaStatementBuilder<D : Dialect>(protected val dialect
     }
 }
 
-internal object DryRunSchemaStatementBuilder : SchemaStatementBuilder {
+object DryRunSchemaStatementBuilder : SchemaStatementBuilder {
 
     private val statement = Statement(
         "Not supported to invoke the dryRun function with the default value."

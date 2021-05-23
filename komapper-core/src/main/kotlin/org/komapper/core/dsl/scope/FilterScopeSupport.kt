@@ -6,7 +6,7 @@ import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.expression.EscapeExpression
 import org.komapper.core.dsl.expression.SubqueryExpression
 
-internal class FilterScopeSupport<T>(
+class FilterScopeSupport<T>(
     private val context: MutableList<Criterion> = mutableListOf(),
     private val newScope: () -> T
 ) : FilterScope, List<Criterion> by context

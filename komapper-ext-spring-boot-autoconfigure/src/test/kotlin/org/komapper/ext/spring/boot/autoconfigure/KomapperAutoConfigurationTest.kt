@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.komapper.core.ClockProvider
-import org.komapper.core.JdbcOption
+import org.komapper.core.ExecutionOption
 import org.komapper.core.Statement
 import org.komapper.core.TemplateStatementBuilder
 import org.komapper.jdbc.DataType
@@ -66,7 +66,7 @@ class KomapperAutoConfigurationTest {
         val clock = database.config.clockProvider.now()
         val timestamp = LocalDateTime.now(clock)
         assertEquals(LocalDateTime.of(2021, 4, 25, 16, 17, 18), timestamp)
-        val jdbcOption = database.config.jdbcOption
+        val jdbcOption = database.config.executionOption
         assertEquals(1234, jdbcOption.queryTimeoutSeconds)
     }
 
@@ -106,8 +106,8 @@ class KomapperAutoConfigurationTest {
         }
 
         @Bean
-        open fun jdbcOption(): JdbcOption {
-            return JdbcOption(queryTimeoutSeconds = 1234)
+        open fun jdbcOption(): ExecutionOption {
+            return ExecutionOption(queryTimeoutSeconds = 1234)
         }
     }
 

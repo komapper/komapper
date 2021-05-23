@@ -3,10 +3,10 @@ package integration
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.komapper.core.dsl.count
+import org.komapper.core.dsl.max
 import org.komapper.jdbc.Database
 import org.komapper.jdbc.dsl.SqlDsl
-import org.komapper.jdbc.dsl.count
-import org.komapper.jdbc.dsl.max
 import org.komapper.jdbc.dsl.runQuery
 
 @ExtendWith(Env::class)

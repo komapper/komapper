@@ -3,7 +3,7 @@ dependencies {
     val springBootVersion: String by project
     implementation("org.springframework:spring-jdbc:$springVersion")
     implementation("org.springframework.boot:spring-boot-autoconfigure:$springBootVersion")
-    implementation(project(":komapper-core"))
+    implementation(project(":komapper-jdbc"))
     testImplementation(project(":komapper-ext-slf4j"))
     testImplementation(project(":komapper-jdbc-h2"))
     testImplementation("ch.qos.logback:logback-classic:1.2.3")

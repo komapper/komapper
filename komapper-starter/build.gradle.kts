@@ -1,6 +1,6 @@
 dependencies {
     api(project(":komapper-annotation"))
-    api(project(":komapper-core"))
+    api(project(":komapper-jdbc"))
     api(project(":komapper-transaction"))
     api(project(":komapper-ext-slf4j"))
     runtimeOnly(project(":komapper-template"))

@@ -1,7 +1,7 @@
 package org.komapper.codegen
 
+import org.komapper.core.Column
 import org.komapper.core.ThreadSafe
-import org.komapper.jdbc.Column
 import org.komapper.jdbc.DataType
 import kotlin.reflect.KClass
 

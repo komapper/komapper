@@ -18,7 +18,6 @@ idea.module {
 
 dependencies {
     compileOnly(project(":komapper-annotation"))
-    implementation(project(":komapper-core"))
     implementation(project(":komapper-transaction"))
     runtimeOnly(project(":komapper-jdbc-h2"))
     ksp(project(":komapper-processor"))

@@ -10,7 +10,7 @@ import org.komapper.core.dsl.context.SqlSetOperationKind
 import org.komapper.core.dsl.context.SubqueryContext
 import org.komapper.core.dsl.expression.TableExpression
 
-internal class SqlSetOperationStatementBuilder(
+class SqlSetOperationStatementBuilder(
     private val dialect: Dialect,
     private val context: SqlSetOperationContext<*>,
     private val aliasManager: AliasManager

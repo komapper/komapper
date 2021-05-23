@@ -2,7 +2,7 @@ package org.komapper.jdbc
 
 import org.komapper.core.ClockProvider
 import org.komapper.core.DefaultClockProvider
-import org.komapper.core.JdbcOption
+import org.komapper.core.ExecutionOption
 import org.komapper.core.Logger
 import org.komapper.core.StdOutLogger
 import org.komapper.core.TemplateStatementBuilder
@@ -23,7 +23,7 @@ import javax.sql.DataSource
  * @property dialect the dialect
  * @property logger the logger
  * @property clockProvider the clock provider
- * @property jdbcOption the jdbc configuration
+ * @property executionOption the jdbc configuration
  * @property session the session
  */
 @ThreadSafe
@@ -31,7 +31,7 @@ interface DatabaseConfig {
     val id: UUID
     val dialect: JdbcDialect
     val clockProvider: ClockProvider
-    val jdbcOption: JdbcOption
+    val executionOption: ExecutionOption
     val logger: Logger
     val session: DatabaseSession
     val statementInspector: StatementInspector
@@ -60,7 +60,7 @@ open class DefaultDatabaseConfig(
 
     override val id: UUID = UUID.randomUUID()
     override val clockProvider: ClockProvider = DefaultClockProvider()
-    override val jdbcOption: JdbcOption = JdbcOption(batchSize = 10)
+    override val executionOption: ExecutionOption = ExecutionOption(batchSize = 10)
     override val logger: Logger by lazy {
         val loader = ServiceLoader.load(LoggerFactory::class.java)
         val factory = loader.firstOrNull()
@@ -101,7 +101,7 @@ object DryRunDatabaseConfig : DatabaseConfig {
         get() = throw UnsupportedOperationException()
     override val clockProvider: ClockProvider
         get() = throw UnsupportedOperationException()
-    override val jdbcOption: JdbcOption
+    override val executionOption: ExecutionOption
         get() = throw UnsupportedOperationException()
     override val session: DatabaseSession
         get() = throw UnsupportedOperationException()

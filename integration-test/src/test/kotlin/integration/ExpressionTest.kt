@@ -3,20 +3,20 @@ package integration
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.komapper.core.dsl.concat
+import org.komapper.core.dsl.div
+import org.komapper.core.dsl.literal
+import org.komapper.core.dsl.lower
+import org.komapper.core.dsl.ltrim
+import org.komapper.core.dsl.minus
+import org.komapper.core.dsl.plus
+import org.komapper.core.dsl.rem
+import org.komapper.core.dsl.rtrim
+import org.komapper.core.dsl.trim
+import org.komapper.core.dsl.upper
 import org.komapper.jdbc.Database
 import org.komapper.jdbc.dsl.SqlDsl
-import org.komapper.jdbc.dsl.concat
-import org.komapper.jdbc.dsl.div
-import org.komapper.jdbc.dsl.literal
-import org.komapper.jdbc.dsl.lower
-import org.komapper.jdbc.dsl.ltrim
-import org.komapper.jdbc.dsl.minus
-import org.komapper.jdbc.dsl.plus
-import org.komapper.jdbc.dsl.rem
-import org.komapper.jdbc.dsl.rtrim
 import org.komapper.jdbc.dsl.runQuery
-import org.komapper.jdbc.dsl.trim
-import org.komapper.jdbc.dsl.upper
 
 @ExtendWith(Env::class)
 class ExpressionTest(private val db: Database) {

@@ -1,4 +1,4 @@
-package org.komapper.core.jdbc
+package org.komapper.jdbc
 
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
@@ -6,8 +6,6 @@ import org.komapper.core.dsl.builder.EntityUpsertStatementBuilder
 import org.komapper.core.dsl.builder.SchemaStatementBuilder
 import org.komapper.core.dsl.context.EntityUpsertContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
-import org.komapper.jdbc.AbstractJdbcDialect
-import org.komapper.jdbc.DataType
 import java.sql.SQLException
 import kotlin.reflect.KClass
 

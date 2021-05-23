@@ -1,6 +1,4 @@
-package org.komapper.jdbc
-
-import org.komapper.core.ThreadSafe
+package org.komapper.core
 
 @ThreadSafe
 data class PrimaryKey(

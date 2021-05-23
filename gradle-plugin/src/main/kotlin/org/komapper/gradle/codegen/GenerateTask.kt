@@ -3,8 +3,8 @@ package org.komapper.gradle.codegen
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
 import org.komapper.codegen.CodeGenerator
+import org.komapper.core.Table
 import org.komapper.jdbc.Database
-import org.komapper.jdbc.Table
 import org.komapper.jdbc.dsl.MetadataDsl
 import org.komapper.jdbc.dsl.runQuery
 import javax.inject.Inject

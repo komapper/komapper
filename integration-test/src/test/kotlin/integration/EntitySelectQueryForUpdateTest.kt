@@ -3,9 +3,9 @@ package integration
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.komapper.core.dsl.desc
 import org.komapper.jdbc.Database
 import org.komapper.jdbc.dsl.EntityDsl
-import org.komapper.jdbc.dsl.desc
 import org.komapper.jdbc.dsl.runQuery
 
 @ExtendWith(Env::class)
