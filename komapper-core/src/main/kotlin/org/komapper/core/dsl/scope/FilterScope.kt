@@ -2,7 +2,7 @@ package org.komapper.core.dsl.scope
 
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.expression.EscapeExpression
-import org.komapper.core.dsl.query.Subquery
+import org.komapper.core.dsl.expression.SubqueryExpression
 
 interface FilterScope {
     infix fun <T : Any, S : Any> ColumnExpression<T, S>.eq(operand: ColumnExpression<T, S>)
@@ -67,23 +67,23 @@ interface FilterScope {
 
     infix fun <T : Any, S : Any> ColumnExpression<T, S>.inList(values: List<T?>)
 
-    infix fun <T : Any, S : Any> ColumnExpression<T, S>.inList(block: () -> Subquery<T?>)
+    infix fun <T : Any, S : Any> ColumnExpression<T, S>.inList(block: () -> SubqueryExpression<T?>)
 
     infix fun <T : Any, S : Any> ColumnExpression<T, S>.notInList(values: List<T?>)
 
-    infix fun <T : Any, S : Any> ColumnExpression<T, S>.notInList(block: () -> Subquery<T?>)
+    infix fun <T : Any, S : Any> ColumnExpression<T, S>.notInList(block: () -> SubqueryExpression<T?>)
 
     infix fun <A : Any, B : Any> Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>.inList2(values: List<Pair<A?, B?>>)
 
-    infix fun <A : Any, B : Any> Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>.inList2(block: () -> Subquery<Pair<A?, B?>>)
+    infix fun <A : Any, B : Any> Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>.inList2(block: () -> SubqueryExpression<Pair<A?, B?>>)
 
     infix fun <A : Any, B : Any> Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>.notInList2(values: List<Pair<A?, B?>>)
 
-    infix fun <A : Any, B : Any> Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>.notInList2(block: () -> Subquery<Pair<A?, B?>>)
+    infix fun <A : Any, B : Any> Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>.notInList2(block: () -> SubqueryExpression<Pair<A?, B?>>)
 
-    fun exists(block: () -> Subquery<*>)
+    fun exists(block: () -> SubqueryExpression<*>)
 
-    fun notExists(block: () -> Subquery<*>)
+    fun notExists(block: () -> SubqueryExpression<*>)
 
     fun <S : CharSequence> text(value: S): EscapeExpression {
         if (value is EscapeExpression) return value

@@ -4,6 +4,7 @@ import org.komapper.core.DatabaseConfig
 import org.komapper.core.DryRunDatabaseConfig
 import org.komapper.core.ThreadSafe
 import org.komapper.core.dsl.context.SubqueryContext
+import org.komapper.core.dsl.expression.SubqueryExpression
 
 @ThreadSafe
 interface Query<T> {
@@ -17,8 +18,8 @@ interface ListQuery<T> : Query<List<T>> {
     fun <R> collect(transform: (Sequence<T>) -> R): Query<R>
 }
 
-interface Subquery<T> : ListQuery<T> {
-    val subqueryContext: SubqueryContext<T>
+interface Subquery<T> : ListQuery<T>, SubqueryExpression<T> {
+    override val subqueryContext: SubqueryContext<T>
     infix fun except(other: Subquery<T>): SqlSetOperationQuery<T>
     infix fun intersect(other: Subquery<T>): SqlSetOperationQuery<T>
     infix fun union(other: Subquery<T>): SqlSetOperationQuery<T>
