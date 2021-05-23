@@ -10,7 +10,6 @@ import org.komapper.core.dsl.min
 import org.komapper.core.dsl.sum
 import org.komapper.jdbc.Database
 import org.komapper.jdbc.dsl.SqlDsl
-import org.komapper.jdbc.dsl.runQuery
 
 @ExtendWith(Env::class)
 class SqlSelectQueryAggregateTest(private val db: Database) {

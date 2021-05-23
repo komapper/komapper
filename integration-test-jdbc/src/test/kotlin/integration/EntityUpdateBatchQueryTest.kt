@@ -10,7 +10,6 @@ import org.komapper.core.OptimisticLockException
 import org.komapper.core.UniqueConstraintException
 import org.komapper.jdbc.Database
 import org.komapper.jdbc.dsl.EntityDsl
-import org.komapper.jdbc.dsl.runQuery
 
 @ExtendWith(Env::class)
 class EntityUpdateBatchQueryTest(private val db: Database) {

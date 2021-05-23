@@ -9,8 +9,6 @@ import org.komapper.core.dsl.scope.WhereDeclaration
 import org.komapper.core.dsl.scope.WhereScope.Companion.plus
 import org.komapper.jdbc.Database
 import org.komapper.jdbc.dsl.EntityDsl
-import org.komapper.jdbc.dsl.plus
-import org.komapper.jdbc.dsl.runQuery
 
 @ExtendWith(Env::class)
 class EntitySelectQueryWhereTest(private val db: Database) {

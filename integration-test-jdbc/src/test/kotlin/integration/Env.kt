@@ -14,7 +14,6 @@ import org.junit.jupiter.api.extension.ParameterResolver
 import org.junit.platform.commons.support.AnnotationSupport.findAnnotation
 import org.komapper.jdbc.Database
 import org.komapper.jdbc.dsl.ScriptDsl
-import org.komapper.jdbc.dsl.runQuery
 import org.komapper.jdbc.tx.transaction
 import org.komapper.jdbc.tx.transactionManager
 

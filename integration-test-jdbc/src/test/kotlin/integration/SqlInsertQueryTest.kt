@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.jdbc.Database
 import org.komapper.jdbc.dsl.SqlDsl
-import org.komapper.jdbc.dsl.runQuery
 import java.math.BigDecimal
 import java.time.LocalDate
 
@@ -19,6 +18,7 @@ class SqlInsertQueryTest(private val db: Database) {
         val a = Address.meta
         val (count, key) = db.runQuery {
             SqlDsl.insert(a).values {
+
                 a.addressId set 19
                 a.street set "STREET 16"
                 a.version set 0

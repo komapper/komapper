@@ -16,7 +16,6 @@ import org.komapper.core.dsl.trim
 import org.komapper.core.dsl.upper
 import org.komapper.jdbc.Database
 import org.komapper.jdbc.dsl.SqlDsl
-import org.komapper.jdbc.dsl.runQuery
 
 @ExtendWith(Env::class)
 class ExpressionTest(private val db: Database) {

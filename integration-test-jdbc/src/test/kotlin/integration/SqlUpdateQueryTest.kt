@@ -8,7 +8,6 @@ import org.komapper.core.dsl.concat
 import org.komapper.core.dsl.plus
 import org.komapper.jdbc.Database
 import org.komapper.jdbc.dsl.SqlDsl
-import org.komapper.jdbc.dsl.runQuery
 
 @ExtendWith(Env::class)
 class SqlUpdateQueryTest(private val db: Database) {

@@ -12,7 +12,6 @@ import org.komapper.core.dsl.concat
 import org.komapper.jdbc.Database
 import org.komapper.jdbc.DatabaseConfig
 import org.komapper.jdbc.dsl.EntityDsl
-import org.komapper.jdbc.dsl.runQuery
 import java.time.Clock
 import java.time.Instant
 import java.time.LocalDateTime

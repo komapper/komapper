@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.jdbc.Database
 import org.komapper.jdbc.dsl.SchemaDsl
-import org.komapper.jdbc.dsl.runQuery
 
 @ExtendWith(Env::class)
 class SchemaQueryTest(private val db: Database) {

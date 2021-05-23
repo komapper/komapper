@@ -6,7 +6,6 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.jdbc.Database
 import org.komapper.jdbc.dsl.SqlDsl
 import org.komapper.jdbc.dsl.TemplateDsl
-import org.komapper.jdbc.dsl.runQuery
 
 @ExtendWith(Env::class)
 class TemplateExecuteQueryTest(private val db: Database) {

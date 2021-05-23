@@ -9,7 +9,6 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.UniqueConstraintException
 import org.komapper.jdbc.Database
 import org.komapper.jdbc.dsl.EntityDsl
-import org.komapper.jdbc.dsl.runQuery
 
 @ExtendWith(Env::class)
 class EntityInsertMultipleQueryTest(private val db: Database) {

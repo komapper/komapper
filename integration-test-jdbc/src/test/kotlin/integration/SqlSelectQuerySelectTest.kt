@@ -10,7 +10,6 @@ import org.komapper.core.dsl.concat
 import org.komapper.core.dsl.count
 import org.komapper.jdbc.Database
 import org.komapper.jdbc.dsl.SqlDsl
-import org.komapper.jdbc.dsl.runQuery
 
 @ExtendWith(Env::class)
 class SqlSelectQuerySelectTest(private val db: Database) {

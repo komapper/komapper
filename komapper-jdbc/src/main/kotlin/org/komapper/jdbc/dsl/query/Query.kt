@@ -10,6 +10,48 @@ import org.komapper.jdbc.DryRunDatabaseConfig
 interface Query<T> {
     fun run(config: DatabaseConfig): T
     fun dryRun(config: DatabaseConfig = DryRunDatabaseConfig): String
+
+    fun <R> flatMap(transform: (T) -> Query<R>): Query<R> {
+        val self = this
+        return object : Query<R> {
+            override fun run(config: DatabaseConfig): R {
+                val result = self.run(config)
+                return transform(result).run(config)
+            }
+
+            override fun dryRun(config: DatabaseConfig): String {
+                return self.dryRun(config)
+            }
+        }
+    }
+
+    fun <R> flatZip(transform: (T) -> Query<R>): Query<Pair<T, R>> {
+        val self = this
+        return object : Query<Pair<T, R>> {
+            override fun run(config: DatabaseConfig): Pair<T, R> {
+                val result = self.run(config)
+                return result to transform(result).run(config)
+            }
+
+            override fun dryRun(config: DatabaseConfig): String {
+                return self.dryRun(config)
+            }
+        }
+    }
+
+    infix operator fun <S> plus(other: Query<S>): Query<S> {
+        val self = this
+        return object : Query<S> {
+            override fun run(config: DatabaseConfig): S {
+                self.run(config)
+                return other.run(config)
+            }
+
+            override fun dryRun(config: DatabaseConfig): String {
+                return self.dryRun(config) + other.dryRun(config)
+            }
+        }
+    }
 }
 
 interface ListQuery<T> : Query<List<T>> {

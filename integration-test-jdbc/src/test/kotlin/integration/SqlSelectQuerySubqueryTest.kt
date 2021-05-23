@@ -7,7 +7,6 @@ import org.komapper.core.dsl.count
 import org.komapper.core.dsl.max
 import org.komapper.jdbc.Database
 import org.komapper.jdbc.dsl.SqlDsl
-import org.komapper.jdbc.dsl.runQuery
 
 @ExtendWith(Env::class)
 class SqlSelectQuerySubqueryTest(private val db: Database) {

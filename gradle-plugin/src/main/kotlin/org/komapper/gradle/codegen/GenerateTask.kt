@@ -6,7 +6,6 @@ import org.komapper.codegen.CodeGenerator
 import org.komapper.core.Table
 import org.komapper.jdbc.Database
 import org.komapper.jdbc.dsl.MetadataDsl
-import org.komapper.jdbc.dsl.runQuery
 import javax.inject.Inject
 
 open class GenerateTask @Inject internal constructor(private val settings: Generator) : DefaultTask() {

@@ -10,7 +10,6 @@ import org.komapper.core.dsl.desc
 import org.komapper.jdbc.Database
 import org.komapper.jdbc.dsl.EntityDsl
 import org.komapper.jdbc.dsl.SqlDsl
-import org.komapper.jdbc.dsl.runQuery
 
 @ExtendWith(Env::class)
 class SqlSetOperationQueryTest(private val db: Database) {

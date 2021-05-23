@@ -1,6 +1,8 @@
 package org.komapper.jdbc
 
 import org.komapper.core.ThreadSafe
+import org.komapper.jdbc.dsl.query.Query
+import org.komapper.jdbc.dsl.query.QueryScope
 import javax.sql.DataSource
 
 /**
@@ -8,8 +10,6 @@ import javax.sql.DataSource
  */
 @ThreadSafe
 interface Database {
-    val config: DatabaseConfig
-    val dataFactory: DataFactory
 
     companion object {
         /**
@@ -43,6 +43,13 @@ interface Database {
         ): Database {
             return create(DefaultDatabaseConfig(url, user, password, dialect))
         }
+    }
+
+    val config: DatabaseConfig
+    val dataFactory: DataFactory
+
+    fun <T> runQuery(block: QueryScope.() -> Query<T>): T {
+        return block(QueryScope).run(this.config)
     }
 }
 

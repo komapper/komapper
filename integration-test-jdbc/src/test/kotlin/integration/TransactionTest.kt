@@ -13,7 +13,6 @@ import org.komapper.jdbc.DefaultDatabaseConfig
 import org.komapper.jdbc.SimpleDataSource
 import org.komapper.jdbc.dialect.h2.H2JdbcDialect
 import org.komapper.jdbc.dsl.EntityDsl
-import org.komapper.jdbc.dsl.runQuery
 import org.komapper.jdbc.tx.TransactionIsolationLevel
 import org.komapper.jdbc.tx.transaction
 
