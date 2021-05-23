@@ -1,7 +1,7 @@
 package org.komapper.core.dsl.query
 
 import org.komapper.core.DatabaseConfig
-import org.komapper.core.Dialect
+import org.komapper.core.JdbcDialect
 import org.komapper.core.JdbcExecutor
 import org.komapper.core.Statement
 import org.komapper.core.dsl.builder.DefaultAliasManager
@@ -23,7 +23,7 @@ interface SqlSetOperationQuery<T> : Subquery<T> {
 internal data class SetOperationQueryImpl<T>(
     private val context: SqlSetOperationContext<T>,
     private val option: SqlSetOperationOption = SqlSetOperationOption.default,
-    private val provide: (Dialect, ResultSet) -> T
+    private val provide: (JdbcDialect, ResultSet) -> T
 ) : SqlSetOperationQuery<T> {
 
     override val subqueryContext = SubqueryContext.SqlSetOperation(context)
@@ -106,7 +106,7 @@ internal data class SetOperationQueryImpl<T>(
     private class Terminal<T, R>(
         private val context: SqlSetOperationContext<T>,
         private val option: SqlSetOperationOption,
-        private val provide: (Dialect, ResultSet) -> T,
+        private val provide: (JdbcDialect, ResultSet) -> T,
         val transform: (Sequence<T>) -> R
     ) : Query<R> {
 

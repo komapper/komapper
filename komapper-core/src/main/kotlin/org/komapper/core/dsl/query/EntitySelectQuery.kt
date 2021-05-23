@@ -1,7 +1,7 @@
 package org.komapper.core.dsl.query
 
 import org.komapper.core.DatabaseConfig
-import org.komapper.core.Dialect
+import org.komapper.core.JdbcDialect
 import org.komapper.core.JdbcExecutor
 import org.komapper.core.Statement
 import org.komapper.core.dsl.builder.EntitySelectStatementBuilder
@@ -211,7 +211,7 @@ internal data class EntitySelectQueryImpl<ENTITY : Any, ID, META : EntityMetamod
             return builder.build()
         }
 
-        private fun fetchAllEntities(dialect: Dialect, rs: ResultSet): List<Map<EntityKey, Any>> {
+        private fun fetchAllEntities(dialect: JdbcDialect, rs: ResultSet): List<Map<EntityKey, Any>> {
             val metamodels = context.projection.metamodels
             val rows = mutableListOf<Map<EntityKey, Any>>()
             while (rs.next()) {

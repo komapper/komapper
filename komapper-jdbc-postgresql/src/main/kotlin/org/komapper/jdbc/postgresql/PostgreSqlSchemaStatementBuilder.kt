@@ -4,8 +4,8 @@ import org.komapper.core.dsl.builder.AbstractSchemaStatementBuilder
 import org.komapper.core.dsl.metamodel.Assignment
 import org.komapper.core.dsl.metamodel.PropertyMetamodel
 
-open class PostgreSqlSchemaStatementBuilder(dialect: PostgreSqlDialect) :
-    AbstractSchemaStatementBuilder<PostgreSqlDialect>(dialect) {
+open class PostgreSqlSchemaStatementBuilder(dialect: PostgreSqlJdbcDialect) :
+    AbstractSchemaStatementBuilder<PostgreSqlJdbcDialect>(dialect) {
 
     override fun resolveDataTypeName(property: PropertyMetamodel<*, *, *>): String {
         return if (property.idAssignment is Assignment.AutoIncrement<*, *, *>) {

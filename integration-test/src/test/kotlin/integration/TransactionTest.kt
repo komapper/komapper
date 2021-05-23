@@ -13,14 +13,14 @@ import org.komapper.core.DefaultDatabaseConfig
 import org.komapper.core.dsl.EntityDsl
 import org.komapper.core.dsl.runQuery
 import org.komapper.core.jdbc.SimpleDataSource
-import org.komapper.jdbc.h2.H2Dialect
+import org.komapper.jdbc.h2.H2JdbcDialect
 import org.komapper.transaction.TransactionIsolationLevel
 import org.komapper.transaction.transaction
 
 class TransactionTest {
 
     private val dataSource = SimpleDataSource("jdbc:h2:mem:transaction-test;DB_CLOSE_DELAY=-1")
-    private val config = DefaultDatabaseConfig(dataSource, H2Dialect())
+    private val config = DefaultDatabaseConfig(dataSource, H2JdbcDialect())
     private val db = Database.create(config)
 
     @BeforeEach

@@ -1,6 +1,6 @@
 package org.komapper.core.dsl.query
 
-import org.komapper.core.Dialect
+import org.komapper.core.JdbcDialect
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.sql.Array
@@ -67,7 +67,7 @@ interface Row {
 }
 
 class RowImpl(
-    private val dialect: Dialect,
+    private val dialect: JdbcDialect,
     private val rs: ResultSet
 ) : Row {
 

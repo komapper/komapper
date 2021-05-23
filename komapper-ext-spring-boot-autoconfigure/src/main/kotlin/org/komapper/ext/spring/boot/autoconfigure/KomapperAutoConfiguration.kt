@@ -7,7 +7,7 @@ import org.komapper.core.DatabaseConfig
 import org.komapper.core.DatabaseSession
 import org.komapper.core.DefaultClockProvider
 import org.komapper.core.DefaultDataFactory
-import org.komapper.core.Dialect
+import org.komapper.core.JdbcDialect
 import org.komapper.core.JdbcOption
 import org.komapper.core.Logger
 import org.komapper.core.StdOutLogger
@@ -41,13 +41,13 @@ open class KomapperAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    open fun dialect(environment: Environment, dataTypes: List<DataType<*>>?): Dialect {
+    open fun dialect(environment: Environment, dataTypes: List<DataType<*>>?): JdbcDialect {
         val url = environment.getProperty(DATASOURCE_URL_PROPERTY)
             ?: error(
                 "$DATASOURCE_URL_PROPERTY is not found. " +
                     "Specify it to the application.properties file or define the Dialect bean manually."
             )
-        return Dialect.load(url, dataTypes ?: emptyList())
+        return JdbcDialect.load(url, dataTypes ?: emptyList())
     }
 
     @Bean
@@ -92,7 +92,7 @@ open class KomapperAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     open fun databaseConfig(
-        dialect: Dialect,
+        dialect: JdbcDialect,
         clockProvider: ClockProvider,
         jdbcOption: JdbcOption,
         logger: Logger,
@@ -118,7 +118,7 @@ open class KomapperAutoConfiguration {
         }
     }
 
-    private fun loadTemplateStatementBuilder(dialect: Dialect): TemplateStatementBuilder {
+    private fun loadTemplateStatementBuilder(dialect: JdbcDialect): TemplateStatementBuilder {
         val loader = ServiceLoader.load(TemplateStatementBuilderFactory::class.java)
         val factory = loader.firstOrNull()
             ?: error(

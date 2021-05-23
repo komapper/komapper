@@ -12,7 +12,7 @@ import org.komapper.core.Statement
 import org.komapper.core.TemplateStatementBuilder
 import org.komapper.core.jdbc.DataType
 import org.komapper.core.jdbc.StringType
-import org.komapper.jdbc.h2.H2Dialect
+import org.komapper.jdbc.h2.H2JdbcDialect
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
 import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.context.annotation.Bean
@@ -41,7 +41,7 @@ class KomapperAutoConfigurationTest {
 
         val database = context.getBean(Database::class.java)
         assertNotNull(database)
-        assertTrue(database.config.dialect is H2Dialect)
+        assertTrue(database.config.dialect is H2JdbcDialect)
         assertThrows<IllegalStateException> {
             database.config.templateStatementBuilder
         }

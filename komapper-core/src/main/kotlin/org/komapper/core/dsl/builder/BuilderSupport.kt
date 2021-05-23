@@ -17,7 +17,6 @@ import org.komapper.core.dsl.expression.LiteralExpression
 import org.komapper.core.dsl.expression.ScalarQueryExpression
 import org.komapper.core.dsl.expression.StringFunction
 import org.komapper.core.dsl.expression.TableExpression
-import org.komapper.core.jdbc.DataType
 
 class BuilderSupport(
     private val dialect: Dialect,
@@ -177,10 +176,7 @@ class BuilderSupport(
     }
 
     private fun visitLiteralExpression(expression: LiteralExpression<*>) {
-        val dataType = dialect.getDataType(expression.interiorClass)
-        @Suppress("UNCHECKED_CAST")
-        dataType as DataType<Any>
-        val string = dataType.toString(expression.value)
+        val string = dialect.formatValue(expression.value, expression.interiorClass)
         buf.append(string)
     }
 

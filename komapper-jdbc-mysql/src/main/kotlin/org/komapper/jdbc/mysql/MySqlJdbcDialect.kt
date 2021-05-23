@@ -1,11 +1,11 @@
-package org.komapper.jdbc.h2
+package org.komapper.jdbc.mysql
 
-import org.komapper.core.AbstractDialect
+import org.komapper.core.AbstractJdbcDialect
 import org.komapper.core.dsl.builder.EntityUpsertStatementBuilder
+import org.komapper.core.dsl.builder.OffsetLimitStatementBuilder
 import org.komapper.core.dsl.builder.SchemaStatementBuilder
 import org.komapper.core.dsl.context.EntityUpsertContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
-import org.komapper.core.jdbc.AnyType
 import org.komapper.core.jdbc.ArrayType
 import org.komapper.core.jdbc.BigDecimalType
 import org.komapper.core.jdbc.BigIntegerType
@@ -32,65 +32,71 @@ import org.komapper.core.jdbc.UIntType
 import org.komapper.core.jdbc.UShortType
 import java.sql.SQLException
 
-open class H2Dialect(dataTypes: List<DataType<*>> = emptyList(), val version: Version = Version.V1_4) :
-    AbstractDialect(defaultDataTypes + dataTypes) {
+open class MySqlJdbcDialect(dataTypes: List<DataType<*>> = emptyList(), val version: Version = Version.V8_0) :
+    AbstractJdbcDialect(
+        defaultDataTypes + dataTypes
+    ) {
 
     companion object {
-        enum class Version { V1_4 }
+        enum class Version { V8_0 }
 
-        const val subprotocol = "h2"
+        const val subprotocol = "mysql"
 
         /** the error code that represents unique violation  */
-        const val UNIQUE_CONSTRAINT_VIOLATION_ERROR_CODE = 23505
+        var UNIQUE_CONSTRAINT_VIOLATION_ERROR_CODES = setOf(1022, 1062)
 
         val defaultDataTypes: List<DataType<*>> = listOf(
-            AnyType("other"),
-            ArrayType("array"),
-            BigDecimalType("bigint"),
-            BigIntegerType("bigint"),
+            ArrayType("varbinary(500)"),
+            BigDecimalType("decimal"),
+            BigIntegerType("decimal"),
             BlobType("blob"),
-            BooleanType("bool"),
+            BooleanType("bit(1)"),
             ByteType("tinyint"),
-            ByteArrayType("binary"),
-            DoubleType("double"),
-            ClobType("clob"),
-            FloatType("float"),
+            ByteArrayType("bytea"),
+            DoubleType("double precision"),
+            ClobType("text"),
+            FloatType("real"),
             IntType("integer"),
-            LocalDateTimeType("timestamp"),
+            LocalDateTimeType("timestamp(6)"),
             LocalDateType("date"),
             LocalTimeType("time"),
             LongType("bigint"),
-            NClobType("nclob"),
-            OffsetDateTimeType("timestamp with time zone"),
+            NClobType("text"),
+            OffsetDateTimeType("timestamp"),
             ShortType("smallint"),
             StringType("varchar(500)"),
-            SQLXMLType("clob"),
+            SQLXMLType("text"),
             UByteType("smallint"),
             UIntType("bigint"),
             UShortType("integer"),
-            H2UUIDType
         )
     }
 
     override val subprotocol: String = Companion.subprotocol
+    override val openQuote: String = "`"
+    override val closeQuote: String = "`"
 
     override fun isUniqueConstraintViolation(exception: SQLException): Boolean {
         val cause = getCause(exception)
-        return cause.errorCode == UNIQUE_CONSTRAINT_VIOLATION_ERROR_CODE
+        return cause.errorCode in UNIQUE_CONSTRAINT_VIOLATION_ERROR_CODES
     }
 
     override fun getSequenceSql(sequenceName: String): String {
-        return "call next value for $sequenceName"
+        throw UnsupportedOperationException()
+    }
+
+    override fun getOffsetLimitStatementBuilder(offset: Int, limit: Int): OffsetLimitStatementBuilder {
+        return MySqlOffsetLimitStatementBuilder(this, offset, limit)
     }
 
     override fun getSchemaStatementBuilder(): SchemaStatementBuilder {
-        return H2SchemaStatementBuilder(this)
+        return MySqlSchemaStatementBuilder(this)
     }
 
     override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> getEntityUpsertStatementBuilder(
         context: EntityUpsertContext<ENTITY, ID, META>,
         entities: List<ENTITY>
     ): EntityUpsertStatementBuilder<ENTITY> {
-        return H2EntityUpsertStatementBuilder(this, context, entities)
+        return MySqlEntityUpsertStatementBuilder(this, context, entities)
     }
 }

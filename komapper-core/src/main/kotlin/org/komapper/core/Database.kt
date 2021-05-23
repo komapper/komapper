@@ -21,7 +21,7 @@ interface Database {
 
         fun create(
             dataSource: DataSource,
-            dialect: Dialect,
+            dialect: JdbcDialect,
         ): Database {
             return create(DefaultDatabaseConfig(dataSource, dialect))
         }
@@ -39,7 +39,7 @@ interface Database {
             url: String,
             user: String = "",
             password: String = "",
-            dialect: Dialect
+            dialect: JdbcDialect
         ): Database {
             return create(DefaultDatabaseConfig(url, user, password, dialect))
         }

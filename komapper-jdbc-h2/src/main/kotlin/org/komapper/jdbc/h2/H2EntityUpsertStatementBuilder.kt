@@ -1,6 +1,6 @@
 package org.komapper.jdbc.h2
 
-import org.komapper.core.Dialect
+import org.komapper.core.JdbcDialect
 import org.komapper.core.Statement
 import org.komapper.core.StatementBuffer
 import org.komapper.core.dsl.builder.AliasManager
@@ -15,7 +15,7 @@ import org.komapper.core.dsl.expression.TableExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 
 internal class H2EntityUpsertStatementBuilder<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
-    private val dialect: Dialect,
+    private val dialect: JdbcDialect,
     private val context: EntityUpsertContext<ENTITY, ID, META>,
     entities: List<ENTITY>
 ) : EntityUpsertStatementBuilder<ENTITY> {
@@ -92,7 +92,7 @@ internal class H2EntityUpsertStatementBuilder<ENTITY : Any, ID, META : EntityMet
     }
 
     private class SourceStatementBuilder<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
-        val dialect: Dialect,
+        val dialect: JdbcDialect,
         val context: EntityUpsertContext<ENTITY, ID, META>,
         val entities: List<ENTITY>
     ) {

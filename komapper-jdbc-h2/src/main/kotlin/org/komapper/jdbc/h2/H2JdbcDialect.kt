@@ -1,10 +1,11 @@
-package org.komapper.jdbc.postgresql
+package org.komapper.jdbc.h2
 
-import org.komapper.core.AbstractDialect
+import org.komapper.core.AbstractJdbcDialect
 import org.komapper.core.dsl.builder.EntityUpsertStatementBuilder
 import org.komapper.core.dsl.builder.SchemaStatementBuilder
 import org.komapper.core.dsl.context.EntityUpsertContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
+import org.komapper.core.jdbc.AnyType
 import org.komapper.core.jdbc.ArrayType
 import org.komapper.core.jdbc.BigDecimalType
 import org.komapper.core.jdbc.BigIntegerType
@@ -31,42 +32,43 @@ import org.komapper.core.jdbc.UIntType
 import org.komapper.core.jdbc.UShortType
 import java.sql.SQLException
 
-open class PostgreSqlDialect(dataTypes: List<DataType<*>> = emptyList(), val version: Version = Version.V42_2) :
-    AbstractDialect(defaultDataTypes + dataTypes) {
+open class H2JdbcDialect(dataTypes: List<DataType<*>> = emptyList(), val version: Version = Version.V1_4) :
+    AbstractJdbcDialect(defaultDataTypes + dataTypes) {
 
     companion object {
-        enum class Version { V42_2 }
+        enum class Version { V1_4 }
 
-        const val subprotocol = "postgresql"
+        const val subprotocol = "h2"
 
-        /** the state code that represents unique violation  */
-        const val UNIQUE_CONSTRAINT_VIOLATION_STATE_CODE = "23505"
+        /** the error code that represents unique violation  */
+        const val UNIQUE_CONSTRAINT_VIOLATION_ERROR_CODE = 23505
 
         val defaultDataTypes: List<DataType<*>> = listOf(
+            AnyType("other"),
             ArrayType("array"),
-            BigDecimalType("decimal"),
-            BigIntegerType("decimal"),
+            BigDecimalType("bigint"),
+            BigIntegerType("bigint"),
             BlobType("blob"),
-            BooleanType("boolean"),
-            ByteType("smallint"),
-            ByteArrayType("bytea"),
-            DoubleType("double precision"),
-            ClobType("text"),
-            FloatType("real"),
+            BooleanType("bool"),
+            ByteType("tinyint"),
+            ByteArrayType("binary"),
+            DoubleType("double"),
+            ClobType("clob"),
+            FloatType("float"),
             IntType("integer"),
             LocalDateTimeType("timestamp"),
             LocalDateType("date"),
             LocalTimeType("time"),
             LongType("bigint"),
-            NClobType("text"),
+            NClobType("nclob"),
             OffsetDateTimeType("timestamp with time zone"),
             ShortType("smallint"),
             StringType("varchar(500)"),
-            SQLXMLType("text"),
+            SQLXMLType("clob"),
             UByteType("smallint"),
             UIntType("bigint"),
             UShortType("integer"),
-            PostgreSqlUUIDType
+            H2UUIDType
         )
     }
 
@@ -74,21 +76,21 @@ open class PostgreSqlDialect(dataTypes: List<DataType<*>> = emptyList(), val ver
 
     override fun isUniqueConstraintViolation(exception: SQLException): Boolean {
         val cause = getCause(exception)
-        return cause.sqlState == UNIQUE_CONSTRAINT_VIOLATION_STATE_CODE
+        return cause.errorCode == UNIQUE_CONSTRAINT_VIOLATION_ERROR_CODE
     }
 
     override fun getSequenceSql(sequenceName: String): String {
-        return "select nextval('$sequenceName')"
+        return "call next value for $sequenceName"
     }
 
     override fun getSchemaStatementBuilder(): SchemaStatementBuilder {
-        return PostgreSqlSchemaStatementBuilder(this)
+        return H2SchemaStatementBuilder(this)
     }
 
     override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> getEntityUpsertStatementBuilder(
         context: EntityUpsertContext<ENTITY, ID, META>,
         entities: List<ENTITY>
     ): EntityUpsertStatementBuilder<ENTITY> {
-        return PostgreSqlEntityUpsertStatementBuilder(this, context, entities)
+        return H2EntityUpsertStatementBuilder(this, context, entities)
     }
 }

@@ -2,7 +2,7 @@ package org.komapper.core.jdbc
 
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import org.komapper.core.AbstractDialect
+import org.komapper.core.AbstractJdbcDialect
 import org.komapper.core.dsl.builder.EntityUpsertStatementBuilder
 import org.komapper.core.dsl.builder.SchemaStatementBuilder
 import org.komapper.core.dsl.context.EntityUpsertContext
@@ -10,9 +10,9 @@ import org.komapper.core.dsl.metamodel.EntityMetamodel
 import java.sql.SQLException
 import kotlin.reflect.KClass
 
-internal class AbstractDialectTest {
+internal class AbstractJdbcDialectTest {
 
-    class MyDialect : AbstractDialect() {
+    class MyJdbcDialect : AbstractJdbcDialect() {
 
         override val subprotocol: String
             get() = throw UnsupportedOperationException()
@@ -41,7 +41,7 @@ internal class AbstractDialectTest {
         }
     }
 
-    private val dialect = MyDialect()
+    private val dialect = MyJdbcDialect()
 
     @Test
     fun quote() {

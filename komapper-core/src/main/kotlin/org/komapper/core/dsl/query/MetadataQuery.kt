@@ -1,7 +1,7 @@
 package org.komapper.core.dsl.query
 
 import org.komapper.core.DatabaseConfig
-import org.komapper.core.Dialect
+import org.komapper.core.JdbcDialect
 import org.komapper.core.jdbc.Column
 import org.komapper.core.jdbc.PrimaryKey
 import org.komapper.core.jdbc.Table
@@ -36,7 +36,7 @@ internal class MetadataQueryImpl(
 }
 
 internal class MetadataReader(
-    private val dialect: Dialect,
+    private val dialect: JdbcDialect,
     private val metaData: DatabaseMetaData,
     private val catalog: String?,
     private val schemaPattern: String?,

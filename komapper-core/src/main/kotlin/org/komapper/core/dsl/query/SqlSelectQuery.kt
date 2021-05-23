@@ -1,7 +1,7 @@
 package org.komapper.core.dsl.query
 
 import org.komapper.core.DatabaseConfig
-import org.komapper.core.Dialect
+import org.komapper.core.JdbcDialect
 import org.komapper.core.JdbcExecutor
 import org.komapper.core.Statement
 import org.komapper.core.dsl.builder.SqlSelectStatementBuilder
@@ -311,7 +311,7 @@ internal data class SqlSelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<
         c: SqlSelectContext<ENTITY, ID, META>,
         transform: (Sequence<ENTITY>) -> R
     ): Query<R> {
-        val provide: (Dialect, ResultSet) -> ENTITY = { dialect, rs ->
+        val provide: (JdbcDialect, ResultSet) -> ENTITY = { dialect, rs ->
             val mapper = EntityMapper(dialect, rs)
             val entity = mapper.execute(c.target, true)
             checkNotNull(entity)
@@ -322,7 +322,7 @@ internal data class SqlSelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<
     internal data class Collectable<T>(
         private val context: SqlSelectContext<*, *, *>,
         private val option: SqlSelectOption,
-        private val provide: (Dialect, ResultSet) -> T
+        private val provide: (JdbcDialect, ResultSet) -> T
     ) : Subquery<T> {
 
         override val subqueryContext = SubqueryContext.SqlSelect<T>(context)
@@ -378,7 +378,7 @@ internal data class SqlSelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<
     internal class Terminal<T, R>(
         private val context: SqlSelectContext<*, *, *>,
         private val option: SqlSelectOption,
-        private val provide: (Dialect, ResultSet) -> T,
+        private val provide: (JdbcDialect, ResultSet) -> T,
         private val transform: (Sequence<T>) -> R
     ) : Query<R> {
 

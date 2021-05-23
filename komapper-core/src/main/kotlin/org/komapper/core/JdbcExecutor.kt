@@ -33,7 +33,7 @@ internal class JdbcExecutor(
 
     fun <T, R> executeQuery(
         statement: Statement,
-        provide: (Dialect, ResultSet) -> T,
+        provide: (JdbcDialect, ResultSet) -> T,
         transform: (Sequence<T>) -> R
     ): R {
         @Suppress("NAME_SHADOWING")

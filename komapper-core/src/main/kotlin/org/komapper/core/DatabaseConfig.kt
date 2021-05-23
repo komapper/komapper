@@ -24,7 +24,7 @@ import javax.sql.DataSource
 @ThreadSafe
 interface DatabaseConfig {
     val id: UUID
-    val dialect: Dialect
+    val dialect: JdbcDialect
     val clockProvider: ClockProvider
     val jdbcOption: JdbcOption
     val logger: Logger
@@ -36,7 +36,7 @@ interface DatabaseConfig {
 
 open class DefaultDatabaseConfig(
     dataSource: DataSource,
-    override val dialect: Dialect
+    override val dialect: JdbcDialect
 ) : DatabaseConfig {
 
     constructor(
@@ -44,13 +44,13 @@ open class DefaultDatabaseConfig(
         user: String = "",
         password: String = "",
         dataTypes: List<DataType<*>> = emptyList()
-    ) : this(SimpleDataSource(url, user, password), Dialect.load(url, dataTypes))
+    ) : this(SimpleDataSource(url, user, password), JdbcDialect.load(url, dataTypes))
 
     constructor(
         url: String,
         user: String = "",
         password: String = "",
-        dialect: Dialect
+        dialect: JdbcDialect
     ) : this(SimpleDataSource(url, user, password), dialect)
 
     override val id: UUID = UUID.randomUUID()
@@ -91,7 +91,7 @@ open class DefaultDatabaseConfig(
 object DryRunDatabaseConfig : DatabaseConfig {
     override val id: UUID
         get() = throw UnsupportedOperationException()
-    override val dialect: Dialect = DryRunDialect
+    override val dialect: JdbcDialect = DryRunJdbcDialect
     override val logger: Logger
         get() = throw UnsupportedOperationException()
     override val clockProvider: ClockProvider
