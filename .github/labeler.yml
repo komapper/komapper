@@ -10,29 +10,29 @@ module/codegen:
 module/core:
   - komapper-core/**/*
 
-module/ext-slf4j:
-  - komapper-ext-slf4j/**/*
-
-module/ext-spring-boot-autoconfigure:
-  - komapper-ext-spring-boot-autoconfigure/**/*
-
-module/ext-spring-boot-starter:
-  - komapper-ext-spring-boot-starter/**/*
-
-module/ext-sqlcommenter:
-  - komapper-ext-sqlcommenter/**/*
-
 module/jdbc:
   - komapper-jdbc/**/*
 
-module/jdbc-h2:
-  - komapper-jdbc-h2/**/*
+module/jdbc-dialect-h2:
+  - komapper-jdbc-dialect-h2/**/*
 
-module/jdbc-mysql:
-  - komapper-jdbc-mysql/**/*
+module/jdbc-dialect-mysql:
+  - komapper-jdbc-dialect-mysql/**/*
 
-module/jdbc-postgresql:
-  - komapper-jdbc-postgresql/**/*
+module/jdbc-dialect-postgresql:
+  - komapper-jdbc-dialect-postgresql/**/*
+
+module/jdbc-spring-boot-autoconfigure:
+  - komapper-jdbc-spring-boot-autoconfigure/**/*
+
+module/jdbc-spring-boot-starter:
+  - komapper-jdbc-spring-boot-starter/**/*
+
+module/jdbc-starter:
+  - komapper-jdbc-starter/**/*
+
+module/jdbc-tx:
+  - komapper-jdbc-tx/**/*
 
 module/platform:
   - komapper-platform/**/*
@@ -40,11 +40,12 @@ module/platform:
 module/processor:
   - komapper-processor/**/*
 
-module/starter:
-  - komapper-starter/**/*
+module/slf4j:
+  - komapper-slf4j/**/*
+
+module/sqlcommenter:
+  - komapper-sqlcommenter/**/*
 
 module/template:
   - komapper-template/**/*
 
-module/transaction:
-  - komapper-transaction/**/*
