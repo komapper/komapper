@@ -4,8 +4,6 @@ import org.komapper.core.Dialect
 import org.komapper.core.ThreadSafe
 import org.komapper.core.dsl.builder.DryRunSchemaStatementBuilder
 import org.komapper.core.dsl.builder.EntityUpsertStatementBuilder
-import org.komapper.core.dsl.builder.OffsetLimitStatementBuilder
-import org.komapper.core.dsl.builder.OffsetLimitStatementBuilderImpl
 import org.komapper.core.dsl.builder.SchemaStatementBuilder
 import org.komapper.core.dsl.context.EntityUpsertContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
@@ -107,27 +105,6 @@ abstract class AbstractJdbcDialect protected constructor(internalDataTypes: List
 
     protected fun getCause(exception: SQLException): SQLException =
         exception.filterIsInstance(SQLException::class.java).first()
-
-    override fun enquote(name: String): String {
-        return openQuote + name + closeQuote
-    }
-
-    override fun escape(text: String, escapeSequence: String?): String {
-        val literal = escapeSequence ?: this.escapeSequence
-        val escapePattern = createEscapePattern(literal)
-        val matcher = escapePattern.matcher(text)
-        return matcher.replaceAll("${Regex.escapeReplacement(literal)}$0")
-    }
-
-    @Suppress("RegExpDuplicateCharacterInClass")
-    protected open fun createEscapePattern(escapeSequence: String): Pattern {
-        val targetChars = "[${Regex.escape("$escapeSequence%_")}]"
-        return Pattern.compile(targetChars)
-    }
-
-    override fun getOffsetLimitStatementBuilder(offset: Int, limit: Int): OffsetLimitStatementBuilder {
-        return OffsetLimitStatementBuilderImpl(this, offset, limit)
-    }
 }
 
 internal object DryRunJdbcDialect : AbstractJdbcDialect() {

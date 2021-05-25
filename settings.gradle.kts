@@ -25,15 +25,21 @@ include("komapper-processor")
 
 // JDBC
 include("komapper-jdbc")
-include("komapper-jdbc-spring-boot-autoconfigure")
-include("komapper-jdbc-spring-boot-starter")
-include("komapper-jdbc-starter")
-include("komapper-jdbc-tx")
+include("komapper-spring-boot-autoconfigure-jdbc")
+include("komapper-spring-boot-starter-jdbc")
+include("komapper-starter-jdbc")
+include("komapper-tx-jdbc")
 
-// JDBC DIALECT
-include("komapper-jdbc-dialect-h2")
-include("komapper-jdbc-dialect-mysql")
-include("komapper-jdbc-dialect-postgresql")
+// R2DBC
+include("komapper-r2dbc")
+include("komapper-tx-r2dbc")
+
+// DIALECT
+include("komapper-dialect-h2")
+include("komapper-dialect-h2-jdbc")
+include("komapper-dialect-h2-r2dbc")
+include("komapper-dialect-mysql-jdbc")
+include("komapper-dialect-postgresql-jdbc")
 
 // OPTIONAL
 include("komapper-template")
@@ -48,9 +54,11 @@ include("komapper-platform")
 include("gradle-plugin")
 
 // EXAMPLE
-include("example-jdbc-minimum")
-include("example-jdbc-spring-boot")
-include("example-jdbc-starter")
+include("example-basic-jdbc")
+include("example-basic-r2dbc")
+include("example-spring-boot-jdbc")
+include("example-starter-jdbc")
 
 // TEST
 include("integration-test-jdbc")
+include("integration-test-r2dbc")

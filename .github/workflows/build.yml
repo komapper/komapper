@@ -33,8 +33,8 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      - name: Assemble and Check
-        run: ./gradlew assemble check -x :integration-test:assemble -x :integration-test:check
+      - name: Check
+        run: ./gradlew check -x :integration-test-jdbc:check -x :integration-test-r2dbc:check
 
       - name: Upload reports
         if: failure()
@@ -69,8 +69,11 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      - name: Assemble and Check
-        run: ./gradlew :integration-test:assemble :integration-test:check -Pjdbc=h2
+      - name: Check JDBC
+        run: ./gradlew :integration-test-jdbc:check -Pjdbc=h2
+
+      - name: Check R2DBC
+        run: ./gradlew :integration-test-r2dbc:check -Pr2dbc=h2
 
       - name: Upload reports
         if: failure()
@@ -116,8 +119,8 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      - name: Assemble and Check
-        run: ./gradlew :integration-test:assemble :integration-test:check -Pjdbc=mysql
+      - name: Check JDBC
+        run: ./gradlew :integration-test-jdbc:check -Pjdbc=mysql
 
       - name: Upload reports
         if: failure()
@@ -162,8 +165,8 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      - name: Assemble and Check
-        run: ./gradlew :integration-test:assemble :integration-test:check -Pjdbc=postgresql
+      - name: Check JDBC
+        run: ./gradlew :integration-test-jdbc:check -Pjdbc=postgresql
 
       - name: Upload reports
         if: failure()
