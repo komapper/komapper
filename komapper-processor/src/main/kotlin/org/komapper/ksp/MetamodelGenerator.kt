@@ -40,7 +40,7 @@ internal class EntityMetamodelGenerator(
     }
 
     override fun run() {
-        if (packageName != "<root>") {
+        if (packageName.isNotEmpty()) {
             w.println("package $packageName")
             w.println()
         }
@@ -326,7 +326,7 @@ internal class EntityMetamodelStubGenerator(
     ).joinToString(", ")
 
     override fun run() {
-        if (packageName != "<root>") {
+        if (packageName.isNotEmpty()) {
             w.println("package $packageName")
             w.println()
         }
