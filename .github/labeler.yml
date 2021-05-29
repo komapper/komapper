@@ -13,26 +13,20 @@ module/core:
 module/jdbc:
   - komapper-jdbc/**/*
 
-module/jdbc-dialect-h2:
-  - komapper-jdbc-dialect-h2/**/*
+module/dialect-h2:
+  - komapper-dialect-h2/**/*
 
-module/jdbc-dialect-mysql:
-  - komapper-jdbc-dialect-mysql/**/*
+module/dialect-h2-jdbc:
+  - komapper-dialect-h2-jdbc/**/*
 
-module/jdbc-dialect-postgresql:
-  - komapper-jdbc-dialect-postgresql/**/*
+module/dialect-h2-r2dbc:
+  - komapper-dialect-h2-r2dbc/**/*
 
-module/jdbc-spring-boot-autoconfigure:
-  - komapper-jdbc-spring-boot-autoconfigure/**/*
+module/dialect-mysql-jdbc:
+  - komapper-dialect-mysql-jdbc/**/*
 
-module/jdbc-spring-boot-starter:
-  - komapper-jdbc-spring-boot-starter/**/*
-
-module/jdbc-starter:
-  - komapper-jdbc-starter/**/*
-
-module/jdbc-tx:
-  - komapper-jdbc-tx/**/*
+module/dialect-postgresql-jdbc:
+  - komapper-dialect-postgresql-jdbc/**/*
 
 module/platform:
   - komapper-platform/**/*
@@ -40,12 +34,30 @@ module/platform:
 module/processor:
   - komapper-processor/**/*
 
+module/r2dbc:
+  - komapper-r2dbc/**/*
+
 module/slf4j:
   - komapper-slf4j/**/*
+
+module/spring-boot-autoconfigure-jdbc:
+  - komapper-spring-boot-autoconfigure-jdbc/**/*
+
+module/spring-boot-starter-jdbc:
+  - komapper-spring-boot-starter-jdbc/**/*
 
 module/sqlcommenter:
   - komapper-sqlcommenter/**/*
 
+module/starter-jdbc:
+  - komapper-starter-jdbc/**/*
+
 module/template:
   - komapper-template/**/*
+
+module/tx-jdbc:
+  - komapper-tx-jdbc/**/*
+
+module/tx-r2dbc:
+  - komapper-tx-r2dbc/**/*
 

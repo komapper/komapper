@@ -1,0 +1,132 @@
+package integration.r2dbc
+
+import integration.r2dbc.setting.Dbms
+import integration.r2dbc.setting.Setting
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.runBlocking
+import org.junit.jupiter.api.extension.AfterTestExecutionCallback
+import org.junit.jupiter.api.extension.BeforeAllCallback
+import org.junit.jupiter.api.extension.BeforeTestExecutionCallback
+import org.junit.jupiter.api.extension.ConditionEvaluationResult
+import org.junit.jupiter.api.extension.ExecutionCondition
+import org.junit.jupiter.api.extension.ExtensionContext
+import org.junit.jupiter.api.extension.ExtensionContext.Namespace.GLOBAL
+import org.junit.jupiter.api.extension.ParameterContext
+import org.junit.jupiter.api.extension.ParameterResolver
+import org.junit.platform.commons.support.AnnotationSupport.findAnnotation
+import org.komapper.r2dbc.R2dbcDatabase
+import org.komapper.r2dbc.dsl.R2dbcScriptDsl
+import org.komapper.tx.r2dbc.transaction
+import java.util.concurrent.atomic.AtomicBoolean
+
+internal class Env :
+    BeforeAllCallback,
+    BeforeTestExecutionCallback,
+    AfterTestExecutionCallback,
+    ParameterResolver,
+    ExecutionCondition,
+    ExtensionContext.Store.CloseableResource {
+
+    companion object {
+        val initialized: AtomicBoolean = AtomicBoolean(false)
+    }
+
+    private val setting = Setting.get()
+    private val db = R2dbcDatabase.create(setting.config)
+    private var beforeAllFlow: Flow<Unit> = emptyFlow()
+
+    override fun beforeAll(context: ExtensionContext?) {
+        beforeAllFlow = flow {
+            if (!initialized.getAndSet(true)) {
+                context?.root?.getStore(GLOBAL)?.put("drop all objects", this)
+                db.transaction.required {
+                    db.runQuery {
+                        R2dbcScriptDsl.execute(setting.createSql).option {
+                            it.copy(suppressLogging = true)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    override fun beforeTestExecution(context: ExtensionContext?) {
+        var beforeTestExecutionFlow: Flow<Unit> = emptyFlow()
+        val resetSql = setting.resetSql
+        if (resetSql != null) {
+            beforeTestExecutionFlow = flow {
+                db.transaction {
+                    db.runQuery {
+                        R2dbcScriptDsl.execute(resetSql).option {
+                            it.copy(suppressLogging = true)
+                        }
+                    }
+                }
+            }
+        }
+
+        runBlocking {
+            beforeAllFlow.onCompletion {
+                beforeTestExecutionFlow.collect()
+            }.collect()
+        }
+    }
+
+    override fun afterTestExecution(context: ExtensionContext?) {
+//        txManager.rollback()
+    }
+
+    override fun close() = runBlocking {
+        db.transaction.required {
+            db.runQuery {
+                R2dbcScriptDsl.execute(setting.dropSql).option {
+                    it.copy(suppressLogging = true)
+                }
+            }
+        }
+    }
+
+    override fun supportsParameter(
+        parameterContext: ParameterContext?,
+        extensionContext: ExtensionContext?
+    ): Boolean = parameterContext!!.parameter.type === R2dbcDatabase::class.java
+
+    override fun resolveParameter(
+        parameterContext: ParameterContext?,
+        extensionContext: ExtensionContext?
+    ): Any = db
+
+    override fun evaluateExecutionCondition(context: ExtensionContext): ConditionEvaluationResult? {
+        return findAnnotation(context.element, Run::class.java)
+            .map {
+                if (isRunnable(it)) {
+                    ConditionEvaluationResult.enabled("runnable: ${setting.dbms}")
+                } else {
+                    ConditionEvaluationResult.disabled("not runnable: ${setting.dbms}")
+                }
+            }.orElseGet {
+                ConditionEvaluationResult.enabled("@Run is not present")
+            }
+    }
+
+    private fun isRunnable(run: Run): Boolean {
+        val dbms = setting.dbms
+        with(run) {
+            if (onlyIf.isNotEmpty()) {
+                return dbms in onlyIf
+            }
+            if (unless.isNotEmpty()) {
+                return dbms !in unless
+            }
+        }
+        return true
+    }
+}
+
+@Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)
+@Retention(AnnotationRetention.RUNTIME)
+annotation class Run(val onlyIf: Array<Dbms> = [], val unless: Array<Dbms> = [])
