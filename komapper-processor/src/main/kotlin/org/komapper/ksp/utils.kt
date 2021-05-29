@@ -4,6 +4,7 @@ import com.google.devtools.ksp.symbol.KSAnnotated
 import com.google.devtools.ksp.symbol.KSAnnotation
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSNode
+import com.google.devtools.ksp.symbol.Modifier
 import com.google.devtools.ksp.visitor.KSEmptyVisitor
 
 internal fun <T> Sequence<T>.anyDuplicates(predicate: (T) -> Boolean): Boolean {
@@ -31,7 +32,7 @@ internal fun KSClassDeclaration.getCompanionObject(): KSClassDeclaration? {
 }
 
 internal fun KSClassDeclaration.isValueClass(): Boolean {
-    return this.findAnnotation("JvmInline") != null
+    return this.modifiers.contains(Modifier.VALUE)
 }
 
 internal fun KSAnnotation.findValue(name: String): Any? {

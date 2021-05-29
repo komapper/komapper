@@ -1,20 +1,13 @@
 package org.komapper.ksp
 
-import com.google.devtools.ksp.processing.CodeGenerator
-import com.google.devtools.ksp.processing.KSPLogger
 import com.google.devtools.ksp.processing.Resolver
 import com.google.devtools.ksp.processing.SymbolProcessor
+import com.google.devtools.ksp.processing.SymbolProcessorEnvironment
 import com.google.devtools.ksp.symbol.KSAnnotated
 
-internal class EntityProcessor(
-    options: Map<String, String>,
-    @Suppress("unused")
-    private val kotlinVersion: KotlinVersion,
-    private val codeGenerator: CodeGenerator,
-    private val logger: KSPLogger
-) : SymbolProcessor {
+internal class EntityProcessor(private val environment: SymbolProcessorEnvironment) : SymbolProcessor {
 
-    private var config: Config = Config.create(options)
+    private var config: Config = Config.create(environment.options)
     private var invoked = false
 
     override fun process(resolver: Resolver): List<KSAnnotated> {
@@ -40,7 +33,7 @@ internal class EntityProcessor(
                         continue
                     }
                 }
-                model.generateMetamodel(codeGenerator)
+                model.generateMetamodel(environment.codeGenerator)
             }
         }
         invoked = true
@@ -48,6 +41,6 @@ internal class EntityProcessor(
     }
 
     private fun log(exit: Exit) {
-        logger.error(exit.report.message, exit.report.node)
+        environment.logger.error(exit.report.message, exit.report.node)
     }
 }
