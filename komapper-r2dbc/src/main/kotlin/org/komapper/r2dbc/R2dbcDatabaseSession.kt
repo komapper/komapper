@@ -2,18 +2,16 @@ package org.komapper.r2dbc
 
 import io.r2dbc.spi.Connection
 import io.r2dbc.spi.ConnectionFactory
-import kotlinx.coroutines.reactive.awaitFirst
 import org.komapper.core.ThreadSafe
+import org.reactivestreams.Publisher
 
 @ThreadSafe
 interface R2dbcDatabaseSession {
-    val connectionFactory: ConnectionFactory
-    // TODO
-    suspend fun getConnection(): Connection
+    fun getConnection(): Publisher<out Connection>
 }
 
-class DefaultR2dbcDatabaseSession(override val connectionFactory: ConnectionFactory) : R2dbcDatabaseSession {
-    override suspend fun getConnection(): Connection {
-        return connectionFactory.create().awaitFirst()
+class DefaultR2dbcDatabaseSession(private val connectionFactory: ConnectionFactory) : R2dbcDatabaseSession {
+    override fun getConnection(): Publisher<out Connection> {
+        return connectionFactory.create()
     }
 }

@@ -22,12 +22,13 @@ internal class EntityInsertQuerySupport<ENTITY : Any, ID, META : EntityMetamodel
             assignment.assign(entity, config.id, config.dialect::enquote) { sequenceName ->
                 val sql = config.dialect.getSequenceSql(sequenceName)
                 val statement = Statement(sql)
+                val executor = R2dbcExecutor(config, option)
+                val flow = executor.executeQuery(statement) { row, _ ->
+                    row.get(1, Long::class.java)
+                }
                 // TODO
                 runBlocking {
-                    val executor = R2dbcExecutor(config, option)
-                    executor.executeQuery(statement) { row, _ ->
-                        row.get(1, Long::class.java)
-                    }.firstOrNull() ?: error("No result: ${statement.sql}")
+                    flow.firstOrNull() ?: error("No result: ${statement.sql}")
                 }
             }
         } else {
