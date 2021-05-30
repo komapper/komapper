@@ -17,10 +17,8 @@ idea.module {
 }
 
 dependencies {
-    compileOnly(project(":komapper-annotation"))
-    implementation(project(":komapper-tx-jdbc"))
+    implementation(project(":komapper-starter-r2dbc"))
     ksp(project(":komapper-processor"))
-    runtimeOnly(project(":komapper-dialect-h2-jdbc"))
 }
 
 application {
