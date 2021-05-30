@@ -20,10 +20,11 @@ idea.module {
 }
 
 dependencies {
-    implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
-    implementation(project(":komapper-spring-boot-starter-jdbc"))
+    implementation(project(":komapper-spring-boot-starter-r2dbc"))
     ksp(project(":komapper-processor"))
+    runtimeOnly("io.r2dbc:r2dbc-h2:0.8.4.RELEASE")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
 

@@ -53,7 +53,7 @@ configure(libraryProjects + gradlePluginProject) {
     }
 }
 
-configure(libraryProjects + gradlePluginProject + integrationTestProjects) {
+configure(libraryProjects + gradlePluginProject + exampleProjects + integrationTestProjects) {
     apply(plugin = "org.jetbrains.kotlin.jvm")
 
     tasks.withType<Test> {
