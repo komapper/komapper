@@ -8,7 +8,7 @@ import javax.sql.DataSource
 class TransactionDatabaseSession(
     private val dataSource: DataSource,
     private val logger: Logger,
-    private val isolationLevel: TransactionIsolationLevel? = null
+    private val isolationLevel: IsolationLevel? = null
 ) : DatabaseSession {
     override val connection: Connection
         get() =

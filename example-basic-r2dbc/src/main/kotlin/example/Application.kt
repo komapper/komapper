@@ -43,7 +43,7 @@ fun main() = runBlocking {
     val a = AddressDef.meta
 
     // execute simple CRUD operations as a transaction
-    db.transaction.required {
+    db.transaction {
         // create a schema
         db.runQuery {
             R2dbcSchemaDsl.create(a)

@@ -14,7 +14,7 @@ class SqlSelectQueryTest(private val db: R2dbcDatabase) {
 
     @Test
     fun where() = runBlocking {
-        db.transaction.required {
+        db.transaction {
             setRollbackOnly()
             val flow = db.runQuery {
                 val a = Address.meta

@@ -4,18 +4,25 @@ import org.komapper.core.ThreadSafe
 
 @ThreadSafe
 interface UserTransaction {
-    operator fun <R> invoke(
-        isolationLevel: TransactionIsolationLevel? = null,
+
+    fun <R> transaction(
+        transactionAttribute: TransactionAttribute = TransactionAttribute.REQUIRED,
+        isolationLevel: IsolationLevel? = null,
         block: TransactionScope.() -> R
-    ): R = required(isolationLevel, block)
+    ): R {
+        return when (transactionAttribute) {
+            TransactionAttribute.REQUIRED -> required(isolationLevel, block)
+            TransactionAttribute.REQUIRES_NEW -> requiresNew(isolationLevel, block)
+        }
+    }
 
     fun <R> required(
-        isolationLevel: TransactionIsolationLevel? = null,
+        isolationLevel: IsolationLevel? = null,
         block: TransactionScope.() -> R
     ): R
 
     fun <R> requiresNew(
-        isolationLevel: TransactionIsolationLevel? = null,
+        isolationLevel: IsolationLevel? = null,
         block: TransactionScope.() -> R
     ): R
 }

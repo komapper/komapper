@@ -14,7 +14,7 @@ interface TransactionManager {
     val isRollbackOnly: Boolean
 
     fun setRollbackOnly()
-    fun begin(isolationLevel: TransactionIsolationLevel? = null)
+    fun begin(isolationLevel: IsolationLevel? = null)
     fun commit()
     fun suspend(): Transaction
     fun resume(tx: Transaction)
@@ -61,7 +61,7 @@ internal class TransactionManagerImpl(
         }
     }
 
-    override fun begin(isolationLevel: TransactionIsolationLevel?) {
+    override fun begin(isolationLevel: IsolationLevel?) {
         val currentTx = threadLocal.get()
         if (currentTx.isActive()) {
             rollbackInternal(currentTx)

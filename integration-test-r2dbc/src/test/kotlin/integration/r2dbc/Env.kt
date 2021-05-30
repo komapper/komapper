@@ -43,7 +43,7 @@ internal class Env :
         beforeAllFlow = flow {
             if (!initialized.getAndSet(true)) {
                 context?.root?.getStore(GLOBAL)?.put("drop all objects", this)
-                db.transaction.required {
+                db.transaction {
                     db.runQuery {
                         R2dbcScriptDsl.execute(setting.createSql).option {
                             it.copy(suppressLogging = true)
@@ -81,7 +81,7 @@ internal class Env :
     }
 
     override fun close() = runBlocking {
-        db.transaction.required {
+        db.transaction {
             db.runQuery {
                 R2dbcScriptDsl.execute(setting.dropSql).option {
                     it.copy(suppressLogging = true)
