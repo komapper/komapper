@@ -17,14 +17,10 @@ idea.module {
 }
 
 dependencies {
-    val kotlinCoroutinesVersion: String by project
     compileOnly(project(":komapper-annotation"))
-    ksp(project(":komapper-processor"))
     implementation(project(":komapper-tx-r2dbc"))
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinCoroutinesVersion")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactive:$kotlinCoroutinesVersion")
+    ksp(project(":komapper-processor"))
     runtimeOnly(project(":komapper-dialect-h2-r2dbc"))
-    runtimeOnly("io.r2dbc:r2dbc-h2:0.8.4.RELEASE")
 }
 
 application {

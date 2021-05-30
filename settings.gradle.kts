@@ -34,6 +34,7 @@ include("komapper-tx-jdbc")
 include("komapper-r2dbc")
 include("komapper-spring-boot-autoconfigure-r2dbc")
 include("komapper-spring-boot-starter-r2dbc")
+include("komapper-starter-r2dbc")
 include("komapper-tx-r2dbc")
 
 // DIALECT
@@ -59,9 +60,10 @@ include("gradle-plugin")
 include("example-basic-jdbc")
 include("example-basic-r2dbc")
 include("example-spring-boot-jdbc")
+include("example-spring-boot-r2dbc")
 include("example-starter-jdbc")
+include("example-starter-r2dbc")
 
 // TEST
 include("integration-test-jdbc")
 include("integration-test-r2dbc")
-include("example-spring-boot-r2dbc")
