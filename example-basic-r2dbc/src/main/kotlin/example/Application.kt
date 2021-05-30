@@ -37,7 +37,7 @@ data class AddressDef(
 
 fun main() = runBlocking {
     // create a Database instance
-    val db = R2dbcDatabase.create("r2dbc:h2:mem:///example")
+    val db = R2dbcDatabase.create("r2dbc:h2:mem:///example;DB_CLOSE_DELAY=-1")
 
     // get a metamodel
     val a = AddressDef.meta

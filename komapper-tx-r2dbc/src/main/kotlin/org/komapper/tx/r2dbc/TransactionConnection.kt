@@ -8,7 +8,8 @@ import kotlinx.coroutines.reactive.awaitFirstOrNull
 import org.reactivestreams.Publisher
 
 interface TransactionConnection : Connection {
-    fun reset()
+    suspend fun initialize()
+    suspend fun reset()
     suspend fun dispose()
     override fun close(): Publisher<Void>
 }
@@ -18,24 +19,24 @@ internal class TransactionConnectionImpl(
     private val isolationLevel: IsolationLevel?
 ) : Connection by connection, TransactionConnection {
 
-    private val isolation: IsolationLevel? = connection.transactionIsolationLevel
-    private val autoCommitState: Boolean = connection.isAutoCommit
+    private val preservedIsolationLevel: IsolationLevel? = connection.transactionIsolationLevel
+    private val preservedAutoCommitState: Boolean = connection.isAutoCommit
 
-    init {
+    override suspend fun initialize() {
         if (isolationLevel != null) {
-            connection.transactionIsolationLevel = isolationLevel
+            connection.setTransactionIsolationLevel(isolationLevel).awaitFirstOrNull()
         }
-        if (autoCommitState) {
-            connection.isAutoCommit = false
+        if (preservedAutoCommitState) {
+            connection.setAutoCommit(false).awaitFirstOrNull()
         }
     }
 
-    override fun reset() {
-        if (isolationLevel != null) {
-            connection.transactionIsolationLevel = isolation
+    override suspend fun reset() {
+        if (preservedIsolationLevel != null && isolationLevel != null) {
+            connection.setTransactionIsolationLevel(preservedIsolationLevel).awaitFirstOrNull()
         }
-        if (autoCommitState) {
-            connection.isAutoCommit = true
+        if (preservedAutoCommitState) {
+            connection.setAutoCommit(true).awaitFirstOrNull()
         }
     }
 
