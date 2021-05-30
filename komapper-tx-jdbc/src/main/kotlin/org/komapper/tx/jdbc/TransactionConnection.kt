@@ -12,7 +12,7 @@ interface TransactionConnection : Connection {
 
 internal class TransactionConnectionImpl(
     private val connection: Connection,
-    private val isolationLevel: TransactionIsolationLevel?
+    private val isolationLevel: IsolationLevel?
 ) : Connection by connection, TransactionConnection {
 
     private var isolation: Int = 0

@@ -4,7 +4,6 @@ import io.r2dbc.spi.Connection
 import io.r2dbc.spi.ConnectionFactory
 import io.r2dbc.spi.ConnectionFactoryMetadata
 import io.r2dbc.spi.IsolationLevel
-import io.r2dbc.spi.R2dbcException
 import kotlinx.coroutines.asContextElement
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.reactive.asPublisher
@@ -78,8 +77,11 @@ internal class TransactionManagerImpl(
             rollbackInternal(currentTx)
             error("The transaction \"$currentTx\" already has begun.")
         }
-        val tx = internalConnectionFactory.create().awaitFirst().let {
-            TransactionImpl(TransactionConnectionImpl(it, isolationLevel))
+        val tx = internalConnectionFactory.create().awaitFirst().let { con ->
+            val txCon = TransactionConnectionImpl(con, isolationLevel).apply {
+                initialize()
+            }
+            TransactionImpl(txCon)
         }
         tx.connection.beginTransaction().awaitFirstOrNull()
         logger.trace(LogCategory.TRANSACTION.value) { "The transaction \"$tx\" has begun." }
@@ -116,7 +118,7 @@ internal class TransactionManagerImpl(
         try {
             connection.rollbackTransaction().awaitFirstOrNull()
             logger.trace(LogCategory.TRANSACTION.value) { "The transaction \"$tx\" has rolled back." }
-        } catch (ignored: R2dbcException) {
+        } catch (ignored: Exception) {
         } finally {
             release(tx)
         }
@@ -127,9 +129,9 @@ internal class TransactionManagerImpl(
         val connection = tx.connection
         try {
             connection.reset()
-        } catch (ignored: R2dbcException) {
+        } catch (ignored: Exception) {
         }
-        connection.close().awaitFirstOrNull()
+        connection.dispose()
     }
 
     private fun Transaction.isActive(): Boolean {

@@ -37,13 +37,13 @@ data class AddressDef(
 
 fun main() = runBlocking {
     // create a Database instance
-    val db = R2dbcDatabase.create("r2dbc:h2:mem:///example")
+    val db = R2dbcDatabase.create("r2dbc:h2:mem:///example;DB_CLOSE_DELAY=-1")
 
     // get a metamodel
     val a = AddressDef.meta
 
     // execute simple CRUD operations as a transaction
-    db.transaction.required {
+    db.transaction {
         // create a schema
         db.runQuery {
             R2dbcSchemaDsl.create(a)

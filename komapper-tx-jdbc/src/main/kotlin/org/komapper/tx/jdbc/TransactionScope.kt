@@ -10,11 +10,11 @@ interface TransactionScope : UserTransaction {
 
 internal class TransactionScopeImpl(
     private val transactionManager: TransactionManager,
-    private val defaultIsolationLevel: TransactionIsolationLevel? = null
+    private val defaultIsolationLevel: IsolationLevel? = null
 ) : TransactionScope {
 
     override fun <R> required(
-        isolationLevel: TransactionIsolationLevel?,
+        isolationLevel: IsolationLevel?,
         block: TransactionScope.() -> R
     ): R {
         return if (transactionManager.isActive) {
@@ -25,7 +25,7 @@ internal class TransactionScopeImpl(
     }
 
     override fun <R> requiresNew(
-        isolationLevel: TransactionIsolationLevel?,
+        isolationLevel: IsolationLevel?,
         block: TransactionScope.() -> R
     ): R {
         return if (transactionManager.isActive) {
@@ -41,7 +41,7 @@ internal class TransactionScopeImpl(
     }
 
     private fun <R> executeInNewTransaction(
-        isolationLevel: TransactionIsolationLevel?,
+        isolationLevel: IsolationLevel?,
         block: TransactionScope.() -> R
     ): R {
         transactionManager.begin(isolationLevel ?: defaultIsolationLevel)

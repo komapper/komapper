@@ -14,7 +14,7 @@ class SqlSelectQueryTest(private val db: R2dbcDatabase) {
 
     @Test
     fun where() = runBlocking {
-        db.transaction.required {
+        db.transaction {
             setRollbackOnly()
             val flow = db.runQuery {
                 val a = Address.meta
@@ -25,23 +25,5 @@ class SqlSelectQueryTest(private val db: R2dbcDatabase) {
             val list = flow.toList(mutableListOf())
             Assertions.assertEquals(listOf(1, 2, 3), list.map { it.addressId })
         }
-    }
-
-    @Test
-    fun where_collectOutsideTransaction() = runBlocking {
-        val flow = db.transaction.required {
-            setRollbackOnly()
-            db.runQuery {
-                val a = Address.meta
-                R2dbcSqlDsl.from(Address.meta)
-                    .where { a.addressId inList listOf(1, 2, 3) }
-                    .orderBy(a.addressId)
-            }
-        }
-        val list = flow.toList(mutableListOf())
-        Assertions.assertEquals(listOf(1, 2, 3), list.map { it.addressId })
-
-        val list2 = flow.toList(mutableListOf())
-        Assertions.assertEquals(listOf(1, 2, 3), list2.map { it.addressId })
     }
 }

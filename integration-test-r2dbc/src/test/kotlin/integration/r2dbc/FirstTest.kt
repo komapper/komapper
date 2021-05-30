@@ -60,7 +60,7 @@ class FirstTest(private val db: R2dbcDatabase) {
                 R2dbcEntityDsl.from(Address.meta).where { a.addressId eq 15 }
             }
             assertNotNull(flow.firstOrNull())
-            db.transaction.requiresNew {
+            requiresNew {
                 setRollbackOnly()
                 db.runQuery {
                     val address = Address(15, "", 1)
@@ -84,7 +84,7 @@ class FirstTest(private val db: R2dbcDatabase) {
                 R2dbcEntityDsl.from(Address.meta).where { a.addressId eq 15 }
             }
             assertNotNull(flow.firstOrNull())
-            db.transaction.required {
+            required {
                 setRollbackOnly()
                 db.runQuery {
                     val address = Address(15, "", 1)

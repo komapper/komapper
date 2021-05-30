@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.reactive.asFlow
@@ -36,59 +37,62 @@ class R2dbcExecutor(
     ): Flow<T> {
         @Suppress("NAME_SHADOWING")
         val statement = inspect(statement)
-        return config.session.getConnection().toFlow()
-            .flatMapConcat { con ->
-                val r2dbcStmt = con.prepare(statement)
-                r2dbcStmt.setUp()
-                r2dbcStmt.bind(statement)
-                r2dbcStmt.execute().toFlow()
-            }.flatMapConcat { result ->
+        return config.session.getConnection().toFlow().flatMapConcat { con ->
+            val r2dbcStmt = con.prepare(statement)
+            r2dbcStmt.setUp()
+            r2dbcStmt.bind(statement)
+            r2dbcStmt.execute().toFlow().flatMapConcat { result ->
                 result.map(transform).toFlow()
-            }.onStart {
-                log(statement)
+            }.onCompletion {
+                con.close()
             }
+        }.onStart {
+            log(statement)
+        }
     }
 
     @OptIn(kotlinx.coroutines.FlowPreview::class)
     suspend fun executeUpdate(statement: Statement): Pair<Int, LongArray> {
         @Suppress("NAME_SHADOWING")
         val statement = inspect(statement)
-        return config.session.getConnection().toFlow()
-            .flatMapConcat { con ->
-                val r2dbcStmt = con.prepare(statement)
-                r2dbcStmt.setUp()
-                r2dbcStmt.bind(statement)
-                r2dbcStmt.execute().toFlow()
-            }.flatMapConcat { result ->
+        return config.session.getConnection().toFlow().flatMapConcat { con ->
+            val r2dbcStmt = con.prepare(statement)
+            r2dbcStmt.setUp()
+            r2dbcStmt.bind(statement)
+            r2dbcStmt.execute().toFlow().flatMapConcat { result ->
                 result.rowsUpdated.toFlow().map { count ->
                     val generatedKeys = result.fetchGeneratedKeys().toList(mutableListOf()).toLongArray()
                     count to generatedKeys
                 }
-            }.onStart {
-                log(statement)
-            }.catch {
-                handleException(it)
-            }.first()
+            }.onCompletion {
+                con.close()
+            }
+        }.onStart {
+            log(statement)
+        }.catch {
+            handleException(it)
+        }.first()
     }
 
     @OptIn(kotlinx.coroutines.FlowPreview::class)
     suspend fun execute(statement: Statement) {
         @Suppress("NAME_SHADOWING")
         val statement = inspect(statement)
-        return config.session.getConnection().toFlow()
-            .flatMapConcat { con ->
-                val batch = con.createBatch()
-                for (sql in statement.sql.split(";")) {
-                    batch.add(sql.trim())
-                }
-                batch.execute().toFlow()
-            }.flatMapConcat { result ->
+        return config.session.getConnection().toFlow().flatMapConcat { con ->
+            val batch = con.createBatch()
+            for (sql in statement.sql.split(";")) {
+                batch.add(sql.trim())
+            }
+            batch.execute().toFlow().flatMapConcat { result ->
                 result.rowsUpdated.toFlow()
-            }.onStart {
-                log(statement)
-            }.catch {
-                handleException(it)
-            }.collect()
+            }.onCompletion {
+                con.close()
+            }
+        }.onStart {
+            log(statement)
+        }.catch {
+            handleException(it)
+        }.collect()
     }
 
     private fun handleException(cause: Throwable) {
