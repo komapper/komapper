@@ -3,6 +3,11 @@ package org.komapper.r2dbc
 import io.r2dbc.spi.Row
 import io.r2dbc.spi.Statement
 import org.komapper.core.Dialect
+import org.komapper.core.dsl.builder.DryRunSchemaStatementBuilder
+import org.komapper.core.dsl.builder.EntityUpsertStatementBuilder
+import org.komapper.core.dsl.builder.SchemaStatementBuilder
+import org.komapper.core.dsl.context.EntityUpsertContext
+import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.r2dbc.spi.R2dbcDialectFactory
 import java.util.ServiceLoader
 import java.util.regex.Pattern
@@ -37,4 +42,45 @@ interface R2dbcDialect : Dialect {
     fun setValue(statement: Statement, index: Int, value: Any?, valueClass: KClass<*>)
     fun getValue(row: Row, index: Int, valueClass: KClass<*>): Any?
     fun getValue(row: Row, columnLabel: String, valueClass: KClass<*>): Any?
+}
+
+internal object DryRunR2dbcDialect : R2dbcDialect {
+
+    override val driver: String = "dry_run"
+
+    override fun getSequenceSql(sequenceName: String): String {
+        throw UnsupportedOperationException()
+    }
+
+    override fun setValue(statement: Statement, index: Int, value: Any?, valueClass: KClass<*>) {
+        throw UnsupportedOperationException()
+    }
+
+    override fun getValue(row: Row, index: Int, valueClass: KClass<*>): Any? {
+        throw UnsupportedOperationException()
+    }
+
+    override fun getValue(row: Row, columnLabel: String, valueClass: KClass<*>): Any? {
+        throw UnsupportedOperationException()
+    }
+
+    // TODO
+    override fun formatValue(value: Any?, valueClass: KClass<*>): String {
+        return value.toString()
+    }
+
+    override fun getDataTypeName(klass: KClass<*>): String {
+        throw UnsupportedOperationException()
+    }
+
+    override fun getSchemaStatementBuilder(): SchemaStatementBuilder {
+        return DryRunSchemaStatementBuilder
+    }
+
+    override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> getEntityUpsertStatementBuilder(
+        context: EntityUpsertContext<ENTITY, ID, META>,
+        entities: List<ENTITY>
+    ): EntityUpsertStatementBuilder<ENTITY> {
+        throw UnsupportedOperationException()
+    }
 }

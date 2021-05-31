@@ -1,6 +1,9 @@
 package org.komapper.r2dbc.dsl.query
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChangedBy
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import org.komapper.core.Statement
 import org.komapper.core.dsl.builder.EntitySelectStatementBuilder
 import org.komapper.core.dsl.context.EntitySelectContext
@@ -24,6 +27,8 @@ interface EntitySelectQuery<ENTITY : Any> : Subquery<ENTITY> {
         on: OnDeclaration<OTHER_ENTITY>
     ): EntitySelectQuery<ENTITY>
 
+    fun first(declaration: WhereDeclaration): Query<ENTITY>
+    fun firstOrNull(declaration: WhereDeclaration): Query<ENTITY?>
     fun where(declaration: WhereDeclaration): EntitySelectQuery<ENTITY>
     fun orderBy(vararg expressions: ColumnExpression<*, *>): EntitySelectQuery<ENTITY>
     fun offset(offset: Int): EntitySelectQuery<ENTITY>
@@ -58,6 +63,18 @@ internal data class EntitySelectQueryImpl<ENTITY : Any, ID, META : EntityMetamod
     ): EntitySelectQueryImpl<ENTITY, ID, META> {
         val newContext = support.leftJoin(metamodel, on)
         return copy(context = newContext)
+    }
+
+    override fun first(declaration: WhereDeclaration): Query<ENTITY> {
+        val newContext = support.first(declaration)
+        val query = copy(context = newContext)
+        return query.first()
+    }
+
+    override fun firstOrNull(declaration: WhereDeclaration): Query<ENTITY?> {
+        val newContext = support.first(declaration)
+        val query = copy(context = newContext)
+        return query.firstOrNull()
     }
 
     override fun where(declaration: WhereDeclaration): EntitySelectQueryImpl<ENTITY, ID, META> {
@@ -115,7 +132,7 @@ internal data class EntitySelectQueryImpl<ENTITY : Any, ID, META : EntityMetamod
         return executor.executeQuery(statement) { row, _ ->
             val mapper = EntityMapper(config.dialect, row)
             mapper.execute(context.target) as ENTITY
-        }
+        }.distinctUntilChangedBy { context.target.getId(it) }
     }
 
     override fun dryRun(config: R2dbcDatabaseConfig): String {
