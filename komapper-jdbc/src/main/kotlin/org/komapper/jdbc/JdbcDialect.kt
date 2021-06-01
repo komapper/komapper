@@ -17,8 +17,32 @@ import kotlin.reflect.KClass
 
 @ThreadSafe
 interface JdbcDialect : Dialect {
+
+    companion object {
+        private val jdbcUrlPattern = Pattern.compile("^jdbc:([^:]*):.*")
+
+        fun load(url: String, dataTypes: List<DataType<*>>): JdbcDialect {
+            val driver = extractJdbcDriver(url)
+            val loader = ServiceLoader.load(JdbcDialectFactory::class.java)
+            val factory = loader.firstOrNull { it.supports(driver) }
+                ?: error(
+                    "The dialect is not found for the JDBC url. " +
+                        "Try to add the 'komapper-dialect-$driver-jdbc' dependency. " +
+                        "url=$url, driver='$driver'"
+                )
+            return factory.create(dataTypes)
+        }
+
+        private fun extractJdbcDriver(url: String): String {
+            val matcher = jdbcUrlPattern.matcher(url)
+            if (matcher.matches()) {
+                return matcher.group(1).lowercase()
+            }
+            error("The driver in the JDBC URL is not found. url=$url")
+        }
+    }
+
     val dataTypes: List<DataType<*>>
-    val subprotocol: String
 
     fun getValue(rs: ResultSet, index: Int, valueClass: KClass<*>): Any?
     fun getValue(rs: ResultSet, columnLabel: String, valueClass: KClass<*>): Any?
@@ -26,30 +50,6 @@ interface JdbcDialect : Dialect {
     fun setValue(ps: PreparedStatement, index: Int, value: Any?, valueClass: KClass<*>)
     fun tryGetDataType(name: String): DataType<*>?
     fun isUniqueConstraintViolation(exception: SQLException): Boolean
-
-    companion object {
-        private val jdbcUrlPattern = Pattern.compile("^jdbc:([^:]*):.*")
-
-        fun load(url: String, dataTypes: List<DataType<*>>): JdbcDialect {
-            val subprotocol = extractJdbcSubprotocol(url)
-            val loader = ServiceLoader.load(JdbcDialectFactory::class.java)
-            val factory = loader.firstOrNull { it.supports(subprotocol) }
-                ?: error(
-                    "The dialect is not found for the JDBC url. " +
-                        "Try to add the 'komapper-jdbc-$subprotocol' dependency. " +
-                        "url=$url, subprotocol='$subprotocol'"
-                )
-            return factory.create(dataTypes)
-        }
-
-        private fun extractJdbcSubprotocol(url: String): String {
-            val matcher = jdbcUrlPattern.matcher(url)
-            if (matcher.matches()) {
-                return matcher.group(1).lowercase()
-            }
-            error("The subprotocol in the JDBC URL is not found. url=$url")
-        }
-    }
 }
 
 abstract class AbstractJdbcDialect protected constructor(internalDataTypes: List<DataType<*>> = emptyList()) :
@@ -58,9 +58,6 @@ abstract class AbstractJdbcDialect protected constructor(internalDataTypes: List
     @Suppress("MemberVisibilityCanBePrivate")
     protected val dataTypeMap: Map<KClass<*>, DataType<*>> = internalDataTypes.associateBy { it.klass }
     override val dataTypes = internalDataTypes
-    override val openQuote: String = "\""
-    override val closeQuote: String = "\""
-    override val escapeSequence: String = "\\"
 
     override fun getValue(rs: ResultSet, index: Int, valueClass: KClass<*>): Any? {
         val dataType = getDataType(valueClass)
@@ -109,7 +106,7 @@ abstract class AbstractJdbcDialect protected constructor(internalDataTypes: List
 
 internal object DryRunJdbcDialect : AbstractJdbcDialect() {
 
-    override val subprotocol: String = "dry_run"
+    override val driver: String = "dry_run"
 
     override fun isUniqueConstraintViolation(exception: SQLException): Boolean {
         throw UnsupportedOperationException()

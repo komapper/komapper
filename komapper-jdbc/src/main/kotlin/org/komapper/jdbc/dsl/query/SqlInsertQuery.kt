@@ -53,7 +53,7 @@ internal data class SqlInsertQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<
     }
 
     override fun dryRun(config: DatabaseConfig): String {
-        return buildStatement(config).sql
+        return buildStatement(config).toString()
     }
 
     private fun buildStatement(config: DatabaseConfig): Statement {

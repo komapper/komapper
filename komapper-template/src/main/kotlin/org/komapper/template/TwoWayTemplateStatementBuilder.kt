@@ -235,7 +235,7 @@ internal class TwoWayTemplateStatementBuilder(
         }
 
         fun append(state: State): State {
-            buf.sql.append(state.buf.sql)
+            buf.sql.addAll(state.buf.sql)
             buf.sqlWithArgs.append(state.buf.sqlWithArgs)
             buf.values.addAll(state.buf.values)
             return this

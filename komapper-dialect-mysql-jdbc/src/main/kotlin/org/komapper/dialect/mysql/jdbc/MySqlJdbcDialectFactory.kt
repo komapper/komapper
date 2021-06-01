@@ -5,8 +5,8 @@ import org.komapper.jdbc.JdbcDialect
 import org.komapper.jdbc.spi.JdbcDialectFactory
 
 class MySqlJdbcDialectFactory : JdbcDialectFactory {
-    override fun supports(subprotocol: String): Boolean {
-        return subprotocol == MySqlJdbcDialect.subprotocol
+    override fun supports(driver: String): Boolean {
+        return driver == MySqlJdbcDialect.subprotocol
     }
 
     override fun create(dataTypes: List<DataType<*>>): JdbcDialect {

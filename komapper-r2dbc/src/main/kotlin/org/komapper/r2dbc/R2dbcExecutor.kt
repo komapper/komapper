@@ -7,12 +7,12 @@ import io.r2dbc.spi.RowMetadata
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapConcat
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.reactive.asFlow
 import org.komapper.core.ExecutionOptionProvider
@@ -60,8 +60,9 @@ class R2dbcExecutor(
             r2dbcStmt.setUp()
             r2dbcStmt.bind(statement)
             r2dbcStmt.execute().toFlow().flatMapConcat { result ->
+                // TODO
+                val generatedKeys = result.fetchGeneratedKeys().toList().toLongArray()
                 result.rowsUpdated.toFlow().map { count ->
-                    val generatedKeys = result.fetchGeneratedKeys().toList(mutableListOf()).toLongArray()
                     count to generatedKeys
                 }
             }.onCompletion {
@@ -71,7 +72,7 @@ class R2dbcExecutor(
             log(statement)
         }.catch {
             handleException(it)
-        }.first()
+        }.single()
     }
 
     @OptIn(kotlinx.coroutines.FlowPreview::class)
@@ -80,7 +81,7 @@ class R2dbcExecutor(
         val statement = inspect(statement)
         return config.session.getConnection().toFlow().flatMapConcat { con ->
             val batch = con.createBatch()
-            for (sql in statement.sql.split(";")) {
+            for (sql in statement.toString().split(";")) {
                 batch.add(sql.trim())
             }
             batch.execute().toFlow().flatMapConcat { result ->
@@ -104,23 +105,33 @@ class R2dbcExecutor(
     }
 
     private fun inspect(statement: Statement): Statement {
+        val sql = replacePlaceHolders(statement.sql)
+
+        @Suppress("NAME_SHADOWING")
+        val statement = Statement(sql, statement.values, statement.sqlWithArgs)
         return config.statementInspector.inspect(statement)
+    }
+
+    private fun replacePlaceHolders(sql: List<CharSequence>): List<CharSequence> {
+        val bindMarker = config.dialect.getBindMarker()
+        return bindMarker.apply(sql)
     }
 
     private fun log(statement: Statement) {
         val suppressLogging = executionOption.suppressLogging ?: false
         if (!suppressLogging) {
-            config.logger.debug(LogCategory.SQL.value) { statement.sql }
+            config.logger.debug(LogCategory.SQL.value) { statement.toString() }
             config.logger.trace(LogCategory.SQL_WITH_ARGS.value) { statement.sqlWithArgs }
         }
     }
 
     private fun io.r2dbc.spi.Connection.prepare(statement: Statement): io.r2dbc.spi.Statement {
-        val s = this.createStatement(statement.sql)
-        if (generatedColumn != null) {
-            s.returnGeneratedValues(generatedColumn)
+        val r2dbcStmt = this.createStatement(statement.toString())
+        return if (generatedColumn != null) {
+            r2dbcStmt.returnGeneratedValues(generatedColumn)
+        } else {
+            r2dbcStmt
         }
-        return s
     }
 
     private fun io.r2dbc.spi.Statement.setUp() {
@@ -129,7 +140,9 @@ class R2dbcExecutor(
 
     private fun io.r2dbc.spi.Statement.bind(statement: Statement) {
         statement.values.forEachIndexed { index, value ->
-            config.dialect.setValue(this, index, value.any, value.klass)
+            val bindMarker = config.dialect.getBindMarker()
+            val dataType = config.dialect.getDataType(value.klass) as DataType<Any>
+            bindMarker.setValue(this, index, value.any, dataType)
         }
     }
 
@@ -143,7 +156,7 @@ class R2dbcExecutor(
                 }
             }.toFlow()
         } else {
-            emptyFlow()
+            flowOf()
         }
     }
 

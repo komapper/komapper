@@ -1,11 +1,11 @@
-package org.komapper.dialect.postgresql.jdbc
+package org.komapper.dialect.postgresql
 
 import org.komapper.core.dsl.builder.AbstractSchemaStatementBuilder
 import org.komapper.core.dsl.metamodel.Assignment
 import org.komapper.core.dsl.metamodel.PropertyMetamodel
 
-open class PostgreSqlSchemaStatementBuilder(dialect: PostgreSqlJdbcDialect) :
-    AbstractSchemaStatementBuilder<PostgreSqlJdbcDialect>(dialect) {
+open class PostgreSqlSchemaStatementBuilder(dialect: PostgreSqlDialect) :
+    AbstractSchemaStatementBuilder<PostgreSqlDialect>(dialect) {
 
     override fun resolveDataTypeName(property: PropertyMetamodel<*, *, *>): String {
         return if (property.idAssignment is Assignment.AutoIncrement<*, *, *>) {
@@ -15,8 +15,7 @@ open class PostgreSqlSchemaStatementBuilder(dialect: PostgreSqlJdbcDialect) :
                 else -> error("Illegal assignment type: ${property.interiorClass.qualifiedName}")
             }
         } else {
-            val dataType = dialect.getDataType(property.interiorClass)
-            dataType.name
+            return dialect.getDataTypeName(property.interiorClass)
         }
     }
 

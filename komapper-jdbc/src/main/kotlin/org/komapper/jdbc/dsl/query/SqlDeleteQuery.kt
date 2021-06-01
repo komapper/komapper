@@ -41,7 +41,7 @@ internal data class SqlDeleteQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<
     }
 
     override fun dryRun(config: DatabaseConfig): String {
-        return buildStatement(config, context).sql
+        return buildStatement(config, context).toString()
     }
 
     private fun buildStatement(config: DatabaseConfig, c: SqlDeleteContext<ENTITY, ID, META>): Statement {

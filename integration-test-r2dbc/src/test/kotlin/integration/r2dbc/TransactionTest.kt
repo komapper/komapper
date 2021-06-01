@@ -15,9 +15,9 @@ import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.komapper.dialect.h2.r2dbx.H2R2dbcDialect
 import org.komapper.r2dbc.DefaultR2dbcDatabaseConfig
 import org.komapper.r2dbc.R2dbcDatabase
+import org.komapper.r2dbc.R2dbcDialect
 import org.komapper.r2dbc.dsl.R2dbcEntityDsl
 import org.komapper.tx.r2dbc.TransactionAttribute
 import org.komapper.tx.r2dbc.transaction
@@ -25,7 +25,7 @@ import org.komapper.tx.r2dbc.transaction
 class TransactionTest {
 
     private val connectionFactory = ConnectionFactories.get("r2dbc:h2:mem:///transaction-test;DB_CLOSE_DELAY=-1")
-    private val config = DefaultR2dbcDatabaseConfig(connectionFactory, H2R2dbcDialect())
+    private val config = DefaultR2dbcDatabaseConfig(connectionFactory, R2dbcDialect.load("h2"))
     private val db = R2dbcDatabase.create(config)
 
     @BeforeEach

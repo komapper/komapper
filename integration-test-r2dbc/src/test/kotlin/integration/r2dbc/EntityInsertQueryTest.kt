@@ -1,6 +1,7 @@
 package integration.r2dbc
 
 import integration.r2dbc.setting.Dbms
+import kotlinx.coroutines.reactive.awaitSingle
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Disabled
@@ -20,6 +21,22 @@ import java.time.ZoneId
 
 @ExtendWith(Env::class)
 class EntityInsertQueryTest(private val db: R2dbcDatabase) {
+
+    // TODO
+    @Test
+    fun testGeneratedValue() = inTransaction(db) {
+        for (i in 1..2) {
+            val con = db.config.session.getConnection().awaitSingle()
+            val s = con.createStatement("insert into IDENTITY_STRATEGY (VALUE) values ($1)").returnGeneratedValues("ID")
+            s.bind("$1", "test")
+            val result = s.execute().awaitSingle()
+            val pub2 = result.map { row, _ -> row.get(0) }
+            val pub = result.rowsUpdated
+            val id = pub2.awaitSingle()
+            val count = pub.awaitSingle()
+            println(count to id)
+        }
+    }
 
     @Test
     fun test() = inTransaction(db) {
@@ -105,6 +122,8 @@ class EntityInsertQueryTest(private val db: R2dbcDatabase) {
         }
     }
 
+    // TODO: the combination with returnGeneratedValues and rowsUpdated doesn't work in PostgreSQL 
+    @Run(unless = [Dbms.POSTGRESQL])
     @Test
     fun identityGenerator() = inTransaction(db) {
         for (i in 1..201) {

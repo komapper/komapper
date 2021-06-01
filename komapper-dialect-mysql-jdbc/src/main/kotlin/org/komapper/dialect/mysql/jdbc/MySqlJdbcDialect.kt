@@ -32,10 +32,10 @@ import org.komapper.jdbc.UIntType
 import org.komapper.jdbc.UShortType
 import java.sql.SQLException
 
-open class MySqlJdbcDialect(dataTypes: List<DataType<*>> = emptyList(), val version: Version = Version.V8_0) :
-    AbstractJdbcDialect(
-        defaultDataTypes + dataTypes
-    ) {
+open class MySqlJdbcDialect(
+    dataTypes: List<DataType<*>> = emptyList(),
+    val version: Version = Version.V8_0
+) : AbstractJdbcDialect(defaultDataTypes + dataTypes) {
 
     companion object {
         enum class Version { V8_0 }
@@ -72,7 +72,8 @@ open class MySqlJdbcDialect(dataTypes: List<DataType<*>> = emptyList(), val vers
         )
     }
 
-    override val subprotocol: String = Companion.subprotocol
+    // TODO
+    override val driver: String get() = "mysql"
     override val openQuote: String = "`"
     override val closeQuote: String = "`"
 

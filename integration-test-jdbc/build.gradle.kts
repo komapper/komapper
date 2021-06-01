@@ -35,13 +35,14 @@ ksp {
 
 tasks {
     test {
-        val jdbc: Any by project
-        val urlKey = "$jdbc.url"
-        val userKey = "$jdbc.user"
-        val passwordKey = "$jdbc.password"
+        val driver: Any by project
+        val urlKey = "$driver.url"
+        val userKey = "$driver.user"
+        val passwordKey = "$driver.password"
         val url = project.property(urlKey) ?: throw GradleException("The $urlKey property is not found.")
         val user = project.property(userKey) ?: throw GradleException("The $userKey property is not found.")
         val password = project.property(passwordKey) ?: throw GradleException("The $passwordKey property is not found.")
+        systemProperty("driver", driver)
         systemProperty("url", url)
         systemProperty("user", user)
         systemProperty("password", password)

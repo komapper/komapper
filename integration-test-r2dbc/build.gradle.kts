@@ -19,7 +19,8 @@ dependencies {
     compileOnly(project(":komapper-annotation"))
     ksp(project(":komapper-processor"))
     implementation(project(":komapper-tx-r2dbc"))
-    implementation(project(":komapper-dialect-h2-r2dbc"))
+    runtimeOnly(project(":komapper-dialect-h2-r2dbc"))
+    runtimeOnly(project(":komapper-dialect-postgresql-r2dbc"))
     runtimeOnly(project(":komapper-slf4j"))
     runtimeOnly(project(":komapper-template"))
     runtimeOnly("ch.qos.logback:logback-classic:1.2.3")
@@ -31,14 +32,15 @@ ksp {
 
 tasks {
     test {
-        val r2dbc: Any by project
-        val urlKey = "$r2dbc.url"
-        val userKey = "$r2dbc.user"
-        val passwordKey = "$r2dbc.password"
-        val url = project.property(urlKey) ?: throw GradleException("The $urlKey property is not found.")
-        val user = project.property(userKey) ?: throw GradleException("The $userKey property is not found.")
-        val password = project.property(passwordKey) ?: throw GradleException("The $passwordKey property is not found.")
-        systemProperty("url", url)
+        val driver: Any by project
+        val databaseKey = "$driver.database"
+        val userKey = "$driver.user"
+        val passwordKey = "$driver.password"
+        val database = project.findProperty(databaseKey) ?: ""
+        val user = project.findProperty(userKey) ?: ""
+        val password = project.findProperty(passwordKey) ?: ""
+        systemProperty("driver", driver)
+        systemProperty("database", database)
         systemProperty("user", user)
         systemProperty("password", password)
     }

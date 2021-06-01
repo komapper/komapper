@@ -20,7 +20,7 @@ internal data class EntityDeleteSingleQuery<ENTITY : Any, ID, META : EntityMetam
     }
 
     override fun dryRun(config: R2dbcDatabaseConfig): String {
-        return buildStatement(config).sql
+        return buildStatement(config).toString()
     }
 
     private suspend fun delete(config: R2dbcDatabaseConfig): Pair<Int, LongArray> {

@@ -10,6 +10,7 @@ import java.util.regex.Pattern
 import kotlin.reflect.KClass
 
 interface Dialect {
+    val driver: String
     val openQuote: String get() = "\""
     val closeQuote: String get() = "\""
     val escapeSequence: String get() = "\\"

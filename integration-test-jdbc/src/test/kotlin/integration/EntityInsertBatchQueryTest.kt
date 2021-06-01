@@ -83,7 +83,7 @@ class EntityInsertBatchQueryTest(private val db: Database) {
         val department2 = Department(1, 60, "DEVELOPMENT", "KYOTO", 1)
         val query = EntityDsl.insert(d).onDuplicateKeyUpdate().batch(department1, department2)
         val counts = db.runQuery { query }
-        if (db.config.dialect.subprotocol == "mysql") {
+        if (db.config.dialect.driver == "mysql") {
             assertEquals(listOf(1, 2), counts)
         } else {
             assertEquals(listOf(1, 1), counts)
@@ -105,7 +105,7 @@ class EntityInsertBatchQueryTest(private val db: Database) {
         val department2 = Department(10, 10, "DEVELOPMENT", "KYOTO", 1)
         val query = EntityDsl.insert(d).onDuplicateKeyUpdate(d.departmentNo).batch(department1, department2)
         val counts = db.runQuery { query }
-        if (db.config.dialect.subprotocol == "mysql") {
+        if (db.config.dialect.driver == "mysql") {
             assertEquals(listOf(1, 2), counts)
         } else {
             assertEquals(listOf(1, 1), counts)
@@ -130,7 +130,7 @@ class EntityInsertBatchQueryTest(private val db: Database) {
                 d.departmentName set excluded.departmentName
             }.batch(listOf(department1, department2))
         val counts = db.runQuery { query }
-        if (db.config.dialect.subprotocol == "mysql") {
+        if (db.config.dialect.driver == "mysql") {
             assertEquals(listOf(1, 2), counts)
         } else {
             assertEquals(listOf(1, 1), counts)
@@ -155,7 +155,7 @@ class EntityInsertBatchQueryTest(private val db: Database) {
                 d.departmentName set excluded.departmentName
             }.batch(department1, department2)
         val counts = db.runQuery { query }
-        if (db.config.dialect.subprotocol == "mysql") {
+        if (db.config.dialect.driver == "mysql") {
             assertEquals(listOf(1, 2), counts)
         } else {
             assertEquals(listOf(1, 1), counts)

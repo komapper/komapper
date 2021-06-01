@@ -70,10 +70,10 @@ jobs:
             ${{ runner.os }}-gradle-
 
       - name: Check JDBC
-        run: ./gradlew :integration-test-jdbc:check -Pjdbc=h2
+        run: ./gradlew :integration-test-jdbc:check -Pdriver=h2
 
       - name: Check R2DBC
-        run: ./gradlew :integration-test-r2dbc:check -Pr2dbc=h2
+        run: ./gradlew :integration-test-r2dbc:check -Pdriver=h2
 
       - name: Upload reports
         if: failure()
@@ -120,7 +120,7 @@ jobs:
             ${{ runner.os }}-gradle-
 
       - name: Check JDBC
-        run: ./gradlew :integration-test-jdbc:check -Pjdbc=mysql
+        run: ./gradlew :integration-test-jdbc:check -Pdriver=mysql
 
       - name: Upload reports
         if: failure()
@@ -166,7 +166,7 @@ jobs:
             ${{ runner.os }}-gradle-
 
       - name: Check JDBC
-        run: ./gradlew :integration-test-jdbc:check -Pjdbc=postgresql
+        run: ./gradlew :integration-test-jdbc:check -Pdriver=postgresql
 
       - name: Upload reports
         if: failure()

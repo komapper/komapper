@@ -20,6 +20,7 @@ interface DataType<T : Any> {
     fun getValue(row: Row, index: Int): T?
     fun getValue(row: Row, columnLabel: String): T?
     fun setValue(statement: Statement, index: Int, value: T?)
+    fun setValue(statement: Statement, name: String, value: T?)
     fun toString(value: T?): String
 }
 
@@ -51,8 +52,20 @@ abstract class AbstractDataType<T : Any>(
         }
     }
 
+    override fun setValue(statement: Statement, name: String, value: T?) {
+        if (value == null) {
+            statement.bindNull(name, klass.javaObjectType)
+        } else {
+            doSetValue(statement, name, value)
+        }
+    }
+
     protected open fun doSetValue(statement: Statement, index: Int, value: T) {
         statement.bind(index, value)
+    }
+
+    protected open fun doSetValue(statement: Statement, name: String, value: T) {
+        statement.bind(name, value)
     }
 
     override fun toString(value: T?): String {
@@ -87,6 +100,10 @@ class BigIntegerType(override val name: String) : DataType<BigInteger> {
 
     override fun setValue(statement: Statement, index: Int, value: BigInteger?) {
         dataType.setValue(statement, index, value?.toBigDecimal())
+    }
+
+    override fun setValue(statement: Statement, name: String, value: BigInteger?) {
+        dataType.setValue(statement, name, value?.toBigDecimal())
     }
 
     override fun toString(value: BigInteger?): String {
