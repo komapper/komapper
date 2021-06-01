@@ -66,7 +66,10 @@ open class H2R2dbcDialect(val version: Version = Version.V0_8) : H2Dialect, R2db
     override val driver: String = Companion.driver
 
     override fun formatValue(value: Any?, valueClass: KClass<*>): String {
-        return value.toString()
+        val dataType = getDataType(valueClass)
+        @Suppress("UNCHECKED_CAST")
+        dataType as DataType<Any>
+        return dataType.toString(value)
     }
 
     // TODO
@@ -75,13 +78,11 @@ open class H2R2dbcDialect(val version: Version = Version.V0_8) : H2Dialect, R2db
         return dataType.name
     }
 
-    // TODO
     override fun setValue(statement: Statement, index: Int, value: Any?, valueClass: KClass<*>) {
-        if (value == null) {
-            statement.bindNull(index, valueClass.java)
-        } else {
-            statement.bind(index, value)
-        }
+        val dataType = getDataType(valueClass)
+        @Suppress("UNCHECKED_CAST")
+        dataType as DataType<Any>
+        return dataType.setValue(statement, index, value)
     }
 
     override fun getValue(row: Row, index: Int, valueClass: KClass<*>): Any? {

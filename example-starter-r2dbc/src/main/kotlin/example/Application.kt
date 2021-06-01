@@ -1,6 +1,5 @@
 package example
 
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
 import org.komapper.annotation.KmAutoIncrement
@@ -55,10 +54,9 @@ fun main() = runBlocking {
         }
 
         // READ: select by id
-        // TODO
         val address1 = db.runQuery {
-            R2dbcEntityDsl.from(a).where { a.id eq newAddress.id }
-        }.first()
+            R2dbcEntityDsl.from(a).first { a.id eq newAddress.id }
+        }
 
         println("address1 = $address1")
 
@@ -68,10 +66,9 @@ fun main() = runBlocking {
         }
 
         // READ: select by street
-        // TODO
         val address2 = db.runQuery {
-            R2dbcEntityDsl.from(a).where { a.street eq "street B" }
-        }.first()
+            R2dbcEntityDsl.from(a).first { a.street eq "street B" }
+        }
 
         println("address2 = $address2")
         check(address1.id == address2.id)

@@ -9,6 +9,7 @@ import org.komapper.core.StdOutLogger
 import org.komapper.core.TemplateStatementBuilder
 import org.komapper.core.spi.DefaultStatementInspector
 import org.komapper.core.spi.StatementInspector
+import org.komapper.core.spi.TemplateStatementBuilderFactory
 import org.komapper.r2dbc.spi.R2dbcDatabaseSessionFactory
 import java.util.ServiceLoader
 import java.util.UUID
@@ -45,6 +46,31 @@ class DefaultR2dbcDatabaseConfig(
         val loader = ServiceLoader.load(StatementInspector::class.java)
         loader.firstOrNull() ?: DefaultStatementInspector()
     }
+    override val templateStatementBuilder: TemplateStatementBuilder by lazy {
+        val loader = ServiceLoader.load(TemplateStatementBuilderFactory::class.java)
+        val factory = loader.firstOrNull()
+            ?: error(
+                "TemplateStatementBuilderFactory is not found. " +
+                    "Add komapper-template dependency or override the templateStatementBuilder property."
+            )
+        factory.create(dialect)
+    }
+}
+
+object DryRunR2dbcDatabaseConfig : R2dbcDatabaseConfig {
+    override val id: UUID
+        get() = throw UnsupportedOperationException()
+    override val dialect: R2dbcDialect = DryRunR2dbcDialect
+    override val logger: Logger
+        get() = throw UnsupportedOperationException()
+    override val clockProvider: ClockProvider
+        get() = throw UnsupportedOperationException()
+    override val executionOption: ExecutionOption
+        get() = throw UnsupportedOperationException()
+    override val session: R2dbcDatabaseSession
+        get() = throw UnsupportedOperationException()
+    override val statementInspector: StatementInspector
+        get() = throw UnsupportedOperationException()
     override val templateStatementBuilder: TemplateStatementBuilder
-        get() = TODO("Not yet implemented")
+        get() = throw UnsupportedOperationException()
 }

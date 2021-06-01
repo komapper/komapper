@@ -1,0 +1,84 @@
+package integration.r2dbc
+
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
+import org.junit.jupiter.api.extension.ExtendWith
+import org.komapper.core.dsl.literal
+import org.komapper.r2dbc.R2dbcDatabase
+import org.komapper.r2dbc.dsl.R2dbcSqlDsl
+
+@ExtendWith(Env::class)
+class LiteralTest(val db: R2dbcDatabase) {
+
+    @Test
+    fun test_boolean() = inTransaction(db) {
+        val m = BooleanTest.meta
+        db.runQuery {
+            R2dbcSqlDsl.insert(m).values {
+                m.id set 1
+                m.value set literal(true)
+            }
+        }
+        val result = db.runQuery {
+            R2dbcSqlDsl.from(m).select(m.value, literal(true)).first()
+        }
+        assertEquals(true to true, result)
+    }
+
+    @Test
+    fun test_int() = inTransaction(db) {
+        val m = IntTest.meta
+        db.runQuery {
+            R2dbcSqlDsl.insert(m).values {
+                m.id set 1
+                m.value set literal(123)
+            }
+        }
+        val result = db.runQuery {
+            R2dbcSqlDsl.from(m).select(m.value, literal(345)).first()
+        }
+        assertEquals(123 to 345, result)
+    }
+
+    // TODO
+    @Disabled
+    @Test
+    fun test_long() = inTransaction(db) {
+        val m = LongTest.meta
+        db.runQuery {
+            R2dbcSqlDsl.insert(m).values {
+                m.id set 1
+                m.value set literal(123L)
+            }
+        }
+        val result = db.runQuery {
+            R2dbcSqlDsl.from(m).select(m.value, literal(345L)).first()
+        }
+        assertEquals(123L to 345L, result)
+    }
+
+    @Test
+    fun test_string() = inTransaction(db) {
+        val m = StringTest.meta
+        db.runQuery {
+            R2dbcSqlDsl.insert(m).values {
+                m.id set 1
+                m.value set literal("hello")
+            }
+        }
+        val result = db.runQuery {
+            R2dbcSqlDsl.from(m).select(m.value, literal("world")).first()
+        }
+        assertEquals("hello" to "world", result)
+    }
+
+    @Test
+    fun test_illegal_string() = inTransaction(db) {
+        val ex = assertThrows<IllegalArgumentException> {
+            literal("I don't like it.")
+        }
+        assertEquals("The value must not contain the single quotation.", ex.message)
+    }
+}

@@ -25,6 +25,10 @@ dependencies {
     runtimeOnly("ch.qos.logback:logback-classic:1.2.3")
 }
 
+ksp {
+    arg("komapper.namingStrategy", "UPPER_SNAKE_CASE")
+}
+
 tasks {
     test {
         val r2dbc: Any by project

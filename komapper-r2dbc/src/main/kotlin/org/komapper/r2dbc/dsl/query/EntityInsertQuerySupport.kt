@@ -24,7 +24,8 @@ internal class EntityInsertQuerySupport<ENTITY : Any, ID, META : EntityMetamodel
                 val statement = Statement(sql)
                 val executor = R2dbcExecutor(config, option)
                 val flow = executor.executeQuery(statement) { row, _ ->
-                    row.get(1, Long::class.java)
+                    // TODO
+                    row.get(0, Long::class.javaObjectType)
                 }
                 // TODO
                 runBlocking {
