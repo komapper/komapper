@@ -168,6 +168,9 @@ jobs:
       - name: Check JDBC
         run: ./gradlew :integration-test-jdbc:check -Pdriver=postgresql
 
+      - name: Check R2DBC
+        run: ./gradlew :integration-test-r2dbc:check -Pdriver=postgresql
+
       - name: Upload reports
         if: failure()
         uses: actions/upload-artifact@v2
