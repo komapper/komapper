@@ -1,1 +1,1 @@
-org.komapper.dialect.postgresql.r2dbx.PostgreSqlR2dbcDialectFactory
+org.komapper.dialect.postgresql.r2dbc.PostgreSqlR2dbcDialectFactory

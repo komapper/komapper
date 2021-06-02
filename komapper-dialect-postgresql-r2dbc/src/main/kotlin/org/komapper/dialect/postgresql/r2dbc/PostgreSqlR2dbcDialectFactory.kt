@@ -1,4 +1,4 @@
-package org.komapper.dialect.postgresql.r2dbx
+package org.komapper.dialect.postgresql.r2dbc
 
 import org.komapper.dialect.postgresql.PostgreSqlDialect
 import org.komapper.r2dbc.R2dbcDialect

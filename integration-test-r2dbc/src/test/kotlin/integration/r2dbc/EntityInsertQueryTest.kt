@@ -23,6 +23,7 @@ import java.time.ZoneId
 class EntityInsertQueryTest(private val db: R2dbcDatabase) {
 
     // TODO
+    @Run(onlyIf = [Dbms.POSTGRESQL])
     @Test
     fun testGeneratedValue() = inTransaction(db) {
         for (i in 1..2) {

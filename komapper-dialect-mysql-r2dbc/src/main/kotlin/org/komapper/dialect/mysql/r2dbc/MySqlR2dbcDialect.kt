@@ -1,8 +1,7 @@
-package org.komapper.dialect.h2.r2dbx
+package org.komapper.dialect.mysql.r2dbc
 
-import org.komapper.dialect.h2.H2Dialect
+import org.komapper.dialect.mysql.MySqlDialect
 import org.komapper.r2dbc.AbstractR2dbcDialect
-import org.komapper.r2dbc.AnyType
 import org.komapper.r2dbc.ArrayType
 import org.komapper.r2dbc.BigDecimalType
 import org.komapper.r2dbc.BigIntegerType
@@ -24,32 +23,29 @@ import org.komapper.r2dbc.UByteType
 import org.komapper.r2dbc.UIntType
 import org.komapper.r2dbc.UShortType
 
-open class H2R2dbcDialect(
+open class MySqlR2dbcDialect(
     dataTypes: List<R2dbcDataType<*>> = emptyList(),
     val version: Version = Version.V0_8
-) : H2Dialect, AbstractR2dbcDialect(defaultDataTypes + dataTypes) {
+) : MySqlDialect, AbstractR2dbcDialect(defaultDataTypes + dataTypes) {
 
     companion object {
         enum class Version { V0_8 }
 
-        const val driver = "h2"
-
         val defaultDataTypes: List<R2dbcDataType<*>> = listOf(
-            AnyType("other"),
-            ArrayType("array"),
-            BigDecimalType("bigint"),
-            BigIntegerType("bigint"),
-            BooleanType("bool"),
+            ArrayType("varbinary(500)"),
+            BigDecimalType("decimal"),
+            BigIntegerType("decimal"),
+            BooleanType("bit(1)"),
             ByteType("tinyint"),
-            ByteArrayType("binary"),
-            DoubleType("double"),
-            FloatType("float"),
+            ByteArrayType("bytea"),
+            DoubleType("double precision"),
+            FloatType("real"),
             IntType("integer"),
-            LocalDateTimeType("timestamp"),
+            LocalDateTimeType("timestamp(6)"),
             LocalDateType("date"),
             LocalTimeType("time"),
             LongType("bigint"),
-            OffsetDateTimeType("timestamp with time zone"),
+            OffsetDateTimeType("timestamp"),
             ShortType("smallint"),
             StringType("varchar(500)"),
             UByteType("smallint"),
@@ -57,6 +53,4 @@ open class H2R2dbcDialect(
             UShortType("integer"),
         )
     }
-
-    override val driver: String = Companion.driver
 }

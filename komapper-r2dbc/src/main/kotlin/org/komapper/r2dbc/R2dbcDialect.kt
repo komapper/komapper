@@ -38,19 +38,19 @@ interface R2dbcDialect : Dialect {
         }
     }
 
-    val dataTypes: List<DataType<*>>
+    val dataTypes: List<R2dbcDataType<*>>
 
     fun getBindMarker(): BindMarker
     fun getValue(row: Row, index: Int, valueClass: KClass<*>): Any?
     fun getValue(row: Row, columnLabel: String, valueClass: KClass<*>): Any?
     fun setValue(statement: Statement, index: Int, value: Any?, valueClass: KClass<*>)
-    fun getDataType(klass: KClass<*>): DataType<*>
+    fun getDataType(klass: KClass<*>): R2dbcDataType<*>
 }
 
-abstract class AbstractR2dbcDialect protected constructor(internalDataTypes: List<DataType<*>> = emptyList()) : R2dbcDialect {
+abstract class AbstractR2dbcDialect protected constructor(internalDataTypes: List<R2dbcDataType<*>> = emptyList()) : R2dbcDialect {
 
     @Suppress("MemberVisibilityCanBePrivate")
-    protected val dataTypeMap: Map<KClass<*>, DataType<*>> = internalDataTypes.associateBy { it.klass }
+    protected val dataTypeMap: Map<KClass<*>, R2dbcDataType<*>> = internalDataTypes.associateBy { it.klass }
     override val dataTypes = internalDataTypes
 
     override fun getBindMarker(): BindMarker {
@@ -70,18 +70,18 @@ abstract class AbstractR2dbcDialect protected constructor(internalDataTypes: Lis
     override fun setValue(statement: Statement, index: Int, value: Any?, valueClass: KClass<*>) {
         val dataType = getDataType(valueClass)
         @Suppress("UNCHECKED_CAST")
-        dataType as DataType<Any>
+        dataType as R2dbcDataType<Any>
         return dataType.setValue(statement, index, value)
     }
 
     override fun formatValue(value: Any?, valueClass: KClass<*>): String {
         val dataType = getDataType(valueClass)
         @Suppress("UNCHECKED_CAST")
-        dataType as DataType<Any>
+        dataType as R2dbcDataType<Any>
         return dataType.toString(value)
     }
 
-    override fun getDataType(klass: KClass<*>): DataType<*> {
+    override fun getDataType(klass: KClass<*>): R2dbcDataType<*> {
         return dataTypeMap[klass] ?: error(
             "The dataType is not found for the type \"${klass.qualifiedName}\"."
         )
@@ -102,7 +102,7 @@ internal object DryRunR2dbcDialect : AbstractR2dbcDialect() {
         throw UnsupportedOperationException()
     }
 
-    override fun getDataType(klass: KClass<*>): DataType<*> {
+    override fun getDataType(klass: KClass<*>): R2dbcDataType<*> {
         return AnyType("other")
     }
 

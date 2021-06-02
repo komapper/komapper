@@ -122,6 +122,9 @@ jobs:
       - name: Check JDBC
         run: ./gradlew :integration-test-jdbc:check -Pdriver=mysql
 
+      - name: Check R2DBC
+        run: ./gradlew :integration-test-r2dbc:check -Pdriver=mysql
+
       - name: Upload reports
         if: failure()
         uses: actions/upload-artifact@v2

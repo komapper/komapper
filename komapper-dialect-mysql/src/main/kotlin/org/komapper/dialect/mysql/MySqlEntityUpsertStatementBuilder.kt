@@ -1,4 +1,4 @@
-package org.komapper.dialect.mysql.jdbc
+package org.komapper.dialect.mysql
 
 import org.komapper.core.Statement
 import org.komapper.core.StatementBuffer
@@ -13,10 +13,9 @@ import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.expression.TableExpression
 import org.komapper.core.dsl.metamodel.Assignment
 import org.komapper.core.dsl.metamodel.EntityMetamodel
-import org.komapper.jdbc.JdbcDialect
 
 class MySqlEntityUpsertStatementBuilder<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
-    private val dialect: JdbcDialect,
+    private val dialect: MySqlDialect,
     private val context: EntityUpsertContext<ENTITY, ID, META>,
     private val entities: List<ENTITY>
 ) : EntityUpsertStatementBuilder<ENTITY> {
@@ -88,7 +87,7 @@ class MySqlEntityUpsertStatementBuilder<ENTITY : Any, ID, META : EntityMetamodel
     }
 
     private class UpsertAliasManager(
-        dialect: JdbcDialect,
+        dialect: MySqlDialect,
         target: TableExpression<*>,
         excluded: TableExpression<*>
     ) : AliasManager {
