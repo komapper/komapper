@@ -9,7 +9,6 @@ import org.komapper.r2dbc.BigIntegerType
 import org.komapper.r2dbc.BooleanType
 import org.komapper.r2dbc.ByteArrayType
 import org.komapper.r2dbc.ByteType
-import org.komapper.r2dbc.DataType
 import org.komapper.r2dbc.DoubleType
 import org.komapper.r2dbc.FloatType
 import org.komapper.r2dbc.IntType
@@ -18,6 +17,7 @@ import org.komapper.r2dbc.LocalDateType
 import org.komapper.r2dbc.LocalTimeType
 import org.komapper.r2dbc.LongType
 import org.komapper.r2dbc.OffsetDateTimeType
+import org.komapper.r2dbc.R2dbcDataType
 import org.komapper.r2dbc.ShortType
 import org.komapper.r2dbc.StringType
 import org.komapper.r2dbc.UByteType
@@ -25,7 +25,7 @@ import org.komapper.r2dbc.UIntType
 import org.komapper.r2dbc.UShortType
 
 open class H2R2dbcDialect(
-    dataTypes: List<DataType<*>> = emptyList(),
+    dataTypes: List<R2dbcDataType<*>> = emptyList(),
     val version: Version = Version.V0_8
 ) : H2Dialect, AbstractR2dbcDialect(defaultDataTypes + dataTypes) {
 
@@ -34,7 +34,7 @@ open class H2R2dbcDialect(
 
         const val driver = "h2"
 
-        val defaultDataTypes: List<DataType<*>> = listOf(
+        val defaultDataTypes: List<R2dbcDataType<*>> = listOf(
             AnyType("other"),
             ArrayType("array"),
             BigDecimalType("bigint"),

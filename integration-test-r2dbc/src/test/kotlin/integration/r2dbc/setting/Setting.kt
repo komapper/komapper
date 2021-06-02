@@ -18,6 +18,7 @@ interface Setting {
             val password = System.getProperty("password") ?: error("The password property is not found.")
             return when (driver) {
                 "h2" -> H2Setting(driver)
+                "mysql" -> MySqlSetting(driver, database, user, password)
                 "postgresql" -> PostgreSqlSetting(driver, database, user, password)
                 else -> error("Unsupported driver: $driver")
             }

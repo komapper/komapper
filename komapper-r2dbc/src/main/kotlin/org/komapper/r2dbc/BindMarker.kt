@@ -6,7 +6,7 @@ import org.komapper.core.PlaceHolder
 interface BindMarker {
     fun apply(sql: List<CharSequence>): List<CharSequence>
 
-    fun setValue(statement: Statement, index: Int, value: Any?, dataType: DataType<Any>)
+    fun setValue(statement: Statement, index: Int, value: Any?, dataType: R2dbcDataType<Any>)
 }
 
 object DefaultBindMarker : BindMarker {
@@ -14,7 +14,7 @@ object DefaultBindMarker : BindMarker {
         return sql
     }
 
-    override fun setValue(statement: Statement, index: Int, value: Any?, dataType: DataType<Any>) {
+    override fun setValue(statement: Statement, index: Int, value: Any?, dataType: R2dbcDataType<Any>) {
         dataType.setValue(statement, index, value)
     }
 }
@@ -30,7 +30,7 @@ object IndexedBindMarker : BindMarker {
         }
     }
 
-    override fun setValue(statement: Statement, index: Int, value: Any?, dataType: DataType<Any>) {
+    override fun setValue(statement: Statement, index: Int, value: Any?, dataType: R2dbcDataType<Any>) {
         dataType.setValue(statement, "$${index + 1}", value)
     }
 }

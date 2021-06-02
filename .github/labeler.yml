@@ -22,11 +22,23 @@ module/dialect-h2-jdbc:
 module/dialect-h2-r2dbc:
   - komapper-dialect-h2-r2dbc/**/*
 
+module/dialect-mysql:
+  - komapper-dialect-mysql/**/*
+
 module/dialect-mysql-jdbc:
   - komapper-dialect-mysql-jdbc/**/*
 
+module/dialect-mysql-r2dbc:
+  - komapper-dialect-mysql-r2dbc/**/*
+
+module/dialect-postgresql:
+  - komapper-dialect-postgresql/**/*
+
 module/dialect-postgresql-jdbc:
   - komapper-dialect-postgresql-jdbc/**/*
+
+module/dialect-postgresql-r2dbc:
+  - komapper-dialect-postgresql-r2dbc/**/*
 
 module/platform:
   - komapper-platform/**/*
@@ -43,14 +55,23 @@ module/slf4j:
 module/spring-boot-autoconfigure-jdbc:
   - komapper-spring-boot-autoconfigure-jdbc/**/*
 
+module/spring-boot-autoconfigure-r2dbc:
+  - komapper-spring-boot-autoconfigure-r2dbc/**/*
+
 module/spring-boot-starter-jdbc:
   - komapper-spring-boot-starter-jdbc/**/*
+
+module/spring-boot-starter-r2dbc:
+  - komapper-spring-boot-starter-r2dbc/**/*
 
 module/sqlcommenter:
   - komapper-sqlcommenter/**/*
 
 module/starter-jdbc:
   - komapper-starter-jdbc/**/*
+
+module/starter-r2dbc:
+  - komapper-starter-r2dbc/**/*
 
 module/template:
   - komapper-template/**/*

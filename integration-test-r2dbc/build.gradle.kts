@@ -20,6 +20,7 @@ dependencies {
     ksp(project(":komapper-processor"))
     implementation(project(":komapper-tx-r2dbc"))
     runtimeOnly(project(":komapper-dialect-h2-r2dbc"))
+    runtimeOnly(project(":komapper-dialect-mysql-r2dbc"))
     runtimeOnly(project(":komapper-dialect-postgresql-r2dbc"))
     runtimeOnly(project(":komapper-slf4j"))
     runtimeOnly(project(":komapper-template"))

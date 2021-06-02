@@ -141,7 +141,7 @@ class R2dbcExecutor(
     private fun io.r2dbc.spi.Statement.bind(statement: Statement) {
         statement.values.forEachIndexed { index, value ->
             val bindMarker = config.dialect.getBindMarker()
-            val dataType = config.dialect.getDataType(value.klass) as DataType<Any>
+            val dataType = config.dialect.getDataType(value.klass) as R2dbcDataType<Any>
             bindMarker.setValue(this, index, value.any, dataType)
         }
     }

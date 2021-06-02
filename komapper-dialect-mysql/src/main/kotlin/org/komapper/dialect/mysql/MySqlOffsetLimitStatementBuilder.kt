@@ -1,4 +1,4 @@
-package org.komapper.dialect.mysql.jdbc
+package org.komapper.dialect.mysql
 
 import org.komapper.core.Statement
 import org.komapper.core.StatementBuffer
@@ -6,7 +6,7 @@ import org.komapper.core.Value
 import org.komapper.core.dsl.builder.OffsetLimitStatementBuilder
 
 class MySqlOffsetLimitStatementBuilder(
-    private val dialect: MySqlJdbcDialect,
+    private val dialect: MySqlDialect,
     private val offset: Int,
     private val limit: Int
 ) : OffsetLimitStatementBuilder {
