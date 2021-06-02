@@ -48,19 +48,21 @@ abstract class AbstractSchemaStatementBuilder<D : Dialect>(protected val dialect
     protected open fun createTable(metamodel: EntityMetamodel<*, *, *>) {
         val tableName = metamodel.getCanonicalTableName(dialect::enquote)
         buf.append("create table if not exists $tableName (")
-        metamodel.properties().joinTo(buf) { p ->
+        val columnDefinition = metamodel.properties().joinToString { p ->
             val columnName = p.getCanonicalColumnName(dialect::enquote)
             val dataTypeName = resolveDataTypeName(p)
             val notNull = if (p.nullable) "" else " not null"
             val identity = resolveIdentity(p)
             "$columnName ${dataTypeName}$notNull$identity"
         }
+        buf.append(columnDefinition)
         buf.append(", ")
-        buf.append("constraint pk_$tableName primary key")
-        metamodel.idProperties().joinTo(buf, prefix = "(", postfix = ")") { p ->
+        buf.append("constraint pk_$tableName primary key(")
+        val idList = metamodel.idProperties().joinToString { p ->
             p.getCanonicalColumnName(dialect::enquote)
         }
-        buf.append(");")
+        buf.append(idList)
+        buf.append("));")
     }
 
     protected open fun resolveDataTypeName(property: PropertyMetamodel<*, *, *>): String {

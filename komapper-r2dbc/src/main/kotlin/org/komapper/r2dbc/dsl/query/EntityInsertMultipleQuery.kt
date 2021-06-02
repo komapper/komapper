@@ -46,7 +46,7 @@ internal data class EntityInsertMultipleQuery<ENTITY : Any, ID, META : EntityMet
     override fun dryRun(config: R2dbcDatabaseConfig): String {
         if (entities.isEmpty()) return ""
         val statement = buildStatement(config, entities)
-        return statement.sql
+        return statement.toString()
     }
 
     private fun buildStatement(config: R2dbcDatabaseConfig, entities: List<ENTITY>): Statement {

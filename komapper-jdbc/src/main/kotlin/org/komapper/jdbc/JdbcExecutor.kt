@@ -121,7 +121,7 @@ internal class JdbcExecutor(
                 log(statement)
                 con.createStatement().use { s ->
                     s.setUp()
-                    s.execute(statement.sql)
+                    s.execute(statement.toString())
                 }
             }
         }
@@ -146,16 +146,17 @@ internal class JdbcExecutor(
     private fun log(statement: Statement) {
         val suppressLogging = executionOption.suppressLogging ?: false
         if (!suppressLogging) {
-            config.logger.debug(LogCategory.SQL.value) { statement.sql }
+            config.logger.debug(LogCategory.SQL.value) { statement.toString() }
             config.logger.trace(LogCategory.SQL_WITH_ARGS.value) { statement.sqlWithArgs }
         }
     }
 
     private fun Connection.prepare(statement: Statement): PreparedStatement {
+        val sql = statement.toString()
         return if (requiresGeneratedKeys) {
-            this.prepareStatement(statement.sql, java.sql.Statement.RETURN_GENERATED_KEYS)
+            this.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS)
         } else {
-            this.prepareStatement(statement.sql)
+            this.prepareStatement(sql)
         }
     }
 

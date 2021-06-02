@@ -14,8 +14,20 @@ import java.util.regex.Pattern
 import kotlin.reflect.KClass
 
 interface R2dbcDialect : Dialect {
+
     companion object {
         private val r2dbcUrlPattern = Pattern.compile("^r2dbc:([^:]*):.*")
+
+        fun load(driver: String): R2dbcDialect {
+            val loader = ServiceLoader.load(R2dbcDialectFactory::class.java)
+            val factory = loader.firstOrNull { it.supports(driver) }
+                ?: error(
+                    "The dialect is not found. " +
+                        "Try to add the 'komapper-dialect-$driver-r2dbc' dependency. " +
+                        "driver='$driver'"
+                )
+            return factory.create()
+        }
 
         fun extractR2dbcDriver(url: String): String {
             val matcher = r2dbcUrlPattern.matcher(url)
@@ -24,27 +36,65 @@ interface R2dbcDialect : Dialect {
             }
             error("The driver is not found in the R2DBC URL. url=$url")
         }
-
-        fun load(driver: String): R2dbcDialect {
-            val loader = ServiceLoader.load(R2dbcDialectFactory::class.java)
-            val factory = loader.firstOrNull { it.supports(driver) }
-                ?: error(
-                    "The dialect is not found. " +
-                        "Try to add the 'komapper-r2dbc-dialect-$driver' dependency. " +
-                        "driver='$driver'"
-                )
-            return factory.create()
-        }
     }
 
-    val driver: String
+    val dataTypes: List<DataType<*>>
 
-    fun setValue(statement: Statement, index: Int, value: Any?, valueClass: KClass<*>)
+    fun getBindMarker(): BindMarker
     fun getValue(row: Row, index: Int, valueClass: KClass<*>): Any?
     fun getValue(row: Row, columnLabel: String, valueClass: KClass<*>): Any?
+    fun setValue(statement: Statement, index: Int, value: Any?, valueClass: KClass<*>)
+    fun getDataType(klass: KClass<*>): DataType<*>
 }
 
-internal object DryRunR2dbcDialect : R2dbcDialect {
+abstract class AbstractR2dbcDialect protected constructor(internalDataTypes: List<DataType<*>> = emptyList()) : R2dbcDialect {
+
+    @Suppress("MemberVisibilityCanBePrivate")
+    protected val dataTypeMap: Map<KClass<*>, DataType<*>> = internalDataTypes.associateBy { it.klass }
+    override val dataTypes = internalDataTypes
+
+    override fun getBindMarker(): BindMarker {
+        return DefaultBindMarker
+    }
+
+    override fun getValue(row: Row, index: Int, valueClass: KClass<*>): Any? {
+        val dataType = getDataType(valueClass)
+        return dataType.getValue(row, index)
+    }
+
+    override fun getValue(row: Row, columnLabel: String, valueClass: KClass<*>): Any? {
+        val dataType = getDataType(valueClass)
+        return dataType.getValue(row, columnLabel)
+    }
+
+    override fun setValue(statement: Statement, index: Int, value: Any?, valueClass: KClass<*>) {
+        val dataType = getDataType(valueClass)
+        @Suppress("UNCHECKED_CAST")
+        dataType as DataType<Any>
+        return dataType.setValue(statement, index, value)
+    }
+
+    override fun formatValue(value: Any?, valueClass: KClass<*>): String {
+        val dataType = getDataType(valueClass)
+        @Suppress("UNCHECKED_CAST")
+        dataType as DataType<Any>
+        return dataType.toString(value)
+    }
+
+    override fun getDataType(klass: KClass<*>): DataType<*> {
+        return dataTypeMap[klass] ?: error(
+            "The dataType is not found for the type \"${klass.qualifiedName}\"."
+        )
+    }
+
+    // TODO
+    override fun getDataTypeName(klass: KClass<*>): String {
+        val dataType = getDataType(klass)
+        return dataType.name
+    }
+}
+
+internal object DryRunR2dbcDialect : AbstractR2dbcDialect() {
 
     override val driver: String = "dry_run"
 
@@ -52,25 +102,8 @@ internal object DryRunR2dbcDialect : R2dbcDialect {
         throw UnsupportedOperationException()
     }
 
-    override fun setValue(statement: Statement, index: Int, value: Any?, valueClass: KClass<*>) {
-        throw UnsupportedOperationException()
-    }
-
-    override fun getValue(row: Row, index: Int, valueClass: KClass<*>): Any? {
-        throw UnsupportedOperationException()
-    }
-
-    override fun getValue(row: Row, columnLabel: String, valueClass: KClass<*>): Any? {
-        throw UnsupportedOperationException()
-    }
-
-    // TODO
-    override fun formatValue(value: Any?, valueClass: KClass<*>): String {
-        return value.toString()
-    }
-
-    override fun getDataTypeName(klass: KClass<*>): String {
-        throw UnsupportedOperationException()
+    override fun getDataType(klass: KClass<*>): DataType<*> {
+        return AnyType("other")
     }
 
     override fun getSchemaStatementBuilder(): SchemaStatementBuilder {

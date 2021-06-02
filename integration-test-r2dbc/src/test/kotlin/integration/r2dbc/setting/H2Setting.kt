@@ -1,17 +1,23 @@
 package integration.r2dbc.setting
 
 import io.r2dbc.spi.ConnectionFactories
-import org.komapper.dialect.h2.r2dbx.H2R2dbcDialect
+import io.r2dbc.spi.ConnectionFactoryOptions
+import io.r2dbc.spi.Option
 import org.komapper.r2dbc.DefaultR2dbcDatabaseConfig
 import org.komapper.r2dbc.R2dbcDatabaseConfig
+import org.komapper.r2dbc.R2dbcDialect
 
-class H2Setting(url: String, user: String, password: String) : Setting {
+class H2Setting(driver: String) : Setting {
 
-    init {
-        ConnectionFactories.get(url)
-    }
+    private val options: ConnectionFactoryOptions = ConnectionFactoryOptions.builder()
+        .option(ConnectionFactoryOptions.DRIVER, driver)
+        .option(ConnectionFactoryOptions.PROTOCOL, "mem")
+        .option(ConnectionFactoryOptions.DATABASE, "test")
+        .option(Option.valueOf("DB_CLOSE_DELAY"), "-1")
+        .build()
 
-    override val config: R2dbcDatabaseConfig = DefaultR2dbcDatabaseConfig(ConnectionFactories.get(url), H2R2dbcDialect())
+    override val config: R2dbcDatabaseConfig =
+        DefaultR2dbcDatabaseConfig(ConnectionFactories.get(options), R2dbcDialect.load(driver))
     override val dbms: Dbms = Dbms.H2
     override val createSql: String = """
         CREATE SEQUENCE IF NOT EXISTS SEQUENCE_STRATEGY_ID START WITH 1 INCREMENT BY 100;

@@ -40,9 +40,10 @@ internal class Env :
     private var beforeAllFlow: Flow<Unit> = emptyFlow()
 
     override fun beforeAll(context: ExtensionContext?) {
+        val self = this
         beforeAllFlow = flow {
             if (!initialized.getAndSet(true)) {
-                context?.root?.getStore(GLOBAL)?.put("drop all objects", this)
+                context?.root?.getStore(GLOBAL)?.put("drop all objects", self)
                 db.transaction {
                     db.runQuery {
                         R2dbcScriptDsl.execute(setting.createSql).option {
@@ -62,7 +63,7 @@ internal class Env :
                 db.transaction {
                     db.runQuery {
                         R2dbcScriptDsl.execute(resetSql).option {
-                            it.copy(suppressLogging = true)
+                            it.copy(suppressLogging = false)
                         }
                     }
                 }

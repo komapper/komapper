@@ -8,6 +8,12 @@ import org.komapper.core.dsl.metamodel.EntityMetamodel
 
 interface H2Dialect : Dialect {
 
+    companion object {
+        const val driver = "h2"
+    }
+
+    override val driver: String get() = Companion.driver
+
     override fun getSequenceSql(sequenceName: String): String {
         return "call next value for $sequenceName"
     }

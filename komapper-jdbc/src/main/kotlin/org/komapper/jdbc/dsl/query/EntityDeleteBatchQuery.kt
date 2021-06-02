@@ -34,7 +34,7 @@ internal data class EntityDeleteBatchQuery<ENTITY : Any, ID, META : EntityMetamo
 
     override fun dryRun(config: DatabaseConfig): String {
         if (entities.isEmpty()) return ""
-        return buildStatement(config, entities.first()).sql
+        return buildStatement(config, entities.first()).toString()
     }
 
     private fun buildStatement(config: DatabaseConfig, entity: ENTITY): Statement {

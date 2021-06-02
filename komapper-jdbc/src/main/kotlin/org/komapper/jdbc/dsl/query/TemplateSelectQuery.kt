@@ -51,7 +51,7 @@ internal data class TemplateSelectQueryImpl<T>(
         }
 
         override fun dryRun(config: DatabaseConfig): String {
-            return buildStatement(config).sql
+            return buildStatement(config).toString()
         }
 
         private fun buildStatement(config: DatabaseConfig): Statement {

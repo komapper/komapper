@@ -164,7 +164,7 @@ class EntityInsertQueryTest(private val db: Database) {
         val department = Department(1, 50, "PLANNING", "TOKYO", 10)
         val query = EntityDsl.insert(d).onDuplicateKeyUpdate().single(department)
         val count = db.runQuery { query }
-        if (db.config.dialect.subprotocol == "mysql") {
+        if (db.config.dialect.driver == "mysql") {
             assertEquals(2, count)
         } else {
             assertEquals(1, count)
@@ -182,7 +182,7 @@ class EntityInsertQueryTest(private val db: Database) {
         val department = Department(6, 10, "PLANNING", "TOKYO", 10)
         val query = EntityDsl.insert(d).onDuplicateKeyUpdate(d.departmentNo).single(department)
         val count = db.runQuery { query }
-        if (db.config.dialect.subprotocol == "mysql") {
+        if (db.config.dialect.driver == "mysql") {
             assertEquals(2, count)
         } else {
             assertEquals(1, count)
@@ -204,7 +204,7 @@ class EntityInsertQueryTest(private val db: Database) {
             d.location set concat(d.location, concat("_", excluded.location))
         }.single(department)
         val count = db.runQuery { query }
-        if (db.config.dialect.subprotocol == "mysql") {
+        if (db.config.dialect.driver == "mysql") {
             assertEquals(2, count)
         } else {
             assertEquals(1, count)
@@ -227,7 +227,7 @@ class EntityInsertQueryTest(private val db: Database) {
                 d.location set concat(d.location, concat("_", excluded.location))
             }.single(department)
         val count = db.runQuery { query }
-        if (db.config.dialect.subprotocol == "mysql") {
+        if (db.config.dialect.driver == "mysql") {
             assertEquals(2, count)
         } else {
             assertEquals(1, count)

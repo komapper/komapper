@@ -6,6 +6,6 @@ import org.komapper.jdbc.JdbcDialect
 
 @ThreadSafe
 interface JdbcDialectFactory {
-    fun supports(subprotocol: String): Boolean
+    fun supports(driver: String): Boolean
     fun create(dataTypes: List<DataType<*>>): JdbcDialect
 }

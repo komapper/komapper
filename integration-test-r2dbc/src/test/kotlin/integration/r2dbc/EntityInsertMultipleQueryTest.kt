@@ -1,5 +1,6 @@
 package integration.r2dbc
 
+import integration.r2dbc.setting.Dbms
 import kotlinx.coroutines.flow.toList
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -29,6 +30,8 @@ class EntityInsertMultipleQueryTest(private val db: R2dbcDatabase) {
         assertEquals(addressList, list)
     }
 
+    // TODO: the combination with returnGeneratedValues and rowsUpdated doesn't work in PostgreSQL 
+    @Run(unless = [Dbms.POSTGRESQL])
     @Test
     fun identity() = inTransaction(db) {
         val i = IdentityStrategy.meta

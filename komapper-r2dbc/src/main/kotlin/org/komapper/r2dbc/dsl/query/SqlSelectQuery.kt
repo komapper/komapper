@@ -346,7 +346,7 @@ internal data class SqlSelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<
         }
 
         override fun dryRun(config: R2dbcDatabaseConfig): String {
-            return buildStatement(config).sql
+            return buildStatement(config).toString()
         }
 
         private fun buildStatement(config: R2dbcDatabaseConfig): Statement {

@@ -24,7 +24,7 @@ internal data class SchemaDropAllQueryImpl(
     }
 
     override fun dryRun(config: DatabaseConfig): String {
-        return buildStatement(config).sql
+        return buildStatement(config).toString()
     }
 
     private fun buildStatement(config: DatabaseConfig): Statement {

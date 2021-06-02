@@ -42,6 +42,8 @@ include("komapper-dialect-h2")
 include("komapper-dialect-h2-jdbc")
 include("komapper-dialect-h2-r2dbc")
 include("komapper-dialect-mysql-jdbc")
+include("komapper-dialect-postgresql")
+include("komapper-dialect-postgresql-r2dbc")
 include("komapper-dialect-postgresql-jdbc")
 
 // OPTIONAL

@@ -14,7 +14,7 @@ internal data class ScriptExecuteQueryImpl(
     val option: ScriptExecuteOption = ScriptExecuteOption.default
 ) :
     ScriptExecuteQuery {
-    private val statement = Statement(sql, emptyList(), sql)
+    private val statement = Statement(sql)
 
     override fun option(configure: (ScriptExecuteOption) -> ScriptExecuteOption): ScriptExecuteQueryImpl {
         return copy(option = configure(option))
@@ -26,6 +26,6 @@ internal data class ScriptExecuteQueryImpl(
     }
 
     override fun dryRun(config: DatabaseConfig): String {
-        return statement.sql
+        return statement.toString()
     }
 }

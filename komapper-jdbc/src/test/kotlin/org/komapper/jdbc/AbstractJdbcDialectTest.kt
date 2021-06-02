@@ -13,7 +13,7 @@ internal class AbstractJdbcDialectTest {
 
     class MyJdbcDialect : AbstractJdbcDialect() {
 
-        override val subprotocol: String
+        override val driver: String
             get() = throw UnsupportedOperationException()
 
         override fun isUniqueConstraintViolation(exception: SQLException): Boolean {

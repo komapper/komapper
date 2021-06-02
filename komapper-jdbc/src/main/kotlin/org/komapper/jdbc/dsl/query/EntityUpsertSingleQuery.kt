@@ -31,7 +31,7 @@ internal data class EntityUpsertSingleQuery<ENTITY : Any, ID, META : EntityMetam
 
     override fun dryRun(config: DatabaseConfig): String {
         val statement = buildStatement(config, entity)
-        return statement.sql
+        return statement.toString()
     }
 
     private fun buildStatement(config: DatabaseConfig, entity: ENTITY): Statement {
