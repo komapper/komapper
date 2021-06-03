@@ -3,9 +3,9 @@ package integration
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.komapper.core.dsl.ScriptDsl
+import org.komapper.core.dsl.TemplateDsl
 import org.komapper.jdbc.Database
-import org.komapper.jdbc.dsl.ScriptDsl
-import org.komapper.jdbc.dsl.TemplateDsl
 
 @ExtendWith(Env::class)
 internal class ScriptExecuteQueryTest(private val db: Database) {

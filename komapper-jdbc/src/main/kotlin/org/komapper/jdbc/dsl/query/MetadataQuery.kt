@@ -7,7 +7,7 @@ import org.komapper.jdbc.DatabaseConfig
 import org.komapper.jdbc.JdbcDialect
 import java.sql.DatabaseMetaData
 
-interface MetadataQuery : Query<List<Table>>
+interface MetadataQuery
 
 internal class MetadataQueryImpl(
     private val catalog: String?,
@@ -16,7 +16,7 @@ internal class MetadataQueryImpl(
     private val tableTypes: List<String>
 ) : MetadataQuery {
 
-    override fun run(config: DatabaseConfig): List<Table> {
+    fun run(config: DatabaseConfig): List<Table> {
         return config.session.connection.use { con ->
             val reader = MetadataReader(
                 config.dialect,
@@ -28,10 +28,6 @@ internal class MetadataQueryImpl(
             )
             reader.read()
         }
-    }
-
-    override fun dryRun(config: DatabaseConfig): String {
-        return ""
     }
 }
 

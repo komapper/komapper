@@ -1,8 +1,8 @@
 package org.komapper.jdbc
 
 import org.komapper.core.ThreadSafe
-import org.komapper.jdbc.dsl.query.Query
-import org.komapper.jdbc.dsl.query.QueryScope
+import org.komapper.core.dsl.query.QueryScope
+import org.komapper.jdbc.dsl.runner.JdbcQueryRunner
 import javax.sql.DataSource
 
 /**
@@ -48,9 +48,21 @@ interface Database {
     val config: DatabaseConfig
     val dataFactory: DataFactory
 
-    fun <T> runQuery(block: QueryScope.() -> Query<T>): T {
-        return block(QueryScope).run(this.config)
+    fun <T> runQuery(block: QueryScope.() -> org.komapper.core.dsl.query.Query<T>): T {
+        val runner = getQueryRunner(block)
+        return runner.run(config)
     }
+
+    fun <T> dryRunQuery(block: QueryScope.() -> org.komapper.core.dsl.query.Query<T>): String {
+        val runner = getQueryRunner(block)
+        return runner.dryRun(config)
+    }
+
+    fun <T> getQueryRunner(block: QueryScope.() -> org.komapper.core.dsl.query.Query<T>): JdbcQueryRunner<T> {
+        val query = block(QueryScope)
+        return query.accept(JdbcQueryVisitor()) as? JdbcQueryRunner<T> ?: TODO()
+    }
+
 }
 
 internal class DatabaseImpl(

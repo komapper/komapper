@@ -1,11 +1,12 @@
 package integration
 
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.komapper.core.dsl.TemplateDsl
 import org.komapper.jdbc.Database
-import org.komapper.jdbc.dsl.TemplateDsl
-import org.komapper.jdbc.dsl.query.Row
+import org.komapper.core.dsl.query.Row
 
 @ExtendWith(Env::class)
 class TemplateSelectQueryTest(private val db: Database) {

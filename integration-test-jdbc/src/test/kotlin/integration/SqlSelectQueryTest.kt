@@ -3,14 +3,15 @@ package integration
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.komapper.core.dsl.SqlDsl
 import org.komapper.core.dsl.case
 import org.komapper.core.dsl.concat
 import org.komapper.core.dsl.expression.When
 import org.komapper.core.dsl.literal
 import org.komapper.jdbc.Database
-import org.komapper.jdbc.dsl.SqlDsl
 
 @ExtendWith(Env::class)
 class SqlSelectQueryTest(private val db: Database) {

@@ -1,11 +1,12 @@
 package integration
 
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.komapper.core.dsl.SqlDsl
+import org.komapper.core.dsl.TemplateDsl
 import org.komapper.jdbc.Database
-import org.komapper.jdbc.dsl.SqlDsl
-import org.komapper.jdbc.dsl.TemplateDsl
 
 @ExtendWith(Env::class)
 class TemplateExecuteQueryTest(private val db: Database) {
@@ -22,9 +23,9 @@ class TemplateExecuteQueryTest(private val db: Database) {
         assertEquals(1, count)
         val a = Address.meta
         val address = db.runQuery {
-            SqlDsl.from(a).first {
+            SqlDsl.from(a).where {
                 a.addressId eq 15
-            }
+            }.first()
         }
         assertEquals(
             Address(

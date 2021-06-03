@@ -8,11 +8,11 @@ import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.komapper.core.dsl.EntityDsl
 import org.komapper.dialect.h2.jdbc.H2JdbcDialect
 import org.komapper.jdbc.Database
 import org.komapper.jdbc.DefaultDatabaseConfig
 import org.komapper.jdbc.SimpleDataSource
-import org.komapper.jdbc.dsl.EntityDsl
 import org.komapper.tx.jdbc.IsolationLevel
 import org.komapper.tx.jdbc.TransactionAttribute
 import org.komapper.tx.jdbc.transaction

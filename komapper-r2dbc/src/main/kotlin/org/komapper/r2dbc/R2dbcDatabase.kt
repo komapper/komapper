@@ -5,6 +5,8 @@ import io.r2dbc.spi.ConnectionFactory
 import io.r2dbc.spi.ConnectionFactoryOptions
 import org.komapper.r2dbc.dsl.query.Query
 import org.komapper.r2dbc.dsl.query.R2dbcQueryScope
+import org.komapper.r2dbc.dsl.runner.R2dbcQueryRunner
+import org.komapper.r2dbc.dsl.runner.R2dbcQueryVisitor
 
 interface R2dbcDatabase {
 
@@ -42,6 +44,13 @@ interface R2dbcDatabase {
 
     suspend fun <T> runQuery(block: R2dbcQueryScope.() -> Query<T>): T {
         return block(R2dbcQueryScope).run(this.config)
+    }
+
+    // TODO
+    suspend fun <T> execQuery(block: R2dbcQueryScope.() -> org.komapper.core.dsl.query.Query<T>): T {
+        val query = block(R2dbcQueryScope)
+        val runner = query.accept(R2dbcQueryVisitor()) as? R2dbcQueryRunner<T> ?: TODO()
+        return runner.run(this.config)
     }
 }
 
