@@ -1,5 +1,8 @@
 package org.komapper.core.dsl.query
 
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import org.komapper.core.dsl.context.SqlSetOperationContext
 import org.komapper.core.dsl.context.SubqueryContext
 import org.komapper.core.dsl.expression.ColumnExpression
@@ -29,14 +32,14 @@ data class SqlPairEntitiesSetOperationQuery<A : Any, A_META : EntityMetamodel<A,
         return Collect(context, option, metamodels) { it.firstOrNull() }
     }
 
-    override fun <R> collect(transform: (Sequence<Pair<A, B?>>) -> R): Query<R> {
-        return Collect(context, option, metamodels, transform)
+    override fun <R> collect(collect: suspend (Flow<Pair<A, B?>>) -> R): Query<R> {
+        return Collect(context, option, metamodels, collect)
     }
 
     override fun except(other: Subquery<Pair<A, B?>>): SetOperationQuery<Pair<A, B?>> {
         return copy(context = support.except(other))
     }
-    
+
     override fun intersect(other: Subquery<Pair<A, B?>>): SetOperationQuery<Pair<A, B?>> {
         return copy(context = support.intersect(other))
     }
@@ -65,11 +68,10 @@ data class SqlPairEntitiesSetOperationQuery<A : Any, A_META : EntityMetamodel<A,
         val context: SqlSetOperationContext<Pair<A, B?>>,
         val option: SqlSetOperationOption,
         val metamodels: Pair<A_META, B_META>,
-        val transform: (Sequence<Pair<A, B?>>) -> R
+        val transform: suspend (Flow<Pair<A, B?>>) -> R
     ) : Query<R> {
         override fun accept(visitor: QueryVisitor): QueryRunner {
             return visitor.visit(this)
         }
     }
-    
 }

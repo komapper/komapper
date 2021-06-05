@@ -1,11 +1,10 @@
 package integration.r2dbc
 
-import kotlinx.coroutines.flow.toList
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.komapper.core.dsl.EntityDsl
 import org.komapper.r2dbc.R2dbcDatabase
-import org.komapper.r2dbc.dsl.R2dbcEntityDsl
 
 @ExtendWith(Env::class)
 class EntitySelectQueryOffsetLimitTest(private val db: R2dbcDatabase) {
@@ -13,14 +12,14 @@ class EntitySelectQueryOffsetLimitTest(private val db: R2dbcDatabase) {
     @Test
     fun offset() = inTransaction(db) {
         val a = Address.meta
-        val list = db.runQuery { R2dbcEntityDsl.from(a).offset(10) }.toList()
+        val list = db.runQuery { EntityDsl.from(a).offset(10) }.toList()
         assertEquals(5, list.size)
     }
 
     @Test
     fun limit() = inTransaction(db) {
         val a = Address.meta
-        val list = db.runQuery { R2dbcEntityDsl.from(a).limit(3) }.toList()
+        val list = db.runQuery { EntityDsl.from(a).limit(3) }.toList()
         assertEquals(3, list.size)
     }
 
@@ -28,7 +27,7 @@ class EntitySelectQueryOffsetLimitTest(private val db: R2dbcDatabase) {
     fun offset_limit() = inTransaction(db) {
         val a = Address.meta
         val list = db.runQuery {
-            R2dbcEntityDsl.from(a)
+            EntityDsl.from(a)
                 .orderBy(a.addressId)
                 .offset(10)
                 .limit(3)

@@ -5,6 +5,7 @@ import io.r2dbc.spi.Result
 import io.r2dbc.spi.Row
 import io.r2dbc.spi.RowMetadata
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flatMapConcat
@@ -14,6 +15,7 @@ import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.flow.transform
 import kotlinx.coroutines.reactive.asFlow
 import org.komapper.core.ExecutionOptionProvider
 import org.komapper.core.LogCategory
@@ -49,6 +51,31 @@ class R2dbcExecutor(
         }.onStart {
             log(statement)
         }
+    }
+
+    @OptIn(kotlinx.coroutines.FlowPreview::class)
+    suspend fun <T, R> executeQuery(
+        statement: Statement,
+        provide: (R2dbcDialect, Row) -> T,
+        collect: suspend (Flow<T>) -> R
+    ): R {
+        @Suppress("NAME_SHADOWING")
+        val statement = inspect(statement)
+        val flow: Flow<T> = config.session.getConnection().toFlow().flatMapConcat { con ->
+            val r2dbcStmt = con.prepare(statement)
+            r2dbcStmt.setUp()
+            r2dbcStmt.bind(statement)
+            r2dbcStmt.execute().toFlow().flatMapConcat { result ->
+                result.map { row, _ ->
+                    provide(config.dialect, row)
+                }.toFlow()
+            }.onCompletion {
+                con.close()
+            }
+        }.onStart {
+            log(statement)
+        }
+        return collect(flow)
     }
 
     @OptIn(kotlinx.coroutines.FlowPreview::class)

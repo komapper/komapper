@@ -1,5 +1,6 @@
 package org.komapper.core.dsl.query
 
+import kotlinx.coroutines.flow.Flow
 import org.komapper.core.dsl.context.SqlSelectContext
 import org.komapper.core.dsl.context.SubqueryContext
 import org.komapper.core.dsl.expression.ColumnExpression
@@ -19,7 +20,7 @@ class SqlMultipleColumnsQuery(
         TODO("Not yet implemented")
     }
 
-    override fun <R> collect(transform: (Sequence<Columns>) -> R): Query<R> {
+    override fun <R> collect(collect: suspend (Flow<Columns>) -> R): Query<R> {
         TODO("Not yet implemented")
     }
 

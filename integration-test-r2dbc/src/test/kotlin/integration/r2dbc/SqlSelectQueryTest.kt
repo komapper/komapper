@@ -1,15 +1,14 @@
 package integration.r2dbc
 
-import kotlinx.coroutines.flow.toList
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.komapper.core.dsl.SqlDsl
 import org.komapper.core.dsl.case
 import org.komapper.core.dsl.concat
 import org.komapper.core.dsl.expression.When
 import org.komapper.core.dsl.literal
 import org.komapper.r2dbc.R2dbcDatabase
-import org.komapper.r2dbc.dsl.R2dbcSqlDsl
 
 @ExtendWith(Env::class)
 class SqlSelectQueryTest(private val db: R2dbcDatabase) {
@@ -18,7 +17,7 @@ class SqlSelectQueryTest(private val db: R2dbcDatabase) {
     fun list() = inTransaction(db) {
         val a = Address.meta
         val list: List<Address> = db.runQuery {
-            R2dbcSqlDsl.from(a)
+            SqlDsl.from(a)
         }.toList()
         Assertions.assertEquals(15, list.size)
     }
@@ -27,7 +26,7 @@ class SqlSelectQueryTest(private val db: R2dbcDatabase) {
     fun first() = inTransaction(db) {
         val a = Address.meta
         val address: Address = db.runQuery {
-            R2dbcSqlDsl.from(a).where { a.addressId eq 1 }.first()
+            SqlDsl.from(a).where { a.addressId eq 1 }.first()
         }
         Assertions.assertNotNull(address)
     }
@@ -36,7 +35,7 @@ class SqlSelectQueryTest(private val db: R2dbcDatabase) {
     fun firstOrNull() = inTransaction(db) {
         val a = Address.meta
         val address: Address? = db.runQuery {
-            R2dbcSqlDsl.from(a).where { a.addressId eq 99 }.firstOrNull()
+            SqlDsl.from(a).where { a.addressId eq 99 }.firstOrNull()
         }
         Assertions.assertNull(address)
     }
@@ -45,7 +44,7 @@ class SqlSelectQueryTest(private val db: R2dbcDatabase) {
     fun option() = inTransaction(db) {
         val e = Employee.meta
         val emp = db.runQuery {
-            R2dbcSqlDsl.from(e)
+            SqlDsl.from(e)
                 .option {
                     it.copy(
                         fetchSize = 10,
@@ -64,14 +63,14 @@ class SqlSelectQueryTest(private val db: R2dbcDatabase) {
     @Test
     fun shortcut_first() = inTransaction(db) {
         val a = Address.meta
-        val address = db.runQuery { R2dbcSqlDsl.from(a).first { a.addressId eq 1 } }
+        val address = db.runQuery { SqlDsl.from(a).first { a.addressId eq 1 } }
         Assertions.assertNotNull(address)
     }
 
     @Test
     fun shortcut_firstOrNull() = inTransaction(db) {
         val a = Address.meta
-        val address = db.runQuery { R2dbcSqlDsl.from(a).firstOrNull { a.addressId eq -1 } }
+        val address = db.runQuery { SqlDsl.from(a).firstOrNull { a.addressId eq -1 } }
         Assertions.assertNull(address)
     }
 
@@ -79,7 +78,7 @@ class SqlSelectQueryTest(private val db: R2dbcDatabase) {
     fun shortcut_first_multipleCondition() = inTransaction(db) {
         val a = Address.meta
         val address = db.runQuery {
-            R2dbcSqlDsl.from(a).first { a.addressId eq 1; a.version eq 1 }
+            SqlDsl.from(a).first { a.addressId eq 1; a.version eq 1 }
         }
         Assertions.assertNotNull(address)
     }
@@ -94,7 +93,7 @@ class SqlSelectQueryTest(private val db: R2dbcDatabase) {
             )
         ) { literal("NO HIT") }
         val list = db.runQuery {
-            R2dbcSqlDsl.from(a).where { a.addressId inList listOf(1, 2, 3) }
+            SqlDsl.from(a).where { a.addressId inList listOf(1, 2, 3) }
                 .orderBy(a.addressId)
                 .select(a.street, caseExpression)
         }.toList()
@@ -118,7 +117,7 @@ class SqlSelectQueryTest(private val db: R2dbcDatabase) {
             )
         ) { literal("NO HIT") }
         val list = db.runQuery {
-            R2dbcSqlDsl.from(a).where { a.addressId inList listOf(1, 2, 3) }
+            SqlDsl.from(a).where { a.addressId inList listOf(1, 2, 3) }
                 .orderBy(a.addressId)
                 .select(a.street, caseExpression)
         }.toList()
@@ -138,7 +137,7 @@ class SqlSelectQueryTest(private val db: R2dbcDatabase) {
             )
         )
         val list = db.runQuery {
-            R2dbcSqlDsl.from(a).where { a.addressId inList listOf(1, 2, 3) }
+            SqlDsl.from(a).where { a.addressId inList listOf(1, 2, 3) }
                 .orderBy(a.addressId)
                 .select(a.street, caseExpression)
         }.toList()

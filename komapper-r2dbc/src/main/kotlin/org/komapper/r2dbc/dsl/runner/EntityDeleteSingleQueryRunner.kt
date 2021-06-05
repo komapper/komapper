@@ -19,7 +19,7 @@ internal data class EntityDeleteSingleQueryRunner<ENTITY : Any, ID, META : Entit
         postDelete(count)
     }
 
-    fun dryRun(config: R2dbcDatabaseConfig): String {
+    override fun dryRun(config: R2dbcDatabaseConfig): String {
         return buildStatement(config).toString()
     }
 

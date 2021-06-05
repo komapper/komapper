@@ -1,5 +1,8 @@
 package org.komapper.core.dsl.query
 
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import org.komapper.core.dsl.context.SqlSetOperationContext
 import org.komapper.core.dsl.context.SubqueryContext
 import org.komapper.core.dsl.expression.ColumnExpression
@@ -26,8 +29,8 @@ data class SqlSetOperationQueryImpl<T : Any>(
         return Collect(context, option, metamodel) { it.firstOrNull() }
     }
 
-    override fun <R> collect(transform: (Sequence<T>) -> R): Query<R> {
-        return Collect(context, option, metamodel, transform)
+    override fun <R> collect(collect: suspend (Flow<T>) -> R): Query<R> {
+        return Collect(context, option, metamodel, collect)
     }
 
     override fun except(other: Subquery<T>): SqlSetOperationQuery<T> {
@@ -58,21 +61,18 @@ data class SqlSetOperationQueryImpl<T : Any>(
         return copy(option = configurator(option))
     }
 
-
     override fun accept(visitor: QueryVisitor): QueryRunner {
         return visitor.visit(this)
     }
-
 
     class Collect<T : Any, R>(
         val context: SqlSetOperationContext<T>,
         val option: SqlSetOperationOption,
         val metamodel: EntityMetamodel<T, *, *>,
-        val transform: (Sequence<T>) -> R
+        val transform: suspend (Flow<T>) -> R
     ) : Query<R> {
         override fun accept(visitor: QueryVisitor): QueryRunner {
             return visitor.visit(this)
         }
     }
-
 }

@@ -51,7 +51,4 @@ sealed interface JdbcQueryRunner<T> : QueryRunner {
             return runner.dryRun(config)
         }
     }
-
 }
-
-

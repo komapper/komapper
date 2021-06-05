@@ -2,8 +2,8 @@ package integration.r2dbc
 
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.komapper.core.dsl.SchemaDsl
 import org.komapper.r2dbc.R2dbcDatabase
-import org.komapper.r2dbc.dsl.R2dbcSchemaDsl
 
 @ExtendWith(Env::class)
 class SchemaQueryTest(private val db: R2dbcDatabase) {
@@ -13,17 +13,17 @@ class SchemaQueryTest(private val db: R2dbcDatabase) {
     @Test
     fun create() = inTransaction(db) {
         db.runQuery {
-            R2dbcSchemaDsl.create(metamodels)
+            SchemaDsl.create(metamodels)
         }
     }
 
     @Test
     fun drop() = inTransaction(db) {
         db.runQuery {
-            R2dbcSchemaDsl.create(metamodels)
+            SchemaDsl.create(metamodels)
         }
         db.runQuery {
-            R2dbcSchemaDsl.drop(metamodels)
+            SchemaDsl.drop(metamodels)
         }
     }
 }

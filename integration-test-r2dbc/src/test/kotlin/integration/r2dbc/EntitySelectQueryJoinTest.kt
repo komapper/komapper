@@ -1,11 +1,11 @@
 package integration.r2dbc
 
-import kotlinx.coroutines.flow.toList
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.komapper.core.dsl.EntityDsl
 import org.komapper.r2dbc.R2dbcDatabase
-import org.komapper.r2dbc.dsl.R2dbcEntityDsl
 
 @ExtendWith(Env::class)
 class EntitySelectQueryJoinTest(private val db: R2dbcDatabase) {
@@ -15,7 +15,7 @@ class EntitySelectQueryJoinTest(private val db: R2dbcDatabase) {
         val a = Address.meta
         val e = Employee.meta
         val list = db.runQuery {
-            R2dbcEntityDsl.from(a).innerJoin(e) {
+            EntityDsl.from(a).innerJoin(e) {
                 a.addressId eq e.addressId
             }
         }.toList()
@@ -27,7 +27,7 @@ class EntitySelectQueryJoinTest(private val db: R2dbcDatabase) {
         val a = Address.meta
         val e = Employee.meta
         val list = db.runQuery {
-            R2dbcEntityDsl.from(a).leftJoin(e) {
+            EntityDsl.from(a).leftJoin(e) {
                 a.addressId eq e.addressId
             }
         }.toList()
@@ -39,12 +39,63 @@ class EntitySelectQueryJoinTest(private val db: R2dbcDatabase) {
         val employee = Employee.meta
         val manager = Employee.newMeta()
         val list = db.runQuery {
-            R2dbcEntityDsl.from(employee).innerJoin(manager) {
+            EntityDsl.from(employee).innerJoin(manager) {
                 employee.managerId eq manager.employeeId
                 manager.managerId.isNull()
             }
         }.toList()
         println(list)
         assertEquals(3, list.size)
+    }
+
+    @Test
+    fun association_many_to_one() = inTransaction(db) {
+        val e = Employee.meta
+        val d = Department.meta
+        val list = db.runQuery {
+            EntityDsl.from(e).innerJoin(d) {
+                e.departmentId eq d.departmentId
+            }.associate(e, d) { employee, department ->
+                employee.copy(department = department)
+            }
+        }
+        assertEquals(14, list.size)
+        Assertions.assertTrue(list.all { it.department != null })
+    }
+
+    @Test
+    fun association_one_to_many() = inTransaction(db) {
+        val d = Department.meta
+        val e = Employee.meta
+        val list = db.runQuery {
+            EntityDsl.from(d).innerJoin(e) {
+                d.departmentId eq e.departmentId
+            }.associate(d, e) { department, employee ->
+                val list = department.employeeList + employee
+                department.copy(employeeList = list)
+            }
+        }
+        assertEquals(3, list.size)
+        val department1 = list.first { it.departmentId == 1 }
+        val department2 = list.first { it.departmentId == 2 }
+        val department3 = list.first { it.departmentId == 3 }
+        assertEquals(3, department1.employeeList.size)
+        assertEquals(5, department2.employeeList.size)
+        assertEquals(6, department3.employeeList.size)
+    }
+
+    @Test
+    fun association_one_to_one() = inTransaction(db) {
+        val a = Address.meta
+        val e = Employee.meta
+        val list = db.runQuery {
+            EntityDsl.from(e).innerJoin(a) {
+                e.addressId eq a.addressId
+            }.associate(e, a) { employee, address ->
+                employee.copy(address = address)
+            }
+        }
+        assertEquals(14, list.size)
+        Assertions.assertTrue(list.all { it.address != null })
     }
 }

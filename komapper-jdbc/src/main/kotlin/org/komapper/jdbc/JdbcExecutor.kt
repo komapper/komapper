@@ -1,5 +1,8 @@
 package org.komapper.jdbc
 
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.runBlocking
 import org.komapper.core.ExecutionOptionProvider
 import org.komapper.core.LogCategory
 import org.komapper.core.Statement
@@ -38,7 +41,7 @@ internal class JdbcExecutor(
     fun <T, R> executeQuery(
         statement: Statement,
         provide: (JdbcDialect, ResultSet) -> T,
-        transform: (Sequence<T>) -> R
+        collect: suspend (Flow<T>) -> R
     ): R {
         @Suppress("NAME_SHADOWING")
         val statement = inspect(statement)
@@ -55,7 +58,9 @@ internal class JdbcExecutor(
                             return provide(config.dialect, rs).also { hasNext = rs.next() }
                         }
                     }
-                    transform(iterator.asSequence())
+                    runBlocking {
+                        collect(iterator.asFlow())
+                    }
                 }
             }
         }

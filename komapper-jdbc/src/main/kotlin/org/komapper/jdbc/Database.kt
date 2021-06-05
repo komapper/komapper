@@ -58,11 +58,11 @@ interface Database {
         return runner.dryRun(config)
     }
 
-    fun <T> getQueryRunner(block: QueryScope.() -> org.komapper.core.dsl.query.Query<T>): JdbcQueryRunner<T> {
+    @Suppress("UNCHECKED_CAST")
+    private fun <T> getQueryRunner(block: QueryScope.() -> org.komapper.core.dsl.query.Query<T>): JdbcQueryRunner<T> {
         val query = block(QueryScope)
-        return query.accept(JdbcQueryVisitor()) as? JdbcQueryRunner<T> ?: TODO()
+        return query.accept(JdbcQueryVisitor()) as JdbcQueryRunner<T>
     }
-
 }
 
 internal class DatabaseImpl(

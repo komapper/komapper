@@ -1,12 +1,11 @@
 package example
 
-import kotlinx.coroutines.flow.Flow
 import org.komapper.annotation.KmAutoIncrement
 import org.komapper.annotation.KmEntityDef
 import org.komapper.annotation.KmId
+import org.komapper.core.dsl.EntityDsl
 import org.komapper.core.dsl.desc
 import org.komapper.r2dbc.R2dbcDatabase
-import org.komapper.r2dbc.dsl.R2dbcEntityDsl
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.transaction.annotation.Transactional
@@ -19,11 +18,12 @@ import org.springframework.web.bind.annotation.RestController
 @Transactional
 class Application(private val database: R2dbcDatabase) {
 
+    // TODO return a flow object
     @RequestMapping("/")
-    suspend fun list(): Flow<Message> {
+    suspend fun list(): List<Message> {
         return database.runQuery {
             val m = MessageDef.meta
-            R2dbcEntityDsl.from(m).orderBy(m.id.desc())
+            EntityDsl.from(m).orderBy(m.id.desc())
         }
     }
 
@@ -32,7 +32,7 @@ class Application(private val database: R2dbcDatabase) {
         val message = Message(text = text)
         return database.runQuery {
             val m = MessageDef.meta
-            R2dbcEntityDsl.insert(m).single(message)
+            EntityDsl.insert(m).single(message)
         }
     }
 }

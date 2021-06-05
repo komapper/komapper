@@ -1,5 +1,6 @@
 package org.komapper.core.dsl.query
 
+import kotlinx.coroutines.flow.Flow
 import org.komapper.core.dsl.context.SqlSelectContext
 import org.komapper.core.dsl.context.SubqueryContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
@@ -22,10 +23,9 @@ class SqlMultipleEntitiesQuery(
         TODO("Not yet implemented")
     }
 
-    override fun <R> collect(transform: (Sequence<Entities>) -> R): Query<R> {
+    override fun <R> collect(collect: suspend (Flow<Entities>) -> R): Query<R> {
         TODO("Not yet implemented")
     }
-
 
     override fun except(other: Subquery<Entities>): SetOperationQuery<Entities> {
         TODO("Not yet implemented")

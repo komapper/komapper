@@ -1,5 +1,6 @@
 package org.komapper.core.dsl.query
 
+import kotlinx.coroutines.flow.Flow
 import org.komapper.core.dsl.context.SubqueryContext
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.expression.SubqueryExpression
@@ -7,44 +8,42 @@ import org.komapper.core.dsl.option.SqlSetOperationOption
 
 interface Query<T> {
     fun accept(visitor: QueryVisitor): QueryRunner
-    
-    operator fun<S> plus(other: Query<S>): Query<S> {
+
+    operator fun <S> plus(other: Query<S>): Query<S> {
         return Plus(this, other)
     }
-    
-    fun<S> flatMap(transform: (T) -> Query<S>): Query<S> {
+
+    fun <S> flatMap(transform: (T) -> Query<S>): Query<S> {
         return FlatMap(this, transform)
     }
 
-    fun<S> flatZip(transform: (T) -> Query<S>): Query<Pair<T, S>> {
+    fun <S> flatZip(transform: (T) -> Query<S>): Query<Pair<T, S>> {
         return FlatZip(this, transform)
     }
 
-    data class Plus<L, R>(val left: Query<L>, val right: Query<R>): Query<R> {
+    data class Plus<T, S>(val left: Query<T>, val right: Query<S>) : Query<S> {
         override fun accept(visitor: QueryVisitor): QueryRunner {
             return visitor.visit(this)
         }
     }
 
-    data class FlatMap<T, S>(val query: Query<T>, val transform: (T) -> Query<S>): Query<S> {
+    data class FlatMap<T, S>(val query: Query<T>, val transform: (T) -> Query<S>) : Query<S> {
         override fun accept(visitor: QueryVisitor): QueryRunner {
             return visitor.visit(this)
         }
     }
 
-    data class FlatZip<T, S>(val query: Query<T>, val transform: (T) -> Query<S>): Query<Pair<T, S>> {
+    data class FlatZip<T, S>(val query: Query<T>, val transform: (T) -> Query<S>) : Query<Pair<T, S>> {
         override fun accept(visitor: QueryVisitor): QueryRunner {
             return visitor.visit(this)
         }
     }
-
 }
-
 
 interface ListQuery<T> : Query<List<T>> {
     fun first(): Query<T>
     fun firstOrNull(): Query<T?>
-    fun <R> collect(transform: (Sequence<T>) -> R): Query<R>
+    fun <R> collect(collect: suspend (Flow<T>) -> R): Query<R>
 }
 
 interface Subquery<T> : ListQuery<T>, SubqueryExpression<T> {

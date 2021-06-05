@@ -1,16 +1,15 @@
 package integration.r2dbc
 
-import kotlinx.coroutines.flow.toList
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.komapper.core.dsl.SqlDsl
 import org.komapper.core.dsl.concat
 import org.komapper.core.dsl.count
 import org.komapper.r2dbc.R2dbcDatabase
-import org.komapper.r2dbc.dsl.R2dbcSqlDsl
 
 @ExtendWith(Env::class)
 class SqlSelectQuerySelectTest(private val db: R2dbcDatabase) {
@@ -19,7 +18,7 @@ class SqlSelectQuerySelectTest(private val db: R2dbcDatabase) {
     fun selectProperty() = inTransaction(db) {
         val a = Address.meta
         val streetList = db.runQuery {
-            R2dbcSqlDsl.from(a)
+            SqlDsl.from(a)
                 .where {
                     a.addressId inList listOf(1, 2)
                 }
@@ -33,7 +32,7 @@ class SqlSelectQuerySelectTest(private val db: R2dbcDatabase) {
     fun selectProperty_first() = inTransaction(db) {
         val a = Address.meta
         val value = db.runQuery {
-            R2dbcSqlDsl.from(a)
+            SqlDsl.from(a)
                 .where {
                     a.addressId inList listOf(1, 2)
                 }
@@ -48,7 +47,7 @@ class SqlSelectQuerySelectTest(private val db: R2dbcDatabase) {
     fun selectPropertiesAsPair() = inTransaction(db) {
         val a = Address.meta
         val pairList = db.runQuery {
-            R2dbcSqlDsl.from(a)
+            SqlDsl.from(a)
                 .where {
                     a.addressId inList listOf(1, 2)
                 }
@@ -62,7 +61,7 @@ class SqlSelectQuerySelectTest(private val db: R2dbcDatabase) {
     fun selectPropertiesAsTriple() = inTransaction(db) {
         val a = Address.meta
         val tripleList = db.runQuery {
-            R2dbcSqlDsl.from(a)
+            SqlDsl.from(a)
                 .where {
                     a.addressId inList listOf(1, 2)
                 }
@@ -82,7 +81,7 @@ class SqlSelectQuerySelectTest(private val db: R2dbcDatabase) {
     fun selectPropertiesAsRecord() = inTransaction(db) {
         val a = Address.meta
         val list = db.runQuery {
-            R2dbcSqlDsl.from(a)
+            SqlDsl.from(a)
                 .where {
                     a.addressId inList listOf(1, 2)
                 }
@@ -107,7 +106,7 @@ class SqlSelectQuerySelectTest(private val db: R2dbcDatabase) {
         val a = Address.meta
         val e = Employee.meta
         val list: List<Address> = db.runQuery {
-            R2dbcSqlDsl.from(a)
+            SqlDsl.from(a)
                 .leftJoin(e) {
                     a.addressId eq e.addressId
                 }
@@ -121,7 +120,7 @@ class SqlSelectQuerySelectTest(private val db: R2dbcDatabase) {
         val a = Address.meta
         val e = Employee.meta
         val list: List<Pair<Address, Employee?>> = db.runQuery {
-            R2dbcSqlDsl.from(a)
+            SqlDsl.from(a)
                 .leftJoin(e) {
                     a.addressId eq e.addressId
                 }
@@ -138,7 +137,7 @@ class SqlSelectQuerySelectTest(private val db: R2dbcDatabase) {
         val a = Address.meta
         val e = Employee.meta
         val list: List<Pair<Address, Employee?>> = db.runQuery {
-            R2dbcSqlDsl.from(a).innerJoin(e) {
+            SqlDsl.from(a).innerJoin(e) {
                 a.addressId eq e.addressId
             }.select(e)
         }.toList()
@@ -152,7 +151,7 @@ class SqlSelectQuerySelectTest(private val db: R2dbcDatabase) {
         val e = Employee.meta
         val d = Department.meta
         val list = db.runQuery {
-            R2dbcSqlDsl.from(a)
+            SqlDsl.from(a)
                 .innerJoin(e) {
                     a.addressId eq e.addressId
                 }.innerJoin(d) {
@@ -169,7 +168,7 @@ class SqlSelectQuerySelectTest(private val db: R2dbcDatabase) {
         val e = Employee.meta
         val d = Department.meta
         val list = db.runQuery {
-            R2dbcSqlDsl.from(a)
+            SqlDsl.from(a)
                 .where {
                     a.addressId inList listOf(1, 2)
                 }
@@ -193,9 +192,9 @@ class SqlSelectQuerySelectTest(private val db: R2dbcDatabase) {
     fun selectProperty2() = inTransaction(db) {
         val d = Department.meta
         val e = Employee.meta
-        val subquery = R2dbcSqlDsl.from(e).where { d.departmentId eq e.departmentId }.select(count())
+        val subquery = SqlDsl.from(e).where { d.departmentId eq e.departmentId }.select(count())
         val list = db.runQuery {
-            R2dbcSqlDsl.from(d)
+            SqlDsl.from(d)
                 .orderBy(d.departmentId)
                 .select(d.departmentName, subquery)
         }.toList()

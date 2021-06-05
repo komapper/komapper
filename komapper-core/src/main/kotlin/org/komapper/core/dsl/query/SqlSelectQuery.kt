@@ -1,5 +1,8 @@
 package org.komapper.core.dsl.query
 
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import org.komapper.core.dsl.context.SqlSelectContext
 import org.komapper.core.dsl.context.SqlSetOperationContext
 import org.komapper.core.dsl.context.SqlSetOperationKind
@@ -44,7 +47,7 @@ interface SqlSelectQuery<ENTITY : Any> : Subquery<ENTITY> {
     ): Subquery<Pair<ENTITY, B?>>
 
     fun <B : Any, B_META : EntityMetamodel<B, *, B_META>,
-            C : Any, C_META : EntityMetamodel<C, *, C_META>> select(
+        C : Any, C_META : EntityMetamodel<C, *, C_META>> select(
         metamodel1: B_META,
         metamodel2: C_META
     ): Subquery<Triple<ENTITY, B?, C?>>
@@ -179,8 +182,8 @@ data class SqlSelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, I
         return Collect(context, option) { it.firstOrNull() }
     }
 
-    override fun <R> collect(transform: (Sequence<ENTITY>) -> R): Query<R> {
-        return Collect(context, option, transform)
+    override fun <R> collect(collect: suspend (Flow<ENTITY>) -> R): Query<R> {
+        return Collect(context, option, collect)
     }
 
     override fun except(other: Subquery<ENTITY>): SetOperationQuery<ENTITY> {
@@ -218,7 +221,7 @@ data class SqlSelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, I
     }
 
     override fun <B : Any, B_META : EntityMetamodel<B, *, B_META>,
-            C : Any, C_META : EntityMetamodel<C, *, C_META>> select(
+        C : Any, C_META : EntityMetamodel<C, *, C_META>> select(
         metamodel1: B_META,
         metamodel2: C_META
     ): Subquery<Triple<ENTITY, B?, C?>> {
@@ -280,12 +283,10 @@ data class SqlSelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, I
     class Collect<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>, R>(
         val context: SqlSelectContext<ENTITY, ID, META>,
         val option: SqlSelectOption,
-        val transform: (Sequence<ENTITY>) -> R
+        val transform: suspend (Flow<ENTITY>) -> R
     ) : Query<R> {
         override fun accept(visitor: QueryVisitor): QueryRunner {
             return visitor.visit(this)
         }
     }
 }
-
-

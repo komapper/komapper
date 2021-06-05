@@ -1,5 +1,6 @@
 package org.komapper.core.dsl.query
 
+import kotlinx.coroutines.flow.Flow
 import org.komapper.core.dsl.context.SqlSelectContext
 import org.komapper.core.dsl.context.SqlSetOperationContext
 import org.komapper.core.dsl.context.SqlSetOperationKind
@@ -24,7 +25,7 @@ class SqlPairEntitiesQuery<A : Any, A_META : EntityMetamodel<A, *, A_META>, B : 
         TODO("Not yet implemented")
     }
 
-    override fun <R> collect(transform: (Sequence<Pair<A, B?>>) -> R): Query<R> {
+    override fun <R> collect(collect: suspend (Flow<Pair<A, B?>>) -> R): Query<R> {
         TODO("Not yet implemented")
     }
 
@@ -54,5 +55,16 @@ class SqlPairEntitiesQuery<A : Any, A_META : EntityMetamodel<A, *, A_META>, B : 
 
     override fun accept(visitor: QueryVisitor): QueryRunner {
         return visitor.visit(this)
+    }
+
+    class Collect<A : Any, A_META : EntityMetamodel<A, *, A_META>, B : Any, B_META : EntityMetamodel<B, *, B_META>, R>(
+        val context: SqlSelectContext<A, *, A_META>,
+        val option: SqlSelectOption,
+        val metamodels: Pair<A_META, B_META>,
+        val transform: suspend (Flow<Pair<A, B?>>) -> R
+    ) : Query<Pair<A, B?>> {
+        override fun accept(visitor: QueryVisitor): QueryRunner {
+            return visitor.visit(this)
+        }
     }
 }

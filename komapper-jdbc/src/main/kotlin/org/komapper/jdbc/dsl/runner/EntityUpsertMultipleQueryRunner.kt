@@ -5,7 +5,6 @@ import org.komapper.core.dsl.context.EntityUpsertContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.option.InsertOption
 import org.komapper.jdbc.DatabaseConfig
-import org.komapper.jdbc.dsl.runner.EntityUpsertQuerySupport
 
 internal data class EntityUpsertMultipleQueryRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     val context: EntityUpsertContext<ENTITY, ID, META>,

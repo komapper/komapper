@@ -1,5 +1,8 @@
 package org.komapper.core.dsl.query
 
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import org.komapper.core.dsl.context.SqlSelectContext
 import org.komapper.core.dsl.context.SqlSetOperationContext
 import org.komapper.core.dsl.context.SqlSetOperationKind
@@ -24,10 +27,10 @@ class SqlTripleColumnsQuery<A : Any, B : Any, C : Any>(
         return Collect(context, option, expressions) { it.firstOrNull() }
     }
 
-    override fun <R> collect(transform: (Sequence<Triple<A?, B?, C?>>) -> R): Query<R> {
-        return Collect(context, option, expressions, transform)
+    override fun <R> collect(collect: suspend (Flow<Triple<A?, B?, C?>>) -> R): Query<R> {
+        return Collect(context, option, expressions, collect)
     }
-    
+
     override fun except(other: Subquery<Triple<A?, B?, C?>>): SetOperationQuery<Triple<A?, B?, C?>> {
         return setOperation(SqlSetOperationKind.EXCEPT, other)
     }
@@ -60,7 +63,7 @@ class SqlTripleColumnsQuery<A : Any, B : Any, C : Any>(
         val context: SqlSelectContext<*, *, *>,
         val option: SqlSelectOption,
         val expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
-        val transform: (Sequence<Triple<A?, B?, C?>>) -> R
+        val transform: suspend (Flow<Triple<A?, B?, C?>>) -> R
     ) : Query<R> {
         override fun accept(visitor: QueryVisitor): QueryRunner {
             return visitor.visit(this)

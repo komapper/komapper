@@ -5,7 +5,6 @@ import org.komapper.core.dsl.context.SqlSetOperationKind
 import org.komapper.core.dsl.context.SubqueryContext
 import org.komapper.core.dsl.element.SortItem
 import org.komapper.core.dsl.expression.ColumnExpression
-import org.komapper.core.dsl.option.SqlSetOperationOption
 
 data class SqlSetOperationQuerySupport<T : Any?>(
     val context: SqlSetOperationContext<T>
@@ -54,5 +53,4 @@ data class SqlSetOperationQuerySupport<T : Any?>(
     private fun orderBy(items: List<SortItem>): SqlSetOperationContext<T> {
         return context.copy(orderBy = context.orderBy + items)
     }
-
 }

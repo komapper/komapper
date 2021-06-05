@@ -4,9 +4,9 @@ import kotlinx.coroutines.flow.toList
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.komapper.core.dsl.SqlDsl
 import org.komapper.core.dsl.desc
 import org.komapper.r2dbc.R2dbcDatabase
-import org.komapper.r2dbc.dsl.R2dbcSqlDsl
 
 @ExtendWith(Env::class)
 class SqlSelectQueryForUpdateTest(private val db: R2dbcDatabase) {
@@ -15,7 +15,7 @@ class SqlSelectQueryForUpdateTest(private val db: R2dbcDatabase) {
     fun forUpdate() = inTransaction(db) {
         val a = Address.meta
         val list = db.runQuery {
-            R2dbcSqlDsl.from(a).where { a.addressId greaterEq 1 }
+            SqlDsl.from(a).where { a.addressId greaterEq 1 }
                 .orderBy(a.addressId.desc())
                 .limit(2)
                 .offset(5)

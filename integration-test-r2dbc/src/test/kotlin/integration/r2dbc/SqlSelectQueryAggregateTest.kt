@@ -1,28 +1,24 @@
 package integration.r2dbc
 
-import kotlinx.coroutines.flow.toList
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.komapper.core.dsl.SqlDsl
 import org.komapper.core.dsl.avg
 import org.komapper.core.dsl.count
 import org.komapper.core.dsl.max
 import org.komapper.core.dsl.min
 import org.komapper.core.dsl.sum
 import org.komapper.r2dbc.R2dbcDatabase
-import org.komapper.r2dbc.dsl.R2dbcSqlDsl
 
 @ExtendWith(Env::class)
 class SqlSelectQueryAggregateTest(private val db: R2dbcDatabase) {
 
-    // TODO
-    @Disabled
     @Test
     fun aggregate_avg() = inTransaction(db) {
         val a = Address.meta
         val avg = db.runQuery {
-            R2dbcSqlDsl.from(a).select(avg(a.addressId)).first()
+            SqlDsl.from(a).select(avg(a.addressId)).first()
         }
         assertEquals(8.0, avg!!, 0.0)
     }
@@ -31,7 +27,7 @@ class SqlSelectQueryAggregateTest(private val db: R2dbcDatabase) {
     fun aggregate_countAsterisk() = inTransaction(db) {
         val a = Address.meta
         val count = db.runQuery {
-            R2dbcSqlDsl.from(a).select(count()).first()
+            SqlDsl.from(a).select(count()).first()
         }
         assertEquals(15, count)
     }
@@ -40,31 +36,29 @@ class SqlSelectQueryAggregateTest(private val db: R2dbcDatabase) {
     fun aggregate_count() = inTransaction(db) {
         val a = Address.meta
         val count = db.runQuery {
-            R2dbcSqlDsl.from(a).select(count(a.street)).first()
+            SqlDsl.from(a).select(count(a.street)).first()
         }
         assertEquals(15, count)
     }
 
-    // TODO
-    @Disabled
     @Test
     fun aggregate_sum() = inTransaction(db) {
         val a = Address.meta
-        val sum = db.runQuery { R2dbcSqlDsl.from(a).select(sum(a.addressId)).first() }
+        val sum = db.runQuery { SqlDsl.from(a).select(sum(a.addressId)).first() }
         assertEquals(120, sum)
     }
 
     @Test
     fun aggregate_max() = inTransaction(db) {
         val a = Address.meta
-        val max = db.runQuery { R2dbcSqlDsl.from(a).select(max(a.addressId)).first() }
+        val max = db.runQuery { SqlDsl.from(a).select(max(a.addressId)).first() }
         assertEquals(15, max)
     }
 
     @Test
     fun aggregate_min() = inTransaction(db) {
         val a = Address.meta
-        val min = db.runQuery { R2dbcSqlDsl.from(a).select(min(a.addressId)).first() }
+        val min = db.runQuery { SqlDsl.from(a).select(min(a.addressId)).first() }
         assertEquals(1, min)
     }
 
@@ -72,7 +66,7 @@ class SqlSelectQueryAggregateTest(private val db: R2dbcDatabase) {
     fun having() = inTransaction(db) {
         val e = Employee.meta
         val list = db.runQuery {
-            R2dbcSqlDsl.from(e)
+            SqlDsl.from(e)
                 .groupBy(e.departmentId)
                 .having {
                     count(e.employeeId) greaterEq 4L
@@ -87,7 +81,7 @@ class SqlSelectQueryAggregateTest(private val db: R2dbcDatabase) {
     fun having_empty_groupBy() = inTransaction(db) {
         val e = Employee.meta
         val list = db.runQuery {
-            R2dbcSqlDsl.from(e)
+            SqlDsl.from(e)
                 .having {
                     count(e.employeeId) greaterEq 4L
                 }

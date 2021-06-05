@@ -13,14 +13,13 @@ internal object Providers {
         checkNotNull(entity)
     }
 
-    fun <A : Any, B : Any> pairEntities(metamodels: Pair<EntityMetamodel<A, *, *>, EntityMetamodel<B, *, *>>)
-            : (JdbcDialect, ResultSet) -> Pair<A, B?> = { dialect, rs ->
-        val mapper = EntityMapper(dialect, rs)
-        val first = mapper.execute(metamodels.first, true)
-        val second = mapper.execute(metamodels.second)
-        checkNotNull(first) to second
-    }
-
+    fun <A : Any, B : Any> pairEntities(metamodels: Pair<EntityMetamodel<A, *, *>, EntityMetamodel<B, *, *>>): (JdbcDialect, ResultSet) -> Pair<A, B?> =
+        { dialect, rs ->
+            val mapper = EntityMapper(dialect, rs)
+            val first = mapper.execute(metamodels.first, true)
+            val second = mapper.execute(metamodels.second)
+            checkNotNull(first) to second
+        }
 
     fun <A : Any> singleColumn(expression: ColumnExpression<A, *>): (JdbcDialect, ResultSet) -> A? =
         { dialect, rs ->
@@ -44,5 +43,4 @@ internal object Providers {
             val third = mapper.execute(expressions.third)
             Triple(first, second, third)
         }
-
 }

@@ -1,5 +1,6 @@
 package org.komapper.jdbc.dsl.runner
 
+import kotlinx.coroutines.flow.Flow
 import org.komapper.core.Statement
 import org.komapper.core.dsl.builder.DefaultAliasManager
 import org.komapper.core.dsl.builder.SqlSetOperationStatementBuilder
@@ -15,7 +16,7 @@ internal data class SqlSetOperationQueryRunner<T : Any?, R>(
     private val context: SqlSetOperationContext<T>,
     private val option: SqlSetOperationOption,
     private val provide: (JdbcDialect, ResultSet) -> T,
-    private val transform: (Sequence<T>) -> R
+    private val collect: suspend (Flow<T>) -> R
 ) : JdbcQueryRunner<R> {
 
     override fun run(config: DatabaseConfig): R {
@@ -25,7 +26,7 @@ internal data class SqlSetOperationQueryRunner<T : Any?, R>(
         }
         val statement = buildStatement(config)
         val executor = JdbcExecutor(config, option)
-        return executor.executeQuery(statement, provide, transform)
+        return executor.executeQuery(statement, provide, collect)
     }
 
     private fun checkWhereClauses(subqueryContext: SubqueryContext<*>) {
@@ -57,4 +58,3 @@ internal data class SqlSetOperationQueryRunner<T : Any?, R>(
         return builder.build()
     }
 }
-

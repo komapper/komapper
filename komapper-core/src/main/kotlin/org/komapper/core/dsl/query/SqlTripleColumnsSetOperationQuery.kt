@@ -1,10 +1,11 @@
 package org.komapper.core.dsl.query
 
-import org.komapper.core.dsl.context.SqlSelectContext
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import org.komapper.core.dsl.context.SqlSetOperationContext
 import org.komapper.core.dsl.context.SubqueryContext
 import org.komapper.core.dsl.expression.ColumnExpression
-import org.komapper.core.dsl.option.SqlSelectOption
 import org.komapper.core.dsl.option.SqlSetOperationOption
 
 data class SqlTripleColumnsSetOperationQuery<A : Any, B : Any, C : Any>(
@@ -23,17 +24,16 @@ data class SqlTripleColumnsSetOperationQuery<A : Any, B : Any, C : Any>(
     }
 
     override fun first(): Query<Triple<A?, B?, C?>> {
-        return Collect(context, option, expressions) { it.first()}
+        return Collect(context, option, expressions) { it.first() }
     }
 
     override fun firstOrNull(): Query<Triple<A?, B?, C?>?> {
-        return Collect(context, option, expressions) { it.firstOrNull()}
+        return Collect(context, option, expressions) { it.firstOrNull() }
     }
 
-    override fun <R> collect(transform: (Sequence<Triple<A?, B?, C?>>) -> R): Query<R> {
-        return Collect(context, option, expressions, transform)
+    override fun <R> collect(collect: suspend (Flow<Triple<A?, B?, C?>>) -> R): Query<R> {
+        return Collect(context, option, expressions, collect)
     }
-
 
     override fun except(other: Subquery<Triple<A?, B?, C?>>): SetOperationQuery<Triple<A?, B?, C?>> {
         return copy(context = support.except(other))
@@ -67,11 +67,10 @@ data class SqlTripleColumnsSetOperationQuery<A : Any, B : Any, C : Any>(
         val context: SqlSetOperationContext<Triple<A?, B?, C?>>,
         val option: SqlSetOperationOption,
         val expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
-        val transform: (Sequence<Triple<A?, B?, C?>>) -> R
+        val transform: suspend (Flow<Triple<A?, B?, C?>>) -> R
     ) : Query<R> {
         override fun accept(visitor: QueryVisitor): QueryRunner {
             return visitor.visit(this)
         }
     }
-
 }

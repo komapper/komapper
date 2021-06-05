@@ -1,5 +1,6 @@
 package org.komapper.jdbc.dsl.runner
 
+import kotlinx.coroutines.flow.Flow
 import org.komapper.core.Statement
 import org.komapper.core.dsl.builder.SqlSelectStatementBuilder
 import org.komapper.core.dsl.context.SqlSelectContext
@@ -14,17 +15,17 @@ internal data class SqlSelectQueryRunner<ENTITY : Any, ID, META : EntityMetamode
     private val context: SqlSelectContext<ENTITY, ID, META>,
     private val option: SqlSelectOption,
     private val provide: (JdbcDialect, ResultSet) -> ENTITY,
-    private val transform: (Sequence<ENTITY>) -> R
+    private val collect: suspend (Flow<ENTITY>) -> R
 ) :
     JdbcQueryRunner<R> {
-    
+
     override fun run(config: DatabaseConfig): R {
         if (!option.allowEmptyWhereClause && context.where.isEmpty()) {
             error("Empty where clause is not allowed.")
         }
         val statement = buildStatement(config)
         val executor = JdbcExecutor(config, option)
-        return executor.executeQuery(statement, provide, transform)
+        return executor.executeQuery(statement, provide, collect)
     }
 
     override fun dryRun(config: DatabaseConfig): String {

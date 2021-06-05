@@ -1,12 +1,12 @@
 package integration
 
+import kotlinx.coroutines.flow.toList
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.TemplateDsl
-import org.komapper.jdbc.Database
 import org.komapper.core.dsl.query.Row
+import org.komapper.jdbc.Database
 
 @ExtendWith(Env::class)
 class TemplateSelectQueryTest(private val db: Database) {

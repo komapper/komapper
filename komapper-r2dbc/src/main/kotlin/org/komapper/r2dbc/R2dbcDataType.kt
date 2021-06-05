@@ -10,6 +10,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.OffsetDateTime
+import java.time.ZoneId
 import kotlin.reflect.KClass
 
 @ThreadSafe
@@ -250,6 +251,11 @@ class OffsetDateTimeType(override val name: String) :
 
     override fun convert(value: Any): OffsetDateTime {
         return when (value) {
+            is LocalDateTime -> {
+                val zoneId = ZoneId.systemDefault()
+                val offset = zoneId.rules.getOffset(value)
+                value.atOffset(offset)
+            }
             is OffsetDateTime -> value
             else -> error("Cannot convert. value=$value, type=${value::class.qualifiedName}.")
         }
