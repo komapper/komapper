@@ -71,7 +71,6 @@ interface R2dbcDatabase {
         val flowQuery = flowableQuery.toFlowQuery()
         return flowQuery.accept(R2dbcFlowQueryVisitor()) as R2dbcFlowQueryRunner<T>
     }
-
 }
 
 internal class R2dbcDatabaseImpl(override val config: R2dbcDatabaseConfig) : R2dbcDatabase

@@ -45,8 +45,8 @@ import org.komapper.r2dbc.dsl.runner.EntitySelectQueryRunner
 import org.komapper.r2dbc.dsl.runner.EntityUpdateSingleQueryRunner
 import org.komapper.r2dbc.dsl.runner.EntityUpsertMultipleQueryRunner
 import org.komapper.r2dbc.dsl.runner.EntityUpsertSingleQueryRunner
-import org.komapper.r2dbc.dsl.runner.RowTransformers
 import org.komapper.r2dbc.dsl.runner.R2dbcQueryRunner
+import org.komapper.r2dbc.dsl.runner.RowTransformers
 import org.komapper.r2dbc.dsl.runner.SchemaCreateQueryRunner
 import org.komapper.r2dbc.dsl.runner.SchemaDropAllQueryRunner
 import org.komapper.r2dbc.dsl.runner.SchemaDropQueryRunner

@@ -47,7 +47,7 @@ interface SqlSelectQuery<ENTITY : Any> : Subquery<ENTITY>, FlowableQuery<ENTITY>
     ): Subquery<Pair<ENTITY, B?>>
 
     fun <B : Any, B_META : EntityMetamodel<B, *, B_META>,
-            C : Any, C_META : EntityMetamodel<C, *, C_META>> select(
+        C : Any, C_META : EntityMetamodel<C, *, C_META>> select(
         metamodel1: B_META,
         metamodel2: C_META
     ): Subquery<Triple<ENTITY, B?, C?>>
@@ -221,7 +221,7 @@ data class SqlSelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, I
     }
 
     override fun <B : Any, B_META : EntityMetamodel<B, *, B_META>,
-            C : Any, C_META : EntityMetamodel<C, *, C_META>> select(
+        C : Any, C_META : EntityMetamodel<C, *, C_META>> select(
         metamodel1: B_META,
         metamodel2: C_META
     ): Subquery<Triple<ENTITY, B?, C?>> {
