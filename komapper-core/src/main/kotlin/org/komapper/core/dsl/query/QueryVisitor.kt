@@ -136,4 +136,3 @@ interface QueryVisitor {
     fun <T, R> visit(query: TemplateSelectQueryImpl.Collect<T, R>): QueryRunner
 }
 
-interface QueryRunner

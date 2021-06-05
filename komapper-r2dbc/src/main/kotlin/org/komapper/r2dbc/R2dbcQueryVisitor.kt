@@ -45,7 +45,7 @@ import org.komapper.r2dbc.dsl.runner.EntitySelectQueryRunner
 import org.komapper.r2dbc.dsl.runner.EntityUpdateSingleQueryRunner
 import org.komapper.r2dbc.dsl.runner.EntityUpsertMultipleQueryRunner
 import org.komapper.r2dbc.dsl.runner.EntityUpsertSingleQueryRunner
-import org.komapper.r2dbc.dsl.runner.Providers
+import org.komapper.r2dbc.dsl.runner.RowTransformers
 import org.komapper.r2dbc.dsl.runner.R2dbcQueryRunner
 import org.komapper.r2dbc.dsl.runner.SchemaCreateQueryRunner
 import org.komapper.r2dbc.dsl.runner.SchemaDropAllQueryRunner
@@ -66,7 +66,7 @@ import org.komapper.r2dbc.dsl.runner.SqlUpdateQueryRunner
 import org.komapper.r2dbc.dsl.runner.TemplateExecuteQueryRunner
 import org.komapper.r2dbc.dsl.runner.TemplateSelectQueryRunner
 
-class R2dbcQueryVisitor : QueryVisitor {
+internal class R2dbcQueryVisitor : QueryVisitor {
 
     @Suppress("UNCHECKED_CAST")
     override fun <T, S> visit(query: Query.Plus<T, S>): QueryRunner {
@@ -169,126 +169,126 @@ class R2dbcQueryVisitor : QueryVisitor {
 
     override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>
     visit(query: SqlSelectQueryImpl<ENTITY, ID, META>): QueryRunner {
-        val provide = Providers.singleEntity(query.context.target)
+        val provide = RowTransformers.singleEntity(query.context.target)
         return SqlSelectQueryRunner(query.context, query.option, provide) { it.toList() }
     }
 
     override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>, R>
     visit(query: SqlSelectQueryImpl.Collect<ENTITY, ID, META, R>): QueryRunner {
-        val provide = Providers.singleEntity(query.context.target)
+        val provide = RowTransformers.singleEntity(query.context.target)
         return SqlSelectQueryRunner(query.context, query.option, provide, query.transform)
     }
 
     override fun <T : Any> visit(query: SqlSetOperationQueryImpl<T>): QueryRunner {
-        val provide = Providers.singleEntity(query.metamodel)
+        val provide = RowTransformers.singleEntity(query.metamodel)
         return SqlSetOperationQueryRunner(query.context, query.option, provide) { it.toList() }
     }
 
     override fun <T : Any, R> visit(query: SqlSetOperationQueryImpl.Collect<T, R>): QueryRunner {
-        val provide = Providers.singleEntity(query.metamodel)
+        val provide = RowTransformers.singleEntity(query.metamodel)
         return SqlSetOperationQueryRunner(query.context, query.option, provide, query.transform)
     }
 
     override fun <A : Any, A_META : EntityMetamodel<A, *, A_META>, B : Any, B_META : EntityMetamodel<B, *, B_META>>
     visit(query: SqlPairEntitiesQuery<A, A_META, B, B_META>): QueryRunner {
-        val provide = Providers.pairEntities(query.metamodels)
+        val provide = RowTransformers.pairEntities(query.metamodels)
         return SqlPairEntitiesQueryRunner(query.context, query.option, provide) { it.toList() }
     }
 
     override fun <A : Any, A_META : EntityMetamodel<A, *, A_META>, B : Any, B_META : EntityMetamodel<B, *, B_META>, R>
     visit(query: SqlPairEntitiesQuery.Collect<A, A_META, B, B_META, R>): QueryRunner {
-        val provide = Providers.pairEntities(query.metamodels)
+        val provide = RowTransformers.pairEntities(query.metamodels)
         return SqlPairEntitiesQueryRunner(query.context, query.option, provide) { it.toList() }
     }
 
     override fun <A : Any, A_META : EntityMetamodel<A, *, A_META>, B : Any, B_META : EntityMetamodel<B, *, B_META>> visit(
         query: SqlPairEntitiesSetOperationQuery<A, A_META, B, B_META>
     ): QueryRunner {
-        val provide = Providers.pairEntities(query.metamodels)
+        val provide = RowTransformers.pairEntities(query.metamodels)
         return SqlSetOperationQueryRunner(query.context, query.option, provide) { it.toList() }
     }
 
     override fun <A : Any, A_META : EntityMetamodel<A, *, A_META>, B : Any, B_META : EntityMetamodel<B, *, B_META>, R> visit(
         query: SqlPairEntitiesSetOperationQuery.Collect<A, A_META, B, B_META, R>
     ): QueryRunner {
-        val provide = Providers.pairEntities(query.metamodels)
+        val provide = RowTransformers.pairEntities(query.metamodels)
         return SqlSetOperationQueryRunner(query.context, query.option, provide, query.transform)
     }
 
     override fun <A : Any, A_META : EntityMetamodel<A, *, A_META>, B : Any, B_META : EntityMetamodel<B, *, B_META>, C : Any, C_META : EntityMetamodel<C, *, C_META>> visit(
         query: SqlTripleEntitiesQuery<A, A_META, B, B_META, C, C_META>
     ): QueryRunner {
-        val provide = Providers.tripleEntities(query.metamodels)
+        val provide = RowTransformers.tripleEntities(query.metamodels)
         return SqlTripleEntitiesQueryRunner(query.context, query.option, provide) { it.toList() }
     }
 
     override fun visit(query: SqlMultipleEntitiesQuery): QueryRunner {
-        val provide = Providers.multipleEntities(query.metamodels)
+        val provide = RowTransformers.multipleEntities(query.metamodels)
         return SqlMultipleEntitiesQueryRunner(query.context, query.option, provide) { it.toList() }
     }
 
     override fun <A : Any> visit(query: SqlSingleColumnQuery<A>): QueryRunner {
-        val provide = Providers.singleColumn(query.expression)
+        val provide = RowTransformers.singleColumn(query.expression)
         return SqlSingleColumnQueryRunner(query.context, query.option, provide) { it.toList() }
     }
 
     override fun <A : Any, R> visit(query: SqlSingleColumnQuery.Collect<A, R>): QueryRunner {
-        val provide = Providers.singleColumn(query.expression)
+        val provide = RowTransformers.singleColumn(query.expression)
         return SqlSingleColumnQueryRunner(query.context, query.option, provide, query.transform)
     }
 
     override fun <A : Any> visit(query: SqlSingleColumnSetOperationQuery<A>): QueryRunner {
-        val provide = Providers.singleColumn(query.expression)
+        val provide = RowTransformers.singleColumn(query.expression)
         return SqlSetOperationQueryRunner(query.context, query.option, provide) { it.toList() }
     }
 
     override fun <A : Any, R> visit(query: SqlSingleColumnSetOperationQuery.Collect<A, R>): QueryRunner {
-        val provide = Providers.singleColumn(query.expression)
+        val provide = RowTransformers.singleColumn(query.expression)
         return SqlSetOperationQueryRunner(query.context, query.option, provide, query.transform)
     }
 
     override fun <A : Any, B : Any> visit(query: SqlPairColumnsQuery<A, B>): QueryRunner {
-        val provide = Providers.pairColumns(query.expressions)
+        val provide = RowTransformers.pairColumns(query.expressions)
         return SqlPairColumnsQueryRunner(query.context, query.option, provide) { it.toList() }
     }
 
     override fun <A : Any, B : Any, R> visit(query: SqlPairColumnsQuery.Collect<A, B, R>): QueryRunner {
-        val provide = Providers.pairColumns(query.expressions)
+        val provide = RowTransformers.pairColumns(query.expressions)
         return SqlPairColumnsQueryRunner(query.context, query.option, provide, query.transform)
     }
 
     override fun <A : Any, B : Any> visit(query: SqlPairColumnsSetOperationQuery<A, B>): QueryRunner {
-        val provide = Providers.pairColumns(query.expressions)
+        val provide = RowTransformers.pairColumns(query.expressions)
         return SqlSetOperationQueryRunner(query.context, query.option, provide) { it.toList() }
     }
 
     override fun <A : Any, B : Any, R> visit(query: SqlPairColumnsSetOperationQuery.Collect<A, B, R>): QueryRunner {
-        val provide = Providers.pairColumns(query.expressions)
+        val provide = RowTransformers.pairColumns(query.expressions)
         return SqlSetOperationQueryRunner(query.context, query.option, provide, query.transform)
     }
 
     override fun <A : Any, B : Any, C : Any> visit(query: SqlTripleColumnsQuery<A, B, C>): QueryRunner {
-        val provide = Providers.tripleColumns(query.expressions)
+        val provide = RowTransformers.tripleColumns(query.expressions)
         return SqlTripleColumnsQueryRunner(query.context, query.option, provide) { it.toList() }
     }
 
     override fun <A : Any, B : Any, C : Any, R> visit(query: SqlTripleColumnsQuery.Collect<A, B, C, R>): QueryRunner {
-        val provide = Providers.tripleColumns(query.expressions)
+        val provide = RowTransformers.tripleColumns(query.expressions)
         return SqlTripleColumnsQueryRunner(query.context, query.option, provide, query.transform)
     }
 
     override fun <A : Any, B : Any, C : Any> visit(query: SqlTripleColumnsSetOperationQuery<A, B, C>): QueryRunner {
-        val provide = Providers.tripleColumns(query.expressions)
+        val provide = RowTransformers.tripleColumns(query.expressions)
         return SqlSetOperationQueryRunner(query.context, query.option, provide) { it.toList() }
     }
 
     override fun <A : Any, B : Any, C : Any, R> visit(query: SqlTripleColumnsSetOperationQuery.Collect<A, B, C, R>): QueryRunner {
-        val provide = Providers.tripleColumns(query.expressions)
+        val provide = RowTransformers.tripleColumns(query.expressions)
         return SqlSetOperationQueryRunner(query.context, query.option, provide, query.transform)
     }
 
     override fun visit(query: SqlMultipleColumnsQuery): QueryRunner {
-        val provide = Providers.multipleColumns(query.expressions)
+        val provide = RowTransformers.multipleColumns(query.expressions)
         return SqlMultipleColumnsQueryRunner(query.context, query.option, provide) { it.toList() }
     }
 

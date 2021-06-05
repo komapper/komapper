@@ -16,7 +16,7 @@ import org.komapper.core.dsl.scope.HavingScope
 import org.komapper.core.dsl.scope.OnDeclaration
 import org.komapper.core.dsl.scope.WhereDeclaration
 
-interface SqlSelectQuery<ENTITY : Any> : Subquery<ENTITY> {
+interface SqlSelectQuery<ENTITY : Any> : Subquery<ENTITY>, FlowableQuery<ENTITY> {
 
     fun distinct(): SqlSelectQuery<ENTITY>
 
@@ -47,7 +47,7 @@ interface SqlSelectQuery<ENTITY : Any> : Subquery<ENTITY> {
     ): Subquery<Pair<ENTITY, B?>>
 
     fun <B : Any, B_META : EntityMetamodel<B, *, B_META>,
-        C : Any, C_META : EntityMetamodel<C, *, C_META>> select(
+            C : Any, C_META : EntityMetamodel<C, *, C_META>> select(
         metamodel1: B_META,
         metamodel2: C_META
     ): Subquery<Triple<ENTITY, B?, C?>>
@@ -221,7 +221,7 @@ data class SqlSelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, I
     }
 
     override fun <B : Any, B_META : EntityMetamodel<B, *, B_META>,
-        C : Any, C_META : EntityMetamodel<C, *, C_META>> select(
+            C : Any, C_META : EntityMetamodel<C, *, C_META>> select(
         metamodel1: B_META,
         metamodel2: C_META
     ): Subquery<Triple<ENTITY, B?, C?>> {
@@ -276,6 +276,10 @@ data class SqlSelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, I
         return SqlMultipleColumnsQuery(newContext, option, list)
     }
 
+    override fun toFlowQuery(): FlowQuery<ENTITY> {
+        return FlowQueryImpl(context, option)
+    }
+
     override fun accept(visitor: QueryVisitor): QueryRunner {
         return visitor.visit(this)
     }
@@ -286,6 +290,16 @@ data class SqlSelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, I
         val transform: suspend (Flow<ENTITY>) -> R
     ) : Query<R> {
         override fun accept(visitor: QueryVisitor): QueryRunner {
+            return visitor.visit(this)
+        }
+    }
+
+    class FlowQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+        val context: SqlSelectContext<ENTITY, ID, META>,
+        val option: SqlSelectOption
+    ) : FlowQuery<ENTITY> {
+
+        override fun accept(visitor: FlowQueryVisitor): FlowQueryRunner {
             return visitor.visit(this)
         }
     }

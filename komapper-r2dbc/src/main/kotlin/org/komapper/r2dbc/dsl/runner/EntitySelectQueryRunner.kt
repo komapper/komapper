@@ -26,9 +26,9 @@ class EntitySelectQueryRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, I
         }
         val statement = buildStatement(config)
         val executor = R2dbcExecutor(config, option)
-        val rows: Flow<Map<EntityKey, Any>> = executor.executeQuery(statement) { r2dbcRow, _ ->
+        val rows: Flow<Map<EntityKey, Any>> = executor.executeQuery(statement) { dialect, r2dbcRow ->
             val row = mutableMapOf<EntityKey, Any>()
-            val mapper = EntityMapper(config.dialect, r2dbcRow)
+            val mapper = EntityMapper(dialect, r2dbcRow)
             for (metamodel in context.projection.metamodels) {
                 val entity = mapper.execute(metamodel) ?: continue
                 @Suppress("UNCHECKED_CAST")

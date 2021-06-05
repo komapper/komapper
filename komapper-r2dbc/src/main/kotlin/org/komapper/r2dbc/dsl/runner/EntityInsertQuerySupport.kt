@@ -23,7 +23,7 @@ internal class EntityInsertQuerySupport<ENTITY : Any, ID, META : EntityMetamodel
                 val sql = config.dialect.getSequenceSql(sequenceName)
                 val statement = Statement(sql)
                 val executor = R2dbcExecutor(config, option)
-                val flow = executor.executeQuery(statement) { row, _ ->
+                val flow = executor.executeQuery(statement) { _, row ->
                     // TODO
                     row.get(0, Long::class.javaObjectType)
                 }

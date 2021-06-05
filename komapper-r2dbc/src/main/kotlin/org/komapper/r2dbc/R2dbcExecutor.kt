@@ -3,9 +3,7 @@ package org.komapper.r2dbc
 import io.r2dbc.spi.R2dbcDataIntegrityViolationException
 import io.r2dbc.spi.Result
 import io.r2dbc.spi.Row
-import io.r2dbc.spi.RowMetadata
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flatMapConcat
@@ -15,7 +13,6 @@ import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.flow.transform
 import kotlinx.coroutines.reactive.asFlow
 import org.komapper.core.ExecutionOptionProvider
 import org.komapper.core.LogCategory
@@ -35,7 +32,7 @@ class R2dbcExecutor(
     @OptIn(kotlinx.coroutines.FlowPreview::class)
     fun <T> executeQuery(
         statement: Statement,
-        transform: (row: Row, metadata: RowMetadata) -> T
+        transform: (R2dbcDialect, Row) -> T
     ): Flow<T> {
         @Suppress("NAME_SHADOWING")
         val statement = inspect(statement)
@@ -44,7 +41,9 @@ class R2dbcExecutor(
             r2dbcStmt.setUp()
             r2dbcStmt.bind(statement)
             r2dbcStmt.execute().toFlow().flatMapConcat { result ->
-                result.map(transform).toFlow()
+                result.map { row, _ ->
+                    transform(config.dialect, row)
+                }.toFlow()
             }.onCompletion {
                 con.close()
             }

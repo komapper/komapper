@@ -59,3 +59,4 @@ interface SetOperationQuery<T> : Subquery<T> {
     fun orderBy(vararg expressions: ColumnExpression<*, *>): SetOperationQuery<T>
     fun option(configurator: (SqlSetOperationOption) -> SqlSetOperationOption): SetOperationQuery<T>
 }
+
