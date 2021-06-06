@@ -3,7 +3,6 @@ package org.komapper.r2dbc
 import io.r2dbc.spi.R2dbcDataIntegrityViolationException
 import io.r2dbc.spi.Result
 import io.r2dbc.spi.Row
-import io.r2dbc.spi.RowMetadata
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
@@ -33,7 +32,7 @@ class R2dbcExecutor(
     @OptIn(kotlinx.coroutines.FlowPreview::class)
     fun <T> executeQuery(
         statement: Statement,
-        transform: (row: Row, metadata: RowMetadata) -> T
+        transform: (R2dbcDialect, Row) -> T
     ): Flow<T> {
         @Suppress("NAME_SHADOWING")
         val statement = inspect(statement)
@@ -42,13 +41,40 @@ class R2dbcExecutor(
             r2dbcStmt.setUp()
             r2dbcStmt.bind(statement)
             r2dbcStmt.execute().toFlow().flatMapConcat { result ->
-                result.map(transform).toFlow()
+                result.map { row, _ ->
+                    transform(config.dialect, row)
+                }.toFlow()
             }.onCompletion {
                 con.close()
             }
         }.onStart {
             log(statement)
         }
+    }
+
+    @OptIn(kotlinx.coroutines.FlowPreview::class)
+    suspend fun <T, R> executeQuery(
+        statement: Statement,
+        provide: (R2dbcDialect, Row) -> T,
+        collect: suspend (Flow<T>) -> R
+    ): R {
+        @Suppress("NAME_SHADOWING")
+        val statement = inspect(statement)
+        val flow: Flow<T> = config.session.getConnection().toFlow().flatMapConcat { con ->
+            val r2dbcStmt = con.prepare(statement)
+            r2dbcStmt.setUp()
+            r2dbcStmt.bind(statement)
+            r2dbcStmt.execute().toFlow().flatMapConcat { result ->
+                result.map { row, _ ->
+                    provide(config.dialect, row)
+                }.toFlow()
+            }.onCompletion {
+                con.close()
+            }
+        }.onStart {
+            log(statement)
+        }
+        return collect(flow)
     }
 
     @OptIn(kotlinx.coroutines.FlowPreview::class)

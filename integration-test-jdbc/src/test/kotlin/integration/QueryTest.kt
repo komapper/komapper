@@ -3,9 +3,9 @@ package integration
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.komapper.core.dsl.EntityDsl
+import org.komapper.core.dsl.SqlDsl
 import org.komapper.jdbc.Database
-import org.komapper.jdbc.dsl.EntityDsl
-import org.komapper.jdbc.dsl.SqlDsl
 
 @ExtendWith(Env::class)
 class QueryTest(private val db: Database) {
@@ -23,7 +23,7 @@ class QueryTest(private val db: Database) {
         val q3 = EntityDsl.from(a).where { a.addressId inList listOf(16, 17) }
         val list = db.runQuery { q1 + q2 + q3 }
         assertEquals(2, list.size)
-        println((q1 + q2 + q3).dryRun())
+        println(db.dryRunQuery { q1 + q2 + q3 })
     }
 
     @Test

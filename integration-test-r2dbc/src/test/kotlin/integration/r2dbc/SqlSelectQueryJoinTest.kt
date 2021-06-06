@@ -1,11 +1,10 @@
 package integration.r2dbc
 
-import kotlinx.coroutines.flow.toList
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.komapper.core.dsl.SqlDsl
 import org.komapper.r2dbc.R2dbcDatabase
-import org.komapper.r2dbc.dsl.R2dbcSqlDsl
 
 @ExtendWith(Env::class)
 class SqlSelectQueryJoinTest(private val db: R2dbcDatabase) {
@@ -15,7 +14,7 @@ class SqlSelectQueryJoinTest(private val db: R2dbcDatabase) {
         val a = Address.meta
         val e = Employee.meta
         val list = db.runQuery {
-            R2dbcSqlDsl.from(a).innerJoin(e) {
+            SqlDsl.from(a).innerJoin(e) {
                 a.addressId eq e.addressId
             }
         }.toList()
@@ -27,7 +26,7 @@ class SqlSelectQueryJoinTest(private val db: R2dbcDatabase) {
         val a = Address.meta
         val e = Employee.meta
         val list = db.runQuery {
-            R2dbcSqlDsl.from(a).leftJoin(e) {
+            SqlDsl.from(a).leftJoin(e) {
                 a.addressId eq e.addressId
             }
         }.toList()

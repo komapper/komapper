@@ -6,9 +6,9 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.komapper.core.dsl.EntityDsl
+import org.komapper.core.dsl.TemplateDsl
 import org.komapper.jdbc.Database
-import org.komapper.jdbc.dsl.EntityDsl
-import org.komapper.jdbc.dsl.TemplateDsl
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.time.LocalDate

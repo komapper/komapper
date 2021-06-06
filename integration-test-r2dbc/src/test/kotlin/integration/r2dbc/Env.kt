@@ -18,8 +18,8 @@ import org.junit.jupiter.api.extension.ExtensionContext.Namespace.GLOBAL
 import org.junit.jupiter.api.extension.ParameterContext
 import org.junit.jupiter.api.extension.ParameterResolver
 import org.junit.platform.commons.support.AnnotationSupport.findAnnotation
+import org.komapper.core.dsl.ScriptDsl
 import org.komapper.r2dbc.R2dbcDatabase
-import org.komapper.r2dbc.dsl.R2dbcScriptDsl
 import org.komapper.tx.r2dbc.transaction
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -46,7 +46,7 @@ internal class Env :
                 context?.root?.getStore(GLOBAL)?.put("drop all objects", self)
                 db.transaction {
                     db.runQuery {
-                        R2dbcScriptDsl.execute(setting.createSql).option {
+                        ScriptDsl.execute(setting.createSql).option {
                             it.copy(suppressLogging = true)
                         }
                     }
@@ -62,7 +62,7 @@ internal class Env :
             beforeTestExecutionFlow = flow {
                 db.transaction {
                     db.runQuery {
-                        R2dbcScriptDsl.execute(resetSql).option {
+                        ScriptDsl.execute(resetSql).option {
                             it.copy(suppressLogging = false)
                         }
                     }
@@ -84,7 +84,7 @@ internal class Env :
     override fun close() = runBlocking {
         db.transaction {
             db.runQuery {
-                R2dbcScriptDsl.execute(setting.dropSql).option {
+                ScriptDsl.execute(setting.dropSql).option {
                     it.copy(suppressLogging = true)
                 }
             }

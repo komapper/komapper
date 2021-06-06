@@ -4,16 +4,15 @@ import integration.r2dbc.setting.Dbms
 import kotlinx.coroutines.reactive.awaitSingle
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.ClockProvider
 import org.komapper.core.UniqueConstraintException
+import org.komapper.core.dsl.EntityDsl
 import org.komapper.core.dsl.concat
 import org.komapper.r2dbc.R2dbcDatabase
 import org.komapper.r2dbc.R2dbcDatabaseConfig
-import org.komapper.r2dbc.dsl.R2dbcEntityDsl
 import java.time.Clock
 import java.time.Instant
 import java.time.LocalDateTime
@@ -43,9 +42,9 @@ class EntityInsertQueryTest(private val db: R2dbcDatabase) {
     fun test() = inTransaction(db) {
         val a = Address.meta
         val address = Address(16, "STREET 16", 0)
-        db.runQuery { R2dbcEntityDsl.insert(a).single(address) }
+        db.runQuery { EntityDsl.insert(a).single(address) }
         val address2 = db.runQuery {
-            R2dbcEntityDsl.from(a).first {
+            EntityDsl.from(a).first {
                 a.addressId eq 16
             }
         }
@@ -56,33 +55,31 @@ class EntityInsertQueryTest(private val db: R2dbcDatabase) {
     fun createdAt_localDateTime() = inTransaction(db) {
         val p = Person.meta
         val person1 = Person(1, "ABC")
-        val id = db.runQuery { R2dbcEntityDsl.insert(p).single(person1) }.personId
-        val person2 = db.runQuery { R2dbcEntityDsl.from(p).first { p.personId eq id } }
+        val id = db.runQuery { EntityDsl.insert(p).single(person1) }.personId
+        val person2 = db.runQuery { EntityDsl.from(p).first { p.personId eq id } }
         assertNotNull(person2.createdAt)
         assertNotNull(person2.updatedAt)
         assertEquals(person2.createdAt, person2.updatedAt)
         val person3 = db.runQuery {
-            R2dbcEntityDsl.from(p).first {
+            EntityDsl.from(p).first {
                 p.personId to 1
             }
         }
         assertEquals(person2, person3)
     }
 
-    // TODO
-    @Disabled
     @Run(unless = [Dbms.POSTGRESQL])
     @Test
     fun createdAt_offsetDateTime() = inTransaction(db) {
         val h = Human.meta
         val human1 = Human(1, "ABC")
-        val id = db.runQuery { R2dbcEntityDsl.insert(h).single(human1) }.humanId
-        val human2 = db.runQuery { R2dbcEntityDsl.from(h).first { h.humanId eq id } }
+        val id = db.runQuery { EntityDsl.insert(h).single(human1) }.humanId
+        val human2 = db.runQuery { EntityDsl.from(h).first { h.humanId eq id } }
         assertNotNull(human2.createdAt)
         assertNotNull(human2.updatedAt)
         assertEquals(human2.createdAt, human2.updatedAt)
         val human3 = db.runQuery {
-            R2dbcEntityDsl.from(h).first {
+            EntityDsl.from(h).first {
                 h.humanId to 1
             }
         }
@@ -102,9 +99,9 @@ class EntityInsertQueryTest(private val db: R2dbcDatabase) {
         }
         val myDb = R2dbcDatabase.create(config)
         val person1 = Person(1, "ABC")
-        val id = myDb.runQuery { R2dbcEntityDsl.insert(p).single(person1) }
+        val id = myDb.runQuery { EntityDsl.insert(p).single(person1) }
         val person2 = db.runQuery {
-            R2dbcEntityDsl.from(p).first {
+            EntityDsl.from(p).first {
                 p.personId to id
             }
         }
@@ -119,7 +116,7 @@ class EntityInsertQueryTest(private val db: R2dbcDatabase) {
         val a = Address.meta
         val address = Address(1, "STREET 1", 0)
         assertThrows<UniqueConstraintException> {
-            db.runQuery { R2dbcEntityDsl.insert(a).single(address) }.let { }
+            db.runQuery { EntityDsl.insert(a).single(address) }.let { }
         }
     }
 
@@ -130,7 +127,7 @@ class EntityInsertQueryTest(private val db: R2dbcDatabase) {
         for (i in 1..201) {
             val m = IdentityStrategy.meta
             val strategy = IdentityStrategy(0, "test")
-            val result = db.runQuery { R2dbcEntityDsl.insert(m).single(strategy) }
+            val result = db.runQuery { EntityDsl.insert(m).single(strategy) }
             assertEquals(i, result.id)
         }
     }
@@ -141,7 +138,7 @@ class EntityInsertQueryTest(private val db: R2dbcDatabase) {
         for (i in 1..201) {
             val m = SequenceStrategy.meta
             val strategy = SequenceStrategy(0, "test")
-            val result = db.runQuery { R2dbcEntityDsl.insert(m).single(strategy) }
+            val result = db.runQuery { EntityDsl.insert(m).single(strategy) }
             assertEquals(i, result.id)
         }
     }
@@ -152,7 +149,7 @@ class EntityInsertQueryTest(private val db: R2dbcDatabase) {
         val m = SequenceStrategy.meta
         val strategy = SequenceStrategy(50, "test")
         val result = db.runQuery {
-            R2dbcEntityDsl.insert(m).option {
+            EntityDsl.insert(m).option {
                 it.copy(disableSequenceAssignment = true)
             }.single(strategy)
         }
@@ -163,10 +160,10 @@ class EntityInsertQueryTest(private val db: R2dbcDatabase) {
     fun onDuplicateKeyUpdate_insert() = inTransaction(db) {
         val d = Department.meta
         val department = Department(5, 50, "PLANNING", "TOKYO", 0)
-        val query = R2dbcEntityDsl.insert(d).onDuplicateKeyUpdate().single(department)
+        val query = EntityDsl.insert(d).onDuplicateKeyUpdate().single(department)
         val count = db.runQuery { query }
         assertEquals(1, count)
-        val found = db.runQuery { R2dbcEntityDsl.from(d).first { d.departmentId eq 5 } }
+        val found = db.runQuery { EntityDsl.from(d).first { d.departmentId eq 5 } }
         assertNotNull(found)
     }
 
@@ -174,10 +171,10 @@ class EntityInsertQueryTest(private val db: R2dbcDatabase) {
     fun onDuplicateKeyUpdateWithKeys_insert() = inTransaction(db) {
         val d = Department.meta
         val department = Department(5, 50, "PLANNING", "TOKYO", 0)
-        val query = R2dbcEntityDsl.insert(d).onDuplicateKeyUpdate(d.departmentNo).single(department)
+        val query = EntityDsl.insert(d).onDuplicateKeyUpdate(d.departmentNo).single(department)
         val count = db.runQuery { query }
         assertEquals(1, count)
-        val found = db.runQuery { R2dbcEntityDsl.from(d).first { d.departmentId eq 5 } }
+        val found = db.runQuery { EntityDsl.from(d).first { d.departmentId eq 5 } }
         assertNotNull(found)
     }
 
@@ -185,14 +182,14 @@ class EntityInsertQueryTest(private val db: R2dbcDatabase) {
     fun onDuplicateKeyUpdate_update() = inTransaction(db) {
         val d = Department.meta
         val department = Department(1, 50, "PLANNING", "TOKYO", 10)
-        val query = R2dbcEntityDsl.insert(d).onDuplicateKeyUpdate().single(department)
+        val query = EntityDsl.insert(d).onDuplicateKeyUpdate().single(department)
         val count = db.runQuery { query }
         if (db.config.dialect.driver == "mysql") {
             assertEquals(2, count)
         } else {
             assertEquals(1, count)
         }
-        val found = db.runQuery { R2dbcEntityDsl.from(d).first { d.departmentId eq 1 } }
+        val found = db.runQuery { EntityDsl.from(d).first { d.departmentId eq 1 } }
         assertEquals(50, found.departmentNo)
         assertEquals("PLANNING", found.departmentName)
         assertEquals("TOKYO", found.location)
@@ -203,14 +200,14 @@ class EntityInsertQueryTest(private val db: R2dbcDatabase) {
     fun onDuplicateKeyUpdateWithKeys_update() = inTransaction(db) {
         val d = Department.meta
         val department = Department(6, 10, "PLANNING", "TOKYO", 10)
-        val query = R2dbcEntityDsl.insert(d).onDuplicateKeyUpdate(d.departmentNo).single(department)
+        val query = EntityDsl.insert(d).onDuplicateKeyUpdate(d.departmentNo).single(department)
         val count = db.runQuery { query }
         if (db.config.dialect.driver == "mysql") {
             assertEquals(2, count)
         } else {
             assertEquals(1, count)
         }
-        val found = db.runQuery { R2dbcEntityDsl.from(d).first { d.departmentNo eq 10 } }
+        val found = db.runQuery { EntityDsl.from(d).first { d.departmentNo eq 10 } }
         assertEquals(1, found.departmentId)
         assertEquals(10, found.departmentNo)
         assertEquals("PLANNING", found.departmentName)
@@ -222,7 +219,7 @@ class EntityInsertQueryTest(private val db: R2dbcDatabase) {
     fun onDuplicateKeyUpdate_update_set() = inTransaction(db) {
         val d = Department.meta
         val department = Department(1, 50, "PLANNING", "TOKYO", 10)
-        val query = R2dbcEntityDsl.insert(d).onDuplicateKeyUpdate().set { excluded ->
+        val query = EntityDsl.insert(d).onDuplicateKeyUpdate().set { excluded ->
             d.departmentName set "PLANNING2"
             d.location set concat(d.location, concat("_", excluded.location))
         }.single(department)
@@ -232,7 +229,7 @@ class EntityInsertQueryTest(private val db: R2dbcDatabase) {
         } else {
             assertEquals(1, count)
         }
-        val found = db.runQuery { R2dbcEntityDsl.from(d).first { d.departmentId eq 1 } }
+        val found = db.runQuery { EntityDsl.from(d).first { d.departmentId eq 1 } }
         assertEquals(10, found.departmentNo)
         assertEquals("PLANNING2", found.departmentName)
         assertEquals("NEW YORK_TOKYO", found.location)
@@ -243,7 +240,7 @@ class EntityInsertQueryTest(private val db: R2dbcDatabase) {
     fun onDuplicateKeyUpdateWithKey_update_set() = inTransaction(db) {
         val d = Department.meta
         val department = Department(5, 10, "PLANNING", "TOKYO", 10)
-        val query = R2dbcEntityDsl.insert(d)
+        val query = EntityDsl.insert(d)
             .onDuplicateKeyUpdate(d.departmentNo)
             .set { excluded ->
                 d.departmentName set "PLANNING2"
@@ -255,7 +252,7 @@ class EntityInsertQueryTest(private val db: R2dbcDatabase) {
         } else {
             assertEquals(1, count)
         }
-        val found = db.runQuery { R2dbcEntityDsl.from(d).first { d.departmentNo eq 10 } }
+        val found = db.runQuery { EntityDsl.from(d).first { d.departmentNo eq 10 } }
         assertEquals(1, found.departmentId)
         assertEquals("PLANNING2", found.departmentName)
         assertEquals("NEW YORK_TOKYO", found.location)
@@ -266,7 +263,7 @@ class EntityInsertQueryTest(private val db: R2dbcDatabase) {
     fun onDuplicateKeyIgnore() = inTransaction(db) {
         val a = Address.meta
         val address = Address(1, "STREET 100", 0)
-        val query = R2dbcEntityDsl.insert(a).onDuplicateKeyIgnore().single(address)
+        val query = EntityDsl.insert(a).onDuplicateKeyIgnore().single(address)
         val count = db.runQuery { query }
         assertEquals(0, count)
     }
@@ -275,7 +272,7 @@ class EntityInsertQueryTest(private val db: R2dbcDatabase) {
     fun onDuplicateKeyIgnoreWithKey() = inTransaction(db) {
         val a = Address.meta
         val address = Address(100, "STREET 1", 0)
-        val query = R2dbcEntityDsl.insert(a).onDuplicateKeyIgnore(a.street).single(address)
+        val query = EntityDsl.insert(a).onDuplicateKeyIgnore(a.street).single(address)
         val count = db.runQuery { query }
         assertEquals(0, count)
     }
@@ -284,7 +281,7 @@ class EntityInsertQueryTest(private val db: R2dbcDatabase) {
     fun onDuplicateKeyIgnoreWithKeys() = inTransaction(db) {
         val a = Address.meta
         val address = Address(100, "STREET 1", 0)
-        val query = R2dbcEntityDsl.insert(a).onDuplicateKeyIgnore(a.street).single(address)
+        val query = EntityDsl.insert(a).onDuplicateKeyIgnore(a.street).single(address)
         val count = db.runQuery { query }
         assertEquals(0, count)
     }

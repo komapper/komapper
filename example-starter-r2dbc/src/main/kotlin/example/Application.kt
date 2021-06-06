@@ -1,6 +1,5 @@
 package example
 
-import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
 import org.komapper.annotation.KmAutoIncrement
 import org.komapper.annotation.KmColumn
@@ -9,9 +8,9 @@ import org.komapper.annotation.KmEntityDef
 import org.komapper.annotation.KmId
 import org.komapper.annotation.KmUpdatedAt
 import org.komapper.annotation.KmVersion
+import org.komapper.core.dsl.EntityDsl
+import org.komapper.core.dsl.SchemaDsl
 import org.komapper.r2dbc.R2dbcDatabase
-import org.komapper.r2dbc.dsl.R2dbcEntityDsl
-import org.komapper.r2dbc.dsl.R2dbcSchemaDsl
 import org.komapper.tx.r2dbc.transaction
 import java.time.LocalDateTime
 
@@ -45,29 +44,29 @@ fun main() = runBlocking {
     db.transaction {
         // create a schema
         db.runQuery {
-            R2dbcSchemaDsl.create(a)
+            SchemaDsl.create(a)
         }
 
         // CREATE
         val newAddress = db.runQuery {
-            R2dbcEntityDsl.insert(a).single(Address(street = "street A"))
+            EntityDsl.insert(a).single(Address(street = "street A"))
         }
 
         // READ: select by id
         val address1 = db.runQuery {
-            R2dbcEntityDsl.from(a).first { a.id eq newAddress.id }
+            EntityDsl.from(a).first { a.id eq newAddress.id }
         }
 
         println("address1 = $address1")
 
         // UPDATE
         db.runQuery {
-            R2dbcEntityDsl.update(a).single(address1.copy(street = "street B"))
+            EntityDsl.update(a).single(address1.copy(street = "street B"))
         }
 
         // READ: select by street
         val address2 = db.runQuery {
-            R2dbcEntityDsl.from(a).first { a.street eq "street B" }
+            EntityDsl.from(a).first { a.street eq "street B" }
         }
 
         println("address2 = $address2")
@@ -77,13 +76,13 @@ fun main() = runBlocking {
 
         // DELETE
         db.runQuery {
-            R2dbcEntityDsl.delete(a).single(address2)
+            EntityDsl.delete(a).single(address2)
         }
 
         // READ: select all
         val addressList = db.runQuery {
-            R2dbcEntityDsl.from(a).orderBy(a.id)
-        }.toList(mutableListOf())
+            EntityDsl.from(a).orderBy(a.id)
+        }
 
         println("addressList = $addressList")
         check(addressList.isEmpty()) { "The addressList must be empty." }

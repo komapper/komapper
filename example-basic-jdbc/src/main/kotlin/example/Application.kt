@@ -7,9 +7,9 @@ import org.komapper.annotation.KmEntityDef
 import org.komapper.annotation.KmId
 import org.komapper.annotation.KmUpdatedAt
 import org.komapper.annotation.KmVersion
+import org.komapper.core.dsl.EntityDsl
+import org.komapper.core.dsl.SchemaDsl
 import org.komapper.jdbc.Database
-import org.komapper.jdbc.dsl.EntityDsl
-import org.komapper.jdbc.dsl.SchemaDsl
 import org.komapper.tx.jdbc.transaction
 import java.time.LocalDateTime
 
@@ -52,9 +52,10 @@ fun main() {
         }
 
         // READ: select by id
+        // TODO
         val address1 = db.runQuery {
-            EntityDsl.from(a).first { a.id eq newAddress.id }
-        }
+            EntityDsl.from(a).where { a.id eq newAddress.id }
+        }.first()
 
         println("address1 = $address1")
 
@@ -65,8 +66,8 @@ fun main() {
 
         // READ: select by street
         val address2 = db.runQuery {
-            EntityDsl.from(a).first { a.street eq "street B" }
-        }
+            EntityDsl.from(a).where { a.street eq "street B" }
+        }.first()
 
         println("address2 = $address2")
         check(address1.id == address2.id)

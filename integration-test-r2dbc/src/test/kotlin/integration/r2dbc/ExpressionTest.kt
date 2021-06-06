@@ -3,6 +3,7 @@ package integration.r2dbc
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.komapper.core.dsl.SqlDsl
 import org.komapper.core.dsl.concat
 import org.komapper.core.dsl.div
 import org.komapper.core.dsl.literal
@@ -15,7 +16,6 @@ import org.komapper.core.dsl.rtrim
 import org.komapper.core.dsl.trim
 import org.komapper.core.dsl.upper
 import org.komapper.r2dbc.R2dbcDatabase
-import org.komapper.r2dbc.dsl.R2dbcSqlDsl
 
 @ExtendWith(Env::class)
 class ExpressionTest(private val db: R2dbcDatabase) {
@@ -24,13 +24,13 @@ class ExpressionTest(private val db: R2dbcDatabase) {
     fun plus() = inTransaction(db) {
         val a = Address.meta
         val result = db.runQuery {
-            R2dbcSqlDsl.from(a)
+            SqlDsl.from(a)
                 .where {
                     a.addressId eq 10
                 }
                 .select(a.addressId + 1)
                 .also {
-                    println(it.dryRun())
+                    println(db.dryRunQuery { it })
                 }.first()
         }
         assertEquals(11, result)
@@ -40,13 +40,13 @@ class ExpressionTest(private val db: R2dbcDatabase) {
     fun plus_other_column() = inTransaction(db) {
         val a = Address.meta
         val result = db.runQuery {
-            R2dbcSqlDsl.from(a)
+            SqlDsl.from(a)
                 .where {
                     a.addressId eq 10
                 }
                 .select(a.addressId + a.addressId)
                 .also {
-                    println(it.dryRun())
+                    println(db.dryRunQuery { it })
                 }.first()
         }
         assertEquals(20, result)
@@ -56,13 +56,13 @@ class ExpressionTest(private val db: R2dbcDatabase) {
     fun minus() = inTransaction(db) {
         val a = Address.meta
         val result = db.runQuery {
-            R2dbcSqlDsl.from(a)
+            SqlDsl.from(a)
                 .where {
                     a.addressId eq 10
                 }
                 .select(a.addressId - 10)
                 .also {
-                    println(it.dryRun())
+                    println(db.dryRunQuery { it })
                 }.first()
         }
         assertEquals(0, result)
@@ -72,13 +72,13 @@ class ExpressionTest(private val db: R2dbcDatabase) {
     fun minus_other_column() = inTransaction(db) {
         val a = Address.meta
         val result = db.runQuery {
-            R2dbcSqlDsl.from(a)
+            SqlDsl.from(a)
                 .where {
                     a.addressId eq 10
                 }
                 .select(a.addressId - a.addressId)
                 .also {
-                    println(it.dryRun())
+                    println(db.dryRunQuery { it })
                 }.first()
         }
         assertEquals(0, result)
@@ -88,13 +88,13 @@ class ExpressionTest(private val db: R2dbcDatabase) {
     fun div() = inTransaction(db) {
         val a = Address.meta
         val result = db.runQuery {
-            R2dbcSqlDsl.from(a)
+            SqlDsl.from(a)
                 .where {
                     a.addressId eq 10
                 }
                 .select(a.addressId / 2)
                 .also {
-                    println(it.dryRun())
+                    println(db.dryRunQuery { it })
                 }.first()
         }
         assertEquals(5, result)
@@ -104,13 +104,13 @@ class ExpressionTest(private val db: R2dbcDatabase) {
     fun div_other_column() = inTransaction(db) {
         val a = Address.meta
         val result = db.runQuery {
-            R2dbcSqlDsl.from(a)
+            SqlDsl.from(a)
                 .where {
                     a.addressId eq 10
                 }
                 .select(a.addressId / a.addressId)
                 .also {
-                    println(it.dryRun())
+                    println(db.dryRunQuery { it })
                 }.first()
         }
         assertEquals(1, result)
@@ -120,13 +120,13 @@ class ExpressionTest(private val db: R2dbcDatabase) {
     fun rem() = inTransaction(db) {
         val a = Address.meta
         val result = db.runQuery {
-            R2dbcSqlDsl.from(a)
+            SqlDsl.from(a)
                 .where {
                     a.addressId eq 10
                 }
                 .select(a.addressId % 3)
                 .also {
-                    println(it.dryRun())
+                    println(db.dryRunQuery { it })
                 }.first()
         }
         assertEquals(1, result)
@@ -136,13 +136,13 @@ class ExpressionTest(private val db: R2dbcDatabase) {
     fun rem_other_column() = inTransaction(db) {
         val a = Address.meta
         val result = db.runQuery {
-            R2dbcSqlDsl.from(a)
+            SqlDsl.from(a)
                 .where {
                     a.addressId eq 10
                 }
                 .select(a.addressId % a.addressId)
                 .also {
-                    println(it.dryRun())
+                    println(db.dryRunQuery { it })
                 }.first()
         }
         assertEquals(0, result)
@@ -152,13 +152,13 @@ class ExpressionTest(private val db: R2dbcDatabase) {
     fun concat() = inTransaction(db) {
         val a = Address.meta
         val result = db.runQuery {
-            R2dbcSqlDsl.from(a)
+            SqlDsl.from(a)
                 .where {
                     a.addressId eq 10
                 }
                 .select(concat(concat("[", a.street), "]"))
                 .also {
-                    println(it.dryRun())
+                    println(db.dryRunQuery { it })
                 }.first()
         }
         assertEquals("[STREET 10]", result)
@@ -168,13 +168,13 @@ class ExpressionTest(private val db: R2dbcDatabase) {
     fun concat_other_column() = inTransaction(db) {
         val a = Address.meta
         val result = db.runQuery {
-            R2dbcSqlDsl.from(a)
+            SqlDsl.from(a)
                 .where {
                     a.addressId eq 10
                 }
                 .select(concat(concat(a.street, a.street), a.street))
                 .also {
-                    println(it.dryRun())
+                    println(db.dryRunQuery { it })
                 }.first()
         }
         assertEquals("STREET 10STREET 10STREET 10", result)
@@ -184,7 +184,7 @@ class ExpressionTest(private val db: R2dbcDatabase) {
     fun lowerFunction() = inTransaction(db) {
         val a = Address.meta
         val result = db.runQuery {
-            R2dbcSqlDsl.from(a).select(lower(literal("TEST"))).first()
+            SqlDsl.from(a).select(lower(literal("TEST"))).first()
         }
         assertEquals("test", result)
     }
@@ -193,7 +193,7 @@ class ExpressionTest(private val db: R2dbcDatabase) {
     fun upperFunction() = inTransaction(db) {
         val a = Address.meta
         val result = db.runQuery {
-            R2dbcSqlDsl.from(a).select(upper(literal("test"))).first()
+            SqlDsl.from(a).select(upper(literal("test"))).first()
         }
         assertEquals("TEST", result)
     }
@@ -202,7 +202,7 @@ class ExpressionTest(private val db: R2dbcDatabase) {
     fun trimFunction() = inTransaction(db) {
         val a = Address.meta
         val result = db.runQuery {
-            R2dbcSqlDsl.from(a).select(trim(literal(" test "))).first()
+            SqlDsl.from(a).select(trim(literal(" test "))).first()
         }
         assertEquals("test", result)
     }
@@ -211,7 +211,7 @@ class ExpressionTest(private val db: R2dbcDatabase) {
     fun ltrimFunction() = inTransaction(db) {
         val a = Address.meta
         val result = db.runQuery {
-            R2dbcSqlDsl.from(a).select(ltrim(literal(" test "))).first()
+            SqlDsl.from(a).select(ltrim(literal(" test "))).first()
         }
         assertEquals("test ", result)
     }
@@ -220,7 +220,7 @@ class ExpressionTest(private val db: R2dbcDatabase) {
     fun rtrimFunction() = inTransaction(db) {
         val a = Address.meta
         val result = db.runQuery {
-            R2dbcSqlDsl.from(a).select(rtrim(literal(" test "))).first()
+            SqlDsl.from(a).select(rtrim(literal(" test "))).first()
         }
         assertEquals(" test", result)
     }

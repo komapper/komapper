@@ -7,9 +7,9 @@ import org.komapper.annotation.KmEntityDef
 import org.komapper.annotation.KmId
 import org.komapper.annotation.KmUpdatedAt
 import org.komapper.annotation.KmVersion
+import org.komapper.core.dsl.EntityDsl
+import org.komapper.core.dsl.SchemaDsl
 import org.komapper.jdbc.Database
-import org.komapper.jdbc.dsl.EntityDsl
-import org.komapper.jdbc.dsl.SchemaDsl
 import org.komapper.tx.jdbc.transaction
 import java.time.LocalDateTime
 

@@ -6,8 +6,8 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.OptimisticLockException
+import org.komapper.core.dsl.EntityDsl
 import org.komapper.jdbc.Database
-import org.komapper.jdbc.dsl.EntityDsl
 
 @ExtendWith(Env::class)
 class EntityDeleteBatchQueryTest(private val db: Database) {

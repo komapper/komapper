@@ -10,9 +10,9 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.ClockProvider
 import org.komapper.core.OptimisticLockException
 import org.komapper.core.UniqueConstraintException
+import org.komapper.core.dsl.EntityDsl
 import org.komapper.jdbc.Database
 import org.komapper.jdbc.DatabaseConfig
-import org.komapper.jdbc.dsl.EntityDsl
 import java.time.Clock
 import java.time.Instant
 import java.time.LocalDateTime

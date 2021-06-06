@@ -5,8 +5,8 @@ import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.komapper.core.dsl.SqlDsl
 import org.komapper.r2dbc.R2dbcDatabase
-import org.komapper.r2dbc.dsl.R2dbcSqlDsl
 import java.math.BigDecimal
 import java.time.LocalDate
 
@@ -17,8 +17,7 @@ class SqlInsertQueryTest(private val db: R2dbcDatabase) {
     fun test() = inTransaction(db) {
         val a = Address.meta
         val (count, key) = db.runQuery {
-            R2dbcSqlDsl.insert(a).values {
-
+            SqlDsl.insert(a).values {
                 a.addressId set 19
                 a.street set "STREET 16"
                 a.version set 0
@@ -32,7 +31,7 @@ class SqlInsertQueryTest(private val db: R2dbcDatabase) {
     fun setIfNotNull() = inTransaction(db) {
         val e = Employee.meta
         val (count, key) = db.runQuery {
-            R2dbcSqlDsl.insert(e).values {
+            SqlDsl.insert(e).values {
                 e.employeeId set 99
                 e.departmentId set 1
                 e.addressId set 1
@@ -47,7 +46,7 @@ class SqlInsertQueryTest(private val db: R2dbcDatabase) {
         assertEquals(1, count)
         assertNull(key)
 
-        val employee = db.runQuery { R2dbcSqlDsl.from(e).first { e.employeeId eq 99 } }
+        val employee = db.runQuery { SqlDsl.from(e).first { e.employeeId eq 99 } }
         assertNull(employee.managerId)
     }
 
@@ -55,7 +54,7 @@ class SqlInsertQueryTest(private val db: R2dbcDatabase) {
     fun generatedKeys() = inTransaction(db) {
         val a = IdentityStrategy.meta
         val (count, key) = db.runQuery {
-            R2dbcSqlDsl.insert(a).values {
+            SqlDsl.insert(a).values {
                 a.id set 10
                 a.value set "test"
             }
@@ -69,8 +68,8 @@ class SqlInsertQueryTest(private val db: R2dbcDatabase) {
         val a = Address.meta
         val aa = Address.newMeta(table = "ADDRESS_ARCHIVE")
         val (count) = db.runQuery {
-            R2dbcSqlDsl.insert(aa).select {
-                R2dbcSqlDsl.from(a).where { a.addressId between 1..5 }
+            SqlDsl.insert(aa).select {
+                SqlDsl.from(a).where { a.addressId between 1..5 }
             }
         }
         assertEquals(5, count)

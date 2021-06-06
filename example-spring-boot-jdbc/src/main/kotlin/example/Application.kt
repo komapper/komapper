@@ -3,9 +3,9 @@ package example
 import org.komapper.annotation.KmAutoIncrement
 import org.komapper.annotation.KmEntityDef
 import org.komapper.annotation.KmId
+import org.komapper.core.dsl.EntityDsl
 import org.komapper.core.dsl.desc
 import org.komapper.jdbc.Database
-import org.komapper.jdbc.dsl.EntityDsl
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.transaction.annotation.Transactional

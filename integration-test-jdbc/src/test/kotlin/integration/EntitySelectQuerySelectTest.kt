@@ -3,8 +3,8 @@ package integration
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.komapper.core.dsl.EntityDsl
 import org.komapper.jdbc.Database
-import org.komapper.jdbc.dsl.EntityDsl
 
 @ExtendWith(Env::class)
 class EntitySelectQuerySelectTest(private val db: Database) {
@@ -17,6 +17,16 @@ class EntitySelectQuerySelectTest(private val db: Database) {
                 .asSqlQuery().select(a.street).first()
         }
         assertEquals("STREET 1", street)
+    }
+
+    @Test
+    fun singleList() {
+        val a = Address.meta
+        val streets = db.runQuery {
+            EntityDsl.from(a).where { a.addressId inList listOf(1, 2) }
+                .asSqlQuery().select(a.street)
+        }
+        assertEquals(listOf("STREET 1", "STREET 2"), streets)
     }
 
     @Test

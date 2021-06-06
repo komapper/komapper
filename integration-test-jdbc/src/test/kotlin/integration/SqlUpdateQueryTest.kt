@@ -4,10 +4,10 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
+import org.komapper.core.dsl.SqlDsl
 import org.komapper.core.dsl.concat
 import org.komapper.core.dsl.plus
 import org.komapper.jdbc.Database
-import org.komapper.jdbc.dsl.SqlDsl
 
 @ExtendWith(Env::class)
 class SqlUpdateQueryTest(private val db: Database) {

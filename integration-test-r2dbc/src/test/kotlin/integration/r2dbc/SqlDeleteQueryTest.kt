@@ -4,8 +4,8 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
+import org.komapper.core.dsl.SqlDsl
 import org.komapper.r2dbc.R2dbcDatabase
-import org.komapper.r2dbc.dsl.R2dbcSqlDsl
 
 @ExtendWith(Env::class)
 class SqlDeleteQueryTest(private val db: R2dbcDatabase) {
@@ -14,7 +14,7 @@ class SqlDeleteQueryTest(private val db: R2dbcDatabase) {
     fun test() = inTransaction(db) {
         val a = Address.meta
         val count = db.runQuery {
-            R2dbcSqlDsl.delete(a).where { a.addressId eq 15 }
+            SqlDsl.delete(a).where { a.addressId eq 15 }
         }
         assertEquals(1, count)
     }
@@ -25,7 +25,7 @@ class SqlDeleteQueryTest(private val db: R2dbcDatabase) {
         val ex = assertThrows<IllegalStateException> {
             @Suppress("UNUSED_VARIABLE")
             val count = db.runQuery {
-                R2dbcSqlDsl.delete(e)
+                SqlDsl.delete(e)
             }
         }
         assertEquals("Empty where clause is not allowed.", ex.message)
@@ -35,7 +35,7 @@ class SqlDeleteQueryTest(private val db: R2dbcDatabase) {
     fun allowEmptyWhereClause_true() = inTransaction(db) {
         val e = Employee.meta
         val count = db.runQuery {
-            R2dbcSqlDsl.delete(e).option { it.copy(allowEmptyWhereClause = true) }
+            SqlDsl.delete(e).option { it.copy(allowEmptyWhereClause = true) }
         }
         assertEquals(14, count)
     }

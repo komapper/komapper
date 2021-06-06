@@ -1,13 +1,14 @@
 package integration
 
+import kotlinx.coroutines.flow.count
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.komapper.core.dsl.EntityDsl
 import org.komapper.core.dsl.desc
 import org.komapper.jdbc.Database
-import org.komapper.jdbc.dsl.EntityDsl
 
 @ExtendWith(Env::class)
 class EntitySelectQueryTest(private val db: Database) {
@@ -37,6 +38,15 @@ class EntitySelectQueryTest(private val db: Database) {
             EntityDsl.from(a).where { a.addressId eq 99 }.firstOrNull()
         }
         assertNull(address)
+    }
+
+    @Test
+    fun collect() {
+        val a = Address.meta
+        val count = db.runQuery {
+            EntityDsl.from(a).collect { it.count() }
+        }
+        assertEquals(15, count)
     }
 
     @Test

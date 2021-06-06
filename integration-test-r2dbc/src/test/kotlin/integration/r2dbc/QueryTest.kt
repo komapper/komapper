@@ -1,13 +1,11 @@
 package integration.r2dbc
 
-import kotlinx.coroutines.flow.count
-import kotlinx.coroutines.flow.toList
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.komapper.core.dsl.EntityDsl
+import org.komapper.core.dsl.SqlDsl
 import org.komapper.r2dbc.R2dbcDatabase
-import org.komapper.r2dbc.dsl.R2dbcEntityDsl
-import org.komapper.r2dbc.dsl.R2dbcSqlDsl
 
 @ExtendWith(Env::class)
 class QueryTest(private val db: R2dbcDatabase) {
@@ -16,26 +14,26 @@ class QueryTest(private val db: R2dbcDatabase) {
     fun plus() = inTransaction(db) {
         val a = Address.meta
         val address = Address(16, "STREET 16", 0)
-        val q1 = R2dbcEntityDsl.insert(a).single(address)
-        val q2 = R2dbcSqlDsl.insert(a).values {
+        val q1 = EntityDsl.insert(a).single(address)
+        val q2 = SqlDsl.insert(a).values {
             a.addressId set 17
             a.street set "STREET 17"
             a.version set 0
         }
-        val q3 = R2dbcEntityDsl.from(a).where { a.addressId inList listOf(16, 17) }
+        val q3 = EntityDsl.from(a).where { a.addressId inList listOf(16, 17) }
         val list = db.runQuery { q1 + q2 + q3 }.toList()
         assertEquals(2, list.size)
-        println((q1 + q2 + q3).dryRun())
+        println(db.dryRunQuery { q1 + q2 + q3 })
     }
 
     @Test
     fun flatMap() = inTransaction(db) {
         val a = Address.meta
         val address = Address(16, "STREET 16", 0)
-        val query = R2dbcEntityDsl.insert(a).single(address).flatMap {
+        val query = EntityDsl.insert(a).single(address).flatMap {
             val addressId = it.addressId
             val e = Employee.meta
-            R2dbcEntityDsl.from(e).where { e.addressId less addressId }
+            EntityDsl.from(e).where { e.addressId less addressId }
         }
         val list = db.runQuery { query }.toList()
         assertEquals(14, list.size)
@@ -45,10 +43,10 @@ class QueryTest(private val db: R2dbcDatabase) {
     fun flatZip() = inTransaction(db) {
         val a = Address.meta
         val address = Address(16, "STREET 16", 0)
-        val query = R2dbcEntityDsl.insert(a).single(address).flatZip {
+        val query = EntityDsl.insert(a).single(address).flatZip {
             val addressId = it.addressId
             val e = Employee.meta
-            R2dbcEntityDsl.from(e).where { e.addressId less addressId }
+            EntityDsl.from(e).where { e.addressId less addressId }
         }
         val (newAddress, flow) = db.runQuery { query }
         assertEquals(16, newAddress.addressId)
