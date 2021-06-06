@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController
 class Application(private val database: R2dbcDatabase) {
 
     @RequestMapping("/")
-    suspend fun list(): Flow<Message> {
+    fun list(): Flow<Message> {
         return database.runFlowableQuery {
             val m = MessageDef.meta
             SqlDsl.from(m).orderBy(m.id.desc())

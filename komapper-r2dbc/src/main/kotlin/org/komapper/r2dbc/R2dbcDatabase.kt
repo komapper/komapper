@@ -60,7 +60,7 @@ interface R2dbcDatabase {
         return query.accept(R2dbcQueryVisitor()) as R2dbcQueryRunner<T>
     }
 
-    suspend fun <T> runFlowableQuery(block: QueryScope.() -> FlowableQuery<T>): Flow<T> {
+    fun <T> runFlowableQuery(block: QueryScope.() -> FlowableQuery<T>): Flow<T> {
         val runner = getFlowQueryRunner(block)
         return runner.run(config)
     }
