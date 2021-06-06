@@ -5,7 +5,7 @@ import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.jdbc.JdbcDialect
 import java.sql.ResultSet
 
-internal object Providers {
+internal object ResultSetTransformers {
 
     fun <T : Any> singleEntity(metamodel: EntityMetamodel<T, *, *>): (JdbcDialect, ResultSet) -> T = { dialect, rs ->
         val mapper = EntityMapper(dialect, rs)

@@ -19,7 +19,6 @@ class TemplateSelectQueryTest(private val db: R2dbcDatabase) {
         )
     }
 
-    // TODO index
     private val asAddressByIndex: (Row) -> Address = { row ->
         Address(
             row.asInt(0)!!,

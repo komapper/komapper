@@ -21,7 +21,7 @@ internal data class TemplateSelectQueryRunner<T, R>(
         return executor.executeQuery(
             statement,
             { dialect, rs ->
-                val row = RowImpl(dialect, rs)
+                val row = JdbcRow(dialect, rs)
                 provide(row)
             },
             collect

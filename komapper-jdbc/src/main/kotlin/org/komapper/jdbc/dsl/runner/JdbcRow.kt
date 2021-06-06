@@ -1,13 +1,14 @@
-package org.komapper.r2dbc.dsl.runner
+package org.komapper.jdbc.dsl.runner
 
 import org.komapper.core.dsl.query.Row
-import org.komapper.r2dbc.R2dbcDialect
+import org.komapper.jdbc.JdbcDialect
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.sql.Array
 import java.sql.Blob
 import java.sql.Clob
 import java.sql.NClob
+import java.sql.ResultSet
 import java.sql.SQLXML
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -17,9 +18,9 @@ import java.util.UUID
 import kotlin.reflect.KClass
 import kotlin.reflect.cast
 
-class RowImpl(
-    private val dialect: R2dbcDialect,
-    private val row: io.r2dbc.spi.Row
+internal class JdbcRow(
+    private val dialect: JdbcDialect,
+    private val rs: ResultSet
 ) : Row {
 
     override fun asAny(index: Int): Any? {
@@ -199,10 +200,10 @@ class RowImpl(
     }
 
     override fun <T : Any> asT(index: Int, klass: KClass<T>): T? {
-        return dialect.getValue(row, index, klass)?.let { klass.cast(it) }
+        return dialect.getValue(rs, index + 1, klass)?.let { klass.cast(it) }
     }
 
     override fun <T : Any> asT(columnLabel: String, klass: KClass<T>): T? {
-        return dialect.getValue(row, columnLabel, klass)?.let { klass.cast(it) }
+        return dialect.getValue(rs, columnLabel, klass)?.let { klass.cast(it) }
     }
 }
