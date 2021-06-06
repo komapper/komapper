@@ -1,6 +1,14 @@
 package integration.r2dbc
 
-import integration.r2dbc.setting.Dbms
+import integration.IntId
+import integration.Street
+import integration.VAddress
+import integration.VIdentityStrategy
+import integration.VPerson
+import integration.VSequenceStrategy
+import integration.Version
+import integration.meta
+import integration.setting.Dbms
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull

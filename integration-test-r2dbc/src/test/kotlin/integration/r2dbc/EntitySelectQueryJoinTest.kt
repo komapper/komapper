@@ -1,5 +1,10 @@
 package integration.r2dbc
 
+import integration.Address
+import integration.Department
+import integration.Employee
+import integration.meta
+import integration.newMeta
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test

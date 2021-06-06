@@ -1,34 +1,9 @@
-plugins {
-    idea
-    id("com.google.devtools.ksp")
-}
-
-sourceSets {
-    test {
-        java {
-            srcDir("build/generated/ksp/main/kotlin")
-        }
-    }
-}
-
-idea.module {
-    generatedSourceDirs.add(file("build/generated/ksp/main/kotlin"))
-}
-
 dependencies {
-    compileOnly(project(":komapper-annotation"))
-    ksp(project(":komapper-processor"))
+    implementation(project(":integration-test-core"))
     implementation(project(":komapper-tx-r2dbc"))
     runtimeOnly(project(":komapper-dialect-h2-r2dbc"))
     runtimeOnly(project(":komapper-dialect-mysql-r2dbc"))
     runtimeOnly(project(":komapper-dialect-postgresql-r2dbc"))
-    runtimeOnly(project(":komapper-slf4j"))
-    runtimeOnly(project(":komapper-template"))
-    runtimeOnly("ch.qos.logback:logback-classic:1.2.3")
-}
-
-ksp {
-    arg("komapper.namingStrategy", "UPPER_SNAKE_CASE")
 }
 
 tasks {

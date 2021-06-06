@@ -1,7 +1,7 @@
 package integration.r2dbc
 
-import integration.r2dbc.setting.Dbms
-import integration.r2dbc.setting.Setting
+import integration.r2dbc.setting.SettingProvider
+import integration.setting.Dbms
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.emptyFlow
@@ -35,7 +35,7 @@ internal class Env :
         val initialized: AtomicBoolean = AtomicBoolean(false)
     }
 
-    private val setting = Setting.get()
+    private val setting = SettingProvider.get()
     private val db = R2dbcDatabase.create(setting.config)
     private var beforeAllFlow: Flow<Unit> = emptyFlow()
 

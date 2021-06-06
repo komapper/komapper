@@ -1,5 +1,7 @@
 package integration.r2dbc
 
+import integration.Address
+import integration.meta
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertNull

@@ -1,5 +1,10 @@
 package integration.r2dbc
 
+import integration.BooleanTest
+import integration.IntTest
+import integration.LongTest
+import integration.StringTest
+import integration.meta
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
