@@ -200,7 +200,7 @@ internal class RowImpl(
     }
 
     override fun <T : Any> asT(index: Int, klass: KClass<T>): T? {
-        return dialect.getValue(rs, index, klass)?.let { klass.cast(it) }
+        return dialect.getValue(rs, index + 1, klass)?.let { klass.cast(it) }
     }
 
     override fun <T : Any> asT(columnLabel: String, klass: KClass<T>): T? {

@@ -14,6 +14,9 @@ import java.time.OffsetDateTime
 import java.util.UUID
 import kotlin.reflect.KClass
 
+/**
+ * Note that columns are numbered from 0.
+ */
 interface Row {
     fun asAny(index: Int): Any?
     fun asAny(columnLabel: String): Any?

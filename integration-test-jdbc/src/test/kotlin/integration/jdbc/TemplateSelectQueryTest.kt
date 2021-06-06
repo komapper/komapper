@@ -22,9 +22,9 @@ class TemplateSelectQueryTest(private val db: Database) {
 
     private val asAddressByIndex: (Row) -> Address = { row ->
         Address(
-            row.asInt(1)!!,
-            row.asString(2)!!,
-            row.asInt(3)!!
+            row.asInt(0)!!,
+            row.asString(1)!!,
+            row.asInt(2)!!
         )
     }
 
