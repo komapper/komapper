@@ -52,10 +52,9 @@ fun main() {
         }
 
         // READ: select by id
-        // TODO
         val address1 = db.runQuery {
-            EntityDsl.from(a).where { a.id eq newAddress.id }
-        }.first()
+            EntityDsl.from(a).where { a.id eq newAddress.id }.first()
+        }
 
         println("address1 = $address1")
 
@@ -66,8 +65,8 @@ fun main() {
 
         // READ: select by street
         val address2 = db.runQuery {
-            EntityDsl.from(a).where { a.street eq "street B" }
-        }.first()
+            EntityDsl.from(a).where { a.street eq "street B" }.first()
+        }
 
         println("address2 = $address2")
         check(address1.id == address2.id)

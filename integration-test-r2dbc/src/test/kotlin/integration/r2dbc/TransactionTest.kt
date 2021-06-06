@@ -1,5 +1,7 @@
 package integration.r2dbc
 
+import integration.Address
+import integration.meta
 import io.r2dbc.spi.ConnectionFactories
 import io.r2dbc.spi.IsolationLevel
 import kotlinx.coroutines.reactive.awaitFirstOrNull

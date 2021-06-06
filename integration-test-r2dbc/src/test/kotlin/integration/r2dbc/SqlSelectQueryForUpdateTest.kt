@@ -1,5 +1,7 @@
 package integration.r2dbc
 
+import integration.Address
+import integration.meta
 import kotlinx.coroutines.flow.toList
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test

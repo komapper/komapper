@@ -1,5 +1,10 @@
 package integration.r2dbc
 
+import integration.Address
+import integration.Employee
+import integration.IdentityStrategy
+import integration.meta
+import integration.newMeta
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertNull
@@ -46,7 +51,7 @@ class SqlInsertQueryTest(private val db: R2dbcDatabase) {
         assertEquals(1, count)
         assertNull(key)
 
-        val employee = db.runQuery { SqlDsl.from(e).first { e.employeeId eq 99 } }
+        val employee = db.runQuery { SqlDsl.from(e).where { e.employeeId eq 99 }.first() }
         assertNull(employee.managerId)
     }
 

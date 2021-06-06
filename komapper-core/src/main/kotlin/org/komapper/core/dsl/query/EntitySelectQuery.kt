@@ -26,9 +26,6 @@ interface EntitySelectQuery<ENTITY : Any> : Subquery<ENTITY> {
         on: OnDeclaration<OTHER_ENTITY>
     ): EntitySelectQuery<ENTITY>
 
-    // TODO
-    fun first(declaration: WhereDeclaration): Query<ENTITY>
-    fun firstOrNull(declaration: WhereDeclaration): Query<ENTITY?>
     fun where(declaration: WhereDeclaration): EntitySelectQuery<ENTITY>
     fun orderBy(vararg expressions: ColumnExpression<*, *>): EntitySelectQuery<ENTITY>
     fun offset(offset: Int): EntitySelectQuery<ENTITY>
@@ -75,18 +72,6 @@ data class EntitySelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY
     ): EntitySelectQueryImpl<ENTITY, ID, META> {
         val newContext = support.leftJoin(metamodel, on)
         return copy(context = newContext)
-    }
-
-    override fun first(declaration: WhereDeclaration): Query<ENTITY> {
-        val newContext = support.first(declaration)
-        val query = copy(context = newContext)
-        return query.first()
-    }
-
-    override fun firstOrNull(declaration: WhereDeclaration): Query<ENTITY?> {
-        val newContext = support.first(declaration)
-        val query = copy(context = newContext)
-        return query.firstOrNull()
     }
 
     override fun where(declaration: WhereDeclaration): EntitySelectQueryImpl<ENTITY, ID, META> {

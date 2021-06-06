@@ -69,5 +69,6 @@ include("example-starter-jdbc")
 include("example-starter-r2dbc")
 
 // TEST
+include("integration-test-core")
 include("integration-test-jdbc")
 include("integration-test-r2dbc")

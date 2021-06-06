@@ -1,6 +1,14 @@
 package integration.r2dbc
 
-import integration.r2dbc.setting.Dbms
+import integration.IntId
+import integration.Street
+import integration.VAddress
+import integration.VIdentityStrategy
+import integration.VPerson
+import integration.VSequenceStrategy
+import integration.Version
+import integration.meta
+import integration.setting.Dbms
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
@@ -45,9 +53,9 @@ class ValueClassTest(val db: R2dbcDatabase) {
         val address = VAddress(IntId(16), Street("STREET 16"), Version(0))
         db.runQuery { EntityDsl.insert(a).single(address) }
         val address2 = db.runQuery {
-            EntityDsl.from(a).first {
+            EntityDsl.from(a).where {
                 a.addressId eq IntId(16)
-            }
+            }.first()
         }
         assertEquals(address, address2)
     }
@@ -57,14 +65,14 @@ class ValueClassTest(val db: R2dbcDatabase) {
         val p = VPerson.meta
         val person1 = VPerson(IntId(1), "ABC")
         val id = db.runQuery { EntityDsl.insert(p).single(person1) }.personId
-        val person2 = db.runQuery { EntityDsl.from(p).first { p.personId eq id } }
+        val person2 = db.runQuery { EntityDsl.from(p).where { p.personId eq id }.first() }
         assertNotNull(person2.createdAt)
         assertNotNull(person2.updatedAt)
         assertEquals(person2.createdAt, person2.updatedAt)
         val person3 = db.runQuery {
-            EntityDsl.from(p).first {
+            EntityDsl.from(p).where {
                 p.personId to 1
-            }
+            }.first()
         }
         assertEquals(person2, person3)
     }
@@ -90,7 +98,7 @@ class ValueClassTest(val db: R2dbcDatabase) {
     @Test
     fun updated_timestamp() = inTransaction(db) {
         val p = VPerson.meta
-        val findQuery = EntityDsl.from(p).first { p.personId eq IntId(1) }
+        val findQuery = EntityDsl.from(p).where { p.personId eq IntId(1) }.first()
         val person1 = VPerson(IntId(1), "ABC")
         val person2 = db.runQuery {
             EntityDsl.insert(p).single(person1) + findQuery

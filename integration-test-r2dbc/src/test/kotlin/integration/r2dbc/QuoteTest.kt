@@ -1,6 +1,12 @@
 package integration.r2dbc
 
-import integration.r2dbc.setting.Dbms
+import integration.BlankName
+import integration.CatalogAndSchema
+import integration.CatalogOnly
+import integration.Order
+import integration.SchemaOnly
+import integration.meta
+import integration.setting.Dbms
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue

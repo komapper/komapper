@@ -1,5 +1,7 @@
 package integration.r2dbc
 
+import integration.Address
+import integration.meta
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -15,9 +17,9 @@ class EntityDeleteQueryTest(private val db: R2dbcDatabase) {
     fun optimisticLockException() = inTransaction(db) {
         val a = Address.meta
         val address = db.runQuery {
-            EntityDsl.from(a).first {
+            EntityDsl.from(a).where {
                 a.addressId eq 15
-            }
+            }.first()
         }
         db.runQuery { EntityDsl.delete(a).single(address) }
         assertThrows<OptimisticLockException> {

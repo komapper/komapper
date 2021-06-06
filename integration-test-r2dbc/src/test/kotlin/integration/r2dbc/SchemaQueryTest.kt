@@ -1,5 +1,10 @@
 package integration.r2dbc
 
+import integration.Aaa
+import integration.Bbb
+import integration.Ccc
+import integration.CompositeKeyAddress
+import integration.meta
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.SchemaDsl
