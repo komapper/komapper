@@ -10,18 +10,22 @@ For more documentation, go to our site: https://www.komapper.org/docs/.
 
 ## Features
 
-- compile-time code generation using [Kotlin Symbol Processing API](https://github.com/google/ksp)
-- annotation-free data models
-- value class support
-- immutable and composable queries
-- upsert (insert-or-update) query support
+- Support both JDBC and R2DBC
+- Most features work without reflection, thanks to [KSP](https://github.com/google/ksp)
+- Entity classes do not require any annotations
+- Support Kotlin value classes
+- Provide Spring Boot autoconfigures
+
+## Status
+
+This project is still in development, all suggestions and contributions are welcome.
 
 ## Examples
 
-### Data model and mapping definition
+### Entity class and mapping definition
 
 ```kotlin
-// Data model: this class doesn't require any annotations.
+// Entity class: this class does not require any annotations.
 data class Address(
     val id: Int = 0,
     val street: String,
