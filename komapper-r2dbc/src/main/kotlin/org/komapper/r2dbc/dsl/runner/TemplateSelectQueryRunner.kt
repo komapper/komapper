@@ -21,7 +21,7 @@ internal data class TemplateSelectQueryRunner<T, R>(
         return executor.executeQuery(
             statement,
             { dialect, row ->
-                provide(RowImpl(dialect, row))
+                provide(R2dbcRow(dialect, row))
             },
             collect
         )

@@ -18,7 +18,7 @@ import java.util.UUID
 import kotlin.reflect.KClass
 import kotlin.reflect.cast
 
-internal class RowImpl(
+internal class JdbcRow(
     private val dialect: JdbcDialect,
     private val rs: ResultSet
 ) : Row {

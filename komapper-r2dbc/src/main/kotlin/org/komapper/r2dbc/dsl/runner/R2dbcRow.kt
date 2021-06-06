@@ -17,7 +17,7 @@ import java.util.UUID
 import kotlin.reflect.KClass
 import kotlin.reflect.cast
 
-class RowImpl(
+class R2dbcRow(
     private val dialect: R2dbcDialect,
     private val row: io.r2dbc.spi.Row
 ) : Row {

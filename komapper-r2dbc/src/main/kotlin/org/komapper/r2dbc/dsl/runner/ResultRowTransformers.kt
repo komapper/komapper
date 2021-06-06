@@ -9,7 +9,7 @@ import org.komapper.core.dsl.query.Entities
 import org.komapper.core.dsl.query.EntitiesImpl
 import org.komapper.r2dbc.R2dbcDialect
 
-internal object RowTransformers {
+internal object ResultRowTransformers {
 
     fun <ENTITY : Any> singleEntity(metamodel: EntityMetamodel<ENTITY, *, *>): (R2dbcDialect, Row) -> ENTITY =
         { dialect, row ->
