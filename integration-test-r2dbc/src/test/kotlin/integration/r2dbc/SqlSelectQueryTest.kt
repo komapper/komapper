@@ -63,14 +63,14 @@ class SqlSelectQueryTest(private val db: R2dbcDatabase) {
     @Test
     fun shortcut_first() = inTransaction(db) {
         val a = Address.meta
-        val address = db.runQuery { SqlDsl.from(a).first { a.addressId eq 1 } }
+        val address = db.runQuery { SqlDsl.from(a).where { a.addressId eq 1 }.first() }
         Assertions.assertNotNull(address)
     }
 
     @Test
     fun shortcut_firstOrNull() = inTransaction(db) {
         val a = Address.meta
-        val address = db.runQuery { SqlDsl.from(a).firstOrNull { a.addressId eq -1 } }
+        val address = db.runQuery { SqlDsl.from(a).where { a.addressId eq -1 }.firstOrNull() }
         Assertions.assertNull(address)
     }
 
@@ -78,7 +78,7 @@ class SqlSelectQueryTest(private val db: R2dbcDatabase) {
     fun shortcut_first_multipleCondition() = inTransaction(db) {
         val a = Address.meta
         val address = db.runQuery {
-            SqlDsl.from(a).first { a.addressId eq 1; a.version eq 1 }
+            SqlDsl.from(a).where { a.addressId eq 1; a.version eq 1 }.first()
         }
         Assertions.assertNotNull(address)
     }

@@ -53,7 +53,7 @@ fun main() {
 
         // READ: select by id
         val address1 = db.runQuery {
-            EntityDsl.from(a).first { a.id eq newAddress.id }
+            EntityDsl.from(a).where { a.id eq newAddress.id }.first()
         }
 
         println("address1 = $address1")
@@ -65,7 +65,7 @@ fun main() {
 
         // READ: select by street
         val address2 = db.runQuery {
-            EntityDsl.from(a).first { a.street eq "street B" }
+            EntityDsl.from(a).where { a.street eq "street B" }.first()
         }
 
         println("address2 = $address2")

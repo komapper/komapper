@@ -30,9 +30,6 @@ interface SqlSelectQuery<ENTITY : Any> : Subquery<ENTITY>, FlowableQuery<ENTITY>
         on: OnDeclaration<OTHER_ENTITY>
     ): SqlSelectQuery<ENTITY>
 
-    // TODO
-    fun first(declaration: WhereDeclaration): Query<ENTITY>
-    fun firstOrNull(declaration: WhereDeclaration): Query<ENTITY?>
     fun where(declaration: WhereDeclaration): SqlSelectQuery<ENTITY>
     fun groupBy(vararg expressions: ColumnExpression<*, *>): SqlSelectQuery<ENTITY>
     fun having(declaration: HavingDeclaration): SqlSelectQuery<ENTITY>
@@ -120,18 +117,6 @@ data class SqlSelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, I
     ): SqlSelectQueryImpl<ENTITY, ID, META> {
         val newContext = support.leftJoin(metamodel, on)
         return copy(context = newContext)
-    }
-
-    override fun first(declaration: WhereDeclaration): Query<ENTITY> {
-        val newContext = support.first(declaration)
-        val query = copy(context = newContext)
-        return query.first()
-    }
-
-    override fun firstOrNull(declaration: WhereDeclaration): Query<ENTITY?> {
-        val newContext = support.first(declaration)
-        val query = copy(context = newContext)
-        return query.firstOrNull()
     }
 
     override fun where(declaration: WhereDeclaration): SqlSelectQueryImpl<ENTITY, ID, META> {

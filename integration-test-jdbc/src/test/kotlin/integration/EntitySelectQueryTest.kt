@@ -66,27 +66,4 @@ class EntitySelectQueryTest(private val db: Database) {
             list
         )
     }
-
-    @Test
-    fun shortcut_first() {
-        val a = Address.meta
-        val address = db.runQuery { EntityDsl.from(a).first { a.addressId eq 1 } }
-        assertNotNull(address)
-    }
-
-    @Test
-    fun shortcut_firstOrNull() {
-        val a = Address.meta
-        val address = db.runQuery { EntityDsl.from(a).firstOrNull { a.addressId eq -1 } }
-        assertNull(address)
-    }
-
-    @Test
-    fun shortcut_first_multipleCondition() {
-        val a = Address.meta
-        val address = db.runQuery {
-            EntityDsl.from(a).first { a.addressId eq 1; a.version eq 1 }
-        }
-        assertNotNull(address)
-    }
 }

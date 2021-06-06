@@ -24,9 +24,9 @@ class SqlUpdateQueryTest(private val db: Database) {
         }
         assertEquals(1, count)
         val address = db.runQuery {
-            SqlDsl.from(a).first {
+            SqlDsl.from(a).where {
                 a.addressId eq 1
-            }
+            }.first()
         }
         assertEquals("STREET 16", address.street)
     }
@@ -44,9 +44,9 @@ class SqlUpdateQueryTest(private val db: Database) {
         }
         assertEquals(1, count)
         val address = db.runQuery {
-            SqlDsl.from(a).first {
+            SqlDsl.from(a).where {
                 a.addressId eq 1
-            }
+            }.first()
         }
         assertEquals("STREET 1", address.street)
         assertEquals(10, address.version)
@@ -64,9 +64,9 @@ class SqlUpdateQueryTest(private val db: Database) {
         }
         assertEquals(1, count)
         val address = db.runQuery {
-            SqlDsl.from(a).first {
+            SqlDsl.from(a).where {
                 a.addressId eq 1
-            }
+            }.first()
         }
         assertEquals(11, address.version)
     }
@@ -83,9 +83,9 @@ class SqlUpdateQueryTest(private val db: Database) {
         }
         assertEquals(1, count)
         val address = db.runQuery {
-            SqlDsl.from(a).first {
+            SqlDsl.from(a).where {
                 a.addressId eq 1
-            }
+            }.first()
         }
         assertEquals("[STREET 1]", address.street)
     }

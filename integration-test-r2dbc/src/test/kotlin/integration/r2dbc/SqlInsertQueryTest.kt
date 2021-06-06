@@ -46,7 +46,7 @@ class SqlInsertQueryTest(private val db: R2dbcDatabase) {
         assertEquals(1, count)
         assertNull(key)
 
-        val employee = db.runQuery { SqlDsl.from(e).first { e.employeeId eq 99 } }
+        val employee = db.runQuery { SqlDsl.from(e).where { e.employeeId eq 99 }.first() }
         assertNull(employee.managerId)
     }
 

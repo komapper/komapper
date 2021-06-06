@@ -45,9 +45,9 @@ class ValueClassTest(val db: Database) {
         val address = VAddress(IntId(16), Street("STREET 16"), Version(0))
         db.runQuery { EntityDsl.insert(a).single(address) }
         val address2 = db.runQuery {
-            EntityDsl.from(a).first {
+            EntityDsl.from(a).where {
                 a.addressId eq IntId(16)
-            }
+            }.first()
         }
         assertEquals(address, address2)
     }
@@ -57,14 +57,14 @@ class ValueClassTest(val db: Database) {
         val p = VPerson.meta
         val person1 = VPerson(IntId(1), "ABC")
         val id = db.runQuery { EntityDsl.insert(p).single(person1) }.personId
-        val person2 = db.runQuery { EntityDsl.from(p).first { p.personId eq id } }
+        val person2 = db.runQuery { EntityDsl.from(p).where { p.personId eq id }.first() }
         assertNotNull(person2.createdAt)
         assertNotNull(person2.updatedAt)
         assertEquals(person2.createdAt, person2.updatedAt)
         val person3 = db.runQuery {
-            EntityDsl.from(p).first {
+            EntityDsl.from(p).where {
                 p.personId to 1
-            }
+            }.first()
         }
         assertEquals(person2, person3)
     }
@@ -90,7 +90,7 @@ class ValueClassTest(val db: Database) {
     @Test
     fun updated_timestamp() {
         val p = VPerson.meta
-        val findQuery = EntityDsl.from(p).first { p.personId eq IntId(1) }
+        val findQuery = EntityDsl.from(p).where { p.personId eq IntId(1) }.first()
         val person1 = VPerson(IntId(1), "ABC")
         val person2 = db.runQuery {
             EntityDsl.insert(p).single(person1) + findQuery

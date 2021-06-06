@@ -56,27 +56,4 @@ class EntitySelectQueryTest(private val db: R2dbcDatabase) {
             flow.toList()
         )
     }
-
-    @Test
-    fun shortcut_first() = inTransaction(db) {
-        val a = Address.meta
-        val address = db.runQuery { EntityDsl.from(a).first { a.addressId eq 1 } }
-        assertNotNull(address)
-    }
-
-    @Test
-    fun shortcut_firstOrNull() = inTransaction(db) {
-        val a = Address.meta
-        val address = db.runQuery { EntityDsl.from(a).firstOrNull { a.addressId eq -1 } }
-        assertNull(address)
-    }
-
-    @Test
-    fun shortcut_first_multipleCondition() = inTransaction(db) {
-        val a = Address.meta
-        val address = db.runQuery {
-            EntityDsl.from(a).first { a.addressId eq 1; a.version eq 1 }
-        }
-        assertNotNull(address)
-    }
 }
