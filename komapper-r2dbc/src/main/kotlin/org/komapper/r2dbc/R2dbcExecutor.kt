@@ -131,16 +131,9 @@ class R2dbcExecutor(
     }
 
     private fun inspect(statement: Statement): Statement {
-        val sql = replacePlaceHolders(statement.sql)
-
-        @Suppress("NAME_SHADOWING")
-        val statement = Statement(sql, statement.values, statement.sqlWithArgs)
-        return config.statementInspector.inspect(statement)
-    }
-
-    private fun replacePlaceHolders(sql: List<CharSequence>): List<CharSequence> {
-        val bindMarker = config.dialect.getBindMarker()
-        return bindMarker.apply(sql)
+        return config.dialect.replacePlaceHolders(statement).let {
+            config.statementInspector.inspect(it)
+        }
     }
 
     private fun log(statement: Statement) {
@@ -166,9 +159,7 @@ class R2dbcExecutor(
 
     private fun io.r2dbc.spi.Statement.bind(statement: Statement) {
         statement.values.forEachIndexed { index, value ->
-            val bindMarker = config.dialect.getBindMarker()
-            val dataType = config.dialect.getDataType(value.klass) as R2dbcDataType<Any>
-            bindMarker.setValue(this, index, value.any, dataType)
+            config.dialect.setValue(this, index, value.any, value.klass)
         }
     }
 

@@ -40,7 +40,7 @@ interface R2dbcDialect : Dialect {
 
     val dataTypes: List<R2dbcDataType<*>>
 
-    fun getBindMarker(): BindMarker
+    fun replacePlaceHolders(statement: org.komapper.core.Statement): org.komapper.core.Statement
     fun getValue(row: Row, index: Int, valueClass: KClass<*>): Any?
     fun getValue(row: Row, columnLabel: String, valueClass: KClass<*>): Any?
     fun setValue(statement: Statement, index: Int, value: Any?, valueClass: KClass<*>)
@@ -53,8 +53,13 @@ abstract class AbstractR2dbcDialect protected constructor(internalDataTypes: Lis
     protected val dataTypeMap: Map<KClass<*>, R2dbcDataType<*>> = internalDataTypes.associateBy { it.klass }
     override val dataTypes = internalDataTypes
 
-    override fun getBindMarker(): BindMarker {
+    protected open fun getBindMarker(): BindMarker {
         return DefaultBindMarker
+    }
+
+    override fun replacePlaceHolders(statement: org.komapper.core.Statement): org.komapper.core.Statement {
+        val bindMarker = getBindMarker()
+        return bindMarker.applyMarkers(statement)
     }
 
     override fun getValue(row: Row, index: Int, valueClass: KClass<*>): Any? {
@@ -71,7 +76,8 @@ abstract class AbstractR2dbcDialect protected constructor(internalDataTypes: Lis
         val dataType = getDataType(valueClass)
         @Suppress("UNCHECKED_CAST")
         dataType as R2dbcDataType<Any>
-        return dataType.setValue(statement, index, value)
+        val bindMarker = getBindMarker()
+        return bindMarker.setValue(statement, index, value, dataType)
     }
 
     override fun formatValue(value: Any?, valueClass: KClass<*>): String {
