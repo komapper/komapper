@@ -4,14 +4,13 @@ import io.r2dbc.spi.Statement
 import org.komapper.core.PlaceHolder
 
 interface BindMarker {
-    fun apply(sql: List<CharSequence>): List<CharSequence>
-
+    fun applyMarkers(statement: org.komapper.core.Statement): org.komapper.core.Statement
     fun setValue(statement: Statement, index: Int, value: Any?, dataType: R2dbcDataType<Any>)
 }
 
 object DefaultBindMarker : BindMarker {
-    override fun apply(sql: List<CharSequence>): List<CharSequence> {
-        return sql
+    override fun applyMarkers(statement: org.komapper.core.Statement): org.komapper.core.Statement {
+        return statement
     }
 
     override fun setValue(statement: Statement, index: Int, value: Any?, dataType: R2dbcDataType<Any>) {
@@ -20,14 +19,14 @@ object DefaultBindMarker : BindMarker {
 }
 
 object IndexedBindMarker : BindMarker {
-    override fun apply(sql: List<CharSequence>): List<CharSequence> {
+    override fun applyMarkers(statement: org.komapper.core.Statement): org.komapper.core.Statement {
         var index = 0
-        return sql.map {
+        return statement.sql.map {
             when (it) {
                 is PlaceHolder -> "$${++index}"
                 else -> it
             }
-        }
+        }.let { statement.copy(sql = it) }
     }
 
     override fun setValue(statement: Statement, index: Int, value: Any?, dataType: R2dbcDataType<Any>) {
