@@ -4,11 +4,10 @@ import org.komapper.core.Statement
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.option.SchemaCreateOption
 import org.komapper.r2dbc.R2dbcDatabaseConfig
-import org.komapper.r2dbc.R2dbcExecutor
 
-internal data class SchemaCreateQueryRunner(
-    val entityMetamodels: List<EntityMetamodel<*, *, *>>,
-    val option: SchemaCreateOption
+internal class SchemaCreateQueryRunner(
+    private val entityMetamodels: List<EntityMetamodel<*, *, *>>,
+    private val option: SchemaCreateOption
 ) : R2dbcQueryRunner<Unit> {
 
     override suspend fun run(config: R2dbcDatabaseConfig) {

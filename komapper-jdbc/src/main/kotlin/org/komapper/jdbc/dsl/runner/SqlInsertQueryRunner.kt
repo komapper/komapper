@@ -7,9 +7,8 @@ import org.komapper.core.dsl.metamodel.Assignment
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.option.SqlInsertOption
 import org.komapper.jdbc.DatabaseConfig
-import org.komapper.jdbc.JdbcExecutor
 
-internal data class SqlInsertQueryRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+internal class SqlInsertQueryRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: SqlInsertContext<ENTITY, ID, META>,
     private val option: SqlInsertOption = SqlInsertOption.default
 ) : JdbcQueryRunner<Pair<Int, Long?>> {

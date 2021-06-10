@@ -4,8 +4,10 @@ import org.komapper.core.dsl.context.SqlInsertContext
 import org.komapper.core.dsl.element.Values
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.option.SqlInsertOption
+import org.komapper.core.dsl.runner.QueryRunner
 import org.komapper.core.dsl.scope.ValuesDeclaration
 import org.komapper.core.dsl.scope.ValuesScope
+import org.komapper.core.dsl.visitor.QueryVisitor
 
 interface SqlInsertQuery<ENTITY : Any> : Query<Pair<Int, Long?>> {
     fun values(declaration: ValuesDeclaration<ENTITY>): SqlInsertQuery<ENTITY>
@@ -13,9 +15,9 @@ interface SqlInsertQuery<ENTITY : Any> : Query<Pair<Int, Long?>> {
     fun option(configure: (SqlInsertOption) -> SqlInsertOption): SqlInsertQuery<ENTITY>
 }
 
-data class SqlInsertQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
-    val context: SqlInsertContext<ENTITY, ID, META>,
-    val option: SqlInsertOption = SqlInsertOption.default
+internal data class SqlInsertQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+    private val context: SqlInsertContext<ENTITY, ID, META>,
+    private val option: SqlInsertOption = SqlInsertOption.default
 ) : SqlInsertQuery<ENTITY> {
 
     override fun values(declaration: ValuesDeclaration<ENTITY>): SqlInsertQueryImpl<ENTITY, ID, META> {
@@ -40,6 +42,6 @@ data class SqlInsertQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, I
     }
 
     override fun accept(visitor: QueryVisitor): QueryRunner {
-        return visitor.visit(this)
+        return visitor.sqlInsertQuery(context, option)
     }
 }

@@ -1,44 +1,25 @@
 package org.komapper.core.dsl.query
 
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.toList
 import org.komapper.core.dsl.option.TemplateSelectOption
+import org.komapper.core.dsl.runner.QueryRunner
+import org.komapper.core.dsl.visitor.QueryVisitor
 
 interface TemplateSelectQuery<T> : ListQuery<T>
 
-data class TemplateSelectQueryImpl<T>(
-    val sql: String,
-    val params: Any,
-    val provide: (Row) -> T,
-    val option: TemplateSelectOption
+internal data class TemplateSelectQueryImpl<T>(
+    private val sql: String,
+    private val params: Any,
+    private val transform: (Row) -> T,
+    private val option: TemplateSelectOption
 ) : TemplateSelectQuery<T> {
 
     override fun accept(visitor: QueryVisitor): QueryRunner {
-        return visitor.visit(this)
+        return visitor.templateSelectQuery(sql, params, transform, option) { it.toList() }
     }
 
-    override fun first(): Query<T> {
-        return Collect(sql, params, provide, option) { it.first() }
-    }
-
-    override fun firstOrNull(): Query<T?> {
-        return Collect(sql, params, provide, option) { it.firstOrNull() }
-    }
-
-    override fun <R> collect(collect: suspend (Flow<T>) -> R): Query<R> {
-        return Collect(sql, params, provide, option, collect)
-    }
-
-    class Collect<T, R>(
-        val sql: String,
-        val params: Any,
-        val provide: (Row) -> T,
-        val option: TemplateSelectOption,
-        val transform: suspend (Flow<T>) -> R
-    ) : Query<R> {
-        override fun accept(visitor: QueryVisitor): QueryRunner {
-            return visitor.visit(this)
-        }
+    override fun <R> collect(collect: suspend (Flow<T>) -> R): Query<R> = Query { visitor ->
+        visitor.templateSelectQuery(sql, params, transform, option, collect)
     }
 }

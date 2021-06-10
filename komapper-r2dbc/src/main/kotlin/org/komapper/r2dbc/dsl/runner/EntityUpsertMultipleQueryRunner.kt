@@ -6,13 +6,13 @@ import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.option.InsertOption
 import org.komapper.r2dbc.R2dbcDatabaseConfig
 
-internal data class EntityUpsertMultipleQueryRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
-    private val context: EntityUpsertContext<ENTITY, ID, META>,
-    private val option: InsertOption,
+internal class EntityUpsertMultipleQueryRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+    context: EntityUpsertContext<ENTITY, ID, META>,
+    option: InsertOption,
     private val entities: List<ENTITY>
 ) : R2dbcQueryRunner<Int> {
 
-    private val support: EntityUpsertQuerySupport<ENTITY, ID, META> = EntityUpsertQuerySupport(context, option)
+    private val support: EntityUpsertQueryRunnerSupport<ENTITY, ID, META> = EntityUpsertQueryRunnerSupport(context, option)
 
     override suspend fun run(config: R2dbcDatabaseConfig): Int {
         if (entities.isEmpty()) return 0

@@ -3,10 +3,9 @@ package org.komapper.jdbc.dsl.runner
 import org.komapper.core.Statement
 import org.komapper.core.dsl.option.ScriptExecuteOption
 import org.komapper.jdbc.DatabaseConfig
-import org.komapper.jdbc.JdbcExecutor
 
-internal data class ScriptExecuteQueryRunner(
-    private val sql: String,
+internal class ScriptExecuteQueryRunner(
+    sql: String,
     private val option: ScriptExecuteOption
 ) :
     JdbcQueryRunner<Unit> {

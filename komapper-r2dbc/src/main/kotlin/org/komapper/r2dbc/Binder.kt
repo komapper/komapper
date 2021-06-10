@@ -2,7 +2,9 @@ package org.komapper.r2dbc
 
 import io.r2dbc.spi.Statement
 import org.komapper.core.PlaceHolder
+import org.komapper.core.ThreadSafe
 
+@ThreadSafe
 interface Binder {
     fun replace(index: Int, placeHolder: PlaceHolder): CharSequence
     fun bind(statement: Statement, index: Int, value: Any?, dataType: R2dbcDataType<Any>)

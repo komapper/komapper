@@ -4,11 +4,10 @@ import org.komapper.core.Statement
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.option.SchemaDropOption
 import org.komapper.r2dbc.R2dbcDatabaseConfig
-import org.komapper.r2dbc.R2dbcExecutor
 
-internal data class SchemaDropQueryRunner(
-    val entityMetamodels: List<EntityMetamodel<*, *, *>> = emptyList(),
-    val option: SchemaDropOption = SchemaDropOption.default
+internal class SchemaDropQueryRunner(
+    private val entityMetamodels: List<EntityMetamodel<*, *, *>> = emptyList(),
+    private val option: SchemaDropOption = SchemaDropOption.default
 ) : R2dbcQueryRunner<Unit> {
 
     override suspend fun run(config: R2dbcDatabaseConfig) {

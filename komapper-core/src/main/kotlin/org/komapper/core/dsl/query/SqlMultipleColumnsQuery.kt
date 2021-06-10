@@ -1,49 +1,50 @@
 package org.komapper.core.dsl.query
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.toList
 import org.komapper.core.dsl.context.SqlSelectContext
 import org.komapper.core.dsl.context.SubqueryContext
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.option.SqlSelectOption
+import org.komapper.core.dsl.runner.QueryRunner
+import org.komapper.core.dsl.visitor.QueryVisitor
 
-class SqlMultipleColumnsQuery(
-    val context: SqlSelectContext<*, *, *>,
-    val option: SqlSelectOption,
-    val expressions: List<ColumnExpression<*, *>>
-) : Subquery<Columns> {
+internal class SqlMultipleColumnsQuery(
+    private val context: SqlSelectContext<*, *, *>,
+    private val option: SqlSelectOption,
+    private val expressions: List<ColumnExpression<*, *>>
+) : FlowableSubquery<Columns> {
 
-    override fun first(): Query<Columns> {
-        TODO("Not yet implemented")
-    }
+    override val subqueryContext: SubqueryContext<Columns> = SubqueryContext.SqlSelect(context)
 
-    override fun firstOrNull(): Query<Columns?> {
-        TODO("Not yet implemented")
-    }
-
-    override fun <R> collect(collect: suspend (Flow<Columns>) -> R): Query<R> {
-        TODO("Not yet implemented")
-    }
-
-    override val subqueryContext: SubqueryContext<Columns>
-        get() = TODO("Not yet implemented")
-
-    override fun except(other: Subquery<Columns>): SetOperationQuery<Columns> {
-        TODO("Not yet implemented")
-    }
-
-    override fun intersect(other: Subquery<Columns>): SetOperationQuery<Columns> {
-        TODO("Not yet implemented")
-    }
-
-    override fun union(other: Subquery<Columns>): SetOperationQuery<Columns> {
-        TODO("Not yet implemented")
-    }
-
-    override fun unionAll(other: Subquery<Columns>): SetOperationQuery<Columns> {
-        TODO("Not yet implemented")
-    }
+    private val support: FlowableSubquerySupport<Columns> =
+        FlowableSubquerySupport(subqueryContext) { SqlMultipleColumnsSetOperationQuery(it, expressions = expressions) }
 
     override fun accept(visitor: QueryVisitor): QueryRunner {
-        return visitor.visit(this)
+        return visitor.sqlMultipleColumnsQuery(context, option, expressions) { it.toList() }
+    }
+
+    override fun <R> collect(collect: suspend (Flow<Columns>) -> R): Query<R> = Query { visitor ->
+        visitor.sqlMultipleColumnsQuery(context, option, expressions, collect)
+    }
+
+    override fun asFlowQuery(): FlowQuery<Columns> = FlowQuery { visitor ->
+        visitor.sqlMultipleColumnsQuery(context, option, expressions)
+    }
+
+    override fun except(other: Subquery<Columns>): FlowableSetOperationQuery<Columns> {
+        return support.except(other)
+    }
+
+    override fun intersect(other: Subquery<Columns>): FlowableSetOperationQuery<Columns> {
+        return support.intersect(other)
+    }
+
+    override fun union(other: Subquery<Columns>): FlowableSetOperationQuery<Columns> {
+        return support.union(other)
+    }
+
+    override fun unionAll(other: Subquery<Columns>): FlowableSetOperationQuery<Columns> {
+        return support.unionAll(other)
     }
 }

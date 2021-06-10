@@ -12,11 +12,10 @@ import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.option.EntitySelectOption
 import org.komapper.jdbc.DatabaseConfig
 import org.komapper.jdbc.JdbcDialect
-import org.komapper.jdbc.JdbcExecutor
 import java.sql.ResultSet
 import kotlin.reflect.cast
 
-class EntitySelectQueryRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>, R>(
+internal class EntitySelectQueryRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>, R>(
     private val context: EntitySelectContext<ENTITY, ID, META>,
     private val option: EntitySelectOption,
     private val transform: suspend (Flow<ENTITY>) -> R

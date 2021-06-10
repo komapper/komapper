@@ -6,13 +6,13 @@ import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.option.EntityDeleteOption
 import org.komapper.r2dbc.R2dbcDatabaseConfig
 
-internal data class EntityDeleteSingleQueryRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
-    private val context: EntityDeleteContext<ENTITY, ID, META>,
-    private val entity: ENTITY,
-    private val option: EntityDeleteOption
+internal class EntityDeleteSingleQueryRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+    context: EntityDeleteContext<ENTITY, ID, META>,
+    option: EntityDeleteOption,
+    private val entity: ENTITY
 ) : R2dbcQueryRunner<Unit> {
 
-    private val support: EntityDeleteQuerySupport<ENTITY, ID, META> = EntityDeleteQuerySupport(context, option)
+    private val support: EntityDeleteQueryRunnerSupport<ENTITY, ID, META> = EntityDeleteQueryRunnerSupport(context, option)
 
     override suspend fun run(config: R2dbcDatabaseConfig) {
         val (count) = delete(config)

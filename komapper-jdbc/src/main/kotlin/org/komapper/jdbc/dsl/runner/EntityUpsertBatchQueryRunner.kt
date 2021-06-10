@@ -6,13 +6,16 @@ import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.option.InsertOption
 import org.komapper.jdbc.DatabaseConfig
 
-internal data class EntityUpsertBatchQueryRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
-    private val context: EntityUpsertContext<ENTITY, ID, META>,
-    private val entities: List<ENTITY>,
-    private val option: InsertOption
+internal class EntityUpsertBatchQueryRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+    context: EntityUpsertContext<ENTITY, ID, META>,
+    option: InsertOption,
+    private val entities: List<ENTITY>
 ) : JdbcQueryRunner<List<Int>> {
 
-    private val support: EntityUpsertQuerySupport<ENTITY, ID, META> = EntityUpsertQuerySupport(context, option)
+    private val support: EntityUpsertQueryRunnerSupport<ENTITY, ID, META> = EntityUpsertQueryRunnerSupport(
+        context,
+        option
+    )
 
     override fun run(config: DatabaseConfig): List<Int> {
         if (entities.isEmpty()) return emptyList()

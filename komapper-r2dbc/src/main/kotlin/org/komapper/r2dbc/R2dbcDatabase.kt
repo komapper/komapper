@@ -4,12 +4,16 @@ import io.r2dbc.spi.ConnectionFactories
 import io.r2dbc.spi.ConnectionFactory
 import io.r2dbc.spi.ConnectionFactoryOptions
 import kotlinx.coroutines.flow.Flow
+import org.komapper.core.ThreadSafe
 import org.komapper.core.dsl.query.FlowableQuery
 import org.komapper.core.dsl.query.Query
 import org.komapper.core.dsl.query.QueryScope
 import org.komapper.r2dbc.dsl.runner.R2dbcFlowQueryRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcQueryRunner
+import org.komapper.r2dbc.dsl.visitor.R2dbcFlowQueryVisitor
+import org.komapper.r2dbc.dsl.visitor.R2dbcQueryVisitor
 
+@ThreadSafe
 interface R2dbcDatabase {
 
     companion object {
@@ -68,7 +72,7 @@ interface R2dbcDatabase {
     @Suppress("UNCHECKED_CAST")
     private fun <T> getFlowQueryRunner(block: QueryScope.() -> FlowableQuery<T>): R2dbcFlowQueryRunner<T> {
         val flowableQuery = block(QueryScope)
-        val flowQuery = flowableQuery.toFlowQuery()
+        val flowQuery = flowableQuery.asFlowQuery()
         return flowQuery.accept(R2dbcFlowQueryVisitor()) as R2dbcFlowQueryRunner<T>
     }
 }

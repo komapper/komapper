@@ -9,6 +9,7 @@ import org.komapper.core.dsl.metamodel.EntityMetamodel
 import java.util.regex.Pattern
 import kotlin.reflect.KClass
 
+@ThreadSafe
 interface Dialect {
     val driver: String
     val openQuote: String get() = "\""

@@ -4,18 +4,16 @@ import kotlinx.coroutines.flow.Flow
 import org.komapper.core.Statement
 import org.komapper.core.dsl.builder.SqlSelectStatementBuilder
 import org.komapper.core.dsl.context.SqlSelectContext
-import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.option.SqlSelectOption
 import org.komapper.jdbc.DatabaseConfig
 import org.komapper.jdbc.JdbcDialect
-import org.komapper.jdbc.JdbcExecutor
 import java.sql.ResultSet
 
-internal data class SqlSelectQueryRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>, R>(
-    private val context: SqlSelectContext<ENTITY, ID, META>,
+internal class SqlSelectQueryRunner<T, R>(
+    private val context: SqlSelectContext<*, *, *>,
     private val option: SqlSelectOption,
-    private val provide: (JdbcDialect, ResultSet) -> ENTITY,
-    private val collect: suspend (Flow<ENTITY>) -> R
+    private val transform: (JdbcDialect, ResultSet) -> T,
+    private val collect: suspend (Flow<T>) -> R
 ) :
     JdbcQueryRunner<R> {
 
@@ -25,7 +23,7 @@ internal data class SqlSelectQueryRunner<ENTITY : Any, ID, META : EntityMetamode
         }
         val statement = buildStatement(config)
         val executor = JdbcExecutor(config, option)
-        return executor.executeQuery(statement, provide, collect)
+        return executor.executeQuery(statement, transform, collect)
     }
 
     override fun dryRun(config: DatabaseConfig): String {

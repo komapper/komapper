@@ -7,6 +7,7 @@ import org.komapper.core.ExecutionOption
 import org.komapper.core.Logger
 import org.komapper.core.StdOutLogger
 import org.komapper.core.TemplateStatementBuilder
+import org.komapper.core.ThreadSafe
 import org.komapper.core.spi.DefaultStatementInspector
 import org.komapper.core.spi.StatementInspector
 import org.komapper.core.spi.TemplateStatementBuilderFactory
@@ -14,6 +15,7 @@ import org.komapper.r2dbc.spi.R2dbcDatabaseSessionFactory
 import java.util.ServiceLoader
 import java.util.UUID
 
+@ThreadSafe
 interface R2dbcDatabaseConfig {
     val id: UUID
     val dialect: R2dbcDialect

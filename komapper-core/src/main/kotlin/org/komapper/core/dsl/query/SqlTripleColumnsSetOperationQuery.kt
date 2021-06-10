@@ -1,76 +1,61 @@
 package org.komapper.core.dsl.query
 
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.toList
 import org.komapper.core.dsl.context.SqlSetOperationContext
 import org.komapper.core.dsl.context.SubqueryContext
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.option.SqlSetOperationOption
+import org.komapper.core.dsl.runner.QueryRunner
+import org.komapper.core.dsl.visitor.QueryVisitor
 
-data class SqlTripleColumnsSetOperationQuery<A : Any, B : Any, C : Any>(
-    val context: SqlSetOperationContext<Triple<A?, B?, C?>>,
-    val option: SqlSetOperationOption = SqlSetOperationOption.default,
-    val expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>
-) : SetOperationQuery<Triple<A?, B?, C?>> {
-
-    override val subqueryContext: SubqueryContext<Triple<A?, B?, C?>>
-        get() = SubqueryContext.SqlSetOperation(context)
+internal data class SqlTripleColumnsSetOperationQuery<A : Any, B : Any, C : Any>(
+    private val context: SqlSetOperationContext<Triple<A?, B?, C?>>,
+    private val option: SqlSetOperationOption = SqlSetOperationOption.default,
+    private val expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>
+) : FlowableSetOperationQuery<Triple<A?, B?, C?>> {
 
     private val support: SqlSetOperationQuerySupport<Triple<A?, B?, C?>> = SqlSetOperationQuerySupport(context)
 
+    override val subqueryContext: SubqueryContext<Triple<A?, B?, C?>> = SubqueryContext.SqlSetOperation(context)
+
     override fun accept(visitor: QueryVisitor): QueryRunner {
-        return visitor.visit(this)
+        return visitor.sqlTripleColumnsSetOperationQuery(context, option, expressions) { it.toList() }
     }
 
-    override fun first(): Query<Triple<A?, B?, C?>> {
-        return Collect(context, option, expressions) { it.first() }
+    override fun <R> collect(collect: suspend (Flow<Triple<A?, B?, C?>>) -> R): Query<R> = Query { visitor ->
+        visitor.sqlTripleColumnsSetOperationQuery(context, option, expressions, collect)
     }
 
-    override fun firstOrNull(): Query<Triple<A?, B?, C?>?> {
-        return Collect(context, option, expressions) { it.firstOrNull() }
+    override fun asFlowQuery(): FlowQuery<Triple<A?, B?, C?>> = FlowQuery { visitor ->
+        visitor.sqlTripleColumnsSetOperationQuery(context, option, expressions)
     }
 
-    override fun <R> collect(collect: suspend (Flow<Triple<A?, B?, C?>>) -> R): Query<R> {
-        return Collect(context, option, expressions, collect)
-    }
-
-    override fun except(other: Subquery<Triple<A?, B?, C?>>): SetOperationQuery<Triple<A?, B?, C?>> {
+    override fun except(other: Subquery<Triple<A?, B?, C?>>): FlowableSetOperationQuery<Triple<A?, B?, C?>> {
         return copy(context = support.except(other))
     }
 
-    override fun intersect(other: Subquery<Triple<A?, B?, C?>>): SetOperationQuery<Triple<A?, B?, C?>> {
+    override fun intersect(other: Subquery<Triple<A?, B?, C?>>): FlowableSetOperationQuery<Triple<A?, B?, C?>> {
         return copy(context = support.intersect(other))
     }
 
-    override fun union(other: Subquery<Triple<A?, B?, C?>>): SetOperationQuery<Triple<A?, B?, C?>> {
+    override fun union(other: Subquery<Triple<A?, B?, C?>>): FlowableSetOperationQuery<Triple<A?, B?, C?>> {
         return copy(context = support.union(other))
     }
 
-    override fun unionAll(other: Subquery<Triple<A?, B?, C?>>): SetOperationQuery<Triple<A?, B?, C?>> {
+    override fun unionAll(other: Subquery<Triple<A?, B?, C?>>): FlowableSetOperationQuery<Triple<A?, B?, C?>> {
         return copy(context = support.unionAll(other))
     }
 
-    override fun orderBy(vararg aliases: CharSequence): SetOperationQuery<Triple<A?, B?, C?>> {
+    override fun orderBy(vararg aliases: CharSequence): FlowableSetOperationQuery<Triple<A?, B?, C?>> {
         return copy(context = support.orderBy(*aliases))
     }
 
-    override fun orderBy(vararg expressions: ColumnExpression<*, *>): SetOperationQuery<Triple<A?, B?, C?>> {
+    override fun orderBy(vararg expressions: ColumnExpression<*, *>): FlowableSetOperationQuery<Triple<A?, B?, C?>> {
         return copy(context = support.orderBy(*expressions))
     }
 
-    override fun option(configurator: (SqlSetOperationOption) -> SqlSetOperationOption): SetOperationQuery<Triple<A?, B?, C?>> {
+    override fun option(configurator: (SqlSetOperationOption) -> SqlSetOperationOption): FlowableSetOperationQuery<Triple<A?, B?, C?>> {
         return copy(option = configurator(option))
-    }
-
-    class Collect<A : Any, B : Any, C : Any, R>(
-        val context: SqlSetOperationContext<Triple<A?, B?, C?>>,
-        val option: SqlSetOperationOption,
-        val expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
-        val transform: suspend (Flow<Triple<A?, B?, C?>>) -> R
-    ) : Query<R> {
-        override fun accept(visitor: QueryVisitor): QueryRunner {
-            return visitor.visit(this)
-        }
     }
 }

@@ -3,9 +3,8 @@ package org.komapper.r2dbc.dsl.runner
 import org.komapper.core.Statement
 import org.komapper.core.dsl.option.TemplateExecuteOption
 import org.komapper.r2dbc.R2dbcDatabaseConfig
-import org.komapper.r2dbc.R2dbcExecutor
 
-internal data class TemplateExecuteQueryRunner(
+internal class TemplateExecuteQueryRunner(
     private val sql: String,
     private val params: Any = object {},
     private val option: TemplateExecuteOption = TemplateExecuteOption.default

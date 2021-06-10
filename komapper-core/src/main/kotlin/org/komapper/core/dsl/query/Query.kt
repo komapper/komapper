@@ -1,48 +1,36 @@
 package org.komapper.core.dsl.query
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
+import org.komapper.core.ThreadSafe
 import org.komapper.core.dsl.context.SubqueryContext
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.expression.SubqueryExpression
 import org.komapper.core.dsl.option.SqlSetOperationOption
+import org.komapper.core.dsl.runner.QueryRunner
+import org.komapper.core.dsl.visitor.QueryVisitor
 
-interface Query<T> {
+@ThreadSafe
+fun interface Query<T> {
     fun accept(visitor: QueryVisitor): QueryRunner
 
-    operator fun <S> plus(other: Query<S>): Query<S> {
-        return Plus(this, other)
+    operator fun <S> plus(other: Query<S>): Query<S> = Query { visitor ->
+        visitor.plusQuery(this, other)
     }
 
-    fun <S> flatMap(transform: (T) -> Query<S>): Query<S> {
-        return FlatMap(this, transform)
+    fun <S> flatMap(transform: (T) -> Query<S>): Query<S> = Query { visitor ->
+        visitor.flatMapQuery(this, transform)
     }
 
-    fun <S> flatZip(transform: (T) -> Query<S>): Query<Pair<T, S>> {
-        return FlatZip(this, transform)
-    }
-
-    data class Plus<T, S>(val left: Query<T>, val right: Query<S>) : Query<S> {
-        override fun accept(visitor: QueryVisitor): QueryRunner {
-            return visitor.visit(this)
-        }
-    }
-
-    data class FlatMap<T, S>(val query: Query<T>, val transform: (T) -> Query<S>) : Query<S> {
-        override fun accept(visitor: QueryVisitor): QueryRunner {
-            return visitor.visit(this)
-        }
-    }
-
-    data class FlatZip<T, S>(val query: Query<T>, val transform: (T) -> Query<S>) : Query<Pair<T, S>> {
-        override fun accept(visitor: QueryVisitor): QueryRunner {
-            return visitor.visit(this)
-        }
+    fun <S> flatZip(transform: (T) -> Query<S>): Query<Pair<T, S>> = Query { visitor ->
+        visitor.flatZipQuery(this, transform)
     }
 }
 
 interface ListQuery<T> : Query<List<T>> {
-    fun first(): Query<T>
-    fun firstOrNull(): Query<T?>
+    fun first(): Query<T> = collect { it.first() }
+    fun firstOrNull(): Query<T?> = collect { it.firstOrNull() }
     fun <R> collect(collect: suspend (Flow<T>) -> R): Query<R>
 }
 

@@ -1,7 +1,6 @@
 package org.komapper.jdbc
 
 import org.komapper.core.Dialect
-import org.komapper.core.ThreadSafe
 import org.komapper.core.dsl.builder.DryRunSchemaStatementBuilder
 import org.komapper.core.dsl.builder.EntityUpsertStatementBuilder
 import org.komapper.core.dsl.builder.SchemaStatementBuilder
@@ -15,7 +14,6 @@ import java.util.ServiceLoader
 import java.util.regex.Pattern
 import kotlin.reflect.KClass
 
-@ThreadSafe
 interface JdbcDialect : Dialect {
 
     companion object {

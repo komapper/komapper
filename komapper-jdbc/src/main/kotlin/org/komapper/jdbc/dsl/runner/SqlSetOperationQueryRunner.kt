@@ -9,13 +9,12 @@ import org.komapper.core.dsl.context.SubqueryContext
 import org.komapper.core.dsl.option.SqlSetOperationOption
 import org.komapper.jdbc.DatabaseConfig
 import org.komapper.jdbc.JdbcDialect
-import org.komapper.jdbc.JdbcExecutor
 import java.sql.ResultSet
 
-internal data class SqlSetOperationQueryRunner<T : Any?, R>(
+internal class SqlSetOperationQueryRunner<T : Any?, R>(
     private val context: SqlSetOperationContext<T>,
     private val option: SqlSetOperationOption,
-    private val provide: (JdbcDialect, ResultSet) -> T,
+    private val transform: (JdbcDialect, ResultSet) -> T,
     private val collect: suspend (Flow<T>) -> R
 ) : JdbcQueryRunner<R> {
 
@@ -26,7 +25,7 @@ internal data class SqlSetOperationQueryRunner<T : Any?, R>(
         }
         val statement = buildStatement(config)
         val executor = JdbcExecutor(config, option)
-        return executor.executeQuery(statement, provide, collect)
+        return executor.executeQuery(statement, transform, collect)
     }
 
     private fun checkWhereClauses(subqueryContext: SubqueryContext<*>) {

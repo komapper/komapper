@@ -28,20 +28,20 @@ internal data class EntityUpsertQueryBuilderImpl<ENTITY : Any, ID, META : Entity
         return copy(context = newContext)
     }
 
-    override fun single(entity: ENTITY): Query<Int> {
-        return EntityUpsertSingleQuery(context, option, entity)
+    override fun single(entity: ENTITY): Query<Int> = Query { visitor ->
+        visitor.entityUpsertSingleQuery(context, option, entity)
     }
 
-    override fun multiple(entities: List<ENTITY>): Query<Int> {
-        return EntityUpsertMultipleQuery(context, option, entities)
+    override fun multiple(entities: List<ENTITY>): Query<Int> = Query { visitor ->
+        visitor.entityUpsertMultipleQuery(context, option, entities)
     }
 
     override fun multiple(vararg entities: ENTITY): Query<Int> {
         return multiple(entities.toList())
     }
 
-    override fun batch(entities: List<ENTITY>): Query<List<Int>> {
-        return EntityUpsertBatchQuery(context, entities, option)
+    override fun batch(entities: List<ENTITY>): Query<List<Int>> = Query { visitor ->
+        visitor.entityUpsertBatchQuery(context, option, entities)
     }
 
     override fun batch(vararg entities: ENTITY): Query<List<Int>> {

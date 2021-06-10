@@ -5,12 +5,11 @@ import org.komapper.core.Statement
 import org.komapper.core.dsl.option.TemplateSelectOption
 import org.komapper.core.dsl.query.Row
 import org.komapper.jdbc.DatabaseConfig
-import org.komapper.jdbc.JdbcExecutor
 
-internal data class TemplateSelectQueryRunner<T, R>(
+internal class TemplateSelectQueryRunner<T, R>(
     private val sql: String,
     private val params: Any,
-    private val provide: (Row) -> T,
+    private val transform: (Row) -> T,
     private val option: TemplateSelectOption,
     private val collect: suspend (Flow<T>) -> R,
 ) : JdbcQueryRunner<R> {
@@ -21,8 +20,8 @@ internal data class TemplateSelectQueryRunner<T, R>(
         return executor.executeQuery(
             statement,
             { dialect, rs ->
-                val row = JdbcRow(dialect, rs)
-                provide(row)
+                val row = JdbcResultSetWrapper(dialect, rs)
+                transform(row)
             },
             collect
         )

@@ -1,69 +1,50 @@
 package org.komapper.core.dsl.query
 
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.toList
 import org.komapper.core.dsl.context.SqlSelectContext
-import org.komapper.core.dsl.context.SqlSetOperationContext
-import org.komapper.core.dsl.context.SqlSetOperationKind
 import org.komapper.core.dsl.context.SubqueryContext
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.option.SqlSelectOption
+import org.komapper.core.dsl.runner.QueryRunner
+import org.komapper.core.dsl.visitor.QueryVisitor
 
-class SqlSingleColumnQuery<A : Any>(
-    val context: SqlSelectContext<*, *, *>,
-    val option: SqlSelectOption,
-    val expression: ColumnExpression<A, *>
-) : Subquery<A?> {
+internal class SqlSingleColumnQuery<A : Any>(
+    private val context: SqlSelectContext<*, *, *>,
+    private val option: SqlSelectOption,
+    private val expression: ColumnExpression<A, *>
+) : FlowableSubquery<A?> {
 
-    override val subqueryContext: SubqueryContext<A?>
-        get() = SubqueryContext.SqlSelect(context)
+    override val subqueryContext: SubqueryContext<A?> = SubqueryContext.SqlSelect(context)
 
-    override fun first(): Query<A?> {
-        return Collect(context, option, expression) { it.first() }
-    }
-
-    override fun firstOrNull(): Query<A?> {
-        return Collect(context, option, expression) { it.firstOrNull() }
-    }
-
-    override fun <R> collect(collect: suspend (Flow<A?>) -> R): Query<R> {
-        return Collect(context, option, expression, collect)
-    }
-
-    override fun except(other: Subquery<A?>): SetOperationQuery<A?> {
-        return setOperation(SqlSetOperationKind.EXCEPT, other)
-    }
-
-    override fun intersect(other: Subquery<A?>): SetOperationQuery<A?> {
-        return setOperation(SqlSetOperationKind.INTERSECT, other)
-    }
-
-    override fun union(other: Subquery<A?>): SetOperationQuery<A?> {
-        return setOperation(SqlSetOperationKind.UNION, other)
-    }
-
-    override fun unionAll(other: Subquery<A?>): SetOperationQuery<A?> {
-        return setOperation(SqlSetOperationKind.UNION_ALL, other)
-    }
-
-    private fun setOperation(kind: SqlSetOperationKind, other: Subquery<A?>): SetOperationQuery<A?> {
-        val setOperatorContext = SqlSetOperationContext(kind, this.subqueryContext, other.subqueryContext)
-        return SqlSingleColumnSetOperationQuery(setOperatorContext, expression = expression)
-    }
+    private val support: FlowableSubquerySupport<A?> =
+        FlowableSubquerySupport(subqueryContext) { SqlSingleColumnSetOperationQuery(it, expression = expression) }
 
     override fun accept(visitor: QueryVisitor): QueryRunner {
-        return visitor.visit(this)
+        return visitor.sqlSingleColumnQuery(context, option, expression) { it.toList() }
     }
 
-    class Collect<A : Any, R>(
-        val context: SqlSelectContext<*, *, *>,
-        val option: SqlSelectOption,
-        val expression: ColumnExpression<A, *>,
-        val transform: suspend (Flow<A?>) -> R
-    ) : Query<R> {
-        override fun accept(visitor: QueryVisitor): QueryRunner {
-            return visitor.visit(this)
-        }
+    override fun <R> collect(collect: suspend (Flow<A?>) -> R): Query<R> = Query { visitor ->
+        visitor.sqlSingleColumnQuery(context, option, expression, collect)
+    }
+
+    override fun asFlowQuery(): FlowQuery<A?> = FlowQuery { visitor ->
+        visitor.sqlSingleColumnQuery(context, option, expression)
+    }
+
+    override fun except(other: Subquery<A?>): FlowableSetOperationQuery<A?> {
+        return support.except(other)
+    }
+
+    override fun intersect(other: Subquery<A?>): FlowableSetOperationQuery<A?> {
+        return support.intersect(other)
+    }
+
+    override fun union(other: Subquery<A?>): FlowableSetOperationQuery<A?> {
+        return support.union(other)
+    }
+
+    override fun unionAll(other: Subquery<A?>): FlowableSetOperationQuery<A?> {
+        return support.unionAll(other)
     }
 }

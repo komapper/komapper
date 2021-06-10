@@ -1,11 +1,8 @@
 package org.komapper.core.dsl.query
 
 import org.komapper.core.OptimisticLockException
-import org.komapper.core.Value
-import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.option.VersionOption
-import kotlin.reflect.cast
 
 internal fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>
 EntityMetamodel<ENTITY, ID, META>.checkIdValueNotNull(entity: ENTITY) {
@@ -37,16 +34,5 @@ fun checkOptimisticLock(
             }
             throw OptimisticLockException(message)
         }
-    }
-}
-
-internal fun <EXTERIOR : Any, INTERIOR : Any>
-ColumnExpression<EXTERIOR, INTERIOR>.asValue(value: Any?): Value {
-    return if (value == null) {
-        Value(null, this.interiorClass)
-    } else {
-        val exterior = this.exteriorClass.cast(value)
-        val interior = this.unwrap(exterior)
-        Value(interior, this.interiorClass)
     }
 }

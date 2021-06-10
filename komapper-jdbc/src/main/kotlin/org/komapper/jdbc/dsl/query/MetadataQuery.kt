@@ -2,13 +2,13 @@ package org.komapper.jdbc.dsl.query
 
 import org.komapper.core.Table
 import org.komapper.core.dsl.query.Query
-import org.komapper.core.dsl.query.QueryRunner
-import org.komapper.core.dsl.query.QueryVisitor
-import org.komapper.jdbc.JdbcQueryVisitor
+import org.komapper.core.dsl.runner.QueryRunner
+import org.komapper.core.dsl.visitor.QueryVisitor
+import org.komapper.jdbc.dsl.visitor.JdbcQueryVisitor
 
 interface MetadataQuery : Query<List<Table>>
 
-class MetadataQueryImpl(
+internal class MetadataQueryImpl(
     val catalog: String?,
     val schemaName: String?,
     val tableNamePattern: String?,

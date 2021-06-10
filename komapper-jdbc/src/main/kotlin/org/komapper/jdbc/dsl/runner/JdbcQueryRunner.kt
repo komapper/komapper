@@ -1,9 +1,9 @@
 package org.komapper.jdbc.dsl.runner
 
-import org.komapper.core.dsl.query.QueryRunner
+import org.komapper.core.dsl.runner.QueryRunner
 import org.komapper.jdbc.DatabaseConfig
 
-sealed interface JdbcQueryRunner<T> : QueryRunner {
+internal sealed interface JdbcQueryRunner<T> : QueryRunner {
     fun run(config: DatabaseConfig): T
     fun dryRun(config: DatabaseConfig): String
 

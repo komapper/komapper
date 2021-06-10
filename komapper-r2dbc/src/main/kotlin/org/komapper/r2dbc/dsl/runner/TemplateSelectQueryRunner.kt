@@ -5,12 +5,11 @@ import org.komapper.core.Statement
 import org.komapper.core.dsl.option.TemplateSelectOption
 import org.komapper.core.dsl.query.Row
 import org.komapper.r2dbc.R2dbcDatabaseConfig
-import org.komapper.r2dbc.R2dbcExecutor
 
-internal data class TemplateSelectQueryRunner<T, R>(
+internal class TemplateSelectQueryRunner<T, R>(
     private val sql: String,
     private val params: Any,
-    private val provide: (Row) -> T,
+    private val transform: (Row) -> T,
     private val option: TemplateSelectOption,
     private val collect: suspend (Flow<T>) -> R
 ) : R2dbcQueryRunner<R> {
@@ -18,13 +17,10 @@ internal data class TemplateSelectQueryRunner<T, R>(
     override suspend fun run(config: R2dbcDatabaseConfig): R {
         val statement = buildStatement(config)
         val executor = R2dbcExecutor(config, option)
-        return executor.executeQuery(
-            statement,
-            { dialect, row ->
-                provide(R2dbcRow(dialect, row))
-            },
-            collect
-        )
+        val flow = executor.executeQuery(statement) { dialect, row ->
+            transform(R2dbcRowWrapper(dialect, row))
+        }
+        return collect(flow)
     }
 
     override fun dryRun(config: R2dbcDatabaseConfig): String {
