@@ -40,7 +40,7 @@ internal data class EntityInsertSingleQueryRunner<ENTITY : Any, ID, META : Entit
 
     override fun dryRun(config: DatabaseConfig): String {
         val statement = buildStatement(config, entity)
-        return statement.asSql()
+        return statement.toSql()
     }
 
     private fun buildStatement(config: DatabaseConfig, entity: ENTITY): Statement {

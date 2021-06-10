@@ -18,6 +18,6 @@ internal data class ScriptExecuteQueryRunner(
     }
 
     override fun dryRun(config: DatabaseConfig): String {
-        return statement.asSql()
+        return statement.toSql()
     }
 }

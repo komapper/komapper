@@ -3,14 +3,14 @@ package org.komapper.core
 import kotlin.reflect.KClass
 
 @ThreadSafe
-data class Statement(val fragments: List<CharSequence>, val values: List<Value>) {
+data class Statement(val fragments: List<CharSequence>, val args: List<Value>) {
     constructor(fragment: CharSequence) : this(listOf(fragment), emptyList())
 
     companion object {
         val EMPTY = Statement(emptyList(), emptyList())
     }
 
-    fun asSql(transform: (Int, PlaceHolder) -> CharSequence = { _, placeHolder -> placeHolder }): String {
+    fun toSql(transform: (Int, PlaceHolder) -> CharSequence = { _, placeHolder -> placeHolder }): String {
         var index = 0
         return fragments.joinToString(separator = "") { fragment ->
             when (fragment) {
@@ -22,8 +22,8 @@ data class Statement(val fragments: List<CharSequence>, val values: List<Value>)
         }
     }
 
-    fun asSqlWithArgs(format: (Any?, KClass<*>) -> String): String {
-        val iterator = values.iterator()
+    fun toSqlWithArgs(format: (Any?, KClass<*>) -> String): String {
+        val iterator = args.iterator()
         var index = 0
         return fragments.joinToString(separator = "") { fragment ->
             when (fragment) {
@@ -40,8 +40,8 @@ data class Statement(val fragments: List<CharSequence>, val values: List<Value>)
 
     infix operator fun plus(other: Statement): Statement {
         val separator = if (this.fragments.isEmpty() || this.fragments.last().trimEnd().endsWith(";")) "" else ";"
-        val sql = this.fragments + listOf(separator) + other.fragments
-        val values = this.values + other.values
-        return Statement(sql, values)
+        val newFragments = this.fragments + listOf(separator) + other.fragments
+        val newArgs = this.args + other.args
+        return Statement(newFragments, newArgs)
     }
 }

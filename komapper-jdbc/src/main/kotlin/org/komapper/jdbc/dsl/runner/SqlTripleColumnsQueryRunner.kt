@@ -27,7 +27,7 @@ class SqlTripleColumnsQueryRunner<A : Any, B : Any, C : Any, R>(
     }
 
     override fun dryRun(config: DatabaseConfig): String {
-        return buildStatement(config).asSql()
+        return buildStatement(config).toSql()
     }
 
     private fun buildStatement(config: DatabaseConfig): Statement {

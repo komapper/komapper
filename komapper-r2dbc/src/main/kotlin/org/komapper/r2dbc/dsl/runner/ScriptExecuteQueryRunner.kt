@@ -19,6 +19,6 @@ internal data class ScriptExecuteQueryRunner(
     }
 
     override fun dryRun(config: R2dbcDatabaseConfig): String {
-        return statement.asSql()
+        return statement.toSql()
     }
 }

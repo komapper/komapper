@@ -11,7 +11,7 @@ class StatementBuffer {
 
     fun append(statement: Statement): StatementBuffer {
         fragments.addAll(statement.fragments)
-        args.addAll(statement.values)
+        args.addAll(statement.args)
         return this
     }
 
@@ -37,6 +37,6 @@ class StatementBuffer {
     }
 
     override fun toString(): String {
-        return toStatement().asSql()
+        return toStatement().toSql()
     }
 }

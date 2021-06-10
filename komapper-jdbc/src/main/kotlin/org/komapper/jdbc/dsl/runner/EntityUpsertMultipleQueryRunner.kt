@@ -33,7 +33,7 @@ internal data class EntityUpsertMultipleQueryRunner<ENTITY : Any, ID, META : Ent
     override fun dryRun(config: DatabaseConfig): String {
         if (entities.isEmpty()) return ""
         val statement = buildStatement(config, entities)
-        return statement.asSql()
+        return statement.toSql()
     }
 
     private fun buildStatement(config: DatabaseConfig, entities: List<ENTITY>): Statement {

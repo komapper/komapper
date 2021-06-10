@@ -34,8 +34,8 @@ class EntityInsertMultipleQueryTest(private val db: R2dbcDatabase) {
         assertEquals(addressList, list)
     }
 
-    // TODO: the combination with returnGeneratedValues and rowsUpdated doesn't work in PostgreSQL 
-    @Run(unless = [Dbms.POSTGRESQL, Dbms.MYSQL])
+    // TODO: MySQL driver doesn't return all generated values after multiple insert statement is issued
+    @Run(unless = [Dbms.MYSQL])
     @Test
     fun identity() = inTransaction(db) {
         val i = IdentityStrategy.meta
