@@ -35,7 +35,7 @@ internal data class EntityUpdateSingleQueryRunner<ENTITY : Any, ID, META : Entit
 
     override fun dryRun(config: R2dbcDatabaseConfig): String {
         val statement = buildStatement(config, entity)
-        return statement.asSql()
+        return statement.toSql()
     }
 
     private fun buildStatement(config: R2dbcDatabaseConfig, entity: ENTITY): Statement {

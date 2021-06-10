@@ -109,7 +109,7 @@ class R2dbcExecutor(
         val statement = inspect(statement)
         return config.session.getConnection().toFlow().flatMapConcat { con ->
             val batch = con.createBatch()
-            for (sql in statement.toSql().split(";")) {
+            for (sql in statement.asSql().split(";")) {
                 batch.add(sql.trim())
             }
             batch.execute().toFlow().flatMapConcat { result ->
@@ -140,24 +140,24 @@ class R2dbcExecutor(
         val suppressLogging = executionOption.suppressLogging ?: false
         if (!suppressLogging) {
             config.logger.debug(LogCategory.SQL.value) {
-                statement.toSql()
+                statement.asSql()
             }
             config.logger.trace(LogCategory.SQL_WITH_ARGS.value) {
-                statement.toSqlWithArgs()
+                statement.asSqlWithArgs()
             }
         }
     }
 
-    private fun Statement.toSql(): String {
-        return this.asSql(config.dialect::replacePlaceHolder)
+    private fun Statement.asSql(): String {
+        return this.toSql(config.dialect::replacePlaceHolder)
     }
 
-    private fun Statement.toSqlWithArgs(): String {
-        return this.asSqlWithArgs(config.dialect::formatValue)
+    private fun Statement.asSqlWithArgs(): String {
+        return this.toSqlWithArgs(config.dialect::formatValue)
     }
 
     private fun io.r2dbc.spi.Connection.prepare(statement: Statement): io.r2dbc.spi.Statement {
-        val sql = statement.toSql()
+        val sql = statement.asSql()
         val r2dbcStmt = this.createStatement(sql)
         return if (generatedColumn != null) {
             r2dbcStmt.returnGeneratedValues(generatedColumn)
@@ -171,7 +171,7 @@ class R2dbcExecutor(
     }
 
     private fun io.r2dbc.spi.Statement.bind(statement: Statement) {
-        statement.values.forEachIndexed { index, value ->
+        statement.args.forEachIndexed { index, value ->
             config.dialect.setValue(this, index, value.any, value.klass)
         }
     }

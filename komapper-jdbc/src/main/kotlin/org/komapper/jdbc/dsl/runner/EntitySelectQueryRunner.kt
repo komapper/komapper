@@ -53,7 +53,7 @@ class EntitySelectQueryRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, I
     }
 
     override fun dryRun(config: DatabaseConfig): String {
-        return buildStatement(config).asSql()
+        return buildStatement(config).toSql()
     }
 
     private fun buildStatement(config: DatabaseConfig): Statement {
