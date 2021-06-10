@@ -20,7 +20,6 @@ import org.komapper.core.Statement
 import org.komapper.core.UniqueConstraintException
 import org.reactivestreams.Publisher
 
-// TODO connection closing
 class R2dbcExecutor(
     private val config: R2dbcDatabaseConfig,
     executionOptionProvider: ExecutionOptionProvider,
@@ -86,10 +85,13 @@ class R2dbcExecutor(
             r2dbcStmt.setUp()
             r2dbcStmt.bind(statement)
             r2dbcStmt.execute().toFlow().flatMapConcat { result ->
-                // TODO
                 val generatedKeys = result.fetchGeneratedKeys().toList().toLongArray()
-                result.rowsUpdated.toFlow().map { count ->
-                    count to generatedKeys
+                // TODO: remove workaround code
+                // https://github.com/pgjdbc/r2dbc-postgresql/issues/415
+                if (config.dialect.driver == "postgresql" && generatedKeys.isNotEmpty()) {
+                    flowOf(generatedKeys.size to generatedKeys)
+                } else {
+                    result.rowsUpdated.toFlow().map { count -> count to generatedKeys }
                 }
             }.onCompletion {
                 con.close()
@@ -177,10 +179,9 @@ class R2dbcExecutor(
     private fun Result.fetchGeneratedKeys(): Flow<Long> {
         return if (generatedColumn != null) {
             this.map { row, _ ->
-                // TODO
                 when (val value = row.get(0)) {
                     is Number -> value.toLong()
-                    else -> error("illegal value: $value")
+                    else -> error("Generated value is not Number. generatedColumn=$generatedColumn, value=$value, valueType=${value::class.qualifiedName}")
                 }
             }.toFlow()
         } else {

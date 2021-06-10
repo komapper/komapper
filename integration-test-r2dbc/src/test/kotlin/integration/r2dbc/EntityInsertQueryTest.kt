@@ -127,8 +127,6 @@ class EntityInsertQueryTest(private val db: R2dbcDatabase) {
         }
     }
 
-    // TODO: the combination with returnGeneratedValues and rowsUpdated doesn't work in PostgreSQL 
-    @Run(unless = [Dbms.POSTGRESQL])
     @Test
     fun identityGenerator() = inTransaction(db) {
         for (i in 1..201) {
