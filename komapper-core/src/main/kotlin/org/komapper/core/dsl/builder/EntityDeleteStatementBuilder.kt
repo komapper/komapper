@@ -17,7 +17,7 @@ class EntityDeleteStatementBuilder<ENTITY : Any, ID, META : EntityMetamodel<ENTI
 ) {
 
     private val aliasManager = DefaultAliasManager(context)
-    private val buf = StatementBuffer(dialect::formatValue)
+    private val buf = StatementBuffer()
     private val support = BuilderSupport(dialect, aliasManager, buf)
 
     fun build(): Statement {

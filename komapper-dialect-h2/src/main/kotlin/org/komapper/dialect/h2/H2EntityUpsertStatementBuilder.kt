@@ -14,7 +14,7 @@ import org.komapper.core.dsl.expression.TableExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 
 internal class H2EntityUpsertStatementBuilder<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
-    private val dialect: H2Dialect,
+    dialect: H2Dialect,
     private val context: EntityUpsertContext<ENTITY, ID, META>,
     entities: List<ENTITY>
 ) : EntityUpsertStatementBuilder<ENTITY> {
@@ -22,7 +22,7 @@ internal class H2EntityUpsertStatementBuilder<ENTITY : Any, ID, META : EntityMet
     private val target = context.target
     private val excluded = context.excluded
     private val aliasManager = UpsertAliasManager(target, excluded)
-    private val buf = StatementBuffer(dialect::formatValue)
+    private val buf = StatementBuffer()
     private val support = BuilderSupport(dialect, aliasManager, buf)
     private val sourceStatementBuilder = SourceStatementBuilder(dialect, context, entities)
 
@@ -96,7 +96,7 @@ internal class H2EntityUpsertStatementBuilder<ENTITY : Any, ID, META : EntityMet
         val entities: List<ENTITY>
     ) {
 
-        private val buf = StatementBuffer(dialect::formatValue)
+        private val buf = StatementBuffer()
 
         fun build(): Statement {
             val properties = context.target.properties()

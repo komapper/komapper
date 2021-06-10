@@ -45,7 +45,7 @@ internal data class EntityUpdateBatchQueryRunner<ENTITY : Any, ID, META : Entity
 
     override fun dryRun(config: DatabaseConfig): String {
         if (entities.isEmpty()) return ""
-        return buildStatement(config, entities.first()).toString()
+        return buildStatement(config, entities.first()).asSql()
     }
 
     private fun buildStatement(config: DatabaseConfig, entity: ENTITY): Statement {

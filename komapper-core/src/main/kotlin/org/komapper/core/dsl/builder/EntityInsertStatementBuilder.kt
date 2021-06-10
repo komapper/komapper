@@ -14,7 +14,7 @@ class EntityInsertStatementBuilder<ENTITY : Any, ID, META : EntityMetamodel<ENTI
     val entities: List<ENTITY>
 ) {
 
-    private val buf = StatementBuffer(dialect::formatValue)
+    private val buf = StatementBuffer()
 
     fun build(): Statement {
         val target = context.target

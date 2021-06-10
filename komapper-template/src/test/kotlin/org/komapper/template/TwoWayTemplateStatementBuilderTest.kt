@@ -28,7 +28,7 @@ class TwoWayTemplateStatementBuilderTest {
     fun simple() {
         val template = "select * from person"
         val sql = sqlBuilder.build(template)
-        assertEquals(template, sql.toString())
+        assertEquals(template, sql.asSql())
     }
 
     @Test
@@ -36,7 +36,7 @@ class TwoWayTemplateStatementBuilderTest {
         val template =
             "select name, age from person where name = /*name*/'test' and age > 1 order by name, age for update"
         val sql = sqlBuilder.build(template)
-        assertEquals("select name, age from person where name = ? and age > 1 order by name, age for update", sql.toString())
+        assertEquals("select name, age from person where name = ? and age > 1 order by name, age for update", sql.asSql())
     }
 
     @Test
@@ -54,7 +54,7 @@ class TwoWayTemplateStatementBuilderTest {
         fun singleValue() {
             val template = "select name, age from person where name = /*name*/'test' and age > 1"
             val sql = sqlBuilder.build(template, ExprContext(mapOf("name" to Value("aaa"))))
-            assertEquals("select name, age from person where name = ? and age > 1", sql.toString())
+            assertEquals("select name, age from person where name = ? and age > 1", sql.asSql())
             assertEquals(listOf(Value("aaa")), sql.values)
         }
 
@@ -62,7 +62,7 @@ class TwoWayTemplateStatementBuilderTest {
         fun singleValue_null() {
             val template = "select name, age from person where name = /*name*/'test' and age > 1"
             val sql = sqlBuilder.build(template)
-            assertEquals("select name, age from person where name = ? and age > 1", sql.toString())
+            assertEquals("select name, age from person where name = ? and age > 1", sql.asSql())
             assertEquals(listOf(Value(null, Any::class)), sql.values)
         }
 
@@ -70,7 +70,7 @@ class TwoWayTemplateStatementBuilderTest {
         fun multipleValues() {
             val template = "select name, age from person where name in /*name*/('a', 'b') and age > 1"
             val sql = sqlBuilder.build(template, ExprContext(mapOf("name" to Value(listOf("x", "y", "z")))))
-            assertEquals("select name, age from person where name in (?, ?, ?) and age > 1", sql.toString())
+            assertEquals("select name, age from person where name in (?, ?, ?) and age > 1", sql.asSql())
             assertEquals(
                 listOf(
                     Value("x"),
@@ -85,7 +85,7 @@ class TwoWayTemplateStatementBuilderTest {
         fun multipleValues_null() {
             val template = "select name, age from person where name in /*name*/('a', 'b') and age > 1"
             val sql = sqlBuilder.build(template)
-            assertEquals("select name, age from person where name in ? and age > 1", sql.toString())
+            assertEquals("select name, age from person where name in ? and age > 1", sql.asSql())
             assertEquals(listOf(Value(null, Any::class)), sql.values)
         }
 
@@ -93,7 +93,7 @@ class TwoWayTemplateStatementBuilderTest {
         fun multipleValues_empty() {
             val template = "select name, age from person where name in /*name*/('a', 'b') and age > 1"
             val sql = sqlBuilder.build(template, ExprContext(mapOf("name" to Value(emptyList<String>()))))
-            assertEquals("select name, age from person where name in (null) and age > 1", sql.toString())
+            assertEquals("select name, age from person where name in (null) and age > 1", sql.asSql())
             assertTrue(sql.values.isEmpty())
         }
 
@@ -103,7 +103,7 @@ class TwoWayTemplateStatementBuilderTest {
                 "select name, age from person where (name, age) in /*pairs*/(('a', 'b'), ('c', 'd'))",
                 ExprContext(mapOf("pairs" to Value(listOf("x" to 1, "y" to 2, "z" to 3))))
             )
-            assertEquals("select name, age from person where (name, age) in ((?, ?), (?, ?), (?, ?))", sql.toString())
+            assertEquals("select name, age from person where (name, age) in ((?, ?), (?, ?), (?, ?))", sql.asSql())
             assertEquals(
                 listOf(
                     Value("x"), Value(1),
@@ -132,7 +132,7 @@ class TwoWayTemplateStatementBuilderTest {
             )
             assertEquals(
                 "select name, age from person where (name, age, weight) in ((?, ?, ?), (?, ?, ?), (?, ?, ?))",
-                sql.toString()
+                sql.asSql()
             )
             assertEquals(
                 listOf(
@@ -152,21 +152,21 @@ class TwoWayTemplateStatementBuilderTest {
         fun `Include the 'order by' clause into the embedded value`() {
             val template = "select name, age from person where age > 1 /*# orderBy */"
             val sql = sqlBuilder.build(template, ExprContext(mapOf("orderBy" to Value("order by name"))))
-            assertEquals("select name, age from person where age > 1 order by name", sql.toString())
+            assertEquals("select name, age from person where age > 1 order by name", sql.asSql())
         }
 
         @Test
         fun `Exclude the 'order by' clause from the embedded value`() {
             val template = "select name, age from person where age > 1 order by /*# orderBy */"
             val sql = sqlBuilder.build(template, ExprContext(mapOf("orderBy" to Value("name, age"))))
-            assertEquals("select name, age from person where age > 1 order by name, age", sql.toString())
+            assertEquals("select name, age from person where age > 1 order by name, age", sql.asSql())
         }
 
         @Test
         fun `Remove the 'order by' clause automatically`() {
             val template = "select name, age from person where age > 1 order by /*# orderBy */"
             val sql = sqlBuilder.build(template, ExprContext(mapOf("orderBy" to Value(""))))
-            assertEquals("select name, age from person where age > 1 ", sql.toString())
+            assertEquals("select name, age from person where age > 1 ", sql.asSql())
         }
     }
 
@@ -177,7 +177,7 @@ class TwoWayTemplateStatementBuilderTest {
         fun test() {
             val template = "select name, age from person where name = /*^name*/'test' and age > 1"
             val sql = sqlBuilder.build(template, ExprContext(mapOf("name" to Value("aaa"))))
-            assertEquals("select name, age from person where name = 'aaa' and age > 1", sql.toString())
+            assertEquals("select name, age from person where name = 'aaa' and age > 1", sql.asSql())
         }
     }
 
@@ -188,7 +188,7 @@ class TwoWayTemplateStatementBuilderTest {
             val template =
                 "select name, age from person where /*%if name != null*/name = /*name*/'test'/*%end*/ and 1 = 1"
             val sql = sqlBuilder.build(template, ExprContext(mapOf("name" to Value("aaa"))))
-            assertEquals("select name, age from person where name = ? and 1 = 1", sql.toString())
+            assertEquals("select name, age from person where name = ? and 1 = 1", sql.asSql())
             assertEquals(listOf(Value("aaa")), sql.values)
         }
 
@@ -197,7 +197,7 @@ class TwoWayTemplateStatementBuilderTest {
             val template =
                 "select name, age from person where /*%if name != null*/name = /*name*/'test'/*%end*/ and 1 = 1"
             val sql = sqlBuilder.build(template)
-            assertEquals("select name, age from person where   1 = 1", sql.toString())
+            assertEquals("select name, age from person where   1 = 1", sql.asSql())
         }
 
         @Test
@@ -205,7 +205,7 @@ class TwoWayTemplateStatementBuilderTest {
             val template =
                 "select name, age from person where /*%if name != null*/name = /*name*/'test'/*%end*/ order by name"
             val sql = sqlBuilder.build(template)
-            assertEquals("select name, age from person   order by name", sql.toString())
+            assertEquals("select name, age from person   order by name", sql.asSql())
         }
 
         @Test
@@ -213,7 +213,7 @@ class TwoWayTemplateStatementBuilderTest {
             val template =
                 "select name, age from person where /*%if name != null*/name = /*name*/'test'/*%end*/ order by /*%if false*/name/*%end*/"
             val sql = sqlBuilder.build(template)
-            assertEquals("select name, age from person ", sql.toString())
+            assertEquals("select name, age from person ", sql.asSql())
         }
     }
 
@@ -224,7 +224,7 @@ class TwoWayTemplateStatementBuilderTest {
             val template =
                 "select name, age from person where /*%for i in list*/age = /*i*/0 /*%if i_has_next *//*# \"or\" */ /*%end*//*%end*/"
             val sql = sqlBuilder.build(template, ExprContext(mapOf("list" to Value(listOf(1, 2, 3)))))
-            assertEquals("select name, age from person where age = ? or age = ? or age = ? ", sql.toString())
+            assertEquals("select name, age from person where age = ? or age = ? or age = ? ", sql.asSql())
             assertEquals(
                 listOf(
                     Value(1),
@@ -242,14 +242,14 @@ class TwoWayTemplateStatementBuilderTest {
         fun subQuery() {
             val template = "select name, age from (select * from person)"
             val sql = sqlBuilder.build(template)
-            assertEquals("select name, age from (select * from person)", sql.toString())
+            assertEquals("select name, age from (select * from person)", sql.asSql())
         }
 
         @Test
         fun emptyParentheses() {
             val template = "select name, age from my_function()"
             val sql = sqlBuilder.build(template)
-            assertEquals(template, sql.toString())
+            assertEquals(template, sql.asSql())
         }
     }
 
@@ -259,14 +259,14 @@ class TwoWayTemplateStatementBuilderTest {
         fun test() {
             val template = "select name from a union select name from b"
             val sql = sqlBuilder.build(template)
-            assertEquals(template, sql.toString())
+            assertEquals(template, sql.asSql())
         }
 
         @Test
         fun `Remove the 'union' keyword automatically`() {
             val template = "select name from a union /*%if false*/select name from b/*%end*/"
             val sql = sqlBuilder.build(template)
-            assertEquals("select name from a ", sql.toString())
+            assertEquals("select name from a ", sql.asSql())
         }
     }
 }

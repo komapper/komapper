@@ -8,8 +8,7 @@ class SqlCommenterStatementInspector : StatementInspector {
 
     override fun inspect(statement: Statement): Statement {
         val scHibernate = SCHibernate()
-        val sql = scHibernate.inspect(statement.toString())
-        val sqlWithArgs = scHibernate.inspect(statement.sqlWithArgs)
-        return statement.copy(sql = listOf(sql), sqlWithArgs = sqlWithArgs)
+        val comment = scHibernate.inspect(" ").trim()
+        return statement.copy(fragments = statement.fragments + comment)
     }
 }

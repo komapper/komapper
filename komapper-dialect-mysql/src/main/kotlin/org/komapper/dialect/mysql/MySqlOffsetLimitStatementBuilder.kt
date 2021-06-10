@@ -11,7 +11,7 @@ class MySqlOffsetLimitStatementBuilder(
     private val limit: Int
 ) : OffsetLimitStatementBuilder {
 
-    private val buf = StatementBuffer(dialect::formatValue)
+    private val buf = StatementBuffer()
 
     override fun build(): Statement {
         val offsetRequired = offset >= 0

@@ -22,7 +22,7 @@ internal class EntityInsertQuerySupport<ENTITY : Any, ID, META : EntityMetamodel
                 val statement = Statement(sql)
                 val executor = JdbcExecutor(config, option)
                 executor.executeQuery(statement) { rs ->
-                    if (rs.next()) rs.getLong(1) else error("No result: ${statement.sql}")
+                    if (rs.next()) rs.getLong(1) else error("No result: ${statement.fragments}")
                 }
             }
         } else {

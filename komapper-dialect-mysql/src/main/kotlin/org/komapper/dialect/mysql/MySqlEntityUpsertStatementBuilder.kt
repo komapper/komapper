@@ -23,7 +23,7 @@ class MySqlEntityUpsertStatementBuilder<ENTITY : Any, ID, META : EntityMetamodel
     private val target = context.target
     private val excluded = context.excluded
     private val aliasManager = UpsertAliasManager(dialect, target, excluded)
-    private val buf = StatementBuffer(dialect::formatValue)
+    private val buf = StatementBuffer()
     private val support = BuilderSupport(dialect, aliasManager, buf)
 
     override fun build(): Statement {

@@ -15,7 +15,7 @@ interface SchemaStatementBuilder {
 
 abstract class AbstractSchemaStatementBuilder<D : Dialect>(protected val dialect: D) : SchemaStatementBuilder {
 
-    protected val buf = StatementBuffer(dialect::formatValue)
+    protected val buf = StatementBuffer()
 
     override fun create(metamodels: List<EntityMetamodel<*, *, *>>): Statement {
         createSchema(metamodels)

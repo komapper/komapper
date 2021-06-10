@@ -29,7 +29,7 @@ internal class EntityInsertQuerySupport<ENTITY : Any, ID, META : EntityMetamodel
                 }
                 // TODO
                 runBlocking {
-                    flow.firstOrNull() ?: error("No result: ${statement.sql}")
+                    flow.firstOrNull() ?: error("No result: ${statement.fragments}")
                 }
             }
         } else {

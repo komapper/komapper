@@ -46,7 +46,7 @@ internal data class EntityInsertMultipleQueryRunner<ENTITY : Any, ID, META : Ent
     override fun dryRun(config: DatabaseConfig): String {
         if (entities.isEmpty()) return ""
         val statement = buildStatement(config, entities)
-        return statement.toString()
+        return statement.asSql()
     }
 
     private fun buildStatement(config: DatabaseConfig, entities: List<ENTITY>): Statement {
