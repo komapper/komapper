@@ -226,7 +226,7 @@ internal class TwoWayTemplateStatementBuilder(
     inner class State(private val ctx: ExprContext) {
         constructor(state: State) : this(ExprContext(state.valueMap))
 
-        private val buf = StatementBuffer(formatter)
+        private val buf = StatementBuffer()
         val valueMap: MutableMap<String, Value> = HashMap(ctx.valueMap)
         var available: Boolean = false
 
@@ -235,9 +235,8 @@ internal class TwoWayTemplateStatementBuilder(
         }
 
         fun append(state: State): State {
-            buf.sql.addAll(state.buf.sql)
-            buf.sqlWithArgs.append(state.buf.sqlWithArgs)
-            buf.values.addAll(state.buf.values)
+            buf.fragments.addAll(state.buf.fragments)
+            buf.args.addAll(state.buf.args)
             return this
         }
 

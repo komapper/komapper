@@ -36,7 +36,7 @@ class SqlMultipleEntitiesQueryRunner<R>(
     }
 
     override fun dryRun(config: DatabaseConfig): String {
-        return buildStatement(config).toString()
+        return buildStatement(config).asSql()
     }
 
     private fun buildStatement(config: DatabaseConfig): Statement {

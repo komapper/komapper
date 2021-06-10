@@ -13,7 +13,7 @@ class SqlSelectStatementBuilder(
     val context: SqlSelectContext<*, *, *>,
     aliasManager: AliasManager = DefaultAliasManager(context)
 ) {
-    private val buf = StatementBuffer(dialect::formatValue)
+    private val buf = StatementBuffer()
     private val support = SelectStatementBuilderSupport(dialect, context, aliasManager, buf)
 
     fun build(): Statement {

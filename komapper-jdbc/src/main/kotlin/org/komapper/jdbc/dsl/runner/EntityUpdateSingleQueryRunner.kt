@@ -35,7 +35,7 @@ internal data class EntityUpdateSingleQueryRunner<ENTITY : Any, ID, META : Entit
 
     override fun dryRun(config: DatabaseConfig): String {
         val statement = buildStatement(config, entity)
-        return statement.toString()
+        return statement.asSql()
     }
 
     private fun buildStatement(config: DatabaseConfig, entity: ENTITY): Statement {

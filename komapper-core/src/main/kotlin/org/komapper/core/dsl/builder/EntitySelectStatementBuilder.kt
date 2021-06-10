@@ -11,7 +11,7 @@ class EntitySelectStatementBuilder<ENTITY : Any, ID, META : EntityMetamodel<ENTI
     val context: EntitySelectContext<ENTITY, ID, META>,
     aliasManager: AliasManager = DefaultAliasManager(context)
 ) {
-    private val buf = StatementBuffer(dialect::formatValue)
+    private val buf = StatementBuffer()
     private val support = SelectStatementBuilderSupport(dialect, context, aliasManager, buf)
 
     fun build(): Statement {

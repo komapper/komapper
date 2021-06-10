@@ -39,7 +39,7 @@ internal data class SqlSelectQueryRunner<ENTITY : Any, ID, META : EntityMetamode
     }
 
     override fun dryRun(config: R2dbcDatabaseConfig): String {
-        return buildStatement(config).toString()
+        return buildStatement(config).asSql()
     }
 
     private fun buildStatement(config: R2dbcDatabaseConfig): Statement {

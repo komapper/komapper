@@ -1,50 +1,42 @@
 package org.komapper.core
 
-import kotlin.reflect.KClass
-
-class StatementBuffer(
-    val format: (Any?, KClass<*>) -> String,
-    capacity: Int = 200
-) {
-    val sql = mutableListOf<CharSequence>()
-    val sqlWithArgs = StringBuilder(capacity)
-    val values = ArrayList<Value>()
+class StatementBuffer {
+    val fragments = mutableListOf<CharSequence>()
+    val args = ArrayList<Value>()
 
     fun append(s: CharSequence): StatementBuffer {
-        sql.add(s)
-        sqlWithArgs.append(s)
+        fragments.add(s)
         return this
     }
 
     fun append(statement: Statement): StatementBuffer {
-        sql.addAll(statement.sql)
-        values.addAll(statement.values)
-        sqlWithArgs.append(statement.sqlWithArgs)
+        fragments.addAll(statement.fragments)
+        args.addAll(statement.values)
         return this
     }
 
     fun bind(value: Value): StatementBuffer {
-        sql.add(PlaceHolder)
-        sqlWithArgs.append(format(value.any, value.klass))
-        values.add(value)
+        fragments.add(PlaceHolder)
+        args.add(value)
         return this
     }
 
     fun cutBack(length: Int): StatementBuffer {
-        val last = sql.removeLast()
+        val last = fragments.removeLast()
         if (last is PlaceHolder || last.length < length) error("Cannot cutBack.")
         val newLast = last.dropLast(length)
-        if (newLast.isNotEmpty()) sql.add(newLast)
-        sqlWithArgs.setLength(sqlWithArgs.length - length)
+        if (newLast.isNotEmpty()) fragments.add(newLast)
         return this
     }
 
     fun toStatement(): Statement {
-        if (sql.isEmpty() && values.isEmpty() && sqlWithArgs.isEmpty()) {
+        if (fragments.isEmpty() && args.isEmpty()) {
             return Statement.EMPTY
         }
-        return Statement(sql, values, sqlWithArgs.toString())
+        return Statement(fragments, args)
     }
 
-    override fun toString() = sql.joinToString(separator = "")
+    override fun toString(): String {
+        return toStatement().asSql()
+    }
 }

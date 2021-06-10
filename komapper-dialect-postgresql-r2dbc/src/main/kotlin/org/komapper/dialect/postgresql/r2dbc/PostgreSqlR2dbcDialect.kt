@@ -5,13 +5,13 @@ import org.komapper.r2dbc.AbstractR2dbcDialect
 import org.komapper.r2dbc.ArrayType
 import org.komapper.r2dbc.BigDecimalType
 import org.komapper.r2dbc.BigIntegerType
-import org.komapper.r2dbc.BindMarker
+import org.komapper.r2dbc.Binder
 import org.komapper.r2dbc.BooleanType
 import org.komapper.r2dbc.ByteArrayType
 import org.komapper.r2dbc.ByteType
 import org.komapper.r2dbc.DoubleType
 import org.komapper.r2dbc.FloatType
-import org.komapper.r2dbc.IndexedBindMarker
+import org.komapper.r2dbc.IndexedBinder
 import org.komapper.r2dbc.IntType
 import org.komapper.r2dbc.LocalDateTimeType
 import org.komapper.r2dbc.LocalDateType
@@ -56,7 +56,7 @@ open class PostgreSqlR2dbcDialect(
         )
     }
 
-    override fun getBindMarker(): BindMarker {
-        return IndexedBindMarker
+    override fun getBinder(): Binder {
+        return IndexedBinder
     }
 }

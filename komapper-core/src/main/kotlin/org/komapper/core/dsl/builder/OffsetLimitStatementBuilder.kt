@@ -15,7 +15,7 @@ class OffsetLimitStatementBuilderImpl(
     private val limit: Int
 ) : OffsetLimitStatementBuilder {
 
-    private val buf = StatementBuffer(dialect::formatValue)
+    private val buf = StatementBuffer()
 
     override fun build(): Statement {
         if (offset >= 0) {

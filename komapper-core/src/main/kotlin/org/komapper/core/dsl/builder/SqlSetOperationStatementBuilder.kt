@@ -16,7 +16,7 @@ class SqlSetOperationStatementBuilder(
     private val aliasManager: AliasManager
 ) {
 
-    private val buf = StatementBuffer(dialect::formatValue)
+    private val buf = StatementBuffer()
     private val support = OrderByBuilderSupport(dialect, context.orderBy, SetOperationAliasManager, buf)
 
     fun build(): Statement {
