@@ -1,10 +1,10 @@
 package org.komapper.core.dsl.metamodel
 
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import org.komapper.core.ThreadSafe
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.locks.ReentrantLock
-import kotlin.concurrent.withLock
 import kotlin.reflect.KClass
 
 @ThreadSafe
@@ -39,11 +39,11 @@ sealed class Assignment<ENTITY> {
 
         private val contextMap = ConcurrentHashMap<UUID, GenerationContext>()
 
-        fun assign(
+        suspend fun assign(
             entity: ENTITY,
             key: UUID,
             enquote: (String) -> String,
-            sequenceNextValue: (String) -> Long
+            sequenceNextValue: suspend (String) -> Long
         ): ENTITY {
             val context = contextMap.computeIfAbsent(key) {
                 val sequenceName = getCanonicalSequenceName(enquote)
@@ -66,13 +66,13 @@ sealed class Assignment<ENTITY> {
                 .filter { it.isNotBlank() }.joinToString(".", transform = transform)
         }
 
-        private class GenerationContext(startWith: Int, val incrementBy: Int, val nextValue: () -> Long) {
-            private val lock = ReentrantLock()
+        private class GenerationContext(startWith: Int, val incrementBy: Int, val nextValue: suspend () -> Long) {
+            private val mutex = Mutex()
             private var base = startWith.toLong()
             private var step = Long.MAX_VALUE
 
-            fun next(): Long {
-                return lock.withLock {
+            suspend fun next(): Long {
+                return mutex.withLock {
                     if (step < incrementBy) {
                         base + step++
                     } else {

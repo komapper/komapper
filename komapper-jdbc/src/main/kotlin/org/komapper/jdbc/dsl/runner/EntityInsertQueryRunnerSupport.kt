@@ -1,5 +1,6 @@
 package org.komapper.jdbc.dsl.runner
 
+import kotlinx.coroutines.runBlocking
 import org.komapper.core.Statement
 import org.komapper.core.dsl.builder.EntityInsertStatementBuilder
 import org.komapper.core.dsl.context.EntityInsertContext
@@ -16,12 +17,14 @@ internal class EntityInsertQueryRunnerSupport<ENTITY : Any, ID, META : EntityMet
     fun preInsert(config: DatabaseConfig, entity: ENTITY): ENTITY {
         val assignment = context.target.idAssignment()
         return if (!option.disableSequenceAssignment && assignment is Assignment.Sequence<ENTITY, *, *>) {
-            assignment.assign(entity, config.id, config.dialect::enquote) { sequenceName ->
-                val sql = config.dialect.getSequenceSql(sequenceName)
-                val statement = Statement(sql)
-                val executor = JdbcExecutor(config, option)
-                executor.executeQuery(statement) { rs ->
-                    if (rs.next()) rs.getLong(1) else error("No result: ${statement.fragments}")
+            runBlocking {
+                assignment.assign(entity, config.id, config.dialect::enquote) { sequenceName ->
+                    val sql = config.dialect.getSequenceSql(sequenceName)
+                    val statement = Statement(sql)
+                    val executor = JdbcExecutor(config, option)
+                    executor.executeQuery(statement) { rs ->
+                        if (rs.next()) rs.getLong(1) else error("No result: ${statement.fragments}")
+                    }
                 }
             }
         } else {
