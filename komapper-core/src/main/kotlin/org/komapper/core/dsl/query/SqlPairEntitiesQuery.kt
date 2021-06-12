@@ -1,70 +1,50 @@
 package org.komapper.core.dsl.query
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.toList
 import org.komapper.core.dsl.context.SqlSelectContext
-import org.komapper.core.dsl.context.SqlSetOperationContext
-import org.komapper.core.dsl.context.SqlSetOperationKind
 import org.komapper.core.dsl.context.SubqueryContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.option.SqlSelectOption
+import org.komapper.core.dsl.runner.QueryRunner
+import org.komapper.core.dsl.visitor.QueryVisitor
 
-class SqlPairEntitiesQuery<A : Any, A_META : EntityMetamodel<A, *, A_META>, B : Any, B_META : EntityMetamodel<B, *, B_META>>(
-    val context: SqlSelectContext<A, *, A_META>,
-    val option: SqlSelectOption,
-    val metamodels: Pair<A_META, B_META>
-) : Subquery<Pair<A, B?>> {
+internal class SqlPairEntitiesQuery<A : Any, A_META : EntityMetamodel<A, *, A_META>, B : Any, B_META : EntityMetamodel<B, *, B_META>>(
+    private val context: SqlSelectContext<A, *, A_META>,
+    private val option: SqlSelectOption,
+    private val metamodels: Pair<A_META, B_META>
+) : FlowableSubquery<Pair<A, B?>> {
 
-    override val subqueryContext: SubqueryContext<Pair<A, B?>>
-        get() = SubqueryContext.SqlSelect(context)
+    override val subqueryContext: SubqueryContext<Pair<A, B?>> = SubqueryContext.SqlSelect(context)
 
-    override fun first(): Query<Pair<A, B?>> {
-        TODO("Not yet implemented")
-    }
-
-    override fun firstOrNull(): Query<Pair<A, B?>?> {
-        TODO("Not yet implemented")
-    }
-
-    override fun <R> collect(collect: suspend (Flow<Pair<A, B?>>) -> R): Query<R> {
-        TODO("Not yet implemented")
-    }
-
-    override fun except(other: Subquery<Pair<A, B?>>): SetOperationQuery<Pair<A, B?>> {
-        return setOperation(SqlSetOperationKind.EXCEPT, other)
-    }
-
-    override fun intersect(other: Subquery<Pair<A, B?>>): SetOperationQuery<Pair<A, B?>> {
-        return setOperation(SqlSetOperationKind.INTERSECT, other)
-    }
-
-    override fun union(other: Subquery<Pair<A, B?>>): SetOperationQuery<Pair<A, B?>> {
-        return setOperation(SqlSetOperationKind.UNION, other)
-    }
-
-    override fun unionAll(other: Subquery<Pair<A, B?>>): SetOperationQuery<Pair<A, B?>> {
-        return setOperation(SqlSetOperationKind.UNION_ALL, other)
-    }
-
-    private fun setOperation(
-        kind: SqlSetOperationKind,
-        other: Subquery<Pair<A, B?>>
-    ): SetOperationQuery<Pair<A, B?>> {
-        val setOperatorContext = SqlSetOperationContext(kind, this.subqueryContext, other.subqueryContext)
-        return SqlPairEntitiesSetOperationQuery(setOperatorContext, metamodels = metamodels)
-    }
+    private val support: FlowableSubquerySupport<Pair<A, B?>> =
+        FlowableSubquerySupport(subqueryContext) { SqlPairEntitiesSetOperationQuery(it, metamodels = metamodels) }
 
     override fun accept(visitor: QueryVisitor): QueryRunner {
-        return visitor.visit(this)
+        return visitor.sqlPairEntitiesQuery(context, option, metamodels) { it.toList() }
     }
 
-    class Collect<A : Any, A_META : EntityMetamodel<A, *, A_META>, B : Any, B_META : EntityMetamodel<B, *, B_META>, R>(
-        val context: SqlSelectContext<A, *, A_META>,
-        val option: SqlSelectOption,
-        val metamodels: Pair<A_META, B_META>,
-        val transform: suspend (Flow<Pair<A, B?>>) -> R
-    ) : Query<Pair<A, B?>> {
-        override fun accept(visitor: QueryVisitor): QueryRunner {
-            return visitor.visit(this)
-        }
+    override fun <R> collect(collect: suspend (Flow<Pair<A, B?>>) -> R): Query<R> = Query { visitor ->
+        visitor.sqlPairEntitiesQuery(context, option, metamodels, collect)
+    }
+
+    override fun asFlowQuery(): FlowQuery<Pair<A, B?>> = FlowQuery { visitor ->
+        visitor.sqlPairEntitiesQuery(context, option, metamodels)
+    }
+
+    override fun except(other: Subquery<Pair<A, B?>>): FlowableSetOperationQuery<Pair<A, B?>> {
+        return support.except(other)
+    }
+
+    override fun intersect(other: Subquery<Pair<A, B?>>): FlowableSetOperationQuery<Pair<A, B?>> {
+        return support.intersect(other)
+    }
+
+    override fun union(other: Subquery<Pair<A, B?>>): FlowableSetOperationQuery<Pair<A, B?>> {
+        return support.union(other)
+    }
+
+    override fun unionAll(other: Subquery<Pair<A, B?>>): FlowableSetOperationQuery<Pair<A, B?>> {
+        return support.unionAll(other)
     }
 }

@@ -3,9 +3,8 @@ package org.komapper.jdbc.dsl.runner
 import org.komapper.core.Statement
 import org.komapper.core.dsl.option.TemplateExecuteOption
 import org.komapper.jdbc.DatabaseConfig
-import org.komapper.jdbc.JdbcExecutor
 
-internal data class TemplateExecuteQueryRunner(
+internal class TemplateExecuteQueryRunner(
     private val sql: String,
     private val params: Any = object {},
     private val option: TemplateExecuteOption = TemplateExecuteOption.default

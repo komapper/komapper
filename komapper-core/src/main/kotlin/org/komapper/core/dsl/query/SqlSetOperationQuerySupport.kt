@@ -6,8 +6,8 @@ import org.komapper.core.dsl.context.SubqueryContext
 import org.komapper.core.dsl.element.SortItem
 import org.komapper.core.dsl.expression.ColumnExpression
 
-data class SqlSetOperationQuerySupport<T : Any?>(
-    val context: SqlSetOperationContext<T>
+internal data class SqlSetOperationQuerySupport<T : Any?>(
+    private val context: SqlSetOperationContext<T>
 ) {
 
     val subqueryContext = SubqueryContext.SqlSetOperation(context)

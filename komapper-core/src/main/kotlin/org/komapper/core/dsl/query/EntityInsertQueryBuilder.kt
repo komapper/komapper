@@ -45,20 +45,20 @@ internal data class EntityInsertQueryBuilderImpl<ENTITY : Any, ID, META : Entity
         return EntityUpsertQueryBuilderImpl(newContext, option)
     }
 
-    override fun single(entity: ENTITY): Query<ENTITY> {
-        return EntityInsertSingleQuery(context, entity, option)
+    override fun single(entity: ENTITY): Query<ENTITY> = Query { visitor ->
+        visitor.entityInsertSingleQuery(context, option, entity)
     }
 
-    override fun multiple(entities: List<ENTITY>): Query<List<ENTITY>> {
-        return EntityInsertMultipleQuery(context, entities, option)
+    override fun multiple(entities: List<ENTITY>): Query<List<ENTITY>> = Query { visitor ->
+        visitor.entityInsertMultipleQuery(context, option, entities)
     }
 
     override fun multiple(vararg entities: ENTITY): Query<List<ENTITY>> {
         return multiple(entities.toList())
     }
 
-    override fun batch(entities: List<ENTITY>, batchSize: Int?): Query<List<ENTITY>> {
-        return EntityInsertBatchQuery(context, entities, option.asEntityBatchInsertOption(batchSize))
+    override fun batch(entities: List<ENTITY>, batchSize: Int?): Query<List<ENTITY>> = Query { visitor ->
+        visitor.entityInsertBatchQuery(context, option.asEntityBatchInsertOption(batchSize), entities)
     }
 
     override fun batch(vararg entities: ENTITY, batchSize: Int?): Query<List<ENTITY>> {

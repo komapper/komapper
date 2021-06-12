@@ -4,11 +4,10 @@ import org.komapper.core.Statement
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.option.SchemaCreateOption
 import org.komapper.jdbc.DatabaseConfig
-import org.komapper.jdbc.JdbcExecutor
 
-internal data class SchemaCreateQueryRunner(
-    val entityMetamodels: List<EntityMetamodel<*, *, *>> = emptyList(),
-    val option: SchemaCreateOption = SchemaCreateOption.default
+internal class SchemaCreateQueryRunner(
+    private val entityMetamodels: List<EntityMetamodel<*, *, *>> = emptyList(),
+    private val option: SchemaCreateOption = SchemaCreateOption.default
 ) : JdbcQueryRunner<Unit> {
 
     override fun run(config: DatabaseConfig) {

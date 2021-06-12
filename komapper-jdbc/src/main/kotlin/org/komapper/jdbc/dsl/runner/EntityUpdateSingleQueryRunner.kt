@@ -6,13 +6,13 @@ import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.option.EntityUpdateOption
 import org.komapper.jdbc.DatabaseConfig
 
-internal data class EntityUpdateSingleQueryRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
-    private val context: EntityUpdateContext<ENTITY, ID, META>,
-    private val option: EntityUpdateOption,
+internal class EntityUpdateSingleQueryRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+    context: EntityUpdateContext<ENTITY, ID, META>,
+    option: EntityUpdateOption,
     private val entity: ENTITY
 ) : JdbcQueryRunner<ENTITY> {
 
-    private val support: EntityUpdateQuerySupport<ENTITY, ID, META> = EntityUpdateQuerySupport(context, option)
+    private val support: EntityUpdateQueryRunnerSupport<ENTITY, ID, META> = EntityUpdateQueryRunnerSupport(context, option)
 
     override fun run(config: DatabaseConfig): ENTITY {
         val newEntity = preUpdate(config, entity)

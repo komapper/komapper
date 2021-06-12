@@ -95,7 +95,6 @@ abstract class AbstractR2dbcDialect protected constructor(internalDataTypes: Lis
         )
     }
 
-    // TODO
     override fun getDataTypeName(klass: KClass<*>): String {
         val dataType = getDataType(klass)
         return dataType.name

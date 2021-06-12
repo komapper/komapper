@@ -6,14 +6,15 @@ import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.option.EntityUpdateBatchOption
 import org.komapper.jdbc.DatabaseConfig
 
-internal data class EntityUpdateBatchQueryRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
-    private val context: EntityUpdateContext<ENTITY, ID, META>,
-    private val entities: List<ENTITY>,
-    private val option: EntityUpdateBatchOption
+internal class EntityUpdateBatchQueryRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+    context: EntityUpdateContext<ENTITY, ID, META>,
+    option: EntityUpdateBatchOption,
+    private val entities: List<ENTITY>
 ) :
     JdbcQueryRunner<List<ENTITY>> {
 
-    private val support: EntityUpdateQuerySupport<ENTITY, ID, META> = EntityUpdateQuerySupport(context, option)
+    private val support: EntityUpdateQueryRunnerSupport<ENTITY, ID, META> =
+        EntityUpdateQueryRunnerSupport(context, option)
 
     override fun run(config: DatabaseConfig): List<ENTITY> {
         if (entities.isEmpty()) return emptyList()

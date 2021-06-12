@@ -3,11 +3,10 @@ package org.komapper.r2dbc.dsl.runner
 import org.komapper.core.Statement
 import org.komapper.core.dsl.option.ScriptExecuteOption
 import org.komapper.r2dbc.R2dbcDatabaseConfig
-import org.komapper.r2dbc.R2dbcExecutor
 
 internal data class ScriptExecuteQueryRunner(
-    val sql: String,
-    val option: ScriptExecuteOption = ScriptExecuteOption.default
+    private val sql: String,
+    private val option: ScriptExecuteOption = ScriptExecuteOption.default
 ) :
     R2dbcQueryRunner<Unit> {
 

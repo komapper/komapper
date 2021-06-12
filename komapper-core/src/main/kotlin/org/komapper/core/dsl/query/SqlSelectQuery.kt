@@ -1,22 +1,21 @@
 package org.komapper.core.dsl.query
 
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.toList
 import org.komapper.core.dsl.context.SqlSelectContext
-import org.komapper.core.dsl.context.SqlSetOperationContext
-import org.komapper.core.dsl.context.SqlSetOperationKind
 import org.komapper.core.dsl.context.SubqueryContext
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.expression.ScalarExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.option.SqlSelectOption
+import org.komapper.core.dsl.runner.QueryRunner
 import org.komapper.core.dsl.scope.HavingDeclaration
 import org.komapper.core.dsl.scope.HavingScope
 import org.komapper.core.dsl.scope.OnDeclaration
 import org.komapper.core.dsl.scope.WhereDeclaration
+import org.komapper.core.dsl.visitor.QueryVisitor
 
-interface SqlSelectQuery<ENTITY : Any> : Subquery<ENTITY>, FlowableQuery<ENTITY> {
+interface SqlSelectQuery<ENTITY : Any> : FlowableSubquery<ENTITY> {
 
     fun distinct(): SqlSelectQuery<ENTITY>
 
@@ -41,17 +40,17 @@ interface SqlSelectQuery<ENTITY : Any> : Subquery<ENTITY>, FlowableQuery<ENTITY>
 
     fun <B : Any, B_META : EntityMetamodel<B, *, B_META>> select(
         metamodel: B_META
-    ): Subquery<Pair<ENTITY, B?>>
+    ): FlowableSubquery<Pair<ENTITY, B?>>
 
     fun <B : Any, B_META : EntityMetamodel<B, *, B_META>,
         C : Any, C_META : EntityMetamodel<C, *, C_META>> select(
         metamodel1: B_META,
         metamodel2: C_META
-    ): Subquery<Triple<ENTITY, B?, C?>>
+    ): FlowableSubquery<Triple<ENTITY, B?, C?>>
 
     fun select(
         vararg metamodels: EntityMetamodel<*, *, *>,
-    ): Subquery<Entities>
+    ): FlowableSubquery<Entities>
 
     fun <T : Any, S : Any> select(
         expression: ScalarExpression<T, S>
@@ -59,27 +58,27 @@ interface SqlSelectQuery<ENTITY : Any> : Subquery<ENTITY>, FlowableQuery<ENTITY>
 
     fun <A : Any> select(
         expression: ColumnExpression<A, *>
-    ): Subquery<A?>
+    ): FlowableSubquery<A?>
 
     fun <A : Any, B : Any> select(
         expression1: ColumnExpression<A, *>,
         expression2: ColumnExpression<B, *>
-    ): Subquery<Pair<A?, B?>>
+    ): FlowableSubquery<Pair<A?, B?>>
 
     fun <A : Any, B : Any, C : Any> select(
         expression1: ColumnExpression<A, *>,
         expression2: ColumnExpression<B, *>,
         expression3: ColumnExpression<C, *>
-    ): Subquery<Triple<A?, B?, C?>>
+    ): FlowableSubquery<Triple<A?, B?, C?>>
 
     fun select(
         vararg expressions: ColumnExpression<*, *>,
-    ): Subquery<Columns>
+    ): FlowableSubquery<Columns>
 }
 
-data class SqlSelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
-    val context: SqlSelectContext<ENTITY, ID, META>,
-    val option: SqlSelectOption = SqlSelectOption.default
+internal data class SqlSelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+    private val context: SqlSelectContext<ENTITY, ID, META>,
+    private val option: SqlSelectOption = SqlSelectOption.default
 ) :
     SqlSelectQuery<ENTITY> {
 
@@ -97,6 +96,9 @@ data class SqlSelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, I
         SelectQuerySupport(context)
 
     override val subqueryContext = SubqueryContext.SqlSelect<ENTITY>(context)
+
+    private val subquerySupport: FlowableSubquerySupport<ENTITY> =
+        FlowableSubquerySupport(subqueryContext) { SqlSetOperationQueryImpl(it, metamodel = context.target) }
 
     override fun distinct(): SqlSelectQueryImpl<ENTITY, ID, META> {
         val newContext = context.copy(distinct = true)
@@ -159,46 +161,33 @@ data class SqlSelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, I
         return copy(option = configure(option))
     }
 
-    override fun first(): Query<ENTITY> {
-        return Collect(context, option) { it.first() }
+    override fun accept(visitor: QueryVisitor): QueryRunner {
+        return visitor.sqlSelectQuery(context, option) { it.toList() }
     }
 
-    override fun firstOrNull(): Query<ENTITY?> {
-        return Collect(context, option) { it.firstOrNull() }
+    override fun <R> collect(collect: suspend (Flow<ENTITY>) -> R): Query<R> = Query { visitor ->
+        visitor.sqlSelectQuery(context, option, collect)
     }
 
-    override fun <R> collect(collect: suspend (Flow<ENTITY>) -> R): Query<R> {
-        return Collect(context, option, collect)
+    override fun except(other: Subquery<ENTITY>): FlowableSetOperationQuery<ENTITY> {
+        return subquerySupport.except(other)
     }
 
-    override fun except(other: Subquery<ENTITY>): SetOperationQuery<ENTITY> {
-        return setOperation(SqlSetOperationKind.EXCEPT, this, other)
+    override fun intersect(other: Subquery<ENTITY>): FlowableSetOperationQuery<ENTITY> {
+        return subquerySupport.intersect(other)
     }
 
-    override fun intersect(other: Subquery<ENTITY>): SetOperationQuery<ENTITY> {
-        return setOperation(SqlSetOperationKind.INTERSECT, this, other)
+    override fun union(other: Subquery<ENTITY>): FlowableSetOperationQuery<ENTITY> {
+        return subquerySupport.union(other)
     }
 
-    override fun union(other: Subquery<ENTITY>): SetOperationQuery<ENTITY> {
-        return setOperation(SqlSetOperationKind.UNION, this, other)
-    }
-
-    override fun unionAll(other: Subquery<ENTITY>): SetOperationQuery<ENTITY> {
-        return setOperation(SqlSetOperationKind.UNION_ALL, this, other)
-    }
-
-    private fun setOperation(
-        kind: SqlSetOperationKind,
-        left: Subquery<ENTITY>,
-        right: Subquery<ENTITY>
-    ): SqlSetOperationQuery<ENTITY> {
-        val setOperatorContext = SqlSetOperationContext(kind, left.subqueryContext, right.subqueryContext)
-        return SqlSetOperationQueryImpl(setOperatorContext, metamodel = context.target)
+    override fun unionAll(other: Subquery<ENTITY>): FlowableSetOperationQuery<ENTITY> {
+        return subquerySupport.unionAll(other)
     }
 
     override fun <B : Any, B_META : EntityMetamodel<B, *, B_META>> select(
         metamodel: B_META,
-    ): Subquery<Pair<ENTITY, B?>> {
+    ): FlowableSubquery<Pair<ENTITY, B?>> {
         val metamodels = context.getEntityMetamodels()
         if (metamodel !in metamodels) error(entityMetamodelNotFound("metamodel"))
         val newContext = context.setProjection(context.target, metamodel)
@@ -209,7 +198,7 @@ data class SqlSelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, I
         C : Any, C_META : EntityMetamodel<C, *, C_META>> select(
         metamodel1: B_META,
         metamodel2: C_META
-    ): Subquery<Triple<ENTITY, B?, C?>> {
+    ): FlowableSubquery<Triple<ENTITY, B?, C?>> {
         val metamodels = context.getEntityMetamodels()
         if (metamodel1 !in metamodels) error(entityMetamodelNotFound("metamodel1"))
         if (metamodel2 !in metamodels) error(entityMetamodelNotFound("metamodel2"))
@@ -217,7 +206,7 @@ data class SqlSelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, I
         return SqlTripleEntitiesQuery(newContext, option, Triple(context.target, metamodel1, metamodel2))
     }
 
-    override fun select(vararg metamodels: EntityMetamodel<*, *, *>): Subquery<Entities> {
+    override fun select(vararg metamodels: EntityMetamodel<*, *, *>): FlowableSubquery<Entities> {
         val contextModels = context.getEntityMetamodels()
         for ((i, metamodel) in metamodels.withIndex()) {
             if (metamodel !in contextModels) error(entityMetamodelNotFound("metamodels", i))
@@ -233,7 +222,7 @@ data class SqlSelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, I
         return ScalarQueryImpl(query, expression)
     }
 
-    override fun <A : Any> select(expression: ColumnExpression<A, *>): Subquery<A?> {
+    override fun <A : Any> select(expression: ColumnExpression<A, *>): FlowableSubquery<A?> {
         val newContext = context.setProjection(expression)
         return SqlSingleColumnQuery(newContext, option, expression)
     }
@@ -241,7 +230,7 @@ data class SqlSelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, I
     override fun <A : Any, B : Any> select(
         expression1: ColumnExpression<A, *>,
         expression2: ColumnExpression<B, *>
-    ): Subquery<Pair<A?, B?>> {
+    ): FlowableSubquery<Pair<A?, B?>> {
         val newContext = context.setProjection(expression1, expression2)
         return SqlPairColumnsQuery(newContext, option, expression1 to expression2)
     }
@@ -250,42 +239,18 @@ data class SqlSelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, I
         expression1: ColumnExpression<A, *>,
         expression2: ColumnExpression<B, *>,
         expression3: ColumnExpression<C, *>
-    ): Subquery<Triple<A?, B?, C?>> {
+    ): FlowableSubquery<Triple<A?, B?, C?>> {
         val newContext = context.setProjection(expression1, expression2, expression3)
         return SqlTripleColumnsQuery(newContext, option, Triple(expression1, expression2, expression3))
     }
 
-    override fun select(vararg expressions: ColumnExpression<*, *>): Subquery<Columns> {
+    override fun select(vararg expressions: ColumnExpression<*, *>): FlowableSubquery<Columns> {
         val list = expressions.toList()
         val newContext = context.setProjection(*list.toTypedArray())
         return SqlMultipleColumnsQuery(newContext, option, list)
     }
 
-    override fun toFlowQuery(): FlowQuery<ENTITY> {
-        return FlowQueryImpl(context, option)
-    }
-
-    override fun accept(visitor: QueryVisitor): QueryRunner {
-        return visitor.visit(this)
-    }
-
-    class Collect<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>, R>(
-        val context: SqlSelectContext<ENTITY, ID, META>,
-        val option: SqlSelectOption,
-        val transform: suspend (Flow<ENTITY>) -> R
-    ) : Query<R> {
-        override fun accept(visitor: QueryVisitor): QueryRunner {
-            return visitor.visit(this)
-        }
-    }
-
-    class FlowQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
-        val context: SqlSelectContext<ENTITY, ID, META>,
-        val option: SqlSelectOption
-    ) : FlowQuery<ENTITY> {
-
-        override fun accept(visitor: FlowQueryVisitor): FlowQueryRunner {
-            return visitor.visit(this)
-        }
+    override fun asFlowQuery(): FlowQuery<ENTITY> = FlowQuery { visitor ->
+        visitor.sqlSelectQuery(context, option)
     }
 }

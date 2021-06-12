@@ -3,9 +3,8 @@ package org.komapper.r2dbc.dsl.runner
 import org.komapper.core.Statement
 import org.komapper.core.dsl.option.SchemaDropAllOption
 import org.komapper.r2dbc.R2dbcDatabaseConfig
-import org.komapper.r2dbc.R2dbcExecutor
 
-internal data class SchemaDropAllQueryRunner(
+internal class SchemaDropAllQueryRunner(
     private val option: SchemaDropAllOption
 ) : R2dbcQueryRunner<Unit> {
 

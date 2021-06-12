@@ -9,7 +9,7 @@ interface SqlInsertQueryBuilder<T : Any> {
     fun select(block: () -> Subquery<T>): SqlInsertQuery<T>
 }
 
-internal class SqlInsertQueryBuilderImpl<T : Any>(val query: SqlInsertQuery<T>) : SqlInsertQueryBuilder<T> {
+internal class SqlInsertQueryBuilderImpl<T : Any>(private val query: SqlInsertQuery<T>) : SqlInsertQueryBuilder<T> {
     override fun values(declaration: ValuesDeclaration<T>): SqlInsertQuery<T> {
         return query.values(declaration)
     }

@@ -1,16 +1,18 @@
 package org.komapper.core.dsl.query
 
 import org.komapper.core.dsl.option.TemplateExecuteOption
+import org.komapper.core.dsl.runner.QueryRunner
+import org.komapper.core.dsl.visitor.QueryVisitor
 
 interface TemplateExecuteQuery : Query<Int> {
     fun option(configure: (TemplateExecuteOption) -> TemplateExecuteOption): TemplateExecuteQuery
     fun params(provide: () -> Any): TemplateExecuteQuery
 }
 
-data class TemplateExecuteQueryImpl(
-    val sql: String,
-    val params: Any = object {},
-    val option: TemplateExecuteOption = TemplateExecuteOption.default
+internal data class TemplateExecuteQueryImpl(
+    private val sql: String,
+    private val params: Any = object {},
+    private val option: TemplateExecuteOption = TemplateExecuteOption.default
 ) : TemplateExecuteQuery {
 
     override fun option(configure: (TemplateExecuteOption) -> TemplateExecuteOption): TemplateExecuteQueryImpl {
@@ -22,6 +24,6 @@ data class TemplateExecuteQueryImpl(
     }
 
     override fun accept(visitor: QueryVisitor): QueryRunner {
-        return visitor.visit(this)
+        return visitor.templateExecuteQuery(sql, params, option)
     }
 }

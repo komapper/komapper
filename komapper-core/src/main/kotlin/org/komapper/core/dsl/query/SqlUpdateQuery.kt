@@ -3,10 +3,12 @@ package org.komapper.core.dsl.query
 import org.komapper.core.dsl.context.SqlUpdateContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.option.SqlUpdateOption
+import org.komapper.core.dsl.runner.QueryRunner
 import org.komapper.core.dsl.scope.SetDeclaration
 import org.komapper.core.dsl.scope.SetScope
 import org.komapper.core.dsl.scope.WhereDeclaration
 import org.komapper.core.dsl.scope.WhereScope
+import org.komapper.core.dsl.visitor.QueryVisitor
 
 interface SqlUpdateQuery<ENTITY : Any> : Query<Int> {
     fun set(declaration: SetDeclaration<ENTITY>): SqlUpdateQuery<ENTITY>
@@ -14,9 +16,9 @@ interface SqlUpdateQuery<ENTITY : Any> : Query<Int> {
     fun option(configure: (SqlUpdateOption) -> SqlUpdateOption): SqlUpdateQuery<ENTITY>
 }
 
-data class SqlUpdateQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
-    val context: SqlUpdateContext<ENTITY, ID, META>,
-    val option: SqlUpdateOption = SqlUpdateOption.default
+internal data class SqlUpdateQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+    private val context: SqlUpdateContext<ENTITY, ID, META>,
+    private val option: SqlUpdateOption = SqlUpdateOption.default
 ) : SqlUpdateQuery<ENTITY> {
 
     override fun set(declaration: SetDeclaration<ENTITY>): SqlUpdateQueryImpl<ENTITY, ID, META> {
@@ -36,6 +38,6 @@ data class SqlUpdateQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, I
     }
 
     override fun accept(visitor: QueryVisitor): QueryRunner {
-        return visitor.visit(this)
+        return visitor.sqlUpdateQuery(context, option)
     }
 }

@@ -1,72 +1,50 @@
 package org.komapper.core.dsl.query
 
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.toList
 import org.komapper.core.dsl.context.SqlSelectContext
-import org.komapper.core.dsl.context.SqlSetOperationContext
-import org.komapper.core.dsl.context.SqlSetOperationKind
 import org.komapper.core.dsl.context.SubqueryContext
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.option.SqlSelectOption
+import org.komapper.core.dsl.runner.QueryRunner
+import org.komapper.core.dsl.visitor.QueryVisitor
 
-class SqlTripleColumnsQuery<A : Any, B : Any, C : Any>(
-    val context: SqlSelectContext<*, *, *>,
-    val option: SqlSelectOption,
-    val expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>
-) : Subquery<Triple<A?, B?, C?>> {
+internal class SqlTripleColumnsQuery<A : Any, B : Any, C : Any>(
+    private val context: SqlSelectContext<*, *, *>,
+    private val option: SqlSelectOption,
+    private val expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>
+) : FlowableSubquery<Triple<A?, B?, C?>> {
 
-    override val subqueryContext: SubqueryContext<Triple<A?, B?, C?>>
-        get() = SubqueryContext.SqlSelect(context)
+    override val subqueryContext: SubqueryContext<Triple<A?, B?, C?>> = SubqueryContext.SqlSelect(context)
 
-    override fun first(): Query<Triple<A?, B?, C?>> {
-        return Collect(context, option, expressions) { it.first() }
-    }
-
-    override fun firstOrNull(): Query<Triple<A?, B?, C?>?> {
-        return Collect(context, option, expressions) { it.firstOrNull() }
-    }
-
-    override fun <R> collect(collect: suspend (Flow<Triple<A?, B?, C?>>) -> R): Query<R> {
-        return Collect(context, option, expressions, collect)
-    }
-
-    override fun except(other: Subquery<Triple<A?, B?, C?>>): SetOperationQuery<Triple<A?, B?, C?>> {
-        return setOperation(SqlSetOperationKind.EXCEPT, other)
-    }
-
-    override fun intersect(other: Subquery<Triple<A?, B?, C?>>): SetOperationQuery<Triple<A?, B?, C?>> {
-        return setOperation(SqlSetOperationKind.INTERSECT, other)
-    }
-
-    override fun union(other: Subquery<Triple<A?, B?, C?>>): SetOperationQuery<Triple<A?, B?, C?>> {
-        return setOperation(SqlSetOperationKind.UNION, other)
-    }
-
-    override fun unionAll(other: Subquery<Triple<A?, B?, C?>>): SetOperationQuery<Triple<A?, B?, C?>> {
-        return setOperation(SqlSetOperationKind.UNION_ALL, other)
-    }
-
-    private fun setOperation(
-        kind: SqlSetOperationKind,
-        other: Subquery<Triple<A?, B?, C?>>
-    ): SetOperationQuery<Triple<A?, B?, C?>> {
-        val setOperatorContext = SqlSetOperationContext(kind, this.subqueryContext, other.subqueryContext)
-        return SqlTripleColumnsSetOperationQuery(setOperatorContext, expressions = expressions)
-    }
+    private val support: FlowableSubquerySupport<Triple<A?, B?, C?>> =
+        FlowableSubquerySupport(subqueryContext) { SqlTripleColumnsSetOperationQuery(it, expressions = expressions) }
 
     override fun accept(visitor: QueryVisitor): QueryRunner {
-        return visitor.visit(this)
+        return visitor.sqlTripleColumnsQuery(context, option, expressions) { it.toList() }
     }
 
-    class Collect<A : Any, B : Any, C : Any, R>(
-        val context: SqlSelectContext<*, *, *>,
-        val option: SqlSelectOption,
-        val expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
-        val transform: suspend (Flow<Triple<A?, B?, C?>>) -> R
-    ) : Query<R> {
-        override fun accept(visitor: QueryVisitor): QueryRunner {
-            return visitor.visit(this)
-        }
+    override fun <R> collect(collect: suspend (Flow<Triple<A?, B?, C?>>) -> R): Query<R> = Query { visitor ->
+        visitor.sqlTripleColumnsQuery(context, option, expressions, collect)
+    }
+
+    override fun asFlowQuery(): FlowQuery<Triple<A?, B?, C?>> = FlowQuery { visitor ->
+        visitor.sqlTripleColumnsQuery(context, option, expressions)
+    }
+
+    override fun except(other: Subquery<Triple<A?, B?, C?>>): FlowableSetOperationQuery<Triple<A?, B?, C?>> {
+        return support.except(other)
+    }
+
+    override fun intersect(other: Subquery<Triple<A?, B?, C?>>): FlowableSetOperationQuery<Triple<A?, B?, C?>> {
+        return support.intersect(other)
+    }
+
+    override fun union(other: Subquery<Triple<A?, B?, C?>>): FlowableSetOperationQuery<Triple<A?, B?, C?>> {
+        return support.union(other)
+    }
+
+    override fun unionAll(other: Subquery<Triple<A?, B?, C?>>): FlowableSetOperationQuery<Triple<A?, B?, C?>> {
+        return support.unionAll(other)
     }
 }

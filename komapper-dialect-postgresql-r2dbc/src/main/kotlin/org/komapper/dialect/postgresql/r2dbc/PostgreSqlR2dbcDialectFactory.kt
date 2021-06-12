@@ -9,7 +9,6 @@ class PostgreSqlR2dbcDialectFactory : R2dbcDialectFactory {
         return driver.lowercase() == PostgreSqlDialect.driver
     }
 
-    // TODO
     override fun create(): R2dbcDialect {
         return PostgreSqlR2dbcDialect()
     }
