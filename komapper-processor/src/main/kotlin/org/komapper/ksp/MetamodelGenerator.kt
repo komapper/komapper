@@ -102,7 +102,7 @@ internal class EntityMetamodelGenerator(
                 is PropertyKind.Id -> {
                     when (val idKind = kind.idKind) {
                         is IdKind.AutoIncrement -> {
-                            "$AutoIncrement<$entityTypeName, $exteriorTypeName, $interiorTypeName>($interiorClass, $wrap, $setter)"
+                            "$AutoIncrement<$entityTypeName, $exteriorTypeName, $interiorTypeName>($columnName, $interiorClass, $wrap, $setter)"
                         }
                         is IdKind.Sequence -> {
                             val paramList = listOf(

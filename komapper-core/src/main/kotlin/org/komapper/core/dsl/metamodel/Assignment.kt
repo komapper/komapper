@@ -10,6 +10,7 @@ import kotlin.reflect.KClass
 @ThreadSafe
 sealed class Assignment<ENTITY> {
     class AutoIncrement<ENTITY, EXTERIOR : Any, INTERIOR : Any>(
+        val columnName: String,
         private val interiorClass: KClass<INTERIOR>,
         private val wrap: (INTERIOR) -> EXTERIOR,
         private val setter: (ENTITY, EXTERIOR) -> ENTITY,

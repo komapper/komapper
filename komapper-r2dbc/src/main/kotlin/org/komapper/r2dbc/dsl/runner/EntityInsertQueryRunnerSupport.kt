@@ -39,9 +39,8 @@ internal class EntityInsertQueryRunnerSupport<ENTITY : Any, ID, META : EntityMet
     }
 
     suspend fun <T> insert(config: R2dbcDatabaseConfig, execute: suspend (R2dbcExecutor) -> T): T {
-        val generatedColumn = when (context.target.idAssignment()) {
-            // TODO
-            is Assignment.AutoIncrement<ENTITY, *, *> -> context.target.idProperties().first().columnName
+        val generatedColumn = when (val assignment = context.target.idAssignment()) {
+            is Assignment.AutoIncrement<ENTITY, *, *> -> assignment.columnName
             else -> null
         }
         val executor = R2dbcExecutor(config, option, generatedColumn)
