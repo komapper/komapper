@@ -9,7 +9,7 @@ import org.komapper.jdbc.JdbcDatabaseConfig
 import org.komapper.jdbc.JdbcExecutor
 
 internal class JdbcSchemaDropQueryRunner(
-    private val entityMetamodels: List<EntityMetamodel<*, *, *>>,
+    entityMetamodels: List<EntityMetamodel<*, *, *>>,
     private val options: SchemaDropOptions
 ) : JdbcQueryRunner<Unit> {
 

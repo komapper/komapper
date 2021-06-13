@@ -9,6 +9,6 @@ class SqlCommenterStatementInspector : StatementInspector {
     override fun inspect(statement: Statement): Statement {
         val scHibernate = SCHibernate()
         val comment = scHibernate.inspect(" ").trim()
-        return statement.copy(fragments = statement.fragments + comment)
+        return statement.copy(charSequences = statement.charSequences + comment)
     }
 }

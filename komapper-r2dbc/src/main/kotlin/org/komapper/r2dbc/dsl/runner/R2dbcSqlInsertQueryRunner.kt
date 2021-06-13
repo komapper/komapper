@@ -12,7 +12,7 @@ import org.komapper.r2dbc.R2dbcExecutor
 
 internal class R2dbcSqlInsertQueryRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: SqlInsertContext<ENTITY, ID, META>,
-    private val options: SqlInsertOptions = SqlInsertOptions.default
+    private val options: SqlInsertOptions
 ) : R2dbcQueryRunner<Pair<Int, Long?>> {
 
     private val runner: SqlInsertQueryRunner<ENTITY, ID, META> = SqlInsertQueryRunner(context, options)

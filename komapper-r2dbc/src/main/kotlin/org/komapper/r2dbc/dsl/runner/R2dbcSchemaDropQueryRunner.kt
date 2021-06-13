@@ -9,8 +9,8 @@ import org.komapper.r2dbc.R2dbcDatabaseConfig
 import org.komapper.r2dbc.R2dbcExecutor
 
 internal class R2dbcSchemaDropQueryRunner(
-    private val entityMetamodels: List<EntityMetamodel<*, *, *>> = emptyList(),
-    private val options: SchemaDropOptions = SchemaDropOptions.default
+    entityMetamodels: List<EntityMetamodel<*, *, *>>,
+    private val options: SchemaDropOptions
 ) : R2dbcQueryRunner<Unit> {
 
     private val runner = SchemaDropQueryRunner(entityMetamodels, options)

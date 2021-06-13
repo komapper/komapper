@@ -10,6 +10,7 @@ import org.komapper.core.Statement
 import org.komapper.core.dsl.context.EntitySelectContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.EntitySelectOptions
+import org.komapper.core.dsl.runner.EntityKey
 import org.komapper.core.dsl.runner.EntitySelectQueryRunner
 import org.komapper.r2dbc.R2dbcDatabaseConfig
 import org.komapper.r2dbc.R2dbcExecutor
@@ -82,9 +83,3 @@ internal class R2dbcEntitySelectQueryRunner<ENTITY : Any, ID, META : EntityMetam
         }
     }
 }
-
-// TODO remove duplicate code
-private data class EntityKey(
-    val entityMetamodel: EntityMetamodel<*, *, *>,
-    val id: Any
-)

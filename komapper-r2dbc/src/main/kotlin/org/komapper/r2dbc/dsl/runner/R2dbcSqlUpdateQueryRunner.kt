@@ -11,7 +11,7 @@ import org.komapper.r2dbc.R2dbcExecutor
 
 internal class R2dbcSqlUpdateQueryRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: SqlUpdateContext<ENTITY, ID, META>,
-    private val options: SqlUpdateOptions = SqlUpdateOptions.default
+    private val options: SqlUpdateOptions
 ) : R2dbcQueryRunner<Int> {
 
     private val runner: SqlUpdateQueryRunner<ENTITY, ID, META> = SqlUpdateQueryRunner(context, options)

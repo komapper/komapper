@@ -9,7 +9,7 @@ import org.komapper.core.dsl.options.EntitySelectOptions
 
 class EntitySelectQueryRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntitySelectContext<ENTITY, ID, META>,
-    private val options: EntitySelectOptions,
+    @Suppress("unused") private val options: EntitySelectOptions,
 ) : QueryRunner {
 
     override fun dryRun(config: DatabaseConfig): Statement {
