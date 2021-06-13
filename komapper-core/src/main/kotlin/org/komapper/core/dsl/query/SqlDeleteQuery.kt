@@ -18,13 +18,13 @@ internal data class SqlDeleteQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<
     private val options: SqlDeleteOptions = SqlDeleteOptions.default
 ) : SqlDeleteQuery {
 
-    override fun where(declaration: WhereDeclaration): SqlDeleteQueryImpl<ENTITY, ID, META> {
+    override fun where(declaration: WhereDeclaration): SqlDeleteQuery {
         val scope = WhereScope().apply(declaration)
         val newContext = context.copy(where = context.where + scope)
         return copy(context = newContext)
     }
 
-    override fun options(configure: (SqlDeleteOptions) -> SqlDeleteOptions): SqlDeleteQueryImpl<ENTITY, ID, META> {
+    override fun options(configure: (SqlDeleteOptions) -> SqlDeleteOptions): SqlDeleteQuery {
         return copy(options = configure(options))
     }
 

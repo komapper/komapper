@@ -62,7 +62,7 @@ internal data class EntitySelectQueryImpl<ENTITY : Any, ID, META : EntityMetamod
     override fun <OTHER_ENTITY : Any, OTHER_META : EntityMetamodel<OTHER_ENTITY, *, OTHER_META>> innerJoin(
         metamodel: OTHER_META,
         on: OnDeclaration<OTHER_ENTITY>
-    ): EntitySelectQueryImpl<ENTITY, ID, META> {
+    ): EntitySelectQuery<ENTITY> {
         val newContext = support.innerJoin(metamodel, on)
         return copy(context = newContext)
     }
@@ -70,37 +70,37 @@ internal data class EntitySelectQueryImpl<ENTITY : Any, ID, META : EntityMetamod
     override fun <OTHER_ENTITY : Any, OTHER_META : EntityMetamodel<OTHER_ENTITY, *, OTHER_META>> leftJoin(
         metamodel: OTHER_META,
         on: OnDeclaration<OTHER_ENTITY>
-    ): EntitySelectQueryImpl<ENTITY, ID, META> {
+    ): EntitySelectQuery<ENTITY> {
         val newContext = support.leftJoin(metamodel, on)
         return copy(context = newContext)
     }
 
-    override fun where(declaration: WhereDeclaration): EntitySelectQueryImpl<ENTITY, ID, META> {
+    override fun where(declaration: WhereDeclaration): EntitySelectQuery<ENTITY> {
         val newContext = support.where(declaration)
         return copy(context = newContext)
     }
 
-    override fun orderBy(vararg expressions: ColumnExpression<*, *>): EntitySelectQueryImpl<ENTITY, ID, META> {
+    override fun orderBy(vararg expressions: ColumnExpression<*, *>): EntitySelectQuery<ENTITY> {
         val newContext = support.orderBy(*expressions)
         return copy(context = newContext)
     }
 
-    override fun offset(offset: Int): EntitySelectQueryImpl<ENTITY, ID, META> {
+    override fun offset(offset: Int): EntitySelectQuery<ENTITY> {
         val newContext = support.offset(offset)
         return copy(context = newContext)
     }
 
-    override fun limit(limit: Int): EntitySelectQueryImpl<ENTITY, ID, META> {
+    override fun limit(limit: Int): EntitySelectQuery<ENTITY> {
         val newContext = support.limit(limit)
         return copy(context = newContext)
     }
 
-    override fun forUpdate(): EntitySelectQueryImpl<ENTITY, ID, META> {
+    override fun forUpdate(): EntitySelectQuery<ENTITY> {
         val newContext = support.forUpdate()
         return copy(context = newContext)
     }
 
-    override fun options(configure: (EntitySelectOptions) -> EntitySelectOptions): EntitySelectQueryImpl<ENTITY, ID, META> {
+    override fun options(configure: (EntitySelectOptions) -> EntitySelectOptions): EntitySelectQuery<ENTITY> {
         return copy(options = configure(options))
     }
 
@@ -108,7 +108,7 @@ internal data class EntitySelectQueryImpl<ENTITY : Any, ID, META : EntityMetamod
         metamodel1: EntityMetamodel<T, *, *>,
         metamodel2: EntityMetamodel<S, *, *>,
         associator: Associator<T, S>
-    ): EntitySelectQueryImpl<ENTITY, ID, META> {
+    ): EntitySelectQuery<ENTITY> {
         val metamodels = context.getEntityMetamodels()
         require(metamodel1 in metamodels) { entityMetamodelNotFound("metamodel1") }
         require(metamodel2 in metamodels) { entityMetamodelNotFound("metamodel2") }

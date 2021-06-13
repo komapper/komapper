@@ -25,7 +25,7 @@ internal data class EntityInsertQueryBuilderImpl<ENTITY : Any, ID, META : Entity
 ) :
     EntityInsertQueryBuilder<ENTITY, ID, META> {
 
-    override fun options(configure: (EntityInsertOptions) -> EntityInsertOptions): EntityInsertQueryBuilderImpl<ENTITY, ID, META> {
+    override fun options(configure: (EntityInsertOptions) -> EntityInsertOptions): EntityInsertQueryBuilder<ENTITY, ID, META> {
         return copy(options = configure(options))
     }
 
