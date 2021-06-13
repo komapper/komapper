@@ -48,7 +48,7 @@ class SqlSelectQueryTest(private val db: R2dbcDatabase) {
         val e = Employee.meta
         val emp = db.runQuery {
             SqlDsl.from(e)
-                .option {
+                .options {
                     it.copy(
                         fetchSize = 10,
                         maxRows = 100,

@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.EntityDsl
 import org.komapper.core.dsl.SqlDsl
+import org.komapper.core.dsl.query.dryRun
 import org.komapper.r2dbc.R2dbcDatabase
 
 @ExtendWith(Env::class)
@@ -26,7 +27,7 @@ class QueryTest(private val db: R2dbcDatabase) {
         val q3 = EntityDsl.from(a).where { a.addressId inList listOf(16, 17) }
         val list = db.runQuery { q1 + q2 + q3 }.toList()
         assertEquals(2, list.size)
-        println(db.dryRunQuery { q1 + q2 + q3 })
+        println((q1 + q2 + q3).dryRun())
     }
 
     @Test

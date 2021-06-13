@@ -7,13 +7,13 @@ import org.komapper.core.dsl.element.JoinKind
 import org.komapper.core.dsl.element.SortItem
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
-import org.komapper.core.dsl.option.ForUpdateOption
+import org.komapper.core.dsl.options.ForUpdateOptions
 import org.komapper.core.dsl.scope.OnDeclaration
 import org.komapper.core.dsl.scope.OnScope
 import org.komapper.core.dsl.scope.WhereDeclaration
 import org.komapper.core.dsl.scope.WhereScope
 
-internal data class SelectQuerySupport<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>, CONTEXT : SelectContext<ENTITY, ID, META, CONTEXT>>(
+internal class SelectQuerySupport<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>, CONTEXT : SelectContext<ENTITY, ID, META, CONTEXT>>(
     private val context: CONTEXT
 ) {
 
@@ -68,7 +68,7 @@ internal data class SelectQuerySupport<ENTITY : Any, ID, META : EntityMetamodel<
     }
 
     fun forUpdate(): CONTEXT {
-        val forUpdate = ForUpdate(ForUpdateOption.BASIC)
+        val forUpdate = ForUpdate(ForUpdateOptions.BASIC)
         return context.setForUpdate(forUpdate)
     }
 }

@@ -1,11 +1,11 @@
 package integration.jdbc.setting
 
 import integration.setting.Setting
-import org.komapper.jdbc.DatabaseConfig
+import org.komapper.jdbc.JdbcDatabaseConfig
 
 object SettingProvider {
 
-    fun get(): Setting<DatabaseConfig> {
+    fun get(): Setting<JdbcDatabaseConfig> {
         val driver = System.getProperty("driver") ?: error("The driver property is not found.")
         val url = System.getProperty("url") ?: error("The url property is not found.")
         val user = System.getProperty("user") ?: error("The user property is not found.")

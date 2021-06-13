@@ -6,13 +6,13 @@ import org.komapper.core.dsl.context.SqlSetOperationContext
 import org.komapper.core.dsl.context.SubqueryContext
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
-import org.komapper.core.dsl.option.SqlSetOperationOption
+import org.komapper.core.dsl.options.SqlSetOperationOptions
 import org.komapper.core.dsl.runner.QueryRunner
 import org.komapper.core.dsl.visitor.QueryVisitor
 
 internal data class SqlMultipleEntitiesSetOperationQuery(
     private val context: SqlSetOperationContext<Entities>,
-    private val option: SqlSetOperationOption = SqlSetOperationOption.default,
+    private val options: SqlSetOperationOptions = SqlSetOperationOptions.default,
     private val metamodels: List<EntityMetamodel<*, *, *>>
 ) : FlowableSetOperationQuery<Entities> {
 
@@ -21,15 +21,15 @@ internal data class SqlMultipleEntitiesSetOperationQuery(
     override val subqueryContext: SubqueryContext<Entities> = SubqueryContext.SqlSetOperation(context)
 
     override fun accept(visitor: QueryVisitor): QueryRunner {
-        return visitor.sqlMultipleEntitiesSetOperationQuery(context, option, metamodels) { it.toList() }
+        return visitor.sqlMultipleEntitiesSetOperationQuery(context, options, metamodels) { it.toList() }
     }
 
     override fun <R> collect(collect: suspend (Flow<Entities>) -> R): Query<R> = Query { visitor ->
-        visitor.sqlMultipleEntitiesSetOperationQuery(context, option, metamodels, collect)
+        visitor.sqlMultipleEntitiesSetOperationQuery(context, options, metamodels, collect)
     }
 
     override fun asFlowQuery(): FlowQuery<Entities> = FlowQuery { visitor ->
-        visitor.sqlMultipleEntitiesSetOperationQuery(context, option, metamodels)
+        visitor.sqlMultipleEntitiesSetOperationQuery(context, options, metamodels)
     }
 
     override fun except(other: Subquery<Entities>): FlowableSetOperationQuery<Entities> {
@@ -56,7 +56,7 @@ internal data class SqlMultipleEntitiesSetOperationQuery(
         return copy(context = support.orderBy(*expressions))
     }
 
-    override fun option(configurator: (SqlSetOperationOption) -> SqlSetOperationOption): FlowableSetOperationQuery<Entities> {
-        return copy(option = configurator(option))
+    override fun options(configurator: (SqlSetOperationOptions) -> SqlSetOperationOptions): FlowableSetOperationQuery<Entities> {
+        return copy(options = configurator(options))
     }
 }

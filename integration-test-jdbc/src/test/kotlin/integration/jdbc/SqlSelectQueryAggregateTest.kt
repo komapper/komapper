@@ -12,10 +12,10 @@ import org.komapper.core.dsl.count
 import org.komapper.core.dsl.max
 import org.komapper.core.dsl.min
 import org.komapper.core.dsl.sum
-import org.komapper.jdbc.Database
+import org.komapper.jdbc.JdbcDatabase
 
 @ExtendWith(Env::class)
-class SqlSelectQueryAggregateTest(private val db: Database) {
+class SqlSelectQueryAggregateTest(private val db: JdbcDatabase) {
 
     @Test
     fun aggregate_avg() {

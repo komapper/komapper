@@ -6,5 +6,4 @@ import org.komapper.r2dbc.R2dbcDatabaseConfig
 
 internal sealed interface R2dbcFlowQueryRunner<T> : FlowQueryRunner {
     fun run(config: R2dbcDatabaseConfig): Flow<T>
-    fun dryRun(config: R2dbcDatabaseConfig): String
 }

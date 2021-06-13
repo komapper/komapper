@@ -48,32 +48,19 @@ interface R2dbcDatabase {
 
     val config: R2dbcDatabaseConfig
 
+    @Suppress("UNCHECKED_CAST")
     suspend fun <T> runQuery(block: QueryScope.() -> Query<T>): T {
-        val runner = getQueryRunner(block)
-        return runner.run(config)
-    }
-
-    fun <T> dryRunQuery(block: QueryScope.() -> Query<T>): String {
-        val runner = getQueryRunner(block)
-        return runner.dryRun(config)
-    }
-
-    @Suppress("UNCHECKED_CAST")
-    private fun <T> getQueryRunner(block: QueryScope.() -> Query<T>): R2dbcQueryRunner<T> {
         val query = block(QueryScope)
-        return query.accept(R2dbcQueryVisitor()) as R2dbcQueryRunner<T>
-    }
-
-    fun <T> runFlowableQuery(block: QueryScope.() -> FlowableQuery<T>): Flow<T> {
-        val runner = getFlowQueryRunner(block)
+        val runner = query.accept(R2dbcQueryVisitor()) as R2dbcQueryRunner<T>
         return runner.run(config)
     }
 
     @Suppress("UNCHECKED_CAST")
-    private fun <T> getFlowQueryRunner(block: QueryScope.() -> FlowableQuery<T>): R2dbcFlowQueryRunner<T> {
+    fun <T> runFlowableQuery(block: QueryScope.() -> FlowableQuery<T>): Flow<T> {
         val flowableQuery = block(QueryScope)
         val flowQuery = flowableQuery.asFlowQuery()
-        return flowQuery.accept(R2dbcFlowQueryVisitor()) as R2dbcFlowQueryRunner<T>
+        val runner = flowQuery.accept(R2dbcFlowQueryVisitor()) as R2dbcFlowQueryRunner<T>
+        return runner.run(config)
     }
 }
 

@@ -8,10 +8,10 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.SqlDsl
-import org.komapper.jdbc.Database
+import org.komapper.jdbc.JdbcDatabase
 
 @ExtendWith(Env::class)
-class SqlDeleteQueryTest(private val db: Database) {
+class SqlDeleteQueryTest(private val db: JdbcDatabase) {
 
     @Test
     fun test() {
@@ -38,7 +38,7 @@ class SqlDeleteQueryTest(private val db: Database) {
     fun allowEmptyWhereClause_true() {
         val e = Employee.meta
         val count = db.runQuery {
-            SqlDsl.delete(e).option { it.copy(allowEmptyWhereClause = true) }
+            SqlDsl.delete(e).options { it.copy(allowEmptyWhereClause = true) }
         }
         assertEquals(14, count)
     }

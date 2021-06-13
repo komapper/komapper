@@ -6,13 +6,13 @@ import org.komapper.core.dsl.context.SqlSetOperationContext
 import org.komapper.core.dsl.context.SubqueryContext
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
-import org.komapper.core.dsl.option.SqlSetOperationOption
+import org.komapper.core.dsl.options.SqlSetOperationOptions
 import org.komapper.core.dsl.runner.QueryRunner
 import org.komapper.core.dsl.visitor.QueryVisitor
 
 internal data class SqlPairEntitiesSetOperationQuery<A : Any, A_META : EntityMetamodel<A, *, A_META>, B : Any, B_META : EntityMetamodel<B, *, B_META>>(
     private val context: SqlSetOperationContext<Pair<A, B?>>,
-    private val option: SqlSetOperationOption = SqlSetOperationOption.default,
+    private val options: SqlSetOperationOptions = SqlSetOperationOptions.default,
     private val metamodels: Pair<A_META, B_META>
 ) : FlowableSetOperationQuery<Pair<A, B?>> {
 
@@ -21,15 +21,15 @@ internal data class SqlPairEntitiesSetOperationQuery<A : Any, A_META : EntityMet
     private val support: SqlSetOperationQuerySupport<Pair<A, B?>> = SqlSetOperationQuerySupport(context)
 
     override fun accept(visitor: QueryVisitor): QueryRunner {
-        return visitor.sqlPairEntitiesSetOperationQuery(context, option, metamodels) { it.toList() }
+        return visitor.sqlPairEntitiesSetOperationQuery(context, options, metamodels) { it.toList() }
     }
 
     override fun <R> collect(collect: suspend (Flow<Pair<A, B?>>) -> R): Query<R> = Query { visitor ->
-        visitor.sqlPairEntitiesSetOperationQuery(context, option, metamodels, collect)
+        visitor.sqlPairEntitiesSetOperationQuery(context, options, metamodels, collect)
     }
 
     override fun asFlowQuery(): FlowQuery<Pair<A, B?>> = FlowQuery { visitor ->
-        visitor.sqlPairEntitiesSetOperationQuery(context, option, metamodels)
+        visitor.sqlPairEntitiesSetOperationQuery(context, options, metamodels)
     }
 
     override fun except(other: Subquery<Pair<A, B?>>): FlowableSetOperationQuery<Pair<A, B?>> {
@@ -56,7 +56,7 @@ internal data class SqlPairEntitiesSetOperationQuery<A : Any, A_META : EntityMet
         return copy(context = support.orderBy(*expressions))
     }
 
-    override fun option(configurator: (SqlSetOperationOption) -> SqlSetOperationOption): FlowableSetOperationQuery<Pair<A, B?>> {
-        return copy(option = configurator(option))
+    override fun options(configurator: (SqlSetOperationOptions) -> SqlSetOperationOptions): FlowableSetOperationQuery<Pair<A, B?>> {
+        return copy(options = configurator(options))
     }
 }

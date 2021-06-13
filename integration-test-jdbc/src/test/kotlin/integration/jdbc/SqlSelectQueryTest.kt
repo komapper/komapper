@@ -14,10 +14,10 @@ import org.komapper.core.dsl.case
 import org.komapper.core.dsl.concat
 import org.komapper.core.dsl.expression.When
 import org.komapper.core.dsl.literal
-import org.komapper.jdbc.Database
+import org.komapper.jdbc.JdbcDatabase
 
 @ExtendWith(Env::class)
-class SqlSelectQueryTest(private val db: Database) {
+class SqlSelectQueryTest(private val db: JdbcDatabase) {
 
     @Test
     fun list() {
@@ -60,7 +60,7 @@ class SqlSelectQueryTest(private val db: Database) {
         val e = Employee.meta
         val emp = db.runQuery {
             SqlDsl.from(e)
-                .option {
+                .options {
                     it.copy(
                         fetchSize = 10,
                         maxRows = 100,

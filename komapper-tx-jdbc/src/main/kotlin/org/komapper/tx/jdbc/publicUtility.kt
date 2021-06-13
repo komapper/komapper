@@ -1,11 +1,11 @@
 package org.komapper.tx.jdbc
 
-import org.komapper.jdbc.Database
-import org.komapper.jdbc.DatabaseSession
+import org.komapper.jdbc.JdbcDatabase
+import org.komapper.jdbc.JdbcDatabaseSession
 
 private const val message = "DatabaseConfig.session must be an instance of TransactionDatabaseSession"
 
-fun <R> Database.transaction(
+fun <R> JdbcDatabase.transaction(
     transactionAttribute: TransactionAttribute = TransactionAttribute.REQUIRED,
     isolationLevel: IsolationLevel? = null,
     block: TransactionScope.() -> R
@@ -18,7 +18,7 @@ fun <R> Database.transaction(
     }
 }
 
-val DatabaseSession.transactionManager: TransactionManager
+val JdbcDatabaseSession.transactionManager: TransactionManager
     get() {
         return if (this is TransactionDatabaseSession) {
             this.transactionManager

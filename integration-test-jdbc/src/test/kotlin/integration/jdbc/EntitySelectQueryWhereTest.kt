@@ -11,10 +11,10 @@ import org.komapper.core.dsl.EntityDsl
 import org.komapper.core.dsl.desc
 import org.komapper.core.dsl.scope.WhereDeclaration
 import org.komapper.core.dsl.scope.WhereScope.Companion.plus
-import org.komapper.jdbc.Database
+import org.komapper.jdbc.JdbcDatabase
 
 @ExtendWith(Env::class)
-class EntitySelectQueryWhereTest(private val db: Database) {
+class EntitySelectQueryWhereTest(private val db: JdbcDatabase) {
 
     @Test
     fun isNull() {
@@ -124,7 +124,7 @@ class EntitySelectQueryWhereTest(private val db: Database) {
         val insertQuery = EntityDsl.insert(a).single(Address(16, "\\STREET _16%", 1))
         val selectQuery = EntityDsl.from(a).where {
             a.street like escape("\\S") + text("%") + escape("T _16%")
-        }.orderBy(a.addressId).option {
+        }.orderBy(a.addressId).options {
             it.copy(escapeSequence = "|")
         }
         val list = db.runQuery {

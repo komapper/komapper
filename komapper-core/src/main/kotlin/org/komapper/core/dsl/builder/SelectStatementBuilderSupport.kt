@@ -76,7 +76,7 @@ internal class SelectStatementBuilderSupport(
     }
 
     fun forUpdateClause() {
-        if (context.forUpdate.option != null) {
+        if (context.forUpdate.options != null) {
             buf.append(" for update")
         }
     }

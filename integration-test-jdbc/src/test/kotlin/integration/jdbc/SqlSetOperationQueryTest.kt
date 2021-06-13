@@ -13,10 +13,10 @@ import org.komapper.core.dsl.EntityDsl
 import org.komapper.core.dsl.SqlDsl
 import org.komapper.core.dsl.alias
 import org.komapper.core.dsl.desc
-import org.komapper.jdbc.Database
+import org.komapper.jdbc.JdbcDatabase
 
 @ExtendWith(Env::class)
-class SqlSetOperationQueryTest(private val db: Database) {
+class SqlSetOperationQueryTest(private val db: JdbcDatabase) {
 
     @Run(unless = [Dbms.MYSQL])
     @Test
@@ -120,7 +120,7 @@ class SqlSetOperationQueryTest(private val db: Database) {
         val e = Employee.meta
         val q1 = SqlDsl.from(e).where { e.employeeId eq 1 }
         val q2 = SqlDsl.from(e)
-        val query = (q1 union q2).option { it.copy(allowEmptyWhereClause = false) }
+        val query = (q1 union q2).options { it.copy(allowEmptyWhereClause = false) }
         val ex = assertThrows<IllegalStateException> {
             db.runQuery { query }.let { }
         }

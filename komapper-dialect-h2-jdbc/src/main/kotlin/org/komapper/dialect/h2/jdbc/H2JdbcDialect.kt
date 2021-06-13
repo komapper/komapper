@@ -11,10 +11,10 @@ import org.komapper.jdbc.BooleanType
 import org.komapper.jdbc.ByteArrayType
 import org.komapper.jdbc.ByteType
 import org.komapper.jdbc.ClobType
-import org.komapper.jdbc.DataType
 import org.komapper.jdbc.DoubleType
 import org.komapper.jdbc.FloatType
 import org.komapper.jdbc.IntType
+import org.komapper.jdbc.JdbcDataType
 import org.komapper.jdbc.LocalDateTimeType
 import org.komapper.jdbc.LocalDateType
 import org.komapper.jdbc.LocalTimeType
@@ -30,7 +30,7 @@ import org.komapper.jdbc.UShortType
 import java.sql.SQLException
 
 open class H2JdbcDialect(
-    dataTypes: List<DataType<*>> = emptyList(),
+    dataTypes: List<JdbcDataType<*>> = emptyList(),
     val version: Version = Version.V1_4
 ) : H2Dialect, AbstractJdbcDialect(defaultDataTypes + dataTypes) {
 
@@ -40,7 +40,7 @@ open class H2JdbcDialect(
         /** the error code that represents unique violation  */
         const val UNIQUE_CONSTRAINT_VIOLATION_ERROR_CODE = 23505
 
-        val defaultDataTypes: List<DataType<*>> = listOf(
+        val defaultDataTypes: List<JdbcDataType<*>> = listOf(
             AnyType("other"),
             ArrayType("array"),
             BigDecimalType("bigint"),

@@ -3,7 +3,7 @@ package org.komapper.spring.boot.autoconfigure.r2dbc
 import io.r2dbc.spi.ConnectionFactory
 import org.komapper.core.ClockProvider
 import org.komapper.core.DefaultClockProvider
-import org.komapper.core.ExecutionOption
+import org.komapper.core.ExecutionOptions
 import org.komapper.core.Logger
 import org.komapper.core.StdOutLogger
 import org.komapper.core.TemplateStatementBuilder
@@ -56,8 +56,8 @@ open class KomapperAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    open fun executionOption(): ExecutionOption {
-        return ExecutionOption()
+    open fun executionOptions(): ExecutionOptions {
+        return ExecutionOptions()
     }
 
     @Bean
@@ -92,7 +92,7 @@ open class KomapperAutoConfiguration {
     open fun databaseConfig(
         r2dbcDialect: R2dbcDialect,
         clockProvider: ClockProvider,
-        executionOption: ExecutionOption,
+        executionOptions: ExecutionOptions,
         logger: Logger,
         r2dbcDatabaseSession: R2dbcDatabaseSession,
         statementInspector: StatementInspector,
@@ -102,7 +102,7 @@ open class KomapperAutoConfiguration {
             override val id = UUID.randomUUID()
             override val dialect = r2dbcDialect
             override val clockProvider = clockProvider
-            override val executionOption = executionOption
+            override val executionOptions = executionOptions
             override val logger = logger
             override val session = r2dbcDatabaseSession
             override val statementInspector = statementInspector

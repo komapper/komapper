@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.toList
 import org.komapper.core.dsl.context.SqlSelectContext
 import org.komapper.core.dsl.context.SubqueryContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
-import org.komapper.core.dsl.option.SqlSelectOption
+import org.komapper.core.dsl.options.SqlSelectOptions
 import org.komapper.core.dsl.runner.QueryRunner
 import org.komapper.core.dsl.visitor.QueryVisitor
 
@@ -14,7 +14,7 @@ internal class SqlTripleEntitiesQuery<
     B : Any, B_META : EntityMetamodel<B, *, B_META>,
     C : Any, C_META : EntityMetamodel<C, *, C_META>>(
     private val context: SqlSelectContext<A, *, A_META>,
-    private val option: SqlSelectOption,
+    private val options: SqlSelectOptions,
     private val metamodels: Triple<A_META, B_META, C_META>
 ) : FlowableSubquery<Triple<A, B?, C?>> {
 
@@ -24,15 +24,15 @@ internal class SqlTripleEntitiesQuery<
         FlowableSubquerySupport(subqueryContext) { SqlTripleEntitiesSetOperationQuery(it, metamodels = metamodels) }
 
     override fun accept(visitor: QueryVisitor): QueryRunner {
-        return visitor.sqlTripleEntitiesQuery(context, option, metamodels) { it.toList() }
+        return visitor.sqlTripleEntitiesQuery(context, options, metamodels) { it.toList() }
     }
 
     override fun <R> collect(collect: suspend (Flow<Triple<A, B?, C?>>) -> R): Query<R> = Query { visitor ->
-        visitor.sqlTripleEntitiesQuery(context, option, metamodels, collect)
+        visitor.sqlTripleEntitiesQuery(context, options, metamodels, collect)
     }
 
     override fun asFlowQuery(): FlowQuery<Triple<A, B?, C?>> = FlowQuery { visitor ->
-        visitor.sqlTripleEntitiesQuery(context, option, metamodels)
+        visitor.sqlTripleEntitiesQuery(context, options, metamodels)
     }
 
     override fun except(other: Subquery<Triple<A, B?, C?>>): FlowableSetOperationQuery<Triple<A, B?, C?>> {

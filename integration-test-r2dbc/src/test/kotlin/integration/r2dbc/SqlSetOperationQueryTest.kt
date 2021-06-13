@@ -120,7 +120,7 @@ class SqlSetOperationQueryTest(private val db: R2dbcDatabase) {
         val e = Employee.meta
         val q1 = SqlDsl.from(e).where { e.employeeId eq 1 }
         val q2 = SqlDsl.from(e)
-        val query = (q1 union q2).option { it.copy(allowEmptyWhereClause = false) }
+        val query = (q1 union q2).options { it.copy(allowEmptyWhereClause = false) }
         val ex = assertThrows<IllegalStateException> {
             db.runQuery { query }.let { }
         }

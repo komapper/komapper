@@ -5,13 +5,13 @@ import kotlinx.coroutines.flow.toList
 import org.komapper.core.dsl.context.SqlSelectContext
 import org.komapper.core.dsl.context.SubqueryContext
 import org.komapper.core.dsl.expression.ColumnExpression
-import org.komapper.core.dsl.option.SqlSelectOption
+import org.komapper.core.dsl.options.SqlSelectOptions
 import org.komapper.core.dsl.runner.QueryRunner
 import org.komapper.core.dsl.visitor.QueryVisitor
 
 internal class SqlTripleColumnsQuery<A : Any, B : Any, C : Any>(
     private val context: SqlSelectContext<*, *, *>,
-    private val option: SqlSelectOption,
+    private val options: SqlSelectOptions,
     private val expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>
 ) : FlowableSubquery<Triple<A?, B?, C?>> {
 
@@ -21,15 +21,15 @@ internal class SqlTripleColumnsQuery<A : Any, B : Any, C : Any>(
         FlowableSubquerySupport(subqueryContext) { SqlTripleColumnsSetOperationQuery(it, expressions = expressions) }
 
     override fun accept(visitor: QueryVisitor): QueryRunner {
-        return visitor.sqlTripleColumnsQuery(context, option, expressions) { it.toList() }
+        return visitor.sqlTripleColumnsQuery(context, options, expressions) { it.toList() }
     }
 
     override fun <R> collect(collect: suspend (Flow<Triple<A?, B?, C?>>) -> R): Query<R> = Query { visitor ->
-        visitor.sqlTripleColumnsQuery(context, option, expressions, collect)
+        visitor.sqlTripleColumnsQuery(context, options, expressions, collect)
     }
 
     override fun asFlowQuery(): FlowQuery<Triple<A?, B?, C?>> = FlowQuery { visitor ->
-        visitor.sqlTripleColumnsQuery(context, option, expressions)
+        visitor.sqlTripleColumnsQuery(context, options, expressions)
     }
 
     override fun except(other: Subquery<Triple<A?, B?, C?>>): FlowableSetOperationQuery<Triple<A?, B?, C?>> {

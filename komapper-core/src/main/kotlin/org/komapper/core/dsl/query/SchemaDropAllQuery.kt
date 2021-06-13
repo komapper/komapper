@@ -1,22 +1,22 @@
 package org.komapper.core.dsl.query
 
-import org.komapper.core.dsl.option.SchemaDropAllOption
+import org.komapper.core.dsl.options.SchemaDropAllOptions
 import org.komapper.core.dsl.runner.QueryRunner
 import org.komapper.core.dsl.visitor.QueryVisitor
 
 interface SchemaDropAllQuery : Query<Unit> {
-    fun option(configure: (SchemaDropAllOption) -> SchemaDropAllOption): SchemaDropAllQuery
+    fun options(configure: (SchemaDropAllOptions) -> SchemaDropAllOptions): SchemaDropAllQuery
 }
 
 internal data class SchemaDropAllQueryImpl(
-    private val option: SchemaDropAllOption = SchemaDropAllOption.default
+    private val options: SchemaDropAllOptions = SchemaDropAllOptions.default
 ) : SchemaDropAllQuery {
 
-    override fun option(configure: (SchemaDropAllOption) -> SchemaDropAllOption): SchemaDropAllQuery {
-        return copy(option = configure(option))
+    override fun options(configure: (SchemaDropAllOptions) -> SchemaDropAllOptions): SchemaDropAllQuery {
+        return copy(options = configure(options))
     }
 
     override fun accept(visitor: QueryVisitor): QueryRunner {
-        return visitor.schemaDropAllQuery(option)
+        return visitor.schemaDropAllQuery(options)
     }
 }

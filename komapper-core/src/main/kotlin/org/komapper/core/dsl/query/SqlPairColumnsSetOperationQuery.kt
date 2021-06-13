@@ -5,13 +5,13 @@ import kotlinx.coroutines.flow.toList
 import org.komapper.core.dsl.context.SqlSetOperationContext
 import org.komapper.core.dsl.context.SubqueryContext
 import org.komapper.core.dsl.expression.ColumnExpression
-import org.komapper.core.dsl.option.SqlSetOperationOption
+import org.komapper.core.dsl.options.SqlSetOperationOptions
 import org.komapper.core.dsl.runner.QueryRunner
 import org.komapper.core.dsl.visitor.QueryVisitor
 
 internal data class SqlPairColumnsSetOperationQuery<A : Any, B : Any>(
     private val context: SqlSetOperationContext<Pair<A?, B?>>,
-    private val option: SqlSetOperationOption = SqlSetOperationOption.default,
+    private val options: SqlSetOperationOptions = SqlSetOperationOptions.default,
     private val expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>
 ) : FlowableSetOperationQuery<Pair<A?, B?>> {
 
@@ -20,15 +20,15 @@ internal data class SqlPairColumnsSetOperationQuery<A : Any, B : Any>(
     private val support: SqlSetOperationQuerySupport<Pair<A?, B?>> = SqlSetOperationQuerySupport(context)
 
     override fun accept(visitor: QueryVisitor): QueryRunner {
-        return visitor.sqlPairColumnsSetOperationQuery(context, option, expressions) { it.toList() }
+        return visitor.sqlPairColumnsSetOperationQuery(context, options, expressions) { it.toList() }
     }
 
     override fun <R> collect(collect: suspend (Flow<Pair<A?, B?>>) -> R): Query<R> = Query { visitor ->
-        visitor.sqlPairColumnsSetOperationQuery(context, option, expressions, collect)
+        visitor.sqlPairColumnsSetOperationQuery(context, options, expressions, collect)
     }
 
     override fun asFlowQuery(): FlowQuery<Pair<A?, B?>> = FlowQuery { visitor ->
-        visitor.sqlPairColumnsSetOperationQuery(context, option, expressions)
+        visitor.sqlPairColumnsSetOperationQuery(context, options, expressions)
     }
 
     override fun except(other: Subquery<Pair<A?, B?>>): FlowableSetOperationQuery<Pair<A?, B?>> {
@@ -55,7 +55,7 @@ internal data class SqlPairColumnsSetOperationQuery<A : Any, B : Any>(
         return copy(context = support.orderBy(*expressions))
     }
 
-    override fun option(configurator: (SqlSetOperationOption) -> SqlSetOperationOption): FlowableSetOperationQuery<Pair<A?, B?>> {
-        return copy(option = configurator(option))
+    override fun options(configurator: (SqlSetOperationOptions) -> SqlSetOperationOptions): FlowableSetOperationQuery<Pair<A?, B?>> {
+        return copy(options = configurator(options))
     }
 }

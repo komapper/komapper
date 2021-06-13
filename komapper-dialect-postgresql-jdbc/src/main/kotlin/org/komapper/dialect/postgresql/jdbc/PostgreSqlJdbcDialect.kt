@@ -10,10 +10,10 @@ import org.komapper.jdbc.BooleanType
 import org.komapper.jdbc.ByteArrayType
 import org.komapper.jdbc.ByteType
 import org.komapper.jdbc.ClobType
-import org.komapper.jdbc.DataType
 import org.komapper.jdbc.DoubleType
 import org.komapper.jdbc.FloatType
 import org.komapper.jdbc.IntType
+import org.komapper.jdbc.JdbcDataType
 import org.komapper.jdbc.LocalDateTimeType
 import org.komapper.jdbc.LocalDateType
 import org.komapper.jdbc.LocalTimeType
@@ -29,7 +29,7 @@ import org.komapper.jdbc.UShortType
 import java.sql.SQLException
 
 open class PostgreSqlJdbcDialect(
-    dataTypes: List<DataType<*>> = emptyList(),
+    dataTypes: List<JdbcDataType<*>> = emptyList(),
     val version: Version = Version.V42_2
 ) : PostgreSqlDialect, AbstractJdbcDialect(defaultDataTypes + dataTypes) {
 
@@ -39,7 +39,7 @@ open class PostgreSqlJdbcDialect(
         /** the state code that represents unique violation  */
         const val UNIQUE_CONSTRAINT_VIOLATION_STATE_CODE = "23505"
 
-        val defaultDataTypes: List<DataType<*>> = listOf(
+        val defaultDataTypes: List<JdbcDataType<*>> = listOf(
             ArrayType("array"),
             BigDecimalType("decimal"),
             BigIntegerType("decimal"),

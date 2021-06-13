@@ -7,10 +7,10 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.SqlDsl
 import org.komapper.core.dsl.TemplateDsl
-import org.komapper.jdbc.Database
+import org.komapper.jdbc.JdbcDatabase
 
 @ExtendWith(Env::class)
-class TemplateExecuteQueryTest(private val db: Database) {
+class TemplateExecuteQueryTest(private val db: JdbcDatabase) {
 
     @Test
     fun test() {

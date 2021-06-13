@@ -2,7 +2,7 @@ package org.komapper.spring.boot.autoconfigure.jdbc
 
 import org.komapper.core.ClockProvider
 import org.komapper.core.DefaultClockProvider
-import org.komapper.core.ExecutionOption
+import org.komapper.core.ExecutionOptions
 import org.komapper.core.Logger
 import org.komapper.core.StdOutLogger
 import org.komapper.core.TemplateStatementBuilder
@@ -10,12 +10,12 @@ import org.komapper.core.spi.DefaultStatementInspector
 import org.komapper.core.spi.LoggerFactory
 import org.komapper.core.spi.StatementInspector
 import org.komapper.core.spi.TemplateStatementBuilderFactory
-import org.komapper.jdbc.DataFactory
-import org.komapper.jdbc.DataType
-import org.komapper.jdbc.Database
-import org.komapper.jdbc.DatabaseConfig
-import org.komapper.jdbc.DatabaseSession
-import org.komapper.jdbc.DefaultDataFactory
+import org.komapper.jdbc.DefaultJdbcDataFactory
+import org.komapper.jdbc.JdbcDataFactory
+import org.komapper.jdbc.JdbcDataType
+import org.komapper.jdbc.JdbcDatabase
+import org.komapper.jdbc.JdbcDatabaseConfig
+import org.komapper.jdbc.JdbcDatabaseSession
 import org.komapper.jdbc.JdbcDialect
 import org.springframework.boot.autoconfigure.AutoConfigureAfter
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass
@@ -31,7 +31,7 @@ import javax.sql.DataSource
 
 @Suppress("unused")
 @Configuration
-@ConditionalOnClass(Database::class)
+@ConditionalOnClass(JdbcDatabase::class)
 @AutoConfigureAfter(DataSourceAutoConfiguration::class)
 open class KomapperAutoConfiguration {
 
@@ -41,7 +41,7 @@ open class KomapperAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    open fun jdbcDialect(environment: Environment, dataTypes: List<DataType<*>>?): JdbcDialect {
+    open fun jdbcDialect(environment: Environment, dataTypes: List<JdbcDataType<*>>?): JdbcDialect {
         val url = environment.getProperty(DATASOURCE_URL_PROPERTY)
             ?: error(
                 "$DATASOURCE_URL_PROPERTY is not found. " +
@@ -58,8 +58,8 @@ open class KomapperAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    open fun executionOption(): ExecutionOption {
-        return ExecutionOption()
+    open fun executionOptions(): ExecutionOptions {
+        return ExecutionOptions()
     }
 
     @Bean
@@ -72,7 +72,7 @@ open class KomapperAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    open fun databaseSession(dataSource: DataSource): DatabaseSession {
+    open fun databaseSession(dataSource: DataSource): JdbcDatabaseSession {
         return TransactionAwareDatabaseSession(dataSource)
     }
 
@@ -85,8 +85,8 @@ open class KomapperAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    open fun dataFactory(databaseSession: DatabaseSession): DataFactory {
-        return DefaultDataFactory(databaseSession)
+    open fun dataFactory(databaseSession: JdbcDatabaseSession): JdbcDataFactory {
+        return DefaultJdbcDataFactory(databaseSession)
     }
 
     @Bean
@@ -94,18 +94,18 @@ open class KomapperAutoConfiguration {
     open fun databaseConfig(
         dialect: JdbcDialect,
         clockProvider: ClockProvider,
-        executionOption: ExecutionOption,
+        executionOptions: ExecutionOptions,
         logger: Logger,
-        session: DatabaseSession,
+        session: JdbcDatabaseSession,
         statementInspector: StatementInspector,
-        dataFactory: DataFactory,
+        dataFactory: JdbcDataFactory,
         templateStatementBuilder: Optional<TemplateStatementBuilder>
-    ): DatabaseConfig {
-        return object : DatabaseConfig {
+    ): JdbcDatabaseConfig {
+        return object : JdbcDatabaseConfig {
             override val id = UUID.randomUUID()
             override val dialect = dialect
             override val clockProvider = clockProvider
-            override val executionOption = executionOption
+            override val executionOptions = executionOptions
             override val logger = logger
             override val session = session
             override val statementInspector = statementInspector
@@ -130,7 +130,7 @@ open class KomapperAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    open fun database(config: DatabaseConfig): Database {
-        return Database.create(config)
+    open fun database(config: JdbcDatabaseConfig): JdbcDatabase {
+        return JdbcDatabase.create(config)
     }
 }

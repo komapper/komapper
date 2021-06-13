@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.EntityDsl
+import org.komapper.core.dsl.query.dryRun
 import org.komapper.r2dbc.R2dbcDatabase
 
 @ExtendWith(Env::class)
@@ -23,7 +24,7 @@ class QuoteTest(val db: R2dbcDatabase) {
     fun catalogAndSchema() = runBlocking {
         val m = CatalogAndSchema.meta
         val query = EntityDsl.from(m)
-        val sql = db.dryRunQuery { query }
+        val sql = query.dryRun().sql
         println(sql)
         assertTrue(sql.contains(""" "catalog"."schema"."CATALOG_AND_SCHEMA" """))
     }
@@ -33,7 +34,7 @@ class QuoteTest(val db: R2dbcDatabase) {
     fun catalogOnly() = runBlocking {
         val m = CatalogOnly.meta
         val query = EntityDsl.from(m)
-        val sql = db.dryRunQuery { query }
+        val sql = query.dryRun().sql
         println(sql)
         assertTrue(sql.contains(""" "catalog"."CATALOG_ONLY" """))
     }
@@ -43,7 +44,7 @@ class QuoteTest(val db: R2dbcDatabase) {
     fun schemaOnly() = runBlocking {
         val m = SchemaOnly.meta
         val query = EntityDsl.from(m)
-        val sql = db.dryRunQuery { query }
+        val sql = query.dryRun().sql
         println(sql)
         assertTrue(sql.contains(""" "schema"."SCHEMA_ONLY" """))
     }
@@ -53,7 +54,7 @@ class QuoteTest(val db: R2dbcDatabase) {
     fun blankName() = runBlocking {
         val m = BlankName.meta
         val query = EntityDsl.from(m)
-        val sql = db.dryRunQuery { query }
+        val sql = query.dryRun().sql
         println(sql)
         assertTrue(sql.contains(""" "BLANK_NAME" """))
         assertTrue(sql.contains("ID"))

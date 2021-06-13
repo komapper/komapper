@@ -6,12 +6,12 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.komapper.core.ClockProvider
-import org.komapper.core.ExecutionOption
+import org.komapper.core.ExecutionOptions
 import org.komapper.core.Statement
 import org.komapper.core.TemplateStatementBuilder
 import org.komapper.dialect.h2.jdbc.H2JdbcDialect
-import org.komapper.jdbc.DataType
-import org.komapper.jdbc.Database
+import org.komapper.jdbc.JdbcDataType
+import org.komapper.jdbc.JdbcDatabase
 import org.komapper.jdbc.StringType
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
 import org.springframework.context.annotation.AnnotationConfigApplicationContext
@@ -39,7 +39,7 @@ class KomapperAutoConfigurationTest {
         )
         context.refresh()
 
-        val database = context.getBean(Database::class.java)
+        val database = context.getBean(JdbcDatabase::class.java)
         assertNotNull(database)
         assertTrue(database.config.dialect is H2JdbcDialect)
         assertThrows<IllegalStateException> {
@@ -59,14 +59,14 @@ class KomapperAutoConfigurationTest {
         )
         context.refresh()
 
-        val database = context.getBean(Database::class.java)
+        val database = context.getBean(JdbcDatabase::class.java)
         assertNotNull(database)
         val dataType = database.config.dialect.getDataType(String::class)
         assertEquals("abc", dataType.name)
         val clock = database.config.clockProvider.now()
         val timestamp = LocalDateTime.now(clock)
         assertEquals(LocalDateTime.of(2021, 4, 25, 16, 17, 18), timestamp)
-        val jdbcOption = database.config.executionOption
+        val jdbcOption = database.config.executionOptions
         assertEquals(1234, jdbcOption.queryTimeoutSeconds)
     }
 
@@ -82,7 +82,7 @@ class KomapperAutoConfigurationTest {
         )
         context.refresh()
 
-        val database = context.getBean(Database::class.java)
+        val database = context.getBean(JdbcDatabase::class.java)
         assertNotNull(database)
         val builder = database.config.templateStatementBuilder
         assertTrue(builder is MyStatementBuilder)
@@ -93,7 +93,7 @@ class KomapperAutoConfigurationTest {
     open class CustomConfigure {
 
         @Bean
-        open fun dataTypes(): List<DataType<*>> {
+        open fun dataTypes(): List<JdbcDataType<*>> {
             return listOf(StringType("abc"))
         }
 
@@ -106,8 +106,8 @@ class KomapperAutoConfigurationTest {
         }
 
         @Bean
-        open fun jdbcOption(): ExecutionOption {
-            return ExecutionOption(queryTimeoutSeconds = 1234)
+        open fun jdbcOption(): ExecutionOptions {
+            return ExecutionOptions(queryTimeoutSeconds = 1234)
         }
     }
 

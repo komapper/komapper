@@ -1,7 +1,7 @@
 package org.komapper.dialect.h2.jdbc
 
 import org.komapper.dialect.h2.H2Dialect
-import org.komapper.jdbc.DataType
+import org.komapper.jdbc.JdbcDataType
 import org.komapper.jdbc.JdbcDialect
 import org.komapper.jdbc.spi.JdbcDialectFactory
 
@@ -10,7 +10,7 @@ class H2JdbcDialectFactory : JdbcDialectFactory {
         return driver == H2Dialect.driver
     }
 
-    override fun create(dataTypes: List<DataType<*>>): JdbcDialect {
+    override fun create(dataTypes: List<JdbcDataType<*>>): JdbcDialect {
         return H2JdbcDialect(dataTypes)
     }
 }

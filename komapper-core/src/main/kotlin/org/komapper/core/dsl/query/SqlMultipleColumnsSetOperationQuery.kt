@@ -5,13 +5,13 @@ import kotlinx.coroutines.flow.toList
 import org.komapper.core.dsl.context.SqlSetOperationContext
 import org.komapper.core.dsl.context.SubqueryContext
 import org.komapper.core.dsl.expression.ColumnExpression
-import org.komapper.core.dsl.option.SqlSetOperationOption
+import org.komapper.core.dsl.options.SqlSetOperationOptions
 import org.komapper.core.dsl.runner.QueryRunner
 import org.komapper.core.dsl.visitor.QueryVisitor
 
 internal data class SqlMultipleColumnsSetOperationQuery(
     private val context: SqlSetOperationContext<Columns>,
-    private val option: SqlSetOperationOption = SqlSetOperationOption.default,
+    private val options: SqlSetOperationOptions = SqlSetOperationOptions.default,
     private val expressions: List<ColumnExpression<*, *>>
 ) : FlowableSetOperationQuery<Columns> {
 
@@ -20,15 +20,15 @@ internal data class SqlMultipleColumnsSetOperationQuery(
     override val subqueryContext: SubqueryContext<Columns> = SubqueryContext.SqlSetOperation(context)
 
     override fun accept(visitor: QueryVisitor): QueryRunner {
-        return visitor.sqlMultipleColumnsSetOperationQuery(context, option, expressions) { it.toList() }
+        return visitor.sqlMultipleColumnsSetOperationQuery(context, options, expressions) { it.toList() }
     }
 
     override fun <R> collect(collect: suspend (Flow<Columns>) -> R): Query<R> = Query { visitor ->
-        visitor.sqlMultipleColumnsSetOperationQuery(context, option, expressions, collect)
+        visitor.sqlMultipleColumnsSetOperationQuery(context, options, expressions, collect)
     }
 
     override fun asFlowQuery(): FlowQuery<Columns> = FlowQuery { visitor ->
-        visitor.sqlMultipleColumnsSetOperationQuery(context, option, expressions)
+        visitor.sqlMultipleColumnsSetOperationQuery(context, options, expressions)
     }
 
     override fun except(other: Subquery<Columns>): FlowableSetOperationQuery<Columns> {
@@ -55,7 +55,7 @@ internal data class SqlMultipleColumnsSetOperationQuery(
         return copy(context = support.orderBy(*expressions))
     }
 
-    override fun option(configurator: (SqlSetOperationOption) -> SqlSetOperationOption): FlowableSetOperationQuery<Columns> {
-        return copy(option = configurator(option))
+    override fun options(configurator: (SqlSetOperationOptions) -> SqlSetOperationOptions): FlowableSetOperationQuery<Columns> {
+        return copy(options = configurator(options))
     }
 }

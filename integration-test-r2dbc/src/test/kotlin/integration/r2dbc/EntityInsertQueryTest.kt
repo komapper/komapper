@@ -28,7 +28,7 @@ import java.time.ZoneId
 @ExtendWith(Env::class)
 class EntityInsertQueryTest(private val db: R2dbcDatabase) {
 
-    // TODO
+    // TODO: resolve the PostgreSQL driver issue
     @Run(onlyIf = [Dbms.POSTGRESQL])
     @Test
     fun testGeneratedValue() = inTransaction(db) {
@@ -154,7 +154,7 @@ class EntityInsertQueryTest(private val db: R2dbcDatabase) {
         val m = SequenceStrategy.meta
         val strategy = SequenceStrategy(50, "test")
         val result = db.runQuery {
-            EntityDsl.insert(m).option {
+            EntityDsl.insert(m).options {
                 it.copy(disableSequenceAssignment = true)
             }.single(strategy)
         }

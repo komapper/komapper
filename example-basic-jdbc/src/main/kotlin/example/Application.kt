@@ -9,7 +9,7 @@ import org.komapper.annotation.KmUpdatedAt
 import org.komapper.annotation.KmVersion
 import org.komapper.core.dsl.EntityDsl
 import org.komapper.core.dsl.SchemaDsl
-import org.komapper.jdbc.Database
+import org.komapper.jdbc.JdbcDatabase
 import org.komapper.tx.jdbc.transaction
 import java.time.LocalDateTime
 
@@ -34,7 +34,7 @@ data class AddressDef(
 
 fun main() {
     // create a Database instance
-    val db = Database.create("jdbc:h2:mem:example;DB_CLOSE_DELAY=-1")
+    val db = JdbcDatabase.create("jdbc:h2:mem:example;DB_CLOSE_DELAY=-1")
 
     // get a metamodel
     val a = AddressDef.meta

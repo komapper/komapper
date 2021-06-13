@@ -4,11 +4,6 @@ import io.r2dbc.spi.Row
 import io.r2dbc.spi.Statement
 import org.komapper.core.Dialect
 import org.komapper.core.PlaceHolder
-import org.komapper.core.dsl.builder.DryRunSchemaStatementBuilder
-import org.komapper.core.dsl.builder.EntityUpsertStatementBuilder
-import org.komapper.core.dsl.builder.SchemaStatementBuilder
-import org.komapper.core.dsl.context.EntityUpsertContext
-import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.r2dbc.spi.R2dbcDialectFactory
 import java.util.ServiceLoader
 import java.util.regex.Pattern
@@ -41,7 +36,6 @@ interface R2dbcDialect : Dialect {
 
     val dataTypes: List<R2dbcDataType<*>>
 
-    fun replacePlaceHolder(index: Int, placeHolder: PlaceHolder): CharSequence
     fun getValue(row: Row, index: Int, valueClass: KClass<*>): Any?
     fun getValue(row: Row, columnLabel: String, valueClass: KClass<*>): Any?
     fun setValue(statement: Statement, index: Int, value: Any?, valueClass: KClass<*>)
@@ -98,29 +92,5 @@ abstract class AbstractR2dbcDialect protected constructor(internalDataTypes: Lis
     override fun getDataTypeName(klass: KClass<*>): String {
         val dataType = getDataType(klass)
         return dataType.name
-    }
-}
-
-internal object DryRunR2dbcDialect : AbstractR2dbcDialect() {
-
-    override val driver: String = "dry_run"
-
-    override fun getSequenceSql(sequenceName: String): String {
-        throw UnsupportedOperationException()
-    }
-
-    override fun getDataType(klass: KClass<*>): R2dbcDataType<*> {
-        return AnyType("other")
-    }
-
-    override fun getSchemaStatementBuilder(): SchemaStatementBuilder {
-        return DryRunSchemaStatementBuilder
-    }
-
-    override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> getEntityUpsertStatementBuilder(
-        context: EntityUpsertContext<ENTITY, ID, META>,
-        entities: List<ENTITY>
-    ): EntityUpsertStatementBuilder<ENTITY> {
-        throw UnsupportedOperationException()
     }
 }

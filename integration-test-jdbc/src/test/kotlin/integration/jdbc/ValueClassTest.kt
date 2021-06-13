@@ -22,10 +22,10 @@ import org.komapper.core.dsl.count
 import org.komapper.core.dsl.expression.When
 import org.komapper.core.dsl.max
 import org.komapper.core.dsl.plus
-import org.komapper.jdbc.Database
+import org.komapper.jdbc.JdbcDatabase
 
 @ExtendWith(Env::class)
-class ValueClassTest(val db: Database) {
+class ValueClassTest(val db: JdbcDatabase) {
 
     @Test
     fun list() {

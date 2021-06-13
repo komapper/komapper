@@ -2,8 +2,9 @@ package org.komapper.r2dbc
 
 import io.r2dbc.spi.ConnectionFactory
 import org.komapper.core.ClockProvider
+import org.komapper.core.DatabaseConfig
 import org.komapper.core.DefaultClockProvider
-import org.komapper.core.ExecutionOption
+import org.komapper.core.ExecutionOptions
 import org.komapper.core.Logger
 import org.komapper.core.StdOutLogger
 import org.komapper.core.TemplateStatementBuilder
@@ -16,18 +17,18 @@ import java.util.ServiceLoader
 import java.util.UUID
 
 @ThreadSafe
-interface R2dbcDatabaseConfig {
-    val id: UUID
-    val dialect: R2dbcDialect
-    val clockProvider: ClockProvider
-    val executionOption: ExecutionOption
-    val logger: Logger
+interface R2dbcDatabaseConfig : DatabaseConfig {
+    override val id: UUID
+    override val dialect: R2dbcDialect
+    override val clockProvider: ClockProvider
+    override val executionOptions: ExecutionOptions
+    override val logger: Logger
 
     val session: R2dbcDatabaseSession
-    val statementInspector: StatementInspector
+    override val statementInspector: StatementInspector
 
     // val dataFactory: DataFactory
-    val templateStatementBuilder: TemplateStatementBuilder
+    override val templateStatementBuilder: TemplateStatementBuilder
 }
 
 class DefaultR2dbcDatabaseConfig(
@@ -37,7 +38,7 @@ class DefaultR2dbcDatabaseConfig(
 
     override val id: UUID = UUID.randomUUID()
     override val clockProvider: ClockProvider = DefaultClockProvider()
-    override val executionOption: ExecutionOption = ExecutionOption()
+    override val executionOptions: ExecutionOptions = ExecutionOptions()
     override val logger: Logger = StdOutLogger()
     override val session: R2dbcDatabaseSession by lazy {
         val loader = ServiceLoader.load(R2dbcDatabaseSessionFactory::class.java)
@@ -57,22 +58,4 @@ class DefaultR2dbcDatabaseConfig(
             )
         factory.create(dialect)
     }
-}
-
-object DryRunR2dbcDatabaseConfig : R2dbcDatabaseConfig {
-    override val id: UUID
-        get() = throw UnsupportedOperationException()
-    override val dialect: R2dbcDialect = DryRunR2dbcDialect
-    override val logger: Logger
-        get() = throw UnsupportedOperationException()
-    override val clockProvider: ClockProvider
-        get() = throw UnsupportedOperationException()
-    override val executionOption: ExecutionOption
-        get() = throw UnsupportedOperationException()
-    override val session: R2dbcDatabaseSession
-        get() = throw UnsupportedOperationException()
-    override val statementInspector: StatementInspector
-        get() = throw UnsupportedOperationException()
-    override val templateStatementBuilder: TemplateStatementBuilder
-        get() = throw UnsupportedOperationException()
 }
