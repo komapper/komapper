@@ -17,10 +17,11 @@ import org.komapper.core.dsl.rem
 import org.komapper.core.dsl.rtrim
 import org.komapper.core.dsl.trim
 import org.komapper.core.dsl.upper
-import org.komapper.jdbc.Database
+import org.komapper.jdbc.JdbcDatabase
+import org.komapper.jdbc.dsl.query.dryRun
 
 @ExtendWith(Env::class)
-class ExpressionTest(private val db: Database) {
+class ExpressionTest(private val db: JdbcDatabase) {
 
     @Test
     fun plus() {
@@ -32,7 +33,7 @@ class ExpressionTest(private val db: Database) {
                 }
                 .select(a.addressId + 1)
                 .also {
-                    println(db.dryRunQuery { it })
+                    println(it.dryRun())
                 }.first()
         }
         assertEquals(11, result)
@@ -48,7 +49,7 @@ class ExpressionTest(private val db: Database) {
                 }
                 .select(a.addressId + a.addressId)
                 .also {
-                    println(db.dryRunQuery { it })
+                    println(it.dryRun())
                 }.first()
         }
         assertEquals(20, result)
@@ -64,7 +65,7 @@ class ExpressionTest(private val db: Database) {
                 }
                 .select(a.addressId - 10)
                 .also {
-                    println(db.dryRunQuery { it })
+                    println(it.dryRun())
                 }.first()
         }
         assertEquals(0, result)
@@ -80,7 +81,7 @@ class ExpressionTest(private val db: Database) {
                 }
                 .select(a.addressId - a.addressId)
                 .also {
-                    println(db.dryRunQuery { it })
+                    println(it.dryRun())
                 }.first()
         }
         assertEquals(0, result)
@@ -96,7 +97,7 @@ class ExpressionTest(private val db: Database) {
                 }
                 .select(a.addressId / 2)
                 .also {
-                    println(db.dryRunQuery { it })
+                    println(it.dryRun())
                 }.first()
         }
         assertEquals(5, result)
@@ -112,7 +113,7 @@ class ExpressionTest(private val db: Database) {
                 }
                 .select(a.addressId / a.addressId)
                 .also {
-                    println(db.dryRunQuery { it })
+                    println(it.dryRun())
                 }.first()
         }
         assertEquals(1, result)
@@ -128,7 +129,7 @@ class ExpressionTest(private val db: Database) {
                 }
                 .select(a.addressId % 3)
                 .also {
-                    println(db.dryRunQuery { it })
+                    println(it.dryRun())
                 }.first()
         }
         assertEquals(1, result)
@@ -144,7 +145,7 @@ class ExpressionTest(private val db: Database) {
                 }
                 .select(a.addressId % a.addressId)
                 .also {
-                    println(db.dryRunQuery { it })
+                    println(it.dryRun())
                 }.first()
         }
         assertEquals(0, result)
@@ -160,7 +161,7 @@ class ExpressionTest(private val db: Database) {
                 }
                 .select(concat(concat("[", a.street), "]"))
                 .also {
-                    println(db.dryRunQuery { it })
+                    println(it.dryRun())
                 }.first()
         }
         assertEquals("[STREET 10]", result)
@@ -176,7 +177,7 @@ class ExpressionTest(private val db: Database) {
                 }
                 .select(concat(concat(a.street, a.street), a.street))
                 .also {
-                    println(db.dryRunQuery { it })
+                    println(it.dryRun())
                 }.first()
         }
         assertEquals("STREET 10STREET 10STREET 10", result)

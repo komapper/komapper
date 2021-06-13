@@ -8,10 +8,10 @@ import integration.meta
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.SchemaDsl
-import org.komapper.jdbc.Database
+import org.komapper.jdbc.JdbcDatabase
 
 @ExtendWith(Env::class)
-class SchemaQueryTest(private val db: Database) {
+class SchemaQueryTest(private val db: JdbcDatabase) {
 
     private val metamodels = listOf(Aaa.meta, Bbb.meta, Ccc.meta, CompositeKeyAddress.meta)
 

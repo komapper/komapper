@@ -6,10 +6,10 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.SqlDsl
-import org.komapper.jdbc.Database
+import org.komapper.jdbc.JdbcDatabase
 
 @ExtendWith(Env::class)
-class SqlSelectQueryOffsetLimitTest(private val db: Database) {
+class SqlSelectQueryOffsetLimitTest(private val db: JdbcDatabase) {
 
     @Test
     fun offset() {

@@ -1,6 +1,7 @@
 package org.komapper.r2dbc.dsl.runner
 
 import kotlinx.coroutines.flow.firstOrNull
+import org.komapper.core.DatabaseConfig
 import org.komapper.core.Statement
 import org.komapper.core.dsl.builder.EntityInsertStatementBuilder
 import org.komapper.core.dsl.context.EntityInsertContext
@@ -54,7 +55,7 @@ internal class EntityInsertQueryRunnerSupport<ENTITY : Any, ID, META : EntityMet
         }
     }
 
-    fun buildStatement(config: R2dbcDatabaseConfig, entities: List<ENTITY>): Statement {
+    fun buildStatement(config: DatabaseConfig, entities: List<ENTITY>): Statement {
         val builder = EntityInsertStatementBuilder(config.dialect, context, entities)
         return builder.build()
     }

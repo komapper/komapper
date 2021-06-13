@@ -1,5 +1,6 @@
 package org.komapper.r2dbc.dsl.runner
 
+import org.komapper.core.DatabaseConfig
 import org.komapper.core.Statement
 import org.komapper.core.dsl.context.EntityUpsertContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
@@ -29,12 +30,11 @@ internal class EntityUpsertSingleQueryRunner<ENTITY : Any, ID, META : EntityMeta
         return support.upsert(config) { it.executeUpdate(statement) }
     }
 
-    override fun dryRun(config: R2dbcDatabaseConfig): String {
-        val statement = buildStatement(config, entity)
-        return statement.toSql()
+    override fun dryRun(config: DatabaseConfig): Statement {
+        return buildStatement(config, entity)
     }
 
-    private fun buildStatement(config: R2dbcDatabaseConfig, entity: ENTITY): Statement {
+    private fun buildStatement(config: DatabaseConfig, entity: ENTITY): Statement {
         return support.buildStatement(config, listOf(entity))
     }
 }

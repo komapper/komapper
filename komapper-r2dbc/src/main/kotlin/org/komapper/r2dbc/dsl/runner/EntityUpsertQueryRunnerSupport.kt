@@ -1,5 +1,6 @@
 package org.komapper.r2dbc.dsl.runner
 
+import org.komapper.core.DatabaseConfig
 import org.komapper.core.Statement
 import org.komapper.core.dsl.context.EntityUpsertContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
@@ -23,7 +24,7 @@ internal class EntityUpsertQueryRunnerSupport<ENTITY : Any, ID, META : EntityMet
         return execute(executor)
     }
 
-    fun buildStatement(config: R2dbcDatabaseConfig, entities: List<ENTITY>): Statement {
+    fun buildStatement(config: DatabaseConfig, entities: List<ENTITY>): Statement {
         val builder = config.dialect.getEntityUpsertStatementBuilder(context, entities)
         return builder.build()
     }

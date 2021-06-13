@@ -2,6 +2,8 @@ package org.komapper.r2dbc.dsl.runner
 
 import io.r2dbc.spi.Row
 import kotlinx.coroutines.flow.Flow
+import org.komapper.core.DatabaseConfig
+import org.komapper.core.Statement
 import org.komapper.core.dsl.context.SqlSetOperationContext
 import org.komapper.core.dsl.options.SqlSetOperationOptions
 import org.komapper.r2dbc.R2dbcDatabaseConfig
@@ -21,7 +23,7 @@ internal class SqlSetOperationQueryRunner<T, R>(
         return collect(flow)
     }
 
-    override fun dryRun(config: R2dbcDatabaseConfig): String {
+    override fun dryRun(config: DatabaseConfig): Statement {
         return runner.dryRun(config)
     }
 }

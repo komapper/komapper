@@ -13,7 +13,7 @@ import java.sql.ResultSet
 import java.sql.SQLException
 
 internal class JdbcExecutor(
-    private val config: DatabaseConfig,
+    private val config: JdbcDatabaseConfig,
     executionOptionProvider: ExecutionOptionsProvider,
     private val requiresGeneratedKeys: Boolean = false
 ) {

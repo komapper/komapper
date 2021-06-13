@@ -1,11 +1,6 @@
 package org.komapper.jdbc
 
 import org.komapper.core.Dialect
-import org.komapper.core.dsl.builder.DryRunSchemaStatementBuilder
-import org.komapper.core.dsl.builder.EntityUpsertStatementBuilder
-import org.komapper.core.dsl.builder.SchemaStatementBuilder
-import org.komapper.core.dsl.context.EntityUpsertContext
-import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.jdbc.spi.JdbcDialectFactory
 import java.sql.PreparedStatement
 import java.sql.ResultSet
@@ -19,7 +14,7 @@ interface JdbcDialect : Dialect {
     companion object {
         private val jdbcUrlPattern = Pattern.compile("^jdbc:([^:]*):.*")
 
-        fun load(url: String, dataTypes: List<DataType<*>>): JdbcDialect {
+        fun load(url: String, dataTypes: List<JdbcDataType<*>>): JdbcDialect {
             val driver = extractJdbcDriver(url)
             val loader = ServiceLoader.load(JdbcDialectFactory::class.java)
             val factory = loader.firstOrNull { it.supports(driver) }
@@ -40,21 +35,21 @@ interface JdbcDialect : Dialect {
         }
     }
 
-    val dataTypes: List<DataType<*>>
+    val dataTypes: List<JdbcDataType<*>>
 
     fun getValue(rs: ResultSet, index: Int, valueClass: KClass<*>): Any?
     fun getValue(rs: ResultSet, columnLabel: String, valueClass: KClass<*>): Any?
-    fun getDataType(klass: KClass<*>): DataType<*>
+    fun getDataType(klass: KClass<*>): JdbcDataType<*>
     fun setValue(ps: PreparedStatement, index: Int, value: Any?, valueClass: KClass<*>)
-    fun tryGetDataType(name: String): DataType<*>?
+    fun tryGetDataType(name: String): JdbcDataType<*>?
     fun isUniqueConstraintViolation(exception: SQLException): Boolean
 }
 
-abstract class AbstractJdbcDialect protected constructor(internalDataTypes: List<DataType<*>> = emptyList()) :
+abstract class AbstractJdbcDialect protected constructor(internalDataTypes: List<JdbcDataType<*>> = emptyList()) :
     JdbcDialect {
 
     @Suppress("MemberVisibilityCanBePrivate")
-    protected val dataTypeMap: Map<KClass<*>, DataType<*>> = internalDataTypes.associateBy { it.klass }
+    protected val dataTypeMap: Map<KClass<*>, JdbcDataType<*>> = internalDataTypes.associateBy { it.klass }
     override val dataTypes = internalDataTypes
 
     override fun getValue(rs: ResultSet, index: Int, valueClass: KClass<*>): Any? {
@@ -70,14 +65,14 @@ abstract class AbstractJdbcDialect protected constructor(internalDataTypes: List
     override fun setValue(ps: PreparedStatement, index: Int, value: Any?, valueClass: KClass<*>) {
         val dataType = getDataType(valueClass)
         @Suppress("UNCHECKED_CAST")
-        dataType as DataType<Any>
+        dataType as JdbcDataType<Any>
         dataType.setValue(ps, index, value)
     }
 
     override fun formatValue(value: Any?, valueClass: KClass<*>): String {
         val dataType = getDataType(valueClass)
         @Suppress("UNCHECKED_CAST")
-        dataType as DataType<Any>
+        dataType as JdbcDataType<Any>
         return dataType.toString(value)
     }
 
@@ -86,13 +81,13 @@ abstract class AbstractJdbcDialect protected constructor(internalDataTypes: List
         return dataType.name
     }
 
-    override fun getDataType(klass: KClass<*>): DataType<*> {
+    override fun getDataType(klass: KClass<*>): JdbcDataType<*> {
         return dataTypeMap[klass] ?: error(
             "The dataType is not found for the type \"${klass.qualifiedName}\"."
         )
     }
 
-    override fun tryGetDataType(name: String): DataType<*>? {
+    override fun tryGetDataType(name: String): JdbcDataType<*>? {
         return dataTypeMap.values.firstOrNull {
             it.name.lowercase() == name.lowercase()
         }
@@ -100,32 +95,4 @@ abstract class AbstractJdbcDialect protected constructor(internalDataTypes: List
 
     protected fun getCause(exception: SQLException): SQLException =
         exception.filterIsInstance(SQLException::class.java).first()
-}
-
-internal object DryRunJdbcDialect : AbstractJdbcDialect() {
-
-    override val driver: String = "dry_run"
-
-    override fun isUniqueConstraintViolation(exception: SQLException): Boolean {
-        throw UnsupportedOperationException()
-    }
-
-    override fun getSequenceSql(sequenceName: String): String {
-        throw UnsupportedOperationException()
-    }
-
-    override fun getDataType(klass: KClass<*>): DataType<Any> {
-        return AnyType("other")
-    }
-
-    override fun getSchemaStatementBuilder(): SchemaStatementBuilder {
-        return DryRunSchemaStatementBuilder
-    }
-
-    override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> getEntityUpsertStatementBuilder(
-        context: EntityUpsertContext<ENTITY, ID, META>,
-        entities: List<ENTITY>
-    ): EntityUpsertStatementBuilder<ENTITY> {
-        throw UnsupportedOperationException()
-    }
 }

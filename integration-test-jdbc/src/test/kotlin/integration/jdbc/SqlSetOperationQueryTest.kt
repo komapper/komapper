@@ -13,10 +13,10 @@ import org.komapper.core.dsl.EntityDsl
 import org.komapper.core.dsl.SqlDsl
 import org.komapper.core.dsl.alias
 import org.komapper.core.dsl.desc
-import org.komapper.jdbc.Database
+import org.komapper.jdbc.JdbcDatabase
 
 @ExtendWith(Env::class)
-class SqlSetOperationQueryTest(private val db: Database) {
+class SqlSetOperationQueryTest(private val db: JdbcDatabase) {
 
     @Run(unless = [Dbms.MYSQL])
     @Test

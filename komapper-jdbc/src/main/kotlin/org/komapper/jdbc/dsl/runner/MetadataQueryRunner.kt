@@ -1,9 +1,11 @@
 package org.komapper.jdbc.dsl.runner
 
 import org.komapper.core.Column
+import org.komapper.core.DatabaseConfig
 import org.komapper.core.PrimaryKey
+import org.komapper.core.Statement
 import org.komapper.core.Table
-import org.komapper.jdbc.DatabaseConfig
+import org.komapper.jdbc.JdbcDatabaseConfig
 import org.komapper.jdbc.JdbcDialect
 import java.sql.DatabaseMetaData
 
@@ -14,7 +16,7 @@ internal class MetadataQueryRunner(
     private val tableTypes: List<String>
 ) : JdbcQueryRunner<List<Table>> {
 
-    override fun run(config: DatabaseConfig): List<Table> {
+    override fun run(config: JdbcDatabaseConfig): List<Table> {
         return config.session.connection.use { con ->
             val reader = MetadataReader(
                 config.dialect,
@@ -28,8 +30,8 @@ internal class MetadataQueryRunner(
         }
     }
 
-    override fun dryRun(config: DatabaseConfig): String {
-        return ""
+    override fun dryRun(config: DatabaseConfig): Statement {
+        return Statement.EMPTY
     }
 }
 

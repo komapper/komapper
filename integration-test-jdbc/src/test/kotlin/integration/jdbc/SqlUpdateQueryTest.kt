@@ -10,10 +10,10 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.SqlDsl
 import org.komapper.core.dsl.concat
 import org.komapper.core.dsl.plus
-import org.komapper.jdbc.Database
+import org.komapper.jdbc.JdbcDatabase
 
 @ExtendWith(Env::class)
-class SqlUpdateQueryTest(private val db: Database) {
+class SqlUpdateQueryTest(private val db: JdbcDatabase) {
 
     @Test
     fun test() {

@@ -10,8 +10,8 @@ import org.komapper.core.ExecutionOptions
 import org.komapper.core.Statement
 import org.komapper.core.TemplateStatementBuilder
 import org.komapper.dialect.h2.jdbc.H2JdbcDialect
-import org.komapper.jdbc.DataType
-import org.komapper.jdbc.Database
+import org.komapper.jdbc.JdbcDataType
+import org.komapper.jdbc.JdbcDatabase
 import org.komapper.jdbc.StringType
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
 import org.springframework.context.annotation.AnnotationConfigApplicationContext
@@ -39,7 +39,7 @@ class KomapperAutoConfigurationTest {
         )
         context.refresh()
 
-        val database = context.getBean(Database::class.java)
+        val database = context.getBean(JdbcDatabase::class.java)
         assertNotNull(database)
         assertTrue(database.config.dialect is H2JdbcDialect)
         assertThrows<IllegalStateException> {
@@ -59,7 +59,7 @@ class KomapperAutoConfigurationTest {
         )
         context.refresh()
 
-        val database = context.getBean(Database::class.java)
+        val database = context.getBean(JdbcDatabase::class.java)
         assertNotNull(database)
         val dataType = database.config.dialect.getDataType(String::class)
         assertEquals("abc", dataType.name)
@@ -82,7 +82,7 @@ class KomapperAutoConfigurationTest {
         )
         context.refresh()
 
-        val database = context.getBean(Database::class.java)
+        val database = context.getBean(JdbcDatabase::class.java)
         assertNotNull(database)
         val builder = database.config.templateStatementBuilder
         assertTrue(builder is MyStatementBuilder)
@@ -93,7 +93,7 @@ class KomapperAutoConfigurationTest {
     open class CustomConfigure {
 
         @Bean
-        open fun dataTypes(): List<DataType<*>> {
+        open fun dataTypes(): List<JdbcDataType<*>> {
             return listOf(StringType("abc"))
         }
 

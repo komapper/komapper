@@ -7,10 +7,10 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.EntityDsl
 import org.komapper.core.dsl.desc
-import org.komapper.jdbc.Database
+import org.komapper.jdbc.JdbcDatabase
 
 @ExtendWith(Env::class)
-class EntitySelectQueryForUpdateTest(private val db: Database) {
+class EntitySelectQueryForUpdateTest(private val db: JdbcDatabase) {
 
     @Test
     fun forUpdate() {

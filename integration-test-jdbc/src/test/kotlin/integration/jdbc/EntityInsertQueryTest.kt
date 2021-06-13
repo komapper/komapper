@@ -17,15 +17,15 @@ import org.komapper.core.ClockProvider
 import org.komapper.core.UniqueConstraintException
 import org.komapper.core.dsl.EntityDsl
 import org.komapper.core.dsl.concat
-import org.komapper.jdbc.Database
-import org.komapper.jdbc.DatabaseConfig
+import org.komapper.jdbc.JdbcDatabase
+import org.komapper.jdbc.JdbcDatabaseConfig
 import java.time.Clock
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
 
 @ExtendWith(Env::class)
-class EntityInsertQueryTest(private val db: Database) {
+class EntityInsertQueryTest(private val db: JdbcDatabase) {
 
     @Test
     fun test() {
@@ -81,12 +81,12 @@ class EntityInsertQueryTest(private val db: Database) {
         val zoneId = ZoneId.of("UTC")
 
         val p = Person.meta
-        val config = object : DatabaseConfig by db.config {
+        val config = object : JdbcDatabaseConfig by db.config {
             override val clockProvider = ClockProvider {
                 Clock.fixed(instant, zoneId)
             }
         }
-        val myDb = Database.create(config)
+        val myDb = JdbcDatabase.create(config)
         val person1 = Person(1, "ABC")
         val id = myDb.runQuery { EntityDsl.insert(p).single(person1) }
         val person2 = db.runQuery {

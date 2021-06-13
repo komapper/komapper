@@ -5,7 +5,7 @@ import org.komapper.annotation.KmEntityDef
 import org.komapper.annotation.KmId
 import org.komapper.core.dsl.EntityDsl
 import org.komapper.core.dsl.desc
-import org.komapper.jdbc.Database
+import org.komapper.jdbc.JdbcDatabase
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.transaction.annotation.Transactional
@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController
 @SpringBootApplication
 @RestController
 @Transactional
-class Application(private val database: Database) {
+class Application(private val database: JdbcDatabase) {
 
     @RequestMapping("/")
     fun list(): List<Message> {

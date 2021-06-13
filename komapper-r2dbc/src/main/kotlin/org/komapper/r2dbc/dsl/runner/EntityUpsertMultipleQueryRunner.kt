@@ -1,5 +1,6 @@
 package org.komapper.r2dbc.dsl.runner
 
+import org.komapper.core.DatabaseConfig
 import org.komapper.core.Statement
 import org.komapper.core.dsl.context.EntityUpsertContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
@@ -30,13 +31,12 @@ internal class EntityUpsertMultipleQueryRunner<ENTITY : Any, ID, META : EntityMe
         return count
     }
 
-    override fun dryRun(config: R2dbcDatabaseConfig): String {
-        if (entities.isEmpty()) return ""
-        val statement = buildStatement(config, entities)
-        return statement.toSql()
+    override fun dryRun(config: DatabaseConfig): Statement {
+        if (entities.isEmpty()) return Statement.EMPTY
+        return buildStatement(config, entities)
     }
 
-    private fun buildStatement(config: R2dbcDatabaseConfig, entities: List<ENTITY>): Statement {
+    private fun buildStatement(config: DatabaseConfig, entities: List<ENTITY>): Statement {
         return support.buildStatement(config, entities)
     }
 }

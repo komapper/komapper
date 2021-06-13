@@ -91,7 +91,7 @@ class KomapperPluginTest {
             komapper {
                 generators {
                     register("h2") {
-                        val db = Database.create("jdbc:h2:mem:example;DB_CLOSE_DELAY=-1")
+                        val db = JdbcDatabase.create("jdbc:h2:mem:example;DB_CLOSE_DELAY=-1")
                         db.runQuery {
                             ScriptDsl.execute(""${'"'}
                                 drop all objects;

@@ -13,7 +13,7 @@ import org.junit.jupiter.api.extension.ParameterContext
 import org.junit.jupiter.api.extension.ParameterResolver
 import org.junit.platform.commons.support.AnnotationSupport.findAnnotation
 import org.komapper.core.dsl.ScriptDsl
-import org.komapper.jdbc.Database
+import org.komapper.jdbc.JdbcDatabase
 import org.komapper.tx.jdbc.transaction
 import org.komapper.tx.jdbc.transactionManager
 
@@ -31,7 +31,7 @@ internal class Env :
     }
 
     private val setting = SettingProvider.get()
-    private val db = Database.create(setting.config)
+    private val db = JdbcDatabase.create(setting.config)
     private val txManager = db.config.session.transactionManager
 
     override fun beforeAll(context: ExtensionContext?) {
@@ -79,7 +79,7 @@ internal class Env :
     override fun supportsParameter(
         parameterContext: ParameterContext?,
         extensionContext: ExtensionContext?
-    ): Boolean = parameterContext!!.parameter.type === Database::class.java
+    ): Boolean = parameterContext!!.parameter.type === JdbcDatabase::class.java
 
     override fun resolveParameter(
         parameterContext: ParameterContext?,

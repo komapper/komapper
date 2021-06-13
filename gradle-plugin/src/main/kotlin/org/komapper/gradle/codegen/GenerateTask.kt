@@ -4,7 +4,7 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
 import org.komapper.codegen.CodeGenerator
 import org.komapper.core.Table
-import org.komapper.jdbc.Database
+import org.komapper.jdbc.JdbcDatabase
 import org.komapper.jdbc.dsl.MetadataDsl
 import javax.inject.Inject
 
@@ -17,7 +17,7 @@ open class GenerateTask @Inject internal constructor(private val settings: Gener
         generate(tables)
     }
 
-    private fun read(database: Database): List<Table> {
+    private fun read(database: JdbcDatabase): List<Table> {
         return database.runQuery {
             MetadataDsl.tables(
                 catalog = settings.catalog.orNull,

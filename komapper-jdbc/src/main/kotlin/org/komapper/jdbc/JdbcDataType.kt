@@ -18,7 +18,7 @@ import java.time.OffsetDateTime
 import kotlin.reflect.KClass
 
 @ThreadSafe
-interface DataType<T : Any> {
+interface JdbcDataType<T : Any> {
     val name: String
     val klass: KClass<T>
     val jdbcType: JDBCType
@@ -32,7 +32,7 @@ interface DataType<T : Any> {
 abstract class AbstractDataType<T : Any>(
     override val klass: KClass<T>,
     override val jdbcType: JDBCType
-) : DataType<T> {
+) : JdbcDataType<T> {
 
     override fun getValue(rs: ResultSet, index: Int): T? {
         val value = doGetValue(rs, index)
@@ -114,7 +114,7 @@ class BigDecimalType(override val name: String) :
     }
 }
 
-class BigIntegerType(override val name: String) : DataType<BigInteger> {
+class BigIntegerType(override val name: String) : JdbcDataType<BigInteger> {
     private val dataType = BigDecimalType(name)
     override val klass: KClass<BigInteger> = BigInteger::class
     override val jdbcType = dataType.jdbcType
@@ -234,7 +234,7 @@ class DoubleType(override val name: String) :
     }
 }
 
-class EnumType(override val klass: KClass<Enum<*>>, override val name: String) : DataType<Enum<*>> {
+class EnumType(override val klass: KClass<Enum<*>>, override val name: String) : JdbcDataType<Enum<*>> {
     private val dataType = StringType(name)
     override val jdbcType = dataType.jdbcType
 

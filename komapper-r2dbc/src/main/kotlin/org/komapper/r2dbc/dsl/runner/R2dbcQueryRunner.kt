@@ -1,11 +1,12 @@
 package org.komapper.r2dbc.dsl.runner
 
+import org.komapper.core.DatabaseConfig
+import org.komapper.core.Statement
 import org.komapper.core.dsl.runner.QueryRunner
 import org.komapper.r2dbc.R2dbcDatabaseConfig
 
 internal sealed interface R2dbcQueryRunner<T> : QueryRunner {
     suspend fun run(config: R2dbcDatabaseConfig): T
-    fun dryRun(config: R2dbcDatabaseConfig): String
 
     data class Plus<LEFT, RIGHT>(
         val left: R2dbcQueryRunner<LEFT>,
@@ -17,8 +18,8 @@ internal sealed interface R2dbcQueryRunner<T> : QueryRunner {
             return right.run(config)
         }
 
-        override fun dryRun(config: R2dbcDatabaseConfig): String {
-            return left.dryRun(config) + ";" + right.dryRun(config)
+        override fun dryRun(config: DatabaseConfig): Statement {
+            return left.dryRun(config) + right.dryRun(config)
         }
     }
 
@@ -32,7 +33,7 @@ internal sealed interface R2dbcQueryRunner<T> : QueryRunner {
             return transform(value).run(config)
         }
 
-        override fun dryRun(config: R2dbcDatabaseConfig): String {
+        override fun dryRun(config: DatabaseConfig): Statement {
             return runner.dryRun(config)
         }
     }
@@ -47,7 +48,7 @@ internal sealed interface R2dbcQueryRunner<T> : QueryRunner {
             return value to transform(value).run(config)
         }
 
-        override fun dryRun(config: R2dbcDatabaseConfig): String {
+        override fun dryRun(config: DatabaseConfig): Statement {
             return runner.dryRun(config)
         }
     }

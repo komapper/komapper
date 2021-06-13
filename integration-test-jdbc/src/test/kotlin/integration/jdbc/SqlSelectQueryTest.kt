@@ -14,10 +14,10 @@ import org.komapper.core.dsl.case
 import org.komapper.core.dsl.concat
 import org.komapper.core.dsl.expression.When
 import org.komapper.core.dsl.literal
-import org.komapper.jdbc.Database
+import org.komapper.jdbc.JdbcDatabase
 
 @ExtendWith(Env::class)
-class SqlSelectQueryTest(private val db: Database) {
+class SqlSelectQueryTest(private val db: JdbcDatabase) {
 
     @Test
     fun list() {

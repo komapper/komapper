@@ -16,15 +16,15 @@ import org.komapper.core.ClockProvider
 import org.komapper.core.OptimisticLockException
 import org.komapper.core.UniqueConstraintException
 import org.komapper.core.dsl.EntityDsl
-import org.komapper.jdbc.Database
-import org.komapper.jdbc.DatabaseConfig
+import org.komapper.jdbc.JdbcDatabase
+import org.komapper.jdbc.JdbcDatabaseConfig
 import java.time.Clock
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
 
 @ExtendWith(Env::class)
-class EntityUpdateQueryTest(private val db: Database) {
+class EntityUpdateQueryTest(private val db: JdbcDatabase) {
 
     @Test
     fun test() {
@@ -72,12 +72,12 @@ class EntityUpdateQueryTest(private val db: Database) {
                 p.personId eq 1
             }.first()
         }
-        val config = object : DatabaseConfig by db.config {
+        val config = object : JdbcDatabaseConfig by db.config {
             override val clockProvider = ClockProvider {
                 Clock.fixed(instant, zoneId)
             }
         }
-        val myDb = Database.create(config)
+        val myDb = JdbcDatabase.create(config)
         myDb.runQuery { EntityDsl.update(p).single(person2.copy(name = "DEF")) }
         val person3 = db.runQuery {
             EntityDsl.from(p).where {

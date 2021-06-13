@@ -11,12 +11,12 @@ import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.SqlDsl
-import org.komapper.jdbc.Database
+import org.komapper.jdbc.JdbcDatabase
 import java.math.BigDecimal
 import java.time.LocalDate
 
 @ExtendWith(Env::class)
-class SqlInsertQueryTest(private val db: Database) {
+class SqlInsertQueryTest(private val db: JdbcDatabase) {
 
     @Test
     fun test() {

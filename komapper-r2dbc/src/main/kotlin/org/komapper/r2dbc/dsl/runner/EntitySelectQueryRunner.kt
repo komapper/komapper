@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
+import org.komapper.core.DatabaseConfig
 import org.komapper.core.Statement
 import org.komapper.core.dsl.builder.EntitySelectStatementBuilder
 import org.komapper.core.dsl.context.EntitySelectContext
@@ -57,11 +58,11 @@ internal class EntitySelectQueryRunner<ENTITY : Any, ID, META : EntityMetamodel<
         }
     }
 
-    override fun dryRun(config: R2dbcDatabaseConfig): String {
-        return buildStatement(config).toSql()
+    override fun dryRun(config: DatabaseConfig): Statement {
+        return buildStatement(config)
     }
 
-    private fun buildStatement(config: R2dbcDatabaseConfig): Statement {
+    private fun buildStatement(config: DatabaseConfig): Statement {
         val builder = EntitySelectStatementBuilder(config.dialect, context)
         return builder.build()
     }

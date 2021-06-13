@@ -12,17 +12,18 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.EntityDsl
-import org.komapper.jdbc.Database
+import org.komapper.jdbc.JdbcDatabase
+import org.komapper.jdbc.dsl.query.dryRun
 
 @ExtendWith(Env::class)
-class QuoteTest(val db: Database) {
+class QuoteTest(val db: JdbcDatabase) {
 
     @Run(onlyIf = [Dbms.H2, Dbms.POSTGRESQL])
     @Test
     fun catalogAndSchema() {
         val m = CatalogAndSchema.meta
         val query = EntityDsl.from(m)
-        val sql = db.dryRunQuery { query }
+        val sql = query.dryRun().sql
         println(sql)
         assertTrue(sql.contains(""" "catalog"."schema"."CATALOG_AND_SCHEMA" """))
     }
@@ -32,7 +33,7 @@ class QuoteTest(val db: Database) {
     fun catalogOnly() {
         val m = CatalogOnly.meta
         val query = EntityDsl.from(m)
-        val sql = db.dryRunQuery { query }
+        val sql = query.dryRun().sql
         println(sql)
         assertTrue(sql.contains(""" "catalog"."CATALOG_ONLY" """))
     }
@@ -42,7 +43,7 @@ class QuoteTest(val db: Database) {
     fun schemaOnly() {
         val m = SchemaOnly.meta
         val query = EntityDsl.from(m)
-        val sql = db.dryRunQuery { query }
+        val sql = query.dryRun().sql
         println(sql)
         assertTrue(sql.contains(""" "schema"."SCHEMA_ONLY" """))
     }
@@ -52,7 +53,7 @@ class QuoteTest(val db: Database) {
     fun blankName() {
         val m = BlankName.meta
         val query = EntityDsl.from(m)
-        val sql = db.dryRunQuery { query }
+        val sql = query.dryRun().sql
         println(sql)
         assertTrue(sql.contains(""" "BLANK_NAME" """))
         assertTrue(sql.contains("ID"))

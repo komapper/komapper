@@ -1,6 +1,7 @@
 package org.komapper.r2dbc.dsl.runner
 
 import kotlinx.coroutines.flow.Flow
+import org.komapper.core.DatabaseConfig
 import org.komapper.core.Statement
 import org.komapper.core.dsl.options.TemplateSelectOptions
 import org.komapper.core.dsl.query.Row
@@ -24,11 +25,11 @@ internal class TemplateSelectQueryRunner<T, R>(
         return collect(flow)
     }
 
-    override fun dryRun(config: R2dbcDatabaseConfig): String {
-        return buildStatement(config).toSql()
+    override fun dryRun(config: DatabaseConfig): Statement {
+        return buildStatement(config)
     }
 
-    private fun buildStatement(config: R2dbcDatabaseConfig): Statement {
+    private fun buildStatement(config: DatabaseConfig): Statement {
         val builder = config.templateStatementBuilder
         return builder.build(sql, params) { config.dialect.escape(it, options.escapeSequence) }
     }

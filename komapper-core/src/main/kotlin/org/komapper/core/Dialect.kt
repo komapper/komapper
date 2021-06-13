@@ -1,5 +1,6 @@
 package org.komapper.core
 
+import org.komapper.core.dsl.builder.DryRunSchemaStatementBuilder
 import org.komapper.core.dsl.builder.EntityUpsertStatementBuilder
 import org.komapper.core.dsl.builder.OffsetLimitStatementBuilder
 import org.komapper.core.dsl.builder.OffsetLimitStatementBuilderImpl
@@ -15,6 +16,10 @@ interface Dialect {
     val openQuote: String get() = "\""
     val closeQuote: String get() = "\""
     val escapeSequence: String get() = "\\"
+
+    fun replacePlaceHolder(index: Int, placeHolder: PlaceHolder): CharSequence {
+        return placeHolder
+    }
 
     fun formatValue(value: Any?, valueClass: KClass<*>): String
 
@@ -48,4 +53,39 @@ interface Dialect {
         context: EntityUpsertContext<ENTITY, ID, META>,
         entities: List<ENTITY>
     ): EntityUpsertStatementBuilder<ENTITY>
+}
+
+internal object DryRunJdbcDialect : Dialect {
+
+    override val driver: String = "dry_run"
+
+    override fun formatValue(value: Any?, valueClass: KClass<*>): String {
+        return if (value == null) {
+            "null"
+        } else {
+            when (valueClass) {
+                String::class -> "'$value'"
+                else -> value.toString()
+            }
+        }
+    }
+
+    override fun getDataTypeName(klass: KClass<*>): String {
+        throw UnsupportedOperationException()
+    }
+
+    override fun getSequenceSql(sequenceName: String): String {
+        throw UnsupportedOperationException()
+    }
+
+    override fun getSchemaStatementBuilder(): SchemaStatementBuilder {
+        return DryRunSchemaStatementBuilder
+    }
+
+    override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> getEntityUpsertStatementBuilder(
+        context: EntityUpsertContext<ENTITY, ID, META>,
+        entities: List<ENTITY>
+    ): EntityUpsertStatementBuilder<ENTITY> {
+        throw UnsupportedOperationException()
+    }
 }

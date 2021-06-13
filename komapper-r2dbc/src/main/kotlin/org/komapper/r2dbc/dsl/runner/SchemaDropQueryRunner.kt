@@ -1,5 +1,6 @@
 package org.komapper.r2dbc.dsl.runner
 
+import org.komapper.core.DatabaseConfig
 import org.komapper.core.Statement
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.SchemaDropOptions
@@ -17,11 +18,11 @@ internal class SchemaDropQueryRunner(
         executor.execute(statement)
     }
 
-    override fun dryRun(config: R2dbcDatabaseConfig): String {
-        return buildStatement(config).toSql()
+    override fun dryRun(config: DatabaseConfig): Statement {
+        return buildStatement(config)
     }
 
-    private fun buildStatement(config: R2dbcDatabaseConfig): Statement {
+    private fun buildStatement(config: DatabaseConfig): Statement {
         val builder = config.dialect.getSchemaStatementBuilder()
         return builder.drop(entityMetamodels)
     }

@@ -7,7 +7,7 @@ import java.sql.NClob
 import java.sql.SQLXML
 
 @ThreadSafe
-interface DataFactory {
+interface JdbcDataFactory {
     fun createArrayOf(typeName: String, elements: List<*>): java.sql.Array
     fun createBlob(): Blob
     fun createClob(): Clob
@@ -15,7 +15,7 @@ interface DataFactory {
     fun createSQLXML(): SQLXML
 }
 
-class DefaultDataFactory(private val session: DatabaseSession) : DataFactory {
+class DefaultJdbcDataFactory(private val session: JdbcDatabaseSession) : JdbcDataFactory {
 
     /**
      * Creates Array objects.

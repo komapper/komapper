@@ -11,10 +11,10 @@ import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.SqlDsl
 import org.komapper.core.dsl.literal
-import org.komapper.jdbc.Database
+import org.komapper.jdbc.JdbcDatabase
 
 @ExtendWith(Env::class)
-class LiteralTest(val db: Database) {
+class LiteralTest(val db: JdbcDatabase) {
 
     @Test
     fun test_boolean() {

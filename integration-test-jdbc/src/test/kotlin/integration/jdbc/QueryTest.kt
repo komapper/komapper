@@ -8,10 +8,11 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.EntityDsl
 import org.komapper.core.dsl.SqlDsl
-import org.komapper.jdbc.Database
+import org.komapper.jdbc.JdbcDatabase
+import org.komapper.jdbc.dsl.query.dryRun
 
 @ExtendWith(Env::class)
-class QueryTest(private val db: Database) {
+class QueryTest(private val db: JdbcDatabase) {
 
     @Test
     fun plus() {
@@ -26,7 +27,7 @@ class QueryTest(private val db: Database) {
         val q3 = EntityDsl.from(a).where { a.addressId inList listOf(16, 17) }
         val list = db.runQuery { q1 + q2 + q3 }
         assertEquals(2, list.size)
-        println(db.dryRunQuery { q1 + q2 + q3 })
+        println((q1 + q2 + q3).dryRun())
     }
 
     @Test
