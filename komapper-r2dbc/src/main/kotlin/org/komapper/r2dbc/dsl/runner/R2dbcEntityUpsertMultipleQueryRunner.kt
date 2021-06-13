@@ -5,15 +5,19 @@ import org.komapper.core.Statement
 import org.komapper.core.dsl.context.EntityUpsertContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.InsertOptions
+import org.komapper.core.dsl.runner.EntityUpsertMultipleQueryRunner
 import org.komapper.r2dbc.R2dbcDatabaseConfig
 
-internal class EntityUpsertMultipleQueryRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+internal class R2dbcEntityUpsertMultipleQueryRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     context: EntityUpsertContext<ENTITY, ID, META>,
     options: InsertOptions,
     private val entities: List<ENTITY>
 ) : R2dbcQueryRunner<Int> {
 
-    private val support: EntityUpsertQueryRunnerSupport<ENTITY, ID, META> = EntityUpsertQueryRunnerSupport(context, options)
+    private val runner: EntityUpsertMultipleQueryRunner<ENTITY, ID, META> =
+        EntityUpsertMultipleQueryRunner(context, options, entities)
+
+    private val support: R2dbcEntityUpsertQueryRunnerSupport<ENTITY, ID, META> = R2dbcEntityUpsertQueryRunnerSupport(context, options)
 
     override suspend fun run(config: R2dbcDatabaseConfig): Int {
         if (entities.isEmpty()) return 0
@@ -26,17 +30,12 @@ internal class EntityUpsertMultipleQueryRunner<ENTITY : Any, ID, META : EntityMe
     }
 
     private suspend fun upsert(config: R2dbcDatabaseConfig, entities: List<ENTITY>): Int {
-        val statement = buildStatement(config, entities)
+        val statement = runner.buildStatement(config, entities)
         val (count) = support.upsert(config) { it.executeUpdate(statement) }
         return count
     }
 
     override fun dryRun(config: DatabaseConfig): Statement {
-        if (entities.isEmpty()) return Statement.EMPTY
-        return buildStatement(config, entities)
-    }
-
-    private fun buildStatement(config: DatabaseConfig, entities: List<ENTITY>): Statement {
-        return support.buildStatement(config, entities)
+        return runner.dryRun(config)
     }
 }

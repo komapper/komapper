@@ -11,7 +11,7 @@ internal class JdbcSchemaDropAllQueryRunner(
     private val options: SchemaDropAllOptions
 ) : JdbcQueryRunner<Unit> {
 
-    private val runner: SchemaDropAllQueryRunner = SchemaDropAllQueryRunner(options)
+    private val runner = SchemaDropAllQueryRunner(options)
 
     override fun run(config: JdbcDatabaseConfig) {
         val statement = runner.buildStatement(config)

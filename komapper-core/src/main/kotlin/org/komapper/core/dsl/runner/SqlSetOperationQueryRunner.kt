@@ -2,21 +2,23 @@ package org.komapper.core.dsl.runner
 
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.Statement
+import org.komapper.core.dsl.builder.DefaultAliasManager
+import org.komapper.core.dsl.builder.SqlSetOperationStatementBuilder
 import org.komapper.core.dsl.context.SqlSetOperationContext
 import org.komapper.core.dsl.options.SqlSetOperationOptions
 
 class SqlSetOperationQueryRunner(
-    context: SqlSetOperationContext<*>,
-    options: SqlSetOperationOptions,
+    private val context: SqlSetOperationContext<*>,
+    private val options: SqlSetOperationOptions,
 ) : QueryRunner {
 
-    private val runner: SqlSetOperationFlowQueryRunner = SqlSetOperationFlowQueryRunner(context, options)
-
     override fun dryRun(config: DatabaseConfig): Statement {
-        return runner.dryRun(config)
+        return buildStatement(config)
     }
 
     fun buildStatement(config: DatabaseConfig): Statement {
-        return runner.buildStatement(config)
+        val aliasManager = DefaultAliasManager(context)
+        val builder = SqlSetOperationStatementBuilder(config.dialect, context, aliasManager)
+        return builder.build()
     }
 }

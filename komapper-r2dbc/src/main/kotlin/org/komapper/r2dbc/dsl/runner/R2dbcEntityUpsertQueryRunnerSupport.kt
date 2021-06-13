@@ -1,19 +1,17 @@
 package org.komapper.r2dbc.dsl.runner
 
-import org.komapper.core.DatabaseConfig
-import org.komapper.core.Statement
 import org.komapper.core.dsl.context.EntityUpsertContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.InsertOptions
 import org.komapper.r2dbc.R2dbcDatabaseConfig
 import org.komapper.r2dbc.R2dbcExecutor
 
-internal class EntityUpsertQueryRunnerSupport<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+internal class R2dbcEntityUpsertQueryRunnerSupport<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityUpsertContext<ENTITY, ID, META>,
     private val options: InsertOptions
 ) {
 
-    private val support: EntityInsertQueryRunnerSupport<ENTITY, ID, META> = EntityInsertQueryRunnerSupport(context.insertContext, options)
+    private val support: R2dbcEntityInsertQueryRunnerSupport<ENTITY, ID, META> = R2dbcEntityInsertQueryRunnerSupport(context.insertContext, options)
 
     suspend fun preUpsert(config: R2dbcDatabaseConfig, entity: ENTITY): ENTITY {
         return support.preInsert(config, entity)
@@ -22,10 +20,5 @@ internal class EntityUpsertQueryRunnerSupport<ENTITY : Any, ID, META : EntityMet
     suspend fun <T> upsert(config: R2dbcDatabaseConfig, execute: suspend (R2dbcExecutor) -> T): T {
         val executor = R2dbcExecutor(config, options)
         return execute(executor)
-    }
-
-    fun buildStatement(config: DatabaseConfig, entities: List<ENTITY>): Statement {
-        val builder = config.dialect.getEntityUpsertStatementBuilder(context, entities)
-        return builder.build()
     }
 }

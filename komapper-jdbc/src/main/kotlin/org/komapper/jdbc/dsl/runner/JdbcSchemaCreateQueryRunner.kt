@@ -13,7 +13,7 @@ internal class JdbcSchemaCreateQueryRunner(
     private val options: SchemaCreateOptions
 ) : JdbcQueryRunner<Unit> {
 
-    private val runner: SchemaCreateQueryRunner = SchemaCreateQueryRunner(entityMetamodels, options)
+    private val runner = SchemaCreateQueryRunner(entityMetamodels, options)
 
     override fun run(config: JdbcDatabaseConfig) {
         val statement = runner.buildStatement(config)
