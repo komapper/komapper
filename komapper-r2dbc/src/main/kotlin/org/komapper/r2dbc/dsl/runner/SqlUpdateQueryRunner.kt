@@ -1,5 +1,6 @@
 package org.komapper.r2dbc.dsl.runner
 
+import org.komapper.core.DatabaseConfig
 import org.komapper.core.Statement
 import org.komapper.core.dsl.builder.SqlUpdateStatementBuilder
 import org.komapper.core.dsl.context.SqlUpdateContext
@@ -23,11 +24,11 @@ internal class SqlUpdateQueryRunner<ENTITY : Any, ID, META : EntityMetamodel<ENT
         return count
     }
 
-    override fun dryRun(config: R2dbcDatabaseConfig): String {
-        return buildStatement(config).toSql()
+    override fun dryRun(config: DatabaseConfig): Statement {
+        return buildStatement(config)
     }
 
-    private fun buildStatement(config: R2dbcDatabaseConfig): Statement {
+    private fun buildStatement(config: DatabaseConfig): Statement {
         val builder = SqlUpdateStatementBuilder(config.dialect, context)
         return builder.build()
     }

@@ -1,5 +1,6 @@
 package org.komapper.r2dbc.dsl.runner
 
+import org.komapper.core.DatabaseConfig
 import org.komapper.core.Statement
 import org.komapper.core.dsl.options.ScriptExecuteOptions
 import org.komapper.r2dbc.R2dbcDatabaseConfig
@@ -18,7 +19,7 @@ internal data class ScriptExecuteQueryRunner(
         return executor.execute(statement)
     }
 
-    override fun dryRun(config: R2dbcDatabaseConfig): String {
-        return statement.toSql()
+    override fun dryRun(config: DatabaseConfig): Statement {
+        return statement
     }
 }

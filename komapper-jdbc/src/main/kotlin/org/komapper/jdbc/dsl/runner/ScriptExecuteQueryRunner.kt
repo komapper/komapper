@@ -1,8 +1,9 @@
 package org.komapper.jdbc.dsl.runner
 
+import org.komapper.core.DatabaseConfig
 import org.komapper.core.Statement
 import org.komapper.core.dsl.options.ScriptExecuteOptions
-import org.komapper.jdbc.DatabaseConfig
+import org.komapper.jdbc.JdbcDatabaseConfig
 import org.komapper.jdbc.JdbcExecutor
 
 internal class ScriptExecuteQueryRunner(
@@ -12,12 +13,12 @@ internal class ScriptExecuteQueryRunner(
     JdbcQueryRunner<Unit> {
     private val statement = Statement(sql)
 
-    override fun run(config: DatabaseConfig) {
+    override fun run(config: JdbcDatabaseConfig) {
         val executor = JdbcExecutor(config, options)
         return executor.execute(statement)
     }
 
-    override fun dryRun(config: DatabaseConfig): String {
-        return statement.toSql()
+    override fun dryRun(config: DatabaseConfig): Statement {
+        return statement
     }
 }

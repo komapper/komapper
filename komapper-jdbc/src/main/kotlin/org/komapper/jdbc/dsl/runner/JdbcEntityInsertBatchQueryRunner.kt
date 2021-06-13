@@ -1,10 +1,11 @@
 package org.komapper.jdbc.dsl.runner
 
+import org.komapper.core.DatabaseConfig
 import org.komapper.core.Statement
 import org.komapper.core.dsl.context.EntityInsertContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.EntityInsertBatchOptions
-import org.komapper.jdbc.DatabaseConfig
+import org.komapper.jdbc.JdbcDatabaseConfig
 
 internal class EntityInsertBatchQueryRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     context: EntityInsertContext<ENTITY, ID, META>,
@@ -15,18 +16,18 @@ internal class EntityInsertBatchQueryRunner<ENTITY : Any, ID, META : EntityMetam
     private val support: EntityInsertQueryRunnerSupport<ENTITY, ID, META> =
         EntityInsertQueryRunnerSupport(context, options)
 
-    override fun run(config: DatabaseConfig): List<ENTITY> {
+    override fun run(config: JdbcDatabaseConfig): List<ENTITY> {
         if (entities.isEmpty()) return emptyList()
         val newEntities = preInsert(config)
         val generatedKeys = insert(config, newEntities)
         return postInsert(newEntities, generatedKeys)
     }
 
-    private fun preInsert(config: DatabaseConfig): List<ENTITY> {
+    private fun preInsert(config: JdbcDatabaseConfig): List<ENTITY> {
         return entities.map { support.preInsert(config, it) }
     }
 
-    private fun insert(config: DatabaseConfig, entities: List<ENTITY>): LongArray {
+    private fun insert(config: JdbcDatabaseConfig, entities: List<ENTITY>): LongArray {
         val statements = entities.map { buildStatement(config, it) }
         val (_, keys) = support.insert(config) { it.executeBatch(statements) }
         return keys
@@ -43,10 +44,9 @@ internal class EntityInsertBatchQueryRunner<ENTITY : Any, ID, META : EntityMetam
         }
     }
 
-    override fun dryRun(config: DatabaseConfig): String {
-        if (entities.isEmpty()) return ""
-        val statement = buildStatement(config, entities.first())
-        return statement.toSql()
+    override fun dryRun(config: DatabaseConfig): Statement {
+        if (entities.isEmpty()) return Statement.EMPTY
+        return buildStatement(config, entities.first())
     }
 
     private fun buildStatement(config: DatabaseConfig, entity: ENTITY): Statement {

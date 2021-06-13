@@ -18,7 +18,7 @@ open class GenerateTask @Inject internal constructor(private val settings: Gener
     }
 
     private fun read(database: JdbcDatabase): List<Table> {
-        return database.runMetadataQuery {
+        return database.runQuery {
             MetadataDsl.tables(
                 catalog = settings.catalog.orNull,
                 schemaPattern = settings.schemaPattern.orNull,

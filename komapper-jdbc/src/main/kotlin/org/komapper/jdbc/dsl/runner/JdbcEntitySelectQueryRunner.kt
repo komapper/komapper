@@ -5,12 +5,13 @@ import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
+import org.komapper.core.DatabaseConfig
 import org.komapper.core.Statement
 import org.komapper.core.dsl.builder.EntitySelectStatementBuilder
 import org.komapper.core.dsl.context.EntitySelectContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.EntitySelectOptions
-import org.komapper.jdbc.DatabaseConfig
+import org.komapper.jdbc.JdbcDatabaseConfig
 import org.komapper.jdbc.JdbcDialect
 import org.komapper.jdbc.JdbcExecutor
 import java.sql.ResultSet
@@ -22,7 +23,7 @@ internal class EntitySelectQueryRunner<ENTITY : Any, ID, META : EntityMetamodel<
     private val transform: suspend (Flow<ENTITY>) -> R
 ) : JdbcQueryRunner<R> {
 
-    override fun run(config: DatabaseConfig): R {
+    override fun run(config: JdbcDatabaseConfig): R {
         if (!options.allowEmptyWhereClause && context.where.isEmpty()) {
             error("Empty where clause is not allowed.")
         }
@@ -52,8 +53,8 @@ internal class EntitySelectQueryRunner<ENTITY : Any, ID, META : EntityMetamodel<
         }
     }
 
-    override fun dryRun(config: DatabaseConfig): String {
-        return buildStatement(config).toSql()
+    override fun dryRun(config: DatabaseConfig): Statement {
+        return buildStatement(config)
     }
 
     private fun buildStatement(config: DatabaseConfig): Statement {

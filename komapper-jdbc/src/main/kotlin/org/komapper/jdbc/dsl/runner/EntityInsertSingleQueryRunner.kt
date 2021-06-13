@@ -1,10 +1,11 @@
 package org.komapper.jdbc.dsl.runner
 
+import org.komapper.core.DatabaseConfig
 import org.komapper.core.Statement
 import org.komapper.core.dsl.context.EntityInsertContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.EntityInsertOptions
-import org.komapper.jdbc.DatabaseConfig
+import org.komapper.jdbc.JdbcDatabaseConfig
 
 internal class EntityInsertSingleQueryRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     context: EntityInsertContext<ENTITY, ID, META>,
@@ -15,17 +16,17 @@ internal class EntityInsertSingleQueryRunner<ENTITY : Any, ID, META : EntityMeta
     private val support: EntityInsertQueryRunnerSupport<ENTITY, ID, META> =
         EntityInsertQueryRunnerSupport(context, options)
 
-    override fun run(config: DatabaseConfig): ENTITY {
+    override fun run(config: JdbcDatabaseConfig): ENTITY {
         val newEntity = preInsert(config)
         val (_, generatedKeys) = insert(config, newEntity)
         return postInsert(newEntity, generatedKeys)
     }
 
-    private fun preInsert(config: DatabaseConfig): ENTITY {
+    private fun preInsert(config: JdbcDatabaseConfig): ENTITY {
         return support.preInsert(config, entity)
     }
 
-    private fun insert(config: DatabaseConfig, entity: ENTITY): Pair<Int, LongArray> {
+    private fun insert(config: JdbcDatabaseConfig, entity: ENTITY): Pair<Int, LongArray> {
         val statement = buildStatement(config, entity)
         return support.insert(config) { it.executeUpdate(statement) }
     }
@@ -39,9 +40,8 @@ internal class EntityInsertSingleQueryRunner<ENTITY : Any, ID, META : EntityMeta
         }
     }
 
-    override fun dryRun(config: DatabaseConfig): String {
-        val statement = buildStatement(config, entity)
-        return statement.toSql()
+    override fun dryRun(config: DatabaseConfig): Statement {
+        return buildStatement(config, entity)
     }
 
     private fun buildStatement(config: DatabaseConfig, entity: ENTITY): Statement {

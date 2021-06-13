@@ -13,12 +13,12 @@ import org.komapper.core.dsl.lower
 import org.komapper.core.dsl.ltrim
 import org.komapper.core.dsl.minus
 import org.komapper.core.dsl.plus
-import org.komapper.core.dsl.query.dryRun
 import org.komapper.core.dsl.rem
 import org.komapper.core.dsl.rtrim
 import org.komapper.core.dsl.trim
 import org.komapper.core.dsl.upper
 import org.komapper.jdbc.JdbcDatabase
+import org.komapper.jdbc.dsl.query.dryRun
 
 @ExtendWith(Env::class)
 class ExpressionTest(private val db: JdbcDatabase) {

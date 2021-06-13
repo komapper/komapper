@@ -1,10 +1,11 @@
 package org.komapper.jdbc.dsl.runner
 
+import org.komapper.core.DatabaseConfig
 import org.komapper.core.Statement
 import org.komapper.core.dsl.context.EntityUpdateContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.EntityUpdateOptions
-import org.komapper.jdbc.DatabaseConfig
+import org.komapper.jdbc.JdbcDatabaseConfig
 
 internal class EntityUpdateSingleQueryRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     context: EntityUpdateContext<ENTITY, ID, META>,
@@ -14,17 +15,17 @@ internal class EntityUpdateSingleQueryRunner<ENTITY : Any, ID, META : EntityMeta
 
     private val support: EntityUpdateQueryRunnerSupport<ENTITY, ID, META> = EntityUpdateQueryRunnerSupport(context, options)
 
-    override fun run(config: DatabaseConfig): ENTITY {
+    override fun run(config: JdbcDatabaseConfig): ENTITY {
         val newEntity = preUpdate(config, entity)
         val (count) = update(config, newEntity)
         return postUpdate(newEntity, count)
     }
 
-    private fun preUpdate(config: DatabaseConfig, entity: ENTITY): ENTITY {
+    private fun preUpdate(config: JdbcDatabaseConfig, entity: ENTITY): ENTITY {
         return support.preUpdate(config, entity)
     }
 
-    private fun update(config: DatabaseConfig, entity: ENTITY): Pair<Int, LongArray> {
+    private fun update(config: JdbcDatabaseConfig, entity: ENTITY): Pair<Int, LongArray> {
         val statement = buildStatement(config, entity)
         return support.update(config) { it.executeUpdate(statement) }
     }
@@ -33,9 +34,8 @@ internal class EntityUpdateSingleQueryRunner<ENTITY : Any, ID, META : EntityMeta
         return support.postUpdate(entity, count)
     }
 
-    override fun dryRun(config: DatabaseConfig): String {
-        val statement = buildStatement(config, entity)
-        return statement.toSql()
+    override fun dryRun(config: DatabaseConfig): Statement {
+        return buildStatement(config, entity)
     }
 
     private fun buildStatement(config: DatabaseConfig, entity: ENTITY): Statement {

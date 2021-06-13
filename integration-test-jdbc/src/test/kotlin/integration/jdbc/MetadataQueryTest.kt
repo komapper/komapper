@@ -10,9 +10,10 @@ import org.komapper.jdbc.dsl.MetadataDsl
 
 @ExtendWith(Env::class)
 class MetadataQueryTest(val db: JdbcDatabase) {
+
     @Test
     fun test() {
-        val tables = db.runMetadataQuery {
+        val tables = db.runQuery {
             MetadataDsl.tables()
         }
         val address = tables.first { it.name.lowercase() == "address" }
@@ -21,7 +22,7 @@ class MetadataQueryTest(val db: JdbcDatabase) {
 
     @Test
     fun autoIncrement() {
-        val tables = db.runMetadataQuery {
+        val tables = db.runQuery {
             MetadataDsl.tables()
         }
         val identityStrategy = tables.first { it.name.lowercase() == "identity_strategy" }

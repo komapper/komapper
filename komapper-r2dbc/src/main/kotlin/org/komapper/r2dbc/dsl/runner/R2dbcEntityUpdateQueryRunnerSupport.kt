@@ -1,5 +1,6 @@
 package org.komapper.r2dbc.dsl.runner
 
+import org.komapper.core.DatabaseConfig
 import org.komapper.core.Statement
 import org.komapper.core.dsl.builder.EntityUpdateStatementBuilder
 import org.komapper.core.dsl.context.EntityUpdateContext
@@ -35,7 +36,7 @@ internal class EntityUpdateQueryRunnerSupport<ENTITY : Any, ID, META : EntityMet
         }
     }
 
-    fun buildStatement(config: R2dbcDatabaseConfig, entity: ENTITY): Statement {
+    fun buildStatement(config: DatabaseConfig, entity: ENTITY): Statement {
         val builder = EntityUpdateStatementBuilder(config.dialect, context, options, entity)
         return builder.build()
     }

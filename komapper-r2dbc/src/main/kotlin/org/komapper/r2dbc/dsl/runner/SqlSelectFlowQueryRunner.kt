@@ -2,6 +2,7 @@ package org.komapper.r2dbc.dsl.runner
 
 import io.r2dbc.spi.Row
 import kotlinx.coroutines.flow.Flow
+import org.komapper.core.DatabaseConfig
 import org.komapper.core.Statement
 import org.komapper.core.dsl.builder.SqlSelectStatementBuilder
 import org.komapper.core.dsl.context.SqlSelectContext
@@ -26,11 +27,11 @@ internal class SqlSelectFlowQueryRunner<T>(
         return executor.executeQuery(statement, transform)
     }
 
-    override fun dryRun(config: R2dbcDatabaseConfig): String {
-        return buildStatement(config).toSql()
+    override fun dryRun(config: DatabaseConfig): Statement {
+        return buildStatement(config)
     }
 
-    private fun buildStatement(config: R2dbcDatabaseConfig): Statement {
+    private fun buildStatement(config: DatabaseConfig): Statement {
         val builder = SqlSelectStatementBuilder(config.dialect, context)
         return builder.build()
     }
