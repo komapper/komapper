@@ -20,7 +20,7 @@ internal class EntityUpsertSingleQueryRunner<ENTITY : Any, ID, META : EntityMeta
         return count
     }
 
-    private fun preUpsert(config: R2dbcDatabaseConfig, entity: ENTITY): ENTITY {
+    private suspend fun preUpsert(config: R2dbcDatabaseConfig, entity: ENTITY): ENTITY {
         return support.preUpsert(config, entity)
     }
 

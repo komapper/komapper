@@ -20,7 +20,7 @@ internal class EntityInsertSingleQueryRunner<ENTITY : Any, ID, META : EntityMeta
         return postInsert(newEntity, generatedKeys)
     }
 
-    private fun preInsert(config: R2dbcDatabaseConfig): ENTITY {
+    private suspend fun preInsert(config: R2dbcDatabaseConfig): ENTITY {
         return support.preInsert(config, entity)
     }
 

@@ -1,7 +1,6 @@
 package org.komapper.r2dbc.dsl.runner
 
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.runBlocking
 import org.komapper.core.Statement
 import org.komapper.core.dsl.builder.EntityInsertStatementBuilder
 import org.komapper.core.dsl.context.EntityInsertContext
@@ -15,7 +14,7 @@ internal class EntityInsertQueryRunnerSupport<ENTITY : Any, ID, META : EntityMet
     val option: InsertOption
 ) {
 
-    fun preInsert(config: R2dbcDatabaseConfig, entity: ENTITY): ENTITY {
+    suspend fun preInsert(config: R2dbcDatabaseConfig, entity: ENTITY): ENTITY {
         val assignment = context.target.idAssignment()
         return if (!option.disableSequenceAssignment && assignment is Assignment.Sequence<ENTITY, *, *>) {
             assignment.assign(entity, config.id, config.dialect::enquote) { sequenceName ->
@@ -23,11 +22,9 @@ internal class EntityInsertQueryRunnerSupport<ENTITY : Any, ID, META : EntityMet
                 val statement = Statement(sql)
                 val executor = R2dbcExecutor(config, option)
                 val flow = executor.executeQuery(statement) { _, row -> row.get(0) }
-                runBlocking {
-                    when (val value = flow.firstOrNull() ?: error("No result: ${statement.toSql()}")) {
-                        is Number -> value.toLong()
-                        else -> error("The value class is not a Number. type=${value::class}")
-                    }
+                when (val value = flow.firstOrNull() ?: error("No result: ${statement.toSql()}")) {
+                    is Number -> value.toLong()
+                    else -> error("The value class is not a Number. type=${value::class}")
                 }
             }
         } else {
@@ -39,9 +36,8 @@ internal class EntityInsertQueryRunnerSupport<ENTITY : Any, ID, META : EntityMet
     }
 
     suspend fun <T> insert(config: R2dbcDatabaseConfig, execute: suspend (R2dbcExecutor) -> T): T {
-        val generatedColumn = when (context.target.idAssignment()) {
-            // TODO
-            is Assignment.AutoIncrement<ENTITY, *, *> -> context.target.idProperties().first().columnName
+        val generatedColumn = when (val assignment = context.target.idAssignment()) {
+            is Assignment.AutoIncrement<ENTITY, *, *> -> assignment.columnName
             else -> null
         }
         val executor = R2dbcExecutor(config, option, generatedColumn)

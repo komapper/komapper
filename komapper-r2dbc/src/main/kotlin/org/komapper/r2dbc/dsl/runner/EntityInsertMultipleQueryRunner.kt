@@ -22,7 +22,7 @@ internal class EntityInsertMultipleQueryRunner<ENTITY : Any, ID, META : EntityMe
         return postInsert(newEntities, generatedKeys)
     }
 
-    private fun preInsert(config: R2dbcDatabaseConfig): List<ENTITY> {
+    private suspend fun preInsert(config: R2dbcDatabaseConfig): List<ENTITY> {
         return entities.map { support.preInsert(config, it) }
     }
 

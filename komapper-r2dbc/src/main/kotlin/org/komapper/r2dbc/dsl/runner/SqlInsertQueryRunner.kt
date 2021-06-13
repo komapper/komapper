@@ -15,9 +15,8 @@ internal class SqlInsertQueryRunner<ENTITY : Any, ID, META : EntityMetamodel<ENT
 
     override suspend fun run(config: R2dbcDatabaseConfig): Pair<Int, Long?> {
         val statement = buildStatement(config)
-        val generatedColumn = when (context.target.idAssignment()) {
-            // TODO
-            is Assignment.AutoIncrement<ENTITY, *, *> -> context.target.idProperties().first().columnName
+        val generatedColumn = when (val assignment = context.target.idAssignment()) {
+            is Assignment.AutoIncrement<ENTITY, *, *> -> assignment.columnName
             else -> null
         }
         val executor = R2dbcExecutor(config, option, generatedColumn)

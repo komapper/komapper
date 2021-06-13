@@ -13,7 +13,7 @@ internal class EntityUpsertQueryRunnerSupport<ENTITY : Any, ID, META : EntityMet
 
     private val support: EntityInsertQueryRunnerSupport<ENTITY, ID, META> = EntityInsertQueryRunnerSupport(context.insertContext, option)
 
-    fun preUpsert(config: R2dbcDatabaseConfig, entity: ENTITY): ENTITY {
+    suspend fun preUpsert(config: R2dbcDatabaseConfig, entity: ENTITY): ENTITY {
         return support.preInsert(config, entity)
     }
 
