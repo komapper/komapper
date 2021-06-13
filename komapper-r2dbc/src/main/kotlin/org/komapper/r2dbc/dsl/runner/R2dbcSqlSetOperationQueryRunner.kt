@@ -9,14 +9,14 @@ import org.komapper.core.dsl.options.SqlSetOperationOptions
 import org.komapper.r2dbc.R2dbcDatabaseConfig
 import org.komapper.r2dbc.R2dbcDialect
 
-internal class SqlSetOperationQueryRunner<T, R>(
+internal class R2dbcSqlSetOperationQueryRunner<T, R>(
     context: SqlSetOperationContext<T>,
     options: SqlSetOperationOptions,
     transform: (R2dbcDialect, Row) -> T,
     private val collect: suspend (Flow<T>) -> R
 ) : R2dbcQueryRunner<R> {
 
-    private val runner: SqlSetOperationFlowQueryRunner<T> = SqlSetOperationFlowQueryRunner(context, options, transform)
+    private val runner: R2dbcSqlSetOperationFlowQueryRunner<T> = R2dbcSqlSetOperationFlowQueryRunner(context, options, transform)
 
     override suspend fun run(config: R2dbcDatabaseConfig): R {
         val flow = runner.run(config)

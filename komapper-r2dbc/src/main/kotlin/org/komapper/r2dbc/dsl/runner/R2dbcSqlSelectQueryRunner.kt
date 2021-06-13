@@ -9,7 +9,7 @@ import org.komapper.core.dsl.options.SqlSelectOptions
 import org.komapper.r2dbc.R2dbcDatabaseConfig
 import org.komapper.r2dbc.R2dbcDialect
 
-internal class SqlSelectQueryRunner<T, R>(
+internal class R2dbcSqlSelectQueryRunner<T, R>(
     context: SqlSelectContext<*, *, *>,
     options: SqlSelectOptions,
     transform: (R2dbcDialect, Row) -> T,
@@ -17,7 +17,7 @@ internal class SqlSelectQueryRunner<T, R>(
 ) :
     R2dbcQueryRunner<R> {
 
-    private val runner: SqlSelectFlowQueryRunner<T> = SqlSelectFlowQueryRunner(context, options, transform)
+    private val runner: R2dbcSqlSelectFlowQueryRunner<T> = R2dbcSqlSelectFlowQueryRunner(context, options, transform)
 
     override suspend fun run(config: R2dbcDatabaseConfig): R {
         val flow = runner.run(config)

@@ -9,14 +9,14 @@ import org.komapper.r2dbc.R2dbcExecutor
 
 internal data class R2dbcScriptExecuteQueryRunner(
     private val sql: String,
-    private val options: ScriptExecuteOptions
+    private val options: ScriptExecuteOptions = ScriptExecuteOptions.default
 ) :
     R2dbcQueryRunner<Unit> {
 
     private val runner = ScriptExecuteQueryRunner(sql, options)
 
     override suspend fun run(config: R2dbcDatabaseConfig) {
-        val statement = runner.buildStatement()
+        val statement = runner.buildStatement(config)
         val executor = R2dbcExecutor(config, options)
         return executor.execute(statement)
     }

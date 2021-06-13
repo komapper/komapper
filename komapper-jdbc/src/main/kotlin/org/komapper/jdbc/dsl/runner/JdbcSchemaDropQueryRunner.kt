@@ -13,7 +13,7 @@ internal class JdbcSchemaDropQueryRunner(
     private val options: SchemaDropOptions
 ) : JdbcQueryRunner<Unit> {
 
-    private val runner: SchemaDropQueryRunner = SchemaDropQueryRunner(entityMetamodels, options)
+    private val runner = SchemaDropQueryRunner(entityMetamodels, options)
 
     override fun run(config: JdbcDatabaseConfig) {
         val statement = runner.buildStatement(config)

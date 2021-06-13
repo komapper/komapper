@@ -5,15 +5,19 @@ import org.komapper.core.Statement
 import org.komapper.core.dsl.context.EntityUpdateContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.EntityUpdateOptions
+import org.komapper.core.dsl.runner.EntityUpdateSingleQueryRunner
 import org.komapper.r2dbc.R2dbcDatabaseConfig
 
-internal class EntityUpdateSingleQueryRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+internal class R2dbcEntityUpdateSingleQueryRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     context: EntityUpdateContext<ENTITY, ID, META>,
     options: EntityUpdateOptions,
     private val entity: ENTITY
 ) : R2dbcQueryRunner<ENTITY> {
 
-    private val support: EntityUpdateQueryRunnerSupport<ENTITY, ID, META> = EntityUpdateQueryRunnerSupport(context, options)
+    private val runner: EntityUpdateSingleQueryRunner<ENTITY, ID, META> =
+        EntityUpdateSingleQueryRunner(context, options, entity)
+
+    private val support: R2dbcEntityUpdateQueryRunnerSupport<ENTITY, ID, META> = R2dbcEntityUpdateQueryRunnerSupport(context, options)
 
     override suspend fun run(config: R2dbcDatabaseConfig): ENTITY {
         val newEntity = preUpdate(config, entity)
@@ -26,7 +30,7 @@ internal class EntityUpdateSingleQueryRunner<ENTITY : Any, ID, META : EntityMeta
     }
 
     private suspend fun update(config: R2dbcDatabaseConfig, entity: ENTITY): Pair<Int, LongArray> {
-        val statement = buildStatement(config, entity)
+        val statement = runner.buildStatement(config, entity)
         return support.update(config) { it.executeUpdate(statement) }
     }
 
@@ -35,10 +39,6 @@ internal class EntityUpdateSingleQueryRunner<ENTITY : Any, ID, META : EntityMeta
     }
 
     override fun dryRun(config: DatabaseConfig): Statement {
-        return buildStatement(config, entity)
-    }
-
-    private fun buildStatement(config: DatabaseConfig, entity: ENTITY): Statement {
-        return support.buildStatement(config, entity)
+        return runner.dryRun(config)
     }
 }
