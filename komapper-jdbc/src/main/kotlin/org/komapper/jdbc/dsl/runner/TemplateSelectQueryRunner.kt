@@ -5,6 +5,7 @@ import org.komapper.core.Statement
 import org.komapper.core.dsl.options.TemplateSelectOptions
 import org.komapper.core.dsl.query.Row
 import org.komapper.jdbc.DatabaseConfig
+import org.komapper.jdbc.JdbcExecutor
 
 internal class TemplateSelectQueryRunner<T, R>(
     private val sql: String,

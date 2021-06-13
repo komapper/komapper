@@ -9,6 +9,7 @@ import org.komapper.core.dsl.context.SubqueryContext
 import org.komapper.core.dsl.options.SqlSetOperationOptions
 import org.komapper.jdbc.DatabaseConfig
 import org.komapper.jdbc.JdbcDialect
+import org.komapper.jdbc.JdbcExecutor
 import java.sql.ResultSet
 
 internal class SqlSetOperationQueryRunner<T : Any?, R>(

@@ -3,6 +3,7 @@ package org.komapper.jdbc.dsl.runner
 import org.komapper.core.Statement
 import org.komapper.core.dsl.options.SchemaDropAllOptions
 import org.komapper.jdbc.DatabaseConfig
+import org.komapper.jdbc.JdbcExecutor
 
 internal class SchemaDropAllQueryRunner(
     private val options: SchemaDropAllOptions

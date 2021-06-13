@@ -7,6 +7,7 @@ import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.VersionOptions
 import org.komapper.core.dsl.query.checkOptimisticLock
 import org.komapper.jdbc.DatabaseConfig
+import org.komapper.jdbc.JdbcExecutor
 
 internal class EntityDeleteQueryRunnerSupport<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     val context: EntityDeleteContext<ENTITY, ID, META>,

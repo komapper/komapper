@@ -1,4 +1,4 @@
-package org.komapper.r2dbc.dsl.runner
+package org.komapper.r2dbc
 
 import io.r2dbc.spi.R2dbcDataIntegrityViolationException
 import io.r2dbc.spi.Result
@@ -18,8 +18,6 @@ import org.komapper.core.ExecutionOptionsProvider
 import org.komapper.core.LogCategory
 import org.komapper.core.Statement
 import org.komapper.core.UniqueConstraintException
-import org.komapper.r2dbc.R2dbcDatabaseConfig
-import org.komapper.r2dbc.R2dbcDialect
 import org.reactivestreams.Publisher
 
 internal class R2dbcExecutor(

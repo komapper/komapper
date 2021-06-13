@@ -6,6 +6,7 @@ import org.komapper.core.dsl.context.SqlDeleteContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.SqlDeleteOptions
 import org.komapper.r2dbc.R2dbcDatabaseConfig
+import org.komapper.r2dbc.R2dbcExecutor
 
 internal class SqlDeleteQueryRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: SqlDeleteContext<ENTITY, ID, META>,

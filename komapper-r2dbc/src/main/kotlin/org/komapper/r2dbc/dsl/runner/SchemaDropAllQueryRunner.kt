@@ -3,6 +3,7 @@ package org.komapper.r2dbc.dsl.runner
 import org.komapper.core.Statement
 import org.komapper.core.dsl.options.SchemaDropAllOptions
 import org.komapper.r2dbc.R2dbcDatabaseConfig
+import org.komapper.r2dbc.R2dbcExecutor
 
 internal class SchemaDropAllQueryRunner(
     private val options: SchemaDropAllOptions

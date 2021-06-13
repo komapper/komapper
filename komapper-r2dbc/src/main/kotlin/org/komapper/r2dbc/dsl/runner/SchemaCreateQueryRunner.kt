@@ -4,6 +4,7 @@ import org.komapper.core.Statement
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.SchemaCreateOptions
 import org.komapper.r2dbc.R2dbcDatabaseConfig
+import org.komapper.r2dbc.R2dbcExecutor
 
 internal class SchemaCreateQueryRunner(
     private val entityMetamodels: List<EntityMetamodel<*, *, *>>,

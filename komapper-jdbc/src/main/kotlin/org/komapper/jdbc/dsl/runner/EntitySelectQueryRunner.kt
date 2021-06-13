@@ -12,6 +12,7 @@ import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.EntitySelectOptions
 import org.komapper.jdbc.DatabaseConfig
 import org.komapper.jdbc.JdbcDialect
+import org.komapper.jdbc.JdbcExecutor
 import java.sql.ResultSet
 import kotlin.reflect.cast
 

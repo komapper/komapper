@@ -1,4 +1,4 @@
-package org.komapper.jdbc.dsl.runner
+package org.komapper.jdbc
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
@@ -7,8 +7,6 @@ import org.komapper.core.ExecutionOptionsProvider
 import org.komapper.core.LogCategory
 import org.komapper.core.Statement
 import org.komapper.core.UniqueConstraintException
-import org.komapper.jdbc.DatabaseConfig
-import org.komapper.jdbc.JdbcDialect
 import java.sql.Connection
 import java.sql.PreparedStatement
 import java.sql.ResultSet
