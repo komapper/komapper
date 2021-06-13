@@ -7,7 +7,7 @@ import org.komapper.jdbc.JdbcDatabaseConfig
 import org.komapper.jdbc.JdbcExecutor
 
 internal class JdbcEntityUpsertQueryRunnerSupport<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
-    context: EntityUpsertContext<ENTITY, ID, META>,
+    private val context: EntityUpsertContext<ENTITY, ID, META>,
     private val options: InsertOptions
 ) {
 

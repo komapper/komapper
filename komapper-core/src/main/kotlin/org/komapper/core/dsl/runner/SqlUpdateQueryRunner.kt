@@ -7,7 +7,7 @@ import org.komapper.core.dsl.context.SqlUpdateContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.SqlUpdateOptions
 
-internal class SqlUpdateQueryRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+class SqlUpdateQueryRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: SqlUpdateContext<ENTITY, ID, META>,
     private val options: SqlUpdateOptions
 ) : QueryRunner {
@@ -16,7 +16,7 @@ internal class SqlUpdateQueryRunner<ENTITY : Any, ID, META : EntityMetamodel<ENT
         return buildStatement(config)
     }
 
-    private fun buildStatement(config: DatabaseConfig): Statement {
+    fun buildStatement(config: DatabaseConfig): Statement {
         val builder = SqlUpdateStatementBuilder(config.dialect, context)
         return builder.build()
     }

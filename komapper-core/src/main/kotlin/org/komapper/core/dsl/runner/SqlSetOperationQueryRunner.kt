@@ -15,4 +15,8 @@ class SqlSetOperationQueryRunner(
     override fun dryRun(config: DatabaseConfig): Statement {
         return runner.dryRun(config)
     }
+
+    fun buildStatement(config: DatabaseConfig): Statement {
+        return runner.buildStatement(config)
+    }
 }

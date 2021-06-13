@@ -9,11 +9,11 @@ import org.komapper.jdbc.JdbcDatabaseConfig
 import org.komapper.jdbc.JdbcExecutor
 
 internal class JdbcSchemaDropQueryRunner(
-    entityMetamodels: List<EntityMetamodel<*, *, *>>,
+    private val entityMetamodels: List<EntityMetamodel<*, *, *>>,
     private val options: SchemaDropOptions
 ) : JdbcQueryRunner<Unit> {
 
-    private val runner = SchemaDropQueryRunner(entityMetamodels, options)
+    private val runner: SchemaDropQueryRunner = SchemaDropQueryRunner(entityMetamodels, options)
 
     override fun run(config: JdbcDatabaseConfig) {
         val statement = runner.buildStatement(config)
