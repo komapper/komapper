@@ -10,6 +10,7 @@ import org.komapper.core.dsl.context.SubqueryContext
 import org.komapper.core.dsl.options.SqlSetOperationOptions
 import org.komapper.r2dbc.R2dbcDatabaseConfig
 import org.komapper.r2dbc.R2dbcDialect
+import org.komapper.r2dbc.R2dbcExecutor
 
 internal class SqlSetOperationFlowQueryRunner<T>(
     private val context: SqlSetOperationContext<T>,

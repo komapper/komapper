@@ -5,6 +5,7 @@ import org.komapper.core.Statement
 import org.komapper.core.dsl.options.TemplateSelectOptions
 import org.komapper.core.dsl.query.Row
 import org.komapper.r2dbc.R2dbcDatabaseConfig
+import org.komapper.r2dbc.R2dbcExecutor
 
 internal class TemplateSelectQueryRunner<T, R>(
     private val sql: String,
