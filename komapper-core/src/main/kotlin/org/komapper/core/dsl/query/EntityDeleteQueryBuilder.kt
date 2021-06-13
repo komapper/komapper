@@ -3,11 +3,11 @@ package org.komapper.core.dsl.query
 import org.komapper.core.ThreadSafe
 import org.komapper.core.dsl.context.EntityDeleteContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
-import org.komapper.core.dsl.option.EntityDeleteOption
+import org.komapper.core.dsl.options.EntityDeleteOptions
 
 @ThreadSafe
 interface EntityDeleteQueryBuilder<ENTITY : Any> {
-    fun option(configure: (EntityDeleteOption) -> EntityDeleteOption): EntityDeleteQueryBuilder<ENTITY>
+    fun options(configure: (EntityDeleteOptions) -> EntityDeleteOptions): EntityDeleteQueryBuilder<ENTITY>
     fun single(entity: ENTITY): Query<Unit>
     fun batch(entities: List<ENTITY>, batchSize: Int? = null): Query<Unit>
     fun batch(vararg entities: ENTITY, batchSize: Int? = null): Query<Unit>
@@ -15,25 +15,25 @@ interface EntityDeleteQueryBuilder<ENTITY : Any> {
 
 internal data class EntityDeleteQueryBuilderImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityDeleteContext<ENTITY, ID, META>,
-    private val option: EntityDeleteOption = EntityDeleteOption.default
+    private val options: EntityDeleteOptions = EntityDeleteOptions.default
 ) :
     EntityDeleteQueryBuilder<ENTITY> {
 
-    override fun option(configure: (EntityDeleteOption) -> EntityDeleteOption): EntityDeleteQueryBuilderImpl<ENTITY, ID, META> {
-        return copy(option = configure(option))
+    override fun options(configure: (EntityDeleteOptions) -> EntityDeleteOptions): EntityDeleteQueryBuilderImpl<ENTITY, ID, META> {
+        return copy(options = configure(options))
     }
 
     override fun single(entity: ENTITY): Query<Unit> {
         context.target.checkIdValueNotNull(entity)
         return Query { visitor ->
-            visitor.entityDeleteSingleQuery(context, option, entity)
+            visitor.entityDeleteSingleQuery(context, options, entity)
         }
     }
 
     override fun batch(entities: List<ENTITY>, batchSize: Int?): Query<Unit> {
         context.target.checkIdValueNotNull(entities)
         return Query { visitor ->
-            visitor.entityDeleteBatchQuery(context, option.asEntityBatchDeleteOption(batchSize), entities)
+            visitor.entityDeleteBatchQuery(context, options.asEntityBatchDeleteOption(batchSize), entities)
         }
     }
 

@@ -9,22 +9,22 @@ import org.komapper.core.Statement
 import org.komapper.core.dsl.builder.EntitySelectStatementBuilder
 import org.komapper.core.dsl.context.EntitySelectContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
-import org.komapper.core.dsl.option.EntitySelectOption
+import org.komapper.core.dsl.options.EntitySelectOptions
 import org.komapper.r2dbc.R2dbcDatabaseConfig
 import kotlin.reflect.cast
 
 internal class EntitySelectQueryRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>, R>(
     private val context: EntitySelectContext<ENTITY, ID, META>,
-    private val option: EntitySelectOption,
+    private val options: EntitySelectOptions,
     private val collect: suspend (Flow<ENTITY>) -> R
 ) : R2dbcQueryRunner<R> {
 
     override suspend fun run(config: R2dbcDatabaseConfig): R {
-        if (!option.allowEmptyWhereClause && context.where.isEmpty()) {
+        if (!options.allowEmptyWhereClause && context.where.isEmpty()) {
             error("Empty where clause is not allowed.")
         }
         val statement = buildStatement(config)
-        val executor = R2dbcExecutor(config, option)
+        val executor = R2dbcExecutor(config, options)
         val rows: Flow<Map<EntityKey, Any>> = executor.executeQuery(statement) { dialect, r2dbcRow ->
             val row = mutableMapOf<EntityKey, Any>()
             val mapper = EntityMapper(dialect, r2dbcRow)

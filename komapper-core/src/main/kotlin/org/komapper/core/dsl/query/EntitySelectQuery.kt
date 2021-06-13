@@ -9,7 +9,7 @@ import org.komapper.core.dsl.context.SubqueryContext
 import org.komapper.core.dsl.element.Associator
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
-import org.komapper.core.dsl.option.EntitySelectOption
+import org.komapper.core.dsl.options.EntitySelectOptions
 import org.komapper.core.dsl.runner.QueryRunner
 import org.komapper.core.dsl.scope.OnDeclaration
 import org.komapper.core.dsl.scope.WhereDeclaration
@@ -32,7 +32,7 @@ interface EntitySelectQuery<ENTITY : Any> : Subquery<ENTITY> {
     fun offset(offset: Int): EntitySelectQuery<ENTITY>
     fun limit(limit: Int): EntitySelectQuery<ENTITY>
     fun forUpdate(): EntitySelectQuery<ENTITY>
-    fun option(configure: (EntitySelectOption) -> EntitySelectOption): EntitySelectQuery<ENTITY>
+    fun options(configure: (EntitySelectOptions) -> EntitySelectOptions): EntitySelectQuery<ENTITY>
     fun <T : Any, S : Any> associate(
         metamodel1: EntityMetamodel<T, *, *>,
         metamodel2: EntityMetamodel<S, *, *>,
@@ -44,7 +44,7 @@ interface EntitySelectQuery<ENTITY : Any> : Subquery<ENTITY> {
 
 internal data class EntitySelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> (
     private val context: EntitySelectContext<ENTITY, ID, META>,
-    private val option: EntitySelectOption = EntitySelectOption.default
+    private val options: EntitySelectOptions = EntitySelectOptions.default
 ) :
     EntitySelectQuery<ENTITY> {
 
@@ -100,8 +100,8 @@ internal data class EntitySelectQueryImpl<ENTITY : Any, ID, META : EntityMetamod
         return copy(context = newContext)
     }
 
-    override fun option(configure: (EntitySelectOption) -> EntitySelectOption): EntitySelectQueryImpl<ENTITY, ID, META> {
-        return copy(option = configure(option))
+    override fun options(configure: (EntitySelectOptions) -> EntitySelectOptions): EntitySelectQueryImpl<ENTITY, ID, META> {
+        return copy(options = configure(options))
     }
 
     override fun <T : Any, S : Any> associate(
@@ -118,7 +118,7 @@ internal data class EntitySelectQueryImpl<ENTITY : Any, ID, META : EntityMetamod
     }
 
     override fun <R> collect(collect: suspend (Flow<ENTITY>) -> R): Query<R> = Query { visitor ->
-        visitor.entitySelectQuery(context, option, collect)
+        visitor.entitySelectQuery(context, options, collect)
     }
 
     override fun except(other: Subquery<ENTITY>): SetOperationQuery<ENTITY> {
@@ -147,10 +147,10 @@ internal data class EntitySelectQueryImpl<ENTITY : Any, ID, META : EntityMetamod
     }
 
     override fun asSqlQuery(): SqlSelectQuery<ENTITY> {
-        return SqlSelectQueryImpl(context.asSqlSelectContext(), option.asSqlSelectOption())
+        return SqlSelectQueryImpl(context.asSqlSelectContext(), options.asSqlSelectOption())
     }
 
     override fun accept(visitor: QueryVisitor): QueryRunner {
-        return visitor.entitySelectQuery(context, option) { it.toList() }
+        return visitor.entitySelectQuery(context, options) { it.toList() }
     }
 }

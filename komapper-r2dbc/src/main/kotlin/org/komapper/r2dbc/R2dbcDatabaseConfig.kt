@@ -3,7 +3,7 @@ package org.komapper.r2dbc
 import io.r2dbc.spi.ConnectionFactory
 import org.komapper.core.ClockProvider
 import org.komapper.core.DefaultClockProvider
-import org.komapper.core.ExecutionOption
+import org.komapper.core.ExecutionOptions
 import org.komapper.core.Logger
 import org.komapper.core.StdOutLogger
 import org.komapper.core.TemplateStatementBuilder
@@ -20,7 +20,7 @@ interface R2dbcDatabaseConfig {
     val id: UUID
     val dialect: R2dbcDialect
     val clockProvider: ClockProvider
-    val executionOption: ExecutionOption
+    val executionOptions: ExecutionOptions
     val logger: Logger
 
     val session: R2dbcDatabaseSession
@@ -37,7 +37,7 @@ class DefaultR2dbcDatabaseConfig(
 
     override val id: UUID = UUID.randomUUID()
     override val clockProvider: ClockProvider = DefaultClockProvider()
-    override val executionOption: ExecutionOption = ExecutionOption()
+    override val executionOptions: ExecutionOptions = ExecutionOptions()
     override val logger: Logger = StdOutLogger()
     override val session: R2dbcDatabaseSession by lazy {
         val loader = ServiceLoader.load(R2dbcDatabaseSessionFactory::class.java)
@@ -67,7 +67,7 @@ object DryRunR2dbcDatabaseConfig : R2dbcDatabaseConfig {
         get() = throw UnsupportedOperationException()
     override val clockProvider: ClockProvider
         get() = throw UnsupportedOperationException()
-    override val executionOption: ExecutionOption
+    override val executionOptions: ExecutionOptions
         get() = throw UnsupportedOperationException()
     override val session: R2dbcDatabaseSession
         get() = throw UnsupportedOperationException()

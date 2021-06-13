@@ -8,15 +8,15 @@ package org.komapper.core
  * @property suppressLogging whether to suppress SQL logging.
  */
 @ThreadSafe
-data class ExecutionOption(
+data class ExecutionOptions(
     val batchSize: Int? = null,
     val fetchSize: Int? = null,
     val maxRows: Int? = null,
     val queryTimeoutSeconds: Int? = null,
     val suppressLogging: Boolean? = null
 ) {
-    infix operator fun plus(other: ExecutionOption): ExecutionOption {
-        return ExecutionOption(
+    infix operator fun plus(other: ExecutionOptions): ExecutionOptions {
+        return ExecutionOptions(
             other.batchSize ?: this.batchSize,
             other.fetchSize ?: this.fetchSize,
             other.maxRows ?: this.maxRows,
@@ -26,6 +26,6 @@ data class ExecutionOption(
     }
 }
 
-interface ExecutionOptionProvider {
-    fun getExecutionOption(): ExecutionOption
+interface ExecutionOptionsProvider {
+    fun getExecutionOptions(): ExecutionOptions
 }

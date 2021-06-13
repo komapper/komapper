@@ -3,17 +3,17 @@ package org.komapper.jdbc.dsl.runner
 import org.komapper.core.Statement
 import org.komapper.core.dsl.context.EntityDeleteContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
-import org.komapper.core.dsl.option.EntityDeleteOption
+import org.komapper.core.dsl.options.EntityDeleteOptions
 import org.komapper.jdbc.DatabaseConfig
 
 internal class EntityDeleteSingleQueryRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     context: EntityDeleteContext<ENTITY, ID, META>,
-    option: EntityDeleteOption,
+    options: EntityDeleteOptions,
     private val entity: ENTITY
 ) : JdbcQueryRunner<Unit> {
 
     private val support: EntityDeleteQueryRunnerSupport<ENTITY, ID, META> =
-        EntityDeleteQueryRunnerSupport(context, option)
+        EntityDeleteQueryRunnerSupport(context, options)
 
     override fun run(config: DatabaseConfig) {
         val (count) = delete(config)

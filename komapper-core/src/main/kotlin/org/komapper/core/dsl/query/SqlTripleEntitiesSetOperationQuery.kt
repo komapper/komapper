@@ -6,7 +6,7 @@ import org.komapper.core.dsl.context.SqlSetOperationContext
 import org.komapper.core.dsl.context.SubqueryContext
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
-import org.komapper.core.dsl.option.SqlSetOperationOption
+import org.komapper.core.dsl.options.SqlSetOperationOptions
 import org.komapper.core.dsl.runner.QueryRunner
 import org.komapper.core.dsl.visitor.QueryVisitor
 
@@ -15,7 +15,7 @@ internal data class SqlTripleEntitiesSetOperationQuery<
     B : Any, B_META : EntityMetamodel<B, *, B_META>,
     C : Any, C_META : EntityMetamodel<C, *, C_META>>(
     private val context: SqlSetOperationContext<Triple<A, B?, C?>>,
-    private val option: SqlSetOperationOption = SqlSetOperationOption.default,
+    private val options: SqlSetOperationOptions = SqlSetOperationOptions.default,
     private val metamodels: Triple<A_META, B_META, C_META>
 ) : FlowableSetOperationQuery<Triple<A, B?, C?>> {
 
@@ -24,15 +24,15 @@ internal data class SqlTripleEntitiesSetOperationQuery<
     private val support: SqlSetOperationQuerySupport<Triple<A, B?, C?>> = SqlSetOperationQuerySupport(context)
 
     override fun accept(visitor: QueryVisitor): QueryRunner {
-        return visitor.sqlTripleEntitiesSetOperationQuery(context, option, metamodels) { it.toList() }
+        return visitor.sqlTripleEntitiesSetOperationQuery(context, options, metamodels) { it.toList() }
     }
 
     override fun <R> collect(collect: suspend (Flow<Triple<A, B?, C?>>) -> R): Query<R> = Query { visitor ->
-        visitor.sqlTripleEntitiesSetOperationQuery(context, option, metamodels, collect)
+        visitor.sqlTripleEntitiesSetOperationQuery(context, options, metamodels, collect)
     }
 
     override fun asFlowQuery(): FlowQuery<Triple<A, B?, C?>> = FlowQuery { visitor ->
-        visitor.sqlTripleEntitiesSetOperationQuery(context, option, metamodels)
+        visitor.sqlTripleEntitiesSetOperationQuery(context, options, metamodels)
     }
 
     override fun except(other: Subquery<Triple<A, B?, C?>>): FlowableSetOperationQuery<Triple<A, B?, C?>> {
@@ -59,7 +59,7 @@ internal data class SqlTripleEntitiesSetOperationQuery<
         return copy(context = support.orderBy(*expressions))
     }
 
-    override fun option(configurator: (SqlSetOperationOption) -> SqlSetOperationOption): FlowableSetOperationQuery<Triple<A, B?, C?>> {
-        return copy(option = configurator(option))
+    override fun options(configurator: (SqlSetOperationOptions) -> SqlSetOperationOptions): FlowableSetOperationQuery<Triple<A, B?, C?>> {
+        return copy(options = configurator(options))
     }
 }

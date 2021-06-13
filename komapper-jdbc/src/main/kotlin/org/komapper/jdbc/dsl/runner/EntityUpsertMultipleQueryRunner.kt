@@ -3,17 +3,17 @@ package org.komapper.jdbc.dsl.runner
 import org.komapper.core.Statement
 import org.komapper.core.dsl.context.EntityUpsertContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
-import org.komapper.core.dsl.option.InsertOption
+import org.komapper.core.dsl.options.InsertOptions
 import org.komapper.jdbc.DatabaseConfig
 
 internal class EntityUpsertMultipleQueryRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     context: EntityUpsertContext<ENTITY, ID, META>,
-    option: InsertOption,
+    options: InsertOptions,
     val entities: List<ENTITY>
 ) : JdbcQueryRunner<Int> {
 
     private val support: EntityUpsertQueryRunnerSupport<ENTITY, ID, META> =
-        EntityUpsertQueryRunnerSupport(context, option)
+        EntityUpsertQueryRunnerSupport(context, options)
 
     override fun run(config: DatabaseConfig): Int {
         if (entities.isEmpty()) return 0

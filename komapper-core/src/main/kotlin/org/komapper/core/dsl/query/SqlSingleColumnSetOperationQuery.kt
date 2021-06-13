@@ -5,13 +5,13 @@ import kotlinx.coroutines.flow.toList
 import org.komapper.core.dsl.context.SqlSetOperationContext
 import org.komapper.core.dsl.context.SubqueryContext
 import org.komapper.core.dsl.expression.ColumnExpression
-import org.komapper.core.dsl.option.SqlSetOperationOption
+import org.komapper.core.dsl.options.SqlSetOperationOptions
 import org.komapper.core.dsl.runner.QueryRunner
 import org.komapper.core.dsl.visitor.QueryVisitor
 
 internal data class SqlSingleColumnSetOperationQuery<A : Any>(
     private val context: SqlSetOperationContext<A?>,
-    private val option: SqlSetOperationOption = SqlSetOperationOption.default,
+    private val options: SqlSetOperationOptions = SqlSetOperationOptions.default,
     private val expression: ColumnExpression<A, *>
 ) : FlowableSetOperationQuery<A?> {
 
@@ -20,15 +20,15 @@ internal data class SqlSingleColumnSetOperationQuery<A : Any>(
     override val subqueryContext: SubqueryContext<A?> = SubqueryContext.SqlSetOperation(context)
 
     override fun accept(visitor: QueryVisitor): QueryRunner {
-        return visitor.sqlSingleColumnSetOperationQuery(context, option, expression) { it.toList() }
+        return visitor.sqlSingleColumnSetOperationQuery(context, options, expression) { it.toList() }
     }
 
     override fun <R> collect(collect: suspend (Flow<A?>) -> R): Query<R> = Query { visitor ->
-        visitor.sqlSingleColumnSetOperationQuery(context, option, expression, collect)
+        visitor.sqlSingleColumnSetOperationQuery(context, options, expression, collect)
     }
 
     override fun asFlowQuery(): FlowQuery<A?> = FlowQuery { visitor ->
-        visitor.sqlSingleColumnSetOperationQuery(context, option, expression)
+        visitor.sqlSingleColumnSetOperationQuery(context, options, expression)
     }
 
     override fun except(other: Subquery<A?>): FlowableSetOperationQuery<A?> {
@@ -55,7 +55,7 @@ internal data class SqlSingleColumnSetOperationQuery<A : Any>(
         return copy(context = support.orderBy(*expressions))
     }
 
-    override fun option(configurator: (SqlSetOperationOption) -> SqlSetOperationOption): FlowableSetOperationQuery<A?> {
-        return copy(option = configurator(option))
+    override fun options(configurator: (SqlSetOperationOptions) -> SqlSetOperationOptions): FlowableSetOperationQuery<A?> {
+        return copy(options = configurator(options))
     }
 }

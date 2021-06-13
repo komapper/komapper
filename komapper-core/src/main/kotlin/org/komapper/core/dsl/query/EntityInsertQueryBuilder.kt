@@ -5,11 +5,11 @@ import org.komapper.core.dsl.context.DuplicateKeyType
 import org.komapper.core.dsl.context.EntityInsertContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.metamodel.PropertyMetamodel
-import org.komapper.core.dsl.option.EntityInsertOption
+import org.komapper.core.dsl.options.EntityInsertOptions
 
 @ThreadSafe
 interface EntityInsertQueryBuilder<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> {
-    fun option(configure: (EntityInsertOption) -> EntityInsertOption): EntityInsertQueryBuilder<ENTITY, ID, META>
+    fun options(configure: (EntityInsertOptions) -> EntityInsertOptions): EntityInsertQueryBuilder<ENTITY, ID, META>
     fun onDuplicateKeyUpdate(vararg keys: PropertyMetamodel<ENTITY, *, *> = emptyArray()): EntityUpsertQueryBuilder<ENTITY, ID, META>
     fun onDuplicateKeyIgnore(vararg keys: PropertyMetamodel<ENTITY, *, *> = emptyArray()): EntityUpsertQueryBuilder<ENTITY, ID, META>
     fun single(entity: ENTITY): Query<ENTITY>
@@ -21,12 +21,12 @@ interface EntityInsertQueryBuilder<ENTITY : Any, ID, META : EntityMetamodel<ENTI
 
 internal data class EntityInsertQueryBuilderImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityInsertContext<ENTITY, ID, META>,
-    private val option: EntityInsertOption = EntityInsertOption.default
+    private val options: EntityInsertOptions = EntityInsertOptions.default
 ) :
     EntityInsertQueryBuilder<ENTITY, ID, META> {
 
-    override fun option(configure: (EntityInsertOption) -> EntityInsertOption): EntityInsertQueryBuilderImpl<ENTITY, ID, META> {
-        return copy(option = configure(option))
+    override fun options(configure: (EntityInsertOptions) -> EntityInsertOptions): EntityInsertQueryBuilderImpl<ENTITY, ID, META> {
+        return copy(options = configure(options))
     }
 
     override fun onDuplicateKeyUpdate(vararg keys: PropertyMetamodel<ENTITY, *, *>): EntityUpsertQueryBuilder<ENTITY, ID, META> {
@@ -42,15 +42,15 @@ internal data class EntityInsertQueryBuilderImpl<ENTITY : Any, ID, META : Entity
         duplicateKeyType: DuplicateKeyType
     ): EntityUpsertQueryBuilder<ENTITY, ID, META> {
         val newContext = context.asEntityUpsertContext(keys, duplicateKeyType)
-        return EntityUpsertQueryBuilderImpl(newContext, option)
+        return EntityUpsertQueryBuilderImpl(newContext, options)
     }
 
     override fun single(entity: ENTITY): Query<ENTITY> = Query { visitor ->
-        visitor.entityInsertSingleQuery(context, option, entity)
+        visitor.entityInsertSingleQuery(context, options, entity)
     }
 
     override fun multiple(entities: List<ENTITY>): Query<List<ENTITY>> = Query { visitor ->
-        visitor.entityInsertMultipleQuery(context, option, entities)
+        visitor.entityInsertMultipleQuery(context, options, entities)
     }
 
     override fun multiple(vararg entities: ENTITY): Query<List<ENTITY>> {
@@ -58,7 +58,7 @@ internal data class EntityInsertQueryBuilderImpl<ENTITY : Any, ID, META : Entity
     }
 
     override fun batch(entities: List<ENTITY>, batchSize: Int?): Query<List<ENTITY>> = Query { visitor ->
-        visitor.entityInsertBatchQuery(context, option.asEntityBatchInsertOption(batchSize), entities)
+        visitor.entityInsertBatchQuery(context, options.asEntityBatchInsertOption(batchSize), entities)
     }
 
     override fun batch(vararg entities: ENTITY, batchSize: Int?): Query<List<ENTITY>> {

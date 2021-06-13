@@ -2,7 +2,7 @@ package org.komapper.spring.boot.autoconfigure.jdbc
 
 import org.komapper.core.ClockProvider
 import org.komapper.core.DefaultClockProvider
-import org.komapper.core.ExecutionOption
+import org.komapper.core.ExecutionOptions
 import org.komapper.core.Logger
 import org.komapper.core.StdOutLogger
 import org.komapper.core.TemplateStatementBuilder
@@ -58,8 +58,8 @@ open class KomapperAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    open fun executionOption(): ExecutionOption {
-        return ExecutionOption()
+    open fun executionOptions(): ExecutionOptions {
+        return ExecutionOptions()
     }
 
     @Bean
@@ -94,7 +94,7 @@ open class KomapperAutoConfiguration {
     open fun databaseConfig(
         dialect: JdbcDialect,
         clockProvider: ClockProvider,
-        executionOption: ExecutionOption,
+        executionOptions: ExecutionOptions,
         logger: Logger,
         session: DatabaseSession,
         statementInspector: StatementInspector,
@@ -105,7 +105,7 @@ open class KomapperAutoConfiguration {
             override val id = UUID.randomUUID()
             override val dialect = dialect
             override val clockProvider = clockProvider
-            override val executionOption = executionOption
+            override val executionOptions = executionOptions
             override val logger = logger
             override val session = session
             override val statementInspector = statementInspector

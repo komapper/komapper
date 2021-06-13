@@ -2,17 +2,17 @@ package org.komapper.jdbc.dsl.runner
 
 import org.komapper.core.Statement
 import org.komapper.core.dsl.metamodel.EntityMetamodel
-import org.komapper.core.dsl.option.SchemaDropOption
+import org.komapper.core.dsl.options.SchemaDropOptions
 import org.komapper.jdbc.DatabaseConfig
 
 internal class SchemaDropQueryRunner(
-    private val entityMetamodels: List<EntityMetamodel<*, *, *>> = emptyList(),
-    private val option: SchemaDropOption = SchemaDropOption.default
+    private val entityMetamodels: List<EntityMetamodel<*, *, *>>,
+    private val options: SchemaDropOptions
 ) : JdbcQueryRunner<Unit> {
 
     override fun run(config: DatabaseConfig) {
         val statement = buildStatement(config)
-        val executor = JdbcExecutor(config, option)
+        val executor = JdbcExecutor(config, options)
         executor.execute(statement)
     }
 

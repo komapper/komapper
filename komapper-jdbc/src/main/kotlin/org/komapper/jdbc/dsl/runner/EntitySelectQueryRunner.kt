@@ -9,7 +9,7 @@ import org.komapper.core.Statement
 import org.komapper.core.dsl.builder.EntitySelectStatementBuilder
 import org.komapper.core.dsl.context.EntitySelectContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
-import org.komapper.core.dsl.option.EntitySelectOption
+import org.komapper.core.dsl.options.EntitySelectOptions
 import org.komapper.jdbc.DatabaseConfig
 import org.komapper.jdbc.JdbcDialect
 import java.sql.ResultSet
@@ -17,16 +17,16 @@ import kotlin.reflect.cast
 
 internal class EntitySelectQueryRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>, R>(
     private val context: EntitySelectContext<ENTITY, ID, META>,
-    private val option: EntitySelectOption,
+    private val options: EntitySelectOptions,
     private val transform: suspend (Flow<ENTITY>) -> R
 ) : JdbcQueryRunner<R> {
 
     override fun run(config: DatabaseConfig): R {
-        if (!option.allowEmptyWhereClause && context.where.isEmpty()) {
+        if (!options.allowEmptyWhereClause && context.where.isEmpty()) {
             error("Empty where clause is not allowed.")
         }
         val statement = buildStatement(config)
-        val executor = JdbcExecutor(config, option)
+        val executor = JdbcExecutor(config, options)
         return executor.executeQuery(statement) { rs ->
             // hold only unique entities
             val pool: MutableMap<EntityKey, Any> = mutableMapOf()

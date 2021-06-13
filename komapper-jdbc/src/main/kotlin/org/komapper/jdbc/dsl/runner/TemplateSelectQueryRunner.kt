@@ -2,7 +2,7 @@ package org.komapper.jdbc.dsl.runner
 
 import kotlinx.coroutines.flow.Flow
 import org.komapper.core.Statement
-import org.komapper.core.dsl.option.TemplateSelectOption
+import org.komapper.core.dsl.options.TemplateSelectOptions
 import org.komapper.core.dsl.query.Row
 import org.komapper.jdbc.DatabaseConfig
 
@@ -10,7 +10,7 @@ internal class TemplateSelectQueryRunner<T, R>(
     private val sql: String,
     private val params: Any,
     private val transform: (Row) -> T,
-    private val option: TemplateSelectOption,
+    private val option: TemplateSelectOptions,
     private val collect: suspend (Flow<T>) -> R,
 ) : JdbcQueryRunner<R> {
 

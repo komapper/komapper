@@ -5,12 +5,12 @@ import org.komapper.core.dsl.builder.SqlInsertStatementBuilder
 import org.komapper.core.dsl.context.SqlInsertContext
 import org.komapper.core.dsl.metamodel.Assignment
 import org.komapper.core.dsl.metamodel.EntityMetamodel
-import org.komapper.core.dsl.option.SqlInsertOption
+import org.komapper.core.dsl.options.SqlInsertOptions
 import org.komapper.r2dbc.R2dbcDatabaseConfig
 
 internal class SqlInsertQueryRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: SqlInsertContext<ENTITY, ID, META>,
-    private val option: SqlInsertOption = SqlInsertOption.default
+    private val options: SqlInsertOptions = SqlInsertOptions.default
 ) : R2dbcQueryRunner<Pair<Int, Long?>> {
 
     override suspend fun run(config: R2dbcDatabaseConfig): Pair<Int, Long?> {
@@ -19,7 +19,7 @@ internal class SqlInsertQueryRunner<ENTITY : Any, ID, META : EntityMetamodel<ENT
             is Assignment.AutoIncrement<ENTITY, *, *> -> assignment.columnName
             else -> null
         }
-        val executor = R2dbcExecutor(config, option, generatedColumn)
+        val executor = R2dbcExecutor(config, options, generatedColumn)
         val (count, keys) = executor.executeUpdate(statement)
         return count to keys.firstOrNull()
     }

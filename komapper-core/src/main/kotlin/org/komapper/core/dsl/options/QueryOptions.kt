@@ -1,67 +1,67 @@
-package org.komapper.core.dsl.option
+package org.komapper.core.dsl.options
 
-import org.komapper.core.ExecutionOption
-import org.komapper.core.ExecutionOptionProvider
+import org.komapper.core.ExecutionOptions
+import org.komapper.core.ExecutionOptionsProvider
 import org.komapper.core.ThreadSafe
 
 @ThreadSafe
-interface QueryOption : ExecutionOptionProvider {
+interface QueryOptions : ExecutionOptionsProvider {
     val queryTimeoutSeconds: Int?
     val suppressLogging: Boolean
 
-    override fun getExecutionOption(): ExecutionOption {
-        return ExecutionOption(
+    override fun getExecutionOptions(): ExecutionOptions {
+        return ExecutionOptions(
             queryTimeoutSeconds = queryTimeoutSeconds,
             suppressLogging = suppressLogging
         )
     }
 }
 
-interface VersionOption : QueryOption {
+interface VersionOptions : QueryOptions {
     val ignoreVersion: Boolean
     val suppressOptimisticLockException: Boolean
 }
 
-interface BatchOption : QueryOption {
+interface BatchOptions : QueryOptions {
     val batchSize: Int?
 
-    override fun getExecutionOption(): ExecutionOption {
-        return super.getExecutionOption().copy(
+    override fun getExecutionOptions(): ExecutionOptions {
+        return super.getExecutionOptions().copy(
             batchSize = batchSize
         )
     }
 }
 
-interface InsertOption : QueryOption {
+interface InsertOptions : QueryOptions {
     val disableSequenceAssignment: Boolean
 }
 
-interface SelectOption : QueryOption {
+interface SelectOptions : QueryOptions {
     val fetchSize: Int?
     val maxRows: Int?
 
-    override fun getExecutionOption(): ExecutionOption {
-        return super.getExecutionOption().copy(
+    override fun getExecutionOptions(): ExecutionOptions {
+        return super.getExecutionOptions().copy(
             fetchSize = fetchSize,
             maxRows = maxRows
         )
     }
 }
 
-interface WhereOption : QueryOption {
+interface WhereOptions : QueryOptions {
     val allowEmptyWhereClause: Boolean
     val escapeSequence: String?
 }
 
-data class EntityDeleteOption(
+data class EntityDeleteOptions(
     override val ignoreVersion: Boolean,
     override val queryTimeoutSeconds: Int?,
     override val suppressLogging: Boolean,
     override val suppressOptimisticLockException: Boolean
-) : VersionOption {
+) : VersionOptions {
 
     companion object {
-        val default = EntityDeleteOption(
+        val default = EntityDeleteOptions(
             ignoreVersion = false,
             queryTimeoutSeconds = null,
             suppressLogging = false,
@@ -69,8 +69,8 @@ data class EntityDeleteOption(
         )
     }
 
-    fun asEntityBatchDeleteOption(batchSize: Int?): EntityDeleteBatchOption {
-        return EntityDeleteBatchOption(
+    fun asEntityBatchDeleteOption(batchSize: Int?): EntityDeleteBatchOptions {
+        return EntityDeleteBatchOptions(
             batchSize = batchSize,
             queryTimeoutSeconds = queryTimeoutSeconds,
             suppressLogging = suppressLogging,
@@ -80,22 +80,22 @@ data class EntityDeleteOption(
     }
 }
 
-data class EntityInsertOption(
+data class EntityInsertOptions(
     override val disableSequenceAssignment: Boolean,
     override val queryTimeoutSeconds: Int?,
     override val suppressLogging: Boolean,
-) : QueryOption, InsertOption {
+) : QueryOptions, InsertOptions {
 
     companion object {
-        val default = EntityInsertOption(
+        val default = EntityInsertOptions(
             disableSequenceAssignment = false,
             queryTimeoutSeconds = null,
             suppressLogging = false
         )
     }
 
-    fun asEntityBatchInsertOption(batchSize: Int?): EntityInsertBatchOption {
-        return EntityInsertBatchOption(
+    fun asEntityBatchInsertOption(batchSize: Int?): EntityInsertBatchOptions {
+        return EntityInsertBatchOptions(
             batchSize = batchSize,
             disableSequenceAssignment = disableSequenceAssignment,
             queryTimeoutSeconds = queryTimeoutSeconds,
@@ -104,15 +104,15 @@ data class EntityInsertOption(
     }
 }
 
-data class EntityUpdateOption(
+data class EntityUpdateOptions(
     override val ignoreVersion: Boolean,
     override val queryTimeoutSeconds: Int?,
     override val suppressLogging: Boolean,
     override val suppressOptimisticLockException: Boolean
-) : VersionOption {
+) : VersionOptions {
 
     companion object {
-        val default = EntityUpdateOption(
+        val default = EntityUpdateOptions(
             ignoreVersion = false,
             queryTimeoutSeconds = null,
             suppressLogging = false,
@@ -120,8 +120,8 @@ data class EntityUpdateOption(
         )
     }
 
-    fun asEntityBatchUpdateOption(batchSize: Int?): EntityUpdateBatchOption {
-        return EntityUpdateBatchOption(
+    fun asEntityBatchUpdateOption(batchSize: Int?): EntityUpdateBatchOptions {
+        return EntityUpdateBatchOptions(
             batchSize = batchSize,
             ignoreVersion = ignoreVersion,
             queryTimeoutSeconds = queryTimeoutSeconds,
@@ -131,17 +131,17 @@ data class EntityUpdateOption(
     }
 }
 
-data class EntitySelectOption(
+data class EntitySelectOptions(
     override val allowEmptyWhereClause: Boolean,
     override val escapeSequence: String?,
     override val fetchSize: Int?,
     override val maxRows: Int?,
     override val queryTimeoutSeconds: Int?,
     override val suppressLogging: Boolean,
-) : SelectOption, WhereOption {
+) : SelectOptions, WhereOptions {
 
     companion object {
-        val default = EntitySelectOption(
+        val default = EntitySelectOptions(
             allowEmptyWhereClause = true,
             escapeSequence = null,
             fetchSize = null,
@@ -151,7 +151,7 @@ data class EntitySelectOption(
         )
     }
 
-    fun asSqlSelectOption() = SqlSelectOption(
+    fun asSqlSelectOption() = SqlSelectOptions(
         allowEmptyWhereClause = allowEmptyWhereClause,
         escapeSequence = escapeSequence,
         fetchSize = fetchSize,
@@ -161,38 +161,38 @@ data class EntitySelectOption(
     )
 }
 
-data class EntityDeleteBatchOption(
+data class EntityDeleteBatchOptions(
     override val batchSize: Int?,
     override val ignoreVersion: Boolean,
     override val queryTimeoutSeconds: Int?,
     override val suppressLogging: Boolean,
     override val suppressOptimisticLockException: Boolean
-) : VersionOption, BatchOption
+) : VersionOptions, BatchOptions
 
-data class EntityInsertBatchOption(
+data class EntityInsertBatchOptions(
     override val batchSize: Int?,
     override val disableSequenceAssignment: Boolean,
     override val suppressLogging: Boolean,
     override val queryTimeoutSeconds: Int?,
-) : BatchOption, InsertOption
+) : BatchOptions, InsertOptions
 
-data class EntityUpdateBatchOption(
+data class EntityUpdateBatchOptions(
     override val suppressLogging: Boolean,
     override val batchSize: Int?,
     override val queryTimeoutSeconds: Int?,
     override val ignoreVersion: Boolean,
     override val suppressOptimisticLockException: Boolean,
-) : VersionOption, BatchOption
+) : VersionOptions, BatchOptions
 
-data class SqlDeleteOption(
+data class SqlDeleteOptions(
     override val allowEmptyWhereClause: Boolean,
     override val escapeSequence: String?,
     override val queryTimeoutSeconds: Int?,
     override val suppressLogging: Boolean,
-) : WhereOption {
+) : WhereOptions {
 
     companion object {
-        val default = SqlDeleteOption(
+        val default = SqlDeleteOptions(
             allowEmptyWhereClause = false,
             escapeSequence = null,
             queryTimeoutSeconds = null,
@@ -201,29 +201,29 @@ data class SqlDeleteOption(
     }
 }
 
-data class SqlInsertOption(
+data class SqlInsertOptions(
     override val queryTimeoutSeconds: Int?,
     override val suppressLogging: Boolean,
-) : QueryOption {
+) : QueryOptions {
 
     companion object {
-        val default = SqlInsertOption(
+        val default = SqlInsertOptions(
             queryTimeoutSeconds = null,
             suppressLogging = false
         )
     }
 }
 
-data class SqlUpdateOption(
+data class SqlUpdateOptions(
     override val allowEmptyWhereClause: Boolean,
     override val escapeSequence: String?,
     override val queryTimeoutSeconds: Int?,
     override val suppressLogging: Boolean,
 ) :
-    WhereOption {
+    WhereOptions {
 
     companion object {
-        val default = SqlUpdateOption(
+        val default = SqlUpdateOptions(
             allowEmptyWhereClause = false,
             escapeSequence = null,
             queryTimeoutSeconds = null,
@@ -232,17 +232,17 @@ data class SqlUpdateOption(
     }
 }
 
-data class SqlSelectOption(
+data class SqlSelectOptions(
     override val allowEmptyWhereClause: Boolean,
     override val escapeSequence: String?,
     override val fetchSize: Int?,
     override val maxRows: Int?,
     override val queryTimeoutSeconds: Int?,
     override val suppressLogging: Boolean,
-) : SelectOption, WhereOption {
+) : SelectOptions, WhereOptions {
 
     companion object {
-        val default = SqlSelectOption(
+        val default = SqlSelectOptions(
             allowEmptyWhereClause = true,
             escapeSequence = null,
             fetchSize = null,
@@ -253,17 +253,17 @@ data class SqlSelectOption(
     }
 }
 
-data class SqlSetOperationOption(
+data class SqlSetOperationOptions(
     override val allowEmptyWhereClause: Boolean,
     override val escapeSequence: String?,
     override val fetchSize: Int?,
     override val maxRows: Int?,
     override val suppressLogging: Boolean,
     override val queryTimeoutSeconds: Int?,
-) : SelectOption, WhereOption {
+) : SelectOptions, WhereOptions {
 
     companion object {
-        val default = SqlSetOperationOption(
+        val default = SqlSetOperationOptions(
             allowEmptyWhereClause = true,
             escapeSequence = null,
             fetchSize = null,
@@ -274,16 +274,16 @@ data class SqlSetOperationOption(
     }
 }
 
-data class TemplateSelectOption(
+data class TemplateSelectOptions(
     val escapeSequence: String?,
     override val fetchSize: Int?,
     override val maxRows: Int?,
     override val queryTimeoutSeconds: Int?,
     override val suppressLogging: Boolean,
-) : SelectOption {
+) : SelectOptions {
 
     companion object {
-        val default = TemplateSelectOption(
+        val default = TemplateSelectOptions(
             escapeSequence = null,
             fetchSize = null,
             maxRows = null,
@@ -293,14 +293,14 @@ data class TemplateSelectOption(
     }
 }
 
-data class TemplateExecuteOption(
+data class TemplateExecuteOptions(
     val escapeSequence: String?,
     override val queryTimeoutSeconds: Int?,
     override val suppressLogging: Boolean,
-) : QueryOption {
+) : QueryOptions {
 
     companion object {
-        val default = TemplateExecuteOption(
+        val default = TemplateExecuteOptions(
             escapeSequence = null,
             queryTimeoutSeconds = null,
             suppressLogging = false
@@ -308,52 +308,52 @@ data class TemplateExecuteOption(
     }
 }
 
-data class ScriptExecuteOption(
+data class ScriptExecuteOptions(
     override val queryTimeoutSeconds: Int?,
     override val suppressLogging: Boolean,
-) : QueryOption {
+) : QueryOptions {
 
     companion object {
-        val default = ScriptExecuteOption(
+        val default = ScriptExecuteOptions(
             queryTimeoutSeconds = null,
             suppressLogging = false
         )
     }
 }
 
-data class SchemaCreateOption(
+data class SchemaCreateOptions(
     override val queryTimeoutSeconds: Int?,
     override val suppressLogging: Boolean,
-) : QueryOption {
+) : QueryOptions {
 
     companion object {
-        val default = SchemaCreateOption(
+        val default = SchemaCreateOptions(
             queryTimeoutSeconds = null,
             suppressLogging = false
         )
     }
 }
 
-data class SchemaDropOption(
+data class SchemaDropOptions(
     override val queryTimeoutSeconds: Int?,
     override val suppressLogging: Boolean,
-) : QueryOption {
+) : QueryOptions {
 
     companion object {
-        val default = SchemaDropOption(
+        val default = SchemaDropOptions(
             queryTimeoutSeconds = null,
             suppressLogging = false
         )
     }
 }
 
-data class SchemaDropAllOption(
+data class SchemaDropAllOptions(
     override val queryTimeoutSeconds: Int?,
     override val suppressLogging: Boolean,
-) : QueryOption {
+) : QueryOptions {
 
     companion object {
-        val default = SchemaDropAllOption(
+        val default = SchemaDropAllOptions(
             queryTimeoutSeconds = null,
             suppressLogging = false
         )

@@ -7,23 +7,23 @@ import org.komapper.core.dsl.builder.DefaultAliasManager
 import org.komapper.core.dsl.builder.SqlSetOperationStatementBuilder
 import org.komapper.core.dsl.context.SqlSetOperationContext
 import org.komapper.core.dsl.context.SubqueryContext
-import org.komapper.core.dsl.option.SqlSetOperationOption
+import org.komapper.core.dsl.options.SqlSetOperationOptions
 import org.komapper.r2dbc.R2dbcDatabaseConfig
 import org.komapper.r2dbc.R2dbcDialect
 
 internal class SqlSetOperationFlowQueryRunner<T>(
     private val context: SqlSetOperationContext<T>,
-    private val option: SqlSetOperationOption,
+    private val options: SqlSetOperationOptions,
     private val transform: (R2dbcDialect, Row) -> T
 ) : R2dbcFlowQueryRunner<T> {
 
     override fun run(config: R2dbcDatabaseConfig): Flow<T> {
-        if (!option.allowEmptyWhereClause) {
+        if (!options.allowEmptyWhereClause) {
             checkWhereClauses(context.left)
             checkWhereClauses(context.right)
         }
         val statement = buildStatement(config)
-        val executor = R2dbcExecutor(config, option)
+        val executor = R2dbcExecutor(config, options)
         return executor.executeQuery(statement, transform)
     }
 

@@ -3,7 +3,7 @@ package org.komapper.jdbc.dsl.runner
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.runBlocking
-import org.komapper.core.ExecutionOptionProvider
+import org.komapper.core.ExecutionOptionsProvider
 import org.komapper.core.LogCategory
 import org.komapper.core.Statement
 import org.komapper.core.UniqueConstraintException
@@ -16,11 +16,11 @@ import java.sql.SQLException
 
 internal class JdbcExecutor(
     private val config: DatabaseConfig,
-    executionOptionProvider: ExecutionOptionProvider,
+    executionOptionProvider: ExecutionOptionsProvider,
     private val requiresGeneratedKeys: Boolean = false
 ) {
 
-    private val executionOption = config.executionOption + executionOptionProvider.getExecutionOption()
+    private val executionOptions = config.executionOptions + executionOptionProvider.getExecutionOptions()
 
     fun <T> executeQuery(
         statement: Statement,
@@ -95,7 +95,7 @@ internal class JdbcExecutor(
                 log(firstStatement)
                 con.prepare(firstStatement).use { ps ->
                     ps.setUp()
-                    val batchSize = executionOption.batchSize?.let { if (it > 0) it else null } ?: 10
+                    val batchSize = executionOptions.batchSize?.let { if (it > 0) it else null } ?: 10
                     val allCounts = IntArray(statements.size)
                     val allKeys = LongArray(statements.size)
                     var offset = 0
@@ -151,7 +151,7 @@ internal class JdbcExecutor(
     }
 
     private fun log(statement: Statement) {
-        val suppressLogging = executionOption.suppressLogging ?: false
+        val suppressLogging = executionOptions.suppressLogging ?: false
         if (!suppressLogging) {
             config.logger.debug(LogCategory.SQL.value) {
                 statement.toSql()
@@ -172,9 +172,9 @@ internal class JdbcExecutor(
     }
 
     private fun java.sql.Statement.setUp() {
-        executionOption.fetchSize?.let { if (it > 0) this.fetchSize = it }
-        executionOption.maxRows?.let { if (it > 0) this.maxRows = it }
-        executionOption.queryTimeoutSeconds?.let { if (it > 0) this.queryTimeout = it }
+        executionOptions.fetchSize?.let { if (it > 0) this.fetchSize = it }
+        executionOptions.maxRows?.let { if (it > 0) this.maxRows = it }
+        executionOptions.queryTimeoutSeconds?.let { if (it > 0) this.queryTimeout = it }
     }
 
     private fun PreparedStatement.bind(statement: Statement) {

@@ -4,11 +4,11 @@ import org.komapper.core.ThreadSafe
 import org.komapper.core.dsl.context.EntityUpdateContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.metamodel.PropertyMetamodel
-import org.komapper.core.dsl.option.EntityUpdateOption
+import org.komapper.core.dsl.options.EntityUpdateOptions
 
 @ThreadSafe
 interface EntityUpdateQueryBuilder<ENTITY : Any> {
-    fun option(configure: (EntityUpdateOption) -> EntityUpdateOption): EntityUpdateQueryBuilder<ENTITY>
+    fun options(configure: (EntityUpdateOptions) -> EntityUpdateOptions): EntityUpdateQueryBuilder<ENTITY>
     fun include(vararg properties: PropertyMetamodel<ENTITY, *, *>): EntityUpdateQueryBuilder<ENTITY>
     fun exclude(vararg properties: PropertyMetamodel<ENTITY, *, *>): EntityUpdateQueryBuilder<ENTITY>
     fun single(entity: ENTITY): Query<ENTITY>
@@ -18,12 +18,12 @@ interface EntityUpdateQueryBuilder<ENTITY : Any> {
 
 internal data class EntityUpdateQueryBuilderImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityUpdateContext<ENTITY, ID, META>,
-    private val option: EntityUpdateOption = EntityUpdateOption.default
+    private val options: EntityUpdateOptions = EntityUpdateOptions.default
 ) :
     EntityUpdateQueryBuilder<ENTITY> {
 
-    override fun option(configure: (EntityUpdateOption) -> EntityUpdateOption): EntityUpdateQueryBuilderImpl<ENTITY, ID, META> {
-        return copy(option = configure(option))
+    override fun options(configure: (EntityUpdateOptions) -> EntityUpdateOptions): EntityUpdateQueryBuilderImpl<ENTITY, ID, META> {
+        return copy(options = configure(options))
     }
 
     override fun include(vararg properties: PropertyMetamodel<ENTITY, *, *>): EntityUpdateQueryBuilderImpl<ENTITY, ID, META> {
@@ -52,14 +52,14 @@ internal data class EntityUpdateQueryBuilderImpl<ENTITY : Any, ID, META : Entity
     override fun single(entity: ENTITY): Query<ENTITY> {
         context.target.checkIdValueNotNull(entity)
         return Query { visitor ->
-            visitor.entityUpdateSingleQuery(context, option, entity)
+            visitor.entityUpdateSingleQuery(context, options, entity)
         }
     }
 
     override fun batch(entities: List<ENTITY>, batchSize: Int?): Query<List<ENTITY>> {
         context.target.checkIdValueNotNull(entities)
         return Query { visitor ->
-            visitor.entityUpdateBatchQuery(context, option.asEntityBatchUpdateOption(batchSize), entities)
+            visitor.entityUpdateBatchQuery(context, options.asEntityBatchUpdateOption(batchSize), entities)
         }
     }
 

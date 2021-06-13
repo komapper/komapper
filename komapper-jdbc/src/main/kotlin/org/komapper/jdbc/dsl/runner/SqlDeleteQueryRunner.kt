@@ -4,20 +4,20 @@ import org.komapper.core.Statement
 import org.komapper.core.dsl.builder.SqlDeleteStatementBuilder
 import org.komapper.core.dsl.context.SqlDeleteContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
-import org.komapper.core.dsl.option.SqlDeleteOption
+import org.komapper.core.dsl.options.SqlDeleteOptions
 import org.komapper.jdbc.DatabaseConfig
 
 internal class SqlDeleteQueryRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: SqlDeleteContext<ENTITY, ID, META>,
-    private val option: SqlDeleteOption = SqlDeleteOption.default
+    private val options: SqlDeleteOptions
 ) : JdbcQueryRunner<Int> {
 
     override fun run(config: DatabaseConfig): Int {
-        if (!option.allowEmptyWhereClause && context.where.isEmpty()) {
+        if (!options.allowEmptyWhereClause && context.where.isEmpty()) {
             error("Empty where clause is not allowed.")
         }
         val statement = buildStatement(config)
-        val executor = JdbcExecutor(config, option)
+        val executor = JdbcExecutor(config, options)
         val (count) = executor.executeUpdate(statement)
         return count
     }

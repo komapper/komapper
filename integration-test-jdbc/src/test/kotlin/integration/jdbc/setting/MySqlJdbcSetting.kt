@@ -7,6 +7,6 @@ import org.komapper.jdbc.DefaultDatabaseConfig
 class MySqlJdbcSetting(url: String, user: String, password: String) : MySqlSetting<DatabaseConfig> {
     override val config: DatabaseConfig =
         object : DefaultDatabaseConfig(url, user, password) {
-            override val executionOption = super.executionOption.copy(batchSize = 2)
+            override val executionOptions = super.executionOptions.copy(batchSize = 2)
         }
 }

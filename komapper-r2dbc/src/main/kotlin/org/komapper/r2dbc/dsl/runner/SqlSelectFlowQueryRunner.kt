@@ -5,23 +5,23 @@ import kotlinx.coroutines.flow.Flow
 import org.komapper.core.Statement
 import org.komapper.core.dsl.builder.SqlSelectStatementBuilder
 import org.komapper.core.dsl.context.SqlSelectContext
-import org.komapper.core.dsl.option.SqlSelectOption
+import org.komapper.core.dsl.options.SqlSelectOptions
 import org.komapper.r2dbc.R2dbcDatabaseConfig
 import org.komapper.r2dbc.R2dbcDialect
 
 internal class SqlSelectFlowQueryRunner<T>(
     private val context: SqlSelectContext<*, *, *>,
-    private val option: SqlSelectOption,
+    private val options: SqlSelectOptions,
     private val transform: (R2dbcDialect, Row) -> T,
 ) :
     R2dbcFlowQueryRunner<T> {
 
     override fun run(config: R2dbcDatabaseConfig): Flow<T> {
-        if (!option.allowEmptyWhereClause && context.where.isEmpty()) {
+        if (!options.allowEmptyWhereClause && context.where.isEmpty()) {
             error("Empty where clause is not allowed.")
         }
         val statement = buildStatement(config)
-        val executor = R2dbcExecutor(config, option)
+        val executor = R2dbcExecutor(config, options)
         return executor.executeQuery(statement, transform)
     }
 

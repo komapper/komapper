@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.reactive.asFlow
-import org.komapper.core.ExecutionOptionProvider
+import org.komapper.core.ExecutionOptionsProvider
 import org.komapper.core.LogCategory
 import org.komapper.core.Statement
 import org.komapper.core.UniqueConstraintException
@@ -24,11 +24,11 @@ import org.reactivestreams.Publisher
 
 internal class R2dbcExecutor(
     private val config: R2dbcDatabaseConfig,
-    executionOptionProvider: ExecutionOptionProvider,
+    executionOptionsProvider: ExecutionOptionsProvider,
     private val generatedColumn: String? = null
 ) {
 
-    private val executionOption = config.executionOption + executionOptionProvider.getExecutionOption()
+    private val executionOptions = config.executionOptions + executionOptionsProvider.getExecutionOptions()
 
     @OptIn(kotlinx.coroutines.FlowPreview::class)
     fun <T> executeQuery(
@@ -114,7 +114,7 @@ internal class R2dbcExecutor(
     }
 
     private fun log(statement: Statement) {
-        val suppressLogging = executionOption.suppressLogging ?: false
+        val suppressLogging = executionOptions.suppressLogging ?: false
         if (!suppressLogging) {
             config.logger.debug(LogCategory.SQL.value) {
                 statement.asSql()
@@ -144,7 +144,7 @@ internal class R2dbcExecutor(
     }
 
     private fun io.r2dbc.spi.Statement.setUp() {
-        executionOption.fetchSize?.let { if (it > 0) this.fetchSize(it) }
+        executionOptions.fetchSize?.let { if (it > 0) this.fetchSize(it) }
     }
 
     private fun io.r2dbc.spi.Statement.bind(statement: Statement) {

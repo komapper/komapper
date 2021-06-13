@@ -2,7 +2,7 @@ package org.komapper.core.dsl.query
 
 import org.komapper.core.OptimisticLockException
 import org.komapper.core.dsl.metamodel.EntityMetamodel
-import org.komapper.core.dsl.option.VersionOption
+import org.komapper.core.dsl.options.VersionOptions
 
 internal fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>
 EntityMetamodel<ENTITY, ID, META>.checkIdValueNotNull(entity: ENTITY) {
@@ -21,7 +21,7 @@ EntityMetamodel<ENTITY, ID, META>.checkIdValueNotNull(entities: List<ENTITY>) {
 }
 
 fun checkOptimisticLock(
-    option: VersionOption,
+    option: VersionOptions,
     count: Int,
     index: Int?
 ) {

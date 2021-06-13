@@ -2,17 +2,17 @@ package org.komapper.jdbc.dsl.runner
 
 import org.komapper.core.Statement
 import org.komapper.core.dsl.metamodel.EntityMetamodel
-import org.komapper.core.dsl.option.SchemaCreateOption
+import org.komapper.core.dsl.options.SchemaCreateOptions
 import org.komapper.jdbc.DatabaseConfig
 
 internal class SchemaCreateQueryRunner(
-    private val entityMetamodels: List<EntityMetamodel<*, *, *>> = emptyList(),
-    private val option: SchemaCreateOption = SchemaCreateOption.default
+    private val entityMetamodels: List<EntityMetamodel<*, *, *>>,
+    private val options: SchemaCreateOptions
 ) : JdbcQueryRunner<Unit> {
 
     override fun run(config: DatabaseConfig) {
         val statement = buildStatement(config)
-        val executor = JdbcExecutor(config, option)
+        val executor = JdbcExecutor(config, options)
         executor.execute(statement)
     }
 

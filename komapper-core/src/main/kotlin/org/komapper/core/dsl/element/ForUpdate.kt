@@ -1,7 +1,7 @@
 package org.komapper.core.dsl.element
 
-import org.komapper.core.dsl.option.ForUpdateOption
+import org.komapper.core.dsl.options.ForUpdateOptions
 
 data class ForUpdate(
-    val option: ForUpdateOption? = null
+    val options: ForUpdateOptions? = null
 )

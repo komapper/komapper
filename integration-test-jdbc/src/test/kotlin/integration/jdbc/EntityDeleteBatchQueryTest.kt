@@ -73,7 +73,7 @@ class EntityDeleteBatchQueryTest(private val db: Database) {
         assertEquals(3, db.runQuery { query }.size)
         db.runQuery {
             EntityDsl.delete(a)
-                .option {
+                .options {
                     it.copy(suppressOptimisticLockException = true)
                 }
                 .batch(

@@ -124,7 +124,7 @@ class EntitySelectQueryWhereTest(private val db: Database) {
         val insertQuery = EntityDsl.insert(a).single(Address(16, "\\STREET _16%", 1))
         val selectQuery = EntityDsl.from(a).where {
             a.street like escape("\\S") + text("%") + escape("T _16%")
-        }.orderBy(a.addressId).option {
+        }.orderBy(a.addressId).options {
             it.copy(escapeSequence = "|")
         }
         val list = db.runQuery {

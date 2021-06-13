@@ -1,16 +1,16 @@
 package org.komapper.jdbc.dsl.runner
 
 import org.komapper.core.Statement
-import org.komapper.core.dsl.option.SchemaDropAllOption
+import org.komapper.core.dsl.options.SchemaDropAllOptions
 import org.komapper.jdbc.DatabaseConfig
 
 internal class SchemaDropAllQueryRunner(
-    private val option: SchemaDropAllOption = SchemaDropAllOption.default
+    private val options: SchemaDropAllOptions
 ) : JdbcQueryRunner<Unit> {
 
     override fun run(config: DatabaseConfig) {
         val statement = buildStatement(config)
-        val executor = JdbcExecutor(config, option)
+        val executor = JdbcExecutor(config, options)
         executor.execute(statement)
     }
 

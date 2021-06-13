@@ -2,17 +2,17 @@ package org.komapper.r2dbc.dsl.runner
 
 import org.komapper.core.Statement
 import org.komapper.core.dsl.metamodel.EntityMetamodel
-import org.komapper.core.dsl.option.SchemaCreateOption
+import org.komapper.core.dsl.options.SchemaCreateOptions
 import org.komapper.r2dbc.R2dbcDatabaseConfig
 
 internal class SchemaCreateQueryRunner(
     private val entityMetamodels: List<EntityMetamodel<*, *, *>>,
-    private val option: SchemaCreateOption
+    private val options: SchemaCreateOptions
 ) : R2dbcQueryRunner<Unit> {
 
     override suspend fun run(config: R2dbcDatabaseConfig) {
         val statement = buildStatement(config)
-        val executor = R2dbcExecutor(config, option)
+        val executor = R2dbcExecutor(config, options)
         executor.execute(statement)
     }
 

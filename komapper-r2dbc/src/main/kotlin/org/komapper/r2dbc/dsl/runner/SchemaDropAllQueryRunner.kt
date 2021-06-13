@@ -1,16 +1,16 @@
 package org.komapper.r2dbc.dsl.runner
 
 import org.komapper.core.Statement
-import org.komapper.core.dsl.option.SchemaDropAllOption
+import org.komapper.core.dsl.options.SchemaDropAllOptions
 import org.komapper.r2dbc.R2dbcDatabaseConfig
 
 internal class SchemaDropAllQueryRunner(
-    private val option: SchemaDropAllOption
+    private val options: SchemaDropAllOptions
 ) : R2dbcQueryRunner<Unit> {
 
     override suspend fun run(config: R2dbcDatabaseConfig) {
         val statement = buildStatement(config)
-        val executor = R2dbcExecutor(config, option)
+        val executor = R2dbcExecutor(config, options)
         executor.execute(statement)
     }
 

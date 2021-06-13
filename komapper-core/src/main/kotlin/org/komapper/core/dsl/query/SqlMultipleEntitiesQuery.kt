@@ -5,13 +5,13 @@ import kotlinx.coroutines.flow.toList
 import org.komapper.core.dsl.context.SqlSelectContext
 import org.komapper.core.dsl.context.SubqueryContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
-import org.komapper.core.dsl.option.SqlSelectOption
+import org.komapper.core.dsl.options.SqlSelectOptions
 import org.komapper.core.dsl.runner.QueryRunner
 import org.komapper.core.dsl.visitor.QueryVisitor
 
 internal class SqlMultipleEntitiesQuery(
     private val context: SqlSelectContext<*, *, *>,
-    private val option: SqlSelectOption,
+    private val options: SqlSelectOptions,
     private val metamodels: List<EntityMetamodel<*, *, *>>
 ) : FlowableSubquery<Entities> {
 
@@ -21,15 +21,15 @@ internal class SqlMultipleEntitiesQuery(
         FlowableSubquerySupport(subqueryContext) { SqlMultipleEntitiesSetOperationQuery(it, metamodels = metamodels) }
 
     override fun accept(visitor: QueryVisitor): QueryRunner {
-        return visitor.sqlMultipleEntitiesQuery(context, option, metamodels) { it.toList() }
+        return visitor.sqlMultipleEntitiesQuery(context, options, metamodels) { it.toList() }
     }
 
     override fun <R> collect(collect: suspend (Flow<Entities>) -> R): Query<R> = Query { visitor ->
-        visitor.sqlMultipleEntitiesQuery(context, option, metamodels, collect)
+        visitor.sqlMultipleEntitiesQuery(context, options, metamodels, collect)
     }
 
     override fun asFlowQuery(): FlowQuery<Entities> = FlowQuery { visitor ->
-        visitor.sqlMultipleEntitiesQuery(context, option, metamodels)
+        visitor.sqlMultipleEntitiesQuery(context, options, metamodels)
     }
 
     override fun except(other: Subquery<Entities>): FlowableSetOperationQuery<Entities> {

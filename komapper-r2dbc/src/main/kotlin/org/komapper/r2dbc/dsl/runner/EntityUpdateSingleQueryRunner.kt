@@ -3,16 +3,16 @@ package org.komapper.r2dbc.dsl.runner
 import org.komapper.core.Statement
 import org.komapper.core.dsl.context.EntityUpdateContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
-import org.komapper.core.dsl.option.EntityUpdateOption
+import org.komapper.core.dsl.options.EntityUpdateOptions
 import org.komapper.r2dbc.R2dbcDatabaseConfig
 
 internal class EntityUpdateSingleQueryRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     context: EntityUpdateContext<ENTITY, ID, META>,
-    option: EntityUpdateOption,
+    options: EntityUpdateOptions,
     private val entity: ENTITY
 ) : R2dbcQueryRunner<ENTITY> {
 
-    private val support: EntityUpdateQueryRunnerSupport<ENTITY, ID, META> = EntityUpdateQueryRunnerSupport(context, option)
+    private val support: EntityUpdateQueryRunnerSupport<ENTITY, ID, META> = EntityUpdateQueryRunnerSupport(context, options)
 
     override suspend fun run(config: R2dbcDatabaseConfig): ENTITY {
         val newEntity = preUpdate(config, entity)
