@@ -6,7 +6,7 @@ import org.komapper.core.dsl.context.EntityUpsertContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.InsertOptions
 
-internal class EntityUpsertBatchQueryRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+class EntityUpsertBatchQueryRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     context: EntityUpsertContext<ENTITY, ID, META>,
     options: InsertOptions,
     private val entities: List<ENTITY>

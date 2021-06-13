@@ -16,7 +16,7 @@ class SqlSetOperationFlowQueryRunner(
         return buildStatement(config)
     }
 
-    private fun buildStatement(config: DatabaseConfig): Statement {
+    fun buildStatement(config: DatabaseConfig): Statement {
         val aliasManager = DefaultAliasManager(context)
         val builder = SqlSetOperationStatementBuilder(config.dialect, context, aliasManager)
         return builder.build()

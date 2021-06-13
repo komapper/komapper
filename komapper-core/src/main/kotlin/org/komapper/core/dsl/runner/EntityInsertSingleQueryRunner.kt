@@ -6,7 +6,7 @@ import org.komapper.core.dsl.context.EntityInsertContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.EntityInsertOptions
 
-internal class EntityInsertSingleQueryRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+class EntityInsertSingleQueryRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     context: EntityInsertContext<ENTITY, ID, META>,
     options: EntityInsertOptions,
     private val entity: ENTITY
@@ -19,7 +19,7 @@ internal class EntityInsertSingleQueryRunner<ENTITY : Any, ID, META : EntityMeta
         return buildStatement(config, entity)
     }
 
-    private fun buildStatement(config: DatabaseConfig, entity: ENTITY): Statement {
+    fun buildStatement(config: DatabaseConfig, entity: ENTITY): Statement {
         return support.buildStatement(config, listOf(entity))
     }
 }

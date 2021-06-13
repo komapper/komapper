@@ -43,6 +43,7 @@ fun checkOptimisticLock(
 }
 
 fun Query<*>.dryRun(config: DatabaseConfig = DryRunDatabaseConfig): DryRunResult {
+    // TODO MetadataQuery
     val runner = this.accept(DefaultQueryVisitor())
     val statement = runner.dryRun(config)
     val result = statement.toDryRunResult(config.dialect)

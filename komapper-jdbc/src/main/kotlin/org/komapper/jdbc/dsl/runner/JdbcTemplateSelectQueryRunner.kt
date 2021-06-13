@@ -5,20 +5,23 @@ import org.komapper.core.DatabaseConfig
 import org.komapper.core.Statement
 import org.komapper.core.dsl.options.TemplateSelectOptions
 import org.komapper.core.dsl.query.Row
+import org.komapper.core.dsl.runner.TemplateSelectQueryRunner
 import org.komapper.jdbc.JdbcDatabaseConfig
 import org.komapper.jdbc.JdbcExecutor
 
-internal class TemplateSelectQueryRunner<T, R>(
-    private val sql: String,
-    private val params: Any,
+internal class JdbcTemplateSelectQueryRunner<T, R>(
+    sql: String,
+    params: Any,
     private val transform: (Row) -> T,
-    private val option: TemplateSelectOptions,
+    private val options: TemplateSelectOptions,
     private val collect: suspend (Flow<T>) -> R,
 ) : JdbcQueryRunner<R> {
 
+    private val runner = TemplateSelectQueryRunner(sql, params, options)
+
     override fun run(config: JdbcDatabaseConfig): R {
-        val statement = buildStatement(config)
-        val executor = JdbcExecutor(config, option)
+        val statement = runner.buildStatement(config)
+        val executor = JdbcExecutor(config, options)
         return executor.executeQuery(
             statement,
             { dialect, rs ->
@@ -30,11 +33,6 @@ internal class TemplateSelectQueryRunner<T, R>(
     }
 
     override fun dryRun(config: DatabaseConfig): Statement {
-        return buildStatement(config)
-    }
-
-    private fun buildStatement(config: DatabaseConfig): Statement {
-        val builder = config.templateStatementBuilder
-        return builder.build(sql, params) { config.dialect.escape(it, option.escapeSequence) }
+        return runner.dryRun(config)
     }
 }

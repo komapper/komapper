@@ -4,18 +4,21 @@ import org.komapper.core.DatabaseConfig
 import org.komapper.core.Statement
 import org.komapper.core.dsl.context.EntityInsertContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
-import org.komapper.core.dsl.options.EntityInsertOptions
+import org.komapper.core.dsl.options.EntityInsertBatchOptions
+import org.komapper.core.dsl.runner.EntityInsertBatchQueryRunner
 import org.komapper.jdbc.JdbcDatabaseConfig
 
-internal class EntityInsertMultipleQueryRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+internal class JdbcEntityInsertBatchQueryRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     context: EntityInsertContext<ENTITY, ID, META>,
-    options: EntityInsertOptions,
+    options: EntityInsertBatchOptions,
     private val entities: List<ENTITY>
-) :
-    JdbcQueryRunner<List<ENTITY>> {
+) : JdbcQueryRunner<List<ENTITY>> {
 
-    private val support: EntityInsertQueryRunnerSupport<ENTITY, ID, META> =
-        EntityInsertQueryRunnerSupport(context, options)
+    private val runner: EntityInsertBatchQueryRunner<ENTITY, ID, META> =
+        EntityInsertBatchQueryRunner(context, options, entities)
+
+    private val support: JdbcEntityInsertQueryRunnerSupport<ENTITY, ID, META> =
+        JdbcEntityInsertQueryRunnerSupport(context, options)
 
     override fun run(config: JdbcDatabaseConfig): List<ENTITY> {
         if (entities.isEmpty()) return emptyList()
@@ -29,8 +32,8 @@ internal class EntityInsertMultipleQueryRunner<ENTITY : Any, ID, META : EntityMe
     }
 
     private fun insert(config: JdbcDatabaseConfig, entities: List<ENTITY>): LongArray {
-        val statement = buildStatement(config, entities)
-        val (_, keys) = support.insert(config) { it.executeUpdate(statement) }
+        val statements = entities.map { runner.buildStatement(config, it) }
+        val (_, keys) = support.insert(config) { it.executeBatch(statements) }
         return keys
     }
 
@@ -46,11 +49,6 @@ internal class EntityInsertMultipleQueryRunner<ENTITY : Any, ID, META : EntityMe
     }
 
     override fun dryRun(config: DatabaseConfig): Statement {
-        if (entities.isEmpty()) return Statement.EMPTY
-        return buildStatement(config, entities)
-    }
-
-    private fun buildStatement(config: DatabaseConfig, entities: List<ENTITY>): Statement {
-        return support.buildStatement(config, entities)
+        return runner.dryRun(config)
     }
 }

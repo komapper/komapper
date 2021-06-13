@@ -5,17 +5,21 @@ import org.komapper.core.Statement
 import org.komapper.core.dsl.context.EntityUpdateContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.EntityUpdateBatchOptions
+import org.komapper.core.dsl.runner.EntityUpdateBatchQueryRunner
 import org.komapper.jdbc.JdbcDatabaseConfig
 
-internal class EntityUpdateBatchQueryRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+internal class JdbcEntityUpdateBatchQueryRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     context: EntityUpdateContext<ENTITY, ID, META>,
     options: EntityUpdateBatchOptions,
     private val entities: List<ENTITY>
 ) :
     JdbcQueryRunner<List<ENTITY>> {
 
-    private val support: EntityUpdateQueryRunnerSupport<ENTITY, ID, META> =
-        EntityUpdateQueryRunnerSupport(context, options)
+    private val runner: EntityUpdateBatchQueryRunner<ENTITY, ID, META> =
+        EntityUpdateBatchQueryRunner(context, options, entities)
+
+    private val support: JdbcEntityUpdateQueryRunnerSupport<ENTITY, ID, META> =
+        JdbcEntityUpdateQueryRunnerSupport(context, options)
 
     override fun run(config: JdbcDatabaseConfig): List<ENTITY> {
         if (entities.isEmpty()) return emptyList()
@@ -29,7 +33,7 @@ internal class EntityUpdateBatchQueryRunner<ENTITY : Any, ID, META : EntityMetam
     }
 
     private fun update(config: JdbcDatabaseConfig, entities: List<ENTITY>): Pair<IntArray, LongArray> {
-        val statements = entities.map { buildStatement(config, it) }
+        val statements = entities.map { runner.buildStatement(config, it) }
         return support.update(config) { it.executeBatch(statements) }
     }
 
@@ -46,11 +50,6 @@ internal class EntityUpdateBatchQueryRunner<ENTITY : Any, ID, META : EntityMetam
     }
 
     override fun dryRun(config: DatabaseConfig): Statement {
-        if (entities.isEmpty()) return Statement.EMPTY
-        return buildStatement(config, entities.first())
-    }
-
-    private fun buildStatement(config: DatabaseConfig, entity: ENTITY): Statement {
-        return support.buildStatement(config, entity)
+        return runner.dryRun(config)
     }
 }

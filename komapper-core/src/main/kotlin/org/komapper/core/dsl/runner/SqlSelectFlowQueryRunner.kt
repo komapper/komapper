@@ -16,7 +16,7 @@ class SqlSelectFlowQueryRunner(
         return buildStatement(config)
     }
 
-    private fun buildStatement(config: DatabaseConfig): Statement {
+    fun buildStatement(config: DatabaseConfig): Statement {
         val builder = SqlSelectStatementBuilder(config.dialect, context)
         return builder.build()
     }

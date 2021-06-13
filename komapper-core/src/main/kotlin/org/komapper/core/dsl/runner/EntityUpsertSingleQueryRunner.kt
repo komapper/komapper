@@ -19,7 +19,7 @@ class EntityUpsertSingleQueryRunner<ENTITY : Any, ID, META : EntityMetamodel<ENT
         return buildStatement(config, entity)
     }
 
-    private fun buildStatement(config: DatabaseConfig, entity: ENTITY): Statement {
+    fun buildStatement(config: DatabaseConfig, entity: ENTITY): Statement {
         return support.buildStatement(config, listOf(entity))
     }
 }

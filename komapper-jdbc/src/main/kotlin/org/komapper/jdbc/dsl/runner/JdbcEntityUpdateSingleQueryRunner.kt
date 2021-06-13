@@ -5,15 +5,20 @@ import org.komapper.core.Statement
 import org.komapper.core.dsl.context.EntityUpdateContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.EntityUpdateOptions
+import org.komapper.core.dsl.runner.EntityUpdateSingleQueryRunner
 import org.komapper.jdbc.JdbcDatabaseConfig
 
-internal class EntityUpdateSingleQueryRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+internal class JdbcEntityUpdateSingleQueryRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     context: EntityUpdateContext<ENTITY, ID, META>,
     options: EntityUpdateOptions,
     private val entity: ENTITY
 ) : JdbcQueryRunner<ENTITY> {
 
-    private val support: EntityUpdateQueryRunnerSupport<ENTITY, ID, META> = EntityUpdateQueryRunnerSupport(context, options)
+    private val runner: EntityUpdateSingleQueryRunner<ENTITY, ID, META> =
+        EntityUpdateSingleQueryRunner(context, options, entity)
+
+    private val support: JdbcEntityUpdateQueryRunnerSupport<ENTITY, ID, META> =
+        JdbcEntityUpdateQueryRunnerSupport(context, options)
 
     override fun run(config: JdbcDatabaseConfig): ENTITY {
         val newEntity = preUpdate(config, entity)
@@ -26,7 +31,7 @@ internal class EntityUpdateSingleQueryRunner<ENTITY : Any, ID, META : EntityMeta
     }
 
     private fun update(config: JdbcDatabaseConfig, entity: ENTITY): Pair<Int, LongArray> {
-        val statement = buildStatement(config, entity)
+        val statement = runner.buildStatement(config, entity)
         return support.update(config) { it.executeUpdate(statement) }
     }
 
@@ -35,10 +40,6 @@ internal class EntityUpdateSingleQueryRunner<ENTITY : Any, ID, META : EntityMeta
     }
 
     override fun dryRun(config: DatabaseConfig): Statement {
-        return buildStatement(config, entity)
-    }
-
-    private fun buildStatement(config: DatabaseConfig, entity: ENTITY): Statement {
-        return support.buildStatement(config, entity)
+        return runner.dryRun(config)
     }
 }

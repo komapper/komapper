@@ -5,17 +5,21 @@ import org.komapper.core.Statement
 import org.komapper.core.dsl.context.EntityDeleteContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.EntityDeleteBatchOptions
+import org.komapper.core.dsl.runner.EntityDeleteBatchQueryRunner
 import org.komapper.jdbc.JdbcDatabaseConfig
 
-internal class EntityDeleteBatchQueryRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+internal class JdbcEntityDeleteBatchQueryRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     context: EntityDeleteContext<ENTITY, ID, META>,
     options: EntityDeleteBatchOptions,
     private val entities: List<ENTITY>
 ) :
     JdbcQueryRunner<Unit> {
 
-    private val support: EntityDeleteQueryRunnerSupport<ENTITY, ID, META> =
-        EntityDeleteQueryRunnerSupport(context, options)
+    private val runner: EntityDeleteBatchQueryRunner<ENTITY, ID, META> =
+        EntityDeleteBatchQueryRunner(context, options, entities)
+
+    private val support: JdbcEntityDeleteQueryRunnerSupport<ENTITY, ID, META> =
+        JdbcEntityDeleteQueryRunnerSupport(context, options)
 
     override fun run(config: JdbcDatabaseConfig) {
         if (entities.isEmpty()) return
@@ -24,7 +28,7 @@ internal class EntityDeleteBatchQueryRunner<ENTITY : Any, ID, META : EntityMetam
     }
 
     private fun delete(config: JdbcDatabaseConfig): Pair<IntArray, LongArray> {
-        val statements = entities.map { buildStatement(config, it) }
+        val statements = entities.map { runner.buildStatement(config, it) }
         return support.delete(config) { it.executeBatch(statements) }
     }
 
@@ -35,11 +39,6 @@ internal class EntityDeleteBatchQueryRunner<ENTITY : Any, ID, META : EntityMetam
     }
 
     override fun dryRun(config: DatabaseConfig): Statement {
-        if (entities.isEmpty()) return Statement.EMPTY
-        return buildStatement(config, entities.first())
-    }
-
-    private fun buildStatement(config: DatabaseConfig, entity: ENTITY): Statement {
-        return support.buildStatement(config, entity)
+        return runner.dryRun(config)
     }
 }

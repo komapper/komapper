@@ -1,20 +1,18 @@
 package org.komapper.jdbc.dsl.runner
 
-import org.komapper.core.DatabaseConfig
-import org.komapper.core.Statement
 import org.komapper.core.dsl.context.EntityUpsertContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.InsertOptions
 import org.komapper.jdbc.JdbcDatabaseConfig
 import org.komapper.jdbc.JdbcExecutor
 
-internal class EntityUpsertQueryRunnerSupport<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+internal class JdbcEntityUpsertQueryRunnerSupport<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityUpsertContext<ENTITY, ID, META>,
     private val options: InsertOptions
 ) {
 
-    private val support: EntityInsertQueryRunnerSupport<ENTITY, ID, META> =
-        EntityInsertQueryRunnerSupport(context.insertContext, options)
+    private val support: JdbcEntityInsertQueryRunnerSupport<ENTITY, ID, META> =
+        JdbcEntityInsertQueryRunnerSupport(context.insertContext, options)
 
     fun preUpsert(config: JdbcDatabaseConfig, entity: ENTITY): ENTITY {
         return support.preInsert(config, entity)
@@ -23,10 +21,5 @@ internal class EntityUpsertQueryRunnerSupport<ENTITY : Any, ID, META : EntityMet
     fun <T> upsert(config: JdbcDatabaseConfig, execute: (JdbcExecutor) -> T): T {
         val executor = JdbcExecutor(config, options)
         return execute(executor)
-    }
-
-    fun buildStatement(config: DatabaseConfig, entities: List<ENTITY>): Statement {
-        val builder = config.dialect.getEntityUpsertStatementBuilder(context, entities)
-        return builder.build()
     }
 }

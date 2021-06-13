@@ -14,7 +14,7 @@ class SchemaDropQueryRunner(
         return buildStatement(config)
     }
 
-    private fun buildStatement(config: DatabaseConfig): Statement {
+    fun buildStatement(config: DatabaseConfig): Statement {
         val builder = config.dialect.getSchemaStatementBuilder()
         return builder.drop(entityMetamodels)
     }

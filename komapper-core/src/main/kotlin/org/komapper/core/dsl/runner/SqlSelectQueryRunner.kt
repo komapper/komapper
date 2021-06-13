@@ -5,7 +5,7 @@ import org.komapper.core.Statement
 import org.komapper.core.dsl.context.SqlSelectContext
 import org.komapper.core.dsl.options.SqlSelectOptions
 
-internal class SqlSelectQueryRunner(
+class SqlSelectQueryRunner(
     context: SqlSelectContext<*, *, *>,
     options: SqlSelectOptions,
 ) :
@@ -15,5 +15,9 @@ internal class SqlSelectQueryRunner(
 
     override fun dryRun(config: DatabaseConfig): Statement {
         return runner.dryRun(config)
+    }
+
+    fun buildStatement(config: DatabaseConfig): Statement {
+        return runner.buildStatement(config)
     }
 }

@@ -5,16 +5,20 @@ import org.komapper.core.Statement
 import org.komapper.core.dsl.context.EntityInsertContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.EntityInsertOptions
+import org.komapper.core.dsl.runner.EntityInsertSingleQueryRunner
 import org.komapper.jdbc.JdbcDatabaseConfig
 
-internal class EntityInsertSingleQueryRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+internal class JdbcEntityInsertSingleQueryRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     context: EntityInsertContext<ENTITY, ID, META>,
     options: EntityInsertOptions,
     private val entity: ENTITY
 ) : JdbcQueryRunner<ENTITY> {
 
-    private val support: EntityInsertQueryRunnerSupport<ENTITY, ID, META> =
-        EntityInsertQueryRunnerSupport(context, options)
+    private val runner: EntityInsertSingleQueryRunner<ENTITY, ID, META> =
+        EntityInsertSingleQueryRunner(context, options, entity)
+
+    private val support: JdbcEntityInsertQueryRunnerSupport<ENTITY, ID, META> =
+        JdbcEntityInsertQueryRunnerSupport(context, options)
 
     override fun run(config: JdbcDatabaseConfig): ENTITY {
         val newEntity = preInsert(config)
@@ -27,7 +31,7 @@ internal class EntityInsertSingleQueryRunner<ENTITY : Any, ID, META : EntityMeta
     }
 
     private fun insert(config: JdbcDatabaseConfig, entity: ENTITY): Pair<Int, LongArray> {
-        val statement = buildStatement(config, entity)
+        val statement = runner.buildStatement(config, entity)
         return support.insert(config) { it.executeUpdate(statement) }
     }
 
@@ -41,10 +45,6 @@ internal class EntityInsertSingleQueryRunner<ENTITY : Any, ID, META : EntityMeta
     }
 
     override fun dryRun(config: DatabaseConfig): Statement {
-        return buildStatement(config, entity)
-    }
-
-    private fun buildStatement(config: DatabaseConfig, entity: ENTITY): Statement {
-        return support.buildStatement(config, listOf(entity))
+        return runner.dryRun(config)
     }
 }

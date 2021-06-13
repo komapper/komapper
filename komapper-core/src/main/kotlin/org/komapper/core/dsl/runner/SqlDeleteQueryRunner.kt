@@ -16,7 +16,7 @@ class SqlDeleteQueryRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, 
         return buildStatement(config)
     }
 
-    private fun buildStatement(config: DatabaseConfig): Statement {
+    fun buildStatement(config: DatabaseConfig): Statement {
         val builder = SqlDeleteStatementBuilder(config.dialect, context)
         return builder.build()
     }
