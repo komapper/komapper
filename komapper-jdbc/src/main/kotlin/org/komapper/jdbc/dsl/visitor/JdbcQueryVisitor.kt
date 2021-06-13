@@ -38,7 +38,6 @@ import org.komapper.core.dsl.query.Query
 import org.komapper.core.dsl.query.Row
 import org.komapper.core.dsl.runner.QueryRunner
 import org.komapper.core.dsl.visitor.QueryVisitor
-import org.komapper.jdbc.dsl.query.MetadataQueryImpl
 import org.komapper.jdbc.dsl.runner.JdbcEntityDeleteBatchQueryRunner
 import org.komapper.jdbc.dsl.runner.JdbcEntityDeleteSingleQueryRunner
 import org.komapper.jdbc.dsl.runner.JdbcEntityInsertBatchQueryRunner
@@ -62,7 +61,6 @@ import org.komapper.jdbc.dsl.runner.JdbcSqlSetOperationQueryRunner
 import org.komapper.jdbc.dsl.runner.JdbcSqlUpdateQueryRunner
 import org.komapper.jdbc.dsl.runner.JdbcTemplateExecuteQueryRunner
 import org.komapper.jdbc.dsl.runner.JdbcTemplateSelectQueryRunner
-import org.komapper.jdbc.dsl.runner.MetadataQueryRunner
 import org.komapper.jdbc.dsl.runner.ResultSetTransformers
 
 internal class JdbcQueryVisitor : QueryVisitor {
@@ -411,9 +409,5 @@ internal class JdbcQueryVisitor : QueryVisitor {
         collect: suspend (Flow<T>) -> R
     ): QueryRunner {
         return JdbcTemplateSelectQueryRunner(sql, params, transform, options, collect)
-    }
-
-    fun visit(query: MetadataQueryImpl): QueryRunner {
-        return MetadataQueryRunner(query.catalog, query.schemaName, query.tableNamePattern, query.tableTypes)
     }
 }

@@ -1,8 +1,10 @@
 package org.komapper.jdbc
 
+import org.komapper.core.Table
 import org.komapper.core.ThreadSafe
 import org.komapper.core.dsl.query.Query
 import org.komapper.core.dsl.query.QueryScope
+import org.komapper.jdbc.dsl.query.MetadataQuery
 import org.komapper.jdbc.dsl.runner.JdbcQueryRunner
 import org.komapper.jdbc.dsl.visitor.JdbcQueryVisitor
 import javax.sql.DataSource
@@ -55,6 +57,11 @@ interface JdbcDatabase {
         val query = block(QueryScope)
         val runner = query.accept(JdbcQueryVisitor()) as JdbcQueryRunner<T>
         return runner.run(config)
+    }
+
+    fun runMetadataQuery(block: QueryScope.() -> MetadataQuery): List<Table> {
+        val query = block(QueryScope)
+        return query.run(config)
     }
 }
 
