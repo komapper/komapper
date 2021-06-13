@@ -9,7 +9,7 @@ import org.komapper.core.dsl.options.SqlInsertOptions
 
 class SqlInsertQueryRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: SqlInsertContext<ENTITY, ID, META>,
-    private val options: SqlInsertOptions = SqlInsertOptions.default
+    @Suppress("unused") private val options: SqlInsertOptions = SqlInsertOptions.default
 ) : QueryRunner {
 
     override fun dryRun(config: DatabaseConfig): Statement {

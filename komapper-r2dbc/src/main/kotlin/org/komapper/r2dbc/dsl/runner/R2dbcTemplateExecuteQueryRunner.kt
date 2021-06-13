@@ -8,9 +8,9 @@ import org.komapper.r2dbc.R2dbcDatabaseConfig
 import org.komapper.r2dbc.R2dbcExecutor
 
 internal class R2dbcTemplateExecuteQueryRunner(
-    private val sql: String,
-    private val params: Any = object {},
-    private val options: TemplateExecuteOptions = TemplateExecuteOptions.default
+    sql: String,
+    params: Any,
+    private val options: TemplateExecuteOptions
 ) : R2dbcQueryRunner<Int> {
 
     private val runner = TemplateExecuteQueryRunner(sql, params, options)

@@ -8,7 +8,7 @@ import org.komapper.core.dsl.options.SqlSelectOptions
 
 class SqlSelectQueryRunner(
     private val context: SqlSelectContext<*, *, *>,
-    private val options: SqlSelectOptions,
+    @Suppress("unused") private val options: SqlSelectOptions,
 ) :
     QueryRunner {
 

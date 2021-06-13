@@ -5,7 +5,7 @@ import org.komapper.core.Statement
 import org.komapper.core.dsl.options.SchemaDropAllOptions
 
 class SchemaDropAllQueryRunner(
-    private val options: SchemaDropAllOptions
+    @Suppress("unused") private val options: SchemaDropAllOptions
 ) : QueryRunner {
 
     override fun dryRun(config: DatabaseConfig): Statement {

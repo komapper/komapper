@@ -9,7 +9,7 @@ import org.komapper.r2dbc.R2dbcDatabaseConfig
 import org.komapper.r2dbc.R2dbcExecutor
 
 internal class R2dbcSchemaCreateQueryRunner(
-    private val entityMetamodels: List<EntityMetamodel<*, *, *>>,
+    entityMetamodels: List<EntityMetamodel<*, *, *>>,
     private val options: SchemaCreateOptions
 ) : R2dbcQueryRunner<Unit> {
 

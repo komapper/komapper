@@ -7,7 +7,7 @@ import org.komapper.r2dbc.R2dbcDatabaseConfig
 import org.komapper.r2dbc.R2dbcExecutor
 
 internal class R2dbcEntityUpsertQueryRunnerSupport<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
-    private val context: EntityUpsertContext<ENTITY, ID, META>,
+    context: EntityUpsertContext<ENTITY, ID, META>,
     private val options: InsertOptions
 ) {
 

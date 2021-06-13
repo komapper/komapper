@@ -9,7 +9,7 @@ import org.komapper.core.dsl.options.SqlUpdateOptions
 
 class SqlUpdateQueryRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: SqlUpdateContext<ENTITY, ID, META>,
-    private val options: SqlUpdateOptions
+    @Suppress("unused") private val options: SqlUpdateOptions
 ) : QueryRunner {
 
     override fun dryRun(config: DatabaseConfig): Statement {

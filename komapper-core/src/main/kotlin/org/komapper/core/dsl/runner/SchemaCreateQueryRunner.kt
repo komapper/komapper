@@ -7,7 +7,7 @@ import org.komapper.core.dsl.options.SchemaCreateOptions
 
 class SchemaCreateQueryRunner(
     private val entityMetamodels: List<EntityMetamodel<*, *, *>>,
-    private val options: SchemaCreateOptions
+    @Suppress("unused") private val options: SchemaCreateOptions
 ) : QueryRunner {
 
     override fun dryRun(config: DatabaseConfig): Statement {

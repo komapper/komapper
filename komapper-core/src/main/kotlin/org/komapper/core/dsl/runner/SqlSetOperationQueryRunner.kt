@@ -9,7 +9,7 @@ import org.komapper.core.dsl.options.SqlSetOperationOptions
 
 class SqlSetOperationQueryRunner(
     private val context: SqlSetOperationContext<*>,
-    private val options: SqlSetOperationOptions,
+    @Suppress("unused") private val options: SqlSetOperationOptions,
 ) : QueryRunner {
 
     override fun dryRun(config: DatabaseConfig): Statement {

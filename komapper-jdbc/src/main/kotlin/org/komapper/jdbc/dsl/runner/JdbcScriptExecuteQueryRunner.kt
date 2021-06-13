@@ -16,7 +16,7 @@ internal class JdbcScriptExecuteQueryRunner(
     private val runner = ScriptExecuteQueryRunner(sql, options)
 
     override fun run(config: JdbcDatabaseConfig) {
-        val statement = runner.buildStatement(config)
+        val statement = runner.buildStatement()
         val executor = JdbcExecutor(config, options)
         return executor.execute(statement)
     }

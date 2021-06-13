@@ -8,8 +8,8 @@ import org.komapper.jdbc.JdbcDatabaseConfig
 import org.komapper.jdbc.JdbcExecutor
 
 internal class JdbcTemplateExecuteQueryRunner(
-    private val sql: String,
-    private val params: Any = object {},
+    sql: String,
+    params: Any,
     private val options: TemplateExecuteOptions
 ) : JdbcQueryRunner<Int> {
 

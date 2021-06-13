@@ -9,7 +9,7 @@ import org.komapper.core.dsl.options.SqlDeleteOptions
 
 class SqlDeleteQueryRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: SqlDeleteContext<ENTITY, ID, META>,
-    private val options: SqlDeleteOptions
+    @Suppress("unused") private val options: SqlDeleteOptions
 ) : QueryRunner {
 
     override fun dryRun(config: DatabaseConfig): Statement {

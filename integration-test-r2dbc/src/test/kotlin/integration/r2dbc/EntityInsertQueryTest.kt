@@ -28,7 +28,7 @@ import java.time.ZoneId
 @ExtendWith(Env::class)
 class EntityInsertQueryTest(private val db: R2dbcDatabase) {
 
-    // TODO
+    // TODO: resolve the PostgreSQL driver issue
     @Run(onlyIf = [Dbms.POSTGRESQL])
     @Test
     fun testGeneratedValue() = inTransaction(db) {
