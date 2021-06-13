@@ -1,39 +1,34 @@
 package org.komapper.jdbc.dsl.runner
 
-import org.komapper.core.DatabaseConfig
 import org.komapper.core.Statement
 import org.komapper.core.dsl.context.EntityUpdateContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.EntityUpdateBatchOptions
-import org.komapper.core.dsl.runner.EntityUpdateBatchQueryRunner
-import org.komapper.jdbc.JdbcDatabaseConfig
+import org.komapper.jdbc.DatabaseConfig
 
-internal class JdbcEntityUpdateBatchQueryRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+internal class EntityUpdateBatchQueryRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     context: EntityUpdateContext<ENTITY, ID, META>,
     options: EntityUpdateBatchOptions,
     private val entities: List<ENTITY>
 ) :
     JdbcQueryRunner<List<ENTITY>> {
 
-    private val runner: EntityUpdateBatchQueryRunner<ENTITY, ID, META> =
-        EntityUpdateBatchQueryRunner(context, options, entities)
+    private val support: EntityUpdateQueryRunnerSupport<ENTITY, ID, META> =
+        EntityUpdateQueryRunnerSupport(context, options)
 
-    private val support: JdbcEntityUpdateQueryRunnerSupport<ENTITY, ID, META> =
-        JdbcEntityUpdateQueryRunnerSupport(context, options)
-
-    override fun run(config: JdbcDatabaseConfig): List<ENTITY> {
+    override fun run(config: DatabaseConfig): List<ENTITY> {
         if (entities.isEmpty()) return emptyList()
         val newEntities = preUpdate(config)
         val (counts) = update(config, newEntities)
         return postUpdate(newEntities, counts)
     }
 
-    private fun preUpdate(config: JdbcDatabaseConfig): List<ENTITY> {
+    private fun preUpdate(config: DatabaseConfig): List<ENTITY> {
         return entities.map { support.preUpdate(config, it) }
     }
 
-    private fun update(config: JdbcDatabaseConfig, entities: List<ENTITY>): Pair<IntArray, LongArray> {
-        val statements = entities.map { runner.buildStatement(config, it) }
+    private fun update(config: DatabaseConfig, entities: List<ENTITY>): Pair<IntArray, LongArray> {
+        val statements = entities.map { buildStatement(config, it) }
         return support.update(config) { it.executeBatch(statements) }
     }
 
@@ -49,7 +44,12 @@ internal class JdbcEntityUpdateBatchQueryRunner<ENTITY : Any, ID, META : EntityM
         }
     }
 
-    override fun dryRun(config: DatabaseConfig): Statement {
-        return runner.dryRun(config)
+    override fun dryRun(config: DatabaseConfig): String {
+        if (entities.isEmpty()) return ""
+        return buildStatement(config, entities.first()).toSql()
+    }
+
+    private fun buildStatement(config: DatabaseConfig, entity: ENTITY): Statement {
+        return support.buildStatement(config, entity)
     }
 }

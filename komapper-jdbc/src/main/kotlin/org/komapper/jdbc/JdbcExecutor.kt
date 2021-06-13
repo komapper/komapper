@@ -1,4 +1,4 @@
-package org.komapper.jdbc
+package org.komapper.jdbc.dsl.runner
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
@@ -7,13 +7,15 @@ import org.komapper.core.ExecutionOptionsProvider
 import org.komapper.core.LogCategory
 import org.komapper.core.Statement
 import org.komapper.core.UniqueConstraintException
+import org.komapper.jdbc.DatabaseConfig
+import org.komapper.jdbc.JdbcDialect
 import java.sql.Connection
 import java.sql.PreparedStatement
 import java.sql.ResultSet
 import java.sql.SQLException
 
 internal class JdbcExecutor(
-    private val config: JdbcDatabaseConfig,
+    private val config: DatabaseConfig,
     executionOptionProvider: ExecutionOptionsProvider,
     private val requiresGeneratedKeys: Boolean = false
 ) {

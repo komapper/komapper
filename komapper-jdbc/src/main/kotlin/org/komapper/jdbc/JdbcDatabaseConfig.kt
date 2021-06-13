@@ -1,7 +1,6 @@
 package org.komapper.jdbc
 
 import org.komapper.core.ClockProvider
-import org.komapper.core.DatabaseConfig
 import org.komapper.core.DefaultClockProvider
 import org.komapper.core.ExecutionOptions
 import org.komapper.core.Logger
@@ -28,28 +27,28 @@ import javax.sql.DataSource
  * @property session the session
  */
 @ThreadSafe
-interface JdbcDatabaseConfig : DatabaseConfig {
-    override val id: UUID
-    override val dialect: JdbcDialect
-    override val clockProvider: ClockProvider
-    override val executionOptions: ExecutionOptions
-    override val logger: Logger
-    val session: JdbcDatabaseSession
-    override val statementInspector: StatementInspector
-    val dataFactory: JdbcDataFactory
-    override val templateStatementBuilder: TemplateStatementBuilder
+interface DatabaseConfig {
+    val id: UUID
+    val dialect: JdbcDialect
+    val clockProvider: ClockProvider
+    val executionOptions: ExecutionOptions
+    val logger: Logger
+    val session: DatabaseSession
+    val statementInspector: StatementInspector
+    val dataFactory: DataFactory
+    val templateStatementBuilder: TemplateStatementBuilder
 }
 
-open class DefaultJdbcDatabaseConfig(
+open class DefaultDatabaseConfig(
     dataSource: DataSource,
     override val dialect: JdbcDialect
-) : JdbcDatabaseConfig {
+) : DatabaseConfig {
 
     constructor(
         url: String,
         user: String = "",
         password: String = "",
-        dataTypes: List<JdbcDataType<*>> = emptyList()
+        dataTypes: List<DataType<*>> = emptyList()
     ) : this(SimpleDataSource(url, user, password), JdbcDialect.load(url, dataTypes))
 
     constructor(
@@ -68,10 +67,10 @@ open class DefaultJdbcDatabaseConfig(
         factory?.create() ?: StdOutLogger()
     }
 
-    override val session: JdbcDatabaseSession by lazy {
+    override val session: DatabaseSession by lazy {
         val loader = ServiceLoader.load(DatabaseSessionFactory::class.java)
         val factory = loader.firstOrNull()
-        factory?.create(dataSource, logger) ?: DefaultJdbcDatabaseSession(dataSource)
+        factory?.create(dataSource, logger) ?: DefaultDatabaseSession(dataSource)
     }
 
     override val statementInspector: StatementInspector by lazy {
@@ -79,8 +78,8 @@ open class DefaultJdbcDatabaseConfig(
         loader.firstOrNull() ?: DefaultStatementInspector()
     }
 
-    override val dataFactory: JdbcDataFactory by lazy {
-        DefaultJdbcDataFactory(session)
+    override val dataFactory: DataFactory by lazy {
+        DefaultDataFactory(session)
     }
 
     override val templateStatementBuilder: TemplateStatementBuilder by lazy {
@@ -92,4 +91,24 @@ open class DefaultJdbcDatabaseConfig(
             )
         factory.create(dialect)
     }
+}
+
+object DryRunDatabaseConfig : DatabaseConfig {
+    override val id: UUID
+        get() = throw UnsupportedOperationException()
+    override val dialect: JdbcDialect = DryRunJdbcDialect
+    override val logger: Logger
+        get() = throw UnsupportedOperationException()
+    override val clockProvider: ClockProvider
+        get() = throw UnsupportedOperationException()
+    override val executionOptions: ExecutionOptions
+        get() = throw UnsupportedOperationException()
+    override val session: DatabaseSession
+        get() = throw UnsupportedOperationException()
+    override val statementInspector: StatementInspector
+        get() = throw UnsupportedOperationException()
+    override val dataFactory: DataFactory
+        get() = throw UnsupportedOperationException()
+    override val templateStatementBuilder: TemplateStatementBuilder
+        get() = throw UnsupportedOperationException()
 }

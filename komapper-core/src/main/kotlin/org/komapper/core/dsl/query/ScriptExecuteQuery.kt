@@ -14,7 +14,7 @@ internal data class ScriptExecuteQueryImpl(
 ) :
     ScriptExecuteQuery {
 
-    override fun options(configure: (ScriptExecuteOptions) -> ScriptExecuteOptions): ScriptExecuteQuery {
+    override fun options(configure: (ScriptExecuteOptions) -> ScriptExecuteOptions): ScriptExecuteQueryImpl {
         return copy(options = configure(options))
     }
 

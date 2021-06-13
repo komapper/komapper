@@ -22,18 +22,18 @@ internal data class EntityUpdateQueryBuilderImpl<ENTITY : Any, ID, META : Entity
 ) :
     EntityUpdateQueryBuilder<ENTITY> {
 
-    override fun options(configure: (EntityUpdateOptions) -> EntityUpdateOptions): EntityUpdateQueryBuilder<ENTITY> {
+    override fun options(configure: (EntityUpdateOptions) -> EntityUpdateOptions): EntityUpdateQueryBuilderImpl<ENTITY, ID, META> {
         return copy(options = configure(options))
     }
 
-    override fun include(vararg properties: PropertyMetamodel<ENTITY, *, *>): EntityUpdateQueryBuilder<ENTITY> {
+    override fun include(vararg properties: PropertyMetamodel<ENTITY, *, *>): EntityUpdateQueryBuilderImpl<ENTITY, ID, META> {
         val newContext = context.copy(includedProperties = properties.toList()).also {
             checkContext(it)
         }
         return copy(context = newContext)
     }
 
-    override fun exclude(vararg properties: PropertyMetamodel<ENTITY, *, *>): EntityUpdateQueryBuilder<ENTITY> {
+    override fun exclude(vararg properties: PropertyMetamodel<ENTITY, *, *>): EntityUpdateQueryBuilderImpl<ENTITY, ID, META> {
         val newContext = context.copy(excludedProperties = properties.toList()).also {
             checkContext(it)
         }

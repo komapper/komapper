@@ -100,7 +100,7 @@ internal data class SqlSelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<
     private val subquerySupport: FlowableSubquerySupport<ENTITY> =
         FlowableSubquerySupport(subqueryContext) { SqlSetOperationQueryImpl(it, metamodel = context.target) }
 
-    override fun distinct(): SqlSelectQuery<ENTITY> {
+    override fun distinct(): SqlSelectQueryImpl<ENTITY, ID, META> {
         val newContext = context.copy(distinct = true)
         return copy(context = newContext)
     }
@@ -108,7 +108,7 @@ internal data class SqlSelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<
     override fun <OTHER_ENTITY : Any, OTHER_META : EntityMetamodel<OTHER_ENTITY, *, OTHER_META>> innerJoin(
         metamodel: OTHER_META,
         on: OnDeclaration<OTHER_ENTITY>
-    ): SqlSelectQuery<ENTITY> {
+    ): SqlSelectQueryImpl<ENTITY, ID, META> {
         val newContext = support.innerJoin(metamodel, on)
         return copy(context = newContext)
     }
@@ -116,48 +116,48 @@ internal data class SqlSelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<
     override fun <OTHER_ENTITY : Any, OTHER_META : EntityMetamodel<OTHER_ENTITY, *, OTHER_META>> leftJoin(
         metamodel: OTHER_META,
         on: OnDeclaration<OTHER_ENTITY>
-    ): SqlSelectQuery<ENTITY> {
+    ): SqlSelectQueryImpl<ENTITY, ID, META> {
         val newContext = support.leftJoin(metamodel, on)
         return copy(context = newContext)
     }
 
-    override fun where(declaration: WhereDeclaration): SqlSelectQuery<ENTITY> {
+    override fun where(declaration: WhereDeclaration): SqlSelectQueryImpl<ENTITY, ID, META> {
         val newContext = support.where(declaration)
         return copy(context = newContext)
     }
 
-    override fun groupBy(vararg expressions: ColumnExpression<*, *>): SqlSelectQuery<ENTITY> {
+    override fun groupBy(vararg expressions: ColumnExpression<*, *>): SqlSelectQueryImpl<ENTITY, ID, META> {
         val newContext = context.copy(groupBy = context.groupBy + expressions)
         return copy(context = newContext)
     }
 
-    override fun having(declaration: HavingDeclaration): SqlSelectQuery<ENTITY> {
+    override fun having(declaration: HavingDeclaration): SqlSelectQueryImpl<ENTITY, ID, META> {
         val scope = HavingScope().apply(declaration)
         val newContext = context.copy(having = context.having + scope)
         return copy(context = newContext)
     }
 
-    override fun orderBy(vararg expressions: ColumnExpression<*, *>): SqlSelectQuery<ENTITY> {
+    override fun orderBy(vararg expressions: ColumnExpression<*, *>): SqlSelectQueryImpl<ENTITY, ID, META> {
         val newContext = support.orderBy(*expressions)
         return copy(context = newContext)
     }
 
-    override fun offset(offset: Int): SqlSelectQuery<ENTITY> {
+    override fun offset(offset: Int): SqlSelectQueryImpl<ENTITY, ID, META> {
         val newContext = support.offset(offset)
         return copy(context = newContext)
     }
 
-    override fun limit(limit: Int): SqlSelectQuery<ENTITY> {
+    override fun limit(limit: Int): SqlSelectQueryImpl<ENTITY, ID, META> {
         val newContext = support.limit(limit)
         return copy(context = newContext)
     }
 
-    override fun forUpdate(): SqlSelectQuery<ENTITY> {
+    override fun forUpdate(): SqlSelectQueryImpl<ENTITY, ID, META> {
         val newContext = support.forUpdate()
         return copy(context = newContext)
     }
 
-    override fun options(configure: (SqlSelectOptions) -> SqlSelectOptions): SqlSelectQuery<ENTITY> {
+    override fun options(configure: (SqlSelectOptions) -> SqlSelectOptions): SqlSelectQueryImpl<ENTITY, ID, META> {
         return copy(options = configure(options))
     }
 

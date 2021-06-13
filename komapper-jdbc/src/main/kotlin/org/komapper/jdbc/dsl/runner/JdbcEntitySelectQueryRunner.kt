@@ -5,33 +5,27 @@ import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
-import org.komapper.core.DatabaseConfig
 import org.komapper.core.Statement
+import org.komapper.core.dsl.builder.EntitySelectStatementBuilder
 import org.komapper.core.dsl.context.EntitySelectContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.EntitySelectOptions
-import org.komapper.core.dsl.runner.EntityKey
-import org.komapper.core.dsl.runner.EntitySelectQueryRunner
-import org.komapper.jdbc.JdbcDatabaseConfig
+import org.komapper.jdbc.DatabaseConfig
 import org.komapper.jdbc.JdbcDialect
-import org.komapper.jdbc.JdbcExecutor
 import java.sql.ResultSet
 import kotlin.reflect.cast
 
-internal class JdbcEntitySelectQueryRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>, R>(
+internal class EntitySelectQueryRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>, R>(
     private val context: EntitySelectContext<ENTITY, ID, META>,
     private val options: EntitySelectOptions,
     private val transform: suspend (Flow<ENTITY>) -> R
 ) : JdbcQueryRunner<R> {
 
-    private val runner: EntitySelectQueryRunner<ENTITY, ID, META> =
-        EntitySelectQueryRunner(context, options)
-
-    override fun run(config: JdbcDatabaseConfig): R {
+    override fun run(config: DatabaseConfig): R {
         if (!options.allowEmptyWhereClause && context.where.isEmpty()) {
             error("Empty where clause is not allowed.")
         }
-        val statement = runner.buildStatement(config)
+        val statement = buildStatement(config)
         val executor = JdbcExecutor(config, options)
         return executor.executeQuery(statement) { rs ->
             // hold only unique entities
@@ -57,8 +51,13 @@ internal class JdbcEntitySelectQueryRunner<ENTITY : Any, ID, META : EntityMetamo
         }
     }
 
-    override fun dryRun(config: DatabaseConfig): Statement {
-        return runner.dryRun(config)
+    override fun dryRun(config: DatabaseConfig): String {
+        return buildStatement(config).toSql()
+    }
+
+    private fun buildStatement(config: DatabaseConfig): Statement {
+        val builder = EntitySelectStatementBuilder(config.dialect, context)
+        return builder.build()
     }
 
     private fun fetchAllEntities(dialect: JdbcDialect, rs: ResultSet): List<Map<EntityKey, Any>> {
@@ -97,3 +96,8 @@ internal class JdbcEntitySelectQueryRunner<ENTITY : Any, ID, META : EntityMetamo
         }
     }
 }
+
+private data class EntityKey(
+    val entityMetamodel: EntityMetamodel<*, *, *>,
+    val id: Any
+)

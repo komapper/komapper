@@ -1,13 +1,14 @@
 package org.komapper.r2dbc.dsl.runner
 
+import org.komapper.core.Statement
+import org.komapper.core.dsl.builder.EntityUpdateStatementBuilder
 import org.komapper.core.dsl.context.EntityUpdateContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.VersionOptions
 import org.komapper.core.dsl.query.checkOptimisticLock
 import org.komapper.r2dbc.R2dbcDatabaseConfig
-import org.komapper.r2dbc.R2dbcExecutor
 
-internal class R2dbcEntityUpdateQueryRunnerSupport<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+internal class EntityUpdateQueryRunnerSupport<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityUpdateContext<ENTITY, ID, META>,
     private val options: VersionOptions
 ) {
@@ -31,5 +32,10 @@ internal class R2dbcEntityUpdateQueryRunnerSupport<ENTITY : Any, ID, META : Enti
         } else {
             entity
         }
+    }
+
+    fun buildStatement(config: R2dbcDatabaseConfig, entity: ENTITY): Statement {
+        val builder = EntityUpdateStatementBuilder(config.dialect, context, options, entity)
+        return builder.build()
     }
 }

@@ -2,7 +2,6 @@ package org.komapper.r2dbc
 
 import io.r2dbc.spi.ConnectionFactory
 import org.komapper.core.ClockProvider
-import org.komapper.core.DatabaseConfig
 import org.komapper.core.DefaultClockProvider
 import org.komapper.core.ExecutionOptions
 import org.komapper.core.Logger
@@ -17,18 +16,18 @@ import java.util.ServiceLoader
 import java.util.UUID
 
 @ThreadSafe
-interface R2dbcDatabaseConfig : DatabaseConfig {
-    override val id: UUID
-    override val dialect: R2dbcDialect
-    override val clockProvider: ClockProvider
-    override val executionOptions: ExecutionOptions
-    override val logger: Logger
+interface R2dbcDatabaseConfig {
+    val id: UUID
+    val dialect: R2dbcDialect
+    val clockProvider: ClockProvider
+    val executionOptions: ExecutionOptions
+    val logger: Logger
 
     val session: R2dbcDatabaseSession
-    override val statementInspector: StatementInspector
+    val statementInspector: StatementInspector
 
     // val dataFactory: DataFactory
-    override val templateStatementBuilder: TemplateStatementBuilder
+    val templateStatementBuilder: TemplateStatementBuilder
 }
 
 class DefaultR2dbcDatabaseConfig(
@@ -58,4 +57,22 @@ class DefaultR2dbcDatabaseConfig(
             )
         factory.create(dialect)
     }
+}
+
+object DryRunR2dbcDatabaseConfig : R2dbcDatabaseConfig {
+    override val id: UUID
+        get() = throw UnsupportedOperationException()
+    override val dialect: R2dbcDialect = DryRunR2dbcDialect
+    override val logger: Logger
+        get() = throw UnsupportedOperationException()
+    override val clockProvider: ClockProvider
+        get() = throw UnsupportedOperationException()
+    override val executionOptions: ExecutionOptions
+        get() = throw UnsupportedOperationException()
+    override val session: R2dbcDatabaseSession
+        get() = throw UnsupportedOperationException()
+    override val statementInspector: StatementInspector
+        get() = throw UnsupportedOperationException()
+    override val templateStatementBuilder: TemplateStatementBuilder
+        get() = throw UnsupportedOperationException()
 }

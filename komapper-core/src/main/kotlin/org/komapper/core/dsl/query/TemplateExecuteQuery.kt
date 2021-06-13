@@ -15,7 +15,7 @@ internal data class TemplateExecuteQueryImpl(
     private val option: TemplateExecuteOptions = TemplateExecuteOptions.default
 ) : TemplateExecuteQuery {
 
-    override fun options(configure: (TemplateExecuteOptions) -> TemplateExecuteOptions): TemplateExecuteQuery {
+    override fun options(configure: (TemplateExecuteOptions) -> TemplateExecuteOptions): TemplateExecuteQueryImpl {
         return copy(option = configure(option))
     }
 

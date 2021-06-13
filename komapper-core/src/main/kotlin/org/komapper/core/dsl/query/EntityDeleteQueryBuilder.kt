@@ -19,7 +19,7 @@ internal data class EntityDeleteQueryBuilderImpl<ENTITY : Any, ID, META : Entity
 ) :
     EntityDeleteQueryBuilder<ENTITY> {
 
-    override fun options(configure: (EntityDeleteOptions) -> EntityDeleteOptions): EntityDeleteQueryBuilder<ENTITY> {
+    override fun options(configure: (EntityDeleteOptions) -> EntityDeleteOptions): EntityDeleteQueryBuilderImpl<ENTITY, ID, META> {
         return copy(options = configure(options))
     }
 

@@ -20,7 +20,7 @@ internal data class SqlInsertQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<
     private val options: SqlInsertOptions = SqlInsertOptions.default
 ) : SqlInsertQuery<ENTITY> {
 
-    override fun values(declaration: ValuesDeclaration<ENTITY>): SqlInsertQuery<ENTITY> {
+    override fun values(declaration: ValuesDeclaration<ENTITY>): SqlInsertQueryImpl<ENTITY, ID, META> {
         val scope = ValuesScope<ENTITY>().apply(declaration)
         val values = when (val values = context.values) {
             is Values.Pairs -> Values.Pairs(values.pairs + scope)
@@ -37,7 +37,7 @@ internal data class SqlInsertQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<
         return copy(context = newContext)
     }
 
-    override fun options(configure: (SqlInsertOptions) -> SqlInsertOptions): SqlInsertQuery<ENTITY> {
+    override fun options(configure: (SqlInsertOptions) -> SqlInsertOptions): SqlInsertQueryImpl<ENTITY, ID, META> {
         return copy(options = configure(options))
     }
 

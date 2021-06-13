@@ -21,19 +21,19 @@ internal data class SqlUpdateQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<
     private val options: SqlUpdateOptions = SqlUpdateOptions.default
 ) : SqlUpdateQuery<ENTITY> {
 
-    override fun set(declaration: SetDeclaration<ENTITY>): SqlUpdateQuery<ENTITY> {
+    override fun set(declaration: SetDeclaration<ENTITY>): SqlUpdateQueryImpl<ENTITY, ID, META> {
         val scope = SetScope<ENTITY>().apply(declaration)
         val newContext = context.copy(set = context.set + scope)
         return copy(context = newContext)
     }
 
-    override fun where(declaration: WhereDeclaration): SqlUpdateQuery<ENTITY> {
+    override fun where(declaration: WhereDeclaration): SqlUpdateQueryImpl<ENTITY, ID, META> {
         val scope = WhereScope().apply(declaration)
         val newContext = context.copy(where = context.where + scope)
         return copy(context = newContext)
     }
 
-    override fun options(configure: (SqlUpdateOptions) -> SqlUpdateOptions): SqlUpdateQuery<ENTITY> {
+    override fun options(configure: (SqlUpdateOptions) -> SqlUpdateOptions): SqlUpdateQueryImpl<ENTITY, ID, META> {
         return copy(options = configure(options))
     }
 

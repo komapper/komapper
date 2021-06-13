@@ -5,31 +5,25 @@ import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
-import org.komapper.core.DatabaseConfig
 import org.komapper.core.Statement
+import org.komapper.core.dsl.builder.EntitySelectStatementBuilder
 import org.komapper.core.dsl.context.EntitySelectContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.EntitySelectOptions
-import org.komapper.core.dsl.runner.EntityKey
-import org.komapper.core.dsl.runner.EntitySelectQueryRunner
 import org.komapper.r2dbc.R2dbcDatabaseConfig
-import org.komapper.r2dbc.R2dbcExecutor
 import kotlin.reflect.cast
 
-internal class R2dbcEntitySelectQueryRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>, R>(
+internal class EntitySelectQueryRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>, R>(
     private val context: EntitySelectContext<ENTITY, ID, META>,
     private val options: EntitySelectOptions,
     private val collect: suspend (Flow<ENTITY>) -> R
 ) : R2dbcQueryRunner<R> {
 
-    private val runner: EntitySelectQueryRunner<ENTITY, ID, META> =
-        EntitySelectQueryRunner(context, options)
-
     override suspend fun run(config: R2dbcDatabaseConfig): R {
         if (!options.allowEmptyWhereClause && context.where.isEmpty()) {
             error("Empty where clause is not allowed.")
         }
-        val statement = runner.buildStatement(config)
+        val statement = buildStatement(config)
         val executor = R2dbcExecutor(config, options)
         val rows: Flow<Map<EntityKey, Any>> = executor.executeQuery(statement) { dialect, r2dbcRow ->
             val row = mutableMapOf<EntityKey, Any>()
@@ -62,8 +56,13 @@ internal class R2dbcEntitySelectQueryRunner<ENTITY : Any, ID, META : EntityMetam
         }
     }
 
-    override fun dryRun(config: DatabaseConfig): Statement {
-        return runner.dryRun(config)
+    override fun dryRun(config: R2dbcDatabaseConfig): String {
+        return buildStatement(config).toSql()
+    }
+
+    private fun buildStatement(config: R2dbcDatabaseConfig): Statement {
+        val builder = EntitySelectStatementBuilder(config.dialect, context)
+        return builder.build()
     }
 
     private fun associate(
@@ -83,3 +82,8 @@ internal class R2dbcEntitySelectQueryRunner<ENTITY : Any, ID, META : EntityMetam
         }
     }
 }
+
+private data class EntityKey(
+    val entityMetamodel: EntityMetamodel<*, *, *>,
+    val id: Any
+)
