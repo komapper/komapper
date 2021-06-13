@@ -10,11 +10,9 @@ data class ScriptExecuteQueryRunner(
 ) :
     QueryRunner {
 
-    override fun dryRun(config: DatabaseConfig): Statement {
-        return buildStatement()
-    }
+    private val statement = Statement(sql)
 
-    fun buildStatement(): Statement {
-        return Statement(sql)
+    override fun dryRun(config: DatabaseConfig): Statement {
+        return statement
     }
 }

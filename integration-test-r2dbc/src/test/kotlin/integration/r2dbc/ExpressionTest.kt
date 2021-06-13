@@ -19,7 +19,6 @@ import org.komapper.core.dsl.rtrim
 import org.komapper.core.dsl.trim
 import org.komapper.core.dsl.upper
 import org.komapper.r2dbc.R2dbcDatabase
-import org.komapper.r2dbc.dsl.query.dryRun
 
 @ExtendWith(Env::class)
 class ExpressionTest(private val db: R2dbcDatabase) {

@@ -9,14 +9,14 @@ import org.komapper.core.dsl.options.SqlDeleteOptions
 
 class SqlDeleteQueryRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: SqlDeleteContext<ENTITY, ID, META>,
-    @Suppress("unused") private val options: SqlDeleteOptions
+    private val options: SqlDeleteOptions
 ) : QueryRunner {
 
     override fun dryRun(config: DatabaseConfig): Statement {
         return buildStatement(config)
     }
 
-    fun buildStatement(config: DatabaseConfig): Statement {
+    private fun buildStatement(config: DatabaseConfig): Statement {
         val builder = SqlDeleteStatementBuilder(config.dialect, context)
         return builder.build()
     }

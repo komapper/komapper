@@ -20,7 +20,7 @@ class EntityUpsertMultipleQueryRunner<ENTITY : Any, ID, META : EntityMetamodel<E
         return buildStatement(config, entities)
     }
 
-    fun buildStatement(config: DatabaseConfig, entities: List<ENTITY>): Statement {
+    private fun buildStatement(config: DatabaseConfig, entities: List<ENTITY>): Statement {
         return support.buildStatement(config, entities)
     }
 }

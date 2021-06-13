@@ -7,14 +7,14 @@ import org.komapper.core.dsl.options.SchemaDropOptions
 
 class SchemaDropQueryRunner(
     private val entityMetamodels: List<EntityMetamodel<*, *, *>> = emptyList(),
-    @Suppress("unused") private val options: SchemaDropOptions = SchemaDropOptions.default
+    private val options: SchemaDropOptions = SchemaDropOptions.default
 ) : QueryRunner {
 
     override fun dryRun(config: DatabaseConfig): Statement {
         return buildStatement(config)
     }
 
-    fun buildStatement(config: DatabaseConfig): Statement {
+    private fun buildStatement(config: DatabaseConfig): Statement {
         val builder = config.dialect.getSchemaStatementBuilder()
         return builder.drop(entityMetamodels)
     }

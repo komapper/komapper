@@ -9,14 +9,14 @@ import org.komapper.core.dsl.options.SqlInsertOptions
 
 class SqlInsertQueryRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: SqlInsertContext<ENTITY, ID, META>,
-    @Suppress("unused") private val options: SqlInsertOptions = SqlInsertOptions.default
+    private val options: SqlInsertOptions = SqlInsertOptions.default
 ) : QueryRunner {
 
     override fun dryRun(config: DatabaseConfig): Statement {
         return buildStatement(config)
     }
 
-    fun buildStatement(config: DatabaseConfig): Statement {
+    private fun buildStatement(config: DatabaseConfig): Statement {
         val builder = SqlInsertStatementBuilder(config.dialect, context)
         return builder.build()
     }

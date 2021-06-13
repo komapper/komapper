@@ -19,7 +19,7 @@ class EntityUpdateSingleQueryRunner<ENTITY : Any, ID, META : EntityMetamodel<ENT
         return buildStatement(config, entity)
     }
 
-    fun buildStatement(config: DatabaseConfig, entity: ENTITY): Statement {
+    private fun buildStatement(config: DatabaseConfig, entity: ENTITY): Statement {
         return support.buildStatement(config, entity)
     }
 }
