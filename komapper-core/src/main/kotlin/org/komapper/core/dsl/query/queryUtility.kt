@@ -1,8 +1,13 @@
 package org.komapper.core.dsl.query
 
+import org.komapper.core.DatabaseConfig
+import org.komapper.core.DryRunDatabaseConfig
+import org.komapper.core.DryRunResult
 import org.komapper.core.OptimisticLockException
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.VersionOptions
+import org.komapper.core.dsl.visitor.DefaultQueryVisitor
+import org.komapper.core.toDryRunResult
 
 internal fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>
 EntityMetamodel<ENTITY, ID, META>.checkIdValueNotNull(entity: ENTITY) {
@@ -34,5 +39,19 @@ fun checkOptimisticLock(
             }
             throw OptimisticLockException(message)
         }
+    }
+}
+
+fun Query<*>.dryRun(config: DatabaseConfig = DryRunDatabaseConfig): DryRunResult {
+    val runner = this.accept(DefaultQueryVisitor())
+    val statement = runner.dryRun(config)
+    val result = statement.toDryRunResult(config.dialect)
+    return if (config is DryRunDatabaseConfig) {
+        result.copy(
+            description = "This data was generated using DryRunDatabaseConfig. " +
+                "To get more correct information, specify the actual DatabaseConfig instance."
+        )
+    } else {
+        result
     }
 }

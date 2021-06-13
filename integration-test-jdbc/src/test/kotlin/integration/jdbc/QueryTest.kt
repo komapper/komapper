@@ -8,8 +8,8 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.EntityDsl
 import org.komapper.core.dsl.SqlDsl
+import org.komapper.core.dsl.query.dryRun
 import org.komapper.jdbc.JdbcDatabase
-import org.komapper.jdbc.dsl.query.dryRun
 
 @ExtendWith(Env::class)
 class QueryTest(private val db: JdbcDatabase) {

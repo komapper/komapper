@@ -13,8 +13,8 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.EntityDsl
+import org.komapper.core.dsl.query.dryRun
 import org.komapper.r2dbc.R2dbcDatabase
-import org.komapper.r2dbc.dsl.query.dryRun
 
 @ExtendWith(Env::class)
 class QuoteTest(val db: R2dbcDatabase) {
