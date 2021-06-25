@@ -10,7 +10,7 @@ class StatementBuffer {
     }
 
     fun append(statement: Statement): StatementBuffer {
-        fragments.addAll(statement.fragments)
+        fragments.addAll(statement.charSequences)
         args.addAll(statement.args)
         return this
     }
