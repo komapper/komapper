@@ -2,7 +2,7 @@ package org.komapper.codegen
 
 import org.komapper.core.SnakeToLowerCamelCase
 import org.komapper.core.SnakeToUpperCamelCase
-import org.komapper.core.Table
+import org.komapper.jdbc.dsl.query.MetadataQuery
 import java.io.PrintWriter
 import java.nio.file.Files
 import java.nio.file.Path
@@ -13,7 +13,7 @@ class CodeGenerator(
     private val packageName: String? = null,
     private val prefix: String = "",
     private val suffix: String = "",
-    private val tables: List<Table>
+    private val tables: List<MetadataQuery.Table>
 ) {
 
     fun generateEntities(

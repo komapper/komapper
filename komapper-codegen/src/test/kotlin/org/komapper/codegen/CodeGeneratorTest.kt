@@ -3,8 +3,7 @@ package org.komapper.codegen
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
-import org.komapper.core.Column
-import org.komapper.core.Table
+import org.komapper.jdbc.dsl.query.MetadataQuery
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.sql.Types
@@ -125,22 +124,38 @@ class CodeGeneratorTest {
         assertEquals(expected, file.readText())
     }
 
-    private fun createTables(): List<Table> {
+    private fun createTables(): List<MetadataQuery.Table> {
         return listOf(
-            Table(
+            MetadataQuery.Table(
                 name = "ADDRESS",
                 columns = listOf(
-                    Column(name = "ADDRESS_ID", dataType = Types.INTEGER, typeName = "integer", isPrimaryKey = true, isAutoIncrement = true),
-                    Column(name = "STREET", dataType = Types.VARCHAR, typeName = "varchar", nullable = true),
-                    Column(name = "VERSION", dataType = Types.INTEGER, typeName = "integer"),
+                    MetadataQuery.Column(
+                        name = "ADDRESS_ID",
+                        dataType = Types.INTEGER,
+                        typeName = "integer",
+                        isPrimaryKey = true,
+                        isAutoIncrement = true
+                    ),
+                    MetadataQuery.Column(
+                        name = "STREET",
+                        dataType = Types.VARCHAR,
+                        typeName = "varchar",
+                        nullable = true
+                    ),
+                    MetadataQuery.Column(name = "VERSION", dataType = Types.INTEGER, typeName = "integer"),
                 ),
             ),
-            Table(
+            MetadataQuery.Table(
                 name = "EMPLOYEE",
                 columns = listOf(
-                    Column(name = "EMPLOYEE_ID", dataType = Types.OTHER, typeName = "uuid", isPrimaryKey = true),
-                    Column(name = "NAME", dataType = Types.VARCHAR, typeName = "varchar"),
-                    Column(name = "VERSION", dataType = Types.INTEGER, typeName = "integer"),
+                    MetadataQuery.Column(
+                        name = "EMPLOYEE_ID",
+                        dataType = Types.OTHER,
+                        typeName = "uuid",
+                        isPrimaryKey = true
+                    ),
+                    MetadataQuery.Column(name = "NAME", dataType = Types.VARCHAR, typeName = "varchar"),
+                    MetadataQuery.Column(name = "VERSION", dataType = Types.INTEGER, typeName = "integer"),
                 ),
             )
         )
