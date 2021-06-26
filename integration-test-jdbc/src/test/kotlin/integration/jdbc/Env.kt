@@ -14,8 +14,8 @@ import org.junit.jupiter.api.extension.ParameterResolver
 import org.junit.platform.commons.support.AnnotationSupport.findAnnotation
 import org.komapper.core.dsl.ScriptDsl
 import org.komapper.jdbc.JdbcDatabase
-import org.komapper.tx.jdbc.transaction
 import org.komapper.tx.jdbc.transactionManager
+import org.komapper.tx.jdbc.withTransaction
 
 internal class Env :
     BeforeAllCallback,
@@ -38,7 +38,7 @@ internal class Env :
         if (!initialized) {
             initialized = true
             context?.root?.getStore(GLOBAL)?.put("drop all objects", this)
-            db.transaction {
+            db.withTransaction {
                 db.runQuery {
                     ScriptDsl.execute(setting.createSql).options {
                         it.copy(suppressLogging = true)
@@ -51,7 +51,7 @@ internal class Env :
     override fun beforeTestExecution(context: ExtensionContext?) {
         val resetSql = setting.resetSql
         if (resetSql != null) {
-            db.transaction {
+            db.withTransaction {
                 db.runQuery {
                     ScriptDsl.execute(resetSql).options {
                         it.copy(suppressLogging = true)
@@ -67,7 +67,7 @@ internal class Env :
     }
 
     override fun close() {
-        db.transaction {
+        db.withTransaction {
             db.runQuery {
                 ScriptDsl.execute(setting.dropSql).options {
                     it.copy(suppressLogging = true)

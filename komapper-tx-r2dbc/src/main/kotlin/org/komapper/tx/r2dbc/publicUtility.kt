@@ -4,9 +4,7 @@ import io.r2dbc.spi.IsolationLevel
 import org.komapper.r2dbc.R2dbcDatabase
 import org.komapper.r2dbc.R2dbcDatabaseSession
 
-private const val message = "R2dbcDatabaseConfig.session must be an instance of TransactionDatabaseSession"
-
-suspend fun <R> R2dbcDatabase.transaction(
+suspend fun <R> R2dbcDatabase.withTransaction(
     transactionAttribute: TransactionAttribute = TransactionAttribute.REQUIRED,
     isolationLevel: IsolationLevel? = null,
     block: suspend TransactionScope.() -> R
@@ -15,7 +13,7 @@ suspend fun <R> R2dbcDatabase.transaction(
     return if (session is TransactionDatabaseSession) {
         session.userTransaction.transaction(transactionAttribute, isolationLevel, block)
     } else {
-        error(message)
+        invalidSession(session)
     }
 }
 
@@ -24,6 +22,13 @@ val R2dbcDatabaseSession.transactionManager: TransactionManager
         return if (this is TransactionDatabaseSession) {
             this.transactionManager
         } else {
-            error(message)
+            invalidSession(this)
         }
     }
+
+private fun invalidSession(session: R2dbcDatabaseSession): Nothing {
+    error(
+        "DatabaseConfig.session must be an instance of ${TransactionDatabaseSession::class.qualifiedName}. " +
+            "But it is ${session::class.qualifiedName}"
+    )
+}

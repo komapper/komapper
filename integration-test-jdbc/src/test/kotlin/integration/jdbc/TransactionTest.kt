@@ -17,7 +17,7 @@ import org.komapper.jdbc.JdbcDatabase
 import org.komapper.jdbc.SimpleDataSource
 import org.komapper.tx.jdbc.IsolationLevel
 import org.komapper.tx.jdbc.TransactionAttribute
-import org.komapper.tx.jdbc.transaction
+import org.komapper.tx.jdbc.withTransaction
 
 class TransactionTest {
 
@@ -67,7 +67,7 @@ class TransactionTest {
     @Test
     fun select() {
         val a = Address.meta
-        val list = db.transaction {
+        val list = db.withTransaction {
             db.runQuery { EntityDsl.from(a) }
         }
         assertEquals(15, list.size)
@@ -78,11 +78,11 @@ class TransactionTest {
     fun commit() {
         val a = Address.meta
         val query = EntityDsl.from(a).where { a.addressId eq 15 }
-        db.transaction {
+        db.withTransaction {
             val address = db.runQuery { query.first() }
             db.runQuery { EntityDsl.delete(a).single(address) }
         }
-        db.transaction {
+        db.withTransaction {
             val address = db.runQuery { query.firstOrNull() }
             assertNull(address)
         }
@@ -93,14 +93,14 @@ class TransactionTest {
         val a = Address.meta
         val query = EntityDsl.from(a).where { a.addressId eq 15 }
         try {
-            db.transaction {
+            db.withTransaction {
                 val address = db.runQuery { query.first() }
                 db.runQuery { EntityDsl.delete(a).single(address) }
                 throw Exception()
             }
         } catch (ignored: Exception) {
         }
-        db.transaction {
+        db.withTransaction {
             val address = db.runQuery { query.first() }
             assertNotNull(address)
         }
@@ -110,14 +110,14 @@ class TransactionTest {
     fun setRollbackOnly() {
         val a = Address.meta
         val query = EntityDsl.from(a).where { a.addressId eq 15 }
-        db.transaction {
+        db.withTransaction {
             val address = db.runQuery { query.first() }
             db.runQuery { EntityDsl.delete(a).single(address) }
             assertFalse(isRollbackOnly())
             setRollbackOnly()
             assertTrue(isRollbackOnly())
         }
-        db.transaction {
+        db.withTransaction {
             val address = db.runQuery { query.first() }
             assertNotNull(address)
         }
@@ -127,11 +127,11 @@ class TransactionTest {
     fun isolationLevel() {
         val a = Address.meta
         val query = EntityDsl.from(a).where { a.addressId eq 15 }
-        db.transaction(isolationLevel = IsolationLevel.SERIALIZABLE) {
+        db.withTransaction(isolationLevel = IsolationLevel.SERIALIZABLE) {
             val address = db.runQuery { query.first() }
             db.runQuery { EntityDsl.delete(a).single(address) }
         }
-        db.transaction {
+        db.withTransaction {
             val address = db.runQuery { query.firstOrNull() }
             assertNull(address)
         }
@@ -141,7 +141,7 @@ class TransactionTest {
     fun required_required() {
         val a = Address.meta
         val query = EntityDsl.from(a).where { a.addressId eq 15 }
-        db.transaction {
+        db.withTransaction {
             val address = db.runQuery { query.first() }
             db.runQuery { EntityDsl.delete(a).single(address) }
             required {
@@ -149,7 +149,7 @@ class TransactionTest {
                 assertNull(address2)
             }
         }
-        db.transaction {
+        db.withTransaction {
             val address = db.runQuery { query.firstOrNull() }
             assertNull(address)
         }
@@ -159,13 +159,13 @@ class TransactionTest {
     fun requiresNew() {
         val a = Address.meta
         val query = EntityDsl.from(a).where { a.addressId eq 15 }
-        db.transaction(TransactionAttribute.REQUIRES_NEW) {
+        db.withTransaction(TransactionAttribute.REQUIRES_NEW) {
             val address = db.runQuery { query.first() }
             db.runQuery { EntityDsl.delete(a).single(address) }
             val address2 = db.runQuery { query.firstOrNull() }
             assertNull(address2)
         }
-        db.transaction {
+        db.withTransaction {
             val address = db.runQuery { query.firstOrNull() }
             assertNull(address)
         }
@@ -175,7 +175,7 @@ class TransactionTest {
     fun required_requiresNew() {
         val a = Address.meta
         val query = EntityDsl.from(a).where { a.addressId eq 15 }
-        db.transaction {
+        db.withTransaction {
             val address = db.runQuery { query.first() }
             db.runQuery { EntityDsl.delete(a).single(address) }
             requiresNew {
@@ -183,7 +183,7 @@ class TransactionTest {
                 assertNotNull(address2)
             }
         }
-        db.transaction {
+        db.withTransaction {
             val address = db.runQuery { query.firstOrNull() }
             assertNull(address)
         }

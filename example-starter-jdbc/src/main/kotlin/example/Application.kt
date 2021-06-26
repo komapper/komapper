@@ -10,7 +10,7 @@ import org.komapper.annotation.KmVersion
 import org.komapper.core.dsl.EntityDsl
 import org.komapper.core.dsl.SchemaDsl
 import org.komapper.jdbc.JdbcDatabase
-import org.komapper.tx.jdbc.transaction
+import org.komapper.tx.jdbc.withTransaction
 import java.time.LocalDateTime
 
 data class Address(
@@ -40,7 +40,7 @@ fun main() {
     val a = AddressDef.meta
 
     // execute simple CRUD operations as a transaction
-    db.transaction {
+    db.withTransaction {
         // create a schema
         db.runQuery {
             SchemaDsl.create(a)
