@@ -10,6 +10,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     steps:
       - uses: actions/checkout@v2
@@ -45,6 +46,7 @@ jobs:
 
   h2:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     needs: [ build ]
 
     steps:
@@ -84,6 +86,7 @@ jobs:
 
   mysql:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     needs: [ build ]
 
     services:
@@ -134,6 +137,7 @@ jobs:
 
   postgresql:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     needs: [ build ]
 
     services:
@@ -184,6 +188,7 @@ jobs:
   publish:
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     needs: [ build, h2, mysql, postgresql ]
 
     steps:
