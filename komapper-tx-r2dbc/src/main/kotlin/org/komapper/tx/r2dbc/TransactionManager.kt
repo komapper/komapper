@@ -21,7 +21,7 @@ interface TransactionManager {
     val isActive: Boolean
     val isRollbackOnly: Boolean
     fun setRollbackOnly()
-    fun createEmptyContext(): CoroutineContext
+    fun suspend(): CoroutineContext
     suspend fun begin(isolationLevel: IsolationLevel? = null): CoroutineContext
     suspend fun commit()
     suspend fun rollback()
@@ -67,7 +67,7 @@ internal class TransactionManagerImpl(
         }
     }
 
-    override fun createEmptyContext(): CoroutineContext {
+    override fun suspend(): CoroutineContext {
         return threadLocal.asContextElement(EmptyTransaction)
     }
 

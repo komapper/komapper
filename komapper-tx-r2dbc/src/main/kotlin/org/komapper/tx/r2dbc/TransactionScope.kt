@@ -31,7 +31,7 @@ internal class TransactionScopeImpl(
         block: suspend TransactionScope.() -> R
     ): R {
         return if (transactionManager.isActive) {
-            val context = transactionManager.createEmptyContext()
+            val context = transactionManager.suspend()
             withContext(context) {
                 executeInNewTransaction(isolationLevel, block)
             }
