@@ -12,7 +12,7 @@ import org.komapper.core.spi.DefaultStatementInspector
 import org.komapper.core.spi.LoggerFactory
 import org.komapper.core.spi.StatementInspector
 import org.komapper.core.spi.TemplateStatementBuilderFactory
-import org.komapper.jdbc.spi.DatabaseSessionFactory
+import org.komapper.jdbc.spi.JdbcDatabaseSessionFactory
 import java.util.ServiceLoader
 import java.util.UUID
 import javax.sql.DataSource
@@ -69,7 +69,7 @@ open class DefaultJdbcDatabaseConfig(
     }
 
     override val session: JdbcDatabaseSession by lazy {
-        val loader = ServiceLoader.load(DatabaseSessionFactory::class.java)
+        val loader = ServiceLoader.load(JdbcDatabaseSessionFactory::class.java)
         val factory = loader.firstOrNull()
         factory?.create(dataSource, logger) ?: DefaultJdbcDatabaseSession(dataSource)
     }

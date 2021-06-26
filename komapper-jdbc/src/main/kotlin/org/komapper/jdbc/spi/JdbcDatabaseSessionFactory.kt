@@ -6,6 +6,6 @@ import org.komapper.jdbc.JdbcDatabaseSession
 import javax.sql.DataSource
 
 @ThreadSafe
-interface DatabaseSessionFactory {
+interface JdbcDatabaseSessionFactory {
     fun create(dataSource: DataSource, logger: Logger): JdbcDatabaseSession
 }

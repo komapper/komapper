@@ -11,7 +11,7 @@ import org.komapper.annotation.KmVersion
 import org.komapper.core.dsl.EntityDsl
 import org.komapper.core.dsl.SchemaDsl
 import org.komapper.r2dbc.R2dbcDatabase
-import org.komapper.tx.r2dbc.transaction
+import org.komapper.tx.r2dbc.withTransaction
 import java.time.LocalDateTime
 
 data class Address(
@@ -41,7 +41,7 @@ fun main() = runBlocking {
     val a = AddressDef.meta
 
     // execute simple CRUD operations as a transaction
-    db.transaction {
+    db.withTransaction {
         // create a schema
         db.runQuery {
             SchemaDsl.create(a)

@@ -20,7 +20,7 @@ import org.junit.jupiter.api.extension.ParameterResolver
 import org.junit.platform.commons.support.AnnotationSupport.findAnnotation
 import org.komapper.core.dsl.ScriptDsl
 import org.komapper.r2dbc.R2dbcDatabase
-import org.komapper.tx.r2dbc.transaction
+import org.komapper.tx.r2dbc.withTransaction
 import java.util.concurrent.atomic.AtomicBoolean
 
 internal class Env :
@@ -44,7 +44,7 @@ internal class Env :
         beforeAllFlow = flow {
             if (!initialized.getAndSet(true)) {
                 context?.root?.getStore(GLOBAL)?.put("drop all objects", self)
-                db.transaction {
+                db.withTransaction {
                     db.runQuery {
                         ScriptDsl.execute(setting.createSql).options {
                             it.copy(suppressLogging = true)
@@ -60,7 +60,7 @@ internal class Env :
         val resetSql = setting.resetSql
         if (resetSql != null) {
             beforeTestExecutionFlow = flow {
-                db.transaction {
+                db.withTransaction {
                     db.runQuery {
                         ScriptDsl.execute(resetSql).options {
                             it.copy(suppressLogging = false)
@@ -82,7 +82,7 @@ internal class Env :
     }
 
     override fun close() = runBlocking {
-        db.transaction {
+        db.withTransaction {
             db.runQuery {
                 ScriptDsl.execute(setting.dropSql).options {
                     it.copy(suppressLogging = true)
