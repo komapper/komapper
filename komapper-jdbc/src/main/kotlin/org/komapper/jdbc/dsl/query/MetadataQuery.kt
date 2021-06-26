@@ -1,14 +1,44 @@
 package org.komapper.jdbc.dsl.query
 
-import org.komapper.core.Column
-import org.komapper.core.PrimaryKey
-import org.komapper.core.Table
+import org.komapper.core.ThreadSafe
 import org.komapper.jdbc.JdbcDatabaseConfig
 import org.komapper.jdbc.JdbcDialect
 import java.sql.DatabaseMetaData
 
 interface MetadataQuery {
     fun run(config: JdbcDatabaseConfig): List<Table>
+
+    @ThreadSafe
+    data class Column(
+        val name: String,
+        val dataType: Int,
+        val typeName: String,
+        val length: Int = 0,
+        val scale: Int = 0,
+        val nullable: Boolean = false,
+        val isPrimaryKey: Boolean = false,
+        val isAutoIncrement: Boolean = false,
+    )
+
+    @ThreadSafe
+    data class PrimaryKey(
+        val name: String,
+        val isAutoIncrement: Boolean = false
+    )
+
+    @ThreadSafe
+    data class Table(
+        val name: String,
+        val catalog: String? = null,
+        val schema: String? = null,
+        val columns: List<Column> = emptyList(),
+    ) {
+        fun getCanonicalTableName(enquote: (String) -> String): String {
+            return listOfNotNull(catalog, schema, name)
+                .filter { it.isNotBlank() }
+                .joinToString(".", transform = enquote)
+        }
+    }
 }
 
 internal class MetadataQueryImpl(
@@ -18,7 +48,7 @@ internal class MetadataQueryImpl(
     private val tableTypes: List<String>
 ) : MetadataQuery {
 
-    override fun run(config: JdbcDatabaseConfig): List<Table> {
+    override fun run(config: JdbcDatabaseConfig): List<MetadataQuery.Table> {
         return config.session.connection.use { con ->
             val reader = MetadataReader(
                 config.dialect,
@@ -41,7 +71,7 @@ internal class MetadataReader(
     private val tableNamePattern: String?,
     private val tableTypes: List<String>
 ) {
-    fun read(): List<Table> {
+    fun read(): List<MetadataQuery.Table> {
         return getTables().map { table ->
             val primaryKeys = getPrimaryKeys(table)
             table.copy(
@@ -50,8 +80,8 @@ internal class MetadataReader(
         }
     }
 
-    private fun getTables(): List<Table> {
-        val tables: MutableList<Table> = mutableListOf()
+    private fun getTables(): List<MetadataQuery.Table> {
+        val tables: MutableList<MetadataQuery.Table> = mutableListOf()
         val rs = metaData.getTables(
             catalog,
             schemaPattern,
@@ -59,7 +89,7 @@ internal class MetadataReader(
             tableTypes.toTypedArray()
         )
         while (rs.next()) {
-            val table = Table(
+            val table = MetadataQuery.Table(
                 name = rs.getString("TABLE_NAME"),
                 catalog = rs.getString("TABLE_CAT"),
                 schema = rs.getString("TABLE_SCHEM")
@@ -69,8 +99,8 @@ internal class MetadataReader(
         return tables
     }
 
-    private fun getColumns(table: Table, primaryKeys: List<PrimaryKey>): List<Column> {
-        val columns: MutableList<Column> = mutableListOf()
+    private fun getColumns(table: MetadataQuery.Table, primaryKeys: List<MetadataQuery.PrimaryKey>): List<MetadataQuery.Column> {
+        val columns: MutableList<MetadataQuery.Column> = mutableListOf()
         val rs = metaData.getColumns(
             table.catalog, table.schema, table.name, null
         )
@@ -78,7 +108,7 @@ internal class MetadataReader(
         while (rs.next()) {
             val name = rs.getString("COLUMN_NAME")
             val primaryKey = pkMap[name]
-            val column = Column(
+            val column = MetadataQuery.Column(
                 name = name,
                 dataType = rs.getInt("DATA_TYPE"),
                 typeName = rs.getString("TYPE_NAME"),
@@ -93,7 +123,7 @@ internal class MetadataReader(
         return columns
     }
 
-    private fun getPrimaryKeys(table: Table): List<PrimaryKey> {
+    private fun getPrimaryKeys(table: MetadataQuery.Table): List<MetadataQuery.PrimaryKey> {
         val keys = mutableListOf<String>()
         val rs = metaData.getPrimaryKeys(
             table.catalog, table.schema, table.name
@@ -104,13 +134,13 @@ internal class MetadataReader(
         return if (keys.size == 1) {
             val key = keys.first()
             val isAutoIncrement = isAutoIncrement(table, key)
-            listOf(PrimaryKey(key, isAutoIncrement))
+            listOf(MetadataQuery.PrimaryKey(key, isAutoIncrement))
         } else {
-            keys.map { PrimaryKey(it) }
+            keys.map { MetadataQuery.PrimaryKey(it) }
         }
     }
 
-    private fun isAutoIncrement(table: Table, key: String): Boolean {
+    private fun isAutoIncrement(table: MetadataQuery.Table, key: String): Boolean {
         return metaData.connection.createStatement().use {
             val columnName = dialect.enquote(key)
             val tableName = table.getCanonicalTableName(dialect::enquote)

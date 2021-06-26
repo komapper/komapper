@@ -1,6 +1,5 @@
 package org.komapper.jdbc
 
-import org.komapper.core.Table
 import org.komapper.core.ThreadSafe
 import org.komapper.core.dsl.query.Query
 import org.komapper.core.dsl.query.QueryScope
@@ -59,7 +58,7 @@ interface JdbcDatabase {
         return runner.run(config)
     }
 
-    fun runMetadataQuery(block: QueryScope.() -> MetadataQuery): List<Table> {
+    fun runMetadataQuery(block: QueryScope.() -> MetadataQuery): List<MetadataQuery.Table> {
         val query = block(QueryScope)
         return query.run(config)
     }

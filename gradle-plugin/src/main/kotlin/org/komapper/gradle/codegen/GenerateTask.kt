@@ -3,9 +3,9 @@ package org.komapper.gradle.codegen
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
 import org.komapper.codegen.CodeGenerator
-import org.komapper.core.Table
 import org.komapper.jdbc.JdbcDatabase
 import org.komapper.jdbc.dsl.MetadataDsl
+import org.komapper.jdbc.dsl.query.MetadataQuery
 import javax.inject.Inject
 
 open class GenerateTask @Inject internal constructor(private val settings: Generator) : DefaultTask() {
@@ -17,7 +17,7 @@ open class GenerateTask @Inject internal constructor(private val settings: Gener
         generate(tables)
     }
 
-    private fun read(database: JdbcDatabase): List<Table> {
+    private fun read(database: JdbcDatabase): List<MetadataQuery.Table> {
         return database.runMetadataQuery {
             MetadataDsl.tables(
                 catalog = settings.catalog.orNull,
@@ -28,7 +28,7 @@ open class GenerateTask @Inject internal constructor(private val settings: Gener
         }
     }
 
-    private fun generate(tables: List<Table>) {
+    private fun generate(tables: List<MetadataQuery.Table>) {
         val generator = CodeGenerator(
             destinationDir = settings.destinationDir.get().asFile.toPath(),
             packageName = settings.packageName.orNull,
