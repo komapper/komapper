@@ -37,7 +37,7 @@ class ApplicationTest {
                 .build().toUri(),
             HttpMethod.GET, HttpEntity.EMPTY,
             typedReference
-        ).body
+        ).body!!
         assertEquals(3, messages.size)
         assertEquals(
             listOf
