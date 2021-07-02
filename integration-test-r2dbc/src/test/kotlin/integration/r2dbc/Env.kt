@@ -7,7 +7,6 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.onCompletion
-import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.extension.AfterTestExecutionCallback
 import org.junit.jupiter.api.extension.BeforeAllCallback
 import org.junit.jupiter.api.extension.BeforeTestExecutionCallback
@@ -70,7 +69,7 @@ internal class Env :
             }
         }
 
-        runBlocking {
+        runBlockingWithTimeout {
             beforeAllFlow.onCompletion {
                 beforeTestExecutionFlow.collect()
             }.collect()
@@ -81,7 +80,7 @@ internal class Env :
 //        txManager.rollback()
     }
 
-    override fun close() = runBlocking {
+    override fun close() = runBlockingWithTimeout {
         db.withTransaction {
             db.runQuery {
                 ScriptDsl.execute(setting.dropSql).options {

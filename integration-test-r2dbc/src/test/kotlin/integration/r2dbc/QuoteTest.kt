@@ -7,7 +7,6 @@ import integration.Order
 import integration.SchemaOnly
 import integration.meta
 import integration.setting.Dbms
-import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
@@ -21,7 +20,7 @@ class QuoteTest(val db: R2dbcDatabase) {
 
     @Run(onlyIf = [Dbms.H2, Dbms.POSTGRESQL])
     @Test
-    fun catalogAndSchema() = runBlocking {
+    fun catalogAndSchema() = runBlockingWithTimeout {
         val m = CatalogAndSchema.meta
         val query = EntityDsl.from(m)
         val sql = query.dryRun().sql
@@ -31,7 +30,7 @@ class QuoteTest(val db: R2dbcDatabase) {
 
     @Run(onlyIf = [Dbms.H2, Dbms.POSTGRESQL])
     @Test
-    fun catalogOnly() = runBlocking {
+    fun catalogOnly() = runBlockingWithTimeout {
         val m = CatalogOnly.meta
         val query = EntityDsl.from(m)
         val sql = query.dryRun().sql
@@ -41,7 +40,7 @@ class QuoteTest(val db: R2dbcDatabase) {
 
     @Run(onlyIf = [Dbms.H2, Dbms.POSTGRESQL])
     @Test
-    fun schemaOnly() = runBlocking {
+    fun schemaOnly() = runBlockingWithTimeout {
         val m = SchemaOnly.meta
         val query = EntityDsl.from(m)
         val sql = query.dryRun().sql
@@ -51,7 +50,7 @@ class QuoteTest(val db: R2dbcDatabase) {
 
     @Run(onlyIf = [Dbms.H2, Dbms.POSTGRESQL])
     @Test
-    fun blankName() = runBlocking {
+    fun blankName() = runBlockingWithTimeout {
         val m = BlankName.meta
         val query = EntityDsl.from(m)
         val sql = query.dryRun().sql

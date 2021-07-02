@@ -7,7 +7,6 @@ import io.r2dbc.spi.IsolationLevel
 import kotlinx.coroutines.reactive.awaitFirstOrNull
 import kotlinx.coroutines.reactive.awaitLast
 import kotlinx.coroutines.reactive.awaitSingle
-import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
@@ -51,7 +50,7 @@ class TransactionTest {
             INSERT INTO ADDRESS VALUES(15,'STREET 15',1);
         """.trimIndent()
 
-        runBlocking {
+        runBlockingWithTimeout {
             val con = connectionFactory.create().awaitSingle()
             val batch = con.createBatch()
             for (each in sql.split(";")) {
@@ -65,7 +64,7 @@ class TransactionTest {
     @AfterEach
     fun after() {
         val sql = "DROP ALL OBJECTS"
-        runBlocking {
+        runBlockingWithTimeout {
             val con = connectionFactory.create().awaitSingle()
             val statement = con.createStatement(sql)
             val result = statement.execute().awaitSingle()
@@ -75,7 +74,7 @@ class TransactionTest {
     }
 
     @Test
-    fun select() = runBlocking {
+    fun select() = runBlockingWithTimeout {
         val a = Address.meta
         val list = db.withTransaction {
             db.runQuery { EntityDsl.from(a) }.toList()
@@ -85,7 +84,7 @@ class TransactionTest {
     }
 
     @Test
-    fun commit() = runBlocking {
+    fun commit() = runBlockingWithTimeout {
         val a = Address.meta
         val query = EntityDsl.from(a).where { a.addressId eq 15 }
         db.withTransaction {
@@ -99,7 +98,7 @@ class TransactionTest {
     }
 
     @Test
-    fun rollback() = runBlocking {
+    fun rollback() = runBlockingWithTimeout {
         val a = Address.meta
         val query = EntityDsl.from(a).where { a.addressId eq 15 }
         try {
@@ -117,7 +116,7 @@ class TransactionTest {
     }
 
     @Test
-    fun setRollbackOnly() = runBlocking {
+    fun setRollbackOnly() = runBlockingWithTimeout {
         val a = Address.meta
         val query = EntityDsl.from(a).where { a.addressId eq 15 }
         db.withTransaction {
@@ -134,7 +133,7 @@ class TransactionTest {
     }
 
     @Test
-    fun isolationLevel() = runBlocking {
+    fun isolationLevel() = runBlockingWithTimeout {
         val a = Address.meta
         val query = EntityDsl.from(a).where { a.addressId eq 15 }
         db.withTransaction(isolationLevel = IsolationLevel.SERIALIZABLE) {
@@ -148,7 +147,7 @@ class TransactionTest {
     }
 
     @Test
-    fun required_required() = runBlocking {
+    fun required_required() = runBlockingWithTimeout {
         val a = Address.meta
         val query = EntityDsl.from(a).where { a.addressId eq 15 }
         db.withTransaction {
@@ -166,7 +165,7 @@ class TransactionTest {
     }
 
     @Test
-    fun requiresNew() = runBlocking {
+    fun requiresNew() = runBlockingWithTimeout {
         val a = Address.meta
         val query = EntityDsl.from(a).where { a.addressId eq 15 }
         db.withTransaction(TransactionAttribute.REQUIRES_NEW) {
@@ -182,7 +181,7 @@ class TransactionTest {
     }
 
     @Test
-    fun required_requiresNew() = runBlocking {
+    fun required_requiresNew() = runBlockingWithTimeout {
         val a = Address.meta
         val query = EntityDsl.from(a).where { a.addressId eq 15 }
         db.withTransaction {
