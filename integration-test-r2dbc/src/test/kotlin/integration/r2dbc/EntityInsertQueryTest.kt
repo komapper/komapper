@@ -8,6 +8,7 @@ import integration.Person
 import integration.SequenceStrategy
 import integration.meta
 import integration.setting.Dbms
+import integration.setting.Run
 import kotlinx.coroutines.reactive.awaitSingle
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
