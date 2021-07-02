@@ -9,6 +9,7 @@ import integration.VSequenceStrategy
 import integration.Version
 import integration.meta
 import integration.setting.Dbms
+import integration.setting.Run
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull

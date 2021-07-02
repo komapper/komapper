@@ -5,6 +5,7 @@ import integration.Department
 import integration.Employee
 import integration.meta
 import integration.setting.Dbms
+import integration.setting.Run
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows

@@ -7,6 +7,7 @@ import integration.Order
 import integration.SchemaOnly
 import integration.meta
 import integration.setting.Dbms
+import integration.setting.Run
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test

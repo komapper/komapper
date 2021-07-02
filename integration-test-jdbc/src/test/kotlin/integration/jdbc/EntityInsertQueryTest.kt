@@ -8,6 +8,7 @@ import integration.Person
 import integration.SequenceStrategy
 import integration.meta
 import integration.setting.Dbms
+import integration.setting.Run
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test

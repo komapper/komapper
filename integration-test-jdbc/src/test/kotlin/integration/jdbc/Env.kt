@@ -1,7 +1,7 @@
 package integration.jdbc
 
 import integration.jdbc.setting.SettingProvider
-import integration.setting.Dbms
+import integration.setting.Run
 import org.junit.jupiter.api.extension.AfterTestExecutionCallback
 import org.junit.jupiter.api.extension.BeforeAllCallback
 import org.junit.jupiter.api.extension.BeforeTestExecutionCallback
@@ -89,7 +89,7 @@ internal class Env :
     override fun evaluateExecutionCondition(context: ExtensionContext): ConditionEvaluationResult? {
         return findAnnotation(context.element, Run::class.java)
             .map {
-                if (isRunnable(it)) {
+                if (Run.isRunnable(it, setting.dbms)) {
                     ConditionEvaluationResult.enabled("runnable: ${setting.dbms}")
                 } else {
                     ConditionEvaluationResult.disabled("not runnable: ${setting.dbms}")
@@ -98,21 +98,4 @@ internal class Env :
                 ConditionEvaluationResult.enabled("@Run is not present")
             }
     }
-
-    private fun isRunnable(run: Run): Boolean {
-        val dbms = setting.dbms
-        with(run) {
-            if (onlyIf.isNotEmpty()) {
-                return dbms in onlyIf
-            }
-            if (unless.isNotEmpty()) {
-                return dbms !in unless
-            }
-        }
-        return true
-    }
 }
-
-@Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)
-@Retention(AnnotationRetention.RUNTIME)
-annotation class Run(val onlyIf: Array<Dbms> = [], val unless: Array<Dbms> = [])
