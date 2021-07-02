@@ -33,7 +33,7 @@ internal class R2dbcEntitySelectQueryRunner<ENTITY : Any, ID, META : EntityMetam
         val executor = R2dbcExecutor(config, options)
         val rows: Flow<Map<EntityKey, Any>> = executor.executeQuery(statement) { dialect, r2dbcRow ->
             val row = mutableMapOf<EntityKey, Any>()
-            val mapper = EntityMapper(dialect, r2dbcRow)
+            val mapper = R2dbcEntityMapper(dialect, r2dbcRow)
             for (metamodel in context.projection.metamodels) {
                 val entity = mapper.execute(metamodel) ?: continue
                 @Suppress("UNCHECKED_CAST")

@@ -46,6 +46,7 @@ import org.komapper.r2dbc.dsl.runner.R2dbcEntityUpdateSingleQueryRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcEntityUpsertMultipleQueryRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcEntityUpsertSingleQueryRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcQueryRunner
+import org.komapper.r2dbc.dsl.runner.R2dbcRowTransformers
 import org.komapper.r2dbc.dsl.runner.R2dbcSchemaCreateQueryRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcSchemaDropAllQueryRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcSchemaDropQueryRunner
@@ -57,7 +58,6 @@ import org.komapper.r2dbc.dsl.runner.R2dbcSqlSetOperationQueryRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcSqlUpdateQueryRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcTemplateExecuteQueryRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcTemplateSelectQueryRunner
-import org.komapper.r2dbc.dsl.runner.ResultRowTransformers
 
 internal class R2dbcQueryVisitor : QueryVisitor {
 
@@ -210,7 +210,7 @@ internal class R2dbcQueryVisitor : QueryVisitor {
         options: SqlSelectOptions,
         collect: suspend (Flow<ENTITY>) -> R
     ): QueryRunner {
-        val transform = ResultRowTransformers.singleEntity(context.target)
+        val transform = R2dbcRowTransformers.singleEntity(context.target)
         return R2dbcSqlSelectQueryRunner(context, options, transform, collect)
     }
 
@@ -220,7 +220,7 @@ internal class R2dbcQueryVisitor : QueryVisitor {
         metamodel: EntityMetamodel<T, *, *>,
         collect: suspend (Flow<T>) -> R
     ): QueryRunner {
-        val provide = ResultRowTransformers.singleEntity(metamodel)
+        val provide = R2dbcRowTransformers.singleEntity(metamodel)
         return R2dbcSqlSetOperationQueryRunner(context, options, provide, collect)
     }
 
@@ -231,7 +231,7 @@ internal class R2dbcQueryVisitor : QueryVisitor {
         metamodels: Pair<A_META, B_META>,
         collect: suspend (Flow<Pair<A, B?>>) -> R
     ): QueryRunner {
-        val transform = ResultRowTransformers.pairEntities(metamodels)
+        val transform = R2dbcRowTransformers.pairEntities(metamodels)
         return R2dbcSqlSelectQueryRunner(context, options, transform, collect)
     }
 
@@ -242,7 +242,7 @@ internal class R2dbcQueryVisitor : QueryVisitor {
         metamodels: Pair<A_META, B_META>,
         collect: suspend (Flow<Pair<A, B?>>) -> R
     ): QueryRunner {
-        val transform = ResultRowTransformers.pairEntities(metamodels)
+        val transform = R2dbcRowTransformers.pairEntities(metamodels)
         return R2dbcSqlSetOperationQueryRunner(context, options, transform, collect)
     }
 
@@ -253,7 +253,7 @@ internal class R2dbcQueryVisitor : QueryVisitor {
         metamodels: Triple<A_META, B_META, C_META>,
         collect: suspend (Flow<Triple<A, B?, C?>>) -> R
     ): QueryRunner {
-        val transform = ResultRowTransformers.tripleEntities(metamodels)
+        val transform = R2dbcRowTransformers.tripleEntities(metamodels)
         return R2dbcSqlSelectQueryRunner(context, options, transform, collect)
     }
 
@@ -264,7 +264,7 @@ internal class R2dbcQueryVisitor : QueryVisitor {
         metamodels: Triple<A_META, B_META, C_META>,
         collect: suspend (Flow<Triple<A, B?, C?>>) -> R
     ): QueryRunner {
-        val transform = ResultRowTransformers.tripleEntities(metamodels)
+        val transform = R2dbcRowTransformers.tripleEntities(metamodels)
         return R2dbcSqlSetOperationQueryRunner(context, options, transform, collect)
     }
 
@@ -274,7 +274,7 @@ internal class R2dbcQueryVisitor : QueryVisitor {
         metamodels: List<EntityMetamodel<*, *, *>>,
         collect: suspend (Flow<Entities>) -> R
     ): QueryRunner {
-        val transform = ResultRowTransformers.multipleEntities(metamodels)
+        val transform = R2dbcRowTransformers.multipleEntities(metamodels)
         return R2dbcSqlSelectQueryRunner(context, options, transform, collect)
     }
 
@@ -284,7 +284,7 @@ internal class R2dbcQueryVisitor : QueryVisitor {
         metamodels: List<EntityMetamodel<*, *, *>>,
         collect: suspend (Flow<Entities>) -> R
     ): QueryRunner {
-        val transform = ResultRowTransformers.multipleEntities(metamodels)
+        val transform = R2dbcRowTransformers.multipleEntities(metamodels)
         return R2dbcSqlSetOperationQueryRunner(context, options, transform, collect)
     }
 
@@ -294,7 +294,7 @@ internal class R2dbcQueryVisitor : QueryVisitor {
         expression: ColumnExpression<A, *>,
         collect: suspend (Flow<A?>) -> R
     ): QueryRunner {
-        val transform = ResultRowTransformers.singleColumn(expression)
+        val transform = R2dbcRowTransformers.singleColumn(expression)
         return R2dbcSqlSelectQueryRunner(context, options, transform, collect)
     }
 
@@ -304,7 +304,7 @@ internal class R2dbcQueryVisitor : QueryVisitor {
         expression: ColumnExpression<A, *>,
         collect: suspend (Flow<A?>) -> R
     ): QueryRunner {
-        val transform = ResultRowTransformers.singleColumn(expression)
+        val transform = R2dbcRowTransformers.singleColumn(expression)
         return R2dbcSqlSetOperationQueryRunner(context, options, transform, collect)
     }
 
@@ -314,7 +314,7 @@ internal class R2dbcQueryVisitor : QueryVisitor {
         expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
         collect: suspend (Flow<Pair<A?, B?>>) -> R
     ): QueryRunner {
-        val transform = ResultRowTransformers.pairColumns(expressions)
+        val transform = R2dbcRowTransformers.pairColumns(expressions)
         return R2dbcSqlSelectQueryRunner(context, options, transform, collect)
     }
 
@@ -324,7 +324,7 @@ internal class R2dbcQueryVisitor : QueryVisitor {
         expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
         collect: suspend (Flow<Pair<A?, B?>>) -> R
     ): QueryRunner {
-        val transform = ResultRowTransformers.pairColumns(expressions)
+        val transform = R2dbcRowTransformers.pairColumns(expressions)
         return R2dbcSqlSetOperationQueryRunner(context, options, transform, collect)
     }
 
@@ -334,7 +334,7 @@ internal class R2dbcQueryVisitor : QueryVisitor {
         expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
         collect: suspend (Flow<Triple<A?, B?, C?>>) -> R
     ): QueryRunner {
-        val provide = ResultRowTransformers.tripleColumns(expressions)
+        val provide = R2dbcRowTransformers.tripleColumns(expressions)
         return R2dbcSqlSelectQueryRunner(context, options, provide, collect)
     }
 
@@ -344,7 +344,7 @@ internal class R2dbcQueryVisitor : QueryVisitor {
         expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
         collect: suspend (Flow<Triple<A?, B?, C?>>) -> R
     ): QueryRunner {
-        val transform = ResultRowTransformers.tripleColumns(expressions)
+        val transform = R2dbcRowTransformers.tripleColumns(expressions)
         return R2dbcSqlSetOperationQueryRunner(context, options, transform, collect)
     }
 
@@ -354,7 +354,7 @@ internal class R2dbcQueryVisitor : QueryVisitor {
         expressions: List<ColumnExpression<*, *>>,
         collect: suspend (Flow<Columns>) -> R
     ): QueryRunner {
-        val transform = ResultRowTransformers.multipleColumns(expressions)
+        val transform = R2dbcRowTransformers.multipleColumns(expressions)
         return R2dbcSqlSelectQueryRunner(context, options, transform, collect)
     }
 
@@ -364,7 +364,7 @@ internal class R2dbcQueryVisitor : QueryVisitor {
         expressions: List<ColumnExpression<*, *>>,
         collect: suspend (Flow<Columns>) -> R
     ): QueryRunner {
-        val transform = ResultRowTransformers.multipleColumns(expressions)
+        val transform = R2dbcRowTransformers.multipleColumns(expressions)
         return R2dbcSqlSetOperationQueryRunner(context, options, transform, collect)
     }
 
