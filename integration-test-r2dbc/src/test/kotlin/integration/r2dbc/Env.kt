@@ -2,11 +2,6 @@ package integration.r2dbc
 
 import integration.r2dbc.setting.SettingProvider
 import integration.setting.Dbms
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.onCompletion
 import org.junit.jupiter.api.extension.AfterTestExecutionCallback
 import org.junit.jupiter.api.extension.BeforeAllCallback
 import org.junit.jupiter.api.extension.BeforeTestExecutionCallback
@@ -20,7 +15,6 @@ import org.junit.platform.commons.support.AnnotationSupport.findAnnotation
 import org.komapper.core.dsl.ScriptDsl
 import org.komapper.r2dbc.R2dbcDatabase
 import org.komapper.tx.r2dbc.withTransaction
-import java.util.concurrent.atomic.AtomicBoolean
 
 internal class Env :
     BeforeAllCallback,
@@ -31,18 +25,19 @@ internal class Env :
     ExtensionContext.Store.CloseableResource {
 
     companion object {
-        val initialized: AtomicBoolean = AtomicBoolean(false)
+        @Volatile
+        var initialized: Boolean = false
     }
 
     private val setting = SettingProvider.get()
     private val db = R2dbcDatabase.create(setting.config)
-    private var beforeAllFlow: Flow<Unit> = emptyFlow()
 
     override fun beforeAll(context: ExtensionContext?) {
         val self = this
-        beforeAllFlow = flow {
-            if (!initialized.getAndSet(true)) {
-                context?.root?.getStore(GLOBAL)?.put("drop all objects", self)
+        if (!initialized) {
+            initialized = true
+            context?.root?.getStore(GLOBAL)?.put("drop all objects", self)
+            runBlockingWithTimeout {
                 db.withTransaction {
                     db.runQuery {
                         ScriptDsl.execute(setting.createSql).options {
@@ -55,10 +50,9 @@ internal class Env :
     }
 
     override fun beforeTestExecution(context: ExtensionContext?) {
-        var beforeTestExecutionFlow: Flow<Unit> = emptyFlow()
         val resetSql = setting.resetSql
         if (resetSql != null) {
-            beforeTestExecutionFlow = flow {
+            runBlockingWithTimeout {
                 db.withTransaction {
                     db.runQuery {
                         ScriptDsl.execute(resetSql).options {
@@ -68,16 +62,9 @@ internal class Env :
                 }
             }
         }
-
-        runBlockingWithTimeout {
-            beforeAllFlow.onCompletion {
-                beforeTestExecutionFlow.collect()
-            }.collect()
-        }
     }
 
     override fun afterTestExecution(context: ExtensionContext?) {
-//        txManager.rollback()
     }
 
     override fun close() = runBlockingWithTimeout {
