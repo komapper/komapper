@@ -66,7 +66,7 @@ internal class JdbcEntitySelectQueryRunner<ENTITY : Any, ID, META : EntityMetamo
         val rows = mutableListOf<Map<EntityKey, Any>>()
         while (rs.next()) {
             val row = mutableMapOf<EntityKey, Any>()
-            val mapper = EntityMapper(dialect, rs)
+            val mapper = JdbcEntityMapper(dialect, rs)
             for (metamodel in metamodels) {
                 val entity = mapper.execute(metamodel) ?: continue
                 @Suppress("UNCHECKED_CAST")

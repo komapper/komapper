@@ -10,9 +10,9 @@ import org.komapper.core.dsl.query.Columns
 import org.komapper.core.dsl.query.Entities
 import org.komapper.core.dsl.runner.FlowQueryRunner
 import org.komapper.core.dsl.visitor.FlowQueryVisitor
+import org.komapper.r2dbc.dsl.runner.R2dbcRowTransformers
 import org.komapper.r2dbc.dsl.runner.R2dbcSqlSelectFlowQueryRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcSqlSetOperationFlowQueryRunner
-import org.komapper.r2dbc.dsl.runner.ResultRowTransformers
 
 internal class R2dbcFlowQueryVisitor : FlowQueryVisitor {
 
@@ -20,7 +20,7 @@ internal class R2dbcFlowQueryVisitor : FlowQueryVisitor {
         context: SqlSelectContext<T, *, *>,
         options: SqlSelectOptions
     ): FlowQueryRunner {
-        val transform = ResultRowTransformers.singleEntity(context.target)
+        val transform = R2dbcRowTransformers.singleEntity(context.target)
         return R2dbcSqlSelectFlowQueryRunner(context, options, transform)
     }
 
@@ -29,7 +29,7 @@ internal class R2dbcFlowQueryVisitor : FlowQueryVisitor {
         options: SqlSetOperationOptions,
         metamodel: EntityMetamodel<T, *, *>
     ): FlowQueryRunner {
-        val transform = ResultRowTransformers.singleEntity(metamodel)
+        val transform = R2dbcRowTransformers.singleEntity(metamodel)
         return R2dbcSqlSetOperationFlowQueryRunner(context, options, transform)
     }
 
@@ -38,7 +38,7 @@ internal class R2dbcFlowQueryVisitor : FlowQueryVisitor {
         options: SqlSelectOptions,
         metamodels: Pair<A_META, B_META>
     ): FlowQueryRunner {
-        val transform = ResultRowTransformers.pairEntities(metamodels)
+        val transform = R2dbcRowTransformers.pairEntities(metamodels)
         return R2dbcSqlSelectFlowQueryRunner(context, options, transform)
     }
 
@@ -47,7 +47,7 @@ internal class R2dbcFlowQueryVisitor : FlowQueryVisitor {
         options: SqlSetOperationOptions,
         metamodels: Pair<A_META, B_META>
     ): FlowQueryRunner {
-        val transform = ResultRowTransformers.pairEntities(metamodels)
+        val transform = R2dbcRowTransformers.pairEntities(metamodels)
         return R2dbcSqlSetOperationFlowQueryRunner(context, options, transform)
     }
 
@@ -56,7 +56,7 @@ internal class R2dbcFlowQueryVisitor : FlowQueryVisitor {
         options: SqlSelectOptions,
         metamodels: Triple<A_META, B_META, C_META>
     ): FlowQueryRunner {
-        val transform = ResultRowTransformers.tripleEntities(metamodels)
+        val transform = R2dbcRowTransformers.tripleEntities(metamodels)
         return R2dbcSqlSelectFlowQueryRunner(context, options, transform)
     }
 
@@ -65,7 +65,7 @@ internal class R2dbcFlowQueryVisitor : FlowQueryVisitor {
         options: SqlSetOperationOptions,
         metamodels: Triple<A_META, B_META, C_META>
     ): FlowQueryRunner {
-        val transform = ResultRowTransformers.tripleEntities(metamodels)
+        val transform = R2dbcRowTransformers.tripleEntities(metamodels)
         return R2dbcSqlSetOperationFlowQueryRunner(context, options, transform)
     }
 
@@ -74,7 +74,7 @@ internal class R2dbcFlowQueryVisitor : FlowQueryVisitor {
         options: SqlSelectOptions,
         metamodels: List<EntityMetamodel<*, *, *>>
     ): FlowQueryRunner {
-        val transform = ResultRowTransformers.multipleEntities(metamodels)
+        val transform = R2dbcRowTransformers.multipleEntities(metamodels)
         return R2dbcSqlSelectFlowQueryRunner(context, options, transform)
     }
 
@@ -83,7 +83,7 @@ internal class R2dbcFlowQueryVisitor : FlowQueryVisitor {
         options: SqlSetOperationOptions,
         metamodels: List<EntityMetamodel<*, *, *>>
     ): FlowQueryRunner {
-        val transform = ResultRowTransformers.multipleEntities(metamodels)
+        val transform = R2dbcRowTransformers.multipleEntities(metamodels)
         return R2dbcSqlSetOperationFlowQueryRunner(context, options, transform)
     }
 
@@ -92,7 +92,7 @@ internal class R2dbcFlowQueryVisitor : FlowQueryVisitor {
         options: SqlSelectOptions,
         expression: ColumnExpression<A, *>
     ): FlowQueryRunner {
-        val transform = ResultRowTransformers.singleColumn(expression)
+        val transform = R2dbcRowTransformers.singleColumn(expression)
         return R2dbcSqlSelectFlowQueryRunner(context, options, transform)
     }
 
@@ -101,7 +101,7 @@ internal class R2dbcFlowQueryVisitor : FlowQueryVisitor {
         options: SqlSetOperationOptions,
         expression: ColumnExpression<A, *>
     ): FlowQueryRunner {
-        val transform = ResultRowTransformers.singleColumn(expression)
+        val transform = R2dbcRowTransformers.singleColumn(expression)
         return R2dbcSqlSetOperationFlowQueryRunner(context, options, transform)
     }
 
@@ -110,7 +110,7 @@ internal class R2dbcFlowQueryVisitor : FlowQueryVisitor {
         options: SqlSelectOptions,
         expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>
     ): FlowQueryRunner {
-        val transform = ResultRowTransformers.pairColumns(expressions)
+        val transform = R2dbcRowTransformers.pairColumns(expressions)
         return R2dbcSqlSelectFlowQueryRunner(context, options, transform)
     }
 
@@ -119,7 +119,7 @@ internal class R2dbcFlowQueryVisitor : FlowQueryVisitor {
         options: SqlSetOperationOptions,
         expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>
     ): FlowQueryRunner {
-        val transform = ResultRowTransformers.pairColumns(expressions)
+        val transform = R2dbcRowTransformers.pairColumns(expressions)
         return R2dbcSqlSetOperationFlowQueryRunner(context, options, transform)
     }
 
@@ -128,7 +128,7 @@ internal class R2dbcFlowQueryVisitor : FlowQueryVisitor {
         options: SqlSelectOptions,
         expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>
     ): FlowQueryRunner {
-        val transform = ResultRowTransformers.tripleColumns(expressions)
+        val transform = R2dbcRowTransformers.tripleColumns(expressions)
         return R2dbcSqlSelectFlowQueryRunner(context, options, transform)
     }
 
@@ -137,7 +137,7 @@ internal class R2dbcFlowQueryVisitor : FlowQueryVisitor {
         options: SqlSetOperationOptions,
         expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>
     ): FlowQueryRunner {
-        val transform = ResultRowTransformers.tripleColumns(expressions)
+        val transform = R2dbcRowTransformers.tripleColumns(expressions)
         return R2dbcSqlSetOperationFlowQueryRunner(context, options, transform)
     }
 
@@ -146,7 +146,7 @@ internal class R2dbcFlowQueryVisitor : FlowQueryVisitor {
         options: SqlSelectOptions,
         expressions: List<ColumnExpression<*, *>>
     ): FlowQueryRunner {
-        val transform = ResultRowTransformers.multipleColumns(expressions)
+        val transform = R2dbcRowTransformers.multipleColumns(expressions)
         return R2dbcSqlSelectFlowQueryRunner(context, options, transform)
     }
 
@@ -155,7 +155,7 @@ internal class R2dbcFlowQueryVisitor : FlowQueryVisitor {
         options: SqlSetOperationOptions,
         expressions: List<ColumnExpression<*, *>>
     ): FlowQueryRunner {
-        val transform = ResultRowTransformers.multipleColumns(expressions)
+        val transform = R2dbcRowTransformers.multipleColumns(expressions)
         return R2dbcSqlSetOperationFlowQueryRunner(context, options, transform)
     }
 }

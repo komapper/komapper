@@ -5,8 +5,8 @@ import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.metamodel.PropertyMetamodel
 import org.komapper.r2dbc.R2dbcDialect
 
-internal class EntityMapper(dialect: R2dbcDialect, row: Row) {
-    private val propertyMapper = PropertyMapper(dialect, row)
+internal class R2dbcEntityMapper(dialect: R2dbcDialect, row: Row) {
+    private val propertyMapper = R2dbcPropertyMapper(dialect, row)
 
     fun <E : Any> execute(metamodel: EntityMetamodel<E, *, *>, forceMapping: Boolean = false): E? {
         val valueMap = mutableMapOf<PropertyMetamodel<*, *, *>, Any?>()

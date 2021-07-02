@@ -50,6 +50,7 @@ import org.komapper.jdbc.dsl.runner.JdbcEntityUpsertBatchQueryRunner
 import org.komapper.jdbc.dsl.runner.JdbcEntityUpsertMultipleQueryRunner
 import org.komapper.jdbc.dsl.runner.JdbcEntityUpsertSingleQueryRunner
 import org.komapper.jdbc.dsl.runner.JdbcQueryRunner
+import org.komapper.jdbc.dsl.runner.JdbcResultSetTransformers
 import org.komapper.jdbc.dsl.runner.JdbcSchemaCreateQueryRunner
 import org.komapper.jdbc.dsl.runner.JdbcSchemaDropAllQueryRunner
 import org.komapper.jdbc.dsl.runner.JdbcSchemaDropQueryRunner
@@ -61,7 +62,6 @@ import org.komapper.jdbc.dsl.runner.JdbcSqlSetOperationQueryRunner
 import org.komapper.jdbc.dsl.runner.JdbcSqlUpdateQueryRunner
 import org.komapper.jdbc.dsl.runner.JdbcTemplateExecuteQueryRunner
 import org.komapper.jdbc.dsl.runner.JdbcTemplateSelectQueryRunner
-import org.komapper.jdbc.dsl.runner.ResultSetTransformers
 
 internal class JdbcQueryVisitor : QueryVisitor {
 
@@ -215,7 +215,7 @@ internal class JdbcQueryVisitor : QueryVisitor {
         options: SqlSelectOptions,
         collect: suspend (Flow<ENTITY>) -> R
     ): QueryRunner {
-        val transform = ResultSetTransformers.singleEntity(context.target)
+        val transform = JdbcResultSetTransformers.singleEntity(context.target)
         return JdbcSqlSelectQueryRunner(context, options, transform, collect)
     }
 
@@ -225,7 +225,7 @@ internal class JdbcQueryVisitor : QueryVisitor {
         metamodel: EntityMetamodel<T, *, *>,
         collect: suspend (Flow<T>) -> R
     ): QueryRunner {
-        val transform = ResultSetTransformers.singleEntity(metamodel)
+        val transform = JdbcResultSetTransformers.singleEntity(metamodel)
         return JdbcSqlSetOperationQueryRunner(context, options, transform, collect)
     }
 
@@ -236,7 +236,7 @@ internal class JdbcQueryVisitor : QueryVisitor {
         metamodels: Pair<A_META, B_META>,
         collect: suspend (Flow<Pair<A, B?>>) -> R
     ): QueryRunner {
-        val transform = ResultSetTransformers.pairEntities(metamodels)
+        val transform = JdbcResultSetTransformers.pairEntities(metamodels)
         return JdbcSqlSelectQueryRunner(context, options, transform, collect)
     }
 
@@ -247,7 +247,7 @@ internal class JdbcQueryVisitor : QueryVisitor {
         metamodels: Pair<A_META, B_META>,
         collect: suspend (Flow<Pair<A, B?>>) -> R
     ): QueryRunner {
-        val transform = ResultSetTransformers.pairEntities(metamodels)
+        val transform = JdbcResultSetTransformers.pairEntities(metamodels)
         return JdbcSqlSetOperationQueryRunner(context, options, transform, collect)
     }
 
@@ -258,7 +258,7 @@ internal class JdbcQueryVisitor : QueryVisitor {
         metamodels: Triple<A_META, B_META, C_META>,
         collect: suspend (Flow<Triple<A, B?, C?>>) -> R
     ): QueryRunner {
-        val transform = ResultSetTransformers.tripleEntities(metamodels)
+        val transform = JdbcResultSetTransformers.tripleEntities(metamodels)
         return JdbcSqlSelectQueryRunner(context, options, transform, collect)
     }
 
@@ -268,7 +268,7 @@ internal class JdbcQueryVisitor : QueryVisitor {
         metamodels: Triple<A_META, B_META, C_META>,
         collect: suspend (Flow<Triple<A, B?, C?>>) -> R
     ): QueryRunner {
-        val transform = ResultSetTransformers.tripleEntities(metamodels)
+        val transform = JdbcResultSetTransformers.tripleEntities(metamodels)
         return JdbcSqlSetOperationQueryRunner(context, options, transform, collect)
     }
 
@@ -278,7 +278,7 @@ internal class JdbcQueryVisitor : QueryVisitor {
         metamodels: List<EntityMetamodel<*, *, *>>,
         collect: suspend (Flow<Entities>) -> R
     ): QueryRunner {
-        val transform = ResultSetTransformers.multipleEntities(metamodels)
+        val transform = JdbcResultSetTransformers.multipleEntities(metamodels)
         return JdbcSqlSelectQueryRunner(context, options, transform, collect)
     }
 
@@ -288,7 +288,7 @@ internal class JdbcQueryVisitor : QueryVisitor {
         metamodels: List<EntityMetamodel<*, *, *>>,
         collect: suspend (Flow<Entities>) -> R
     ): QueryRunner {
-        val transform = ResultSetTransformers.multipleEntities(metamodels)
+        val transform = JdbcResultSetTransformers.multipleEntities(metamodels)
         return JdbcSqlSetOperationQueryRunner(context, options, transform, collect)
     }
 
@@ -298,7 +298,7 @@ internal class JdbcQueryVisitor : QueryVisitor {
         expression: ColumnExpression<A, *>,
         collect: suspend (Flow<A?>) -> R
     ): QueryRunner {
-        val transform = ResultSetTransformers.singleColumn(expression)
+        val transform = JdbcResultSetTransformers.singleColumn(expression)
         return JdbcSqlSelectQueryRunner(context, options, transform, collect)
     }
 
@@ -308,7 +308,7 @@ internal class JdbcQueryVisitor : QueryVisitor {
         expression: ColumnExpression<A, *>,
         collect: suspend (Flow<A?>) -> R
     ): QueryRunner {
-        val transform = ResultSetTransformers.singleColumn(expression)
+        val transform = JdbcResultSetTransformers.singleColumn(expression)
         return JdbcSqlSetOperationQueryRunner(context, options, transform, collect)
     }
 
@@ -318,7 +318,7 @@ internal class JdbcQueryVisitor : QueryVisitor {
         expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
         collect: suspend (Flow<Pair<A?, B?>>) -> R
     ): QueryRunner {
-        val transform = ResultSetTransformers.pairColumns(expressions)
+        val transform = JdbcResultSetTransformers.pairColumns(expressions)
         return JdbcSqlSelectQueryRunner(context, options, transform, collect)
     }
 
@@ -328,7 +328,7 @@ internal class JdbcQueryVisitor : QueryVisitor {
         expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
         collect: suspend (Flow<Pair<A?, B?>>) -> R
     ): QueryRunner {
-        val transform = ResultSetTransformers.pairColumns(expressions)
+        val transform = JdbcResultSetTransformers.pairColumns(expressions)
         return JdbcSqlSetOperationQueryRunner(context, options, transform, collect)
     }
 
@@ -338,7 +338,7 @@ internal class JdbcQueryVisitor : QueryVisitor {
         expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
         collect: suspend (Flow<Triple<A?, B?, C?>>) -> R
     ): QueryRunner {
-        val transform = ResultSetTransformers.tripleColumns(expressions)
+        val transform = JdbcResultSetTransformers.tripleColumns(expressions)
         return JdbcSqlSelectQueryRunner(context, options, transform, collect)
     }
 
@@ -348,7 +348,7 @@ internal class JdbcQueryVisitor : QueryVisitor {
         expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
         collect: suspend (Flow<Triple<A?, B?, C?>>) -> R
     ): QueryRunner {
-        val transform = ResultSetTransformers.tripleColumns(expressions)
+        val transform = JdbcResultSetTransformers.tripleColumns(expressions)
         return JdbcSqlSetOperationQueryRunner(context, options, transform, collect)
     }
 
@@ -358,7 +358,7 @@ internal class JdbcQueryVisitor : QueryVisitor {
         expressions: List<ColumnExpression<*, *>>,
         collect: suspend (Flow<Columns>) -> R
     ): QueryRunner {
-        val transform = ResultSetTransformers.multipleColumns(expressions)
+        val transform = JdbcResultSetTransformers.multipleColumns(expressions)
         return JdbcSqlSelectQueryRunner(context, options, transform, collect)
     }
 
@@ -368,7 +368,7 @@ internal class JdbcQueryVisitor : QueryVisitor {
         expressions: List<ColumnExpression<*, *>>,
         collect: suspend (Flow<Columns>) -> R
     ): QueryRunner {
-        val transform = ResultSetTransformers.multipleColumns(expressions)
+        val transform = JdbcResultSetTransformers.multipleColumns(expressions)
         return JdbcSqlSetOperationQueryRunner(context, options, transform, collect)
     }
 
