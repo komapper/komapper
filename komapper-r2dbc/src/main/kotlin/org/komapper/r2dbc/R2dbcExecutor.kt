@@ -60,13 +60,11 @@ internal class R2dbcExecutor(
             r2dbcStmt.setUp()
             r2dbcStmt.bind(statement)
             r2dbcStmt.execute().toFlow().flatMapConcat { result ->
-                val generatedKeys = result.fetchGeneratedKeys().toList().toLongArray()
-                // TODO: remove workaround code
-                // https://github.com/pgjdbc/r2dbc-postgresql/issues/415
-                if (config.dialect.driver == "postgresql" && generatedKeys.isNotEmpty()) {
-                    flowOf(generatedKeys.size to generatedKeys)
+                if (generatedColumn == null) {
+                    result.rowsUpdated.toFlow().map { count -> count to longArrayOf() }
                 } else {
-                    result.rowsUpdated.toFlow().map { count -> count to generatedKeys }
+                    val generatedKeys = result.fetchGeneratedKeys().toList().toLongArray()
+                    flowOf(generatedKeys.size to generatedKeys)
                 }
             }.onCompletion {
                 con.close()
@@ -152,16 +150,12 @@ internal class R2dbcExecutor(
     }
 
     private fun Result.fetchGeneratedKeys(): Flow<Long> {
-        return if (generatedColumn != null) {
-            this.map { row, _ ->
-                when (val value = row.get(0)) {
-                    is Number -> value.toLong()
-                    else -> error("Generated value is not Number. generatedColumn=$generatedColumn, value=$value, valueType=${value::class.qualifiedName}")
-                }
-            }.toFlow()
-        } else {
-            flowOf()
-        }
+        return this.map { row, _ ->
+            when (val value = row.get(0)) {
+                is Number -> value.toLong()
+                else -> error("Generated value is not Number. generatedColumn=$generatedColumn, value=$value, valueType=${value::class.qualifiedName}")
+            }
+        }.toFlow()
     }
 
     @Suppress("UNCHECKED_CAST")
