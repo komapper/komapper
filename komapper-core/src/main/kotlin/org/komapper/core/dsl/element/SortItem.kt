@@ -1,7 +1,9 @@
 package org.komapper.core.dsl.element
 
+import org.komapper.core.ThreadSafe
 import org.komapper.core.dsl.expression.ColumnExpression
 
+@ThreadSafe
 sealed class SortItem {
     sealed class Property<T : Any, S : Any> : ColumnExpression<T, S>, SortItem() {
         abstract val expression: ColumnExpression<T, S>

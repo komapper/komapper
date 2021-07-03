@@ -47,6 +47,7 @@ interface Dialect {
     }
 
     fun getSequenceSql(sequenceName: String): String
+
     fun getSchemaStatementBuilder(): SchemaStatementBuilder
 
     fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> getEntityUpsertStatementBuilder(
@@ -55,7 +56,7 @@ interface Dialect {
     ): EntityUpsertStatementBuilder<ENTITY>
 }
 
-internal object DryRunJdbcDialect : Dialect {
+internal object DryRunDialect : Dialect {
 
     override val driver: String = "dry_run"
 

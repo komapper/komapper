@@ -10,6 +10,12 @@ data class Statement(val charSequences: List<CharSequence>, val args: List<Value
         val EMPTY = Statement(emptyList(), emptyList())
     }
 
+    init {
+        val count = charSequences.count { it is PlaceHolder }
+        val size = args.size
+        require(count == args.size) { "count=$count, size=$size" }
+    }
+
     fun toSql(transform: (Int, PlaceHolder) -> CharSequence = { _, placeHolder -> placeHolder }): String {
         var index = 0
         return charSequences.joinToString(separator = "") { each ->
@@ -39,9 +45,10 @@ data class Statement(val charSequences: List<CharSequence>, val args: List<Value
     }
 
     infix operator fun plus(other: Statement): Statement {
-        val separator = if (this.charSequences.isEmpty() || this.charSequences.last().trimEnd().endsWith(";")) "" else ";"
-        val newFragments = this.charSequences + separator + other.charSequences
-        val newArgs = this.args + other.args
-        return Statement(newFragments, newArgs)
+        val separator =
+            if (this.charSequences.isEmpty() || this.charSequences.last().trimEnd().endsWith(";")) "" else ";"
+        val charSequences = this.charSequences + separator + other.charSequences
+        val args = this.args + other.args
+        return Statement(charSequences, args)
     }
 }
