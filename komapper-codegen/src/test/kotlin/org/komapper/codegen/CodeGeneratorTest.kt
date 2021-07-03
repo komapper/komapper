@@ -100,22 +100,22 @@ class CodeGeneratorTest {
 
             import org.komapper.annotation.*
             
-            @KmEntityDef(Address::class)
-            @KmTable("ADDRESS")
+            @KomapperEntityDef(Address::class)
+            @KomapperTable("ADDRESS")
             data class AddressDef (
-                @KmId @KmAutoIncrement @KmColumn("ADDRESS_ID") val addressId: Nothing,
-                @KmColumn("STREET") val street: Nothing,
-                @KmColumn("VERSION") val version: Nothing,
+                @KomapperId @KomapperAutoIncrement @KomapperColumn("ADDRESS_ID") val addressId: Nothing,
+                @KomapperColumn("STREET") val street: Nothing,
+                @KomapperColumn("VERSION") val version: Nothing,
             ) {
                 companion object
             }
             
-            @KmEntityDef(Employee::class)
-            @KmTable("EMPLOYEE")
+            @KomapperEntityDef(Employee::class)
+            @KomapperTable("EMPLOYEE")
             data class EmployeeDef (
-                @KmId @KmColumn("EMPLOYEE_ID") val employeeId: Nothing,
-                @KmColumn("NAME") val name: Nothing,
-                @KmColumn("VERSION") val version: Nothing,
+                @KomapperId @KomapperColumn("EMPLOYEE_ID") val employeeId: Nothing,
+                @KomapperColumn("NAME") val name: Nothing,
+                @KomapperColumn("VERSION") val version: Nothing,
             ) {
                 companion object
             }

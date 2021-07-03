@@ -25,9 +25,9 @@ class EntityProcessorTest {
                 """
                 package test
                 import org.komapper.annotation.*
-                @KmEntity
+                @KomapperEntity
                 data class Dept(
-                    @KmId val id: Int
+                    @KomapperId val id: Int
                 )
                 """
             )
@@ -44,7 +44,7 @@ class EntityProcessorTest {
                 """
                 package test
                 import org.komapper.annotation.*
-                @KmEntity
+                @KomapperEntity
                 data class Dept(
                     val id: Int
                 ) { companion object }
@@ -64,7 +64,7 @@ class EntityProcessorTest {
                 package test
                 import org.komapper.annotation.*
                 internal class Parent { 
-                    @KmEntity
+                    @KomapperEntity
                     data class Dept(
                         val id: Int
                     ) { companion object }
@@ -87,7 +87,7 @@ class EntityProcessorTest {
                 data class Dept(
                     val id: Int
                 )
-                @KmEntityDef(entity = Dept::class)
+                @KomapperEntityDef(entity = Dept::class)
                 data class DeptDef(
                     val id: Int,
                     val version: Int
@@ -108,7 +108,7 @@ class EntityProcessorTest {
                 package test
                 import org.komapper.annotation.*
                 @Suppress("ClassName")
-                @KmEntity
+                @KomapperEntity
                 data class __Dept(
                     val id: Int
                 ) { companion object }
@@ -120,7 +120,7 @@ class EntityProcessorTest {
     }
 
     @Test
-    fun `The class name cannot start with '__', @KmEntityDef`() {
+    fun `The class name cannot start with '__', @KomapperEntityDef`() {
         val result = compile(
             kotlin(
                 "source.kt",
@@ -131,7 +131,7 @@ class EntityProcessorTest {
                 data class __Dept(
                     val id: Int
                 )
-                @KmEntityDef(entity = __Dept::class)
+                @KomapperEntityDef(entity = __Dept::class)
                 data class DeptDef(
                     val id: Int
                 ) { companion object }
@@ -150,7 +150,7 @@ class EntityProcessorTest {
                 """
                 package test
                 import org.komapper.annotation.*
-                @KmEntity
+                @KomapperEntity
                 data class Dept(
                     val __id: Int
                 ) { companion object }
@@ -162,7 +162,7 @@ class EntityProcessorTest {
     }
 
     @Test
-    fun `The property name cannot start with '__', @KmEntityDef`() {
+    fun `The property name cannot start with '__', @KomapperEntityDef`() {
         val result = compile(
             kotlin(
                 "source.kt",
@@ -173,7 +173,7 @@ class EntityProcessorTest {
                     val id: Int,
                     val __name: String
                 )
-                @KmEntityDef(entity = Dept::class)
+                @KomapperEntityDef(entity = Dept::class)
                 data class DeptDef(
                     val id: Int
                 ) { companion object }
@@ -192,7 +192,7 @@ class EntityProcessorTest {
                 """
                 package test
                 import org.komapper.annotation.*
-                @KmEntity
+                @KomapperEntity
                 class Dept(
                     val id: Int
                 ) { companion object }
@@ -204,7 +204,7 @@ class EntityProcessorTest {
     }
 
     @Test
-    fun `The entity class must be a data class, @KmEntityDef`() {
+    fun `The entity class must be a data class, @KomapperEntityDef`() {
         val result = compile(
             kotlin(
                 "source.kt",
@@ -214,7 +214,7 @@ class EntityProcessorTest {
                 class Dept(
                     val id: Int
                 )
-                @KmEntityDef(entity = Dept::class)
+                @KomapperEntityDef(entity = Dept::class)
                 data class DeptDef(
                     val id: Int
                 ) { companion object }
@@ -226,7 +226,7 @@ class EntityProcessorTest {
     }
 
     @Test
-    fun `@KmEntity cannot be applied to this element`() {
+    fun `@KomapperEntity cannot be applied to this element`() {
         val result = compile(
             kotlin(
                 "source.kt",
@@ -234,17 +234,17 @@ class EntityProcessorTest {
                 package test
                 import org.komapper.annotation.*
                 class Dept(
-                    @KmEntity val id: Int
+                    @KomapperEntity val id: Int
                 ) { companion object }
                 """
             )
         )
         assertEquals(result.exitCode, KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertTrue(result.messages.contains("@KmEntity cannot be applied to this element."))
+        assertTrue(result.messages.contains("@KomapperEntity cannot be applied to this element."))
     }
 
     @Test
-    fun `@KmEntityDef cannot be applied to this element`() {
+    fun `@KomapperEntityDef cannot be applied to this element`() {
         val result = compile(
             kotlin(
                 "source.kt",
@@ -255,13 +255,13 @@ class EntityProcessorTest {
                     val id: Int
                 )
                 class DeptDef(
-                    @KmEntityDef(entity = Dept::class) val id: Int
+                    @KomapperEntityDef(entity = Dept::class) val id: Int
                 ) { companion object }
                 """
             )
         )
         assertEquals(result.exitCode, KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertTrue(result.messages.contains("@KmEntityDef cannot be applied to this element."))
+        assertTrue(result.messages.contains("@KomapperEntityDef cannot be applied to this element."))
     }
 
     @Test
@@ -272,7 +272,7 @@ class EntityProcessorTest {
                 """
                 package test
                 import org.komapper.annotation.*
-                @KmEntity
+                @KomapperEntity
                 private data class Dept(
                     val id: Int
                 ) { companion object }
@@ -284,7 +284,7 @@ class EntityProcessorTest {
     }
 
     @Test
-    fun `The entity class must not be private, @KmEntityDef`() {
+    fun `The entity class must not be private, @KomapperEntityDef`() {
         val result = compile(
             kotlin(
                 "source.kt",
@@ -294,7 +294,7 @@ class EntityProcessorTest {
                 private data class Dept(
                     val id: Int
                 )
-                @KmEntityDef(entity = Dept::class)
+                @KomapperEntityDef(entity = Dept::class)
                 data class DeptDef(
                     val id: Int
                 ) { companion object }
@@ -313,7 +313,7 @@ class EntityProcessorTest {
                 """
                 package test
                 import org.komapper.annotation.*
-                @KmEntity
+                @KomapperEntity
                 data class Dept<T>(
                     val id: T
                 ) { companion object }
@@ -325,7 +325,7 @@ class EntityProcessorTest {
     }
 
     @Test
-    fun `The entity class must not have type parameters, @KmEntityDef`() {
+    fun `The entity class must not have type parameters, @KomapperEntityDef`() {
         val result = compile(
             kotlin(
                 "source.kt",
@@ -335,7 +335,7 @@ class EntityProcessorTest {
                 data class Dept<T>(
                     val id: T
                 )
-                @KmEntityDef(entity = Dept::class)
+                @KomapperEntityDef(entity = Dept::class)
                 data class DeptDef<T>(
                     val id: T
                 ) { companion object }
@@ -347,27 +347,27 @@ class EntityProcessorTest {
     }
 
     @Test
-    fun `Multiple @KmVersion cannot coexist in a single class`() {
+    fun `Multiple @KomapperVersion cannot coexist in a single class`() {
         val result = compile(
             kotlin(
                 "source.kt",
                 """
                 package test
                 import org.komapper.annotation.*
-                @KmEntity
+                @KomapperEntity
                 data class Dept(
-                    @KmVersion val aaa: Int,
-                    @KmVersion val bbb: Int
+                    @KomapperVersion val aaa: Int,
+                    @KomapperVersion val bbb: Int
                 ) { companion object }
                 """
             )
         )
         assertEquals(result.exitCode, KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertTrue(result.messages.contains("Multiple @KmVersion cannot coexist in a single class."))
+        assertTrue(result.messages.contains("Multiple @KomapperVersion cannot coexist in a single class."))
     }
 
     @Test
-    fun `Multiple @KmCreatedAt cannot coexist in a single class`() {
+    fun `Multiple @KomapperCreatedAt cannot coexist in a single class`() {
         val result = compile(
             kotlin(
                 "source.kt",
@@ -375,36 +375,36 @@ class EntityProcessorTest {
                 package test
                 import org.komapper.annotation.*
                 import java.time.LocalDateTime
-                @KmEntity
+                @KomapperEntity
                 data class Dept(
-                    @KmCreatedAt val aaa: LocalDateTime,
-                    @KmCreatedAt val bbb: LocalDateTime
+                    @KomapperCreatedAt val aaa: LocalDateTime,
+                    @KomapperCreatedAt val bbb: LocalDateTime
                 ) { companion object }
                 """
             )
         )
         assertEquals(result.exitCode, KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertTrue(result.messages.contains("Multiple @KmCreatedAt cannot coexist in a single class."))
+        assertTrue(result.messages.contains("Multiple @KomapperCreatedAt cannot coexist in a single class."))
     }
 
     @Test
-    fun `Multiple @KmUpdatedAt cannot coexist in a single class`() {
+    fun `Multiple @KomapperUpdatedAt cannot coexist in a single class`() {
         val result = compile(
             kotlin(
                 "source.kt",
                 """
                 package test
                 import org.komapper.annotation.*import java.time.LocalDateTime
-                @KmEntity
+                @KomapperEntity
                 data class Dept(
-                    @KmUpdatedAt val aaa: LocalDateTime,
-                    @KmUpdatedAt val bbb: LocalDateTime
+                    @KomapperUpdatedAt val aaa: LocalDateTime,
+                    @KomapperUpdatedAt val bbb: LocalDateTime
                 ) { companion object }
                 """
             )
         )
         assertEquals(result.exitCode, KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertTrue(result.messages.contains("Multiple @KmUpdatedAt cannot coexist in a single class."))
+        assertTrue(result.messages.contains("Multiple @KomapperUpdatedAt cannot coexist in a single class."))
     }
 
     @Test
@@ -415,10 +415,10 @@ class EntityProcessorTest {
                 """
                 package test
                 import org.komapper.annotation.*
-                @KmEntity
+                @KomapperEntity
                 data class Dept(
-                    @KmIgnore val aaa: Int = 0,
-                    @KmIgnore val bbb: Int = 0
+                    @KomapperIgnore val aaa: Int = 0,
+                    @KomapperIgnore val bbb: Int = 0
                 ) { companion object }
                 """
             )
@@ -435,7 +435,7 @@ class EntityProcessorTest {
                 """
                 package test
                 import org.komapper.annotation.*
-                @KmEntity
+                @KomapperEntity
                 data class Dept(
                     private val aaa: Int
                 ) { companion object }
@@ -447,103 +447,103 @@ class EntityProcessorTest {
     }
 
     @Test
-    fun `@KmId and @KmVersion cannot coexist on the same property`() {
+    fun `@KomapperId and @KomapperVersion cannot coexist on the same property`() {
         val result = compile(
             kotlin(
                 "source.kt",
                 """
                 package test
                 import org.komapper.annotation.*
-                @KmEntity
+                @KomapperEntity
                 data class Dept(
-                    @KmId @KmVersion val id: Int
+                    @KomapperId @KomapperVersion val id: Int
                 ) { companion object }
                 """
             )
         )
         assertEquals(result.exitCode, KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertTrue(result.messages.contains("@KmId and @KmVersion cannot coexist on the same property."))
+        assertTrue(result.messages.contains("@KomapperId and @KomapperVersion cannot coexist on the same property."))
     }
 
     @Test
-    fun `@KmAutoIncrement and @KmId must coexist on the same property`() {
+    fun `@KomapperAutoIncrement and @KomapperId must coexist on the same property`() {
         val result = compile(
             kotlin(
                 "source.kt",
                 """
                 package test
                 import org.komapper.annotation.*
-                @KmEntity
+                @KomapperEntity
                 data class Dept(
-                    @KmAutoIncrement val id: Int
+                    @KomapperAutoIncrement val id: Int
                 ) { companion object }
                 """
             )
         )
         assertEquals(result.exitCode, KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertTrue(result.messages.contains("@KmAutoIncrement and @KmId must coexist on the same property."))
+        assertTrue(result.messages.contains("@KomapperAutoIncrement and @KomapperId must coexist on the same property."))
     }
 
     @Test
-    fun `@KmAutoIncrement and @KmSequence cannot coexist on the same property`() {
+    fun `@KomapperAutoIncrement and @KomapperSequence cannot coexist on the same property`() {
         val result = compile(
             kotlin(
                 "source.kt",
                 """
                 package test
                 import org.komapper.annotation.*
-                @KmEntity
+                @KomapperEntity
                 data class Dept(
-                    @KmAutoIncrement @KmSequence("ID", 1, 100) val id: Int
+                    @KomapperAutoIncrement @KomapperSequence("ID", 1, 100) val id: Int
                 ) { companion object }
                 """
             )
         )
         assertEquals(result.exitCode, KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertTrue(result.messages.contains("@KmAutoIncrement and @KmSequence cannot coexist on the same property."))
+        assertTrue(result.messages.contains("@KomapperAutoIncrement and @KomapperSequence cannot coexist on the same property."))
     }
 
     @Test
-    fun `@KmAutoIncrement and @KmSequence cannot coexist in a single class`() {
+    fun `@KomapperAutoIncrement and @KomapperSequence cannot coexist in a single class`() {
         val result = compile(
             kotlin(
                 "source.kt",
                 """
                 package test
                 import org.komapper.annotation.*
-                @KmEntity
+                @KomapperEntity
                 data class Dept(
-                    @KmId @KmAutoIncrement val id1: Int,
-                    @KmId @KmSequence("ID", 1, 100) val id2: Int
+                    @KomapperId @KomapperAutoIncrement val id1: Int,
+                    @KomapperId @KomapperSequence("ID", 1, 100) val id2: Int
                 ) { companion object }
                 """
             )
         )
         assertEquals(result.exitCode, KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertTrue(result.messages.contains("@KmAutoIncrement and @KmSequence cannot coexist in a single class."))
+        assertTrue(result.messages.contains("@KomapperAutoIncrement and @KomapperSequence cannot coexist in a single class."))
     }
 
     @Test
-    fun `The type of @KmVersion annotated property must be either Int, Long, UInt or value class`() {
+    fun `The type of @KomapperVersion annotated property must be either Int, Long, UInt or value class`() {
         val result = compile(
             kotlin(
                 "source.kt",
                 """
                 package test
                 import org.komapper.annotation.*
-                @KmEntity
+                @KomapperEntity
                 data class Dept(
-                    @KmVersion val aaa: String
+                    @KomapperVersion val aaa: String
                 ) { companion object }
                 """
             )
         )
         assertEquals(result.exitCode, KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertTrue(result.messages.contains("The type of @KmVersion annotated property must be either Int, Long, UInt or value class."))
+        assertTrue(result.messages.contains("The type of @KomapperVersion annotated property must be either Int, Long, UInt or value class."))
     }
 
     @Test
-    fun `When the type of @KmVersion annotated property is value class, the type of the value class's own property must be either Int, Long or UInt`() {
+    fun `When the type of @KomapperVersion annotated property is value class, the type of the value class's own property must be either Int, Long or UInt`() {
         val result = compile(
             kotlin(
                 "source.kt",
@@ -554,9 +554,9 @@ class EntityProcessorTest {
                 value class MyVersion(
                     val version: String
                 )
-                @KmEntity
+                @KomapperEntity
                 data class Dept(
-                    @KmVersion val version: MyVersion
+                    @KomapperVersion val version: MyVersion
                 ) { companion object }
                 """
             )
@@ -564,33 +564,33 @@ class EntityProcessorTest {
         assertEquals(result.exitCode, KotlinCompilation.ExitCode.COMPILATION_ERROR)
         assertTrue(
             result.messages.contains(
-                "When the type of @KmVersion annotated property is value class, " +
+                "When the type of @KomapperVersion annotated property is value class, " +
                     "the type of the value class's own property must be either Int, Long or UInt."
             )
         )
     }
 
     @Test
-    fun `The type of @KmCreatedAt annotated property must be either LocalDateTime or OffsetDateTime`() {
+    fun `The type of @KomapperCreatedAt annotated property must be either LocalDateTime or OffsetDateTime`() {
         val result = compile(
             kotlin(
                 "source.kt",
                 """
                 package test
                 import org.komapper.annotation.*
-                @KmEntity
+                @KomapperEntity
                 data class Dept(
-                    @KmCreatedAt val aaa: String
+                    @KomapperCreatedAt val aaa: String
                 ) { companion object }
                 """
             )
         )
         assertEquals(result.exitCode, KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertTrue(result.messages.contains("The type of @KmCreatedAt annotated property must be either LocalDateTime or OffsetDateTime."))
+        assertTrue(result.messages.contains("The type of @KomapperCreatedAt annotated property must be either LocalDateTime or OffsetDateTime."))
     }
 
     @Test
-    fun `When the type of @KmCreatedAt annotated property is value class, the type of the value class's own property must be either LocalDateTime or OffsetDateTime`() {
+    fun `When the type of @KomapperCreatedAt annotated property is value class, the type of the value class's own property must be either LocalDateTime or OffsetDateTime`() {
         val result = compile(
             kotlin(
                 "source.kt",
@@ -601,9 +601,9 @@ class EntityProcessorTest {
                 value class MyDateTime(
                     val dataTime: String
                 )
-                @KmEntity
+                @KomapperEntity
                 data class Dept(
-                    @KmCreatedAt val dataTime: MyDateTime
+                    @KomapperCreatedAt val dataTime: MyDateTime
                 ) { companion object }
                 """
             )
@@ -611,33 +611,33 @@ class EntityProcessorTest {
         assertEquals(result.exitCode, KotlinCompilation.ExitCode.COMPILATION_ERROR)
         assertTrue(
             result.messages.contains(
-                "When the type of @KmCreatedAt annotated property is value class, " +
+                "When the type of @KomapperCreatedAt annotated property is value class, " +
                     "the type of the value class's own property must be either LocalDateTime or OffsetDateTime."
             )
         )
     }
 
     @Test
-    fun `The type of @KmUpdatedAt annotated property must be either LocalDateTime or OffsetDateTime`() {
+    fun `The type of @KomapperUpdatedAt annotated property must be either LocalDateTime or OffsetDateTime`() {
         val result = compile(
             kotlin(
                 "source.kt",
                 """
                 package test
                 import org.komapper.annotation.*
-                @KmEntity
+                @KomapperEntity
                 data class Dept(
-                    @KmUpdatedAt val aaa: String
+                    @KomapperUpdatedAt val aaa: String
                 ) { companion object }
                 """
             )
         )
         assertEquals(result.exitCode, KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertTrue(result.messages.contains("The type of @KmUpdatedAt annotated property must be either LocalDateTime or OffsetDateTime."))
+        assertTrue(result.messages.contains("The type of @KomapperUpdatedAt annotated property must be either LocalDateTime or OffsetDateTime."))
     }
 
     @Test
-    fun `When the type of @KmUpdatedAt annotated property is value class, the type of the value class's own property must be either LocalDateTime or OffsetDateTime`() {
+    fun `When the type of @KomapperUpdatedAt annotated property is value class, the type of the value class's own property must be either LocalDateTime or OffsetDateTime`() {
         val result = compile(
             kotlin(
                 "source.kt",
@@ -648,9 +648,9 @@ class EntityProcessorTest {
                 value class MyDateTime(
                     val dataTime: String
                 )
-                @KmEntity
+                @KomapperEntity
                 data class Dept(
-                    @KmUpdatedAt val dataTime: MyDateTime
+                    @KomapperUpdatedAt val dataTime: MyDateTime
                 ) { companion object }
                 """
             )
@@ -658,7 +658,7 @@ class EntityProcessorTest {
         assertEquals(result.exitCode, KotlinCompilation.ExitCode.COMPILATION_ERROR)
         assertTrue(
             result.messages.contains(
-                "When the type of @KmUpdatedAt annotated property is value class, " +
+                "When the type of @KomapperUpdatedAt annotated property is value class, " +
                     "the type of the value class's own property must be either LocalDateTime or OffsetDateTime."
             )
         )
@@ -672,9 +672,9 @@ class EntityProcessorTest {
                 """
                 package test
                 import org.komapper.annotation.*
-                @KmEntity
+                @KomapperEntity
                 data class Dept(
-                    @KmIgnore val aaa: String
+                    @KomapperIgnore val aaa: String
                 ) { companion object }
                 """
             )
@@ -684,45 +684,45 @@ class EntityProcessorTest {
     }
 
     @Test
-    fun `The type of @KmAutoIncrement annotated property must be either Int, Long, UInt or value class`() {
+    fun `The type of @KomapperAutoIncrement annotated property must be either Int, Long, UInt or value class`() {
         val result = compile(
             kotlin(
                 "source.kt",
                 """
                 package test
                 import org.komapper.annotation.*
-                @KmEntity
+                @KomapperEntity
                 data class Dept(
-                    @KmId @KmAutoIncrement val id: String
+                    @KomapperId @KomapperAutoIncrement val id: String
                 ) { companion object }
                 """
             )
         )
         assertEquals(result.exitCode, KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertTrue(result.messages.contains("The type of @KmAutoIncrement annotated property must be either Int, Long, UInt or value class."))
+        assertTrue(result.messages.contains("The type of @KomapperAutoIncrement annotated property must be either Int, Long, UInt or value class."))
     }
 
     @Test
-    fun `The type of @KmSequence annotated property must be either Int, Long, UInt or value class`() {
+    fun `The type of @KomapperSequence annotated property must be either Int, Long, UInt or value class`() {
         val result = compile(
             kotlin(
                 "source.kt",
                 """
                 package test
                 import org.komapper.annotation.*
-                @KmEntity
+                @KomapperEntity
                 data class Dept(
-                    @KmId @KmSequence("ID", 1, 100) val id: String
+                    @KomapperId @KomapperSequence("ID", 1, 100) val id: String
                 ) { companion object }
                 """
             )
         )
         assertEquals(result.exitCode, KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertTrue(result.messages.contains("The type of @KmSequence annotated property must be either Int, Long, UInt or value class."))
+        assertTrue(result.messages.contains("The type of @KomapperSequence annotated property must be either Int, Long, UInt or value class."))
     }
 
     @Test
-    fun `When the type of @KmAutoIncrement annotated property is value class, the type of value class's own property must be either Int, Long or UInt`() {
+    fun `When the type of @KomapperAutoIncrement annotated property is value class, the type of value class's own property must be either Int, Long or UInt`() {
         val result = compile(
             kotlin(
                 "source.kt",
@@ -733,19 +733,19 @@ class EntityProcessorTest {
                 value class MyId(
                     val id: String
                 )
-                @KmEntity
+                @KomapperEntity
                 data class Dept(
-                    @KmId @KmAutoIncrement val id: MyId
+                    @KomapperId @KomapperAutoIncrement val id: MyId
                 ) { companion object }
                 """
             )
         )
         assertEquals(result.exitCode, KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertTrue(result.messages.contains("When the type of @KmAutoIncrement annotated property is value class, the type of the value class's own property must be either Int, Long or UInt."))
+        assertTrue(result.messages.contains("When the type of @KomapperAutoIncrement annotated property is value class, the type of the value class's own property must be either Int, Long or UInt."))
     }
 
     @Test
-    fun `When the type of @KmSequence annotated property is value class, the type of value class's own property must be either Int, Long or UInt`() {
+    fun `When the type of @KomapperSequence annotated property is value class, the type of value class's own property must be either Int, Long or UInt`() {
         val result = compile(
             kotlin(
                 "source.kt",
@@ -756,9 +756,9 @@ class EntityProcessorTest {
                 value class MyId(
                     val id: String
                 )
-                @KmEntity
+                @KomapperEntity
                 data class Dept(
-                    @KmId @KmSequence("my_seq") val id: MyId
+                    @KomapperId @KomapperSequence("my_seq") val id: MyId
                 ) { companion object }
                 """
             )
@@ -766,29 +766,29 @@ class EntityProcessorTest {
         assertEquals(result.exitCode, KotlinCompilation.ExitCode.COMPILATION_ERROR)
         assertTrue(
             result.messages.contains(
-                "When the type of @KmSequence annotated property is value class, " +
+                "When the type of @KomapperSequence annotated property is value class, " +
                     "the type of the value class's own property must be either Int, Long or UInt."
             )
         )
     }
 
     @Test
-    fun `@KmSequence name is not found`() {
+    fun `@KomapperSequence name is not found`() {
         val result = compile(
             kotlin(
                 "source.kt",
                 """
                 package test
                 import org.komapper.annotation.*
-                @KmEntity
+                @KomapperEntity
                 data class Dept(
-                    @KmId @KmSequence() val id: Int
+                    @KomapperId @KomapperSequence() val id: Int
                 ) { companion object }
                 """
             )
         )
         assertEquals(result.exitCode, KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertTrue(result.messages.contains("@KmSequence.name is not found."))
+        assertTrue(result.messages.contains("@KomapperSequence.name is not found."))
     }
 
     @Test
@@ -801,9 +801,9 @@ class EntityProcessorTest {
                 import org.komapper.annotation.*
                 @JvmInline
                 value class Name(private val name: String)
-                @KmEntity
+                @KomapperEntity
                 data class Dept(
-                    @KmId val id: Int,
+                    @KomapperId val id: Int,
                     val name: Name,
                 ) { companion object }
                 """
@@ -823,9 +823,9 @@ class EntityProcessorTest {
                 import org.komapper.annotation.*
                 @JvmInline
                 value class Name(val name: String?)
-                @KmEntity
+                @KomapperEntity
                 data class Dept(
-                    @KmId val id: Int,
+                    @KomapperId val id: Int,
                     val name: Name,
                 ) { companion object }
                 """

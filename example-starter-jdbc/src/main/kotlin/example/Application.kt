@@ -1,12 +1,12 @@
 package example
 
-import org.komapper.annotation.KmAutoIncrement
-import org.komapper.annotation.KmColumn
-import org.komapper.annotation.KmCreatedAt
-import org.komapper.annotation.KmEntityDef
-import org.komapper.annotation.KmId
-import org.komapper.annotation.KmUpdatedAt
-import org.komapper.annotation.KmVersion
+import org.komapper.annotation.KomapperAutoIncrement
+import org.komapper.annotation.KomapperColumn
+import org.komapper.annotation.KomapperCreatedAt
+import org.komapper.annotation.KomapperEntityDef
+import org.komapper.annotation.KomapperId
+import org.komapper.annotation.KomapperUpdatedAt
+import org.komapper.annotation.KomapperVersion
 import org.komapper.core.dsl.EntityDsl
 import org.komapper.core.dsl.SchemaDsl
 import org.komapper.jdbc.JdbcDatabase
@@ -21,13 +21,13 @@ data class Address(
     val updatedAt: LocalDateTime? = null,
 )
 
-@KmEntityDef(Address::class)
+@KomapperEntityDef(Address::class)
 data class AddressDef(
-    @KmId @KmAutoIncrement @KmColumn(name = "ADDRESS_ID")
+    @KomapperId @KomapperAutoIncrement @KomapperColumn(name = "ADDRESS_ID")
     val id: Nothing,
-    @KmVersion val version: Nothing,
-    @KmCreatedAt val createdAt: Nothing,
-    @KmUpdatedAt val updatedAt: Nothing,
+    @KomapperVersion val version: Nothing,
+    @KomapperCreatedAt val createdAt: Nothing,
+    @KomapperUpdatedAt val updatedAt: Nothing,
 ) {
     companion object
 }

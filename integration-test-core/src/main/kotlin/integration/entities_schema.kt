@@ -1,40 +1,40 @@
 package integration
 
-import org.komapper.annotation.KmAutoIncrement
-import org.komapper.annotation.KmEntity
-import org.komapper.annotation.KmId
-import org.komapper.annotation.KmSequence
-import org.komapper.annotation.KmTable
+import org.komapper.annotation.KomapperAutoIncrement
+import org.komapper.annotation.KomapperEntity
+import org.komapper.annotation.KomapperId
+import org.komapper.annotation.KomapperSequence
+import org.komapper.annotation.KomapperTable
 
-@KmEntity
+@KomapperEntity
 data class Aaa(
-    @KmId val id: Int,
+    @KomapperId val id: Int,
     val name: String,
 ) {
     companion object
 }
 
-@KmEntity
+@KomapperEntity
 data class Bbb(
-    @KmId @KmAutoIncrement val id: Int,
+    @KomapperId @KomapperAutoIncrement val id: Int,
     val name: String?,
 ) {
     companion object
 }
 
-@KmEntity
+@KomapperEntity
 data class Ccc(
-    @KmId @KmSequence("CCC_SEQ", incrementBy = 50)
+    @KomapperId @KomapperSequence("CCC_SEQ", incrementBy = 50)
     val id: Int,
     val name: String,
 ) {
     companion object
 }
 
-@KmEntity
-@KmTable(schema = "test")
+@KomapperEntity
+@KomapperTable(schema = "test")
 data class Ddd(
-    @KmId @KmAutoIncrement val id: Int,
+    @KomapperId @KomapperAutoIncrement val id: Int,
     val name: String?,
 ) {
     companion object

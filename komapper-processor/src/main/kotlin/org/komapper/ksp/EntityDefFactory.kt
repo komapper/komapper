@@ -3,6 +3,15 @@ package org.komapper.ksp
 import com.google.devtools.ksp.getDeclaredProperties
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSValueParameter
+import org.komapper.annotation.KomapperAutoIncrement
+import org.komapper.annotation.KomapperColumn
+import org.komapper.annotation.KomapperCreatedAt
+import org.komapper.annotation.KomapperId
+import org.komapper.annotation.KomapperIgnore
+import org.komapper.annotation.KomapperSequence
+import org.komapper.annotation.KomapperTable
+import org.komapper.annotation.KomapperUpdatedAt
+import org.komapper.annotation.KomapperVersion
 import org.komapper.core.NamingStrategy
 
 internal class EntityDefFactory(
@@ -20,22 +29,24 @@ internal class EntityDefFactory(
     }
 
     private fun getTable(): Table {
-        val annotation = defDeclaration.findAnnotation("KmTable")
+        val annotation = defDeclaration.findAnnotation(KomapperTable::class)
         val name = annotation?.findValue("name")?.toString()?.trim().let {
             if (it.isNullOrBlank()) null else it
         } ?: namingStrategy.apply(definitionSource.entityDeclaration.simpleName.asString())
-        val catalog = annotation?.findValue("catalog")?.toString()?.trim() ?: ""
-        val schema = annotation?.findValue("schema")?.toString()?.trim() ?: ""
-        val alwaysQuote = annotation?.findValue("alwaysQuote")?.toString()?.let { it == "true" } ?: false
+        val catalog = annotation?.findValue("catalog")?.toString()?.trim() ?: KomapperTable.catalog
+        val schema = annotation?.findValue("schema")?.toString()?.trim() ?: KomapperTable.schema
+        val alwaysQuote =
+            annotation?.findValue("alwaysQuote")?.toString()?.toBooleanStrict() ?: KomapperTable.alwaysQuote
         return Table(name, catalog, schema, alwaysQuote)
     }
 
     private fun getColumn(parameter: KSValueParameter): Column {
-        val annotation = parameter.findAnnotation("KmColumn")
+        val annotation = parameter.findAnnotation(KomapperColumn::class)
         val name = annotation?.findValue("name")?.toString()?.trim().let {
             if (it.isNullOrBlank()) null else it
         } ?: namingStrategy.apply(parameter.toString())
-        val alwaysQuote = annotation?.findValue("alwaysQuote")?.toString()?.let { it == "true" } ?: false
+        val alwaysQuote =
+            annotation?.findValue("alwaysQuote")?.toString()?.toBooleanStrict() ?: KomapperColumn.alwaysQuote
         return Column(name, alwaysQuote)
     }
 
@@ -57,13 +68,13 @@ internal class EntityDefFactory(
 
     private fun validateProperties(properties: Sequence<PropertyDef>) {
         if (properties.anyDuplicates { it.kind is PropertyKind.Version }) {
-            report("Multiple @KmVersion cannot coexist in a single class.", defDeclaration)
+            report("Multiple @${KomapperVersion::class.simpleName} cannot coexist in a single class.", defDeclaration)
         }
         if (properties.anyDuplicates { it.kind is PropertyKind.CreatedAt }) {
-            report("Multiple @KmCreatedAt cannot coexist in a single class.", defDeclaration)
+            report("Multiple @${KomapperCreatedAt::class.simpleName} cannot coexist in a single class.", defDeclaration)
         }
         if (properties.anyDuplicates { it.kind is PropertyKind.UpdatedAt }) {
-            report("Multiple @KmUpdatedAt cannot coexist in a single class.", defDeclaration)
+            report("Multiple @${KomapperUpdatedAt::class.simpleName} cannot coexist in a single class.", defDeclaration)
         }
     }
 
@@ -72,15 +83,16 @@ internal class EntityDefFactory(
         var sequence: IdKind.Sequence? = null
         for (a in parameter.annotations) {
             when (a.shortName.asString()) {
-                "KmAutoIncrement" -> autoIncrement = IdKind.AutoIncrement(a)
-                "KmSequence" -> sequence = let {
+                KomapperAutoIncrement::class.simpleName -> autoIncrement = IdKind.AutoIncrement(a)
+                KomapperSequence::class.simpleName -> sequence = let {
                     val name = a.findValue("name")?.toString()?.trim()
-                        ?: report("@KmSequence.name is not found.", a)
-                    val startWith = a.findValue("startWith") ?: 1
-                    val incrementBy = a.findValue("incrementBy") ?: 50
-                    val catalog = a.findValue("catalog")?.toString()?.trim() ?: ""
-                    val schema = a.findValue("schema")?.toString()?.trim() ?: ""
-                    val alwaysQuote = a.findValue("alwaysQuote")?.toString()?.let { it == "true" } ?: false
+                        ?: report("@${KomapperSequence::class.simpleName}.name is not found.", a)
+                    val startWith = a.findValue("startWith") ?: KomapperSequence.startWith
+                    val incrementBy = a.findValue("incrementBy") ?: KomapperSequence.incrementBy
+                    val catalog = a.findValue("catalog")?.toString()?.trim() ?: KomapperSequence.catalog
+                    val schema = a.findValue("schema")?.toString()?.trim() ?: KomapperSequence.schema
+                    val alwaysQuote =
+                        a.findValue("alwaysQuote")?.toString()?.toBooleanStrict() ?: KomapperSequence.alwaysQuote
                     IdKind.Sequence(a, name, startWith, incrementBy, catalog, schema, alwaysQuote)
                 }
             }
@@ -103,11 +115,11 @@ internal class EntityDefFactory(
         var ignore: PropertyKind.Ignore? = null
         for (a in parameter.annotations) {
             when (a.shortName.asString()) {
-                "KmId" -> id = PropertyKind.Id(a, idKind)
-                "KmVersion" -> version = PropertyKind.Version(a)
-                "KmCreatedAt" -> createdAt = PropertyKind.CreatedAt(a)
-                "KmUpdatedAt" -> updatedAt = PropertyKind.UpdatedAt(a)
-                "KmIgnore" -> ignore = PropertyKind.Ignore(a)
+                KomapperId::class.simpleName -> id = PropertyKind.Id(a, idKind)
+                KomapperVersion::class.simpleName -> version = PropertyKind.Version(a)
+                KomapperCreatedAt::class.simpleName -> createdAt = PropertyKind.CreatedAt(a)
+                KomapperUpdatedAt::class.simpleName -> updatedAt = PropertyKind.UpdatedAt(a)
+                KomapperIgnore::class.simpleName -> ignore = PropertyKind.Ignore(a)
             }
         }
         val kinds = listOfNotNull(id, version, createdAt, updatedAt, ignore)
@@ -119,7 +131,10 @@ internal class EntityDefFactory(
         }
         return kinds.firstOrNull().also { kind ->
             if (idKind != null && kind !is PropertyKind.Id) {
-                report("${idKind.annotation} and @KmId must coexist on the same property.", parameter)
+                report(
+                    "${idKind.annotation} and @${KomapperId::class.simpleName} must coexist on the same property.",
+                    parameter
+                )
             }
         }
     }

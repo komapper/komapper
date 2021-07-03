@@ -1,9 +1,9 @@
 package example
 
 import kotlinx.coroutines.flow.Flow
-import org.komapper.annotation.KmAutoIncrement
-import org.komapper.annotation.KmEntityDef
-import org.komapper.annotation.KmId
+import org.komapper.annotation.KomapperAutoIncrement
+import org.komapper.annotation.KomapperEntityDef
+import org.komapper.annotation.KomapperId
 import org.komapper.core.dsl.EntityDsl
 import org.komapper.core.dsl.SqlDsl
 import org.komapper.core.dsl.desc
@@ -47,9 +47,9 @@ data class Message(
     val text: String
 )
 
-@KmEntityDef(Message::class)
+@KomapperEntityDef(Message::class)
 data class MessageDef(
-    @KmId @KmAutoIncrement val id: Nothing,
+    @KomapperId @KomapperAutoIncrement val id: Nothing,
 ) {
     companion object
 }
