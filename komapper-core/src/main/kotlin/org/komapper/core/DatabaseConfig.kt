@@ -16,7 +16,7 @@ interface DatabaseConfig {
 object DryRunDatabaseConfig : DatabaseConfig {
     override val id: UUID
         get() = throw UnsupportedOperationException()
-    override val dialect: Dialect = DryRunJdbcDialect
+    override val dialect: Dialect = DryRunDialect
     override val logger: Logger
         get() = throw UnsupportedOperationException()
     override val clockProvider: ClockProvider
