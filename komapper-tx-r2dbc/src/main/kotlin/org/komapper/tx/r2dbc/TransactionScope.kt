@@ -1,7 +1,6 @@
 package org.komapper.tx.r2dbc
 
 import io.r2dbc.spi.IsolationLevel
-import kotlinx.coroutines.withContext
 import org.komapper.core.Scope
 
 @Scope
@@ -31,8 +30,7 @@ internal class TransactionScopeImpl(
         block: suspend TransactionScope.() -> R
     ): R {
         return if (transactionManager.isActive) {
-            val context = transactionManager.suspend()
-            withContext(context) {
+            transactionManager.suspend() {
                 executeInNewTransaction(isolationLevel, block)
             }
         } else {
@@ -44,8 +42,7 @@ internal class TransactionScopeImpl(
         isolationLevel: IsolationLevel?,
         block: suspend TransactionScope.() -> R
     ): R {
-        val context = transactionManager.begin(isolationLevel ?: defaultIsolationLevel)
-        return withContext(context) {
+        return transactionManager.begin(isolationLevel ?: defaultIsolationLevel) {
             try {
                 val result = block(this@TransactionScopeImpl)
                 if (!transactionManager.isRollbackOnly) {
