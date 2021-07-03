@@ -12,7 +12,7 @@ import kotlin.reflect.KClass
 interface R2dbcDialect : Dialect {
 
     companion object {
-        private val r2dbcUrlPattern = Pattern.compile("^r2dbc:([^:]*):.*")
+        private val r2dbcUrlPattern = Pattern.compile("^r2dbc[s]?:([^:]*):.*")
 
         fun load(driver: String): R2dbcDialect {
             val loader = ServiceLoader.load(R2dbcDialectFactory::class.java)
