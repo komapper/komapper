@@ -1,6 +1,7 @@
 dependencies {
     val kspVersion: String by project
     implementation(project(":komapper-core"))
+    implementation(project(":komapper-annotation"))
     implementation("com.google.devtools.ksp:symbol-processing-api:$kspVersion")
     testImplementation(project(":komapper-annotation"))
     testImplementation("com.google.devtools.ksp:symbol-processing:$kspVersion")

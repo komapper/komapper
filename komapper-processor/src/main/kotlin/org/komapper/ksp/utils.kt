@@ -6,6 +6,7 @@ import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSNode
 import com.google.devtools.ksp.symbol.Modifier
 import com.google.devtools.ksp.visitor.KSEmptyVisitor
+import kotlin.reflect.KClass
 
 internal fun <T> Sequence<T>.anyDuplicates(predicate: (T) -> Boolean): Boolean {
     return this.filter(predicate).take(2).count() == 2
@@ -42,6 +43,6 @@ internal fun KSAnnotation.findValue(name: String): Any? {
         .firstOrNull()
 }
 
-internal fun KSAnnotated.findAnnotation(shortName: String): KSAnnotation? {
-    return this.annotations.firstOrNull { it.shortName.asString() == shortName }
+internal fun KSAnnotated.findAnnotation(klass: KClass<*>): KSAnnotation? {
+    return this.annotations.firstOrNull { it.shortName.asString() == klass.simpleName }
 }

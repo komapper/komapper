@@ -4,6 +4,8 @@ import com.google.devtools.ksp.processing.Resolver
 import com.google.devtools.ksp.processing.SymbolProcessor
 import com.google.devtools.ksp.processing.SymbolProcessorEnvironment
 import com.google.devtools.ksp.symbol.KSAnnotated
+import org.komapper.annotation.KomapperEntity
+import org.komapper.annotation.KomapperEntityDef
 
 internal class EntityProcessor(private val environment: SymbolProcessorEnvironment) : SymbolProcessor {
 
@@ -15,8 +17,8 @@ internal class EntityProcessor(private val environment: SymbolProcessorEnvironme
             return emptyList()
         }
         val pairs = listOf(
-            "org.komapper.annotation.KomapperEntityDef" to SeparateDefinitionSourceResolver(),
-            "org.komapper.annotation.KomapperEntity" to SelfDefinitionSourceResolver()
+            KomapperEntityDef::class.qualifiedName!! to SeparateDefinitionSourceResolver(),
+            KomapperEntity::class.qualifiedName!! to SelfDefinitionSourceResolver()
         )
         for ((annotation, definitionSourceResolver) in pairs) {
             val symbols = resolver.getSymbolsWithAnnotation(annotation)

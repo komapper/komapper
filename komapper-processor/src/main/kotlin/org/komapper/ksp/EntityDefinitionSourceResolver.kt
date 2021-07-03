@@ -7,6 +7,8 @@ import com.google.devtools.ksp.symbol.KSDeclaration
 import com.google.devtools.ksp.symbol.KSNode
 import com.google.devtools.ksp.symbol.KSType
 import com.google.devtools.ksp.symbol.Modifier
+import org.komapper.annotation.KomapperEntity
+import org.komapper.annotation.KomapperEntityDef
 
 internal interface EntityDefinitionSourceResolver {
     fun resolve(symbol: KSNode): EntityDefinitionSource
@@ -17,20 +19,20 @@ internal class SeparateDefinitionSourceResolver : EntityDefinitionSourceResolver
         val defDeclaration = symbol.accept(
             object : ClassDeclarationVisitor() {
                 override fun defaultHandler(node: KSNode, data: Unit): KSClassDeclaration {
-                    report("@KomapperEntityDef cannot be applied to this element.", node)
+                    report("@${KomapperEntityDef::class.simpleName} cannot be applied to this element.", node)
                 }
             },
             Unit
         )
-        val annotation = defDeclaration.findAnnotation("KomapperEntityDef")
+        val annotation = defDeclaration.findAnnotation(KomapperEntityDef::class)
         val value = annotation?.findValue("entity")
         if (value !is KSType) {
-            report("The entity value of @KomapperEntityDef is not found.", defDeclaration)
+            report("The entity value of @${KomapperEntityDef::class.simpleName} is not found.", defDeclaration)
         }
         val entityDeclaration = value.declaration.accept(
             object : ClassDeclarationVisitor() {
                 override fun defaultHandler(node: KSNode, data: Unit): KSClassDeclaration {
-                    report("The entity value of @KomapperEntityDef is not found.", defDeclaration)
+                    report("The entity value of @${KomapperEntityDef::class.simpleName} is not found.", defDeclaration)
                 }
             },
             Unit
@@ -45,7 +47,7 @@ internal class SelfDefinitionSourceResolver : EntityDefinitionSourceResolver {
         val entityDeclaration = symbol.accept(
             object : ClassDeclarationVisitor() {
                 override fun defaultHandler(node: KSNode, data: Unit): KSClassDeclaration {
-                    report("@KomapperEntity cannot be applied to this element.", node)
+                    report("@${KomapperEntity::class.simpleName} cannot be applied to this element.", node)
                 }
             },
             Unit
