@@ -71,19 +71,19 @@ class CodeGenerator(
             for (table in tables) {
                 p.println()
                 val className = SnakeToUpperCamelCase.apply(table.name)
-                p.println("@KmEntityDef($className::class)")
+                p.println("@KomapperEntityDef($className::class)")
                 val kmTableArgs = listOfNotNull(
                     table.name,
                     if (useCatalog) table.catalog else null,
                     if (useSchema) table.schema else null
                 ).joinToString { "\"$it\"" }
-                p.println("@KmTable($kmTableArgs)")
+                p.println("@KomapperTable($kmTableArgs)")
                 p.println("data class $prefix$className${suffix}Def (")
                 for (column in table.columns) {
                     val propertyName = SnakeToLowerCamelCase.apply(column.name)
-                    val id = if (column.isPrimaryKey) "@KmId " else ""
-                    val autoIncrement = if (column.isAutoIncrement) "@KmAutoIncrement " else ""
-                    p.println("    $id$autoIncrement@KmColumn(\"${column.name}\") val $propertyName: Nothing,")
+                    val id = if (column.isPrimaryKey) "@KomapperId " else ""
+                    val autoIncrement = if (column.isAutoIncrement) "@KomapperAutoIncrement " else ""
+                    p.println("    $id$autoIncrement@KomapperColumn(\"${column.name}\") val $propertyName: Nothing,")
                 }
                 p.println(") {")
                 p.println("    companion object")

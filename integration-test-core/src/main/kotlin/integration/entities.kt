@@ -1,91 +1,91 @@
 package integration
 
-import org.komapper.annotation.KmAutoIncrement
-import org.komapper.annotation.KmColumn
-import org.komapper.annotation.KmCreatedAt
-import org.komapper.annotation.KmEntity
-import org.komapper.annotation.KmId
-import org.komapper.annotation.KmIgnore
-import org.komapper.annotation.KmSequence
-import org.komapper.annotation.KmTable
-import org.komapper.annotation.KmUpdatedAt
-import org.komapper.annotation.KmVersion
+import org.komapper.annotation.KomapperAutoIncrement
+import org.komapper.annotation.KomapperColumn
+import org.komapper.annotation.KomapperCreatedAt
+import org.komapper.annotation.KomapperEntity
+import org.komapper.annotation.KomapperId
+import org.komapper.annotation.KomapperIgnore
+import org.komapper.annotation.KomapperSequence
+import org.komapper.annotation.KomapperTable
+import org.komapper.annotation.KomapperUpdatedAt
+import org.komapper.annotation.KomapperVersion
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.OffsetDateTime
 
-@KmEntity
+@KomapperEntity
 data class Address(
-    @KmId @KmColumn(name = "ADDRESS_ID") val addressId: Int,
+    @KomapperId @KomapperColumn(name = "ADDRESS_ID") val addressId: Int,
     val street: String,
-    @KmVersion val version: Int
+    @KomapperVersion val version: Int
 ) {
     companion object
 }
 
-@KmEntity
+@KomapperEntity
 data class CompositeKeyAddress(
-    @KmId val addressId1: Int,
-    @KmId val addressId2: Int,
+    @KomapperId val addressId1: Int,
+    @KomapperId val addressId2: Int,
     val street: String,
     val version: Int
 ) {
     companion object
 }
 
-@KmEntity
-@KmTable("IDENTITY_STRATEGY")
+@KomapperEntity
+@KomapperTable("IDENTITY_STRATEGY")
 data class IdentityStrategy(
-    @KmId @KmAutoIncrement val id: Int?,
+    @KomapperId @KomapperAutoIncrement val id: Int?,
     val value: String
 ) {
     companion object
 }
 
-@KmEntity
-@KmTable("SEQUENCE_STRATEGY")
+@KomapperEntity
+@KomapperTable("SEQUENCE_STRATEGY")
 data class SequenceStrategy(
-    @KmId @KmSequence(name = "SEQUENCE_STRATEGY_ID", incrementBy = 100) val id: Int,
+    @KomapperId @KomapperSequence(name = "SEQUENCE_STRATEGY_ID", incrementBy = 100) val id: Int,
     val value: String
 ) {
     companion object
 }
 
-@KmEntity
+@KomapperEntity
 data class Person(
-    @KmId @KmColumn("PERSON_ID") val personId: Int,
+    @KomapperId @KomapperColumn("PERSON_ID") val personId: Int,
     val name: String,
-    @KmCreatedAt @KmColumn("CREATED_AT") val createdAt: LocalDateTime? = null,
-    @KmUpdatedAt @KmColumn("UPDATED_AT") val updatedAt: LocalDateTime? = null
+    @KomapperCreatedAt @KomapperColumn("CREATED_AT") val createdAt: LocalDateTime? = null,
+    @KomapperUpdatedAt @KomapperColumn("UPDATED_AT") val updatedAt: LocalDateTime? = null
 ) {
     companion object
 }
 
-@KmEntity
-@KmTable("PERSON")
+@KomapperEntity
+@KomapperTable("PERSON")
 data class Human(
-    @KmId @KmColumn("PERSON_ID") val humanId: Int,
+    @KomapperId @KomapperColumn("PERSON_ID") val humanId: Int,
     val name: String,
-    @KmCreatedAt val createdAt: OffsetDateTime? = null,
-    @KmUpdatedAt val updatedAt: OffsetDateTime? = null
+    @KomapperCreatedAt val createdAt: OffsetDateTime? = null,
+    @KomapperUpdatedAt val updatedAt: OffsetDateTime? = null
 ) {
     companion object
 }
 
-@KmEntity
+@KomapperEntity
 data class Employee(
-    @KmId @KmColumn("EMPLOYEE_ID") val employeeId: Int,
-    @KmColumn("EMPLOYEE_NO") val employeeNo: Int,
-    @KmColumn("EMPLOYEE_NAME") val employeeName: String,
-    @KmColumn("MANAGER_ID") val managerId: Int?,
+    @KomapperId @KomapperColumn("EMPLOYEE_ID") val employeeId: Int,
+    @KomapperColumn("EMPLOYEE_NO") val employeeNo: Int,
+    @KomapperColumn("EMPLOYEE_NAME") val employeeName: String,
+    @KomapperColumn("MANAGER_ID") val managerId: Int?,
     val hiredate: LocalDate,
     val salary: BigDecimal,
-    @KmColumn("DEPARTMENT_ID") val departmentId: Int,
-    @KmColumn("ADDRESS_ID") val addressId: Int,
-    @KmVersion val version: Int,
-    @KmIgnore val address: Address? = null,
-    @KmIgnore val department: Department? = null
+    @KomapperColumn("DEPARTMENT_ID") val departmentId: Int,
+    @KomapperColumn("ADDRESS_ID") val addressId: Int,
+    @KomapperVersion val version: Int,
+    @KomapperIgnore val address: Address? = null,
+    @KomapperIgnore val department: Department? = null
 ) {
     companion object
 }
@@ -115,27 +115,27 @@ data class Common(
     val version: Int = 0
 )
 
-@KmEntity
+@KomapperEntity
 data class Department(
-    @KmId @KmColumn("DEPARTMENT_ID") val departmentId: Int,
-    @KmColumn("DEPARTMENT_NO") val departmentNo: Int,
-    @KmColumn("DEPARTMENT_NAME") val departmentName: String,
+    @KomapperId @KomapperColumn("DEPARTMENT_ID") val departmentId: Int,
+    @KomapperColumn("DEPARTMENT_NO") val departmentNo: Int,
+    @KomapperColumn("DEPARTMENT_NAME") val departmentName: String,
     val location: String,
-    @KmVersion val version: Int,
-    @KmIgnore val employeeList: List<Employee> = emptyList()
+    @KomapperVersion val version: Int,
+    @KomapperIgnore val employeeList: List<Employee> = emptyList()
 ) {
     companion object
 }
 
-@KmEntity
-@KmTable("DEPARTMENT")
+@KomapperEntity
+@KomapperTable("DEPARTMENT")
 data class NoVersionDepartment(
-    @KmId @KmColumn("DEPARTMENT_ID") val departmentId: Int,
-    @KmColumn("DEPARTMENT_NO") val departmentNo: Int,
-    @KmColumn("DEPARTMENT_NAME") val departmentName: String,
+    @KomapperId @KomapperColumn("DEPARTMENT_ID") val departmentId: Int,
+    @KomapperColumn("DEPARTMENT_NO") val departmentNo: Int,
+    @KomapperColumn("DEPARTMENT_NAME") val departmentName: String,
     val location: String,
     val version: Int,
-    @KmIgnore val employeeList: List<Employee> = emptyList()
+    @KomapperIgnore val employeeList: List<Employee> = emptyList()
 ) {
     companion object
 }

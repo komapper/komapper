@@ -20,7 +20,7 @@ internal class EntityDefFactory(
     }
 
     private fun getTable(): Table {
-        val annotation = defDeclaration.findAnnotation("KmTable")
+        val annotation = defDeclaration.findAnnotation("KomapperTable")
         val name = annotation?.findValue("name")?.toString()?.trim().let {
             if (it.isNullOrBlank()) null else it
         } ?: namingStrategy.apply(definitionSource.entityDeclaration.simpleName.asString())
@@ -31,7 +31,7 @@ internal class EntityDefFactory(
     }
 
     private fun getColumn(parameter: KSValueParameter): Column {
-        val annotation = parameter.findAnnotation("KmColumn")
+        val annotation = parameter.findAnnotation("KomapperColumn")
         val name = annotation?.findValue("name")?.toString()?.trim().let {
             if (it.isNullOrBlank()) null else it
         } ?: namingStrategy.apply(parameter.toString())
@@ -57,13 +57,13 @@ internal class EntityDefFactory(
 
     private fun validateProperties(properties: Sequence<PropertyDef>) {
         if (properties.anyDuplicates { it.kind is PropertyKind.Version }) {
-            report("Multiple @KmVersion cannot coexist in a single class.", defDeclaration)
+            report("Multiple @KomapperVersion cannot coexist in a single class.", defDeclaration)
         }
         if (properties.anyDuplicates { it.kind is PropertyKind.CreatedAt }) {
-            report("Multiple @KmCreatedAt cannot coexist in a single class.", defDeclaration)
+            report("Multiple @KomapperCreatedAt cannot coexist in a single class.", defDeclaration)
         }
         if (properties.anyDuplicates { it.kind is PropertyKind.UpdatedAt }) {
-            report("Multiple @KmUpdatedAt cannot coexist in a single class.", defDeclaration)
+            report("Multiple @KomapperUpdatedAt cannot coexist in a single class.", defDeclaration)
         }
     }
 
@@ -72,10 +72,10 @@ internal class EntityDefFactory(
         var sequence: IdKind.Sequence? = null
         for (a in parameter.annotations) {
             when (a.shortName.asString()) {
-                "KmAutoIncrement" -> autoIncrement = IdKind.AutoIncrement(a)
-                "KmSequence" -> sequence = let {
+                "KomapperAutoIncrement" -> autoIncrement = IdKind.AutoIncrement(a)
+                "KomapperSequence" -> sequence = let {
                     val name = a.findValue("name")?.toString()?.trim()
-                        ?: report("@KmSequence.name is not found.", a)
+                        ?: report("@KomapperSequence.name is not found.", a)
                     val startWith = a.findValue("startWith") ?: 1
                     val incrementBy = a.findValue("incrementBy") ?: 50
                     val catalog = a.findValue("catalog")?.toString()?.trim() ?: ""
@@ -103,11 +103,11 @@ internal class EntityDefFactory(
         var ignore: PropertyKind.Ignore? = null
         for (a in parameter.annotations) {
             when (a.shortName.asString()) {
-                "KmId" -> id = PropertyKind.Id(a, idKind)
-                "KmVersion" -> version = PropertyKind.Version(a)
-                "KmCreatedAt" -> createdAt = PropertyKind.CreatedAt(a)
-                "KmUpdatedAt" -> updatedAt = PropertyKind.UpdatedAt(a)
-                "KmIgnore" -> ignore = PropertyKind.Ignore(a)
+                "KomapperId" -> id = PropertyKind.Id(a, idKind)
+                "KomapperVersion" -> version = PropertyKind.Version(a)
+                "KomapperCreatedAt" -> createdAt = PropertyKind.CreatedAt(a)
+                "KomapperUpdatedAt" -> updatedAt = PropertyKind.UpdatedAt(a)
+                "KomapperIgnore" -> ignore = PropertyKind.Ignore(a)
             }
         }
         val kinds = listOfNotNull(id, version, createdAt, updatedAt, ignore)
@@ -119,7 +119,7 @@ internal class EntityDefFactory(
         }
         return kinds.firstOrNull().also { kind ->
             if (idKind != null && kind !is PropertyKind.Id) {
-                report("${idKind.annotation} and @KmId must coexist on the same property.", parameter)
+                report("${idKind.annotation} and @KomapperId must coexist on the same property.", parameter)
             }
         }
     }

@@ -17,20 +17,20 @@ internal class SeparateDefinitionSourceResolver : EntityDefinitionSourceResolver
         val defDeclaration = symbol.accept(
             object : ClassDeclarationVisitor() {
                 override fun defaultHandler(node: KSNode, data: Unit): KSClassDeclaration {
-                    report("@KmEntityDef cannot be applied to this element.", node)
+                    report("@KomapperEntityDef cannot be applied to this element.", node)
                 }
             },
             Unit
         )
-        val annotation = defDeclaration.findAnnotation("KmEntityDef")
+        val annotation = defDeclaration.findAnnotation("KomapperEntityDef")
         val value = annotation?.findValue("entity")
         if (value !is KSType) {
-            report("The entity value of @KmEntityDef is not found.", defDeclaration)
+            report("The entity value of @KomapperEntityDef is not found.", defDeclaration)
         }
         val entityDeclaration = value.declaration.accept(
             object : ClassDeclarationVisitor() {
                 override fun defaultHandler(node: KSNode, data: Unit): KSClassDeclaration {
-                    report("The entity value of @KmEntityDef is not found.", defDeclaration)
+                    report("The entity value of @KomapperEntityDef is not found.", defDeclaration)
                 }
             },
             Unit
@@ -45,7 +45,7 @@ internal class SelfDefinitionSourceResolver : EntityDefinitionSourceResolver {
         val entityDeclaration = symbol.accept(
             object : ClassDeclarationVisitor() {
                 override fun defaultHandler(node: KSNode, data: Unit): KSClassDeclaration {
-                    report("@KmEntity cannot be applied to this element.", node)
+                    report("@KomapperEntity cannot be applied to this element.", node)
                 }
             },
             Unit

@@ -1,14 +1,14 @@
 package integration
 
-import org.komapper.annotation.KmAutoIncrement
-import org.komapper.annotation.KmColumn
-import org.komapper.annotation.KmCreatedAt
-import org.komapper.annotation.KmEntity
-import org.komapper.annotation.KmId
-import org.komapper.annotation.KmSequence
-import org.komapper.annotation.KmTable
-import org.komapper.annotation.KmUpdatedAt
-import org.komapper.annotation.KmVersion
+import org.komapper.annotation.KomapperAutoIncrement
+import org.komapper.annotation.KomapperColumn
+import org.komapper.annotation.KomapperCreatedAt
+import org.komapper.annotation.KomapperEntity
+import org.komapper.annotation.KomapperId
+import org.komapper.annotation.KomapperSequence
+import org.komapper.annotation.KomapperTable
+import org.komapper.annotation.KomapperUpdatedAt
+import org.komapper.annotation.KomapperVersion
 import java.time.LocalDateTime
 
 @JvmInline
@@ -27,40 +27,40 @@ value class Version(val value: Int)
 @JvmInline
 value class Timestamp(val value: LocalDateTime)
 
-@KmEntity
-@KmTable("ADDRESS")
+@KomapperEntity
+@KomapperTable("ADDRESS")
 data class VAddress(
-    @KmId val addressId: IntId,
+    @KomapperId val addressId: IntId,
     val street: Street,
-    @KmVersion val version: Version
+    @KomapperVersion val version: Version
 ) {
     companion object
 }
 
-@KmEntity
-@KmTable("PERSON")
+@KomapperEntity
+@KomapperTable("PERSON")
 data class VPerson(
-    @KmId @KmColumn("PERSON_ID") val personId: IntId,
+    @KomapperId @KomapperColumn("PERSON_ID") val personId: IntId,
     val name: String,
-    @KmCreatedAt @KmColumn("CREATED_AT") val createdAt: Timestamp? = null,
-    @KmUpdatedAt @KmColumn("UPDATED_AT") val updatedAt: Timestamp? = null
+    @KomapperCreatedAt @KomapperColumn("CREATED_AT") val createdAt: Timestamp? = null,
+    @KomapperUpdatedAt @KomapperColumn("UPDATED_AT") val updatedAt: Timestamp? = null
 ) {
     companion object
 }
 
-@KmEntity
-@KmTable("IDENTITY_STRATEGY")
+@KomapperEntity
+@KomapperTable("IDENTITY_STRATEGY")
 data class VIdentityStrategy(
-    @KmId @KmAutoIncrement val id: IntId?,
+    @KomapperId @KomapperAutoIncrement val id: IntId?,
     val value: String
 ) {
     companion object
 }
 
-@KmEntity
-@KmTable("SEQUENCE_STRATEGY")
+@KomapperEntity
+@KomapperTable("SEQUENCE_STRATEGY")
 data class VSequenceStrategy(
-    @KmId @KmSequence(name = "SEQUENCE_STRATEGY_ID", incrementBy = 100) val id: IntId,
+    @KomapperId @KomapperSequence(name = "SEQUENCE_STRATEGY_ID", incrementBy = 100) val id: IntId,
     val value: String
 ) {
     companion object

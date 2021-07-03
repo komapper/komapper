@@ -35,13 +35,15 @@ data class Address(
 )
 
 // Mapping definition: this class maps the ADDRESS table and the Address class.
-@KmEntityDef(Address::class)
+@KomapperEntityDef(Address::class)
 data class AddressDef(
-    @KmId @KmAutoIncrement @KmColumn(name = "ADDRESS_ID")
+    @KomapperId
+    @KomapperAutoIncrement
+    @KomapperColumn(name = "ADDRESS_ID")
     val id: Nothing,
-    @KmVersion val version: Nothing,
-    @KmCreatedAt val createdAt: Nothing,
-    @KmUpdatedAt val updatedAt: Nothing,
+    @KomapperVersion val version: Nothing,
+    @KomapperCreatedAt val createdAt: Nothing,
+    @KomapperUpdatedAt val updatedAt: Nothing,
 ) {
     companion object
 }

@@ -6,19 +6,19 @@ import kotlin.reflect.KClass
 
 @Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.SOURCE)
-annotation class KmEntity
+annotation class KomapperEntity
 
 @Target(AnnotationTarget.VALUE_PARAMETER)
 @Retention(AnnotationRetention.SOURCE)
-annotation class KmId
+annotation class KomapperId
 
 @Target(AnnotationTarget.VALUE_PARAMETER)
 @Retention(AnnotationRetention.SOURCE)
-annotation class KmVersion
+annotation class KomapperVersion
 
 @Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.SOURCE)
-annotation class KmTable(
+annotation class KomapperTable(
     val name: String = "",
     val catalog: String = "",
     val schema: String = "",
@@ -27,23 +27,23 @@ annotation class KmTable(
 
 @Target(AnnotationTarget.VALUE_PARAMETER)
 @Retention(AnnotationRetention.SOURCE)
-annotation class KmColumn(val name: String = "", val alwaysQuote: Boolean = false)
+annotation class KomapperColumn(val name: String = "", val alwaysQuote: Boolean = false)
 
 @Target(AnnotationTarget.VALUE_PARAMETER)
 @Retention(AnnotationRetention.SOURCE)
-annotation class KmCreatedAt
+annotation class KomapperCreatedAt
 
 @Target(AnnotationTarget.VALUE_PARAMETER)
 @Retention(AnnotationRetention.SOURCE)
-annotation class KmUpdatedAt
+annotation class KomapperUpdatedAt
 
 @Target(AnnotationTarget.VALUE_PARAMETER)
 @Retention(AnnotationRetention.SOURCE)
-annotation class KmIgnore
+annotation class KomapperIgnore
 
 @Target(AnnotationTarget.VALUE_PARAMETER)
 @Retention(AnnotationRetention.SOURCE)
-annotation class KmSequence(
+annotation class KomapperSequence(
     val name: String,
     val startWith: Int = 1,
     val incrementBy: Int = 50,
@@ -54,8 +54,8 @@ annotation class KmSequence(
 
 @Target(AnnotationTarget.VALUE_PARAMETER)
 @Retention(AnnotationRetention.SOURCE)
-annotation class KmAutoIncrement
+annotation class KomapperAutoIncrement
 
 @Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.SOURCE)
-annotation class KmEntityDef(val entity: KClass<*>)
+annotation class KomapperEntityDef(val entity: KClass<*>)

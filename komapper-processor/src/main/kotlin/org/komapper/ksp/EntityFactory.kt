@@ -120,8 +120,8 @@ internal class EntityFactory(config: Config, private val entityDef: EntityDef) {
         when (val kind = property.kind) {
             is PropertyKind.Id -> validateIdProperty(property, kind.idKind)
             is PropertyKind.Version -> validateVersionProperty(property)
-            is PropertyKind.CreatedAt -> validateTimestampProperty(property, "@KmCreatedAt")
-            is PropertyKind.UpdatedAt -> validateTimestampProperty(property, "@KmUpdatedAt")
+            is PropertyKind.CreatedAt -> validateTimestampProperty(property, "@KomapperCreatedAt")
+            is PropertyKind.UpdatedAt -> validateTimestampProperty(property, "@KomapperUpdatedAt")
             is PropertyKind.Ignore -> validateIgnoreProperty(property)
             else -> Unit
         }
@@ -166,8 +166,8 @@ internal class EntityFactory(config: Config, private val entityDef: EntityDef) {
             }
         }
         when (idKind) {
-            is IdKind.AutoIncrement -> validate("@KmAutoIncrement")
-            is IdKind.Sequence -> validate("@KmSequence")
+            is IdKind.AutoIncrement -> validate("@KomapperAutoIncrement")
+            is IdKind.Sequence -> validate("@KomapperSequence")
         }
     }
 
@@ -177,14 +177,14 @@ internal class EntityFactory(config: Config, private val entityDef: EntityDef) {
             else -> {
                 if (property.valueClass == null) {
                     report(
-                        "The type of @KmVersion annotated property must be either Int, Long, UInt or value class.",
+                        "The type of @KomapperVersion annotated property must be either Int, Long, UInt or value class.",
                         property.parameter
                     )
                 } else {
                     when (property.valueClass.property.typeName) {
                         "kotlin.Int", "kotlin.Long", "kotlin.UInt" -> Unit
                         else -> report(
-                            "When the type of @KmVersion annotated property is value class, the type of the value class's own property must be either Int, Long or UInt.",
+                            "When the type of @KomapperVersion annotated property is value class, the type of the value class's own property must be either Int, Long or UInt.",
                             property.parameter
                         )
                     }
@@ -238,7 +238,7 @@ internal class EntityFactory(config: Config, private val entityDef: EntityDef) {
         }
         if (idKinds.count() > 1) {
             report(
-                "@KmAutoIncrement and @KmSequence cannot coexist in a single class.",
+                "@KomapperAutoIncrement and @KomapperSequence cannot coexist in a single class.",
                 entityDef.definitionSource.entityDeclaration
             )
         }

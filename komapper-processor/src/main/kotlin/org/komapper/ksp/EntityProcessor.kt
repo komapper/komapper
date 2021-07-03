@@ -15,8 +15,8 @@ internal class EntityProcessor(private val environment: SymbolProcessorEnvironme
             return emptyList()
         }
         val pairs = listOf(
-            "org.komapper.annotation.KmEntityDef" to SeparateDefinitionSourceResolver(),
-            "org.komapper.annotation.KmEntity" to SelfDefinitionSourceResolver()
+            "org.komapper.annotation.KomapperEntityDef" to SeparateDefinitionSourceResolver(),
+            "org.komapper.annotation.KomapperEntity" to SelfDefinitionSourceResolver()
         )
         for ((annotation, definitionSourceResolver) in pairs) {
             val symbols = resolver.getSymbolsWithAnnotation(annotation)
