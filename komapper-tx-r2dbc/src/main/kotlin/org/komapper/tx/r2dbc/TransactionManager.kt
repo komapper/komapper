@@ -4,16 +4,17 @@ import io.r2dbc.spi.Connection
 import io.r2dbc.spi.ConnectionFactory
 import io.r2dbc.spi.ConnectionFactoryMetadata
 import io.r2dbc.spi.IsolationLevel
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.asContextElement
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.reactive.asPublisher
 import kotlinx.coroutines.reactive.awaitFirst
 import kotlinx.coroutines.reactive.awaitFirstOrNull
+import kotlinx.coroutines.withContext
 import org.komapper.core.LogCategory
 import org.komapper.core.Logger
 import org.komapper.core.ThreadSafe
 import org.reactivestreams.Publisher
-import kotlin.coroutines.CoroutineContext
 
 @ThreadSafe
 interface TransactionManager {
@@ -21,8 +22,8 @@ interface TransactionManager {
     val isActive: Boolean
     val isRollbackOnly: Boolean
     fun setRollbackOnly()
-    fun suspend(): CoroutineContext
-    suspend fun begin(isolationLevel: IsolationLevel? = null): CoroutineContext
+    suspend fun <R> begin(isolationLevel: IsolationLevel? = null, block: suspend CoroutineScope.() -> R): R
+    suspend fun <R> suspend(block: suspend CoroutineScope.() -> R): R
     suspend fun commit()
     suspend fun rollback()
 }
@@ -67,11 +68,7 @@ internal class TransactionManagerImpl(
         }
     }
 
-    override fun suspend(): CoroutineContext {
-        return threadLocal.asContextElement(EmptyTransaction)
-    }
-
-    override suspend fun begin(isolationLevel: IsolationLevel?): CoroutineContext {
+    override suspend fun <R> begin(isolationLevel: IsolationLevel?, block: suspend CoroutineScope.() -> R): R {
         val currentTx = threadLocal.get()
         if (currentTx.isActive()) {
             rollbackInternal(currentTx)
@@ -85,7 +82,13 @@ internal class TransactionManagerImpl(
         }
         tx.connection.beginTransaction().awaitFirstOrNull()
         logger.trace(LogCategory.TRANSACTION.value) { "The transaction \"$tx\" has begun." }
-        return threadLocal.asContextElement(tx)
+        val context = threadLocal.asContextElement(tx)
+        return withContext(context, block)
+    }
+
+    override suspend fun <R> suspend(block: suspend CoroutineScope.() -> R): R {
+        val context = threadLocal.asContextElement(EmptyTransaction)
+        return withContext(context, block)
     }
 
     override suspend fun commit() {
