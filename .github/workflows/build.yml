@@ -89,17 +89,6 @@ jobs:
     timeout-minutes: 10
     needs: [ build ]
 
-    services:
-      mysql:
-        image: mysql:8.0.20
-        env:
-          MYSQL_ROOT_PASSWORD: integration_test
-          MYSQL_DATABASE: integration_test
-          MYSQL_USER: integration_test
-          MYSQL_PASSWORD: integration_test
-        ports:
-          - 3306:3306
-
     steps:
       - uses: actions/checkout@v2
 
@@ -139,16 +128,6 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     needs: [ build ]
-
-    services:
-      postgres:
-        image: postgres:13.3
-        env:
-          POSTGRES_USER: integration_test
-          POSTGRES_PASSWORD: integration_test
-          POSTGRES_DB: integration_test
-        ports:
-          - 5432:5432
 
     steps:
       - uses: actions/checkout@v2
