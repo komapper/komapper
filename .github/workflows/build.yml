@@ -47,7 +47,6 @@ jobs:
   h2:
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    needs: [ build ]
 
     steps:
       - uses: actions/checkout@v2
@@ -87,7 +86,6 @@ jobs:
   mysql:
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    needs: [ build ]
 
     steps:
       - uses: actions/checkout@v2
@@ -127,7 +125,6 @@ jobs:
   postgresql:
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    needs: [ build ]
 
     steps:
       - uses: actions/checkout@v2
