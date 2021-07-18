@@ -1,4 +1,5 @@
 plugins {
+    java
     kotlin("jvm")
     id("com.diffplug.spotless") version "5.14.1"
     id("io.github.gradle-nexus.publish-plugin") version "1.1.0"
@@ -44,29 +45,7 @@ val integrationTestProjects = subprojects.filter {
     it.name.startsWith("integration-test")
 }
 
-configure(libraryProjects + gradlePluginProject) {
-    apply(plugin = "org.jetbrains.kotlin.jvm")
-
-    configure<JavaPluginExtension> {
-        withJavadocJar()
-        withSourcesJar()
-    }
-}
-
-configure(libraryProjects + gradlePluginProject + exampleProjects + integrationTestProjects) {
-    apply(plugin = "org.jetbrains.kotlin.jvm")
-
-    tasks.withType<Test> {
-        useJUnitPlatform()
-    }
-
-    dependencies {
-        "testImplementation"("org.junit.jupiter:junit-jupiter-api:5.7.2")
-        "testRuntimeOnly"("org.junit.jupiter:junit-jupiter-engine:5.7.2")
-    }
-}
-
-configure(libraryProjects + gradlePluginProject + integrationTestProjects + exampleProjects) {
+configure(libraryProjects + exampleProjects + integrationTestProjects) {
     apply(plugin = "org.jetbrains.kotlin.jvm")
 
     configure<com.diffplug.gradle.spotless.SpotlessExtension> {
@@ -74,6 +53,34 @@ configure(libraryProjects + gradlePluginProject + integrationTestProjects + exam
             targetExclude("build/**")
             ktlint("0.41.0")
         }
+    }
+}
+
+configure(listOf(gradlePluginProject)) {
+    apply(plugin = "java")
+
+    configure<com.diffplug.gradle.spotless.SpotlessExtension> {
+        java {
+            googleJavaFormat("1.7")
+        }
+    }
+}
+
+configure(libraryProjects + gradlePluginProject) {
+    configure<JavaPluginExtension> {
+        withJavadocJar()
+        withSourcesJar()
+    }
+}
+
+configure(libraryProjects + gradlePluginProject + exampleProjects + integrationTestProjects) {
+    tasks.withType<Test> {
+        useJUnitPlatform()
+    }
+
+    dependencies {
+        "testImplementation"("org.junit.jupiter:junit-jupiter-api:5.7.2")
+        "testRuntimeOnly"("org.junit.jupiter:junit-jupiter-engine:5.7.2")
     }
 }
 
