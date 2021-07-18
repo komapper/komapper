@@ -22,6 +22,10 @@ dependencies {
     runtimeOnly(project(":komapper-slf4j"))
     runtimeOnly(project(":komapper-template"))
     runtimeOnly("ch.qos.logback:logback-classic:1.2.3")
+    api(platform("org.testcontainers:testcontainers-bom:1.15.3"))
+    runtimeOnly("org.testcontainers:mysql")
+    runtimeOnly("org.testcontainers:postgresql")
+    runtimeOnly("org.testcontainers:r2dbc")
 }
 
 ksp {

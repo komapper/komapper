@@ -12,7 +12,7 @@ import kotlin.reflect.KClass
 interface JdbcDialect : Dialect {
 
     companion object {
-        private val jdbcUrlPattern = Pattern.compile("^jdbc:([^:]*):.*")
+        private val jdbcUrlPattern = Pattern.compile("^jdbc:(tc:)?([^:]*):.*")
 
         fun load(url: String, dataTypes: List<JdbcDataType<*>>): JdbcDialect {
             val driver = extractJdbcDriver(url)
@@ -29,7 +29,7 @@ interface JdbcDialect : Dialect {
         private fun extractJdbcDriver(url: String): String {
             val matcher = jdbcUrlPattern.matcher(url)
             if (matcher.matches()) {
-                return matcher.group(1).lowercase()
+                return matcher.group(2).lowercase()
             }
             error("The driver in the JDBC URL is not found. url=$url")
         }

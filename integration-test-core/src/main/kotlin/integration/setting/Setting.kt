@@ -6,4 +6,5 @@ interface Setting<CONFIG> {
     val createSql: String
     val dropSql: String
     val resetSql: String?
+    fun close() = Unit
 }

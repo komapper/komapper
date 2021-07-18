@@ -16,7 +16,7 @@ fun <T> inTransaction(db: R2dbcDatabase, block: suspend TransactionScope.() -> T
     }
 }
 
-fun <T> runBlockingWithTimeout(timeMillis: Long = 3000L, block: suspend CoroutineScope.() -> T) {
+fun <T> runBlockingWithTimeout(timeMillis: Long = 30000L, block: suspend CoroutineScope.() -> T) {
     runBlocking {
         withTimeout(timeMillis, block)
     }
