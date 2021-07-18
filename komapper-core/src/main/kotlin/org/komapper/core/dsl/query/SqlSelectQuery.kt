@@ -8,11 +8,11 @@ import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.expression.ScalarExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.SqlSelectOptions
-import org.komapper.core.dsl.runner.QueryRunner
 import org.komapper.core.dsl.scope.HavingDeclaration
 import org.komapper.core.dsl.scope.HavingScope
 import org.komapper.core.dsl.scope.OnDeclaration
 import org.komapper.core.dsl.scope.WhereDeclaration
+import org.komapper.core.dsl.visitor.FlowQueryVisitor
 import org.komapper.core.dsl.visitor.QueryVisitor
 
 interface SqlSelectQuery<ENTITY : Any> : FlowableSubquery<ENTITY> {
@@ -161,12 +161,14 @@ internal data class SqlSelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<
         return copy(options = configure(options))
     }
 
-    override fun accept(visitor: QueryVisitor): QueryRunner {
+    override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
         return visitor.sqlSelectQuery(context, options) { it.toList() }
     }
 
-    override fun <R> collect(collect: suspend (Flow<ENTITY>) -> R): Query<R> = Query { visitor ->
-        visitor.sqlSelectQuery(context, options, collect)
+    override fun <R> collect(collect: suspend (Flow<ENTITY>) -> R): Query<R> = object : Query<R> {
+        override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
+            return visitor.sqlSelectQuery(context, options, collect)
+        }
     }
 
     override fun except(other: Subquery<ENTITY>): FlowableSetOperationQuery<ENTITY> {
@@ -250,7 +252,9 @@ internal data class SqlSelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<
         return SqlMultipleColumnsQuery(newContext, options, list)
     }
 
-    override fun asFlowQuery(): FlowQuery<ENTITY> = FlowQuery { visitor ->
-        visitor.sqlSelectQuery(context, options)
+    override fun asFlowQuery(): FlowQuery<ENTITY> = object : FlowQuery<ENTITY> {
+        override fun <VISIT_RESULT> accept(visitor: FlowQueryVisitor<VISIT_RESULT>): VISIT_RESULT {
+            return visitor.sqlSelectQuery(context, options)
+        }
     }
 }

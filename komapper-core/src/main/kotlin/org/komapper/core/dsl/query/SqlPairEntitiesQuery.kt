@@ -6,7 +6,7 @@ import org.komapper.core.dsl.context.SqlSelectContext
 import org.komapper.core.dsl.context.SubqueryContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.SqlSelectOptions
-import org.komapper.core.dsl.runner.QueryRunner
+import org.komapper.core.dsl.visitor.FlowQueryVisitor
 import org.komapper.core.dsl.visitor.QueryVisitor
 
 internal class SqlPairEntitiesQuery<A : Any, A_META : EntityMetamodel<A, *, A_META>, B : Any, B_META : EntityMetamodel<B, *, B_META>>(
@@ -20,16 +20,20 @@ internal class SqlPairEntitiesQuery<A : Any, A_META : EntityMetamodel<A, *, A_ME
     private val support: FlowableSubquerySupport<Pair<A, B?>> =
         FlowableSubquerySupport(subqueryContext) { SqlPairEntitiesSetOperationQuery(it, metamodels = metamodels) }
 
-    override fun accept(visitor: QueryVisitor): QueryRunner {
+    override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
         return visitor.sqlPairEntitiesQuery(context, options, metamodels) { it.toList() }
     }
 
-    override fun <R> collect(collect: suspend (Flow<Pair<A, B?>>) -> R): Query<R> = Query { visitor ->
-        visitor.sqlPairEntitiesQuery(context, options, metamodels, collect)
+    override fun <R> collect(collect: suspend (Flow<Pair<A, B?>>) -> R): Query<R> = object : Query<R> {
+        override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
+            return visitor.sqlPairEntitiesQuery(context, options, metamodels, collect)
+        }
     }
 
-    override fun asFlowQuery(): FlowQuery<Pair<A, B?>> = FlowQuery { visitor ->
-        visitor.sqlPairEntitiesQuery(context, options, metamodels)
+    override fun asFlowQuery(): FlowQuery<Pair<A, B?>> = object : FlowQuery<Pair<A, B?>> {
+        override fun <VISIT_RESULT> accept(visitor: FlowQueryVisitor<VISIT_RESULT>): VISIT_RESULT {
+            return visitor.sqlPairEntitiesQuery(context, options, metamodels)
+        }
     }
 
     override fun except(other: Subquery<Pair<A, B?>>): FlowableSetOperationQuery<Pair<A, B?>> {

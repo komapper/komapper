@@ -37,117 +37,116 @@ import org.komapper.core.dsl.query.Columns
 import org.komapper.core.dsl.query.Entities
 import org.komapper.core.dsl.query.Query
 import org.komapper.core.dsl.query.Row
-import org.komapper.core.dsl.runner.QueryRunner
 
 @ThreadSafe
-interface QueryVisitor {
+interface QueryVisitor<VISIT_RESULT> {
 
-    fun <T, S> plusQuery(left: Query<T>, right: Query<S>): QueryRunner
+    fun <T, S> plusQuery(left: Query<T>, right: Query<S>): VISIT_RESULT
 
-    fun <T, S> flatMapQuery(query: Query<T>, transform: (T) -> Query<S>): QueryRunner
+    fun <T, S> flatMapQuery(query: Query<T>, transform: (T) -> Query<S>): VISIT_RESULT
 
-    fun <T, S> flatZipQuery(query: Query<T>, transform: (T) -> Query<S>): QueryRunner
+    fun <T, S> flatZipQuery(query: Query<T>, transform: (T) -> Query<S>): VISIT_RESULT
 
     fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>, R>
     entitySelectQuery(
         context: EntitySelectContext<ENTITY, ID, META>,
         options: EntitySelectOptions,
         transform: suspend (Flow<ENTITY>) -> R
-    ): QueryRunner
+    ): VISIT_RESULT
 
     fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>
     entityDeleteBatchQuery(
         context: EntityDeleteContext<ENTITY, ID, META>,
         options: EntityDeleteBatchOptions,
         entities: List<ENTITY>
-    ): QueryRunner
+    ): VISIT_RESULT
 
     fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>
     entityDeleteSingleQuery(
         context: EntityDeleteContext<ENTITY, ID, META>,
         options: EntityDeleteOptions,
         entity: ENTITY
-    ): QueryRunner
+    ): VISIT_RESULT
 
     fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>
     entityInsertMultipleQuery(
         context: EntityInsertContext<ENTITY, ID, META>,
         options: EntityInsertOptions,
         entities: List<ENTITY>
-    ): QueryRunner
+    ): VISIT_RESULT
 
     fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>
     entityInsertBatchQuery(
         context: EntityInsertContext<ENTITY, ID, META>,
         options: EntityInsertBatchOptions,
         entities: List<ENTITY>
-    ): QueryRunner
+    ): VISIT_RESULT
 
     fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>
     entityInsertSingleQuery(
         context: EntityInsertContext<ENTITY, ID, META>,
         options: EntityInsertOptions,
         entity: ENTITY
-    ): QueryRunner
+    ): VISIT_RESULT
 
     fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>
     entityUpdateBatchQuery(
         context: EntityUpdateContext<ENTITY, ID, META>,
         options: EntityUpdateBatchOptions,
         entities: List<ENTITY>
-    ): QueryRunner
+    ): VISIT_RESULT
 
     fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>
     entityUpdateSingleQuery(
         context: EntityUpdateContext<ENTITY, ID, META>,
         options: EntityUpdateOptions,
         entity: ENTITY
-    ): QueryRunner
+    ): VISIT_RESULT
 
     fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>
     entityUpsertBatchQuery(
         context: EntityUpsertContext<ENTITY, ID, META>,
         options: InsertOptions,
         entities: List<ENTITY>
-    ): QueryRunner
+    ): VISIT_RESULT
 
     fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>
     entityUpsertMultipleQuery(
         context: EntityUpsertContext<ENTITY, ID, META>,
         options: InsertOptions,
         entities: List<ENTITY>
-    ): QueryRunner
+    ): VISIT_RESULT
 
     fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>
     entityUpsertSingleQuery(
         context: EntityUpsertContext<ENTITY, ID, META>,
         options: InsertOptions,
         entity: ENTITY,
-    ): QueryRunner
+    ): VISIT_RESULT
 
     fun schemaCreateQuery(
         entityMetamodels: List<EntityMetamodel<*, *, *>>,
         options: SchemaCreateOptions
-    ): QueryRunner
+    ): VISIT_RESULT
 
     fun schemaDropQuery(
         entityMetamodels: List<EntityMetamodel<*, *, *>>,
         options: SchemaDropOptions
-    ): QueryRunner
+    ): VISIT_RESULT
 
-    fun schemaDropAllQuery(options: SchemaDropAllOptions): QueryRunner
+    fun schemaDropAllQuery(options: SchemaDropAllOptions): VISIT_RESULT
 
     fun scriptExecuteQuery(
         sql: String,
         options: ScriptExecuteOptions
-    ): QueryRunner
+    ): VISIT_RESULT
 
     fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>, R>
     sqlSelectQuery(
         context: SqlSelectContext<ENTITY, ID, META>,
         options: SqlSelectOptions,
         collect: suspend (Flow<ENTITY>) -> R
-    ): QueryRunner
+    ): VISIT_RESULT
 
     fun <T : Any, R>
     sqlSetOperationQuery(
@@ -155,7 +154,7 @@ interface QueryVisitor {
         options: SqlSetOperationOptions,
         metamodel: EntityMetamodel<T, *, *>,
         collect: suspend (Flow<T>) -> R
-    ): QueryRunner
+    ): VISIT_RESULT
 
     fun <A : Any, A_META : EntityMetamodel<A, *, A_META>, B : Any, B_META : EntityMetamodel<B, *, B_META>, R>
     sqlPairEntitiesQuery(
@@ -163,7 +162,7 @@ interface QueryVisitor {
         options: SqlSelectOptions,
         metamodels: Pair<A_META, B_META>,
         collect: suspend (Flow<Pair<A, B?>>) -> R
-    ): QueryRunner
+    ): VISIT_RESULT
 
     fun <A : Any, A_META : EntityMetamodel<A, *, A_META>, B : Any, B_META : EntityMetamodel<B, *, B_META>, R>
     sqlPairEntitiesSetOperationQuery(
@@ -171,7 +170,7 @@ interface QueryVisitor {
         options: SqlSetOperationOptions,
         metamodels: Pair<A_META, B_META>,
         collect: suspend (Flow<Pair<A, B?>>) -> R
-    ): QueryRunner
+    ): VISIT_RESULT
 
     fun <A : Any, A_META : EntityMetamodel<A, *, A_META>, B : Any, B_META : EntityMetamodel<B, *, B_META>, C : Any, C_META : EntityMetamodel<C, *, C_META>, R>
     sqlTripleEntitiesQuery(
@@ -179,7 +178,7 @@ interface QueryVisitor {
         options: SqlSelectOptions,
         metamodels: Triple<A_META, B_META, C_META>,
         collect: suspend (Flow<Triple<A, B?, C?>>) -> R
-    ): QueryRunner
+    ): VISIT_RESULT
 
     fun <A : Any, A_META : EntityMetamodel<A, *, A_META>, B : Any, B_META : EntityMetamodel<B, *, B_META>, C : Any, C_META : EntityMetamodel<C, *, C_META>, R>
     sqlTripleEntitiesSetOperationQuery(
@@ -187,21 +186,21 @@ interface QueryVisitor {
         options: SqlSetOperationOptions,
         metamodels: Triple<A_META, B_META, C_META>,
         collect: suspend (Flow<Triple<A, B?, C?>>) -> R
-    ): QueryRunner
+    ): VISIT_RESULT
 
     fun <R> sqlMultipleEntitiesQuery(
         context: SqlSelectContext<*, *, *>,
         options: SqlSelectOptions,
         metamodels: List<EntityMetamodel<*, *, *>>,
         collect: suspend (Flow<Entities>) -> R
-    ): QueryRunner
+    ): VISIT_RESULT
 
     fun <R> sqlMultipleEntitiesSetOperationQuery(
         context: SqlSetOperationContext<Entities>,
         options: SqlSetOperationOptions,
         metamodels: List<EntityMetamodel<*, *, *>>,
         collect: suspend (Flow<Entities>) -> R
-    ): QueryRunner
+    ): VISIT_RESULT
 
     fun <A : Any, R>
     sqlSingleColumnQuery(
@@ -209,7 +208,7 @@ interface QueryVisitor {
         options: SqlSelectOptions,
         expression: ColumnExpression<A, *>,
         collect: suspend (Flow<A?>) -> R
-    ): QueryRunner
+    ): VISIT_RESULT
 
     fun <A : Any, R>
     sqlSingleColumnSetOperationQuery(
@@ -217,7 +216,7 @@ interface QueryVisitor {
         options: SqlSetOperationOptions,
         expression: ColumnExpression<A, *>,
         collect: suspend (Flow<A?>) -> R
-    ): QueryRunner
+    ): VISIT_RESULT
 
     fun <A : Any, B : Any, R>
     sqlPairColumnsQuery(
@@ -225,7 +224,7 @@ interface QueryVisitor {
         options: SqlSelectOptions,
         expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
         collect: suspend (Flow<Pair<A?, B?>>) -> R
-    ): QueryRunner
+    ): VISIT_RESULT
 
     fun <A : Any, B : Any, R>
     sqlPairColumnsSetOperationQuery(
@@ -233,7 +232,7 @@ interface QueryVisitor {
         options: SqlSetOperationOptions = SqlSetOperationOptions.default,
         expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
         collect: suspend (Flow<Pair<A?, B?>>) -> R
-    ): QueryRunner
+    ): VISIT_RESULT
 
     fun <A : Any, B : Any, C : Any, R>
     sqlTripleColumnsQuery(
@@ -241,7 +240,7 @@ interface QueryVisitor {
         options: SqlSelectOptions,
         expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
         collect: suspend (Flow<Triple<A?, B?, C?>>) -> R
-    ): QueryRunner
+    ): VISIT_RESULT
 
     fun <A : Any, B : Any, C : Any, R>
     sqlTripleColumnsSetOperationQuery(
@@ -249,45 +248,45 @@ interface QueryVisitor {
         options: SqlSetOperationOptions,
         expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
         collect: suspend (Flow<Triple<A?, B?, C?>>) -> R
-    ): QueryRunner
+    ): VISIT_RESULT
 
     fun <R> sqlMultipleColumnsQuery(
         context: SqlSelectContext<*, *, *>,
         options: SqlSelectOptions,
         expressions: List<ColumnExpression<*, *>>,
         collect: suspend (Flow<Columns>) -> R
-    ): QueryRunner
+    ): VISIT_RESULT
 
     fun <R> sqlMultipleColumnsSetOperationQuery(
         context: SqlSetOperationContext<Columns>,
         options: SqlSetOperationOptions,
         expressions: List<ColumnExpression<*, *>>,
         collect: suspend (Flow<Columns>) -> R
-    ): QueryRunner
+    ): VISIT_RESULT
 
     fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>
     sqlDeleteQuery(
         context: SqlDeleteContext<ENTITY, ID, META>,
         options: SqlDeleteOptions
-    ): QueryRunner
+    ): VISIT_RESULT
 
     fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>
     sqlInsertQuery(
         context: SqlInsertContext<ENTITY, ID, META>,
         options: SqlInsertOptions
-    ): QueryRunner
+    ): VISIT_RESULT
 
     fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>
     sqlUpdateQuery(
         context: SqlUpdateContext<ENTITY, ID, META>,
         options: SqlUpdateOptions
-    ): QueryRunner
+    ): VISIT_RESULT
 
     fun templateExecuteQuery(
         sql: String,
         params: Any,
         options: TemplateExecuteOptions
-    ): QueryRunner
+    ): VISIT_RESULT
 
     fun <T, R> templateSelectQuery(
         sql: String,
@@ -295,5 +294,5 @@ interface QueryVisitor {
         transform: (Row) -> T,
         options: TemplateSelectOptions,
         collect: suspend (Flow<T>) -> R
-    ): QueryRunner
+    ): VISIT_RESULT
 }

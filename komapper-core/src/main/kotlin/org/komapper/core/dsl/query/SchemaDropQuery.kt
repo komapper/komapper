@@ -2,7 +2,6 @@ package org.komapper.core.dsl.query
 
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.SchemaDropOptions
-import org.komapper.core.dsl.runner.QueryRunner
 import org.komapper.core.dsl.visitor.QueryVisitor
 
 interface SchemaDropQuery : Query<Unit> {
@@ -18,7 +17,7 @@ internal data class SchemaDropQueryImpl(
         return copy(options = configure(options))
     }
 
-    override fun accept(visitor: QueryVisitor): QueryRunner {
+    override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
         return visitor.schemaDropQuery(entityMetamodels, options)
     }
 }

@@ -3,7 +3,6 @@ package org.komapper.core.dsl.query
 import org.komapper.core.dsl.context.SqlUpdateContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.SqlUpdateOptions
-import org.komapper.core.dsl.runner.QueryRunner
 import org.komapper.core.dsl.scope.SetDeclaration
 import org.komapper.core.dsl.scope.SetScope
 import org.komapper.core.dsl.scope.WhereDeclaration
@@ -37,7 +36,7 @@ internal data class SqlUpdateQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<
         return copy(options = configure(options))
     }
 
-    override fun accept(visitor: QueryVisitor): QueryRunner {
+    override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
         return visitor.sqlUpdateQuery(context, options)
     }
 }

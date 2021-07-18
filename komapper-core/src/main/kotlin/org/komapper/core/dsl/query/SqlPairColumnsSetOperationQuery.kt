@@ -6,7 +6,7 @@ import org.komapper.core.dsl.context.SqlSetOperationContext
 import org.komapper.core.dsl.context.SubqueryContext
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.options.SqlSetOperationOptions
-import org.komapper.core.dsl.runner.QueryRunner
+import org.komapper.core.dsl.visitor.FlowQueryVisitor
 import org.komapper.core.dsl.visitor.QueryVisitor
 
 internal data class SqlPairColumnsSetOperationQuery<A : Any, B : Any>(
@@ -19,16 +19,20 @@ internal data class SqlPairColumnsSetOperationQuery<A : Any, B : Any>(
 
     private val support: SqlSetOperationQuerySupport<Pair<A?, B?>> = SqlSetOperationQuerySupport(context)
 
-    override fun accept(visitor: QueryVisitor): QueryRunner {
+    override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
         return visitor.sqlPairColumnsSetOperationQuery(context, options, expressions) { it.toList() }
     }
 
-    override fun <R> collect(collect: suspend (Flow<Pair<A?, B?>>) -> R): Query<R> = Query { visitor ->
-        visitor.sqlPairColumnsSetOperationQuery(context, options, expressions, collect)
+    override fun <R> collect(collect: suspend (Flow<Pair<A?, B?>>) -> R): Query<R> = object : Query<R> {
+        override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
+            return visitor.sqlPairColumnsSetOperationQuery(context, options, expressions, collect)
+        }
     }
 
-    override fun asFlowQuery(): FlowQuery<Pair<A?, B?>> = FlowQuery { visitor ->
-        visitor.sqlPairColumnsSetOperationQuery(context, options, expressions)
+    override fun asFlowQuery(): FlowQuery<Pair<A?, B?>> = object : FlowQuery<Pair<A?, B?>> {
+        override fun <VISIT_RESULT> accept(visitor: FlowQueryVisitor<VISIT_RESULT>): VISIT_RESULT {
+            return visitor.sqlPairColumnsSetOperationQuery(context, options, expressions)
+        }
     }
 
     override fun except(other: Subquery<Pair<A?, B?>>): FlowableSetOperationQuery<Pair<A?, B?>> {

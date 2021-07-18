@@ -4,7 +4,6 @@ import org.komapper.core.dsl.context.SqlInsertContext
 import org.komapper.core.dsl.element.Values
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.SqlInsertOptions
-import org.komapper.core.dsl.runner.QueryRunner
 import org.komapper.core.dsl.scope.ValuesDeclaration
 import org.komapper.core.dsl.scope.ValuesScope
 import org.komapper.core.dsl.visitor.QueryVisitor
@@ -41,7 +40,7 @@ internal data class SqlInsertQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<
         return copy(options = configure(options))
     }
 
-    override fun accept(visitor: QueryVisitor): QueryRunner {
+    override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
         return visitor.sqlInsertQuery(context, options)
     }
 }
