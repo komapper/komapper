@@ -8,23 +8,28 @@ import org.komapper.core.dsl.context.SubqueryContext
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.expression.SubqueryExpression
 import org.komapper.core.dsl.options.SqlSetOperationOptions
-import org.komapper.core.dsl.runner.QueryRunner
 import org.komapper.core.dsl.visitor.QueryVisitor
 
 @ThreadSafe
-fun interface Query<T> {
-    fun accept(visitor: QueryVisitor): QueryRunner
+interface Query<T> {
+    fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT
 
-    operator fun <S> plus(other: Query<S>): Query<S> = Query { visitor ->
-        visitor.plusQuery(this, other)
+    operator fun <S> plus(other: Query<S>): Query<S> = object : Query<S> {
+        override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
+            return visitor.plusQuery(this@Query, other)
+        }
     }
 
-    fun <S> flatMap(transform: (T) -> Query<S>): Query<S> = Query { visitor ->
-        visitor.flatMapQuery(this, transform)
+    fun <S> flatMap(transform: (T) -> Query<S>): Query<S> = object : Query<S> {
+        override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
+            return visitor.flatMapQuery(this@Query, transform)
+        }
     }
 
-    fun <S> flatZip(transform: (T) -> Query<S>): Query<Pair<T, S>> = Query { visitor ->
-        visitor.flatZipQuery(this, transform)
+    fun <S> flatZip(transform: (T) -> Query<S>): Query<Pair<T, S>> = object : Query<Pair<T, S>> {
+        override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
+            return visitor.flatZipQuery(this@Query, transform)
+        }
     }
 }
 

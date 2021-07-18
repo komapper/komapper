@@ -1,7 +1,6 @@
 package org.komapper.core.dsl.query
 
 import org.komapper.core.dsl.options.SchemaDropAllOptions
-import org.komapper.core.dsl.runner.QueryRunner
 import org.komapper.core.dsl.visitor.QueryVisitor
 
 interface SchemaDropAllQuery : Query<Unit> {
@@ -16,7 +15,7 @@ internal data class SchemaDropAllQueryImpl(
         return copy(options = configure(options))
     }
 
-    override fun accept(visitor: QueryVisitor): QueryRunner {
+    override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
         return visitor.schemaDropAllQuery(options)
     }
 }

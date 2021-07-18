@@ -6,7 +6,7 @@ import org.komapper.core.dsl.context.SqlSelectContext
 import org.komapper.core.dsl.context.SubqueryContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.SqlSelectOptions
-import org.komapper.core.dsl.runner.QueryRunner
+import org.komapper.core.dsl.visitor.FlowQueryVisitor
 import org.komapper.core.dsl.visitor.QueryVisitor
 
 internal class SqlTripleEntitiesQuery<
@@ -23,16 +23,20 @@ internal class SqlTripleEntitiesQuery<
     private val support: FlowableSubquerySupport<Triple<A, B?, C?>> =
         FlowableSubquerySupport(subqueryContext) { SqlTripleEntitiesSetOperationQuery(it, metamodels = metamodels) }
 
-    override fun accept(visitor: QueryVisitor): QueryRunner {
+    override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
         return visitor.sqlTripleEntitiesQuery(context, options, metamodels) { it.toList() }
     }
 
-    override fun <R> collect(collect: suspend (Flow<Triple<A, B?, C?>>) -> R): Query<R> = Query { visitor ->
-        visitor.sqlTripleEntitiesQuery(context, options, metamodels, collect)
+    override fun <R> collect(collect: suspend (Flow<Triple<A, B?, C?>>) -> R): Query<R> = object : Query<R> {
+        override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
+            return visitor.sqlTripleEntitiesQuery(context, options, metamodels, collect)
+        }
     }
 
-    override fun asFlowQuery(): FlowQuery<Triple<A, B?, C?>> = FlowQuery { visitor ->
-        visitor.sqlTripleEntitiesQuery(context, options, metamodels)
+    override fun asFlowQuery(): FlowQuery<Triple<A, B?, C?>> = object : FlowQuery<Triple<A, B?, C?>> {
+        override fun <VISIT_RESULT> accept(visitor: FlowQueryVisitor<VISIT_RESULT>): VISIT_RESULT {
+            return visitor.sqlTripleEntitiesQuery(context, options, metamodels)
+        }
     }
 
     override fun except(other: Subquery<Triple<A, B?, C?>>): FlowableSetOperationQuery<Triple<A, B?, C?>> {

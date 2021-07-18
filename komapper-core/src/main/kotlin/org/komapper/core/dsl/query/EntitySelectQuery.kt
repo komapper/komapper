@@ -10,7 +10,6 @@ import org.komapper.core.dsl.element.Associator
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.EntitySelectOptions
-import org.komapper.core.dsl.runner.QueryRunner
 import org.komapper.core.dsl.scope.OnDeclaration
 import org.komapper.core.dsl.scope.WhereDeclaration
 import org.komapper.core.dsl.visitor.QueryVisitor
@@ -117,8 +116,10 @@ internal data class EntitySelectQueryImpl<ENTITY : Any, ID, META : EntityMetamod
         return copy(context = newContext)
     }
 
-    override fun <R> collect(collect: suspend (Flow<ENTITY>) -> R): Query<R> = Query { visitor ->
-        visitor.entitySelectQuery(context, options, collect)
+    override fun <R> collect(collect: suspend (Flow<ENTITY>) -> R): Query<R> = object : Query<R> {
+        override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
+            return visitor.entitySelectQuery(context, options, collect)
+        }
     }
 
     override fun except(other: Subquery<ENTITY>): SetOperationQuery<ENTITY> {
@@ -150,7 +151,7 @@ internal data class EntitySelectQueryImpl<ENTITY : Any, ID, META : EntityMetamod
         return SqlSelectQueryImpl(context.asSqlSelectContext(), options.asSqlSelectOption())
     }
 
-    override fun accept(visitor: QueryVisitor): QueryRunner {
+    override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
         return visitor.entitySelectQuery(context, options) { it.toList() }
     }
 }

@@ -6,7 +6,7 @@ import org.komapper.core.dsl.context.SqlSelectContext
 import org.komapper.core.dsl.context.SubqueryContext
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.options.SqlSelectOptions
-import org.komapper.core.dsl.runner.QueryRunner
+import org.komapper.core.dsl.visitor.FlowQueryVisitor
 import org.komapper.core.dsl.visitor.QueryVisitor
 
 internal class SqlTripleColumnsQuery<A : Any, B : Any, C : Any>(
@@ -20,16 +20,20 @@ internal class SqlTripleColumnsQuery<A : Any, B : Any, C : Any>(
     private val support: FlowableSubquerySupport<Triple<A?, B?, C?>> =
         FlowableSubquerySupport(subqueryContext) { SqlTripleColumnsSetOperationQuery(it, expressions = expressions) }
 
-    override fun accept(visitor: QueryVisitor): QueryRunner {
+    override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
         return visitor.sqlTripleColumnsQuery(context, options, expressions) { it.toList() }
     }
 
-    override fun <R> collect(collect: suspend (Flow<Triple<A?, B?, C?>>) -> R): Query<R> = Query { visitor ->
-        visitor.sqlTripleColumnsQuery(context, options, expressions, collect)
+    override fun <R> collect(collect: suspend (Flow<Triple<A?, B?, C?>>) -> R): Query<R> = object : Query<R> {
+        override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
+            return visitor.sqlTripleColumnsQuery(context, options, expressions, collect)
+        }
     }
 
-    override fun asFlowQuery(): FlowQuery<Triple<A?, B?, C?>> = FlowQuery { visitor ->
-        visitor.sqlTripleColumnsQuery(context, options, expressions)
+    override fun asFlowQuery(): FlowQuery<Triple<A?, B?, C?>> = object : FlowQuery<Triple<A?, B?, C?>> {
+        override fun <VISIT_RESULT> accept(visitor: FlowQueryVisitor<VISIT_RESULT>): VISIT_RESULT {
+            return visitor.sqlTripleColumnsQuery(context, options, expressions)
+        }
     }
 
     override fun except(other: Subquery<Triple<A?, B?, C?>>): FlowableSetOperationQuery<Triple<A?, B?, C?>> {

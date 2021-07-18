@@ -6,7 +6,7 @@ import org.komapper.core.dsl.context.SqlSelectContext
 import org.komapper.core.dsl.context.SubqueryContext
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.options.SqlSelectOptions
-import org.komapper.core.dsl.runner.QueryRunner
+import org.komapper.core.dsl.visitor.FlowQueryVisitor
 import org.komapper.core.dsl.visitor.QueryVisitor
 
 internal class SqlMultipleColumnsQuery(
@@ -20,16 +20,20 @@ internal class SqlMultipleColumnsQuery(
     private val support: FlowableSubquerySupport<Columns> =
         FlowableSubquerySupport(subqueryContext) { SqlMultipleColumnsSetOperationQuery(it, expressions = expressions) }
 
-    override fun accept(visitor: QueryVisitor): QueryRunner {
+    override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
         return visitor.sqlMultipleColumnsQuery(context, options, expressions) { it.toList() }
     }
 
-    override fun <R> collect(collect: suspend (Flow<Columns>) -> R): Query<R> = Query { visitor ->
-        visitor.sqlMultipleColumnsQuery(context, options, expressions, collect)
+    override fun <R> collect(collect: suspend (Flow<Columns>) -> R): Query<R> = object : Query<R> {
+        override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
+            return visitor.sqlMultipleColumnsQuery(context, options, expressions, collect)
+        }
     }
 
-    override fun asFlowQuery(): FlowQuery<Columns> = FlowQuery { visitor ->
-        visitor.sqlMultipleColumnsQuery(context, options, expressions)
+    override fun asFlowQuery(): FlowQuery<Columns> = object : FlowQuery<Columns> {
+        override fun <VISIT_RESULT> accept(visitor: FlowQueryVisitor<VISIT_RESULT>): VISIT_RESULT {
+            return visitor.sqlMultipleColumnsQuery(context, options, expressions)
+        }
     }
 
     override fun except(other: Subquery<Columns>): FlowableSetOperationQuery<Columns> {

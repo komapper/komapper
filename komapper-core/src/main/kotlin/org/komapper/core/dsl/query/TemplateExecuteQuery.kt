@@ -1,7 +1,6 @@
 package org.komapper.core.dsl.query
 
 import org.komapper.core.dsl.options.TemplateExecuteOptions
-import org.komapper.core.dsl.runner.QueryRunner
 import org.komapper.core.dsl.visitor.QueryVisitor
 
 interface TemplateExecuteQuery : Query<Int> {
@@ -23,7 +22,7 @@ internal data class TemplateExecuteQueryImpl(
         return copy(params = provide())
     }
 
-    override fun accept(visitor: QueryVisitor): QueryRunner {
+    override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
         return visitor.templateExecuteQuery(sql, params, option)
     }
 }
