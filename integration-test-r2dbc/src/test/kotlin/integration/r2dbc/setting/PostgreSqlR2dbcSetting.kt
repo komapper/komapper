@@ -6,17 +6,32 @@ import io.r2dbc.spi.ConnectionFactoryOptions
 import org.komapper.r2dbc.DefaultR2dbcDatabaseConfig
 import org.komapper.r2dbc.R2dbcDatabaseConfig
 import org.komapper.r2dbc.R2dbcDialect
+import org.testcontainers.containers.PostgreSQLContainer
+import org.testcontainers.containers.PostgreSQLContainerProvider
+import org.testcontainers.containers.PostgreSQLR2DBCDatabaseContainer
+import org.testcontainers.jdbc.ConnectionUrl
 
-class PostgreSqlR2dbcSetting(driver: String, database: String, user: String, password: String) : PostgreSqlSetting<R2dbcDatabaseConfig> {
-
-    private val options: ConnectionFactoryOptions = ConnectionFactoryOptions.builder()
-        .option(ConnectionFactoryOptions.DRIVER, driver)
-        .option(ConnectionFactoryOptions.HOST, "localhost")
-        .option(ConnectionFactoryOptions.DATABASE, database)
-        .option(ConnectionFactoryOptions.USER, user)
-        .option(ConnectionFactoryOptions.PASSWORD, password)
-        .build()
+class PostgreSqlR2dbcSetting : PostgreSqlSetting<R2dbcDatabaseConfig> {
+    companion object {
+        const val DRIVER: String = "postgresql"
+        val CONTAINER: PostgreSQLR2DBCDatabaseContainer by lazy {
+            val url = System.getProperty("url") ?: error("The url property is not found.")
+            val connectionUrl = ConnectionUrl.newInstance(url)
+            val containerProvider = PostgreSQLContainerProvider()
+            val container = containerProvider.newInstance(connectionUrl) as PostgreSQLContainer<*>
+            PostgreSQLR2DBCDatabaseContainer(container).apply {
+                start()
+            }
+        }
+        val OPTIONS: ConnectionFactoryOptions = CONTAINER.configure(
+            ConnectionFactoryOptions.builder().option(ConnectionFactoryOptions.DRIVER, DRIVER).build()
+        )
+    }
 
     override val config: R2dbcDatabaseConfig =
-        DefaultR2dbcDatabaseConfig(ConnectionFactories.get(options), R2dbcDialect.load(driver))
+        DefaultR2dbcDatabaseConfig(ConnectionFactories.get(OPTIONS), R2dbcDialect.load(DRIVER))
+
+    override fun close() {
+        CONTAINER.close()
+    }
 }

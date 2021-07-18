@@ -12,7 +12,7 @@ import kotlin.reflect.KClass
 interface R2dbcDialect : Dialect {
 
     companion object {
-        private val r2dbcUrlPattern = Pattern.compile("^r2dbc[s]?:([^:]*):.*")
+        private val r2dbcUrlPattern = Pattern.compile("^r2dbc[s]?:(tc:)?([^:]*):.*")
 
         fun load(driver: String): R2dbcDialect {
             val loader = ServiceLoader.load(R2dbcDialectFactory::class.java)
@@ -28,7 +28,7 @@ interface R2dbcDialect : Dialect {
         fun extractR2dbcDriver(url: String): String {
             val matcher = r2dbcUrlPattern.matcher(url)
             if (matcher.matches()) {
-                return matcher.group(1).lowercase()
+                return matcher.group(2).lowercase()
             }
             error("The driver is not found in the R2DBC URL. url=$url")
         }

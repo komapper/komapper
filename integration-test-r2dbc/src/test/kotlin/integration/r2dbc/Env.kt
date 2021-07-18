@@ -75,6 +75,7 @@ internal class Env :
                 }
             }
         }
+        setting.close()
     }
 
     override fun supportsParameter(

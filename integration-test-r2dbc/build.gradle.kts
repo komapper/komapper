@@ -4,20 +4,18 @@ dependencies {
     runtimeOnly(project(":komapper-dialect-h2-r2dbc"))
     runtimeOnly(project(":komapper-dialect-mysql-r2dbc"))
     runtimeOnly(project(":komapper-dialect-postgresql-r2dbc"))
+    implementation("org.testcontainers:mysql")
+    implementation("org.testcontainers:postgresql")
+    implementation("org.testcontainers:r2dbc")
+    runtimeOnly("mysql:mysql-connector-java:8.0.25")
 }
 
 tasks {
     test {
         val driver: Any by project
-        val databaseKey = "$driver.database"
-        val userKey = "$driver.user"
-        val passwordKey = "$driver.password"
-        val database = project.findProperty(databaseKey) ?: ""
-        val user = project.findProperty(userKey) ?: ""
-        val password = project.findProperty(passwordKey) ?: ""
+        val urlKey = "$driver.url"
+        val url = project.findProperty(urlKey) ?: ""
         systemProperty("driver", driver)
-        systemProperty("database", database)
-        systemProperty("user", user)
-        systemProperty("password", password)
+        systemProperty("url", url)
     }
 }
