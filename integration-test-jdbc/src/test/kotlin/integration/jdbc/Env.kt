@@ -8,7 +8,6 @@ import org.junit.jupiter.api.extension.BeforeTestExecutionCallback
 import org.junit.jupiter.api.extension.ConditionEvaluationResult
 import org.junit.jupiter.api.extension.ExecutionCondition
 import org.junit.jupiter.api.extension.ExtensionContext
-import org.junit.jupiter.api.extension.ExtensionContext.Namespace.GLOBAL
 import org.junit.jupiter.api.extension.ParameterContext
 import org.junit.jupiter.api.extension.ParameterResolver
 import org.junit.platform.commons.support.AnnotationSupport.findAnnotation
@@ -22,8 +21,7 @@ internal class Env :
     BeforeTestExecutionCallback,
     AfterTestExecutionCallback,
     ParameterResolver,
-    ExecutionCondition,
-    ExtensionContext.Store.CloseableResource {
+    ExecutionCondition {
 
     companion object {
         @Volatile
@@ -37,7 +35,6 @@ internal class Env :
     override fun beforeAll(context: ExtensionContext?) {
         if (!initialized) {
             initialized = true
-            context?.root?.getStore(GLOBAL)?.put("drop all objects", this)
             db.withTransaction {
                 db.runQuery {
                     ScriptDsl.execute(setting.createSql).options {
@@ -64,16 +61,6 @@ internal class Env :
 
     override fun afterTestExecution(context: ExtensionContext?) {
         txManager.rollback()
-    }
-
-    override fun close() {
-        db.withTransaction {
-            db.runQuery {
-                ScriptDsl.execute(setting.dropSql).options {
-                    it.copy(suppressLogging = true)
-                }
-            }
-        }
     }
 
     override fun supportsParameter(
