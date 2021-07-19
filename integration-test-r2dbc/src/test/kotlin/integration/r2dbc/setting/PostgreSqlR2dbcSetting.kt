@@ -14,24 +14,20 @@ import org.testcontainers.jdbc.ConnectionUrl
 class PostgreSqlR2dbcSetting : PostgreSqlSetting<R2dbcDatabaseConfig> {
     companion object {
         const val DRIVER: String = "postgresql"
-        val CONTAINER: PostgreSQLR2DBCDatabaseContainer by lazy {
+        val OPTIONS: ConnectionFactoryOptions by lazy {
             val url = System.getProperty("url") ?: error("The url property is not found.")
             val connectionUrl = ConnectionUrl.newInstance(url)
-            val containerProvider = PostgreSQLContainerProvider()
-            val container = containerProvider.newInstance(connectionUrl) as PostgreSQLContainer<*>
-            PostgreSQLR2DBCDatabaseContainer(container).apply {
-                start()
-            }
+            val container = PostgreSQLContainerProvider().newInstance(connectionUrl) as PostgreSQLContainer<*>
+            val r2dbcContainer = PostgreSQLR2DBCDatabaseContainer(container)
+            r2dbcContainer.start()
+            r2dbcContainer.configure(
+                ConnectionFactoryOptions.builder().option(
+                    ConnectionFactoryOptions.DRIVER, DRIVER
+                ).build()
+            )
         }
-        val OPTIONS: ConnectionFactoryOptions = CONTAINER.configure(
-            ConnectionFactoryOptions.builder().option(ConnectionFactoryOptions.DRIVER, DRIVER).build()
-        )
     }
 
     override val config: R2dbcDatabaseConfig =
         DefaultR2dbcDatabaseConfig(ConnectionFactories.get(OPTIONS), R2dbcDialect.load(DRIVER))
-
-    override fun close() {
-        CONTAINER.close()
-    }
 }

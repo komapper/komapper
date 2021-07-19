@@ -136,7 +136,6 @@ interface H2Setting<CONFIG> : Setting<CONFIG> {
 
         INSERT INTO ID_GENERATOR VALUES('TABLE_STRATEGY_ID', 1);
         """.trimIndent()
-    override val dropSql: String get() = "DROP ALL OBJECTS"
     override val resetSql: String
         get() = """
         ALTER TABLE IDENTITY_STRATEGY ALTER COLUMN ID RESTART WITH 1;

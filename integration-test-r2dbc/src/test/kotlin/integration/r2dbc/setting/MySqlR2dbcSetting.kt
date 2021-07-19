@@ -15,26 +15,20 @@ class MySqlR2dbcSetting :
     MySqlSetting<R2dbcDatabaseConfig> {
     companion object {
         const val DRIVER: String = "mysql"
-        val CONTAINER: MySQLR2DBCDatabaseContainer by lazy {
+        val OPTIONS: ConnectionFactoryOptions by lazy {
             val url = System.getProperty("url") ?: error("The url property is not found.")
             val connectionUrl = ConnectionUrl.newInstance(url)
-            val containerProvider = MySQLContainerProvider()
-            val container = containerProvider.newInstance(connectionUrl) as MySQLContainer<*>
-            MySQLR2DBCDatabaseContainer(container).apply {
-                start()
-            }
+            val container = MySQLContainerProvider().newInstance(connectionUrl) as MySQLContainer<*>
+            val r2dbcContainer = MySQLR2DBCDatabaseContainer(container)
+            r2dbcContainer.start()
+            r2dbcContainer.configure(
+                ConnectionFactoryOptions.builder().option(
+                    ConnectionFactoryOptions.DRIVER, DRIVER
+                ).build()
+            )
         }
-        val OPTIONS: ConnectionFactoryOptions = CONTAINER.configure(
-            ConnectionFactoryOptions.builder().option(
-                ConnectionFactoryOptions.DRIVER, DRIVER
-            ).build()
-        )
     }
 
     override val config: R2dbcDatabaseConfig =
         DefaultR2dbcDatabaseConfig(ConnectionFactories.get(OPTIONS), R2dbcDialect.load(DRIVER))
-
-    override fun close() {
-        CONTAINER.close()
-    }
 }
