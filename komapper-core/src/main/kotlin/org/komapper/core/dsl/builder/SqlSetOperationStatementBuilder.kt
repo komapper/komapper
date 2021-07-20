@@ -8,7 +8,6 @@ import org.komapper.core.dsl.context.SqlSelectContext
 import org.komapper.core.dsl.context.SqlSetOperationContext
 import org.komapper.core.dsl.context.SqlSetOperationKind
 import org.komapper.core.dsl.context.SubqueryContext
-import org.komapper.core.dsl.expression.TableExpression
 
 class SqlSetOperationStatementBuilder(
     private val dialect: Dialect,

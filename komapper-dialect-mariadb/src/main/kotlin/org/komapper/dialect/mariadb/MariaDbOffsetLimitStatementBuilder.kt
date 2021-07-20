@@ -4,7 +4,6 @@ import org.komapper.core.Statement
 import org.komapper.core.StatementBuffer
 import org.komapper.core.Value
 import org.komapper.core.dsl.builder.OffsetLimitStatementBuilder
-import org.komapper.dialect.mariadb.MariaDbDialect
 
 class MariaDbOffsetLimitStatementBuilder(
     private val dialect: MariaDbDialect,
