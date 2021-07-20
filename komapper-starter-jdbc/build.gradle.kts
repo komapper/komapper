@@ -7,5 +7,5 @@ dependencies {
     runtimeOnly(project(":komapper-dialect-h2-jdbc"))
     runtimeOnly(project(":komapper-dialect-mysql-jdbc"))
     runtimeOnly(project(":komapper-dialect-postgresql-jdbc"))
-    runtimeOnly("ch.qos.logback:logback-classic:1.2.3")
+    runtimeOnly("ch.qos.logback:logback-classic:1.2.4")
 }
