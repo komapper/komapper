@@ -205,7 +205,7 @@ jobs:
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    needs: [ build, h2, mysql, postgresql ]
+    needs: [ build, h2, mariadb, mysql, postgresql ]
 
     steps:
       - name: Set up JDK 8
