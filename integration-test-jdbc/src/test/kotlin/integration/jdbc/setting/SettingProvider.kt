@@ -8,13 +8,11 @@ object SettingProvider {
     fun get(): Setting<JdbcDatabaseConfig> {
         val driver = System.getProperty("driver") ?: error("The driver property is not found.")
         val url = System.getProperty("url") ?: error("The url property is not found.")
-        val user = System.getProperty("user") ?: error("The user property is not found.")
-        val password = System.getProperty("password") ?: error("The password property is not found.")
         return when (driver) {
-            "h2" -> H2JdbcSetting(url, user, password)
-            "mariadb" -> MariaDbJdbcSetting(url, user, password)
-            "mysql" -> MySqlJdbcSetting(url, user, password)
-            "postgresql" -> PostgreSqlJdbcSetting(url, user, password)
+            "h2" -> H2JdbcSetting(url)
+            "mariadb" -> MariaDbJdbcSetting(url)
+            "mysql" -> MySqlJdbcSetting(url)
+            "postgresql" -> PostgreSqlJdbcSetting(url)
             else -> error("Unsupported driver: $driver")
         }
     }

@@ -9,17 +9,35 @@ dependencies {
 }
 
 tasks {
+    fun Test.prepareProperties(driver: String) {
+        val urlKey = "$driver.url"
+        val url = project.property(urlKey) ?: throw GradleException("The $urlKey property is not found.")
+        this.systemProperty("driver", driver)
+        this.systemProperty("url", url)
+    }
+
     test {
         val driver: Any by project
-        val urlKey = "$driver.url"
-        val userKey = "$driver.user"
-        val passwordKey = "$driver.password"
-        val url = project.property(urlKey) ?: throw GradleException("The $urlKey property is not found.")
-        val user = project.property(userKey) ?: throw GradleException("The $userKey property is not found.")
-        val password = project.property(passwordKey) ?: throw GradleException("The $passwordKey property is not found.")
-        systemProperty("driver", driver)
-        systemProperty("url", url)
-        systemProperty("user", user)
-        systemProperty("password", password)
+        prepareProperties(driver.toString())
+    }
+
+    val h2 by registering(Test::class) {
+        prepareProperties("h2")
+    }
+    
+    val mariadb by registering(Test::class) {
+        prepareProperties("mariadb")
+    }
+
+    val mysql by registering(Test::class) {
+        prepareProperties("mysql")
+    }
+
+    val postgresql by registering(Test::class) {
+        prepareProperties("postgresql")
+    }
+
+    register("testAll") {
+        dependsOn(h2, mariadb, mysql, postgresql)
     }
 }
