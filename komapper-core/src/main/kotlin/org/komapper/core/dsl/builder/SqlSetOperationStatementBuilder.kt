@@ -17,7 +17,7 @@ class SqlSetOperationStatementBuilder(
 ) {
 
     private val buf = StatementBuffer()
-    private val support = OrderByBuilderSupport(dialect, context.orderBy, SetOperationAliasManager, buf)
+    private val support = OrderByBuilderSupport(dialect, context.orderBy, EmptyAliasManager, buf)
 
     fun build(): Statement {
         visitSetOperationComponent(SubqueryContext.SqlSetOperation(context))
@@ -59,10 +59,5 @@ class SqlSetOperationStatementBuilder(
         buf.append("(")
         buf.append(statement)
         buf.append(")")
-    }
-
-    private object SetOperationAliasManager : AliasManager {
-        override val index: Int = 0
-        override fun getAlias(expression: TableExpression<*>): String = ""
     }
 }

@@ -5,6 +5,8 @@ import integration.Department
 import integration.IdentityStrategy
 import integration.Person
 import integration.meta
+import integration.setting.Dbms
+import integration.setting.Run
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
@@ -116,6 +118,7 @@ class EntityInsertMultipleQueryTest(private val db: JdbcDatabase) {
     }
 
     @Test
+    @Run(unless = [Dbms.MARIADB])
     fun onDuplicateKeyUpdate_set() {
         val d = Department.meta
         val department1 = Department(5, 50, "PLANNING", "TOKYO", 1)
@@ -136,6 +139,7 @@ class EntityInsertMultipleQueryTest(private val db: JdbcDatabase) {
     }
 
     @Test
+    @Run(unless = [Dbms.MARIADB])
     fun onDuplicateKeyUpdateWithKey_set() {
         val d = Department.meta
         val department1 = Department(5, 50, "PLANNING", "TOKYO", 1)

@@ -12,6 +12,7 @@ object SettingProvider {
         val password = System.getProperty("password") ?: error("The password property is not found.")
         return when (driver) {
             "h2" -> H2JdbcSetting(url, user, password)
+            "mariadb" -> MariaDbJdbcSetting(url, user, password)
             "mysql" -> MySqlJdbcSetting(url, user, password)
             "postgresql" -> PostgreSqlJdbcSetting(url, user, password)
             else -> error("Unsupported driver: $driver")

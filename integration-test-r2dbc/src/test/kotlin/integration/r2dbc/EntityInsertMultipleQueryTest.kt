@@ -121,6 +121,7 @@ class EntityInsertMultipleQueryTest(private val db: R2dbcDatabase) {
     }
 
     @Test
+    @Run(unless = [Dbms.MARIADB])
     fun onDuplicateKeyUpdate_set() = inTransaction(db) {
         val d = Department.meta
         val department1 = Department(5, 50, "PLANNING", "TOKYO", 1)
@@ -141,6 +142,7 @@ class EntityInsertMultipleQueryTest(private val db: R2dbcDatabase) {
     }
 
     @Test
+    @Run(unless = [Dbms.MARIADB])
     fun onDuplicateKeyUpdateWithKey_set() = inTransaction(db) {
         val d = Department.meta
         val department1 = Department(5, 50, "PLANNING", "TOKYO", 1)

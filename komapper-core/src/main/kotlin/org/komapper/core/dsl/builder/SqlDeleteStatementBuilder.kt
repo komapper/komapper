@@ -12,7 +12,11 @@ class SqlDeleteStatementBuilder<ENTITY : Any, ID, META : EntityMetamodel<ENTITY,
     val dialect: Dialect,
     val context: SqlDeleteContext<ENTITY, ID, META>
 ) {
-    private val aliasManager = DefaultAliasManager(context)
+    private val aliasManager = if (dialect.supportsAliasForDeleteStatement()) {
+        DefaultAliasManager(context)
+    } else {
+        EmptyAliasManager
+    }
     private val buf = StatementBuffer()
     private val support = BuilderSupport(dialect, aliasManager, buf)
 

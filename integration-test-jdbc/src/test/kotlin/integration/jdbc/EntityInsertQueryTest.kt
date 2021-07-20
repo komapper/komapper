@@ -172,10 +172,9 @@ class EntityInsertQueryTest(private val db: JdbcDatabase) {
         val department = Department(1, 50, "PLANNING", "TOKYO", 10)
         val query = EntityDsl.insert(d).onDuplicateKeyUpdate().single(department)
         val count = db.runQuery { query }
-        if (db.config.dialect.driver == "mysql") {
-            assertEquals(2, count)
-        } else {
-            assertEquals(1, count)
+        when (db.config.dialect.driver) {
+            "mysql", "mariadb" -> assertEquals(2, count)
+            else -> assertEquals(1, count)
         }
         val found = db.runQuery { EntityDsl.from(d).where { d.departmentId eq 1 }.first() }
         assertEquals(50, found.departmentNo)
@@ -190,10 +189,9 @@ class EntityInsertQueryTest(private val db: JdbcDatabase) {
         val department = Department(6, 10, "PLANNING", "TOKYO", 10)
         val query = EntityDsl.insert(d).onDuplicateKeyUpdate(d.departmentNo).single(department)
         val count = db.runQuery { query }
-        if (db.config.dialect.driver == "mysql") {
-            assertEquals(2, count)
-        } else {
-            assertEquals(1, count)
+        when (db.config.dialect.driver) {
+            "mysql", "mariadb" -> assertEquals(2, count)
+            else -> assertEquals(1, count)
         }
         val found = db.runQuery { EntityDsl.from(d).where { d.departmentNo eq 10 }.first() }
         assertEquals(1, found.departmentId)
@@ -204,6 +202,7 @@ class EntityInsertQueryTest(private val db: JdbcDatabase) {
     }
 
     @Test
+    @Run(unless = [Dbms.MARIADB])
     fun onDuplicateKeyUpdate_update_set() {
         val d = Department.meta
         val department = Department(1, 50, "PLANNING", "TOKYO", 10)
@@ -212,10 +211,9 @@ class EntityInsertQueryTest(private val db: JdbcDatabase) {
             d.location set concat(d.location, concat("_", excluded.location))
         }.single(department)
         val count = db.runQuery { query }
-        if (db.config.dialect.driver == "mysql") {
-            assertEquals(2, count)
-        } else {
-            assertEquals(1, count)
+        when (db.config.dialect.driver) {
+            "mysql", "mariadb" -> assertEquals(2, count)
+            else -> assertEquals(1, count)
         }
         val found = db.runQuery { EntityDsl.from(d).where { d.departmentId eq 1 }.first() }
         assertEquals(10, found.departmentNo)
@@ -225,6 +223,7 @@ class EntityInsertQueryTest(private val db: JdbcDatabase) {
     }
 
     @Test
+    @Run(unless = [Dbms.MARIADB])
     fun onDuplicateKeyUpdateWithKey_update_set() {
         val d = Department.meta
         val department = Department(5, 10, "PLANNING", "TOKYO", 10)
@@ -235,10 +234,9 @@ class EntityInsertQueryTest(private val db: JdbcDatabase) {
                 d.location set concat(d.location, concat("_", excluded.location))
             }.single(department)
         val count = db.runQuery { query }
-        if (db.config.dialect.driver == "mysql") {
-            assertEquals(2, count)
-        } else {
-            assertEquals(1, count)
+        when (db.config.dialect.driver) {
+            "mysql", "mariadb" -> assertEquals(2, count)
+            else -> assertEquals(1, count)
         }
         val found = db.runQuery { EntityDsl.from(d).where { d.departmentNo eq 10 }.first() }
         assertEquals(1, found.departmentId)

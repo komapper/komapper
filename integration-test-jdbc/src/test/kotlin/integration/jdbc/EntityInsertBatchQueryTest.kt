@@ -5,6 +5,8 @@ import integration.Department
 import integration.IdentityStrategy
 import integration.Person
 import integration.meta
+import integration.setting.Dbms
+import integration.setting.Run
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -88,10 +90,9 @@ class EntityInsertBatchQueryTest(private val db: JdbcDatabase) {
         val department2 = Department(1, 60, "DEVELOPMENT", "KYOTO", 1)
         val query = EntityDsl.insert(d).onDuplicateKeyUpdate().batch(department1, department2)
         val counts = db.runQuery { query }
-        if (db.config.dialect.driver == "mysql") {
-            assertEquals(listOf(1, 2), counts)
-        } else {
-            assertEquals(listOf(1, 1), counts)
+        when (db.config.dialect.driver) {
+            "mysql", "mariadb" -> assertEquals(listOf(1, 2), counts)
+            else -> assertEquals(listOf(1, 1), counts)
         }
         val list = db.runQuery {
             EntityDsl.from(d).where { d.departmentId inList listOf(1, 5) }.orderBy(d.departmentId)
@@ -110,10 +111,9 @@ class EntityInsertBatchQueryTest(private val db: JdbcDatabase) {
         val department2 = Department(10, 10, "DEVELOPMENT", "KYOTO", 1)
         val query = EntityDsl.insert(d).onDuplicateKeyUpdate(d.departmentNo).batch(department1, department2)
         val counts = db.runQuery { query }
-        if (db.config.dialect.driver == "mysql") {
-            assertEquals(listOf(1, 2), counts)
-        } else {
-            assertEquals(listOf(1, 1), counts)
+        when (db.config.dialect.driver) {
+            "mysql", "mariadb" -> assertEquals(listOf(1, 2), counts)
+            else -> assertEquals(listOf(1, 1), counts)
         }
         val list = db.runQuery {
             EntityDsl.from(d).where { d.departmentNo inList listOf(10, 50) }.orderBy(d.departmentNo)
@@ -126,6 +126,7 @@ class EntityInsertBatchQueryTest(private val db: JdbcDatabase) {
     }
 
     @Test
+    @Run(unless = [Dbms.MARIADB])
     fun onDuplicateKeyUpdate_set() {
         val d = Department.meta
         val department1 = Department(5, 50, "PLANNING", "TOKYO", 1)
@@ -135,10 +136,9 @@ class EntityInsertBatchQueryTest(private val db: JdbcDatabase) {
                 d.departmentName set excluded.departmentName
             }.batch(listOf(department1, department2))
         val counts = db.runQuery { query }
-        if (db.config.dialect.driver == "mysql") {
-            assertEquals(listOf(1, 2), counts)
-        } else {
-            assertEquals(listOf(1, 1), counts)
+        when (db.config.dialect.driver) {
+            "mysql", "mariadb" -> assertEquals(listOf(1, 2), counts)
+            else -> assertEquals(listOf(1, 1), counts)
         }
         val list = db.runQuery {
             EntityDsl.from(d).where { d.departmentId inList listOf(1, 5) }.orderBy(d.departmentId)
@@ -151,6 +151,7 @@ class EntityInsertBatchQueryTest(private val db: JdbcDatabase) {
     }
 
     @Test
+    @Run(unless = [Dbms.MARIADB])
     fun onDuplicateKeyUpdateWithKeys_set() {
         val d = Department.meta
         val department1 = Department(5, 50, "PLANNING", "TOKYO", 1)
@@ -160,10 +161,9 @@ class EntityInsertBatchQueryTest(private val db: JdbcDatabase) {
                 d.departmentName set excluded.departmentName
             }.batch(department1, department2)
         val counts = db.runQuery { query }
-        if (db.config.dialect.driver == "mysql") {
-            assertEquals(listOf(1, 2), counts)
-        } else {
-            assertEquals(listOf(1, 1), counts)
+        when (db.config.dialect.driver) {
+            "mysql", "mariadb" -> assertEquals(listOf(1, 2), counts)
+            else -> assertEquals(listOf(1, 1), counts)
         }
         val list = db.runQuery {
             EntityDsl.from(d).where { d.departmentNo inList listOf(10, 50) }.orderBy(d.departmentNo)
