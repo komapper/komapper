@@ -9,7 +9,7 @@ dependencies {
     implementation("org.testcontainers:mysql")
     implementation("org.testcontainers:postgresql")
     implementation("org.testcontainers:r2dbc")
-    runtimeOnly("mysql:mysql-connector-java:8.0.25")
+    runtimeOnly("mysql:mysql-connector-java:8.0.26")
     runtimeOnly("org.mariadb.jdbc:mariadb-java-client:2.7.3")
 }
 
