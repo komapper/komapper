@@ -21,7 +21,7 @@ dependencies {
     api(project(":komapper-core"))
     runtimeOnly(project(":komapper-slf4j"))
     runtimeOnly(project(":komapper-template"))
-    runtimeOnly("ch.qos.logback:logback-classic:1.2.3")
+    runtimeOnly("ch.qos.logback:logback-classic:1.2.4")
     api(platform("org.testcontainers:testcontainers-bom:1.15.3"))
     runtimeOnly("org.testcontainers:mariadb")
     runtimeOnly("org.testcontainers:mysql")
