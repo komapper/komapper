@@ -34,3 +34,8 @@ class DefaultAliasManager(context: Context, private val parent: AliasManager? = 
         return aliasMap[expression]
     }
 }
+
+object EmptyAliasManager : AliasManager {
+    override val index: Int = 0
+    override fun getAlias(expression: TableExpression<*>): String = ""
+}

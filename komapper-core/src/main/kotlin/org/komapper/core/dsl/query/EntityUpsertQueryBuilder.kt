@@ -25,7 +25,7 @@ internal data class EntityUpsertQueryBuilderImpl<ENTITY : Any, ID, META : Entity
     override fun set(declaration: SetScope<ENTITY>.(META) -> Unit): EntityUpsertQueryBuilder<ENTITY, ID, META> {
         val scope = SetScope<ENTITY>()
         declaration(scope, context.excluded)
-        val newContext = context.copy(assignmentMap = scope.toMap())
+        val newContext = context.copy(assignmentMap = scope.toMap(), assigned = true)
         return copy(context = newContext)
     }
 

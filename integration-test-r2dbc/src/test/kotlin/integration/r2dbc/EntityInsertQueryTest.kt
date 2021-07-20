@@ -58,7 +58,7 @@ class EntityInsertQueryTest(private val db: R2dbcDatabase) {
         assertEquals(person2, person3)
     }
 
-    @Run(unless = [Dbms.POSTGRESQL])
+    @Run(unless = [Dbms.MARIADB, Dbms.POSTGRESQL])
     @Test
     fun createdAt_offsetDateTime() = inTransaction(db) {
         val h = Human.meta
@@ -172,10 +172,9 @@ class EntityInsertQueryTest(private val db: R2dbcDatabase) {
         val department = Department(1, 50, "PLANNING", "TOKYO", 10)
         val query = EntityDsl.insert(d).onDuplicateKeyUpdate().single(department)
         val count = db.runQuery { query }
-        if (db.config.dialect.driver == "mysql") {
-            assertEquals(2, count)
-        } else {
-            assertEquals(1, count)
+        when (db.config.dialect.driver) {
+            "mysql", "mariadb" -> assertEquals(2, count)
+            else -> assertEquals(1, count)
         }
         val found = db.runQuery { EntityDsl.from(d).where { d.departmentId eq 1 }.first() }
         assertEquals(50, found.departmentNo)
@@ -190,10 +189,9 @@ class EntityInsertQueryTest(private val db: R2dbcDatabase) {
         val department = Department(6, 10, "PLANNING", "TOKYO", 10)
         val query = EntityDsl.insert(d).onDuplicateKeyUpdate(d.departmentNo).single(department)
         val count = db.runQuery { query }
-        if (db.config.dialect.driver == "mysql") {
-            assertEquals(2, count)
-        } else {
-            assertEquals(1, count)
+        when (db.config.dialect.driver) {
+            "mysql", "mariadb" -> assertEquals(2, count)
+            else -> assertEquals(1, count)
         }
         val found = db.runQuery { EntityDsl.from(d).where { d.departmentNo eq 10 }.first() }
         assertEquals(1, found.departmentId)
@@ -204,6 +202,7 @@ class EntityInsertQueryTest(private val db: R2dbcDatabase) {
     }
 
     @Test
+    @Run(unless = [Dbms.MARIADB])
     fun onDuplicateKeyUpdate_update_set() = inTransaction(db) {
         val d = Department.meta
         val department = Department(1, 50, "PLANNING", "TOKYO", 10)
@@ -225,6 +224,7 @@ class EntityInsertQueryTest(private val db: R2dbcDatabase) {
     }
 
     @Test
+    @Run(unless = [Dbms.MARIADB])
     fun onDuplicateKeyUpdateWithKey_update_set() = inTransaction(db) {
         val d = Department.meta
         val department = Department(5, 10, "PLANNING", "TOKYO", 10)

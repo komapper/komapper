@@ -22,6 +22,15 @@ module/dialect-h2-jdbc:
 module/dialect-h2-r2dbc:
   - komapper-dialect-h2-r2dbc/**/*
 
+module/dialect-mariadb:
+  - komapper-dialect-mariadb/**/*
+
+module/dialect-mariadb-jdbc:
+  - komapper-dialect-mariadb-jdbc/**/*
+
+module/dialect-mariadb-r2dbc:
+  - komapper-dialect-mariadb-r2dbc/**/*
+
 module/dialect-mysql:
   - komapper-dialect-mysql/**/*
 

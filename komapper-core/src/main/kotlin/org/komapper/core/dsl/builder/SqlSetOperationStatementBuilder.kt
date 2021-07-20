@@ -8,7 +8,6 @@ import org.komapper.core.dsl.context.SqlSelectContext
 import org.komapper.core.dsl.context.SqlSetOperationContext
 import org.komapper.core.dsl.context.SqlSetOperationKind
 import org.komapper.core.dsl.context.SubqueryContext
-import org.komapper.core.dsl.expression.TableExpression
 
 class SqlSetOperationStatementBuilder(
     private val dialect: Dialect,
@@ -17,7 +16,7 @@ class SqlSetOperationStatementBuilder(
 ) {
 
     private val buf = StatementBuffer()
-    private val support = OrderByBuilderSupport(dialect, context.orderBy, SetOperationAliasManager, buf)
+    private val support = OrderByBuilderSupport(dialect, context.orderBy, EmptyAliasManager, buf)
 
     fun build(): Statement {
         visitSetOperationComponent(SubqueryContext.SqlSetOperation(context))
@@ -59,10 +58,5 @@ class SqlSetOperationStatementBuilder(
         buf.append("(")
         buf.append(statement)
         buf.append(")")
-    }
-
-    private object SetOperationAliasManager : AliasManager {
-        override val index: Int = 0
-        override fun getAlias(expression: TableExpression<*>): String = ""
     }
 }

@@ -15,7 +15,8 @@ data class EntityUpsertContext<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, 
     ),
     val keys: List<PropertyMetamodel<ENTITY, *, *>> = emptyList(),
     val duplicateKeyType: DuplicateKeyType,
-    val assignmentMap: Map<PropertyMetamodel<ENTITY, *, *>, Operand> = createAssignmentMap(target, excluded)
+    val assignmentMap: Map<PropertyMetamodel<ENTITY, *, *>, Operand> = createAssignmentMap(target, excluded),
+    val assigned: Boolean = false
 ) : Context {
 
     companion object {

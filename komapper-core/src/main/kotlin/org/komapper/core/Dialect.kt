@@ -54,6 +54,8 @@ interface Dialect {
         context: EntityUpsertContext<ENTITY, ID, META>,
         entities: List<ENTITY>
     ): EntityUpsertStatementBuilder<ENTITY>
+
+    fun supportsAliasForDeleteStatement() = true
 }
 
 internal object DryRunDialect : Dialect {
