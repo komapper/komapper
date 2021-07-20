@@ -4,9 +4,9 @@ import integration.setting.H2Setting
 import org.komapper.jdbc.DefaultJdbcDatabaseConfig
 import org.komapper.jdbc.JdbcDatabaseConfig
 
-class H2JdbcSetting(url: String, user: String, password: String) : H2Setting<JdbcDatabaseConfig> {
+class H2JdbcSetting(url: String) : H2Setting<JdbcDatabaseConfig> {
     override val config: JdbcDatabaseConfig =
-        object : DefaultJdbcDatabaseConfig(url, user, password) {
+        object : DefaultJdbcDatabaseConfig(url) {
             override val executionOptions = super.executionOptions.copy(batchSize = 2)
         }
 }

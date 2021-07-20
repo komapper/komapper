@@ -5,9 +5,9 @@ import integration.setting.PostgreSqlSetting
 import org.komapper.jdbc.DefaultJdbcDatabaseConfig
 import org.komapper.jdbc.JdbcDatabaseConfig
 
-class PostgreSqlJdbcSetting(url: String, user: String, password: String) : PostgreSqlSetting<JdbcDatabaseConfig> {
+class PostgreSqlJdbcSetting(url: String) : PostgreSqlSetting<JdbcDatabaseConfig> {
     override val config: JdbcDatabaseConfig =
-        object : DefaultJdbcDatabaseConfig(url, user, password, listOf(PostgreSqlJsonType())) {
+        object : DefaultJdbcDatabaseConfig(url, "test", "test", listOf(PostgreSqlJsonType())) {
             override val executionOptions = super.executionOptions.copy(batchSize = 2)
         }
 }
