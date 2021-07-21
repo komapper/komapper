@@ -24,7 +24,7 @@ tasks {
     val h2 by registering(Test::class) {
         prepareProperties("h2")
     }
-    
+
     val mariadb by registering(Test::class) {
         prepareProperties("mariadb")
     }

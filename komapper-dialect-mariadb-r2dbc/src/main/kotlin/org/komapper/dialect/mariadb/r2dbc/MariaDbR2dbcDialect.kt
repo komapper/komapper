@@ -25,12 +25,10 @@ import org.komapper.r2dbc.UShortType
 
 open class MariaDbR2dbcDialect(
     dataTypes: List<R2dbcDataType<*>> = emptyList(),
-    val version: Version = Version.V0_8
+    val version: Version = Version.IMPLICIT
 ) : MariaDbDialect, AbstractR2dbcDialect(defaultDataTypes + dataTypes) {
 
     companion object {
-        enum class Version { V0_8 }
-
         val defaultDataTypes: List<R2dbcDataType<*>> = listOf(
             ArrayType("varbinary(500)"),
             BigDecimalType("decimal"),
@@ -53,4 +51,6 @@ open class MariaDbR2dbcDialect(
             UShortType("integer"),
         )
     }
+
+    enum class Version { IMPLICIT }
 }
