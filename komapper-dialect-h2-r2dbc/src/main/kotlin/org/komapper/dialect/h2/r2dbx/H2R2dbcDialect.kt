@@ -26,12 +26,10 @@ import org.komapper.r2dbc.UShortType
 
 open class H2R2dbcDialect(
     dataTypes: List<R2dbcDataType<*>> = emptyList(),
-    val version: Version = Version.V0_8
+    val version: Version = Version.IMPLICIT
 ) : H2Dialect, AbstractR2dbcDialect(defaultDataTypes + dataTypes) {
 
     companion object {
-        enum class Version { V0_8 }
-
         const val driver = "h2"
 
         val defaultDataTypes: List<R2dbcDataType<*>> = listOf(
@@ -57,6 +55,8 @@ open class H2R2dbcDialect(
             UShortType("integer"),
         )
     }
+
+    enum class Version { IMPLICIT }
 
     override val driver: String = Companion.driver
 }

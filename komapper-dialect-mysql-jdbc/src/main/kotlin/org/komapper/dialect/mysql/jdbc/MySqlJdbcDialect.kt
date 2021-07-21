@@ -30,12 +30,10 @@ import java.sql.SQLException
 
 open class MySqlJdbcDialect(
     dataTypes: List<JdbcDataType<*>> = emptyList(),
-    val version: Version = Version.V8_0
+    val version: Version = Version.IMPLICIT
 ) : MySqlDialect, AbstractJdbcDialect(defaultDataTypes + dataTypes) {
 
     companion object {
-        enum class Version { V8_0 }
-
         /** the error code that represents unique violation  */
         var UNIQUE_CONSTRAINT_VIOLATION_ERROR_CODES = setOf(1022, 1062)
 
@@ -65,6 +63,8 @@ open class MySqlJdbcDialect(
             UShortType("integer"),
         )
     }
+
+    enum class Version { IMPLICIT }
 
     override fun isUniqueConstraintViolation(exception: SQLException): Boolean {
         val cause = getCause(exception)

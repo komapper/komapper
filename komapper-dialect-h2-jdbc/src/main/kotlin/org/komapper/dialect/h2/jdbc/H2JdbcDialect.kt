@@ -31,12 +31,10 @@ import java.sql.SQLException
 
 open class H2JdbcDialect(
     dataTypes: List<JdbcDataType<*>> = emptyList(),
-    val version: Version = Version.V1_4
+    val version: Version = Version.IMPLICIT
 ) : H2Dialect, AbstractJdbcDialect(defaultDataTypes + dataTypes) {
 
     companion object {
-        enum class Version { V1_4 }
-
         /** the error code that represents unique violation  */
         const val UNIQUE_CONSTRAINT_VIOLATION_ERROR_CODE = 23505
 
@@ -68,6 +66,8 @@ open class H2JdbcDialect(
             H2UUIDType
         )
     }
+
+    enum class Version { IMPLICIT }
 
     override fun isUniqueConstraintViolation(exception: SQLException): Boolean {
         val cause = getCause(exception)

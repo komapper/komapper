@@ -27,12 +27,10 @@ import org.komapper.r2dbc.UShortType
 
 open class PostgreSqlR2dbcDialect(
     dataTypes: List<R2dbcDataType<*>> = emptyList(),
-    val version: Version = Version.V0_9
+    val version: Version = Version.IMPLICIT
 ) : PostgreSqlDialect, AbstractR2dbcDialect(defaultDataTypes + dataTypes) {
 
     companion object {
-        enum class Version { V0_9 }
-
         val defaultDataTypes: List<R2dbcDataType<*>> = listOf(
             ArrayType("array"),
             BigDecimalType("decimal"),
@@ -55,6 +53,8 @@ open class PostgreSqlR2dbcDialect(
             UShortType("integer"),
         )
     }
+
+    enum class Version { IMPLICIT }
 
     override fun getBinder(): Binder {
         return IndexedBinder

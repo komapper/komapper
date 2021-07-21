@@ -30,12 +30,10 @@ import java.sql.SQLException
 
 open class PostgreSqlJdbcDialect(
     dataTypes: List<JdbcDataType<*>> = emptyList(),
-    val version: Version = Version.V42_2
+    val version: Version = Version.IMPLICIT
 ) : PostgreSqlDialect, AbstractJdbcDialect(defaultDataTypes + dataTypes) {
 
     companion object {
-        enum class Version { V42_2 }
-
         /** the state code that represents unique violation  */
         const val UNIQUE_CONSTRAINT_VIOLATION_STATE_CODE = "23505"
 
@@ -66,6 +64,8 @@ open class PostgreSqlJdbcDialect(
             PostgreSqlUUIDType
         )
     }
+
+    enum class Version { IMPLICIT }
 
     override fun isUniqueConstraintViolation(exception: SQLException): Boolean {
         val cause = getCause(exception)
