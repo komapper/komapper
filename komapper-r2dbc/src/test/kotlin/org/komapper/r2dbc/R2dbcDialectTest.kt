@@ -19,6 +19,12 @@ class R2dbcDialectTest {
     }
 
     @Test
+    fun extractR2dbcDriver_testcontainers() {
+        val driver = R2dbcDialect.extractR2dbcDriver("r2dbc:tc:h2:mem:///testdb")
+        assertEquals("h2", driver)
+    }
+
+    @Test
     fun extractR2dbcDriver_error() {
         assertThrows<IllegalStateException> {
             R2dbcDialect.extractR2dbcDriver("jdbc:h2:mem:///testdb")

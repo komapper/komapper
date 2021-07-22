@@ -26,7 +26,7 @@ interface JdbcDialect : Dialect {
             return factory.create(dataTypes)
         }
 
-        private fun extractJdbcDriver(url: String): String {
+        internal fun extractJdbcDriver(url: String): String {
             val matcher = jdbcUrlPattern.matcher(url)
             if (matcher.matches()) {
                 return matcher.group(2).lowercase()
