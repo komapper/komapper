@@ -18,5 +18,8 @@ dependencies {
     runtimeOnly(project(":komapper-template"))
     runtimeOnly(project(":komapper-slf4j"))
     runtimeOnly(project(":komapper-dialect-h2-r2dbc"))
+    runtimeOnly(project(":komapper-dialect-mariadb-r2dbc"))
+    runtimeOnly(project(":komapper-dialect-mysql-r2dbc"))
+    runtimeOnly(project(":komapper-dialect-postgresql-r2dbc"))
     runtimeOnly(project(":komapper-spring-boot-autoconfigure-r2dbc"))
 }
