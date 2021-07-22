@@ -23,7 +23,7 @@ internal class JdbcEntityInsertQueryRunnerSupport<ENTITY : Any, ID, META : Entit
                     val statement = Statement(sql)
                     val executor = JdbcExecutor(config, options)
                     executor.executeQuery(statement) { rs ->
-                        if (rs.next()) rs.getLong(1) else error("No result: ${statement.charSequences}")
+                        if (rs.next()) rs.getLong(1) else error("No result: ${statement.toSql()}")
                     }
                 }
             }

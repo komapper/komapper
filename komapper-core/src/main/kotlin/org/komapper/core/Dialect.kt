@@ -17,7 +17,7 @@ interface Dialect {
     val closeQuote: String get() = "\""
     val escapeSequence: String get() = "\\"
 
-    fun replacePlaceHolder(index: Int, placeHolder: PlaceHolder): CharSequence {
+    fun replacePlaceHolder(index: Int, placeHolder: StatementPart.PlaceHolder): CharSequence {
         return placeHolder
     }
 

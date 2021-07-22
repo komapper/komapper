@@ -3,7 +3,6 @@ package org.komapper.core
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import java.lang.IllegalStateException
 
 internal class StatementBufferTest {
 
@@ -14,8 +13,15 @@ internal class StatementBufferTest {
         buffer.bind(Value(1))
         buffer.append("bbb")
         buffer.bind(Value(2))
-        assertEquals(listOf("aaa", PlaceHolder, "bbb", PlaceHolder), buffer.charSequences)
-        assertEquals(listOf(Value(1), Value(2)), buffer.args)
+        assertEquals(
+            listOf(
+                StatementPart.Text("aaa"),
+                StatementPart.PlaceHolder(Value(1)),
+                StatementPart.Text("bbb"),
+                StatementPart.PlaceHolder(Value(2))
+            ),
+            buffer.parts
+        )
     }
 
     @Test
@@ -23,9 +29,25 @@ internal class StatementBufferTest {
         val buffer = StatementBuffer()
         buffer.append("aaa")
         buffer.bind(Value(1))
-        buffer.append(Statement(listOf("bbb", PlaceHolder, "ccc"), listOf(Value(2))))
-        assertEquals(listOf("aaa", PlaceHolder, "bbb", PlaceHolder, "ccc"), buffer.charSequences)
-        assertEquals(listOf(Value(1), Value(2)), buffer.args)
+        buffer.append(
+            Statement(
+                listOf(
+                    StatementPart.Text("bbb"),
+                    StatementPart.PlaceHolder(Value(2)),
+                    StatementPart.Text("ccc")
+                )
+            )
+        )
+        assertEquals(
+            listOf(
+                StatementPart.Text("aaa"),
+                StatementPart.PlaceHolder(Value(1)),
+                StatementPart.Text("bbb"),
+                StatementPart.PlaceHolder(Value(2)),
+                StatementPart.Text("ccc"),
+            ),
+            buffer.parts
+        )
     }
 
     @Test
@@ -34,7 +56,7 @@ internal class StatementBufferTest {
         buffer.append("abc")
         buffer.append("def")
         buffer.cutBack(2)
-        assertEquals(listOf("abc", "d"), buffer.charSequences)
+        assertEquals(listOf(StatementPart.Text("abc"), StatementPart.Text("d")), buffer.parts)
     }
 
     @Test
@@ -56,6 +78,4 @@ internal class StatementBufferTest {
             buffer.cutBack(1)
         }
     }
-
-
 }

@@ -3,7 +3,7 @@ package org.komapper.r2dbc
 import io.r2dbc.spi.Row
 import io.r2dbc.spi.Statement
 import org.komapper.core.Dialect
-import org.komapper.core.PlaceHolder
+import org.komapper.core.StatementPart
 import org.komapper.r2dbc.spi.R2dbcDialectFactory
 import java.util.ServiceLoader
 import java.util.regex.Pattern
@@ -53,7 +53,7 @@ abstract class AbstractR2dbcDialect protected constructor(internalDataTypes: Lis
         return DefaultBinder
     }
 
-    override fun replacePlaceHolder(index: Int, placeHolder: PlaceHolder): CharSequence {
+    override fun replacePlaceHolder(index: Int, placeHolder: StatementPart.PlaceHolder): CharSequence {
         val bindMarker = getBinder()
         return bindMarker.replace(index, placeHolder)
     }
