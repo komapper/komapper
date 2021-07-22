@@ -235,7 +235,7 @@ internal class TwoWayTemplateStatementBuilder(
         }
 
         fun append(state: State): State {
-            buf.fragments.addAll(state.buf.fragments)
+            buf.charSequences.addAll(state.buf.charSequences)
             buf.args.addAll(state.buf.args)
             return this
         }
