@@ -43,7 +43,7 @@ class PropertyMetamodelStub<ENTITY : Any, EXTERIOR : Any> :
     PropertyMetamodel<ENTITY, EXTERIOR, EXTERIOR> {
     override val owner: EntityMetamodel<ENTITY, *, *> get() = fail()
     override val exteriorClass: KClass<EXTERIOR> get() = fail()
-    override val interiorClass: KClass<EXTERIOR> = fail()
+    override val interiorClass: KClass<EXTERIOR> get() = fail()
     override val name: String get() = fail()
     override val columnName: String get() = fail()
     override val alwaysQuote: Boolean get() = fail()
