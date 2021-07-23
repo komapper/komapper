@@ -26,7 +26,7 @@ class PropertyMetamodelImpl<ENTITY : Any, EXTERIOR : Any, INTERIOR : Any>(
     private val descriptor: PropertyDescriptor<ENTITY, EXTERIOR, INTERIOR>
 ) : PropertyMetamodel<ENTITY, EXTERIOR, INTERIOR> {
     override val exteriorClass: KClass<EXTERIOR> get() = descriptor.exteriorClass
-    override val interiorClass: KClass<INTERIOR> = descriptor.interiorClass
+    override val interiorClass: KClass<INTERIOR> get() = descriptor.interiorClass
     override val name: String get() = descriptor.name
     override val columnName: String get() = descriptor.columnName
     override val alwaysQuote: Boolean get() = descriptor.alwaysQuote
@@ -34,8 +34,8 @@ class PropertyMetamodelImpl<ENTITY : Any, EXTERIOR : Any, INTERIOR : Any>(
     override val setter: (ENTITY, EXTERIOR) -> ENTITY get() = descriptor.setter
     override val wrap: (INTERIOR) -> EXTERIOR get() = descriptor.wrap
     override val unwrap: (EXTERIOR) -> INTERIOR get() = descriptor.unwrap
-    override val nullable: Boolean = descriptor.nullable
-    override val idAssignment: Assignment<ENTITY>? = descriptor.idAssignment
+    override val nullable: Boolean get() = descriptor.nullable
+    override val idAssignment: Assignment<ENTITY>? get() = descriptor.idAssignment
 }
 
 @Suppress("unused")
