@@ -8,7 +8,7 @@ import org.komapper.core.dsl.expression.ColumnExpression
 sealed class Operand {
     data class Column(val expression: ColumnExpression<*, *>) : Operand()
     data class Argument<T : Any, S : Any>(private val expression: ColumnExpression<T, S>, private val exterior: T?) : Operand() {
-        val value: Value = if (exterior == null) {
+        val value: Value get() = if (exterior == null) {
             Value(null, expression.interiorClass)
         } else {
             val interior = expression.unwrap(exterior)

@@ -11,7 +11,7 @@ class ValuesScope<ENTITY : Any>(
 ) : List<Pair<PropertyMetamodel<ENTITY, *, *>, Operand>> by context {
 
     companion object {
-        operator fun <E : Any> ValuesDeclaration<E>.plus(other: ValuesDeclaration<E>): ValuesDeclaration<E> {
+        infix operator fun <E : Any> ValuesDeclaration<E>.plus(other: ValuesDeclaration<E>): ValuesDeclaration<E> {
             return {
                 this@plus(this)
                 other(this)
