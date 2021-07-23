@@ -1,18 +1,18 @@
 package org.komapper.r2dbc
 
 import io.r2dbc.spi.Statement
-import org.komapper.core.PlaceHolder
+import org.komapper.core.StatementPart
 import org.komapper.core.ThreadSafe
 
 @ThreadSafe
 interface Binder {
-    fun replace(index: Int, placeHolder: PlaceHolder): CharSequence
+    fun replace(index: Int, placeHolder: StatementPart.PlaceHolder): CharSequence
     fun bind(statement: Statement, index: Int, value: Any?, dataType: R2dbcDataType<Any>)
 }
 
 object DefaultBinder : Binder {
 
-    override fun replace(index: Int, placeHolder: PlaceHolder): CharSequence {
+    override fun replace(index: Int, placeHolder: StatementPart.PlaceHolder): CharSequence {
         return placeHolder
     }
 
@@ -23,7 +23,7 @@ object DefaultBinder : Binder {
 
 object IndexedBinder : Binder {
 
-    override fun replace(index: Int, placeHolder: PlaceHolder): CharSequence {
+    override fun replace(index: Int, placeHolder: StatementPart.PlaceHolder): CharSequence {
         return "$${index + 1}"
     }
 

@@ -5,12 +5,13 @@ dependencies {
     runtimeOnly(project(":komapper-dialect-mariadb-r2dbc"))
     runtimeOnly(project(":komapper-dialect-mysql-r2dbc"))
     runtimeOnly(project(":komapper-dialect-postgresql-r2dbc"))
-    implementation("org.testcontainers:mariadb")
-    implementation("org.testcontainers:mysql")
-    implementation("org.testcontainers:postgresql")
-    implementation("org.testcontainers:r2dbc")
-    runtimeOnly("mysql:mysql-connector-java:8.0.26")
-    runtimeOnly("org.mariadb.jdbc:mariadb-java-client:2.7.3")
+    testImplementation(platform("org.testcontainers:testcontainers-bom:1.16.0"))
+    testImplementation("org.testcontainers:mariadb")
+    testImplementation("org.testcontainers:mysql")
+    testImplementation("org.testcontainers:postgresql")
+    testImplementation("org.testcontainers:r2dbc")
+    testRuntimeOnly("mysql:mysql-connector-java:8.0.26")
+    testRuntimeOnly("org.mariadb.jdbc:mariadb-java-client:2.7.3")
 }
 
 tasks {

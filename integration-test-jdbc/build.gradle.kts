@@ -2,10 +2,15 @@ dependencies {
     implementation(project(":integration-test-core"))
     implementation(project(":komapper-tx-jdbc"))
     implementation("org.postgresql:postgresql:42.2.23")
-    implementation(project(":komapper-dialect-h2-jdbc"))
+    runtimeOnly(project(":komapper-dialect-h2-jdbc"))
     runtimeOnly(project(":komapper-dialect-mariadb-jdbc"))
     runtimeOnly(project(":komapper-dialect-mysql-jdbc"))
     runtimeOnly(project(":komapper-dialect-postgresql-jdbc"))
+    testImplementation(platform("org.testcontainers:testcontainers-bom:1.16.0"))
+    testRuntimeOnly("org.testcontainers:mariadb")
+    testRuntimeOnly("org.testcontainers:mysql")
+    testRuntimeOnly("org.testcontainers:postgresql")
+    testRuntimeOnly("org.testcontainers:r2dbc")
 }
 
 tasks {

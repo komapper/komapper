@@ -3,52 +3,43 @@ package org.komapper.core
 import kotlin.reflect.KClass
 
 @ThreadSafe
-data class Statement(val charSequences: List<CharSequence>, val args: List<Value>) {
-    constructor(charSequence: CharSequence) : this(listOf(charSequence), emptyList())
+data class Statement(val parts: List<StatementPart>) {
+    constructor(text: CharSequence) : this(listOf(StatementPart.Text(text)))
 
     companion object {
-        val EMPTY = Statement(emptyList(), emptyList())
+        val EMPTY = Statement(emptyList())
     }
 
-    init {
-        val count = charSequences.count { it is PlaceHolder }
-        val size = args.size
-        require(count == args.size) { "count=$count, size=$size" }
-    }
+    val args: List<Value> = parts.filterIsInstance<StatementPart.PlaceHolder>().map { it.value }
 
-    fun toSql(transform: (Int, PlaceHolder) -> CharSequence = { _, placeHolder -> placeHolder }): String {
+    fun toSql(transform: (Int, StatementPart.PlaceHolder) -> CharSequence = { _, placeHolder -> placeHolder }): String {
         var index = 0
-        return charSequences.joinToString(separator = "") { each ->
-            when (each) {
-                is PlaceHolder -> {
-                    transform(index++, each)
+        return parts.joinToString(separator = "") { part ->
+            when (part) {
+                is StatementPart.Text -> part
+                is StatementPart.PlaceHolder -> {
+                    transform(index++, part)
                 }
-                else -> each
             }
         }
     }
 
     fun toSqlWithArgs(format: (Any?, KClass<*>) -> String): String {
-        val iterator = args.iterator()
-        var index = 0
-        return charSequences.joinToString(separator = "") { each ->
-            when (each) {
-                is PlaceHolder -> {
-                    if (!iterator.hasNext()) error("The value is not found. index=$index")
-                    val value = iterator.next()
-                    index++
+        return parts.joinToString(separator = "") { part ->
+            when (part) {
+                is StatementPart.Text -> part.text
+                is StatementPart.PlaceHolder -> {
+                    val value = part.value
                     format(value.any, value.klass)
                 }
-                else -> each
             }
         }
     }
 
     infix operator fun plus(other: Statement): Statement {
         val separator =
-            if (this.charSequences.isEmpty() || this.charSequences.last().trimEnd().endsWith(";")) "" else ";"
-        val charSequences = this.charSequences + separator + other.charSequences
-        val args = this.args + other.args
-        return Statement(charSequences, args)
+            if (this.parts.isEmpty() || this.parts.last().trimEnd().endsWith(";")) "" else ";"
+        val parts = this.parts + StatementPart.Text(separator) + other.parts
+        return Statement(parts)
     }
 }

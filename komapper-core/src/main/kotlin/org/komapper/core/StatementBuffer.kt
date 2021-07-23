@@ -1,39 +1,36 @@
 package org.komapper.core
 
 class StatementBuffer {
-    val fragments = mutableListOf<CharSequence>()
-    val args = ArrayList<Value>()
+    val parts = mutableListOf<StatementPart>()
 
-    fun append(s: CharSequence): StatementBuffer {
-        fragments.add(s)
+    fun append(text: CharSequence): StatementBuffer {
+        parts.add(StatementPart.Text(text))
         return this
     }
 
     fun append(statement: Statement): StatementBuffer {
-        fragments.addAll(statement.charSequences)
-        args.addAll(statement.args)
+        parts.addAll(statement.parts)
         return this
     }
 
     fun bind(value: Value): StatementBuffer {
-        fragments.add(PlaceHolder)
-        args.add(value)
+        parts.add(StatementPart.PlaceHolder(value))
         return this
     }
 
     fun cutBack(length: Int): StatementBuffer {
-        val last = fragments.removeLast()
-        if (last is PlaceHolder || last.length < length) error("Cannot cutBack.")
+        val last = parts.removeLast()
+        if (last is StatementPart.PlaceHolder || last.length < length) error("Cannot cutBack.")
         val newLast = last.dropLast(length)
-        if (newLast.isNotEmpty()) fragments.add(newLast)
+        if (newLast.isNotEmpty()) parts.add(StatementPart.Text(newLast))
         return this
     }
 
     fun toStatement(): Statement {
-        if (fragments.isEmpty() && args.isEmpty()) {
+        if (parts.isEmpty()) {
             return Statement.EMPTY
         }
-        return Statement(fragments, args)
+        return Statement(parts)
     }
 
     override fun toString(): String {
