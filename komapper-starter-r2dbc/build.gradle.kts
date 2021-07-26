@@ -8,5 +8,5 @@ dependencies {
     runtimeOnly(project(":komapper-dialect-mariadb-r2dbc"))
     runtimeOnly(project(":komapper-dialect-mysql-r2dbc"))
     runtimeOnly(project(":komapper-dialect-postgresql-r2dbc"))
-    runtimeOnly("ch.qos.logback:logback-classic:1.2.4")
+    runtimeOnly("ch.qos.logback:logback-classic:1.2.5")
 }
