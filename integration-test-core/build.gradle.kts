@@ -21,7 +21,7 @@ dependencies {
     api(project(":komapper-core"))
     runtimeOnly(project(":komapper-slf4j"))
     runtimeOnly(project(":komapper-template"))
-    runtimeOnly("ch.qos.logback:logback-classic:1.2.4")
+    runtimeOnly("ch.qos.logback:logback-classic:1.2.5")
 }
 
 ksp {
