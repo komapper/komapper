@@ -3,7 +3,7 @@ package org.komapper.slf4j
 import org.komapper.core.Logger
 import org.slf4j.LoggerFactory
 
-class Slf4jLogger : Logger {
+class Slf4jLoggerAdapter : Logger {
 
     override fun trace(category: String, message: () -> String) {
         val logger = LoggerFactory.getLogger(category)
