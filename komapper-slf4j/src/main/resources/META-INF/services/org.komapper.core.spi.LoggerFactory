@@ -1,2 +1,2 @@
-org.komapper.slf4j.Slf4jLoggerFactory
+org.komapper.slf4j.Slf4jLoggerAdapterFactory
 
