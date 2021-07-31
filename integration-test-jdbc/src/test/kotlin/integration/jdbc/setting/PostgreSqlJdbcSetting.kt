@@ -1,6 +1,6 @@
 package integration.jdbc.setting
 
-import integration.PostgreSqlJsonType
+import integration.jdbc.PostgreSqlJsonType
 import integration.setting.PostgreSqlSetting
 import org.komapper.jdbc.DefaultJdbcDatabaseConfig
 import org.komapper.jdbc.JdbcDatabaseConfig

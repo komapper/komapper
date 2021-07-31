@@ -1,5 +1,6 @@
-package integration
+package integration.jdbc
 
+import integration.Json
 import org.komapper.jdbc.JdbcDataType
 import org.komapper.jdbc.StringType
 import org.postgresql.util.PGobject

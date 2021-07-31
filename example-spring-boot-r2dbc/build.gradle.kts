@@ -20,10 +20,11 @@ idea.module {
 }
 
 dependencies {
+    ksp(project(":komapper-processor"))
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation(project(":komapper-spring-boot-starter-r2dbc"))
-    ksp(project(":komapper-processor"))
+    runtimeOnly(project(":komapper-dialect-h2-r2dbc"))
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
 

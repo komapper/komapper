@@ -17,8 +17,9 @@ idea.module {
 }
 
 dependencies {
-    implementation(project(":komapper-starter-jdbc"))
     ksp(project(":komapper-processor"))
+    implementation(project(":komapper-starter-jdbc"))
+    runtimeOnly(project(":komapper-dialect-h2-jdbc"))
 }
 
 application {

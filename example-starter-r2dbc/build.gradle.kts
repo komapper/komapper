@@ -17,8 +17,9 @@ idea.module {
 }
 
 dependencies {
-    implementation(project(":komapper-starter-r2dbc"))
     ksp(project(":komapper-processor"))
+    implementation(project(":komapper-starter-r2dbc"))
+    runtimeOnly(project(":komapper-dialect-h2-r2dbc"))
 }
 
 application {
