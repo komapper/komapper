@@ -10,6 +10,8 @@ import org.komapper.annotation.KomapperVersion
 import java.io.Serializable
 import java.math.BigDecimal
 import java.math.BigInteger
+import java.sql.Array
+import java.sql.SQLXML
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -25,6 +27,12 @@ data class AnyPerson(@KomapperId val name: String) : Serializable {
 @KomapperEntity
 @KomapperTable("ANY_TEST")
 data class AnyTest(@KomapperId val id: Int, val value: Any) {
+    companion object
+}
+
+@KomapperEntity
+@KomapperTable("ARRAY_TEST")
+data class ArrayTest(@KomapperId val id: Int, val value: Array?) {
     companion object
 }
 
@@ -110,6 +118,12 @@ data class OffsetDateTimeTest(@KomapperId val id: Int, val value: OffsetDateTime
 @KomapperEntity
 @KomapperTable("SHORT_TEST")
 data class ShortTest(@KomapperId val id: Int, val value: Short) {
+    companion object
+}
+
+@KomapperEntity
+@KomapperTable("SQLXML_TEST")
+data class SqlXmlTest(@KomapperId val id: Int, val value: SQLXML?) {
     companion object
 }
 

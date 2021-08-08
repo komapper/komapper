@@ -2,7 +2,6 @@ package org.komapper.dialect.mariadb.jdbc
 
 import org.komapper.dialect.mariadb.MariaDbDialect
 import org.komapper.jdbc.AbstractJdbcDialect
-import org.komapper.jdbc.ArrayType
 import org.komapper.jdbc.BigDecimalType
 import org.komapper.jdbc.BigIntegerType
 import org.komapper.jdbc.BlobType
@@ -38,13 +37,12 @@ open class MariaDbJdbcDialect(
         var UNIQUE_CONSTRAINT_VIOLATION_ERROR_CODES = setOf(1022, 1062)
 
         val defaultDataTypes: List<JdbcDataType<*>> = listOf(
-            ArrayType("varbinary(500)"),
             BigDecimalType("decimal"),
             BigIntegerType("decimal"),
             BlobType("blob"),
             BooleanType("bit(1)"),
             ByteType("tinyint"),
-            ByteArrayType("bytea"),
+            ByteArrayType("varbinary(500)"),
             DoubleType("double precision"),
             ClobType("text"),
             FloatType("real"),
