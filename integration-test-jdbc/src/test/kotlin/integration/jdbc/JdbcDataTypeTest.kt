@@ -6,6 +6,7 @@ import integration.setting.Run
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.EntityDsl
@@ -36,6 +37,35 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
             EntityDsl.from(m).where { m.id eq 1 }.first()
         }
         assertEquals(data, data2)
+    }
+
+    @Run(onlyIf = [Dbms.H2, Dbms.POSTGRESQL])
+    @Test
+    fun array() {
+        val m = integration.ArrayTest.meta
+        val array = db.dataFactory.createArrayOf("text", listOf("A", "B", "C"))
+        val data = integration.ArrayTest(1, array)
+        db.runQuery { EntityDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            EntityDsl.from(m).where { m.id eq 1 }.first()
+        }
+        val anyArray = data2.value!!.getArray(1, 3) as Array<*>
+        assertEquals(3, anyArray.size)
+        assertEquals("A", anyArray[0])
+        assertEquals("B", anyArray[1])
+        assertEquals("C", anyArray[2])
+    }
+
+    @Run(onlyIf = [Dbms.H2, Dbms.POSTGRESQL])
+    @Test
+    fun array_null() {
+        val m = integration.ArrayTest.meta
+        val data = integration.ArrayTest(1, null)
+        db.runQuery { EntityDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            EntityDsl.from(m).where { m.id eq 1 }.first()
+        }
+        assertNull(data2.value)
     }
 
     @Test
@@ -216,6 +246,33 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
             EntityDsl.from(m).where { m.id eq 1 }.first()
         }
         assertEquals(data, data2)
+    }
+
+    @Run(onlyIf = [Dbms.POSTGRESQL, Dbms.H2])
+    @Test
+    fun sqlXml() {
+        val m = integration.SqlXmlTest.meta
+        val value = db.dataFactory.createSQLXML()
+        val xml = "<test>hello</test>"
+        value.string = xml
+        val data = integration.SqlXmlTest(1, value)
+        db.runQuery { EntityDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            EntityDsl.from(m).where { m.id eq 1 }.first()
+        }
+        assertEquals(xml, data2.value!!.string)
+    }
+
+    @Run(onlyIf = [Dbms.POSTGRESQL, Dbms.H2])
+    @Test
+    fun sqlXml_null() {
+        val m = integration.SqlXmlTest.meta
+        val data = integration.SqlXmlTest(1, null)
+        db.runQuery { EntityDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            EntityDsl.from(m).where { m.id eq 1 }.first()
+        }
+        assertNull(data2.value)
     }
 
     @Test
