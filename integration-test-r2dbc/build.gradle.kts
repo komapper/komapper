@@ -11,7 +11,7 @@ dependencies {
     testImplementation("org.testcontainers:postgresql")
     testImplementation("org.testcontainers:r2dbc")
     testRuntimeOnly("mysql:mysql-connector-java:8.0.26")
-    testRuntimeOnly("org.mariadb.jdbc:mariadb-java-client:2.7.3")
+    testRuntimeOnly("org.mariadb.jdbc:mariadb-java-client:2.7.4")
 }
 
 tasks {
