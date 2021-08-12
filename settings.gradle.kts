@@ -4,7 +4,7 @@ pluginManagement {
     val springBootVersion: String by settings
     repositories {
         gradlePluginPortal()
-        google()
+        mavenCentral()
     }
     plugins {
         kotlin("jvm") version kotlinVersion
