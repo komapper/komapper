@@ -44,7 +44,7 @@ jobs:
           name: build
           path: ./**/build/reports
 
-  integration-test:
+  test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -89,7 +89,7 @@ jobs:
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    needs: [ build, integration-test ]
+    needs: [ build, test ]
 
     steps:
       - name: Set up JDK 8
