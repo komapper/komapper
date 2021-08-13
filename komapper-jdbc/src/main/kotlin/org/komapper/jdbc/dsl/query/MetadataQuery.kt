@@ -82,54 +82,57 @@ internal class MetadataReader(
 
     private fun getTables(): List<MetadataQuery.Table> {
         val tables: MutableList<MetadataQuery.Table> = mutableListOf()
-        val rs = metaData.getTables(
+        metaData.getTables(
             catalog,
             schemaPattern,
             tableNamePattern,
             tableTypes.toTypedArray()
-        )
-        while (rs.next()) {
-            val table = MetadataQuery.Table(
-                name = rs.getString("TABLE_NAME"),
-                catalog = rs.getString("TABLE_CAT"),
-                schema = rs.getString("TABLE_SCHEM")
-            )
-            tables.add(table)
+        ).use { rs ->
+            while (rs.next()) {
+                val table = MetadataQuery.Table(
+                    name = rs.getString("TABLE_NAME"),
+                    catalog = rs.getString("TABLE_CAT"),
+                    schema = rs.getString("TABLE_SCHEM")
+                )
+                tables.add(table)
+            }
         }
         return tables
     }
 
     private fun getColumns(table: MetadataQuery.Table, primaryKeys: List<MetadataQuery.PrimaryKey>): List<MetadataQuery.Column> {
         val columns: MutableList<MetadataQuery.Column> = mutableListOf()
-        val rs = metaData.getColumns(
+        metaData.getColumns(
             table.catalog, table.schema, table.name, null
-        )
-        val pkMap = primaryKeys.associateBy { it.name }
-        while (rs.next()) {
-            val name = rs.getString("COLUMN_NAME")
-            val primaryKey = pkMap[name]
-            val column = MetadataQuery.Column(
-                name = name,
-                dataType = rs.getInt("DATA_TYPE"),
-                typeName = rs.getString("TYPE_NAME"),
-                length = rs.getInt("COLUMN_SIZE"),
-                scale = rs.getInt("DECIMAL_DIGITS"),
-                nullable = rs.getBoolean("NULLABLE"),
-                isPrimaryKey = primaryKey != null,
-                isAutoIncrement = primaryKey?.isAutoIncrement == true
-            )
-            columns.add(column)
+        ).use { rs ->
+            val pkMap = primaryKeys.associateBy { it.name }
+            while (rs.next()) {
+                val name = rs.getString("COLUMN_NAME")
+                val primaryKey = pkMap[name]
+                val column = MetadataQuery.Column(
+                    name = name,
+                    dataType = rs.getInt("DATA_TYPE"),
+                    typeName = rs.getString("TYPE_NAME"),
+                    length = rs.getInt("COLUMN_SIZE"),
+                    scale = rs.getInt("DECIMAL_DIGITS"),
+                    nullable = rs.getBoolean("NULLABLE"),
+                    isPrimaryKey = primaryKey != null,
+                    isAutoIncrement = primaryKey?.isAutoIncrement == true
+                )
+                columns.add(column)
+            }
         }
         return columns
     }
 
     private fun getPrimaryKeys(table: MetadataQuery.Table): List<MetadataQuery.PrimaryKey> {
         val keys = mutableListOf<String>()
-        val rs = metaData.getPrimaryKeys(
+        metaData.getPrimaryKeys(
             table.catalog, table.schema, table.name
-        )
-        while (rs.next()) {
-            keys.add(rs.getString("COLUMN_NAME"))
+        ).use { rs ->
+            while (rs.next()) {
+                keys.add(rs.getString("COLUMN_NAME"))
+            }
         }
         return if (keys.size == 1) {
             val key = keys.first()
