@@ -44,10 +44,11 @@ jobs:
           name: build
           path: ./**/build/reports
 
-  integration-test:
+  test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
+        type: [jdbc, r2dbc]
         dbms: [h2, mariadb, mysql, postgresql]
     timeout-minutes: 10
 
@@ -74,21 +75,21 @@ jobs:
             ${{ runner.os }}-gradle-
 
       - name: Test
-        # Skip mysql R2DBC test because the MySQL R2DBC driver is unstable.
-        run: ./gradlew :integration-test-jdbc:${{ matrix.dbms }} :integration-test-r2dbc:${{ matrix.dbms }} -x :integration-test-r2dbc:mysql
+        # Skip mysql R2DBC test because its driver is unstable.
+        run: ./gradlew :integration-test-${{ matrix.type }}:${{ matrix.dbms }} -x :integration-test-r2dbc:mysql
 
       - name: Upload reports
         if: failure()
         uses: actions/upload-artifact@v2
         with:
-          name: ${{ matrix.dbms }}
+          name: ${{ matrix.type }}-${{ matrix.dbms }}
           path: ./**/build/reports
 
   publish:
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    needs: [ build, integration-test ]
+    needs: [ build, test ]
 
     steps:
       - name: Set up JDK 8
