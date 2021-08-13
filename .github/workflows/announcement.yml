@@ -1,4 +1,4 @@
-name: Announce
+name: Announcement
 
 on:
   release:
@@ -13,6 +13,7 @@ jobs:
       - name: tweet
         uses: m1ner79/Github-Twittction@v1.0.1
         with:
+          twitter_status: "Komapper ${payload.release.tag_name} is out! #komapper ${payload.release.html_url}"
           twitter_consumer_key: ${{ secrets.TWITTER_API_KEY }}
           twitter_consumer_secret: ${{ secrets.TWITTER_API_SECRET_KEY }}
           twitter_access_token_key: ${{ secrets.TWITTER_ACCESS_TOKEN }}
