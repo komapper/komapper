@@ -13,7 +13,7 @@ jobs:
       - name: tweet
         uses: m1ner79/Github-Twittction@v1.0.1
         with:
-          twitter_status: "Komapper ${{ github.event.release.tag_name }} is out! #komapper ${{ github.event.repository.full_name }}"
+          twitter_status: "Komapper ${{ github.event.release.tag_name }} is out! #komapper ${{ github.event.release.html_url }}"
           twitter_consumer_key: ${{ secrets.TWITTER_API_KEY }}
           twitter_consumer_secret: ${{ secrets.TWITTER_API_SECRET_KEY }}
           twitter_access_token_key: ${{ secrets.TWITTER_ACCESS_TOKEN }}
