@@ -6,18 +6,18 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.SqlDsl
-import org.komapper.core.dsl.concat
-import org.komapper.core.dsl.div
-import org.komapper.core.dsl.literal
-import org.komapper.core.dsl.lower
-import org.komapper.core.dsl.ltrim
-import org.komapper.core.dsl.minus
-import org.komapper.core.dsl.plus
+import org.komapper.core.dsl.operator.concat
+import org.komapper.core.dsl.operator.div
+import org.komapper.core.dsl.operator.literal
+import org.komapper.core.dsl.operator.lower
+import org.komapper.core.dsl.operator.ltrim
+import org.komapper.core.dsl.operator.minus
+import org.komapper.core.dsl.operator.plus
+import org.komapper.core.dsl.operator.rem
+import org.komapper.core.dsl.operator.rtrim
+import org.komapper.core.dsl.operator.trim
+import org.komapper.core.dsl.operator.upper
 import org.komapper.core.dsl.query.dryRun
-import org.komapper.core.dsl.rem
-import org.komapper.core.dsl.rtrim
-import org.komapper.core.dsl.trim
-import org.komapper.core.dsl.upper
 import org.komapper.jdbc.JdbcDatabase
 
 @ExtendWith(Env::class)
