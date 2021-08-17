@@ -6,12 +6,12 @@ import org.komapper.core.dsl.context.EntitySelectContext
 import org.komapper.core.dsl.context.SqlSetOperationContext
 import org.komapper.core.dsl.context.SqlSetOperationKind
 import org.komapper.core.dsl.context.SubqueryContext
+import org.komapper.core.dsl.declaration.OnDeclaration
+import org.komapper.core.dsl.declaration.WhereDeclaration
 import org.komapper.core.dsl.element.Associator
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.EntitySelectOptions
-import org.komapper.core.dsl.scope.OnDeclaration
-import org.komapper.core.dsl.scope.WhereDeclaration
 import org.komapper.core.dsl.visitor.QueryVisitor
 
 interface EntitySelectQuery<ENTITY : Any> : Subquery<ENTITY> {

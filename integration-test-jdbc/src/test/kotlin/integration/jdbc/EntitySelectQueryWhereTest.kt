@@ -8,9 +8,9 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.EntityDsl
-import org.komapper.core.dsl.desc
-import org.komapper.core.dsl.scope.WhereDeclaration
-import org.komapper.core.dsl.scope.WhereScope.Companion.plus
+import org.komapper.core.dsl.declaration.WhereDeclaration
+import org.komapper.core.dsl.operator.desc
+import org.komapper.core.dsl.operator.plus
 import org.komapper.jdbc.JdbcDatabase
 
 @ExtendWith(Env::class)

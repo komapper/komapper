@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.SqlDsl
-import org.komapper.core.dsl.literal
+import org.komapper.core.dsl.operator.literal
 import org.komapper.r2dbc.R2dbcDatabase
 
 @ExtendWith(Env::class)

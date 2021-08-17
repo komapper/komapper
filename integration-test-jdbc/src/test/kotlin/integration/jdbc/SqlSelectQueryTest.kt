@@ -10,10 +10,10 @@ import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.SqlDsl
-import org.komapper.core.dsl.case
-import org.komapper.core.dsl.concat
 import org.komapper.core.dsl.expression.When
-import org.komapper.core.dsl.literal
+import org.komapper.core.dsl.operator.case
+import org.komapper.core.dsl.operator.concat
+import org.komapper.core.dsl.operator.literal
 import org.komapper.jdbc.JdbcDatabase
 
 @ExtendWith(Env::class)

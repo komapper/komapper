@@ -4,7 +4,7 @@ import org.komapper.annotation.KomapperAutoIncrement
 import org.komapper.annotation.KomapperEntityDef
 import org.komapper.annotation.KomapperId
 import org.komapper.core.dsl.EntityDsl
-import org.komapper.core.dsl.desc
+import org.komapper.core.dsl.operator.desc
 import org.komapper.jdbc.JdbcDatabase
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication

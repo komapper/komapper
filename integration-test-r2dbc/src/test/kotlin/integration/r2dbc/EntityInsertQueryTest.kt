@@ -17,7 +17,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.ClockProvider
 import org.komapper.core.UniqueConstraintException
 import org.komapper.core.dsl.EntityDsl
-import org.komapper.core.dsl.concat
+import org.komapper.core.dsl.operator.concat
 import org.komapper.r2dbc.R2dbcDatabase
 import org.komapper.r2dbc.R2dbcDatabaseConfig
 import java.time.Clock

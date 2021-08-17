@@ -8,8 +8,8 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.SqlDsl
-import org.komapper.core.dsl.concat
-import org.komapper.core.dsl.plus
+import org.komapper.core.dsl.operator.concat
+import org.komapper.core.dsl.operator.plus
 import org.komapper.jdbc.JdbcDatabase
 
 @ExtendWith(Env::class)

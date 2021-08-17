@@ -1,6 +1,8 @@
 package org.komapper.core.dsl.query
 
 import org.komapper.core.dsl.context.SelectContext
+import org.komapper.core.dsl.declaration.OnDeclaration
+import org.komapper.core.dsl.declaration.WhereDeclaration
 import org.komapper.core.dsl.element.ForUpdate
 import org.komapper.core.dsl.element.Join
 import org.komapper.core.dsl.element.JoinKind
@@ -8,9 +10,7 @@ import org.komapper.core.dsl.element.SortItem
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.ForUpdateOptions
-import org.komapper.core.dsl.scope.OnDeclaration
 import org.komapper.core.dsl.scope.OnScope
-import org.komapper.core.dsl.scope.WhereDeclaration
 import org.komapper.core.dsl.scope.WhereScope
 
 internal class SelectQuerySupport<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>, CONTEXT : SelectContext<ENTITY, ID, META, CONTEXT>>(

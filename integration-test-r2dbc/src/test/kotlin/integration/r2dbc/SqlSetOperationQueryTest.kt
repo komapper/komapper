@@ -12,8 +12,8 @@ import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.EntityDsl
 import org.komapper.core.dsl.SqlDsl
-import org.komapper.core.dsl.alias
-import org.komapper.core.dsl.desc
+import org.komapper.core.dsl.operator.alias
+import org.komapper.core.dsl.operator.desc
 import org.komapper.r2dbc.R2dbcDatabase
 
 @ExtendWith(Env::class)

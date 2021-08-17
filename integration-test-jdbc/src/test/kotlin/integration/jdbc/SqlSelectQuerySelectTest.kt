@@ -11,8 +11,8 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.SqlDsl
-import org.komapper.core.dsl.concat
-import org.komapper.core.dsl.count
+import org.komapper.core.dsl.operator.concat
+import org.komapper.core.dsl.operator.count
 import org.komapper.jdbc.JdbcDatabase
 
 @ExtendWith(Env::class)
