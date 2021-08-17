@@ -1,7 +1,7 @@
 package org.komapper.core.dsl.query
 
 import org.komapper.core.ThreadSafe
-import org.komapper.core.dsl.scope.SetDeclaration
+import org.komapper.core.dsl.declaration.SetDeclaration
 
 @ThreadSafe
 interface SqlUpdateQueryBuilder<T : Any> {

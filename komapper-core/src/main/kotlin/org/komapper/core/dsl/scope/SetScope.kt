@@ -10,15 +10,6 @@ class SetScope<ENTITY : Any>(
     private val context: MutableList<Pair<PropertyMetamodel<ENTITY, *, *>, Operand>> = mutableListOf()
 ) : List<Pair<PropertyMetamodel<ENTITY, *, *>, Operand>> by context {
 
-    companion object {
-        infix operator fun <E : Any> ValuesDeclaration<E>.plus(other: ValuesDeclaration<E>): ValuesDeclaration<E> {
-            return {
-                this@plus(this)
-                other(this)
-            }
-        }
-    }
-
     infix fun <T : Any> PropertyMetamodel<ENTITY, T, *>.set(value: T?) {
         val right = Operand.Argument(this, value)
         context.add(this to right)

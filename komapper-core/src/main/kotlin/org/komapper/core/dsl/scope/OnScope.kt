@@ -12,15 +12,6 @@ class OnScope<ENTITY : Any> (
 ) :
     Collection<Criterion> by context {
 
-    companion object {
-        infix operator fun <E : Any> OnDeclaration<E>.plus(other: OnDeclaration<E>): OnDeclaration<E> {
-            return {
-                this@plus(this)
-                other(this)
-            }
-        }
-    }
-
     infix fun <T : Any, S : Any> PropertyMetamodel<*, T, S>.eq(right: PropertyMetamodel<ENTITY, T, S>) {
         context.add(Criterion.Eq(Operand.Column(this), Operand.Column(right)))
     }

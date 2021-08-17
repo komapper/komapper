@@ -1,8 +1,8 @@
 package org.komapper.core.dsl.expression
 
+import org.komapper.core.dsl.declaration.WhenDeclaration
 import org.komapper.core.dsl.element.Criterion
 import org.komapper.core.dsl.element.Operand
-import org.komapper.core.dsl.scope.WhenDeclaration
 import org.komapper.core.dsl.scope.WhenScope
 
 class CaseExpression<T : Any, S : Any>(
