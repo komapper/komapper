@@ -9,18 +9,18 @@ interface TemplateSelectQuery<T> : ListQuery<T>
 
 internal data class TemplateSelectQueryImpl<T>(
     private val sql: String,
-    private val params: Any,
+    private val data: Any,
     private val transform: (Row) -> T,
     private val options: TemplateSelectOptions
 ) : TemplateSelectQuery<T> {
 
     override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
-        return visitor.templateSelectQuery(sql, params, transform, options) { it.toList() }
+        return visitor.templateSelectQuery(sql, data, transform, options) { it.toList() }
     }
 
     override fun <R> collect(collect: suspend (Flow<T>) -> R): Query<R> = object : Query<R> {
         override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
-            return visitor.templateSelectQuery(sql, params, transform, options, collect)
+            return visitor.templateSelectQuery(sql, data, transform, options, collect)
         }
     }
 }

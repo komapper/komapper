@@ -26,15 +26,15 @@ internal class TwoWayTemplateStatementBuilder(
         """^(select|from|where|group by|having|order by|for update|option)\s""", RegexOption.IGNORE_CASE
     )
 
-    override fun build(template: CharSequence, params: Any, escape: (String) -> String): Statement {
-        val ctx = createContext(params, escape)
+    override fun build(template: CharSequence, data: Any, escape: (String) -> String): Statement {
+        val ctx = createContext(data, escape)
         return build(template.toString(), ctx)
     }
 
-    private fun createContext(any: Any, escape: (String) -> String): ExprContext {
-        val valueMap = any::class.memberProperties
+    private fun createContext(data: Any, escape: (String) -> String): ExprContext {
+        val valueMap = data::class.memberProperties
             .filter { it.visibility == KVisibility.PUBLIC }
-            .associate { it.name to Value(it.call(any), it.returnType.jvmErasure) }
+            .associate { it.name to Value(it.call(data), it.returnType.jvmErasure) }
         return ExprContext(valueMap, escape)
     }
 

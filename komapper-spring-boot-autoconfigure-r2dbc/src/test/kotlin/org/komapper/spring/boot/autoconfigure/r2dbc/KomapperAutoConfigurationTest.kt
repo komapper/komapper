@@ -111,7 +111,7 @@ class KomapperAutoConfigurationTest {
     }
 
     class MyStatementBuilder : TemplateStatementBuilder {
-        override fun build(template: CharSequence, params: Any, escape: (String) -> String): Statement {
+        override fun build(template: CharSequence, data: Any, escape: (String) -> String): Statement {
             throw UnsupportedOperationException()
         }
 
