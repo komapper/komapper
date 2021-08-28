@@ -17,7 +17,7 @@ import org.komapper.r2dbc.dsl.runner.R2dbcSqlSelectFlowQueryRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcSqlSetOperationFlowQueryRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcTemplateSelectFlowQueryRunner
 
-internal class R2dbcFlowQueryVisitor : FlowQueryVisitor<R2dbcFlowQueryRunner<*>> {
+internal object R2dbcFlowQueryVisitor : FlowQueryVisitor<R2dbcFlowQueryRunner<*>> {
 
     override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> sqlSelectQuery(
         context: SqlSelectContext<ENTITY, ID, META>,

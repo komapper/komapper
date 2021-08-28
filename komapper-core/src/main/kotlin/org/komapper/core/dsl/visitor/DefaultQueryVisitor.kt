@@ -62,7 +62,7 @@ import org.komapper.core.dsl.runner.TemplateExecuteQueryRunner
 import org.komapper.core.dsl.runner.TemplateSelectQueryRunner
 
 @ThreadSafe
-class DefaultQueryVisitor : QueryVisitor<QueryRunner> {
+internal object DefaultQueryVisitor : QueryVisitor<QueryRunner> {
 
     override fun <T, S> plusQuery(left: Query<T>, right: Query<S>): QueryRunner {
         val leftRunner = left.accept(this)

@@ -53,7 +53,7 @@ interface JdbcDatabase {
     @Suppress("UNCHECKED_CAST")
     fun <T> runQuery(block: QueryScope.() -> Query<T>): T {
         val query = block(QueryScope)
-        val runner = query.accept(JdbcQueryVisitor()) as JdbcQueryRunner<T>
+        val runner = query.accept(JdbcQueryVisitor) as JdbcQueryRunner<T>
         return runner.run(config)
     }
 }
