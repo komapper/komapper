@@ -17,7 +17,7 @@ internal data class SqlTripleEntitiesSetOperationQuery<
     private val context: SqlSetOperationContext<Triple<A, B?, C?>>,
     private val options: SqlSetOperationOptions = SqlSetOperationOptions.default,
     private val metamodels: Triple<A_META, B_META, C_META>
-) : FlowableSetOperationQuery<Triple<A, B?, C?>> {
+) : FlowSetOperationQuery<Triple<A, B?, C?>> {
 
     override val subqueryContext: SubqueryContext<Triple<A, B?, C?>> = SubqueryContext.SqlSetOperation(context)
 
@@ -27,43 +27,41 @@ internal data class SqlTripleEntitiesSetOperationQuery<
         return visitor.sqlTripleEntitiesSetOperationQuery(context, options, metamodels) { it.toList() }
     }
 
+    override fun <VISIT_RESULT> accept(visitor: FlowQueryVisitor<VISIT_RESULT>): VISIT_RESULT {
+        return visitor.sqlTripleEntitiesSetOperationQuery(context, options, metamodels)
+    }
+
     override fun <R> collect(collect: suspend (Flow<Triple<A, B?, C?>>) -> R): Query<R> = object : Query<R> {
         override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
             return visitor.sqlTripleEntitiesSetOperationQuery(context, options, metamodels, collect)
         }
     }
 
-    override fun asFlowQuery(): FlowQuery<Triple<A, B?, C?>> = object : FlowQuery<Triple<A, B?, C?>> {
-        override fun <VISIT_RESULT> accept(visitor: FlowQueryVisitor<VISIT_RESULT>): VISIT_RESULT {
-            return visitor.sqlTripleEntitiesSetOperationQuery(context, options, metamodels)
-        }
-    }
-
-    override fun except(other: Subquery<Triple<A, B?, C?>>): FlowableSetOperationQuery<Triple<A, B?, C?>> {
+    override fun except(other: Subquery<Triple<A, B?, C?>>): FlowSetOperationQuery<Triple<A, B?, C?>> {
         return copy(context = support.except(other))
     }
 
-    override fun intersect(other: Subquery<Triple<A, B?, C?>>): FlowableSetOperationQuery<Triple<A, B?, C?>> {
+    override fun intersect(other: Subquery<Triple<A, B?, C?>>): FlowSetOperationQuery<Triple<A, B?, C?>> {
         return copy(context = support.intersect(other))
     }
 
-    override fun union(other: Subquery<Triple<A, B?, C?>>): FlowableSetOperationQuery<Triple<A, B?, C?>> {
+    override fun union(other: Subquery<Triple<A, B?, C?>>): FlowSetOperationQuery<Triple<A, B?, C?>> {
         return copy(context = support.union(other))
     }
 
-    override fun unionAll(other: Subquery<Triple<A, B?, C?>>): FlowableSetOperationQuery<Triple<A, B?, C?>> {
+    override fun unionAll(other: Subquery<Triple<A, B?, C?>>): FlowSetOperationQuery<Triple<A, B?, C?>> {
         return copy(context = support.unionAll(other))
     }
 
-    override fun orderBy(vararg aliases: CharSequence): FlowableSetOperationQuery<Triple<A, B?, C?>> {
+    override fun orderBy(vararg aliases: CharSequence): FlowSetOperationQuery<Triple<A, B?, C?>> {
         return copy(context = support.orderBy(*aliases))
     }
 
-    override fun orderBy(vararg expressions: ColumnExpression<*, *>): FlowableSetOperationQuery<Triple<A, B?, C?>> {
+    override fun orderBy(vararg expressions: ColumnExpression<*, *>): FlowSetOperationQuery<Triple<A, B?, C?>> {
         return copy(context = support.orderBy(*expressions))
     }
 
-    override fun options(configurator: (SqlSetOperationOptions) -> SqlSetOperationOptions): FlowableSetOperationQuery<Triple<A, B?, C?>> {
+    override fun options(configurator: (SqlSetOperationOptions) -> SqlSetOperationOptions): FlowSetOperationQuery<Triple<A, B?, C?>> {
         return copy(options = configurator(options))
     }
 }

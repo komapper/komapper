@@ -43,7 +43,7 @@ fun checkOptimisticLock(
 }
 
 fun Query<*>.dryRun(config: DatabaseConfig = DryRunDatabaseConfig): DryRunResult {
-    val runner = this.accept(DefaultQueryVisitor())
+    val runner = this.accept(DefaultQueryVisitor)
     val statement = runner.dryRun(config)
     val result = statement.toDryRunResult(config.dialect)
     return if (config is DryRunDatabaseConfig) {

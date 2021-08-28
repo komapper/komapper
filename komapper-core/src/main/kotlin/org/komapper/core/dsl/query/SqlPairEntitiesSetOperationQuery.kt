@@ -14,7 +14,7 @@ internal data class SqlPairEntitiesSetOperationQuery<A : Any, A_META : EntityMet
     private val context: SqlSetOperationContext<Pair<A, B?>>,
     private val options: SqlSetOperationOptions = SqlSetOperationOptions.default,
     private val metamodels: Pair<A_META, B_META>
-) : FlowableSetOperationQuery<Pair<A, B?>> {
+) : FlowSetOperationQuery<Pair<A, B?>> {
 
     override val subqueryContext: SubqueryContext<Pair<A, B?>> = SubqueryContext.SqlSetOperation(context)
 
@@ -24,43 +24,41 @@ internal data class SqlPairEntitiesSetOperationQuery<A : Any, A_META : EntityMet
         return visitor.sqlPairEntitiesSetOperationQuery(context, options, metamodels) { it.toList() }
     }
 
+    override fun <VISIT_RESULT> accept(visitor: FlowQueryVisitor<VISIT_RESULT>): VISIT_RESULT {
+        return visitor.sqlPairEntitiesSetOperationQuery(context, options, metamodels)
+    }
+
     override fun <R> collect(collect: suspend (Flow<Pair<A, B?>>) -> R): Query<R> = object : Query<R> {
         override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
             return visitor.sqlPairEntitiesSetOperationQuery(context, options, metamodels, collect)
         }
     }
 
-    override fun asFlowQuery(): FlowQuery<Pair<A, B?>> = object : FlowQuery<Pair<A, B?>> {
-        override fun <VISIT_RESULT> accept(visitor: FlowQueryVisitor<VISIT_RESULT>): VISIT_RESULT {
-            return visitor.sqlPairEntitiesSetOperationQuery(context, options, metamodels)
-        }
-    }
-
-    override fun except(other: Subquery<Pair<A, B?>>): FlowableSetOperationQuery<Pair<A, B?>> {
+    override fun except(other: Subquery<Pair<A, B?>>): FlowSetOperationQuery<Pair<A, B?>> {
         return copy(context = support.except(other))
     }
 
-    override fun intersect(other: Subquery<Pair<A, B?>>): FlowableSetOperationQuery<Pair<A, B?>> {
+    override fun intersect(other: Subquery<Pair<A, B?>>): FlowSetOperationQuery<Pair<A, B?>> {
         return copy(context = support.intersect(other))
     }
 
-    override fun union(other: Subquery<Pair<A, B?>>): FlowableSetOperationQuery<Pair<A, B?>> {
+    override fun union(other: Subquery<Pair<A, B?>>): FlowSetOperationQuery<Pair<A, B?>> {
         return copy(context = support.union(other))
     }
 
-    override fun unionAll(other: Subquery<Pair<A, B?>>): FlowableSetOperationQuery<Pair<A, B?>> {
+    override fun unionAll(other: Subquery<Pair<A, B?>>): FlowSetOperationQuery<Pair<A, B?>> {
         return copy(context = support.unionAll(other))
     }
 
-    override fun orderBy(vararg aliases: CharSequence): FlowableSetOperationQuery<Pair<A, B?>> {
+    override fun orderBy(vararg aliases: CharSequence): FlowSetOperationQuery<Pair<A, B?>> {
         return copy(context = support.orderBy(*aliases))
     }
 
-    override fun orderBy(vararg expressions: ColumnExpression<*, *>): FlowableSetOperationQuery<Pair<A, B?>> {
+    override fun orderBy(vararg expressions: ColumnExpression<*, *>): FlowSetOperationQuery<Pair<A, B?>> {
         return copy(context = support.orderBy(*expressions))
     }
 
-    override fun options(configurator: (SqlSetOperationOptions) -> SqlSetOperationOptions): FlowableSetOperationQuery<Pair<A, B?>> {
+    override fun options(configurator: (SqlSetOperationOptions) -> SqlSetOperationOptions): FlowSetOperationQuery<Pair<A, B?>> {
         return copy(options = configurator(options))
     }
 }

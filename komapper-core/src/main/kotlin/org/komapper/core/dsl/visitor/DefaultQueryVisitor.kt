@@ -62,7 +62,7 @@ import org.komapper.core.dsl.runner.TemplateExecuteQueryRunner
 import org.komapper.core.dsl.runner.TemplateSelectQueryRunner
 
 @ThreadSafe
-class DefaultQueryVisitor : QueryVisitor<QueryRunner> {
+internal object DefaultQueryVisitor : QueryVisitor<QueryRunner> {
 
     override fun <T, S> plusQuery(left: Query<T>, right: Query<S>): QueryRunner {
         val leftRunner = left.accept(this)
@@ -371,19 +371,19 @@ class DefaultQueryVisitor : QueryVisitor<QueryRunner> {
 
     override fun templateExecuteQuery(
         sql: String,
-        params: Any,
+        data: Any,
         options: TemplateExecuteOptions
     ): QueryRunner {
-        return TemplateExecuteQueryRunner(sql, params, options)
+        return TemplateExecuteQueryRunner(sql, data, options)
     }
 
     override fun <T, R> templateSelectQuery(
         sql: String,
-        params: Any,
+        data: Any,
         transform: (Row) -> T,
         options: TemplateSelectOptions,
         collect: suspend (Flow<T>) -> R
     ): QueryRunner {
-        return TemplateSelectQueryRunner(sql, params, options)
+        return TemplateSelectQueryRunner(sql, data, options)
     }
 }

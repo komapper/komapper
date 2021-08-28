@@ -13,15 +13,19 @@ internal class SqlPairColumnsQuery<A : Any, B : Any>(
     private val context: SqlSelectContext<*, *, *>,
     private val options: SqlSelectOptions,
     private val expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>
-) : FlowableSubquery<Pair<A?, B?>> {
+) : FlowSubquery<Pair<A?, B?>> {
 
     override val subqueryContext: SubqueryContext<Pair<A?, B?>> = SubqueryContext.SqlSelect(context)
 
-    private val support: FlowableSubquerySupport<Pair<A?, B?>> =
-        FlowableSubquerySupport(subqueryContext) { SqlPairColumnsSetOperationQuery(it, expressions = expressions) }
+    private val support: FlowSubquerySupport<Pair<A?, B?>> =
+        FlowSubquerySupport(subqueryContext) { SqlPairColumnsSetOperationQuery(it, expressions = expressions) }
 
     override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
         return visitor.sqlPairColumnsQuery(context, options, expressions) { it.toList() }
+    }
+
+    override fun <VISIT_RESULT> accept(visitor: FlowQueryVisitor<VISIT_RESULT>): VISIT_RESULT {
+        return visitor.sqlPairColumnsQuery(context, options, expressions)
     }
 
     override fun <R> collect(collect: suspend (Flow<Pair<A?, B?>>) -> R): Query<R> = object : Query<R> {
@@ -30,25 +34,19 @@ internal class SqlPairColumnsQuery<A : Any, B : Any>(
         }
     }
 
-    override fun asFlowQuery(): FlowQuery<Pair<A?, B?>> = object : FlowQuery<Pair<A?, B?>> {
-        override fun <VISIT_RESULT> accept(visitor: FlowQueryVisitor<VISIT_RESULT>): VISIT_RESULT {
-            return visitor.sqlPairColumnsQuery(context, options, expressions)
-        }
-    }
-
-    override fun except(other: Subquery<Pair<A?, B?>>): FlowableSetOperationQuery<Pair<A?, B?>> {
+    override fun except(other: Subquery<Pair<A?, B?>>): FlowSetOperationQuery<Pair<A?, B?>> {
         return support.except(other)
     }
 
-    override fun intersect(other: Subquery<Pair<A?, B?>>): FlowableSetOperationQuery<Pair<A?, B?>> {
+    override fun intersect(other: Subquery<Pair<A?, B?>>): FlowSetOperationQuery<Pair<A?, B?>> {
         return support.intersect(other)
     }
 
-    override fun union(other: Subquery<Pair<A?, B?>>): FlowableSetOperationQuery<Pair<A?, B?>> {
+    override fun union(other: Subquery<Pair<A?, B?>>): FlowSetOperationQuery<Pair<A?, B?>> {
         return support.union(other)
     }
 
-    override fun unionAll(other: Subquery<Pair<A?, B?>>): FlowableSetOperationQuery<Pair<A?, B?>> {
+    override fun unionAll(other: Subquery<Pair<A?, B?>>): FlowSetOperationQuery<Pair<A?, B?>> {
         return support.unionAll(other)
     }
 }

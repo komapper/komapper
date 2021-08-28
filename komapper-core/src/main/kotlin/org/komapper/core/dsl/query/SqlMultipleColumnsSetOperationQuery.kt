@@ -13,7 +13,7 @@ internal data class SqlMultipleColumnsSetOperationQuery(
     private val context: SqlSetOperationContext<Columns>,
     private val options: SqlSetOperationOptions = SqlSetOperationOptions.default,
     private val expressions: List<ColumnExpression<*, *>>
-) : FlowableSetOperationQuery<Columns> {
+) : FlowSetOperationQuery<Columns> {
 
     private val support: SqlSetOperationQuerySupport<Columns> = SqlSetOperationQuerySupport(context)
 
@@ -23,43 +23,41 @@ internal data class SqlMultipleColumnsSetOperationQuery(
         return visitor.sqlMultipleColumnsSetOperationQuery(context, options, expressions) { it.toList() }
     }
 
+    override fun <VISIT_RESULT> accept(visitor: FlowQueryVisitor<VISIT_RESULT>): VISIT_RESULT {
+        return visitor.sqlMultipleColumnsSetOperationQuery(context, options, expressions)
+    }
+
     override fun <R> collect(collect: suspend (Flow<Columns>) -> R): Query<R> = object : Query<R> {
         override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
             return visitor.sqlMultipleColumnsSetOperationQuery(context, options, expressions, collect)
         }
     }
 
-    override fun asFlowQuery(): FlowQuery<Columns> = object : FlowQuery<Columns> {
-        override fun <VISIT_RESULT> accept(visitor: FlowQueryVisitor<VISIT_RESULT>): VISIT_RESULT {
-            return visitor.sqlMultipleColumnsSetOperationQuery(context, options, expressions)
-        }
-    }
-
-    override fun except(other: Subquery<Columns>): FlowableSetOperationQuery<Columns> {
+    override fun except(other: Subquery<Columns>): FlowSetOperationQuery<Columns> {
         return copy(context = support.except(other))
     }
 
-    override fun intersect(other: Subquery<Columns>): FlowableSetOperationQuery<Columns> {
+    override fun intersect(other: Subquery<Columns>): FlowSetOperationQuery<Columns> {
         return copy(context = support.intersect(other))
     }
 
-    override fun union(other: Subquery<Columns>): FlowableSetOperationQuery<Columns> {
+    override fun union(other: Subquery<Columns>): FlowSetOperationQuery<Columns> {
         return copy(context = support.union(other))
     }
 
-    override fun unionAll(other: Subquery<Columns>): FlowableSetOperationQuery<Columns> {
+    override fun unionAll(other: Subquery<Columns>): FlowSetOperationQuery<Columns> {
         return copy(context = support.unionAll(other))
     }
 
-    override fun orderBy(vararg aliases: CharSequence): FlowableSetOperationQuery<Columns> {
+    override fun orderBy(vararg aliases: CharSequence): FlowSetOperationQuery<Columns> {
         return copy(context = support.orderBy(*aliases))
     }
 
-    override fun orderBy(vararg expressions: ColumnExpression<*, *>): FlowableSetOperationQuery<Columns> {
+    override fun orderBy(vararg expressions: ColumnExpression<*, *>): FlowSetOperationQuery<Columns> {
         return copy(context = support.orderBy(*expressions))
     }
 
-    override fun options(configurator: (SqlSetOperationOptions) -> SqlSetOperationOptions): FlowableSetOperationQuery<Columns> {
+    override fun options(configurator: (SqlSetOperationOptions) -> SqlSetOperationOptions): FlowSetOperationQuery<Columns> {
         return copy(options = configurator(options))
     }
 }

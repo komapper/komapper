@@ -62,7 +62,7 @@ import org.komapper.jdbc.dsl.runner.JdbcSqlUpdateQueryRunner
 import org.komapper.jdbc.dsl.runner.JdbcTemplateExecuteQueryRunner
 import org.komapper.jdbc.dsl.runner.JdbcTemplateSelectQueryRunner
 
-internal class JdbcQueryVisitor : QueryVisitor<JdbcQueryRunner<*>> {
+internal object JdbcQueryVisitor : QueryVisitor<JdbcQueryRunner<*>> {
 
     @Suppress("UNCHECKED_CAST")
     override fun <T, S> plusQuery(left: Query<T>, right: Query<S>): JdbcQueryRunner<S> {
@@ -394,19 +394,19 @@ internal class JdbcQueryVisitor : QueryVisitor<JdbcQueryRunner<*>> {
 
     override fun templateExecuteQuery(
         sql: String,
-        params: Any,
+        data: Any,
         options: TemplateExecuteOptions
     ): JdbcQueryRunner<Int> {
-        return JdbcTemplateExecuteQueryRunner(sql, params, options)
+        return JdbcTemplateExecuteQueryRunner(sql, data, options)
     }
 
     override fun <T, R> templateSelectQuery(
         sql: String,
-        params: Any,
+        data: Any,
         transform: (Row) -> T,
         options: TemplateSelectOptions,
         collect: suspend (Flow<T>) -> R
     ): JdbcQueryRunner<R> {
-        return JdbcTemplateSelectQueryRunner(sql, params, transform, options, collect)
+        return JdbcTemplateSelectQueryRunner(sql, data, transform, options, collect)
     }
 }

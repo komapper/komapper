@@ -6,15 +6,18 @@ import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.SqlSelectOptions
 import org.komapper.core.dsl.options.SqlSetOperationOptions
+import org.komapper.core.dsl.options.TemplateSelectOptions
 import org.komapper.core.dsl.query.Columns
 import org.komapper.core.dsl.query.Entities
+import org.komapper.core.dsl.query.Row
 import org.komapper.core.dsl.visitor.FlowQueryVisitor
 import org.komapper.r2dbc.dsl.runner.R2dbcFlowQueryRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcRowTransformers
 import org.komapper.r2dbc.dsl.runner.R2dbcSqlSelectFlowQueryRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcSqlSetOperationFlowQueryRunner
+import org.komapper.r2dbc.dsl.runner.R2dbcTemplateSelectFlowQueryRunner
 
-internal class R2dbcFlowQueryVisitor : FlowQueryVisitor<R2dbcFlowQueryRunner<*>> {
+internal object R2dbcFlowQueryVisitor : FlowQueryVisitor<R2dbcFlowQueryRunner<*>> {
 
     override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> sqlSelectQuery(
         context: SqlSelectContext<ENTITY, ID, META>,
@@ -157,5 +160,14 @@ internal class R2dbcFlowQueryVisitor : FlowQueryVisitor<R2dbcFlowQueryRunner<*>>
     ): R2dbcFlowQueryRunner<Columns> {
         val transform = R2dbcRowTransformers.multipleColumns(expressions)
         return R2dbcSqlSetOperationFlowQueryRunner(context, options, transform)
+    }
+
+    override fun <T> templateSelectQuery(
+        sql: String,
+        data: Any,
+        transform: (Row) -> T,
+        options: TemplateSelectOptions
+    ): R2dbcFlowQueryRunner<*> {
+        return R2dbcTemplateSelectFlowQueryRunner(sql, data, transform, options)
     }
 }

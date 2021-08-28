@@ -10,14 +10,15 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.SqlDsl
+import org.komapper.core.dsl.TemplateDsl
 import org.komapper.r2dbc.R2dbcDatabase
 
 @ExtendWith(Env::class)
-class FlowableQueryTest(val db: R2dbcDatabase) {
+class FlowQueryTest(val db: R2dbcDatabase) {
 
     @Test
     fun singleEntity() = inTransaction(db) {
-        val flow = db.runFlowableQuery {
+        val flow = db.flow {
             val a = Address.meta
             SqlDsl.from(a).where { a.addressId inList listOf(1, 2) }.orderBy(a.addressId)
         }
@@ -26,7 +27,7 @@ class FlowableQueryTest(val db: R2dbcDatabase) {
 
     @Test
     fun singleEntity_union() = inTransaction(db) {
-        val flow = db.runFlowableQuery {
+        val flow = db.flow {
             val a = Address.meta
             SqlDsl.from(a).where { a.addressId eq 1 }.union(
                 SqlDsl.from(a).where { a.addressId eq 2 }
@@ -37,7 +38,7 @@ class FlowableQueryTest(val db: R2dbcDatabase) {
 
     @Test
     fun pairEntities() = inTransaction(db) {
-        val flow = db.runFlowableQuery {
+        val flow = db.flow {
             val a = Address.meta
             val e = Employee.meta
             SqlDsl.from(a)
@@ -51,7 +52,7 @@ class FlowableQueryTest(val db: R2dbcDatabase) {
 
     @Test
     fun tripleEntities() = inTransaction(db) {
-        val flow = db.runFlowableQuery {
+        val flow = db.flow {
             val a = Address.meta
             val e = Employee.meta
             val d = Department.meta
@@ -70,7 +71,7 @@ class FlowableQueryTest(val db: R2dbcDatabase) {
         val e = Employee.meta
         val m = Employee.newMeta()
         val d = Department.meta
-        val flow = db.runFlowableQuery {
+        val flow = db.flow {
             SqlDsl.from(a).where { a.addressId inList listOf(1, 2) }
                 .innerJoin(e) { a.addressId eq e.addressId }
                 .innerJoin(d) { e.departmentId eq d.departmentId }
@@ -83,7 +84,7 @@ class FlowableQueryTest(val db: R2dbcDatabase) {
 
     @Test
     fun singleColumn() = inTransaction(db) {
-        val flow = db.runFlowableQuery {
+        val flow = db.flow {
             val a = Address.meta
             SqlDsl.from(a)
                 .where { a.addressId inList listOf(1, 2) }
@@ -95,7 +96,7 @@ class FlowableQueryTest(val db: R2dbcDatabase) {
 
     @Test
     fun singleColumn_union() = inTransaction(db) {
-        val flow = db.runFlowableQuery {
+        val flow = db.flow {
             val a = Address.meta
             SqlDsl.from(a)
                 .where { a.addressId eq 1 }
@@ -110,7 +111,7 @@ class FlowableQueryTest(val db: R2dbcDatabase) {
 
     @Test
     fun pairColumns() = inTransaction(db) {
-        val flow = db.runFlowableQuery {
+        val flow = db.flow {
             val a = Address.meta
             SqlDsl.from(a)
                 .where { a.addressId inList listOf(1, 2) }
@@ -128,7 +129,7 @@ class FlowableQueryTest(val db: R2dbcDatabase) {
 
     @Test
     fun pairColumns_union() = inTransaction(db) {
-        val flow = db.runFlowableQuery {
+        val flow = db.flow {
             val a = Address.meta
             SqlDsl.from(a)
                 .where { a.addressId eq 1 }
@@ -149,7 +150,7 @@ class FlowableQueryTest(val db: R2dbcDatabase) {
 
     @Test
     fun tripleColumns() = inTransaction(db) {
-        val flow = db.runFlowableQuery {
+        val flow = db.flow {
             val a = Address.meta
             SqlDsl.from(a)
                 .where { a.addressId inList listOf(1, 2) }
@@ -167,7 +168,7 @@ class FlowableQueryTest(val db: R2dbcDatabase) {
 
     @Test
     fun tripleColumns_union() = inTransaction(db) {
-        val flow = db.runFlowableQuery {
+        val flow = db.flow {
             val a = Address.meta
             SqlDsl.from(a)
                 .where { a.addressId eq 1 }
@@ -189,7 +190,7 @@ class FlowableQueryTest(val db: R2dbcDatabase) {
     @Test
     fun multipleColumns() = inTransaction(db) {
         val a = Address.meta
-        val flow = db.runFlowableQuery {
+        val flow = db.flow {
             SqlDsl.from(a)
                 .where { a.addressId inList listOf(1, 2) }
                 .orderBy(a.addressId)
@@ -204,7 +205,7 @@ class FlowableQueryTest(val db: R2dbcDatabase) {
     @Test
     fun multipleColumns_union() = inTransaction(db) {
         val e = Employee.meta
-        val flow = db.runFlowableQuery {
+        val flow = db.flow {
             SqlDsl.from(e)
                 .where { e.employeeId eq 1 }
                 .select(e.employeeId, e.employeeNo, e.employeeName, e.salary).union(
@@ -217,5 +218,13 @@ class FlowableQueryTest(val db: R2dbcDatabase) {
         assertEquals(2, list.size)
         assertEquals(1, list[0][e.employeeId])
         assertEquals(2, list[1][e.employeeId])
+    }
+
+    @Test
+    fun template() = inTransaction(db) {
+        val flow = db.flow {
+            TemplateDsl.from("select address_id from ADDRESS order by address_id").select { it.asInt("address_id") }
+        }
+        assertEquals((1..15).toList(), flow.toList())
     }
 }
