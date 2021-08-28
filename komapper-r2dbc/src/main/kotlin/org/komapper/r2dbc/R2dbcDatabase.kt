@@ -5,7 +5,7 @@ import io.r2dbc.spi.ConnectionFactory
 import io.r2dbc.spi.ConnectionFactoryOptions
 import kotlinx.coroutines.flow.Flow
 import org.komapper.core.ThreadSafe
-import org.komapper.core.dsl.query.FlowableQuery
+import org.komapper.core.dsl.query.FlowQuery
 import org.komapper.core.dsl.query.Query
 import org.komapper.core.dsl.query.QueryScope
 import org.komapper.r2dbc.dsl.runner.R2dbcFlowQueryRunner
@@ -56,10 +56,9 @@ interface R2dbcDatabase {
     }
 
     @Suppress("UNCHECKED_CAST")
-    fun <T> runFlowableQuery(block: QueryScope.() -> FlowableQuery<T>): Flow<T> {
-        val flowableQuery = block(QueryScope)
-        val flowQuery = flowableQuery.asFlowQuery()
-        val runner = flowQuery.accept(R2dbcFlowQueryVisitor()) as R2dbcFlowQueryRunner<T>
+    fun <T> runFlowableQuery(block: QueryScope.() -> FlowQuery<T>): Flow<T> {
+        val query = block(QueryScope)
+        val runner = query.accept(R2dbcFlowQueryVisitor()) as R2dbcFlowQueryRunner<T>
         return runner.run(config)
     }
 }

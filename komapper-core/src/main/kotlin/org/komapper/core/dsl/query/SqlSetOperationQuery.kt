@@ -10,13 +10,13 @@ import org.komapper.core.dsl.options.SqlSetOperationOptions
 import org.komapper.core.dsl.visitor.FlowQueryVisitor
 import org.komapper.core.dsl.visitor.QueryVisitor
 
-interface SqlSetOperationQuery<ENTITY : Any> : FlowableSetOperationQuery<ENTITY>
+interface SqlSetOperationQuery<ENTITY : Any> : FlowSetOperationQuery<ENTITY>
 
 internal data class SqlSetOperationQueryImpl<ENTITY : Any>(
     private val context: SqlSetOperationContext<ENTITY>,
     private val options: SqlSetOperationOptions = SqlSetOperationOptions.default,
     private val metamodel: EntityMetamodel<ENTITY, *, *>
-) : SqlSetOperationQuery<ENTITY>, FlowableQuery<ENTITY> {
+) : SqlSetOperationQuery<ENTITY>, FlowQuery<ENTITY> {
 
     override val subqueryContext = SubqueryContext.SqlSetOperation(context)
 
@@ -26,15 +26,13 @@ internal data class SqlSetOperationQueryImpl<ENTITY : Any>(
         return visitor.sqlSetOperationQuery(context, options, metamodel) { it.toList() }
     }
 
+    override fun <VISIT_RESULT> accept(visitor: FlowQueryVisitor<VISIT_RESULT>): VISIT_RESULT {
+        return visitor.sqlSetOperationQuery(context, options, metamodel)
+    }
+
     override fun <R> collect(collect: suspend (Flow<ENTITY>) -> R): Query<R> = object : Query<R> {
         override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
             return visitor.sqlSetOperationQuery(context, options, metamodel, collect)
-        }
-    }
-
-    override fun asFlowQuery(): FlowQuery<ENTITY> = object : FlowQuery<ENTITY> {
-        override fun <VISIT_RESULT> accept(visitor: FlowQueryVisitor<VISIT_RESULT>): VISIT_RESULT {
-            return visitor.sqlSetOperationQuery(context, options, metamodel)
         }
     }
 

@@ -13,7 +13,7 @@ import org.komapper.core.dsl.SqlDsl
 import org.komapper.r2dbc.R2dbcDatabase
 
 @ExtendWith(Env::class)
-class FlowableQueryTest(val db: R2dbcDatabase) {
+class FlowQueryTest(val db: R2dbcDatabase) {
 
     @Test
     fun singleEntity() = inTransaction(db) {

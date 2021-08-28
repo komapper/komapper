@@ -13,15 +13,19 @@ internal class SqlSingleColumnQuery<A : Any>(
     private val context: SqlSelectContext<*, *, *>,
     private val options: SqlSelectOptions,
     private val expression: ColumnExpression<A, *>
-) : FlowableSubquery<A?> {
+) : FlowSubquery<A?> {
 
     override val subqueryContext: SubqueryContext<A?> = SubqueryContext.SqlSelect(context)
 
-    private val support: FlowableSubquerySupport<A?> =
-        FlowableSubquerySupport(subqueryContext) { SqlSingleColumnSetOperationQuery(it, expression = expression) }
+    private val support: FlowSubquerySupport<A?> =
+        FlowSubquerySupport(subqueryContext) { SqlSingleColumnSetOperationQuery(it, expression = expression) }
 
     override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
         return visitor.sqlSingleColumnQuery(context, options, expression) { it.toList() }
+    }
+
+    override fun <VISIT_RESULT> accept(visitor: FlowQueryVisitor<VISIT_RESULT>): VISIT_RESULT {
+        return visitor.sqlSingleColumnQuery(context, options, expression)
     }
 
     override fun <R> collect(collect: suspend (Flow<A?>) -> R): Query<R> = object : Query<R> {
@@ -30,25 +34,19 @@ internal class SqlSingleColumnQuery<A : Any>(
         }
     }
 
-    override fun asFlowQuery(): FlowQuery<A?> = object : FlowQuery<A?> {
-        override fun <VISIT_RESULT> accept(visitor: FlowQueryVisitor<VISIT_RESULT>): VISIT_RESULT {
-            return visitor.sqlSingleColumnQuery(context, options, expression)
-        }
-    }
-
-    override fun except(other: Subquery<A?>): FlowableSetOperationQuery<A?> {
+    override fun except(other: Subquery<A?>): FlowSetOperationQuery<A?> {
         return support.except(other)
     }
 
-    override fun intersect(other: Subquery<A?>): FlowableSetOperationQuery<A?> {
+    override fun intersect(other: Subquery<A?>): FlowSetOperationQuery<A?> {
         return support.intersect(other)
     }
 
-    override fun union(other: Subquery<A?>): FlowableSetOperationQuery<A?> {
+    override fun union(other: Subquery<A?>): FlowSetOperationQuery<A?> {
         return support.union(other)
     }
 
-    override fun unionAll(other: Subquery<A?>): FlowableSetOperationQuery<A?> {
+    override fun unionAll(other: Subquery<A?>): FlowSetOperationQuery<A?> {
         return support.unionAll(other)
     }
 }
