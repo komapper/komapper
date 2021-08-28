@@ -16,7 +16,7 @@ class TemplateExecuteQueryTest(private val db: R2dbcDatabase) {
     fun test() = inTransaction(db) {
         val count = db.runQuery {
             val sql = "update ADDRESS set street = /*street*/'' where address_id = /*id*/0"
-            TemplateDsl.execute(sql).params {
+            TemplateDsl.execute(sql).bind {
                 data class Params(val id: Int, val street: String)
                 Params(15, "NY street")
             }
