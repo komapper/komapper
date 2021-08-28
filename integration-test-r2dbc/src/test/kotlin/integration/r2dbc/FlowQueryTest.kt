@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.SqlDsl
+import org.komapper.core.dsl.TemplateDsl
 import org.komapper.r2dbc.R2dbcDatabase
 
 @ExtendWith(Env::class)
@@ -217,5 +218,13 @@ class FlowQueryTest(val db: R2dbcDatabase) {
         assertEquals(2, list.size)
         assertEquals(1, list[0][e.employeeId])
         assertEquals(2, list[1][e.employeeId])
+    }
+
+    @Test
+    fun template() = inTransaction(db) {
+        val flow = db.flow {
+            TemplateDsl.from("select address_id from address order by address_id").select { it.asInt("address_id") }
+        }
+        assertEquals((1..15).toList(), flow.toList())
     }
 }

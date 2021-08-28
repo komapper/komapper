@@ -7,8 +7,10 @@ import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.SqlSelectOptions
 import org.komapper.core.dsl.options.SqlSetOperationOptions
+import org.komapper.core.dsl.options.TemplateSelectOptions
 import org.komapper.core.dsl.query.Columns
 import org.komapper.core.dsl.query.Entities
+import org.komapper.core.dsl.query.Row
 
 @ThreadSafe
 interface FlowQueryVisitor<VISIT_RESULT> {
@@ -111,5 +113,12 @@ interface FlowQueryVisitor<VISIT_RESULT> {
         context: SqlSetOperationContext<Columns>,
         options: SqlSetOperationOptions,
         expressions: List<ColumnExpression<*, *>>
+    ): VISIT_RESULT
+
+    fun <T> templateSelectQuery(
+        sql: String,
+        params: Any,
+        transform: (Row) -> T,
+        options: TemplateSelectOptions
     ): VISIT_RESULT
 }
