@@ -164,10 +164,10 @@ internal class R2dbcFlowQueryVisitor : FlowQueryVisitor<R2dbcFlowQueryRunner<*>>
 
     override fun <T> templateSelectQuery(
         sql: String,
-        params: Any,
+        data: Any,
         transform: (Row) -> T,
         options: TemplateSelectOptions
     ): R2dbcFlowQueryRunner<*> {
-        return R2dbcTemplateSelectFlowQueryRunner(sql, params, transform, options)
+        return R2dbcTemplateSelectFlowQueryRunner(sql, data, transform, options)
     }
 }

@@ -6,7 +6,7 @@ import org.komapper.core.dsl.options.TemplateSelectOptions
 
 class TemplateSelectQueryRunner(
     private val sql: String,
-    private val params: Any,
+    private val data: Any,
     private val options: TemplateSelectOptions,
 ) : QueryRunner {
 
@@ -16,6 +16,6 @@ class TemplateSelectQueryRunner(
 
     fun buildStatement(config: DatabaseConfig): Statement {
         val builder = config.templateStatementBuilder
-        return builder.build(sql, params) { config.dialect.escape(it, options.escapeSequence) }
+        return builder.build(sql, data) { config.dialect.escape(it, options.escapeSequence) }
     }
 }

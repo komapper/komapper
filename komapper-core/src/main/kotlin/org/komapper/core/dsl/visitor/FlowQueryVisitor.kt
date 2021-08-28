@@ -117,7 +117,7 @@ interface FlowQueryVisitor<VISIT_RESULT> {
 
     fun <T> templateSelectQuery(
         sql: String,
-        params: Any,
+        data: Any,
         transform: (Row) -> T,
         options: TemplateSelectOptions
     ): VISIT_RESULT

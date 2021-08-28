@@ -9,11 +9,11 @@ import org.komapper.r2dbc.R2dbcExecutor
 
 internal class R2dbcTemplateExecuteQueryRunner(
     sql: String,
-    params: Any,
+    data: Any,
     private val options: TemplateExecuteOptions
 ) : R2dbcQueryRunner<Int> {
 
-    private val runner = TemplateExecuteQueryRunner(sql, params, options)
+    private val runner = TemplateExecuteQueryRunner(sql, data, options)
 
     override suspend fun run(config: R2dbcDatabaseConfig): Int {
         val statement = runner.buildStatement(config)

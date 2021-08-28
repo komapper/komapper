@@ -394,19 +394,19 @@ internal class JdbcQueryVisitor : QueryVisitor<JdbcQueryRunner<*>> {
 
     override fun templateExecuteQuery(
         sql: String,
-        params: Any,
+        data: Any,
         options: TemplateExecuteOptions
     ): JdbcQueryRunner<Int> {
-        return JdbcTemplateExecuteQueryRunner(sql, params, options)
+        return JdbcTemplateExecuteQueryRunner(sql, data, options)
     }
 
     override fun <T, R> templateSelectQuery(
         sql: String,
-        params: Any,
+        data: Any,
         transform: (Row) -> T,
         options: TemplateSelectOptions,
         collect: suspend (Flow<T>) -> R
     ): JdbcQueryRunner<R> {
-        return JdbcTemplateSelectQueryRunner(sql, params, transform, options, collect)
+        return JdbcTemplateSelectQueryRunner(sql, data, transform, options, collect)
     }
 }

@@ -390,19 +390,19 @@ internal class R2dbcQueryVisitor : QueryVisitor<R2dbcQueryRunner<*>> {
 
     override fun templateExecuteQuery(
         sql: String,
-        params: Any,
+        data: Any,
         options: TemplateExecuteOptions
     ): R2dbcQueryRunner<Int> {
-        return R2dbcTemplateExecuteQueryRunner(sql, params, options)
+        return R2dbcTemplateExecuteQueryRunner(sql, data, options)
     }
 
     override fun <T, R> templateSelectQuery(
         sql: String,
-        params: Any,
+        data: Any,
         transform: (Row) -> T,
         options: TemplateSelectOptions,
         collect: suspend (Flow<T>) -> R
     ): R2dbcQueryRunner<R> {
-        return R2dbcTemplateSelectQueryRunner(sql, params, transform, options, collect)
+        return R2dbcTemplateSelectQueryRunner(sql, data, transform, options, collect)
     }
 }

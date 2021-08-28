@@ -11,13 +11,13 @@ import org.komapper.jdbc.JdbcExecutor
 
 internal class JdbcTemplateSelectQueryRunner<T, R>(
     sql: String,
-    params: Any,
+    data: Any,
     private val transform: (Row) -> T,
     private val options: TemplateSelectOptions,
     private val collect: suspend (Flow<T>) -> R,
 ) : JdbcQueryRunner<R> {
 
-    private val runner = TemplateSelectQueryRunner(sql, params, options)
+    private val runner = TemplateSelectQueryRunner(sql, data, options)
 
     override fun run(config: JdbcDatabaseConfig): R {
         val statement = runner.buildStatement(config)

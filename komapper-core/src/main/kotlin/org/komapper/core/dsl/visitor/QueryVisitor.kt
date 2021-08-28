@@ -284,13 +284,13 @@ interface QueryVisitor<VISIT_RESULT> {
 
     fun templateExecuteQuery(
         sql: String,
-        params: Any,
+        data: Any,
         options: TemplateExecuteOptions
     ): VISIT_RESULT
 
     fun <T, R> templateSelectQuery(
         sql: String,
-        params: Any,
+        data: Any,
         transform: (Row) -> T,
         options: TemplateSelectOptions,
         collect: suspend (Flow<T>) -> R
