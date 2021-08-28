@@ -56,7 +56,7 @@ interface R2dbcDatabase {
     }
 
     @Suppress("UNCHECKED_CAST")
-    fun <T> runFlowableQuery(block: QueryScope.() -> FlowQuery<T>): Flow<T> {
+    fun <T> flow(block: QueryScope.() -> FlowQuery<T>): Flow<T> {
         val query = block(QueryScope)
         val runner = query.accept(R2dbcFlowQueryVisitor()) as R2dbcFlowQueryRunner<T>
         return runner.run(config)
