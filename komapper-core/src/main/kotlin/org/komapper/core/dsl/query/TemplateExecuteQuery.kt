@@ -10,7 +10,7 @@ interface TemplateExecuteQuery : Query<Int> {
 
 internal data class TemplateExecuteQueryImpl(
     private val sql: String,
-    private val params: Any = object {},
+    private val data: Any = object {},
     private val option: TemplateExecuteOptions = TemplateExecuteOptions.default
 ) : TemplateExecuteQuery {
 
@@ -19,10 +19,10 @@ internal data class TemplateExecuteQueryImpl(
     }
 
     override fun params(provide: () -> Any): TemplateExecuteQuery {
-        return copy(params = provide())
+        return copy(data = provide())
     }
 
     override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
-        return visitor.templateExecuteQuery(sql, params, option)
+        return visitor.templateExecuteQuery(sql, data, option)
     }
 }

@@ -12,7 +12,7 @@ interface TemplateSelectQueryBuilder {
 
 internal data class TemplateSelectQueryBuilderImpl(
     private val sql: String,
-    private val params: Any = object {},
+    private val data: Any = object {},
     private val options: TemplateSelectOptions = TemplateSelectOptions.default
 ) : TemplateSelectQueryBuilder {
 
@@ -21,10 +21,10 @@ internal data class TemplateSelectQueryBuilderImpl(
     }
 
     override fun where(provide: () -> Any): TemplateSelectQueryBuilder {
-        return copy(params = provide())
+        return copy(data = provide())
     }
 
     override fun <T> select(provide: (Row) -> T): TemplateSelectQuery<T> {
-        return TemplateSelectQueryImpl(sql, params, provide, options)
+        return TemplateSelectQueryImpl(sql, data, provide, options)
     }
 }
