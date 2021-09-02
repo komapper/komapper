@@ -5,5 +5,5 @@ dependencies {
     implementation("com.google.devtools.ksp:symbol-processing-api:$kspVersion")
     testImplementation(project(":komapper-annotation"))
     testImplementation("com.google.devtools.ksp:symbol-processing:$kspVersion")
-    testImplementation("com.github.tschuchortdev:kotlin-compile-testing-ksp:1.4.3")
+    testImplementation("com.github.tschuchortdev:kotlin-compile-testing-ksp:1.4.4")
 }
