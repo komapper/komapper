@@ -15,11 +15,10 @@ class TemplateExecuteQueryTest(private val db: R2dbcDatabase) {
     @Test
     fun test() = inTransaction(db) {
         val count = db.runQuery {
+            data class Condition(val id: Int, val street: String)
+
             val sql = "update ADDRESS set street = /*street*/'' where address_id = /*id*/0"
-            TemplateDsl.execute(sql).bind {
-                data class Params(val id: Int, val street: String)
-                Params(15, "NY street")
-            }
+            TemplateDsl.execute(sql).bind(Condition(15, "NY street"))
         }
         assertEquals(1, count)
         val a = Address.meta

@@ -51,12 +51,12 @@ class TemplateSelectQueryTest(private val db: R2dbcDatabase) {
     fun condition_objectExpression() = inTransaction(db) {
         val list = db.runQuery {
             val sql = "select * from ADDRESS where street = /*street*/'test'"
-            TemplateDsl.from(sql).bind {
+            TemplateDsl.from(sql).bind(
                 object {
                     @Suppress("unused")
                     val street = "STREET 10"
                 }
-            }.select(asAddress)
+            ).select(asAddress)
         }.toList()
         assertEquals(1, list.size)
         assertEquals(
@@ -72,11 +72,10 @@ class TemplateSelectQueryTest(private val db: R2dbcDatabase) {
     @Test
     fun condition_dataClass() = inTransaction(db) {
         val list = db.runQuery {
+            data class Condition(val street: String)
+
             val sql = "select * from ADDRESS where street = /*street*/'test'"
-            TemplateDsl.from(sql).bind {
-                data class Condition(val street: String)
-                Condition("STREET 10")
-            }.select(asAddress)
+            TemplateDsl.from(sql).bind(Condition("STREET 10")).select(asAddress)
         }.toList()
         assertEquals(1, list.size)
         assertEquals(
@@ -93,12 +92,12 @@ class TemplateSelectQueryTest(private val db: R2dbcDatabase) {
     fun `in`() = inTransaction(db) {
         val list = db.runQuery {
             val sql = "select * from ADDRESS where address_id in /*list*/(0)"
-            TemplateDsl.from(sql).bind {
+            TemplateDsl.from(sql).bind(
                 object {
                     @Suppress("unused")
                     val list = listOf(1, 2)
                 }
-            }.select(asAddress)
+            ).select(asAddress)
         }.toList()
         assertEquals(2, list.size)
         assertEquals(
@@ -123,12 +122,12 @@ class TemplateSelectQueryTest(private val db: R2dbcDatabase) {
     fun in2() = inTransaction(db) {
         val list = db.runQuery {
             val sql = "select * from ADDRESS where (address_id, street) in /*pairs*/(0, '')"
-            TemplateDsl.from(sql).bind {
+            TemplateDsl.from(sql).bind(
                 object {
                     @Suppress("unused")
                     val pairs = listOf(1 to "STREET 1", 2 to "STREET 2")
                 }
-            }.select(asAddress)
+            ).select(asAddress)
         }.toList()
         assertEquals(2, list.size)
         assertEquals(
@@ -153,7 +152,7 @@ class TemplateSelectQueryTest(private val db: R2dbcDatabase) {
     fun in3() = inTransaction(db) {
         val list = db.runQuery {
             val sql = "select * from ADDRESS where (address_id, street, version) in /*triples*/(0, '', 0)"
-            TemplateDsl.from(sql).bind {
+            TemplateDsl.from(sql).bind(
                 object {
                     @Suppress("unused")
                     val triples = listOf(
@@ -161,7 +160,7 @@ class TemplateSelectQueryTest(private val db: R2dbcDatabase) {
                         Triple(2, "STREET 2", 1)
                     )
                 }
-            }.select(asAddress)
+            ).select(asAddress)
         }.toList()
         assertEquals(2, list.size)
         assertEquals(
@@ -185,16 +184,17 @@ class TemplateSelectQueryTest(private val db: R2dbcDatabase) {
     @Test
     fun escape() = inTransaction(db) {
         val list = db.runQuery {
+            data class Condition(val street: String)
+
             val sql =
                 """
                 select * from ADDRESS 
                 where street like concat(/* street.escape() */'test', '%')
                 order by address_id
                 """.trimIndent()
-            TemplateDsl.from(sql).bind {
-                data class Condition(val street: String)
+            TemplateDsl.from(sql).bind(
                 Condition("STREET 1")
-            }.select(asAddress)
+            ).select(asAddress)
         }.toList()
         assertEquals((listOf(1) + (10..15)).toList(), list.map { it.addressId })
     }
@@ -202,11 +202,10 @@ class TemplateSelectQueryTest(private val db: R2dbcDatabase) {
     @Test
     fun asPrefix() = inTransaction(db) {
         val list = db.runQuery {
+            data class Condition(val street: String)
+
             val sql = "select * from ADDRESS where street like /*street.asPrefix()*/'test' order by address_id"
-            TemplateDsl.from(sql).bind {
-                data class Condition(val street: String)
-                Condition("STREET 1")
-            }.select(asAddress)
+            TemplateDsl.from(sql).bind(Condition("STREET 1")).select(asAddress)
         }.toList()
         assertEquals((listOf(1) + (10..15)).toList(), list.map { it.addressId })
     }

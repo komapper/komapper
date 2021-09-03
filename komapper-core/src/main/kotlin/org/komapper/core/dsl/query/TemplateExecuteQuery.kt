@@ -5,7 +5,7 @@ import org.komapper.core.dsl.visitor.QueryVisitor
 
 interface TemplateExecuteQuery : Query<Int> {
     fun options(configure: (TemplateExecuteOptions) -> TemplateExecuteOptions): TemplateExecuteQuery
-    fun bind(provide: () -> Any): TemplateExecuteQuery
+    fun bind(data: Any): TemplateExecuteQuery
 }
 
 internal data class TemplateExecuteQueryImpl(
@@ -18,8 +18,8 @@ internal data class TemplateExecuteQueryImpl(
         return copy(option = configure(option))
     }
 
-    override fun bind(provide: () -> Any): TemplateExecuteQuery {
-        return copy(data = provide())
+    override fun bind(data: Any): TemplateExecuteQuery {
+        return copy(data = data)
     }
 
     override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
