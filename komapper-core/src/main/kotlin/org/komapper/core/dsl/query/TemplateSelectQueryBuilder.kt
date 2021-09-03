@@ -5,7 +5,7 @@ import org.komapper.core.dsl.options.TemplateSelectOptions
 
 @ThreadSafe
 interface TemplateSelectQueryBuilder {
-    fun bind(provide: () -> Any): TemplateSelectQueryBuilder
+    fun bind(data: Any): TemplateSelectQueryBuilder
     fun options(configure: (TemplateSelectOptions) -> TemplateSelectOptions): TemplateSelectQueryBuilder
     fun <T> select(provide: (Row) -> T): TemplateSelectQuery<T>
 }
@@ -20,8 +20,8 @@ internal data class TemplateSelectQueryBuilderImpl(
         return copy(options = configure(options))
     }
 
-    override fun bind(provide: () -> Any): TemplateSelectQueryBuilder {
-        return copy(data = provide())
+    override fun bind(data: Any): TemplateSelectQueryBuilder {
+        return copy(data = data)
     }
 
     override fun <T> select(provide: (Row) -> T): TemplateSelectQuery<T> {
