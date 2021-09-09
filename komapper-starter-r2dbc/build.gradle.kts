@@ -4,5 +4,5 @@ dependencies {
     api(project(":komapper-tx-r2dbc"))
     api(project(":komapper-slf4j"))
     runtimeOnly(project(":komapper-template"))
-    runtimeOnly("ch.qos.logback:logback-classic:1.2.5")
+    runtimeOnly("ch.qos.logback:logback-classic:1.2.6")
 }
