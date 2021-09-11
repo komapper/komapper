@@ -1,18 +1,5 @@
 plugins {
-    idea
     id("com.google.devtools.ksp")
-}
-
-sourceSets {
-    main {
-        java {
-            srcDir("build/generated/ksp/main/kotlin")
-        }
-    }
-}
-
-idea.module {
-    generatedSourceDirs.add(file("build/generated/ksp/main/kotlin"))
 }
 
 dependencies {
@@ -22,6 +9,12 @@ dependencies {
     runtimeOnly(project(":komapper-slf4j"))
     runtimeOnly(project(":komapper-template"))
     runtimeOnly("ch.qos.logback:logback-classic:1.2.6")
+}
+
+kotlin {
+    sourceSets.main {
+        kotlin.srcDir("build/generated/ksp/main/kotlin")
+    }
 }
 
 ksp {
