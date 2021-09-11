@@ -5,10 +5,10 @@ import java.sql.Connection
 import javax.sql.DataSource
 
 @ThreadSafe
-interface JdbcDatabaseSession {
+interface JdbcSession {
     val connection: Connection
 }
 
-class DefaultJdbcDatabaseSession(private val dataSource: DataSource) : JdbcDatabaseSession {
+class DefaultJdbcSession(private val dataSource: DataSource) : JdbcSession {
     override val connection: Connection get() = dataSource.connection
 }

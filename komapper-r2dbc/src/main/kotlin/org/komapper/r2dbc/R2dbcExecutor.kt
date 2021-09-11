@@ -35,7 +35,7 @@ internal class R2dbcExecutor(
     ): Flow<T> {
         @Suppress("NAME_SHADOWING")
         val statement = inspect(statement)
-        return config.session.getConnection().toFlow().flatMapConcat { con ->
+        return config.session.connection.toFlow().flatMapConcat { con ->
             val r2dbcStmt = con.prepare(statement)
             r2dbcStmt.setUp()
             r2dbcStmt.bind(statement)
@@ -55,7 +55,7 @@ internal class R2dbcExecutor(
     suspend fun executeUpdate(statement: Statement): Pair<Int, LongArray> {
         @Suppress("NAME_SHADOWING")
         val statement = inspect(statement)
-        return config.session.getConnection().toFlow().flatMapConcat { con ->
+        return config.session.connection.toFlow().flatMapConcat { con ->
             val r2dbcStmt = con.prepare(statement)
             r2dbcStmt.setUp()
             r2dbcStmt.bind(statement)
@@ -80,7 +80,7 @@ internal class R2dbcExecutor(
     suspend fun execute(statement: Statement) {
         @Suppress("NAME_SHADOWING")
         val statement = inspect(statement)
-        return config.session.getConnection().toFlow().flatMapConcat { con ->
+        return config.session.connection.toFlow().flatMapConcat { con ->
             val batch = con.createBatch()
             for (each in statement.asSql().split(";")) {
                 val sql = each.trim()

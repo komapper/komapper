@@ -13,8 +13,8 @@ import org.komapper.core.spi.StatementInspector
 import org.komapper.core.spi.TemplateStatementBuilderFactory
 import org.komapper.r2dbc.R2dbcDatabase
 import org.komapper.r2dbc.R2dbcDatabaseConfig
-import org.komapper.r2dbc.R2dbcDatabaseSession
 import org.komapper.r2dbc.R2dbcDialect
+import org.komapper.r2dbc.R2dbcSession
 import org.springframework.boot.autoconfigure.AutoConfigureAfter
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
@@ -70,8 +70,8 @@ open class KomapperAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    open fun r2dbcDatabaseSession(connectionFactory: ConnectionFactory): R2dbcDatabaseSession {
-        return TransactionAwareDatabaseSession(connectionFactory)
+    open fun r2dbcDatabaseSession(connectionFactory: ConnectionFactory): R2dbcSession {
+        return TransactionAwareSession(connectionFactory)
     }
 
     @Bean
@@ -94,7 +94,7 @@ open class KomapperAutoConfiguration {
         clockProvider: ClockProvider,
         executionOptions: ExecutionOptions,
         logger: Logger,
-        r2dbcDatabaseSession: R2dbcDatabaseSession,
+        session: R2dbcSession,
         statementInspector: StatementInspector,
         templateStatementBuilder: Optional<TemplateStatementBuilder>
     ): R2dbcDatabaseConfig {
@@ -104,7 +104,7 @@ open class KomapperAutoConfiguration {
             override val clockProvider = clockProvider
             override val executionOptions = executionOptions
             override val logger = logger
-            override val session = r2dbcDatabaseSession
+            override val session = session
             override val statementInspector = statementInspector
             override val templateStatementBuilder by lazy {
                 templateStatementBuilder.orElseGet {

@@ -1,7 +1,7 @@
 package org.komapper.tx.jdbc
 
 import org.komapper.jdbc.JdbcDatabase
-import org.komapper.jdbc.JdbcDatabaseSession
+import org.komapper.jdbc.JdbcSession
 
 fun <R> JdbcDatabase.withTransaction(
     transactionAttribute: TransactionAttribute = TransactionAttribute.REQUIRED,
@@ -9,25 +9,25 @@ fun <R> JdbcDatabase.withTransaction(
     block: TransactionScope.() -> R
 ): R {
     val session = config.session
-    return if (session is TransactionDatabaseSession) {
+    return if (session is TransactionSession) {
         session.userTransaction.transaction(transactionAttribute, isolationLevel, block)
     } else {
         invalidSession(session)
     }
 }
 
-val JdbcDatabaseSession.transactionManager: TransactionManager
+val JdbcSession.transactionManager: TransactionManager
     get() {
-        return if (this is TransactionDatabaseSession) {
+        return if (this is TransactionSession) {
             this.transactionManager
         } else {
             invalidSession(this)
         }
     }
 
-private fun invalidSession(session: JdbcDatabaseSession): Nothing {
+private fun invalidSession(session: JdbcSession): Nothing {
     error(
-        "DatabaseConfig.session must be an instance of ${TransactionDatabaseSession::class.qualifiedName}. " +
+        "DatabaseConfig.session must be an instance of ${TransactionSession::class.qualifiedName}. " +
             "But it is ${session::class.qualifiedName}"
     )
 }

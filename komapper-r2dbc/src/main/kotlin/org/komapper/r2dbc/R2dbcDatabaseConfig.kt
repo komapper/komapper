@@ -12,7 +12,7 @@ import org.komapper.core.ThreadSafe
 import org.komapper.core.spi.DefaultStatementInspector
 import org.komapper.core.spi.StatementInspector
 import org.komapper.core.spi.TemplateStatementBuilderFactory
-import org.komapper.r2dbc.spi.R2dbcDatabaseSessionFactory
+import org.komapper.r2dbc.spi.R2dbcSessionFactory
 import java.util.ServiceLoader
 import java.util.UUID
 
@@ -24,7 +24,7 @@ interface R2dbcDatabaseConfig : DatabaseConfig {
     override val executionOptions: ExecutionOptions
     override val logger: Logger
 
-    val session: R2dbcDatabaseSession
+    val session: R2dbcSession
     override val statementInspector: StatementInspector
 
     // val dataFactory: DataFactory
@@ -40,10 +40,10 @@ class DefaultR2dbcDatabaseConfig(
     override val clockProvider: ClockProvider = DefaultClockProvider()
     override val executionOptions: ExecutionOptions = ExecutionOptions()
     override val logger: Logger = StdOutLogger()
-    override val session: R2dbcDatabaseSession by lazy {
-        val loader = ServiceLoader.load(R2dbcDatabaseSessionFactory::class.java)
+    override val session: R2dbcSession by lazy {
+        val loader = ServiceLoader.load(R2dbcSessionFactory::class.java)
         val factory = loader.firstOrNull()
-        factory?.create(connectionFactory, logger) ?: DefaultR2dbcDatabaseSession(connectionFactory)
+        factory?.create(connectionFactory, logger) ?: DefaultR2DbcSession(connectionFactory)
     }
     override val statementInspector: StatementInspector by lazy {
         val loader = ServiceLoader.load(StatementInspector::class.java)

@@ -15,7 +15,7 @@ interface JdbcDataFactory {
     fun createSQLXML(): SQLXML
 }
 
-class DefaultJdbcDataFactory(private val session: JdbcDatabaseSession) : JdbcDataFactory {
+class DefaultJdbcDataFactory(private val session: JdbcSession) : JdbcDataFactory {
 
     /**
      * Creates Array objects.
