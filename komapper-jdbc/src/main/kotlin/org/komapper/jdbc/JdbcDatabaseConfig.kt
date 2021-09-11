@@ -12,7 +12,7 @@ import org.komapper.core.spi.DefaultStatementInspector
 import org.komapper.core.spi.LoggerFactory
 import org.komapper.core.spi.StatementInspector
 import org.komapper.core.spi.TemplateStatementBuilderFactory
-import org.komapper.jdbc.spi.JdbcDatabaseSessionFactory
+import org.komapper.jdbc.spi.JdbcSessionFactory
 import java.util.ServiceLoader
 import java.util.UUID
 import javax.sql.DataSource
@@ -34,7 +34,7 @@ interface JdbcDatabaseConfig : DatabaseConfig {
     override val clockProvider: ClockProvider
     override val executionOptions: ExecutionOptions
     override val logger: Logger
-    val session: JdbcDatabaseSession
+    val session: JdbcSession
     override val statementInspector: StatementInspector
     val dataFactory: JdbcDataFactory
     override val templateStatementBuilder: TemplateStatementBuilder
@@ -68,10 +68,10 @@ open class DefaultJdbcDatabaseConfig(
         factory?.create() ?: StdOutLogger()
     }
 
-    override val session: JdbcDatabaseSession by lazy {
-        val loader = ServiceLoader.load(JdbcDatabaseSessionFactory::class.java)
+    override val session: JdbcSession by lazy {
+        val loader = ServiceLoader.load(JdbcSessionFactory::class.java)
         val factory = loader.firstOrNull()
-        factory?.create(dataSource, logger) ?: DefaultJdbcDatabaseSession(dataSource)
+        factory?.create(dataSource, logger) ?: DefaultJdbcSession(dataSource)
     }
 
     override val statementInspector: StatementInspector by lazy {

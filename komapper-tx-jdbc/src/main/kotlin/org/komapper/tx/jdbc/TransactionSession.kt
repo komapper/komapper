@@ -1,15 +1,15 @@
 package org.komapper.tx.jdbc
 
 import org.komapper.core.Logger
-import org.komapper.jdbc.JdbcDatabaseSession
+import org.komapper.jdbc.JdbcSession
 import java.sql.Connection
 import javax.sql.DataSource
 
-class TransactionDatabaseSession(
+class TransactionSession(
     private val dataSource: DataSource,
     private val logger: Logger,
     private val isolationLevel: IsolationLevel? = null
-) : JdbcDatabaseSession {
+) : JdbcSession {
     override val connection: Connection
         get() =
             transactionManager.dataSource.connection

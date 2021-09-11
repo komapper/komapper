@@ -15,8 +15,8 @@ import org.komapper.jdbc.JdbcDataFactory
 import org.komapper.jdbc.JdbcDataType
 import org.komapper.jdbc.JdbcDatabase
 import org.komapper.jdbc.JdbcDatabaseConfig
-import org.komapper.jdbc.JdbcDatabaseSession
 import org.komapper.jdbc.JdbcDialect
+import org.komapper.jdbc.JdbcSession
 import org.springframework.boot.autoconfigure.AutoConfigureAfter
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
@@ -72,8 +72,8 @@ open class KomapperAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    open fun databaseSession(dataSource: DataSource): JdbcDatabaseSession {
-        return TransactionAwareDatabaseSession(dataSource)
+    open fun databaseSession(dataSource: DataSource): JdbcSession {
+        return TransactionAwareSession(dataSource)
     }
 
     @Bean
@@ -85,7 +85,7 @@ open class KomapperAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    open fun dataFactory(databaseSession: JdbcDatabaseSession): JdbcDataFactory {
+    open fun dataFactory(databaseSession: JdbcSession): JdbcDataFactory {
         return DefaultJdbcDataFactory(databaseSession)
     }
 
@@ -96,7 +96,7 @@ open class KomapperAutoConfiguration {
         clockProvider: ClockProvider,
         executionOptions: ExecutionOptions,
         logger: Logger,
-        session: JdbcDatabaseSession,
+        session: JdbcSession,
         statementInspector: StatementInspector,
         dataFactory: JdbcDataFactory,
         templateStatementBuilder: Optional<TemplateStatementBuilder>

@@ -6,11 +6,11 @@ import org.komapper.core.ThreadSafe
 import org.reactivestreams.Publisher
 
 @ThreadSafe
-interface R2dbcDatabaseSession {
+interface R2dbcSession {
     fun getConnection(): Publisher<out Connection>
 }
 
-class DefaultR2dbcDatabaseSession(private val connectionFactory: ConnectionFactory) : R2dbcDatabaseSession {
+class DefaultR2DbcSession(private val connectionFactory: ConnectionFactory) : R2dbcSession {
     override fun getConnection(): Publisher<out Connection> {
         return connectionFactory.create()
     }
