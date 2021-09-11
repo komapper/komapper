@@ -4,18 +4,6 @@ plugins {
     id("com.google.devtools.ksp")
 }
 
-sourceSets {
-    main {
-        java {
-            srcDir("build/generated/ksp/main/kotlin")
-        }
-    }
-}
-
-idea.module {
-    generatedSourceDirs.add(file("build/generated/ksp/main/kotlin"))
-}
-
 dependencies {
     compileOnly(project(":komapper-annotation"))
     implementation(project(":komapper-tx-r2dbc"))
@@ -25,4 +13,14 @@ dependencies {
 
 application {
     mainClass.set("example.ApplicationKt")
+}
+
+kotlin {
+    sourceSets.main {
+        kotlin.srcDir("build/generated/ksp/main/kotlin")
+    }
+}
+
+ksp {
+    arg("komapper.namingStrategy", "UPPER_SNAKE_CASE")
 }

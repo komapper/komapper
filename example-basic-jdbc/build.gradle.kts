@@ -1,19 +1,6 @@
 plugins {
     application
-    idea
     id("com.google.devtools.ksp")
-}
-
-sourceSets {
-    main {
-        java {
-            srcDir("build/generated/ksp/main/kotlin")
-        }
-    }
-}
-
-idea.module {
-    generatedSourceDirs.add(file("build/generated/ksp/main/kotlin"))
 }
 
 dependencies {
@@ -25,6 +12,12 @@ dependencies {
 
 application {
     mainClass.set("example.ApplicationKt")
+}
+
+kotlin {
+    sourceSets.main {
+        kotlin.srcDir("build/generated/ksp/main/kotlin")
+    }
 }
 
 ksp {

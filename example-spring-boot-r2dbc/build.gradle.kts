@@ -1,23 +1,10 @@
 plugins {
-    idea
     id("org.springframework.boot")
     id("com.google.devtools.ksp")
     kotlin("plugin.allopen")
 }
 
 apply(plugin = "io.spring.dependency-management")
-
-sourceSets {
-    main {
-        java {
-            srcDir("build/generated/ksp/main/kotlin")
-        }
-    }
-}
-
-idea.module {
-    generatedSourceDirs.add(file("build/generated/ksp/main/kotlin"))
-}
 
 dependencies {
     ksp(project(":komapper-processor"))
@@ -26,6 +13,12 @@ dependencies {
     implementation(project(":komapper-spring-boot-starter-r2dbc"))
     runtimeOnly(project(":komapper-dialect-h2-r2dbc"))
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+}
+
+kotlin {
+    sourceSets.main {
+        kotlin.srcDir("build/generated/ksp/main/kotlin")
+    }
 }
 
 ksp {
