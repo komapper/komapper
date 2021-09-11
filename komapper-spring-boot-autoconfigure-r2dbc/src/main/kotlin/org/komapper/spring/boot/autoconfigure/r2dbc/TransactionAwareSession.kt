@@ -11,7 +11,6 @@ class TransactionAwareSession(connectionFactory: ConnectionFactory) : R2dbcSessi
         else -> TransactionAwareConnectionFactoryProxy(connectionFactory)
     }
 
-    override fun getConnection(): Publisher<out io.r2dbc.spi.Connection> {
-        return connectionFactoryProxy.create()
-    }
+    override val connection: Publisher<out io.r2dbc.spi.Connection>
+        get() = connectionFactoryProxy.create()
 }

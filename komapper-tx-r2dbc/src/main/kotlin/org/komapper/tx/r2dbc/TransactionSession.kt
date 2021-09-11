@@ -13,9 +13,8 @@ class TransactionSession(
     private val isolationLevel: IsolationLevel? = null
 ) : R2dbcSession {
 
-    override fun getConnection(): Publisher<out Connection> {
-        return transactionManager.connectionFactory.create()
-    }
+    override val connection: Publisher<out Connection>
+        get() = transactionManager.connectionFactory.create()
 
     val userTransaction: UserTransaction by lazy {
         TransactionScopeImpl(transactionManager, isolationLevel)

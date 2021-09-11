@@ -7,11 +7,10 @@ import org.reactivestreams.Publisher
 
 @ThreadSafe
 interface R2dbcSession {
-    fun getConnection(): Publisher<out Connection>
+    val connection: Publisher<out Connection>
 }
 
 class DefaultR2DbcSession(private val connectionFactory: ConnectionFactory) : R2dbcSession {
-    override fun getConnection(): Publisher<out Connection> {
-        return connectionFactory.create()
-    }
+    override val connection: Publisher<out Connection>
+        get() = connectionFactory.create()
 }
