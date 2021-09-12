@@ -106,6 +106,28 @@ class SqlSelectQuerySelectTest(private val db: JdbcDatabase) {
     }
 
     @Test
+    fun selectColumns() {
+        val a = Address.meta
+        val list = db.runQuery {
+            SqlDsl.from(a)
+                .where {
+                    a.addressId inList listOf(1, 2)
+                }
+                .orderBy(a.addressId)
+                .selectColumns(a.addressId, a.street, a.version)
+        }
+        assertEquals(2, list.size)
+        val record0 = list[0]
+        assertEquals(1, record0[a.addressId])
+        assertEquals("STREET 1", record0[a.street])
+        assertEquals(1, record0[a.version])
+        val record1 = list[1]
+        assertEquals(2, record1[a.addressId])
+        assertEquals("STREET 2", record1[a.street])
+        assertEquals(1, record1[a.version])
+    }
+
+    @Test
     fun selectEntity() {
         val a = Address.meta
         val e = Employee.meta
@@ -190,6 +212,27 @@ class SqlSelectQuerySelectTest(private val db: JdbcDatabase) {
         assertTrue(record0[a] is Address)
         assertTrue(record0[e] is Employee)
         assertTrue(record0[d] is Department)
+    }
+
+    @Test
+    fun selectEntities() {
+        val a = Address.meta
+        val e = Employee.meta
+        val list = db.runQuery {
+            SqlDsl.from(a)
+                .where {
+                    a.addressId inList listOf(1, 2)
+                }
+                .innerJoin(e) {
+                    a.addressId eq e.addressId
+                }
+                .orderBy(a.addressId)
+                .selectEntities(e)
+        }
+        assertEquals(2, list.size)
+        val record0 = list[0]
+        assertTrue(record0[a] is Address)
+        assertTrue(record0[e] is Employee)
     }
 
     @Test
