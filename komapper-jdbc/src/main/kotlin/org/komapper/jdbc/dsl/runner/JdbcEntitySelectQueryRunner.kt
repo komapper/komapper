@@ -21,7 +21,7 @@ import kotlin.reflect.cast
 internal class JdbcEntitySelectQueryRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>, R>(
     private val context: EntitySelectContext<ENTITY, ID, META>,
     private val options: EntitySelectOptions,
-    private val transform: suspend (Flow<ENTITY>) -> R
+    private val collect: suspend (Flow<ENTITY>) -> R
 ) : JdbcQueryRunner<R> {
 
     private val runner: EntitySelectQueryRunner<ENTITY, ID, META> =
@@ -33,26 +33,26 @@ internal class JdbcEntitySelectQueryRunner<ENTITY : Any, ID, META : EntityMetamo
         }
         val statement = runner.buildStatement(config)
         val executor = JdbcExecutor(config, options)
-        return executor.executeQuery(statement) { rs ->
-            // hold only unique entities
-            val pool: MutableMap<EntityKey, Any> = mutableMapOf()
-            val rows = fetchAllEntities(config.dialect, rs)
-            for (row in rows) {
-                val entityKeys: MutableMap<EntityMetamodel<*, *, *>, EntityKey> = mutableMapOf()
-                for ((key, entity) in row) {
-                    pool.putIfAbsent(key, entity)
-                    entityKeys[key.entityMetamodel] = key
-                }
-                associate(entityKeys, pool)
+        val rows = executor.executeQuery(statement) { rs ->
+            fetchAllEntities(config.dialect, rs)
+        }
+        // hold only unique entities
+        val pool: MutableMap<EntityKey, Any> = mutableMapOf()
+        for (row in rows) {
+            val entityKeys: MutableMap<EntityMetamodel<*, *, *>, EntityKey> = mutableMapOf()
+            for ((key, entity) in row) {
+                pool.putIfAbsent(key, entity)
+                entityKeys[key.entityMetamodel] = key
             }
-            pool.entries.asFlow().filter {
-                it.key.entityMetamodel == context.target
-            }.map {
-                context.target.klass().cast(it.value)
-            }.let {
-                runBlocking {
-                    transform(it)
-                }
+            associate(entityKeys, pool)
+        }
+        return pool.entries.asFlow().filter {
+            it.key.entityMetamodel == context.target
+        }.map {
+            context.target.klass().cast(it.value)
+        }.let {
+            runBlocking {
+                collect(it)
             }
         }
     }
