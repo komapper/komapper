@@ -51,7 +51,7 @@ interface QueryVisitor<VISIT_RESULT> {
     entitySelectQuery(
         context: EntitySelectContext<ENTITY, ID, META>,
         options: EntitySelectOptions,
-        transform: suspend (Flow<ENTITY>) -> R
+        collect: suspend (Flow<ENTITY>) -> R
     ): VISIT_RESULT
 
     fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>

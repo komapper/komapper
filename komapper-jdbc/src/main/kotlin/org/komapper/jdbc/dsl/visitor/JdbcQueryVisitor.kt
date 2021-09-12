@@ -91,9 +91,9 @@ internal object JdbcQueryVisitor : QueryVisitor<JdbcQueryRunner<*>> {
     entitySelectQuery(
         context: EntitySelectContext<ENTITY, ID, META>,
         options: EntitySelectOptions,
-        transform: suspend (Flow<ENTITY>) -> R
+        collect: suspend (Flow<ENTITY>) -> R
     ): JdbcQueryRunner<R> {
-        return JdbcEntitySelectQueryRunner(context, options, transform)
+        return JdbcEntitySelectQueryRunner(context, options, collect)
     }
 
     override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>

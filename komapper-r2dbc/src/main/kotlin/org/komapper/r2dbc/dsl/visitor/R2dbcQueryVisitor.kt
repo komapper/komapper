@@ -86,9 +86,9 @@ internal object R2dbcQueryVisitor : QueryVisitor<R2dbcQueryRunner<*>> {
     override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>, R> entitySelectQuery(
         context: EntitySelectContext<ENTITY, ID, META>,
         options: EntitySelectOptions,
-        transform: suspend (Flow<ENTITY>) -> R
+        collect: suspend (Flow<ENTITY>) -> R
     ): R2dbcQueryRunner<R> {
-        return R2dbcEntitySelectQueryRunner(context, options, transform)
+        return R2dbcEntitySelectQueryRunner(context, options, collect)
     }
 
     override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>
