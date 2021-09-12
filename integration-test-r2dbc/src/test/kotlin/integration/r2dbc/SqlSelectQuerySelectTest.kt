@@ -19,7 +19,7 @@ import org.komapper.r2dbc.R2dbcDatabase
 class SqlSelectQuerySelectTest(private val db: R2dbcDatabase) {
 
     @Test
-    fun selectProperty() = inTransaction(db) {
+    fun selectColumns() = inTransaction(db) {
         val a = Address.meta
         val streetList = db.runQuery {
             SqlDsl.from(a)
@@ -33,7 +33,7 @@ class SqlSelectQuerySelectTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun selectProperty_first() = inTransaction(db) {
+    fun selectColumns_first() = inTransaction(db) {
         val a = Address.meta
         val value = db.runQuery {
             SqlDsl.from(a)
@@ -48,7 +48,7 @@ class SqlSelectQuerySelectTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun selectPropertiesAsPair() = inTransaction(db) {
+    fun selectColumnsAsPair() = inTransaction(db) {
         val a = Address.meta
         val pairList = db.runQuery {
             SqlDsl.from(a)
@@ -62,7 +62,7 @@ class SqlSelectQuerySelectTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun selectPropertiesAsTriple() = inTransaction(db) {
+    fun selectColumnsAsTriple() = inTransaction(db) {
         val a = Address.meta
         val tripleList = db.runQuery {
             SqlDsl.from(a)
@@ -82,7 +82,7 @@ class SqlSelectQuerySelectTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun selectPropertiesAsRecord() = inTransaction(db) {
+    fun selectColumnsAsRecord() = inTransaction(db) {
         val a = Address.meta
         val list = db.runQuery {
             SqlDsl.from(a)
@@ -193,7 +193,7 @@ class SqlSelectQuerySelectTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun selectProperty2() = inTransaction(db) {
+    fun selectColumnsAsPair_scalar() = inTransaction(db) {
         val d = Department.meta
         val e = Employee.meta
         val subquery = SqlDsl.from(e).where { d.departmentId eq e.departmentId }.select(count())
@@ -202,6 +202,10 @@ class SqlSelectQuerySelectTest(private val db: R2dbcDatabase) {
                 .orderBy(d.departmentId)
                 .select(d.departmentName, subquery)
         }.toList()
-        println(list)
+        assertEquals(4, list.size)
+        assertEquals("ACCOUNTING" to 3L, list[0])
+        assertEquals("RESEARCH" to 5L, list[1])
+        assertEquals("SALES" to 6L, list[2])
+        assertEquals("OPERATIONS" to 0L, list[3])
     }
 }

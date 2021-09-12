@@ -52,6 +52,10 @@ interface SqlSelectQuery<ENTITY : Any> : FlowSubquery<ENTITY> {
         vararg metamodels: EntityMetamodel<*, *, *>,
     ): FlowSubquery<Entities>
 
+    fun selectEntities(
+        vararg metamodels: EntityMetamodel<*, *, *>,
+    ): FlowSubquery<Entities>
+
     fun <T : Any, S : Any> select(
         expression: ScalarExpression<T, S>
     ): ScalarQuery<T?, T, S>
@@ -72,6 +76,10 @@ interface SqlSelectQuery<ENTITY : Any> : FlowSubquery<ENTITY> {
     ): FlowSubquery<Triple<A?, B?, C?>>
 
     fun select(
+        vararg expressions: ColumnExpression<*, *>,
+    ): FlowSubquery<Columns>
+
+    fun selectColumns(
         vararg expressions: ColumnExpression<*, *>,
     ): FlowSubquery<Columns>
 }
@@ -213,6 +221,10 @@ internal data class SqlSelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<
     }
 
     override fun select(vararg metamodels: EntityMetamodel<*, *, *>): FlowSubquery<Entities> {
+        return selectEntities(*metamodels)
+    }
+
+    override fun selectEntities(vararg metamodels: EntityMetamodel<*, *, *>): FlowSubquery<Entities> {
         val contextModels = context.getEntityMetamodels()
         for ((i, metamodel) in metamodels.withIndex()) {
             if (metamodel !in contextModels) error(entityMetamodelNotFound("metamodels", i))
@@ -251,6 +263,10 @@ internal data class SqlSelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<
     }
 
     override fun select(vararg expressions: ColumnExpression<*, *>): FlowSubquery<Columns> {
+        return selectColumns(*expressions)
+    }
+
+    override fun selectColumns(vararg expressions: ColumnExpression<*, *>): FlowSubquery<Columns> {
         val list = expressions.toList()
         val newContext = context.setProjection(*list.toTypedArray())
         return SqlMultipleColumnsQuery(newContext, options, list)
