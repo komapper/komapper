@@ -19,7 +19,7 @@ import org.komapper.jdbc.JdbcDatabase
 class SqlSelectQuerySelectTest(private val db: JdbcDatabase) {
 
     @Test
-    fun selectProperty() {
+    fun selectColumn() {
         val a = Address.meta
         val streetList = db.runQuery {
             SqlDsl.from(a)
@@ -33,7 +33,7 @@ class SqlSelectQuerySelectTest(private val db: JdbcDatabase) {
     }
 
     @Test
-    fun selectProperty_first() {
+    fun selectColumn_first() {
         val a = Address.meta
         val value = db.runQuery {
             SqlDsl.from(a)
@@ -48,7 +48,7 @@ class SqlSelectQuerySelectTest(private val db: JdbcDatabase) {
     }
 
     @Test
-    fun selectPropertiesAsPair() {
+    fun selectColumnsAsPair() {
         val a = Address.meta
         val pairList = db.runQuery {
             SqlDsl.from(a)
@@ -62,7 +62,7 @@ class SqlSelectQuerySelectTest(private val db: JdbcDatabase) {
     }
 
     @Test
-    fun selectPropertiesAsTriple() {
+    fun selectColumnsAsTriple() {
         val a = Address.meta
         val tripleList = db.runQuery {
             SqlDsl.from(a)
@@ -82,7 +82,7 @@ class SqlSelectQuerySelectTest(private val db: JdbcDatabase) {
     }
 
     @Test
-    fun selectPropertiesAsRecord() {
+    fun selectColumnsAsRecord() {
         val a = Address.meta
         val list = db.runQuery {
             SqlDsl.from(a)
@@ -236,7 +236,7 @@ class SqlSelectQuerySelectTest(private val db: JdbcDatabase) {
     }
 
     @Test
-    fun selectProperty2() {
+    fun selectColumnsAsPair_scalar() {
         val d = Department.meta
         val e = Employee.meta
         val subquery = SqlDsl.from(e).where { d.departmentId eq e.departmentId }.select(count())
@@ -245,6 +245,10 @@ class SqlSelectQuerySelectTest(private val db: JdbcDatabase) {
                 .orderBy(d.departmentId)
                 .select(d.departmentName, subquery)
         }
-        println(list)
+        assertEquals(4, list.size)
+        assertEquals("ACCOUNTING" to 3L, list[0])
+        assertEquals("RESEARCH" to 5L, list[1])
+        assertEquals("SALES" to 6L, list[2])
+        assertEquals("OPERATIONS" to 0L, list[3])
     }
 }
