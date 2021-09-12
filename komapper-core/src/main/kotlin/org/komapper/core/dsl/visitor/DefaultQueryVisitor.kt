@@ -83,7 +83,7 @@ internal object DefaultQueryVisitor : QueryVisitor<QueryRunner> {
     override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>, R> entitySelectQuery(
         context: EntitySelectContext<ENTITY, ID, META>,
         options: EntitySelectOptions,
-        transform: suspend (Flow<ENTITY>) -> R
+        collect: suspend (Flow<ENTITY>) -> R
     ): QueryRunner {
         return EntitySelectQueryRunner(context, options)
     }
