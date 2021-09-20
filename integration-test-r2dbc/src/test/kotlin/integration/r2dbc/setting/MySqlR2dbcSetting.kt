@@ -5,7 +5,7 @@ import io.r2dbc.spi.ConnectionFactories
 import io.r2dbc.spi.ConnectionFactoryOptions
 import org.komapper.r2dbc.DefaultR2dbcDatabaseConfig
 import org.komapper.r2dbc.R2dbcDatabaseConfig
-import org.komapper.r2dbc.R2dbcDialect
+import org.komapper.r2dbc.spi.R2dbcDialectProvider
 import org.testcontainers.containers.MySQLContainer
 import org.testcontainers.containers.MySQLContainerProvider
 import org.testcontainers.containers.MySQLR2DBCDatabaseContainer
@@ -30,5 +30,5 @@ class MySqlR2dbcSetting :
     }
 
     override val config: R2dbcDatabaseConfig =
-        DefaultR2dbcDatabaseConfig(ConnectionFactories.get(OPTIONS), R2dbcDialect.load(DRIVER))
+        DefaultR2dbcDatabaseConfig(ConnectionFactories.get(OPTIONS), R2dbcDialectProvider.get(DRIVER))
 }

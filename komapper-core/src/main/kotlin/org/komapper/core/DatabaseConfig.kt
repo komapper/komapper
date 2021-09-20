@@ -1,6 +1,5 @@
 package org.komapper.core
 
-import org.komapper.core.spi.StatementInspector
 import java.util.UUID
 
 interface DatabaseConfig {

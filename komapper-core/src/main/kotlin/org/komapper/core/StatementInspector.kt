@@ -1,7 +1,4 @@
-package org.komapper.core.spi
-
-import org.komapper.core.Statement
-import org.komapper.core.ThreadSafe
+package org.komapper.core
 
 @ThreadSafe
 interface StatementInspector {

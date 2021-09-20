@@ -5,7 +5,7 @@ import io.r2dbc.spi.ConnectionFactories
 import io.r2dbc.spi.ConnectionFactoryOptions
 import org.komapper.r2dbc.DefaultR2dbcDatabaseConfig
 import org.komapper.r2dbc.R2dbcDatabaseConfig
-import org.komapper.r2dbc.R2dbcDialect
+import org.komapper.r2dbc.spi.R2dbcDialectProvider
 import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.containers.PostgreSQLContainerProvider
 import org.testcontainers.containers.PostgreSQLR2DBCDatabaseContainer
@@ -29,5 +29,5 @@ class PostgreSqlR2dbcSetting : PostgreSqlSetting<R2dbcDatabaseConfig> {
     }
 
     override val config: R2dbcDatabaseConfig =
-        DefaultR2dbcDatabaseConfig(ConnectionFactories.get(OPTIONS), R2dbcDialect.load(DRIVER))
+        DefaultR2dbcDatabaseConfig(ConnectionFactories.get(OPTIONS), R2dbcDialectProvider.get(DRIVER))
 }

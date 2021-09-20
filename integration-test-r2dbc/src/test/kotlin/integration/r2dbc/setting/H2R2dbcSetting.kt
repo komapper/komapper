@@ -4,7 +4,7 @@ import integration.setting.H2Setting
 import io.r2dbc.spi.ConnectionFactories
 import org.komapper.r2dbc.DefaultR2dbcDatabaseConfig
 import org.komapper.r2dbc.R2dbcDatabaseConfig
-import org.komapper.r2dbc.R2dbcDialect
+import org.komapper.r2dbc.spi.R2dbcDialectProvider
 
 class H2R2dbcSetting : H2Setting<R2dbcDatabaseConfig> {
     companion object {
@@ -13,5 +13,5 @@ class H2R2dbcSetting : H2Setting<R2dbcDatabaseConfig> {
     }
 
     override val config: R2dbcDatabaseConfig =
-        DefaultR2dbcDatabaseConfig(ConnectionFactories.get(URL), R2dbcDialect.load(DRIVER))
+        DefaultR2dbcDatabaseConfig(ConnectionFactories.get(URL), R2dbcDialectProvider.get(DRIVER))
 }
