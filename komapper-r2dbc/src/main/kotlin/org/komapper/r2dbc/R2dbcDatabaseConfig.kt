@@ -6,14 +6,13 @@ import org.komapper.core.DatabaseConfig
 import org.komapper.core.DefaultClockProvider
 import org.komapper.core.ExecutionOptions
 import org.komapper.core.Logger
-import org.komapper.core.StdOutLogger
+import org.komapper.core.StatementInspector
 import org.komapper.core.TemplateStatementBuilder
 import org.komapper.core.ThreadSafe
-import org.komapper.core.spi.DefaultStatementInspector
-import org.komapper.core.spi.StatementInspector
-import org.komapper.core.spi.TemplateStatementBuilderFactory
-import org.komapper.r2dbc.spi.R2dbcSessionFactory
-import java.util.ServiceLoader
+import org.komapper.core.spi.LoggerProvider
+import org.komapper.core.spi.StatementInspectorProvider
+import org.komapper.core.spi.TemplateStatementBuilderProvider
+import org.komapper.r2dbc.spi.R2dbcSessionProvider
 import java.util.UUID
 
 @ThreadSafe
@@ -39,23 +38,16 @@ class DefaultR2dbcDatabaseConfig(
     override val id: UUID = UUID.randomUUID()
     override val clockProvider: ClockProvider = DefaultClockProvider()
     override val executionOptions: ExecutionOptions = ExecutionOptions()
-    override val logger: Logger = StdOutLogger()
+    override val logger: Logger by lazy {
+        LoggerProvider.get()
+    }
     override val session: R2dbcSession by lazy {
-        val loader = ServiceLoader.load(R2dbcSessionFactory::class.java)
-        val factory = loader.firstOrNull()
-        factory?.create(connectionFactory, logger) ?: DefaultR2DbcSession(connectionFactory)
+        R2dbcSessionProvider.get(connectionFactory, logger)
     }
     override val statementInspector: StatementInspector by lazy {
-        val loader = ServiceLoader.load(StatementInspector::class.java)
-        loader.firstOrNull() ?: DefaultStatementInspector()
+        StatementInspectorProvider.get()
     }
     override val templateStatementBuilder: TemplateStatementBuilder by lazy {
-        val loader = ServiceLoader.load(TemplateStatementBuilderFactory::class.java)
-        val factory = loader.firstOrNull()
-            ?: error(
-                "TemplateStatementBuilderFactory is not found. " +
-                    "Add komapper-template dependency or override the templateStatementBuilder property."
-            )
-        factory.create(dialect)
+        TemplateStatementBuilderProvider.get(dialect)
     }
 }

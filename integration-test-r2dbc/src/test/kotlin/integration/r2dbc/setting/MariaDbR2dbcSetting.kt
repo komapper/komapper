@@ -5,7 +5,7 @@ import io.r2dbc.spi.ConnectionFactories
 import io.r2dbc.spi.ConnectionFactoryOptions
 import org.komapper.r2dbc.DefaultR2dbcDatabaseConfig
 import org.komapper.r2dbc.R2dbcDatabaseConfig
-import org.komapper.r2dbc.R2dbcDialect
+import org.komapper.r2dbc.spi.R2dbcDialectProvider
 import org.testcontainers.containers.MariaDBContainer
 import org.testcontainers.containers.MariaDBContainerProvider
 import org.testcontainers.containers.MariaDBR2DBCDatabaseContainer
@@ -30,5 +30,5 @@ class MariaDbR2dbcSetting :
     }
 
     override val config: R2dbcDatabaseConfig =
-        DefaultR2dbcDatabaseConfig(ConnectionFactories.get(OPTIONS), R2dbcDialect.load(DRIVER))
+        DefaultR2dbcDatabaseConfig(ConnectionFactories.get(OPTIONS), R2dbcDialectProvider.get(DRIVER))
 }

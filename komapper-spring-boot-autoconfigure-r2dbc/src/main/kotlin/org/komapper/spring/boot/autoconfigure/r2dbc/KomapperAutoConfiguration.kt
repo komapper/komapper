@@ -5,16 +5,16 @@ import org.komapper.core.ClockProvider
 import org.komapper.core.DefaultClockProvider
 import org.komapper.core.ExecutionOptions
 import org.komapper.core.Logger
-import org.komapper.core.StdOutLogger
+import org.komapper.core.StatementInspector
 import org.komapper.core.TemplateStatementBuilder
-import org.komapper.core.spi.DefaultStatementInspector
-import org.komapper.core.spi.LoggerFactory
-import org.komapper.core.spi.StatementInspector
-import org.komapper.core.spi.TemplateStatementBuilderFactory
+import org.komapper.core.spi.LoggerProvider
+import org.komapper.core.spi.StatementInspectorProvider
+import org.komapper.core.spi.TemplateStatementBuilderProvider
 import org.komapper.r2dbc.R2dbcDatabase
 import org.komapper.r2dbc.R2dbcDatabaseConfig
 import org.komapper.r2dbc.R2dbcDialect
 import org.komapper.r2dbc.R2dbcSession
+import org.komapper.r2dbc.spi.R2dbcDialectProvider
 import org.springframework.boot.autoconfigure.AutoConfigureAfter
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
@@ -23,7 +23,6 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.env.Environment
 import java.util.Optional
-import java.util.ServiceLoader
 import java.util.UUID
 
 @Suppress("unused")
@@ -44,8 +43,8 @@ open class KomapperAutoConfiguration {
                 "$R2DBC_URL_PROPERTY is not found. " +
                     "Specify it to the application.properties file or define the R2dbcDialect bean manually."
             )
-        val driver = R2dbcDialect.extractR2dbcDriver(url)
-        return R2dbcDialect.load(driver)
+        val driver = R2dbcDialectProvider.extractR2dbcDriver(url)
+        return R2dbcDialectProvider.get(driver)
     }
 
     @Bean
@@ -63,9 +62,7 @@ open class KomapperAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     open fun logger(): Logger {
-        val loader = ServiceLoader.load(LoggerFactory::class.java)
-        val factory = loader.firstOrNull()
-        return factory?.create() ?: StdOutLogger()
+        return LoggerProvider.get()
     }
 
     @Bean
@@ -77,8 +74,7 @@ open class KomapperAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     open fun statementInspector(): StatementInspector {
-        val loader = ServiceLoader.load(StatementInspector::class.java)
-        return loader.firstOrNull() ?: DefaultStatementInspector()
+        return StatementInspectorProvider.get()
     }
 
 //    @Bean
@@ -115,13 +111,7 @@ open class KomapperAutoConfiguration {
     }
 
     private fun loadTemplateStatementBuilder(dialect: R2dbcDialect): TemplateStatementBuilder {
-        val loader = ServiceLoader.load(TemplateStatementBuilderFactory::class.java)
-        val factory = loader.firstOrNull()
-            ?: error(
-                "TemplateStatementBuilderFactory is not found. " +
-                    "Add komapper-template dependency or define the TemplateStatementBuilder bean."
-            )
-        return factory.create(dialect)
+        return TemplateStatementBuilderProvider.get(dialect)
     }
 
     @Bean

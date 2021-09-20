@@ -5,15 +5,14 @@ import org.komapper.core.DatabaseConfig
 import org.komapper.core.DefaultClockProvider
 import org.komapper.core.ExecutionOptions
 import org.komapper.core.Logger
-import org.komapper.core.StdOutLogger
+import org.komapper.core.StatementInspector
 import org.komapper.core.TemplateStatementBuilder
 import org.komapper.core.ThreadSafe
-import org.komapper.core.spi.DefaultStatementInspector
-import org.komapper.core.spi.LoggerFactory
-import org.komapper.core.spi.StatementInspector
-import org.komapper.core.spi.TemplateStatementBuilderFactory
-import org.komapper.jdbc.spi.JdbcSessionFactory
-import java.util.ServiceLoader
+import org.komapper.core.spi.LoggerProvider
+import org.komapper.core.spi.StatementInspectorProvider
+import org.komapper.core.spi.TemplateStatementBuilderProvider
+import org.komapper.jdbc.spi.JdbcDialectProvider
+import org.komapper.jdbc.spi.JdbcSessionProvider
 import java.util.UUID
 import javax.sql.DataSource
 
@@ -50,7 +49,7 @@ open class DefaultJdbcDatabaseConfig(
         user: String = "",
         password: String = "",
         dataTypes: List<JdbcDataType<*>> = emptyList()
-    ) : this(SimpleDataSource(url, user, password), JdbcDialect.load(url, dataTypes))
+    ) : this(SimpleDataSource(url, user, password), JdbcDialectProvider.get(url, dataTypes))
 
     constructor(
         url: String,
@@ -63,33 +62,18 @@ open class DefaultJdbcDatabaseConfig(
     override val clockProvider: ClockProvider = DefaultClockProvider()
     override val executionOptions: ExecutionOptions = ExecutionOptions(batchSize = 10)
     override val logger: Logger by lazy {
-        val loader = ServiceLoader.load(LoggerFactory::class.java)
-        val factory = loader.firstOrNull()
-        factory?.create() ?: StdOutLogger()
+        LoggerProvider.get()
     }
-
     override val session: JdbcSession by lazy {
-        val loader = ServiceLoader.load(JdbcSessionFactory::class.java)
-        val factory = loader.firstOrNull()
-        factory?.create(dataSource, logger) ?: DefaultJdbcSession(dataSource)
+        JdbcSessionProvider.get(dataSource, logger)
     }
-
     override val statementInspector: StatementInspector by lazy {
-        val loader = ServiceLoader.load(StatementInspector::class.java)
-        loader.firstOrNull() ?: DefaultStatementInspector()
+        StatementInspectorProvider.get()
     }
-
     override val dataFactory: JdbcDataFactory by lazy {
         DefaultJdbcDataFactory(session)
     }
-
     override val templateStatementBuilder: TemplateStatementBuilder by lazy {
-        val loader = ServiceLoader.load(TemplateStatementBuilderFactory::class.java)
-        val factory = loader.firstOrNull()
-            ?: error(
-                "TemplateStatementBuilderFactory is not found. " +
-                    "Add komapper-template dependency or override the templateStatementBuilder property."
-            )
-        factory.create(dialect)
+        TemplateStatementBuilderProvider.get(dialect)
     }
 }

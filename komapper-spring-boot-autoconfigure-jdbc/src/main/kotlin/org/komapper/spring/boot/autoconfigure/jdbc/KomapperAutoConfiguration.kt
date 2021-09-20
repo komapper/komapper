@@ -4,12 +4,11 @@ import org.komapper.core.ClockProvider
 import org.komapper.core.DefaultClockProvider
 import org.komapper.core.ExecutionOptions
 import org.komapper.core.Logger
-import org.komapper.core.StdOutLogger
+import org.komapper.core.StatementInspector
 import org.komapper.core.TemplateStatementBuilder
-import org.komapper.core.spi.DefaultStatementInspector
-import org.komapper.core.spi.LoggerFactory
-import org.komapper.core.spi.StatementInspector
-import org.komapper.core.spi.TemplateStatementBuilderFactory
+import org.komapper.core.spi.LoggerProvider
+import org.komapper.core.spi.StatementInspectorProvider
+import org.komapper.core.spi.TemplateStatementBuilderProvider
 import org.komapper.jdbc.DefaultJdbcDataFactory
 import org.komapper.jdbc.JdbcDataFactory
 import org.komapper.jdbc.JdbcDataType
@@ -17,6 +16,7 @@ import org.komapper.jdbc.JdbcDatabase
 import org.komapper.jdbc.JdbcDatabaseConfig
 import org.komapper.jdbc.JdbcDialect
 import org.komapper.jdbc.JdbcSession
+import org.komapper.jdbc.spi.JdbcDialectProvider
 import org.springframework.boot.autoconfigure.AutoConfigureAfter
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
@@ -25,7 +25,6 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.env.Environment
 import java.util.Optional
-import java.util.ServiceLoader
 import java.util.UUID
 import javax.sql.DataSource
 
@@ -47,7 +46,7 @@ open class KomapperAutoConfiguration {
                 "$DATASOURCE_URL_PROPERTY is not found. " +
                     "Specify it to the application.properties file or define the Dialect bean manually."
             )
-        return JdbcDialect.load(url, dataTypes ?: emptyList())
+        return JdbcDialectProvider.get(url, dataTypes ?: emptyList())
     }
 
     @Bean
@@ -65,9 +64,7 @@ open class KomapperAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     open fun logger(): Logger {
-        val loader = ServiceLoader.load(LoggerFactory::class.java)
-        val factory = loader.firstOrNull()
-        return factory?.create() ?: StdOutLogger()
+        return LoggerProvider.get()
     }
 
     @Bean
@@ -79,8 +76,7 @@ open class KomapperAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     open fun statementInspector(): StatementInspector {
-        val loader = ServiceLoader.load(StatementInspector::class.java)
-        return loader.firstOrNull() ?: DefaultStatementInspector()
+        return StatementInspectorProvider.get()
     }
 
     @Bean
@@ -119,13 +115,7 @@ open class KomapperAutoConfiguration {
     }
 
     private fun loadTemplateStatementBuilder(dialect: JdbcDialect): TemplateStatementBuilder {
-        val loader = ServiceLoader.load(TemplateStatementBuilderFactory::class.java)
-        val factory = loader.firstOrNull()
-            ?: error(
-                "TemplateStatementBuilderFactory is not found. " +
-                    "Add komapper-template dependency or define the TemplateStatementBuilder bean."
-            )
-        return factory.create(dialect)
+        return TemplateStatementBuilderProvider.get(dialect)
     }
 
     @Bean
