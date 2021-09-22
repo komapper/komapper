@@ -8,8 +8,8 @@ import org.komapper.core.ThreadSafe
 import org.komapper.core.dsl.query.FlowQuery
 import org.komapper.core.dsl.query.Query
 import org.komapper.core.dsl.query.QueryScope
-import org.komapper.r2dbc.dsl.runner.R2dbcFlowQueryRunner
-import org.komapper.r2dbc.dsl.runner.R2dbcQueryRunner
+import org.komapper.r2dbc.dsl.runner.R2dbcFlowBuilder
+import org.komapper.r2dbc.dsl.runner.R2dbcRunner
 import org.komapper.r2dbc.dsl.visitor.R2dbcFlowQueryVisitor
 import org.komapper.r2dbc.dsl.visitor.R2dbcQueryVisitor
 
@@ -53,14 +53,14 @@ interface R2dbcDatabase {
     @Suppress("UNCHECKED_CAST")
     suspend fun <T> runQuery(block: QueryScope.() -> Query<T>): T {
         val query = block(QueryScope)
-        val runner = query.accept(R2dbcQueryVisitor) as R2dbcQueryRunner<T>
+        val runner = query.accept(R2dbcQueryVisitor) as R2dbcRunner<T>
         return runner.run(config)
     }
 
     @Suppress("UNCHECKED_CAST")
     fun <T> flow(block: QueryScope.() -> FlowQuery<T>): Flow<T> {
         val query = block(QueryScope)
-        val runner = query.accept(R2dbcFlowQueryVisitor) as R2dbcFlowQueryRunner<T>
+        val runner = query.accept(R2dbcFlowQueryVisitor) as R2dbcFlowBuilder<T>
         return runner.run(config)
     }
 }
