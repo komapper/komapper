@@ -6,13 +6,12 @@ import org.komapper.core.DatabaseConfig
 import org.komapper.core.DefaultClockProvider
 import org.komapper.core.ExecutionOptions
 import org.komapper.core.Logger
+import org.komapper.core.Loggers
 import org.komapper.core.StatementInspector
+import org.komapper.core.StatementInspectors
 import org.komapper.core.TemplateStatementBuilder
+import org.komapper.core.TemplateStatementBuilders
 import org.komapper.core.ThreadSafe
-import org.komapper.core.spi.LoggerProvider
-import org.komapper.core.spi.StatementInspectorProvider
-import org.komapper.core.spi.TemplateStatementBuilderProvider
-import org.komapper.r2dbc.spi.R2dbcSessionProvider
 import java.util.UUID
 
 @ThreadSafe
@@ -39,15 +38,15 @@ class DefaultR2dbcDatabaseConfig(
     override val clockProvider: ClockProvider = DefaultClockProvider()
     override val executionOptions: ExecutionOptions = ExecutionOptions()
     override val logger: Logger by lazy {
-        LoggerProvider.get()
+        Loggers.get()
     }
     override val session: R2dbcSession by lazy {
-        R2dbcSessionProvider.get(connectionFactory, logger)
+        R2dbcSessions.get(connectionFactory, logger)
     }
     override val statementInspector: StatementInspector by lazy {
-        StatementInspectorProvider.get()
+        StatementInspectors.get()
     }
     override val templateStatementBuilder: TemplateStatementBuilder by lazy {
-        TemplateStatementBuilderProvider.get(dialect)
+        TemplateStatementBuilders.get(dialect)
     }
 }

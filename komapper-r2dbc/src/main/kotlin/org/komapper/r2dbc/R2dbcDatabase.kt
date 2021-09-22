@@ -12,7 +12,6 @@ import org.komapper.r2dbc.dsl.runner.R2dbcFlowQueryRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcQueryRunner
 import org.komapper.r2dbc.dsl.visitor.R2dbcFlowQueryVisitor
 import org.komapper.r2dbc.dsl.visitor.R2dbcQueryVisitor
-import org.komapper.r2dbc.spi.R2dbcDialectProvider
 
 @ThreadSafe
 interface R2dbcDatabase {
@@ -35,15 +34,15 @@ interface R2dbcDatabase {
             val driver = options.getValue(ConnectionFactoryOptions.DRIVER)
             checkNotNull(driver) { "The driver option is not found." }
             val connectionFactory = ConnectionFactories.get(options)
-            val dialect = R2dbcDialectProvider.get(driver)
+            val dialect = R2dbcDialects.get(driver)
             val config = DefaultR2dbcDatabaseConfig(connectionFactory, dialect)
             return create(config)
         }
 
         fun create(url: String): R2dbcDatabase {
             val connectionFactory = ConnectionFactories.get(url)
-            val driver = R2dbcDialectProvider.extractR2dbcDriver(url)
-            val dialect = R2dbcDialectProvider.get(driver)
+            val driver = R2dbcDialects.extractR2dbcDriver(url)
+            val dialect = R2dbcDialects.get(driver)
             val config = DefaultR2dbcDatabaseConfig(connectionFactory, dialect)
             return create(config)
         }

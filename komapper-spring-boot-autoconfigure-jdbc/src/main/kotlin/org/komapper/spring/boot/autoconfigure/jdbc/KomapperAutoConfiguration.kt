@@ -4,19 +4,19 @@ import org.komapper.core.ClockProvider
 import org.komapper.core.DefaultClockProvider
 import org.komapper.core.ExecutionOptions
 import org.komapper.core.Logger
+import org.komapper.core.Loggers
 import org.komapper.core.StatementInspector
+import org.komapper.core.StatementInspectors
 import org.komapper.core.TemplateStatementBuilder
-import org.komapper.core.spi.LoggerProvider
-import org.komapper.core.spi.StatementInspectorProvider
-import org.komapper.core.spi.TemplateStatementBuilderProvider
+import org.komapper.core.TemplateStatementBuilders
 import org.komapper.jdbc.DefaultJdbcDataFactory
 import org.komapper.jdbc.JdbcDataFactory
 import org.komapper.jdbc.JdbcDataType
 import org.komapper.jdbc.JdbcDatabase
 import org.komapper.jdbc.JdbcDatabaseConfig
 import org.komapper.jdbc.JdbcDialect
+import org.komapper.jdbc.JdbcDialects
 import org.komapper.jdbc.JdbcSession
-import org.komapper.jdbc.spi.JdbcDialectProvider
 import org.springframework.boot.autoconfigure.AutoConfigureAfter
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
@@ -46,7 +46,7 @@ open class KomapperAutoConfiguration {
                 "$DATASOURCE_URL_PROPERTY is not found. " +
                     "Specify it to the application.properties file or define the Dialect bean manually."
             )
-        return JdbcDialectProvider.get(url, dataTypes ?: emptyList())
+        return JdbcDialects.get(url, dataTypes ?: emptyList())
     }
 
     @Bean
@@ -64,7 +64,7 @@ open class KomapperAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     open fun logger(): Logger {
-        return LoggerProvider.get()
+        return Loggers.get()
     }
 
     @Bean
@@ -76,7 +76,7 @@ open class KomapperAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     open fun statementInspector(): StatementInspector {
-        return StatementInspectorProvider.get()
+        return StatementInspectors.get()
     }
 
     @Bean
@@ -115,7 +115,7 @@ open class KomapperAutoConfiguration {
     }
 
     private fun loadTemplateStatementBuilder(dialect: JdbcDialect): TemplateStatementBuilder {
-        return TemplateStatementBuilderProvider.get(dialect)
+        return TemplateStatementBuilders.get(dialect)
     }
 
     @Bean

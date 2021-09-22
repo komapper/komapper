@@ -5,14 +5,12 @@ import org.komapper.core.DatabaseConfig
 import org.komapper.core.DefaultClockProvider
 import org.komapper.core.ExecutionOptions
 import org.komapper.core.Logger
+import org.komapper.core.Loggers
 import org.komapper.core.StatementInspector
+import org.komapper.core.StatementInspectors
 import org.komapper.core.TemplateStatementBuilder
+import org.komapper.core.TemplateStatementBuilders
 import org.komapper.core.ThreadSafe
-import org.komapper.core.spi.LoggerProvider
-import org.komapper.core.spi.StatementInspectorProvider
-import org.komapper.core.spi.TemplateStatementBuilderProvider
-import org.komapper.jdbc.spi.JdbcDialectProvider
-import org.komapper.jdbc.spi.JdbcSessionProvider
 import java.util.UUID
 import javax.sql.DataSource
 
@@ -49,7 +47,7 @@ open class DefaultJdbcDatabaseConfig(
         user: String = "",
         password: String = "",
         dataTypes: List<JdbcDataType<*>> = emptyList()
-    ) : this(SimpleDataSource(url, user, password), JdbcDialectProvider.get(url, dataTypes))
+    ) : this(SimpleDataSource(url, user, password), JdbcDialects.get(url, dataTypes))
 
     constructor(
         url: String,
@@ -62,18 +60,18 @@ open class DefaultJdbcDatabaseConfig(
     override val clockProvider: ClockProvider = DefaultClockProvider()
     override val executionOptions: ExecutionOptions = ExecutionOptions(batchSize = 10)
     override val logger: Logger by lazy {
-        LoggerProvider.get()
+        Loggers.get()
     }
     override val session: JdbcSession by lazy {
-        JdbcSessionProvider.get(dataSource, logger)
+        JdbcSessions.get(dataSource, logger)
     }
     override val statementInspector: StatementInspector by lazy {
-        StatementInspectorProvider.get()
+        StatementInspectors.get()
     }
     override val dataFactory: JdbcDataFactory by lazy {
         DefaultJdbcDataFactory(session)
     }
     override val templateStatementBuilder: TemplateStatementBuilder by lazy {
-        TemplateStatementBuilderProvider.get(dialect)
+        TemplateStatementBuilders.get(dialect)
     }
 }
