@@ -17,22 +17,22 @@ internal class SelectQuerySupport<ENTITY : Any, ID, META : EntityMetamodel<ENTIT
     private val context: CONTEXT
 ) {
 
-    fun <OTHER_ENTITY : Any, OTHER_META : EntityMetamodel<OTHER_ENTITY, *, OTHER_META>> innerJoin(
-        entityMetamodel: OTHER_META,
+    fun innerJoin(
+        metamodel: EntityMetamodel<*, *, *>,
         declaration: OnDeclaration
     ): CONTEXT {
-        return join(entityMetamodel, declaration, JoinKind.INNER)
+        return join(metamodel, declaration, JoinKind.INNER)
     }
 
-    fun <OTHER_ENTITY : Any, OTHER_META : EntityMetamodel<OTHER_ENTITY, *, OTHER_META>> leftJoin(
-        metamodel: OTHER_META,
+    fun leftJoin(
+        metamodel: EntityMetamodel<*, *, *>,
         declaration: OnDeclaration
     ): CONTEXT {
         return join(metamodel, declaration, JoinKind.LEFT_OUTER)
     }
 
-    private fun <OTHER_ENTITY : Any, OTHER_META : EntityMetamodel<OTHER_ENTITY, *, OTHER_META>> join(
-        metamodel: OTHER_META,
+    private fun join(
+        metamodel: EntityMetamodel<*, *, *>,
         declaration: OnDeclaration,
         kind: JoinKind
     ): CONTEXT {

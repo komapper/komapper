@@ -16,16 +16,8 @@ import org.komapper.core.dsl.visitor.QueryVisitor
 
 interface EntitySelectQuery<ENTITY : Any> : Subquery<ENTITY> {
 
-    fun <OTHER_ENTITY : Any, OTHER_META : EntityMetamodel<OTHER_ENTITY, *, OTHER_META>> innerJoin(
-        metamodel: OTHER_META,
-        on: OnDeclaration
-    ): EntitySelectQuery<ENTITY>
-
-    fun <OTHER_ENTITY : Any, OTHER_META : EntityMetamodel<OTHER_ENTITY, *, OTHER_META>> leftJoin(
-        metamodel: OTHER_META,
-        on: OnDeclaration
-    ): EntitySelectQuery<ENTITY>
-
+    fun innerJoin(metamodel: EntityMetamodel<*, *, *>, on: OnDeclaration): EntitySelectQuery<ENTITY>
+    fun leftJoin(metamodel: EntityMetamodel<*, *, *>, on: OnDeclaration): EntitySelectQuery<ENTITY>
     fun where(declaration: WhereDeclaration): EntitySelectQuery<ENTITY>
     fun orderBy(vararg expressions: ColumnExpression<*, *>): EntitySelectQuery<ENTITY>
     fun offset(offset: Int): EntitySelectQuery<ENTITY>
@@ -58,18 +50,12 @@ internal data class EntitySelectQueryImpl<ENTITY : Any, ID, META : EntityMetamod
 
     override val subqueryContext = SubqueryContext.EntitySelect<ENTITY>(context)
 
-    override fun <OTHER_ENTITY : Any, OTHER_META : EntityMetamodel<OTHER_ENTITY, *, OTHER_META>> innerJoin(
-        metamodel: OTHER_META,
-        on: OnDeclaration
-    ): EntitySelectQuery<ENTITY> {
+    override fun innerJoin(metamodel: EntityMetamodel<*, *, *>, on: OnDeclaration): EntitySelectQuery<ENTITY> {
         val newContext = support.innerJoin(metamodel, on)
         return copy(context = newContext)
     }
 
-    override fun <OTHER_ENTITY : Any, OTHER_META : EntityMetamodel<OTHER_ENTITY, *, OTHER_META>> leftJoin(
-        metamodel: OTHER_META,
-        on: OnDeclaration
-    ): EntitySelectQuery<ENTITY> {
+    override fun leftJoin(metamodel: EntityMetamodel<*, *, *>, on: OnDeclaration): EntitySelectQuery<ENTITY> {
         val newContext = support.leftJoin(metamodel, on)
         return copy(context = newContext)
     }
