@@ -40,6 +40,10 @@ val exampleProjects = subprojects.filter {
     it.name.startsWith("example")
 }
 
+val exampleSpringBootProjects = subprojects.filter {
+    it.name.startsWith("example-spring-boot")
+}
+
 val integrationTestProjects = subprojects.filter {
     it.name.startsWith("integration-test")
 }
@@ -78,8 +82,14 @@ configure(libraryProjects + gradlePluginProject + exampleProjects + integrationT
     }
 
     dependencies {
-        "testImplementation"("org.junit.jupiter:junit-jupiter-api:5.8.1")
-        "testRuntimeOnly"("org.junit.jupiter:junit-jupiter-engine:5.8.1")
+        if (project in exampleSpringBootProjects) {
+            // version numbers are resolved by io.spring.dependency-management
+            "testImplementation"("org.junit.jupiter:junit-jupiter-api")
+            "testRuntimeOnly"("org.junit.jupiter:junit-jupiter-engine")
+        } else {
+            "testImplementation"("org.junit.jupiter:junit-jupiter-api:5.8.1")
+            "testRuntimeOnly"("org.junit.jupiter:junit-jupiter-engine:5.8.1")
+        }
     }
 }
 
