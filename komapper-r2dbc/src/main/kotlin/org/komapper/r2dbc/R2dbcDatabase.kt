@@ -8,11 +8,10 @@ import org.komapper.core.ThreadSafe
 import org.komapper.core.dsl.query.FlowQuery
 import org.komapper.core.dsl.query.Query
 import org.komapper.core.dsl.query.QueryScope
-import org.komapper.r2dbc.dsl.runner.R2dbcFlowQueryRunner
-import org.komapper.r2dbc.dsl.runner.R2dbcQueryRunner
+import org.komapper.r2dbc.dsl.runner.FlowBuilder
+import org.komapper.r2dbc.dsl.runner.R2dbcRunner
 import org.komapper.r2dbc.dsl.visitor.R2dbcFlowQueryVisitor
 import org.komapper.r2dbc.dsl.visitor.R2dbcQueryVisitor
-import org.komapper.r2dbc.spi.R2dbcDialectProvider
 
 @ThreadSafe
 interface R2dbcDatabase {
@@ -35,15 +34,15 @@ interface R2dbcDatabase {
             val driver = options.getValue(ConnectionFactoryOptions.DRIVER)
             checkNotNull(driver) { "The driver option is not found." }
             val connectionFactory = ConnectionFactories.get(options)
-            val dialect = R2dbcDialectProvider.get(driver)
+            val dialect = R2dbcDialects.get(driver)
             val config = DefaultR2dbcDatabaseConfig(connectionFactory, dialect)
             return create(config)
         }
 
         fun create(url: String): R2dbcDatabase {
             val connectionFactory = ConnectionFactories.get(url)
-            val driver = R2dbcDialectProvider.extractR2dbcDriver(url)
-            val dialect = R2dbcDialectProvider.get(driver)
+            val driver = R2dbcDialects.extractR2dbcDriver(url)
+            val dialect = R2dbcDialects.get(driver)
             val config = DefaultR2dbcDatabaseConfig(connectionFactory, dialect)
             return create(config)
         }
@@ -54,15 +53,15 @@ interface R2dbcDatabase {
     @Suppress("UNCHECKED_CAST")
     suspend fun <T> runQuery(block: QueryScope.() -> Query<T>): T {
         val query = block(QueryScope)
-        val runner = query.accept(R2dbcQueryVisitor) as R2dbcQueryRunner<T>
+        val runner = query.accept(R2dbcQueryVisitor) as R2dbcRunner<T>
         return runner.run(config)
     }
 
     @Suppress("UNCHECKED_CAST")
     fun <T> flow(block: QueryScope.() -> FlowQuery<T>): Flow<T> {
         val query = block(QueryScope)
-        val runner = query.accept(R2dbcFlowQueryVisitor) as R2dbcFlowQueryRunner<T>
-        return runner.run(config)
+        val builder = query.accept(R2dbcFlowQueryVisitor) as FlowBuilder<T>
+        return builder.build(config)
     }
 }
 

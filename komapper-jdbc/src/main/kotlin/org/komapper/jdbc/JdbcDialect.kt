@@ -10,9 +10,8 @@ interface JdbcDialect : Dialect {
     val dataTypes: List<JdbcDataType<*>>
     fun getValue(rs: ResultSet, index: Int, valueClass: KClass<*>): Any?
     fun getValue(rs: ResultSet, columnLabel: String, valueClass: KClass<*>): Any?
-    fun getDataType(klass: KClass<*>): JdbcDataType<*>
     fun setValue(ps: PreparedStatement, index: Int, value: Any?, valueClass: KClass<*>)
-    fun tryGetDataType(name: String): JdbcDataType<*>?
+    fun getDataType(klass: KClass<*>): JdbcDataType<*>
     fun isUniqueConstraintViolation(exception: SQLException): Boolean
 }
 
@@ -56,12 +55,6 @@ abstract class AbstractJdbcDialect protected constructor(internalDataTypes: List
         return dataTypeMap[klass] ?: error(
             "The dataType is not found for the type \"${klass.qualifiedName}\"."
         )
-    }
-
-    override fun tryGetDataType(name: String): JdbcDataType<*>? {
-        return dataTypeMap.values.firstOrNull {
-            it.name.lowercase() == name.lowercase()
-        }
     }
 
     protected fun getCause(exception: SQLException): SQLException =

@@ -37,55 +37,55 @@ import org.komapper.core.dsl.query.Columns
 import org.komapper.core.dsl.query.Entities
 import org.komapper.core.dsl.query.Query
 import org.komapper.core.dsl.query.Row
-import org.komapper.core.dsl.runner.EntityDeleteBatchQueryRunner
-import org.komapper.core.dsl.runner.EntityDeleteSingleQueryRunner
-import org.komapper.core.dsl.runner.EntityInsertBatchQueryRunner
-import org.komapper.core.dsl.runner.EntityInsertMultipleQueryRunner
-import org.komapper.core.dsl.runner.EntityInsertSingleQueryRunner
-import org.komapper.core.dsl.runner.EntitySelectQueryRunner
-import org.komapper.core.dsl.runner.EntityUpdateBatchQueryRunner
-import org.komapper.core.dsl.runner.EntityUpdateSingleQueryRunner
-import org.komapper.core.dsl.runner.EntityUpsertBatchQueryRunner
-import org.komapper.core.dsl.runner.EntityUpsertMultipleQueryRunner
-import org.komapper.core.dsl.runner.EntityUpsertSingleQueryRunner
-import org.komapper.core.dsl.runner.QueryRunner
-import org.komapper.core.dsl.runner.SchemaCreateQueryRunner
-import org.komapper.core.dsl.runner.SchemaDropAllQueryRunner
-import org.komapper.core.dsl.runner.SchemaDropQueryRunner
-import org.komapper.core.dsl.runner.ScriptExecuteQueryRunner
-import org.komapper.core.dsl.runner.SqlDeleteQueryRunner
-import org.komapper.core.dsl.runner.SqlInsertQueryRunner
-import org.komapper.core.dsl.runner.SqlSelectQueryRunner
-import org.komapper.core.dsl.runner.SqlSetOperationQueryRunner
-import org.komapper.core.dsl.runner.SqlUpdateQueryRunner
-import org.komapper.core.dsl.runner.TemplateExecuteQueryRunner
-import org.komapper.core.dsl.runner.TemplateSelectQueryRunner
+import org.komapper.core.dsl.runner.EntityDeleteBatchRunner
+import org.komapper.core.dsl.runner.EntityDeleteSingleRunner
+import org.komapper.core.dsl.runner.EntityInsertBatchRunner
+import org.komapper.core.dsl.runner.EntityInsertMultipleRunner
+import org.komapper.core.dsl.runner.EntityInsertSingleRunner
+import org.komapper.core.dsl.runner.EntitySelectRunner
+import org.komapper.core.dsl.runner.EntityUpdateBatchRunner
+import org.komapper.core.dsl.runner.EntityUpdateSingleRunner
+import org.komapper.core.dsl.runner.EntityUpsertBatchRunner
+import org.komapper.core.dsl.runner.EntityUpsertMultipleRunner
+import org.komapper.core.dsl.runner.EntityUpsertSingleRunner
+import org.komapper.core.dsl.runner.Runner
+import org.komapper.core.dsl.runner.SchemaCreateRunner
+import org.komapper.core.dsl.runner.SchemaDropAllRunner
+import org.komapper.core.dsl.runner.SchemaDropRunner
+import org.komapper.core.dsl.runner.ScriptExecuteRunner
+import org.komapper.core.dsl.runner.SqlDeleteRunner
+import org.komapper.core.dsl.runner.SqlInsertRunner
+import org.komapper.core.dsl.runner.SqlSelectRunner
+import org.komapper.core.dsl.runner.SqlSetOperationRunner
+import org.komapper.core.dsl.runner.SqlUpdateRunner
+import org.komapper.core.dsl.runner.TemplateExecuteRunner
+import org.komapper.core.dsl.runner.TemplateSelectRunner
 
 @ThreadSafe
-internal object DefaultQueryVisitor : QueryVisitor<QueryRunner> {
+internal object DefaultQueryVisitor : QueryVisitor<Runner> {
 
-    override fun <T, S> plusQuery(left: Query<T>, right: Query<S>): QueryRunner {
+    override fun <T, S> plusQuery(left: Query<T>, right: Query<S>): Runner {
         val leftRunner = left.accept(this)
         val rightRunner = right.accept(this)
-        return QueryRunner.Plus(leftRunner, rightRunner)
+        return Runner.Plus(leftRunner, rightRunner)
     }
 
-    override fun <T, S> flatMapQuery(query: Query<T>, transform: (T) -> Query<S>): QueryRunner {
+    override fun <T, S> flatMapQuery(query: Query<T>, transform: (T) -> Query<S>): Runner {
         val runner = query.accept(this)
-        return QueryRunner.FlatMap(runner)
+        return Runner.FlatMap(runner)
     }
 
-    override fun <T, S> flatZipQuery(query: Query<T>, transform: (T) -> Query<S>): QueryRunner {
+    override fun <T, S> flatZipQuery(query: Query<T>, transform: (T) -> Query<S>): Runner {
         val runner = query.accept(this)
-        return QueryRunner.FlatZip(runner)
+        return Runner.FlatZip(runner)
     }
 
     override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>, R> entitySelectQuery(
         context: EntitySelectContext<ENTITY, ID, META>,
         options: EntitySelectOptions,
         collect: suspend (Flow<ENTITY>) -> R
-    ): QueryRunner {
-        return EntitySelectQueryRunner(context, options)
+    ): Runner {
+        return EntitySelectRunner(context, options)
     }
 
     override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>
@@ -93,8 +93,8 @@ internal object DefaultQueryVisitor : QueryVisitor<QueryRunner> {
         context: EntityDeleteContext<ENTITY, ID, META>,
         options: EntityDeleteBatchOptions,
         entities: List<ENTITY>
-    ): QueryRunner {
-        return EntityDeleteBatchQueryRunner(context, options, entities)
+    ): Runner {
+        return EntityDeleteBatchRunner(context, options, entities)
     }
 
     override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>
@@ -102,32 +102,32 @@ internal object DefaultQueryVisitor : QueryVisitor<QueryRunner> {
         context: EntityDeleteContext<ENTITY, ID, META>,
         options: EntityDeleteOptions,
         entity: ENTITY
-    ): QueryRunner {
-        return EntityDeleteSingleQueryRunner(context, options, entity)
+    ): Runner {
+        return EntityDeleteSingleRunner(context, options, entity)
     }
 
     override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> entityInsertMultipleQuery(
         context: EntityInsertContext<ENTITY, ID, META>,
         options: EntityInsertOptions,
         entities: List<ENTITY>
-    ): QueryRunner {
-        return EntityInsertMultipleQueryRunner(context, options, entities)
+    ): Runner {
+        return EntityInsertMultipleRunner(context, options, entities)
     }
 
     override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> entityInsertBatchQuery(
         context: EntityInsertContext<ENTITY, ID, META>,
         options: EntityInsertBatchOptions,
         entities: List<ENTITY>
-    ): QueryRunner {
-        return EntityInsertBatchQueryRunner(context, options, entities)
+    ): Runner {
+        return EntityInsertBatchRunner(context, options, entities)
     }
 
     override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> entityInsertSingleQuery(
         context: EntityInsertContext<ENTITY, ID, META>,
         options: EntityInsertOptions,
         entity: ENTITY
-    ): QueryRunner {
-        return EntityInsertSingleQueryRunner(context, options, entity)
+    ): Runner {
+        return EntityInsertSingleRunner(context, options, entity)
     }
 
     override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>
@@ -135,8 +135,8 @@ internal object DefaultQueryVisitor : QueryVisitor<QueryRunner> {
         context: EntityUpdateContext<ENTITY, ID, META>,
         options: EntityUpdateBatchOptions,
         entities: List<ENTITY>
-    ): QueryRunner {
-        return EntityUpdateBatchQueryRunner(context, options, entities)
+    ): Runner {
+        return EntityUpdateBatchRunner(context, options, entities)
     }
 
     override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>
@@ -144,8 +144,8 @@ internal object DefaultQueryVisitor : QueryVisitor<QueryRunner> {
         context: EntityUpdateContext<ENTITY, ID, META>,
         options: EntityUpdateOptions,
         entity: ENTITY
-    ): QueryRunner {
-        return EntityUpdateSingleQueryRunner(context, options, entity)
+    ): Runner {
+        return EntityUpdateSingleRunner(context, options, entity)
     }
 
     override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>
@@ -153,8 +153,8 @@ internal object DefaultQueryVisitor : QueryVisitor<QueryRunner> {
         context: EntityUpsertContext<ENTITY, ID, META>,
         options: InsertOptions,
         entities: List<ENTITY>
-    ): QueryRunner {
-        return EntityUpsertBatchQueryRunner(context, options, entities)
+    ): Runner {
+        return EntityUpsertBatchRunner(context, options, entities)
     }
 
     override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>
@@ -162,8 +162,8 @@ internal object DefaultQueryVisitor : QueryVisitor<QueryRunner> {
         context: EntityUpsertContext<ENTITY, ID, META>,
         options: InsertOptions,
         entities: List<ENTITY>
-    ): QueryRunner {
-        return EntityUpsertMultipleQueryRunner(context, options, entities)
+    ): Runner {
+        return EntityUpsertMultipleRunner(context, options, entities)
     }
 
     override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>
@@ -171,33 +171,33 @@ internal object DefaultQueryVisitor : QueryVisitor<QueryRunner> {
         context: EntityUpsertContext<ENTITY, ID, META>,
         options: InsertOptions,
         entity: ENTITY,
-    ): QueryRunner {
-        return EntityUpsertSingleQueryRunner(context, options, entity)
+    ): Runner {
+        return EntityUpsertSingleRunner(context, options, entity)
     }
 
     override fun schemaCreateQuery(
         entityMetamodels: List<EntityMetamodel<*, *, *>>,
         options: SchemaCreateOptions
-    ): QueryRunner {
-        return SchemaCreateQueryRunner(entityMetamodels, options)
+    ): Runner {
+        return SchemaCreateRunner(entityMetamodels, options)
     }
 
     override fun schemaDropQuery(
         entityMetamodels: List<EntityMetamodel<*, *, *>>,
         options: SchemaDropOptions
-    ): QueryRunner {
-        return SchemaDropQueryRunner(entityMetamodels, options)
+    ): Runner {
+        return SchemaDropRunner(entityMetamodels, options)
     }
 
-    override fun schemaDropAllQuery(options: SchemaDropAllOptions): QueryRunner {
-        return SchemaDropAllQueryRunner(options)
+    override fun schemaDropAllQuery(options: SchemaDropAllOptions): Runner {
+        return SchemaDropAllRunner(options)
     }
 
     override fun scriptExecuteQuery(
         sql: String,
         options: ScriptExecuteOptions
-    ): QueryRunner {
-        return ScriptExecuteQueryRunner(sql, options)
+    ): Runner {
+        return ScriptExecuteRunner(sql, options)
     }
 
     override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>, R>
@@ -205,8 +205,8 @@ internal object DefaultQueryVisitor : QueryVisitor<QueryRunner> {
         context: SqlSelectContext<ENTITY, ID, META>,
         options: SqlSelectOptions,
         collect: suspend (Flow<ENTITY>) -> R
-    ): QueryRunner {
-        return SqlSelectQueryRunner(context, options)
+    ): Runner {
+        return SqlSelectRunner(context, options)
     }
 
     override fun <T : Any, R> sqlSetOperationQuery(
@@ -214,8 +214,8 @@ internal object DefaultQueryVisitor : QueryVisitor<QueryRunner> {
         options: SqlSetOperationOptions,
         metamodel: EntityMetamodel<T, *, *>,
         collect: suspend (Flow<T>) -> R
-    ): QueryRunner {
-        return SqlSetOperationQueryRunner(context, options)
+    ): Runner {
+        return SqlSetOperationRunner(context, options)
     }
 
     override fun <A : Any, A_META : EntityMetamodel<A, *, A_META>, B : Any, B_META : EntityMetamodel<B, *, B_META>, R>
@@ -224,8 +224,8 @@ internal object DefaultQueryVisitor : QueryVisitor<QueryRunner> {
         options: SqlSelectOptions,
         metamodels: Pair<A_META, B_META>,
         collect: suspend (Flow<Pair<A, B?>>) -> R
-    ): QueryRunner {
-        return SqlSelectQueryRunner(context, options)
+    ): Runner {
+        return SqlSelectRunner(context, options)
     }
 
     override fun <A : Any, A_META : EntityMetamodel<A, *, A_META>, B : Any, B_META : EntityMetamodel<B, *, B_META>, R>
@@ -234,8 +234,8 @@ internal object DefaultQueryVisitor : QueryVisitor<QueryRunner> {
         options: SqlSetOperationOptions,
         metamodels: Pair<A_META, B_META>,
         collect: suspend (Flow<Pair<A, B?>>) -> R
-    ): QueryRunner {
-        return SqlSetOperationQueryRunner(context, options)
+    ): Runner {
+        return SqlSetOperationRunner(context, options)
     }
 
     override fun <A : Any, A_META : EntityMetamodel<A, *, A_META>, B : Any, B_META : EntityMetamodel<B, *, B_META>, C : Any, C_META : EntityMetamodel<C, *, C_META>, R>
@@ -244,8 +244,8 @@ internal object DefaultQueryVisitor : QueryVisitor<QueryRunner> {
         options: SqlSelectOptions,
         metamodels: Triple<A_META, B_META, C_META>,
         collect: suspend (Flow<Triple<A, B?, C?>>) -> R
-    ): QueryRunner {
-        return SqlSelectQueryRunner(context, options)
+    ): Runner {
+        return SqlSelectRunner(context, options)
     }
 
     override fun <A : Any, A_META : EntityMetamodel<A, *, A_META>, B : Any, B_META : EntityMetamodel<B, *, B_META>, C : Any, C_META : EntityMetamodel<C, *, C_META>, R>
@@ -254,8 +254,8 @@ internal object DefaultQueryVisitor : QueryVisitor<QueryRunner> {
         options: SqlSetOperationOptions,
         metamodels: Triple<A_META, B_META, C_META>,
         collect: suspend (Flow<Triple<A, B?, C?>>) -> R
-    ): QueryRunner {
-        return SqlSetOperationQueryRunner(context, options)
+    ): Runner {
+        return SqlSetOperationRunner(context, options)
     }
 
     override fun <R> sqlMultipleEntitiesQuery(
@@ -263,8 +263,8 @@ internal object DefaultQueryVisitor : QueryVisitor<QueryRunner> {
         options: SqlSelectOptions,
         metamodels: List<EntityMetamodel<*, *, *>>,
         collect: suspend (Flow<Entities>) -> R
-    ): QueryRunner {
-        return SqlSelectQueryRunner(context, options)
+    ): Runner {
+        return SqlSelectRunner(context, options)
     }
 
     override fun <R> sqlMultipleEntitiesSetOperationQuery(
@@ -272,8 +272,8 @@ internal object DefaultQueryVisitor : QueryVisitor<QueryRunner> {
         options: SqlSetOperationOptions,
         metamodels: List<EntityMetamodel<*, *, *>>,
         collect: suspend (Flow<Entities>) -> R
-    ): QueryRunner {
-        return SqlSetOperationQueryRunner(context, options)
+    ): Runner {
+        return SqlSetOperationRunner(context, options)
     }
 
     override fun <A : Any, R> sqlSingleColumnQuery(
@@ -281,8 +281,8 @@ internal object DefaultQueryVisitor : QueryVisitor<QueryRunner> {
         options: SqlSelectOptions,
         expression: ColumnExpression<A, *>,
         collect: suspend (Flow<A?>) -> R
-    ): QueryRunner {
-        return SqlSelectQueryRunner(context, options)
+    ): Runner {
+        return SqlSelectRunner(context, options)
     }
 
     override fun <A : Any, R> sqlSingleColumnSetOperationQuery(
@@ -290,8 +290,8 @@ internal object DefaultQueryVisitor : QueryVisitor<QueryRunner> {
         options: SqlSetOperationOptions,
         expression: ColumnExpression<A, *>,
         collect: suspend (Flow<A?>) -> R
-    ): QueryRunner {
-        return SqlSetOperationQueryRunner(context, options)
+    ): Runner {
+        return SqlSetOperationRunner(context, options)
     }
 
     override fun <A : Any, B : Any, R> sqlPairColumnsQuery(
@@ -299,8 +299,8 @@ internal object DefaultQueryVisitor : QueryVisitor<QueryRunner> {
         options: SqlSelectOptions,
         expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
         collect: suspend (Flow<Pair<A?, B?>>) -> R
-    ): QueryRunner {
-        return SqlSelectQueryRunner(context, options)
+    ): Runner {
+        return SqlSelectRunner(context, options)
     }
 
     override fun <A : Any, B : Any, R> sqlPairColumnsSetOperationQuery(
@@ -308,8 +308,8 @@ internal object DefaultQueryVisitor : QueryVisitor<QueryRunner> {
         options: SqlSetOperationOptions,
         expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
         collect: suspend (Flow<Pair<A?, B?>>) -> R
-    ): QueryRunner {
-        return SqlSetOperationQueryRunner(context, options)
+    ): Runner {
+        return SqlSetOperationRunner(context, options)
     }
 
     override fun <A : Any, B : Any, C : Any, R> sqlTripleColumnsQuery(
@@ -317,8 +317,8 @@ internal object DefaultQueryVisitor : QueryVisitor<QueryRunner> {
         options: SqlSelectOptions,
         expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
         collect: suspend (Flow<Triple<A?, B?, C?>>) -> R
-    ): QueryRunner {
-        return SqlSelectQueryRunner(context, options)
+    ): Runner {
+        return SqlSelectRunner(context, options)
     }
 
     override fun <A : Any, B : Any, C : Any, R> sqlTripleColumnsSetOperationQuery(
@@ -326,8 +326,8 @@ internal object DefaultQueryVisitor : QueryVisitor<QueryRunner> {
         options: SqlSetOperationOptions,
         expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
         collect: suspend (Flow<Triple<A?, B?, C?>>) -> R
-    ): QueryRunner {
-        return SqlSetOperationQueryRunner(context, options)
+    ): Runner {
+        return SqlSetOperationRunner(context, options)
     }
 
     override fun <R> sqlMultipleColumnsQuery(
@@ -335,8 +335,8 @@ internal object DefaultQueryVisitor : QueryVisitor<QueryRunner> {
         options: SqlSelectOptions,
         expressions: List<ColumnExpression<*, *>>,
         collect: suspend (Flow<Columns>) -> R
-    ): QueryRunner {
-        return SqlSelectQueryRunner(context, options)
+    ): Runner {
+        return SqlSelectRunner(context, options)
     }
 
     override fun <R> sqlMultipleColumnsSetOperationQuery(
@@ -344,37 +344,37 @@ internal object DefaultQueryVisitor : QueryVisitor<QueryRunner> {
         options: SqlSetOperationOptions,
         expressions: List<ColumnExpression<*, *>>,
         collect: suspend (Flow<Columns>) -> R
-    ): QueryRunner {
-        return SqlSetOperationQueryRunner(context, options)
+    ): Runner {
+        return SqlSetOperationRunner(context, options)
     }
 
     override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> sqlDeleteQuery(
         context: SqlDeleteContext<ENTITY, ID, META>,
         options: SqlDeleteOptions
-    ): QueryRunner {
-        return SqlDeleteQueryRunner(context, options)
+    ): Runner {
+        return SqlDeleteRunner(context, options)
     }
 
     override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> sqlInsertQuery(
         context: SqlInsertContext<ENTITY, ID, META>,
         options: SqlInsertOptions
-    ): QueryRunner {
-        return SqlInsertQueryRunner(context, options)
+    ): Runner {
+        return SqlInsertRunner(context, options)
     }
 
     override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> sqlUpdateQuery(
         context: SqlUpdateContext<ENTITY, ID, META>,
         options: SqlUpdateOptions
-    ): QueryRunner {
-        return SqlUpdateQueryRunner(context, options)
+    ): Runner {
+        return SqlUpdateRunner(context, options)
     }
 
     override fun templateExecuteQuery(
         sql: String,
         data: Any,
         options: TemplateExecuteOptions
-    ): QueryRunner {
-        return TemplateExecuteQueryRunner(sql, data, options)
+    ): Runner {
+        return TemplateExecuteRunner(sql, data, options)
     }
 
     override fun <T, R> templateSelectQuery(
@@ -383,7 +383,7 @@ internal object DefaultQueryVisitor : QueryVisitor<QueryRunner> {
         transform: (Row) -> T,
         options: TemplateSelectOptions,
         collect: suspend (Flow<T>) -> R
-    ): QueryRunner {
-        return TemplateSelectQueryRunner(sql, data, options)
+    ): Runner {
+        return TemplateSelectRunner(sql, data, options)
     }
 }

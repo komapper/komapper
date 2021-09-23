@@ -3,7 +3,7 @@ package org.komapper.jdbc
 import org.komapper.core.ThreadSafe
 import org.komapper.core.dsl.query.Query
 import org.komapper.core.dsl.query.QueryScope
-import org.komapper.jdbc.dsl.runner.JdbcQueryRunner
+import org.komapper.jdbc.dsl.runner.JdbcRunner
 import org.komapper.jdbc.dsl.visitor.JdbcQueryVisitor
 import javax.sql.DataSource
 
@@ -53,7 +53,7 @@ interface JdbcDatabase {
     @Suppress("UNCHECKED_CAST")
     fun <T> runQuery(block: QueryScope.() -> Query<T>): T {
         val query = block(QueryScope)
-        val runner = query.accept(JdbcQueryVisitor) as JdbcQueryRunner<T>
+        val runner = query.accept(JdbcQueryVisitor) as JdbcRunner<T>
         return runner.run(config)
     }
 }
