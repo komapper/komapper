@@ -1,7 +1,7 @@
 dependencies {
     implementation(project(":integration-test-core"))
     implementation(project(":komapper-tx-jdbc"))
-    implementation("org.postgresql:postgresql:42.2.23")
+    implementation("org.postgresql:postgresql:42.2.24")
     runtimeOnly(project(":komapper-dialect-h2-jdbc"))
     runtimeOnly(project(":komapper-dialect-mariadb-jdbc"))
     runtimeOnly(project(":komapper-dialect-mysql-jdbc"))
