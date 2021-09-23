@@ -21,12 +21,12 @@ interface SqlSelectQuery<ENTITY : Any> : FlowSubquery<ENTITY> {
 
     fun <OTHER_ENTITY : Any, OTHER_META : EntityMetamodel<OTHER_ENTITY, *, OTHER_META>> innerJoin(
         metamodel: OTHER_META,
-        on: OnDeclaration<OTHER_ENTITY>
+        on: OnDeclaration
     ): SqlSelectQuery<ENTITY>
 
     fun <OTHER_ENTITY : Any, OTHER_META : EntityMetamodel<OTHER_ENTITY, *, OTHER_META>> leftJoin(
         metamodel: OTHER_META,
-        on: OnDeclaration<OTHER_ENTITY>
+        on: OnDeclaration
     ): SqlSelectQuery<ENTITY>
 
     fun where(declaration: WhereDeclaration): SqlSelectQuery<ENTITY>
@@ -115,7 +115,7 @@ internal data class SqlSelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<
 
     override fun <OTHER_ENTITY : Any, OTHER_META : EntityMetamodel<OTHER_ENTITY, *, OTHER_META>> innerJoin(
         metamodel: OTHER_META,
-        on: OnDeclaration<OTHER_ENTITY>
+        on: OnDeclaration
     ): SqlSelectQuery<ENTITY> {
         val newContext = support.innerJoin(metamodel, on)
         return copy(context = newContext)
@@ -123,7 +123,7 @@ internal data class SqlSelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<
 
     override fun <OTHER_ENTITY : Any, OTHER_META : EntityMetamodel<OTHER_ENTITY, *, OTHER_META>> leftJoin(
         metamodel: OTHER_META,
-        on: OnDeclaration<OTHER_ENTITY>
+        on: OnDeclaration
     ): SqlSelectQuery<ENTITY> {
         val newContext = support.leftJoin(metamodel, on)
         return copy(context = newContext)

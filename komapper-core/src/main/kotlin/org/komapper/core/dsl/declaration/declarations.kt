@@ -7,7 +7,7 @@ import org.komapper.core.dsl.scope.ValuesScope
 import org.komapper.core.dsl.scope.WhenScope
 import org.komapper.core.dsl.scope.WhereScope
 
-typealias OnDeclaration<ENTITY> = OnScope<ENTITY>.() -> Unit
+typealias OnDeclaration = OnScope.() -> Unit
 typealias WhereDeclaration = WhereScope.() -> Unit
 typealias HavingDeclaration = HavingScope.() -> Unit
 typealias ValuesDeclaration<ENTITY> = ValuesScope<ENTITY>.() -> Unit

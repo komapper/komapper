@@ -19,24 +19,24 @@ internal class SelectQuerySupport<ENTITY : Any, ID, META : EntityMetamodel<ENTIT
 
     fun <OTHER_ENTITY : Any, OTHER_META : EntityMetamodel<OTHER_ENTITY, *, OTHER_META>> innerJoin(
         entityMetamodel: OTHER_META,
-        declaration: OnDeclaration<OTHER_ENTITY>
+        declaration: OnDeclaration
     ): CONTEXT {
         return join(entityMetamodel, declaration, JoinKind.INNER)
     }
 
     fun <OTHER_ENTITY : Any, OTHER_META : EntityMetamodel<OTHER_ENTITY, *, OTHER_META>> leftJoin(
         metamodel: OTHER_META,
-        declaration: OnDeclaration<OTHER_ENTITY>
+        declaration: OnDeclaration
     ): CONTEXT {
         return join(metamodel, declaration, JoinKind.LEFT_OUTER)
     }
 
     private fun <OTHER_ENTITY : Any, OTHER_META : EntityMetamodel<OTHER_ENTITY, *, OTHER_META>> join(
         metamodel: OTHER_META,
-        declaration: OnDeclaration<OTHER_ENTITY>,
+        declaration: OnDeclaration,
         kind: JoinKind
     ): CONTEXT {
-        val scope = OnScope<OTHER_ENTITY>().apply(declaration)
+        val scope = OnScope().apply(declaration)
         if (scope.isNotEmpty()) {
             val join = Join(metamodel, kind, scope.toList())
             return context.addJoin(join)
