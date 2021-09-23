@@ -11,16 +11,16 @@ import org.komapper.r2dbc.R2dbcDatabaseConfig
 import org.komapper.r2dbc.R2dbcDialect
 import org.komapper.r2dbc.R2dbcExecutor
 
-internal class SqlSelectR2dbcFlowBuilder<T>(
+internal class SqlSelectFlowBuilder<T>(
     private val context: SqlSelectContext<*, *, *>,
     private val options: SqlSelectOptions,
     private val transform: (R2dbcDialect, Row) -> T,
 ) :
-    R2dbcFlowBuilder<T> {
+    FlowBuilder<T> {
 
     private val runner: SqlSelectRunner = SqlSelectRunner(context, options)
 
-    override fun run(config: R2dbcDatabaseConfig): Flow<T> {
+    override fun build(config: R2dbcDatabaseConfig): Flow<T> {
         if (!options.allowEmptyWhereClause && context.where.isEmpty()) {
             error("Empty where clause is not allowed.")
         }

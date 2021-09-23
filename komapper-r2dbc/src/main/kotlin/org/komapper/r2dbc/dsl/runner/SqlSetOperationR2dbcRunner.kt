@@ -16,14 +16,14 @@ internal class SqlSetOperationR2dbcRunner<T, R>(
     private val collect: suspend (Flow<T>) -> R
 ) : R2dbcRunner<R> {
 
-    private val runner: SqlSetOperationR2dbcFlowBuilder<T> = SqlSetOperationR2dbcFlowBuilder(context, options, transform)
+    private val flowBuilder: SqlSetOperationFlowBuilder<T> = SqlSetOperationFlowBuilder(context, options, transform)
 
     override suspend fun run(config: R2dbcDatabaseConfig): R {
-        val flow = runner.run(config)
+        val flow = flowBuilder.build(config)
         return collect(flow)
     }
 
     override fun dryRun(config: DatabaseConfig): Statement {
-        return runner.dryRun(config)
+        return flowBuilder.dryRun(config)
     }
 }

@@ -17,14 +17,14 @@ internal class SqlSelectR2dbcRunner<T, R>(
 ) :
     R2dbcRunner<R> {
 
-    private val runner: SqlSelectR2dbcFlowBuilder<T> = SqlSelectR2dbcFlowBuilder(context, options, transform)
+    private val flowBuilder: SqlSelectFlowBuilder<T> = SqlSelectFlowBuilder(context, options, transform)
 
     override suspend fun run(config: R2dbcDatabaseConfig): R {
-        val flow = runner.run(config)
+        val flow = flowBuilder.build(config)
         return collect(flow)
     }
 
     override fun dryRun(config: DatabaseConfig): Statement {
-        return runner.dryRun(config)
+        return flowBuilder.dryRun(config)
     }
 }

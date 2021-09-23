@@ -12,15 +12,15 @@ import org.komapper.r2dbc.R2dbcDatabaseConfig
 import org.komapper.r2dbc.R2dbcDialect
 import org.komapper.r2dbc.R2dbcExecutor
 
-internal class SqlSetOperationR2dbcFlowBuilder<T>(
+internal class SqlSetOperationFlowBuilder<T>(
     private val context: SqlSetOperationContext<T>,
     private val options: SqlSetOperationOptions,
     private val transform: (R2dbcDialect, Row) -> T
-) : R2dbcFlowBuilder<T> {
+) : FlowBuilder<T> {
 
     private val runner: SqlSetOperationRunner = SqlSetOperationRunner(context, options)
 
-    override fun run(config: R2dbcDatabaseConfig): Flow<T> {
+    override fun build(config: R2dbcDatabaseConfig): Flow<T> {
         if (!options.allowEmptyWhereClause) {
             checkWhereClauses(context.left)
             checkWhereClauses(context.right)
