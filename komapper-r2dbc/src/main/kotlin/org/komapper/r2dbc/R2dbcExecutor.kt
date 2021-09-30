@@ -132,7 +132,7 @@ internal class R2dbcExecutor(
         return this.toSqlWithArgs(config.dialect::formatValue)
     }
 
-    private fun <T, F : Flow<T>> io.r2dbc.spi.Closeable.use(block: (io.r2dbc.spi.Closeable) -> F): F {
+    private fun <T> io.r2dbc.spi.Closeable.use(block: (io.r2dbc.spi.Closeable) -> Flow<T>): Flow<T> {
         return runCatching(block)
             .onSuccess { flow ->
                 flow.onCompletion { close() }
