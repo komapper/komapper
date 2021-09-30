@@ -36,15 +36,15 @@ internal class R2dbcExecutor(
         @Suppress("NAME_SHADOWING")
         val statement = inspect(statement)
         return config.session.connection.toFlow().flatMapConcat { con ->
-            val r2dbcStmt = con.prepare(statement)
-            r2dbcStmt.setUp()
-            r2dbcStmt.bind(statement)
-            r2dbcStmt.execute().toFlow().flatMapConcat { result ->
-                result.map { row, _ ->
-                    transform(config.dialect, row)
-                }.toFlow()
-            }.onCompletion {
-                con.close()
+            con.use {
+                val r2dbcStmt = con.prepare(statement)
+                r2dbcStmt.setUp()
+                r2dbcStmt.bind(statement)
+                r2dbcStmt.execute().toFlow().flatMapConcat { result ->
+                    result.map { row, _ ->
+                        transform(config.dialect, row)
+                    }.toFlow()
+                }
             }
         }.onStart {
             log(statement)
@@ -56,18 +56,18 @@ internal class R2dbcExecutor(
         @Suppress("NAME_SHADOWING")
         val statement = inspect(statement)
         return config.session.connection.toFlow().flatMapConcat { con ->
-            val r2dbcStmt = con.prepare(statement)
-            r2dbcStmt.setUp()
-            r2dbcStmt.bind(statement)
-            r2dbcStmt.execute().toFlow().flatMapConcat { result ->
-                if (generatedColumn == null) {
-                    result.rowsUpdated.toFlow().map { count -> count to longArrayOf() }
-                } else {
-                    val generatedKeys = result.fetchGeneratedKeys().toList().toLongArray()
-                    flowOf(generatedKeys.size to generatedKeys)
+            con.use {
+                val r2dbcStmt = con.prepare(statement)
+                r2dbcStmt.setUp()
+                r2dbcStmt.bind(statement)
+                r2dbcStmt.execute().toFlow().flatMapConcat { result ->
+                    if (generatedColumn == null) {
+                        result.rowsUpdated.toFlow().map { count -> count to longArrayOf() }
+                    } else {
+                        val generatedKeys = result.fetchGeneratedKeys().toList().toLongArray()
+                        flowOf(generatedKeys.size to generatedKeys)
+                    }
                 }
-            }.onCompletion {
-                con.close()
             }
         }.onStart {
             log(statement)
@@ -81,17 +81,17 @@ internal class R2dbcExecutor(
         @Suppress("NAME_SHADOWING")
         val statement = inspect(statement)
         return config.session.connection.toFlow().flatMapConcat { con ->
-            val batch = con.createBatch()
-            for (each in statement.asSql().split(";")) {
-                val sql = each.trim()
-                if (sql.isNotEmpty()) {
-                    batch.add(sql)
+            con.use {
+                val batch = con.createBatch()
+                for (each in statement.asSql().split(";")) {
+                    val sql = each.trim()
+                    if (sql.isNotEmpty()) {
+                        batch.add(sql)
+                    }
                 }
-            }
-            batch.execute().toFlow().flatMapConcat { result ->
-                result.rowsUpdated.toFlow()
-            }.onCompletion {
-                con.close()
+                batch.execute().toFlow().flatMapConcat { result ->
+                    result.rowsUpdated.toFlow()
+                }
             }
         }.onStart {
             log(statement)
@@ -130,6 +130,15 @@ internal class R2dbcExecutor(
 
     private fun Statement.asSqlWithArgs(): String {
         return this.toSqlWithArgs(config.dialect::formatValue)
+    }
+
+    private fun <T> io.r2dbc.spi.Closeable.use(block: (io.r2dbc.spi.Closeable) -> Flow<T>): Flow<T> {
+        return runCatching(block)
+            .onSuccess { flow ->
+                flow.onCompletion { close() }
+            }.onFailure {
+                close()
+            }.getOrThrow()
     }
 
     private fun io.r2dbc.spi.Connection.prepare(statement: Statement): io.r2dbc.spi.Statement {
