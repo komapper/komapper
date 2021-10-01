@@ -1,5 +1,6 @@
 package org.komapper.jdbc
 
+import org.komapper.core.spi.findByPriority
 import org.komapper.jdbc.spi.JdbcDialectFactory
 import java.util.ServiceLoader
 import java.util.regex.Pattern
@@ -10,7 +11,7 @@ object JdbcDialects {
     fun get(url: String, dataTypes: List<JdbcDataType<*>>): JdbcDialect {
         val driver = extractJdbcDriver(url)
         val loader = ServiceLoader.load(JdbcDialectFactory::class.java)
-        val factory = loader.firstOrNull { it.supports(driver) }
+        val factory = loader.filter { it.supports(driver) }.findByPriority()
             ?: error(
                 "The dialect is not found for the JDBC url. " +
                     "Try to add the 'komapper-dialect-$driver-jdbc' dependency. " +

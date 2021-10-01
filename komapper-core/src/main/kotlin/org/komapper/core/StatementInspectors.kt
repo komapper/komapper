@@ -6,14 +6,19 @@ import java.util.ServiceLoader
 object StatementInspectors {
     fun get(): StatementInspector {
         val loader = ServiceLoader.load(StatementInspectorFactory::class.java)
-        return loader.map { it.create() }.reduceOrNull(::decorate) ?: DefaultStatementInspector
+        return compose(loader)
     }
 
-    internal fun decorate(acc: StatementInspector, inspector: StatementInspector): StatementInspector {
-        return StatementInspector { statement ->
-            acc.inspect(statement).let {
-                inspector.inspect(it)
-            }
-        }
+    internal fun compose(factories: Iterable<StatementInspectorFactory>): StatementInspector {
+        return factories
+            .sortedByDescending { it.priority }
+            .map { it.create() }
+            .reduceOrNull { acc, inspector ->
+                StatementInspector { statement ->
+                    acc.inspect(statement).let {
+                        inspector.inspect(it)
+                    }
+                }
+            } ?: DefaultStatementInspector
     }
 }

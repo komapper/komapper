@@ -1,5 +1,6 @@
 package org.komapper.r2dbc
 
+import org.komapper.core.spi.findByPriority
 import org.komapper.r2dbc.spi.R2dbcDialectFactory
 import java.util.ServiceLoader
 import java.util.regex.Pattern
@@ -9,7 +10,7 @@ object R2dbcDialects {
 
     fun get(driver: String): R2dbcDialect {
         val loader = ServiceLoader.load(R2dbcDialectFactory::class.java)
-        val factory = loader.firstOrNull { it.supports(driver) }
+        val factory = loader.filter { it.supports(driver) }.findByPriority()
             ?: error(
                 "The dialect is not found. " +
                     "Try to add the 'komapper-dialect-$driver-r2dbc' dependency. " +

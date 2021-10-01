@@ -4,6 +4,6 @@ import org.komapper.core.Logger
 import org.komapper.core.ThreadSafe
 
 @ThreadSafe
-interface LoggerFactory {
+interface LoggerFactory : Prioritized {
     fun create(): Logger
 }
