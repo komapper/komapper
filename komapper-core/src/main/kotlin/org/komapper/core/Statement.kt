@@ -42,4 +42,8 @@ data class Statement(val parts: List<StatementPart>) {
         val parts = this.parts + StatementPart.Text(separator) + other.parts
         return Statement(parts)
     }
+
+    infix operator fun plus(text: CharSequence): Statement {
+        return copy(parts = parts + StatementPart.Text(text))
+    }
 }
