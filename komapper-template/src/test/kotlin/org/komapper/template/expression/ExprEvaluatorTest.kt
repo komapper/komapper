@@ -1,11 +1,11 @@
 package org.komapper.template.expression
 
-import org.junit.jupiter.api.Assertions.assertArrayEquals
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import org.komapper.core.Value
+import kotlin.test.Test
+import kotlin.test.assertContentEquals
+import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 
 class ExprEvaluatorTest {
 
@@ -201,7 +201,7 @@ class ExprEvaluatorTest {
         @Test
         fun `Cannot compare because the left operand is null`() {
             val ctx = ExprContext(mapOf("a" to Value(null, Any::class)))
-            val exception = assertThrows<ExprException> {
+            val exception = assertFailsWith<ExprException> {
                 evaluator
                     .eval("a > 1", ctx)
             }
@@ -213,7 +213,7 @@ class ExprEvaluatorTest {
             val ctx = ExprContext(
                 mapOf("a" to Value(null, Any::class))
             )
-            val exception = assertThrows<ExprException> {
+            val exception = assertFailsWith<ExprException> {
                 evaluator
                     .eval("1 > a", ctx)
             }
@@ -223,7 +223,7 @@ class ExprEvaluatorTest {
         @Test
         fun `Cannot compare because the operands are not comparable to each other`() {
             val ctx = ExprContext(mapOf("a" to Value("string")))
-            val exception = assertThrows<ExprException> {
+            val exception = assertFailsWith<ExprException> {
                 evaluator
                     .eval("a > 1", ctx)
             }
@@ -278,7 +278,7 @@ class ExprEvaluatorTest {
         @Test
         fun `Cannot perform the logical operator because the left operand is null`() {
             val ctx = ExprContext(mapOf("a" to Value(null, Any::class)))
-            val exception = assertThrows<ExprException> {
+            val exception = assertFailsWith<ExprException> {
                 evaluator
                     .eval("a && true", ctx)
             }
@@ -288,7 +288,7 @@ class ExprEvaluatorTest {
         @Test
         fun `Cannot perform the logical operator because the right operand is null`() {
             val ctx = ExprContext(mapOf("a" to Value(null, Any::class)))
-            val exception = assertThrows<ExprException> {
+            val exception = assertFailsWith<ExprException> {
                 evaluator
                     .eval("true && a", ctx)
             }
@@ -298,7 +298,7 @@ class ExprEvaluatorTest {
         @Test
         fun `Cannot perform the logical operator because either operand is not boolean`() {
             val ctx = ExprContext(mapOf("a" to Value("string")))
-            val exception = assertThrows<ExprException> {
+            val exception = assertFailsWith<ExprException> {
                 evaluator
                     .eval("true && a", ctx)
             }
@@ -308,7 +308,7 @@ class ExprEvaluatorTest {
         @Test
         fun `Cannot perform the logical operator because the operand is null`() {
             val ctx = ExprContext(mapOf("a" to Value(null, Any::class)))
-            val exception = assertThrows<ExprException> {
+            val exception = assertFailsWith<ExprException> {
                 evaluator
                     .eval("!a", ctx)
             }
@@ -318,7 +318,7 @@ class ExprEvaluatorTest {
         @Test
         fun `Cannot perform the logical operator because the operand is not Boolean`() {
             val ctx = ExprContext(mapOf("a" to Value("string")))
-            val exception = assertThrows<ExprException> {
+            val exception = assertFailsWith<ExprException> {
                 evaluator
                     .eval("!a", ctx)
             }
@@ -396,7 +396,7 @@ class ExprEvaluatorTest {
         fun enum_function() {
             val ctx = ExprContext(emptyMap())
             val (obj) = evaluator.eval("@${Direction::class.java.name}@.values()", ctx)
-            assertArrayEquals(Direction.values(), obj as Array<Direction>)
+            assertContentEquals(Direction.values(), obj as Array<Direction>)
         }
     }
 
@@ -466,7 +466,7 @@ class ExprEvaluatorTest {
             val ctx = ExprContext(
                 mapOf("a" to Value(null, String::class))
             )
-            val exception = assertThrows<ExprException> {
+            val exception = assertFailsWith<ExprException> {
                 evaluator.eval("a.length", ctx)
             }
             println(exception)
@@ -477,7 +477,7 @@ class ExprEvaluatorTest {
             val ctx = ExprContext(
                 mapOf("a" to Value("string"))
             )
-            val exception = assertThrows<ExprException> {
+            val exception = assertFailsWith<ExprException> {
                 evaluator.eval("a.notFound", ctx)
             }
             println(exception)
@@ -549,7 +549,7 @@ class ExprEvaluatorTest {
             val ctx = ExprContext(
                 mapOf("a" to Value(null, String::class))
             )
-            val exception = assertThrows<ExprException> {
+            val exception = assertFailsWith<ExprException> {
                 evaluator
                     .eval("a.subSequence(0, 1)", ctx)
             }
@@ -561,7 +561,7 @@ class ExprEvaluatorTest {
             val ctx = ExprContext(
                 mapOf("a" to Value("string"))
             )
-            val exception = assertThrows<ExprException> {
+            val exception = assertFailsWith<ExprException> {
                 evaluator
                     .eval("a.notFound()", ctx)
             }

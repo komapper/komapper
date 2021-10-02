@@ -5,12 +5,12 @@ import integration.Department
 import integration.Employee
 import integration.meta
 import integration.newMeta
-import org.junit.jupiter.api.Assertions
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.EntityDsl
 import org.komapper.r2dbc.R2dbcDatabase
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 @ExtendWith(Env::class)
 class EntitySelectQueryJoinTest(private val db: R2dbcDatabase) {
@@ -65,7 +65,7 @@ class EntitySelectQueryJoinTest(private val db: R2dbcDatabase) {
             }
         }
         assertEquals(14, list.size)
-        Assertions.assertTrue(list.all { it.department != null })
+        assertTrue(list.all { it.department != null })
     }
 
     @Test
@@ -101,6 +101,6 @@ class EntitySelectQueryJoinTest(private val db: R2dbcDatabase) {
             }
         }
         assertEquals(14, list.size)
-        Assertions.assertTrue(list.all { it.address != null })
+        assertTrue(list.all { it.address != null })
     }
 }

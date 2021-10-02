@@ -6,12 +6,12 @@ import integration.Employee
 import integration.meta
 import integration.newMeta
 import kotlinx.coroutines.flow.toList
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.SqlDsl
 import org.komapper.core.dsl.TemplateDsl
 import org.komapper.r2dbc.R2dbcDatabase
+import kotlin.test.Test
+import kotlin.test.assertEquals
 
 @ExtendWith(Env::class)
 class FlowQueryTest(val db: R2dbcDatabase) {

@@ -1,9 +1,9 @@
 package org.komapper.sqlcommenter
 
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Test
 import org.komapper.core.Statement
 import org.komapper.core.StatementPart
+import kotlin.test.Test
+import kotlin.test.assertEquals
 
 internal class SqlCommenterTest {
 

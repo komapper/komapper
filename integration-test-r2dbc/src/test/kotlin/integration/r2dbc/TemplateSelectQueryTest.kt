@@ -1,12 +1,12 @@
 package integration.r2dbc
 
 import integration.Address
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.TemplateDsl
 import org.komapper.core.dsl.query.Row
 import org.komapper.r2dbc.R2dbcDatabase
+import kotlin.test.Test
+import kotlin.test.assertEquals
 
 @ExtendWith(Env::class)
 class TemplateSelectQueryTest(private val db: R2dbcDatabase) {

@@ -1,15 +1,15 @@
 package org.komapper.tx.jdbc
 
-import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertFalse
-import org.junit.jupiter.api.Assertions.assertNotNull
-import org.junit.jupiter.api.Assertions.assertNull
-import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
 import org.komapper.core.StdOutLogger
 import org.komapper.jdbc.SimpleDataSource
+import kotlin.test.AfterTest
+import kotlin.test.BeforeTest
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 internal class TransactionScopeImplTest {
 
@@ -53,7 +53,7 @@ internal class TransactionScopeImplTest {
     private val txScope = TransactionScopeImpl(txManager)
     private val repository = Repository(txManager)
 
-    @BeforeEach
+    @BeforeTest
     fun before() {
         val sql = """
             CREATE TABLE ADDRESS(ADDRESS_ID INTEGER NOT NULL PRIMARY KEY, STREET VARCHAR(20) UNIQUE, VERSION INTEGER);
@@ -81,7 +81,7 @@ internal class TransactionScopeImplTest {
         }
     }
 
-    @AfterEach
+    @AfterTest
     fun after() {
         val sql = "DROP ALL OBJECTS"
         dataSource.connection.use { con ->

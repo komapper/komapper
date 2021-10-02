@@ -2,14 +2,14 @@ package integration.jdbc
 
 import integration.Address
 import integration.meta
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.OptimisticLockException
 import org.komapper.core.dsl.EntityDsl
 import org.komapper.jdbc.JdbcDatabase
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
+import kotlin.test.assertTrue
 
 @ExtendWith(Env::class)
 class EntityDeleteBatchQueryTest(private val db: JdbcDatabase) {
@@ -44,7 +44,7 @@ class EntityDeleteBatchQueryTest(private val db: JdbcDatabase) {
         }
         val query = EntityDsl.from(a).where { a.addressId inList listOf(16, 17, 18) }
         assertEquals(3, db.runQuery { query }.size)
-        val ex = assertThrows<OptimisticLockException> {
+        val ex = assertFailsWith<OptimisticLockException> {
             db.runQuery {
                 EntityDsl.delete(a).batch(
                     listOf(

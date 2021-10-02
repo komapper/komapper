@@ -1,8 +1,8 @@
 package org.komapper.core
 
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 
 internal class StatementBufferTest {
 
@@ -56,7 +56,8 @@ internal class StatementBufferTest {
         buffer.append("abc")
         buffer.append("def")
         buffer.cutBack(2)
-        assertEquals(listOf(StatementPart.Text("abc"), StatementPart.Text("d")), buffer.parts)
+        val expected: List<StatementPart> = listOf(StatementPart.Text("abc"), StatementPart.Text("d"))
+        assertEquals(expected, buffer.parts)
     }
 
     @Test
@@ -64,7 +65,7 @@ internal class StatementBufferTest {
         val buffer = StatementBuffer()
         buffer.append("abc")
         buffer.append("def")
-        assertThrows<IllegalStateException> {
+        assertFailsWith<IllegalStateException> {
             buffer.cutBack(4)
         }
     }
@@ -74,7 +75,7 @@ internal class StatementBufferTest {
         val buffer = StatementBuffer()
         buffer.append("abc")
         buffer.bind(Value(1))
-        assertThrows<IllegalStateException> {
+        assertFailsWith<IllegalStateException> {
             buffer.cutBack(1)
         }
     }

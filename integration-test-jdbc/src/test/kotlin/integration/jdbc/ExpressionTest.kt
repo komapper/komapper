@@ -2,8 +2,6 @@ package integration.jdbc
 
 import integration.Address
 import integration.meta
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.SqlDsl
 import org.komapper.core.dsl.operator.concat
@@ -19,6 +17,8 @@ import org.komapper.core.dsl.operator.trim
 import org.komapper.core.dsl.operator.upper
 import org.komapper.core.dsl.query.dryRun
 import org.komapper.jdbc.JdbcDatabase
+import kotlin.test.Test
+import kotlin.test.assertEquals
 
 @ExtendWith(Env::class)
 class ExpressionTest(private val db: JdbcDatabase) {

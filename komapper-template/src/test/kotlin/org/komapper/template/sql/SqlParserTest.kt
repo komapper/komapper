@@ -1,9 +1,9 @@
 package org.komapper.template.sql
 
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
+import kotlin.test.assertTrue
 
 class SqlParserTest {
 
@@ -146,35 +146,35 @@ class SqlParserTest {
         @Test
         fun `The expression is not found in the bind value directive`() {
             val sql = "/* */"
-            val exception = assertThrows<SqlException> { SqlParser(sql).parse() }
+            val exception = assertFailsWith<SqlException> { SqlParser(sql).parse() }
             println(exception)
         }
 
         @Test
         fun `The expression is not found in the embedded value directive`() {
             val sql = "/*# */"
-            val exception = assertThrows<SqlException> { SqlParser(sql).parse() }
+            val exception = assertFailsWith<SqlException> { SqlParser(sql).parse() }
             println(exception)
         }
 
         @Test
         fun `The expression is not found in the literal value directive`() {
             val sql = "/*^ */"
-            val exception = assertThrows<SqlException> { SqlParser(sql).parse() }
+            val exception = assertFailsWith<SqlException> { SqlParser(sql).parse() }
             println(exception)
         }
 
         @Test
         fun `The test value must follow the bind value directive`() {
             val sql = "/* aaa */"
-            val exception = assertThrows<SqlException> { SqlParser(sql).parse() }
+            val exception = assertFailsWith<SqlException> { SqlParser(sql).parse() }
             println(exception)
         }
 
         @Test
         fun `The test value must follow the literal value directive`() {
             val sql = "/*^ aaa */"
-            val exception = assertThrows<SqlException> { SqlParser(sql).parse() }
+            val exception = assertFailsWith<SqlException> { SqlParser(sql).parse() }
             println(exception)
         }
     }
@@ -242,7 +242,7 @@ class SqlParserTest {
         @Test
         fun `The close paren is not found`() {
             val sql = "select date("
-            val exception = assertThrows<SqlException> { SqlParser(sql).parse() }
+            val exception = assertFailsWith<SqlException> { SqlParser(sql).parse() }
             println(exception)
         }
     }
@@ -294,56 +294,56 @@ class SqlParserTest {
         @Test
         fun `The corresponding end directive is not found`() {
             val sql = "/*%if aaa*/ a"
-            val exception = assertThrows<SqlException> { SqlParser(sql).parse() }
+            val exception = assertFailsWith<SqlException> { SqlParser(sql).parse() }
             println(exception)
         }
 
         @Test
         fun `While the elseif directive is used, the corresponding if directive is not found`() {
             val sql = "/*%elseif aaa*/ a"
-            val exception = assertThrows<SqlException> { SqlParser(sql).parse() }
+            val exception = assertFailsWith<SqlException> { SqlParser(sql).parse() }
             println(exception)
         }
 
         @Test
         fun `While the else directive is used, the corresponding if directive is not found`() {
             val sql = "/*%else*/ a"
-            val exception = assertThrows<SqlException> { SqlParser(sql).parse() }
+            val exception = assertFailsWith<SqlException> { SqlParser(sql).parse() }
             println(exception)
         }
 
         @Test
         fun `The corresponding if directive is not found`() {
             val sql = "/*%end*/ a"
-            val exception = assertThrows<SqlException> { SqlParser(sql).parse() }
+            val exception = assertFailsWith<SqlException> { SqlParser(sql).parse() }
             println(exception)
         }
 
         @Test
         fun `The expression is not found in the if directive`() {
             val sql = "/*%if */"
-            val exception = assertThrows<SqlException> { SqlParser(sql).parse() }
+            val exception = assertFailsWith<SqlException> { SqlParser(sql).parse() }
             println(exception)
         }
 
         @Test
         fun `The expression is not found in the elseif directive`() {
             val sql = "/*%elseif */"
-            val exception = assertThrows<SqlException> { SqlParser(sql).parse() }
+            val exception = assertFailsWith<SqlException> { SqlParser(sql).parse() }
             println(exception)
         }
 
         @Test
         fun `illegal elseif`() {
             val sql = "/*%if aaa*/ b /*%else*/ c /*%elseif ddd*/ e /*%end*/"
-            val exception = assertThrows<SqlException> { SqlParser(sql).parse() }
+            val exception = assertFailsWith<SqlException> { SqlParser(sql).parse() }
             println(exception)
         }
 
         @Test
         fun `illegal else`() {
             val sql = "/*%if aaa*/ b /*%else*/ c /*%else*/ d /*%end*/"
-            val exception = assertThrows<SqlException> { SqlParser(sql).parse() }
+            val exception = assertFailsWith<SqlException> { SqlParser(sql).parse() }
             println(exception)
         }
     }
@@ -367,42 +367,42 @@ class SqlParserTest {
         @Test
         fun `The corresponding end directive is not found`() {
             val sql = "/*%for a in aaa*/ b"
-            val exception = assertThrows<SqlException> { SqlParser(sql).parse() }
+            val exception = assertFailsWith<SqlException> { SqlParser(sql).parse() }
             println(exception)
         }
 
         @Test
         fun `The corresponding for directive is not found`() {
             val sql = "/*%end*/ a"
-            val exception = assertThrows<SqlException> { SqlParser(sql).parse() }
+            val exception = assertFailsWith<SqlException> { SqlParser(sql).parse() }
             println(exception)
         }
 
         @Test
         fun `The statement is not found`() {
             val sql = "/*%for */"
-            val exception = assertThrows<SqlException> { SqlParser(sql).parse() }
+            val exception = assertFailsWith<SqlException> { SqlParser(sql).parse() }
             println(exception)
         }
 
         @Test
         fun `The in keyword is not found`() {
             val sql = "/*%for aaa*/"
-            val exception = assertThrows<SqlException> { SqlParser(sql).parse() }
+            val exception = assertFailsWith<SqlException> { SqlParser(sql).parse() }
             println(exception)
         }
 
         @Test
         fun `The identifier is not found`() {
             val sql = "/*%for in aaa*/"
-            val exception = assertThrows<SqlException> { SqlParser(sql).parse() }
+            val exception = assertFailsWith<SqlException> { SqlParser(sql).parse() }
             println(exception)
         }
 
         @Test
         fun `The expression is not found`() {
             val sql = "/*%for a in*/"
-            val exception = assertThrows<SqlException> { SqlParser(sql).parse() }
+            val exception = assertFailsWith<SqlException> { SqlParser(sql).parse() }
             println(exception)
         }
     }

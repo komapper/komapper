@@ -1,9 +1,9 @@
 package org.komapper.template.expression
 
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
+import kotlin.test.assertTrue
 
 class ExprParserTest {
 
@@ -62,13 +62,13 @@ class ExprParserTest {
 
     @Test
     fun `The operand is not found`() {
-        val exception = assertThrows<ExprException> { ExprParser("aaa >").parse() }
+        val exception = assertFailsWith<ExprException> { ExprParser("aaa >").parse() }
         println(exception)
     }
 
     @Test
     fun `The illegal number literal is found`() {
-        val exception = assertThrows<ExprException> {
+        val exception = assertFailsWith<ExprException> {
             ExprParser("1 + 1a")
                 .parse()
         }
@@ -78,14 +78,14 @@ class ExprParserTest {
     @Test
     fun `The close paren is not found`() {
         val exception =
-            assertThrows<ExprException> { ExprParser("aaa(bbb").parse() }
+            assertFailsWith<ExprException> { ExprParser("aaa(bbb").parse() }
         println(exception)
     }
 
     @Test
     fun `The token is not supported`() {
         val exception =
-            assertThrows<ExprException> { ExprParser("aaa * bbb").parse() }
+            assertFailsWith<ExprException> { ExprParser("aaa * bbb").parse() }
         println(exception)
     }
 }

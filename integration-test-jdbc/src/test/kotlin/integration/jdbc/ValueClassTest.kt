@@ -10,10 +10,6 @@ import integration.Version
 import integration.meta
 import integration.setting.Dbms
 import integration.setting.Run
-import org.junit.jupiter.api.Assertions
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNotNull
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.EntityDsl
 import org.komapper.core.dsl.SqlDsl
@@ -24,6 +20,10 @@ import org.komapper.core.dsl.operator.count
 import org.komapper.core.dsl.operator.max
 import org.komapper.core.dsl.operator.plus
 import org.komapper.jdbc.JdbcDatabase
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertNotEquals
+import kotlin.test.assertNotNull
 
 @ExtendWith(Env::class)
 class ValueClassTest(val db: JdbcDatabase) {
@@ -109,7 +109,7 @@ class ValueClassTest(val db: JdbcDatabase) {
         }
         assertNotNull(person2.updatedAt)
         assertNotNull(person3.updatedAt)
-        Assertions.assertNotEquals(person2.updatedAt, person3.updatedAt)
+        assertNotEquals(person2.updatedAt, person3.updatedAt)
     }
 
     @Test

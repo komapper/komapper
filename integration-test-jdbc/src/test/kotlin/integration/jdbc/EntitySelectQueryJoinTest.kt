@@ -5,12 +5,12 @@ import integration.Department
 import integration.Employee
 import integration.meta
 import integration.newMeta
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.EntityDsl
 import org.komapper.jdbc.JdbcDatabase
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 @ExtendWith(Env::class)
 class EntitySelectQueryJoinTest(private val db: JdbcDatabase) {

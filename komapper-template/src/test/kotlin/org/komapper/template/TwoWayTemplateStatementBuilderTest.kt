@@ -1,10 +1,6 @@
 package org.komapper.template
 
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import org.komapper.core.Value
 import org.komapper.template.expression.DefaultExprEnvironment
 import org.komapper.template.expression.DefaultExprEvaluator
@@ -12,6 +8,10 @@ import org.komapper.template.expression.ExprContext
 import org.komapper.template.expression.NoCacheExprNodeFactory
 import org.komapper.template.sql.NoCacheSqlNodeFactory
 import org.komapper.template.sql.SqlException
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
+import kotlin.test.assertTrue
 
 class TwoWayTemplateStatementBuilderTest {
 
@@ -43,7 +43,7 @@ class TwoWayTemplateStatementBuilderTest {
     fun `The expression evaluation was failed`() {
         val template =
             "select name, age from person where name = /*name.a*/'test'"
-        val exception = assertThrows<SqlException> { statementBuilder.build(template) }
+        val exception = assertFailsWith<SqlException> { statementBuilder.build(template) }
         println(exception)
     }
 

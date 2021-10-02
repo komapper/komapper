@@ -8,13 +8,13 @@ import integration.SchemaOnly
 import integration.meta
 import integration.setting.Dbms
 import integration.setting.Run
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.EntityDsl
 import org.komapper.core.dsl.query.dryRun
 import org.komapper.jdbc.JdbcDatabase
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 @ExtendWith(Env::class)
 class QuoteTest(val db: JdbcDatabase) {

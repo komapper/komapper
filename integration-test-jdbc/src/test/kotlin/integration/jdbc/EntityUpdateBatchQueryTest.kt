@@ -4,16 +4,16 @@ import integration.Address
 import integration.Department
 import integration.Person
 import integration.meta
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertFalse
-import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.OptimisticLockException
 import org.komapper.core.UniqueConstraintException
 import org.komapper.core.dsl.EntityDsl
 import org.komapper.jdbc.JdbcDatabase
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 @ExtendWith(Env::class)
 class EntityUpdateBatchQueryTest(private val db: JdbcDatabase) {
@@ -61,7 +61,7 @@ class EntityUpdateBatchQueryTest(private val db: JdbcDatabase) {
     @Test
     fun uniqueConstraintException() {
         val a = Address.meta
-        assertThrows<UniqueConstraintException> {
+        assertFailsWith<UniqueConstraintException> {
             db.runQuery {
                 EntityDsl.update(a).batch(
                     listOf(
@@ -77,7 +77,7 @@ class EntityUpdateBatchQueryTest(private val db: JdbcDatabase) {
     @Test
     fun optimisticLockException() {
         val a = Address.meta
-        val ex = assertThrows<OptimisticLockException> {
+        val ex = assertFailsWith<OptimisticLockException> {
             db.runQuery {
                 EntityDsl.update(a).batch(
                     listOf(

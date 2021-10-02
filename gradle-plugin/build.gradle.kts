@@ -44,7 +44,7 @@ java {
 configurations.all {
     resolutionStrategy.eachDependency {
         if (requested.group == "org.jetbrains.kotlin") {
-            useVersion("1.4.31")
+            useVersion("1.5.21")
         }
     }
 }

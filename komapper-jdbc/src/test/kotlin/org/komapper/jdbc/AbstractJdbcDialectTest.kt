@@ -1,13 +1,13 @@
 package org.komapper.jdbc
 
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Test
 import org.komapper.core.dsl.builder.EntityUpsertStatementBuilder
 import org.komapper.core.dsl.builder.SchemaStatementBuilder
 import org.komapper.core.dsl.context.EntityUpsertContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import java.sql.SQLException
 import kotlin.reflect.KClass
+import kotlin.test.Test
+import kotlin.test.assertEquals
 
 internal class AbstractJdbcDialectTest {
 
