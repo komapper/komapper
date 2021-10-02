@@ -5,7 +5,7 @@ import org.komapper.core.dsl.element.Criterion
 import org.komapper.core.dsl.element.Operand
 import org.komapper.core.dsl.scope.WhenScope
 
-class CaseExpression<T : Any, S : Any>(
+internal class CaseExpression<T : Any, S : Any>(
     private val firstWhen: When<T, S>,
     remainingWhen: List<When<T, S>>,
     val otherwise: ColumnExpression<T, S>?

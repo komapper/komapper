@@ -4,7 +4,7 @@ import org.komapper.core.dsl.context.SqlSetOperationContext
 import org.komapper.core.dsl.context.SqlSetOperationKind
 import org.komapper.core.dsl.context.SubqueryContext
 import org.komapper.core.dsl.element.SortItem
-import org.komapper.core.dsl.expression.ColumnExpression
+import org.komapper.core.dsl.expression.SortExpression
 
 internal data class SqlSetOperationQuerySupport<T : Any?>(
     private val context: SqlSetOperationContext<T>
@@ -43,10 +43,8 @@ internal data class SqlSetOperationQuerySupport<T : Any?>(
         return orderBy(items)
     }
 
-    fun orderBy(vararg expressions: ColumnExpression<*, *>): SqlSetOperationContext<T> {
-        val items = expressions.map {
-            if (it is SortItem) it else SortItem.Property.Asc(it)
-        }
+    fun orderBy(vararg expressions: SortExpression): SqlSetOperationContext<T> {
+        val items = expressions.map(SortItem.Column::of)
         return orderBy(items)
     }
 

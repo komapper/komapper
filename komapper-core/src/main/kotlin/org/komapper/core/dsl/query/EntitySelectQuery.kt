@@ -9,7 +9,7 @@ import org.komapper.core.dsl.context.SubqueryContext
 import org.komapper.core.dsl.declaration.OnDeclaration
 import org.komapper.core.dsl.declaration.WhereDeclaration
 import org.komapper.core.dsl.element.Associator
-import org.komapper.core.dsl.expression.ColumnExpression
+import org.komapper.core.dsl.expression.SortExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.EntitySelectOptions
 import org.komapper.core.dsl.visitor.QueryVisitor
@@ -19,7 +19,7 @@ interface EntitySelectQuery<ENTITY : Any> : Subquery<ENTITY> {
     fun innerJoin(metamodel: EntityMetamodel<*, *, *>, on: OnDeclaration): EntitySelectQuery<ENTITY>
     fun leftJoin(metamodel: EntityMetamodel<*, *, *>, on: OnDeclaration): EntitySelectQuery<ENTITY>
     fun where(declaration: WhereDeclaration): EntitySelectQuery<ENTITY>
-    fun orderBy(vararg expressions: ColumnExpression<*, *>): EntitySelectQuery<ENTITY>
+    fun orderBy(vararg expressions: SortExpression): EntitySelectQuery<ENTITY>
     fun offset(offset: Int): EntitySelectQuery<ENTITY>
     fun limit(limit: Int): EntitySelectQuery<ENTITY>
     fun forUpdate(): EntitySelectQuery<ENTITY>
@@ -65,7 +65,7 @@ internal data class EntitySelectQueryImpl<ENTITY : Any, ID, META : EntityMetamod
         return copy(context = newContext)
     }
 
-    override fun orderBy(vararg expressions: ColumnExpression<*, *>): EntitySelectQuery<ENTITY> {
+    override fun orderBy(vararg expressions: SortExpression): EntitySelectQuery<ENTITY> {
         val newContext = support.orderBy(*expressions)
         return copy(context = newContext)
     }

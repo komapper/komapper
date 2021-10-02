@@ -4,7 +4,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.toList
 import org.komapper.core.dsl.context.SqlSetOperationContext
 import org.komapper.core.dsl.context.SubqueryContext
-import org.komapper.core.dsl.expression.ColumnExpression
+import org.komapper.core.dsl.expression.SortExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.SqlSetOperationOptions
 import org.komapper.core.dsl.visitor.FlowQueryVisitor
@@ -56,7 +56,7 @@ internal data class SqlSetOperationQueryImpl<ENTITY : Any>(
         return copy(context = support.orderBy(*aliases))
     }
 
-    override fun orderBy(vararg expressions: ColumnExpression<*, *>): SqlSetOperationQuery<ENTITY> {
+    override fun orderBy(vararg expressions: SortExpression): SqlSetOperationQuery<ENTITY> {
         return copy(context = support.orderBy(*expressions))
     }
 

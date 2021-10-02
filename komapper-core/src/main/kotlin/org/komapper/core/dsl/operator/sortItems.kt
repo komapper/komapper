@@ -2,19 +2,14 @@ package org.komapper.core.dsl.operator
 
 import org.komapper.core.dsl.element.SortItem
 import org.komapper.core.dsl.expression.ColumnExpression
+import org.komapper.core.dsl.expression.SortExpression
 
-fun <T : Any, S : Any> ColumnExpression<T, S>.asc(): ColumnExpression<T, S> {
-    if (this is SortItem.Property.Asc) {
-        return this
-    }
-    return SortItem.Property.Asc(this)
+fun <T : Any, S : Any> ColumnExpression<T, S>.asc(): SortExpression {
+    return SortItem.Column.Asc(this)
 }
 
-fun <T : Any, S : Any> ColumnExpression<T, S>.desc(): ColumnExpression<T, S> {
-    if (this is SortItem.Property.Desc) {
-        return this
-    }
-    return SortItem.Property.Desc(this)
+fun <T : Any, S : Any> ColumnExpression<T, S>.desc(): SortExpression {
+    return SortItem.Column.Desc(this)
 }
 
 fun asc(alias: CharSequence): CharSequence {

@@ -2,19 +2,25 @@ package org.komapper.core.dsl.element
 
 import org.komapper.core.ThreadSafe
 import org.komapper.core.dsl.expression.ColumnExpression
+import org.komapper.core.dsl.expression.SortExpression
+import org.komapper.core.dsl.expression.SortedColumnExpression
 
 @ThreadSafe
 sealed class SortItem {
-    sealed class Property<T : Any, S : Any> : ColumnExpression<T, S>, SortItem() {
-        abstract val expression: ColumnExpression<T, S>
+    sealed class Column : SortedColumnExpression, SortItem() {
+        companion object {
+            fun of(expression: SortExpression): Column {
+                return when (expression) {
+                    is SortedColumnExpression -> expression.asColumn()
+                    is ColumnExpression<*, *> -> Asc(expression)
+                }
+            }
+        }
 
-        data class Asc<T : Any, S : Any>(override val expression: ColumnExpression<T, S>) :
-            Property<T, S>(),
-            ColumnExpression<T, S> by expression
+        override fun asColumn(): Column = this
 
-        data class Desc<T : Any, S : Any>(override val expression: ColumnExpression<T, S>) :
-            Property<T, S>(),
-            ColumnExpression<T, S> by expression
+        data class Asc(val expression: ColumnExpression<*, *>) : Column()
+        data class Desc(val expression: ColumnExpression<*, *>) : Column()
     }
 
     sealed class Alias : CharSequence, SortItem() {
