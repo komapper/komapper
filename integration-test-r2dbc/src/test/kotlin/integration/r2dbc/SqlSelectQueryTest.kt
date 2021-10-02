@@ -3,8 +3,6 @@ package integration.r2dbc
 import integration.Address
 import integration.Employee
 import integration.meta
-import org.junit.jupiter.api.Assertions
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.SqlDsl
 import org.komapper.core.dsl.expression.When
@@ -12,6 +10,10 @@ import org.komapper.core.dsl.operator.case
 import org.komapper.core.dsl.operator.concat
 import org.komapper.core.dsl.operator.literal
 import org.komapper.r2dbc.R2dbcDatabase
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 
 @ExtendWith(Env::class)
 class SqlSelectQueryTest(private val db: R2dbcDatabase) {
@@ -22,7 +24,7 @@ class SqlSelectQueryTest(private val db: R2dbcDatabase) {
         val list: List<Address> = db.runQuery {
             SqlDsl.from(a)
         }.toList()
-        Assertions.assertEquals(15, list.size)
+        assertEquals(15, list.size)
     }
 
     @Test
@@ -31,7 +33,7 @@ class SqlSelectQueryTest(private val db: R2dbcDatabase) {
         val address: Address = db.runQuery {
             SqlDsl.from(a).where { a.addressId eq 1 }.first()
         }
-        Assertions.assertNotNull(address)
+        assertNotNull(address)
     }
 
     @Test
@@ -40,7 +42,7 @@ class SqlSelectQueryTest(private val db: R2dbcDatabase) {
         val address: Address? = db.runQuery {
             SqlDsl.from(a).where { a.addressId eq 99 }.firstOrNull()
         }
-        Assertions.assertNull(address)
+        assertNull(address)
     }
 
     @Test
@@ -67,14 +69,14 @@ class SqlSelectQueryTest(private val db: R2dbcDatabase) {
     fun shortcut_first() = inTransaction(db) {
         val a = Address.meta
         val address = db.runQuery { SqlDsl.from(a).where { a.addressId eq 1 }.first() }
-        Assertions.assertNotNull(address)
+        assertNotNull(address)
     }
 
     @Test
     fun shortcut_firstOrNull() = inTransaction(db) {
         val a = Address.meta
         val address = db.runQuery { SqlDsl.from(a).where { a.addressId eq -1 }.firstOrNull() }
-        Assertions.assertNull(address)
+        assertNull(address)
     }
 
     @Test
@@ -83,7 +85,7 @@ class SqlSelectQueryTest(private val db: R2dbcDatabase) {
         val address = db.runQuery {
             SqlDsl.from(a).where { a.addressId eq 1; a.version eq 1 }.first()
         }
-        Assertions.assertNotNull(address)
+        assertNotNull(address)
     }
 
     @Test
@@ -100,7 +102,7 @@ class SqlSelectQueryTest(private val db: R2dbcDatabase) {
                 .orderBy(a.addressId)
                 .select(a.street, caseExpression)
         }.toList()
-        Assertions.assertEquals(
+        assertEquals(
             listOf("STREET 1" to "NO HIT", "STREET 2" to "HIT", "STREET 3" to "NO HIT"),
             list
         )
@@ -124,7 +126,7 @@ class SqlSelectQueryTest(private val db: R2dbcDatabase) {
                 .orderBy(a.addressId)
                 .select(a.street, caseExpression)
         }.toList()
-        Assertions.assertEquals(
+        assertEquals(
             listOf("STREET 1" to "NO HIT", "STREET 2" to "HIT", "STREET 3" to "STREET 3!!!"),
             list
         )
@@ -144,7 +146,7 @@ class SqlSelectQueryTest(private val db: R2dbcDatabase) {
                 .orderBy(a.addressId)
                 .select(a.street, caseExpression)
         }.toList()
-        Assertions.assertEquals(
+        assertEquals(
             listOf("STREET 1" to null, "STREET 2" to "HIT", "STREET 3" to null),
             list
         )

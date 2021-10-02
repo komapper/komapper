@@ -1,8 +1,8 @@
 package org.komapper.jdbc
 
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 
 class JdbcDialectsTest {
 
@@ -20,7 +20,7 @@ class JdbcDialectsTest {
 
     @Test
     fun extractJdbcDriver_error() {
-        assertThrows<IllegalStateException> {
+        assertFailsWith<IllegalStateException> {
             JdbcDialects.extractJdbcDriver("aaa:bbb")
         }
     }

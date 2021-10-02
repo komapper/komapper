@@ -5,12 +5,7 @@ import integration.Department
 import integration.NoVersionDepartment
 import integration.Person
 import integration.meta
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNotEquals
-import org.junit.jupiter.api.Assertions.assertNotNull
-import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.ClockProvider
 import org.komapper.core.OptimisticLockException
@@ -22,6 +17,12 @@ import java.time.Clock
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
+import kotlin.test.assertNotEquals
+import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 
 @ExtendWith(Env::class)
 class EntityUpdateQueryTest(private val db: R2dbcDatabase) {
@@ -91,8 +92,10 @@ class EntityUpdateQueryTest(private val db: R2dbcDatabase) {
     fun uniqueConstraintException() = inTransaction(db) {
         val a = Address.meta
         val address = Address(1, "STREET 2", 1)
-        assertThrows<UniqueConstraintException> {
-            db.runQuery { EntityDsl.update(a).single(address) }.let { }
+        assertFailsWith<UniqueConstraintException> {
+            runBlocking {
+                db.runQuery { EntityDsl.update(a).single(address) }.let { }
+            }
         }
     }
 
@@ -101,7 +104,7 @@ class EntityUpdateQueryTest(private val db: R2dbcDatabase) {
         val a = Address.meta
         val address = db.runQuery { EntityDsl.from(a).where { a.addressId eq 15 }.first() }
         db.runQuery { EntityDsl.update(a).single(address) }
-        assertThrows<OptimisticLockException> {
+        assertFailsWith<OptimisticLockException> {
             db.runQuery { EntityDsl.update(a).single(address) }.let {}
         }
     }
@@ -125,7 +128,7 @@ class EntityUpdateQueryTest(private val db: R2dbcDatabase) {
         val findQuery = EntityDsl.from(d).where { d.departmentId eq 1 }.first()
         val department = db.runQuery { findQuery }
         val department2 = department.copy(departmentName = "ABC", location = "DEF")
-        assertThrows<IllegalStateException> {
+        assertFailsWith<IllegalStateException> {
             db.runQuery { EntityDsl.update(d).include(d.departmentId).single(department2) }.let { }
         }
     }
@@ -149,7 +152,7 @@ class EntityUpdateQueryTest(private val db: R2dbcDatabase) {
         val findQuery = EntityDsl.from(d).where { d.departmentId eq 1 }.first()
         val department = db.runQuery { findQuery }
         val department2 = department.copy(departmentName = "ABC", location = "DEF")
-        assertThrows<IllegalStateException> {
+        assertFailsWith<IllegalStateException> {
             db.runQuery {
                 EntityDsl.update(d)
                     .exclude(d.departmentName, d.location, d.version, d.departmentNo)

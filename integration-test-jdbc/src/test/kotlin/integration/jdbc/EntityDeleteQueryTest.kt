@@ -2,13 +2,13 @@ package integration.jdbc
 
 import integration.Address
 import integration.meta
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.OptimisticLockException
 import org.komapper.core.dsl.EntityDsl
 import org.komapper.jdbc.JdbcDatabase
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 
 @ExtendWith(Env::class)
 class EntityDeleteQueryTest(private val db: JdbcDatabase) {
@@ -22,7 +22,7 @@ class EntityDeleteQueryTest(private val db: JdbcDatabase) {
             }.first()
         }
         db.runQuery { EntityDsl.delete(a).single(address) }
-        assertThrows<OptimisticLockException> {
+        assertFailsWith<OptimisticLockException> {
             db.runQuery { EntityDsl.delete(a).single(address) }
         }
     }

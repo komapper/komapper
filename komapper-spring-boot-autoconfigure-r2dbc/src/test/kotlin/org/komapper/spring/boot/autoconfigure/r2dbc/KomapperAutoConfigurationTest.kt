@@ -1,10 +1,5 @@
 package org.komapper.spring.boot.autoconfigure.r2dbc
 
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNotNull
-import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import org.komapper.core.ClockProvider
 import org.komapper.core.ExecutionOptions
 import org.komapper.core.Statement
@@ -20,6 +15,11 @@ import java.time.Clock
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
+import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 
 class KomapperAutoConfigurationTest {
 
@@ -39,7 +39,7 @@ class KomapperAutoConfigurationTest {
         val database = context.getBean(R2dbcDatabase::class.java)
         assertNotNull(database)
         assertTrue(database.config.dialect is H2R2dbcDialect)
-        assertThrows<IllegalStateException> {
+        assertFailsWith<IllegalStateException> {
             database.config.templateStatementBuilder
         }
     }

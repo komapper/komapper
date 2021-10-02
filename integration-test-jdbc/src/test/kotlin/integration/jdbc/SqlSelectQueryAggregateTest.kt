@@ -3,8 +3,6 @@ package integration.jdbc
 import integration.Address
 import integration.Employee
 import integration.meta
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.SqlDsl
 import org.komapper.core.dsl.operator.avg
@@ -13,6 +11,8 @@ import org.komapper.core.dsl.operator.max
 import org.komapper.core.dsl.operator.min
 import org.komapper.core.dsl.operator.sum
 import org.komapper.jdbc.JdbcDatabase
+import kotlin.test.Test
+import kotlin.test.assertEquals
 
 @ExtendWith(Env::class)
 class SqlSelectQueryAggregateTest(private val db: JdbcDatabase) {

@@ -5,15 +5,15 @@ import integration.Employee
 import integration.IdentityStrategy
 import integration.meta
 import integration.newMeta
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNotNull
-import org.junit.jupiter.api.Assertions.assertNull
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.SqlDsl
 import org.komapper.jdbc.JdbcDatabase
 import java.math.BigDecimal
 import java.time.LocalDate
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 
 @ExtendWith(Env::class)
 class SqlInsertQueryTest(private val db: JdbcDatabase) {

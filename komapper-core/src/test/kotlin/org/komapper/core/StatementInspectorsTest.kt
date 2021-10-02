@@ -1,9 +1,9 @@
 package org.komapper.core
 
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Test
 import org.komapper.core.spi.Prioritized
 import org.komapper.core.spi.StatementInspectorFactory
+import kotlin.test.Test
+import kotlin.test.assertEquals
 
 internal class StatementInspectorsTest {
 

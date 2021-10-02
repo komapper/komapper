@@ -1,10 +1,5 @@
 package org.komapper.template.sql
 
-import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import org.komapper.template.sql.SqlTokenType.AND
 import org.komapper.template.sql.SqlTokenType.BIND_VALUE_DIRECTIVE
 import org.komapper.template.sql.SqlTokenType.DELIMITER
@@ -33,18 +28,23 @@ import org.komapper.template.sql.SqlTokenType.SPACE
 import org.komapper.template.sql.SqlTokenType.UNION
 import org.komapper.template.sql.SqlTokenType.WHERE
 import org.komapper.template.sql.SqlTokenType.WORD
+import kotlin.test.AfterTest
+import kotlin.test.BeforeTest
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 
 class SqlTokenizerTest {
 
     private lateinit var lineSeparator: String
 
-    @BeforeEach
+    @BeforeTest
     fun setUp() {
         lineSeparator = System.getProperty("line.separator")
         System.setProperty("line.separator", "\r\n")
     }
 
-    @AfterEach
+    @AfterTest
     fun tearDown() {
         System.setProperty("line.separator", lineSeparator)
     }
@@ -149,7 +149,7 @@ class SqlTokenizerTest {
         assertEquals("where", tokenizer.token)
         assertEquals(SPACE, tokenizer.next())
         assertEquals(" ", tokenizer.token)
-        val exception = assertThrows<SqlException> {
+        val exception = assertFailsWith<SqlException> {
             tokenizer.next()
         }
         println(exception)
@@ -162,7 +162,7 @@ class SqlTokenizerTest {
         assertEquals("where", tokenizer.token)
         assertEquals(SPACE, tokenizer.next())
         assertEquals(" ", tokenizer.token)
-        val exception = assertThrows<SqlException> {
+        val exception = assertFailsWith<SqlException> {
             tokenizer.next()
         }
         println(exception)
@@ -556,7 +556,7 @@ class SqlTokenizerTest {
         assertEquals("where", tokenizer.token)
         assertEquals(SPACE, tokenizer.next())
         assertEquals(" ", tokenizer.token)
-        val exception = assertThrows<SqlException> {
+        val exception = assertFailsWith<SqlException> {
             tokenizer.next()
         }
         println(exception)

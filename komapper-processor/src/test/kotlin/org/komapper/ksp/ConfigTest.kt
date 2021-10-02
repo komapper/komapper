@@ -1,10 +1,10 @@
 package org.komapper.ksp
 
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import org.komapper.core.CamelToLowerSnakeCase
 import org.komapper.core.Implicit
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 
 class ConfigTest {
 
@@ -41,7 +41,7 @@ class ConfigTest {
     @Test
     fun namingStrategy_error() {
         val options = mapOf("komapper.namingStrategy" to "unknown")
-        val e = assertThrows<IllegalStateException> {
+        val e = assertFailsWith<IllegalStateException> {
             Config.create(options)
         }
         assertEquals("'unknown' is illegal value as a komapper.namingStrategy option.", e.message)

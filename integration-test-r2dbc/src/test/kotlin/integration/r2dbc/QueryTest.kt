@@ -3,13 +3,13 @@ package integration.r2dbc
 import integration.Address
 import integration.Employee
 import integration.meta
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.EntityDsl
 import org.komapper.core.dsl.SqlDsl
 import org.komapper.core.dsl.query.dryRun
 import org.komapper.r2dbc.R2dbcDatabase
+import kotlin.test.Test
+import kotlin.test.assertEquals
 
 @ExtendWith(Env::class)
 class QueryTest(private val db: R2dbcDatabase) {

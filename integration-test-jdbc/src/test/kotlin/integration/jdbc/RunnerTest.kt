@@ -2,10 +2,10 @@ package integration.jdbc
 
 import integration.Address
 import integration.meta
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.EntityDsl
 import org.komapper.jdbc.JdbcDatabase
+import kotlin.test.Test
 
 @ExtendWith(Env::class)
 class RunnerTest(val db: JdbcDatabase) {

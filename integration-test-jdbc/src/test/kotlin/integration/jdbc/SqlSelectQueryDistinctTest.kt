@@ -3,11 +3,11 @@ package integration.jdbc
 import integration.Department
 import integration.Employee
 import integration.meta
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.SqlDsl
 import org.komapper.jdbc.JdbcDatabase
+import kotlin.test.Test
+import kotlin.test.assertEquals
 
 @ExtendWith(Env::class)
 class SqlSelectQueryDistinctTest(private val db: JdbcDatabase) {

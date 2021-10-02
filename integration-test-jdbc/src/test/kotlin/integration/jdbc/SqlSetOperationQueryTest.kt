@@ -6,15 +6,15 @@ import integration.Employee
 import integration.meta
 import integration.setting.Dbms
 import integration.setting.Run
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.EntityDsl
 import org.komapper.core.dsl.SqlDsl
 import org.komapper.core.dsl.operator.alias
 import org.komapper.core.dsl.operator.desc
 import org.komapper.jdbc.JdbcDatabase
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 
 @ExtendWith(Env::class)
 class SqlSetOperationQueryTest(private val db: JdbcDatabase) {
@@ -122,7 +122,7 @@ class SqlSetOperationQueryTest(private val db: JdbcDatabase) {
         val q1 = SqlDsl.from(e).where { e.employeeId eq 1 }
         val q2 = SqlDsl.from(e)
         val query = (q1 union q2).options { it.copy(allowEmptyWhereClause = false) }
-        val ex = assertThrows<IllegalStateException> {
+        val ex = assertFailsWith<IllegalStateException> {
             db.runQuery { query }.let { }
         }
         assertEquals("Empty where clause is not allowed.", ex.message)

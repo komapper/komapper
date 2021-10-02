@@ -1,7 +1,5 @@
 package org.komapper.codegen
 
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 import org.komapper.jdbc.dsl.query.MetadataQuery
 import java.nio.file.Path
@@ -9,6 +7,8 @@ import java.nio.file.Paths
 import java.sql.Types
 import java.util.UUID
 import kotlin.io.path.readText
+import kotlin.test.Test
+import kotlin.test.assertEquals
 
 class CodeGeneratorTest {
     @TempDir

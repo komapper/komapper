@@ -5,13 +5,13 @@ import integration.IntTest
 import integration.LongTest
 import integration.StringTest
 import integration.meta
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.SqlDsl
 import org.komapper.core.dsl.operator.literal
 import org.komapper.jdbc.JdbcDatabase
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 
 @ExtendWith(Env::class)
 class LiteralTest(val db: JdbcDatabase) {
@@ -78,7 +78,7 @@ class LiteralTest(val db: JdbcDatabase) {
 
     @Test
     fun test_illegal_string() {
-        val ex = assertThrows<IllegalArgumentException> {
+        val ex = assertFailsWith<IllegalArgumentException> {
             literal("I don't like it.")
         }
         assertEquals("The value must not contain the single quotation.", ex.message)

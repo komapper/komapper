@@ -8,11 +8,15 @@ import kotlinx.coroutines.reactive.awaitFirstOrNull
 import kotlinx.coroutines.reactive.awaitLast
 import kotlinx.coroutines.reactive.awaitSingle
 import kotlinx.coroutines.runBlocking
-import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.Assertions
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
 import org.komapper.core.StdOutLogger
+import kotlin.test.AfterTest
+import kotlin.test.BeforeTest
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 internal class TransactionScopeImplTest {
 
@@ -54,7 +58,7 @@ internal class TransactionScopeImplTest {
     private val txScope = TransactionScopeImpl(txManager)
     private val repository = Repository(txManager)
 
-    @BeforeEach
+    @BeforeTest
     fun before() {
         val sql = """
             CREATE TABLE ADDRESS(ADDRESS_ID INTEGER NOT NULL PRIMARY KEY, STREET VARCHAR(20) UNIQUE, VERSION INTEGER);
@@ -86,7 +90,7 @@ internal class TransactionScopeImplTest {
         }
     }
 
-    @AfterEach
+    @AfterTest
     fun after() {
         val sql = "DROP ALL OBJECTS"
         runBlocking {
@@ -103,8 +107,8 @@ internal class TransactionScopeImplTest {
         val list = txScope.transaction {
             repository.selectAll()
         }
-        Assertions.assertEquals(15, list.size)
-        Assertions.assertEquals(Address(1, "STREET 1", 1), list[0])
+        assertEquals(15, list.size)
+        assertEquals(Address(1, "STREET 1", 1), list[0])
     }
 
     @Test
@@ -114,7 +118,7 @@ internal class TransactionScopeImplTest {
         }
         txScope.transaction {
             val address = repository.selectById(15)
-            Assertions.assertNull(address)
+            assertNull(address)
         }
     }
 
@@ -129,23 +133,23 @@ internal class TransactionScopeImplTest {
         }
         txScope.transaction {
             val address = repository.selectById(15)
-            Assertions.assertNotNull(address)
+            assertNotNull(address)
         }
-    }
+    }.let { }
 
     @Test
     fun setRollbackOnly() = runBlocking {
         txScope.transaction {
             repository.delete(15)
-            Assertions.assertFalse(isRollbackOnly())
+            assertFalse(isRollbackOnly())
             setRollbackOnly()
-            Assertions.assertTrue(isRollbackOnly())
+            assertTrue(isRollbackOnly())
         }
         txScope.transaction {
             val address = repository.selectById(15)
-            Assertions.assertNotNull(address)
+            assertNotNull(address)
         }
-    }
+    }.let { }
 
     @Test
     fun isolationLevel() = runBlocking {
@@ -154,7 +158,7 @@ internal class TransactionScopeImplTest {
         }
         txScope.transaction {
             val address = repository.selectById(15)
-            Assertions.assertNull(address)
+            assertNull(address)
         }
     }
 
@@ -164,12 +168,12 @@ internal class TransactionScopeImplTest {
             repository.delete(15)
             txScope.required {
                 val address = repository.selectById(15)
-                Assertions.assertNull(address)
+                assertNull(address)
             }
         }
         txScope.transaction {
             val address = repository.selectById(15)
-            Assertions.assertNull(address)
+            assertNull(address)
         }
     }
 
@@ -178,11 +182,11 @@ internal class TransactionScopeImplTest {
         txScope.transaction(TransactionAttribute.REQUIRES_NEW) {
             repository.delete(15)
             val address = repository.selectById(15)
-            Assertions.assertNull(address)
+            assertNull(address)
         }
         txScope.transaction {
             val address = repository.selectById(15)
-            Assertions.assertNull(address)
+            assertNull(address)
         }
     }
 
@@ -191,15 +195,15 @@ internal class TransactionScopeImplTest {
         txScope.transaction {
             repository.delete(15)
             val address = repository.selectById(15)
-            Assertions.assertNull(address)
+            assertNull(address)
             requiresNew {
                 val address2 = repository.selectById(15)
-                Assertions.assertNotNull(address2)
+                assertNotNull(address2)
             }
         }
         txScope.transaction {
             val address = repository.selectById(15)
-            Assertions.assertNull(address)
+            assertNull(address)
         }
     }
 }

@@ -3,14 +3,14 @@ package integration.jdbc
 import integration.Address
 import integration.Employee
 import integration.meta
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.SqlDsl
 import org.komapper.core.dsl.operator.concat
 import org.komapper.core.dsl.operator.plus
 import org.komapper.jdbc.JdbcDatabase
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 
 @ExtendWith(Env::class)
 class SqlUpdateQueryTest(private val db: JdbcDatabase) {
@@ -96,7 +96,7 @@ class SqlUpdateQueryTest(private val db: JdbcDatabase) {
     @Test
     fun allowEmptyWhereClause_default() {
         val e = Employee.meta
-        val ex = assertThrows<IllegalStateException> {
+        val ex = assertFailsWith<IllegalStateException> {
             @Suppress("UNUSED_VARIABLE")
             val count = db.runQuery {
                 SqlDsl.update(e).set {

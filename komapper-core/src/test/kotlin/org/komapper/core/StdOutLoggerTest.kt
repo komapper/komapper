@@ -1,6 +1,6 @@
 package org.komapper.core
 
-import org.junit.jupiter.api.Test
+import kotlin.test.Test
 
 class StdOutLoggerTest {
     private val logger = StdOutLogger()

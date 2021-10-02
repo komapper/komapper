@@ -1,8 +1,8 @@
 package org.komapper.core.spi
 
-import org.junit.jupiter.api.Assertions.assertNull
-import org.junit.jupiter.api.Assertions.assertSame
-import org.junit.jupiter.api.Test
+import kotlin.test.Test
+import kotlin.test.assertNull
+import kotlin.test.assertSame
 
 internal class UtilityKtTest {
 

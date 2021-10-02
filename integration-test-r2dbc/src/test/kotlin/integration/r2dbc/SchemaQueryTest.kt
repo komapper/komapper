@@ -5,10 +5,10 @@ import integration.Bbb
 import integration.Ccc
 import integration.CompositeKeyAddress
 import integration.meta
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.SchemaDsl
 import org.komapper.r2dbc.R2dbcDatabase
+import kotlin.test.Test
 
 @ExtendWith(Env::class)
 class SchemaQueryTest(private val db: R2dbcDatabase) {

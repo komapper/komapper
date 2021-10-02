@@ -1,8 +1,5 @@
 package org.komapper.template.expression
 
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import org.komapper.template.expression.ExprTokenType.AND
 import org.komapper.template.expression.ExprTokenType.BIG_DECIMAL
 import org.komapper.template.expression.ExprTokenType.CLASS_REF
@@ -19,6 +16,9 @@ import org.komapper.template.expression.ExprTokenType.STRING
 import org.komapper.template.expression.ExprTokenType.TRUE
 import org.komapper.template.expression.ExprTokenType.VALUE
 import org.komapper.template.expression.ExprTokenType.WHITESPACE
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 
 class ExprTokenizerTest {
 
@@ -188,28 +188,28 @@ class ExprTokenizerTest {
     @Test
     fun `The end of single quotation mark is not found`() {
         val tokenizer = ExprTokenizer("'aaa")
-        val exception = assertThrows<ExprException> { tokenizer.next() }
+        val exception = assertFailsWith<ExprException> { tokenizer.next() }
         println(exception)
     }
 
     @Test
     fun `The end of double quotation mark is not found`() {
         val tokenizer = ExprTokenizer("\"aaa")
-        val exception = assertThrows<ExprException> { tokenizer.next() }
+        val exception = assertFailsWith<ExprException> { tokenizer.next() }
         println(exception)
     }
 
     @Test
     fun `Either property or function name must follow the dot`() {
         val tokenizer = ExprTokenizer(".")
-        val exception = assertThrows<ExprException> { tokenizer.next() }
+        val exception = assertFailsWith<ExprException> { tokenizer.next() }
         println(exception)
     }
 
     @Test
     fun `The character is illegal as an identifier start`() {
         val tokenizer = ExprTokenizer(".!")
-        val exception = assertThrows<ExprException> { tokenizer.next() }
+        val exception = assertFailsWith<ExprException> { tokenizer.next() }
         println(exception)
     }
 }

@@ -1,7 +1,5 @@
 package org.komapper.core.dsl.scope
 
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Test
 import org.komapper.core.dsl.declaration.WhenDeclaration
 import org.komapper.core.dsl.element.Criterion
 import org.komapper.core.dsl.element.Operand
@@ -9,6 +7,8 @@ import org.komapper.core.dsl.metamodel.PropertyMetamodelStub
 import org.komapper.core.dsl.operator.and
 import org.komapper.core.dsl.operator.or
 import org.komapper.core.dsl.operator.plus
+import kotlin.test.Test
+import kotlin.test.assertEquals
 
 internal class WhenScopeTest {
 

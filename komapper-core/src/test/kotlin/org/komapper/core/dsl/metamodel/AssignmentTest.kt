@@ -1,9 +1,9 @@
 package org.komapper.core.dsl.metamodel
 
 import kotlinx.coroutines.runBlocking
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Test
 import java.util.UUID
+import kotlin.test.Test
+import kotlin.test.assertEquals
 
 internal class AssignmentTest {
 

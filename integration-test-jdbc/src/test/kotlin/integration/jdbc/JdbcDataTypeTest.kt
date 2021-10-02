@@ -3,11 +3,6 @@ package integration.jdbc
 import integration.meta
 import integration.setting.Dbms
 import integration.setting.Run
-import org.junit.jupiter.api.Assertions
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNotNull
-import org.junit.jupiter.api.Assertions.assertNull
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.EntityDsl
 import org.komapper.core.dsl.TemplateDsl
@@ -20,6 +15,11 @@ import java.time.LocalTime
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
 import java.util.UUID
+import kotlin.test.Test
+import kotlin.test.assertContentEquals
+import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 
 @ExtendWith(Env::class)
 class JdbcDataTypeTest(val db: JdbcDatabase) {
@@ -121,7 +121,7 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
             EntityDsl.from(m).where { m.id eq 1 }.first()
         }
         assertEquals(data.id, data2.id)
-        Assertions.assertArrayEquals(data.value, data2.value)
+        assertContentEquals(data.value, data2.value)
     }
 
     @Test

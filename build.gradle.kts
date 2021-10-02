@@ -48,7 +48,7 @@ val integrationTestProjects = subprojects.filter {
     it.name.startsWith("integration-test")
 }
 
-configure(libraryProjects + exampleProjects + integrationTestProjects) {
+configure(libraryProjects + gradlePluginProject + exampleProjects + integrationTestProjects) {
     apply(plugin = "org.jetbrains.kotlin.jvm")
 
     configure<com.diffplug.gradle.spotless.SpotlessExtension> {
@@ -82,13 +82,11 @@ configure(libraryProjects + gradlePluginProject + exampleProjects + integrationT
     }
 
     dependencies {
-        if (project in exampleSpringBootProjects) {
-            // version numbers are resolved by io.spring.dependency-management
-            "testImplementation"("org.junit.jupiter:junit-jupiter-api")
-            "testRuntimeOnly"("org.junit.jupiter:junit-jupiter-engine")
+        if (project == gradlePluginProject) {
+            testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.1")
+            testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.8.1")
         } else {
-            "testImplementation"("org.junit.jupiter:junit-jupiter-api:5.8.1")
-            "testRuntimeOnly"("org.junit.jupiter:junit-jupiter-engine:5.8.1")
+            testImplementation(kotlin("test"))
         }
     }
 }

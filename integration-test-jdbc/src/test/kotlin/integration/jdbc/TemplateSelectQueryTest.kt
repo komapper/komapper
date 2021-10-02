@@ -2,12 +2,12 @@ package integration.jdbc
 
 import integration.Address
 import kotlinx.coroutines.flow.toList
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.TemplateDsl
 import org.komapper.core.dsl.query.Row
 import org.komapper.jdbc.JdbcDatabase
+import kotlin.test.Test
+import kotlin.test.assertEquals
 
 @ExtendWith(Env::class)
 class TemplateSelectQueryTest(private val db: JdbcDatabase) {
