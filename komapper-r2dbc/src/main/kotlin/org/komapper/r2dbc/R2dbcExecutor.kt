@@ -37,9 +37,9 @@ internal class R2dbcExecutor(
         val statement = inspect(statement)
         return config.session.connection.toFlow().flatMapConcat { con ->
             con.use {
-                val r2dbcStmt = con.prepare(statement)
-                r2dbcStmt.setUp()
-                r2dbcStmt.bind(statement)
+                val r2dbcStmt = prepare(con, statement)
+                setUp(r2dbcStmt)
+                bind(r2dbcStmt, statement)
                 r2dbcStmt.execute().toFlow().flatMapConcat { result ->
                     result.map { row, _ ->
                         transform(config.dialect, row)
@@ -57,14 +57,14 @@ internal class R2dbcExecutor(
         val statement = inspect(statement)
         return config.session.connection.toFlow().flatMapConcat { con ->
             con.use {
-                val r2dbcStmt = con.prepare(statement)
-                r2dbcStmt.setUp()
-                r2dbcStmt.bind(statement)
+                val r2dbcStmt = prepare(con, statement)
+                setUp(r2dbcStmt)
+                bind(r2dbcStmt, statement)
                 r2dbcStmt.execute().toFlow().flatMapConcat { result ->
                     if (generatedColumn == null) {
                         result.rowsUpdated.toFlow().map { count -> count to longArrayOf() }
                     } else {
-                        val generatedKeys = result.fetchGeneratedKeys().toList().toLongArray()
+                        val generatedKeys = fetchGeneratedKeys(result).toList().toLongArray()
                         flowOf(generatedKeys.size to generatedKeys)
                     }
                 }
@@ -83,7 +83,7 @@ internal class R2dbcExecutor(
         return config.session.connection.toFlow().flatMapConcat { con ->
             con.use {
                 val batch = con.createBatch()
-                for (each in statement.asSql().split(";")) {
+                for (each in asSql(statement).split(";")) {
                     val sql = each.trim()
                     if (sql.isNotEmpty()) {
                         batch.add(sql)
@@ -116,34 +116,25 @@ internal class R2dbcExecutor(
         val suppressLogging = executionOptions.suppressLogging ?: false
         if (!suppressLogging) {
             config.logger.debug(LogCategory.SQL.value) {
-                statement.asSql()
+                asSql(statement)
             }
             config.logger.trace(LogCategory.SQL_WITH_ARGS.value) {
-                statement.asSqlWithArgs()
+                asSqlWithArgs(statement)
             }
         }
     }
 
-    private fun Statement.asSql(): String {
-        return this.toSql(config.dialect::replacePlaceHolder)
+    private fun asSql(statement: Statement): String {
+        return statement.toSql(config.dialect::replacePlaceHolder)
     }
 
-    private fun Statement.asSqlWithArgs(): String {
-        return this.toSqlWithArgs(config.dialect::formatValue)
+    private fun asSqlWithArgs(statement: Statement): String {
+        return statement.toSqlWithArgs(config.dialect::formatValue)
     }
 
-    private fun <T> io.r2dbc.spi.Closeable.use(block: (io.r2dbc.spi.Closeable) -> Flow<T>): Flow<T> {
-        return runCatching(block)
-            .onSuccess { flow ->
-                flow.onCompletion { close() }
-            }.onFailure {
-                close()
-            }.getOrThrow()
-    }
-
-    private fun io.r2dbc.spi.Connection.prepare(statement: Statement): io.r2dbc.spi.Statement {
-        val sql = statement.asSql()
-        val r2dbcStmt = this.createStatement(sql)
+    private fun prepare(con: io.r2dbc.spi.Connection, statement: Statement): io.r2dbc.spi.Statement {
+        val sql = asSql(statement)
+        val r2dbcStmt = con.createStatement(sql)
         return if (generatedColumn != null) {
             r2dbcStmt.returnGeneratedValues(generatedColumn)
         } else {
@@ -151,28 +142,37 @@ internal class R2dbcExecutor(
         }
     }
 
-    private fun io.r2dbc.spi.Statement.setUp() {
-        executionOptions.fetchSize?.let { if (it > 0) this.fetchSize(it) }
+    private fun setUp(r2dbcStmt: io.r2dbc.spi.Statement) {
+        executionOptions.fetchSize?.let { if (it > 0) r2dbcStmt.fetchSize(it) }
     }
 
-    private fun io.r2dbc.spi.Statement.bind(statement: Statement) {
+    private fun bind(r2dbcStmt: io.r2dbc.spi.Statement, statement: Statement) {
         statement.args.forEachIndexed { index, value ->
-            config.dialect.setValue(this, index, value.any, value.klass)
+            config.dialect.setValue(r2dbcStmt, index, value.any, value.klass)
         }
     }
 
-    private fun Result.fetchGeneratedKeys(): Flow<Long> {
-        return this.map { row, _ ->
+    private fun fetchGeneratedKeys(result: Result): Flow<Long> {
+        return result.map { row, _ ->
             when (val value = row.get(0)) {
                 is Number -> value.toLong()
                 else -> error("Generated value is not Number. generatedColumn=$generatedColumn, value=$value, valueType=${value::class.qualifiedName}")
             }
         }.toFlow()
     }
+}
 
-    @Suppress("UNCHECKED_CAST")
-    private fun <T> Publisher<T>.toFlow(): Flow<T> {
-        val publisher = this as Publisher<*>
-        return publisher.asFlow() as Flow<T>
-    }
+@Suppress("UNCHECKED_CAST")
+private fun <T> Publisher<T>.toFlow(): Flow<T> {
+    val publisher = this as Publisher<*>
+    return publisher.asFlow() as Flow<T>
+}
+
+private fun <T> io.r2dbc.spi.Closeable.use(block: (io.r2dbc.spi.Closeable) -> Flow<T>): Flow<T> {
+    return runCatching(block)
+        .onSuccess { flow ->
+            flow.onCompletion { close() }
+        }.onFailure {
+            close()
+        }.getOrThrow()
 }
