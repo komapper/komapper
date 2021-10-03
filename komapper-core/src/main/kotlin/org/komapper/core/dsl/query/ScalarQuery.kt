@@ -5,14 +5,14 @@ import org.komapper.core.dsl.expression.ScalarQueryExpression
 import org.komapper.core.dsl.expression.TableExpression
 import kotlin.reflect.KClass
 
-interface ScalarQuery<A, B : Any, C : Any> : Subquery<A>, ScalarQueryExpression<A, B, C>
+interface ScalarQuery<A, B : Any, C : Any> : FlowSubquery<A>, ScalarQueryExpression<A, B, C>
 
 internal data class ScalarQueryImpl<A, B : Any, C : Any>(
-    val query: Subquery<A>,
+    val query: FlowSubquery<A>,
     val expression: ScalarExpression<B, C>
 ) :
     ScalarQuery<A, B, C>,
-    Subquery<A> by query {
+    FlowSubquery<A> by query {
     override val owner: TableExpression<*>
         get() = expression.owner
     override val exteriorClass: KClass<B>
