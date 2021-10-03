@@ -28,9 +28,9 @@ internal class JdbcExecutor(
         val statement = inspect(statement)
         return config.session.connection.use { con ->
             log(statement)
-            con.prepare(statement).use { ps ->
-                ps.setUp()
-                ps.bind(statement)
+            prepare(con, statement).use { ps ->
+                setUp(ps)
+                bind(ps, statement)
                 ps.executeQuery().use { rs ->
                     transform(rs)
                 }
@@ -47,9 +47,9 @@ internal class JdbcExecutor(
         val statement = inspect(statement)
         return config.session.connection.use { con ->
             log(statement)
-            con.prepare(statement).use { ps ->
-                ps.setUp()
-                ps.bind(statement)
+            prepare(con, statement).use { ps ->
+                setUp(ps)
+                bind(ps, statement)
                 ps.executeQuery().use { rs ->
                     val iterator = object : Iterator<T> {
                         var hasNext = rs.next()
@@ -72,11 +72,11 @@ internal class JdbcExecutor(
         return executeWithExceptionCheck {
             config.session.connection.use { con ->
                 log(statement)
-                con.prepare(statement).use { ps ->
-                    ps.setUp()
-                    ps.bind(statement)
+                prepare(con, statement).use { ps ->
+                    setUp(ps)
+                    bind(ps, statement)
                     val count = ps.executeUpdate()
-                    val keys = ps.fetchGeneratedKeys()
+                    val keys = fetchGeneratedKeys(ps)
                     count to keys
                 }
             }
@@ -91,8 +91,8 @@ internal class JdbcExecutor(
             config.session.connection.use { con ->
                 val firstStatement = statements.first()
                 log(firstStatement)
-                con.prepare(firstStatement).use { ps ->
-                    ps.setUp()
+                prepare(con, firstStatement).use { ps ->
+                    setUp(ps)
                     val batchSize = executionOptions.batchSize?.let { if (it > 0) it else null } ?: 10
                     val allCounts = IntArray(statements.size)
                     val allKeys = LongArray(statements.size)
@@ -101,17 +101,17 @@ internal class JdbcExecutor(
                         if (i > 0) {
                             log(statement)
                         }
-                        ps.bind(statement)
+                        bind(ps, statement)
                         ps.addBatch()
                         if (i == statements.size - 1 || batchSize > 0 && (i + 1) % batchSize == 0) {
                             val counts = ps.executeBatch()
-                            val keys = ps.fetchGeneratedKeys()
+                            val keys = fetchGeneratedKeys(ps)
                             counts.copyInto(allCounts, offset)
                             keys.copyInto(allKeys, offset)
                             offset = i + 1
                         }
                     }
-                    ps.bind(firstStatement)
+                    bind(ps, firstStatement)
                     allCounts to allKeys
                 }
             }
@@ -125,7 +125,7 @@ internal class JdbcExecutor(
             config.session.connection.use { con ->
                 log(statement)
                 con.createStatement().use { s ->
-                    s.setUp()
+                    s.let(::setUp)
                     s.execute(statement.toSql())
                 }
             }
@@ -160,30 +160,30 @@ internal class JdbcExecutor(
         }
     }
 
-    private fun Connection.prepare(statement: Statement): PreparedStatement {
+    private fun prepare(con: Connection, statement: Statement): PreparedStatement {
         val sql = statement.toSql()
         return if (requiresGeneratedKeys) {
-            this.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS)
+            con.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS)
         } else {
-            this.prepareStatement(sql)
+            con.prepareStatement(sql)
         }
     }
 
-    private fun java.sql.Statement.setUp() {
-        executionOptions.fetchSize?.let { if (it > 0) this.fetchSize = it }
-        executionOptions.maxRows?.let { if (it > 0) this.maxRows = it }
-        executionOptions.queryTimeoutSeconds?.let { if (it > 0) this.queryTimeout = it }
+    private fun setUp(statement: java.sql.Statement) {
+        executionOptions.fetchSize?.let { if (it > 0) statement.fetchSize = it }
+        executionOptions.maxRows?.let { if (it > 0) statement.maxRows = it }
+        executionOptions.queryTimeoutSeconds?.let { if (it > 0) statement.queryTimeout = it }
     }
 
-    private fun PreparedStatement.bind(statement: Statement) {
+    private fun bind(ps: PreparedStatement, statement: Statement) {
         statement.args.forEachIndexed { index, value ->
-            config.dialect.setValue(this, index + 1, value.any, value.klass)
+            config.dialect.setValue(ps, index + 1, value.any, value.klass)
         }
     }
 
-    private fun PreparedStatement.fetchGeneratedKeys(): LongArray {
+    private fun fetchGeneratedKeys(ps: PreparedStatement): LongArray {
         return if (requiresGeneratedKeys) {
-            this.generatedKeys.use { rs ->
+            ps.generatedKeys.use { rs ->
                 val keys = mutableListOf<Long>()
                 while (rs.next()) {
                     val key = rs.getLong(1)
