@@ -9,6 +9,7 @@ import org.komapper.core.dsl.declaration.OnDeclaration
 import org.komapper.core.dsl.declaration.WhereDeclaration
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.expression.ScalarExpression
+import org.komapper.core.dsl.expression.SortExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.SqlSelectOptions
 import org.komapper.core.dsl.scope.HavingScope
@@ -23,7 +24,7 @@ interface SqlSelectQuery<ENTITY : Any> : FlowSubquery<ENTITY> {
     fun where(declaration: WhereDeclaration): SqlSelectQuery<ENTITY>
     fun groupBy(vararg expressions: ColumnExpression<*, *>): SqlSelectQuery<ENTITY>
     fun having(declaration: HavingDeclaration): SqlSelectQuery<ENTITY>
-    fun orderBy(vararg expressions: ColumnExpression<*, *>): SqlSelectQuery<ENTITY>
+    fun orderBy(vararg expressions: SortExpression): SqlSelectQuery<ENTITY>
     fun offset(offset: Int): SqlSelectQuery<ENTITY>
     fun limit(limit: Int): SqlSelectQuery<ENTITY>
     fun forUpdate(): SqlSelectQuery<ENTITY>
@@ -130,7 +131,7 @@ internal data class SqlSelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<
         return copy(context = newContext)
     }
 
-    override fun orderBy(vararg expressions: ColumnExpression<*, *>): SqlSelectQuery<ENTITY> {
+    override fun orderBy(vararg expressions: SortExpression): SqlSelectQuery<ENTITY> {
         val newContext = support.orderBy(*expressions)
         return copy(context = newContext)
     }

@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.toList
 import org.komapper.core.dsl.context.SqlSetOperationContext
 import org.komapper.core.dsl.context.SubqueryContext
 import org.komapper.core.dsl.expression.ColumnExpression
+import org.komapper.core.dsl.expression.SortExpression
 import org.komapper.core.dsl.options.SqlSetOperationOptions
 import org.komapper.core.dsl.visitor.FlowQueryVisitor
 import org.komapper.core.dsl.visitor.QueryVisitor
@@ -53,7 +54,7 @@ internal data class SqlTripleColumnsSetOperationQuery<A : Any, B : Any, C : Any>
         return copy(context = support.orderBy(*aliases))
     }
 
-    override fun orderBy(vararg expressions: ColumnExpression<*, *>): FlowSetOperationQuery<Triple<A?, B?, C?>> {
+    override fun orderBy(vararg expressions: SortExpression): FlowSetOperationQuery<Triple<A?, B?, C?>> {
         return copy(context = support.orderBy(*expressions))
     }
 

@@ -14,6 +14,8 @@ import org.komapper.core.dsl.expression.CaseExpression
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.expression.EscapeExpression
 import org.komapper.core.dsl.expression.LiteralExpression
+import org.komapper.core.dsl.expression.PropertyExpression
+import org.komapper.core.dsl.expression.ScalarExpression
 import org.komapper.core.dsl.expression.ScalarQueryExpression
 import org.komapper.core.dsl.expression.StringFunction
 import org.komapper.core.dsl.expression.TableExpression
@@ -49,9 +51,6 @@ class BuilderSupport(
 
     fun visitColumnExpression(expression: ColumnExpression<*, *>) {
         when (expression) {
-            is AggregateFunction<*, *> -> {
-                visitAggregateFunction(expression)
-            }
             is AliasExpression<*, *> -> {
                 visitAliasExpression(expression)
             }
@@ -64,13 +63,13 @@ class BuilderSupport(
             is LiteralExpression<*> -> {
                 visitLiteralExpression(expression)
             }
-            is ScalarQueryExpression<*, *, *> -> {
-                visitScalarQueryExpression(expression)
+            is ScalarExpression<*, *> -> {
+                visitScalarExpression(expression)
             }
             is StringFunction -> {
                 visitStringFunction(expression)
             }
-            else -> {
+            is PropertyExpression<*, *> -> {
                 val name = expression.getCanonicalColumnName(dialect::enquote)
                 val owner = expression.owner
                 val alias = aliasManager.getAlias(owner)
@@ -80,39 +79,6 @@ class BuilderSupport(
                 } else {
                     buf.append("$alias.$name")
                 }
-            }
-        }
-    }
-
-    private fun visitAggregateFunction(function: AggregateFunction<*, *>) {
-        when (function) {
-            is AggregateFunction.Avg -> {
-                buf.append("avg(")
-                visitColumnExpression(function.expression)
-                buf.append(")")
-            }
-            is AggregateFunction.CountAsterisk -> {
-                buf.append("count(*)")
-            }
-            is AggregateFunction.Count -> {
-                buf.append("count(")
-                visitColumnExpression(function.expression)
-                buf.append(")")
-            }
-            is AggregateFunction.Max<*, *> -> {
-                buf.append("max(")
-                visitColumnExpression(function.expression)
-                buf.append(")")
-            }
-            is AggregateFunction.Min<*, *> -> {
-                buf.append("min(")
-                visitColumnExpression(function.expression)
-                buf.append(")")
-            }
-            is AggregateFunction.Sum<*, *> -> {
-                buf.append("sum(")
-                visitColumnExpression(function.expression)
-                buf.append(")")
             }
         }
     }
@@ -178,6 +144,50 @@ class BuilderSupport(
     private fun visitLiteralExpression(expression: LiteralExpression<*>) {
         val string = dialect.formatValue(expression.value, expression.interiorClass)
         buf.append(string)
+    }
+
+    private fun visitScalarExpression(expression: ScalarExpression<*, *>) {
+        when (expression) {
+            is AggregateFunction<*, *> -> {
+                visitAggregateFunction(expression)
+            }
+            is ScalarQueryExpression<*, *, *> -> {
+                visitScalarQueryExpression(expression)
+            }
+        }
+    }
+
+    private fun visitAggregateFunction(function: AggregateFunction<*, *>) {
+        when (function) {
+            is AggregateFunction.Avg -> {
+                buf.append("avg(")
+                visitColumnExpression(function.expression)
+                buf.append(")")
+            }
+            is AggregateFunction.CountAsterisk -> {
+                buf.append("count(*)")
+            }
+            is AggregateFunction.Count -> {
+                buf.append("count(")
+                visitColumnExpression(function.expression)
+                buf.append(")")
+            }
+            is AggregateFunction.Max<*, *> -> {
+                buf.append("max(")
+                visitColumnExpression(function.expression)
+                buf.append(")")
+            }
+            is AggregateFunction.Min<*, *> -> {
+                buf.append("min(")
+                visitColumnExpression(function.expression)
+                buf.append(")")
+            }
+            is AggregateFunction.Sum<*, *> -> {
+                buf.append("sum(")
+                visitColumnExpression(function.expression)
+                buf.append(")")
+            }
+        }
     }
 
     private fun visitScalarQueryExpression(expression: ScalarQueryExpression<*, *, *>) {

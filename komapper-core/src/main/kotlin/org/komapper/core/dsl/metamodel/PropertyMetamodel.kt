@@ -2,11 +2,11 @@ package org.komapper.core.dsl.metamodel
 
 import org.komapper.core.ThreadSafe
 import org.komapper.core.Value
-import org.komapper.core.dsl.expression.ColumnExpression
+import org.komapper.core.dsl.expression.PropertyExpression
 import kotlin.reflect.KClass
 
 @ThreadSafe
-interface PropertyMetamodel<ENTITY : Any, EXTERIOR : Any, INTERIOR : Any> : ColumnExpression<EXTERIOR, INTERIOR> {
+interface PropertyMetamodel<ENTITY : Any, EXTERIOR : Any, INTERIOR : Any> : PropertyExpression<EXTERIOR, INTERIOR> {
     override val owner: EntityMetamodel<ENTITY, *, *>
     val name: String
     val getter: (ENTITY) -> EXTERIOR?

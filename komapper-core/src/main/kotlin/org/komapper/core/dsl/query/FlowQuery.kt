@@ -1,7 +1,7 @@
 package org.komapper.core.dsl.query
 
 import org.komapper.core.ThreadSafe
-import org.komapper.core.dsl.expression.ColumnExpression
+import org.komapper.core.dsl.expression.SortExpression
 import org.komapper.core.dsl.options.SqlSetOperationOptions
 import org.komapper.core.dsl.visitor.FlowQueryVisitor
 
@@ -19,6 +19,6 @@ interface FlowSubquery<T> : Subquery<T>, FlowQuery<T> {
 
 interface FlowSetOperationQuery<T> : SetOperationQuery<T>, FlowSubquery<T> {
     override fun orderBy(vararg aliases: CharSequence): FlowSetOperationQuery<T>
-    override fun orderBy(vararg expressions: ColumnExpression<*, *>): FlowSetOperationQuery<T>
+    override fun orderBy(vararg expressions: SortExpression): FlowSetOperationQuery<T>
     override fun options(configurator: (SqlSetOperationOptions) -> SqlSetOperationOptions): FlowSetOperationQuery<T>
 }

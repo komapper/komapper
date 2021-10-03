@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import org.komapper.core.ThreadSafe
 import org.komapper.core.dsl.context.SubqueryContext
-import org.komapper.core.dsl.expression.ColumnExpression
+import org.komapper.core.dsl.expression.SortExpression
 import org.komapper.core.dsl.expression.SubqueryExpression
 import org.komapper.core.dsl.options.SqlSetOperationOptions
 import org.komapper.core.dsl.visitor.QueryVisitor
@@ -49,6 +49,6 @@ interface Subquery<T> : ListQuery<T>, SubqueryExpression<T> {
 
 interface SetOperationQuery<T> : Subquery<T> {
     fun orderBy(vararg aliases: CharSequence): SetOperationQuery<T>
-    fun orderBy(vararg expressions: ColumnExpression<*, *>): SetOperationQuery<T>
+    fun orderBy(vararg expressions: SortExpression): SetOperationQuery<T>
     fun options(configurator: (SqlSetOperationOptions) -> SqlSetOperationOptions): SetOperationQuery<T>
 }

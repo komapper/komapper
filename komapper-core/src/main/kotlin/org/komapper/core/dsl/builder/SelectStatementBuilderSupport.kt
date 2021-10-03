@@ -107,10 +107,10 @@ internal class OrderByBuilderSupport(
             buf.append(" order by ")
             for (item in orderBy) {
                 when (item) {
-                    is SortItem.Property<*, *> -> {
+                    is SortItem.Column -> {
                         val (expression, sort) = when (item) {
-                            is SortItem.Property.Asc<*, *> -> item.expression to "asc"
-                            is SortItem.Property.Desc<*, *> -> item.expression to "desc"
+                            is SortItem.Column.Asc -> item.expression to "asc"
+                            is SortItem.Column.Desc -> item.expression to "desc"
                         }
                         column(expression)
                         buf.append(" $sort")

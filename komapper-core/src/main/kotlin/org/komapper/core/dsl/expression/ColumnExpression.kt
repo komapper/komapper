@@ -1,10 +1,8 @@
 package org.komapper.core.dsl.expression
 
-import org.komapper.core.ThreadSafe
 import kotlin.reflect.KClass
 
-@ThreadSafe
-interface ColumnExpression<EXTERIOR : Any, INTERIOR : Any> {
+sealed interface ColumnExpression<EXTERIOR : Any, INTERIOR : Any> : SortExpression {
     val owner: TableExpression<*>
     val exteriorClass: KClass<EXTERIOR>
     val interiorClass: KClass<INTERIOR>
