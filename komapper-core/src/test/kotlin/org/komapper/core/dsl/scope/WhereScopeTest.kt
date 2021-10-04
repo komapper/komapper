@@ -9,6 +9,7 @@ import org.komapper.core.dsl.operator.or
 import org.komapper.core.dsl.operator.plus
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertIs
 
 internal class WhereScopeTest {
 
@@ -22,7 +23,7 @@ internal class WhereScopeTest {
         val scope = WhereScope().apply(w3)
         assertEquals(2, scope.size)
         assertEquals(Criterion.Eq(Operand.Column(p1), Operand.Argument(p1, 1)), scope[0])
-        assertEquals(Criterion.Grater(Operand.Column(p2), Operand.Argument(p2, "a")), scope[1])
+        assertEquals(Criterion.Greater(Operand.Column(p2), Operand.Argument(p2, "a")), scope[1])
     }
 
     @Test
@@ -35,7 +36,7 @@ internal class WhereScopeTest {
         val scope = WhereScope().apply(w3)
         assertEquals(2, scope.size)
         assertEquals(Criterion.Eq(Operand.Column(p1), Operand.Argument(p1, 1)), scope[0])
-        assertEquals(Criterion.And(listOf(Criterion.Grater(Operand.Column(p2), Operand.Argument(p2, "a")))), scope[1])
+        assertEquals(Criterion.And(listOf(Criterion.Greater(Operand.Column(p2), Operand.Argument(p2, "a")))), scope[1])
     }
 
     @Test
@@ -48,6 +49,6 @@ internal class WhereScopeTest {
         val scope = WhereScope().apply(w3)
         assertEquals(2, scope.size)
         assertEquals(Criterion.Eq(Operand.Column(p1), Operand.Argument(p1, 1)), scope[0])
-        assertEquals(Criterion.Or(listOf(Criterion.Grater(Operand.Column(p2), Operand.Argument(p2, "a")))), scope[1])
+        assertEquals(Criterion.Or(listOf(Criterion.Greater(Operand.Column(p2), Operand.Argument(p2, "a")))), scope[1])
     }
 }

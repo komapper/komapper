@@ -106,31 +106,31 @@ class FilterScopeSupport<T>(
     }
 
     override infix fun <T : Any, S : Any> ColumnExpression<T, S>.greater(operand: ColumnExpression<T, S>) {
-        add(Criterion::Grater, this, operand)
+        add(Criterion::Greater, this, operand)
     }
 
     override infix fun <T : Any, S : Any> ColumnExpression<T, S>.greater(operand: T?) {
         if (operand == null) return
-        add(Criterion::Grater, this, operand)
+        add(Criterion::Greater, this, operand)
     }
 
     override infix fun <T : Any, S : Any> T?.greater(operand: ColumnExpression<T, S>) {
         if (this == null) return
-        add(Criterion::Grater, this, operand)
+        add(Criterion::Greater, this, operand)
     }
 
     override infix fun <T : Any, S : Any> ColumnExpression<T, S>.greaterEq(operand: ColumnExpression<T, S>) {
-        add(Criterion::GraterEq, this, operand)
+        add(Criterion::GreaterEq, this, operand)
     }
 
     override infix fun <T : Any, S : Any> ColumnExpression<T, S>.greaterEq(operand: T?) {
         if (operand == null) return
-        add(Criterion::GraterEq, this, operand)
+        add(Criterion::GreaterEq, this, operand)
     }
 
     override infix fun <T : Any, S : Any> T?.greaterEq(operand: ColumnExpression<T, S>) {
         if (this == null) return
-        add(Criterion::GraterEq, this, operand)
+        add(Criterion::GreaterEq, this, operand)
     }
 
     override fun <T : Any, S : Any> ColumnExpression<T, S>.isNull() {
