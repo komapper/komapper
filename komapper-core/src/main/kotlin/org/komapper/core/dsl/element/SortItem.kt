@@ -1,24 +1,23 @@
 package org.komapper.core.dsl.element
 
 import org.komapper.core.ThreadSafe
+import org.komapper.core.dsl.expression.AscendingExpression
 import org.komapper.core.dsl.expression.ColumnExpression
+import org.komapper.core.dsl.expression.DescendingExpression
 import org.komapper.core.dsl.expression.SortExpression
-import org.komapper.core.dsl.expression.SortedColumnExpression
 
 @ThreadSafe
 sealed class SortItem {
-    sealed class Column : SortedColumnExpression, SortItem() {
+    sealed class Column : SortItem() {
         companion object {
             fun of(expression: SortExpression): Column {
                 return when (expression) {
-                    is SortedColumnExpression -> expression.asColumn()
+                    is AscendingExpression -> Asc(expression.column)
+                    is DescendingExpression -> Desc(expression.column)
                     is ColumnExpression<*, *> -> Asc(expression)
                 }
             }
         }
-
-        override fun asColumn(): Column = this
-
         data class Asc(val expression: ColumnExpression<*, *>) : Column()
         data class Desc(val expression: ColumnExpression<*, *>) : Column()
     }
