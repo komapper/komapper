@@ -116,7 +116,7 @@ class FilterScopeSupport<T>(
 
     override infix fun <T : Any, S : Any> T?.greater(operand: ColumnExpression<T, S>) {
         if (this == null) return
-        add(Criterion::GraterEq, this, operand)
+        add(Criterion::Grater, this, operand)
     }
 
     override infix fun <T : Any, S : Any> ColumnExpression<T, S>.greaterEq(operand: ColumnExpression<T, S>) {
