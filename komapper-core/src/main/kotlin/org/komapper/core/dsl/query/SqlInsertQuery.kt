@@ -31,7 +31,7 @@ internal data class SqlInsertQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<
 
     override fun <T : Any> select(block: () -> Subquery<T>): SqlInsertQuery<ENTITY> {
         val subquery = block()
-        val values = Values.Subquery(subquery.subqueryContext)
+        val values = Values.Subquery(subquery)
         val newContext = context.copy(values = values)
         return copy(context = newContext)
     }

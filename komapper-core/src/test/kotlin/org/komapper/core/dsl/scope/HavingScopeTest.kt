@@ -22,7 +22,7 @@ internal class HavingScopeTest {
         val scope = HavingScope().apply(h3)
         assertEquals(2, scope.size)
         assertEquals(Criterion.Eq(Operand.Column(p1), Operand.Argument(p1, 1)), scope[0])
-        assertEquals(Criterion.Grater(Operand.Column(p2), Operand.Argument(p2, "a")), scope[1])
+        assertEquals(Criterion.Greater(Operand.Column(p2), Operand.Argument(p2, "a")), scope[1])
     }
 
     @Test
@@ -35,7 +35,7 @@ internal class HavingScopeTest {
         val scope = HavingScope().apply(h3)
         assertEquals(2, scope.size)
         assertEquals(Criterion.Eq(Operand.Column(p1), Operand.Argument(p1, 1)), scope[0])
-        assertEquals(Criterion.And(listOf(Criterion.Grater(Operand.Column(p2), Operand.Argument(p2, "a")))), scope[1])
+        assertEquals(Criterion.And(listOf(Criterion.Greater(Operand.Column(p2), Operand.Argument(p2, "a")))), scope[1])
     }
 
     @Test
@@ -48,6 +48,6 @@ internal class HavingScopeTest {
         val scope = HavingScope().apply(h3)
         assertEquals(2, scope.size)
         assertEquals(Criterion.Eq(Operand.Column(p1), Operand.Argument(p1, 1)), scope[0])
-        assertEquals(Criterion.Or(listOf(Criterion.Grater(Operand.Column(p2), Operand.Argument(p2, "a")))), scope[1])
+        assertEquals(Criterion.Or(listOf(Criterion.Greater(Operand.Column(p2), Operand.Argument(p2, "a")))), scope[1])
     }
 }
