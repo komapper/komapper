@@ -18,6 +18,7 @@ import org.komapper.core.dsl.expression.PropertyExpression
 import org.komapper.core.dsl.expression.ScalarExpression
 import org.komapper.core.dsl.expression.ScalarQueryExpression
 import org.komapper.core.dsl.expression.StringFunction
+import org.komapper.core.dsl.expression.SubqueryExpression
 import org.komapper.core.dsl.expression.TableExpression
 
 class BuilderSupport(
@@ -192,13 +193,13 @@ class BuilderSupport(
 
     private fun visitScalarQueryExpression(expression: ScalarQueryExpression<*, *, *>) {
         buf.append("(")
-        val statement = buildSubqueryStatement(expression.subqueryContext)
+        val statement = buildSubqueryStatement(expression)
         buf.append(statement)
         buf.append(")")
     }
 
-    fun buildSubqueryStatement(subqueryContext: SubqueryContext<*>): Statement {
-        return when (subqueryContext) {
+    fun buildSubqueryStatement(expression: SubqueryExpression<*>): Statement {
+        return when (val subqueryContext = expression.subqueryContext) {
             is SubqueryContext.EntitySelect<*> -> {
                 val context = subqueryContext.context
                 val childAliasManager = DefaultAliasManager(context, aliasManager)
@@ -292,8 +293,8 @@ class BuilderSupport(
             is Criterion.NotInSubQuery -> operation.inSubQuery(c.left, c.right, true)
             is Criterion.InSubQuery2 -> operation.inSubQuery2(c.left, c.right)
             is Criterion.NotInSubQuery2 -> operation.inSubQuery2(c.left, c.right, true)
-            is Criterion.Exists -> operation.exists(c.context)
-            is Criterion.NotExists -> operation.exists(c.context, true)
+            is Criterion.Exists -> operation.exists(c.expression)
+            is Criterion.NotExists -> operation.exists(c.expression, true)
             is Criterion.And -> operation.logicalBinary("and", c.criteria, index)
             is Criterion.Or -> operation.logicalBinary("or", c.criteria, index)
             is Criterion.Not -> operation.not(c.criteria)
@@ -407,7 +408,7 @@ class BuilderSupport(
             buf.append(")")
         }
 
-        fun inSubQuery(left: Operand, right: SubqueryContext<*>, not: Boolean = false) {
+        fun inSubQuery(left: Operand, right: SubqueryExpression<*>, not: Boolean = false) {
             visitOperand(left)
             if (not) {
                 buf.append(" not")
@@ -418,7 +419,7 @@ class BuilderSupport(
             buf.append(")")
         }
 
-        fun inSubQuery2(left: Pair<Operand, Operand>, right: SubqueryContext<*>, not: Boolean = false) {
+        fun inSubQuery2(left: Pair<Operand, Operand>, right: SubqueryExpression<*>, not: Boolean = false) {
             buf.append("(")
             visitOperand(left.first)
             buf.append(", ")
@@ -433,12 +434,12 @@ class BuilderSupport(
             buf.append(")")
         }
 
-        fun exists(subqueryContext: SubqueryContext<*>, not: Boolean = false) {
+        fun exists(expression: SubqueryExpression<*>, not: Boolean = false) {
             if (not) {
                 buf.append("not ")
             }
             buf.append("exists (")
-            val statement = buildSubqueryStatement(subqueryContext)
+            val statement = buildSubqueryStatement(expression)
             buf.append(statement)
             buf.append(")")
         }

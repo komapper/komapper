@@ -4,10 +4,10 @@ import org.komapper.core.Dialect
 import org.komapper.core.Statement
 import org.komapper.core.StatementBuffer
 import org.komapper.core.dsl.context.SqlInsertContext
-import org.komapper.core.dsl.context.SubqueryContext
 import org.komapper.core.dsl.element.Operand
 import org.komapper.core.dsl.element.Values
 import org.komapper.core.dsl.expression.ColumnExpression
+import org.komapper.core.dsl.expression.SubqueryExpression
 import org.komapper.core.dsl.metamodel.Assignment
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 
@@ -57,7 +57,7 @@ class SqlInsertStatementBuilder<ENTITY : Any, ID, META : EntityMetamodel<ENTITY,
                 }
                 buf.cutBack(2)
                 buf.append(") ")
-                subquery(values.context)
+                subquery(values.expression)
             }
         }
         return buf.toStatement()
@@ -77,8 +77,8 @@ class SqlInsertStatementBuilder<ENTITY : Any, ID, META : EntityMetamodel<ENTITY,
         support.visitOperand(operand)
     }
 
-    private fun subquery(subqueryContext: SubqueryContext<*>) {
-        val statement = support.buildSubqueryStatement(subqueryContext)
+    private fun subquery(expression: SubqueryExpression<*>) {
+        val statement = support.buildSubqueryStatement(expression)
         buf.append(statement)
     }
 }
