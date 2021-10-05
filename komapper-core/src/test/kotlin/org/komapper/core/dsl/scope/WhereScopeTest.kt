@@ -1,9 +1,11 @@
 package org.komapper.core.dsl.scope
 
+import org.komapper.core.dsl.context.SubqueryContext
 import org.komapper.core.dsl.declaration.WhereDeclaration
 import org.komapper.core.dsl.element.Criterion
 import org.komapper.core.dsl.element.Operand
 import org.komapper.core.dsl.expression.EscapeExpression
+import org.komapper.core.dsl.expression.SubqueryExpression
 import org.komapper.core.dsl.metamodel.PropertyMetamodelStub
 import org.komapper.core.dsl.operator.and
 import org.komapper.core.dsl.operator.or
@@ -12,6 +14,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
 import kotlin.test.assertTrue
+import kotlin.test.fail
 
 internal class WhereScopeTest {
 
@@ -289,28 +292,46 @@ internal class WhereScopeTest {
     @Test
     fun inList() {
         val p1 = PropertyMetamodelStub<Nothing, Int>()
+        val subquery = object : SubqueryExpression<Int?> {
+            override val subqueryContext: SubqueryContext<Int?>
+                get() = fail()
+        }
         val scope = WhereScope().apply {
             p1 inList listOf(1, 2)
+            p1 inList { subquery }
         }
         val criteria = scope.toList()
-        assertEquals(1, criteria.size)
+        assertEquals(2, criteria.size)
         assertIs<Criterion.InList>(criteria[0]).let { (left, right) ->
             assertIs<Operand.Column>(left)
             assertTrue(right.all { it is Operand.Argument<*, *> })
+        }
+        assertIs<Criterion.InSubQuery>(criteria[1]).let { (left, right) ->
+            assertIs<Operand.Column>(left)
+            assertEquals(subquery, right)
         }
     }
 
     @Test
     fun notInList() {
         val p1 = PropertyMetamodelStub<Nothing, Int>()
+        val subquery = object : SubqueryExpression<Int?> {
+            override val subqueryContext: SubqueryContext<Int?>
+                get() = fail()
+        }
         val scope = WhereScope().apply {
             p1 notInList listOf(1, 2)
+            p1 notInList { subquery }
         }
         val criteria = scope.toList()
-        assertEquals(1, criteria.size)
+        assertEquals(2, criteria.size)
         assertIs<Criterion.NotInList>(criteria[0]).let { (left, right) ->
             assertIs<Operand.Column>(left)
             assertTrue(right.all { it is Operand.Argument<*, *> })
+        }
+        assertIs<Criterion.NotInSubQuery>(criteria[1]).let { (left, right) ->
+            assertIs<Operand.Column>(left)
+            assertEquals(subquery, right)
         }
     }
 
@@ -318,11 +339,16 @@ internal class WhereScopeTest {
     fun inList2() {
         val p1 = PropertyMetamodelStub<Nothing, Int>()
         val p2 = PropertyMetamodelStub<Nothing, Int>()
+        val subquery = object : SubqueryExpression<Pair<Int?, Int?>> {
+            override val subqueryContext: SubqueryContext<Pair<Int?, Int?>>
+                get() = fail()
+        }
         val scope = WhereScope().apply {
             (p1 to p2) inList2 listOf(1 to 2)
+            (p1 to p2) inList2 { subquery }
         }
         val criteria = scope.toList()
-        assertEquals(1, criteria.size)
+        assertEquals(2, criteria.size)
         assertIs<Criterion.InList2>(criteria[0]).let { (left, right) ->
             assertIs<Operand.Column>(left.first)
             assertIs<Operand.Column>(left.second)
@@ -333,17 +359,27 @@ internal class WhereScopeTest {
                 }
             )
         }
+        assertIs<Criterion.InSubQuery2>(criteria[1]).let { (left, right) ->
+            assertIs<Operand.Column>(left.first)
+            assertIs<Operand.Column>(left.second)
+            assertEquals(subquery, right)
+        }
     }
 
     @Test
     fun notInList2() {
         val p1 = PropertyMetamodelStub<Nothing, Int>()
         val p2 = PropertyMetamodelStub<Nothing, Int>()
+        val subquery = object : SubqueryExpression<Pair<Int?, Int?>> {
+            override val subqueryContext: SubqueryContext<Pair<Int?, Int?>>
+                get() = fail()
+        }
         val scope = WhereScope().apply {
             (p1 to p2) notInList2 listOf(1 to 2)
+            (p1 to p2) notInList2 { subquery }
         }
         val criteria = scope.toList()
-        assertEquals(1, criteria.size)
+        assertEquals(2, criteria.size)
         assertIs<Criterion.NotInList2>(criteria[0]).let { (left, right) ->
             assertIs<Operand.Column>(left.first)
             assertIs<Operand.Column>(left.second)
@@ -354,5 +390,38 @@ internal class WhereScopeTest {
                 }
             )
         }
+        assertIs<Criterion.NotInSubQuery2>(criteria[1]).let { (left, right) ->
+            assertIs<Operand.Column>(left.first)
+            assertIs<Operand.Column>(left.second)
+            assertEquals(subquery, right)
+        }
+    }
+
+    @Test
+    fun exists() {
+        val subquery = object : SubqueryExpression<Int?> {
+            override val subqueryContext: SubqueryContext<Int?>
+                get() = fail()
+        }
+        val scope = WhereScope().apply {
+            exists { subquery }
+        }
+        val criteria = scope.toList()
+        assertEquals(1, criteria.size)
+        assertIs<Criterion.Exists>(criteria[0])
+    }
+
+    @Test
+    fun notExists() {
+        val subquery = object : SubqueryExpression<Int?> {
+            override val subqueryContext: SubqueryContext<Int?>
+                get() = fail()
+        }
+        val scope = WhereScope().apply {
+            notExists { subquery }
+        }
+        val criteria = scope.toList()
+        assertEquals(1, criteria.size)
+        assertIs<Criterion.NotExists>(criteria[0])
     }
 }
