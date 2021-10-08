@@ -10,6 +10,7 @@ import org.komapper.core.dsl.declaration.WhereDeclaration
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.expression.ScalarExpression
 import org.komapper.core.dsl.expression.SortExpression
+import org.komapper.core.dsl.expression.SubqueryExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.SqlSelectOptions
 import org.komapper.core.dsl.scope.HavingScope
@@ -169,19 +170,19 @@ internal data class SqlSelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<
         }
     }
 
-    override fun except(other: Subquery<ENTITY>): FlowSetOperationQuery<ENTITY> {
+    override fun except(other: SubqueryExpression<ENTITY>): FlowSetOperationQuery<ENTITY> {
         return subquerySupport.except(other)
     }
 
-    override fun intersect(other: Subquery<ENTITY>): FlowSetOperationQuery<ENTITY> {
+    override fun intersect(other: SubqueryExpression<ENTITY>): FlowSetOperationQuery<ENTITY> {
         return subquerySupport.intersect(other)
     }
 
-    override fun union(other: Subquery<ENTITY>): FlowSetOperationQuery<ENTITY> {
+    override fun union(other: SubqueryExpression<ENTITY>): FlowSetOperationQuery<ENTITY> {
         return subquerySupport.union(other)
     }
 
-    override fun unionAll(other: Subquery<ENTITY>): FlowSetOperationQuery<ENTITY> {
+    override fun unionAll(other: SubqueryExpression<ENTITY>): FlowSetOperationQuery<ENTITY> {
         return subquerySupport.unionAll(other)
     }
 

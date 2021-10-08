@@ -6,6 +6,7 @@ import org.komapper.core.dsl.context.SqlSetOperationContext
 import org.komapper.core.dsl.context.SubqueryContext
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.expression.SortExpression
+import org.komapper.core.dsl.expression.SubqueryExpression
 import org.komapper.core.dsl.options.SqlSetOperationOptions
 import org.komapper.core.dsl.visitor.FlowQueryVisitor
 import org.komapper.core.dsl.visitor.QueryVisitor
@@ -34,19 +35,19 @@ internal data class SqlMultipleColumnsSetOperationQuery(
         }
     }
 
-    override fun except(other: Subquery<Columns>): FlowSetOperationQuery<Columns> {
+    override fun except(other: SubqueryExpression<Columns>): FlowSetOperationQuery<Columns> {
         return copy(context = support.except(other))
     }
 
-    override fun intersect(other: Subquery<Columns>): FlowSetOperationQuery<Columns> {
+    override fun intersect(other: SubqueryExpression<Columns>): FlowSetOperationQuery<Columns> {
         return copy(context = support.intersect(other))
     }
 
-    override fun union(other: Subquery<Columns>): FlowSetOperationQuery<Columns> {
+    override fun union(other: SubqueryExpression<Columns>): FlowSetOperationQuery<Columns> {
         return copy(context = support.union(other))
     }
 
-    override fun unionAll(other: Subquery<Columns>): FlowSetOperationQuery<Columns> {
+    override fun unionAll(other: SubqueryExpression<Columns>): FlowSetOperationQuery<Columns> {
         return copy(context = support.unionAll(other))
     }
 

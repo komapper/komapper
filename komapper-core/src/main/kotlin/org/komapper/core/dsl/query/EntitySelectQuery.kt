@@ -10,6 +10,7 @@ import org.komapper.core.dsl.declaration.OnDeclaration
 import org.komapper.core.dsl.declaration.WhereDeclaration
 import org.komapper.core.dsl.element.Associator
 import org.komapper.core.dsl.expression.SortExpression
+import org.komapper.core.dsl.expression.SubqueryExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.EntitySelectOptions
 import org.komapper.core.dsl.visitor.QueryVisitor
@@ -108,26 +109,26 @@ internal data class EntitySelectQueryImpl<ENTITY : Any, ID, META : EntityMetamod
         }
     }
 
-    override fun except(other: Subquery<ENTITY>): SetOperationQuery<ENTITY> {
+    override fun except(other: SubqueryExpression<ENTITY>): SetOperationQuery<ENTITY> {
         return setOperation(SqlSetOperationKind.EXCEPT, this, other)
     }
 
-    override fun intersect(other: Subquery<ENTITY>): SetOperationQuery<ENTITY> {
+    override fun intersect(other: SubqueryExpression<ENTITY>): SetOperationQuery<ENTITY> {
         return setOperation(SqlSetOperationKind.INTERSECT, this, other)
     }
 
-    override fun union(other: Subquery<ENTITY>): SetOperationQuery<ENTITY> {
+    override fun union(other: SubqueryExpression<ENTITY>): SetOperationQuery<ENTITY> {
         return setOperation(SqlSetOperationKind.UNION, this, other)
     }
 
-    override fun unionAll(other: Subquery<ENTITY>): SetOperationQuery<ENTITY> {
+    override fun unionAll(other: SubqueryExpression<ENTITY>): SetOperationQuery<ENTITY> {
         return setOperation(SqlSetOperationKind.UNION_ALL, this, other)
     }
 
     private fun setOperation(
         kind: SqlSetOperationKind,
-        left: Subquery<ENTITY>,
-        right: Subquery<ENTITY>
+        left: SubqueryExpression<ENTITY>,
+        right: SubqueryExpression<ENTITY>
     ): SqlSetOperationQuery<ENTITY> {
         val setOperatorContext = SqlSetOperationContext(kind, left.subqueryContext, right.subqueryContext)
         return SqlSetOperationQueryImpl(setOperatorContext, metamodel = context.target)

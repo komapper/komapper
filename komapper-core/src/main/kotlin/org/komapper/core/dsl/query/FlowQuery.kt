@@ -2,6 +2,7 @@ package org.komapper.core.dsl.query
 
 import org.komapper.core.ThreadSafe
 import org.komapper.core.dsl.expression.SortExpression
+import org.komapper.core.dsl.expression.SubqueryExpression
 import org.komapper.core.dsl.options.SqlSetOperationOptions
 import org.komapper.core.dsl.visitor.FlowQueryVisitor
 
@@ -11,10 +12,10 @@ interface FlowQuery<T> {
 }
 
 interface FlowSubquery<T> : Subquery<T>, FlowQuery<T> {
-    override infix fun except(other: Subquery<T>): FlowSetOperationQuery<T>
-    override infix fun intersect(other: Subquery<T>): FlowSetOperationQuery<T>
-    override infix fun union(other: Subquery<T>): FlowSetOperationQuery<T>
-    override infix fun unionAll(other: Subquery<T>): FlowSetOperationQuery<T>
+    override infix fun except(other: SubqueryExpression<T>): FlowSetOperationQuery<T>
+    override infix fun intersect(other: SubqueryExpression<T>): FlowSetOperationQuery<T>
+    override infix fun union(other: SubqueryExpression<T>): FlowSetOperationQuery<T>
+    override infix fun unionAll(other: SubqueryExpression<T>): FlowSetOperationQuery<T>
 }
 
 interface FlowSetOperationQuery<T> : SetOperationQuery<T>, FlowSubquery<T> {

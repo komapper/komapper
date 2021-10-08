@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.toList
 import org.komapper.core.dsl.context.SqlSetOperationContext
 import org.komapper.core.dsl.context.SubqueryContext
 import org.komapper.core.dsl.expression.SortExpression
+import org.komapper.core.dsl.expression.SubqueryExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.SqlSetOperationOptions
 import org.komapper.core.dsl.visitor.FlowQueryVisitor
@@ -34,19 +35,19 @@ internal data class SqlMultipleEntitiesSetOperationQuery(
         }
     }
 
-    override fun except(other: Subquery<Entities>): FlowSetOperationQuery<Entities> {
+    override fun except(other: SubqueryExpression<Entities>): FlowSetOperationQuery<Entities> {
         return copy(context = support.except(other))
     }
 
-    override fun intersect(other: Subquery<Entities>): FlowSetOperationQuery<Entities> {
+    override fun intersect(other: SubqueryExpression<Entities>): FlowSetOperationQuery<Entities> {
         return copy(context = support.intersect(other))
     }
 
-    override fun union(other: Subquery<Entities>): FlowSetOperationQuery<Entities> {
+    override fun union(other: SubqueryExpression<Entities>): FlowSetOperationQuery<Entities> {
         return copy(context = support.union(other))
     }
 
-    override fun unionAll(other: Subquery<Entities>): FlowSetOperationQuery<Entities> {
+    override fun unionAll(other: SubqueryExpression<Entities>): FlowSetOperationQuery<Entities> {
         return copy(context = support.unionAll(other))
     }
 

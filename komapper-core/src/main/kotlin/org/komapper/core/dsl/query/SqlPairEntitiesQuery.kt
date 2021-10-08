@@ -4,6 +4,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.toList
 import org.komapper.core.dsl.context.SqlSelectContext
 import org.komapper.core.dsl.context.SubqueryContext
+import org.komapper.core.dsl.expression.SubqueryExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.SqlSelectOptions
 import org.komapper.core.dsl.visitor.FlowQueryVisitor
@@ -34,19 +35,19 @@ internal class SqlPairEntitiesQuery<A : Any, A_META : EntityMetamodel<A, *, A_ME
         }
     }
 
-    override fun except(other: Subquery<Pair<A, B?>>): FlowSetOperationQuery<Pair<A, B?>> {
+    override fun except(other: SubqueryExpression<Pair<A, B?>>): FlowSetOperationQuery<Pair<A, B?>> {
         return support.except(other)
     }
 
-    override fun intersect(other: Subquery<Pair<A, B?>>): FlowSetOperationQuery<Pair<A, B?>> {
+    override fun intersect(other: SubqueryExpression<Pair<A, B?>>): FlowSetOperationQuery<Pair<A, B?>> {
         return support.intersect(other)
     }
 
-    override fun union(other: Subquery<Pair<A, B?>>): FlowSetOperationQuery<Pair<A, B?>> {
+    override fun union(other: SubqueryExpression<Pair<A, B?>>): FlowSetOperationQuery<Pair<A, B?>> {
         return support.union(other)
     }
 
-    override fun unionAll(other: Subquery<Pair<A, B?>>): FlowSetOperationQuery<Pair<A, B?>> {
+    override fun unionAll(other: SubqueryExpression<Pair<A, B?>>): FlowSetOperationQuery<Pair<A, B?>> {
         return support.unionAll(other)
     }
 }

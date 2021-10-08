@@ -5,6 +5,7 @@ import org.komapper.core.dsl.context.SqlSetOperationKind
 import org.komapper.core.dsl.context.SubqueryContext
 import org.komapper.core.dsl.element.SortItem
 import org.komapper.core.dsl.expression.SortExpression
+import org.komapper.core.dsl.expression.SubqueryExpression
 
 internal data class SqlSetOperationQuerySupport<T : Any?>(
     private val context: SqlSetOperationContext<T>
@@ -12,23 +13,23 @@ internal data class SqlSetOperationQuerySupport<T : Any?>(
 
     val subqueryContext = SubqueryContext.SqlSetOperation(context)
 
-    fun except(other: Subquery<T>): SqlSetOperationContext<T> {
+    fun except(other: SubqueryExpression<T>): SqlSetOperationContext<T> {
         return setOperation(SqlSetOperationKind.EXCEPT, other)
     }
 
-    fun intersect(other: Subquery<T>): SqlSetOperationContext<T> {
+    fun intersect(other: SubqueryExpression<T>): SqlSetOperationContext<T> {
         return setOperation(SqlSetOperationKind.INTERSECT, other)
     }
 
-    fun union(other: Subquery<T>): SqlSetOperationContext<T> {
+    fun union(other: SubqueryExpression<T>): SqlSetOperationContext<T> {
         return setOperation(SqlSetOperationKind.UNION, other)
     }
 
-    fun unionAll(other: Subquery<T>): SqlSetOperationContext<T> {
+    fun unionAll(other: SubqueryExpression<T>): SqlSetOperationContext<T> {
         return setOperation(SqlSetOperationKind.UNION_ALL, other)
     }
 
-    private fun setOperation(kind: SqlSetOperationKind, other: Subquery<T>): SqlSetOperationContext<T> {
+    private fun setOperation(kind: SqlSetOperationKind, other: SubqueryExpression<T>): SqlSetOperationContext<T> {
         return context.copy(
             kind = kind,
             left = SubqueryContext.SqlSetOperation(context),
