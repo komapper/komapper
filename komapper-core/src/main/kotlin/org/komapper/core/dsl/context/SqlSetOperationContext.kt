@@ -16,8 +16,7 @@ data class SqlSetOperationContext(
 
     private fun visitSubqueryContext(subqueryContext: SubqueryContext): Set<EntityMetamodel<*, *, *>> {
         return when (subqueryContext) {
-            is EntitySelectContext<*, *, *> -> setOf(subqueryContext.target)
-            is SqlSelectContext<*, *, *> -> setOf(subqueryContext.target)
+            is SelectContext<*, *, *, *> -> setOf(subqueryContext.target)
             is SqlSetOperationContext -> {
                 visitSubqueryContext(subqueryContext.left) + visitSubqueryContext(subqueryContext.right)
             }

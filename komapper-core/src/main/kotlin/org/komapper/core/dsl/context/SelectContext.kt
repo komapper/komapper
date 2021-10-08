@@ -7,11 +7,11 @@ import org.komapper.core.dsl.element.Projection
 import org.komapper.core.dsl.element.SortItem
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 
-interface SelectContext<
+sealed interface SelectContext<
     ENTITY : Any,
     ID,
     META : EntityMetamodel<ENTITY, ID, META>,
-    CONTEXT : SelectContext<ENTITY, ID, META, CONTEXT>> : Context {
+    CONTEXT : SelectContext<ENTITY, ID, META, CONTEXT>> : Context, SubqueryContext {
 
     val target: META
     val projection: Projection
