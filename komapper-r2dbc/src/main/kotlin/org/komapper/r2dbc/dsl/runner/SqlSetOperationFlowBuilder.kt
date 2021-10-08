@@ -4,8 +4,7 @@ import io.r2dbc.spi.Row
 import kotlinx.coroutines.flow.Flow
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.Statement
-import org.komapper.core.dsl.context.EntitySelectContext
-import org.komapper.core.dsl.context.SqlSelectContext
+import org.komapper.core.dsl.context.SelectContext
 import org.komapper.core.dsl.context.SqlSetOperationContext
 import org.komapper.core.dsl.context.SubqueryContext
 import org.komapper.core.dsl.options.SqlSetOperationOptions
@@ -34,12 +33,7 @@ internal class SqlSetOperationFlowBuilder<T>(
 
     private fun checkWhereClauses(subqueryContext: SubqueryContext) {
         when (subqueryContext) {
-            is EntitySelectContext<*, *, *> -> {
-                if (subqueryContext.where.isEmpty()) {
-                    error("Empty where clause is not allowed.")
-                }
-            }
-            is SqlSelectContext<*, *, *> -> {
+            is SelectContext<*, *, *, *> -> {
                 if (subqueryContext.where.isEmpty()) {
                     error("Empty where clause is not allowed.")
                 }
