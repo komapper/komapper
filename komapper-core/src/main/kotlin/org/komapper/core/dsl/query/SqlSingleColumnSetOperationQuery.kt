@@ -3,7 +3,6 @@ package org.komapper.core.dsl.query
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.toList
 import org.komapper.core.dsl.context.SqlSetOperationContext
-import org.komapper.core.dsl.context.SubqueryContext
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.expression.SortExpression
 import org.komapper.core.dsl.expression.SubqueryExpression
@@ -12,14 +11,12 @@ import org.komapper.core.dsl.visitor.FlowQueryVisitor
 import org.komapper.core.dsl.visitor.QueryVisitor
 
 internal data class SqlSingleColumnSetOperationQuery<A : Any>(
-    private val context: SqlSetOperationContext<A?>,
+    override val context: SqlSetOperationContext,
     private val options: SqlSetOperationOptions = SqlSetOperationOptions.default,
     private val expression: ColumnExpression<A, *>
 ) : FlowSetOperationQuery<A?> {
 
     private val support: SqlSetOperationQuerySupport<A?> = SqlSetOperationQuerySupport(context)
-
-    override val subqueryContext: SubqueryContext<A?> = SubqueryContext.SqlSetOperation(context)
 
     override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
         return visitor.sqlSingleColumnSetOperationQuery(context, options, expression) { it.toList() }

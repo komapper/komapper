@@ -11,7 +11,7 @@ import org.komapper.core.dsl.context.SubqueryContext
 
 class SqlSetOperationStatementBuilder(
     private val dialect: Dialect,
-    private val context: SqlSetOperationContext<*>,
+    private val context: SqlSetOperationContext,
     private val aliasManager: AliasManager
 ) {
 
@@ -19,25 +19,25 @@ class SqlSetOperationStatementBuilder(
     private val support = OrderByBuilderSupport(dialect, context.orderBy, EmptyAliasManager, buf)
 
     fun build(): Statement {
-        visitSetOperationComponent(SubqueryContext.SqlSetOperation(context))
+        visitSubqueryContext(context)
         support.orderByClause()
         return buf.toStatement()
     }
 
-    private fun visitSetOperationComponent(component: SubqueryContext<*>) {
-        when (component) {
-            is SubqueryContext.EntitySelect -> visitEntityContext(component.context)
-            is SubqueryContext.SqlSelect -> visitSelectContext(component.context)
-            is SubqueryContext.SqlSetOperation -> {
-                visitSetOperationComponent(component.context.left)
-                val operator = when (component.context.kind) {
+    private fun visitSubqueryContext(subqueryContext: SubqueryContext) {
+        when (subqueryContext) {
+            is EntitySelectContext<*, *, *> -> visitEntityContext(subqueryContext)
+            is SqlSelectContext<*, *, *> -> visitSelectContext(subqueryContext)
+            is SqlSetOperationContext -> {
+                visitSubqueryContext(subqueryContext.left)
+                val operator = when (subqueryContext.kind) {
                     SqlSetOperationKind.INTERSECT -> "intersect"
                     SqlSetOperationKind.EXCEPT -> "except"
                     SqlSetOperationKind.UNION -> "union"
                     SqlSetOperationKind.UNION_ALL -> "union all"
                 }
                 buf.append(" $operator ")
-                visitSetOperationComponent(component.context.right)
+                visitSubqueryContext(subqueryContext.right)
             }
         }
     }

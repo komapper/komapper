@@ -5,7 +5,6 @@ import kotlinx.coroutines.flow.toList
 import org.komapper.core.dsl.context.EntitySelectContext
 import org.komapper.core.dsl.context.SqlSetOperationContext
 import org.komapper.core.dsl.context.SqlSetOperationKind
-import org.komapper.core.dsl.context.SubqueryContext
 import org.komapper.core.dsl.declaration.OnDeclaration
 import org.komapper.core.dsl.declaration.WhereDeclaration
 import org.komapper.core.dsl.element.Associator
@@ -35,7 +34,7 @@ interface EntitySelectQuery<ENTITY : Any> : Subquery<ENTITY> {
 }
 
 internal data class EntitySelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
-    private val context: EntitySelectContext<ENTITY, ID, META>,
+    override val context: EntitySelectContext<ENTITY, ID, META>,
     private val options: EntitySelectOptions = EntitySelectOptions.default
 ) :
     EntitySelectQuery<ENTITY> {
@@ -48,8 +47,6 @@ internal data class EntitySelectQueryImpl<ENTITY : Any, ID, META : EntityMetamod
 
     private val support: SelectQuerySupport<ENTITY, ID, META, EntitySelectContext<ENTITY, ID, META>> =
         SelectQuerySupport(context)
-
-    override val subqueryContext = SubqueryContext.EntitySelect<ENTITY>(context)
 
     override fun innerJoin(metamodel: EntityMetamodel<*, *, *>, on: OnDeclaration): EntitySelectQuery<ENTITY> {
         val newContext = support.innerJoin(metamodel, on)
@@ -130,7 +127,7 @@ internal data class EntitySelectQueryImpl<ENTITY : Any, ID, META : EntityMetamod
         left: SubqueryExpression<ENTITY>,
         right: SubqueryExpression<ENTITY>
     ): SqlSetOperationQuery<ENTITY> {
-        val setOperatorContext = SqlSetOperationContext(kind, left.subqueryContext, right.subqueryContext)
+        val setOperatorContext = SqlSetOperationContext(kind, left.context, right.context)
         return SqlSetOperationQueryImpl(setOperatorContext, metamodel = context.target)
     }
 

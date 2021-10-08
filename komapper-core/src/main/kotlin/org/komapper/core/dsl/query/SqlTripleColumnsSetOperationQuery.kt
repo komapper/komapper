@@ -3,7 +3,6 @@ package org.komapper.core.dsl.query
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.toList
 import org.komapper.core.dsl.context.SqlSetOperationContext
-import org.komapper.core.dsl.context.SubqueryContext
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.expression.SortExpression
 import org.komapper.core.dsl.expression.SubqueryExpression
@@ -12,14 +11,12 @@ import org.komapper.core.dsl.visitor.FlowQueryVisitor
 import org.komapper.core.dsl.visitor.QueryVisitor
 
 internal data class SqlTripleColumnsSetOperationQuery<A : Any, B : Any, C : Any>(
-    private val context: SqlSetOperationContext<Triple<A?, B?, C?>>,
+    override val context: SqlSetOperationContext,
     private val options: SqlSetOperationOptions = SqlSetOperationOptions.default,
     private val expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>
 ) : FlowSetOperationQuery<Triple<A?, B?, C?>> {
 
     private val support: SqlSetOperationQuerySupport<Triple<A?, B?, C?>> = SqlSetOperationQuerySupport(context)
-
-    override val subqueryContext: SubqueryContext<Triple<A?, B?, C?>> = SubqueryContext.SqlSetOperation(context)
 
     override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
         return visitor.sqlTripleColumnsSetOperationQuery(context, options, expressions) { it.toList() }

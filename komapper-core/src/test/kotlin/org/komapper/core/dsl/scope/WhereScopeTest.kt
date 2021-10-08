@@ -293,7 +293,7 @@ internal class WhereScopeTest {
     fun inList() {
         val p1 = PropertyMetamodelStub<Nothing, Int>()
         val subquery = object : SubqueryExpression<Int?> {
-            override val subqueryContext: SubqueryContext<Int?>
+            override val context: SubqueryContext
                 get() = fail()
         }
         val scope = WhereScope().apply {
@@ -316,7 +316,7 @@ internal class WhereScopeTest {
     fun notInList() {
         val p1 = PropertyMetamodelStub<Nothing, Int>()
         val subquery = object : SubqueryExpression<Int?> {
-            override val subqueryContext: SubqueryContext<Int?>
+            override val context: SubqueryContext
                 get() = fail()
         }
         val scope = WhereScope().apply {
@@ -340,7 +340,7 @@ internal class WhereScopeTest {
         val p1 = PropertyMetamodelStub<Nothing, Int>()
         val p2 = PropertyMetamodelStub<Nothing, Int>()
         val subquery = object : SubqueryExpression<Pair<Int?, Int?>> {
-            override val subqueryContext: SubqueryContext<Pair<Int?, Int?>>
+            override val context: SubqueryContext
                 get() = fail()
         }
         val scope = WhereScope().apply {
@@ -371,7 +371,7 @@ internal class WhereScopeTest {
         val p1 = PropertyMetamodelStub<Nothing, Int>()
         val p2 = PropertyMetamodelStub<Nothing, Int>()
         val subquery = object : SubqueryExpression<Pair<Int?, Int?>> {
-            override val subqueryContext: SubqueryContext<Pair<Int?, Int?>>
+            override val context: SubqueryContext
                 get() = fail()
         }
         val scope = WhereScope().apply {
@@ -400,7 +400,7 @@ internal class WhereScopeTest {
     @Test
     fun exists() {
         val subquery = object : SubqueryExpression<Int?> {
-            override val subqueryContext: SubqueryContext<Int?>
+            override val context: SubqueryContext
                 get() = fail()
         }
         val scope = WhereScope().apply {
@@ -414,7 +414,7 @@ internal class WhereScopeTest {
     @Test
     fun notExists() {
         val subquery = object : SubqueryExpression<Int?> {
-            override val subqueryContext: SubqueryContext<Int?>
+            override val context: SubqueryContext
                 get() = fail()
         }
         val scope = WhereScope().apply {

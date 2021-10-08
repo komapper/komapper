@@ -8,8 +8,6 @@ import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.SqlSelectOptions
 import org.komapper.core.dsl.options.SqlSetOperationOptions
 import org.komapper.core.dsl.options.TemplateSelectOptions
-import org.komapper.core.dsl.query.Columns
-import org.komapper.core.dsl.query.Entities
 import org.komapper.core.dsl.query.Row
 
 @ThreadSafe
@@ -21,7 +19,7 @@ interface FlowQueryVisitor<VISIT_RESULT> {
     ): VISIT_RESULT
 
     fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> sqlSetOperationQuery(
-        context: SqlSetOperationContext<ENTITY>,
+        context: SqlSetOperationContext,
         options: SqlSetOperationOptions,
         metamodel: EntityMetamodel<ENTITY, ID, META>,
     ): VISIT_RESULT
@@ -35,7 +33,7 @@ interface FlowQueryVisitor<VISIT_RESULT> {
 
     fun <A : Any, A_META : EntityMetamodel<A, *, A_META>, B : Any, B_META : EntityMetamodel<B, *, B_META>>
     sqlPairEntitiesSetOperationQuery(
-        context: SqlSetOperationContext<Pair<A, B?>>,
+        context: SqlSetOperationContext,
         options: SqlSetOperationOptions,
         metamodels: Pair<A_META, B_META>,
     ): VISIT_RESULT
@@ -49,7 +47,7 @@ interface FlowQueryVisitor<VISIT_RESULT> {
 
     fun <A : Any, A_META : EntityMetamodel<A, *, A_META>, B : Any, B_META : EntityMetamodel<B, *, B_META>, C : Any, C_META : EntityMetamodel<C, *, C_META>>
     sqlTripleEntitiesSetOperationQuery(
-        context: SqlSetOperationContext<Triple<A, B?, C?>>,
+        context: SqlSetOperationContext,
         options: SqlSetOperationOptions,
         metamodels: Triple<A_META, B_META, C_META>,
     ): VISIT_RESULT
@@ -61,7 +59,7 @@ interface FlowQueryVisitor<VISIT_RESULT> {
     ): VISIT_RESULT
 
     fun sqlMultipleEntitiesSetOperationQuery(
-        context: SqlSetOperationContext<Entities>,
+        context: SqlSetOperationContext,
         options: SqlSetOperationOptions,
         metamodels: List<EntityMetamodel<*, *, *>>,
     ): VISIT_RESULT
@@ -73,7 +71,7 @@ interface FlowQueryVisitor<VISIT_RESULT> {
     ): VISIT_RESULT
 
     fun <A : Any> sqlSingleColumnSetOperationQuery(
-        context: SqlSetOperationContext<A?>,
+        context: SqlSetOperationContext,
         options: SqlSetOperationOptions,
         expression: ColumnExpression<A, *>,
     ): VISIT_RESULT
@@ -85,7 +83,7 @@ interface FlowQueryVisitor<VISIT_RESULT> {
     ): VISIT_RESULT
 
     fun <A : Any, B : Any> sqlPairColumnsSetOperationQuery(
-        context: SqlSetOperationContext<Pair<A?, B?>>,
+        context: SqlSetOperationContext,
         options: SqlSetOperationOptions = SqlSetOperationOptions.default,
         expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
     ): VISIT_RESULT
@@ -98,7 +96,7 @@ interface FlowQueryVisitor<VISIT_RESULT> {
     ): VISIT_RESULT
 
     fun <A : Any, B : Any, C : Any> sqlTripleColumnsSetOperationQuery(
-        context: SqlSetOperationContext<Triple<A?, B?, C?>>,
+        context: SqlSetOperationContext,
         options: SqlSetOperationOptions,
         expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
     ): VISIT_RESULT
@@ -110,7 +108,7 @@ interface FlowQueryVisitor<VISIT_RESULT> {
     ): VISIT_RESULT
 
     fun sqlMultipleColumnsSetOperationQuery(
-        context: SqlSetOperationContext<Columns>,
+        context: SqlSetOperationContext,
         options: SqlSetOperationOptions,
         expressions: List<ColumnExpression<*, *>>
     ): VISIT_RESULT

@@ -10,7 +10,7 @@ import org.komapper.r2dbc.R2dbcDatabaseConfig
 import org.komapper.r2dbc.R2dbcDialect
 
 internal class SqlSetOperationR2dbcRunner<T, R>(
-    context: SqlSetOperationContext<T>,
+    context: SqlSetOperationContext,
     options: SqlSetOperationOptions,
     transform: (R2dbcDialect, Row) -> T,
     private val collect: suspend (Flow<T>) -> R

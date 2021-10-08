@@ -3,7 +3,6 @@ package org.komapper.core.dsl.query
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.toList
 import org.komapper.core.dsl.context.SqlSetOperationContext
-import org.komapper.core.dsl.context.SubqueryContext
 import org.komapper.core.dsl.expression.SortExpression
 import org.komapper.core.dsl.expression.SubqueryExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
@@ -15,12 +14,10 @@ internal data class SqlTripleEntitiesSetOperationQuery<
     A : Any, A_META : EntityMetamodel<A, *, A_META>,
     B : Any, B_META : EntityMetamodel<B, *, B_META>,
     C : Any, C_META : EntityMetamodel<C, *, C_META>>(
-    private val context: SqlSetOperationContext<Triple<A, B?, C?>>,
+    override val context: SqlSetOperationContext,
     private val options: SqlSetOperationOptions = SqlSetOperationOptions.default,
     private val metamodels: Triple<A_META, B_META, C_META>
 ) : FlowSetOperationQuery<Triple<A, B?, C?>> {
-
-    override val subqueryContext: SubqueryContext<Triple<A, B?, C?>> = SubqueryContext.SqlSetOperation(context)
 
     private val support: SqlSetOperationQuerySupport<Triple<A, B?, C?>> = SqlSetOperationQuerySupport(context)
 

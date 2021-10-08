@@ -6,8 +6,8 @@ import org.komapper.core.dsl.context.SubqueryContext
 import org.komapper.core.dsl.expression.SubqueryExpression
 
 internal class FlowSubquerySupport<T>(
-    private val subqueryContext: SubqueryContext<T>,
-    private val transform: (SqlSetOperationContext<T>) -> FlowSetOperationQuery<T>,
+    private val context: SubqueryContext,
+    private val transform: (SqlSetOperationContext) -> FlowSetOperationQuery<T>,
 ) {
 
     fun except(other: SubqueryExpression<T>): FlowSetOperationQuery<T> {
@@ -30,7 +30,7 @@ internal class FlowSubquerySupport<T>(
         kind: SqlSetOperationKind,
         other: SubqueryExpression<T>
     ): FlowSetOperationQuery<T> {
-        val setOperatorContext = SqlSetOperationContext(kind, this.subqueryContext, other.subqueryContext)
+        val setOperatorContext = SqlSetOperationContext(kind, context, other.context)
         return transform(setOperatorContext)
     }
 }

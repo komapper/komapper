@@ -3,7 +3,6 @@ package org.komapper.core.dsl.query
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.toList
 import org.komapper.core.dsl.context.SqlSelectContext
-import org.komapper.core.dsl.context.SubqueryContext
 import org.komapper.core.dsl.declaration.HavingDeclaration
 import org.komapper.core.dsl.declaration.OnDeclaration
 import org.komapper.core.dsl.declaration.WhereDeclaration
@@ -78,7 +77,7 @@ interface SqlSelectQuery<ENTITY : Any> : FlowSubquery<ENTITY> {
 }
 
 internal data class SqlSelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
-    private val context: SqlSelectContext<ENTITY, ID, META>,
+    override val context: SqlSelectContext<ENTITY, ID, META>,
     private val options: SqlSelectOptions = SqlSelectOptions.default
 ) :
     SqlSelectQuery<ENTITY> {
@@ -96,10 +95,8 @@ internal data class SqlSelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<
     private val support: SelectQuerySupport<ENTITY, ID, META, SqlSelectContext<ENTITY, ID, META>> =
         SelectQuerySupport(context)
 
-    override val subqueryContext = SubqueryContext.SqlSelect<ENTITY>(context)
-
     private val subquerySupport: FlowSubquerySupport<ENTITY> =
-        FlowSubquerySupport(subqueryContext) { SqlSetOperationQueryImpl(it, metamodel = context.target) }
+        FlowSubquerySupport(context) { SqlSetOperationQueryImpl(it, metamodel = context.target) }
 
     override fun distinct(): SqlSelectQuery<ENTITY> {
         val newContext = context.copy(distinct = true)

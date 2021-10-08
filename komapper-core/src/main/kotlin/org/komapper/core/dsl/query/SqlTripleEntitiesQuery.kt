@@ -3,7 +3,6 @@ package org.komapper.core.dsl.query
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.toList
 import org.komapper.core.dsl.context.SqlSelectContext
-import org.komapper.core.dsl.context.SubqueryContext
 import org.komapper.core.dsl.expression.SubqueryExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.SqlSelectOptions
@@ -14,15 +13,13 @@ internal class SqlTripleEntitiesQuery<
     A : Any, A_META : EntityMetamodel<A, *, A_META>,
     B : Any, B_META : EntityMetamodel<B, *, B_META>,
     C : Any, C_META : EntityMetamodel<C, *, C_META>>(
-    private val context: SqlSelectContext<A, *, A_META>,
+    override val context: SqlSelectContext<A, *, A_META>,
     private val options: SqlSelectOptions,
     private val metamodels: Triple<A_META, B_META, C_META>
 ) : FlowSubquery<Triple<A, B?, C?>> {
 
-    override val subqueryContext: SubqueryContext<Triple<A, B?, C?>> = SubqueryContext.SqlSelect(context)
-
     private val support: FlowSubquerySupport<Triple<A, B?, C?>> =
-        FlowSubquerySupport(subqueryContext) { SqlTripleEntitiesSetOperationQuery(it, metamodels = metamodels) }
+        FlowSubquerySupport(context) { SqlTripleEntitiesSetOperationQuery(it, metamodels = metamodels) }
 
     override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
         return visitor.sqlTripleEntitiesQuery(context, options, metamodels) { it.toList() }

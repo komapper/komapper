@@ -3,7 +3,6 @@ package org.komapper.core.dsl.query
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.toList
 import org.komapper.core.dsl.context.SqlSetOperationContext
-import org.komapper.core.dsl.context.SubqueryContext
 import org.komapper.core.dsl.expression.SortExpression
 import org.komapper.core.dsl.expression.SubqueryExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
@@ -12,14 +11,12 @@ import org.komapper.core.dsl.visitor.FlowQueryVisitor
 import org.komapper.core.dsl.visitor.QueryVisitor
 
 internal data class SqlMultipleEntitiesSetOperationQuery(
-    private val context: SqlSetOperationContext<Entities>,
+    override val context: SqlSetOperationContext,
     private val options: SqlSetOperationOptions = SqlSetOperationOptions.default,
     private val metamodels: List<EntityMetamodel<*, *, *>>
 ) : FlowSetOperationQuery<Entities> {
 
     private val support: SqlSetOperationQuerySupport<Entities> = SqlSetOperationQuerySupport(context)
-
-    override val subqueryContext: SubqueryContext<Entities> = SubqueryContext.SqlSetOperation(context)
 
     override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
         return visitor.sqlMultipleEntitiesSetOperationQuery(context, options, metamodels) { it.toList() }
