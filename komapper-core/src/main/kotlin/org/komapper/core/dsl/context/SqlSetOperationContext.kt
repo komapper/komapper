@@ -3,23 +3,23 @@ package org.komapper.core.dsl.context
 import org.komapper.core.dsl.element.SortItem
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 
-data class SqlSetOperationContext<T>(
+data class SqlSetOperationContext(
     val kind: SqlSetOperationKind,
-    val left: SubqueryContext<T>,
-    val right: SubqueryContext<T>,
+    val left: SubqueryContext,
+    val right: SubqueryContext,
     val orderBy: List<SortItem> = listOf()
-) : Context {
+) : Context, SubqueryContext {
 
     override fun getEntityMetamodels(): Set<EntityMetamodel<*, *, *>> {
         return visitSubqueryContext(left) + visitSubqueryContext(right)
     }
 
-    private fun visitSubqueryContext(subqueryContext: SubqueryContext<*>): Set<EntityMetamodel<*, *, *>> {
+    private fun visitSubqueryContext(subqueryContext: SubqueryContext): Set<EntityMetamodel<*, *, *>> {
         return when (subqueryContext) {
-            is SubqueryContext.EntitySelect -> setOf(subqueryContext.context.target)
-            is SubqueryContext.SqlSelect -> setOf(subqueryContext.context.target)
-            is SubqueryContext.SqlSetOperation -> {
-                visitSubqueryContext(subqueryContext.context.left) + visitSubqueryContext(subqueryContext.context.right)
+            is EntitySelectContext<*, *, *> -> setOf(subqueryContext.target)
+            is SqlSelectContext<*, *, *> -> setOf(subqueryContext.target)
+            is SqlSetOperationContext -> {
+                visitSubqueryContext(subqueryContext.left) + visitSubqueryContext(subqueryContext.right)
             }
         }
     }

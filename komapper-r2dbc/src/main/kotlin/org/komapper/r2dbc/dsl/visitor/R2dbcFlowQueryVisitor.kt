@@ -28,7 +28,7 @@ internal object R2dbcFlowQueryVisitor : FlowQueryVisitor<FlowBuilder<*>> {
     }
 
     override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> sqlSetOperationQuery(
-        context: SqlSetOperationContext<ENTITY>,
+        context: SqlSetOperationContext,
         options: SqlSetOperationOptions,
         metamodel: EntityMetamodel<ENTITY, ID, META>
     ): FlowBuilder<ENTITY> {
@@ -46,7 +46,7 @@ internal object R2dbcFlowQueryVisitor : FlowQueryVisitor<FlowBuilder<*>> {
     }
 
     override fun <A : Any, A_META : EntityMetamodel<A, *, A_META>, B : Any, B_META : EntityMetamodel<B, *, B_META>> sqlPairEntitiesSetOperationQuery(
-        context: SqlSetOperationContext<Pair<A, B?>>,
+        context: SqlSetOperationContext,
         options: SqlSetOperationOptions,
         metamodels: Pair<A_META, B_META>
     ): FlowBuilder<Pair<A, B?>> {
@@ -64,7 +64,7 @@ internal object R2dbcFlowQueryVisitor : FlowQueryVisitor<FlowBuilder<*>> {
     }
 
     override fun <A : Any, A_META : EntityMetamodel<A, *, A_META>, B : Any, B_META : EntityMetamodel<B, *, B_META>, C : Any, C_META : EntityMetamodel<C, *, C_META>> sqlTripleEntitiesSetOperationQuery(
-        context: SqlSetOperationContext<Triple<A, B?, C?>>,
+        context: SqlSetOperationContext,
         options: SqlSetOperationOptions,
         metamodels: Triple<A_META, B_META, C_META>
     ): FlowBuilder<Triple<A, B?, C?>> {
@@ -82,7 +82,7 @@ internal object R2dbcFlowQueryVisitor : FlowQueryVisitor<FlowBuilder<*>> {
     }
 
     override fun sqlMultipleEntitiesSetOperationQuery(
-        context: SqlSetOperationContext<Entities>,
+        context: SqlSetOperationContext,
         options: SqlSetOperationOptions,
         metamodels: List<EntityMetamodel<*, *, *>>
     ): FlowBuilder<Entities> {
@@ -100,7 +100,7 @@ internal object R2dbcFlowQueryVisitor : FlowQueryVisitor<FlowBuilder<*>> {
     }
 
     override fun <A : Any> sqlSingleColumnSetOperationQuery(
-        context: SqlSetOperationContext<A?>,
+        context: SqlSetOperationContext,
         options: SqlSetOperationOptions,
         expression: ColumnExpression<A, *>
     ): FlowBuilder<A?> {
@@ -118,7 +118,7 @@ internal object R2dbcFlowQueryVisitor : FlowQueryVisitor<FlowBuilder<*>> {
     }
 
     override fun <A : Any, B : Any> sqlPairColumnsSetOperationQuery(
-        context: SqlSetOperationContext<Pair<A?, B?>>,
+        context: SqlSetOperationContext,
         options: SqlSetOperationOptions,
         expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>
     ): FlowBuilder<Pair<A?, B?>> {
@@ -136,7 +136,7 @@ internal object R2dbcFlowQueryVisitor : FlowQueryVisitor<FlowBuilder<*>> {
     }
 
     override fun <A : Any, B : Any, C : Any> sqlTripleColumnsSetOperationQuery(
-        context: SqlSetOperationContext<Triple<A?, B?, C?>>,
+        context: SqlSetOperationContext,
         options: SqlSetOperationOptions,
         expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>
     ): FlowBuilder<Triple<A?, B?, C?>> {
@@ -154,7 +154,7 @@ internal object R2dbcFlowQueryVisitor : FlowQueryVisitor<FlowBuilder<*>> {
     }
 
     override fun sqlMultipleColumnsSetOperationQuery(
-        context: SqlSetOperationContext<Columns>,
+        context: SqlSetOperationContext,
         options: SqlSetOperationOptions,
         expressions: List<ColumnExpression<*, *>>
     ): FlowBuilder<Columns> {

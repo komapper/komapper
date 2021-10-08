@@ -4,7 +4,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import org.komapper.core.ThreadSafe
-import org.komapper.core.dsl.context.SubqueryContext
 import org.komapper.core.dsl.expression.SortExpression
 import org.komapper.core.dsl.expression.SubqueryExpression
 import org.komapper.core.dsl.options.SqlSetOperationOptions
@@ -40,11 +39,10 @@ interface ListQuery<T> : Query<List<T>> {
 }
 
 interface Subquery<T> : ListQuery<T>, SubqueryExpression<T> {
-    override val subqueryContext: SubqueryContext<T>
-    infix fun except(other: Subquery<T>): SetOperationQuery<T>
-    infix fun intersect(other: Subquery<T>): SetOperationQuery<T>
-    infix fun union(other: Subquery<T>): SetOperationQuery<T>
-    infix fun unionAll(other: Subquery<T>): SetOperationQuery<T>
+    infix fun except(other: SubqueryExpression<T>): SetOperationQuery<T>
+    infix fun intersect(other: SubqueryExpression<T>): SetOperationQuery<T>
+    infix fun union(other: SubqueryExpression<T>): SetOperationQuery<T>
+    infix fun unionAll(other: SubqueryExpression<T>): SetOperationQuery<T>
 }
 
 interface SetOperationQuery<T> : Subquery<T> {

@@ -19,7 +19,7 @@ data class EntitySelectContext<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, 
     override val limit: Int = -1,
     override val forUpdate: ForUpdate = ForUpdate(),
     val associatorMap: Map<Association, Associator<Any, Any>> = mapOf()
-) : SelectContext<ENTITY, ID, META, EntitySelectContext<ENTITY, ID, META>> {
+) : SelectContext<ENTITY, ID, META, EntitySelectContext<ENTITY, ID, META>>, SubqueryContext {
 
     override fun addJoin(join: Join<*, *>): EntitySelectContext<ENTITY, ID, META> {
         return copy(joins = this.joins + join)

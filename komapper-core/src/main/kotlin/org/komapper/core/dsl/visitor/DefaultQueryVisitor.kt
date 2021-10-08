@@ -210,7 +210,7 @@ internal object DefaultQueryVisitor : QueryVisitor<Runner> {
     }
 
     override fun <T : Any, R> sqlSetOperationQuery(
-        context: SqlSetOperationContext<T>,
+        context: SqlSetOperationContext,
         options: SqlSetOperationOptions,
         metamodel: EntityMetamodel<T, *, *>,
         collect: suspend (Flow<T>) -> R
@@ -230,7 +230,7 @@ internal object DefaultQueryVisitor : QueryVisitor<Runner> {
 
     override fun <A : Any, A_META : EntityMetamodel<A, *, A_META>, B : Any, B_META : EntityMetamodel<B, *, B_META>, R>
     sqlPairEntitiesSetOperationQuery(
-        context: SqlSetOperationContext<Pair<A, B?>>,
+        context: SqlSetOperationContext,
         options: SqlSetOperationOptions,
         metamodels: Pair<A_META, B_META>,
         collect: suspend (Flow<Pair<A, B?>>) -> R
@@ -250,7 +250,7 @@ internal object DefaultQueryVisitor : QueryVisitor<Runner> {
 
     override fun <A : Any, A_META : EntityMetamodel<A, *, A_META>, B : Any, B_META : EntityMetamodel<B, *, B_META>, C : Any, C_META : EntityMetamodel<C, *, C_META>, R>
     sqlTripleEntitiesSetOperationQuery(
-        context: SqlSetOperationContext<Triple<A, B?, C?>>,
+        context: SqlSetOperationContext,
         options: SqlSetOperationOptions,
         metamodels: Triple<A_META, B_META, C_META>,
         collect: suspend (Flow<Triple<A, B?, C?>>) -> R
@@ -268,7 +268,7 @@ internal object DefaultQueryVisitor : QueryVisitor<Runner> {
     }
 
     override fun <R> sqlMultipleEntitiesSetOperationQuery(
-        context: SqlSetOperationContext<Entities>,
+        context: SqlSetOperationContext,
         options: SqlSetOperationOptions,
         metamodels: List<EntityMetamodel<*, *, *>>,
         collect: suspend (Flow<Entities>) -> R
@@ -286,7 +286,7 @@ internal object DefaultQueryVisitor : QueryVisitor<Runner> {
     }
 
     override fun <A : Any, R> sqlSingleColumnSetOperationQuery(
-        context: SqlSetOperationContext<A?>,
+        context: SqlSetOperationContext,
         options: SqlSetOperationOptions,
         expression: ColumnExpression<A, *>,
         collect: suspend (Flow<A?>) -> R
@@ -304,7 +304,7 @@ internal object DefaultQueryVisitor : QueryVisitor<Runner> {
     }
 
     override fun <A : Any, B : Any, R> sqlPairColumnsSetOperationQuery(
-        context: SqlSetOperationContext<Pair<A?, B?>>,
+        context: SqlSetOperationContext,
         options: SqlSetOperationOptions,
         expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
         collect: suspend (Flow<Pair<A?, B?>>) -> R
@@ -322,7 +322,7 @@ internal object DefaultQueryVisitor : QueryVisitor<Runner> {
     }
 
     override fun <A : Any, B : Any, C : Any, R> sqlTripleColumnsSetOperationQuery(
-        context: SqlSetOperationContext<Triple<A?, B?, C?>>,
+        context: SqlSetOperationContext,
         options: SqlSetOperationOptions,
         expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
         collect: suspend (Flow<Triple<A?, B?, C?>>) -> R
@@ -340,7 +340,7 @@ internal object DefaultQueryVisitor : QueryVisitor<Runner> {
     }
 
     override fun <R> sqlMultipleColumnsSetOperationQuery(
-        context: SqlSetOperationContext<Columns>,
+        context: SqlSetOperationContext,
         options: SqlSetOperationOptions,
         expressions: List<ColumnExpression<*, *>>,
         collect: suspend (Flow<Columns>) -> R

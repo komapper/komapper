@@ -8,7 +8,7 @@ import org.komapper.core.dsl.context.SqlSetOperationContext
 import org.komapper.core.dsl.options.SqlSetOperationOptions
 
 class SqlSetOperationRunner(
-    private val context: SqlSetOperationContext<*>,
+    private val context: SqlSetOperationContext,
     @Suppress("unused") private val options: SqlSetOperationOptions,
 ) : Runner {
 

@@ -20,7 +20,7 @@ data class SqlSelectContext<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID,
     val groupBy: List<ColumnExpression<*, *>> = listOf(),
     val having: List<Criterion> = listOf(),
     val distinct: Boolean = false,
-) : SelectContext<ENTITY, ID, META, SqlSelectContext<ENTITY, ID, META>> {
+) : SelectContext<ENTITY, ID, META, SqlSelectContext<ENTITY, ID, META>>, SubqueryContext {
 
     fun setProjection(vararg expressions: ColumnExpression<*, *>): SqlSelectContext<ENTITY, ID, META> {
         return copy(projection = Projection.Expressions(expressions.toList()))

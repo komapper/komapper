@@ -3,8 +3,8 @@ package org.komapper.core.dsl.query
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.toList
 import org.komapper.core.dsl.context.SqlSetOperationContext
-import org.komapper.core.dsl.context.SubqueryContext
 import org.komapper.core.dsl.expression.SortExpression
+import org.komapper.core.dsl.expression.SubqueryExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.SqlSetOperationOptions
 import org.komapper.core.dsl.visitor.FlowQueryVisitor
@@ -13,12 +13,10 @@ import org.komapper.core.dsl.visitor.QueryVisitor
 interface SqlSetOperationQuery<ENTITY : Any> : FlowSetOperationQuery<ENTITY>
 
 internal data class SqlSetOperationQueryImpl<ENTITY : Any>(
-    private val context: SqlSetOperationContext<ENTITY>,
+    override val context: SqlSetOperationContext,
     private val options: SqlSetOperationOptions = SqlSetOperationOptions.default,
     private val metamodel: EntityMetamodel<ENTITY, *, *>
 ) : SqlSetOperationQuery<ENTITY>, FlowQuery<ENTITY> {
-
-    override val subqueryContext = SubqueryContext.SqlSetOperation(context)
 
     private val support: SqlSetOperationQuerySupport<ENTITY> = SqlSetOperationQuerySupport(context)
 
@@ -36,19 +34,19 @@ internal data class SqlSetOperationQueryImpl<ENTITY : Any>(
         }
     }
 
-    override fun except(other: Subquery<ENTITY>): SqlSetOperationQuery<ENTITY> {
+    override fun except(other: SubqueryExpression<ENTITY>): SqlSetOperationQuery<ENTITY> {
         return copy(context = support.except(other))
     }
 
-    override fun intersect(other: Subquery<ENTITY>): SqlSetOperationQuery<ENTITY> {
+    override fun intersect(other: SubqueryExpression<ENTITY>): SqlSetOperationQuery<ENTITY> {
         return copy(context = support.intersect(other))
     }
 
-    override fun union(other: Subquery<ENTITY>): SqlSetOperationQuery<ENTITY> {
+    override fun union(other: SubqueryExpression<ENTITY>): SqlSetOperationQuery<ENTITY> {
         return copy(context = support.union(other))
     }
 
-    override fun unionAll(other: Subquery<ENTITY>): SqlSetOperationQuery<ENTITY> {
+    override fun unionAll(other: SubqueryExpression<ENTITY>): SqlSetOperationQuery<ENTITY> {
         return copy(context = support.unionAll(other))
     }
 

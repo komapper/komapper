@@ -3,20 +3,18 @@ package org.komapper.core.dsl.query
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.toList
 import org.komapper.core.dsl.context.SqlSetOperationContext
-import org.komapper.core.dsl.context.SubqueryContext
 import org.komapper.core.dsl.expression.SortExpression
+import org.komapper.core.dsl.expression.SubqueryExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.SqlSetOperationOptions
 import org.komapper.core.dsl.visitor.FlowQueryVisitor
 import org.komapper.core.dsl.visitor.QueryVisitor
 
 internal data class SqlPairEntitiesSetOperationQuery<A : Any, A_META : EntityMetamodel<A, *, A_META>, B : Any, B_META : EntityMetamodel<B, *, B_META>>(
-    private val context: SqlSetOperationContext<Pair<A, B?>>,
+    override val context: SqlSetOperationContext,
     private val options: SqlSetOperationOptions = SqlSetOperationOptions.default,
     private val metamodels: Pair<A_META, B_META>
 ) : FlowSetOperationQuery<Pair<A, B?>> {
-
-    override val subqueryContext: SubqueryContext<Pair<A, B?>> = SubqueryContext.SqlSetOperation(context)
 
     private val support: SqlSetOperationQuerySupport<Pair<A, B?>> = SqlSetOperationQuerySupport(context)
 
@@ -34,19 +32,19 @@ internal data class SqlPairEntitiesSetOperationQuery<A : Any, A_META : EntityMet
         }
     }
 
-    override fun except(other: Subquery<Pair<A, B?>>): FlowSetOperationQuery<Pair<A, B?>> {
+    override fun except(other: SubqueryExpression<Pair<A, B?>>): FlowSetOperationQuery<Pair<A, B?>> {
         return copy(context = support.except(other))
     }
 
-    override fun intersect(other: Subquery<Pair<A, B?>>): FlowSetOperationQuery<Pair<A, B?>> {
+    override fun intersect(other: SubqueryExpression<Pair<A, B?>>): FlowSetOperationQuery<Pair<A, B?>> {
         return copy(context = support.intersect(other))
     }
 
-    override fun union(other: Subquery<Pair<A, B?>>): FlowSetOperationQuery<Pair<A, B?>> {
+    override fun union(other: SubqueryExpression<Pair<A, B?>>): FlowSetOperationQuery<Pair<A, B?>> {
         return copy(context = support.union(other))
     }
 
-    override fun unionAll(other: Subquery<Pair<A, B?>>): FlowSetOperationQuery<Pair<A, B?>> {
+    override fun unionAll(other: SubqueryExpression<Pair<A, B?>>): FlowSetOperationQuery<Pair<A, B?>> {
         return copy(context = support.unionAll(other))
     }
 

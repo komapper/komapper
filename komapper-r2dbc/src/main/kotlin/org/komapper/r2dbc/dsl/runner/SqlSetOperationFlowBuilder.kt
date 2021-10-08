@@ -4,6 +4,8 @@ import io.r2dbc.spi.Row
 import kotlinx.coroutines.flow.Flow
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.Statement
+import org.komapper.core.dsl.context.EntitySelectContext
+import org.komapper.core.dsl.context.SqlSelectContext
 import org.komapper.core.dsl.context.SqlSetOperationContext
 import org.komapper.core.dsl.context.SubqueryContext
 import org.komapper.core.dsl.options.SqlSetOperationOptions
@@ -13,7 +15,7 @@ import org.komapper.r2dbc.R2dbcDialect
 import org.komapper.r2dbc.R2dbcExecutor
 
 internal class SqlSetOperationFlowBuilder<T>(
-    private val context: SqlSetOperationContext<T>,
+    private val context: SqlSetOperationContext,
     private val options: SqlSetOperationOptions,
     private val transform: (R2dbcDialect, Row) -> T
 ) : FlowBuilder<T> {
@@ -30,21 +32,21 @@ internal class SqlSetOperationFlowBuilder<T>(
         return executor.executeQuery(statement, transform)
     }
 
-    private fun checkWhereClauses(subqueryContext: SubqueryContext<*>) {
+    private fun checkWhereClauses(subqueryContext: SubqueryContext) {
         when (subqueryContext) {
-            is SubqueryContext.EntitySelect -> {
-                if (subqueryContext.context.where.isEmpty()) {
+            is EntitySelectContext<*, *, *> -> {
+                if (subqueryContext.where.isEmpty()) {
                     error("Empty where clause is not allowed.")
                 }
             }
-            is SubqueryContext.SqlSelect -> {
-                if (subqueryContext.context.where.isEmpty()) {
+            is SqlSelectContext<*, *, *> -> {
+                if (subqueryContext.where.isEmpty()) {
                     error("Empty where clause is not allowed.")
                 }
             }
-            is SubqueryContext.SqlSetOperation -> {
-                checkWhereClauses(subqueryContext.context.left)
-                checkWhereClauses(subqueryContext.context.right)
+            is SqlSetOperationContext -> {
+                checkWhereClauses(subqueryContext.left)
+                checkWhereClauses(subqueryContext.right)
             }
         }
     }
