@@ -13,6 +13,7 @@ import org.komapper.core.dsl.operator.minus
 import org.komapper.core.dsl.operator.plus
 import org.komapper.core.dsl.operator.rem
 import org.komapper.core.dsl.operator.rtrim
+import org.komapper.core.dsl.operator.substring
 import org.komapper.core.dsl.operator.trim
 import org.komapper.core.dsl.operator.upper
 import org.komapper.core.dsl.query.dryRun
@@ -199,6 +200,24 @@ class ExpressionTest(private val db: JdbcDatabase) {
             SqlDsl.from(a).select(upper(literal("test"))).first()
         }
         assertEquals("TEST", result)
+    }
+
+    @Test
+    fun substringFunction_startIndex() {
+        val a = Address.meta
+        val result = db.runQuery {
+            SqlDsl.from(a).select(substring(literal("hello world"), 7)).first()
+        }
+        assertEquals("world", result)
+    }
+
+    @Test
+    fun substringFunction_startIndex_endIndex() {
+        val a = Address.meta
+        val result = db.runQuery {
+            SqlDsl.from(a).select(substring(literal("hello world"), 7, 1)).first()
+        }
+        assertEquals("w", result)
     }
 
     @Test

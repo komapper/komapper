@@ -244,12 +244,23 @@ class BuilderSupport(
                 visitOperand(function.operand)
                 buf.append(")")
             }
+            is StringFunction.Substring -> {
+                buf.append("substring(")
+                visitOperand(function.target)
+                buf.append(", ")
+                visitOperand(function.startIndex)
+                val endIndex = function.endIndex
+                if (endIndex != null) {
+                    buf.append(", ")
+                    visitOperand(endIndex)
+                }
+                buf.append(")")
+            }
             is StringFunction.Trim -> {
                 buf.append("trim(")
                 visitOperand(function.operand)
                 buf.append(")")
             }
-
             is StringFunction.Upper -> {
                 buf.append("upper(")
                 visitOperand(function.operand)
