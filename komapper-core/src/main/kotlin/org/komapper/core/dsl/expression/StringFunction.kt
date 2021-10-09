@@ -28,6 +28,14 @@ internal sealed class StringFunction<T : Any> : ColumnExpression<T, String> {
     ) :
         ColumnExpression<T, String> by expression, StringFunction<T>()
 
+    internal data class Substring<T : Any>(
+        val expression: ColumnExpression<T, String>,
+        val target: Operand,
+        val startIndex: Operand,
+        val endIndex: Operand?
+    ) :
+        ColumnExpression<T, String> by expression, StringFunction<T>()
+
     internal data class Trim<T : Any>(
         val expression: ColumnExpression<T, String>,
         val operand: Operand
