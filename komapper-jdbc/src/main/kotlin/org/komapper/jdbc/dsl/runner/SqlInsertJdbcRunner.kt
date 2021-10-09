@@ -13,16 +13,17 @@ import org.komapper.jdbc.JdbcExecutor
 internal class SqlInsertJdbcRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: SqlInsertContext<ENTITY, ID, META>,
     private val options: SqlInsertOptions
-) : JdbcRunner<Pair<Int, Long?>> {
+) : JdbcRunner<Pair<Int, ID?>> {
 
     private val runner: SqlInsertRunner<ENTITY, ID, META> = SqlInsertRunner(context, options)
 
-    override fun run(config: JdbcDatabaseConfig): Pair<Int, Long?> {
+    override fun run(config: JdbcDatabaseConfig): Pair<Int, ID?> {
         val statement = runner.buildStatement(config)
         val requiresGeneratedKeys = context.target.idAssignment() is Assignment.AutoIncrement<ENTITY, *, *>
         val executor = JdbcExecutor(config, options, requiresGeneratedKeys)
         val (count, keys) = executor.executeUpdate(statement)
-        return count to keys.firstOrNull()
+        val id = keys.firstOrNull()?.let { context.target.toId(it) }
+        return count to id
     }
 
     override fun dryRun(config: DatabaseConfig): Statement {

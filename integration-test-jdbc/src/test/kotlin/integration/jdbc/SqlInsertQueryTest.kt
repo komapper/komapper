@@ -12,7 +12,7 @@ import java.math.BigDecimal
 import java.time.LocalDate
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
+import kotlin.test.assertIs
 import kotlin.test.assertNull
 
 @ExtendWith(Env::class)
@@ -59,14 +59,14 @@ class SqlInsertQueryTest(private val db: JdbcDatabase) {
     @Test
     fun generatedKeys() {
         val a = IdentityStrategy.meta
-        val (count, key) = db.runQuery {
+        val (count, id) = db.runQuery {
             SqlDsl.insert(a).values {
                 a.id set 10
                 a.value set "test"
             }
         }
         assertEquals(1, count)
-        assertNotNull(key)
+        assertIs<Int>(id)
     }
 
     @Test

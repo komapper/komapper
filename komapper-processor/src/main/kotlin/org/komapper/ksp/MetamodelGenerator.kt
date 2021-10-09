@@ -70,6 +70,7 @@ internal class EntityMetamodelGenerator(
         updatedAtProperty()
         properties()
         getId()
+        toId()
         preInsert()
         preUpdate()
         postUpdate()
@@ -211,6 +212,21 @@ internal class EntityMetamodelGenerator(
             "listOf($list)"
         }
         w.println("    override fun getId(e: $entityTypeName): $idTypeName = $body")
+    }
+
+    private fun toId() {
+        val body = if (entity.idProperties.size == 1) {
+            val p = entity.idProperties[0]
+            when (p.typeName) {
+                "kotlin.Int" -> "generatedKey.toInt()"
+                "kotlin.Long" -> "generatedKey"
+                "kotlin.UInt" -> "generatedKey.toUInt()"
+                else -> "null"
+            }
+        } else {
+            "null"
+        }
+        w.println("    override fun toId(generatedKey: Long): $idTypeName? = $body")
     }
 
     private fun preInsert() {

@@ -381,7 +381,7 @@ internal object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
     override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> sqlInsertQuery(
         context: SqlInsertContext<ENTITY, ID, META>,
         options: SqlInsertOptions
-    ): JdbcRunner<Pair<Int, Long?>> {
+    ): JdbcRunner<Pair<Int, ID?>> {
         return SqlInsertJdbcRunner(context, options)
     }
 
