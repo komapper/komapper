@@ -232,12 +232,13 @@ internal class EntityMetamodelGenerator(
     private fun toId() {
         val body = if (entity.idProperties.size == 1) {
             val p = entity.idProperties[0]
-            when (p.typeName) {
+            val id = when (p.typeName) {
                 "kotlin.Int" -> "generatedKey.toInt()"
                 "kotlin.Long" -> "generatedKey"
                 "kotlin.UInt" -> "generatedKey.toUInt()"
-                else -> "null"
+                else -> null
             }
+            if (id == null) "null" else "this.$p.wrap($id)"
         } else {
             "null"
         }
