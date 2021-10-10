@@ -4,7 +4,7 @@ import org.komapper.core.dsl.element.Criterion
 import org.komapper.core.dsl.element.ForUpdate
 import org.komapper.core.dsl.element.Join
 import org.komapper.core.dsl.element.Projection
-import org.komapper.core.dsl.element.SortItem
+import org.komapper.core.dsl.expression.SortItem
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 
 sealed interface SelectContext<

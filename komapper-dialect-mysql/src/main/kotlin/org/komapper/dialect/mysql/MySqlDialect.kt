@@ -35,4 +35,6 @@ interface MySqlDialect : Dialect {
     ): EntityUpsertStatementBuilder<ENTITY> {
         return MySqlEntityUpsertStatementBuilder(this, context, entities)
     }
+
+    override fun supportsNullOrdering(): Boolean = false
 }

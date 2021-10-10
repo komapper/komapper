@@ -10,11 +10,17 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.EntityDsl
 import org.komapper.core.dsl.SqlDsl
 import org.komapper.core.dsl.operator.alias
+import org.komapper.core.dsl.operator.asc
+import org.komapper.core.dsl.operator.ascNullsFirst
+import org.komapper.core.dsl.operator.ascNullsLast
 import org.komapper.core.dsl.operator.desc
+import org.komapper.core.dsl.operator.descNullsFirst
+import org.komapper.core.dsl.operator.descNullsLast
 import org.komapper.jdbc.JdbcDatabase
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import kotlin.test.assertNull
 
 @ExtendWith(Env::class)
 class SqlSetOperationQueryTest(private val db: JdbcDatabase) {
@@ -126,5 +132,82 @@ class SqlSetOperationQueryTest(private val db: JdbcDatabase) {
             db.runQuery { query }.let { }
         }
         assertEquals("Empty where clause is not allowed.", ex.message)
+    }
+
+    @Test
+    fun orderBy() {
+        val e = Employee.meta
+        val q1 = SqlDsl.from(e).select(e.employeeId alias "ID")
+        val query = (q1 union q1).orderBy("ID")
+        val list = db.runQuery { query }
+        println(list)
+        assertEquals(1, list.first())
+        assertEquals(14, list.last())
+    }
+
+    @Test
+    fun orderBy_asc() {
+        val e = Employee.meta
+        val q1 = SqlDsl.from(e).select(e.employeeId alias "ID")
+        val query = (q1 union q1).orderBy(asc("ID"))
+        val list = db.runQuery { query }
+        println(list)
+        assertEquals(1, list.first())
+        assertEquals(14, list.last())
+    }
+
+    @Test
+    fun orderBy_desc() {
+        val e = Employee.meta
+        val q1 = SqlDsl.from(e).select(e.employeeId alias "ID")
+        val query = (q1 union q1).orderBy(desc("ID"))
+        val list = db.runQuery { query }
+        println(list)
+        assertEquals(14, list.first())
+        assertEquals(1, list.last())
+    }
+
+    @Test
+    fun orderBy_ascNullsFirst() {
+        val e = Employee.meta
+        val q1 = SqlDsl.from(e).select(e.managerId alias "ID")
+        val query = (q1 union q1).orderBy(ascNullsFirst("ID"))
+        val list = db.runQuery { query }
+        println(list)
+        assertNull(list.first())
+        assertEquals(13, list.last())
+    }
+
+    @Test
+    fun orderBy_ascNullsLast() {
+        val e = Employee.meta
+        val q1 = SqlDsl.from(e).select(e.managerId alias "ID")
+        val query = (q1 union q1).orderBy(ascNullsLast("ID"))
+        val list = db.runQuery { query }
+        println(list)
+        assertEquals(4, list.first())
+        assertNull(list.last())
+    }
+
+    @Test
+    fun orderBy_descNullsFirst() {
+        val e = Employee.meta
+        val q1 = SqlDsl.from(e).select(e.managerId alias "ID")
+        val query = (q1 union q1).orderBy(descNullsFirst("ID"))
+        val list = db.runQuery { query }
+        println(list)
+        assertNull(list.first())
+        assertEquals(4, list.last())
+    }
+
+    @Test
+    fun orderBy_descNullsLast() {
+        val e = Employee.meta
+        val q1 = SqlDsl.from(e).select(e.managerId alias "ID")
+        val query = (q1 union q1).orderBy(descNullsLast("ID"))
+        val list = db.runQuery { query }
+        println(list)
+        assertEquals(13, list.first())
+        assertNull(list.last())
     }
 }
