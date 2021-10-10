@@ -45,7 +45,7 @@ internal class EntityMetamodelGenerator(
             w.println()
         }
         w.println("// generated at ${ZonedDateTime.now()}")
-        w.println("@Suppress(\"ClassName\", \"PrivatePropertyName\")")
+        w.println("@Suppress(\"ClassName\", \"PrivatePropertyName\", \"UNUSED_PARAMETER\")")
         w.println("@$EntityMetamodelImplementor")
         w.println("class $simpleName private constructor($constructorParamList) : $EntityMetamodel<$entityTypeName, $idTypeName, $simpleName> {")
         w.println("    private val __tableName = table")
@@ -69,9 +69,9 @@ internal class EntityMetamodelGenerator(
         createdAtProperty()
         updatedAtProperty()
         properties()
+        toId()
         getId()
         setId()
-        toId()
         preInsert()
         preUpdate()
         postUpdate()
@@ -87,7 +87,55 @@ internal class EntityMetamodelGenerator(
     }
 
     private fun entityDescriptor() {
+        fun toId() {
+            val body = if (entity.idProperties.size == 1) {
+                val p = entity.idProperties[0]
+                val id = when (p.valueClass?.property?.typeName ?: p.typeName) {
+                    "kotlin.Int" -> "generatedKey.toInt()"
+                    "kotlin.Long" -> "generatedKey"
+                    "kotlin.UInt" -> "generatedKey.toUInt()"
+                    else -> null
+                }
+                if (id == null) "null" else "this.$p.wrap($id)"
+            } else {
+                "null"
+            }
+            w.println("        fun toId(generatedKey: Long): $idTypeName? = $body")
+        }
+
+        fun getId() {
+            val body = if (entity.idProperties.size == 1) {
+                val p = entity.idProperties[0]
+                val nullable = p.nullability == Nullability.NULLABLE
+                "e.$p" + if (nullable) " ?: error(\"The id property '$p' must not null.\")" else ""
+            } else {
+                val list = entity.idProperties.joinToString {
+                    val nullable = it.nullability == Nullability.NULLABLE
+                    "e.$it" + if (nullable) " ?: error(\"The id property '$it' must not null.\")" else ""
+                }
+                "listOf($list)"
+            }
+            w.println("        fun getId(e: $entityTypeName): $idTypeName = $body")
+        }
+
+        fun setId() {
+            val paramList = if (entity.idProperties.size == 1) {
+                val p = entity.idProperties[0]
+                "$p = id"
+            } else {
+                entity.idProperties.mapIndexed { index, p ->
+                    val nullable = p.nullability == Nullability.NULLABLE
+                    "$p = id[$index] as ${p.typeName}${if (nullable) "?" else ""}"
+                }.joinToString()
+            }
+            val body = if (paramList == "") "e" else "e.copy($paramList)"
+            w.println("        fun setId(e: $entityTypeName, id: $idTypeName): $entityTypeName = $body")
+        }
+
         w.println("    private object $EntityDescriptor {")
+        toId()
+        getId()
+        setId()
         for (p in entity.properties) {
             val exteriorTypeName = p.typeName
             val interiorTypeName = p.valueClass?.property?.typeName ?: p.typeName
@@ -104,13 +152,12 @@ internal class EntityMetamodelGenerator(
                 is PropertyKind.Id -> {
                     when (val idKind = kind.idKind) {
                         is IdKind.AutoIncrement -> {
-                            "$AutoIncrement<$entityTypeName, $exteriorTypeName, $interiorTypeName>($columnName, $interiorClass, $wrap, $setter)"
+                            "$AutoIncrement<$entityTypeName, $idTypeName>($columnName, ::toId, ::setId)"
                         }
                         is IdKind.Sequence -> {
                             val paramList = listOf(
-                                interiorClass,
-                                wrap,
-                                setter,
+                                "::toId",
+                                "::setId",
                                 "\"${idKind.name}\"",
                                 "\"${idKind.catalog}\"",
                                 "\"${idKind.schema}\"",
@@ -118,7 +165,7 @@ internal class EntityMetamodelGenerator(
                                 "${idKind.startWith}",
                                 "${idKind.incrementBy}",
                             ).joinToString(", ")
-                            "$Sequence<$entityTypeName, $exteriorTypeName, $interiorTypeName>($paramList)"
+                            "$Sequence<$entityTypeName, $idTypeName>($paramList)"
                         }
                         else -> "null"
                     }
@@ -200,49 +247,16 @@ internal class EntityMetamodelGenerator(
         w.println("    override fun properties(): List<$PropertyMetamodel<$entityTypeName, *, *>> = listOf($nameList)")
     }
 
+    private fun toId() {
+        w.println("    override fun toId(generatedKey: Long): $idTypeName? = $EntityDescriptor.toId(generatedKey)")
+    }
+
     private fun getId() {
-        val body = if (entity.idProperties.size == 1) {
-            val p = entity.idProperties[0]
-            val nullable = p.nullability == Nullability.NULLABLE
-            "e.$p" + if (nullable) " ?: error(\"The id property '$p' must not null.\")" else ""
-        } else {
-            val list = entity.idProperties.joinToString {
-                val nullable = it.nullability == Nullability.NULLABLE
-                "e.$it" + if (nullable) " ?: error(\"The id property '$it' must not null.\")" else ""
-            }
-            "listOf($list)"
-        }
-        w.println("    override fun getId(e: $entityTypeName): $idTypeName = $body")
+        w.println("    override fun getId(e: $entityTypeName): $idTypeName = $EntityDescriptor.getId(e)")
     }
 
     private fun setId() {
-        val paramList = if (entity.idProperties.size == 1) {
-            val p = entity.idProperties[0]
-            "$p = id"
-        } else {
-            entity.idProperties.mapIndexed { index, p ->
-                val nullable = p.nullability == Nullability.NULLABLE
-                "$p = id[$index] as ${p.typeName}${if (nullable) "?" else ""}"
-            }.joinToString()
-        }
-        val body = if (paramList == "") "e" else "e.copy($paramList)"
-        w.println("    override fun setId(e: $entityTypeName, id: $idTypeName): $entityTypeName = $body")
-    }
-
-    private fun toId() {
-        val body = if (entity.idProperties.size == 1) {
-            val p = entity.idProperties[0]
-            val id = when (p.typeName) {
-                "kotlin.Int" -> "generatedKey.toInt()"
-                "kotlin.Long" -> "generatedKey"
-                "kotlin.UInt" -> "generatedKey.toUInt()"
-                else -> null
-            }
-            if (id == null) "null" else "this.$p.wrap($id)"
-        } else {
-            "null"
-        }
-        w.println("    override fun toId(generatedKey: Long): $idTypeName? = $body")
+        w.println("    override fun setId(e: $entityTypeName, id: $idTypeName): $entityTypeName = $EntityDescriptor.setId(e, id)")
     }
 
     private fun preInsert() {

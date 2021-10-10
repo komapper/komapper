@@ -19,7 +19,7 @@ internal class SqlInsertJdbcRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTI
 
     override fun run(config: JdbcDatabaseConfig): Pair<Int, ID?> {
         val statement = runner.buildStatement(config)
-        val requiresGeneratedKeys = context.target.idAssignment() is Assignment.AutoIncrement<ENTITY, *, *>
+        val requiresGeneratedKeys = context.target.idAssignment() is Assignment.AutoIncrement<ENTITY, *>
         val executor = JdbcExecutor(config, options, requiresGeneratedKeys)
         val (count, keys) = executor.executeUpdate(statement)
         val id = keys.firstOrNull()?.let { context.target.toId(it) }

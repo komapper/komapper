@@ -36,7 +36,7 @@ class MySqlEntityUpsertStatementBuilder<ENTITY : Any, ID, META : EntityMetamodel
         buf.append(" (")
         for (
             p in target.properties().filter {
-                it.idAssignment !is Assignment.AutoIncrement<ENTITY, *, *>
+                it.idAssignment !is Assignment.AutoIncrement<ENTITY, *>
             }
         ) {
             column(p)
@@ -48,7 +48,7 @@ class MySqlEntityUpsertStatementBuilder<ENTITY : Any, ID, META : EntityMetamodel
             buf.append("(")
             for (
                 p in target.properties().filter {
-                    it.idAssignment !is Assignment.AutoIncrement<ENTITY, *, *>
+                    it.idAssignment !is Assignment.AutoIncrement<ENTITY, *>
                 }
             ) {
                 buf.bind(p.toValue(entity))

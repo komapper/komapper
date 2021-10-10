@@ -5,29 +5,25 @@ import kotlinx.coroutines.sync.withLock
 import org.komapper.core.ThreadSafe
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
-import kotlin.reflect.KClass
 
 @ThreadSafe
 sealed class Assignment<ENTITY> {
-    class AutoIncrement<ENTITY, EXTERIOR : Any, INTERIOR : Any>(
+
+    class AutoIncrement<ENTITY : Any, ID>(
         val columnName: String,
-        private val interiorClass: KClass<INTERIOR>,
-        private val wrap: (INTERIOR) -> EXTERIOR,
-        private val setter: (ENTITY, EXTERIOR) -> ENTITY,
+        private val toId: (Long) -> ID?,
+        private val setId: (ENTITY, ID) -> ENTITY
     ) :
         Assignment<ENTITY>() {
 
-        fun assign(entity: ENTITY, value: Long): ENTITY {
-            val interior = value.convert(interiorClass)
-            val exterior = wrap(interior)
-            return setter(entity, exterior)
+        fun assign(entity: ENTITY, generatedKey: Long): ENTITY {
+            return executeAssignment(entity, generatedKey, toId, setId)
         }
     }
 
-    class Sequence<ENTITY, EXTERIOR : Any, INTERIOR : Any>(
-        private val interiorClass: KClass<INTERIOR>,
-        private val wrap: (INTERIOR) -> EXTERIOR,
-        private val setter: (ENTITY, EXTERIOR) -> ENTITY,
+    class Sequence<ENTITY : Any, ID>(
+        private val toId: (Long) -> ID?,
+        private val setId: (ENTITY, ID) -> ENTITY,
         val name: String,
         val catalogName: String,
         val schemaName: String,
@@ -51,9 +47,8 @@ sealed class Assignment<ENTITY> {
                     sequenceNextValue(sequenceName)
                 }
             }
-            val interior = context.next().convert(interiorClass)
-            val exterior = wrap(interior)
-            return setter(entity, exterior)
+            val generatedKey = context.next()
+            return executeAssignment(entity, generatedKey, toId, setId)
         }
 
         fun getCanonicalSequenceName(enquote: (String) -> String): String {
@@ -87,12 +82,13 @@ sealed class Assignment<ENTITY> {
     }
 }
 
-private fun <T : Any> Long.convert(klass: KClass<T>): T {
-    @Suppress("UNCHECKED_CAST")
-    return when (klass) {
-        Int::class -> this.toInt()
-        Long::class -> this
-        UInt::class -> this.toUInt()
-        else -> error("Conversion target class must be either Int, UInt or Long.")
-    } as T
+private fun <ENTITY, ID> executeAssignment(
+    entity: ENTITY,
+    generatedKey: Long,
+    toId: (Long) -> ID?,
+    setId: (ENTITY, ID) -> ENTITY
+): ENTITY {
+    val id = toId(generatedKey)
+    checkNotNull(id) { "generatedKey: $generatedKey" }
+    return setId(entity, id)
 }

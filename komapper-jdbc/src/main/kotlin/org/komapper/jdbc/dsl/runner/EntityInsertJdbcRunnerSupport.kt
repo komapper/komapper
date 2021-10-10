@@ -16,7 +16,7 @@ internal class EntityInsertJdbcRunnerSupport<ENTITY : Any, ID, META : EntityMeta
 
     fun preInsert(config: JdbcDatabaseConfig, entity: ENTITY): ENTITY {
         val assignment = context.target.idAssignment()
-        return if (!options.disableSequenceAssignment && assignment is Assignment.Sequence<ENTITY, *, *>) {
+        return if (!options.disableSequenceAssignment && assignment is Assignment.Sequence<ENTITY, *>) {
             runBlocking {
                 assignment.assign(entity, config.id, config.dialect::enquote) { sequenceName ->
                     val sql = config.dialect.getSequenceSql(sequenceName)
@@ -36,14 +36,14 @@ internal class EntityInsertJdbcRunnerSupport<ENTITY : Any, ID, META : EntityMeta
     }
 
     fun <T> insert(config: JdbcDatabaseConfig, execute: (JdbcExecutor) -> T): T {
-        val requiresGeneratedKeys = context.target.idAssignment() is Assignment.AutoIncrement<ENTITY, *, *>
+        val requiresGeneratedKeys = context.target.idAssignment() is Assignment.AutoIncrement<ENTITY, *>
         val executor = JdbcExecutor(config, options, requiresGeneratedKeys)
         return execute(executor)
     }
 
     fun postInsert(entity: ENTITY, generatedKey: Long): ENTITY {
         val assignment = context.target.idAssignment()
-        return if (assignment is Assignment.AutoIncrement<ENTITY, *, *>) {
+        return if (assignment is Assignment.AutoIncrement<ENTITY, *>) {
             assignment.assign(entity, generatedKey)
         } else {
             entity

@@ -33,7 +33,7 @@ class PostgreSqlEntityUpsertStatementBuilder<ENTITY : Any, ID, META : EntityMeta
         buf.append(" (")
         for (
             p in target.properties().filter {
-                it.idAssignment !is Assignment.AutoIncrement<ENTITY, *, *>
+                it.idAssignment !is Assignment.AutoIncrement<ENTITY, *>
             }
         ) {
             column(p)
@@ -45,7 +45,7 @@ class PostgreSqlEntityUpsertStatementBuilder<ENTITY : Any, ID, META : EntityMeta
             buf.append("(")
             for (
                 p in target.properties().filter {
-                    it.idAssignment !is Assignment.AutoIncrement<ENTITY, *, *>
+                    it.idAssignment !is Assignment.AutoIncrement<ENTITY, *>
                 }
             ) {
                 buf.bind(p.toValue(entity))

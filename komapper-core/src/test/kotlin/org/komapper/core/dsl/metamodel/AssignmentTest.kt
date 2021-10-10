@@ -8,11 +8,12 @@ import kotlin.test.assertEquals
 internal class AssignmentTest {
 
     data class Emp(val id: Int = 0)
+    private fun toId(generatedKey: Long): Int = generatedKey.toInt()
+    private fun setId(entity: Emp, id: Int): Emp = entity.copy(id = id)
 
     @Test
     fun autoIncrement() {
-        val autoIncrement =
-            Assignment.AutoIncrement<Emp, Int, Int>("ID", Int::class, { it }, { e, v -> e.copy(id = v) })
+        val autoIncrement = Assignment.AutoIncrement("ID", ::toId, ::setId)
         val emp = autoIncrement.assign(Emp(), 123L)
         assertEquals(Emp(123), emp)
     }
@@ -21,10 +22,9 @@ internal class AssignmentTest {
     fun sequence() {
         val startWith = 100
         val incrementBy = 2
-        val sequence = Assignment.Sequence<Emp, Int, Int>(
-            Int::class,
-            { it },
-            { e, v -> e.copy(id = v) },
+        val sequence = Assignment.Sequence(
+            ::toId,
+            ::setId,
             "id",
             "catalog",
             "schema",

@@ -70,12 +70,12 @@ abstract class AbstractSchemaStatementBuilder<D : Dialect>(protected val dialect
     }
 
     protected open fun resolveIdentity(property: PropertyMetamodel<*, *, *>): String {
-        return if (property.idAssignment is Assignment.AutoIncrement<*, *, *>) " auto_increment" else ""
+        return if (property.idAssignment is Assignment.AutoIncrement<*, *>) " auto_increment" else ""
     }
 
     protected open fun createSequence(metamodel: EntityMetamodel<*, *, *>) {
         val idAssignment = metamodel.properties().map { it.idAssignment }.firstOrNull { it != null }
-        if (idAssignment is Assignment.Sequence<*, *, *>) {
+        if (idAssignment is Assignment.Sequence<*, *>) {
             buf.append("create sequence if not exists ${idAssignment.getCanonicalSequenceName(dialect::enquote)} start with ${idAssignment.startWith} increment by ${idAssignment.incrementBy};")
         }
     }
@@ -86,7 +86,7 @@ abstract class AbstractSchemaStatementBuilder<D : Dialect>(protected val dialect
 
     protected open fun dropSequence(metamodel: EntityMetamodel<*, *, *>) {
         val idAssignment = metamodel.properties().map { it.idAssignment }.firstOrNull { it != null }
-        if (idAssignment is Assignment.Sequence<*, *, *>) {
+        if (idAssignment is Assignment.Sequence<*, *>) {
             buf.append("drop sequence if exists ${idAssignment.getCanonicalSequenceName(dialect::enquote)};")
         }
     }
@@ -94,7 +94,7 @@ abstract class AbstractSchemaStatementBuilder<D : Dialect>(protected val dialect
     protected open fun extractSchemaNames(metamodels: List<EntityMetamodel<*, *, *>>): List<String> {
         val tableSchemaNames = metamodels.map { it.schemaName() }
         val sequenceSchemaNames =
-            metamodels.mapNotNull { it.idAssignment() }.filterIsInstance<Assignment.Sequence<*, *, *>>()
+            metamodels.mapNotNull { it.idAssignment() }.filterIsInstance<Assignment.Sequence<*, *>>()
                 .map { it.schemaName }
         return (tableSchemaNames + sequenceSchemaNames).distinct().filter { it.isNotBlank() }
     }

@@ -28,7 +28,7 @@ class SqlInsertStatementBuilder<ENTITY : Any, ID, META : EntityMetamodel<ENTITY,
                 buf.append(" (")
                 for (property in values.pairs.map { it.first }) {
                     if (property in target.idProperties() &&
-                        property.idAssignment is Assignment.AutoIncrement<*, *, *>
+                        property.idAssignment is Assignment.AutoIncrement<*, *>
                     ) {
                         continue
                     }
@@ -39,7 +39,7 @@ class SqlInsertStatementBuilder<ENTITY : Any, ID, META : EntityMetamodel<ENTITY,
                 buf.append(") values (")
                 for ((property, operand) in values.pairs) {
                     if (property in target.idProperties() &&
-                        property.idAssignment is Assignment.AutoIncrement<*, *, *>
+                        property.idAssignment is Assignment.AutoIncrement<*, *>
                     ) {
                         continue
                     }

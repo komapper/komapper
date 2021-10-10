@@ -19,7 +19,7 @@ class EntityInsertStatementBuilder<ENTITY : Any, ID, META : EntityMetamodel<ENTI
     fun build(): Statement {
         val target = context.target
         val properties = target.properties().filter {
-            it.idAssignment !is Assignment.AutoIncrement<ENTITY, *, *>
+            it.idAssignment !is Assignment.AutoIncrement<ENTITY, *>
         }
         buf.append("insert into ")
         table(target)
