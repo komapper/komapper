@@ -45,11 +45,11 @@ fun <T : Any> upper(
 fun <T : Any> substring(
     expression: ColumnExpression<T, String>,
     startIndex: Int,
-    endIndex: Int? = null
+    length: Int? = null
 ): ColumnExpression<T, String> {
     val target = Operand.Column(expression)
     val o1 = Operand.Argument(literal(startIndex), startIndex)
-    val o2 = endIndex?.let { Operand.Argument(literal(it), it) }
+    val o2 = length?.let { Operand.Argument(literal(it), it) }
     return StringFunction.Substring(expression, target, o1, o2)
 }
 
