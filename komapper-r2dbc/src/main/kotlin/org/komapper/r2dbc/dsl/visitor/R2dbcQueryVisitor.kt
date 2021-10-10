@@ -377,7 +377,7 @@ internal object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
     override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> sqlInsertQuery(
         context: SqlInsertContext<ENTITY, ID, META>,
         options: SqlInsertOptions
-    ): R2dbcRunner<Pair<Int, Long?>> {
+    ): R2dbcRunner<Pair<Int, ID?>> {
         return SqlInsertR2dbcRunner(context, options)
     }
 

@@ -5,8 +5,8 @@ import org.komapper.core.Statement
 import org.komapper.core.StatementBuffer
 import org.komapper.core.dsl.context.EntityInsertContext
 import org.komapper.core.dsl.expression.ColumnExpression
-import org.komapper.core.dsl.metamodel.Assignment
 import org.komapper.core.dsl.metamodel.EntityMetamodel
+import org.komapper.core.dsl.metamodel.IdAssignment
 
 class EntityInsertStatementBuilder<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     val dialect: Dialect,
@@ -19,7 +19,7 @@ class EntityInsertStatementBuilder<ENTITY : Any, ID, META : EntityMetamodel<ENTI
     fun build(): Statement {
         val target = context.target
         val properties = target.properties().filter {
-            it.idAssignment !is Assignment.AutoIncrement<ENTITY, *, *>
+            it.idAssignment !is IdAssignment.AutoIncrement<ENTITY, *>
         }
         buf.append("insert into ")
         table(target)

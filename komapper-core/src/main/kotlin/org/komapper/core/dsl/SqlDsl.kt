@@ -22,7 +22,7 @@ object SqlDsl : Dsl {
         return SqlSelectQueryImpl(SqlSelectContext(metamodel))
     }
 
-    fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> insert(metamodel: META): SqlInsertQueryBuilder<ENTITY> {
+    fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> insert(metamodel: META): SqlInsertQueryBuilder<ENTITY, ID> {
         val query = SqlInsertQueryImpl(SqlInsertContext(metamodel))
         return SqlInsertQueryBuilderImpl(query)
     }

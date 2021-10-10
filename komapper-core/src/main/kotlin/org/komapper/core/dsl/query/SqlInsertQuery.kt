@@ -9,18 +9,18 @@ import org.komapper.core.dsl.options.SqlInsertOptions
 import org.komapper.core.dsl.scope.ValuesScope
 import org.komapper.core.dsl.visitor.QueryVisitor
 
-interface SqlInsertQuery<ENTITY : Any> : Query<Pair<Int, Long?>> {
-    fun values(declaration: ValuesDeclaration<ENTITY>): SqlInsertQuery<ENTITY>
-    fun <T : Any> select(block: () -> SubqueryExpression<T>): SqlInsertQuery<ENTITY>
-    fun options(configure: (SqlInsertOptions) -> SqlInsertOptions): SqlInsertQuery<ENTITY>
+interface SqlInsertQuery<ENTITY : Any, ID> : Query<Pair<Int, ID?>> {
+    fun values(declaration: ValuesDeclaration<ENTITY>): SqlInsertQuery<ENTITY, ID>
+    fun <T : Any> select(block: () -> SubqueryExpression<T>): SqlInsertQuery<ENTITY, ID>
+    fun options(configure: (SqlInsertOptions) -> SqlInsertOptions): SqlInsertQuery<ENTITY, ID>
 }
 
 internal data class SqlInsertQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: SqlInsertContext<ENTITY, ID, META>,
     private val options: SqlInsertOptions = SqlInsertOptions.default
-) : SqlInsertQuery<ENTITY> {
+) : SqlInsertQuery<ENTITY, ID> {
 
-    override fun values(declaration: ValuesDeclaration<ENTITY>): SqlInsertQuery<ENTITY> {
+    override fun values(declaration: ValuesDeclaration<ENTITY>): SqlInsertQuery<ENTITY, ID> {
         val scope = ValuesScope<ENTITY>().apply(declaration)
         val values = when (val values = context.values) {
             is Values.Pairs -> Values.Pairs(values.pairs + scope)
@@ -30,14 +30,14 @@ internal data class SqlInsertQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<
         return copy(context = newContext)
     }
 
-    override fun <T : Any> select(block: () -> SubqueryExpression<T>): SqlInsertQuery<ENTITY> {
+    override fun <T : Any> select(block: () -> SubqueryExpression<T>): SqlInsertQuery<ENTITY, ID> {
         val subquery = block()
         val values = Values.Subquery(subquery)
         val newContext = context.copy(values = values)
         return copy(context = newContext)
     }
 
-    override fun options(configure: (SqlInsertOptions) -> SqlInsertOptions): SqlInsertQuery<ENTITY> {
+    override fun options(configure: (SqlInsertOptions) -> SqlInsertOptions): SqlInsertQuery<ENTITY, ID> {
         return copy(options = configure(options))
     }
 
