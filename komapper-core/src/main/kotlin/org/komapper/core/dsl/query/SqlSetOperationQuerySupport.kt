@@ -2,8 +2,8 @@ package org.komapper.core.dsl.query
 
 import org.komapper.core.dsl.context.SqlSetOperationContext
 import org.komapper.core.dsl.context.SqlSetOperationKind
-import org.komapper.core.dsl.element.SortItem
 import org.komapper.core.dsl.expression.SortExpression
+import org.komapper.core.dsl.expression.SortItem
 import org.komapper.core.dsl.expression.SubqueryExpression
 
 internal data class SqlSetOperationQuerySupport<T : Any?>(

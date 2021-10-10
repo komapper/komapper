@@ -5,8 +5,8 @@ import org.komapper.core.StatementBuffer
 import org.komapper.core.dsl.context.SelectContext
 import org.komapper.core.dsl.element.Criterion
 import org.komapper.core.dsl.element.JoinKind
-import org.komapper.core.dsl.element.SortItem
 import org.komapper.core.dsl.expression.ColumnExpression
+import org.komapper.core.dsl.expression.SortItem
 import org.komapper.core.dsl.expression.TableExpression
 
 internal class SelectStatementBuilderSupport(
@@ -108,19 +108,26 @@ internal class OrderByBuilderSupport(
             for (item in orderBy) {
                 when (item) {
                     is SortItem.Column -> {
-                        val (expression, sort) = when (item) {
-                            is SortItem.Column.Asc -> item.expression to "asc"
-                            is SortItem.Column.Desc -> item.expression to "desc"
+                        val appendColumn = { column(item.expression) }
+                        when (item) {
+                            is SortItem.Column.Asc -> asc(appendColumn)
+                            is SortItem.Column.AscNullsFirst -> ascNullsFirst(appendColumn)
+                            is SortItem.Column.AscNullsLast -> ascNullsLast(appendColumn)
+                            is SortItem.Column.Desc -> desc(appendColumn)
+                            is SortItem.Column.DescNullsFirst -> descNullsFirst(appendColumn)
+                            is SortItem.Column.DescNullsLast -> descNullsLast(appendColumn)
                         }
-                        column(expression)
-                        buf.append(" $sort")
                     }
                     is SortItem.Alias -> {
-                        val (alias, sort) = when (item) {
-                            is SortItem.Alias.Asc -> item.alias to "asc"
-                            is SortItem.Alias.Desc -> item.alias to "desc"
+                        val appendColumn: () -> Unit = { buf.append(dialect.enquote(item.alias)) }
+                        when (item) {
+                            is SortItem.Alias.Asc -> asc(appendColumn)
+                            is SortItem.Alias.AscNullsFirst -> ascNullsFirst(appendColumn)
+                            is SortItem.Alias.AscNullsLast -> ascNullsLast(appendColumn)
+                            is SortItem.Alias.Desc -> desc(appendColumn)
+                            is SortItem.Alias.DescNullsFirst -> descNullsFirst(appendColumn)
+                            is SortItem.Alias.DescNullsLast -> descNullsLast(appendColumn)
                         }
-                        buf.append("${dialect.enquote(alias)} $sort")
                     }
                 }
                 buf.append(", ")
@@ -129,7 +136,65 @@ internal class OrderByBuilderSupport(
         }
     }
 
-    fun column(expression: ColumnExpression<*, *>) {
+    private fun column(expression: ColumnExpression<*, *>) {
         support.visitColumnExpression(expression)
+    }
+
+    private fun asc(appendColumn: () -> Unit) {
+        appendColumn()
+        buf.append(" asc")
+    }
+
+    private fun desc(appendColumn: () -> Unit) {
+        appendColumn()
+        buf.append(" desc")
+    }
+
+    private fun ascNullsFirst(appendColumn: () -> Unit) {
+        if (dialect.supportsNullOrdering()) {
+            appendColumn()
+            buf.append(" asc nulls first")
+        } else {
+            buf.append("case when ")
+            appendColumn()
+            buf.append(" is null then 0 else 1 end asc, ")
+            asc(appendColumn)
+        }
+    }
+
+    private fun ascNullsLast(appendColumn: () -> Unit) {
+        if (dialect.supportsNullOrdering()) {
+            appendColumn()
+            buf.append(" asc nulls last")
+        } else {
+            buf.append("case when ")
+            appendColumn()
+            buf.append(" is null then 1 else 0 end asc, ")
+            asc(appendColumn)
+        }
+    }
+
+    private fun descNullsFirst(appendColumn: () -> Unit) {
+        if (dialect.supportsNullOrdering()) {
+            appendColumn()
+            buf.append(" desc nulls first")
+        } else {
+            buf.append("case when ")
+            appendColumn()
+            buf.append(" is null then 1 else 0 end desc, ")
+            desc(appendColumn)
+        }
+    }
+
+    private fun descNullsLast(appendColumn: () -> Unit) {
+        if (dialect.supportsNullOrdering()) {
+            appendColumn()
+            buf.append(" desc nulls last")
+        } else {
+            buf.append("case when ")
+            appendColumn()
+            buf.append(" is null then 0 else 1 end desc, ")
+            desc(appendColumn)
+        }
     }
 }

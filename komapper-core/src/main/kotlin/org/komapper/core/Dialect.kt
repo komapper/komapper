@@ -56,6 +56,8 @@ interface Dialect {
     ): EntityUpsertStatementBuilder<ENTITY>
 
     fun supportsAliasForDeleteStatement() = true
+
+    fun supportsNullOrdering(): Boolean = true
 }
 
 internal object DryRunDialect : Dialect {

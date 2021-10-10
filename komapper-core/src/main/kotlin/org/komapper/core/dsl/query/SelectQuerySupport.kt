@@ -6,8 +6,8 @@ import org.komapper.core.dsl.declaration.WhereDeclaration
 import org.komapper.core.dsl.element.ForUpdate
 import org.komapper.core.dsl.element.Join
 import org.komapper.core.dsl.element.JoinKind
-import org.komapper.core.dsl.element.SortItem
 import org.komapper.core.dsl.expression.SortExpression
+import org.komapper.core.dsl.expression.SortItem
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.ForUpdateOptions
 import org.komapper.core.dsl.scope.OnScope

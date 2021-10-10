@@ -37,4 +37,6 @@ interface MariaDbDialect : Dialect {
     }
 
     override fun supportsAliasForDeleteStatement() = false
+
+    override fun supportsNullOrdering(): Boolean = false
 }

@@ -1,6 +1,6 @@
 package org.komapper.core.dsl.context
 
-import org.komapper.core.dsl.element.SortItem
+import org.komapper.core.dsl.expression.SortItem
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 
 data class SqlSetOperationContext(
