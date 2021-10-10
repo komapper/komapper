@@ -203,7 +203,7 @@ class ExpressionTest(private val db: JdbcDatabase) {
     }
 
     @Test
-    fun substringFunction_startIndex() {
+    fun substringFunction() {
         val a = Address.meta
         val result = db.runQuery {
             SqlDsl.from(a).select(substring(literal("hello world"), 7)).first()
@@ -212,7 +212,7 @@ class ExpressionTest(private val db: JdbcDatabase) {
     }
 
     @Test
-    fun substringFunction_startIndex_endIndex() {
+    fun substringFunction_length() {
         val a = Address.meta
         val result = db.runQuery {
             SqlDsl.from(a).select(substring(literal("hello world"), 7, 1)).first()

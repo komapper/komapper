@@ -32,7 +32,7 @@ internal sealed class StringFunction<T : Any> : ColumnExpression<T, String> {
         val expression: ColumnExpression<T, String>,
         val target: Operand,
         val startIndex: Operand,
-        val endIndex: Operand?
+        val length: Operand?
     ) :
         ColumnExpression<T, String> by expression, StringFunction<T>()
 

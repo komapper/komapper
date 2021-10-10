@@ -249,10 +249,10 @@ class BuilderSupport(
                 visitOperand(function.target)
                 buf.append(", ")
                 visitOperand(function.startIndex)
-                val endIndex = function.endIndex
-                if (endIndex != null) {
+                val length = function.length
+                if (length != null) {
                     buf.append(", ")
-                    visitOperand(endIndex)
+                    visitOperand(length)
                 }
                 buf.append(")")
             }
