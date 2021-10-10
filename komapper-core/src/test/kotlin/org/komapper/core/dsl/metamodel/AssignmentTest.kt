@@ -13,7 +13,7 @@ internal class AssignmentTest {
 
     @Test
     fun autoIncrement() {
-        val autoIncrement = Assignment.AutoIncrement("ID", ::toId, ::setId)
+        val autoIncrement = Assignment.AutoIncrement(::toId, ::setId, "ID")
         val emp = autoIncrement.assign(Emp(), 123L)
         assertEquals(Emp(123), emp)
     }

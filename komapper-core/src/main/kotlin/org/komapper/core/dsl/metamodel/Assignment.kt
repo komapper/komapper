@@ -10,9 +10,9 @@ import java.util.concurrent.ConcurrentHashMap
 sealed class Assignment<ENTITY> {
 
     class AutoIncrement<ENTITY : Any, ID>(
-        val columnName: String,
         private val toId: (Long) -> ID?,
-        private val setId: (ENTITY, ID) -> ENTITY
+        private val setId: (ENTITY, ID) -> ENTITY,
+        val columnName: String
     ) :
         Assignment<ENTITY>() {
 

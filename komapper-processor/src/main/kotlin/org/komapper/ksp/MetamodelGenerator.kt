@@ -152,7 +152,7 @@ internal class EntityMetamodelGenerator(
                 is PropertyKind.Id -> {
                     when (val idKind = kind.idKind) {
                         is IdKind.AutoIncrement -> {
-                            "$AutoIncrement<$entityTypeName, $idTypeName>($columnName, ::toId, ::setId)"
+                            "$AutoIncrement<$entityTypeName, $idTypeName>(::toId, ::setId, $columnName)"
                         }
                         is IdKind.Sequence -> {
                             val paramList = listOf(
