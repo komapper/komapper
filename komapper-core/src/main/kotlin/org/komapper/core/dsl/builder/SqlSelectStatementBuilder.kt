@@ -4,9 +4,9 @@ import org.komapper.core.Dialect
 import org.komapper.core.Statement
 import org.komapper.core.StatementBuffer
 import org.komapper.core.dsl.context.SqlSelectContext
-import org.komapper.core.dsl.element.Criterion
 import org.komapper.core.dsl.expression.AggregateFunction
 import org.komapper.core.dsl.expression.ColumnExpression
+import org.komapper.core.dsl.expression.Criterion
 
 class SqlSelectStatementBuilder(
     val dialect: Dialect,

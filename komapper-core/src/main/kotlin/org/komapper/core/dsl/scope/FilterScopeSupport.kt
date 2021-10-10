@@ -1,9 +1,9 @@
 package org.komapper.core.dsl.scope
 
-import org.komapper.core.dsl.element.Criterion
-import org.komapper.core.dsl.element.Operand
 import org.komapper.core.dsl.expression.ColumnExpression
+import org.komapper.core.dsl.expression.Criterion
 import org.komapper.core.dsl.expression.EscapeExpression
+import org.komapper.core.dsl.expression.Operand
 import org.komapper.core.dsl.expression.SubqueryExpression
 
 class FilterScopeSupport<T>(

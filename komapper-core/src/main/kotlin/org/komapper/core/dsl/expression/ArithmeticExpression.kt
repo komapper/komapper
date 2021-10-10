@@ -1,7 +1,5 @@
 package org.komapper.core.dsl.expression
 
-import org.komapper.core.dsl.element.Operand
-
 internal sealed class ArithmeticExpression<T : Any, S : Number> : ColumnExpression<T, S> {
     internal data class Plus<T : Any, S : Number>(
         val expression: ColumnExpression<T, S>,

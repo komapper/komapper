@@ -1,8 +1,8 @@
 package org.komapper.core.dsl.context
 
-import org.komapper.core.dsl.element.Criterion
-import org.komapper.core.dsl.element.Operand
 import org.komapper.core.dsl.expression.ColumnExpression
+import org.komapper.core.dsl.expression.Criterion
+import org.komapper.core.dsl.expression.Operand
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 
 data class SqlUpdateContext<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(

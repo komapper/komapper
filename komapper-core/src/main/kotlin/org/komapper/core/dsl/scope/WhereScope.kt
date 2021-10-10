@@ -2,7 +2,7 @@ package org.komapper.core.dsl.scope
 
 import org.komapper.core.Scope
 import org.komapper.core.dsl.declaration.WhereDeclaration
-import org.komapper.core.dsl.element.Criterion
+import org.komapper.core.dsl.expression.Criterion
 
 @Scope
 class WhereScope(

@@ -1,6 +1,7 @@
 package org.komapper.core.dsl.element
 
 import org.komapper.core.ThreadSafe
+import org.komapper.core.dsl.expression.Operand
 import org.komapper.core.dsl.expression.SubqueryExpression
 import org.komapper.core.dsl.metamodel.PropertyMetamodel
 

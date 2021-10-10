@@ -1,7 +1,7 @@
 package org.komapper.core.dsl.operator
 
-import org.komapper.core.dsl.element.Operand
 import org.komapper.core.dsl.expression.ColumnExpression
+import org.komapper.core.dsl.expression.Operand
 import org.komapper.core.dsl.expression.StringFunction
 
 fun <T : Any> concat(

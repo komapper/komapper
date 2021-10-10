@@ -3,9 +3,9 @@ package org.komapper.core.dsl.builder
 import org.komapper.core.Dialect
 import org.komapper.core.StatementBuffer
 import org.komapper.core.dsl.context.SelectContext
-import org.komapper.core.dsl.element.Criterion
 import org.komapper.core.dsl.element.JoinKind
 import org.komapper.core.dsl.expression.ColumnExpression
+import org.komapper.core.dsl.expression.Criterion
 import org.komapper.core.dsl.expression.SortItem
 import org.komapper.core.dsl.expression.TableExpression
 
