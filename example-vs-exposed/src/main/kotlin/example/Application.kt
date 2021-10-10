@@ -62,11 +62,11 @@ fun main() {
             )
         }
 
-        val pragueId = db.runQuery {
+        val (_, pragueId) = db.runQuery {
             SqlDsl.insert(c).values {
                 c.name set substring(trim(literal("   Prague   ")), 1, 2)
             }
-        }.let { (_, id) -> id!!.toInt() }
+        }
 
         val prague = db.runQuery {
             SqlDsl.from(c).where { c.id eq pragueId }.first()
