@@ -5,7 +5,7 @@ import java.util.UUID
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-internal class AssignmentTest {
+internal class IdAssignmentTest {
 
     data class Emp(val id: Int = 0)
     private fun toId(generatedKey: Long): Int = generatedKey.toInt()
@@ -13,7 +13,7 @@ internal class AssignmentTest {
 
     @Test
     fun autoIncrement() {
-        val autoIncrement = Assignment.AutoIncrement(::toId, ::setId, "ID")
+        val autoIncrement = IdAssignment.AutoIncrement(::toId, ::setId, "ID")
         val emp = autoIncrement.assign(Emp(), 123L)
         assertEquals(Emp(123), emp)
     }
@@ -22,7 +22,7 @@ internal class AssignmentTest {
     fun sequence() {
         val startWith = 100
         val incrementBy = 2
-        val sequence = Assignment.Sequence(
+        val sequence = IdAssignment.Sequence(
             ::toId,
             ::setId,
             "id",

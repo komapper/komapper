@@ -5,12 +5,12 @@ import com.google.devtools.ksp.symbol.Nullability
 import java.io.PrintWriter
 import java.time.ZonedDateTime
 
-private const val Assignment = "org.komapper.core.dsl.metamodel.Assignment"
+private const val IdAssignment = "org.komapper.core.dsl.metamodel.IdAssignment"
 private const val EntityMetamodel = "org.komapper.core.dsl.metamodel.EntityMetamodel"
 private const val EntityMetamodelStub = "org.komapper.core.dsl.metamodel.EntityMetamodelStub"
 private const val EntityMetamodelImplementor = "org.komapper.core.dsl.metamodel.EntityMetamodelImplementor"
-private const val AutoIncrement = "org.komapper.core.dsl.metamodel.Assignment.AutoIncrement"
-private const val Sequence = "org.komapper.core.dsl.metamodel.Assignment.Sequence"
+private const val AutoIncrement = "org.komapper.core.dsl.metamodel.IdAssignment.AutoIncrement"
+private const val Sequence = "org.komapper.core.dsl.metamodel.IdAssignment.Sequence"
 private const val PropertyDescriptor = "org.komapper.core.dsl.metamodel.PropertyDescriptor"
 private const val PropertyMetamodel = "org.komapper.core.dsl.metamodel.PropertyMetamodel"
 private const val PropertyMetamodelImpl = "org.komapper.core.dsl.metamodel.PropertyMetamodelImpl"
@@ -217,7 +217,7 @@ internal class EntityMetamodelGenerator(
                 else -> null
             }
         }.firstOrNull()
-        w.print("    override fun idAssignment(): $Assignment<$entityTypeName>? = ")
+        w.print("    override fun idAssignment(): $IdAssignment<$entityTypeName>? = ")
         if (p != null) {
             w.println("$p.idAssignment")
         } else {

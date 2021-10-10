@@ -7,7 +7,7 @@ import kotlin.reflect.KClass
 
 @ThreadSafe
 interface EntityMetamodel<ENTITY : Any, ID, out META : EntityMetamodel<ENTITY, ID, META>> : TableExpression<ENTITY> {
-    fun idAssignment(): Assignment<ENTITY>?
+    fun idAssignment(): IdAssignment<ENTITY>?
     fun idProperties(): List<PropertyMetamodel<ENTITY, *, *>>
     fun versionProperty(): PropertyMetamodel<ENTITY, *, *>?
     fun createdAtProperty(): PropertyMetamodel<ENTITY, *, *>?
@@ -31,7 +31,7 @@ abstract class EntityMetamodelStub<ENTITY : Any, META : EntityMetamodelStub<ENTI
     override fun catalogName(): String = fail()
     override fun schemaName(): String = fail()
     override fun alwaysQuote(): Boolean = fail()
-    override fun idAssignment(): Assignment<ENTITY>? = fail()
+    override fun idAssignment(): IdAssignment<ENTITY>? = fail()
     override fun idProperties(): List<PropertyMetamodel<ENTITY, *, *>> = fail()
     override fun versionProperty(): PropertyMetamodel<ENTITY, *, *>? = fail()
     override fun createdAtProperty(): PropertyMetamodel<ENTITY, *, *>? = fail()

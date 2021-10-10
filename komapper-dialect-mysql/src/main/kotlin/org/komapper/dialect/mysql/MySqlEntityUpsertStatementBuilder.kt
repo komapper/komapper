@@ -11,8 +11,8 @@ import org.komapper.core.dsl.context.EntityUpsertContext
 import org.komapper.core.dsl.element.Operand
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.expression.TableExpression
-import org.komapper.core.dsl.metamodel.Assignment
 import org.komapper.core.dsl.metamodel.EntityMetamodel
+import org.komapper.core.dsl.metamodel.IdAssignment
 
 class MySqlEntityUpsertStatementBuilder<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     private val dialect: MySqlDialect,
@@ -36,7 +36,7 @@ class MySqlEntityUpsertStatementBuilder<ENTITY : Any, ID, META : EntityMetamodel
         buf.append(" (")
         for (
             p in target.properties().filter {
-                it.idAssignment !is Assignment.AutoIncrement<ENTITY, *>
+                it.idAssignment !is IdAssignment.AutoIncrement<ENTITY, *>
             }
         ) {
             column(p)
@@ -48,7 +48,7 @@ class MySqlEntityUpsertStatementBuilder<ENTITY : Any, ID, META : EntityMetamodel
             buf.append("(")
             for (
                 p in target.properties().filter {
-                    it.idAssignment !is Assignment.AutoIncrement<ENTITY, *>
+                    it.idAssignment !is IdAssignment.AutoIncrement<ENTITY, *>
                 }
             ) {
                 buf.bind(p.toValue(entity))

@@ -12,7 +12,7 @@ interface PropertyMetamodel<ENTITY : Any, EXTERIOR : Any, INTERIOR : Any> : Prop
     val getter: (ENTITY) -> EXTERIOR?
     val setter: (ENTITY, EXTERIOR) -> ENTITY
     val nullable: Boolean
-    val idAssignment: Assignment<ENTITY>?
+    val idAssignment: IdAssignment<ENTITY>?
 
     fun toValue(entity: ENTITY): Value {
         val exterior = getter(entity)
@@ -35,7 +35,7 @@ class PropertyMetamodelImpl<ENTITY : Any, EXTERIOR : Any, INTERIOR : Any>(
     override val wrap: (INTERIOR) -> EXTERIOR get() = descriptor.wrap
     override val unwrap: (EXTERIOR) -> INTERIOR get() = descriptor.unwrap
     override val nullable: Boolean get() = descriptor.nullable
-    override val idAssignment: Assignment<ENTITY>? get() = descriptor.idAssignment
+    override val idAssignment: IdAssignment<ENTITY>? get() = descriptor.idAssignment
 }
 
 @Suppress("unused")
@@ -52,7 +52,7 @@ class PropertyMetamodelStub<ENTITY : Any, EXTERIOR : Any> :
     override val wrap: (EXTERIOR) -> EXTERIOR get() = fail()
     override val unwrap: (EXTERIOR) -> EXTERIOR get() = fail()
     override val nullable: Boolean get() = fail()
-    override val idAssignment: Assignment<ENTITY> get() = fail()
+    override val idAssignment: IdAssignment<ENTITY> get() = fail()
 
     private fun fail(): Nothing {
         error("Fix google/ksp compile errors.")

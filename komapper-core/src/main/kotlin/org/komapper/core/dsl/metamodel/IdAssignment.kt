@@ -7,14 +7,14 @@ import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 
 @ThreadSafe
-sealed class Assignment<ENTITY> {
+sealed class IdAssignment<ENTITY> {
 
     class AutoIncrement<ENTITY : Any, ID>(
         private val toId: (Long) -> ID?,
         private val setId: (ENTITY, ID) -> ENTITY,
         val columnName: String
     ) :
-        Assignment<ENTITY>() {
+        IdAssignment<ENTITY>() {
 
         fun assign(entity: ENTITY, generatedKey: Long): ENTITY {
             return executeAssignment(entity, generatedKey, toId, setId)
@@ -31,7 +31,7 @@ sealed class Assignment<ENTITY> {
         val startWith: Int,
         val incrementBy: Int,
     ) :
-        Assignment<ENTITY>() {
+        IdAssignment<ENTITY>() {
 
         private val contextMap = ConcurrentHashMap<UUID, GenerationContext>()
 
