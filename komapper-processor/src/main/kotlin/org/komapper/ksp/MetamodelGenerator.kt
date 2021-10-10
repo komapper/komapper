@@ -70,6 +70,7 @@ internal class EntityMetamodelGenerator(
         updatedAtProperty()
         properties()
         getId()
+        setId()
         toId()
         preInsert()
         preUpdate()
@@ -212,6 +213,20 @@ internal class EntityMetamodelGenerator(
             "listOf($list)"
         }
         w.println("    override fun getId(e: $entityTypeName): $idTypeName = $body")
+    }
+
+    private fun setId() {
+        val paramList = if (entity.idProperties.size == 1) {
+            val p = entity.idProperties[0]
+            "$p = id"
+        } else {
+            entity.idProperties.mapIndexed { index, p ->
+                val nullable = p.nullability == Nullability.NULLABLE
+                "$p = id[$index] as ${p.typeName}${if (nullable) "?" else ""}"
+            }.joinToString()
+        }
+        val body = if (paramList == "") "e" else "e.copy($paramList)"
+        w.println("    override fun setId(e: $entityTypeName, id: $idTypeName): $entityTypeName = $body")
     }
 
     private fun toId() {
