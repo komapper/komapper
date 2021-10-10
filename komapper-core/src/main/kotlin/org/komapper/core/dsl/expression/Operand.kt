@@ -1,8 +1,7 @@
-package org.komapper.core.dsl.element
+package org.komapper.core.dsl.expression
 
 import org.komapper.core.ThreadSafe
 import org.komapper.core.Value
-import org.komapper.core.dsl.expression.ColumnExpression
 
 @ThreadSafe
 sealed class Operand {

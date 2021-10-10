@@ -1,8 +1,8 @@
 package org.komapper.core.dsl.operator
 
-import org.komapper.core.dsl.element.Operand
 import org.komapper.core.dsl.expression.ArithmeticExpression
 import org.komapper.core.dsl.expression.ColumnExpression
+import org.komapper.core.dsl.expression.Operand
 
 infix operator fun <T : Any, S : Number> ColumnExpression<T, S>.plus(value: T): ColumnExpression<T, S> {
     val left = Operand.Column(this)

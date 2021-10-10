@@ -137,5 +137,4 @@ class EntitySelectQueryTest(private val db: JdbcDatabase) {
         assertEquals(13, list.first().managerId)
         assertNull(list.last().managerId)
     }
-
 }

@@ -1,7 +1,5 @@
 package org.komapper.core.dsl.expression
 
-import org.komapper.core.dsl.element.Operand
-
 internal sealed class StringFunction<T : Any> : ColumnExpression<T, String> {
     internal data class Concat<T : Any>(
         val expression: ColumnExpression<T, String>,

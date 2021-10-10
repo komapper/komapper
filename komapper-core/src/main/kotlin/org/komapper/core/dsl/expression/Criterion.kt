@@ -1,8 +1,6 @@
-package org.komapper.core.dsl.element
+package org.komapper.core.dsl.expression
 
 import org.komapper.core.ThreadSafe
-import org.komapper.core.dsl.expression.EscapeExpression
-import org.komapper.core.dsl.expression.SubqueryExpression
 
 @ThreadSafe
 sealed class Criterion {

@@ -1,6 +1,6 @@
 package org.komapper.core.dsl.context
 
-import org.komapper.core.dsl.element.Operand
+import org.komapper.core.dsl.expression.Operand
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.metamodel.PropertyMetamodel
 
