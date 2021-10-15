@@ -5,12 +5,15 @@ import com.google.devtools.ksp.symbol.Nullability
 import java.io.PrintWriter
 import java.time.ZonedDateTime
 
-private const val IdAssignment = "org.komapper.core.dsl.metamodel.IdAssignment"
+private const val ConcurrentHashMap = "java.util.concurrent.ConcurrentHashMap"
 private const val EntityMetamodel = "org.komapper.core.dsl.metamodel.EntityMetamodel"
 private const val EntityMetamodelStub = "org.komapper.core.dsl.metamodel.EntityMetamodelStub"
 private const val EntityMetamodelImplementor = "org.komapper.core.dsl.metamodel.EntityMetamodelImplementor"
+private const val IdAssignment = "org.komapper.core.dsl.metamodel.IdAssignment"
 private const val AutoIncrement = "org.komapper.core.dsl.metamodel.IdAssignment.AutoIncrement"
 private const val Sequence = "org.komapper.core.dsl.metamodel.IdAssignment.Sequence"
+private const val IdContext = "org.komapper.core.dsl.metamodel.IdContext"
+private const val UUID = "java.util.UUID"
 private const val PropertyDescriptor = "org.komapper.core.dsl.metamodel.PropertyDescriptor"
 private const val PropertyMetamodel = "org.komapper.core.dsl.metamodel.PropertyMetamodel"
 private const val PropertyMetamodelImpl = "org.komapper.core.dsl.metamodel.PropertyMetamodelImpl"
@@ -30,7 +33,8 @@ internal class EntityMetamodelGenerator(
         "table: String = \"${entity.table.name}\"",
         "catalog: String = \"${entity.table.catalog}\"",
         "schema: String = \"${entity.table.schema}\"",
-        "alwaysQuote: Boolean = ${entity.table.alwaysQuote}"
+        "alwaysQuote: Boolean = ${entity.table.alwaysQuote}",
+        "disableSequenceAssignment: Boolean = false",
     ).joinToString(", ")
 
     private val idTypeName: String = if (entity.idProperties.size == 1) {
@@ -52,6 +56,7 @@ internal class EntityMetamodelGenerator(
         w.println("    private val __catalogName = catalog")
         w.println("    private val __schemaName = schema")
         w.println("    private val __alwaysQuote = alwaysQuote")
+        w.println("    private val __disableSequenceAssignment = disableSequenceAssignment")
 
         entityDescriptor()
 
@@ -71,7 +76,6 @@ internal class EntityMetamodelGenerator(
         properties()
         toId()
         getId()
-        setId()
         preInsert()
         preUpdate()
         postUpdate()
@@ -87,55 +91,16 @@ internal class EntityMetamodelGenerator(
     }
 
     private fun entityDescriptor() {
-        fun toId() {
-            val body = if (entity.idProperties.size == 1) {
-                val p = entity.idProperties[0]
-                val id = when (p.valueClass?.property?.typeName ?: p.typeName) {
-                    "kotlin.Int" -> "generatedKey.toInt()"
-                    "kotlin.Long" -> "generatedKey"
-                    "kotlin.UInt" -> "generatedKey.toUInt()"
-                    else -> null
-                }
-                if (id == null) "null" else "this.$p.wrap($id)"
-            } else {
-                "null"
-            }
-            w.println("        fun toId(generatedKey: Long): $idTypeName? = $body")
-        }
-
-        fun getId() {
-            val body = if (entity.idProperties.size == 1) {
-                val p = entity.idProperties[0]
-                val nullable = p.nullability == Nullability.NULLABLE
-                "e.$p" + if (nullable) " ?: error(\"The id property '$p' must not null.\")" else ""
-            } else {
-                val list = entity.idProperties.joinToString {
-                    val nullable = it.nullability == Nullability.NULLABLE
-                    "e.$it" + if (nullable) " ?: error(\"The id property '$it' must not null.\")" else ""
-                }
-                "listOf($list)"
-            }
-            w.println("        fun getId(e: $entityTypeName): $idTypeName = $body")
-        }
-
-        fun setId() {
-            val paramList = if (entity.idProperties.size == 1) {
-                val p = entity.idProperties[0]
-                "$p = id"
-            } else {
-                entity.idProperties.mapIndexed { index, p ->
-                    val nullable = p.nullability == Nullability.NULLABLE
-                    "$p = id[$index] as ${p.typeName}${if (nullable) "?" else ""}"
-                }.joinToString()
-            }
-            val body = if (paramList == "") "e" else "e.copy($paramList)"
-            w.println("        fun setId(e: $entityTypeName, id: $idTypeName): $entityTypeName = $body")
-        }
-
         w.println("    private object $EntityDescriptor {")
-        toId()
-        getId()
-        setId()
+        val sequenceIdExists = entity.properties.any {
+            when (it.kind) {
+                is PropertyKind.Id -> it.kind.idKind is IdKind.Sequence
+                else -> false
+            }
+        }
+        if (sequenceIdExists) {
+            w.println("        val __idContextMap: $ConcurrentHashMap<$UUID, $IdContext> = $ConcurrentHashMap()")
+        }
         for (p in entity.properties) {
             val exteriorTypeName = p.typeName
             val interiorTypeName = p.valueClass?.property?.typeName ?: p.typeName
@@ -148,33 +113,9 @@ internal class EntityMetamodelGenerator(
             val wrap = if (p.valueClass == null) "{ it }" else "{ ${p.valueClass}(it) }"
             val unwrap = if (p.valueClass == null) "{ it }" else "{ it.${p.valueClass.property} }"
             val nullable = if (p.nullability == Nullability.NULLABLE) "true" else "false"
-            val assignment = when (val kind = p.kind) {
-                is PropertyKind.Id -> {
-                    when (val idKind = kind.idKind) {
-                        is IdKind.AutoIncrement -> {
-                            "$AutoIncrement<$entityTypeName, $idTypeName>(::toId, ::setId, $columnName)"
-                        }
-                        is IdKind.Sequence -> {
-                            val paramList = listOf(
-                                "::toId",
-                                "::setId",
-                                "\"${idKind.name}\"",
-                                "\"${idKind.catalog}\"",
-                                "\"${idKind.schema}\"",
-                                "${idKind.alwaysQuote}",
-                                "${idKind.startWith}",
-                                "${idKind.incrementBy}",
-                            ).joinToString(", ")
-                            "$Sequence<$entityTypeName, $idTypeName>($paramList)"
-                        }
-                        else -> "null"
-                    }
-                }
-                else -> "null"
-            }
             val propertyDescriptor =
                 "$PropertyDescriptor<$entityTypeName, $exteriorTypeName, $interiorTypeName>"
-            w.println("        val $p = $propertyDescriptor($exteriorClass, $interiorClass, \"$p\", $columnName, $alwaysQuote, $getter, $setter, $wrap, $unwrap, $nullable, $assignment)")
+            w.println("        val $p = $propertyDescriptor($exteriorClass, $interiorClass, \"$p\", $columnName, $alwaysQuote, $getter, $setter, $wrap, $unwrap, $nullable)")
         }
         w.println("    }")
     }
@@ -210,16 +151,40 @@ internal class EntityMetamodelGenerator(
     }
 
     private fun idAssignment() {
-        val p = entity.properties.mapNotNull {
+        val pair = entity.properties.mapNotNull {
             when (it.kind) {
-                is PropertyKind.Id ->
-                    if (it.kind.idKind != null) it else null
+                is PropertyKind.Id -> {
+                    val idKind = it.kind.idKind
+                    if (idKind != null) it to idKind else null
+                }
                 else -> null
             }
         }.firstOrNull()
+
         w.print("    override fun idAssignment(): $IdAssignment<$entityTypeName>? = ")
-        if (p != null) {
-            w.println("$p.idAssignment")
+        if (pair != null) {
+            val (p, idKind) = pair
+            val assignment = when (idKind) {
+                is IdKind.AutoIncrement -> {
+                    "$AutoIncrement<$entityTypeName, $idTypeName>(::toId, $p)"
+                }
+                is IdKind.Sequence -> {
+                    val paramList = listOf(
+                        "::toId",
+                        "$p",
+                        "$EntityDescriptor.__idContextMap",
+                        "\"${idKind.name}\"",
+                        "\"${idKind.catalog}\"",
+                        "\"${idKind.schema}\"",
+                        "${idKind.alwaysQuote}",
+                        "${idKind.startWith}",
+                        "${idKind.incrementBy}",
+                        "__disableSequenceAssignment"
+                    ).joinToString(", ")
+                    "$Sequence<$entityTypeName, $idTypeName>($paramList)"
+                }
+            }
+            w.println(assignment)
         } else {
             w.println("null")
         }
@@ -247,16 +212,35 @@ internal class EntityMetamodelGenerator(
         w.println("    override fun properties(): List<$PropertyMetamodel<$entityTypeName, *, *>> = listOf($nameList)")
     }
 
-    private fun toId() {
-        w.println("    override fun toId(generatedKey: Long): $idTypeName? = $EntityDescriptor.toId(generatedKey)")
+    fun toId() {
+        val body = if (entity.idProperties.size == 1) {
+            val p = entity.idProperties[0]
+            val id = when (p.valueClass?.property?.typeName ?: p.typeName) {
+                "kotlin.Int" -> "generatedKey.toInt()"
+                "kotlin.Long" -> "generatedKey"
+                "kotlin.UInt" -> "generatedKey.toUInt()"
+                else -> null
+            }
+            if (id == null) "null" else "this.$p.wrap($id)"
+        } else {
+            "null"
+        }
+        w.println("    override fun toId(generatedKey: Long): $idTypeName? = $body")
     }
 
-    private fun getId() {
-        w.println("    override fun getId(e: $entityTypeName): $idTypeName = $EntityDescriptor.getId(e)")
-    }
-
-    private fun setId() {
-        w.println("    override fun setId(e: $entityTypeName, id: $idTypeName): $entityTypeName = $EntityDescriptor.setId(e, id)")
+    fun getId() {
+        val body = if (entity.idProperties.size == 1) {
+            val p = entity.idProperties[0]
+            val nullable = p.nullability == Nullability.NULLABLE
+            "e.$p" + if (nullable) " ?: error(\"The id property '$p' must not null.\")" else ""
+        } else {
+            val list = entity.idProperties.joinToString {
+                val nullable = it.nullability == Nullability.NULLABLE
+                "e.$it" + if (nullable) " ?: error(\"The id property '$it' must not null.\")" else ""
+            }
+            "listOf($list)"
+        }
+        w.println("    override fun getId(e: $entityTypeName): $idTypeName = $body")
     }
 
     private fun preInsert() {
@@ -337,14 +321,14 @@ internal class EntityMetamodelGenerator(
     }
 
     private fun newMeta() {
-        val paramList = "table: String, catalog: String, schema: String, alwaysQuote: Boolean"
-        w.println("    override fun newMeta($paramList) = $simpleName(table, catalog, schema, alwaysQuote)")
+        val paramList = "table: String, catalog: String, schema: String, alwaysQuote: Boolean, disableSequenceAssignment: Boolean"
+        w.println("    override fun newMeta($paramList) = $simpleName(table, catalog, schema, alwaysQuote, disableSequenceAssignment)")
     }
 
     private fun companionObject() {
         w.println("    companion object {")
         w.println("        val meta = $simpleName()")
-        w.println("        fun newMeta($constructorParamList) = $simpleName(table, catalog, schema, alwaysQuote)")
+        w.println("        fun newMeta($constructorParamList) = $simpleName(table, catalog, schema, alwaysQuote, disableSequenceAssignment)")
         w.println("    }")
     }
 
@@ -352,7 +336,7 @@ internal class EntityMetamodelGenerator(
         val companionObjectName = (entity.companionObject.qualifiedName ?: entity.companionObject.simpleName).asString()
         w.println("")
         w.println("val $companionObjectName.meta get() = $simpleName.meta")
-        w.println("fun $companionObjectName.newMeta($constructorParamList) = $simpleName.newMeta(table, catalog, schema, alwaysQuote)")
+        w.println("fun $companionObjectName.newMeta($constructorParamList) = $simpleName.newMeta(table, catalog, schema, alwaysQuote, disableSequenceAssignment)")
     }
 }
 

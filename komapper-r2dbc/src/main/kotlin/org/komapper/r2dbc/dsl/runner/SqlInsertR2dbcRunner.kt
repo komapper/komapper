@@ -20,7 +20,7 @@ internal class SqlInsertR2dbcRunner<ENTITY : Any, ID, META : EntityMetamodel<ENT
     override suspend fun run(config: R2dbcDatabaseConfig): Pair<Int, ID?> {
         val statement = runner.buildStatement(config)
         val generatedColumn = when (val assignment = context.target.idAssignment()) {
-            is IdAssignment.AutoIncrement<ENTITY, *> -> assignment.columnName
+            is IdAssignment.AutoIncrement<ENTITY, *> -> assignment.property.columnName
             else -> null
         }
         val executor = R2dbcExecutor(config, options, generatedColumn)

@@ -8,7 +8,7 @@ open class PostgreSqlSchemaStatementBuilder(dialect: PostgreSqlDialect) :
     AbstractSchemaStatementBuilder<PostgreSqlDialect>(dialect) {
 
     override fun resolveDataTypeName(property: PropertyMetamodel<*, *, *>): String {
-        return if (property.idAssignment is IdAssignment.AutoIncrement<*, *>) {
+        return if (property.owner.idAssignment() is IdAssignment.AutoIncrement<*, *>) {
             when (property.interiorClass) {
                 Int::class -> "serial"
                 Long::class -> "bigserial"

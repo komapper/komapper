@@ -1,7 +1,5 @@
 package org.komapper.core.dsl.metamodel
 
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import org.komapper.core.ThreadSafe
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
@@ -9,31 +7,30 @@ import java.util.concurrent.ConcurrentHashMap
 @ThreadSafe
 sealed class IdAssignment<ENTITY> {
 
-    class AutoIncrement<ENTITY : Any, ID>(
+    class AutoIncrement<ENTITY : Any, ID : Any>(
         private val toId: (Long) -> ID?,
-        private val setId: (ENTITY, ID) -> ENTITY,
-        val columnName: String
+        val property: PropertyMetamodel<ENTITY, ID, *>,
     ) :
         IdAssignment<ENTITY>() {
 
         fun assign(entity: ENTITY, generatedKey: Long): ENTITY {
-            return executeAssignment(entity, generatedKey, toId, setId)
+            return executeAssignment(entity, property, generatedKey, toId)
         }
     }
 
-    class Sequence<ENTITY : Any, ID>(
+    class Sequence<ENTITY : Any, ID : Any>(
         private val toId: (Long) -> ID?,
-        private val setId: (ENTITY, ID) -> ENTITY,
+        private val property: PropertyMetamodel<ENTITY, ID, *>,
+        private val idContextMap: ConcurrentHashMap<UUID, IdContext> = ConcurrentHashMap(),
         val name: String,
         val catalogName: String,
         val schemaName: String,
         val alwaysQuote: Boolean,
         val startWith: Int,
         val incrementBy: Int,
+        val disableSequenceAssignment: Boolean
     ) :
         IdAssignment<ENTITY>() {
-
-        private val contextMap = ConcurrentHashMap<UUID, GenerationContext>()
 
         suspend fun assign(
             entity: ENTITY,
@@ -41,14 +38,14 @@ sealed class IdAssignment<ENTITY> {
             enquote: (String) -> String,
             sequenceNextValue: suspend (String) -> Long
         ): ENTITY {
-            val context = contextMap.computeIfAbsent(key) {
-                val sequenceName = getCanonicalSequenceName(enquote)
-                GenerationContext(startWith, incrementBy) {
-                    sequenceNextValue(sequenceName)
-                }
+            val context = idContextMap.computeIfAbsent(key) {
+                IdContext(startWith, incrementBy)
             }
-            val generatedKey = context.next()
-            return executeAssignment(entity, generatedKey, toId, setId)
+            val generatedKey = context.next {
+                val sequenceName = getCanonicalSequenceName(enquote)
+                sequenceNextValue(sequenceName)
+            }
+            return executeAssignment(entity, property, generatedKey, toId)
         }
 
         fun getCanonicalSequenceName(enquote: (String) -> String): String {
@@ -60,35 +57,16 @@ sealed class IdAssignment<ENTITY> {
             return listOf(catalogName, schemaName, name)
                 .filter { it.isNotBlank() }.joinToString(".", transform = transform)
         }
-
-        private class GenerationContext(startWith: Int, val incrementBy: Int, val nextValue: suspend () -> Long) {
-            private val mutex = Mutex()
-            private var base = startWith.toLong()
-            private var step = Long.MAX_VALUE
-
-            suspend fun next(): Long {
-                return mutex.withLock {
-                    if (step < incrementBy) {
-                        base + step++
-                    } else {
-                        nextValue().also {
-                            base = it
-                            step = 1
-                        }
-                    }
-                }
-            }
-        }
     }
 }
 
-private fun <ENTITY, ID> executeAssignment(
+private fun <ENTITY : Any, ID : Any> executeAssignment(
     entity: ENTITY,
+    property: PropertyMetamodel<ENTITY, ID, *>,
     generatedKey: Long,
-    toId: (Long) -> ID?,
-    setId: (ENTITY, ID) -> ENTITY
+    toId: (Long) -> ID?
 ): ENTITY {
     val id = toId(generatedKey)
     checkNotNull(id) { "generatedKey: $generatedKey" }
-    return setId(entity, id)
+    return property.setter(entity, id)
 }

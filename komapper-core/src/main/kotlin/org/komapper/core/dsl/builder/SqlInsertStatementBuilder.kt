@@ -9,7 +9,7 @@ import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.expression.Operand
 import org.komapper.core.dsl.expression.SubqueryExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
-import org.komapper.core.dsl.metamodel.IdAssignment
+import org.komapper.core.dsl.metamodel.isAutoIncrement
 
 class SqlInsertStatementBuilder<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     val dialect: Dialect,
@@ -27,9 +27,7 @@ class SqlInsertStatementBuilder<ENTITY : Any, ID, META : EntityMetamodel<ENTITY,
             is Values.Pairs -> {
                 buf.append(" (")
                 for (property in values.pairs.map { it.first }) {
-                    if (property in target.idProperties() &&
-                        property.idAssignment is IdAssignment.AutoIncrement<*, *>
-                    ) {
+                    if (property.isAutoIncrement()) {
                         continue
                     }
                     column(property)
@@ -38,9 +36,7 @@ class SqlInsertStatementBuilder<ENTITY : Any, ID, META : EntityMetamodel<ENTITY,
                 buf.cutBack(2)
                 buf.append(") values (")
                 for ((property, operand) in values.pairs) {
-                    if (property in target.idProperties() &&
-                        property.idAssignment is IdAssignment.AutoIncrement<*, *>
-                    ) {
+                    if (property.isAutoIncrement()) {
                         continue
                     }
                     operand(operand)

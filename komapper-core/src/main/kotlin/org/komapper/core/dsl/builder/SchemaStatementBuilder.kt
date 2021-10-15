@@ -70,11 +70,15 @@ abstract class AbstractSchemaStatementBuilder<D : Dialect>(protected val dialect
     }
 
     protected open fun resolveIdentity(property: PropertyMetamodel<*, *, *>): String {
-        return if (property.idAssignment is IdAssignment.AutoIncrement<*, *>) " auto_increment" else ""
+        val isAutoIncrement = when (val idAssignment = property.owner.idAssignment()) {
+            is IdAssignment.AutoIncrement<*, *> -> idAssignment.property == property
+            else -> false
+        }
+        return if (isAutoIncrement) " auto_increment" else ""
     }
 
     protected open fun createSequence(metamodel: EntityMetamodel<*, *, *>) {
-        val idAssignment = metamodel.properties().map { it.idAssignment }.firstOrNull { it != null }
+        val idAssignment = metamodel.idAssignment()
         if (idAssignment is IdAssignment.Sequence<*, *>) {
             buf.append("create sequence if not exists ${idAssignment.getCanonicalSequenceName(dialect::enquote)} start with ${idAssignment.startWith} increment by ${idAssignment.incrementBy};")
         }
@@ -85,7 +89,7 @@ abstract class AbstractSchemaStatementBuilder<D : Dialect>(protected val dialect
     }
 
     protected open fun dropSequence(metamodel: EntityMetamodel<*, *, *>) {
-        val idAssignment = metamodel.properties().map { it.idAssignment }.firstOrNull { it != null }
+        val idAssignment = metamodel.idAssignment()
         if (idAssignment is IdAssignment.Sequence<*, *>) {
             buf.append("drop sequence if exists ${idAssignment.getCanonicalSequenceName(dialect::enquote)};")
         }

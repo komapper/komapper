@@ -11,7 +11,7 @@ import org.komapper.core.dsl.context.EntityUpsertContext
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.expression.TableExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
-import org.komapper.core.dsl.metamodel.IdAssignment
+import org.komapper.core.dsl.metamodel.getNonAutoIncrementProperties
 
 class MariaDbEntityUpsertStatementBuilder<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     private val dialect: MariaDbDialect,
@@ -25,6 +25,7 @@ class MariaDbEntityUpsertStatementBuilder<ENTITY : Any, ID, META : EntityMetamod
     private val support = BuilderSupport(dialect, aliasManager, buf)
 
     override fun build(): Statement {
+        val properties = target.getNonAutoIncrementProperties()
         if (context.assigned) {
             error("The 'EntityUpsertQueryBuilder#set' call is not supported. MariaDB cannot refer to the row to be inserted.")
         }
@@ -35,11 +36,7 @@ class MariaDbEntityUpsertStatementBuilder<ENTITY : Any, ID, META : EntityMetamod
         buf.append(" into ")
         table(target)
         buf.append(" (")
-        for (
-            p in target.properties().filter {
-                it.idAssignment !is IdAssignment.AutoIncrement<ENTITY, *>
-            }
-        ) {
+        for (p in properties) {
             column(p)
             buf.append(", ")
         }
@@ -47,11 +44,7 @@ class MariaDbEntityUpsertStatementBuilder<ENTITY : Any, ID, META : EntityMetamod
         buf.append(") values ")
         for (entity in entities) {
             buf.append("(")
-            for (
-                p in target.properties().filter {
-                    it.idAssignment !is IdAssignment.AutoIncrement<ENTITY, *>
-                }
-            ) {
+            for (p in properties) {
                 buf.bind(p.toValue(entity))
                 buf.append(", ")
             }

@@ -11,7 +11,8 @@ data class EntityUpsertContext<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, 
         table = "excluded",
         catalog = "",
         schema = "",
-        alwaysQuote = false
+        alwaysQuote = false,
+        disableSequenceAssignment = false
     ),
     val keys: List<PropertyMetamodel<ENTITY, *, *>> = emptyList(),
     val duplicateKeyType: DuplicateKeyType,
