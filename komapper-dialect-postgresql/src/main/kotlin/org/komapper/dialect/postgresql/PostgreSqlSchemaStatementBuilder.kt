@@ -1,7 +1,6 @@
 package org.komapper.dialect.postgresql
 
 import org.komapper.core.dsl.builder.AbstractSchemaStatementBuilder
-import org.komapper.core.dsl.metamodel.IdAssignment
 import org.komapper.core.dsl.metamodel.PropertyMetamodel
 import org.komapper.core.dsl.metamodel.isAutoIncrement
 
