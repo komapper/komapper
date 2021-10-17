@@ -1,14 +1,14 @@
 package org.komapper.dialect.postgresql
 
 import org.komapper.core.dsl.builder.AbstractSchemaStatementBuilder
-import org.komapper.core.dsl.metamodel.IdAssignment
 import org.komapper.core.dsl.metamodel.PropertyMetamodel
+import org.komapper.core.dsl.metamodel.isAutoIncrement
 
 open class PostgreSqlSchemaStatementBuilder(dialect: PostgreSqlDialect) :
     AbstractSchemaStatementBuilder<PostgreSqlDialect>(dialect) {
 
     override fun resolveDataTypeName(property: PropertyMetamodel<*, *, *>): String {
-        return if (property.idAssignment is IdAssignment.AutoIncrement<*, *>) {
+        return if (property.isAutoIncrement()) {
             when (property.interiorClass) {
                 Int::class -> "serial"
                 Long::class -> "bigserial"

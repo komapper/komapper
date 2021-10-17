@@ -15,24 +15,24 @@ internal class EntityInsertJdbcRunnerSupport<ENTITY : Any, ID, META : EntityMeta
 ) {
 
     fun preInsert(config: JdbcDatabaseConfig, entity: ENTITY): ENTITY {
-        val assignment = context.target.idAssignment()
-        return if (!options.disableSequenceAssignment && assignment is IdAssignment.Sequence<ENTITY, *>) {
-            runBlocking {
-                assignment.assign(entity, config.id, config.dialect::enquote) { sequenceName ->
-                    val sql = config.dialect.getSequenceSql(sequenceName)
-                    val statement = Statement(sql)
-                    val executor = JdbcExecutor(config, options)
-                    executor.executeQuery(statement) { rs ->
-                        if (rs.next()) rs.getLong(1) else error("No result: ${statement.toSql()}")
+        val newEntity = when (val assignment = context.target.idAssignment()) {
+            is IdAssignment.Sequence<ENTITY, *> ->
+                if (!assignment.disableSequenceAssignment && !options.disableSequenceAssignment) {
+                    runBlocking {
+                        assignment.assign(entity, config.id, config.dialect::enquote) { sequenceName ->
+                            val sql = config.dialect.getSequenceSql(sequenceName)
+                            val statement = Statement(sql)
+                            val executor = JdbcExecutor(config, options)
+                            executor.executeQuery(statement) { rs ->
+                                if (rs.next()) rs.getLong(1) else error("No result: ${statement.toSql()}")
+                            }
+                        }
                     }
-                }
-            }
-        } else {
-            entity
-        }.let { newEntity ->
-            val clock = config.clockProvider.now()
-            context.target.preInsert(newEntity, clock)
+                } else null
+            else -> null
         }
+        val clock = config.clockProvider.now()
+        return context.target.preInsert(newEntity ?: entity, clock)
     }
 
     fun <T> insert(config: JdbcDatabaseConfig, execute: (JdbcExecutor) -> T): T {

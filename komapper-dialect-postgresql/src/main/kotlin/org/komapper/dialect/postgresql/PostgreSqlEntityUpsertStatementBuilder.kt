@@ -13,7 +13,7 @@ import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.expression.Operand
 import org.komapper.core.dsl.expression.TableExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
-import org.komapper.core.dsl.metamodel.IdAssignment
+import org.komapper.core.dsl.metamodel.getNonAutoIncrementProperties
 
 class PostgreSqlEntityUpsertStatementBuilder<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     private val dialect: Dialect,
@@ -28,14 +28,11 @@ class PostgreSqlEntityUpsertStatementBuilder<ENTITY : Any, ID, META : EntityMeta
     private val support = BuilderSupport(dialect, aliasManager, buf)
 
     override fun build(): Statement {
+        val properties = target.getNonAutoIncrementProperties()
         buf.append("insert into ")
         table(target)
         buf.append(" (")
-        for (
-            p in target.properties().filter {
-                it.idAssignment !is IdAssignment.AutoIncrement<ENTITY, *>
-            }
-        ) {
+        for (p in properties) {
             column(p)
             buf.append(", ")
         }
@@ -43,11 +40,7 @@ class PostgreSqlEntityUpsertStatementBuilder<ENTITY : Any, ID, META : EntityMeta
         buf.append(") values ")
         for (entity in entities) {
             buf.append("(")
-            for (
-                p in target.properties().filter {
-                    it.idAssignment !is IdAssignment.AutoIncrement<ENTITY, *>
-                }
-            ) {
+            for (p in properties) {
                 buf.bind(p.toValue(entity))
                 buf.append(", ")
             }

@@ -15,5 +15,4 @@ class PropertyDescriptor<ENTITY, EXTERIOR : Any, INTERIOR : Any>(
     val wrap: (INTERIOR) -> EXTERIOR,
     val unwrap: (EXTERIOR) -> INTERIOR,
     val nullable: Boolean,
-    val idAssignment: IdAssignment<ENTITY>?
 )

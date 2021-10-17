@@ -15,29 +15,30 @@ internal class EntityInsertR2dbcRunnerSupport<ENTITY : Any, ID, META : EntityMet
 ) {
 
     suspend fun preInsert(config: R2dbcDatabaseConfig, entity: ENTITY): ENTITY {
-        val assignment = context.target.idAssignment()
-        return if (!options.disableSequenceAssignment && assignment is IdAssignment.Sequence<ENTITY, *>) {
-            assignment.assign(entity, config.id, config.dialect::enquote) { sequenceName ->
-                val sql = config.dialect.getSequenceSql(sequenceName)
-                val statement = Statement(sql)
-                val executor = R2dbcExecutor(config, options)
-                val flow = executor.executeQuery(statement) { _, row -> row.get(0) }
-                when (val value = flow.firstOrNull() ?: error("No result: ${statement.toSql()}")) {
-                    is Number -> value.toLong()
-                    else -> error("The value class is not a Number. type=${value::class}")
-                }
+        val newEntity = when (val assignment = context.target.idAssignment()) {
+            is IdAssignment.Sequence<ENTITY, *> -> {
+                if (!assignment.disableSequenceAssignment && !options.disableSequenceAssignment) {
+                    assignment.assign(entity, config.id, config.dialect::enquote) { sequenceName ->
+                        val sql = config.dialect.getSequenceSql(sequenceName)
+                        val statement = Statement(sql)
+                        val executor = R2dbcExecutor(config, options)
+                        val flow = executor.executeQuery(statement) { _, row -> row.get(0) }
+                        when (val value = flow.firstOrNull() ?: error("No result: ${statement.toSql()}")) {
+                            is Number -> value.toLong()
+                            else -> error("The value class is not a Number. type=${value::class}")
+                        }
+                    }
+                } else null
             }
-        } else {
-            entity
-        }.let { newEntity ->
-            val clock = config.clockProvider.now()
-            context.target.preInsert(newEntity, clock)
+            else -> null
         }
+        val clock = config.clockProvider.now()
+        return context.target.preInsert(newEntity ?: entity, clock)
     }
 
     suspend fun <T> insert(config: R2dbcDatabaseConfig, execute: suspend (R2dbcExecutor) -> T): T {
         val generatedColumn = when (val assignment = context.target.idAssignment()) {
-            is IdAssignment.AutoIncrement<ENTITY, *> -> assignment.columnName
+            is IdAssignment.AutoIncrement<ENTITY, *> -> assignment.property.columnName
             else -> null
         }
         val executor = R2dbcExecutor(config, options, generatedColumn)

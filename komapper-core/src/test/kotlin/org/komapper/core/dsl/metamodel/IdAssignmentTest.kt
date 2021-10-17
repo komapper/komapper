@@ -2,6 +2,7 @@ package org.komapper.core.dsl.metamodel
 
 import kotlinx.coroutines.runBlocking
 import java.util.UUID
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -9,11 +10,14 @@ internal class IdAssignmentTest {
 
     data class Emp(val id: Int = 0)
     private fun toId(generatedKey: Long): Int = generatedKey.toInt()
-    private fun setId(entity: Emp, id: Int): Emp = entity.copy(id = id)
+    private val property = object : PropertyMetamodel<Emp, Int, Int> by PropertyMetamodelStub() {
+        override val setter: (Emp, Int) -> Emp
+            get() = { entity, id -> entity.copy(id = id) }
+    }
 
     @Test
     fun autoIncrement() {
-        val autoIncrement = IdAssignment.AutoIncrement(::toId, ::setId, "ID")
+        val autoIncrement = IdAssignment.AutoIncrement(::toId, property)
         val emp = autoIncrement.assign(Emp(), 123L)
         assertEquals(Emp(123), emp)
     }
@@ -24,13 +28,15 @@ internal class IdAssignmentTest {
         val incrementBy = 2
         val sequence = IdAssignment.Sequence(
             ::toId,
-            ::setId,
+            property,
+            ConcurrentHashMap(),
             "id",
             "catalog",
             "schema",
             true,
             startWith,
-            incrementBy
+            incrementBy,
+            false,
         )
         val key = UUID.randomUUID()
         runBlocking {
