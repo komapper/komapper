@@ -5,7 +5,7 @@ dependencies {
     runtimeOnly(project(":komapper-dialect-mariadb-r2dbc"))
     runtimeOnly(project(":komapper-dialect-mysql-r2dbc"))
     runtimeOnly(project(":komapper-dialect-postgresql-r2dbc"))
-    testImplementation(platform("org.testcontainers:testcontainers-bom:1.16.1"))
+    testImplementation(platform("org.testcontainers:testcontainers-bom:1.16.2"))
     testImplementation("org.testcontainers:mariadb")
     testImplementation("org.testcontainers:mysql")
     testImplementation("org.testcontainers:postgresql")

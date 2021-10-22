@@ -6,7 +6,7 @@ dependencies {
     runtimeOnly(project(":komapper-dialect-mariadb-jdbc"))
     runtimeOnly(project(":komapper-dialect-mysql-jdbc"))
     runtimeOnly(project(":komapper-dialect-postgresql-jdbc"))
-    testImplementation(platform("org.testcontainers:testcontainers-bom:1.16.1"))
+    testImplementation(platform("org.testcontainers:testcontainers-bom:1.16.2"))
     testRuntimeOnly("org.testcontainers:mariadb")
     testRuntimeOnly("org.testcontainers:mysql")
     testRuntimeOnly("org.testcontainers:postgresql")
