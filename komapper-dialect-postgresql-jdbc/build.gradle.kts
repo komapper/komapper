@@ -1,5 +1,5 @@
 dependencies {
     api(project(":komapper-dialect-postgresql"))
     api(project(":komapper-jdbc"))
-    implementation("org.postgresql:postgresql:42.3.0")
+    implementation("org.postgresql:postgresql:42.3.1")
 }
