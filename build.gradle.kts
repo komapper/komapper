@@ -6,6 +6,18 @@ plugins {
     id("net.researchgate.release") version "2.8.1"
 }
 
+val platformProject = project("komapper-platform")
+val gradlePluginProject = project("gradle-plugin")
+val libraryProjects = subprojects.filter {
+    it.name.startsWith("komapper") && !it.name.endsWith("platform")
+}
+val exampleProjects = subprojects.filter {
+    it.name.startsWith("example")
+}
+val integrationTestProjects = subprojects.filter {
+    it.name.startsWith("integration-test")
+}
+
 val isReleaseVersion = !version.toString().endsWith("SNAPSHOT")
 
 allprojects {
@@ -28,58 +40,9 @@ allprojects {
     }
 }
 
-val libraryProjects = subprojects.filter {
-    it.name.startsWith("komapper") && !it.name.endsWith("platform")
-}
-
-val platformProject = project("komapper-platform")
-
-val gradlePluginProject = project("gradle-plugin")
-
-val exampleProjects = subprojects.filter {
-    it.name.startsWith("example")
-}
-
-val exampleSpringBootProjects = subprojects.filter {
-    it.name.startsWith("example-spring-boot")
-}
-
-val integrationTestProjects = subprojects.filter {
-    it.name.startsWith("integration-test")
-}
-
 configure(libraryProjects + gradlePluginProject + exampleProjects + integrationTestProjects) {
-    apply(plugin = "org.jetbrains.kotlin.jvm")
-
-    configure<com.diffplug.gradle.spotless.SpotlessExtension> {
-        kotlin {
-            targetExclude("build/**")
-            ktlint("0.41.0")
-        }
-    }
-}
-
-configure(listOf(gradlePluginProject)) {
     apply(plugin = "java")
-
-    configure<com.diffplug.gradle.spotless.SpotlessExtension> {
-        java {
-            googleJavaFormat("1.7")
-        }
-    }
-}
-
-configure(libraryProjects + gradlePluginProject) {
-    configure<JavaPluginExtension> {
-        withJavadocJar()
-        withSourcesJar()
-    }
-}
-
-configure(libraryProjects + gradlePluginProject + exampleProjects + integrationTestProjects) {
-    tasks.withType<Test> {
-        useJUnitPlatform()
-    }
+    apply(plugin = "org.jetbrains.kotlin.jvm")
 
     dependencies {
         if (project == gradlePluginProject) {
@@ -89,11 +52,50 @@ configure(libraryProjects + gradlePluginProject + exampleProjects + integrationT
             testImplementation(kotlin("test"))
         }
     }
+
+    java {
+        toolchain {
+            languageVersion.set(JavaLanguageVersion.of(8))
+        }
+    }
+
+    spotless {
+        kotlin {
+            targetExclude("build/**")
+            ktlint("0.41.0")
+        }
+    }
+
+    tasks {
+        withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+            kotlinOptions {
+                jvmTarget = "1.8"
+            }
+        }
+
+        withType<Test> {
+            useJUnitPlatform()
+        }
+    }
+}
+
+configure(libraryProjects + gradlePluginProject) {
+    java {
+        withJavadocJar()
+        withSourcesJar()
+    }
+
+    spotless {
+        java {
+            googleJavaFormat("1.7")
+        }
+    }
 }
 
 configure(libraryProjects + platformProject) {
     apply(plugin = "maven-publish")
     apply(plugin = "signing")
+
     val component = if (this == platformProject) {
         apply(plugin = "java-platform")
         "javaPlatform"
@@ -145,7 +147,6 @@ configure(libraryProjects + platformProject) {
 }
 
 rootProject.apply {
-
     release {
         newVersionCommitMessage = "[Gradle Release Plugin] - [skip ci] new version commit: "
         tagTemplate = "v\$version"
