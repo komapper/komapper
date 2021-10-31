@@ -8,6 +8,8 @@ plugins {
 // we don't publish this project to sonatype
 gradle.startParameter.excludedTaskNames.add(":gradle-plugin:publishToSonatype")
 
+val isReleaseVersion = !version.toString().endsWith("SNAPSHOT")
+
 gradlePlugin {
     plugins {
         create("gradlePlugin") {
@@ -40,5 +42,11 @@ configurations.all {
         if (requested.group == "org.jetbrains.kotlin") {
             useVersion("1.5.21")
         }
+    }
+}
+
+tasks {
+    publishPlugins {
+        enabled = !isReleaseVersion
     }
 }
