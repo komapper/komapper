@@ -47,6 +47,6 @@ configurations.all {
 
 tasks {
     publishPlugins {
-        enabled = !isReleaseVersion
+        enabled = isReleaseVersion
     }
 }
