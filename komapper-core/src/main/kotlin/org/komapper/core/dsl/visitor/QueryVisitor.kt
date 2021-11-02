@@ -34,7 +34,6 @@ import org.komapper.core.dsl.options.SqlUpdateOptions
 import org.komapper.core.dsl.options.TemplateExecuteOptions
 import org.komapper.core.dsl.options.TemplateSelectOptions
 import org.komapper.core.dsl.query.Columns
-import org.komapper.core.dsl.query.Entities
 import org.komapper.core.dsl.query.Query
 import org.komapper.core.dsl.query.Row
 
@@ -154,52 +153,6 @@ interface QueryVisitor<VISIT_RESULT> {
         options: SqlSetOperationOptions,
         metamodel: EntityMetamodel<T, *, *>,
         collect: suspend (Flow<T>) -> R
-    ): VISIT_RESULT
-
-    fun <A : Any, A_META : EntityMetamodel<A, *, A_META>, B : Any, B_META : EntityMetamodel<B, *, B_META>, R>
-    sqlPairEntitiesQuery(
-        context: SqlSelectContext<A, *, A_META>,
-        options: SqlSelectOptions,
-        metamodels: Pair<A_META, B_META>,
-        collect: suspend (Flow<Pair<A, B?>>) -> R
-    ): VISIT_RESULT
-
-    fun <A : Any, A_META : EntityMetamodel<A, *, A_META>, B : Any, B_META : EntityMetamodel<B, *, B_META>, R>
-    sqlPairEntitiesSetOperationQuery(
-        context: SqlSetOperationContext,
-        options: SqlSetOperationOptions,
-        metamodels: Pair<A_META, B_META>,
-        collect: suspend (Flow<Pair<A, B?>>) -> R
-    ): VISIT_RESULT
-
-    fun <A : Any, A_META : EntityMetamodel<A, *, A_META>, B : Any, B_META : EntityMetamodel<B, *, B_META>, C : Any, C_META : EntityMetamodel<C, *, C_META>, R>
-    sqlTripleEntitiesQuery(
-        context: SqlSelectContext<A, *, A_META>,
-        options: SqlSelectOptions,
-        metamodels: Triple<A_META, B_META, C_META>,
-        collect: suspend (Flow<Triple<A, B?, C?>>) -> R
-    ): VISIT_RESULT
-
-    fun <A : Any, A_META : EntityMetamodel<A, *, A_META>, B : Any, B_META : EntityMetamodel<B, *, B_META>, C : Any, C_META : EntityMetamodel<C, *, C_META>, R>
-    sqlTripleEntitiesSetOperationQuery(
-        context: SqlSetOperationContext,
-        options: SqlSetOperationOptions,
-        metamodels: Triple<A_META, B_META, C_META>,
-        collect: suspend (Flow<Triple<A, B?, C?>>) -> R
-    ): VISIT_RESULT
-
-    fun <R> sqlMultipleEntitiesQuery(
-        context: SqlSelectContext<*, *, *>,
-        options: SqlSelectOptions,
-        metamodels: List<EntityMetamodel<*, *, *>>,
-        collect: suspend (Flow<Entities>) -> R
-    ): VISIT_RESULT
-
-    fun <R> sqlMultipleEntitiesSetOperationQuery(
-        context: SqlSetOperationContext,
-        options: SqlSetOperationOptions,
-        metamodels: List<EntityMetamodel<*, *, *>>,
-        collect: suspend (Flow<Entities>) -> R
     ): VISIT_RESULT
 
     fun <A : Any, R>

@@ -24,46 +24,6 @@ interface FlowQueryVisitor<VISIT_RESULT> {
         metamodel: EntityMetamodel<ENTITY, ID, META>,
     ): VISIT_RESULT
 
-    fun <A : Any, A_META : EntityMetamodel<A, *, A_META>, B : Any, B_META : EntityMetamodel<B, *, B_META>>
-    sqlPairEntitiesQuery(
-        context: SqlSelectContext<A, *, A_META>,
-        options: SqlSelectOptions,
-        metamodels: Pair<A_META, B_META>,
-    ): VISIT_RESULT
-
-    fun <A : Any, A_META : EntityMetamodel<A, *, A_META>, B : Any, B_META : EntityMetamodel<B, *, B_META>>
-    sqlPairEntitiesSetOperationQuery(
-        context: SqlSetOperationContext,
-        options: SqlSetOperationOptions,
-        metamodels: Pair<A_META, B_META>,
-    ): VISIT_RESULT
-
-    fun <A : Any, A_META : EntityMetamodel<A, *, A_META>, B : Any, B_META : EntityMetamodel<B, *, B_META>, C : Any, C_META : EntityMetamodel<C, *, C_META>>
-    sqlTripleEntitiesQuery(
-        context: SqlSelectContext<A, *, A_META>,
-        options: SqlSelectOptions,
-        metamodels: Triple<A_META, B_META, C_META>,
-    ): VISIT_RESULT
-
-    fun <A : Any, A_META : EntityMetamodel<A, *, A_META>, B : Any, B_META : EntityMetamodel<B, *, B_META>, C : Any, C_META : EntityMetamodel<C, *, C_META>>
-    sqlTripleEntitiesSetOperationQuery(
-        context: SqlSetOperationContext,
-        options: SqlSetOperationOptions,
-        metamodels: Triple<A_META, B_META, C_META>,
-    ): VISIT_RESULT
-
-    fun sqlMultipleEntitiesQuery(
-        context: SqlSelectContext<*, *, *>,
-        options: SqlSelectOptions,
-        metamodels: List<EntityMetamodel<*, *, *>>,
-    ): VISIT_RESULT
-
-    fun sqlMultipleEntitiesSetOperationQuery(
-        context: SqlSetOperationContext,
-        options: SqlSetOperationOptions,
-        metamodels: List<EntityMetamodel<*, *, *>>,
-    ): VISIT_RESULT
-
     fun <A : Any> sqlSingleColumnQuery(
         context: SqlSelectContext<*, *, *>,
         options: SqlSelectOptions,

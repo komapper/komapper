@@ -33,7 +33,6 @@ import org.komapper.core.dsl.options.SqlUpdateOptions
 import org.komapper.core.dsl.options.TemplateExecuteOptions
 import org.komapper.core.dsl.options.TemplateSelectOptions
 import org.komapper.core.dsl.query.Columns
-import org.komapper.core.dsl.query.Entities
 import org.komapper.core.dsl.query.Query
 import org.komapper.core.dsl.query.Row
 import org.komapper.core.dsl.visitor.QueryVisitor
@@ -221,70 +220,6 @@ internal object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
     ): R2dbcRunner<R> {
         val provide = R2dbcRowTransformers.singleEntity(metamodel)
         return SqlSetOperationR2dbcRunner(context, options, provide, collect)
-    }
-
-    override fun <A : Any, A_META : EntityMetamodel<A, *, A_META>, B : Any, B_META : EntityMetamodel<B, *, B_META>, R>
-    sqlPairEntitiesQuery(
-        context: SqlSelectContext<A, *, A_META>,
-        options: SqlSelectOptions,
-        metamodels: Pair<A_META, B_META>,
-        collect: suspend (Flow<Pair<A, B?>>) -> R
-    ): R2dbcRunner<R> {
-        val transform = R2dbcRowTransformers.pairEntities(metamodels)
-        return SqlSelectR2dbcRunner(context, options, transform, collect)
-    }
-
-    override fun <A : Any, A_META : EntityMetamodel<A, *, A_META>, B : Any, B_META : EntityMetamodel<B, *, B_META>, R>
-    sqlPairEntitiesSetOperationQuery(
-        context: SqlSetOperationContext,
-        options: SqlSetOperationOptions,
-        metamodels: Pair<A_META, B_META>,
-        collect: suspend (Flow<Pair<A, B?>>) -> R
-    ): R2dbcRunner<R> {
-        val transform = R2dbcRowTransformers.pairEntities(metamodels)
-        return SqlSetOperationR2dbcRunner(context, options, transform, collect)
-    }
-
-    override fun <A : Any, A_META : EntityMetamodel<A, *, A_META>, B : Any, B_META : EntityMetamodel<B, *, B_META>, C : Any, C_META : EntityMetamodel<C, *, C_META>, R>
-    sqlTripleEntitiesQuery(
-        context: SqlSelectContext<A, *, A_META>,
-        options: SqlSelectOptions,
-        metamodels: Triple<A_META, B_META, C_META>,
-        collect: suspend (Flow<Triple<A, B?, C?>>) -> R
-    ): R2dbcRunner<R> {
-        val transform = R2dbcRowTransformers.tripleEntities(metamodels)
-        return SqlSelectR2dbcRunner(context, options, transform, collect)
-    }
-
-    override fun <A : Any, A_META : EntityMetamodel<A, *, A_META>, B : Any, B_META : EntityMetamodel<B, *, B_META>, C : Any, C_META : EntityMetamodel<C, *, C_META>, R>
-    sqlTripleEntitiesSetOperationQuery(
-        context: SqlSetOperationContext,
-        options: SqlSetOperationOptions,
-        metamodels: Triple<A_META, B_META, C_META>,
-        collect: suspend (Flow<Triple<A, B?, C?>>) -> R
-    ): R2dbcRunner<R> {
-        val transform = R2dbcRowTransformers.tripleEntities(metamodels)
-        return SqlSetOperationR2dbcRunner(context, options, transform, collect)
-    }
-
-    override fun <R> sqlMultipleEntitiesQuery(
-        context: SqlSelectContext<*, *, *>,
-        options: SqlSelectOptions,
-        metamodels: List<EntityMetamodel<*, *, *>>,
-        collect: suspend (Flow<Entities>) -> R
-    ): R2dbcRunner<R> {
-        val transform = R2dbcRowTransformers.multipleEntities(metamodels)
-        return SqlSelectR2dbcRunner(context, options, transform, collect)
-    }
-
-    override fun <R> sqlMultipleEntitiesSetOperationQuery(
-        context: SqlSetOperationContext,
-        options: SqlSetOperationOptions,
-        metamodels: List<EntityMetamodel<*, *, *>>,
-        collect: suspend (Flow<Entities>) -> R
-    ): R2dbcRunner<R> {
-        val transform = R2dbcRowTransformers.multipleEntities(metamodels)
-        return SqlSetOperationR2dbcRunner(context, options, transform, collect)
     }
 
     override fun <A : Any, R> sqlSingleColumnQuery(

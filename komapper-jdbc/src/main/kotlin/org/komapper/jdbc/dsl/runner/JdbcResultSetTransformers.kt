@@ -4,8 +4,6 @@ import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.query.Columns
 import org.komapper.core.dsl.query.ColumnsImpl
-import org.komapper.core.dsl.query.Entities
-import org.komapper.core.dsl.query.EntitiesImpl
 import org.komapper.jdbc.JdbcDialect
 import java.sql.ResultSet
 
@@ -16,30 +14,6 @@ internal object JdbcResultSetTransformers {
         val entity = mapper.execute(metamodel, true)
         checkNotNull(entity)
     }
-
-    fun <A : Any, B : Any> pairEntities(metamodels: Pair<EntityMetamodel<A, *, *>, EntityMetamodel<B, *, *>>): (JdbcDialect, ResultSet) -> Pair<A, B?> =
-        { dialect, rs ->
-            val mapper = JdbcEntityMapper(dialect, rs)
-            val first = mapper.execute(metamodels.first, true)
-            val second = mapper.execute(metamodels.second)
-            checkNotNull(first) to second
-        }
-
-    fun <A : Any, B : Any, C : Any> tripleEntities(metamodels: Triple<EntityMetamodel<A, *, *>, EntityMetamodel<B, *, *>, EntityMetamodel<C, *, *>>): (JdbcDialect, ResultSet) -> Triple<A, B?, C?> =
-        { dialect, rs ->
-            val mapper = JdbcEntityMapper(dialect, rs)
-            val first = mapper.execute(metamodels.first, true)
-            val second = mapper.execute(metamodels.second)
-            val third = mapper.execute(metamodels.third)
-            Triple(checkNotNull(first), second, third)
-        }
-
-    fun multipleEntities(metamodels: List<EntityMetamodel<*, *, *>>): (JdbcDialect, ResultSet) -> Entities =
-        { dialect, rs ->
-            val mapper = JdbcEntityMapper(dialect, rs)
-            val map = metamodels.associateWith { mapper.execute(it) }
-            EntitiesImpl(map)
-        }
 
     fun <A : Any> singleColumn(expression: ColumnExpression<A, *>): (JdbcDialect, ResultSet) -> A? =
         { dialect, rs ->
