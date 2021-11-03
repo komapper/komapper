@@ -137,9 +137,9 @@ class EntityInsertQueryTest(private val db: R2dbcDatabase) {
         val m = SequenceStrategy.meta
         val strategy = SequenceStrategy(50, "test")
         val result = db.runQuery {
-            SqlDsl.insert(m).options {
+            SqlDsl.insert(m).single(strategy).options {
                 it.copy(disableSequenceAssignment = true)
-            }.single(strategy)
+            }
         }
         assertEquals(50, result.id)
     }
