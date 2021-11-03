@@ -71,12 +71,6 @@ internal data class EntitySelectQueryImpl<ENTITY : Any, ID, META : EntityMetamod
 ) :
     EntitySelectQuery<ENTITY> {
 
-    companion object Message {
-        fun entityMetamodelNotFound(parameterName: String): String {
-            return "The '$parameterName' metamodel is not found. Bind it to this query in advance using the from or join clause."
-        }
-    }
-
     private val support: SelectQuerySupport<ENTITY, ID, META, EntitySelectContext<ENTITY, ID, META>> =
         SelectQuerySupport(context)
 

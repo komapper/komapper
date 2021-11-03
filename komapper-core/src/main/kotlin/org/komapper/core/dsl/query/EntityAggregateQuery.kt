@@ -20,13 +20,19 @@ data class AggregateQueryImpl(
     private val options: EntitySelectOptions
 ) : EntityAggregateQuery {
 
+    companion object Message {
+        fun entityMetamodelNotFound(parameterName: String): String {
+            return "The '$parameterName' metamodel is not found. Bind it to this query in advance using the from or join clause."
+        }
+    }
+
     override fun <T : Any, S : Any> associate(
         metamodel1: EntityMetamodel<T, *, *>,
         metamodel2: EntityMetamodel<S, *, *>,
     ): EntityAggregateQuery {
         val metamodels = context.getEntityMetamodels()
-        require(metamodel1 in metamodels) { EntitySelectQueryImpl.entityMetamodelNotFound("metamodel1") }
-        require(metamodel2 in metamodels) { EntitySelectQueryImpl.entityMetamodelNotFound("metamodel2") }
+        require(metamodel1 in metamodels) { entityMetamodelNotFound("metamodel1") }
+        require(metamodel2 in metamodels) { entityMetamodelNotFound("metamodel2") }
         @Suppress("UNCHECKED_CAST")
         val newContext = context.addAssociation(metamodel1 to metamodel2)
         return copy(context = newContext)
