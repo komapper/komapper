@@ -5,16 +5,15 @@ import org.komapper.core.dsl.context.EntityUpsertContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.EntityInsertOptions
 import org.komapper.core.dsl.scope.SetScope
-import org.komapper.core.dsl.visitor.QueryVisitor
 
 @ThreadSafe
 interface EntityUpsertQueryBuilder<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> {
     fun set(declaration: SetScope<ENTITY>.(META) -> Unit): EntityUpsertQueryBuilder<ENTITY, ID, META>
-    fun single(entity: ENTITY): Query<Int>
-    fun multiple(entities: List<ENTITY>): Query<Int>
-    fun multiple(vararg entities: ENTITY): Query<Int>
-    fun batch(entities: List<ENTITY>): Query<List<Int>>
-    fun batch(vararg entities: ENTITY): Query<List<Int>>
+    fun single(entity: ENTITY): EntityUpsertQuery<Int>
+    fun multiple(entities: List<ENTITY>): EntityUpsertQuery<Int>
+    fun multiple(vararg entities: ENTITY): EntityUpsertQuery<Int>
+    fun batch(entities: List<ENTITY>, batchSize: Int? = null): EntityUpsertQuery<List<Int>>
+    fun batch(vararg entities: ENTITY, batchSize: Int? = null): EntityUpsertQuery<List<Int>>
 }
 
 internal data class EntityUpsertQueryBuilderImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
@@ -29,29 +28,23 @@ internal data class EntityUpsertQueryBuilderImpl<ENTITY : Any, ID, META : Entity
         return copy(context = newContext)
     }
 
-    override fun single(entity: ENTITY): Query<Int> = object : Query<Int> {
-        override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
-            return visitor.entityUpsertSingleQuery(context, options, entity)
-        }
+    override fun single(entity: ENTITY): EntityUpsertQuery<Int> {
+        return EntityUpsertQuery.Single(context, options, entity)
     }
 
-    override fun multiple(entities: List<ENTITY>): Query<Int> = object : Query<Int> {
-        override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
-            return visitor.entityUpsertMultipleQuery(context, options, entities)
-        }
+    override fun multiple(entities: List<ENTITY>): EntityUpsertQuery<Int> {
+        return EntityUpsertQuery.Multiple(context, options, entities)
     }
 
-    override fun multiple(vararg entities: ENTITY): Query<Int> {
+    override fun multiple(vararg entities: ENTITY): EntityUpsertQuery<Int> {
         return multiple(entities.toList())
     }
 
-    override fun batch(entities: List<ENTITY>): Query<List<Int>> = object : Query<List<Int>> {
-        override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
-            return visitor.entityUpsertBatchQuery(context, options, entities)
-        }
+    override fun batch(entities: List<ENTITY>, batchSize: Int?): EntityUpsertQuery<List<Int>> {
+        return EntityUpsertQuery.Batch(context, options, entities, batchSize)
     }
 
-    override fun batch(vararg entities: ENTITY): Query<List<Int>> {
-        return batch(entities.toList())
+    override fun batch(vararg entities: ENTITY, batchSize: Int?): EntityUpsertQuery<List<Int>> {
+        return batch(entities.toList(), batchSize)
     }
 }
