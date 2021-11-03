@@ -15,7 +15,7 @@ interface EntityAggregateQuery : Query<EntityAggregate> {
     fun options(configure: (EntitySelectOptions) -> EntitySelectOptions): EntityAggregateQuery
 }
 
-data class AggregateQueryImpl(
+internal data class EntityAggregateQueryImpl(
     private val context: EntitySelectContext<*, *, *>,
     private val options: EntitySelectOptions
 ) : EntityAggregateQuery {

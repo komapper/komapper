@@ -122,7 +122,7 @@ internal data class EntitySelectQueryImpl<ENTITY : Any, ID, META : EntityMetamod
         metamodel1: EntityMetamodel<T, *, *>,
         metamodel2: EntityMetamodel<S, *, *>,
     ): EntityAggregateQuery {
-        return AggregateQueryImpl(context, options).associate(metamodel1, metamodel2)
+        return EntityAggregateQueryImpl(context, options).associate(metamodel1, metamodel2)
     }
 
     override fun <R> collect(collect: suspend (Flow<ENTITY>) -> R): Query<R> = object : Query<R> {
