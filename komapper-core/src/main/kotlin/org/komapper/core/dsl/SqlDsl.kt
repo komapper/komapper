@@ -2,24 +2,22 @@ package org.komapper.core.dsl
 
 import org.komapper.core.dsl.context.SqlDeleteContext
 import org.komapper.core.dsl.context.SqlInsertContext
-import org.komapper.core.dsl.context.SqlSelectContext
 import org.komapper.core.dsl.context.SqlUpdateContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
+import org.komapper.core.dsl.query.EntitySelectQuery
 import org.komapper.core.dsl.query.SqlDeleteQuery
 import org.komapper.core.dsl.query.SqlDeleteQueryImpl
 import org.komapper.core.dsl.query.SqlInsertQueryBuilder
 import org.komapper.core.dsl.query.SqlInsertQueryBuilderImpl
 import org.komapper.core.dsl.query.SqlInsertQueryImpl
-import org.komapper.core.dsl.query.SqlSelectQuery
-import org.komapper.core.dsl.query.SqlSelectQueryImpl
 import org.komapper.core.dsl.query.SqlUpdateQueryBuilder
 import org.komapper.core.dsl.query.SqlUpdateQueryBuilderImpl
 import org.komapper.core.dsl.query.SqlUpdateQueryImpl
 
 object SqlDsl : Dsl {
 
-    fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> from(metamodel: META): SqlSelectQuery<ENTITY> {
-        return SqlSelectQueryImpl(SqlSelectContext(metamodel))
+    fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> from(metamodel: META): EntitySelectQuery<ENTITY> {
+        return EntityDsl.from(metamodel)
     }
 
     fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> insert(metamodel: META): SqlInsertQueryBuilder<ENTITY, ID> {

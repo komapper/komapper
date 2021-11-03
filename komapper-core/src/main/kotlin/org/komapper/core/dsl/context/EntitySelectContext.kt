@@ -17,6 +17,7 @@ data class EntitySelectContext<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, 
     override val offset: Int = -1,
     override val limit: Int = -1,
     override val forUpdate: ForUpdate = ForUpdate(),
+    val distinct: Boolean = false,
     val associations: List<Association> = emptyList()
 ) : SelectContext<ENTITY, ID, META, EntitySelectContext<ENTITY, ID, META>> {
 
@@ -61,7 +62,8 @@ data class EntitySelectContext<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, 
             orderBy = orderBy,
             offset = offset,
             limit = limit,
-            forUpdate = forUpdate
+            forUpdate = forUpdate,
+            distinct = distinct
         )
     }
 }
