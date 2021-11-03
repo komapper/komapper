@@ -46,6 +46,11 @@ interface QueryVisitor<VISIT_RESULT> {
 
     fun <T, S> flatZipQuery(query: Query<T>, transform: (T) -> Query<S>): VISIT_RESULT
 
+    fun entityAggregateQuery(
+        context: EntitySelectContext<*, *, *>,
+        options: EntitySelectOptions
+    ): VISIT_RESULT
+
     fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>, R>
     entitySelectQuery(
         context: EntitySelectContext<ENTITY, ID, META>,

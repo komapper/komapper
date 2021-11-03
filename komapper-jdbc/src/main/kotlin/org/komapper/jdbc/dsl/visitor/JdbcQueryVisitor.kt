@@ -36,6 +36,7 @@ import org.komapper.core.dsl.query.Columns
 import org.komapper.core.dsl.query.Query
 import org.komapper.core.dsl.query.Row
 import org.komapper.core.dsl.visitor.QueryVisitor
+import org.komapper.jdbc.dsl.runner.EntityAggregateJdbcRunner
 import org.komapper.jdbc.dsl.runner.EntityDeleteBatchJdbcRunner
 import org.komapper.jdbc.dsl.runner.EntityDeleteSingleJdbcRunner
 import org.komapper.jdbc.dsl.runner.EntityInsertBatchJdbcRunner
@@ -86,13 +87,18 @@ internal object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
         }
     }
 
+    override fun entityAggregateQuery(context: EntitySelectContext<*, *, *>, options: EntitySelectOptions): JdbcRunner<*> {
+        return EntityAggregateJdbcRunner(context, options)
+    }
+
     override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>, R>
     entitySelectQuery(
         context: EntitySelectContext<ENTITY, ID, META>,
         options: EntitySelectOptions,
         collect: suspend (Flow<ENTITY>) -> R
     ): JdbcRunner<R> {
-        return EntitySelectJdbcRunner(context, options, collect)
+        val transformer = JdbcResultSetTransformers.singleEntity(context.target)
+        return EntitySelectJdbcRunner(context, options, transformer, collect)
     }
 
     override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>

@@ -79,6 +79,10 @@ internal object DefaultQueryVisitor : QueryVisitor<Runner> {
         return Runner.FlatZip(runner)
     }
 
+    override fun entityAggregateQuery(context: EntitySelectContext<*, *, *>, options: EntitySelectOptions): Runner {
+        return EntitySelectRunner(context, options)
+    }
+
     override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>, R> entitySelectQuery(
         context: EntitySelectContext<ENTITY, ID, META>,
         options: EntitySelectOptions,

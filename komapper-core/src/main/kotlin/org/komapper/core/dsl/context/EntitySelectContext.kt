@@ -1,7 +1,6 @@
 package org.komapper.core.dsl.context
 
 import org.komapper.core.dsl.element.Association
-import org.komapper.core.dsl.element.Associator
 import org.komapper.core.dsl.element.ForUpdate
 import org.komapper.core.dsl.element.Join
 import org.komapper.core.dsl.element.Projection
@@ -18,7 +17,7 @@ data class EntitySelectContext<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, 
     override val offset: Int = -1,
     override val limit: Int = -1,
     override val forUpdate: ForUpdate = ForUpdate(),
-    val associatorMap: Map<Association, Associator<Any, Any>> = mapOf()
+    val associations: List<Association> = emptyList()
 ) : SelectContext<ENTITY, ID, META, EntitySelectContext<ENTITY, ID, META>> {
 
     override fun addJoin(join: Join<*, *>): EntitySelectContext<ENTITY, ID, META> {
@@ -45,14 +44,13 @@ data class EntitySelectContext<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, 
         return copy(forUpdate = forUpdate)
     }
 
-    fun putAssociator(
+    fun addAssociation(
         association: Association,
-        associator: Associator<Any, Any>
-    ): EntitySelectContext<ENTITY, ID, META> {
+    ): EntitySelectContext<*, *, *> {
         val newProjection = Projection.Metamodels(
             (projection.metamodels + listOf(association.first, association.second)).distinct()
         )
-        return copy(projection = newProjection, associatorMap = this.associatorMap + (association to associator))
+        return copy(projection = newProjection, associations = this.associations + association)
     }
 
     fun asSqlSelectContext(): SqlSelectContext<ENTITY, ID, META> {

@@ -7,7 +7,6 @@ import org.komapper.core.dsl.context.SqlSetOperationContext
 import org.komapper.core.dsl.context.SqlSetOperationKind
 import org.komapper.core.dsl.declaration.OnDeclaration
 import org.komapper.core.dsl.declaration.WhereDeclaration
-import org.komapper.core.dsl.element.Associator
 import org.komapper.core.dsl.expression.SortExpression
 import org.komapper.core.dsl.expression.SubqueryExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
@@ -27,8 +26,7 @@ interface EntitySelectQuery<ENTITY : Any> : Subquery<ENTITY> {
     fun <T : Any, S : Any> associate(
         metamodel1: EntityMetamodel<T, *, *>,
         metamodel2: EntityMetamodel<S, *, *>,
-        associator: Associator<T, S>
-    ): EntitySelectQuery<ENTITY>
+    ): EntityAggregateQuery
 
     fun asSqlQuery(): SqlSelectQuery<ENTITY>
 }
@@ -90,14 +88,8 @@ internal data class EntitySelectQueryImpl<ENTITY : Any, ID, META : EntityMetamod
     override fun <T : Any, S : Any> associate(
         metamodel1: EntityMetamodel<T, *, *>,
         metamodel2: EntityMetamodel<S, *, *>,
-        associator: Associator<T, S>
-    ): EntitySelectQuery<ENTITY> {
-        val metamodels = context.getEntityMetamodels()
-        require(metamodel1 in metamodels) { entityMetamodelNotFound("metamodel1") }
-        require(metamodel2 in metamodels) { entityMetamodelNotFound("metamodel2") }
-        @Suppress("UNCHECKED_CAST")
-        val newContext = context.putAssociator(metamodel1 to metamodel2, associator as Associator<Any, Any>)
-        return copy(context = newContext)
+    ): EntityAggregateQuery {
+        return AggregateQueryImpl(context, options).associate(metamodel1, metamodel2)
     }
 
     override fun <R> collect(collect: suspend (Flow<ENTITY>) -> R): Query<R> = object : Query<R> {

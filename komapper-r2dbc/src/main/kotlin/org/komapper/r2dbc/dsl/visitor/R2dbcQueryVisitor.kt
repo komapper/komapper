@@ -36,6 +36,7 @@ import org.komapper.core.dsl.query.Columns
 import org.komapper.core.dsl.query.Query
 import org.komapper.core.dsl.query.Row
 import org.komapper.core.dsl.visitor.QueryVisitor
+import org.komapper.r2dbc.dsl.runner.EntityAggregateR2dbcRunner
 import org.komapper.r2dbc.dsl.runner.EntityDeleteSingleR2dbcRunner
 import org.komapper.r2dbc.dsl.runner.EntityInsertMultipleR2dbcRunner
 import org.komapper.r2dbc.dsl.runner.EntityInsertSingleR2dbcRunner
@@ -82,12 +83,20 @@ internal object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
         }
     }
 
+    override fun entityAggregateQuery(
+        context: EntitySelectContext<*, *, *>,
+        options: EntitySelectOptions
+    ): R2dbcRunner<*> {
+        return EntityAggregateR2dbcRunner(context, options)
+    }
+
     override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>, R> entitySelectQuery(
         context: EntitySelectContext<ENTITY, ID, META>,
         options: EntitySelectOptions,
         collect: suspend (Flow<ENTITY>) -> R
     ): R2dbcRunner<R> {
-        return EntitySelectR2dbcRunner(context, options, collect)
+        val transform = R2dbcRowTransformers.singleEntity(context.target)
+        return EntitySelectR2dbcRunner(context, options, transform, collect)
     }
 
     override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>

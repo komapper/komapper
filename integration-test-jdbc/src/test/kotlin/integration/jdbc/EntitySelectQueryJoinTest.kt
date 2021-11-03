@@ -57,50 +57,51 @@ class EntitySelectQueryJoinTest(private val db: JdbcDatabase) {
     fun association_many_to_one() {
         val e = Employee.meta
         val d = Department.meta
-        val list = db.runQuery {
+        val aggregate = db.runQuery {
             EntityDsl.from(e).innerJoin(d) {
                 e.departmentId eq d.departmentId
-            }.associate(e, d) { employee, department ->
-                employee.copy(department = department)
-            }
+            }.associate(e, d)
         }
-        assertEquals(14, list.size)
-        assertTrue(list.all { it.department != null })
+        val map = aggregate.oneToMany(d, e)
+        assertEquals(3, map.size)
+        val employees1 = map.filterKeys { it.departmentId == 1 }.values.first()
+        val employees2 = map.filterKeys { it.departmentId == 2 }.values.first()
+        val employees3 = map.filterKeys { it.departmentId == 3 }.values.first()
+        assertEquals(3, employees1.size)
+        assertEquals(5, employees2.size)
+        assertEquals(6, employees3.size)
     }
 
     @Test
     fun association_one_to_many() {
         val d = Department.meta
         val e = Employee.meta
-        val list = db.runQuery {
+        val aggregate = db.runQuery {
             EntityDsl.from(d).innerJoin(e) {
                 d.departmentId eq e.departmentId
-            }.associate(d, e) { department, employee ->
-                val list = department.employeeList + employee
-                department.copy(employeeList = list)
-            }
+            }.associate(d, e)
         }
-        assertEquals(3, list.size)
-        val department1 = list.first { it.departmentId == 1 }
-        val department2 = list.first { it.departmentId == 2 }
-        val department3 = list.first { it.departmentId == 3 }
-        assertEquals(3, department1.employeeList.size)
-        assertEquals(5, department2.employeeList.size)
-        assertEquals(6, department3.employeeList.size)
+        val map = aggregate.oneToMany(d, e)
+        assertEquals(3, map.size)
+        val employees1 = map.filterKeys { it.departmentId == 1 }.values.first()
+        val employees2 = map.filterKeys { it.departmentId == 2 }.values.first()
+        val employees3 = map.filterKeys { it.departmentId == 3 }.values.first()
+        assertEquals(3, employees1.size)
+        assertEquals(5, employees2.size)
+        assertEquals(6, employees3.size)
     }
 
     @Test
     fun association_one_to_one() {
         val a = Address.meta
         val e = Employee.meta
-        val list = db.runQuery {
+        val aggregate = db.runQuery {
             EntityDsl.from(e).innerJoin(a) {
                 e.addressId eq a.addressId
-            }.associate(e, a) { employee, address ->
-                employee.copy(address = address)
-            }
+            }.associate(e, a)
         }
-        assertEquals(14, list.size)
-        assertTrue(list.all { it.address != null })
+        val map = aggregate.oneToOne(e, a)
+        assertEquals(14, map.size)
+        assertTrue(map.values.all { it != null })
     }
 }
