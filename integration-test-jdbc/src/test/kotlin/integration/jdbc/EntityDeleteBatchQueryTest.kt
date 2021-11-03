@@ -73,9 +73,6 @@ class EntityDeleteBatchQueryTest(private val db: JdbcDatabase) {
         assertEquals(3, db.runQuery { query }.size)
         db.runQuery {
             SqlDsl.delete(a)
-                .options {
-                    it.copy(suppressOptimisticLockException = true)
-                }
                 .batch(
                     listOf(
                         addressList[0],
@@ -83,6 +80,9 @@ class EntityDeleteBatchQueryTest(private val db: JdbcDatabase) {
                         addressList[2].copy(version = 1)
                     )
                 )
+                .options {
+                    it.copy(suppressOptimisticLockException = true)
+                }
         }
     }
 }
