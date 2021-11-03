@@ -1,15 +1,12 @@
 package org.komapper.core.dsl
 
 import org.komapper.core.dsl.context.SqlDeleteContext
-import org.komapper.core.dsl.context.SqlUpdateContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.query.EntityInsertQueryBuilder
 import org.komapper.core.dsl.query.EntitySelectQuery
+import org.komapper.core.dsl.query.EntityUpdateQueryBuilder
 import org.komapper.core.dsl.query.SqlDeleteQuery
 import org.komapper.core.dsl.query.SqlDeleteQueryImpl
-import org.komapper.core.dsl.query.SqlUpdateQueryBuilder
-import org.komapper.core.dsl.query.SqlUpdateQueryBuilderImpl
-import org.komapper.core.dsl.query.SqlUpdateQueryImpl
 
 object SqlDsl : Dsl {
 
@@ -21,9 +18,8 @@ object SqlDsl : Dsl {
         return EntityDsl.insert(metamodel)
     }
 
-    fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> update(metamodel: META): SqlUpdateQueryBuilder<ENTITY> {
-        val query = SqlUpdateQueryImpl(SqlUpdateContext(metamodel))
-        return SqlUpdateQueryBuilderImpl(query)
+    fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> update(metamodel: META): EntityUpdateQueryBuilder<ENTITY> {
+        return EntityDsl.update(metamodel)
     }
 
     fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> delete(metamodel: META): SqlDeleteQuery {

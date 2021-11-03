@@ -25,4 +25,8 @@ data class EntityUpdateContext<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, 
         }
         return properties.filter { it != createdAtProperty } - idProperties + versionProperties
     }
+
+    fun asSqlUpdateContext(): SqlUpdateContext<ENTITY, ID, META> {
+        return SqlUpdateContext(target)
+    }
 }

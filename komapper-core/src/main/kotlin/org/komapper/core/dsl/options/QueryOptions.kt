@@ -136,6 +136,15 @@ data class EntityUpdateOptions(
             suppressOptimisticLockException = suppressOptimisticLockException
         )
     }
+
+    fun asSqlUpdateOptions(): SqlUpdateOptions {
+        return SqlUpdateOptions(
+            allowEmptyWhereClause = false,
+            escapeSequence = null,
+            queryTimeoutSeconds = queryTimeoutSeconds,
+            suppressLogging = suppressLogging,
+        )
+    }
 }
 
 data class EntitySelectOptions(

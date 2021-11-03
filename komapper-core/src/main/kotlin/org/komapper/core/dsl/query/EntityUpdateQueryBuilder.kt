@@ -2,6 +2,7 @@ package org.komapper.core.dsl.query
 
 import org.komapper.core.ThreadSafe
 import org.komapper.core.dsl.context.EntityUpdateContext
+import org.komapper.core.dsl.declaration.SetDeclaration
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.metamodel.PropertyMetamodel
 import org.komapper.core.dsl.options.EntityUpdateOptions
@@ -15,6 +16,7 @@ interface EntityUpdateQueryBuilder<ENTITY : Any> {
     fun single(entity: ENTITY): Query<ENTITY>
     fun batch(entities: List<ENTITY>, batchSize: Int? = null): Query<List<ENTITY>>
     fun batch(vararg entities: ENTITY, batchSize: Int? = null): Query<List<ENTITY>>
+    fun set(declaration: SetDeclaration<ENTITY>): SqlUpdateQuery<ENTITY>
 }
 
 internal data class EntityUpdateQueryBuilderImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
@@ -70,5 +72,14 @@ internal data class EntityUpdateQueryBuilderImpl<ENTITY : Any, ID, META : Entity
 
     override fun batch(vararg entities: ENTITY, batchSize: Int?): Query<List<ENTITY>> {
         return batch(entities.toList())
+    }
+
+    override fun set(declaration: SetDeclaration<ENTITY>): SqlUpdateQuery<ENTITY> {
+        return asSqlUpdateQueryBuilder().set(declaration)
+    }
+
+    private fun asSqlUpdateQueryBuilder(): SqlUpdateQueryBuilder<ENTITY> {
+        val query = SqlUpdateQueryImpl(context.asSqlUpdateContext(), options.asSqlUpdateOptions())
+        return SqlUpdateQueryBuilderImpl(query)
     }
 }
