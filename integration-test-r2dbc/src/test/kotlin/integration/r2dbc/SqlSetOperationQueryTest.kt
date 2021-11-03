@@ -7,7 +7,6 @@ import integration.meta
 import integration.setting.Dbms
 import integration.setting.Run
 import org.junit.jupiter.api.extension.ExtendWith
-import org.komapper.core.dsl.EntityDsl
 import org.komapper.core.dsl.SqlDsl
 import org.komapper.core.dsl.operator.alias
 import org.komapper.core.dsl.operator.desc
@@ -56,7 +55,7 @@ class SqlSetOperationQueryTest(private val db: R2dbcDatabase) {
         val e = Employee.meta
         val q1 = SqlDsl.from(e).where { e.employeeId eq 1 }
         val q2 = SqlDsl.from(e).where { e.employeeId eq 1 }
-        val q3 = EntityDsl.from(e).where { e.employeeId eq 5 }
+        val q3 = SqlDsl.from(e).where { e.employeeId eq 5 }
         val query = (q1 union q2 union q3).orderBy(e.employeeId.desc())
         val list = db.runQuery { query }.toList()
         assertEquals(2, list.size)

@@ -3,7 +3,7 @@ package integration.r2dbc
 import integration.Address
 import integration.meta
 import org.junit.jupiter.api.extension.ExtendWith
-import org.komapper.core.dsl.EntityDsl
+import org.komapper.core.dsl.SqlDsl
 import org.komapper.r2dbc.R2dbcDatabase
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -15,7 +15,7 @@ class EntitySelectQuerySelectTest(private val db: R2dbcDatabase) {
     fun single() = inTransaction(db) {
         val a = Address.meta
         val street = db.runQuery {
-            EntityDsl.from(a).where { a.addressId eq 1 }
+            SqlDsl.from(a).where { a.addressId eq 1 }
                 .asSqlQuery().select(a.street).first()
         }
         assertEquals("STREET 1", street)
@@ -25,7 +25,7 @@ class EntitySelectQuerySelectTest(private val db: R2dbcDatabase) {
     fun pair() = inTransaction(db) {
         val a = Address.meta
         val (id, street) = db.runQuery {
-            EntityDsl.from(a).where { a.addressId eq 1 }
+            SqlDsl.from(a).where { a.addressId eq 1 }
                 .asSqlQuery().select(a.addressId, a.street).first()
         }
         assertEquals(1, id)

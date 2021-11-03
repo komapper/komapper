@@ -108,7 +108,6 @@ import org.komapper.annotation.KomapperId
 import org.komapper.annotation.KomapperTable
 import org.komapper.core.dsl.EntityDsl
 import org.komapper.core.dsl.SchemaDsl
-import org.komapper.core.dsl.SqlDsl
 import org.komapper.core.dsl.operator.count
 import org.komapper.core.dsl.operator.literal
 import org.komapper.core.dsl.operator.substring

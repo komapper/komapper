@@ -4,7 +4,6 @@ import org.komapper.annotation.KomapperAutoIncrement
 import org.komapper.annotation.KomapperEntityDef
 import org.komapper.annotation.KomapperId
 import org.komapper.annotation.KomapperTable
-import org.komapper.core.dsl.EntityDsl
 import org.komapper.core.dsl.SchemaDsl
 import org.komapper.core.dsl.SqlDsl
 import org.komapper.core.dsl.operator.count
@@ -56,7 +55,7 @@ fun main() {
         }
 
         val (saintPetersburg, munich) = db.runQuery {
-            EntityDsl.insert(c).multiple(
+            SqlDsl.insert(c).multiple(
                 City(name = "St. Petersburg"),
                 City(name = "Munich"),
             )
@@ -74,7 +73,7 @@ fun main() {
         check(prague.name == "Pr") { prague.toString() }
 
         db.runQuery {
-            EntityDsl.insert(u).multiple(
+            SqlDsl.insert(u).multiple(
                 User(id = "andrey", name = "Andrey", cityId = saintPetersburg.id),
                 User(id = "sergey", name = "Sergey", cityId = munich.id),
                 User(id = "eugene", name = "Eugene", cityId = munich.id),

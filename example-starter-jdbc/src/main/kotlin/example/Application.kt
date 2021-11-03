@@ -7,8 +7,8 @@ import org.komapper.annotation.KomapperEntityDef
 import org.komapper.annotation.KomapperId
 import org.komapper.annotation.KomapperUpdatedAt
 import org.komapper.annotation.KomapperVersion
-import org.komapper.core.dsl.EntityDsl
 import org.komapper.core.dsl.SchemaDsl
+import org.komapper.core.dsl.SqlDsl
 import org.komapper.jdbc.JdbcDatabase
 import org.komapper.tx.jdbc.withTransaction
 import java.time.LocalDateTime
@@ -48,24 +48,24 @@ fun main() {
 
         // CREATE
         val newAddress = db.runQuery {
-            EntityDsl.insert(a).single(Address(street = "street A"))
+            SqlDsl.insert(a).single(Address(street = "street A"))
         }
 
         // READ: select by id
         val address1 = db.runQuery {
-            EntityDsl.from(a).where { a.id eq newAddress.id }.first()
+            SqlDsl.from(a).where { a.id eq newAddress.id }.first()
         }
 
         println("address1 = $address1")
 
         // UPDATE
         db.runQuery {
-            EntityDsl.update(a).single(address1.copy(street = "street B"))
+            SqlDsl.update(a).single(address1.copy(street = "street B"))
         }
 
         // READ: select by street
         val address2 = db.runQuery {
-            EntityDsl.from(a).where { a.street eq "street B" }.first()
+            SqlDsl.from(a).where { a.street eq "street B" }.first()
         }
 
         println("address2 = $address2")
@@ -75,12 +75,12 @@ fun main() {
 
         // DELETE
         db.runQuery {
-            EntityDsl.delete(a).single(address2)
+            SqlDsl.delete(a).single(address2)
         }
 
         // READ: select all
         val addressList = db.runQuery {
-            EntityDsl.from(a).orderBy(a.id)
+            SqlDsl.from(a).orderBy(a.id)
         }
 
         println("addressList = $addressList")

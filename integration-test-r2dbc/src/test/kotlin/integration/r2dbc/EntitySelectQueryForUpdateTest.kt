@@ -3,7 +3,7 @@ package integration.r2dbc
 import integration.Address
 import integration.meta
 import org.junit.jupiter.api.extension.ExtendWith
-import org.komapper.core.dsl.EntityDsl
+import org.komapper.core.dsl.SqlDsl
 import org.komapper.core.dsl.operator.desc
 import org.komapper.r2dbc.R2dbcDatabase
 import kotlin.test.Test
@@ -16,7 +16,7 @@ class EntitySelectQueryForUpdateTest(private val db: R2dbcDatabase) {
     fun forUpdate() = inTransaction(db) {
         val a = Address.meta
         val list = db.runQuery {
-            EntityDsl.from(a).where { a.addressId greaterEq 1 }
+            SqlDsl.from(a).where { a.addressId greaterEq 1 }
                 .orderBy(a.addressId.desc())
                 .limit(2)
                 .offset(5)

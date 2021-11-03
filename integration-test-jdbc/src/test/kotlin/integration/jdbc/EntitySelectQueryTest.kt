@@ -5,7 +5,7 @@ import integration.Employee
 import integration.meta
 import kotlinx.coroutines.flow.count
 import org.junit.jupiter.api.extension.ExtendWith
-import org.komapper.core.dsl.EntityDsl
+import org.komapper.core.dsl.SqlDsl
 import org.komapper.core.dsl.operator.asc
 import org.komapper.core.dsl.operator.ascNullsFirst
 import org.komapper.core.dsl.operator.ascNullsLast
@@ -25,7 +25,7 @@ class EntitySelectQueryTest(private val db: JdbcDatabase) {
     fun list() {
         val a = Address.meta
         val list: List<Address> = db.runQuery {
-            EntityDsl.from(a).where { a.addressId eq 1 }
+            SqlDsl.from(a).where { a.addressId eq 1 }
         }
         assertNotNull(list)
     }
@@ -34,7 +34,7 @@ class EntitySelectQueryTest(private val db: JdbcDatabase) {
     fun first() {
         val a = Address.meta
         val address: Address = db.runQuery {
-            EntityDsl.from(a).where { a.addressId eq 1 }.first()
+            SqlDsl.from(a).where { a.addressId eq 1 }.first()
         }
         assertNotNull(address)
     }
@@ -43,7 +43,7 @@ class EntitySelectQueryTest(private val db: JdbcDatabase) {
     fun firstOrNull() {
         val a = Address.meta
         val address: Address? = db.runQuery {
-            EntityDsl.from(a).where { a.addressId eq 99 }.firstOrNull()
+            SqlDsl.from(a).where { a.addressId eq 99 }.firstOrNull()
         }
         assertNull(address)
     }
@@ -52,7 +52,7 @@ class EntitySelectQueryTest(private val db: JdbcDatabase) {
     fun collect() {
         val a = Address.meta
         val count = db.runQuery {
-            EntityDsl.from(a).collect { it.count() }
+            SqlDsl.from(a).collect { it.count() }
         }
         assertEquals(15, count)
     }
@@ -60,7 +60,7 @@ class EntitySelectQueryTest(private val db: JdbcDatabase) {
     @Test
     fun decoupling() {
         val a = Address.meta
-        val query = EntityDsl.from(a)
+        val query = SqlDsl.from(a)
             .where { a.addressId greaterEq 1 }
             .orderBy(a.addressId.desc())
             .limit(2)
@@ -78,7 +78,7 @@ class EntitySelectQueryTest(private val db: JdbcDatabase) {
     @Test
     fun orderBy() {
         val e = Employee.meta
-        val query = EntityDsl.from(e).orderBy(e.employeeId)
+        val query = SqlDsl.from(e).orderBy(e.employeeId)
         val list = db.runQuery { query }
         assertEquals(1, list.first().employeeId)
         assertEquals(14, list.last().employeeId)
@@ -87,7 +87,7 @@ class EntitySelectQueryTest(private val db: JdbcDatabase) {
     @Test
     fun orderBy_asc() {
         val e = Employee.meta
-        val query = EntityDsl.from(e).orderBy(e.employeeId.asc())
+        val query = SqlDsl.from(e).orderBy(e.employeeId.asc())
         val list = db.runQuery { query }
         assertEquals(1, list.first().employeeId)
         assertEquals(14, list.last().employeeId)
@@ -96,7 +96,7 @@ class EntitySelectQueryTest(private val db: JdbcDatabase) {
     @Test
     fun orderBy_desc() {
         val e = Employee.meta
-        val query = EntityDsl.from(e).orderBy(e.employeeId.desc())
+        val query = SqlDsl.from(e).orderBy(e.employeeId.desc())
         val list = db.runQuery { query }
         assertEquals(14, list.first().employeeId)
         assertEquals(1, list.last().employeeId)
@@ -105,7 +105,7 @@ class EntitySelectQueryTest(private val db: JdbcDatabase) {
     @Test
     fun orderBy_ascNullsFirst() {
         val e = Employee.meta
-        val query = EntityDsl.from(e).orderBy(e.managerId.ascNullsFirst())
+        val query = SqlDsl.from(e).orderBy(e.managerId.ascNullsFirst())
         val list = db.runQuery { query }
         assertNull(list.first().managerId)
         assertEquals(13, list.last().managerId)
@@ -114,7 +114,7 @@ class EntitySelectQueryTest(private val db: JdbcDatabase) {
     @Test
     fun orderBy_ascNullsLast() {
         val e = Employee.meta
-        val query = EntityDsl.from(e).orderBy(e.managerId.ascNullsLast())
+        val query = SqlDsl.from(e).orderBy(e.managerId.ascNullsLast())
         val list = db.runQuery { query }
         assertEquals(4, list.first().managerId)
         assertNull(list.last().managerId)
@@ -123,7 +123,7 @@ class EntitySelectQueryTest(private val db: JdbcDatabase) {
     @Test
     fun orderBy_descNullsFirst() {
         val e = Employee.meta
-        val query = EntityDsl.from(e).orderBy(e.managerId.descNullsFirst())
+        val query = SqlDsl.from(e).orderBy(e.managerId.descNullsFirst())
         val list = db.runQuery { query }
         assertNull(list.first().managerId)
         assertEquals(4, list.last().managerId)
@@ -132,7 +132,7 @@ class EntitySelectQueryTest(private val db: JdbcDatabase) {
     @Test
     fun orderBy_descNullsLast() {
         val e = Employee.meta
-        val query = EntityDsl.from(e).orderBy(e.managerId.descNullsLast())
+        val query = SqlDsl.from(e).orderBy(e.managerId.descNullsLast())
         val list = db.runQuery { query }
         assertEquals(13, list.first().managerId)
         assertNull(list.last().managerId)

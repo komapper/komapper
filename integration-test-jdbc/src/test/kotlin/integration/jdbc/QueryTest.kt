@@ -4,7 +4,6 @@ import integration.Address
 import integration.Employee
 import integration.meta
 import org.junit.jupiter.api.extension.ExtendWith
-import org.komapper.core.dsl.EntityDsl
 import org.komapper.core.dsl.SqlDsl
 import org.komapper.core.dsl.query.dryRun
 import org.komapper.jdbc.JdbcDatabase
@@ -18,13 +17,13 @@ class QueryTest(private val db: JdbcDatabase) {
     fun plus() {
         val a = Address.meta
         val address = Address(16, "STREET 16", 0)
-        val q1 = EntityDsl.insert(a).single(address)
+        val q1 = SqlDsl.insert(a).single(address)
         val q2 = SqlDsl.insert(a).values {
             a.addressId set 17
             a.street set "STREET 17"
             a.version set 0
         }
-        val q3 = EntityDsl.from(a).where { a.addressId inList listOf(16, 17) }
+        val q3 = SqlDsl.from(a).where { a.addressId inList listOf(16, 17) }
         val list = db.runQuery { q1 + q2 + q3 }
         assertEquals(2, list.size)
         println((q1 + q2 + q3).dryRun())
@@ -34,10 +33,10 @@ class QueryTest(private val db: JdbcDatabase) {
     fun flatMap() {
         val a = Address.meta
         val address = Address(16, "STREET 16", 0)
-        val query = EntityDsl.insert(a).single(address).flatMap {
+        val query = SqlDsl.insert(a).single(address).flatMap {
             val addressId = it.addressId
             val e = Employee.meta
-            EntityDsl.from(e).where { e.addressId less addressId }
+            SqlDsl.from(e).where { e.addressId less addressId }
         }
         val list = db.runQuery { query }
         assertEquals(14, list.size)
@@ -47,10 +46,10 @@ class QueryTest(private val db: JdbcDatabase) {
     fun flatZip() {
         val a = Address.meta
         val address = Address(16, "STREET 16", 0)
-        val query = EntityDsl.insert(a).single(address).flatZip {
+        val query = SqlDsl.insert(a).single(address).flatZip {
             val addressId = it.addressId
             val e = Employee.meta
-            EntityDsl.from(e).where { e.addressId less addressId }
+            SqlDsl.from(e).where { e.addressId less addressId }
         }
         val (newAddress, list) = db.runQuery { query }
         assertEquals(16, newAddress.addressId)

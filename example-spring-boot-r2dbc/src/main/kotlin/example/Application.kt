@@ -4,7 +4,6 @@ import kotlinx.coroutines.flow.Flow
 import org.komapper.annotation.KomapperAutoIncrement
 import org.komapper.annotation.KomapperEntityDef
 import org.komapper.annotation.KomapperId
-import org.komapper.core.dsl.EntityDsl
 import org.komapper.core.dsl.SqlDsl
 import org.komapper.core.dsl.operator.desc
 import org.komapper.r2dbc.R2dbcDatabase
@@ -33,7 +32,7 @@ class Application(private val database: R2dbcDatabase) {
         val message = Message(text = text)
         return database.runQuery {
             val m = MessageDef.meta
-            EntityDsl.insert(m).single(message)
+            SqlDsl.insert(m).single(message)
         }
     }
 }

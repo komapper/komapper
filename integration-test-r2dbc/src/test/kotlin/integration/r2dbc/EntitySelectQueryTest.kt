@@ -3,7 +3,7 @@ package integration.r2dbc
 import integration.Address
 import integration.meta
 import org.junit.jupiter.api.extension.ExtendWith
-import org.komapper.core.dsl.EntityDsl
+import org.komapper.core.dsl.SqlDsl
 import org.komapper.core.dsl.operator.desc
 import org.komapper.r2dbc.R2dbcDatabase
 import kotlin.test.Test
@@ -18,7 +18,7 @@ class EntitySelectQueryTest(private val db: R2dbcDatabase) {
     fun list() = inTransaction(db) {
         val a = Address.meta
         val flow = db.runQuery {
-            EntityDsl.from(a).where { a.addressId eq 1 }
+            SqlDsl.from(a).where { a.addressId eq 1 }
         }
         assertNotNull(flow)
     }
@@ -27,7 +27,7 @@ class EntitySelectQueryTest(private val db: R2dbcDatabase) {
     fun first() = inTransaction(db) {
         val a = Address.meta
         val address = db.runQuery {
-            EntityDsl.from(a).where { a.addressId eq 1 }.first()
+            SqlDsl.from(a).where { a.addressId eq 1 }.first()
         }
         assertNotNull(address)
     }
@@ -36,7 +36,7 @@ class EntitySelectQueryTest(private val db: R2dbcDatabase) {
     fun firstOrNull() = inTransaction(db) {
         val a = Address.meta
         val address: Address? = db.runQuery {
-            EntityDsl.from(a).where { a.addressId eq 99 }.firstOrNull()
+            SqlDsl.from(a).where { a.addressId eq 99 }.firstOrNull()
         }
         assertNull(address)
     }
@@ -44,7 +44,7 @@ class EntitySelectQueryTest(private val db: R2dbcDatabase) {
     @Test
     fun decoupling() = inTransaction(db) {
         val a = Address.meta
-        val query = EntityDsl.from(a)
+        val query = SqlDsl.from(a)
             .where { a.addressId greaterEq 1 }
             .orderBy(a.addressId.desc())
             .limit(2)

@@ -3,7 +3,7 @@ package example
 import org.komapper.annotation.KomapperAutoIncrement
 import org.komapper.annotation.KomapperEntityDef
 import org.komapper.annotation.KomapperId
-import org.komapper.core.dsl.EntityDsl
+import org.komapper.core.dsl.SqlDsl
 import org.komapper.core.dsl.operator.desc
 import org.komapper.jdbc.JdbcDatabase
 import org.springframework.boot.SpringApplication
@@ -22,7 +22,7 @@ class Application(private val database: JdbcDatabase) {
     fun list(): List<Message> {
         return database.runQuery {
             val m = MessageDef.meta
-            EntityDsl.from(m).orderBy(m.id.desc())
+            SqlDsl.from(m).orderBy(m.id.desc())
         }
     }
 
@@ -31,7 +31,7 @@ class Application(private val database: JdbcDatabase) {
         val message = Message(text = text)
         return database.runQuery {
             val m = MessageDef.meta
-            EntityDsl.insert(m).single(message)
+            SqlDsl.insert(m).single(message)
         }
     }
 }

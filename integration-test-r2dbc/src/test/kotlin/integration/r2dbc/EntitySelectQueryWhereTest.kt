@@ -4,7 +4,7 @@ import integration.Address
 import integration.Employee
 import integration.meta
 import org.junit.jupiter.api.extension.ExtendWith
-import org.komapper.core.dsl.EntityDsl
+import org.komapper.core.dsl.SqlDsl
 import org.komapper.core.dsl.declaration.WhereDeclaration
 import org.komapper.core.dsl.operator.desc
 import org.komapper.core.dsl.operator.plus
@@ -20,7 +20,7 @@ class EntitySelectQueryWhereTest(private val db: R2dbcDatabase) {
     fun isNull() = inTransaction(db) {
         val e = Employee.meta
         val list = db.runQuery {
-            EntityDsl.from(e).where {
+            SqlDsl.from(e).where {
                 e.managerId.isNull()
             }
         }.toList()
@@ -31,7 +31,7 @@ class EntitySelectQueryWhereTest(private val db: R2dbcDatabase) {
     fun isNotNull() = inTransaction(db) {
         val e = Employee.meta
         val list = db.runQuery {
-            EntityDsl.from(e).where {
+            SqlDsl.from(e).where {
                 e.managerId.isNotNull()
             }
         }.toList()
@@ -42,7 +42,7 @@ class EntitySelectQueryWhereTest(private val db: R2dbcDatabase) {
     fun between() = inTransaction(db) {
         val a = Address.meta
         val idList = db.runQuery {
-            EntityDsl.from(a).where {
+            SqlDsl.from(a).where {
                 a.addressId between 5..10
             }.orderBy(a.addressId)
         }.toList()
@@ -53,7 +53,7 @@ class EntitySelectQueryWhereTest(private val db: R2dbcDatabase) {
     fun notBetween() = inTransaction(db) {
         val a = Address.meta
         val idList = db.runQuery {
-            EntityDsl.from(a).where {
+            SqlDsl.from(a).where {
                 a.addressId notBetween 5..10
             }.orderBy(a.addressId)
         }.toList()
@@ -65,7 +65,7 @@ class EntitySelectQueryWhereTest(private val db: R2dbcDatabase) {
     fun like() = inTransaction(db) {
         val a = Address.meta
         val list = db.runQuery {
-            EntityDsl.from(a).where {
+            SqlDsl.from(a).where {
                 a.street like "STREET 1_"
             }.orderBy(a.addressId)
         }.toList()
@@ -76,7 +76,7 @@ class EntitySelectQueryWhereTest(private val db: R2dbcDatabase) {
     fun like_asPrefix() = inTransaction(db) {
         val a = Address.meta
         val list = db.runQuery {
-            EntityDsl.from(a).where {
+            SqlDsl.from(a).where {
                 a.street like "STREET 1".asPrefix()
             }.orderBy(a.addressId)
         }.toList()
@@ -87,7 +87,7 @@ class EntitySelectQueryWhereTest(private val db: R2dbcDatabase) {
     fun like_asInfix() = inTransaction(db) {
         val a = Address.meta
         val list = db.runQuery {
-            EntityDsl.from(a).where {
+            SqlDsl.from(a).where {
                 a.street like "T 1".asInfix()
             }.orderBy(a.addressId)
         }.toList()
@@ -98,7 +98,7 @@ class EntitySelectQueryWhereTest(private val db: R2dbcDatabase) {
     fun like_asSuffix() = inTransaction(db) {
         val a = Address.meta
         val list = db.runQuery {
-            EntityDsl.from(a).where {
+            SqlDsl.from(a).where {
                 a.street like "1".asSuffix()
             }.orderBy(a.addressId)
         }.toList()
@@ -108,8 +108,8 @@ class EntitySelectQueryWhereTest(private val db: R2dbcDatabase) {
     @Test
     fun like_escape() = inTransaction(db) {
         val a = Address.meta
-        val insertQuery = EntityDsl.insert(a).single(Address(16, "\\STREET _16%", 1))
-        val selectQuery = EntityDsl.from(a).where {
+        val insertQuery = SqlDsl.insert(a).single(Address(16, "\\STREET _16%", 1))
+        val selectQuery = SqlDsl.from(a).where {
             a.street like escape("\\S") + text("%") + escape("T _16%")
         }.orderBy(a.addressId)
         val list = db.runQuery {
@@ -121,8 +121,8 @@ class EntitySelectQueryWhereTest(private val db: R2dbcDatabase) {
     @Test
     fun like_escapeWithEscapeSequence() = inTransaction(db) {
         val a = Address.meta
-        val insertQuery = EntityDsl.insert(a).single(Address(16, "\\STREET _16%", 1))
-        val selectQuery = EntityDsl.from(a).where {
+        val insertQuery = SqlDsl.insert(a).single(Address(16, "\\STREET _16%", 1))
+        val selectQuery = SqlDsl.from(a).where {
             a.street like escape("\\S") + text("%") + escape("T _16%")
         }.orderBy(a.addressId).options {
             it.copy(escapeSequence = "|")
@@ -137,7 +137,7 @@ class EntitySelectQueryWhereTest(private val db: R2dbcDatabase) {
     fun notLike() = inTransaction(db) {
         val a = Address.meta
         val list = db.runQuery {
-            EntityDsl.from(a).where {
+            SqlDsl.from(a).where {
                 a.street notLike "STREET 1_"
             }.orderBy(a.addressId)
         }.toList()
@@ -148,7 +148,7 @@ class EntitySelectQueryWhereTest(private val db: R2dbcDatabase) {
     fun notLike_asPrefix() = inTransaction(db) {
         val a = Address.meta
         val list = db.runQuery {
-            EntityDsl.from(a).where {
+            SqlDsl.from(a).where {
                 a.street notLike "STREET 1".asPrefix()
             }.orderBy(a.addressId)
         }.toList()
@@ -159,7 +159,7 @@ class EntitySelectQueryWhereTest(private val db: R2dbcDatabase) {
     fun notLike_asInfix() = inTransaction(db) {
         val a = Address.meta
         val list = db.runQuery {
-            EntityDsl.from(a).where {
+            SqlDsl.from(a).where {
                 a.street notLike "T 1".asInfix()
             }.orderBy(a.addressId)
         }.toList()
@@ -170,7 +170,7 @@ class EntitySelectQueryWhereTest(private val db: R2dbcDatabase) {
     fun notLike_asSuffix() = inTransaction(db) {
         val a = Address.meta
         val list = db.runQuery {
-            EntityDsl.from(a).where {
+            SqlDsl.from(a).where {
                 a.street notLike "1".asSuffix()
             }.orderBy(a.addressId)
         }.toList()
@@ -180,8 +180,8 @@ class EntitySelectQueryWhereTest(private val db: R2dbcDatabase) {
     @Test
     fun notLike_escape() = inTransaction(db) {
         val a = Address.meta
-        val insertQuery = EntityDsl.insert(a).single(Address(16, "\\STREET _16%", 1))
-        val selectQuery = EntityDsl.from(a).where {
+        val insertQuery = SqlDsl.insert(a).single(Address(16, "\\STREET _16%", 1))
+        val selectQuery = SqlDsl.from(a).where {
             a.street notLike escape("\\S") + text("%") + escape("T _16%")
         }.orderBy(a.addressId)
         val list = db.runQuery {
@@ -194,7 +194,7 @@ class EntitySelectQueryWhereTest(private val db: R2dbcDatabase) {
     fun startsWith() = inTransaction(db) {
         val a = Address.meta
         val list = db.runQuery {
-            EntityDsl.from(a).where {
+            SqlDsl.from(a).where {
                 a.street startsWith "STREET 1"
             }.orderBy(a.addressId)
         }.toList()
@@ -204,8 +204,8 @@ class EntitySelectQueryWhereTest(private val db: R2dbcDatabase) {
     @Test
     fun startsWith_escape() = inTransaction(db) {
         val a = Address.meta
-        val insertQuery = EntityDsl.insert(a).single(Address(16, "STREET 1%6", 1))
-        val selectQuery = EntityDsl.from(a).where {
+        val insertQuery = SqlDsl.insert(a).single(Address(16, "STREET 1%6", 1))
+        val selectQuery = SqlDsl.from(a).where {
             a.street startsWith "STREET 1%"
         }.orderBy(a.addressId)
         val list = db.runQuery { insertQuery + selectQuery }.toList()
@@ -216,7 +216,7 @@ class EntitySelectQueryWhereTest(private val db: R2dbcDatabase) {
     fun notStartsWith() = inTransaction(db) {
         val a = Address.meta
         val list = db.runQuery {
-            EntityDsl.from(a).where {
+            SqlDsl.from(a).where {
                 a.street notStartsWith "STREET 1"
             }.orderBy(a.addressId)
         }.toList()
@@ -227,7 +227,7 @@ class EntitySelectQueryWhereTest(private val db: R2dbcDatabase) {
     fun contains() = inTransaction(db) {
         val a = Address.meta
         val list = db.runQuery {
-            EntityDsl.from(a).where {
+            SqlDsl.from(a).where {
                 a.street contains "T 1"
             }.orderBy(a.addressId)
         }.toList()
@@ -238,7 +238,7 @@ class EntitySelectQueryWhereTest(private val db: R2dbcDatabase) {
     fun notContains() = inTransaction(db) {
         val a = Address.meta
         val list = db.runQuery {
-            EntityDsl.from(a).where {
+            SqlDsl.from(a).where {
                 a.street notContains "T 1"
             }.orderBy(a.addressId)
         }.toList()
@@ -249,7 +249,7 @@ class EntitySelectQueryWhereTest(private val db: R2dbcDatabase) {
     fun endsWith() = inTransaction(db) {
         val a = Address.meta
         val list = db.runQuery {
-            EntityDsl.from(a).where {
+            SqlDsl.from(a).where {
                 a.street endsWith "1"
             }.orderBy(a.addressId)
         }.toList()
@@ -260,7 +260,7 @@ class EntitySelectQueryWhereTest(private val db: R2dbcDatabase) {
     fun notEndsWith() = inTransaction(db) {
         val a = Address.meta
         val list = db.runQuery {
-            EntityDsl.from(a).where {
+            SqlDsl.from(a).where {
                 a.street notEndsWith "1"
             }.orderBy(a.addressId)
         }.toList()
@@ -271,7 +271,7 @@ class EntitySelectQueryWhereTest(private val db: R2dbcDatabase) {
     fun inList() = inTransaction(db) {
         val a = Address.meta
         val list = db.runQuery {
-            EntityDsl.from(a).where {
+            SqlDsl.from(a).where {
                 a.addressId inList listOf(9, 10)
             }.orderBy(a.addressId.desc())
         }.toList()
@@ -288,7 +288,7 @@ class EntitySelectQueryWhereTest(private val db: R2dbcDatabase) {
     fun notInList() = inTransaction(db) {
         val a = Address.meta
         val list = db.runQuery {
-            EntityDsl.from(a).where {
+            SqlDsl.from(a).where {
                 a.addressId notInList (1..9).toList()
             }.orderBy(a.addressId)
         }.toList()
@@ -299,7 +299,7 @@ class EntitySelectQueryWhereTest(private val db: R2dbcDatabase) {
     fun inList_empty() = inTransaction(db) {
         val a = Address.meta
         val list = db.runQuery {
-            EntityDsl.from(a).where {
+            SqlDsl.from(a).where {
                 a.addressId inList emptyList()
             }.orderBy(a.addressId.desc())
         }.toList()
@@ -311,9 +311,9 @@ class EntitySelectQueryWhereTest(private val db: R2dbcDatabase) {
         val e = Employee.meta
         val a = Address.meta
         val query =
-            EntityDsl.from(e).where {
+            SqlDsl.from(e).where {
                 e.addressId inList {
-                    EntityDsl.from(a)
+                    SqlDsl.from(a)
                         .where {
                             e.addressId eq a.addressId
                             e.employeeName like "%S%"
@@ -329,9 +329,9 @@ class EntitySelectQueryWhereTest(private val db: R2dbcDatabase) {
         val e = Employee.meta
         val a = Address.meta
         val query =
-            EntityDsl.from(e).where {
+            SqlDsl.from(e).where {
                 e.addressId notInList {
-                    EntityDsl.from(a).where {
+                    SqlDsl.from(a).where {
                         e.addressId eq a.addressId
                         e.employeeName like "%S%"
                     }.asSqlQuery().select(a.addressId)
@@ -345,7 +345,7 @@ class EntitySelectQueryWhereTest(private val db: R2dbcDatabase) {
     fun inList2() = inTransaction(db) {
         val a = Address.meta
         val list = db.runQuery {
-            EntityDsl.from(a).where {
+            SqlDsl.from(a).where {
                 a.addressId to a.version inList2 listOf(9 to 1, 10 to 1)
             }.orderBy(a.addressId.desc())
         }.toList()
@@ -366,7 +366,7 @@ class EntitySelectQueryWhereTest(private val db: R2dbcDatabase) {
         }
         val a = Address.meta
         val list = db.runQuery {
-            EntityDsl.from(a).where {
+            SqlDsl.from(a).where {
                 a.addressId to a.version notInList2 seq.toList()
             }.orderBy(a.addressId)
         }.toList()
@@ -378,9 +378,9 @@ class EntitySelectQueryWhereTest(private val db: R2dbcDatabase) {
         val e = Employee.meta
         val a = Address.meta
         val query =
-            EntityDsl.from(e).where {
+            SqlDsl.from(e).where {
                 e.addressId to e.version inList2 {
-                    EntityDsl.from(a)
+                    SqlDsl.from(a)
                         .where {
                             e.addressId eq a.addressId
                             e.employeeName like "%S%"
@@ -396,9 +396,9 @@ class EntitySelectQueryWhereTest(private val db: R2dbcDatabase) {
         val e = Employee.meta
         val a = Address.meta
         val query =
-            EntityDsl.from(e).where {
+            SqlDsl.from(e).where {
                 e.addressId to e.version notInList2 {
-                    EntityDsl.from(a).where {
+                    SqlDsl.from(a).where {
                         e.addressId eq a.addressId
                         e.employeeName like "%S%"
                     }.asSqlQuery().select(a.addressId, a.version)
@@ -413,9 +413,9 @@ class EntitySelectQueryWhereTest(private val db: R2dbcDatabase) {
         val e = Employee.meta
         val a = Address.meta
         val query =
-            EntityDsl.from(e).where {
+            SqlDsl.from(e).where {
                 exists {
-                    EntityDsl.from(a).where {
+                    SqlDsl.from(a).where {
                         e.addressId eq a.addressId
                         e.employeeName like "%S%"
                     }
@@ -430,9 +430,9 @@ class EntitySelectQueryWhereTest(private val db: R2dbcDatabase) {
         val e = Employee.meta
         val a = Address.meta
         val query =
-            EntityDsl.from(e).where {
+            SqlDsl.from(e).where {
                 notExists {
-                    EntityDsl.from(a).where {
+                    SqlDsl.from(a).where {
                         e.addressId eq a.addressId
                         e.employeeName like "%S%"
                     }
@@ -446,7 +446,7 @@ class EntitySelectQueryWhereTest(private val db: R2dbcDatabase) {
     fun not() = inTransaction(db) {
         val a = Address.meta
         val idList = db.runQuery {
-            EntityDsl.from(a).where {
+            SqlDsl.from(a).where {
                 a.addressId greater 5
                 not {
                     a.addressId greaterEq 10
@@ -460,7 +460,7 @@ class EntitySelectQueryWhereTest(private val db: R2dbcDatabase) {
     fun and() = inTransaction(db) {
         val a = Address.meta
         val list = db.runQuery {
-            EntityDsl.from(a).where {
+            SqlDsl.from(a).where {
                 a.addressId greater 1
                 and {
                     a.addressId greater 1
@@ -482,7 +482,7 @@ class EntitySelectQueryWhereTest(private val db: R2dbcDatabase) {
     fun or() = inTransaction(db) {
         val a = Address.meta
         val list = db.runQuery {
-            EntityDsl.from(a).where {
+            SqlDsl.from(a).where {
                 a.addressId greaterEq 1
                 or {
                     a.addressId greaterEq 1
@@ -509,7 +509,7 @@ class EntitySelectQueryWhereTest(private val db: R2dbcDatabase) {
         val w2: WhereDeclaration = {
             a.version eq 1
         }
-        val list = db.runQuery { EntityDsl.from(a).where(w1 + w2) }.toList()
+        val list = db.runQuery { SqlDsl.from(a).where(w1 + w2) }.toList()
         assertEquals(1, list.size)
     }
 }
