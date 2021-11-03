@@ -30,24 +30,6 @@ interface SqlSelectQuery<ENTITY : Any> : FlowSubquery<ENTITY> {
     fun forUpdate(): SqlSelectQuery<ENTITY>
     fun options(configure: (SqlSelectOptions) -> SqlSelectOptions): SqlSelectQuery<ENTITY>
 
-    fun <B : Any, B_META : EntityMetamodel<B, *, B_META>> select(
-        metamodel: B_META
-    ): FlowSubquery<Pair<ENTITY, B?>>
-
-    fun <B : Any, B_META : EntityMetamodel<B, *, B_META>,
-        C : Any, C_META : EntityMetamodel<C, *, C_META>> select(
-        metamodel1: B_META,
-        metamodel2: C_META
-    ): FlowSubquery<Triple<ENTITY, B?, C?>>
-
-    fun select(
-        vararg metamodels: EntityMetamodel<*, *, *>,
-    ): FlowSubquery<Entities>
-
-    fun selectEntities(
-        vararg metamodels: EntityMetamodel<*, *, *>,
-    ): FlowSubquery<Entities>
-
     fun <T : Any, S : Any> select(
         expression: ScalarExpression<T, S>
     ): ScalarQuery<T?, T, S>
@@ -81,16 +63,6 @@ internal data class SqlSelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<
     private val options: SqlSelectOptions = SqlSelectOptions.default
 ) :
     SqlSelectQuery<ENTITY> {
-
-    companion object Message {
-        fun entityMetamodelNotFound(parameterName: String): String {
-            return "The '$parameterName' metamodel is not found. Bind it to this query in advance using the from or join clause."
-        }
-
-        fun entityMetamodelNotFound(parameterName: String, index: Int): String {
-            return "The '$parameterName' metamodel(index=$index) is not found. Bind it to this query in advance using the from or join clause."
-        }
-    }
 
     private val support: SelectQuerySupport<ENTITY, ID, META, SqlSelectContext<ENTITY, ID, META>> =
         SelectQuerySupport(context)
@@ -181,41 +153,6 @@ internal data class SqlSelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<
 
     override fun unionAll(other: SubqueryExpression<ENTITY>): FlowSetOperationQuery<ENTITY> {
         return subquerySupport.unionAll(other)
-    }
-
-    override fun <B : Any, B_META : EntityMetamodel<B, *, B_META>> select(
-        metamodel: B_META,
-    ): FlowSubquery<Pair<ENTITY, B?>> {
-        val metamodels = context.getEntityMetamodels()
-        if (metamodel !in metamodels) error(entityMetamodelNotFound("metamodel"))
-        val newContext = context.setProjection(context.target, metamodel)
-        return SqlPairEntitiesQuery(newContext, options, context.target to metamodel)
-    }
-
-    override fun <B : Any, B_META : EntityMetamodel<B, *, B_META>,
-        C : Any, C_META : EntityMetamodel<C, *, C_META>> select(
-        metamodel1: B_META,
-        metamodel2: C_META
-    ): FlowSubquery<Triple<ENTITY, B?, C?>> {
-        val metamodels = context.getEntityMetamodels()
-        if (metamodel1 !in metamodels) error(entityMetamodelNotFound("metamodel1"))
-        if (metamodel2 !in metamodels) error(entityMetamodelNotFound("metamodel2"))
-        val newContext = context.setProjection(context.target, metamodel1, metamodel2)
-        return SqlTripleEntitiesQuery(newContext, options, Triple(context.target, metamodel1, metamodel2))
-    }
-
-    override fun select(vararg metamodels: EntityMetamodel<*, *, *>): FlowSubquery<Entities> {
-        return selectEntities(*metamodels)
-    }
-
-    override fun selectEntities(vararg metamodels: EntityMetamodel<*, *, *>): FlowSubquery<Entities> {
-        val contextModels = context.getEntityMetamodels()
-        for ((i, metamodel) in metamodels.withIndex()) {
-            if (metamodel !in contextModels) error(entityMetamodelNotFound("metamodels", i))
-        }
-        val list = listOf(context.target) + metamodels.toList()
-        val newContext = context.setProjection(*list.toTypedArray())
-        return SqlMultipleEntitiesQuery(newContext, options, list)
     }
 
     override fun <T : Any, S : Any> select(expression: ScalarExpression<T, S>): ScalarQuery<T?, T, S> {

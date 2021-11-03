@@ -2,7 +2,6 @@ package integration.r2dbc
 
 import integration.Address
 import integration.meta
-import kotlinx.coroutines.flow.toList
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.SqlDsl
 import org.komapper.core.dsl.operator.desc

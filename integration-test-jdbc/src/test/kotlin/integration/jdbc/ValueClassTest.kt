@@ -11,7 +11,6 @@ import integration.meta
 import integration.setting.Dbms
 import integration.setting.Run
 import org.junit.jupiter.api.extension.ExtendWith
-import org.komapper.core.dsl.EntityDsl
 import org.komapper.core.dsl.SqlDsl
 import org.komapper.core.dsl.expression.When
 import org.komapper.core.dsl.operator.case
@@ -32,7 +31,7 @@ class ValueClassTest(val db: JdbcDatabase) {
     fun list() {
         val a = VAddress.meta
         val list: List<VAddress> = db.runQuery {
-            EntityDsl.from(a).where { a.addressId eq IntId(1) }
+            SqlDsl.from(a).where { a.addressId eq IntId(1) }
         }
         assertNotNull(list)
         assertEquals(1, list.size)
@@ -42,7 +41,7 @@ class ValueClassTest(val db: JdbcDatabase) {
     fun first() {
         val a = VAddress.meta
         val address: VAddress = db.runQuery {
-            EntityDsl.from(a).where { a.addressId eq IntId(1) }.first()
+            SqlDsl.from(a).where { a.addressId eq IntId(1) }.first()
         }
         assertNotNull(address)
         println(address)
@@ -52,9 +51,9 @@ class ValueClassTest(val db: JdbcDatabase) {
     fun insert() {
         val a = VAddress.meta
         val address = VAddress(IntId(16), Street("STREET 16"), Version(0))
-        db.runQuery { EntityDsl.insert(a).single(address) }
+        db.runQuery { SqlDsl.insert(a).single(address) }
         val address2 = db.runQuery {
-            EntityDsl.from(a).where {
+            SqlDsl.from(a).where {
                 a.addressId eq IntId(16)
             }.first()
         }
@@ -65,13 +64,13 @@ class ValueClassTest(val db: JdbcDatabase) {
     fun insert_timestamp() {
         val p = VPerson.meta
         val person1 = VPerson(IntId(1), "ABC")
-        val id = db.runQuery { EntityDsl.insert(p).single(person1) }.personId
-        val person2 = db.runQuery { EntityDsl.from(p).where { p.personId eq id }.first() }
+        val id = db.runQuery { SqlDsl.insert(p).single(person1) }.personId
+        val person2 = db.runQuery { SqlDsl.from(p).where { p.personId eq id }.first() }
         assertNotNull(person2.createdAt)
         assertNotNull(person2.updatedAt)
         assertEquals(person2.createdAt, person2.updatedAt)
         val person3 = db.runQuery {
-            EntityDsl.from(p).where {
+            SqlDsl.from(p).where {
                 p.personId to 1
             }.first()
         }
@@ -81,10 +80,10 @@ class ValueClassTest(val db: JdbcDatabase) {
     @Test
     fun update() {
         val a = VAddress.meta
-        val query = EntityDsl.from(a).where { a.addressId eq IntId(15) }
+        val query = SqlDsl.from(a).where { a.addressId eq IntId(15) }
         val address = db.runQuery { query.first() }
         val newAddress = address.copy(street = Street("NY street"))
-        db.runQuery { EntityDsl.update(a).single(newAddress) }
+        db.runQuery { SqlDsl.update(a).single(newAddress) }
         val address2 = db.runQuery { query.firstOrNull() }
         assertEquals(
             VAddress(
@@ -99,13 +98,13 @@ class ValueClassTest(val db: JdbcDatabase) {
     @Test
     fun updated_timestamp() {
         val p = VPerson.meta
-        val findQuery = EntityDsl.from(p).where { p.personId eq IntId(1) }.first()
+        val findQuery = SqlDsl.from(p).where { p.personId eq IntId(1) }.first()
         val person1 = VPerson(IntId(1), "ABC")
         val person2 = db.runQuery {
-            EntityDsl.insert(p).single(person1) + findQuery
+            SqlDsl.insert(p).single(person1) + findQuery
         }
         val person3 = db.runQuery {
-            EntityDsl.update(p).single(person2.copy(name = "DEF")) + findQuery
+            SqlDsl.update(p).single(person2.copy(name = "DEF")) + findQuery
         }
         assertNotNull(person2.updatedAt)
         assertNotNull(person3.updatedAt)
@@ -115,9 +114,9 @@ class ValueClassTest(val db: JdbcDatabase) {
     @Test
     fun delete() {
         val a = VAddress.meta
-        val query = EntityDsl.from(a).where { a.addressId eq IntId(15) }
+        val query = SqlDsl.from(a).where { a.addressId eq IntId(15) }
         val address = db.runQuery { query.first() }
-        db.runQuery { EntityDsl.delete(a).single(address) }
+        db.runQuery { SqlDsl.delete(a).single(address) }
         assertEquals(emptyList<VAddress>(), db.runQuery { query })
     }
 
@@ -126,7 +125,7 @@ class ValueClassTest(val db: JdbcDatabase) {
         for (i in 1..201) {
             val m = VIdentityStrategy.meta
             val strategy = VIdentityStrategy(IntId(0), "test")
-            val result = db.runQuery { EntityDsl.insert(m).single(strategy) }
+            val result = db.runQuery { SqlDsl.insert(m).single(strategy) }
             assertEquals(IntId(i), result.id)
         }
     }
@@ -137,7 +136,7 @@ class ValueClassTest(val db: JdbcDatabase) {
         for (i in 1..201) {
             val m = VSequenceStrategy.meta
             val strategy = VSequenceStrategy(IntId(0), "test")
-            val result = db.runQuery { EntityDsl.insert(m).single(strategy) }
+            val result = db.runQuery { SqlDsl.insert(m).single(strategy) }
             assertEquals(IntId(i), result.id)
         }
     }
@@ -146,7 +145,7 @@ class ValueClassTest(val db: JdbcDatabase) {
     fun inList2() {
         val a = VAddress.meta
         val list: List<VAddress> = db.runQuery {
-            EntityDsl.from(a).where { (a.addressId to a.street) inList2 listOf(IntId(1) to Street("STREET 1")) }
+            SqlDsl.from(a).where { (a.addressId to a.street) inList2 listOf(IntId(1) to Street("STREET 1")) }
         }
         assertEquals(1, list.size)
     }
@@ -155,7 +154,7 @@ class ValueClassTest(val db: JdbcDatabase) {
     fun endsWith() {
         val a = VAddress.meta
         val list = db.runQuery {
-            EntityDsl.from(a).where { a.street endsWith "1" }
+            SqlDsl.from(a).where { a.street endsWith "1" }
         }
         assertEquals(2, list.size)
         assertEquals(listOf(1, 11), list.map { it.addressId.value })
@@ -165,7 +164,7 @@ class ValueClassTest(val db: JdbcDatabase) {
     fun between() {
         val a = VAddress.meta
         val list = db.runQuery {
-            EntityDsl.from(a)
+            SqlDsl.from(a)
                 .where { a.addressId between IntId(6)..IntId(10) }
                 .orderBy(a.addressId)
         }
@@ -177,7 +176,7 @@ class ValueClassTest(val db: JdbcDatabase) {
     fun notBetween() {
         val a = VAddress.meta
         val list = db.runQuery {
-            EntityDsl.from(a)
+            SqlDsl.from(a)
                 .where { a.addressId notBetween IntId(6)..IntId(10) }
                 .orderBy(a.addressId)
         }

@@ -2,7 +2,6 @@ package org.komapper.core.dsl.query
 
 import org.komapper.core.ThreadSafe
 import org.komapper.core.dsl.expression.ColumnExpression
-import org.komapper.core.dsl.metamodel.EntityMetamodel
 import kotlin.reflect.cast
 
 @ThreadSafe
@@ -16,10 +15,6 @@ interface Record<K> {
 
 interface Columns : Record<ColumnExpression<*, *>> {
     operator fun <T : Any> get(key: ColumnExpression<T, *>): T?
-}
-
-interface Entities : Record<EntityMetamodel<*, *, *>> {
-    operator fun <T : Any> get(key: EntityMetamodel<T, *, *>): T?
 }
 
 abstract class AbstractRecord<K>(protected val map: Map<K, Any?>) : Record<K> {
@@ -44,16 +39,5 @@ class ColumnsImpl(
     override fun <T : Any> get(key: ColumnExpression<T, *>): T? {
         val value = map[key]
         return if (value == null) null else key.exteriorClass.cast(value)
-    }
-}
-
-class EntitiesImpl(
-    map: Map<EntityMetamodel<*, *, *>, Any?>
-) : AbstractRecord<EntityMetamodel<*, *, *>>(map), Entities {
-
-    override fun <T : Any> get(key: EntityMetamodel<T, *, *>): T? {
-        val value = map[key]
-        @Suppress("UNCHECKED_CAST")
-        return if (value == null) null else value as T?
     }
 }

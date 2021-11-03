@@ -4,11 +4,10 @@ import org.komapper.core.Dialect
 import org.komapper.core.Statement
 import org.komapper.core.StatementBuffer
 import org.komapper.core.dsl.context.EntitySelectContext
-import org.komapper.core.dsl.metamodel.EntityMetamodel
 
-class EntitySelectStatementBuilder<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+class EntitySelectStatementBuilder(
     val dialect: Dialect,
-    val context: EntitySelectContext<ENTITY, ID, META>,
+    val context: EntitySelectContext<*, *, *>,
     aliasManager: AliasManager = DefaultAliasManager(context)
 ) {
     private val buf = StatementBuffer()
@@ -25,7 +24,7 @@ class EntitySelectStatementBuilder<ENTITY : Any, ID, META : EntityMetamodel<ENTI
     }
 
     private fun selectClause() {
-        support.selectClause()
+        support.selectClause(context.distinct)
     }
 
     private fun fromClause() {

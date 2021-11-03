@@ -5,8 +5,6 @@ import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.query.Columns
 import org.komapper.core.dsl.query.ColumnsImpl
-import org.komapper.core.dsl.query.Entities
-import org.komapper.core.dsl.query.EntitiesImpl
 import org.komapper.r2dbc.R2dbcDialect
 
 internal object R2dbcRowTransformers {
@@ -15,32 +13,6 @@ internal object R2dbcRowTransformers {
         { dialect, row ->
             val mapper = R2dbcEntityMapper(dialect, row)
             mapper.execute(metamodel, true) as ENTITY
-        }
-
-    fun <A : Any, B : Any> pairEntities(metamodels: Pair<EntityMetamodel<A, *, *>, EntityMetamodel<B, *, *>>): (R2dbcDialect, Row) -> Pair<A, B?> =
-        { dialect, row ->
-            val mapper = R2dbcEntityMapper(dialect, row)
-            val first = mapper.execute(metamodels.first, true)
-            val second = mapper.execute(metamodels.second)
-            checkNotNull(first) to second
-        }
-
-    fun <A : Any, B : Any, C : Any> tripleEntities(
-        metamodels: Triple<EntityMetamodel<A, *, *>, EntityMetamodel<B, *, *>, EntityMetamodel<C, *, *>>
-    ): (R2dbcDialect, Row) -> Triple<A, B?, C?> =
-        { dialect, row ->
-            val mapper = R2dbcEntityMapper(dialect, row)
-            val first = mapper.execute(metamodels.first, true)
-            val second = mapper.execute(metamodels.second)
-            val third = mapper.execute(metamodels.third)
-            Triple(checkNotNull(first), second, third)
-        }
-
-    fun multipleEntities(metamodels: List<EntityMetamodel<*, *, *>>): (R2dbcDialect, Row) -> Entities =
-        { dialect, row ->
-            val mapper = R2dbcEntityMapper(dialect, row)
-            val map = metamodels.associateWith { mapper.execute(it) }
-            EntitiesImpl(map)
         }
 
     fun <A : Any> singleColumn(expression: ColumnExpression<A, *>): (R2dbcDialect, Row) -> A? =

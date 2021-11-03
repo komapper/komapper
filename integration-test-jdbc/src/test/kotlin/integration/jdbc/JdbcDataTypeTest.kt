@@ -4,7 +4,7 @@ import integration.meta
 import integration.setting.Dbms
 import integration.setting.Run
 import org.junit.jupiter.api.extension.ExtendWith
-import org.komapper.core.dsl.EntityDsl
+import org.komapper.core.dsl.SqlDsl
 import org.komapper.core.dsl.TemplateDsl
 import org.komapper.jdbc.JdbcDatabase
 import java.math.BigDecimal
@@ -32,9 +32,9 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
             1,
             integration.AnyPerson("ABC")
         )
-        db.runQuery { EntityDsl.insert(m).single(data) }
+        db.runQuery { SqlDsl.insert(m).single(data) }
         val data2 = db.runQuery {
-            EntityDsl.from(m).where { m.id eq 1 }.first()
+            SqlDsl.from(m).where { m.id eq 1 }.first()
         }
         assertEquals(data, data2)
     }
@@ -45,9 +45,9 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
         val m = integration.ArrayTest.meta
         val array = db.dataFactory.createArrayOf("text", listOf("A", "B", "C"))
         val data = integration.ArrayTest(1, array)
-        db.runQuery { EntityDsl.insert(m).single(data) }
+        db.runQuery { SqlDsl.insert(m).single(data) }
         val data2 = db.runQuery {
-            EntityDsl.from(m).where { m.id eq 1 }.first()
+            SqlDsl.from(m).where { m.id eq 1 }.first()
         }
         val anyArray = data2.value!!.getArray(1, 3) as Array<*>
         assertEquals(3, anyArray.size)
@@ -61,9 +61,9 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
     fun array_null() {
         val m = integration.ArrayTest.meta
         val data = integration.ArrayTest(1, null)
-        db.runQuery { EntityDsl.insert(m).single(data) }
+        db.runQuery { SqlDsl.insert(m).single(data) }
         val data2 = db.runQuery {
-            EntityDsl.from(m).where { m.id eq 1 }.first()
+            SqlDsl.from(m).where { m.id eq 1 }.first()
         }
         assertNull(data2.value)
     }
@@ -72,9 +72,9 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
     fun bigDecimal() {
         val m = integration.BigDecimalTest.meta
         val data = integration.BigDecimalTest(1, BigDecimal.TEN)
-        db.runQuery { EntityDsl.insert(m).single(data) }
+        db.runQuery { SqlDsl.insert(m).single(data) }
         val data2 = db.runQuery {
-            EntityDsl.from(m).where { m.id eq 1 }.first()
+            SqlDsl.from(m).where { m.id eq 1 }.first()
         }
         assertEquals(data, data2)
     }
@@ -83,9 +83,9 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
     fun bigInteger() {
         val m = integration.BigIntegerTest.meta
         val data = integration.BigIntegerTest(1, BigInteger.TEN)
-        db.runQuery { EntityDsl.insert(m).single(data) }
+        db.runQuery { SqlDsl.insert(m).single(data) }
         val data2 = db.runQuery {
-            EntityDsl.from(m).where { m.id eq 1 }.first()
+            SqlDsl.from(m).where { m.id eq 1 }.first()
         }
         assertEquals(data, data2)
     }
@@ -94,9 +94,9 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
     fun boolean() {
         val m = integration.BooleanTest.meta
         val data = integration.BooleanTest(1, true)
-        db.runQuery { EntityDsl.insert(m).single(data) }
+        db.runQuery { SqlDsl.insert(m).single(data) }
         val data2 = db.runQuery {
-            EntityDsl.from(m).where { m.id eq 1 }.first()
+            SqlDsl.from(m).where { m.id eq 1 }.first()
         }
         assertEquals(data, data2)
     }
@@ -105,9 +105,9 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
     fun byte() {
         val m = integration.ByteTest.meta
         val data = integration.ByteTest(1, 10)
-        db.runQuery { EntityDsl.insert(m).single(data) }
+        db.runQuery { SqlDsl.insert(m).single(data) }
         val data2 = db.runQuery {
-            EntityDsl.from(m).where { m.id eq 1 }.first()
+            SqlDsl.from(m).where { m.id eq 1 }.first()
         }
         assertEquals(data, data2)
     }
@@ -116,9 +116,9 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
     fun byteArray() {
         val m = integration.ByteArrayTest.meta
         val data = integration.ByteArrayTest(1, byteArrayOf(10, 20, 30))
-        db.runQuery { EntityDsl.insert(m).single(data) }
+        db.runQuery { SqlDsl.insert(m).single(data) }
         val data2 = db.runQuery {
-            EntityDsl.from(m).where { m.id eq 1 }.first()
+            SqlDsl.from(m).where { m.id eq 1 }.first()
         }
         assertEquals(data.id, data2.id)
         assertContentEquals(data.value, data2.value)
@@ -128,9 +128,9 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
     fun double() {
         val m = integration.DoubleTest.meta
         val data = integration.DoubleTest(1, 10.0)
-        db.runQuery { EntityDsl.insert(m).single(data) }
+        db.runQuery { SqlDsl.insert(m).single(data) }
         val data2 = db.runQuery {
-            EntityDsl.from(m).where { m.id eq 1 }.first()
+            SqlDsl.from(m).where { m.id eq 1 }.first()
         }
         assertEquals(data, data2)
     }
@@ -139,9 +139,9 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
     fun float() {
         val m = integration.FloatTest.meta
         val data = integration.FloatTest(1, 10.0f)
-        db.runQuery { EntityDsl.insert(m).single(data) }
+        db.runQuery { SqlDsl.insert(m).single(data) }
         val data2 = db.runQuery {
-            EntityDsl.from(m).where { m.id eq 1 }.first()
+            SqlDsl.from(m).where { m.id eq 1 }.first()
         }
         assertEquals(data, data2)
     }
@@ -150,9 +150,9 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
     fun int() {
         val m = integration.IntTest.meta
         val data = integration.IntTest(1, 10)
-        db.runQuery { EntityDsl.insert(m).single(data) }
+        db.runQuery { SqlDsl.insert(m).single(data) }
         val data2 = db.runQuery {
-            EntityDsl.from(m).where { m.id eq 1 }.first()
+            SqlDsl.from(m).where { m.id eq 1 }.first()
         }
         assertEquals(data, data2)
     }
@@ -164,9 +164,9 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
             1,
             LocalDateTime.of(2019, 6, 1, 12, 11, 10)
         )
-        db.runQuery { EntityDsl.insert(m).single(data) }
+        db.runQuery { SqlDsl.insert(m).single(data) }
         val data2 = db.runQuery {
-            EntityDsl.from(m).where { m.id eq 1 }.first()
+            SqlDsl.from(m).where { m.id eq 1 }.first()
         }
         assertEquals(data, data2)
     }
@@ -178,9 +178,9 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
             1,
             LocalDate.of(2019, 6, 1)
         )
-        db.runQuery { EntityDsl.insert(m).single(data) }
+        db.runQuery { SqlDsl.insert(m).single(data) }
         val data2 = db.runQuery {
-            EntityDsl.from(m).where { m.id eq 1 }.first()
+            SqlDsl.from(m).where { m.id eq 1 }.first()
         }
         assertEquals(data, data2)
     }
@@ -189,9 +189,9 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
     fun localTime() {
         val m = integration.LocalTimeTest.meta
         val data = integration.LocalTimeTest(1, LocalTime.of(12, 11, 10))
-        db.runQuery { EntityDsl.insert(m).single(data) }
+        db.runQuery { SqlDsl.insert(m).single(data) }
         val data2 = db.runQuery {
-            EntityDsl.from(m).where { m.id eq 1 }.first()
+            SqlDsl.from(m).where { m.id eq 1 }.first()
         }
         assertEquals(data, data2)
     }
@@ -200,9 +200,9 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
     fun long() {
         val m = integration.LongTest.meta
         val data = integration.LongTest(1, 10L)
-        db.runQuery { EntityDsl.insert(m).single(data) }
+        db.runQuery { SqlDsl.insert(m).single(data) }
         val data2 = db.runQuery {
-            EntityDsl.from(m).where { m.id eq 1 }.first()
+            SqlDsl.from(m).where { m.id eq 1 }.first()
         }
         assertEquals(data, data2)
     }
@@ -215,9 +215,9 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
         val offset = ZoneOffset.ofHours(9)
         val value = OffsetDateTime.of(dateTime, offset)
         val data = integration.OffsetDateTimeTest(1, value)
-        db.runQuery { EntityDsl.insert(m).single(data) }
+        db.runQuery { SqlDsl.insert(m).single(data) }
         val data2 = db.runQuery {
-            EntityDsl.from(m).where { m.id eq 1 }.first()
+            SqlDsl.from(m).where { m.id eq 1 }.first()
         }
         assertEquals(data, data2)
     }
@@ -230,9 +230,9 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
         val offset = ZoneOffset.ofHours(9)
         val value = OffsetDateTime.of(dateTime, offset)
         val data = integration.OffsetDateTimeTest(1, value)
-        db.runQuery { EntityDsl.insert(m).single(data) }
+        db.runQuery { SqlDsl.insert(m).single(data) }
         val data2 = db.runQuery {
-            EntityDsl.from(m).where { m.id eq 1 }.first()
+            SqlDsl.from(m).where { m.id eq 1 }.first()
         }
         assertNotNull(data2)
     }
@@ -241,9 +241,9 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
     fun short() {
         val m = integration.ShortTest.meta
         val data = integration.ShortTest(1, 10)
-        db.runQuery { EntityDsl.insert(m).single(data) }
+        db.runQuery { SqlDsl.insert(m).single(data) }
         val data2 = db.runQuery {
-            EntityDsl.from(m).where { m.id eq 1 }.first()
+            SqlDsl.from(m).where { m.id eq 1 }.first()
         }
         assertEquals(data, data2)
     }
@@ -256,9 +256,9 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
         val xml = "<test>hello</test>"
         value.string = xml
         val data = integration.SqlXmlTest(1, value)
-        db.runQuery { EntityDsl.insert(m).single(data) }
+        db.runQuery { SqlDsl.insert(m).single(data) }
         val data2 = db.runQuery {
-            EntityDsl.from(m).where { m.id eq 1 }.first()
+            SqlDsl.from(m).where { m.id eq 1 }.first()
         }
         assertEquals(xml, data2.value!!.string)
     }
@@ -268,9 +268,9 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
     fun sqlXml_null() {
         val m = integration.SqlXmlTest.meta
         val data = integration.SqlXmlTest(1, null)
-        db.runQuery { EntityDsl.insert(m).single(data) }
+        db.runQuery { SqlDsl.insert(m).single(data) }
         val data2 = db.runQuery {
-            EntityDsl.from(m).where { m.id eq 1 }.first()
+            SqlDsl.from(m).where { m.id eq 1 }.first()
         }
         assertNull(data2.value)
     }
@@ -279,9 +279,9 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
     fun string() {
         val m = integration.StringTest.meta
         val data = integration.StringTest(1, "ABC")
-        db.runQuery { EntityDsl.insert(m).single(data) }
+        db.runQuery { SqlDsl.insert(m).single(data) }
         val data2 = db.runQuery {
-            EntityDsl.from(m).where { m.id eq 1 }.first()
+            SqlDsl.from(m).where { m.id eq 1 }.first()
         }
         assertEquals(data, data2)
     }
@@ -298,9 +298,9 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
                 """.trimIndent()
             )
         )
-        db.runQuery { EntityDsl.insert(m).single(data) }
+        db.runQuery { SqlDsl.insert(m).single(data) }
         val data2 = db.runQuery {
-            EntityDsl.from(m).where { m.id eq 1 }.first()
+            SqlDsl.from(m).where { m.id eq 1 }.first()
         }
         assertEquals(data, data2)
 
@@ -317,9 +317,9 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
     fun unsignedByte() {
         val m = integration.UByteTest.meta
         val data = integration.UByteTest(1, 10u)
-        db.runQuery { EntityDsl.insert(m).single(data) }
+        db.runQuery { SqlDsl.insert(m).single(data) }
         val data2 = db.runQuery {
-            EntityDsl.from(m).where { m.id eq 1 }.first()
+            SqlDsl.from(m).where { m.id eq 1 }.first()
         }
         assertEquals(data, data2)
     }
@@ -328,9 +328,9 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
     fun unsignedByte_maxValue() {
         val m = integration.UByteTest.meta
         val data = integration.UByteTest(1, UByte.MAX_VALUE)
-        db.runQuery { EntityDsl.insert(m).single(data) }
+        db.runQuery { SqlDsl.insert(m).single(data) }
         val data2 = db.runQuery {
-            EntityDsl.from(m).where { m.id eq 1 }.first()
+            SqlDsl.from(m).where { m.id eq 1 }.first()
         }
         assertEquals(data, data2)
     }
@@ -339,9 +339,9 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
     fun unsignedByte_null() {
         val m = integration.UByteTest.meta
         val data = integration.UByteTest(1, null)
-        db.runQuery { EntityDsl.insert(m).single(data) }
+        db.runQuery { SqlDsl.insert(m).single(data) }
         val data2 = db.runQuery {
-            EntityDsl.from(m).where { m.id eq 1 }.first()
+            SqlDsl.from(m).where { m.id eq 1 }.first()
         }
         assertEquals(data, data2)
     }
@@ -350,9 +350,9 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
     fun unsignedInt() {
         val m = integration.UIntTest.meta
         val data = integration.UIntTest(1, 10u)
-        db.runQuery { EntityDsl.insert(m).single(data) }
+        db.runQuery { SqlDsl.insert(m).single(data) }
         val data2 = db.runQuery {
-            EntityDsl.from(m).where { m.id eq 1 }.first()
+            SqlDsl.from(m).where { m.id eq 1 }.first()
         }
         assertEquals(data, data2)
     }
@@ -361,9 +361,9 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
     fun unsignedInt_maxValue() {
         val m = integration.UIntTest.meta
         val data = integration.UIntTest(1, UInt.MAX_VALUE)
-        db.runQuery { EntityDsl.insert(m).single(data) }
+        db.runQuery { SqlDsl.insert(m).single(data) }
         val data2 = db.runQuery {
-            EntityDsl.from(m).where { m.id eq 1 }.first()
+            SqlDsl.from(m).where { m.id eq 1 }.first()
         }
         assertEquals(data, data2)
     }
@@ -372,9 +372,9 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
     fun unsignedInt_null() {
         val m = integration.UIntTest.meta
         val data = integration.UIntTest(1, null)
-        db.runQuery { EntityDsl.insert(m).single(data) }
+        db.runQuery { SqlDsl.insert(m).single(data) }
         val data2 = db.runQuery {
-            EntityDsl.from(m).where { m.id eq 1 }.first()
+            SqlDsl.from(m).where { m.id eq 1 }.first()
         }
         assertEquals(data, data2)
     }
@@ -383,9 +383,9 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
     fun unsignedShort() {
         val m = integration.UShortTest.meta
         val data = integration.UShortTest(1, 10u)
-        db.runQuery { EntityDsl.insert(m).single(data) }
+        db.runQuery { SqlDsl.insert(m).single(data) }
         val data2 = db.runQuery {
-            EntityDsl.from(m).where { m.id eq 1 }.first()
+            SqlDsl.from(m).where { m.id eq 1 }.first()
         }
         assertEquals(data, data2)
     }
@@ -394,9 +394,9 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
     fun unsigned_autoIncrement() {
         val m = integration.UnsignedIdentityStrategy.meta
         val data = integration.UnsignedIdentityStrategy(null, "test")
-        db.runQuery { EntityDsl.insert(m).single(data) }
+        db.runQuery { SqlDsl.insert(m).single(data) }
         val data2 = db.runQuery {
-            EntityDsl.from(m).where { m.id eq 1u }.first()
+            SqlDsl.from(m).where { m.id eq 1u }.first()
         }
         assertNotNull(data2)
     }
@@ -406,9 +406,9 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
     fun unsigned_sequence() {
         val m = integration.UnsignedSequenceStrategy.meta
         val data = integration.UnsignedSequenceStrategy(0u, "test")
-        db.runQuery { EntityDsl.insert(m).single(data) }
+        db.runQuery { SqlDsl.insert(m).single(data) }
         val data2 = db.runQuery {
-            EntityDsl.from(m).where { m.id eq 1u }.first()
+            SqlDsl.from(m).where { m.id eq 1u }.first()
         }
         assertNotNull(data2)
     }
@@ -417,12 +417,12 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
     fun unsigned_version() {
         val m = integration.UnsignedAddress.meta
         val data = integration.UnsignedAddress(16u, "STREET 16", 0u)
-        val data2 = db.runQuery { EntityDsl.insert(m).single(data) }
+        val data2 = db.runQuery { SqlDsl.insert(m).single(data) }
         db.runQuery {
-            EntityDsl.update(m).single(data2.copy(street = "STREET 16 B"))
+            SqlDsl.update(m).single(data2.copy(street = "STREET 16 B"))
         }
         val data3 = db.runQuery {
-            EntityDsl.from(m).where { m.addressId eq 16u }.first()
+            SqlDsl.from(m).where { m.addressId eq 16u }.first()
         }
         assertEquals(16u, data3.addressId)
         assertEquals(1u, data3.version)
@@ -432,12 +432,12 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
     fun unsigned_version_valueClass() {
         val m = integration.UnsignedAddress2.meta
         val data = integration.UnsignedAddress2(16u, "STREET 16", null)
-        val data2 = db.runQuery { EntityDsl.insert(m).single(data) }
+        val data2 = db.runQuery { SqlDsl.insert(m).single(data) }
         db.runQuery {
-            EntityDsl.update(m).single(data2.copy(street = "STREET 16 B"))
+            SqlDsl.update(m).single(data2.copy(street = "STREET 16 B"))
         }
         val data3 = db.runQuery {
-            EntityDsl.from(m).where { m.addressId eq 16u }.first()
+            SqlDsl.from(m).where { m.addressId eq 16u }.first()
         }
         assertEquals(16u, data3.addressId)
         assertEquals(integration.UIntVersion(1u), data3.version)
@@ -447,9 +447,9 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
     fun unsignedShort_maxValue() {
         val m = integration.UShortTest.meta
         val data = integration.UShortTest(1, UShort.MAX_VALUE)
-        db.runQuery { EntityDsl.insert(m).single(data) }
+        db.runQuery { SqlDsl.insert(m).single(data) }
         val data2 = db.runQuery {
-            EntityDsl.from(m).where { m.id eq 1 }.first()
+            SqlDsl.from(m).where { m.id eq 1 }.first()
         }
         assertEquals(data, data2)
     }
@@ -458,9 +458,9 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
     fun unsignedShort_null() {
         val m = integration.UShortTest.meta
         val data = integration.UShortTest(1, null)
-        db.runQuery { EntityDsl.insert(m).single(data) }
+        db.runQuery { SqlDsl.insert(m).single(data) }
         val data2 = db.runQuery {
-            EntityDsl.from(m).where { m.id eq 1 }.first()
+            SqlDsl.from(m).where { m.id eq 1 }.first()
         }
         assertEquals(data, data2)
     }
@@ -471,9 +471,9 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
         val m = integration.UUIDTest.meta
         val value = UUID.randomUUID()
         val data = integration.UUIDTest(1, value)
-        db.runQuery { EntityDsl.insert(m).single(data) }
+        db.runQuery { SqlDsl.insert(m).single(data) }
         val data2 = db.runQuery {
-            EntityDsl.from(m).where { m.id eq 1 }.first()
+            SqlDsl.from(m).where { m.id eq 1 }.first()
         }
         assertEquals(data, data2)
     }
@@ -483,9 +483,9 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
     fun uuid_null() {
         val m = integration.UUIDTest.meta
         val data = integration.UUIDTest(1, null)
-        db.runQuery { EntityDsl.insert(m).single(data) }
+        db.runQuery { SqlDsl.insert(m).single(data) }
         val data2 = db.runQuery {
-            EntityDsl.from(m).where { m.id eq 1 }.first()
+            SqlDsl.from(m).where { m.id eq 1 }.first()
         }
         assertEquals(data, data2)
     }

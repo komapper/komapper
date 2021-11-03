@@ -9,4 +9,8 @@ data class EntityDeleteContext<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, 
     override fun getEntityMetamodels(): Set<EntityMetamodel<*, *, *>> {
         return setOf(target)
     }
+
+    fun asSqlDeleteContext(): SqlDeleteContext<ENTITY, ID, META> {
+        return SqlDeleteContext(target)
+    }
 }

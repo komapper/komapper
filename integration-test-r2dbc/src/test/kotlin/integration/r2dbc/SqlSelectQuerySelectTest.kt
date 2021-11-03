@@ -11,9 +11,6 @@ import org.komapper.core.dsl.operator.count
 import org.komapper.r2dbc.R2dbcDatabase
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
-import kotlin.test.assertNull
-import kotlin.test.assertTrue
 
 @ExtendWith(Env::class)
 class SqlSelectQuerySelectTest(private val db: R2dbcDatabase) {
@@ -117,79 +114,6 @@ class SqlSelectQuerySelectTest(private val db: R2dbcDatabase) {
                 .orderBy(a.addressId)
         }.toList()
         assertEquals(15, list.size)
-    }
-
-    @Test
-    fun selectEntitiesAsPair_leftJoin() = inTransaction(db) {
-        val a = Address.meta
-        val e = Employee.meta
-        val list: List<Pair<Address, Employee?>> = db.runQuery {
-            SqlDsl.from(a)
-                .leftJoin(e) {
-                    a.addressId eq e.addressId
-                }
-                .orderBy(a.addressId)
-                .select(e)
-        }.toList()
-        assertEquals(15, list.size)
-        assertNotNull(list[14].first)
-        assertNull(list[14].second)
-    }
-
-    @Test
-    fun selectEntitiesAsPair_innerJoin() = inTransaction(db) {
-        val a = Address.meta
-        val e = Employee.meta
-        val list: List<Pair<Address, Employee?>> = db.runQuery {
-            SqlDsl.from(a).innerJoin(e) {
-                a.addressId eq e.addressId
-            }.select(e)
-        }.toList()
-        assertEquals(14, list.size)
-        assertTrue(list.all { (_, employee) -> employee != null })
-    }
-
-    @Test
-    fun selectEntitiesAsTriple() = inTransaction(db) {
-        val a = Address.meta
-        val e = Employee.meta
-        val d = Department.meta
-        val list = db.runQuery {
-            SqlDsl.from(a)
-                .innerJoin(e) {
-                    a.addressId eq e.addressId
-                }.innerJoin(d) {
-                    e.departmentId eq d.departmentId
-                }.select(e, d)
-        }.toList()
-        assertEquals(14, list.size)
-        assertTrue(list.all { (_, employee, department) -> employee != null && department != null })
-    }
-
-    @Test
-    fun selectEntitiesAsRecord() = inTransaction(db) {
-        val a = Address.meta
-        val e = Employee.meta
-        val d = Department.meta
-        val list = db.runQuery {
-            SqlDsl.from(a)
-                .where {
-                    a.addressId inList listOf(1, 2)
-                }
-                .innerJoin(e) {
-                    a.addressId eq e.addressId
-                }
-                .innerJoin(d) {
-                    e.departmentId eq d.departmentId
-                }
-                .orderBy(a.addressId)
-                .select(a, e, d)
-        }.toList()
-        assertEquals(2, list.size)
-        val record0 = list[0]
-        assertTrue(record0[a] is Address)
-        assertTrue(record0[e] is Employee)
-        assertTrue(record0[d] is Department)
     }
 
     @Test

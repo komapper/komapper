@@ -22,4 +22,10 @@ data class EntityInsertContext<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, 
             duplicateKeyType = duplicateKeyType
         )
     }
+
+    fun asSqlInsertContext(): SqlInsertContext<ENTITY, ID, META> {
+        return SqlInsertContext(
+            target = target
+        )
+    }
 }

@@ -8,6 +8,7 @@ import org.komapper.core.dsl.SqlDsl
 import org.komapper.core.dsl.expression.When
 import org.komapper.core.dsl.operator.case
 import org.komapper.core.dsl.operator.concat
+import org.komapper.core.dsl.operator.desc
 import org.komapper.core.dsl.operator.literal
 import org.komapper.r2dbc.R2dbcDatabase
 import kotlin.test.Test
@@ -46,6 +47,24 @@ class SqlSelectQueryTest(private val db: R2dbcDatabase) {
     }
 
     @Test
+    fun decoupling() = inTransaction(db) {
+        val a = Address.meta
+        val query = SqlDsl.from(a)
+            .where { a.addressId greaterEq 1 }
+            .orderBy(a.addressId.desc())
+            .limit(2)
+            .offset(5)
+        val flow = db.runQuery { query }
+        assertEquals(
+            listOf(
+                Address(10, "STREET 10", 1),
+                Address(9, "STREET 9", 1)
+            ),
+            flow.toList()
+        )
+    }
+
+    @Test
     fun option() = inTransaction(db) {
         val e = Employee.meta
         val emp = db.runQuery {
@@ -63,29 +82,6 @@ class SqlSelectQueryTest(private val db: R2dbcDatabase) {
                 }.first()
         }
         println(emp)
-    }
-
-    @Test
-    fun shortcut_first() = inTransaction(db) {
-        val a = Address.meta
-        val address = db.runQuery { SqlDsl.from(a).where { a.addressId eq 1 }.first() }
-        assertNotNull(address)
-    }
-
-    @Test
-    fun shortcut_firstOrNull() = inTransaction(db) {
-        val a = Address.meta
-        val address = db.runQuery { SqlDsl.from(a).where { a.addressId eq -1 }.firstOrNull() }
-        assertNull(address)
-    }
-
-    @Test
-    fun shortcut_first_multipleCondition() = inTransaction(db) {
-        val a = Address.meta
-        val address = db.runQuery {
-            SqlDsl.from(a).where { a.addressId eq 1; a.version eq 1 }.first()
-        }
-        assertNotNull(address)
     }
 
     @Test

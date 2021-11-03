@@ -1,10 +1,8 @@
 package integration.r2dbc
 
 import integration.Address
-import integration.Department
 import integration.Employee
 import integration.meta
-import integration.newMeta
 import kotlinx.coroutines.flow.toList
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.SqlDsl
@@ -36,52 +34,6 @@ class FlowQueryTest(val db: R2dbcDatabase) {
             ).orderBy(a.addressId)
         }
         assertEquals(listOf(1, 2), flow.toList().map { it.addressId })
-    }
-
-    @Test
-    fun pairEntities() = inTransaction(db) {
-        val flow = db.flow {
-            val a = Address.meta
-            val e = Employee.meta
-            SqlDsl.from(a)
-                .where { a.addressId inList listOf(1, 2) }
-                .innerJoin(e) { a.addressId eq e.addressId }
-                .orderBy(a.addressId)
-                .select(e)
-        }
-        assertEquals(listOf(1, 2), flow.toList().map { it.first.addressId })
-    }
-
-    @Test
-    fun tripleEntities() = inTransaction(db) {
-        val flow = db.flow {
-            val a = Address.meta
-            val e = Employee.meta
-            val d = Department.meta
-            SqlDsl.from(a).where { a.addressId inList listOf(1, 2) }
-                .innerJoin(e) { a.addressId eq e.addressId }
-                .innerJoin(d) { e.departmentId eq d.departmentId }
-                .orderBy(a.addressId)
-                .select(e, d)
-        }
-        assertEquals(listOf(1, 2), flow.toList().map { it.first.addressId })
-    }
-
-    @Test
-    fun multipleEntities() = inTransaction(db) {
-        val a = Address.meta
-        val e = Employee.meta
-        val m = Employee.newMeta()
-        val d = Department.meta
-        val flow = db.flow {
-            SqlDsl.from(a).where { a.addressId inList listOf(1, 2) }
-                .innerJoin(e) { a.addressId eq e.addressId }
-                .innerJoin(d) { e.departmentId eq d.departmentId }
-                .leftJoin(m) { e.managerId eq m.employeeId }
-                .orderBy(a.addressId)
-                .select(e, d, m)
-        }
-        assertEquals(listOf(1, 2), flow.toList().map { it[a]!!.addressId })
     }
 
     @Test
