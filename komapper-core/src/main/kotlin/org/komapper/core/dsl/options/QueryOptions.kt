@@ -102,6 +102,13 @@ data class EntityInsertOptions(
             suppressLogging = suppressLogging,
         )
     }
+
+    fun asSqlInsertOptions(): SqlInsertOptions {
+        return SqlInsertOptions(
+            queryTimeoutSeconds = queryTimeoutSeconds,
+            suppressLogging = suppressLogging,
+        )
+    }
 }
 
 data class EntityUpdateOptions(

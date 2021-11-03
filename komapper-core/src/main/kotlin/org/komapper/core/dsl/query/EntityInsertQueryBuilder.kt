@@ -3,6 +3,8 @@ package org.komapper.core.dsl.query
 import org.komapper.core.ThreadSafe
 import org.komapper.core.dsl.context.DuplicateKeyType
 import org.komapper.core.dsl.context.EntityInsertContext
+import org.komapper.core.dsl.declaration.ValuesDeclaration
+import org.komapper.core.dsl.expression.SubqueryExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.metamodel.PropertyMetamodel
 import org.komapper.core.dsl.options.EntityInsertOptions
@@ -18,6 +20,8 @@ interface EntityInsertQueryBuilder<ENTITY : Any, ID, META : EntityMetamodel<ENTI
     fun multiple(vararg entities: ENTITY): Query<List<ENTITY>>
     fun batch(entities: List<ENTITY>, batchSize: Int? = null): Query<List<ENTITY>>
     fun batch(vararg entities: ENTITY, batchSize: Int? = null): Query<List<ENTITY>>
+    fun values(declaration: ValuesDeclaration<ENTITY>): SqlInsertQuery<ENTITY, ID>
+    fun select(block: () -> SubqueryExpression<ENTITY>): SqlInsertQuery<ENTITY, ID>
 }
 
 internal data class EntityInsertQueryBuilderImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
@@ -70,5 +74,18 @@ internal data class EntityInsertQueryBuilderImpl<ENTITY : Any, ID, META : Entity
 
     override fun batch(vararg entities: ENTITY, batchSize: Int?): Query<List<ENTITY>> {
         return batch(entities.toList())
+    }
+
+    override fun values(declaration: ValuesDeclaration<ENTITY>): SqlInsertQuery<ENTITY, ID> {
+        return asSqlInsertQueryBuilder().values(declaration)
+    }
+
+    override fun select(block: () -> SubqueryExpression<ENTITY>): SqlInsertQuery<ENTITY, ID> {
+        return asSqlInsertQueryBuilder().select(block)
+    }
+
+    private fun asSqlInsertQueryBuilder(): SqlInsertQueryBuilder<ENTITY, ID> {
+        val query = SqlInsertQueryImpl(context.asSqlInsertContext(), options.asSqlInsertOptions())
+        return SqlInsertQueryBuilderImpl(query)
     }
 }
