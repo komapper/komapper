@@ -55,12 +55,12 @@ fun main() {
 
         // INSERT
         val newAddress = db.runQuery {
-            EntityDsl.insert(a).single(Address(street = "street A"))
+            SqlDsl.insert(a).single(Address(street = "street A"))
         }
 
         // SELECT
         val address = db.runQuery {
-            EntityDsl.from(a).where { a.id eq newAddress.id }.first()
+            SqlDsl.from(a).where { a.id eq newAddress.id }.first()
         }
     }
 }
@@ -84,12 +84,12 @@ fun main() = runBlocking {
 
         // INSERT
         val newAddress = db.runQuery {
-            EntityDsl.insert(a).single(Address(street = "street A"))
+            SqlDsl.insert(a).single(Address(street = "street A"))
         }
 
         // SELECT
         val address = db.runQuery {
-            EntityDsl.from(a).where { a.id eq newAddress.id }.first()
+            SqlDsl.from(a).where { a.id eq newAddress.id }.first()
         }
     }
 }
@@ -106,8 +106,8 @@ import org.komapper.annotation.KomapperAutoIncrement
 import org.komapper.annotation.KomapperEntityDef
 import org.komapper.annotation.KomapperId
 import org.komapper.annotation.KomapperTable
-import org.komapper.core.dsl.EntityDsl
 import org.komapper.core.dsl.SchemaDsl
+import org.komapper.core.dsl.SqlDsl
 import org.komapper.core.dsl.operator.count
 import org.komapper.core.dsl.operator.literal
 import org.komapper.core.dsl.operator.substring
@@ -157,16 +157,14 @@ fun main() {
         }
 
         val (saintPetersburg, munich) = db.runQuery {
-            EntityDsl.insert(c).multiple(
+            SqlDsl.insert(c).multiple(
                 City(name = "St. Petersburg"),
                 City(name = "Munich"),
             )
         }
 
         val (_, pragueId) = db.runQuery {
-            SqlDsl.insert(c).values {
-                c.name set substring(trim(literal("   Prague   ")), 1, 2)
-            }
+            SqlDsl.insert(c).values { c.name set substring(trim(literal("   Prague   ")), 1, 2) }
         }
 
         val prague = db.runQuery {
@@ -175,7 +173,7 @@ fun main() {
         check(prague.name == "Pr") { prague.toString() }
 
         db.runQuery {
-            EntityDsl.insert(u).multiple(
+            SqlDsl.insert(u).multiple(
                 User(id = "andrey", name = "Andrey", cityId = saintPetersburg.id),
                 User(id = "sergey", name = "Sergey", cityId = munich.id),
                 User(id = "eugene", name = "Eugene", cityId = munich.id),
@@ -185,15 +183,11 @@ fun main() {
         }
 
         db.runQuery {
-            SqlDsl.update(u)
-                .set { u.name set "Alexey" }
-                .where { u.id eq "alex" }
+            SqlDsl.update(u).set { u.name set "Alexey" }.where { u.id eq "alex" }
         }
 
         db.runQuery {
-            SqlDsl.delete(u).where {
-                u.name like "%thing"
-            }
+            SqlDsl.delete(u).where { u.name like "%thing" }
         }
 
         println("All cities:")
@@ -215,8 +209,7 @@ fun main() {
                     }
                     u.id eq "sergey"
                     u.cityId eq c.id
-                }
-                .select(u.name, c.name)
+                }.select(u.name, c.name)
         }.forEach { (userName, cityName) ->
             println("$userName lives in $cityName")
         }
@@ -230,8 +223,7 @@ fun main() {
                 }.where {
                     c.name eq "St. Petersburg"
                     or { u.cityId.isNull() }
-                }
-                .select(u.name, u.cityId, c.name)
+                }.select(u.name, u.cityId, c.name)
         }.forEach { (userName, cityId, cityName) ->
             if (cityId != null) {
                 println("$userName lives in $cityName")
@@ -246,8 +238,7 @@ fun main() {
             SqlDsl.from(c)
                 .innerJoin(u) {
                     c.id eq u.cityId
-                }
-                .groupBy(c.name)
+                }.groupBy(c.name)
                 .select(c.name, count(u.id))
         }.forEach { (cityName, userCount) ->
             if (userCount != null && userCount > 0L) {
