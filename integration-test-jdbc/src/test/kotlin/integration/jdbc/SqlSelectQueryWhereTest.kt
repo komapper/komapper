@@ -317,7 +317,7 @@ class SqlSelectQueryWhereTest(private val db: JdbcDatabase) {
                         .where {
                             e.addressId eq a.addressId
                             e.employeeName like "%S%"
-                        }.asSqlQuery().select(a.addressId)
+                        }.select(a.addressId)
                 }
             }
         val list = db.runQuery { query }
@@ -334,7 +334,7 @@ class SqlSelectQueryWhereTest(private val db: JdbcDatabase) {
                     SqlDsl.from(a).where {
                         e.addressId eq a.addressId
                         e.employeeName like "%S%"
-                    }.asSqlQuery().select(a.addressId)
+                    }.select(a.addressId)
                 }
             }
         val list = db.runQuery { query }
@@ -384,7 +384,7 @@ class SqlSelectQueryWhereTest(private val db: JdbcDatabase) {
                         .where {
                             e.addressId eq a.addressId
                             e.employeeName like "%S%"
-                        }.asSqlQuery().select(a.addressId, a.version)
+                        }.select(a.addressId, a.version)
                 }
             }
         val list = db.runQuery { query }
@@ -401,7 +401,7 @@ class SqlSelectQueryWhereTest(private val db: JdbcDatabase) {
                     SqlDsl.from(a).where {
                         e.addressId eq a.addressId
                         e.employeeName like "%S%"
-                    }.asSqlQuery().select(a.addressId, a.version)
+                    }.select(a.addressId, a.version)
                 }
             }
         val list = db.runQuery { query }

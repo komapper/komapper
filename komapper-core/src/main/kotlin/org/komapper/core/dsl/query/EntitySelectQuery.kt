@@ -63,8 +63,6 @@ interface EntitySelectQuery<ENTITY : Any> : FlowSubquery<ENTITY> {
     fun selectColumns(
         vararg expressions: ColumnExpression<*, *>,
     ): FlowSubquery<Columns>
-
-    fun asSqlQuery(): SqlSelectQuery<ENTITY>
 }
 
 internal data class EntitySelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
@@ -203,7 +201,7 @@ internal data class EntitySelectQueryImpl<ENTITY : Any, ID, META : EntityMetamod
         return asSqlQuery().selectColumns(*expressions)
     }
 
-    override fun asSqlQuery(): SqlSelectQuery<ENTITY> {
+    private fun asSqlQuery(): SqlSelectQuery<ENTITY> {
         return SqlSelectQueryImpl(context.asSqlSelectContext(), options.asSqlSelectOption())
     }
 

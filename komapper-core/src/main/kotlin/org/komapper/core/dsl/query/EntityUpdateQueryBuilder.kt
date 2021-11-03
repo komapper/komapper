@@ -48,12 +48,12 @@ internal data class EntityUpdateQueryBuilderImpl<ENTITY : Any, ID, META : Entity
 
     override fun single(entity: ENTITY): EntityUpdateQuery<ENTITY> {
         context.target.checkIdValueNotNull(entity)
-        return EntityUpdateQuery.Single(context, options, entity)
+        return EntityUpdateSingleQuery(context, options, entity)
     }
 
     override fun batch(entities: List<ENTITY>, batchSize: Int?): EntityUpdateQuery<List<ENTITY>> {
         context.target.checkIdValueNotNull(entities)
-        return EntityUpdateQuery.Batch(context, options, entities, batchSize)
+        return EntityUpdateBatchQuery(context, options, entities, batchSize)
     }
 
     override fun batch(vararg entities: ENTITY, batchSize: Int?): EntityUpdateQuery<List<ENTITY>> {

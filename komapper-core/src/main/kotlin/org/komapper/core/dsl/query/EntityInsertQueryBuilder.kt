@@ -45,11 +45,11 @@ internal data class EntityInsertQueryBuilderImpl<ENTITY : Any, ID, META : Entity
     }
 
     override fun single(entity: ENTITY): EntityInsertQuery<ENTITY> {
-        return EntityInsertQuery.Single(context, options, entity)
+        return EntityInsertSingleQuery(context, options, entity)
     }
 
     override fun multiple(entities: List<ENTITY>): EntityInsertQuery<List<ENTITY>> {
-        return EntityInsertQuery.Multiple(context, options, entities)
+        return EntityInsertMultipleQuery(context, options, entities)
     }
 
     override fun multiple(vararg entities: ENTITY): EntityInsertQuery<List<ENTITY>> {
@@ -57,7 +57,7 @@ internal data class EntityInsertQueryBuilderImpl<ENTITY : Any, ID, META : Entity
     }
 
     override fun batch(entities: List<ENTITY>, batchSize: Int?): EntityInsertQuery<List<ENTITY>> {
-        return EntityInsertQuery.Batch(context, options, entities, batchSize)
+        return EntityInsertBatchQuery(context, options, entities, batchSize)
     }
 
     override fun batch(vararg entities: ENTITY, batchSize: Int?): EntityInsertQuery<List<ENTITY>> {

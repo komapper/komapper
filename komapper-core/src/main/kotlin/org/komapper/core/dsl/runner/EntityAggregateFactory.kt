@@ -1,11 +1,13 @@
 package org.komapper.core.dsl.runner
 
+import org.komapper.core.ThreadSafe
 import org.komapper.core.dsl.context.EntitySelectContext
 import org.komapper.core.dsl.element.Association
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.query.EntityAggregate
 import org.komapper.core.dsl.query.EntityAggregateImpl
 
+@ThreadSafe
 class EntityAggregateFactory(
     private val context: EntitySelectContext<*, *, *>
 ) {
@@ -39,11 +41,7 @@ class EntityAggregateFactory(
         return EntityAggregateImpl(associations)
     }
 
-    private fun associate(
-        association: Association,
-        key: Any,
-        value: Any?
-    ) {
+    private fun associate(association: Association, key: Any, value: Any?) {
         val map = associations.computeIfAbsent(association) { mutableMapOf() }
         val set = map.computeIfAbsent(key) { mutableSetOf() }
         if (value != null) {

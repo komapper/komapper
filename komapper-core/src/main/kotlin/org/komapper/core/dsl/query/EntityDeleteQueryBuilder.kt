@@ -23,12 +23,12 @@ internal data class EntityDeleteQueryBuilderImpl<ENTITY : Any, ID, META : Entity
 
     override fun single(entity: ENTITY): EntityDeleteQuery {
         context.target.checkIdValueNotNull(entity)
-        return EntityDeleteQuery.Single(context, options, entity)
+        return EntityDeleteSingleQuery(context, options, entity)
     }
 
     override fun batch(entities: List<ENTITY>, batchSize: Int?): EntityDeleteQuery {
         context.target.checkIdValueNotNull(entities)
-        return EntityDeleteQuery.Batch(context, options, entities, batchSize)
+        return EntityDeleteBatchQuery(context, options, entities, batchSize)
     }
 
     override fun batch(vararg entities: ENTITY, batchSize: Int?): EntityDeleteQuery {
