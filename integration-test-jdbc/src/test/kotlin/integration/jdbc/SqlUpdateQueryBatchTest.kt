@@ -16,7 +16,7 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 @ExtendWith(Env::class)
-class EntityUpdateBatchQueryTest(private val db: JdbcDatabase) {
+class SqlUpdateQueryBatchTest(private val db: JdbcDatabase) {
 
     @Test
     fun test() {

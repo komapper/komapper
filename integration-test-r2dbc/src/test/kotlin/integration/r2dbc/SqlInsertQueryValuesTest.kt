@@ -16,7 +16,7 @@ import kotlin.test.assertIs
 import kotlin.test.assertNull
 
 @ExtendWith(Env::class)
-class SqlInsertQueryTest(private val db: R2dbcDatabase) {
+class SqlInsertQueryValuesTest(private val db: R2dbcDatabase) {
 
     @Test
     fun test() = inTransaction(db) {

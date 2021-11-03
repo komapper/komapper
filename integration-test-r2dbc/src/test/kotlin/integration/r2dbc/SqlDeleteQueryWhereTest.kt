@@ -11,7 +11,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 
 @ExtendWith(Env::class)
-class SqlDeleteQueryTest(private val db: R2dbcDatabase) {
+class SqlDeleteQueryWhereTest(private val db: R2dbcDatabase) {
 
     @Test
     fun test() = inTransaction(db) {

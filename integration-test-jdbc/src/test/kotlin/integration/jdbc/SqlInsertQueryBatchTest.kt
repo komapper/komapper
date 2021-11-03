@@ -18,7 +18,7 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 @ExtendWith(Env::class)
-class EntityInsertMultipleQueryTest(private val db: JdbcDatabase) {
+class SqlInsertQueryBatchTest(private val db: JdbcDatabase) {
 
     @Test
     fun test() {
@@ -28,7 +28,7 @@ class EntityInsertMultipleQueryTest(private val db: JdbcDatabase) {
             Address(17, "STREET 17", 0),
             Address(18, "STREET 18", 0)
         )
-        val ids = db.runQuery { SqlDsl.insert(a).multiple(addressList) }.map { it.addressId }
+        val ids = db.runQuery { SqlDsl.insert(a).batch(addressList) }.map { it.addressId }
         val list = db.runQuery {
             SqlDsl.from(a).where { a.addressId inList ids }
         }
@@ -43,7 +43,7 @@ class EntityInsertMultipleQueryTest(private val db: JdbcDatabase) {
             IdentityStrategy(null, "BBB"),
             IdentityStrategy(null, "CCC")
         )
-        val results1 = db.runQuery { SqlDsl.insert(i).multiple(strategies) }
+        val results1 = db.runQuery { SqlDsl.insert(i).batch(strategies) }
         val results2 = db.runQuery { SqlDsl.from(i).orderBy(i.id) }
         assertEquals(results1, results2)
         assertTrue(results1.all { it.id != null })
@@ -57,7 +57,7 @@ class EntityInsertMultipleQueryTest(private val db: JdbcDatabase) {
             Person(2, "B"),
             Person(3, "C")
         )
-        val ids = db.runQuery { SqlDsl.insert(p).multiple(personList) }.map { it.personId }
+        val ids = db.runQuery { SqlDsl.insert(p).batch(personList) }.map { it.personId }
         val list = db.runQuery { SqlDsl.from(p).where { p.personId inList ids } }
         for (person in list) {
             assertNotNull(person.createdAt)
@@ -72,7 +72,7 @@ class EntityInsertMultipleQueryTest(private val db: JdbcDatabase) {
             db.runQuery {
                 SqlDsl.insert(
                     a
-                ).multiple(
+                ).batch(
                     listOf(
                         Address(16, "STREET 16", 0),
                         Address(17, "STREET 17", 0),
@@ -88,8 +88,12 @@ class EntityInsertMultipleQueryTest(private val db: JdbcDatabase) {
         val d = Department.meta
         val department1 = Department(5, 50, "PLANNING", "TOKYO", 1)
         val department2 = Department(1, 60, "DEVELOPMENT", "KYOTO", 1)
-        val query = SqlDsl.insert(d).onDuplicateKeyUpdate().multiple(listOf(department1, department2))
-        db.runQuery { query }
+        val query = SqlDsl.insert(d).onDuplicateKeyUpdate().batch(department1, department2)
+        val counts = db.runQuery { query }
+        when (db.config.dialect.driver) {
+            "mysql", "mariadb" -> assertEquals(listOf(1, 2), counts)
+            else -> assertEquals(listOf(1, 1), counts)
+        }
         val list = db.runQuery {
             SqlDsl.from(d).where { d.departmentId inList listOf(1, 5) }.orderBy(d.departmentId)
         }
@@ -105,8 +109,12 @@ class EntityInsertMultipleQueryTest(private val db: JdbcDatabase) {
         val d = Department.meta
         val department1 = Department(5, 50, "PLANNING", "TOKYO", 1)
         val department2 = Department(10, 10, "DEVELOPMENT", "KYOTO", 1)
-        val query = SqlDsl.insert(d).onDuplicateKeyUpdate(d.departmentNo).multiple(listOf(department1, department2))
-        db.runQuery { query }
+        val query = SqlDsl.insert(d).onDuplicateKeyUpdate(d.departmentNo).batch(department1, department2)
+        val counts = db.runQuery { query }
+        when (db.config.dialect.driver) {
+            "mysql", "mariadb" -> assertEquals(listOf(1, 2), counts)
+            else -> assertEquals(listOf(1, 1), counts)
+        }
         val list = db.runQuery {
             SqlDsl.from(d).where { d.departmentNo inList listOf(10, 50) }.orderBy(d.departmentNo)
         }
@@ -122,12 +130,16 @@ class EntityInsertMultipleQueryTest(private val db: JdbcDatabase) {
     fun onDuplicateKeyUpdate_set() {
         val d = Department.meta
         val department1 = Department(5, 50, "PLANNING", "TOKYO", 1)
-        val department2 = Department(1, 10, "DEVELOPMENT", "KYOTO", 1)
+        val department2 = Department(1, 60, "DEVELOPMENT", "KYOTO", 1)
         val query =
             SqlDsl.insert(d).onDuplicateKeyUpdate().set { excluded ->
                 d.departmentName set excluded.departmentName
-            }.multiple(listOf(department1, department2))
-        db.runQuery { query }
+            }.batch(listOf(department1, department2))
+        val counts = db.runQuery { query }
+        when (db.config.dialect.driver) {
+            "mysql", "mariadb" -> assertEquals(listOf(1, 2), counts)
+            else -> assertEquals(listOf(1, 1), counts)
+        }
         val list = db.runQuery {
             SqlDsl.from(d).where { d.departmentId inList listOf(1, 5) }.orderBy(d.departmentId)
         }
@@ -140,17 +152,19 @@ class EntityInsertMultipleQueryTest(private val db: JdbcDatabase) {
 
     @Test
     @Run(unless = [Dbms.MARIADB])
-    fun onDuplicateKeyUpdateWithKey_set() {
+    fun onDuplicateKeyUpdateWithKeys_set() {
         val d = Department.meta
         val department1 = Department(5, 50, "PLANNING", "TOKYO", 1)
         val department2 = Department(10, 10, "DEVELOPMENT", "KYOTO", 1)
         val query =
-            SqlDsl.insert(d)
-                .onDuplicateKeyUpdate(d.departmentNo)
-                .set { excluded ->
-                    d.departmentName set excluded.departmentName
-                }.multiple(listOf(department1, department2))
-        db.runQuery { query }
+            SqlDsl.insert(d).onDuplicateKeyUpdate(d.departmentNo).set { excluded ->
+                d.departmentName set excluded.departmentName
+            }.batch(department1, department2)
+        val counts = db.runQuery { query }
+        when (db.config.dialect.driver) {
+            "mysql", "mariadb" -> assertEquals(listOf(1, 2), counts)
+            else -> assertEquals(listOf(1, 1), counts)
+        }
         val list = db.runQuery {
             SqlDsl.from(d).where { d.departmentNo inList listOf(10, 50) }.orderBy(d.departmentNo)
         }
@@ -166,9 +180,9 @@ class EntityInsertMultipleQueryTest(private val db: JdbcDatabase) {
         val d = Department.meta
         val department1 = Department(5, 50, "PLANNING", "TOKYO", 1)
         val department2 = Department(1, 60, "DEVELOPMENT", "KYOTO", 1)
-        val query = SqlDsl.insert(d).onDuplicateKeyIgnore().multiple(listOf(department1, department2))
-        val count = db.runQuery { query }
-        assertEquals(1, count)
+        val query = SqlDsl.insert(d).onDuplicateKeyIgnore().batch(listOf(department1, department2))
+        val counts = db.runQuery { query }
+        assertEquals(listOf(1, 0), counts)
         val list = db.runQuery {
             SqlDsl.from(d).where { d.departmentId inList listOf(1, 5) }.orderBy(d.departmentId)
         }
@@ -184,11 +198,9 @@ class EntityInsertMultipleQueryTest(private val db: JdbcDatabase) {
         val d = Department.meta
         val department1 = Department(5, 50, "PLANNING", "TOKYO", 1)
         val department2 = Department(10, 10, "DEVELOPMENT", "KYOTO", 1)
-        val query = SqlDsl.insert(d)
-            .onDuplicateKeyIgnore(d.departmentNo)
-            .multiple(listOf(department1, department2))
-        val count = db.runQuery { query }
-        assertEquals(1, count)
+        val query = SqlDsl.insert(d).onDuplicateKeyIgnore(d.departmentNo).batch(listOf(department1, department2))
+        val counts = db.runQuery { query }
+        assertEquals(listOf(1, 0), counts)
         val list = db.runQuery {
             SqlDsl.from(d).where { d.departmentNo inList listOf(10, 50) }.orderBy(d.departmentNo)
         }
@@ -207,8 +219,8 @@ class EntityInsertMultipleQueryTest(private val db: JdbcDatabase) {
             IdentityStrategy(null, "BBB"),
             IdentityStrategy(null, "CCC")
         )
-        val query = SqlDsl.insert(i).onDuplicateKeyUpdate().multiple(strategies)
-        val count = db.runQuery { query }
-        assertEquals(3, count)
+        val query = SqlDsl.insert(i).onDuplicateKeyUpdate().batch(strategies)
+        val counts = db.runQuery { query }
+        assertEquals(listOf(1, 1, 1), counts)
     }
 }

@@ -9,6 +9,7 @@ import org.komapper.core.dsl.SqlDsl
 import org.komapper.core.dsl.expression.When
 import org.komapper.core.dsl.operator.case
 import org.komapper.core.dsl.operator.concat
+import org.komapper.core.dsl.operator.desc
 import org.komapper.core.dsl.operator.literal
 import org.komapper.jdbc.JdbcDatabase
 import kotlin.test.Test
@@ -56,6 +57,23 @@ class SqlSelectQueryTest(private val db: JdbcDatabase) {
     }
 
     @Test
+    fun decoupling() {
+        val a = Address.meta
+        val query = SqlDsl.from(a)
+            .where { a.addressId greaterEq 1 }
+            .orderBy(a.addressId.desc())
+            .limit(2)
+            .offset(5)
+        val list = db.runQuery { query }
+        assertEquals(
+            listOf(
+                Address(10, "STREET 10", 1),
+                Address(9, "STREET 9", 1)
+            ),
+            list
+        )
+    }
+    @Test
     fun option() {
         val e = Employee.meta
         val emp = db.runQuery {
@@ -73,29 +91,6 @@ class SqlSelectQueryTest(private val db: JdbcDatabase) {
                 }.first()
         }
         println(emp)
-    }
-
-    @Test
-    fun shortcut_first() {
-        val a = Address.meta
-        val address = db.runQuery { SqlDsl.from(a).where { a.addressId eq 1 }.first() }
-        assertNotNull(address)
-    }
-
-    @Test
-    fun shortcut_firstOrNull() {
-        val a = Address.meta
-        val address = db.runQuery { SqlDsl.from(a).where { a.addressId eq -1 }.firstOrNull() }
-        assertNull(address)
-    }
-
-    @Test
-    fun shortcut_first_multipleCondition() {
-        val a = Address.meta
-        val address = db.runQuery {
-            SqlDsl.from(a).where { a.addressId eq 1; a.version eq 1 }.first()
-        }
-        assertNotNull(address)
     }
 
     @Test

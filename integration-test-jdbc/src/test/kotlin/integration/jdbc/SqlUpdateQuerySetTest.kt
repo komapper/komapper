@@ -1,4 +1,4 @@
-package integration.r2dbc
+package integration.jdbc
 
 import integration.Address
 import integration.Employee
@@ -7,16 +7,16 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.SqlDsl
 import org.komapper.core.dsl.operator.concat
 import org.komapper.core.dsl.operator.plus
-import org.komapper.r2dbc.R2dbcDatabase
+import org.komapper.jdbc.JdbcDatabase
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 
 @ExtendWith(Env::class)
-class SqlUpdateQueryTest(private val db: R2dbcDatabase) {
+class SqlUpdateQuerySetTest(private val db: JdbcDatabase) {
 
     @Test
-    fun test() = inTransaction(db) {
+    fun test() {
         val a = Address.meta
         val count = db.runQuery {
             SqlDsl.update(a).set {
@@ -35,7 +35,7 @@ class SqlUpdateQueryTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun setIfNotNull() = inTransaction(db) {
+    fun setIfNotNull() {
         val a = Address.meta
         val count = db.runQuery {
             SqlDsl.update(a).set {
@@ -56,7 +56,7 @@ class SqlUpdateQueryTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun arithmetic_add() = inTransaction(db) {
+    fun arithmetic_add() {
         val a = Address.meta
         val count = db.runQuery {
             SqlDsl.update(a).set {
@@ -75,7 +75,7 @@ class SqlUpdateQueryTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun string_concat() = inTransaction(db) {
+    fun string_concat() {
         val a = Address.meta
         val count = db.runQuery {
             SqlDsl.update(a).set {
@@ -94,7 +94,7 @@ class SqlUpdateQueryTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun allowEmptyWhereClause_default() = inTransaction(db) {
+    fun allowEmptyWhereClause_default() {
         val e = Employee.meta
         val ex = assertFailsWith<IllegalStateException> {
             @Suppress("UNUSED_VARIABLE")
@@ -108,7 +108,7 @@ class SqlUpdateQueryTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun allowEmptyWhereClause_true() = inTransaction(db) {
+    fun allowEmptyWhereClause_true() {
         val e = Employee.meta
         val count = db.runQuery {
             SqlDsl.update(e).set {

@@ -1,4 +1,4 @@
-package integration.jdbc
+package integration.r2dbc
 
 import integration.Address
 import integration.Employee
@@ -8,105 +8,105 @@ import org.komapper.core.dsl.SqlDsl
 import org.komapper.core.dsl.declaration.WhereDeclaration
 import org.komapper.core.dsl.operator.desc
 import org.komapper.core.dsl.operator.plus
-import org.komapper.jdbc.JdbcDatabase
+import org.komapper.r2dbc.R2dbcDatabase
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 @ExtendWith(Env::class)
-class EntitySelectQueryWhereTest(private val db: JdbcDatabase) {
+class SqlSelectQueryWhereTest(private val db: R2dbcDatabase) {
 
     @Test
-    fun isNull() {
+    fun isNull() = inTransaction(db) {
         val e = Employee.meta
         val list = db.runQuery {
             SqlDsl.from(e).where {
                 e.managerId.isNull()
             }
-        }
+        }.toList()
         assertEquals(listOf(9), list.map { it.employeeId })
     }
 
     @Test
-    fun isNotNull() {
+    fun isNotNull() = inTransaction(db) {
         val e = Employee.meta
         val list = db.runQuery {
             SqlDsl.from(e).where {
                 e.managerId.isNotNull()
             }
-        }
+        }.toList()
         assertTrue(9 !in list.map { it.employeeId })
     }
 
     @Test
-    fun between() {
+    fun between() = inTransaction(db) {
         val a = Address.meta
         val idList = db.runQuery {
             SqlDsl.from(a).where {
                 a.addressId between 5..10
             }.orderBy(a.addressId)
-        }
+        }.toList()
         assertEquals((5..10).toList(), idList.map { it.addressId })
     }
 
     @Test
-    fun notBetween() {
+    fun notBetween() = inTransaction(db) {
         val a = Address.meta
         val idList = db.runQuery {
             SqlDsl.from(a).where {
                 a.addressId notBetween 5..10
             }.orderBy(a.addressId)
-        }
+        }.toList()
         val ids = (1..4) + (11..15)
         assertEquals(ids.toList(), idList.map { it.addressId })
     }
 
     @Test
-    fun like() {
+    fun like() = inTransaction(db) {
         val a = Address.meta
         val list = db.runQuery {
             SqlDsl.from(a).where {
                 a.street like "STREET 1_"
             }.orderBy(a.addressId)
-        }
+        }.toList()
         assertEquals((10..15).toList(), list.map { it.addressId })
     }
 
     @Test
-    fun like_asPrefix() {
+    fun like_asPrefix() = inTransaction(db) {
         val a = Address.meta
         val list = db.runQuery {
             SqlDsl.from(a).where {
                 a.street like "STREET 1".asPrefix()
             }.orderBy(a.addressId)
-        }
+        }.toList()
         assertEquals(listOf(1) + (10..15), list.map { it.addressId })
     }
 
     @Test
-    fun like_asInfix() {
+    fun like_asInfix() = inTransaction(db) {
         val a = Address.meta
         val list = db.runQuery {
             SqlDsl.from(a).where {
                 a.street like "T 1".asInfix()
             }.orderBy(a.addressId)
-        }
+        }.toList()
         assertEquals(listOf(1) + (10..15), list.map { it.addressId })
     }
 
     @Test
-    fun like_asSuffix() {
+    fun like_asSuffix() = inTransaction(db) {
         val a = Address.meta
         val list = db.runQuery {
             SqlDsl.from(a).where {
                 a.street like "1".asSuffix()
             }.orderBy(a.addressId)
-        }
+        }.toList()
         assertEquals(listOf(1, 11), list.map { it.addressId })
     }
 
     @Test
-    fun like_escape() {
+    fun like_escape() = inTransaction(db) {
         val a = Address.meta
         val insertQuery = SqlDsl.insert(a).single(Address(16, "\\STREET _16%", 1))
         val selectQuery = SqlDsl.from(a).where {
@@ -114,12 +114,12 @@ class EntitySelectQueryWhereTest(private val db: JdbcDatabase) {
         }.orderBy(a.addressId)
         val list = db.runQuery {
             insertQuery + selectQuery
-        }
+        }.toList()
         assertEquals(listOf(16), list.map { it.addressId })
     }
 
     @Test
-    fun like_escapeWithEscapeSequence() {
+    fun like_escapeWithEscapeSequence() = inTransaction(db) {
         val a = Address.meta
         val insertQuery = SqlDsl.insert(a).single(Address(16, "\\STREET _16%", 1))
         val selectQuery = SqlDsl.from(a).where {
@@ -129,56 +129,56 @@ class EntitySelectQueryWhereTest(private val db: JdbcDatabase) {
         }
         val list = db.runQuery {
             insertQuery + selectQuery
-        }
+        }.toList()
         assertEquals(listOf(16), list.map { it.addressId })
     }
 
     @Test
-    fun notLike() {
+    fun notLike() = inTransaction(db) {
         val a = Address.meta
         val list = db.runQuery {
             SqlDsl.from(a).where {
                 a.street notLike "STREET 1_"
             }.orderBy(a.addressId)
-        }
+        }.toList()
         assertEquals((1..9).toList(), list.map { it.addressId })
     }
 
     @Test
-    fun notLike_asPrefix() {
+    fun notLike_asPrefix() = inTransaction(db) {
         val a = Address.meta
         val list = db.runQuery {
             SqlDsl.from(a).where {
                 a.street notLike "STREET 1".asPrefix()
             }.orderBy(a.addressId)
-        }
+        }.toList()
         assertEquals((2..9).toList(), list.map { it.addressId })
     }
 
     @Test
-    fun notLike_asInfix() {
+    fun notLike_asInfix() = inTransaction(db) {
         val a = Address.meta
         val list = db.runQuery {
             SqlDsl.from(a).where {
                 a.street notLike "T 1".asInfix()
             }.orderBy(a.addressId)
-        }
+        }.toList()
         assertEquals((2..9).toList(), list.map { it.addressId })
     }
 
     @Test
-    fun notLike_asSuffix() {
+    fun notLike_asSuffix() = inTransaction(db) {
         val a = Address.meta
         val list = db.runQuery {
             SqlDsl.from(a).where {
                 a.street notLike "1".asSuffix()
             }.orderBy(a.addressId)
-        }
+        }.toList()
         assertEquals(((2..10) + (12..15)).toList(), list.map { it.addressId })
     }
 
     @Test
-    fun notLike_escape() {
+    fun notLike_escape() = inTransaction(db) {
         val a = Address.meta
         val insertQuery = SqlDsl.insert(a).single(Address(16, "\\STREET _16%", 1))
         val selectQuery = SqlDsl.from(a).where {
@@ -186,95 +186,95 @@ class EntitySelectQueryWhereTest(private val db: JdbcDatabase) {
         }.orderBy(a.addressId)
         val list = db.runQuery {
             insertQuery + selectQuery
-        }
+        }.toList()
         assertEquals((1..15).toList(), list.map { it.addressId })
     }
 
     @Test
-    fun startsWith() {
+    fun startsWith() = inTransaction(db) {
         val a = Address.meta
         val list = db.runQuery {
             SqlDsl.from(a).where {
                 a.street startsWith "STREET 1"
             }.orderBy(a.addressId)
-        }
+        }.toList()
         assertEquals(listOf(1) + (10..15), list.map { it.addressId })
     }
 
     @Test
-    fun startsWith_escape() {
+    fun startsWith_escape() = inTransaction(db) {
         val a = Address.meta
         val insertQuery = SqlDsl.insert(a).single(Address(16, "STREET 1%6", 1))
         val selectQuery = SqlDsl.from(a).where {
             a.street startsWith "STREET 1%"
         }.orderBy(a.addressId)
-        val list = db.runQuery { insertQuery + selectQuery }
+        val list = db.runQuery { insertQuery + selectQuery }.toList()
         assertEquals(listOf(16), list.map { it.addressId })
     }
 
     @Test
-    fun notStartsWith() {
+    fun notStartsWith() = inTransaction(db) {
         val a = Address.meta
         val list = db.runQuery {
             SqlDsl.from(a).where {
                 a.street notStartsWith "STREET 1"
             }.orderBy(a.addressId)
-        }
+        }.toList()
         assertEquals((2..9).toList(), list.map { it.addressId })
     }
 
     @Test
-    fun contains() {
+    fun contains() = inTransaction(db) {
         val a = Address.meta
         val list = db.runQuery {
             SqlDsl.from(a).where {
                 a.street contains "T 1"
             }.orderBy(a.addressId)
-        }
+        }.toList()
         assertEquals(listOf(1) + (10..15), list.map { it.addressId })
     }
 
     @Test
-    fun notContains() {
+    fun notContains() = inTransaction(db) {
         val a = Address.meta
         val list = db.runQuery {
             SqlDsl.from(a).where {
                 a.street notContains "T 1"
             }.orderBy(a.addressId)
-        }
+        }.toList()
         assertEquals((2..9).toList(), list.map { it.addressId })
     }
 
     @Test
-    fun endsWith() {
+    fun endsWith() = inTransaction(db) {
         val a = Address.meta
         val list = db.runQuery {
             SqlDsl.from(a).where {
                 a.street endsWith "1"
             }.orderBy(a.addressId)
-        }
+        }.toList()
         assertEquals(listOf(1, 11), list.map { it.addressId })
     }
 
     @Test
-    fun notEndsWith() {
+    fun notEndsWith() = inTransaction(db) {
         val a = Address.meta
         val list = db.runQuery {
             SqlDsl.from(a).where {
                 a.street notEndsWith "1"
             }.orderBy(a.addressId)
-        }
+        }.toList()
         assertEquals(((2..10) + (12..15)).toList(), list.map { it.addressId })
     }
 
     @Test
-    fun inList() {
+    fun inList() = inTransaction(db) {
         val a = Address.meta
         val list = db.runQuery {
             SqlDsl.from(a).where {
                 a.addressId inList listOf(9, 10)
             }.orderBy(a.addressId.desc())
-        }
+        }.toList()
         assertEquals(
             listOf(
                 Address(10, "STREET 10", 1),
@@ -285,29 +285,29 @@ class EntitySelectQueryWhereTest(private val db: JdbcDatabase) {
     }
 
     @Test
-    fun notInList() {
+    fun notInList() = inTransaction(db) {
         val a = Address.meta
         val list = db.runQuery {
             SqlDsl.from(a).where {
                 a.addressId notInList (1..9).toList()
             }.orderBy(a.addressId)
-        }
+        }.toList()
         assertEquals((10..15).toList(), list.map { it.addressId })
     }
 
     @Test
-    fun inList_empty() {
+    fun inList_empty() = inTransaction(db) {
         val a = Address.meta
         val list = db.runQuery {
             SqlDsl.from(a).where {
                 a.addressId inList emptyList()
             }.orderBy(a.addressId.desc())
-        }
+        }.toList()
         assertTrue(list.isEmpty())
     }
 
     @Test
-    fun inList_SubQuery() {
+    fun inList_SubQuery() = inTransaction(db) {
         val e = Employee.meta
         val a = Address.meta
         val query =
@@ -320,12 +320,12 @@ class EntitySelectQueryWhereTest(private val db: JdbcDatabase) {
                         }.asSqlQuery().select(a.addressId)
                 }
             }
-        val list = db.runQuery { query }
+        val list = db.runQuery { query }.toList()
         assertEquals(5, list.size)
     }
 
     @Test
-    fun notInList_SubQuery() {
+    fun notInList_SubQuery() = inTransaction(db) {
         val e = Employee.meta
         val a = Address.meta
         val query =
@@ -337,18 +337,18 @@ class EntitySelectQueryWhereTest(private val db: JdbcDatabase) {
                     }.asSqlQuery().select(a.addressId)
                 }
             }
-        val list = db.runQuery { query }
+        val list = db.runQuery { query }.toList()
         assertEquals(9, list.size)
     }
 
     @Test
-    fun inList2() {
+    fun inList2() = inTransaction(db) {
         val a = Address.meta
         val list = db.runQuery {
             SqlDsl.from(a).where {
                 a.addressId to a.version inList2 listOf(9 to 1, 10 to 1)
             }.orderBy(a.addressId.desc())
-        }
+        }.toList()
         assertEquals(
             listOf(
                 Address(10, "STREET 10", 1),
@@ -359,7 +359,7 @@ class EntitySelectQueryWhereTest(private val db: JdbcDatabase) {
     }
 
     @Test
-    fun notInList2() {
+    fun notInList2() = inTransaction(db) {
         val seq = sequence {
             var i = 0
             while (++i < 10) yield(i to 1)
@@ -369,12 +369,12 @@ class EntitySelectQueryWhereTest(private val db: JdbcDatabase) {
             SqlDsl.from(a).where {
                 a.addressId to a.version notInList2 seq.toList()
             }.orderBy(a.addressId)
-        }
+        }.toList()
         assertEquals((10..15).toList(), list.map { it.addressId })
     }
 
     @Test
-    fun inList2_SubQuery() {
+    fun inList2_SubQuery() = inTransaction(db) {
         val e = Employee.meta
         val a = Address.meta
         val query =
@@ -387,12 +387,12 @@ class EntitySelectQueryWhereTest(private val db: JdbcDatabase) {
                         }.asSqlQuery().select(a.addressId, a.version)
                 }
             }
-        val list = db.runQuery { query }
+        val list = db.runQuery { query }.toList()
         assertEquals(5, list.size)
     }
 
     @Test
-    fun notInList_SubQuery2() {
+    fun notInList_SubQuery2() = inTransaction(db) {
         val e = Employee.meta
         val a = Address.meta
         val query =
@@ -404,12 +404,12 @@ class EntitySelectQueryWhereTest(private val db: JdbcDatabase) {
                     }.asSqlQuery().select(a.addressId, a.version)
                 }
             }
-        val list = db.runQuery { query }
+        val list = db.runQuery { query }.toList()
         assertEquals(9, list.size)
     }
 
     @Test
-    fun exists() {
+    fun exists() = inTransaction(db) {
         val e = Employee.meta
         val a = Address.meta
         val query =
@@ -421,12 +421,12 @@ class EntitySelectQueryWhereTest(private val db: JdbcDatabase) {
                     }
                 }
             }
-        val list = db.runQuery { query }
+        val list = db.runQuery { query }.toList()
         assertEquals(5, list.size)
     }
 
     @Test
-    fun notExists() {
+    fun notExists() = inTransaction(db) {
         val e = Employee.meta
         val a = Address.meta
         val query =
@@ -438,12 +438,12 @@ class EntitySelectQueryWhereTest(private val db: JdbcDatabase) {
                     }
                 }
             }
-        val list = db.runQuery { query }
+        val list = db.runQuery { query }.toList()
         assertEquals(9, list.size)
     }
 
     @Test
-    fun not() {
+    fun not() = inTransaction(db) {
         val a = Address.meta
         val idList = db.runQuery {
             SqlDsl.from(a).where {
@@ -452,12 +452,12 @@ class EntitySelectQueryWhereTest(private val db: JdbcDatabase) {
                     a.addressId greaterEq 10
                 }
             }.orderBy(a.addressId)
-        }.map { it.addressId }
+        }.map { it.addressId }.toList()
         assertEquals((6..9).toList(), idList)
     }
 
     @Test
-    fun and() {
+    fun and() = inTransaction(db) {
         val a = Address.meta
         val list = db.runQuery {
             SqlDsl.from(a).where {
@@ -468,7 +468,7 @@ class EntitySelectQueryWhereTest(private val db: JdbcDatabase) {
             }.orderBy(a.addressId.desc())
                 .limit(2)
                 .offset(5)
-        }
+        }.toList()
         assertEquals(
             listOf(
                 Address(10, "STREET 10", 1),
@@ -479,7 +479,7 @@ class EntitySelectQueryWhereTest(private val db: JdbcDatabase) {
     }
 
     @Test
-    fun or() {
+    fun or() = inTransaction(db) {
         val a = Address.meta
         val list = db.runQuery {
             SqlDsl.from(a).where {
@@ -490,7 +490,7 @@ class EntitySelectQueryWhereTest(private val db: JdbcDatabase) {
             }.orderBy(a.addressId.desc())
                 .limit(2)
                 .offset(5)
-        }
+        }.toList()
         assertEquals(
             listOf(
                 Address(10, "STREET 10", 1),
@@ -501,7 +501,7 @@ class EntitySelectQueryWhereTest(private val db: JdbcDatabase) {
     }
 
     @Test
-    fun composition() {
+    fun composition() = inTransaction(db) {
         val a = Address.meta
         val w1: WhereDeclaration = {
             a.addressId eq 1
@@ -509,7 +509,7 @@ class EntitySelectQueryWhereTest(private val db: JdbcDatabase) {
         val w2: WhereDeclaration = {
             a.version eq 1
         }
-        val list = db.runQuery { SqlDsl.from(a).where(w1 + w2) }
+        val list = db.runQuery { SqlDsl.from(a).where(w1 + w2) }.toList()
         assertEquals(1, list.size)
     }
 }

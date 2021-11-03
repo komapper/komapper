@@ -1,17 +1,18 @@
-package integration.jdbc
+package integration.r2dbc
 
 import integration.Address
 import integration.Department
 import integration.NoVersionDepartment
 import integration.Person
 import integration.meta
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.ClockProvider
 import org.komapper.core.OptimisticLockException
 import org.komapper.core.UniqueConstraintException
 import org.komapper.core.dsl.SqlDsl
-import org.komapper.jdbc.JdbcDatabase
-import org.komapper.jdbc.JdbcDatabaseConfig
+import org.komapper.r2dbc.R2dbcDatabase
+import org.komapper.r2dbc.R2dbcDatabaseConfig
 import java.time.Clock
 import java.time.Instant
 import java.time.LocalDateTime
@@ -24,10 +25,10 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 @ExtendWith(Env::class)
-class EntityUpdateQueryTest(private val db: JdbcDatabase) {
+class SqlUpdateQuerySingleTest(private val db: R2dbcDatabase) {
 
     @Test
-    fun test() {
+    fun test() = inTransaction(db) {
         val a = Address.meta
         val query = SqlDsl.from(a).where { a.addressId eq 15 }
         val address = db.runQuery { query.first() }
@@ -45,7 +46,7 @@ class EntityUpdateQueryTest(private val db: JdbcDatabase) {
     }
 
     @Test
-    fun updatedAt() {
+    fun updatedAt() = inTransaction(db) {
         val p = Person.meta
         val findQuery = SqlDsl.from(p).where { p.personId eq 1 }.first()
         val person1 = Person(1, "ABC")
@@ -60,7 +61,7 @@ class EntityUpdateQueryTest(private val db: JdbcDatabase) {
     }
 
     @Test
-    fun updatedAt_customize() {
+    fun updatedAt_customize() = inTransaction(db) {
         val instant = Instant.parse("2021-01-01T00:00:00Z")
         val zoneId = ZoneId.of("UTC")
 
@@ -72,12 +73,12 @@ class EntityUpdateQueryTest(private val db: JdbcDatabase) {
                 p.personId eq 1
             }.first()
         }
-        val config = object : JdbcDatabaseConfig by db.config {
+        val config = object : R2dbcDatabaseConfig by db.config {
             override val clockProvider = ClockProvider {
                 Clock.fixed(instant, zoneId)
             }
         }
-        val myDb = JdbcDatabase.create(config)
+        val myDb = R2dbcDatabase.create(config)
         myDb.runQuery { SqlDsl.update(p).single(person2.copy(name = "DEF")) }
         val person3 = db.runQuery {
             SqlDsl.from(p).where {
@@ -88,16 +89,18 @@ class EntityUpdateQueryTest(private val db: JdbcDatabase) {
     }
 
     @Test
-    fun uniqueConstraintException() {
+    fun uniqueConstraintException() = inTransaction(db) {
         val a = Address.meta
         val address = Address(1, "STREET 2", 1)
         assertFailsWith<UniqueConstraintException> {
-            db.runQuery { SqlDsl.update(a).single(address) }.let { }
+            runBlocking {
+                db.runQuery { SqlDsl.update(a).single(address) }.let { }
+            }
         }
     }
 
     @Test
-    fun optimisticLockException() {
+    fun optimisticLockException() = inTransaction(db) {
         val a = Address.meta
         val address = db.runQuery { SqlDsl.from(a).where { a.addressId eq 15 }.first() }
         db.runQuery { SqlDsl.update(a).single(address) }
@@ -107,7 +110,7 @@ class EntityUpdateQueryTest(private val db: JdbcDatabase) {
     }
 
     @Test
-    fun include() {
+    fun include() = inTransaction(db) {
         val d = Department.meta
         val findQuery = SqlDsl.from(d).where { d.departmentId eq 1 }.first()
         val department = db.runQuery { findQuery }
@@ -120,7 +123,7 @@ class EntityUpdateQueryTest(private val db: JdbcDatabase) {
     }
 
     @Test
-    fun include_emptyTargetProperties() {
+    fun include_emptyTargetProperties() = inTransaction(db) {
         val d = NoVersionDepartment.meta
         val findQuery = SqlDsl.from(d).where { d.departmentId eq 1 }.first()
         val department = db.runQuery { findQuery }
@@ -131,7 +134,7 @@ class EntityUpdateQueryTest(private val db: JdbcDatabase) {
     }
 
     @Test
-    fun exclude() {
+    fun exclude() = inTransaction(db) {
         val d = Department.meta
         val findQuery = SqlDsl.from(d).where { d.departmentId eq 1 }.first()
         val department = db.runQuery { findQuery }
@@ -144,7 +147,7 @@ class EntityUpdateQueryTest(private val db: JdbcDatabase) {
     }
 
     @Test
-    fun exclude_emptyTargetProperties() {
+    fun exclude_emptyTargetProperties() = inTransaction(db) {
         val d = NoVersionDepartment.meta
         val findQuery = SqlDsl.from(d).where { d.departmentId eq 1 }.first()
         val department = db.runQuery { findQuery }

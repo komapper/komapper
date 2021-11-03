@@ -1,4 +1,4 @@
-package integration.r2dbc
+package integration.jdbc
 
 import integration.Address
 import integration.Department
@@ -10,7 +10,7 @@ import integration.setting.Run
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.UniqueConstraintException
 import org.komapper.core.dsl.SqlDsl
-import org.komapper.r2dbc.R2dbcDatabase
+import org.komapper.jdbc.JdbcDatabase
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -18,10 +18,10 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 @ExtendWith(Env::class)
-class EntityInsertMultipleQueryTest(private val db: R2dbcDatabase) {
+class SqlInsertQueryMultipleTest(private val db: JdbcDatabase) {
 
     @Test
-    fun test() = inTransaction(db) {
+    fun test() {
         val a = Address.meta
         val addressList = listOf(
             Address(16, "STREET 16", 0),
@@ -31,14 +31,12 @@ class EntityInsertMultipleQueryTest(private val db: R2dbcDatabase) {
         val ids = db.runQuery { SqlDsl.insert(a).multiple(addressList) }.map { it.addressId }
         val list = db.runQuery {
             SqlDsl.from(a).where { a.addressId inList ids }
-        }.toList()
+        }
         assertEquals(addressList, list)
     }
 
-    // TODO: MySQL driver doesn't return all generated values after multiple insert statement is issued
-    @Run(unless = [Dbms.MYSQL])
     @Test
-    fun identity() = inTransaction(db) {
+    fun identity() {
         val i = IdentityStrategy.meta
         val strategies = listOf(
             IdentityStrategy(null, "AAA"),
@@ -46,13 +44,13 @@ class EntityInsertMultipleQueryTest(private val db: R2dbcDatabase) {
             IdentityStrategy(null, "CCC")
         )
         val results1 = db.runQuery { SqlDsl.insert(i).multiple(strategies) }
-        val results2 = db.runQuery { SqlDsl.from(i).orderBy(i.id) }.toList()
+        val results2 = db.runQuery { SqlDsl.from(i).orderBy(i.id) }
         assertEquals(results1, results2)
         assertTrue(results1.all { it.id != null })
     }
 
     @Test
-    fun createdAt_updatedAt() = inTransaction(db) {
+    fun createdAt_updatedAt() {
         val p = Person.meta
         val personList = listOf(
             Person(1, "A"),
@@ -60,7 +58,7 @@ class EntityInsertMultipleQueryTest(private val db: R2dbcDatabase) {
             Person(3, "C")
         )
         val ids = db.runQuery { SqlDsl.insert(p).multiple(personList) }.map { it.personId }
-        val list = db.runQuery { SqlDsl.from(p).where { p.personId inList ids } }.toList()
+        val list = db.runQuery { SqlDsl.from(p).where { p.personId inList ids } }
         for (person in list) {
             assertNotNull(person.createdAt)
             assertNotNull(person.updatedAt)
@@ -68,7 +66,7 @@ class EntityInsertMultipleQueryTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun uniqueConstraintException() = inTransaction(db) {
+    fun uniqueConstraintException() {
         val a = Address.meta
         assertFailsWith<UniqueConstraintException> {
             db.runQuery {
@@ -86,7 +84,7 @@ class EntityInsertMultipleQueryTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun onDuplicateKeyUpdate() = inTransaction(db) {
+    fun onDuplicateKeyUpdate() {
         val d = Department.meta
         val department1 = Department(5, 50, "PLANNING", "TOKYO", 1)
         val department2 = Department(1, 60, "DEVELOPMENT", "KYOTO", 1)
@@ -94,7 +92,7 @@ class EntityInsertMultipleQueryTest(private val db: R2dbcDatabase) {
         db.runQuery { query }
         val list = db.runQuery {
             SqlDsl.from(d).where { d.departmentId inList listOf(1, 5) }.orderBy(d.departmentId)
-        }.toList()
+        }
         assertEquals(2, list.size)
         assertEquals(
             listOf("DEVELOPMENT" to "KYOTO", "PLANNING" to "TOKYO"),
@@ -103,16 +101,15 @@ class EntityInsertMultipleQueryTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun onDuplicateKeyUpdateWithKeys() = inTransaction(db) {
+    fun onDuplicateKeyUpdateWithKeys() {
         val d = Department.meta
         val department1 = Department(5, 50, "PLANNING", "TOKYO", 1)
         val department2 = Department(10, 10, "DEVELOPMENT", "KYOTO", 1)
-        val query =
-            SqlDsl.insert(d).onDuplicateKeyUpdate(d.departmentNo).multiple(listOf(department1, department2))
+        val query = SqlDsl.insert(d).onDuplicateKeyUpdate(d.departmentNo).multiple(listOf(department1, department2))
         db.runQuery { query }
         val list = db.runQuery {
             SqlDsl.from(d).where { d.departmentNo inList listOf(10, 50) }.orderBy(d.departmentNo)
-        }.toList()
+        }
         assertEquals(2, list.size)
         assertEquals(
             listOf("DEVELOPMENT" to "KYOTO", "PLANNING" to "TOKYO"),
@@ -122,7 +119,7 @@ class EntityInsertMultipleQueryTest(private val db: R2dbcDatabase) {
 
     @Test
     @Run(unless = [Dbms.MARIADB])
-    fun onDuplicateKeyUpdate_set() = inTransaction(db) {
+    fun onDuplicateKeyUpdate_set() {
         val d = Department.meta
         val department1 = Department(5, 50, "PLANNING", "TOKYO", 1)
         val department2 = Department(1, 10, "DEVELOPMENT", "KYOTO", 1)
@@ -133,7 +130,7 @@ class EntityInsertMultipleQueryTest(private val db: R2dbcDatabase) {
         db.runQuery { query }
         val list = db.runQuery {
             SqlDsl.from(d).where { d.departmentId inList listOf(1, 5) }.orderBy(d.departmentId)
-        }.toList()
+        }
         assertEquals(2, list.size)
         assertEquals(
             listOf("DEVELOPMENT" to "NEW YORK", "PLANNING" to "TOKYO"),
@@ -143,7 +140,7 @@ class EntityInsertMultipleQueryTest(private val db: R2dbcDatabase) {
 
     @Test
     @Run(unless = [Dbms.MARIADB])
-    fun onDuplicateKeyUpdateWithKey_set() = inTransaction(db) {
+    fun onDuplicateKeyUpdateWithKey_set() {
         val d = Department.meta
         val department1 = Department(5, 50, "PLANNING", "TOKYO", 1)
         val department2 = Department(10, 10, "DEVELOPMENT", "KYOTO", 1)
@@ -156,7 +153,7 @@ class EntityInsertMultipleQueryTest(private val db: R2dbcDatabase) {
         db.runQuery { query }
         val list = db.runQuery {
             SqlDsl.from(d).where { d.departmentNo inList listOf(10, 50) }.orderBy(d.departmentNo)
-        }.toList()
+        }
         assertEquals(2, list.size)
         assertEquals(
             listOf("DEVELOPMENT" to "NEW YORK", "PLANNING" to "TOKYO"),
@@ -165,7 +162,7 @@ class EntityInsertMultipleQueryTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun onDuplicateKeyIgnore() = inTransaction(db) {
+    fun onDuplicateKeyIgnore() {
         val d = Department.meta
         val department1 = Department(5, 50, "PLANNING", "TOKYO", 1)
         val department2 = Department(1, 60, "DEVELOPMENT", "KYOTO", 1)
@@ -174,7 +171,7 @@ class EntityInsertMultipleQueryTest(private val db: R2dbcDatabase) {
         assertEquals(1, count)
         val list = db.runQuery {
             SqlDsl.from(d).where { d.departmentId inList listOf(1, 5) }.orderBy(d.departmentId)
-        }.toList()
+        }
         assertEquals(2, list.size)
         assertEquals(
             listOf("ACCOUNTING" to "NEW YORK", "PLANNING" to "TOKYO"),
@@ -183,7 +180,7 @@ class EntityInsertMultipleQueryTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun onDuplicateKeyIgnoreWithKeys() = inTransaction(db) {
+    fun onDuplicateKeyIgnoreWithKeys() {
         val d = Department.meta
         val department1 = Department(5, 50, "PLANNING", "TOKYO", 1)
         val department2 = Department(10, 10, "DEVELOPMENT", "KYOTO", 1)
@@ -194,7 +191,7 @@ class EntityInsertMultipleQueryTest(private val db: R2dbcDatabase) {
         assertEquals(1, count)
         val list = db.runQuery {
             SqlDsl.from(d).where { d.departmentNo inList listOf(10, 50) }.orderBy(d.departmentNo)
-        }.toList()
+        }
         assertEquals(2, list.size)
         assertEquals(
             listOf("ACCOUNTING" to "NEW YORK", "PLANNING" to "TOKYO"),
@@ -203,7 +200,7 @@ class EntityInsertMultipleQueryTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun identity_onDuplicateKeyUpdate() = inTransaction(db) {
+    fun identity_onDuplicateKeyUpdate() {
         val i = IdentityStrategy.meta
         val strategies = listOf(
             IdentityStrategy(null, "AAA"),

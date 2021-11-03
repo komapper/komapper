@@ -12,7 +12,7 @@ import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
 
 @ExtendWith(Env::class)
-class EntityDeleteBatchQueryTest(private val db: JdbcDatabase) {
+class SqlDeleteQueryBatchTest(private val db: JdbcDatabase) {
 
     @Test
     fun test() {

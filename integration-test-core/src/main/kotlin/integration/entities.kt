@@ -5,7 +5,6 @@ import org.komapper.annotation.KomapperColumn
 import org.komapper.annotation.KomapperCreatedAt
 import org.komapper.annotation.KomapperEntity
 import org.komapper.annotation.KomapperId
-import org.komapper.annotation.KomapperIgnore
 import org.komapper.annotation.KomapperSequence
 import org.komapper.annotation.KomapperTable
 import org.komapper.annotation.KomapperUpdatedAt
@@ -84,8 +83,6 @@ data class Employee(
     @KomapperColumn("DEPARTMENT_ID") val departmentId: Int,
     @KomapperColumn("ADDRESS_ID") val addressId: Int,
     @KomapperVersion val version: Int,
-    @KomapperIgnore val address: Address? = null,
-    @KomapperIgnore val department: Department? = null
 ) {
     companion object
 }
@@ -122,7 +119,6 @@ data class Department(
     @KomapperColumn("DEPARTMENT_NAME") val departmentName: String,
     val location: String,
     @KomapperVersion val version: Int,
-    @KomapperIgnore val employeeList: List<Employee> = emptyList()
 ) {
     companion object
 }
@@ -135,7 +131,6 @@ data class NoVersionDepartment(
     @KomapperColumn("DEPARTMENT_NAME") val departmentName: String,
     val location: String,
     val version: Int,
-    @KomapperIgnore val employeeList: List<Employee> = emptyList()
 ) {
     companion object
 }
