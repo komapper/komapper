@@ -57,7 +57,7 @@ data class EntityDeleteOptions(
     override val ignoreVersion: Boolean,
     override val queryTimeoutSeconds: Int?,
     override val suppressLogging: Boolean,
-    override val suppressOptimisticLockException: Boolean
+    override val suppressOptimisticLockException: Boolean,
 ) : VersionOptions {
 
     companion object {
@@ -76,6 +76,15 @@ data class EntityDeleteOptions(
             suppressLogging = suppressLogging,
             ignoreVersion = ignoreVersion,
             suppressOptimisticLockException = suppressOptimisticLockException
+        )
+    }
+
+    fun asSqlDeleteOptions(): SqlDeleteOptions {
+        return SqlDeleteOptions(
+            allowEmptyWhereClause = false,
+            escapeSequence = null,
+            queryTimeoutSeconds = queryTimeoutSeconds,
+            suppressLogging = suppressLogging
         )
     }
 }

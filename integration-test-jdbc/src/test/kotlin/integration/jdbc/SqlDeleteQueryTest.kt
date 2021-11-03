@@ -28,7 +28,7 @@ class SqlDeleteQueryTest(private val db: JdbcDatabase) {
         val ex = assertFailsWith<IllegalStateException> {
             @Suppress("UNUSED_VARIABLE")
             val count = db.runQuery {
-                SqlDsl.delete(e)
+                SqlDsl.delete(e).all()
             }
         }
         assertEquals("Empty where clause is not allowed.", ex.message)
@@ -38,7 +38,7 @@ class SqlDeleteQueryTest(private val db: JdbcDatabase) {
     fun allowEmptyWhereClause_true() {
         val e = Employee.meta
         val count = db.runQuery {
-            SqlDsl.delete(e).options { it.copy(allowEmptyWhereClause = true) }
+            SqlDsl.delete(e).all().options { it.copy(allowEmptyWhereClause = true) }
         }
         assertEquals(14, count)
     }

@@ -2,6 +2,7 @@ package org.komapper.core.dsl.query
 
 import org.komapper.core.ThreadSafe
 import org.komapper.core.dsl.context.EntityDeleteContext
+import org.komapper.core.dsl.declaration.WhereDeclaration
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.EntityDeleteOptions
 import org.komapper.core.dsl.visitor.QueryVisitor
@@ -12,6 +13,8 @@ interface EntityDeleteQueryBuilder<ENTITY : Any> {
     fun single(entity: ENTITY): Query<Unit>
     fun batch(entities: List<ENTITY>, batchSize: Int? = null): Query<Unit>
     fun batch(vararg entities: ENTITY, batchSize: Int? = null): Query<Unit>
+    fun where(declaration: WhereDeclaration): SqlDeleteQuery
+    fun all(): SqlDeleteQuery
 }
 
 internal data class EntityDeleteQueryBuilderImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
@@ -44,5 +47,17 @@ internal data class EntityDeleteQueryBuilderImpl<ENTITY : Any, ID, META : Entity
 
     override fun batch(vararg entities: ENTITY, batchSize: Int?): Query<Unit> {
         return batch(entities.toList())
+    }
+
+    override fun where(declaration: WhereDeclaration): SqlDeleteQuery {
+        return asSqlDeleteQuery().where(declaration)
+    }
+
+    override fun all(): SqlDeleteQuery {
+        return asSqlDeleteQuery()
+    }
+
+    private fun asSqlDeleteQuery(): SqlDeleteQuery {
+        return SqlDeleteQueryImpl(context.asSqlDeleteContext(), options.asSqlDeleteOptions())
     }
 }
