@@ -6,22 +6,21 @@ import org.komapper.core.dsl.context.EntitySelectContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.EntitySelectOptions
 import org.komapper.core.dsl.query.EntityAggregate
-import org.komapper.core.dsl.runner.EntityAggregateFactory
+import org.komapper.core.dsl.query.EntityAggregateFactory
 import org.komapper.core.dsl.runner.EntityKey
 import org.komapper.core.dsl.runner.EntitySelectRunner
 import org.komapper.jdbc.JdbcDatabaseConfig
 import org.komapper.jdbc.JdbcExecutor
 
-internal class EntityAggregateJdbcRunner(
-    private val context: EntitySelectContext<*, *, *>,
+internal class EntityAggregateJdbcRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+    private val context: EntitySelectContext<ENTITY, ID, META>,
     private val options: EntitySelectOptions,
-) : JdbcRunner<EntityAggregate> {
+) : JdbcRunner<EntityAggregate<ENTITY>> {
 
     private val runner: EntitySelectRunner = EntitySelectRunner(context, options)
+    private val factory: EntityAggregateFactory<ENTITY, ID, META> = EntityAggregateFactory(context)
 
-    private val aggregateFactory: EntityAggregateFactory = EntityAggregateFactory(context)
-
-    override fun run(config: JdbcDatabaseConfig): EntityAggregate {
+    override fun run(config: JdbcDatabaseConfig): EntityAggregate<ENTITY> {
         if (!options.allowEmptyWhereClause && context.where.isEmpty()) {
             error("Empty where clause is not allowed.")
         }
@@ -44,7 +43,7 @@ internal class EntityAggregateJdbcRunner(
             }
             rows
         }
-        return aggregateFactory.create(rows)
+        return factory.create(rows)
     }
 
     override fun dryRun(config: DatabaseConfig): Statement {

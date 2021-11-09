@@ -10,6 +10,8 @@ import org.komapper.core.dsl.SqlDsl
 import org.komapper.jdbc.JdbcDatabase
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertSame
 import kotlin.test.assertTrue
 
 @ExtendWith(Env::class)
@@ -54,16 +56,19 @@ class SqlSelectQueryJoinTest(private val db: JdbcDatabase) {
     }
 
     @Test
-    fun association_many_to_one() {
+    fun fetchAll_many_to_one() {
         val e = Employee.meta
         val d = Department.meta
         val aggregate = db.runQuery {
             SqlDsl.from(e).innerJoin(d) {
                 e.departmentId eq d.departmentId
-            }.associate(e, d)
+            }.includeAll()
         }
-        val map = aggregate.oneToMany(d, e)
+
+        assertTrue(aggregate.hasAssociation(d to e))
+        val map = aggregate.oneToMany(d to e)
         assertEquals(3, map.size)
+        assertSame(map, aggregate.oneToMany(d to e))
         val employees1 = map.filterKeys { it.departmentId == 1 }.values.first()
         val employees2 = map.filterKeys { it.departmentId == 2 }.values.first()
         val employees3 = map.filterKeys { it.departmentId == 3 }.values.first()
@@ -73,15 +78,17 @@ class SqlSelectQueryJoinTest(private val db: JdbcDatabase) {
     }
 
     @Test
-    fun association_one_to_many() {
+    fun fetchAll_one_to_many() {
         val d = Department.meta
         val e = Employee.meta
         val aggregate = db.runQuery {
             SqlDsl.from(d).innerJoin(e) {
                 d.departmentId eq e.departmentId
-            }.associate(d, e)
+            }.includeAll()
         }
-        val map = aggregate.oneToMany(d, e)
+
+        assertTrue(aggregate.hasAssociation(d to e))
+        val map = aggregate.oneToMany(d to e)
         assertEquals(3, map.size)
         val employees1 = map.filterKeys { it.departmentId == 1 }.values.first()
         val employees2 = map.filterKeys { it.departmentId == 2 }.values.first()
@@ -92,16 +99,49 @@ class SqlSelectQueryJoinTest(private val db: JdbcDatabase) {
     }
 
     @Test
-    fun association_one_to_one() {
+    fun fetchAll_one_to_one() {
         val a = Address.meta
         val e = Employee.meta
+        val d = Department.meta
         val aggregate = db.runQuery {
             SqlDsl.from(e).innerJoin(a) {
                 e.addressId eq a.addressId
-            }.associate(e, a)
+            }.innerJoin(d) {
+                e.departmentId eq d.departmentId
+            }.includeAll()
         }
-        val map = aggregate.oneToOne(e, a)
+
+        assertTrue(aggregate.hasAssociation(e to a))
+        val map = aggregate.oneToOne(e to a)
         assertEquals(14, map.size)
         assertTrue(map.values.all { it != null })
+
+        assertTrue(aggregate.hasAssociation(e to d))
+        val map2 = aggregate.oneToOne(e to d)
+        assertEquals(14, map.size)
+        assertTrue(map2.values.all { it != null })
+    }
+
+    @Test
+    fun fetchExplicitly_one_to_one() {
+        val a = Address.meta
+        val e = Employee.meta
+        val d = Department.meta
+        val aggregate = db.runQuery {
+            SqlDsl.from(e).innerJoin(a) {
+                e.addressId eq a.addressId
+            }.innerJoin(d) {
+                e.departmentId eq d.departmentId
+            }.include(a)
+        }
+
+        assertTrue(aggregate.hasAssociation(e to a))
+        val map = aggregate.oneToOne(e to a)
+        assertEquals(14, map.size)
+        assertTrue(map.values.all { it != null })
+
+        assertFalse(aggregate.hasAssociation(e to d))
+        val map2 = aggregate.oneToOne(e to d)
+        assertEquals(0, map2.size)
     }
 }

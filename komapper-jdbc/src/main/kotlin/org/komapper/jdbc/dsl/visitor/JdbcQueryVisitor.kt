@@ -87,7 +87,11 @@ internal object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
         }
     }
 
-    override fun entityAggregateQuery(context: EntitySelectContext<*, *, *>, options: EntitySelectOptions): JdbcRunner<*> {
+    override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>
+    entityAggregateQuery(
+        context: EntitySelectContext<ENTITY, ID, META>,
+        options: EntitySelectOptions
+    ): JdbcRunner<*> {
         return EntityAggregateJdbcRunner(context, options)
     }
 

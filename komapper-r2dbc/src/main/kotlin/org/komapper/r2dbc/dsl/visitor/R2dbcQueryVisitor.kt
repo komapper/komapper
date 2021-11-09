@@ -83,8 +83,8 @@ internal object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
         }
     }
 
-    override fun entityAggregateQuery(
-        context: EntitySelectContext<*, *, *>,
+    override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> entityAggregateQuery(
+        context: EntitySelectContext<ENTITY, ID, META>,
         options: EntitySelectOptions
     ): R2dbcRunner<*> {
         return EntityAggregateR2dbcRunner(context, options)
