@@ -4,7 +4,7 @@ import integration.Address
 import integration.meta
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.OptimisticLockException
-import org.komapper.core.dsl.SqlDsl
+import org.komapper.core.dsl.QueryDsl
 import org.komapper.r2dbc.R2dbcDatabase
 import kotlin.test.Test
 import kotlin.test.assertFailsWith
@@ -17,22 +17,22 @@ class SqlDeleteQuerySingleTest(private val db: R2dbcDatabase) {
     fun optimisticLockException() = inTransaction(db) {
         val a = Address.meta
         val address = db.runQuery {
-            SqlDsl.from(a).where {
+            QueryDsl.from(a).where {
                 a.addressId eq 15
             }.first()
         }
-        db.runQuery { SqlDsl.delete(a).single(address) }
+        db.runQuery { QueryDsl.delete(a).single(address) }
         assertFailsWith<OptimisticLockException> {
-            db.runQuery { SqlDsl.delete(a).single(address) }
+            db.runQuery { QueryDsl.delete(a).single(address) }
         }
     }
 
     @Test
     fun testEntity() = inTransaction(db) {
         val a = Address.meta
-        val query = SqlDsl.from(a).where { a.addressId eq 15 }
+        val query = QueryDsl.from(a).where { a.addressId eq 15 }
         val address = db.runQuery { query.first() }
-        db.runQuery { SqlDsl.delete(a).single(address) }
+        db.runQuery { QueryDsl.delete(a).single(address) }
         assertNull(db.runQuery { query }.firstOrNull())
     }
 }

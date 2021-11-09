@@ -4,7 +4,7 @@ import integration.Address
 import integration.meta
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.OptimisticLockException
-import org.komapper.core.dsl.SqlDsl
+import org.komapper.core.dsl.QueryDsl
 import org.komapper.jdbc.JdbcDatabase
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -23,11 +23,11 @@ class SqlDeleteQueryBatchTest(private val db: JdbcDatabase) {
             Address(18, "STREET 18", 0)
         )
         for (address in addressList) {
-            db.runQuery { SqlDsl.insert(a).single(address) }
+            db.runQuery { QueryDsl.insert(a).single(address) }
         }
-        val query = SqlDsl.from(a).where { a.addressId inList listOf(16, 17, 18) }
+        val query = QueryDsl.from(a).where { a.addressId inList listOf(16, 17, 18) }
         assertEquals(3, db.runQuery { query }.size)
-        db.runQuery { SqlDsl.delete(a).batch(addressList) }
+        db.runQuery { QueryDsl.delete(a).batch(addressList) }
         assertTrue(db.runQuery { query }.isEmpty())
     }
 
@@ -40,13 +40,13 @@ class SqlDeleteQueryBatchTest(private val db: JdbcDatabase) {
             Address(18, "STREET 18", 0)
         )
         for (address in addressList) {
-            db.runQuery { SqlDsl.insert(a).single(address) }
+            db.runQuery { QueryDsl.insert(a).single(address) }
         }
-        val query = SqlDsl.from(a).where { a.addressId inList listOf(16, 17, 18) }
+        val query = QueryDsl.from(a).where { a.addressId inList listOf(16, 17, 18) }
         assertEquals(3, db.runQuery { query }.size)
         val ex = assertFailsWith<OptimisticLockException> {
             db.runQuery {
-                SqlDsl.delete(a).batch(
+                QueryDsl.delete(a).batch(
                     listOf(
                         addressList[0],
                         addressList[1],
@@ -67,12 +67,12 @@ class SqlDeleteQueryBatchTest(private val db: JdbcDatabase) {
             Address(18, "STREET 18", 0)
         )
         for (address in addressList) {
-            db.runQuery { SqlDsl.insert(a).single(address) }
+            db.runQuery { QueryDsl.insert(a).single(address) }
         }
-        val query = SqlDsl.from(a).where { a.addressId inList listOf(16, 17, 18) }
+        val query = QueryDsl.from(a).where { a.addressId inList listOf(16, 17, 18) }
         assertEquals(3, db.runQuery { query }.size)
         db.runQuery {
-            SqlDsl.delete(a)
+            QueryDsl.delete(a)
                 .batch(
                     listOf(
                         addressList[0],

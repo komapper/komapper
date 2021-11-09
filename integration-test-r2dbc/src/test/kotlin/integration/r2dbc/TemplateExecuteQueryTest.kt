@@ -3,7 +3,7 @@ package integration.r2dbc
 import integration.Address
 import integration.meta
 import org.junit.jupiter.api.extension.ExtendWith
-import org.komapper.core.dsl.SqlDsl
+import org.komapper.core.dsl.QueryDsl
 import org.komapper.core.dsl.TemplateDsl
 import org.komapper.r2dbc.R2dbcDatabase
 import kotlin.test.Test
@@ -23,7 +23,7 @@ class TemplateExecuteQueryTest(private val db: R2dbcDatabase) {
         assertEquals(1, count)
         val a = Address.meta
         val address = db.runQuery {
-            SqlDsl.from(a).where {
+            QueryDsl.from(a).where {
                 a.addressId eq 15
             }.first()
         }

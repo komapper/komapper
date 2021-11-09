@@ -6,7 +6,7 @@ import integration.Employee
 import integration.meta
 import integration.newMeta
 import org.junit.jupiter.api.extension.ExtendWith
-import org.komapper.core.dsl.SqlDsl
+import org.komapper.core.dsl.QueryDsl
 import org.komapper.jdbc.JdbcDatabase
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -22,7 +22,7 @@ class SqlSelectQueryJoinTest(private val db: JdbcDatabase) {
         val a = Address.meta
         val e = Employee.meta
         val list = db.runQuery {
-            SqlDsl.from(a).innerJoin(e) {
+            QueryDsl.from(a).innerJoin(e) {
                 a.addressId eq e.addressId
             }
         }
@@ -34,7 +34,7 @@ class SqlSelectQueryJoinTest(private val db: JdbcDatabase) {
         val a = Address.meta
         val e = Employee.meta
         val list = db.runQuery {
-            SqlDsl.from(a).leftJoin(e) {
+            QueryDsl.from(a).leftJoin(e) {
                 a.addressId eq e.addressId
             }
         }
@@ -46,7 +46,7 @@ class SqlSelectQueryJoinTest(private val db: JdbcDatabase) {
         val employee = Employee.meta
         val manager = Employee.newMeta()
         val list = db.runQuery {
-            SqlDsl.from(employee).innerJoin(manager) {
+            QueryDsl.from(employee).innerJoin(manager) {
                 employee.managerId eq manager.employeeId
                 manager.managerId.isNull()
             }
@@ -60,7 +60,7 @@ class SqlSelectQueryJoinTest(private val db: JdbcDatabase) {
         val e = Employee.meta
         val d = Department.meta
         val aggregate = db.runQuery {
-            SqlDsl.from(e).innerJoin(d) {
+            QueryDsl.from(e).innerJoin(d) {
                 e.departmentId eq d.departmentId
             }.includeAll()
         }
@@ -82,7 +82,7 @@ class SqlSelectQueryJoinTest(private val db: JdbcDatabase) {
         val d = Department.meta
         val e = Employee.meta
         val aggregate = db.runQuery {
-            SqlDsl.from(d).innerJoin(e) {
+            QueryDsl.from(d).innerJoin(e) {
                 d.departmentId eq e.departmentId
             }.includeAll()
         }
@@ -104,7 +104,7 @@ class SqlSelectQueryJoinTest(private val db: JdbcDatabase) {
         val e = Employee.meta
         val d = Department.meta
         val aggregate = db.runQuery {
-            SqlDsl.from(e).innerJoin(a) {
+            QueryDsl.from(e).innerJoin(a) {
                 e.addressId eq a.addressId
             }.innerJoin(d) {
                 e.departmentId eq d.departmentId
@@ -128,7 +128,7 @@ class SqlSelectQueryJoinTest(private val db: JdbcDatabase) {
         val e = Employee.meta
         val d = Department.meta
         val aggregate = db.runQuery {
-            SqlDsl.from(e).innerJoin(a) {
+            QueryDsl.from(e).innerJoin(a) {
                 e.addressId eq a.addressId
             }.innerJoin(d) {
                 e.departmentId eq d.departmentId

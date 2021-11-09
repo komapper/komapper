@@ -4,8 +4,8 @@ import org.komapper.annotation.KomapperAutoIncrement
 import org.komapper.annotation.KomapperEntityDef
 import org.komapper.annotation.KomapperId
 import org.komapper.annotation.KomapperTable
+import org.komapper.core.dsl.QueryDsl
 import org.komapper.core.dsl.SchemaDsl
-import org.komapper.core.dsl.SqlDsl
 import org.komapper.core.dsl.operator.count
 import org.komapper.core.dsl.operator.literal
 import org.komapper.core.dsl.operator.substring
@@ -55,23 +55,23 @@ fun main() {
         }
 
         val (saintPetersburg, munich) = db.runQuery {
-            SqlDsl.insert(c).multiple(
+            QueryDsl.insert(c).multiple(
                 City(name = "St. Petersburg"),
                 City(name = "Munich"),
             )
         }
 
         val (_, pragueId) = db.runQuery {
-            SqlDsl.insert(c).values { c.name set substring(trim(literal("   Prague   ")), 1, 2) }
+            QueryDsl.insert(c).values { c.name set substring(trim(literal("   Prague   ")), 1, 2) }
         }
 
         val prague = db.runQuery {
-            SqlDsl.from(c).where { c.id eq pragueId }.first()
+            QueryDsl.from(c).where { c.id eq pragueId }.first()
         }
         check(prague.name == "Pr") { prague.toString() }
 
         db.runQuery {
-            SqlDsl.insert(u).multiple(
+            QueryDsl.insert(u).multiple(
                 User(id = "andrey", name = "Andrey", cityId = saintPetersburg.id),
                 User(id = "sergey", name = "Sergey", cityId = munich.id),
                 User(id = "eugene", name = "Eugene", cityId = munich.id),
@@ -81,23 +81,23 @@ fun main() {
         }
 
         db.runQuery {
-            SqlDsl.update(u).set { u.name set "Alexey" }.where { u.id eq "alex" }
+            QueryDsl.update(u).set { u.name set "Alexey" }.where { u.id eq "alex" }
         }
 
         db.runQuery {
-            SqlDsl.delete(u).where { u.name like "%thing" }
+            QueryDsl.delete(u).where { u.name like "%thing" }
         }
 
         println("All cities:")
 
-        for (city in db.runQuery { SqlDsl.from(c) }) {
+        for (city in db.runQuery { QueryDsl.from(c) }) {
             println("${city.id}: ${city.name}")
         }
 
         println("Manual join:")
 
         db.runQuery {
-            SqlDsl.from(u)
+            QueryDsl.from(u)
                 .innerJoin(c) {
                     u.cityId eq c.id
                 }.where {
@@ -115,7 +115,7 @@ fun main() {
         println("Join with foreign key:")
 
         db.runQuery {
-            SqlDsl.from(u)
+            QueryDsl.from(u)
                 .innerJoin(c) {
                     u.cityId eq c.id
                 }.where {
@@ -133,7 +133,7 @@ fun main() {
         println("Functions and group by:")
 
         db.runQuery {
-            SqlDsl.from(c)
+            QueryDsl.from(c)
                 .innerJoin(u) {
                     c.id eq u.cityId
                 }.groupBy(c.name)
