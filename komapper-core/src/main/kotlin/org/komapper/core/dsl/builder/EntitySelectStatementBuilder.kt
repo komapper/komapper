@@ -24,7 +24,7 @@ class EntitySelectStatementBuilder(
     }
 
     private fun selectClause() {
-        support.selectClause(context.distinct)
+        support.selectClause()
     }
 
     private fun fromClause() {

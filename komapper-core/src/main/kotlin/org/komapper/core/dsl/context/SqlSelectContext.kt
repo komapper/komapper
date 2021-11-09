@@ -17,9 +17,9 @@ data class SqlSelectContext<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID,
     override val offset: Int = -1,
     override val limit: Int = -1,
     override val forUpdate: ForUpdate = ForUpdate(),
+    override val distinct: Boolean = false,
     val groupBy: List<ColumnExpression<*, *>> = listOf(),
     val having: List<Criterion> = listOf(),
-    val distinct: Boolean = false,
 ) : SelectContext<ENTITY, ID, META, SqlSelectContext<ENTITY, ID, META>> {
 
     fun setProjection(vararg expressions: ColumnExpression<*, *>): SqlSelectContext<ENTITY, ID, META> {

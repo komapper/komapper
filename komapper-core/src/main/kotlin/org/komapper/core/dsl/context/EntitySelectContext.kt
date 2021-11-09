@@ -16,7 +16,7 @@ data class EntitySelectContext<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, 
     override val offset: Int = -1,
     override val limit: Int = -1,
     override val forUpdate: ForUpdate = ForUpdate(),
-    val distinct: Boolean = false,
+    override val distinct: Boolean = false,
 ) : SelectContext<ENTITY, ID, META, EntitySelectContext<ENTITY, ID, META>> {
 
     override fun addJoin(join: Join<*, *>): EntitySelectContext<ENTITY, ID, META> {
