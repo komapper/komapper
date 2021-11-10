@@ -21,13 +21,18 @@ val integrationTestProjects = subprojects.filter {
 }
 
 val isReleaseVersion = !version.toString().endsWith("SNAPSHOT")
+val ktlintVersion: String by project
 
 allprojects {
     apply(plugin = "com.diffplug.spotless")
 
+    repositories {
+        mavenCentral()
+    }
+
     spotless {
         kotlinGradle {
-            ktlint("0.41.0")
+            ktlint(ktlintVersion)
         }
     }
 
@@ -35,10 +40,6 @@ allprojects {
         build {
             dependsOn(spotlessApply)
         }
-    }
-
-    repositories {
-        mavenCentral()
     }
 }
 
@@ -59,7 +60,7 @@ configure(libraryProjects + gradlePluginProject + exampleProjects + integrationT
     spotless {
         kotlin {
             targetExclude("build/**")
-            ktlint("0.41.0")
+            ktlint(ktlintVersion)
         }
     }
 
@@ -132,20 +133,20 @@ configure(libraryProjects + platformProject) {
 }
 
 rootProject.apply {
-    release {
-        newVersionCommitMessage = "[Gradle Release Plugin] - [skip ci] new version commit: "
-        tagTemplate = "v\$version"
-        with(propertyMissing("git") as net.researchgate.release.GitAdapter.GitConfig) {
-            requireBranch = "main"
-        }
-    }
-
     nexusPublishing {
         repositories {
             sonatype {
                 nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
                 snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
             }
+        }
+    }
+
+    release {
+        newVersionCommitMessage = "[Gradle Release Plugin] - [skip ci] new version commit: "
+        tagTemplate = "v\$version"
+        with(propertyMissing("git") as net.researchgate.release.GitAdapter.GitConfig) {
+            requireBranch = "main"
         }
     }
 }
