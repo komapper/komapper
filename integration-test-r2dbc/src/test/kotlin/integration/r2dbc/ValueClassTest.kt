@@ -10,6 +10,7 @@ import integration.Version
 import integration.meta
 import integration.setting.Dbms
 import integration.setting.Run
+import kotlinx.coroutines.delay
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.QueryDsl
 import org.komapper.core.dsl.expression.When
@@ -103,6 +104,7 @@ class ValueClassTest(val db: R2dbcDatabase) {
         val person2 = db.runQuery {
             QueryDsl.insert(p).single(person1) + findQuery
         }
+        delay(10)
         val person3 = db.runQuery {
             QueryDsl.update(p).single(person2.copy(name = "DEF")) + findQuery
         }
