@@ -21,13 +21,14 @@ val integrationTestProjects = subprojects.filter {
 }
 
 val isReleaseVersion = !version.toString().endsWith("SNAPSHOT")
+val ktlintVersion: String by project
 
 allprojects {
     apply(plugin = "com.diffplug.spotless")
 
     spotless {
         kotlinGradle {
-            ktlint("0.41.0")
+            ktlint(ktlintVersion)
         }
     }
 
@@ -59,7 +60,7 @@ configure(libraryProjects + gradlePluginProject + exampleProjects + integrationT
     spotless {
         kotlin {
             targetExclude("build/**")
-            ktlint("0.41.0")
+            ktlint(ktlintVersion)
         }
     }
 
