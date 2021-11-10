@@ -1,7 +1,7 @@
 plugins {
     java
     kotlin("jvm")
-    id("com.diffplug.spotless") version "5.17.1"
+    id("com.diffplug.spotless") version "6.0.0"
     id("io.github.gradle-nexus.publish-plugin") version "1.1.0"
     id("net.researchgate.release") version "2.8.1"
 }
