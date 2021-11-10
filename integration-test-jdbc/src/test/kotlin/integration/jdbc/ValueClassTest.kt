@@ -103,6 +103,7 @@ class ValueClassTest(val db: JdbcDatabase) {
         val person2 = db.runQuery {
             QueryDsl.insert(p).single(person1) + findQuery
         }
+        Thread.sleep(10)
         val person3 = db.runQuery {
             QueryDsl.update(p).single(person2.copy(name = "DEF")) + findQuery
         }
