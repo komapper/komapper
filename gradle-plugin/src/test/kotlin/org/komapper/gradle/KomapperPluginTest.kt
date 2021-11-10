@@ -1,12 +1,12 @@
 package org.komapper.gradle
 
 import org.gradle.testkit.runner.GradleRunner
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 import java.io.File
+import kotlin.test.BeforeTest
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 class KomapperPluginTest {
 
@@ -16,7 +16,7 @@ class KomapperPluginTest {
     private lateinit var settingsFile: File
     private lateinit var buildFile: File
 
-    @BeforeEach
+    @BeforeTest
     fun setup() {
         settingsFile = File(testProjectDir, "settings.gradle.kts").apply {
             writeText(

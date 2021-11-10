@@ -45,12 +45,7 @@ configure(libraryProjects + gradlePluginProject + exampleProjects + integrationT
     apply(plugin = "org.jetbrains.kotlin.jvm")
 
     dependencies {
-        if (project == gradlePluginProject) {
-            testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.1")
-            testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.8.1")
-        } else {
-            testImplementation(kotlin("test"))
-        }
+        testImplementation(kotlin("test"))
     }
 
     java {
@@ -83,12 +78,6 @@ configure(libraryProjects + gradlePluginProject) {
     java {
         withJavadocJar()
         withSourcesJar()
-    }
-
-    spotless {
-        java {
-            googleJavaFormat("1.7")
-        }
     }
 }
 
