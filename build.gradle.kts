@@ -1,5 +1,7 @@
 plugins {
     java
+    `maven-publish`
+    signing
     kotlin("jvm")
     id("com.diffplug.spotless") version "6.0.0"
     id("io.github.gradle-nexus.publish-plugin") version "1.1.0"
@@ -23,7 +25,7 @@ val isReleaseVersion = !version.toString().endsWith("SNAPSHOT")
 allprojects {
     apply(plugin = "com.diffplug.spotless")
 
-    configure<com.diffplug.gradle.spotless.SpotlessExtension> {
+    spotless {
         kotlinGradle {
             ktlint("0.41.0")
         }
@@ -45,12 +47,7 @@ configure(libraryProjects + gradlePluginProject + exampleProjects + integrationT
     apply(plugin = "org.jetbrains.kotlin.jvm")
 
     dependencies {
-        if (project == gradlePluginProject) {
-            testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.1")
-            testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.8.1")
-        } else {
-            testImplementation(kotlin("test"))
-        }
+        testImplementation(kotlin("test"))
     }
 
     java {
@@ -67,13 +64,7 @@ configure(libraryProjects + gradlePluginProject + exampleProjects + integrationT
     }
 
     tasks {
-        withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-            kotlinOptions {
-                jvmTarget = "1.8"
-            }
-        }
-
-        withType<Test> {
+        withType<Test>().configureEach {
             useJUnitPlatform()
         }
     }
@@ -83,12 +74,6 @@ configure(libraryProjects + gradlePluginProject) {
     java {
         withJavadocJar()
         withSourcesJar()
-    }
-
-    spotless {
-        java {
-            googleJavaFormat("1.7")
-        }
     }
 }
 
@@ -103,7 +88,7 @@ configure(libraryProjects + platformProject) {
         "java"
     }
 
-    configure<PublishingExtension> {
+    publishing {
         publications {
             create<MavenPublication>("maven") {
                 from(components[component])
@@ -136,7 +121,7 @@ configure(libraryProjects + platformProject) {
         }
     }
 
-    configure<SigningExtension> {
+    signing {
         val signingKey: String? by project
         val signingPassword: String? by project
         useInMemoryPgpKeys(signingKey, signingPassword)
