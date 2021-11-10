@@ -4,7 +4,7 @@ import integration.Address
 import integration.Employee
 import integration.meta
 import org.junit.jupiter.api.extension.ExtendWith
-import org.komapper.core.dsl.SqlDsl
+import org.komapper.core.dsl.QueryDsl
 import org.komapper.core.dsl.declaration.WhereDeclaration
 import org.komapper.core.dsl.operator.desc
 import org.komapper.core.dsl.operator.plus
@@ -20,7 +20,7 @@ class SqlSelectQueryWhereTest(private val db: JdbcDatabase) {
     fun isNull() {
         val e = Employee.meta
         val list = db.runQuery {
-            SqlDsl.from(e).where {
+            QueryDsl.from(e).where {
                 e.managerId.isNull()
             }
         }
@@ -31,7 +31,7 @@ class SqlSelectQueryWhereTest(private val db: JdbcDatabase) {
     fun isNotNull() {
         val e = Employee.meta
         val list = db.runQuery {
-            SqlDsl.from(e).where {
+            QueryDsl.from(e).where {
                 e.managerId.isNotNull()
             }
         }
@@ -42,7 +42,7 @@ class SqlSelectQueryWhereTest(private val db: JdbcDatabase) {
     fun between() {
         val a = Address.meta
         val idList = db.runQuery {
-            SqlDsl.from(a).where {
+            QueryDsl.from(a).where {
                 a.addressId between 5..10
             }.orderBy(a.addressId)
         }
@@ -53,7 +53,7 @@ class SqlSelectQueryWhereTest(private val db: JdbcDatabase) {
     fun notBetween() {
         val a = Address.meta
         val idList = db.runQuery {
-            SqlDsl.from(a).where {
+            QueryDsl.from(a).where {
                 a.addressId notBetween 5..10
             }.orderBy(a.addressId)
         }
@@ -65,7 +65,7 @@ class SqlSelectQueryWhereTest(private val db: JdbcDatabase) {
     fun like() {
         val a = Address.meta
         val list = db.runQuery {
-            SqlDsl.from(a).where {
+            QueryDsl.from(a).where {
                 a.street like "STREET 1_"
             }.orderBy(a.addressId)
         }
@@ -76,7 +76,7 @@ class SqlSelectQueryWhereTest(private val db: JdbcDatabase) {
     fun like_asPrefix() {
         val a = Address.meta
         val list = db.runQuery {
-            SqlDsl.from(a).where {
+            QueryDsl.from(a).where {
                 a.street like "STREET 1".asPrefix()
             }.orderBy(a.addressId)
         }
@@ -87,7 +87,7 @@ class SqlSelectQueryWhereTest(private val db: JdbcDatabase) {
     fun like_asInfix() {
         val a = Address.meta
         val list = db.runQuery {
-            SqlDsl.from(a).where {
+            QueryDsl.from(a).where {
                 a.street like "T 1".asInfix()
             }.orderBy(a.addressId)
         }
@@ -98,7 +98,7 @@ class SqlSelectQueryWhereTest(private val db: JdbcDatabase) {
     fun like_asSuffix() {
         val a = Address.meta
         val list = db.runQuery {
-            SqlDsl.from(a).where {
+            QueryDsl.from(a).where {
                 a.street like "1".asSuffix()
             }.orderBy(a.addressId)
         }
@@ -108,8 +108,8 @@ class SqlSelectQueryWhereTest(private val db: JdbcDatabase) {
     @Test
     fun like_escape() {
         val a = Address.meta
-        val insertQuery = SqlDsl.insert(a).single(Address(16, "\\STREET _16%", 1))
-        val selectQuery = SqlDsl.from(a).where {
+        val insertQuery = QueryDsl.insert(a).single(Address(16, "\\STREET _16%", 1))
+        val selectQuery = QueryDsl.from(a).where {
             a.street like escape("\\S") + text("%") + escape("T _16%")
         }.orderBy(a.addressId)
         val list = db.runQuery {
@@ -121,8 +121,8 @@ class SqlSelectQueryWhereTest(private val db: JdbcDatabase) {
     @Test
     fun like_escapeWithEscapeSequence() {
         val a = Address.meta
-        val insertQuery = SqlDsl.insert(a).single(Address(16, "\\STREET _16%", 1))
-        val selectQuery = SqlDsl.from(a).where {
+        val insertQuery = QueryDsl.insert(a).single(Address(16, "\\STREET _16%", 1))
+        val selectQuery = QueryDsl.from(a).where {
             a.street like escape("\\S") + text("%") + escape("T _16%")
         }.orderBy(a.addressId).options {
             it.copy(escapeSequence = "|")
@@ -137,7 +137,7 @@ class SqlSelectQueryWhereTest(private val db: JdbcDatabase) {
     fun notLike() {
         val a = Address.meta
         val list = db.runQuery {
-            SqlDsl.from(a).where {
+            QueryDsl.from(a).where {
                 a.street notLike "STREET 1_"
             }.orderBy(a.addressId)
         }
@@ -148,7 +148,7 @@ class SqlSelectQueryWhereTest(private val db: JdbcDatabase) {
     fun notLike_asPrefix() {
         val a = Address.meta
         val list = db.runQuery {
-            SqlDsl.from(a).where {
+            QueryDsl.from(a).where {
                 a.street notLike "STREET 1".asPrefix()
             }.orderBy(a.addressId)
         }
@@ -159,7 +159,7 @@ class SqlSelectQueryWhereTest(private val db: JdbcDatabase) {
     fun notLike_asInfix() {
         val a = Address.meta
         val list = db.runQuery {
-            SqlDsl.from(a).where {
+            QueryDsl.from(a).where {
                 a.street notLike "T 1".asInfix()
             }.orderBy(a.addressId)
         }
@@ -170,7 +170,7 @@ class SqlSelectQueryWhereTest(private val db: JdbcDatabase) {
     fun notLike_asSuffix() {
         val a = Address.meta
         val list = db.runQuery {
-            SqlDsl.from(a).where {
+            QueryDsl.from(a).where {
                 a.street notLike "1".asSuffix()
             }.orderBy(a.addressId)
         }
@@ -180,8 +180,8 @@ class SqlSelectQueryWhereTest(private val db: JdbcDatabase) {
     @Test
     fun notLike_escape() {
         val a = Address.meta
-        val insertQuery = SqlDsl.insert(a).single(Address(16, "\\STREET _16%", 1))
-        val selectQuery = SqlDsl.from(a).where {
+        val insertQuery = QueryDsl.insert(a).single(Address(16, "\\STREET _16%", 1))
+        val selectQuery = QueryDsl.from(a).where {
             a.street notLike escape("\\S") + text("%") + escape("T _16%")
         }.orderBy(a.addressId)
         val list = db.runQuery {
@@ -194,7 +194,7 @@ class SqlSelectQueryWhereTest(private val db: JdbcDatabase) {
     fun startsWith() {
         val a = Address.meta
         val list = db.runQuery {
-            SqlDsl.from(a).where {
+            QueryDsl.from(a).where {
                 a.street startsWith "STREET 1"
             }.orderBy(a.addressId)
         }
@@ -204,8 +204,8 @@ class SqlSelectQueryWhereTest(private val db: JdbcDatabase) {
     @Test
     fun startsWith_escape() {
         val a = Address.meta
-        val insertQuery = SqlDsl.insert(a).single(Address(16, "STREET 1%6", 1))
-        val selectQuery = SqlDsl.from(a).where {
+        val insertQuery = QueryDsl.insert(a).single(Address(16, "STREET 1%6", 1))
+        val selectQuery = QueryDsl.from(a).where {
             a.street startsWith "STREET 1%"
         }.orderBy(a.addressId)
         val list = db.runQuery { insertQuery + selectQuery }
@@ -216,7 +216,7 @@ class SqlSelectQueryWhereTest(private val db: JdbcDatabase) {
     fun notStartsWith() {
         val a = Address.meta
         val list = db.runQuery {
-            SqlDsl.from(a).where {
+            QueryDsl.from(a).where {
                 a.street notStartsWith "STREET 1"
             }.orderBy(a.addressId)
         }
@@ -227,7 +227,7 @@ class SqlSelectQueryWhereTest(private val db: JdbcDatabase) {
     fun contains() {
         val a = Address.meta
         val list = db.runQuery {
-            SqlDsl.from(a).where {
+            QueryDsl.from(a).where {
                 a.street contains "T 1"
             }.orderBy(a.addressId)
         }
@@ -238,7 +238,7 @@ class SqlSelectQueryWhereTest(private val db: JdbcDatabase) {
     fun notContains() {
         val a = Address.meta
         val list = db.runQuery {
-            SqlDsl.from(a).where {
+            QueryDsl.from(a).where {
                 a.street notContains "T 1"
             }.orderBy(a.addressId)
         }
@@ -249,7 +249,7 @@ class SqlSelectQueryWhereTest(private val db: JdbcDatabase) {
     fun endsWith() {
         val a = Address.meta
         val list = db.runQuery {
-            SqlDsl.from(a).where {
+            QueryDsl.from(a).where {
                 a.street endsWith "1"
             }.orderBy(a.addressId)
         }
@@ -260,7 +260,7 @@ class SqlSelectQueryWhereTest(private val db: JdbcDatabase) {
     fun notEndsWith() {
         val a = Address.meta
         val list = db.runQuery {
-            SqlDsl.from(a).where {
+            QueryDsl.from(a).where {
                 a.street notEndsWith "1"
             }.orderBy(a.addressId)
         }
@@ -271,7 +271,7 @@ class SqlSelectQueryWhereTest(private val db: JdbcDatabase) {
     fun inList() {
         val a = Address.meta
         val list = db.runQuery {
-            SqlDsl.from(a).where {
+            QueryDsl.from(a).where {
                 a.addressId inList listOf(9, 10)
             }.orderBy(a.addressId.desc())
         }
@@ -288,7 +288,7 @@ class SqlSelectQueryWhereTest(private val db: JdbcDatabase) {
     fun notInList() {
         val a = Address.meta
         val list = db.runQuery {
-            SqlDsl.from(a).where {
+            QueryDsl.from(a).where {
                 a.addressId notInList (1..9).toList()
             }.orderBy(a.addressId)
         }
@@ -299,7 +299,7 @@ class SqlSelectQueryWhereTest(private val db: JdbcDatabase) {
     fun inList_empty() {
         val a = Address.meta
         val list = db.runQuery {
-            SqlDsl.from(a).where {
+            QueryDsl.from(a).where {
                 a.addressId inList emptyList()
             }.orderBy(a.addressId.desc())
         }
@@ -311,9 +311,9 @@ class SqlSelectQueryWhereTest(private val db: JdbcDatabase) {
         val e = Employee.meta
         val a = Address.meta
         val query =
-            SqlDsl.from(e).where {
+            QueryDsl.from(e).where {
                 e.addressId inList {
-                    SqlDsl.from(a)
+                    QueryDsl.from(a)
                         .where {
                             e.addressId eq a.addressId
                             e.employeeName like "%S%"
@@ -329,9 +329,9 @@ class SqlSelectQueryWhereTest(private val db: JdbcDatabase) {
         val e = Employee.meta
         val a = Address.meta
         val query =
-            SqlDsl.from(e).where {
+            QueryDsl.from(e).where {
                 e.addressId notInList {
-                    SqlDsl.from(a).where {
+                    QueryDsl.from(a).where {
                         e.addressId eq a.addressId
                         e.employeeName like "%S%"
                     }.select(a.addressId)
@@ -345,7 +345,7 @@ class SqlSelectQueryWhereTest(private val db: JdbcDatabase) {
     fun inList2() {
         val a = Address.meta
         val list = db.runQuery {
-            SqlDsl.from(a).where {
+            QueryDsl.from(a).where {
                 a.addressId to a.version inList2 listOf(9 to 1, 10 to 1)
             }.orderBy(a.addressId.desc())
         }
@@ -366,7 +366,7 @@ class SqlSelectQueryWhereTest(private val db: JdbcDatabase) {
         }
         val a = Address.meta
         val list = db.runQuery {
-            SqlDsl.from(a).where {
+            QueryDsl.from(a).where {
                 a.addressId to a.version notInList2 seq.toList()
             }.orderBy(a.addressId)
         }
@@ -378,9 +378,9 @@ class SqlSelectQueryWhereTest(private val db: JdbcDatabase) {
         val e = Employee.meta
         val a = Address.meta
         val query =
-            SqlDsl.from(e).where {
+            QueryDsl.from(e).where {
                 e.addressId to e.version inList2 {
-                    SqlDsl.from(a)
+                    QueryDsl.from(a)
                         .where {
                             e.addressId eq a.addressId
                             e.employeeName like "%S%"
@@ -396,9 +396,9 @@ class SqlSelectQueryWhereTest(private val db: JdbcDatabase) {
         val e = Employee.meta
         val a = Address.meta
         val query =
-            SqlDsl.from(e).where {
+            QueryDsl.from(e).where {
                 e.addressId to e.version notInList2 {
-                    SqlDsl.from(a).where {
+                    QueryDsl.from(a).where {
                         e.addressId eq a.addressId
                         e.employeeName like "%S%"
                     }.select(a.addressId, a.version)
@@ -413,9 +413,9 @@ class SqlSelectQueryWhereTest(private val db: JdbcDatabase) {
         val e = Employee.meta
         val a = Address.meta
         val query =
-            SqlDsl.from(e).where {
+            QueryDsl.from(e).where {
                 exists {
-                    SqlDsl.from(a).where {
+                    QueryDsl.from(a).where {
                         e.addressId eq a.addressId
                         e.employeeName like "%S%"
                     }
@@ -430,9 +430,9 @@ class SqlSelectQueryWhereTest(private val db: JdbcDatabase) {
         val e = Employee.meta
         val a = Address.meta
         val query =
-            SqlDsl.from(e).where {
+            QueryDsl.from(e).where {
                 notExists {
-                    SqlDsl.from(a).where {
+                    QueryDsl.from(a).where {
                         e.addressId eq a.addressId
                         e.employeeName like "%S%"
                     }
@@ -446,7 +446,7 @@ class SqlSelectQueryWhereTest(private val db: JdbcDatabase) {
     fun not() {
         val a = Address.meta
         val idList = db.runQuery {
-            SqlDsl.from(a).where {
+            QueryDsl.from(a).where {
                 a.addressId greater 5
                 not {
                     a.addressId greaterEq 10
@@ -460,7 +460,7 @@ class SqlSelectQueryWhereTest(private val db: JdbcDatabase) {
     fun and() {
         val a = Address.meta
         val list = db.runQuery {
-            SqlDsl.from(a).where {
+            QueryDsl.from(a).where {
                 a.addressId greater 1
                 and {
                     a.addressId greater 1
@@ -482,7 +482,7 @@ class SqlSelectQueryWhereTest(private val db: JdbcDatabase) {
     fun or() {
         val a = Address.meta
         val list = db.runQuery {
-            SqlDsl.from(a).where {
+            QueryDsl.from(a).where {
                 a.addressId greaterEq 1
                 or {
                     a.addressId greaterEq 1
@@ -509,7 +509,7 @@ class SqlSelectQueryWhereTest(private val db: JdbcDatabase) {
         val w2: WhereDeclaration = {
             a.version eq 1
         }
-        val list = db.runQuery { SqlDsl.from(a).where(w1 + w2) }
+        val list = db.runQuery { QueryDsl.from(a).where(w1 + w2) }
         assertEquals(1, list.size)
     }
 }

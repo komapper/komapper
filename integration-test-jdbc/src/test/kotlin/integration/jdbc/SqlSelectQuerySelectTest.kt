@@ -5,7 +5,7 @@ import integration.Department
 import integration.Employee
 import integration.meta
 import org.junit.jupiter.api.extension.ExtendWith
-import org.komapper.core.dsl.SqlDsl
+import org.komapper.core.dsl.QueryDsl
 import org.komapper.core.dsl.operator.concat
 import org.komapper.core.dsl.operator.count
 import org.komapper.jdbc.JdbcDatabase
@@ -19,7 +19,7 @@ class SqlSelectQuerySelectTest(private val db: JdbcDatabase) {
     fun selectColumn() {
         val a = Address.meta
         val streetList = db.runQuery {
-            SqlDsl.from(a)
+            QueryDsl.from(a)
                 .where {
                     a.addressId inList listOf(1, 2)
                 }
@@ -33,7 +33,7 @@ class SqlSelectQuerySelectTest(private val db: JdbcDatabase) {
     fun selectColumn_first() {
         val a = Address.meta
         val value = db.runQuery {
-            SqlDsl.from(a)
+            QueryDsl.from(a)
                 .where {
                     a.addressId inList listOf(1, 2)
                 }
@@ -48,7 +48,7 @@ class SqlSelectQuerySelectTest(private val db: JdbcDatabase) {
     fun selectColumnsAsPair() {
         val a = Address.meta
         val pairList = db.runQuery {
-            SqlDsl.from(a)
+            QueryDsl.from(a)
                 .where {
                     a.addressId inList listOf(1, 2)
                 }
@@ -62,7 +62,7 @@ class SqlSelectQuerySelectTest(private val db: JdbcDatabase) {
     fun selectColumnsAsTriple() {
         val a = Address.meta
         val tripleList = db.runQuery {
-            SqlDsl.from(a)
+            QueryDsl.from(a)
                 .where {
                     a.addressId inList listOf(1, 2)
                 }
@@ -82,7 +82,7 @@ class SqlSelectQuerySelectTest(private val db: JdbcDatabase) {
     fun selectColumnsAsRecord() {
         val a = Address.meta
         val list = db.runQuery {
-            SqlDsl.from(a)
+            QueryDsl.from(a)
                 .where {
                     a.addressId inList listOf(1, 2)
                 }
@@ -106,7 +106,7 @@ class SqlSelectQuerySelectTest(private val db: JdbcDatabase) {
     fun selectColumns() {
         val a = Address.meta
         val list = db.runQuery {
-            SqlDsl.from(a)
+            QueryDsl.from(a)
                 .where {
                     a.addressId inList listOf(1, 2)
                 }
@@ -129,7 +129,7 @@ class SqlSelectQuerySelectTest(private val db: JdbcDatabase) {
         val a = Address.meta
         val e = Employee.meta
         val list: List<Address> = db.runQuery {
-            SqlDsl.from(a)
+            QueryDsl.from(a)
                 .leftJoin(e) {
                     a.addressId eq e.addressId
                 }
@@ -142,9 +142,9 @@ class SqlSelectQuerySelectTest(private val db: JdbcDatabase) {
     fun selectColumnsAsPair_scalar() {
         val d = Department.meta
         val e = Employee.meta
-        val subquery = SqlDsl.from(e).where { d.departmentId eq e.departmentId }.select(count())
+        val subquery = QueryDsl.from(e).where { d.departmentId eq e.departmentId }.select(count())
         val list = db.runQuery {
-            SqlDsl.from(d)
+            QueryDsl.from(d)
                 .orderBy(d.departmentId)
                 .select(d.departmentName, subquery)
         }

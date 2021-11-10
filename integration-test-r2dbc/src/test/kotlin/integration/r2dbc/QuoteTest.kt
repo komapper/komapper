@@ -9,7 +9,7 @@ import integration.meta
 import integration.setting.Dbms
 import integration.setting.Run
 import org.junit.jupiter.api.extension.ExtendWith
-import org.komapper.core.dsl.SqlDsl
+import org.komapper.core.dsl.QueryDsl
 import org.komapper.core.dsl.query.dryRun
 import org.komapper.r2dbc.R2dbcDatabase
 import kotlin.test.Test
@@ -23,7 +23,7 @@ class QuoteTest(val db: R2dbcDatabase) {
     @Test
     fun catalogAndSchema() = runBlockingWithTimeout {
         val m = CatalogAndSchema.meta
-        val query = SqlDsl.from(m)
+        val query = QueryDsl.from(m)
         val sql = query.dryRun().sql
         println(sql)
         assertTrue(sql.contains(""" "catalog"."schema"."CATALOG_AND_SCHEMA" """))
@@ -33,7 +33,7 @@ class QuoteTest(val db: R2dbcDatabase) {
     @Test
     fun catalogOnly() = runBlockingWithTimeout {
         val m = CatalogOnly.meta
-        val query = SqlDsl.from(m)
+        val query = QueryDsl.from(m)
         val sql = query.dryRun().sql
         println(sql)
         assertTrue(sql.contains(""" "catalog"."CATALOG_ONLY" """))
@@ -43,7 +43,7 @@ class QuoteTest(val db: R2dbcDatabase) {
     @Test
     fun schemaOnly() = runBlockingWithTimeout {
         val m = SchemaOnly.meta
-        val query = SqlDsl.from(m)
+        val query = QueryDsl.from(m)
         val sql = query.dryRun().sql
         println(sql)
         assertTrue(sql.contains(""" "schema"."SCHEMA_ONLY" """))
@@ -53,7 +53,7 @@ class QuoteTest(val db: R2dbcDatabase) {
     @Test
     fun blankName() = runBlockingWithTimeout {
         val m = BlankName.meta
-        val query = SqlDsl.from(m)
+        val query = QueryDsl.from(m)
         val sql = query.dryRun().sql
         println(sql)
         assertTrue(sql.contains(""" "BLANK_NAME" """))
@@ -63,8 +63,8 @@ class QuoteTest(val db: R2dbcDatabase) {
     @Test
     fun alwaysQuote() = inTransaction(db) {
         val m = Order.meta
-        db.runQuery { SqlDsl.insert(m).single(Order(1, "value")) }
-        val list = db.runQuery { SqlDsl.from(m) }.toList()
+        db.runQuery { QueryDsl.insert(m).single(Order(1, "value")) }
+        val list = db.runQuery { QueryDsl.from(m) }.toList()
         assertEquals(1, list.size)
     }
 }

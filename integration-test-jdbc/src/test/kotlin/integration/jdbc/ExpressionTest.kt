@@ -3,7 +3,7 @@ package integration.jdbc
 import integration.Address
 import integration.meta
 import org.junit.jupiter.api.extension.ExtendWith
-import org.komapper.core.dsl.SqlDsl
+import org.komapper.core.dsl.QueryDsl
 import org.komapper.core.dsl.operator.concat
 import org.komapper.core.dsl.operator.div
 import org.komapper.core.dsl.operator.literal
@@ -28,7 +28,7 @@ class ExpressionTest(private val db: JdbcDatabase) {
     fun plus() {
         val a = Address.meta
         val result = db.runQuery {
-            SqlDsl.from(a)
+            QueryDsl.from(a)
                 .where {
                     a.addressId eq 10
                 }
@@ -44,7 +44,7 @@ class ExpressionTest(private val db: JdbcDatabase) {
     fun plus_other_column() {
         val a = Address.meta
         val result = db.runQuery {
-            SqlDsl.from(a)
+            QueryDsl.from(a)
                 .where {
                     a.addressId eq 10
                 }
@@ -60,7 +60,7 @@ class ExpressionTest(private val db: JdbcDatabase) {
     fun minus() {
         val a = Address.meta
         val result = db.runQuery {
-            SqlDsl.from(a)
+            QueryDsl.from(a)
                 .where {
                     a.addressId eq 10
                 }
@@ -76,7 +76,7 @@ class ExpressionTest(private val db: JdbcDatabase) {
     fun minus_other_column() {
         val a = Address.meta
         val result = db.runQuery {
-            SqlDsl.from(a)
+            QueryDsl.from(a)
                 .where {
                     a.addressId eq 10
                 }
@@ -92,7 +92,7 @@ class ExpressionTest(private val db: JdbcDatabase) {
     fun div() {
         val a = Address.meta
         val result = db.runQuery {
-            SqlDsl.from(a)
+            QueryDsl.from(a)
                 .where {
                     a.addressId eq 10
                 }
@@ -108,7 +108,7 @@ class ExpressionTest(private val db: JdbcDatabase) {
     fun div_other_column() {
         val a = Address.meta
         val result = db.runQuery {
-            SqlDsl.from(a)
+            QueryDsl.from(a)
                 .where {
                     a.addressId eq 10
                 }
@@ -124,7 +124,7 @@ class ExpressionTest(private val db: JdbcDatabase) {
     fun rem() {
         val a = Address.meta
         val result = db.runQuery {
-            SqlDsl.from(a)
+            QueryDsl.from(a)
                 .where {
                     a.addressId eq 10
                 }
@@ -140,7 +140,7 @@ class ExpressionTest(private val db: JdbcDatabase) {
     fun rem_other_column() {
         val a = Address.meta
         val result = db.runQuery {
-            SqlDsl.from(a)
+            QueryDsl.from(a)
                 .where {
                     a.addressId eq 10
                 }
@@ -156,7 +156,7 @@ class ExpressionTest(private val db: JdbcDatabase) {
     fun concat() {
         val a = Address.meta
         val result = db.runQuery {
-            SqlDsl.from(a)
+            QueryDsl.from(a)
                 .where {
                     a.addressId eq 10
                 }
@@ -172,7 +172,7 @@ class ExpressionTest(private val db: JdbcDatabase) {
     fun concat_other_column() {
         val a = Address.meta
         val result = db.runQuery {
-            SqlDsl.from(a)
+            QueryDsl.from(a)
                 .where {
                     a.addressId eq 10
                 }
@@ -188,7 +188,7 @@ class ExpressionTest(private val db: JdbcDatabase) {
     fun lowerFunction() {
         val a = Address.meta
         val result = db.runQuery {
-            SqlDsl.from(a).select(lower(literal("TEST"))).first()
+            QueryDsl.from(a).select(lower(literal("TEST"))).first()
         }
         assertEquals("test", result)
     }
@@ -197,7 +197,7 @@ class ExpressionTest(private val db: JdbcDatabase) {
     fun upperFunction() {
         val a = Address.meta
         val result = db.runQuery {
-            SqlDsl.from(a).select(upper(literal("test"))).first()
+            QueryDsl.from(a).select(upper(literal("test"))).first()
         }
         assertEquals("TEST", result)
     }
@@ -206,7 +206,7 @@ class ExpressionTest(private val db: JdbcDatabase) {
     fun substringFunction() {
         val a = Address.meta
         val result = db.runQuery {
-            SqlDsl.from(a).select(substring(literal("hello world"), 7)).first()
+            QueryDsl.from(a).select(substring(literal("hello world"), 7)).first()
         }
         assertEquals("world", result)
     }
@@ -215,7 +215,7 @@ class ExpressionTest(private val db: JdbcDatabase) {
     fun substringFunction_length() {
         val a = Address.meta
         val result = db.runQuery {
-            SqlDsl.from(a).select(substring(literal("hello world"), 7, 1)).first()
+            QueryDsl.from(a).select(substring(literal("hello world"), 7, 1)).first()
         }
         assertEquals("w", result)
     }
@@ -224,7 +224,7 @@ class ExpressionTest(private val db: JdbcDatabase) {
     fun trimFunction() {
         val a = Address.meta
         val result = db.runQuery {
-            SqlDsl.from(a).select(trim(literal(" test "))).first()
+            QueryDsl.from(a).select(trim(literal(" test "))).first()
         }
         assertEquals("test", result)
     }
@@ -233,7 +233,7 @@ class ExpressionTest(private val db: JdbcDatabase) {
     fun ltrimFunction() {
         val a = Address.meta
         val result = db.runQuery {
-            SqlDsl.from(a).select(ltrim(literal(" test "))).first()
+            QueryDsl.from(a).select(ltrim(literal(" test "))).first()
         }
         assertEquals("test ", result)
     }
@@ -242,7 +242,7 @@ class ExpressionTest(private val db: JdbcDatabase) {
     fun rtrimFunction() {
         val a = Address.meta
         val result = db.runQuery {
-            SqlDsl.from(a).select(rtrim(literal(" test "))).first()
+            QueryDsl.from(a).select(rtrim(literal(" test "))).first()
         }
         assertEquals(" test", result)
     }

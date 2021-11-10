@@ -3,7 +3,7 @@ package integration.r2dbc
 import integration.Address
 import integration.meta
 import org.junit.jupiter.api.extension.ExtendWith
-import org.komapper.core.dsl.SqlDsl
+import org.komapper.core.dsl.QueryDsl
 import org.komapper.core.dsl.operator.concat
 import org.komapper.core.dsl.operator.div
 import org.komapper.core.dsl.operator.literal
@@ -27,7 +27,7 @@ class ExpressionTest(private val db: R2dbcDatabase) {
     fun plus() = inTransaction(db) {
         val a = Address.meta
         val result = db.runQuery {
-            SqlDsl.from(a)
+            QueryDsl.from(a)
                 .where {
                     a.addressId eq 10
                 }
@@ -43,7 +43,7 @@ class ExpressionTest(private val db: R2dbcDatabase) {
     fun plus_other_column() = inTransaction(db) {
         val a = Address.meta
         val result = db.runQuery {
-            SqlDsl.from(a)
+            QueryDsl.from(a)
                 .where {
                     a.addressId eq 10
                 }
@@ -59,7 +59,7 @@ class ExpressionTest(private val db: R2dbcDatabase) {
     fun minus() = inTransaction(db) {
         val a = Address.meta
         val result = db.runQuery {
-            SqlDsl.from(a)
+            QueryDsl.from(a)
                 .where {
                     a.addressId eq 10
                 }
@@ -75,7 +75,7 @@ class ExpressionTest(private val db: R2dbcDatabase) {
     fun minus_other_column() = inTransaction(db) {
         val a = Address.meta
         val result = db.runQuery {
-            SqlDsl.from(a)
+            QueryDsl.from(a)
                 .where {
                     a.addressId eq 10
                 }
@@ -91,7 +91,7 @@ class ExpressionTest(private val db: R2dbcDatabase) {
     fun div() = inTransaction(db) {
         val a = Address.meta
         val result = db.runQuery {
-            SqlDsl.from(a)
+            QueryDsl.from(a)
                 .where {
                     a.addressId eq 10
                 }
@@ -107,7 +107,7 @@ class ExpressionTest(private val db: R2dbcDatabase) {
     fun div_other_column() = inTransaction(db) {
         val a = Address.meta
         val result = db.runQuery {
-            SqlDsl.from(a)
+            QueryDsl.from(a)
                 .where {
                     a.addressId eq 10
                 }
@@ -123,7 +123,7 @@ class ExpressionTest(private val db: R2dbcDatabase) {
     fun rem() = inTransaction(db) {
         val a = Address.meta
         val result = db.runQuery {
-            SqlDsl.from(a)
+            QueryDsl.from(a)
                 .where {
                     a.addressId eq 10
                 }
@@ -139,7 +139,7 @@ class ExpressionTest(private val db: R2dbcDatabase) {
     fun rem_other_column() = inTransaction(db) {
         val a = Address.meta
         val result = db.runQuery {
-            SqlDsl.from(a)
+            QueryDsl.from(a)
                 .where {
                     a.addressId eq 10
                 }
@@ -155,7 +155,7 @@ class ExpressionTest(private val db: R2dbcDatabase) {
     fun concat() = inTransaction(db) {
         val a = Address.meta
         val result = db.runQuery {
-            SqlDsl.from(a)
+            QueryDsl.from(a)
                 .where {
                     a.addressId eq 10
                 }
@@ -171,7 +171,7 @@ class ExpressionTest(private val db: R2dbcDatabase) {
     fun concat_other_column() = inTransaction(db) {
         val a = Address.meta
         val result = db.runQuery {
-            SqlDsl.from(a)
+            QueryDsl.from(a)
                 .where {
                     a.addressId eq 10
                 }
@@ -187,7 +187,7 @@ class ExpressionTest(private val db: R2dbcDatabase) {
     fun lowerFunction() = inTransaction(db) {
         val a = Address.meta
         val result = db.runQuery {
-            SqlDsl.from(a).select(lower(literal("TEST"))).first()
+            QueryDsl.from(a).select(lower(literal("TEST"))).first()
         }
         assertEquals("test", result)
     }
@@ -196,7 +196,7 @@ class ExpressionTest(private val db: R2dbcDatabase) {
     fun upperFunction() = inTransaction(db) {
         val a = Address.meta
         val result = db.runQuery {
-            SqlDsl.from(a).select(upper(literal("test"))).first()
+            QueryDsl.from(a).select(upper(literal("test"))).first()
         }
         assertEquals("TEST", result)
     }
@@ -205,7 +205,7 @@ class ExpressionTest(private val db: R2dbcDatabase) {
     fun trimFunction() = inTransaction(db) {
         val a = Address.meta
         val result = db.runQuery {
-            SqlDsl.from(a).select(trim(literal(" test "))).first()
+            QueryDsl.from(a).select(trim(literal(" test "))).first()
         }
         assertEquals("test", result)
     }
@@ -214,7 +214,7 @@ class ExpressionTest(private val db: R2dbcDatabase) {
     fun ltrimFunction() = inTransaction(db) {
         val a = Address.meta
         val result = db.runQuery {
-            SqlDsl.from(a).select(ltrim(literal(" test "))).first()
+            QueryDsl.from(a).select(ltrim(literal(" test "))).first()
         }
         assertEquals("test ", result)
     }
@@ -223,7 +223,7 @@ class ExpressionTest(private val db: R2dbcDatabase) {
     fun rtrimFunction() = inTransaction(db) {
         val a = Address.meta
         val result = db.runQuery {
-            SqlDsl.from(a).select(rtrim(literal(" test "))).first()
+            QueryDsl.from(a).select(rtrim(literal(" test "))).first()
         }
         assertEquals(" test", result)
     }

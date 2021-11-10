@@ -6,7 +6,7 @@ import integration.IdentityStrategy
 import integration.meta
 import integration.newMeta
 import org.junit.jupiter.api.extension.ExtendWith
-import org.komapper.core.dsl.SqlDsl
+import org.komapper.core.dsl.QueryDsl
 import org.komapper.jdbc.JdbcDatabase
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -22,7 +22,7 @@ class SqlInsertQueryValuesTest(private val db: JdbcDatabase) {
     fun test() {
         val a = Address.meta
         val (count, key) = db.runQuery {
-            SqlDsl.insert(a).values {
+            QueryDsl.insert(a).values {
 
                 a.addressId set 19
                 a.street set "STREET 16"
@@ -37,7 +37,7 @@ class SqlInsertQueryValuesTest(private val db: JdbcDatabase) {
     fun setIfNotNull() {
         val e = Employee.meta
         val (count, key) = db.runQuery {
-            SqlDsl.insert(e).values {
+            QueryDsl.insert(e).values {
                 e.employeeId set 99
                 e.departmentId set 1
                 e.addressId set 1
@@ -52,7 +52,7 @@ class SqlInsertQueryValuesTest(private val db: JdbcDatabase) {
         assertEquals(1, count)
         assertNull(key)
 
-        val employee = db.runQuery { SqlDsl.from(e).where { e.employeeId eq 99 }.first() }
+        val employee = db.runQuery { QueryDsl.from(e).where { e.employeeId eq 99 }.first() }
         assertNull(employee.managerId)
     }
 
@@ -60,7 +60,7 @@ class SqlInsertQueryValuesTest(private val db: JdbcDatabase) {
     fun generatedKeys() {
         val a = IdentityStrategy.meta
         val (count, id) = db.runQuery {
-            SqlDsl.insert(a).values {
+            QueryDsl.insert(a).values {
                 a.id set 10
                 a.value set "test"
             }
@@ -74,8 +74,8 @@ class SqlInsertQueryValuesTest(private val db: JdbcDatabase) {
         val a = Address.meta
         val aa = Address.newMeta(table = "ADDRESS_ARCHIVE")
         val (count) = db.runQuery {
-            SqlDsl.insert(aa).select {
-                SqlDsl.from(a).where { a.addressId between 1..5 }
+            QueryDsl.insert(aa).select {
+                QueryDsl.from(a).where { a.addressId between 1..5 }
             }
         }
         assertEquals(5, count)

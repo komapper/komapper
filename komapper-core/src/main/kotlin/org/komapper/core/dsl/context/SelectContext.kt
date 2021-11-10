@@ -21,6 +21,7 @@ sealed interface SelectContext<
     val offset: Int
     val limit: Int
     val forUpdate: ForUpdate
+    val distinct: Boolean
 
     fun addJoin(join: Join<*, *>): CONTEXT
     fun addWhere(where: List<Criterion>): CONTEXT

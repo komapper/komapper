@@ -4,7 +4,7 @@ import integration.Address
 import integration.Employee
 import integration.meta
 import org.junit.jupiter.api.extension.ExtendWith
-import org.komapper.core.dsl.SqlDsl
+import org.komapper.core.dsl.QueryDsl
 import org.komapper.core.dsl.expression.When
 import org.komapper.core.dsl.operator.case
 import org.komapper.core.dsl.operator.concat
@@ -23,7 +23,7 @@ class SqlSelectQueryTest(private val db: R2dbcDatabase) {
     fun list() = inTransaction(db) {
         val a = Address.meta
         val list: List<Address> = db.runQuery {
-            SqlDsl.from(a)
+            QueryDsl.from(a)
         }.toList()
         assertEquals(15, list.size)
     }
@@ -32,7 +32,7 @@ class SqlSelectQueryTest(private val db: R2dbcDatabase) {
     fun first() = inTransaction(db) {
         val a = Address.meta
         val address: Address = db.runQuery {
-            SqlDsl.from(a).where { a.addressId eq 1 }.first()
+            QueryDsl.from(a).where { a.addressId eq 1 }.first()
         }
         assertNotNull(address)
     }
@@ -41,7 +41,7 @@ class SqlSelectQueryTest(private val db: R2dbcDatabase) {
     fun firstOrNull() = inTransaction(db) {
         val a = Address.meta
         val address: Address? = db.runQuery {
-            SqlDsl.from(a).where { a.addressId eq 99 }.firstOrNull()
+            QueryDsl.from(a).where { a.addressId eq 99 }.firstOrNull()
         }
         assertNull(address)
     }
@@ -49,7 +49,7 @@ class SqlSelectQueryTest(private val db: R2dbcDatabase) {
     @Test
     fun decoupling() = inTransaction(db) {
         val a = Address.meta
-        val query = SqlDsl.from(a)
+        val query = QueryDsl.from(a)
             .where { a.addressId greaterEq 1 }
             .orderBy(a.addressId.desc())
             .limit(2)
@@ -68,7 +68,7 @@ class SqlSelectQueryTest(private val db: R2dbcDatabase) {
     fun option() = inTransaction(db) {
         val e = Employee.meta
         val emp = db.runQuery {
-            SqlDsl.from(e)
+            QueryDsl.from(e)
                 .options {
                     it.copy(
                         fetchSize = 10,
@@ -94,7 +94,7 @@ class SqlSelectQueryTest(private val db: R2dbcDatabase) {
             )
         ) { literal("NO HIT") }
         val list = db.runQuery {
-            SqlDsl.from(a).where { a.addressId inList listOf(1, 2, 3) }
+            QueryDsl.from(a).where { a.addressId inList listOf(1, 2, 3) }
                 .orderBy(a.addressId)
                 .select(a.street, caseExpression)
         }.toList()
@@ -118,7 +118,7 @@ class SqlSelectQueryTest(private val db: R2dbcDatabase) {
             )
         ) { literal("NO HIT") }
         val list = db.runQuery {
-            SqlDsl.from(a).where { a.addressId inList listOf(1, 2, 3) }
+            QueryDsl.from(a).where { a.addressId inList listOf(1, 2, 3) }
                 .orderBy(a.addressId)
                 .select(a.street, caseExpression)
         }.toList()
@@ -138,7 +138,7 @@ class SqlSelectQueryTest(private val db: R2dbcDatabase) {
             )
         )
         val list = db.runQuery {
-            SqlDsl.from(a).where { a.addressId inList listOf(1, 2, 3) }
+            QueryDsl.from(a).where { a.addressId inList listOf(1, 2, 3) }
                 .orderBy(a.addressId)
                 .select(a.street, caseExpression)
         }.toList()

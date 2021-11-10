@@ -3,7 +3,7 @@ package integration.r2dbc
 import integration.Address
 import integration.meta
 import org.junit.jupiter.api.extension.ExtendWith
-import org.komapper.core.dsl.SqlDsl
+import org.komapper.core.dsl.QueryDsl
 import org.komapper.r2dbc.R2dbcDatabase
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -14,14 +14,14 @@ class SqlSelectQueryOffsetLimitTest(private val db: R2dbcDatabase) {
     @Test
     fun offset() = inTransaction(db) {
         val a = Address.meta
-        val list = db.runQuery { SqlDsl.from(a).offset(10) }.toList()
+        val list = db.runQuery { QueryDsl.from(a).offset(10) }.toList()
         assertEquals(5, list.size)
     }
 
     @Test
     fun limit() = inTransaction(db) {
         val a = Address.meta
-        val list = db.runQuery { SqlDsl.from(a).limit(3) }.toList()
+        val list = db.runQuery { QueryDsl.from(a).limit(3) }.toList()
         assertEquals(3, list.size)
     }
 
@@ -29,7 +29,7 @@ class SqlSelectQueryOffsetLimitTest(private val db: R2dbcDatabase) {
     fun offset_limit() = inTransaction(db) {
         val a = Address.meta
         val list = db.runQuery {
-            SqlDsl.from(a)
+            QueryDsl.from(a)
                 .orderBy(a.addressId)
                 .offset(10)
                 .limit(3)

@@ -18,9 +18,9 @@ internal class SelectStatementBuilderSupport(
     private val support = BuilderSupport(dialect, aliasManager, buf)
     private val orderBySupport = OrderByBuilderSupport(dialect, context.orderBy, aliasManager, buf)
 
-    fun selectClause(distinct: Boolean = false) {
+    fun selectClause() {
         buf.append("select ")
-        if (distinct) {
+        if (context.distinct) {
             buf.append("distinct ")
         }
         for (e in context.projection.expressions()) {

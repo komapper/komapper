@@ -4,7 +4,7 @@ import integration.Department
 import integration.Employee
 import integration.meta
 import org.junit.jupiter.api.extension.ExtendWith
-import org.komapper.core.dsl.SqlDsl
+import org.komapper.core.dsl.QueryDsl
 import org.komapper.core.dsl.operator.count
 import org.komapper.core.dsl.operator.max
 import org.komapper.jdbc.JdbcDatabase
@@ -18,8 +18,8 @@ class SqlSelectQuerySubqueryTest(private val db: JdbcDatabase) {
     fun subquery_selectClause() {
         val d = Department.meta
         val e = Employee.meta
-        val subquery = SqlDsl.from(e).where { d.departmentId eq e.departmentId }.select(count())
-        val query = SqlDsl.from(d)
+        val subquery = QueryDsl.from(e).where { d.departmentId eq e.departmentId }.select(count())
+        val query = QueryDsl.from(d)
             .orderBy(d.departmentId)
             .select(d.departmentName, subquery)
         val list = db.runQuery { query }
@@ -31,11 +31,11 @@ class SqlSelectQuerySubqueryTest(private val db: JdbcDatabase) {
     fun subquery_whereClause() {
         val d = Department.meta
         val e = Employee.meta
-        val subquery = SqlDsl.from(d)
+        val subquery = QueryDsl.from(d)
             .where {
                 d.departmentName eq "SALES"
             }.select(max(d.departmentId))
-        val query = SqlDsl.from(e).where {
+        val query = QueryDsl.from(e).where {
             e.departmentId eq subquery
         }
         val list = db.runQuery { query }
