@@ -9,6 +9,7 @@ import org.komapper.annotation.KomapperUpdatedAt
 import org.komapper.annotation.KomapperVersion
 import org.komapper.core.dsl.QueryDsl
 import org.komapper.core.dsl.SchemaDsl
+import org.komapper.core.dsl.query.first
 import org.komapper.jdbc.JdbcDatabase
 import org.komapper.tx.jdbc.withTransaction
 import java.time.LocalDateTime

@@ -11,6 +11,8 @@ import org.komapper.core.ClockProvider
 import org.komapper.core.OptimisticLockException
 import org.komapper.core.UniqueConstraintException
 import org.komapper.core.dsl.QueryDsl
+import org.komapper.core.dsl.query.first
+import org.komapper.core.dsl.query.firstOrNull
 import org.komapper.core.dsl.query.plus
 import org.komapper.r2dbc.R2dbcDatabase
 import org.komapper.r2dbc.R2dbcDatabaseConfig

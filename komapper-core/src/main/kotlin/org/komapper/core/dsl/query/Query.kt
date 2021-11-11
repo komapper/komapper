@@ -1,8 +1,6 @@
 package org.komapper.core.dsl.query
 
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.firstOrNull
 import org.komapper.core.ThreadSafe
 import org.komapper.core.dsl.expression.SortExpression
 import org.komapper.core.dsl.expression.SubqueryExpression
@@ -15,8 +13,6 @@ interface Query<T> {
 }
 
 interface ListQuery<T> : Query<List<T>> {
-    fun first(): Query<T> = collect { it.first() }
-    fun firstOrNull(): Query<T?> = collect { it.firstOrNull() }
     fun <R> collect(collect: suspend (Flow<T>) -> R): Query<R>
 }
 

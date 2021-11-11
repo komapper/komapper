@@ -18,6 +18,8 @@ import org.komapper.core.dsl.operator.concat
 import org.komapper.core.dsl.operator.count
 import org.komapper.core.dsl.operator.max
 import org.komapper.core.dsl.operator.plus
+import org.komapper.core.dsl.query.first
+import org.komapper.core.dsl.query.firstOrNull
 import org.komapper.core.dsl.query.plus
 import org.komapper.jdbc.JdbcDatabase
 import kotlin.test.Test

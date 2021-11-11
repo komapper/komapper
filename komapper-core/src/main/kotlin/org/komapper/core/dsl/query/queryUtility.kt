@@ -1,5 +1,7 @@
 package org.komapper.core.dsl.query
 
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.DryRunDatabaseConfig
 import org.komapper.core.DryRunResult
@@ -86,3 +88,7 @@ fun <T, S> Query<T>.flatZip(transform: (T) -> Query<S>): Query<Pair<T, S>> = obj
         return visitor.flatZipQuery(this@flatZip, transform)
     }
 }
+
+fun <T> ListQuery<T>.first(): Query<T> = collect { it.first() }
+
+fun <T> ListQuery<T>.firstOrNull(): Query<T?> = collect { it.firstOrNull() }

@@ -10,6 +10,7 @@ import org.komapper.core.dsl.operator.count
 import org.komapper.core.dsl.operator.literal
 import org.komapper.core.dsl.operator.substring
 import org.komapper.core.dsl.operator.trim
+import org.komapper.core.dsl.query.first
 import org.komapper.jdbc.JdbcDatabase
 import org.komapper.tx.jdbc.withTransaction
 
