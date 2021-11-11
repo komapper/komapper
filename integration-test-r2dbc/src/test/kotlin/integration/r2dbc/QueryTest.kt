@@ -6,9 +6,15 @@ import integration.meta
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.QueryDsl
 import org.komapper.core.dsl.query.dryRun
+import org.komapper.core.dsl.query.flatMap
+import org.komapper.core.dsl.query.flatZip
+import org.komapper.core.dsl.query.map
+import org.komapper.core.dsl.query.plus
+import org.komapper.core.dsl.query.zip
 import org.komapper.r2dbc.R2dbcDatabase
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 @ExtendWith(Env::class)
 class QueryTest(private val db: R2dbcDatabase) {
@@ -27,6 +33,27 @@ class QueryTest(private val db: R2dbcDatabase) {
         val list = db.runQuery { q1 + q2 + q3 }.toList()
         assertEquals(2, list.size)
         println((q1 + q2 + q3).dryRun())
+    }
+
+    @Test
+    fun map() = inTransaction(db) {
+        val a = Address.meta
+        val query = QueryDsl.from(a).map { it.map { address -> address.copy(version = 100) } }
+        val list = db.runQuery { query }
+        assertTrue(list.all { it.version == 100 })
+    }
+
+    @Test
+    fun zip() = inTransaction(db) {
+        val a = Address.meta
+        val address = Address(16, "STREET 16", 0)
+        val q1 = QueryDsl.insert(a).single(address)
+        val q2 = QueryDsl.from(a)
+        val q3 = q1.zip(q2)
+        val (first, second) = db.runQuery { q3 }
+        assertEquals(address, first)
+        assertEquals(16, second.size)
+        println(q3.dryRun())
     }
 
     @Test

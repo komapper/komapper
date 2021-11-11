@@ -69,6 +69,17 @@ internal object DefaultQueryVisitor : QueryVisitor<Runner> {
         return Runner.Plus(leftRunner, rightRunner)
     }
 
+    override fun <T, S> mapQuery(query: Query<T>, transform: (T) -> S): Runner {
+        val runner = query.accept(this)
+        return Runner.Map(runner)
+    }
+
+    override fun <T, S> zipQuery(left: Query<T>, right: Query<S>): Runner {
+        val leftRunner = left.accept(this)
+        val rightRunner = right.accept(this)
+        return Runner.Zip(leftRunner, rightRunner)
+    }
+
     override fun <T, S> flatMapQuery(query: Query<T>, transform: (T) -> Query<S>): Runner {
         val runner = query.accept(this)
         return Runner.FlatMap(runner)

@@ -8,6 +8,7 @@ import org.komapper.core.dsl.QueryDsl
 import org.komapper.core.dsl.declaration.WhereDeclaration
 import org.komapper.core.dsl.operator.desc
 import org.komapper.core.dsl.operator.plus
+import org.komapper.core.dsl.query.plus
 import org.komapper.r2dbc.R2dbcDatabase
 import kotlin.test.Test
 import kotlin.test.assertEquals

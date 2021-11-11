@@ -15,6 +15,20 @@ interface Runner {
         }
     }
 
+    data class Map(val runner: Runner) : Runner {
+
+        override fun dryRun(config: DatabaseConfig): Statement {
+            return runner.dryRun(config)
+        }
+    }
+
+    data class Zip(val left: Runner, val right: Runner) : Runner {
+
+        override fun dryRun(config: DatabaseConfig): Statement {
+            return left.dryRun(config) + right.dryRun(config)
+        }
+    }
+
     data class FlatMap(val runner: Runner) : Runner {
 
         override fun dryRun(config: DatabaseConfig): Statement {

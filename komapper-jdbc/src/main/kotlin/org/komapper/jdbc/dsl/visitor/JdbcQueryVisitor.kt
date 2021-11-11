@@ -72,6 +72,19 @@ internal object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
     }
 
     @Suppress("UNCHECKED_CAST")
+    override fun <T, S> mapQuery(query: Query<T>, transform: (T) -> S): JdbcRunner<S> {
+        val runner = query.accept(this) as JdbcRunner<T>
+        return JdbcRunner.Map(runner, transform)
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    override fun <T, S> zipQuery(left: Query<T>, right: Query<S>): JdbcRunner<Pair<T, S>> {
+        val leftRunner = left.accept(this) as JdbcRunner<T>
+        val rightRunner = right.accept(this) as JdbcRunner<S>
+        return JdbcRunner.Zip(leftRunner, rightRunner)
+    }
+
+    @Suppress("UNCHECKED_CAST")
     override fun <T, S> flatMapQuery(query: Query<T>, transform: (T) -> Query<S>): JdbcRunner<S> {
         val runner = query.accept(this) as JdbcRunner<T>
         return JdbcRunner.FlatMap(runner) {

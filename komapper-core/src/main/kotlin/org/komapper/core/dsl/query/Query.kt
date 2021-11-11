@@ -12,24 +12,6 @@ import org.komapper.core.dsl.visitor.QueryVisitor
 @ThreadSafe
 interface Query<T> {
     fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT
-
-    operator fun <S> plus(other: Query<S>): Query<S> = object : Query<S> {
-        override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
-            return visitor.plusQuery(this@Query, other)
-        }
-    }
-
-    fun <S> flatMap(transform: (T) -> Query<S>): Query<S> = object : Query<S> {
-        override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
-            return visitor.flatMapQuery(this@Query, transform)
-        }
-    }
-
-    fun <S> flatZip(transform: (T) -> Query<S>): Query<Pair<T, S>> = object : Query<Pair<T, S>> {
-        override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
-            return visitor.flatZipQuery(this@Query, transform)
-        }
-    }
 }
 
 interface ListQuery<T> : Query<List<T>> {

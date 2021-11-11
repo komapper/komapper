@@ -7,6 +7,7 @@ import org.komapper.core.OptimisticLockException
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.VersionOptions
 import org.komapper.core.dsl.visitor.DefaultQueryVisitor
+import org.komapper.core.dsl.visitor.QueryVisitor
 import org.komapper.core.toDryRunResult
 
 internal fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>
@@ -53,5 +54,35 @@ fun Query<*>.dryRun(config: DatabaseConfig = DryRunDatabaseConfig): DryRunResult
         )
     } else {
         result
+    }
+}
+
+operator fun <T, S> Query<T>.plus(other: Query<S>): Query<S> = object : Query<S> {
+    override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
+        return visitor.plusQuery(this@plus, other)
+    }
+}
+
+fun <T, S> Query<T>.map(transform: (T) -> S): Query<S> = object : Query<S> {
+    override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
+        return visitor.mapQuery(this@map, transform)
+    }
+}
+
+fun <T, S> Query<T>.zip(other: Query<S>): Query<Pair<T, S>> = object : Query<Pair<T, S>> {
+    override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
+        return visitor.zipQuery(this@zip, other)
+    }
+}
+
+fun <T, S> Query<T>.flatMap(transform: (T) -> Query<S>): Query<S> = object : Query<S> {
+    override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
+        return visitor.flatMapQuery(this@flatMap, transform)
+    }
+}
+
+fun <T, S> Query<T>.flatZip(transform: (T) -> Query<S>): Query<Pair<T, S>> = object : Query<Pair<T, S>> {
+    override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
+        return visitor.flatZipQuery(this@flatZip, transform)
     }
 }

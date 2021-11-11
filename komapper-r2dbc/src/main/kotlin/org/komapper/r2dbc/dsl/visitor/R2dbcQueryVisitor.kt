@@ -68,6 +68,19 @@ internal object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
     }
 
     @Suppress("UNCHECKED_CAST")
+    override fun <T, S> mapQuery(query: Query<T>, transform: (T) -> S): R2dbcRunner<S> {
+        val runner = query.accept(this) as R2dbcRunner<T>
+        return R2dbcRunner.Map(runner, transform)
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    override fun <T, S> zipQuery(left: Query<T>, right: Query<S>): R2dbcRunner<Pair<T, S>> {
+        val leftRunner = left.accept(this) as R2dbcRunner<T>
+        val rightRunner = right.accept(this) as R2dbcRunner<S>
+        return R2dbcRunner.Zip(leftRunner, rightRunner)
+    }
+
+    @Suppress("UNCHECKED_CAST")
     override fun <T, S> flatMapQuery(query: Query<T>, transform: (T) -> Query<S>): R2dbcRunner<S> {
         val runner = query.accept(this) as R2dbcRunner<T>
         return R2dbcRunner.FlatMap(runner) {
