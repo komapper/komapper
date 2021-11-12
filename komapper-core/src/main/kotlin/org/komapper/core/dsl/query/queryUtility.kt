@@ -59,9 +59,9 @@ fun Query<*>.dryRun(config: DatabaseConfig = DryRunDatabaseConfig): DryRunResult
     }
 }
 
-operator fun <T, S> Query<T>.plus(other: Query<S>): Query<S> = object : Query<S> {
+fun <T, S> Query<T>.andThen(other: Query<S>): Query<S> = object : Query<S> {
     override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
-        return visitor.plusQuery(this@plus, other)
+        return visitor.andThenQuery(this@andThen, other)
     }
 }
 

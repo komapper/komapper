@@ -19,9 +19,9 @@ import org.komapper.core.dsl.operator.concat
 import org.komapper.core.dsl.operator.count
 import org.komapper.core.dsl.operator.max
 import org.komapper.core.dsl.operator.plus
+import org.komapper.core.dsl.query.andThen
 import org.komapper.core.dsl.query.first
 import org.komapper.core.dsl.query.firstOrNull
-import org.komapper.core.dsl.query.plus
 import org.komapper.r2dbc.R2dbcDatabase
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -105,11 +105,11 @@ class ValueClassTest(val db: R2dbcDatabase) {
         val findQuery = QueryDsl.from(p).where { p.personId eq IntId(1) }.first()
         val person1 = VPerson(IntId(1), "ABC")
         val person2 = db.runQuery {
-            QueryDsl.insert(p).single(person1) + findQuery
+            QueryDsl.insert(p).single(person1).andThen(findQuery)
         }
         delay(10)
         val person3 = db.runQuery {
-            QueryDsl.update(p).single(person2.copy(name = "DEF")) + findQuery
+            QueryDsl.update(p).single(person2.copy(name = "DEF")).andThen(findQuery)
         }
         assertNotNull(person2.updatedAt)
         assertNotNull(person3.updatedAt)

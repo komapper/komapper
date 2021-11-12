@@ -11,9 +11,9 @@ import org.komapper.core.ClockProvider
 import org.komapper.core.OptimisticLockException
 import org.komapper.core.UniqueConstraintException
 import org.komapper.core.dsl.QueryDsl
+import org.komapper.core.dsl.query.andThen
 import org.komapper.core.dsl.query.first
 import org.komapper.core.dsl.query.firstOrNull
-import org.komapper.core.dsl.query.plus
 import org.komapper.r2dbc.R2dbcDatabase
 import org.komapper.r2dbc.R2dbcDatabaseConfig
 import java.time.Clock
@@ -54,10 +54,10 @@ class SqlUpdateQuerySingleTest(private val db: R2dbcDatabase) {
         val findQuery = QueryDsl.from(p).where { p.personId eq 1 }.first()
         val person1 = Person(1, "ABC")
         val person2 = db.runQuery {
-            QueryDsl.insert(p).single(person1) + findQuery
+            QueryDsl.insert(p).single(person1).andThen(findQuery)
         }
         val person3 = db.runQuery {
-            QueryDsl.update(p).single(person2.copy(name = "DEF")) + findQuery
+            QueryDsl.update(p).single(person2.copy(name = "DEF")).andThen(findQuery)
         }
         assertNotNull(person2.updatedAt)
         assertNotNull(person3.updatedAt)

@@ -8,7 +8,7 @@ import org.komapper.jdbc.JdbcDatabaseConfig
 internal sealed interface JdbcRunner<T> : Runner {
     fun run(config: JdbcDatabaseConfig): T
 
-    data class Plus<LEFT, RIGHT>(
+    data class AndThen<LEFT, RIGHT>(
         val left: JdbcRunner<LEFT>,
         val right: JdbcRunner<RIGHT>
     ) : JdbcRunner<RIGHT> {

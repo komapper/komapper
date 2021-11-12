@@ -8,7 +8,7 @@ import org.komapper.core.ThreadSafe
 interface Runner {
     fun dryRun(config: DatabaseConfig): Statement
 
-    data class Plus(val left: Runner, val right: Runner) : Runner {
+    data class AndThen(val left: Runner, val right: Runner) : Runner {
 
         override fun dryRun(config: DatabaseConfig): Statement {
             return left.dryRun(config) + right.dryRun(config)

@@ -65,10 +65,10 @@ import org.komapper.jdbc.dsl.runner.TemplateSelectJdbcRunner
 internal object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
 
     @Suppress("UNCHECKED_CAST")
-    override fun <T, S> plusQuery(left: Query<T>, right: Query<S>): JdbcRunner<S> {
+    override fun <T, S> andThenQuery(left: Query<T>, right: Query<S>): JdbcRunner<S> {
         val leftRunner = left.accept(this) as JdbcRunner<T>
         val rightRunner = right.accept(this) as JdbcRunner<S>
-        return JdbcRunner.Plus(leftRunner, rightRunner)
+        return JdbcRunner.AndThen(leftRunner, rightRunner)
     }
 
     @Suppress("UNCHECKED_CAST")

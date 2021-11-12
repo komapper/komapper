@@ -8,7 +8,7 @@ import org.komapper.r2dbc.R2dbcDatabaseConfig
 internal sealed interface R2dbcRunner<T> : Runner {
     suspend fun run(config: R2dbcDatabaseConfig): T
 
-    data class Plus<LEFT, RIGHT>(
+    data class AndThen<LEFT, RIGHT>(
         val left: R2dbcRunner<LEFT>,
         val right: R2dbcRunner<RIGHT>
     ) : R2dbcRunner<RIGHT> {

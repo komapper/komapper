@@ -61,10 +61,10 @@ import org.komapper.r2dbc.dsl.runner.TemplateSelectR2dbcRunner
 internal object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
 
     @Suppress("UNCHECKED_CAST")
-    override fun <T, S> plusQuery(left: Query<T>, right: Query<S>): R2dbcRunner<S> {
+    override fun <T, S> andThenQuery(left: Query<T>, right: Query<S>): R2dbcRunner<S> {
         val leftRunner = left.accept(this) as R2dbcRunner<T>
         val rightRunner = right.accept(this) as R2dbcRunner<S>
-        return R2dbcRunner.Plus(leftRunner, rightRunner)
+        return R2dbcRunner.AndThen(leftRunner, rightRunner)
     }
 
     @Suppress("UNCHECKED_CAST")

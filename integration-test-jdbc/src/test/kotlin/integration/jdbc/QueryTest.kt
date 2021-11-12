@@ -5,11 +5,11 @@ import integration.Employee
 import integration.meta
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.QueryDsl
+import org.komapper.core.dsl.query.andThen
 import org.komapper.core.dsl.query.dryRun
 import org.komapper.core.dsl.query.flatMap
 import org.komapper.core.dsl.query.flatZip
 import org.komapper.core.dsl.query.map
-import org.komapper.core.dsl.query.plus
 import org.komapper.core.dsl.query.zip
 import org.komapper.jdbc.JdbcDatabase
 import kotlin.test.Test
@@ -30,9 +30,9 @@ class QueryTest(private val db: JdbcDatabase) {
             a.version set 0
         }
         val q3 = QueryDsl.from(a).where { a.addressId inList listOf(16, 17) }
-        val list = db.runQuery { q1 + q2 + q3 }
+        val list = db.runQuery { q1.andThen(q2).andThen(q3) }
         assertEquals(2, list.size)
-        println((q1 + q2 + q3).dryRun())
+        println(q1.andThen(q2).andThen(q3).dryRun())
     }
 
     @Test
