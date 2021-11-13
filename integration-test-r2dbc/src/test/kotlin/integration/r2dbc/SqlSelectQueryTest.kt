@@ -10,6 +10,8 @@ import org.komapper.core.dsl.operator.case
 import org.komapper.core.dsl.operator.concat
 import org.komapper.core.dsl.operator.desc
 import org.komapper.core.dsl.operator.literal
+import org.komapper.core.dsl.query.first
+import org.komapper.core.dsl.query.firstOrNull
 import org.komapper.r2dbc.R2dbcDatabase
 import kotlin.test.Test
 import kotlin.test.assertEquals

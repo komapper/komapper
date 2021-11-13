@@ -16,6 +16,7 @@ import org.komapper.core.dsl.operator.rtrim
 import org.komapper.core.dsl.operator.trim
 import org.komapper.core.dsl.operator.upper
 import org.komapper.core.dsl.query.dryRun
+import org.komapper.core.dsl.query.first
 import org.komapper.r2dbc.R2dbcDatabase
 import kotlin.test.Test
 import kotlin.test.assertEquals

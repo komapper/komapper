@@ -8,6 +8,7 @@ import org.komapper.core.dsl.QueryDsl
 import org.komapper.core.dsl.declaration.WhereDeclaration
 import org.komapper.core.dsl.operator.desc
 import org.komapper.core.dsl.operator.plus
+import org.komapper.core.dsl.query.andThen
 import org.komapper.r2dbc.R2dbcDatabase
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -113,7 +114,7 @@ class SqlSelectQueryWhereTest(private val db: R2dbcDatabase) {
             a.street like escape("\\S") + text("%") + escape("T _16%")
         }.orderBy(a.addressId)
         val list = db.runQuery {
-            insertQuery + selectQuery
+            insertQuery.andThen(selectQuery)
         }.toList()
         assertEquals(listOf(16), list.map { it.addressId })
     }
@@ -128,7 +129,7 @@ class SqlSelectQueryWhereTest(private val db: R2dbcDatabase) {
             it.copy(escapeSequence = "|")
         }
         val list = db.runQuery {
-            insertQuery + selectQuery
+            insertQuery.andThen(selectQuery)
         }.toList()
         assertEquals(listOf(16), list.map { it.addressId })
     }
@@ -185,7 +186,7 @@ class SqlSelectQueryWhereTest(private val db: R2dbcDatabase) {
             a.street notLike escape("\\S") + text("%") + escape("T _16%")
         }.orderBy(a.addressId)
         val list = db.runQuery {
-            insertQuery + selectQuery
+            insertQuery.andThen(selectQuery)
         }.toList()
         assertEquals((1..15).toList(), list.map { it.addressId })
     }
@@ -208,7 +209,7 @@ class SqlSelectQueryWhereTest(private val db: R2dbcDatabase) {
         val selectQuery = QueryDsl.from(a).where {
             a.street startsWith "STREET 1%"
         }.orderBy(a.addressId)
-        val list = db.runQuery { insertQuery + selectQuery }.toList()
+        val list = db.runQuery { insertQuery.andThen(selectQuery) }.toList()
         assertEquals(listOf(16), list.map { it.addressId })
     }
 

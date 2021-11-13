@@ -63,10 +63,21 @@ import org.komapper.core.dsl.runner.TemplateSelectRunner
 @ThreadSafe
 internal object DefaultQueryVisitor : QueryVisitor<Runner> {
 
-    override fun <T, S> plusQuery(left: Query<T>, right: Query<S>): Runner {
+    override fun <T, S> andThenQuery(left: Query<T>, right: Query<S>): Runner {
         val leftRunner = left.accept(this)
         val rightRunner = right.accept(this)
-        return Runner.Plus(leftRunner, rightRunner)
+        return Runner.AndThen(leftRunner, rightRunner)
+    }
+
+    override fun <T, S> mapQuery(query: Query<T>, transform: (T) -> S): Runner {
+        val runner = query.accept(this)
+        return Runner.Map(runner)
+    }
+
+    override fun <T, S> zipQuery(left: Query<T>, right: Query<S>): Runner {
+        val leftRunner = left.accept(this)
+        val rightRunner = right.accept(this)
+        return Runner.Zip(leftRunner, rightRunner)
     }
 
     override fun <T, S> flatMapQuery(query: Query<T>, transform: (T) -> Query<S>): Runner {

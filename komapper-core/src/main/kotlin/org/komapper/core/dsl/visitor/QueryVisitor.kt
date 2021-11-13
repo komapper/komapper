@@ -40,7 +40,11 @@ import org.komapper.core.dsl.query.Row
 @ThreadSafe
 interface QueryVisitor<VISIT_RESULT> {
 
-    fun <T, S> plusQuery(left: Query<T>, right: Query<S>): VISIT_RESULT
+    fun <T, S> andThenQuery(left: Query<T>, right: Query<S>): VISIT_RESULT
+
+    fun <T, S> mapQuery(query: Query<T>, transform: (T) -> S): VISIT_RESULT
+
+    fun <T, S> zipQuery(left: Query<T>, right: Query<S>): VISIT_RESULT
 
     fun <T, S> flatMapQuery(query: Query<T>, transform: (T) -> Query<S>): VISIT_RESULT
 

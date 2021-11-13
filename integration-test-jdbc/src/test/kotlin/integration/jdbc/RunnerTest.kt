@@ -4,6 +4,8 @@ import integration.Address
 import integration.meta
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.QueryDsl
+import org.komapper.core.dsl.query.first
+import org.komapper.core.dsl.query.firstOrNull
 import org.komapper.jdbc.JdbcDatabase
 import kotlin.test.Test
 

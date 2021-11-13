@@ -3,6 +3,7 @@ package integration.jdbc
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.ScriptDsl
 import org.komapper.core.dsl.TemplateDsl
+import org.komapper.core.dsl.query.first
 import org.komapper.jdbc.JdbcDatabase
 import kotlin.test.Test
 import kotlin.test.assertEquals

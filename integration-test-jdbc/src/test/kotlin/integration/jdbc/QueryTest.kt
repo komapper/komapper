@@ -5,10 +5,16 @@ import integration.Employee
 import integration.meta
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.QueryDsl
+import org.komapper.core.dsl.query.andThen
 import org.komapper.core.dsl.query.dryRun
+import org.komapper.core.dsl.query.flatMap
+import org.komapper.core.dsl.query.flatZip
+import org.komapper.core.dsl.query.map
+import org.komapper.core.dsl.query.zip
 import org.komapper.jdbc.JdbcDatabase
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 @ExtendWith(Env::class)
 class QueryTest(private val db: JdbcDatabase) {
@@ -24,9 +30,30 @@ class QueryTest(private val db: JdbcDatabase) {
             a.version set 0
         }
         val q3 = QueryDsl.from(a).where { a.addressId inList listOf(16, 17) }
-        val list = db.runQuery { q1 + q2 + q3 }
+        val list = db.runQuery { q1.andThen(q2).andThen(q3) }
         assertEquals(2, list.size)
-        println((q1 + q2 + q3).dryRun())
+        println(q1.andThen(q2).andThen(q3).dryRun())
+    }
+
+    @Test
+    fun map() {
+        val a = Address.meta
+        val query = QueryDsl.from(a).map { it.map { address -> address.copy(version = 100) } }
+        val list = db.runQuery { query }
+        assertTrue(list.all { it.version == 100 })
+    }
+
+    @Test
+    fun zip() {
+        val a = Address.meta
+        val address = Address(16, "STREET 16", 0)
+        val q1 = QueryDsl.insert(a).single(address)
+        val q2 = QueryDsl.from(a)
+        val q3 = q1.zip(q2)
+        val (first, second) = db.runQuery { q3 }
+        assertEquals(address, first)
+        assertEquals(16, second.size)
+        println(q3.dryRun())
     }
 
     @Test

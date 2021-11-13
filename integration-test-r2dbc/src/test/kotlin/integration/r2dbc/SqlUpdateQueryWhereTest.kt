@@ -7,6 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.QueryDsl
 import org.komapper.core.dsl.operator.concat
 import org.komapper.core.dsl.operator.plus
+import org.komapper.core.dsl.query.first
 import org.komapper.r2dbc.R2dbcDatabase
 import kotlin.test.Test
 import kotlin.test.assertEquals

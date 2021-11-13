@@ -7,6 +7,7 @@ import integration.meta
 import integration.newMeta
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.QueryDsl
+import org.komapper.core.dsl.query.first
 import org.komapper.r2dbc.R2dbcDatabase
 import java.math.BigDecimal
 import java.time.LocalDate

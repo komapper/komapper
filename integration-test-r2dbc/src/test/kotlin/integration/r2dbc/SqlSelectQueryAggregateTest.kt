@@ -10,6 +10,7 @@ import org.komapper.core.dsl.operator.count
 import org.komapper.core.dsl.operator.max
 import org.komapper.core.dsl.operator.min
 import org.komapper.core.dsl.operator.sum
+import org.komapper.core.dsl.query.first
 import org.komapper.r2dbc.R2dbcDatabase
 import kotlin.test.Test
 import kotlin.test.assertEquals
