@@ -31,7 +31,7 @@ internal class HavingScopeTest {
         val p2 = PropertyMetamodelStub<Nothing, String>()
         val h1: HavingDeclaration = { p1.eq(1) }
         val h2: HavingDeclaration = { p2.greater("a") }
-        val h3 = h1 and h2
+        val h3 = h1.and(h2)
         val scope = HavingScope().apply(h3)
         assertEquals(2, scope.size)
         assertEquals(Criterion.Eq(Operand.Column(p1), Operand.Argument(p1, 1)), scope[0])
@@ -44,7 +44,7 @@ internal class HavingScopeTest {
         val p2 = PropertyMetamodelStub<Nothing, String>()
         val h1: HavingDeclaration = { p1.eq(1) }
         val h2: HavingDeclaration = { p2.greater("a") }
-        val h3 = h1 or h2
+        val h3 = h1.or(h2)
         val scope = HavingScope().apply(h3)
         assertEquals(2, scope.size)
         assertEquals(Criterion.Eq(Operand.Column(p1), Operand.Argument(p1, 1)), scope[0])

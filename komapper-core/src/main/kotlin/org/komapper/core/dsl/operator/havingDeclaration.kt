@@ -9,14 +9,14 @@ infix operator fun HavingDeclaration.plus(other: HavingDeclaration): HavingDecla
     }
 }
 
-infix fun HavingDeclaration.and(other: HavingDeclaration): HavingDeclaration {
+fun HavingDeclaration.and(other: HavingDeclaration): HavingDeclaration {
     return {
         this@and(this)
         and { other(this) }
     }
 }
 
-infix fun HavingDeclaration.or(other: HavingDeclaration): HavingDeclaration {
+fun HavingDeclaration.or(other: HavingDeclaration): HavingDeclaration {
     return {
         this@or(this)
         or { other(this) }

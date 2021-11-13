@@ -9,14 +9,14 @@ infix operator fun WhenDeclaration.plus(other: WhenDeclaration): WhenDeclaration
     }
 }
 
-infix fun WhenDeclaration.and(other: WhenDeclaration): WhenDeclaration {
+fun WhenDeclaration.and(other: WhenDeclaration): WhenDeclaration {
     return {
         this@and(this)
         and { other(this) }
     }
 }
 
-infix fun WhenDeclaration.or(other: WhenDeclaration): WhenDeclaration {
+fun WhenDeclaration.or(other: WhenDeclaration): WhenDeclaration {
     return {
         this@or(this)
         or { other(this) }

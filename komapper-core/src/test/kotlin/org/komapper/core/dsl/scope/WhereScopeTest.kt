@@ -37,7 +37,7 @@ internal class WhereScopeTest {
         val p2 = PropertyMetamodelStub<Nothing, String>()
         val w1: WhereDeclaration = { p1.eq(1) }
         val w2: WhereDeclaration = { p2.greater("a") }
-        val w3 = w1 and w2
+        val w3 = w1.and(w2)
         val scope = WhereScope().apply(w3)
         assertEquals(2, scope.size)
         assertEquals(Criterion.Eq(Operand.Column(p1), Operand.Argument(p1, 1)), scope[0])
@@ -50,7 +50,7 @@ internal class WhereScopeTest {
         val p2 = PropertyMetamodelStub<Nothing, String>()
         val w1: WhereDeclaration = { p1.eq(1) }
         val w2: WhereDeclaration = { p2.greater("a") }
-        val w3 = w1 or w2
+        val w3 = w1.or(w2)
         val scope = WhereScope().apply(w3)
         assertEquals(2, scope.size)
         assertEquals(Criterion.Eq(Operand.Column(p1), Operand.Argument(p1, 1)), scope[0])
