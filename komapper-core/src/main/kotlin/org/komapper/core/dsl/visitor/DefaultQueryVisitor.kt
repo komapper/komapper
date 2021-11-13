@@ -90,7 +90,7 @@ internal object DefaultQueryVisitor : QueryVisitor<Runner> {
         return Runner.FlatZip(runner)
     }
 
-    override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> entityAggregateQuery(
+    override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> entityContextQuery(
         context: EntitySelectContext<ENTITY, ID, META>,
         options: EntitySelectOptions
     ): Runner {

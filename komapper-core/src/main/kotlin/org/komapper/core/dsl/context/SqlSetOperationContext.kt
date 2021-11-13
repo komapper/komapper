@@ -8,7 +8,7 @@ data class SqlSetOperationContext(
     val left: SubqueryContext,
     val right: SubqueryContext,
     val orderBy: List<SortItem> = listOf()
-) : Context, SubqueryContext {
+) : QueryContext, SubqueryContext {
 
     override fun getEntityMetamodels(): Set<EntityMetamodel<*, *, *>> {
         return visitSubqueryContext(left) + visitSubqueryContext(right)

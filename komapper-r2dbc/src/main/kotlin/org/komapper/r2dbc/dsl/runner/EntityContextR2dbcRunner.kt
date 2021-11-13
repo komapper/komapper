@@ -7,22 +7,22 @@ import org.komapper.core.Statement
 import org.komapper.core.dsl.context.EntitySelectContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.EntitySelectOptions
-import org.komapper.core.dsl.query.EntityAggregate
-import org.komapper.core.dsl.query.EntityAggregateFactory
+import org.komapper.core.dsl.query.EntityContext
+import org.komapper.core.dsl.query.EntityContextFactory
 import org.komapper.core.dsl.runner.EntityKey
 import org.komapper.core.dsl.runner.EntitySelectRunner
 import org.komapper.r2dbc.R2dbcDatabaseConfig
 import org.komapper.r2dbc.R2dbcExecutor
 
-internal class EntityAggregateR2dbcRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+internal class EntityContextR2dbcRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntitySelectContext<ENTITY, ID, META>,
     private val options: EntitySelectOptions,
-) : R2dbcRunner<EntityAggregate<ENTITY>> {
+) : R2dbcRunner<EntityContext<ENTITY>> {
 
     private val runner: EntitySelectRunner = EntitySelectRunner(context, options)
-    private val factory: EntityAggregateFactory<ENTITY, ID, META> = EntityAggregateFactory(context)
+    private val factory: EntityContextFactory<ENTITY, ID, META> = EntityContextFactory(context)
 
-    override suspend fun run(config: R2dbcDatabaseConfig): EntityAggregate<ENTITY> {
+    override suspend fun run(config: R2dbcDatabaseConfig): EntityContext<ENTITY> {
         if (!options.allowEmptyWhereClause && context.where.isEmpty()) {
             error("Empty where clause is not allowed.")
         }

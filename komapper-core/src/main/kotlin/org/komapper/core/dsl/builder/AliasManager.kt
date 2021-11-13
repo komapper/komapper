@@ -1,6 +1,6 @@
 package org.komapper.core.dsl.builder
 
-import org.komapper.core.dsl.context.Context
+import org.komapper.core.dsl.context.QueryContext
 import org.komapper.core.dsl.expression.TableExpression
 
 interface AliasManager {
@@ -8,7 +8,7 @@ interface AliasManager {
     fun getAlias(expression: TableExpression<*>): String?
 }
 
-class DefaultAliasManager(context: Context, private val parent: AliasManager? = null) : AliasManager {
+class DefaultAliasManager(context: QueryContext, private val parent: AliasManager? = null) : AliasManager {
     private val aliasMap: Map<TableExpression<*>, String>
     override val index: Int
 

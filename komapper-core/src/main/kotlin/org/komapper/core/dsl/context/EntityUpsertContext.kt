@@ -18,7 +18,7 @@ data class EntityUpsertContext<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, 
     val duplicateKeyType: DuplicateKeyType,
     val assignmentMap: Map<PropertyMetamodel<ENTITY, *, *>, Operand> = createAssignmentMap(target, excluded),
     val assigned: Boolean = false
-) : Context {
+) : QueryContext {
 
     companion object {
         private fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> createAssignmentMap(

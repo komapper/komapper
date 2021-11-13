@@ -6,7 +6,7 @@ import org.komapper.core.dsl.metamodel.EntityMetamodel
 data class SqlDeleteContext<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     val target: META,
     val where: List<Criterion> = listOf()
-) : Context {
+) : QueryContext {
 
     override fun getEntityMetamodels(): Set<EntityMetamodel<*, *, *>> {
         return setOf(target)

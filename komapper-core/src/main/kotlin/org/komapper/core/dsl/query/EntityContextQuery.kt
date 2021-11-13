@@ -5,15 +5,15 @@ import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.EntitySelectOptions
 import org.komapper.core.dsl.visitor.QueryVisitor
 
-interface EntityAggregateQuery<ENTITY> : Query<EntityAggregate<ENTITY>> {
-    fun include(metamodel: EntityMetamodel<*, *, *>): EntityAggregateQuery<ENTITY>
-    fun options(configure: (EntitySelectOptions) -> EntitySelectOptions): EntityAggregateQuery<ENTITY>
+interface EntityContextQuery<ENTITY> : Query<EntityContext<ENTITY>> {
+    fun include(metamodel: EntityMetamodel<*, *, *>): EntityContextQuery<ENTITY>
+    fun options(configure: (EntitySelectOptions) -> EntitySelectOptions): EntityContextQuery<ENTITY>
 }
 
-internal data class EntityAggregateQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+internal data class EntityContextQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntitySelectContext<ENTITY, ID, META>,
     private val options: EntitySelectOptions
-) : EntityAggregateQuery<ENTITY> {
+) : EntityContextQuery<ENTITY> {
 
     companion object Message {
         fun entityMetamodelNotFound(parameterName: String): String {
@@ -21,23 +21,23 @@ internal data class EntityAggregateQueryImpl<ENTITY : Any, ID, META : EntityMeta
         }
     }
 
-    override fun include(metamodel: EntityMetamodel<*, *, *>): EntityAggregateQuery<ENTITY> {
+    override fun include(metamodel: EntityMetamodel<*, *, *>): EntityContextQuery<ENTITY> {
         val metamodels = context.joins.map { it.target }
         require(metamodel in metamodels) { entityMetamodelNotFound("metamodel") }
         val newContext = context.addProjectionMetamodels(listOf(metamodel))
         return copy(context = newContext)
     }
 
-    fun includeAll(): EntityAggregateQuery<ENTITY> {
+    fun includeAll(): EntityContextQuery<ENTITY> {
         val newContext = context.addProjectionMetamodels(context.joins.map { it.target })
         return copy(context = newContext)
     }
 
-    override fun options(configure: (EntitySelectOptions) -> EntitySelectOptions): EntityAggregateQuery<ENTITY> {
+    override fun options(configure: (EntitySelectOptions) -> EntitySelectOptions): EntityContextQuery<ENTITY> {
         return copy(options = configure(options))
     }
 
     override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
-        return visitor.entityAggregateQuery(context, options)
+        return visitor.entityContextQuery(context, options)
     }
 }

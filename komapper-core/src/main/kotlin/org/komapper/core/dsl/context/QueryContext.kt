@@ -4,6 +4,6 @@ import org.komapper.core.ThreadSafe
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 
 @ThreadSafe
-interface Context {
+interface QueryContext {
     fun getEntityMetamodels(): Set<EntityMetamodel<*, *, *>>
 }

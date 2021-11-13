@@ -9,7 +9,7 @@ data class SqlUpdateContext<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID,
     val target: EntityMetamodel<ENTITY, ID, META>,
     val set: List<Pair<ColumnExpression<*, *>, Operand>> = listOf(),
     val where: List<Criterion> = listOf()
-) : Context {
+) : QueryContext {
 
     override fun getEntityMetamodels(): Set<EntityMetamodel<*, *, *>> {
         return setOf(target)

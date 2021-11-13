@@ -11,7 +11,7 @@ sealed interface SelectContext<
     ENTITY : Any,
     ID,
     META : EntityMetamodel<ENTITY, ID, META>,
-    CONTEXT : SelectContext<ENTITY, ID, META, CONTEXT>> : Context, SubqueryContext {
+    CONTEXT : SelectContext<ENTITY, ID, META, CONTEXT>> : QueryContext, SubqueryContext {
 
     val target: META
     val projection: Projection
