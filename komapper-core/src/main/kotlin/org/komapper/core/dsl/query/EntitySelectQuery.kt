@@ -29,8 +29,8 @@ interface EntitySelectQuery<ENTITY : Any> : FlowSubquery<ENTITY> {
     fun forUpdate(): EntitySelectQuery<ENTITY>
     fun options(configure: (EntitySelectOptions) -> EntitySelectOptions): EntitySelectQuery<ENTITY>
 
-    fun include(metamodel: EntityMetamodel<*, *, *>): EntityAggregateQuery<ENTITY>
-    fun includeAll(): EntityAggregateQuery<ENTITY>
+    fun include(metamodel: EntityMetamodel<*, *, *>): EntityContextQuery<ENTITY>
+    fun includeAll(): EntityContextQuery<ENTITY>
 
     fun groupBy(vararg expressions: ColumnExpression<*, *>): SqlSelectQuery<ENTITY>
     fun having(declaration: HavingDeclaration): SqlSelectQuery<ENTITY>
@@ -116,12 +116,12 @@ internal data class EntitySelectQueryImpl<ENTITY : Any, ID, META : EntityMetamod
         return copy(options = configure(options))
     }
 
-    override fun include(metamodel: EntityMetamodel<*, *, *>): EntityAggregateQuery<ENTITY> {
-        return EntityAggregateQueryImpl(context, options).include(metamodel)
+    override fun include(metamodel: EntityMetamodel<*, *, *>): EntityContextQuery<ENTITY> {
+        return EntityContextQueryImpl(context, options).include(metamodel)
     }
 
-    override fun includeAll(): EntityAggregateQuery<ENTITY> {
-        return EntityAggregateQueryImpl(context, options).includeAll()
+    override fun includeAll(): EntityContextQuery<ENTITY> {
+        return EntityContextQueryImpl(context, options).includeAll()
     }
 
     override fun <R> collect(collect: suspend (Flow<ENTITY>) -> R): Query<R> = object : Query<R> {

@@ -7,7 +7,7 @@ data class EntityUpdateContext<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, 
     val target: META,
     val includedProperties: List<PropertyMetamodel<ENTITY, *, *>> = emptyList(),
     val excludedProperties: List<PropertyMetamodel<ENTITY, *, *>> = emptyList()
-) : Context {
+) : QueryContext {
 
     override fun getEntityMetamodels(): Set<EntityMetamodel<*, *, *>> {
         return setOf(target)

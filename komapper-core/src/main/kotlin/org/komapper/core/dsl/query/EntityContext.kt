@@ -9,22 +9,33 @@ import java.util.concurrent.ConcurrentMap
 import kotlin.reflect.cast
 
 @ThreadSafe
-interface EntityAggregate<ENTITY> {
-    val entities: List<ENTITY>
-    fun hasAssociation(pair: Pair<EntityMetamodel<*, *, *>, EntityMetamodel<*, *, *>>): Boolean
-    fun <T : Any, S : Any> oneToOne(pair: Pair<EntityMetamodel<T, *, *>, EntityMetamodel<S, *, *>>): Map<T, S?>
-    fun <T : Any, S : Any> oneToMany(pair: Pair<EntityMetamodel<T, *, *>, EntityMetamodel<S, *, *>>): Map<T, Set<S>>
+interface EntityContext<ENTITY> {
+    val mainEntities: List<ENTITY>
+    operator fun contains(pair: Pair<EntityMetamodel<*, *, *>, EntityMetamodel<*, *, *>>): Boolean
+    fun <T : Any, S : Any> associate(pair: Pair<EntityMetamodel<T, *, *>, EntityMetamodel<S, *, *>>): OneToMany<T, S>
+    fun <T : Any, S : Any, ID> associateById(pair: Pair<EntityMetamodel<T, ID, *>, EntityMetamodel<S, *, *>>): OneToMany<ID, S>
 }
 
-internal class EntityAggregateImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+@ThreadSafe
+interface OneToOne<T, S> : Map<T, S?>
+
+@ThreadSafe
+interface OneToMany<T, S> : Map<T, Set<S>> {
+    fun asOneToOne(): OneToOne<T, S> {
+        val map = mapValues { it.value.firstOrNull() }
+        return OneToOneImpl(map)
+    }
+}
+
+internal class EntityContextImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntitySelectContext<ENTITY, ID, META>,
     private val rows: List<Map<EntityKey, Any>>,
-) : EntityAggregate<ENTITY> {
+) : EntityContext<ENTITY> {
 
     private val cache: ConcurrentMap<Pair<EntityMetamodel<*, *, *>, EntityMetamodel<*, *, *>>, Map<Any, Set<Any>>> =
         ConcurrentHashMap()
 
-    override val entities: List<ENTITY> by lazy {
+    override val mainEntities: List<ENTITY> by lazy {
         val metamodel = context.target
         rows.asSequence()
             .flatMap { it.values }
@@ -34,27 +45,28 @@ internal class EntityAggregateImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTI
             .toList()
     }
 
-    override fun hasAssociation(pair: Pair<EntityMetamodel<*, *, *>, EntityMetamodel<*, *, *>>): Boolean {
+    override fun contains(pair: Pair<EntityMetamodel<*, *, *>, EntityMetamodel<*, *, *>>): Boolean {
         val metamodels = context.projection.metamodels
         return pair.first in metamodels && pair.second in metamodels
     }
 
-    override fun <T : Any, S : Any> oneToOne(pair: Pair<EntityMetamodel<T, *, *>, EntityMetamodel<S, *, *>>): Map<T, S?> {
-        val oneToMany = oneToMany(pair)
-        return oneToMany.mapValues { it.value.firstOrNull() }
-    }
-
-    override fun <T : Any, S : Any> oneToMany(pair: Pair<EntityMetamodel<T, *, *>, EntityMetamodel<S, *, *>>): Map<T, Set<S>> {
-        return if (hasAssociation(pair)) {
+    override fun <T : Any, S : Any> associate(pair: Pair<EntityMetamodel<T, *, *>, EntityMetamodel<S, *, *>>): OneToMany<T, S> {
+        return if (contains(pair)) {
             val oneToMany = cache.computeIfAbsent(pair) { createOneToMany(it) }
             @Suppress("UNCHECKED_CAST")
-            oneToMany as Map<T, Set<S>>
+            oneToMany as OneToMany<T, S>
         } else {
-            emptyMap()
+            OneToManyImpl(emptyMap())
         }
     }
 
-    private fun createOneToMany(pair: Pair<EntityMetamodel<*, *, *>, EntityMetamodel<*, *, *>>): Map<Any, Set<Any>> {
+    override fun <T : Any, S : Any, ID> associateById(pair: Pair<EntityMetamodel<T, ID, *>, EntityMetamodel<S, *, *>>): OneToMany<ID, S> {
+        val oneToMany = associate(pair)
+        val metamodel = pair.first
+        return OneToManyImpl(oneToMany.mapKeys { metamodel.getId(it.key) })
+    }
+
+    private fun createOneToMany(pair: Pair<EntityMetamodel<*, *, *>, EntityMetamodel<*, *, *>>): OneToMany<Any, Any> {
         val oneToMany = mutableMapOf<Any, MutableSet<Any>>()
         // hold only unique entities
         val pool: MutableMap<EntityKey, Any> = mutableMapOf()
@@ -75,6 +87,10 @@ internal class EntityAggregateImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTI
                 }
             }
         }
-        return oneToMany
+        return OneToManyImpl(oneToMany)
     }
 }
+
+internal class OneToOneImpl<T, S>(private val map: Map<T, S?>) : Map<T, S?> by map, OneToOne<T, S>
+
+internal class OneToManyImpl<T, S>(private val map: Map<T, Set<S>>) : Map<T, Set<S>> by map, OneToMany<T, S>
