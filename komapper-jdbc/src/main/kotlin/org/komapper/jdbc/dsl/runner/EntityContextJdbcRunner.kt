@@ -6,8 +6,7 @@ import org.komapper.core.dsl.context.EntitySelectContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.EntitySelectOptions
 import org.komapper.core.dsl.query.EntityContext
-import org.komapper.core.dsl.query.EntityContextFactory
-import org.komapper.core.dsl.runner.EntityKey
+import org.komapper.core.dsl.runner.EntityContextFactory
 import org.komapper.core.dsl.runner.EntitySelectRunner
 import org.komapper.jdbc.JdbcDatabaseConfig
 import org.komapper.jdbc.JdbcExecutor
@@ -27,17 +26,13 @@ internal class EntityContextJdbcRunner<ENTITY : Any, ID, META : EntityMetamodel<
         val statement = runner.buildStatement(config)
         val executor = JdbcExecutor(config, options)
         val rows = executor.executeQuery(statement) { rs ->
-            val rows = mutableListOf<Map<EntityKey, Any>>()
+            val rows = mutableListOf<Map<EntityMetamodel<*, *, *>, Any>>()
             while (rs.next()) {
-                val row = mutableMapOf<EntityKey, Any>()
+                val row = mutableMapOf<EntityMetamodel<*, *, *>, Any>()
                 val mapper = JdbcEntityMapper(config.dialect, rs)
                 for (metamodel in context.projection.metamodels) {
                     val entity = mapper.execute(metamodel) ?: continue
-                    @Suppress("UNCHECKED_CAST")
-                    metamodel as EntityMetamodel<Any, Any, *>
-                    val id = metamodel.getId(entity)
-                    val key = EntityKey(metamodel, id)
-                    row[key] = entity
+                    row[metamodel] = entity
                 }
                 rows.add(row)
             }

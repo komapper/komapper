@@ -8,8 +8,7 @@ import org.komapper.core.dsl.context.EntitySelectContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.EntitySelectOptions
 import org.komapper.core.dsl.query.EntityContext
-import org.komapper.core.dsl.query.EntityContextFactory
-import org.komapper.core.dsl.runner.EntityKey
+import org.komapper.core.dsl.runner.EntityContextFactory
 import org.komapper.core.dsl.runner.EntitySelectRunner
 import org.komapper.r2dbc.R2dbcDatabaseConfig
 import org.komapper.r2dbc.R2dbcExecutor
@@ -28,16 +27,12 @@ internal class EntityContextR2dbcRunner<ENTITY : Any, ID, META : EntityMetamodel
         }
         val statement = runner.buildStatement(config)
         val executor = R2dbcExecutor(config, options)
-        val rows: Flow<Map<EntityKey, Any>> = executor.executeQuery(statement) { dialect, r2dbcRow ->
-            val row = mutableMapOf<EntityKey, Any>()
+        val rows: Flow<Map<EntityMetamodel<*, *, *>, Any>> = executor.executeQuery(statement) { dialect, r2dbcRow ->
+            val row = mutableMapOf<EntityMetamodel<*, *, *>, Any>()
             val mapper = R2dbcEntityMapper(dialect, r2dbcRow)
             for (metamodel in context.projection.metamodels) {
                 val entity = mapper.execute(metamodel) ?: continue
-                @Suppress("UNCHECKED_CAST")
-                metamodel as EntityMetamodel<Any, Any, *>
-                val id = metamodel.getId(entity)
-                val key = EntityKey(metamodel, id)
-                row[key] = entity
+                row[metamodel] = entity
             }
             row
         }
