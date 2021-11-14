@@ -1,4 +1,4 @@
-package org.komapper.ksp
+package org.komapper.processor
 
 internal object ClassNames {
     const val ConcurrentHashMap = "java.util.concurrent.ConcurrentHashMap"

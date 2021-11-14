@@ -1,4 +1,4 @@
-package org.komapper.ksp
+package org.komapper.processor
 
 import com.google.devtools.ksp.processing.Dependencies
 import com.google.devtools.ksp.processing.Resolver

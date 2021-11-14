@@ -1,4 +1,4 @@
-package org.komapper.ksp
+package org.komapper.processor
 
 import com.tschuchort.compiletesting.KotlinCompilation
 import com.tschuchort.compiletesting.SourceFile

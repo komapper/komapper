@@ -1,4 +1,4 @@
-package org.komapper.ksp
+package org.komapper.processor
 
 internal class EntityModel(
     val config: Config,

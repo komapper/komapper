@@ -1,10 +1,10 @@
-package org.komapper.ksp
+package org.komapper.processor
 
 import com.google.devtools.ksp.symbol.KSClassDeclaration
-import org.komapper.ksp.ClassNames.EntityMetamodelImplementor
-import org.komapper.ksp.ClassNames.EntityMetamodelStub
-import org.komapper.ksp.ClassNames.PropertyMetamodel
-import org.komapper.ksp.ClassNames.PropertyMetamodelStub
+import org.komapper.processor.ClassNames.EntityMetamodelImplementor
+import org.komapper.processor.ClassNames.EntityMetamodelStub
+import org.komapper.processor.ClassNames.PropertyMetamodel
+import org.komapper.processor.ClassNames.PropertyMetamodelStub
 import java.io.PrintWriter
 import java.time.ZonedDateTime
 

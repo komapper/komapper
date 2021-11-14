@@ -1,19 +1,19 @@
-package org.komapper.ksp
+package org.komapper.processor
 
 import com.google.devtools.ksp.symbol.Nullability
-import org.komapper.ksp.ClassNames.AutoIncrement
-import org.komapper.ksp.ClassNames.Clock
-import org.komapper.ksp.ClassNames.ConcurrentHashMap
-import org.komapper.ksp.ClassNames.EntityDescriptor
-import org.komapper.ksp.ClassNames.EntityMetamodel
-import org.komapper.ksp.ClassNames.EntityMetamodelImplementor
-import org.komapper.ksp.ClassNames.IdAssignment
-import org.komapper.ksp.ClassNames.IdContext
-import org.komapper.ksp.ClassNames.PropertyDescriptor
-import org.komapper.ksp.ClassNames.PropertyMetamodel
-import org.komapper.ksp.ClassNames.PropertyMetamodelImpl
-import org.komapper.ksp.ClassNames.Sequence
-import org.komapper.ksp.ClassNames.UUID
+import org.komapper.processor.ClassNames.AutoIncrement
+import org.komapper.processor.ClassNames.Clock
+import org.komapper.processor.ClassNames.ConcurrentHashMap
+import org.komapper.processor.ClassNames.EntityDescriptor
+import org.komapper.processor.ClassNames.EntityMetamodel
+import org.komapper.processor.ClassNames.EntityMetamodelImplementor
+import org.komapper.processor.ClassNames.IdAssignment
+import org.komapper.processor.ClassNames.IdContext
+import org.komapper.processor.ClassNames.PropertyDescriptor
+import org.komapper.processor.ClassNames.PropertyMetamodel
+import org.komapper.processor.ClassNames.PropertyMetamodelImpl
+import org.komapper.processor.ClassNames.Sequence
+import org.komapper.processor.ClassNames.UUID
 import java.io.PrintWriter
 import java.time.ZonedDateTime
 
