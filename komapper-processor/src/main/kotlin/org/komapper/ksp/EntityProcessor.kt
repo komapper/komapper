@@ -11,7 +11,7 @@ import java.io.PrintWriter
 
 internal class EntityProcessor(private val environment: SymbolProcessorEnvironment) : SymbolProcessor {
 
-    private var config: Config = Config.create(environment.options)
+    private val config: Config = Config.create(environment.options)
     private var invoked = false
 
     override fun process(resolver: Resolver): List<KSAnnotated> {
