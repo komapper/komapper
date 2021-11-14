@@ -245,4 +245,24 @@ class SqlSelectQueryJoinTest(private val db: JdbcDatabase) {
         val employees = entityContext.mainEntities
         assertEquals(14, employees.size)
     }
+
+    @Test
+    fun associate_selfJoin() {
+        val e = Employee.meta
+        val m = Employee.newMeta()
+        val entityContext = db.runQuery {
+            QueryDsl.from(m).innerJoin(e) {
+                m.employeeId eq e.managerId
+            }.includeAll()
+        }
+
+        val managers = entityContext.mainEntities
+        assertEquals(6, managers.size)
+        assertEquals(managers.map { it.employeeId }.toSet(), setOf(4, 6, 7, 8, 9, 13))
+
+        assertTrue(entityContext.contains(m to e))
+        val oneToMany = entityContext.associate(m to e)
+        assertTrue(oneToMany.keys.containsAll(managers))
+        assertTrue(managers.containsAll(oneToMany.keys))
+    }
 }
