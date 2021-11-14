@@ -12,12 +12,8 @@ import java.io.PrintWriter
 internal class EntityProcessor(private val environment: SymbolProcessorEnvironment) : SymbolProcessor {
 
     private val config: Config = Config.create(environment.options)
-    private var invoked = false
 
     override fun process(resolver: Resolver): List<KSAnnotated> {
-        if (invoked) {
-            return emptyList()
-        }
         val pairs = listOf(
             KomapperEntityDef::class.qualifiedName!! to SeparateDefinitionSourceResolver(),
             KomapperEntity::class.qualifiedName!! to SelfDefinitionSourceResolver()
@@ -40,7 +36,6 @@ internal class EntityProcessor(private val environment: SymbolProcessorEnvironme
                 generateMetamodel(model)
             }
         }
-        invoked = true
         return emptyList()
     }
 
