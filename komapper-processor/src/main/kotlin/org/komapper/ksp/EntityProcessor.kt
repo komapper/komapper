@@ -27,12 +27,12 @@ internal class EntityProcessor(private val environment: SymbolProcessorEnvironme
             val analyzer = EntityAnalyzer(config, definitionSourceResolver)
             for (symbol in symbols) {
                 val model = when (val result = analyzer.analyze(symbol)) {
-                    is EntityAnalyzerResult.Success -> result.model
-                    is EntityAnalyzerResult.Failure -> {
+                    is EntityAnalysisResult.Success -> result.model
+                    is EntityAnalysisResult.Failure -> {
                         log(result.exit)
                         result.model
                     }
-                    is EntityAnalyzerResult.Error -> {
+                    is EntityAnalysisResult.Error -> {
                         log(result.exit)
                         continue
                     }

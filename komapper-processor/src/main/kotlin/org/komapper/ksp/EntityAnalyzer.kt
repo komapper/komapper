@@ -7,26 +7,26 @@ internal class EntityAnalyzer(
     private val definitionSourceResolver: EntityDefinitionSourceResolver
 ) {
 
-    fun analyze(symbol: KSAnnotated): EntityAnalyzerResult {
+    fun analyze(symbol: KSAnnotated): EntityAnalysisResult {
         val definitionSource = try {
             definitionSourceResolver.resolve(symbol)
         } catch (e: Exit) {
-            return EntityAnalyzerResult.Error(e)
+            return EntityAnalysisResult.Error(e)
         }
         return try {
             val entityDef = EntityDefFactory(config, definitionSource).create()
             val entity = EntityFactory(config, entityDef).create()
             val model = EntityModel(config, definitionSource, entity)
-            EntityAnalyzerResult.Success(model)
+            EntityAnalysisResult.Success(model)
         } catch (e: Exit) {
             val model = EntityModel(config, definitionSource)
-            EntityAnalyzerResult.Failure(model, e)
+            EntityAnalysisResult.Failure(model, e)
         }
     }
 }
 
-internal sealed class EntityAnalyzerResult {
-    data class Success(val model: EntityModel) : EntityAnalyzerResult()
-    data class Failure(val model: EntityModel, val exit: Exit) : EntityAnalyzerResult()
-    data class Error(val exit: Exit) : EntityAnalyzerResult()
+internal sealed class EntityAnalysisResult {
+    data class Success(val model: EntityModel) : EntityAnalysisResult()
+    data class Failure(val model: EntityModel, val exit: Exit) : EntityAnalysisResult()
+    data class Error(val exit: Exit) : EntityAnalysisResult()
 }
