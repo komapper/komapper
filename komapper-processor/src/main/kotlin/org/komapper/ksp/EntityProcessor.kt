@@ -1,11 +1,13 @@
 package org.komapper.ksp
 
+import com.google.devtools.ksp.processing.Dependencies
 import com.google.devtools.ksp.processing.Resolver
 import com.google.devtools.ksp.processing.SymbolProcessor
 import com.google.devtools.ksp.processing.SymbolProcessorEnvironment
 import com.google.devtools.ksp.symbol.KSAnnotated
 import org.komapper.annotation.KomapperEntity
 import org.komapper.annotation.KomapperEntityDef
+import java.io.PrintWriter
 
 internal class EntityProcessor(private val environment: SymbolProcessorEnvironment) : SymbolProcessor {
 
@@ -35,7 +37,7 @@ internal class EntityProcessor(private val environment: SymbolProcessorEnvironme
                         continue
                     }
                 }
-                model.generateMetamodel(environment.codeGenerator)
+                generateMetamodel(model)
             }
         }
         invoked = true
@@ -44,5 +46,37 @@ internal class EntityProcessor(private val environment: SymbolProcessorEnvironme
 
     private fun log(exit: Exit) {
         environment.logger.error(exit.report.message, exit.report.node)
+    }
+
+    private fun generateMetamodel(model: EntityModel) {
+        fun createSimpleName(): String {
+            val defDeclaration = model.definitionSource.defDeclaration
+            val packageName = defDeclaration.packageName.asString()
+            val qualifiedName = defDeclaration.qualifiedName?.asString() ?: ""
+            val packageRemovedQualifiedName = qualifiedName.removePrefix("$packageName.")
+            return config.prefix + packageRemovedQualifiedName.replace(".", "_") + config.suffix
+        }
+
+        val declaration = model.definitionSource.entityDeclaration
+        val packageName = declaration.packageName.asString()
+        val entityQualifiedName = declaration.qualifiedName?.asString() ?: ""
+        val entityTypeName = entityQualifiedName.removePrefix("$packageName.")
+        val simpleName = createSimpleName()
+        val file = declaration.containingFile!!
+        environment.codeGenerator.createNewFile(Dependencies(false, file), packageName, simpleName).use { out ->
+            PrintWriter(out).use {
+                val runnable = if (model.entity != null) {
+                    EntityMetamodelGenerator(
+                        model.entity, packageName, entityTypeName, simpleName, it
+                    )
+                } else {
+                    val defDeclaration = model.definitionSource.defDeclaration
+                    EntityMetamodelStubGenerator(
+                        defDeclaration, declaration, packageName, entityTypeName, simpleName, it
+                    )
+                }
+                runnable.run()
+            }
+        }
     }
 }
