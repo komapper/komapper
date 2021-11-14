@@ -1,25 +1,21 @@
-package org.komapper.ksp
+package org.komapper.processor
 
-import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.Nullability
+import org.komapper.processor.ClassNames.AutoIncrement
+import org.komapper.processor.ClassNames.Clock
+import org.komapper.processor.ClassNames.ConcurrentHashMap
+import org.komapper.processor.ClassNames.EntityDescriptor
+import org.komapper.processor.ClassNames.EntityMetamodel
+import org.komapper.processor.ClassNames.EntityMetamodelImplementor
+import org.komapper.processor.ClassNames.IdAssignment
+import org.komapper.processor.ClassNames.IdContext
+import org.komapper.processor.ClassNames.PropertyDescriptor
+import org.komapper.processor.ClassNames.PropertyMetamodel
+import org.komapper.processor.ClassNames.PropertyMetamodelImpl
+import org.komapper.processor.ClassNames.Sequence
+import org.komapper.processor.ClassNames.UUID
 import java.io.PrintWriter
 import java.time.ZonedDateTime
-
-private const val ConcurrentHashMap = "java.util.concurrent.ConcurrentHashMap"
-private const val EntityMetamodel = "org.komapper.core.dsl.metamodel.EntityMetamodel"
-private const val EntityMetamodelStub = "org.komapper.core.dsl.metamodel.EntityMetamodelStub"
-private const val EntityMetamodelImplementor = "org.komapper.core.dsl.metamodel.EntityMetamodelImplementor"
-private const val IdAssignment = "org.komapper.core.dsl.metamodel.IdAssignment"
-private const val AutoIncrement = "org.komapper.core.dsl.metamodel.IdAssignment.AutoIncrement"
-private const val Sequence = "org.komapper.core.dsl.metamodel.IdAssignment.Sequence"
-private const val IdContext = "org.komapper.core.dsl.metamodel.IdContext"
-private const val UUID = "java.util.UUID"
-private const val PropertyDescriptor = "org.komapper.core.dsl.metamodel.PropertyDescriptor"
-private const val PropertyMetamodel = "org.komapper.core.dsl.metamodel.PropertyMetamodel"
-private const val PropertyMetamodelImpl = "org.komapper.core.dsl.metamodel.PropertyMetamodelImpl"
-private const val PropertyMetamodelStub = "org.komapper.core.dsl.metamodel.PropertyMetamodelStub"
-private const val Clock = "java.time.Clock"
-private const val EntityDescriptor = "__EntityDescriptor"
 
 internal class EntityMetamodelGenerator(
     private val entity: Entity,
@@ -44,12 +40,13 @@ internal class EntityMetamodelGenerator(
     }
 
     override fun run() {
+        w.println("@file:Suppress(\"ClassName\", \"PrivatePropertyName\", \"UNUSED_PARAMETER\", \"unused\", \"RemoveRedundantQualifierName\", \"MemberVisibilityCanBePrivate\", \"RedundantNullableReturnType\")")
+
         if (packageName.isNotEmpty()) {
             w.println("package $packageName")
             w.println()
         }
         w.println("// generated at ${ZonedDateTime.now()}")
-        w.println("@Suppress(\"ClassName\", \"PrivatePropertyName\", \"UNUSED_PARAMETER\")")
         w.println("@$EntityMetamodelImplementor")
         w.println("class $simpleName private constructor($constructorParamList) : $EntityMetamodel<$entityTypeName, $idTypeName, $simpleName> {")
         w.println("    private val __tableName = table")
@@ -166,7 +163,7 @@ internal class EntityMetamodelGenerator(
             val (p, idKind) = pair
             val assignment = when (idKind) {
                 is IdKind.AutoIncrement -> {
-                    "$AutoIncrement<$entityTypeName, $idTypeName>(::toId, $p)"
+                    "$AutoIncrement(::toId, $p)"
                 }
                 is IdKind.Sequence -> {
                     val paramList = listOf(
@@ -181,7 +178,7 @@ internal class EntityMetamodelGenerator(
                         "${idKind.incrementBy}",
                         "__disableSequenceAssignment"
                     ).joinToString(", ")
-                    "$Sequence<$entityTypeName, $idTypeName>($paramList)"
+                    "$Sequence($paramList)"
                 }
             }
             w.println(assignment)
@@ -212,7 +209,7 @@ internal class EntityMetamodelGenerator(
         w.println("    override fun properties(): List<$PropertyMetamodel<$entityTypeName, *, *>> = listOf($nameList)")
     }
 
-    fun toId() {
+    private fun toId() {
         val body = if (entity.idProperties.size == 1) {
             val p = entity.idProperties[0]
             val id = when (p.valueClass?.property?.typeName ?: p.typeName) {
@@ -228,7 +225,7 @@ internal class EntityMetamodelGenerator(
         w.println("    override fun toId(generatedKey: Long): $idTypeName? = $body")
     }
 
-    fun getId() {
+    private fun getId() {
         val body = if (entity.idProperties.size == 1) {
             val p = entity.idProperties[0]
             val nullable = p.nullability == Nullability.NULLABLE
@@ -321,7 +318,8 @@ internal class EntityMetamodelGenerator(
     }
 
     private fun newMeta() {
-        val paramList = "table: String, catalog: String, schema: String, alwaysQuote: Boolean, disableSequenceAssignment: Boolean"
+        val paramList =
+            "table: String, catalog: String, schema: String, alwaysQuote: Boolean, disableSequenceAssignment: Boolean"
         w.println("    override fun newMeta($paramList) = $simpleName(table, catalog, schema, alwaysQuote, disableSequenceAssignment)")
     }
 
@@ -337,51 +335,5 @@ internal class EntityMetamodelGenerator(
         w.println("")
         w.println("val $companionObjectName.meta get() = $simpleName.meta")
         w.println("fun $companionObjectName.newMeta($constructorParamList) = $simpleName.newMeta(table, catalog, schema, alwaysQuote, disableSequenceAssignment)")
-    }
-}
-
-internal class EntityMetamodelStubGenerator(
-    private val defDeclaration: KSClassDeclaration,
-    private val declaration: KSClassDeclaration,
-    private val packageName: String,
-    private val entityTypeName: String,
-    private val simpleName: String,
-    private val w: PrintWriter
-) : Runnable {
-    private val constructorParamList = listOf(
-        "table: String = \"\"",
-        "catalog: String = \"\"",
-        "schema: String = \"\"",
-        "alwaysQuote: Boolean = false"
-    ).joinToString(", ")
-
-    override fun run() {
-        if (packageName.isNotEmpty()) {
-            w.println("package $packageName")
-            w.println()
-        }
-        w.println("// generated at ${ZonedDateTime.now()}")
-        w.println("@Suppress(\"ClassName\")")
-        w.println("@$EntityMetamodelImplementor")
-        w.println("class $simpleName : $EntityMetamodelStub<$entityTypeName, $simpleName>() {")
-        val parameters = declaration.primaryConstructor?.parameters
-        if (parameters != null) {
-            for (p in parameters) {
-                val typeName = p.type.resolve().declaration.qualifiedName?.asString()
-                w.println("    val $p: $PropertyMetamodel<$entityTypeName, $typeName, $typeName> = $PropertyMetamodelStub<$entityTypeName, $typeName>()")
-            }
-        }
-        w.println("    companion object {")
-        w.println("        val meta = $simpleName()")
-        w.println("        fun newMeta($constructorParamList) = $simpleName()")
-        w.println("    }")
-        w.println("}")
-        val companionObject = defDeclaration.getCompanionObject()
-        if (companionObject != null) {
-            val companionObjectName = (companionObject.qualifiedName ?: companionObject.simpleName).asString()
-            w.println("")
-            w.println("val $companionObjectName.meta get() = $simpleName.meta")
-            w.println("fun $companionObjectName.newMeta($constructorParamList) = $simpleName.newMeta(table, catalog, schema, alwaysQuote)")
-        }
     }
 }

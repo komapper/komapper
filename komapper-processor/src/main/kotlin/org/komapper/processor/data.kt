@@ -1,4 +1,4 @@
-package org.komapper.ksp
+package org.komapper.processor
 
 import com.google.devtools.ksp.isPrivate
 import com.google.devtools.ksp.symbol.KSAnnotation
@@ -7,7 +7,7 @@ import com.google.devtools.ksp.symbol.KSPropertyDeclaration
 import com.google.devtools.ksp.symbol.KSValueParameter
 import com.google.devtools.ksp.symbol.Nullability
 
-data class EntityDefinitionSource(
+internal data class EntityDefinitionSource(
     val defDeclaration: KSClassDeclaration,
     val entityDeclaration: KSClassDeclaration
 )

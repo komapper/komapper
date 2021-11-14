@@ -1,4 +1,4 @@
-package org.komapper.ksp
+package org.komapper.processor
 
 import org.komapper.core.CamelToLowerSnakeCase
 import org.komapper.core.CamelToUpperSnakeCase
