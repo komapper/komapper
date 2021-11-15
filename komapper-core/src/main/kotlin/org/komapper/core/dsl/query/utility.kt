@@ -8,6 +8,7 @@ import org.komapper.core.DryRunResult
 import org.komapper.core.OptimisticLockException
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.VersionOptions
+import org.komapper.core.dsl.scope.WhereScope
 import org.komapper.core.dsl.visitor.DefaultQueryVisitor
 import org.komapper.core.dsl.visitor.QueryVisitor
 import org.komapper.core.toDryRunResult
@@ -92,3 +93,14 @@ fun <T, S> Query<T>.flatZip(transform: (T) -> Query<S>): Query<Pair<T, S>> = obj
 fun <T> ListQuery<T>.first(): Query<T> = collect { it.first() }
 
 fun <T> ListQuery<T>.firstOrNull(): Query<T?> = collect { it.firstOrNull() }
+
+fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> META.where(declaration: WhereScope.(META) -> Unit): META {
+    return newMeta(
+        table = tableName(),
+        catalog = catalogName(),
+        schema = schemaName(),
+        alwaysQuote = alwaysQuote(),
+        disableSequenceAssignment = false,
+        where = declaration
+    )
+}

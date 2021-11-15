@@ -9,6 +9,7 @@ import org.komapper.core.dsl.declaration.WhereDeclaration
 import org.komapper.core.dsl.operator.desc
 import org.komapper.core.dsl.operator.plus
 import org.komapper.core.dsl.query.andThen
+import org.komapper.core.dsl.query.where
 import org.komapper.jdbc.JdbcDatabase
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -511,6 +512,13 @@ class SqlSelectQueryWhereTest(private val db: JdbcDatabase) {
             a.version eq 1
         }
         val list = db.runQuery { QueryDsl.from(a).where(w1 + w2) }
+        assertEquals(1, list.size)
+    }
+
+    @Test
+    fun defaultWhere() {
+        val a = Address.meta.where { it.addressId eq 1 }
+        val list = db.runQuery { QueryDsl.from(a) }
         assertEquals(1, list.size)
     }
 }

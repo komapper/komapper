@@ -55,9 +55,10 @@ internal class SelectStatementBuilderSupport(
     }
 
     fun whereClause() {
-        if (context.where.isNotEmpty()) {
+        val where = context.target.where() + context.where
+        if (where.isNotEmpty()) {
             buf.append(" where ")
-            for ((index, criterion) in context.where.withIndex()) {
+            for ((index, criterion) in where.withIndex()) {
                 criterion(index, criterion)
                 buf.append(" and ")
             }

@@ -1,7 +1,9 @@
 package org.komapper.core.dsl.metamodel
 
 import org.komapper.core.ThreadSafe
+import org.komapper.core.dsl.expression.Criterion
 import org.komapper.core.dsl.expression.TableExpression
+import org.komapper.core.dsl.scope.WhereScope
 import java.time.Clock
 import kotlin.reflect.KClass
 
@@ -19,7 +21,14 @@ interface EntityMetamodel<ENTITY : Any, ID, out META : EntityMetamodel<ENTITY, I
     fun preUpdate(e: ENTITY, c: Clock): ENTITY
     fun postUpdate(e: ENTITY): ENTITY
     fun newEntity(m: Map<PropertyMetamodel<*, *, *>, Any?>): ENTITY
-    fun newMeta(table: String, catalog: String, schema: String, alwaysQuote: Boolean, disableSequenceAssignment: Boolean): META
+    fun newMeta(
+        table: String,
+        catalog: String,
+        schema: String,
+        alwaysQuote: Boolean,
+        disableSequenceAssignment: Boolean,
+        where: WhereScope.(META) -> Unit
+    ): META
 }
 
 @Suppress("unused")
@@ -30,6 +39,7 @@ abstract class EntityMetamodelStub<ENTITY : Any, META : EntityMetamodelStub<ENTI
     override fun catalogName(): String = fail()
     override fun schemaName(): String = fail()
     override fun alwaysQuote(): Boolean = fail()
+    override fun where(): List<Criterion> = fail()
     override fun idAssignment(): IdAssignment<ENTITY>? = fail()
     override fun idProperties(): List<PropertyMetamodel<ENTITY, *, *>> = fail()
     override fun versionProperty(): PropertyMetamodel<ENTITY, *, *>? = fail()
@@ -42,7 +52,14 @@ abstract class EntityMetamodelStub<ENTITY : Any, META : EntityMetamodelStub<ENTI
     override fun preInsert(e: ENTITY, c: Clock): ENTITY = fail()
     override fun preUpdate(e: ENTITY, c: Clock): ENTITY = fail()
     override fun postUpdate(e: ENTITY): ENTITY = fail()
-    override fun newMeta(table: String, catalog: String, schema: String, alwaysQuote: Boolean, disableSequenceAssignment: Boolean): META = fail()
+    override fun newMeta(
+        table: String,
+        catalog: String,
+        schema: String,
+        alwaysQuote: Boolean,
+        disableSequenceAssignment: Boolean,
+        where: WhereScope.(META) -> Unit
+    ): META = fail()
 
     private fun fail(): Nothing {
         error("Fix google/ksp compile errors.")
