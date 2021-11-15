@@ -1,11 +1,11 @@
 package org.komapper.core.dsl.context
 
+import org.komapper.core.dsl.declaration.HavingDeclaration
 import org.komapper.core.dsl.declaration.WhereDeclaration
 import org.komapper.core.dsl.element.ForUpdate
 import org.komapper.core.dsl.element.Join
 import org.komapper.core.dsl.element.Projection
 import org.komapper.core.dsl.expression.ColumnExpression
-import org.komapper.core.dsl.expression.Criterion
 import org.komapper.core.dsl.expression.SortItem
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 
@@ -20,7 +20,7 @@ data class SqlSelectContext<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID,
     override val forUpdate: ForUpdate = ForUpdate(),
     override val distinct: Boolean = false,
     val groupBy: List<ColumnExpression<*, *>> = listOf(),
-    val having: List<Criterion> = listOf(),
+    val having: List<HavingDeclaration> = listOf(),
 ) : SelectContext<ENTITY, ID, META, SqlSelectContext<ENTITY, ID, META>> {
 
     fun setProjection(vararg expressions: ColumnExpression<*, *>): SqlSelectContext<ENTITY, ID, META> {

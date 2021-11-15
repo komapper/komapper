@@ -12,7 +12,6 @@ import org.komapper.core.dsl.expression.SortExpression
 import org.komapper.core.dsl.expression.SubqueryExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.SqlSelectOptions
-import org.komapper.core.dsl.scope.HavingScope
 import org.komapper.core.dsl.visitor.FlowQueryVisitor
 import org.komapper.core.dsl.visitor.QueryVisitor
 
@@ -96,8 +95,7 @@ internal data class SqlSelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<
     }
 
     override fun having(declaration: HavingDeclaration): SqlSelectQuery<ENTITY> {
-        val scope = HavingScope().apply(declaration)
-        val newContext = context.copy(having = context.having + scope)
+        val newContext = context.copy(having = context.having + declaration)
         return copy(context = newContext)
     }
 

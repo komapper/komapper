@@ -2,11 +2,13 @@ package org.komapper.core.dsl.builder
 
 import org.komapper.core.dsl.context.SelectContext
 import org.komapper.core.dsl.context.SqlDeleteContext
+import org.komapper.core.dsl.context.SqlSelectContext
 import org.komapper.core.dsl.context.SqlUpdateContext
 import org.komapper.core.dsl.declaration.WhereDeclaration
 import org.komapper.core.dsl.element.Join
 import org.komapper.core.dsl.expression.Criterion
 import org.komapper.core.dsl.metamodel.EntityMetamodel
+import org.komapper.core.dsl.scope.HavingScope
 import org.komapper.core.dsl.scope.OnScope
 import org.komapper.core.dsl.scope.WhereScope
 
@@ -30,4 +32,8 @@ private fun where(metamodel: EntityMetamodel<*, *, *>, where: List<WhereDeclarat
 
 internal fun Join<*, *>.on(): List<Criterion> {
     return OnScope().apply { on() }
+}
+
+internal fun SqlSelectContext<*, *, *>.having(): List<Criterion> {
+    return HavingScope().apply { having.forEach { it() } }
 }

@@ -62,9 +62,10 @@ class SqlSelectStatementBuilder(
     }
 
     private fun havingClause() {
-        if (context.having.isNotEmpty()) {
+        val having = context.having()
+        if (having.isNotEmpty()) {
             buf.append(" having ")
-            for ((index, criterion) in context.having.withIndex()) {
+            for ((index, criterion) in having.withIndex()) {
                 criterion(index, criterion)
                 buf.append(" and ")
             }
