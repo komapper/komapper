@@ -41,9 +41,10 @@ internal class SelectStatementBuilderSupport(
                     buf.append(" left outer join ")
                 }
                 table(join.target)
-                if (join.on.isNotEmpty()) {
+                val on = join.on()
+                if (on.isNotEmpty()) {
                     buf.append(" on (")
-                    for ((index, criterion) in join.on.withIndex()) {
+                    for ((index, criterion) in on.withIndex()) {
                         criterion(index, criterion)
                         buf.append(" and ")
                     }
@@ -55,7 +56,7 @@ internal class SelectStatementBuilderSupport(
     }
 
     fun whereClause() {
-        val where = context.target.where() + context.where
+        val where = context.where()
         if (where.isNotEmpty()) {
             buf.append(" where ")
             for ((index, criterion) in where.withIndex()) {

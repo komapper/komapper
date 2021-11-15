@@ -30,9 +30,10 @@ class SqlUpdateStatementBuilder<ENTITY : Any, ID, META : EntityMetamodel<ENTITY,
             buf.append(", ")
         }
         buf.cutBack(2)
-        if (context.where.isNotEmpty()) {
+        val where = context.where()
+        if (where.isNotEmpty()) {
             buf.append(" where ")
-            for ((index, criterion) in context.where.withIndex()) {
+            for ((index, criterion) in where.withIndex()) {
                 criterion(index, criterion)
                 buf.append(" and ")
             }

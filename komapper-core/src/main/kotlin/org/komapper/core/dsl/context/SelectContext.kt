@@ -1,9 +1,9 @@
 package org.komapper.core.dsl.context
 
+import org.komapper.core.dsl.declaration.WhereDeclaration
 import org.komapper.core.dsl.element.ForUpdate
 import org.komapper.core.dsl.element.Join
 import org.komapper.core.dsl.element.Projection
-import org.komapper.core.dsl.expression.Criterion
 import org.komapper.core.dsl.expression.SortItem
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 
@@ -16,7 +16,7 @@ sealed interface SelectContext<
     val target: META
     val projection: Projection
     val joins: List<Join<*, *>>
-    val where: List<Criterion>
+    val where: List<WhereDeclaration>
     val orderBy: List<SortItem>
     val offset: Int
     val limit: Int
@@ -24,7 +24,7 @@ sealed interface SelectContext<
     val distinct: Boolean
 
     fun addJoin(join: Join<*, *>): CONTEXT
-    fun addWhere(where: List<Criterion>): CONTEXT
+    fun addWhere(where: WhereDeclaration): CONTEXT
     fun addOrderBy(orderBy: List<SortItem>): CONTEXT
     fun setLimit(limit: Int): CONTEXT
     fun setOffset(offset: Int): CONTEXT

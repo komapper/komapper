@@ -6,7 +6,6 @@ import org.komapper.core.dsl.declaration.WhereDeclaration
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.SqlUpdateOptions
 import org.komapper.core.dsl.scope.SetScope
-import org.komapper.core.dsl.scope.WhereScope
 import org.komapper.core.dsl.visitor.QueryVisitor
 
 interface SqlUpdateQuery<ENTITY : Any> : Query<Int> {
@@ -27,8 +26,7 @@ internal data class SqlUpdateQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<
     }
 
     override fun where(declaration: WhereDeclaration): SqlUpdateQuery<ENTITY> {
-        val scope = WhereScope().apply(declaration)
-        val newContext = context.copy(where = context.where + scope)
+        val newContext = context.copy(where = context.where + declaration)
         return copy(context = newContext)
     }
 

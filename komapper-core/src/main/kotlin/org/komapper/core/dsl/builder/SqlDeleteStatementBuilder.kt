@@ -23,9 +23,10 @@ class SqlDeleteStatementBuilder<ENTITY : Any, ID, META : EntityMetamodel<ENTITY,
     fun build(): Statement {
         buf.append("delete from ")
         table(context.target)
-        if (context.where.isNotEmpty()) {
+        val where = context.where()
+        if (where.isNotEmpty()) {
             buf.append(" where ")
-            for ((index, criterion) in context.where.withIndex()) {
+            for ((index, criterion) in where.withIndex()) {
                 criterion(index, criterion)
                 buf.append(" and ")
             }

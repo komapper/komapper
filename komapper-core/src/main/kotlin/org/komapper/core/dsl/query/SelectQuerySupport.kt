@@ -10,8 +10,6 @@ import org.komapper.core.dsl.expression.SortExpression
 import org.komapper.core.dsl.expression.SortItem
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.ForUpdateOptions
-import org.komapper.core.dsl.scope.OnScope
-import org.komapper.core.dsl.scope.WhereScope
 
 internal class SelectQuerySupport<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>, CONTEXT : SelectContext<ENTITY, ID, META, CONTEXT>>(
     private val context: CONTEXT
@@ -36,17 +34,12 @@ internal class SelectQuerySupport<ENTITY : Any, ID, META : EntityMetamodel<ENTIT
         declaration: OnDeclaration,
         kind: JoinKind
     ): CONTEXT {
-        val scope = OnScope().apply(declaration)
-        if (scope.isNotEmpty()) {
-            val join = Join(metamodel, kind, scope.toList())
-            return context.addJoin(join)
-        }
-        return context
+        val join = Join(metamodel, kind, declaration)
+        return context.addJoin(join)
     }
 
     fun where(declaration: WhereDeclaration): CONTEXT {
-        val scope = WhereScope().apply(declaration)
-        return context.addWhere(scope)
+        return context.addWhere(declaration)
     }
 
     fun orderBy(vararg expressions: SortExpression): CONTEXT {

@@ -1,9 +1,9 @@
 package org.komapper.core.dsl.context
 
+import org.komapper.core.dsl.declaration.WhereDeclaration
 import org.komapper.core.dsl.element.ForUpdate
 import org.komapper.core.dsl.element.Join
 import org.komapper.core.dsl.element.Projection
-import org.komapper.core.dsl.expression.Criterion
 import org.komapper.core.dsl.expression.SortItem
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 
@@ -11,7 +11,7 @@ data class EntitySelectContext<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, 
     override val target: META,
     override val projection: Projection.Metamodels = Projection.Metamodels(listOf(target)),
     override val joins: List<Join<*, *>> = listOf(),
-    override val where: List<Criterion> = listOf(),
+    override val where: List<WhereDeclaration> = listOf(),
     override val orderBy: List<SortItem> = listOf(),
     override val offset: Int = -1,
     override val limit: Int = -1,
@@ -23,7 +23,7 @@ data class EntitySelectContext<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, 
         return copy(joins = this.joins + join)
     }
 
-    override fun addWhere(where: List<Criterion>): EntitySelectContext<ENTITY, ID, META> {
+    override fun addWhere(where: WhereDeclaration): EntitySelectContext<ENTITY, ID, META> {
         return copy(where = this.where + where)
     }
 
