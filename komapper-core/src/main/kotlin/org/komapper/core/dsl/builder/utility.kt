@@ -43,10 +43,10 @@ internal fun SqlSelectContext<*, *, *>.having(): List<Criterion> {
     return HavingScope().apply { having.forEach { it() } }
 }
 
-internal fun <ENTITY: Any> SqlUpdateContext<ENTITY, *, *>.set(): List<Pair<PropertyMetamodel<ENTITY, *, *>, Operand>> {
+internal fun <ENTITY : Any> SqlUpdateContext<ENTITY, *, *>.set(): List<Pair<PropertyMetamodel<ENTITY, *, *>, Operand>> {
     return SetScope<ENTITY>().apply { set.forEach { it() } }
 }
 
-internal fun <ENTITY : Any> Values.Declarations.pairs(): List<Pair<PropertyMetamodel<ENTITY, *, *>, Operand>> {
+internal fun <ENTITY : Any> Values.Declarations<ENTITY>.pairs(): List<Pair<PropertyMetamodel<ENTITY, *, *>, Operand>> {
     return ValuesScope<ENTITY>().apply { declarations.forEach { it() } }
 }

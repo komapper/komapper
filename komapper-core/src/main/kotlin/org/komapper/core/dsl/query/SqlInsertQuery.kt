@@ -20,8 +20,6 @@ internal data class SqlInsertQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<
 ) : SqlInsertQuery<ENTITY, ID> {
 
     override fun values(declaration: ValuesDeclaration<ENTITY>): SqlInsertQuery<ENTITY, ID> {
-        @Suppress("UNCHECKED_CAST")
-        declaration as ValuesDeclaration<*>
         val values = when (val values = context.values) {
             is Values.Declarations -> Values.Declarations(values.declarations + declaration)
             is Values.Subquery -> Values.Declarations(listOf(declaration))
@@ -32,7 +30,7 @@ internal data class SqlInsertQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<
 
     override fun <T : Any> select(block: () -> SubqueryExpression<T>): SqlInsertQuery<ENTITY, ID> {
         val subquery = block()
-        val values = Values.Subquery(subquery)
+        val values = Values.Subquery<ENTITY>(subquery)
         val newContext = context.copy(values = values)
         return copy(context = newContext)
     }
