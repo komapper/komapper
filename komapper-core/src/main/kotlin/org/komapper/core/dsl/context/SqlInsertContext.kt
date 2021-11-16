@@ -5,7 +5,7 @@ import org.komapper.core.dsl.metamodel.EntityMetamodel
 
 data class SqlInsertContext<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     val target: META,
-    val values: Values = Values.Pairs(emptyList())
+    val values: Values = Values.Declarations(emptyList())
 ) : QueryContext {
 
     override fun getEntityMetamodels(): Set<EntityMetamodel<*, *, *>> {

@@ -24,9 +24,10 @@ class SqlInsertStatementBuilder<ENTITY : Any, ID, META : EntityMetamodel<ENTITY,
         buf.append("insert into ")
         table(target)
         when (val values = context.values) {
-            is Values.Pairs -> {
+            is Values.Declarations -> {
                 buf.append(" (")
-                for (property in values.pairs.map { it.first }) {
+                val pairs = values.pairs<ENTITY>()
+                for (property in pairs.map { it.first }) {
                     if (property.isAutoIncrement()) {
                         continue
                     }
@@ -35,7 +36,7 @@ class SqlInsertStatementBuilder<ENTITY : Any, ID, META : EntityMetamodel<ENTITY,
                 }
                 buf.cutBack(2)
                 buf.append(") values (")
-                for ((property, operand) in values.pairs) {
+                for ((property, operand) in pairs) {
                     if (property.isAutoIncrement()) {
                         continue
                     }
