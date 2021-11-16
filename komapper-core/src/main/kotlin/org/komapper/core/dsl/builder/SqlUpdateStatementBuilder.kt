@@ -23,7 +23,8 @@ class SqlUpdateStatementBuilder<ENTITY : Any, ID, META : EntityMetamodel<ENTITY,
         buf.append("update ")
         table(context.target)
         buf.append(" set ")
-        for ((left, right) in context.set) {
+        val set = context.set()
+        for ((left, right) in set) {
             column(left)
             buf.append(" = ")
             operand(right)

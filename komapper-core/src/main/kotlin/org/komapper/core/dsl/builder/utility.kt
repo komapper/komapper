@@ -13,6 +13,7 @@ import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.metamodel.PropertyMetamodel
 import org.komapper.core.dsl.scope.HavingScope
 import org.komapper.core.dsl.scope.OnScope
+import org.komapper.core.dsl.scope.SetScope
 import org.komapper.core.dsl.scope.ValuesScope
 import org.komapper.core.dsl.scope.WhereScope
 
@@ -40,6 +41,10 @@ internal fun Join<*, *>.on(): List<Criterion> {
 
 internal fun SqlSelectContext<*, *, *>.having(): List<Criterion> {
     return HavingScope().apply { having.forEach { it() } }
+}
+
+internal fun <ENTITY: Any> SqlUpdateContext<ENTITY, *, *>.set(): List<Pair<PropertyMetamodel<ENTITY, *, *>, Operand>> {
+    return SetScope<ENTITY>().apply { set.forEach { it() } }
 }
 
 internal fun <ENTITY : Any> Values.Declarations.pairs(): List<Pair<PropertyMetamodel<ENTITY, *, *>, Operand>> {

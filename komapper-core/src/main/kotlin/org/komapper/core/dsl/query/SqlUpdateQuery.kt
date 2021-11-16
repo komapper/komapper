@@ -20,8 +20,7 @@ internal data class SqlUpdateQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<
 ) : SqlUpdateQuery<ENTITY> {
 
     override fun set(declaration: SetDeclaration<ENTITY>): SqlUpdateQuery<ENTITY> {
-        val scope = SetScope<ENTITY>().apply(declaration)
-        val newContext = context.copy(set = context.set + scope)
+        val newContext = context.copy(set = context.set + declaration)
         return copy(context = newContext)
     }
 
