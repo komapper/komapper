@@ -2,6 +2,7 @@ package org.komapper.core.dsl.context
 
 import org.komapper.core.dsl.declaration.WhereDeclaration
 import org.komapper.core.dsl.metamodel.EntityMetamodel
+import org.komapper.core.dsl.metamodel.where
 
 data class SqlDeleteContext<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     val target: META,
@@ -10,5 +11,9 @@ data class SqlDeleteContext<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID,
 
     override fun getEntityMetamodels(): Set<EntityMetamodel<*, *, *>> {
         return setOf(target)
+    }
+
+    override fun getWhereDeclarations(): List<WhereDeclaration> {
+        return target.where + where
     }
 }

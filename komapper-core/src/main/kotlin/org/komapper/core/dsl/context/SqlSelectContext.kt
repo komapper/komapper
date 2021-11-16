@@ -12,7 +12,7 @@ import org.komapper.core.dsl.metamodel.EntityMetamodel
 data class SqlSelectContext<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     override val target: META,
     override val projection: Projection = Projection.Metamodels(listOf(target)),
-    override val joins: List<Join<*, *>> = listOf(),
+    override val joins: List<Join<*, *, *>> = listOf(),
     override val where: List<WhereDeclaration> = listOf(),
     override val orderBy: List<SortItem> = listOf(),
     override val offset: Int = -1,
@@ -31,7 +31,7 @@ data class SqlSelectContext<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID,
         return copy(projection = Projection.Metamodels(metamodels.toList()))
     }
 
-    override fun addJoin(join: Join<*, *>): SqlSelectContext<ENTITY, ID, META> {
+    override fun addJoin(join: Join<*, *, *>): SqlSelectContext<ENTITY, ID, META> {
         return copy(joins = this.joins + join)
     }
 

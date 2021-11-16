@@ -1,14 +1,13 @@
 package org.komapper.core.dsl.metamodel
 
 import org.komapper.core.ThreadSafe
-import org.komapper.core.dsl.expression.Criterion
 import org.komapper.core.dsl.expression.TableExpression
-import org.komapper.core.dsl.scope.WhereScope
 import java.time.Clock
 import kotlin.reflect.KClass
 
 @ThreadSafe
-interface EntityMetamodel<ENTITY : Any, ID, out META : EntityMetamodel<ENTITY, ID, META>> : TableExpression<ENTITY> {
+interface EntityMetamodel<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> : TableExpression<ENTITY> {
+    fun declarations(): List<MetamodelDeclaration<ENTITY, ID, META>>
     fun idAssignment(): IdAssignment<ENTITY>?
     fun idProperties(): List<PropertyMetamodel<ENTITY, *, *>>
     fun versionProperty(): PropertyMetamodel<ENTITY, *, *>?
@@ -27,7 +26,7 @@ interface EntityMetamodel<ENTITY : Any, ID, out META : EntityMetamodel<ENTITY, I
         schema: String,
         alwaysQuote: Boolean,
         disableSequenceAssignment: Boolean,
-        where: WhereScope.(META) -> Unit
+        declarations: List<MetamodelDeclaration<ENTITY, ID, META>>
     ): META
 }
 
@@ -39,7 +38,7 @@ abstract class EntityMetamodelStub<ENTITY : Any, META : EntityMetamodelStub<ENTI
     override fun catalogName(): String = fail()
     override fun schemaName(): String = fail()
     override fun alwaysQuote(): Boolean = fail()
-    override fun where(): List<Criterion> = fail()
+    override fun declarations(): List<MetamodelDeclaration<ENTITY, Any, META>> = fail()
     override fun idAssignment(): IdAssignment<ENTITY>? = fail()
     override fun idProperties(): List<PropertyMetamodel<ENTITY, *, *>> = fail()
     override fun versionProperty(): PropertyMetamodel<ENTITY, *, *>? = fail()
@@ -58,7 +57,7 @@ abstract class EntityMetamodelStub<ENTITY : Any, META : EntityMetamodelStub<ENTI
         schema: String,
         alwaysQuote: Boolean,
         disableSequenceAssignment: Boolean,
-        where: WhereScope.(META) -> Unit
+        declarations: List<MetamodelDeclaration<ENTITY, Any, META>>
     ): META = fail()
 
     private fun fail(): Nothing {

@@ -17,7 +17,7 @@ internal class SqlUpdateJdbcRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTI
     private val runner: SqlUpdateRunner<ENTITY, ID, META> = SqlUpdateRunner(context, options)
 
     override fun run(config: JdbcDatabaseConfig): Int {
-        if (!options.allowEmptyWhereClause && context.where.isEmpty()) {
+        if (!options.allowEmptyWhereClause && context.getWhereDeclarations().isEmpty()) {
             error("Empty where clause is not allowed.")
         }
         val statement = runner.buildStatement(config)

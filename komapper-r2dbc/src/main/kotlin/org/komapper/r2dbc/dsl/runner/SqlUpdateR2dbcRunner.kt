@@ -17,7 +17,7 @@ internal class SqlUpdateR2dbcRunner<ENTITY : Any, ID, META : EntityMetamodel<ENT
     private val runner: SqlUpdateRunner<ENTITY, ID, META> = SqlUpdateRunner(context, options)
 
     override suspend fun run(config: R2dbcDatabaseConfig): Int {
-        if (!options.allowEmptyWhereClause && context.where.isEmpty()) {
+        if (!options.allowEmptyWhereClause && context.getWhereDeclarations().isEmpty()) {
             error("Empty where clause is not allowed.")
         }
         val statement = runner.buildStatement(config)

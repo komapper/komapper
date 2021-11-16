@@ -5,6 +5,7 @@ import org.komapper.core.Statement
 import org.komapper.core.StatementBuffer
 import org.komapper.core.dsl.context.EntityDeleteContext
 import org.komapper.core.dsl.expression.ColumnExpression
+import org.komapper.core.dsl.expression.Criterion
 import org.komapper.core.dsl.expression.TableExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.VersionOptions
@@ -32,8 +33,13 @@ class EntityDeleteStatementBuilder<ENTITY : Any, ID, META : EntityMetamodel<ENTI
         val versionRequired = versionProperty != null && !option.ignoreVersion
         buf.append("delete from ")
         table(target)
-        if (identityProperties.isNotEmpty() || versionRequired) {
+        val criteria = context.getWhereCriteria()
+        if (criteria.isNotEmpty() || identityProperties.isNotEmpty() || versionRequired) {
             buf.append(" where ")
+            for ((index, criterion) in criteria.withIndex()) {
+                criterion(index, criterion)
+                buf.append(" and ")
+            }
             if (identityProperties.isNotEmpty()) {
                 for (p in identityProperties) {
                     column(p)
@@ -61,5 +67,9 @@ class EntityDeleteStatementBuilder<ENTITY : Any, ID, META : EntityMetamodel<ENTI
 
     private fun column(expression: ColumnExpression<*, *>) {
         support.visitColumnExpression(expression)
+    }
+
+    private fun criterion(index: Int, c: Criterion) {
+        support.visitCriterion(index, c)
     }
 }

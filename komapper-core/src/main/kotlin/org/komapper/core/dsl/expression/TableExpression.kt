@@ -10,7 +10,6 @@ interface TableExpression<T : Any> {
     fun catalogName(): String
     fun schemaName(): String
     fun alwaysQuote(): Boolean
-    fun where(): List<Criterion>
     fun getCanonicalTableName(enquote: (String) -> String): String {
         val transform = if (alwaysQuote()) {
             enquote

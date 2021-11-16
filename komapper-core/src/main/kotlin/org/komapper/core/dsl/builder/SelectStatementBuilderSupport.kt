@@ -41,10 +41,10 @@ internal class SelectStatementBuilderSupport(
                     buf.append(" left outer join ")
                 }
                 table(join.target)
-                val on = join.on()
-                if (on.isNotEmpty()) {
+                val criteria = join.getOnCriteria()
+                if (criteria.isNotEmpty()) {
                     buf.append(" on (")
-                    for ((index, criterion) in on.withIndex()) {
+                    for ((index, criterion) in criteria.withIndex()) {
                         criterion(index, criterion)
                         buf.append(" and ")
                     }
@@ -56,10 +56,10 @@ internal class SelectStatementBuilderSupport(
     }
 
     fun whereClause() {
-        val where = context.where()
-        if (where.isNotEmpty()) {
+        val criteria = context.getWhereCriteria()
+        if (criteria.isNotEmpty()) {
             buf.append(" where ")
-            for ((index, criterion) in where.withIndex()) {
+            for ((index, criterion) in criteria.withIndex()) {
                 criterion(index, criterion)
                 buf.append(" and ")
             }
@@ -98,16 +98,16 @@ internal class SelectStatementBuilderSupport(
 
 internal class OrderByBuilderSupport(
     private val dialect: Dialect,
-    private val orderBy: List<SortItem>,
+    private val sortItems: List<SortItem>,
     aliasManager: AliasManager,
     private val buf: StatementBuffer
 ) {
     private val support = BuilderSupport(dialect, aliasManager, buf)
 
     fun orderByClause() {
-        if (orderBy.isNotEmpty()) {
+        if (sortItems.isNotEmpty()) {
             buf.append(" order by ")
-            for (item in orderBy) {
+            for (item in sortItems) {
                 when (item) {
                     is SortItem.Column -> {
                         val appendColumn = { column(item.expression) }

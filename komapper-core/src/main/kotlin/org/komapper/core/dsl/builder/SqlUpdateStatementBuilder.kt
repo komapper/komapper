@@ -23,18 +23,18 @@ class SqlUpdateStatementBuilder<ENTITY : Any, ID, META : EntityMetamodel<ENTITY,
         buf.append("update ")
         table(context.target)
         buf.append(" set ")
-        val set = context.set()
-        for ((left, right) in set) {
+        val assignments = context.getAssignments()
+        for ((left, right) in assignments) {
             column(left)
             buf.append(" = ")
             operand(right)
             buf.append(", ")
         }
         buf.cutBack(2)
-        val where = context.where()
-        if (where.isNotEmpty()) {
+        val criteria = context.getWhereCriteria()
+        if (criteria.isNotEmpty()) {
             buf.append(" where ")
-            for ((index, criterion) in where.withIndex()) {
+            for ((index, criterion) in criteria.withIndex()) {
                 criterion(index, criterion)
                 buf.append(" and ")
             }
