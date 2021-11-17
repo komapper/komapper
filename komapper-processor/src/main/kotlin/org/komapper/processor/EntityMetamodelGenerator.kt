@@ -9,6 +9,7 @@ import org.komapper.processor.ClassNames.EntityMetamodel
 import org.komapper.processor.ClassNames.EntityMetamodelImplementor
 import org.komapper.processor.ClassNames.IdAssignment
 import org.komapper.processor.ClassNames.IdContext
+import org.komapper.processor.ClassNames.MetamodelDeclaration
 import org.komapper.processor.ClassNames.PropertyDescriptor
 import org.komapper.processor.ClassNames.PropertyMetamodel
 import org.komapper.processor.ClassNames.PropertyMetamodelImpl
@@ -25,19 +26,20 @@ internal class EntityMetamodelGenerator(
     private val w: PrintWriter
 ) : Runnable {
 
+    private val idTypeName: String = if (entity.idProperties.size == 1) {
+        entity.idProperties[0].typeName
+    } else {
+        "List<Any>"
+    }
+
     private val constructorParamList = listOf(
         "table: String = \"${entity.table.name}\"",
         "catalog: String = \"${entity.table.catalog}\"",
         "schema: String = \"${entity.table.schema}\"",
         "alwaysQuote: Boolean = ${entity.table.alwaysQuote}",
         "disableSequenceAssignment: Boolean = false",
+        "declarations: List<$MetamodelDeclaration<$entityTypeName, $idTypeName, $simpleName>> = emptyList()"
     ).joinToString(", ")
-
-    private val idTypeName: String = if (entity.idProperties.size == 1) {
-        entity.idProperties[0].typeName
-    } else {
-        "List<Any>"
-    }
 
     override fun run() {
         w.println("@file:Suppress(\"ClassName\", \"PrivatePropertyName\", \"UNUSED_PARAMETER\", \"unused\", \"RemoveRedundantQualifierName\", \"MemberVisibilityCanBePrivate\", \"RedundantNullableReturnType\")")
@@ -54,6 +56,7 @@ internal class EntityMetamodelGenerator(
         w.println("    private val __schemaName = schema")
         w.println("    private val __alwaysQuote = alwaysQuote")
         w.println("    private val __disableSequenceAssignment = disableSequenceAssignment")
+        w.println("    private val __declarations = declarations")
 
         entityDescriptor()
 
@@ -64,6 +67,7 @@ internal class EntityMetamodelGenerator(
         catalogName()
         schemaName()
         alwaysQuote()
+        declarations()
 
         idAssignment()
         idProperties()
@@ -145,6 +149,10 @@ internal class EntityMetamodelGenerator(
 
     private fun alwaysQuote() {
         w.println("    override fun alwaysQuote() = __alwaysQuote")
+    }
+
+    private fun declarations() {
+        w.println("    override fun declarations() = __declarations")
     }
 
     private fun idAssignment() {
@@ -319,14 +327,14 @@ internal class EntityMetamodelGenerator(
 
     private fun newMeta() {
         val paramList =
-            "table: String, catalog: String, schema: String, alwaysQuote: Boolean, disableSequenceAssignment: Boolean"
-        w.println("    override fun newMeta($paramList) = $simpleName(table, catalog, schema, alwaysQuote, disableSequenceAssignment)")
+            "table: String, catalog: String, schema: String, alwaysQuote: Boolean, disableSequenceAssignment: Boolean, declarations: List<$MetamodelDeclaration<$entityTypeName, $idTypeName, $simpleName>>"
+        w.println("    override fun newMeta($paramList) = $simpleName(table, catalog, schema, alwaysQuote, disableSequenceAssignment, declarations)")
     }
 
     private fun companionObject() {
         w.println("    companion object {")
         w.println("        val meta = $simpleName()")
-        w.println("        fun newMeta($constructorParamList) = $simpleName(table, catalog, schema, alwaysQuote, disableSequenceAssignment)")
+        w.println("        fun newMeta($constructorParamList) = $simpleName(table, catalog, schema, alwaysQuote, disableSequenceAssignment, declarations)")
         w.println("    }")
     }
 
@@ -334,6 +342,6 @@ internal class EntityMetamodelGenerator(
         val companionObjectName = (entity.companionObject.qualifiedName ?: entity.companionObject.simpleName).asString()
         w.println("")
         w.println("val $companionObjectName.meta get() = $simpleName.meta")
-        w.println("fun $companionObjectName.newMeta($constructorParamList) = $simpleName.newMeta(table, catalog, schema, alwaysQuote, disableSequenceAssignment)")
+        w.println("fun $companionObjectName.newMeta($constructorParamList) = $simpleName.newMeta(table, catalog, schema, alwaysQuote, disableSequenceAssignment, declarations)")
     }
 }

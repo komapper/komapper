@@ -12,15 +12,22 @@ import org.komapper.core.dsl.expression.SortExpression
 import org.komapper.core.dsl.expression.SubqueryExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.SqlSelectOptions
-import org.komapper.core.dsl.scope.HavingScope
 import org.komapper.core.dsl.visitor.FlowQueryVisitor
 import org.komapper.core.dsl.visitor.QueryVisitor
 
 interface SqlSelectQuery<ENTITY : Any> : FlowSubquery<ENTITY> {
 
     fun distinct(): SqlSelectQuery<ENTITY>
-    fun innerJoin(metamodel: EntityMetamodel<*, *, *>, on: OnDeclaration): SqlSelectQuery<ENTITY>
-    fun leftJoin(metamodel: EntityMetamodel<*, *, *>, on: OnDeclaration): SqlSelectQuery<ENTITY>
+    fun <ENTITY2 : Any, ID2, META2 : EntityMetamodel<ENTITY2, ID2, META2>> innerJoin(
+        metamodel: META2,
+        on: OnDeclaration
+    ): SqlSelectQuery<ENTITY>
+
+    fun <ENTITY2 : Any, ID2, META2 : EntityMetamodel<ENTITY2, ID2, META2>> leftJoin(
+        metamodel: META2,
+        on: OnDeclaration
+    ): SqlSelectQuery<ENTITY>
+
     fun where(declaration: WhereDeclaration): SqlSelectQuery<ENTITY>
     fun groupBy(vararg expressions: ColumnExpression<*, *>): SqlSelectQuery<ENTITY>
     fun having(declaration: HavingDeclaration): SqlSelectQuery<ENTITY>
@@ -75,12 +82,18 @@ internal data class SqlSelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<
         return copy(context = newContext)
     }
 
-    override fun innerJoin(metamodel: EntityMetamodel<*, *, *>, on: OnDeclaration): SqlSelectQuery<ENTITY> {
+    override fun <ENTITY2 : Any, ID2, META2 : EntityMetamodel<ENTITY2, ID2, META2>> innerJoin(
+        metamodel: META2,
+        on: OnDeclaration
+    ): SqlSelectQuery<ENTITY> {
         val newContext = support.innerJoin(metamodel, on)
         return copy(context = newContext)
     }
 
-    override fun leftJoin(metamodel: EntityMetamodel<*, *, *>, on: OnDeclaration): SqlSelectQuery<ENTITY> {
+    override fun <ENTITY2 : Any, ID2, META2 : EntityMetamodel<ENTITY2, ID2, META2>> leftJoin(
+        metamodel: META2,
+        on: OnDeclaration
+    ): SqlSelectQuery<ENTITY> {
         val newContext = support.leftJoin(metamodel, on)
         return copy(context = newContext)
     }
@@ -96,8 +109,7 @@ internal data class SqlSelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<
     }
 
     override fun having(declaration: HavingDeclaration): SqlSelectQuery<ENTITY> {
-        val scope = HavingScope().apply(declaration)
-        val newContext = context.copy(having = context.having + scope)
+        val newContext = context.copy(having = context.having + declaration)
         return copy(context = newContext)
     }
 

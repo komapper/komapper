@@ -1,12 +1,11 @@
 package org.komapper.core.dsl.element
 
 import org.komapper.core.ThreadSafe
-import org.komapper.core.dsl.expression.Operand
+import org.komapper.core.dsl.declaration.ValuesDeclaration
 import org.komapper.core.dsl.expression.SubqueryExpression
-import org.komapper.core.dsl.metamodel.PropertyMetamodel
 
 @ThreadSafe
-sealed class Values {
-    data class Pairs(val pairs: List<Pair<PropertyMetamodel<*, *, *>, Operand>>) : Values()
-    data class Subquery(val expression: SubqueryExpression<*>) : Values()
+sealed class Values<ENTITY : Any> {
+    data class Declarations<ENTITY : Any>(val declarations: List<ValuesDeclaration<ENTITY>>) : Values<ENTITY>()
+    data class Subquery<ENTITY : Any>(val expression: SubqueryExpression<*>) : Values<ENTITY>()
 }

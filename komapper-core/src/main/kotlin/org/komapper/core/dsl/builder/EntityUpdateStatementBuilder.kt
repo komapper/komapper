@@ -5,6 +5,7 @@ import org.komapper.core.Statement
 import org.komapper.core.StatementBuffer
 import org.komapper.core.dsl.context.EntityUpdateContext
 import org.komapper.core.dsl.expression.ColumnExpression
+import org.komapper.core.dsl.expression.Criterion
 import org.komapper.core.dsl.expression.TableExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.VersionOptions
@@ -15,9 +16,8 @@ class EntityUpdateStatementBuilder<ENTITY : Any, ID, META : EntityMetamodel<ENTI
     val option: VersionOptions,
     val entity: ENTITY
 ) {
-    private val aliasManager = DefaultAliasManager(context)
     private val buf = StatementBuffer()
-    private val support = BuilderSupport(dialect, aliasManager, buf)
+    private val support = BuilderSupport(dialect, EmptyAliasManager, buf)
 
     fun build(): Statement {
         val target = context.target
@@ -36,9 +36,14 @@ class EntityUpdateStatementBuilder<ENTITY : Any, ID, META : EntityMetamodel<ENTI
             buf.append(", ")
         }
         buf.cutBack(2)
+        val criteria = context.getWhereCriteria()
         val versionRequired = versionProperty != null && !option.ignoreVersion
-        if (idProperties.isNotEmpty() || versionRequired) {
+        if (criteria.isNotEmpty() || idProperties.isNotEmpty() || versionRequired) {
             buf.append(" where ")
+            for ((index, criterion) in criteria.withIndex()) {
+                criterion(index, criterion)
+                buf.append(" and ")
+            }
             if (idProperties.isNotEmpty()) {
                 for (p in idProperties) {
                     column(p)
@@ -67,5 +72,9 @@ class EntityUpdateStatementBuilder<ENTITY : Any, ID, META : EntityMetamodel<ENTI
     private fun column(expression: ColumnExpression<*, *>) {
         val name = expression.getCanonicalColumnName(dialect::enquote)
         buf.append(name)
+    }
+
+    private fun criterion(index: Int, c: Criterion) {
+        support.visitCriterion(index, c)
     }
 }

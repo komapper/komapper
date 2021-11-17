@@ -4,7 +4,6 @@ import org.komapper.core.dsl.context.SqlDeleteContext
 import org.komapper.core.dsl.declaration.WhereDeclaration
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.SqlDeleteOptions
-import org.komapper.core.dsl.scope.WhereScope
 import org.komapper.core.dsl.visitor.QueryVisitor
 
 interface SqlDeleteQuery : Query<Int> {
@@ -18,8 +17,7 @@ internal data class SqlDeleteQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<
 ) : SqlDeleteQuery {
 
     override fun where(declaration: WhereDeclaration): SqlDeleteQuery {
-        val scope = WhereScope().apply(declaration)
-        val newContext = context.copy(where = context.where + scope)
+        val newContext = context.copy(where = context.where + declaration)
         return copy(context = newContext)
     }
 

@@ -6,7 +6,6 @@ import org.komapper.core.dsl.element.Values
 import org.komapper.core.dsl.expression.SubqueryExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.SqlInsertOptions
-import org.komapper.core.dsl.scope.ValuesScope
 import org.komapper.core.dsl.visitor.QueryVisitor
 
 interface SqlInsertQuery<ENTITY : Any, ID> : Query<Pair<Int, ID?>> {
@@ -21,10 +20,9 @@ internal data class SqlInsertQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<
 ) : SqlInsertQuery<ENTITY, ID> {
 
     override fun values(declaration: ValuesDeclaration<ENTITY>): SqlInsertQuery<ENTITY, ID> {
-        val scope = ValuesScope<ENTITY>().apply(declaration)
         val values = when (val values = context.values) {
-            is Values.Pairs -> Values.Pairs(values.pairs + scope)
-            is Values.Subquery -> Values.Pairs(scope.toList())
+            is Values.Declarations -> Values.Declarations(values.declarations + declaration)
+            is Values.Subquery -> Values.Declarations(listOf(declaration))
         }
         val newContext = context.copy(values = values)
         return copy(context = newContext)
@@ -32,7 +30,7 @@ internal data class SqlInsertQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<
 
     override fun <T : Any> select(block: () -> SubqueryExpression<T>): SqlInsertQuery<ENTITY, ID> {
         val subquery = block()
-        val values = Values.Subquery(subquery)
+        val values = Values.Subquery<ENTITY>(subquery)
         val newContext = context.copy(values = values)
         return copy(context = newContext)
     }
