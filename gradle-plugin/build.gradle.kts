@@ -2,7 +2,7 @@ plugins {
     `java-gradle-plugin`
     // use this plugin to enable the "publishToMavenLocal" task
     `maven-publish`
-    id("com.gradle.plugin-publish") version "0.17.0"
+    id("com.gradle.plugin-publish") version "0.18.0"
 }
 
 // we don't publish this project to sonatype
