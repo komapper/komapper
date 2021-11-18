@@ -60,7 +60,7 @@ data class Human(
     @KomapperUpdatedAt val updatedAt: OffsetDateTime? = null
 )
 
-@KomapperEntity
+@KomapperEntity(["employee", "manager"])
 data class Employee(
     @KomapperId @KomapperColumn("EMPLOYEE_ID") val employeeId: Int,
     @KomapperColumn("EMPLOYEE_NO") val employeeNo: Int,

@@ -10,7 +10,8 @@ import java.time.ZonedDateTime
 
 internal class EntityMetamodelStubGenerator(
     private val declaration: KSClassDeclaration,
-    private val extensionProperty: String,
+    private val metaObject: String,
+    private val aliases: List<String>,
     private val packageName: String,
     private val entityTypeName: String,
     private val simpleName: String,
@@ -43,10 +44,14 @@ internal class EntityMetamodelStubGenerator(
         }
         w.println("    fun clone($constructorParamList) = $simpleName()")
         w.println("    companion object {")
-        w.println("        val meta = $simpleName()")
+        for (alias in aliases) {
+            w.println("        val $alias = $simpleName()")
+        }
         w.println("    }")
         w.println("}")
         w.println("")
-        w.println("val ${ClassNames.Meta}.$extensionProperty get() = $simpleName.meta")
+        for (alias in aliases) {
+            w.println("val $metaObject.$alias get() = $simpleName.$alias")
+        }
     }
 }

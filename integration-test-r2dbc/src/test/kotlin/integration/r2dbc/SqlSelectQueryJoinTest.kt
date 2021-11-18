@@ -3,6 +3,7 @@ package integration.r2dbc
 import integration.address
 import integration.department
 import integration.employee
+import integration.manager
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
@@ -42,7 +43,7 @@ class SqlSelectQueryJoinTest(private val db: R2dbcDatabase) {
     @Test
     fun innerJoin_multiConditions() = inTransaction(db) {
         val employee = Meta.employee
-        val manager = Meta.employee.clone()
+        val manager = Meta.manager
         val list = db.runQuery {
             QueryDsl.from(employee).innerJoin(manager) {
                 employee.managerId eq manager.employeeId

@@ -3,6 +3,7 @@ package integration.jdbc
 import integration.address
 import integration.department
 import integration.employee
+import integration.manager
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
@@ -42,7 +43,7 @@ class SqlSelectQueryJoinTest(private val db: JdbcDatabase) {
     @Test
     fun innerJoin_multiConditions() {
         val employee = Meta.employee
-        val manager = employee.clone()
+        val manager = Meta.manager
         val list = db.runQuery {
             QueryDsl.from(employee).innerJoin(manager) {
                 employee.managerId eq manager.employeeId
@@ -248,7 +249,7 @@ class SqlSelectQueryJoinTest(private val db: JdbcDatabase) {
     @Test
     fun associate_selfJoin() {
         val e = Meta.employee
-        val m = e.clone()
+        val m = Meta.manager
         val entityContext = db.runQuery {
             QueryDsl.from(m).innerJoin(e) {
                 m.employeeId eq e.managerId

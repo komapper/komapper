@@ -20,7 +20,8 @@ import java.time.ZonedDateTime
 
 internal class EntityMetamodelGenerator(
     private val entity: Entity,
-    private val extensionProperty: String,
+    private val metaObject: String,
+    private val aliases: List<String>,
     private val packageName: String,
     private val entityTypeName: String,
     private val simpleName: String,
@@ -340,11 +341,15 @@ internal class EntityMetamodelGenerator(
 
     private fun companionObject() {
         w.println("    companion object {")
-        w.println("        val meta = $simpleName()")
+        for (alias in aliases) {
+            w.println("        val $alias = $simpleName()")
+        }
         w.println("    }")
     }
 
     private fun utils() {
-        w.println("val $extensionProperty get() = $simpleName.meta")
+        for (alias in aliases) {
+            w.println("val $metaObject.$alias get() = $simpleName.$alias")
+        }
     }
 }

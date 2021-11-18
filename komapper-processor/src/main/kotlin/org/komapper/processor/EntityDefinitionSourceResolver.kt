@@ -26,9 +26,12 @@ internal class SeparateDefinitionSourceResolver : EntityDefinitionSourceResolver
         )
         val annotation = defDeclaration.findAnnotation(KomapperEntityDef::class)
         val entity = annotation?.findValue("entity")
-        val entityName = annotation?.findValue("entityName")?.toString() ?: ""
+        val aliases = annotation?.findValue("aliases")
         if (entity !is KSType) {
             report("The entity value of @${KomapperEntityDef::class.simpleName} is not found.", defDeclaration)
+        }
+        if (aliases !is List<*>) {
+            report("The aliases value of @${KomapperEntityDef::class.simpleName} is invalid.", defDeclaration)
         }
         val entityDeclaration = entity.declaration.accept(
             object : ClassDeclarationVisitor() {
@@ -39,7 +42,7 @@ internal class SeparateDefinitionSourceResolver : EntityDefinitionSourceResolver
             Unit
         )
         validateEntityDeclaration(entityDeclaration)
-        return EntityDefinitionSource(defDeclaration, entityDeclaration, entityName)
+        return EntityDefinitionSource(defDeclaration, entityDeclaration, aliases.map { it.toString() })
     }
 }
 
@@ -54,9 +57,12 @@ internal class SelfDefinitionSourceResolver : EntityDefinitionSourceResolver {
             Unit
         )
         val annotation = entityDeclaration.findAnnotation(KomapperEntity::class)
-        val name = annotation?.findValue("name")?.toString() ?: ""
+        val aliases = annotation?.findValue("aliases")
+        if (aliases !is List<*>) {
+            report("The aliases value of @${KomapperEntity::class.simpleName} is invalid.", entityDeclaration)
+        }
         validateEntityDeclaration(entityDeclaration)
-        return EntityDefinitionSource(entityDeclaration, entityDeclaration, name)
+        return EntityDefinitionSource(entityDeclaration, entityDeclaration, aliases.map { it.toString() })
     }
 }
 
