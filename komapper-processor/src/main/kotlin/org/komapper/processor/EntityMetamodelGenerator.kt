@@ -9,7 +9,6 @@ import org.komapper.processor.ClassNames.EntityMetamodel
 import org.komapper.processor.ClassNames.EntityMetamodelImplementor
 import org.komapper.processor.ClassNames.IdAssignment
 import org.komapper.processor.ClassNames.IdContext
-import org.komapper.processor.ClassNames.Meta
 import org.komapper.processor.ClassNames.MetamodelDeclaration
 import org.komapper.processor.ClassNames.PropertyDescriptor
 import org.komapper.processor.ClassNames.PropertyMetamodel
