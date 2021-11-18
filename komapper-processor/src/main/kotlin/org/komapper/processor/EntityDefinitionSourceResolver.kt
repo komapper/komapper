@@ -25,11 +25,15 @@ internal class SeparateDefinitionSourceResolver : EntityDefinitionSourceResolver
             Unit
         )
         val annotation = defDeclaration.findAnnotation(KomapperEntityDef::class)
-        val value = annotation?.findValue("entity")
-        if (value !is KSType) {
+        val entity = annotation?.findValue("entity")
+        val aliases = annotation?.findValue("aliases")
+        if (entity !is KSType) {
             report("The entity value of @${KomapperEntityDef::class.simpleName} is not found.", defDeclaration)
         }
-        val entityDeclaration = value.declaration.accept(
+        if (aliases !is List<*>) {
+            report("The aliases value of @${KomapperEntityDef::class.simpleName} is invalid.", defDeclaration)
+        }
+        val entityDeclaration = entity.declaration.accept(
             object : ClassDeclarationVisitor() {
                 override fun defaultHandler(node: KSNode, data: Unit): KSClassDeclaration {
                     report("The entity value of @${KomapperEntityDef::class.simpleName} is not found.", defDeclaration)
@@ -38,7 +42,7 @@ internal class SeparateDefinitionSourceResolver : EntityDefinitionSourceResolver
             Unit
         )
         validateEntityDeclaration(entityDeclaration)
-        return EntityDefinitionSource(defDeclaration, entityDeclaration)
+        return EntityDefinitionSource(defDeclaration, entityDeclaration, aliases.map { it.toString() })
     }
 }
 
@@ -52,8 +56,13 @@ internal class SelfDefinitionSourceResolver : EntityDefinitionSourceResolver {
             },
             Unit
         )
+        val annotation = entityDeclaration.findAnnotation(KomapperEntity::class)
+        val aliases = annotation?.findValue("aliases")
+        if (aliases !is List<*>) {
+            report("The aliases value of @${KomapperEntity::class.simpleName} is invalid.", entityDeclaration)
+        }
         validateEntityDeclaration(entityDeclaration)
-        return EntityDefinitionSource(entityDeclaration, entityDeclaration)
+        return EntityDefinitionSource(entityDeclaration, entityDeclaration, aliases.map { it.toString() })
     }
 }
 

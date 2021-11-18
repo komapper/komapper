@@ -106,9 +106,7 @@ class CodeGeneratorTest {
                 @KomapperId @KomapperAutoIncrement @KomapperColumn("ADDRESS_ID") val addressId: Nothing,
                 @KomapperColumn("STREET") val street: Nothing,
                 @KomapperColumn("VERSION") val version: Nothing,
-            ) {
-                companion object
-            }
+            )
             
             @KomapperEntityDef(Employee::class)
             @KomapperTable("EMPLOYEE")
@@ -116,9 +114,7 @@ class CodeGeneratorTest {
                 @KomapperId @KomapperColumn("EMPLOYEE_ID") val employeeId: Nothing,
                 @KomapperColumn("NAME") val name: Nothing,
                 @KomapperColumn("VERSION") val version: Nothing,
-            ) {
-                companion object
-            }
+            )
             
         """.trimIndent()
         assertEquals(expected, file.readText())

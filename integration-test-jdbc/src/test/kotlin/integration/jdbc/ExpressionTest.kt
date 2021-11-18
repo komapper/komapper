@@ -1,8 +1,8 @@
 package integration.jdbc
 
-import integration.Address
-import integration.meta
+import integration.address
 import org.junit.jupiter.api.extension.ExtendWith
+import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
 import org.komapper.core.dsl.operator.concat
 import org.komapper.core.dsl.operator.div
@@ -27,7 +27,7 @@ class ExpressionTest(private val db: JdbcDatabase) {
 
     @Test
     fun plus() {
-        val a = Address.meta
+        val a = Meta.address
         val result = db.runQuery {
             QueryDsl.from(a)
                 .where {
@@ -43,7 +43,7 @@ class ExpressionTest(private val db: JdbcDatabase) {
 
     @Test
     fun plus_other_column() {
-        val a = Address.meta
+        val a = Meta.address
         val result = db.runQuery {
             QueryDsl.from(a)
                 .where {
@@ -59,7 +59,7 @@ class ExpressionTest(private val db: JdbcDatabase) {
 
     @Test
     fun minus() {
-        val a = Address.meta
+        val a = Meta.address
         val result = db.runQuery {
             QueryDsl.from(a)
                 .where {
@@ -75,7 +75,7 @@ class ExpressionTest(private val db: JdbcDatabase) {
 
     @Test
     fun minus_other_column() {
-        val a = Address.meta
+        val a = Meta.address
         val result = db.runQuery {
             QueryDsl.from(a)
                 .where {
@@ -91,7 +91,7 @@ class ExpressionTest(private val db: JdbcDatabase) {
 
     @Test
     fun div() {
-        val a = Address.meta
+        val a = Meta.address
         val result = db.runQuery {
             QueryDsl.from(a)
                 .where {
@@ -107,7 +107,7 @@ class ExpressionTest(private val db: JdbcDatabase) {
 
     @Test
     fun div_other_column() {
-        val a = Address.meta
+        val a = Meta.address
         val result = db.runQuery {
             QueryDsl.from(a)
                 .where {
@@ -123,7 +123,7 @@ class ExpressionTest(private val db: JdbcDatabase) {
 
     @Test
     fun rem() {
-        val a = Address.meta
+        val a = Meta.address
         val result = db.runQuery {
             QueryDsl.from(a)
                 .where {
@@ -139,7 +139,7 @@ class ExpressionTest(private val db: JdbcDatabase) {
 
     @Test
     fun rem_other_column() {
-        val a = Address.meta
+        val a = Meta.address
         val result = db.runQuery {
             QueryDsl.from(a)
                 .where {
@@ -155,7 +155,7 @@ class ExpressionTest(private val db: JdbcDatabase) {
 
     @Test
     fun concat() {
-        val a = Address.meta
+        val a = Meta.address
         val result = db.runQuery {
             QueryDsl.from(a)
                 .where {
@@ -171,7 +171,7 @@ class ExpressionTest(private val db: JdbcDatabase) {
 
     @Test
     fun concat_other_column() {
-        val a = Address.meta
+        val a = Meta.address
         val result = db.runQuery {
             QueryDsl.from(a)
                 .where {
@@ -187,7 +187,7 @@ class ExpressionTest(private val db: JdbcDatabase) {
 
     @Test
     fun lowerFunction() {
-        val a = Address.meta
+        val a = Meta.address
         val result = db.runQuery {
             QueryDsl.from(a).select(lower(literal("TEST"))).first()
         }
@@ -196,7 +196,7 @@ class ExpressionTest(private val db: JdbcDatabase) {
 
     @Test
     fun upperFunction() {
-        val a = Address.meta
+        val a = Meta.address
         val result = db.runQuery {
             QueryDsl.from(a).select(upper(literal("test"))).first()
         }
@@ -205,7 +205,7 @@ class ExpressionTest(private val db: JdbcDatabase) {
 
     @Test
     fun substringFunction() {
-        val a = Address.meta
+        val a = Meta.address
         val result = db.runQuery {
             QueryDsl.from(a).select(substring(literal("hello world"), 7)).first()
         }
@@ -214,7 +214,7 @@ class ExpressionTest(private val db: JdbcDatabase) {
 
     @Test
     fun substringFunction_length() {
-        val a = Address.meta
+        val a = Meta.address
         val result = db.runQuery {
             QueryDsl.from(a).select(substring(literal("hello world"), 7, 1)).first()
         }
@@ -223,7 +223,7 @@ class ExpressionTest(private val db: JdbcDatabase) {
 
     @Test
     fun trimFunction() {
-        val a = Address.meta
+        val a = Meta.address
         val result = db.runQuery {
             QueryDsl.from(a).select(trim(literal(" test "))).first()
         }
@@ -232,7 +232,7 @@ class ExpressionTest(private val db: JdbcDatabase) {
 
     @Test
     fun ltrimFunction() {
-        val a = Address.meta
+        val a = Meta.address
         val result = db.runQuery {
             QueryDsl.from(a).select(ltrim(literal(" test "))).first()
         }
@@ -241,7 +241,7 @@ class ExpressionTest(private val db: JdbcDatabase) {
 
     @Test
     fun rtrimFunction() {
-        val a = Address.meta
+        val a = Meta.address
         val result = db.runQuery {
             QueryDsl.from(a).select(rtrim(literal(" test "))).first()
         }

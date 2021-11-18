@@ -36,7 +36,6 @@ internal class EntityFactory(config: Config, private val entityDef: EntityDef) {
             versionProperty,
             createdAtProperty,
             updatedAtProperty,
-            entityDef.companionObject
         ).also {
             validateEntity(it)
         }

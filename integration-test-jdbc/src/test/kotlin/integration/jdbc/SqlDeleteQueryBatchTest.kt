@@ -1,9 +1,10 @@
 package integration.jdbc
 
 import integration.Address
-import integration.meta
+import integration.address
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.OptimisticLockException
+import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
 import org.komapper.jdbc.JdbcDatabase
 import kotlin.test.Test
@@ -16,7 +17,7 @@ class SqlDeleteQueryBatchTest(private val db: JdbcDatabase) {
 
     @Test
     fun test() {
-        val a = Address.meta
+        val a = Meta.address
         val addressList = listOf(
             Address(16, "STREET 16", 0),
             Address(17, "STREET 17", 0),
@@ -33,7 +34,7 @@ class SqlDeleteQueryBatchTest(private val db: JdbcDatabase) {
 
     @Test
     fun optimisticLockException() {
-        val a = Address.meta
+        val a = Meta.address
         val addressList = listOf(
             Address(16, "STREET 16", 0),
             Address(17, "STREET 17", 0),
@@ -60,7 +61,7 @@ class SqlDeleteQueryBatchTest(private val db: JdbcDatabase) {
 
     @Test
     fun suppressOptimisticLockException() {
-        val a = Address.meta
+        val a = Meta.address
         val addressList = listOf(
             Address(16, "STREET 16", 0),
             Address(17, "STREET 17", 0),

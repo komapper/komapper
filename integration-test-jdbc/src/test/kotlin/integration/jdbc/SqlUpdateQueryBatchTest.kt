@@ -1,12 +1,14 @@
 package integration.jdbc
 
 import integration.Address
-import integration.Department
 import integration.Person
-import integration.meta
+import integration.address
+import integration.department
+import integration.person
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.OptimisticLockException
 import org.komapper.core.UniqueConstraintException
+import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
 import org.komapper.jdbc.JdbcDatabase
 import kotlin.test.Test
@@ -20,7 +22,7 @@ class SqlUpdateQueryBatchTest(private val db: JdbcDatabase) {
 
     @Test
     fun test() {
-        val a = Address.meta
+        val a = Meta.address
         val addressList = listOf(
             Address(16, "STREET 16", 0),
             Address(17, "STREET 17", 0),
@@ -44,7 +46,7 @@ class SqlUpdateQueryBatchTest(private val db: JdbcDatabase) {
 
     @Test
     fun updatedAt() {
-        val p = Person.meta
+        val p = Meta.person
         val personList = listOf(
             Person(1, "A"),
             Person(2, "B"),
@@ -60,7 +62,7 @@ class SqlUpdateQueryBatchTest(private val db: JdbcDatabase) {
 
     @Test
     fun uniqueConstraintException() {
-        val a = Address.meta
+        val a = Meta.address
         assertFailsWith<UniqueConstraintException> {
             db.runQuery {
                 QueryDsl.update(a).batch(
@@ -76,7 +78,7 @@ class SqlUpdateQueryBatchTest(private val db: JdbcDatabase) {
 
     @Test
     fun optimisticLockException() {
-        val a = Address.meta
+        val a = Meta.address
         val ex = assertFailsWith<OptimisticLockException> {
             db.runQuery {
                 QueryDsl.update(a).batch(
@@ -93,7 +95,7 @@ class SqlUpdateQueryBatchTest(private val db: JdbcDatabase) {
 
     @Test
     fun include() {
-        val d = Department.meta
+        val d = Meta.department
         val selectQuery = QueryDsl.from(d).where { d.departmentId inList listOf(1, 2) }
         val before = db.runQuery { selectQuery }
         val updateList = before.map {
@@ -115,7 +117,7 @@ class SqlUpdateQueryBatchTest(private val db: JdbcDatabase) {
 
     @Test
     fun exclude() {
-        val d = Department.meta
+        val d = Meta.department
         val selectQuery = QueryDsl.from(d).where { d.departmentId inList listOf(1, 2) }
         val before = db.runQuery { selectQuery }
         val updateList = before.map {

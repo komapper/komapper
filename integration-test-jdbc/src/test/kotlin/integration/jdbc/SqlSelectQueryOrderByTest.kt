@@ -1,8 +1,8 @@
 package integration.jdbc
 
-import integration.Employee
-import integration.meta
+import integration.employee
 import org.junit.jupiter.api.extension.ExtendWith
+import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
 import org.komapper.core.dsl.operator.asc
 import org.komapper.core.dsl.operator.ascNullsFirst
@@ -20,7 +20,7 @@ class SqlSelectQueryOrderByTest(private val db: JdbcDatabase) {
 
     @Test
     fun orderBy() {
-        val e = Employee.meta
+        val e = Meta.employee
         val query = QueryDsl.from(e).orderBy(e.employeeId)
         val list = db.runQuery { query }
         assertEquals(1, list.first().employeeId)
@@ -29,7 +29,7 @@ class SqlSelectQueryOrderByTest(private val db: JdbcDatabase) {
 
     @Test
     fun orderBy_asc() {
-        val e = Employee.meta
+        val e = Meta.employee
         val query = QueryDsl.from(e).orderBy(e.employeeId.asc())
         val list = db.runQuery { query }
         assertEquals(1, list.first().employeeId)
@@ -38,7 +38,7 @@ class SqlSelectQueryOrderByTest(private val db: JdbcDatabase) {
 
     @Test
     fun orderBy_desc() {
-        val e = Employee.meta
+        val e = Meta.employee
         val query = QueryDsl.from(e).orderBy(e.employeeId.desc())
         val list = db.runQuery { query }
         assertEquals(14, list.first().employeeId)
@@ -47,7 +47,7 @@ class SqlSelectQueryOrderByTest(private val db: JdbcDatabase) {
 
     @Test
     fun orderBy_ascNullsFirst() {
-        val e = Employee.meta
+        val e = Meta.employee
         val query = QueryDsl.from(e).orderBy(e.managerId.ascNullsFirst())
         val list = db.runQuery { query }
         assertNull(list.first().managerId)
@@ -56,7 +56,7 @@ class SqlSelectQueryOrderByTest(private val db: JdbcDatabase) {
 
     @Test
     fun orderBy_ascNullsLast() {
-        val e = Employee.meta
+        val e = Meta.employee
         val query = QueryDsl.from(e).orderBy(e.managerId.ascNullsLast())
         val list = db.runQuery { query }
         assertEquals(4, list.first().managerId)
@@ -65,7 +65,7 @@ class SqlSelectQueryOrderByTest(private val db: JdbcDatabase) {
 
     @Test
     fun orderBy_descNullsFirst() {
-        val e = Employee.meta
+        val e = Meta.employee
         val query = QueryDsl.from(e).orderBy(e.managerId.descNullsFirst())
         val list = db.runQuery { query }
         assertNull(list.first().managerId)
@@ -74,7 +74,7 @@ class SqlSelectQueryOrderByTest(private val db: JdbcDatabase) {
 
     @Test
     fun orderBy_descNullsLast() {
-        val e = Employee.meta
+        val e = Meta.employee
         val query = QueryDsl.from(e).orderBy(e.managerId.descNullsLast())
         val list = db.runQuery { query }
         assertEquals(13, list.first().managerId)

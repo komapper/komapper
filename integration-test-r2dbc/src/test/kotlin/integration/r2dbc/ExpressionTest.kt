@@ -1,8 +1,8 @@
 package integration.r2dbc
 
-import integration.Address
-import integration.meta
+import integration.address
 import org.junit.jupiter.api.extension.ExtendWith
+import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
 import org.komapper.core.dsl.operator.concat
 import org.komapper.core.dsl.operator.div
@@ -26,7 +26,7 @@ class ExpressionTest(private val db: R2dbcDatabase) {
 
     @Test
     fun plus() = inTransaction(db) {
-        val a = Address.meta
+        val a = Meta.address
         val result = db.runQuery {
             QueryDsl.from(a)
                 .where {
@@ -42,7 +42,7 @@ class ExpressionTest(private val db: R2dbcDatabase) {
 
     @Test
     fun plus_other_column() = inTransaction(db) {
-        val a = Address.meta
+        val a = Meta.address
         val result = db.runQuery {
             QueryDsl.from(a)
                 .where {
@@ -58,7 +58,7 @@ class ExpressionTest(private val db: R2dbcDatabase) {
 
     @Test
     fun minus() = inTransaction(db) {
-        val a = Address.meta
+        val a = Meta.address
         val result = db.runQuery {
             QueryDsl.from(a)
                 .where {
@@ -74,7 +74,7 @@ class ExpressionTest(private val db: R2dbcDatabase) {
 
     @Test
     fun minus_other_column() = inTransaction(db) {
-        val a = Address.meta
+        val a = Meta.address
         val result = db.runQuery {
             QueryDsl.from(a)
                 .where {
@@ -90,7 +90,7 @@ class ExpressionTest(private val db: R2dbcDatabase) {
 
     @Test
     fun div() = inTransaction(db) {
-        val a = Address.meta
+        val a = Meta.address
         val result = db.runQuery {
             QueryDsl.from(a)
                 .where {
@@ -106,7 +106,7 @@ class ExpressionTest(private val db: R2dbcDatabase) {
 
     @Test
     fun div_other_column() = inTransaction(db) {
-        val a = Address.meta
+        val a = Meta.address
         val result = db.runQuery {
             QueryDsl.from(a)
                 .where {
@@ -122,7 +122,7 @@ class ExpressionTest(private val db: R2dbcDatabase) {
 
     @Test
     fun rem() = inTransaction(db) {
-        val a = Address.meta
+        val a = Meta.address
         val result = db.runQuery {
             QueryDsl.from(a)
                 .where {
@@ -138,7 +138,7 @@ class ExpressionTest(private val db: R2dbcDatabase) {
 
     @Test
     fun rem_other_column() = inTransaction(db) {
-        val a = Address.meta
+        val a = Meta.address
         val result = db.runQuery {
             QueryDsl.from(a)
                 .where {
@@ -154,7 +154,7 @@ class ExpressionTest(private val db: R2dbcDatabase) {
 
     @Test
     fun concat() = inTransaction(db) {
-        val a = Address.meta
+        val a = Meta.address
         val result = db.runQuery {
             QueryDsl.from(a)
                 .where {
@@ -170,7 +170,7 @@ class ExpressionTest(private val db: R2dbcDatabase) {
 
     @Test
     fun concat_other_column() = inTransaction(db) {
-        val a = Address.meta
+        val a = Meta.address
         val result = db.runQuery {
             QueryDsl.from(a)
                 .where {
@@ -186,7 +186,7 @@ class ExpressionTest(private val db: R2dbcDatabase) {
 
     @Test
     fun lowerFunction() = inTransaction(db) {
-        val a = Address.meta
+        val a = Meta.address
         val result = db.runQuery {
             QueryDsl.from(a).select(lower(literal("TEST"))).first()
         }
@@ -195,7 +195,7 @@ class ExpressionTest(private val db: R2dbcDatabase) {
 
     @Test
     fun upperFunction() = inTransaction(db) {
-        val a = Address.meta
+        val a = Meta.address
         val result = db.runQuery {
             QueryDsl.from(a).select(upper(literal("test"))).first()
         }
@@ -204,7 +204,7 @@ class ExpressionTest(private val db: R2dbcDatabase) {
 
     @Test
     fun trimFunction() = inTransaction(db) {
-        val a = Address.meta
+        val a = Meta.address
         val result = db.runQuery {
             QueryDsl.from(a).select(trim(literal(" test "))).first()
         }
@@ -213,7 +213,7 @@ class ExpressionTest(private val db: R2dbcDatabase) {
 
     @Test
     fun ltrimFunction() = inTransaction(db) {
-        val a = Address.meta
+        val a = Meta.address
         val result = db.runQuery {
             QueryDsl.from(a).select(ltrim(literal(" test "))).first()
         }
@@ -222,7 +222,7 @@ class ExpressionTest(private val db: R2dbcDatabase) {
 
     @Test
     fun rtrimFunction() = inTransaction(db) {
-        val a = Address.meta
+        val a = Meta.address
         val result = db.runQuery {
             QueryDsl.from(a).select(rtrim(literal(" test "))).first()
         }

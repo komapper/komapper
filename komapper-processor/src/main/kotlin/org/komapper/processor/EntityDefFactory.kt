@@ -1,7 +1,6 @@
 package org.komapper.processor
 
 import com.google.devtools.ksp.getDeclaredProperties
-import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSValueParameter
 import org.komapper.annotation.KomapperAutoIncrement
 import org.komapper.annotation.KomapperColumn
@@ -24,8 +23,7 @@ internal class EntityDefFactory(
     fun create(): EntityDef {
         val table = getTable()
         val allProperties = createAllProperties()
-        val companionObject = getCompanionObject()
-        return EntityDef(definitionSource, table, allProperties, companionObject)
+        return EntityDef(definitionSource, table, allProperties)
     }
 
     private fun getTable(): Table {
@@ -137,10 +135,5 @@ internal class EntityDefFactory(
                 )
             }
         }
-    }
-
-    private fun getCompanionObject(): KSClassDeclaration {
-        return defDeclaration.getCompanionObject()
-            ?: report("Define a companion object in the class.", defDeclaration)
     }
 }

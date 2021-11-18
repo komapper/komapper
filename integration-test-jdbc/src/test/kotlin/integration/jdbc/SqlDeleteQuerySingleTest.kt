@@ -1,9 +1,10 @@
 package integration.jdbc
 
 import integration.Address
-import integration.meta
+import integration.address
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.OptimisticLockException
+import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
 import org.komapper.core.dsl.query.first
 import org.komapper.jdbc.JdbcDatabase
@@ -16,7 +17,7 @@ class SqlDeleteQuerySingleTest(private val db: JdbcDatabase) {
 
     @Test
     fun optimisticLockException() {
-        val a = Address.meta
+        val a = Meta.address
         val address = db.runQuery {
             QueryDsl.from(a).where {
                 a.addressId eq 15
@@ -30,7 +31,7 @@ class SqlDeleteQuerySingleTest(private val db: JdbcDatabase) {
 
     @Test
     fun testEntity() {
-        val a = Address.meta
+        val a = Meta.address
         val query = QueryDsl.from(a).where { a.addressId eq 15 }
         val address = db.runQuery { query.first() }
         db.runQuery { QueryDsl.delete(a).single(address) }

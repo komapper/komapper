@@ -9,11 +9,13 @@ internal data class Config(
     val prefix: String,
     val suffix: String,
     val namingStrategy: NamingStrategy,
+    val metaObject: String
 ) {
     companion object {
         private const val prefixKeyName = "komapper.prefix"
         private const val suffixKeyName = "komapper.suffix"
         private const val namingStrategyKeyName = "komapper.namingStrategy"
+        private const val metaObjectKeyName = "komapper.metaObject"
 
         fun create(options: Map<String, String>): Config {
             val prefix = options.getOrDefault(prefixKeyName, "_")
@@ -26,7 +28,8 @@ internal data class Config(
                     else -> error("'$it' is illegal value as a $namingStrategyKeyName option.")
                 }
             }
-            return Config(prefix, suffix, namingStrategy)
+            val metaObject = options.getOrDefault(metaObjectKeyName, ClassNames.Meta)
+            return Config(prefix, suffix, namingStrategy, metaObject)
         }
     }
 }

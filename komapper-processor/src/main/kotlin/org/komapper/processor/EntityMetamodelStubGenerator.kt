@@ -9,18 +9,22 @@ import java.io.PrintWriter
 import java.time.ZonedDateTime
 
 internal class EntityMetamodelStubGenerator(
-    private val defDeclaration: KSClassDeclaration,
     private val declaration: KSClassDeclaration,
+    private val metaObject: String,
+    private val aliases: List<String>,
     private val packageName: String,
     private val entityTypeName: String,
     private val simpleName: String,
     private val w: PrintWriter
 ) : Runnable {
+
     private val constructorParamList = listOf(
         "table: String = \"\"",
         "catalog: String = \"\"",
         "schema: String = \"\"",
-        "alwaysQuote: Boolean = false"
+        "alwaysQuote: Boolean = false",
+        "disableSequenceAssignment: Boolean = false",
+        "declarations: List<${ClassNames.MetamodelDeclaration}<$entityTypeName, Any, $simpleName>> = emptyList()"
     ).joinToString(", ")
 
     override fun run() {
@@ -38,17 +42,16 @@ internal class EntityMetamodelStubGenerator(
                 w.println("    val $p: $PropertyMetamodel<$entityTypeName, $typeName, $typeName> = $PropertyMetamodelStub<$entityTypeName, $typeName>()")
             }
         }
+        w.println("    fun clone($constructorParamList) = $simpleName()")
         w.println("    companion object {")
-        w.println("        val meta = $simpleName()")
-        w.println("        fun newMeta($constructorParamList) = $simpleName()")
+        for (alias in aliases) {
+            w.println("        val $alias = $simpleName()")
+        }
         w.println("    }")
         w.println("}")
-        val companionObject = defDeclaration.getCompanionObject()
-        if (companionObject != null) {
-            val companionObjectName = (companionObject.qualifiedName ?: companionObject.simpleName).asString()
-            w.println("")
-            w.println("val $companionObjectName.meta get() = $simpleName.meta")
-            w.println("fun $companionObjectName.newMeta($constructorParamList) = $simpleName.newMeta(table, catalog, schema, alwaysQuote)")
+        w.println("")
+        for (alias in aliases) {
+            w.println("val $metaObject.$alias get() = $simpleName.$alias")
         }
     }
 }

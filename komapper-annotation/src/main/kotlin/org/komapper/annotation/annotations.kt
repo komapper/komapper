@@ -6,7 +6,9 @@ import kotlin.reflect.KClass
 
 @Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.SOURCE)
-annotation class KomapperEntity
+annotation class KomapperEntity(
+    val aliases: Array<String> = [],
+)
 
 @Target(AnnotationTarget.VALUE_PARAMETER)
 @Retention(AnnotationRetention.SOURCE)
@@ -81,4 +83,7 @@ annotation class KomapperAutoIncrement
 
 @Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.SOURCE)
-annotation class KomapperEntityDef(val entity: KClass<*>)
+annotation class KomapperEntityDef(
+    val entity: KClass<*>,
+    val aliases: Array<String> = []
+)

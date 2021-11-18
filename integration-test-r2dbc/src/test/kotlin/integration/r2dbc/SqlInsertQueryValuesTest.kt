@@ -1,11 +1,10 @@
 package integration.r2dbc
 
-import integration.Address
-import integration.Employee
-import integration.IdentityStrategy
-import integration.meta
-import integration.newMeta
+import integration.address
+import integration.employee
+import integration.identityStrategy
 import org.junit.jupiter.api.extension.ExtendWith
+import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
 import org.komapper.core.dsl.query.first
 import org.komapper.r2dbc.R2dbcDatabase
@@ -21,7 +20,7 @@ class SqlInsertQueryValuesTest(private val db: R2dbcDatabase) {
 
     @Test
     fun test() = inTransaction(db) {
-        val a = Address.meta
+        val a = Meta.address
         val (count, key) = db.runQuery {
             QueryDsl.insert(a).values {
                 a.addressId set 19
@@ -35,7 +34,7 @@ class SqlInsertQueryValuesTest(private val db: R2dbcDatabase) {
 
     @Test
     fun setIfNotNull() = inTransaction(db) {
-        val e = Employee.meta
+        val e = Meta.employee
         val (count, key) = db.runQuery {
             QueryDsl.insert(e).values {
                 e.employeeId set 99
@@ -58,7 +57,7 @@ class SqlInsertQueryValuesTest(private val db: R2dbcDatabase) {
 
     @Test
     fun generatedKeys() = inTransaction(db) {
-        val a = IdentityStrategy.meta
+        val a = Meta.identityStrategy
         val (count, id) = db.runQuery {
             QueryDsl.insert(a).values {
                 a.id set 10
@@ -71,8 +70,8 @@ class SqlInsertQueryValuesTest(private val db: R2dbcDatabase) {
 
     @Test
     fun select() = inTransaction(db) {
-        val a = Address.meta
-        val aa = Address.newMeta(table = "ADDRESS_ARCHIVE")
+        val a = Meta.address
+        val aa = a.clone(table = "ADDRESS_ARCHIVE")
         val (count) = db.runQuery {
             QueryDsl.insert(aa).select {
                 QueryDsl.from(a).where { a.addressId between 1..5 }

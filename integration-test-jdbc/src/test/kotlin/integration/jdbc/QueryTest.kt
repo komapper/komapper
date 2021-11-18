@@ -1,9 +1,10 @@
 package integration.jdbc
 
 import integration.Address
-import integration.Employee
-import integration.meta
+import integration.address
+import integration.employee
 import org.junit.jupiter.api.extension.ExtendWith
+import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
 import org.komapper.core.dsl.query.andThen
 import org.komapper.core.dsl.query.dryRun
@@ -21,7 +22,7 @@ class QueryTest(private val db: JdbcDatabase) {
 
     @Test
     fun plus() {
-        val a = Address.meta
+        val a = Meta.address
         val address = Address(16, "STREET 16", 0)
         val q1 = QueryDsl.insert(a).single(address)
         val q2 = QueryDsl.insert(a).values {
@@ -37,7 +38,7 @@ class QueryTest(private val db: JdbcDatabase) {
 
     @Test
     fun map() {
-        val a = Address.meta
+        val a = Meta.address
         val query = QueryDsl.from(a).map { it.map { address -> address.copy(version = 100) } }
         val list = db.runQuery { query }
         assertTrue(list.all { it.version == 100 })
@@ -45,7 +46,7 @@ class QueryTest(private val db: JdbcDatabase) {
 
     @Test
     fun zip() {
-        val a = Address.meta
+        val a = Meta.address
         val address = Address(16, "STREET 16", 0)
         val q1 = QueryDsl.insert(a).single(address)
         val q2 = QueryDsl.from(a)
@@ -58,11 +59,11 @@ class QueryTest(private val db: JdbcDatabase) {
 
     @Test
     fun flatMap() {
-        val a = Address.meta
+        val a = Meta.address
         val address = Address(16, "STREET 16", 0)
         val query = QueryDsl.insert(a).single(address).flatMap {
             val addressId = it.addressId
-            val e = Employee.meta
+            val e = Meta.employee
             QueryDsl.from(e).where { e.addressId less addressId }
         }
         val list = db.runQuery { query }
@@ -71,11 +72,11 @@ class QueryTest(private val db: JdbcDatabase) {
 
     @Test
     fun flatZip() {
-        val a = Address.meta
+        val a = Meta.address
         val address = Address(16, "STREET 16", 0)
         val query = QueryDsl.insert(a).single(address).flatZip {
             val addressId = it.addressId
-            val e = Employee.meta
+            val e = Meta.employee
             QueryDsl.from(e).where { e.addressId less addressId }
         }
         val (newAddress, list) = db.runQuery { query }

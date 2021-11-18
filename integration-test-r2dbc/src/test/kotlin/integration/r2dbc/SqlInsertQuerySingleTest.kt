@@ -6,12 +6,18 @@ import integration.Human
 import integration.IdentityStrategy
 import integration.Person
 import integration.SequenceStrategy
-import integration.meta
+import integration.address
+import integration.department
+import integration.human
+import integration.identityStrategy
+import integration.person
+import integration.sequenceStrategy
 import integration.setting.Dbms
 import integration.setting.Run
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.ClockProvider
 import org.komapper.core.UniqueConstraintException
+import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
 import org.komapper.core.dsl.operator.concat
 import org.komapper.core.dsl.query.first
@@ -31,7 +37,7 @@ class SqlInsertQuerySingleTest(private val db: R2dbcDatabase) {
 
     @Test
     fun test() = inTransaction(db) {
-        val a = Address.meta
+        val a = Meta.address
         val address = Address(16, "STREET 16", 0)
         db.runQuery { QueryDsl.insert(a).single(address) }
         val address2 = db.runQuery {
@@ -44,7 +50,7 @@ class SqlInsertQuerySingleTest(private val db: R2dbcDatabase) {
 
     @Test
     fun createdAt_localDateTime() = inTransaction(db) {
-        val p = Person.meta
+        val p = Meta.person
         val person1 = Person(1, "ABC")
         val id = db.runQuery { QueryDsl.insert(p).single(person1) }.personId
         val person2 = db.runQuery { QueryDsl.from(p).where { p.personId eq id }.first() }
@@ -62,7 +68,7 @@ class SqlInsertQuerySingleTest(private val db: R2dbcDatabase) {
     @Run(unless = [Dbms.MARIADB, Dbms.POSTGRESQL])
     @Test
     fun createdAt_offsetDateTime() = inTransaction(db) {
-        val h = Human.meta
+        val h = Meta.human
         val human1 = Human(1, "ABC")
         val id = db.runQuery { QueryDsl.insert(h).single(human1) }.humanId
         val human2 = db.runQuery { QueryDsl.from(h).where { h.humanId eq id }.first() }
@@ -82,7 +88,7 @@ class SqlInsertQuerySingleTest(private val db: R2dbcDatabase) {
         val instant = Instant.parse("2021-01-01T00:00:00Z")
         val zoneId = ZoneId.of("UTC")
 
-        val p = Person.meta
+        val p = Meta.person
         val config = object : R2dbcDatabaseConfig by db.config {
             override val clockProvider = ClockProvider {
                 Clock.fixed(instant, zoneId)
@@ -104,7 +110,7 @@ class SqlInsertQuerySingleTest(private val db: R2dbcDatabase) {
 
     @Test
     fun uniqueConstraintException() = inTransaction(db) {
-        val a = Address.meta
+        val a = Meta.address
         val address = Address(1, "STREET 1", 0)
         assertFailsWith<UniqueConstraintException> {
             db.runQuery { QueryDsl.insert(a).single(address) }.let { }
@@ -114,7 +120,7 @@ class SqlInsertQuerySingleTest(private val db: R2dbcDatabase) {
     @Test
     fun identityGenerator() = inTransaction(db) {
         for (i in 1..201) {
-            val m = IdentityStrategy.meta
+            val m = Meta.identityStrategy
             val strategy = IdentityStrategy(0, "test")
             val result = db.runQuery { QueryDsl.insert(m).single(strategy) }
             assertEquals(i, result.id)
@@ -125,7 +131,7 @@ class SqlInsertQuerySingleTest(private val db: R2dbcDatabase) {
     @Test
     fun sequenceGenerator() = inTransaction(db) {
         for (i in 1..201) {
-            val m = SequenceStrategy.meta
+            val m = Meta.sequenceStrategy
             val strategy = SequenceStrategy(0, "test")
             val result = db.runQuery { QueryDsl.insert(m).single(strategy) }
             assertEquals(i, result.id)
@@ -135,7 +141,7 @@ class SqlInsertQuerySingleTest(private val db: R2dbcDatabase) {
     @Run(unless = [Dbms.MYSQL])
     @Test
     fun sequenceGenerator_disableSequenceAssignment() = inTransaction(db) {
-        val m = SequenceStrategy.meta
+        val m = Meta.sequenceStrategy
         val strategy = SequenceStrategy(50, "test")
         val result = db.runQuery {
             QueryDsl.insert(m).single(strategy).options {
@@ -147,7 +153,7 @@ class SqlInsertQuerySingleTest(private val db: R2dbcDatabase) {
 
     @Test
     fun onDuplicateKeyUpdate_insert() = inTransaction(db) {
-        val d = Department.meta
+        val d = Meta.department
         val department = Department(5, 50, "PLANNING", "TOKYO", 0)
         val query = QueryDsl.insert(d).onDuplicateKeyUpdate().single(department)
         val count = db.runQuery { query }
@@ -158,7 +164,7 @@ class SqlInsertQuerySingleTest(private val db: R2dbcDatabase) {
 
     @Test
     fun onDuplicateKeyUpdateWithKeys_insert() = inTransaction(db) {
-        val d = Department.meta
+        val d = Meta.department
         val department = Department(5, 50, "PLANNING", "TOKYO", 0)
         val query = QueryDsl.insert(d).onDuplicateKeyUpdate(d.departmentNo).single(department)
         val count = db.runQuery { query }
@@ -169,7 +175,7 @@ class SqlInsertQuerySingleTest(private val db: R2dbcDatabase) {
 
     @Test
     fun onDuplicateKeyUpdate_update() = inTransaction(db) {
-        val d = Department.meta
+        val d = Meta.department
         val department = Department(1, 50, "PLANNING", "TOKYO", 10)
         val query = QueryDsl.insert(d).onDuplicateKeyUpdate().single(department)
         val count = db.runQuery { query }
@@ -186,7 +192,7 @@ class SqlInsertQuerySingleTest(private val db: R2dbcDatabase) {
 
     @Test
     fun onDuplicateKeyUpdateWithKeys_update() = inTransaction(db) {
-        val d = Department.meta
+        val d = Meta.department
         val department = Department(6, 10, "PLANNING", "TOKYO", 10)
         val query = QueryDsl.insert(d).onDuplicateKeyUpdate(d.departmentNo).single(department)
         val count = db.runQuery { query }
@@ -205,7 +211,7 @@ class SqlInsertQuerySingleTest(private val db: R2dbcDatabase) {
     @Test
     @Run(unless = [Dbms.MARIADB])
     fun onDuplicateKeyUpdate_update_set() = inTransaction(db) {
-        val d = Department.meta
+        val d = Meta.department
         val department = Department(1, 50, "PLANNING", "TOKYO", 10)
         val query = QueryDsl.insert(d).onDuplicateKeyUpdate().set { excluded ->
             d.departmentName set "PLANNING2"
@@ -227,7 +233,7 @@ class SqlInsertQuerySingleTest(private val db: R2dbcDatabase) {
     @Test
     @Run(unless = [Dbms.MARIADB])
     fun onDuplicateKeyUpdateWithKey_update_set() = inTransaction(db) {
-        val d = Department.meta
+        val d = Meta.department
         val department = Department(5, 10, "PLANNING", "TOKYO", 10)
         val query = QueryDsl.insert(d)
             .onDuplicateKeyUpdate(d.departmentNo)
@@ -250,7 +256,7 @@ class SqlInsertQuerySingleTest(private val db: R2dbcDatabase) {
 
     @Test
     fun onDuplicateKeyIgnore() = inTransaction(db) {
-        val a = Address.meta
+        val a = Meta.address
         val address = Address(1, "STREET 100", 0)
         val query = QueryDsl.insert(a).onDuplicateKeyIgnore().single(address)
         val count = db.runQuery { query }
@@ -259,7 +265,7 @@ class SqlInsertQuerySingleTest(private val db: R2dbcDatabase) {
 
     @Test
     fun onDuplicateKeyIgnoreWithKey() = inTransaction(db) {
-        val a = Address.meta
+        val a = Meta.address
         val address = Address(100, "STREET 1", 0)
         val query = QueryDsl.insert(a).onDuplicateKeyIgnore(a.street).single(address)
         val count = db.runQuery { query }
@@ -268,7 +274,7 @@ class SqlInsertQuerySingleTest(private val db: R2dbcDatabase) {
 
     @Test
     fun onDuplicateKeyIgnoreWithKeys() = inTransaction(db) {
-        val a = Address.meta
+        val a = Meta.address
         val address = Address(100, "STREET 1", 0)
         val query = QueryDsl.insert(a).onDuplicateKeyIgnore(a.street).single(address)
         val count = db.runQuery { query }

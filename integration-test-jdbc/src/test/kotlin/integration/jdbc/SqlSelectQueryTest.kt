@@ -1,12 +1,13 @@
 package integration.jdbc
 
 import integration.Address
-import integration.Employee
-import integration.meta
+import integration.address
+import integration.employee
 import kotlinx.coroutines.flow.count
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.OptimisticLockException
+import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
 import org.komapper.core.dsl.expression.When
 import org.komapper.core.dsl.metamodel.define
@@ -27,7 +28,7 @@ class SqlSelectQueryTest(private val db: JdbcDatabase) {
 
     @Test
     fun list() {
-        val a = Address.meta
+        val a = Meta.address
         val list: List<Address> = db.runQuery {
             QueryDsl.from(a)
         }
@@ -36,7 +37,7 @@ class SqlSelectQueryTest(private val db: JdbcDatabase) {
 
     @Test
     fun first() {
-        val a = Address.meta
+        val a = Meta.address
         val address: Address = db.runQuery {
             QueryDsl.from(a).where { a.addressId eq 1 }.first()
         }
@@ -45,7 +46,7 @@ class SqlSelectQueryTest(private val db: JdbcDatabase) {
 
     @Test
     fun firstOrNull() {
-        val a = Address.meta
+        val a = Meta.address
         val address: Address? = db.runQuery {
             QueryDsl.from(a).where { a.addressId eq 99 }.firstOrNull()
         }
@@ -54,7 +55,7 @@ class SqlSelectQueryTest(private val db: JdbcDatabase) {
 
     @Test
     fun collect() {
-        val a = Address.meta
+        val a = Meta.address
         val count = db.runQuery {
             QueryDsl.from(a).collect { it.count() }
         }
@@ -63,7 +64,7 @@ class SqlSelectQueryTest(private val db: JdbcDatabase) {
 
     @Test
     fun decoupling() {
-        val a = Address.meta
+        val a = Meta.address
         val query = QueryDsl.from(a)
             .where { a.addressId greaterEq 1 }
             .orderBy(a.addressId.desc())
@@ -81,7 +82,7 @@ class SqlSelectQueryTest(private val db: JdbcDatabase) {
 
     @Test
     fun option() {
-        val e = Employee.meta
+        val e = Meta.employee
         val emp = db.runQuery {
             QueryDsl.from(e)
                 .options {
@@ -101,7 +102,7 @@ class SqlSelectQueryTest(private val db: JdbcDatabase) {
 
     @Test
     fun caseExpression() {
-        val a = Address.meta
+        val a = Meta.address
         val caseExpression = case(
             When(
                 { a.street eq "STREET 2"; a.addressId greater 1 },
@@ -121,7 +122,7 @@ class SqlSelectQueryTest(private val db: JdbcDatabase) {
 
     @Test
     fun caseExpression_multipleWhen() {
-        val a = Address.meta
+        val a = Meta.address
         val caseExpression = case(
             When(
                 { a.street eq "STREET 2"; a.addressId greater 1 },
@@ -145,7 +146,7 @@ class SqlSelectQueryTest(private val db: JdbcDatabase) {
 
     @Test
     fun caseExpression_otherwiseNotSpecified() {
-        val a = Address.meta
+        val a = Meta.address
         val caseExpression = case(
             When(
                 { a.street eq "STREET 2"; a.addressId greater 1 },
@@ -165,7 +166,7 @@ class SqlSelectQueryTest(private val db: JdbcDatabase) {
 
     @Test
     fun defaultWhere() {
-        val a = Address.meta.define { a ->
+        val a = Meta.address.define { a ->
             where { a.addressId eq 1 }
         }
         val list = db.runQuery { QueryDsl.from(a) }
@@ -174,8 +175,8 @@ class SqlSelectQueryTest(private val db: JdbcDatabase) {
 
     @Test
     fun defaultWhere_join() {
-        val e = Employee.meta
-        val a = Address.meta.define { a ->
+        val e = Meta.employee
+        val a = Meta.address.define { a ->
             where { a.addressId eq 1 }
         }
         val list = db.runQuery {
@@ -188,9 +189,9 @@ class SqlSelectQueryTest(private val db: JdbcDatabase) {
 
     @Test
     fun defaultWhere_update_single() {
-        val a = Address.meta
+        val a = Meta.address
         val address = db.runQuery { QueryDsl.from(a).where { a.addressId eq 15 }.first() }
-        val a2 = Address.meta.define { a2 ->
+        val a2 = Meta.address.define { a2 ->
             where { a2.version eq 99 }
         }
         assertThrows<OptimisticLockException> {
@@ -200,7 +201,7 @@ class SqlSelectQueryTest(private val db: JdbcDatabase) {
 
     @Test
     fun defaultWhere_update_set() {
-        val a = Address.meta.define { a ->
+        val a = Meta.address.define { a ->
             where { a.addressId eq 15 }
         }
         val count = db.runQuery { QueryDsl.update(a).set { a.street set "hello" } }
@@ -209,9 +210,9 @@ class SqlSelectQueryTest(private val db: JdbcDatabase) {
 
     @Test
     fun defaultWhere_delete_single() {
-        val a = Address.meta
+        val a = Meta.address
         val address = db.runQuery { QueryDsl.from(a).where { a.addressId eq 15 }.first() }
-        val a2 = Address.meta.define { a2 ->
+        val a2 = Meta.address.define { a2 ->
             where { a2.version eq 99 }
         }
         assertThrows<OptimisticLockException> {
@@ -221,7 +222,7 @@ class SqlSelectQueryTest(private val db: JdbcDatabase) {
 
     @Test
     fun defaultWhere_delete_all() {
-        val a = Address.meta.define { a ->
+        val a = Meta.address.define { a ->
             where { a.addressId eq 15 }
         }
         val count = db.runQuery { QueryDsl.delete(a).all() }

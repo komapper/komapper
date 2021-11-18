@@ -1,14 +1,15 @@
 package integration.r2dbc
 
-import integration.BlankName
-import integration.CatalogAndSchema
-import integration.CatalogOnly
 import integration.Order
-import integration.SchemaOnly
-import integration.meta
+import integration.blankName
+import integration.catalogAndSchema
+import integration.catalogOnly
+import integration.order
+import integration.schemaOnly
 import integration.setting.Dbms
 import integration.setting.Run
 import org.junit.jupiter.api.extension.ExtendWith
+import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
 import org.komapper.core.dsl.query.dryRun
 import org.komapper.r2dbc.R2dbcDatabase
@@ -22,7 +23,7 @@ class QuoteTest(val db: R2dbcDatabase) {
     @Run(onlyIf = [Dbms.H2, Dbms.POSTGRESQL])
     @Test
     fun catalogAndSchema() = runBlockingWithTimeout {
-        val m = CatalogAndSchema.meta
+        val m = Meta.catalogAndSchema
         val query = QueryDsl.from(m)
         val sql = query.dryRun().sql
         println(sql)
@@ -32,7 +33,7 @@ class QuoteTest(val db: R2dbcDatabase) {
     @Run(onlyIf = [Dbms.H2, Dbms.POSTGRESQL])
     @Test
     fun catalogOnly() = runBlockingWithTimeout {
-        val m = CatalogOnly.meta
+        val m = Meta.catalogOnly
         val query = QueryDsl.from(m)
         val sql = query.dryRun().sql
         println(sql)
@@ -42,7 +43,7 @@ class QuoteTest(val db: R2dbcDatabase) {
     @Run(onlyIf = [Dbms.H2, Dbms.POSTGRESQL])
     @Test
     fun schemaOnly() = runBlockingWithTimeout {
-        val m = SchemaOnly.meta
+        val m = Meta.schemaOnly
         val query = QueryDsl.from(m)
         val sql = query.dryRun().sql
         println(sql)
@@ -52,7 +53,7 @@ class QuoteTest(val db: R2dbcDatabase) {
     @Run(onlyIf = [Dbms.H2, Dbms.POSTGRESQL])
     @Test
     fun blankName() = runBlockingWithTimeout {
-        val m = BlankName.meta
+        val m = Meta.blankName
         val query = QueryDsl.from(m)
         val sql = query.dryRun().sql
         println(sql)
@@ -62,7 +63,7 @@ class QuoteTest(val db: R2dbcDatabase) {
 
     @Test
     fun alwaysQuote() = inTransaction(db) {
-        val m = Order.meta
+        val m = Meta.order
         db.runQuery { QueryDsl.insert(m).single(Order(1, "value")) }
         val list = db.runQuery { QueryDsl.from(m) }.toList()
         assertEquals(1, list.size)

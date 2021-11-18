@@ -1,12 +1,13 @@
 package integration.r2dbc
 
 import integration.Address
-import integration.Employee
-import integration.meta
+import integration.address
+import integration.employee
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.OptimisticLockException
+import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
 import org.komapper.core.dsl.expression.When
 import org.komapper.core.dsl.metamodel.define
@@ -27,7 +28,7 @@ class SqlSelectQueryTest(private val db: R2dbcDatabase) {
 
     @Test
     fun list() = inTransaction(db) {
-        val a = Address.meta
+        val a = Meta.address
         val list: List<Address> = db.runQuery {
             QueryDsl.from(a)
         }.toList()
@@ -36,7 +37,7 @@ class SqlSelectQueryTest(private val db: R2dbcDatabase) {
 
     @Test
     fun first() = inTransaction(db) {
-        val a = Address.meta
+        val a = Meta.address
         val address: Address = db.runQuery {
             QueryDsl.from(a).where { a.addressId eq 1 }.first()
         }
@@ -45,7 +46,7 @@ class SqlSelectQueryTest(private val db: R2dbcDatabase) {
 
     @Test
     fun firstOrNull() = inTransaction(db) {
-        val a = Address.meta
+        val a = Meta.address
         val address: Address? = db.runQuery {
             QueryDsl.from(a).where { a.addressId eq 99 }.firstOrNull()
         }
@@ -54,7 +55,7 @@ class SqlSelectQueryTest(private val db: R2dbcDatabase) {
 
     @Test
     fun decoupling() = inTransaction(db) {
-        val a = Address.meta
+        val a = Meta.address
         val query = QueryDsl.from(a)
             .where { a.addressId greaterEq 1 }
             .orderBy(a.addressId.desc())
@@ -72,7 +73,7 @@ class SqlSelectQueryTest(private val db: R2dbcDatabase) {
 
     @Test
     fun option() = inTransaction(db) {
-        val e = Employee.meta
+        val e = Meta.employee
         val emp = db.runQuery {
             QueryDsl.from(e)
                 .options {
@@ -92,7 +93,7 @@ class SqlSelectQueryTest(private val db: R2dbcDatabase) {
 
     @Test
     fun caseExpression() = inTransaction(db) {
-        val a = Address.meta
+        val a = Meta.address
         val caseExpression = case(
             When(
                 { a.street eq "STREET 2"; a.addressId greater 1 },
@@ -112,7 +113,7 @@ class SqlSelectQueryTest(private val db: R2dbcDatabase) {
 
     @Test
     fun caseExpression_multipleWhen() = inTransaction(db) {
-        val a = Address.meta
+        val a = Meta.address
         val caseExpression = case(
             When(
                 { a.street eq "STREET 2"; a.addressId greater 1 },
@@ -136,7 +137,7 @@ class SqlSelectQueryTest(private val db: R2dbcDatabase) {
 
     @Test
     fun caseExpression_otherwiseNotSpecified() = inTransaction(db) {
-        val a = Address.meta
+        val a = Meta.address
         val caseExpression = case(
             When(
                 { a.street eq "STREET 2"; a.addressId greater 1 },
@@ -156,7 +157,7 @@ class SqlSelectQueryTest(private val db: R2dbcDatabase) {
 
     @Test
     fun defaultWhere() = inTransaction(db) {
-        val a = Address.meta.define { a ->
+        val a = Meta.address.define { a ->
             where { a.addressId eq 1 }
         }
         val list = db.runQuery { QueryDsl.from(a) }
@@ -165,9 +166,9 @@ class SqlSelectQueryTest(private val db: R2dbcDatabase) {
 
     @Test
     fun defaultWhere_update_single() = inTransaction(db) {
-        val a = Address.meta
+        val a = Meta.address
         val address = db.runQuery { QueryDsl.from(a).where { a.addressId eq 15 }.first() }
-        val a2 = Address.meta.define { a2 ->
+        val a2 = Meta.address.define { a2 ->
             where { a2.version eq 99 }
         }
         assertThrows<OptimisticLockException> {
@@ -179,7 +180,7 @@ class SqlSelectQueryTest(private val db: R2dbcDatabase) {
 
     @Test
     fun defaultWhere_update_set() = inTransaction(db) {
-        val a = Address.meta.define { a ->
+        val a = Meta.address.define { a ->
             where { a.addressId eq 15 }
         }
         val count = db.runQuery { QueryDsl.update(a).set { a.street set "hello" } }
@@ -188,9 +189,9 @@ class SqlSelectQueryTest(private val db: R2dbcDatabase) {
 
     @Test
     fun defaultWhere_delete_single() = inTransaction(db) {
-        val a = Address.meta
+        val a = Meta.address
         val address = db.runQuery { QueryDsl.from(a).where { a.addressId eq 15 }.first() }
-        val a2 = Address.meta.define { a2 ->
+        val a2 = Meta.address.define { a2 ->
             where { a2.version eq 99 }
         }
         assertThrows<OptimisticLockException> {
@@ -202,7 +203,7 @@ class SqlSelectQueryTest(private val db: R2dbcDatabase) {
 
     @Test
     fun defaultWhere_delete_all() = inTransaction(db) {
-        val a = Address.meta.define { a ->
+        val a = Meta.address.define { a ->
             where { a.addressId eq 15 }
         }
         val count = db.runQuery { QueryDsl.delete(a).all() }

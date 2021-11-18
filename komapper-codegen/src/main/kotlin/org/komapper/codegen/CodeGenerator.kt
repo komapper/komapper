@@ -85,9 +85,7 @@ class CodeGenerator(
                     val autoIncrement = if (column.isAutoIncrement) "@KomapperAutoIncrement " else ""
                     p.println("    $id$autoIncrement@KomapperColumn(\"${column.name}\") val $propertyName: Nothing,")
                 }
-                p.println(") {")
-                p.println("    companion object")
-                p.println("}")
+                p.println(")")
             }
         }
     }

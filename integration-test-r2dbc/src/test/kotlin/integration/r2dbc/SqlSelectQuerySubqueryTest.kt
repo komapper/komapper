@@ -1,9 +1,9 @@
 package integration.r2dbc
 
-import integration.Department
-import integration.Employee
-import integration.meta
+import integration.department
+import integration.employee
 import org.junit.jupiter.api.extension.ExtendWith
+import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
 import org.komapper.core.dsl.operator.count
 import org.komapper.core.dsl.operator.max
@@ -16,8 +16,8 @@ class SqlSelectQuerySubqueryTest(private val db: R2dbcDatabase) {
 
     @Test
     fun subquery_selectClause() = inTransaction(db) {
-        val d = Department.meta
-        val e = Employee.meta
+        val d = Meta.department
+        val e = Meta.employee
         val subquery = QueryDsl.from(e).where { d.departmentId eq e.departmentId }.select(count())
         val query = QueryDsl.from(d)
             .orderBy(d.departmentId)
@@ -29,8 +29,8 @@ class SqlSelectQuerySubqueryTest(private val db: R2dbcDatabase) {
 
     @Test
     fun subquery_whereClause() = inTransaction(db) {
-        val d = Department.meta
-        val e = Employee.meta
+        val d = Meta.department
+        val e = Meta.employee
         val subquery = QueryDsl.from(d)
             .where {
                 d.departmentName eq "SALES"

@@ -20,150 +20,102 @@ import java.util.UUID
 
 @KomapperEntity
 @KomapperTable("ANY_PERSON")
-data class AnyPerson(@KomapperId val name: String) : Serializable {
-    companion object
-}
+data class AnyPerson(@KomapperId val name: String) : Serializable
 
 @KomapperEntity
 @KomapperTable("ANY_TEST")
-data class AnyTest(@KomapperId val id: Int, val value: Any) {
-    companion object
-}
+data class AnyTest(@KomapperId val id: Int, val value: Any)
 
 @KomapperEntity
 @KomapperTable("ARRAY_TEST")
-data class ArrayTest(@KomapperId val id: Int, val value: Array?) {
-    companion object
-}
+data class ArrayTest(@KomapperId val id: Int, val value: Array?)
 
 @KomapperEntity
 @KomapperTable("BIG_DECIMAL_TEST")
-data class BigDecimalTest(@KomapperId val id: Int, val value: BigDecimal) {
-    companion object
-}
+data class BigDecimalTest(@KomapperId val id: Int, val value: BigDecimal)
 
 @KomapperEntity
 @KomapperTable("BIG_INTEGER_TEST")
-data class BigIntegerTest(@KomapperId val id: Int, val value: BigInteger) {
-    companion object
-}
+data class BigIntegerTest(@KomapperId val id: Int, val value: BigInteger)
 
 @KomapperEntity
 @KomapperTable("BOOLEAN_TEST")
-data class BooleanTest(@KomapperId val id: Int, val value: Boolean) {
-    companion object
-}
+data class BooleanTest(@KomapperId val id: Int, val value: Boolean)
 
 @KomapperEntity
 @KomapperTable("BYTE_TEST")
-data class ByteTest(@KomapperId val id: Int, val value: Byte) {
-    companion object
-}
+data class ByteTest(@KomapperId val id: Int, val value: Byte)
 
 @KomapperEntity
 @KomapperTable("BYTE_ARRAY_TEST")
 @Suppress("ArrayInDataClass")
-data class ByteArrayTest(@KomapperId val id: Int, val value: ByteArray) {
-    companion object
-}
+data class ByteArrayTest(@KomapperId val id: Int, val value: ByteArray)
 
 @KomapperEntity
 @KomapperTable("DOUBLE_TEST")
-data class DoubleTest(@KomapperId val id: Int, val value: Double) {
-    companion object
-}
+data class DoubleTest(@KomapperId val id: Int, val value: Double)
 
 @KomapperEntity
 @KomapperTable("FLOAT_TEST")
-data class FloatTest(@KomapperId val id: Int, val value: Float) {
-    companion object
-}
+data class FloatTest(@KomapperId val id: Int, val value: Float)
 
 @KomapperEntity
 @KomapperTable("INT_TEST")
-data class IntTest(@KomapperId val id: Int, val value: Int) {
-    companion object
-}
+data class IntTest(@KomapperId val id: Int, val value: Int)
 
 @KomapperEntity
 @KomapperTable("LOCAL_DATE_TIME_TEST")
-data class LocalDateTimeTest(@KomapperId val id: Int, val value: LocalDateTime) {
-    companion object
-}
+data class LocalDateTimeTest(@KomapperId val id: Int, val value: LocalDateTime)
 
 @KomapperEntity
 @KomapperTable("LOCAL_DATE_TEST")
-data class LocalDateTest(@KomapperId val id: Int, val value: LocalDate) {
-    companion object
-}
+data class LocalDateTest(@KomapperId val id: Int, val value: LocalDate)
 
 @KomapperEntity
 @KomapperTable("LOCAL_TIME_TEST")
-data class LocalTimeTest(@KomapperId val id: Int, val value: LocalTime) {
-    companion object
-}
+data class LocalTimeTest(@KomapperId val id: Int, val value: LocalTime)
 
 @KomapperEntity
 @KomapperTable("LONG_TEST")
-data class LongTest(@KomapperId val id: Int, val value: Long) {
-    companion object
-}
+data class LongTest(@KomapperId val id: Int, val value: Long)
 
 @KomapperEntity
 @KomapperTable("OFFSET_DATE_TIME_TEST")
-data class OffsetDateTimeTest(@KomapperId val id: Int, val value: OffsetDateTime) {
-    companion object
-}
+data class OffsetDateTimeTest(@KomapperId val id: Int, val value: OffsetDateTime)
 
 @KomapperEntity
 @KomapperTable("SHORT_TEST")
-data class ShortTest(@KomapperId val id: Int, val value: Short) {
-    companion object
-}
+data class ShortTest(@KomapperId val id: Int, val value: Short)
 
 @KomapperEntity
 @KomapperTable("SQLXML_TEST")
-data class SqlXmlTest(@KomapperId val id: Int, val value: SQLXML?) {
-    companion object
-}
+data class SqlXmlTest(@KomapperId val id: Int, val value: SQLXML?)
 
 @KomapperEntity
 @KomapperTable("STRING_TEST")
-data class StringTest(@KomapperId val id: Int, val value: String) {
-    companion object
-}
+data class StringTest(@KomapperId val id: Int, val value: String)
 
 data class Json(val data: String)
 
 @KomapperEntity
 @KomapperTable("JSON_TEST")
-data class JsonTest(@KomapperId val id: Int, val value: Json) {
-    companion object
-}
+data class JsonTest(@KomapperId val id: Int, val value: Json)
 
 @KomapperEntity
 @KomapperTable("SHORT_TEST")
-data class UByteTest(@KomapperId val id: Int, val value: UByte?) {
-    companion object
-}
+data class UByteTest(@KomapperId val id: Int, val value: UByte?)
 
 @KomapperEntity
 @KomapperTable("LONG_TEST")
-data class UIntTest(@KomapperId val id: Int, val value: UInt?) {
-    companion object
-}
+data class UIntTest(@KomapperId val id: Int, val value: UInt?)
 
 @KomapperEntity
 @KomapperTable("INT_TEST")
-data class UShortTest(@KomapperId val id: Int, val value: UShort?) {
-    companion object
-}
+data class UShortTest(@KomapperId val id: Int, val value: UShort?)
 
 @KomapperEntity
 @KomapperTable("UUID_TEST")
-data class UUIDTest(@KomapperId val id: Int, val value: UUID?) {
-    companion object
-}
+data class UUIDTest(@KomapperId val id: Int, val value: UUID?)
 
 @KomapperEntity
 @KomapperTable("ADDRESS")
@@ -171,9 +123,7 @@ data class UnsignedAddress(
     @KomapperId @KomapperColumn(name = "ADDRESS_ID") val addressId: UInt,
     val street: String,
     @KomapperVersion val version: UInt?
-) {
-    companion object
-}
+)
 
 @JvmInline
 value class UIntVersion(val value: UInt)
@@ -184,24 +134,18 @@ data class UnsignedAddress2(
     @KomapperId @KomapperColumn(name = "ADDRESS_ID") val addressId: UInt,
     val street: String,
     @KomapperVersion val version: UIntVersion?
-) {
-    companion object
-}
+)
 
 @KomapperEntity
 @KomapperTable("IDENTITY_STRATEGY")
 data class UnsignedIdentityStrategy(
     @KomapperId @KomapperAutoIncrement val id: UInt?,
     val value: String
-) {
-    companion object
-}
+)
 
 @KomapperEntity
 @KomapperTable("SEQUENCE_STRATEGY")
 data class UnsignedSequenceStrategy(
     @KomapperId @KomapperSequence(name = "SEQUENCE_STRATEGY_ID", incrementBy = 100) val id: UInt,
     val value: String
-) {
-    companion object
-}
+)

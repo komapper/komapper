@@ -7,11 +7,15 @@ import integration.VIdentityStrategy
 import integration.VPerson
 import integration.VSequenceStrategy
 import integration.Version
-import integration.meta
 import integration.setting.Dbms
 import integration.setting.Run
+import integration.vAddress
+import integration.vIdentityStrategy
+import integration.vPerson
+import integration.vSequenceStrategy
 import kotlinx.coroutines.delay
 import org.junit.jupiter.api.extension.ExtendWith
+import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
 import org.komapper.core.dsl.expression.When
 import org.komapper.core.dsl.operator.case
@@ -33,7 +37,7 @@ class ValueClassTest(val db: R2dbcDatabase) {
 
     @Test
     fun list() = inTransaction(db) {
-        val a = VAddress.meta
+        val a = Meta.vAddress
         val list: List<VAddress> = db.runQuery {
             QueryDsl.from(a).where { a.addressId eq IntId(1) }
         }.toList()
@@ -43,7 +47,7 @@ class ValueClassTest(val db: R2dbcDatabase) {
 
     @Test
     fun first() = inTransaction(db) {
-        val a = VAddress.meta
+        val a = Meta.vAddress
         val address: VAddress = db.runQuery {
             QueryDsl.from(a).where { a.addressId eq IntId(1) }.first()
         }
@@ -53,7 +57,7 @@ class ValueClassTest(val db: R2dbcDatabase) {
 
     @Test
     fun insert() = inTransaction(db) {
-        val a = VAddress.meta
+        val a = Meta.vAddress
         val address = VAddress(IntId(16), Street("STREET 16"), Version(0))
         db.runQuery { QueryDsl.insert(a).single(address) }
         val address2 = db.runQuery {
@@ -66,7 +70,7 @@ class ValueClassTest(val db: R2dbcDatabase) {
 
     @Test
     fun insert_timestamp() = inTransaction(db) {
-        val p = VPerson.meta
+        val p = Meta.vPerson
         val person1 = VPerson(IntId(1), "ABC")
         val id = db.runQuery { QueryDsl.insert(p).single(person1) }.personId
         val person2 = db.runQuery { QueryDsl.from(p).where { p.personId eq id }.first() }
@@ -83,7 +87,7 @@ class ValueClassTest(val db: R2dbcDatabase) {
 
     @Test
     fun update() = inTransaction(db) {
-        val a = VAddress.meta
+        val a = Meta.vAddress
         val query = QueryDsl.from(a).where { a.addressId eq IntId(15) }
         val address = db.runQuery { query.first() }
         val newAddress = address.copy(street = Street("NY street"))
@@ -101,7 +105,7 @@ class ValueClassTest(val db: R2dbcDatabase) {
 
     @Test
     fun updated_timestamp() = inTransaction(db) {
-        val p = VPerson.meta
+        val p = Meta.vPerson
         val findQuery = QueryDsl.from(p).where { p.personId eq IntId(1) }.first()
         val person1 = VPerson(IntId(1), "ABC")
         val person2 = db.runQuery {
@@ -118,7 +122,7 @@ class ValueClassTest(val db: R2dbcDatabase) {
 
     @Test
     fun delete() = inTransaction(db) {
-        val a = VAddress.meta
+        val a = Meta.vAddress
         val query = QueryDsl.from(a).where { a.addressId eq IntId(15) }
         val address = db.runQuery { query.first() }
         db.runQuery { QueryDsl.delete(a).single(address) }
@@ -128,7 +132,7 @@ class ValueClassTest(val db: R2dbcDatabase) {
     @Test
     fun identityGenerator() = inTransaction(db) {
         for (i in 1..201) {
-            val m = VIdentityStrategy.meta
+            val m = Meta.vIdentityStrategy
             val strategy = VIdentityStrategy(IntId(0), "test")
             val result = db.runQuery { QueryDsl.insert(m).single(strategy) }
             assertEquals(IntId(i), result.id)
@@ -139,7 +143,7 @@ class ValueClassTest(val db: R2dbcDatabase) {
     @Test
     fun sequenceGenerator() = inTransaction(db) {
         for (i in 1..201) {
-            val m = VSequenceStrategy.meta
+            val m = Meta.vSequenceStrategy
             val strategy = VSequenceStrategy(IntId(0), "test")
             val result = db.runQuery { QueryDsl.insert(m).single(strategy) }
             assertEquals(IntId(i), result.id)
@@ -148,7 +152,7 @@ class ValueClassTest(val db: R2dbcDatabase) {
 
     @Test
     fun inList2() = inTransaction(db) {
-        val a = VAddress.meta
+        val a = Meta.vAddress
         val list: List<VAddress> = db.runQuery {
             QueryDsl.from(a).where { (a.addressId to a.street) inList2 listOf(IntId(1) to Street("STREET 1")) }
         }.toList()
@@ -157,7 +161,7 @@ class ValueClassTest(val db: R2dbcDatabase) {
 
     @Test
     fun endsWith() = inTransaction(db) {
-        val a = VAddress.meta
+        val a = Meta.vAddress
         val list = db.runQuery {
             QueryDsl.from(a).where { a.street endsWith "1" }
         }.toList()
@@ -167,7 +171,7 @@ class ValueClassTest(val db: R2dbcDatabase) {
 
     @Test
     fun between() = inTransaction(db) {
-        val a = VAddress.meta
+        val a = Meta.vAddress
         val list = db.runQuery {
             QueryDsl.from(a)
                 .where { a.addressId between IntId(6)..IntId(10) }
@@ -179,7 +183,7 @@ class ValueClassTest(val db: R2dbcDatabase) {
 
     @Test
     fun notBetween() = inTransaction(db) {
-        val a = VAddress.meta
+        val a = Meta.vAddress
         val list = db.runQuery {
             QueryDsl.from(a)
                 .where { a.addressId notBetween IntId(6)..IntId(10) }
@@ -191,7 +195,7 @@ class ValueClassTest(val db: R2dbcDatabase) {
 
     @Test
     fun select_single() = inTransaction(db) {
-        val a = VAddress.meta
+        val a = Meta.vAddress
         val result = db.runQuery {
             QueryDsl.from(a).orderBy(a.addressId).select(a.street).first()
         }
@@ -200,7 +204,7 @@ class ValueClassTest(val db: R2dbcDatabase) {
 
     @Test
     fun select_pair() = inTransaction(db) {
-        val a = VAddress.meta
+        val a = Meta.vAddress
         val result = db.runQuery {
             QueryDsl.from(a).orderBy(a.addressId).select(a.addressId, a.street).first()
         }
@@ -209,7 +213,7 @@ class ValueClassTest(val db: R2dbcDatabase) {
 
     @Test
     fun expression_count() = inTransaction(db) {
-        val a = VAddress.meta
+        val a = Meta.vAddress
         val count = db.runQuery {
             QueryDsl.from(a).select(count()).first()
         }
@@ -218,7 +222,7 @@ class ValueClassTest(val db: R2dbcDatabase) {
 
     @Test
     fun expression_max() = inTransaction(db) {
-        val a = VAddress.meta
+        val a = Meta.vAddress
         val max = db.runQuery {
             QueryDsl.from(a).select(max(a.addressId)).first()
         }
@@ -227,7 +231,7 @@ class ValueClassTest(val db: R2dbcDatabase) {
 
     @Test
     fun expression_plus() = inTransaction(db) {
-        val a = VAddress.meta
+        val a = Meta.vAddress
         val result = db.runQuery {
             QueryDsl.from(a).orderBy(a.addressId).select(a.addressId + IntId(100)).first()
         }
@@ -236,7 +240,7 @@ class ValueClassTest(val db: R2dbcDatabase) {
 
     @Test
     fun expression_concat() = inTransaction(db) {
-        val a = VAddress.meta
+        val a = Meta.vAddress
         val result = db.runQuery {
             QueryDsl.from(a).orderBy(a.addressId).select(concat(Street("["), concat(a.street, Street("]")))).first()
         }
@@ -245,7 +249,7 @@ class ValueClassTest(val db: R2dbcDatabase) {
 
     @Test
     fun expression_case() = inTransaction(db) {
-        val a = VAddress.meta
+        val a = Meta.vAddress
         val caseExpression = case(
             When(
                 { a.street eq Street("STREET 2"); a.addressId greater IntId(1) },

@@ -17,7 +17,7 @@ fun PropertyMetamodel<*, *, *>.isAutoIncrement(): Boolean {
 }
 
 fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> META.define(declaration: MetamodelDeclaration<ENTITY, ID, META>): META {
-    return newMeta(
+    return newMetamodel(
         table = tableName(),
         catalog = catalogName(),
         schema = schemaName(),
