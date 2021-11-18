@@ -56,6 +56,7 @@ internal class EntityProcessor(private val environment: SymbolProcessorEnvironme
         val entityName = model.definitionSource.entityName.ifEmpty {
             toCamelCase(declaration.simpleName.asString())
         }
+        val extensionProperty = config.metaObject + "." + entityName
         val packageName = declaration.packageName.asString()
         val entityQualifiedName = declaration.qualifiedName?.asString() ?: ""
         val entityTypeName = entityQualifiedName.removePrefix("$packageName.")
@@ -65,11 +66,11 @@ internal class EntityProcessor(private val environment: SymbolProcessorEnvironme
             PrintWriter(out).use {
                 val runnable = if (model.entity != null) {
                     EntityMetamodelGenerator(
-                        model.entity, entityName, packageName, entityTypeName, simpleName, it
+                        model.entity, extensionProperty, packageName, entityTypeName, simpleName, it
                     )
                 } else {
                     EntityMetamodelStubGenerator(
-                        declaration, entityName, packageName, entityTypeName, simpleName, it
+                        declaration, extensionProperty, packageName, entityTypeName, simpleName, it
                     )
                 }
                 runnable.run()
