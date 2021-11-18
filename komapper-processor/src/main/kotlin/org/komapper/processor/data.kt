@@ -9,7 +9,8 @@ import com.google.devtools.ksp.symbol.Nullability
 
 internal data class EntityDefinitionSource(
     val defDeclaration: KSClassDeclaration,
-    val entityDeclaration: KSClassDeclaration
+    val entityDeclaration: KSClassDeclaration,
+    val entityName: String
 )
 
 internal data class EntityDef(

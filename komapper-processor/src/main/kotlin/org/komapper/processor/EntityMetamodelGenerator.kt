@@ -21,6 +21,7 @@ import java.time.ZonedDateTime
 
 internal class EntityMetamodelGenerator(
     private val entity: Entity,
+    private val entityName: String,
     private val packageName: String,
     private val entityTypeName: String,
     private val simpleName: String,
@@ -345,6 +346,6 @@ internal class EntityMetamodelGenerator(
     }
 
     private fun utils() {
-        w.println("val $Meta.${ toPropertyNameFormat(entityTypeName)} get() = $simpleName.meta")
+        w.println("val $Meta.$entityName get() = $simpleName.meta")
     }
 }

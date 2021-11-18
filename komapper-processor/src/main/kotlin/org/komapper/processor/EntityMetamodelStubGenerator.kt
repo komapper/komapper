@@ -10,6 +10,7 @@ import java.time.ZonedDateTime
 
 internal class EntityMetamodelStubGenerator(
     private val declaration: KSClassDeclaration,
+    private val entityName: String,
     private val packageName: String,
     private val entityTypeName: String,
     private val simpleName: String,
@@ -46,6 +47,6 @@ internal class EntityMetamodelStubGenerator(
         w.println("    }")
         w.println("}")
         w.println("")
-        w.println("val ${ClassNames.Meta}.${toPropertyNameFormat(entityTypeName)} get() = $simpleName.meta")
+        w.println("val ${ClassNames.Meta}.$entityName get() = $simpleName.meta")
     }
 }

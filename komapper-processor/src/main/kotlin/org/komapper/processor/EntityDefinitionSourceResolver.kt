@@ -25,11 +25,12 @@ internal class SeparateDefinitionSourceResolver : EntityDefinitionSourceResolver
             Unit
         )
         val annotation = defDeclaration.findAnnotation(KomapperEntityDef::class)
-        val value = annotation?.findValue("entity")
-        if (value !is KSType) {
+        val entity = annotation?.findValue("entity")
+        val entityName = annotation?.findValue("entityName")?.toString() ?: ""
+        if (entity !is KSType) {
             report("The entity value of @${KomapperEntityDef::class.simpleName} is not found.", defDeclaration)
         }
-        val entityDeclaration = value.declaration.accept(
+        val entityDeclaration = entity.declaration.accept(
             object : ClassDeclarationVisitor() {
                 override fun defaultHandler(node: KSNode, data: Unit): KSClassDeclaration {
                     report("The entity value of @${KomapperEntityDef::class.simpleName} is not found.", defDeclaration)
@@ -38,7 +39,7 @@ internal class SeparateDefinitionSourceResolver : EntityDefinitionSourceResolver
             Unit
         )
         validateEntityDeclaration(entityDeclaration)
-        return EntityDefinitionSource(defDeclaration, entityDeclaration)
+        return EntityDefinitionSource(defDeclaration, entityDeclaration, entityName)
     }
 }
 
@@ -52,8 +53,10 @@ internal class SelfDefinitionSourceResolver : EntityDefinitionSourceResolver {
             },
             Unit
         )
+        val annotation = entityDeclaration.findAnnotation(KomapperEntity::class)
+        val name = annotation?.findValue("name")?.toString() ?: ""
         validateEntityDeclaration(entityDeclaration)
-        return EntityDefinitionSource(entityDeclaration, entityDeclaration)
+        return EntityDefinitionSource(entityDeclaration, entityDeclaration, name)
     }
 }
 

@@ -7,10 +7,10 @@ internal class UtilityKtTest {
 
     @Test
     fun toPropertyNameFormat() {
-        assertEquals("aaaBbbCcc", toPropertyNameFormat("AaaBbbCcc"))
-        assertEquals("aa5BbbCcc", toPropertyNameFormat("Aa5BbbCcc"))
-        assertEquals("a5aBbbCcc", toPropertyNameFormat("A5aBbbCcc"))
-        assertEquals("vAddress", toPropertyNameFormat("VAddress"))
-        assertEquals("uuidTest", toPropertyNameFormat("UUIDTest"))
+        assertEquals("aaaBbbCcc", toCamelCase("AaaBbbCcc"))
+        assertEquals("aa5BbbCcc", toCamelCase("Aa5BbbCcc"))
+        assertEquals("a5aBbbCcc", toCamelCase("A5aBbbCcc"))
+        assertEquals("vAddress", toCamelCase("VAddress"))
+        assertEquals("uuidTest", toCamelCase("UUIDTest"))
     }
 }
