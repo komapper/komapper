@@ -8,6 +8,7 @@ import org.komapper.annotation.KomapperEntityDef
 import org.komapper.annotation.KomapperId
 import org.komapper.annotation.KomapperUpdatedAt
 import org.komapper.annotation.KomapperVersion
+import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
 import org.komapper.core.dsl.SchemaDsl
 import org.komapper.core.dsl.query.first
@@ -30,16 +31,14 @@ data class AddressDef(
     @KomapperVersion val version: Nothing,
     @KomapperCreatedAt val createdAt: Nothing,
     @KomapperUpdatedAt val updatedAt: Nothing,
-) {
-    companion object
-}
+)
 
 fun main() = runBlocking {
     // create a Database instance
     val db = R2dbcDatabase.create("r2dbc:h2:mem:///example;DB_CLOSE_DELAY=-1")
 
     // get a metamodel
-    val a = AddressDef.meta
+    val a = Meta.address
 
     // execute simple CRUD operations as a transaction
     db.withTransaction {

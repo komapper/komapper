@@ -65,9 +65,8 @@ internal class EntityProcessor(private val environment: SymbolProcessorEnvironme
                         model.entity, packageName, entityTypeName, simpleName, it
                     )
                 } else {
-                    val defDeclaration = model.definitionSource.defDeclaration
                     EntityMetamodelStubGenerator(
-                        defDeclaration, declaration, packageName, entityTypeName, simpleName, it
+                        declaration, packageName, entityTypeName, simpleName, it
                     )
                 }
                 runnable.run()

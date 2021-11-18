@@ -1,12 +1,12 @@
 package integration.jdbc
 
-import integration.Address
-import integration.Department
-import integration.Employee
-import integration.meta
+import integration.address
+import integration.department
+import integration.employee
 import integration.setting.Dbms
 import integration.setting.Run
 import org.junit.jupiter.api.extension.ExtendWith
+import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
 import org.komapper.core.dsl.operator.alias
 import org.komapper.core.dsl.operator.asc
@@ -27,7 +27,7 @@ class SqlSetOperationQueryTest(private val db: JdbcDatabase) {
     @Run(unless = [Dbms.MYSQL])
     @Test
     fun except_entity() {
-        val e = Employee.meta
+        val e = Meta.employee
         val q1 = QueryDsl.from(e).where { e.employeeId inList listOf(1, 2, 3, 4, 5) }
         val q2 = QueryDsl.from(e).where { e.employeeId inList listOf(2, 4, 6, 8) }
         val query = (q1 except q2).orderBy(e.employeeId)
@@ -44,7 +44,7 @@ class SqlSetOperationQueryTest(private val db: JdbcDatabase) {
     @Run(unless = [Dbms.MYSQL])
     @Test
     fun intersect_entity() {
-        val e = Employee.meta
+        val e = Meta.employee
         val q1 = QueryDsl.from(e).where { e.employeeId inList listOf(1, 2, 3, 4, 5) }
         val q2 = QueryDsl.from(e).where { e.employeeId inList listOf(2, 4, 6, 8) }
         val query = (q1 intersect q2).orderBy(e.employeeId)
@@ -58,7 +58,7 @@ class SqlSetOperationQueryTest(private val db: JdbcDatabase) {
 
     @Test
     fun union_entity() {
-        val e = Employee.meta
+        val e = Meta.employee
         val q1 = QueryDsl.from(e).where { e.employeeId eq 1 }
         val q2 = QueryDsl.from(e).where { e.employeeId eq 1 }
         val q3 = QueryDsl.from(e).where { e.employeeId eq 5 }
@@ -73,7 +73,7 @@ class SqlSetOperationQueryTest(private val db: JdbcDatabase) {
 
     @Test
     fun union_subquery() {
-        val e = Employee.meta
+        val e = Meta.employee
         val q1 = QueryDsl.from(e).where { e.employeeId eq 1 }.select(e.employeeId)
         val q2 = QueryDsl.from(e).where { e.employeeId eq 6 }.select(e.employeeId)
         val subquery = q1 union q2
@@ -86,9 +86,9 @@ class SqlSetOperationQueryTest(private val db: JdbcDatabase) {
 
     @Test
     fun union_columns() {
-        val e = Employee.meta
-        val a = Address.meta
-        val d = Department.meta
+        val e = Meta.employee
+        val a = Meta.address
+        val d = Meta.department
         val q1 =
             QueryDsl.from(e).where { e.employeeId eq 1 }
                 .select(e.employeeId alias "ID", e.employeeName alias "NAME")
@@ -106,7 +106,7 @@ class SqlSetOperationQueryTest(private val db: JdbcDatabase) {
 
     @Test
     fun unionAll_entity() {
-        val e = Employee.meta
+        val e = Meta.employee
         val q1 = QueryDsl.from(e).where { e.employeeId eq 1 }
         val q2 = QueryDsl.from(e).where { e.employeeId eq 1 }
         val q3 = QueryDsl.from(e).where { e.employeeId eq 5 }
@@ -123,7 +123,7 @@ class SqlSetOperationQueryTest(private val db: JdbcDatabase) {
 
     @Test
     fun emptyWhereClause() {
-        val e = Employee.meta
+        val e = Meta.employee
         val q1 = QueryDsl.from(e).where { e.employeeId eq 1 }
         val q2 = QueryDsl.from(e)
         val query = (q1 union q2).options { it.copy(allowEmptyWhereClause = false) }
@@ -135,7 +135,7 @@ class SqlSetOperationQueryTest(private val db: JdbcDatabase) {
 
     @Test
     fun orderBy() {
-        val e = Employee.meta
+        val e = Meta.employee
         val q1 = QueryDsl.from(e).select(e.employeeId alias "ID")
         val query = (q1 union q1).orderBy("ID")
         val list = db.runQuery { query }
@@ -146,7 +146,7 @@ class SqlSetOperationQueryTest(private val db: JdbcDatabase) {
 
     @Test
     fun orderBy_asc() {
-        val e = Employee.meta
+        val e = Meta.employee
         val q1 = QueryDsl.from(e).select(e.employeeId alias "ID")
         val query = (q1 union q1).orderBy(asc("ID"))
         val list = db.runQuery { query }
@@ -157,7 +157,7 @@ class SqlSetOperationQueryTest(private val db: JdbcDatabase) {
 
     @Test
     fun orderBy_desc() {
-        val e = Employee.meta
+        val e = Meta.employee
         val q1 = QueryDsl.from(e).select(e.employeeId alias "ID")
         val query = (q1 union q1).orderBy(desc("ID"))
         val list = db.runQuery { query }
@@ -168,7 +168,7 @@ class SqlSetOperationQueryTest(private val db: JdbcDatabase) {
 
     @Test
     fun orderBy_ascNullsFirst() {
-        val e = Employee.meta
+        val e = Meta.employee
         val q1 = QueryDsl.from(e).select(e.managerId alias "ID")
         val query = (q1 union q1).orderBy(ascNullsFirst("ID"))
         val list = db.runQuery { query }
@@ -179,7 +179,7 @@ class SqlSetOperationQueryTest(private val db: JdbcDatabase) {
 
     @Test
     fun orderBy_ascNullsLast() {
-        val e = Employee.meta
+        val e = Meta.employee
         val q1 = QueryDsl.from(e).select(e.managerId alias "ID")
         val query = (q1 union q1).orderBy(ascNullsLast("ID"))
         val list = db.runQuery { query }
@@ -190,7 +190,7 @@ class SqlSetOperationQueryTest(private val db: JdbcDatabase) {
 
     @Test
     fun orderBy_descNullsFirst() {
-        val e = Employee.meta
+        val e = Meta.employee
         val q1 = QueryDsl.from(e).select(e.managerId alias "ID")
         val query = (q1 union q1).orderBy(descNullsFirst("ID"))
         val list = db.runQuery { query }
@@ -201,7 +201,7 @@ class SqlSetOperationQueryTest(private val db: JdbcDatabase) {
 
     @Test
     fun orderBy_descNullsLast() {
-        val e = Employee.meta
+        val e = Meta.employee
         val q1 = QueryDsl.from(e).select(e.managerId alias "ID")
         val query = (q1 union q1).orderBy(descNullsLast("ID"))
         val list = db.runQuery { query }

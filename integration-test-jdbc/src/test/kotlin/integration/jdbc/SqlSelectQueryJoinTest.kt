@@ -1,11 +1,10 @@
 package integration.jdbc
 
-import integration.Address
-import integration.Department
-import integration.Employee
-import integration.meta
-import integration.newMeta
+import integration.address
+import integration.department
+import integration.employee
 import org.junit.jupiter.api.extension.ExtendWith
+import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
 import org.komapper.jdbc.JdbcDatabase
 import kotlin.test.Test
@@ -18,8 +17,8 @@ class SqlSelectQueryJoinTest(private val db: JdbcDatabase) {
 
     @Test
     fun innerJoin() {
-        val a = Address.meta
-        val e = Employee.meta
+        val a = Meta.address
+        val e = Meta.employee
         val list = db.runQuery {
             QueryDsl.from(a).innerJoin(e) {
                 a.addressId eq e.addressId
@@ -30,8 +29,8 @@ class SqlSelectQueryJoinTest(private val db: JdbcDatabase) {
 
     @Test
     fun leftJoin() {
-        val a = Address.meta
-        val e = Employee.meta
+        val a = Meta.address
+        val e = Meta.employee
         val list = db.runQuery {
             QueryDsl.from(a).leftJoin(e) {
                 a.addressId eq e.addressId
@@ -42,8 +41,8 @@ class SqlSelectQueryJoinTest(private val db: JdbcDatabase) {
 
     @Test
     fun innerJoin_multiConditions() {
-        val employee = Employee.meta
-        val manager = Employee.newMeta()
+        val employee = Meta.employee
+        val manager = employee.clone()
         val list = db.runQuery {
             QueryDsl.from(employee).innerJoin(manager) {
                 employee.managerId eq manager.employeeId
@@ -56,9 +55,9 @@ class SqlSelectQueryJoinTest(private val db: JdbcDatabase) {
 
     @Test
     fun include_one_association() {
-        val a = Address.meta
-        val e = Employee.meta
-        val d = Department.meta
+        val a = Meta.address
+        val e = Meta.employee
+        val d = Meta.department
         val entityContext = db.runQuery {
             QueryDsl.from(e)
                 .innerJoin(a) {
@@ -85,9 +84,9 @@ class SqlSelectQueryJoinTest(private val db: JdbcDatabase) {
 
     @Test
     fun include_two_associations() {
-        val a = Address.meta
-        val e = Employee.meta
-        val d = Department.meta
+        val a = Meta.address
+        val e = Meta.employee
+        val d = Meta.department
         val entityContext = db.runQuery {
             QueryDsl.from(e)
                 .innerJoin(a) {
@@ -115,9 +114,9 @@ class SqlSelectQueryJoinTest(private val db: JdbcDatabase) {
 
     @Test
     fun includeAll() {
-        val a = Address.meta
-        val e = Employee.meta
-        val d = Department.meta
+        val a = Meta.address
+        val e = Meta.employee
+        val d = Meta.department
         val entityContext = db.runQuery {
             QueryDsl.from(e)
                 .innerJoin(a) {
@@ -144,8 +143,8 @@ class SqlSelectQueryJoinTest(private val db: JdbcDatabase) {
 
     @Test
     fun associate() {
-        val d = Department.meta
-        val e = Employee.meta
+        val d = Meta.department
+        val e = Meta.employee
         val entityContext = db.runQuery {
             QueryDsl.from(d).innerJoin(e) {
                 d.departmentId eq e.departmentId
@@ -165,8 +164,8 @@ class SqlSelectQueryJoinTest(private val db: JdbcDatabase) {
 
     @Test
     fun associateById() {
-        val d = Department.meta
-        val e = Employee.meta
+        val d = Meta.department
+        val e = Meta.employee
         val entityContext = db.runQuery {
             QueryDsl.from(d).innerJoin(e) {
                 d.departmentId eq e.departmentId
@@ -189,8 +188,8 @@ class SqlSelectQueryJoinTest(private val db: JdbcDatabase) {
 
     @Test
     fun associate_asOneToOne() {
-        val a = Address.meta
-        val e = Employee.meta
+        val a = Meta.address
+        val e = Meta.employee
         val entityContext = db.runQuery {
             QueryDsl.from(e)
                 .innerJoin(a) {
@@ -210,8 +209,8 @@ class SqlSelectQueryJoinTest(private val db: JdbcDatabase) {
 
     @Test
     fun associateById_asOneToOne() {
-        val a = Address.meta
-        val e = Employee.meta
+        val a = Meta.address
+        val e = Meta.employee
         val entityContext = db.runQuery {
             QueryDsl.from(e)
                 .innerJoin(a) {
@@ -231,9 +230,9 @@ class SqlSelectQueryJoinTest(private val db: JdbcDatabase) {
 
     @Test
     fun mainEntities() {
-        val a = Address.meta
-        val e = Employee.meta
-        val d = Department.meta
+        val a = Meta.address
+        val e = Meta.employee
+        val d = Meta.department
         val entityContext = db.runQuery {
             QueryDsl.from(e)
                 .innerJoin(a) {
@@ -248,8 +247,8 @@ class SqlSelectQueryJoinTest(private val db: JdbcDatabase) {
 
     @Test
     fun associate_selfJoin() {
-        val e = Employee.meta
-        val m = Employee.newMeta()
+        val e = Meta.employee
+        val m = e.clone()
         val entityContext = db.runQuery {
             QueryDsl.from(m).innerJoin(e) {
                 m.employeeId eq e.managerId

@@ -1,10 +1,11 @@
 package integration.r2dbc
 
 import integration.Address
-import integration.Department
-import integration.Employee
-import integration.meta
+import integration.address
+import integration.department
+import integration.employee
 import org.junit.jupiter.api.extension.ExtendWith
+import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
 import org.komapper.core.dsl.operator.concat
 import org.komapper.core.dsl.operator.count
@@ -18,7 +19,7 @@ class SqlSelectQuerySelectTest(private val db: R2dbcDatabase) {
 
     @Test
     fun selectColumns() = inTransaction(db) {
-        val a = Address.meta
+        val a = Meta.address
         val streetList = db.runQuery {
             QueryDsl.from(a)
                 .where {
@@ -32,7 +33,7 @@ class SqlSelectQuerySelectTest(private val db: R2dbcDatabase) {
 
     @Test
     fun selectColumns_first() = inTransaction(db) {
-        val a = Address.meta
+        val a = Meta.address
         val value = db.runQuery {
             QueryDsl.from(a)
                 .where {
@@ -47,7 +48,7 @@ class SqlSelectQuerySelectTest(private val db: R2dbcDatabase) {
 
     @Test
     fun selectColumnsAsPair() = inTransaction(db) {
-        val a = Address.meta
+        val a = Meta.address
         val pairList = db.runQuery {
             QueryDsl.from(a)
                 .where {
@@ -61,7 +62,7 @@ class SqlSelectQuerySelectTest(private val db: R2dbcDatabase) {
 
     @Test
     fun selectColumnsAsTriple() = inTransaction(db) {
-        val a = Address.meta
+        val a = Meta.address
         val tripleList = db.runQuery {
             QueryDsl.from(a)
                 .where {
@@ -81,7 +82,7 @@ class SqlSelectQuerySelectTest(private val db: R2dbcDatabase) {
 
     @Test
     fun selectColumnsAsRecord() = inTransaction(db) {
-        val a = Address.meta
+        val a = Meta.address
         val list = db.runQuery {
             QueryDsl.from(a)
                 .where {
@@ -105,8 +106,8 @@ class SqlSelectQuerySelectTest(private val db: R2dbcDatabase) {
 
     @Test
     fun selectEntity() = inTransaction(db) {
-        val a = Address.meta
-        val e = Employee.meta
+        val a = Meta.address
+        val e = Meta.employee
         val list: List<Address> = db.runQuery {
             QueryDsl.from(a)
                 .leftJoin(e) {
@@ -119,8 +120,8 @@ class SqlSelectQuerySelectTest(private val db: R2dbcDatabase) {
 
     @Test
     fun selectColumnsAsPair_scalar() = inTransaction(db) {
-        val d = Department.meta
-        val e = Employee.meta
+        val d = Meta.department
+        val e = Meta.employee
         val subquery = QueryDsl.from(e).where { d.departmentId eq e.departmentId }.select(count())
         val list = db.runQuery {
             QueryDsl.from(d)

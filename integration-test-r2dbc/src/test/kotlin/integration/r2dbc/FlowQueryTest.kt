@@ -1,10 +1,10 @@
 package integration.r2dbc
 
-import integration.Address
-import integration.Employee
-import integration.meta
+import integration.address
+import integration.employee
 import kotlinx.coroutines.flow.toList
 import org.junit.jupiter.api.extension.ExtendWith
+import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
 import org.komapper.core.dsl.TemplateDsl
 import org.komapper.core.dsl.operator.count
@@ -19,7 +19,7 @@ class FlowQueryTest(val db: R2dbcDatabase) {
     @Test
     fun singleEntity() = inTransaction(db) {
         val flow = db.flow {
-            val a = Address.meta
+            val a = Meta.address
             QueryDsl.from(a).where { a.addressId inList listOf(1, 2) }.orderBy(a.addressId)
         }
         assertEquals(listOf(1, 2), flow.toList().map { it.addressId })
@@ -28,7 +28,7 @@ class FlowQueryTest(val db: R2dbcDatabase) {
     @Test
     fun singleEntity_union() = inTransaction(db) {
         val flow = db.flow {
-            val a = Address.meta
+            val a = Meta.address
             QueryDsl.from(a).where { a.addressId eq 1 }.union(
                 QueryDsl.from(a).where { a.addressId eq 2 }
             ).orderBy(a.addressId)
@@ -39,7 +39,7 @@ class FlowQueryTest(val db: R2dbcDatabase) {
     @Test
     fun singleColumn() = inTransaction(db) {
         val flow = db.flow {
-            val a = Address.meta
+            val a = Meta.address
             QueryDsl.from(a)
                 .where { a.addressId inList listOf(1, 2) }
                 .orderBy(a.addressId)
@@ -51,11 +51,11 @@ class FlowQueryTest(val db: R2dbcDatabase) {
     @Test
     fun singleColumn_union() = inTransaction(db) {
         val flow = db.flow {
-            val a = Address.meta
+            val a = Meta.address
             QueryDsl.from(a)
                 .where { a.addressId eq 1 }
                 .select(a.addressId).union(
-                    QueryDsl.from(Address.meta)
+                    QueryDsl.from(Meta.address)
                         .where { a.addressId eq 2 }
                         .select(a.addressId)
                 ).orderBy(a.addressId)
@@ -66,7 +66,7 @@ class FlowQueryTest(val db: R2dbcDatabase) {
     @Test
     fun pairColumns() = inTransaction(db) {
         val flow = db.flow {
-            val a = Address.meta
+            val a = Meta.address
             QueryDsl.from(a)
                 .where { a.addressId inList listOf(1, 2) }
                 .orderBy(a.addressId)
@@ -84,11 +84,11 @@ class FlowQueryTest(val db: R2dbcDatabase) {
     @Test
     fun pairColumns_union() = inTransaction(db) {
         val flow = db.flow {
-            val a = Address.meta
+            val a = Meta.address
             QueryDsl.from(a)
                 .where { a.addressId eq 1 }
                 .select(a.addressId, a.street).union(
-                    QueryDsl.from(Address.meta)
+                    QueryDsl.from(Meta.address)
                         .where { a.addressId eq 2 }
                         .select(a.addressId, a.street)
                 ).orderBy(a.addressId)
@@ -105,7 +105,7 @@ class FlowQueryTest(val db: R2dbcDatabase) {
     @Test
     fun tripleColumns() = inTransaction(db) {
         val flow = db.flow {
-            val a = Address.meta
+            val a = Meta.address
             QueryDsl.from(a)
                 .where { a.addressId inList listOf(1, 2) }
                 .orderBy(a.addressId)
@@ -123,7 +123,7 @@ class FlowQueryTest(val db: R2dbcDatabase) {
     @Test
     fun tripleColumns_union() = inTransaction(db) {
         val flow = db.flow {
-            val a = Address.meta
+            val a = Meta.address
             QueryDsl.from(a)
                 .where { a.addressId eq 1 }
                 .select(a.addressId, a.street, a.version).union(
@@ -143,7 +143,7 @@ class FlowQueryTest(val db: R2dbcDatabase) {
 
     @Test
     fun multipleColumns() = inTransaction(db) {
-        val a = Address.meta
+        val a = Meta.address
         val flow = db.flow {
             QueryDsl.from(a)
                 .where { a.addressId inList listOf(1, 2) }
@@ -158,7 +158,7 @@ class FlowQueryTest(val db: R2dbcDatabase) {
 
     @Test
     fun multipleColumns_union() = inTransaction(db) {
-        val e = Employee.meta
+        val e = Meta.employee
         val flow = db.flow {
             QueryDsl.from(e)
                 .where { e.employeeId eq 1 }
@@ -184,7 +184,7 @@ class FlowQueryTest(val db: R2dbcDatabase) {
 
     @Test
     fun scalar() = inTransaction(db) {
-        val a = Address.meta
+        val a = Meta.address
         val scalarQuery: ScalarQuery<Long?, Long, Long> = QueryDsl.from(a).select(count(a.street))
         val flow = db.flow { scalarQuery }
         assertEquals(listOf(15L), flow.toList())

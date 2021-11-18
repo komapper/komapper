@@ -1,9 +1,9 @@
 package integration.jdbc
 
-import integration.Address
-import integration.Employee
-import integration.meta
+import integration.address
+import integration.employee
 import org.junit.jupiter.api.extension.ExtendWith
+import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
 import org.komapper.core.dsl.operator.concat
 import org.komapper.core.dsl.operator.plus
@@ -18,7 +18,7 @@ class SqlUpdateQuerySetTest(private val db: JdbcDatabase) {
 
     @Test
     fun test() {
-        val a = Address.meta
+        val a = Meta.address
         val count = db.runQuery {
             QueryDsl.update(a).set {
                 a.street set "STREET 16"
@@ -37,7 +37,7 @@ class SqlUpdateQuerySetTest(private val db: JdbcDatabase) {
 
     @Test
     fun setIfNotNull() {
-        val a = Address.meta
+        val a = Meta.address
         val count = db.runQuery {
             QueryDsl.update(a).set {
                 a.street setIfNotNull null
@@ -58,7 +58,7 @@ class SqlUpdateQuerySetTest(private val db: JdbcDatabase) {
 
     @Test
     fun arithmetic_add() {
-        val a = Address.meta
+        val a = Meta.address
         val count = db.runQuery {
             QueryDsl.update(a).set {
                 a.version set (a.version + 10)
@@ -77,7 +77,7 @@ class SqlUpdateQuerySetTest(private val db: JdbcDatabase) {
 
     @Test
     fun string_concat() {
-        val a = Address.meta
+        val a = Meta.address
         val count = db.runQuery {
             QueryDsl.update(a).set {
                 a.street set (concat(concat("[", a.street), "]"))
@@ -96,7 +96,7 @@ class SqlUpdateQuerySetTest(private val db: JdbcDatabase) {
 
     @Test
     fun allowEmptyWhereClause_default() {
-        val e = Employee.meta
+        val e = Meta.employee
         val ex = assertFailsWith<IllegalStateException> {
             @Suppress("UNUSED_VARIABLE")
             val count = db.runQuery {
@@ -110,7 +110,7 @@ class SqlUpdateQuerySetTest(private val db: JdbcDatabase) {
 
     @Test
     fun allowEmptyWhereClause_true() {
-        val e = Employee.meta
+        val e = Meta.employee
         val count = db.runQuery {
             QueryDsl.update(e).set {
                 e.employeeName set "ABC"

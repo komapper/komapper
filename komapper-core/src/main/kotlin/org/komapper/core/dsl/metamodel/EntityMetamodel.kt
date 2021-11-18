@@ -20,7 +20,7 @@ interface EntityMetamodel<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, M
     fun preUpdate(e: ENTITY, c: Clock): ENTITY
     fun postUpdate(e: ENTITY): ENTITY
     fun newEntity(m: Map<PropertyMetamodel<*, *, *>, Any?>): ENTITY
-    fun newMeta(
+    fun newMetamodel(
         table: String,
         catalog: String,
         schema: String,
@@ -51,7 +51,7 @@ abstract class EntityMetamodelStub<ENTITY : Any, META : EntityMetamodelStub<ENTI
     override fun preInsert(e: ENTITY, c: Clock): ENTITY = fail()
     override fun preUpdate(e: ENTITY, c: Clock): ENTITY = fail()
     override fun postUpdate(e: ENTITY): ENTITY = fail()
-    override fun newMeta(
+    override fun newMetamodel(
         table: String,
         catalog: String,
         schema: String,

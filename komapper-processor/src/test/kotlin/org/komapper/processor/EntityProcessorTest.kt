@@ -18,25 +18,6 @@ class EntityProcessorTest {
     var tempDir: Path? = null
 
     @Test
-    fun `Define a companion object in the class`() {
-        val result = compile(
-            kotlin(
-                "source.kt",
-                """
-                package test
-                import org.komapper.annotation.*
-                @KomapperEntity
-                data class Dept(
-                    @KomapperId val id: Int
-                )
-                """
-            )
-        )
-        assertEquals(result.exitCode, KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertTrue(result.messages.contains("Define a companion object in the class."))
-    }
-
-    @Test
     fun `The entity class must have at least one id property`() {
         val result = compile(
             kotlin(
@@ -47,7 +28,7 @@ class EntityProcessorTest {
                 @KomapperEntity
                 data class Dept(
                     val id: Int
-                ) { companion object }
+                )
                 """
             )
         )
@@ -67,7 +48,7 @@ class EntityProcessorTest {
                     @KomapperEntity
                     data class Dept(
                         val id: Int
-                    ) { companion object }
+                    )
                 }
                 """
             )
@@ -91,7 +72,7 @@ class EntityProcessorTest {
                 data class DeptDef(
                     val id: Int,
                     val version: Int
-                ) { companion object }
+                )
                 """
             )
         )
@@ -111,7 +92,7 @@ class EntityProcessorTest {
                 @KomapperEntity
                 data class __Dept(
                     val id: Int
-                ) { companion object }
+                )
                 """
             )
         )
@@ -134,7 +115,7 @@ class EntityProcessorTest {
                 @KomapperEntityDef(entity = __Dept::class)
                 data class DeptDef(
                     val id: Int
-                ) { companion object }
+                )
                 """
             )
         )
@@ -153,7 +134,7 @@ class EntityProcessorTest {
                 @KomapperEntity
                 data class Dept(
                     val __id: Int
-                ) { companion object }
+                )
                 """
             )
         )
@@ -176,7 +157,7 @@ class EntityProcessorTest {
                 @KomapperEntityDef(entity = Dept::class)
                 data class DeptDef(
                     val id: Int
-                ) { companion object }
+                )
                 """
             )
         )
@@ -195,7 +176,7 @@ class EntityProcessorTest {
                 @KomapperEntity
                 class Dept(
                     val id: Int
-                ) { companion object }
+                )
                 """
             )
         )
@@ -217,7 +198,7 @@ class EntityProcessorTest {
                 @KomapperEntityDef(entity = Dept::class)
                 data class DeptDef(
                     val id: Int
-                ) { companion object }
+                )
                 """
             )
         )
@@ -235,7 +216,7 @@ class EntityProcessorTest {
                 import org.komapper.annotation.*
                 class Dept(
                     @KomapperEntity val id: Int
-                ) { companion object }
+                )
                 """
             )
         )
@@ -256,7 +237,7 @@ class EntityProcessorTest {
                 )
                 class DeptDef(
                     @KomapperEntityDef(entity = Dept::class) val id: Int
-                ) { companion object }
+                )
                 """
             )
         )
@@ -275,7 +256,7 @@ class EntityProcessorTest {
                 @KomapperEntity
                 private data class Dept(
                     val id: Int
-                ) { companion object }
+                )
                 """
             )
         )
@@ -297,7 +278,7 @@ class EntityProcessorTest {
                 @KomapperEntityDef(entity = Dept::class)
                 data class DeptDef(
                     val id: Int
-                ) { companion object }
+                )
                 """
             )
         )
@@ -316,7 +297,7 @@ class EntityProcessorTest {
                 @KomapperEntity
                 data class Dept<T>(
                     val id: T
-                ) { companion object }
+                )
                 """
             )
         )
@@ -338,7 +319,7 @@ class EntityProcessorTest {
                 @KomapperEntityDef(entity = Dept::class)
                 data class DeptDef<T>(
                     val id: T
-                ) { companion object }
+                )
                 """
             )
         )
@@ -358,7 +339,7 @@ class EntityProcessorTest {
                 data class Dept(
                     @KomapperVersion val aaa: Int,
                     @KomapperVersion val bbb: Int
-                ) { companion object }
+                )
                 """
             )
         )
@@ -379,7 +360,7 @@ class EntityProcessorTest {
                 data class Dept(
                     @KomapperCreatedAt val aaa: LocalDateTime,
                     @KomapperCreatedAt val bbb: LocalDateTime
-                ) { companion object }
+                )
                 """
             )
         )
@@ -399,7 +380,7 @@ class EntityProcessorTest {
                 data class Dept(
                     @KomapperUpdatedAt val aaa: LocalDateTime,
                     @KomapperUpdatedAt val bbb: LocalDateTime
-                ) { companion object }
+                )
                 """
             )
         )
@@ -419,7 +400,7 @@ class EntityProcessorTest {
                 data class Dept(
                     @KomapperIgnore val aaa: Int = 0,
                     @KomapperIgnore val bbb: Int = 0
-                ) { companion object }
+                )
                 """
             )
         )
@@ -438,7 +419,7 @@ class EntityProcessorTest {
                 @KomapperEntity
                 data class Dept(
                     private val aaa: Int
-                ) { companion object }
+                )
                 """
             )
         )
@@ -457,7 +438,7 @@ class EntityProcessorTest {
                 @KomapperEntity
                 data class Dept(
                     @KomapperId @KomapperVersion val id: Int
-                ) { companion object }
+                )
                 """
             )
         )
@@ -476,7 +457,7 @@ class EntityProcessorTest {
                 @KomapperEntity
                 data class Dept(
                     @KomapperAutoIncrement val id: Int
-                ) { companion object }
+                )
                 """
             )
         )
@@ -495,7 +476,7 @@ class EntityProcessorTest {
                 @KomapperEntity
                 data class Dept(
                     @KomapperAutoIncrement @KomapperSequence("ID", 1, 100) val id: Int
-                ) { companion object }
+                )
                 """
             )
         )
@@ -515,7 +496,7 @@ class EntityProcessorTest {
                 data class Dept(
                     @KomapperId @KomapperAutoIncrement val id1: Int,
                     @KomapperId @KomapperSequence("ID", 1, 100) val id2: Int
-                ) { companion object }
+                )
                 """
             )
         )
@@ -534,7 +515,7 @@ class EntityProcessorTest {
                 @KomapperEntity
                 data class Dept(
                     @KomapperVersion val aaa: String
-                ) { companion object }
+                )
                 """
             )
         )
@@ -557,7 +538,7 @@ class EntityProcessorTest {
                 @KomapperEntity
                 data class Dept(
                     @KomapperVersion val version: MyVersion
-                ) { companion object }
+                )
                 """
             )
         )
@@ -581,7 +562,7 @@ class EntityProcessorTest {
                 @KomapperEntity
                 data class Dept(
                     @KomapperCreatedAt val aaa: String
-                ) { companion object }
+                )
                 """
             )
         )
@@ -604,7 +585,7 @@ class EntityProcessorTest {
                 @KomapperEntity
                 data class Dept(
                     @KomapperCreatedAt val dataTime: MyDateTime
-                ) { companion object }
+                )
                 """
             )
         )
@@ -628,7 +609,7 @@ class EntityProcessorTest {
                 @KomapperEntity
                 data class Dept(
                     @KomapperUpdatedAt val aaa: String
-                ) { companion object }
+                )
                 """
             )
         )
@@ -651,7 +632,7 @@ class EntityProcessorTest {
                 @KomapperEntity
                 data class Dept(
                     @KomapperUpdatedAt val dataTime: MyDateTime
-                ) { companion object }
+                )
                 """
             )
         )
@@ -675,7 +656,7 @@ class EntityProcessorTest {
                 @KomapperEntity
                 data class Dept(
                     @KomapperIgnore val aaa: String
-                ) { companion object }
+                )
                 """
             )
         )
@@ -694,7 +675,7 @@ class EntityProcessorTest {
                 @KomapperEntity
                 data class Dept(
                     @KomapperId @KomapperAutoIncrement val id: String
-                ) { companion object }
+                )
                 """
             )
         )
@@ -713,7 +694,7 @@ class EntityProcessorTest {
                 @KomapperEntity
                 data class Dept(
                     @KomapperId @KomapperSequence("ID", 1, 100) val id: String
-                ) { companion object }
+                )
                 """
             )
         )
@@ -736,7 +717,7 @@ class EntityProcessorTest {
                 @KomapperEntity
                 data class Dept(
                     @KomapperId @KomapperAutoIncrement val id: MyId
-                ) { companion object }
+                )
                 """
             )
         )
@@ -759,7 +740,7 @@ class EntityProcessorTest {
                 @KomapperEntity
                 data class Dept(
                     @KomapperId @KomapperSequence("my_seq") val id: MyId
-                ) { companion object }
+                )
                 """
             )
         )
@@ -783,7 +764,7 @@ class EntityProcessorTest {
                 @KomapperEntity
                 data class Dept(
                     @KomapperId @KomapperSequence() val id: Int
-                ) { companion object }
+                )
                 """
             )
         )
@@ -805,7 +786,7 @@ class EntityProcessorTest {
                 data class Dept(
                     @KomapperId val id: Int,
                     val name: Name,
-                ) { companion object }
+                )
                 """
             )
         )
@@ -827,7 +808,7 @@ class EntityProcessorTest {
                 data class Dept(
                     @KomapperId val id: Int,
                     val name: Name,
-                ) { companion object }
+                )
                 """
             )
         )

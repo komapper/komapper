@@ -33,9 +33,7 @@ data class VAddress(
     @KomapperId val addressId: IntId,
     val street: Street,
     @KomapperVersion val version: Version
-) {
-    companion object
-}
+)
 
 @KomapperEntity
 @KomapperTable("PERSON")
@@ -44,24 +42,18 @@ data class VPerson(
     val name: String,
     @KomapperCreatedAt @KomapperColumn("CREATED_AT") val createdAt: Timestamp? = null,
     @KomapperUpdatedAt @KomapperColumn("UPDATED_AT") val updatedAt: Timestamp? = null
-) {
-    companion object
-}
+)
 
 @KomapperEntity
 @KomapperTable("IDENTITY_STRATEGY")
 data class VIdentityStrategy(
     @KomapperId @KomapperAutoIncrement val id: IntId?,
     val value: String
-) {
-    companion object
-}
+)
 
 @KomapperEntity
 @KomapperTable("SEQUENCE_STRATEGY")
 data class VSequenceStrategy(
     @KomapperId @KomapperSequence(name = "SEQUENCE_STRATEGY_ID", incrementBy = 100) val id: IntId,
     val value: String
-) {
-    companion object
-}
+)

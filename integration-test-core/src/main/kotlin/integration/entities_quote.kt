@@ -12,39 +12,29 @@ data class CatalogAndSchema(
     @KomapperId @KomapperColumn(name = "ADDRESS_ID") val addressId: Int,
     val street: String,
     @KomapperVersion val version: Int
-) {
-    companion object
-}
+)
 
 @KomapperEntity
 @KomapperTable(catalog = "catalog", alwaysQuote = true)
 data class CatalogOnly(
     @KomapperId val id: Int,
-) {
-    companion object
-}
+)
 
 @KomapperEntity
 @KomapperTable(schema = "schema", alwaysQuote = true)
 data class SchemaOnly(
     @KomapperId val id: Int,
-) {
-    companion object
-}
+)
 
 @KomapperEntity
 @KomapperTable("    ", alwaysQuote = true)
 data class BlankName(
     @KomapperId @KomapperColumn("    ", alwaysQuote = true) val id: Int,
-) {
-    companion object
-}
+)
 
 @KomapperEntity
 @KomapperTable(alwaysQuote = true)
 data class Order(
     @KomapperId @KomapperColumn(alwaysQuote = true) val orderId: Int,
     @KomapperColumn(alwaysQuote = true) val value: String
-) {
-    companion object
-}
+)

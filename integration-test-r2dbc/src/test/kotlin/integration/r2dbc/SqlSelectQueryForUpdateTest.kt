@@ -1,8 +1,9 @@
 package integration.r2dbc
 
 import integration.Address
-import integration.meta
+import integration.address
 import org.junit.jupiter.api.extension.ExtendWith
+import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
 import org.komapper.core.dsl.operator.desc
 import org.komapper.r2dbc.R2dbcDatabase
@@ -14,7 +15,7 @@ class SqlSelectQueryForUpdateTest(private val db: R2dbcDatabase) {
 
     @Test
     fun forUpdate() = inTransaction(db) {
-        val a = Address.meta
+        val a = Meta.address
         val list = db.runQuery {
             QueryDsl.from(a).where { a.addressId greaterEq 1 }
                 .orderBy(a.addressId.desc())

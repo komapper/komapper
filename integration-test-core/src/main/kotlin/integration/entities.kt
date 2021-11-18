@@ -19,9 +19,7 @@ data class Address(
     @KomapperId @KomapperColumn(name = "ADDRESS_ID") val addressId: Int,
     val street: String,
     @KomapperVersion val version: Int
-) {
-    companion object
-}
+)
 
 @KomapperEntity
 data class CompositeKeyAddress(
@@ -29,27 +27,21 @@ data class CompositeKeyAddress(
     @KomapperId val addressId2: Int,
     val street: String,
     val version: Int
-) {
-    companion object
-}
+)
 
 @KomapperEntity
 @KomapperTable("IDENTITY_STRATEGY")
 data class IdentityStrategy(
     @KomapperId @KomapperAutoIncrement val id: Int?,
     val value: String
-) {
-    companion object
-}
+)
 
 @KomapperEntity
 @KomapperTable("SEQUENCE_STRATEGY")
 data class SequenceStrategy(
     @KomapperId @KomapperSequence(name = "SEQUENCE_STRATEGY_ID", incrementBy = 100) val id: Int,
     val value: String
-) {
-    companion object
-}
+)
 
 @KomapperEntity
 data class Person(
@@ -57,9 +49,7 @@ data class Person(
     val name: String,
     @KomapperCreatedAt @KomapperColumn("CREATED_AT") val createdAt: LocalDateTime? = null,
     @KomapperUpdatedAt @KomapperColumn("UPDATED_AT") val updatedAt: LocalDateTime? = null
-) {
-    companion object
-}
+)
 
 @KomapperEntity
 @KomapperTable("PERSON")
@@ -68,9 +58,7 @@ data class Human(
     val name: String,
     @KomapperCreatedAt val createdAt: OffsetDateTime? = null,
     @KomapperUpdatedAt val updatedAt: OffsetDateTime? = null
-) {
-    companion object
-}
+)
 
 @KomapperEntity
 data class Employee(
@@ -83,9 +71,7 @@ data class Employee(
     @KomapperColumn("DEPARTMENT_ID") val departmentId: Int,
     @KomapperColumn("ADDRESS_ID") val addressId: Int,
     @KomapperVersion val version: Int,
-) {
-    companion object
-}
+)
 
 data class WorkerSalary(val salary: BigDecimal)
 
@@ -119,9 +105,7 @@ data class Department(
     @KomapperColumn("DEPARTMENT_NAME") val departmentName: String,
     val location: String,
     @KomapperVersion val version: Int,
-) {
-    companion object
-}
+)
 
 @KomapperEntity
 @KomapperTable("DEPARTMENT")
@@ -131,8 +115,6 @@ data class NoVersionDepartment(
     @KomapperColumn("DEPARTMENT_NAME") val departmentName: String,
     val location: String,
     val version: Int,
-) {
-    companion object
-}
+)
 
 data class NoId(val value1: Int, val value2: Int)

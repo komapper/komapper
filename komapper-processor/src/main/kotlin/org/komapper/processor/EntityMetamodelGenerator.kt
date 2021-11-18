@@ -9,6 +9,7 @@ import org.komapper.processor.ClassNames.EntityMetamodel
 import org.komapper.processor.ClassNames.EntityMetamodelImplementor
 import org.komapper.processor.ClassNames.IdAssignment
 import org.komapper.processor.ClassNames.IdContext
+import org.komapper.processor.ClassNames.Meta
 import org.komapper.processor.ClassNames.MetamodelDeclaration
 import org.komapper.processor.ClassNames.PropertyDescriptor
 import org.komapper.processor.ClassNames.PropertyMetamodel
@@ -82,11 +83,13 @@ internal class EntityMetamodelGenerator(
         postUpdate()
 
         newEntity()
-        newMeta()
+        newMetamodel()
+        clone()
 
         companionObject()
 
         w.println("}")
+        w.println()
 
         utils()
     }
@@ -325,23 +328,23 @@ internal class EntityMetamodelGenerator(
         w.println("    override fun newEntity(m: Map<$PropertyMetamodel<*, *, *>, Any?>) = $entityTypeName($argList)")
     }
 
-    private fun newMeta() {
+    private fun newMetamodel() {
         val paramList =
             "table: String, catalog: String, schema: String, alwaysQuote: Boolean, disableSequenceAssignment: Boolean, declarations: List<$MetamodelDeclaration<$entityTypeName, $idTypeName, $simpleName>>"
-        w.println("    override fun newMeta($paramList) = $simpleName(table, catalog, schema, alwaysQuote, disableSequenceAssignment, declarations)")
+        w.println("    override fun newMetamodel($paramList) = $simpleName(table, catalog, schema, alwaysQuote, disableSequenceAssignment, declarations)")
+    }
+
+    private fun clone() {
+        w.println("    fun clone($constructorParamList) = $simpleName(table, catalog, schema, alwaysQuote, disableSequenceAssignment, declarations)")
     }
 
     private fun companionObject() {
         w.println("    companion object {")
         w.println("        val meta = $simpleName()")
-        w.println("        fun newMeta($constructorParamList) = $simpleName(table, catalog, schema, alwaysQuote, disableSequenceAssignment, declarations)")
         w.println("    }")
     }
 
     private fun utils() {
-        val companionObjectName = (entity.companionObject.qualifiedName ?: entity.companionObject.simpleName).asString()
-        w.println("")
-        w.println("val $companionObjectName.meta get() = $simpleName.meta")
-        w.println("fun $companionObjectName.newMeta($constructorParamList) = $simpleName.newMeta(table, catalog, schema, alwaysQuote, disableSequenceAssignment, declarations)")
+        w.println("val $Meta.${ toPropertyNameFormat(entityTypeName)} get() = $simpleName.meta")
     }
 }

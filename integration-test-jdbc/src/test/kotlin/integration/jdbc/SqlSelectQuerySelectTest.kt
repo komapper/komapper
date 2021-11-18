@@ -1,10 +1,11 @@
 package integration.jdbc
 
 import integration.Address
-import integration.Department
-import integration.Employee
-import integration.meta
+import integration.address
+import integration.department
+import integration.employee
 import org.junit.jupiter.api.extension.ExtendWith
+import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
 import org.komapper.core.dsl.operator.concat
 import org.komapper.core.dsl.operator.count
@@ -18,7 +19,7 @@ class SqlSelectQuerySelectTest(private val db: JdbcDatabase) {
 
     @Test
     fun selectColumn() {
-        val a = Address.meta
+        val a = Meta.address
         val streetList = db.runQuery {
             QueryDsl.from(a)
                 .where {
@@ -32,7 +33,7 @@ class SqlSelectQuerySelectTest(private val db: JdbcDatabase) {
 
     @Test
     fun selectColumn_first() {
-        val a = Address.meta
+        val a = Meta.address
         val value = db.runQuery {
             QueryDsl.from(a)
                 .where {
@@ -47,7 +48,7 @@ class SqlSelectQuerySelectTest(private val db: JdbcDatabase) {
 
     @Test
     fun selectColumnsAsPair() {
-        val a = Address.meta
+        val a = Meta.address
         val pairList = db.runQuery {
             QueryDsl.from(a)
                 .where {
@@ -61,7 +62,7 @@ class SqlSelectQuerySelectTest(private val db: JdbcDatabase) {
 
     @Test
     fun selectColumnsAsTriple() {
-        val a = Address.meta
+        val a = Meta.address
         val tripleList = db.runQuery {
             QueryDsl.from(a)
                 .where {
@@ -81,7 +82,7 @@ class SqlSelectQuerySelectTest(private val db: JdbcDatabase) {
 
     @Test
     fun selectColumnsAsRecord() {
-        val a = Address.meta
+        val a = Meta.address
         val list = db.runQuery {
             QueryDsl.from(a)
                 .where {
@@ -105,7 +106,7 @@ class SqlSelectQuerySelectTest(private val db: JdbcDatabase) {
 
     @Test
     fun selectColumns() {
-        val a = Address.meta
+        val a = Meta.address
         val list = db.runQuery {
             QueryDsl.from(a)
                 .where {
@@ -127,8 +128,8 @@ class SqlSelectQuerySelectTest(private val db: JdbcDatabase) {
 
     @Test
     fun selectEntity() {
-        val a = Address.meta
-        val e = Employee.meta
+        val a = Meta.address
+        val e = Meta.employee
         val list: List<Address> = db.runQuery {
             QueryDsl.from(a)
                 .leftJoin(e) {
@@ -141,8 +142,8 @@ class SqlSelectQuerySelectTest(private val db: JdbcDatabase) {
 
     @Test
     fun selectColumnsAsPair_scalar() {
-        val d = Department.meta
-        val e = Employee.meta
+        val d = Meta.department
+        val e = Meta.employee
         val subquery = QueryDsl.from(e).where { d.departmentId eq e.departmentId }.select(count())
         val list = db.runQuery {
             QueryDsl.from(d)

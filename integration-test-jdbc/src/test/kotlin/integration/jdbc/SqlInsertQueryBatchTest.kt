@@ -4,11 +4,15 @@ import integration.Address
 import integration.Department
 import integration.IdentityStrategy
 import integration.Person
-import integration.meta
+import integration.address
+import integration.department
+import integration.identityStrategy
+import integration.person
 import integration.setting.Dbms
 import integration.setting.Run
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.UniqueConstraintException
+import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
 import org.komapper.jdbc.JdbcDatabase
 import kotlin.test.Test
@@ -22,7 +26,7 @@ class SqlInsertQueryBatchTest(private val db: JdbcDatabase) {
 
     @Test
     fun test() {
-        val a = Address.meta
+        val a = Meta.address
         val addressList = listOf(
             Address(16, "STREET 16", 0),
             Address(17, "STREET 17", 0),
@@ -37,7 +41,7 @@ class SqlInsertQueryBatchTest(private val db: JdbcDatabase) {
 
     @Test
     fun identity() {
-        val i = IdentityStrategy.meta
+        val i = Meta.identityStrategy
         val strategies = listOf(
             IdentityStrategy(null, "AAA"),
             IdentityStrategy(null, "BBB"),
@@ -51,7 +55,7 @@ class SqlInsertQueryBatchTest(private val db: JdbcDatabase) {
 
     @Test
     fun createdAt_updatedAt() {
-        val p = Person.meta
+        val p = Meta.person
         val personList = listOf(
             Person(1, "A"),
             Person(2, "B"),
@@ -67,7 +71,7 @@ class SqlInsertQueryBatchTest(private val db: JdbcDatabase) {
 
     @Test
     fun uniqueConstraintException() {
-        val a = Address.meta
+        val a = Meta.address
         assertFailsWith<UniqueConstraintException> {
             db.runQuery {
                 QueryDsl.insert(
@@ -85,7 +89,7 @@ class SqlInsertQueryBatchTest(private val db: JdbcDatabase) {
 
     @Test
     fun onDuplicateKeyUpdate() {
-        val d = Department.meta
+        val d = Meta.department
         val department1 = Department(5, 50, "PLANNING", "TOKYO", 1)
         val department2 = Department(1, 60, "DEVELOPMENT", "KYOTO", 1)
         val query = QueryDsl.insert(d).onDuplicateKeyUpdate().batch(department1, department2)
@@ -106,7 +110,7 @@ class SqlInsertQueryBatchTest(private val db: JdbcDatabase) {
 
     @Test
     fun onDuplicateKeyUpdateWithKeys() {
-        val d = Department.meta
+        val d = Meta.department
         val department1 = Department(5, 50, "PLANNING", "TOKYO", 1)
         val department2 = Department(10, 10, "DEVELOPMENT", "KYOTO", 1)
         val query = QueryDsl.insert(d).onDuplicateKeyUpdate(d.departmentNo).batch(department1, department2)
@@ -128,7 +132,7 @@ class SqlInsertQueryBatchTest(private val db: JdbcDatabase) {
     @Test
     @Run(unless = [Dbms.MARIADB])
     fun onDuplicateKeyUpdate_set() {
-        val d = Department.meta
+        val d = Meta.department
         val department1 = Department(5, 50, "PLANNING", "TOKYO", 1)
         val department2 = Department(1, 60, "DEVELOPMENT", "KYOTO", 1)
         val query =
@@ -153,7 +157,7 @@ class SqlInsertQueryBatchTest(private val db: JdbcDatabase) {
     @Test
     @Run(unless = [Dbms.MARIADB])
     fun onDuplicateKeyUpdateWithKeys_set() {
-        val d = Department.meta
+        val d = Meta.department
         val department1 = Department(5, 50, "PLANNING", "TOKYO", 1)
         val department2 = Department(10, 10, "DEVELOPMENT", "KYOTO", 1)
         val query =
@@ -177,7 +181,7 @@ class SqlInsertQueryBatchTest(private val db: JdbcDatabase) {
 
     @Test
     fun onDuplicateKeyIgnore() {
-        val d = Department.meta
+        val d = Meta.department
         val department1 = Department(5, 50, "PLANNING", "TOKYO", 1)
         val department2 = Department(1, 60, "DEVELOPMENT", "KYOTO", 1)
         val query = QueryDsl.insert(d).onDuplicateKeyIgnore().batch(listOf(department1, department2))
@@ -195,7 +199,7 @@ class SqlInsertQueryBatchTest(private val db: JdbcDatabase) {
 
     @Test
     fun onDuplicateKeyIgnoreWithKeys() {
-        val d = Department.meta
+        val d = Meta.department
         val department1 = Department(5, 50, "PLANNING", "TOKYO", 1)
         val department2 = Department(10, 10, "DEVELOPMENT", "KYOTO", 1)
         val query = QueryDsl.insert(d).onDuplicateKeyIgnore(d.departmentNo).batch(listOf(department1, department2))
@@ -213,7 +217,7 @@ class SqlInsertQueryBatchTest(private val db: JdbcDatabase) {
 
     @Test
     fun identity_onDuplicateKeyUpdate() {
-        val i = IdentityStrategy.meta
+        val i = Meta.identityStrategy
         val strategies = listOf(
             IdentityStrategy(null, "AAA"),
             IdentityStrategy(null, "BBB"),

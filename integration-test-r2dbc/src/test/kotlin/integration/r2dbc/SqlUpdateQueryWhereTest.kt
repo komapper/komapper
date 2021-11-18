@@ -1,9 +1,9 @@
 package integration.r2dbc
 
-import integration.Address
-import integration.Employee
-import integration.meta
+import integration.address
+import integration.employee
 import org.junit.jupiter.api.extension.ExtendWith
+import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
 import org.komapper.core.dsl.operator.concat
 import org.komapper.core.dsl.operator.plus
@@ -18,7 +18,7 @@ class SqlUpdateQueryWhereTest(private val db: R2dbcDatabase) {
 
     @Test
     fun test() = inTransaction(db) {
-        val a = Address.meta
+        val a = Meta.address
         val count = db.runQuery {
             QueryDsl.update(a).set {
                 a.street set "STREET 16"
@@ -37,7 +37,7 @@ class SqlUpdateQueryWhereTest(private val db: R2dbcDatabase) {
 
     @Test
     fun setIfNotNull() = inTransaction(db) {
-        val a = Address.meta
+        val a = Meta.address
         val count = db.runQuery {
             QueryDsl.update(a).set {
                 a.street setIfNotNull null
@@ -58,7 +58,7 @@ class SqlUpdateQueryWhereTest(private val db: R2dbcDatabase) {
 
     @Test
     fun arithmetic_add() = inTransaction(db) {
-        val a = Address.meta
+        val a = Meta.address
         val count = db.runQuery {
             QueryDsl.update(a).set {
                 a.version set (a.version + 10)
@@ -77,7 +77,7 @@ class SqlUpdateQueryWhereTest(private val db: R2dbcDatabase) {
 
     @Test
     fun string_concat() = inTransaction(db) {
-        val a = Address.meta
+        val a = Meta.address
         val count = db.runQuery {
             QueryDsl.update(a).set {
                 a.street set (concat(concat("[", a.street), "]"))
@@ -96,7 +96,7 @@ class SqlUpdateQueryWhereTest(private val db: R2dbcDatabase) {
 
     @Test
     fun allowEmptyWhereClause_default() = inTransaction(db) {
-        val e = Employee.meta
+        val e = Meta.employee
         val ex = assertFailsWith<IllegalStateException> {
             @Suppress("UNUSED_VARIABLE")
             val count = db.runQuery {
@@ -110,7 +110,7 @@ class SqlUpdateQueryWhereTest(private val db: R2dbcDatabase) {
 
     @Test
     fun allowEmptyWhereClause_true() = inTransaction(db) {
-        val e = Employee.meta
+        val e = Meta.employee
         val count = db.runQuery {
             QueryDsl.update(e).set {
                 e.employeeName set "ABC"

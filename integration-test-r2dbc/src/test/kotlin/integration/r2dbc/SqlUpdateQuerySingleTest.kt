@@ -1,15 +1,17 @@
 package integration.r2dbc
 
 import integration.Address
-import integration.Department
-import integration.NoVersionDepartment
 import integration.Person
-import integration.meta
+import integration.address
+import integration.department
+import integration.noVersionDepartment
+import integration.person
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.ClockProvider
 import org.komapper.core.OptimisticLockException
 import org.komapper.core.UniqueConstraintException
+import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
 import org.komapper.core.dsl.query.andThen
 import org.komapper.core.dsl.query.first
@@ -32,7 +34,7 @@ class SqlUpdateQuerySingleTest(private val db: R2dbcDatabase) {
 
     @Test
     fun test() = inTransaction(db) {
-        val a = Address.meta
+        val a = Meta.address
         val query = QueryDsl.from(a).where { a.addressId eq 15 }
         val address = db.runQuery { query.first() }
         val newAddress = address.copy(street = "NY street")
@@ -50,7 +52,7 @@ class SqlUpdateQuerySingleTest(private val db: R2dbcDatabase) {
 
     @Test
     fun updatedAt() = inTransaction(db) {
-        val p = Person.meta
+        val p = Meta.person
         val findQuery = QueryDsl.from(p).where { p.personId eq 1 }.first()
         val person1 = Person(1, "ABC")
         val person2 = db.runQuery {
@@ -68,7 +70,7 @@ class SqlUpdateQuerySingleTest(private val db: R2dbcDatabase) {
         val instant = Instant.parse("2021-01-01T00:00:00Z")
         val zoneId = ZoneId.of("UTC")
 
-        val p = Person.meta
+        val p = Meta.person
         val person1 = Person(1, "ABC")
         db.runQuery { QueryDsl.insert(p).single(person1) }
         val person2 = db.runQuery {
@@ -93,7 +95,7 @@ class SqlUpdateQuerySingleTest(private val db: R2dbcDatabase) {
 
     @Test
     fun uniqueConstraintException() = inTransaction(db) {
-        val a = Address.meta
+        val a = Meta.address
         val address = Address(1, "STREET 2", 1)
         assertFailsWith<UniqueConstraintException> {
             runBlocking {
@@ -104,7 +106,7 @@ class SqlUpdateQuerySingleTest(private val db: R2dbcDatabase) {
 
     @Test
     fun optimisticLockException() = inTransaction(db) {
-        val a = Address.meta
+        val a = Meta.address
         val address = db.runQuery { QueryDsl.from(a).where { a.addressId eq 15 }.first() }
         db.runQuery { QueryDsl.update(a).single(address) }
         assertFailsWith<OptimisticLockException> {
@@ -114,7 +116,7 @@ class SqlUpdateQuerySingleTest(private val db: R2dbcDatabase) {
 
     @Test
     fun include() = inTransaction(db) {
-        val d = Department.meta
+        val d = Meta.department
         val findQuery = QueryDsl.from(d).where { d.departmentId eq 1 }.first()
         val department = db.runQuery { findQuery }
         val department2 = department.copy(departmentName = "ABC", location = "DEF")
@@ -127,7 +129,7 @@ class SqlUpdateQuerySingleTest(private val db: R2dbcDatabase) {
 
     @Test
     fun include_emptyTargetProperties() = inTransaction(db) {
-        val d = NoVersionDepartment.meta
+        val d = Meta.noVersionDepartment
         val findQuery = QueryDsl.from(d).where { d.departmentId eq 1 }.first()
         val department = db.runQuery { findQuery }
         val department2 = department.copy(departmentName = "ABC", location = "DEF")
@@ -138,7 +140,7 @@ class SqlUpdateQuerySingleTest(private val db: R2dbcDatabase) {
 
     @Test
     fun exclude() = inTransaction(db) {
-        val d = Department.meta
+        val d = Meta.department
         val findQuery = QueryDsl.from(d).where { d.departmentId eq 1 }.first()
         val department = db.runQuery { findQuery }
         val department2 = department.copy(departmentName = "ABC", location = "DEF")
@@ -151,7 +153,7 @@ class SqlUpdateQuerySingleTest(private val db: R2dbcDatabase) {
 
     @Test
     fun exclude_emptyTargetProperties() = inTransaction(db) {
-        val d = NoVersionDepartment.meta
+        val d = Meta.noVersionDepartment
         val findQuery = QueryDsl.from(d).where { d.departmentId eq 1 }.first()
         val department = db.runQuery { findQuery }
         val department2 = department.copy(departmentName = "ABC", location = "DEF")

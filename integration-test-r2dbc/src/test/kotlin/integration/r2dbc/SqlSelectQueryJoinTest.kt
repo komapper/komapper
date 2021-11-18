@@ -1,11 +1,10 @@
 package integration.r2dbc
 
-import integration.Address
-import integration.Department
-import integration.Employee
-import integration.meta
-import integration.newMeta
+import integration.address
+import integration.department
+import integration.employee
 import org.junit.jupiter.api.extension.ExtendWith
+import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
 import org.komapper.r2dbc.R2dbcDatabase
 import kotlin.test.Test
@@ -18,8 +17,8 @@ class SqlSelectQueryJoinTest(private val db: R2dbcDatabase) {
 
     @Test
     fun innerJoin() = inTransaction(db) {
-        val a = Address.meta
-        val e = Employee.meta
+        val a = Meta.address
+        val e = Meta.employee
         val list = db.runQuery {
             QueryDsl.from(a).innerJoin(e) {
                 a.addressId eq e.addressId
@@ -30,8 +29,8 @@ class SqlSelectQueryJoinTest(private val db: R2dbcDatabase) {
 
     @Test
     fun leftJoin() = inTransaction(db) {
-        val a = Address.meta
-        val e = Employee.meta
+        val a = Meta.address
+        val e = Meta.employee
         val list = db.runQuery {
             QueryDsl.from(a).leftJoin(e) {
                 a.addressId eq e.addressId
@@ -42,8 +41,8 @@ class SqlSelectQueryJoinTest(private val db: R2dbcDatabase) {
 
     @Test
     fun innerJoin_multiConditions() = inTransaction(db) {
-        val employee = Employee.meta
-        val manager = Employee.newMeta()
+        val employee = Meta.employee
+        val manager = Meta.employee.clone()
         val list = db.runQuery {
             QueryDsl.from(employee).innerJoin(manager) {
                 employee.managerId eq manager.employeeId
@@ -56,9 +55,9 @@ class SqlSelectQueryJoinTest(private val db: R2dbcDatabase) {
 
     @Test
     fun include_one_association() = inTransaction(db) {
-        val a = Address.meta
-        val e = Employee.meta
-        val d = Department.meta
+        val a = Meta.address
+        val e = Meta.employee
+        val d = Meta.department
         val entityContext = db.runQuery {
             QueryDsl.from(e)
                 .innerJoin(a) {
@@ -85,9 +84,9 @@ class SqlSelectQueryJoinTest(private val db: R2dbcDatabase) {
 
     @Test
     fun include_two_associations() = inTransaction(db) {
-        val a = Address.meta
-        val e = Employee.meta
-        val d = Department.meta
+        val a = Meta.address
+        val e = Meta.employee
+        val d = Meta.department
         val entityContext = db.runQuery {
             QueryDsl.from(e)
                 .innerJoin(a) {
@@ -115,9 +114,9 @@ class SqlSelectQueryJoinTest(private val db: R2dbcDatabase) {
 
     @Test
     fun includeAll() = inTransaction(db) {
-        val a = Address.meta
-        val e = Employee.meta
-        val d = Department.meta
+        val a = Meta.address
+        val e = Meta.employee
+        val d = Meta.department
         val entityContext = db.runQuery {
             QueryDsl.from(e)
                 .innerJoin(a) {
@@ -144,8 +143,8 @@ class SqlSelectQueryJoinTest(private val db: R2dbcDatabase) {
 
     @Test
     fun associate() = inTransaction(db) {
-        val d = Department.meta
-        val e = Employee.meta
+        val d = Meta.department
+        val e = Meta.employee
         val entityContext = db.runQuery {
             QueryDsl.from(d).innerJoin(e) {
                 d.departmentId eq e.departmentId
@@ -165,8 +164,8 @@ class SqlSelectQueryJoinTest(private val db: R2dbcDatabase) {
 
     @Test
     fun associateById() = inTransaction(db) {
-        val d = Department.meta
-        val e = Employee.meta
+        val d = Meta.department
+        val e = Meta.employee
         val entityContext = db.runQuery {
             QueryDsl.from(d).innerJoin(e) {
                 d.departmentId eq e.departmentId
@@ -189,8 +188,8 @@ class SqlSelectQueryJoinTest(private val db: R2dbcDatabase) {
 
     @Test
     fun associate_asOneToOne() = inTransaction(db) {
-        val a = Address.meta
-        val e = Employee.meta
+        val a = Meta.address
+        val e = Meta.employee
         val entityContext = db.runQuery {
             QueryDsl.from(e)
                 .innerJoin(a) {
@@ -210,8 +209,8 @@ class SqlSelectQueryJoinTest(private val db: R2dbcDatabase) {
 
     @Test
     fun associateById_asOneToOne() = inTransaction(db) {
-        val a = Address.meta
-        val e = Employee.meta
+        val a = Meta.address
+        val e = Meta.employee
         val entityContext = db.runQuery {
             QueryDsl.from(e)
                 .innerJoin(a) {
@@ -231,9 +230,9 @@ class SqlSelectQueryJoinTest(private val db: R2dbcDatabase) {
 
     @Test
     fun mainEntities() = inTransaction(db) {
-        val a = Address.meta
-        val e = Employee.meta
-        val d = Department.meta
+        val a = Meta.address
+        val e = Meta.employee
+        val d = Meta.department
         val entityContext = db.runQuery {
             QueryDsl.from(e)
                 .innerJoin(a) {

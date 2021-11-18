@@ -1,11 +1,11 @@
 package integration.r2dbc
 
-import integration.BooleanTest
-import integration.IntTest
-import integration.LongTest
-import integration.StringTest
-import integration.meta
+import integration.booleanTest
+import integration.intTest
+import integration.longTest
+import integration.stringTest
 import org.junit.jupiter.api.extension.ExtendWith
+import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
 import org.komapper.core.dsl.operator.literal
 import org.komapper.core.dsl.query.first
@@ -19,7 +19,7 @@ class LiteralTest(val db: R2dbcDatabase) {
 
     @Test
     fun test_boolean() = inTransaction(db) {
-        val m = BooleanTest.meta
+        val m = Meta.booleanTest
         db.runQuery {
             QueryDsl.insert(m).values {
                 m.id set 1
@@ -34,7 +34,7 @@ class LiteralTest(val db: R2dbcDatabase) {
 
     @Test
     fun test_int() = inTransaction(db) {
-        val m = IntTest.meta
+        val m = Meta.intTest
         db.runQuery {
             QueryDsl.insert(m).values {
                 m.id set 1
@@ -49,7 +49,7 @@ class LiteralTest(val db: R2dbcDatabase) {
 
     @Test
     fun test_long() = inTransaction(db) {
-        val m = LongTest.meta
+        val m = Meta.longTest
         db.runQuery {
             QueryDsl.insert(m).values {
                 m.id set 1
@@ -64,7 +64,7 @@ class LiteralTest(val db: R2dbcDatabase) {
 
     @Test
     fun test_string() = inTransaction(db) {
-        val m = StringTest.meta
+        val m = Meta.stringTest
         db.runQuery {
             QueryDsl.insert(m).values {
                 m.id set 1

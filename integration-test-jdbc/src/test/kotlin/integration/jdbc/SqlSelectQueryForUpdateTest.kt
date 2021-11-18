@@ -1,8 +1,9 @@
 package integration.jdbc
 
 import integration.Address
-import integration.meta
+import integration.address
 import org.junit.jupiter.api.extension.ExtendWith
+import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
 import org.komapper.core.dsl.operator.desc
 import org.komapper.jdbc.JdbcDatabase
@@ -14,7 +15,7 @@ class SqlSelectQueryForUpdateTest(private val db: JdbcDatabase) {
 
     @Test
     fun forUpdate() {
-        val a = Address.meta
+        val a = Meta.address
         val list = db.runQuery {
             QueryDsl.from(a).where { a.addressId greaterEq 1 }
                 .orderBy(a.addressId.desc())
