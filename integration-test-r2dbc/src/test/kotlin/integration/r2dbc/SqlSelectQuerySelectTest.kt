@@ -27,7 +27,7 @@ class SqlSelectQuerySelectTest(private val db: R2dbcDatabase) {
                 }
                 .orderBy(a.addressId)
                 .select(a.street)
-        }.toList()
+        }
         assertEquals(listOf("STREET 1", "STREET 2"), streetList)
     }
 
@@ -56,7 +56,7 @@ class SqlSelectQuerySelectTest(private val db: R2dbcDatabase) {
                 }
                 .orderBy(a.addressId)
                 .select(a.addressId, a.street)
-        }.toList()
+        }
         assertEquals(listOf(1 to "STREET 1", 2 to "STREET 2"), pairList)
     }
 
@@ -70,7 +70,7 @@ class SqlSelectQuerySelectTest(private val db: R2dbcDatabase) {
                 }
                 .orderBy(a.addressId)
                 .select(a.addressId, a.street, a.version)
-        }.toList()
+        }
         assertEquals(
             listOf(
                 Triple(1, "STREET 1", 1),
@@ -90,7 +90,7 @@ class SqlSelectQuerySelectTest(private val db: R2dbcDatabase) {
                 }
                 .orderBy(a.addressId)
                 .select(a.addressId, a.street, a.version, concat(a.street, " test"))
-        }.toList()
+        }
         assertEquals(2, list.size)
         val record0 = list[0]
         assertEquals(1, record0[a.addressId])
@@ -114,7 +114,7 @@ class SqlSelectQuerySelectTest(private val db: R2dbcDatabase) {
                     a.addressId eq e.addressId
                 }
                 .orderBy(a.addressId)
-        }.toList()
+        }
         assertEquals(15, list.size)
     }
 
@@ -127,7 +127,7 @@ class SqlSelectQuerySelectTest(private val db: R2dbcDatabase) {
             QueryDsl.from(d)
                 .orderBy(d.departmentId)
                 .select(d.departmentName, subquery)
-        }.toList()
+        }
         assertEquals(4, list.size)
         assertEquals("ACCOUNTING" to 3L, list[0])
         assertEquals("RESEARCH" to 5L, list[1])

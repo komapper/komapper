@@ -14,14 +14,14 @@ class SqlSelectQueryOffsetLimitTest(private val db: R2dbcDatabase) {
     @Test
     fun offset() = inTransaction(db) {
         val a = Meta.address
-        val list = db.runQuery { QueryDsl.from(a).offset(10) }.toList()
+        val list = db.runQuery { QueryDsl.from(a).offset(10) }
         assertEquals(5, list.size)
     }
 
     @Test
     fun limit() = inTransaction(db) {
         val a = Meta.address
-        val list = db.runQuery { QueryDsl.from(a).limit(3) }.toList()
+        val list = db.runQuery { QueryDsl.from(a).limit(3) }
         assertEquals(3, list.size)
     }
 
@@ -33,7 +33,7 @@ class SqlSelectQueryOffsetLimitTest(private val db: R2dbcDatabase) {
                 .orderBy(a.addressId)
                 .offset(10)
                 .limit(3)
-        }.toList()
+        }
         assertEquals(3, list.size)
         assertEquals(11, list[0].addressId)
         assertEquals(12, list[1].addressId)

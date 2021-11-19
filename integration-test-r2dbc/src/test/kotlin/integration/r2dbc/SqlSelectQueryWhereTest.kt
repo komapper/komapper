@@ -25,7 +25,7 @@ class SqlSelectQueryWhereTest(private val db: R2dbcDatabase) {
             QueryDsl.from(e).where {
                 e.managerId.isNull()
             }
-        }.toList()
+        }
         assertEquals(listOf(9), list.map { it.employeeId })
     }
 
@@ -36,7 +36,7 @@ class SqlSelectQueryWhereTest(private val db: R2dbcDatabase) {
             QueryDsl.from(e).where {
                 e.managerId.isNotNull()
             }
-        }.toList()
+        }
         assertTrue(9 !in list.map { it.employeeId })
     }
 
@@ -47,7 +47,7 @@ class SqlSelectQueryWhereTest(private val db: R2dbcDatabase) {
             QueryDsl.from(a).where {
                 a.addressId between 5..10
             }.orderBy(a.addressId)
-        }.toList()
+        }
         assertEquals((5..10).toList(), idList.map { it.addressId })
     }
 
@@ -58,7 +58,7 @@ class SqlSelectQueryWhereTest(private val db: R2dbcDatabase) {
             QueryDsl.from(a).where {
                 a.addressId notBetween 5..10
             }.orderBy(a.addressId)
-        }.toList()
+        }
         val ids = (1..4) + (11..15)
         assertEquals(ids.toList(), idList.map { it.addressId })
     }
@@ -70,7 +70,7 @@ class SqlSelectQueryWhereTest(private val db: R2dbcDatabase) {
             QueryDsl.from(a).where {
                 a.street like "STREET 1_"
             }.orderBy(a.addressId)
-        }.toList()
+        }
         assertEquals((10..15).toList(), list.map { it.addressId })
     }
 
@@ -81,7 +81,7 @@ class SqlSelectQueryWhereTest(private val db: R2dbcDatabase) {
             QueryDsl.from(a).where {
                 a.street like "STREET 1".asPrefix()
             }.orderBy(a.addressId)
-        }.toList()
+        }
         assertEquals(listOf(1) + (10..15), list.map { it.addressId })
     }
 
@@ -92,7 +92,7 @@ class SqlSelectQueryWhereTest(private val db: R2dbcDatabase) {
             QueryDsl.from(a).where {
                 a.street like "T 1".asInfix()
             }.orderBy(a.addressId)
-        }.toList()
+        }
         assertEquals(listOf(1) + (10..15), list.map { it.addressId })
     }
 
@@ -103,7 +103,7 @@ class SqlSelectQueryWhereTest(private val db: R2dbcDatabase) {
             QueryDsl.from(a).where {
                 a.street like "1".asSuffix()
             }.orderBy(a.addressId)
-        }.toList()
+        }
         assertEquals(listOf(1, 11), list.map { it.addressId })
     }
 
@@ -116,7 +116,7 @@ class SqlSelectQueryWhereTest(private val db: R2dbcDatabase) {
         }.orderBy(a.addressId)
         val list = db.runQuery {
             insertQuery.andThen(selectQuery)
-        }.toList()
+        }
         assertEquals(listOf(16), list.map { it.addressId })
     }
 
@@ -131,7 +131,7 @@ class SqlSelectQueryWhereTest(private val db: R2dbcDatabase) {
         }
         val list = db.runQuery {
             insertQuery.andThen(selectQuery)
-        }.toList()
+        }
         assertEquals(listOf(16), list.map { it.addressId })
     }
 
@@ -142,7 +142,7 @@ class SqlSelectQueryWhereTest(private val db: R2dbcDatabase) {
             QueryDsl.from(a).where {
                 a.street notLike "STREET 1_"
             }.orderBy(a.addressId)
-        }.toList()
+        }
         assertEquals((1..9).toList(), list.map { it.addressId })
     }
 
@@ -153,7 +153,7 @@ class SqlSelectQueryWhereTest(private val db: R2dbcDatabase) {
             QueryDsl.from(a).where {
                 a.street notLike "STREET 1".asPrefix()
             }.orderBy(a.addressId)
-        }.toList()
+        }
         assertEquals((2..9).toList(), list.map { it.addressId })
     }
 
@@ -164,7 +164,7 @@ class SqlSelectQueryWhereTest(private val db: R2dbcDatabase) {
             QueryDsl.from(a).where {
                 a.street notLike "T 1".asInfix()
             }.orderBy(a.addressId)
-        }.toList()
+        }
         assertEquals((2..9).toList(), list.map { it.addressId })
     }
 
@@ -175,7 +175,7 @@ class SqlSelectQueryWhereTest(private val db: R2dbcDatabase) {
             QueryDsl.from(a).where {
                 a.street notLike "1".asSuffix()
             }.orderBy(a.addressId)
-        }.toList()
+        }
         assertEquals(((2..10) + (12..15)).toList(), list.map { it.addressId })
     }
 
@@ -188,7 +188,7 @@ class SqlSelectQueryWhereTest(private val db: R2dbcDatabase) {
         }.orderBy(a.addressId)
         val list = db.runQuery {
             insertQuery.andThen(selectQuery)
-        }.toList()
+        }
         assertEquals((1..15).toList(), list.map { it.addressId })
     }
 
@@ -199,7 +199,7 @@ class SqlSelectQueryWhereTest(private val db: R2dbcDatabase) {
             QueryDsl.from(a).where {
                 a.street startsWith "STREET 1"
             }.orderBy(a.addressId)
-        }.toList()
+        }
         assertEquals(listOf(1) + (10..15), list.map { it.addressId })
     }
 
@@ -210,7 +210,7 @@ class SqlSelectQueryWhereTest(private val db: R2dbcDatabase) {
         val selectQuery = QueryDsl.from(a).where {
             a.street startsWith "STREET 1%"
         }.orderBy(a.addressId)
-        val list = db.runQuery { insertQuery.andThen(selectQuery) }.toList()
+        val list = db.runQuery { insertQuery.andThen(selectQuery) }
         assertEquals(listOf(16), list.map { it.addressId })
     }
 
@@ -221,7 +221,7 @@ class SqlSelectQueryWhereTest(private val db: R2dbcDatabase) {
             QueryDsl.from(a).where {
                 a.street notStartsWith "STREET 1"
             }.orderBy(a.addressId)
-        }.toList()
+        }
         assertEquals((2..9).toList(), list.map { it.addressId })
     }
 
@@ -232,7 +232,7 @@ class SqlSelectQueryWhereTest(private val db: R2dbcDatabase) {
             QueryDsl.from(a).where {
                 a.street contains "T 1"
             }.orderBy(a.addressId)
-        }.toList()
+        }
         assertEquals(listOf(1) + (10..15), list.map { it.addressId })
     }
 
@@ -243,7 +243,7 @@ class SqlSelectQueryWhereTest(private val db: R2dbcDatabase) {
             QueryDsl.from(a).where {
                 a.street notContains "T 1"
             }.orderBy(a.addressId)
-        }.toList()
+        }
         assertEquals((2..9).toList(), list.map { it.addressId })
     }
 
@@ -254,7 +254,7 @@ class SqlSelectQueryWhereTest(private val db: R2dbcDatabase) {
             QueryDsl.from(a).where {
                 a.street endsWith "1"
             }.orderBy(a.addressId)
-        }.toList()
+        }
         assertEquals(listOf(1, 11), list.map { it.addressId })
     }
 
@@ -265,7 +265,7 @@ class SqlSelectQueryWhereTest(private val db: R2dbcDatabase) {
             QueryDsl.from(a).where {
                 a.street notEndsWith "1"
             }.orderBy(a.addressId)
-        }.toList()
+        }
         assertEquals(((2..10) + (12..15)).toList(), list.map { it.addressId })
     }
 
@@ -276,7 +276,7 @@ class SqlSelectQueryWhereTest(private val db: R2dbcDatabase) {
             QueryDsl.from(a).where {
                 a.addressId inList listOf(9, 10)
             }.orderBy(a.addressId.desc())
-        }.toList()
+        }
         assertEquals(
             listOf(
                 Address(10, "STREET 10", 1),
@@ -293,7 +293,7 @@ class SqlSelectQueryWhereTest(private val db: R2dbcDatabase) {
             QueryDsl.from(a).where {
                 a.addressId notInList (1..9).toList()
             }.orderBy(a.addressId)
-        }.toList()
+        }
         assertEquals((10..15).toList(), list.map { it.addressId })
     }
 
@@ -304,7 +304,7 @@ class SqlSelectQueryWhereTest(private val db: R2dbcDatabase) {
             QueryDsl.from(a).where {
                 a.addressId inList emptyList()
             }.orderBy(a.addressId.desc())
-        }.toList()
+        }
         assertTrue(list.isEmpty())
     }
 
@@ -322,7 +322,7 @@ class SqlSelectQueryWhereTest(private val db: R2dbcDatabase) {
                         }.select(a.addressId)
                 }
             }
-        val list = db.runQuery { query }.toList()
+        val list = db.runQuery { query }
         assertEquals(5, list.size)
     }
 
@@ -339,7 +339,7 @@ class SqlSelectQueryWhereTest(private val db: R2dbcDatabase) {
                     }.select(a.addressId)
                 }
             }
-        val list = db.runQuery { query }.toList()
+        val list = db.runQuery { query }
         assertEquals(9, list.size)
     }
 
@@ -350,7 +350,7 @@ class SqlSelectQueryWhereTest(private val db: R2dbcDatabase) {
             QueryDsl.from(a).where {
                 a.addressId to a.version inList2 listOf(9 to 1, 10 to 1)
             }.orderBy(a.addressId.desc())
-        }.toList()
+        }
         assertEquals(
             listOf(
                 Address(10, "STREET 10", 1),
@@ -371,7 +371,7 @@ class SqlSelectQueryWhereTest(private val db: R2dbcDatabase) {
             QueryDsl.from(a).where {
                 a.addressId to a.version notInList2 seq.toList()
             }.orderBy(a.addressId)
-        }.toList()
+        }
         assertEquals((10..15).toList(), list.map { it.addressId })
     }
 
@@ -389,7 +389,7 @@ class SqlSelectQueryWhereTest(private val db: R2dbcDatabase) {
                         }.select(a.addressId, a.version)
                 }
             }
-        val list = db.runQuery { query }.toList()
+        val list = db.runQuery { query }
         assertEquals(5, list.size)
     }
 
@@ -406,7 +406,7 @@ class SqlSelectQueryWhereTest(private val db: R2dbcDatabase) {
                     }.select(a.addressId, a.version)
                 }
             }
-        val list = db.runQuery { query }.toList()
+        val list = db.runQuery { query }
         assertEquals(9, list.size)
     }
 
@@ -423,7 +423,7 @@ class SqlSelectQueryWhereTest(private val db: R2dbcDatabase) {
                     }
                 }
             }
-        val list = db.runQuery { query }.toList()
+        val list = db.runQuery { query }
         assertEquals(5, list.size)
     }
 
@@ -440,7 +440,7 @@ class SqlSelectQueryWhereTest(private val db: R2dbcDatabase) {
                     }
                 }
             }
-        val list = db.runQuery { query }.toList()
+        val list = db.runQuery { query }
         assertEquals(9, list.size)
     }
 
@@ -454,7 +454,7 @@ class SqlSelectQueryWhereTest(private val db: R2dbcDatabase) {
                     a.addressId greaterEq 10
                 }
             }.orderBy(a.addressId)
-        }.map { it.addressId }.toList()
+        }.map { it.addressId }
         assertEquals((6..9).toList(), idList)
     }
 
@@ -470,7 +470,7 @@ class SqlSelectQueryWhereTest(private val db: R2dbcDatabase) {
             }.orderBy(a.addressId.desc())
                 .limit(2)
                 .offset(5)
-        }.toList()
+        }
         assertEquals(
             listOf(
                 Address(10, "STREET 10", 1),
@@ -492,7 +492,7 @@ class SqlSelectQueryWhereTest(private val db: R2dbcDatabase) {
             }.orderBy(a.addressId.desc())
                 .limit(2)
                 .offset(5)
-        }.toList()
+        }
         assertEquals(
             listOf(
                 Address(10, "STREET 10", 1),
@@ -511,7 +511,7 @@ class SqlSelectQueryWhereTest(private val db: R2dbcDatabase) {
         val w2: WhereDeclaration = {
             a.version eq 1
         }
-        val list = db.runQuery { QueryDsl.from(a).where(w1 + w2) }.toList()
+        val list = db.runQuery { QueryDsl.from(a).where(w1 + w2) }
         assertEquals(1, list.size)
     }
 }

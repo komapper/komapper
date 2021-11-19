@@ -35,7 +35,7 @@ class SqlInsertQueryMultipleTest(private val db: R2dbcDatabase) {
         val ids = db.runQuery { QueryDsl.insert(a).multiple(addressList) }.map { it.addressId }
         val list = db.runQuery {
             QueryDsl.from(a).where { a.addressId inList ids }
-        }.toList()
+        }
         assertEquals(addressList, list)
     }
 
@@ -50,7 +50,7 @@ class SqlInsertQueryMultipleTest(private val db: R2dbcDatabase) {
             IdentityStrategy(null, "CCC")
         )
         val results1 = db.runQuery { QueryDsl.insert(i).multiple(strategies) }
-        val results2 = db.runQuery { QueryDsl.from(i).orderBy(i.id) }.toList()
+        val results2 = db.runQuery { QueryDsl.from(i).orderBy(i.id) }
         assertEquals(results1, results2)
         assertTrue(results1.all { it.id != null })
     }
@@ -64,7 +64,7 @@ class SqlInsertQueryMultipleTest(private val db: R2dbcDatabase) {
             Person(3, "C")
         )
         val ids = db.runQuery { QueryDsl.insert(p).multiple(personList) }.map { it.personId }
-        val list = db.runQuery { QueryDsl.from(p).where { p.personId inList ids } }.toList()
+        val list = db.runQuery { QueryDsl.from(p).where { p.personId inList ids } }
         for (person in list) {
             assertNotNull(person.createdAt)
             assertNotNull(person.updatedAt)
@@ -98,7 +98,7 @@ class SqlInsertQueryMultipleTest(private val db: R2dbcDatabase) {
         db.runQuery { query }
         val list = db.runQuery {
             QueryDsl.from(d).where { d.departmentId inList listOf(1, 5) }.orderBy(d.departmentId)
-        }.toList()
+        }
         assertEquals(2, list.size)
         assertEquals(
             listOf("DEVELOPMENT" to "KYOTO", "PLANNING" to "TOKYO"),
@@ -116,7 +116,7 @@ class SqlInsertQueryMultipleTest(private val db: R2dbcDatabase) {
         db.runQuery { query }
         val list = db.runQuery {
             QueryDsl.from(d).where { d.departmentNo inList listOf(10, 50) }.orderBy(d.departmentNo)
-        }.toList()
+        }
         assertEquals(2, list.size)
         assertEquals(
             listOf("DEVELOPMENT" to "KYOTO", "PLANNING" to "TOKYO"),
@@ -137,7 +137,7 @@ class SqlInsertQueryMultipleTest(private val db: R2dbcDatabase) {
         db.runQuery { query }
         val list = db.runQuery {
             QueryDsl.from(d).where { d.departmentId inList listOf(1, 5) }.orderBy(d.departmentId)
-        }.toList()
+        }
         assertEquals(2, list.size)
         assertEquals(
             listOf("DEVELOPMENT" to "NEW YORK", "PLANNING" to "TOKYO"),
@@ -160,7 +160,7 @@ class SqlInsertQueryMultipleTest(private val db: R2dbcDatabase) {
         db.runQuery { query }
         val list = db.runQuery {
             QueryDsl.from(d).where { d.departmentNo inList listOf(10, 50) }.orderBy(d.departmentNo)
-        }.toList()
+        }
         assertEquals(2, list.size)
         assertEquals(
             listOf("DEVELOPMENT" to "NEW YORK", "PLANNING" to "TOKYO"),
@@ -178,7 +178,7 @@ class SqlInsertQueryMultipleTest(private val db: R2dbcDatabase) {
         assertEquals(1, count)
         val list = db.runQuery {
             QueryDsl.from(d).where { d.departmentId inList listOf(1, 5) }.orderBy(d.departmentId)
-        }.toList()
+        }
         assertEquals(2, list.size)
         assertEquals(
             listOf("ACCOUNTING" to "NEW YORK", "PLANNING" to "TOKYO"),
@@ -198,7 +198,7 @@ class SqlInsertQueryMultipleTest(private val db: R2dbcDatabase) {
         assertEquals(1, count)
         val list = db.runQuery {
             QueryDsl.from(d).where { d.departmentNo inList listOf(10, 50) }.orderBy(d.departmentNo)
-        }.toList()
+        }
         assertEquals(2, list.size)
         assertEquals(
             listOf("ACCOUNTING" to "NEW YORK", "PLANNING" to "TOKYO"),

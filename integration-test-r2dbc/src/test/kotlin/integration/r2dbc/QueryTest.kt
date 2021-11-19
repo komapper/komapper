@@ -31,7 +31,7 @@ class QueryTest(private val db: R2dbcDatabase) {
             a.version set 0
         }
         val q3 = QueryDsl.from(a).where { a.addressId inList listOf(16, 17) }
-        val list = db.runQuery { q1.andThen(q2).andThen(q3) }.toList()
+        val list = db.runQuery { q1.andThen(q2).andThen(q3) }
         assertEquals(2, list.size)
         println(q1.andThen(q2).andThen(q3).dryRun())
     }
@@ -66,7 +66,7 @@ class QueryTest(private val db: R2dbcDatabase) {
             val e = Meta.employee
             QueryDsl.from(e).where { e.addressId less addressId }
         }
-        val list = db.runQuery { query }.toList()
+        val list = db.runQuery { query }
         assertEquals(14, list.size)
     }
 

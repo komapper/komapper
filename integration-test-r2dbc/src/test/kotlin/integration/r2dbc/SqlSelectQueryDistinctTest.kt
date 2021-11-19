@@ -17,11 +17,11 @@ class SqlSelectQueryDistinctTest(private val db: R2dbcDatabase) {
         val d = Meta.department
         val e = Meta.employee
         val query = QueryDsl.from(d).innerJoin(e) { d.departmentId eq e.departmentId }
-        val list = db.runQuery { query }.toList()
+        val list = db.runQuery { query }
         assertEquals(14, list.size)
 
         val query2 = query.distinct()
-        val list2 = db.runQuery { query2 }.toList()
+        val list2 = db.runQuery { query2 }
         assertEquals(3, list2.size)
     }
 }

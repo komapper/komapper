@@ -31,7 +31,7 @@ class SqlSelectQueryTest(private val db: R2dbcDatabase) {
         val a = Meta.address
         val list: List<Address> = db.runQuery {
             QueryDsl.from(a)
-        }.toList()
+        }
         assertEquals(15, list.size)
     }
 
@@ -104,7 +104,7 @@ class SqlSelectQueryTest(private val db: R2dbcDatabase) {
             QueryDsl.from(a).where { a.addressId inList listOf(1, 2, 3) }
                 .orderBy(a.addressId)
                 .select(a.street, caseExpression)
-        }.toList()
+        }
         assertEquals(
             listOf("STREET 1" to "NO HIT", "STREET 2" to "HIT", "STREET 3" to "NO HIT"),
             list
@@ -128,7 +128,7 @@ class SqlSelectQueryTest(private val db: R2dbcDatabase) {
             QueryDsl.from(a).where { a.addressId inList listOf(1, 2, 3) }
                 .orderBy(a.addressId)
                 .select(a.street, caseExpression)
-        }.toList()
+        }
         assertEquals(
             listOf("STREET 1" to "NO HIT", "STREET 2" to "HIT", "STREET 3" to "STREET 3!!!"),
             list
@@ -148,7 +148,7 @@ class SqlSelectQueryTest(private val db: R2dbcDatabase) {
             QueryDsl.from(a).where { a.addressId inList listOf(1, 2, 3) }
                 .orderBy(a.addressId)
                 .select(a.street, caseExpression)
-        }.toList()
+        }
         assertEquals(
             listOf("STREET 1" to null, "STREET 2" to "HIT", "STREET 3" to null),
             list

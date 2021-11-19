@@ -22,7 +22,7 @@ class SqlSelectQueryForUpdateTest(private val db: R2dbcDatabase) {
                 .limit(2)
                 .offset(5)
                 .forUpdate()
-        }.toList()
+        }
         assertEquals(
             listOf(
                 Address(10, "STREET 10", 1),

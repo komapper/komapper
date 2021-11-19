@@ -25,7 +25,7 @@ class SqlSetOperationQueryTest(private val db: R2dbcDatabase) {
         val q1 = QueryDsl.from(e).where { e.employeeId inList listOf(1, 2, 3, 4, 5) }
         val q2 = QueryDsl.from(e).where { e.employeeId inList listOf(2, 4, 6, 8) }
         val query = (q1 except q2).orderBy(e.employeeId)
-        val list = db.runQuery { query }.toList()
+        val list = db.runQuery { query }
         assertEquals(3, list.size)
         val e1 = list[0]
         val e2 = list[1]
@@ -42,7 +42,7 @@ class SqlSetOperationQueryTest(private val db: R2dbcDatabase) {
         val q1 = QueryDsl.from(e).where { e.employeeId inList listOf(1, 2, 3, 4, 5) }
         val q2 = QueryDsl.from(e).where { e.employeeId inList listOf(2, 4, 6, 8) }
         val query = (q1 intersect q2).orderBy(e.employeeId)
-        val list = db.runQuery { query }.toList()
+        val list = db.runQuery { query }
         assertEquals(2, list.size)
         val e1 = list[0]
         val e2 = list[1]
@@ -57,7 +57,7 @@ class SqlSetOperationQueryTest(private val db: R2dbcDatabase) {
         val q2 = QueryDsl.from(e).where { e.employeeId eq 1 }
         val q3 = QueryDsl.from(e).where { e.employeeId eq 5 }
         val query = (q1 union q2 union q3).orderBy(e.employeeId.desc())
-        val list = db.runQuery { query }.toList()
+        val list = db.runQuery { query }
         assertEquals(2, list.size)
         val e1 = list[0]
         val e2 = list[1]
@@ -74,7 +74,7 @@ class SqlSetOperationQueryTest(private val db: R2dbcDatabase) {
         val query = QueryDsl.from(e).where {
             e.managerId inList { subquery }
         }
-        val list = db.runQuery { query }.toList()
+        val list = db.runQuery { query }
         assertEquals(5, list.size)
     }
 
@@ -91,7 +91,7 @@ class SqlSetOperationQueryTest(private val db: R2dbcDatabase) {
         val q3 = QueryDsl.from(d).where { d.departmentId eq 3 }
             .select(d.departmentId alias "ID", d.departmentName alias "NAME")
         val query = (q1 union q2 union q3).orderBy("ID", desc("NAME"))
-        val list = db.runQuery { query }.toList()
+        val list = db.runQuery { query }
         assertEquals(3, list.size)
         assertEquals(1 to "SMITH", list[0])
         assertEquals(2 to "STREET 2", list[1])
@@ -105,7 +105,7 @@ class SqlSetOperationQueryTest(private val db: R2dbcDatabase) {
         val q2 = QueryDsl.from(e).where { e.employeeId eq 1 }
         val q3 = QueryDsl.from(e).where { e.employeeId eq 5 }
         val query = (q1 unionAll q2 unionAll q3).orderBy(e.employeeId.desc())
-        val list = db.runQuery { query }.toList()
+        val list = db.runQuery { query }
         assertEquals(3, list.size)
         val e1 = list[0]
         val e2 = list[1]

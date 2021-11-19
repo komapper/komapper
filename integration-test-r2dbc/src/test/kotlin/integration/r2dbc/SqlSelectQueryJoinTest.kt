@@ -24,7 +24,7 @@ class SqlSelectQueryJoinTest(private val db: R2dbcDatabase) {
             QueryDsl.from(a).innerJoin(e) {
                 a.addressId eq e.addressId
             }
-        }.toList()
+        }
         assertEquals(14, list.size)
     }
 
@@ -36,7 +36,7 @@ class SqlSelectQueryJoinTest(private val db: R2dbcDatabase) {
             QueryDsl.from(a).leftJoin(e) {
                 a.addressId eq e.addressId
             }
-        }.toList()
+        }
         assertEquals(15, list.size)
     }
 
@@ -49,7 +49,7 @@ class SqlSelectQueryJoinTest(private val db: R2dbcDatabase) {
                 employee.managerId eq manager.employeeId
                 manager.managerId.isNull()
             }
-        }.toList()
+        }
         println(list)
         assertEquals(3, list.size)
     }

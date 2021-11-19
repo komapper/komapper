@@ -22,7 +22,7 @@ class SqlSelectQuerySubqueryTest(private val db: R2dbcDatabase) {
         val query = QueryDsl.from(d)
             .orderBy(d.departmentId)
             .select(d.departmentName, subquery)
-        val list = db.runQuery { query }.toList()
+        val list = db.runQuery { query }
         val expected = listOf("ACCOUNTING" to 3L, "RESEARCH" to 5L, "SALES" to 6L, "OPERATIONS" to 0L)
         assertEquals(expected, list)
     }
@@ -38,7 +38,7 @@ class SqlSelectQuerySubqueryTest(private val db: R2dbcDatabase) {
         val query = QueryDsl.from(e).where {
             e.departmentId eq subquery
         }
-        val list = db.runQuery { query }.toList()
+        val list = db.runQuery { query }
         assertEquals(6, list.size)
     }
 }

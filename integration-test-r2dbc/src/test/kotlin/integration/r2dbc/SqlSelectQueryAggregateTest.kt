@@ -77,7 +77,7 @@ class SqlSelectQueryAggregateTest(private val db: R2dbcDatabase) {
                 }
                 .orderBy(e.departmentId)
                 .select(e.departmentId, count(e.employeeId))
-        }.toList()
+        }
         assertEquals(listOf(2 to 5L, 3 to 6L), list)
     }
 
@@ -91,7 +91,7 @@ class SqlSelectQueryAggregateTest(private val db: R2dbcDatabase) {
                 }
                 .orderBy(e.departmentId)
                 .select(e.departmentId, count(e.employeeId))
-        }.toList()
+        }
         assertEquals(listOf(2 to 5L, 3 to 6L), list)
     }
 }
