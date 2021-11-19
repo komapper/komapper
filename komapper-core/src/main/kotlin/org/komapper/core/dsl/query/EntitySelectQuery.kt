@@ -17,50 +17,9 @@ import org.komapper.core.dsl.options.EntitySelectOptions
 import org.komapper.core.dsl.visitor.FlowQueryVisitor
 import org.komapper.core.dsl.visitor.QueryVisitor
 
-interface EntitySelectQuery<ENTITY : Any> : FlowSubquery<ENTITY> {
-
-    fun distinct(): EntitySelectQuery<ENTITY>
-    fun <ENTITY2 : Any, ID2, META2 : EntityMetamodel<ENTITY2, ID2, META2>> innerJoin(metamodel: META2, on: OnDeclaration): EntitySelectQuery<ENTITY>
-    fun <ENTITY2 : Any, ID2, META2 : EntityMetamodel<ENTITY2, ID2, META2>> leftJoin(metamodel: META2, on: OnDeclaration): EntitySelectQuery<ENTITY>
-    fun where(declaration: WhereDeclaration): EntitySelectQuery<ENTITY>
-    fun orderBy(vararg expressions: SortExpression): EntitySelectQuery<ENTITY>
-    fun offset(offset: Int): EntitySelectQuery<ENTITY>
-    fun limit(limit: Int): EntitySelectQuery<ENTITY>
-    fun forUpdate(): EntitySelectQuery<ENTITY>
-    fun options(configure: (EntitySelectOptions) -> EntitySelectOptions): EntitySelectQuery<ENTITY>
-
+interface EntitySelectQuery<ENTITY : Any> : SelectQuery<ENTITY, EntitySelectOptions, EntitySelectQuery<ENTITY>> {
     fun include(metamodel: EntityMetamodel<*, *, *>): EntityContextQuery<ENTITY>
     fun includeAll(): EntityContextQuery<ENTITY>
-
-    fun groupBy(vararg expressions: ColumnExpression<*, *>): SqlSelectQuery<ENTITY>
-    fun having(declaration: HavingDeclaration): SqlSelectQuery<ENTITY>
-
-    fun <T : Any, S : Any> select(
-        expression: ScalarExpression<T, S>
-    ): ScalarQuery<T?, T, S>
-
-    fun <A : Any> select(
-        expression: ColumnExpression<A, *>
-    ): FlowSubquery<A?>
-
-    fun <A : Any, B : Any> select(
-        expression1: ColumnExpression<A, *>,
-        expression2: ColumnExpression<B, *>
-    ): FlowSubquery<Pair<A?, B?>>
-
-    fun <A : Any, B : Any, C : Any> select(
-        expression1: ColumnExpression<A, *>,
-        expression2: ColumnExpression<B, *>,
-        expression3: ColumnExpression<C, *>
-    ): FlowSubquery<Triple<A?, B?, C?>>
-
-    fun select(
-        vararg expressions: ColumnExpression<*, *>,
-    ): FlowSubquery<Columns>
-
-    fun selectColumns(
-        vararg expressions: ColumnExpression<*, *>,
-    ): FlowSubquery<Columns>
 }
 
 internal data class EntitySelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(

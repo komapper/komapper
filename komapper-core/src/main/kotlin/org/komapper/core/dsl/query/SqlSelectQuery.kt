@@ -15,55 +15,7 @@ import org.komapper.core.dsl.options.SqlSelectOptions
 import org.komapper.core.dsl.visitor.FlowQueryVisitor
 import org.komapper.core.dsl.visitor.QueryVisitor
 
-interface SqlSelectQuery<ENTITY : Any> : FlowSubquery<ENTITY> {
-
-    fun distinct(): SqlSelectQuery<ENTITY>
-    fun <ENTITY2 : Any, ID2, META2 : EntityMetamodel<ENTITY2, ID2, META2>> innerJoin(
-        metamodel: META2,
-        on: OnDeclaration
-    ): SqlSelectQuery<ENTITY>
-
-    fun <ENTITY2 : Any, ID2, META2 : EntityMetamodel<ENTITY2, ID2, META2>> leftJoin(
-        metamodel: META2,
-        on: OnDeclaration
-    ): SqlSelectQuery<ENTITY>
-
-    fun where(declaration: WhereDeclaration): SqlSelectQuery<ENTITY>
-    fun groupBy(vararg expressions: ColumnExpression<*, *>): SqlSelectQuery<ENTITY>
-    fun having(declaration: HavingDeclaration): SqlSelectQuery<ENTITY>
-    fun orderBy(vararg expressions: SortExpression): SqlSelectQuery<ENTITY>
-    fun offset(offset: Int): SqlSelectQuery<ENTITY>
-    fun limit(limit: Int): SqlSelectQuery<ENTITY>
-    fun forUpdate(): SqlSelectQuery<ENTITY>
-    fun options(configure: (SqlSelectOptions) -> SqlSelectOptions): SqlSelectQuery<ENTITY>
-
-    fun <T : Any, S : Any> select(
-        expression: ScalarExpression<T, S>
-    ): ScalarQuery<T?, T, S>
-
-    fun <A : Any> select(
-        expression: ColumnExpression<A, *>
-    ): FlowSubquery<A?>
-
-    fun <A : Any, B : Any> select(
-        expression1: ColumnExpression<A, *>,
-        expression2: ColumnExpression<B, *>
-    ): FlowSubquery<Pair<A?, B?>>
-
-    fun <A : Any, B : Any, C : Any> select(
-        expression1: ColumnExpression<A, *>,
-        expression2: ColumnExpression<B, *>,
-        expression3: ColumnExpression<C, *>
-    ): FlowSubquery<Triple<A?, B?, C?>>
-
-    fun select(
-        vararg expressions: ColumnExpression<*, *>,
-    ): FlowSubquery<Columns>
-
-    fun selectColumns(
-        vararg expressions: ColumnExpression<*, *>,
-    ): FlowSubquery<Columns>
-}
+interface SqlSelectQuery<ENTITY : Any> : SelectQuery<ENTITY, SqlSelectOptions, SqlSelectQuery<ENTITY>>
 
 internal data class SqlSelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     override val context: SqlSelectContext<ENTITY, ID, META>,
