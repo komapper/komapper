@@ -17,7 +17,6 @@ import org.komapper.core.dsl.options.EntityDeleteBatchOptions
 import org.komapper.core.dsl.options.EntityDeleteOptions
 import org.komapper.core.dsl.options.EntityInsertBatchOptions
 import org.komapper.core.dsl.options.EntityInsertOptions
-import org.komapper.core.dsl.options.EntitySelectOptions
 import org.komapper.core.dsl.options.EntityUpdateBatchOptions
 import org.komapper.core.dsl.options.EntityUpdateOptions
 import org.komapper.core.dsl.options.InsertOptions
@@ -25,9 +24,9 @@ import org.komapper.core.dsl.options.SchemaCreateOptions
 import org.komapper.core.dsl.options.SchemaDropAllOptions
 import org.komapper.core.dsl.options.SchemaDropOptions
 import org.komapper.core.dsl.options.ScriptExecuteOptions
+import org.komapper.core.dsl.options.SelectOptions
 import org.komapper.core.dsl.options.SqlDeleteOptions
 import org.komapper.core.dsl.options.SqlInsertOptions
-import org.komapper.core.dsl.options.SqlSelectOptions
 import org.komapper.core.dsl.options.SqlSetOperationOptions
 import org.komapper.core.dsl.options.SqlUpdateOptions
 import org.komapper.core.dsl.options.TemplateExecuteOptions
@@ -98,14 +97,14 @@ internal object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
 
     override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> entityContextQuery(
         context: EntitySelectContext<ENTITY, ID, META>,
-        options: EntitySelectOptions
+        options: SelectOptions
     ): R2dbcRunner<*> {
         return EntityContextR2dbcRunner(context, options)
     }
 
     override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>, R> entitySelectQuery(
         context: EntitySelectContext<ENTITY, ID, META>,
-        options: EntitySelectOptions,
+        options: SelectOptions,
         collect: suspend (Flow<ENTITY>) -> R
     ): R2dbcRunner<R> {
         val transform = R2dbcRowTransformers.singleEntity(context.target)
@@ -227,7 +226,7 @@ internal object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
     override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>, R>
     sqlSelectQuery(
         context: SqlSelectContext<ENTITY, ID, META>,
-        options: SqlSelectOptions,
+        options: SelectOptions,
         collect: suspend (Flow<ENTITY>) -> R
     ): R2dbcRunner<R> {
         val transform = R2dbcRowTransformers.singleEntity(context.target)
@@ -246,7 +245,7 @@ internal object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
 
     override fun <A : Any, R> sqlSingleColumnQuery(
         context: SqlSelectContext<*, *, *>,
-        options: SqlSelectOptions,
+        options: SelectOptions,
         expression: ColumnExpression<A, *>,
         collect: suspend (Flow<A?>) -> R
     ): R2dbcRunner<R> {
@@ -266,7 +265,7 @@ internal object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
 
     override fun <A : Any, B : Any, R> sqlPairColumnsQuery(
         context: SqlSelectContext<*, *, *>,
-        options: SqlSelectOptions,
+        options: SelectOptions,
         expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
         collect: suspend (Flow<Pair<A?, B?>>) -> R
     ): R2dbcRunner<R> {
@@ -286,7 +285,7 @@ internal object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
 
     override fun <A : Any, B : Any, C : Any, R> sqlTripleColumnsQuery(
         context: SqlSelectContext<*, *, *>,
-        options: SqlSelectOptions,
+        options: SelectOptions,
         expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
         collect: suspend (Flow<Triple<A?, B?, C?>>) -> R
     ): R2dbcRunner<R> {
@@ -306,7 +305,7 @@ internal object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
 
     override fun <R> sqlMultipleColumnsQuery(
         context: SqlSelectContext<*, *, *>,
-        options: SqlSelectOptions,
+        options: SelectOptions,
         expressions: List<ColumnExpression<*, *>>,
         collect: suspend (Flow<Columns>) -> R
     ): R2dbcRunner<R> {

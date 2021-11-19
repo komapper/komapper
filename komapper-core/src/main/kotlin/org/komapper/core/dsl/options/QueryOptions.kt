@@ -36,7 +36,7 @@ interface InsertOptions : QueryOptions {
     val disableSequenceAssignment: Boolean
 }
 
-interface SelectOptions : QueryOptions {
+interface FetchOptions : QueryOptions {
     val fetchSize: Int?
     val maxRows: Int?
 
@@ -156,17 +156,17 @@ data class EntityUpdateOptions(
     }
 }
 
-data class EntitySelectOptions(
+data class SelectOptions(
     override val allowEmptyWhereClause: Boolean,
     override val escapeSequence: String?,
     override val fetchSize: Int?,
     override val maxRows: Int?,
     override val queryTimeoutSeconds: Int?,
     override val suppressLogging: Boolean,
-) : SelectOptions, WhereOptions {
+) : FetchOptions, WhereOptions {
 
     companion object {
-        val default = EntitySelectOptions(
+        val default = SelectOptions(
             allowEmptyWhereClause = true,
             escapeSequence = null,
             fetchSize = null,
@@ -175,15 +175,6 @@ data class EntitySelectOptions(
             suppressLogging = false
         )
     }
-
-    fun asSqlSelectOption() = SqlSelectOptions(
-        allowEmptyWhereClause = allowEmptyWhereClause,
-        escapeSequence = escapeSequence,
-        fetchSize = fetchSize,
-        maxRows = maxRows,
-        queryTimeoutSeconds = queryTimeoutSeconds,
-        suppressLogging = suppressLogging,
-    )
 }
 
 data class EntityDeleteBatchOptions(
@@ -257,27 +248,6 @@ data class SqlUpdateOptions(
     }
 }
 
-data class SqlSelectOptions(
-    override val allowEmptyWhereClause: Boolean,
-    override val escapeSequence: String?,
-    override val fetchSize: Int?,
-    override val maxRows: Int?,
-    override val queryTimeoutSeconds: Int?,
-    override val suppressLogging: Boolean,
-) : SelectOptions, WhereOptions {
-
-    companion object {
-        val default = SqlSelectOptions(
-            allowEmptyWhereClause = true,
-            escapeSequence = null,
-            fetchSize = null,
-            maxRows = null,
-            queryTimeoutSeconds = null,
-            suppressLogging = false
-        )
-    }
-}
-
 data class SqlSetOperationOptions(
     override val allowEmptyWhereClause: Boolean,
     override val escapeSequence: String?,
@@ -285,7 +255,7 @@ data class SqlSetOperationOptions(
     override val maxRows: Int?,
     override val suppressLogging: Boolean,
     override val queryTimeoutSeconds: Int?,
-) : SelectOptions, WhereOptions {
+) : FetchOptions, WhereOptions {
 
     companion object {
         val default = SqlSetOperationOptions(
@@ -305,7 +275,7 @@ data class TemplateSelectOptions(
     override val maxRows: Int?,
     override val queryTimeoutSeconds: Int?,
     override val suppressLogging: Boolean,
-) : SelectOptions {
+) : FetchOptions {
 
     companion object {
         val default = TemplateSelectOptions(

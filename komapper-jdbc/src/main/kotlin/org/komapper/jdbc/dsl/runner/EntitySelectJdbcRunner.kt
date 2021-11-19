@@ -5,7 +5,7 @@ import org.komapper.core.DatabaseConfig
 import org.komapper.core.Statement
 import org.komapper.core.dsl.context.EntitySelectContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
-import org.komapper.core.dsl.options.EntitySelectOptions
+import org.komapper.core.dsl.options.SelectOptions
 import org.komapper.core.dsl.runner.EntitySelectRunner
 import org.komapper.jdbc.JdbcDatabaseConfig
 import org.komapper.jdbc.JdbcDialect
@@ -14,7 +14,7 @@ import java.sql.ResultSet
 
 internal class EntitySelectJdbcRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>, R>(
     private val context: EntitySelectContext<ENTITY, ID, META>,
-    private val options: EntitySelectOptions,
+    private val options: SelectOptions,
     private val transform: (JdbcDialect, ResultSet) -> ENTITY,
     private val collect: suspend (Flow<ENTITY>) -> R
 ) : JdbcRunner<R> {

@@ -11,15 +11,15 @@ import org.komapper.core.dsl.expression.SortExpression
 import org.komapper.core.dsl.expression.SubqueryExpression
 import org.komapper.core.dsl.expression.WhereDeclaration
 import org.komapper.core.dsl.metamodel.EntityMetamodel
-import org.komapper.core.dsl.options.SqlSelectOptions
+import org.komapper.core.dsl.options.SelectOptions
 import org.komapper.core.dsl.visitor.FlowQueryVisitor
 import org.komapper.core.dsl.visitor.QueryVisitor
 
-interface SqlSelectQuery<ENTITY : Any> : SelectQuery<ENTITY, SqlSelectOptions, SqlSelectQuery<ENTITY>>
+interface SqlSelectQuery<ENTITY : Any> : SelectQuery<ENTITY, SqlSelectQuery<ENTITY>>
 
 internal data class SqlSelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     override val context: SqlSelectContext<ENTITY, ID, META>,
-    private val options: SqlSelectOptions = SqlSelectOptions.default
+    private val options: SelectOptions = SelectOptions.default
 ) :
     SqlSelectQuery<ENTITY> {
 
@@ -85,7 +85,7 @@ internal data class SqlSelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<
         return copy(context = newContext)
     }
 
-    override fun options(configure: (SqlSelectOptions) -> SqlSelectOptions): SqlSelectQuery<ENTITY> {
+    override fun options(configure: (SelectOptions) -> SelectOptions): SqlSelectQuery<ENTITY> {
         return copy(options = configure(options))
     }
 

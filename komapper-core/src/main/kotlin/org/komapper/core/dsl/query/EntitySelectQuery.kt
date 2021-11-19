@@ -13,18 +13,18 @@ import org.komapper.core.dsl.expression.SortExpression
 import org.komapper.core.dsl.expression.SubqueryExpression
 import org.komapper.core.dsl.expression.WhereDeclaration
 import org.komapper.core.dsl.metamodel.EntityMetamodel
-import org.komapper.core.dsl.options.EntitySelectOptions
+import org.komapper.core.dsl.options.SelectOptions
 import org.komapper.core.dsl.visitor.FlowQueryVisitor
 import org.komapper.core.dsl.visitor.QueryVisitor
 
-interface EntitySelectQuery<ENTITY : Any> : SelectQuery<ENTITY, EntitySelectOptions, EntitySelectQuery<ENTITY>> {
+interface EntitySelectQuery<ENTITY : Any> : SelectQuery<ENTITY, EntitySelectQuery<ENTITY>> {
     fun include(metamodel: EntityMetamodel<*, *, *>): EntityContextQuery<ENTITY>
     fun includeAll(): EntityContextQuery<ENTITY>
 }
 
 internal data class EntitySelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     override val context: EntitySelectContext<ENTITY, ID, META>,
-    private val options: EntitySelectOptions = EntitySelectOptions.default
+    private val options: SelectOptions = SelectOptions.default
 ) :
     EntitySelectQuery<ENTITY> {
 
@@ -77,7 +77,7 @@ internal data class EntitySelectQueryImpl<ENTITY : Any, ID, META : EntityMetamod
         return copy(context = newContext)
     }
 
-    override fun options(configure: (EntitySelectOptions) -> EntitySelectOptions): EntitySelectQuery<ENTITY> {
+    override fun options(configure: (SelectOptions) -> SelectOptions): EntitySelectQuery<ENTITY> {
         return copy(options = configure(options))
     }
 
@@ -160,7 +160,7 @@ internal data class EntitySelectQueryImpl<ENTITY : Any, ID, META : EntityMetamod
     }
 
     private fun asSqlQuery(): SqlSelectQuery<ENTITY> {
-        return SqlSelectQueryImpl(context.asSqlSelectContext(), options.asSqlSelectOption())
+        return SqlSelectQueryImpl(context.asSqlSelectContext(), options)
     }
 
     override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {

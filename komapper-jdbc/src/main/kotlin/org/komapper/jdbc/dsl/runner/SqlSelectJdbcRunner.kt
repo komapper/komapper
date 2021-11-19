@@ -4,7 +4,7 @@ import kotlinx.coroutines.flow.Flow
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.Statement
 import org.komapper.core.dsl.context.SqlSelectContext
-import org.komapper.core.dsl.options.SqlSelectOptions
+import org.komapper.core.dsl.options.SelectOptions
 import org.komapper.core.dsl.runner.SqlSelectRunner
 import org.komapper.jdbc.JdbcDatabaseConfig
 import org.komapper.jdbc.JdbcDialect
@@ -13,7 +13,7 @@ import java.sql.ResultSet
 
 internal class SqlSelectJdbcRunner<T, R>(
     private val context: SqlSelectContext<*, *, *>,
-    private val options: SqlSelectOptions,
+    private val options: SelectOptions,
     private val transform: (JdbcDialect, ResultSet) -> T,
     private val collect: suspend (Flow<T>) -> R
 ) :

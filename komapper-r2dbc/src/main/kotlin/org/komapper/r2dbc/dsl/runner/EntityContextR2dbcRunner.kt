@@ -6,7 +6,7 @@ import org.komapper.core.DatabaseConfig
 import org.komapper.core.Statement
 import org.komapper.core.dsl.context.EntitySelectContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
-import org.komapper.core.dsl.options.EntitySelectOptions
+import org.komapper.core.dsl.options.SelectOptions
 import org.komapper.core.dsl.query.EntityContext
 import org.komapper.core.dsl.runner.EntityContextFactory
 import org.komapper.core.dsl.runner.EntitySelectRunner
@@ -15,7 +15,7 @@ import org.komapper.r2dbc.R2dbcExecutor
 
 internal class EntityContextR2dbcRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntitySelectContext<ENTITY, ID, META>,
-    private val options: EntitySelectOptions,
+    private val options: SelectOptions,
 ) : R2dbcRunner<EntityContext<ENTITY>> {
 
     private val runner: EntitySelectRunner = EntitySelectRunner(context, options)

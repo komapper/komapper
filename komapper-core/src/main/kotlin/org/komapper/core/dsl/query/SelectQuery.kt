@@ -9,9 +9,9 @@ import org.komapper.core.dsl.expression.WhereDeclaration
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.SelectOptions
 
-interface SelectQuery<ENTITY : Any, OPTIONS : SelectOptions, QUERY : SelectQuery<ENTITY, OPTIONS, QUERY>> :
+interface SelectQuery<ENTITY : Any, QUERY : SelectQuery<ENTITY, QUERY>> :
     FlowSubquery<ENTITY> {
-    fun distinct(): SelectQuery<ENTITY, OPTIONS, QUERY>
+    fun distinct(): QUERY
     fun <ENTITY2 : Any, ID2, META2 : EntityMetamodel<ENTITY2, ID2, META2>> innerJoin(
         metamodel: META2,
         on: OnDeclaration
@@ -27,7 +27,7 @@ interface SelectQuery<ENTITY : Any, OPTIONS : SelectOptions, QUERY : SelectQuery
     fun offset(offset: Int): QUERY
     fun limit(limit: Int): QUERY
     fun forUpdate(): QUERY
-    fun options(configure: (OPTIONS) -> OPTIONS): QUERY
+    fun options(configure: (SelectOptions) -> SelectOptions): QUERY
     fun groupBy(vararg expressions: ColumnExpression<*, *>): SqlSelectQuery<ENTITY>
     fun having(declaration: HavingDeclaration): SqlSelectQuery<ENTITY>
     fun <T : Any, S : Any> select(

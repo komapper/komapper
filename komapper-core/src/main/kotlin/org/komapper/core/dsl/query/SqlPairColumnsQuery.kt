@@ -5,13 +5,13 @@ import kotlinx.coroutines.flow.toList
 import org.komapper.core.dsl.context.SqlSelectContext
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.expression.SubqueryExpression
-import org.komapper.core.dsl.options.SqlSelectOptions
+import org.komapper.core.dsl.options.SelectOptions
 import org.komapper.core.dsl.visitor.FlowQueryVisitor
 import org.komapper.core.dsl.visitor.QueryVisitor
 
 internal class SqlPairColumnsQuery<A : Any, B : Any>(
     override val context: SqlSelectContext<*, *, *>,
-    private val options: SqlSelectOptions,
+    private val options: SelectOptions,
     private val expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>
 ) : FlowSubquery<Pair<A?, B?>> {
 

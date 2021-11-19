@@ -2,17 +2,17 @@ package org.komapper.core.dsl.query
 
 import org.komapper.core.dsl.context.EntitySelectContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
-import org.komapper.core.dsl.options.EntitySelectOptions
+import org.komapper.core.dsl.options.SelectOptions
 import org.komapper.core.dsl.visitor.QueryVisitor
 
 interface EntityContextQuery<ENTITY> : Query<EntityContext<ENTITY>> {
     fun include(metamodel: EntityMetamodel<*, *, *>): EntityContextQuery<ENTITY>
-    fun options(configure: (EntitySelectOptions) -> EntitySelectOptions): EntityContextQuery<ENTITY>
+    fun options(configure: (SelectOptions) -> SelectOptions): EntityContextQuery<ENTITY>
 }
 
 internal data class EntityContextQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntitySelectContext<ENTITY, ID, META>,
-    private val options: EntitySelectOptions
+    private val options: SelectOptions
 ) : EntityContextQuery<ENTITY> {
 
     companion object Message {
@@ -33,7 +33,7 @@ internal data class EntityContextQueryImpl<ENTITY : Any, ID, META : EntityMetamo
         return copy(context = newContext)
     }
 
-    override fun options(configure: (EntitySelectOptions) -> EntitySelectOptions): EntityContextQuery<ENTITY> {
+    override fun options(configure: (SelectOptions) -> SelectOptions): EntityContextQuery<ENTITY> {
         return copy(options = configure(options))
     }
 

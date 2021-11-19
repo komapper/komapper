@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.Flow
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.Statement
 import org.komapper.core.dsl.context.SqlSelectContext
-import org.komapper.core.dsl.options.SqlSelectOptions
+import org.komapper.core.dsl.options.SelectOptions
 import org.komapper.core.dsl.runner.SqlSelectRunner
 import org.komapper.r2dbc.R2dbcDatabaseConfig
 import org.komapper.r2dbc.R2dbcDialect
@@ -13,7 +13,7 @@ import org.komapper.r2dbc.R2dbcExecutor
 
 internal class SqlSelectFlowBuilder<T>(
     private val context: SqlSelectContext<*, *, *>,
-    private val options: SqlSelectOptions,
+    private val options: SelectOptions,
     private val transform: (R2dbcDialect, Row) -> T,
 ) :
     FlowBuilder<T> {

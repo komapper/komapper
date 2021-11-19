@@ -4,11 +4,11 @@ import org.komapper.core.DatabaseConfig
 import org.komapper.core.Statement
 import org.komapper.core.dsl.builder.EntitySelectStatementBuilder
 import org.komapper.core.dsl.context.EntitySelectContext
-import org.komapper.core.dsl.options.EntitySelectOptions
+import org.komapper.core.dsl.options.SelectOptions
 
 class EntitySelectRunner(
     private val context: EntitySelectContext<*, *, *>,
-    @Suppress("unused") private val options: EntitySelectOptions,
+    @Suppress("unused") private val options: SelectOptions,
 ) : Runner {
 
     override fun dryRun(config: DatabaseConfig): Statement {

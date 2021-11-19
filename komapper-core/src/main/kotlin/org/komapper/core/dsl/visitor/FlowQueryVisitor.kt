@@ -5,7 +5,7 @@ import org.komapper.core.dsl.context.SqlSelectContext
 import org.komapper.core.dsl.context.SqlSetOperationContext
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
-import org.komapper.core.dsl.options.SqlSelectOptions
+import org.komapper.core.dsl.options.SelectOptions
 import org.komapper.core.dsl.options.SqlSetOperationOptions
 import org.komapper.core.dsl.options.TemplateSelectOptions
 import org.komapper.core.dsl.query.Row
@@ -15,7 +15,7 @@ interface FlowQueryVisitor<VISIT_RESULT> {
 
     fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> sqlSelectQuery(
         context: SqlSelectContext<ENTITY, ID, META>,
-        options: SqlSelectOptions
+        options: SelectOptions
     ): VISIT_RESULT
 
     fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> sqlSetOperationQuery(
@@ -26,7 +26,7 @@ interface FlowQueryVisitor<VISIT_RESULT> {
 
     fun <A : Any> sqlSingleColumnQuery(
         context: SqlSelectContext<*, *, *>,
-        options: SqlSelectOptions,
+        options: SelectOptions,
         expression: ColumnExpression<A, *>,
     ): VISIT_RESULT
 
@@ -38,7 +38,7 @@ interface FlowQueryVisitor<VISIT_RESULT> {
 
     fun <A : Any, B : Any> sqlPairColumnsQuery(
         context: SqlSelectContext<*, *, *>,
-        options: SqlSelectOptions,
+        options: SelectOptions,
         expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
     ): VISIT_RESULT
 
@@ -51,7 +51,7 @@ interface FlowQueryVisitor<VISIT_RESULT> {
     fun <A : Any, B : Any, C : Any>
     sqlTripleColumnsQuery(
         context: SqlSelectContext<*, *, *>,
-        options: SqlSelectOptions,
+        options: SelectOptions,
         expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
     ): VISIT_RESULT
 
@@ -63,7 +63,7 @@ interface FlowQueryVisitor<VISIT_RESULT> {
 
     fun sqlMultipleColumnsQuery(
         context: SqlSelectContext<*, *, *>,
-        options: SqlSelectOptions,
+        options: SelectOptions,
         expressions: List<ColumnExpression<*, *>>
     ): VISIT_RESULT
 

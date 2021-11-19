@@ -4,7 +4,7 @@ import org.komapper.core.dsl.context.SqlSelectContext
 import org.komapper.core.dsl.context.SqlSetOperationContext
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
-import org.komapper.core.dsl.options.SqlSelectOptions
+import org.komapper.core.dsl.options.SelectOptions
 import org.komapper.core.dsl.options.SqlSetOperationOptions
 import org.komapper.core.dsl.options.TemplateSelectOptions
 import org.komapper.core.dsl.query.Columns
@@ -20,7 +20,7 @@ internal object R2dbcFlowQueryVisitor : FlowQueryVisitor<FlowBuilder<*>> {
 
     override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> sqlSelectQuery(
         context: SqlSelectContext<ENTITY, ID, META>,
-        options: SqlSelectOptions
+        options: SelectOptions
     ): FlowBuilder<ENTITY> {
         val transform = R2dbcRowTransformers.singleEntity(context.target)
         return SqlSelectFlowBuilder(context, options, transform)
@@ -37,7 +37,7 @@ internal object R2dbcFlowQueryVisitor : FlowQueryVisitor<FlowBuilder<*>> {
 
     override fun <A : Any> sqlSingleColumnQuery(
         context: SqlSelectContext<*, *, *>,
-        options: SqlSelectOptions,
+        options: SelectOptions,
         expression: ColumnExpression<A, *>
     ): FlowBuilder<A?> {
         val transform = R2dbcRowTransformers.singleColumn(expression)
@@ -55,7 +55,7 @@ internal object R2dbcFlowQueryVisitor : FlowQueryVisitor<FlowBuilder<*>> {
 
     override fun <A : Any, B : Any> sqlPairColumnsQuery(
         context: SqlSelectContext<*, *, *>,
-        options: SqlSelectOptions,
+        options: SelectOptions,
         expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>
     ): FlowBuilder<Pair<A?, B?>> {
         val transform = R2dbcRowTransformers.pairColumns(expressions)
@@ -73,7 +73,7 @@ internal object R2dbcFlowQueryVisitor : FlowQueryVisitor<FlowBuilder<*>> {
 
     override fun <A : Any, B : Any, C : Any> sqlTripleColumnsQuery(
         context: SqlSelectContext<*, *, *>,
-        options: SqlSelectOptions,
+        options: SelectOptions,
         expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>
     ): FlowBuilder<Triple<A?, B?, C?>> {
         val transform = R2dbcRowTransformers.tripleColumns(expressions)
@@ -91,7 +91,7 @@ internal object R2dbcFlowQueryVisitor : FlowQueryVisitor<FlowBuilder<*>> {
 
     override fun sqlMultipleColumnsQuery(
         context: SqlSelectContext<*, *, *>,
-        options: SqlSelectOptions,
+        options: SelectOptions,
         expressions: List<ColumnExpression<*, *>>
     ): FlowBuilder<Columns> {
         val transform = R2dbcRowTransformers.multipleColumns(expressions)
