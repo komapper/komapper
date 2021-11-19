@@ -1,7 +1,7 @@
 package org.komapper.core.dsl.scope
 
-import org.komapper.core.dsl.declaration.HavingDeclaration
 import org.komapper.core.dsl.expression.Criterion
+import org.komapper.core.dsl.expression.HavingDeclaration
 import org.komapper.core.dsl.expression.Operand
 import org.komapper.core.dsl.metamodel.PropertyMetamodelStub
 import org.komapper.core.dsl.operator.and

@@ -1,10 +1,10 @@
 package org.komapper.core.dsl.context
 
-import org.komapper.core.dsl.declaration.WhereDeclaration
 import org.komapper.core.dsl.element.ForUpdate
 import org.komapper.core.dsl.element.Join
 import org.komapper.core.dsl.element.Projection
 import org.komapper.core.dsl.expression.SortItem
+import org.komapper.core.dsl.expression.WhereDeclaration
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.metamodel.where
 

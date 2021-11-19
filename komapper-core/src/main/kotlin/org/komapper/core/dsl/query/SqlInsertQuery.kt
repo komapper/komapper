@@ -1,9 +1,9 @@
 package org.komapper.core.dsl.query
 
 import org.komapper.core.dsl.context.SqlInsertContext
-import org.komapper.core.dsl.declaration.ValuesDeclaration
 import org.komapper.core.dsl.element.Values
 import org.komapper.core.dsl.expression.SubqueryExpression
+import org.komapper.core.dsl.expression.ValuesDeclaration
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.SqlInsertOptions
 import org.komapper.core.dsl.visitor.QueryVisitor

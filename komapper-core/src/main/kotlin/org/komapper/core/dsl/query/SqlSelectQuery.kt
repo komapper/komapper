@@ -3,13 +3,13 @@ package org.komapper.core.dsl.query
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.toList
 import org.komapper.core.dsl.context.SqlSelectContext
-import org.komapper.core.dsl.declaration.HavingDeclaration
-import org.komapper.core.dsl.declaration.OnDeclaration
-import org.komapper.core.dsl.declaration.WhereDeclaration
 import org.komapper.core.dsl.expression.ColumnExpression
+import org.komapper.core.dsl.expression.HavingDeclaration
+import org.komapper.core.dsl.expression.OnDeclaration
 import org.komapper.core.dsl.expression.ScalarExpression
 import org.komapper.core.dsl.expression.SortExpression
 import org.komapper.core.dsl.expression.SubqueryExpression
+import org.komapper.core.dsl.expression.WhereDeclaration
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.SqlSelectOptions
 import org.komapper.core.dsl.visitor.FlowQueryVisitor

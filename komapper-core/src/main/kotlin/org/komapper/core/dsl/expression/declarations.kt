@@ -1,4 +1,4 @@
-package org.komapper.core.dsl.declaration
+package org.komapper.core.dsl.expression
 
 import org.komapper.core.dsl.scope.HavingScope
 import org.komapper.core.dsl.scope.OnScope

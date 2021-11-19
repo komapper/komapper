@@ -2,7 +2,7 @@ package org.komapper.core.dsl.query
 
 import org.komapper.core.ThreadSafe
 import org.komapper.core.dsl.context.EntityDeleteContext
-import org.komapper.core.dsl.declaration.WhereDeclaration
+import org.komapper.core.dsl.expression.WhereDeclaration
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.EntityDeleteOptions
 

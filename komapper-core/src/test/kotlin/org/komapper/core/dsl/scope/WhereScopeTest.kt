@@ -1,11 +1,11 @@
 package org.komapper.core.dsl.scope
 
 import org.komapper.core.dsl.context.SubqueryContext
-import org.komapper.core.dsl.declaration.WhereDeclaration
 import org.komapper.core.dsl.expression.Criterion
 import org.komapper.core.dsl.expression.EscapeExpression
 import org.komapper.core.dsl.expression.Operand
 import org.komapper.core.dsl.expression.SubqueryExpression
+import org.komapper.core.dsl.expression.WhereDeclaration
 import org.komapper.core.dsl.metamodel.PropertyMetamodelStub
 import org.komapper.core.dsl.operator.and
 import org.komapper.core.dsl.operator.or

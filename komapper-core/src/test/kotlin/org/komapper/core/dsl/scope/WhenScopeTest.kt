@@ -1,8 +1,8 @@
 package org.komapper.core.dsl.scope
 
-import org.komapper.core.dsl.declaration.WhenDeclaration
 import org.komapper.core.dsl.expression.Criterion
 import org.komapper.core.dsl.expression.Operand
+import org.komapper.core.dsl.expression.WhenDeclaration
 import org.komapper.core.dsl.metamodel.PropertyMetamodelStub
 import org.komapper.core.dsl.operator.and
 import org.komapper.core.dsl.operator.or

@@ -1,6 +1,6 @@
 package org.komapper.core.dsl.metamodel
 
-import org.komapper.core.dsl.declaration.WhereDeclaration
+import org.komapper.core.dsl.expression.WhereDeclaration
 
 fun <ENTITY : Any> EntityMetamodel<ENTITY, *, *>.getAutoIncrementProperty(): PropertyMetamodel<ENTITY, *, *>? {
     val idAssignment = this.idAssignment()

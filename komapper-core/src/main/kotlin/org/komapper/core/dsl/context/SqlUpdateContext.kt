@@ -1,7 +1,7 @@
 package org.komapper.core.dsl.context
 
-import org.komapper.core.dsl.declaration.SetDeclaration
-import org.komapper.core.dsl.declaration.WhereDeclaration
+import org.komapper.core.dsl.expression.SetDeclaration
+import org.komapper.core.dsl.expression.WhereDeclaration
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.metamodel.where
 

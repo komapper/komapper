@@ -5,13 +5,13 @@ import kotlinx.coroutines.flow.toList
 import org.komapper.core.dsl.context.EntitySelectContext
 import org.komapper.core.dsl.context.SqlSetOperationContext
 import org.komapper.core.dsl.context.SqlSetOperationKind
-import org.komapper.core.dsl.declaration.HavingDeclaration
-import org.komapper.core.dsl.declaration.OnDeclaration
-import org.komapper.core.dsl.declaration.WhereDeclaration
 import org.komapper.core.dsl.expression.ColumnExpression
+import org.komapper.core.dsl.expression.HavingDeclaration
+import org.komapper.core.dsl.expression.OnDeclaration
 import org.komapper.core.dsl.expression.ScalarExpression
 import org.komapper.core.dsl.expression.SortExpression
 import org.komapper.core.dsl.expression.SubqueryExpression
+import org.komapper.core.dsl.expression.WhereDeclaration
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.EntitySelectOptions
 import org.komapper.core.dsl.visitor.FlowQueryVisitor

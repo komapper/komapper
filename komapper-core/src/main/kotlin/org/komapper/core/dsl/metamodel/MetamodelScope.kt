@@ -1,7 +1,7 @@
 package org.komapper.core.dsl.metamodel
 
 import org.komapper.core.Scope
-import org.komapper.core.dsl.declaration.WhereDeclaration
+import org.komapper.core.dsl.expression.WhereDeclaration
 
 @Scope
 class MetamodelScope<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> {

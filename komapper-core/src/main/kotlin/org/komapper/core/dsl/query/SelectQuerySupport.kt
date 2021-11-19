@@ -1,13 +1,13 @@
 package org.komapper.core.dsl.query
 
 import org.komapper.core.dsl.context.SelectContext
-import org.komapper.core.dsl.declaration.OnDeclaration
-import org.komapper.core.dsl.declaration.WhereDeclaration
 import org.komapper.core.dsl.element.ForUpdate
 import org.komapper.core.dsl.element.Join
 import org.komapper.core.dsl.element.JoinKind
+import org.komapper.core.dsl.expression.OnDeclaration
 import org.komapper.core.dsl.expression.SortExpression
 import org.komapper.core.dsl.expression.SortItem
+import org.komapper.core.dsl.expression.WhereDeclaration
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.ForUpdateOptions
 

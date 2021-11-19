@@ -1,6 +1,6 @@
 package org.komapper.core.dsl.operator
 
-import org.komapper.core.dsl.declaration.HavingDeclaration
+import org.komapper.core.dsl.expression.HavingDeclaration
 
 infix operator fun HavingDeclaration.plus(other: HavingDeclaration): HavingDeclaration {
     return {

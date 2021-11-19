@@ -1,8 +1,8 @@
 package org.komapper.core.dsl.query
 
 import org.komapper.core.ThreadSafe
-import org.komapper.core.dsl.declaration.ValuesDeclaration
 import org.komapper.core.dsl.expression.SubqueryExpression
+import org.komapper.core.dsl.expression.ValuesDeclaration
 
 @ThreadSafe
 interface SqlInsertQueryBuilder<T : Any, ID> {
