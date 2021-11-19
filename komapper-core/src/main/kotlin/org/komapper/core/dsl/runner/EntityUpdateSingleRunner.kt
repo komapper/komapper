@@ -4,11 +4,11 @@ import org.komapper.core.DatabaseConfig
 import org.komapper.core.Statement
 import org.komapper.core.dsl.context.EntityUpdateContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
-import org.komapper.core.dsl.options.EntityUpdateOptions
+import org.komapper.core.dsl.options.UpdateOptions
 
 class EntityUpdateSingleRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     context: EntityUpdateContext<ENTITY, ID, META>,
-    options: EntityUpdateOptions,
+    options: UpdateOptions,
     private val entity: ENTITY
 ) : Runner {
 

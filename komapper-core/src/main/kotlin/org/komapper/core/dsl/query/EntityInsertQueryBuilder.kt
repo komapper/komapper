@@ -7,7 +7,7 @@ import org.komapper.core.dsl.expression.SubqueryExpression
 import org.komapper.core.dsl.expression.ValuesDeclaration
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.metamodel.PropertyMetamodel
-import org.komapper.core.dsl.options.EntityInsertOptions
+import org.komapper.core.dsl.options.InsertOptions
 
 @ThreadSafe
 interface EntityInsertQueryBuilder<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> {
@@ -18,13 +18,13 @@ interface EntityInsertQueryBuilder<ENTITY : Any, ID, META : EntityMetamodel<ENTI
     fun multiple(vararg entities: ENTITY): EntityInsertQuery<List<ENTITY>>
     fun batch(entities: List<ENTITY>, batchSize: Int? = null): EntityInsertQuery<List<ENTITY>>
     fun batch(vararg entities: ENTITY, batchSize: Int? = null): EntityInsertQuery<List<ENTITY>>
-    fun values(declaration: ValuesDeclaration<ENTITY>): SqlInsertQuery<ENTITY, ID>
-    fun select(block: () -> SubqueryExpression<ENTITY>): SqlInsertQuery<ENTITY, ID>
+    fun values(declaration: ValuesDeclaration<ENTITY>): RelationInsertQuery<ENTITY, ID>
+    fun select(block: () -> SubqueryExpression<ENTITY>): RelationInsertQuery<ENTITY, ID>
 }
 
 internal data class EntityInsertQueryBuilderImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityInsertContext<ENTITY, ID, META>,
-    private val options: EntityInsertOptions = EntityInsertOptions.default
+    private val options: InsertOptions = InsertOptions.default
 ) :
     EntityInsertQueryBuilder<ENTITY, ID, META> {
 
@@ -57,23 +57,24 @@ internal data class EntityInsertQueryBuilderImpl<ENTITY : Any, ID, META : Entity
     }
 
     override fun batch(entities: List<ENTITY>, batchSize: Int?): EntityInsertQuery<List<ENTITY>> {
-        return EntityInsertBatchQuery(context, options, entities, batchSize)
+        val options = if (batchSize != null) options.copy(batchSize = batchSize) else options
+        return EntityInsertBatchQuery(context, options, entities)
     }
 
     override fun batch(vararg entities: ENTITY, batchSize: Int?): EntityInsertQuery<List<ENTITY>> {
-        return batch(entities.toList())
+        return batch(entities.toList(), batchSize)
     }
 
-    override fun values(declaration: ValuesDeclaration<ENTITY>): SqlInsertQuery<ENTITY, ID> {
-        return asSqlInsertQueryBuilder().values(declaration)
+    override fun values(declaration: ValuesDeclaration<ENTITY>): RelationInsertQuery<ENTITY, ID> {
+        return asRelationInsertQueryBuilder().values(declaration)
     }
 
-    override fun select(block: () -> SubqueryExpression<ENTITY>): SqlInsertQuery<ENTITY, ID> {
-        return asSqlInsertQueryBuilder().select(block)
+    override fun select(block: () -> SubqueryExpression<ENTITY>): RelationInsertQuery<ENTITY, ID> {
+        return asRelationInsertQueryBuilder().select(block)
     }
 
-    private fun asSqlInsertQueryBuilder(): SqlInsertQueryBuilder<ENTITY, ID> {
-        val query = SqlInsertQueryImpl(context.asSqlInsertContext(), options.asSqlInsertOptions())
-        return SqlInsertQueryBuilderImpl(query)
+    private fun asRelationInsertQueryBuilder(): RelationInsertQueryBuilder<ENTITY, ID> {
+        val query = RelationInsertQueryImpl(context.asRelationInsertContext(), options)
+        return RelationInsertQueryBuilderImpl(query)
     }
 }

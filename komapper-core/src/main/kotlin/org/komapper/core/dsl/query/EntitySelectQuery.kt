@@ -3,8 +3,8 @@ package org.komapper.core.dsl.query
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.toList
 import org.komapper.core.dsl.context.SelectContext
-import org.komapper.core.dsl.context.SqlSetOperationContext
-import org.komapper.core.dsl.context.SqlSetOperationKind
+import org.komapper.core.dsl.context.SetOperationContext
+import org.komapper.core.dsl.context.SetOperationKind
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.expression.HavingDeclaration
 import org.komapper.core.dsl.expression.OnDeclaration
@@ -95,51 +95,51 @@ internal data class EntitySelectQueryImpl<ENTITY : Any, ID, META : EntityMetamod
     }
 
     override fun except(other: SubqueryExpression<ENTITY>): FlowSetOperationQuery<ENTITY> {
-        return setOperation(SqlSetOperationKind.EXCEPT, this, other)
+        return setOperation(SetOperationKind.EXCEPT, this, other)
     }
 
     override fun intersect(other: SubqueryExpression<ENTITY>): FlowSetOperationQuery<ENTITY> {
-        return setOperation(SqlSetOperationKind.INTERSECT, this, other)
+        return setOperation(SetOperationKind.INTERSECT, this, other)
     }
 
     override fun union(other: SubqueryExpression<ENTITY>): FlowSetOperationQuery<ENTITY> {
-        return setOperation(SqlSetOperationKind.UNION, this, other)
+        return setOperation(SetOperationKind.UNION, this, other)
     }
 
     override fun unionAll(other: SubqueryExpression<ENTITY>): FlowSetOperationQuery<ENTITY> {
-        return setOperation(SqlSetOperationKind.UNION_ALL, this, other)
+        return setOperation(SetOperationKind.UNION_ALL, this, other)
     }
 
     private fun setOperation(
-        kind: SqlSetOperationKind,
+        kind: SetOperationKind,
         left: SubqueryExpression<ENTITY>,
         right: SubqueryExpression<ENTITY>
-    ): SqlSetOperationQuery<ENTITY> {
-        val setOperatorContext = SqlSetOperationContext(kind, left.context, right.context)
-        return SqlSetOperationQueryImpl(setOperatorContext, metamodel = context.target)
+    ): FlowSetOperationQuery<ENTITY> {
+        val setOperatorContext = SetOperationContext(kind, left.context, right.context)
+        return RelationSetOperationQueryImpl(setOperatorContext, metamodel = context.target)
     }
 
-    override fun groupBy(vararg expressions: ColumnExpression<*, *>): SqlSelectQuery<ENTITY> {
-        return asSqlQuery().groupBy(*expressions)
+    override fun groupBy(vararg expressions: ColumnExpression<*, *>): RelationSelectQuery<ENTITY> {
+        return asRelationQuery().groupBy(*expressions)
     }
 
-    override fun having(declaration: HavingDeclaration): SqlSelectQuery<ENTITY> {
-        return asSqlQuery().having(declaration)
+    override fun having(declaration: HavingDeclaration): RelationSelectQuery<ENTITY> {
+        return asRelationQuery().having(declaration)
     }
 
     override fun <T : Any, S : Any> select(expression: ScalarExpression<T, S>): ScalarQuery<T?, T, S> {
-        return asSqlQuery().select(expression)
+        return asRelationQuery().select(expression)
     }
 
     override fun <A : Any> select(expression: ColumnExpression<A, *>): FlowSubquery<A?> {
-        return asSqlQuery().select(expression)
+        return asRelationQuery().select(expression)
     }
 
     override fun <A : Any, B : Any> select(
         expression1: ColumnExpression<A, *>,
         expression2: ColumnExpression<B, *>
     ): FlowSubquery<Pair<A?, B?>> {
-        return asSqlQuery().select(expression1, expression2)
+        return asRelationQuery().select(expression1, expression2)
     }
 
     override fun <A : Any, B : Any, C : Any> select(
@@ -147,19 +147,19 @@ internal data class EntitySelectQueryImpl<ENTITY : Any, ID, META : EntityMetamod
         expression2: ColumnExpression<B, *>,
         expression3: ColumnExpression<C, *>
     ): FlowSubquery<Triple<A?, B?, C?>> {
-        return asSqlQuery().select(expression1, expression2, expression3)
+        return asRelationQuery().select(expression1, expression2, expression3)
     }
 
     override fun select(vararg expressions: ColumnExpression<*, *>): FlowSubquery<Columns> {
-        return asSqlQuery().select(*expressions)
+        return asRelationQuery().select(*expressions)
     }
 
     override fun selectColumns(vararg expressions: ColumnExpression<*, *>): FlowSubquery<Columns> {
-        return asSqlQuery().selectColumns(*expressions)
+        return asRelationQuery().selectColumns(*expressions)
     }
 
-    private fun asSqlQuery(): SqlSelectQuery<ENTITY> {
-        return SqlSelectQueryImpl(context, options)
+    private fun asRelationQuery(): RelationSelectQuery<ENTITY> {
+        return RelationSelectQueryImpl(context, options)
     }
 
     override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
@@ -167,6 +167,6 @@ internal data class EntitySelectQueryImpl<ENTITY : Any, ID, META : EntityMetamod
     }
 
     override fun <VISIT_RESULT> accept(visitor: FlowQueryVisitor<VISIT_RESULT>): VISIT_RESULT {
-        return asSqlQuery().accept(visitor)
+        return asRelationQuery().accept(visitor)
     }
 }

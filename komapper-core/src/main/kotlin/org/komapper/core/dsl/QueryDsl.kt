@@ -17,7 +17,7 @@ import org.komapper.core.dsl.query.EntityUpdateQueryBuilderImpl
 object QueryDsl : Dsl {
 
     fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> from(
-        metamodel: META
+        metamodel: META,
     ): EntitySelectQuery<ENTITY> {
         return EntitySelectQueryImpl(SelectContext(metamodel))
     }

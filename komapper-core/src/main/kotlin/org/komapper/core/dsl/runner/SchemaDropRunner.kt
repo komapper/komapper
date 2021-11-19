@@ -3,11 +3,11 @@ package org.komapper.core.dsl.runner
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.Statement
 import org.komapper.core.dsl.metamodel.EntityMetamodel
-import org.komapper.core.dsl.options.SchemaDropOptions
+import org.komapper.core.dsl.options.SchemaOptions
 
 class SchemaDropRunner(
     private val entityMetamodels: List<EntityMetamodel<*, *, *>> = emptyList(),
-    @Suppress("unused") private val options: SchemaDropOptions = SchemaDropOptions.default
+    @Suppress("unused") private val options: SchemaOptions = SchemaOptions.default
 ) : Runner {
 
     override fun dryRun(config: DatabaseConfig): Statement {

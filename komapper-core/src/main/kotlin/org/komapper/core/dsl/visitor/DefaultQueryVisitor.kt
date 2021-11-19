@@ -6,31 +6,21 @@ import org.komapper.core.dsl.context.EntityDeleteContext
 import org.komapper.core.dsl.context.EntityInsertContext
 import org.komapper.core.dsl.context.EntityUpdateContext
 import org.komapper.core.dsl.context.EntityUpsertContext
+import org.komapper.core.dsl.context.RelationDeleteContext
+import org.komapper.core.dsl.context.RelationInsertContext
+import org.komapper.core.dsl.context.RelationUpdateContext
 import org.komapper.core.dsl.context.SelectContext
-import org.komapper.core.dsl.context.SqlDeleteContext
-import org.komapper.core.dsl.context.SqlInsertContext
-import org.komapper.core.dsl.context.SqlSetOperationContext
-import org.komapper.core.dsl.context.SqlUpdateContext
+import org.komapper.core.dsl.context.SetOperationContext
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
-import org.komapper.core.dsl.options.EntityDeleteBatchOptions
-import org.komapper.core.dsl.options.EntityDeleteOptions
-import org.komapper.core.dsl.options.EntityInsertBatchOptions
-import org.komapper.core.dsl.options.EntityInsertOptions
-import org.komapper.core.dsl.options.EntityUpdateBatchOptions
-import org.komapper.core.dsl.options.EntityUpdateOptions
+import org.komapper.core.dsl.options.DeleteOptions
 import org.komapper.core.dsl.options.InsertOptions
-import org.komapper.core.dsl.options.SchemaCreateOptions
-import org.komapper.core.dsl.options.SchemaDropAllOptions
-import org.komapper.core.dsl.options.SchemaDropOptions
-import org.komapper.core.dsl.options.ScriptExecuteOptions
+import org.komapper.core.dsl.options.SchemaOptions
+import org.komapper.core.dsl.options.ScriptOptions
 import org.komapper.core.dsl.options.SelectOptions
-import org.komapper.core.dsl.options.SqlDeleteOptions
-import org.komapper.core.dsl.options.SqlInsertOptions
-import org.komapper.core.dsl.options.SqlSetOperationOptions
-import org.komapper.core.dsl.options.SqlUpdateOptions
 import org.komapper.core.dsl.options.TemplateExecuteOptions
 import org.komapper.core.dsl.options.TemplateSelectOptions
+import org.komapper.core.dsl.options.UpdateOptions
 import org.komapper.core.dsl.query.Columns
 import org.komapper.core.dsl.query.Query
 import org.komapper.core.dsl.query.Row
@@ -44,16 +34,16 @@ import org.komapper.core.dsl.runner.EntityUpdateSingleRunner
 import org.komapper.core.dsl.runner.EntityUpsertBatchRunner
 import org.komapper.core.dsl.runner.EntityUpsertMultipleRunner
 import org.komapper.core.dsl.runner.EntityUpsertSingleRunner
+import org.komapper.core.dsl.runner.RelationDeleteRunner
+import org.komapper.core.dsl.runner.RelationInsertRunner
+import org.komapper.core.dsl.runner.RelationUpdateRunner
 import org.komapper.core.dsl.runner.Runner
 import org.komapper.core.dsl.runner.SchemaCreateRunner
 import org.komapper.core.dsl.runner.SchemaDropAllRunner
 import org.komapper.core.dsl.runner.SchemaDropRunner
 import org.komapper.core.dsl.runner.ScriptExecuteRunner
 import org.komapper.core.dsl.runner.SelectRunner
-import org.komapper.core.dsl.runner.SqlDeleteRunner
-import org.komapper.core.dsl.runner.SqlInsertRunner
-import org.komapper.core.dsl.runner.SqlSetOperationRunner
-import org.komapper.core.dsl.runner.SqlUpdateRunner
+import org.komapper.core.dsl.runner.SetOperationRunner
 import org.komapper.core.dsl.runner.TemplateExecuteRunner
 import org.komapper.core.dsl.runner.TemplateSelectRunner
 
@@ -105,7 +95,7 @@ internal object DefaultQueryVisitor : QueryVisitor<Runner> {
     override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>
     entityDeleteBatchQuery(
         context: EntityDeleteContext<ENTITY, ID, META>,
-        options: EntityDeleteBatchOptions,
+        options: DeleteOptions,
         entities: List<ENTITY>
     ): Runner {
         return EntityDeleteBatchRunner(context, options, entities)
@@ -114,7 +104,7 @@ internal object DefaultQueryVisitor : QueryVisitor<Runner> {
     override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>
     entityDeleteSingleQuery(
         context: EntityDeleteContext<ENTITY, ID, META>,
-        options: EntityDeleteOptions,
+        options: DeleteOptions,
         entity: ENTITY
     ): Runner {
         return EntityDeleteSingleRunner(context, options, entity)
@@ -122,7 +112,7 @@ internal object DefaultQueryVisitor : QueryVisitor<Runner> {
 
     override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> entityInsertMultipleQuery(
         context: EntityInsertContext<ENTITY, ID, META>,
-        options: EntityInsertOptions,
+        options: InsertOptions,
         entities: List<ENTITY>
     ): Runner {
         return EntityInsertMultipleRunner(context, options, entities)
@@ -130,7 +120,7 @@ internal object DefaultQueryVisitor : QueryVisitor<Runner> {
 
     override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> entityInsertBatchQuery(
         context: EntityInsertContext<ENTITY, ID, META>,
-        options: EntityInsertBatchOptions,
+        options: InsertOptions,
         entities: List<ENTITY>
     ): Runner {
         return EntityInsertBatchRunner(context, options, entities)
@@ -138,7 +128,7 @@ internal object DefaultQueryVisitor : QueryVisitor<Runner> {
 
     override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> entityInsertSingleQuery(
         context: EntityInsertContext<ENTITY, ID, META>,
-        options: EntityInsertOptions,
+        options: InsertOptions,
         entity: ENTITY
     ): Runner {
         return EntityInsertSingleRunner(context, options, entity)
@@ -147,7 +137,7 @@ internal object DefaultQueryVisitor : QueryVisitor<Runner> {
     override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>
     entityUpdateBatchQuery(
         context: EntityUpdateContext<ENTITY, ID, META>,
-        options: EntityUpdateBatchOptions,
+        options: UpdateOptions,
         entities: List<ENTITY>
     ): Runner {
         return EntityUpdateBatchRunner(context, options, entities)
@@ -156,7 +146,7 @@ internal object DefaultQueryVisitor : QueryVisitor<Runner> {
     override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>
     entityUpdateSingleQuery(
         context: EntityUpdateContext<ENTITY, ID, META>,
-        options: EntityUpdateOptions,
+        options: UpdateOptions,
         entity: ENTITY
     ): Runner {
         return EntityUpdateSingleRunner(context, options, entity)
@@ -191,25 +181,25 @@ internal object DefaultQueryVisitor : QueryVisitor<Runner> {
 
     override fun schemaCreateQuery(
         entityMetamodels: List<EntityMetamodel<*, *, *>>,
-        options: SchemaCreateOptions
+        options: SchemaOptions
     ): Runner {
         return SchemaCreateRunner(entityMetamodels, options)
     }
 
     override fun schemaDropQuery(
         entityMetamodels: List<EntityMetamodel<*, *, *>>,
-        options: SchemaDropOptions
+        options: SchemaOptions
     ): Runner {
         return SchemaDropRunner(entityMetamodels, options)
     }
 
-    override fun schemaDropAllQuery(options: SchemaDropAllOptions): Runner {
+    override fun schemaDropAllQuery(options: SchemaOptions): Runner {
         return SchemaDropAllRunner(options)
     }
 
     override fun scriptExecuteQuery(
         sql: String,
-        options: ScriptExecuteOptions
+        options: ScriptOptions
     ): Runner {
         return ScriptExecuteRunner(sql, options)
     }
@@ -223,16 +213,16 @@ internal object DefaultQueryVisitor : QueryVisitor<Runner> {
         return SelectRunner(context, options)
     }
 
-    override fun <T : Any, R> sqlSetOperationQuery(
-        context: SqlSetOperationContext,
-        options: SqlSetOperationOptions,
+    override fun <T : Any, R> setOperationQuery(
+        context: SetOperationContext,
+        options: SelectOptions,
         metamodel: EntityMetamodel<T, *, *>,
         collect: suspend (Flow<T>) -> R
     ): Runner {
-        return SqlSetOperationRunner(context, options)
+        return SetOperationRunner(context, options)
     }
 
-    override fun <A : Any, R> sqlSingleColumnQuery(
+    override fun <A : Any, R> singleColumnSelectQuery(
         context: SelectContext<*, *, *>,
         options: SelectOptions,
         expression: ColumnExpression<A, *>,
@@ -241,16 +231,16 @@ internal object DefaultQueryVisitor : QueryVisitor<Runner> {
         return SelectRunner(context, options)
     }
 
-    override fun <A : Any, R> sqlSingleColumnSetOperationQuery(
-        context: SqlSetOperationContext,
-        options: SqlSetOperationOptions,
+    override fun <A : Any, R> singleColumnSetOperationQuery(
+        context: SetOperationContext,
+        options: SelectOptions,
         expression: ColumnExpression<A, *>,
         collect: suspend (Flow<A?>) -> R
     ): Runner {
-        return SqlSetOperationRunner(context, options)
+        return SetOperationRunner(context, options)
     }
 
-    override fun <A : Any, B : Any, R> sqlPairColumnsQuery(
+    override fun <A : Any, B : Any, R> pairColumnsSelectQuery(
         context: SelectContext<*, *, *>,
         options: SelectOptions,
         expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
@@ -259,16 +249,16 @@ internal object DefaultQueryVisitor : QueryVisitor<Runner> {
         return SelectRunner(context, options)
     }
 
-    override fun <A : Any, B : Any, R> sqlPairColumnsSetOperationQuery(
-        context: SqlSetOperationContext,
-        options: SqlSetOperationOptions,
+    override fun <A : Any, B : Any, R> pairColumnsSetOperationQuery(
+        context: SetOperationContext,
+        options: SelectOptions,
         expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
         collect: suspend (Flow<Pair<A?, B?>>) -> R
     ): Runner {
-        return SqlSetOperationRunner(context, options)
+        return SetOperationRunner(context, options)
     }
 
-    override fun <A : Any, B : Any, C : Any, R> sqlTripleColumnsQuery(
+    override fun <A : Any, B : Any, C : Any, R> tripleColumnsSelectQuery(
         context: SelectContext<*, *, *>,
         options: SelectOptions,
         expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
@@ -277,16 +267,16 @@ internal object DefaultQueryVisitor : QueryVisitor<Runner> {
         return SelectRunner(context, options)
     }
 
-    override fun <A : Any, B : Any, C : Any, R> sqlTripleColumnsSetOperationQuery(
-        context: SqlSetOperationContext,
-        options: SqlSetOperationOptions,
+    override fun <A : Any, B : Any, C : Any, R> tripleColumnsSetOperationQuery(
+        context: SetOperationContext,
+        options: SelectOptions,
         expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
         collect: suspend (Flow<Triple<A?, B?, C?>>) -> R
     ): Runner {
-        return SqlSetOperationRunner(context, options)
+        return SetOperationRunner(context, options)
     }
 
-    override fun <R> sqlMultipleColumnsQuery(
+    override fun <R> multipleColumnsSelectQuery(
         context: SelectContext<*, *, *>,
         options: SelectOptions,
         expressions: List<ColumnExpression<*, *>>,
@@ -295,34 +285,34 @@ internal object DefaultQueryVisitor : QueryVisitor<Runner> {
         return SelectRunner(context, options)
     }
 
-    override fun <R> sqlMultipleColumnsSetOperationQuery(
-        context: SqlSetOperationContext,
-        options: SqlSetOperationOptions,
+    override fun <R> multipleColumnsSetOperationQuery(
+        context: SetOperationContext,
+        options: SelectOptions,
         expressions: List<ColumnExpression<*, *>>,
         collect: suspend (Flow<Columns>) -> R
     ): Runner {
-        return SqlSetOperationRunner(context, options)
+        return SetOperationRunner(context, options)
     }
 
-    override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> sqlDeleteQuery(
-        context: SqlDeleteContext<ENTITY, ID, META>,
-        options: SqlDeleteOptions
+    override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> relationDeleteQuery(
+        context: RelationDeleteContext<ENTITY, ID, META>,
+        options: DeleteOptions
     ): Runner {
-        return SqlDeleteRunner(context, options)
+        return RelationDeleteRunner(context, options)
     }
 
-    override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> sqlInsertQuery(
-        context: SqlInsertContext<ENTITY, ID, META>,
-        options: SqlInsertOptions
+    override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> relationInsertQuery(
+        context: RelationInsertContext<ENTITY, ID, META>,
+        options: InsertOptions
     ): Runner {
-        return SqlInsertRunner(context, options)
+        return RelationInsertRunner(context, options)
     }
 
-    override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> sqlUpdateQuery(
-        context: SqlUpdateContext<ENTITY, ID, META>,
-        options: SqlUpdateOptions
+    override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> relationUpdateQuery(
+        context: RelationUpdateContext<ENTITY, ID, META>,
+        options: UpdateOptions
     ): Runner {
-        return SqlUpdateRunner(context, options)
+        return RelationUpdateRunner(context, options)
     }
 
     override fun templateExecuteQuery(

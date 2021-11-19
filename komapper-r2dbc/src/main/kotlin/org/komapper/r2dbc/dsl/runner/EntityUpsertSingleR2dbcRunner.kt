@@ -17,7 +17,8 @@ internal class EntityUpsertSingleR2dbcRunner<ENTITY : Any, ID, META : EntityMeta
     private val runner: EntityUpsertSingleRunner<ENTITY, ID, META> =
         EntityUpsertSingleRunner(context, options, entity)
 
-    private val support: EntityUpsertR2dbcRunnerSupport<ENTITY, ID, META> = EntityUpsertR2dbcRunnerSupport(context, options)
+    private val support: EntityUpsertR2dbcRunnerSupport<ENTITY, ID, META> =
+        EntityUpsertR2dbcRunnerSupport(context, options)
 
     override suspend fun run(config: R2dbcDatabaseConfig): Int {
         val newEntity = preUpsert(config, entity)

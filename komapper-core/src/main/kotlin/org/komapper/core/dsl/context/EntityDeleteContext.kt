@@ -16,7 +16,7 @@ data class EntityDeleteContext<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, 
         return target.where
     }
 
-    fun asSqlDeleteContext(): SqlDeleteContext<ENTITY, ID, META> {
-        return SqlDeleteContext(target)
+    fun asRelationDeleteContext(): RelationDeleteContext<ENTITY, ID, META> {
+        return RelationDeleteContext(target)
     }
 }

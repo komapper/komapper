@@ -23,8 +23,8 @@ data class EntityInsertContext<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, 
         )
     }
 
-    fun asSqlInsertContext(): SqlInsertContext<ENTITY, ID, META> {
-        return SqlInsertContext(
+    fun asRelationInsertContext(): RelationInsertContext<ENTITY, ID, META> {
+        return RelationInsertContext(
             target = target
         )
     }

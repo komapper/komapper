@@ -5,7 +5,7 @@ import org.komapper.core.Statement
 import org.komapper.core.StatementBuffer
 import org.komapper.core.Value
 import org.komapper.core.dsl.context.SelectContext
-import org.komapper.core.dsl.context.SqlSetOperationContext
+import org.komapper.core.dsl.context.SetOperationContext
 import org.komapper.core.dsl.expression.AggregateFunction
 import org.komapper.core.dsl.expression.AliasExpression
 import org.komapper.core.dsl.expression.ArithmeticExpression
@@ -206,8 +206,8 @@ class BuilderSupport(
                 val builder = SelectStatementBuilder(dialect, context, childAliasManager)
                 builder.build()
             }
-            is SqlSetOperationContext -> {
-                val builder = SqlSetOperationStatementBuilder(dialect, context, aliasManager)
+            is SetOperationContext -> {
+                val builder = SetOperationStatementBuilder(dialect, context, aliasManager)
                 builder.build()
             }
         }

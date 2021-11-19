@@ -28,8 +28,8 @@ interface SelectQuery<ENTITY : Any, QUERY : SelectQuery<ENTITY, QUERY>> :
     fun limit(limit: Int): QUERY
     fun forUpdate(): QUERY
     fun options(configure: (SelectOptions) -> SelectOptions): QUERY
-    fun groupBy(vararg expressions: ColumnExpression<*, *>): SqlSelectQuery<ENTITY>
-    fun having(declaration: HavingDeclaration): SqlSelectQuery<ENTITY>
+    fun groupBy(vararg expressions: ColumnExpression<*, *>): RelationSelectQuery<ENTITY>
+    fun having(declaration: HavingDeclaration): RelationSelectQuery<ENTITY>
     fun <T : Any, S : Any> select(
         expression: ScalarExpression<T, S>
     ): ScalarQuery<T?, T, S>

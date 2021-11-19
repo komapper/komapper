@@ -5,7 +5,7 @@ import org.komapper.core.dsl.context.EntityUpdateContext
 import org.komapper.core.dsl.expression.SetDeclaration
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.metamodel.PropertyMetamodel
-import org.komapper.core.dsl.options.EntityUpdateOptions
+import org.komapper.core.dsl.options.UpdateOptions
 
 @ThreadSafe
 interface EntityUpdateQueryBuilder<ENTITY : Any> {
@@ -14,12 +14,12 @@ interface EntityUpdateQueryBuilder<ENTITY : Any> {
     fun single(entity: ENTITY): EntityUpdateQuery<ENTITY>
     fun batch(entities: List<ENTITY>, batchSize: Int? = null): EntityUpdateQuery<List<ENTITY>>
     fun batch(vararg entities: ENTITY, batchSize: Int? = null): EntityUpdateQuery<List<ENTITY>>
-    fun set(declaration: SetDeclaration<ENTITY>): SqlUpdateQuery<ENTITY>
+    fun set(declaration: SetDeclaration<ENTITY>): RelationUpdateQuery<ENTITY>
 }
 
 internal data class EntityUpdateQueryBuilderImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityUpdateContext<ENTITY, ID, META>,
-    private val options: EntityUpdateOptions = EntityUpdateOptions.default
+    private val options: UpdateOptions = UpdateOptions.default
 ) :
     EntityUpdateQueryBuilder<ENTITY> {
 
@@ -53,19 +53,20 @@ internal data class EntityUpdateQueryBuilderImpl<ENTITY : Any, ID, META : Entity
 
     override fun batch(entities: List<ENTITY>, batchSize: Int?): EntityUpdateQuery<List<ENTITY>> {
         context.target.checkIdValueNotNull(entities)
-        return EntityUpdateBatchQuery(context, options, entities, batchSize)
+        val options = if (batchSize != null) options.copy(batchSize = batchSize) else options
+        return EntityUpdateBatchQuery(context, options, entities)
     }
 
     override fun batch(vararg entities: ENTITY, batchSize: Int?): EntityUpdateQuery<List<ENTITY>> {
-        return batch(entities.toList())
+        return batch(entities.toList(), batchSize)
     }
 
-    override fun set(declaration: SetDeclaration<ENTITY>): SqlUpdateQuery<ENTITY> {
-        return asSqlUpdateQueryBuilder().set(declaration)
+    override fun set(declaration: SetDeclaration<ENTITY>): RelationUpdateQuery<ENTITY> {
+        return asRelationUpdateQueryBuilder().set(declaration)
     }
 
-    private fun asSqlUpdateQueryBuilder(): SqlUpdateQueryBuilder<ENTITY> {
-        val query = SqlUpdateQueryImpl(context.asSqlUpdateContext(), options.asSqlUpdateOptions())
-        return SqlUpdateQueryBuilderImpl(query)
+    private fun asRelationUpdateQueryBuilder(): RelationUpdateQueryBuilder<ENTITY> {
+        val query = RelationUpdateQueryImpl(context.asRelationUpdateContext(), options)
+        return RelationUpdateQueryBuilderImpl(query)
     }
 }

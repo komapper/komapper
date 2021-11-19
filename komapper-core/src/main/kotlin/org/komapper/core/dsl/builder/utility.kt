@@ -1,8 +1,8 @@
 package org.komapper.core.dsl.builder
 
 import org.komapper.core.dsl.context.QueryContext
+import org.komapper.core.dsl.context.RelationUpdateContext
 import org.komapper.core.dsl.context.SelectContext
-import org.komapper.core.dsl.context.SqlUpdateContext
 import org.komapper.core.dsl.element.Join
 import org.komapper.core.dsl.element.Values
 import org.komapper.core.dsl.expression.Criterion
@@ -27,7 +27,7 @@ internal fun SelectContext<*, *, *>.getHavingCriteria(): List<Criterion> {
     return HavingScope().apply { having.forEach { it() } }
 }
 
-internal fun <ENTITY : Any> SqlUpdateContext<ENTITY, *, *>.getAssignments(): List<Pair<PropertyMetamodel<ENTITY, *, *>, Operand>> {
+internal fun <ENTITY : Any> RelationUpdateContext<ENTITY, *, *>.getAssignments(): List<Pair<PropertyMetamodel<ENTITY, *, *>, Operand>> {
     return SetScope<ENTITY>().apply { set.forEach { it() } }
 }
 

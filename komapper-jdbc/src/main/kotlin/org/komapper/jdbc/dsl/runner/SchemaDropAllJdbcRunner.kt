@@ -2,13 +2,13 @@ package org.komapper.jdbc.dsl.runner
 
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.Statement
-import org.komapper.core.dsl.options.SchemaDropAllOptions
+import org.komapper.core.dsl.options.SchemaOptions
 import org.komapper.core.dsl.runner.SchemaDropAllRunner
 import org.komapper.jdbc.JdbcDatabaseConfig
 import org.komapper.jdbc.JdbcExecutor
 
 internal class SchemaDropAllJdbcRunner(
-    private val options: SchemaDropAllOptions
+    private val options: SchemaOptions
 ) : JdbcRunner<Unit> {
 
     private val runner = SchemaDropAllRunner(options)
