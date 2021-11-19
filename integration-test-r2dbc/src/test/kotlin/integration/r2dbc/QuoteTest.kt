@@ -65,7 +65,7 @@ class QuoteTest(val db: R2dbcDatabase) {
     fun alwaysQuote() = inTransaction(db) {
         val m = Meta.order
         db.runQuery { QueryDsl.insert(m).single(Order(1, "value")) }
-        val list = db.runQuery { QueryDsl.from(m) }.toList()
+        val list = db.runQuery { QueryDsl.from(m) }
         assertEquals(1, list.size)
     }
 }

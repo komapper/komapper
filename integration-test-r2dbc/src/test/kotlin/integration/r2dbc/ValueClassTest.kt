@@ -40,7 +40,7 @@ class ValueClassTest(val db: R2dbcDatabase) {
         val a = Meta.vAddress
         val list: List<VAddress> = db.runQuery {
             QueryDsl.from(a).where { a.addressId eq IntId(1) }
-        }.toList()
+        }
         assertNotNull(list)
         assertEquals(1, list.size)
     }
@@ -126,7 +126,7 @@ class ValueClassTest(val db: R2dbcDatabase) {
         val query = QueryDsl.from(a).where { a.addressId eq IntId(15) }
         val address = db.runQuery { query.first() }
         db.runQuery { QueryDsl.delete(a).single(address) }
-        assertEquals(emptyList<VAddress>(), db.runQuery { query }.toList())
+        assertEquals(emptyList<VAddress>(), db.runQuery { query })
     }
 
     @Test
@@ -155,7 +155,7 @@ class ValueClassTest(val db: R2dbcDatabase) {
         val a = Meta.vAddress
         val list: List<VAddress> = db.runQuery {
             QueryDsl.from(a).where { (a.addressId to a.street) inList2 listOf(IntId(1) to Street("STREET 1")) }
-        }.toList()
+        }
         assertEquals(1, list.size)
     }
 
@@ -164,7 +164,7 @@ class ValueClassTest(val db: R2dbcDatabase) {
         val a = Meta.vAddress
         val list = db.runQuery {
             QueryDsl.from(a).where { a.street endsWith "1" }
-        }.toList()
+        }
         assertEquals(2, list.size)
         assertEquals(listOf(1, 11), list.map { it.addressId.value })
     }
@@ -176,7 +176,7 @@ class ValueClassTest(val db: R2dbcDatabase) {
             QueryDsl.from(a)
                 .where { a.addressId between IntId(6)..IntId(10) }
                 .orderBy(a.addressId)
-        }.toList()
+        }
         assertEquals(5, list.size)
         assertEquals((6..10).toList(), list.map { it.addressId.value })
     }
@@ -188,7 +188,7 @@ class ValueClassTest(val db: R2dbcDatabase) {
             QueryDsl.from(a)
                 .where { a.addressId notBetween IntId(6)..IntId(10) }
                 .orderBy(a.addressId)
-        }.toList()
+        }
         assertEquals(10, list.size)
         assertEquals(((1..5) + (11..15)).toList(), list.map { it.addressId.value })
     }
@@ -260,7 +260,7 @@ class ValueClassTest(val db: R2dbcDatabase) {
             QueryDsl.from(a).where { a.addressId inList listOf(IntId(1), IntId(2), IntId(3)) }
                 .orderBy(a.addressId)
                 .select(a.street, caseExpression)
-        }.toList()
+        }
         assertEquals(
             listOf(
                 Street("STREET 1") to Street("STREET 1"),
