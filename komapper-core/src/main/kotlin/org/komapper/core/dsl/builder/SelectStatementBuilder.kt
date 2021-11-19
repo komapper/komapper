@@ -1,24 +1,38 @@
 package org.komapper.core.dsl.builder
 
 import org.komapper.core.Dialect
+import org.komapper.core.Statement
 import org.komapper.core.StatementBuffer
 import org.komapper.core.dsl.context.SelectContext
 import org.komapper.core.dsl.element.JoinKind
+import org.komapper.core.dsl.expression.AggregateFunction
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.expression.Criterion
 import org.komapper.core.dsl.expression.SortItem
 import org.komapper.core.dsl.expression.TableExpression
 
-internal class SelectStatementBuilderSupport(
-    private val dialect: Dialect,
-    private val context: SelectContext<*, *, *, *>,
-    aliasManager: AliasManager = DefaultAliasManager(context),
-    private val buf: StatementBuffer
+class SelectStatementBuilder(
+    val dialect: Dialect,
+    val context: SelectContext<*, *, *>,
+    aliasManager: AliasManager = DefaultAliasManager(context)
 ) {
+    private val buf = StatementBuffer()
     private val support = BuilderSupport(dialect, aliasManager, buf)
     private val orderBySupport = OrderByBuilderSupport(dialect, context.orderBy, aliasManager, buf)
 
-    fun selectClause() {
+    fun build(): Statement {
+        selectClause()
+        fromClause()
+        whereClause()
+        groupByClause()
+        havingClause()
+        orderByClause()
+        offsetLimitClause()
+        forUpdateClause()
+        return buf.toStatement()
+    }
+
+    private fun selectClause() {
         buf.append("select ")
         if (context.distinct) {
             buf.append("distinct ")
@@ -30,7 +44,7 @@ internal class SelectStatementBuilderSupport(
         buf.cutBack(2)
     }
 
-    fun fromClause() {
+    private fun fromClause() {
         buf.append(" from ")
         table(context.target)
         if (context.joins.isNotEmpty()) {
@@ -55,7 +69,7 @@ internal class SelectStatementBuilderSupport(
         }
     }
 
-    fun whereClause() {
+    private fun whereClause() {
         val criteria = context.getWhereCriteria()
         if (criteria.isNotEmpty()) {
             buf.append(" where ")
@@ -67,17 +81,50 @@ internal class SelectStatementBuilderSupport(
         }
     }
 
-    fun orderByClause() {
+    private fun groupByClause() {
+        val groupByItems = context.groupBy.ifEmpty {
+            val expressions = context.projection.expressions()
+            val aggregateFunctions = expressions.filterIsInstance<AggregateFunction<*, *>>()
+            val groupByItems = expressions - aggregateFunctions
+            if (aggregateFunctions.isNotEmpty() && groupByItems.isNotEmpty()) {
+                groupByItems
+            } else {
+                emptyList()
+            }
+        }
+        if (groupByItems.isNotEmpty()) {
+            buf.append(" group by ")
+            for (item in groupByItems) {
+                column(item)
+                buf.append(", ")
+            }
+            buf.cutBack(2)
+        }
+    }
+
+    private fun havingClause() {
+        val criteria = context.getHavingCriteria()
+        if (criteria.isNotEmpty()) {
+            buf.append(" having ")
+            for ((index, criterion) in criteria.withIndex()) {
+                criterion(index, criterion)
+                buf.append(" and ")
+            }
+            buf.cutBack(5)
+        }
+    }
+
+    private fun orderByClause() {
         orderBySupport.orderByClause()
     }
 
-    fun offsetLimitClause() {
+    private fun offsetLimitClause() {
         val builder = dialect.getOffsetLimitStatementBuilder(context.offset, context.limit)
         val statement = builder.build()
         buf.append(statement)
     }
 
-    fun forUpdateClause() {
+    private fun forUpdateClause() {
         if (context.forUpdate.options != null) {
             buf.append(" for update")
         }
@@ -87,11 +134,11 @@ internal class SelectStatementBuilderSupport(
         support.visitTableExpression(expression, TableNameType.NAME_AND_ALIAS)
     }
 
-    fun column(expression: ColumnExpression<*, *>) {
+    private fun column(expression: ColumnExpression<*, *>) {
         support.visitColumnExpression(expression)
     }
 
-    fun criterion(index: Int, c: Criterion) {
+    private fun criterion(index: Int, c: Criterion) {
         support.visitCriterion(index, c)
     }
 }

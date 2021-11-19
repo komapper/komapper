@@ -2,8 +2,8 @@ package org.komapper.core.dsl
 
 import org.komapper.core.dsl.context.EntityDeleteContext
 import org.komapper.core.dsl.context.EntityInsertContext
-import org.komapper.core.dsl.context.EntitySelectContext
 import org.komapper.core.dsl.context.EntityUpdateContext
+import org.komapper.core.dsl.context.SelectContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.query.EntityDeleteQueryBuilder
 import org.komapper.core.dsl.query.EntityDeleteQueryBuilderImpl
@@ -19,7 +19,7 @@ object QueryDsl : Dsl {
     fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> from(
         metamodel: META
     ): EntitySelectQuery<ENTITY> {
-        return EntitySelectQueryImpl(EntitySelectContext(metamodel))
+        return EntitySelectQueryImpl(SelectContext(metamodel))
     }
 
     fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> insert(

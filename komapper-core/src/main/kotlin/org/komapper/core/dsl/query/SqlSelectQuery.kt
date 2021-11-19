@@ -2,7 +2,7 @@ package org.komapper.core.dsl.query
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.toList
-import org.komapper.core.dsl.context.SqlSelectContext
+import org.komapper.core.dsl.context.SelectContext
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.expression.HavingDeclaration
 import org.komapper.core.dsl.expression.OnDeclaration
@@ -18,13 +18,12 @@ import org.komapper.core.dsl.visitor.QueryVisitor
 interface SqlSelectQuery<ENTITY : Any> : SelectQuery<ENTITY, SqlSelectQuery<ENTITY>>
 
 internal data class SqlSelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
-    override val context: SqlSelectContext<ENTITY, ID, META>,
+    override val context: SelectContext<ENTITY, ID, META>,
     private val options: SelectOptions = SelectOptions.default
 ) :
     SqlSelectQuery<ENTITY> {
 
-    private val support: SelectQuerySupport<ENTITY, ID, META, SqlSelectContext<ENTITY, ID, META>> =
-        SelectQuerySupport(context)
+    private val support: SelectQuerySupport<ENTITY, ID, META> = SelectQuerySupport(context)
 
     private val subquerySupport: FlowSubquerySupport<ENTITY> =
         FlowSubquerySupport(context) { SqlSetOperationQueryImpl(it, metamodel = context.target) }
@@ -120,13 +119,13 @@ internal data class SqlSelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<
     }
 
     override fun <T : Any, S : Any> select(expression: ScalarExpression<T, S>): ScalarQuery<T?, T, S> {
-        val newContext = context.setProjection(expression)
+        val newContext = support.setProjection(expression)
         val query = SqlSingleColumnQuery(newContext, options, expression)
         return ScalarQueryImpl(query, expression)
     }
 
     override fun <A : Any> select(expression: ColumnExpression<A, *>): FlowSubquery<A?> {
-        val newContext = context.setProjection(expression)
+        val newContext = support.setProjection(expression)
         return SqlSingleColumnQuery(newContext, options, expression)
     }
 
@@ -134,7 +133,7 @@ internal data class SqlSelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<
         expression1: ColumnExpression<A, *>,
         expression2: ColumnExpression<B, *>
     ): FlowSubquery<Pair<A?, B?>> {
-        val newContext = context.setProjection(expression1, expression2)
+        val newContext = support.setProjection(expression1, expression2)
         return SqlPairColumnsQuery(newContext, options, expression1 to expression2)
     }
 
@@ -143,7 +142,7 @@ internal data class SqlSelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<
         expression2: ColumnExpression<B, *>,
         expression3: ColumnExpression<C, *>
     ): FlowSubquery<Triple<A?, B?, C?>> {
-        val newContext = context.setProjection(expression1, expression2, expression3)
+        val newContext = support.setProjection(expression1, expression2, expression3)
         return SqlTripleColumnsQuery(newContext, options, Triple(expression1, expression2, expression3))
     }
 
@@ -153,7 +152,7 @@ internal data class SqlSelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<
 
     override fun selectColumns(vararg expressions: ColumnExpression<*, *>): FlowSubquery<Columns> {
         val list = expressions.toList()
-        val newContext = context.setProjection(*list.toTypedArray())
+        val newContext = support.setProjection(*list.toTypedArray())
         return SqlMultipleColumnsQuery(newContext, options, list)
     }
 }

@@ -33,7 +33,7 @@ internal class SqlSetOperationFlowBuilder<T>(
 
     private fun checkWhereClauses(subqueryContext: SubqueryContext) {
         when (subqueryContext) {
-            is SelectContext<*, *, *, *> -> {
+            is SelectContext<*, *, *> -> {
                 if (subqueryContext.where.isEmpty()) {
                     error("Empty where clause is not allowed.")
                 }

@@ -1,7 +1,7 @@
 package org.komapper.core.dsl.builder
 
 import org.komapper.core.dsl.context.QueryContext
-import org.komapper.core.dsl.context.SqlSelectContext
+import org.komapper.core.dsl.context.SelectContext
 import org.komapper.core.dsl.context.SqlUpdateContext
 import org.komapper.core.dsl.element.Join
 import org.komapper.core.dsl.element.Values
@@ -23,7 +23,7 @@ internal fun Join<*, *, *>.getOnCriteria(): List<Criterion> {
     return OnScope().apply { on() }
 }
 
-internal fun SqlSelectContext<*, *, *>.getHavingCriteria(): List<Criterion> {
+internal fun SelectContext<*, *, *>.getHavingCriteria(): List<Criterion> {
     return HavingScope().apply { having.forEach { it() } }
 }
 

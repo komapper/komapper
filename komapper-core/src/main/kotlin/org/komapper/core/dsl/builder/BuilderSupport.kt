@@ -4,8 +4,7 @@ import org.komapper.core.Dialect
 import org.komapper.core.Statement
 import org.komapper.core.StatementBuffer
 import org.komapper.core.Value
-import org.komapper.core.dsl.context.EntitySelectContext
-import org.komapper.core.dsl.context.SqlSelectContext
+import org.komapper.core.dsl.context.SelectContext
 import org.komapper.core.dsl.context.SqlSetOperationContext
 import org.komapper.core.dsl.expression.AggregateFunction
 import org.komapper.core.dsl.expression.AliasExpression
@@ -202,14 +201,9 @@ class BuilderSupport(
 
     fun buildSubqueryStatement(expression: SubqueryExpression<*>): Statement {
         return when (val context = expression.context) {
-            is EntitySelectContext<*, *, *> -> {
+            is SelectContext<*, *, *> -> {
                 val childAliasManager = DefaultAliasManager(context, aliasManager)
-                val builder = EntitySelectStatementBuilder(dialect, context, childAliasManager)
-                builder.build()
-            }
-            is SqlSelectContext<*, *, *> -> {
-                val childAliasManager = DefaultAliasManager(context, aliasManager)
-                val builder = SqlSelectStatementBuilder(dialect, context, childAliasManager)
+                val builder = SelectStatementBuilder(dialect, context, childAliasManager)
                 builder.build()
             }
             is SqlSetOperationContext -> {

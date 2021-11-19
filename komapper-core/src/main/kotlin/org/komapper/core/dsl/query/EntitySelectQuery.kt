@@ -2,7 +2,7 @@ package org.komapper.core.dsl.query
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.toList
-import org.komapper.core.dsl.context.EntitySelectContext
+import org.komapper.core.dsl.context.SelectContext
 import org.komapper.core.dsl.context.SqlSetOperationContext
 import org.komapper.core.dsl.context.SqlSetOperationKind
 import org.komapper.core.dsl.expression.ColumnExpression
@@ -23,13 +23,12 @@ interface EntitySelectQuery<ENTITY : Any> : SelectQuery<ENTITY, EntitySelectQuer
 }
 
 internal data class EntitySelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
-    override val context: EntitySelectContext<ENTITY, ID, META>,
+    override val context: SelectContext<ENTITY, ID, META>,
     private val options: SelectOptions = SelectOptions.default
 ) :
     EntitySelectQuery<ENTITY> {
 
-    private val support: SelectQuerySupport<ENTITY, ID, META, EntitySelectContext<ENTITY, ID, META>> =
-        SelectQuerySupport(context)
+    private val support: SelectQuerySupport<ENTITY, ID, META> = SelectQuerySupport(context)
 
     override fun distinct(): EntitySelectQuery<ENTITY> {
         val newContext = context.copy(distinct = true)
@@ -160,7 +159,7 @@ internal data class EntitySelectQueryImpl<ENTITY : Any, ID, META : EntityMetamod
     }
 
     private fun asSqlQuery(): SqlSelectQuery<ENTITY> {
-        return SqlSelectQueryImpl(context.asSqlSelectContext(), options)
+        return SqlSelectQueryImpl(context, options)
     }
 
     override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {

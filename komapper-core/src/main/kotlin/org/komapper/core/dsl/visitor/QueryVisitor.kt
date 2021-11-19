@@ -4,12 +4,11 @@ import kotlinx.coroutines.flow.Flow
 import org.komapper.core.ThreadSafe
 import org.komapper.core.dsl.context.EntityDeleteContext
 import org.komapper.core.dsl.context.EntityInsertContext
-import org.komapper.core.dsl.context.EntitySelectContext
 import org.komapper.core.dsl.context.EntityUpdateContext
 import org.komapper.core.dsl.context.EntityUpsertContext
+import org.komapper.core.dsl.context.SelectContext
 import org.komapper.core.dsl.context.SqlDeleteContext
 import org.komapper.core.dsl.context.SqlInsertContext
-import org.komapper.core.dsl.context.SqlSelectContext
 import org.komapper.core.dsl.context.SqlSetOperationContext
 import org.komapper.core.dsl.context.SqlUpdateContext
 import org.komapper.core.dsl.expression.ColumnExpression
@@ -50,13 +49,13 @@ interface QueryVisitor<VISIT_RESULT> {
     fun <T, S> flatZipQuery(query: Query<T>, transform: (T) -> Query<S>): VISIT_RESULT
 
     fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> entityContextQuery(
-        context: EntitySelectContext<ENTITY, ID, META>,
+        context: SelectContext<ENTITY, ID, META>,
         options: SelectOptions
     ): VISIT_RESULT
 
     fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>, R>
     entitySelectQuery(
-        context: EntitySelectContext<ENTITY, ID, META>,
+        context: SelectContext<ENTITY, ID, META>,
         options: SelectOptions,
         collect: suspend (Flow<ENTITY>) -> R
     ): VISIT_RESULT
@@ -150,7 +149,7 @@ interface QueryVisitor<VISIT_RESULT> {
 
     fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>, R>
     sqlSelectQuery(
-        context: SqlSelectContext<ENTITY, ID, META>,
+        context: SelectContext<ENTITY, ID, META>,
         options: SelectOptions,
         collect: suspend (Flow<ENTITY>) -> R
     ): VISIT_RESULT
@@ -165,7 +164,7 @@ interface QueryVisitor<VISIT_RESULT> {
 
     fun <A : Any, R>
     sqlSingleColumnQuery(
-        context: SqlSelectContext<*, *, *>,
+        context: SelectContext<*, *, *>,
         options: SelectOptions,
         expression: ColumnExpression<A, *>,
         collect: suspend (Flow<A?>) -> R
@@ -181,7 +180,7 @@ interface QueryVisitor<VISIT_RESULT> {
 
     fun <A : Any, B : Any, R>
     sqlPairColumnsQuery(
-        context: SqlSelectContext<*, *, *>,
+        context: SelectContext<*, *, *>,
         options: SelectOptions,
         expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
         collect: suspend (Flow<Pair<A?, B?>>) -> R
@@ -197,7 +196,7 @@ interface QueryVisitor<VISIT_RESULT> {
 
     fun <A : Any, B : Any, C : Any, R>
     sqlTripleColumnsQuery(
-        context: SqlSelectContext<*, *, *>,
+        context: SelectContext<*, *, *>,
         options: SelectOptions,
         expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
         collect: suspend (Flow<Triple<A?, B?, C?>>) -> R
@@ -212,7 +211,7 @@ interface QueryVisitor<VISIT_RESULT> {
     ): VISIT_RESULT
 
     fun <R> sqlMultipleColumnsQuery(
-        context: SqlSelectContext<*, *, *>,
+        context: SelectContext<*, *, *>,
         options: SelectOptions,
         expressions: List<ColumnExpression<*, *>>,
         collect: suspend (Flow<Columns>) -> R

@@ -1,7 +1,7 @@
 package org.komapper.core.dsl.visitor
 
 import org.komapper.core.ThreadSafe
-import org.komapper.core.dsl.context.SqlSelectContext
+import org.komapper.core.dsl.context.SelectContext
 import org.komapper.core.dsl.context.SqlSetOperationContext
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
@@ -14,7 +14,7 @@ import org.komapper.core.dsl.query.Row
 interface FlowQueryVisitor<VISIT_RESULT> {
 
     fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> sqlSelectQuery(
-        context: SqlSelectContext<ENTITY, ID, META>,
+        context: SelectContext<ENTITY, ID, META>,
         options: SelectOptions
     ): VISIT_RESULT
 
@@ -25,7 +25,7 @@ interface FlowQueryVisitor<VISIT_RESULT> {
     ): VISIT_RESULT
 
     fun <A : Any> sqlSingleColumnQuery(
-        context: SqlSelectContext<*, *, *>,
+        context: SelectContext<*, *, *>,
         options: SelectOptions,
         expression: ColumnExpression<A, *>,
     ): VISIT_RESULT
@@ -37,7 +37,7 @@ interface FlowQueryVisitor<VISIT_RESULT> {
     ): VISIT_RESULT
 
     fun <A : Any, B : Any> sqlPairColumnsQuery(
-        context: SqlSelectContext<*, *, *>,
+        context: SelectContext<*, *, *>,
         options: SelectOptions,
         expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
     ): VISIT_RESULT
@@ -50,7 +50,7 @@ interface FlowQueryVisitor<VISIT_RESULT> {
 
     fun <A : Any, B : Any, C : Any>
     sqlTripleColumnsQuery(
-        context: SqlSelectContext<*, *, *>,
+        context: SelectContext<*, *, *>,
         options: SelectOptions,
         expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
     ): VISIT_RESULT
@@ -62,7 +62,7 @@ interface FlowQueryVisitor<VISIT_RESULT> {
     ): VISIT_RESULT
 
     fun sqlMultipleColumnsQuery(
-        context: SqlSelectContext<*, *, *>,
+        context: SelectContext<*, *, *>,
         options: SelectOptions,
         expressions: List<ColumnExpression<*, *>>
     ): VISIT_RESULT

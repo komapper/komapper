@@ -3,12 +3,11 @@ package org.komapper.jdbc.dsl.visitor
 import kotlinx.coroutines.flow.Flow
 import org.komapper.core.dsl.context.EntityDeleteContext
 import org.komapper.core.dsl.context.EntityInsertContext
-import org.komapper.core.dsl.context.EntitySelectContext
 import org.komapper.core.dsl.context.EntityUpdateContext
 import org.komapper.core.dsl.context.EntityUpsertContext
+import org.komapper.core.dsl.context.SelectContext
 import org.komapper.core.dsl.context.SqlDeleteContext
 import org.komapper.core.dsl.context.SqlInsertContext
-import org.komapper.core.dsl.context.SqlSelectContext
 import org.komapper.core.dsl.context.SqlSetOperationContext
 import org.komapper.core.dsl.context.SqlUpdateContext
 import org.komapper.core.dsl.expression.ColumnExpression
@@ -41,7 +40,6 @@ import org.komapper.jdbc.dsl.runner.EntityDeleteSingleJdbcRunner
 import org.komapper.jdbc.dsl.runner.EntityInsertBatchJdbcRunner
 import org.komapper.jdbc.dsl.runner.EntityInsertMultipleJdbcRunner
 import org.komapper.jdbc.dsl.runner.EntityInsertSingleJdbcRunner
-import org.komapper.jdbc.dsl.runner.EntitySelectJdbcRunner
 import org.komapper.jdbc.dsl.runner.EntityUpdateBatchJdbcRunner
 import org.komapper.jdbc.dsl.runner.EntityUpdateSingleJdbcRunner
 import org.komapper.jdbc.dsl.runner.EntityUpsertBatchJdbcRunner
@@ -53,9 +51,9 @@ import org.komapper.jdbc.dsl.runner.SchemaCreateJdbcRunner
 import org.komapper.jdbc.dsl.runner.SchemaDropAllJdbcRunner
 import org.komapper.jdbc.dsl.runner.SchemaDropJdbcRunner
 import org.komapper.jdbc.dsl.runner.ScriptExecuteJdbcRunner
+import org.komapper.jdbc.dsl.runner.SelectJdbcRunner
 import org.komapper.jdbc.dsl.runner.SqlDeleteJdbcRunner
 import org.komapper.jdbc.dsl.runner.SqlInsertJdbcRunner
-import org.komapper.jdbc.dsl.runner.SqlSelectJdbcRunner
 import org.komapper.jdbc.dsl.runner.SqlSetOperationJdbcRunner
 import org.komapper.jdbc.dsl.runner.SqlUpdateJdbcRunner
 import org.komapper.jdbc.dsl.runner.TemplateExecuteJdbcRunner
@@ -101,7 +99,7 @@ internal object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
 
     override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>
     entityContextQuery(
-        context: EntitySelectContext<ENTITY, ID, META>,
+        context: SelectContext<ENTITY, ID, META>,
         options: SelectOptions
     ): JdbcRunner<*> {
         return EntityContextJdbcRunner(context, options)
@@ -109,12 +107,12 @@ internal object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
 
     override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>, R>
     entitySelectQuery(
-        context: EntitySelectContext<ENTITY, ID, META>,
+        context: SelectContext<ENTITY, ID, META>,
         options: SelectOptions,
         collect: suspend (Flow<ENTITY>) -> R
     ): JdbcRunner<R> {
         val transformer = JdbcResultSetTransformers.singleEntity(context.target)
-        return EntitySelectJdbcRunner(context, options, transformer, collect)
+        return SelectJdbcRunner(context, options, transformer, collect)
     }
 
     override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>
@@ -231,12 +229,12 @@ internal object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
 
     override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>, R>
     sqlSelectQuery(
-        context: SqlSelectContext<ENTITY, ID, META>,
+        context: SelectContext<ENTITY, ID, META>,
         options: SelectOptions,
         collect: suspend (Flow<ENTITY>) -> R
     ): JdbcRunner<R> {
         val transform = JdbcResultSetTransformers.singleEntity(context.target)
-        return SqlSelectJdbcRunner(context, options, transform, collect)
+        return SelectJdbcRunner(context, options, transform, collect)
     }
 
     override fun <T : Any, R> sqlSetOperationQuery(
@@ -250,13 +248,13 @@ internal object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
     }
 
     override fun <A : Any, R> sqlSingleColumnQuery(
-        context: SqlSelectContext<*, *, *>,
+        context: SelectContext<*, *, *>,
         options: SelectOptions,
         expression: ColumnExpression<A, *>,
         collect: suspend (Flow<A?>) -> R
     ): JdbcRunner<R> {
         val transform = JdbcResultSetTransformers.singleColumn(expression)
-        return SqlSelectJdbcRunner(context, options, transform, collect)
+        return SelectJdbcRunner(context, options, transform, collect)
     }
 
     override fun <A : Any, R> sqlSingleColumnSetOperationQuery(
@@ -270,13 +268,13 @@ internal object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
     }
 
     override fun <A : Any, B : Any, R> sqlPairColumnsQuery(
-        context: SqlSelectContext<*, *, *>,
+        context: SelectContext<*, *, *>,
         options: SelectOptions,
         expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
         collect: suspend (Flow<Pair<A?, B?>>) -> R
     ): JdbcRunner<R> {
         val transform = JdbcResultSetTransformers.pairColumns(expressions)
-        return SqlSelectJdbcRunner(context, options, transform, collect)
+        return SelectJdbcRunner(context, options, transform, collect)
     }
 
     override fun <A : Any, B : Any, R> sqlPairColumnsSetOperationQuery(
@@ -290,13 +288,13 @@ internal object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
     }
 
     override fun <A : Any, B : Any, C : Any, R> sqlTripleColumnsQuery(
-        context: SqlSelectContext<*, *, *>,
+        context: SelectContext<*, *, *>,
         options: SelectOptions,
         expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
         collect: suspend (Flow<Triple<A?, B?, C?>>) -> R
     ): JdbcRunner<R> {
         val transform = JdbcResultSetTransformers.tripleColumns(expressions)
-        return SqlSelectJdbcRunner(context, options, transform, collect)
+        return SelectJdbcRunner(context, options, transform, collect)
     }
 
     override fun <A : Any, B : Any, C : Any, R> sqlTripleColumnsSetOperationQuery(
@@ -310,13 +308,13 @@ internal object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
     }
 
     override fun <R> sqlMultipleColumnsQuery(
-        context: SqlSelectContext<*, *, *>,
+        context: SelectContext<*, *, *>,
         options: SelectOptions,
         expressions: List<ColumnExpression<*, *>>,
         collect: suspend (Flow<Columns>) -> R
     ): JdbcRunner<R> {
         val transform = JdbcResultSetTransformers.multipleColumns(expressions)
-        return SqlSelectJdbcRunner(context, options, transform, collect)
+        return SelectJdbcRunner(context, options, transform, collect)
     }
 
     override fun <R> sqlMultipleColumnsSetOperationQuery(
