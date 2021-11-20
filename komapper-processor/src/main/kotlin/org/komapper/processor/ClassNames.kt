@@ -18,4 +18,5 @@ internal object ClassNames {
     const val EntityDescriptor = "__EntityDescriptor"
     const val MetamodelDeclaration = "org.komapper.core.dsl.metamodel.MetamodelDeclaration"
     const val Meta = "org.komapper.core.dsl.Meta"
+    const val KomapperStub = "KomapperStub"
 }

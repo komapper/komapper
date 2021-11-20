@@ -32,6 +32,25 @@ data class AddressDef(
     @KomapperUpdatedAt val updatedAt: Nothing,
 )
 
+data class Employee(
+    val id: Int = 0,
+    val name: String,
+    val version: Int = 0,
+    val createdAt: LocalDateTime = LocalDateTime.MIN,
+    val updatedAt: LocalDateTime = LocalDateTime.MIN,
+)
+
+annotation class KomapperStub
+
+@KomapperEntityDef(Employee::class)
+@KomapperStub
+data class EmployeeDef(
+    @KomapperId @KomapperAutoIncrement val id: Nothing,
+    @KomapperVersion val version: Nothing,
+    @KomapperCreatedAt val createdAt: Nothing,
+    @KomapperUpdatedAt val updatedAt: Nothing,
+)
+
 fun main() {
     // create a Database instance
     val db = JdbcDatabase.create("jdbc:h2:mem:example;DB_CLOSE_DELAY=-1")

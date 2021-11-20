@@ -28,6 +28,8 @@ internal class EntityMetamodelStubGenerator(
     ).joinToString(", ")
 
     override fun run() {
+        w.println("@file:Suppress(\"ClassName\", \"PrivatePropertyName\", \"UNUSED_PARAMETER\", \"unused\", \"RemoveRedundantQualifierName\", \"MemberVisibilityCanBePrivate\", \"RedundantNullableReturnType\")")
+
         if (packageName.isNotEmpty()) {
             w.println("package $packageName")
             w.println()
