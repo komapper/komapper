@@ -14,7 +14,7 @@ interface EntityMetamodel<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, M
     fun createdAtProperty(): PropertyMetamodel<ENTITY, *, *>?
     fun updatedAtProperty(): PropertyMetamodel<ENTITY, *, *>?
     fun properties(): List<PropertyMetamodel<ENTITY, *, *>>
-    fun getId(e: ENTITY): ID
+    fun id(e: ENTITY): ID
     fun toId(generatedKey: Long): ID?
     fun preInsert(e: ENTITY, c: Clock): ENTITY
     fun preUpdate(e: ENTITY, c: Clock): ENTITY
@@ -46,7 +46,7 @@ abstract class EntityMetamodelStub<ENTITY : Any, META : EntityMetamodelStub<ENTI
     override fun updatedAtProperty(): PropertyMetamodel<ENTITY, *, *>? = fail()
     override fun properties(): List<PropertyMetamodel<ENTITY, *, *>> = fail()
     override fun newEntity(m: Map<PropertyMetamodel<*, *, *>, Any?>): ENTITY = fail()
-    override fun getId(e: ENTITY): Any = fail()
+    override fun id(e: ENTITY): Any = fail()
     override fun toId(generatedKey: Long): Any = fail()
     override fun preInsert(e: ENTITY, c: Clock): ENTITY = fail()
     override fun preUpdate(e: ENTITY, c: Clock): ENTITY = fail()
