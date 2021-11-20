@@ -7,7 +7,7 @@ import org.komapper.core.dsl.options.TemplateSelectOptions
 interface TemplateSelectQueryBuilder {
     fun bind(data: Any): TemplateSelectQueryBuilder
     fun options(configure: (TemplateSelectOptions) -> TemplateSelectOptions): TemplateSelectQueryBuilder
-    fun <T> select(provide: (Row) -> T): TemplateSelectQuery<T>
+    fun <T> select(transform: (Row) -> T): TemplateSelectQuery<T>
 }
 
 internal data class TemplateSelectQueryBuilderImpl(
@@ -24,7 +24,7 @@ internal data class TemplateSelectQueryBuilderImpl(
         return copy(data = data)
     }
 
-    override fun <T> select(provide: (Row) -> T): TemplateSelectQuery<T> {
-        return TemplateSelectQueryImpl(sql, data, provide, options)
+    override fun <T> select(transform: (Row) -> T): TemplateSelectQuery<T> {
+        return TemplateSelectQueryImpl(sql, data, transform, options)
     }
 }

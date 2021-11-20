@@ -17,7 +17,8 @@ internal class EntityUpsertSingleJdbcRunner<ENTITY : Any, ID, META : EntityMetam
     private val runner: EntityUpsertSingleRunner<ENTITY, ID, META> =
         EntityUpsertSingleRunner(context, options, entity)
 
-    private val support: EntityUpsertJdbcRunnerSupport<ENTITY, ID, META> = EntityUpsertJdbcRunnerSupport(context, options)
+    private val support: EntityUpsertJdbcRunnerSupport<ENTITY, ID, META> =
+        EntityUpsertJdbcRunnerSupport(context, options)
 
     override fun run(config: JdbcDatabaseConfig): Int {
         val newEntity = preUpsert(config, entity)

@@ -6,7 +6,7 @@ import integration.employee
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
-import org.komapper.core.dsl.declaration.WhereDeclaration
+import org.komapper.core.dsl.expression.WhereDeclaration
 import org.komapper.core.dsl.operator.desc
 import org.komapper.core.dsl.operator.plus
 import org.komapper.core.dsl.query.andThen

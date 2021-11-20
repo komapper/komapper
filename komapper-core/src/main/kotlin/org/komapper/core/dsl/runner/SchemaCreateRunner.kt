@@ -3,11 +3,11 @@ package org.komapper.core.dsl.runner
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.Statement
 import org.komapper.core.dsl.metamodel.EntityMetamodel
-import org.komapper.core.dsl.options.SchemaCreateOptions
+import org.komapper.core.dsl.options.SchemaOptions
 
 class SchemaCreateRunner(
     private val entityMetamodels: List<EntityMetamodel<*, *, *>>,
-    @Suppress("unused") private val options: SchemaCreateOptions
+    @Suppress("unused") private val options: SchemaOptions
 ) : Runner {
 
     override fun dryRun(config: DatabaseConfig): Statement {

@@ -17,7 +17,8 @@ internal class EntityUpsertMultipleR2dbcRunner<ENTITY : Any, ID, META : EntityMe
     private val runner: EntityUpsertMultipleRunner<ENTITY, ID, META> =
         EntityUpsertMultipleRunner(context, options, entities)
 
-    private val support: EntityUpsertR2dbcRunnerSupport<ENTITY, ID, META> = EntityUpsertR2dbcRunnerSupport(context, options)
+    private val support: EntityUpsertR2dbcRunnerSupport<ENTITY, ID, META> =
+        EntityUpsertR2dbcRunnerSupport(context, options)
 
     override suspend fun run(config: R2dbcDatabaseConfig): Int {
         if (entities.isEmpty()) return 0

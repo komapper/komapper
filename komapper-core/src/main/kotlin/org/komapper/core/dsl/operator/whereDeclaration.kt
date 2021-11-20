@@ -1,6 +1,6 @@
 package org.komapper.core.dsl.operator
 
-import org.komapper.core.dsl.declaration.WhereDeclaration
+import org.komapper.core.dsl.expression.WhereDeclaration
 
 infix operator fun WhereDeclaration.plus(other: WhereDeclaration): WhereDeclaration {
     return {

@@ -4,11 +4,11 @@ import org.komapper.core.DatabaseConfig
 import org.komapper.core.Statement
 import org.komapper.core.dsl.context.EntityInsertContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
-import org.komapper.core.dsl.options.EntityInsertBatchOptions
+import org.komapper.core.dsl.options.InsertOptions
 
 class EntityInsertBatchRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
     context: EntityInsertContext<ENTITY, ID, META>,
-    options: EntityInsertBatchOptions,
+    options: InsertOptions,
     private val entities: List<ENTITY>
 ) : Runner {
 

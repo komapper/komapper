@@ -15,4 +15,11 @@ sealed class Projection {
             is Metamodels -> this.metamodels.flatMap { it.properties() }
         }
     }
+
+    fun metamodels(): List<EntityMetamodel<*, *, *>> {
+        return when (this) {
+            is Expressions -> emptyList()
+            is Metamodels -> this.metamodels
+        }
+    }
 }

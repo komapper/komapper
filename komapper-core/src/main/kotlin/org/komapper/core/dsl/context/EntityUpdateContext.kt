@@ -1,6 +1,6 @@
 package org.komapper.core.dsl.context
 
-import org.komapper.core.dsl.declaration.WhereDeclaration
+import org.komapper.core.dsl.expression.WhereDeclaration
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.metamodel.PropertyMetamodel
 import org.komapper.core.dsl.metamodel.where
@@ -32,7 +32,7 @@ data class EntityUpdateContext<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, 
         return properties.filter { it != createdAtProperty } - idProperties + versionProperties
     }
 
-    fun asSqlUpdateContext(): SqlUpdateContext<ENTITY, ID, META> {
-        return SqlUpdateContext(target)
+    fun asRelationUpdateContext(): RelationUpdateContext<ENTITY, ID, META> {
+        return RelationUpdateContext(target)
     }
 }

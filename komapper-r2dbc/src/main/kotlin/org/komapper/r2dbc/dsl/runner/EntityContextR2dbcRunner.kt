@@ -4,21 +4,21 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.toList
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.Statement
-import org.komapper.core.dsl.context.EntitySelectContext
+import org.komapper.core.dsl.context.SelectContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
-import org.komapper.core.dsl.options.EntitySelectOptions
+import org.komapper.core.dsl.options.SelectOptions
 import org.komapper.core.dsl.query.EntityContext
 import org.komapper.core.dsl.runner.EntityContextFactory
-import org.komapper.core.dsl.runner.EntitySelectRunner
+import org.komapper.core.dsl.runner.SelectRunner
 import org.komapper.r2dbc.R2dbcDatabaseConfig
 import org.komapper.r2dbc.R2dbcExecutor
 
 internal class EntityContextR2dbcRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
-    private val context: EntitySelectContext<ENTITY, ID, META>,
-    private val options: EntitySelectOptions,
+    private val context: SelectContext<ENTITY, ID, META>,
+    private val options: SelectOptions,
 ) : R2dbcRunner<EntityContext<ENTITY>> {
 
-    private val runner: EntitySelectRunner = EntitySelectRunner(context, options)
+    private val runner: SelectRunner = SelectRunner(context, options)
     private val factory: EntityContextFactory<ENTITY, ID, META> = EntityContextFactory(context)
 
     override suspend fun run(config: R2dbcDatabaseConfig): EntityContext<ENTITY> {
@@ -30,7 +30,7 @@ internal class EntityContextR2dbcRunner<ENTITY : Any, ID, META : EntityMetamodel
         val rows: Flow<Map<EntityMetamodel<*, *, *>, Any>> = executor.executeQuery(statement) { dialect, r2dbcRow ->
             val row = mutableMapOf<EntityMetamodel<*, *, *>, Any>()
             val mapper = R2dbcEntityMapper(dialect, r2dbcRow)
-            for (metamodel in context.projection.metamodels) {
+            for (metamodel in context.projection.metamodels()) {
                 val entity = mapper.execute(metamodel) ?: continue
                 row[metamodel] = entity
             }

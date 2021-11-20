@@ -1,6 +1,6 @@
 package org.komapper.core.dsl.operator
 
-import org.komapper.core.dsl.declaration.WhenDeclaration
+import org.komapper.core.dsl.expression.WhenDeclaration
 
 infix operator fun WhenDeclaration.plus(other: WhenDeclaration): WhenDeclaration {
     return {

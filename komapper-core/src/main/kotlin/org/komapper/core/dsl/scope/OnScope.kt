@@ -1,8 +1,8 @@
 package org.komapper.core.dsl.scope
 
 import org.komapper.core.Scope
-import org.komapper.core.dsl.declaration.OnDeclaration
 import org.komapper.core.dsl.expression.Criterion
+import org.komapper.core.dsl.expression.OnDeclaration
 
 @Scope
 class OnScope(

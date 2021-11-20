@@ -1,6 +1,6 @@
 package org.komapper.core.dsl.runner
 
-import org.komapper.core.dsl.context.EntitySelectContext
+import org.komapper.core.dsl.context.SelectContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.query.EntityContext
 import org.komapper.core.dsl.query.OneToMany
@@ -10,7 +10,7 @@ import java.util.concurrent.ConcurrentMap
 import kotlin.reflect.cast
 
 internal class EntityContextImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
-    private val context: EntitySelectContext<ENTITY, ID, META>,
+    private val context: SelectContext<ENTITY, ID, META>,
     private val pool: Map<EntityKey, Any>,
     private val rows: List<Map<EntityMetamodel<*, *, *>, Any>>,
 ) : EntityContext<ENTITY> {
@@ -29,7 +29,7 @@ internal class EntityContextImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY
     }
 
     override fun contains(pair: Pair<EntityMetamodel<*, *, *>, EntityMetamodel<*, *, *>>): Boolean {
-        val metamodels = context.projection.metamodels
+        val metamodels = context.projection.metamodels()
         return pair.first in metamodels && pair.second in metamodels
     }
 

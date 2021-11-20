@@ -3,35 +3,23 @@ package org.komapper.jdbc.dsl.visitor
 import kotlinx.coroutines.flow.Flow
 import org.komapper.core.dsl.context.EntityDeleteContext
 import org.komapper.core.dsl.context.EntityInsertContext
-import org.komapper.core.dsl.context.EntitySelectContext
 import org.komapper.core.dsl.context.EntityUpdateContext
 import org.komapper.core.dsl.context.EntityUpsertContext
-import org.komapper.core.dsl.context.SqlDeleteContext
-import org.komapper.core.dsl.context.SqlInsertContext
-import org.komapper.core.dsl.context.SqlSelectContext
-import org.komapper.core.dsl.context.SqlSetOperationContext
-import org.komapper.core.dsl.context.SqlUpdateContext
+import org.komapper.core.dsl.context.RelationDeleteContext
+import org.komapper.core.dsl.context.RelationInsertContext
+import org.komapper.core.dsl.context.RelationUpdateContext
+import org.komapper.core.dsl.context.SelectContext
+import org.komapper.core.dsl.context.SetOperationContext
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
-import org.komapper.core.dsl.options.EntityDeleteBatchOptions
-import org.komapper.core.dsl.options.EntityDeleteOptions
-import org.komapper.core.dsl.options.EntityInsertBatchOptions
-import org.komapper.core.dsl.options.EntityInsertOptions
-import org.komapper.core.dsl.options.EntitySelectOptions
-import org.komapper.core.dsl.options.EntityUpdateBatchOptions
-import org.komapper.core.dsl.options.EntityUpdateOptions
+import org.komapper.core.dsl.options.DeleteOptions
 import org.komapper.core.dsl.options.InsertOptions
-import org.komapper.core.dsl.options.SchemaCreateOptions
-import org.komapper.core.dsl.options.SchemaDropAllOptions
-import org.komapper.core.dsl.options.SchemaDropOptions
-import org.komapper.core.dsl.options.ScriptExecuteOptions
-import org.komapper.core.dsl.options.SqlDeleteOptions
-import org.komapper.core.dsl.options.SqlInsertOptions
-import org.komapper.core.dsl.options.SqlSelectOptions
-import org.komapper.core.dsl.options.SqlSetOperationOptions
-import org.komapper.core.dsl.options.SqlUpdateOptions
+import org.komapper.core.dsl.options.SchemaOptions
+import org.komapper.core.dsl.options.ScriptOptions
+import org.komapper.core.dsl.options.SelectOptions
 import org.komapper.core.dsl.options.TemplateExecuteOptions
 import org.komapper.core.dsl.options.TemplateSelectOptions
+import org.komapper.core.dsl.options.UpdateOptions
 import org.komapper.core.dsl.query.Columns
 import org.komapper.core.dsl.query.Query
 import org.komapper.core.dsl.query.Row
@@ -42,7 +30,6 @@ import org.komapper.jdbc.dsl.runner.EntityDeleteSingleJdbcRunner
 import org.komapper.jdbc.dsl.runner.EntityInsertBatchJdbcRunner
 import org.komapper.jdbc.dsl.runner.EntityInsertMultipleJdbcRunner
 import org.komapper.jdbc.dsl.runner.EntityInsertSingleJdbcRunner
-import org.komapper.jdbc.dsl.runner.EntitySelectJdbcRunner
 import org.komapper.jdbc.dsl.runner.EntityUpdateBatchJdbcRunner
 import org.komapper.jdbc.dsl.runner.EntityUpdateSingleJdbcRunner
 import org.komapper.jdbc.dsl.runner.EntityUpsertBatchJdbcRunner
@@ -50,15 +37,15 @@ import org.komapper.jdbc.dsl.runner.EntityUpsertMultipleJdbcRunner
 import org.komapper.jdbc.dsl.runner.EntityUpsertSingleJdbcRunner
 import org.komapper.jdbc.dsl.runner.JdbcResultSetTransformers
 import org.komapper.jdbc.dsl.runner.JdbcRunner
+import org.komapper.jdbc.dsl.runner.RelationDeleteJdbcRunner
+import org.komapper.jdbc.dsl.runner.RelationInsertJdbcRunner
+import org.komapper.jdbc.dsl.runner.RelationUpdateJdbcRunner
 import org.komapper.jdbc.dsl.runner.SchemaCreateJdbcRunner
 import org.komapper.jdbc.dsl.runner.SchemaDropAllJdbcRunner
 import org.komapper.jdbc.dsl.runner.SchemaDropJdbcRunner
 import org.komapper.jdbc.dsl.runner.ScriptExecuteJdbcRunner
-import org.komapper.jdbc.dsl.runner.SqlDeleteJdbcRunner
-import org.komapper.jdbc.dsl.runner.SqlInsertJdbcRunner
-import org.komapper.jdbc.dsl.runner.SqlSelectJdbcRunner
-import org.komapper.jdbc.dsl.runner.SqlSetOperationJdbcRunner
-import org.komapper.jdbc.dsl.runner.SqlUpdateJdbcRunner
+import org.komapper.jdbc.dsl.runner.SelectJdbcRunner
+import org.komapper.jdbc.dsl.runner.SetOperationJdbcRunner
 import org.komapper.jdbc.dsl.runner.TemplateExecuteJdbcRunner
 import org.komapper.jdbc.dsl.runner.TemplateSelectJdbcRunner
 
@@ -102,26 +89,26 @@ internal object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
 
     override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>
     entityContextQuery(
-        context: EntitySelectContext<ENTITY, ID, META>,
-        options: EntitySelectOptions
+        context: SelectContext<ENTITY, ID, META>,
+        options: SelectOptions
     ): JdbcRunner<*> {
         return EntityContextJdbcRunner(context, options)
     }
 
     override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>, R>
     entitySelectQuery(
-        context: EntitySelectContext<ENTITY, ID, META>,
-        options: EntitySelectOptions,
+        context: SelectContext<ENTITY, ID, META>,
+        options: SelectOptions,
         collect: suspend (Flow<ENTITY>) -> R
     ): JdbcRunner<R> {
         val transformer = JdbcResultSetTransformers.singleEntity(context.target)
-        return EntitySelectJdbcRunner(context, options, transformer, collect)
+        return SelectJdbcRunner(context, options, transformer, collect)
     }
 
     override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>
     entityDeleteBatchQuery(
         context: EntityDeleteContext<ENTITY, ID, META>,
-        options: EntityDeleteBatchOptions,
+        options: DeleteOptions,
         entities: List<ENTITY>
     ): JdbcRunner<Unit> {
         return EntityDeleteBatchJdbcRunner(context, options, entities)
@@ -130,7 +117,7 @@ internal object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
     override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>
     entityDeleteSingleQuery(
         context: EntityDeleteContext<ENTITY, ID, META>,
-        options: EntityDeleteOptions,
+        options: DeleteOptions,
         entity: ENTITY
     ): JdbcRunner<Unit> {
         return EntityDeleteSingleJdbcRunner(context, options, entity)
@@ -138,7 +125,7 @@ internal object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
 
     override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> entityInsertMultipleQuery(
         context: EntityInsertContext<ENTITY, ID, META>,
-        options: EntityInsertOptions,
+        options: InsertOptions,
         entities: List<ENTITY>
     ): JdbcRunner<List<ENTITY>> {
         return EntityInsertMultipleJdbcRunner(context, options, entities)
@@ -146,7 +133,7 @@ internal object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
 
     override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> entityInsertBatchQuery(
         context: EntityInsertContext<ENTITY, ID, META>,
-        options: EntityInsertBatchOptions,
+        options: InsertOptions,
         entities: List<ENTITY>
     ): JdbcRunner<List<ENTITY>> {
         return EntityInsertBatchJdbcRunner(context, options, entities)
@@ -154,7 +141,7 @@ internal object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
 
     override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> entityInsertSingleQuery(
         context: EntityInsertContext<ENTITY, ID, META>,
-        options: EntityInsertOptions,
+        options: InsertOptions,
         entity: ENTITY
     ): JdbcRunner<ENTITY> {
         return EntityInsertSingleJdbcRunner(context, options, entity)
@@ -163,16 +150,16 @@ internal object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
     override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>
     entityUpdateBatchQuery(
         context: EntityUpdateContext<ENTITY, ID, META>,
-        options: EntityUpdateBatchOptions,
+        options: UpdateOptions,
         entities: List<ENTITY>
-    ): JdbcRunner<List<ENTITY>> {
+    ): JdbcRunner<*> {
         return EntityUpdateBatchJdbcRunner(context, options, entities)
     }
 
     override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>
     entityUpdateSingleQuery(
         context: EntityUpdateContext<ENTITY, ID, META>,
-        options: EntityUpdateOptions,
+        options: UpdateOptions,
         entity: ENTITY
     ): JdbcRunner<ENTITY> {
         return EntityUpdateSingleJdbcRunner(context, options, entity)
@@ -207,148 +194,148 @@ internal object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
 
     override fun schemaCreateQuery(
         entityMetamodels: List<EntityMetamodel<*, *, *>>,
-        options: SchemaCreateOptions
+        options: SchemaOptions
     ): JdbcRunner<Unit> {
         return SchemaCreateJdbcRunner(entityMetamodels, options)
     }
 
     override fun schemaDropQuery(
         entityMetamodels: List<EntityMetamodel<*, *, *>>,
-        options: SchemaDropOptions
+        options: SchemaOptions
     ): JdbcRunner<Unit> {
         return SchemaDropJdbcRunner(entityMetamodels, options)
     }
 
-    override fun schemaDropAllQuery(options: SchemaDropAllOptions): JdbcRunner<Unit> {
+    override fun schemaDropAllQuery(options: SchemaOptions): JdbcRunner<Unit> {
         return SchemaDropAllJdbcRunner(options)
     }
 
     override fun scriptExecuteQuery(
         sql: String,
-        options: ScriptExecuteOptions
+        options: ScriptOptions
     ): JdbcRunner<Unit> {
         return ScriptExecuteJdbcRunner(sql, options)
     }
 
     override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>, R>
     sqlSelectQuery(
-        context: SqlSelectContext<ENTITY, ID, META>,
-        options: SqlSelectOptions,
+        context: SelectContext<ENTITY, ID, META>,
+        options: SelectOptions,
         collect: suspend (Flow<ENTITY>) -> R
     ): JdbcRunner<R> {
         val transform = JdbcResultSetTransformers.singleEntity(context.target)
-        return SqlSelectJdbcRunner(context, options, transform, collect)
+        return SelectJdbcRunner(context, options, transform, collect)
     }
 
-    override fun <T : Any, R> sqlSetOperationQuery(
-        context: SqlSetOperationContext,
-        options: SqlSetOperationOptions,
+    override fun <T : Any, R> setOperationQuery(
+        context: SetOperationContext,
+        options: SelectOptions,
         metamodel: EntityMetamodel<T, *, *>,
         collect: suspend (Flow<T>) -> R
     ): JdbcRunner<R> {
         val transform = JdbcResultSetTransformers.singleEntity(metamodel)
-        return SqlSetOperationJdbcRunner(context, options, transform, collect)
+        return SetOperationJdbcRunner(context, options, transform, collect)
     }
 
-    override fun <A : Any, R> sqlSingleColumnQuery(
-        context: SqlSelectContext<*, *, *>,
-        options: SqlSelectOptions,
+    override fun <A : Any, R> singleColumnSelectQuery(
+        context: SelectContext<*, *, *>,
+        options: SelectOptions,
         expression: ColumnExpression<A, *>,
         collect: suspend (Flow<A?>) -> R
     ): JdbcRunner<R> {
         val transform = JdbcResultSetTransformers.singleColumn(expression)
-        return SqlSelectJdbcRunner(context, options, transform, collect)
+        return SelectJdbcRunner(context, options, transform, collect)
     }
 
-    override fun <A : Any, R> sqlSingleColumnSetOperationQuery(
-        context: SqlSetOperationContext,
-        options: SqlSetOperationOptions,
+    override fun <A : Any, R> singleColumnSetOperationQuery(
+        context: SetOperationContext,
+        options: SelectOptions,
         expression: ColumnExpression<A, *>,
         collect: suspend (Flow<A?>) -> R
     ): JdbcRunner<R> {
         val transform = JdbcResultSetTransformers.singleColumn(expression)
-        return SqlSetOperationJdbcRunner(context, options, transform, collect)
+        return SetOperationJdbcRunner(context, options, transform, collect)
     }
 
-    override fun <A : Any, B : Any, R> sqlPairColumnsQuery(
-        context: SqlSelectContext<*, *, *>,
-        options: SqlSelectOptions,
+    override fun <A : Any, B : Any, R> pairColumnsSelectQuery(
+        context: SelectContext<*, *, *>,
+        options: SelectOptions,
         expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
         collect: suspend (Flow<Pair<A?, B?>>) -> R
     ): JdbcRunner<R> {
         val transform = JdbcResultSetTransformers.pairColumns(expressions)
-        return SqlSelectJdbcRunner(context, options, transform, collect)
+        return SelectJdbcRunner(context, options, transform, collect)
     }
 
-    override fun <A : Any, B : Any, R> sqlPairColumnsSetOperationQuery(
-        context: SqlSetOperationContext,
-        options: SqlSetOperationOptions,
+    override fun <A : Any, B : Any, R> pairColumnsSetOperationQuery(
+        context: SetOperationContext,
+        options: SelectOptions,
         expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
         collect: suspend (Flow<Pair<A?, B?>>) -> R
     ): JdbcRunner<R> {
         val transform = JdbcResultSetTransformers.pairColumns(expressions)
-        return SqlSetOperationJdbcRunner(context, options, transform, collect)
+        return SetOperationJdbcRunner(context, options, transform, collect)
     }
 
-    override fun <A : Any, B : Any, C : Any, R> sqlTripleColumnsQuery(
-        context: SqlSelectContext<*, *, *>,
-        options: SqlSelectOptions,
+    override fun <A : Any, B : Any, C : Any, R> tripleColumnsSelectQuery(
+        context: SelectContext<*, *, *>,
+        options: SelectOptions,
         expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
         collect: suspend (Flow<Triple<A?, B?, C?>>) -> R
     ): JdbcRunner<R> {
         val transform = JdbcResultSetTransformers.tripleColumns(expressions)
-        return SqlSelectJdbcRunner(context, options, transform, collect)
+        return SelectJdbcRunner(context, options, transform, collect)
     }
 
-    override fun <A : Any, B : Any, C : Any, R> sqlTripleColumnsSetOperationQuery(
-        context: SqlSetOperationContext,
-        options: SqlSetOperationOptions,
+    override fun <A : Any, B : Any, C : Any, R> tripleColumnsSetOperationQuery(
+        context: SetOperationContext,
+        options: SelectOptions,
         expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
         collect: suspend (Flow<Triple<A?, B?, C?>>) -> R
     ): JdbcRunner<R> {
         val transform = JdbcResultSetTransformers.tripleColumns(expressions)
-        return SqlSetOperationJdbcRunner(context, options, transform, collect)
+        return SetOperationJdbcRunner(context, options, transform, collect)
     }
 
-    override fun <R> sqlMultipleColumnsQuery(
-        context: SqlSelectContext<*, *, *>,
-        options: SqlSelectOptions,
+    override fun <R> multipleColumnsSelectQuery(
+        context: SelectContext<*, *, *>,
+        options: SelectOptions,
         expressions: List<ColumnExpression<*, *>>,
         collect: suspend (Flow<Columns>) -> R
     ): JdbcRunner<R> {
         val transform = JdbcResultSetTransformers.multipleColumns(expressions)
-        return SqlSelectJdbcRunner(context, options, transform, collect)
+        return SelectJdbcRunner(context, options, transform, collect)
     }
 
-    override fun <R> sqlMultipleColumnsSetOperationQuery(
-        context: SqlSetOperationContext,
-        options: SqlSetOperationOptions,
+    override fun <R> multipleColumnsSetOperationQuery(
+        context: SetOperationContext,
+        options: SelectOptions,
         expressions: List<ColumnExpression<*, *>>,
         collect: suspend (Flow<Columns>) -> R
     ): JdbcRunner<R> {
         val transform = JdbcResultSetTransformers.multipleColumns(expressions)
-        return SqlSetOperationJdbcRunner(context, options, transform, collect)
+        return SetOperationJdbcRunner(context, options, transform, collect)
     }
 
-    override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> sqlDeleteQuery(
-        context: SqlDeleteContext<ENTITY, ID, META>,
-        options: SqlDeleteOptions
+    override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> relationDeleteQuery(
+        context: RelationDeleteContext<ENTITY, ID, META>,
+        options: DeleteOptions
     ): JdbcRunner<Int> {
-        return SqlDeleteJdbcRunner(context, options)
+        return RelationDeleteJdbcRunner(context, options)
     }
 
-    override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> sqlInsertQuery(
-        context: SqlInsertContext<ENTITY, ID, META>,
-        options: SqlInsertOptions
+    override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> relationInsertQuery(
+        context: RelationInsertContext<ENTITY, ID, META>,
+        options: InsertOptions
     ): JdbcRunner<Pair<Int, ID?>> {
-        return SqlInsertJdbcRunner(context, options)
+        return RelationInsertJdbcRunner(context, options)
     }
 
-    override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> sqlUpdateQuery(
-        context: SqlUpdateContext<ENTITY, ID, META>,
-        options: SqlUpdateOptions
-    ): JdbcRunner<Int> {
-        return SqlUpdateJdbcRunner(context, options)
+    override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> relationUpdateQuery(
+        context: RelationUpdateContext<ENTITY, ID, META>,
+        options: UpdateOptions
+    ): JdbcRunner<*> {
+        return RelationUpdateJdbcRunner(context, options)
     }
 
     override fun templateExecuteQuery(

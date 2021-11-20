@@ -2,11 +2,11 @@ package org.komapper.core.dsl.runner
 
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.Statement
-import org.komapper.core.dsl.options.ScriptExecuteOptions
+import org.komapper.core.dsl.options.ScriptOptions
 
 data class ScriptExecuteRunner(
     private val sql: String,
-    private val options: ScriptExecuteOptions = ScriptExecuteOptions.default
+    private val options: ScriptOptions = ScriptOptions.default
 ) :
     Runner {
 
