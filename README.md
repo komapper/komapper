@@ -253,4 +253,32 @@ fun main() {
 }
 ```
 
+Generated SQL:
+
+```sql
+org.komapper.SQL_WITH_ARGS - create table if not exists Cities (ID integer auto_increment, NAME varchar(500) not null, constraint pk_Cities primary key(ID));create table if not exists Users (ID varchar(500) not null, NAME varchar(500) not null, CITY_ID integer, constraint pk_Users primary key(ID));
+org.komapper.SQL_WITH_ARGS - insert into Cities (NAME) values ('St. Petersburg'), ('Munich')
+org.komapper.SQL_WITH_ARGS - insert into Cities (NAME) values ((substring((trim('   Prague   ')), 1, 2)))
+org.komapper.SQL_WITH_ARGS - select t0_.ID, t0_.NAME from Cities as t0_ where t0_.ID = 3
+org.komapper.SQL_WITH_ARGS - insert into Users (ID, NAME, CITY_ID) values ('andrey', 'Andrey', 1), ('sergey', 'Sergey', 2), ('eugene', 'Eugene', 2), ('alex', 'Alex', null), ('smth', 'Something', null)
+org.komapper.SQL_WITH_ARGS - update Users as t0_ set NAME = 'Alexey' where t0_.ID = 'alex'
+org.komapper.SQL_WITH_ARGS - delete from Users as t0_ where t0_.NAME like '%thing' escape '\'
+All cities:
+org.komapper.SQL_WITH_ARGS - select t0_.ID, t0_.NAME from Cities as t0_
+1: St. Petersburg
+2: Munich
+3: Pr
+Manual join:
+org.komapper.SQL_WITH_ARGS - select t0_.NAME, t1_.NAME from Users as t0_ inner join Cities as t1_ on (t0_.CITY_ID = t1_.ID) where (t0_.ID = 'andrey' or (t0_.NAME = 'Sergey')) and t0_.ID = 'sergey' and t0_.CITY_ID = t1_.ID
+Sergey lives in Munich
+Join with foreign key:
+org.komapper.SQL_WITH_ARGS - select t0_.NAME, t0_.CITY_ID, t1_.NAME from Users as t0_ inner join Cities as t1_ on (t0_.CITY_ID = t1_.ID) where t1_.NAME = 'St. Petersburg' or (t0_.CITY_ID is null)
+Andrey lives in St. Petersburg
+Functions and group by:
+org.komapper.SQL_WITH_ARGS - select t0_.NAME, count(t1_.ID) from Cities as t0_ inner join Users as t1_ on (t0_.ID = t1_.CITY_ID) group by t0_.NAME
+2 user(s) live(s) in Munich
+1 user(s) live(s) in St. Petersburg
+org.komapper.SQL_WITH_ARGS - drop table if exists Users;drop table if exists Cities;
+```
+
 See the [example-vs-exposed](example-vs-exposed) module to get complete code.
