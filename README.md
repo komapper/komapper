@@ -44,7 +44,7 @@ fun main() {
     val db = JdbcDatabase.create("jdbc:h2:mem:example;DB_CLOSE_DELAY=-1")
 
     // get a metamodel
-    val a = AddressDef.meta
+    val a = Meta.address
 
     // execute simple operations in a transaction
     db.withTransaction {
@@ -73,7 +73,7 @@ fun main() = runBlocking {
     val db = R2dbcDatabase.create("r2dbc:h2:mem:///example;DB_CLOSE_DELAY=-1")
 
     // get a metamodel
-    val a = AddressDef.meta
+    val a = Meta.address
 
     // execute simple operations in a transaction
     db.withTransaction {
@@ -106,6 +106,7 @@ import org.komapper.annotation.KomapperAutoIncrement
 import org.komapper.annotation.KomapperEntityDef
 import org.komapper.annotation.KomapperId
 import org.komapper.annotation.KomapperTable
+import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
 import org.komapper.core.dsl.SchemaDsl
 import org.komapper.core.dsl.operator.count
@@ -132,9 +133,7 @@ data class City(
 data class UserDef(
     @KomapperId
     val id: Nothing
-) {
-    companion object
-}
+)
 
 @KomapperEntityDef(City::class)
 @KomapperTable("Cities")
@@ -142,13 +141,11 @@ data class CityDef(
     @KomapperId
     @KomapperAutoIncrement
     val id: Nothing
-) {
-    companion object
-}
+)
 
 fun main() {
-    val c = CityDef.meta
-    val u = UserDef.meta
+    val c = Meta.city
+    val u = Meta.user
 
     val db = JdbcDatabase.create("jdbc:h2:mem:example;DB_CLOSE_DELAY=-1")
 
