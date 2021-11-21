@@ -100,7 +100,7 @@ fun main() = runBlocking {
 The following code is equivalent to the [SQL DSL example](https://github.com/JetBrains/Exposed#sql-dsl) in Kotlin Exposed:
 
 ```kotlin
-package example
+package org.komapper.example
 
 import org.komapper.annotation.KomapperAutoIncrement
 import org.komapper.annotation.KomapperEntityDef
@@ -281,4 +281,4 @@ org.komapper.SQL_WITH_ARGS - select t0_.NAME, count(t1_.ID) from Cities as t0_ i
 org.komapper.SQL_WITH_ARGS - drop table if exists Users;drop table if exists Cities;
 ```
 
-See the [example-vs-exposed](example-vs-exposed) module to get complete code.
+See the [comparison-with-exposed](https://github.com/komapper/komapper-examples/tree/main/comparison-with-exposed) project to get complete code.
