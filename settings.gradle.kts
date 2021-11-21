@@ -69,7 +69,6 @@ include("example-spring-boot-jdbc")
 include("example-spring-boot-r2dbc")
 include("example-starter-jdbc")
 include("example-starter-r2dbc")
-include("example-vs-exposed")
 
 // TEST
 include("integration-test-core")
