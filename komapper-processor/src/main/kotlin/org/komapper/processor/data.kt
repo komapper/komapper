@@ -11,6 +11,7 @@ internal data class EntityDefinitionSource(
     val defDeclaration: KSClassDeclaration,
     val entityDeclaration: KSClassDeclaration,
     val aliases: List<String>,
+    val stubAnnotation: KSAnnotation?,
 )
 
 internal data class EntityDef(

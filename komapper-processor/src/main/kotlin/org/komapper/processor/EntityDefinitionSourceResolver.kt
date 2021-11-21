@@ -9,6 +9,7 @@ import com.google.devtools.ksp.symbol.KSType
 import com.google.devtools.ksp.symbol.Modifier
 import org.komapper.annotation.KomapperEntity
 import org.komapper.annotation.KomapperEntityDef
+import org.komapper.processor.ClassNames.KomapperStub
 
 internal interface EntityDefinitionSourceResolver {
     fun resolve(symbol: KSNode): EntityDefinitionSource
@@ -24,9 +25,9 @@ internal class SeparateDefinitionSourceResolver : EntityDefinitionSourceResolver
             },
             Unit
         )
-        val annotation = defDeclaration.findAnnotation(KomapperEntityDef::class)
-        val entity = annotation?.findValue("entity")
-        val aliases = annotation?.findValue("aliases")
+        val defAnnotation = defDeclaration.findAnnotation(KomapperEntityDef::class)
+        val entity = defAnnotation?.findValue("entity")
+        val aliases = defAnnotation?.findValue("aliases")
         if (entity !is KSType) {
             report("The entity value of @${KomapperEntityDef::class.simpleName} is not found.", defDeclaration)
         }
@@ -42,7 +43,8 @@ internal class SeparateDefinitionSourceResolver : EntityDefinitionSourceResolver
             Unit
         )
         validateEntityDeclaration(entityDeclaration)
-        return EntityDefinitionSource(defDeclaration, entityDeclaration, aliases.map { it.toString() })
+        val stubAnnotation = defDeclaration.findAnnotation(KomapperStub)
+        return EntityDefinitionSource(defDeclaration, entityDeclaration, aliases.map { it.toString() }, stubAnnotation)
     }
 }
 
@@ -62,7 +64,8 @@ internal class SelfDefinitionSourceResolver : EntityDefinitionSourceResolver {
             report("The aliases value of @${KomapperEntity::class.simpleName} is invalid.", entityDeclaration)
         }
         validateEntityDeclaration(entityDeclaration)
-        return EntityDefinitionSource(entityDeclaration, entityDeclaration, aliases.map { it.toString() })
+        val stubAnnotation = entityDeclaration.findAnnotation(KomapperStub)
+        return EntityDefinitionSource(entityDeclaration, entityDeclaration, aliases.map { it.toString() }, stubAnnotation)
     }
 }
 

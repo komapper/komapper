@@ -26,6 +26,10 @@ internal fun KSAnnotated.findAnnotation(klass: KClass<*>): KSAnnotation? {
     return this.annotations.firstOrNull { it.shortName.asString() == klass.simpleName }
 }
 
+internal fun KSAnnotated.findAnnotation(simpleName: String): KSAnnotation? {
+    return this.annotations.firstOrNull { it.shortName.asString() == simpleName }
+}
+
 internal fun toCamelCase(text: String): String {
     val builder = StringBuilder()
     val buf = CharBuffer.wrap(text)

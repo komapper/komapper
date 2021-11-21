@@ -24,7 +24,7 @@ internal class EntityContextImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY
         pool.asSequence()
             .filter { it.key.entityMetamodel == metamodel }
             .map { klass.cast(it.value) }
-            .distinctBy { metamodel.getId(it) }
+            .distinctBy { metamodel.id(it) }
             .toList()
     }
 
@@ -46,7 +46,7 @@ internal class EntityContextImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY
     override fun <T : Any, S : Any, ID> associateById(pair: Pair<EntityMetamodel<T, ID, *>, EntityMetamodel<S, *, *>>): OneToMany<ID, S> {
         val oneToMany = associate(pair)
         val metamodel = pair.first
-        return OneToManyImpl(oneToMany.mapKeys { metamodel.getId(it.key) })
+        return OneToManyImpl(oneToMany.mapKeys { metamodel.id(it.key) })
     }
 
     private fun createOneToMany(pair: Pair<EntityMetamodel<*, *, *>, EntityMetamodel<*, *, *>>): OneToMany<Any, Any> {

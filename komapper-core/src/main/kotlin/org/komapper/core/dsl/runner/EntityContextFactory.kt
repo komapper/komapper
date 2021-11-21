@@ -18,7 +18,7 @@ class EntityContextFactory<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, 
             for ((metamodel, entity) in row) {
                 @Suppress("UNCHECKED_CAST")
                 metamodel as EntityMetamodel<Any, Any, *>
-                val id = metamodel.getId(entity)
+                val id = metamodel.id(entity)
                 val key = EntityKey(metamodel, id)
                 val prev = pool.putIfAbsent(key, entity)
                 newRow[metamodel] = prev ?: entity

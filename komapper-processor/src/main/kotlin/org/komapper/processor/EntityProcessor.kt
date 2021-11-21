@@ -64,13 +64,13 @@ internal class EntityProcessor(private val environment: SymbolProcessorEnvironme
         val file = declaration.containingFile!!
         environment.codeGenerator.createNewFile(Dependencies(false, file), packageName, simpleName).use { out ->
             PrintWriter(out).use {
-                val runnable = if (model.entity != null) {
-                    EntityMetamodelGenerator(
-                        model.entity, config.metaObject, aliases, packageName, entityTypeName, simpleName, it
-                    )
-                } else {
+                val runnable = if (model.definitionSource.stubAnnotation != null || model.entity == null) {
                     EntityMetamodelStubGenerator(
                         declaration, config.metaObject, aliases, packageName, entityTypeName, simpleName, it
+                    )
+                } else {
+                    EntityMetamodelGenerator(
+                        model.entity, config.metaObject, aliases, packageName, entityTypeName, simpleName, it
                     )
                 }
                 runnable.run()
