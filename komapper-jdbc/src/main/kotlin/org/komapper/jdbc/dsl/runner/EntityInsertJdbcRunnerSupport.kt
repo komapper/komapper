@@ -4,7 +4,7 @@ import kotlinx.coroutines.runBlocking
 import org.komapper.core.Statement
 import org.komapper.core.dsl.context.EntityInsertContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
-import org.komapper.core.dsl.metamodel.IdAssignment
+import org.komapper.core.dsl.metamodel.IdGenerator
 import org.komapper.core.dsl.options.InsertOptions
 import org.komapper.jdbc.JdbcDatabaseConfig
 import org.komapper.jdbc.JdbcExecutor
@@ -15,11 +15,11 @@ internal class EntityInsertJdbcRunnerSupport<ENTITY : Any, ID : Any, META : Enti
 ) {
 
     fun preInsert(config: JdbcDatabaseConfig, entity: ENTITY): ENTITY {
-        val newEntity = when (val assignment = context.target.idAssignment()) {
-            is IdAssignment.Sequence<ENTITY, *> ->
-                if (!assignment.disableSequenceAssignment && !options.disableSequenceAssignment) {
+        val newEntity = when (val idGenerator = context.target.idGenerator()) {
+            is IdGenerator.Sequence<ENTITY, ID> ->
+                if (!context.target.disableSequenceAssignment() && !options.disableSequenceAssignment) {
                     runBlocking {
-                        assignment.assign(entity, config.id, config.dialect::enquote) { sequenceName ->
+                        val id = idGenerator.generate(config.id, config.dialect::enquote) { sequenceName ->
                             val sql = config.dialect.getSequenceSql(sequenceName)
                             val statement = Statement(sql)
                             val executor = JdbcExecutor(config, options)
@@ -27,6 +27,7 @@ internal class EntityInsertJdbcRunnerSupport<ENTITY : Any, ID : Any, META : Enti
                                 if (rs.next()) rs.getLong(1) else error("No result: ${statement.toSql()}")
                             }
                         }
+                        idGenerator.property.setter(entity, id)
                     }
                 } else null
             else -> null
@@ -36,15 +37,16 @@ internal class EntityInsertJdbcRunnerSupport<ENTITY : Any, ID : Any, META : Enti
     }
 
     fun <T> insert(config: JdbcDatabaseConfig, execute: (JdbcExecutor) -> T): T {
-        val requiresGeneratedKeys = context.target.idAssignment() is IdAssignment.AutoIncrement<ENTITY, *>
+        val requiresGeneratedKeys = context.target.idGenerator() is IdGenerator.AutoIncrement<ENTITY, *>
         val executor = JdbcExecutor(config, options, requiresGeneratedKeys)
         return execute(executor)
     }
 
     fun postInsert(entity: ENTITY, generatedKey: Long): ENTITY {
-        val assignment = context.target.idAssignment()
-        return if (assignment is IdAssignment.AutoIncrement<ENTITY, *>) {
-            assignment.assign(entity, generatedKey)
+        val idGenerator = context.target.idGenerator()
+        return if (idGenerator is IdGenerator.AutoIncrement<ENTITY, ID>) {
+            val id = context.target.toId(generatedKey)!!
+            idGenerator.property.setter(entity, id)
         } else {
             entity
         }

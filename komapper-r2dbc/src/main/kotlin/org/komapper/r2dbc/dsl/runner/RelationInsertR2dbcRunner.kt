@@ -4,7 +4,7 @@ import org.komapper.core.DatabaseConfig
 import org.komapper.core.Statement
 import org.komapper.core.dsl.context.RelationInsertContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
-import org.komapper.core.dsl.metamodel.IdAssignment
+import org.komapper.core.dsl.metamodel.IdGenerator
 import org.komapper.core.dsl.options.InsertOptions
 import org.komapper.core.dsl.runner.RelationInsertRunner
 import org.komapper.r2dbc.R2dbcDatabaseConfig
@@ -19,8 +19,8 @@ internal class RelationInsertR2dbcRunner<ENTITY : Any, ID : Any, META : EntityMe
 
     override suspend fun run(config: R2dbcDatabaseConfig): Pair<Int, ID?> {
         val statement = runner.buildStatement(config)
-        val generatedColumn = when (val assignment = context.target.idAssignment()) {
-            is IdAssignment.AutoIncrement<ENTITY, *> -> assignment.property.columnName
+        val generatedColumn = when (val idGenerator = context.target.idGenerator()) {
+            is IdGenerator.AutoIncrement<ENTITY, *> -> idGenerator.property.columnName
             else -> null
         }
         val executor = R2dbcExecutor(config, options, generatedColumn)

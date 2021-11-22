@@ -4,7 +4,7 @@ import org.komapper.core.Dialect
 import org.komapper.core.Statement
 import org.komapper.core.StatementBuffer
 import org.komapper.core.dsl.metamodel.EntityMetamodel
-import org.komapper.core.dsl.metamodel.IdAssignment
+import org.komapper.core.dsl.metamodel.IdGenerator
 import org.komapper.core.dsl.metamodel.PropertyMetamodel
 
 interface SchemaStatementBuilder {
@@ -70,17 +70,17 @@ abstract class AbstractSchemaStatementBuilder<D : Dialect>(protected val dialect
     }
 
     protected open fun resolveIdentity(property: PropertyMetamodel<*, *, *>): String {
-        val isAutoIncrement = when (val idAssignment = property.owner.idAssignment()) {
-            is IdAssignment.AutoIncrement<*, *> -> idAssignment.property == property
+        val idGenerator = when (val idAssignment = property.owner.idGenerator()) {
+            is IdGenerator.AutoIncrement<*, *> -> idAssignment.property == property
             else -> false
         }
-        return if (isAutoIncrement) " auto_increment" else ""
+        return if (idGenerator) " auto_increment" else ""
     }
 
     protected open fun createSequence(metamodel: EntityMetamodel<*, *, *>) {
-        val idAssignment = metamodel.idAssignment()
-        if (idAssignment is IdAssignment.Sequence<*, *>) {
-            buf.append("create sequence if not exists ${idAssignment.getCanonicalSequenceName(dialect::enquote)} start with ${idAssignment.startWith} increment by ${idAssignment.incrementBy};")
+        val idGenerator = metamodel.idGenerator()
+        if (idGenerator is IdGenerator.Sequence<*, *>) {
+            buf.append("create sequence if not exists ${idGenerator.getCanonicalSequenceName(dialect::enquote)} start with ${idGenerator.startWith} increment by ${idGenerator.incrementBy};")
         }
     }
 
@@ -89,16 +89,16 @@ abstract class AbstractSchemaStatementBuilder<D : Dialect>(protected val dialect
     }
 
     protected open fun dropSequence(metamodel: EntityMetamodel<*, *, *>) {
-        val idAssignment = metamodel.idAssignment()
-        if (idAssignment is IdAssignment.Sequence<*, *>) {
-            buf.append("drop sequence if exists ${idAssignment.getCanonicalSequenceName(dialect::enquote)};")
+        val idGenerator = metamodel.idGenerator()
+        if (idGenerator is IdGenerator.Sequence<*, *>) {
+            buf.append("drop sequence if exists ${idGenerator.getCanonicalSequenceName(dialect::enquote)};")
         }
     }
 
     protected open fun extractSchemaNames(metamodels: List<EntityMetamodel<*, *, *>>): List<String> {
         val tableSchemaNames = metamodels.map { it.schemaName() }
         val sequenceSchemaNames =
-            metamodels.mapNotNull { it.idAssignment() }.filterIsInstance<IdAssignment.Sequence<*, *>>()
+            metamodels.mapNotNull { it.idGenerator() }.filterIsInstance<IdGenerator.Sequence<*, *>>()
                 .map { it.schemaName }
         return (tableSchemaNames + sequenceSchemaNames).distinct().filter { it.isNotBlank() }
     }

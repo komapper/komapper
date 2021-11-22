@@ -3,8 +3,8 @@ package org.komapper.core.dsl.metamodel
 import org.komapper.core.dsl.expression.WhereDeclaration
 
 fun <ENTITY : Any> EntityMetamodel<ENTITY, *, *>.getAutoIncrementProperty(): PropertyMetamodel<ENTITY, *, *>? {
-    val idAssignment = this.idAssignment()
-    return if (idAssignment is IdAssignment.AutoIncrement<ENTITY, *>) idAssignment.property else null
+    val idGenerator = this.idGenerator()
+    return if (idGenerator is IdGenerator.AutoIncrement<ENTITY, *>) idGenerator.property else null
 }
 
 fun <ENTITY : Any> EntityMetamodel<ENTITY, *, *>.getNonAutoIncrementProperties(): List<PropertyMetamodel<ENTITY, *, *>> {
