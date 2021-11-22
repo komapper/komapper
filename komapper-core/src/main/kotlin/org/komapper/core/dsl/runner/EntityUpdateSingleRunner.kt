@@ -6,7 +6,7 @@ import org.komapper.core.dsl.context.EntityUpdateContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.UpdateOptions
 
-class EntityUpdateSingleRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+class EntityUpdateSingleRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     context: EntityUpdateContext<ENTITY, ID, META>,
     options: UpdateOptions,
     private val entity: ENTITY

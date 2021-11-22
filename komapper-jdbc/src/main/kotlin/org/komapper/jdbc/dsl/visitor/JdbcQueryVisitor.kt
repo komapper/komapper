@@ -87,7 +87,7 @@ internal object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
         }
     }
 
-    override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
     entityContextQuery(
         context: SelectContext<ENTITY, ID, META>,
         options: SelectOptions
@@ -95,7 +95,7 @@ internal object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
         return EntityContextJdbcRunner(context, options)
     }
 
-    override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>, R>
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, R>
     entitySelectQuery(
         context: SelectContext<ENTITY, ID, META>,
         options: SelectOptions,
@@ -105,7 +105,7 @@ internal object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
         return SelectJdbcRunner(context, options, transformer, collect)
     }
 
-    override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
     entityDeleteBatchQuery(
         context: EntityDeleteContext<ENTITY, ID, META>,
         options: DeleteOptions,
@@ -114,7 +114,7 @@ internal object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
         return EntityDeleteBatchJdbcRunner(context, options, entities)
     }
 
-    override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
     entityDeleteSingleQuery(
         context: EntityDeleteContext<ENTITY, ID, META>,
         options: DeleteOptions,
@@ -123,7 +123,7 @@ internal object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
         return EntityDeleteSingleJdbcRunner(context, options, entity)
     }
 
-    override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> entityInsertMultipleQuery(
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityInsertMultipleQuery(
         context: EntityInsertContext<ENTITY, ID, META>,
         options: InsertOptions,
         entities: List<ENTITY>
@@ -131,7 +131,7 @@ internal object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
         return EntityInsertMultipleJdbcRunner(context, options, entities)
     }
 
-    override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> entityInsertBatchQuery(
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityInsertBatchQuery(
         context: EntityInsertContext<ENTITY, ID, META>,
         options: InsertOptions,
         entities: List<ENTITY>
@@ -139,7 +139,7 @@ internal object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
         return EntityInsertBatchJdbcRunner(context, options, entities)
     }
 
-    override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> entityInsertSingleQuery(
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityInsertSingleQuery(
         context: EntityInsertContext<ENTITY, ID, META>,
         options: InsertOptions,
         entity: ENTITY
@@ -147,7 +147,7 @@ internal object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
         return EntityInsertSingleJdbcRunner(context, options, entity)
     }
 
-    override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
     entityUpdateBatchQuery(
         context: EntityUpdateContext<ENTITY, ID, META>,
         options: UpdateOptions,
@@ -156,7 +156,7 @@ internal object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
         return EntityUpdateBatchJdbcRunner(context, options, entities)
     }
 
-    override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
     entityUpdateSingleQuery(
         context: EntityUpdateContext<ENTITY, ID, META>,
         options: UpdateOptions,
@@ -165,7 +165,7 @@ internal object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
         return EntityUpdateSingleJdbcRunner(context, options, entity)
     }
 
-    override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
     entityUpsertBatchQuery(
         context: EntityUpsertContext<ENTITY, ID, META>,
         options: InsertOptions,
@@ -174,7 +174,7 @@ internal object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
         return EntityUpsertBatchJdbcRunner(context, options, entities)
     }
 
-    override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
     entityUpsertMultipleQuery(
         context: EntityUpsertContext<ENTITY, ID, META>,
         options: InsertOptions,
@@ -183,7 +183,7 @@ internal object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
         return EntityUpsertMultipleJdbcRunner(context, options, entities)
     }
 
-    override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
     entityUpsertSingleQuery(
         context: EntityUpsertContext<ENTITY, ID, META>,
         options: InsertOptions,
@@ -217,7 +217,7 @@ internal object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
         return ScriptExecuteJdbcRunner(sql, options)
     }
 
-    override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>, R>
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, R>
     sqlSelectQuery(
         context: SelectContext<ENTITY, ID, META>,
         options: SelectOptions,
@@ -317,21 +317,21 @@ internal object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
         return SetOperationJdbcRunner(context, options, transform, collect)
     }
 
-    override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> relationDeleteQuery(
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> relationDeleteQuery(
         context: RelationDeleteContext<ENTITY, ID, META>,
         options: DeleteOptions
     ): JdbcRunner<Int> {
         return RelationDeleteJdbcRunner(context, options)
     }
 
-    override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> relationInsertQuery(
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> relationInsertQuery(
         context: RelationInsertContext<ENTITY, ID, META>,
         options: InsertOptions
     ): JdbcRunner<Pair<Int, ID?>> {
         return RelationInsertJdbcRunner(context, options)
     }
 
-    override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> relationUpdateQuery(
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> relationUpdateQuery(
         context: RelationUpdateContext<ENTITY, ID, META>,
         options: UpdateOptions
     ): JdbcRunner<*> {

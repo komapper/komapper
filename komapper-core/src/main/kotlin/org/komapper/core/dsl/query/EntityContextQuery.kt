@@ -10,7 +10,7 @@ interface EntityContextQuery<ENTITY> : Query<EntityContext<ENTITY>> {
     fun options(configure: (SelectOptions) -> SelectOptions): EntityContextQuery<ENTITY>
 }
 
-internal data class EntityContextQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+internal data class EntityContextQueryImpl<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: SelectContext<ENTITY, ID, META>,
     private val options: SelectOptions
 ) : EntityContextQuery<ENTITY> {

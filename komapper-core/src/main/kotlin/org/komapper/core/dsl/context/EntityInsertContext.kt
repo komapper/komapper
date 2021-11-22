@@ -3,7 +3,7 @@ package org.komapper.core.dsl.context
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.metamodel.PropertyMetamodel
 
-data class EntityInsertContext<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+data class EntityInsertContext<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     val target: META
 ) : QueryContext {
 

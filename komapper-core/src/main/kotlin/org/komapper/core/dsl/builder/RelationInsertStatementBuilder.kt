@@ -11,7 +11,7 @@ import org.komapper.core.dsl.expression.SubqueryExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.metamodel.isAutoIncrement
 
-class RelationInsertStatementBuilder<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+class RelationInsertStatementBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     val dialect: Dialect,
     val context: RelationInsertContext<ENTITY, ID, META>
 ) {

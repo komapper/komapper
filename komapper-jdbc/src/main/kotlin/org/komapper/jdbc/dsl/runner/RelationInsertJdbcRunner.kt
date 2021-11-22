@@ -10,7 +10,7 @@ import org.komapper.core.dsl.runner.RelationInsertRunner
 import org.komapper.jdbc.JdbcDatabaseConfig
 import org.komapper.jdbc.JdbcExecutor
 
-internal class RelationInsertJdbcRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+internal class RelationInsertJdbcRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: RelationInsertContext<ENTITY, ID, META>,
     private val options: InsertOptions
 ) : JdbcRunner<Pair<Int, ID?>> {

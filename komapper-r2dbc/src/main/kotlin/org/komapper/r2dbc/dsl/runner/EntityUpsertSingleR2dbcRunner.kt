@@ -8,7 +8,7 @@ import org.komapper.core.dsl.options.InsertOptions
 import org.komapper.core.dsl.runner.EntityUpsertSingleRunner
 import org.komapper.r2dbc.R2dbcDatabaseConfig
 
-internal class EntityUpsertSingleR2dbcRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+internal class EntityUpsertSingleR2dbcRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     context: EntityUpsertContext<ENTITY, ID, META>,
     options: InsertOptions,
     private val entity: ENTITY,

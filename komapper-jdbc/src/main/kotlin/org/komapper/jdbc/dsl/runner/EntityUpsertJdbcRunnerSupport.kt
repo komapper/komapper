@@ -6,7 +6,7 @@ import org.komapper.core.dsl.options.InsertOptions
 import org.komapper.jdbc.JdbcDatabaseConfig
 import org.komapper.jdbc.JdbcExecutor
 
-internal class EntityUpsertJdbcRunnerSupport<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+internal class EntityUpsertJdbcRunnerSupport<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     context: EntityUpsertContext<ENTITY, ID, META>,
     private val options: InsertOptions
 ) {

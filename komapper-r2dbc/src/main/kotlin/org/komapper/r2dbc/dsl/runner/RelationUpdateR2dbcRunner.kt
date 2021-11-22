@@ -9,7 +9,7 @@ import org.komapper.core.dsl.runner.RelationUpdateRunner
 import org.komapper.r2dbc.R2dbcDatabaseConfig
 import org.komapper.r2dbc.R2dbcExecutor
 
-internal class RelationUpdateR2dbcRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+internal class RelationUpdateR2dbcRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: RelationUpdateContext<ENTITY, ID, META>,
     private val options: UpdateOptions
 ) : R2dbcRunner<Int> {

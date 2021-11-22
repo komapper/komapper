@@ -14,7 +14,7 @@ interface RelationInsertQuery<ENTITY : Any, ID> : Query<Pair<Int, ID?>> {
     fun options(configure: (InsertOptions) -> InsertOptions): RelationInsertQuery<ENTITY, ID>
 }
 
-internal data class RelationInsertQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+internal data class RelationInsertQueryImpl<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: RelationInsertContext<ENTITY, ID, META>,
     private val options: InsertOptions = InsertOptions.default
 ) : RelationInsertQuery<ENTITY, ID> {

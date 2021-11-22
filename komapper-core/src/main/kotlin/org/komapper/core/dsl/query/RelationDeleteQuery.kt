@@ -11,7 +11,7 @@ interface RelationDeleteQuery : Query<Int> {
     fun options(configure: (DeleteOptions) -> DeleteOptions): RelationDeleteQuery
 }
 
-internal data class RelationDeleteQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+internal data class RelationDeleteQueryImpl<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: RelationDeleteContext<ENTITY, ID, META>,
     private val options: DeleteOptions = DeleteOptions.default
 ) : RelationDeleteQuery {

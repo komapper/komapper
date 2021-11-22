@@ -6,7 +6,7 @@ import java.time.Clock
 import kotlin.reflect.KClass
 
 @ThreadSafe
-interface EntityMetamodel<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> : TableExpression<ENTITY> {
+interface EntityMetamodel<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> : TableExpression<ENTITY> {
     fun declarations(): List<MetamodelDeclaration<ENTITY, ID, META>>
     fun idAssignment(): IdAssignment<ENTITY>?
     fun idProperties(): List<PropertyMetamodel<ENTITY, *, *>>

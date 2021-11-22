@@ -22,7 +22,7 @@ interface EntitySelectQuery<ENTITY : Any> : SelectQuery<ENTITY, EntitySelectQuer
     fun includeAll(): EntityContextQuery<ENTITY>
 }
 
-internal data class EntitySelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+internal data class EntitySelectQueryImpl<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     override val context: SelectContext<ENTITY, ID, META>,
     private val options: SelectOptions = SelectOptions.default
 ) :
@@ -35,7 +35,7 @@ internal data class EntitySelectQueryImpl<ENTITY : Any, ID, META : EntityMetamod
         return copy(context = newContext)
     }
 
-    override fun <ENTITY2 : Any, ID2, META2 : EntityMetamodel<ENTITY2, ID2, META2>> innerJoin(
+    override fun <ENTITY2 : Any, ID2 : Any, META2 : EntityMetamodel<ENTITY2, ID2, META2>> innerJoin(
         metamodel: META2,
         on: OnDeclaration
     ): EntitySelectQuery<ENTITY> {
@@ -43,7 +43,7 @@ internal data class EntitySelectQueryImpl<ENTITY : Any, ID, META : EntityMetamod
         return copy(context = newContext)
     }
 
-    override fun <ENTITY2 : Any, ID2, META2 : EntityMetamodel<ENTITY2, ID2, META2>> leftJoin(
+    override fun <ENTITY2 : Any, ID2 : Any, META2 : EntityMetamodel<ENTITY2, ID2, META2>> leftJoin(
         metamodel: META2,
         on: OnDeclaration
     ): EntitySelectQuery<ENTITY> {

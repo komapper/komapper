@@ -7,7 +7,7 @@ import org.komapper.core.dsl.context.RelationInsertContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.InsertOptions
 
-class RelationInsertRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+class RelationInsertRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: RelationInsertContext<ENTITY, ID, META>,
     @Suppress("unused") private val options: InsertOptions = InsertOptions.default
 ) : Runner {

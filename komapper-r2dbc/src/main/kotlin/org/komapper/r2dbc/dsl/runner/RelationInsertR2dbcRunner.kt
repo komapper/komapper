@@ -10,7 +10,7 @@ import org.komapper.core.dsl.runner.RelationInsertRunner
 import org.komapper.r2dbc.R2dbcDatabaseConfig
 import org.komapper.r2dbc.R2dbcExecutor
 
-internal class RelationInsertR2dbcRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+internal class RelationInsertR2dbcRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: RelationInsertContext<ENTITY, ID, META>,
     private val options: InsertOptions
 ) : R2dbcRunner<Pair<Int, ID?>> {

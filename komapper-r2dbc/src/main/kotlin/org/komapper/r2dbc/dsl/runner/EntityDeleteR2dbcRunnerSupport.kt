@@ -7,7 +7,7 @@ import org.komapper.core.dsl.query.checkOptimisticLock
 import org.komapper.r2dbc.R2dbcDatabaseConfig
 import org.komapper.r2dbc.R2dbcExecutor
 
-internal class EntityDeleteR2dbcRunnerSupport<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+internal class EntityDeleteR2dbcRunnerSupport<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     val context: EntityDeleteContext<ENTITY, ID, META>,
     val options: VersionOptions
 ) {

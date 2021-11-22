@@ -9,7 +9,7 @@ interface EntityUpsertQuery<T> : Query<T> {
 
     fun options(configure: (InsertOptions) -> InsertOptions): EntityUpsertQuery<T>
 
-    data class Single<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+    data class Single<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
         private val context: EntityUpsertContext<ENTITY, ID, META>,
         private val options: InsertOptions,
         private val entity: ENTITY
@@ -23,7 +23,7 @@ interface EntityUpsertQuery<T> : Query<T> {
         }
     }
 
-    data class Multiple<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+    data class Multiple<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
         private val context: EntityUpsertContext<ENTITY, ID, META>,
         private val options: InsertOptions,
         private val entities: List<ENTITY>
@@ -37,7 +37,7 @@ interface EntityUpsertQuery<T> : Query<T> {
         }
     }
 
-    data class Batch<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+    data class Batch<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
         private val context: EntityUpsertContext<ENTITY, ID, META>,
         private val options: InsertOptions,
         private val entities: List<ENTITY>,

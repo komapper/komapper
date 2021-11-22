@@ -8,7 +8,7 @@ import org.komapper.core.dsl.options.InsertOptions
 import org.komapper.core.dsl.runner.EntityInsertBatchRunner
 import org.komapper.jdbc.JdbcDatabaseConfig
 
-internal class EntityInsertBatchJdbcRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+internal class EntityInsertBatchJdbcRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     context: EntityInsertContext<ENTITY, ID, META>,
     options: InsertOptions,
     private val entities: List<ENTITY>

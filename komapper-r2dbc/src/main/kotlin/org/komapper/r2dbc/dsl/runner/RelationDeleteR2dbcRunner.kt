@@ -9,7 +9,7 @@ import org.komapper.core.dsl.runner.RelationDeleteRunner
 import org.komapper.r2dbc.R2dbcDatabaseConfig
 import org.komapper.r2dbc.R2dbcExecutor
 
-internal class RelationDeleteR2dbcRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+internal class RelationDeleteR2dbcRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: RelationDeleteContext<ENTITY, ID, META>,
     private val options: DeleteOptions
 ) : R2dbcRunner<Int> {

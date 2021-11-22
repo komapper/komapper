@@ -7,7 +7,7 @@ import org.komapper.core.dsl.context.EntityUpdateContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.VersionOptions
 
-internal class EntityUpdateRunnerSupport<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+internal class EntityUpdateRunnerSupport<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityUpdateContext<ENTITY, ID, META>,
     private val options: VersionOptions
 ) {

@@ -10,7 +10,7 @@ import org.komapper.core.dsl.expression.Operand
 import org.komapper.core.dsl.expression.TableExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 
-class RelationUpdateStatementBuilder<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+class RelationUpdateStatementBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     val dialect: Dialect,
     val context: RelationUpdateContext<ENTITY, ID, META>,
 ) {

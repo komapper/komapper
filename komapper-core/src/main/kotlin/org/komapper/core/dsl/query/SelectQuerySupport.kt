@@ -13,25 +13,25 @@ import org.komapper.core.dsl.expression.WhereDeclaration
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.ForUpdateOptions
 
-internal class SelectQuerySupport<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+internal class SelectQuerySupport<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: SelectContext<ENTITY, ID, META>
 ) {
 
-    fun <ENTITY2 : Any, ID2, META2 : EntityMetamodel<ENTITY2, ID2, META2>> innerJoin(
+    fun <ENTITY2 : Any, ID2 : Any, META2 : EntityMetamodel<ENTITY2, ID2, META2>> innerJoin(
         metamodel: META2,
         declaration: OnDeclaration
     ): SelectContext<ENTITY, ID, META> {
         return join(metamodel, declaration, JoinKind.INNER)
     }
 
-    fun <ENTITY2 : Any, ID2, META2 : EntityMetamodel<ENTITY2, ID2, META2>> leftJoin(
+    fun <ENTITY2 : Any, ID2 : Any, META2 : EntityMetamodel<ENTITY2, ID2, META2>> leftJoin(
         metamodel: META2,
         declaration: OnDeclaration
     ): SelectContext<ENTITY, ID, META> {
         return join(metamodel, declaration, JoinKind.LEFT_OUTER)
     }
 
-    private fun <ENTITY2 : Any, ID2, META2 : EntityMetamodel<ENTITY2, ID2, META2>> join(
+    private fun <ENTITY2 : Any, ID2 : Any, META2 : EntityMetamodel<ENTITY2, ID2, META2>> join(
         metamodel: META2,
         declaration: OnDeclaration,
         kind: JoinKind

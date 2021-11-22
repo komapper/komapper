@@ -8,7 +8,7 @@ import org.komapper.core.dsl.options.UpdateOptions
 import org.komapper.core.dsl.runner.EntityUpdateSingleRunner
 import org.komapper.jdbc.JdbcDatabaseConfig
 
-internal class EntityUpdateSingleJdbcRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+internal class EntityUpdateSingleJdbcRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     context: EntityUpdateContext<ENTITY, ID, META>,
     options: UpdateOptions,
     private val entity: ENTITY

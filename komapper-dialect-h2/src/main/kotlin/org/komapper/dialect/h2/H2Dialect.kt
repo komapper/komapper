@@ -22,7 +22,7 @@ interface H2Dialect : Dialect {
         return H2SchemaStatementBuilder(this)
     }
 
-    override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> getEntityUpsertStatementBuilder(
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> getEntityUpsertStatementBuilder(
         context: EntityUpsertContext<ENTITY, ID, META>,
         entities: List<ENTITY>
     ): EntityUpsertStatementBuilder<ENTITY> {

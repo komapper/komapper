@@ -9,7 +9,7 @@ interface EntityUpdateQuery<T> : Query<T> {
     fun options(configure: (UpdateOptions) -> UpdateOptions): EntityUpdateQuery<T>
 }
 
-internal data class EntityUpdateSingleQuery<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+internal data class EntityUpdateSingleQuery<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityUpdateContext<ENTITY, ID, META>,
     private val options: UpdateOptions,
     private val entity: ENTITY
@@ -23,7 +23,7 @@ internal data class EntityUpdateSingleQuery<ENTITY : Any, ID, META : EntityMetam
     }
 }
 
-internal data class EntityUpdateBatchQuery<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+internal data class EntityUpdateBatchQuery<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityUpdateContext<ENTITY, ID, META>,
     private val options: UpdateOptions,
     private val entities: List<ENTITY>,

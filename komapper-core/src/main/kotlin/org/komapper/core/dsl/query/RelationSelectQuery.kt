@@ -17,7 +17,7 @@ import org.komapper.core.dsl.visitor.QueryVisitor
 
 interface RelationSelectQuery<ENTITY : Any> : SelectQuery<ENTITY, RelationSelectQuery<ENTITY>>
 
-internal data class RelationSelectQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+internal data class RelationSelectQueryImpl<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     override val context: SelectContext<ENTITY, ID, META>,
     private val options: SelectOptions = SelectOptions.default
 ) :
@@ -33,7 +33,7 @@ internal data class RelationSelectQueryImpl<ENTITY : Any, ID, META : EntityMetam
         return copy(context = newContext)
     }
 
-    override fun <ENTITY2 : Any, ID2, META2 : EntityMetamodel<ENTITY2, ID2, META2>> innerJoin(
+    override fun <ENTITY2 : Any, ID2 : Any, META2 : EntityMetamodel<ENTITY2, ID2, META2>> innerJoin(
         metamodel: META2,
         on: OnDeclaration
     ): RelationSelectQuery<ENTITY> {
@@ -41,7 +41,7 @@ internal data class RelationSelectQueryImpl<ENTITY : Any, ID, META : EntityMetam
         return copy(context = newContext)
     }
 
-    override fun <ENTITY2 : Any, ID2, META2 : EntityMetamodel<ENTITY2, ID2, META2>> leftJoin(
+    override fun <ENTITY2 : Any, ID2 : Any, META2 : EntityMetamodel<ENTITY2, ID2, META2>> leftJoin(
         metamodel: META2,
         on: OnDeclaration
     ): RelationSelectQuery<ENTITY> {

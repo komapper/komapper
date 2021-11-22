@@ -10,7 +10,7 @@ import org.komapper.core.dsl.metamodel.PropertyMetamodel
 import org.komapper.core.dsl.options.InsertOptions
 
 @ThreadSafe
-interface EntityInsertQueryBuilder<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> {
+interface EntityInsertQueryBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> {
     fun onDuplicateKeyUpdate(vararg keys: PropertyMetamodel<ENTITY, *, *> = emptyArray()): EntityUpsertQueryBuilder<ENTITY, ID, META>
     fun onDuplicateKeyIgnore(vararg keys: PropertyMetamodel<ENTITY, *, *> = emptyArray()): EntityUpsertQueryBuilder<ENTITY, ID, META>
     fun single(entity: ENTITY): EntityInsertQuery<ENTITY>
@@ -22,7 +22,7 @@ interface EntityInsertQueryBuilder<ENTITY : Any, ID, META : EntityMetamodel<ENTI
     fun select(block: () -> SubqueryExpression<ENTITY>): RelationInsertQuery<ENTITY, ID>
 }
 
-internal data class EntityInsertQueryBuilderImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+internal data class EntityInsertQueryBuilderImpl<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityInsertContext<ENTITY, ID, META>,
     private val options: InsertOptions = InsertOptions.default
 ) :

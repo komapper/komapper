@@ -38,82 +38,82 @@ interface QueryVisitor<VISIT_RESULT> {
 
     fun <T, S> flatZipQuery(query: Query<T>, transform: (T) -> Query<S>): VISIT_RESULT
 
-    fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> entityContextQuery(
+    fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityContextQuery(
         context: SelectContext<ENTITY, ID, META>,
         options: SelectOptions
     ): VISIT_RESULT
 
-    fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>, R>
+    fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, R>
     entitySelectQuery(
         context: SelectContext<ENTITY, ID, META>,
         options: SelectOptions,
         collect: suspend (Flow<ENTITY>) -> R
     ): VISIT_RESULT
 
-    fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>
+    fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
     entityDeleteBatchQuery(
         context: EntityDeleteContext<ENTITY, ID, META>,
         options: DeleteOptions,
         entities: List<ENTITY>
     ): VISIT_RESULT
 
-    fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>
+    fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
     entityDeleteSingleQuery(
         context: EntityDeleteContext<ENTITY, ID, META>,
         options: DeleteOptions,
         entity: ENTITY
     ): VISIT_RESULT
 
-    fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>
+    fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
     entityInsertMultipleQuery(
         context: EntityInsertContext<ENTITY, ID, META>,
         options: InsertOptions,
         entities: List<ENTITY>
     ): VISIT_RESULT
 
-    fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>
+    fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
     entityInsertBatchQuery(
         context: EntityInsertContext<ENTITY, ID, META>,
         options: InsertOptions,
         entities: List<ENTITY>
     ): VISIT_RESULT
 
-    fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>
+    fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
     entityInsertSingleQuery(
         context: EntityInsertContext<ENTITY, ID, META>,
         options: InsertOptions,
         entity: ENTITY
     ): VISIT_RESULT
 
-    fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>
+    fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
     entityUpdateBatchQuery(
         context: EntityUpdateContext<ENTITY, ID, META>,
         options: UpdateOptions,
         entities: List<ENTITY>
     ): VISIT_RESULT
 
-    fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>
+    fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
     entityUpdateSingleQuery(
         context: EntityUpdateContext<ENTITY, ID, META>,
         options: UpdateOptions,
         entity: ENTITY
     ): VISIT_RESULT
 
-    fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>
+    fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
     entityUpsertBatchQuery(
         context: EntityUpsertContext<ENTITY, ID, META>,
         options: InsertOptions,
         entities: List<ENTITY>
     ): VISIT_RESULT
 
-    fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>
+    fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
     entityUpsertMultipleQuery(
         context: EntityUpsertContext<ENTITY, ID, META>,
         options: InsertOptions,
         entities: List<ENTITY>
     ): VISIT_RESULT
 
-    fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>
+    fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
     entityUpsertSingleQuery(
         context: EntityUpsertContext<ENTITY, ID, META>,
         options: InsertOptions,
@@ -137,7 +137,7 @@ interface QueryVisitor<VISIT_RESULT> {
         options: ScriptOptions
     ): VISIT_RESULT
 
-    fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>, R>
+    fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, R>
     sqlSelectQuery(
         context: SelectContext<ENTITY, ID, META>,
         options: SelectOptions,
@@ -214,19 +214,19 @@ interface QueryVisitor<VISIT_RESULT> {
         collect: suspend (Flow<Columns>) -> R
     ): VISIT_RESULT
 
-    fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>
+    fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
     relationDeleteQuery(
         context: RelationDeleteContext<ENTITY, ID, META>,
         options: DeleteOptions
     ): VISIT_RESULT
 
-    fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>
+    fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
     relationInsertQuery(
         context: RelationInsertContext<ENTITY, ID, META>,
         options: InsertOptions
     ): VISIT_RESULT
 
-    fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>
+    fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
     relationUpdateQuery(
         context: RelationUpdateContext<ENTITY, ID, META>,
         options: UpdateOptions

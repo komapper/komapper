@@ -15,7 +15,7 @@ interface EntityDeleteQueryBuilder<ENTITY : Any> {
     fun all(): RelationDeleteQuery
 }
 
-internal data class EntityDeleteQueryBuilderImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+internal data class EntityDeleteQueryBuilderImpl<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityDeleteContext<ENTITY, ID, META>,
     private val options: DeleteOptions = DeleteOptions.default
 ) :

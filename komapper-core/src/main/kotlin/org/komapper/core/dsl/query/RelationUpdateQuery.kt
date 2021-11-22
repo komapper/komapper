@@ -13,7 +13,7 @@ interface RelationUpdateQuery<ENTITY : Any> : Query<Int> {
     fun options(configure: (UpdateOptions) -> UpdateOptions): RelationUpdateQuery<ENTITY>
 }
 
-internal data class RelationUpdateQueryImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+internal data class RelationUpdateQueryImpl<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: RelationUpdateContext<ENTITY, ID, META>,
     private val options: UpdateOptions = UpdateOptions.default
 ) : RelationUpdateQuery<ENTITY> {

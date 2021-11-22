@@ -6,7 +6,7 @@ import org.komapper.core.dsl.context.EntityInsertContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.InsertOptions
 
-class EntityInsertMultipleRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+class EntityInsertMultipleRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     context: EntityInsertContext<ENTITY, ID, META>,
     options: InsertOptions,
     private val entities: List<ENTITY>

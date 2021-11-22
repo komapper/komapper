@@ -13,7 +13,7 @@ import org.komapper.core.dsl.expression.Operand
 import org.komapper.core.dsl.expression.TableExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 
-internal class H2EntityUpsertStatementBuilder<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+internal class H2EntityUpsertStatementBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     dialect: H2Dialect,
     private val context: EntityUpsertContext<ENTITY, ID, META>,
     entities: List<ENTITY>
@@ -90,7 +90,7 @@ internal class H2EntityUpsertStatementBuilder<ENTITY : Any, ID, META : EntityMet
         }
     }
 
-    private class SourceStatementBuilder<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+    private class SourceStatementBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
         val dialect: H2Dialect,
         val context: EntityUpsertContext<ENTITY, ID, META>,
         val entities: List<ENTITY>

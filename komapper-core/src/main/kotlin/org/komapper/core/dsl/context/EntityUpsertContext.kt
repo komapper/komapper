@@ -4,7 +4,7 @@ import org.komapper.core.dsl.expression.Operand
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.metamodel.PropertyMetamodel
 
-data class EntityUpsertContext<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+data class EntityUpsertContext<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     val insertContext: EntityInsertContext<ENTITY, ID, META>,
     val target: META,
     val excluded: META = target.newMetamodel(
@@ -22,7 +22,7 @@ data class EntityUpsertContext<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, 
 ) : QueryContext {
 
     companion object {
-        private fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> createAssignmentMap(
+        private fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> createAssignmentMap(
             m1: META,
             m2: META
         ): Map<PropertyMetamodel<ENTITY, *, *>, Operand> {
