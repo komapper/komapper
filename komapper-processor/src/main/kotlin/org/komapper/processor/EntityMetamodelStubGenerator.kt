@@ -13,8 +13,8 @@ internal class EntityMetamodelStubGenerator(
     private val metaObject: String,
     private val aliases: List<String>,
     private val packageName: String,
-    private val entityTypeName: String,
     private val simpleName: String,
+    private val entityTypeName: String,
     private val w: PrintWriter
 ) : Runnable {
 
