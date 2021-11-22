@@ -1,7 +1,5 @@
 package org.komapper.jdbc.dsl.runner
 
-import kotlinx.coroutines.runBlocking
-import org.komapper.core.Statement
 import org.komapper.core.dsl.context.EntityInsertContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.metamodel.IdGenerator
@@ -18,17 +16,8 @@ internal class EntityInsertJdbcRunnerSupport<ENTITY : Any, ID : Any, META : Enti
         val newEntity = when (val idGenerator = context.target.idGenerator()) {
             is IdGenerator.Sequence<ENTITY, ID> ->
                 if (!context.target.disableSequenceAssignment() && !options.disableSequenceAssignment) {
-                    runBlocking {
-                        val id = idGenerator.generate(config.id, config.dialect::enquote) { sequenceName ->
-                            val sql = config.dialect.getSequenceSql(sequenceName)
-                            val statement = Statement(sql)
-                            val executor = JdbcExecutor(config, options)
-                            executor.executeQuery(statement) { rs ->
-                                if (rs.next()) rs.getLong(1) else error("No result: ${statement.toSql()}")
-                            }
-                        }
-                        idGenerator.property.setter(entity, id)
-                    }
+                    val id = idGenerator.execute(config, options)
+                    idGenerator.property.setter(entity, id)
                 } else null
             else -> null
         }

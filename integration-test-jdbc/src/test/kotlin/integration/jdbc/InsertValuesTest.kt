@@ -3,6 +3,7 @@ package integration.jdbc
 import integration.address
 import integration.employee
 import integration.identityStrategy
+import integration.sequenceStrategy
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
@@ -57,11 +58,23 @@ class InsertValuesTest(private val db: JdbcDatabase) {
     }
 
     @Test
-    fun generatedKeys() {
+    fun generatedKeys_autoIncrement() {
         val a = Meta.identityStrategy
         val (count, id) = db.runQuery {
             QueryDsl.insert(a).values {
                 a.id set 10
+                a.value set "test"
+            }
+        }
+        assertEquals(1, count)
+        assertIs<Int>(id)
+    }
+
+    @Test
+    fun generatedKeys_sequence() {
+        val a = Meta.sequenceStrategy
+        val (count, id) = db.runQuery {
+            QueryDsl.insert(a).values {
                 a.value set "test"
             }
         }

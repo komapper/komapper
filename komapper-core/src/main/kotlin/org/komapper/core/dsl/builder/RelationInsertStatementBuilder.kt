@@ -9,11 +9,13 @@ import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.expression.Operand
 import org.komapper.core.dsl.expression.SubqueryExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
+import org.komapper.core.dsl.metamodel.PropertyMetamodel
 import org.komapper.core.dsl.metamodel.isAutoIncrement
 
 class RelationInsertStatementBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     val dialect: Dialect,
-    val context: RelationInsertContext<ENTITY, ID, META>
+    val context: RelationInsertContext<ENTITY, ID, META>,
+    private val idAssignment: Pair<PropertyMetamodel<ENTITY, ID, *>, Operand>?
 ) {
     private val aliasManager = DefaultAliasManager(context)
     private val buf = StatementBuffer()
@@ -26,22 +28,23 @@ class RelationInsertStatementBuilder<ENTITY : Any, ID : Any, META : EntityMetamo
         when (val values = context.values) {
             is Values.Declarations<ENTITY> -> {
                 buf.append(" (")
-                val assignments = values.getAssignments()
-                for (property in assignments.map { it.first }) {
-                    if (property.isAutoIncrement()) {
-                        continue
+                val assignments = (values.getAssignments().asSequence() + idAssignment)
+                    .filterNotNull()
+                    .filter { !it.first.isAutoIncrement() }
+                    .toList()
+                if (assignments.isNotEmpty()) {
+                    for ((property, _) in assignments) {
+                        column(property)
+                        buf.append(", ")
                     }
-                    column(property)
-                    buf.append(", ")
                 }
                 buf.cutBack(2)
                 buf.append(") values (")
-                for ((property, operand) in assignments) {
-                    if (property.isAutoIncrement()) {
-                        continue
+                if (assignments.isNotEmpty()) {
+                    for ((_, operand) in assignments) {
+                        operand(operand)
+                        buf.append(", ")
                     }
-                    operand(operand)
-                    buf.append(", ")
                 }
                 buf.cutBack(2)
                 buf.append(")")
