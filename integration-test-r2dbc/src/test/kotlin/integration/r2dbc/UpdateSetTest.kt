@@ -1,7 +1,10 @@
 package integration.r2dbc
 
+import integration.Person
 import integration.address
 import integration.employee
+import integration.person
+import kotlinx.coroutines.delay
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
@@ -12,9 +15,10 @@ import org.komapper.r2dbc.R2dbcDatabase
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import kotlin.test.assertNotEquals
 
 @ExtendWith(Env::class)
-class UpdateWhereTest(private val db: R2dbcDatabase) {
+class UpdateSetTest(private val db: R2dbcDatabase) {
 
     @Test
     fun test() = inTransaction(db) {
@@ -117,5 +121,28 @@ class UpdateWhereTest(private val db: R2dbcDatabase) {
             }.options { it.copy(allowEmptyWhereClause = true) }
         }
         assertEquals(14, count)
+    }
+
+    @Test
+    fun timestamp() = inTransaction(db) {
+        val p = Meta.person
+        val person1 = db.runQuery {
+            QueryDsl.insert(p).single(Person(1, "abc"))
+        }
+        delay(10)
+        val count = db.runQuery {
+            QueryDsl.update(p).set {
+                p.name set "ABC"
+            }.where {
+                p.personId eq 1
+            }
+        }
+        val person2 = db.runQuery {
+            QueryDsl.from(p).where {
+                p.personId eq 1
+            }.first()
+        }
+        assertEquals(1, count)
+        assertNotEquals(person1.updatedAt, person2.updatedAt)
     }
 }

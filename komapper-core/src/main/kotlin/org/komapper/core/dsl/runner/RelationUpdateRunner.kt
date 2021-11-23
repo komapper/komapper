@@ -4,7 +4,9 @@ import org.komapper.core.DatabaseConfig
 import org.komapper.core.Statement
 import org.komapper.core.dsl.builder.RelationUpdateStatementBuilder
 import org.komapper.core.dsl.context.RelationUpdateContext
+import org.komapper.core.dsl.expression.Operand
 import org.komapper.core.dsl.metamodel.EntityMetamodel
+import org.komapper.core.dsl.metamodel.PropertyMetamodel
 import org.komapper.core.dsl.options.UpdateOptions
 
 class RelationUpdateRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
@@ -16,8 +18,11 @@ class RelationUpdateRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY
         return buildStatement(config)
     }
 
-    fun buildStatement(config: DatabaseConfig): Statement {
-        val builder = RelationUpdateStatementBuilder(config.dialect, context)
+    fun buildStatement(
+        config: DatabaseConfig,
+        updatedAtAssignment: Pair<PropertyMetamodel<ENTITY, *, *>, Operand>? = null
+    ): Statement {
+        val builder = RelationUpdateStatementBuilder(config.dialect, context, updatedAtAssignment)
         return builder.build()
     }
 }

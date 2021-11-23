@@ -1,7 +1,9 @@
 package integration.jdbc
 
+import integration.Person
 import integration.address
 import integration.employee
+import integration.person
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
@@ -12,6 +14,7 @@ import org.komapper.jdbc.JdbcDatabase
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import kotlin.test.assertNotEquals
 
 @ExtendWith(Env::class)
 class UpdateSetTest(private val db: JdbcDatabase) {
@@ -117,5 +120,28 @@ class UpdateSetTest(private val db: JdbcDatabase) {
             }.options { it.copy(allowEmptyWhereClause = true) }
         }
         assertEquals(14, count)
+    }
+
+    @Test
+    fun timestamp() {
+        val p = Meta.person
+        val person1 = db.runQuery {
+            QueryDsl.insert(p).single(Person(1, "abc"))
+        }
+        Thread.sleep(10)
+        val count = db.runQuery {
+            QueryDsl.update(p).set {
+                p.name set "ABC"
+            }.where {
+                p.personId eq 1
+            }
+        }
+        val person2 = db.runQuery {
+            QueryDsl.from(p).where {
+                p.personId eq 1
+            }.first()
+        }
+        assertEquals(1, count)
+        assertNotEquals(person1.updatedAt, person2.updatedAt)
     }
 }
