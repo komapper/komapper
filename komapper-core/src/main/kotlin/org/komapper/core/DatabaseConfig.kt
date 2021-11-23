@@ -18,8 +18,7 @@ object DryRunDatabaseConfig : DatabaseConfig {
     override val dialect: Dialect = DryRunDialect
     override val logger: Logger
         get() = throw UnsupportedOperationException()
-    override val clockProvider: ClockProvider
-        get() = throw UnsupportedOperationException()
+    override val clockProvider: ClockProvider = DefaultClockProvider()
     override val executionOptions: ExecutionOptions
         get() = throw UnsupportedOperationException()
     override val statementInspector: StatementInspector
