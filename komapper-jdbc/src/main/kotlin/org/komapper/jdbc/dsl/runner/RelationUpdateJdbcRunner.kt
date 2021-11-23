@@ -17,9 +17,6 @@ internal class RelationUpdateJdbcRunner<ENTITY : Any, ID : Any, META : EntityMet
     private val runner: RelationUpdateRunner<ENTITY, ID, META> = RelationUpdateRunner(context, options)
 
     override fun run(config: JdbcDatabaseConfig): Int {
-        if (!options.allowEmptyWhereClause && context.getWhereDeclarations().isEmpty()) {
-            error("Empty where clause is not allowed.")
-        }
         val clock = config.clockProvider.now()
         val updatedAtAssignment = context.target.updatedAtAssignment(clock)
         val statement = runner.buildStatement(config, updatedAtAssignment)

@@ -35,6 +35,18 @@ class DeleteWhereTest(private val db: JdbcDatabase) {
     }
 
     @Test
+    fun allowEmptyWhereClause_default_empty() {
+        val e = Meta.employee
+        val ex = assertFailsWith<IllegalStateException> {
+            @Suppress("UNUSED_VARIABLE")
+            val count = db.runQuery {
+                QueryDsl.delete(e).where { }
+            }
+        }
+        assertEquals("Empty where clause is not allowed.", ex.message)
+    }
+
+    @Test
     fun allowEmptyWhereClause_true() {
         val e = Meta.employee
         val count = db.runQuery {

@@ -12,7 +12,7 @@ import org.komapper.jdbc.JdbcExecutor
 import java.sql.ResultSet
 
 internal class SelectJdbcRunner<T, R>(
-    private val context: SelectContext<*, *, *>,
+    context: SelectContext<*, *, *>,
     private val options: SelectOptions,
     private val transform: (JdbcDialect, ResultSet) -> T,
     private val collect: suspend (Flow<T>) -> R
@@ -22,9 +22,6 @@ internal class SelectJdbcRunner<T, R>(
     private val runner: SelectRunner = SelectRunner(context, options)
 
     override fun run(config: JdbcDatabaseConfig): R {
-        if (!options.allowEmptyWhereClause && context.where.isEmpty()) {
-            error("Empty where clause is not allowed.")
-        }
         val statement = runner.buildStatement(config)
         val executor = JdbcExecutor(config, options)
         return executor.executeQuery(statement, transform, collect)
