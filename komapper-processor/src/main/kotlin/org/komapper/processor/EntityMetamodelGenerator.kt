@@ -83,6 +83,7 @@ internal class EntityMetamodelGenerator(
         properties()
         id()
         toId()
+        toVersionAssignment()
         toCreatedAtAssignment()
         toUpdatedAtAssignment()
         preInsert()
@@ -259,6 +260,19 @@ internal class EntityMetamodelGenerator(
             "null"
         }
         w.println("    override fun toId(generatedKey: Long): $idTypeName? = $body")
+    }
+
+    private fun toVersionAssignment() {
+        val body = entity.versionProperty?.let {
+            if (it.valueClass == null) {
+                val tag = it.literalTag
+                "$it to $Argument($it, 0$tag)"
+            } else {
+                val tag = it.valueClass.property.literalTag
+                "$it to $Argument($it, ${it.valueClass}(0$tag))"
+            }
+        } ?: "null"
+        w.println("    override fun toVersionAssignment(): Pair<$PropertyMetamodel<$entityTypeName, *, *>, $Operand>? = $body")
     }
 
     private fun toCreatedAtAssignment() {

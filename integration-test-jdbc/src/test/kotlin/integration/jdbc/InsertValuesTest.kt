@@ -105,6 +105,21 @@ class InsertValuesTest(private val db: JdbcDatabase) {
     }
 
     @Test
+    fun version() {
+        val a = Meta.address
+        val (count, key) = db.runQuery {
+            QueryDsl.insert(a).values {
+                a.addressId set 19
+                a.street set "STREET 16"
+            }
+        }
+        assertEquals(1, count)
+        assertNull(key)
+        val address = db.runQuery { QueryDsl.from(a).where { a.addressId eq 19 }.first() }
+        assertEquals(0, address.version)
+    }
+
+    @Test
     fun select() {
         val a = Meta.address
         val aa = a.clone(table = "ADDRESS_ARCHIVE")

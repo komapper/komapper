@@ -16,6 +16,7 @@ class RelationInsertStatementBuilder<ENTITY : Any, ID : Any, META : EntityMetamo
     val dialect: Dialect,
     val context: RelationInsertContext<ENTITY, ID, META>,
     private val idAssignment: Pair<PropertyMetamodel<ENTITY, ID, *>, Operand>?,
+    private val versionAssignment: Pair<PropertyMetamodel<ENTITY, *, *>, Operand>?,
     private val createdAtAssignment: Pair<PropertyMetamodel<ENTITY, *, *>, Operand>?,
     private val updatedAtAssignment: Pair<PropertyMetamodel<ENTITY, *, *>, Operand>?,
 ) {
@@ -30,10 +31,7 @@ class RelationInsertStatementBuilder<ENTITY : Any, ID : Any, META : EntityMetamo
         when (val values = context.values) {
             is Values.Declarations<ENTITY> -> {
                 buf.append(" (")
-                val additionalAssignments = listOfNotNull(idAssignment, createdAtAssignment, updatedAtAssignment)
-                val assignments = (values.getAssignments() + additionalAssignments)
-                    .filter { !it.first.isAutoIncrement() }
-                    .toList()
+                val assignments = toAssignments(values)
                 if (assignments.isNotEmpty()) {
                     for ((property, _) in assignments) {
                         column(property)
@@ -63,6 +61,20 @@ class RelationInsertStatementBuilder<ENTITY : Any, ID : Any, META : EntityMetamo
             }
         }
         return buf.toStatement()
+    }
+
+    private fun toAssignments(values: Values.Declarations<ENTITY>): List<Pair<PropertyMetamodel<ENTITY, *, *>, Operand>> {
+        val assignments = values.getAssignments()
+        val properties = assignments.map { it.first }
+        val additionalAssignments = listOfNotNull(
+            idAssignment,
+            versionAssignment,
+            createdAtAssignment,
+            updatedAtAssignment
+        ).filterNot { it.first in properties }
+        return (assignments + additionalAssignments)
+            .filter { !it.first.isAutoIncrement() }
+            .toList()
     }
 
     private fun table(metamodel: EntityMetamodel<*, *, *>) {
