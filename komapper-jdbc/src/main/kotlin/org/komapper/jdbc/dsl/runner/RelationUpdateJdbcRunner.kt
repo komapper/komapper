@@ -21,7 +21,7 @@ internal class RelationUpdateJdbcRunner<ENTITY : Any, ID : Any, META : EntityMet
             error("Empty where clause is not allowed.")
         }
         val clock = config.clockProvider.now()
-        val updatedAtAssignment = context.target.toUpdatedAtAssignment(clock)
+        val updatedAtAssignment = context.target.updatedAtAssignment(clock)
         val statement = runner.buildStatement(config, updatedAtAssignment)
         val executor = JdbcExecutor(config, options)
         val (count) = executor.executeUpdate(statement)

@@ -34,9 +34,9 @@ internal class RelationInsertR2dbcRunner<ENTITY : Any, ID : Any, META : EntityMe
             runner.buildStatement(
                 config,
                 pair?.second,
-                context.target.toVersionAssignment(),
-                context.target.toCreatedAtAssignment(clock),
-                context.target.toUpdatedAtAssignment(clock)
+                context.target.versionAssignment(),
+                context.target.createdAtAssignment(clock),
+                context.target.updatedAtAssignment(clock)
             )
         val generatedColumn = when (val idGenerator = context.target.idGenerator()) {
             is IdGenerator.AutoIncrement<ENTITY, *> -> idGenerator.property.columnName

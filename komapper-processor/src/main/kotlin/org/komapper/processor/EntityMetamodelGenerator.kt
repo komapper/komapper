@@ -1,7 +1,6 @@
 package org.komapper.processor
 
 import com.google.devtools.ksp.symbol.Nullability
-import org.komapper.core.dsl.expression.Operand
 import org.komapper.processor.ClassNames.Argument
 import org.komapper.processor.ClassNames.AutoIncrement
 import org.komapper.processor.ClassNames.Clock
@@ -83,9 +82,9 @@ internal class EntityMetamodelGenerator(
         properties()
         id()
         toId()
-        toVersionAssignment()
-        toCreatedAtAssignment()
-        toUpdatedAtAssignment()
+        versionAssignment()
+        createdAtAssignment()
+        updatedAtAssignment()
         preInsert()
         preUpdate()
         postUpdate()
@@ -262,7 +261,7 @@ internal class EntityMetamodelGenerator(
         w.println("    override fun toId(generatedKey: Long): $idTypeName? = $body")
     }
 
-    private fun toVersionAssignment() {
+    private fun versionAssignment() {
         val body = entity.versionProperty?.let {
             if (it.valueClass == null) {
                 val tag = it.literalTag
@@ -272,10 +271,10 @@ internal class EntityMetamodelGenerator(
                 "$it to $Argument($it, ${it.valueClass}(0$tag))"
             }
         } ?: "null"
-        w.println("    override fun toVersionAssignment(): Pair<$PropertyMetamodel<$entityTypeName, *, *>, $Operand>? = $body")
+        w.println("    override fun versionAssignment(): Pair<$PropertyMetamodel<$entityTypeName, *, *>, $Operand>? = $body")
     }
 
-    private fun toCreatedAtAssignment() {
+    private fun createdAtAssignment() {
         val body = entity.createdAtProperty?.let {
             if (it.valueClass == null) {
                 "$it to $Argument($it, ${it.typeName}.now(c))"
@@ -283,10 +282,10 @@ internal class EntityMetamodelGenerator(
                 "$it to $Argument($it, ${it.typeName}(${it.valueClass.property.typeName}.now(c)))"
             }
         } ?: "null"
-        w.println("    override fun toCreatedAtAssignment(c: $Clock): Pair<$PropertyMetamodel<$entityTypeName, *, *>, $Operand>? = $body")
+        w.println("    override fun createdAtAssignment(c: $Clock): Pair<$PropertyMetamodel<$entityTypeName, *, *>, $Operand>? = $body")
     }
 
-    private fun toUpdatedAtAssignment() {
+    private fun updatedAtAssignment() {
         val body = entity.updatedAtProperty?.let {
             if (it.valueClass == null) {
                 "$it to $Argument($it, ${it.typeName}.now(c))"
@@ -294,7 +293,7 @@ internal class EntityMetamodelGenerator(
                 "$it to $Argument($it, ${it.typeName}(${it.valueClass.property.typeName}.now(c)))"
             }
         } ?: "null"
-        w.println("    override fun toUpdatedAtAssignment(c: $Clock): Pair<$PropertyMetamodel<$entityTypeName, *, *>, $Operand>? = $body")
+        w.println("    override fun updatedAtAssignment(c: $Clock): Pair<$PropertyMetamodel<$entityTypeName, *, *>, $Operand>? = $body")
     }
 
     private fun preInsert() {
