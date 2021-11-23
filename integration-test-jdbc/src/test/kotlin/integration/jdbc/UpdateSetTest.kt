@@ -144,4 +144,51 @@ class UpdateSetTest(private val db: JdbcDatabase) {
         assertEquals(1, count)
         assertNotEquals(person1.updatedAt, person2.updatedAt)
     }
+
+    @Test
+    fun versionIncrement() {
+        val a = Meta.address
+        val address1 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.first() }
+        assertEquals(1, address1.version)
+
+        val count = db.runQuery {
+            QueryDsl.update(a).set {
+                a.street set "STREET 16"
+            }.where {
+                a.addressId eq 1
+            }
+        }
+        assertEquals(1, count)
+
+        val address2 = db.runQuery {
+            QueryDsl.from(a).where {
+                a.addressId eq 1
+            }.first()
+        }
+        assertEquals(2, address2.version)
+    }
+
+    @Test
+    fun versionIncrement_disabled() {
+        val a = Meta.address
+        val address1 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.first() }
+        assertEquals(1, address1.version)
+
+        val count = db.runQuery {
+            QueryDsl.update(a).set {
+                a.street set "STREET 16"
+                a.version set 10
+            }.where {
+                a.addressId eq 1
+            }
+        }
+        assertEquals(1, count)
+
+        val address2 = db.runQuery {
+            QueryDsl.from(a).where {
+                a.addressId eq 1
+            }.first()
+        }
+        assertEquals(10, address2.version)
+    }
 }

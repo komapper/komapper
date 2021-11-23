@@ -25,15 +25,24 @@ class RelationUpdateStatementBuilder<ENTITY : Any, ID : Any, META : EntityMetamo
         buf.append("update ")
         table(context.target)
         buf.append(" set ")
-        val additionalAssignment = listOfNotNull(updatedAtAssignment)
-        val assignments = context.getAssignments() + additionalAssignment
-        for ((left, right) in assignments) {
-            column(left)
-            buf.append(" = ")
-            operand(right)
-            buf.append(", ")
+        val assignments = getAssignments()
+        if (assignments.isNotEmpty()) {
+            for ((left, right) in assignments) {
+                column(left)
+                buf.append(" = ")
+                operand(right)
+                buf.append(", ")
+            }
+            buf.cutBack(2)
         }
-        buf.cutBack(2)
+        val version = context.target.versionProperty()
+        if (version != null && version !in assignments.map { it.first }) {
+            buf.append(", ")
+            column(version)
+            buf.append(" = ")
+            column(version)
+            buf.append(" + 1")
+        }
         val criteria = context.getWhereCriteria()
         if (criteria.isNotEmpty()) {
             buf.append(" where ")
@@ -44,6 +53,13 @@ class RelationUpdateStatementBuilder<ENTITY : Any, ID : Any, META : EntityMetamo
             buf.cutBack(5)
         }
         return buf.toStatement()
+    }
+
+    private fun getAssignments(): List<Pair<PropertyMetamodel<ENTITY, *, *>, Operand>> {
+        val assignments = context.getAssignments()
+        val properties = assignments.map { it.first }
+        val additionalAssignment = listOfNotNull(updatedAtAssignment).filterNot { it.first in properties }
+        return assignments + additionalAssignment
     }
 
     private fun table(expression: TableExpression<*>) {
