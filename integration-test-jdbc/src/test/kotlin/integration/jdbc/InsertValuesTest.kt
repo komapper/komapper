@@ -10,6 +10,7 @@ import integration.setting.Run
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
+import org.komapper.core.dsl.query.dryRun
 import org.komapper.core.dsl.query.first
 import org.komapper.jdbc.JdbcDatabase
 import java.math.BigDecimal
@@ -166,5 +167,40 @@ class InsertValuesTest(private val db: JdbcDatabase) {
             }
         }
         assertEquals(5, count)
+    }
+
+    @Test
+    fun dryRun_sequence() {
+        val s = Meta.sequenceStrategy
+        val query = QueryDsl.insert(s).values {
+            s.value set "test"
+        }
+        val result = query.dryRun()
+        val expected = "insert into SEQUENCE_STRATEGY (VALUE, ID) values (?, ?)"
+        assertEquals(expected, result.sql)
+    }
+
+    @Test
+    fun dryRun_timestamp() {
+        val p = Meta.person
+        val query = QueryDsl.insert(p).values {
+            p.personId set 99
+            p.name set "test"
+        }
+        val result = query.dryRun()
+        val expected = "insert into PERSON (PERSON_ID, NAME, CREATED_AT, UPDATED_AT) values (?, ?, ?, ?)"
+        assertEquals(expected, result.sql)
+    }
+
+    @Test
+    fun dryRun_version() {
+        val a = Meta.address
+        val query = QueryDsl.insert(a).values {
+            a.addressId set 16
+            a.street set "STREET 16"
+        }
+        val result = query.dryRun()
+        val expected = "insert into ADDRESS (ADDRESS_ID, STREET, VERSION) values (?, ?, ?)"
+        assertEquals(expected, result.sql)
     }
 }

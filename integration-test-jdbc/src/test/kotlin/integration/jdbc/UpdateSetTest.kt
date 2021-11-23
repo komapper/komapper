@@ -9,6 +9,7 @@ import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
 import org.komapper.core.dsl.operator.concat
 import org.komapper.core.dsl.operator.plus
+import org.komapper.core.dsl.query.dryRun
 import org.komapper.core.dsl.query.first
 import org.komapper.jdbc.JdbcDatabase
 import kotlin.test.Test
@@ -214,5 +215,31 @@ class UpdateSetTest(private val db: JdbcDatabase) {
             }.first()
         }
         assertEquals(10, address2.version)
+    }
+
+    @Test
+    fun dryRun_timestamp() {
+        val p = Meta.person
+        val query = QueryDsl.update(p).set {
+            p.name set "test"
+        }.where {
+            p.personId eq 1
+        }
+        val result = query.dryRun()
+        val expected = "update PERSON as t0_ set NAME = ?, UPDATED_AT = ? where t0_.PERSON_ID = ?"
+        assertEquals(expected, result.sql)
+    }
+
+    @Test
+    fun dryRun_version() {
+        val a = Meta.address
+        val query = QueryDsl.update(a).set {
+            a.street set "STREET 16"
+        }.where {
+            a.addressId eq 16
+        }
+        val result = query.dryRun()
+        val expected = "update ADDRESS as t0_ set STREET = ?, VERSION = VERSION + 1 where t0_.ADDRESS_ID = ?"
+        assertEquals(expected, result.sql)
     }
 }

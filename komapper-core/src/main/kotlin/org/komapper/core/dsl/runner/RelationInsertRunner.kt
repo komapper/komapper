@@ -6,6 +6,7 @@ import org.komapper.core.dsl.builder.RelationInsertStatementBuilder
 import org.komapper.core.dsl.context.RelationInsertContext
 import org.komapper.core.dsl.expression.Operand
 import org.komapper.core.dsl.metamodel.EntityMetamodel
+import org.komapper.core.dsl.metamodel.IdGenerator
 import org.komapper.core.dsl.metamodel.PropertyMetamodel
 import org.komapper.core.dsl.options.InsertOptions
 
@@ -15,7 +16,18 @@ class RelationInsertRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY
 ) : Runner {
 
     override fun dryRun(config: DatabaseConfig): Statement {
-        return buildStatement(config)
+        val idAssignment = when (val idGenerator = context.target.idGenerator()) {
+            is IdGenerator.Sequence<ENTITY, ID> -> {
+                val argument = Operand.Argument(idGenerator.property, null)
+                idGenerator.property to argument
+            }
+            else -> null
+        }
+        val versionAssignment = context.target.versionAssignment()
+        val clock = config.clockProvider.now()
+        val createdAtAssignment = context.target.createdAtAssignment(clock)
+        val updatedAtAssignment = context.target.updatedAtAssignment(clock)
+        return buildStatement(config, idAssignment, versionAssignment, createdAtAssignment, updatedAtAssignment)
     }
 
     fun buildStatement(
