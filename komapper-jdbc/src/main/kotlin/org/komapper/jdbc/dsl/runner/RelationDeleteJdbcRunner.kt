@@ -9,7 +9,7 @@ import org.komapper.core.dsl.runner.RelationDeleteRunner
 import org.komapper.jdbc.JdbcDatabaseConfig
 import org.komapper.jdbc.JdbcExecutor
 
-internal class RelationDeleteJdbcRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+internal class RelationDeleteJdbcRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: RelationDeleteContext<ENTITY, ID, META>,
     private val options: DeleteOptions
 ) : JdbcRunner<Int> {

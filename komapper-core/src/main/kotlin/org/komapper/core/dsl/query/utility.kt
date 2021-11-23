@@ -12,14 +12,14 @@ import org.komapper.core.dsl.visitor.DefaultQueryVisitor
 import org.komapper.core.dsl.visitor.QueryVisitor
 import org.komapper.core.toDryRunResult
 
-internal fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>
+internal fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
 EntityMetamodel<ENTITY, ID, META>.checkIdValueNotNull(entity: ENTITY) {
     this.idProperties().forEach { p ->
         p.getter(entity) ?: error("The id value must not null. name=${p.name}")
     }
 }
 
-internal fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>
+internal fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
 EntityMetamodel<ENTITY, ID, META>.checkIdValueNotNull(entities: List<ENTITY>) {
     entities.mapIndexed { index, entity ->
         this.idProperties().forEach { p ->

@@ -8,7 +8,7 @@ import org.komapper.core.dsl.options.DeleteOptions
 import org.komapper.core.dsl.runner.EntityDeleteBatchRunner
 import org.komapper.jdbc.JdbcDatabaseConfig
 
-internal class EntityDeleteBatchJdbcRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+internal class EntityDeleteBatchJdbcRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     context: EntityDeleteContext<ENTITY, ID, META>,
     options: DeleteOptions,
     private val entities: List<ENTITY>

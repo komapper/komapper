@@ -9,7 +9,7 @@ interface EntityDeleteQuery : Query<Unit> {
     fun options(configure: (DeleteOptions) -> DeleteOptions): EntityDeleteQuery
 }
 
-internal data class EntityDeleteSingleQuery<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+internal data class EntityDeleteSingleQuery<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityDeleteContext<ENTITY, ID, META>,
     private val options: DeleteOptions,
     private val entity: ENTITY
@@ -24,7 +24,7 @@ internal data class EntityDeleteSingleQuery<ENTITY : Any, ID, META : EntityMetam
     }
 }
 
-internal data class EntityDeleteBatchQuery<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+internal data class EntityDeleteBatchQuery<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityDeleteContext<ENTITY, ID, META>,
     private val options: DeleteOptions,
     private val entities: List<ENTITY>,

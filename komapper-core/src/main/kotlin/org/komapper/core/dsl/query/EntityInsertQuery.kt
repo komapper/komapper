@@ -9,7 +9,7 @@ interface EntityInsertQuery<T> : Query<T> {
     fun options(configure: (InsertOptions) -> InsertOptions): EntityInsertQuery<T>
 }
 
-internal data class EntityInsertSingleQuery<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+internal data class EntityInsertSingleQuery<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityInsertContext<ENTITY, ID, META>,
     private val options: InsertOptions,
     private val entity: ENTITY
@@ -23,7 +23,7 @@ internal data class EntityInsertSingleQuery<ENTITY : Any, ID, META : EntityMetam
     }
 }
 
-internal data class EntityInsertMultipleQuery<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+internal data class EntityInsertMultipleQuery<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityInsertContext<ENTITY, ID, META>,
     private val options: InsertOptions,
     private val entities: List<ENTITY>
@@ -37,7 +37,7 @@ internal data class EntityInsertMultipleQuery<ENTITY : Any, ID, META : EntityMet
     }
 }
 
-internal data class EntityInsertBatchQuery<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+internal data class EntityInsertBatchQuery<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityInsertContext<ENTITY, ID, META>,
     private val options: InsertOptions,
     private val entities: List<ENTITY>,

@@ -4,7 +4,7 @@ import org.komapper.core.dsl.expression.WhereDeclaration
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.metamodel.where
 
-data class RelationDeleteContext<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+data class RelationDeleteContext<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     val target: META,
     val where: List<WhereDeclaration> = listOf()
 ) : QueryContext {

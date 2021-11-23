@@ -5,39 +5,32 @@ import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 
 @ThreadSafe
-sealed class IdAssignment<ENTITY> {
+sealed class IdGenerator<ENTITY : Any, ID : Any> {
+
+    abstract val property: PropertyMetamodel<ENTITY, ID, *>
 
     class AutoIncrement<ENTITY : Any, ID : Any>(
-        private val toId: (Long) -> ID?,
-        val property: PropertyMetamodel<ENTITY, ID, *>,
-    ) :
-        IdAssignment<ENTITY>() {
-
-        fun assign(entity: ENTITY, generatedKey: Long): ENTITY {
-            return executeAssignment(entity, property, generatedKey, toId)
-        }
-    }
+        override val property: PropertyMetamodel<ENTITY, ID, *>,
+    ) : IdGenerator<ENTITY, ID>()
 
     class Sequence<ENTITY : Any, ID : Any>(
+        override val property: PropertyMetamodel<ENTITY, ID, *>,
         private val toId: (Long) -> ID?,
-        private val property: PropertyMetamodel<ENTITY, ID, *>,
-        private val idContextMap: ConcurrentHashMap<UUID, IdContext> = ConcurrentHashMap(),
+        private val idContextMap: ConcurrentHashMap<UUID, IdContext>,
         val name: String,
         val catalogName: String,
         val schemaName: String,
         val alwaysQuote: Boolean,
         val startWith: Int,
         val incrementBy: Int,
-        val disableSequenceAssignment: Boolean
     ) :
-        IdAssignment<ENTITY>() {
+        IdGenerator<ENTITY, ID>() {
 
-        suspend fun assign(
-            entity: ENTITY,
+        suspend fun generate(
             key: UUID,
             enquote: (String) -> String,
             sequenceNextValue: suspend (String) -> Long
-        ): ENTITY {
+        ): ID {
             val context = idContextMap.computeIfAbsent(key) {
                 IdContext(startWith, incrementBy)
             }
@@ -45,7 +38,7 @@ sealed class IdAssignment<ENTITY> {
                 val sequenceName = getCanonicalSequenceName(enquote)
                 sequenceNextValue(sequenceName)
             }
-            return executeAssignment(entity, property, generatedKey, toId)
+            return toId(generatedKey)!!
         }
 
         fun getCanonicalSequenceName(enquote: (String) -> String): String {
@@ -58,15 +51,4 @@ sealed class IdAssignment<ENTITY> {
                 .filter { it.isNotBlank() }.joinToString(".", transform = transform)
         }
     }
-}
-
-private fun <ENTITY : Any, ID : Any> executeAssignment(
-    entity: ENTITY,
-    property: PropertyMetamodel<ENTITY, ID, *>,
-    generatedKey: Long,
-    toId: (Long) -> ID?
-): ENTITY {
-    val id = toId(generatedKey)
-    checkNotNull(id) { "generatedKey: $generatedKey" }
-    return property.setter(entity, id)
 }

@@ -12,12 +12,12 @@ import org.komapper.core.dsl.options.SelectOptions
 interface SelectQuery<ENTITY : Any, QUERY : SelectQuery<ENTITY, QUERY>> :
     FlowSubquery<ENTITY> {
     fun distinct(): QUERY
-    fun <ENTITY2 : Any, ID2, META2 : EntityMetamodel<ENTITY2, ID2, META2>> innerJoin(
+    fun <ENTITY2 : Any, ID2 : Any, META2 : EntityMetamodel<ENTITY2, ID2, META2>> innerJoin(
         metamodel: META2,
         on: OnDeclaration
     ): QUERY
 
-    fun <ENTITY2 : Any, ID2, META2 : EntityMetamodel<ENTITY2, ID2, META2>> leftJoin(
+    fun <ENTITY2 : Any, ID2 : Any, META2 : EntityMetamodel<ENTITY2, ID2, META2>> leftJoin(
         metamodel: META2,
         on: OnDeclaration
     ): QUERY

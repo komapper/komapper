@@ -8,7 +8,7 @@ import org.komapper.core.dsl.expression.Criterion
 import org.komapper.core.dsl.expression.TableExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 
-class RelationDeleteStatementBuilder<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+class RelationDeleteStatementBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     val dialect: Dialect,
     val context: RelationDeleteContext<ENTITY, ID, META>
 ) {

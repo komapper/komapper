@@ -15,7 +15,7 @@ import org.komapper.core.dsl.expression.TableExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.metamodel.getNonAutoIncrementProperties
 
-class PostgreSqlEntityUpsertStatementBuilder<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+class PostgreSqlEntityUpsertStatementBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val dialect: Dialect,
     private val context: EntityUpsertContext<ENTITY, ID, META>,
     private val entities: List<ENTITY>

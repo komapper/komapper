@@ -17,7 +17,7 @@ interface EntityUpdateQueryBuilder<ENTITY : Any> {
     fun set(declaration: SetDeclaration<ENTITY>): RelationUpdateQuery<ENTITY>
 }
 
-internal data class EntityUpdateQueryBuilderImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+internal data class EntityUpdateQueryBuilderImpl<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityUpdateContext<ENTITY, ID, META>,
     private val options: UpdateOptions = UpdateOptions.default
 ) :

@@ -7,8 +7,8 @@ import org.komapper.processor.ClassNames.ConcurrentHashMap
 import org.komapper.processor.ClassNames.EntityDescriptor
 import org.komapper.processor.ClassNames.EntityMetamodel
 import org.komapper.processor.ClassNames.EntityMetamodelImplementor
-import org.komapper.processor.ClassNames.IdAssignment
 import org.komapper.processor.ClassNames.IdContext
+import org.komapper.processor.ClassNames.IdGenerator
 import org.komapper.processor.ClassNames.MetamodelDeclaration
 import org.komapper.processor.ClassNames.PropertyDescriptor
 import org.komapper.processor.ClassNames.PropertyMetamodel
@@ -69,9 +69,10 @@ internal class EntityMetamodelGenerator(
         catalogName()
         schemaName()
         alwaysQuote()
+        disableSequenceAssignment()
         declarations()
 
-        idAssignment()
+        idGenerator()
         idProperties()
         versionProperty()
         createdAtProperty()
@@ -155,11 +156,15 @@ internal class EntityMetamodelGenerator(
         w.println("    override fun alwaysQuote() = __alwaysQuote")
     }
 
+    private fun disableSequenceAssignment() {
+        w.println("    override fun disableSequenceAssignment() = __disableSequenceAssignment")
+    }
+
     private fun declarations() {
         w.println("    override fun declarations() = __declarations")
     }
 
-    private fun idAssignment() {
+    private fun idGenerator() {
         val pair = entity.properties.mapNotNull {
             when (it.kind) {
                 is PropertyKind.Id -> {
@@ -170,17 +175,17 @@ internal class EntityMetamodelGenerator(
             }
         }.firstOrNull()
 
-        w.print("    override fun idAssignment(): $IdAssignment<$entityTypeName>? = ")
+        w.print("    override fun idGenerator(): $IdGenerator<$entityTypeName, $idTypeName>? = ")
         if (pair != null) {
             val (p, idKind) = pair
             val assignment = when (idKind) {
                 is IdKind.AutoIncrement -> {
-                    "$AutoIncrement(::toId, $p)"
+                    "$AutoIncrement($p)"
                 }
                 is IdKind.Sequence -> {
                     val paramList = listOf(
-                        "::toId",
                         "$p",
+                        "::toId",
                         "$EntityDescriptor.__idContextMap",
                         "\"${idKind.name}\"",
                         "\"${idKind.catalog}\"",
@@ -188,7 +193,6 @@ internal class EntityMetamodelGenerator(
                         "${idKind.alwaysQuote}",
                         "${idKind.startWith}",
                         "${idKind.incrementBy}",
-                        "__disableSequenceAssignment"
                     ).joinToString(", ")
                     "$Sequence($paramList)"
                 }

@@ -83,14 +83,14 @@ internal object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
         }
     }
 
-    override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> entityContextQuery(
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityContextQuery(
         context: SelectContext<ENTITY, ID, META>,
         options: SelectOptions
     ): R2dbcRunner<*> {
         return EntityContextR2dbcRunner(context, options)
     }
 
-    override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>, R> entitySelectQuery(
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, R> entitySelectQuery(
         context: SelectContext<ENTITY, ID, META>,
         options: SelectOptions,
         collect: suspend (Flow<ENTITY>) -> R
@@ -99,7 +99,7 @@ internal object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
         return SelectR2dbcRunner(context, options, transform, collect)
     }
 
-    override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
     entityDeleteBatchQuery(
         context: EntityDeleteContext<ENTITY, ID, META>,
         options: DeleteOptions,
@@ -108,7 +108,7 @@ internal object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
         throw UnsupportedOperationException("Batch delete is not supported.")
     }
 
-    override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
     entityDeleteSingleQuery(
         context: EntityDeleteContext<ENTITY, ID, META>,
         options: DeleteOptions,
@@ -117,7 +117,7 @@ internal object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
         return EntityDeleteSingleR2dbcRunner(context, options, entity)
     }
 
-    override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> entityInsertMultipleQuery(
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityInsertMultipleQuery(
         context: EntityInsertContext<ENTITY, ID, META>,
         options: InsertOptions,
         entities: List<ENTITY>
@@ -125,7 +125,7 @@ internal object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
         return EntityInsertMultipleR2dbcRunner(context, options, entities)
     }
 
-    override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> entityInsertBatchQuery(
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityInsertBatchQuery(
         context: EntityInsertContext<ENTITY, ID, META>,
         options: InsertOptions,
         entities: List<ENTITY>
@@ -133,7 +133,7 @@ internal object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
         throw UnsupportedOperationException("Batch insert is not supported. Instead, use multiple insert.")
     }
 
-    override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> entityInsertSingleQuery(
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityInsertSingleQuery(
         context: EntityInsertContext<ENTITY, ID, META>,
         options: InsertOptions,
         entity: ENTITY
@@ -141,7 +141,7 @@ internal object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
         return EntityInsertSingleR2dbcRunner(context, options, entity)
     }
 
-    override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
     entityUpdateBatchQuery(
         context: EntityUpdateContext<ENTITY, ID, META>,
         options: UpdateOptions,
@@ -150,7 +150,7 @@ internal object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
         throw UnsupportedOperationException("Batch update is not supported. Instead, use multiple update.")
     }
 
-    override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
     entityUpdateSingleQuery(
         context: EntityUpdateContext<ENTITY, ID, META>,
         options: UpdateOptions,
@@ -159,7 +159,7 @@ internal object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
         return EntityUpdateSingleR2dbcRunner(context, options, entity)
     }
 
-    override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
     entityUpsertBatchQuery(
         context: EntityUpsertContext<ENTITY, ID, META>,
         options: InsertOptions,
@@ -168,7 +168,7 @@ internal object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
         throw UnsupportedOperationException("Batch upsert is not supported. Instead, use multiple upsert.")
     }
 
-    override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
     entityUpsertMultipleQuery(
         context: EntityUpsertContext<ENTITY, ID, META>,
         options: InsertOptions,
@@ -177,7 +177,7 @@ internal object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
         return EntityUpsertMultipleR2dbcRunner(context, options, entities)
     }
 
-    override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
     entityUpsertSingleQuery(
         context: EntityUpsertContext<ENTITY, ID, META>,
         options: InsertOptions,
@@ -211,7 +211,7 @@ internal object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
         return ScriptExecuteR2dbcRunner(sql, options)
     }
 
-    override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>, R>
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, R>
     sqlSelectQuery(
         context: SelectContext<ENTITY, ID, META>,
         options: SelectOptions,
@@ -311,21 +311,21 @@ internal object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
         return SetOperationR2dbcRunner(context, options, transform, collect)
     }
 
-    override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> relationDeleteQuery(
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> relationDeleteQuery(
         context: RelationDeleteContext<ENTITY, ID, META>,
         options: DeleteOptions
     ): R2dbcRunner<Int> {
         return RelationDeleteR2dbcRunner(context, options)
     }
 
-    override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> relationInsertQuery(
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> relationInsertQuery(
         context: RelationInsertContext<ENTITY, ID, META>,
         options: InsertOptions
     ): R2dbcRunner<Pair<Int, ID?>> {
         return RelationInsertR2dbcRunner(context, options)
     }
 
-    override fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> relationUpdateQuery(
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> relationUpdateQuery(
         context: RelationUpdateContext<ENTITY, ID, META>,
         options: UpdateOptions
     ): R2dbcRunner<*> {

@@ -9,7 +9,7 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentMap
 import kotlin.reflect.cast
 
-internal class EntityContextImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+internal class EntityContextImpl<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: SelectContext<ENTITY, ID, META>,
     private val pool: Map<EntityKey, Any>,
     private val rows: List<Map<EntityMetamodel<*, *, *>, Any>>,
@@ -43,7 +43,7 @@ internal class EntityContextImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY
         }
     }
 
-    override fun <T : Any, S : Any, ID> associateById(pair: Pair<EntityMetamodel<T, ID, *>, EntityMetamodel<S, *, *>>): OneToMany<ID, S> {
+    override fun <T : Any, S : Any, ID : Any> associateById(pair: Pair<EntityMetamodel<T, ID, *>, EntityMetamodel<S, *, *>>): OneToMany<ID, S> {
         val oneToMany = associate(pair)
         val metamodel = pair.first
         return OneToManyImpl(oneToMany.mapKeys { metamodel.id(it.key) })

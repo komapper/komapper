@@ -16,25 +16,25 @@ import org.komapper.core.dsl.query.EntityUpdateQueryBuilderImpl
 
 object QueryDsl : Dsl {
 
-    fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> from(
+    fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> from(
         metamodel: META,
     ): EntitySelectQuery<ENTITY> {
         return EntitySelectQueryImpl(SelectContext(metamodel))
     }
 
-    fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> insert(
+    fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> insert(
         metamodel: META,
     ): EntityInsertQueryBuilder<ENTITY, ID, META> {
         return EntityInsertQueryBuilderImpl(EntityInsertContext(metamodel))
     }
 
-    fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> update(
+    fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> update(
         metamodel: META,
     ): EntityUpdateQueryBuilder<ENTITY> {
         return EntityUpdateQueryBuilderImpl(EntityUpdateContext(metamodel))
     }
 
-    fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> delete(
+    fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> delete(
         metamodel: META,
     ): EntityDeleteQueryBuilder<ENTITY> {
         return EntityDeleteQueryBuilderImpl(EntityDeleteContext(metamodel))

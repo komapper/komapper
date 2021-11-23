@@ -7,7 +7,7 @@ import org.komapper.core.dsl.options.InsertOptions
 import org.komapper.core.dsl.scope.SetScope
 
 @ThreadSafe
-interface EntityUpsertQueryBuilder<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> {
+interface EntityUpsertQueryBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> {
     fun set(declaration: SetScope<ENTITY>.(META) -> Unit): EntityUpsertQueryBuilder<ENTITY, ID, META>
     fun single(entity: ENTITY): EntityUpsertQuery<Int>
     fun multiple(entities: List<ENTITY>): EntityUpsertQuery<Int>
@@ -16,7 +16,7 @@ interface EntityUpsertQueryBuilder<ENTITY : Any, ID, META : EntityMetamodel<ENTI
     fun batch(vararg entities: ENTITY, batchSize: Int? = null): EntityUpsertQuery<List<Int>>
 }
 
-internal data class EntityUpsertQueryBuilderImpl<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+internal data class EntityUpsertQueryBuilderImpl<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityUpsertContext<ENTITY, ID, META>,
     private val options: InsertOptions
 ) : EntityUpsertQueryBuilder<ENTITY, ID, META> {

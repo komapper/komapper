@@ -12,12 +12,12 @@ import org.komapper.core.dsl.query.Row
 @ThreadSafe
 interface FlowQueryVisitor<VISIT_RESULT> {
 
-    fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> selectQuery(
+    fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> selectQuery(
         context: SelectContext<ENTITY, ID, META>,
         options: SelectOptions
     ): VISIT_RESULT
 
-    fun <ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>> setOperationQuery(
+    fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> setOperationQuery(
         context: SetOperationContext,
         options: SelectOptions,
         metamodel: EntityMetamodel<ENTITY, ID, META>,

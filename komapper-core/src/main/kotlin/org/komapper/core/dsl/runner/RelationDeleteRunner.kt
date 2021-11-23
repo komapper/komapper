@@ -7,7 +7,7 @@ import org.komapper.core.dsl.context.RelationDeleteContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.DeleteOptions
 
-class RelationDeleteRunner<ENTITY : Any, ID, META : EntityMetamodel<ENTITY, ID, META>>(
+class RelationDeleteRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: RelationDeleteContext<ENTITY, ID, META>,
     @Suppress("unused") private val options: DeleteOptions
 ) : Runner {
