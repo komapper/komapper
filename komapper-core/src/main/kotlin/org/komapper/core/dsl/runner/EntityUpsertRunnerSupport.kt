@@ -8,7 +8,7 @@ import org.komapper.core.dsl.options.InsertOptions
 
 internal class EntityUpsertRunnerSupport<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityUpsertContext<ENTITY, ID, META>,
-    private val options: InsertOptions
+    @Suppress("unused") private val options: InsertOptions
 ) {
 
     fun buildStatement(config: DatabaseConfig, entities: List<ENTITY>): Statement {

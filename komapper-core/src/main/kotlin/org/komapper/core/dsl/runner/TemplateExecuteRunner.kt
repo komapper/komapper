@@ -6,7 +6,7 @@ import org.komapper.core.dsl.options.TemplateExecuteOptions
 
 class TemplateExecuteRunner(
     private val sql: String,
-    private val data: Any = object {},
+    private val data: Any,
     private val options: TemplateExecuteOptions
 ) : Runner {
 

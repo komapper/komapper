@@ -6,7 +6,7 @@ import org.komapper.core.dsl.options.ScriptOptions
 
 data class ScriptExecuteRunner(
     private val sql: String,
-    private val options: ScriptOptions = ScriptOptions.default
+    private val options: ScriptOptions
 ) :
     Runner {
 
