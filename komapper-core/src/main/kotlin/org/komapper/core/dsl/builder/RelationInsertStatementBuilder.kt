@@ -15,7 +15,9 @@ import org.komapper.core.dsl.metamodel.isAutoIncrement
 class RelationInsertStatementBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     val dialect: Dialect,
     val context: RelationInsertContext<ENTITY, ID, META>,
-    private val idAssignment: Pair<PropertyMetamodel<ENTITY, ID, *>, Operand>?
+    private val idAssignment: Pair<PropertyMetamodel<ENTITY, ID, *>, Operand>?,
+    private val createdAtAssignment: Pair<PropertyMetamodel<ENTITY, *, *>, Operand>?,
+    private val updatedAtAssignment: Pair<PropertyMetamodel<ENTITY, *, *>, Operand>?,
 ) {
     private val aliasManager = DefaultAliasManager(context)
     private val buf = StatementBuffer()
@@ -28,8 +30,8 @@ class RelationInsertStatementBuilder<ENTITY : Any, ID : Any, META : EntityMetamo
         when (val values = context.values) {
             is Values.Declarations<ENTITY> -> {
                 buf.append(" (")
-                val assignments = (values.getAssignments().asSequence() + idAssignment)
-                    .filterNotNull()
+                val additionalAssignments = listOfNotNull(idAssignment, createdAtAssignment, updatedAtAssignment)
+                val assignments = (values.getAssignments() + additionalAssignments)
                     .filter { !it.first.isAutoIncrement() }
                     .toList()
                 if (assignments.isNotEmpty()) {

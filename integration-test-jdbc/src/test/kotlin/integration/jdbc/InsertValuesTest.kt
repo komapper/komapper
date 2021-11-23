@@ -3,6 +3,7 @@ package integration.jdbc
 import integration.address
 import integration.employee
 import integration.identityStrategy
+import integration.person
 import integration.sequenceStrategy
 import integration.setting.Dbms
 import integration.setting.Run
@@ -16,6 +17,7 @@ import java.time.LocalDate
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
+import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
 @ExtendWith(Env::class)
@@ -83,6 +85,23 @@ class InsertValuesTest(private val db: JdbcDatabase) {
         }
         assertEquals(1, count)
         assertIs<Int>(id)
+    }
+
+    @Test
+    fun timestamp() {
+        val p = Meta.person
+        val (count) = db.runQuery {
+            QueryDsl.insert(p).values {
+                p.personId set 99
+                p.name set "test"
+            }
+        }
+        assertEquals(1, count)
+        val person = db.runQuery {
+            QueryDsl.from(p).where { p.personId eq 99 }.first()
+        }
+        assertNotNull(person.createdAt)
+        assertNotNull(person.updatedAt)
     }
 
     @Test

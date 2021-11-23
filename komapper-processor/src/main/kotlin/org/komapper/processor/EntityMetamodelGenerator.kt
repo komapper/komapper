@@ -1,6 +1,8 @@
 package org.komapper.processor
 
 import com.google.devtools.ksp.symbol.Nullability
+import org.komapper.core.dsl.expression.Operand
+import org.komapper.processor.ClassNames.Argument
 import org.komapper.processor.ClassNames.AutoIncrement
 import org.komapper.processor.ClassNames.Clock
 import org.komapper.processor.ClassNames.ConcurrentHashMap
@@ -10,6 +12,7 @@ import org.komapper.processor.ClassNames.EntityMetamodelImplementor
 import org.komapper.processor.ClassNames.IdContext
 import org.komapper.processor.ClassNames.IdGenerator
 import org.komapper.processor.ClassNames.MetamodelDeclaration
+import org.komapper.processor.ClassNames.Operand
 import org.komapper.processor.ClassNames.PropertyDescriptor
 import org.komapper.processor.ClassNames.PropertyMetamodel
 import org.komapper.processor.ClassNames.PropertyMetamodelImpl
@@ -78,8 +81,10 @@ internal class EntityMetamodelGenerator(
         createdAtProperty()
         updatedAtProperty()
         properties()
-        toId()
         id()
+        toId()
+        toCreatedAtAssignment()
+        toUpdatedAtAssignment()
         preInsert()
         preUpdate()
         postUpdate()
@@ -225,6 +230,21 @@ internal class EntityMetamodelGenerator(
         w.println("    override fun properties(): List<$PropertyMetamodel<$entityTypeName, *, *>> = listOf($nameList)")
     }
 
+    private fun id() {
+        val body = if (entity.idProperties.size == 1) {
+            val p = entity.idProperties[0]
+            val nullable = p.nullability == Nullability.NULLABLE
+            "e.$p" + if (nullable) " ?: error(\"The id property '$p' must not null.\")" else ""
+        } else {
+            val list = entity.idProperties.joinToString {
+                val nullable = it.nullability == Nullability.NULLABLE
+                "e.$it" + if (nullable) " ?: error(\"The id property '$it' must not null.\")" else ""
+            }
+            "listOf($list)"
+        }
+        w.println("    override fun id(e: $entityTypeName): $idTypeName = $body")
+    }
+
     private fun toId() {
         val body = if (entity.idProperties.size == 1) {
             val p = entity.idProperties[0]
@@ -241,19 +261,26 @@ internal class EntityMetamodelGenerator(
         w.println("    override fun toId(generatedKey: Long): $idTypeName? = $body")
     }
 
-    private fun id() {
-        val body = if (entity.idProperties.size == 1) {
-            val p = entity.idProperties[0]
-            val nullable = p.nullability == Nullability.NULLABLE
-            "e.$p" + if (nullable) " ?: error(\"The id property '$p' must not null.\")" else ""
-        } else {
-            val list = entity.idProperties.joinToString {
-                val nullable = it.nullability == Nullability.NULLABLE
-                "e.$it" + if (nullable) " ?: error(\"The id property '$it' must not null.\")" else ""
+    private fun toCreatedAtAssignment() {
+        val body = entity.createdAtProperty?.let {
+            if (it.valueClass == null) {
+                "$it to $Argument($it, ${it.typeName}.now(c))"
+            } else {
+                "$it to $Argument($it, ${it.typeName}(${it.valueClass.property.typeName}.now(c)))"
             }
-            "listOf($list)"
-        }
-        w.println("    override fun id(e: $entityTypeName): $idTypeName = $body")
+        } ?: "null"
+        w.println("    override fun toCreatedAtAssignment(c: $Clock): Pair<$PropertyMetamodel<$entityTypeName, *, *>, $Operand>? = $body")
+    }
+
+    private fun toUpdatedAtAssignment() {
+        val body = entity.updatedAtProperty?.let {
+            if (it.valueClass == null) {
+                "$it to $Argument($it, ${it.typeName}.now(c))"
+            } else {
+                "$it to $Argument($it, ${it.typeName}(${it.valueClass.property.typeName}.now(c)))"
+            }
+        } ?: "null"
+        w.println("    override fun toUpdatedAtAssignment(c: $Clock): Pair<$PropertyMetamodel<$entityTypeName, *, *>, $Operand>? = $body")
     }
 
     private fun preInsert() {

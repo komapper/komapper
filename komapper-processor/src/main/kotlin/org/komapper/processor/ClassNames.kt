@@ -19,4 +19,6 @@ internal object ClassNames {
     const val MetamodelDeclaration = "org.komapper.core.dsl.metamodel.MetamodelDeclaration"
     const val Meta = "org.komapper.core.dsl.Meta"
     const val KomapperStub = "KomapperStub"
+    const val Operand = "org.komapper.core.dsl.expression.Operand"
+    const val Argument = "$Operand.Argument"
 }

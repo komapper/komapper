@@ -1,6 +1,7 @@
 package org.komapper.core.dsl.metamodel
 
 import org.komapper.core.ThreadSafe
+import org.komapper.core.dsl.expression.Operand
 import org.komapper.core.dsl.expression.TableExpression
 import java.time.Clock
 import kotlin.reflect.KClass
@@ -16,6 +17,8 @@ interface EntityMetamodel<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY,
     fun properties(): List<PropertyMetamodel<ENTITY, *, *>>
     fun id(e: ENTITY): ID
     fun toId(generatedKey: Long): ID?
+    fun toCreatedAtAssignment(c: Clock): Pair<PropertyMetamodel<ENTITY, *, *>, Operand>?
+    fun toUpdatedAtAssignment(c: Clock): Pair<PropertyMetamodel<ENTITY, *, *>, Operand>?
     fun preInsert(e: ENTITY, c: Clock): ENTITY
     fun preUpdate(e: ENTITY, c: Clock): ENTITY
     fun postUpdate(e: ENTITY): ENTITY
@@ -49,6 +52,8 @@ abstract class EntityMetamodelStub<ENTITY : Any, META : EntityMetamodelStub<ENTI
     override fun newEntity(m: Map<PropertyMetamodel<*, *, *>, Any?>): ENTITY = fail()
     override fun id(e: ENTITY): Any = fail()
     override fun toId(generatedKey: Long): Any = fail()
+    override fun toCreatedAtAssignment(c: Clock): Pair<PropertyMetamodel<ENTITY, *, *>, Operand>? = fail()
+    override fun toUpdatedAtAssignment(c: Clock): Pair<PropertyMetamodel<ENTITY, *, *>, Operand>? = fail()
     override fun preInsert(e: ENTITY, c: Clock): ENTITY = fail()
     override fun preUpdate(e: ENTITY, c: Clock): ENTITY = fail()
     override fun postUpdate(e: ENTITY): ENTITY = fail()
