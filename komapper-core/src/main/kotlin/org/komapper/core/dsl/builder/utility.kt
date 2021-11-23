@@ -3,8 +3,8 @@ package org.komapper.core.dsl.builder
 import org.komapper.core.dsl.context.QueryContext
 import org.komapper.core.dsl.context.RelationUpdateContext
 import org.komapper.core.dsl.context.SelectContext
+import org.komapper.core.dsl.element.ColumnsAndSource
 import org.komapper.core.dsl.element.Join
-import org.komapper.core.dsl.element.Values
 import org.komapper.core.dsl.expression.Criterion
 import org.komapper.core.dsl.expression.Operand
 import org.komapper.core.dsl.metamodel.PropertyMetamodel
@@ -30,6 +30,6 @@ internal fun <ENTITY : Any> RelationUpdateContext<ENTITY, *, *>.getAssignments()
     return SetScope<ENTITY>().apply(set)
 }
 
-internal fun <ENTITY : Any> Values.Declarations<ENTITY>.getAssignments(): List<Pair<PropertyMetamodel<ENTITY, *, *>, Operand>> {
+internal fun <ENTITY : Any> ColumnsAndSource.Values<ENTITY>.getAssignments(): List<Pair<PropertyMetamodel<ENTITY, *, *>, Operand>> {
     return SetScope<ENTITY>().apply(declaration)
 }

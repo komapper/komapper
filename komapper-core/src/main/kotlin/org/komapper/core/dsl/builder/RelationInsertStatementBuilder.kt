@@ -4,7 +4,7 @@ import org.komapper.core.Dialect
 import org.komapper.core.Statement
 import org.komapper.core.StatementBuffer
 import org.komapper.core.dsl.context.RelationInsertContext
-import org.komapper.core.dsl.element.Values
+import org.komapper.core.dsl.element.ColumnsAndSource
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.expression.Operand
 import org.komapper.core.dsl.expression.SubqueryExpression
@@ -28,10 +28,10 @@ class RelationInsertStatementBuilder<ENTITY : Any, ID : Any, META : EntityMetamo
         val target = context.target
         buf.append("insert into ")
         table(target)
-        when (val values = context.values) {
-            is Values.Declarations<ENTITY> -> {
+        when (val columnsAndSource = context.columnsAndSource) {
+            is ColumnsAndSource.Values<ENTITY> -> {
                 buf.append(" (")
-                val assignments = toAssignments(values)
+                val assignments = toAssignments(columnsAndSource)
                 if (assignments.isNotEmpty()) {
                     for ((property, _) in assignments) {
                         column(property)
@@ -49,7 +49,7 @@ class RelationInsertStatementBuilder<ENTITY : Any, ID : Any, META : EntityMetamo
                 buf.cutBack(2)
                 buf.append(")")
             }
-            is Values.Subquery<ENTITY> -> {
+            is ColumnsAndSource.Subquery<ENTITY> -> {
                 buf.append(" (")
                 for (p in target.properties()) {
                     column(p)
@@ -57,14 +57,14 @@ class RelationInsertStatementBuilder<ENTITY : Any, ID : Any, META : EntityMetamo
                 }
                 buf.cutBack(2)
                 buf.append(") ")
-                subquery(values.expression)
+                subquery(columnsAndSource.expression)
             }
         }
         return buf.toStatement()
     }
 
-    private fun toAssignments(values: Values.Declarations<ENTITY>): List<Pair<PropertyMetamodel<ENTITY, *, *>, Operand>> {
-        val assignments = values.getAssignments()
+    private fun toAssignments(columnsAndSource: ColumnsAndSource.Values<ENTITY>): List<Pair<PropertyMetamodel<ENTITY, *, *>, Operand>> {
+        val assignments = columnsAndSource.getAssignments()
         val properties = assignments.map { it.first }
         val additionalAssignments = listOfNotNull(
             idAssignment,

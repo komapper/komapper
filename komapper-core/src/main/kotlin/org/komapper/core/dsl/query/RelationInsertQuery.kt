@@ -1,7 +1,7 @@
 package org.komapper.core.dsl.query
 
 import org.komapper.core.dsl.context.RelationInsertContext
-import org.komapper.core.dsl.element.Values
+import org.komapper.core.dsl.element.ColumnsAndSource
 import org.komapper.core.dsl.expression.SetDeclaration
 import org.komapper.core.dsl.expression.SubqueryExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
@@ -21,18 +21,17 @@ internal data class RelationInsertQueryImpl<ENTITY : Any, ID : Any, META : Entit
 ) : RelationInsertQuery<ENTITY, ID> {
 
     override fun values(declaration: SetDeclaration<ENTITY>): RelationInsertQuery<ENTITY, ID> {
-        val values = when (val values = context.values) {
-            is Values.Declarations -> Values.Declarations(values.declaration + declaration)
-            is Values.Subquery -> Values.Declarations(declaration)
+        val values = when (val columnsAndSource = context.columnsAndSource) {
+            is ColumnsAndSource.Values -> ColumnsAndSource.Values(columnsAndSource.declaration + declaration)
+            is ColumnsAndSource.Subquery -> ColumnsAndSource.Values(declaration)
         }
-        val newContext = context.copy(values = values)
+        val newContext = context.copy(columnsAndSource = values)
         return copy(context = newContext)
     }
 
     override fun <T : Any> select(block: () -> SubqueryExpression<T>): RelationInsertQuery<ENTITY, ID> {
-        val subquery = block()
-        val values = Values.Subquery<ENTITY>(subquery)
-        val newContext = context.copy(values = values)
+        val subquery = ColumnsAndSource.Subquery<ENTITY>(block())
+        val newContext = context.copy(columnsAndSource = subquery)
         return copy(context = newContext)
     }
 
