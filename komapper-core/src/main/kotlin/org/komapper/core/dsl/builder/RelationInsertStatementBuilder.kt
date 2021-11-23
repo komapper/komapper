@@ -74,7 +74,6 @@ class RelationInsertStatementBuilder<ENTITY : Any, ID : Any, META : EntityMetamo
         ).filterNot { it.first in properties }
         return (assignments + additionalAssignments)
             .filter { !it.first.isAutoIncrement() }
-            .toList()
     }
 
     private fun table(metamodel: EntityMetamodel<*, *, *>) {

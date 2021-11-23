@@ -17,8 +17,8 @@ internal class EntityUpdateSingleJdbcRunner<ENTITY : Any, ID : Any, META : Entit
     private val runner: EntityUpdateSingleRunner<ENTITY, ID, META> =
         EntityUpdateSingleRunner(context, options, entity)
 
-    private val support: EntityUpdateJdbcyRunnerSupport<ENTITY, ID, META> =
-        EntityUpdateJdbcyRunnerSupport(context, options)
+    private val support: EntityUpdateJdbcRunnerSupport<ENTITY, ID, META> =
+        EntityUpdateJdbcRunnerSupport(context, options)
 
     override fun run(config: JdbcDatabaseConfig): ENTITY {
         val newEntity = preUpdate(config, entity)

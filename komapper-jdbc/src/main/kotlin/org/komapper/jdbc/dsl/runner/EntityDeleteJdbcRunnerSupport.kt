@@ -3,7 +3,7 @@ package org.komapper.jdbc.dsl.runner
 import org.komapper.core.dsl.context.EntityDeleteContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.VersionOptions
-import org.komapper.core.dsl.query.checkOptimisticLock
+import org.komapper.core.dsl.runner.checkOptimisticLock
 import org.komapper.jdbc.JdbcDatabaseConfig
 import org.komapper.jdbc.JdbcExecutor
 

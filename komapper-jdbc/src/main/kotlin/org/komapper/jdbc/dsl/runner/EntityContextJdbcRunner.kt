@@ -20,9 +20,6 @@ internal class EntityContextJdbcRunner<ENTITY : Any, ID : Any, META : EntityMeta
     private val factory: EntityContextFactory<ENTITY, ID, META> = EntityContextFactory(context)
 
     override fun run(config: JdbcDatabaseConfig): EntityContext<ENTITY> {
-        if (!options.allowEmptyWhereClause && context.where.isEmpty()) {
-            error("Empty where clause is not allowed.")
-        }
         val statement = runner.buildStatement(config)
         val executor = JdbcExecutor(config, options)
         val rows = executor.executeQuery(statement) { rs ->

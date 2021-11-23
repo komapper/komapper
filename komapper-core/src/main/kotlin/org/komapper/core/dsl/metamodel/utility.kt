@@ -23,15 +23,16 @@ fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> META.defi
         schema = schemaName(),
         alwaysQuote = alwaysQuote(),
         disableSequenceAssignment = disableSequenceAssignment(),
-        declarations = declarations() + declaration
+        declaration = declaration() + declaration
     )
 }
 
-val <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> META.where: List<WhereDeclaration>
+val <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> META.where: WhereDeclaration
     get() {
         val metamodel = this
         val scope = MetamodelScope<ENTITY, ID, META>().apply {
-            metamodel.declarations().forEach { it(metamodel) }
+            val declaration = metamodel.declaration()
+            declaration(metamodel)
         }
         return scope.where
     }

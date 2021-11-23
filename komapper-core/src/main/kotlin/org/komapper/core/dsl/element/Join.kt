@@ -12,9 +12,7 @@ data class Join<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>
     val kind: JoinKind,
     val on: OnDeclaration
 ) {
-    fun getWhereDeclarations(): List<WhereDeclaration> {
-        return target.where
-    }
+    val where: WhereDeclaration get() = target.where
 }
 
 enum class JoinKind {

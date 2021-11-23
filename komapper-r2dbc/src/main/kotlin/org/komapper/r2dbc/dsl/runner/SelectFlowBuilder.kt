@@ -12,7 +12,7 @@ import org.komapper.r2dbc.R2dbcDialect
 import org.komapper.r2dbc.R2dbcExecutor
 
 internal class SelectFlowBuilder<T>(
-    private val context: SelectContext<*, *, *>,
+    context: SelectContext<*, *, *>,
     private val options: SelectOptions,
     private val transform: (R2dbcDialect, Row) -> T,
 ) :
@@ -21,9 +21,6 @@ internal class SelectFlowBuilder<T>(
     private val runner: SelectRunner = SelectRunner(context, options)
 
     override fun build(config: R2dbcDatabaseConfig): Flow<T> {
-        if (!options.allowEmptyWhereClause && context.where.isEmpty()) {
-            error("Empty where clause is not allowed.")
-        }
         val statement = runner.buildStatement(config)
         val executor = R2dbcExecutor(config, options)
         return executor.executeQuery(statement, transform)

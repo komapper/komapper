@@ -10,16 +10,13 @@ import org.komapper.r2dbc.R2dbcDatabaseConfig
 import org.komapper.r2dbc.R2dbcExecutor
 
 internal class RelationDeleteR2dbcRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
-    private val context: RelationDeleteContext<ENTITY, ID, META>,
+    context: RelationDeleteContext<ENTITY, ID, META>,
     private val options: DeleteOptions
 ) : R2dbcRunner<Int> {
 
     private val runner: RelationDeleteRunner<ENTITY, ID, META> = RelationDeleteRunner(context, options)
 
     override suspend fun run(config: R2dbcDatabaseConfig): Int {
-        if (!options.allowEmptyWhereClause && context.getWhereDeclarations().isEmpty()) {
-            error("Empty where clause is not allowed.")
-        }
         val statement = runner.buildStatement(config)
         val executor = R2dbcExecutor(config, options)
         val (count) = executor.executeUpdate(statement)

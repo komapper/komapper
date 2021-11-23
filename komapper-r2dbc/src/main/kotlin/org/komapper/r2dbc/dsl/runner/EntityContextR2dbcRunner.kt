@@ -22,9 +22,6 @@ internal class EntityContextR2dbcRunner<ENTITY : Any, ID : Any, META : EntityMet
     private val factory: EntityContextFactory<ENTITY, ID, META> = EntityContextFactory(context)
 
     override suspend fun run(config: R2dbcDatabaseConfig): EntityContext<ENTITY> {
-        if (!options.allowEmptyWhereClause && context.where.isEmpty()) {
-            error("Empty where clause is not allowed.")
-        }
         val statement = runner.buildStatement(config)
         val executor = R2dbcExecutor(config, options)
         val rows: Flow<Map<EntityMetamodel<*, *, *>, Any>> = executor.executeQuery(statement) { dialect, r2dbcRow ->

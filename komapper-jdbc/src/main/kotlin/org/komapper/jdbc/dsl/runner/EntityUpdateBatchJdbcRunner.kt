@@ -18,8 +18,8 @@ internal class EntityUpdateBatchJdbcRunner<ENTITY : Any, ID : Any, META : Entity
     private val runner: EntityUpdateBatchRunner<ENTITY, ID, META> =
         EntityUpdateBatchRunner(context, options, entities)
 
-    private val support: EntityUpdateJdbcyRunnerSupport<ENTITY, ID, META> =
-        EntityUpdateJdbcyRunnerSupport(context, options)
+    private val support: EntityUpdateJdbcRunnerSupport<ENTITY, ID, META> =
+        EntityUpdateJdbcRunnerSupport(context, options)
 
     override fun run(config: JdbcDatabaseConfig): List<ENTITY> {
         if (entities.isEmpty()) return emptyList()

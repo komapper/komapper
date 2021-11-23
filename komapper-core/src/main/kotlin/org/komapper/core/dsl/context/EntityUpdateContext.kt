@@ -15,7 +15,7 @@ data class EntityUpdateContext<ENTITY : Any, ID : Any, META : EntityMetamodel<EN
         return setOf(target)
     }
 
-    override fun getWhereDeclarations(): List<WhereDeclaration> {
+    override fun getCompositeWhere(): WhereDeclaration {
         return target.where
     }
 

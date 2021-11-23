@@ -10,16 +10,13 @@ import org.komapper.jdbc.JdbcDatabaseConfig
 import org.komapper.jdbc.JdbcExecutor
 
 internal class RelationDeleteJdbcRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
-    private val context: RelationDeleteContext<ENTITY, ID, META>,
+    context: RelationDeleteContext<ENTITY, ID, META>,
     private val options: DeleteOptions
 ) : JdbcRunner<Int> {
 
     private val runner: RelationDeleteRunner<ENTITY, ID, META> = RelationDeleteRunner(context, options)
 
     override fun run(config: JdbcDatabaseConfig): Int {
-        if (!options.allowEmptyWhereClause && context.getWhereDeclarations().isEmpty()) {
-            error("Empty where clause is not allowed.")
-        }
         val statement = runner.buildStatement(config)
         val executor = JdbcExecutor(config, options)
         val (count) = executor.executeUpdate(statement)
