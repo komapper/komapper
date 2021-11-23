@@ -124,7 +124,7 @@ class UpdateSetTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun timestamp() = inTransaction(db) {
+    fun assignTimestamp_auto() = inTransaction(db) {
         val p = Meta.person
         val person1 = db.runQuery {
             QueryDsl.insert(p).single(Person(1, "abc"))
@@ -144,5 +144,76 @@ class UpdateSetTest(private val db: R2dbcDatabase) {
         }
         assertEquals(1, count)
         assertNotEquals(person1.updatedAt, person2.updatedAt)
+    }
+
+    @Test
+    fun assignTimestamp_manual() = inTransaction(db) {
+        val p = Meta.person
+        val person1 = db.runQuery {
+            QueryDsl.insert(p).single(Person(1, "abc"))
+        }
+        delay(10)
+        val count = db.runQuery {
+            QueryDsl.update(p).set {
+                p.name set "ABC"
+                p.updatedAt set person1.updatedAt
+            }.where {
+                p.personId eq 1
+            }
+        }
+        val person2 = db.runQuery {
+            QueryDsl.from(p).where {
+                p.personId eq 1
+            }.first()
+        }
+        assertEquals(1, count)
+        assertEquals(person1.updatedAt, person2.updatedAt)
+    }
+
+    @Test
+    fun incrementVersion_auto() = inTransaction(db) {
+        val a = Meta.address
+        val address1 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.first() }
+        assertEquals(1, address1.version)
+
+        val count = db.runQuery {
+            QueryDsl.update(a).set {
+                a.street set "STREET 16"
+            }.where {
+                a.addressId eq 1
+            }
+        }
+        assertEquals(1, count)
+
+        val address2 = db.runQuery {
+            QueryDsl.from(a).where {
+                a.addressId eq 1
+            }.first()
+        }
+        assertEquals(2, address2.version)
+    }
+
+    @Test
+    fun incrementVersion_disabled() = inTransaction(db) {
+        val a = Meta.address
+        val address1 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.first() }
+        assertEquals(1, address1.version)
+
+        val count = db.runQuery {
+            QueryDsl.update(a).set {
+                a.street set "STREET 16"
+                a.version set 10
+            }.where {
+                a.addressId eq 1
+            }
+        }
+        assertEquals(1, count)
+
+        val address2 = db.runQuery {
+            QueryDsl.from(a).where {
+                a.addressId eq 1
+            }.first()
+        }
+        assertEquals(10, address2.version)
     }
 }

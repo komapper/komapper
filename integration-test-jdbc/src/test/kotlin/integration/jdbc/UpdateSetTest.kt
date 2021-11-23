@@ -123,7 +123,7 @@ class UpdateSetTest(private val db: JdbcDatabase) {
     }
 
     @Test
-    fun timestamp() {
+    fun assignTimestamp_auto() {
         val p = Meta.person
         val person1 = db.runQuery {
             QueryDsl.insert(p).single(Person(1, "abc"))
@@ -146,7 +146,31 @@ class UpdateSetTest(private val db: JdbcDatabase) {
     }
 
     @Test
-    fun versionIncrement() {
+    fun assignTimestamp_manual() {
+        val p = Meta.person
+        val person1 = db.runQuery {
+            QueryDsl.insert(p).single(Person(1, "abc"))
+        }
+        Thread.sleep(10)
+        val count = db.runQuery {
+            QueryDsl.update(p).set {
+                p.name set "ABC"
+                p.updatedAt set person1.updatedAt
+            }.where {
+                p.personId eq 1
+            }
+        }
+        val person2 = db.runQuery {
+            QueryDsl.from(p).where {
+                p.personId eq 1
+            }.first()
+        }
+        assertEquals(1, count)
+        assertEquals(person1.updatedAt, person2.updatedAt)
+    }
+
+    @Test
+    fun incrementVersion_auto() {
         val a = Meta.address
         val address1 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.first() }
         assertEquals(1, address1.version)
@@ -169,7 +193,7 @@ class UpdateSetTest(private val db: JdbcDatabase) {
     }
 
     @Test
-    fun versionIncrement_disabled() {
+    fun incrementVersion_disabled() {
         val a = Meta.address
         val address1 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.first() }
         assertEquals(1, address1.version)

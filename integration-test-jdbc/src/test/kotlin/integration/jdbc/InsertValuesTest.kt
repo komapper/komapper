@@ -14,6 +14,7 @@ import org.komapper.core.dsl.query.first
 import org.komapper.jdbc.JdbcDatabase
 import java.math.BigDecimal
 import java.time.LocalDate
+import java.time.LocalDateTime
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
@@ -88,7 +89,7 @@ class InsertValuesTest(private val db: JdbcDatabase) {
     }
 
     @Test
-    fun timestamp() {
+    fun assignTimestamp_auto() {
         val p = Meta.person
         val (count) = db.runQuery {
             QueryDsl.insert(p).values {
@@ -105,7 +106,27 @@ class InsertValuesTest(private val db: JdbcDatabase) {
     }
 
     @Test
-    fun version() {
+    fun assignTimestamp_manual() {
+        val p = Meta.person
+        val timestamp = LocalDateTime.of(2020, 1, 1, 0, 0, 0)
+        val (count) = db.runQuery {
+            QueryDsl.insert(p).values {
+                p.personId set 99
+                p.name set "test"
+                p.createdAt set timestamp
+                p.updatedAt set timestamp
+            }
+        }
+        assertEquals(1, count)
+        val person2 = db.runQuery {
+            QueryDsl.from(p).where { p.personId eq 99 }.first()
+        }
+        assertEquals(timestamp, person2.createdAt)
+        assertEquals(timestamp, person2.updatedAt)
+    }
+
+    @Test
+    fun assignVersion_auto() {
         val a = Meta.address
         val (count, key) = db.runQuery {
             QueryDsl.insert(a).values {
@@ -117,6 +138,22 @@ class InsertValuesTest(private val db: JdbcDatabase) {
         assertNull(key)
         val address = db.runQuery { QueryDsl.from(a).where { a.addressId eq 19 }.first() }
         assertEquals(0, address.version)
+    }
+
+    @Test
+    fun assignVersion_manual() {
+        val a = Meta.address
+        val (count, key) = db.runQuery {
+            QueryDsl.insert(a).values {
+                a.addressId set 19
+                a.street set "STREET 16"
+                a.version set 10
+            }
+        }
+        assertEquals(1, count)
+        assertNull(key)
+        val address = db.runQuery { QueryDsl.from(a).where { a.addressId eq 19 }.first() }
+        assertEquals(10, address.version)
     }
 
     @Test
