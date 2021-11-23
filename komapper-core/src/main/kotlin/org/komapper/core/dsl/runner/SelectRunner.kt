@@ -17,7 +17,7 @@ class SelectRunner(
     }
 
     fun buildStatement(config: DatabaseConfig): Statement {
-        checkWhereClause(options, context.where)
+        checkWhereClause(context, options)
         val builder = SelectStatementBuilder(config.dialect, context)
         return builder.build()
     }

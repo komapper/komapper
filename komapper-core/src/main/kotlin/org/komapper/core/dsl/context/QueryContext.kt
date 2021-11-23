@@ -7,5 +7,5 @@ import org.komapper.core.dsl.metamodel.EntityMetamodel
 @ThreadSafe
 interface QueryContext {
     fun getEntityMetamodels(): Set<EntityMetamodel<*, *, *>>
-    fun getWhereDeclarations(): List<WhereDeclaration> = emptyList()
+    fun getCompositeWhere(): WhereDeclaration = {}
 }

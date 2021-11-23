@@ -24,7 +24,7 @@ class RelationUpdateRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY
         config: DatabaseConfig,
         updatedAtAssignment: Pair<PropertyMetamodel<ENTITY, *, *>, Operand>? = null
     ): Statement {
-        checkWhereClause(options, context.getWhereDeclarations())
+        checkWhereClause(context, options)
         val builder = RelationUpdateStatementBuilder(config.dialect, context, updatedAtAssignment)
         return builder.build()
     }

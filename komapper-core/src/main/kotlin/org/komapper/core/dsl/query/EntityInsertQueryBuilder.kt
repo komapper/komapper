@@ -3,8 +3,8 @@ package org.komapper.core.dsl.query
 import org.komapper.core.ThreadSafe
 import org.komapper.core.dsl.context.DuplicateKeyType
 import org.komapper.core.dsl.context.EntityInsertContext
+import org.komapper.core.dsl.expression.SetDeclaration
 import org.komapper.core.dsl.expression.SubqueryExpression
-import org.komapper.core.dsl.expression.ValuesDeclaration
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.metamodel.PropertyMetamodel
 import org.komapper.core.dsl.options.InsertOptions
@@ -18,7 +18,7 @@ interface EntityInsertQueryBuilder<ENTITY : Any, ID : Any, META : EntityMetamode
     fun multiple(vararg entities: ENTITY): EntityInsertQuery<List<ENTITY>>
     fun batch(entities: List<ENTITY>, batchSize: Int? = null): EntityInsertQuery<List<ENTITY>>
     fun batch(vararg entities: ENTITY, batchSize: Int? = null): EntityInsertQuery<List<ENTITY>>
-    fun values(declaration: ValuesDeclaration<ENTITY>): RelationInsertQuery<ENTITY, ID>
+    fun values(declaration: SetDeclaration<ENTITY>): RelationInsertQuery<ENTITY, ID>
     fun select(block: () -> SubqueryExpression<ENTITY>): RelationInsertQuery<ENTITY, ID>
 }
 
@@ -65,7 +65,7 @@ internal data class EntityInsertQueryBuilderImpl<ENTITY : Any, ID : Any, META : 
         return batch(entities.toList(), batchSize)
     }
 
-    override fun values(declaration: ValuesDeclaration<ENTITY>): RelationInsertQuery<ENTITY, ID> {
+    override fun values(declaration: SetDeclaration<ENTITY>): RelationInsertQuery<ENTITY, ID> {
         return asRelationInsertQueryBuilder().values(declaration)
     }
 

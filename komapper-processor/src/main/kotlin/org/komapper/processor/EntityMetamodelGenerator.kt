@@ -42,7 +42,7 @@ internal class EntityMetamodelGenerator(
         "schema: String = \"${entity.table.schema}\"",
         "alwaysQuote: Boolean = ${entity.table.alwaysQuote}",
         "disableSequenceAssignment: Boolean = false",
-        "declarations: List<$MetamodelDeclaration<$entityTypeName, $idTypeName, $simpleName>> = emptyList()"
+        "declaration: $MetamodelDeclaration<$entityTypeName, $idTypeName, $simpleName> = {}"
     ).joinToString(", ")
 
     override fun run() {
@@ -60,7 +60,7 @@ internal class EntityMetamodelGenerator(
         w.println("    private val __schemaName = schema")
         w.println("    private val __alwaysQuote = alwaysQuote")
         w.println("    private val __disableSequenceAssignment = disableSequenceAssignment")
-        w.println("    private val __declarations = declarations")
+        w.println("    private val __declaration = declaration")
 
         entityDescriptor()
 
@@ -72,7 +72,7 @@ internal class EntityMetamodelGenerator(
         schemaName()
         alwaysQuote()
         disableSequenceAssignment()
-        declarations()
+        declaration()
 
         idGenerator()
         idProperties()
@@ -165,8 +165,8 @@ internal class EntityMetamodelGenerator(
         w.println("    override fun disableSequenceAssignment() = __disableSequenceAssignment")
     }
 
-    private fun declarations() {
-        w.println("    override fun declarations() = __declarations")
+    private fun declaration() {
+        w.println("    override fun declaration() = __declaration")
     }
 
     private fun idGenerator() {
@@ -375,12 +375,12 @@ internal class EntityMetamodelGenerator(
 
     private fun newMetamodel() {
         val paramList =
-            "table: String, catalog: String, schema: String, alwaysQuote: Boolean, disableSequenceAssignment: Boolean, declarations: List<$MetamodelDeclaration<$entityTypeName, $idTypeName, $simpleName>>"
-        w.println("    override fun newMetamodel($paramList) = $simpleName(table, catalog, schema, alwaysQuote, disableSequenceAssignment, declarations)")
+            "table: String, catalog: String, schema: String, alwaysQuote: Boolean, disableSequenceAssignment: Boolean, declaration: $MetamodelDeclaration<$entityTypeName, $idTypeName, $simpleName>"
+        w.println("    override fun newMetamodel($paramList) = $simpleName(table, catalog, schema, alwaysQuote, disableSequenceAssignment, declaration)")
     }
 
     private fun clone() {
-        w.println("    fun clone($constructorParamList) = $simpleName(table, catalog, schema, alwaysQuote, disableSequenceAssignment, declarations)")
+        w.println("    fun clone($constructorParamList) = $simpleName(table, catalog, schema, alwaysQuote, disableSequenceAssignment, declaration)")
     }
 
     private fun companionObject() {

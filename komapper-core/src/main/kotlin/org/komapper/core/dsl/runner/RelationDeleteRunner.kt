@@ -17,7 +17,7 @@ class RelationDeleteRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY
     }
 
     fun buildStatement(config: DatabaseConfig): Statement {
-        checkWhereClause(options, context.getWhereDeclarations())
+        checkWhereClause(context, options)
         val builder = RelationDeleteStatementBuilder(config.dialect, context)
         return builder.build()
     }

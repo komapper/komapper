@@ -8,7 +8,7 @@ import kotlin.reflect.KClass
 
 @ThreadSafe
 interface EntityMetamodel<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> : TableExpression<ENTITY> {
-    fun declarations(): List<MetamodelDeclaration<ENTITY, ID, META>>
+    fun declaration(): MetamodelDeclaration<ENTITY, ID, META>
     fun idGenerator(): IdGenerator<ENTITY, ID>?
     fun idProperties(): List<PropertyMetamodel<ENTITY, *, *>>
     fun versionProperty(): PropertyMetamodel<ENTITY, *, *>?
@@ -30,7 +30,7 @@ interface EntityMetamodel<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY,
         schema: String,
         alwaysQuote: Boolean,
         disableSequenceAssignment: Boolean,
-        declarations: List<MetamodelDeclaration<ENTITY, ID, META>>
+        declaration: MetamodelDeclaration<ENTITY, ID, META>
     ): META
 }
 
@@ -43,7 +43,7 @@ abstract class EntityMetamodelStub<ENTITY : Any, META : EntityMetamodelStub<ENTI
     override fun schemaName(): String = fail()
     override fun alwaysQuote(): Boolean = fail()
     override fun disableSequenceAssignment(): Boolean = fail()
-    override fun declarations(): List<MetamodelDeclaration<ENTITY, Any, META>> = fail()
+    override fun declaration(): MetamodelDeclaration<ENTITY, Any, META> = fail()
     override fun idGenerator(): IdGenerator<ENTITY, Any>? = fail()
     override fun idProperties(): List<PropertyMetamodel<ENTITY, *, *>> = fail()
     override fun versionProperty(): PropertyMetamodel<ENTITY, *, *>? = fail()
@@ -65,7 +65,7 @@ abstract class EntityMetamodelStub<ENTITY : Any, META : EntityMetamodelStub<ENTI
         schema: String,
         alwaysQuote: Boolean,
         disableSequenceAssignment: Boolean,
-        declarations: List<MetamodelDeclaration<ENTITY, Any, META>>
+        declaration: MetamodelDeclaration<ENTITY, Any, META>
     ): META = fail()
 
     private fun fail(): Nothing {

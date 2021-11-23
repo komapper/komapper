@@ -13,7 +13,7 @@ data class EntityUpsertContext<ENTITY : Any, ID : Any, META : EntityMetamodel<EN
         schema = "",
         alwaysQuote = false,
         disableSequenceAssignment = false,
-        declarations = emptyList()
+        declaration = {}
     ),
     val keys: List<PropertyMetamodel<ENTITY, *, *>> = emptyList(),
     val duplicateKeyType: DuplicateKeyType,

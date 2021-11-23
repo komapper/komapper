@@ -2,13 +2,13 @@ package org.komapper.core.dsl.metamodel
 
 import org.komapper.core.Scope
 import org.komapper.core.dsl.expression.WhereDeclaration
+import org.komapper.core.dsl.operator.plus
 
 @Scope
 class MetamodelScope<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> {
-    private val _where: MutableList<WhereDeclaration> = mutableListOf()
-    internal val where: List<WhereDeclaration> get() = _where
+    internal var where: WhereDeclaration = {}
 
     fun where(declaration: WhereDeclaration) {
-        _where.add(declaration)
+        where += declaration
     }
 }
