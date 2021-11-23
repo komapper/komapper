@@ -1,6 +1,6 @@
 package org.komapper.core.dsl.context
 
-import org.komapper.core.dsl.expression.SetDeclaration
+import org.komapper.core.dsl.expression.AssignmentDeclaration
 import org.komapper.core.dsl.expression.WhereDeclaration
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.metamodel.where
@@ -8,7 +8,7 @@ import org.komapper.core.dsl.operator.plus
 
 data class RelationUpdateContext<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     val target: META,
-    val set: SetDeclaration<ENTITY> = {},
+    val set: AssignmentDeclaration<ENTITY> = {},
     val where: WhereDeclaration = { }
 ) : QueryContext {
 

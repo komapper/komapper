@@ -6,6 +6,8 @@ import org.komapper.core.dsl.builder.BuilderSupport
 import org.komapper.core.dsl.builder.EmptyAliasManager
 import org.komapper.core.dsl.builder.EntityUpsertStatementBuilder
 import org.komapper.core.dsl.builder.TableNameType
+import org.komapper.core.dsl.builder.createAssignments
+import org.komapper.core.dsl.builder.getAssignments
 import org.komapper.core.dsl.context.DuplicateKeyType
 import org.komapper.core.dsl.context.EntityUpsertContext
 import org.komapper.core.dsl.expression.ColumnExpression
@@ -25,10 +27,10 @@ class MariaDbEntityUpsertStatementBuilder<ENTITY : Any, ID : Any, META : EntityM
     private val support = BuilderSupport(dialect, aliasManager, buf)
 
     override fun build(): Statement {
-        val properties = target.getNonAutoIncrementProperties()
-        if (context.assigned) {
+        if (context.getAssignments().isNotEmpty()) {
             error("The 'EntityUpsertQueryBuilder#set' call is not supported. MariaDB cannot refer to the row to be inserted.")
         }
+        val properties = target.getNonAutoIncrementProperties()
         buf.append("insert")
         if (context.duplicateKeyType == DuplicateKeyType.IGNORE) {
             buf.append(" ignore")
@@ -54,7 +56,8 @@ class MariaDbEntityUpsertStatementBuilder<ENTITY : Any, ID : Any, META : EntityM
         buf.cutBack(2)
         if (context.duplicateKeyType == DuplicateKeyType.UPDATE) {
             buf.append(" on duplicate key update ")
-            for ((left) in context.assignmentMap) {
+            val assignments = context.createAssignments()
+            for ((left) in assignments) {
                 column(left)
                 buf.append(" = values(")
                 column(left)
