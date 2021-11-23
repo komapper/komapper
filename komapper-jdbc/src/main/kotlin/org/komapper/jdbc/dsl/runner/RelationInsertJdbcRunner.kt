@@ -29,7 +29,15 @@ internal class RelationInsertJdbcRunner<ENTITY : Any, ID : Any, META : EntityMet
                 } else null
             else -> null
         }
-        val statement = runner.buildStatement(config, pair?.second)
+        val clock = config.clockProvider.now()
+        val statement =
+            runner.buildStatement(
+                config,
+                pair?.second,
+                context.target.versionAssignment(),
+                context.target.createdAtAssignment(clock),
+                context.target.updatedAtAssignment(clock)
+            )
         val requiresGeneratedKeys = context.target.idGenerator() is IdGenerator.AutoIncrement<ENTITY, *>
         val executor = JdbcExecutor(config, options, requiresGeneratedKeys)
         val (count, keys) = executor.executeUpdate(statement)

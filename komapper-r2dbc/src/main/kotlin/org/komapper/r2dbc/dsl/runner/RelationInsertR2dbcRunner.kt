@@ -29,7 +29,15 @@ internal class RelationInsertR2dbcRunner<ENTITY : Any, ID : Any, META : EntityMe
                 } else null
             else -> null
         }
-        val statement = runner.buildStatement(config, pair?.second)
+        val clock = config.clockProvider.now()
+        val statement =
+            runner.buildStatement(
+                config,
+                pair?.second,
+                context.target.versionAssignment(),
+                context.target.createdAtAssignment(clock),
+                context.target.updatedAtAssignment(clock)
+            )
         val generatedColumn = when (val idGenerator = context.target.idGenerator()) {
             is IdGenerator.AutoIncrement<ENTITY, *> -> idGenerator.property.columnName
             else -> null

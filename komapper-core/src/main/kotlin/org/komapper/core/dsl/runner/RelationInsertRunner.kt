@@ -18,8 +18,21 @@ class RelationInsertRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY
         return buildStatement(config)
     }
 
-    fun buildStatement(config: DatabaseConfig, idAssignment: Pair<PropertyMetamodel<ENTITY, ID, *>, Operand>? = null): Statement {
-        val builder = RelationInsertStatementBuilder(config.dialect, context, idAssignment)
+    fun buildStatement(
+        config: DatabaseConfig,
+        idAssignment: Pair<PropertyMetamodel<ENTITY, ID, *>, Operand>? = null,
+        versionAssignment: Pair<PropertyMetamodel<ENTITY, *, *>, Operand>? = null,
+        createdAtAssignment: Pair<PropertyMetamodel<ENTITY, *, *>, Operand>? = null,
+        updatedAtAssignment: Pair<PropertyMetamodel<ENTITY, *, *>, Operand>? = null
+    ): Statement {
+        val builder = RelationInsertStatementBuilder(
+            config.dialect,
+            context,
+            idAssignment,
+            versionAssignment,
+            createdAtAssignment,
+            updatedAtAssignment
+        )
         return builder.build()
     }
 }

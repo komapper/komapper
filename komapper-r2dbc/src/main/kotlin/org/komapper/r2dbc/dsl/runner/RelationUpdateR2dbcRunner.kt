@@ -20,7 +20,9 @@ internal class RelationUpdateR2dbcRunner<ENTITY : Any, ID : Any, META : EntityMe
         if (!options.allowEmptyWhereClause && context.getWhereDeclarations().isEmpty()) {
             error("Empty where clause is not allowed.")
         }
-        val statement = runner.buildStatement(config)
+        val clock = config.clockProvider.now()
+        val updatedAtAssignment = context.target.updatedAtAssignment(clock)
+        val statement = runner.buildStatement(config, updatedAtAssignment)
         val executor = R2dbcExecutor(config, options)
         val (count) = executor.executeUpdate(statement)
         return count

@@ -9,10 +9,12 @@ import org.komapper.core.dsl.expression.Criterion
 import org.komapper.core.dsl.expression.Operand
 import org.komapper.core.dsl.expression.TableExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
+import org.komapper.core.dsl.metamodel.PropertyMetamodel
 
 class RelationUpdateStatementBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     val dialect: Dialect,
     val context: RelationUpdateContext<ENTITY, ID, META>,
+    private val updatedAtAssignment: Pair<PropertyMetamodel<ENTITY, *, *>, Operand>?
 ) {
 
     private val aliasManager = DefaultAliasManager(context)
@@ -23,14 +25,24 @@ class RelationUpdateStatementBuilder<ENTITY : Any, ID : Any, META : EntityMetamo
         buf.append("update ")
         table(context.target)
         buf.append(" set ")
-        val assignments = context.getAssignments()
-        for ((left, right) in assignments) {
-            column(left)
-            buf.append(" = ")
-            operand(right)
-            buf.append(", ")
+        val assignments = getAssignments()
+        if (assignments.isNotEmpty()) {
+            for ((left, right) in assignments) {
+                column(left)
+                buf.append(" = ")
+                operand(right)
+                buf.append(", ")
+            }
+            buf.cutBack(2)
         }
-        buf.cutBack(2)
+        val version = context.target.versionProperty()
+        if (version != null && version !in assignments.map { it.first }) {
+            buf.append(", ")
+            column(version)
+            buf.append(" = ")
+            column(version)
+            buf.append(" + 1")
+        }
         val criteria = context.getWhereCriteria()
         if (criteria.isNotEmpty()) {
             buf.append(" where ")
@@ -41,6 +53,13 @@ class RelationUpdateStatementBuilder<ENTITY : Any, ID : Any, META : EntityMetamo
             buf.cutBack(5)
         }
         return buf.toStatement()
+    }
+
+    private fun getAssignments(): List<Pair<PropertyMetamodel<ENTITY, *, *>, Operand>> {
+        val assignments = context.getAssignments()
+        val properties = assignments.map { it.first }
+        val additionalAssignment = listOfNotNull(updatedAtAssignment).filterNot { it.first in properties }
+        return assignments + additionalAssignment
     }
 
     private fun table(expression: TableExpression<*>) {
