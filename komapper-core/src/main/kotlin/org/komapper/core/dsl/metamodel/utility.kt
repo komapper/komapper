@@ -22,7 +22,7 @@ fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> META.defi
         catalog = catalogName(),
         schema = schemaName(),
         alwaysQuote = alwaysQuote(),
-        disableSequenceAssignment = false,
+        disableSequenceAssignment = disableSequenceAssignment(),
         declarations = declarations() + declaration
     )
 }
