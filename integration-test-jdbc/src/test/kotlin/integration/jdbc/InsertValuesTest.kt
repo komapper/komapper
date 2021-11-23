@@ -4,6 +4,8 @@ import integration.address
 import integration.employee
 import integration.identityStrategy
 import integration.sequenceStrategy
+import integration.setting.Dbms
+import integration.setting.Run
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
@@ -70,6 +72,7 @@ class InsertValuesTest(private val db: JdbcDatabase) {
         assertIs<Int>(id)
     }
 
+    @Run(unless = [Dbms.MYSQL])
     @Test
     fun generatedKeys_sequence() {
         val a = Meta.sequenceStrategy
