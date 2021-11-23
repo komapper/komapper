@@ -3,7 +3,7 @@ package org.komapper.r2dbc.dsl.runner
 import org.komapper.core.dsl.context.EntityUpdateContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.VersionOptions
-import org.komapper.core.dsl.query.checkOptimisticLock
+import org.komapper.core.dsl.runner.checkOptimisticLock
 import org.komapper.r2dbc.R2dbcDatabaseConfig
 import org.komapper.r2dbc.R2dbcExecutor
 
