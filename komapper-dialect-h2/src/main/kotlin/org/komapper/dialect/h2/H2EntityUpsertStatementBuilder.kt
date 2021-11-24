@@ -6,6 +6,8 @@ import org.komapper.core.dsl.builder.AliasManager
 import org.komapper.core.dsl.builder.BuilderSupport
 import org.komapper.core.dsl.builder.EntityUpsertStatementBuilder
 import org.komapper.core.dsl.builder.TableNameType
+import org.komapper.core.dsl.builder.createAssignments
+import org.komapper.core.dsl.builder.getAssignments
 import org.komapper.core.dsl.context.DuplicateKeyType
 import org.komapper.core.dsl.context.EntityUpsertContext
 import org.komapper.core.dsl.expression.ColumnExpression
@@ -51,7 +53,8 @@ internal class H2EntityUpsertStatementBuilder<ENTITY : Any, ID : Any, META : Ent
         buf.append(")")
         if (context.duplicateKeyType == DuplicateKeyType.UPDATE) {
             buf.append(" when matched then update set ")
-            for ((left, right) in context.assignmentMap) {
+            val assignments = context.getAssignments().ifEmpty { context.createAssignments() }
+            for ((left, right) in assignments) {
                 column(left)
                 buf.append(" = ")
                 operand(right)
