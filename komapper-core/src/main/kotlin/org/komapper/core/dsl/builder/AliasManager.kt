@@ -15,10 +15,10 @@ class DefaultAliasManager(context: QueryContext, private val parent: AliasManage
     init {
         val map: MutableMap<TableExpression<*>, String> = mutableMapOf()
         var i = parent?.index ?: 0
-        for (expression in context.getEntityMetamodels()) {
+        for (table in context.getTables()) {
             val alias = "t${i}_"
             i++
-            map[expression] = alias
+            map[table] = alias
         }
         this.aliasMap = map.toMap()
         this.index = i

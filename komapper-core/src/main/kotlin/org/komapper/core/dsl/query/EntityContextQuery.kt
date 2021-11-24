@@ -17,15 +17,12 @@ internal data class EntityContextQueryImpl<ENTITY : Any, ID : Any, META : Entity
     private val support: SelectQuerySupport<ENTITY, ID, META> = SelectQuerySupport(context)
 
     fun include(vararg metamodels: EntityMetamodel<*, *, *>): EntityContextQuery<ENTITY> {
-        val joinedMetamodels = context.joins.map { it.target }
-        val projectionMetamodels = metamodels.filter { it in joinedMetamodels }
-        val newContext = support.addProjection(projectionMetamodels)
+        val newContext = support.include(metamodels.toList())
         return copy(context = newContext)
     }
 
     fun includeAll(): EntityContextQuery<ENTITY> {
-        val metamodels = context.joins.map { it.target }
-        val newContext = support.addProjection(metamodels)
+        val newContext = support.includeAll()
         return copy(context = newContext)
     }
 

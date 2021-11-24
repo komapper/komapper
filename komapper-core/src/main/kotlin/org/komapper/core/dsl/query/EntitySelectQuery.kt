@@ -81,11 +81,15 @@ internal data class EntitySelectQueryImpl<ENTITY : Any, ID : Any, META : EntityM
     }
 
     override fun include(vararg metamodels: EntityMetamodel<*, *, *>): EntityContextQuery<ENTITY> {
-        return EntityContextQueryImpl(context, options).include(*metamodels)
+        return asEntityContextQuery().include(*metamodels)
     }
 
     override fun includeAll(): EntityContextQuery<ENTITY> {
-        return EntityContextQueryImpl(context, options).includeAll()
+        return asEntityContextQuery().includeAll()
+    }
+
+    private fun asEntityContextQuery(): EntityContextQueryImpl<ENTITY, ID, META> {
+        return EntityContextQueryImpl(context, options)
     }
 
     override fun <R> collect(collect: suspend (Flow<ENTITY>) -> R): Query<R> = object : Query<R> {

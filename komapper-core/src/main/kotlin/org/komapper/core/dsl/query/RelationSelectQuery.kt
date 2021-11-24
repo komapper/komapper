@@ -120,13 +120,13 @@ internal data class RelationSelectQueryImpl<ENTITY : Any, ID : Any, META : Entit
     }
 
     override fun <T : Any, S : Any> select(expression: ScalarExpression<T, S>): ScalarQuery<T?, T, S> {
-        val newContext = support.setProjection(expression)
+        val newContext = support.select(expression)
         val query = SingleColumnSelectQuery(newContext, options, expression)
         return ScalarQueryImpl(query, expression)
     }
 
     override fun <A : Any> select(expression: ColumnExpression<A, *>): FlowSubquery<A?> {
-        val newContext = support.setProjection(expression)
+        val newContext = support.select(expression)
         return SingleColumnSelectQuery(newContext, options, expression)
     }
 
@@ -134,7 +134,7 @@ internal data class RelationSelectQueryImpl<ENTITY : Any, ID : Any, META : Entit
         expression1: ColumnExpression<A, *>,
         expression2: ColumnExpression<B, *>
     ): FlowSubquery<Pair<A?, B?>> {
-        val newContext = support.setProjection(expression1, expression2)
+        val newContext = support.select(expression1, expression2)
         return PairColumnsSelectQuery(newContext, options, expression1 to expression2)
     }
 
@@ -143,7 +143,7 @@ internal data class RelationSelectQueryImpl<ENTITY : Any, ID : Any, META : Entit
         expression2: ColumnExpression<B, *>,
         expression3: ColumnExpression<C, *>
     ): FlowSubquery<Triple<A?, B?, C?>> {
-        val newContext = support.setProjection(expression1, expression2, expression3)
+        val newContext = support.select(expression1, expression2, expression3)
         return TripleColumnsSelectQuery(newContext, options, Triple(expression1, expression2, expression3))
     }
 
@@ -153,7 +153,7 @@ internal data class RelationSelectQueryImpl<ENTITY : Any, ID : Any, META : Entit
 
     override fun selectColumns(vararg expressions: ColumnExpression<*, *>): FlowSubquery<Columns> {
         val list = expressions.toList()
-        val newContext = support.setProjection(*list.toTypedArray())
+        val newContext = support.select(*list.toTypedArray())
         return MultipleColumnsSelectQuery(newContext, options, list)
     }
 }

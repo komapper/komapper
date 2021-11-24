@@ -27,7 +27,7 @@ internal class EntityContextJdbcRunner<ENTITY : Any, ID : Any, META : EntityMeta
             while (rs.next()) {
                 val row = mutableMapOf<EntityMetamodel<*, *, *>, Any>()
                 val mapper = JdbcEntityMapper(config.dialect, rs)
-                for (metamodel in context.projection.metamodels()) {
+                for (metamodel in context.getProjection().metamodels()) {
                     val entity = mapper.execute(metamodel) ?: continue
                     row[metamodel] = entity
                 }

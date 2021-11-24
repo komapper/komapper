@@ -37,7 +37,7 @@ class SelectStatementBuilder(
         if (context.distinct) {
             buf.append("distinct ")
         }
-        for (e in context.projection.expressions()) {
+        for (e in context.getProjection().expressions()) {
             column(e)
             buf.append(", ")
         }
@@ -83,9 +83,9 @@ class SelectStatementBuilder(
 
     private fun groupByClause() {
         val groupByItems = context.groupBy.ifEmpty {
-            val expressions = context.projection.expressions()
+            val expressions = context.getProjection().expressions()
             val aggregateFunctions = expressions.filterIsInstance<AggregateFunction<*, *>>()
-            val groupByItems = expressions - aggregateFunctions
+            val groupByItems = expressions - aggregateFunctions.toSet()
             if (aggregateFunctions.isNotEmpty() && groupByItems.isNotEmpty()) {
                 groupByItems
             } else {

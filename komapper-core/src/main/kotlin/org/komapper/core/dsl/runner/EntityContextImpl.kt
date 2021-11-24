@@ -29,7 +29,7 @@ internal class EntityContextImpl<ENTITY : Any, ID : Any, META : EntityMetamodel<
     }
 
     override fun contains(pair: Pair<EntityMetamodel<*, *, *>, EntityMetamodel<*, *, *>>): Boolean {
-        val metamodels = context.projection.metamodels()
+        val metamodels = context.getProjection().metamodels()
         return pair.first in metamodels && pair.second in metamodels
     }
 
