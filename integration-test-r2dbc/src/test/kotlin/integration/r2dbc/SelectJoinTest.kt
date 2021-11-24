@@ -94,8 +94,7 @@ class SelectJoinTest(private val db: R2dbcDatabase) {
                     e.addressId eq a.addressId
                 }.innerJoin(d) {
                     e.departmentId eq d.departmentId
-                }.include(a)
-                .include(d)
+                }.include(a, d)
         }
 
         assertTrue(entityContext.contains(a to e))
