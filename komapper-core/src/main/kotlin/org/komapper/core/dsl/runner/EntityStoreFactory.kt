@@ -11,7 +11,7 @@ class EntityStoreFactory<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, 
 ) {
 
     fun create(rows: List<Map<EntityMetamodel<*, *, *>, Any>>): EntityStore<ENTITY> {
-        val pool: MutableMap<EntityKey, Any> = mutableMapOf()
+        val cache: MutableMap<EntityKey, Any> = mutableMapOf()
         val newRows = mutableListOf<Map<EntityMetamodel<*, *, *>, Any>>()
         for (row in rows) {
             val newRow = mutableMapOf<EntityMetamodel<*, *, *>, Any>()
@@ -20,11 +20,11 @@ class EntityStoreFactory<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, 
                 metamodel as EntityMetamodel<Any, Any, *>
                 val id = metamodel.id(entity)
                 val key = EntityKey(metamodel, id)
-                val prev = pool.putIfAbsent(key, entity)
+                val prev = cache.putIfAbsent(key, entity)
                 newRow[metamodel] = prev ?: entity
             }
             newRows.add(newRow)
         }
-        return EntityStoreImpl(context, pool, newRows)
+        return EntityStoreImpl(context, newRows)
     }
 }

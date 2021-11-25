@@ -4,12 +4,14 @@ import integration.address
 import integration.department
 import integration.employee
 import integration.manager
+import integration.person
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
 import org.komapper.r2dbc.R2dbcDatabase
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
@@ -258,23 +260,6 @@ class SelectJoinTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun mainEntities() = inTransaction(db) {
-        val a = Meta.address
-        val e = Meta.employee
-        val d = Meta.department
-        val store = db.runQuery {
-            QueryDsl.from(e)
-                .innerJoin(a) {
-                    e.addressId eq a.addressId
-                }.innerJoin(d) {
-                    e.departmentId eq d.departmentId
-                }.includeAll()
-        }
-        val employees = store.mainEntities
-        assertEquals(14, employees.size)
-    }
-
-    @Test
     fun oneToMany_selfJoin() = inTransaction(db) {
         val e = Meta.employee
         val m = Meta.manager
@@ -284,7 +269,7 @@ class SelectJoinTest(private val db: R2dbcDatabase) {
             }.includeAll()
         }
 
-        val managers = store.mainEntities
+        val managers = store.list(m)
         assertEquals(6, managers.size)
         assertEquals(managers.map { it.employeeId }.toSet(), setOf(4, 6, 7, 8, 9, 13))
 
@@ -292,5 +277,27 @@ class SelectJoinTest(private val db: R2dbcDatabase) {
         val oneToMany = store.oneToMany(m, e)
         assertTrue(oneToMany.keys.containsAll(managers))
         assertTrue(managers.containsAll(oneToMany.keys))
+    }
+
+    @Test
+    fun list() = inTransaction(db) {
+        val a = Meta.address
+        val e = Meta.employee
+        val d = Meta.department
+        val store = db.runQuery {
+            QueryDsl.from(e)
+                .innerJoin(a) {
+                    e.addressId eq a.addressId
+                }.innerJoin(d) {
+                    e.departmentId eq d.departmentId
+                }.orderBy(d.departmentId).includeAll()
+        }
+        assertTrue(store.contains(a))
+        assertTrue(store.contains(e))
+        assertTrue(store.contains(d))
+        assertFalse(store.contains(Meta.person))
+        assertEquals(14, store.list(e).size)
+        assertEquals(14, store.list(e).size)
+        assertEquals(3, store.list(d).size)
     }
 }
