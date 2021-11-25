@@ -7,7 +7,7 @@ import org.komapper.core.dsl.metamodel.EntityMetamodel
 @ThreadSafe
 sealed class Projection {
     data class Expressions(val expressions: List<ColumnExpression<*, *>>) : Projection()
-    data class Metamodels(val metamodels: List<EntityMetamodel<*, *, *>>) : Projection()
+    data class Metamodels(val metamodels: Set<EntityMetamodel<*, *, *>>) : Projection()
 
     fun expressions(): List<ColumnExpression<*, *>> {
         return when (this) {
@@ -16,9 +16,9 @@ sealed class Projection {
         }
     }
 
-    fun metamodels(): List<EntityMetamodel<*, *, *>> {
+    fun metamodels(): Set<EntityMetamodel<*, *, *>> {
         return when (this) {
-            is Expressions -> emptyList()
+            is Expressions -> emptySet()
             is Metamodels -> this.metamodels
         }
     }

@@ -94,8 +94,7 @@ class SelectJoinTest(private val db: JdbcDatabase) {
                     e.addressId eq a.addressId
                 }.innerJoin(d) {
                     e.departmentId eq d.departmentId
-                }.include(a)
-                .include(d)
+                }.include(a, d)
         }
 
         assertTrue(entityContext.contains(a to e))

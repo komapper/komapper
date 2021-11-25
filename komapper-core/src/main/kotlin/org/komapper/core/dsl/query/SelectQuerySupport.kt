@@ -4,7 +4,6 @@ import org.komapper.core.dsl.context.SelectContext
 import org.komapper.core.dsl.element.ForUpdate
 import org.komapper.core.dsl.element.Join
 import org.komapper.core.dsl.element.JoinKind
-import org.komapper.core.dsl.element.Projection
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.expression.OnDeclaration
 import org.komapper.core.dsl.expression.SortExpression
@@ -63,15 +62,15 @@ internal class SelectQuerySupport<ENTITY : Any, ID : Any, META : EntityMetamodel
         return context.copy(forUpdate = forUpdate)
     }
 
-    fun setProjection(vararg expressions: ColumnExpression<*, *>): SelectContext<ENTITY, ID, META> {
-        return context.copy(projection = Projection.Expressions(expressions.toList()))
+    fun select(vararg expressions: ColumnExpression<*, *>): SelectContext<ENTITY, ID, META> {
+        return context.copy(select = expressions.toList())
     }
 
-    fun addProjection(metamodels: List<EntityMetamodel<*, *, *>>): SelectContext<ENTITY, ID, META> {
-        val newProjection = when (val projection = context.projection) {
-            is Projection.Expressions -> Projection.Metamodels(metamodels)
-            is Projection.Metamodels -> Projection.Metamodels((projection.metamodels + metamodels).distinct())
-        }
-        return context.copy(projection = newProjection)
+    fun include(metamodels: List<EntityMetamodel<*, *, *>>): SelectContext<ENTITY, ID, META> {
+        return context.copy(include = context.include + metamodels)
+    }
+
+    fun includeAll(): SelectContext<ENTITY, ID, META> {
+        return context.copy(includeAll = true)
     }
 }

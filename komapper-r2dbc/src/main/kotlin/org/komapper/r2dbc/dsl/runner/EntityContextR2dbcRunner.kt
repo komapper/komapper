@@ -27,7 +27,7 @@ internal class EntityContextR2dbcRunner<ENTITY : Any, ID : Any, META : EntityMet
         val rows: Flow<Map<EntityMetamodel<*, *, *>, Any>> = executor.executeQuery(statement) { dialect, r2dbcRow ->
             val row = mutableMapOf<EntityMetamodel<*, *, *>, Any>()
             val mapper = R2dbcEntityMapper(dialect, r2dbcRow)
-            for (metamodel in context.projection.metamodels()) {
+            for (metamodel in context.getProjection().metamodels()) {
                 val entity = mapper.execute(metamodel) ?: continue
                 row[metamodel] = entity
             }
