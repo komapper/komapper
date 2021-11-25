@@ -5,21 +5,21 @@ import org.komapper.core.Statement
 import org.komapper.core.dsl.context.SelectContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.SelectOptions
-import org.komapper.core.dsl.query.EntityContext
-import org.komapper.core.dsl.runner.EntityContextFactory
+import org.komapper.core.dsl.query.EntityStore
+import org.komapper.core.dsl.runner.EntityStoreFactory
 import org.komapper.core.dsl.runner.SelectRunner
 import org.komapper.jdbc.JdbcDatabaseConfig
 import org.komapper.jdbc.JdbcExecutor
 
-internal class EntityContextJdbcRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
+internal class EntityStoreJdbcRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: SelectContext<ENTITY, ID, META>,
     private val options: SelectOptions,
-) : JdbcRunner<EntityContext<ENTITY>> {
+) : JdbcRunner<EntityStore<ENTITY>> {
 
     private val runner: SelectRunner = SelectRunner(context, options)
-    private val factory: EntityContextFactory<ENTITY, ID, META> = EntityContextFactory(context)
+    private val factory: EntityStoreFactory<ENTITY, ID, META> = EntityStoreFactory(context)
 
-    override fun run(config: JdbcDatabaseConfig): EntityContext<ENTITY> {
+    override fun run(config: JdbcDatabaseConfig): EntityStore<ENTITY> {
         val statement = runner.buildStatement(config)
         val executor = JdbcExecutor(config, options)
         val rows = executor.executeQuery(statement) { rs ->

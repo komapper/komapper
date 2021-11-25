@@ -55,11 +55,40 @@ class SelectJoinTest(private val db: JdbcDatabase) {
     }
 
     @Test
+    fun include_no_association() {
+        val a = Meta.address
+        val e = Meta.employee
+        val d = Meta.department
+        val store = db.runQuery {
+            QueryDsl.from(e)
+                .innerJoin(a) {
+                    e.addressId eq a.addressId
+                }.innerJoin(d) {
+                    e.departmentId eq d.departmentId
+                }.include()
+        }
+
+        assertTrue(!store.contains(a, e))
+        assertTrue(!store.contains(a, d))
+        assertTrue(!store.contains(e, a))
+        assertTrue(!store.contains(e, d))
+        assertTrue(!store.contains(d, a))
+        assertTrue(!store.contains(d, e))
+
+        assertTrue(store.oneToMany(a, d).isEmpty())
+        assertTrue(store.oneToMany(a, e).isEmpty())
+        assertTrue(store.oneToMany(e, a).isEmpty())
+        assertTrue(store.oneToMany(e, d).isEmpty())
+        assertTrue(store.oneToMany(d, a).isEmpty())
+        assertTrue(store.oneToMany(d, e).isEmpty())
+    }
+
+    @Test
     fun include_one_association() {
         val a = Meta.address
         val e = Meta.employee
         val d = Meta.department
-        val entityContext = db.runQuery {
+        val store = db.runQuery {
             QueryDsl.from(e)
                 .innerJoin(a) {
                     e.addressId eq a.addressId
@@ -68,19 +97,19 @@ class SelectJoinTest(private val db: JdbcDatabase) {
                 }.include(a)
         }
 
-        assertTrue(entityContext.contains(a to e))
-        assertTrue(!entityContext.contains(a to d))
-        assertTrue(entityContext.contains(e to a))
-        assertTrue(!entityContext.contains(e to d))
-        assertTrue(!entityContext.contains(d to a))
-        assertTrue(!entityContext.contains(d to e))
+        assertTrue(store.contains(a, e))
+        assertTrue(!store.contains(a, d))
+        assertTrue(store.contains(e, a))
+        assertTrue(!store.contains(e, d))
+        assertTrue(!store.contains(d, a))
+        assertTrue(!store.contains(d, e))
 
-        assertTrue(entityContext.associate(a to d).isEmpty())
-        assertTrue(entityContext.associate(a to e).isNotEmpty())
-        assertTrue(entityContext.associate(e to a).isNotEmpty())
-        assertTrue(entityContext.associate(e to d).isEmpty())
-        assertTrue(entityContext.associate(d to a).isEmpty())
-        assertTrue(entityContext.associate(d to e).isEmpty())
+        assertTrue(store.oneToMany(a, d).isEmpty())
+        assertTrue(store.oneToMany(a, e).isNotEmpty())
+        assertTrue(store.oneToMany(e, a).isNotEmpty())
+        assertTrue(store.oneToMany(e, d).isEmpty())
+        assertTrue(store.oneToMany(d, a).isEmpty())
+        assertTrue(store.oneToMany(d, e).isEmpty())
     }
 
     @Test
@@ -88,7 +117,7 @@ class SelectJoinTest(private val db: JdbcDatabase) {
         val a = Meta.address
         val e = Meta.employee
         val d = Meta.department
-        val entityContext = db.runQuery {
+        val store = db.runQuery {
             QueryDsl.from(e)
                 .innerJoin(a) {
                     e.addressId eq a.addressId
@@ -97,19 +126,19 @@ class SelectJoinTest(private val db: JdbcDatabase) {
                 }.include(a, d)
         }
 
-        assertTrue(entityContext.contains(a to e))
-        assertTrue(entityContext.contains(a to d))
-        assertTrue(entityContext.contains(e to a))
-        assertTrue(entityContext.contains(e to d))
-        assertTrue(entityContext.contains(d to a))
-        assertTrue(entityContext.contains(d to e))
+        assertTrue(store.contains(a, e))
+        assertTrue(store.contains(a, d))
+        assertTrue(store.contains(e, a))
+        assertTrue(store.contains(e, d))
+        assertTrue(store.contains(d, a))
+        assertTrue(store.contains(d, e))
 
-        assertTrue(entityContext.associate(a to d).isNotEmpty())
-        assertTrue(entityContext.associate(a to e).isNotEmpty())
-        assertTrue(entityContext.associate(e to a).isNotEmpty())
-        assertTrue(entityContext.associate(e to d).isNotEmpty())
-        assertTrue(entityContext.associate(d to a).isNotEmpty())
-        assertTrue(entityContext.associate(d to e).isNotEmpty())
+        assertTrue(store.oneToMany(a, d).isNotEmpty())
+        assertTrue(store.oneToMany(a, e).isNotEmpty())
+        assertTrue(store.oneToMany(e, a).isNotEmpty())
+        assertTrue(store.oneToMany(e, d).isNotEmpty())
+        assertTrue(store.oneToMany(d, a).isNotEmpty())
+        assertTrue(store.oneToMany(d, e).isNotEmpty())
     }
 
     @Test
@@ -117,7 +146,7 @@ class SelectJoinTest(private val db: JdbcDatabase) {
         val a = Meta.address
         val e = Meta.employee
         val d = Meta.department
-        val entityContext = db.runQuery {
+        val store = db.runQuery {
             QueryDsl.from(e)
                 .innerJoin(a) {
                     e.addressId eq a.addressId
@@ -126,33 +155,33 @@ class SelectJoinTest(private val db: JdbcDatabase) {
                 }.includeAll()
         }
 
-        assertTrue(entityContext.contains(a to e))
-        assertTrue(entityContext.contains(a to d))
-        assertTrue(entityContext.contains(e to a))
-        assertTrue(entityContext.contains(e to d))
-        assertTrue(entityContext.contains(d to a))
-        assertTrue(entityContext.contains(d to e))
+        assertTrue(store.contains(a, e))
+        assertTrue(store.contains(a, d))
+        assertTrue(store.contains(e, a))
+        assertTrue(store.contains(e, d))
+        assertTrue(store.contains(d, a))
+        assertTrue(store.contains(d, e))
 
-        assertTrue(entityContext.associate(a to d).isNotEmpty())
-        assertTrue(entityContext.associate(a to e).isNotEmpty())
-        assertTrue(entityContext.associate(e to a).isNotEmpty())
-        assertTrue(entityContext.associate(e to d).isNotEmpty())
-        assertTrue(entityContext.associate(d to a).isNotEmpty())
-        assertTrue(entityContext.associate(d to e).isNotEmpty())
+        assertTrue(store.oneToMany(a, d).isNotEmpty())
+        assertTrue(store.oneToMany(a, e).isNotEmpty())
+        assertTrue(store.oneToMany(e, a).isNotEmpty())
+        assertTrue(store.oneToMany(e, d).isNotEmpty())
+        assertTrue(store.oneToMany(d, a).isNotEmpty())
+        assertTrue(store.oneToMany(d, e).isNotEmpty())
     }
 
     @Test
-    fun associate() {
+    fun oneToMany() {
         val d = Meta.department
         val e = Meta.employee
-        val entityContext = db.runQuery {
+        val store = db.runQuery {
             QueryDsl.from(d).innerJoin(e) {
                 d.departmentId eq e.departmentId
             }.includeAll()
         }
 
-        assertTrue(entityContext.contains(d to e))
-        val map = entityContext.associate(d to e)
+        assertTrue(store.contains(d, e))
+        val map = store.oneToMany(d, e)
         assertEquals(3, map.size)
         val employees1 = map.filterKeys { it.departmentId == 1 }.values.first()
         val employees2 = map.filterKeys { it.departmentId == 2 }.values.first()
@@ -163,17 +192,17 @@ class SelectJoinTest(private val db: JdbcDatabase) {
     }
 
     @Test
-    fun associateById() {
+    fun oneToManyById() {
         val d = Meta.department
         val e = Meta.employee
-        val entityContext = db.runQuery {
+        val store = db.runQuery {
             QueryDsl.from(d).innerJoin(e) {
                 d.departmentId eq e.departmentId
             }.includeAll()
         }
 
-        assertTrue(entityContext.contains(d to e))
-        val map = entityContext.associateById(d to e)
+        assertTrue(store.contains(d, e))
+        val map = store.oneToManyById(d, e)
         assertEquals(3, map.size)
         val employees1 = map[1]
         val employees2 = map[2]
@@ -187,18 +216,18 @@ class SelectJoinTest(private val db: JdbcDatabase) {
     }
 
     @Test
-    fun associate_asOneToOne() {
+    fun oneToOne() {
         val a = Meta.address
         val e = Meta.employee
-        val entityContext = db.runQuery {
+        val store = db.runQuery {
             QueryDsl.from(e)
                 .innerJoin(a) {
                     e.addressId eq a.addressId
                 }.includeAll()
         }
 
-        assertTrue(entityContext.contains(e to a))
-        val map = entityContext.associate(e to a).asOneToOne()
+        assertTrue(store.contains(e, a))
+        val map = store.oneToOne(e, a)
         assertEquals(14, map.size)
         assertTrue(map.values.all { it != null })
 
@@ -208,18 +237,18 @@ class SelectJoinTest(private val db: JdbcDatabase) {
     }
 
     @Test
-    fun associateById_asOneToOne() {
+    fun oneToOneById() {
         val a = Meta.address
         val e = Meta.employee
-        val entityContext = db.runQuery {
+        val store = db.runQuery {
             QueryDsl.from(e)
                 .innerJoin(a) {
                     e.addressId eq a.addressId
                 }.includeAll()
         }
 
-        assertTrue(entityContext.contains(e to a))
-        val map = entityContext.associateById(e to a).asOneToOne()
+        assertTrue(store.contains(e, a))
+        val map = store.oneToOneById(e, a)
         assertEquals(14, map.size)
         assertTrue(map.values.all { it != null })
 
@@ -233,7 +262,7 @@ class SelectJoinTest(private val db: JdbcDatabase) {
         val a = Meta.address
         val e = Meta.employee
         val d = Meta.department
-        val entityContext = db.runQuery {
+        val store = db.runQuery {
             QueryDsl.from(e)
                 .innerJoin(a) {
                     e.addressId eq a.addressId
@@ -241,26 +270,26 @@ class SelectJoinTest(private val db: JdbcDatabase) {
                     e.departmentId eq d.departmentId
                 }.includeAll()
         }
-        val employees = entityContext.mainEntities
+        val employees = store.mainEntities
         assertEquals(14, employees.size)
     }
 
     @Test
-    fun associate_selfJoin() {
+    fun oneToMany_selfJoin() {
         val e = Meta.employee
         val m = Meta.manager
-        val entityContext = db.runQuery {
+        val store = db.runQuery {
             QueryDsl.from(m).innerJoin(e) {
                 m.employeeId eq e.managerId
             }.includeAll()
         }
 
-        val managers = entityContext.mainEntities
+        val managers = store.mainEntities
         assertEquals(6, managers.size)
         assertEquals(managers.map { it.employeeId }.toSet(), setOf(4, 6, 7, 8, 9, 13))
 
-        assertTrue(entityContext.contains(m to e))
-        val oneToMany = entityContext.associate(m to e)
+        assertTrue(store.contains(m, e))
+        val oneToMany = store.oneToMany(m, e)
         assertTrue(oneToMany.keys.containsAll(managers))
         assertTrue(managers.containsAll(oneToMany.keys))
     }
