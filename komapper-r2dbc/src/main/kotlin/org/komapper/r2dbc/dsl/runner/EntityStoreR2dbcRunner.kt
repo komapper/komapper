@@ -16,12 +16,12 @@ import org.komapper.r2dbc.R2dbcExecutor
 internal class EntityStoreR2dbcRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: SelectContext<ENTITY, ID, META>,
     private val options: SelectOptions,
-) : R2dbcRunner<EntityStore<ENTITY>> {
+) : R2dbcRunner<EntityStore> {
 
     private val runner: SelectRunner = SelectRunner(context, options)
     private val factory: EntityStoreFactory<ENTITY, ID, META> = EntityStoreFactory(context)
 
-    override suspend fun run(config: R2dbcDatabaseConfig): EntityStore<ENTITY> {
+    override suspend fun run(config: R2dbcDatabaseConfig): EntityStore {
         val statement = runner.buildStatement(config)
         val executor = R2dbcExecutor(config, options)
         val rows: Flow<Map<EntityMetamodel<*, *, *>, Any>> = executor.executeQuery(statement) { dialect, r2dbcRow ->

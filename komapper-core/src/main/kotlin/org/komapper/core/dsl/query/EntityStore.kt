@@ -4,7 +4,7 @@ import org.komapper.core.ThreadSafe
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 
 @ThreadSafe
-interface EntityStore<ENTITY> {
+interface EntityStore {
 
     fun contains(metamodel: EntityMetamodel<*, *, *>): Boolean
 

@@ -14,12 +14,12 @@ import org.komapper.jdbc.JdbcExecutor
 internal class EntityStoreJdbcRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: SelectContext<ENTITY, ID, META>,
     private val options: SelectOptions,
-) : JdbcRunner<EntityStore<ENTITY>> {
+) : JdbcRunner<EntityStore> {
 
     private val runner: SelectRunner = SelectRunner(context, options)
     private val factory: EntityStoreFactory<ENTITY, ID, META> = EntityStoreFactory(context)
 
-    override fun run(config: JdbcDatabaseConfig): EntityStore<ENTITY> {
+    override fun run(config: JdbcDatabaseConfig): EntityStore {
         val statement = runner.buildStatement(config)
         val executor = JdbcExecutor(config, options)
         val rows = executor.executeQuery(statement) { rs ->

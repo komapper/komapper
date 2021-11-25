@@ -10,7 +10,7 @@ class EntityStoreFactory<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, 
     private val context: SelectContext<ENTITY, ID, META>,
 ) {
 
-    fun create(rows: List<Map<EntityMetamodel<*, *, *>, Any>>): EntityStore<ENTITY> {
+    fun create(rows: List<Map<EntityMetamodel<*, *, *>, Any>>): EntityStore {
         val cache: MutableMap<EntityKey, Any> = mutableMapOf()
         val newRows = mutableListOf<Map<EntityMetamodel<*, *, *>, Any>>()
         for (row in rows) {

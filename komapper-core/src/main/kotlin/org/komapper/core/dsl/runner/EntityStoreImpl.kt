@@ -9,7 +9,7 @@ import java.util.concurrent.ConcurrentMap
 internal class EntityStoreImpl<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: SelectContext<ENTITY, ID, META>,
     private val rows: List<Map<EntityMetamodel<*, *, *>, Any>>,
-) : EntityStore<ENTITY> {
+) : EntityStore {
 
     private val oneToManyCache: ConcurrentMap<Pair<EntityMetamodel<*, *, *>, EntityMetamodel<*, *, *>>, Map<Any, Set<Any>>> =
         ConcurrentHashMap()
