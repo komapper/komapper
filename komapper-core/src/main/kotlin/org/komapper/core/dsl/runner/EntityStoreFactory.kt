@@ -3,14 +3,14 @@ package org.komapper.core.dsl.runner
 import org.komapper.core.ThreadSafe
 import org.komapper.core.dsl.context.SelectContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
-import org.komapper.core.dsl.query.EntityContext
+import org.komapper.core.dsl.query.EntityStore
 
 @ThreadSafe
-class EntityContextFactory<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
+class EntityStoreFactory<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: SelectContext<ENTITY, ID, META>,
 ) {
 
-    fun create(rows: List<Map<EntityMetamodel<*, *, *>, Any>>): EntityContext<ENTITY> {
+    fun create(rows: List<Map<EntityMetamodel<*, *, *>, Any>>): EntityStore<ENTITY> {
         val pool: MutableMap<EntityKey, Any> = mutableMapOf()
         val newRows = mutableListOf<Map<EntityMetamodel<*, *, *>, Any>>()
         for (row in rows) {
@@ -25,6 +25,6 @@ class EntityContextFactory<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY
             }
             newRows.add(newRow)
         }
-        return EntityContextImpl(context, pool, newRows)
+        return EntityStoreImpl(context, pool, newRows)
     }
 }

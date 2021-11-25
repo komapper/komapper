@@ -24,10 +24,10 @@ import org.komapper.core.dsl.query.Columns
 import org.komapper.core.dsl.query.Query
 import org.komapper.core.dsl.query.Row
 import org.komapper.core.dsl.visitor.QueryVisitor
-import org.komapper.r2dbc.dsl.runner.EntityContextR2dbcRunner
 import org.komapper.r2dbc.dsl.runner.EntityDeleteSingleR2dbcRunner
 import org.komapper.r2dbc.dsl.runner.EntityInsertMultipleR2dbcRunner
 import org.komapper.r2dbc.dsl.runner.EntityInsertSingleR2dbcRunner
+import org.komapper.r2dbc.dsl.runner.EntityStoreR2dbcRunner
 import org.komapper.r2dbc.dsl.runner.EntityUpdateSingleR2dbcRunner
 import org.komapper.r2dbc.dsl.runner.EntityUpsertMultipleR2dbcRunner
 import org.komapper.r2dbc.dsl.runner.EntityUpsertSingleR2dbcRunner
@@ -87,7 +87,7 @@ internal object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
         context: SelectContext<ENTITY, ID, META>,
         options: SelectOptions
     ): R2dbcRunner<*> {
-        return EntityContextR2dbcRunner(context, options)
+        return EntityStoreR2dbcRunner(context, options)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, R> entitySelectQuery(

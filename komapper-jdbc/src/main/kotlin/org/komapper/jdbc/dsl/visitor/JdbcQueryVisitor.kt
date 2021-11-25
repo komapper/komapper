@@ -24,12 +24,12 @@ import org.komapper.core.dsl.query.Columns
 import org.komapper.core.dsl.query.Query
 import org.komapper.core.dsl.query.Row
 import org.komapper.core.dsl.visitor.QueryVisitor
-import org.komapper.jdbc.dsl.runner.EntityContextJdbcRunner
 import org.komapper.jdbc.dsl.runner.EntityDeleteBatchJdbcRunner
 import org.komapper.jdbc.dsl.runner.EntityDeleteSingleJdbcRunner
 import org.komapper.jdbc.dsl.runner.EntityInsertBatchJdbcRunner
 import org.komapper.jdbc.dsl.runner.EntityInsertMultipleJdbcRunner
 import org.komapper.jdbc.dsl.runner.EntityInsertSingleJdbcRunner
+import org.komapper.jdbc.dsl.runner.EntityStoreJdbcRunner
 import org.komapper.jdbc.dsl.runner.EntityUpdateBatchJdbcRunner
 import org.komapper.jdbc.dsl.runner.EntityUpdateSingleJdbcRunner
 import org.komapper.jdbc.dsl.runner.EntityUpsertBatchJdbcRunner
@@ -92,7 +92,7 @@ internal object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
         context: SelectContext<ENTITY, ID, META>,
         options: SelectOptions
     ): JdbcRunner<*> {
-        return EntityContextJdbcRunner(context, options)
+        return EntityStoreJdbcRunner(context, options)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, R>

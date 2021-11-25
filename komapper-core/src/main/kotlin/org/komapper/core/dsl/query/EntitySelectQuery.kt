@@ -18,8 +18,8 @@ import org.komapper.core.dsl.visitor.FlowQueryVisitor
 import org.komapper.core.dsl.visitor.QueryVisitor
 
 interface EntitySelectQuery<ENTITY : Any> : SelectQuery<ENTITY, EntitySelectQuery<ENTITY>> {
-    fun include(vararg metamodels: EntityMetamodel<*, *, *>): EntityContextQuery<ENTITY>
-    fun includeAll(): EntityContextQuery<ENTITY>
+    fun include(vararg metamodels: EntityMetamodel<*, *, *>): EntityStoreQuery<ENTITY>
+    fun includeAll(): EntityStoreQuery<ENTITY>
 }
 
 internal data class EntitySelectQueryImpl<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
@@ -80,16 +80,16 @@ internal data class EntitySelectQueryImpl<ENTITY : Any, ID : Any, META : EntityM
         return copy(options = configure(options))
     }
 
-    override fun include(vararg metamodels: EntityMetamodel<*, *, *>): EntityContextQuery<ENTITY> {
+    override fun include(vararg metamodels: EntityMetamodel<*, *, *>): EntityStoreQuery<ENTITY> {
         return asEntityContextQuery().include(*metamodels)
     }
 
-    override fun includeAll(): EntityContextQuery<ENTITY> {
+    override fun includeAll(): EntityStoreQuery<ENTITY> {
         return asEntityContextQuery().includeAll()
     }
 
-    private fun asEntityContextQuery(): EntityContextQueryImpl<ENTITY, ID, META> {
-        return EntityContextQueryImpl(context, options)
+    private fun asEntityContextQuery(): EntityStoreQueryImpl<ENTITY, ID, META> {
+        return EntityStoreQueryImpl(context, options)
     }
 
     override fun <R> collect(collect: suspend (Flow<ENTITY>) -> R): Query<R> = object : Query<R> {
