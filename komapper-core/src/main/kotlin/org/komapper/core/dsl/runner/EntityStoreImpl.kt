@@ -5,30 +5,27 @@ import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.query.EntityStore
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentMap
-import kotlin.reflect.cast
 
 internal class EntityStoreImpl<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: SelectContext<ENTITY, ID, META>,
-    private val pool: Map<EntityKey, Any>,
     private val rows: List<Map<EntityMetamodel<*, *, *>, Any>>,
-) : EntityStore<ENTITY> {
+) : EntityStore {
 
     private val oneToManyCache: ConcurrentMap<Pair<EntityMetamodel<*, *, *>, EntityMetamodel<*, *, *>>, Map<Any, Set<Any>>> =
         ConcurrentHashMap()
 
-    override val mainEntities: List<ENTITY> by lazy {
-        val metamodel = context.target
-        val klass = metamodel.klass()
-        pool.asSequence()
-            .filter { it.key.entityMetamodel == metamodel }
-            .map { klass.cast(it.value) }
-            .distinctBy { metamodel.id(it) }
-            .toList()
+    override fun contains(metamodel: EntityMetamodel<*, *, *>): Boolean {
+        return metamodel in context.getProjection().metamodels()
     }
 
     override fun contains(first: EntityMetamodel<*, *, *>, second: EntityMetamodel<*, *, *>): Boolean {
         val metamodels = context.getProjection().metamodels()
         return first in metamodels && second in metamodels
+    }
+
+    override fun <T : Any> list(metamodel: EntityMetamodel<T, *, *>): List<T> {
+        val oneToMany = oneToMany(metamodel, metamodel)
+        return oneToMany.keys.toList()
     }
 
     override fun <T : Any, S : Any> oneToOne(

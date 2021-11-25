@@ -4,10 +4,13 @@ import org.komapper.core.ThreadSafe
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 
 @ThreadSafe
-interface EntityStore<ENTITY> {
-    val mainEntities: List<ENTITY>
+interface EntityStore {
+
+    fun contains(metamodel: EntityMetamodel<*, *, *>): Boolean
 
     fun contains(first: EntityMetamodel<*, *, *>, second: EntityMetamodel<*, *, *>): Boolean
+
+    fun <T : Any> list(metamodel: EntityMetamodel<T, *, *>): List<T>
 
     fun <T : Any, S : Any> oneToOne(
         first: EntityMetamodel<T, *, *>,

@@ -18,8 +18,8 @@ import org.komapper.core.dsl.visitor.FlowQueryVisitor
 import org.komapper.core.dsl.visitor.QueryVisitor
 
 interface EntitySelectQuery<ENTITY : Any> : SelectQuery<ENTITY, EntitySelectQuery<ENTITY>> {
-    fun include(vararg metamodels: EntityMetamodel<*, *, *>): EntityStoreQuery<ENTITY>
-    fun includeAll(): EntityStoreQuery<ENTITY>
+    fun include(vararg metamodels: EntityMetamodel<*, *, *>): EntityStoreQuery
+    fun includeAll(): EntityStoreQuery
 }
 
 internal data class EntitySelectQueryImpl<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
@@ -80,11 +80,11 @@ internal data class EntitySelectQueryImpl<ENTITY : Any, ID : Any, META : EntityM
         return copy(options = configure(options))
     }
 
-    override fun include(vararg metamodels: EntityMetamodel<*, *, *>): EntityStoreQuery<ENTITY> {
+    override fun include(vararg metamodels: EntityMetamodel<*, *, *>): EntityStoreQuery {
         return asEntityContextQuery().include(*metamodels)
     }
 
-    override fun includeAll(): EntityStoreQuery<ENTITY> {
+    override fun includeAll(): EntityStoreQuery {
         return asEntityContextQuery().includeAll()
     }
 

@@ -5,28 +5,28 @@ import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.SelectOptions
 import org.komapper.core.dsl.visitor.QueryVisitor
 
-interface EntityStoreQuery<ENTITY> : Query<EntityStore<ENTITY>> {
-    fun options(configure: (SelectOptions) -> SelectOptions): EntityStoreQuery<ENTITY>
+interface EntityStoreQuery : Query<EntityStore> {
+    fun options(configure: (SelectOptions) -> SelectOptions): EntityStoreQuery
 }
 
 internal data class EntityStoreQueryImpl<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: SelectContext<ENTITY, ID, META>,
     private val options: SelectOptions
-) : EntityStoreQuery<ENTITY> {
+) : EntityStoreQuery {
 
     private val support: SelectQuerySupport<ENTITY, ID, META> = SelectQuerySupport(context)
 
-    fun include(vararg metamodels: EntityMetamodel<*, *, *>): EntityStoreQuery<ENTITY> {
+    fun include(vararg metamodels: EntityMetamodel<*, *, *>): EntityStoreQuery {
         val newContext = support.include(metamodels.toList())
         return copy(context = newContext)
     }
 
-    fun includeAll(): EntityStoreQuery<ENTITY> {
+    fun includeAll(): EntityStoreQuery {
         val newContext = support.includeAll()
         return copy(context = newContext)
     }
 
-    override fun options(configure: (SelectOptions) -> SelectOptions): EntityStoreQuery<ENTITY> {
+    override fun options(configure: (SelectOptions) -> SelectOptions): EntityStoreQuery {
         return copy(options = configure(options))
     }
 
