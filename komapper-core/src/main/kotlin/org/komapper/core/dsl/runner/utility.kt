@@ -1,16 +1,15 @@
 package org.komapper.core.dsl.runner
 
 import org.komapper.core.OptimisticLockException
+import org.komapper.core.dsl.builder.getWhereCriteria
 import org.komapper.core.dsl.context.QueryContext
 import org.komapper.core.dsl.options.VersionOptions
 import org.komapper.core.dsl.options.WhereOptions
-import org.komapper.core.dsl.scope.WhereScope
 
 fun checkWhereClause(queryContext: QueryContext, options: WhereOptions) {
     if (!options.allowEmptyWhereClause) {
-        val where = queryContext.getCompositeWhere()
-        val scope = WhereScope().apply(where)
-        if (scope.isEmpty()) {
+        val criteria = queryContext.getWhereCriteria()
+        if (criteria.isEmpty()) {
             error("Empty where clause is not allowed.")
         }
     }
