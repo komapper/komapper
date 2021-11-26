@@ -24,7 +24,7 @@ internal class EntityStoreR2dbcRunner<ENTITY : Any, ID : Any, META : EntityMetam
     override suspend fun run(config: R2dbcDatabaseConfig): EntityStore {
         val statement = runner.buildStatement(config)
         val executor = R2dbcExecutor(config, options)
-        val rows: Flow<Map<EntityMetamodel<*, *, *>, Any>> = executor.executeQuery(statement) { dialect, r2dbcRow ->
+        val rows: Flow<MutableMap<EntityMetamodel<*, *, *>, Any>> = executor.executeQuery(statement) { dialect, r2dbcRow ->
             val row = mutableMapOf<EntityMetamodel<*, *, *>, Any>()
             val mapper = R2dbcEntityMapper(dialect, r2dbcRow)
             for (metamodel in context.getProjection().metamodels()) {

@@ -23,7 +23,7 @@ internal class EntityStoreJdbcRunner<ENTITY : Any, ID : Any, META : EntityMetamo
         val statement = runner.buildStatement(config)
         val executor = JdbcExecutor(config, options)
         val rows = executor.executeQuery(statement) { rs ->
-            val rows = mutableListOf<Map<EntityMetamodel<*, *, *>, Any>>()
+            val rows = mutableListOf<MutableMap<EntityMetamodel<*, *, *>, Any>>()
             while (rs.next()) {
                 val row = mutableMapOf<EntityMetamodel<*, *, *>, Any>()
                 val mapper = JdbcEntityMapper(config.dialect, rs)

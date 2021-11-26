@@ -70,12 +70,9 @@ class SelectJoinTest(private val db: R2dbcDatabase) {
                 }.include()
         }
 
-        assertTrue(!store.contains(a, e))
-        assertTrue(!store.contains(a, d))
-        assertTrue(!store.contains(e, a))
-        assertTrue(!store.contains(e, d))
-        assertTrue(!store.contains(d, a))
-        assertTrue(!store.contains(d, e))
+        assertTrue(store.contains(e))
+        assertTrue(!store.contains(a))
+        assertTrue(!store.contains(d))
 
         assertTrue(store.oneToMany(a, d).isEmpty())
         assertTrue(store.oneToMany(a, e).isEmpty())
@@ -99,12 +96,9 @@ class SelectJoinTest(private val db: R2dbcDatabase) {
                 }.include(a)
         }
 
-        assertTrue(store.contains(a, e))
-        assertTrue(!store.contains(a, d))
-        assertTrue(store.contains(e, a))
-        assertTrue(!store.contains(e, d))
-        assertTrue(!store.contains(d, a))
-        assertTrue(!store.contains(d, e))
+        assertTrue(a in store)
+        assertTrue(e in store)
+        assertTrue(d !in store)
 
         assertTrue(store.oneToMany(a, d).isEmpty())
         assertTrue(store.oneToMany(a, e).isNotEmpty())
@@ -128,12 +122,9 @@ class SelectJoinTest(private val db: R2dbcDatabase) {
                 }.include(a, d)
         }
 
-        assertTrue(store.contains(a, e))
-        assertTrue(store.contains(a, d))
-        assertTrue(store.contains(e, a))
-        assertTrue(store.contains(e, d))
-        assertTrue(store.contains(d, a))
-        assertTrue(store.contains(d, e))
+        assertTrue(a in store)
+        assertTrue(e in store)
+        assertTrue(d in store)
 
         assertTrue(store.oneToMany(a, d).isNotEmpty())
         assertTrue(store.oneToMany(a, e).isNotEmpty())
@@ -157,12 +148,9 @@ class SelectJoinTest(private val db: R2dbcDatabase) {
                 }.includeAll()
         }
 
-        assertTrue(store.contains(a, e))
-        assertTrue(store.contains(a, d))
-        assertTrue(store.contains(e, a))
-        assertTrue(store.contains(e, d))
-        assertTrue(store.contains(d, a))
-        assertTrue(store.contains(d, e))
+        assertTrue(a in store)
+        assertTrue(e in store)
+        assertTrue(d in store)
 
         assertTrue(store.oneToMany(a, d).isNotEmpty())
         assertTrue(store.oneToMany(a, e).isNotEmpty())
@@ -182,7 +170,6 @@ class SelectJoinTest(private val db: R2dbcDatabase) {
             }.includeAll()
         }
 
-        assertTrue(store.contains(d, e))
         val map = store.oneToMany(d, e)
         assertEquals(3, map.size)
         val employees1 = map.filterKeys { it.departmentId == 1 }.values.first()
@@ -203,7 +190,6 @@ class SelectJoinTest(private val db: R2dbcDatabase) {
             }.includeAll()
         }
 
-        assertTrue(store.contains(d, e))
         val map = store.oneToManyById(d, e)
         assertEquals(3, map.size)
         val employees1 = map[1]
@@ -228,7 +214,6 @@ class SelectJoinTest(private val db: R2dbcDatabase) {
                 }.includeAll()
         }
 
-        assertTrue(store.contains(e, a))
         val map = store.oneToOne(e, a)
         assertEquals(14, map.size)
         assertTrue(map.values.all { it != null })
@@ -249,7 +234,6 @@ class SelectJoinTest(private val db: R2dbcDatabase) {
                 }.includeAll()
         }
 
-        assertTrue(store.contains(e, a))
         val map = store.oneToOneById(e, a)
         assertEquals(14, map.size)
         assertTrue(map.values.all { it != null })
@@ -273,7 +257,6 @@ class SelectJoinTest(private val db: R2dbcDatabase) {
         assertEquals(6, managers.size)
         assertEquals(managers.map { it.employeeId }.toSet(), setOf(4, 6, 7, 8, 9, 13))
 
-        assertTrue(store.contains(m, e))
         val oneToMany = store.oneToMany(m, e)
         assertTrue(oneToMany.keys.containsAll(managers))
         assertTrue(managers.containsAll(oneToMany.keys))
@@ -292,11 +275,11 @@ class SelectJoinTest(private val db: R2dbcDatabase) {
                     e.departmentId eq d.departmentId
                 }.orderBy(d.departmentId).includeAll()
         }
-        assertTrue(store.contains(a))
-        assertTrue(store.contains(e))
-        assertTrue(store.contains(d))
-        assertFalse(store.contains(Meta.person))
-        assertEquals(14, store.list(e).size)
+        assertTrue(a in store)
+        assertTrue(e in store)
+        assertTrue(d in store)
+        assertFalse(Meta.person in store)
+        assertEquals(14, store.list(a).size)
         assertEquals(14, store.list(e).size)
         assertEquals(3, store.list(d).size)
     }
