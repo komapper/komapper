@@ -26,6 +26,6 @@ class EntityStoreFactory<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, 
             }
             newRows.add(newRow)
         }
-        return EntityStoreImpl(context, rows)
+        return EntityStoreImpl(context, newRows)
     }
 }
