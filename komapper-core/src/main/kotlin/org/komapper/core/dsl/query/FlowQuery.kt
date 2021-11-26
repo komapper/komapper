@@ -7,7 +7,7 @@ import org.komapper.core.dsl.options.SelectOptions
 import org.komapper.core.dsl.visitor.FlowQueryVisitor
 
 @ThreadSafe
-interface FlowQuery<T> {
+interface FlowQuery<out T> {
     fun <VISIT_RESULT> accept(visitor: FlowQueryVisitor<VISIT_RESULT>): VISIT_RESULT
 }
 
