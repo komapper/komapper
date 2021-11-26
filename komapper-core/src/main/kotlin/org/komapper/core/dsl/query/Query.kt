@@ -8,11 +8,11 @@ import org.komapper.core.dsl.options.SelectOptions
 import org.komapper.core.dsl.visitor.QueryVisitor
 
 @ThreadSafe
-interface Query<T> {
+interface Query<out T> {
     fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT
 }
 
-interface ListQuery<T> : Query<List<T>> {
+interface ListQuery<out T> : Query<List<T>> {
     fun <R> collect(collect: suspend (Flow<T>) -> R): Query<R>
 }
 
