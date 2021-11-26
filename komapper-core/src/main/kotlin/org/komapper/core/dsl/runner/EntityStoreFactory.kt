@@ -4,6 +4,7 @@ import org.komapper.core.ThreadSafe
 import org.komapper.core.dsl.context.SelectContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.query.EntityStore
+import org.komapper.core.dsl.query.EntityStoreImpl
 
 @ThreadSafe
 class EntityStoreFactory<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
@@ -12,9 +13,9 @@ class EntityStoreFactory<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, 
 
     fun create(rows: List<Map<EntityMetamodel<*, *, *>, Any>>): EntityStore {
         val cache: MutableMap<EntityKey, Any> = mutableMapOf()
-        val newRows = mutableListOf<Map<EntityMetamodel<*, *, *>, Any>>()
+        val newRows = ArrayList<Map<EntityMetamodel<*, *, *>, Any>>(rows.size)
         for (row in rows) {
-            val newRow = mutableMapOf<EntityMetamodel<*, *, *>, Any>()
+            val newRow = LinkedHashMap<EntityMetamodel<*, *, *>, Any>(row.size)
             for ((metamodel, entity) in row) {
                 @Suppress("UNCHECKED_CAST")
                 metamodel as EntityMetamodel<Any, Any, *>
