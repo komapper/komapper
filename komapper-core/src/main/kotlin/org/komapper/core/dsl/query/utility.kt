@@ -27,17 +27,24 @@ EntityMetamodel<ENTITY, ID, META>.checkIdValueNotNull(entities: List<ENTITY>) {
 }
 
 fun Query<*>.dryRun(config: DatabaseConfig = DryRunDatabaseConfig): DryRunResult {
-    val runner = this.accept(DefaultQueryVisitor)
-    val statement = runner.dryRun(config)
-    val result = statement.toDryRunResult(config.dialect)
-    return if (config is DryRunDatabaseConfig) {
-        result.copy(
-            description = "This data was generated using DryRunDatabaseConfig. " +
-                "To get more correct information, specify the actual DatabaseConfig instance."
-        )
+    val description = if (config is DryRunDatabaseConfig) {
+        "This data was generated using DryRunDatabaseConfig. " +
+            "To get more correct information, specify the actual DatabaseConfig instance."
     } else {
-        result
+        ""
     }
+    val runner = this.accept(DefaultQueryVisitor)
+    val statement = try {
+        runner.dryRun(config)
+    } catch (throwable: Throwable) {
+        return DryRunResult(
+            sql = throwable.message ?: "",
+            sqlWithArgs = throwable.message ?: "",
+            throwable = throwable,
+            description = description
+        )
+    }
+    return statement.toDryRunResult(config.dialect, description)
 }
 
 fun <T, S> Query<T>.andThen(other: Query<S>): Query<S> = object : Query<S> {
