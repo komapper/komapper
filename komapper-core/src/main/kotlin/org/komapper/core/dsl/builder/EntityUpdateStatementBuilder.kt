@@ -37,7 +37,7 @@ class EntityUpdateStatementBuilder<ENTITY : Any, ID : Any, META : EntityMetamode
         }
         buf.cutBack(2)
         val criteria = context.getWhereCriteria()
-        val versionRequired = versionProperty != null && !option.ignoreVersion
+        val versionRequired = versionProperty != null && !option.disableOptimisticLock
         if (criteria.isNotEmpty() || idProperties.isNotEmpty() || versionRequired) {
             buf.append(" where ")
             for ((index, criterion) in criteria.withIndex()) {

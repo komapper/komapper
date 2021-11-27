@@ -26,7 +26,7 @@ internal class EntityUpdateR2dbcRunnerSupport<ENTITY : Any, ID : Any, META : Ent
         if (context.target.versionProperty() != null) {
             checkOptimisticLock(options, count, index)
         }
-        return if (!options.ignoreVersion) {
+        return if (!options.disableOptimisticLock) {
             context.target.postUpdate(entity)
         } else {
             entity

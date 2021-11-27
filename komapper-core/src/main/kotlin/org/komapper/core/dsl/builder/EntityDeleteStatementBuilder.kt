@@ -30,7 +30,7 @@ class EntityDeleteStatementBuilder<ENTITY : Any, ID : Any, META : EntityMetamode
         val target = context.target
         val identityProperties = target.idProperties()
         val versionProperty = target.versionProperty()
-        val versionRequired = versionProperty != null && !option.ignoreVersion
+        val versionRequired = versionProperty != null && !option.disableOptimisticLock
         buf.append("delete from ")
         table(target)
         val criteria = context.getWhereCriteria()

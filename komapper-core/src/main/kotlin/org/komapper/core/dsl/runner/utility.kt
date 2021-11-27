@@ -20,7 +20,7 @@ fun checkOptimisticLock(
     count: Int,
     index: Int?
 ) {
-    if (!option.ignoreVersion && !option.suppressOptimisticLockException) {
+    if (!option.disableOptimisticLock && !option.suppressOptimisticLockException) {
         if (count != 1) {
             val message = if (index == null) {
                 "count=$count"
