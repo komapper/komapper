@@ -32,7 +32,7 @@ internal data class RelationInsertQueryImpl<ENTITY : Any, ID : Any, META : Entit
     override fun <T : Any> select(block: () -> SubqueryExpression<T>): RelationInsertQuery<ENTITY, ID> {
         val subquery = ColumnsAndSource.Subquery<ENTITY>(block())
         val newContext = context.copy(columnsAndSource = subquery)
-        return copy(context = newContext)
+        return copy(context = newContext, options = options.copy(disableSequenceAssignment = true))
     }
 
     override fun options(configure: (InsertOptions) -> InsertOptions): RelationInsertQuery<ENTITY, ID> {
