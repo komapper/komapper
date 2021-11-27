@@ -1,9 +1,11 @@
 package org.komapper.core.dsl.context
 
+import org.komapper.core.ThreadSafe
 import org.komapper.core.dsl.expression.SortItem
 import org.komapper.core.dsl.expression.TableExpression
 import org.komapper.core.dsl.options.SelectOptions
 
+@ThreadSafe
 data class SetOperationContext(
     val kind: SetOperationKind,
     val left: SubqueryContext,

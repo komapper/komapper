@@ -1,5 +1,6 @@
 package org.komapper.core.dsl.context
 
+import org.komapper.core.ThreadSafe
 import org.komapper.core.dsl.element.ForUpdate
 import org.komapper.core.dsl.element.Join
 import org.komapper.core.dsl.element.Projection
@@ -13,6 +14,7 @@ import org.komapper.core.dsl.metamodel.where
 import org.komapper.core.dsl.operator.plus
 import org.komapper.core.dsl.options.SelectOptions
 
+@ThreadSafe
 data class SelectContext<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     val target: META,
     val select: List<ColumnExpression<*, *>> = listOf(),

@@ -1,10 +1,12 @@
 package org.komapper.core.dsl.context
 
+import org.komapper.core.ThreadSafe
 import org.komapper.core.dsl.expression.TableExpression
 import org.komapper.core.dsl.expression.UpsertAssignmentDeclaration
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.metamodel.PropertyMetamodel
 
+@ThreadSafe
 data class EntityUpsertContext<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     val insertContext: EntityInsertContext<ENTITY, ID, META>,
     val target: META,
