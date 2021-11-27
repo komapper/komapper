@@ -2,11 +2,10 @@ package org.komapper.core.dsl.runner
 
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.Statement
-import org.komapper.core.dsl.options.ScriptOptions
+import org.komapper.core.dsl.context.ScriptContext
 
 data class ScriptExecuteRunner(
-    private val sql: String,
-    private val options: ScriptOptions
+    private val context: ScriptContext,
 ) :
     Runner {
 
@@ -15,6 +14,6 @@ data class ScriptExecuteRunner(
     }
 
     fun buildStatement(): Statement {
-        return Statement(sql)
+        return Statement(context.sql)
     }
 }

@@ -8,14 +8,14 @@ import org.komapper.core.dsl.context.EntityUpsertContext
 import org.komapper.core.dsl.context.RelationDeleteContext
 import org.komapper.core.dsl.context.RelationInsertContext
 import org.komapper.core.dsl.context.RelationUpdateContext
+import org.komapper.core.dsl.context.SchemaContext
+import org.komapper.core.dsl.context.ScriptContext
 import org.komapper.core.dsl.context.SelectContext
 import org.komapper.core.dsl.context.SetOperationContext
+import org.komapper.core.dsl.context.TemplateExecuteContext
+import org.komapper.core.dsl.context.TemplateSelectContext
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
-import org.komapper.core.dsl.options.SchemaOptions
-import org.komapper.core.dsl.options.ScriptOptions
-import org.komapper.core.dsl.options.TemplateExecuteOptions
-import org.komapper.core.dsl.options.TemplateSelectOptions
 import org.komapper.core.dsl.query.Columns
 import org.komapper.core.dsl.query.Query
 import org.komapper.core.dsl.query.Row
@@ -171,28 +171,25 @@ internal object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
     }
 
     override fun schemaCreateQuery(
-        entityMetamodels: List<EntityMetamodel<*, *, *>>,
-        options: SchemaOptions
+        context: SchemaContext
     ): R2dbcRunner<Unit> {
-        return SchemaCreateR2dbcRunner(entityMetamodels, options)
+        return SchemaCreateR2dbcRunner(context)
     }
 
     override fun schemaDropQuery(
-        entityMetamodels: List<EntityMetamodel<*, *, *>>,
-        options: SchemaOptions
+        context: SchemaContext
     ): R2dbcRunner<Unit> {
-        return SchemaDropR2dbcRunner(entityMetamodels, options)
+        return SchemaDropR2dbcRunner(context)
     }
 
-    override fun schemaDropAllQuery(options: SchemaOptions): R2dbcRunner<Unit> {
-        return SchemaDropAllR2dbcRunner(options)
+    override fun schemaDropAllQuery(context: SchemaContext): R2dbcRunner<Unit> {
+        return SchemaDropAllR2dbcRunner(context)
     }
 
     override fun scriptExecuteQuery(
-        sql: String,
-        options: ScriptOptions
+        context: ScriptContext
     ): R2dbcRunner<Unit> {
-        return ScriptExecuteR2dbcRunner(sql, options)
+        return ScriptExecuteR2dbcRunner(context)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, R>
@@ -304,20 +301,16 @@ internal object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
     }
 
     override fun templateExecuteQuery(
-        sql: String,
-        data: Any,
-        options: TemplateExecuteOptions
+        context: TemplateExecuteContext
     ): R2dbcRunner<Int> {
-        return TemplateExecuteR2dbcRunner(sql, data, options)
+        return TemplateExecuteR2dbcRunner(context)
     }
 
     override fun <T, R> templateSelectQuery(
-        sql: String,
-        data: Any,
+        context: TemplateSelectContext,
         transform: (Row) -> T,
-        options: TemplateSelectOptions,
         collect: suspend (Flow<T>) -> R
     ): R2dbcRunner<R> {
-        return TemplateSelectR2dbcRunner(sql, data, transform, options, collect)
+        return TemplateSelectR2dbcRunner(context, transform, collect)
     }
 }

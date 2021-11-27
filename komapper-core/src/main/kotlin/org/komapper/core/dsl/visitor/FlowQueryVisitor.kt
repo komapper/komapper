@@ -3,9 +3,9 @@ package org.komapper.core.dsl.visitor
 import org.komapper.core.ThreadSafe
 import org.komapper.core.dsl.context.SelectContext
 import org.komapper.core.dsl.context.SetOperationContext
+import org.komapper.core.dsl.context.TemplateSelectContext
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
-import org.komapper.core.dsl.options.TemplateSelectOptions
 import org.komapper.core.dsl.query.Row
 
 @ThreadSafe
@@ -62,9 +62,7 @@ interface FlowQueryVisitor<VISIT_RESULT> {
     ): VISIT_RESULT
 
     fun <T> templateSelectQuery(
-        sql: String,
-        data: Any,
-        transform: (Row) -> T,
-        options: TemplateSelectOptions
+        context: TemplateSelectContext,
+        transform: (Row) -> T
     ): VISIT_RESULT
 }

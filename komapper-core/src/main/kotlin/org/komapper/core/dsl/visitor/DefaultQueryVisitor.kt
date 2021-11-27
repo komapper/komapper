@@ -9,14 +9,14 @@ import org.komapper.core.dsl.context.EntityUpsertContext
 import org.komapper.core.dsl.context.RelationDeleteContext
 import org.komapper.core.dsl.context.RelationInsertContext
 import org.komapper.core.dsl.context.RelationUpdateContext
+import org.komapper.core.dsl.context.SchemaContext
+import org.komapper.core.dsl.context.ScriptContext
 import org.komapper.core.dsl.context.SelectContext
 import org.komapper.core.dsl.context.SetOperationContext
+import org.komapper.core.dsl.context.TemplateExecuteContext
+import org.komapper.core.dsl.context.TemplateSelectContext
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
-import org.komapper.core.dsl.options.SchemaOptions
-import org.komapper.core.dsl.options.ScriptOptions
-import org.komapper.core.dsl.options.TemplateExecuteOptions
-import org.komapper.core.dsl.options.TemplateSelectOptions
 import org.komapper.core.dsl.query.Columns
 import org.komapper.core.dsl.query.Query
 import org.komapper.core.dsl.query.Row
@@ -164,28 +164,25 @@ internal object DefaultQueryVisitor : QueryVisitor<Runner> {
     }
 
     override fun schemaCreateQuery(
-        entityMetamodels: List<EntityMetamodel<*, *, *>>,
-        options: SchemaOptions
+        context: SchemaContext
     ): Runner {
-        return SchemaCreateRunner(entityMetamodels, options)
+        return SchemaCreateRunner(context)
     }
 
     override fun schemaDropQuery(
-        entityMetamodels: List<EntityMetamodel<*, *, *>>,
-        options: SchemaOptions
+        context: SchemaContext
     ): Runner {
-        return SchemaDropRunner(entityMetamodels)
+        return SchemaDropRunner(context)
     }
 
-    override fun schemaDropAllQuery(options: SchemaOptions): Runner {
-        return SchemaDropAllRunner(options)
+    override fun schemaDropAllQuery(context: SchemaContext): Runner {
+        return SchemaDropAllRunner(context)
     }
 
     override fun scriptExecuteQuery(
-        sql: String,
-        options: ScriptOptions
+        context: ScriptContext
     ): Runner {
-        return ScriptExecuteRunner(sql, options)
+        return ScriptExecuteRunner(context)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, R>
@@ -287,20 +284,16 @@ internal object DefaultQueryVisitor : QueryVisitor<Runner> {
     }
 
     override fun templateExecuteQuery(
-        sql: String,
-        data: Any,
-        options: TemplateExecuteOptions
+        context: TemplateExecuteContext
     ): Runner {
-        return TemplateExecuteRunner(sql, data, options)
+        return TemplateExecuteRunner(context)
     }
 
     override fun <T, R> templateSelectQuery(
-        sql: String,
-        data: Any,
+        context: TemplateSelectContext,
         transform: (Row) -> T,
-        options: TemplateSelectOptions,
         collect: suspend (Flow<T>) -> R
     ): Runner {
-        return TemplateSelectRunner(sql, data, options)
+        return TemplateSelectRunner(context)
     }
 }

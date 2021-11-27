@@ -1,6 +1,7 @@
 package org.komapper.core.dsl.query
 
 import org.komapper.core.ThreadSafe
+import org.komapper.core.dsl.context.TemplateSelectContext
 import org.komapper.core.dsl.options.TemplateSelectOptions
 
 @ThreadSafe
@@ -11,20 +12,20 @@ interface TemplateSelectQueryBuilder {
 }
 
 internal data class TemplateSelectQueryBuilderImpl(
-    private val sql: String,
-    private val data: Any = object {},
-    private val options: TemplateSelectOptions = TemplateSelectOptions.default
+    private val context: TemplateSelectContext,
 ) : TemplateSelectQueryBuilder {
 
     override fun options(configure: (TemplateSelectOptions) -> TemplateSelectOptions): TemplateSelectQueryBuilder {
-        return copy(options = configure(options))
+        val newContext = context.copy(options = configure(context.options))
+        return copy(context = newContext)
     }
 
     override fun bind(data: Any): TemplateSelectQueryBuilder {
-        return copy(data = data)
+        val newContext = context.copy(data = data)
+        return copy(context = newContext)
     }
 
     override fun <T> select(transform: (Row) -> T): TemplateSelectQuery<T> {
-        return TemplateSelectQueryImpl(sql, data, transform, options)
+        return TemplateSelectQueryImpl(context, transform)
     }
 }

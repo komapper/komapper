@@ -1,5 +1,6 @@
 package org.komapper.core.dsl
 
+import org.komapper.core.dsl.context.SchemaContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.query.SchemaCreateQuery
 import org.komapper.core.dsl.query.SchemaCreateQueryImpl
@@ -11,7 +12,7 @@ import org.komapper.core.dsl.query.SchemaDropQueryImpl
 object SchemaDsl : Dsl {
 
     fun create(metamodels: List<EntityMetamodel<*, *, *>>): SchemaCreateQuery {
-        return SchemaCreateQueryImpl(metamodels)
+        return SchemaCreateQueryImpl(SchemaContext(metamodels))
     }
 
     fun create(vararg metamodels: EntityMetamodel<*, *, *>): SchemaCreateQuery {
@@ -19,7 +20,7 @@ object SchemaDsl : Dsl {
     }
 
     fun drop(metamodels: List<EntityMetamodel<*, *, *>>): SchemaDropQuery {
-        return SchemaDropQueryImpl(metamodels)
+        return SchemaDropQueryImpl(SchemaContext(metamodels))
     }
 
     fun drop(vararg metamodels: EntityMetamodel<*, *, *>): SchemaDropQuery {
@@ -27,6 +28,6 @@ object SchemaDsl : Dsl {
     }
 
     fun dropAll(): SchemaDropAllQuery {
-        return SchemaDropAllQueryImpl()
+        return SchemaDropAllQueryImpl(SchemaContext())
     }
 }

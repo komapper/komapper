@@ -8,14 +8,14 @@ import org.komapper.core.dsl.context.EntityUpsertContext
 import org.komapper.core.dsl.context.RelationDeleteContext
 import org.komapper.core.dsl.context.RelationInsertContext
 import org.komapper.core.dsl.context.RelationUpdateContext
+import org.komapper.core.dsl.context.SchemaContext
+import org.komapper.core.dsl.context.ScriptContext
 import org.komapper.core.dsl.context.SelectContext
 import org.komapper.core.dsl.context.SetOperationContext
+import org.komapper.core.dsl.context.TemplateExecuteContext
+import org.komapper.core.dsl.context.TemplateSelectContext
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
-import org.komapper.core.dsl.options.SchemaOptions
-import org.komapper.core.dsl.options.ScriptOptions
-import org.komapper.core.dsl.options.TemplateExecuteOptions
-import org.komapper.core.dsl.options.TemplateSelectOptions
 import org.komapper.core.dsl.query.Columns
 import org.komapper.core.dsl.query.Query
 import org.komapper.core.dsl.query.Row
@@ -177,28 +177,25 @@ internal object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
     }
 
     override fun schemaCreateQuery(
-        entityMetamodels: List<EntityMetamodel<*, *, *>>,
-        options: SchemaOptions
+        context: SchemaContext
     ): JdbcRunner<Unit> {
-        return SchemaCreateJdbcRunner(entityMetamodels, options)
+        return SchemaCreateJdbcRunner(context)
     }
 
     override fun schemaDropQuery(
-        entityMetamodels: List<EntityMetamodel<*, *, *>>,
-        options: SchemaOptions
+        context: SchemaContext
     ): JdbcRunner<Unit> {
-        return SchemaDropJdbcRunner(entityMetamodels, options)
+        return SchemaDropJdbcRunner(context)
     }
 
-    override fun schemaDropAllQuery(options: SchemaOptions): JdbcRunner<Unit> {
-        return SchemaDropAllJdbcRunner(options)
+    override fun schemaDropAllQuery(context: SchemaContext): JdbcRunner<Unit> {
+        return SchemaDropAllJdbcRunner(context)
     }
 
     override fun scriptExecuteQuery(
-        sql: String,
-        options: ScriptOptions
+        context: ScriptContext
     ): JdbcRunner<Unit> {
-        return ScriptExecuteJdbcRunner(sql, options)
+        return ScriptExecuteJdbcRunner(context)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, R>
@@ -310,20 +307,16 @@ internal object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
     }
 
     override fun templateExecuteQuery(
-        sql: String,
-        data: Any,
-        options: TemplateExecuteOptions
+        context: TemplateExecuteContext
     ): JdbcRunner<Int> {
-        return TemplateExecuteJdbcRunner(sql, data, options)
+        return TemplateExecuteJdbcRunner(context)
     }
 
     override fun <T, R> templateSelectQuery(
-        sql: String,
-        data: Any,
+        context: TemplateSelectContext,
         transform: (Row) -> T,
-        options: TemplateSelectOptions,
         collect: suspend (Flow<T>) -> R
     ): JdbcRunner<R> {
-        return TemplateSelectJdbcRunner(sql, data, transform, options, collect)
+        return TemplateSelectJdbcRunner(context, transform, collect)
     }
 }

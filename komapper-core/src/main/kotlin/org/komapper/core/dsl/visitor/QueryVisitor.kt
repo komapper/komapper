@@ -9,14 +9,14 @@ import org.komapper.core.dsl.context.EntityUpsertContext
 import org.komapper.core.dsl.context.RelationDeleteContext
 import org.komapper.core.dsl.context.RelationInsertContext
 import org.komapper.core.dsl.context.RelationUpdateContext
+import org.komapper.core.dsl.context.SchemaContext
+import org.komapper.core.dsl.context.ScriptContext
 import org.komapper.core.dsl.context.SelectContext
 import org.komapper.core.dsl.context.SetOperationContext
+import org.komapper.core.dsl.context.TemplateExecuteContext
+import org.komapper.core.dsl.context.TemplateSelectContext
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
-import org.komapper.core.dsl.options.SchemaOptions
-import org.komapper.core.dsl.options.ScriptOptions
-import org.komapper.core.dsl.options.TemplateExecuteOptions
-import org.komapper.core.dsl.options.TemplateSelectOptions
 import org.komapper.core.dsl.query.Columns
 import org.komapper.core.dsl.query.Query
 import org.komapper.core.dsl.query.Row
@@ -105,20 +105,17 @@ interface QueryVisitor<VISIT_RESULT> {
     ): VISIT_RESULT
 
     fun schemaCreateQuery(
-        entityMetamodels: List<EntityMetamodel<*, *, *>>,
-        options: SchemaOptions
+        context: SchemaContext
     ): VISIT_RESULT
 
     fun schemaDropQuery(
-        entityMetamodels: List<EntityMetamodel<*, *, *>>,
-        options: SchemaOptions
+        context: SchemaContext
     ): VISIT_RESULT
 
-    fun schemaDropAllQuery(options: SchemaOptions): VISIT_RESULT
+    fun schemaDropAllQuery(context: SchemaContext): VISIT_RESULT
 
     fun scriptExecuteQuery(
-        sql: String,
-        options: ScriptOptions
+        context: ScriptContext
     ): VISIT_RESULT
 
     fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, R>
@@ -204,16 +201,12 @@ interface QueryVisitor<VISIT_RESULT> {
     ): VISIT_RESULT
 
     fun templateExecuteQuery(
-        sql: String,
-        data: Any,
-        options: TemplateExecuteOptions
+        context: TemplateExecuteContext
     ): VISIT_RESULT
 
     fun <T, R> templateSelectQuery(
-        sql: String,
-        data: Any,
+        context: TemplateSelectContext,
         transform: (Row) -> T,
-        options: TemplateSelectOptions,
         collect: suspend (Flow<T>) -> R
     ): VISIT_RESULT
 }

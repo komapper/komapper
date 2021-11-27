@@ -1,5 +1,6 @@
 package org.komapper.core.dsl.query
 
+import org.komapper.core.dsl.context.ScriptContext
 import org.komapper.core.dsl.options.ScriptOptions
 import org.komapper.core.dsl.visitor.QueryVisitor
 
@@ -8,16 +9,16 @@ interface ScriptExecuteQuery : Query<Unit> {
 }
 
 internal data class ScriptExecuteQueryImpl(
-    private val sql: String,
-    private val options: ScriptOptions = ScriptOptions.default
+    private val context: ScriptContext,
 ) :
     ScriptExecuteQuery {
 
     override fun options(configure: (ScriptOptions) -> ScriptOptions): ScriptExecuteQuery {
-        return copy(options = configure(options))
+        val newContext = context.copy(options = configure(context.options))
+        return copy(context = newContext)
     }
 
     override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
-        return visitor.scriptExecuteQuery(sql, options)
+        return visitor.scriptExecuteQuery(context)
     }
 }

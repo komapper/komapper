@@ -2,10 +2,11 @@ package org.komapper.core.dsl.runner
 
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.Statement
-import org.komapper.core.dsl.options.SchemaOptions
+import org.komapper.core.dsl.context.SchemaContext
 
 class SchemaDropAllRunner(
-    @Suppress("unused") private val options: SchemaOptions
+    @Suppress("unused")
+    private val context: SchemaContext,
 ) : Runner {
 
     override fun dryRun(config: DatabaseConfig): Statement {
