@@ -12,6 +12,7 @@ import org.komapper.core.dsl.expression.WhereDeclaration
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.operator.plus
 import org.komapper.core.dsl.options.ForUpdateOptions
+import org.komapper.core.dsl.options.SelectOptions
 
 internal class SelectQuerySupport<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: SelectContext<ENTITY, ID, META>
@@ -72,5 +73,9 @@ internal class SelectQuerySupport<ENTITY : Any, ID : Any, META : EntityMetamodel
 
     fun includeAll(): SelectContext<ENTITY, ID, META> {
         return context.copy(includeAll = true)
+    }
+
+    fun options(options: SelectOptions): SelectContext<ENTITY, ID, META> {
+        return context.copy(options = options)
     }
 }

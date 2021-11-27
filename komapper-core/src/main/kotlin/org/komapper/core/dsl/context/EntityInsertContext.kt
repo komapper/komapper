@@ -3,9 +3,11 @@ package org.komapper.core.dsl.context
 import org.komapper.core.dsl.expression.TableExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.metamodel.PropertyMetamodel
+import org.komapper.core.dsl.options.InsertOptions
 
 data class EntityInsertContext<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
-    val target: META
+    val target: META,
+    val options: InsertOptions = InsertOptions.default,
 ) : QueryContext {
 
     override fun getTables(): Set<TableExpression<*>> {

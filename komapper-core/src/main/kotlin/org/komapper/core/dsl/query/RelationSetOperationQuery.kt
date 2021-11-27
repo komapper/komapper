@@ -14,23 +14,22 @@ interface RelationSetOperationQuery<ENTITY : Any> : FlowSetOperationQuery<ENTITY
 
 internal data class RelationSetOperationQueryImpl<ENTITY : Any>(
     override val context: SetOperationContext,
-    private val options: SelectOptions = SelectOptions.default,
     private val metamodel: EntityMetamodel<ENTITY, *, *>
 ) : RelationSetOperationQuery<ENTITY> {
 
     private val support: SetOperationQuerySupport<ENTITY> = SetOperationQuerySupport(context)
 
     override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
-        return visitor.setOperationQuery(context, options, metamodel) { it.toList() }
+        return visitor.setOperationQuery(context, metamodel) { it.toList() }
     }
 
     override fun <VISIT_RESULT> accept(visitor: FlowQueryVisitor<VISIT_RESULT>): VISIT_RESULT {
-        return visitor.setOperationQuery(context, options, metamodel)
+        return visitor.setOperationQuery(context, metamodel)
     }
 
     override fun <R> collect(collect: suspend (Flow<ENTITY>) -> R): Query<R> = object : Query<R> {
         override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
-            return visitor.setOperationQuery(context, options, metamodel, collect)
+            return visitor.setOperationQuery(context, metamodel, collect)
         }
     }
 
@@ -58,7 +57,8 @@ internal data class RelationSetOperationQueryImpl<ENTITY : Any>(
         return copy(context = support.orderBy(*expressions))
     }
 
-    override fun options(configurator: (SelectOptions) -> SelectOptions): FlowSetOperationQuery<ENTITY> {
-        return copy(options = configurator(options))
+    override fun options(configure: (SelectOptions) -> SelectOptions): FlowSetOperationQuery<ENTITY> {
+        val newContext = context.copy(options = configure(context.options))
+        return copy(context = newContext)
     }
 }

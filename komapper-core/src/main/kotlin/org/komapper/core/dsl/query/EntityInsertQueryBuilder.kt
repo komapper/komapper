@@ -7,7 +7,6 @@ import org.komapper.core.dsl.expression.AssignmentDeclaration
 import org.komapper.core.dsl.expression.SubqueryExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.metamodel.PropertyMetamodel
-import org.komapper.core.dsl.options.InsertOptions
 
 @ThreadSafe
 interface EntityInsertQueryBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> {
@@ -24,7 +23,6 @@ interface EntityInsertQueryBuilder<ENTITY : Any, ID : Any, META : EntityMetamode
 
 internal data class EntityInsertQueryBuilderImpl<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityInsertContext<ENTITY, ID, META>,
-    private val options: InsertOptions = InsertOptions.default
 ) :
     EntityInsertQueryBuilder<ENTITY, ID, META> {
 
@@ -41,15 +39,15 @@ internal data class EntityInsertQueryBuilderImpl<ENTITY : Any, ID : Any, META : 
         duplicateKeyType: DuplicateKeyType
     ): EntityUpsertQueryBuilder<ENTITY, ID, META> {
         val newContext = context.asEntityUpsertContext(keys, duplicateKeyType)
-        return EntityUpsertQueryBuilderImpl(newContext, options)
+        return EntityUpsertQueryBuilderImpl(newContext)
     }
 
     override fun single(entity: ENTITY): EntityInsertQuery<ENTITY> {
-        return EntityInsertSingleQuery(context, options, entity)
+        return EntityInsertSingleQuery(context, entity)
     }
 
     override fun multiple(entities: List<ENTITY>): EntityInsertQuery<List<ENTITY>> {
-        return EntityInsertMultipleQuery(context, options, entities)
+        return EntityInsertMultipleQuery(context, entities)
     }
 
     override fun multiple(vararg entities: ENTITY): EntityInsertQuery<List<ENTITY>> {
@@ -57,8 +55,10 @@ internal data class EntityInsertQueryBuilderImpl<ENTITY : Any, ID : Any, META : 
     }
 
     override fun batch(entities: List<ENTITY>, batchSize: Int?): EntityInsertQuery<List<ENTITY>> {
-        val options = if (batchSize != null) options.copy(batchSize = batchSize) else options
-        return EntityInsertBatchQuery(context, options, entities)
+        val context = if (batchSize != null) {
+            context.copy(options = context.options.copy(batchSize = batchSize))
+        } else context
+        return EntityInsertBatchQuery(context, entities)
     }
 
     override fun batch(vararg entities: ENTITY, batchSize: Int?): EntityInsertQuery<List<ENTITY>> {
@@ -74,7 +74,7 @@ internal data class EntityInsertQueryBuilderImpl<ENTITY : Any, ID : Any, META : 
     }
 
     private fun asRelationInsertQueryBuilder(): RelationInsertQueryBuilder<ENTITY, ID> {
-        val query = RelationInsertQueryImpl(context.asRelationInsertContext(), options)
+        val query = RelationInsertQueryImpl(context.asRelationInsertContext())
         return RelationInsertQueryBuilderImpl(query)
     }
 }

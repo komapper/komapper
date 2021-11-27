@@ -12,23 +12,22 @@ import org.komapper.core.dsl.visitor.QueryVisitor
 
 internal data class PairColumnsSetOperationQuery<A : Any, B : Any>(
     override val context: SetOperationContext,
-    private val options: SelectOptions = SelectOptions.default,
     private val expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>
 ) : FlowSetOperationQuery<Pair<A?, B?>> {
 
     private val support: SetOperationQuerySupport<Pair<A?, B?>> = SetOperationQuerySupport(context)
 
     override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
-        return visitor.pairColumnsSetOperationQuery(context, options, expressions) { it.toList() }
+        return visitor.pairColumnsSetOperationQuery(context, expressions) { it.toList() }
     }
 
     override fun <VISIT_RESULT> accept(visitor: FlowQueryVisitor<VISIT_RESULT>): VISIT_RESULT {
-        return visitor.pairColumnsSetOperationQuery(context, options, expressions)
+        return visitor.pairColumnsSetOperationQuery(context, expressions)
     }
 
     override fun <R> collect(collect: suspend (Flow<Pair<A?, B?>>) -> R): Query<R> = object : Query<R> {
         override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
-            return visitor.pairColumnsSetOperationQuery(context, options, expressions, collect)
+            return visitor.pairColumnsSetOperationQuery(context, expressions, collect)
         }
     }
 
@@ -56,7 +55,8 @@ internal data class PairColumnsSetOperationQuery<A : Any, B : Any>(
         return copy(context = support.orderBy(*expressions))
     }
 
-    override fun options(configurator: (SelectOptions) -> SelectOptions): FlowSetOperationQuery<Pair<A?, B?>> {
-        return copy(options = configurator(options))
+    override fun options(configure: (SelectOptions) -> SelectOptions): FlowSetOperationQuery<Pair<A?, B?>> {
+        val newContext = context.copy(options = configure(context.options))
+        return copy(context = newContext)
     }
 }

@@ -11,43 +11,48 @@ interface EntityUpsertQuery<T> : Query<T> {
 
 data class EntityUpsertSingleQuery<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityUpsertContext<ENTITY, ID, META>,
-    private val options: InsertOptions,
     private val entity: ENTITY
 ) : EntityUpsertQuery<Int> {
     override fun options(configure: (InsertOptions) -> InsertOptions): EntityUpsertQuery<Int> {
-        return copy(options = configure(options))
+        val options = configure(context.insertContext.options)
+        val insertContext = context.insertContext.copy(options = options)
+        val newContext = context.copy(insertContext = insertContext)
+        return copy(context = newContext)
     }
 
     override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
-        return visitor.entityUpsertSingleQuery(context, options, entity)
+        return visitor.entityUpsertSingleQuery(context, entity)
     }
 }
 
 data class EntityUpsertMultipleQuery<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityUpsertContext<ENTITY, ID, META>,
-    private val options: InsertOptions,
     private val entities: List<ENTITY>
 ) : EntityUpsertQuery<Int> {
     override fun options(configure: (InsertOptions) -> InsertOptions): EntityUpsertQuery<Int> {
-        return copy(options = configure(options))
+        val options = configure(context.insertContext.options)
+        val insertContext = context.insertContext.copy(options = options)
+        val newContext = context.copy(insertContext = insertContext)
+        return copy(context = newContext)
     }
 
     override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
-        return visitor.entityUpsertMultipleQuery(context, options, entities)
+        return visitor.entityUpsertMultipleQuery(context, entities)
     }
 }
 
 data class EntityUpsertBatchQuery<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityUpsertContext<ENTITY, ID, META>,
-    private val options: InsertOptions,
     private val entities: List<ENTITY>,
-    private val batchSize: Int?
 ) : EntityUpsertQuery<List<Int>> {
     override fun options(configure: (InsertOptions) -> InsertOptions): EntityUpsertQuery<List<Int>> {
-        return copy(options = configure(options))
+        val options = configure(context.insertContext.options)
+        val insertContext = context.insertContext.copy(options = options)
+        val newContext = context.copy(insertContext = insertContext)
+        return copy(context = newContext)
     }
 
     override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
-        return visitor.entityUpsertBatchQuery(context, options.copy(batchSize = batchSize), entities)
+        return visitor.entityUpsertBatchQuery(context, entities)
     }
 }

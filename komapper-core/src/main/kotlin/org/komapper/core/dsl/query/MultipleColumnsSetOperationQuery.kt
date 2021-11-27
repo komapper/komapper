@@ -12,23 +12,22 @@ import org.komapper.core.dsl.visitor.QueryVisitor
 
 internal data class MultipleColumnsSetOperationQuery(
     override val context: SetOperationContext,
-    private val options: SelectOptions = SelectOptions.default,
     private val expressions: List<ColumnExpression<*, *>>
 ) : FlowSetOperationQuery<Columns> {
 
     private val support: SetOperationQuerySupport<Columns> = SetOperationQuerySupport(context)
 
     override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
-        return visitor.multipleColumnsSetOperationQuery(context, options, expressions) { it.toList() }
+        return visitor.multipleColumnsSetOperationQuery(context, expressions) { it.toList() }
     }
 
     override fun <VISIT_RESULT> accept(visitor: FlowQueryVisitor<VISIT_RESULT>): VISIT_RESULT {
-        return visitor.multipleColumnsSetOperationQuery(context, options, expressions)
+        return visitor.multipleColumnsSetOperationQuery(context, expressions)
     }
 
     override fun <R> collect(collect: suspend (Flow<Columns>) -> R): Query<R> = object : Query<R> {
         override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
-            return visitor.multipleColumnsSetOperationQuery(context, options, expressions, collect)
+            return visitor.multipleColumnsSetOperationQuery(context, expressions, collect)
         }
     }
 
@@ -56,7 +55,8 @@ internal data class MultipleColumnsSetOperationQuery(
         return copy(context = support.orderBy(*expressions))
     }
 
-    override fun options(configurator: (SelectOptions) -> SelectOptions): FlowSetOperationQuery<Columns> {
-        return copy(options = configurator(options))
+    override fun options(configure: (SelectOptions) -> SelectOptions): FlowSetOperationQuery<Columns> {
+        val newContext = context.copy(options = configure(context.options))
+        return copy(context = newContext)
     }
 }

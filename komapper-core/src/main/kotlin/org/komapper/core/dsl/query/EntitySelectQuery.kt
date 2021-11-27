@@ -24,7 +24,6 @@ interface EntitySelectQuery<ENTITY : Any> : SelectQuery<ENTITY, EntitySelectQuer
 
 internal data class EntitySelectQueryImpl<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     override val context: SelectContext<ENTITY, ID, META>,
-    private val options: SelectOptions = SelectOptions.default
 ) :
     EntitySelectQuery<ENTITY> {
 
@@ -77,7 +76,8 @@ internal data class EntitySelectQueryImpl<ENTITY : Any, ID : Any, META : EntityM
     }
 
     override fun options(configure: (SelectOptions) -> SelectOptions): EntitySelectQuery<ENTITY> {
-        return copy(options = configure(options))
+        val newContext = support.options(configure(context.options))
+        return copy(context = newContext)
     }
 
     override fun include(vararg metamodels: EntityMetamodel<*, *, *>): EntityStoreQuery {
@@ -89,12 +89,12 @@ internal data class EntitySelectQueryImpl<ENTITY : Any, ID : Any, META : EntityM
     }
 
     private fun asEntityContextQuery(): EntityStoreQueryImpl<ENTITY, ID, META> {
-        return EntityStoreQueryImpl(context, options)
+        return EntityStoreQueryImpl(context)
     }
 
     override fun <R> collect(collect: suspend (Flow<ENTITY>) -> R): Query<R> = object : Query<R> {
         override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
-            return visitor.entitySelectQuery(context, options, collect)
+            return visitor.entitySelectQuery(context, collect)
         }
     }
 
@@ -163,11 +163,11 @@ internal data class EntitySelectQueryImpl<ENTITY : Any, ID : Any, META : EntityM
     }
 
     private fun asRelationQuery(): RelationSelectQuery<ENTITY> {
-        return RelationSelectQueryImpl(context, options)
+        return RelationSelectQueryImpl(context)
     }
 
     override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
-        return visitor.entitySelectQuery(context, options) { it.toList() }
+        return visitor.entitySelectQuery(context) { it.toList() }
     }
 
     override fun <VISIT_RESULT> accept(visitor: FlowQueryVisitor<VISIT_RESULT>): VISIT_RESULT {

@@ -4,20 +4,19 @@ import org.komapper.core.DatabaseConfig
 import org.komapper.core.Statement
 import org.komapper.core.dsl.context.EntityInsertContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
-import org.komapper.core.dsl.options.InsertOptions
 import org.komapper.core.dsl.runner.EntityInsertSingleRunner
 import org.komapper.r2dbc.R2dbcDatabaseConfig
 
 internal class EntityInsertSingleR2dbcRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     context: EntityInsertContext<ENTITY, ID, META>,
-    options: InsertOptions,
     private val entity: ENTITY
 ) : R2dbcRunner<ENTITY> {
 
     private val runner: EntityInsertSingleRunner<ENTITY, ID, META> =
-        EntityInsertSingleRunner(context, options, entity)
+        EntityInsertSingleRunner(context, entity)
 
-    private val support: EntityInsertR2dbcRunnerSupport<ENTITY, ID, META> = EntityInsertR2dbcRunnerSupport(context, options)
+    private val support: EntityInsertR2dbcRunnerSupport<ENTITY, ID, META> =
+        EntityInsertR2dbcRunnerSupport(context)
 
     override suspend fun run(config: R2dbcDatabaseConfig): ENTITY {
         val newEntity = preInsert(config)

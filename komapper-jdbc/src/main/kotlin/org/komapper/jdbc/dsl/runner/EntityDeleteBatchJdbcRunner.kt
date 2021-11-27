@@ -4,22 +4,20 @@ import org.komapper.core.DatabaseConfig
 import org.komapper.core.Statement
 import org.komapper.core.dsl.context.EntityDeleteContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
-import org.komapper.core.dsl.options.DeleteOptions
 import org.komapper.core.dsl.runner.EntityDeleteBatchRunner
 import org.komapper.jdbc.JdbcDatabaseConfig
 
 internal class EntityDeleteBatchJdbcRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     context: EntityDeleteContext<ENTITY, ID, META>,
-    options: DeleteOptions,
     private val entities: List<ENTITY>
 ) :
     JdbcRunner<Unit> {
 
     private val runner: EntityDeleteBatchRunner<ENTITY, ID, META> =
-        EntityDeleteBatchRunner(context, options, entities)
+        EntityDeleteBatchRunner(context, entities)
 
     private val support: EntityDeleteJdbcRunnerSupport<ENTITY, ID, META> =
-        EntityDeleteJdbcRunnerSupport(context, options)
+        EntityDeleteJdbcRunnerSupport(context)
 
     override fun run(config: JdbcDatabaseConfig) {
         if (entities.isEmpty()) return

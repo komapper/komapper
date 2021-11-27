@@ -4,21 +4,20 @@ import org.komapper.core.DatabaseConfig
 import org.komapper.core.Statement
 import org.komapper.core.dsl.context.EntityInsertContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
-import org.komapper.core.dsl.options.InsertOptions
 import org.komapper.core.dsl.runner.EntityInsertMultipleRunner
 import org.komapper.r2dbc.R2dbcDatabaseConfig
 
 internal class EntityInsertMultipleR2dbcRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     context: EntityInsertContext<ENTITY, ID, META>,
-    options: InsertOptions,
     private val entities: List<ENTITY>
 ) :
     R2dbcRunner<List<ENTITY>> {
 
     private val runner: EntityInsertMultipleRunner<ENTITY, ID, META> =
-        EntityInsertMultipleRunner(context, options, entities)
+        EntityInsertMultipleRunner(context, entities)
 
-    private val support: EntityInsertR2dbcRunnerSupport<ENTITY, ID, META> = EntityInsertR2dbcRunnerSupport(context, options)
+    private val support: EntityInsertR2dbcRunnerSupport<ENTITY, ID, META> =
+        EntityInsertR2dbcRunnerSupport(context)
 
     override suspend fun run(config: R2dbcDatabaseConfig): List<ENTITY> {
         if (entities.isEmpty()) return emptyList()

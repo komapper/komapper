@@ -12,14 +12,10 @@ import org.komapper.core.dsl.context.SelectContext
 import org.komapper.core.dsl.context.SetOperationContext
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
-import org.komapper.core.dsl.options.DeleteOptions
-import org.komapper.core.dsl.options.InsertOptions
 import org.komapper.core.dsl.options.SchemaOptions
 import org.komapper.core.dsl.options.ScriptOptions
-import org.komapper.core.dsl.options.SelectOptions
 import org.komapper.core.dsl.options.TemplateExecuteOptions
 import org.komapper.core.dsl.options.TemplateSelectOptions
-import org.komapper.core.dsl.options.UpdateOptions
 import org.komapper.core.dsl.query.Columns
 import org.komapper.core.dsl.query.Query
 import org.komapper.core.dsl.query.Row
@@ -84,25 +80,22 @@ internal object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityContextQuery(
-        context: SelectContext<ENTITY, ID, META>,
-        options: SelectOptions
+        context: SelectContext<ENTITY, ID, META>
     ): R2dbcRunner<*> {
-        return EntityStoreR2dbcRunner(context, options)
+        return EntityStoreR2dbcRunner(context)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, R> entitySelectQuery(
         context: SelectContext<ENTITY, ID, META>,
-        options: SelectOptions,
         collect: suspend (Flow<ENTITY>) -> R
     ): R2dbcRunner<R> {
         val transform = R2dbcRowTransformers.singleEntity(context.target)
-        return SelectR2dbcRunner(context, options, transform, collect)
+        return SelectR2dbcRunner(context, transform, collect)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
     entityDeleteBatchQuery(
         context: EntityDeleteContext<ENTITY, ID, META>,
-        options: DeleteOptions,
         entities: List<ENTITY>
     ): R2dbcRunner<*> {
         throw UnsupportedOperationException("Batch delete is not supported.")
@@ -111,23 +104,20 @@ internal object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
     entityDeleteSingleQuery(
         context: EntityDeleteContext<ENTITY, ID, META>,
-        options: DeleteOptions,
         entity: ENTITY
     ): R2dbcRunner<Unit> {
-        return EntityDeleteSingleR2dbcRunner(context, options, entity)
+        return EntityDeleteSingleR2dbcRunner(context, entity)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityInsertMultipleQuery(
         context: EntityInsertContext<ENTITY, ID, META>,
-        options: InsertOptions,
         entities: List<ENTITY>
     ): R2dbcRunner<List<ENTITY>> {
-        return EntityInsertMultipleR2dbcRunner(context, options, entities)
+        return EntityInsertMultipleR2dbcRunner(context, entities)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityInsertBatchQuery(
         context: EntityInsertContext<ENTITY, ID, META>,
-        options: InsertOptions,
         entities: List<ENTITY>
     ): R2dbcRunner<*> {
         throw UnsupportedOperationException("Batch insert is not supported. Instead, use multiple insert.")
@@ -135,16 +125,14 @@ internal object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityInsertSingleQuery(
         context: EntityInsertContext<ENTITY, ID, META>,
-        options: InsertOptions,
         entity: ENTITY
     ): R2dbcRunner<ENTITY> {
-        return EntityInsertSingleR2dbcRunner(context, options, entity)
+        return EntityInsertSingleR2dbcRunner(context, entity)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
     entityUpdateBatchQuery(
         context: EntityUpdateContext<ENTITY, ID, META>,
-        options: UpdateOptions,
         entities: List<ENTITY>
     ): R2dbcRunner<*> {
         throw UnsupportedOperationException("Batch update is not supported. Instead, use multiple update.")
@@ -153,16 +141,14 @@ internal object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
     entityUpdateSingleQuery(
         context: EntityUpdateContext<ENTITY, ID, META>,
-        options: UpdateOptions,
         entity: ENTITY
     ): R2dbcRunner<ENTITY> {
-        return EntityUpdateSingleR2dbcRunner(context, options, entity)
+        return EntityUpdateSingleR2dbcRunner(context, entity)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
     entityUpsertBatchQuery(
         context: EntityUpsertContext<ENTITY, ID, META>,
-        options: InsertOptions,
         entities: List<ENTITY>
     ): R2dbcRunner<*> {
         throw UnsupportedOperationException("Batch upsert is not supported. Instead, use multiple upsert.")
@@ -171,19 +157,17 @@ internal object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
     entityUpsertMultipleQuery(
         context: EntityUpsertContext<ENTITY, ID, META>,
-        options: InsertOptions,
         entities: List<ENTITY>
     ): R2dbcRunner<Int> {
-        return EntityUpsertMultipleR2dbcRunner(context, options, entities)
+        return EntityUpsertMultipleR2dbcRunner(context, entities)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
     entityUpsertSingleQuery(
         context: EntityUpsertContext<ENTITY, ID, META>,
-        options: InsertOptions,
         entity: ENTITY,
     ): R2dbcRunner<Int> {
-        return EntityUpsertSingleR2dbcRunner(context, options, entity)
+        return EntityUpsertSingleR2dbcRunner(context, entity)
     }
 
     override fun schemaCreateQuery(
@@ -214,122 +198,109 @@ internal object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, R>
     sqlSelectQuery(
         context: SelectContext<ENTITY, ID, META>,
-        options: SelectOptions,
         collect: suspend (Flow<ENTITY>) -> R
     ): R2dbcRunner<R> {
         val transform = R2dbcRowTransformers.singleEntity(context.target)
-        return SelectR2dbcRunner(context, options, transform, collect)
+        return SelectR2dbcRunner(context, transform, collect)
     }
 
     override fun <T : Any, R> setOperationQuery(
         context: SetOperationContext,
-        options: SelectOptions,
         metamodel: EntityMetamodel<T, *, *>,
         collect: suspend (Flow<T>) -> R
     ): R2dbcRunner<R> {
         val provide = R2dbcRowTransformers.singleEntity(metamodel)
-        return SetOperationR2dbcRunner(context, options, provide, collect)
+        return SetOperationR2dbcRunner(context, provide, collect)
     }
 
     override fun <A : Any, R> singleColumnSelectQuery(
         context: SelectContext<*, *, *>,
-        options: SelectOptions,
         expression: ColumnExpression<A, *>,
         collect: suspend (Flow<A?>) -> R
     ): R2dbcRunner<R> {
         val transform = R2dbcRowTransformers.singleColumn(expression)
-        return SelectR2dbcRunner(context, options, transform, collect)
+        return SelectR2dbcRunner(context, transform, collect)
     }
 
     override fun <A : Any, R> singleColumnSetOperationQuery(
         context: SetOperationContext,
-        options: SelectOptions,
         expression: ColumnExpression<A, *>,
         collect: suspend (Flow<A?>) -> R
     ): R2dbcRunner<R> {
         val transform = R2dbcRowTransformers.singleColumn(expression)
-        return SetOperationR2dbcRunner(context, options, transform, collect)
+        return SetOperationR2dbcRunner(context, transform, collect)
     }
 
     override fun <A : Any, B : Any, R> pairColumnsSelectQuery(
         context: SelectContext<*, *, *>,
-        options: SelectOptions,
         expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
         collect: suspend (Flow<Pair<A?, B?>>) -> R
     ): R2dbcRunner<R> {
         val transform = R2dbcRowTransformers.pairColumns(expressions)
-        return SelectR2dbcRunner(context, options, transform, collect)
+        return SelectR2dbcRunner(context, transform, collect)
     }
 
     override fun <A : Any, B : Any, R> pairColumnsSetOperationQuery(
         context: SetOperationContext,
-        options: SelectOptions,
         expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
         collect: suspend (Flow<Pair<A?, B?>>) -> R
     ): R2dbcRunner<R> {
         val transform = R2dbcRowTransformers.pairColumns(expressions)
-        return SetOperationR2dbcRunner(context, options, transform, collect)
+        return SetOperationR2dbcRunner(context, transform, collect)
     }
 
     override fun <A : Any, B : Any, C : Any, R> tripleColumnsSelectQuery(
         context: SelectContext<*, *, *>,
-        options: SelectOptions,
         expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
         collect: suspend (Flow<Triple<A?, B?, C?>>) -> R
     ): R2dbcRunner<R> {
         val provide = R2dbcRowTransformers.tripleColumns(expressions)
-        return SelectR2dbcRunner(context, options, provide, collect)
+        return SelectR2dbcRunner(context, provide, collect)
     }
 
     override fun <A : Any, B : Any, C : Any, R> tripleColumnsSetOperationQuery(
         context: SetOperationContext,
-        options: SelectOptions,
         expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
         collect: suspend (Flow<Triple<A?, B?, C?>>) -> R
     ): R2dbcRunner<R> {
         val transform = R2dbcRowTransformers.tripleColumns(expressions)
-        return SetOperationR2dbcRunner(context, options, transform, collect)
+        return SetOperationR2dbcRunner(context, transform, collect)
     }
 
     override fun <R> multipleColumnsSelectQuery(
         context: SelectContext<*, *, *>,
-        options: SelectOptions,
         expressions: List<ColumnExpression<*, *>>,
         collect: suspend (Flow<Columns>) -> R
     ): R2dbcRunner<R> {
         val transform = R2dbcRowTransformers.multipleColumns(expressions)
-        return SelectR2dbcRunner(context, options, transform, collect)
+        return SelectR2dbcRunner(context, transform, collect)
     }
 
     override fun <R> multipleColumnsSetOperationQuery(
         context: SetOperationContext,
-        options: SelectOptions,
         expressions: List<ColumnExpression<*, *>>,
         collect: suspend (Flow<Columns>) -> R
     ): R2dbcRunner<R> {
         val transform = R2dbcRowTransformers.multipleColumns(expressions)
-        return SetOperationR2dbcRunner(context, options, transform, collect)
+        return SetOperationR2dbcRunner(context, transform, collect)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> relationDeleteQuery(
-        context: RelationDeleteContext<ENTITY, ID, META>,
-        options: DeleteOptions
+        context: RelationDeleteContext<ENTITY, ID, META>
     ): R2dbcRunner<Int> {
-        return RelationDeleteR2dbcRunner(context, options)
+        return RelationDeleteR2dbcRunner(context)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> relationInsertQuery(
-        context: RelationInsertContext<ENTITY, ID, META>,
-        options: InsertOptions
+        context: RelationInsertContext<ENTITY, ID, META>
     ): R2dbcRunner<Pair<Int, ID?>> {
-        return RelationInsertR2dbcRunner(context, options)
+        return RelationInsertR2dbcRunner(context)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> relationUpdateQuery(
-        context: RelationUpdateContext<ENTITY, ID, META>,
-        options: UpdateOptions
+        context: RelationUpdateContext<ENTITY, ID, META>
     ): R2dbcRunner<*> {
-        return RelationUpdateR2dbcRunner(context, options)
+        return RelationUpdateR2dbcRunner(context)
     }
 
     override fun templateExecuteQuery(

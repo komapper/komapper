@@ -5,11 +5,9 @@ import org.komapper.core.Statement
 import org.komapper.core.dsl.builder.RelationDeleteStatementBuilder
 import org.komapper.core.dsl.context.RelationDeleteContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
-import org.komapper.core.dsl.options.DeleteOptions
 
 class RelationDeleteRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: RelationDeleteContext<ENTITY, ID, META>,
-    @Suppress("unused") private val options: DeleteOptions
 ) : Runner {
 
     override fun dryRun(config: DatabaseConfig): Statement {
@@ -17,7 +15,7 @@ class RelationDeleteRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY
     }
 
     fun buildStatement(config: DatabaseConfig): Statement {
-        checkWhereClause(context, options)
+        checkWhereClause(context, context.options)
         val builder = RelationDeleteStatementBuilder(config.dialect, context)
         return builder.build()
     }

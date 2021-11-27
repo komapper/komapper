@@ -4,16 +4,14 @@ import org.komapper.core.DatabaseConfig
 import org.komapper.core.Statement
 import org.komapper.core.dsl.context.EntityInsertContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
-import org.komapper.core.dsl.options.InsertOptions
 
 class EntityInsertBatchRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     context: EntityInsertContext<ENTITY, ID, META>,
-    options: InsertOptions,
     private val entities: List<ENTITY>
 ) : Runner {
 
     private val support: EntityInsertRunnerSupport<ENTITY, ID, META> =
-        EntityInsertRunnerSupport(context, options)
+        EntityInsertRunnerSupport(context)
 
     override fun dryRun(config: DatabaseConfig): Statement {
         if (entities.isEmpty()) return Statement.EMPTY

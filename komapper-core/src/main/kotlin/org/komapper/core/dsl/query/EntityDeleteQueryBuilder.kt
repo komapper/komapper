@@ -4,7 +4,6 @@ import org.komapper.core.ThreadSafe
 import org.komapper.core.dsl.context.EntityDeleteContext
 import org.komapper.core.dsl.expression.WhereDeclaration
 import org.komapper.core.dsl.metamodel.EntityMetamodel
-import org.komapper.core.dsl.options.DeleteOptions
 
 @ThreadSafe
 interface EntityDeleteQueryBuilder<ENTITY : Any> {
@@ -17,19 +16,20 @@ interface EntityDeleteQueryBuilder<ENTITY : Any> {
 
 internal data class EntityDeleteQueryBuilderImpl<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityDeleteContext<ENTITY, ID, META>,
-    private val options: DeleteOptions = DeleteOptions.default
 ) :
     EntityDeleteQueryBuilder<ENTITY> {
 
     override fun single(entity: ENTITY): EntityDeleteQuery {
         context.target.checkIdValueNotNull(entity)
-        return EntityDeleteSingleQuery(context, options, entity)
+        return EntityDeleteSingleQuery(context, entity)
     }
 
     override fun batch(entities: List<ENTITY>, batchSize: Int?): EntityDeleteQuery {
         context.target.checkIdValueNotNull(entities)
-        val options = if (batchSize != null) options.copy(batchSize = batchSize) else options
-        return EntityDeleteBatchQuery(context, options, entities)
+        val context = if (batchSize != null) {
+            context.copy(options = context.options.copy(batchSize = batchSize))
+        } else context
+        return EntityDeleteBatchQuery(context, entities)
     }
 
     override fun batch(vararg entities: ENTITY, batchSize: Int?): EntityDeleteQuery {
@@ -45,6 +45,6 @@ internal data class EntityDeleteQueryBuilderImpl<ENTITY : Any, ID : Any, META : 
     }
 
     private fun asRelationDeleteQuery(): RelationDeleteQuery {
-        return RelationDeleteQueryImpl(context.asRelationDeleteContext(), options)
+        return RelationDeleteQueryImpl(context.asRelationDeleteContext())
     }
 }
