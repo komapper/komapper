@@ -18,7 +18,7 @@ class RelationDeleteStatementBuilder<ENTITY : Any, ID : Any, META : EntityMetamo
         EmptyAliasManager
     }
     private val buf = StatementBuffer()
-    private val support = BuilderSupport(dialect, aliasManager, buf)
+    private val support = BuilderSupport(dialect, aliasManager, buf, context.options.escapeSequence)
 
     fun build(): Statement {
         buf.append("delete from ")
