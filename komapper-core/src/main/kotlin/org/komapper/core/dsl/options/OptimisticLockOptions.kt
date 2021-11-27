@@ -1,6 +1,6 @@
 package org.komapper.core.dsl.options
 
-interface VersionOptions : QueryOptions {
+interface OptimisticLockOptions : QueryOptions {
     val disableOptimisticLock: Boolean
     val suppressOptimisticLockException: Boolean
 }

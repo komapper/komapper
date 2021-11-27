@@ -8,7 +8,7 @@ data class DeleteOptions(
     override val queryTimeoutSeconds: Int?,
     override val suppressLogging: Boolean,
     override val suppressOptimisticLockException: Boolean,
-) : BatchOptions, VersionOptions, WhereOptions {
+) : BatchOptions, OptimisticLockOptions, WhereOptions {
 
     companion object {
         val default = DeleteOptions(

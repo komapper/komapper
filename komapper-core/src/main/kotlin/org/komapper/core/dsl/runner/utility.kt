@@ -3,7 +3,7 @@ package org.komapper.core.dsl.runner
 import org.komapper.core.OptimisticLockException
 import org.komapper.core.dsl.builder.getWhereCriteria
 import org.komapper.core.dsl.context.QueryContext
-import org.komapper.core.dsl.options.VersionOptions
+import org.komapper.core.dsl.options.OptimisticLockOptions
 import org.komapper.core.dsl.options.WhereOptions
 
 fun checkWhereClause(queryContext: QueryContext, options: WhereOptions) {
@@ -16,7 +16,7 @@ fun checkWhereClause(queryContext: QueryContext, options: WhereOptions) {
 }
 
 fun checkOptimisticLock(
-    option: VersionOptions,
+    option: OptimisticLockOptions,
     count: Int,
     index: Int?
 ) {

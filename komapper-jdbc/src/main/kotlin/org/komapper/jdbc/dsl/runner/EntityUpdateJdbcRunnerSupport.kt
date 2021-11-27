@@ -2,14 +2,14 @@ package org.komapper.jdbc.dsl.runner
 
 import org.komapper.core.dsl.context.EntityUpdateContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
-import org.komapper.core.dsl.options.VersionOptions
+import org.komapper.core.dsl.options.OptimisticLockOptions
 import org.komapper.core.dsl.runner.checkOptimisticLock
 import org.komapper.jdbc.JdbcDatabaseConfig
 import org.komapper.jdbc.JdbcExecutor
 
 internal class EntityUpdateJdbcRunnerSupport<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityUpdateContext<ENTITY, ID, META>,
-    private val options: VersionOptions
+    private val options: OptimisticLockOptions
 ) {
 
     fun preUpdate(config: JdbcDatabaseConfig, entity: ENTITY): ENTITY {
