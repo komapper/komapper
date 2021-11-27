@@ -6,23 +6,21 @@ import org.komapper.core.dsl.context.RelationInsertContext
 import org.komapper.core.dsl.expression.Operand
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.metamodel.IdGenerator
-import org.komapper.core.dsl.options.InsertOptions
 import org.komapper.core.dsl.runner.RelationInsertRunner
 import org.komapper.jdbc.JdbcDatabaseConfig
 import org.komapper.jdbc.JdbcExecutor
 
 internal class RelationInsertJdbcRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: RelationInsertContext<ENTITY, ID, META>,
-    private val options: InsertOptions
 ) : JdbcRunner<Pair<Int, ID?>> {
 
-    private val runner: RelationInsertRunner<ENTITY, ID, META> = RelationInsertRunner(context, options)
+    private val runner: RelationInsertRunner<ENTITY, ID, META> = RelationInsertRunner(context)
 
     override fun run(config: JdbcDatabaseConfig): Pair<Int, ID?> {
         val pair = when (val idGenerator = context.target.idGenerator()) {
             is IdGenerator.Sequence<ENTITY, ID> ->
-                if (!context.target.disableSequenceAssignment() && !options.disableSequenceAssignment) {
-                    val id = idGenerator.execute(config, options)
+                if (!context.target.disableSequenceAssignment() && !context.options.disableSequenceAssignment) {
+                    val id = idGenerator.execute(config, context.options)
                     val argument = Operand.Argument(idGenerator.property, id)
                     val idAssignment = idGenerator.property to argument
                     id to idAssignment
@@ -39,7 +37,7 @@ internal class RelationInsertJdbcRunner<ENTITY : Any, ID : Any, META : EntityMet
                 context.target.updatedAtAssignment(clock)
             )
         val requiresGeneratedKeys = context.target.idGenerator() is IdGenerator.AutoIncrement<ENTITY, *>
-        val executor = JdbcExecutor(config, options, requiresGeneratedKeys)
+        val executor = JdbcExecutor(config, context.options, requiresGeneratedKeys)
         val (count, keys) = executor.executeUpdate(statement)
         val id = pair?.first ?: (keys.firstOrNull()?.let { context.target.toId(it) })
         return count to id

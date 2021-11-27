@@ -17,7 +17,7 @@ class SelectStatementBuilder(
     aliasManager: AliasManager = DefaultAliasManager(context)
 ) {
     private val buf = StatementBuffer()
-    private val support = BuilderSupport(dialect, aliasManager, buf)
+    private val support = BuilderSupport(dialect, aliasManager, buf, context.options.escapeSequence)
     private val orderBySupport = OrderByBuilderSupport(dialect, context.orderBy, aliasManager, buf)
 
     fun build(): Statement {

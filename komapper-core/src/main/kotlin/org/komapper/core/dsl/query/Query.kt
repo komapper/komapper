@@ -26,5 +26,5 @@ interface Subquery<T> : ListQuery<T>, SubqueryExpression<T> {
 interface SetOperationQuery<T> : Subquery<T> {
     fun orderBy(vararg aliases: CharSequence): SetOperationQuery<T>
     fun orderBy(vararg expressions: SortExpression): SetOperationQuery<T>
-    fun options(configurator: (SelectOptions) -> SelectOptions): SetOperationQuery<T>
+    fun options(configure: (SelectOptions) -> SelectOptions): SetOperationQuery<T>
 }

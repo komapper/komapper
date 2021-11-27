@@ -14,7 +14,6 @@ interface RelationDeleteQuery : Query<Int> {
 
 internal data class RelationDeleteQueryImpl<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: RelationDeleteContext<ENTITY, ID, META>,
-    private val options: DeleteOptions = DeleteOptions.default
 ) : RelationDeleteQuery {
 
     override fun where(declaration: WhereDeclaration): RelationDeleteQuery {
@@ -23,10 +22,11 @@ internal data class RelationDeleteQueryImpl<ENTITY : Any, ID : Any, META : Entit
     }
 
     override fun options(configure: (DeleteOptions) -> DeleteOptions): RelationDeleteQuery {
-        return copy(options = configure(options))
+        val newContext = context.copy(options = configure(context.options))
+        return copy(context = newContext)
     }
 
     override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
-        return visitor.relationDeleteQuery(context, options)
+        return visitor.relationDeleteQuery(context)
     }
 }

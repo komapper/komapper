@@ -21,5 +21,5 @@ interface FlowSubquery<T> : Subquery<T>, FlowQuery<T> {
 interface FlowSetOperationQuery<T> : SetOperationQuery<T>, FlowSubquery<T> {
     override fun orderBy(vararg aliases: CharSequence): FlowSetOperationQuery<T>
     override fun orderBy(vararg expressions: SortExpression): FlowSetOperationQuery<T>
-    override fun options(configurator: (SelectOptions) -> SelectOptions): FlowSetOperationQuery<T>
+    override fun options(configure: (SelectOptions) -> SelectOptions): FlowSetOperationQuery<T>
 }

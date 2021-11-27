@@ -11,30 +11,30 @@ interface EntityDeleteQuery : Query<Unit> {
 
 internal data class EntityDeleteSingleQuery<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityDeleteContext<ENTITY, ID, META>,
-    private val options: DeleteOptions,
     private val entity: ENTITY
 ) : EntityDeleteQuery {
 
     override fun options(configure: (DeleteOptions) -> DeleteOptions): EntityDeleteQuery {
-        return copy(options = configure(options))
+        val newContext = context.copy(options = configure(context.options))
+        return copy(context = newContext)
     }
 
     override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
-        return visitor.entityDeleteSingleQuery(context, options, entity)
+        return visitor.entityDeleteSingleQuery(context, entity)
     }
 }
 
 internal data class EntityDeleteBatchQuery<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityDeleteContext<ENTITY, ID, META>,
-    private val options: DeleteOptions,
     private val entities: List<ENTITY>,
 ) : EntityDeleteQuery {
 
     override fun options(configure: (DeleteOptions) -> DeleteOptions): EntityDeleteQuery {
-        return copy(options = configure(options))
+        val newContext = context.copy(options = configure(context.options))
+        return copy(context = newContext)
     }
 
     override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
-        return visitor.entityDeleteBatchQuery(context, options, entities)
+        return visitor.entityDeleteBatchQuery(context, entities)
     }
 }

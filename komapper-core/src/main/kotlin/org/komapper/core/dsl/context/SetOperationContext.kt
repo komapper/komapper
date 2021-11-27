@@ -1,14 +1,18 @@
 package org.komapper.core.dsl.context
 
+import org.komapper.core.ThreadSafe
 import org.komapper.core.dsl.expression.SortItem
 import org.komapper.core.dsl.expression.TableExpression
+import org.komapper.core.dsl.options.SelectOptions
 
+@ThreadSafe
 data class SetOperationContext(
     val kind: SetOperationKind,
     val left: SubqueryContext,
     val right: SubqueryContext,
-    val orderBy: List<SortItem> = listOf()
-) : QueryContext, SubqueryContext {
+    val orderBy: List<SortItem> = listOf(),
+    val options: SelectOptions = SelectOptions.default
+) : TablesProvider, SubqueryContext {
 
     override fun getTables(): Set<TableExpression<*>> {
         return visitSubqueryContext(left) + visitSubqueryContext(right)

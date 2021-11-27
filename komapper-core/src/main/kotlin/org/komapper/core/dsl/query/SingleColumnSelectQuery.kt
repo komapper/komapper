@@ -5,13 +5,11 @@ import kotlinx.coroutines.flow.toList
 import org.komapper.core.dsl.context.SelectContext
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.expression.SubqueryExpression
-import org.komapper.core.dsl.options.SelectOptions
 import org.komapper.core.dsl.visitor.FlowQueryVisitor
 import org.komapper.core.dsl.visitor.QueryVisitor
 
 internal class SingleColumnSelectQuery<A : Any>(
     override val context: SelectContext<*, *, *>,
-    private val options: SelectOptions,
     private val expression: ColumnExpression<A, *>
 ) : FlowSubquery<A?> {
 
@@ -19,16 +17,16 @@ internal class SingleColumnSelectQuery<A : Any>(
         FlowSubquerySupport(context) { SingleColumnSetOperationQuery(it, expression = expression) }
 
     override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
-        return visitor.singleColumnSelectQuery(context, options, expression) { it.toList() }
+        return visitor.singleColumnSelectQuery(context, expression) { it.toList() }
     }
 
     override fun <VISIT_RESULT> accept(visitor: FlowQueryVisitor<VISIT_RESULT>): VISIT_RESULT {
-        return visitor.singleColumnQuery(context, options, expression)
+        return visitor.singleColumnQuery(context, expression)
     }
 
     override fun <R> collect(collect: suspend (Flow<A?>) -> R): Query<R> = object : Query<R> {
         override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
-            return visitor.singleColumnSelectQuery(context, options, expression, collect)
+            return visitor.singleColumnSelectQuery(context, expression, collect)
         }
     }
 

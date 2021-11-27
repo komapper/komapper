@@ -4,21 +4,19 @@ import org.komapper.core.DatabaseConfig
 import org.komapper.core.Statement
 import org.komapper.core.dsl.context.EntityInsertContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
-import org.komapper.core.dsl.options.InsertOptions
 import org.komapper.core.dsl.runner.EntityInsertBatchRunner
 import org.komapper.jdbc.JdbcDatabaseConfig
 
 internal class EntityInsertBatchJdbcRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     context: EntityInsertContext<ENTITY, ID, META>,
-    options: InsertOptions,
     private val entities: List<ENTITY>
 ) : JdbcRunner<List<ENTITY>> {
 
     private val runner: EntityInsertBatchRunner<ENTITY, ID, META> =
-        EntityInsertBatchRunner(context, options, entities)
+        EntityInsertBatchRunner(context, entities)
 
     private val support: EntityInsertJdbcRunnerSupport<ENTITY, ID, META> =
-        EntityInsertJdbcRunnerSupport(context, options)
+        EntityInsertJdbcRunnerSupport(context)
 
     override fun run(config: JdbcDatabaseConfig): List<ENTITY> {
         if (entities.isEmpty()) return emptyList()

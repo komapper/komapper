@@ -11,28 +11,28 @@ interface EntityUpdateQuery<T> : Query<T> {
 
 internal data class EntityUpdateSingleQuery<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityUpdateContext<ENTITY, ID, META>,
-    private val options: UpdateOptions,
     private val entity: ENTITY
 ) : EntityUpdateQuery<ENTITY> {
     override fun options(configure: (UpdateOptions) -> UpdateOptions): EntityUpdateQuery<ENTITY> {
-        return copy(options = configure(options))
+        val newContext = context.copy(options = configure(context.options))
+        return copy(context = newContext)
     }
 
     override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
-        return visitor.entityUpdateSingleQuery(context, options, entity)
+        return visitor.entityUpdateSingleQuery(context, entity)
     }
 }
 
 internal data class EntityUpdateBatchQuery<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityUpdateContext<ENTITY, ID, META>,
-    private val options: UpdateOptions,
     private val entities: List<ENTITY>,
 ) : EntityUpdateQuery<List<ENTITY>> {
     override fun options(configure: (UpdateOptions) -> UpdateOptions): EntityUpdateQuery<List<ENTITY>> {
-        return copy(options = configure(options))
+        val newContext = context.copy(options = configure(context.options))
+        return copy(context = newContext)
     }
 
     override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
-        return visitor.entityUpdateBatchQuery(context, options, entities)
+        return visitor.entityUpdateBatchQuery(context, entities)
     }
 }

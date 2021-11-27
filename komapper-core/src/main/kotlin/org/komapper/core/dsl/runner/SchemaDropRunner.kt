@@ -2,12 +2,10 @@ package org.komapper.core.dsl.runner
 
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.Statement
-import org.komapper.core.dsl.metamodel.EntityMetamodel
-import org.komapper.core.dsl.options.SchemaOptions
+import org.komapper.core.dsl.context.SchemaContext
 
 class SchemaDropRunner(
-    private val entityMetamodels: List<EntityMetamodel<*, *, *>> = emptyList(),
-    @Suppress("unused") private val options: SchemaOptions = SchemaOptions.default
+    private val context: SchemaContext,
 ) : Runner {
 
     override fun dryRun(config: DatabaseConfig): Statement {
@@ -16,6 +14,6 @@ class SchemaDropRunner(
 
     fun buildStatement(config: DatabaseConfig): Statement {
         val builder = config.dialect.getSchemaStatementBuilder()
-        return builder.drop(entityMetamodels)
+        return builder.drop(context.metamodels)
     }
 }

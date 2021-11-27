@@ -11,7 +11,6 @@ interface EntityStoreQuery : Query<EntityStore> {
 
 internal data class EntityStoreQueryImpl<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: SelectContext<ENTITY, ID, META>,
-    private val options: SelectOptions
 ) : EntityStoreQuery {
 
     private val support: SelectQuerySupport<ENTITY, ID, META> = SelectQuerySupport(context)
@@ -27,10 +26,11 @@ internal data class EntityStoreQueryImpl<ENTITY : Any, ID : Any, META : EntityMe
     }
 
     override fun options(configure: (SelectOptions) -> SelectOptions): EntityStoreQuery {
-        return copy(options = configure(options))
+        val newContext = support.options(configure(context.options))
+        return copy(context = newContext)
     }
 
     override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
-        return visitor.entityContextQuery(context, options)
+        return visitor.entityContextQuery(context)
     }
 }

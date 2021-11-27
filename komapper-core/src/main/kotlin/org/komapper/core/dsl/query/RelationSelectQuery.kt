@@ -20,7 +20,6 @@ interface RelationSelectQuery<ENTITY : Any> : SelectQuery<ENTITY, RelationSelect
 
 internal data class RelationSelectQueryImpl<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     override val context: SelectContext<ENTITY, ID, META>,
-    private val options: SelectOptions = SelectOptions.default
 ) :
     RelationSelectQuery<ENTITY> {
 
@@ -86,20 +85,21 @@ internal data class RelationSelectQueryImpl<ENTITY : Any, ID : Any, META : Entit
     }
 
     override fun options(configure: (SelectOptions) -> SelectOptions): RelationSelectQuery<ENTITY> {
-        return copy(options = configure(options))
+        val newContext = context.copy(options = configure(context.options))
+        return copy(context = newContext)
     }
 
     override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
-        return visitor.sqlSelectQuery(context, options) { it.toList() }
+        return visitor.sqlSelectQuery(context) { it.toList() }
     }
 
     override fun <VISIT_RESULT> accept(visitor: FlowQueryVisitor<VISIT_RESULT>): VISIT_RESULT {
-        return visitor.selectQuery(context, options)
+        return visitor.selectQuery(context)
     }
 
     override fun <R> collect(collect: suspend (Flow<ENTITY>) -> R): Query<R> = object : Query<R> {
         override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
-            return visitor.sqlSelectQuery(context, options, collect)
+            return visitor.sqlSelectQuery(context, collect)
         }
     }
 
@@ -121,13 +121,13 @@ internal data class RelationSelectQueryImpl<ENTITY : Any, ID : Any, META : Entit
 
     override fun <T : Any, S : Any> select(expression: ScalarExpression<T, S>): ScalarQuery<T?, T, S> {
         val newContext = support.select(expression)
-        val query = SingleColumnSelectQuery(newContext, options, expression)
+        val query = SingleColumnSelectQuery(newContext, expression)
         return ScalarQueryImpl(query, expression)
     }
 
     override fun <A : Any> select(expression: ColumnExpression<A, *>): FlowSubquery<A?> {
         val newContext = support.select(expression)
-        return SingleColumnSelectQuery(newContext, options, expression)
+        return SingleColumnSelectQuery(newContext, expression)
     }
 
     override fun <A : Any, B : Any> select(
@@ -135,7 +135,7 @@ internal data class RelationSelectQueryImpl<ENTITY : Any, ID : Any, META : Entit
         expression2: ColumnExpression<B, *>
     ): FlowSubquery<Pair<A?, B?>> {
         val newContext = support.select(expression1, expression2)
-        return PairColumnsSelectQuery(newContext, options, expression1 to expression2)
+        return PairColumnsSelectQuery(newContext, expression1 to expression2)
     }
 
     override fun <A : Any, B : Any, C : Any> select(
@@ -144,7 +144,7 @@ internal data class RelationSelectQueryImpl<ENTITY : Any, ID : Any, META : Entit
         expression3: ColumnExpression<C, *>
     ): FlowSubquery<Triple<A?, B?, C?>> {
         val newContext = support.select(expression1, expression2, expression3)
-        return TripleColumnsSelectQuery(newContext, options, Triple(expression1, expression2, expression3))
+        return TripleColumnsSelectQuery(newContext, Triple(expression1, expression2, expression3))
     }
 
     override fun select(vararg expressions: ColumnExpression<*, *>): FlowSubquery<Columns> {
@@ -154,6 +154,6 @@ internal data class RelationSelectQueryImpl<ENTITY : Any, ID : Any, META : Entit
     override fun selectColumns(vararg expressions: ColumnExpression<*, *>): FlowSubquery<Columns> {
         val list = expressions.toList()
         val newContext = support.select(*list.toTypedArray())
-        return MultipleColumnsSelectQuery(newContext, options, list)
+        return MultipleColumnsSelectQuery(newContext, list)
     }
 }

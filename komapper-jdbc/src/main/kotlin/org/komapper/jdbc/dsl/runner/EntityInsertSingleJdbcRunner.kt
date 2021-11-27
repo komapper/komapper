@@ -4,21 +4,19 @@ import org.komapper.core.DatabaseConfig
 import org.komapper.core.Statement
 import org.komapper.core.dsl.context.EntityInsertContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
-import org.komapper.core.dsl.options.InsertOptions
 import org.komapper.core.dsl.runner.EntityInsertSingleRunner
 import org.komapper.jdbc.JdbcDatabaseConfig
 
 internal class EntityInsertSingleJdbcRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     context: EntityInsertContext<ENTITY, ID, META>,
-    options: InsertOptions,
     private val entity: ENTITY
 ) : JdbcRunner<ENTITY> {
 
     private val runner: EntityInsertSingleRunner<ENTITY, ID, META> =
-        EntityInsertSingleRunner(context, options, entity)
+        EntityInsertSingleRunner(context, entity)
 
     private val support: EntityInsertJdbcRunnerSupport<ENTITY, ID, META> =
-        EntityInsertJdbcRunnerSupport(context, options)
+        EntityInsertJdbcRunnerSupport(context)
 
     override fun run(config: JdbcDatabaseConfig): ENTITY {
         val newEntity = preInsert(config)

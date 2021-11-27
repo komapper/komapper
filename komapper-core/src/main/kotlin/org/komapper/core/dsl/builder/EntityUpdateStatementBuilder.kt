@@ -8,12 +8,10 @@ import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.expression.Criterion
 import org.komapper.core.dsl.expression.TableExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
-import org.komapper.core.dsl.options.OptimisticLockOptions
 
 class EntityUpdateStatementBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     val dialect: Dialect,
     val context: EntityUpdateContext<ENTITY, ID, META>,
-    val option: OptimisticLockOptions,
     val entity: ENTITY
 ) {
     private val buf = StatementBuffer()
@@ -37,7 +35,7 @@ class EntityUpdateStatementBuilder<ENTITY : Any, ID : Any, META : EntityMetamode
         }
         buf.cutBack(2)
         val criteria = context.getWhereCriteria()
-        val versionRequired = versionProperty != null && !option.disableOptimisticLock
+        val versionRequired = versionProperty != null && !context.options.disableOptimisticLock
         if (criteria.isNotEmpty() || idProperties.isNotEmpty() || versionRequired) {
             buf.append(" where ")
             for ((index, criterion) in criteria.withIndex()) {

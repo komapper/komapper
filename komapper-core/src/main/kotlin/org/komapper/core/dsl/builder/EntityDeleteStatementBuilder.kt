@@ -8,12 +8,10 @@ import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.expression.Criterion
 import org.komapper.core.dsl.expression.TableExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
-import org.komapper.core.dsl.options.OptimisticLockOptions
 
 class EntityDeleteStatementBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     val dialect: Dialect,
     val context: EntityDeleteContext<ENTITY, ID, META>,
-    val option: OptimisticLockOptions,
     val entity: ENTITY
 ) {
 
@@ -30,7 +28,7 @@ class EntityDeleteStatementBuilder<ENTITY : Any, ID : Any, META : EntityMetamode
         val target = context.target
         val identityProperties = target.idProperties()
         val versionProperty = target.versionProperty()
-        val versionRequired = versionProperty != null && !option.disableOptimisticLock
+        val versionRequired = versionProperty != null && !context.options.disableOptimisticLock
         buf.append("delete from ")
         table(target)
         val criteria = context.getWhereCriteria()

@@ -7,11 +7,9 @@ import org.komapper.core.dsl.builder.SetOperationStatementBuilder
 import org.komapper.core.dsl.context.SelectContext
 import org.komapper.core.dsl.context.SetOperationContext
 import org.komapper.core.dsl.context.SubqueryContext
-import org.komapper.core.dsl.options.SelectOptions
 
 class SetOperationRunner(
     private val context: SetOperationContext,
-    @Suppress("unused") private val options: SelectOptions,
 ) : Runner {
 
     override fun dryRun(config: DatabaseConfig): Statement {
@@ -28,7 +26,9 @@ class SetOperationRunner(
 
     private fun checkWhereClauses(subqueryContext: SubqueryContext) {
         when (subqueryContext) {
-            is SelectContext<*, *, *> -> checkWhereClause(subqueryContext, options)
+            is SelectContext<*, *, *> -> {
+                checkWhereClause(subqueryContext)
+            }
             is SetOperationContext -> {
                 checkWhereClauses(subqueryContext.left)
                 checkWhereClauses(subqueryContext.right)

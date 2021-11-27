@@ -5,7 +5,6 @@ import org.komapper.core.dsl.context.EntityUpdateContext
 import org.komapper.core.dsl.expression.AssignmentDeclaration
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.metamodel.PropertyMetamodel
-import org.komapper.core.dsl.options.UpdateOptions
 
 @ThreadSafe
 interface EntityUpdateQueryBuilder<ENTITY : Any> {
@@ -19,7 +18,6 @@ interface EntityUpdateQueryBuilder<ENTITY : Any> {
 
 internal data class EntityUpdateQueryBuilderImpl<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityUpdateContext<ENTITY, ID, META>,
-    private val options: UpdateOptions = UpdateOptions.default
 ) :
     EntityUpdateQueryBuilder<ENTITY> {
 
@@ -48,13 +46,15 @@ internal data class EntityUpdateQueryBuilderImpl<ENTITY : Any, ID : Any, META : 
 
     override fun single(entity: ENTITY): EntityUpdateQuery<ENTITY> {
         context.target.checkIdValueNotNull(entity)
-        return EntityUpdateSingleQuery(context, options, entity)
+        return EntityUpdateSingleQuery(context, entity)
     }
 
     override fun batch(entities: List<ENTITY>, batchSize: Int?): EntityUpdateQuery<List<ENTITY>> {
         context.target.checkIdValueNotNull(entities)
-        val options = if (batchSize != null) options.copy(batchSize = batchSize) else options
-        return EntityUpdateBatchQuery(context, options, entities)
+        val context = if (batchSize != null) {
+            context.copy(options = context.options.copy(batchSize = batchSize))
+        } else context
+        return EntityUpdateBatchQuery(context, entities)
     }
 
     override fun batch(vararg entities: ENTITY, batchSize: Int?): EntityUpdateQuery<List<ENTITY>> {
@@ -66,7 +66,7 @@ internal data class EntityUpdateQueryBuilderImpl<ENTITY : Any, ID : Any, META : 
     }
 
     private fun asRelationUpdateQueryBuilder(): RelationUpdateQueryBuilder<ENTITY> {
-        val query = RelationUpdateQueryImpl(context.asRelationUpdateContext(), options)
+        val query = RelationUpdateQueryImpl(context.asRelationUpdateContext())
         return RelationUpdateQueryBuilderImpl(query)
     }
 }

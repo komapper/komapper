@@ -116,11 +116,20 @@ class SetOperationTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun emptyWhereClause() = inTransaction(db) {
+    fun emptyWhereClause_top_level_allowEmptyWhereClause_option_is_ignored() = inTransaction(db) {
         val e = Meta.employee
         val q1 = QueryDsl.from(e).where { e.employeeId eq 1 }
         val q2 = QueryDsl.from(e)
         val query = (q1 union q2).options { it.copy(allowEmptyWhereClause = false) }
+        db.runQuery { query }
+    }
+
+    @Test
+    fun emptyWhereClause() = inTransaction(db) {
+        val e = Meta.employee
+        val q1 = QueryDsl.from(e).where { e.employeeId eq 1 }
+        val q2 = QueryDsl.from(e).options { it.copy(allowEmptyWhereClause = false) }
+        val query = (q1 union q2)
         val ex = assertFailsWith<IllegalStateException> {
             db.runQuery { query }.let { }
         }

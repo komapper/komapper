@@ -4,11 +4,9 @@ import org.komapper.core.DatabaseConfig
 import org.komapper.core.Statement
 import org.komapper.core.dsl.builder.SelectStatementBuilder
 import org.komapper.core.dsl.context.SelectContext
-import org.komapper.core.dsl.options.SelectOptions
 
 class SelectRunner(
     private val context: SelectContext<*, *, *>,
-    @Suppress("unused") private val options: SelectOptions,
 ) :
     Runner {
 
@@ -17,7 +15,7 @@ class SelectRunner(
     }
 
     fun buildStatement(config: DatabaseConfig): Statement {
-        checkWhereClause(context, options)
+        checkWhereClause(context)
         val builder = SelectStatementBuilder(config.dialect, context)
         return builder.build()
     }

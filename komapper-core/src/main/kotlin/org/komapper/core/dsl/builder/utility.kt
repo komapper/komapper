@@ -1,9 +1,9 @@
 package org.komapper.core.dsl.builder
 
 import org.komapper.core.dsl.context.EntityUpsertContext
-import org.komapper.core.dsl.context.QueryContext
 import org.komapper.core.dsl.context.RelationUpdateContext
 import org.komapper.core.dsl.context.SelectContext
+import org.komapper.core.dsl.context.WhereProvider
 import org.komapper.core.dsl.element.ColumnsAndSource
 import org.komapper.core.dsl.element.Join
 import org.komapper.core.dsl.expression.Criterion
@@ -15,7 +15,7 @@ import org.komapper.core.dsl.scope.HavingScope
 import org.komapper.core.dsl.scope.OnScope
 import org.komapper.core.dsl.scope.WhereScope
 
-internal fun QueryContext.getWhereCriteria(): List<Criterion> {
+internal fun WhereProvider.getWhereCriteria(): List<Criterion> {
     val where = getCompositeWhere()
     return WhereScope().apply(where)
 }

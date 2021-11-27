@@ -8,11 +8,9 @@ import org.komapper.core.dsl.expression.Operand
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.metamodel.IdGenerator
 import org.komapper.core.dsl.metamodel.PropertyMetamodel
-import org.komapper.core.dsl.options.InsertOptions
 
 class RelationInsertRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: RelationInsertContext<ENTITY, ID, META>,
-    @Suppress("unused") private val options: InsertOptions
 ) : Runner {
 
     override fun dryRun(config: DatabaseConfig): Statement {

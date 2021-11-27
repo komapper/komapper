@@ -19,7 +19,7 @@ class RelationUpdateStatementBuilder<ENTITY : Any, ID : Any, META : EntityMetamo
 
     private val aliasManager = DefaultAliasManager(context)
     private val buf = StatementBuffer()
-    private val support = BuilderSupport(dialect, aliasManager, buf)
+    private val support = BuilderSupport(dialect, aliasManager, buf, context.options.escapeSequence)
 
     fun build(): Statement {
         buf.append("update ")

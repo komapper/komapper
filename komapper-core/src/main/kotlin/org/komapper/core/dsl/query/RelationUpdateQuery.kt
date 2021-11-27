@@ -16,7 +16,6 @@ interface RelationUpdateQuery<ENTITY : Any> : Query<Int> {
 
 internal data class RelationUpdateQueryImpl<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: RelationUpdateContext<ENTITY, ID, META>,
-    private val options: UpdateOptions = UpdateOptions.default
 ) : RelationUpdateQuery<ENTITY> {
 
     override fun set(declaration: AssignmentDeclaration<ENTITY>): RelationUpdateQuery<ENTITY> {
@@ -30,10 +29,11 @@ internal data class RelationUpdateQueryImpl<ENTITY : Any, ID : Any, META : Entit
     }
 
     override fun options(configure: (UpdateOptions) -> UpdateOptions): RelationUpdateQuery<ENTITY> {
-        return copy(options = configure(options))
+        val newContext = context.copy(options = configure(context.options))
+        return copy(context = newContext)
     }
 
     override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
-        return visitor.relationUpdateQuery(context, options)
+        return visitor.relationUpdateQuery(context)
     }
 }

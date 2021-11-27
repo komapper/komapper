@@ -12,23 +12,22 @@ import org.komapper.core.dsl.visitor.QueryVisitor
 
 internal data class SingleColumnSetOperationQuery<A : Any>(
     override val context: SetOperationContext,
-    private val options: SelectOptions = SelectOptions.default,
     private val expression: ColumnExpression<A, *>
 ) : FlowSetOperationQuery<A?> {
 
     private val support: SetOperationQuerySupport<A?> = SetOperationQuerySupport(context)
 
     override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
-        return visitor.singleColumnSetOperationQuery(context, options, expression) { it.toList() }
+        return visitor.singleColumnSetOperationQuery(context, expression) { it.toList() }
     }
 
     override fun <VISIT_RESULT> accept(visitor: FlowQueryVisitor<VISIT_RESULT>): VISIT_RESULT {
-        return visitor.singleColumnSetOperationQuery(context, options, expression)
+        return visitor.singleColumnSetOperationQuery(context, expression)
     }
 
     override fun <R> collect(collect: suspend (Flow<A?>) -> R): Query<R> = object : Query<R> {
         override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
-            return visitor.singleColumnSetOperationQuery(context, options, expression, collect)
+            return visitor.singleColumnSetOperationQuery(context, expression, collect)
         }
     }
 
@@ -56,7 +55,8 @@ internal data class SingleColumnSetOperationQuery<A : Any>(
         return copy(context = support.orderBy(*expressions))
     }
 
-    override fun options(configurator: (SelectOptions) -> SelectOptions): FlowSetOperationQuery<A?> {
-        return copy(options = configurator(options))
+    override fun options(configure: (SelectOptions) -> SelectOptions): FlowSetOperationQuery<A?> {
+        val newContext = context.copy(options = configure(context.options))
+        return copy(context = newContext)
     }
 }
