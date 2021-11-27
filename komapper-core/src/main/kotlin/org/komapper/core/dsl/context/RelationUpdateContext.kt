@@ -12,8 +12,8 @@ data class RelationUpdateContext<ENTITY : Any, ID : Any, META : EntityMetamodel<
     val target: META,
     val set: AssignmentDeclaration<ENTITY> = {},
     val where: WhereDeclaration = { },
-    val options: UpdateOptions = UpdateOptions.default,
-) : QueryContext {
+    override val options: UpdateOptions = UpdateOptions.default,
+) : TablesProvider, WhereProvider {
 
     override fun getTables(): Set<TableExpression<*>> {
         return setOf(target)

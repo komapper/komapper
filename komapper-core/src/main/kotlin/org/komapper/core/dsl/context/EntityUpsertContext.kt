@@ -19,7 +19,7 @@ data class EntityUpsertContext<ENTITY : Any, ID : Any, META : EntityMetamodel<EN
     val keys: List<PropertyMetamodel<ENTITY, *, *>> = emptyList(),
     val duplicateKeyType: DuplicateKeyType,
     val set: UpsertAssignmentDeclaration<ENTITY, META> = {},
-) : QueryContext {
+) : TablesProvider {
 
     override fun getTables(): Set<TableExpression<*>> {
         return setOf(target)

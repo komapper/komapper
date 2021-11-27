@@ -8,8 +8,8 @@ import org.komapper.core.dsl.options.DeleteOptions
 
 data class EntityDeleteContext<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     val target: META,
-    val options: DeleteOptions = DeleteOptions.default,
-) : QueryContext {
+    override val options: DeleteOptions = DeleteOptions.default,
+) : TablesProvider, WhereProvider {
 
     override fun getTables(): Set<TableExpression<*>> {
         return setOf(target)

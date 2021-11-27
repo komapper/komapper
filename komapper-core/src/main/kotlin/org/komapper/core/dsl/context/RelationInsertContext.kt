@@ -9,7 +9,7 @@ data class RelationInsertContext<ENTITY : Any, ID : Any, META : EntityMetamodel<
     val target: META,
     val columnsAndSource: ColumnsAndSource<ENTITY> = ColumnsAndSource.Values {},
     val options: InsertOptions = InsertOptions.default,
-) : QueryContext {
+) : TablesProvider {
 
     override fun getTables(): Set<TableExpression<*>> {
         return setOf(target)

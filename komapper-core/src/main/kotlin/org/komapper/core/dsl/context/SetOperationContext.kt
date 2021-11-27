@@ -10,7 +10,7 @@ data class SetOperationContext(
     val right: SubqueryContext,
     val orderBy: List<SortItem> = listOf(),
     val options: SelectOptions = SelectOptions.default
-) : QueryContext, SubqueryContext {
+) : TablesProvider, SubqueryContext {
 
     override fun getTables(): Set<TableExpression<*>> {
         return visitSubqueryContext(left) + visitSubqueryContext(right)

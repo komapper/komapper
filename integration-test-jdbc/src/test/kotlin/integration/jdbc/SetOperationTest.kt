@@ -122,11 +122,20 @@ class SetOperationTest(private val db: JdbcDatabase) {
     }
 
     @Test
-    fun emptyWhereClause() {
+    fun emptyWhereClause_top_level_allowEmptyWhereClause_option_is_ignored() {
         val e = Meta.employee
         val q1 = QueryDsl.from(e).where { e.employeeId eq 1 }
         val q2 = QueryDsl.from(e)
         val query = (q1 union q2).options { it.copy(allowEmptyWhereClause = false) }
+        db.runQuery { query }
+    }
+
+    @Test
+    fun emptyWhereClause() {
+        val e = Meta.employee
+        val q1 = QueryDsl.from(e).where { e.employeeId eq 1 }
+        val q2 = QueryDsl.from(e).options { it.copy(allowEmptyWhereClause = false) }
+        val query = (q1 union q2)
         val ex = assertFailsWith<IllegalStateException> {
             db.runQuery { query }.let { }
         }

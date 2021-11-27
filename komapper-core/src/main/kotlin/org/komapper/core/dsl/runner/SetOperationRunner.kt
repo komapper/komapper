@@ -26,7 +26,9 @@ class SetOperationRunner(
 
     private fun checkWhereClauses(subqueryContext: SubqueryContext) {
         when (subqueryContext) {
-            is SelectContext<*, *, *> -> checkWhereClause(subqueryContext, context.options)
+            is SelectContext<*, *, *> -> {
+                checkWhereClause(subqueryContext)
+            }
             is SetOperationContext -> {
                 checkWhereClauses(subqueryContext.left)
                 checkWhereClauses(subqueryContext.right)
