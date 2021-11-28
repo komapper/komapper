@@ -1,6 +1,8 @@
 package org.komapper.core.dsl.context
 
 import org.komapper.core.ThreadSafe
+import org.komapper.core.dsl.expression.AssignmentDeclaration
+import org.komapper.core.dsl.expression.SubqueryExpression
 import org.komapper.core.dsl.expression.TableExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.metamodel.PropertyMetamodel
@@ -28,9 +30,19 @@ data class EntityInsertContext<ENTITY : Any, ID : Any, META : EntityMetamodel<EN
         )
     }
 
-    fun asRelationInsertContext(): RelationInsertContext<ENTITY, ID, META> {
-        return RelationInsertContext(
-            target = target
+    fun asRelationInsertValuesContext(declaration: AssignmentDeclaration<ENTITY>): RelationInsertValuesContext<ENTITY, ID, META> {
+        return RelationInsertValuesContext(
+            target = target,
+            values = declaration,
+            options = options
+        )
+    }
+
+    fun asRelationInsertSelectContext(block: () -> SubqueryExpression<ENTITY>): RelationInsertSelectContext<ENTITY, ID, META> {
+        return RelationInsertSelectContext(
+            target = target,
+            select = block(),
+            options = options.copy(disableSequenceAssignment = true)
         )
     }
 }

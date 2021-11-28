@@ -7,7 +7,8 @@ import org.komapper.core.dsl.context.EntityInsertContext
 import org.komapper.core.dsl.context.EntityUpdateContext
 import org.komapper.core.dsl.context.EntityUpsertContext
 import org.komapper.core.dsl.context.RelationDeleteContext
-import org.komapper.core.dsl.context.RelationInsertContext
+import org.komapper.core.dsl.context.RelationInsertSelectContext
+import org.komapper.core.dsl.context.RelationInsertValuesContext
 import org.komapper.core.dsl.context.RelationUpdateContext
 import org.komapper.core.dsl.context.SchemaContext
 import org.komapper.core.dsl.context.ScriptContext
@@ -31,7 +32,8 @@ import org.komapper.core.dsl.runner.EntityUpsertBatchRunner
 import org.komapper.core.dsl.runner.EntityUpsertMultipleRunner
 import org.komapper.core.dsl.runner.EntityUpsertSingleRunner
 import org.komapper.core.dsl.runner.RelationDeleteRunner
-import org.komapper.core.dsl.runner.RelationInsertRunner
+import org.komapper.core.dsl.runner.RelationInsertSelectRunner
+import org.komapper.core.dsl.runner.RelationInsertValuesRunner
 import org.komapper.core.dsl.runner.RelationUpdateRunner
 import org.komapper.core.dsl.runner.Runner
 import org.komapper.core.dsl.runner.SchemaCreateRunner
@@ -271,10 +273,14 @@ internal object DefaultQueryVisitor : QueryVisitor<Runner> {
         return RelationDeleteRunner(context)
     }
 
-    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> relationInsertQuery(
-        context: RelationInsertContext<ENTITY, ID, META>
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> relationInsertValuesQuery(
+        context: RelationInsertValuesContext<ENTITY, ID, META>
     ): Runner {
-        return RelationInsertRunner(context)
+        return RelationInsertValuesRunner(context)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> relationInsertSelectQuery(context: RelationInsertSelectContext<ENTITY, ID, META>): Runner {
+        return RelationInsertSelectRunner(context)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> relationUpdateQuery(

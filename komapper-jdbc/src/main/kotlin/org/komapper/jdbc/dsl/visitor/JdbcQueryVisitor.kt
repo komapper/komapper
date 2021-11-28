@@ -6,7 +6,8 @@ import org.komapper.core.dsl.context.EntityInsertContext
 import org.komapper.core.dsl.context.EntityUpdateContext
 import org.komapper.core.dsl.context.EntityUpsertContext
 import org.komapper.core.dsl.context.RelationDeleteContext
-import org.komapper.core.dsl.context.RelationInsertContext
+import org.komapper.core.dsl.context.RelationInsertSelectContext
+import org.komapper.core.dsl.context.RelationInsertValuesContext
 import org.komapper.core.dsl.context.RelationUpdateContext
 import org.komapper.core.dsl.context.SchemaContext
 import org.komapper.core.dsl.context.ScriptContext
@@ -34,7 +35,8 @@ import org.komapper.jdbc.dsl.runner.EntityUpsertSingleJdbcRunner
 import org.komapper.jdbc.dsl.runner.JdbcResultSetTransformers
 import org.komapper.jdbc.dsl.runner.JdbcRunner
 import org.komapper.jdbc.dsl.runner.RelationDeleteJdbcRunner
-import org.komapper.jdbc.dsl.runner.RelationInsertJdbcRunner
+import org.komapper.jdbc.dsl.runner.RelationInsertSelectJdbcRunner
+import org.komapper.jdbc.dsl.runner.RelationInsertValuesJdbcRunner
 import org.komapper.jdbc.dsl.runner.RelationUpdateJdbcRunner
 import org.komapper.jdbc.dsl.runner.SchemaCreateJdbcRunner
 import org.komapper.jdbc.dsl.runner.SchemaDropAllJdbcRunner
@@ -294,10 +296,16 @@ internal object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
         return RelationDeleteJdbcRunner(context)
     }
 
-    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> relationInsertQuery(
-        context: RelationInsertContext<ENTITY, ID, META>
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> relationInsertValuesQuery(
+        context: RelationInsertValuesContext<ENTITY, ID, META>
     ): JdbcRunner<Pair<Int, ID?>> {
-        return RelationInsertJdbcRunner(context)
+        return RelationInsertValuesJdbcRunner(context)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> relationInsertSelectQuery(
+        context: RelationInsertSelectContext<ENTITY, ID, META>
+    ): JdbcRunner<Pair<Int, List<ID>>> {
+        return RelationInsertSelectJdbcRunner(context)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> relationUpdateQuery(

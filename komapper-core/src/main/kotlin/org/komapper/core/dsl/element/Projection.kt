@@ -9,10 +9,12 @@ sealed class Projection {
     data class Expressions(val expressions: List<ColumnExpression<*, *>>) : Projection()
     data class Metamodels(val metamodels: Set<EntityMetamodel<*, *, *>>) : Projection()
 
-    fun expressions(): List<ColumnExpression<*, *>> {
+    fun expressions(projectionPredicate: (ColumnExpression<*, *>) -> Boolean = { true }): List<ColumnExpression<*, *>> {
         return when (this) {
-            is Expressions -> this.expressions
-            is Metamodels -> this.metamodels.flatMap { it.properties() }
+            is Expressions -> this.expressions.filter(projectionPredicate)
+            is Metamodels -> this.metamodels.flatMap {
+                it.properties().filter(projectionPredicate)
+            }
         }
     }
 
