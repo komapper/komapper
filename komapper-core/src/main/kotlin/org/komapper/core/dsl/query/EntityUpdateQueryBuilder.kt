@@ -62,11 +62,7 @@ internal data class EntityUpdateQueryBuilderImpl<ENTITY : Any, ID : Any, META : 
     }
 
     override fun set(declaration: AssignmentDeclaration<ENTITY>): RelationUpdateQuery<ENTITY> {
-        return asRelationUpdateQueryBuilder().set(declaration)
-    }
-
-    private fun asRelationUpdateQueryBuilder(): RelationUpdateQueryBuilder<ENTITY> {
-        val query = RelationUpdateQueryImpl(context.asRelationUpdateContext())
-        return RelationUpdateQueryBuilderImpl(query)
+        val newContext = context.asRelationUpdateContext(declaration)
+        return RelationUpdateQueryImpl(newContext)
     }
 }
