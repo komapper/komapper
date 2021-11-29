@@ -81,7 +81,7 @@ internal object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
         }
     }
 
-    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityContextQuery(
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityStoreQuery(
         context: SelectContext<ENTITY, ID, META>
     ): R2dbcRunner<*> {
         return EntityStoreR2dbcRunner(context)

@@ -31,6 +31,6 @@ internal data class EntityStoreQueryImpl<ENTITY : Any, ID : Any, META : EntityMe
     }
 
     override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
-        return visitor.entityContextQuery(context)
+        return visitor.entityStoreQuery(context)
     }
 }

@@ -75,7 +75,7 @@ internal object DefaultQueryVisitor : QueryVisitor<Runner> {
         return Runner.FlatZip(runner)
     }
 
-    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityContextQuery(
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityStoreQuery(
         context: SelectContext<ENTITY, ID, META>
     ): Runner {
         return SelectRunner(context)
