@@ -17,12 +17,13 @@ class InsertSelectTest(private val db: JdbcDatabase) {
     fun test() {
         val a = Meta.address
         val aa = a.clone(table = "ADDRESS_ARCHIVE")
-        val (count, _) = db.runQuery {
+        val (count, ids) = db.runQuery {
             QueryDsl.insert(aa).select {
                 QueryDsl.from(a).where { a.addressId between 1..5 }
             }
         }
         assertEquals(5, count)
+        assertEquals(emptyList(), ids)
     }
 
     @Test

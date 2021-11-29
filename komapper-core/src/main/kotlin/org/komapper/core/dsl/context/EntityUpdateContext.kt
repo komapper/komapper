@@ -1,6 +1,7 @@
 package org.komapper.core.dsl.context
 
 import org.komapper.core.ThreadSafe
+import org.komapper.core.dsl.expression.AssignmentDeclaration
 import org.komapper.core.dsl.expression.TableExpression
 import org.komapper.core.dsl.expression.WhereDeclaration
 import org.komapper.core.dsl.metamodel.EntityMetamodel
@@ -37,7 +38,7 @@ data class EntityUpdateContext<ENTITY : Any, ID : Any, META : EntityMetamodel<EN
         return properties.filter { it != createdAtProperty } - idProperties + versionProperties
     }
 
-    fun asRelationUpdateContext(): RelationUpdateContext<ENTITY, ID, META> {
-        return RelationUpdateContext(target)
+    fun asRelationUpdateContext(declaration: AssignmentDeclaration<ENTITY>): RelationUpdateContext<ENTITY, ID, META> {
+        return RelationUpdateContext(target, declaration)
     }
 }

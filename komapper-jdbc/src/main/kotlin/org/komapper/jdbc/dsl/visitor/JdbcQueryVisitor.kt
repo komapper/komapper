@@ -86,7 +86,7 @@ internal object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
-    entityContextQuery(
+    entityStoreQuery(
         context: SelectContext<ENTITY, ID, META>
     ): JdbcRunner<*> {
         return EntityStoreJdbcRunner(context)
