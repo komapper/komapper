@@ -3,18 +3,16 @@ package org.komapper.core.dsl.builder
 import org.komapper.core.Dialect
 import org.komapper.core.Statement
 import org.komapper.core.StatementBuffer
-import org.komapper.core.dsl.context.RelationInsertContext
-import org.komapper.core.dsl.element.ColumnsAndSource
+import org.komapper.core.dsl.context.RelationInsertValuesContext
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.expression.Operand
-import org.komapper.core.dsl.expression.SubqueryExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.metamodel.PropertyMetamodel
 import org.komapper.core.dsl.metamodel.isAutoIncrement
 
-class RelationInsertStatementBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
+class RelationInsertValuesStatementBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     val dialect: Dialect,
-    val context: RelationInsertContext<ENTITY, ID, META>,
+    val context: RelationInsertValuesContext<ENTITY, ID, META>,
     private val idAssignment: Pair<PropertyMetamodel<ENTITY, ID, *>, Operand>?,
     private val versionAssignment: Pair<PropertyMetamodel<ENTITY, *, *>, Operand>?,
     private val createdAtAssignment: Pair<PropertyMetamodel<ENTITY, *, *>, Operand>?,
@@ -28,43 +26,29 @@ class RelationInsertStatementBuilder<ENTITY : Any, ID : Any, META : EntityMetamo
         val target = context.target
         buf.append("insert into ")
         table(target)
-        when (val columnsAndSource = context.columnsAndSource) {
-            is ColumnsAndSource.Values<ENTITY> -> {
-                buf.append(" (")
-                val assignments = toAssignments(columnsAndSource)
-                if (assignments.isNotEmpty()) {
-                    for ((property, _) in assignments) {
-                        column(property)
-                        buf.append(", ")
-                    }
-                }
-                buf.cutBack(2)
-                buf.append(") values (")
-                if (assignments.isNotEmpty()) {
-                    for ((_, operand) in assignments) {
-                        operand(operand)
-                        buf.append(", ")
-                    }
-                }
-                buf.cutBack(2)
-                buf.append(")")
-            }
-            is ColumnsAndSource.Subquery<ENTITY> -> {
-                buf.append(" (")
-                for (p in target.properties()) {
-                    column(p)
-                    buf.append(", ")
-                }
-                buf.cutBack(2)
-                buf.append(") ")
-                subquery(columnsAndSource.expression)
+        buf.append(" (")
+        val assignments = getAssignments()
+        if (assignments.isNotEmpty()) {
+            for ((property, _) in assignments) {
+                column(property)
+                buf.append(", ")
             }
         }
+        buf.cutBack(2)
+        buf.append(") values (")
+        if (assignments.isNotEmpty()) {
+            for ((_, operand) in assignments) {
+                operand(operand)
+                buf.append(", ")
+            }
+        }
+        buf.cutBack(2)
+        buf.append(")")
         return buf.toStatement()
     }
 
-    private fun toAssignments(columnsAndSource: ColumnsAndSource.Values<ENTITY>): List<Pair<PropertyMetamodel<ENTITY, *, *>, Operand>> {
-        val assignments = columnsAndSource.getAssignments()
+    private fun getAssignments(): List<Pair<PropertyMetamodel<ENTITY, *, *>, Operand>> {
+        val assignments = context.getAssignments()
         val properties = assignments.map { it.first }
         val additionalAssignments = listOfNotNull(
             idAssignment,
@@ -88,10 +72,5 @@ class RelationInsertStatementBuilder<ENTITY : Any, ID : Any, META : EntityMetamo
 
     private fun operand(operand: Operand) {
         support.visitOperand(operand)
-    }
-
-    private fun subquery(expression: SubqueryExpression<*>) {
-        val statement = support.buildSubqueryStatement(expression)
-        buf.append(statement)
     }
 }

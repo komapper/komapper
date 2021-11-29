@@ -17,8 +17,8 @@ interface EntityInsertQueryBuilder<ENTITY : Any, ID : Any, META : EntityMetamode
     fun multiple(vararg entities: ENTITY): EntityInsertQuery<List<ENTITY>>
     fun batch(entities: List<ENTITY>, batchSize: Int? = null): EntityInsertQuery<List<ENTITY>>
     fun batch(vararg entities: ENTITY, batchSize: Int? = null): EntityInsertQuery<List<ENTITY>>
-    fun values(declaration: AssignmentDeclaration<ENTITY>): RelationInsertQuery<ENTITY, ID>
-    fun select(block: () -> SubqueryExpression<ENTITY>): RelationInsertQuery<ENTITY, ID>
+    fun select(block: () -> SubqueryExpression<ENTITY>): RelationInsertQuery<ENTITY, ID, Pair<Int, List<ID>>>
+    fun values(declaration: AssignmentDeclaration<ENTITY>): RelationInsertQuery<ENTITY, ID, Pair<Int, ID?>>
 }
 
 internal data class EntityInsertQueryBuilderImpl<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
@@ -65,16 +65,13 @@ internal data class EntityInsertQueryBuilderImpl<ENTITY : Any, ID : Any, META : 
         return batch(entities.toList(), batchSize)
     }
 
-    override fun values(declaration: AssignmentDeclaration<ENTITY>): RelationInsertQuery<ENTITY, ID> {
-        return asRelationInsertQueryBuilder().values(declaration)
+    override fun select(block: () -> SubqueryExpression<ENTITY>): RelationInsertQuery<ENTITY, ID, Pair<Int, List<ID>>> {
+        val newContext = context.asRelationInsertSelectContext(block)
+        return RelationInsertSelectQuery(newContext)
     }
 
-    override fun select(block: () -> SubqueryExpression<ENTITY>): RelationInsertQuery<ENTITY, ID> {
-        return asRelationInsertQueryBuilder().select(block)
-    }
-
-    private fun asRelationInsertQueryBuilder(): RelationInsertQueryBuilder<ENTITY, ID> {
-        val query = RelationInsertQueryImpl(context.asRelationInsertContext())
-        return RelationInsertQueryBuilderImpl(query)
+    override fun values(declaration: AssignmentDeclaration<ENTITY>): RelationInsertQuery<ENTITY, ID, Pair<Int, ID?>> {
+        val newContext = context.asRelationInsertValuesContext(declaration)
+        return RelationInsertValuesQuery(newContext)
     }
 }

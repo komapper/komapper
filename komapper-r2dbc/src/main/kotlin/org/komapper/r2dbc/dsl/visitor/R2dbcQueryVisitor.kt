@@ -6,7 +6,8 @@ import org.komapper.core.dsl.context.EntityInsertContext
 import org.komapper.core.dsl.context.EntityUpdateContext
 import org.komapper.core.dsl.context.EntityUpsertContext
 import org.komapper.core.dsl.context.RelationDeleteContext
-import org.komapper.core.dsl.context.RelationInsertContext
+import org.komapper.core.dsl.context.RelationInsertSelectContext
+import org.komapper.core.dsl.context.RelationInsertValuesContext
 import org.komapper.core.dsl.context.RelationUpdateContext
 import org.komapper.core.dsl.context.SchemaContext
 import org.komapper.core.dsl.context.ScriptContext
@@ -30,7 +31,8 @@ import org.komapper.r2dbc.dsl.runner.EntityUpsertSingleR2dbcRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcRowTransformers
 import org.komapper.r2dbc.dsl.runner.R2dbcRunner
 import org.komapper.r2dbc.dsl.runner.RelationDeleteR2dbcRunner
-import org.komapper.r2dbc.dsl.runner.RelationInsertR2dbcRunner
+import org.komapper.r2dbc.dsl.runner.RelationInsertSelectR2dbcRunner
+import org.komapper.r2dbc.dsl.runner.RelationInsertValuesR2dbcRunner
 import org.komapper.r2dbc.dsl.runner.RelationUpdateR2dbcRunner
 import org.komapper.r2dbc.dsl.runner.SchemaCreateR2dbcRunner
 import org.komapper.r2dbc.dsl.runner.SchemaDropAllR2dbcRunner
@@ -288,10 +290,16 @@ internal object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
         return RelationDeleteR2dbcRunner(context)
     }
 
-    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> relationInsertQuery(
-        context: RelationInsertContext<ENTITY, ID, META>
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> relationInsertValuesQuery(
+        context: RelationInsertValuesContext<ENTITY, ID, META>
     ): R2dbcRunner<Pair<Int, ID?>> {
-        return RelationInsertR2dbcRunner(context)
+        return RelationInsertValuesR2dbcRunner(context)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> relationInsertSelectQuery(
+        context: RelationInsertSelectContext<ENTITY, ID, META>
+    ): R2dbcRunner<Pair<Int, List<ID>>> {
+        return RelationInsertSelectR2dbcRunner(context)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> relationUpdateQuery(

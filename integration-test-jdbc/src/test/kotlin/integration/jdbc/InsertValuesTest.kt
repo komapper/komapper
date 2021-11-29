@@ -158,18 +158,6 @@ class InsertValuesTest(private val db: JdbcDatabase) {
     }
 
     @Test
-    fun select() {
-        val a = Meta.address
-        val aa = a.clone(table = "ADDRESS_ARCHIVE")
-        val (count) = db.runQuery {
-            QueryDsl.insert(aa).select {
-                QueryDsl.from(a).where { a.addressId between 1..5 }
-            }
-        }
-        assertEquals(5, count)
-    }
-
-    @Test
     fun dryRun_sequence() {
         val s = Meta.sequenceStrategy
         val query = QueryDsl.insert(s).values {

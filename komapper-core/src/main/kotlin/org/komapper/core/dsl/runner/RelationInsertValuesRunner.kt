@@ -2,15 +2,15 @@ package org.komapper.core.dsl.runner
 
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.Statement
-import org.komapper.core.dsl.builder.RelationInsertStatementBuilder
-import org.komapper.core.dsl.context.RelationInsertContext
+import org.komapper.core.dsl.builder.RelationInsertValuesStatementBuilder
+import org.komapper.core.dsl.context.RelationInsertValuesContext
 import org.komapper.core.dsl.expression.Operand
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.metamodel.IdGenerator
 import org.komapper.core.dsl.metamodel.PropertyMetamodel
 
-class RelationInsertRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
-    private val context: RelationInsertContext<ENTITY, ID, META>,
+class RelationInsertValuesRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
+    private val context: RelationInsertValuesContext<ENTITY, ID, META>,
 ) : Runner {
 
     override fun dryRun(config: DatabaseConfig): Statement {
@@ -35,7 +35,7 @@ class RelationInsertRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY
         createdAtAssignment: Pair<PropertyMetamodel<ENTITY, *, *>, Operand>? = null,
         updatedAtAssignment: Pair<PropertyMetamodel<ENTITY, *, *>, Operand>? = null
     ): Statement {
-        val builder = RelationInsertStatementBuilder(
+        val builder = RelationInsertValuesStatementBuilder(
             config.dialect,
             context,
             idAssignment,

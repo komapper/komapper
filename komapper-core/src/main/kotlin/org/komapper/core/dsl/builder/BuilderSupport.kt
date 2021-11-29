@@ -199,15 +199,18 @@ class BuilderSupport(
         buf.append(")")
     }
 
-    fun buildSubqueryStatement(expression: SubqueryExpression<*>): Statement {
+    fun buildSubqueryStatement(
+        expression: SubqueryExpression<*>,
+        projectionPredicate: (ColumnExpression<*, *>) -> Boolean = { true }
+    ): Statement {
         return when (val context = expression.context) {
             is SelectContext<*, *, *> -> {
                 val childAliasManager = DefaultAliasManager(context, aliasManager)
-                val builder = SelectStatementBuilder(dialect, context, childAliasManager)
+                val builder = SelectStatementBuilder(dialect, context, childAliasManager, projectionPredicate)
                 builder.build()
             }
             is SetOperationContext -> {
-                val builder = SetOperationStatementBuilder(dialect, context, aliasManager)
+                val builder = SetOperationStatementBuilder(dialect, context, aliasManager, projectionPredicate)
                 builder.build()
             }
         }

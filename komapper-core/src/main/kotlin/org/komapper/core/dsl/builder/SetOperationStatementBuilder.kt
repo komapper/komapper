@@ -7,11 +7,13 @@ import org.komapper.core.dsl.context.SelectContext
 import org.komapper.core.dsl.context.SetOperationContext
 import org.komapper.core.dsl.context.SetOperationKind
 import org.komapper.core.dsl.context.SubqueryContext
+import org.komapper.core.dsl.expression.ColumnExpression
 
 class SetOperationStatementBuilder(
     private val dialect: Dialect,
     private val context: SetOperationContext,
-    private val aliasManager: AliasManager
+    private val aliasManager: AliasManager,
+    private val projectionPredicate: (ColumnExpression<*, *>) -> Boolean = { true }
 ) {
 
     private val buf = StatementBuffer()
@@ -42,7 +44,7 @@ class SetOperationStatementBuilder(
 
     private fun visitSelectContext(selectContext: SelectContext<*, *, *>) {
         val childAliasManager = DefaultAliasManager(selectContext, aliasManager)
-        val builder = SelectStatementBuilder(dialect, selectContext, childAliasManager)
+        val builder = SelectStatementBuilder(dialect, selectContext, childAliasManager, projectionPredicate)
         val statement = builder.build()
         buf.append("(")
         buf.append(statement)

@@ -154,16 +154,4 @@ class InsertValuesTest(private val db: R2dbcDatabase) {
         val address = db.runQuery { QueryDsl.from(a).where { a.addressId eq 19 }.first() }
         assertEquals(10, address.version)
     }
-
-    @Test
-    fun select() = inTransaction(db) {
-        val a = Meta.address
-        val aa = a.clone(table = "ADDRESS_ARCHIVE")
-        val (count) = db.runQuery {
-            QueryDsl.insert(aa).select {
-                QueryDsl.from(a).where { a.addressId between 1..5 }
-            }
-        }
-        assertEquals(5, count)
-    }
 }

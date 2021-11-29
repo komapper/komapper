@@ -14,7 +14,8 @@ import org.komapper.core.dsl.expression.TableExpression
 class SelectStatementBuilder(
     val dialect: Dialect,
     val context: SelectContext<*, *, *>,
-    aliasManager: AliasManager = DefaultAliasManager(context)
+    aliasManager: AliasManager = DefaultAliasManager(context),
+    private val projectionPredicate: (ColumnExpression<*, *>) -> Boolean = { true }
 ) {
     private val buf = StatementBuffer()
     private val support = BuilderSupport(dialect, aliasManager, buf, context.options.escapeSequence)
@@ -37,7 +38,7 @@ class SelectStatementBuilder(
         if (context.distinct) {
             buf.append("distinct ")
         }
-        for (e in context.getProjection().expressions()) {
+        for (e in context.getProjection().expressions(projectionPredicate)) {
             column(e)
             buf.append(", ")
         }

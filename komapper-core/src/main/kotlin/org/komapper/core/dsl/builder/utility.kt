@@ -1,10 +1,10 @@
 package org.komapper.core.dsl.builder
 
 import org.komapper.core.dsl.context.EntityUpsertContext
+import org.komapper.core.dsl.context.RelationInsertValuesContext
 import org.komapper.core.dsl.context.RelationUpdateContext
 import org.komapper.core.dsl.context.SelectContext
 import org.komapper.core.dsl.context.WhereProvider
-import org.komapper.core.dsl.element.ColumnsAndSource
 import org.komapper.core.dsl.element.Join
 import org.komapper.core.dsl.expression.Criterion
 import org.komapper.core.dsl.expression.Operand
@@ -32,8 +32,8 @@ internal fun <ENTITY : Any> RelationUpdateContext<ENTITY, *, *>.getAssignments()
     return AssignmentScope<ENTITY>().apply(set)
 }
 
-internal fun <ENTITY : Any> ColumnsAndSource.Values<ENTITY>.getAssignments(): List<Pair<PropertyMetamodel<ENTITY, *, *>, Operand>> {
-    return AssignmentScope<ENTITY>().apply(declaration)
+internal fun <ENTITY : Any> RelationInsertValuesContext<ENTITY, *, *>.getAssignments(): List<Pair<PropertyMetamodel<ENTITY, *, *>, Operand>> {
+    return AssignmentScope<ENTITY>().apply(values)
 }
 
 fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> EntityUpsertContext<ENTITY, ID, META>.getAssignments(): List<Pair<PropertyMetamodel<ENTITY, *, *>, Operand>> {

@@ -7,7 +7,8 @@ import org.komapper.core.dsl.context.EntityInsertContext
 import org.komapper.core.dsl.context.EntityUpdateContext
 import org.komapper.core.dsl.context.EntityUpsertContext
 import org.komapper.core.dsl.context.RelationDeleteContext
-import org.komapper.core.dsl.context.RelationInsertContext
+import org.komapper.core.dsl.context.RelationInsertSelectContext
+import org.komapper.core.dsl.context.RelationInsertValuesContext
 import org.komapper.core.dsl.context.RelationUpdateContext
 import org.komapper.core.dsl.context.SchemaContext
 import org.komapper.core.dsl.context.ScriptContext
@@ -191,8 +192,13 @@ interface QueryVisitor<VISIT_RESULT> {
     ): VISIT_RESULT
 
     fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
-    relationInsertQuery(
-        context: RelationInsertContext<ENTITY, ID, META>
+    relationInsertValuesQuery(
+        context: RelationInsertValuesContext<ENTITY, ID, META>
+    ): VISIT_RESULT
+
+    fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
+    relationInsertSelectQuery(
+        context: RelationInsertSelectContext<ENTITY, ID, META>
     ): VISIT_RESULT
 
     fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
