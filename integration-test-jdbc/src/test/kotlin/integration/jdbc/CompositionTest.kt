@@ -123,8 +123,13 @@ class CompositionTest(private val db: JdbcDatabase) {
             count(e.departmentId) greater 3
         }
         val groupBy = groupBy(e.departmentId)
+        val orderBy = orderBy(e.departmentId)
         val list = db.runQuery {
-            QueryDsl.from(e).having(having).groupBy(groupBy).select(e.departmentId, count(e.departmentId))
+            QueryDsl.from(e)
+                .having(having)
+                .groupBy(groupBy)
+                .orderBy(orderBy)
+                .select(e.departmentId, count(e.departmentId))
         }
         assertEquals(2, list.size)
         assertEquals(listOf(2 to 5L, 3 to 6L), list)
