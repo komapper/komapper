@@ -3,9 +3,7 @@ package org.komapper.core.dsl.query
 import org.komapper.core.dsl.context.SelectContext
 import org.komapper.core.dsl.element.ForUpdate
 import org.komapper.core.dsl.element.Join
-import org.komapper.core.dsl.element.JoinKind
 import org.komapper.core.dsl.expression.ColumnExpression
-import org.komapper.core.dsl.expression.OnDeclaration
 import org.komapper.core.dsl.expression.SortExpression
 import org.komapper.core.dsl.expression.SortItem
 import org.komapper.core.dsl.expression.WhereDeclaration
@@ -18,26 +16,9 @@ internal class SelectQuerySupport<ENTITY : Any, ID : Any, META : EntityMetamodel
     private val context: SelectContext<ENTITY, ID, META>
 ) {
 
-    fun <ENTITY2 : Any, ID2 : Any, META2 : EntityMetamodel<ENTITY2, ID2, META2>> innerJoin(
-        metamodel: META2,
-        declaration: OnDeclaration
+    fun <ENTITY2 : Any, ID2 : Any, META2 : EntityMetamodel<ENTITY2, ID2, META2>> join(
+        join: Join<ENTITY2, ID2, META2>,
     ): SelectContext<ENTITY, ID, META> {
-        return join(metamodel, declaration, JoinKind.INNER)
-    }
-
-    fun <ENTITY2 : Any, ID2 : Any, META2 : EntityMetamodel<ENTITY2, ID2, META2>> leftJoin(
-        metamodel: META2,
-        declaration: OnDeclaration
-    ): SelectContext<ENTITY, ID, META> {
-        return join(metamodel, declaration, JoinKind.LEFT_OUTER)
-    }
-
-    private fun <ENTITY2 : Any, ID2 : Any, META2 : EntityMetamodel<ENTITY2, ID2, META2>> join(
-        metamodel: META2,
-        declaration: OnDeclaration,
-        kind: JoinKind
-    ): SelectContext<ENTITY, ID, META> {
-        val join = Join(metamodel, kind, declaration)
         return context.copy(joins = context.joins + join)
     }
 
@@ -45,7 +26,7 @@ internal class SelectQuerySupport<ENTITY : Any, ID : Any, META : EntityMetamodel
         return context.copy(where = context.where + declaration)
     }
 
-    fun orderBy(vararg expressions: SortExpression): SelectContext<ENTITY, ID, META> {
+    fun orderBy(expressions: List<SortExpression>): SelectContext<ENTITY, ID, META> {
         val items = expressions.map(SortItem.Column::of)
         return context.copy(orderBy = context.orderBy + items)
     }

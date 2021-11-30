@@ -7,14 +7,22 @@ import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.metamodel.where
 
 @ThreadSafe
-data class Join<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
-    val target: META,
-    val kind: JoinKind,
+sealed interface Join<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> {
+    val target: META
     val on: OnDeclaration
-) {
-    val where: WhereDeclaration get() = target.where
+    val where: WhereDeclaration
 }
 
-enum class JoinKind {
-    INNER, LEFT_OUTER
+data class InnerJoin<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
+    override val target: META,
+    override val on: OnDeclaration
+) : Join<ENTITY, ID, META> {
+    override val where: WhereDeclaration get() = target.where
+}
+
+data class LeftJoin<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
+    override val target: META,
+    override val on: OnDeclaration
+) : Join<ENTITY, ID, META> {
+    override val where: WhereDeclaration get() = target.where
 }

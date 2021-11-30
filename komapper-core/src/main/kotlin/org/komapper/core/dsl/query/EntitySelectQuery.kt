@@ -5,9 +5,10 @@ import kotlinx.coroutines.flow.toList
 import org.komapper.core.dsl.context.SelectContext
 import org.komapper.core.dsl.context.SetOperationContext
 import org.komapper.core.dsl.context.SetOperationKind
+import org.komapper.core.dsl.element.InnerJoin
+import org.komapper.core.dsl.element.LeftJoin
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.expression.HavingDeclaration
-import org.komapper.core.dsl.expression.OnDeclaration
 import org.komapper.core.dsl.expression.ScalarExpression
 import org.komapper.core.dsl.expression.SortExpression
 import org.komapper.core.dsl.expression.SubqueryExpression
@@ -34,19 +35,13 @@ internal data class EntitySelectQueryImpl<ENTITY : Any, ID : Any, META : EntityM
         return copy(context = newContext)
     }
 
-    override fun <ENTITY2 : Any, ID2 : Any, META2 : EntityMetamodel<ENTITY2, ID2, META2>> innerJoin(
-        metamodel: META2,
-        on: OnDeclaration
-    ): EntitySelectQuery<ENTITY> {
-        val newContext = support.innerJoin(metamodel, on)
+    override fun <ENTITY2 : Any, ID2 : Any, META2 : EntityMetamodel<ENTITY2, ID2, META2>> innerJoin(join: InnerJoin<ENTITY2, ID2, META2>): EntitySelectQuery<ENTITY> {
+        val newContext = support.join(join)
         return copy(context = newContext)
     }
 
-    override fun <ENTITY2 : Any, ID2 : Any, META2 : EntityMetamodel<ENTITY2, ID2, META2>> leftJoin(
-        metamodel: META2,
-        on: OnDeclaration
-    ): EntitySelectQuery<ENTITY> {
-        val newContext = support.leftJoin(metamodel, on)
+    override fun <ENTITY2 : Any, ID2 : Any, META2 : EntityMetamodel<ENTITY2, ID2, META2>> leftJoin(join: LeftJoin<ENTITY2, ID2, META2>): EntitySelectQuery<ENTITY> {
+        val newContext = support.join(join)
         return copy(context = newContext)
     }
 
@@ -55,8 +50,8 @@ internal data class EntitySelectQueryImpl<ENTITY : Any, ID : Any, META : EntityM
         return copy(context = newContext)
     }
 
-    override fun orderBy(vararg expressions: SortExpression): EntitySelectQuery<ENTITY> {
-        val newContext = support.orderBy(*expressions)
+    override fun orderBy(expressions: List<SortExpression>): EntitySelectQuery<ENTITY> {
+        val newContext = support.orderBy(expressions)
         return copy(context = newContext)
     }
 
@@ -123,8 +118,8 @@ internal data class EntitySelectQueryImpl<ENTITY : Any, ID : Any, META : EntityM
         return RelationSetOperationQueryImpl(setOperatorContext, metamodel = context.target)
     }
 
-    override fun groupBy(vararg expressions: ColumnExpression<*, *>): RelationSelectQuery<ENTITY> {
-        return asRelationQuery().groupBy(*expressions)
+    override fun groupBy(expressions: List<ColumnExpression<*, *>>): RelationSelectQuery<ENTITY> {
+        return asRelationQuery().groupBy(expressions)
     }
 
     override fun having(declaration: HavingDeclaration): RelationSelectQuery<ENTITY> {

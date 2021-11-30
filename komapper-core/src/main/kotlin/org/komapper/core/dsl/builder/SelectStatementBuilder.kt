@@ -4,7 +4,8 @@ import org.komapper.core.Dialect
 import org.komapper.core.Statement
 import org.komapper.core.StatementBuffer
 import org.komapper.core.dsl.context.SelectContext
-import org.komapper.core.dsl.element.JoinKind
+import org.komapper.core.dsl.element.InnerJoin
+import org.komapper.core.dsl.element.LeftJoin
 import org.komapper.core.dsl.expression.AggregateFunction
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.expression.Criterion
@@ -50,10 +51,9 @@ class SelectStatementBuilder(
         table(context.target)
         if (context.joins.isNotEmpty()) {
             for (join in context.joins) {
-                if (join.kind === JoinKind.INNER) {
-                    buf.append(" inner join ")
-                } else if (join.kind === JoinKind.LEFT_OUTER) {
-                    buf.append(" left outer join ")
+                when (join) {
+                    is InnerJoin -> buf.append(" inner join ")
+                    is LeftJoin -> buf.append(" left outer join ")
                 }
                 table(join.target)
                 val criteria = join.getOnCriteria()
