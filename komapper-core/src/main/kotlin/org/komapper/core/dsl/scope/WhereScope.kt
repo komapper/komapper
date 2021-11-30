@@ -6,19 +6,25 @@ import org.komapper.core.dsl.expression.WhereDeclaration
 
 @Scope
 class WhereScope(
-    private val support: FilterScopeSupport<WhereScope> = FilterScopeSupport { WhereScope() }
-) : FilterScope by support,
-    List<Criterion> by support {
+    private val support: FilterScopeSupport
+) : FilterScope by support {
 
     fun and(declaration: WhereDeclaration) {
-        support.addCriteria(declaration, Criterion::And)
+        addCriteria(declaration, Criterion::And)
     }
 
     fun or(declaration: WhereDeclaration) {
-        support.addCriteria(declaration, Criterion::Or)
+        addCriteria(declaration, Criterion::Or)
     }
 
     fun not(declaration: WhereDeclaration) {
-        support.addCriteria(declaration, Criterion::Not)
+        addCriteria(declaration, Criterion::Not)
+    }
+
+    private fun addCriteria(declaration: WhereDeclaration, operator: (List<Criterion>) -> Criterion) {
+        val newSupport = FilterScopeSupport()
+        WhereScope(newSupport).apply(declaration)
+        val criterion = operator(newSupport.toList())
+        support.add(criterion)
     }
 }

@@ -30,7 +30,6 @@ class InsertValuesTest(private val db: JdbcDatabase) {
         val a = Meta.address
         val (count, key) = db.runQuery {
             QueryDsl.insert(a).values {
-
                 a.addressId set 19
                 a.street set "STREET 16"
                 a.version set 0

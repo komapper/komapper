@@ -6,19 +6,25 @@ import org.komapper.core.dsl.expression.OnDeclaration
 
 @Scope
 class OnScope(
-    private val support: FilterScopeSupport<OnScope> = FilterScopeSupport { OnScope() }
-) : FilterScope by support,
-    List<Criterion> by support {
+    private val support: FilterScopeSupport
+) : FilterScope by support {
 
     fun and(declaration: OnDeclaration) {
-        support.addCriteria(declaration, Criterion::And)
+        addCriteria(declaration, Criterion::And)
     }
 
     fun or(declaration: OnDeclaration) {
-        support.addCriteria(declaration, Criterion::Or)
+        addCriteria(declaration, Criterion::Or)
     }
 
     fun not(declaration: OnDeclaration) {
-        support.addCriteria(declaration, Criterion::Not)
+        addCriteria(declaration, Criterion::Not)
+    }
+
+    private fun addCriteria(declaration: OnDeclaration, operator: (List<Criterion>) -> Criterion) {
+        val newSupport = FilterScopeSupport()
+        OnScope(newSupport).apply(declaration)
+        val criterion = operator(newSupport.toList())
+        support.add(criterion)
     }
 }

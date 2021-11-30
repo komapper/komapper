@@ -1,8 +1,8 @@
 package org.komapper.core.dsl.context
 
 import org.komapper.core.ThreadSafe
+import org.komapper.core.dsl.expression.AssignmentDeclaration
 import org.komapper.core.dsl.expression.TableExpression
-import org.komapper.core.dsl.expression.UpsertAssignmentDeclaration
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.metamodel.PropertyMetamodel
 
@@ -20,7 +20,7 @@ data class EntityUpsertContext<ENTITY : Any, ID : Any, META : EntityMetamodel<EN
     ),
     val keys: List<PropertyMetamodel<ENTITY, *, *>> = emptyList(),
     val duplicateKeyType: DuplicateKeyType,
-    val set: UpsertAssignmentDeclaration<ENTITY, META> = {},
+    val set: AssignmentDeclaration<ENTITY, META> = {},
 ) : TablesProvider {
 
     override fun getTables(): Set<TableExpression<*>> {

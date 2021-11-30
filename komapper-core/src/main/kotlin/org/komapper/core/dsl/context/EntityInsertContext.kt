@@ -30,7 +30,7 @@ data class EntityInsertContext<ENTITY : Any, ID : Any, META : EntityMetamodel<EN
         )
     }
 
-    fun asRelationInsertValuesContext(declaration: AssignmentDeclaration<ENTITY>): RelationInsertValuesContext<ENTITY, ID, META> {
+    fun asRelationInsertValuesContext(declaration: AssignmentDeclaration<ENTITY, META>): RelationInsertValuesContext<ENTITY, ID, META> {
         return RelationInsertValuesContext(
             target = target,
             values = declaration,

@@ -1,5 +1,7 @@
 package org.komapper.core.dsl.query
 
+import org.komapper.core.dsl.element.InnerJoin
+import org.komapper.core.dsl.element.LeftJoin
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.expression.HavingDeclaration
 import org.komapper.core.dsl.expression.OnDeclaration
@@ -15,20 +17,30 @@ interface SelectQuery<ENTITY : Any, QUERY : SelectQuery<ENTITY, QUERY>> :
     fun <ENTITY2 : Any, ID2 : Any, META2 : EntityMetamodel<ENTITY2, ID2, META2>> innerJoin(
         metamodel: META2,
         on: OnDeclaration
-    ): QUERY
+    ): QUERY = innerJoin(InnerJoin(metamodel, on))
 
     fun <ENTITY2 : Any, ID2 : Any, META2 : EntityMetamodel<ENTITY2, ID2, META2>> leftJoin(
         metamodel: META2,
         on: OnDeclaration
+    ): QUERY = leftJoin(LeftJoin(metamodel, on))
+
+    fun <ENTITY2 : Any, ID2 : Any, META2 : EntityMetamodel<ENTITY2, ID2, META2>> innerJoin(
+        join: InnerJoin<ENTITY2, ID2, META2>,
+    ): QUERY
+
+    fun <ENTITY2 : Any, ID2 : Any, META2 : EntityMetamodel<ENTITY2, ID2, META2>> leftJoin(
+        join: LeftJoin<ENTITY2, ID2, META2>,
     ): QUERY
 
     fun where(declaration: WhereDeclaration): QUERY
-    fun orderBy(vararg expressions: SortExpression): QUERY
+    fun orderBy(vararg expressions: SortExpression): QUERY = orderBy(expressions.toList())
+    fun orderBy(expressions: List<SortExpression>): QUERY
     fun offset(offset: Int): QUERY
     fun limit(limit: Int): QUERY
     fun forUpdate(): QUERY
     fun options(configure: (SelectOptions) -> SelectOptions): QUERY
-    fun groupBy(vararg expressions: ColumnExpression<*, *>): RelationSelectQuery<ENTITY>
+    fun groupBy(vararg expressions: ColumnExpression<*, *>): RelationSelectQuery<ENTITY> = groupBy(expressions.toList())
+    fun groupBy(expressions: List<ColumnExpression<*, *>>): RelationSelectQuery<ENTITY>
     fun having(declaration: HavingDeclaration): RelationSelectQuery<ENTITY>
     fun <T : Any, S : Any> select(
         expression: ScalarExpression<T, S>

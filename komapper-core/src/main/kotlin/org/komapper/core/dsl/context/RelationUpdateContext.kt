@@ -12,7 +12,7 @@ import org.komapper.core.dsl.options.UpdateOptions
 @ThreadSafe
 data class RelationUpdateContext<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     val target: META,
-    val set: AssignmentDeclaration<ENTITY> = {},
+    val set: AssignmentDeclaration<ENTITY, META> = {},
     val where: WhereDeclaration = { },
     override val options: UpdateOptions = UpdateOptions.default,
 ) : TablesProvider, WhereProvider {

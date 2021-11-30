@@ -2,15 +2,25 @@ package integration.jdbc
 
 import integration.Address
 import integration.address
+import integration.department
 import integration.employee
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
+import org.komapper.core.dsl.operator.count
 import org.komapper.core.dsl.query.andThen
 import org.komapper.core.dsl.query.dryRun
 import org.komapper.core.dsl.query.flatMap
 import org.komapper.core.dsl.query.flatZip
+import org.komapper.core.dsl.query.groupBy
+import org.komapper.core.dsl.query.having
+import org.komapper.core.dsl.query.innerJoin
 import org.komapper.core.dsl.query.map
+import org.komapper.core.dsl.query.on
+import org.komapper.core.dsl.query.orderBy
+import org.komapper.core.dsl.query.set
+import org.komapper.core.dsl.query.values
+import org.komapper.core.dsl.query.where
 import org.komapper.core.dsl.query.zip
 import org.komapper.jdbc.JdbcDatabase
 import kotlin.test.Test
@@ -82,5 +92,74 @@ class CompositionTest(private val db: JdbcDatabase) {
         val (newAddress, list) = db.runQuery { query }
         assertEquals(16, newAddress.addressId)
         assertEquals(14, list.size)
+    }
+
+    @Test
+    fun buildSelectQuery() {
+        val a = Meta.address
+        val e = Meta.employee
+        val d = Meta.department
+        val join = innerJoin(e) {
+            e.addressId eq a.addressId
+        }
+        val where = where {
+            e.managerId.isNull()
+        }
+        val on = on {
+            e.departmentId eq d.departmentId
+        }
+        val orderBy = orderBy(a.addressId, a.street)
+        val list = db.runQuery {
+            QueryDsl.from(a).innerJoin(join).innerJoin(d, on).where(where).orderBy(orderBy)
+        }
+        assertEquals(1, list.size)
+        assertEquals(9, list.first().addressId)
+    }
+
+    @Test
+    fun buildAggregateQuery() {
+        val e = Meta.employee
+        val having = having {
+            count(e.departmentId) greater 3
+        }
+        val groupBy = groupBy(e.departmentId)
+        val orderBy = orderBy(e.departmentId)
+        val list = db.runQuery {
+            QueryDsl.from(e)
+                .having(having)
+                .groupBy(groupBy)
+                .orderBy(orderBy)
+                .select(e.departmentId, count(e.departmentId))
+        }
+        assertEquals(2, list.size)
+        assertEquals(listOf(2 to 5L, 3 to 6L), list)
+    }
+
+    @Test
+    fun buildUpdateQuery() {
+        val a = Meta.address
+        val set = set(a) {
+            a.street set "HELLO"
+        }
+        val where = where {
+            a.addressId eq 1
+        }
+        val count = db.runQuery {
+            QueryDsl.update(a).set(set).where(where)
+        }
+        assertEquals(1, count)
+    }
+
+    @Test
+    fun buildInsertQuery() {
+        val a = Meta.address
+        val value = values(a) {
+            a.addressId set 20
+            a.street set "HELLO"
+        }
+        val (count) = db.runQuery {
+            QueryDsl.insert(a).values(value)
+        }
+        assertEquals(1, count)
     }
 }

@@ -6,15 +6,16 @@ import org.komapper.core.dsl.expression.EscapeExpression
 import org.komapper.core.dsl.expression.Operand
 import org.komapper.core.dsl.expression.SubqueryExpression
 
-class FilterScopeSupport<T>(
-    private val context: MutableList<Criterion> = mutableListOf(),
-    private val newScope: () -> T
-) : FilterScope, List<Criterion> by context
-        where T : FilterScope,
-              T : List<Criterion> {
+class FilterScopeSupport(
+    private val criteria: MutableList<Criterion> = mutableListOf(),
+) : FilterScope {
+
+    fun toList(): List<Criterion> {
+        return criteria.toList()
+    }
 
     internal fun add(criterion: Criterion) {
-        context.add(criterion)
+        criteria.add(criterion)
     }
 
     private fun <T : Any, S : Any> add(
@@ -22,7 +23,7 @@ class FilterScopeSupport<T>(
         left: ColumnExpression<T, S>,
         right: ColumnExpression<T, S>
     ) {
-        context.add(operator(Operand.Column(left), Operand.Column(right)))
+        criteria.add(operator(Operand.Column(left), Operand.Column(right)))
     }
 
     private fun <T : Any, S : Any> add(
@@ -30,7 +31,7 @@ class FilterScopeSupport<T>(
         left: ColumnExpression<T, S>,
         right: T
     ) {
-        context.add(operator(Operand.Column(left), Operand.Argument(left, right)))
+        criteria.add(operator(Operand.Column(left), Operand.Argument(left, right)))
     }
 
     private fun <T : Any, S : Any> add(
@@ -38,15 +39,15 @@ class FilterScopeSupport<T>(
         left: T,
         right: ColumnExpression<T, S>
     ) {
-        context.add(operator(Operand.Argument(right, left), Operand.Column(right)))
+        criteria.add(operator(Operand.Argument(right, left), Operand.Column(right)))
     }
 
     private fun <T : Any, S : CharSequence> addLikeOperator(left: ColumnExpression<T, S>, right: EscapeExpression) {
-        context.add(Criterion.Like(Operand.Column(left), right))
+        criteria.add(Criterion.Like(Operand.Column(left), right))
     }
 
     private fun <T : Any, S : CharSequence> addNotLikeOperator(left: ColumnExpression<T, S>, right: EscapeExpression) {
-        context.add(Criterion.NotLike(Operand.Column(left), right))
+        criteria.add(Criterion.NotLike(Operand.Column(left), right))
     }
 
     override infix fun <T : Any, S : Any> ColumnExpression<T, S>.eq(operand: ColumnExpression<T, S>) {
@@ -261,11 +262,5 @@ class FilterScopeSupport<T>(
     override fun notExists(block: () -> SubqueryExpression<*>) {
         val expression = block()
         add(Criterion.NotExists(expression))
-    }
-
-    fun addCriteria(declaration: T.() -> Unit, operator: (List<Criterion>) -> Criterion) {
-        val scope = newScope().apply(declaration)
-        val criterion = operator(scope.toList())
-        add(criterion)
     }
 }
