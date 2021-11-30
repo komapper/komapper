@@ -7,22 +7,22 @@ import org.komapper.core.dsl.metamodel.PropertyMetamodel
 
 @Scope
 class AssignmentScope<ENTITY : Any>(
-    private val context: MutableList<Pair<PropertyMetamodel<ENTITY, *, *>, Operand>> = mutableListOf()
-) : List<Pair<PropertyMetamodel<ENTITY, *, *>, Operand>> by context {
+    private val assignments: MutableList<Pair<PropertyMetamodel<ENTITY, *, *>, Operand>> = mutableListOf()
+) {
 
     infix fun <T : Any> PropertyMetamodel<ENTITY, T, *>.set(value: T?) {
         val right = Operand.Argument(this, value)
-        context.add(this to right)
+        assignments.add(this to right)
     }
 
     infix fun <T : Any, S : Any> PropertyMetamodel<ENTITY, T, S>.set(operand: ColumnExpression<T, S>) {
         val right = Operand.Column(operand)
-        context.add(this to right)
+        assignments.add(this to right)
     }
 
     infix fun <T : Any, S : Any> PropertyMetamodel<ENTITY, T, S>.setIfNotNull(value: T?) {
         if (value == null) return
         val right = Operand.Argument(this, value)
-        context.add(this to right)
+        assignments.add(this to right)
     }
 }

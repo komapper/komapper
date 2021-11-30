@@ -6,19 +6,25 @@ import org.komapper.core.dsl.expression.WhenDeclaration
 
 @Scope
 class WhenScope(
-    private val support: FilterScopeSupport<WhenScope> = FilterScopeSupport { WhenScope() }
-) : FilterScope by support,
-    List<Criterion> by support {
+    private val support: FilterScopeSupport
+) : FilterScope by support {
 
     fun and(declaration: WhenDeclaration) {
-        support.addCriteria(declaration, Criterion::And)
+        addCriteria(declaration, Criterion::And)
     }
 
     fun or(declaration: WhenDeclaration) {
-        support.addCriteria(declaration, Criterion::Or)
+        addCriteria(declaration, Criterion::Or)
     }
 
     fun not(declaration: WhenDeclaration) {
-        support.addCriteria(declaration, Criterion::Not)
+        addCriteria(declaration, Criterion::Not)
+    }
+
+    private fun addCriteria(declaration: WhenDeclaration, operator: (List<Criterion>) -> Criterion) {
+        val newSupport = FilterScopeSupport()
+        WhenScope(newSupport).apply(declaration)
+        val criterion = operator(newSupport.toList())
+        support.add(criterion)
     }
 }

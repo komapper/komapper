@@ -7,7 +7,7 @@ import integration.employee
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
-import org.komapper.core.dsl.operator.sum
+import org.komapper.core.dsl.operator.count
 import org.komapper.core.dsl.query.andThen
 import org.komapper.core.dsl.query.dryRun
 import org.komapper.core.dsl.query.flatMap
@@ -23,7 +23,6 @@ import org.komapper.core.dsl.query.values
 import org.komapper.core.dsl.query.where
 import org.komapper.core.dsl.query.zip
 import org.komapper.jdbc.JdbcDatabase
-import java.math.BigDecimal
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -121,13 +120,14 @@ class CompositionTest(private val db: JdbcDatabase) {
     fun buildAggregateQuery() {
         val e = Meta.employee
         val having = having {
-            sum(e.salary) greater BigDecimal.valueOf(9000)
+            count(e.departmentId) greater 3
         }
         val groupBy = groupBy(e.departmentId)
         val list = db.runQuery {
-            QueryDsl.from(e).having(having).groupBy(groupBy).select(e.departmentId, sum(e.salary))
+            QueryDsl.from(e).having(having).groupBy(groupBy).select(e.departmentId, count(e.departmentId))
         }
         assertEquals(2, list.size)
+        assertEquals(listOf(2 to 5L, 3 to 6L), list)
     }
 
     @Test

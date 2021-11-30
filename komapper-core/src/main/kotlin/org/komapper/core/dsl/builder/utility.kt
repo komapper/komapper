@@ -11,36 +11,49 @@ import org.komapper.core.dsl.expression.Operand
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.metamodel.PropertyMetamodel
 import org.komapper.core.dsl.scope.AssignmentScope
+import org.komapper.core.dsl.scope.FilterScopeSupport
 import org.komapper.core.dsl.scope.HavingScope
 import org.komapper.core.dsl.scope.OnScope
 import org.komapper.core.dsl.scope.WhereScope
 
 internal fun WhereProvider.getWhereCriteria(): List<Criterion> {
     val where = getCompositeWhere()
-    return WhereScope().apply(where)
+    val support = FilterScopeSupport()
+    WhereScope(support).apply(where)
+    return support.toList()
 }
 
 internal fun Join<*, *, *>.getOnCriteria(): List<Criterion> {
-    return OnScope().apply(on)
+    val support = FilterScopeSupport()
+    OnScope(support).apply(on)
+    return support.toList()
 }
 
 internal fun SelectContext<*, *, *>.getHavingCriteria(): List<Criterion> {
-    return HavingScope().apply(having)
+    val support = FilterScopeSupport()
+    HavingScope(support).apply(having)
+    return support.toList()
 }
 
 internal fun <ENTITY : Any> RelationUpdateContext<ENTITY, *, *>.getAssignments(): List<Pair<PropertyMetamodel<ENTITY, *, *>, Operand>> {
-    return AssignmentScope<ENTITY>().apply(set)
+    val assignments = mutableListOf<Pair<PropertyMetamodel<ENTITY, *, *>, Operand>>()
+    AssignmentScope(assignments).apply(set)
+    return assignments
 }
 
 internal fun <ENTITY : Any> RelationInsertValuesContext<ENTITY, *, *>.getAssignments(): List<Pair<PropertyMetamodel<ENTITY, *, *>, Operand>> {
-    return AssignmentScope<ENTITY>().apply(values)
+    val assignments = mutableListOf<Pair<PropertyMetamodel<ENTITY, *, *>, Operand>>()
+    AssignmentScope(assignments).apply(values)
+    return assignments
 }
 
 fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> EntityUpsertContext<ENTITY, ID, META>.getAssignments(): List<Pair<PropertyMetamodel<ENTITY, *, *>, Operand>> {
     val context = this
-    return AssignmentScope<ENTITY>().apply {
+    val assignments = mutableListOf<Pair<PropertyMetamodel<ENTITY, *, *>, Operand>>()
+    AssignmentScope(assignments).apply {
         context.set(this, context.excluded)
     }
+    return assignments
 }
 
 fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> EntityUpsertContext<ENTITY, ID, META>.createAssignments(): List<Pair<PropertyMetamodel<ENTITY, *, *>, Operand>> {
