@@ -12,7 +12,6 @@ import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.expression.HavingDeclaration
 import org.komapper.core.dsl.expression.OnDeclaration
 import org.komapper.core.dsl.expression.SortExpression
-import org.komapper.core.dsl.expression.UpsertAssignmentDeclaration
 import org.komapper.core.dsl.expression.WhereDeclaration
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.visitor.DefaultQueryVisitor
@@ -90,20 +89,15 @@ fun <T> ListQuery<T>.first(): Query<T> = collect { it.first() }
 
 fun <T> ListQuery<T>.firstOrNull(): Query<T?> = collect { it.firstOrNull() }
 
-fun <ENTITY : Any> set(
-    @Suppress("UNUSED_PARAMETER") metamodel: EntityMetamodel<ENTITY, *, *>,
-    declaration: AssignmentDeclaration<ENTITY>
-): AssignmentDeclaration<ENTITY> = declaration
-
-fun <ENTITY : Any> values(
-    @Suppress("UNUSED_PARAMETER") metamodel: EntityMetamodel<ENTITY, *, *>,
-    declaration: AssignmentDeclaration<ENTITY>
-): AssignmentDeclaration<ENTITY> = declaration
-
-fun <ENTITY : Any, META : EntityMetamodel<ENTITY, *, *>> upsertSet(
+fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> set(
     @Suppress("UNUSED_PARAMETER") metamodel: META,
-    declaration: UpsertAssignmentDeclaration<ENTITY, META>
-): UpsertAssignmentDeclaration<ENTITY, META> = declaration
+    declaration: AssignmentDeclaration<ENTITY, META>
+): AssignmentDeclaration<ENTITY, META> = declaration
+
+fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> values(
+    @Suppress("UNUSED_PARAMETER") metamodel: META,
+    declaration: AssignmentDeclaration<ENTITY, META>
+): AssignmentDeclaration<ENTITY, META> = declaration
 
 fun on(declaration: OnDeclaration): OnDeclaration = declaration
 

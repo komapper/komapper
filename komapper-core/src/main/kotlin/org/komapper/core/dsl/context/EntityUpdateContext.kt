@@ -38,7 +38,7 @@ data class EntityUpdateContext<ENTITY : Any, ID : Any, META : EntityMetamodel<EN
         return properties.filter { it != createdAtProperty } - idProperties + versionProperties
     }
 
-    fun asRelationUpdateContext(declaration: AssignmentDeclaration<ENTITY>): RelationUpdateContext<ENTITY, ID, META> {
+    fun asRelationUpdateContext(declaration: AssignmentDeclaration<ENTITY, META>): RelationUpdateContext<ENTITY, ID, META> {
         return RelationUpdateContext(target, declaration)
     }
 }

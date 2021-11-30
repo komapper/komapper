@@ -2,7 +2,7 @@ package org.komapper.core.dsl.query
 
 import org.komapper.core.ThreadSafe
 import org.komapper.core.dsl.context.EntityUpsertContext
-import org.komapper.core.dsl.expression.UpsertAssignmentDeclaration
+import org.komapper.core.dsl.expression.AssignmentDeclaration
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.operator.plus
 import org.komapper.core.dsl.scope.AssignmentScope
@@ -21,7 +21,7 @@ internal data class EntityUpsertQueryBuilderImpl<ENTITY : Any, ID : Any, META : 
     private val context: EntityUpsertContext<ENTITY, ID, META>,
 ) : EntityUpsertQueryBuilder<ENTITY, ID, META> {
 
-    override fun set(declaration: UpsertAssignmentDeclaration<ENTITY, META>): EntityUpsertQueryBuilder<ENTITY, ID, META> {
+    override fun set(declaration: AssignmentDeclaration<ENTITY, META>): EntityUpsertQueryBuilder<ENTITY, ID, META> {
         val newContext = context.copy(set = context.set + declaration)
         return copy(context = newContext)
     }

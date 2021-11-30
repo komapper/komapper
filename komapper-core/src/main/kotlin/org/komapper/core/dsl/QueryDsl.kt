@@ -30,7 +30,7 @@ object QueryDsl : Dsl {
 
     fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> update(
         metamodel: META,
-    ): EntityUpdateQueryBuilder<ENTITY> {
+    ): EntityUpdateQueryBuilder<ENTITY, ID, META> {
         return EntityUpdateQueryBuilderImpl(EntityUpdateContext(metamodel))
     }
 

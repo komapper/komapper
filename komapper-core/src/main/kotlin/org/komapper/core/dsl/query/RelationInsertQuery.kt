@@ -8,21 +8,21 @@ import org.komapper.core.dsl.operator.plus
 import org.komapper.core.dsl.options.InsertOptions
 import org.komapper.core.dsl.visitor.QueryVisitor
 
-interface RelationInsertQuery<ENTITY : Any, ID : Any, R> : Query<R> {
-    fun options(configure: (InsertOptions) -> InsertOptions): RelationInsertQuery<ENTITY, ID, R>
-    fun values(declaration: AssignmentDeclaration<ENTITY>): RelationInsertQuery<ENTITY, ID, Pair<Int, ID?>>
+interface RelationInsertQuery<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, R> : Query<R> {
+    fun options(configure: (InsertOptions) -> InsertOptions): RelationInsertQuery<ENTITY, ID, META, R>
+    fun values(declaration: AssignmentDeclaration<ENTITY, META>): RelationInsertQuery<ENTITY, ID, META, Pair<Int, ID?>>
 }
 
 internal data class RelationInsertSelectQuery<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: RelationInsertSelectContext<ENTITY, ID, META>,
-) : RelationInsertQuery<ENTITY, ID, Pair<Int, List<ID>>> {
+) : RelationInsertQuery<ENTITY, ID, META, Pair<Int, List<ID>>> {
 
-    override fun options(configure: (InsertOptions) -> InsertOptions): RelationInsertQuery<ENTITY, ID, Pair<Int, List<ID>>> {
+    override fun options(configure: (InsertOptions) -> InsertOptions): RelationInsertQuery<ENTITY, ID, META, Pair<Int, List<ID>>> {
         val newContext = context.copy(options = configure(context.options))
         return copy(context = newContext)
     }
 
-    override fun values(declaration: AssignmentDeclaration<ENTITY>): RelationInsertQuery<ENTITY, ID, Pair<Int, ID?>> {
+    override fun values(declaration: AssignmentDeclaration<ENTITY, META>): RelationInsertQuery<ENTITY, ID, META, Pair<Int, ID?>> {
         val newContext = context.asRelationInsertValuesContext(declaration)
         return RelationInsertValuesQuery(newContext)
     }
@@ -34,14 +34,14 @@ internal data class RelationInsertSelectQuery<ENTITY : Any, ID : Any, META : Ent
 
 internal data class RelationInsertValuesQuery<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: RelationInsertValuesContext<ENTITY, ID, META>,
-) : RelationInsertQuery<ENTITY, ID, Pair<Int, ID?>> {
+) : RelationInsertQuery<ENTITY, ID, META, Pair<Int, ID?>> {
 
-    override fun options(configure: (InsertOptions) -> InsertOptions): RelationInsertQuery<ENTITY, ID, Pair<Int, ID?>> {
+    override fun options(configure: (InsertOptions) -> InsertOptions): RelationInsertQuery<ENTITY, ID, META, Pair<Int, ID?>> {
         val newContext = context.copy(options = configure(context.options))
         return copy(context = newContext)
     }
 
-    override fun values(declaration: AssignmentDeclaration<ENTITY>): RelationInsertQuery<ENTITY, ID, Pair<Int, ID?>> {
+    override fun values(declaration: AssignmentDeclaration<ENTITY, META>): RelationInsertQuery<ENTITY, ID, META, Pair<Int, ID?>> {
         val newContext = context.copy(values = context.values + declaration)
         return copy(context = newContext)
     }

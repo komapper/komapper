@@ -9,7 +9,7 @@ import org.komapper.core.dsl.options.InsertOptions
 @ThreadSafe
 data class RelationInsertValuesContext<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     val target: META,
-    val values: AssignmentDeclaration<ENTITY>,
+    val values: AssignmentDeclaration<ENTITY, META>,
     val options: InsertOptions,
 ) : TablesProvider {
 

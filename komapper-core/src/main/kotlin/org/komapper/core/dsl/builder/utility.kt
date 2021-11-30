@@ -35,15 +35,21 @@ internal fun SelectContext<*, *, *>.getHavingCriteria(): List<Criterion> {
     return support.toList()
 }
 
-internal fun <ENTITY : Any> RelationUpdateContext<ENTITY, *, *>.getAssignments(): List<Pair<PropertyMetamodel<ENTITY, *, *>, Operand>> {
+internal fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> RelationUpdateContext<ENTITY, ID, META>.getAssignments(): List<Pair<PropertyMetamodel<ENTITY, *, *>, Operand>> {
+    val context = this
     val assignments = mutableListOf<Pair<PropertyMetamodel<ENTITY, *, *>, Operand>>()
-    AssignmentScope(assignments).apply(set)
+    AssignmentScope(assignments).apply {
+        context.set(this, context.target)
+    }
     return assignments
 }
 
-internal fun <ENTITY : Any> RelationInsertValuesContext<ENTITY, *, *>.getAssignments(): List<Pair<PropertyMetamodel<ENTITY, *, *>, Operand>> {
+internal fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> RelationInsertValuesContext<ENTITY, ID, META>.getAssignments(): List<Pair<PropertyMetamodel<ENTITY, *, *>, Operand>> {
+    val context = this
     val assignments = mutableListOf<Pair<PropertyMetamodel<ENTITY, *, *>, Operand>>()
-    AssignmentScope(assignments).apply(values)
+    AssignmentScope(assignments).apply {
+        context.values(this, context.target)
+    }
     return assignments
 }
 
