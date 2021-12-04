@@ -105,6 +105,12 @@ interface QueryVisitor<VISIT_RESULT> {
         entity: ENTITY,
     ): VISIT_RESULT
 
+    fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
+    entityUpsertDuplicateKeyIgnoreSingleQuery(
+        context: EntityUpsertContext<ENTITY, ID, META>,
+        entity: ENTITY,
+    ): VISIT_RESULT
+
     fun schemaCreateQuery(
         context: SchemaContext
     ): VISIT_RESULT

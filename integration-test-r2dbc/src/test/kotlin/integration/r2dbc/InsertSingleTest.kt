@@ -31,6 +31,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 
 @ExtendWith(Env::class)
 class InsertSingleTest(private val db: R2dbcDatabase) {
@@ -156,8 +157,8 @@ class InsertSingleTest(private val db: R2dbcDatabase) {
         val d = Meta.department
         val department = Department(5, 50, "PLANNING", "TOKYO", 0)
         val query = QueryDsl.insert(d).onDuplicateKeyUpdate().single(department)
-        val count = db.runQuery { query }
-        assertEquals(1, count)
+        val department2 = db.runQuery { query }
+        assertEquals(department, department2)
         val found = db.runQuery { QueryDsl.from(d).where { d.departmentId eq 5 }.first() }
         assertNotNull(found)
     }
@@ -167,8 +168,8 @@ class InsertSingleTest(private val db: R2dbcDatabase) {
         val d = Meta.department
         val department = Department(5, 50, "PLANNING", "TOKYO", 0)
         val query = QueryDsl.insert(d).onDuplicateKeyUpdate(d.departmentNo).single(department)
-        val count = db.runQuery { query }
-        assertEquals(1, count)
+        val department2 = db.runQuery { query }
+        assertEquals(department, department2)
         val found = db.runQuery { QueryDsl.from(d).where { d.departmentId eq 5 }.first() }
         assertNotNull(found)
     }
@@ -178,11 +179,8 @@ class InsertSingleTest(private val db: R2dbcDatabase) {
         val d = Meta.department
         val department = Department(1, 50, "PLANNING", "TOKYO", 10)
         val query = QueryDsl.insert(d).onDuplicateKeyUpdate().single(department)
-        val count = db.runQuery { query }
-        when (db.config.dialect.driver) {
-            "mysql", "mariadb" -> assertEquals(2, count)
-            else -> assertEquals(1, count)
-        }
+        val department2 = db.runQuery { query }
+        assertEquals(department, department2)
         val found = db.runQuery { QueryDsl.from(d).where { d.departmentId eq 1 }.first() }
         assertEquals(50, found.departmentNo)
         assertEquals("PLANNING", found.departmentName)
@@ -195,11 +193,8 @@ class InsertSingleTest(private val db: R2dbcDatabase) {
         val d = Meta.department
         val department = Department(6, 10, "PLANNING", "TOKYO", 10)
         val query = QueryDsl.insert(d).onDuplicateKeyUpdate(d.departmentNo).single(department)
-        val count = db.runQuery { query }
-        when (db.config.dialect.driver) {
-            "mysql", "mariadb" -> assertEquals(2, count)
-            else -> assertEquals(1, count)
-        }
+        val department2 = db.runQuery { query }
+        assertEquals(department, department2)
         val found = db.runQuery { QueryDsl.from(d).where { d.departmentNo eq 10 }.first() }
         assertEquals(1, found.departmentId)
         assertEquals(10, found.departmentNo)
@@ -217,12 +212,8 @@ class InsertSingleTest(private val db: R2dbcDatabase) {
             d.departmentName set "PLANNING2"
             d.location set concat(d.location, concat("_", excluded.location))
         }.single(department)
-        val count = db.runQuery { query }
-        if (db.config.dialect.driver == "mysql") {
-            assertEquals(2, count)
-        } else {
-            assertEquals(1, count)
-        }
+        val department2 = db.runQuery { query }
+        assertEquals(department, department2)
         val found = db.runQuery { QueryDsl.from(d).where { d.departmentId eq 1 }.first() }
         assertEquals(10, found.departmentNo)
         assertEquals("PLANNING2", found.departmentName)
@@ -241,12 +232,8 @@ class InsertSingleTest(private val db: R2dbcDatabase) {
                 d.departmentName set "PLANNING2"
                 d.location set concat(d.location, concat("_", excluded.location))
             }.single(department)
-        val count = db.runQuery { query }
-        if (db.config.dialect.driver == "mysql") {
-            assertEquals(2, count)
-        } else {
-            assertEquals(1, count)
-        }
+        val department2 = db.runQuery { query }
+        assertEquals(department, department2)
         val found = db.runQuery { QueryDsl.from(d).where { d.departmentNo eq 10 }.first() }
         assertEquals(1, found.departmentId)
         assertEquals("PLANNING2", found.departmentName)
@@ -255,29 +242,29 @@ class InsertSingleTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun onDuplicateKeyIgnore() = inTransaction(db) {
+    fun onDuplicateKeyIgnore_inserted() = inTransaction(db) {
+        val a = Meta.address
+        val address = Address(16, "STREET 16", 0)
+        val query = QueryDsl.insert(a).onDuplicateKeyIgnore().single(address)
+        val address2 = db.runQuery { query }
+        assertEquals(address, address2)
+    }
+
+    @Test
+    fun onDuplicateKeyIgnore_ignored() = inTransaction(db) {
         val a = Meta.address
         val address = Address(1, "STREET 100", 0)
         val query = QueryDsl.insert(a).onDuplicateKeyIgnore().single(address)
-        val count = db.runQuery { query }
-        assertEquals(0, count)
+        val address2 = db.runQuery { query }
+        assertNull(address2)
     }
 
     @Test
-    fun onDuplicateKeyIgnoreWithKey() = inTransaction(db) {
+    fun onDuplicateKeyIgnoreWithKey_ignored() = inTransaction(db) {
         val a = Meta.address
         val address = Address(100, "STREET 1", 0)
         val query = QueryDsl.insert(a).onDuplicateKeyIgnore(a.street).single(address)
-        val count = db.runQuery { query }
-        assertEquals(0, count)
-    }
-
-    @Test
-    fun onDuplicateKeyIgnoreWithKeys() = inTransaction(db) {
-        val a = Meta.address
-        val address = Address(100, "STREET 1", 0)
-        val query = QueryDsl.insert(a).onDuplicateKeyIgnore(a.street).single(address)
-        val count = db.runQuery { query }
-        assertEquals(0, count)
+        val address2 = db.runQuery { query }
+        assertNull(address2)
     }
 }

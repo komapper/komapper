@@ -7,10 +7,10 @@ import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.runner.EntityUpsertSingleRunner
 import org.komapper.r2dbc.R2dbcDatabaseConfig
 
-internal class EntityUpsertSingleR2dbcRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
+internal class EntityUpsertDuplicateKeyIgnoreSingleR2dbcRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     context: EntityUpsertContext<ENTITY, ID, META>,
     private val entity: ENTITY,
-) : R2dbcRunner<ENTITY> {
+) : R2dbcRunner<ENTITY?> {
 
     private val runner: EntityUpsertSingleRunner<ENTITY, ID, META> =
         EntityUpsertSingleRunner(context, entity)
@@ -18,10 +18,10 @@ internal class EntityUpsertSingleR2dbcRunner<ENTITY : Any, ID : Any, META : Enti
     private val support: EntityUpsertR2dbcRunnerSupport<ENTITY, ID, META> =
         EntityUpsertR2dbcRunnerSupport(context)
 
-    override suspend fun run(config: R2dbcDatabaseConfig): ENTITY {
+    override suspend fun run(config: R2dbcDatabaseConfig): ENTITY? {
         val newEntity = preUpsert(config, entity)
-        val (_, keys) = upsert(config, newEntity)
-        return postUpsert(newEntity, keys)
+        val (count, keys) = upsert(config, newEntity)
+        return if (count == 0) null else postUpsert(newEntity, keys)
     }
 
     private suspend fun preUpsert(config: R2dbcDatabaseConfig, entity: ENTITY): ENTITY {
