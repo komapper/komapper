@@ -6,8 +6,6 @@ import org.komapper.core.dsl.builder.AliasManager
 import org.komapper.core.dsl.builder.BuilderSupport
 import org.komapper.core.dsl.builder.EntityUpsertStatementBuilder
 import org.komapper.core.dsl.builder.TableNameType
-import org.komapper.core.dsl.builder.createAssignments
-import org.komapper.core.dsl.builder.getAssignments
 import org.komapper.core.dsl.context.DuplicateKeyType
 import org.komapper.core.dsl.context.EntityUpsertContext
 import org.komapper.core.dsl.expression.ColumnExpression

@@ -16,5 +16,4 @@ internal class EntityUpsertRunnerSupport<ENTITY : Any, ID : Any, META : EntityMe
         val builder = config.dialect.getEntityUpsertStatementBuilder(context, entities)
         return builder.build(assignments)
     }
-    
 }

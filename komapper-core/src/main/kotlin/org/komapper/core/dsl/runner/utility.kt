@@ -2,15 +2,8 @@ package org.komapper.core.dsl.runner
 
 import org.komapper.core.OptimisticLockException
 import org.komapper.core.dsl.builder.getWhereCriteria
-import org.komapper.core.dsl.context.EntityUpsertContext
-import org.komapper.core.dsl.context.RelationInsertValuesContext
-import org.komapper.core.dsl.context.RelationUpdateContext
 import org.komapper.core.dsl.context.WhereProvider
-import org.komapper.core.dsl.expression.Operand
-import org.komapper.core.dsl.metamodel.EntityMetamodel
-import org.komapper.core.dsl.metamodel.PropertyMetamodel
 import org.komapper.core.dsl.options.OptimisticLockOptions
-import org.komapper.core.dsl.scope.AssignmentScope
 
 fun checkWhereClause(whereProvider: WhereProvider) {
     if (!whereProvider.options.allowEmptyWhereClause) {
