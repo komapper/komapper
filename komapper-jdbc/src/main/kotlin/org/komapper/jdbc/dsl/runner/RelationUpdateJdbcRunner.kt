@@ -17,10 +17,13 @@ internal class RelationUpdateJdbcRunner<ENTITY : Any, ID : Any, META : EntityMet
     override fun run(config: JdbcDatabaseConfig): Int {
         val clock = config.clockProvider.now()
         val updatedAtAssignment = context.target.updatedAtAssignment(clock)
-        val statement = runner.buildStatement(config, updatedAtAssignment)
-        val executor = JdbcExecutor(config, context.options)
-        val (count) = executor.executeUpdate(statement)
-        return count
+        val result = runner.buildStatement(config, updatedAtAssignment)
+        val statement = result.getOrNull()
+        return if (statement != null) {
+            val executor = JdbcExecutor(config, context.options)
+            val (count) = executor.executeUpdate(statement)
+            count
+        } else 0
     }
 
     override fun dryRun(config: DatabaseConfig): Statement {

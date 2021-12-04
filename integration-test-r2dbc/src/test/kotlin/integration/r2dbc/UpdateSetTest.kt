@@ -216,4 +216,15 @@ class UpdateSetTest(private val db: R2dbcDatabase) {
         }
         assertEquals(10, address2.version)
     }
+
+    @Test
+    fun emptySetClause() = inTransaction(db) {
+        val a = Meta.address
+        val query = QueryDsl.update(a).set {
+        }.where {
+            a.addressId eq 16
+        }
+        val count = db.runQuery { query }
+        assertEquals(0, count)
+    }
 }

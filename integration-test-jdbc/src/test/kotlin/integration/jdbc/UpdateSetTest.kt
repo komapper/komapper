@@ -256,4 +256,15 @@ class UpdateSetTest(private val db: JdbcDatabase) {
         val expected = "update ADDRESS as t0_ set STREET = ?, VERSION = VERSION + 1 where t0_.ADDRESS_ID = ?"
         assertEquals(expected, result.sql)
     }
+
+    @Test
+    fun emptySetClause() {
+        val a = Meta.address
+        val query = QueryDsl.update(a).set {
+        }.where {
+            a.addressId eq 16
+        }
+        val count = db.runQuery { query }
+        assertEquals(0, count)
+    }
 }
