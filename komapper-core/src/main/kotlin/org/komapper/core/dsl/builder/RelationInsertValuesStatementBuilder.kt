@@ -8,26 +8,20 @@ import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.expression.Operand
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.metamodel.PropertyMetamodel
-import org.komapper.core.dsl.metamodel.isAutoIncrement
 
 class RelationInsertValuesStatementBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     val dialect: Dialect,
     val context: RelationInsertValuesContext<ENTITY, ID, META>,
-    private val idAssignment: Pair<PropertyMetamodel<ENTITY, ID, *>, Operand>?,
-    private val versionAssignment: Pair<PropertyMetamodel<ENTITY, *, *>, Operand>?,
-    private val createdAtAssignment: Pair<PropertyMetamodel<ENTITY, *, *>, Operand>?,
-    private val updatedAtAssignment: Pair<PropertyMetamodel<ENTITY, *, *>, Operand>?,
 ) {
     private val aliasManager = DefaultAliasManager(context)
     private val buf = StatementBuffer()
     private val support = BuilderSupport(dialect, aliasManager, buf)
 
-    fun build(): Statement {
+    fun build(assignments: List<Pair<PropertyMetamodel<ENTITY, *, *>, Operand>>): Statement {
         val target = context.target
         buf.append("insert into ")
         table(target)
         buf.append(" (")
-        val assignments = getAssignments()
         if (assignments.isNotEmpty()) {
             for ((property, _) in assignments) {
                 column(property)
@@ -45,19 +39,6 @@ class RelationInsertValuesStatementBuilder<ENTITY : Any, ID : Any, META : Entity
         buf.cutBack(2)
         buf.append(")")
         return buf.toStatement()
-    }
-
-    private fun getAssignments(): List<Pair<PropertyMetamodel<ENTITY, *, *>, Operand>> {
-        val assignments = context.getAssignments()
-        val properties = assignments.map { it.first }
-        val additionalAssignments = listOfNotNull(
-            idAssignment,
-            versionAssignment,
-            createdAtAssignment,
-            updatedAtAssignment
-        ).filterNot { it.first in properties }
-        return (assignments + additionalAssignments)
-            .filter { !it.first.isAutoIncrement() }
     }
 
     private fun table(metamodel: EntityMetamodel<*, *, *>) {

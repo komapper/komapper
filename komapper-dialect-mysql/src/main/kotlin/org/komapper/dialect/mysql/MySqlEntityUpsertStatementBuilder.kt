@@ -6,14 +6,13 @@ import org.komapper.core.dsl.builder.AliasManager
 import org.komapper.core.dsl.builder.BuilderSupport
 import org.komapper.core.dsl.builder.EntityUpsertStatementBuilder
 import org.komapper.core.dsl.builder.TableNameType
-import org.komapper.core.dsl.builder.createAssignments
-import org.komapper.core.dsl.builder.getAssignments
 import org.komapper.core.dsl.context.DuplicateKeyType
 import org.komapper.core.dsl.context.EntityUpsertContext
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.expression.Operand
 import org.komapper.core.dsl.expression.TableExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
+import org.komapper.core.dsl.metamodel.PropertyMetamodel
 import org.komapper.core.dsl.metamodel.getNonAutoIncrementProperties
 
 class MySqlEntityUpsertStatementBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
@@ -28,7 +27,7 @@ class MySqlEntityUpsertStatementBuilder<ENTITY : Any, ID : Any, META : EntityMet
     private val buf = StatementBuffer()
     private val support = BuilderSupport(dialect, aliasManager, buf)
 
-    override fun build(): Statement {
+    override fun build(assignments: List<Pair<PropertyMetamodel<ENTITY, *, *>, Operand>>): Statement {
         val properties = target.getNonAutoIncrementProperties()
         buf.append("insert")
         if (context.duplicateKeyType == DuplicateKeyType.IGNORE) {
@@ -57,7 +56,6 @@ class MySqlEntityUpsertStatementBuilder<ENTITY : Any, ID : Any, META : EntityMet
         table(excluded, TableNameType.ALIAS_ONLY)
         if (context.duplicateKeyType == DuplicateKeyType.UPDATE) {
             buf.append(" on duplicate key update ")
-            val assignments = context.getAssignments().ifEmpty { context.createAssignments() }
             for ((left, right) in assignments) {
                 column(left)
                 buf.append(" = ")

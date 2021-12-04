@@ -6,14 +6,13 @@ import org.komapper.core.dsl.builder.AliasManager
 import org.komapper.core.dsl.builder.BuilderSupport
 import org.komapper.core.dsl.builder.EntityUpsertStatementBuilder
 import org.komapper.core.dsl.builder.TableNameType
-import org.komapper.core.dsl.builder.createAssignments
-import org.komapper.core.dsl.builder.getAssignments
 import org.komapper.core.dsl.context.DuplicateKeyType
 import org.komapper.core.dsl.context.EntityUpsertContext
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.expression.Operand
 import org.komapper.core.dsl.expression.TableExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
+import org.komapper.core.dsl.metamodel.PropertyMetamodel
 
 internal class H2EntityUpsertStatementBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     dialect: H2Dialect,
@@ -28,7 +27,7 @@ internal class H2EntityUpsertStatementBuilder<ENTITY : Any, ID : Any, META : Ent
     private val support = BuilderSupport(dialect, aliasManager, buf)
     private val sourceStatementBuilder = SourceStatementBuilder(dialect, context, entities)
 
-    override fun build(): Statement {
+    override fun build(assignments: List<Pair<PropertyMetamodel<ENTITY, *, *>, Operand>>): Statement {
         buf.append("merge into ")
         table(target, TableNameType.NAME_AND_ALIAS)
         buf.append(" using (")
@@ -53,7 +52,6 @@ internal class H2EntityUpsertStatementBuilder<ENTITY : Any, ID : Any, META : Ent
         buf.append(")")
         if (context.duplicateKeyType == DuplicateKeyType.UPDATE) {
             buf.append(" when matched then update set ")
-            val assignments = context.getAssignments().ifEmpty { context.createAssignments() }
             for ((left, right) in assignments) {
                 column(left)
                 buf.append(" = ")

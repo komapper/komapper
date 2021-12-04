@@ -3,6 +3,7 @@ package integration.jdbc
 import integration.Person
 import integration.address
 import integration.employee
+import integration.identityStrategy
 import integration.person
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
@@ -255,5 +256,27 @@ class UpdateSetTest(private val db: JdbcDatabase) {
         val result = query.dryRun()
         val expected = "update ADDRESS as t0_ set STREET = ?, VERSION = VERSION + 1 where t0_.ADDRESS_ID = ?"
         assertEquals(expected, result.sql)
+    }
+
+    @Test
+    fun dryRun_emptySetClause() {
+        val i = Meta.identityStrategy
+        val query = QueryDsl.update(i).set {
+        }.where {
+            i.id eq 1
+        }
+        val result = query.dryRun()
+        println(result)
+    }
+
+    @Test
+    fun emptySetClause() {
+        val i = Meta.identityStrategy
+        val query = QueryDsl.update(i).set {
+        }.where {
+            i.id eq 1
+        }
+        val count = db.runQuery { query }
+        assertEquals(0, count)
     }
 }

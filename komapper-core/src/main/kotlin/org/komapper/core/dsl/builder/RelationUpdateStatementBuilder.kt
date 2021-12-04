@@ -14,18 +14,16 @@ import org.komapper.core.dsl.metamodel.PropertyMetamodel
 class RelationUpdateStatementBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     val dialect: Dialect,
     val context: RelationUpdateContext<ENTITY, ID, META>,
-    private val updatedAtAssignment: Pair<PropertyMetamodel<ENTITY, *, *>, Operand>?
 ) {
 
     private val aliasManager = DefaultAliasManager(context)
     private val buf = StatementBuffer()
     private val support = BuilderSupport(dialect, aliasManager, buf, context.options.escapeSequence)
 
-    fun build(): Statement {
+    fun build(assignments: List<Pair<PropertyMetamodel<ENTITY, *, *>, Operand>>): Statement {
         buf.append("update ")
         table(context.target)
         buf.append(" set ")
-        val assignments = getAssignments()
         if (assignments.isNotEmpty()) {
             for ((left, right) in assignments) {
                 column(left)
@@ -37,7 +35,9 @@ class RelationUpdateStatementBuilder<ENTITY : Any, ID : Any, META : EntityMetamo
         }
         val version = context.target.versionProperty()
         if (version != null && version !in assignments.map { it.first }) {
-            buf.append(", ")
+            if (assignments.isNotEmpty()) {
+                buf.append(", ")
+            }
             column(version)
             buf.append(" = ")
             column(version)
@@ -53,13 +53,6 @@ class RelationUpdateStatementBuilder<ENTITY : Any, ID : Any, META : EntityMetamo
             buf.cutBack(5)
         }
         return buf.toStatement()
-    }
-
-    private fun getAssignments(): List<Pair<PropertyMetamodel<ENTITY, *, *>, Operand>> {
-        val assignments = context.getAssignments()
-        val properties = assignments.map { it.first }
-        val additionalAssignment = listOfNotNull(updatedAtAssignment).filterNot { it.first in properties }
-        return assignments + additionalAssignment
     }
 
     private fun table(expression: TableExpression<*>) {
