@@ -30,6 +30,7 @@ import org.komapper.jdbc.dsl.runner.EntityStoreJdbcRunner
 import org.komapper.jdbc.dsl.runner.EntityUpdateBatchJdbcRunner
 import org.komapper.jdbc.dsl.runner.EntityUpdateSingleJdbcRunner
 import org.komapper.jdbc.dsl.runner.EntityUpsertBatchJdbcRunner
+import org.komapper.jdbc.dsl.runner.EntityUpsertDuplicateKeyIgnoreSingleJdbcRunner
 import org.komapper.jdbc.dsl.runner.EntityUpsertMultipleJdbcRunner
 import org.komapper.jdbc.dsl.runner.EntityUpsertSingleJdbcRunner
 import org.komapper.jdbc.dsl.runner.JdbcResultSetTransformers
@@ -174,8 +175,16 @@ internal object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
     entityUpsertSingleQuery(
         context: EntityUpsertContext<ENTITY, ID, META>,
         entity: ENTITY,
-    ): JdbcRunner<Int> {
+    ): JdbcRunner<ENTITY> {
         return EntityUpsertSingleJdbcRunner(context, entity)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
+    entityUpsertDuplicateKeyIgnoreSingleQuery(
+        context: EntityUpsertContext<ENTITY, ID, META>,
+        entity: ENTITY,
+    ): JdbcRunner<ENTITY?> {
+        return EntityUpsertDuplicateKeyIgnoreSingleJdbcRunner(context, entity)
     }
 
     override fun schemaCreateQuery(

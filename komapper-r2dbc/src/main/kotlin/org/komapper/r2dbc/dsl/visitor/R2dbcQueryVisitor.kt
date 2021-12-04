@@ -26,6 +26,7 @@ import org.komapper.r2dbc.dsl.runner.EntityInsertMultipleR2dbcRunner
 import org.komapper.r2dbc.dsl.runner.EntityInsertSingleR2dbcRunner
 import org.komapper.r2dbc.dsl.runner.EntityStoreR2dbcRunner
 import org.komapper.r2dbc.dsl.runner.EntityUpdateSingleR2dbcRunner
+import org.komapper.r2dbc.dsl.runner.EntityUpsertDuplicateKeyIgnoreSingleR2dbcRunner
 import org.komapper.r2dbc.dsl.runner.EntityUpsertMultipleR2dbcRunner
 import org.komapper.r2dbc.dsl.runner.EntityUpsertSingleR2dbcRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcRowTransformers
@@ -168,8 +169,15 @@ internal object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
     entityUpsertSingleQuery(
         context: EntityUpsertContext<ENTITY, ID, META>,
         entity: ENTITY,
-    ): R2dbcRunner<Int> {
+    ): R2dbcRunner<ENTITY> {
         return EntityUpsertSingleR2dbcRunner(context, entity)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityUpsertDuplicateKeyIgnoreSingleQuery(
+        context: EntityUpsertContext<ENTITY, ID, META>,
+        entity: ENTITY
+    ): R2dbcRunner<*> {
+        return EntityUpsertDuplicateKeyIgnoreSingleR2dbcRunner(context, entity)
     }
 
     override fun schemaCreateQuery(

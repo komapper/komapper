@@ -8,47 +8,43 @@ import org.komapper.core.dsl.operator.plus
 import org.komapper.core.dsl.scope.AssignmentScope
 
 @ThreadSafe
-interface EntityUpsertQueryBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> {
-    fun set(declaration: AssignmentScope<ENTITY>.(META) -> Unit): EntityUpsertQueryBuilder<ENTITY, ID, META>
-    fun single(entity: ENTITY): EntityUpsertQuery<ENTITY>
+interface EntityUpsertDuplicateKeyIgnoreQueryBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> {
+    fun set(declaration: AssignmentScope<ENTITY>.(META) -> Unit): EntityUpsertDuplicateKeyIgnoreQueryBuilder<ENTITY, ID, META>
+    fun single(entity: ENTITY): EntityUpsertQuery<ENTITY?>
     fun multiple(entities: List<ENTITY>): EntityUpsertQuery<Int>
     fun multiple(vararg entities: ENTITY): EntityUpsertQuery<Int>
     fun batch(entities: List<ENTITY>, batchSize: Int? = null): EntityUpsertQuery<List<Int>>
     fun batch(vararg entities: ENTITY, batchSize: Int? = null): EntityUpsertQuery<List<Int>>
 }
 
-internal data class EntityUpsertQueryBuilderImpl<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
+internal data class EntityUpsertDuplicateKeyIgnoreQueryBuilderImpl<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityUpsertContext<ENTITY, ID, META>,
-) : EntityUpsertQueryBuilder<ENTITY, ID, META> {
+) : EntityUpsertDuplicateKeyIgnoreQueryBuilder<ENTITY, ID, META> {
 
-    override fun set(declaration: AssignmentDeclaration<ENTITY, META>): EntityUpsertQueryBuilder<ENTITY, ID, META> {
+    private val builder: EntityUpsertQueryBuilder<ENTITY, ID, META> = EntityUpsertQueryBuilderImpl(context)
+
+    override fun set(declaration: AssignmentDeclaration<ENTITY, META>): EntityUpsertDuplicateKeyIgnoreQueryBuilder<ENTITY, ID, META> {
         val newContext = context.copy(set = context.set + declaration)
         return copy(context = newContext)
     }
 
-    override fun single(entity: ENTITY): EntityUpsertQuery<ENTITY> {
-        return EntityUpsertSingleQuery(context, entity)
+    override fun single(entity: ENTITY): EntityUpsertQuery<ENTITY?> {
+        return EntityUpsertDuplicateKeyIgnoreSingleQuery(context, entity)
     }
 
     override fun multiple(entities: List<ENTITY>): EntityUpsertQuery<Int> {
-        return EntityUpsertMultipleQuery(context, entities)
+        return builder.multiple(entities)
     }
 
     override fun multiple(vararg entities: ENTITY): EntityUpsertQuery<Int> {
-        return multiple(entities.toList())
+        return builder.multiple(entities.toList())
     }
 
     override fun batch(entities: List<ENTITY>, batchSize: Int?): EntityUpsertQuery<List<Int>> {
-        val context = if (batchSize != null) {
-            val options = context.insertContext.options.copy(batchSize = batchSize)
-            val insertContext = context.insertContext.copy(options = options)
-            context.copy(insertContext = insertContext)
-        } else context
-
-        return EntityUpsertBatchQuery(context, entities)
+        return builder.batch(entities, batchSize)
     }
 
     override fun batch(vararg entities: ENTITY, batchSize: Int?): EntityUpsertQuery<List<Int>> {
-        return batch(entities.toList(), batchSize)
+        return builder.batch(entities.toList(), batchSize)
     }
 }

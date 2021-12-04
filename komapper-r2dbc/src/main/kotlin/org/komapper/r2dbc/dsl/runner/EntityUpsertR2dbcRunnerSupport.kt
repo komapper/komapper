@@ -6,7 +6,7 @@ import org.komapper.r2dbc.R2dbcDatabaseConfig
 import org.komapper.r2dbc.R2dbcExecutor
 
 internal class EntityUpsertR2dbcRunnerSupport<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
-    private val context: EntityUpsertContext<ENTITY, ID, META>,
+    context: EntityUpsertContext<ENTITY, ID, META>,
 ) {
 
     private val support: EntityInsertR2dbcRunnerSupport<ENTITY, ID, META> =
@@ -17,7 +17,10 @@ internal class EntityUpsertR2dbcRunnerSupport<ENTITY : Any, ID : Any, META : Ent
     }
 
     suspend fun <T> upsert(config: R2dbcDatabaseConfig, execute: suspend (R2dbcExecutor) -> T): T {
-        val executor = R2dbcExecutor(config, context.insertContext.options)
-        return execute(executor)
+        return support.insert(config, execute)
+    }
+
+    fun postInsert(entity: ENTITY, generatedKey: Long): ENTITY {
+        return support.postInsert(entity, generatedKey)
     }
 }
