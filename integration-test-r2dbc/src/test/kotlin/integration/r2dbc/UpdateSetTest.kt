@@ -3,6 +3,7 @@ package integration.r2dbc
 import integration.Person
 import integration.address
 import integration.employee
+import integration.identityStrategy
 import integration.person
 import kotlinx.coroutines.delay
 import org.junit.jupiter.api.extension.ExtendWith
@@ -219,10 +220,10 @@ class UpdateSetTest(private val db: R2dbcDatabase) {
 
     @Test
     fun emptySetClause() = inTransaction(db) {
-        val a = Meta.address
-        val query = QueryDsl.update(a).set {
+        val i = Meta.identityStrategy
+        val query = QueryDsl.update(i).set {
         }.where {
-            a.addressId eq 16
+            i.id eq 1
         }
         val count = db.runQuery { query }
         assertEquals(0, count)

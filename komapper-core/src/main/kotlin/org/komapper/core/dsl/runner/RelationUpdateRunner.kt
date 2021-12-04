@@ -17,7 +17,7 @@ class RelationUpdateRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY
         val clock = config.clockProvider.now()
         val updatedAtAssignment = context.target.updatedAtAssignment(clock)
         val result = buildStatement(config, updatedAtAssignment)
-        return result.getOrDefault(Statement.EMPTY)
+        return result.getOrThrow()
     }
 
     fun buildStatement(
@@ -28,7 +28,7 @@ class RelationUpdateRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY
         val assignments = getAssignments(updatedAtAssignment)
         if (assignments.isEmpty() && context.target.versionProperty() == null) {
             return Result.failure(
-                Exception("No update statement is generated because no assignment is specified.")
+                IllegalStateException("No update statement is generated because no assignment is specified.")
             )
         }
         val builder = RelationUpdateStatementBuilder(config.dialect, context)
