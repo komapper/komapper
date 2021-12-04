@@ -26,8 +26,7 @@ class SelectStatementBuilder(
         selectClause()
         fromClause()
         whereClause()
-        groupByClause()
-        havingClause()
+        groupByAndHavingClauses()
         orderByClause()
         offsetLimitClause()
         forUpdateClause()
@@ -82,16 +81,16 @@ class SelectStatementBuilder(
         }
     }
 
-    private fun groupByClause() {
-        val groupByItems = context.groupBy.ifEmpty {
+    private fun groupByAndHavingClauses() {
+        val havingCriteria = context.getHavingCriteria()
+        val groupByItems = if (context.groupBy.isNotEmpty()) {
+            context.groupBy
+        } else if (havingCriteria.isNotEmpty()) {
             val expressions = context.getProjection().expressions()
             val aggregateFunctions = expressions.filterIsInstance<AggregateFunction<*, *>>()
-            val groupByItems = expressions - aggregateFunctions.toSet()
-            if (aggregateFunctions.isNotEmpty() && groupByItems.isNotEmpty()) {
-                groupByItems
-            } else {
-                emptyList()
-            }
+            expressions - aggregateFunctions.toSet()
+        } else {
+            emptyList()
         }
         if (groupByItems.isNotEmpty()) {
             buf.append(" group by ")
@@ -101,13 +100,9 @@ class SelectStatementBuilder(
             }
             buf.cutBack(2)
         }
-    }
-
-    private fun havingClause() {
-        val criteria = context.getHavingCriteria()
-        if (criteria.isNotEmpty()) {
+        if (havingCriteria.isNotEmpty()) {
             buf.append(" having ")
-            for ((index, criterion) in criteria.withIndex()) {
+            for ((index, criterion) in havingCriteria.withIndex()) {
                 criterion(index, criterion)
                 buf.append(" and ")
             }

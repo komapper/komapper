@@ -94,4 +94,18 @@ class SelectAggregateTest(private val db: JdbcDatabase) {
         }
         assertEquals(listOf(2 to 5L, 3 to 6L), list)
     }
+
+    @Test
+    fun having_empty_groupBy_when_aggregate_function_is_not_in_select_list() {
+        val e = Meta.employee
+        val list = db.runQuery {
+            QueryDsl.from(e)
+                .having {
+                    count(e.employeeId) greaterEq 4L
+                }
+                .orderBy(e.departmentId)
+                .select(e.departmentId)
+        }
+        assertEquals(listOf(2, 3), list)
+    }
 }
