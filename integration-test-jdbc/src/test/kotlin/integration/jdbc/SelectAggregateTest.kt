@@ -82,7 +82,7 @@ class SelectAggregateTest(private val db: JdbcDatabase) {
     }
 
     @Test
-    fun having_empty_groupBy() {
+    fun `The aggregate function is in the select list and the having clause, but there is no groupBy clause`() {
         val e = Meta.employee
         val list = db.runQuery {
             QueryDsl.from(e)
@@ -96,7 +96,7 @@ class SelectAggregateTest(private val db: JdbcDatabase) {
     }
 
     @Test
-    fun having_empty_groupBy_when_aggregate_function_is_not_in_select_list() {
+    fun `The aggregate function is in the having clause, but there is no groupBy clause`() {
         val e = Meta.employee
         val list = db.runQuery {
             QueryDsl.from(e)
@@ -107,5 +107,16 @@ class SelectAggregateTest(private val db: JdbcDatabase) {
                 .select(e.departmentId)
         }
         assertEquals(listOf(2, 3), list)
+    }
+
+    @Test
+    fun `The aggregate function is in the select list, but there is no groupBy clause`() {
+        val e = Meta.employee
+        val list = db.runQuery {
+            QueryDsl.from(e)
+                .orderBy(e.departmentId)
+                .select(e.departmentId, count(e.employeeId))
+        }
+        assertEquals(listOf(1 to 3L, 2 to 5L, 3 to 6L), list)
     }
 }
