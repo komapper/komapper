@@ -83,11 +83,11 @@ class SelectStatementBuilder(
 
     private fun groupByAndHavingClauses() {
         val havingCriteria = context.getHavingCriteria()
+        val expressions = context.getProjection().expressions()
+        val aggregateFunctions = expressions.filterIsInstance<AggregateFunction<*, *>>()
         val groupByItems = if (context.groupBy.isNotEmpty()) {
             context.groupBy
-        } else if (havingCriteria.isNotEmpty()) {
-            val expressions = context.getProjection().expressions()
-            val aggregateFunctions = expressions.filterIsInstance<AggregateFunction<*, *>>()
+        } else if (havingCriteria.isNotEmpty() || aggregateFunctions.isNotEmpty()) {
             expressions - aggregateFunctions.toSet()
         } else {
             emptyList()
