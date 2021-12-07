@@ -24,6 +24,7 @@ val isReleaseVersion = !version.toString().endsWith("SNAPSHOT")
 val ktlintVersion: String by project
 
 allprojects {
+    apply(plugin = "base")
     apply(plugin = "com.diffplug.spotless")
 
     repositories {
