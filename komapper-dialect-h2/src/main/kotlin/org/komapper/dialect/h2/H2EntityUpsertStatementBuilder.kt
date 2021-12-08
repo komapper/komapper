@@ -13,9 +13,10 @@ import org.komapper.core.dsl.expression.Operand
 import org.komapper.core.dsl.expression.TableExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.metamodel.PropertyMetamodel
+import org.komapper.core.dsl.metamodel.getNonAutoIncrementProperties
 
 internal class H2EntityUpsertStatementBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
-    dialect: H2Dialect,
+    private val dialect: H2Dialect,
     private val context: EntityUpsertContext<ENTITY, ID, META>,
     entities: List<ENTITY>
 ) : EntityUpsertStatementBuilder<ENTITY> {
@@ -43,8 +44,14 @@ internal class H2EntityUpsertStatementBuilder<ENTITY : Any, ID : Any, META : Ent
             buf.append(" and ")
         }
         buf.cutBack(5)
-        buf.append(" when not matched then insert values (")
-        for (p in excluded.properties()) {
+        buf.append(" when not matched then insert (")
+        for (p in target.getNonAutoIncrementProperties()) {
+            columnWithoutAlias(p)
+            buf.append(", ")
+        }
+        buf.cutBack(2)
+        buf.append(") values (")
+        for (p in excluded.getNonAutoIncrementProperties()) {
             column(p)
             buf.append(", ")
         }
@@ -69,6 +76,11 @@ internal class H2EntityUpsertStatementBuilder<ENTITY : Any, ID : Any, META : Ent
 
     private fun column(expression: ColumnExpression<*, *>) {
         support.visitColumnExpression(expression)
+    }
+
+    private fun columnWithoutAlias(expression: ColumnExpression<*, *>) {
+        val name = expression.getCanonicalColumnName(dialect::enquote)
+        buf.append(name)
     }
 
     private fun operand(operand: Operand) {
