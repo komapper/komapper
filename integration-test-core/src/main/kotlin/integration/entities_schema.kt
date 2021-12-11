@@ -1,6 +1,7 @@
 package integration
 
 import org.komapper.annotation.KomapperAutoIncrement
+import org.komapper.annotation.KomapperColumn
 import org.komapper.annotation.KomapperEntity
 import org.komapper.annotation.KomapperId
 import org.komapper.annotation.KomapperSequence
@@ -8,7 +9,7 @@ import org.komapper.annotation.KomapperTable
 
 @KomapperEntity
 data class Aaa(
-    @KomapperId val id: Int,
+    @KomapperId @KomapperColumn(alwaysQuote = true) val id: Int,
     val name: String,
 )
 
