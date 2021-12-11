@@ -10,7 +10,7 @@ interface Logger {
     fun error(category: String, message: () -> String)
 }
 
-open class StdOutLogger : Logger {
+class StdOutLogger : Logger {
     override fun trace(category: String, message: () -> String) {
         log(category, message)
     }
