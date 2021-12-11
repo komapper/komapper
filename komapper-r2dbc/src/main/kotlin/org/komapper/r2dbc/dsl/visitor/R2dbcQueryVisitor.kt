@@ -26,9 +26,10 @@ import org.komapper.r2dbc.dsl.runner.EntityInsertMultipleR2dbcRunner
 import org.komapper.r2dbc.dsl.runner.EntityInsertSingleR2dbcRunner
 import org.komapper.r2dbc.dsl.runner.EntityStoreR2dbcRunner
 import org.komapper.r2dbc.dsl.runner.EntityUpdateSingleR2dbcRunner
-import org.komapper.r2dbc.dsl.runner.EntityUpsertDuplicateKeyIgnoreSingleR2dbcRunner
 import org.komapper.r2dbc.dsl.runner.EntityUpsertMultipleR2dbcRunner
+import org.komapper.r2dbc.dsl.runner.EntityUpsertSingleIgnoreR2dbcRunner
 import org.komapper.r2dbc.dsl.runner.EntityUpsertSingleR2dbcRunner
+import org.komapper.r2dbc.dsl.runner.EntityUpsertSingleUpdateR2dbcRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcRowTransformers
 import org.komapper.r2dbc.dsl.runner.R2dbcRunner
 import org.komapper.r2dbc.dsl.runner.RelationDeleteR2dbcRunner
@@ -169,15 +170,22 @@ internal object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
     entityUpsertSingleQuery(
         context: EntityUpsertContext<ENTITY, ID, META>,
         entity: ENTITY,
-    ): R2dbcRunner<ENTITY> {
+    ): R2dbcRunner<Int> {
         return EntityUpsertSingleR2dbcRunner(context, entity)
     }
 
-    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityUpsertDuplicateKeyIgnoreSingleQuery(
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityUpsertSingleUpdateQuery(
+        context: EntityUpsertContext<ENTITY, ID, META>,
+        entity: ENTITY
+    ): R2dbcRunner<ENTITY> {
+        return EntityUpsertSingleUpdateR2dbcRunner(context, entity)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityUpsertSingleIgnoreQuery(
         context: EntityUpsertContext<ENTITY, ID, META>,
         entity: ENTITY
     ): R2dbcRunner<*> {
-        return EntityUpsertDuplicateKeyIgnoreSingleR2dbcRunner(context, entity)
+        return EntityUpsertSingleIgnoreR2dbcRunner(context, entity)
     }
 
     override fun schemaCreateQuery(

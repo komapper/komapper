@@ -165,7 +165,14 @@ internal object DefaultQueryVisitor : QueryVisitor<Runner> {
         return EntityUpsertSingleRunner(context, entity)
     }
 
-    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityUpsertDuplicateKeyIgnoreSingleQuery(
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityUpsertSingleUpdateQuery(
+        context: EntityUpsertContext<ENTITY, ID, META>,
+        entity: ENTITY
+    ): Runner {
+        return EntityUpsertSingleRunner(context, entity)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityUpsertSingleIgnoreQuery(
         context: EntityUpsertContext<ENTITY, ID, META>,
         entity: ENTITY
     ): Runner {

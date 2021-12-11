@@ -30,9 +30,10 @@ import org.komapper.jdbc.dsl.runner.EntityStoreJdbcRunner
 import org.komapper.jdbc.dsl.runner.EntityUpdateBatchJdbcRunner
 import org.komapper.jdbc.dsl.runner.EntityUpdateSingleJdbcRunner
 import org.komapper.jdbc.dsl.runner.EntityUpsertBatchJdbcRunner
-import org.komapper.jdbc.dsl.runner.EntityUpsertDuplicateKeyIgnoreSingleJdbcRunner
 import org.komapper.jdbc.dsl.runner.EntityUpsertMultipleJdbcRunner
+import org.komapper.jdbc.dsl.runner.EntityUpsertSingleIgnoreJdbcRunner
 import org.komapper.jdbc.dsl.runner.EntityUpsertSingleJdbcRunner
+import org.komapper.jdbc.dsl.runner.EntityUpsertSingleUpdateJdbcRunner
 import org.komapper.jdbc.dsl.runner.JdbcResultSetTransformers
 import org.komapper.jdbc.dsl.runner.JdbcRunner
 import org.komapper.jdbc.dsl.runner.RelationDeleteJdbcRunner
@@ -175,16 +176,24 @@ internal object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
     entityUpsertSingleQuery(
         context: EntityUpsertContext<ENTITY, ID, META>,
         entity: ENTITY,
-    ): JdbcRunner<ENTITY> {
+    ): JdbcRunner<Int> {
         return EntityUpsertSingleJdbcRunner(context, entity)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
-    entityUpsertDuplicateKeyIgnoreSingleQuery(
+    entityUpsertSingleUpdateQuery(
+        context: EntityUpsertContext<ENTITY, ID, META>,
+        entity: ENTITY
+    ): JdbcRunner<ENTITY> {
+        return EntityUpsertSingleUpdateJdbcRunner(context, entity)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
+    entityUpsertSingleIgnoreQuery(
         context: EntityUpsertContext<ENTITY, ID, META>,
         entity: ENTITY,
     ): JdbcRunner<ENTITY?> {
-        return EntityUpsertDuplicateKeyIgnoreSingleJdbcRunner(context, entity)
+        return EntityUpsertSingleIgnoreJdbcRunner(context, entity)
     }
 
     override fun schemaCreateQuery(

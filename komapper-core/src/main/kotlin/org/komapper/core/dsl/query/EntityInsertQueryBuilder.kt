@@ -10,8 +10,8 @@ import org.komapper.core.dsl.metamodel.PropertyMetamodel
 
 @ThreadSafe
 interface EntityInsertQueryBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> {
-    fun onDuplicateKeyUpdate(vararg keys: PropertyMetamodel<ENTITY, *, *> = emptyArray()): EntityUpsertQueryBuilder<ENTITY, ID, META>
-    fun onDuplicateKeyIgnore(vararg keys: PropertyMetamodel<ENTITY, *, *> = emptyArray()): EntityUpsertDuplicateKeyIgnoreQueryBuilder<ENTITY, ID, META>
+    fun onDuplicateKeyUpdate(vararg keys: PropertyMetamodel<ENTITY, *, *> = emptyArray()): EntityInsertOnDuplicateKeyUpdateQuery<ENTITY, ID, META>
+    fun onDuplicateKeyIgnore(vararg keys: PropertyMetamodel<ENTITY, *, *> = emptyArray()): EntityInsertOnDuplicateKeyIgnoreQuery<ENTITY, ID, META>
     fun single(entity: ENTITY): EntityInsertQuery<ENTITY>
     fun multiple(entities: List<ENTITY>): EntityInsertQuery<List<ENTITY>>
     fun multiple(vararg entities: ENTITY): EntityInsertQuery<List<ENTITY>>
@@ -26,14 +26,14 @@ internal data class EntityInsertQueryBuilderImpl<ENTITY : Any, ID : Any, META : 
 ) :
     EntityInsertQueryBuilder<ENTITY, ID, META> {
 
-    override fun onDuplicateKeyUpdate(vararg keys: PropertyMetamodel<ENTITY, *, *>): EntityUpsertQueryBuilder<ENTITY, ID, META> {
+    override fun onDuplicateKeyUpdate(vararg keys: PropertyMetamodel<ENTITY, *, *>): EntityInsertOnDuplicateKeyUpdateQuery<ENTITY, ID, META> {
         val newContext = context.asEntityUpsertContext(keys.toList(), DuplicateKeyType.UPDATE)
-        return EntityUpsertQueryBuilderImpl(newContext)
+        return EntityInsertOnDuplicateKeyUpdateQueryImpl(newContext)
     }
 
-    override fun onDuplicateKeyIgnore(vararg keys: PropertyMetamodel<ENTITY, *, *>): EntityUpsertDuplicateKeyIgnoreQueryBuilder<ENTITY, ID, META> {
+    override fun onDuplicateKeyIgnore(vararg keys: PropertyMetamodel<ENTITY, *, *>): EntityInsertOnDuplicateKeyIgnoreQuery<ENTITY, ID, META> {
         val newContext = context.asEntityUpsertContext(keys.toList(), DuplicateKeyType.IGNORE)
-        return EntityUpsertDuplicateKeyIgnoreQueryBuilderImpl(newContext)
+        return EntityInsertOnDuplicateKeyIgnoreQueryImpl(newContext)
     }
 
     override fun single(entity: ENTITY): EntityInsertQuery<ENTITY> {

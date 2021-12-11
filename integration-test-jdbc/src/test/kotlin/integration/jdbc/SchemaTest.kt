@@ -3,7 +3,7 @@ package integration.jdbc
 import integration.aaa
 import integration.bbb
 import integration.ccc
-import integration.compositeKeyAddress
+import integration.compositeKey
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.SchemaDsl
@@ -13,7 +13,7 @@ import kotlin.test.Test
 @ExtendWith(Env::class)
 class SchemaTest(private val db: JdbcDatabase) {
 
-    private val metamodels = listOf(Meta.aaa, Meta.bbb, Meta.ccc, Meta.compositeKeyAddress)
+    private val metamodels = listOf(Meta.aaa, Meta.bbb, Meta.ccc, Meta.compositeKey)
 
     @Test
     fun create() {
