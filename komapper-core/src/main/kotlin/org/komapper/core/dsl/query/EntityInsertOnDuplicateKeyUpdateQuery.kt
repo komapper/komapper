@@ -58,7 +58,11 @@ internal data class EntityInsertOnDuplicateKeyUpdateQueryImpl<ENTITY : Any, ID :
                 for ((property, value) in keys) {
                     @Suppress("UNCHECKED_CAST")
                     property as ColumnExpression<Any, Any>
-                    property eq value
+                    if (value == null) {
+                        property.isNull()
+                    } else {
+                        property eq value
+                    }
                 }
             }.first()
         }
