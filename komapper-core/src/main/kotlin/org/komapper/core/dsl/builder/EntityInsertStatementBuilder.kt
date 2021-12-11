@@ -9,9 +9,9 @@ import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.metamodel.getNonAutoIncrementProperties
 
 class EntityInsertStatementBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
-    val dialect: Dialect,
-    val context: EntityInsertContext<ENTITY, ID, META>,
-    val entities: List<ENTITY>
+    private val dialect: Dialect,
+    private val context: EntityInsertContext<ENTITY, ID, META>,
+    private val entities: List<ENTITY>
 ) {
 
     private val buf = StatementBuffer()
