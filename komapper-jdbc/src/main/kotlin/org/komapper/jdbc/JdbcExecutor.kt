@@ -102,7 +102,7 @@ internal class JdbcExecutor(
                         }
                         bind(ps, statement)
                         ps.addBatch()
-                        if (i == statements.size - 1 || batchSize > 0 && (i + 1) % batchSize == 0) {
+                        if (i == statements.size - 1 || (i + 1) % batchSize == 0) {
                             val counts = ps.executeBatch()
                             val keys = fetchGeneratedKeys(ps)
                             counts.copyInto(allCounts, offset)
