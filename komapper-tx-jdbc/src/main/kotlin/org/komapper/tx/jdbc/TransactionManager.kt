@@ -1,7 +1,6 @@
 package org.komapper.tx.jdbc
 
-import org.komapper.core.LogCategory
-import org.komapper.core.Logger
+import org.komapper.core.LoggerFacade
 import org.komapper.core.ThreadSafe
 import java.sql.Connection
 import java.sql.SQLException
@@ -23,7 +22,7 @@ interface TransactionManager {
 
 internal class TransactionManagerImpl(
     private val internalDataSource: DataSource,
-    private val logger: Logger
+    private val loggerFacade: LoggerFacade
 ) : TransactionManager {
     private val threadLocal = ThreadLocal<Transaction>()
     override val dataSource = object : DataSource by internalDataSource {
@@ -83,7 +82,7 @@ internal class TransactionManagerImpl(
             }
         }
         threadLocal.set(tx)
-        logger.trace(LogCategory.TRANSACTION.value) { "The transaction \"$tx\" has begun." }
+        loggerFacade.begin(tx.id)
     }
 
     override fun commit() {
@@ -95,7 +94,7 @@ internal class TransactionManagerImpl(
             val connection = tx.connection
             try {
                 connection.commit()
-                logger.trace(LogCategory.TRANSACTION.value) { "The transaction \"$tx\" has committed." }
+                loggerFacade.commit(tx.id)
             } catch (e: SQLException) {
                 rollbackInternal(tx)
                 throw e
@@ -137,7 +136,7 @@ internal class TransactionManagerImpl(
             val connection = tx.connection
             try {
                 connection.rollback()
-                logger.trace(LogCategory.TRANSACTION.value) { "The transaction \"$tx\" has rolled back." }
+                loggerFacade.rollback(tx.id)
             } catch (ignored: SQLException) {
             } finally {
                 release(tx)

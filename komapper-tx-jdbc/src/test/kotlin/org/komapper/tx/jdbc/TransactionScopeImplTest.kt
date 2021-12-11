@@ -1,5 +1,6 @@
 package org.komapper.tx.jdbc
 
+import org.komapper.core.DefaultLoggerFacade
 import org.komapper.core.StdOutLogger
 import org.komapper.jdbc.SimpleDataSource
 import kotlin.test.AfterTest
@@ -49,7 +50,7 @@ internal class TransactionScopeImplTest {
     }
 
     private val dataSource = SimpleDataSource("jdbc:h2:mem:transaction-test;DB_CLOSE_DELAY=-1")
-    private val txManager = TransactionManagerImpl(dataSource, StdOutLogger())
+    private val txManager = TransactionManagerImpl(dataSource, DefaultLoggerFacade(StdOutLogger()))
     private val txScope = TransactionScopeImpl(txManager)
     private val repository = Repository(txManager)
 

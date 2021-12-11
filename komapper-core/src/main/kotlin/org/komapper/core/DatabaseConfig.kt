@@ -8,6 +8,7 @@ interface DatabaseConfig {
     val clockProvider: ClockProvider
     val executionOptions: ExecutionOptions
     val logger: Logger
+    val loggerFacade: LoggerFacade
     val statementInspector: StatementInspector
     val templateStatementBuilder: TemplateStatementBuilder
 }
@@ -17,6 +18,8 @@ object DryRunDatabaseConfig : DatabaseConfig {
         get() = throw UnsupportedOperationException()
     override val dialect: Dialect = DryRunDialect
     override val logger: Logger
+        get() = throw UnsupportedOperationException()
+    override val loggerFacade: LoggerFacade
         get() = throw UnsupportedOperationException()
     override val clockProvider: ClockProvider = DefaultClockProvider()
     override val executionOptions: ExecutionOptions

@@ -4,7 +4,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.runBlocking
 import org.komapper.core.ExecutionOptionsProvider
-import org.komapper.core.LogCategory
 import org.komapper.core.Statement
 import org.komapper.core.UniqueConstraintException
 import java.sql.Connection
@@ -103,7 +102,7 @@ internal class JdbcExecutor(
                         }
                         bind(ps, statement)
                         ps.addBatch()
-                        if (i == statements.size - 1 || batchSize > 0 && (i + 1) % batchSize == 0) {
+                        if (i == statements.size - 1 || (i + 1) % batchSize == 0) {
                             val counts = ps.executeBatch()
                             val keys = fetchGeneratedKeys(ps)
                             counts.copyInto(allCounts, offset)
@@ -151,12 +150,8 @@ internal class JdbcExecutor(
     private fun log(statement: Statement) {
         val suppressLogging = executionOptions.suppressLogging ?: false
         if (!suppressLogging) {
-            config.logger.debug(LogCategory.SQL.value) {
-                statement.toSql()
-            }
-            config.logger.trace(LogCategory.SQL_WITH_ARGS.value) {
-                statement.toSqlWithArgs(config.dialect::formatValue)
-            }
+            config.loggerFacade.sql(statement)
+            config.loggerFacade.sqlWithArgs(statement, config.dialect::formatValue)
         }
     }
 

@@ -12,19 +12,19 @@ data class Statement(val parts: List<StatementPart>) {
 
     val args: List<Value> = parts.filterIsInstance<StatementPart.PlaceHolder>().map { it.value }
 
-    fun toSql(transform: (Int, StatementPart.PlaceHolder) -> CharSequence = { _, placeHolder -> placeHolder }): String {
+    fun toSql(format: (Int, StatementPart.PlaceHolder) -> CharSequence = { _, placeHolder -> placeHolder }): String {
         var index = 0
         return parts.joinToString(separator = "") { part ->
             when (part) {
                 is StatementPart.Text -> part
                 is StatementPart.PlaceHolder -> {
-                    transform(index++, part)
+                    format(index++, part)
                 }
             }
         }
     }
 
-    fun toSqlWithArgs(format: (Any?, KClass<*>) -> String): String {
+    fun toSqlWithArgs(format: (Any?, KClass<*>) -> CharSequence): String {
         return parts.joinToString(separator = "") { part ->
             when (part) {
                 is StatementPart.Text -> part.text

@@ -4,8 +4,10 @@ import io.r2dbc.spi.ConnectionFactory
 import org.komapper.core.ClockProvider
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.DefaultClockProvider
+import org.komapper.core.DefaultLoggerFacade
 import org.komapper.core.ExecutionOptions
 import org.komapper.core.Logger
+import org.komapper.core.LoggerFacade
 import org.komapper.core.Loggers
 import org.komapper.core.StatementInspector
 import org.komapper.core.StatementInspectors
@@ -40,8 +42,11 @@ class DefaultR2dbcDatabaseConfig(
     override val logger: Logger by lazy {
         Loggers.get()
     }
+    override val loggerFacade: LoggerFacade by lazy {
+        DefaultLoggerFacade(logger)
+    }
     override val session: R2dbcSession by lazy {
-        R2dbcSessions.get(connectionFactory, logger)
+        R2dbcSessions.get(connectionFactory, loggerFacade)
     }
     override val statementInspector: StatementInspector by lazy {
         StatementInspectors.get()
