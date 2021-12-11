@@ -10,19 +10,15 @@ import org.komapper.core.dsl.metamodel.where
 sealed interface Join<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> {
     val target: META
     val on: OnDeclaration
-    val where: WhereDeclaration
+    val where: WhereDeclaration get() = target.where
 }
 
 data class InnerJoin<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     override val target: META,
     override val on: OnDeclaration
-) : Join<ENTITY, ID, META> {
-    override val where: WhereDeclaration get() = target.where
-}
+) : Join<ENTITY, ID, META>
 
 data class LeftJoin<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     override val target: META,
     override val on: OnDeclaration
-) : Join<ENTITY, ID, META> {
-    override val where: WhereDeclaration get() = target.where
-}
+) : Join<ENTITY, ID, META>
