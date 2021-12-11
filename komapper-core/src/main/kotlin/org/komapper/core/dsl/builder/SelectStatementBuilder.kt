@@ -13,8 +13,8 @@ import org.komapper.core.dsl.expression.SortItem
 import org.komapper.core.dsl.expression.TableExpression
 
 class SelectStatementBuilder(
-    val dialect: Dialect,
-    val context: SelectContext<*, *, *>,
+    private val dialect: Dialect,
+    private val context: SelectContext<*, *, *>,
     aliasManager: AliasManager = DefaultAliasManager(context),
     private val projectionPredicate: (ColumnExpression<*, *>) -> Boolean = { true }
 ) {

@@ -12,8 +12,8 @@ import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.metamodel.PropertyMetamodel
 
 class RelationUpdateStatementBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
-    val dialect: Dialect,
-    val context: RelationUpdateContext<ENTITY, ID, META>,
+    private val dialect: Dialect,
+    private val context: RelationUpdateContext<ENTITY, ID, META>,
 ) {
 
     private val aliasManager = DefaultAliasManager(context)

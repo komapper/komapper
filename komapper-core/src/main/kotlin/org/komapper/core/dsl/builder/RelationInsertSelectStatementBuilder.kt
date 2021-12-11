@@ -11,8 +11,8 @@ import org.komapper.core.dsl.metamodel.IdGenerator
 import org.komapper.core.dsl.metamodel.getNonAutoIncrementProperties
 
 class RelationInsertSelectStatementBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
-    val dialect: Dialect,
-    val context: RelationInsertSelectContext<ENTITY, ID, META>,
+    private val dialect: Dialect,
+    private val context: RelationInsertSelectContext<ENTITY, ID, META>,
 ) {
     private val aliasManager = DefaultAliasManager(context)
     private val buf = StatementBuffer()

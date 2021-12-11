@@ -10,9 +10,9 @@ import org.komapper.core.dsl.expression.TableExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 
 class EntityUpdateStatementBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
-    val dialect: Dialect,
-    val context: EntityUpdateContext<ENTITY, ID, META>,
-    val entity: ENTITY
+    private val dialect: Dialect,
+    private val context: EntityUpdateContext<ENTITY, ID, META>,
+    private val entity: ENTITY
 ) {
     private val buf = StatementBuffer()
     private val support = BuilderSupport(dialect, EmptyAliasManager, buf)

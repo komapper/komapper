@@ -10,7 +10,7 @@ interface OffsetLimitStatementBuilder {
 }
 
 class OffsetLimitStatementBuilderImpl(
-    private val dialect: Dialect,
+    @Suppress("unused") private val dialect: Dialect,
     private val offset: Int,
     private val limit: Int
 ) : OffsetLimitStatementBuilder {

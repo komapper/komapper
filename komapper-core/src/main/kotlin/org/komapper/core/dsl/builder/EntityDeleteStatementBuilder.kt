@@ -10,9 +10,9 @@ import org.komapper.core.dsl.expression.TableExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 
 class EntityDeleteStatementBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
-    val dialect: Dialect,
-    val context: EntityDeleteContext<ENTITY, ID, META>,
-    val entity: ENTITY
+    dialect: Dialect,
+    private val context: EntityDeleteContext<ENTITY, ID, META>,
+    private val entity: ENTITY
 ) {
 
     private val aliasManager =
