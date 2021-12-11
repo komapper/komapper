@@ -22,7 +22,16 @@ data class Address(
 )
 
 @KomapperEntity
+@KomapperTable(name = "COMP_KEY_ADDRESS")
 data class CompositeKeyAddress(
+    @KomapperId val addressId1: Int,
+    @KomapperId val addressId2: Int,
+    val street: String,
+    val version: Int
+)
+
+@KomapperEntity
+data class CompositeKey(
     @KomapperId val addressId1: Int,
     @KomapperId val addressId2: Int,
     val street: String,

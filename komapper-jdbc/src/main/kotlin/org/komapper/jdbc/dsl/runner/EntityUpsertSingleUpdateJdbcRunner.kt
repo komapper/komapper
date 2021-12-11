@@ -7,10 +7,10 @@ import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.runner.EntityUpsertSingleRunner
 import org.komapper.jdbc.JdbcDatabaseConfig
 
-internal class EntityUpsertSingleJdbcRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
+internal class EntityUpsertSingleUpdateJdbcRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     context: EntityUpsertContext<ENTITY, ID, META>,
     private val entity: ENTITY,
-) : JdbcRunner<Int> {
+) : JdbcRunner<ENTITY> {
 
     private val runner: EntityUpsertSingleRunner<ENTITY, ID, META> =
         EntityUpsertSingleRunner(context, entity)
@@ -18,10 +18,10 @@ internal class EntityUpsertSingleJdbcRunner<ENTITY : Any, ID : Any, META : Entit
     private val support: EntityUpsertJdbcRunnerSupport<ENTITY, ID, META> =
         EntityUpsertJdbcRunnerSupport(context)
 
-    override fun run(config: JdbcDatabaseConfig): Int {
+    override fun run(config: JdbcDatabaseConfig): ENTITY {
         val newEntity = preUpsert(config, entity)
-        val (count) = upsert(config, newEntity)
-        return count
+        val (_, keys) = upsert(config, newEntity)
+        return postUpsert(newEntity, keys)
     }
 
     private fun preUpsert(config: JdbcDatabaseConfig, entity: ENTITY): ENTITY {
@@ -31,6 +31,15 @@ internal class EntityUpsertSingleJdbcRunner<ENTITY : Any, ID : Any, META : Entit
     private fun upsert(config: JdbcDatabaseConfig, entity: ENTITY): Pair<Int, LongArray> {
         val statement = runner.buildStatement(config, entity)
         return support.upsert(config) { it.executeUpdate(statement) }
+    }
+
+    private fun postUpsert(entity: ENTITY, generatedKeys: LongArray): ENTITY {
+        val key = generatedKeys.firstOrNull()
+        return if (key != null) {
+            support.postUpsert(entity, key)
+        } else {
+            entity
+        }
     }
 
     override fun dryRun(config: DatabaseConfig): Statement {

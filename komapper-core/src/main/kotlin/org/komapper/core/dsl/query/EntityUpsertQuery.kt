@@ -12,8 +12,8 @@ interface EntityUpsertQuery<T> : Query<T> {
 data class EntityUpsertSingleQuery<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityUpsertContext<ENTITY, ID, META>,
     private val entity: ENTITY
-) : EntityUpsertQuery<ENTITY> {
-    override fun options(configure: (InsertOptions) -> InsertOptions): EntityUpsertQuery<ENTITY> {
+) : EntityUpsertQuery<Int> {
+    override fun options(configure: (InsertOptions) -> InsertOptions): EntityUpsertQuery<Int> {
         return copy(context = context.copy(configure))
     }
 
@@ -22,7 +22,17 @@ data class EntityUpsertSingleQuery<ENTITY : Any, ID : Any, META : EntityMetamode
     }
 }
 
-data class EntityUpsertDuplicateKeyIgnoreSingleQuery<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
+data class EntityUpsertSingleUpdateQuery<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
+    private val context: EntityUpsertContext<ENTITY, ID, META>,
+    private val entity: ENTITY
+) : Query<ENTITY> {
+
+    override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
+        return visitor.entityUpsertSingleUpdateQuery(context, entity)
+    }
+}
+
+data class EntityUpsertSingleIgnoreQuery<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityUpsertContext<ENTITY, ID, META>,
     private val entity: ENTITY
 ) : EntityUpsertQuery<ENTITY?> {
@@ -31,7 +41,7 @@ data class EntityUpsertDuplicateKeyIgnoreSingleQuery<ENTITY : Any, ID : Any, MET
     }
 
     override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
-        return visitor.entityUpsertDuplicateKeyIgnoreSingleQuery(context, entity)
+        return visitor.entityUpsertSingleIgnoreQuery(context, entity)
     }
 }
 
