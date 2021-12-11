@@ -7,6 +7,7 @@ import org.komapper.core.dsl.context.SetOperationContext
 import org.komapper.core.dsl.context.SetOperationKind
 import org.komapper.core.dsl.element.InnerJoin
 import org.komapper.core.dsl.element.LeftJoin
+import org.komapper.core.dsl.element.Relationship
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.expression.HavingDeclaration
 import org.komapper.core.dsl.expression.ScalarExpression
@@ -35,13 +36,13 @@ internal data class EntitySelectQueryImpl<ENTITY : Any, ID : Any, META : EntityM
         return copy(context = newContext)
     }
 
-    override fun <ENTITY2 : Any, ID2 : Any, META2 : EntityMetamodel<ENTITY2, ID2, META2>> innerJoin(join: InnerJoin<ENTITY2, ID2, META2>): EntitySelectQuery<ENTITY> {
-        val newContext = support.join(join)
+    override fun <ENTITY2 : Any, ID2 : Any, META2 : EntityMetamodel<ENTITY2, ID2, META2>> innerJoin(relationship: Relationship<ENTITY2, ID2, META2>): EntitySelectQuery<ENTITY> {
+        val newContext = support.join(InnerJoin(relationship.metamodel, relationship.on))
         return copy(context = newContext)
     }
 
-    override fun <ENTITY2 : Any, ID2 : Any, META2 : EntityMetamodel<ENTITY2, ID2, META2>> leftJoin(join: LeftJoin<ENTITY2, ID2, META2>): EntitySelectQuery<ENTITY> {
-        val newContext = support.join(join)
+    override fun <ENTITY2 : Any, ID2 : Any, META2 : EntityMetamodel<ENTITY2, ID2, META2>> leftJoin(relationship: Relationship<ENTITY2, ID2, META2>): EntitySelectQuery<ENTITY> {
+        val newContext = support.join(LeftJoin(relationship.metamodel, relationship.on))
         return copy(context = newContext)
     }
 

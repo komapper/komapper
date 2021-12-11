@@ -14,7 +14,7 @@ import org.komapper.core.dsl.query.flatMap
 import org.komapper.core.dsl.query.flatZip
 import org.komapper.core.dsl.query.groupBy
 import org.komapper.core.dsl.query.having
-import org.komapper.core.dsl.query.innerJoin
+import org.komapper.core.dsl.query.join
 import org.komapper.core.dsl.query.map
 import org.komapper.core.dsl.query.on
 import org.komapper.core.dsl.query.orderBy
@@ -99,7 +99,7 @@ class CompositionTest(private val db: JdbcDatabase) {
         val a = Meta.address
         val e = Meta.employee
         val d = Meta.department
-        val join = innerJoin(e) {
+        val join = join(e) {
             e.addressId eq a.addressId
         }
         val where = where {
