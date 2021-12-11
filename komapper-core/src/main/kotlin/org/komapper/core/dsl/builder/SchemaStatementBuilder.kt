@@ -57,7 +57,8 @@ abstract class AbstractSchemaStatementBuilder<D : Dialect>(protected val dialect
         }
         buf.append(columnDefinition)
         buf.append(", ")
-        buf.append("constraint pk_$tableName primary key(")
+        val primaryKeyName = "pk_${metamodel.tableName()}"
+        buf.append("constraint $primaryKeyName primary key(")
         val idList = metamodel.idProperties().joinToString { p ->
             p.getCanonicalColumnName(dialect::enquote)
         }
