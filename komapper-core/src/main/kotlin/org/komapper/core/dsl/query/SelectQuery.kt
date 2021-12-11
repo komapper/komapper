@@ -1,7 +1,6 @@
 package org.komapper.core.dsl.query
 
-import org.komapper.core.dsl.element.InnerJoin
-import org.komapper.core.dsl.element.LeftJoin
+import org.komapper.core.dsl.element.Relationship
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.expression.HavingDeclaration
 import org.komapper.core.dsl.expression.OnDeclaration
@@ -17,19 +16,19 @@ interface SelectQuery<ENTITY : Any, QUERY : SelectQuery<ENTITY, QUERY>> :
     fun <ENTITY2 : Any, ID2 : Any, META2 : EntityMetamodel<ENTITY2, ID2, META2>> innerJoin(
         metamodel: META2,
         on: OnDeclaration
-    ): QUERY = innerJoin(InnerJoin(metamodel, on))
+    ): QUERY = innerJoin(Relationship(metamodel, on))
 
     fun <ENTITY2 : Any, ID2 : Any, META2 : EntityMetamodel<ENTITY2, ID2, META2>> leftJoin(
         metamodel: META2,
         on: OnDeclaration
-    ): QUERY = leftJoin(LeftJoin(metamodel, on))
+    ): QUERY = leftJoin(Relationship(metamodel, on))
 
     fun <ENTITY2 : Any, ID2 : Any, META2 : EntityMetamodel<ENTITY2, ID2, META2>> innerJoin(
-        join: InnerJoin<ENTITY2, ID2, META2>,
+        relationship: Relationship<ENTITY2, ID2, META2>,
     ): QUERY
 
     fun <ENTITY2 : Any, ID2 : Any, META2 : EntityMetamodel<ENTITY2, ID2, META2>> leftJoin(
-        join: LeftJoin<ENTITY2, ID2, META2>,
+        relationship: Relationship<ENTITY2, ID2, META2>,
     ): QUERY
 
     fun where(declaration: WhereDeclaration): QUERY

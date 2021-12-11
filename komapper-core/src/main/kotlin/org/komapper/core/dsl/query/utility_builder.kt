@@ -1,7 +1,6 @@
 package org.komapper.core.dsl.query
 
-import org.komapper.core.dsl.element.InnerJoin
-import org.komapper.core.dsl.element.LeftJoin
+import org.komapper.core.dsl.element.Relationship
 import org.komapper.core.dsl.expression.AssignmentDeclaration
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.expression.HavingDeclaration
@@ -30,12 +29,9 @@ fun orderBy(vararg expressions: SortExpression): List<SortExpression> = expressi
 
 fun groupBy(vararg expressions: ColumnExpression<*, *>): List<ColumnExpression<*, *>> = expressions.toList()
 
-fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> innerJoin(
+fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> join(
     metamodel: META,
     declaration: OnDeclaration
-): InnerJoin<ENTITY, ID, META> = InnerJoin(metamodel, declaration)
-
-fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> leftJoin(
-    metamodel: META,
-    declaration: OnDeclaration
-): LeftJoin<ENTITY, ID, META> = LeftJoin(metamodel, declaration)
+): Relationship<ENTITY, ID, META> {
+    return Relationship(metamodel, declaration)
+}
