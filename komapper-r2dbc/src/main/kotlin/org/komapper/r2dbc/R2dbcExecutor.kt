@@ -15,7 +15,6 @@ import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.reactive.asFlow
 import org.komapper.core.ExecutionOptionsProvider
-import org.komapper.core.LogCategory
 import org.komapper.core.Statement
 import org.komapper.core.UniqueConstraintException
 import org.reactivestreams.Publisher
@@ -115,21 +114,13 @@ internal class R2dbcExecutor(
     private fun log(statement: Statement) {
         val suppressLogging = executionOptions.suppressLogging ?: false
         if (!suppressLogging) {
-            config.logger.debug(LogCategory.SQL.value) {
-                asSql(statement)
-            }
-            config.logger.trace(LogCategory.SQL_WITH_ARGS.value) {
-                asSqlWithArgs(statement)
-            }
+            config.loggerFacade.sql(statement, config.dialect::replacePlaceHolder)
+            config.loggerFacade.sqlWithArgs(statement, config.dialect::formatValue)
         }
     }
 
     private fun asSql(statement: Statement): String {
         return statement.toSql(config.dialect::replacePlaceHolder)
-    }
-
-    private fun asSqlWithArgs(statement: Statement): String {
-        return statement.toSqlWithArgs(config.dialect::formatValue)
     }
 
     private fun prepare(con: io.r2dbc.spi.Connection, statement: Statement): io.r2dbc.spi.Statement {

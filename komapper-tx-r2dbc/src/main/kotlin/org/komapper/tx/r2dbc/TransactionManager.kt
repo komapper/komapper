@@ -11,8 +11,7 @@ import kotlinx.coroutines.reactive.asPublisher
 import kotlinx.coroutines.reactive.awaitFirst
 import kotlinx.coroutines.reactive.awaitFirstOrNull
 import kotlinx.coroutines.withContext
-import org.komapper.core.LogCategory
-import org.komapper.core.Logger
+import org.komapper.core.LoggerFacade
 import org.komapper.core.ThreadSafe
 import org.reactivestreams.Publisher
 
@@ -30,7 +29,7 @@ interface TransactionManager {
 
 internal class TransactionManagerImpl(
     private val internalConnectionFactory: ConnectionFactory,
-    private val logger: Logger
+    private val loggerFacade: LoggerFacade
 ) : TransactionManager {
     private val threadLocal: ThreadLocal<Transaction> = ThreadLocal.withInitial { EmptyTransaction }
     override val connectionFactory: ConnectionFactory = object : ConnectionFactory {
@@ -81,7 +80,7 @@ internal class TransactionManagerImpl(
             TransactionImpl(txCon)
         }
         tx.connection.beginTransaction().awaitFirstOrNull()
-        logger.trace(LogCategory.TRANSACTION.value) { "The transaction \"$tx\" has begun." }
+        loggerFacade.begin(tx.id)
         val context = threadLocal.asContextElement(tx)
         return withContext(context, block)
     }
@@ -99,7 +98,7 @@ internal class TransactionManagerImpl(
         val connection = tx.connection
         try {
             connection.commitTransaction().awaitFirstOrNull()
-            logger.trace(LogCategory.TRANSACTION.value) { "The transaction \"$tx\" has committed." }
+            loggerFacade.commit(tx.id)
         } catch (e: Exception) {
             rollbackInternal(tx)
             throw e
@@ -120,7 +119,7 @@ internal class TransactionManagerImpl(
         val connection = tx.connection
         try {
             connection.rollbackTransaction().awaitFirstOrNull()
-            logger.trace(LogCategory.TRANSACTION.value) { "The transaction \"$tx\" has rolled back." }
+            loggerFacade.rollback(tx.id)
         } catch (ignored: Exception) {
         } finally {
             release(tx)

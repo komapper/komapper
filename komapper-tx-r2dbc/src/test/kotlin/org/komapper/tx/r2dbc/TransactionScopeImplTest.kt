@@ -8,6 +8,7 @@ import kotlinx.coroutines.reactive.awaitFirstOrNull
 import kotlinx.coroutines.reactive.awaitLast
 import kotlinx.coroutines.reactive.awaitSingle
 import kotlinx.coroutines.runBlocking
+import org.komapper.core.DefaultLoggerFacade
 import org.komapper.core.StdOutLogger
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
@@ -54,7 +55,7 @@ internal class TransactionScopeImplTest {
     }
 
     private val connectionFactory = ConnectionFactories.get("r2dbc:h2:mem:///transaction-test;DB_CLOSE_DELAY=-1")
-    private val txManager = TransactionManagerImpl(connectionFactory, StdOutLogger())
+    private val txManager = TransactionManagerImpl(connectionFactory, DefaultLoggerFacade(StdOutLogger()))
     private val txScope = TransactionScopeImpl(txManager)
     private val repository = Repository(txManager)
 

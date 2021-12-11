@@ -3,8 +3,10 @@ package org.komapper.jdbc
 import org.komapper.core.ClockProvider
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.DefaultClockProvider
+import org.komapper.core.DefaultLoggerFacade
 import org.komapper.core.ExecutionOptions
 import org.komapper.core.Logger
+import org.komapper.core.LoggerFacade
 import org.komapper.core.Loggers
 import org.komapper.core.StatementInspector
 import org.komapper.core.StatementInspectors
@@ -62,8 +64,11 @@ open class DefaultJdbcDatabaseConfig(
     override val logger: Logger by lazy {
         Loggers.get()
     }
+    override val loggerFacade: LoggerFacade by lazy {
+        DefaultLoggerFacade(logger)
+    }
     override val session: JdbcSession by lazy {
-        JdbcSessions.get(dataSource, logger)
+        JdbcSessions.get(dataSource, loggerFacade)
     }
     override val statementInspector: StatementInspector by lazy {
         StatementInspectors.get()
