@@ -19,6 +19,13 @@ class Slf4jLoggerAdapter : Logger {
         }
     }
 
+    override fun info(category: String, message: () -> String) {
+        val logger = LoggerFactory.getLogger(category)
+        if (logger.isInfoEnabled) {
+            logger.info(message())
+        }
+    }
+
     override fun warn(category: String, message: () -> String) {
         val logger = LoggerFactory.getLogger(category)
         if (logger.isWarnEnabled) {

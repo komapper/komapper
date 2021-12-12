@@ -6,6 +6,7 @@ import java.time.LocalTime
 interface Logger {
     fun trace(category: String, message: () -> String)
     fun debug(category: String, message: () -> String)
+    fun info(category: String, message: () -> String)
     fun warn(category: String, message: () -> String)
     fun error(category: String, message: () -> String)
 }
@@ -16,6 +17,10 @@ class StdOutLogger : Logger {
     }
 
     override fun debug(category: String, message: () -> String) {
+        log(category, message)
+    }
+
+    override fun info(category: String, message: () -> String) {
         log(category, message)
     }
 
