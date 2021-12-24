@@ -29,9 +29,9 @@ class InsertValuesTest(private val db: R2dbcDatabase) {
         val a = Meta.address
         val (count, key) = db.runQuery {
             QueryDsl.insert(a).values {
-                a.addressId set 19
-                a.street set "STREET 16"
-                a.version set 0
+                a.addressId eq 19
+                a.street eq "STREET 16"
+                a.version eq 0
             }
         }
         assertEquals(1, count)
@@ -43,15 +43,15 @@ class InsertValuesTest(private val db: R2dbcDatabase) {
         val e = Meta.employee
         val (count, key) = db.runQuery {
             QueryDsl.insert(e).values {
-                e.employeeId set 99
-                e.departmentId set 1
-                e.addressId set 1
-                e.employeeName set "aaa"
-                e.employeeNo set 99
-                e.hiredate set LocalDate.now()
-                e.salary set BigDecimal("1000")
-                e.version set 1
-                e.managerId setIfNotNull null
+                e.employeeId eq 99
+                e.departmentId eq 1
+                e.addressId eq 1
+                e.employeeName eq "aaa"
+                e.employeeNo eq 99
+                e.hiredate eq LocalDate.now()
+                e.salary eq BigDecimal("1000")
+                e.version eq 1
+                e.managerId eqIfNotNull null
             }
         }
         assertEquals(1, count)
@@ -66,8 +66,8 @@ class InsertValuesTest(private val db: R2dbcDatabase) {
         val a = Meta.identityStrategy
         val (count, id) = db.runQuery {
             QueryDsl.insert(a).values {
-                a.id set 10
-                a.value set "test"
+                a.id eq 10
+                a.value eq "test"
             }
         }
         assertEquals(1, count)
@@ -80,7 +80,7 @@ class InsertValuesTest(private val db: R2dbcDatabase) {
         val a = Meta.sequenceStrategy
         val (count, id) = db.runQuery {
             QueryDsl.insert(a).values {
-                a.value set "test"
+                a.value eq "test"
             }
         }
         assertEquals(1, count)
@@ -92,8 +92,8 @@ class InsertValuesTest(private val db: R2dbcDatabase) {
         val p = Meta.person
         val (count) = db.runQuery {
             QueryDsl.insert(p).values {
-                p.personId set 99
-                p.name set "test"
+                p.personId eq 99
+                p.name eq "test"
             }
         }
         assertEquals(1, count)
@@ -110,10 +110,10 @@ class InsertValuesTest(private val db: R2dbcDatabase) {
         val timestamp = LocalDateTime.of(2020, 1, 1, 0, 0, 0)
         val (count) = db.runQuery {
             QueryDsl.insert(p).values {
-                p.personId set 99
-                p.name set "test"
-                p.createdAt set timestamp
-                p.updatedAt set timestamp
+                p.personId eq 99
+                p.name eq "test"
+                p.createdAt eq timestamp
+                p.updatedAt eq timestamp
             }
         }
         assertEquals(1, count)
@@ -129,8 +129,8 @@ class InsertValuesTest(private val db: R2dbcDatabase) {
         val a = Meta.address
         val (count, key) = db.runQuery {
             QueryDsl.insert(a).values {
-                a.addressId set 19
-                a.street set "STREET 16"
+                a.addressId eq 19
+                a.street eq "STREET 16"
             }
         }
         assertEquals(1, count)
@@ -144,9 +144,9 @@ class InsertValuesTest(private val db: R2dbcDatabase) {
         val a = Meta.address
         val (count, key) = db.runQuery {
             QueryDsl.insert(a).values {
-                a.addressId set 19
-                a.street set "STREET 16"
-                a.version set 10
+                a.addressId eq 19
+                a.street eq "STREET 16"
+                a.version eq 10
             }
         }
         assertEquals(1, count)

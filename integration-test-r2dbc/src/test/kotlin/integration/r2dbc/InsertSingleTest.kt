@@ -204,8 +204,8 @@ class InsertSingleTest(private val db: R2dbcDatabase) {
         val d = Meta.department
         val department = Department(1, 50, "PLANNING", "TOKYO", 10)
         val query = QueryDsl.insert(d).onDuplicateKeyUpdate().set { excluded ->
-            d.departmentName set "PLANNING2"
-            d.location set concat(d.location, concat("_", excluded.location))
+            d.departmentName eq "PLANNING2"
+            d.location eq concat(d.location, concat("_", excluded.location))
         }.single(department)
         db.runQuery { query }
         val found = db.runQuery { QueryDsl.from(d).where { d.departmentId eq 1 }.first() }
@@ -223,8 +223,8 @@ class InsertSingleTest(private val db: R2dbcDatabase) {
         val query = QueryDsl.insert(d)
             .onDuplicateKeyUpdate(d.departmentNo)
             .set { excluded ->
-                d.departmentName set "PLANNING2"
-                d.location set concat(d.location, concat("_", excluded.location))
+                d.departmentName eq "PLANNING2"
+                d.location eq concat(d.location, concat("_", excluded.location))
             }.single(department)
         db.runQuery { query }
         val found = db.runQuery { QueryDsl.from(d).where { d.departmentNo eq 10 }.first() }

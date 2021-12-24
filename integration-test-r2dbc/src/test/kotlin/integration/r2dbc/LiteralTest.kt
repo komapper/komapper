@@ -22,8 +22,8 @@ class LiteralTest(val db: R2dbcDatabase) {
         val m = Meta.booleanTest
         db.runQuery {
             QueryDsl.insert(m).values {
-                m.id set 1
-                m.value set literal(true)
+                m.id eq 1
+                m.value eq literal(true)
             }
         }
         val result = db.runQuery {
@@ -37,8 +37,8 @@ class LiteralTest(val db: R2dbcDatabase) {
         val m = Meta.intTest
         db.runQuery {
             QueryDsl.insert(m).values {
-                m.id set 1
-                m.value set literal(123)
+                m.id eq 1
+                m.value eq literal(123)
             }
         }
         val result = db.runQuery {
@@ -52,8 +52,8 @@ class LiteralTest(val db: R2dbcDatabase) {
         val m = Meta.longTest
         db.runQuery {
             QueryDsl.insert(m).values {
-                m.id set 1
-                m.value set literal(123L)
+                m.id eq 1
+                m.value eq literal(123L)
             }
         }
         val result = db.runQuery {
@@ -67,8 +67,8 @@ class LiteralTest(val db: R2dbcDatabase) {
         val m = Meta.stringTest
         db.runQuery {
             QueryDsl.insert(m).values {
-                m.id set 1
-                m.value set literal("hello")
+                m.id eq 1
+                m.value eq literal("hello")
             }
         }
         val result = db.runQuery {

@@ -31,10 +31,10 @@ class InsertSelectTest(private val db: JdbcDatabase) {
         val i = Meta.identityStrategy
         db.runQuery {
             val q1 = QueryDsl.insert(i).values {
-                i.value set "test"
+                i.value eq "test"
             }
             val q2 = QueryDsl.insert(i).values {
-                i.value set "test2"
+                i.value eq "test2"
             }
             q1.andThen(q2)
         }
