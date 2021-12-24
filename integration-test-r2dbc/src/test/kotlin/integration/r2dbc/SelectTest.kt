@@ -183,7 +183,7 @@ class SelectTest(private val db: R2dbcDatabase) {
         val a = Meta.address.define { a ->
             where { a.addressId eq 15 }
         }
-        val count = db.runQuery { QueryDsl.update(a).set { a.street set "hello" } }
+        val count = db.runQuery { QueryDsl.update(a).set { a.street eq "hello" } }
         assertEquals(1, count)
     }
 

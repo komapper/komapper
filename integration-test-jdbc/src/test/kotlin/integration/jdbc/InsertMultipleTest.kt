@@ -129,7 +129,7 @@ class InsertMultipleTest(private val db: JdbcDatabase) {
         val department2 = Department(1, 10, "DEVELOPMENT", "KYOTO", 1)
         val query =
             QueryDsl.insert(d).onDuplicateKeyUpdate().set { excluded ->
-                d.departmentName set excluded.departmentName
+                d.departmentName eq excluded.departmentName
             }.multiple(listOf(department1, department2))
         db.runQuery { query }
         val list = db.runQuery {
@@ -152,7 +152,7 @@ class InsertMultipleTest(private val db: JdbcDatabase) {
             QueryDsl.insert(d)
                 .onDuplicateKeyUpdate(d.departmentNo)
                 .set { excluded ->
-                    d.departmentName set excluded.departmentName
+                    d.departmentName eq excluded.departmentName
                 }.multiple(listOf(department1, department2))
         db.runQuery { query }
         val list = db.runQuery {

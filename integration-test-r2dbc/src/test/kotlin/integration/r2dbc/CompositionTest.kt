@@ -26,9 +26,9 @@ class CompositionTest(private val db: R2dbcDatabase) {
         val address = Address(16, "STREET 16", 0)
         val q1 = QueryDsl.insert(a).single(address)
         val q2 = QueryDsl.insert(a).values {
-            a.addressId set 17
-            a.street set "STREET 17"
-            a.version set 0
+            a.addressId eq 17
+            a.street eq "STREET 17"
+            a.version eq 0
         }
         val q3 = QueryDsl.from(a).where { a.addressId inList listOf(16, 17) }
         val list = db.runQuery { q1.andThen(q2).andThen(q3) }

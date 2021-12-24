@@ -26,7 +26,7 @@ class UpdateSetTest(private val db: R2dbcDatabase) {
         val a = Meta.address
         val count = db.runQuery {
             QueryDsl.update(a).set {
-                a.street set "STREET 16"
+                a.street eq "STREET 16"
             }.where {
                 a.addressId eq 1
             }
@@ -45,8 +45,8 @@ class UpdateSetTest(private val db: R2dbcDatabase) {
         val a = Meta.address
         val count = db.runQuery {
             QueryDsl.update(a).set {
-                a.street setIfNotNull null
-                a.version set 10
+                a.street eqIfNotNull null
+                a.version eq 10
             }.where {
                 a.addressId eq 1
             }
@@ -66,7 +66,7 @@ class UpdateSetTest(private val db: R2dbcDatabase) {
         val a = Meta.address
         val count = db.runQuery {
             QueryDsl.update(a).set {
-                a.version set (a.version + 10)
+                a.version eq (a.version + 10)
             }.where {
                 a.addressId eq 1
             }
@@ -85,7 +85,7 @@ class UpdateSetTest(private val db: R2dbcDatabase) {
         val a = Meta.address
         val count = db.runQuery {
             QueryDsl.update(a).set {
-                a.street set (concat(concat("[", a.street), "]"))
+                a.street eq (concat(concat("[", a.street), "]"))
             }.where {
                 a.addressId eq 1
             }
@@ -106,7 +106,7 @@ class UpdateSetTest(private val db: R2dbcDatabase) {
             @Suppress("UNUSED_VARIABLE")
             val count = db.runQuery {
                 QueryDsl.update(e).set {
-                    e.employeeName set "ABC"
+                    e.employeeName eq "ABC"
                 }
             }
         }
@@ -118,7 +118,7 @@ class UpdateSetTest(private val db: R2dbcDatabase) {
         val e = Meta.employee
         val count = db.runQuery {
             QueryDsl.update(e).set {
-                e.employeeName set "ABC"
+                e.employeeName eq "ABC"
             }.options { it.copy(allowEmptyWhereClause = true) }
         }
         assertEquals(14, count)
@@ -133,7 +133,7 @@ class UpdateSetTest(private val db: R2dbcDatabase) {
         delay(10)
         val count = db.runQuery {
             QueryDsl.update(p).set {
-                p.name set "ABC"
+                p.name eq "ABC"
             }.where {
                 p.personId eq 1
             }
@@ -156,8 +156,8 @@ class UpdateSetTest(private val db: R2dbcDatabase) {
         delay(10)
         val count = db.runQuery {
             QueryDsl.update(p).set {
-                p.name set "ABC"
-                p.updatedAt set person1.updatedAt
+                p.name eq "ABC"
+                p.updatedAt eq person1.updatedAt
             }.where {
                 p.personId eq 1
             }
@@ -179,7 +179,7 @@ class UpdateSetTest(private val db: R2dbcDatabase) {
 
         val count = db.runQuery {
             QueryDsl.update(a).set {
-                a.street set "STREET 16"
+                a.street eq "STREET 16"
             }.where {
                 a.addressId eq 1
             }
@@ -202,8 +202,8 @@ class UpdateSetTest(private val db: R2dbcDatabase) {
 
         val count = db.runQuery {
             QueryDsl.update(a).set {
-                a.street set "STREET 16"
-                a.version set 10
+                a.street eq "STREET 16"
+                a.version eq 10
             }.where {
                 a.addressId eq 1
             }

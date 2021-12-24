@@ -137,7 +137,7 @@ class InsertBatchTest(private val db: JdbcDatabase) {
         val department2 = Department(1, 60, "DEVELOPMENT", "KYOTO", 1)
         val query =
             QueryDsl.insert(d).onDuplicateKeyUpdate().set { excluded ->
-                d.departmentName set excluded.departmentName
+                d.departmentName eq excluded.departmentName
             }.batch(listOf(department1, department2))
         val counts = db.runQuery { query }
         when (db.config.dialect.driver) {
@@ -162,7 +162,7 @@ class InsertBatchTest(private val db: JdbcDatabase) {
         val department2 = Department(10, 10, "DEVELOPMENT", "KYOTO", 1)
         val query =
             QueryDsl.insert(d).onDuplicateKeyUpdate(d.departmentNo).set { excluded ->
-                d.departmentName set excluded.departmentName
+                d.departmentName eq excluded.departmentName
             }.batch(department1, department2)
         val counts = db.runQuery { query }
         when (db.config.dialect.driver) {
