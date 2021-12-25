@@ -51,10 +51,14 @@ interface JdbcDatabase {
     val dataFactory: JdbcDataFactory
 
     @Suppress("UNCHECKED_CAST")
-    fun <T> runQuery(block: QueryScope.() -> Query<T>): T {
-        val query = block(QueryScope)
+    fun <T> runQuery(query: Query<T>): T {
         val runner = query.accept(JdbcQueryVisitor) as JdbcRunner<T>
         return runner.run(config)
+    }
+
+    fun <T> runQuery(block: QueryScope.() -> Query<T>): T {
+        val query = block(QueryScope)
+        return runQuery(query)
     }
 }
 

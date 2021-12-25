@@ -31,7 +31,7 @@ class CompositionTest(private val db: R2dbcDatabase) {
             a.version eq 0
         }
         val q3 = QueryDsl.from(a).where { a.addressId inList listOf(16, 17) }
-        val list = db.runQuery { q1.andThen(q2).andThen(q3) }
+        val list = db.runQuery(q1.andThen(q2).andThen(q3))
         assertEquals(2, list.size)
         println(q1.andThen(q2).andThen(q3).dryRun())
     }
@@ -40,7 +40,7 @@ class CompositionTest(private val db: R2dbcDatabase) {
     fun map() = inTransaction(db) {
         val a = Meta.address
         val query = QueryDsl.from(a).map { it.map { address -> address.copy(version = 100) } }
-        val list = db.runQuery { query }
+        val list = db.runQuery(query)
         assertTrue(list.all { it.version == 100 })
     }
 
@@ -51,7 +51,7 @@ class CompositionTest(private val db: R2dbcDatabase) {
         val q1 = QueryDsl.insert(a).single(address)
         val q2 = QueryDsl.from(a)
         val q3 = q1.zip(q2)
-        val (first, second) = db.runQuery { q3 }
+        val (first, second) = db.runQuery(q3)
         assertEquals(address, first)
         assertEquals(16, second.size)
         println(q3.dryRun())
@@ -66,7 +66,7 @@ class CompositionTest(private val db: R2dbcDatabase) {
             val e = Meta.employee
             QueryDsl.from(e).where { e.addressId less addressId }
         }
-        val list = db.runQuery { query }
+        val list = db.runQuery(query)
         assertEquals(14, list.size)
     }
 
@@ -79,7 +79,7 @@ class CompositionTest(private val db: R2dbcDatabase) {
             val e = Meta.employee
             QueryDsl.from(e).where { e.addressId less addressId }
         }
-        val (newAddress, flow) = db.runQuery { query }
+        val (newAddress, flow) = db.runQuery(query)
         assertEquals(16, newAddress.addressId)
         assertEquals(14, flow.count())
     }
