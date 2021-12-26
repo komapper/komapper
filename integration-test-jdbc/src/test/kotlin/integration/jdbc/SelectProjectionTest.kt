@@ -18,7 +18,7 @@ import kotlin.test.assertEquals
 class SelectProjectionTest(private val db: JdbcDatabase) {
 
     @Test
-    fun selectColumn() {
+    fun selectSingleColumn() {
         val a = Meta.address
         val streetList = db.runQuery {
             QueryDsl.from(a)
@@ -32,7 +32,7 @@ class SelectProjectionTest(private val db: JdbcDatabase) {
     }
 
     @Test
-    fun selectColumn_first() {
+    fun selectSingleColumn_first() {
         val a = Meta.address
         val value = db.runQuery {
             QueryDsl.from(a)
@@ -47,7 +47,7 @@ class SelectProjectionTest(private val db: JdbcDatabase) {
     }
 
     @Test
-    fun selectColumnsAsPair() {
+    fun selectPairColumns() {
         val a = Meta.address
         val pairList = db.runQuery {
             QueryDsl.from(a)
@@ -61,7 +61,7 @@ class SelectProjectionTest(private val db: JdbcDatabase) {
     }
 
     @Test
-    fun selectColumnsAsTriple() {
+    fun selectTripleColumns() {
         val a = Meta.address
         val tripleList = db.runQuery {
             QueryDsl.from(a)
@@ -81,7 +81,7 @@ class SelectProjectionTest(private val db: JdbcDatabase) {
     }
 
     @Test
-    fun selectColumnsAsRecord() {
+    fun selectRecord() {
         val a = Meta.address
         val list = db.runQuery {
             QueryDsl.from(a)
@@ -141,7 +141,7 @@ class SelectProjectionTest(private val db: JdbcDatabase) {
     }
 
     @Test
-    fun selectColumnsAsPair_scalar() {
+    fun selectPairColumns_scalar() {
         val d = Meta.department
         val e = Meta.employee
         val subquery = QueryDsl.from(e).where { d.departmentId eq e.departmentId }.select(count())
@@ -158,7 +158,7 @@ class SelectProjectionTest(private val db: JdbcDatabase) {
     }
 
     @Test
-    fun singleNotNullColumn() {
+    fun selectSingleNotNullColumn() {
         val a = Meta.address
         val streetList: List<String> = db.runQuery {
             QueryDsl.from(a)
@@ -172,7 +172,7 @@ class SelectProjectionTest(private val db: JdbcDatabase) {
     }
 
     @Test
-    fun pairNotNullColumns() {
+    fun selectPairNotNullColumns() {
         val a = Meta.address
         val pairList: List<Pair<Int, String>> = db.runQuery {
             QueryDsl.from(a)
@@ -186,7 +186,7 @@ class SelectProjectionTest(private val db: JdbcDatabase) {
     }
 
     @Test
-    fun tripleNotNullColumns() {
+    fun selectTripleNotNullColumns() {
         val a = Meta.address
         val tripleList: List<Triple<Int, String, Int>> = db.runQuery {
             QueryDsl.from(a)

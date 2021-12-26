@@ -18,7 +18,7 @@ import kotlin.test.assertEquals
 class SelectProjectionTest(private val db: R2dbcDatabase) {
 
     @Test
-    fun selectColumns() = inTransaction(db) {
+    fun selectSingleColumn() = inTransaction(db) {
         val a = Meta.address
         val streetList = db.runQuery {
             QueryDsl.from(a)
@@ -32,7 +32,7 @@ class SelectProjectionTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun selectColumns_first() = inTransaction(db) {
+    fun selectSingleColumn_first() = inTransaction(db) {
         val a = Meta.address
         val value = db.runQuery {
             QueryDsl.from(a)
@@ -47,7 +47,7 @@ class SelectProjectionTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun selectColumnsAsPair() = inTransaction(db) {
+    fun selectPairColumns() = inTransaction(db) {
         val a = Meta.address
         val pairList = db.runQuery {
             QueryDsl.from(a)
@@ -61,7 +61,7 @@ class SelectProjectionTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun selectColumnsAsTriple() = inTransaction(db) {
+    fun selectTripleColumns() = inTransaction(db) {
         val a = Meta.address
         val tripleList = db.runQuery {
             QueryDsl.from(a)
@@ -81,7 +81,7 @@ class SelectProjectionTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun selectColumnsAsRecord() = inTransaction(db) {
+    fun selectRecord() = inTransaction(db) {
         val a = Meta.address
         val list = db.runQuery {
             QueryDsl.from(a)
@@ -119,7 +119,7 @@ class SelectProjectionTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun selectColumnsAsPair_scalar() = inTransaction(db) {
+    fun selectPairColumns_scalar() = inTransaction(db) {
         val d = Meta.department
         val e = Meta.employee
         val subquery = QueryDsl.from(e).where { d.departmentId eq e.departmentId }.select(count())
@@ -136,7 +136,7 @@ class SelectProjectionTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun singleNotNullColumn() = inTransaction(db) {
+    fun selectSingleNotNullColumn() = inTransaction(db) {
         val a = Meta.address
         val streetList: List<String> = db.runQuery {
             QueryDsl.from(a)
@@ -150,7 +150,7 @@ class SelectProjectionTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun pairNotNullColumns() = inTransaction(db) {
+    fun selectPairNotNullColumns() = inTransaction(db) {
         val a = Meta.address
         val pairList: List<Pair<Int, String>> = db.runQuery {
             QueryDsl.from(a)
@@ -164,7 +164,7 @@ class SelectProjectionTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun tripleNotNullColumns() = inTransaction(db) {
+    fun selectTripleNotNullColumns() = inTransaction(db) {
         val a = Meta.address
         val tripleList: List<Triple<Int, String, Int>> = db.runQuery {
             QueryDsl.from(a)
