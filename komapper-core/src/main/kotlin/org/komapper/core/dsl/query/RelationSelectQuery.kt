@@ -121,6 +121,12 @@ internal data class RelationSelectQueryImpl<ENTITY : Any, ID : Any, META : Entit
         return ScalarQueryImpl(query, expression)
     }
 
+    override fun <T : Any, S : Any> selectNotNull(expression: ScalarExpression<T, S>): ScalarQuery<T, T, S> {
+        val newContext = support.select(expression)
+        val query = SingleNotNullColumnSelectQuery(newContext, expression)
+        return ScalarQueryImpl(query, expression)
+    }
+
     override fun <A : Any> select(expression: ColumnExpression<A, *>): FlowSubquery<A?> {
         val newContext = support.select(expression)
         return SingleColumnSelectQuery(newContext, expression)
