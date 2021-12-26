@@ -95,6 +95,24 @@ class FlowTest(val db: R2dbcDatabase) {
     }
 
     @Test
+    fun pairNotNullColumns() = inTransaction(db) {
+        val flow: Flow<Pair<Int, String>> = db.flow {
+            val a = Meta.address
+            QueryDsl.from(a)
+                .where { a.addressId inList listOf(1, 2) }
+                .orderBy(a.addressId)
+                .selectNotNull(a.addressId, a.street)
+        }
+        assertEquals(
+            listOf(
+                1 to "STREET 1",
+                2 to "STREET 2"
+            ),
+            flow.toList()
+        )
+    }
+
+    @Test
     fun pairColumns_union() = inTransaction(db) {
         val flow = db.flow {
             val a = Meta.address

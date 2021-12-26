@@ -139,6 +139,14 @@ internal data class RelationSelectQueryImpl<ENTITY : Any, ID : Any, META : Entit
         return PairColumnsSelectQuery(newContext, expression1 to expression2)
     }
 
+    override fun <A : Any, B : Any> selectNotNull(
+        expression1: ColumnExpression<A, *>,
+        expression2: ColumnExpression<B, *>
+    ): FlowSubquery<Pair<A, B>> {
+        val newContext = support.select(expression1, expression2)
+        return PairNotNullColumnsSelectQuery(newContext, expression1 to expression2)
+    }
+
     override fun <A : Any, B : Any, C : Any> select(
         expression1: ColumnExpression<A, *>,
         expression2: ColumnExpression<B, *>,

@@ -58,6 +58,11 @@ interface SelectQuery<ENTITY : Any, QUERY : SelectQuery<ENTITY, QUERY>> :
         expression2: ColumnExpression<B, *>
     ): FlowSubquery<Pair<A?, B?>>
 
+    fun <A : Any, B : Any> selectNotNull(
+        expression1: ColumnExpression<A, *>,
+        expression2: ColumnExpression<B, *>
+    ): FlowSubquery<Pair<A, B>>
+
     fun <A : Any, B : Any, C : Any> select(
         expression1: ColumnExpression<A, *>,
         expression2: ColumnExpression<B, *>,
