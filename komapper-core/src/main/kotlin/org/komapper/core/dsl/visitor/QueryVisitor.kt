@@ -152,10 +152,24 @@ interface QueryVisitor<VISIT_RESULT> {
     ): VISIT_RESULT
 
     fun <A : Any, R>
+    singleNotNullColumnSelectQuery(
+        context: SelectContext<*, *, *>,
+        expression: ColumnExpression<A, *>,
+        collect: suspend (Flow<A>) -> R
+    ): VISIT_RESULT
+
+    fun <A : Any, R>
     singleColumnSetOperationQuery(
         context: SetOperationContext,
         expression: ColumnExpression<A, *>,
         collect: suspend (Flow<A?>) -> R
+    ): VISIT_RESULT
+
+    fun <A : Any, R>
+    singleNotNullColumnSetOperationQuery(
+        context: SetOperationContext,
+        expression: ColumnExpression<A, *>,
+        collect: suspend (Flow<A>) -> R
     ): VISIT_RESULT
 
     fun <A : Any, B : Any, R>

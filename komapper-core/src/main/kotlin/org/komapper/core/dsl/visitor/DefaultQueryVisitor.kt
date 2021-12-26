@@ -225,10 +225,26 @@ internal object DefaultQueryVisitor : QueryVisitor<Runner> {
         return SelectRunner(context)
     }
 
+    override fun <A : Any, R> singleNotNullColumnSelectQuery(
+        context: SelectContext<*, *, *>,
+        expression: ColumnExpression<A, *>,
+        collect: suspend (Flow<A>) -> R
+    ): Runner {
+        return SelectRunner(context)
+    }
+
     override fun <A : Any, R> singleColumnSetOperationQuery(
         context: SetOperationContext,
         expression: ColumnExpression<A, *>,
         collect: suspend (Flow<A?>) -> R
+    ): Runner {
+        return SetOperationRunner(context)
+    }
+
+    override fun <A : Any, R> singleNotNullColumnSetOperationQuery(
+        context: SetOperationContext,
+        expression: ColumnExpression<A, *>,
+        collect: suspend (Flow<A>) -> R
     ): Runner {
         return SetOperationRunner(context)
     }

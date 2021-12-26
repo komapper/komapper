@@ -245,12 +245,30 @@ internal object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
         return SelectJdbcRunner(context, transform, collect)
     }
 
+    override fun <A : Any, R> singleNotNullColumnSelectQuery(
+        context: SelectContext<*, *, *>,
+        expression: ColumnExpression<A, *>,
+        collect: suspend (Flow<A>) -> R
+    ): JdbcRunner<R> {
+        val transform = JdbcResultSetTransformers.singleNotNullColumn(expression)
+        return SelectJdbcRunner(context, transform, collect)
+    }
+
     override fun <A : Any, R> singleColumnSetOperationQuery(
         context: SetOperationContext,
         expression: ColumnExpression<A, *>,
         collect: suspend (Flow<A?>) -> R
     ): JdbcRunner<R> {
         val transform = JdbcResultSetTransformers.singleColumn(expression)
+        return SetOperationJdbcRunner(context, transform, collect)
+    }
+
+    override fun <A : Any, R> singleNotNullColumnSetOperationQuery(
+        context: SetOperationContext,
+        expression: ColumnExpression<A, *>,
+        collect: suspend (Flow<A>) -> R
+    ): JdbcRunner<*> {
+        val transform = JdbcResultSetTransformers.singleNotNullColumn(expression)
         return SetOperationJdbcRunner(context, transform, collect)
     }
 

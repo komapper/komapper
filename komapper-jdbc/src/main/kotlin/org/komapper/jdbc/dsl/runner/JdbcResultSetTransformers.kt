@@ -15,10 +15,21 @@ internal object JdbcResultSetTransformers {
         checkNotNull(entity)
     }
 
-    fun <A : Any> singleColumn(expression: ColumnExpression<A, *>): (JdbcDialect, ResultSet) -> A? =
+    fun <A : Any> singleColumn(expression: ColumnExpression<A, *>): (JdbcDialect, ResultSet) -> A? {
+        return singleColumn(expression) { it }
+    }
+
+    fun <A : Any> singleNotNullColumn(expression: ColumnExpression<A, *>): (JdbcDialect, ResultSet) -> A {
+        return singleColumn(expression) {
+            checkNotNull(it) { "The value of the selected column is null." }
+        }
+    }
+
+    private fun <A : Any, R> singleColumn(expression: ColumnExpression<A, *>, transform: (A?) -> R): (JdbcDialect, ResultSet) -> R =
         { dialect, rs ->
             val mapper = JdbcPropertyMapper(dialect, rs)
-            mapper.execute(expression)
+            val value = mapper.execute(expression)
+            transform(value)
         }
 
     fun <A : Any, B : Any> pairColumns(expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>): (JdbcDialect, ResultSet) -> Pair<A?, B?> =

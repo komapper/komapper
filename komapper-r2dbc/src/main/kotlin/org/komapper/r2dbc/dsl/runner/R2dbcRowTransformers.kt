@@ -15,10 +15,21 @@ internal object R2dbcRowTransformers {
             mapper.execute(metamodel, true) as ENTITY
         }
 
-    fun <A : Any> singleColumn(expression: ColumnExpression<A, *>): (R2dbcDialect, Row) -> A? =
+    fun <A : Any> singleColumn(expression: ColumnExpression<A, *>): (R2dbcDialect, Row) -> A? {
+        return singleColumn(expression) { it }
+    }
+
+    fun <A : Any> singleNotNullColumn(expression: ColumnExpression<A, *>): (R2dbcDialect, Row) -> A {
+        return singleColumn(expression) {
+            checkNotNull(it) { "The value of the selected column is null." }
+        }
+    }
+
+    private fun <A : Any, R> singleColumn(expression: ColumnExpression<A, *>, transform: (A?) -> R): (R2dbcDialect, Row) -> R =
         { dialect, row ->
             val mapper = R2dbcPropertyMapper(dialect, row)
-            mapper.execute(expression)
+            val value = mapper.execute(expression)
+            transform(value)
         }
 
     fun <A : Any, B : Any> pairColumns(expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>): (R2dbcDialect, Row) -> Pair<A?, B?> =
