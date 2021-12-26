@@ -13,6 +13,7 @@ import org.komapper.core.dsl.query.first
 import org.komapper.r2dbc.R2dbcDatabase
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 
 @ExtendWith(Env::class)
 class SelectProjectionTest(private val db: R2dbcDatabase) {
@@ -181,5 +182,65 @@ class SelectProjectionTest(private val db: R2dbcDatabase) {
             ),
             tripleList
         )
+    }
+
+    @Test
+    fun selectSingleNotNullColumn_error() = inTransaction(db) {
+        val e = Meta.employee
+        val ex = assertFailsWith<IllegalStateException> {
+            db.runQuery {
+                QueryDsl.from(e).selectNotNull(e.managerId)
+            }
+            Unit
+        }
+        println(ex.message)
+    }
+
+    @Test
+    fun selectPairNotNullColumn_error() = inTransaction(db) {
+        val e = Meta.employee
+        val ex1 = assertFailsWith<IllegalStateException> {
+            db.runQuery {
+                QueryDsl.from(e).selectNotNull(e.managerId, e.employeeId)
+            }
+            Unit
+        }
+        println(ex1.message)
+
+        val ex2 = assertFailsWith<IllegalStateException> {
+            db.runQuery {
+                QueryDsl.from(e).selectNotNull(e.employeeId, e.managerId)
+            }
+            Unit
+        }
+        println(ex2.message)
+    }
+
+    @Test
+    fun selectTripleNotNullColumn_error() = inTransaction(db) {
+        val e = Meta.employee
+        val ex1 = assertFailsWith<IllegalStateException> {
+            db.runQuery {
+                QueryDsl.from(e).selectNotNull(e.managerId, e.employeeId, e.addressId)
+            }
+            Unit
+        }
+        println(ex1.message)
+
+        val ex2 = assertFailsWith<IllegalStateException> {
+            db.runQuery {
+                QueryDsl.from(e).selectNotNull(e.employeeId, e.managerId, e.addressId)
+            }
+            Unit
+        }
+        println(ex2.message)
+
+        val ex3 = assertFailsWith<IllegalStateException> {
+            db.runQuery {
+                QueryDsl.from(e).selectNotNull(e.employeeId, e.addressId, e.managerId)
+            }
+            Unit
+        }
+        println(ex3.message)
     }
 }
