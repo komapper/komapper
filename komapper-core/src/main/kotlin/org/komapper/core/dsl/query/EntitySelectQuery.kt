@@ -161,6 +161,14 @@ internal data class EntitySelectQueryImpl<ENTITY : Any, ID : Any, META : EntityM
         return asRelationQuery().select(expression1, expression2, expression3)
     }
 
+    override fun <A : Any, B : Any, C : Any> selectNotNull(
+        expression1: ColumnExpression<A, *>,
+        expression2: ColumnExpression<B, *>,
+        expression3: ColumnExpression<C, *>
+    ): FlowSubquery<Triple<A, B, C>> {
+        return asRelationQuery().selectNotNull(expression1, expression2, expression3)
+    }
+
     override fun select(vararg expressions: ColumnExpression<*, *>): FlowSubquery<Columns> {
         return asRelationQuery().select(*expressions)
     }

@@ -103,11 +103,27 @@ internal object R2dbcFlowQueryVisitor : FlowQueryVisitor<FlowBuilder<*>> {
         return SelectFlowBuilder(context, transform)
     }
 
+    override fun <A : Any, B : Any, C : Any> tripleNotNullColumnsSelectQuery(
+        context: SelectContext<*, *, *>,
+        expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>
+    ): FlowBuilder<Triple<A, B, C>> {
+        val transform = R2dbcRowTransformers.tripleNotNullColumns(expressions)
+        return SelectFlowBuilder(context, transform)
+    }
+
     override fun <A : Any, B : Any, C : Any> tripleColumnsSetOperationQuery(
         context: SetOperationContext,
         expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>
     ): FlowBuilder<Triple<A?, B?, C?>> {
         val transform = R2dbcRowTransformers.tripleColumns(expressions)
+        return SetOperationFlowBuilder(context, transform)
+    }
+
+    override fun <A : Any, B : Any, C : Any> tripleNotNullColumnsSetOperationQuery(
+        context: SetOperationContext,
+        expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>
+    ): FlowBuilder<Triple<A, B, C>> {
+        val transform = R2dbcRowTransformers.tripleNotNullColumns(expressions)
         return SetOperationFlowBuilder(context, transform)
     }
 

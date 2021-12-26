@@ -162,4 +162,24 @@ class SelectProjectionTest(private val db: R2dbcDatabase) {
         }
         assertEquals(listOf(1 to "STREET 1", 2 to "STREET 2"), pairList)
     }
+
+    @Test
+    fun tripleNotNullColumns() = inTransaction(db) {
+        val a = Meta.address
+        val tripleList: List<Triple<Int, String, Int>> = db.runQuery {
+            QueryDsl.from(a)
+                .where {
+                    a.addressId inList listOf(1, 2)
+                }
+                .orderBy(a.addressId)
+                .selectNotNull(a.addressId, a.street, a.version)
+        }
+        assertEquals(
+            listOf(
+                Triple(1, "STREET 1", 1),
+                Triple(2, "STREET 2", 1)
+            ),
+            tripleList
+        )
+    }
 }

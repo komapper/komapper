@@ -69,6 +69,12 @@ interface SelectQuery<ENTITY : Any, QUERY : SelectQuery<ENTITY, QUERY>> :
         expression3: ColumnExpression<C, *>
     ): FlowSubquery<Triple<A?, B?, C?>>
 
+    fun <A : Any, B : Any, C : Any> selectNotNull(
+        expression1: ColumnExpression<A, *>,
+        expression2: ColumnExpression<B, *>,
+        expression3: ColumnExpression<C, *>
+    ): FlowSubquery<Triple<A, B, C>>
+
     fun select(
         vararg expressions: ColumnExpression<*, *>,
     ): FlowSubquery<Columns>
