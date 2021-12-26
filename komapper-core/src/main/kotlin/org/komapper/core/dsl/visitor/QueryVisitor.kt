@@ -208,10 +208,24 @@ interface QueryVisitor<VISIT_RESULT> {
     ): VISIT_RESULT
 
     fun <A : Any, B : Any, C : Any, R>
+    tripleNotNullColumnsSelectQuery(
+        context: SelectContext<*, *, *>,
+        expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
+        collect: suspend (Flow<Triple<A, B, C>>) -> R
+    ): VISIT_RESULT
+
+    fun <A : Any, B : Any, C : Any, R>
     tripleColumnsSetOperationQuery(
         context: SetOperationContext,
         expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
         collect: suspend (Flow<Triple<A?, B?, C?>>) -> R
+    ): VISIT_RESULT
+
+    fun <A : Any, B : Any, C : Any, R>
+    tripleNotNullColumnsSetOperationQuery(
+        context: SetOperationContext,
+        expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
+        collect: suspend (Flow<Triple<A, B, C>>) -> R
     ): VISIT_RESULT
 
     fun <R> multipleColumnsSelectQuery(

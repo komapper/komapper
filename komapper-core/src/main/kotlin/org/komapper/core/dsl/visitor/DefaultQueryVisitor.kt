@@ -289,10 +289,26 @@ internal object DefaultQueryVisitor : QueryVisitor<Runner> {
         return SelectRunner(context)
     }
 
+    override fun <A : Any, B : Any, C : Any, R> tripleNotNullColumnsSelectQuery(
+        context: SelectContext<*, *, *>,
+        expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
+        collect: suspend (Flow<Triple<A, B, C>>) -> R
+    ): Runner {
+        return SelectRunner(context)
+    }
+
     override fun <A : Any, B : Any, C : Any, R> tripleColumnsSetOperationQuery(
         context: SetOperationContext,
         expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
         collect: suspend (Flow<Triple<A?, B?, C?>>) -> R
+    ): Runner {
+        return SetOperationRunner(context)
+    }
+
+    override fun <A : Any, B : Any, C : Any, R> tripleNotNullColumnsSetOperationQuery(
+        context: SetOperationContext,
+        expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
+        collect: suspend (Flow<Triple<A, B, C>>) -> R
     ): Runner {
         return SetOperationRunner(context)
     }

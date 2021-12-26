@@ -317,12 +317,30 @@ internal object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
         return SelectJdbcRunner(context, transform, collect)
     }
 
+    override fun <A : Any, B : Any, C : Any, R> tripleNotNullColumnsSelectQuery(
+        context: SelectContext<*, *, *>,
+        expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
+        collect: suspend (Flow<Triple<A, B, C>>) -> R
+    ): JdbcRunner<R> {
+        val transform = JdbcResultSetTransformers.tripleNotNullColumns(expressions)
+        return SelectJdbcRunner(context, transform, collect)
+    }
+
     override fun <A : Any, B : Any, C : Any, R> tripleColumnsSetOperationQuery(
         context: SetOperationContext,
         expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
         collect: suspend (Flow<Triple<A?, B?, C?>>) -> R
     ): JdbcRunner<R> {
         val transform = JdbcResultSetTransformers.tripleColumns(expressions)
+        return SetOperationJdbcRunner(context, transform, collect)
+    }
+
+    override fun <A : Any, B : Any, C : Any, R> tripleNotNullColumnsSetOperationQuery(
+        context: SetOperationContext,
+        expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
+        collect: suspend (Flow<Triple<A, B, C>>) -> R
+    ): JdbcRunner<R> {
+        val transform = JdbcResultSetTransformers.tripleNotNullColumns(expressions)
         return SetOperationJdbcRunner(context, transform, collect)
     }
 
