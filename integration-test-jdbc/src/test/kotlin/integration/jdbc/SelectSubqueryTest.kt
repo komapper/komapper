@@ -28,6 +28,19 @@ class SelectSubqueryTest(private val db: JdbcDatabase) {
     }
 
     @Test
+    fun subquery_selectClause_notNull() {
+        val d = Meta.department
+        val e = Meta.employee
+        val subquery = QueryDsl.from(e).where { d.departmentId eq e.departmentId }.selectNotNull(count())
+        val query = QueryDsl.from(d)
+            .orderBy(d.departmentId)
+            .selectNotNull(d.departmentName, subquery)
+        val list = db.runQuery { query }
+        val expected = listOf("ACCOUNTING" to 3L, "RESEARCH" to 5L, "SALES" to 6L, "OPERATIONS" to 0L)
+        assertEquals(expected, list)
+    }
+
+    @Test
     fun subquery_whereClause() {
         val d = Meta.department
         val e = Meta.employee

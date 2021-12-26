@@ -1,7 +1,6 @@
 package org.komapper.core.dsl.query
 
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.toList
 import org.komapper.core.dsl.context.SetOperationContext
 import org.komapper.core.dsl.expression.SortExpression
 import org.komapper.core.dsl.expression.SubqueryExpression
@@ -18,10 +17,6 @@ internal data class RelationSetOperationQueryImpl<ENTITY : Any>(
 ) : RelationSetOperationQuery<ENTITY> {
 
     private val support: SetOperationQuerySupport<ENTITY> = SetOperationQuerySupport(context)
-
-    override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
-        return visitor.setOperationQuery(context, metamodel) { it.toList() }
-    }
 
     override fun <VISIT_RESULT> accept(visitor: FlowQueryVisitor<VISIT_RESULT>): VISIT_RESULT {
         return visitor.setOperationQuery(context, metamodel)

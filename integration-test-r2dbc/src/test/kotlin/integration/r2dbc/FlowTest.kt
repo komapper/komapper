@@ -2,6 +2,7 @@ package integration.r2dbc
 
 import integration.address
 import integration.employee
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.toList
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
@@ -49,6 +50,18 @@ class FlowTest(val db: R2dbcDatabase) {
     }
 
     @Test
+    fun singleNotNullColumn() = inTransaction(db) {
+        val flow: Flow<Int> = db.flow {
+            val a = Meta.address
+            QueryDsl.from(a)
+                .where { a.addressId inList listOf(1, 2) }
+                .orderBy(a.addressId)
+                .selectNotNull(a.addressId)
+        }
+        assertEquals(listOf(1, 2), flow.toList())
+    }
+
+    @Test
     fun singleColumn_union() = inTransaction(db) {
         val flow = db.flow {
             val a = Meta.address
@@ -71,6 +84,24 @@ class FlowTest(val db: R2dbcDatabase) {
                 .where { a.addressId inList listOf(1, 2) }
                 .orderBy(a.addressId)
                 .select(a.addressId, a.street)
+        }
+        assertEquals(
+            listOf(
+                1 to "STREET 1",
+                2 to "STREET 2"
+            ),
+            flow.toList()
+        )
+    }
+
+    @Test
+    fun pairNotNullColumns() = inTransaction(db) {
+        val flow: Flow<Pair<Int, String>> = db.flow {
+            val a = Meta.address
+            QueryDsl.from(a)
+                .where { a.addressId inList listOf(1, 2) }
+                .orderBy(a.addressId)
+                .selectNotNull(a.addressId, a.street)
         }
         assertEquals(
             listOf(
@@ -110,6 +141,24 @@ class FlowTest(val db: R2dbcDatabase) {
                 .where { a.addressId inList listOf(1, 2) }
                 .orderBy(a.addressId)
                 .select(a.addressId, a.street, a.version)
+        }
+        assertEquals(
+            listOf(
+                Triple(1, "STREET 1", 1),
+                Triple(2, "STREET 2", 1)
+            ),
+            flow.toList()
+        )
+    }
+
+    @Test
+    fun tripleNotNullColumns() = inTransaction(db) {
+        val flow: Flow<Triple<Int, String, Int>> = db.flow {
+            val a = Meta.address
+            QueryDsl.from(a)
+                .where { a.addressId inList listOf(1, 2) }
+                .orderBy(a.addressId)
+                .selectNotNull(a.addressId, a.street, a.version)
         }
         assertEquals(
             listOf(

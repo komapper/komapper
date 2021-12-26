@@ -11,7 +11,7 @@ import org.komapper.core.dsl.query.Row
 @ThreadSafe
 interface FlowQueryVisitor<VISIT_RESULT> {
 
-    fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> selectQuery(
+    fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> relationSelectQuery(
         context: SelectContext<ENTITY, ID, META>
     ): VISIT_RESULT
 
@@ -20,7 +20,12 @@ interface FlowQueryVisitor<VISIT_RESULT> {
         metamodel: EntityMetamodel<ENTITY, ID, META>,
     ): VISIT_RESULT
 
-    fun <A : Any> singleColumnQuery(
+    fun <A : Any> singleColumnSelectQuery(
+        context: SelectContext<*, *, *>,
+        expression: ColumnExpression<A, *>,
+    ): VISIT_RESULT
+
+    fun <A : Any> singleNotNullColumnSelectQuery(
         context: SelectContext<*, *, *>,
         expression: ColumnExpression<A, *>,
     ): VISIT_RESULT
@@ -30,7 +35,17 @@ interface FlowQueryVisitor<VISIT_RESULT> {
         expression: ColumnExpression<A, *>,
     ): VISIT_RESULT
 
-    fun <A : Any, B : Any> pairColumnsQuery(
+    fun <A : Any> singleNotNullColumnSetOperationQuery(
+        context: SetOperationContext,
+        expression: ColumnExpression<A, *>,
+    ): VISIT_RESULT
+
+    fun <A : Any, B : Any> pairColumnsSelectQuery(
+        context: SelectContext<*, *, *>,
+        expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
+    ): VISIT_RESULT
+
+    fun <A : Any, B : Any> pairNotNullColumnsSelectQuery(
         context: SelectContext<*, *, *>,
         expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
     ): VISIT_RESULT
@@ -40,8 +55,19 @@ interface FlowQueryVisitor<VISIT_RESULT> {
         expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
     ): VISIT_RESULT
 
+    fun <A : Any, B : Any> pairNotNullColumnsSetOperationQuery(
+        context: SetOperationContext,
+        expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
+    ): VISIT_RESULT
+
     fun <A : Any, B : Any, C : Any>
-    tripleColumnsQuery(
+    tripleColumnsSelectQuery(
+        context: SelectContext<*, *, *>,
+        expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
+    ): VISIT_RESULT
+
+    fun <A : Any, B : Any, C : Any>
+    tripleNotNullColumnsSelectQuery(
         context: SelectContext<*, *, *>,
         expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
     ): VISIT_RESULT
@@ -51,7 +77,12 @@ interface FlowQueryVisitor<VISIT_RESULT> {
         expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
     ): VISIT_RESULT
 
-    fun multipleColumnsQuery(
+    fun <A : Any, B : Any, C : Any> tripleNotNullColumnsSetOperationQuery(
+        context: SetOperationContext,
+        expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
+    ): VISIT_RESULT
+
+    fun multipleColumnsSelectQuery(
         context: SelectContext<*, *, *>,
         expressions: List<ColumnExpression<*, *>>
     ): VISIT_RESULT

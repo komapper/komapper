@@ -1,7 +1,6 @@
 package org.komapper.core.dsl.query
 
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.toList
 import org.komapper.core.dsl.context.SelectContext
 import org.komapper.core.dsl.context.SetOperationContext
 import org.komapper.core.dsl.context.SetOperationKind
@@ -131,8 +130,16 @@ internal data class EntitySelectQueryImpl<ENTITY : Any, ID : Any, META : EntityM
         return asRelationQuery().select(expression)
     }
 
+    override fun <T : Any, S : Any> selectNotNull(expression: ScalarExpression<T, S>): ScalarQuery<T, T, S> {
+        return asRelationQuery().selectNotNull(expression)
+    }
+
     override fun <A : Any> select(expression: ColumnExpression<A, *>): FlowSubquery<A?> {
         return asRelationQuery().select(expression)
+    }
+
+    override fun <A : Any> selectNotNull(expression: ColumnExpression<A, *>): FlowSubquery<A> {
+        return asRelationQuery().selectNotNull(expression)
     }
 
     override fun <A : Any, B : Any> select(
@@ -142,12 +149,27 @@ internal data class EntitySelectQueryImpl<ENTITY : Any, ID : Any, META : EntityM
         return asRelationQuery().select(expression1, expression2)
     }
 
+    override fun <A : Any, B : Any> selectNotNull(
+        expression1: ColumnExpression<A, *>,
+        expression2: ColumnExpression<B, *>
+    ): FlowSubquery<Pair<A, B>> {
+        return asRelationQuery().selectNotNull(expression1, expression2)
+    }
+
     override fun <A : Any, B : Any, C : Any> select(
         expression1: ColumnExpression<A, *>,
         expression2: ColumnExpression<B, *>,
         expression3: ColumnExpression<C, *>
     ): FlowSubquery<Triple<A?, B?, C?>> {
         return asRelationQuery().select(expression1, expression2, expression3)
+    }
+
+    override fun <A : Any, B : Any, C : Any> selectNotNull(
+        expression1: ColumnExpression<A, *>,
+        expression2: ColumnExpression<B, *>,
+        expression3: ColumnExpression<C, *>
+    ): FlowSubquery<Triple<A, B, C>> {
+        return asRelationQuery().selectNotNull(expression1, expression2, expression3)
     }
 
     override fun select(vararg expressions: ColumnExpression<*, *>): FlowSubquery<Columns> {
@@ -160,10 +182,6 @@ internal data class EntitySelectQueryImpl<ENTITY : Any, ID : Any, META : EntityM
 
     private fun asRelationQuery(): RelationSelectQuery<ENTITY> {
         return RelationSelectQueryImpl(context)
-    }
-
-    override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
-        return visitor.entitySelectQuery(context) { it.toList() }
     }
 
     override fun <VISIT_RESULT> accept(visitor: FlowQueryVisitor<VISIT_RESULT>): VISIT_RESULT {

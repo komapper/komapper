@@ -1,7 +1,6 @@
 package org.komapper.core.dsl.query
 
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.toList
 import org.komapper.core.dsl.context.SelectContext
 import org.komapper.core.dsl.element.InnerJoin
 import org.komapper.core.dsl.element.LeftJoin
@@ -85,17 +84,13 @@ internal data class RelationSelectQueryImpl<ENTITY : Any, ID : Any, META : Entit
         return copy(context = newContext)
     }
 
-    override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
-        return visitor.sqlSelectQuery(context) { it.toList() }
-    }
-
     override fun <VISIT_RESULT> accept(visitor: FlowQueryVisitor<VISIT_RESULT>): VISIT_RESULT {
-        return visitor.selectQuery(context)
+        return visitor.relationSelectQuery(context)
     }
 
     override fun <R> collect(collect: suspend (Flow<ENTITY>) -> R): Query<R> = object : Query<R> {
         override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
-            return visitor.sqlSelectQuery(context, collect)
+            return visitor.relationSelectQuery(context, collect)
         }
     }
 
@@ -121,9 +116,20 @@ internal data class RelationSelectQueryImpl<ENTITY : Any, ID : Any, META : Entit
         return ScalarQueryImpl(query, expression)
     }
 
+    override fun <T : Any, S : Any> selectNotNull(expression: ScalarExpression<T, S>): ScalarQuery<T, T, S> {
+        val newContext = support.select(expression)
+        val query = SingleNotNullColumnSelectQuery(newContext, expression)
+        return ScalarQueryImpl(query, expression)
+    }
+
     override fun <A : Any> select(expression: ColumnExpression<A, *>): FlowSubquery<A?> {
         val newContext = support.select(expression)
         return SingleColumnSelectQuery(newContext, expression)
+    }
+
+    override fun <A : Any> selectNotNull(expression: ColumnExpression<A, *>): FlowSubquery<A> {
+        val newContext = support.select(expression)
+        return SingleNotNullColumnSelectQuery(newContext, expression)
     }
 
     override fun <A : Any, B : Any> select(
@@ -134,6 +140,14 @@ internal data class RelationSelectQueryImpl<ENTITY : Any, ID : Any, META : Entit
         return PairColumnsSelectQuery(newContext, expression1 to expression2)
     }
 
+    override fun <A : Any, B : Any> selectNotNull(
+        expression1: ColumnExpression<A, *>,
+        expression2: ColumnExpression<B, *>
+    ): FlowSubquery<Pair<A, B>> {
+        val newContext = support.select(expression1, expression2)
+        return PairNotNullColumnsSelectQuery(newContext, expression1 to expression2)
+    }
+
     override fun <A : Any, B : Any, C : Any> select(
         expression1: ColumnExpression<A, *>,
         expression2: ColumnExpression<B, *>,
@@ -141,6 +155,15 @@ internal data class RelationSelectQueryImpl<ENTITY : Any, ID : Any, META : Entit
     ): FlowSubquery<Triple<A?, B?, C?>> {
         val newContext = support.select(expression1, expression2, expression3)
         return TripleColumnsSelectQuery(newContext, Triple(expression1, expression2, expression3))
+    }
+
+    override fun <A : Any, B : Any, C : Any> selectNotNull(
+        expression1: ColumnExpression<A, *>,
+        expression2: ColumnExpression<B, *>,
+        expression3: ColumnExpression<C, *>
+    ): FlowSubquery<Triple<A, B, C>> {
+        val newContext = support.select(expression1, expression2, expression3)
+        return TripleNotNullColumnsSelectQuery(newContext, Triple(expression1, expression2, expression3))
     }
 
     override fun select(vararg expressions: ColumnExpression<*, *>): FlowSubquery<Columns> {

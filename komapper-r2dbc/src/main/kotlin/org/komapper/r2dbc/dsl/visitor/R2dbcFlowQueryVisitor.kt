@@ -16,7 +16,7 @@ import org.komapper.r2dbc.dsl.runner.TemplateSelectFlowBuilder
 
 internal object R2dbcFlowQueryVisitor : FlowQueryVisitor<FlowBuilder<*>> {
 
-    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> selectQuery(
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> relationSelectQuery(
         context: SelectContext<ENTITY, ID, META>
     ): FlowBuilder<ENTITY> {
         val transform = R2dbcRowTransformers.singleEntity(context.target)
@@ -31,11 +31,19 @@ internal object R2dbcFlowQueryVisitor : FlowQueryVisitor<FlowBuilder<*>> {
         return SetOperationFlowBuilder(context, transform)
     }
 
-    override fun <A : Any> singleColumnQuery(
+    override fun <A : Any> singleColumnSelectQuery(
         context: SelectContext<*, *, *>,
         expression: ColumnExpression<A, *>
     ): FlowBuilder<A?> {
         val transform = R2dbcRowTransformers.singleColumn(expression)
+        return SelectFlowBuilder(context, transform)
+    }
+
+    override fun <A : Any> singleNotNullColumnSelectQuery(
+        context: SelectContext<*, *, *>,
+        expression: ColumnExpression<A, *>
+    ): FlowBuilder<A> {
+        val transform = R2dbcRowTransformers.singleNotNullColumn(expression)
         return SelectFlowBuilder(context, transform)
     }
 
@@ -47,11 +55,27 @@ internal object R2dbcFlowQueryVisitor : FlowQueryVisitor<FlowBuilder<*>> {
         return SetOperationFlowBuilder(context, transform)
     }
 
-    override fun <A : Any, B : Any> pairColumnsQuery(
+    override fun <A : Any> singleNotNullColumnSetOperationQuery(
+        context: SetOperationContext,
+        expression: ColumnExpression<A, *>
+    ): FlowBuilder<*> {
+        val transform = R2dbcRowTransformers.singleNotNullColumn(expression)
+        return SetOperationFlowBuilder(context, transform)
+    }
+
+    override fun <A : Any, B : Any> pairColumnsSelectQuery(
         context: SelectContext<*, *, *>,
         expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>
     ): FlowBuilder<Pair<A?, B?>> {
         val transform = R2dbcRowTransformers.pairColumns(expressions)
+        return SelectFlowBuilder(context, transform)
+    }
+
+    override fun <A : Any, B : Any> pairNotNullColumnsSelectQuery(
+        context: SelectContext<*, *, *>,
+        expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>
+    ): FlowBuilder<Pair<A, B>> {
+        val transform = R2dbcRowTransformers.pairNotNullColumns(expressions)
         return SelectFlowBuilder(context, transform)
     }
 
@@ -63,11 +87,27 @@ internal object R2dbcFlowQueryVisitor : FlowQueryVisitor<FlowBuilder<*>> {
         return SetOperationFlowBuilder(context, transform)
     }
 
-    override fun <A : Any, B : Any, C : Any> tripleColumnsQuery(
+    override fun <A : Any, B : Any> pairNotNullColumnsSetOperationQuery(
+        context: SetOperationContext,
+        expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>
+    ): FlowBuilder<Pair<A, B>> {
+        val transform = R2dbcRowTransformers.pairNotNullColumns(expressions)
+        return SetOperationFlowBuilder(context, transform)
+    }
+
+    override fun <A : Any, B : Any, C : Any> tripleColumnsSelectQuery(
         context: SelectContext<*, *, *>,
         expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>
     ): FlowBuilder<Triple<A?, B?, C?>> {
         val transform = R2dbcRowTransformers.tripleColumns(expressions)
+        return SelectFlowBuilder(context, transform)
+    }
+
+    override fun <A : Any, B : Any, C : Any> tripleNotNullColumnsSelectQuery(
+        context: SelectContext<*, *, *>,
+        expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>
+    ): FlowBuilder<Triple<A, B, C>> {
+        val transform = R2dbcRowTransformers.tripleNotNullColumns(expressions)
         return SelectFlowBuilder(context, transform)
     }
 
@@ -79,7 +119,15 @@ internal object R2dbcFlowQueryVisitor : FlowQueryVisitor<FlowBuilder<*>> {
         return SetOperationFlowBuilder(context, transform)
     }
 
-    override fun multipleColumnsQuery(
+    override fun <A : Any, B : Any, C : Any> tripleNotNullColumnsSetOperationQuery(
+        context: SetOperationContext,
+        expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>
+    ): FlowBuilder<Triple<A, B, C>> {
+        val transform = R2dbcRowTransformers.tripleNotNullColumns(expressions)
+        return SetOperationFlowBuilder(context, transform)
+    }
+
+    override fun multipleColumnsSelectQuery(
         context: SelectContext<*, *, *>,
         expressions: List<ColumnExpression<*, *>>
     ): FlowBuilder<Columns> {

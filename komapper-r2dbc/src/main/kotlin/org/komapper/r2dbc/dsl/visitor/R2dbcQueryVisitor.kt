@@ -211,7 +211,7 @@ internal object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, R>
-    sqlSelectQuery(
+    relationSelectQuery(
         context: SelectContext<ENTITY, ID, META>,
         collect: suspend (Flow<ENTITY>) -> R
     ): R2dbcRunner<R> {
@@ -237,12 +237,30 @@ internal object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
         return SelectR2dbcRunner(context, transform, collect)
     }
 
+    override fun <A : Any, R> singleNotNullColumnSelectQuery(
+        context: SelectContext<*, *, *>,
+        expression: ColumnExpression<A, *>,
+        collect: suspend (Flow<A>) -> R
+    ): R2dbcRunner<R> {
+        val transform = R2dbcRowTransformers.singleNotNullColumn(expression)
+        return SelectR2dbcRunner(context, transform, collect)
+    }
+
     override fun <A : Any, R> singleColumnSetOperationQuery(
         context: SetOperationContext,
         expression: ColumnExpression<A, *>,
         collect: suspend (Flow<A?>) -> R
     ): R2dbcRunner<R> {
         val transform = R2dbcRowTransformers.singleColumn(expression)
+        return SetOperationR2dbcRunner(context, transform, collect)
+    }
+
+    override fun <A : Any, R> singleNotNullColumnSetOperationQuery(
+        context: SetOperationContext,
+        expression: ColumnExpression<A, *>,
+        collect: suspend (Flow<A>) -> R
+    ): R2dbcRunner<R> {
+        val transform = R2dbcRowTransformers.singleNotNullColumn(expression)
         return SetOperationR2dbcRunner(context, transform, collect)
     }
 
@@ -255,12 +273,30 @@ internal object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
         return SelectR2dbcRunner(context, transform, collect)
     }
 
+    override fun <A : Any, B : Any, R> pairNotNullColumnsSelectQuery(
+        context: SelectContext<*, *, *>,
+        expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
+        collect: suspend (Flow<Pair<A, B>>) -> R
+    ): R2dbcRunner<R> {
+        val transform = R2dbcRowTransformers.pairNotNullColumns(expressions)
+        return SelectR2dbcRunner(context, transform, collect)
+    }
+
     override fun <A : Any, B : Any, R> pairColumnsSetOperationQuery(
         context: SetOperationContext,
         expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
         collect: suspend (Flow<Pair<A?, B?>>) -> R
     ): R2dbcRunner<R> {
         val transform = R2dbcRowTransformers.pairColumns(expressions)
+        return SetOperationR2dbcRunner(context, transform, collect)
+    }
+
+    override fun <A : Any, B : Any, R> pairNotNullColumnsSetOperationQuery(
+        context: SetOperationContext,
+        expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
+        collect: suspend (Flow<Pair<A, B>>) -> R
+    ): R2dbcRunner<*> {
+        val transform = R2dbcRowTransformers.pairNotNullColumns(expressions)
         return SetOperationR2dbcRunner(context, transform, collect)
     }
 
@@ -273,12 +309,30 @@ internal object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
         return SelectR2dbcRunner(context, provide, collect)
     }
 
+    override fun <A : Any, B : Any, C : Any, R> tripleNotNullColumnsSelectQuery(
+        context: SelectContext<*, *, *>,
+        expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
+        collect: suspend (Flow<Triple<A, B, C>>) -> R
+    ): R2dbcRunner<R> {
+        val provide = R2dbcRowTransformers.tripleNotNullColumns(expressions)
+        return SelectR2dbcRunner(context, provide, collect)
+    }
+
     override fun <A : Any, B : Any, C : Any, R> tripleColumnsSetOperationQuery(
         context: SetOperationContext,
         expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
         collect: suspend (Flow<Triple<A?, B?, C?>>) -> R
     ): R2dbcRunner<R> {
         val transform = R2dbcRowTransformers.tripleColumns(expressions)
+        return SetOperationR2dbcRunner(context, transform, collect)
+    }
+
+    override fun <A : Any, B : Any, C : Any, R> tripleNotNullColumnsSetOperationQuery(
+        context: SetOperationContext,
+        expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
+        collect: suspend (Flow<Triple<A, B, C>>) -> R
+    ): R2dbcRunner<R> {
+        val transform = R2dbcRowTransformers.tripleNotNullColumns(expressions)
         return SetOperationR2dbcRunner(context, transform, collect)
     }
 

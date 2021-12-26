@@ -202,7 +202,7 @@ internal object DefaultQueryVisitor : QueryVisitor<Runner> {
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, R>
-    sqlSelectQuery(
+    relationSelectQuery(
         context: SelectContext<ENTITY, ID, META>,
         collect: suspend (Flow<ENTITY>) -> R
     ): Runner {
@@ -225,10 +225,26 @@ internal object DefaultQueryVisitor : QueryVisitor<Runner> {
         return SelectRunner(context)
     }
 
+    override fun <A : Any, R> singleNotNullColumnSelectQuery(
+        context: SelectContext<*, *, *>,
+        expression: ColumnExpression<A, *>,
+        collect: suspend (Flow<A>) -> R
+    ): Runner {
+        return SelectRunner(context)
+    }
+
     override fun <A : Any, R> singleColumnSetOperationQuery(
         context: SetOperationContext,
         expression: ColumnExpression<A, *>,
         collect: suspend (Flow<A?>) -> R
+    ): Runner {
+        return SetOperationRunner(context)
+    }
+
+    override fun <A : Any, R> singleNotNullColumnSetOperationQuery(
+        context: SetOperationContext,
+        expression: ColumnExpression<A, *>,
+        collect: suspend (Flow<A>) -> R
     ): Runner {
         return SetOperationRunner(context)
     }
@@ -241,10 +257,26 @@ internal object DefaultQueryVisitor : QueryVisitor<Runner> {
         return SelectRunner(context)
     }
 
+    override fun <A : Any, B : Any, R> pairNotNullColumnsSelectQuery(
+        context: SelectContext<*, *, *>,
+        expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
+        collect: suspend (Flow<Pair<A, B>>) -> R
+    ): Runner {
+        return SelectRunner(context)
+    }
+
     override fun <A : Any, B : Any, R> pairColumnsSetOperationQuery(
         context: SetOperationContext,
         expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
         collect: suspend (Flow<Pair<A?, B?>>) -> R
+    ): Runner {
+        return SetOperationRunner(context)
+    }
+
+    override fun <A : Any, B : Any, R> pairNotNullColumnsSetOperationQuery(
+        context: SetOperationContext,
+        expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
+        collect: suspend (Flow<Pair<A, B>>) -> R
     ): Runner {
         return SetOperationRunner(context)
     }
@@ -257,10 +289,26 @@ internal object DefaultQueryVisitor : QueryVisitor<Runner> {
         return SelectRunner(context)
     }
 
+    override fun <A : Any, B : Any, C : Any, R> tripleNotNullColumnsSelectQuery(
+        context: SelectContext<*, *, *>,
+        expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
+        collect: suspend (Flow<Triple<A, B, C>>) -> R
+    ): Runner {
+        return SelectRunner(context)
+    }
+
     override fun <A : Any, B : Any, C : Any, R> tripleColumnsSetOperationQuery(
         context: SetOperationContext,
         expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
         collect: suspend (Flow<Triple<A?, B?, C?>>) -> R
+    ): Runner {
+        return SetOperationRunner(context)
+    }
+
+    override fun <A : Any, B : Any, C : Any, R> tripleNotNullColumnsSetOperationQuery(
+        context: SetOperationContext,
+        expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
+        collect: suspend (Flow<Triple<A, B, C>>) -> R
     ): Runner {
         return SetOperationRunner(context)
     }

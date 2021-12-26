@@ -45,20 +45,39 @@ interface SelectQuery<ENTITY : Any, QUERY : SelectQuery<ENTITY, QUERY>> :
         expression: ScalarExpression<T, S>
     ): ScalarQuery<T?, T, S>
 
+    fun <T : Any, S : Any> selectNotNull(
+        expression: ScalarExpression<T, S>
+    ): ScalarQuery<T, T, S>
+
     fun <A : Any> select(
         expression: ColumnExpression<A, *>
     ): FlowSubquery<A?>
+
+    fun <A : Any> selectNotNull(
+        expression: ColumnExpression<A, *>
+    ): FlowSubquery<A>
 
     fun <A : Any, B : Any> select(
         expression1: ColumnExpression<A, *>,
         expression2: ColumnExpression<B, *>
     ): FlowSubquery<Pair<A?, B?>>
 
+    fun <A : Any, B : Any> selectNotNull(
+        expression1: ColumnExpression<A, *>,
+        expression2: ColumnExpression<B, *>
+    ): FlowSubquery<Pair<A, B>>
+
     fun <A : Any, B : Any, C : Any> select(
         expression1: ColumnExpression<A, *>,
         expression2: ColumnExpression<B, *>,
         expression3: ColumnExpression<C, *>
     ): FlowSubquery<Triple<A?, B?, C?>>
+
+    fun <A : Any, B : Any, C : Any> selectNotNull(
+        expression1: ColumnExpression<A, *>,
+        expression2: ColumnExpression<B, *>,
+        expression3: ColumnExpression<C, *>
+    ): FlowSubquery<Triple<A, B, C>>
 
     fun select(
         vararg expressions: ColumnExpression<*, *>,

@@ -132,7 +132,7 @@ interface QueryVisitor<VISIT_RESULT> {
     ): VISIT_RESULT
 
     fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, R>
-    sqlSelectQuery(
+    relationSelectQuery(
         context: SelectContext<ENTITY, ID, META>,
         collect: suspend (Flow<ENTITY>) -> R
     ): VISIT_RESULT
@@ -152,10 +152,24 @@ interface QueryVisitor<VISIT_RESULT> {
     ): VISIT_RESULT
 
     fun <A : Any, R>
+    singleNotNullColumnSelectQuery(
+        context: SelectContext<*, *, *>,
+        expression: ColumnExpression<A, *>,
+        collect: suspend (Flow<A>) -> R
+    ): VISIT_RESULT
+
+    fun <A : Any, R>
     singleColumnSetOperationQuery(
         context: SetOperationContext,
         expression: ColumnExpression<A, *>,
         collect: suspend (Flow<A?>) -> R
+    ): VISIT_RESULT
+
+    fun <A : Any, R>
+    singleNotNullColumnSetOperationQuery(
+        context: SetOperationContext,
+        expression: ColumnExpression<A, *>,
+        collect: suspend (Flow<A>) -> R
     ): VISIT_RESULT
 
     fun <A : Any, B : Any, R>
@@ -166,10 +180,24 @@ interface QueryVisitor<VISIT_RESULT> {
     ): VISIT_RESULT
 
     fun <A : Any, B : Any, R>
+    pairNotNullColumnsSelectQuery(
+        context: SelectContext<*, *, *>,
+        expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
+        collect: suspend (Flow<Pair<A, B>>) -> R
+    ): VISIT_RESULT
+
+    fun <A : Any, B : Any, R>
     pairColumnsSetOperationQuery(
         context: SetOperationContext,
         expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
         collect: suspend (Flow<Pair<A?, B?>>) -> R
+    ): VISIT_RESULT
+
+    fun <A : Any, B : Any, R>
+    pairNotNullColumnsSetOperationQuery(
+        context: SetOperationContext,
+        expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
+        collect: suspend (Flow<Pair<A, B>>) -> R
     ): VISIT_RESULT
 
     fun <A : Any, B : Any, C : Any, R>
@@ -180,10 +208,24 @@ interface QueryVisitor<VISIT_RESULT> {
     ): VISIT_RESULT
 
     fun <A : Any, B : Any, C : Any, R>
+    tripleNotNullColumnsSelectQuery(
+        context: SelectContext<*, *, *>,
+        expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
+        collect: suspend (Flow<Triple<A, B, C>>) -> R
+    ): VISIT_RESULT
+
+    fun <A : Any, B : Any, C : Any, R>
     tripleColumnsSetOperationQuery(
         context: SetOperationContext,
         expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
         collect: suspend (Flow<Triple<A?, B?, C?>>) -> R
+    ): VISIT_RESULT
+
+    fun <A : Any, B : Any, C : Any, R>
+    tripleNotNullColumnsSetOperationQuery(
+        context: SetOperationContext,
+        expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
+        collect: suspend (Flow<Triple<A, B, C>>) -> R
     ): VISIT_RESULT
 
     fun <R> multipleColumnsSelectQuery(

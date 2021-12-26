@@ -13,12 +13,13 @@ import org.komapper.core.dsl.query.first
 import org.komapper.r2dbc.R2dbcDatabase
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 
 @ExtendWith(Env::class)
 class SelectProjectionTest(private val db: R2dbcDatabase) {
 
     @Test
-    fun selectColumns() = inTransaction(db) {
+    fun selectSingleColumn() = inTransaction(db) {
         val a = Meta.address
         val streetList = db.runQuery {
             QueryDsl.from(a)
@@ -32,7 +33,7 @@ class SelectProjectionTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun selectColumns_first() = inTransaction(db) {
+    fun selectSingleColumn_first() = inTransaction(db) {
         val a = Meta.address
         val value = db.runQuery {
             QueryDsl.from(a)
@@ -47,7 +48,7 @@ class SelectProjectionTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun selectColumnsAsPair() = inTransaction(db) {
+    fun selectPairColumns() = inTransaction(db) {
         val a = Meta.address
         val pairList = db.runQuery {
             QueryDsl.from(a)
@@ -61,7 +62,7 @@ class SelectProjectionTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun selectColumnsAsTriple() = inTransaction(db) {
+    fun selectTripleColumns() = inTransaction(db) {
         val a = Meta.address
         val tripleList = db.runQuery {
             QueryDsl.from(a)
@@ -81,7 +82,7 @@ class SelectProjectionTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun selectColumnsAsRecord() = inTransaction(db) {
+    fun selectRecord() = inTransaction(db) {
         val a = Meta.address
         val list = db.runQuery {
             QueryDsl.from(a)
@@ -119,7 +120,7 @@ class SelectProjectionTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun selectColumnsAsPair_scalar() = inTransaction(db) {
+    fun selectPairColumns_scalar() = inTransaction(db) {
         val d = Meta.department
         val e = Meta.employee
         val subquery = QueryDsl.from(e).where { d.departmentId eq e.departmentId }.select(count())
@@ -133,5 +134,113 @@ class SelectProjectionTest(private val db: R2dbcDatabase) {
         assertEquals("RESEARCH" to 5L, list[1])
         assertEquals("SALES" to 6L, list[2])
         assertEquals("OPERATIONS" to 0L, list[3])
+    }
+
+    @Test
+    fun selectSingleNotNullColumn() = inTransaction(db) {
+        val a = Meta.address
+        val streetList: List<String> = db.runQuery {
+            QueryDsl.from(a)
+                .where {
+                    a.addressId inList listOf(1, 2)
+                }
+                .orderBy(a.addressId)
+                .selectNotNull(a.street)
+        }
+        assertEquals(listOf("STREET 1", "STREET 2"), streetList)
+    }
+
+    @Test
+    fun selectPairNotNullColumns() = inTransaction(db) {
+        val a = Meta.address
+        val pairList: List<Pair<Int, String>> = db.runQuery {
+            QueryDsl.from(a)
+                .where {
+                    a.addressId inList listOf(1, 2)
+                }
+                .orderBy(a.addressId)
+                .selectNotNull(a.addressId, a.street)
+        }
+        assertEquals(listOf(1 to "STREET 1", 2 to "STREET 2"), pairList)
+    }
+
+    @Test
+    fun selectTripleNotNullColumns() = inTransaction(db) {
+        val a = Meta.address
+        val tripleList: List<Triple<Int, String, Int>> = db.runQuery {
+            QueryDsl.from(a)
+                .where {
+                    a.addressId inList listOf(1, 2)
+                }
+                .orderBy(a.addressId)
+                .selectNotNull(a.addressId, a.street, a.version)
+        }
+        assertEquals(
+            listOf(
+                Triple(1, "STREET 1", 1),
+                Triple(2, "STREET 2", 1)
+            ),
+            tripleList
+        )
+    }
+
+    @Test
+    fun selectSingleNotNullColumn_error() = inTransaction(db) {
+        val e = Meta.employee
+        val ex = assertFailsWith<IllegalStateException> {
+            db.runQuery {
+                QueryDsl.from(e).selectNotNull(e.managerId)
+            }
+            Unit
+        }
+        println(ex.message)
+    }
+
+    @Test
+    fun selectPairNotNullColumn_error() = inTransaction(db) {
+        val e = Meta.employee
+        val ex1 = assertFailsWith<IllegalStateException> {
+            db.runQuery {
+                QueryDsl.from(e).selectNotNull(e.managerId, e.employeeId)
+            }
+            Unit
+        }
+        println(ex1.message)
+
+        val ex2 = assertFailsWith<IllegalStateException> {
+            db.runQuery {
+                QueryDsl.from(e).selectNotNull(e.employeeId, e.managerId)
+            }
+            Unit
+        }
+        println(ex2.message)
+    }
+
+    @Test
+    fun selectTripleNotNullColumn_error() = inTransaction(db) {
+        val e = Meta.employee
+        val ex1 = assertFailsWith<IllegalStateException> {
+            db.runQuery {
+                QueryDsl.from(e).selectNotNull(e.managerId, e.employeeId, e.addressId)
+            }
+            Unit
+        }
+        println(ex1.message)
+
+        val ex2 = assertFailsWith<IllegalStateException> {
+            db.runQuery {
+                QueryDsl.from(e).selectNotNull(e.employeeId, e.managerId, e.addressId)
+            }
+            Unit
+        }
+        println(ex2.message)
+
+        val ex3 = assertFailsWith<IllegalStateException> {
+            db.runQuery {
+                QueryDsl.from(e).selectNotNull(e.employeeId, e.addressId, e.managerId)
+            }
+            Unit
+        }
+        println(ex3.message)
     }
 }

@@ -1,7 +1,6 @@
 package org.komapper.core.dsl.query
 
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.toList
 import org.komapper.core.dsl.context.SelectContext
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.expression.SubqueryExpression
@@ -16,12 +15,8 @@ internal class MultipleColumnsSelectQuery(
     private val support: FlowSubquerySupport<Columns> =
         FlowSubquerySupport(context) { MultipleColumnsSetOperationQuery(it, expressions = expressions) }
 
-    override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
-        return visitor.multipleColumnsSelectQuery(context, expressions) { it.toList() }
-    }
-
     override fun <VISIT_RESULT> accept(visitor: FlowQueryVisitor<VISIT_RESULT>): VISIT_RESULT {
-        return visitor.multipleColumnsQuery(context, expressions)
+        return visitor.multipleColumnsSelectQuery(context, expressions)
     }
 
     override fun <R> collect(collect: suspend (Flow<Columns>) -> R): Query<R> = object : Query<R> {

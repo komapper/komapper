@@ -1,6 +1,7 @@
 package org.komapper.core.dsl.query
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.toList
 import org.komapper.core.ThreadSafe
 import org.komapper.core.dsl.expression.SortExpression
 import org.komapper.core.dsl.expression.SubqueryExpression
@@ -14,6 +15,9 @@ interface Query<out T> {
 
 interface ListQuery<out T> : Query<List<T>> {
     fun <R> collect(collect: suspend (Flow<T>) -> R): Query<R>
+    override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
+        return collect { it.toList() }.accept(visitor)
+    }
 }
 
 interface Subquery<T> : ListQuery<T>, SubqueryExpression<T> {

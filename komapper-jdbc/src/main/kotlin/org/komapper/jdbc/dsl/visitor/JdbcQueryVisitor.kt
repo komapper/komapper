@@ -219,7 +219,7 @@ internal object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, R>
-    sqlSelectQuery(
+    relationSelectQuery(
         context: SelectContext<ENTITY, ID, META>,
         collect: suspend (Flow<ENTITY>) -> R
     ): JdbcRunner<R> {
@@ -245,12 +245,30 @@ internal object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
         return SelectJdbcRunner(context, transform, collect)
     }
 
+    override fun <A : Any, R> singleNotNullColumnSelectQuery(
+        context: SelectContext<*, *, *>,
+        expression: ColumnExpression<A, *>,
+        collect: suspend (Flow<A>) -> R
+    ): JdbcRunner<R> {
+        val transform = JdbcResultSetTransformers.singleNotNullColumn(expression)
+        return SelectJdbcRunner(context, transform, collect)
+    }
+
     override fun <A : Any, R> singleColumnSetOperationQuery(
         context: SetOperationContext,
         expression: ColumnExpression<A, *>,
         collect: suspend (Flow<A?>) -> R
     ): JdbcRunner<R> {
         val transform = JdbcResultSetTransformers.singleColumn(expression)
+        return SetOperationJdbcRunner(context, transform, collect)
+    }
+
+    override fun <A : Any, R> singleNotNullColumnSetOperationQuery(
+        context: SetOperationContext,
+        expression: ColumnExpression<A, *>,
+        collect: suspend (Flow<A>) -> R
+    ): JdbcRunner<*> {
+        val transform = JdbcResultSetTransformers.singleNotNullColumn(expression)
         return SetOperationJdbcRunner(context, transform, collect)
     }
 
@@ -263,12 +281,30 @@ internal object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
         return SelectJdbcRunner(context, transform, collect)
     }
 
+    override fun <A : Any, B : Any, R> pairNotNullColumnsSelectQuery(
+        context: SelectContext<*, *, *>,
+        expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
+        collect: suspend (Flow<Pair<A, B>>) -> R
+    ): JdbcRunner<R> {
+        val transform = JdbcResultSetTransformers.pairNotNullColumns(expressions)
+        return SelectJdbcRunner(context, transform, collect)
+    }
+
     override fun <A : Any, B : Any, R> pairColumnsSetOperationQuery(
         context: SetOperationContext,
         expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
         collect: suspend (Flow<Pair<A?, B?>>) -> R
     ): JdbcRunner<R> {
         val transform = JdbcResultSetTransformers.pairColumns(expressions)
+        return SetOperationJdbcRunner(context, transform, collect)
+    }
+
+    override fun <A : Any, B : Any, R> pairNotNullColumnsSetOperationQuery(
+        context: SetOperationContext,
+        expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
+        collect: suspend (Flow<Pair<A, B>>) -> R
+    ): JdbcRunner<R> {
+        val transform = JdbcResultSetTransformers.pairNotNullColumns(expressions)
         return SetOperationJdbcRunner(context, transform, collect)
     }
 
@@ -281,12 +317,30 @@ internal object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
         return SelectJdbcRunner(context, transform, collect)
     }
 
+    override fun <A : Any, B : Any, C : Any, R> tripleNotNullColumnsSelectQuery(
+        context: SelectContext<*, *, *>,
+        expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
+        collect: suspend (Flow<Triple<A, B, C>>) -> R
+    ): JdbcRunner<R> {
+        val transform = JdbcResultSetTransformers.tripleNotNullColumns(expressions)
+        return SelectJdbcRunner(context, transform, collect)
+    }
+
     override fun <A : Any, B : Any, C : Any, R> tripleColumnsSetOperationQuery(
         context: SetOperationContext,
         expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
         collect: suspend (Flow<Triple<A?, B?, C?>>) -> R
     ): JdbcRunner<R> {
         val transform = JdbcResultSetTransformers.tripleColumns(expressions)
+        return SetOperationJdbcRunner(context, transform, collect)
+    }
+
+    override fun <A : Any, B : Any, C : Any, R> tripleNotNullColumnsSetOperationQuery(
+        context: SetOperationContext,
+        expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
+        collect: suspend (Flow<Triple<A, B, C>>) -> R
+    ): JdbcRunner<R> {
+        val transform = JdbcResultSetTransformers.tripleNotNullColumns(expressions)
         return SetOperationJdbcRunner(context, transform, collect)
     }
 
