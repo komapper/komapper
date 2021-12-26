@@ -1,7 +1,6 @@
 package org.komapper.core.dsl.query
 
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.toList
 import org.komapper.core.dsl.context.SelectContext
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.expression.SubqueryExpression
@@ -15,10 +14,6 @@ internal class PairColumnsSelectQuery<A : Any, B : Any>(
 
     private val support: FlowSubquerySupport<Pair<A?, B?>> =
         FlowSubquerySupport(context) { PairColumnsSetOperationQuery(it, expressions = expressions) }
-
-    override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
-        return visitor.pairColumnsSelectQuery(context, expressions) { it.toList() }
-    }
 
     override fun <VISIT_RESULT> accept(visitor: FlowQueryVisitor<VISIT_RESULT>): VISIT_RESULT {
         return visitor.pairColumnsSelectQuery(context, expressions)

@@ -1,7 +1,6 @@
 package org.komapper.core.dsl.query
 
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.toList
 import org.komapper.core.dsl.context.SetOperationContext
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.expression.SortExpression
@@ -16,10 +15,6 @@ internal data class PairNotNullColumnsSetOperationQuery<A : Any, B : Any>(
 ) : FlowSetOperationQuery<Pair<A, B>> {
 
     private val support: SetOperationQuerySupport<Pair<A, B>> = SetOperationQuerySupport(context)
-
-    override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
-        return visitor.pairNotNullColumnsSetOperationQuery(context, expressions) { it.toList() }
-    }
 
     override fun <VISIT_RESULT> accept(visitor: FlowQueryVisitor<VISIT_RESULT>): VISIT_RESULT {
         return visitor.pairNotNullColumnsSetOperationQuery(context, expressions)

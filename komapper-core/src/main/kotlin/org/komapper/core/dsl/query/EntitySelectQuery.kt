@@ -1,7 +1,6 @@
 package org.komapper.core.dsl.query
 
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.toList
 import org.komapper.core.dsl.context.SelectContext
 import org.komapper.core.dsl.context.SetOperationContext
 import org.komapper.core.dsl.context.SetOperationKind
@@ -183,10 +182,6 @@ internal data class EntitySelectQueryImpl<ENTITY : Any, ID : Any, META : EntityM
 
     private fun asRelationQuery(): RelationSelectQuery<ENTITY> {
         return RelationSelectQueryImpl(context)
-    }
-
-    override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
-        return visitor.entitySelectQuery(context) { it.toList() }
     }
 
     override fun <VISIT_RESULT> accept(visitor: FlowQueryVisitor<VISIT_RESULT>): VISIT_RESULT {
