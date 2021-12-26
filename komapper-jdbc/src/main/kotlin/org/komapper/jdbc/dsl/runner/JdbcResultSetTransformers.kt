@@ -32,12 +32,24 @@ internal object JdbcResultSetTransformers {
             transform(value)
         }
 
-    fun <A : Any, B : Any> pairColumns(expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>): (JdbcDialect, ResultSet) -> Pair<A?, B?> =
+    fun <A : Any, B : Any> pairColumns(expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>): (JdbcDialect, ResultSet) -> Pair<A?, B?> {
+        return pairColumns(expressions) { it }
+    }
+
+    fun <A : Any, B : Any> pairNotNullColumns(expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>): (JdbcDialect, ResultSet) -> Pair<A, B> {
+        return pairColumns(expressions) {
+            val first = checkNotNull(it.first) { "The value of the first selected column is null." }
+            val second = checkNotNull(it.second) { "The value of the second selected column is null." }
+            first to second
+        }
+    }
+
+    private fun <A : Any, B : Any, AR, BR> pairColumns(expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>, transform: (Pair<A?, B?>) -> Pair<AR, BR>): (JdbcDialect, ResultSet) -> Pair<AR, BR> =
         { dialect, rs ->
             val mapper = JdbcPropertyMapper(dialect, rs)
             val first = mapper.execute(expressions.first)
             val second = mapper.execute(expressions.second)
-            first to second
+            transform(first to second)
         }
 
     fun <A : Any, B : Any, C : Any> tripleColumns(expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>): (JdbcDialect, ResultSet) -> Triple<A?, B?, C?> =

@@ -281,12 +281,30 @@ internal object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
         return SelectJdbcRunner(context, transform, collect)
     }
 
+    override fun <A : Any, B : Any, R> pairNotNullColumnsSelectQuery(
+        context: SelectContext<*, *, *>,
+        expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
+        collect: suspend (Flow<Pair<A, B>>) -> R
+    ): JdbcRunner<R> {
+        val transform = JdbcResultSetTransformers.pairNotNullColumns(expressions)
+        return SelectJdbcRunner(context, transform, collect)
+    }
+
     override fun <A : Any, B : Any, R> pairColumnsSetOperationQuery(
         context: SetOperationContext,
         expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
         collect: suspend (Flow<Pair<A?, B?>>) -> R
     ): JdbcRunner<R> {
         val transform = JdbcResultSetTransformers.pairColumns(expressions)
+        return SetOperationJdbcRunner(context, transform, collect)
+    }
+
+    override fun <A : Any, B : Any, R> pairNotNullColumnsSetOperationQuery(
+        context: SetOperationContext,
+        expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
+        collect: suspend (Flow<Pair<A, B>>) -> R
+    ): JdbcRunner<R> {
+        val transform = JdbcResultSetTransformers.pairNotNullColumns(expressions)
         return SetOperationJdbcRunner(context, transform, collect)
     }
 

@@ -45,7 +45,17 @@ interface FlowQueryVisitor<VISIT_RESULT> {
         expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
     ): VISIT_RESULT
 
+    fun <A : Any, B : Any> pairNotNullColumnsSelectQuery(
+        context: SelectContext<*, *, *>,
+        expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
+    ): VISIT_RESULT
+
     fun <A : Any, B : Any> pairColumnsSetOperationQuery(
+        context: SetOperationContext,
+        expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
+    ): VISIT_RESULT
+
+    fun <A : Any, B : Any> pairNotNullColumnsSetOperationQuery(
         context: SetOperationContext,
         expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
     ): VISIT_RESULT

@@ -273,12 +273,30 @@ internal object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
         return SelectR2dbcRunner(context, transform, collect)
     }
 
+    override fun <A : Any, B : Any, R> pairNotNullColumnsSelectQuery(
+        context: SelectContext<*, *, *>,
+        expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
+        collect: suspend (Flow<Pair<A, B>>) -> R
+    ): R2dbcRunner<R> {
+        val transform = R2dbcRowTransformers.pairNotNullColumns(expressions)
+        return SelectR2dbcRunner(context, transform, collect)
+    }
+
     override fun <A : Any, B : Any, R> pairColumnsSetOperationQuery(
         context: SetOperationContext,
         expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
         collect: suspend (Flow<Pair<A?, B?>>) -> R
     ): R2dbcRunner<R> {
         val transform = R2dbcRowTransformers.pairColumns(expressions)
+        return SetOperationR2dbcRunner(context, transform, collect)
+    }
+
+    override fun <A : Any, B : Any, R> pairNotNullColumnsSetOperationQuery(
+        context: SetOperationContext,
+        expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
+        collect: suspend (Flow<Pair<A, B>>) -> R
+    ): R2dbcRunner<*> {
+        val transform = R2dbcRowTransformers.pairNotNullColumns(expressions)
         return SetOperationR2dbcRunner(context, transform, collect)
     }
 

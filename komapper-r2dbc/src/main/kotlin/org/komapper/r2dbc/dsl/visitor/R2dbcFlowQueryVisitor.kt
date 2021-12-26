@@ -71,11 +71,27 @@ internal object R2dbcFlowQueryVisitor : FlowQueryVisitor<FlowBuilder<*>> {
         return SelectFlowBuilder(context, transform)
     }
 
+    override fun <A : Any, B : Any> pairNotNullColumnsSelectQuery(
+        context: SelectContext<*, *, *>,
+        expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>
+    ): FlowBuilder<Pair<A, B>> {
+        val transform = R2dbcRowTransformers.pairNotNullColumns(expressions)
+        return SelectFlowBuilder(context, transform)
+    }
+
     override fun <A : Any, B : Any> pairColumnsSetOperationQuery(
         context: SetOperationContext,
         expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>
     ): FlowBuilder<Pair<A?, B?>> {
         val transform = R2dbcRowTransformers.pairColumns(expressions)
+        return SetOperationFlowBuilder(context, transform)
+    }
+
+    override fun <A : Any, B : Any> pairNotNullColumnsSetOperationQuery(
+        context: SetOperationContext,
+        expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>
+    ): FlowBuilder<Pair<A, B>> {
+        val transform = R2dbcRowTransformers.pairNotNullColumns(expressions)
         return SetOperationFlowBuilder(context, transform)
     }
 
