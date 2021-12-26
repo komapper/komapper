@@ -135,6 +135,10 @@ internal data class EntitySelectQueryImpl<ENTITY : Any, ID : Any, META : EntityM
         return asRelationQuery().select(expression)
     }
 
+    override fun <A : Any> selectNotNull(expression: ColumnExpression<A, *>): FlowSubquery<A> {
+        return asRelationQuery().selectNotNull(expression)
+    }
+
     override fun <A : Any, B : Any> select(
         expression1: ColumnExpression<A, *>,
         expression2: ColumnExpression<B, *>

@@ -21,7 +21,7 @@ internal class MultipleColumnsSelectQuery(
     }
 
     override fun <VISIT_RESULT> accept(visitor: FlowQueryVisitor<VISIT_RESULT>): VISIT_RESULT {
-        return visitor.multipleColumnsQuery(context, expressions)
+        return visitor.multipleColumnsSelectQuery(context, expressions)
     }
 
     override fun <R> collect(collect: suspend (Flow<Columns>) -> R): Query<R> = object : Query<R> {

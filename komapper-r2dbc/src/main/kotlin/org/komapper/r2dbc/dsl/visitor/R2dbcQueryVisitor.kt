@@ -211,7 +211,7 @@ internal object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, R>
-    sqlSelectQuery(
+    relationSelectQuery(
         context: SelectContext<ENTITY, ID, META>,
         collect: suspend (Flow<ENTITY>) -> R
     ): R2dbcRunner<R> {

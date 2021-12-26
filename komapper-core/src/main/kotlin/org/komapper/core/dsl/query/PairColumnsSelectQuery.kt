@@ -21,7 +21,7 @@ internal class PairColumnsSelectQuery<A : Any, B : Any>(
     }
 
     override fun <VISIT_RESULT> accept(visitor: FlowQueryVisitor<VISIT_RESULT>): VISIT_RESULT {
-        return visitor.pairColumnsQuery(context, expressions)
+        return visitor.pairColumnsSelectQuery(context, expressions)
     }
 
     override fun <R> collect(collect: suspend (Flow<Pair<A?, B?>>) -> R): Query<R> = object : Query<R> {

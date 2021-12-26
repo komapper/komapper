@@ -156,4 +156,18 @@ class SelectProjectionTest(private val db: JdbcDatabase) {
         assertEquals("SALES" to 6L, list[2])
         assertEquals("OPERATIONS" to 0L, list[3])
     }
+
+    @Test
+    fun singleNotNullColumn() {
+        val a = Meta.address
+        val streetList: List<String> = db.runQuery {
+            QueryDsl.from(a)
+                .where {
+                    a.addressId inList listOf(1, 2)
+                }
+                .orderBy(a.addressId)
+                .selectNotNull(a.street)
+        }
+        assertEquals(listOf("STREET 1", "STREET 2"), streetList)
+    }
 }

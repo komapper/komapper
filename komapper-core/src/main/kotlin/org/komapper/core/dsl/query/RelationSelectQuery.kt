@@ -86,16 +86,16 @@ internal data class RelationSelectQueryImpl<ENTITY : Any, ID : Any, META : Entit
     }
 
     override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
-        return visitor.sqlSelectQuery(context) { it.toList() }
+        return visitor.relationSelectQuery(context) { it.toList() }
     }
 
     override fun <VISIT_RESULT> accept(visitor: FlowQueryVisitor<VISIT_RESULT>): VISIT_RESULT {
-        return visitor.selectQuery(context)
+        return visitor.relationSelectQuery(context)
     }
 
     override fun <R> collect(collect: suspend (Flow<ENTITY>) -> R): Query<R> = object : Query<R> {
         override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
-            return visitor.sqlSelectQuery(context, collect)
+            return visitor.relationSelectQuery(context, collect)
         }
     }
 
@@ -124,6 +124,11 @@ internal data class RelationSelectQueryImpl<ENTITY : Any, ID : Any, META : Entit
     override fun <A : Any> select(expression: ColumnExpression<A, *>): FlowSubquery<A?> {
         val newContext = support.select(expression)
         return SingleColumnSelectQuery(newContext, expression)
+    }
+
+    override fun <A : Any> selectNotNull(expression: ColumnExpression<A, *>): FlowSubquery<A> {
+        val newContext = support.select(expression)
+        return SingleNotNullColumnSelectQuery(newContext, expression)
     }
 
     override fun <A : Any, B : Any> select(

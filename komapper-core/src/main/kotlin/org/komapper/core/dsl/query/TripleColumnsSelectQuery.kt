@@ -21,7 +21,7 @@ internal class TripleColumnsSelectQuery<A : Any, B : Any, C : Any>(
     }
 
     override fun <VISIT_RESULT> accept(visitor: FlowQueryVisitor<VISIT_RESULT>): VISIT_RESULT {
-        return visitor.tripleColumnsQuery(context, expressions)
+        return visitor.tripleColumnsSelectQuery(context, expressions)
     }
 
     override fun <R> collect(collect: suspend (Flow<Triple<A?, B?, C?>>) -> R): Query<R> = object : Query<R> {

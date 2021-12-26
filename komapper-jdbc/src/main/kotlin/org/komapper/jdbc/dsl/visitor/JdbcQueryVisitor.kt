@@ -219,7 +219,7 @@ internal object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, R>
-    sqlSelectQuery(
+    relationSelectQuery(
         context: SelectContext<ENTITY, ID, META>,
         collect: suspend (Flow<ENTITY>) -> R
     ): JdbcRunner<R> {
