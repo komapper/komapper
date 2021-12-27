@@ -202,6 +202,11 @@ class FilterScopeSupport(
         add(Criterion.InList(o1, o2))
     }
 
+    override fun <T : Any, S : Any> ColumnExpression<T, S>.inList(subquery: SubqueryExpression<T?>) {
+        val left = Operand.Column(this)
+        add(Criterion.InSubQuery(left, subquery))
+    }
+
     override infix fun <T : Any, S : Any> ColumnExpression<T, S>.inList(block: () -> SubqueryExpression<T?>) {
         val left = Operand.Column(this)
         val right = block()
@@ -212,6 +217,11 @@ class FilterScopeSupport(
         val o1 = Operand.Column(this)
         val o2 = values.map { Operand.Argument(this, it) }
         add(Criterion.NotInList(o1, o2))
+    }
+
+    override fun <T : Any, S : Any> ColumnExpression<T, S>.notInList(subquery: SubqueryExpression<T?>) {
+        val left = Operand.Column(this)
+        add(Criterion.NotInSubQuery(left, subquery))
     }
 
     override infix fun <T : Any, S : Any> ColumnExpression<T, S>.notInList(block: () -> SubqueryExpression<T?>) {
@@ -231,6 +241,11 @@ class FilterScopeSupport(
         add(Criterion.InList2(left, right))
     }
 
+    override fun <A : Any, B : Any> Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>.inList2(subquery: SubqueryExpression<Pair<A?, B?>>) {
+        val left = Operand.Column(this.first) to Operand.Column(this.second)
+        add(Criterion.InSubQuery2(left, subquery))
+    }
+
     override infix fun <A : Any, B : Any> Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>.inList2(block: () -> SubqueryExpression<Pair<A?, B?>>) {
         val left = Operand.Column(this.first) to Operand.Column(this.second)
         val right = block()
@@ -248,15 +263,28 @@ class FilterScopeSupport(
         add(Criterion.NotInList2(left, right))
     }
 
+    override fun <A : Any, B : Any> Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>.notInList2(subquery: SubqueryExpression<Pair<A?, B?>>) {
+        val left = Operand.Column(this.first) to Operand.Column(this.second)
+        add(Criterion.NotInSubQuery2(left, subquery))
+    }
+
     override infix fun <A : Any, B : Any> Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>.notInList2(block: () -> SubqueryExpression<Pair<A?, B?>>) {
         val left = Operand.Column(this.first) to Operand.Column(this.second)
         val right = block()
         add(Criterion.NotInSubQuery2(left, right))
     }
 
+    override fun exists(subquery: SubqueryExpression<*>) {
+        add(Criterion.Exists(subquery))
+    }
+
     override fun exists(block: () -> SubqueryExpression<*>) {
         val expression = block()
         add(Criterion.Exists(expression))
+    }
+
+    override fun notExists(subquery: SubqueryExpression<*>) {
+        add(Criterion.NotExists(subquery))
     }
 
     override fun notExists(block: () -> SubqueryExpression<*>) {

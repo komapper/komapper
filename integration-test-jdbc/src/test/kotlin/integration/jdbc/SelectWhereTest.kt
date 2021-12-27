@@ -327,6 +327,23 @@ class SelectWhereTest(private val db: JdbcDatabase) {
     }
 
     @Test
+    fun inList_SubQuery_nonLambda() {
+        val e = Meta.employee
+        val a = Meta.address
+        val subquery = QueryDsl.from(a)
+            .where {
+                e.addressId eq a.addressId
+                e.employeeName like "%S%"
+            }.select(a.addressId)
+        val query =
+            QueryDsl.from(e).where {
+                e.addressId inList subquery
+            }
+        val list = db.runQuery { query }
+        assertEquals(5, list.size)
+    }
+
+    @Test
     fun notInList_SubQuery() {
         val e = Meta.employee
         val a = Meta.address
@@ -338,6 +355,22 @@ class SelectWhereTest(private val db: JdbcDatabase) {
                         e.employeeName like "%S%"
                     }.select(a.addressId)
                 }
+            }
+        val list = db.runQuery { query }
+        assertEquals(9, list.size)
+    }
+
+    @Test
+    fun notInList_SubQuery_nonLambda() {
+        val e = Meta.employee
+        val a = Meta.address
+        val subquery = QueryDsl.from(a).where {
+            e.addressId eq a.addressId
+            e.employeeName like "%S%"
+        }.select(a.addressId)
+        val query =
+            QueryDsl.from(e).where {
+                e.addressId notInList subquery
             }
         val list = db.runQuery { query }
         assertEquals(9, list.size)
@@ -394,6 +427,23 @@ class SelectWhereTest(private val db: JdbcDatabase) {
     }
 
     @Test
+    fun inList2_SubQuery_nonLambda() {
+        val e = Meta.employee
+        val a = Meta.address
+        val subquery = QueryDsl.from(a)
+            .where {
+                e.addressId eq a.addressId
+                e.employeeName like "%S%"
+            }.select(a.addressId, a.version)
+        val query =
+            QueryDsl.from(e).where {
+                e.addressId to e.version inList2 subquery
+            }
+        val list = db.runQuery { query }
+        assertEquals(5, list.size)
+    }
+
+    @Test
     fun notInList_SubQuery2() {
         val e = Meta.employee
         val a = Meta.address
@@ -405,6 +455,22 @@ class SelectWhereTest(private val db: JdbcDatabase) {
                         e.employeeName like "%S%"
                     }.select(a.addressId, a.version)
                 }
+            }
+        val list = db.runQuery { query }
+        assertEquals(9, list.size)
+    }
+
+    @Test
+    fun notInList_SubQuery2_nonLambda() {
+        val e = Meta.employee
+        val a = Meta.address
+        val subquery = QueryDsl.from(a).where {
+            e.addressId eq a.addressId
+            e.employeeName like "%S%"
+        }.select(a.addressId, a.version)
+        val query =
+            QueryDsl.from(e).where {
+                e.addressId to e.version notInList2 subquery
             }
         val list = db.runQuery { query }
         assertEquals(9, list.size)
@@ -428,6 +494,22 @@ class SelectWhereTest(private val db: JdbcDatabase) {
     }
 
     @Test
+    fun exists_nonLambda() {
+        val e = Meta.employee
+        val a = Meta.address
+        val subquery = QueryDsl.from(a).where {
+            e.addressId eq a.addressId
+            e.employeeName like "%S%"
+        }
+        val query =
+            QueryDsl.from(e).where {
+                exists(subquery)
+            }
+        val list = db.runQuery { query }
+        assertEquals(5, list.size)
+    }
+
+    @Test
     fun notExists() {
         val e = Meta.employee
         val a = Meta.address
@@ -439,6 +521,22 @@ class SelectWhereTest(private val db: JdbcDatabase) {
                         e.employeeName like "%S%"
                     }
                 }
+            }
+        val list = db.runQuery { query }
+        assertEquals(9, list.size)
+    }
+
+    @Test
+    fun notExists_nonLambda() {
+        val e = Meta.employee
+        val a = Meta.address
+        val subquery = QueryDsl.from(a).where {
+            e.addressId eq a.addressId
+            e.employeeName like "%S%"
+        }
+        val query =
+            QueryDsl.from(e).where {
+                notExists(subquery)
             }
         val list = db.runQuery { query }
         assertEquals(9, list.size)
