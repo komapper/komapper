@@ -1,6 +1,5 @@
 package org.komapper.jdbc
 
-import org.komapper.core.ThreadSafe
 import org.komapper.core.dsl.query.Query
 import org.komapper.core.dsl.query.QueryScope
 import org.komapper.jdbc.dsl.runner.JdbcRunner
@@ -10,8 +9,7 @@ import javax.sql.DataSource
 /**
  * A database.
  */
-@ThreadSafe
-interface JdbcDatabase {
+interface JdbcDatabase : Jdbc {
 
     companion object {
         /**

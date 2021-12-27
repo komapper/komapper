@@ -1,15 +1,16 @@
-package org.komapper.tx.r2dbc
+package org.komapper.tx.jdbc
 
-import io.r2dbc.spi.IsolationLevel
-import org.komapper.r2dbc.R2dbcDatabase
-import org.komapper.r2dbc.R2dbcSession
+import org.komapper.jdbc.Jdbc
+import org.komapper.jdbc.JdbcDatabase
+import org.komapper.jdbc.JdbcSession
 
-suspend fun <R> R2dbcDatabase.withTransaction(
+fun <R> Jdbc.withTransaction(
     transactionAttribute: TransactionAttribute = TransactionAttribute.REQUIRED,
     isolationLevel: IsolationLevel? = null,
-    block: suspend TransactionScope.() -> R
+    block: TransactionScope.() -> R
 ): R {
-    val session = config.session
+    val database = this as JdbcDatabase
+    val session = database.config.session
     return if (session is TransactionSession) {
         session.userTransaction.transaction(transactionAttribute, isolationLevel, block)
     } else {
@@ -17,7 +18,7 @@ suspend fun <R> R2dbcDatabase.withTransaction(
     }
 }
 
-val R2dbcSession.transactionManager: TransactionManager
+val JdbcSession.transactionManager: TransactionManager
     get() {
         return if (this is TransactionSession) {
             this.transactionManager
@@ -26,7 +27,7 @@ val R2dbcSession.transactionManager: TransactionManager
         }
     }
 
-private fun invalidSession(session: R2dbcSession): Nothing {
+private fun invalidSession(session: JdbcSession): Nothing {
     error(
         "DatabaseConfig.session must be an instance of ${TransactionSession::class.qualifiedName}. " +
             "But it is ${session::class.qualifiedName}"
