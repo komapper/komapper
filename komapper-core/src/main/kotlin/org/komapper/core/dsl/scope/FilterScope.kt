@@ -67,21 +67,33 @@ interface FilterScope {
 
     infix fun <T : Any, S : Any> ColumnExpression<T, S>.inList(values: List<T?>)
 
+    infix fun <T : Any, S : Any> ColumnExpression<T, S>.inList(subquery: SubqueryExpression<T?>)
+
     infix fun <T : Any, S : Any> ColumnExpression<T, S>.inList(block: () -> SubqueryExpression<T?>)
 
     infix fun <T : Any, S : Any> ColumnExpression<T, S>.notInList(values: List<T?>)
+
+    infix fun <T : Any, S : Any> ColumnExpression<T, S>.notInList(subquery: SubqueryExpression<T?>)
 
     infix fun <T : Any, S : Any> ColumnExpression<T, S>.notInList(block: () -> SubqueryExpression<T?>)
 
     infix fun <A : Any, B : Any> Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>.inList2(values: List<Pair<A?, B?>>)
 
+    infix fun <A : Any, B : Any> Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>.inList2(subquery: SubqueryExpression<Pair<A?, B?>>)
+
     infix fun <A : Any, B : Any> Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>.inList2(block: () -> SubqueryExpression<Pair<A?, B?>>)
 
     infix fun <A : Any, B : Any> Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>.notInList2(values: List<Pair<A?, B?>>)
 
+    infix fun <A : Any, B : Any> Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>.notInList2(subquery: SubqueryExpression<Pair<A?, B?>>)
+
     infix fun <A : Any, B : Any> Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>.notInList2(block: () -> SubqueryExpression<Pair<A?, B?>>)
 
+    fun exists(subquery: SubqueryExpression<*>)
+
     fun exists(block: () -> SubqueryExpression<*>)
+
+    fun notExists(subquery: SubqueryExpression<*>)
 
     fun notExists(block: () -> SubqueryExpression<*>)
 
