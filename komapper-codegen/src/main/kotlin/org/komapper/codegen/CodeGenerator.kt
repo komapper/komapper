@@ -67,7 +67,11 @@ class CodeGenerator(
                 p.println("package $packageName")
                 p.println()
             }
-            p.println("import org.komapper.annotation.*")
+            p.println("import org.komapper.annotation.KomapperAutoIncrement")
+            p.println("import org.komapper.annotation.KomapperColumn")
+            p.println("import org.komapper.annotation.KomapperEntityDef")
+            p.println("import org.komapper.annotation.KomapperId")
+            p.println("import org.komapper.annotation.KomapperTable")
             for (table in tables) {
                 p.println()
                 val className = SnakeToUpperCamelCase.apply(table.name)
