@@ -119,6 +119,7 @@ internal class EntityMetamodelGenerator(
             val interiorClass = "$interiorTypeName::class"
             val columnName = "\"${p.column.name}\""
             val alwaysQuote = "${p.column.alwaysQuote}"
+            val masking = "${p.column.masking}"
             val getter = "{ it.$p }"
             val setter = "{ e, v -> e.copy($p = v) }"
             val wrap = if (p.valueClass == null) "{ it }" else "{ ${p.valueClass}(it) }"
@@ -126,7 +127,7 @@ internal class EntityMetamodelGenerator(
             val nullable = if (p.nullability == Nullability.NULLABLE) "true" else "false"
             val propertyDescriptor =
                 "$PropertyDescriptor<$entityTypeName, $exteriorTypeName, $interiorTypeName>"
-            w.println("        val $p = $propertyDescriptor($exteriorClass, $interiorClass, \"$p\", $columnName, $alwaysQuote, $getter, $setter, $wrap, $unwrap, $nullable)")
+            w.println("        val $p = $propertyDescriptor($exteriorClass, $interiorClass, \"$p\", $columnName, $alwaysQuote, $masking, $getter, $setter, $wrap, $unwrap, $nullable)")
         }
         w.println("    }")
     }

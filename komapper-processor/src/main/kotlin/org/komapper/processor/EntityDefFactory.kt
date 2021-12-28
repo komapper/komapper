@@ -45,7 +45,9 @@ internal class EntityDefFactory(
         } ?: namingStrategy.apply(parameter.toString())
         val alwaysQuote =
             annotation?.findValue("alwaysQuote")?.toString()?.toBooleanStrict() ?: KomapperColumn.alwaysQuote
-        return Column(name, alwaysQuote)
+        val masking =
+            annotation?.findValue("masking")?.toString()?.toBooleanStrict() ?: KomapperColumn.masking
+        return Column(name, alwaysQuote, masking)
     }
 
     private fun createAllProperties(): List<PropertyDef> {

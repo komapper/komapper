@@ -24,13 +24,13 @@ data class Statement(val parts: List<StatementPart>) {
         }
     }
 
-    fun toSqlWithArgs(format: (Any?, KClass<*>) -> CharSequence): String {
+    fun toSqlWithArgs(format: (Any?, KClass<*>, Boolean) -> CharSequence): String {
         return parts.joinToString(separator = "") { part ->
             when (part) {
                 is StatementPart.Text -> part.text
                 is StatementPart.PlaceHolder -> {
                     val value = part.value
-                    format(value.any, value.klass)
+                    format(value.any, value.klass, value.masking)
                 }
             }
         }

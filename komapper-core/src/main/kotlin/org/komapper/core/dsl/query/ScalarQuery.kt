@@ -27,4 +27,6 @@ internal data class ScalarQueryImpl<A, B : Any, C : Any>(
         get() = expression.columnName
     override val alwaysQuote: Boolean
         get() = expression.alwaysQuote
+    override val masking: Boolean
+        get() = expression.masking
 }
