@@ -13,4 +13,5 @@ internal class LiteralExpression<T : Any>(val value: T, klass: KClass<T>) :
     override val columnName: String
         get() = throw UnsupportedOperationException()
     override val alwaysQuote: Boolean get() = false
+    override val masking: Boolean get() = false
 }

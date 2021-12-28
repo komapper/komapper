@@ -10,6 +10,7 @@ internal sealed class AggregateFunction<T : Any, S : Any> : ScalarExpression<T, 
         override val interiorClass: KClass<Double> = Double::class
         override val columnName: String get() = expression.columnName
         override val alwaysQuote: Boolean get() = expression.alwaysQuote
+        override val masking: Boolean get() = expression.masking
         override val wrap: (Double) -> Double = { it }
         override val unwrap: (Double) -> Double = { it }
     }
@@ -20,6 +21,7 @@ internal sealed class AggregateFunction<T : Any, S : Any> : ScalarExpression<T, 
         override val interiorClass: KClass<Long> get() = Long::class
         override val columnName: String get() = throw UnsupportedOperationException()
         override val alwaysQuote: Boolean get() = throw UnsupportedOperationException()
+        override val masking: Boolean get() = throw UnsupportedOperationException()
         override val wrap: (Long) -> Long = { it }
         override val unwrap: (Long) -> Long = { it }
     }
@@ -31,6 +33,7 @@ internal sealed class AggregateFunction<T : Any, S : Any> : ScalarExpression<T, 
         override val interiorClass: KClass<Long> = Long::class
         override val columnName: String get() = expression.columnName
         override val alwaysQuote: Boolean get() = expression.alwaysQuote
+        override val masking: Boolean get() = expression.masking
         override val wrap: (Long) -> Long = { it }
         override val unwrap: (Long) -> Long = { it }
     }

@@ -33,7 +33,7 @@ internal class StatementTest {
         assertEquals("select * from employee where name = ? and age = ?", statement.toSql())
         assertEquals(
             "select * from employee where name = aaa and age = 20",
-            statement.toSqlWithArgs { first, _ -> first.toString() }
+            statement.toSqlWithArgs { first, _, _ -> first.toString() }
         )
     }
 

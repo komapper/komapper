@@ -17,7 +17,7 @@ import kotlin.reflect.full.memberProperties
 import kotlin.reflect.jvm.jvmErasure
 
 internal class TwoWayTemplateStatementBuilder(
-    private val formatter: (Any?, KClass<*>) -> String,
+    private val formatter: (Any?, KClass<*>, Boolean) -> String,
     private val sqlNodeFactory: SqlNodeFactory,
     private val exprEvaluator: ExprEvaluator
 ) : TemplateStatementBuilder {
@@ -147,7 +147,7 @@ internal class TwoWayTemplateStatementBuilder(
         }
         is SqlNode.LiteralValueDirective -> {
             val (obj, type) = eval(node.location, node.expression, state.asExprContext())
-            val literal = formatter(obj, type)
+            val literal = formatter(obj, type, false)
             state.append(literal)
             node.nodeList.fold(state, ::visit)
         }

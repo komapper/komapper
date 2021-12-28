@@ -48,11 +48,15 @@ abstract class AbstractR2dbcDialect protected constructor(internalDataTypes: Lis
         return bindMarker.bind(statement, index, value, dataType)
     }
 
-    override fun formatValue(value: Any?, valueClass: KClass<*>): String {
-        val dataType = getDataType(valueClass)
-        @Suppress("UNCHECKED_CAST")
-        dataType as R2dbcDataType<Any>
-        return dataType.toString(value)
+    override fun formatValue(value: Any?, valueClass: KClass<*>, masking: Boolean): String {
+        return if (masking) {
+            mask
+        } else {
+            val dataType = getDataType(valueClass)
+            @Suppress("UNCHECKED_CAST")
+            dataType as R2dbcDataType<Any>
+            return dataType.toString(value)
+        }
     }
 
     override fun getDataType(klass: KClass<*>): R2dbcDataType<*> {

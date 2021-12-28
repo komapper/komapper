@@ -5,13 +5,17 @@ import org.komapper.core.Value
 
 @ThreadSafe
 sealed class Operand {
-    data class Column(val expression: ColumnExpression<*, *>) : Operand()
+    abstract val masking: Boolean
+    data class Column(val expression: ColumnExpression<*, *>) : Operand() {
+        override val masking: Boolean get() = expression.masking
+    }
     data class Argument<T : Any, S : Any>(private val expression: ColumnExpression<T, S>, private val exterior: T?) : Operand() {
+        override val masking: Boolean get() = expression.masking
         val value: Value get() = if (exterior == null) {
-            Value(null, expression.interiorClass)
+            Value(null, expression.interiorClass, expression.masking)
         } else {
             val interior = expression.unwrap(exterior)
-            Value(interior, expression.interiorClass)
+            Value(interior, expression.interiorClass, expression.masking)
         }
     }
 }

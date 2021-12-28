@@ -39,11 +39,15 @@ abstract class AbstractJdbcDialect protected constructor(internalDataTypes: List
         dataType.setValue(ps, index, value)
     }
 
-    override fun formatValue(value: Any?, valueClass: KClass<*>): String {
-        val dataType = getDataType(valueClass)
-        @Suppress("UNCHECKED_CAST")
-        dataType as JdbcDataType<Any>
-        return dataType.toString(value)
+    override fun formatValue(value: Any?, valueClass: KClass<*>, masking: Boolean): String {
+        return if (masking) {
+            mask
+        } else {
+            val dataType = getDataType(valueClass)
+            @Suppress("UNCHECKED_CAST")
+            dataType as JdbcDataType<Any>
+            dataType.toString(value)
+        }
     }
 
     override fun getDataTypeName(klass: KClass<*>): String {

@@ -38,11 +38,13 @@ annotation class KomapperTable(
 @Retention(AnnotationRetention.SOURCE)
 annotation class KomapperColumn(
     val name: String = KomapperColumn.name,
-    val alwaysQuote: Boolean = KomapperColumn.alwaysQuote
+    val alwaysQuote: Boolean = KomapperColumn.alwaysQuote,
+    val masking: Boolean = KomapperColumn.masking,
 ) {
     companion object {
         const val name = ""
         const val alwaysQuote = false
+        const val masking = false
     }
 }
 

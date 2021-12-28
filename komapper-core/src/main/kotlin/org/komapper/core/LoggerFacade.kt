@@ -9,7 +9,7 @@ interface LoggerFacade {
         format: (Int, StatementPart.PlaceHolder) -> CharSequence = { _, placeHolder -> placeHolder }
     )
 
-    fun sqlWithArgs(statement: Statement, format: (Any?, KClass<*>) -> CharSequence)
+    fun sqlWithArgs(statement: Statement, format: (Any?, KClass<*>, Boolean) -> CharSequence)
     fun begin(transactionId: UUID)
     fun commit(transactionId: UUID)
     fun rollback(transactionId: UUID)
@@ -22,7 +22,7 @@ class DefaultLoggerFacade(private val logger: Logger) : LoggerFacade {
         }
     }
 
-    override fun sqlWithArgs(statement: Statement, format: (Any?, KClass<*>) -> CharSequence) {
+    override fun sqlWithArgs(statement: Statement, format: (Any?, KClass<*>, Boolean) -> CharSequence) {
         logger.trace(LogCategory.SQL_WITH_ARGS.value) {
             statement.toSqlWithArgs(format)
         }

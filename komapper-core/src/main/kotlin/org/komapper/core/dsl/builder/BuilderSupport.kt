@@ -144,7 +144,7 @@ class BuilderSupport(
     }
 
     private fun visitLiteralExpression(expression: LiteralExpression<*>) {
-        val string = dialect.formatValue(expression.value, expression.interiorClass)
+        val string = dialect.formatValue(expression.value, expression.interiorClass, false)
         buf.append(string)
     }
 
@@ -334,7 +334,7 @@ class BuilderSupport(
             buf.append(" like ")
             val finalEscapeSequence = escapeSequence ?: dialect.escapeSequence
             val newValue = escape(right) { dialect.escape(it, finalEscapeSequence) }
-            buf.bind(Value(newValue, String::class))
+            buf.bind(Value(newValue, String::class, left.masking))
             buf.append(" escape ")
             buf.bind(Value(finalEscapeSequence, String::class))
         }

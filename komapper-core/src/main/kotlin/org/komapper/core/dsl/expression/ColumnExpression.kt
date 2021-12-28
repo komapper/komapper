@@ -10,6 +10,7 @@ sealed interface ColumnExpression<EXTERIOR : Any, INTERIOR : Any> : SortExpressi
     val unwrap: (EXTERIOR) -> INTERIOR
     val columnName: String
     val alwaysQuote: Boolean
+    val masking: Boolean
 
     fun getCanonicalColumnName(enquote: (String) -> String): String {
         val transform = if (alwaysQuote) {

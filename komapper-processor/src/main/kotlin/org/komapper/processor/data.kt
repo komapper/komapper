@@ -113,4 +113,8 @@ internal data class Table(
     val alwaysQuote: Boolean
 )
 
-internal data class Column(val name: String, val alwaysQuote: Boolean)
+internal data class Column(
+    val name: String,
+    val alwaysQuote: Boolean,
+    val masking: Boolean
+)

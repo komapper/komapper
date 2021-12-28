@@ -10,6 +10,7 @@ class PropertyDescriptor<ENTITY, EXTERIOR : Any, INTERIOR : Any>(
     val name: String,
     val columnName: String,
     val alwaysQuote: Boolean,
+    val masking: Boolean,
     val getter: (ENTITY) -> EXTERIOR?,
     val setter: (ENTITY, EXTERIOR) -> ENTITY,
     val wrap: (INTERIOR) -> EXTERIOR,

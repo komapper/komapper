@@ -16,12 +16,13 @@ interface Dialect {
     val openQuote: String get() = "\""
     val closeQuote: String get() = "\""
     val escapeSequence: String get() = "\\"
+    val mask: String get() = "*****"
 
     fun replacePlaceHolder(index: Int, placeHolder: StatementPart.PlaceHolder): CharSequence {
         return placeHolder
     }
 
-    fun formatValue(value: Any?, valueClass: KClass<*>): String
+    fun formatValue(value: Any?, valueClass: KClass<*>, masking: Boolean): String
 
     fun enquote(name: String): String {
         return openQuote + name + closeQuote
@@ -64,8 +65,10 @@ internal object DryRunDialect : Dialect {
 
     override val driver: String = "dry_run"
 
-    override fun formatValue(value: Any?, valueClass: KClass<*>): String {
-        return if (value == null) {
+    override fun formatValue(value: Any?, valueClass: KClass<*>, masking: Boolean): String {
+        return if (masking) {
+            mask
+        } else if (value == null) {
             "null"
         } else {
             when (valueClass) {

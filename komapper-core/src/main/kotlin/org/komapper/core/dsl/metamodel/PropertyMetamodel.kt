@@ -16,7 +16,7 @@ interface PropertyMetamodel<ENTITY : Any, EXTERIOR : Any, INTERIOR : Any> : Prop
     fun toValue(entity: ENTITY): Value {
         val exterior = getter(entity)
         val interior = if (exterior == null) null else unwrap(exterior)
-        return Value(interior, interiorClass)
+        return Value(interior, interiorClass, masking)
     }
 }
 
@@ -29,6 +29,7 @@ class PropertyMetamodelImpl<ENTITY : Any, EXTERIOR : Any, INTERIOR : Any>(
     override val name: String get() = descriptor.name
     override val columnName: String get() = descriptor.columnName
     override val alwaysQuote: Boolean get() = descriptor.alwaysQuote
+    override val masking: Boolean get() = descriptor.masking
     override val getter: (ENTITY) -> EXTERIOR? get() = descriptor.getter
     override val setter: (ENTITY, EXTERIOR) -> ENTITY get() = descriptor.setter
     override val wrap: (INTERIOR) -> EXTERIOR get() = descriptor.wrap
@@ -45,6 +46,7 @@ class PropertyMetamodelStub<ENTITY : Any, EXTERIOR : Any> :
     override val name: String get() = fail()
     override val columnName: String get() = fail()
     override val alwaysQuote: Boolean get() = fail()
+    override val masking: Boolean get() = fail()
     override val getter: (ENTITY) -> EXTERIOR? get() = fail()
     override val setter: (ENTITY, EXTERIOR) -> ENTITY get() = fail()
     override val wrap: (EXTERIOR) -> EXTERIOR get() = fail()

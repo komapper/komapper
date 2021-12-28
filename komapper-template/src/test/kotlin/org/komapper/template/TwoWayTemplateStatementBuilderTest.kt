@@ -16,7 +16,7 @@ import kotlin.test.assertTrue
 class TwoWayTemplateStatementBuilderTest {
 
     private val statementBuilder = TwoWayTemplateStatementBuilder(
-        { value, _ -> if (value is CharSequence) "'$value'" else value.toString() },
+        { value, _, _ -> if (value is CharSequence) "'$value'" else value.toString() },
         sqlNodeFactory = NoCacheSqlNodeFactory(),
         exprEvaluator = DefaultExprEvaluator(
             NoCacheExprNodeFactory(),
