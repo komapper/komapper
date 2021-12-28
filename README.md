@@ -27,6 +27,33 @@ https://www.komapper.org/ja/docs/
 - MySQL
 - PostgreSQL
 
+## Installation
+
+Add the following code to add Komapper to your Gradle build script (gradle.build.kts):
+
+```kotlin
+plugins {
+    kotlin("jvm") version "1.5.31"
+    id("com.google.devtools.ksp") version "1.5.31-1.0.1"
+}
+
+val komapperVersion = "0.24.0"
+
+dependencies {
+    implementation("org.komapper:komapper-starter-jdbc:$komapperVersion")
+    implementation("org.komapper:komapper-dialect-h2-jdbc:$komapperVersion")
+    ksp("org.komapper:komapper-processor:$komapperVersion")
+}
+```
+
+You can use other starter modules instead of `komapper-starter-jdbc`.
+Also, you can use other dialect modules instead of `komapper-dialect-h2-jdbc`.
+
+See also Quickstart for more details:
+
+- https://www.komapper.org/docs/quickstart/ (English)
+- https://www.komapper.org/ja/docs/quickstart/ (日本語)
+
 ## Status
 
 This project is still in development, all suggestions and contributions are welcome.

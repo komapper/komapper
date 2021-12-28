@@ -150,4 +150,29 @@ rootProject.apply {
             requireBranch = "main"
         }
     }
+
+    tasks {
+        val replaceVersion by registering {
+            doLast {
+                val releaseVersion = project.properties["release.releaseVersion"]?.toString()
+                checkNotNull(releaseVersion) { "release.releaseVersion is not set" }
+                ant.withGroovyBuilder {
+                    "replaceregexp"(
+                        "match" to """(val komapperVersion = ")[^"]*(")""",
+                        "replace" to "\\1${releaseVersion}\\2",
+                        "encoding" to "UTF-8",
+                        "flags" to "g"
+                    ) {
+                        "fileset"("dir" to ".") {
+                            "include"("name" to "README.md")
+                        }
+                    }
+                }
+            }
+        }
+
+        beforeReleaseBuild {
+            dependsOn(replaceVersion)
+        }
+    }
 }
