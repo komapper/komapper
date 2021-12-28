@@ -64,3 +64,24 @@ internal class TransactionScopeImpl(
         return transactionManager.isRollbackOnly
     }
 }
+
+internal class TransactionScopeStub : TransactionScope {
+
+    private var isRollbackOnly = false
+
+    override fun setRollbackOnly() {
+        isRollbackOnly = true
+    }
+
+    override fun isRollbackOnly(): Boolean {
+        return isRollbackOnly
+    }
+
+    override fun <R> required(isolationLevel: IsolationLevel?, block: TransactionScope.() -> R): R {
+        return block(this)
+    }
+
+    override fun <R> requiresNew(isolationLevel: IsolationLevel?, block: TransactionScope.() -> R): R {
+        return block(this)
+    }
+}

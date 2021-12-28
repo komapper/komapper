@@ -9,13 +9,21 @@ fun <R> Jdbc.withTransaction(
     isolationLevel: IsolationLevel? = null,
     block: TransactionScope.() -> R
 ): R {
-    val database = this as JdbcDatabase
-    val session = database.config.session
-    return if (session is TransactionSession) {
-        session.userTransaction.transaction(transactionAttribute, isolationLevel, block)
+    return if (this is JdbcDatabase) {
+        val session = this.config.session
+        return if (session is TransactionSession) {
+            session.userTransaction.transaction(transactionAttribute, isolationLevel, block)
+        } else {
+            withoutTransaction(block)
+        }
     } else {
-        invalidSession(session)
+        withoutTransaction(block)
     }
+}
+
+private fun <R> withoutTransaction(block: TransactionScope.() -> R): R {
+    val transactionScope = TransactionScopeStub()
+    return block(transactionScope)
 }
 
 val JdbcSession.transactionManager: TransactionManager
