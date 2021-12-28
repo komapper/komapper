@@ -1,7 +1,7 @@
 plugins {
     id("org.springframework.boot")
     id("com.google.devtools.ksp")
-    kotlin("plugin.allopen")
+    kotlin("plugin.spring")
 }
 
 apply(plugin = "io.spring.dependency-management")
@@ -23,11 +23,6 @@ kotlin {
 
 ksp {
     arg("komapper.namingStrategy", "UPPER_SNAKE_CASE")
-}
-
-allOpen {
-    annotation("org.springframework.context.annotation.Configuration")
-    annotation("org.springframework.transaction.annotation.Transactional")
 }
 
 springBoot {
