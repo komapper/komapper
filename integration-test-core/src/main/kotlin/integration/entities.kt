@@ -82,31 +82,6 @@ data class Employee(
     @KomapperVersion val version: Int,
 )
 
-data class WorkerSalary(val salary: BigDecimal)
-
-data class WorkerDetail(
-    val hiredate: LocalDate,
-    val salary: WorkerSalary
-)
-
-data class Worker(
-    val employeeId: Int,
-    val employeeNo: Int,
-    val employeeName: String,
-    val managerId: Int?,
-    val detail: WorkerDetail,
-    val departmentId: Int,
-    val addressId: Int,
-    val version: Int
-)
-
-data class Common(
-    val personId: Int = 0,
-    val createdAt: LocalDateTime = LocalDateTime.of(2000, 1, 1, 0, 0, 0),
-    val updatedAt: LocalDateTime = LocalDateTime.of(2000, 1, 1, 0, 0, 0),
-    val version: Int = 0
-)
-
 @KomapperEntity
 data class Department(
     @KomapperId @KomapperColumn("DEPARTMENT_ID") val departmentId: Int,
@@ -125,5 +100,3 @@ data class NoVersionDepartment(
     val location: String,
     val version: Int,
 )
-
-data class NoId(val value1: Int, val value2: Int)
