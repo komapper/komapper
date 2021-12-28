@@ -42,7 +42,7 @@ internal class SeparateDefinitionSourceResolver : EntityDefinitionSourceResolver
             },
             Unit
         )
-        validateEntityDeclaration(entityDeclaration)
+        validateEntityDeclaration(entityDeclaration, defAnnotation)
         val stubAnnotation = defDeclaration.findAnnotation(KomapperStub)
         return EntityDefinitionSource(defDeclaration, entityDeclaration, aliases.map { it.toString() }, stubAnnotation)
     }
@@ -63,30 +63,32 @@ internal class SelfDefinitionSourceResolver : EntityDefinitionSourceResolver {
         if (aliases !is List<*>) {
             report("The aliases value of @${KomapperEntity::class.simpleName} is invalid.", entityDeclaration)
         }
-        validateEntityDeclaration(entityDeclaration)
+        validateEntityDeclaration(entityDeclaration, entityDeclaration)
         val stubAnnotation = entityDeclaration.findAnnotation(KomapperStub)
         return EntityDefinitionSource(entityDeclaration, entityDeclaration, aliases.map { it.toString() }, stubAnnotation)
     }
 }
 
-private fun validateEntityDeclaration(entityDeclaration: KSClassDeclaration) {
+private fun validateEntityDeclaration(entityDeclaration: KSClassDeclaration, recipient: KSNode) {
     val modifiers = entityDeclaration.modifiers
     if (!modifiers.contains(Modifier.DATA)) {
-        report("The entity class must be a data class.", entityDeclaration)
+        report("The entity class \"${entityDeclaration.simpleName.asString()}\" must be a data class.", recipient)
     }
     if (entityDeclaration.typeParameters.isNotEmpty()) {
-        report("The entity class must not have type parameters.", entityDeclaration)
+        report("The entity class \"${entityDeclaration.simpleName.asString()}\" must not have type parameters.", recipient)
     }
     if (entityDeclaration.isPrivate()) {
-        report("The entity class must not be private.", entityDeclaration)
+        report("The entity class \"${entityDeclaration.simpleName.asString()}\" must not be private.", recipient)
     }
-    validateParentDeclaration(entityDeclaration.parentDeclaration)
+    validateEnclosingDeclaration(entityDeclaration, entityDeclaration.parentDeclaration, recipient)
 }
 
-private fun validateParentDeclaration(declaration: KSDeclaration?) {
-    if (declaration == null) return
-    if (!declaration.isPublic()) {
-        report("The parent declaration of the entity class must be public.", declaration)
+private fun validateEnclosingDeclaration(enclosed: KSDeclaration, enclosing: KSDeclaration?, recipient: KSNode) {
+    if (enclosing == null) return
+    if (!enclosing.isPublic()) {
+        val enclosingName = enclosing.simpleName.asString()
+        val enclosedName = enclosed.simpleName.asString()
+        report("The enclosing declaration \"$enclosingName\" of the entity class \"$enclosedName\" must be public.", recipient)
     }
-    validateParentDeclaration(declaration.parentDeclaration)
+    validateEnclosingDeclaration(enclosed, enclosing.parentDeclaration, recipient)
 }
