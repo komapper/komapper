@@ -98,7 +98,11 @@ class CodeGeneratorTest {
         val expected = """
             package entity
 
-            import org.komapper.annotation.*
+            import org.komapper.annotation.KomapperAutoIncrement
+            import org.komapper.annotation.KomapperColumn
+            import org.komapper.annotation.KomapperEntityDef
+            import org.komapper.annotation.KomapperId
+            import org.komapper.annotation.KomapperTable
             
             @KomapperEntityDef(Address::class)
             @KomapperTable("ADDRESS")
