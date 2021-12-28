@@ -37,7 +37,7 @@ class EntityProcessorTest {
     }
 
     @Test
-    fun `The parent declaration of the entity class must be public`() {
+    fun `The enclosing declaration of the entity class must be public`() {
         val result = compile(
             kotlin(
                 "source.kt",
@@ -54,7 +54,7 @@ class EntityProcessorTest {
             )
         )
         assertEquals(result.exitCode, KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertTrue(result.messages.contains("The parent declaration of the entity class must be public."))
+        assertTrue(result.messages.contains("The enclosing declaration \"Parent\" of the entity class \"Dept\" must be public."))
     }
 
     @Test
@@ -181,7 +181,7 @@ class EntityProcessorTest {
             )
         )
         assertEquals(result.exitCode, KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertTrue(result.messages.contains("The entity class must be a data class."))
+        assertTrue(result.messages.contains("The entity class \"Dept\" must be a data class."))
     }
 
     @Test
@@ -203,7 +203,7 @@ class EntityProcessorTest {
             )
         )
         assertEquals(result.exitCode, KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertTrue(result.messages.contains("The entity class must be a data class."))
+        assertTrue(result.messages.contains("The entity class \"Dept\" must be a data class."))
     }
 
     @Test
@@ -261,7 +261,7 @@ class EntityProcessorTest {
             )
         )
         assertEquals(result.exitCode, KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertTrue(result.messages.contains("The entity class must not be private."))
+        assertTrue(result.messages.contains("The entity class \"Dept\" must not be private."))
     }
 
     @Test
@@ -283,7 +283,7 @@ class EntityProcessorTest {
             )
         )
         assertEquals(result.exitCode, KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertTrue(result.messages.contains("The entity class must not be private."))
+        assertTrue(result.messages.contains("The entity class \"Dept\" must not be private."))
     }
 
     @Test
@@ -302,7 +302,7 @@ class EntityProcessorTest {
             )
         )
         assertEquals(result.exitCode, KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertTrue(result.messages.contains("The entity class must not have type parameters."))
+        assertTrue(result.messages.contains("The entity class \"Dept\" must not have type parameters."))
     }
 
     @Test
@@ -324,7 +324,7 @@ class EntityProcessorTest {
             )
         )
         assertEquals(result.exitCode, KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertTrue(result.messages.contains("The entity class must not have type parameters."))
+        assertTrue(result.messages.contains("The entity class \"Dept\" must not have type parameters."))
     }
 
     @Test
