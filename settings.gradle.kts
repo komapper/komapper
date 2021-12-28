@@ -7,7 +7,7 @@ pluginManagement {
     }
     plugins {
         kotlin("jvm") version kotlinVersion
-        kotlin("plugin.allopen") version kotlinVersion
+        kotlin("plugin.spring") version kotlinVersion
         id("com.google.devtools.ksp") version kspVersion
         id("org.springframework.boot") version springBootVersion
     }
