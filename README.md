@@ -37,7 +37,7 @@ plugins {
     id("com.google.devtools.ksp") version "1.5.31-1.0.1"
 }
 
-val komapperVersion = "0.24.0"
+val komapperVersion = "0.25.0"
 
 dependencies {
     implementation("org.komapper:komapper-starter-jdbc:$komapperVersion")
