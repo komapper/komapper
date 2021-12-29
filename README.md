@@ -189,7 +189,7 @@ fun main() {
         }
 
         val (_, pragueId) = db.runQuery {
-            QueryDsl.insert(c).values { c.name set substring(trim(literal("   Prague   ")), 1, 2) }
+            QueryDsl.insert(c).values { c.name eq substring(trim(literal("   Prague   ")), 1, 2) }
         }
 
         val prague = db.runQuery {
@@ -208,7 +208,7 @@ fun main() {
         }
 
         db.runQuery {
-            QueryDsl.update(u).set { u.name set "Alexey" }.where { u.id eq "alex" }
+            QueryDsl.update(u).set { u.name eq "Alexey" }.where { u.id eq "alex" }
         }
 
         db.runQuery {
