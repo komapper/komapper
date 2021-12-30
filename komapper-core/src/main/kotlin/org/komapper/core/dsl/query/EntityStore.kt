@@ -1,7 +1,6 @@
 package org.komapper.core.dsl.query
 
 import org.komapper.core.ThreadSafe
-import org.komapper.core.dsl.context.SelectContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import kotlin.reflect.cast
 
@@ -10,7 +9,7 @@ interface EntityStore {
 
     operator fun contains(metamodel: EntityMetamodel<*, *, *>): Boolean
 
-    fun <T : Any> list(metamodel: EntityMetamodel<T, *, *>): List<T>
+    operator fun <T : Any> get(metamodel: EntityMetamodel<T, *, *>): Set<T>
 
     fun <T : Any, S : Any> oneToOne(
         first: EntityMetamodel<T, *, *>,
@@ -33,30 +32,22 @@ interface EntityStore {
     ): Map<ID, Set<S>>
 }
 
-internal class EntityStoreImpl<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
-    private val context: SelectContext<ENTITY, ID, META>,
-    private val rows: List<Map<EntityMetamodel<*, *, *>, Any>>,
+internal class EntityStoreImpl(
+    private val entitySets: Map<EntityMetamodel<*, *, *>, Set<Any>>,
+    private val rows: List<Map<EntityMetamodel<*, *, *>, Any>>
 ) : EntityStore {
 
     override operator fun contains(metamodel: EntityMetamodel<*, *, *>): Boolean {
-        return metamodel in context.getProjection().metamodels()
+        return entitySets.containsKey(metamodel)
     }
 
     private fun contains(first: EntityMetamodel<*, *, *>, second: EntityMetamodel<*, *, *>): Boolean {
-        val metamodels = context.getProjection().metamodels()
-        return first in metamodels && second in metamodels
+        return entitySets.contains(first) && entitySets.containsKey(second)
     }
 
-    override fun <T : Any> list(metamodel: EntityMetamodel<T, *, *>): List<T> {
-        if (!contains(metamodel)) {
-            return emptyList()
-        }
-        return rows.asSequence()
-            .map { it[metamodel] }
-            .filterNotNull()
-            .map(metamodel.klass()::cast)
-            .distinct()
-            .toList()
+    override operator fun <T : Any> get(metamodel: EntityMetamodel<T, *, *>): Set<T> {
+        @Suppress("UNCHECKED_CAST")
+        return entitySets[metamodel] as Set<T>? ?: emptySet()
     }
 
     override fun <T : Any, S : Any> oneToOne(

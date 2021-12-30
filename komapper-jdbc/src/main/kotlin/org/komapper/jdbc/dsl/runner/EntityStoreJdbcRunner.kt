@@ -15,9 +15,10 @@ internal class EntityStoreJdbcRunner<ENTITY : Any, ID : Any, META : EntityMetamo
 ) : JdbcRunner<EntityStore> {
 
     private val runner: SelectRunner = SelectRunner(context)
-    private val factory: EntityStoreFactory<ENTITY, ID, META> = EntityStoreFactory(context)
+    private val factory: EntityStoreFactory = EntityStoreFactory()
 
     override fun run(config: JdbcDatabaseConfig): EntityStore {
+        val metamodels = context.getProjection().metamodels()
         val statement = runner.buildStatement(config)
         val executor = JdbcExecutor(config, context.options)
         val rows = executor.executeQuery(statement) { rs ->
@@ -25,7 +26,7 @@ internal class EntityStoreJdbcRunner<ENTITY : Any, ID : Any, META : EntityMetamo
             while (rs.next()) {
                 val row = mutableMapOf<EntityMetamodel<*, *, *>, Any>()
                 val mapper = JdbcEntityMapper(config.dialect, rs)
-                for (metamodel in context.getProjection().metamodels()) {
+                for (metamodel in metamodels) {
                     val entity = mapper.execute(metamodel) ?: continue
                     row[metamodel] = entity
                 }
@@ -33,7 +34,7 @@ internal class EntityStoreJdbcRunner<ENTITY : Any, ID : Any, META : EntityMetamo
             }
             rows
         }
-        return factory.create(rows)
+        return factory.create(metamodels, rows)
     }
 
     override fun dryRun(config: DatabaseConfig): Statement {
