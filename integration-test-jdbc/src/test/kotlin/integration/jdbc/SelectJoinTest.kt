@@ -253,7 +253,7 @@ class SelectJoinTest(private val db: JdbcDatabase) {
             }.includeAll()
         }
 
-        val managers = store.list(m)
+        val managers = store[m]
         assertEquals(6, managers.size)
         assertEquals(managers.map { it.employeeId }.toSet(), setOf(4, 6, 7, 8, 9, 13))
 
@@ -263,7 +263,7 @@ class SelectJoinTest(private val db: JdbcDatabase) {
     }
 
     @Test
-    fun list() {
+    fun get() {
         val a = Meta.address
         val e = Meta.employee
         val d = Meta.department
@@ -279,8 +279,8 @@ class SelectJoinTest(private val db: JdbcDatabase) {
         assertTrue(e in store)
         assertTrue(d in store)
         assertFalse(Meta.person in store)
-        assertEquals(14, store.list(a).size)
-        assertEquals(14, store.list(e).size)
-        assertEquals(3, store.list(d).size)
+        assertEquals(14, store[a].size)
+        assertEquals(14, store[e].size)
+        assertEquals(3, store[d].size)
     }
 }

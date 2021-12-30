@@ -17,21 +17,22 @@ internal class EntityStoreR2dbcRunner<ENTITY : Any, ID : Any, META : EntityMetam
 ) : R2dbcRunner<EntityStore> {
 
     private val runner: SelectRunner = SelectRunner(context)
-    private val factory: EntityStoreFactory<ENTITY, ID, META> = EntityStoreFactory(context)
+    private val factory: EntityStoreFactory = EntityStoreFactory()
 
     override suspend fun run(config: R2dbcDatabaseConfig): EntityStore {
+        val metamodels = context.getProjection().metamodels()
         val statement = runner.buildStatement(config)
         val executor = R2dbcExecutor(config, context.options)
         val rows: Flow<Map<EntityMetamodel<*, *, *>, Any>> = executor.executeQuery(statement) { dialect, r2dbcRow ->
             val row = mutableMapOf<EntityMetamodel<*, *, *>, Any>()
             val mapper = R2dbcEntityMapper(dialect, r2dbcRow)
-            for (metamodel in context.getProjection().metamodels()) {
+            for (metamodel in metamodels) {
                 val entity = mapper.execute(metamodel) ?: continue
                 row[metamodel] = entity
             }
             row
         }
-        return factory.create(rows.toList())
+        return factory.create(metamodels, rows.toList())
     }
 
     override fun dryRun(config: DatabaseConfig): Statement {
