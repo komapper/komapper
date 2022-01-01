@@ -10,9 +10,8 @@ import org.komapper.core.dsl.options.DeleteOptions
  * The builder of delete queries.
  * @param ENTITY the entity type
  */
-// TODO rename
 @ThreadSafe
-interface EntityDeleteQueryBuilder<ENTITY : Any> {
+interface DeleteQueryBuilder<ENTITY : Any> {
     /**
      * Builds a query to delete a single entity.
      * @param entity the entity to be deleted
@@ -50,10 +49,10 @@ interface EntityDeleteQueryBuilder<ENTITY : Any> {
     fun all(): RelationDeleteQuery
 }
 
-internal data class EntityDeleteQueryBuilderImpl<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
+internal data class DeleteQueryBuilderImpl<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityDeleteContext<ENTITY, ID, META>,
 ) :
-    EntityDeleteQueryBuilder<ENTITY> {
+    DeleteQueryBuilder<ENTITY> {
 
     override fun single(entity: ENTITY): EntityDeleteQuery {
         context.target.checkIdValueNotNull(entity)

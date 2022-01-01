@@ -15,15 +15,14 @@ import org.komapper.core.dsl.scope.AssignmentScope
  * @param ID the entity id type
  * @param META the entity metamodel type
  */
-// TODO rename
 @ThreadSafe
-interface EntityInsertOnDuplicateKeyUpdateQuery<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> {
+interface InsertOnDuplicateKeyUpdateQueryBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> {
     /**
      * Sets the values to be updated.
      * @param declaration the assignment declaration
-     * @return the query
+     * @return the builder
      */
-    fun set(declaration: AssignmentScope<ENTITY>.(META) -> Unit): EntityInsertOnDuplicateKeyUpdateQuery<ENTITY, ID, META>
+    fun set(declaration: AssignmentScope<ENTITY>.(META) -> Unit): InsertOnDuplicateKeyUpdateQueryBuilder<ENTITY, ID, META>
 
     /**
      * Builds a query to insert or update a single entity.
@@ -68,13 +67,13 @@ interface EntityInsertOnDuplicateKeyUpdateQuery<ENTITY : Any, ID : Any, META : E
     fun executeAndGet(entity: ENTITY): Query<ENTITY>
 }
 
-internal data class EntityInsertOnDuplicateKeyUpdateQueryImpl<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
+internal data class InsertOnDuplicateKeyUpdateQueryBuilderImpl<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityUpsertContext<ENTITY, ID, META>,
-) : EntityInsertOnDuplicateKeyUpdateQuery<ENTITY, ID, META> {
+) : InsertOnDuplicateKeyUpdateQueryBuilder<ENTITY, ID, META> {
 
     private val builder: EntityUpsertQueryBuilder<ENTITY, ID, META> = EntityUpsertQueryBuilderImpl(context)
 
-    override fun set(declaration: AssignmentDeclaration<ENTITY, META>): EntityInsertOnDuplicateKeyUpdateQuery<ENTITY, ID, META> {
+    override fun set(declaration: AssignmentDeclaration<ENTITY, META>): InsertOnDuplicateKeyUpdateQueryBuilder<ENTITY, ID, META> {
         val newContext = context.copy(set = context.set + declaration)
         return copy(context = newContext)
     }

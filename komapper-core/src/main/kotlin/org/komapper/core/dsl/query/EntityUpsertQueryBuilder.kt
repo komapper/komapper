@@ -10,9 +10,8 @@ import org.komapper.core.dsl.metamodel.EntityMetamodel
  * @param ID the entity id type
  * @param META the entity metamodel type
  */
-// TODO make it internal
 @ThreadSafe
-interface EntityUpsertQueryBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> {
+internal interface EntityUpsertQueryBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> {
     fun single(entity: ENTITY): EntityUpsertQuery<Int>
     fun multiple(entities: List<ENTITY>): EntityUpsertQuery<Int>
     fun batch(entities: List<ENTITY>, batchSize: Int? = null): EntityUpsertQuery<List<Int>>

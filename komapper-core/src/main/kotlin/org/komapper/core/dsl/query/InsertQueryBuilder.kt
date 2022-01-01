@@ -14,11 +14,21 @@ import org.komapper.core.dsl.metamodel.PropertyMetamodel
  * @param ID the entity id type
  * @param META the entity metamodel type
  */
-// TODO rename
 @ThreadSafe
-interface EntityInsertQueryBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> {
-    fun onDuplicateKeyUpdate(vararg keys: PropertyMetamodel<ENTITY, *, *> = emptyArray()): EntityInsertOnDuplicateKeyUpdateQuery<ENTITY, ID, META>
-    fun onDuplicateKeyIgnore(vararg keys: PropertyMetamodel<ENTITY, *, *> = emptyArray()): EntityInsertOnDuplicateKeyIgnoreQuery<ENTITY, ID, META>
+interface InsertQueryBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> {
+    /**
+     * Creates a builder of the query that inserts or updates entities.
+     * @param keys the keys used for duplicate checking
+     * @return the query
+     */
+    fun onDuplicateKeyUpdate(vararg keys: PropertyMetamodel<ENTITY, *, *> = emptyArray()): InsertOnDuplicateKeyUpdateQueryBuilder<ENTITY, ID, META>
+
+    /**
+     * Creates a builder of the query that inserts entities and ignores duplicate keys.
+     * @param keys the keys used for duplicate checking
+     * @return the query
+     */
+    fun onDuplicateKeyIgnore(vararg keys: PropertyMetamodel<ENTITY, *, *> = emptyArray()): InsertOnDuplicateKeyIgnoreQueryBuilder<ENTITY, ID, META>
 
     /**
      * Builds a query to insert a single entity.
@@ -70,19 +80,19 @@ interface EntityInsertQueryBuilder<ENTITY : Any, ID : Any, META : EntityMetamode
     fun values(declaration: AssignmentDeclaration<ENTITY, META>): RelationInsertQuery<ENTITY, ID, META, Pair<Int, ID?>>
 }
 
-internal data class EntityInsertQueryBuilderImpl<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
+internal data class InsertQueryBuilderImpl<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityInsertContext<ENTITY, ID, META>,
 ) :
-    EntityInsertQueryBuilder<ENTITY, ID, META> {
+    InsertQueryBuilder<ENTITY, ID, META> {
 
-    override fun onDuplicateKeyUpdate(vararg keys: PropertyMetamodel<ENTITY, *, *>): EntityInsertOnDuplicateKeyUpdateQuery<ENTITY, ID, META> {
+    override fun onDuplicateKeyUpdate(vararg keys: PropertyMetamodel<ENTITY, *, *>): InsertOnDuplicateKeyUpdateQueryBuilder<ENTITY, ID, META> {
         val newContext = context.asEntityUpsertContext(keys.toList(), DuplicateKeyType.UPDATE)
-        return EntityInsertOnDuplicateKeyUpdateQueryImpl(newContext)
+        return InsertOnDuplicateKeyUpdateQueryBuilderImpl(newContext)
     }
 
-    override fun onDuplicateKeyIgnore(vararg keys: PropertyMetamodel<ENTITY, *, *>): EntityInsertOnDuplicateKeyIgnoreQuery<ENTITY, ID, META> {
+    override fun onDuplicateKeyIgnore(vararg keys: PropertyMetamodel<ENTITY, *, *>): InsertOnDuplicateKeyIgnoreQueryBuilder<ENTITY, ID, META> {
         val newContext = context.asEntityUpsertContext(keys.toList(), DuplicateKeyType.IGNORE)
-        return EntityInsertOnDuplicateKeyIgnoreQueryImpl(newContext)
+        return InsertOnDuplicateKeyIgnoreQueryBuilderImpl(newContext)
     }
 
     override fun single(entity: ENTITY): EntityInsertQuery<ENTITY> {

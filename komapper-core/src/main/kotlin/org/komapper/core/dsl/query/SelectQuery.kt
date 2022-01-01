@@ -13,7 +13,6 @@ import org.komapper.core.dsl.options.SelectOptions
 /**
  * Represents the query to retrieve data.
  */
-// TODO change
 interface SelectQuery<ENTITY : Any, QUERY : SelectQuery<ENTITY, QUERY>> :
     FlowSubquery<ENTITY> {
     fun distinct(): QUERY

@@ -13,21 +13,20 @@ import org.komapper.core.dsl.options.DeleteOptions
  * @param ID the entity id type
  * @param META the entity metamodel type
  */
-// TODO rename
 @ThreadSafe
-interface EntityUpdateQueryBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> {
+interface UpdateQueryBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> {
     /**
      * Returns a new builder that updates specified properties.
      * @param properties the properties to be included
      * @return the query
      */
-    fun include(vararg properties: PropertyMetamodel<ENTITY, *, *>): EntityUpdateQueryBuilder<ENTITY, ID, META>
+    fun include(vararg properties: PropertyMetamodel<ENTITY, *, *>): UpdateQueryBuilder<ENTITY, ID, META>
     /**
      * Returns a new builder that does not update specified properties.
      * @param properties the properties to be excluded
      * @return the query
      */
-    fun exclude(vararg properties: PropertyMetamodel<ENTITY, *, *>): EntityUpdateQueryBuilder<ENTITY, ID, META>
+    fun exclude(vararg properties: PropertyMetamodel<ENTITY, *, *>): UpdateQueryBuilder<ENTITY, ID, META>
     /**
      * Builds a query to update a single entity.
      * @param entity the entity to be updated
@@ -56,19 +55,19 @@ interface EntityUpdateQueryBuilder<ENTITY : Any, ID : Any, META : EntityMetamode
     fun set(declaration: AssignmentDeclaration<ENTITY, META>): RelationUpdateQuery<ENTITY, ID, META>
 }
 
-internal data class EntityUpdateQueryBuilderImpl<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
+internal data class UpdateQueryBuilderImpl<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityUpdateContext<ENTITY, ID, META>,
 ) :
-    EntityUpdateQueryBuilder<ENTITY, ID, META> {
+    UpdateQueryBuilder<ENTITY, ID, META> {
 
-    override fun include(vararg properties: PropertyMetamodel<ENTITY, *, *>): EntityUpdateQueryBuilder<ENTITY, ID, META> {
+    override fun include(vararg properties: PropertyMetamodel<ENTITY, *, *>): UpdateQueryBuilder<ENTITY, ID, META> {
         val newContext = context.copy(includedProperties = properties.toList()).also {
             checkContext(it)
         }
         return copy(context = newContext)
     }
 
-    override fun exclude(vararg properties: PropertyMetamodel<ENTITY, *, *>): EntityUpdateQueryBuilder<ENTITY, ID, META> {
+    override fun exclude(vararg properties: PropertyMetamodel<ENTITY, *, *>): UpdateQueryBuilder<ENTITY, ID, META> {
         val newContext = context.copy(excludedProperties = properties.toList()).also {
             checkContext(it)
         }
