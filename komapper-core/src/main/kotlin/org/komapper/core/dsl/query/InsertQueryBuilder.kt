@@ -67,7 +67,14 @@ interface InsertQueryBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTI
 
     /**
      * Builds a query to insert rows using the select expression.
-     * @param block the select expression
+     * @param subquery the subquery expression
+     * @return the query
+     */
+    fun select(subquery: SubqueryExpression<ENTITY>): RelationInsertQuery<ENTITY, ID, META, Pair<Int, List<ID>>>
+
+    /**
+     * Builds a query to insert rows using the select expression.
+     * @param block the block that returns a subquery expression
      * @return the query
      */
     fun select(block: () -> SubqueryExpression<ENTITY>): RelationInsertQuery<ENTITY, ID, META, Pair<Int, List<ID>>>
@@ -118,8 +125,13 @@ internal data class InsertQueryBuilderImpl<ENTITY : Any, ID : Any, META : Entity
         return batch(entities.toList(), batchSize)
     }
 
+    override fun select(subquery: SubqueryExpression<ENTITY>): RelationInsertQuery<ENTITY, ID, META, Pair<Int, List<ID>>> {
+        val newContext = context.asRelationInsertSelectContext(subquery)
+        return RelationInsertSelectQuery(newContext)
+    }
+
     override fun select(block: () -> SubqueryExpression<ENTITY>): RelationInsertQuery<ENTITY, ID, META, Pair<Int, List<ID>>> {
-        val newContext = context.asRelationInsertSelectContext(block)
+        val newContext = context.asRelationInsertSelectContext(block())
         return RelationInsertSelectQuery(newContext)
     }
 

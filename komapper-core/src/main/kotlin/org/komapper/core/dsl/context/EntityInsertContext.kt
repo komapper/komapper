@@ -38,10 +38,10 @@ data class EntityInsertContext<ENTITY : Any, ID : Any, META : EntityMetamodel<EN
         )
     }
 
-    fun asRelationInsertSelectContext(block: () -> SubqueryExpression<ENTITY>): RelationInsertSelectContext<ENTITY, ID, META> {
+    fun asRelationInsertSelectContext(subquery: SubqueryExpression<ENTITY>): RelationInsertSelectContext<ENTITY, ID, META> {
         return RelationInsertSelectContext(
             target = target,
-            select = block(),
+            select = subquery,
             options = options.copy(disableSequenceAssignment = true)
         )
     }
