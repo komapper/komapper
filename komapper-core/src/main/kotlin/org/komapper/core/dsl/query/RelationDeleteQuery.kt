@@ -13,11 +13,12 @@ import org.komapper.core.dsl.visitor.QueryVisitor
  */
 interface RelationDeleteQuery : Query<Int> {
     /**
-     * Builds a query to delete specified rows.
+     * Builds a WHERE clause.
      * @param declaration the where declaration
      * @return the query
      */
     fun where(declaration: WhereDeclaration): RelationDeleteQuery
+
     /**
      * Builds a query with the options applied.
      * @param configure the configure function to apply options

@@ -16,13 +16,13 @@ import org.komapper.core.dsl.options.DeleteOptions
 @ThreadSafe
 interface UpdateQueryBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> {
     /**
-     * Returns a new builder that updates specified properties.
+     * Returns a new builder of the query that updates specified properties.
      * @param properties the properties to be included
      * @return the query
      */
     fun include(vararg properties: PropertyMetamodel<ENTITY, *, *>): UpdateQueryBuilder<ENTITY, ID, META>
     /**
-     * Returns a new builder that does not update specified properties.
+     * Returns a new builder of the query that does not update specified properties.
      * @param properties the properties to be excluded
      * @return the query
      */
@@ -48,7 +48,7 @@ interface UpdateQueryBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTI
      */
     fun batch(vararg entities: ENTITY, batchSize: Int? = null): EntityUpdateQuery<List<ENTITY>>
     /**
-     * Sets the values to be updated.
+     * Builds a SET clause.
      * @param declaration the assignment declaration
      * @return the query
      */

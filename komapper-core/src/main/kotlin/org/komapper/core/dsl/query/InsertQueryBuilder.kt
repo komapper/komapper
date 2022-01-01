@@ -73,7 +73,7 @@ interface InsertQueryBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTI
     fun select(block: () -> SubqueryExpression<ENTITY>): RelationInsertQuery<ENTITY, ID, META, Pair<Int, List<ID>>>
 
     /**
-     * Builds a query to insert a single row with specified values.
+     * Builds a VALUES clause.
      * @param declaration the assignment declaration
      * @return the query
      */

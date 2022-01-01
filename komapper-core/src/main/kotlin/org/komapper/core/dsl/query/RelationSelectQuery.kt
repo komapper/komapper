@@ -170,10 +170,10 @@ internal data class RelationSelectQueryImpl<ENTITY : Any, ID : Any, META : Entit
     }
 
     override fun select(vararg expressions: ColumnExpression<*, *>): FlowSubquery<Record> {
-        return selectColumns(*expressions)
+        return selectAsRecord(*expressions)
     }
 
-    override fun selectColumns(vararg expressions: ColumnExpression<*, *>): FlowSubquery<Record> {
+    override fun selectAsRecord(vararg expressions: ColumnExpression<*, *>): FlowSubquery<Record> {
         val list = expressions.toList()
         val newContext = support.select(*list.toTypedArray())
         return MultipleColumnsSelectQuery(newContext, list)

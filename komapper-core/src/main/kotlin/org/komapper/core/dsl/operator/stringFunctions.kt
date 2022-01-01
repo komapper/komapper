@@ -4,6 +4,9 @@ import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.expression.Operand
 import org.komapper.core.dsl.expression.StringFunction
 
+/**
+ * Builds a CONCAT function.
+ */
 fun <T : Any> concat(
     left: ColumnExpression<T, String>,
     right: T
@@ -13,12 +16,18 @@ fun <T : Any> concat(
     return StringFunction.Concat(left, o1, o2)
 }
 
+/**
+ * Builds a CONCAT function.
+ */
 fun <T : Any> concat(left: T, right: ColumnExpression<T, String>): ColumnExpression<T, String> {
     val o1 = Operand.Argument(right, left)
     val o2 = Operand.Column(right)
     return StringFunction.Concat(right, o1, o2)
 }
 
+/**
+ * Builds a CONCAT function.
+ */
 fun <T : Any> concat(
     left: ColumnExpression<T, String>,
     right: ColumnExpression<T, String>
@@ -28,6 +37,9 @@ fun <T : Any> concat(
     return StringFunction.Concat(right, o1, o2)
 }
 
+/**
+ * Builds a LOWER function.
+ */
 fun <T : Any> lower(
     expression: ColumnExpression<T, String>
 ): ColumnExpression<T, String> {
@@ -35,6 +47,9 @@ fun <T : Any> lower(
     return StringFunction.Lower(expression, operand)
 }
 
+/**
+ * Builds an UPPER function.
+ */
 fun <T : Any> upper(
     expression: ColumnExpression<T, String>
 ): ColumnExpression<T, String> {
@@ -42,6 +57,9 @@ fun <T : Any> upper(
     return StringFunction.Upper(expression, operand)
 }
 
+/**
+ * Builds an SUBSTRING function.
+ */
 fun <T : Any> substring(
     expression: ColumnExpression<T, String>,
     startIndex: Int,

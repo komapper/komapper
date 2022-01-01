@@ -114,7 +114,7 @@ class SelectProjectionTest(private val db: JdbcDatabase) {
                     a.addressId inList listOf(1, 2)
                 }
                 .orderBy(a.addressId)
-                .selectColumns(a.addressId, a.street, a.version)
+                .selectAsRecord(a.addressId, a.street, a.version)
         }
         assertEquals(2, list.size)
         val record0 = list[0]

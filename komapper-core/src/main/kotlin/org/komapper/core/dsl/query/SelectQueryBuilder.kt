@@ -179,8 +179,8 @@ internal data class SelectQueryBuilderImpl<ENTITY : Any, ID : Any, META : Entity
         return asRelationQuery().select(*expressions)
     }
 
-    override fun selectColumns(vararg expressions: ColumnExpression<*, *>): FlowSubquery<Record> {
-        return asRelationQuery().selectColumns(*expressions)
+    override fun selectAsRecord(vararg expressions: ColumnExpression<*, *>): FlowSubquery<Record> {
+        return asRelationQuery().selectAsRecord(*expressions)
     }
 
     private fun asRelationQuery(): RelationSelectQuery<ENTITY> {

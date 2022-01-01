@@ -16,7 +16,7 @@ import kotlin.reflect.KClass
 interface ScalarQuery<A, B : Any, C : Any> : Query<A>, ScalarQueryExpression<A, B, C>
 
 internal data class NullableScalarQuery<A, B : Any, C : Any>(
-    val query: FlowSubquery<A>,
+    val query: Subquery<A>,
     val expression: ScalarExpression<B, C>
 ) :
     ScalarQuery<A?, B, C>,

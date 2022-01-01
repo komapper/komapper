@@ -17,17 +17,19 @@ import org.komapper.core.dsl.visitor.QueryVisitor
  */
 interface RelationUpdateQuery<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> : Query<Int> {
     /**
-     * Sets the values to be updated.
+     * Builds a SET clause.
      * @param declaration the assignment declaration
      * @return the query
      */
     fun set(declaration: AssignmentDeclaration<ENTITY, META>): RelationUpdateQuery<ENTITY, ID, META>
+
     /**
-     * Builds a query to update specified rows.
+     * Builds a WHERE clause.
      * @param declaration the where declaration
      * @return the query
      */
     fun where(declaration: WhereDeclaration): RelationUpdateQuery<ENTITY, ID, META>
+
     /**
      * Builds a query with the options applied.
      * @param configure the configure function to apply options

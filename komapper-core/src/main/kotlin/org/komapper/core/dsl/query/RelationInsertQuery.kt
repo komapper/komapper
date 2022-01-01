@@ -18,17 +18,18 @@ import org.komapper.core.dsl.visitor.QueryVisitor
  */
 interface RelationInsertQuery<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, R> : Query<R> {
     /**
+     * Builds a VALUES clause.
+     * @param declaration the assignment declaration
+     * @return the query
+     */
+    fun values(declaration: AssignmentDeclaration<ENTITY, META>): RelationInsertQuery<ENTITY, ID, META, Pair<Int, ID?>>
+
+    /**
      * Builds a query with the options applied.
      * @param configure the configure function to apply options
      * @return the query
      */
     fun options(configure: (InsertOptions) -> InsertOptions): RelationInsertQuery<ENTITY, ID, META, R>
-    /**
-     * Builds a query to insert a single row with specified values.
-     * @param declaration the assignment declaration
-     * @return the query
-     */
-    fun values(declaration: AssignmentDeclaration<ENTITY, META>): RelationInsertQuery<ENTITY, ID, META, Pair<Int, ID?>>
 }
 
 internal data class RelationInsertSelectQuery<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(

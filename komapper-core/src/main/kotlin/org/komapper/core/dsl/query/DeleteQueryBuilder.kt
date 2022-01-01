@@ -36,7 +36,7 @@ interface DeleteQueryBuilder<ENTITY : Any> {
     fun batch(vararg entities: ENTITY, batchSize: Int? = null): EntityDeleteQuery
 
     /**
-     * Builds a query to delete specified rows.
+     * Builds a WHERE clause.
      * @param declaration the where declaration
      * @return the query
      */
