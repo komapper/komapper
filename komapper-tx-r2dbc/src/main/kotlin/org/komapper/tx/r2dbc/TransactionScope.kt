@@ -3,9 +3,19 @@ package org.komapper.tx.r2dbc
 import io.r2dbc.spi.IsolationLevel
 import org.komapper.core.Scope
 
+/**
+ * The R2DBC transaction scope.
+ */
 @Scope
 interface TransactionScope : UserTransaction {
+    /**
+     * Marks the transaction as rollback.
+     */
     fun setRollbackOnly()
+
+    /**
+     * Returns true if the transaction is marked as rollback.
+     */
     fun isRollbackOnly(): Boolean
 }
 

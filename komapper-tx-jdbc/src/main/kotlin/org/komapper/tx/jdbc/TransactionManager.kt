@@ -6,6 +6,9 @@ import java.sql.Connection
 import java.sql.SQLException
 import javax.sql.DataSource
 
+/**
+ * The JDBC transaction APIs designed for advanced use.
+ */
 @ThreadSafe
 interface TransactionManager {
     val dataSource: DataSource

@@ -7,6 +7,9 @@ import org.komapper.core.LoggerFacade
 import org.komapper.r2dbc.R2dbcSession
 import org.reactivestreams.Publisher
 
+/**
+ * Represents a transactional session for R2DBC.
+ */
 class TransactionSession(
     private val connectionFactory: ConnectionFactory,
     private val loggerFacade: LoggerFacade,

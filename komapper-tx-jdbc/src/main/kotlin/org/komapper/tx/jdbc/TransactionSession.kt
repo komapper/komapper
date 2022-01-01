@@ -5,6 +5,9 @@ import org.komapper.jdbc.JdbcSession
 import java.sql.Connection
 import javax.sql.DataSource
 
+/**
+ * Represents a transactional session for JDBC.
+ */
 class TransactionSession(
     private val dataSource: DataSource,
     private val loggerFacade: LoggerFacade,
