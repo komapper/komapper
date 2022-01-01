@@ -84,9 +84,9 @@ interface SelectQuery<ENTITY : Any, QUERY : SelectQuery<ENTITY, QUERY>> :
 
     fun select(
         vararg expressions: ColumnExpression<*, *>,
-    ): FlowSubquery<Columns>
+    ): FlowSubquery<Record>
 
     fun selectColumns(
         vararg expressions: ColumnExpression<*, *>,
-    ): FlowSubquery<Columns>
+    ): FlowSubquery<Record>
 }

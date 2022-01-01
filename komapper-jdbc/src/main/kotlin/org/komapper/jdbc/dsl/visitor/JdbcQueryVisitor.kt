@@ -17,8 +17,8 @@ import org.komapper.core.dsl.context.TemplateExecuteContext
 import org.komapper.core.dsl.context.TemplateSelectContext
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
-import org.komapper.core.dsl.query.Columns
 import org.komapper.core.dsl.query.Query
+import org.komapper.core.dsl.query.Record
 import org.komapper.core.dsl.query.Row
 import org.komapper.core.dsl.visitor.QueryVisitor
 import org.komapper.jdbc.dsl.runner.EntityDeleteBatchJdbcRunner
@@ -347,7 +347,7 @@ internal object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
     override fun <R> multipleColumnsSelectQuery(
         context: SelectContext<*, *, *>,
         expressions: List<ColumnExpression<*, *>>,
-        collect: suspend (Flow<Columns>) -> R
+        collect: suspend (Flow<Record>) -> R
     ): JdbcRunner<R> {
         val transform = JdbcResultSetTransformers.multipleColumns(expressions)
         return SelectJdbcRunner(context, transform, collect)
@@ -356,7 +356,7 @@ internal object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
     override fun <R> multipleColumnsSetOperationQuery(
         context: SetOperationContext,
         expressions: List<ColumnExpression<*, *>>,
-        collect: suspend (Flow<Columns>) -> R
+        collect: suspend (Flow<Record>) -> R
     ): JdbcRunner<R> {
         val transform = JdbcResultSetTransformers.multipleColumns(expressions)
         return SetOperationJdbcRunner(context, transform, collect)

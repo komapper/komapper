@@ -169,11 +169,11 @@ internal data class RelationSelectQueryImpl<ENTITY : Any, ID : Any, META : Entit
         return TripleNotNullColumnsSelectQuery(newContext, Triple(expression1, expression2, expression3))
     }
 
-    override fun select(vararg expressions: ColumnExpression<*, *>): FlowSubquery<Columns> {
+    override fun select(vararg expressions: ColumnExpression<*, *>): FlowSubquery<Record> {
         return selectColumns(*expressions)
     }
 
-    override fun selectColumns(vararg expressions: ColumnExpression<*, *>): FlowSubquery<Columns> {
+    override fun selectColumns(vararg expressions: ColumnExpression<*, *>): FlowSubquery<Record> {
         val list = expressions.toList()
         val newContext = support.select(*list.toTypedArray())
         return MultipleColumnsSelectQuery(newContext, list)

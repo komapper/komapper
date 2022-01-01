@@ -18,8 +18,8 @@ import org.komapper.core.dsl.context.TemplateExecuteContext
 import org.komapper.core.dsl.context.TemplateSelectContext
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
-import org.komapper.core.dsl.query.Columns
 import org.komapper.core.dsl.query.Query
+import org.komapper.core.dsl.query.Record
 import org.komapper.core.dsl.query.Row
 
 @ThreadSafe
@@ -231,13 +231,13 @@ interface QueryVisitor<VISIT_RESULT> {
     fun <R> multipleColumnsSelectQuery(
         context: SelectContext<*, *, *>,
         expressions: List<ColumnExpression<*, *>>,
-        collect: suspend (Flow<Columns>) -> R
+        collect: suspend (Flow<Record>) -> R
     ): VISIT_RESULT
 
     fun <R> multipleColumnsSetOperationQuery(
         context: SetOperationContext,
         expressions: List<ColumnExpression<*, *>>,
-        collect: suspend (Flow<Columns>) -> R
+        collect: suspend (Flow<Record>) -> R
     ): VISIT_RESULT
 
     fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>

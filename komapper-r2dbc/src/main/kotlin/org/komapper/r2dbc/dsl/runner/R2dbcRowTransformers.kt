@@ -3,8 +3,8 @@ package org.komapper.r2dbc.dsl.runner
 import io.r2dbc.spi.Row
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
-import org.komapper.core.dsl.query.Columns
-import org.komapper.core.dsl.query.ColumnsImpl
+import org.komapper.core.dsl.query.Record
+import org.komapper.core.dsl.query.RecordImpl
 import org.komapper.r2dbc.R2dbcDialect
 
 internal object R2dbcRowTransformers {
@@ -83,9 +83,9 @@ internal object R2dbcRowTransformers {
             transform(Triple(first, second, third))
         }
 
-    fun multipleColumns(expressions: List<ColumnExpression<*, *>>): (R2dbcDialect, Row) -> Columns = { dialect, row ->
+    fun multipleColumns(expressions: List<ColumnExpression<*, *>>): (R2dbcDialect, Row) -> Record = { dialect, row ->
         val mapper = R2dbcPropertyMapper(dialect, row)
         val map = expressions.associateWith { mapper.execute(it) }
-        ColumnsImpl(map)
+        RecordImpl(map)
     }
 }

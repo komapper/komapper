@@ -17,8 +17,8 @@ import org.komapper.core.dsl.context.TemplateExecuteContext
 import org.komapper.core.dsl.context.TemplateSelectContext
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
-import org.komapper.core.dsl.query.Columns
 import org.komapper.core.dsl.query.Query
+import org.komapper.core.dsl.query.Record
 import org.komapper.core.dsl.query.Row
 import org.komapper.core.dsl.visitor.QueryVisitor
 import org.komapper.r2dbc.dsl.runner.EntityDeleteSingleR2dbcRunner
@@ -339,7 +339,7 @@ internal object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
     override fun <R> multipleColumnsSelectQuery(
         context: SelectContext<*, *, *>,
         expressions: List<ColumnExpression<*, *>>,
-        collect: suspend (Flow<Columns>) -> R
+        collect: suspend (Flow<Record>) -> R
     ): R2dbcRunner<R> {
         val transform = R2dbcRowTransformers.multipleColumns(expressions)
         return SelectR2dbcRunner(context, transform, collect)
@@ -348,7 +348,7 @@ internal object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
     override fun <R> multipleColumnsSetOperationQuery(
         context: SetOperationContext,
         expressions: List<ColumnExpression<*, *>>,
-        collect: suspend (Flow<Columns>) -> R
+        collect: suspend (Flow<Record>) -> R
     ): R2dbcRunner<R> {
         val transform = R2dbcRowTransformers.multipleColumns(expressions)
         return SetOperationR2dbcRunner(context, transform, collect)
