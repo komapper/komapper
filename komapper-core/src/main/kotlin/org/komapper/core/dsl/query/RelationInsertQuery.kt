@@ -8,9 +8,28 @@ import org.komapper.core.dsl.operator.plus
 import org.komapper.core.dsl.options.InsertOptions
 import org.komapper.core.dsl.visitor.QueryVisitor
 
+/**
+ * Represents the query to insert rows.
+ * This query returns a pair containing the number of rows affected and the ID(s) generated.
+ * @param ENTITY the entity type
+ * @param ID the entity id type
+ * @param META the entity metamodel type
+ * @param R the result type of query
+ */
 interface RelationInsertQuery<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, R> : Query<R> {
-    fun options(configure: (InsertOptions) -> InsertOptions): RelationInsertQuery<ENTITY, ID, META, R>
+    /**
+     * Builds a VALUES clause.
+     * @param declaration the assignment declaration
+     * @return the query
+     */
     fun values(declaration: AssignmentDeclaration<ENTITY, META>): RelationInsertQuery<ENTITY, ID, META, Pair<Int, ID?>>
+
+    /**
+     * Builds a query with the options applied.
+     * @param configure the configure function to apply options
+     * @return the query
+     */
+    fun options(configure: (InsertOptions) -> InsertOptions): RelationInsertQuery<ENTITY, ID, META, R>
 }
 
 internal data class RelationInsertSelectQuery<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(

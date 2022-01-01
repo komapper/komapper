@@ -5,7 +5,7 @@ import org.komapper.core.dsl.context.SetOperationContext
 import org.komapper.core.dsl.context.TemplateSelectContext
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
-import org.komapper.core.dsl.query.Columns
+import org.komapper.core.dsl.query.Record
 import org.komapper.core.dsl.query.Row
 import org.komapper.core.dsl.visitor.FlowQueryVisitor
 import org.komapper.r2dbc.dsl.runner.FlowBuilder
@@ -130,7 +130,7 @@ internal object R2dbcFlowQueryVisitor : FlowQueryVisitor<FlowBuilder<*>> {
     override fun multipleColumnsSelectQuery(
         context: SelectContext<*, *, *>,
         expressions: List<ColumnExpression<*, *>>
-    ): FlowBuilder<Columns> {
+    ): FlowBuilder<Record> {
         val transform = R2dbcRowTransformers.multipleColumns(expressions)
         return SelectFlowBuilder(context, transform)
     }
@@ -138,7 +138,7 @@ internal object R2dbcFlowQueryVisitor : FlowQueryVisitor<FlowBuilder<*>> {
     override fun multipleColumnsSetOperationQuery(
         context: SetOperationContext,
         expressions: List<ColumnExpression<*, *>>
-    ): FlowBuilder<Columns> {
+    ): FlowBuilder<Record> {
         val transform = R2dbcRowTransformers.multipleColumns(expressions)
         return SetOperationFlowBuilder(context, transform)
     }

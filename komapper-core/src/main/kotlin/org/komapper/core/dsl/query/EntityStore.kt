@@ -4,28 +4,65 @@ import org.komapper.core.ThreadSafe
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import kotlin.reflect.cast
 
+/**
+ * The store containing the retrieved entities.
+ */
 @ThreadSafe
 interface EntityStore {
 
+    /**
+     * Whether the entity metamodel is contained in this store.
+     * @param metamodel the entity metamodel
+     * @return whether the entity metamodel is contained in this store
+     */
     operator fun contains(metamodel: EntityMetamodel<*, *, *>): Boolean
 
+    /**
+     * Returns an entity set.
+     * @param metamodel the entity metamodel
+     * @return the entity set
+     */
     operator fun <T : Any> get(metamodel: EntityMetamodel<T, *, *>): Set<T>
 
+    /**
+     * Returns a one-to-one association.
+     * @param first the entity metamodel of the base side
+     * @param second the entity metamodel of another side
+     * @return the one-to-one association
+     */
     fun <T : Any, S : Any> oneToOne(
         first: EntityMetamodel<T, *, *>,
         second: EntityMetamodel<S, *, *>
     ): Map<T, S?>
 
+    /**
+     * Returns a one-to-one association with the entity ID as the base-side type.
+     * @param first the entity metamodel of the base side
+     * @param second the entity metamodel of another side
+     * @return the one-to-one association
+     */
     fun <T : Any, ID : Any, S : Any> oneToOneById(
         first: EntityMetamodel<T, ID, *>,
         second: EntityMetamodel<S, *, *>
     ): Map<ID, S?>
 
+    /**
+     * Returns a one-to-many association.
+     * @param first the entity metamodel of the base side
+     * @param second the entity metamodel of another side
+     * @return the one-to-many association
+     */
     fun <T : Any, S : Any> oneToMany(
         first: EntityMetamodel<T, *, *>,
         second: EntityMetamodel<S, *, *>
     ): Map<T, Set<S>>
 
+    /**
+     * Returns a one-to-many association with the entity ID as the base-side type.
+     * @param first the entity metamodel of the base side
+     * @param second the entity metamodel of another side
+     * @return the one-to-many association
+     */
     fun <T : Any, ID : Any, S : Any> oneToManyById(
         first: EntityMetamodel<T, ID, *>,
         second: EntityMetamodel<S, *, *>

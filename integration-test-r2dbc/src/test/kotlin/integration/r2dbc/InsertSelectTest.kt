@@ -20,6 +20,18 @@ class InsertSelectTest(private val db: R2dbcDatabase) {
         val a = Meta.address
         val aa = a.clone(table = "ADDRESS_ARCHIVE")
         val (count, ids) = db.runQuery {
+            val query = QueryDsl.from(a).where { a.addressId between 1..5 }
+            QueryDsl.insert(aa).select(query)
+        }
+        assertEquals(5, count)
+        assertEquals(emptyList(), ids)
+    }
+
+    @Test
+    fun test_lambda() = inTransaction(db) {
+        val a = Meta.address
+        val aa = a.clone(table = "ADDRESS_ARCHIVE")
+        val (count, ids) = db.runQuery {
             QueryDsl.insert(aa).select {
                 QueryDsl.from(a).where { a.addressId between 1..5 }
             }
@@ -28,7 +40,7 @@ class InsertSelectTest(private val db: R2dbcDatabase) {
         assertEquals(emptyList(), ids)
     }
 
-    // TODO: MySQL driver doesn't return all generated values after an insert select statement is issued
+// TODO: MySQL driver doesn't return all generated values after an insert select statement is issued
     @Run(unless = [Dbms.MYSQL])
     @Test
     fun generatedKeys() = inTransaction(db) {

@@ -8,6 +8,7 @@ pluginManagement {
     plugins {
         kotlin("jvm") version kotlinVersion
         kotlin("plugin.spring") version kotlinVersion
+        id("org.jetbrains.dokka") version kotlinVersion
         id("com.google.devtools.ksp") version kspVersion
         id("org.springframework.boot") version springBootVersion
     }

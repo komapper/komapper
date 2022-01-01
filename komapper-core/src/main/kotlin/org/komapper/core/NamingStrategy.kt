@@ -2,12 +2,23 @@ package org.komapper.core
 
 import java.nio.CharBuffer
 
+/**
+ * The naming strategy.
+ */
 @ThreadSafe
 interface NamingStrategy {
 
+    /**
+     * Applies the naming strategy to the given [name].
+     * @param name the name
+     * @return the converted name
+     */
     fun apply(name: String): String
 }
 
+/**
+ * Converts the camel case name to the lower snake case name.
+ */
 object CamelToLowerSnakeCase : NamingStrategy {
 
     private val camelToSnakeCase = CamelToSnakeCase(Char::lowercaseChar)
@@ -17,6 +28,9 @@ object CamelToLowerSnakeCase : NamingStrategy {
     }
 }
 
+/**
+ * Converts the camel case name to the upper snake case name.
+ */
 object CamelToUpperSnakeCase : NamingStrategy {
 
     private val camelToSnakeCase = CamelToSnakeCase(Char::uppercaseChar)
@@ -47,12 +61,18 @@ private class CamelToSnakeCase(private val mapper: (Char) -> Char) {
     }
 }
 
+/**
+ * Converts nothing.
+ */
 object Implicit : NamingStrategy {
     override fun apply(name: String): String {
         return name
     }
 }
 
+/**
+ * Converts the snake case name to the lower camel case name.
+ */
 object SnakeToLowerCamelCase : NamingStrategy {
 
     private val snakeToCamelCase = SnakeToCamelCase(Char::lowercaseChar)
@@ -62,6 +82,9 @@ object SnakeToLowerCamelCase : NamingStrategy {
     }
 }
 
+/**
+ * Converts the snake case name to the upper camel case name.
+ */
 object SnakeToUpperCamelCase : NamingStrategy {
 
     private val snakeToCamelCase = SnakeToCamelCase(Char::uppercaseChar)

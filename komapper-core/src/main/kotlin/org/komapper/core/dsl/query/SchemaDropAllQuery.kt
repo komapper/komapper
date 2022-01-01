@@ -4,7 +4,16 @@ import org.komapper.core.dsl.context.SchemaContext
 import org.komapper.core.dsl.options.SchemaOptions
 import org.komapper.core.dsl.visitor.QueryVisitor
 
+/**
+ * Represents the query to drop all tables and their associated constraints.
+ * This query returns Unit.
+ */
 interface SchemaDropAllQuery : Query<Unit> {
+    /**
+     * Builds a query with the options applied.
+     * @param configure the configure function to apply options
+     * @return the query
+     */
     fun options(configure: (SchemaOptions) -> SchemaOptions): SchemaDropAllQuery
 }
 

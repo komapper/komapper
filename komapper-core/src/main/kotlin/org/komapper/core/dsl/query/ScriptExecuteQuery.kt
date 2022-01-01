@@ -4,7 +4,16 @@ import org.komapper.core.dsl.context.ScriptContext
 import org.komapper.core.dsl.options.ScriptOptions
 import org.komapper.core.dsl.visitor.QueryVisitor
 
+/**
+ * Represents the query to execute a script.
+ * This query returns Unit.
+ */
 interface ScriptExecuteQuery : Query<Unit> {
+    /**
+     * Builds a query with the options applied.
+     * @param configure the configure function to apply options
+     * @return the query
+     */
     fun options(configure: (ScriptOptions) -> ScriptOptions): ScriptExecuteQuery
 }
 

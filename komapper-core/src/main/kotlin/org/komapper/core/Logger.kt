@@ -2,6 +2,9 @@ package org.komapper.core
 
 import java.time.LocalTime
 
+/**
+ * The Logger.
+ */
 @ThreadSafe
 interface Logger {
     fun trace(category: String, message: () -> String)
@@ -11,6 +14,9 @@ interface Logger {
     fun error(category: String, message: () -> String)
 }
 
+/**
+ * Simple [Logger] implementation printing log messages to the standard output.
+ */
 class StdOutLogger : Logger {
     override fun trace(category: String, message: () -> String) {
         log(category, message)
@@ -38,6 +44,9 @@ class StdOutLogger : Logger {
     }
 }
 
+/**
+ * Represents log category.
+ */
 enum class LogCategory(val value: String) {
     SQL("org.komapper.SQL"),
     SQL_WITH_ARGS("org.komapper.SQL_WITH_ARGS"),

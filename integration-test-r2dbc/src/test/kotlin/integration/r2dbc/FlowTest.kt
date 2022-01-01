@@ -8,8 +8,6 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
 import org.komapper.core.dsl.TemplateDsl
-import org.komapper.core.dsl.operator.count
-import org.komapper.core.dsl.query.ScalarQuery
 import org.komapper.r2dbc.R2dbcDatabase
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -229,13 +227,5 @@ class FlowTest(val db: R2dbcDatabase) {
             TemplateDsl.from("select address_id from ADDRESS order by address_id").select { it.asInt("address_id") }
         }
         assertEquals((1..15).toList(), flow.toList())
-    }
-
-    @Test
-    fun scalar() = inTransaction(db) {
-        val a = Meta.address
-        val scalarQuery: ScalarQuery<Long?, Long, Long> = QueryDsl.from(a).select(count(a.street))
-        val flow = db.flow { scalarQuery }
-        assertEquals(listOf(15L), flow.toList())
     }
 }

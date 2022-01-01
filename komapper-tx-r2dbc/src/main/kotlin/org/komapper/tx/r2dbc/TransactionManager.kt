@@ -15,6 +15,9 @@ import org.komapper.core.LoggerFacade
 import org.komapper.core.ThreadSafe
 import org.reactivestreams.Publisher
 
+/**
+ * The R2DBC transaction APIs designed for advanced use.
+ */
 @ThreadSafe
 interface TransactionManager {
     val connectionFactory: ConnectionFactory

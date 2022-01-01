@@ -23,6 +23,11 @@ EntityMetamodel<ENTITY, ID, META>.checkIdValueNotNull(entities: List<ENTITY>) {
     }
 }
 
+/**
+ * Executes a dry run.
+ * @param config the database configuration
+ * @return the result of dry run
+ */
 fun Query<*>.dryRun(config: DatabaseConfig = DryRunDatabaseConfig): DryRunResult {
     val description = if (config is DryRunDatabaseConfig) {
         "This data was generated using DryRunDatabaseConfig. " +

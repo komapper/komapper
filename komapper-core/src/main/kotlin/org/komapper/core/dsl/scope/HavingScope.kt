@@ -4,6 +4,9 @@ import org.komapper.core.Scope
 import org.komapper.core.dsl.expression.Criterion
 import org.komapper.core.dsl.expression.HavingDeclaration
 
+/**
+ * Represents the scope for the having expression.
+ */
 @Scope
 class HavingScope(
     private val support: FilterScopeSupport

@@ -5,6 +5,11 @@ import org.komapper.core.dsl.context.TemplateSelectContext
 import org.komapper.core.dsl.visitor.FlowQueryVisitor
 import org.komapper.core.dsl.visitor.QueryVisitor
 
+/**
+ * Represents the query to retrieve rows using sql template.
+ * This query returns a list or flow that contains the retrieved rows.
+ * @param T the element type of [List] or [Flow]
+ */
 interface TemplateSelectQuery<T> : ListQuery<T>, FlowQuery<T>
 
 internal data class TemplateSelectQueryImpl<T>(

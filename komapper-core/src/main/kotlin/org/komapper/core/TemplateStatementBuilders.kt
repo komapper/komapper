@@ -4,7 +4,13 @@ import org.komapper.core.spi.TemplateStatementBuilderFactory
 import org.komapper.core.spi.findByPriority
 import java.util.ServiceLoader
 
+/**
+ * The provider of [TemplateStatementBuilder].
+ */
 object TemplateStatementBuilders {
+    /**
+     * @return the [TemplateStatementBuilder] instance
+     */
     fun get(dialect: Dialect): TemplateStatementBuilder {
         val loader = ServiceLoader.load(TemplateStatementBuilderFactory::class.java)
         val factory = loader.findByPriority()

@@ -12,45 +12,45 @@ import org.komapper.core.dsl.visitor.QueryVisitor
 internal data class MultipleColumnsSetOperationQuery(
     override val context: SetOperationContext,
     private val expressions: List<ColumnExpression<*, *>>
-) : FlowSetOperationQuery<Columns> {
+) : FlowSetOperationQuery<Record> {
 
-    private val support: SetOperationQuerySupport<Columns> = SetOperationQuerySupport(context)
+    private val support: SetOperationQuerySupport<Record> = SetOperationQuerySupport(context)
 
     override fun <VISIT_RESULT> accept(visitor: FlowQueryVisitor<VISIT_RESULT>): VISIT_RESULT {
         return visitor.multipleColumnsSetOperationQuery(context, expressions)
     }
 
-    override fun <R> collect(collect: suspend (Flow<Columns>) -> R): Query<R> = object : Query<R> {
+    override fun <R> collect(collect: suspend (Flow<Record>) -> R): Query<R> = object : Query<R> {
         override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
             return visitor.multipleColumnsSetOperationQuery(context, expressions, collect)
         }
     }
 
-    override fun except(other: SubqueryExpression<Columns>): FlowSetOperationQuery<Columns> {
+    override fun except(other: SubqueryExpression<Record>): FlowSetOperationQuery<Record> {
         return copy(context = support.except(other))
     }
 
-    override fun intersect(other: SubqueryExpression<Columns>): FlowSetOperationQuery<Columns> {
+    override fun intersect(other: SubqueryExpression<Record>): FlowSetOperationQuery<Record> {
         return copy(context = support.intersect(other))
     }
 
-    override fun union(other: SubqueryExpression<Columns>): FlowSetOperationQuery<Columns> {
+    override fun union(other: SubqueryExpression<Record>): FlowSetOperationQuery<Record> {
         return copy(context = support.union(other))
     }
 
-    override fun unionAll(other: SubqueryExpression<Columns>): FlowSetOperationQuery<Columns> {
+    override fun unionAll(other: SubqueryExpression<Record>): FlowSetOperationQuery<Record> {
         return copy(context = support.unionAll(other))
     }
 
-    override fun orderBy(vararg aliases: CharSequence): FlowSetOperationQuery<Columns> {
+    override fun orderBy(vararg aliases: CharSequence): FlowSetOperationQuery<Record> {
         return copy(context = support.orderBy(*aliases))
     }
 
-    override fun orderBy(vararg expressions: SortExpression): FlowSetOperationQuery<Columns> {
+    override fun orderBy(vararg expressions: SortExpression): FlowSetOperationQuery<Record> {
         return copy(context = support.orderBy(*expressions))
     }
 
-    override fun options(configure: (SelectOptions) -> SelectOptions): FlowSetOperationQuery<Columns> {
+    override fun options(configure: (SelectOptions) -> SelectOptions): FlowSetOperationQuery<Record> {
         val newContext = context.copy(options = configure(context.options))
         return copy(context = newContext)
     }

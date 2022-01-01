@@ -6,11 +6,47 @@ import org.komapper.core.Dialect
 import org.komapper.core.StatementPart
 import kotlin.reflect.KClass
 
+/**
+ * Represents a dialect for R2DBC access.
+ */
 interface R2dbcDialect : Dialect {
+    /**
+     * Data types.
+     */
     val dataTypes: List<R2dbcDataType<*>>
+
+    /**
+     * Returns the value.
+     * @param row the row
+     * @param index the index
+     * @param valueClass the value class
+     * @return the value
+     */
     fun getValue(row: Row, index: Int, valueClass: KClass<*>): Any?
+
+    /**
+     * Returns the value.
+     * @param row the row
+     * @param columnLabel the column label
+     * @param valueClass the value class
+     * @return the value
+     */
     fun getValue(row: Row, columnLabel: String, valueClass: KClass<*>): Any?
+
+    /**
+     * Sets the value.
+     * @param statement the statement
+     * @param index the index
+     * @param value the value
+     * @param valueClass the value class
+     */
     fun setValue(statement: Statement, index: Int, value: Any?, valueClass: KClass<*>)
+
+    /**
+     * Returns the data type.
+     * @param klass the value class
+     * @return the data type
+     */
     fun getDataType(klass: KClass<*>): R2dbcDataType<*>
 }
 

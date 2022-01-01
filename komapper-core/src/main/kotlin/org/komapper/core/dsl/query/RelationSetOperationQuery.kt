@@ -9,6 +9,10 @@ import org.komapper.core.dsl.options.SelectOptions
 import org.komapper.core.dsl.visitor.FlowQueryVisitor
 import org.komapper.core.dsl.visitor.QueryVisitor
 
+/**
+ * Represents the set operation query.
+ * @param ENTITY the entity type
+ */
 interface RelationSetOperationQuery<ENTITY : Any> : FlowSetOperationQuery<ENTITY>
 
 internal data class RelationSetOperationQueryImpl<ENTITY : Any>(

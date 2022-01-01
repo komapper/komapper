@@ -12,6 +12,9 @@ import org.komapper.r2dbc.dsl.runner.R2dbcRunner
 import org.komapper.r2dbc.dsl.visitor.R2dbcFlowQueryVisitor
 import org.komapper.r2dbc.dsl.visitor.R2dbcQueryVisitor
 
+/**
+ * Represents a database accessed by R2DBC.
+ */
 interface R2dbcDatabase : R2dbc {
 
     companion object {
@@ -46,25 +49,48 @@ interface R2dbcDatabase : R2dbc {
         }
     }
 
+    /**
+     * The database configuration.
+     */
     val config: R2dbcDatabaseConfig
 
+    /**
+     * Runs the given [query] and returns the result.
+     * @param query the query
+     * @return the result represented by the query
+     */
     @Suppress("UNCHECKED_CAST")
     suspend fun <T> runQuery(query: Query<T>): T {
         val runner = query.accept(R2dbcQueryVisitor) as R2dbcRunner<T>
         return runner.run(config)
     }
 
+    /**
+     * Runs the given [block] and returns the result.
+     * @param block the block that returns a query
+     * @return the result represented by the query
+     */
     suspend fun <T> runQuery(block: QueryScope.() -> Query<T>): T {
         val query = block(QueryScope)
         return runQuery(query)
     }
 
+    /**
+     * Converts the given [query] to [Flow].
+     * @param query the query
+     * @return the flow
+     */
     @Suppress("UNCHECKED_CAST")
     fun <T> flow(query: FlowQuery<T>): Flow<T> {
         val builder = query.accept(R2dbcFlowQueryVisitor) as FlowBuilder<T>
         return builder.build(config)
     }
 
+    /**
+     * Converts the given [block] to [Flow].
+     * @param block the block that returns a query
+     * @return the flow
+     */
     fun <T> flow(block: QueryScope.() -> FlowQuery<T>): Flow<T> {
         val query = block(QueryScope)
         return flow(query)

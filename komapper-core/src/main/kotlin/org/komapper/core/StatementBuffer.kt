@@ -1,5 +1,8 @@
 package org.komapper.core
 
+/**
+ * The buffer for the SQL statement.
+ */
 class StatementBuffer {
     val parts = mutableListOf<StatementPart>()
 

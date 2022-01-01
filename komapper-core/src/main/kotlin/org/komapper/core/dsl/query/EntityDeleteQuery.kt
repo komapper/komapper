@@ -5,7 +5,16 @@ import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.DeleteOptions
 import org.komapper.core.dsl.visitor.QueryVisitor
 
+/**
+ * Represents the query to delete entities.
+ * This query returns Unit.
+ */
 interface EntityDeleteQuery : Query<Unit> {
+    /**
+     * Builds a query with the options applied.
+     * @param configure the configure function to apply options
+     * @return the query
+     */
     fun options(configure: (DeleteOptions) -> DeleteOptions): EntityDeleteQuery
 }
 

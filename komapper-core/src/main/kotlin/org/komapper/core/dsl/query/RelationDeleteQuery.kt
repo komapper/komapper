@@ -7,8 +7,23 @@ import org.komapper.core.dsl.operator.plus
 import org.komapper.core.dsl.options.DeleteOptions
 import org.komapper.core.dsl.visitor.QueryVisitor
 
+/**
+ * Represents the query to delete rows.
+ * This query returns the number of rows affected.
+ */
 interface RelationDeleteQuery : Query<Int> {
+    /**
+     * Builds a WHERE clause.
+     * @param declaration the where declaration
+     * @return the query
+     */
     fun where(declaration: WhereDeclaration): RelationDeleteQuery
+
+    /**
+     * Builds a query with the options applied.
+     * @param configure the configure function to apply options
+     * @return the query
+     */
     fun options(configure: (DeleteOptions) -> DeleteOptions): RelationDeleteQuery
 }
 

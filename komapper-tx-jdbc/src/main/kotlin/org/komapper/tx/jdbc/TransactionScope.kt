@@ -2,9 +2,19 @@ package org.komapper.tx.jdbc
 
 import org.komapper.core.Scope
 
+/**
+ * The JDBC transaction scope.
+ */
 @Scope
 interface TransactionScope : UserTransaction {
+    /**
+     * Marks the transaction as rollback.
+     */
     fun setRollbackOnly()
+
+    /**
+     * Returns true if the transaction is marked as rollback.
+     */
     fun isRollbackOnly(): Boolean
 }
 

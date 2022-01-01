@@ -2,8 +2,8 @@ package org.komapper.jdbc.dsl.runner
 
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
-import org.komapper.core.dsl.query.Columns
-import org.komapper.core.dsl.query.ColumnsImpl
+import org.komapper.core.dsl.query.Record
+import org.komapper.core.dsl.query.RecordImpl
 import org.komapper.jdbc.JdbcDialect
 import java.sql.ResultSet
 
@@ -83,10 +83,10 @@ internal object JdbcResultSetTransformers {
             transform(Triple(first, second, third))
         }
 
-    fun multipleColumns(expressions: List<ColumnExpression<*, *>>): (JdbcDialect, ResultSet) -> Columns =
+    fun multipleColumns(expressions: List<ColumnExpression<*, *>>): (JdbcDialect, ResultSet) -> Record =
         { dialect, rs ->
             val mapper = JdbcPropertyMapper(dialect, rs)
             val map = expressions.associateWith { mapper.execute(it) }
-            ColumnsImpl(map)
+            RecordImpl(map)
         }
 }

@@ -4,6 +4,9 @@ import org.komapper.core.Scope
 import org.komapper.core.dsl.expression.Criterion
 import org.komapper.core.dsl.expression.OnDeclaration
 
+/**
+ * Represents the scope for the join on expression.
+ */
 @Scope
 class OnScope(
     private val support: FilterScopeSupport

@@ -4,6 +4,9 @@ import org.komapper.core.Scope
 import org.komapper.core.dsl.expression.Criterion
 import org.komapper.core.dsl.expression.WhenDeclaration
 
+/**
+ * Represents the scope for the case when expression.
+ */
 @Scope
 class WhenScope(
     private val support: FilterScopeSupport

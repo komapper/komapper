@@ -5,11 +5,21 @@ import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.InsertOptions
 import org.komapper.core.dsl.visitor.QueryVisitor
 
+/**
+ * Represents the query to upsert entities.
+ * This query returns a numeric value or a list of numeric values returned by the driver.
+ * @param T the entity type
+ */
 interface EntityUpsertQuery<T> : Query<T> {
+    /**
+     * Builds a query with the options applied.
+     * @param configure the configure function to apply options
+     * @return the query
+     */
     fun options(configure: (InsertOptions) -> InsertOptions): EntityUpsertQuery<T>
 }
 
-data class EntityUpsertSingleQuery<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
+internal data class EntityUpsertSingleQuery<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityUpsertContext<ENTITY, ID, META>,
     private val entity: ENTITY
 ) : EntityUpsertQuery<Int> {
@@ -22,7 +32,7 @@ data class EntityUpsertSingleQuery<ENTITY : Any, ID : Any, META : EntityMetamode
     }
 }
 
-data class EntityUpsertSingleUpdateQuery<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
+internal data class EntityUpsertSingleUpdateQuery<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityUpsertContext<ENTITY, ID, META>,
     private val entity: ENTITY
 ) : Query<ENTITY> {
@@ -32,7 +42,7 @@ data class EntityUpsertSingleUpdateQuery<ENTITY : Any, ID : Any, META : EntityMe
     }
 }
 
-data class EntityUpsertSingleIgnoreQuery<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
+internal data class EntityUpsertSingleIgnoreQuery<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityUpsertContext<ENTITY, ID, META>,
     private val entity: ENTITY
 ) : EntityUpsertQuery<ENTITY?> {
@@ -45,7 +55,7 @@ data class EntityUpsertSingleIgnoreQuery<ENTITY : Any, ID : Any, META : EntityMe
     }
 }
 
-data class EntityUpsertMultipleQuery<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
+internal data class EntityUpsertMultipleQuery<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityUpsertContext<ENTITY, ID, META>,
     private val entities: List<ENTITY>
 ) : EntityUpsertQuery<Int> {

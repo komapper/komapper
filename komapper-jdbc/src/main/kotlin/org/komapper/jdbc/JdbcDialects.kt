@@ -5,9 +5,17 @@ import org.komapper.jdbc.spi.JdbcDialectFactory
 import java.util.ServiceLoader
 import java.util.regex.Pattern
 
+/**
+ * The provider of [JdbcDialect]
+ */
 object JdbcDialects {
     private val jdbcUrlPattern = Pattern.compile("^jdbc:(tc:)?([^:]*):.*")
 
+    /**
+     * @param url the JDBC URL
+     * @param dataTypes the data types
+     * @return the [JdbcDialect]
+     */
     fun get(url: String, dataTypes: List<JdbcDataType<*>>): JdbcDialect {
         val driver = extractJdbcDriver(url)
         val loader = ServiceLoader.load(JdbcDialectFactory::class.java)
