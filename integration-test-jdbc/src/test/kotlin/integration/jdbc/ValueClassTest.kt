@@ -214,7 +214,7 @@ class ValueClassTest(val db: JdbcDatabase) {
     fun expression_count() {
         val a = Meta.vAddress
         val count = db.runQuery {
-            QueryDsl.from(a).select(count()).first()
+            QueryDsl.from(a).select(count())
         }
         assertEquals(15, count)
     }
@@ -223,7 +223,7 @@ class ValueClassTest(val db: JdbcDatabase) {
     fun expression_max() {
         val a = Meta.vAddress
         val max = db.runQuery {
-            QueryDsl.from(a).select(max(a.addressId)).first()
+            QueryDsl.from(a).select(max(a.addressId))
         }
         assertEquals(IntId(15), max)
     }

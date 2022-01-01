@@ -215,7 +215,7 @@ class ValueClassTest(val db: R2dbcDatabase) {
     fun expression_count() = inTransaction(db) {
         val a = Meta.vAddress
         val count = db.runQuery {
-            QueryDsl.from(a).select(count()).first()
+            QueryDsl.from(a).select(count())
         }
         assertEquals(15, count)
     }
@@ -224,7 +224,7 @@ class ValueClassTest(val db: R2dbcDatabase) {
     fun expression_max() = inTransaction(db) {
         val a = Meta.vAddress
         val max = db.runQuery {
-            QueryDsl.from(a).select(max(a.addressId)).first()
+            QueryDsl.from(a).select(max(a.addressId))
         }
         assertEquals(IntId(15), max)
     }

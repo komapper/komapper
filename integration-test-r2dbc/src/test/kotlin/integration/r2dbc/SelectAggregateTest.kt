@@ -10,7 +10,6 @@ import org.komapper.core.dsl.operator.count
 import org.komapper.core.dsl.operator.max
 import org.komapper.core.dsl.operator.min
 import org.komapper.core.dsl.operator.sum
-import org.komapper.core.dsl.query.first
 import org.komapper.r2dbc.R2dbcDatabase
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -22,7 +21,7 @@ class SelectAggregateTest(private val db: R2dbcDatabase) {
     fun aggregate_avg() = inTransaction(db) {
         val a = Meta.address
         val avg = db.runQuery {
-            QueryDsl.from(a).select(avg(a.addressId)).first()
+            QueryDsl.from(a).select(avg(a.addressId))
         }
         assertEquals(8.0, avg!!, 0.0)
     }
@@ -31,7 +30,7 @@ class SelectAggregateTest(private val db: R2dbcDatabase) {
     fun aggregate_countAsterisk() = inTransaction(db) {
         val a = Meta.address
         val count = db.runQuery {
-            QueryDsl.from(a).select(count()).first()
+            QueryDsl.from(a).select(count())
         }
         assertEquals(15, count)
     }
@@ -40,7 +39,7 @@ class SelectAggregateTest(private val db: R2dbcDatabase) {
     fun aggregate_count() = inTransaction(db) {
         val a = Meta.address
         val count = db.runQuery {
-            QueryDsl.from(a).select(count(a.street)).first()
+            QueryDsl.from(a).select(count(a.street))
         }
         assertEquals(15, count)
     }
@@ -48,21 +47,21 @@ class SelectAggregateTest(private val db: R2dbcDatabase) {
     @Test
     fun aggregate_sum() = inTransaction(db) {
         val a = Meta.address
-        val sum = db.runQuery { QueryDsl.from(a).select(sum(a.addressId)).first() }
+        val sum = db.runQuery { QueryDsl.from(a).select(sum(a.addressId)) }
         assertEquals(120, sum)
     }
 
     @Test
     fun aggregate_max() = inTransaction(db) {
         val a = Meta.address
-        val max = db.runQuery { QueryDsl.from(a).select(max(a.addressId)).first() }
+        val max = db.runQuery { QueryDsl.from(a).select(max(a.addressId)) }
         assertEquals(15, max)
     }
 
     @Test
     fun aggregate_min() = inTransaction(db) {
         val a = Meta.address
-        val min = db.runQuery { QueryDsl.from(a).select(min(a.addressId)).first() }
+        val min = db.runQuery { QueryDsl.from(a).select(min(a.addressId)) }
         assertEquals(1, min)
     }
 
