@@ -17,6 +17,9 @@ import org.komapper.core.dsl.options.SelectOptions
 import org.komapper.core.dsl.visitor.FlowQueryVisitor
 import org.komapper.core.dsl.visitor.QueryVisitor
 
+/**
+ * Represents the query to retrieve rows.
+ */
 interface RelationSelectQuery<ENTITY : Any> : SelectQuery<ENTITY, RelationSelectQuery<ENTITY>>
 
 internal data class RelationSelectQueryImpl<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(

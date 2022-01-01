@@ -15,6 +15,8 @@ import java.util.UUID
 import kotlin.reflect.KClass
 
 /**
+ * Represents a single row connected to the result set obtained by query execution.
+ * This interface provides access to the column values.
  * Note that columns are numbered from 0.
  */
 interface Row {

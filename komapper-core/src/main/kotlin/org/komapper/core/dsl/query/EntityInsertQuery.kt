@@ -5,7 +5,17 @@ import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.InsertOptions
 import org.komapper.core.dsl.visitor.QueryVisitor
 
+/**
+ * Represents the query to insert entities.
+ * This query returns new entity or entities.
+ * @param T the entity type
+ */
 interface EntityInsertQuery<T> : Query<T> {
+    /**
+     * Builds a query with the options applied.
+     * @param configure the configure function to apply options
+     * @return the query
+     */
     fun options(configure: (InsertOptions) -> InsertOptions): EntityInsertQuery<T>
 }
 

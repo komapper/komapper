@@ -10,6 +10,10 @@ import org.komapper.core.dsl.expression.WhereDeclaration
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.SelectOptions
 
+/**
+ * Represents the query to retrieve data.
+ */
+// TODO change
 interface SelectQuery<ENTITY : Any, QUERY : SelectQuery<ENTITY, QUERY>> :
     FlowSubquery<ENTITY> {
     fun distinct(): QUERY

@@ -4,6 +4,9 @@ import org.komapper.core.Scope
 import org.komapper.core.dsl.expression.Criterion
 import org.komapper.core.dsl.expression.WhereDeclaration
 
+/**
+ * Represents the scope for the where expression.
+ */
 @Scope
 class WhereScope(
     private val support: FilterScopeSupport

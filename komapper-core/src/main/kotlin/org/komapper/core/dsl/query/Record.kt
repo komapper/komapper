@@ -4,6 +4,9 @@ import org.komapper.core.ThreadSafe
 import org.komapper.core.dsl.expression.ColumnExpression
 import kotlin.reflect.cast
 
+/**
+ * Represents a single row detached from the result set obtained by query execution.
+ */
 @ThreadSafe
 interface Record<K> {
     val keys: Set<K>
@@ -13,6 +16,7 @@ interface Record<K> {
     operator fun iterator(): Iterator<Map.Entry<K, Any?>>
 }
 
+// TODO rename
 interface Columns : Record<ColumnExpression<*, *>> {
     operator fun <T : Any> get(key: ColumnExpression<T, *>): T?
 }

@@ -8,9 +8,31 @@ import org.komapper.core.dsl.operator.plus
 import org.komapper.core.dsl.options.UpdateOptions
 import org.komapper.core.dsl.visitor.QueryVisitor
 
+/**
+ * Represents the query to update rows.
+ * This query returns the number of rows affected.
+ * @param ENTITY the entity type
+ * @param ID the entity id type
+ * @param META the entity metamodel type
+ */
 interface RelationUpdateQuery<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> : Query<Int> {
+    /**
+     * Sets the values to be updated.
+     * @param declaration the assignment declaration
+     * @return the query
+     */
     fun set(declaration: AssignmentDeclaration<ENTITY, META>): RelationUpdateQuery<ENTITY, ID, META>
+    /**
+     * Builds a query to update specified rows.
+     * @param declaration the where declaration
+     * @return the query
+     */
     fun where(declaration: WhereDeclaration): RelationUpdateQuery<ENTITY, ID, META>
+    /**
+     * Builds a query with the options applied.
+     * @param configure the configure function to apply options
+     * @return the query
+     */
     fun options(configure: (UpdateOptions) -> UpdateOptions): RelationUpdateQuery<ENTITY, ID, META>
 }
 

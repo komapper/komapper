@@ -5,6 +5,9 @@ import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.expression.Operand
 import org.komapper.core.dsl.metamodel.PropertyMetamodel
 
+/**
+ * Represents the scope for the assignment expression.
+ */
 @Scope
 class AssignmentScope<ENTITY : Any>(
     private val assignments: MutableList<Pair<PropertyMetamodel<ENTITY, *, *>, Operand>> = mutableListOf()

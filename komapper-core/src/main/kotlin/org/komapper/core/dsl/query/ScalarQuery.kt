@@ -5,6 +5,14 @@ import org.komapper.core.dsl.expression.ScalarQueryExpression
 import org.komapper.core.dsl.expression.TableExpression
 import kotlin.reflect.KClass
 
+/**
+ * Represents a query that returns a scalar.
+ * ```kotlin
+ * val a = Meta.address
+ * val query: ScalarQuery<Long?, Long, Long> = QueryDsl.from(a).select(count())
+ * ```
+ */
+// TODO change
 interface ScalarQuery<A, B : Any, C : Any> : FlowSubquery<A>, ScalarQueryExpression<A, B, C>
 
 internal data class ScalarQueryImpl<A, B : Any, C : Any>(

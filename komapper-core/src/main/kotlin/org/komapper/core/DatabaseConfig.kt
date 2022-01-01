@@ -2,7 +2,14 @@ package org.komapper.core
 
 import java.util.UUID
 
+/**
+ * Database configuration.
+ */
+@ThreadSafe
 interface DatabaseConfig {
+    /**
+     * The identity of this configuration.
+     */
     val id: UUID
     val dialect: Dialect
     val clockProvider: ClockProvider
@@ -13,6 +20,9 @@ interface DatabaseConfig {
     val templateStatementBuilder: TemplateStatementBuilder
 }
 
+/**
+ * Database configuration for a dry run.
+ */
 object DryRunDatabaseConfig : DatabaseConfig {
     override val id: UUID
         get() = throw UnsupportedOperationException()

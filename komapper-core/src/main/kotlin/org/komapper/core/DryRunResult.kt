@@ -1,5 +1,13 @@
 package org.komapper.core
 
+/**
+ * The result of dry run.
+ * @property sql the SQL string
+ * @property sqlWithArgs the SQL string with arguments
+ * @property args the arguments
+ * @property throwable the exception
+ * @property description the description
+ */
 data class DryRunResult(
     val sql: String = "",
     val sqlWithArgs: String = "",

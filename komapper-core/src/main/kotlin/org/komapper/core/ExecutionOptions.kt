@@ -1,6 +1,7 @@
 package org.komapper.core
 
 /**
+ * The options for sql execution.
  * @property batchSize the batch size. This value is used for batch commands.
  * @property fetchSize the fetch size.
  * @property maxRows the max rows.
@@ -26,6 +27,10 @@ data class ExecutionOptions(
     }
 }
 
+/**
+ * The provider of [ExecutionOptions].
+ */
+@ThreadSafe
 interface ExecutionOptionsProvider {
     fun getExecutionOptions(): ExecutionOptions
 }

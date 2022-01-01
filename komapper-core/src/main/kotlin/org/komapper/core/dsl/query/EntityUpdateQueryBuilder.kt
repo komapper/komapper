@@ -5,14 +5,54 @@ import org.komapper.core.dsl.context.EntityUpdateContext
 import org.komapper.core.dsl.expression.AssignmentDeclaration
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.metamodel.PropertyMetamodel
+import org.komapper.core.dsl.options.DeleteOptions
 
+/**
+ * The builder of update queries.
+ * @param ENTITY the entity type
+ * @param ID the entity id type
+ * @param META the entity metamodel type
+ */
+// TODO rename
 @ThreadSafe
 interface EntityUpdateQueryBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> {
+    /**
+     * Returns a new builder that updates specified properties.
+     * @param properties the properties to be included
+     * @return the query
+     */
     fun include(vararg properties: PropertyMetamodel<ENTITY, *, *>): EntityUpdateQueryBuilder<ENTITY, ID, META>
+    /**
+     * Returns a new builder that does not update specified properties.
+     * @param properties the properties to be excluded
+     * @return the query
+     */
     fun exclude(vararg properties: PropertyMetamodel<ENTITY, *, *>): EntityUpdateQueryBuilder<ENTITY, ID, META>
+    /**
+     * Builds a query to update a single entity.
+     * @param entity the entity to be updated
+     * @return the query
+     */
     fun single(entity: ENTITY): EntityUpdateQuery<ENTITY>
+    /**
+     * Builds a query to update a list of entities in a batch.
+     * @param entities the entities to be updated
+     * @param batchSize the batch size. If it is null, the value of [DeleteOptions.batchSize] will be used.
+     * @return the query
+     */
     fun batch(entities: List<ENTITY>, batchSize: Int? = null): EntityUpdateQuery<List<ENTITY>>
+    /**
+     * Builds a query to delete an array of entities in a batch.
+     * @param entities the entities to be deleted
+     * @param batchSize the batch size. If it is null, the value of [DeleteOptions.batchSize] will be used.
+     * @return the query
+     */
     fun batch(vararg entities: ENTITY, batchSize: Int? = null): EntityUpdateQuery<List<ENTITY>>
+    /**
+     * Sets the values to be updated.
+     * @param declaration the assignment declaration
+     * @return the query
+     */
     fun set(declaration: AssignmentDeclaration<ENTITY, META>): RelationUpdateQuery<ENTITY, ID, META>
 }
 

@@ -4,6 +4,13 @@ import org.komapper.core.ThreadSafe
 import org.komapper.core.dsl.context.EntityUpsertContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 
+/**
+ * The builder of upsert queries.
+ * @param ENTITY the entity type
+ * @param ID the entity id type
+ * @param META the entity metamodel type
+ */
+// TODO make it internal
 @ThreadSafe
 interface EntityUpsertQueryBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> {
     fun single(entity: ENTITY): EntityUpsertQuery<Int>

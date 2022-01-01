@@ -7,14 +7,52 @@ import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.operator.plus
 import org.komapper.core.dsl.scope.AssignmentScope
 
+/**
+ * Represents the builder of the query that inserts entities and ignores duplicate keys.
+ * @param ENTITY the entity type
+ * @param ID the entity id type
+ * @param META the entity metamodel type
+ */
+// TODO rename
 @ThreadSafe
 interface EntityInsertOnDuplicateKeyIgnoreQuery<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> {
+    // TODO remove
     fun set(declaration: AssignmentScope<ENTITY>.(META) -> Unit): EntityInsertOnDuplicateKeyIgnoreQuery<ENTITY, ID, META>
+    /**
+     * Builds a query to insert a single entity.
+     * @param entity the entity to be inserted
+     * @return the query
+     */
     fun single(entity: ENTITY): EntityUpsertQuery<Int>
+    /**
+     * Builds a query to bulk insert a list of entities.
+     * @param entities the entities to be inserted
+     * @return the query
+     */
     fun multiple(entities: List<ENTITY>): EntityUpsertQuery<Int>
+    /**
+     * Builds a query to bulk insert an array of entities.
+     * @param entities the entities to be inserted
+     * @return the query
+     */
     fun multiple(vararg entities: ENTITY): EntityUpsertQuery<Int>
+    /**
+     * Builds a query to bulk insert a list of entities.
+     * @param entities the entities to be inserted
+     * @return the query
+     */
     fun batch(entities: List<ENTITY>, batchSize: Int? = null): EntityUpsertQuery<List<Int>>
+    /**
+     * Builds a query to bulk insert an array of entities.
+     * @param entities the entities to be inserted
+     * @return the query
+     */
     fun batch(vararg entities: ENTITY, batchSize: Int? = null): EntityUpsertQuery<List<Int>>
+    /**
+     * Builds a query to insert or update a single entity and get the result as a new entity.
+     * @param entity the entity to be inserted
+     * @return the query that returns a new entity only when the entity is inserted
+     */
     fun executeAndGet(entity: ENTITY): EntityUpsertQuery<ENTITY?>
 }
 

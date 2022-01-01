@@ -4,13 +4,49 @@ import org.komapper.core.ThreadSafe
 import org.komapper.core.dsl.context.EntityDeleteContext
 import org.komapper.core.dsl.expression.WhereDeclaration
 import org.komapper.core.dsl.metamodel.EntityMetamodel
+import org.komapper.core.dsl.options.DeleteOptions
 
+/**
+ * The builder of delete queries.
+ * @param ENTITY the entity type
+ */
+// TODO rename
 @ThreadSafe
 interface EntityDeleteQueryBuilder<ENTITY : Any> {
+    /**
+     * Builds a query to delete a single entity.
+     * @param entity the entity to be deleted
+     * @return the query
+     */
     fun single(entity: ENTITY): EntityDeleteQuery
+
+    /**
+     * Builds a query to delete a list of entities in a batch.
+     * @param entities the entities to be deleted
+     * @param batchSize the batch size. If it is null, the value of [DeleteOptions.batchSize] will be used.
+     * @return the query
+     */
     fun batch(entities: List<ENTITY>, batchSize: Int? = null): EntityDeleteQuery
+
+    /**
+     * Builds a query to delete an array of entities in a batch.
+     * @param entities the entities to be deleted
+     * @param batchSize the batch size. If it is null, the value of [DeleteOptions.batchSize] will be used.
+     * @return the query
+     */
     fun batch(vararg entities: ENTITY, batchSize: Int? = null): EntityDeleteQuery
+
+    /**
+     * Builds a query to delete specified rows.
+     * @param declaration the where declaration
+     * @return the query
+     */
     fun where(declaration: WhereDeclaration): RelationDeleteQuery
+
+    /**
+     * Builds a query to delete all rows.
+     * @return the query
+     */
     fun all(): RelationDeleteQuery
 }
 

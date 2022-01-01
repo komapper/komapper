@@ -8,16 +8,65 @@ import org.komapper.core.dsl.expression.SubqueryExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.metamodel.PropertyMetamodel
 
+/**
+ * The builder of insert queries.
+ * @param ENTITY the entity type
+ * @param ID the entity id type
+ * @param META the entity metamodel type
+ */
+// TODO rename
 @ThreadSafe
 interface EntityInsertQueryBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> {
     fun onDuplicateKeyUpdate(vararg keys: PropertyMetamodel<ENTITY, *, *> = emptyArray()): EntityInsertOnDuplicateKeyUpdateQuery<ENTITY, ID, META>
     fun onDuplicateKeyIgnore(vararg keys: PropertyMetamodel<ENTITY, *, *> = emptyArray()): EntityInsertOnDuplicateKeyIgnoreQuery<ENTITY, ID, META>
+
+    /**
+     * Builds a query to insert a single entity.
+     * @param entity the entity to be inserted
+     * @return the query
+     */
     fun single(entity: ENTITY): EntityInsertQuery<ENTITY>
+
+    /**
+     * Builds a query to bulk insert a list of entities.
+     * @param entities the entities to be inserted
+     * @return the query
+     */
     fun multiple(entities: List<ENTITY>): EntityInsertQuery<List<ENTITY>>
+
+    /**
+     * Builds a query to bulk insert an array of entities.
+     * @param entities the entities to be inserted
+     * @return the query
+     */
     fun multiple(vararg entities: ENTITY): EntityInsertQuery<List<ENTITY>>
+
+    /**
+     * Builds a query to insert a list of entities in a batch.
+     * @param entities the entities to be inserted
+     * @return the query
+     */
     fun batch(entities: List<ENTITY>, batchSize: Int? = null): EntityInsertQuery<List<ENTITY>>
+
+    /**
+     * Builds a query to insert an array of entities in a batch.
+     * @param entities the entities to be inserted
+     * @return the query
+     */
     fun batch(vararg entities: ENTITY, batchSize: Int? = null): EntityInsertQuery<List<ENTITY>>
+
+    /**
+     * Builds a query to insert rows using the select expression.
+     * @param block the select expression
+     * @return the query
+     */
     fun select(block: () -> SubqueryExpression<ENTITY>): RelationInsertQuery<ENTITY, ID, META, Pair<Int, List<ID>>>
+
+    /**
+     * Builds a query to insert a single row with specified values.
+     * @param declaration the assignment declaration
+     * @return the query
+     */
     fun values(declaration: AssignmentDeclaration<ENTITY, META>): RelationInsertQuery<ENTITY, ID, META, Pair<Int, ID?>>
 }
 

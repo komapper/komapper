@@ -4,6 +4,9 @@ import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.expression.EscapeExpression
 import org.komapper.core.dsl.expression.SubqueryExpression
 
+/**
+ * Represents the scope for filtering.
+ */
 interface FilterScope {
     infix fun <T : Any, S : Any> ColumnExpression<T, S>.eq(operand: ColumnExpression<T, S>)
 
