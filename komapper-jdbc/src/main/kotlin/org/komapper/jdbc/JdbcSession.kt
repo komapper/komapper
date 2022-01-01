@@ -4,8 +4,14 @@ import org.komapper.core.ThreadSafe
 import java.sql.Connection
 import javax.sql.DataSource
 
+/**
+ * Represents a session for JDBC access.
+ */
 @ThreadSafe
 interface JdbcSession {
+    /**
+     * The JDBC connection.
+     */
     val connection: Connection
 }
 

@@ -17,26 +17,24 @@ import java.util.UUID
 import javax.sql.DataSource
 
 /**
- * A database configuration.
- *
- * @property id the id of this configuration. The id is used as a key to manage sequence values. The name must be unique.
- * @property dialect the dialect
- * @property logger the logger
- * @property clockProvider the clock provider
- * @property executionOptions the jdbc configuration
- * @property session the session
+ * Represents a database configuration for JDBC access.
  */
 @ThreadSafe
 interface JdbcDatabaseConfig : DatabaseConfig {
-    override val id: UUID
+    /**
+     * The dialect.
+     */
     override val dialect: JdbcDialect
-    override val clockProvider: ClockProvider
-    override val executionOptions: ExecutionOptions
-    override val logger: Logger
+
+/**
+     * The session to the database.
+     */
     val session: JdbcSession
-    override val statementInspector: StatementInspector
+
+    /**
+     * The data factory.
+     */
     val dataFactory: JdbcDataFactory
-    override val templateStatementBuilder: TemplateStatementBuilder
 }
 
 open class DefaultJdbcDatabaseConfig(

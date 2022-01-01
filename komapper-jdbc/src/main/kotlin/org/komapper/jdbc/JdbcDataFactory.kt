@@ -6,6 +6,9 @@ import java.sql.Clob
 import java.sql.NClob
 import java.sql.SQLXML
 
+/**
+ * Represents a factory for JDBC-specific data.
+ */
 @ThreadSafe
 interface JdbcDataFactory {
     fun createArrayOf(typeName: String, elements: List<*>): java.sql.Array

@@ -5,8 +5,14 @@ import io.r2dbc.spi.ConnectionFactory
 import org.komapper.core.ThreadSafe
 import org.reactivestreams.Publisher
 
+/**
+ * Represents a session for R2DBC access.
+ */
 @ThreadSafe
 interface R2dbcSession {
+    /**
+     * The R2DBC connection.
+     */
     val connection: Publisher<out Connection>
 }
 

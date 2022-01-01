@@ -16,19 +16,21 @@ import org.komapper.core.TemplateStatementBuilders
 import org.komapper.core.ThreadSafe
 import java.util.UUID
 
+/**
+ * Represents a database configuration for R2DBC access.
+ */
 @ThreadSafe
 interface R2dbcDatabaseConfig : DatabaseConfig {
-    override val id: UUID
+
+    /**
+     * The dialect.
+     */
     override val dialect: R2dbcDialect
-    override val clockProvider: ClockProvider
-    override val executionOptions: ExecutionOptions
-    override val logger: Logger
 
+/**
+     * The session to the database.
+     */
     val session: R2dbcSession
-    override val statementInspector: StatementInspector
-
-    // val dataFactory: DataFactory
-    override val templateStatementBuilder: TemplateStatementBuilder
 }
 
 class DefaultR2dbcDatabaseConfig(

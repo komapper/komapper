@@ -8,6 +8,12 @@ import java.sql.SQLFeatureNotSupportedException
 import java.util.logging.Logger
 import javax.sql.DataSource
 
+/**
+ * A simple implementation of [DataSource].
+ * @property url the JDBC URL
+ * @property user the JDBC user
+ * @property password the JDBC password
+ */
 @Suppress("MemberVisibilityCanBePrivate")
 @ThreadSafe
 class SimpleDataSource(val url: String, val user: String = "", val password: String = "") : DataSource {
