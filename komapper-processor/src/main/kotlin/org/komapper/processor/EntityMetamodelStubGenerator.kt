@@ -24,7 +24,7 @@ internal class EntityMetamodelStubGenerator(
         "schema: String = \"\"",
         "alwaysQuote: Boolean = false",
         "disableSequenceAssignment: Boolean = false",
-        "declarations: List<${ClassNames.MetamodelDeclaration}<$entityTypeName, Any, $simpleName>> = emptyList()"
+        "declarations: List<${ClassNames.EntityMetamodelDeclaration}<$simpleName>> = emptyList()"
     ).joinToString(", ")
 
     override fun run() {

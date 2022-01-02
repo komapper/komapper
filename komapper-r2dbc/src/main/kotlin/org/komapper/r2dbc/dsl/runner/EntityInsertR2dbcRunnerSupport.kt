@@ -36,7 +36,7 @@ internal class EntityInsertR2dbcRunnerSupport<ENTITY : Any, ID : Any, META : Ent
     fun postInsert(entity: ENTITY, generatedKey: Long): ENTITY {
         val idGenerator = context.target.idGenerator()
         return if (idGenerator is IdGenerator.AutoIncrement<ENTITY, ID>) {
-            val id = context.target.toId(generatedKey)!!
+            val id = context.target.convertToId(generatedKey)!!
             idGenerator.property.setter(entity, id)
         } else {
             entity

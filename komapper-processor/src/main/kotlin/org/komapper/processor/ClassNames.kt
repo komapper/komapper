@@ -16,7 +16,7 @@ internal object ClassNames {
     const val PropertyMetamodelStub = "org.komapper.core.dsl.metamodel.PropertyMetamodelStub"
     const val Clock = "java.time.Clock"
     const val EntityDescriptor = "__EntityDescriptor"
-    const val MetamodelDeclaration = "org.komapper.core.dsl.metamodel.MetamodelDeclaration"
+    const val EntityMetamodelDeclaration = "org.komapper.core.dsl.metamodel.EntityMetamodelDeclaration"
     const val Meta = "org.komapper.core.dsl.Meta"
     const val KomapperStub = "KomapperStub"
     const val Operand = "org.komapper.core.dsl.expression.Operand"

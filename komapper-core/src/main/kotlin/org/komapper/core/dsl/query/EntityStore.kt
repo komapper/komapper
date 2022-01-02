@@ -100,7 +100,7 @@ internal class EntityStoreImpl(
         second: EntityMetamodel<S, *, *>
     ): Map<ID, S?> {
         val oneToMany = createOneToMany(first, second)
-        return oneToMany.mapKeys { first.id(it.key) }.mapValues { it.value.firstOrNull() }
+        return oneToMany.mapKeys { first.extractId(it.key) }.mapValues { it.value.firstOrNull() }
     }
 
     override fun <T : Any, S : Any> oneToMany(
@@ -115,7 +115,7 @@ internal class EntityStoreImpl(
         second: EntityMetamodel<S, *, *>
     ): Map<ID, Set<S>> {
         val oneToMany = createOneToMany(first, second)
-        return oneToMany.mapKeys { first.id(it.key) }
+        return oneToMany.mapKeys { first.extractId(it.key) }
     }
 
     private fun <T : Any, S : Any> createOneToMany(

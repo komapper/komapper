@@ -16,7 +16,12 @@ fun PropertyMetamodel<*, *, *>.isAutoIncrement(): Boolean {
     return this == this.owner.getAutoIncrementProperty()
 }
 
-fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> META.define(declaration: MetamodelDeclaration<ENTITY, ID, META>): META {
+/**
+ * Creates a new entity metamodel.
+ * @param declaration the entity metamodel declaration
+ * @return the new entity metamodel
+ */
+fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> META.define(declaration: EntityMetamodelDeclaration<META>): META {
     return newMetamodel(
         table = tableName(),
         catalog = catalogName(),
@@ -27,10 +32,13 @@ fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> META.defi
     )
 }
 
+/**
+ * Returns the where declaration.
+ */
 val <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> META.where: WhereDeclaration
     get() {
         val metamodel = this
-        val scope = MetamodelScope<ENTITY, ID, META>().apply {
+        val scope = EntityMetamodelScope().apply {
             val declaration = metamodel.declaration()
             declaration(metamodel)
         }
