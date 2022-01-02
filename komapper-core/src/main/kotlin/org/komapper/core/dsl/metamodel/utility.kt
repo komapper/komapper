@@ -16,7 +16,12 @@ fun PropertyMetamodel<*, *, *>.isAutoIncrement(): Boolean {
     return this == this.owner.getAutoIncrementProperty()
 }
 
-fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> META.define(declaration: MetamodelDeclaration<ENTITY, ID, META>): META {
+/**
+ * Creates a new entity metamodel.
+ * @param declaration the entity metamodel declaration
+ * @return the new entity metamodel
+ */
+fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> META.define(declaration: EntityMetamodelDeclaration<META>): META {
     return newMetamodel(
         table = tableName(),
         catalog = catalogName(),
@@ -27,12 +32,30 @@ fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> META.defi
     )
 }
 
+/**
+ * Returns the where declaration.
+ */
 val <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> META.where: WhereDeclaration
     get() {
         val metamodel = this
-        val scope = MetamodelScope<ENTITY, ID, META>().apply {
+        val scope = EntityMetamodelScope().apply {
             val declaration = metamodel.declaration()
             declaration(metamodel)
         }
         return scope.where
     }
+
+/**
+ * Check the version of the metamodel.
+ * @param metamodelName the full qualified name of the metamodel
+ * @param version the version of the metamodel
+ * @exception IllegalArgumentException if the version is not compatible.
+ */
+fun checkMetamodelVersion(metamodelName: String, version: Int) {
+    if (version != EntityMetamodel.METAMODEL_VERSION) {
+        throw IllegalArgumentException(
+            "The metamodel version of \"$metamodelName\" is not compatible. expected: ${EntityMetamodel.METAMODEL_VERSION}, actual: $version. " +
+                "Regenerate \"$metamodelName\"."
+        )
+    }
+}

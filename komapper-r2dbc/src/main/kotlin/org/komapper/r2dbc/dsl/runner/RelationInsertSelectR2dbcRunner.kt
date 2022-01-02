@@ -23,7 +23,7 @@ internal class RelationInsertSelectR2dbcRunner<ENTITY : Any, ID : Any, META : En
         }
         val executor = R2dbcExecutor(config, context.options, generatedColumn)
         val (count, keys) = executor.executeUpdate(statement)
-        val ids = keys.map { context.target.toId(it) }.filterNotNull()
+        val ids = keys.map { context.target.convertToId(it) }.filterNotNull()
         return count to ids
     }
 

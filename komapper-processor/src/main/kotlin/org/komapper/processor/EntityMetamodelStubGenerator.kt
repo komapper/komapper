@@ -1,10 +1,10 @@
 package org.komapper.processor
 
 import com.google.devtools.ksp.symbol.KSClassDeclaration
-import org.komapper.processor.ClassNames.EntityMetamodelImplementor
-import org.komapper.processor.ClassNames.EntityMetamodelStub
-import org.komapper.processor.ClassNames.PropertyMetamodel
-import org.komapper.processor.ClassNames.PropertyMetamodelStub
+import org.komapper.processor.Symbols.EntityMetamodelImplementor
+import org.komapper.processor.Symbols.EntityMetamodelStub
+import org.komapper.processor.Symbols.PropertyMetamodel
+import org.komapper.processor.Symbols.PropertyMetamodelStub
 import java.io.PrintWriter
 import java.time.ZonedDateTime
 
@@ -24,7 +24,7 @@ internal class EntityMetamodelStubGenerator(
         "schema: String = \"\"",
         "alwaysQuote: Boolean = false",
         "disableSequenceAssignment: Boolean = false",
-        "declarations: List<${ClassNames.MetamodelDeclaration}<$entityTypeName, Any, $simpleName>> = emptyList()"
+        "declarations: List<${Symbols.EntityMetamodelDeclaration}<$simpleName>> = emptyList()"
     ).joinToString(", ")
 
     override fun run() {

@@ -25,7 +25,7 @@ class EntityStoreFactory {
                 }
                 @Suppress("UNCHECKED_CAST")
                 metamodel as EntityMetamodel<Any, Any, *>
-                val id = metamodel.id(entity)
+                val id = metamodel.extractId(entity)
                 val key = EntityKey(metamodel, id)
                 val prev = cache.putIfAbsent(key, entity)
                 newRow[metamodel] = prev ?: entity

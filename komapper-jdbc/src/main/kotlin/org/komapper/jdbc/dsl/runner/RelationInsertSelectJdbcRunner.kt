@@ -20,7 +20,7 @@ internal class RelationInsertSelectJdbcRunner<ENTITY : Any, ID : Any, META : Ent
         val requiresGeneratedKeys = context.target.idGenerator() is IdGenerator.AutoIncrement<ENTITY, ID>
         val executor = JdbcExecutor(config, context.options, requiresGeneratedKeys)
         val (count, keys) = executor.executeUpdate(statement)
-        val ids = keys.map { context.target.toId(it) }.filterNotNull()
+        val ids = keys.map { context.target.convertToId(it) }.filterNotNull()
         return count to ids
     }
 

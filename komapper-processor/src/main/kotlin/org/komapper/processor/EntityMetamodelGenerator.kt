@@ -1,22 +1,23 @@
 package org.komapper.processor
 
 import com.google.devtools.ksp.symbol.Nullability
-import org.komapper.processor.ClassNames.Argument
-import org.komapper.processor.ClassNames.AutoIncrement
-import org.komapper.processor.ClassNames.Clock
-import org.komapper.processor.ClassNames.ConcurrentHashMap
-import org.komapper.processor.ClassNames.EntityDescriptor
-import org.komapper.processor.ClassNames.EntityMetamodel
-import org.komapper.processor.ClassNames.EntityMetamodelImplementor
-import org.komapper.processor.ClassNames.IdContext
-import org.komapper.processor.ClassNames.IdGenerator
-import org.komapper.processor.ClassNames.MetamodelDeclaration
-import org.komapper.processor.ClassNames.Operand
-import org.komapper.processor.ClassNames.PropertyDescriptor
-import org.komapper.processor.ClassNames.PropertyMetamodel
-import org.komapper.processor.ClassNames.PropertyMetamodelImpl
-import org.komapper.processor.ClassNames.Sequence
-import org.komapper.processor.ClassNames.UUID
+import org.komapper.processor.Symbols.Argument
+import org.komapper.processor.Symbols.AutoIncrement
+import org.komapper.processor.Symbols.Clock
+import org.komapper.processor.Symbols.ConcurrentHashMap
+import org.komapper.processor.Symbols.EntityDescriptor
+import org.komapper.processor.Symbols.EntityMetamodel
+import org.komapper.processor.Symbols.EntityMetamodelDeclaration
+import org.komapper.processor.Symbols.EntityMetamodelImplementor
+import org.komapper.processor.Symbols.IdContext
+import org.komapper.processor.Symbols.IdGenerator
+import org.komapper.processor.Symbols.Operand
+import org.komapper.processor.Symbols.PropertyDescriptor
+import org.komapper.processor.Symbols.PropertyMetamodel
+import org.komapper.processor.Symbols.PropertyMetamodelImpl
+import org.komapper.processor.Symbols.Sequence
+import org.komapper.processor.Symbols.UUID
+import org.komapper.processor.Symbols.checkMetamodelVersion
 import java.io.PrintWriter
 import java.time.ZonedDateTime
 
@@ -42,7 +43,7 @@ internal class EntityMetamodelGenerator(
         "schema: String = \"${entity.table.schema}\"",
         "alwaysQuote: Boolean = ${entity.table.alwaysQuote}",
         "disableSequenceAssignment: Boolean = false",
-        "declaration: $MetamodelDeclaration<$entityTypeName, $idTypeName, $simpleName> = {}"
+        "declaration: $EntityMetamodelDeclaration<$simpleName> = {}"
     ).joinToString(", ")
 
     override fun run() {
@@ -80,8 +81,8 @@ internal class EntityMetamodelGenerator(
         createdAtProperty()
         updatedAtProperty()
         properties()
-        id()
-        toId()
+        extractId()
+        convertToId()
         versionAssignment()
         createdAtAssignment()
         updatedAtAssignment()
@@ -191,7 +192,7 @@ internal class EntityMetamodelGenerator(
                 is IdKind.Sequence -> {
                     val paramList = listOf(
                         "$p",
-                        "::toId",
+                        "::convertToId",
                         "$EntityDescriptor.__idContextMap",
                         "\"${idKind.name}\"",
                         "\"${idKind.catalog}\"",
@@ -231,7 +232,7 @@ internal class EntityMetamodelGenerator(
         w.println("    override fun properties(): List<$PropertyMetamodel<$entityTypeName, *, *>> = listOf($nameList)")
     }
 
-    private fun id() {
+    private fun extractId() {
         val body = if (entity.idProperties.size == 1) {
             val p = entity.idProperties[0]
             val nullable = p.nullability == Nullability.NULLABLE
@@ -243,10 +244,10 @@ internal class EntityMetamodelGenerator(
             }
             "listOf($list)"
         }
-        w.println("    override fun id(e: $entityTypeName): $idTypeName = $body")
+        w.println("    override fun extractId(e: $entityTypeName): $idTypeName = $body")
     }
 
-    private fun toId() {
+    private fun convertToId() {
         val body = if (entity.idProperties.size == 1) {
             val p = entity.idProperties[0]
             val id = when (p.valueClass?.property?.typeName ?: p.typeName) {
@@ -259,7 +260,7 @@ internal class EntityMetamodelGenerator(
         } else {
             "null"
         }
-        w.println("    override fun toId(generatedKey: Long): $idTypeName? = $body")
+        w.println("    override fun convertToId(generatedKey: Long): $idTypeName? = $body")
     }
 
     private fun versionAssignment() {
@@ -376,7 +377,7 @@ internal class EntityMetamodelGenerator(
 
     private fun newMetamodel() {
         val paramList =
-            "table: String, catalog: String, schema: String, alwaysQuote: Boolean, disableSequenceAssignment: Boolean, declaration: $MetamodelDeclaration<$entityTypeName, $idTypeName, $simpleName>"
+            "table: String, catalog: String, schema: String, alwaysQuote: Boolean, disableSequenceAssignment: Boolean, declaration: $EntityMetamodelDeclaration<$simpleName>"
         w.println("    override fun newMetamodel($paramList) = $simpleName(table, catalog, schema, alwaysQuote, disableSequenceAssignment, declaration)")
     }
 
@@ -386,6 +387,9 @@ internal class EntityMetamodelGenerator(
 
     private fun companionObject() {
         w.println("    companion object {")
+        w.println("        init {")
+        w.println("            $checkMetamodelVersion(\"$packageName.$simpleName\", $EntityMetamodel.METAMODEL_VERSION)")
+        w.println("        }")
         for (alias in aliases) {
             w.println("        val $alias = $simpleName()")
         }

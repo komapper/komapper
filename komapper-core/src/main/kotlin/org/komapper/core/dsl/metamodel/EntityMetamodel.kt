@@ -8,15 +8,22 @@ import kotlin.reflect.KClass
 
 @ThreadSafe
 interface EntityMetamodel<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> : TableExpression<ENTITY> {
-    fun declaration(): MetamodelDeclaration<ENTITY, ID, META>
+    companion object {
+        /**
+         * The version of the metamodel.
+         * This version will be changed when the specification is changed.
+         */
+        const val METAMODEL_VERSION: Int = 1
+    }
+    fun declaration(): EntityMetamodelDeclaration<META>
     fun idGenerator(): IdGenerator<ENTITY, ID>?
     fun idProperties(): List<PropertyMetamodel<ENTITY, *, *>>
     fun versionProperty(): PropertyMetamodel<ENTITY, *, *>?
     fun createdAtProperty(): PropertyMetamodel<ENTITY, *, *>?
     fun updatedAtProperty(): PropertyMetamodel<ENTITY, *, *>?
     fun properties(): List<PropertyMetamodel<ENTITY, *, *>>
-    fun id(e: ENTITY): ID
-    fun toId(generatedKey: Long): ID?
+    fun extractId(e: ENTITY): ID
+    fun convertToId(generatedKey: Long): ID?
     fun versionAssignment(): Pair<PropertyMetamodel<ENTITY, *, *>, Operand>?
     fun createdAtAssignment(c: Clock): Pair<PropertyMetamodel<ENTITY, *, *>, Operand>?
     fun updatedAtAssignment(c: Clock): Pair<PropertyMetamodel<ENTITY, *, *>, Operand>?
@@ -30,7 +37,7 @@ interface EntityMetamodel<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY,
         schema: String,
         alwaysQuote: Boolean,
         disableSequenceAssignment: Boolean,
-        declaration: MetamodelDeclaration<ENTITY, ID, META>
+        declaration: EntityMetamodelDeclaration<META>
     ): META
 }
 
@@ -43,7 +50,7 @@ abstract class EntityMetamodelStub<ENTITY : Any, META : EntityMetamodelStub<ENTI
     override fun schemaName(): String = fail()
     override fun alwaysQuote(): Boolean = fail()
     override fun disableSequenceAssignment(): Boolean = fail()
-    override fun declaration(): MetamodelDeclaration<ENTITY, Any, META> = fail()
+    override fun declaration(): EntityMetamodelDeclaration<META> = fail()
     override fun idGenerator(): IdGenerator<ENTITY, Any>? = fail()
     override fun idProperties(): List<PropertyMetamodel<ENTITY, *, *>> = fail()
     override fun versionProperty(): PropertyMetamodel<ENTITY, *, *>? = fail()
@@ -51,8 +58,8 @@ abstract class EntityMetamodelStub<ENTITY : Any, META : EntityMetamodelStub<ENTI
     override fun updatedAtProperty(): PropertyMetamodel<ENTITY, *, *>? = fail()
     override fun properties(): List<PropertyMetamodel<ENTITY, *, *>> = fail()
     override fun newEntity(m: Map<PropertyMetamodel<*, *, *>, Any?>): ENTITY = fail()
-    override fun id(e: ENTITY): Any = fail()
-    override fun toId(generatedKey: Long): Any = fail()
+    override fun extractId(e: ENTITY): Any = fail()
+    override fun convertToId(generatedKey: Long): Any = fail()
     override fun versionAssignment(): Pair<PropertyMetamodel<ENTITY, *, *>, Operand>? = fail()
     override fun createdAtAssignment(c: Clock): Pair<PropertyMetamodel<ENTITY, *, *>, Operand>? = fail()
     override fun updatedAtAssignment(c: Clock): Pair<PropertyMetamodel<ENTITY, *, *>, Operand>? = fail()
@@ -65,7 +72,7 @@ abstract class EntityMetamodelStub<ENTITY : Any, META : EntityMetamodelStub<ENTI
         schema: String,
         alwaysQuote: Boolean,
         disableSequenceAssignment: Boolean,
-        declaration: MetamodelDeclaration<ENTITY, Any, META>
+        declaration: EntityMetamodelDeclaration<META>
     ): META = fail()
 
     private fun fail(): Nothing {
