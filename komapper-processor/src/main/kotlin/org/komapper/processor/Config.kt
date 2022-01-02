@@ -28,7 +28,7 @@ internal data class Config(
                     else -> error("'$it' is illegal value as a $namingStrategyKeyName option.")
                 }
             }
-            val metaObject = options.getOrDefault(metaObjectKeyName, ClassNames.Meta)
+            val metaObject = options.getOrDefault(metaObjectKeyName, Symbols.Meta)
             return Config(prefix, suffix, namingStrategy, metaObject)
         }
     }

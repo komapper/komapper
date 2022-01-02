@@ -1,22 +1,23 @@
 package org.komapper.processor
 
 import com.google.devtools.ksp.symbol.Nullability
-import org.komapper.processor.ClassNames.Argument
-import org.komapper.processor.ClassNames.AutoIncrement
-import org.komapper.processor.ClassNames.Clock
-import org.komapper.processor.ClassNames.ConcurrentHashMap
-import org.komapper.processor.ClassNames.EntityDescriptor
-import org.komapper.processor.ClassNames.EntityMetamodel
-import org.komapper.processor.ClassNames.EntityMetamodelDeclaration
-import org.komapper.processor.ClassNames.EntityMetamodelImplementor
-import org.komapper.processor.ClassNames.IdContext
-import org.komapper.processor.ClassNames.IdGenerator
-import org.komapper.processor.ClassNames.Operand
-import org.komapper.processor.ClassNames.PropertyDescriptor
-import org.komapper.processor.ClassNames.PropertyMetamodel
-import org.komapper.processor.ClassNames.PropertyMetamodelImpl
-import org.komapper.processor.ClassNames.Sequence
-import org.komapper.processor.ClassNames.UUID
+import org.komapper.processor.Symbols.Argument
+import org.komapper.processor.Symbols.AutoIncrement
+import org.komapper.processor.Symbols.Clock
+import org.komapper.processor.Symbols.ConcurrentHashMap
+import org.komapper.processor.Symbols.EntityDescriptor
+import org.komapper.processor.Symbols.EntityMetamodel
+import org.komapper.processor.Symbols.EntityMetamodelDeclaration
+import org.komapper.processor.Symbols.EntityMetamodelImplementor
+import org.komapper.processor.Symbols.IdContext
+import org.komapper.processor.Symbols.IdGenerator
+import org.komapper.processor.Symbols.Operand
+import org.komapper.processor.Symbols.PropertyDescriptor
+import org.komapper.processor.Symbols.PropertyMetamodel
+import org.komapper.processor.Symbols.PropertyMetamodelImpl
+import org.komapper.processor.Symbols.Sequence
+import org.komapper.processor.Symbols.UUID
+import org.komapper.processor.Symbols.checkMetamodelVersion
 import java.io.PrintWriter
 import java.time.ZonedDateTime
 
@@ -386,6 +387,9 @@ internal class EntityMetamodelGenerator(
 
     private fun companionObject() {
         w.println("    companion object {")
+        w.println("        init {")
+        w.println("            $checkMetamodelVersion(\"$packageName.$simpleName\", $EntityMetamodel.METAMODEL_VERSION)")
+        w.println("        }")
         for (alias in aliases) {
             w.println("        val $alias = $simpleName()")
         }

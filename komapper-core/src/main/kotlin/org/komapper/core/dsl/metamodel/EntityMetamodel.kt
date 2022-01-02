@@ -8,6 +8,13 @@ import kotlin.reflect.KClass
 
 @ThreadSafe
 interface EntityMetamodel<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> : TableExpression<ENTITY> {
+    companion object {
+        /**
+         * The version of the metamodel.
+         * This version will be changed when the specification is changed.
+         */
+        const val METAMODEL_VERSION: Int = 1
+    }
     fun declaration(): EntityMetamodelDeclaration<META>
     fun idGenerator(): IdGenerator<ENTITY, ID>?
     fun idProperties(): List<PropertyMetamodel<ENTITY, *, *>>

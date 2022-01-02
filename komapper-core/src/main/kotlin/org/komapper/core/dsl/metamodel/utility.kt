@@ -44,3 +44,18 @@ val <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> META.wher
         }
         return scope.where
     }
+
+/**
+ * Check the version of the metamodel.
+ * @param metamodelName the full qualified name of the metamodel
+ * @param version the version of the metamodel
+ * @exception IllegalArgumentException if the version is not compatible.
+ */
+fun checkMetamodelVersion(metamodelName: String, version: Int) {
+    if (version != EntityMetamodel.METAMODEL_VERSION) {
+        throw IllegalArgumentException(
+            "The metamodel version of \"$metamodelName\" is not compatible. expected: ${EntityMetamodel.METAMODEL_VERSION}, actual: $version. " +
+                "Regenerate \"$metamodelName\"."
+        )
+    }
+}

@@ -1,6 +1,6 @@
 package org.komapper.processor
 
-internal object ClassNames {
+internal object Symbols {
     const val ConcurrentHashMap = "java.util.concurrent.ConcurrentHashMap"
     const val EntityMetamodel = "org.komapper.core.dsl.metamodel.EntityMetamodel"
     const val EntityMetamodelStub = "org.komapper.core.dsl.metamodel.EntityMetamodelStub"
@@ -21,4 +21,5 @@ internal object ClassNames {
     const val KomapperStub = "KomapperStub"
     const val Operand = "org.komapper.core.dsl.expression.Operand"
     const val Argument = "$Operand.Argument"
+    const val checkMetamodelVersion = "org.komapper.core.dsl.metamodel.checkMetamodelVersion"
 }

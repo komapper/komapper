@@ -9,7 +9,7 @@ import com.google.devtools.ksp.symbol.KSType
 import com.google.devtools.ksp.symbol.Modifier
 import org.komapper.annotation.KomapperEntity
 import org.komapper.annotation.KomapperEntityDef
-import org.komapper.processor.ClassNames.KomapperStub
+import org.komapper.processor.Symbols.KomapperStub
 
 internal interface EntityDefinitionSourceResolver {
     fun resolve(symbol: KSNode): EntityDefinitionSource
