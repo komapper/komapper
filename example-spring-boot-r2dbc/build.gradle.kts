@@ -1,4 +1,5 @@
 plugins {
+    idea
     id("org.springframework.boot")
     id("com.google.devtools.ksp")
     kotlin("plugin.spring")
@@ -15,9 +16,11 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
 
-kotlin {
-    sourceSets.main {
-        kotlin.srcDir("build/generated/ksp/main/kotlin")
+idea {
+    module {
+        sourceDirs = sourceDirs + file("build/generated/ksp/main/kotlin")
+        testSourceDirs = testSourceDirs + file("build/generated/ksp/test/kotlin")
+        generatedSourceDirs = generatedSourceDirs + file("build/generated/ksp/main/kotlin") + file("build/generated/ksp/test/kotlin")
     }
 }
 
