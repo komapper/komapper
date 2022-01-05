@@ -13,13 +13,3 @@ internal class TransactionImpl(override val connection: TransactionConnection) :
     override var isRollbackOnly: Boolean = false
     override fun toString() = id.toString()
 }
-
-internal object EmptyTransaction : Transaction {
-    override val id: UUID
-        get() = throw UnsupportedOperationException()
-    override val connection: TransactionConnection
-        get() = throw UnsupportedOperationException()
-    override var isRollbackOnly: Boolean
-        get() = throw UnsupportedOperationException()
-        set(_) = throw UnsupportedOperationException()
-}

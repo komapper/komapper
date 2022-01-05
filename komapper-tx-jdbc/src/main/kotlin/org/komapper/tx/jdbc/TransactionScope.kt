@@ -39,11 +39,11 @@ internal class TransactionScopeImpl(
         block: TransactionScope.() -> R
     ): R {
         return if (transactionManager.isActive) {
-            val context = transactionManager.suspend()
+            val tx = transactionManager.suspend()
             try {
                 executeInNewTransaction(isolationLevel, block)
             } finally {
-                transactionManager.resume(context)
+                transactionManager.resume(tx)
             }
         } else {
             executeInNewTransaction(isolationLevel, block)
