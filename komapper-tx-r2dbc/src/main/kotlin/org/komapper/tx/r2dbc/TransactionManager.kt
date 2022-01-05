@@ -4,15 +4,16 @@ import io.r2dbc.spi.Connection
 import io.r2dbc.spi.ConnectionFactory
 import io.r2dbc.spi.ConnectionFactoryMetadata
 import io.r2dbc.spi.IsolationLevel
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.asContextElement
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.reactive.asPublisher
 import kotlinx.coroutines.reactive.awaitFirst
 import kotlinx.coroutines.reactive.awaitFirstOrNull
+import kotlinx.coroutines.withContext
 import org.komapper.core.LoggerFacade
 import org.komapper.core.ThreadSafe
 import org.reactivestreams.Publisher
-import kotlin.coroutines.CoroutineContext
 
 /**
  * The R2DBC transaction APIs designed for advanced use.
@@ -23,7 +24,7 @@ interface TransactionManager {
     val isActive: Boolean
     val isRollbackOnly: Boolean
     fun setRollbackOnly()
-    suspend fun begin(isolationLevel: IsolationLevel? = null): CoroutineContext
+    suspend fun <R> begin(isolationLevel: IsolationLevel? = null, block: suspend CoroutineScope.() -> R): R
     suspend fun commit()
     suspend fun suspend(): Transaction
     suspend fun resume(tx: Transaction)
@@ -70,7 +71,7 @@ internal class TransactionManagerImpl(
         }
     }
 
-    override suspend fun begin(isolationLevel: IsolationLevel?): CoroutineContext {
+    override suspend fun <R> begin(isolationLevel: IsolationLevel?, block: suspend CoroutineScope.() -> R): R {
         val currentTx = threadLocal.get()
         if (currentTx.isActive()) {
             rollbackInternal(currentTx)
@@ -84,7 +85,8 @@ internal class TransactionManagerImpl(
         }
         tx.connection.beginTransaction().awaitFirstOrNull()
         loggerFacade.begin(tx.id)
-        return threadLocal.asContextElement(tx)
+        val context = threadLocal.asContextElement(tx)
+        return withContext(context, block)
     }
 
     override suspend fun commit() {
