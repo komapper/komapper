@@ -4,7 +4,7 @@ plugins {
     signing
     kotlin("jvm")
     id("org.jetbrains.dokka")
-    id("com.diffplug.spotless") version "6.1.0"
+    id("org.jlleitschuh.gradle.ktlint") version "10.2.1"
     id("io.github.gradle-nexus.publish-plugin") version "1.1.0"
     id("net.researchgate.release") version "2.8.1"
 }
@@ -26,21 +26,21 @@ val ktlintVersion: String by project
 
 allprojects {
     apply(plugin = "base")
-    apply(plugin = "com.diffplug.spotless")
+    apply(plugin = "org.jlleitschuh.gradle.ktlint")
+
+    ktlint {
+        filter {
+            exclude("build/**")
+        }
+    }
 
     repositories {
         mavenCentral()
     }
 
-    spotless {
-        kotlinGradle {
-            ktlint(ktlintVersion)
-        }
-    }
-
     tasks {
         build {
-            dependsOn(spotlessApply)
+            dependsOn("ktlintFormat")
         }
     }
 }
@@ -56,13 +56,6 @@ configure(libraryProjects + gradlePluginProject + exampleProjects + integrationT
     java {
         toolchain {
             languageVersion.set(JavaLanguageVersion.of(8))
-        }
-    }
-
-    spotless {
-        kotlin {
-            targetExclude("build/**")
-            ktlint(ktlintVersion)
         }
     }
 
