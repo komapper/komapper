@@ -25,7 +25,6 @@ val isReleaseVersion = !version.toString().endsWith("SNAPSHOT")
 val ktlintVersion: String by project
 
 allprojects {
-    apply(plugin = "base")
     apply(plugin = "org.jlleitschuh.gradle.ktlint")
 
     ktlint {
@@ -36,12 +35,6 @@ allprojects {
 
     repositories {
         mavenCentral()
-    }
-
-    tasks {
-        build {
-            dependsOn("ktlintFormat")
-        }
     }
 }
 
