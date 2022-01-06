@@ -10,6 +10,7 @@ interface Prioritized {
     companion object {
         const val defaultPriority: Int = 100
     }
+
     /**
      * Returns the priority of this component.
      * The higher the value, the higher the priority.

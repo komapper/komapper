@@ -15,6 +15,7 @@ interface TemplateExecuteQuery : Query<Int> {
      * @return the query
      */
     fun options(configure: (TemplateExecuteOptions) -> TemplateExecuteOptions): TemplateExecuteQuery
+
     /**
      * Binds data to the query.
      * @param data data to be bound
