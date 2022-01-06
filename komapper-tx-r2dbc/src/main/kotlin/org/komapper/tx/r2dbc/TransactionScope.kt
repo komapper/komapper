@@ -40,8 +40,11 @@ internal class TransactionScopeImpl(
         block: suspend TransactionScope.() -> R
     ): R {
         return if (transactionManager.isActive) {
-            transactionManager.suspend() {
+            val tx = transactionManager.suspend()
+            try {
                 executeInNewTransaction(isolationLevel, block)
+            } finally {
+                transactionManager.resume(tx)
             }
         } else {
             executeInNewTransaction(isolationLevel, block)

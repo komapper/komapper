@@ -25,8 +25,9 @@ interface TransactionManager {
     val isRollbackOnly: Boolean
     fun setRollbackOnly()
     suspend fun <R> begin(isolationLevel: IsolationLevel? = null, block: suspend CoroutineScope.() -> R): R
-    suspend fun <R> suspend(block: suspend CoroutineScope.() -> R): R
     suspend fun commit()
+    suspend fun suspend(): Transaction
+    suspend fun resume(tx: Transaction)
     suspend fun rollback()
 }
 
@@ -34,7 +35,7 @@ internal class TransactionManagerImpl(
     private val internalConnectionFactory: ConnectionFactory,
     private val loggerFacade: LoggerFacade
 ) : TransactionManager {
-    private val threadLocal: ThreadLocal<Transaction> = ThreadLocal.withInitial { EmptyTransaction }
+    private val threadLocal: ThreadLocal<Transaction> = ThreadLocal()
     override val connectionFactory: ConnectionFactory = object : ConnectionFactory {
         override fun create(): Publisher<out Connection> {
             val tx = threadLocal.get()
@@ -88,11 +89,6 @@ internal class TransactionManagerImpl(
         return withContext(context, block)
     }
 
-    override suspend fun <R> suspend(block: suspend CoroutineScope.() -> R): R {
-        val context = threadLocal.asContextElement(EmptyTransaction)
-        return withContext(context, block)
-    }
-
     override suspend fun commit() {
         val tx = threadLocal.get()
         if (!tx.isActive()) {
@@ -108,6 +104,23 @@ internal class TransactionManagerImpl(
         } finally {
             release(tx)
         }
+    }
+
+    override suspend fun suspend(): Transaction {
+        val tx = threadLocal.get()
+        if (!tx.isActive()) {
+            error("A transaction hasn't yet begun.")
+        }
+        threadLocal.remove()
+        return tx
+    }
+
+    override suspend fun resume(tx: Transaction) {
+        val currentTx = threadLocal.get()
+        if (currentTx.isActive()) {
+            rollbackInternal(currentTx)
+        }
+        threadLocal.set(tx)
     }
 
     override suspend fun rollback() {
@@ -138,8 +151,8 @@ internal class TransactionManagerImpl(
         }
         connection.dispose()
     }
+}
 
-    private fun Transaction.isActive(): Boolean {
-        return this != EmptyTransaction
-    }
+private fun Transaction?.isActive(): Boolean {
+    return this != null
 }

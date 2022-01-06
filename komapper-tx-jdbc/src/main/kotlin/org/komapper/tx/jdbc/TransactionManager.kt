@@ -160,6 +160,8 @@ internal class TransactionManagerImpl(
             connection.dispose()
         }
     }
+}
 
-    private fun Transaction?.isActive(): Boolean = this != null
+private fun Transaction?.isActive(): Boolean {
+    return this != null
 }
