@@ -17,13 +17,13 @@ class StatementBuffer {
     }
 
     fun bind(value: Value): StatementBuffer {
-        parts.add(StatementPart.PlaceHolder(value))
+        parts.add(StatementPart.Value(value))
         return this
     }
 
     fun cutBack(length: Int): StatementBuffer {
         val last = parts.removeLast()
-        if (last is StatementPart.PlaceHolder || last.length < length) error("Cannot cutBack.")
+        if (last is StatementPart.Value || last.length < length) error("Cannot cutBack.")
         val newLast = last.dropLast(length)
         if (newLast.isNotEmpty()) parts.add(StatementPart.Text(newLast))
         return this

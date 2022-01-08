@@ -11,11 +11,11 @@ internal class UtilityKtTest {
             Statement(
                 listOf(
                     StatementPart.Text("select * from employee where name = "),
-                    StatementPart.PlaceHolder(Value("aaa")),
+                    StatementPart.Value(Value("aaa")),
                     StatementPart.Text(" and age = "),
-                    StatementPart.PlaceHolder(Value(20)),
+                    StatementPart.Value(Value(20)),
                     StatementPart.Text(" and password = "),
-                    StatementPart.PlaceHolder(Value("sensitive data", String::class, true)),
+                    StatementPart.Value(Value("sensitive data", String::class, true)),
                 ),
             )
         val result = statement.toDryRunResult(DryRunDialect)

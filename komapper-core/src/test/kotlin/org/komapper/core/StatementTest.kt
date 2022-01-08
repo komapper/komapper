@@ -11,9 +11,9 @@ internal class StatementTest {
             Statement(
                 listOf(
                     StatementPart.Text("select * from employee where name = "),
-                    StatementPart.PlaceHolder(Value("aaa")),
+                    StatementPart.Value(Value("aaa")),
                     StatementPart.Text(" and age = "),
-                    StatementPart.PlaceHolder(Value(20))
+                    StatementPart.Value(Value(20))
                 ),
             )
         assertEquals(listOf(Value("aaa"), Value(20)), statement.args)
@@ -25,9 +25,9 @@ internal class StatementTest {
             Statement(
                 listOf(
                     StatementPart.Text("select * from employee where name = "),
-                    StatementPart.PlaceHolder(Value("aaa")),
+                    StatementPart.Value(Value("aaa")),
                     StatementPart.Text(" and age = "),
-                    StatementPart.PlaceHolder(Value(20))
+                    StatementPart.Value(Value(20))
                 ),
             )
         assertEquals("select * from employee where name = ? and age = ?", statement.toSql())
@@ -43,16 +43,16 @@ internal class StatementTest {
             Statement(
                 listOf(
                     StatementPart.Text("select * from employee where name = "),
-                    StatementPart.PlaceHolder(Value("aaa")),
+                    StatementPart.Value(Value("aaa")),
                     StatementPart.Text(" and age = "),
-                    StatementPart.PlaceHolder(Value(20))
+                    StatementPart.Value(Value(20))
                 ),
             )
         val b =
             Statement(
                 listOf(
                     StatementPart.Text("delete from employee where name = "),
-                    StatementPart.PlaceHolder(Value("bbb"))
+                    StatementPart.Value(Value("bbb"))
                 ),
             )
         val c = a + b

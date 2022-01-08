@@ -13,23 +13,31 @@ data class Statement(val parts: List<StatementPart>) {
 
     companion object {
         val EMPTY = Statement(emptyList())
+
+        fun createBindVariable(
+            @Suppress("UNUSED_PARAMETER") index: Int,
+            value: StatementPart.Value
+        ): CharSequence {
+            return value
+        }
     }
 
     /**
      * The arguments of the SQL statement.
      */
-    val args: List<Value> = parts.filterIsInstance<StatementPart.PlaceHolder>().map { it.value }
+    val args: List<Value> = parts.filterIsInstance<StatementPart.Value>().map { it.value }
 
     /**
      * Converts the SQL statement to an SQL string.
-     * @param format the format function of the SQL statement
+     *
+     * @param format the format function of the bind values
      */
-    fun toSql(format: (Int, StatementPart.PlaceHolder) -> CharSequence = { _, placeHolder -> placeHolder }): String {
+    fun toSql(format: (Int, StatementPart.Value) -> CharSequence = ::createBindVariable): String {
         var index = 0
         return parts.joinToString(separator = "") { part ->
             when (part) {
                 is StatementPart.Text -> part
-                is StatementPart.PlaceHolder -> {
+                is StatementPart.Value -> {
                     format(index++, part)
                 }
             }
@@ -38,13 +46,14 @@ data class Statement(val parts: List<StatementPart>) {
 
     /**
      * Converts the SQL statement to an SQL string with arguments.
-     * @param format the format function of the SQL statement
+     *
+     * @param format the format function of the bound values
      */
     fun toSqlWithArgs(format: (Any?, KClass<*>, Boolean) -> CharSequence): String {
         return parts.joinToString(separator = "") { part ->
             when (part) {
                 is StatementPart.Text -> part.text
-                is StatementPart.PlaceHolder -> {
+                is StatementPart.Value -> {
                     val value = part.value
                     format(value.any, value.klass, value.masking)
                 }
@@ -54,6 +63,7 @@ data class Statement(val parts: List<StatementPart>) {
 
     /**
      * Composes the SQL statement.
+     *
      * @param other the other SQL statement
      */
     infix operator fun plus(other: Statement): Statement {
@@ -65,6 +75,7 @@ data class Statement(val parts: List<StatementPart>) {
 
     /**
      * Adds a part of the SQL statement.
+     *
      * @param text a part of the SQL statement
      */
     infix operator fun plus(text: CharSequence): Statement {

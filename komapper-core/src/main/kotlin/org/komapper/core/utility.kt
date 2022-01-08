@@ -8,7 +8,7 @@ package org.komapper.core
  * @return The result of dry run
  */
 fun Statement.toDryRunResult(dialect: Dialect, description: String = ""): DryRunResult {
-    val sql = this.toSql(dialect::replacePlaceHolder)
+    val sql = this.toSql(dialect::createBindVariable)
     val sqlWithArgs = this.toSqlWithArgs(dialect::formatValue)
     return DryRunResult(sql = sql, sqlWithArgs = sqlWithArgs, args = this.args, description = description)
 }

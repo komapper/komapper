@@ -15,6 +15,14 @@ import kotlin.reflect.KClass
  */
 @ThreadSafe
 interface Dialect {
+
+    companion object {
+        const val OPEN_QUOTE = "\""
+        const val CLOSE_QUOTE = "\""
+        const val ESCAPE_SEQUENCE = "\\"
+        const val MASK = "*****"
+    }
+
     /**
      * The name of the driver.
      */
@@ -23,32 +31,32 @@ interface Dialect {
     /**
      * The open quote for identifiers.
      */
-    val openQuote: String get() = "\""
+    val openQuote: String get() = OPEN_QUOTE
 
     /**
      * The close quote for identifiers.
      */
-    val closeQuote: String get() = "\""
+    val closeQuote: String get() = CLOSE_QUOTE
 
     /**
      * The escape sequence to be used in the LIKE predicate.
      */
-    val escapeSequence: String get() = "\\"
+    val escapeSequence: String get() = ESCAPE_SEQUENCE
 
     /**
      * The mask string used to hide sensitive information contained in logs.
      */
-    val mask: String get() = "*****"
+    val mask: String get() = MASK
 
     /**
-     * Replaces the placeholder with other [CharSequence].
+     * Creates a bind variable name.
      *
-     * @param index the placeholder index
-     * @param placeHolder the placeholder
-     * @return the new placeholder
+     * @param index the binding index
+     * @param value the value
+     * @return the bind variable name
      */
-    fun replacePlaceHolder(index: Int, placeHolder: StatementPart.PlaceHolder): CharSequence {
-        return placeHolder
+    fun createBindVariable(index: Int, value: StatementPart.Value): CharSequence {
+        return Statement.createBindVariable(index, value)
     }
 
     /**

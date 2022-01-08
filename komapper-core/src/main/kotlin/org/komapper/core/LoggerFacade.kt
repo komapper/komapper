@@ -13,10 +13,7 @@ interface LoggerFacade {
      * @param statement the sql statement
      * @param format the format of the sql statement
      */
-    fun sql(
-        statement: Statement,
-        format: (Int, StatementPart.PlaceHolder) -> CharSequence = { _, placeHolder -> placeHolder }
-    )
+    fun sql(statement: Statement, format: (Int, StatementPart.Value) -> CharSequence)
 
     /**
      * Logs the sql statement with arguments.
@@ -52,7 +49,7 @@ interface LoggerFacade {
  * The default implementation of [LoggerFacade].
  */
 class DefaultLoggerFacade(private val logger: Logger) : LoggerFacade {
-    override fun sql(statement: Statement, format: (Int, StatementPart.PlaceHolder) -> CharSequence) {
+    override fun sql(statement: Statement, format: (Int, StatementPart.Value) -> CharSequence) {
         logger.debug(LogCategory.SQL.value) {
             statement.toSql(format)
         }

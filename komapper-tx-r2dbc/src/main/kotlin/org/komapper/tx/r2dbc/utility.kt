@@ -7,6 +7,7 @@ import org.komapper.r2dbc.R2dbcSession
 
 /**
  * Begins a R2DBC transaction.
+ *
  * @param R the return type of the block
  * @param transactionAttribute the transaction attribute
  * @param isolationLevel the isolation level. If null, the default isolation level is determined by the driver.
@@ -21,7 +22,7 @@ suspend fun <R> R2dbc.withTransaction(
     return if (this is R2dbcDatabase) {
         val session = this.config.session
         return if (session is TransactionSession) {
-            session.userTransaction.withTransaction(transactionAttribute, isolationLevel, block)
+            session.userTransaction.run(transactionAttribute, isolationLevel, block)
         } else {
             withoutTransaction(block)
         }

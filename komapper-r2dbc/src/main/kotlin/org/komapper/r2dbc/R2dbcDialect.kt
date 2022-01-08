@@ -65,9 +65,9 @@ abstract class AbstractR2dbcDialect protected constructor(internalDataTypes: Lis
         return DefaultBinder
     }
 
-    override fun replacePlaceHolder(index: Int, placeHolder: StatementPart.PlaceHolder): CharSequence {
+    override fun createBindVariable(index: Int, value: StatementPart.Value): CharSequence {
         val binder = getBinder()
-        return binder.replace(index, placeHolder)
+        return binder.createBindVariable(index, value)
     }
 
     override fun getValue(row: Row, index: Int, valueClass: KClass<*>): Any? {
