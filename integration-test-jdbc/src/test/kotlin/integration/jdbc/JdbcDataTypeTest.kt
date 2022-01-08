@@ -1,5 +1,6 @@
 package integration.jdbc
 
+import integration.Direction
 import integration.Json
 import integration.JsonTest
 import integration.SqlXmlTest
@@ -21,6 +22,7 @@ import integration.booleanTest
 import integration.byteArrayTest
 import integration.byteTest
 import integration.doubleTest
+import integration.enumTest
 import integration.floatTest
 import integration.intTest
 import integration.jsonTest
@@ -169,6 +171,17 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
     fun double() {
         val m = Meta.doubleTest
         val data = integration.DoubleTest(1, 10.0)
+        db.runQuery { QueryDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        assertEquals(data, data2)
+    }
+
+    @Test
+    fun enum() {
+        val m = Meta.enumTest
+        val data = integration.EnumTest(1, Direction.EAST)
         db.runQuery { QueryDsl.insert(m).single(data) }
         val data2 = db.runQuery {
             QueryDsl.from(m).where { m.id eq 1 }.first()

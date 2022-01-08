@@ -2,6 +2,7 @@ package org.komapper.processor
 
 import com.google.devtools.ksp.getDeclaredProperties
 import com.google.devtools.ksp.isPublic
+import com.google.devtools.ksp.symbol.ClassKind
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSNode
 import com.google.devtools.ksp.symbol.KSType
@@ -53,17 +54,43 @@ internal class EntityFactory(config: Config, private val entityDef: EntityDef) {
                     ?: report("The corresponding property declaration is not found.", parameter)
                 val column = getColumn(propertyDef, parameter)
                 val type = parameter.type.resolve()
-                val typeName = (type.declaration.qualifiedName ?: type.declaration.simpleName).asString()
-                val literalTag = resolveLiteralTag(typeName)
-                val valueClass = createValueClass(type)
+                val kotlinClass = createEnumClass(type) ?: createValueClass(type) ?: PlainClass(type.declaration)
+                val literalTag = resolveLiteralTag(kotlinClass.exteriorTypeName)
                 val nullability = type.nullability
                 val kind = propertyDef?.kind
-                Property(parameter, declaration, column, typeName, literalTag, valueClass, nullability, kind).also {
+                Property(
+                    parameter = parameter,
+                    declaration = declaration,
+                    column = column,
+                    kotlinClass = kotlinClass,
+                    literalTag = literalTag,
+                    nullability = nullability,
+                    kind = kind
+                ).also {
                     validateProperty(it)
                 }
             }?.also {
                 validateAllProperties(it)
             }?.toList() ?: emptyList()
+    }
+
+    private fun createEnumClass(type: KSType): EnumClass? {
+        return type.declaration.accept(
+            object : KSEmptyVisitor<Unit, EnumClass?>() {
+                override fun defaultHandler(node: KSNode, data: Unit): EnumClass? {
+                    return null
+                }
+
+                override fun visitClassDeclaration(classDeclaration: KSClassDeclaration, data: Unit): EnumClass? {
+                    return if (classDeclaration.classKind == ClassKind.ENUM_CLASS) {
+                        return EnumClass(classDeclaration)
+                    } else {
+                        null
+                    }
+                }
+            },
+            Unit
+        )
     }
 
     private fun createValueClass(type: KSType): ValueClass? {
@@ -116,8 +143,8 @@ internal class EntityFactory(config: Config, private val entityDef: EntityDef) {
         if (property.isPrivate()) {
             report("The property must not be private.", property.parameter)
         }
-        if (property.valueClass != null) {
-            validateValueClassProperty(property, property.valueClass.property)
+        if (property.kotlinClass is ValueClass) {
+            validateValueClassProperty(property, property.kotlinClass.property)
         }
         when (val kind = property.kind) {
             is PropertyKind.Id -> validateIdProperty(property, kind.idKind)
@@ -150,19 +177,20 @@ internal class EntityFactory(config: Config, private val entityDef: EntityDef) {
             when (property.typeName) {
                 "kotlin.Int", "kotlin.Long", "kotlin.UInt" -> Unit
                 else -> {
-                    if (property.valueClass == null) {
-                        report(
+                    when (val kotlinClass = property.kotlinClass) {
+                        is ValueClass -> {
+                            when (kotlinClass.property.typeName) {
+                                "kotlin.Int", "kotlin.Long", "kotlin.UInt" -> Unit
+                                else -> report(
+                                    "When the type of $annotationName annotated property is value class, the type of the value class's own property must be either Int, Long or UInt.",
+                                    property.parameter
+                                )
+                            }
+                        }
+                        else -> report(
                             "The type of $annotationName annotated property must be either Int, Long, UInt or value class.",
                             property.parameter
                         )
-                    } else {
-                        when (property.valueClass.property.typeName) {
-                            "kotlin.Int", "kotlin.Long", "kotlin.UInt" -> Unit
-                            else -> report(
-                                "When the type of $annotationName annotated property is value class, the type of the value class's own property must be either Int, Long or UInt.",
-                                property.parameter
-                            )
-                        }
                     }
                 }
             }
@@ -177,19 +205,20 @@ internal class EntityFactory(config: Config, private val entityDef: EntityDef) {
         when (property.typeName) {
             "kotlin.Int", "kotlin.Long", "kotlin.UInt" -> Unit
             else -> {
-                if (property.valueClass == null) {
-                    report(
+                when (val kotlinClass = property.kotlinClass) {
+                    is ValueClass -> {
+                        when (kotlinClass.property.typeName) {
+                            "kotlin.Int", "kotlin.Long", "kotlin.UInt" -> Unit
+                            else -> report(
+                                "When the type of @${KomapperVersion::class.simpleName} annotated property is value class, the type of the value class's own property must be either Int, Long or UInt.",
+                                property.parameter
+                            )
+                        }
+                    }
+                    else -> report(
                         "The type of @${KomapperVersion::class.simpleName} annotated property must be either Int, Long, UInt or value class.",
                         property.parameter
                     )
-                } else {
-                    when (property.valueClass.property.typeName) {
-                        "kotlin.Int", "kotlin.Long", "kotlin.UInt" -> Unit
-                        else -> report(
-                            "When the type of @${KomapperVersion::class.simpleName} annotated property is value class, the type of the value class's own property must be either Int, Long or UInt.",
-                            property.parameter
-                        )
-                    }
                 }
             }
         }
@@ -197,23 +226,22 @@ internal class EntityFactory(config: Config, private val entityDef: EntityDef) {
 
     private fun validateTimestampProperty(property: Property, annotationName: String) {
         when (property.typeName) {
-            "java.time.LocalDateTime",
-            "java.time.OffsetDateTime" -> Unit
+            "java.time.LocalDateTime", "java.time.OffsetDateTime" -> Unit
             else -> {
-                if (property.valueClass == null) {
-                    report(
+                when (val kotlinClass = property.kotlinClass) {
+                    is ValueClass -> {
+                        when (kotlinClass.property.typeName) {
+                            "java.time.LocalDateTime", "java.time.OffsetDateTime" -> Unit
+                            else -> report(
+                                "When the type of $annotationName annotated property is value class, the type of the value class's own property must be either LocalDateTime or OffsetDateTime.",
+                                property.parameter
+                            )
+                        }
+                    }
+                    else -> report(
                         "The type of $annotationName annotated property must be either LocalDateTime or OffsetDateTime.",
                         property.parameter
                     )
-                } else {
-                    when (property.valueClass.property.typeName) {
-                        "java.time.LocalDateTime",
-                        "java.time.OffsetDateTime" -> Unit
-                        else -> report(
-                            "When the type of $annotationName annotated property is value class, the type of the value class's own property must be either LocalDateTime or OffsetDateTime.",
-                            property.parameter
-                        )
-                    }
                 }
             }
         }

@@ -54,7 +54,7 @@ internal class EntityMetamodelGenerator(
             w.println()
         }
         w.println("// generated at ${ZonedDateTime.now()}")
-        w.println("@$EntityMetamodelImplementor")
+        w.println("@$EntityMetamodelImplementor($entityTypeName::class)")
         w.println("class $simpleName private constructor($constructorParamList) : $EntityMetamodel<$entityTypeName, $idTypeName, $simpleName> {")
         w.println("    private val __tableName = table")
         w.println("    private val __catalogName = catalog")
@@ -114,8 +114,8 @@ internal class EntityMetamodelGenerator(
             w.println("        val __idContextMap: $ConcurrentHashMap<$UUID, $IdContext> = $ConcurrentHashMap()")
         }
         for (p in entity.properties) {
-            val exteriorTypeName = p.typeName
-            val interiorTypeName = p.valueClass?.property?.typeName ?: p.typeName
+            val exteriorTypeName = p.exteriorTypeName
+            val interiorTypeName = p.interiorTypeName
             val exteriorClass = "$exteriorTypeName::class"
             val interiorClass = "$interiorTypeName::class"
             val columnName = "\"${p.column.name}\""
@@ -123,8 +123,16 @@ internal class EntityMetamodelGenerator(
             val masking = "${p.column.masking}"
             val getter = "{ it.$p }"
             val setter = "{ e, v -> e.copy($p = v) }"
-            val wrap = if (p.valueClass == null) "{ it }" else "{ ${p.valueClass}(it) }"
-            val unwrap = if (p.valueClass == null) "{ it }" else "{ it.${p.valueClass.property} }"
+            val wrap = when (p.kotlinClass) {
+                is EnumClass -> "{ ${p.kotlinClass.declaration}.valueOf(it) }"
+                is ValueClass -> "{ ${p.kotlinClass}(it) }"
+                else -> "{ it }"
+            }
+            val unwrap = when (p.kotlinClass) {
+                is EnumClass -> "{ it.toString() }"
+                is ValueClass -> "{ it.${p.kotlinClass.property} }"
+                else -> "{ it }"
+            }
             val nullable = if (p.nullability == Nullability.NULLABLE) "true" else "false"
             val propertyDescriptor =
                 "$PropertyDescriptor<$entityTypeName, $exteriorTypeName, $interiorTypeName>"
@@ -135,8 +143,8 @@ internal class EntityMetamodelGenerator(
 
     private fun propertyMetamodels() {
         for (p in entity.properties) {
-            val exteriorTypeName = p.typeName
-            val interiorTypeName = p.valueClass?.property?.typeName ?: p.typeName
+            val exteriorTypeName = p.exteriorTypeName
+            val interiorTypeName = p.interiorTypeName
             val propertyMetamodel =
                 "$PropertyMetamodel<$entityTypeName, $exteriorTypeName, $interiorTypeName>"
             w.println("    val $p: $propertyMetamodel by lazy { $PropertyMetamodelImpl(this, $EntityDescriptor.$p) }")
@@ -250,7 +258,11 @@ internal class EntityMetamodelGenerator(
     private fun convertToId() {
         val body = if (entity.idProperties.size == 1) {
             val p = entity.idProperties[0]
-            val id = when (p.valueClass?.property?.typeName ?: p.typeName) {
+            val typeName = when (p.kotlinClass) {
+                is ValueClass -> p.kotlinClass.property.typeName
+                else -> p.typeName
+            }
+            val id = when (typeName) {
                 "kotlin.Int" -> "generatedKey.toInt()"
                 "kotlin.Long" -> "generatedKey"
                 "kotlin.UInt" -> "generatedKey.toUInt()"
@@ -265,12 +277,15 @@ internal class EntityMetamodelGenerator(
 
     private fun versionAssignment() {
         val body = entity.versionProperty?.let {
-            if (it.valueClass == null) {
-                val tag = it.literalTag
-                "$it to $Argument($it, 0$tag)"
-            } else {
-                val tag = it.valueClass.property.literalTag
-                "$it to $Argument($it, ${it.valueClass}(0$tag))"
+            when (it.kotlinClass) {
+                is ValueClass -> {
+                    val tag = it.kotlinClass.property.literalTag
+                    "$it to $Argument($it, ${it.kotlinClass}(0$tag))"
+                }
+                else -> {
+                    val tag = it.literalTag
+                    "$it to $Argument($it, 0$tag)"
+                }
             }
         } ?: "null"
         w.println("    override fun versionAssignment(): Pair<$PropertyMetamodel<$entityTypeName, *, *>, $Operand>? = $body")
@@ -278,10 +293,13 @@ internal class EntityMetamodelGenerator(
 
     private fun createdAtAssignment() {
         val body = entity.createdAtProperty?.let {
-            if (it.valueClass == null) {
-                "$it to $Argument($it, ${it.typeName}.now(c))"
-            } else {
-                "$it to $Argument($it, ${it.typeName}(${it.valueClass.property.typeName}.now(c)))"
+            when (it.kotlinClass) {
+                is ValueClass -> {
+                    "$it to $Argument($it, ${it.typeName}(${it.kotlinClass.property.typeName}.now(c)))"
+                }
+                else -> {
+                    "$it to $Argument($it, ${it.typeName}.now(c))"
+                }
             }
         } ?: "null"
         w.println("    override fun createdAtAssignment(c: $Clock): Pair<$PropertyMetamodel<$entityTypeName, *, *>, $Operand>? = $body")
@@ -289,10 +307,13 @@ internal class EntityMetamodelGenerator(
 
     private fun updatedAtAssignment() {
         val body = entity.updatedAtProperty?.let {
-            if (it.valueClass == null) {
-                "$it to $Argument($it, ${it.typeName}.now(c))"
-            } else {
-                "$it to $Argument($it, ${it.typeName}(${it.valueClass.property.typeName}.now(c)))"
+            when (it.kotlinClass) {
+                is ValueClass -> {
+                    "$it to $Argument($it, ${it.typeName}(${it.kotlinClass.property.typeName}.now(c)))"
+                }
+                else -> {
+                    "$it to $Argument($it, ${it.typeName}.now(c))"
+                }
             }
         } ?: "null"
         w.println("    override fun updatedAtAssignment(c: $Clock): Pair<$PropertyMetamodel<$entityTypeName, *, *>, $Operand>? = $body")
@@ -301,26 +322,35 @@ internal class EntityMetamodelGenerator(
     private fun preInsert() {
         val version = entity.versionProperty?.let {
             val nullable = it.nullability == Nullability.NULLABLE
-            if (it.valueClass == null) {
-                val tag = it.literalTag
-                "$it = e.$it${if (nullable) " ?: 0$tag" else ""}"
-            } else {
-                val tag = it.valueClass.property.literalTag
-                "$it = e.$it${if (nullable) " ?: ${it.valueClass}(0$tag)" else ""}"
+            when (it.kotlinClass) {
+                is ValueClass -> {
+                    val tag = it.kotlinClass.property.literalTag
+                    "$it = e.$it${if (nullable) " ?: ${it.kotlinClass}(0$tag)" else ""}"
+                }
+                else -> {
+                    val tag = it.literalTag
+                    "$it = e.$it${if (nullable) " ?: 0$tag" else ""}"
+                }
             }
         }
         val createdAt = entity.createdAtProperty?.let {
-            if (it.valueClass == null) {
-                "$it = ${it.typeName}.now(c)"
-            } else {
-                "$it = ${it.typeName}(${it.valueClass.property.typeName}.now(c))"
+            when (it.kotlinClass) {
+                is ValueClass -> {
+                    "$it = ${it.typeName}(${it.kotlinClass.property.typeName}.now(c))"
+                }
+                else -> {
+                    "$it = ${it.typeName}.now(c)"
+                }
             }
         }
         val updatedAt = entity.updatedAtProperty?.let {
-            if (it.valueClass == null) {
-                "$it = ${it.typeName}.now(c)"
-            } else {
-                "$it = ${it.typeName}(${it.valueClass.property.typeName}.now(c))"
+            when (it.kotlinClass) {
+                is ValueClass -> {
+                    "$it = ${it.typeName}(${it.kotlinClass.property.typeName}.now(c))"
+                }
+                else -> {
+                    "$it = ${it.typeName}.now(c)"
+                }
             }
         }
         val paramList = listOfNotNull(version, createdAt, updatedAt).joinToString()
@@ -334,10 +364,13 @@ internal class EntityMetamodelGenerator(
 
     private fun preUpdate() {
         val updatedAt = entity.updatedAtProperty?.let {
-            if (it.valueClass == null) {
-                "$it = ${it.typeName}.now(c)"
-            } else {
-                "$it = ${it.typeName}(${it.valueClass.property.typeName}.now(c))"
+            when (it.kotlinClass) {
+                is ValueClass -> {
+                    "$it = ${it.typeName}(${it.kotlinClass.property.typeName}.now(c))"
+                }
+                else -> {
+                    "$it = ${it.typeName}.now(c)"
+                }
             }
         }
         val body = if (updatedAt == null) {
@@ -351,12 +384,15 @@ internal class EntityMetamodelGenerator(
     private fun postUpdate() {
         val version = entity.versionProperty?.let {
             val nullable = it.nullability == Nullability.NULLABLE
-            if (it.valueClass == null) {
-                val tag = it.literalTag
-                "$it = e.$it${if (nullable) "?" else ""}.inc()${if (nullable) " ?: 0$tag" else ""}"
-            } else {
-                val tag = it.valueClass.property.literalTag
-                "$it = ${it.valueClass}(e.$it${if (nullable) "?" else ""}.${it.valueClass.property}${if (nullable) "?" else ""}.inc()${if (nullable) " ?: 0$tag" else ""})"
+            when (it.kotlinClass) {
+                is ValueClass -> {
+                    val tag = it.kotlinClass.property.literalTag
+                    "$it = ${it.kotlinClass}(e.$it${if (nullable) "?" else ""}.${it.kotlinClass.property}${if (nullable) "?" else ""}.inc()${if (nullable) " ?: 0$tag" else ""})"
+                }
+                else -> {
+                    val tag = it.literalTag
+                    "$it = e.$it${if (nullable) "?" else ""}.inc()${if (nullable) " ?: 0$tag" else ""}"
+                }
             }
         }
         val body = if (version == null) {
