@@ -7,7 +7,7 @@ import com.google.devtools.ksp.symbol.Modifier
 import java.nio.CharBuffer
 import kotlin.reflect.KClass
 
-internal fun <T> Sequence<T>.anyDuplicates(predicate: (T) -> Boolean): Boolean {
+internal fun <T> Sequence<T>.hasDuplicates(predicate: (T) -> Boolean): Boolean {
     return this.filter(predicate).take(2).count() == 2
 }
 

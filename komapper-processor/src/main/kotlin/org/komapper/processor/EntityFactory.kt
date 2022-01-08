@@ -24,15 +24,15 @@ internal class EntityFactory(config: Config, private val entityDef: EntityDef) {
         val createdAtProperty: Property? = allProperties.firstOrNull { it.kind is PropertyKind.CreatedAt }
         val updatedAtProperty: Property? = allProperties.firstOrNull { it.kind is PropertyKind.UpdatedAt }
         val ignoredProperties = allProperties.filter { it.kind is PropertyKind.Ignore }
-        val properties = allProperties - ignoredProperties
+        val properties = allProperties - ignoredProperties.toSet()
         if (properties.none()) {
             report("Any persistent properties are not found.", entityDef.definitionSource.entityDeclaration)
         }
         return Entity(
             entityDef.definitionSource.entityDeclaration,
             entityDef.table,
-            properties.toList(),
-            idProperties.toList(),
+            properties,
+            idProperties,
             versionProperty,
             createdAtProperty,
             updatedAtProperty,
@@ -41,7 +41,7 @@ internal class EntityFactory(config: Config, private val entityDef: EntityDef) {
         }
     }
 
-    private fun createAllProperties(): Sequence<Property> {
+    private fun createAllProperties(): List<Property> {
         val propertyDefMap = entityDef.properties.associateBy { it.declaration.simpleName }
         val (_, entityDeclaration) = entityDef.definitionSource
         val propertyDeclarationMap = entityDeclaration.getDeclaredProperties().associateBy { it.simpleName }
@@ -63,7 +63,7 @@ internal class EntityFactory(config: Config, private val entityDef: EntityDef) {
                 }
             }?.also {
                 validateAllProperties(it)
-            } ?: emptySequence()
+            }?.toList() ?: emptyList()
     }
 
     private fun createValueClass(type: KSType): ValueClass? {

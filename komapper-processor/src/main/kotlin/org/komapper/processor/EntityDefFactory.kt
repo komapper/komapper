@@ -67,13 +67,13 @@ internal class EntityDefFactory(
     }
 
     private fun validateProperties(properties: Sequence<PropertyDef>) {
-        if (properties.anyDuplicates { it.kind is PropertyKind.Version }) {
+        if (properties.hasDuplicates { it.kind is PropertyKind.Version }) {
             report("Multiple @${KomapperVersion::class.simpleName} cannot coexist in a single class.", defDeclaration)
         }
-        if (properties.anyDuplicates { it.kind is PropertyKind.CreatedAt }) {
+        if (properties.hasDuplicates { it.kind is PropertyKind.CreatedAt }) {
             report("Multiple @${KomapperCreatedAt::class.simpleName} cannot coexist in a single class.", defDeclaration)
         }
-        if (properties.anyDuplicates { it.kind is PropertyKind.UpdatedAt }) {
+        if (properties.hasDuplicates { it.kind is PropertyKind.UpdatedAt }) {
             report("Multiple @${KomapperUpdatedAt::class.simpleName} cannot coexist in a single class.", defDeclaration)
         }
     }
