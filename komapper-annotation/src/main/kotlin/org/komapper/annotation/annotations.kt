@@ -7,9 +7,11 @@ import java.time.OffsetDateTime
 import kotlin.reflect.KClass
 
 /**
- * Indicates that the annotated class is an entity.
+ * Indicates that the annotated class is an entity class.
+ *
  * The annotated class must be a data class.
- * @param aliases aliases of the entity metamodel instances
+ *
+ * @param aliases the names of the entity metamodel instances
  */
 @Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.SOURCE)
@@ -25,7 +27,8 @@ annotation class KomapperEntity(
 annotation class KomapperId
 
 /**
- * Indicates that the annotated property is a version.
+ * Indicates that the annotated property is a version number of the optimistic lock.
+ *
  * The type of the annotated property must be one of the following:
  * - [Int]
  * - [Long]
@@ -38,6 +41,7 @@ annotation class KomapperVersion
 
 /**
  * Adds table information.
+ *
  * @property name the table name
  * @property catalog the catalog name
  * @property schema the schema name
@@ -46,10 +50,10 @@ annotation class KomapperVersion
 @Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.SOURCE)
 annotation class KomapperTable(
-    val name: String = KomapperTable.name,
-    val catalog: String = KomapperTable.catalog,
-    val schema: String = KomapperTable.schema,
-    val alwaysQuote: Boolean = KomapperTable.alwaysQuote
+    val name: String = NAME,
+    val catalog: String = CATALOG,
+    val schema: String = SCHEMA,
+    val alwaysQuote: Boolean = ALWAYS_QUOTE
 ) {
     companion object {
         const val NAME: String = ""
@@ -61,9 +65,10 @@ annotation class KomapperTable(
 
 /**
  * Adds column information.
+ *
  * @property name the table name
  * @property alwaysQuote whether to quote the [name]
- * @property masking whether to mask the value that corresponds to the annotated property in the logs
+ * @property masking whether to mask the value that corresponds to the annotated property in logs
  */
 @Target(AnnotationTarget.VALUE_PARAMETER)
 @Retention(AnnotationRetention.SOURCE)
@@ -81,6 +86,7 @@ annotation class KomapperColumn(
 
 /**
  * Indicates that the annotated property is a timestamp to be set at creation time.
+ *
  * The type of the annotated property must be one of the following:
  * - [LocalDateTime]
  * - [OffsetDateTime]
@@ -92,6 +98,7 @@ annotation class KomapperCreatedAt
 
 /**
  * Indicates that the annotated property is a timestamp to be set at creation time and update time.
+ *
  * The type of the annotated property must be one of the following:
  * - [LocalDateTime]
  * - [OffsetDateTime]
@@ -110,11 +117,13 @@ annotation class KomapperIgnore
 
 /**
  * Indicates that the annotated property is numbered using the sequence.
+ *
  * The type of the annotated property must be one of the following:
  * - [Int]
  * - [Long]
  * - [UInt]
  * - A value class whose property type is one of [Int], [Long] or [UInt].
+ *
  * @property name the sequence name
  * @property startWith the initial value of the sequence
  * @property incrementBy the increment value of the sequence
@@ -143,6 +152,7 @@ annotation class KomapperSequence(
 
 /**
  * Indicates that the annotated property is an auto-increment column.
+ *
  * The type of the annotated property must be one of the following:
  * - [Int]
  * - [Long]
@@ -154,10 +164,12 @@ annotation class KomapperSequence(
 annotation class KomapperAutoIncrement
 
 /**
- * Indicates that the annotated class is an entity definition.
+ * Indicates that the annotated class is an entity definition class.
+ *
  * The annotated class and the entity class must be data classes.
- * @property entity the class defined as an entity
- * @property aliases the aliases of the entity metamodel instances
+ *
+ * @property entity the entity class
+ * @property aliases the names of the entity metamodel instances
  */
 @Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.SOURCE)

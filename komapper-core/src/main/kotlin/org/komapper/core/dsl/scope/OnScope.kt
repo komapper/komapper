@@ -5,7 +5,7 @@ import org.komapper.core.dsl.expression.Criterion
 import org.komapper.core.dsl.expression.OnDeclaration
 
 /**
- * Represents the scope for the join on expression.
+ * Provides operators for the ON clause.
  */
 @Scope
 class OnScope(

@@ -6,13 +6,15 @@ import org.komapper.core.dsl.options.UpdateOptions
 import org.komapper.core.dsl.visitor.QueryVisitor
 
 /**
- * Represents the query to update entities.
+ * Represents a query to update entities.
  * This query returns new entity or entities.
+ *
  * @param T the entity type
  */
 interface EntityUpdateQuery<T> : Query<T> {
     /**
      * Builds a query with the options applied.
+     *
      * @param configure the configure function to apply options
      * @return the query
      */

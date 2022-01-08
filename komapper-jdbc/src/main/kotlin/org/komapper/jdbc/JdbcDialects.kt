@@ -6,7 +6,7 @@ import java.util.ServiceLoader
 import java.util.regex.Pattern
 
 /**
- * The provider of [JdbcDialect]
+ * The provider of [JdbcDialect].
  */
 object JdbcDialects {
     private val jdbcUrlPattern = Pattern.compile("^jdbc:(tc:)?([^:]*):.*")

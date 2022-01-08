@@ -17,6 +17,7 @@ interface R2dbcDialect : Dialect {
 
     /**
      * Returns the value.
+     *
      * @param row the row
      * @param index the index
      * @param valueClass the value class
@@ -26,6 +27,7 @@ interface R2dbcDialect : Dialect {
 
     /**
      * Returns the value.
+     *
      * @param row the row
      * @param columnLabel the column label
      * @param valueClass the value class
@@ -35,6 +37,7 @@ interface R2dbcDialect : Dialect {
 
     /**
      * Sets the value.
+     *
      * @param statement the statement
      * @param index the index
      * @param value the value
@@ -44,6 +47,7 @@ interface R2dbcDialect : Dialect {
 
     /**
      * Returns the data type.
+     *
      * @param klass the value class
      * @return the data type
      */

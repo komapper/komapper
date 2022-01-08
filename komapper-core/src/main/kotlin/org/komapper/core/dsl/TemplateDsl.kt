@@ -14,6 +14,7 @@ object TemplateDsl : Dsl {
 
     /**
      * Creates a builder for constructing a select query.
+     *
      * @param sql the sql template
      * @return the builder
      */
@@ -23,6 +24,7 @@ object TemplateDsl : Dsl {
 
     /**
      * Creates a query for executing an arbitrary command.
+     *
      * @param sql the sql template
      * @return the query
      */

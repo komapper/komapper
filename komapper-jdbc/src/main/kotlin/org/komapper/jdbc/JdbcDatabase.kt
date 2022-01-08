@@ -14,6 +14,7 @@ interface JdbcDatabase : Jdbc {
     companion object {
         /**
          * Creates a [JdbcDatabase] instance.
+         *
          * @param config the database configuration
          */
         fun create(config: JdbcDatabaseConfig): JdbcDatabase {
@@ -22,6 +23,7 @@ interface JdbcDatabase : Jdbc {
 
         /**
          * Creates a [JdbcDatabase] instance.
+         *
          * @param dataSource the JDBC data source
          * @param dialect the dialect
          */
@@ -34,6 +36,7 @@ interface JdbcDatabase : Jdbc {
 
         /**
          * Creates a [JdbcDatabase] instance.
+         *
          * @param url the JDBC URL
          * @param user the JDBC user
          * @param password the JDBC password
@@ -49,6 +52,7 @@ interface JdbcDatabase : Jdbc {
 
         /**
          * Creates a [JdbcDatabase] instance.
+         *
          * @param url the JDBC URL
          * @param user the JDBC user
          * @param password the JDBC password

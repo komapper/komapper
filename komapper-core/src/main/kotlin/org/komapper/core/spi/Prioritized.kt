@@ -14,6 +14,7 @@ interface Prioritized {
     /**
      * Returns the priority of this component.
      * The higher the value, the higher the priority.
+     *
      * @return the priority
      */
     val priority: Int get() = defaultPriority

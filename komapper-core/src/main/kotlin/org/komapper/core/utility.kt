@@ -2,6 +2,7 @@ package org.komapper.core
 
 /**
  * Returns the result of dry run.
+ *
  * @param dialect the dialect of the database
  * @param description the description of the dry run result
  * @return The result of dry run

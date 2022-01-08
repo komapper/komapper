@@ -11,6 +11,7 @@ import org.komapper.core.dsl.visitor.QueryVisitor
 /**
  * Represents the query to insert rows.
  * This query returns a pair containing the number of rows affected and the ID(s) generated.
+ *
  * @param ENTITY the entity type
  * @param ID the entity id type
  * @param META the entity metamodel type
@@ -18,7 +19,8 @@ import org.komapper.core.dsl.visitor.QueryVisitor
  */
 interface RelationInsertQuery<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, R> : Query<R> {
     /**
-     * Builds a VALUES clause.
+     * Builds a query with a VALUES clause.
+     *
      * @param declaration the assignment declaration
      * @return the query
      */
@@ -26,6 +28,7 @@ interface RelationInsertQuery<ENTITY : Any, ID : Any, META : EntityMetamodel<ENT
 
     /**
      * Builds a query with the options applied.
+     *
      * @param configure the configure function to apply options
      * @return the query
      */

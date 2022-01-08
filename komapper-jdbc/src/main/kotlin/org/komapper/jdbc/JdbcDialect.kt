@@ -17,6 +17,7 @@ interface JdbcDialect : Dialect {
 
     /**
      * Returns the value.
+     *
      * @param rs the result set
      * @param index the column index
      * @param valueClass the value class
@@ -26,6 +27,7 @@ interface JdbcDialect : Dialect {
 
     /**
      * Returns the value.
+     *
      * @param rs the result set
      * @param columnLabel the column label
      * @param valueClass the value class
@@ -35,6 +37,7 @@ interface JdbcDialect : Dialect {
 
     /**
      * Sets the value.
+     *
      * @param ps the prepared statement
      * @param index the column index
      * @param value the value
@@ -44,6 +47,7 @@ interface JdbcDialect : Dialect {
 
     /**
      * Returns the data type.
+     *
      * @param klass the value class
      * @return the data type
      */
@@ -51,6 +55,7 @@ interface JdbcDialect : Dialect {
 
     /**
      * Returns whether the exception indicates unique constraint violation.
+     *
      * @param exception the exception
      * @return whether the exception indicates unique constraint violation
      */

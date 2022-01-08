@@ -9,13 +9,15 @@ import org.komapper.core.dsl.options.SelectOptions
 import org.komapper.core.dsl.visitor.QueryVisitor
 
 /**
- * Represents the query to database.
+ * Represents a query to database.
+ *
  * @param T the result type of query execution
  */
 @ThreadSafe
 interface Query<out T> {
     /**
      * Accepts a visitor.
+     *
      * @param VISIT_RESULT the result type
      * @param visitor the visitor
      * @return the result of visitor processing
@@ -24,12 +26,14 @@ interface Query<out T> {
 }
 
 /**
- * Represents the query whose result type is [List].
+ * Represents a query whose result type is [List].
+ *
  * @param T the element type of [List]
  */
 interface ListQuery<out T> : Query<List<T>> {
     /**
      * Builds a query that reduces the result set.
+     *
      * @param R the result type of collecting
      * @param collect the function to collect a [Flow] instance that represents the result set
      * @return the query that returns a collected value
@@ -38,6 +42,7 @@ interface ListQuery<out T> : Query<List<T>> {
 
     /**
      * Accepts a visitor.
+     *
      * @param VISIT_RESULT the result type
      * @param visitor the visitor
      * @return the result of visitor processing
@@ -48,33 +53,38 @@ interface ListQuery<out T> : Query<List<T>> {
 }
 
 /**
- * Represents the subquery.
+ * Represents a subquery.
+ *
  * @param T the element type of [List]
  */
 interface Subquery<T> : ListQuery<T>, SubqueryExpression<T> {
     /**
-     * Applies the EXCEPT operator.
+     * Builds a query with a EXCEPT operator.
+     *
      * @param other the other subquery
      * @return the query
      */
     infix fun except(other: SubqueryExpression<T>): SetOperationQuery<T>
 
     /**
-     * Applies the INTERSECT operator.
+     * Builds a query with an INTERSECT operator.
+     *
      * @param other the other subquery
      * @return the query
      */
     infix fun intersect(other: SubqueryExpression<T>): SetOperationQuery<T>
 
     /**
-     * Applies the UNION operator.
+     * Builds a query with a UNION operator.
+     *
      * @param other the other subquery
      * @return the query
      */
     infix fun union(other: SubqueryExpression<T>): SetOperationQuery<T>
 
     /**
-     * Applies the UNION ALL operator.
+     * Builds a query with a UNION ALL operator.
+     *
      * @param other the other subquery
      * @return the query
      */
@@ -82,19 +92,22 @@ interface Subquery<T> : ListQuery<T>, SubqueryExpression<T> {
 }
 
 /**
- * Represents the set operation query.
+ * Represents a set operation query.
+ *
  * @param T the element type of [List]
  */
 interface SetOperationQuery<T> : Subquery<T> {
     /**
-     * Builds an ORDER BY clause.
+     * Builds a query with an ORDER BY clause.
+     *
      * @param aliases the aliases of the columns
      * @return the query
      */
     fun orderBy(vararg aliases: CharSequence): SetOperationQuery<T>
 
     /**
-     * Builds an ORDER BY clause.
+     * Builds a query with an ORDER BY clause.
+     *
      * @param expressions the sort expressions of the columns
      * @return the query
      */
@@ -102,6 +115,7 @@ interface SetOperationQuery<T> : Subquery<T> {
 
     /**
      * Builds a query with the options applied.
+     *
      * @param configure the configure function to apply options
      * @return the query
      */

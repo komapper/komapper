@@ -11,6 +11,7 @@ interface UserTransaction {
 
     /**
      * Begins a transaction.
+     *
      * @param R the return type of the block
      * @param transactionAttribute the transaction attribute
      * @param isolationLevel the isolation level.
@@ -30,6 +31,7 @@ interface UserTransaction {
 
     /**
      * Begins a transaction with [TransactionAttribute.REQUIRED].
+     *
      * @param R the return type of the block
      * @param isolationLevel the isolation level
      * @param block the block executed in the transaction
@@ -42,6 +44,7 @@ interface UserTransaction {
 
     /**
      * Begins a transaction with [TransactionAttribute.REQUIRES_NEW].
+     *
      * @param R the return type of the block
      * @param isolationLevel the isolation level
      * @param block the block executed in the transaction

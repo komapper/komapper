@@ -9,6 +9,7 @@ import kotlin.reflect.KClass
 interface LoggerFacade {
     /**
      * Logs the sql statement.
+     *
      * @param statement the sql statement
      * @param format the format of the sql statement
      */
@@ -19,6 +20,7 @@ interface LoggerFacade {
 
     /**
      * Logs the sql statement with arguments.
+     *
      * @param statement the sql statement
      * @param format the format of the sql statement
      */
@@ -26,18 +28,21 @@ interface LoggerFacade {
 
     /**
      * Logs the beginning of transaction.
+     *
      * @param transactionId the transaction id
      */
     fun begin(transactionId: UUID)
 
     /**
      * Logs the commit of transaction.
+     *
      * @param transactionId the transaction id
      */
     fun commit(transactionId: UUID)
 
     /**
      * Logs the rollback of transaction.
+     *
      * @param transactionId the transaction id
      */
     fun rollback(transactionId: UUID)

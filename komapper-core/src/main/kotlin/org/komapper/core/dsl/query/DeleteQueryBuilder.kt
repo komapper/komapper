@@ -8,12 +8,14 @@ import org.komapper.core.dsl.options.DeleteOptions
 
 /**
  * The builder of delete queries.
+ *
  * @param ENTITY the entity type
  */
 @ThreadSafe
 interface DeleteQueryBuilder<ENTITY : Any> {
     /**
      * Builds a query to delete a single entity.
+     *
      * @param entity the entity to be deleted
      * @return the query
      */
@@ -21,6 +23,7 @@ interface DeleteQueryBuilder<ENTITY : Any> {
 
     /**
      * Builds a query to delete a list of entities in a batch.
+     *
      * @param entities the entities to be deleted
      * @param batchSize the batch size. If it is null, the value of [DeleteOptions.batchSize] will be used.
      * @return the query
@@ -29,6 +32,7 @@ interface DeleteQueryBuilder<ENTITY : Any> {
 
     /**
      * Builds a query to delete an array of entities in a batch.
+     *
      * @param entities the entities to be deleted
      * @param batchSize the batch size. If it is null, the value of [DeleteOptions.batchSize] will be used.
      * @return the query
@@ -36,7 +40,8 @@ interface DeleteQueryBuilder<ENTITY : Any> {
     fun batch(vararg entities: ENTITY, batchSize: Int? = null): EntityDeleteQuery
 
     /**
-     * Builds a WHERE clause.
+     * Builds a query to delete rows with a WHERE clause.
+     *
      * @param declaration the where declaration
      * @return the query
      */
@@ -44,6 +49,7 @@ interface DeleteQueryBuilder<ENTITY : Any> {
 
     /**
      * Builds a query to delete all rows.
+     *
      * @return the query
      */
     fun all(): RelationDeleteQuery

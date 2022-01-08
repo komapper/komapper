@@ -11,7 +11,7 @@ interface EntityMetamodel<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY,
     companion object {
         /**
          * The version of the metamodel.
-         * This version will be changed when the specification is changed.
+         * This version will be incremented as the specification changes.
          */
         const val METAMODEL_VERSION: Int = 1
     }

@@ -4,6 +4,7 @@ import kotlin.reflect.KClass
 
 /**
  * The SQL statement.
+ *
  * @property parts the parts of the SQL statement.
  */
 @ThreadSafe

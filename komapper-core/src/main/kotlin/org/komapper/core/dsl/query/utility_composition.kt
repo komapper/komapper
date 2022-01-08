@@ -34,6 +34,18 @@ fun <T, S> Query<T>.flatZip(transform: (T) -> Query<S>): Query<Pair<T, S>> = obj
     }
 }
 
+/**
+ * Builds a query that returns the first element.
+ *
+ * @param T the element type of [List]
+ * @return the query
+ */
 fun <T> ListQuery<T>.first(): Query<T> = collect { it.first() }
 
+/**
+ * Builds a query that returns the first element or `null`.
+ *
+ * @param T the element type of [List]
+ * @return the query
+ */
 fun <T> ListQuery<T>.firstOrNull(): Query<T?> = collect { it.firstOrNull() }

@@ -12,6 +12,7 @@ interface EntityStore {
 
     /**
      * Whether the entity metamodel is contained in this store.
+     *
      * @param metamodel the entity metamodel
      * @return whether the entity metamodel is contained in this store
      */
@@ -26,6 +27,7 @@ interface EntityStore {
 
     /**
      * Returns a one-to-one association.
+     *
      * @param first the entity metamodel of the base side
      * @param second the entity metamodel of another side
      * @return the one-to-one association
@@ -37,6 +39,7 @@ interface EntityStore {
 
     /**
      * Returns a one-to-one association with the entity ID as the base-side type.
+     *
      * @param first the entity metamodel of the base side
      * @param second the entity metamodel of another side
      * @return the one-to-one association
@@ -48,6 +51,7 @@ interface EntityStore {
 
     /**
      * Returns a one-to-many association.
+     *
      * @param first the entity metamodel of the base side
      * @param second the entity metamodel of another side
      * @return the one-to-many association
@@ -59,6 +63,7 @@ interface EntityStore {
 
     /**
      * Returns a one-to-many association with the entity ID as the base-side type.
+     *
      * @param first the entity metamodel of the base side
      * @param second the entity metamodel of another side
      * @return the one-to-many association

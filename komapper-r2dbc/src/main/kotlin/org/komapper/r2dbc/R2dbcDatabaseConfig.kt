@@ -27,7 +27,7 @@ interface R2dbcDatabaseConfig : DatabaseConfig {
      */
     override val dialect: R2dbcDialect
 
-/**
+    /**
      * The session to the database.
      */
     val session: R2dbcSession

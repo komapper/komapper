@@ -19,13 +19,14 @@ interface Record {
      */
     val values: Collection<Any?>
 
-/**
+    /**
      * The columns and values contained in this record.
      */
     val entries: Set<Map.Entry<ColumnExpression<*, *>, Any?>>
 
     /**
      * Returns whether the column is contained.
+     *
      * @param key the column
      * @return true if the column is contained
      */
@@ -38,6 +39,7 @@ interface Record {
 
     /**
      * Returns the value of the specified column.
+     *
      * @param T the type of the value
      * @param key the column
      */

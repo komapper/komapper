@@ -30,6 +30,7 @@ interface R2dbcDataType<T : Any> {
 
     /**
      * Returns the value.
+     *
      * @param row the row
      * @param index the index
      * @return the value
@@ -38,6 +39,7 @@ interface R2dbcDataType<T : Any> {
 
     /**
      * Returns the value.
+     *
      * @param row the row
      * @param columnLabel the column label
      * @return the value
@@ -45,7 +47,8 @@ interface R2dbcDataType<T : Any> {
     fun getValue(row: Row, columnLabel: String): T?
 
     /**
-     * Sets the value
+     * Sets the value.
+     *
      * @param statement the statement
      * @param index the index
      * @param value the value
@@ -53,7 +56,8 @@ interface R2dbcDataType<T : Any> {
     fun setValue(statement: Statement, index: Int, value: T?)
 
     /**
-     * Sets the value
+     * Sets the value.
+     *
      * @param statement the statement
      * @param name the name of identifier to bind to
      * @param value the value
@@ -62,6 +66,7 @@ interface R2dbcDataType<T : Any> {
 
     /**
      * Returns the string presentation of the value.
+     *
      * @param value the value
      * @return the string presentation of the value
      */

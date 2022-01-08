@@ -5,7 +5,7 @@ import org.komapper.core.dsl.expression.Criterion
 import org.komapper.core.dsl.expression.HavingDeclaration
 
 /**
- * Represents the scope for the having expression.
+ * Provides operators for the HAVING clause.
  */
 @Scope
 class HavingScope(

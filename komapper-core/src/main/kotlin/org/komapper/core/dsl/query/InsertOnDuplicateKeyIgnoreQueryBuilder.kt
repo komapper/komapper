@@ -5,7 +5,8 @@ import org.komapper.core.dsl.context.EntityUpsertContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 
 /**
- * Represents the builder of the query that inserts entities and ignores duplicate keys.
+ * The builder of the query that inserts entities and ignores duplicate keys.
+ *
  * @param ENTITY the entity type
  * @param ID the entity id type
  * @param META the entity metamodel type
@@ -14,6 +15,7 @@ import org.komapper.core.dsl.metamodel.EntityMetamodel
 interface InsertOnDuplicateKeyIgnoreQueryBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> {
     /**
      * Builds a query to insert a single entity.
+     *
      * @param entity the entity to be inserted
      * @return the query
      */
@@ -21,6 +23,7 @@ interface InsertOnDuplicateKeyIgnoreQueryBuilder<ENTITY : Any, ID : Any, META : 
 
     /**
      * Builds a query to bulk insert a list of entities.
+     *
      * @param entities the entities to be inserted
      * @return the query
      */
@@ -28,20 +31,23 @@ interface InsertOnDuplicateKeyIgnoreQueryBuilder<ENTITY : Any, ID : Any, META : 
 
     /**
      * Builds a query to bulk insert an array of entities.
+     *
      * @param entities the entities to be inserted
      * @return the query
      */
     fun multiple(vararg entities: ENTITY): EntityUpsertQuery<Int>
 
     /**
-     * Builds a query to bulk insert a list of entities.
+     * Builds a query to insert a list of entities in a batch.
+     *
      * @param entities the entities to be inserted
      * @return the query
      */
     fun batch(entities: List<ENTITY>, batchSize: Int? = null): EntityUpsertQuery<List<Int>>
 
     /**
-     * Builds a query to bulk insert an array of entities.
+     * Builds a query to insert an array of entities in a batch.
+     *
      * @param entities the entities to be inserted
      * @return the query
      */
@@ -49,6 +55,7 @@ interface InsertOnDuplicateKeyIgnoreQueryBuilder<ENTITY : Any, ID : Any, META : 
 
     /**
      * Builds a query to insert or update a single entity and get the result as a new entity.
+     *
      * @param entity the entity to be inserted
      * @return the query that returns a new entity when the entity is inserted, or null when the entity has duplicate keys
      */

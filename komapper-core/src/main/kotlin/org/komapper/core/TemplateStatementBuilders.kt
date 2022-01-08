@@ -9,6 +9,7 @@ import java.util.ServiceLoader
  */
 object TemplateStatementBuilders {
     /**
+     * @param dialect the dialect of the database
      * @return the [TemplateStatementBuilder] instance
      */
     fun get(dialect: Dialect): TemplateStatementBuilder {

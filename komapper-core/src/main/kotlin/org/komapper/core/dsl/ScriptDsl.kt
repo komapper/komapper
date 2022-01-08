@@ -11,6 +11,7 @@ object ScriptDsl : Dsl {
 
     /**
      * Creates a query for executing a script.
+     *
      * @param sql the script to execute
      */
     fun execute(sql: String): ScriptExecuteQuery {

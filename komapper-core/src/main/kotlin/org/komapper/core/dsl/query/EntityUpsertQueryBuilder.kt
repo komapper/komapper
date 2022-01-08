@@ -6,6 +6,7 @@ import org.komapper.core.dsl.metamodel.EntityMetamodel
 
 /**
  * The builder of upsert queries.
+ *
  * @param ENTITY the entity type
  * @param ID the entity id type
  * @param META the entity metamodel type

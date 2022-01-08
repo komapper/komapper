@@ -10,6 +10,7 @@ import javax.sql.DataSource
 
 /**
  * A simple implementation of [DataSource].
+ *
  * @property url the JDBC URL
  * @property user the JDBC user
  * @property password the JDBC password

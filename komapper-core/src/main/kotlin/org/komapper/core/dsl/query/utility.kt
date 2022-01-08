@@ -25,6 +25,7 @@ EntityMetamodel<ENTITY, ID, META>.checkIdValueNotNull(entities: List<ENTITY>) {
 
 /**
  * Executes a dry run.
+ *
  * @param config the database configuration
  * @return the result of dry run
  */

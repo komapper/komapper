@@ -5,7 +5,7 @@ import org.komapper.core.dsl.expression.Criterion
 import org.komapper.core.dsl.expression.WhereDeclaration
 
 /**
- * Represents the scope for the where expression.
+ * Provides operators for the WHERE clause.
  */
 @Scope
 class WhereScope(

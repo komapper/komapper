@@ -18,7 +18,7 @@ import org.komapper.core.dsl.visitor.FlowQueryVisitor
 import org.komapper.core.dsl.visitor.QueryVisitor
 
 /**
- * Represents the query to retrieve rows.
+ * Represents a query to retrieve rows.
  */
 interface RelationSelectQuery<ENTITY : Any> : SelectQuery<ENTITY, RelationSelectQuery<ENTITY>>
 

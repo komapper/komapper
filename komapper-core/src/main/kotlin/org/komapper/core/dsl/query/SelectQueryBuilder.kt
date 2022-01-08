@@ -20,6 +20,7 @@ import org.komapper.core.dsl.visitor.QueryVisitor
 
 /**
  * The builder of select queries.
+ *
  * @param ENTITY the entity type
  * @param ID the entity id type
  * @param META the entity metamodel type
