@@ -3,7 +3,6 @@ plugins {
     `maven-publish`
     signing
     kotlin("jvm")
-    id("org.jetbrains.dokka")
     id("org.jlleitschuh.gradle.ktlint") version "10.2.1"
     id("io.github.gradle-nexus.publish-plugin") version "1.1.0"
     id("net.researchgate.release") version "2.8.1"
@@ -28,6 +27,23 @@ allprojects {
     apply(plugin = "org.jlleitschuh.gradle.ktlint")
 
     ktlint {
+        enableExperimentalRules.set(true)
+        disabledRules.set(
+            listOf(
+                "experimental:annotation",
+                "experimental:annotation-spacing",
+                "experimental:argument-list-wrapping",
+                "experimental:enum-entry-name-case",
+                "experimental:multiline-if-else",
+                "experimental:no-empty-first-line-in-method-block",
+                "experimental:package-name",
+                "experimental:spacing-around-angle-brackets",
+                "experimental:double-colon-spacing",
+                "experimental:unary-op-spacing",
+                "experimental:spacing-between-declarations-with-annotations",
+                // "experimental:spacing-between-declarations-with-comments"
+            )
+        )
         filter {
             exclude("build/**")
         }
@@ -60,7 +76,6 @@ configure(libraryProjects + gradlePluginProject + exampleProjects + integrationT
 }
 
 configure(libraryProjects + gradlePluginProject) {
-    apply(plugin = "org.jetbrains.dokka")
     java {
         withJavadocJar()
         withSourcesJar()

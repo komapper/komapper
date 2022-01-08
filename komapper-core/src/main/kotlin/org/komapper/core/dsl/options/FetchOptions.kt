@@ -7,6 +7,7 @@ interface FetchOptions : QueryOptions {
      * The fetch size used in SELECT queries.
      */
     val fetchSize: Int?
+
     /**
      * The max row size used in SELECT queries.
      */

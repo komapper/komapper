@@ -21,18 +21,21 @@ interface UpdateQueryBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTI
      * @return the query
      */
     fun include(vararg properties: PropertyMetamodel<ENTITY, *, *>): UpdateQueryBuilder<ENTITY, ID, META>
+
     /**
      * Returns a new builder of the query that does not update specified properties.
      * @param properties the properties to be excluded
      * @return the query
      */
     fun exclude(vararg properties: PropertyMetamodel<ENTITY, *, *>): UpdateQueryBuilder<ENTITY, ID, META>
+
     /**
      * Builds a query to update a single entity.
      * @param entity the entity to be updated
      * @return the query
      */
     fun single(entity: ENTITY): EntityUpdateQuery<ENTITY>
+
     /**
      * Builds a query to update a list of entities in a batch.
      * @param entities the entities to be updated
@@ -40,6 +43,7 @@ interface UpdateQueryBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTI
      * @return the query
      */
     fun batch(entities: List<ENTITY>, batchSize: Int? = null): EntityUpdateQuery<List<ENTITY>>
+
     /**
      * Builds a query to delete an array of entities in a batch.
      * @param entities the entities to be deleted
@@ -47,6 +51,7 @@ interface UpdateQueryBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTI
      * @return the query
      */
     fun batch(vararg entities: ENTITY, batchSize: Int? = null): EntityUpdateQuery<List<ENTITY>>
+
     /**
      * Builds a SET clause.
      * @param declaration the assignment declaration

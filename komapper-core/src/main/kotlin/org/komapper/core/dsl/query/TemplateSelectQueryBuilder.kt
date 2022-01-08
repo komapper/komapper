@@ -15,12 +15,14 @@ interface TemplateSelectQueryBuilder {
      * @return the builder
      */
     fun bind(data: Any): TemplateSelectQueryBuilder
+
     /**
      * Builds a builder with the options applied.
      * @param configure the configure function to apply options
      * @return the builder
      */
     fun options(configure: (TemplateSelectOptions) -> TemplateSelectOptions): TemplateSelectQueryBuilder
+
     /**
      * Builds a query that returns a list of an arbitrary type.
      * @param T the element type of list
