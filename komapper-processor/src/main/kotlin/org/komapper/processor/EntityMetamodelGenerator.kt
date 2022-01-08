@@ -54,7 +54,7 @@ internal class EntityMetamodelGenerator(
             w.println()
         }
         w.println("// generated at ${ZonedDateTime.now()}")
-        w.println("@$EntityMetamodelImplementor")
+        w.println("@$EntityMetamodelImplementor($entityTypeName::class)")
         w.println("class $simpleName private constructor($constructorParamList) : $EntityMetamodel<$entityTypeName, $idTypeName, $simpleName> {")
         w.println("    private val __tableName = table")
         w.println("    private val __catalogName = catalog")

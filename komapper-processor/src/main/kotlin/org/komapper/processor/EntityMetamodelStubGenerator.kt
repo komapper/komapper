@@ -35,7 +35,7 @@ internal class EntityMetamodelStubGenerator(
             w.println()
         }
         w.println("// generated at ${ZonedDateTime.now()}")
-        w.println("@$EntityMetamodelImplementor")
+        w.println("@$EntityMetamodelImplementor($entityTypeName::class)")
         w.println("class $simpleName : $EntityMetamodelStub<$entityTypeName, $simpleName>() {")
         val parameters = declaration.primaryConstructor?.parameters
         if (parameters != null) {
