@@ -3,7 +3,6 @@ plugins {
     `maven-publish`
     signing
     kotlin("jvm")
-    id("org.jetbrains.dokka")
     id("org.jlleitschuh.gradle.ktlint") version "10.2.1"
     id("io.github.gradle-nexus.publish-plugin") version "1.1.0"
     id("net.researchgate.release") version "2.8.1"
@@ -77,7 +76,6 @@ configure(libraryProjects + gradlePluginProject + exampleProjects + integrationT
 }
 
 configure(libraryProjects + gradlePluginProject) {
-    apply(plugin = "org.jetbrains.dokka")
     java {
         withJavadocJar()
         withSourcesJar()
