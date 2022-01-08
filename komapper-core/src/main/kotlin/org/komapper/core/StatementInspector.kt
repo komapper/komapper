@@ -7,6 +7,7 @@ package org.komapper.core
 fun interface StatementInspector {
     /**
      * Inspects the SQL statement.
+     *
      * @param statement the SQL statement
      * @return the new SQL statement
      */

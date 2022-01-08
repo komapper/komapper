@@ -10,7 +10,8 @@ import org.komapper.core.dsl.options.TemplateSelectOptions
 @ThreadSafe
 interface TemplateSelectQueryBuilder {
     /**
-     * Binds data to the query.
+     * Builds a builder that the data is bound.
+     *
      * @param data data to be bound
      * @return the builder
      */
@@ -18,13 +19,15 @@ interface TemplateSelectQueryBuilder {
 
     /**
      * Builds a builder with the options applied.
+     *
      * @param configure the configure function to apply options
      * @return the builder
      */
     fun options(configure: (TemplateSelectOptions) -> TemplateSelectOptions): TemplateSelectQueryBuilder
 
     /**
-     * Builds a query that returns a list of an arbitrary type.
+     * Builds a query that returns a list.
+     *
      * @param T the element type of list
      * @param transform the function to transform a [Row] type to an arbitrary type
      * @return the query

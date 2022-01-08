@@ -9,6 +9,7 @@ import org.komapper.core.dsl.options.DeleteOptions
 
 /**
  * The builder of update queries.
+ *
  * @param ENTITY the entity type
  * @param ID the entity id type
  * @param META the entity metamodel type
@@ -17,6 +18,7 @@ import org.komapper.core.dsl.options.DeleteOptions
 interface UpdateQueryBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> {
     /**
      * Returns a new builder of the query that updates specified properties.
+     *
      * @param properties the properties to be included
      * @return the query
      */
@@ -24,6 +26,7 @@ interface UpdateQueryBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTI
 
     /**
      * Returns a new builder of the query that does not update specified properties.
+     *
      * @param properties the properties to be excluded
      * @return the query
      */
@@ -31,6 +34,7 @@ interface UpdateQueryBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTI
 
     /**
      * Builds a query to update a single entity.
+     *
      * @param entity the entity to be updated
      * @return the query
      */
@@ -38,6 +42,7 @@ interface UpdateQueryBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTI
 
     /**
      * Builds a query to update a list of entities in a batch.
+     *
      * @param entities the entities to be updated
      * @param batchSize the batch size. If it is null, the value of [DeleteOptions.batchSize] will be used.
      * @return the query
@@ -46,6 +51,7 @@ interface UpdateQueryBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTI
 
     /**
      * Builds a query to delete an array of entities in a batch.
+     *
      * @param entities the entities to be deleted
      * @param batchSize the batch size. If it is null, the value of [DeleteOptions.batchSize] will be used.
      * @return the query
@@ -53,7 +59,8 @@ interface UpdateQueryBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTI
     fun batch(vararg entities: ENTITY, batchSize: Int? = null): EntityUpdateQuery<List<ENTITY>>
 
     /**
-     * Builds a SET clause.
+     * Builds a query with a SET clause.
+     *
      * @param declaration the assignment declaration
      * @return the query
      */

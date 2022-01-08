@@ -172,7 +172,7 @@ internal class EntityMetamodelGenerator(
     }
 
     private fun idGenerator() {
-        val pair = entity.properties.mapNotNull {
+        val pair = entity.properties.firstNotNullOfOrNull {
             when (it.kind) {
                 is PropertyKind.Id -> {
                     val idKind = it.kind.idKind
@@ -180,7 +180,7 @@ internal class EntityMetamodelGenerator(
                 }
                 else -> null
             }
-        }.firstOrNull()
+        }
 
         w.print("    override fun idGenerator(): $IdGenerator<$entityTypeName, $idTypeName>? = ")
         if (pair != null) {

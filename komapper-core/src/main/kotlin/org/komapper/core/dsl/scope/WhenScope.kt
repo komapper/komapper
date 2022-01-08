@@ -5,7 +5,7 @@ import org.komapper.core.dsl.expression.Criterion
 import org.komapper.core.dsl.expression.WhenDeclaration
 
 /**
- * Represents the scope for the case when expression.
+ * Provides operators for the WHEN clause.
  */
 @Scope
 class WhenScope(

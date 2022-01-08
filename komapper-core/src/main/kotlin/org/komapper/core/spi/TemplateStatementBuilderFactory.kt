@@ -11,6 +11,7 @@ import org.komapper.core.ThreadSafe
 interface TemplateStatementBuilderFactory : Prioritized {
     /**
      * Create a [TemplateStatementBuilder].
+     *
      * @param dialect the dialect of database
      * @param enableCache whether to enable cache or not
      * @return the [TemplateStatementBuilder].

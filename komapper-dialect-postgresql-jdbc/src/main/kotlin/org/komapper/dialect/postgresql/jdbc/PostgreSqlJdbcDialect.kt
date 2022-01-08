@@ -28,13 +28,13 @@ import java.sql.SQLException
 open class PostgreSqlJdbcDialect(
     dataTypes: List<JdbcDataType<*>> = emptyList(),
     val version: Version = Version.IMPLICIT
-) : PostgreSqlDialect, AbstractJdbcDialect(defaultDataTypes + dataTypes) {
+) : PostgreSqlDialect, AbstractJdbcDialect(DEFAULT_DATA_TYPES + dataTypes) {
 
     companion object {
         /** the state code that represents unique violation  */
         const val UNIQUE_CONSTRAINT_VIOLATION_STATE_CODE = "23505"
 
-        val defaultDataTypes: List<JdbcDataType<*>> = listOf(
+        val DEFAULT_DATA_TYPES: List<JdbcDataType<*>> = listOf(
             ArrayType("text[]"),
             BigDecimalType("numeric"),
             BigIntegerType("numeric"),

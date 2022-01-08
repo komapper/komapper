@@ -114,13 +114,13 @@ internal class R2dbcExecutor(
     private fun log(statement: Statement) {
         val suppressLogging = executionOptions.suppressLogging ?: false
         if (!suppressLogging) {
-            config.loggerFacade.sql(statement, config.dialect::replacePlaceHolder)
+            config.loggerFacade.sql(statement, config.dialect::createBindVariable)
             config.loggerFacade.sqlWithArgs(statement, config.dialect::formatValue)
         }
     }
 
     private fun asSql(statement: Statement): String {
-        return statement.toSql(config.dialect::replacePlaceHolder)
+        return statement.toSql(config.dialect::createBindVariable)
     }
 
     private fun prepare(con: io.r2dbc.spi.Connection, statement: Statement): io.r2dbc.spi.Statement {

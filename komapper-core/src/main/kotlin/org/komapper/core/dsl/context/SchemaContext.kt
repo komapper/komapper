@@ -7,5 +7,5 @@ import org.komapper.core.dsl.options.SchemaOptions
 @ThreadSafe
 data class SchemaContext(
     val metamodels: List<EntityMetamodel<*, *, *>> = emptyList(),
-    val options: SchemaOptions = SchemaOptions.default
+    val options: SchemaOptions = SchemaOptions.DEFAULT
 )

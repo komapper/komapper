@@ -15,6 +15,14 @@ import kotlin.reflect.KClass
  */
 @ThreadSafe
 interface Dialect {
+
+    companion object {
+        const val OPEN_QUOTE = "\""
+        const val CLOSE_QUOTE = "\""
+        const val ESCAPE_SEQUENCE = "\\"
+        const val MASK = "*****"
+    }
+
     /**
      * The name of the driver.
      */
@@ -23,35 +31,37 @@ interface Dialect {
     /**
      * The open quote for identifiers.
      */
-    val openQuote: String get() = "\""
+    val openQuote: String get() = OPEN_QUOTE
 
     /**
      * The close quote for identifiers.
      */
-    val closeQuote: String get() = "\""
+    val closeQuote: String get() = CLOSE_QUOTE
 
     /**
      * The escape sequence to be used in the LIKE predicate.
      */
-    val escapeSequence: String get() = "\\"
+    val escapeSequence: String get() = ESCAPE_SEQUENCE
 
     /**
-     * The mask string used to hide sensitive information contained in the log.
+     * The mask string used to hide sensitive information contained in logs.
      */
-    val mask: String get() = "*****"
+    val mask: String get() = MASK
 
     /**
-     * Replaces the placeholder with other [CharSequence].
-     * @param index the placeholder index
-     * @param placeHolder the placeholder
-     * @return the new placeholder
+     * Creates a bind variable name.
+     *
+     * @param index the binding index
+     * @param value the value
+     * @return the bind variable name
      */
-    fun replacePlaceHolder(index: Int, placeHolder: StatementPart.PlaceHolder): CharSequence {
-        return placeHolder
+    fun createBindVariable(index: Int, value: StatementPart.Value): CharSequence {
+        return Statement.createBindVariable(index, value)
     }
 
     /**
      * Formats the value.
+     *
      * @param value the value
      * @param valueClass the class of the value
      * @param masking whether to mask the value
@@ -60,7 +70,8 @@ interface Dialect {
     fun formatValue(value: Any?, valueClass: KClass<*>, masking: Boolean): String
 
     /**
-     * Enquotes the sql identifier.
+     * Enclose the sql identifier with the [openQuote] and the [closeQuote].
+     *
      * @param name the identifier
      * @return the quoted identifier
      */
@@ -69,7 +80,8 @@ interface Dialect {
     }
 
     /**
-     * Escapes the operand value of the LIKE predicate.
+     * Escapes the operand value of the LIKE predicate with the escape sequence.
+     *
      * @param text the value
      * @param escapeSequence the escape sequence
      * @return the escaped value
@@ -83,6 +95,7 @@ interface Dialect {
 
     /**
      * Creates a regex pattern to escape the operand value of the LIKE predicate.
+     *
      * @param escapeSequence the escape sequence
      * @return the regex pattern
      */
@@ -94,6 +107,7 @@ interface Dialect {
 
     /**
      * Returns the data type name.
+     *
      * @param klass the class corresponding the data type
      * @return the data type name
      */
@@ -101,6 +115,7 @@ interface Dialect {
 
     /**
      * Returns the statement builder for creating the offset and limit expression.
+     *
      * @param offset the offset
      * @param limit the limit
      * @return the statement builder
@@ -111,6 +126,7 @@ interface Dialect {
 
     /**
      * Returns the SQL string for retrieving a new sequence number.
+     *
      * @param sequenceName the sequence name
      * @return the SQL string
      */
@@ -118,12 +134,14 @@ interface Dialect {
 
     /**
      * Returns the statement builder for schema.
+     *
      * @return the statement builder
      */
     fun getSchemaStatementBuilder(): SchemaStatementBuilder
 
     /**
      * Returns the statement builder for the entity upsert command.
+     *
      * @param ENTITY the entity type
      * @param ID the entity id type
      * @param META the entity metamodel type
@@ -138,12 +156,14 @@ interface Dialect {
 
     /**
      * Returns whether the alias is supported in the delete statement.
+     *
      * @return whether the alias is supported
      */
     fun supportsAliasForDeleteStatement() = true
 
     /**
      * Returns whether the nulls first and nulls last options are supported in the order by clause.
+     *
      * @return whether the nulls first and nulls last options are supported
      */
     fun supportsNullOrdering(): Boolean = true

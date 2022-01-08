@@ -11,7 +11,7 @@ data class InsertOptions(
 ) : BatchOptions, QueryOptions {
 
     companion object {
-        val default = InsertOptions(
+        val DEFAULT = InsertOptions(
             batchSize = null,
             disableSequenceAssignment = false,
             queryTimeoutSeconds = null,

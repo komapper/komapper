@@ -19,10 +19,21 @@ interface R2dbcDatabase : R2dbc {
 
     companion object {
 
+        /**
+         * Creates a [R2dbcDatabase] instance.
+         *
+         * @param config the database configuration
+         */
         fun create(config: R2dbcDatabaseConfig): R2dbcDatabase {
             return R2dbcDatabaseImpl(config)
         }
 
+        /**
+         * Creates a [R2dbcDatabase] instance.
+         *
+         * @param connectionFactory the connection factory
+         * @param dialect the dialect
+         */
         fun create(
             connectionFactory: ConnectionFactory,
             dialect: R2dbcDialect,
@@ -31,6 +42,11 @@ interface R2dbcDatabase : R2dbc {
             return create(config)
         }
 
+        /**
+         * Creates a [R2dbcDatabase] instance.
+         *
+         * @param options the connection factory options
+         */
         fun create(options: ConnectionFactoryOptions): R2dbcDatabase {
             val driver = options.getValue(ConnectionFactoryOptions.DRIVER)
             checkNotNull(driver) { "The driver option is not found." }
@@ -40,6 +56,11 @@ interface R2dbcDatabase : R2dbc {
             return create(config)
         }
 
+        /**
+         * Creates a [R2dbcDatabase] instance.
+         *
+         * @param url the R2DBC URL
+         */
         fun create(url: String): R2dbcDatabase {
             val connectionFactory = ConnectionFactories.get(url)
             val driver = R2dbcDialects.extractR2dbcDriver(url)
@@ -56,6 +77,7 @@ interface R2dbcDatabase : R2dbc {
 
     /**
      * Runs the given [query] and returns the result.
+     *
      * @param query the query
      * @return the result represented by the query
      */
@@ -67,6 +89,7 @@ interface R2dbcDatabase : R2dbc {
 
     /**
      * Runs the given [block] and returns the result.
+     *
      * @param block the block that returns a query
      * @return the result represented by the query
      */
@@ -77,6 +100,7 @@ interface R2dbcDatabase : R2dbc {
 
     /**
      * Converts the given [query] to [Flow].
+     *
      * @param query the query
      * @return the flow
      */
@@ -88,6 +112,7 @@ interface R2dbcDatabase : R2dbc {
 
     /**
      * Converts the given [block] to [Flow].
+     *
      * @param block the block that returns a query
      * @return the flow
      */

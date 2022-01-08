@@ -31,10 +31,10 @@ internal class EntityDefFactory(
         val name = annotation?.findValue("name")?.toString()?.trim().let {
             if (it.isNullOrBlank()) null else it
         } ?: namingStrategy.apply(definitionSource.entityDeclaration.simpleName.asString())
-        val catalog = annotation?.findValue("catalog")?.toString()?.trim() ?: KomapperTable.catalog
-        val schema = annotation?.findValue("schema")?.toString()?.trim() ?: KomapperTable.schema
+        val catalog = annotation?.findValue("catalog")?.toString()?.trim() ?: KomapperTable.CATALOG
+        val schema = annotation?.findValue("schema")?.toString()?.trim() ?: KomapperTable.SCHEMA
         val alwaysQuote =
-            annotation?.findValue("alwaysQuote")?.toString()?.toBooleanStrict() ?: KomapperTable.alwaysQuote
+            annotation?.findValue("alwaysQuote")?.toString()?.toBooleanStrict() ?: KomapperTable.ALWAYS_QUOTE
         return Table(name, catalog, schema, alwaysQuote)
     }
 
@@ -44,9 +44,9 @@ internal class EntityDefFactory(
             if (it.isNullOrBlank()) null else it
         } ?: namingStrategy.apply(parameter.toString())
         val alwaysQuote =
-            annotation?.findValue("alwaysQuote")?.toString()?.toBooleanStrict() ?: KomapperColumn.alwaysQuote
+            annotation?.findValue("alwaysQuote")?.toString()?.toBooleanStrict() ?: KomapperColumn.ALWAYS_QUOTE
         val masking =
-            annotation?.findValue("masking")?.toString()?.toBooleanStrict() ?: KomapperColumn.masking
+            annotation?.findValue("masking")?.toString()?.toBooleanStrict() ?: KomapperColumn.MASKING
         return Column(name, alwaysQuote, masking)
     }
 
@@ -67,13 +67,13 @@ internal class EntityDefFactory(
     }
 
     private fun validateProperties(properties: Sequence<PropertyDef>) {
-        if (properties.anyDuplicates { it.kind is PropertyKind.Version }) {
+        if (properties.hasDuplicates { it.kind is PropertyKind.Version }) {
             report("Multiple @${KomapperVersion::class.simpleName} cannot coexist in a single class.", defDeclaration)
         }
-        if (properties.anyDuplicates { it.kind is PropertyKind.CreatedAt }) {
+        if (properties.hasDuplicates { it.kind is PropertyKind.CreatedAt }) {
             report("Multiple @${KomapperCreatedAt::class.simpleName} cannot coexist in a single class.", defDeclaration)
         }
-        if (properties.anyDuplicates { it.kind is PropertyKind.UpdatedAt }) {
+        if (properties.hasDuplicates { it.kind is PropertyKind.UpdatedAt }) {
             report("Multiple @${KomapperUpdatedAt::class.simpleName} cannot coexist in a single class.", defDeclaration)
         }
     }
@@ -87,12 +87,12 @@ internal class EntityDefFactory(
                 KomapperSequence::class.simpleName -> sequence = let {
                     val name = a.findValue("name")?.toString()?.trim()
                         ?: report("@${KomapperSequence::class.simpleName}.name is not found.", a)
-                    val startWith = a.findValue("startWith") ?: KomapperSequence.startWith
-                    val incrementBy = a.findValue("incrementBy") ?: KomapperSequence.incrementBy
-                    val catalog = a.findValue("catalog")?.toString()?.trim() ?: KomapperSequence.catalog
-                    val schema = a.findValue("schema")?.toString()?.trim() ?: KomapperSequence.schema
+                    val startWith = a.findValue("startWith") ?: KomapperSequence.START_WITH
+                    val incrementBy = a.findValue("incrementBy") ?: KomapperSequence.INCREMENT_BY
+                    val catalog = a.findValue("catalog")?.toString()?.trim() ?: KomapperSequence.CATALOG
+                    val schema = a.findValue("schema")?.toString()?.trim() ?: KomapperSequence.SCHEMA
                     val alwaysQuote =
-                        a.findValue("alwaysQuote")?.toString()?.toBooleanStrict() ?: KomapperSequence.alwaysQuote
+                        a.findValue("alwaysQuote")?.toString()?.toBooleanStrict() ?: KomapperSequence.ALWAYS_QUOTE
                     IdKind.Sequence(a, name, startWith, incrementBy, catalog, schema, alwaysQuote)
                 }
             }

@@ -6,7 +6,7 @@ data class ScriptOptions(
 ) : QueryOptions {
 
     companion object {
-        val default = ScriptOptions(
+        val DEFAULT = ScriptOptions(
             queryTimeoutSeconds = null,
             suppressLogging = false
         )

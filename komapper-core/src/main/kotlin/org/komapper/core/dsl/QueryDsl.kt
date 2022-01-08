@@ -21,6 +21,7 @@ object QueryDsl : Dsl {
 
     /**
      * Creates a SELECT query builder.
+     *
      * @param ENTITY the entity type
      * @param ID the entity id type
      * @param META the entity metamodel type
@@ -35,6 +36,7 @@ object QueryDsl : Dsl {
 
     /**
      * Creates a INSERT query builder.
+     *
      * @param ENTITY the entity type
      * @param ID the entity id type
      * @param META the entity metamodel type
@@ -49,6 +51,7 @@ object QueryDsl : Dsl {
 
     /**
      * Creates a UPDATE query builder.
+     *
      * @param ENTITY the entity type
      * @param ID the entity id type
      * @param META the entity metamodel type
@@ -63,6 +66,7 @@ object QueryDsl : Dsl {
 
     /**
      * Creates a DELETE query builder.
+     *
      * @param ENTITY the entity type
      * @param ID the entity id type
      * @param META the entity metamodel type

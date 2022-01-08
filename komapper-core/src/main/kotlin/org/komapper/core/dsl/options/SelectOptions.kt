@@ -10,7 +10,7 @@ data class SelectOptions(
 ) : FetchOptions, WhereOptions {
 
     companion object {
-        val default = SelectOptions(
+        val DEFAULT = SelectOptions(
             allowEmptyWhereClause = true,
             escapeSequence = null,
             fetchSize = null,

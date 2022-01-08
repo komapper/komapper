@@ -16,6 +16,7 @@ object SchemaDsl : Dsl {
 
     /**
      * Creates a query for creating tables and their associated constraints.
+     *
      * @param metamodels the entity metamodels
      */
     fun create(metamodels: List<EntityMetamodel<*, *, *>>): SchemaCreateQuery {
@@ -24,6 +25,7 @@ object SchemaDsl : Dsl {
 
     /**
      * Creates a query for creating tables and their associated constraints.
+     *
      * @param metamodels the entity metamodels
      */
     fun create(vararg metamodels: EntityMetamodel<*, *, *>): SchemaCreateQuery {
@@ -32,6 +34,7 @@ object SchemaDsl : Dsl {
 
     /**
      * Creates a query for dropping tables and their associated constraints.
+     *
      * @param metamodels the entity metamodels
      */
     fun drop(metamodels: List<EntityMetamodel<*, *, *>>): SchemaDropQuery {
@@ -40,6 +43,7 @@ object SchemaDsl : Dsl {
 
     /**
      * Creates a query for dropping tables and their associated constraints.
+     *
      * @param metamodels the entity metamodels
      */
     fun drop(vararg metamodels: EntityMetamodel<*, *, *>): SchemaDropQuery {

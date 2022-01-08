@@ -18,6 +18,7 @@ fun PropertyMetamodel<*, *, *>.isAutoIncrement(): Boolean {
 
 /**
  * Creates a new entity metamodel.
+ *
  * @param declaration the entity metamodel declaration
  * @return the new entity metamodel
  */
@@ -47,6 +48,7 @@ val <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> META.wher
 
 /**
  * Check the version of the metamodel.
+ *
  * @param metamodelName the full qualified name of the metamodel
  * @param version the version of the metamodel
  * @exception IllegalArgumentException if the version is not compatible.

@@ -6,12 +6,13 @@ import org.komapper.core.dsl.options.SelectOptions
 import org.komapper.core.dsl.visitor.QueryVisitor
 
 /**
- * Represents the query to retrieve multiple entity sets.
+ * Represents a query to retrieve multiple entity sets.
  * This query returns the store that holds entity sets.
  */
 interface EntityStoreQuery : Query<EntityStore> {
     /**
      * Builds a query with the options applied.
+     *
      * @param configure the configure function to apply options
      * @return the query
      */

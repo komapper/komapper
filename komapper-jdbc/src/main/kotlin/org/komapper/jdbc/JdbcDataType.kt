@@ -39,6 +39,7 @@ interface JdbcDataType<T : Any> {
 
     /**
      * Returns the value.
+     *
      * @param rs the result set
      * @param index the index
      * @return the value
@@ -55,6 +56,7 @@ interface JdbcDataType<T : Any> {
 
     /**
      * Sets the value.
+     *
      * @param ps the prepared statement
      * @param index the index
      */
@@ -62,6 +64,7 @@ interface JdbcDataType<T : Any> {
 
     /**
      * Returns the string presentation of the value.
+     *
      * @param value the value
      * @return the string presentation of the value
      */

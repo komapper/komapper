@@ -10,6 +10,7 @@ import org.komapper.core.dsl.metamodel.PropertyMetamodel
 
 /**
  * The builder of insert queries.
+ *
  * @param ENTITY the entity type
  * @param ID the entity id type
  * @param META the entity metamodel type
@@ -18,6 +19,7 @@ import org.komapper.core.dsl.metamodel.PropertyMetamodel
 interface InsertQueryBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> {
     /**
      * Creates a builder of the query that inserts or updates entities.
+     *
      * @param keys the keys used for duplicate checking
      * @return the query
      */
@@ -25,6 +27,7 @@ interface InsertQueryBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTI
 
     /**
      * Creates a builder of the query that inserts entities and ignores duplicate keys.
+     *
      * @param keys the keys used for duplicate checking
      * @return the query
      */
@@ -32,6 +35,7 @@ interface InsertQueryBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTI
 
     /**
      * Builds a query to insert a single entity.
+     *
      * @param entity the entity to be inserted
      * @return the query
      */
@@ -39,6 +43,7 @@ interface InsertQueryBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTI
 
     /**
      * Builds a query to bulk insert a list of entities.
+     *
      * @param entities the entities to be inserted
      * @return the query
      */
@@ -46,6 +51,7 @@ interface InsertQueryBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTI
 
     /**
      * Builds a query to bulk insert an array of entities.
+     *
      * @param entities the entities to be inserted
      * @return the query
      */
@@ -53,6 +59,7 @@ interface InsertQueryBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTI
 
     /**
      * Builds a query to insert a list of entities in a batch.
+     *
      * @param entities the entities to be inserted
      * @return the query
      */
@@ -60,27 +67,31 @@ interface InsertQueryBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTI
 
     /**
      * Builds a query to insert an array of entities in a batch.
+     *
      * @param entities the entities to be inserted
      * @return the query
      */
     fun batch(vararg entities: ENTITY, batchSize: Int? = null): EntityInsertQuery<List<ENTITY>>
 
     /**
-     * Builds a query to insert rows using the select expression.
+     * Builds a query with a SELECT clause.
+     *
      * @param subquery the subquery expression
      * @return the query
      */
     fun select(subquery: SubqueryExpression<ENTITY>): RelationInsertQuery<ENTITY, ID, META, Pair<Int, List<ID>>>
 
     /**
-     * Builds a query to insert rows using the select expression.
+     * Builds a query with a SELECT clause.
+     *
      * @param block the block that returns a subquery expression
      * @return the query
      */
     fun select(block: () -> SubqueryExpression<ENTITY>): RelationInsertQuery<ENTITY, ID, META, Pair<Int, List<ID>>>
 
     /**
-     * Builds a VALUES clause.
+     * Builds a query with a VALUES clause.
+     *
      * @param declaration the assignment declaration
      * @return the query
      */

@@ -6,7 +6,7 @@ import org.komapper.r2dbc.spi.R2dbcDialectFactory
 
 class PostgreSqlR2dbcDialectFactory : R2dbcDialectFactory {
     override fun supports(driver: String): Boolean {
-        return driver.lowercase() == PostgreSqlDialect.driver
+        return driver.lowercase() == PostgreSqlDialect.DRIVER
     }
 
     override fun create(): R2dbcDialect {

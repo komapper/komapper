@@ -105,7 +105,7 @@ internal class TransactionScopeImplTest {
 
     @Test
     fun select() = runBlocking {
-        val list = txScope.withTransaction {
+        val list = txScope.run {
             repository.selectAll()
         }
         assertEquals(15, list.size)
@@ -114,10 +114,10 @@ internal class TransactionScopeImplTest {
 
     @Test
     fun commit() = runBlocking {
-        txScope.withTransaction {
+        txScope.run {
             repository.delete(15)
         }
-        txScope.withTransaction {
+        txScope.run {
             val address = repository.selectById(15)
             assertNull(address)
         }
@@ -126,13 +126,13 @@ internal class TransactionScopeImplTest {
     @Test
     fun rollback() = runBlocking {
         try {
-            txScope.withTransaction {
+            txScope.run {
                 repository.delete(15)
                 throw Exception()
             }
         } catch (ignored: Exception) {
         }
-        txScope.withTransaction {
+        txScope.run {
             val address = repository.selectById(15)
             assertNotNull(address)
         }
@@ -140,13 +140,13 @@ internal class TransactionScopeImplTest {
 
     @Test
     fun setRollbackOnly() = runBlocking {
-        txScope.withTransaction {
+        txScope.run {
             repository.delete(15)
             assertFalse(isRollbackOnly())
             setRollbackOnly()
             assertTrue(isRollbackOnly())
         }
-        txScope.withTransaction {
+        txScope.run {
             val address = repository.selectById(15)
             assertNotNull(address)
         }
@@ -154,10 +154,10 @@ internal class TransactionScopeImplTest {
 
     @Test
     fun isolationLevel() = runBlocking {
-        txScope.withTransaction(isolationLevel = IsolationLevel.SERIALIZABLE) {
+        txScope.run(isolationLevel = IsolationLevel.SERIALIZABLE) {
             repository.delete(15)
         }
-        txScope.withTransaction {
+        txScope.run {
             val address = repository.selectById(15)
             assertNull(address)
         }
@@ -165,14 +165,14 @@ internal class TransactionScopeImplTest {
 
     @Test
     fun required_required() = runBlocking {
-        txScope.withTransaction {
+        txScope.run {
             repository.delete(15)
             txScope.required {
                 val address = repository.selectById(15)
                 assertNull(address)
             }
         }
-        txScope.withTransaction {
+        txScope.run {
             val address = repository.selectById(15)
             assertNull(address)
         }
@@ -180,12 +180,12 @@ internal class TransactionScopeImplTest {
 
     @Test
     fun requiresNew() = runBlocking {
-        txScope.withTransaction(TransactionAttribute.REQUIRES_NEW) {
+        txScope.run(TransactionAttribute.REQUIRES_NEW) {
             repository.delete(15)
             val address = repository.selectById(15)
             assertNull(address)
         }
-        txScope.withTransaction {
+        txScope.run {
             val address = repository.selectById(15)
             assertNull(address)
         }
@@ -193,7 +193,7 @@ internal class TransactionScopeImplTest {
 
     @Test
     fun required_requiresNew() = runBlocking {
-        txScope.withTransaction {
+        txScope.run {
             repository.delete(15)
             val address = repository.selectById(15)
             assertNull(address)
@@ -202,7 +202,7 @@ internal class TransactionScopeImplTest {
                 assertNotNull(address2)
             }
         }
-        txScope.withTransaction {
+        txScope.run {
             val address = repository.selectById(15)
             assertNull(address)
         }

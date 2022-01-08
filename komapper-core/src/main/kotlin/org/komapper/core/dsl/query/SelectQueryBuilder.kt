@@ -20,6 +20,7 @@ import org.komapper.core.dsl.visitor.QueryVisitor
 
 /**
  * The builder of select queries.
+ *
  * @param ENTITY the entity type
  * @param ID the entity id type
  * @param META the entity metamodel type
@@ -122,41 +123,41 @@ internal data class SelectQueryBuilderImpl<ENTITY : Any, ID : Any, META : Entity
     }
 
     override fun groupBy(expressions: List<ColumnExpression<*, *>>): RelationSelectQuery<ENTITY> {
-        return asRelationQuery().groupBy(expressions)
+        return asRelationSelectQuery().groupBy(expressions)
     }
 
     override fun having(declaration: HavingDeclaration): RelationSelectQuery<ENTITY> {
-        return asRelationQuery().having(declaration)
+        return asRelationSelectQuery().having(declaration)
     }
 
     override fun <T : Any, S : Any> select(expression: ScalarExpression<T, S>): ScalarQuery<T?, T, S> {
-        return asRelationQuery().select(expression)
+        return asRelationSelectQuery().select(expression)
     }
 
     override fun <T : Any, S : Any> selectNotNull(expression: ScalarExpression<T, S>): ScalarQuery<T, T, S> {
-        return asRelationQuery().selectNotNull(expression)
+        return asRelationSelectQuery().selectNotNull(expression)
     }
 
     override fun <A : Any> select(expression: ColumnExpression<A, *>): FlowSubquery<A?> {
-        return asRelationQuery().select(expression)
+        return asRelationSelectQuery().select(expression)
     }
 
     override fun <A : Any> selectNotNull(expression: ColumnExpression<A, *>): FlowSubquery<A> {
-        return asRelationQuery().selectNotNull(expression)
+        return asRelationSelectQuery().selectNotNull(expression)
     }
 
     override fun <A : Any, B : Any> select(
         expression1: ColumnExpression<A, *>,
         expression2: ColumnExpression<B, *>
     ): FlowSubquery<Pair<A?, B?>> {
-        return asRelationQuery().select(expression1, expression2)
+        return asRelationSelectQuery().select(expression1, expression2)
     }
 
     override fun <A : Any, B : Any> selectNotNull(
         expression1: ColumnExpression<A, *>,
         expression2: ColumnExpression<B, *>
     ): FlowSubquery<Pair<A, B>> {
-        return asRelationQuery().selectNotNull(expression1, expression2)
+        return asRelationSelectQuery().selectNotNull(expression1, expression2)
     }
 
     override fun <A : Any, B : Any, C : Any> select(
@@ -164,7 +165,7 @@ internal data class SelectQueryBuilderImpl<ENTITY : Any, ID : Any, META : Entity
         expression2: ColumnExpression<B, *>,
         expression3: ColumnExpression<C, *>
     ): FlowSubquery<Triple<A?, B?, C?>> {
-        return asRelationQuery().select(expression1, expression2, expression3)
+        return asRelationSelectQuery().select(expression1, expression2, expression3)
     }
 
     override fun <A : Any, B : Any, C : Any> selectNotNull(
@@ -172,22 +173,22 @@ internal data class SelectQueryBuilderImpl<ENTITY : Any, ID : Any, META : Entity
         expression2: ColumnExpression<B, *>,
         expression3: ColumnExpression<C, *>
     ): FlowSubquery<Triple<A, B, C>> {
-        return asRelationQuery().selectNotNull(expression1, expression2, expression3)
+        return asRelationSelectQuery().selectNotNull(expression1, expression2, expression3)
     }
 
     override fun select(vararg expressions: ColumnExpression<*, *>): FlowSubquery<Record> {
-        return asRelationQuery().select(*expressions)
+        return asRelationSelectQuery().select(*expressions)
     }
 
     override fun selectAsRecord(vararg expressions: ColumnExpression<*, *>): FlowSubquery<Record> {
-        return asRelationQuery().selectAsRecord(*expressions)
+        return asRelationSelectQuery().selectAsRecord(*expressions)
     }
 
-    private fun asRelationQuery(): RelationSelectQuery<ENTITY> {
+    private fun asRelationSelectQuery(): RelationSelectQuery<ENTITY> {
         return RelationSelectQueryImpl(context)
     }
 
     override fun <VISIT_RESULT> accept(visitor: FlowQueryVisitor<VISIT_RESULT>): VISIT_RESULT {
-        return asRelationQuery().accept(visitor)
+        return asRelationSelectQuery().accept(visitor)
     }
 }

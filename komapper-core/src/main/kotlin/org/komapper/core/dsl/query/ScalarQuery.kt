@@ -8,10 +8,15 @@ import kotlin.reflect.KClass
 
 /**
  * Represents a query that returns a scalar.
- * ```kotlin
+ *
+ * ```
  * val a = Meta.address
  * val query: ScalarQuery<Long?, Long, Long> = QueryDsl.from(a).select(count())
  * ```
+ *
+ * @param A the result type of query execution
+ * @param B the exterior type of column
+ * @param C the interior type of column
  */
 interface ScalarQuery<A, B : Any, C : Any> : Query<A>, ScalarQueryExpression<A, B, C>
 

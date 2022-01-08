@@ -11,7 +11,7 @@ data class SetOperationContext(
     val left: SubqueryContext,
     val right: SubqueryContext,
     val orderBy: List<SortItem> = listOf(),
-    val options: SelectOptions = SelectOptions.default
+    val options: SelectOptions = SelectOptions.DEFAULT
 ) : TablesProvider, SubqueryContext {
 
     override fun getTables(): Set<TableExpression<*>> {

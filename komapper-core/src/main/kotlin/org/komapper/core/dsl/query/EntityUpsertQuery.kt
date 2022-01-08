@@ -6,13 +6,15 @@ import org.komapper.core.dsl.options.InsertOptions
 import org.komapper.core.dsl.visitor.QueryVisitor
 
 /**
- * Represents the query to upsert entities.
- * This query returns a numeric value or a list of numeric values returned by the driver.
+ * Represents a query to upsert entities.
+ * This query returns a numeric value or a list of numeric values specific to the driver.
+ *
  * @param T the entity type
  */
 interface EntityUpsertQuery<T> : Query<T> {
     /**
      * Builds a query with the options applied.
+     *
      * @param configure the configure function to apply options
      * @return the query
      */

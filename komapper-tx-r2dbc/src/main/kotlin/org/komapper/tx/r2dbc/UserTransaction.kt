@@ -11,14 +11,15 @@ import org.komapper.core.ThreadSafe
 interface UserTransaction {
 
     /**
-     * Begins a transaction.
+     * Runs a transaction.
+     *
      * @param R the return type of the block
      * @param transactionAttribute the transaction attribute
      * @param isolationLevel the isolation level
      * @param block the block executed in the transaction
      * @return the result of the block
      */
-    suspend fun <R> withTransaction(
+    suspend fun <R> run(
         transactionAttribute: TransactionAttribute = TransactionAttribute.REQUIRED,
         isolationLevel: IsolationLevel? = null,
         block: suspend TransactionScope.() -> R
@@ -31,6 +32,7 @@ interface UserTransaction {
 
     /**
      * Begins a transaction with [TransactionAttribute.REQUIRED].
+     *
      * @param R the return type of the block
      * @param isolationLevel the isolation level
      * @param block the block executed in the transaction
@@ -43,6 +45,7 @@ interface UserTransaction {
 
     /**
      * Begins a transaction with [TransactionAttribute.REQUIRES_NEW].
+     *
      * @param R the return type of the block
      * @param isolationLevel the isolation level
      * @param block the block executed in the transaction

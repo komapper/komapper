@@ -32,13 +32,13 @@ import java.sql.SQLException
 open class H2JdbcDialect(
     dataTypes: List<JdbcDataType<*>> = emptyList(),
     val version: Version = Version.IMPLICIT
-) : H2Dialect, AbstractJdbcDialect(defaultDataTypes + dataTypes) {
+) : H2Dialect, AbstractJdbcDialect(DEFAULT_DATA_TYPES + dataTypes) {
 
     companion object {
         /** the error code that represents unique violation  */
         const val UNIQUE_CONSTRAINT_VIOLATION_ERROR_CODE = 23505
 
-        val defaultDataTypes: List<JdbcDataType<*>> = listOf(
+        val DEFAULT_DATA_TYPES: List<JdbcDataType<*>> = listOf(
             AnyType("other"),
             ArrayType("array"),
             BigDecimalType("bigint"),

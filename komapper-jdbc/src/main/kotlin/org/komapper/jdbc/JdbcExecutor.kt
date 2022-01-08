@@ -123,9 +123,10 @@ internal class JdbcExecutor(
         executeWithExceptionCheck {
             config.session.connection.use { con ->
                 log(statement)
+                val sql = asSql(statement)
                 con.createStatement().use { s ->
                     s.let(::setUp)
-                    s.execute(statement.toSql())
+                    s.execute(sql)
                 }
             }
         }
@@ -150,13 +151,17 @@ internal class JdbcExecutor(
     private fun log(statement: Statement) {
         val suppressLogging = executionOptions.suppressLogging ?: false
         if (!suppressLogging) {
-            config.loggerFacade.sql(statement)
+            config.loggerFacade.sql(statement, config.dialect::createBindVariable)
             config.loggerFacade.sqlWithArgs(statement, config.dialect::formatValue)
         }
     }
 
+    private fun asSql(statement: Statement): String {
+        return statement.toSql(config.dialect::createBindVariable)
+    }
+
     private fun prepare(con: Connection, statement: Statement): PreparedStatement {
-        val sql = statement.toSql()
+        val sql = asSql(statement)
         return if (requiresGeneratedKeys) {
             con.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS)
         } else {

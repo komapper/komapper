@@ -7,7 +7,7 @@ import org.komapper.jdbc.spi.JdbcDialectFactory
 
 class PostgreSqlJdbcDialectFactory : JdbcDialectFactory {
     override fun supports(driver: String): Boolean {
-        return driver.lowercase() == PostgreSqlDialect.driver
+        return driver.lowercase() == PostgreSqlDialect.DRIVER
     }
 
     override fun create(dataTypes: List<JdbcDataType<*>>): JdbcDialect {

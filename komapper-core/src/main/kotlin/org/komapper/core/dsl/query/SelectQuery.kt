@@ -11,20 +11,23 @@ import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.SelectOptions
 
 /**
- * Represents the query to retrieve data.
+ * Represents a query to retrieve data.
+ *
  * @param ENTITY the entity type
  * @param QUERY the query type
  */
 interface SelectQuery<ENTITY : Any, QUERY : SelectQuery<ENTITY, QUERY>> :
     FlowSubquery<ENTITY> {
     /**
-     * Specifies a DISTINCT keyword.
+     * Builds a query with the DISTINCT keyword specified.
+     *
      * @return the query that returns a list of entities
      */
     fun distinct(): QUERY
 
     /**
-     * Builds a INNER JOIN clause.
+     * Builds a query with an INNER JOIN clause.
+     *
      * @return the query that returns a list of entities
      */
     fun <ENTITY2 : Any, ID2 : Any, META2 : EntityMetamodel<ENTITY2, ID2, META2>> innerJoin(
@@ -33,7 +36,8 @@ interface SelectQuery<ENTITY : Any, QUERY : SelectQuery<ENTITY, QUERY>> :
     ): QUERY = innerJoin(Relationship(metamodel, on))
 
     /**
-     * Builds a LEFT OUTER JOIN clause.
+     * Builds a query with a LEFT OUTER JOIN clause.
+     *
      * @return the query that returns a list of entities
      */
     fun <ENTITY2 : Any, ID2 : Any, META2 : EntityMetamodel<ENTITY2, ID2, META2>> leftJoin(
@@ -42,7 +46,8 @@ interface SelectQuery<ENTITY : Any, QUERY : SelectQuery<ENTITY, QUERY>> :
     ): QUERY = leftJoin(Relationship(metamodel, on))
 
     /**
-     * Builds a INNER JOIN clause.
+     * Builds a query with an INNER JOIN clause.
+     *
      * @return the query that returns a list of entities
      */
     fun <ENTITY2 : Any, ID2 : Any, META2 : EntityMetamodel<ENTITY2, ID2, META2>> innerJoin(
@@ -50,7 +55,8 @@ interface SelectQuery<ENTITY : Any, QUERY : SelectQuery<ENTITY, QUERY>> :
     ): QUERY
 
     /**
-     * Builds the LEFT OUTER JOIN clause.
+     * Builds a query with a LEFT OUTER JOIN clause.
+     *
      * @return the query that returns a list of entities
      */
     fun <ENTITY2 : Any, ID2 : Any, META2 : EntityMetamodel<ENTITY2, ID2, META2>> leftJoin(
@@ -58,70 +64,81 @@ interface SelectQuery<ENTITY : Any, QUERY : SelectQuery<ENTITY, QUERY>> :
     ): QUERY
 
     /**
-     * Builds a WHERE clause.
+     * Builds a query with a WHERE clause.
+     *
      * @return the query that returns a list of entities
      */
     fun where(declaration: WhereDeclaration): QUERY
 
     /**
-     * Builds an ORDER BY clause.
+     * Builds a query with an ORDER BY clause.
+     *
      * @return the query that returns a list of entities
      */
     fun orderBy(vararg expressions: SortExpression): QUERY = orderBy(expressions.toList())
 
     /**
-     * Builds an ORDER BY clause.
+     * Builds a query with an ORDER BY clause.
+     *
      * @return the query that returns a list of entities
      */
     fun orderBy(expressions: List<SortExpression>): QUERY
 
     /**
-     * Builds a OFFSET clause.
+     * Builds a query with an OFFSET clause.
+     *
      * @param offset the offset value. If it is negative, it is ignored.
      * @return the query that returns a list of entities
      */
     fun offset(offset: Int): QUERY
 
     /**
-     * Builds a LIMIT clause.
+     * Builds a query with a LIMIT clause.
+     *
      * @param limit the limit value. If it is negative or zero, it is ignored.
      * @return the query that returns a list of entities
      */
     fun limit(limit: Int): QUERY
 
     /**
-     * Builds a FOR UPDATE clause.
+     * Builds a query with a FOR UPDATE clause.
+     *
      * @return the query that returns a list of entities
      */
     fun forUpdate(): QUERY
 
     /**
      * Builds a query with the options applied.
+     *
      * @param configure the configure function to apply options
      * @return the query that returns a list of entities
      */
     fun options(configure: (SelectOptions) -> SelectOptions): QUERY
 
     /**
-     * Builds a GROUP BY clause.
+     * Builds a query with a GROUP BY clause.
+     *
      * @return the query that returns a list of entities
      */
     fun groupBy(vararg expressions: ColumnExpression<*, *>): RelationSelectQuery<ENTITY> = groupBy(expressions.toList())
 
     /**
-     * Builds a GROUP BY clause.
+     * Builds a query with a GROUP BY clause.
+     *
      * @return the query that returns a list of entities
      */
     fun groupBy(expressions: List<ColumnExpression<*, *>>): RelationSelectQuery<ENTITY>
 
     /**
-     * Builds a HAVING clause.
+     * Builds a query with a HAVING clause.
+     *
      * @return the query that returns a list of entities
      */
     fun having(declaration: HavingDeclaration): RelationSelectQuery<ENTITY>
 
     /**
-     * Builds a SELECT clause.
+     * Builds a query that selects a nullable scalar column.
+     *
      * @param expression the scalar expression that evaluates to nullable
      * @return the query that returns a nullable scalar value
      */
@@ -130,7 +147,8 @@ interface SelectQuery<ENTITY : Any, QUERY : SelectQuery<ENTITY, QUERY>> :
     ): ScalarQuery<T?, T, S>
 
     /**
-     * Builds a SELECT clause.
+     * Builds a query that selects a non-null scalar column.
+     *
      * @param expression the scalar expression that evaluates to not null
      * @return the query that returns a non-null scalar value
      */
@@ -139,7 +157,8 @@ interface SelectQuery<ENTITY : Any, QUERY : SelectQuery<ENTITY, QUERY>> :
     ): ScalarQuery<T, T, S>
 
     /**
-     * Builds a SELECT clause.
+     * Builds a query that selects a nullable column.
+     *
      * @param expression the column expression that evaluates to nullable
      * @return the query that returns a list of nullable values
      */
@@ -148,7 +167,8 @@ interface SelectQuery<ENTITY : Any, QUERY : SelectQuery<ENTITY, QUERY>> :
     ): FlowSubquery<A?>
 
     /**
-     * Builds a SELECT clause.
+     * Builds a query that selects a non-null column.
+     *
      * @param expression the column expression that evaluates to not null
      * @return the query that returns a list of non-null values
      */
@@ -157,7 +177,8 @@ interface SelectQuery<ENTITY : Any, QUERY : SelectQuery<ENTITY, QUERY>> :
     ): FlowSubquery<A>
 
     /**
-     * Builds a SELECT clause.
+     * Builds a query that selects two nullable columns.
+     *
      * @param expression1 the column expression that evaluates to nullable
      * @param expression2 the column expression that evaluates to nullable
      * @return the query that returns a list of nullable value pairs
@@ -168,7 +189,8 @@ interface SelectQuery<ENTITY : Any, QUERY : SelectQuery<ENTITY, QUERY>> :
     ): FlowSubquery<Pair<A?, B?>>
 
     /**
-     * Builds a SELECT clause.
+     * Builds a query that selects two non-null columns.
+     *
      * @param expression1 the column expression that evaluates to not null
      * @param expression2 the column expression that evaluates to not null
      * @return the query that returns a list of non-null value pairs
@@ -179,7 +201,8 @@ interface SelectQuery<ENTITY : Any, QUERY : SelectQuery<ENTITY, QUERY>> :
     ): FlowSubquery<Pair<A, B>>
 
     /**
-     * Builds a SELECT clause.
+     * Builds a query that selects three nullable columns.
+     *
      * @param expression1 the column expression that evaluates to nullable
      * @param expression2 the column expression that evaluates to nullable
      * @param expression3 the column expression that evaluates to nullable
@@ -192,7 +215,8 @@ interface SelectQuery<ENTITY : Any, QUERY : SelectQuery<ENTITY, QUERY>> :
     ): FlowSubquery<Triple<A?, B?, C?>>
 
     /**
-     * Builds a SELECT clause.
+     * Builds a query that selects three non-null columns.
+     *
      * @param expression1 the column expression that evaluates to not null
      * @param expression2 the column expression that evaluates to not null
      * @param expression3 the column expression that evaluates to not null
@@ -205,7 +229,8 @@ interface SelectQuery<ENTITY : Any, QUERY : SelectQuery<ENTITY, QUERY>> :
     ): FlowSubquery<Triple<A, B, C>>
 
     /**
-     * Builds a SELECT clause.
+     * Builds a query that selects multiple columns.
+     *
      * @param expressions the column expressions
      * @return the query that returns a list of records
      */
@@ -214,7 +239,8 @@ interface SelectQuery<ENTITY : Any, QUERY : SelectQuery<ENTITY, QUERY>> :
     ): FlowSubquery<Record>
 
     /**
-     * Builds a SELECT clause.
+     * Builds a query that selects multiple columns.
+     *
      * @param expressions the column expressions
      * @return the query that returns a list of records
      */

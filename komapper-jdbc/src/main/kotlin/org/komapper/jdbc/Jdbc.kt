@@ -3,7 +3,7 @@ package org.komapper.jdbc
 import org.komapper.core.ThreadSafe
 
 /**
- * Represents a JDBC resource.
+ * A marker interface for a JDBC database.
  */
 @ThreadSafe
 sealed interface Jdbc

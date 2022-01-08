@@ -10,12 +10,12 @@ import org.komapper.core.ThreadSafe
 @ThreadSafe
 interface Binder {
     /**
-     * Replaces the placeholder.
+     * Creates a bind variable name.
      *
-     * @param index the index of the placeholder
-     * @param placeHolder the placeholder
+     * @param index the binding index
+     * @param value the bind variable name
      */
-    fun replace(index: Int, placeHolder: StatementPart.PlaceHolder): CharSequence
+    fun createBindVariable(index: Int, value: StatementPart.Value): CharSequence
 
     /**
      * Binds the value to the SQL statement.
@@ -30,8 +30,8 @@ interface Binder {
 
 object DefaultBinder : Binder {
 
-    override fun replace(index: Int, placeHolder: StatementPart.PlaceHolder): CharSequence {
-        return placeHolder
+    override fun createBindVariable(index: Int, value: StatementPart.Value): CharSequence {
+        return org.komapper.core.Statement.createBindVariable(index, value)
     }
 
     override fun bind(statement: Statement, index: Int, value: Any?, dataType: R2dbcDataType<Any>) {
@@ -41,7 +41,7 @@ object DefaultBinder : Binder {
 
 object IndexedBinder : Binder {
 
-    override fun replace(index: Int, placeHolder: StatementPart.PlaceHolder): CharSequence {
+    override fun createBindVariable(index: Int, value: StatementPart.Value): CharSequence {
         return "$${index + 1}"
     }
 

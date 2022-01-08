@@ -8,13 +8,15 @@ import org.komapper.core.dsl.options.SelectOptions
 import org.komapper.core.dsl.visitor.FlowQueryVisitor
 
 /**
- * Represents the query whose result can be [Flow].
+ * Represents the query whose result is [Flow].
+ *
  * @param T the element type of [Flow]
  */
 @ThreadSafe
 interface FlowQuery<out T> {
     /**
      * Accepts a visitor.
+     *
      * @param VISIT_RESULT the result type
      * @param visitor the visitor
      */
@@ -22,33 +24,38 @@ interface FlowQuery<out T> {
 }
 
 /**
- * Represents the subquery.
+ * Represents a subquery.
+ *
  * @param T the element type of [Flow]
  */
 interface FlowSubquery<T> : Subquery<T>, FlowQuery<T> {
     /**
-     * Applies the EXCEPT operator.
+     * Builds a query with an EXCEPT operator.
+     *
      * @param other the other subquery
      * @return the query
      */
     override infix fun except(other: SubqueryExpression<T>): FlowSetOperationQuery<T>
 
     /**
-     * Applies the INTERSECT operator.
+     * Builds a query with an INTERSECT operator.
+     *
      * @param other the other subquery
      * @return the query
      */
     override infix fun intersect(other: SubqueryExpression<T>): FlowSetOperationQuery<T>
 
     /**
-     * Applies the UNION operator.
+     * Builds a query with a UNION operator.
+     *
      * @param other the other subquery
      * @return the query
      */
     override infix fun union(other: SubqueryExpression<T>): FlowSetOperationQuery<T>
 
     /**
-     * Applies the UNION ALL operator.
+     * Builds a query with a UNION ALL operator.
+     *
      * @param other the other subquery
      * @return the query
      */
@@ -57,25 +64,29 @@ interface FlowSubquery<T> : Subquery<T>, FlowQuery<T> {
 
 /**
  * Represents the set operation query.
+ *
  * @param T the element type of [Flow]
  */
 interface FlowSetOperationQuery<T> : SetOperationQuery<T>, FlowSubquery<T> {
     /**
-     * Sets sort expressions.
+     * Builds a query with an ORDER BY clause.
+     *
      * @param aliases the aliases of the columns
      * @return the query
      */
     override fun orderBy(vararg aliases: CharSequence): FlowSetOperationQuery<T>
 
     /**
-     * Builds an ORDER BY clause.
+     * Builds a query with an ORDER BY clause.
+     *
      * @param expressions the sort expressions of the columns
      * @return the query
      */
     override fun orderBy(vararg expressions: SortExpression): FlowSetOperationQuery<T>
 
     /**
-     * Builds an ORDER BY clause.
+     * Builds a query with the options applied.
+     *
      * @param configure the configure function to apply options
      * @return the query
      */

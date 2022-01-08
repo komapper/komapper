@@ -9,10 +9,10 @@ import org.komapper.core.dsl.metamodel.EntityMetamodel
 interface PostgreSqlDialect : Dialect {
 
     companion object {
-        const val driver = "postgresql"
+        const val DRIVER = "postgresql"
     }
 
-    override val driver: String get() = Companion.driver
+    override val driver: String get() = DRIVER
 
     override fun getSequenceSql(sequenceName: String): String {
         return "select nextval('$sequenceName')"

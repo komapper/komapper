@@ -8,9 +8,6 @@ import java.util.ServiceLoader
  */
 @ThreadSafe
 object StatementInspectors {
-    /**
-     * @return the [StatementInspector]
-     */
     fun get(): StatementInspector {
         val loader = ServiceLoader.load(StatementInspectorFactory::class.java)
         return compose(loader)

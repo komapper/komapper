@@ -16,9 +16,9 @@ internal class StatementBufferTest {
         assertEquals(
             listOf(
                 StatementPart.Text("aaa"),
-                StatementPart.PlaceHolder(Value(1)),
+                StatementPart.Value(Value(1)),
                 StatementPart.Text("bbb"),
-                StatementPart.PlaceHolder(Value(2))
+                StatementPart.Value(Value(2))
             ),
             buffer.parts
         )
@@ -33,7 +33,7 @@ internal class StatementBufferTest {
             Statement(
                 listOf(
                     StatementPart.Text("bbb"),
-                    StatementPart.PlaceHolder(Value(2)),
+                    StatementPart.Value(Value(2)),
                     StatementPart.Text("ccc")
                 )
             )
@@ -41,9 +41,9 @@ internal class StatementBufferTest {
         assertEquals(
             listOf(
                 StatementPart.Text("aaa"),
-                StatementPart.PlaceHolder(Value(1)),
+                StatementPart.Value(Value(1)),
                 StatementPart.Text("bbb"),
-                StatementPart.PlaceHolder(Value(2)),
+                StatementPart.Value(Value(2)),
                 StatementPart.Text("ccc"),
             ),
             buffer.parts

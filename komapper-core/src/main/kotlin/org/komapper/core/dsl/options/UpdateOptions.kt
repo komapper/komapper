@@ -11,7 +11,7 @@ data class UpdateOptions(
 ) : BatchOptions, OptimisticLockOptions, WhereOptions {
 
     companion object {
-        val default = UpdateOptions(
+        val DEFAULT = UpdateOptions(
             allowEmptyWhereClause = false,
             escapeSequence = null,
             batchSize = null,

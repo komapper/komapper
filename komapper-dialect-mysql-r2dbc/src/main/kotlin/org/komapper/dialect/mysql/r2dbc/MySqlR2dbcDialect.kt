@@ -26,10 +26,10 @@ import org.komapper.r2dbc.UShortType
 open class MySqlR2dbcDialect(
     dataTypes: List<R2dbcDataType<*>> = emptyList(),
     val version: Version = Version.IMPLICIT
-) : MySqlDialect, AbstractR2dbcDialect(defaultDataTypes + dataTypes) {
+) : MySqlDialect, AbstractR2dbcDialect(DEFAULT_DATA_TYPES + dataTypes) {
 
     companion object {
-        val defaultDataTypes: List<R2dbcDataType<*>> = listOf(
+        val DEFAULT_DATA_TYPES: List<R2dbcDataType<*>> = listOf(
             ArrayType("varbinary(500)"),
             BigDecimalType("decimal"),
             BigIntegerType("decimal"),

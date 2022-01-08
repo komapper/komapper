@@ -7,7 +7,7 @@ import org.komapper.jdbc.spi.JdbcDialectFactory
 
 class H2JdbcDialectFactory : JdbcDialectFactory {
     override fun supports(driver: String): Boolean {
-        return driver == H2Dialect.driver
+        return driver == H2Dialect.DRIVER
     }
 
     override fun create(dataTypes: List<JdbcDataType<*>>): JdbcDialect {
