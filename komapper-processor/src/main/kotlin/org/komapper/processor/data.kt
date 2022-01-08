@@ -3,6 +3,7 @@ package org.komapper.processor
 import com.google.devtools.ksp.isPrivate
 import com.google.devtools.ksp.symbol.KSAnnotation
 import com.google.devtools.ksp.symbol.KSClassDeclaration
+import com.google.devtools.ksp.symbol.KSDeclaration
 import com.google.devtools.ksp.symbol.KSPropertyDeclaration
 import com.google.devtools.ksp.symbol.KSValueParameter
 import com.google.devtools.ksp.symbol.Nullability
@@ -41,12 +42,14 @@ internal data class Property(
     val parameter: KSValueParameter,
     val declaration: KSPropertyDeclaration,
     val column: Column,
-    val typeName: String,
+    val kotlinClass: KotlinClass,
     val literalTag: String,
-    val valueClass: ValueClass?,
     val nullability: Nullability,
     val kind: PropertyKind?,
 ) {
+    val typeName get() = kotlinClass.exteriorTypeName
+    val exteriorTypeName get() = kotlinClass.exteriorTypeName
+    val interiorTypeName get() = kotlinClass.interiorTypeName
     fun isPrivate() = declaration.isPrivate()
 
     override fun toString(): String {
@@ -54,12 +57,40 @@ internal data class Property(
     }
 }
 
-internal data class ValueClass(
-    val declaration: KSClassDeclaration,
-    val property: ValueClassProperty,
-) {
+internal sealed class KotlinClass {
+    abstract val declaration: KSDeclaration
+    val exteriorTypeName: String get() = (declaration.qualifiedName ?: declaration.simpleName).asString()
+    abstract val interiorTypeName: String
     override fun toString(): String {
-        return declaration.qualifiedName?.asString() ?: ""
+        return exteriorTypeName
+    }
+}
+
+internal data class EnumClass(
+    override val declaration: KSClassDeclaration
+) : KotlinClass() {
+    override val interiorTypeName: String = "String"
+    override fun toString(): String {
+        return super.toString()
+    }
+}
+
+internal data class ValueClass(
+    override val declaration: KSClassDeclaration,
+    val property: ValueClassProperty,
+) : KotlinClass() {
+    override val interiorTypeName: String get() = property.typeName
+    override fun toString(): String {
+        return super.toString()
+    }
+}
+
+internal data class PlainClass(
+    override val declaration: KSDeclaration
+) : KotlinClass() {
+    override val interiorTypeName: String get() = exteriorTypeName
+    override fun toString(): String {
+        return super.toString()
     }
 }
 

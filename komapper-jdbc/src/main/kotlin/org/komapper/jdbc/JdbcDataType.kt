@@ -276,33 +276,6 @@ class DoubleType(override val name: String) :
     }
 }
 
-class EnumType(override val klass: KClass<Enum<*>>, override val name: String) : JdbcDataType<Enum<*>> {
-    private val dataType = StringType(name)
-    override val jdbcType = dataType.jdbcType
-
-    override fun getValue(rs: ResultSet, index: Int): Enum<*>? {
-        val value = dataType.getValue(rs, index) ?: return null
-        return toEnumConstant(value)
-    }
-
-    override fun getValue(rs: ResultSet, columnLabel: String): Enum<*>? {
-        val value = dataType.getValue(rs, columnLabel) ?: return null
-        return toEnumConstant(value)
-    }
-
-    override fun setValue(ps: PreparedStatement, index: Int, value: Enum<*>?) {
-        dataType.setValue(ps, index, value?.name)
-    }
-
-    override fun toString(value: Enum<*>?): String {
-        return dataType.toString(value?.name)
-    }
-
-    fun toEnumConstant(value: String): Enum<*> {
-        return klass.java.enumConstants.first { it.name == value }
-    }
-}
-
 class FloatType(override val name: String) : AbstractDataType<Float>(Float::class, JDBCType.FLOAT) {
 
     override fun doGetValue(rs: ResultSet, index: Int): Float {

@@ -55,6 +55,14 @@ data class ByteArrayTest(@KomapperId val id: Int, val value: ByteArray)
 @KomapperTable("DOUBLE_TEST")
 data class DoubleTest(@KomapperId val id: Int, val value: Double)
 
+enum class Direction {
+    NORTH, SOUTH, EAST, WEST
+}
+
+@KomapperEntity
+@KomapperTable("ENUM_TEST")
+data class EnumTest(@KomapperId val id: Int, val value: Direction)
+
 @KomapperEntity
 @KomapperTable("FLOAT_TEST")
 data class FloatTest(@KomapperId val id: Int, val value: Float)
