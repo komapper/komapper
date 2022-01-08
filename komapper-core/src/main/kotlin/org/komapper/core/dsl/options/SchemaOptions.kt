@@ -6,7 +6,7 @@ data class SchemaOptions(
 ) : QueryOptions {
 
     companion object {
-        val default = SchemaOptions(
+        val DEFAULT = SchemaOptions(
             queryTimeoutSeconds = null,
             suppressLogging = false
         )

@@ -13,7 +13,7 @@ data class TemplateExecuteOptions(
 ) : QueryOptions {
 
     companion object {
-        val default = TemplateExecuteOptions(
+        val DEFAULT = TemplateExecuteOptions(
             escapeSequence = null,
             queryTimeoutSeconds = null,
             suppressLogging = false

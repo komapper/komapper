@@ -30,13 +30,13 @@ import java.sql.SQLException
 open class MySqlJdbcDialect(
     dataTypes: List<JdbcDataType<*>> = emptyList(),
     val version: Version = Version.IMPLICIT
-) : MySqlDialect, AbstractJdbcDialect(defaultDataTypes + dataTypes) {
+) : MySqlDialect, AbstractJdbcDialect(DEFAULT_DATA_TYPES + dataTypes) {
 
     companion object {
         /** the error code that represents unique violation  */
-        var UNIQUE_CONSTRAINT_VIOLATION_ERROR_CODES = setOf(1022, 1062)
+        val UNIQUE_CONSTRAINT_VIOLATION_ERROR_CODES = setOf(1022, 1062)
 
-        val defaultDataTypes: List<JdbcDataType<*>> = listOf(
+        val DEFAULT_DATA_TYPES: List<JdbcDataType<*>> = listOf(
             BigDecimalType("decimal"),
             BigIntegerType("decimal"),
             BlobType("blob"),

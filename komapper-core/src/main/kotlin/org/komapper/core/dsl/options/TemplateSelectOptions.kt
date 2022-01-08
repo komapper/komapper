@@ -15,7 +15,7 @@ data class TemplateSelectOptions(
 ) : FetchOptions {
 
     companion object {
-        val default = TemplateSelectOptions(
+        val DEFAULT = TemplateSelectOptions(
             escapeSequence = null,
             fetchSize = null,
             maxRows = null,

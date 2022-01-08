@@ -29,7 +29,7 @@ data class SelectContext<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, 
     val having: HavingDeclaration = {},
     val include: List<EntityMetamodel<*, *, *>> = listOf(),
     val includeAll: Boolean = false,
-    override val options: SelectOptions = SelectOptions.default,
+    override val options: SelectOptions = SelectOptions.DEFAULT,
 ) : TablesProvider, WhereProvider, SubqueryContext {
 
     fun getProjection(): Projection {

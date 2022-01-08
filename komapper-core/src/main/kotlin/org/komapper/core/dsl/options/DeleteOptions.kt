@@ -11,7 +11,7 @@ data class DeleteOptions(
 ) : BatchOptions, OptimisticLockOptions, WhereOptions {
 
     companion object {
-        val default = DeleteOptions(
+        val DEFAULT = DeleteOptions(
             allowEmptyWhereClause = false,
             batchSize = null,
             escapeSequence = null,

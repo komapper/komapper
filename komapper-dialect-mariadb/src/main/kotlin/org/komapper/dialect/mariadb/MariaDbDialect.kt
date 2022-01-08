@@ -10,10 +10,10 @@ import org.komapper.core.dsl.metamodel.EntityMetamodel
 interface MariaDbDialect : Dialect {
 
     companion object {
-        const val driver = "mariadb"
+        const val DRIVER = "mariadb"
     }
 
-    override val driver: String get() = Companion.driver
+    override val driver: String get() = DRIVER
     override val openQuote: String get() = "`"
     override val closeQuote: String get() = "`"
 

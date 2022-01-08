@@ -10,10 +10,10 @@ import org.komapper.core.dsl.metamodel.EntityMetamodel
 interface MySqlDialect : Dialect {
 
     companion object {
-        const val driver = "mysql"
+        const val DRIVER = "mysql"
     }
 
-    override val driver: String get() = Companion.driver
+    override val driver: String get() = DRIVER
     override val openQuote: String get() = "`"
     override val closeQuote: String get() = "`"
 

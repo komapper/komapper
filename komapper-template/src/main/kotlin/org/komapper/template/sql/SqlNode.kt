@@ -176,7 +176,7 @@ internal sealed class SqlNode {
         data class Word(override val token: String) : Token()
         data class Space(override val token: String) : Token() {
             companion object {
-                private val map = listOf(
+                private val MAP = listOf(
                     "\u0009",
                     "\u000B",
                     "\u000C",
@@ -187,7 +187,7 @@ internal sealed class SqlNode {
                     "\u0020"
                 ).associateWith(Token::Space)
 
-                fun of(token: String): Space = map.getOrElse(token) {
+                fun of(token: String): Space = MAP.getOrElse(token) {
                     Space(
                         token
                     )
@@ -197,10 +197,10 @@ internal sealed class SqlNode {
 
         data class Other(override val token: String) : Token() {
             companion object {
-                private val map =
+                private val MAP =
                     listOf(",", "=", ">", "<", "-", "+", "*", "/", "(", ")", ";").associateWith(Token::Other)
 
-                fun of(token: String): Other = map.getOrElse(token) {
+                fun of(token: String): Other = MAP.getOrElse(token) {
                     Other(
                         token
                     )

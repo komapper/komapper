@@ -7,7 +7,7 @@ import org.komapper.jdbc.spi.JdbcDialectFactory
 
 class MariaDbJdbcDialectFactory : JdbcDialectFactory {
     override fun supports(driver: String): Boolean {
-        return driver == MariaDbDialect.driver
+        return driver == MariaDbDialect.DRIVER
     }
 
     override fun create(dataTypes: List<JdbcDataType<*>>): JdbcDialect {

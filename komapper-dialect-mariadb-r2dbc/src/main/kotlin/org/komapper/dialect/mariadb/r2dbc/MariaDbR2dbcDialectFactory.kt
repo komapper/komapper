@@ -6,7 +6,7 @@ import org.komapper.r2dbc.spi.R2dbcDialectFactory
 
 class MariaDbR2dbcDialectFactory : R2dbcDialectFactory {
     override fun supports(driver: String): Boolean {
-        return driver.lowercase() == MariaDbDialect.driver
+        return driver.lowercase() == MariaDbDialect.DRIVER
     }
 
     override fun create(): R2dbcDialect {

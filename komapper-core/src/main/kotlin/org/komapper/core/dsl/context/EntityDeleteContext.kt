@@ -10,7 +10,7 @@ import org.komapper.core.dsl.options.DeleteOptions
 @ThreadSafe
 data class EntityDeleteContext<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     val target: META,
-    override val options: DeleteOptions = DeleteOptions.default,
+    override val options: DeleteOptions = DeleteOptions.DEFAULT,
 ) : TablesProvider, WhereProvider {
 
     override fun getTables(): Set<TableExpression<*>> {

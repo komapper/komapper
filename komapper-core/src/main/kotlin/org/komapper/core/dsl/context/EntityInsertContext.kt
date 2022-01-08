@@ -11,7 +11,7 @@ import org.komapper.core.dsl.options.InsertOptions
 @ThreadSafe
 data class EntityInsertContext<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     val target: META,
-    val options: InsertOptions = InsertOptions.default,
+    val options: InsertOptions = InsertOptions.DEFAULT,
 ) : TablesProvider {
 
     override fun getTables(): Set<TableExpression<*>> {
