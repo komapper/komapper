@@ -12,6 +12,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation(project(":komapper-spring-boot-starter-jdbc"))
+    implementation(project(":komapper-sqlcommenter"))
     runtimeOnly(project(":komapper-dialect-h2-jdbc"))
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
