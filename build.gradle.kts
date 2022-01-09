@@ -21,9 +21,9 @@ val integrationTestProjects = subprojects.filter {
 }
 
 val isReleaseVersion = !version.toString().endsWith("SNAPSHOT")
-val ktlintVersion: String by project
 
 allprojects {
+    apply(plugin = "base")
     apply(plugin = "org.jlleitschuh.gradle.ktlint")
 
     ktlint {
@@ -51,6 +51,21 @@ allprojects {
 
     repositories {
         mavenCentral()
+    }
+
+    tasks {
+        val pairs = listOf(
+            "ktlintKotlinScriptCheck" to "ktlintKotlinScriptFormat",
+            "ktlintMainSourceSetCheck" to "ktlintMainSourceSetFormat",
+            "ktlintTestSourceSetCheck" to "ktlintTestSourceSetFormat",
+        )
+        for ((checkTask, formatTask) in pairs) {
+            findByName(checkTask)?.mustRunAfter(formatTask)
+        }
+
+        build {
+            dependsOn("ktlintFormat")
+        }
     }
 }
 
