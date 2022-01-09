@@ -816,6 +816,26 @@ class EntityProcessorTest {
         assertTrue(result.messages.contains("The value class's own property 'name' must not be nullable."))
     }
 
+    @Test
+    fun `The property type must not have any type parameters`() {
+        val result = compile(
+            kotlin(
+                "source.kt",
+                """
+                package test
+                import org.komapper.annotation.*
+                @KomapperEntity
+                data class Dept(
+                    @KomapperId val id: Int,
+                    val names: List<String>,
+                )
+                """
+            )
+        )
+        assertEquals(result.exitCode, KotlinCompilation.ExitCode.COMPILATION_ERROR)
+        assertTrue(result.messages.contains("The property type must not have any type parameters."))
+    }
+
     private fun prepareCompilation(vararg sourceFiles: SourceFile): KotlinCompilation {
         return KotlinCompilation()
             .apply {
