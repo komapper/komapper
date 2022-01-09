@@ -26,7 +26,7 @@ interface JdbcDatabaseConfig : DatabaseConfig {
      */
     override val dialect: JdbcDialect
 
-/**
+    /**
      * The session to the database.
      */
     val session: JdbcSession
