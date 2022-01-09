@@ -31,7 +31,7 @@ import java.util.UUID
 import javax.sql.DataSource
 
 @Suppress("unused")
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @ConditionalOnClass(JdbcDatabase::class)
 @AutoConfigureAfter(DataSourceAutoConfiguration::class)
 open class KomapperAutoConfiguration {

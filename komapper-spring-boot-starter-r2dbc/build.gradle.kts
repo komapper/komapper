@@ -14,7 +14,6 @@ dependencies {
     api("io.r2dbc:r2dbc-pool:0.8.7.RELEASE")
     api(project(":komapper-annotation"))
     api(project(":komapper-r2dbc"))
-    api(project(":komapper-sqlcommenter"))
     runtimeOnly(project(":komapper-template"))
     runtimeOnly(project(":komapper-slf4j"))
     runtimeOnly(project(":komapper-spring-boot-autoconfigure-r2dbc"))

@@ -3,7 +3,12 @@ pluginManagement {
     val kspVersion: String by settings
     val springBootVersion: String by settings
     repositories {
+        mavenLocal()
+        maven { url = uri("https://repo.spring.io/release") }
+        maven { url = uri("https://repo.spring.io/milestone") }
+        maven { url = uri("https://repo.spring.io/snapshot") }
         gradlePluginPortal()
+        mavenCentral()
     }
     plugins {
         kotlin("jvm") version kotlinVersion
@@ -74,3 +79,4 @@ include("example-starter-r2dbc")
 include("integration-test-core")
 include("integration-test-jdbc")
 include("integration-test-r2dbc")
+include("komapper-spring-native-jdbc")
