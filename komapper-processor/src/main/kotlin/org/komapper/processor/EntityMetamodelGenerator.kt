@@ -424,7 +424,7 @@ internal class EntityMetamodelGenerator(
     private fun companionObject() {
         w.println("    companion object {")
         w.println("        init {")
-        w.println("            $checkMetamodelVersion(\"$packageName.$simpleName\", $EntityMetamodel.METAMODEL_VERSION)")
+        w.println("            $checkMetamodelVersion(\"$packageName.$simpleName\", ${org.komapper.core.dsl.metamodel.EntityMetamodel.METAMODEL_VERSION})")
         w.println("        }")
         for (alias in aliases) {
             w.println("        val $alias = $simpleName()")
