@@ -1,6 +1,7 @@
 package org.komapper.core
 
 import org.komapper.core.spi.StatementInspectorFactory
+import org.komapper.core.spi.findByPriority
 import java.util.ServiceLoader
 
 /**
@@ -10,19 +11,7 @@ import java.util.ServiceLoader
 object StatementInspectors {
     fun get(): StatementInspector {
         val loader = ServiceLoader.load(StatementInspectorFactory::class.java)
-        return compose(loader)
-    }
-
-    internal fun compose(factories: Iterable<StatementInspectorFactory>): StatementInspector {
-        return factories
-            .sortedByDescending { it.priority }
-            .map { it.create() }
-            .reduceOrNull { acc, inspector ->
-                StatementInspector { statement ->
-                    acc.inspect(statement).let {
-                        inspector.inspect(it)
-                    }
-                }
-            } ?: DefaultStatementInspector
+        val factory = loader.findByPriority()
+        return factory?.create() ?: DefaultStatementInspector
     }
 }
