@@ -1,10 +1,10 @@
-Komapper: Kotlin SQL Mapper
-===========================
+Komapper: Kotlin ORM for JDBC and R2DBC
+========================================
 
 [![Build](https://github.com/komapper/komapper/actions/workflows/build.yml/badge.svg)](https://github.com/komapper/komapper/actions/workflows/build.yml)
 [![Twitter](https://img.shields.io/badge/twitter-@komapper-pink.svg?style=flat)](https://twitter.com/komapper)
 
-Komapper is a database access library for server-side Kotlin.
+Komapper is an ORM library for server-side Kotlin.
 
 For more documentation, go to our site:  
 https://www.komapper.org/docs/.
@@ -19,6 +19,12 @@ https://www.komapper.org/ja/docs/
 - Immutable and composable queries
 - Support for Kotlin value classes
 - Easy Spring Boot integration
+
+## Requirements
+
+- Kotlin 1.3.51 or later
+- Java 11 or later
+- Gradle 7.2 or later
 
 ## Supported Databases
 
