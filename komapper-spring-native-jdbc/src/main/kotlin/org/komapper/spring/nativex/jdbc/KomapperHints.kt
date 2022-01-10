@@ -19,7 +19,6 @@ import org.springframework.nativex.hint.NativeHints
 import org.springframework.nativex.hint.TypeHint
 import org.springframework.nativex.type.NativeConfiguration
 import java.util.Optional
-import java.util.UUID
 import javax.sql.DataSource
 
 @NativeHints(
@@ -51,7 +50,6 @@ import javax.sql.DataSource
                     DataSource::class,
                     Environment::class,
                     Optional::class,
-                    UUID::class
                 ]
             )
         ]
