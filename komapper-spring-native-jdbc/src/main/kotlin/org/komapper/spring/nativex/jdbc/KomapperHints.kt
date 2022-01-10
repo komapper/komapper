@@ -19,7 +19,6 @@ import org.springframework.nativex.hint.NativeHints
 import org.springframework.nativex.hint.TypeHint
 import org.springframework.nativex.type.NativeConfiguration
 import java.util.Optional
-import javax.sql.DataSource
 
 @NativeHints(
     NativeHint(
@@ -47,7 +46,6 @@ import javax.sql.DataSource
             ),
             TypeHint(
                 types = [
-                    DataSource::class,
                     Environment::class,
                     Optional::class,
                 ]
