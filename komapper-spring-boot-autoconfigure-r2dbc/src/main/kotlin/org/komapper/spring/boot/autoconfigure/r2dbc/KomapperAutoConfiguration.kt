@@ -28,7 +28,7 @@ import java.util.Optional
 import java.util.UUID
 
 @Suppress("unused")
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @ConditionalOnClass(R2dbcDatabase::class)
 @AutoConfigureAfter(R2dbcAutoConfiguration::class)
 open class KomapperAutoConfiguration {
