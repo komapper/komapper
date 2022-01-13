@@ -8,5 +8,5 @@ dependencies {
     testImplementation(project(":komapper-dialect-h2-r2dbc"))
     testImplementation("io.r2dbc:r2dbc-h2:0.8.5.RELEASE")
     testImplementation("ch.qos.logback:logback-classic:1.2.10")
-    testImplementation("io.r2dbc:r2dbc-pool:0.8.7.RELEASE")
+    testImplementation("io.r2dbc:r2dbc-pool:0.9.0.RELEASE")
 }
