@@ -72,7 +72,7 @@ jobs:
 
       - name: Test
         # Skip mysql R2DBC test because its driver is unstable.
-        if: ${{ matrix.type != 'r2dbc' &&  matrix.driver != 'mysql' }}
+        if: ${{ matrix.type != 'r2dbc' || matrix.driver != 'mysql' }}
         uses: gradle/gradle-build-action@v2
         with:
           arguments: :integration-test-${{ matrix.type }}:check -Pdriver=${{ matrix.driver }}
