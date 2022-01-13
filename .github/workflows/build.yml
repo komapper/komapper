@@ -48,7 +48,7 @@ jobs:
     strategy:
       matrix:
         type: [jdbc, r2dbc]
-        dbms: [h2, mariadb, mysql, postgresql]
+        driver: [h2, mariadb, mysql, postgresql]
     timeout-minutes: 15
 
     steps:
@@ -72,9 +72,10 @@ jobs:
 
       - name: Test
         # Skip mysql R2DBC test because its driver is unstable.
+        if: ${{ matrix.type != 'r2dbc' || matrix.driver != 'mysql' }}
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: :integration-test-${{ matrix.type }}:${{ matrix.dbms }} -x :integration-test-r2dbc:mysql
+          arguments: :integration-test-${{ matrix.type }}:check -Pdriver=${{ matrix.driver }}
 
       - name: Upload reports
         if: failure()

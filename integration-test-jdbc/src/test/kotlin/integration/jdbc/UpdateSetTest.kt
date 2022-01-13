@@ -241,7 +241,7 @@ class UpdateSetTest(private val db: JdbcDatabase) {
             p.personId eq 1
         }
         val result = query.dryRun()
-        val expected = "update PERSON as t0_ set NAME = ?, UPDATED_AT = ? where t0_.PERSON_ID = ?"
+        val expected = "update person as t0_ set name = ?, updated_at = ? where t0_.person_id = ?"
         assertEquals(expected, result.sql)
     }
 
@@ -254,7 +254,7 @@ class UpdateSetTest(private val db: JdbcDatabase) {
             a.addressId eq 16
         }
         val result = query.dryRun()
-        val expected = "update ADDRESS as t0_ set STREET = ?, VERSION = VERSION + 1 where t0_.ADDRESS_ID = ?"
+        val expected = "update address as t0_ set street = ?, version = version + 1 where t0_.address_id = ?"
         assertEquals(expected, result.sql)
     }
 

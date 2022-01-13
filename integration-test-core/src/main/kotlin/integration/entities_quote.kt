@@ -9,7 +9,7 @@ import org.komapper.annotation.KomapperVersion
 @KomapperEntity
 @KomapperTable(catalog = "catalog", schema = "schema", alwaysQuote = true)
 data class CatalogAndSchema(
-    @KomapperId @KomapperColumn(name = "ADDRESS_ID") val addressId: Int,
+    @KomapperId @KomapperColumn(name = "address_id") val addressId: Int,
     val street: String,
     @KomapperVersion val version: Int
 )

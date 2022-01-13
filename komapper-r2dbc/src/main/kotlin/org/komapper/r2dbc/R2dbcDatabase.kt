@@ -48,7 +48,7 @@ interface R2dbcDatabase : R2dbc {
          * @param options the connection factory options
          */
         fun create(options: ConnectionFactoryOptions): R2dbcDatabase {
-            val driver = options.getValue(ConnectionFactoryOptions.DRIVER)
+            val driver = options.getValue(ConnectionFactoryOptions.DRIVER)?.toString()
             checkNotNull(driver) { "The driver option is not found." }
             val connectionFactory = ConnectionFactories.get(options)
             val dialect = R2dbcDialects.get(driver)

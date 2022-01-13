@@ -28,7 +28,7 @@ value class Version(val value: Int)
 value class Timestamp(val value: LocalDateTime)
 
 @KomapperEntity
-@KomapperTable("ADDRESS")
+@KomapperTable("address")
 data class VAddress(
     @KomapperId val addressId: IntId,
     val street: Street,
@@ -36,24 +36,24 @@ data class VAddress(
 )
 
 @KomapperEntity
-@KomapperTable("PERSON")
+@KomapperTable("person")
 data class VPerson(
-    @KomapperId @KomapperColumn("PERSON_ID") val personId: IntId,
+    @KomapperId @KomapperColumn("person_id") val personId: IntId,
     val name: String,
-    @KomapperCreatedAt @KomapperColumn("CREATED_AT") val createdAt: Timestamp? = null,
-    @KomapperUpdatedAt @KomapperColumn("UPDATED_AT") val updatedAt: Timestamp? = null
+    @KomapperCreatedAt @KomapperColumn("created_at") val createdAt: Timestamp? = null,
+    @KomapperUpdatedAt @KomapperColumn("updated_at") val updatedAt: Timestamp? = null
 )
 
 @KomapperEntity
-@KomapperTable("IDENTITY_STRATEGY")
+@KomapperTable("identity_strategy")
 data class VIdentityStrategy(
     @KomapperId @KomapperAutoIncrement val id: IntId?,
-    val value: String
+    @KomapperColumn(alwaysQuote = true)val value: String
 )
 
 @KomapperEntity
-@KomapperTable("SEQUENCE_STRATEGY")
+@KomapperTable("sequence_strategy")
 data class VSequenceStrategy(
-    @KomapperId @KomapperSequence(name = "SEQUENCE_STRATEGY_ID", incrementBy = 100) val id: IntId,
-    val value: String
+    @KomapperId @KomapperSequence(name = "sequence_strategy_id", incrementBy = 100) val id: IntId,
+    @KomapperColumn(alwaysQuote = true)val value: String
 )

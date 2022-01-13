@@ -16,7 +16,7 @@ class InsertSelectTest(private val db: JdbcDatabase) {
     @Test
     fun test() {
         val a = Meta.address
-        val aa = a.clone(table = "ADDRESS_ARCHIVE")
+        val aa = a.clone(table = "address_archive")
         val (count, ids) = db.runQuery {
             val query = QueryDsl.from(a).where { a.addressId between 1..5 }
             QueryDsl.insert(aa).select(query)
@@ -28,7 +28,7 @@ class InsertSelectTest(private val db: JdbcDatabase) {
     @Test
     fun test_lambda() {
         val a = Meta.address
-        val aa = a.clone(table = "ADDRESS_ARCHIVE")
+        val aa = a.clone(table = "address_archive")
         val (count, ids) = db.runQuery {
             QueryDsl.insert(aa).select {
                 QueryDsl.from(a).where { a.addressId between 1..5 }

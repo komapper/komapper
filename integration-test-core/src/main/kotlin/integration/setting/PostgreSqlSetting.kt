@@ -5,63 +5,63 @@ interface PostgreSqlSetting<CONFIG> : Setting<CONFIG> {
     override val dbms: Dbms get() = Dbms.POSTGRESQL
     override val createSql: String
         get() = """
-        CREATE SEQUENCE IF NOT EXISTS SEQUENCE_STRATEGY_ID INCREMENT BY 100 START WITH 1;
-        CREATE SEQUENCE IF NOT EXISTS MY_SEQUENCE_STRATEGY_ID INCREMENT BY 100 START WITH 1;
-        CREATE SEQUENCE IF NOT EXISTS PERSON_ID INCREMENT BY 100 START WITH 1;
+        create sequence if not exists sequence_strategy_id increment by 100 start with 1;
+        create sequence if not exists my_sequence_strategy_id increment by 100 start with 1;
+        create sequence if not exists person_id increment by 100 start with 1;
         
-        CREATE TABLE IF NOT EXISTS DEPARTMENT(DEPARTMENT_ID INTEGER NOT NULL PRIMARY KEY, DEPARTMENT_NO INTEGER NOT NULL UNIQUE,DEPARTMENT_NAME VARCHAR(20),LOCATION VARCHAR(20) DEFAULT 'TOKYO', VERSION INTEGER);
-        CREATE TABLE IF NOT EXISTS ADDRESS(ADDRESS_ID INTEGER NOT NULL PRIMARY KEY, STREET VARCHAR(20) UNIQUE, VERSION INTEGER);
-        CREATE TABLE IF NOT EXISTS ADDRESS_ARCHIVE(ADDRESS_ID INTEGER NOT NULL PRIMARY KEY, STREET VARCHAR(20) UNIQUE, VERSION INTEGER);
-        CREATE TABLE IF NOT EXISTS EMPLOYEE(EMPLOYEE_ID INTEGER NOT NULL PRIMARY KEY, EMPLOYEE_NO INTEGER NOT NULL ,EMPLOYEE_NAME VARCHAR(20),MANAGER_ID INTEGER,HIREDATE DATE,SALARY NUMERIC(7,2),DEPARTMENT_ID INTEGER,ADDRESS_ID INTEGER, VERSION INTEGER, CONSTRAINT FK_DEPARTMENT_ID FOREIGN KEY(DEPARTMENT_ID) REFERENCES DEPARTMENT(DEPARTMENT_ID), CONSTRAINT FK_ADDRESS_ID FOREIGN KEY(ADDRESS_ID) REFERENCES ADDRESS(ADDRESS_ID));
-        CREATE TABLE IF NOT EXISTS PERSON(PERSON_ID INTEGER NOT NULL PRIMARY KEY, NAME VARCHAR(20), CREATED_AT TIMESTAMP, UPDATED_AT TIMESTAMP, VERSION INTEGER);
-        CREATE TABLE IF NOT EXISTS "ORDER"("ORDER_ID" INTEGER NOT NULL PRIMARY KEY, "VALUE" VARCHAR(20));
+        create table if not exists department(department_id integer not null primary key, department_no integer not null unique,department_name varchar(20),location varchar(20) default 'tokyo', version integer);
+        create table if not exists address(address_id integer not null primary key, street varchar(20) unique, version integer);
+        create table if not exists address_archive(address_id integer not null primary key, street varchar(20) unique, version integer);
+        create table if not exists employee(employee_id integer not null primary key, employee_no integer not null ,employee_name varchar(20),manager_id integer,hiredate date,salary numeric(7,2),department_id integer,address_id integer, version integer, constraint fk_department_id foreign key(department_id) references department(department_id), constraint fk_address_id foreign key(address_id) references address(address_id));
+        create table if not exists person(person_id integer not null primary key, name varchar(20), created_at timestamp, updated_at timestamp, version integer);
+        create table if not exists "order"("order_id" integer not null primary key, "value" varchar(20));
 
-        CREATE TABLE IF NOT EXISTS COMP_KEY_DEPARTMENT(DEPARTMENT_ID1 INTEGER NOT NULL, DEPARTMENT_ID2 INTEGER NOT NULL, DEPARTMENT_NO INTEGER NOT NULL UNIQUE,DEPARTMENT_NAME VARCHAR(20),LOCATION VARCHAR(20) DEFAULT 'TOKYO', VERSION INTEGER, CONSTRAINT PK_COMP_KEY_DEPARTMENT PRIMARY KEY(DEPARTMENT_ID1, DEPARTMENT_ID2));
-        CREATE TABLE IF NOT EXISTS COMP_KEY_ADDRESS(ADDRESS_ID1 INTEGER NOT NULL, ADDRESS_ID2 INTEGER NOT NULL, STREET VARCHAR(20), VERSION INTEGER, CONSTRAINT PK_COMP_KEY_ADDRESS PRIMARY KEY(ADDRESS_ID1, ADDRESS_ID2));
-        CREATE TABLE IF NOT EXISTS COMP_KEY_EMPLOYEE(EMPLOYEE_ID1 INTEGER NOT NULL, EMPLOYEE_ID2 INTEGER NOT NULL, EMPLOYEE_NO INTEGER NOT NULL ,EMPLOYEE_NAME VARCHAR(20),MANAGER_ID1 INTEGER,MANAGER_ID2 INTEGER,HIREDATE DATE,SALARY NUMERIC(7,2),DEPARTMENT_ID1 INTEGER,DEPARTMENT_ID2 INTEGER,ADDRESS_ID1 INTEGER,ADDRESS_ID2 INTEGER,VERSION INTEGER, CONSTRAINT PK_COMP_KEY_EMPLOYEE PRIMARY KEY(EMPLOYEE_ID1, EMPLOYEE_ID2), CONSTRAINT FK_COMP_KEY_DEPARTMENT_ID FOREIGN KEY(DEPARTMENT_ID1, DEPARTMENT_ID2) REFERENCES COMP_KEY_DEPARTMENT(DEPARTMENT_ID1, DEPARTMENT_ID2), CONSTRAINT FK_COMP_KEY_ADDRESS_ID FOREIGN KEY(ADDRESS_ID1, ADDRESS_ID2) REFERENCES COMP_KEY_ADDRESS(ADDRESS_ID1, ADDRESS_ID2));
+        create table if not exists comp_key_department(department_id1 integer not null, department_id2 integer not null, department_no integer not null unique,department_name varchar(20),location varchar(20) default 'tokyo', version integer, constraint pk_comp_key_department primary key(department_id1, department_id2));
+        create table if not exists comp_key_address(address_id1 integer not null, address_id2 integer not null, street varchar(20), version integer, constraint pk_comp_key_address primary key(address_id1, address_id2));
+        create table if not exists comp_key_employee(employee_id1 integer not null, employee_id2 integer not null, employee_no integer not null ,employee_name varchar(20),manager_id1 integer,manager_id2 integer,hiredate date,salary numeric(7,2),department_id1 integer,department_id2 integer,address_id1 integer,address_id2 integer,version integer, constraint pk_comp_key_employee primary key(employee_id1, employee_id2), constraint fk_comp_key_department_id foreign key(department_id1, department_id2) references comp_key_department(department_id1, department_id2), constraint fk_comp_key_address_id foreign key(address_id1, address_id2) references comp_key_address(address_id1, address_id2));
         
-        CREATE TABLE IF NOT EXISTS LARGE_OBJECT(ID NUMERIC(8) NOT NULL PRIMARY KEY, NAME VARCHAR(20), LARGE_NAME TEXT, BYTES BYTEA, LARGE_BYTES OID, DTO BYTEA, LARGE_DTO OID);
-        CREATE TABLE IF NOT EXISTS TENSE (ID INTEGER NOT NULL PRIMARY KEY,DATE_DATE DATE, DATE_TIME TIME, DATE_TIMESTAMP TIMESTAMP, CAL_DATE DATE, CAL_TIME TIME, CAL_TIMESTAMP TIMESTAMP, SQL_DATE DATE, SQL_TIME TIME, SQL_TIMESTAMP TIMESTAMP);
-        CREATE TABLE IF NOT EXISTS JOB (ID INTEGER NOT NULL PRIMARY KEY, JOB_TYPE VARCHAR(20));
-        CREATE TABLE IF NOT EXISTS AUTHORITY (ID INTEGER NOT NULL PRIMARY KEY, AUTHORITY_TYPE INTEGER);
-        CREATE TABLE IF NOT EXISTS NO_ID (VALUE1 INTEGER, VALUE2 INTEGER);
-        CREATE TABLE IF NOT EXISTS OWNER_OF_NO_ID (ID INTEGER NOT NULL PRIMARY KEY, NO_ID_VALUE1 INTEGER);
-        CREATE TABLE IF NOT EXISTS CONSTRAINT_CHECKING (PRIMARY_KEY INTEGER PRIMARY KEY, UNIQUE_KEY INTEGER UNIQUE, FOREIGN_KEY INTEGER, CHECK_CONSTRAINT INTEGER, NOT_NULL INTEGER NOT NULL, CONSTRAINT CK_CONSTRAINT_CHECKING_1 CHECK (CHECK_CONSTRAINT > 0), CONSTRAINT FK_JOB_ID FOREIGN KEY (FOREIGN_KEY) REFERENCES JOB (ID));
-        CREATE TABLE IF NOT EXISTS PATTERN (VALUE VARCHAR(10));
-        CREATE TABLE IF NOT EXISTS SAL_EMP (NAME TEXT PRIMARY KEY, PAY_BY_QUARTER INTEGER[], SCHEDULE TEXT[][]);
+        create table if not exists large_object(id numeric(8) not null primary key, name varchar(20), large_name text, bytes bytea, large_bytes oid, dto bytea, large_dto oid);
+        create table if not exists tense (id integer not null primary key,date_date date, date_time time, date_timestamp timestamp, cal_date date, cal_time time, cal_timestamp timestamp, sql_date date, sql_time time, sql_timestamp timestamp);
+        create table if not exists job (id integer not null primary key, job_type varchar(20));
+        create table if not exists authority (id integer not null primary key, authority_type integer);
+        create table if not exists no_id (value1 integer, value2 integer);
+        create table if not exists owner_of_no_id (id integer not null primary key, no_id_value1 integer);
+        create table if not exists constraint_checking (primary_key integer primary key, unique_key integer unique, foreign_key integer, check_constraint integer, not_null integer not null, constraint ck_constraint_checking_1 check (check_constraint > 0), constraint fk_job_id foreign key (foreign_key) references job (id));
+        create table if not exists pattern (value varchar(10));
+        create table if not exists sal_emp (name text primary key, pay_by_quarter integer[], schedule text[][]);
         
-        CREATE TABLE IF NOT EXISTS ID_GENERATOR(PK VARCHAR(20) NOT NULL PRIMARY KEY, VALUE INTEGER NOT NULL);
-        CREATE TABLE IF NOT EXISTS MY_ID_GENERATOR(MY_PK VARCHAR(20) NOT NULL PRIMARY KEY, MY_VALUE INTEGER NOT NULL);
-        CREATE TABLE IF NOT EXISTS AUTO_STRATEGY(ID SERIAL PRIMARY KEY, VALUE VARCHAR(10));
-        CREATE TABLE IF NOT EXISTS IDENTITY_STRATEGY(ID SERIAL PRIMARY KEY, VALUE VARCHAR(10));
-        CREATE TABLE IF NOT EXISTS SEQUENCE_STRATEGY(ID INTEGER NOT NULL PRIMARY KEY, VALUE VARCHAR(10));
-        CREATE TABLE IF NOT EXISTS SEQUENCE_STRATEGY2(ID INTEGER NOT NULL PRIMARY KEY, VALUE VARCHAR(10));
-        CREATE TABLE IF NOT EXISTS TABLE_STRATEGY(ID INTEGER NOT NULL PRIMARY KEY, VALUE VARCHAR(10));
-        CREATE TABLE IF NOT EXISTS TABLE_STRATEGY2(ID INTEGER NOT NULL PRIMARY KEY, VALUE VARCHAR(10));
-        CREATE TABLE IF NOT EXISTS PRODUCT(ID INTEGER NOT NULL PRIMARY KEY, VALUE XML);
-        CREATE TABLE IF NOT EXISTS VERY_LONG_CHARACTERS_NAMED_TABLE(VERY_LONG_CHARACTERS_NAMED_TABLE_ID SERIAL PRIMARY KEY, VALUE VARCHAR(10));
+        create table if not exists id_generator(pk varchar(20) not null primary key, value integer not null);
+        create table if not exists my_id_generator(my_pk varchar(20) not null primary key, my_value integer not null);
+        create table if not exists auto_strategy(id serial primary key, value varchar(10));
+        create table if not exists identity_strategy(id serial primary key, value varchar(10));
+        create table if not exists sequence_strategy(id integer not null primary key, value varchar(10));
+        create table if not exists sequence_strategy2(id integer not null primary key, value varchar(10));
+        create table if not exists table_strategy(id integer not null primary key, value varchar(10));
+        create table if not exists table_strategy2(id integer not null primary key, value varchar(10));
+        create table if not exists product(id integer not null primary key, value xml);
+        create table if not exists very_long_characters_named_table(very_long_characters_named_table_id serial primary key, value varchar(10));
 
-        CREATE TABLE IF NOT EXISTS ARRAY_TEST(ID INTEGER NOT NULL PRIMARY KEY, VALUE TEXT[]);
-        CREATE TABLE IF NOT EXISTS BIG_DECIMAL_TEST(ID INTEGER NOT NULL PRIMARY KEY, VALUE NUMERIC);
-        CREATE TABLE IF NOT EXISTS BIG_INTEGER_TEST(ID INTEGER NOT NULL PRIMARY KEY, VALUE NUMERIC);
-        CREATE TABLE IF NOT EXISTS BOOLEAN_TEST(ID INTEGER NOT NULL PRIMARY KEY, VALUE BOOLEAN);
-        CREATE TABLE IF NOT EXISTS BYTE_TEST(ID INTEGER NOT NULL PRIMARY KEY, VALUE INT2);
-        CREATE TABLE IF NOT EXISTS BYTE_ARRAY_TEST(ID INTEGER NOT NULL PRIMARY KEY, VALUE BYTEA);
-        CREATE TABLE IF NOT EXISTS DOUBLE_TEST(ID INTEGER NOT NULL PRIMARY KEY, VALUE FLOAT8);
-        CREATE TABLE IF NOT EXISTS ENUM_TEST(ID INTEGER NOT NULL PRIMARY KEY, VALUE VARCHAR(20));
-        CREATE TABLE IF NOT EXISTS FLOAT_TEST(ID INTEGER NOT NULL PRIMARY KEY, VALUE FLOAT);
-        CREATE TABLE IF NOT EXISTS INT_TEST(ID INTEGER NOT NULL PRIMARY KEY, VALUE INTEGER);
-        CREATE TABLE IF NOT EXISTS LOCAL_DATE_TIME_TEST(ID INTEGER NOT NULL PRIMARY KEY, VALUE TIMESTAMP);
-        CREATE TABLE IF NOT EXISTS LOCAL_DATE_TEST(ID INTEGER NOT NULL PRIMARY KEY, VALUE DATE);
-        CREATE TABLE IF NOT EXISTS LOCAL_TIME_TEST(ID INTEGER NOT NULL PRIMARY KEY, VALUE TIME);
-        CREATE TABLE IF NOT EXISTS LONG_TEST(ID INTEGER NOT NULL PRIMARY KEY, VALUE BIGINT);
-        CREATE TABLE IF NOT EXISTS OFFSET_DATE_TIME_TEST(ID INTEGER NOT NULL PRIMARY KEY, VALUE TIMESTAMP WITH TIME ZONE);
-        CREATE TABLE IF NOT EXISTS SHORT_TEST(ID INTEGER NOT NULL PRIMARY KEY, VALUE SMALLINT);
-        CREATE TABLE IF NOT EXISTS SQLXML_TEST(ID INTEGER NOT NULL PRIMARY KEY, VALUE XML);
-        CREATE TABLE IF NOT EXISTS STRING_TEST(ID INTEGER NOT NULL PRIMARY KEY, VALUE VARCHAR(20));
-        CREATE TABLE IF NOT EXISTS UUID_TEST(ID INTEGER NOT NULL PRIMARY KEY, VALUE UUID);
+        create table if not exists array_test(id integer not null primary key, value text[]);
+        create table if not exists big_decimal_test(id integer not null primary key, value numeric);
+        create table if not exists big_integer_test(id integer not null primary key, value numeric);
+        create table if not exists boolean_test(id integer not null primary key, value boolean);
+        create table if not exists byte_test(id integer not null primary key, value int2);
+        create table if not exists byte_array_test(id integer not null primary key, value bytea);
+        create table if not exists double_test(id integer not null primary key, value float8);
+        create table if not exists enum_test(id integer not null primary key, value varchar(20));
+        create table if not exists float_test(id integer not null primary key, value float);
+        create table if not exists int_test(id integer not null primary key, value integer);
+        create table if not exists local_date_time_test(id integer not null primary key, value timestamp);
+        create table if not exists local_date_test(id integer not null primary key, value date);
+        create table if not exists local_time_test(id integer not null primary key, value time);
+        create table if not exists long_test(id integer not null primary key, value bigint);
+        create table if not exists offset_date_time_test(id integer not null primary key, value timestamp with time zone);
+        create table if not exists short_test(id integer not null primary key, value smallint);
+        create table if not exists sqlxml_test(id integer not null primary key, value xml);
+        create table if not exists string_test(id integer not null primary key, value varchar(20));
+        create table if not exists uuid_test(id integer not null primary key, value uuid);
         
-        CREATE TABLE IF NOT EXISTS JSON_TEST(ID INTEGER NOT NULL PRIMARY KEY, VALUE JSONB);
+        create table if not exists json_test(id integer not null primary key, value jsonb);
         
         INSERT INTO DEPARTMENT VALUES(1,10,'ACCOUNTING','NEW YORK',1);
         INSERT INTO DEPARTMENT VALUES(2,20,'RESEARCH','DALLAS',1);

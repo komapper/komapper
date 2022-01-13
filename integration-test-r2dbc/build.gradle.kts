@@ -1,49 +1,37 @@
+val driver: Any by project
+
 dependencies {
     implementation(project(":integration-test-core"))
     implementation(project(":komapper-tx-r2dbc"))
-    runtimeOnly(project(":komapper-dialect-h2-r2dbc"))
-    runtimeOnly(project(":komapper-dialect-mariadb-r2dbc"))
-    runtimeOnly(project(":komapper-dialect-mysql-r2dbc"))
-    runtimeOnly(project(":komapper-dialect-postgresql-r2dbc"))
     testImplementation(platform("org.testcontainers:testcontainers-bom:1.16.2"))
+    testImplementation("org.testcontainers:r2dbc")
     testImplementation("org.testcontainers:mariadb")
     testImplementation("org.testcontainers:mysql")
     testImplementation("org.testcontainers:postgresql")
-    testImplementation("org.testcontainers:r2dbc")
-    testRuntimeOnly("mysql:mysql-connector-java:8.0.27")
-    testRuntimeOnly("org.mariadb.jdbc:mariadb-java-client:2.7.4")
+    when (driver) {
+        "h2" -> {
+            runtimeOnly(project(":komapper-dialect-h2-r2dbc"))
+        }
+        "mariadb" -> {
+            runtimeOnly(project(":komapper-dialect-mariadb-r2dbc"))
+            testRuntimeOnly("org.mariadb.jdbc:mariadb-java-client:2.7.4")
+        }
+        "mysql" -> {
+            runtimeOnly(project(":komapper-dialect-mysql-r2dbc"))
+            testRuntimeOnly("mysql:mysql-connector-java:8.0.27")
+        }
+        "postgresql" -> {
+            runtimeOnly(project(":komapper-dialect-postgresql-r2dbc"))
+        }
+        else -> throw IllegalArgumentException("Unknown driver: $driver")
+    }
 }
 
 tasks {
-    fun Test.prepareProperties(driver: String) {
+    test {
         val urlKey = "$driver.url"
         val url = project.property(urlKey) ?: throw GradleException("The $urlKey property is not found.")
         this.systemProperty("driver", driver)
         this.systemProperty("url", url)
-    }
-
-    test {
-        val driver: Any by project
-        prepareProperties(driver.toString())
-    }
-
-    val h2 by registering(Test::class) {
-        prepareProperties("h2")
-    }
-
-    val mariadb by registering(Test::class) {
-        prepareProperties("mariadb")
-    }
-
-    val mysql by registering(Test::class) {
-        prepareProperties("mysql")
-    }
-
-    val postgresql by registering(Test::class) {
-        prepareProperties("postgresql")
-    }
-
-    register("testAll") {
-        dependsOn(h2, mariadb, mysql, postgresql)
     }
 }

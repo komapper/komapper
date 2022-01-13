@@ -21,5 +21,5 @@ idea {
 }
 
 ksp {
-    arg("komapper.namingStrategy", "UPPER_SNAKE_CASE")
+    arg("komapper.namingStrategy", "lower_snake_case")
 }

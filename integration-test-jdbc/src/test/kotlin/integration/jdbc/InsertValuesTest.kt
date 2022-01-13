@@ -163,7 +163,7 @@ class InsertValuesTest(private val db: JdbcDatabase) {
             s.value eq "test"
         }
         val result = query.dryRun()
-        val expected = "insert into SEQUENCE_STRATEGY (VALUE, ID) values (?, ?)"
+        val expected = """insert into sequence_strategy ("value", id) values (?, ?)"""
         assertEquals(expected, result.sql)
     }
 
@@ -175,7 +175,7 @@ class InsertValuesTest(private val db: JdbcDatabase) {
             p.name eq "test"
         }
         val result = query.dryRun()
-        val expected = "insert into PERSON (PERSON_ID, NAME, CREATED_AT, UPDATED_AT) values (?, ?, ?, ?)"
+        val expected = "insert into person (person_id, name, created_at, updated_at) values (?, ?, ?, ?)"
         assertEquals(expected, result.sql)
     }
 
@@ -187,7 +187,7 @@ class InsertValuesTest(private val db: JdbcDatabase) {
             a.street eq "STREET 16"
         }
         val result = query.dryRun()
-        val expected = "insert into ADDRESS (ADDRESS_ID, STREET, VERSION) values (?, ?, ?)"
+        val expected = "insert into address (address_id, street, version) values (?, ?, ?)"
         assertEquals(expected, result.sql)
     }
 }
