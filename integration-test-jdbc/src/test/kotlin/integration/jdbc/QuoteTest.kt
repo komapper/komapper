@@ -27,7 +27,7 @@ class QuoteTest(val db: JdbcDatabase) {
         val query = QueryDsl.from(m)
         val sql = query.dryRun().sql
         println(sql)
-        assertTrue(sql.contains(""" "catalog"."schema"."CATALOG_AND_SCHEMA" """))
+        assertTrue(sql.contains(""" "catalog"."schema"."catalog_and_schema" """))
     }
 
     @Run(onlyIf = [Dbms.H2, Dbms.POSTGRESQL])
@@ -37,7 +37,7 @@ class QuoteTest(val db: JdbcDatabase) {
         val query = QueryDsl.from(m)
         val sql = query.dryRun().sql
         println(sql)
-        assertTrue(sql.contains(""" "catalog"."CATALOG_ONLY" """))
+        assertTrue(sql.contains(""" "catalog"."catalog_only" """))
     }
 
     @Run(onlyIf = [Dbms.H2, Dbms.POSTGRESQL])
@@ -47,7 +47,7 @@ class QuoteTest(val db: JdbcDatabase) {
         val query = QueryDsl.from(m)
         val sql = query.dryRun().sql
         println(sql)
-        assertTrue(sql.contains(""" "schema"."SCHEMA_ONLY" """))
+        assertTrue(sql.contains(""" "schema"."schema_only" """))
     }
 
     @Run(onlyIf = [Dbms.H2, Dbms.POSTGRESQL])
@@ -57,8 +57,8 @@ class QuoteTest(val db: JdbcDatabase) {
         val query = QueryDsl.from(m)
         val sql = query.dryRun().sql
         println(sql)
-        assertTrue(sql.contains(""" "BLANK_NAME" """))
-        assertTrue(sql.contains("ID"))
+        assertTrue(sql.contains(""" "blank_name" """))
+        assertTrue(sql.contains("id"))
     }
 
     @Test

@@ -16,13 +16,13 @@ import java.time.OffsetDateTime
 
 @KomapperEntity
 data class Address(
-    @KomapperId @KomapperColumn(name = "ADDRESS_ID") val addressId: Int,
+    @KomapperId @KomapperColumn(name = "address_id") val addressId: Int,
     val street: String,
     @KomapperVersion val version: Int
 )
 
 @KomapperEntity
-@KomapperTable(name = "COMP_KEY_ADDRESS")
+@KomapperTable(name = "comp_key_address")
 data class CompositeKeyAddress(
     @KomapperId val addressId1: Int,
     @KomapperId val addressId2: Int,
@@ -39,31 +39,31 @@ data class CompositeKey(
 )
 
 @KomapperEntity
-@KomapperTable("IDENTITY_STRATEGY")
+@KomapperTable("identity_strategy")
 data class IdentityStrategy(
     @KomapperId @KomapperAutoIncrement val id: Int?,
-    val value: String
+    @KomapperColumn(alwaysQuote = true)val value: String
 )
 
 @KomapperEntity
-@KomapperTable("SEQUENCE_STRATEGY")
+@KomapperTable("sequence_strategy")
 data class SequenceStrategy(
-    @KomapperId @KomapperSequence(name = "SEQUENCE_STRATEGY_ID", incrementBy = 100) val id: Int,
-    val value: String
+    @KomapperId @KomapperSequence(name = "sequence_strategy_id", incrementBy = 100) val id: Int,
+    @KomapperColumn(alwaysQuote = true)val value: String
 )
 
 @KomapperEntity
 data class Person(
-    @KomapperId @KomapperColumn("PERSON_ID") val personId: Int,
+    @KomapperId @KomapperColumn("person_id") val personId: Int,
     val name: String,
-    @KomapperCreatedAt @KomapperColumn("CREATED_AT") val createdAt: LocalDateTime? = null,
-    @KomapperUpdatedAt @KomapperColumn("UPDATED_AT") val updatedAt: LocalDateTime? = null
+    @KomapperCreatedAt @KomapperColumn("created_at") val createdAt: LocalDateTime? = null,
+    @KomapperUpdatedAt @KomapperColumn("updated_at") val updatedAt: LocalDateTime? = null
 )
 
 @KomapperEntity
-@KomapperTable("PERSON")
+@KomapperTable("person")
 data class Human(
-    @KomapperId @KomapperColumn("PERSON_ID") val humanId: Int,
+    @KomapperId @KomapperColumn("person_id") val humanId: Int,
     val name: String,
     @KomapperCreatedAt val createdAt: OffsetDateTime? = null,
     @KomapperUpdatedAt val updatedAt: OffsetDateTime? = null
@@ -71,32 +71,32 @@ data class Human(
 
 @KomapperEntity(["employee", "manager"])
 data class Employee(
-    @KomapperId @KomapperColumn("EMPLOYEE_ID") val employeeId: Int,
-    @KomapperColumn("EMPLOYEE_NO") val employeeNo: Int,
-    @KomapperColumn("EMPLOYEE_NAME") val employeeName: String,
-    @KomapperColumn("MANAGER_ID") val managerId: Int?,
+    @KomapperId @KomapperColumn("employee_id") val employeeId: Int,
+    @KomapperColumn("employee_no") val employeeNo: Int,
+    @KomapperColumn("employee_name") val employeeName: String,
+    @KomapperColumn("manager_id") val managerId: Int?,
     val hiredate: LocalDate,
     val salary: BigDecimal,
-    @KomapperColumn("DEPARTMENT_ID") val departmentId: Int,
-    @KomapperColumn("ADDRESS_ID") val addressId: Int,
+    @KomapperColumn("department_id") val departmentId: Int,
+    @KomapperColumn("address_id") val addressId: Int,
     @KomapperVersion val version: Int,
 )
 
 @KomapperEntity
 data class Department(
-    @KomapperId @KomapperColumn("DEPARTMENT_ID") val departmentId: Int,
-    @KomapperColumn("DEPARTMENT_NO") val departmentNo: Int,
-    @KomapperColumn("DEPARTMENT_NAME") val departmentName: String,
+    @KomapperId @KomapperColumn("department_id") val departmentId: Int,
+    @KomapperColumn("department_no") val departmentNo: Int,
+    @KomapperColumn("department_name") val departmentName: String,
     val location: String,
     @KomapperVersion val version: Int,
 )
 
 @KomapperEntity
-@KomapperTable("DEPARTMENT")
+@KomapperTable("department")
 data class NoVersionDepartment(
-    @KomapperId @KomapperColumn("DEPARTMENT_ID") val departmentId: Int,
-    @KomapperColumn("DEPARTMENT_NO") val departmentNo: Int,
-    @KomapperColumn("DEPARTMENT_NAME") val departmentName: String,
+    @KomapperId @KomapperColumn("department_id") val departmentId: Int,
+    @KomapperColumn("department_no") val departmentNo: Int,
+    @KomapperColumn("department_name") val departmentName: String,
     val location: String,
     val version: Int,
 )

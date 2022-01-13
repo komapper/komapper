@@ -35,7 +35,7 @@ class TemplateTest(private val db: JdbcDatabase) {
     @Test
     fun test_columnLabel() {
         val list = db.runQuery {
-            val sql = "select * from ADDRESS"
+            val sql = "select * from address"
             TemplateDsl.from(sql).select(asAddress)
         }
         assertEquals(15, list.size)
@@ -45,7 +45,7 @@ class TemplateTest(private val db: JdbcDatabase) {
     @Test
     fun test_index() {
         val list = db.runQuery {
-            val sql = "select * from ADDRESS"
+            val sql = "select * from address"
             TemplateDsl.from(sql).select(asAddressByIndex)
         }
         assertEquals(15, list.size)
@@ -55,7 +55,7 @@ class TemplateTest(private val db: JdbcDatabase) {
     @Test
     fun sequence() {
         val list = db.runQuery {
-            val sql = "select * from ADDRESS"
+            val sql = "select * from address"
             TemplateDsl.from(sql).select(asAddress).collect { it.toList() }
         }
         assertEquals(15, list.size)
@@ -72,7 +72,7 @@ class TemplateTest(private val db: JdbcDatabase) {
     @Test
     fun condition_objectExpression() {
         val list = db.runQuery {
-            val sql = "select * from ADDRESS where street = /*street*/'test'"
+            val sql = "select * from address where street = /*street*/'test'"
             TemplateDsl.from(sql).bind(
                 object {
                     @Suppress("unused")
@@ -96,7 +96,7 @@ class TemplateTest(private val db: JdbcDatabase) {
         val list = db.runQuery {
             data class Condition(val street: String)
 
-            val sql = "select * from ADDRESS where street = /*street*/'test'"
+            val sql = "select * from address where street = /*street*/'test'"
             TemplateDsl.from(sql).bind(Condition("STREET 10")).select(asAddress)
         }
         assertEquals(1, list.size)
@@ -113,7 +113,7 @@ class TemplateTest(private val db: JdbcDatabase) {
     @Test
     fun `in`() {
         val list = db.runQuery {
-            val sql = "select * from ADDRESS where address_id in /*list*/(0)"
+            val sql = "select * from address where address_id in /*list*/(0)"
             TemplateDsl.from(sql).bind(
                 object {
                     @Suppress("unused")
@@ -143,7 +143,7 @@ class TemplateTest(private val db: JdbcDatabase) {
     @Test
     fun in2() {
         val list = db.runQuery {
-            val sql = "select * from ADDRESS where (address_id, street) in /*pairs*/(0, '')"
+            val sql = "select * from address where (address_id, street) in /*pairs*/(0, '')"
             TemplateDsl.from(sql).bind(
                 object {
                     @Suppress("unused")
@@ -173,7 +173,7 @@ class TemplateTest(private val db: JdbcDatabase) {
     @Test
     fun in3() {
         val list = db.runQuery {
-            val sql = "select * from ADDRESS where (address_id, street, version) in /*triples*/(0, '', 0)"
+            val sql = "select * from address where (address_id, street, version) in /*triples*/(0, '', 0)"
             TemplateDsl.from(sql).bind(
                 object {
                     @Suppress("unused")
@@ -210,7 +210,7 @@ class TemplateTest(private val db: JdbcDatabase) {
 
             val sql =
                 """
-                select * from ADDRESS 
+                select * from address 
                 where street like concat(/* street.escape() */'test', '%')
                 order by address_id
                 """.trimIndent()
@@ -226,7 +226,7 @@ class TemplateTest(private val db: JdbcDatabase) {
         val list = db.runQuery {
             data class Condition(val street: String)
 
-            val sql = "select * from ADDRESS where street like /*street.asPrefix()*/'test' order by address_id"
+            val sql = "select * from address where street like /*street.asPrefix()*/'test' order by address_id"
             TemplateDsl.from(sql).bind(Condition("STREET 1")).select(asAddress)
         }
         assertEquals((listOf(1) + (10..15)).toList(), list.map { it.addressId })
@@ -237,7 +237,7 @@ class TemplateTest(private val db: JdbcDatabase) {
         val count = db.runQuery {
             data class Condition(val id: Int, val street: String)
 
-            val sql = "update ADDRESS set street = /*street*/'' where address_id = /*id*/0"
+            val sql = "update address set street = /*street*/'' where address_id = /*id*/0"
             TemplateDsl.execute(sql).bind(Condition(15, "NY street"))
         }
         assertEquals(1, count)

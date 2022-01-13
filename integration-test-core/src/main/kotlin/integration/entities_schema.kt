@@ -21,7 +21,7 @@ data class Bbb(
 
 @KomapperEntity
 data class Ccc(
-    @KomapperId @KomapperSequence("CCC_SEQ", incrementBy = 50)
+    @KomapperId @KomapperSequence("ccc_seq", incrementBy = 50)
     val id: Int,
     val name: String,
 )

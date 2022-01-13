@@ -18,7 +18,7 @@ class InsertSelectTest(private val db: R2dbcDatabase) {
     @Test
     fun test() = inTransaction(db) {
         val a = Meta.address
-        val aa = a.clone(table = "ADDRESS_ARCHIVE")
+        val aa = a.clone(table = "address_archive")
         val (count, ids) = db.runQuery {
             val query = QueryDsl.from(a).where { a.addressId between 1..5 }
             QueryDsl.insert(aa).select(query)
@@ -30,7 +30,7 @@ class InsertSelectTest(private val db: R2dbcDatabase) {
     @Test
     fun test_lambda() = inTransaction(db) {
         val a = Meta.address
-        val aa = a.clone(table = "ADDRESS_ARCHIVE")
+        val aa = a.clone(table = "address_archive")
         val (count, ids) = db.runQuery {
             QueryDsl.insert(aa).select {
                 QueryDsl.from(a).where { a.addressId between 1..5 }

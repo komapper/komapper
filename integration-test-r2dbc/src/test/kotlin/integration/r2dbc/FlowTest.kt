@@ -224,7 +224,7 @@ class FlowTest(val db: R2dbcDatabase) {
     @Test
     fun template() = inTransaction(db) {
         val flow = db.flow {
-            TemplateDsl.from("select address_id from ADDRESS order by address_id").select { it.asInt("address_id") }
+            TemplateDsl.from("select address_id from address order by address_id").select { it.asInt("address_id") }
         }
         assertEquals((1..15).toList(), flow.toList())
     }
