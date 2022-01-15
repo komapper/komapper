@@ -26,28 +26,28 @@ allprojects {
     apply(plugin = "base")
     apply(plugin = "org.jlleitschuh.gradle.ktlint")
 
-    ktlint {
-        enableExperimentalRules.set(true)
-        disabledRules.set(
-            listOf(
-                "experimental:annotation",
-                "experimental:annotation-spacing",
-                "experimental:argument-list-wrapping",
-                "experimental:enum-entry-name-case",
-                "experimental:multiline-if-else",
-                "experimental:no-empty-first-line-in-method-block",
-                "experimental:package-name",
-                "experimental:spacing-around-angle-brackets",
-                "experimental:double-colon-spacing",
-                "experimental:unary-op-spacing",
-                "experimental:spacing-between-declarations-with-annotations",
-                // "experimental:spacing-between-declarations-with-comments"
-            )
-        )
-        filter {
-            exclude("build/**")
-        }
-    }
+    // ktlint {
+    //     enableExperimentalRules.set(true)
+    //     disabledRules.set(
+    //         listOf(
+    //             "experimental:annotation",
+    //             "experimental:annotation-spacing",
+    //             "experimental:argument-list-wrapping",
+    //             "experimental:enum-entry-name-case",
+    //             "experimental:multiline-if-else",
+    //             "experimental:no-empty-first-line-in-method-block",
+    //             "experimental:package-name",
+    //             "experimental:spacing-around-angle-brackets",
+    //             "experimental:double-colon-spacing",
+    //             "experimental:unary-op-spacing",
+    //             "experimental:spacing-between-declarations-with-annotations",
+    //             // "experimental:spacing-between-declarations-with-comments"
+    //         )
+    //     )
+    //     filter {
+    //         exclude("build/**")
+    //     }
+    // }
 
     repositories {
         mavenCentral()
