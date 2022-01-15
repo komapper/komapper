@@ -26,7 +26,7 @@ https://www.komapper.org/ja/docs/
 - Java 11 or later
 - Gradle 7.2 or later
 
-## Supported connectivity
+## Supported connectivity types
 
 - JDBC 4.3
 - R2DBC [Arabba-SR12](https://r2dbc.io/2022/01/13/r2dbc-arabba-sr12-released)
