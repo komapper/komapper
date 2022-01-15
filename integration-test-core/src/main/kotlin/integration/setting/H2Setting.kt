@@ -39,7 +39,7 @@ interface H2Setting<CONFIG> : Setting<CONFIG> {
         create table if not exists table_strategy2(id integer not null primary key, "value" varchar(10));
 
         create table if not exists any_test(id integer not null primary key, "value" other);
-        create table if not exists array_test(id integer not null primary key, "value" varchar(100) array);
+        create table if not exists array_test(id integer not null primary key, "value" array);
         create table if not exists big_decimal_test(id integer not null primary key, "value" bigint);
         create table if not exists big_integer_test(id integer not null primary key, "value" bigint);
         create table if not exists boolean_test(id integer not null primary key, "value" bool);
