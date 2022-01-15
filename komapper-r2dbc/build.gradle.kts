@@ -1,9 +1,10 @@
 dependencies {
     val kotlinCoroutinesVersion: String by project
     api(project(":komapper-core"))
-    api("io.r2dbc:r2dbc-spi:0.9.0.RELEASE")
     api("org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinCoroutinesVersion")
     api("org.jetbrains.kotlinx:kotlinx-coroutines-reactive:$kotlinCoroutinesVersion")
+    api(platform("io.r2dbc:r2dbc-bom:Arabba-SR12"))
+    api("io.r2dbc:r2dbc-spi")
 }
 
 tasks {
