@@ -3,7 +3,9 @@ package org.komapper.quarkus.jdbc.deployment;
 import static java.util.stream.Collectors.toList;
 
 import io.quarkus.agroal.spi.JdbcDataSourceBuildItem;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import org.jboss.logging.Logger;
 import org.komapper.quarkus.jdbc.DataSourceDefinition;
 import org.komapper.quarkus.jdbc.KomapperSettings;
