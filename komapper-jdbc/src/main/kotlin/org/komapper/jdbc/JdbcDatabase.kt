@@ -31,7 +31,8 @@ interface JdbcDatabase : Jdbc {
             dataSource: DataSource,
             dialect: JdbcDialect,
         ): JdbcDatabase {
-            return create(DefaultJdbcDatabaseConfig(dataSource, dialect))
+            val config = DefaultJdbcDatabaseConfig(dataSource, dialect)
+            return create(config)
         }
 
         /**
@@ -47,7 +48,11 @@ interface JdbcDatabase : Jdbc {
             password: String = "",
             dataTypes: List<JdbcDataType<*>> = emptyList()
         ): JdbcDatabase {
-            return create(DefaultJdbcDatabaseConfig(url, user, password, dataTypes))
+            val dataSource = SimpleDataSource(url, user, password)
+            val driver = JdbcDialects.extractJdbcDriver(url)
+            val dialect = JdbcDialects.get(driver, dataTypes)
+            val config = DefaultJdbcDatabaseConfig(dataSource, dialect)
+            return create(config)
         }
 
         /**
@@ -64,7 +69,9 @@ interface JdbcDatabase : Jdbc {
             password: String = "",
             dialect: JdbcDialect
         ): JdbcDatabase {
-            return create(DefaultJdbcDatabaseConfig(url, user, password, dialect))
+            val dataSource = SimpleDataSource(url, user, password)
+            val config = DefaultJdbcDatabaseConfig(dataSource, dialect)
+            return create(config)
         }
     }
 

@@ -41,11 +41,10 @@ public class KomapperRecorder {
       var loggerFacadeHandle = container.instance(LoggerFacade.class);
       var statementInspectorHandle = container.instance(StatementInspector.class);
       var newId = UUID.randomUUID();
-      var newDialect =
-          JdbcDialects.INSTANCE.getByDriver(dataSourceDefinition.driver, Collections.emptyList());
-      var newSession =
-          new DefaultJdbcSession(dataSourceResolver.resolve(dataSourceDefinition.name));
-      var newDataFactory = new DefaultJdbcDataFactory(newSession);
+      var dialect = JdbcDialects.INSTANCE.get(dataSourceDefinition.driver, Collections.emptyList());
+      var templateStatementBuilder = TemplateStatementBuilders.INSTANCE.get(dialect);
+      var session = new DefaultJdbcSession(dataSourceResolver.resolve(dataSourceDefinition.name));
+      var dataFactory = new DefaultJdbcDataFactory(session);
       var newExecutionOptions =
           executionOptions.plus(
               new ExecutionOptions(
@@ -58,23 +57,22 @@ public class KomapperRecorder {
 
         @Override
         public JdbcDataFactory getDataFactory() {
-          return newDataFactory;
+          return dataFactory;
         }
 
         @Override
         public JdbcSession getSession() {
-          return newSession;
+          return session;
         }
 
         @Override
         public JdbcDialect getDialect() {
-          return newDialect;
+          return dialect;
         }
 
         @Override
         public TemplateStatementBuilder getTemplateStatementBuilder() {
-          // TODO
-          return TemplateStatementBuilders.INSTANCE.get(newDialect);
+          return templateStatementBuilder;
         }
 
         @Override

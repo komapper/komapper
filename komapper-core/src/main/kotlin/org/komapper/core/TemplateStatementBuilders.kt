@@ -15,10 +15,6 @@ object TemplateStatementBuilders {
     fun get(dialect: Dialect): TemplateStatementBuilder {
         val loader = ServiceLoader.load(TemplateStatementBuilderFactory::class.java)
         val factory = loader.findByPriority()
-            ?: error(
-                "TemplateStatementBuilderFactory is not found. " +
-                    "Add komapper-template dependency or override the templateStatementBuilder property."
-            )
-        return factory.create(dialect)
+        return factory?.create(dialect) ?: DefaultTemplateStatementBuilder()
     }
 }
