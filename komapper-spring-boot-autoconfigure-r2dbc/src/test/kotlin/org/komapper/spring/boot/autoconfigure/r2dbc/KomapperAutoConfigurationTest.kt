@@ -17,7 +17,6 @@ import java.time.ZoneId
 import java.time.ZoneOffset
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
@@ -39,9 +38,7 @@ class KomapperAutoConfigurationTest {
         val database = context.getBean(R2dbcDatabase::class.java)
         assertNotNull(database)
         assertTrue(database.config.dialect is H2R2dbcDialect)
-        assertFailsWith<IllegalStateException> {
-            database.config.templateStatementBuilder
-        }
+        assertNotNull(database.config.templateStatementBuilder)
     }
 
     @Test

@@ -24,7 +24,6 @@ import org.springframework.boot.autoconfigure.r2dbc.R2dbcAutoConfiguration
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.env.Environment
-import java.util.Optional
 import java.util.UUID
 
 @Suppress("unused")
@@ -85,6 +84,12 @@ open class KomapperAutoConfiguration {
         return StatementInspectors.get()
     }
 
+    @Bean
+    @ConditionalOnMissingBean
+    open fun templateStatementBuilder(dialect: R2dbcDialect): TemplateStatementBuilder {
+        return TemplateStatementBuilders.get(dialect)
+    }
+
 //    @Bean
 //    @ConditionalOnMissingBean
 //    open fun dataFactory(databaseSession: DatabaseSession): DataFactory {
@@ -101,7 +106,7 @@ open class KomapperAutoConfiguration {
         loggerFacade: LoggerFacade,
         session: R2dbcSession,
         statementInspector: StatementInspector,
-        templateStatementBuilder: Optional<TemplateStatementBuilder>
+        templateStatementBuilder: TemplateStatementBuilder
     ): R2dbcDatabaseConfig {
         return object : R2dbcDatabaseConfig {
             override val id = UUID.randomUUID()
@@ -112,16 +117,8 @@ open class KomapperAutoConfiguration {
             override val loggerFacade = loggerFacade
             override val session = session
             override val statementInspector = statementInspector
-            override val templateStatementBuilder by lazy {
-                templateStatementBuilder.orElseGet {
-                    loadTemplateStatementBuilder(r2dbcDialect)
-                }
-            }
+            override val templateStatementBuilder = templateStatementBuilder
         }
-    }
-
-    private fun loadTemplateStatementBuilder(dialect: R2dbcDialect): TemplateStatementBuilder {
-        return TemplateStatementBuilders.get(dialect)
     }
 
     @Bean

@@ -13,14 +13,12 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.env.MapPropertySource
-import java.lang.IllegalStateException
 import java.time.Clock
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
@@ -42,9 +40,7 @@ class KomapperAutoConfigurationTest {
         val database = context.getBean(JdbcDatabase::class.java)
         assertNotNull(database)
         assertTrue(database.config.dialect is H2JdbcDialect)
-        assertFailsWith<IllegalStateException> {
-            database.config.templateStatementBuilder
-        }
+        assertNotNull(database.config.templateStatementBuilder)
     }
 
     @Test

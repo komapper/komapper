@@ -26,7 +26,6 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.env.Environment
-import java.util.Optional
 import java.util.UUID
 import javax.sql.DataSource
 
@@ -48,7 +47,7 @@ open class KomapperAutoConfiguration {
                 "$DATASOURCE_URL_PROPERTY is not found. " +
                     "Specify it to the application.properties file or define the Dialect bean manually."
             )
-        return JdbcDialects.get(url, dataTypes ?: emptyList())
+        return JdbcDialects.getByUrl(url, dataTypes ?: emptyList())
     }
 
     @Bean
@@ -95,6 +94,12 @@ open class KomapperAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
+    open fun templateStatementBuilder(dialect: JdbcDialect): TemplateStatementBuilder {
+        return TemplateStatementBuilders.get(dialect)
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
     open fun databaseConfig(
         dialect: JdbcDialect,
         clockProvider: ClockProvider,
@@ -104,7 +109,7 @@ open class KomapperAutoConfiguration {
         session: JdbcSession,
         statementInspector: StatementInspector,
         dataFactory: JdbcDataFactory,
-        templateStatementBuilder: Optional<TemplateStatementBuilder>
+        templateStatementBuilder: TemplateStatementBuilder
     ): JdbcDatabaseConfig {
         return object : JdbcDatabaseConfig {
             override val id = UUID.randomUUID()
@@ -116,16 +121,8 @@ open class KomapperAutoConfiguration {
             override val session = session
             override val statementInspector = statementInspector
             override val dataFactory = dataFactory
-            override val templateStatementBuilder by lazy {
-                templateStatementBuilder.orElseGet {
-                    loadTemplateStatementBuilder(dialect)
-                }
-            }
+            override val templateStatementBuilder = templateStatementBuilder
         }
-    }
-
-    private fun loadTemplateStatementBuilder(dialect: JdbcDialect): TemplateStatementBuilder {
-        return TemplateStatementBuilders.get(dialect)
     }
 
     @Bean

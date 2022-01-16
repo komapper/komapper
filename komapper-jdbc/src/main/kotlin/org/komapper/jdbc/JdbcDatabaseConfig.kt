@@ -47,14 +47,7 @@ open class DefaultJdbcDatabaseConfig(
         user: String = "",
         password: String = "",
         dataTypes: List<JdbcDataType<*>> = emptyList()
-    ) : this(SimpleDataSource(url, user, password), JdbcDialects.get(url, dataTypes))
-
-    constructor(
-        url: String,
-        user: String = "",
-        password: String = "",
-        dialect: JdbcDialect
-    ) : this(SimpleDataSource(url, user, password), dialect)
+    ) : this(SimpleDataSource(url, user, password), JdbcDialects.getByUrl(url, dataTypes))
 
     override val id: UUID = UUID.randomUUID()
     override val clockProvider: ClockProvider = DefaultClockProvider()

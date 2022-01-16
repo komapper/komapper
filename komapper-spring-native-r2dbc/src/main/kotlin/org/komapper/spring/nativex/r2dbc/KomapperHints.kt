@@ -16,7 +16,6 @@ import org.springframework.core.env.Environment
 import org.springframework.nativex.hint.NativeHint
 import org.springframework.nativex.hint.TypeHint
 import org.springframework.nativex.type.NativeConfiguration
-import java.util.Optional
 
 @NativeHint(
     trigger = KomapperAutoConfiguration::class,
@@ -40,12 +39,7 @@ import java.util.Optional
                 "org.komapper.spring.boot.autoconfigure.r2dbc.KomapperAutoConfiguration\$databaseConfig\$1"
             ]
         ),
-        TypeHint(
-            types = [
-                Environment::class,
-                Optional::class,
-            ]
-        )
+        TypeHint(types = [Environment::class])
     ]
 )
 class KomapperHints : NativeConfiguration

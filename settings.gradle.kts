@@ -1,6 +1,7 @@
 pluginManagement {
     val kotlinVersion: String by settings
     val kspVersion: String by settings
+    val quarkusVersion: String by settings
     val springBootVersion: String by settings
     repositories {
         mavenLocal()
@@ -13,7 +14,10 @@ pluginManagement {
     plugins {
         kotlin("jvm") version kotlinVersion
         kotlin("plugin.spring") version kotlinVersion
+        kotlin("plugin.allopen") version kotlinVersion
         id("com.google.devtools.ksp") version kspVersion
+        id("io.quarkus") version quarkusVersion
+        id("io.quarkus.extension") version quarkusVersion
         id("org.springframework.boot") version springBootVersion
     }
 }
@@ -29,6 +33,8 @@ include("komapper-processor")
 
 // JDBC
 include("komapper-jdbc")
+include("komapper-quarkus-jdbc")
+include("komapper-quarkus-jdbc-deployment")
 include("komapper-spring-boot-autoconfigure-jdbc")
 include("komapper-spring-boot-starter-jdbc")
 include("komapper-spring-native-jdbc")

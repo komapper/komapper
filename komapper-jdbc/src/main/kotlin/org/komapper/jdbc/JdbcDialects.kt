@@ -12,23 +12,34 @@ object JdbcDialects {
     private val jdbcUrlPattern = Pattern.compile("^jdbc:(tc:)?([^:]*):.*")
 
     /**
-     * @param url the JDBC URL
+     * @param driver the driver name
      * @param dataTypes the data types
      * @return the [JdbcDialect]
      */
-    fun get(url: String, dataTypes: List<JdbcDataType<*>>): JdbcDialect {
-        val driver = extractJdbcDriver(url)
+    fun get(driver: String, dataTypes: List<JdbcDataType<*>>): JdbcDialect {
         val loader = ServiceLoader.load(JdbcDialectFactory::class.java)
         val factory = loader.filter { it.supports(driver) }.findByPriority()
             ?: error(
                 "The dialect is not found for the JDBC url. " +
                     "Try to add the 'komapper-dialect-$driver-jdbc' dependency. " +
-                    "url=$url, driver='$driver'"
+                    "driver='$driver'"
             )
         return factory.create(dataTypes)
     }
 
-    internal fun extractJdbcDriver(url: String): String {
+    /**
+     * @param url the JDBC url
+     * @param dataTypes the data types
+     */
+    fun getByUrl(url: String, dataTypes: List<JdbcDataType<*>>): JdbcDialect {
+        val driver = extractJdbcDriver(url)
+        return get(driver, dataTypes)
+    }
+
+    /**
+     * @param url the JDBC url
+     */
+    fun extractJdbcDriver(url: String): String {
         val matcher = jdbcUrlPattern.matcher(url)
         if (matcher.matches()) {
             return matcher.group(2).lowercase()

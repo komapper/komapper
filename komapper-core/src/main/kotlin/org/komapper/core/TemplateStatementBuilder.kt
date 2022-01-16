@@ -23,3 +23,15 @@ interface TemplateStatementBuilder {
      */
     fun clearCache()
 }
+
+class DefaultTemplateStatementBuilder : TemplateStatementBuilder {
+    override fun build(template: CharSequence, data: Any, escape: (String) -> String): Statement {
+        throw UnsupportedOperationException(
+            "Appropriate TemplateStatementBuilder is not found. " +
+                "Add komapper-template dependency or override the templateStatementBuilder property."
+        )
+    }
+
+    override fun clearCache() {
+    }
+}
