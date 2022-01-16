@@ -9,6 +9,7 @@ import io.quarkus.deployment.annotations.BuildStep;
 import io.quarkus.deployment.annotations.ExecutionTime;
 import io.quarkus.deployment.annotations.Record;
 import io.quarkus.deployment.builditem.FeatureBuildItem;
+import io.quarkus.deployment.builditem.nativeimage.ServiceProviderBuildItem;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -40,6 +41,21 @@ public class KomapperProcessor {
       KomapperBuildTimeConfig buildTimeConfig, List<JdbcDataSourceBuildItem> dataSources) {
     var factory = new KomapperSettingsFactory(buildTimeConfig, dataSources);
     return new KomapperSettingsBuildItem(factory.create());
+  }
+
+  @BuildStep
+  void registerNativeImageResources(BuildProducer<ServiceProviderBuildItem> serviceProvider) {
+    var serviceInterfaces =
+        List.of(
+            "org.komapper.core.spi.LoggerFactory",
+            "org.komapper.core.spi.StatementInspectorFactory",
+            "org.komapper.core.spi.TemplateStatementBuilder",
+            "org.komapper.r2dbc.spi.R2dbcDialectFactory",
+            "org.komapper.jdbc.spi.JdbcDialectFactory");
+    for (var interfase : serviceInterfaces) {
+      var item = ServiceProviderBuildItem.allProvidersFromClassPath(interfase);
+      serviceProvider.produce(item);
+    }
   }
 
   @BuildStep
