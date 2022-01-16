@@ -35,11 +35,11 @@ public class KomapperRecorder {
       var container = Arc.container();
       var dataSourceResolver = container.instance(DataSourceResolver.class).get();
       var executionOptions = container.instance(ExecutionOptions.class).get();
-      var clockProviderHandle = container.instance(ClockProvider.class);
-      var loggerHandle = container.instance(Logger.class);
-      var loggerFacadeHandle = container.instance(LoggerFacade.class);
-      var statementInspectorHandle = container.instance(StatementInspector.class);
-      var newId = UUID.randomUUID();
+      var clockProvider = container.instance(ClockProvider.class).get();
+      var logger = container.instance(Logger.class).get();
+      var loggerFacade = container.instance(LoggerFacade.class).get();
+      var statementInspector = container.instance(StatementInspector.class).get();
+      var id = UUID.randomUUID();
       var dialect = JdbcDialects.INSTANCE.get(dataSourceDefinition.driver, Collections.emptyList());
       var templateStatementBuilder = TemplateStatementBuilders.INSTANCE.get(dialect);
       var session = new DefaultJdbcSession(dataSourceResolver.resolve(dataSourceDefinition.name));
@@ -76,17 +76,17 @@ public class KomapperRecorder {
 
         @Override
         public StatementInspector getStatementInspector() {
-          return statementInspectorHandle.get();
+          return statementInspector;
         }
 
         @Override
         public LoggerFacade getLoggerFacade() {
-          return loggerFacadeHandle.get();
+          return loggerFacade;
         }
 
         @Override
         public Logger getLogger() {
-          return loggerHandle.get();
+          return logger;
         }
 
         @Override
@@ -96,12 +96,12 @@ public class KomapperRecorder {
 
         @Override
         public ClockProvider getClockProvider() {
-          return clockProviderHandle.get();
+          return clockProvider;
         }
 
         @Override
         public UUID getId() {
-          return newId;
+          return id;
         }
       };
     };
