@@ -55,6 +55,9 @@ module/platform:
 module/processor:
   - komapper-processor/**/*
 
+module/quarkus-jdbc:
+  - komapper-quarkus-jdbc/**/*
+
 module/r2dbc:
   - komapper-r2dbc/**/*
 
