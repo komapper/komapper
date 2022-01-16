@@ -9,6 +9,11 @@ import io.quarkus.deployment.annotations.BuildStep;
 import io.quarkus.deployment.annotations.ExecutionTime;
 import io.quarkus.deployment.annotations.Record;
 import io.quarkus.deployment.builditem.FeatureBuildItem;
+import java.util.List;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import javax.enterprise.inject.Default;
+import javax.inject.Singleton;
 import org.jboss.jandex.DotName;
 import org.komapper.jdbc.JdbcDatabase;
 import org.komapper.jdbc.JdbcDatabaseConfig;
@@ -16,12 +21,6 @@ import org.komapper.quarkus.jdbc.DataSourceDefinition;
 import org.komapper.quarkus.jdbc.DefaultDataSourceResolver;
 import org.komapper.quarkus.jdbc.KomapperProducer;
 import org.komapper.quarkus.jdbc.KomapperRecorder;
-
-import javax.enterprise.inject.Default;
-import javax.inject.Singleton;
-import java.util.List;
-import java.util.function.Function;
-import java.util.function.Supplier;
 
 public class KomapperProcessor {
   public static final String FEATURE = "komapper";

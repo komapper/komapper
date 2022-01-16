@@ -2,6 +2,7 @@ package org.komapper.quarkus.jdbc;
 
 import io.quarkus.arc.DefaultBean;
 import io.quarkus.arc.Unremovable;
+import javax.inject.Singleton;
 import org.komapper.core.ClockProvider;
 import org.komapper.core.DefaultClockProvider;
 import org.komapper.core.DefaultLoggerFacade;
@@ -11,8 +12,6 @@ import org.komapper.core.LoggerFacade;
 import org.komapper.core.Loggers;
 import org.komapper.core.StatementInspector;
 import org.komapper.core.StatementInspectors;
-
-import javax.inject.Singleton;
 
 @Singleton
 @Unremovable

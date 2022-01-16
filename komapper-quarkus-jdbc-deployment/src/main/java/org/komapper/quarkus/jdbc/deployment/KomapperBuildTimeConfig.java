@@ -1,9 +1,7 @@
 package org.komapper.quarkus.jdbc.deployment;
 
 import io.quarkus.runtime.annotations.*;
-
 import java.util.Map;
-import java.util.Optional;
 
 @ConfigRoot
 public class KomapperBuildTimeConfig {

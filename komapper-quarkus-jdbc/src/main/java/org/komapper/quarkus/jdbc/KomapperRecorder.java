@@ -3,6 +3,12 @@ package org.komapper.quarkus.jdbc;
 import io.quarkus.agroal.DataSource;
 import io.quarkus.arc.Arc;
 import io.quarkus.runtime.annotations.Recorder;
+import java.lang.annotation.Annotation;
+import java.util.Collections;
+import java.util.Objects;
+import java.util.UUID;
+import java.util.function.Supplier;
+import javax.enterprise.inject.Default;
 import org.komapper.core.ClockProvider;
 import org.komapper.core.ExecutionOptions;
 import org.komapper.core.Logger;
@@ -18,13 +24,6 @@ import org.komapper.jdbc.JdbcDatabaseConfig;
 import org.komapper.jdbc.JdbcDialect;
 import org.komapper.jdbc.JdbcDialects;
 import org.komapper.jdbc.JdbcSession;
-
-import javax.enterprise.inject.Default;
-import java.lang.annotation.Annotation;
-import java.util.Collections;
-import java.util.Objects;
-import java.util.UUID;
-import java.util.function.Supplier;
 
 @Recorder
 public class KomapperRecorder {

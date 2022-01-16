@@ -1,17 +1,12 @@
 package org.komapper.quarkus.jdbc.deployment;
 
+import static java.util.stream.Collectors.toList;
+
 import io.quarkus.agroal.spi.JdbcDataSourceBuildItem;
-import io.quarkus.deployment.builditem.ApplicationArchivesBuildItem;
-import io.quarkus.deployment.builditem.LaunchModeBuildItem;
+import java.util.*;
 import org.jboss.logging.Logger;
 import org.komapper.quarkus.jdbc.DataSourceDefinition;
 import org.komapper.quarkus.jdbc.KomapperSettings;
-
-import java.util.*;
-import java.util.function.Function;
-
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
 
 public class KomapperSettingsFactory {
 
@@ -21,8 +16,7 @@ public class KomapperSettingsFactory {
   private final List<JdbcDataSourceBuildItem> dataSources;
 
   KomapperSettingsFactory(
-      KomapperBuildTimeConfig buildTimeConfig,
-      List<JdbcDataSourceBuildItem> dataSources) {
+      KomapperBuildTimeConfig buildTimeConfig, List<JdbcDataSourceBuildItem> dataSources) {
     this.buildTimeConfig = Objects.requireNonNull(buildTimeConfig);
     this.dataSources = new ArrayList<>(Objects.requireNonNull(dataSources));
   }
