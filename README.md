@@ -14,12 +14,19 @@ https://www.komapper.org/ja/docs/
 
 ## Features
 
+### Highlighted features
+
 - Support for both JDBC and R2DBC
 - Code generation at compile-time using [Kotlin Symbol Processing API](https://github.com/google/ksp)
 - Immutable and composable queries
 - Support for Kotlin value classes
 - Easy Spring Boot integration
 
+### Experimentally supported features
+
+- Quarkus integration
+- Spring Native integration
+ 
 ## Prerequisite
 
 - Kotlin 1.3.51 or later
