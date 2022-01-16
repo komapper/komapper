@@ -4,6 +4,7 @@ dependencies {
     implementation("org.springframework:spring-r2dbc:$springVersion")
     implementation("org.springframework.boot:spring-boot-autoconfigure:$springBootVersion")
     implementation(project(":komapper-r2dbc"))
+    testImplementation(platform("io.r2dbc:r2dbc-bom:Arabba-SR12"))
     testImplementation(project(":komapper-slf4j"))
     testImplementation(project(":komapper-dialect-h2-r2dbc"))
     testImplementation("io.r2dbc:r2dbc-h2")
