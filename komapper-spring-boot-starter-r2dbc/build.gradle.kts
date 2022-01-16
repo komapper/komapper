@@ -2,6 +2,7 @@ dependencies {
     val springVersion: String by project
     val springBootVersion: String by project
     val kotlinCoroutinesVersion: String by project
+    implementation(platform("io.r2dbc:r2dbc-bom:Arabba-SR12"))
     api("org.springframework:spring-beans:$springVersion")
     api("org.springframework:spring-core:$springVersion")
     api("org.springframework:spring-context:$springVersion")
