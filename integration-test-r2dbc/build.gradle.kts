@@ -18,7 +18,7 @@ dependencies {
         }
         "mysql" -> {
             runtimeOnly(project(":komapper-dialect-mysql-r2dbc"))
-            testRuntimeOnly("mysql:mysql-connector-java:8.0.27")
+            testRuntimeOnly("mysql:mysql-connector-java:8.0.28")
         }
         "postgresql" -> {
             runtimeOnly(project(":komapper-dialect-postgresql-r2dbc"))
