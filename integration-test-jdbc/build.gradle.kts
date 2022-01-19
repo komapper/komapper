@@ -4,7 +4,7 @@ dependencies {
     implementation(project(":integration-test-core"))
     implementation(project(":komapper-tx-jdbc"))
     implementation("org.postgresql:postgresql:42.3.1")
-    testImplementation(platform("org.testcontainers:testcontainers-bom:1.16.2"))
+    testImplementation(platform("org.testcontainers:testcontainers-bom:1.16.3"))
     testRuntimeOnly("org.testcontainers:mariadb")
     testRuntimeOnly("org.testcontainers:mysql")
     testRuntimeOnly("org.testcontainers:postgresql")
