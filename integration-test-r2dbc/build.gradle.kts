@@ -3,7 +3,7 @@ val driver: Any by project
 dependencies {
     implementation(project(":integration-test-core"))
     implementation(project(":komapper-tx-r2dbc"))
-    testImplementation(platform("org.testcontainers:testcontainers-bom:1.16.2"))
+    testImplementation(platform("org.testcontainers:testcontainers-bom:1.16.3"))
     testImplementation("org.testcontainers:r2dbc")
     testImplementation("org.testcontainers:mariadb")
     testImplementation("org.testcontainers:mysql")
