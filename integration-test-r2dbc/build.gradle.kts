@@ -14,7 +14,7 @@ dependencies {
         }
         "mariadb" -> {
             runtimeOnly(project(":komapper-dialect-mariadb-r2dbc"))
-            testRuntimeOnly("org.mariadb.jdbc:mariadb-java-client:2.7.4")
+            testRuntimeOnly("org.mariadb.jdbc:mariadb-java-client:2.7.5")
         }
         "mysql" -> {
             runtimeOnly(project(":komapper-dialect-mysql-r2dbc"))
