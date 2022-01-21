@@ -16,7 +16,12 @@ class RelationUpdateStatementBuilder<ENTITY : Any, ID : Any, META : EntityMetamo
     private val context: RelationUpdateContext<ENTITY, ID, META>,
 ) {
 
-    private val aliasManager = DefaultAliasManager(context)
+    private val aliasManager = if (dialect.supportsAliasForUpdateStatement()) {
+        DefaultAliasManager(context)
+    } else {
+        EmptyAliasManager
+    }
+
     private val buf = StatementBuffer()
     private val support = BuilderSupport(dialect, aliasManager, buf, context.options.escapeSequence)
 

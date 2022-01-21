@@ -134,7 +134,7 @@ class ValueClassTest(val db: JdbcDatabase) {
             val m = Meta.vIdentityStrategy
             val strategy = VIdentityStrategy(IntId(0), "test")
             val result = db.runQuery { QueryDsl.insert(m).single(strategy) }
-            assertEquals(IntId(i), result.id)
+            assertEquals(IntId(i), result.id, "i = $i")
         }
     }
 
@@ -149,6 +149,7 @@ class ValueClassTest(val db: JdbcDatabase) {
         }
     }
 
+    @Run(unless = [Dbms.SQLSERVER])
     @Test
     fun inList2() {
         val a = Meta.vAddress

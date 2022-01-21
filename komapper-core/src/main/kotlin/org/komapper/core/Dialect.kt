@@ -155,11 +155,25 @@ interface Dialect {
     ): EntityUpsertStatementBuilder<ENTITY>
 
     /**
+     * Returns the default length argument for the substring function.
+     *
+     * @return the default length argument
+     */
+    fun getDefaultLengthForSubstringFunction(): Int? = null
+
+/**
      * Returns whether the alias is supported in the delete statement.
      *
      * @return whether the alias is supported
      */
     fun supportsAliasForDeleteStatement() = true
+
+    /**
+     * Returns whether the alias is supported in the update statement.
+     *
+     * @return whether the alias is supported
+     */
+    fun supportsAliasForUpdateStatement() = true
 
     /**
      * Returns whether the nulls first and nulls last options are supported in the order by clause.

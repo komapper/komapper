@@ -39,6 +39,8 @@ class InsertMultipleTest(private val db: JdbcDatabase) {
         assertEquals(addressList, list)
     }
 
+    // TODO https://github.com/Microsoft/mssql-jdbc/issues/245
+    @Run(unless = [Dbms.SQLSERVER])
     @Test
     fun identity() {
         val i = Meta.identityStrategy

@@ -39,6 +39,8 @@ class InsertBatchTest(private val db: JdbcDatabase) {
         assertEquals(addressList, list)
     }
 
+    // TODO https://github.com/Microsoft/mssql-jdbc/issues/245
+    @Run(unless = [Dbms.SQLSERVER])
     @Test
     fun identity() {
         val i = Meta.identityStrategy
@@ -215,6 +217,8 @@ class InsertBatchTest(private val db: JdbcDatabase) {
         )
     }
 
+    // TODO https://github.com/Microsoft/mssql-jdbc/issues/245
+    @Run(unless = [Dbms.SQLSERVER])
     @Test
     fun identity_onDuplicateKeyUpdate() {
         val i = Meta.identityStrategy

@@ -247,7 +247,12 @@ class BuilderSupport(
                 buf.append(", ")
                 visitOperand(function.startIndex)
                 val length = function.length
-                if (length != null) {
+                if (length == null) {
+                    val defaultLength = dialect.getDefaultLengthForSubstringFunction()
+                    if (defaultLength != null) {
+                        buf.append(", $defaultLength")
+                    }
+                } else {
                     buf.append(", ")
                     visitOperand(length)
                 }

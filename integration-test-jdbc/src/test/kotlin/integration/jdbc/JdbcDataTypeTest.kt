@@ -276,9 +276,9 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
         assertEquals(data, data2)
     }
 
-    @Run(unless = [Dbms.H2])
+    @Run(unless = [Dbms.H2, Dbms.SQLSERVER])
     @Test
-    fun offsetDateTime_unlessH2() {
+    fun offsetDateTime_offsetLost() {
         val m = Meta.offsetDateTimeTest
         val dateTime = LocalDateTime.of(2019, 6, 1, 12, 11, 10)
         val offset = ZoneOffset.ofHours(9)
@@ -288,6 +288,7 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
         val data2 = db.runQuery {
             QueryDsl.from(m).where { m.id eq 1 }.first()
         }
+        println(data2)
         assertNotNull(data2)
     }
 

@@ -1,6 +1,8 @@
 package integration.jdbc
 
 import integration.address
+import integration.setting.Dbms
+import integration.setting.Run
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
@@ -11,6 +13,7 @@ import kotlin.test.assertEquals
 @ExtendWith(Env::class)
 class SelectOffsetLimitTest(private val db: JdbcDatabase) {
 
+    @Run(unless = [Dbms.SQLSERVER])
     @Test
     fun offset() {
         val a = Meta.address
@@ -18,6 +21,7 @@ class SelectOffsetLimitTest(private val db: JdbcDatabase) {
         assertEquals(5, list.size)
     }
 
+    @Run(unless = [Dbms.SQLSERVER])
     @Test
     fun limit() {
         val a = Meta.address
@@ -26,7 +30,21 @@ class SelectOffsetLimitTest(private val db: JdbcDatabase) {
     }
 
     @Test
-    fun offset_limit() {
+    fun orderBy_offset() {
+        val a = Meta.address
+        val list = db.runQuery { QueryDsl.from(a).orderBy(a.addressId).offset(10) }
+        assertEquals(5, list.size)
+    }
+
+    @Test
+    fun orderBy_limit() {
+        val a = Meta.address
+        val list = db.runQuery { QueryDsl.from(a).orderBy(a.addressId).limit(3) }
+        assertEquals(3, list.size)
+    }
+
+    @Test
+    fun orderBy_offset_limit() {
         val a = Meta.address
         val list = db.runQuery {
             QueryDsl.from(a)

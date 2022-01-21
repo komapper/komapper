@@ -1,0 +1,65 @@
+package org.komapper.dialect.sqlserver.jdbc
+
+import org.komapper.dialect.sqlserver.SqlServerDialect
+import org.komapper.jdbc.AbstractJdbcDialect
+import org.komapper.jdbc.ArrayType
+import org.komapper.jdbc.BigDecimalType
+import org.komapper.jdbc.BigIntegerType
+import org.komapper.jdbc.ByteArrayType
+import org.komapper.jdbc.ByteType
+import org.komapper.jdbc.DoubleType
+import org.komapper.jdbc.FloatType
+import org.komapper.jdbc.IntType
+import org.komapper.jdbc.JdbcDataType
+import org.komapper.jdbc.LocalDateTimeType
+import org.komapper.jdbc.LocalDateType
+import org.komapper.jdbc.LocalTimeType
+import org.komapper.jdbc.LongType
+import org.komapper.jdbc.SQLXMLType
+import org.komapper.jdbc.ShortType
+import org.komapper.jdbc.StringType
+import org.komapper.jdbc.UByteType
+import org.komapper.jdbc.UIntType
+import org.komapper.jdbc.UShortType
+import java.sql.SQLException
+
+class SqlServerJdbcDialect(
+    dataTypes: List<JdbcDataType<*>> = emptyList(),
+    val version: Version = Version.IMPLICIT
+) : SqlServerDialect, AbstractJdbcDialect(DEFAULT_DATA_TYPES + dataTypes) {
+
+    companion object {
+        /** the error code that represents unique violation  */
+        const val UNIQUE_CONSTRAINT_VIOLATION_STATE_CODE = 2627
+
+        val DEFAULT_DATA_TYPES: List<JdbcDataType<*>> = listOf(
+            // TODO
+            ArrayType("text[]"),
+            BigDecimalType("decimal"),
+            BigIntegerType("decimal"),
+            ByteType("smallint"),
+            ByteArrayType("varbinary(1000)"),
+            DoubleType("real"),
+            FloatType("float"),
+            IntType("int"),
+            LocalDateTimeType("datetime"),
+            LocalDateType("date"),
+            LocalTimeType("time"),
+            LongType("bigint"),
+            ShortType("smallint"),
+            SQLXMLType("xml"),
+            StringType("varchar(1000)"),
+            UByteType("smallint"),
+            UIntType("bigint"),
+            UShortType("int"),
+            SqlServerBitType,
+        )
+    }
+
+    enum class Version { IMPLICIT }
+
+    override fun isUniqueConstraintViolation(exception: SQLException): Boolean {
+        val cause = getCause(exception)
+        return cause.errorCode == UNIQUE_CONSTRAINT_VIOLATION_STATE_CODE
+    }
+}

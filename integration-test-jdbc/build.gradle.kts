@@ -6,6 +6,7 @@ dependencies {
     implementation("org.postgresql:postgresql:42.3.1")
     testImplementation(platform("org.testcontainers:testcontainers-bom:1.16.3"))
     testRuntimeOnly("org.testcontainers:mariadb")
+    testRuntimeOnly("org.testcontainers:mssqlserver")
     testRuntimeOnly("org.testcontainers:mysql")
     testRuntimeOnly("org.testcontainers:postgresql")
     when (driver) {
@@ -20,6 +21,9 @@ dependencies {
         }
         "postgresql" -> {
             runtimeOnly(project(":komapper-dialect-postgresql-jdbc"))
+        }
+        "sqlserver" -> {
+            runtimeOnly(project(":komapper-dialect-sqlserver-jdbc"))
         }
         else -> throw IllegalArgumentException("Unknown driver: $driver")
     }

@@ -2,6 +2,8 @@ package integration.jdbc
 
 import integration.address
 import integration.identityStrategy
+import integration.setting.Dbms
+import integration.setting.Run
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
@@ -38,6 +40,8 @@ class InsertSelectTest(private val db: JdbcDatabase) {
         assertEquals(emptyList(), ids)
     }
 
+    // TODO https://github.com/Microsoft/mssql-jdbc/issues/245
+    @Run(unless = [Dbms.SQLSERVER])
     @Test
     fun generatedKeys() {
         val i = Meta.identityStrategy

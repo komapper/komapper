@@ -65,7 +65,7 @@ class InsertSingleTest(private val db: JdbcDatabase) {
         assertEquals(person2, person3)
     }
 
-    @Run(unless = [Dbms.POSTGRESQL])
+    @Run(unless = [Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun createdAt_offsetDateTime() {
         val h = Meta.human
@@ -123,7 +123,7 @@ class InsertSingleTest(private val db: JdbcDatabase) {
             val m = Meta.identityStrategy
             val strategy = IdentityStrategy(0, "test")
             val result = db.runQuery { QueryDsl.insert(m).single(strategy) }
-            assertEquals(i, result.id)
+            assertEquals(i, result.id, "i = $i")
         }
     }
 

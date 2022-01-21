@@ -3,6 +3,8 @@ package integration.jdbc
 import integration.Address
 import integration.address
 import integration.employee
+import integration.setting.Dbms
+import integration.setting.Run
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
@@ -376,6 +378,7 @@ class SelectWhereTest(private val db: JdbcDatabase) {
         assertEquals(9, list.size)
     }
 
+    @Run(unless = [Dbms.SQLSERVER])
     @Test
     fun inList2() {
         val a = Meta.address
@@ -393,6 +396,7 @@ class SelectWhereTest(private val db: JdbcDatabase) {
         )
     }
 
+    @Run(unless = [Dbms.SQLSERVER])
     @Test
     fun notInList2() {
         val seq = sequence {
@@ -408,6 +412,7 @@ class SelectWhereTest(private val db: JdbcDatabase) {
         assertEquals((10..15).toList(), list.map { it.addressId })
     }
 
+    @Run(unless = [Dbms.SQLSERVER])
     @Test
     fun inList2_SubQuery() {
         val e = Meta.employee
@@ -426,6 +431,7 @@ class SelectWhereTest(private val db: JdbcDatabase) {
         assertEquals(5, list.size)
     }
 
+    @Run(unless = [Dbms.SQLSERVER])
     @Test
     fun inList2_SubQuery_nonLambda() {
         val e = Meta.employee
@@ -443,6 +449,7 @@ class SelectWhereTest(private val db: JdbcDatabase) {
         assertEquals(5, list.size)
     }
 
+    @Run(unless = [Dbms.SQLSERVER])
     @Test
     fun notInList_SubQuery2() {
         val e = Meta.employee
@@ -460,6 +467,7 @@ class SelectWhereTest(private val db: JdbcDatabase) {
         assertEquals(9, list.size)
     }
 
+    @Run(unless = [Dbms.SQLSERVER])
     @Test
     fun notInList_SubQuery2_nonLambda() {
         val e = Meta.employee

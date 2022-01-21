@@ -23,6 +23,9 @@ dependencies {
         "postgresql" -> {
             runtimeOnly(project(":komapper-dialect-postgresql-r2dbc"))
         }
+        "sqlserver" -> {
+            runtimeOnly(project(":komapper-dialect-sqlserver-r2dbc"))
+        }
         else -> throw IllegalArgumentException("Unknown driver: $driver")
     }
 }
