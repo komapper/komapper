@@ -39,7 +39,7 @@ class InsertMultipleTest(private val db: R2dbcDatabase) {
         assertEquals(addressList, list)
     }
 
-    // TODO: MySQL driver doesn't return all generated values after a multiple insert statement is issued
+    // TODO: MySQL and SQL Server drivers don't return all generated values after a multiple insert statement is issued
     @Run(unless = [Dbms.MYSQL, Dbms.SQLSERVER])
     @Test
     fun identity() = inTransaction(db) {
@@ -206,7 +206,7 @@ class InsertMultipleTest(private val db: R2dbcDatabase) {
         )
     }
 
-    // TODO: MySQL driver doesn't return all generated values after a multiple insert statement is issued
+    // TODO: MySQL and SQL Server drivers don't return all generated values after a multiple insert statement is issued
     @Run(unless = [Dbms.MYSQL, Dbms.SQLSERVER])
     @Test
     fun identity_onDuplicateKeyUpdate() = inTransaction(db) {

@@ -155,7 +155,6 @@ class TemplateTest(private val db: R2dbcDatabase) {
         )
     }
 
-    // TODO
     @Run(unless = [Dbms.SQLSERVER])
     @Test
     fun in3() = inTransaction(db) {

@@ -406,7 +406,7 @@ class BuilderSupport(
                 }
                 buf.append(" in (")
                 if (right.isEmpty()) {
-                    buf.append("null")
+                    buf.append("(null, null)")
                 } else {
                     for ((first, second) in right) {
                         buf.append("(")

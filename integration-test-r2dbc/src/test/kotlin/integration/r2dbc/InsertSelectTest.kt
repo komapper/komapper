@@ -40,7 +40,7 @@ class InsertSelectTest(private val db: R2dbcDatabase) {
         assertEquals(emptyList(), ids)
     }
 
-    // TODO: MySQL driver doesn't return all generated values after an insert select statement is issued
+    // TODO: MySQL and SQL Server drivers don't return all generated values after a multiple insert statement is issued
     @Run(unless = [Dbms.MYSQL, Dbms.SQLSERVER])
     @Test
     fun generatedKeys() = inTransaction(db) {

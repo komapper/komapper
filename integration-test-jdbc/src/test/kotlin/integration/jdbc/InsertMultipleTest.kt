@@ -39,7 +39,7 @@ class InsertMultipleTest(private val db: JdbcDatabase) {
         assertEquals(addressList, list)
     }
 
-    // TODO https://github.com/Microsoft/mssql-jdbc/issues/245
+    // TODO: SQL Server driver doesn't return all generated values after a multiple insert statement is issued
     @Run(unless = [Dbms.SQLSERVER])
     @Test
     fun identity() {

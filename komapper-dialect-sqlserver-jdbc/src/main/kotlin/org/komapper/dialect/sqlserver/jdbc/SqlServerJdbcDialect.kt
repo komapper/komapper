@@ -2,7 +2,6 @@ package org.komapper.dialect.sqlserver.jdbc
 
 import org.komapper.dialect.sqlserver.SqlServerDialect
 import org.komapper.jdbc.AbstractJdbcDialect
-import org.komapper.jdbc.ArrayType
 import org.komapper.jdbc.BigDecimalType
 import org.komapper.jdbc.BigIntegerType
 import org.komapper.jdbc.ByteArrayType
@@ -33,8 +32,6 @@ class SqlServerJdbcDialect(
         const val UNIQUE_CONSTRAINT_VIOLATION_STATE_CODE = 2627
 
         val DEFAULT_DATA_TYPES: List<JdbcDataType<*>> = listOf(
-            // TODO
-            ArrayType("text[]"),
             BigDecimalType("decimal"),
             BigIntegerType("decimal"),
             ByteType("smallint"),
