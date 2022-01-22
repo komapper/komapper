@@ -15,12 +15,11 @@ import org.komapper.core.dsl.expression.TableExpression
 class SelectStatementBuilder(
     private val dialect: Dialect,
     private val context: SelectContext<*, *, *>,
-    aliasManager: AliasManager = DefaultAliasManager(context),
+    private val aliasManager: AliasManager = DefaultAliasManager(context),
     private val projectionPredicate: (ColumnExpression<*, *>) -> Boolean = { true }
 ) {
     private val buf = StatementBuffer()
     private val support = BuilderSupport(dialect, aliasManager, buf, context.options.escapeSequence)
-    private val orderBySupport = OrderByBuilderSupport(dialect, context.orderBy, aliasManager, buf)
 
     fun build(): Statement {
         selectClause()
@@ -111,6 +110,16 @@ class SelectStatementBuilder(
     }
 
     private fun orderByClause() {
+        val orderBy = context.orderBy.ifEmpty {
+            if ((context.offset >= 0 || context.limit > 0) &&
+                !dialect.supportsLimitOffsetWithoutOrderByClause()
+            ) {
+                context.getProjection().expressions().map(SortItem.Column::of)
+            } else {
+                emptyList()
+            }
+        }
+        val orderBySupport = OrderByBuilderSupport(dialect, orderBy, aliasManager, buf)
         orderBySupport.orderByClause()
     }
 

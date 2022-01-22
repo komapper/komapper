@@ -161,7 +161,14 @@ interface Dialect {
      */
     fun getDefaultLengthForSubstringFunction(): Int? = null
 
-/**
+    /**
+     * Returns whether the limit and offset clauses are supported without using the order by clause.
+     *
+     * @return whether the limit and offset clauses are supported
+     */
+    fun supportsLimitOffsetWithoutOrderByClause(): Boolean = true
+
+    /**
      * Returns whether the alias is supported in the delete statement.
      *
      * @return whether the alias is supported

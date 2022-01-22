@@ -40,6 +40,8 @@ interface SqlServerDialect : Dialect {
 
     override fun getDefaultLengthForSubstringFunction(): Int? = Int.MAX_VALUE
 
+    override fun supportsLimitOffsetWithoutOrderByClause(): Boolean = false
+
     override fun supportsAliasForDeleteStatement(): Boolean = false
 
     override fun supportsAliasForUpdateStatement(): Boolean = false
