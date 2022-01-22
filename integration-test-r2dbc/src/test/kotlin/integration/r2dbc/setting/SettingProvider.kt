@@ -11,6 +11,7 @@ object SettingProvider {
             "mariadb" -> MariaDbR2dbcSetting()
             "mysql" -> MySqlR2dbcSetting()
             "postgresql" -> PostgreSqlR2dbcSetting()
+            "sqlserver" -> SqlServerR2dbcSetting()
             else -> error("Unsupported driver: $driver")
         }
     }

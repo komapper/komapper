@@ -6,6 +6,7 @@ dependencies {
     testImplementation(platform("org.testcontainers:testcontainers-bom:1.16.3"))
     testImplementation("org.testcontainers:r2dbc")
     testImplementation("org.testcontainers:mariadb")
+    testImplementation("org.testcontainers:mssqlserver")
     testImplementation("org.testcontainers:mysql")
     testImplementation("org.testcontainers:postgresql")
     when (driver) {
@@ -25,6 +26,7 @@ dependencies {
         }
         "sqlserver" -> {
             runtimeOnly(project(":komapper-dialect-sqlserver-r2dbc"))
+            testRuntimeOnly("com.microsoft.sqlserver:mssql-jdbc:9.4.1.jre11")
         }
         else -> throw IllegalArgumentException("Unknown driver: $driver")
     }

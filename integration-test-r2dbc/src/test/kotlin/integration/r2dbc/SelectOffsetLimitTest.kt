@@ -1,6 +1,8 @@
 package integration.r2dbc
 
 import integration.address
+import integration.setting.Dbms
+import integration.setting.Run
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
@@ -11,6 +13,8 @@ import kotlin.test.assertEquals
 @ExtendWith(Env::class)
 class SelectOffsetLimitTest(private val db: R2dbcDatabase) {
 
+    // TODO
+    @Run(unless = [Dbms.SQLSERVER])
     @Test
     fun offset() = inTransaction(db) {
         val a = Meta.address
@@ -18,6 +22,8 @@ class SelectOffsetLimitTest(private val db: R2dbcDatabase) {
         assertEquals(5, list.size)
     }
 
+    // TODO
+    @Run(unless = [Dbms.SQLSERVER])
     @Test
     fun limit() = inTransaction(db) {
         val a = Meta.address
@@ -26,7 +32,21 @@ class SelectOffsetLimitTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun offset_limit() = inTransaction(db) {
+    fun orderBy_offset() = inTransaction(db) {
+        val a = Meta.address
+        val list = db.runQuery { QueryDsl.from(a).orderBy(a.addressId).offset(10) }
+        assertEquals(5, list.size)
+    }
+
+    @Test
+    fun orderBy_limit() = inTransaction(db) {
+        val a = Meta.address
+        val list = db.runQuery { QueryDsl.from(a).orderBy(a.addressId).limit(3) }
+        assertEquals(3, list.size)
+    }
+
+    @Test
+    fun orderBy_offset_limit() = inTransaction(db) {
         val a = Meta.address
         val list = db.runQuery {
             QueryDsl.from(a)

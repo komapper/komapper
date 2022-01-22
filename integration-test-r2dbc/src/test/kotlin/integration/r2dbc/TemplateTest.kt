@@ -2,6 +2,8 @@ package integration.r2dbc
 
 import integration.Address
 import integration.address
+import integration.setting.Dbms
+import integration.setting.Run
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
@@ -122,6 +124,8 @@ class TemplateTest(private val db: R2dbcDatabase) {
         )
     }
 
+    // TODO
+    @Run(unless = [Dbms.SQLSERVER])
     @Test
     fun in2() = inTransaction(db) {
         val list = db.runQuery {
@@ -152,6 +156,8 @@ class TemplateTest(private val db: R2dbcDatabase) {
         )
     }
 
+    // TODO
+    @Run(unless = [Dbms.SQLSERVER])
     @Test
     fun in3() = inTransaction(db) {
         val list = db.runQuery {
