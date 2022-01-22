@@ -48,7 +48,7 @@ jobs:
     strategy:
       matrix:
         type: [jdbc, r2dbc]
-        driver: [h2, mariadb, mysql, postgresql]
+        driver: [h2, mariadb, mysql, postgresql, sqlserver]
     timeout-minutes: 15
 
     steps:
