@@ -2,8 +2,6 @@ package integration.jdbc
 
 import integration.Address
 import integration.address
-import integration.setting.Dbms
-import integration.setting.Run
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
@@ -15,8 +13,6 @@ import kotlin.test.assertEquals
 @ExtendWith(Env::class)
 class SelectForUpdateTest(private val db: JdbcDatabase) {
 
-    // TODO
-    @Run(unless = [Dbms.SQLSERVER])
     @Test
     fun forUpdate() {
         val a = Meta.address

@@ -188,6 +188,20 @@ interface Dialect {
      * @return whether the nulls first and nulls last options are supported
      */
     fun supportsNullOrdering(): Boolean = true
+
+    /**
+     * Returns whether the for update clause is supported.
+     *
+     * @return whether the for update clause is supported
+     */
+    fun supportsForUpdateClause(): Boolean = true
+
+    /**
+     * Returns whether the table hint is supported.
+     *
+     * @return whether the table hint is supported
+     */
+    fun supportsTableHint(): Boolean = false
 }
 
 internal object DryRunDialect : Dialect {

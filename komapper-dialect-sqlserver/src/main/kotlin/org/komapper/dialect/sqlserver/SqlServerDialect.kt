@@ -47,4 +47,8 @@ interface SqlServerDialect : Dialect {
     override fun supportsAliasForUpdateStatement(): Boolean = false
 
     override fun supportsNullOrdering(): Boolean = false
+
+    override fun supportsForUpdateClause(): Boolean = false
+
+    override fun supportsTableHint(): Boolean = true
 }

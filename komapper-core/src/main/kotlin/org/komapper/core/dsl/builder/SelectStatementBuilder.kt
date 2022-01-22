@@ -47,6 +47,9 @@ class SelectStatementBuilder(
     private fun fromClause() {
         buf.append(" from ")
         table(context.target)
+        if (dialect.supportsTableHint() && context.forUpdate.options != null) {
+            buf.append(" with (updlock, rowlock)")
+        }
         if (context.joins.isNotEmpty()) {
             for (join in context.joins) {
                 when (join) {
@@ -130,7 +133,7 @@ class SelectStatementBuilder(
     }
 
     private fun forUpdateClause() {
-        if (context.forUpdate.options != null) {
+        if (dialect.supportsForUpdateClause() && context.forUpdate.options != null) {
             buf.append(" for update")
         }
     }
