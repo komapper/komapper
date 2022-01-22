@@ -49,6 +49,15 @@ module/dialect-postgresql-jdbc:
 module/dialect-postgresql-r2dbc:
   - komapper-dialect-postgresql-r2dbc/**/*
 
+module/dialect-sqlserver:
+  - komapper-dialect-sqlserver/**/*
+
+module/dialect-sqlserver-jdbc:
+  - komapper-dialect-sqlserver-jdbc/**/*
+
+module/dialect-sqlserver-r2dbc:
+  - komapper-dialect-sqlserver-r2dbc/**/*
+
 module/platform:
   - komapper-platform/**/*
 
