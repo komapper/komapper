@@ -50,5 +50,7 @@ interface SqlServerDialect : Dialect {
 
     override fun supportsForUpdateClause(): Boolean = false
 
+    override fun supportsMultipleColumnsInInPredicate(): Boolean = false
+
     override fun supportsTableHint(): Boolean = true
 }

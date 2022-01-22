@@ -197,6 +197,13 @@ interface Dialect {
     fun supportsForUpdateClause(): Boolean = true
 
     /**
+     * Returns whether the multiple columns are supported in the in predicate.
+     *
+     * @return whether the multiple columns are supported
+     */
+    fun supportsMultipleColumnsInInPredicate(): Boolean = true
+
+    /**
      * Returns whether the table hint is supported.
      *
      * @return whether the table hint is supported
@@ -204,7 +211,7 @@ interface Dialect {
     fun supportsTableHint(): Boolean = false
 }
 
-internal object DryRunDialect : Dialect {
+object DryRunDialect : Dialect {
 
     override val driver: String = "dry_run"
 

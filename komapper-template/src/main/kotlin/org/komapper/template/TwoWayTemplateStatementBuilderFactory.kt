@@ -17,6 +17,6 @@ class TwoWayTemplateStatementBuilderFactory : TemplateStatementBuilderFactory {
         val exprNodeFactory = if (enableCache) CacheExprNodeFactory() else NoCacheExprNodeFactory()
         val exprEnvironment = DefaultExprEnvironment()
         val exprEvaluator = DefaultExprEvaluator(exprNodeFactory, exprEnvironment)
-        return TwoWayTemplateStatementBuilder(dialect::formatValue, sqlNodeFactory, exprEvaluator)
+        return TwoWayTemplateStatementBuilder(dialect, sqlNodeFactory, exprEvaluator)
     }
 }

@@ -1,6 +1,7 @@
 package org.komapper.template
 
 import org.junit.jupiter.api.Nested
+import org.komapper.core.DryRunDialect
 import org.komapper.core.Value
 import org.komapper.template.expression.DefaultExprEnvironment
 import org.komapper.template.expression.DefaultExprEvaluator
@@ -16,7 +17,7 @@ import kotlin.test.assertTrue
 class TwoWayTemplateStatementBuilderTest {
 
     private val statementBuilder = TwoWayTemplateStatementBuilder(
-        { value, _, _ -> if (value is CharSequence) "'$value'" else value.toString() },
+        dialect = DryRunDialect,
         sqlNodeFactory = NoCacheSqlNodeFactory(),
         exprEvaluator = DefaultExprEvaluator(
             NoCacheExprNodeFactory(),

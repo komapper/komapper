@@ -378,7 +378,6 @@ class SelectWhereTest(private val db: JdbcDatabase) {
         assertEquals(9, list.size)
     }
 
-    @Run(unless = [Dbms.SQLSERVER])
     @Test
     fun inList2() {
         val a = Meta.address
@@ -396,7 +395,17 @@ class SelectWhereTest(private val db: JdbcDatabase) {
         )
     }
 
-    @Run(unless = [Dbms.SQLSERVER])
+    @Test
+    fun inList2_empty() {
+        val a = Meta.address
+        val list = db.runQuery {
+            QueryDsl.from(a).where {
+                a.addressId to a.version inList2 emptyList()
+            }.orderBy(a.addressId.desc())
+        }
+        assertTrue(list.isEmpty())
+    }
+
     @Test
     fun notInList2() {
         val seq = sequence {

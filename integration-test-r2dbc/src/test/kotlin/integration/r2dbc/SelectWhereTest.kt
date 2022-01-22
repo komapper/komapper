@@ -345,8 +345,6 @@ class SelectWhereTest(private val db: R2dbcDatabase) {
         assertEquals(9, list.size)
     }
 
-    // TODO
-    @Run(unless = [Dbms.SQLSERVER])
     @Test
     fun inList2() = inTransaction(db) {
         val a = Meta.address
@@ -364,8 +362,6 @@ class SelectWhereTest(private val db: R2dbcDatabase) {
         )
     }
 
-    // TODO
-    @Run(unless = [Dbms.SQLSERVER])
     @Test
     fun notInList2() = inTransaction(db) {
         val seq = sequence {
@@ -381,7 +377,6 @@ class SelectWhereTest(private val db: R2dbcDatabase) {
         assertEquals((10..15).toList(), list.map { it.addressId })
     }
 
-    // TODO
     @Run(unless = [Dbms.SQLSERVER])
     @Test
     fun inList2_SubQuery() = inTransaction(db) {
@@ -401,7 +396,6 @@ class SelectWhereTest(private val db: R2dbcDatabase) {
         assertEquals(5, list.size)
     }
 
-    // TODO
     @Run(unless = [Dbms.SQLSERVER])
     @Test
     fun notInList_SubQuery2() = inTransaction(db) {

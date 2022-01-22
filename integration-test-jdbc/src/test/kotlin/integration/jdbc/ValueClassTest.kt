@@ -149,7 +149,6 @@ class ValueClassTest(val db: JdbcDatabase) {
         }
     }
 
-    @Run(unless = [Dbms.SQLSERVER])
     @Test
     fun inList2() {
         val a = Meta.vAddress

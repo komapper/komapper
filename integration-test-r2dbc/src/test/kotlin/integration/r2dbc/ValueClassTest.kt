@@ -150,8 +150,6 @@ class ValueClassTest(val db: R2dbcDatabase) {
         }
     }
 
-    // TODO
-    @Run(unless = [Dbms.SQLSERVER])
     @Test
     fun inList2() = inTransaction(db) {
         val a = Meta.vAddress
