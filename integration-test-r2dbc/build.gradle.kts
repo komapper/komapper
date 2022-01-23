@@ -26,7 +26,7 @@ dependencies {
         }
         "sqlserver" -> {
             runtimeOnly(project(":komapper-dialect-sqlserver-r2dbc"))
-            testRuntimeOnly("com.microsoft.sqlserver:mssql-jdbc:9.4.1.jre11")
+            testRuntimeOnly("com.microsoft.sqlserver:mssql-jdbc:9.4.1.jre16")
         }
         else -> throw IllegalArgumentException("Unknown driver: $driver")
     }
