@@ -47,7 +47,6 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        type: [jdbc]
         driver: [h2, mariadb, mysql, postgresql, sqlserver]
     timeout-minutes: 15
 
@@ -73,20 +72,19 @@ jobs:
       - name: Test
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: :integration-test-${{ matrix.type }}:check -Pdriver=${{ matrix.driver }}
+          arguments: :integration-test-jdbc:check -Pdriver=${{ matrix.driver }}
 
       - name: Upload reports
         if: failure()
         uses: actions/upload-artifact@v2
         with:
-          name: ${{ matrix.type }}-${{ matrix.driver }}
+          name: jdbc-${{ matrix.driver }}
           path: ./**/build/reports
 
   r2dbc-test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        type: [r2dbc]
         # Exclude mysql and sqlserver as their drivers seem to be unstable.
         driver: [h2, mariadb, postgresql]
     timeout-minutes: 15
@@ -113,13 +111,13 @@ jobs:
       - name: Test
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: :integration-test-${{ matrix.type }}:check -Pdriver=${{ matrix.driver }}
+          arguments: :integration-test-r2dbc:check -Pdriver=${{ matrix.driver }}
 
       - name: Upload reports
         if: failure()
         uses: actions/upload-artifact@v2
         with:
-          name: ${{ matrix.type }}-${{ matrix.driver }}
+          name: r2dbc-${{ matrix.driver }}
           path: ./**/build/reports
 
   publish:
