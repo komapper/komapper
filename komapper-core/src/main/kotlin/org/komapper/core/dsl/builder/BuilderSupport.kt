@@ -41,11 +41,13 @@ class BuilderSupport(
                 buf.append(alias)
             }
             TableNameType.NAME_AND_ALIAS -> {
+                buf.append(name)
                 val alias = aliasManager.getAlias(expression) ?: error("Alias is not found. table=$name ,sql=$buf")
-                if (alias.isBlank()) {
-                    buf.append(name)
-                } else {
-                    buf.append("$name as $alias")
+                if (alias.isNotBlank()) {
+                    if (dialect.supportsAsKeywordForTableAlias()) {
+                        buf.append(" as")
+                    }
+                    buf.append(" $alias")
                 }
             }
         }
@@ -114,9 +116,17 @@ class BuilderSupport(
                 visitOperand(expression.right)
             }
             is ArithmeticExpression.Rem<*, *> -> {
-                visitOperand(expression.left)
-                buf.append(" % ")
-                visitOperand(expression.right)
+                if (dialect.supportsModFunction()) {
+                    buf.append("mod(")
+                    visitOperand(expression.left)
+                    buf.append(", ")
+                    visitOperand(expression.right)
+                    buf.append(")")
+                } else {
+                    visitOperand(expression.left)
+                    buf.append(" % ")
+                    visitOperand(expression.right)
+                }
             }
         }
         buf.append(")")
@@ -242,7 +252,8 @@ class BuilderSupport(
                 buf.append(")")
             }
             is StringFunction.Substring -> {
-                buf.append("substring(")
+                val substring = dialect.getSubstringFunction()
+                buf.append("$substring(")
                 visitOperand(function.target)
                 buf.append(", ")
                 visitOperand(function.startIndex)

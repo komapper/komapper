@@ -7,9 +7,9 @@ dependencies {
     compileOnly(project(":komapper-annotation"))
     ksp(project(":komapper-processor"))
     api(project(":komapper-core"))
+    implementation("ch.qos.logback:logback-classic:1.2.10")
     runtimeOnly(project(":komapper-slf4j"))
     runtimeOnly(project(":komapper-template"))
-    runtimeOnly("ch.qos.logback:logback-classic:1.2.10")
 }
 
 idea {

@@ -40,6 +40,15 @@ module/dialect-mysql-jdbc:
 module/dialect-mysql-r2dbc:
   - komapper-dialect-mysql-r2dbc/**/*
 
+module/dialect-oracle:
+  - komapper-dialect-oracle/**/*
+
+module/dialect-oracle-jdbc:
+  - komapper-dialect-oracle-jdbc/**/*
+
+module/dialect-oracle-r2dbc:
+  - komapper-dialect-oracle-r2dbc/**/*
+
 module/dialect-postgresql:
   - komapper-dialect-postgresql/**/*
 

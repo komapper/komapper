@@ -47,7 +47,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        driver: [h2, mariadb, mysql, postgresql, sqlserver]
+        driver: [h2, mariadb, mysql, oracle, postgresql, sqlserver]
     timeout-minutes: 15
 
     steps:

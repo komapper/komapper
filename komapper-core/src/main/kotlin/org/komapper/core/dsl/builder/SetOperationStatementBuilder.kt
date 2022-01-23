@@ -32,7 +32,9 @@ class SetOperationStatementBuilder(
                 visitSubqueryContext(subqueryContext.left)
                 val operator = when (subqueryContext.kind) {
                     SetOperationKind.INTERSECT -> "intersect"
-                    SetOperationKind.EXCEPT -> "except"
+                    SetOperationKind.EXCEPT -> {
+                        if (dialect.supportsExceptSetOperation()) "except" else "minus"
+                    }
                     SetOperationKind.UNION -> "union"
                     SetOperationKind.UNION_ALL -> "union all"
                 }
