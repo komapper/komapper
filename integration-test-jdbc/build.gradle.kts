@@ -75,6 +75,9 @@ fun JvmTestSuite.setup(driver: String) {
         java {
             setSrcDirs(listOf("src/test/kotlin"))
         }
+        resources {
+            setSrcDirs(listOf("src/test/resources"))
+        }
     }
     targets {
         all {
