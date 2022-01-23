@@ -34,7 +34,7 @@ jobs:
       - name: Check
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: check -x :integration-test-jdbc:check -x :integration-test-r2dbc:check
+          arguments: check -x h2 -x :integration-test-jdbc:check -x :integration-test-r2dbc:check
 
       - name: Upload reports
         if: failure()
