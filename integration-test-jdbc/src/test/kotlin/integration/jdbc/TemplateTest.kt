@@ -2,6 +2,8 @@ package integration.jdbc
 
 import integration.Address
 import integration.address
+import integration.setting.Dbms
+import integration.setting.Run
 import kotlinx.coroutines.flow.toList
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
@@ -140,6 +142,7 @@ class TemplateTest(private val db: JdbcDatabase) {
         )
     }
 
+    @Run(unless = [Dbms.SQLSERVER])
     @Test
     fun in2() {
         val list = db.runQuery {
@@ -170,6 +173,7 @@ class TemplateTest(private val db: JdbcDatabase) {
         )
     }
 
+    @Run(unless = [Dbms.SQLSERVER])
     @Test
     fun in3() {
         val list = db.runQuery {

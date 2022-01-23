@@ -39,6 +39,8 @@ class InsertMultipleTest(private val db: JdbcDatabase) {
         assertEquals(addressList, list)
     }
 
+    // TODO: SQL Server driver doesn't return all generated values after a multiple insert statement is issued
+    @Run(unless = [Dbms.SQLSERVER])
     @Test
     fun identity() {
         val i = Meta.identityStrategy

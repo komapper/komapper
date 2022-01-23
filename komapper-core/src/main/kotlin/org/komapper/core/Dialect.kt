@@ -155,6 +155,20 @@ interface Dialect {
     ): EntityUpsertStatementBuilder<ENTITY>
 
     /**
+     * Returns the default length argument for the substring function.
+     *
+     * @return the default length argument
+     */
+    fun getDefaultLengthForSubstringFunction(): Int? = null
+
+    /**
+     * Returns whether the limit and offset clauses are supported without using the order by clause.
+     *
+     * @return whether the limit and offset clauses are supported
+     */
+    fun supportsLimitOffsetWithoutOrderByClause(): Boolean = true
+
+    /**
      * Returns whether the alias is supported in the delete statement.
      *
      * @return whether the alias is supported
@@ -162,14 +176,42 @@ interface Dialect {
     fun supportsAliasForDeleteStatement() = true
 
     /**
+     * Returns whether the alias is supported in the update statement.
+     *
+     * @return whether the alias is supported
+     */
+    fun supportsAliasForUpdateStatement() = true
+
+    /**
      * Returns whether the nulls first and nulls last options are supported in the order by clause.
      *
      * @return whether the nulls first and nulls last options are supported
      */
     fun supportsNullOrdering(): Boolean = true
+
+    /**
+     * Returns whether the for update clause is supported.
+     *
+     * @return whether the for update clause is supported
+     */
+    fun supportsForUpdateClause(): Boolean = true
+
+    /**
+     * Returns whether the multiple columns are supported in the in predicate.
+     *
+     * @return whether the multiple columns are supported
+     */
+    fun supportsMultipleColumnsInInPredicate(): Boolean = true
+
+    /**
+     * Returns whether the table hint is supported.
+     *
+     * @return whether the table hint is supported
+     */
+    fun supportsTableHint(): Boolean = false
 }
 
-internal object DryRunDialect : Dialect {
+object DryRunDialect : Dialect {
 
     override val driver: String = "dry_run"
 

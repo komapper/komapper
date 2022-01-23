@@ -175,6 +175,7 @@ class SetOperationTest(private val db: JdbcDatabase) {
         assertEquals(1, list.last())
     }
 
+    @Run(unless = [Dbms.SQLSERVER])
     @Test
     fun orderBy_ascNullsFirst() {
         val e = Meta.employee
@@ -186,6 +187,7 @@ class SetOperationTest(private val db: JdbcDatabase) {
         assertEquals(13, list.last())
     }
 
+    @Run(unless = [Dbms.SQLSERVER])
     @Test
     fun orderBy_ascNullsLast() {
         val e = Meta.employee
@@ -197,6 +199,7 @@ class SetOperationTest(private val db: JdbcDatabase) {
         assertNull(list.last())
     }
 
+    @Run(unless = [Dbms.SQLSERVER])
     @Test
     fun orderBy_descNullsFirst() {
         val e = Meta.employee
@@ -208,6 +211,7 @@ class SetOperationTest(private val db: JdbcDatabase) {
         assertEquals(4, list.last())
     }
 
+    @Run(unless = [Dbms.SQLSERVER])
     @Test
     fun orderBy_descNullsLast() {
         val e = Meta.employee

@@ -26,7 +26,21 @@ class SelectOffsetLimitTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun offset_limit() = inTransaction(db) {
+    fun orderBy_offset() = inTransaction(db) {
+        val a = Meta.address
+        val list = db.runQuery { QueryDsl.from(a).orderBy(a.addressId).offset(10) }
+        assertEquals(5, list.size)
+    }
+
+    @Test
+    fun orderBy_limit() = inTransaction(db) {
+        val a = Meta.address
+        val list = db.runQuery { QueryDsl.from(a).orderBy(a.addressId).limit(3) }
+        assertEquals(3, list.size)
+    }
+
+    @Test
+    fun orderBy_offset_limit() = inTransaction(db) {
         val a = Meta.address
         val list = db.runQuery {
             QueryDsl.from(a)

@@ -1,5 +1,6 @@
 package org.komapper.template
 
+import org.komapper.core.Dialect
 import org.komapper.core.Statement
 import org.komapper.core.StatementBuffer
 import org.komapper.core.TemplateStatementBuilder
@@ -11,13 +12,12 @@ import org.komapper.template.sql.SqlException
 import org.komapper.template.sql.SqlLocation
 import org.komapper.template.sql.SqlNode
 import org.komapper.template.sql.SqlNodeFactory
-import kotlin.reflect.KClass
 import kotlin.reflect.KVisibility
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.jvm.jvmErasure
 
 internal class TwoWayTemplateStatementBuilder(
-    private val formatter: (Any?, KClass<*>, Boolean) -> String,
+    private val dialect: Dialect,
     private val sqlNodeFactory: SqlNodeFactory,
     private val exprEvaluator: ExprEvaluator
 ) : TemplateStatementBuilder {
@@ -112,12 +112,18 @@ internal class TwoWayTemplateStatementBuilder(
                         if (++counter > 1) state.append(", ")
                         when (o) {
                             is Pair<*, *> -> {
+                                if (!dialect.supportsMultipleColumnsInInPredicate()) {
+                                    throw UnsupportedOperationException("Dialect(name=${dialect.driver}) does not support multiple columns in IN predicate.")
+                                }
                                 val (f, s) = o
                                 state.append("(")
                                     .bind(newValue(f)).append(", ")
                                     .bind(newValue(s)).append(")")
                             }
                             is Triple<*, *, *> -> {
+                                if (!dialect.supportsMultipleColumnsInInPredicate()) {
+                                    throw UnsupportedOperationException("Dialect(name=${dialect.driver}) does not support multiple columns in IN predicate.")
+                                }
                                 val (f, s, t) = o
                                 state.append("(")
                                     .bind(newValue(f)).append(", ")
@@ -147,7 +153,7 @@ internal class TwoWayTemplateStatementBuilder(
         }
         is SqlNode.LiteralValueDirective -> {
             val (obj, type) = eval(node.location, node.expression, state.asExprContext())
-            val literal = formatter(obj, type, false)
+            val literal = dialect.formatValue(obj, type, false)
             state.append(literal)
             node.nodeList.fold(state, ::visit)
         }

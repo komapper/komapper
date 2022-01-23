@@ -3,6 +3,8 @@ package integration.r2dbc
 import integration.Address
 import integration.address
 import integration.employee
+import integration.setting.Dbms
+import integration.setting.Run
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
@@ -375,6 +377,7 @@ class SelectWhereTest(private val db: R2dbcDatabase) {
         assertEquals((10..15).toList(), list.map { it.addressId })
     }
 
+    @Run(unless = [Dbms.SQLSERVER])
     @Test
     fun inList2_SubQuery() = inTransaction(db) {
         val e = Meta.employee
@@ -393,6 +396,7 @@ class SelectWhereTest(private val db: R2dbcDatabase) {
         assertEquals(5, list.size)
     }
 
+    @Run(unless = [Dbms.SQLSERVER])
     @Test
     fun notInList_SubQuery2() = inTransaction(db) {
         val e = Meta.employee

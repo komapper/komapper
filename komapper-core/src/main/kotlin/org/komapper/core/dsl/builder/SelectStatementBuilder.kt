@@ -15,12 +15,11 @@ import org.komapper.core.dsl.expression.TableExpression
 class SelectStatementBuilder(
     private val dialect: Dialect,
     private val context: SelectContext<*, *, *>,
-    aliasManager: AliasManager = DefaultAliasManager(context),
+    private val aliasManager: AliasManager = DefaultAliasManager(context),
     private val projectionPredicate: (ColumnExpression<*, *>) -> Boolean = { true }
 ) {
     private val buf = StatementBuffer()
     private val support = BuilderSupport(dialect, aliasManager, buf, context.options.escapeSequence)
-    private val orderBySupport = OrderByBuilderSupport(dialect, context.orderBy, aliasManager, buf)
 
     fun build(): Statement {
         selectClause()
@@ -48,6 +47,9 @@ class SelectStatementBuilder(
     private fun fromClause() {
         buf.append(" from ")
         table(context.target)
+        if (dialect.supportsTableHint() && context.forUpdate.options != null) {
+            buf.append(" with (updlock, rowlock)")
+        }
         if (context.joins.isNotEmpty()) {
             for (join in context.joins) {
                 when (join) {
@@ -111,6 +113,16 @@ class SelectStatementBuilder(
     }
 
     private fun orderByClause() {
+        val orderBy = context.orderBy.ifEmpty {
+            if ((context.offset >= 0 || context.limit > 0) &&
+                !dialect.supportsLimitOffsetWithoutOrderByClause()
+            ) {
+                context.getProjection().expressions().map(SortItem.Column::of)
+            } else {
+                emptyList()
+            }
+        }
+        val orderBySupport = OrderByBuilderSupport(dialect, orderBy, aliasManager, buf)
         orderBySupport.orderByClause()
     }
 
@@ -121,7 +133,7 @@ class SelectStatementBuilder(
     }
 
     private fun forUpdateClause() {
-        if (context.forUpdate.options != null) {
+        if (dialect.supportsForUpdateClause() && context.forUpdate.options != null) {
             buf.append(" for update")
         }
     }

@@ -49,3 +49,14 @@ object IndexedBinder : Binder {
         dataType.setValue(statement, "$${index + 1}", value)
     }
 }
+
+object AtSignBinder : Binder {
+
+    override fun createBindVariable(index: Int, value: StatementPart.Value): CharSequence {
+        return "@p${index + 1}"
+    }
+
+    override fun bind(statement: Statement, index: Int, value: Any?, dataType: R2dbcDataType<Any>) {
+        dataType.setValue(statement, "@p${index + 1}", value)
+    }
+}

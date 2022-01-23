@@ -247,7 +247,12 @@ class BuilderSupport(
                 buf.append(", ")
                 visitOperand(function.startIndex)
                 val length = function.length
-                if (length != null) {
+                if (length == null) {
+                    val defaultLength = dialect.getDefaultLengthForSubstringFunction()
+                    if (defaultLength != null) {
+                        buf.append(", $defaultLength")
+                    }
+                } else {
                     buf.append(", ")
                     visitOperand(length)
                 }
@@ -390,29 +395,58 @@ class BuilderSupport(
             right: List<Pair<Operand, Operand>>,
             not: Boolean = false
         ) {
-            buf.append("(")
-            visitOperand(left.first)
-            buf.append(", ")
-            visitOperand(left.second)
-            buf.append(")")
-            if (not) {
-                buf.append(" not")
-            }
-            buf.append(" in (")
-            if (right.isEmpty()) {
-                buf.append("null")
-            } else {
-                for ((first, second) in right) {
-                    buf.append("(")
-                    visitOperand(first)
-                    buf.append(", ")
-                    visitOperand(second)
-                    buf.append(")")
-                    buf.append(", ")
+            if (dialect.supportsMultipleColumnsInInPredicate()) {
+                buf.append("(")
+                visitOperand(left.first)
+                buf.append(", ")
+                visitOperand(left.second)
+                buf.append(")")
+                if (not) {
+                    buf.append(" not")
                 }
-                buf.cutBack(2)
+                buf.append(" in (")
+                if (right.isEmpty()) {
+                    buf.append("(null, null)")
+                } else {
+                    for ((first, second) in right) {
+                        buf.append("(")
+                        visitOperand(first)
+                        buf.append(", ")
+                        visitOperand(second)
+                        buf.append(")")
+                        buf.append(", ")
+                    }
+                    buf.cutBack(2)
+                }
+                buf.append(")")
+            } else {
+                if (not) {
+                    buf.append("not ")
+                }
+                buf.append("(")
+                if (right.isEmpty()) {
+                    visitOperand(left.first)
+                    buf.append(" = null")
+                    buf.append(" and ")
+                    visitOperand(left.second)
+                    buf.append(" = null")
+                } else {
+                    for ((first, second) in right) {
+                        buf.append("(")
+                        visitOperand(left.first)
+                        buf.append(" = ")
+                        visitOperand(first)
+                        buf.append(" and ")
+                        visitOperand(left.second)
+                        buf.append(" = ")
+                        visitOperand(second)
+                        buf.append(")")
+                        buf.append(" or ")
+                    }
+                    buf.cutBack(4)
+                }
+                buf.append(")")
             }
-            buf.append(")")
         }
 
         fun inSubQuery(left: Operand, right: SubqueryExpression<*>, not: Boolean = false) {
@@ -427,6 +461,9 @@ class BuilderSupport(
         }
 
         fun inSubQuery2(left: Pair<Operand, Operand>, right: SubqueryExpression<*>, not: Boolean = false) {
+            if (!dialect.supportsMultipleColumnsInInPredicate()) {
+                throw UnsupportedOperationException("Dialect(driver=${dialect.driver}) does not support multiple columns in IN predicate.")
+            }
             buf.append("(")
             visitOperand(left.first)
             buf.append(", ")

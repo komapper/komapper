@@ -43,12 +43,11 @@ jobs:
           name: build
           path: ./**/build/reports
 
-  test:
+  jdbc-test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        type: [jdbc, r2dbc]
-        driver: [h2, mariadb, mysql, postgresql]
+        driver: [h2, mariadb, mysql, postgresql, sqlserver]
     timeout-minutes: 15
 
     steps:
@@ -71,24 +70,61 @@ jobs:
           java-version: 17
 
       - name: Test
-        # Skip mysql R2DBC test because its driver is unstable.
-        if: ${{ matrix.type != 'r2dbc' || matrix.driver != 'mysql' }}
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: :integration-test-${{ matrix.type }}:check -Pdriver=${{ matrix.driver }}
+          arguments: :integration-test-jdbc:check -Pdriver=${{ matrix.driver }}
 
       - name: Upload reports
         if: failure()
         uses: actions/upload-artifact@v2
         with:
-          name: ${{ matrix.type }}-${{ matrix.dbms }}
+          name: jdbc-${{ matrix.driver }}
+          path: ./**/build/reports
+
+  r2dbc-test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        # Exclude mysql and sqlserver as their drivers seem to be unstable.
+        driver: [h2, mariadb, postgresql]
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up JDK 11
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'temurin'
+          java-version: 11
+
+      - name: Prepare JDK11 env var
+        shell: bash
+        run: echo "JDK11=$JAVA_HOME" >> $GITHUB_ENV
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'temurin'
+          java-version: 17
+
+      - name: Test
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: :integration-test-r2dbc:check -Pdriver=${{ matrix.driver }}
+
+      - name: Upload reports
+        if: failure()
+        uses: actions/upload-artifact@v2
+        with:
+          name: r2dbc-${{ matrix.driver }}
           path: ./**/build/reports
 
   publish:
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    needs: [ build, test ]
+    needs: [ build, jdbc-test, r2dbc-test ]
 
     steps:
       - name: Set up JDK 11

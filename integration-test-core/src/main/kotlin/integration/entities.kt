@@ -100,3 +100,15 @@ data class NoVersionDepartment(
     val location: String,
     val version: Int,
 )
+
+@KomapperEntity
+data class AutoIncrementTable(
+    @KomapperId @KomapperAutoIncrement val id: Int?,
+    @KomapperColumn(alwaysQuote = true)val value: String
+)
+
+@KomapperEntity
+data class SequenceTable(
+    @KomapperId @KomapperSequence(name = "sequence_table_id", incrementBy = 100) val id: Int,
+    @KomapperColumn(alwaysQuote = true)val value: String
+)

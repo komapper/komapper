@@ -62,6 +62,9 @@ include("komapper-dialect-mysql-r2dbc")
 include("komapper-dialect-postgresql")
 include("komapper-dialect-postgresql-r2dbc")
 include("komapper-dialect-postgresql-jdbc")
+include("komapper-dialect-sqlserver")
+include("komapper-dialect-sqlserver-jdbc")
+include("komapper-dialect-sqlserver-r2dbc")
 
 // OPTIONAL
 include("komapper-template")
