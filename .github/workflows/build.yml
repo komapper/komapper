@@ -72,7 +72,7 @@ jobs:
       - name: Test
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: :integration-test-jdbc:check -Pdriver=${{ matrix.driver }}
+          arguments: :integration-test-jdbc:${{ matrix.driver }}
 
       - name: Upload reports
         if: failure()
@@ -111,7 +111,7 @@ jobs:
       - name: Test
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: :integration-test-r2dbc:check -Pdriver=${{ matrix.driver }}
+          arguments: :integration-test-r2dbc:${{ matrix.driver }}
 
       - name: Upload reports
         if: failure()
