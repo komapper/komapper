@@ -49,6 +49,15 @@ testing {
             }
         }
 
+        register("oracle", JvmTestSuite::class) {
+            setup(name)
+            dependencies {
+                implementation(project)
+                runtimeOnly("org.testcontainers:oracle-xe")
+                runtimeOnly(project(":komapper-dialect-oracle-jdbc"))
+            }
+        }
+
         register("postgresql", JvmTestSuite::class) {
             setup(name)
             dependencies {

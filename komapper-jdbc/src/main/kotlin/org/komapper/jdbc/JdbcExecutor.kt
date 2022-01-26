@@ -117,16 +117,21 @@ internal class JdbcExecutor(
         }
     }
 
+    // TODO
     fun execute(statement: Statement) {
         @Suppress("NAME_SHADOWING")
         val statement = inspect(statement)
         executeWithExceptionCheck {
             config.session.connection.use { con ->
                 log(statement)
-                val sql = asSql(statement)
                 con.createStatement().use { s ->
                     s.let(::setUp)
-                    s.execute(sql)
+                    for (each in asSql(statement).split(";")) {
+                        val sql = each.trim()
+                        if (sql.isNotEmpty()) {
+                            s.execute(sql)
+                        }
+                    }
                 }
             }
         }
@@ -163,7 +168,11 @@ internal class JdbcExecutor(
     private fun prepare(con: Connection, statement: Statement): PreparedStatement {
         val sql = asSql(statement)
         return if (requiresGeneratedKeys) {
-            con.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS)
+            if (config.dialect.supportsReturnGeneratedKeysFlag()) {
+                con.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS)
+            } else {
+                con.prepareStatement(sql, intArrayOf(1))
+            }
         } else {
             con.prepareStatement(sql)
         }

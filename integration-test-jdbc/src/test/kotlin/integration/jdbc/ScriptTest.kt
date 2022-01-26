@@ -18,7 +18,6 @@ internal class ScriptTest(private val db: JdbcDatabase) {
     fun test_double_quote() {
         db.runQuery {
             val script = """
-            drop table if exists execute_table;
             create table execute_table("value" varchar(20));
             insert into execute_table("value") values('test');
             """
@@ -32,6 +31,13 @@ internal class ScriptTest(private val db: JdbcDatabase) {
             }.first()
         }
         assertEquals("test", value)
+
+        db.runQuery {
+            val script = """
+            drop table execute_table;
+            """
+            ScriptDsl.execute(script)
+        }
     }
 
     @Run(onlyIf = [Dbms.MARIADB, Dbms.MYSQL])
@@ -39,7 +45,6 @@ internal class ScriptTest(private val db: JdbcDatabase) {
     fun test_back_quote() {
         db.runQuery {
             val script = """
-            drop table if exists execute_table;
             create table execute_table(`value` varchar(20));
             insert into execute_table(`value`) values('test');
             """
@@ -53,5 +58,12 @@ internal class ScriptTest(private val db: JdbcDatabase) {
             }.first()
         }
         assertEquals("test", value)
+
+        db.runQuery {
+            val script = """
+            drop table execute_table;
+            """
+            ScriptDsl.execute(script)
+        }
     }
 }

@@ -260,6 +260,7 @@ class LocalDateType(override val name: String) :
     override fun convert(value: Any): LocalDate {
         return when (value) {
             is LocalDate -> value
+            is LocalDateTime -> value.toLocalDate()
             else -> error("Cannot convert. value=$value, type=${value::class.qualifiedName}.")
         }
     }

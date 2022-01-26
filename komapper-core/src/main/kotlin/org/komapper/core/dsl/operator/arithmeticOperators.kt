@@ -82,7 +82,7 @@ infix operator fun <T : Any, S : Number> ColumnExpression<T, S>.div(other: Colum
 infix operator fun <T : Any, S : Number> ColumnExpression<T, S>.rem(value: T): ColumnExpression<T, S> {
     val left = Operand.Column(this)
     val right = Operand.Argument(this, value)
-    return ArithmeticExpression.Rem(this, left, right)
+    return ArithmeticExpression.Mod(this, left, right)
 }
 
 /**
@@ -91,5 +91,5 @@ infix operator fun <T : Any, S : Number> ColumnExpression<T, S>.rem(value: T): C
 infix operator fun <T : Any, S : Number> ColumnExpression<T, S>.rem(other: ColumnExpression<T, S>): ColumnExpression<T, S> {
     val left = Operand.Column(this)
     val right = Operand.Column(other)
-    return ArithmeticExpression.Rem(this, left, right)
+    return ArithmeticExpression.Mod(this, left, right)
 }

@@ -11,9 +11,8 @@ open class SqlServerSchemaStatementBuilder(dialect: SqlServerDialect) :
     override fun createSchema(metamodels: List<EntityMetamodel<*, *, *>>) {
         val schemaNames = extractSchemaNames(metamodels)
         for (name in schemaNames) {
-            buf.append("if not exists (select * from information_schema.schemata where schema_name = '$name') begin ")
+            buf.append("if not exists (select * from information_schema.schemata where schema_name = '$name') ")
             buf.append("create schema if not exists ${dialect.enquote(name)};")
-            buf.append("end;")
         }
     }
 
@@ -22,7 +21,7 @@ open class SqlServerSchemaStatementBuilder(dialect: SqlServerDialect) :
         val tableName = "'${metamodel.tableName()}'"
         buf.append("if not exists (")
         buf.append("select * from information_schema.tables where table_schema = $tableSchema and table_name = $tableName")
-        buf.append(") begin ")
+        buf.append(") ")
         val canonicalTableName = metamodel.getCanonicalTableName(dialect::enquote)
         buf.append("create table $canonicalTableName (")
         val columnDefinition = metamodel.properties().joinToString { p ->
@@ -41,7 +40,6 @@ open class SqlServerSchemaStatementBuilder(dialect: SqlServerDialect) :
         }
         buf.append(idList)
         buf.append("));")
-        buf.append("end;")
     }
 
     override fun resolveIdentity(property: PropertyMetamodel<*, *, *>): String {
@@ -59,9 +57,8 @@ open class SqlServerSchemaStatementBuilder(dialect: SqlServerDialect) :
             val sequenceName = "'${idGenerator.name}'"
             buf.append("if (exists (")
             buf.append("select * from information_schema.sequences where sequence_schema = $sequenceSchema and sequence_name = $sequenceName")
-            buf.append(")) begin ")
+            buf.append(")) ")
             buf.append("create sequence ${idGenerator.getCanonicalSequenceName(dialect::enquote)} start with ${idGenerator.startWith} increment by ${idGenerator.incrementBy};")
-            buf.append("end;")
         }
     }
 }

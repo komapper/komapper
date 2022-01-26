@@ -8,15 +8,19 @@ import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.metamodel.getNonAutoIncrementProperties
 
-class EntityInsertStatementBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
+interface EntityInsertStatementBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> {
+    fun build(): Statement
+}
+
+class DefaultEntityInsertStatementBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val dialect: Dialect,
     private val context: EntityInsertContext<ENTITY, ID, META>,
     private val entities: List<ENTITY>
-) {
+) : EntityInsertStatementBuilder<ENTITY, ID, META> {
 
     private val buf = StatementBuffer()
 
-    fun build(): Statement {
+    override fun build(): Statement {
         val target = context.target
         val properties = target.getNonAutoIncrementProperties()
         buf.append("insert into ")

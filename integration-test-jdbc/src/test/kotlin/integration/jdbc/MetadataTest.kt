@@ -1,5 +1,7 @@
 package integration.jdbc
 
+import integration.setting.Dbms
+import integration.setting.Run
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.jdbc.JdbcDatabase
 import org.komapper.jdbc.dsl.MetadataDsl
@@ -17,6 +19,7 @@ class MetadataTest(val db: JdbcDatabase) {
         assertEquals(3, address.columns.size)
     }
 
+    @Run(unless = [Dbms.ORACLE])
     @Test
     fun autoIncrement() {
         val tables = MetadataDsl.tables().run(db.config)

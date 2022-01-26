@@ -29,7 +29,7 @@ internal sealed class ArithmeticExpression<T : Any, S : Number> : ColumnExpressi
     ) :
         ColumnExpression<T, S> by expression, ArithmeticExpression<T, S>()
 
-    internal data class Rem<T : Any, S : Number>(
+    internal data class Mod<T : Any, S : Number>(
         val expression: ColumnExpression<T, S>,
         val left: Operand,
         val right: Operand

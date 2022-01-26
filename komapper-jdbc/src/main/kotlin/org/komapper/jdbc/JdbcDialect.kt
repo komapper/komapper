@@ -60,6 +60,13 @@ interface JdbcDialect : Dialect {
      * @return whether the exception indicates unique constraint violation
      */
     fun isUniqueConstraintViolation(exception: SQLException): Boolean
+
+    /**
+     * Returns whether the [java.sql.Statement.RETURN_GENERATED_KEYS] flag is supported.
+     *
+     * @return whether the RETURN_GENERATED_KEYS flat is supported
+     */
+    fun supportsReturnGeneratedKeysFlag(): Boolean = true
 }
 
 abstract class AbstractJdbcDialect protected constructor(internalDataTypes: List<JdbcDataType<*>> = emptyList()) :

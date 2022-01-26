@@ -12,6 +12,7 @@ object SettingProvider {
             "h2" -> H2JdbcSetting(url)
             "mariadb" -> MariaDbJdbcSetting(url)
             "mysql" -> MySqlJdbcSetting(url)
+            "oracle" -> OracleJdbcSetting(url)
             "postgresql" -> PostgreSqlJdbcSetting(url)
             "sqlserver" -> SqlServerJdbcSetting(url)
             else -> error("Unsupported driver: $driver")

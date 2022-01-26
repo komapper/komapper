@@ -1,10 +1,13 @@
 package org.komapper.core
 
+import org.komapper.core.dsl.builder.DefaultEntityInsertStatementBuilder
 import org.komapper.core.dsl.builder.DryRunSchemaStatementBuilder
+import org.komapper.core.dsl.builder.EntityInsertStatementBuilder
 import org.komapper.core.dsl.builder.EntityUpsertStatementBuilder
 import org.komapper.core.dsl.builder.OffsetLimitStatementBuilder
 import org.komapper.core.dsl.builder.OffsetLimitStatementBuilderImpl
 import org.komapper.core.dsl.builder.SchemaStatementBuilder
+import org.komapper.core.dsl.context.EntityInsertContext
 import org.komapper.core.dsl.context.EntityUpsertContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import java.util.regex.Pattern
@@ -133,11 +136,25 @@ interface Dialect {
     fun getSequenceSql(sequenceName: String): String
 
     /**
+     * Returns the substring function.
+     *
+     * @return the substring function
+     */
+    fun getSubstringFunction(): String = "substring"
+
+/**
      * Returns the statement builder for schema.
      *
      * @return the statement builder
      */
     fun getSchemaStatementBuilder(): SchemaStatementBuilder
+
+    fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> getEntityInsertStatementBuilder(
+        context: EntityInsertContext<ENTITY, ID, META>,
+        entities: List<ENTITY>
+    ): EntityInsertStatementBuilder<ENTITY, ID, META> {
+        return DefaultEntityInsertStatementBuilder(this, context, entities)
+    }
 
     /**
      * Returns the statement builder for the entity upsert command.
@@ -161,7 +178,7 @@ interface Dialect {
      */
     fun getDefaultLengthForSubstringFunction(): Int? = null
 
-    /**
+/**
      * Returns whether the limit and offset clauses are supported without using the order by clause.
      *
      * @return whether the limit and offset clauses are supported
@@ -183,6 +200,20 @@ interface Dialect {
     fun supportsAliasForUpdateStatement() = true
 
     /**
+     * Returns whether the as keyword is supported for a table alias.
+     *
+     * @return whether the as keyword is supported
+     */
+    fun supportsAsKeywordForTableAlias(): Boolean = true
+
+    /**
+     * Returns whether the except set operation is supported.
+     *
+     * @return whether the except set operation is supported
+     */
+    fun supportsExceptSetOperation(): Boolean = true
+
+/**
      * Returns whether the nulls first and nulls last options are supported in the order by clause.
      *
      * @return whether the nulls first and nulls last options are supported
@@ -195,6 +226,13 @@ interface Dialect {
      * @return whether the for update clause is supported
      */
     fun supportsForUpdateClause(): Boolean = true
+
+    /**
+     * Returns whether the mod function is supported.
+     *
+     * @return whether the mod function is supported
+     */
+    fun supportsModuloOperator(): Boolean = true
 
     /**
      * Returns whether the multiple columns are supported in the in predicate.

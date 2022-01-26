@@ -13,6 +13,7 @@ dependencies {
     api("org.testcontainers:mariadb")
     api("org.testcontainers:mssqlserver")
     api("org.testcontainers:mysql")
+    api("org.testcontainers:oracle-xe")
     api("org.testcontainers:postgresql")
 }
 
@@ -53,6 +54,14 @@ testing {
             }
         }
 
+        register("oracle", JvmTestSuite::class) {
+            setup(name)
+            dependencies {
+                implementation(project)
+                runtimeOnly(project(":komapper-dialect-oracle-r2dbc"))
+            }
+        }
+
         register("postgresql", JvmTestSuite::class) {
             setup(name)
             dependencies {
@@ -77,6 +86,9 @@ fun JvmTestSuite.setup(driver: String) {
     sources {
         java {
             setSrcDirs(listOf("src/test/kotlin"))
+        }
+        resources {
+            setSrcDirs(listOf("src/test/resources"))
         }
     }
     targets {
