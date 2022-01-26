@@ -40,9 +40,9 @@ class InsertSelectTest(private val db: JdbcDatabase) {
         assertEquals(emptyList(), ids)
     }
 
-    // TODO: SQL Server driver doesn't return all generated values after a multiple insert statement is issued
+    // TODO: MariaDB and SQL Server drivers don't return all generated values after a multiple insert statement is issued
     // TODO: ORACLE driver does not support multiple insert when the identity column is used
-    @Run(unless = [Dbms.SQLSERVER, Dbms.ORACLE])
+    @Run(unless = [Dbms.MARIADB, Dbms.ORACLE, Dbms.SQLSERVER])
     @Test
     fun generatedKeys() {
         val i = Meta.identityStrategy
