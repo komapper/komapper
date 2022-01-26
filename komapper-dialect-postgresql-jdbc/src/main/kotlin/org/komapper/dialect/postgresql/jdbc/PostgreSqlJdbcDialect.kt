@@ -62,7 +62,8 @@ open class PostgreSqlJdbcDialect(
     enum class Version { IMPLICIT }
 
     override fun isUniqueConstraintViolation(exception: SQLException): Boolean {
-        val cause = getCause(exception)
-        return cause.sqlState == UNIQUE_CONSTRAINT_VIOLATION_STATE_CODE
+        return exception.filterIsInstance<SQLException>().any {
+            it.sqlState == UNIQUE_CONSTRAINT_VIOLATION_STATE_CODE
+        }
     }
 }
