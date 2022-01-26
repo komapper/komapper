@@ -276,7 +276,7 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
         assertEquals(data, data2)
     }
 
-    @Run(unless = [Dbms.H2, Dbms.SQLSERVER])
+    @Run(unless = [Dbms.H2, Dbms.MARIADB, Dbms.SQLSERVER])
     @Test
     fun offsetDateTime_offsetLost() {
         val m = Meta.offsetDateTimeTest
