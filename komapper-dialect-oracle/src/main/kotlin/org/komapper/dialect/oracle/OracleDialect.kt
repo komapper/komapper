@@ -20,7 +20,7 @@ interface OracleDialect : Dialect {
 
     override fun supportsExceptSetOperation(): Boolean = false
 
-    override fun supportsModFunction(): Boolean = true
+    override fun supportsModuloOperator(): Boolean = false
 
     override fun getSequenceSql(sequenceName: String): String {
         return "select $sequenceName.nextval from dual"

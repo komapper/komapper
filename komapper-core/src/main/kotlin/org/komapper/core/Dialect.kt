@@ -232,7 +232,7 @@ interface Dialect {
      *
      * @return whether the mod function is supported
      */
-    fun supportsModFunction(): Boolean = true
+    fun supportsModuloOperator(): Boolean = true
 
     /**
      * Returns whether the multiple columns are supported in the in predicate.

@@ -115,17 +115,17 @@ class BuilderSupport(
                 buf.append(" / ")
                 visitOperand(expression.right)
             }
-            is ArithmeticExpression.Rem<*, *> -> {
-                if (dialect.supportsModFunction()) {
+            is ArithmeticExpression.Mod<*, *> -> {
+                if (dialect.supportsModuloOperator()) {
+                    visitOperand(expression.left)
+                    buf.append(" % ")
+                    visitOperand(expression.right)
+                } else {
                     buf.append("mod(")
                     visitOperand(expression.left)
                     buf.append(", ")
                     visitOperand(expression.right)
                     buf.append(")")
-                } else {
-                    visitOperand(expression.left)
-                    buf.append(" % ")
-                    visitOperand(expression.right)
                 }
             }
         }
