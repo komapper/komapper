@@ -57,8 +57,9 @@ class OracleJdbcDialect(
     enum class Version { IMPLICIT }
 
     override fun isUniqueConstraintViolation(exception: SQLException): Boolean {
-        val cause = getCause(exception)
-        return cause.errorCode == UNIQUE_CONSTRAINT_VIOLATION_ERROR_CODE
+        return exception.filterIsInstance<SQLException>().all {
+            return it.errorCode == UNIQUE_CONSTRAINT_VIOLATION_ERROR_CODE
+        }
     }
 
     override fun supportsReturnGeneratedKeysFlag(): Boolean = false

@@ -53,7 +53,8 @@ internal class MetadataQueryImpl(
             val reader = MetadataReader(
                 config.dialect,
                 con.metaData,
-                catalog,
+                // TODO: Remove this workaround in the future
+                catalog ?: if (config.dialect.driver == "mariadb") { "" } else null,
                 schemaName,
                 tableNamePattern,
                 tableTypes

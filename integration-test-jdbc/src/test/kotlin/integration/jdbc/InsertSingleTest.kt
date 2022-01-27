@@ -65,7 +65,7 @@ class InsertSingleTest(private val db: JdbcDatabase) {
         assertEquals(person2, person3)
     }
 
-    @Run(unless = [Dbms.POSTGRESQL, Dbms.SQLSERVER])
+    @Run(unless = [Dbms.MARIADB, Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun createdAt_offsetDateTime() {
         val h = Meta.human

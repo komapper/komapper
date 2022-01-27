@@ -114,7 +114,4 @@ abstract class AbstractJdbcDialect protected constructor(internalDataTypes: List
             "The dataType is not found for the type \"${klass.qualifiedName}\"."
         )
     }
-
-    protected fun getCause(exception: SQLException): SQLException =
-        exception.filterIsInstance(SQLException::class.java).first()
 }

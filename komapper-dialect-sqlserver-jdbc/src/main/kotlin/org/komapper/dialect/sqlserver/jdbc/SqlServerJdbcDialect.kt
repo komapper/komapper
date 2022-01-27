@@ -29,7 +29,7 @@ class SqlServerJdbcDialect(
 
     companion object {
         /** the error code that represents unique violation  */
-        const val UNIQUE_CONSTRAINT_VIOLATION_STATE_CODE = 2627
+        const val UNIQUE_CONSTRAINT_VIOLATION_ERROR_CODE = 2627
 
         val DEFAULT_DATA_TYPES: List<JdbcDataType<*>> = listOf(
             BigDecimalType("decimal"),
@@ -56,7 +56,8 @@ class SqlServerJdbcDialect(
     enum class Version { IMPLICIT }
 
     override fun isUniqueConstraintViolation(exception: SQLException): Boolean {
-        val cause = getCause(exception)
-        return cause.errorCode == UNIQUE_CONSTRAINT_VIOLATION_STATE_CODE
+        return exception.filterIsInstance<SQLException>().all {
+            return it.errorCode == UNIQUE_CONSTRAINT_VIOLATION_ERROR_CODE
+        }
     }
 }
