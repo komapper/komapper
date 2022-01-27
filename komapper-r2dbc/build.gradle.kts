@@ -1,6 +1,7 @@
 dependencies {
     val kotlinCoroutinesVersion: String by project
-    api(platform("io.r2dbc:r2dbc-bom:Arabba-SR12"))
+    val r2dbcVersion: String by project
+    api(platform("io.r2dbc:r2dbc-bom:$r2dbcVersion"))
     api(project(":komapper-core"))
     api("org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinCoroutinesVersion")
     api("org.jetbrains.kotlinx:kotlinx-coroutines-reactive:$kotlinCoroutinesVersion")
