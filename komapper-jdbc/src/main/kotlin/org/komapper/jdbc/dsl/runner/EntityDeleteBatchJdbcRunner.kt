@@ -27,7 +27,7 @@ internal class EntityDeleteBatchJdbcRunner<ENTITY : Any, ID : Any, META : Entity
 
     private fun delete(config: JdbcDatabaseConfig): Pair<IntArray, LongArray> {
         val statements = entities.map { runner.buildStatement(config, it) }
-        return support.delete(config) { it.executeBatch(statements) }
+        return support.delete(config) { it.executeBatch(statements, ::customizeBatchCounts) }
     }
 
     private fun postDelete(counts: IntArray) {

@@ -15,6 +15,7 @@ import org.komapper.core.UniqueConstraintException
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
 import org.komapper.jdbc.JdbcDatabase
+import java.sql.Statement
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -96,7 +97,8 @@ class InsertBatchTest(private val db: JdbcDatabase) {
         val query = QueryDsl.insert(d).onDuplicateKeyUpdate().batch(department1, department2)
         val counts = db.runQuery { query }
         when (db.config.dialect.driver) {
-            "mysql", "mariadb" -> assertEquals(listOf(1, 2), counts)
+            "mariadb" -> assertEquals(listOf(Statement.SUCCESS_NO_INFO, Statement.SUCCESS_NO_INFO), counts)
+            "mysql" -> assertEquals(listOf(1, 2), counts)
             else -> assertEquals(listOf(1, 1), counts)
         }
         val list = db.runQuery {
@@ -117,7 +119,8 @@ class InsertBatchTest(private val db: JdbcDatabase) {
         val query = QueryDsl.insert(d).onDuplicateKeyUpdate(d.departmentNo).batch(department1, department2)
         val counts = db.runQuery { query }
         when (db.config.dialect.driver) {
-            "mysql", "mariadb" -> assertEquals(listOf(1, 2), counts)
+            "mariadb" -> assertEquals(listOf(Statement.SUCCESS_NO_INFO, Statement.SUCCESS_NO_INFO), counts)
+            "mysql" -> assertEquals(listOf(1, 2), counts)
             else -> assertEquals(listOf(1, 1), counts)
         }
         val list = db.runQuery {
@@ -187,7 +190,10 @@ class InsertBatchTest(private val db: JdbcDatabase) {
         val department2 = Department(1, 60, "DEVELOPMENT", "KYOTO", 1)
         val query = QueryDsl.insert(d).onDuplicateKeyIgnore().batch(listOf(department1, department2))
         val counts = db.runQuery { query }
-        assertEquals(listOf(1, 0), counts)
+        when (db.config.dialect.driver) {
+            "mariadb" -> assertEquals(listOf(Statement.SUCCESS_NO_INFO, Statement.SUCCESS_NO_INFO), counts)
+            else -> assertEquals(listOf(1, 0), counts)
+        }
         val list = db.runQuery {
             QueryDsl.from(d).where { d.departmentId inList listOf(1, 5) }.orderBy(d.departmentId)
         }
@@ -205,7 +211,10 @@ class InsertBatchTest(private val db: JdbcDatabase) {
         val department2 = Department(10, 10, "DEVELOPMENT", "KYOTO", 1)
         val query = QueryDsl.insert(d).onDuplicateKeyIgnore(d.departmentNo).batch(listOf(department1, department2))
         val counts = db.runQuery { query }
-        assertEquals(listOf(1, 0), counts)
+        when (db.config.dialect.driver) {
+            "mariadb" -> assertEquals(listOf(Statement.SUCCESS_NO_INFO, Statement.SUCCESS_NO_INFO), counts)
+            else -> assertEquals(listOf(1, 0), counts)
+        }
         val list = db.runQuery {
             QueryDsl.from(d).where { d.departmentNo inList listOf(10, 50) }.orderBy(d.departmentNo)
         }

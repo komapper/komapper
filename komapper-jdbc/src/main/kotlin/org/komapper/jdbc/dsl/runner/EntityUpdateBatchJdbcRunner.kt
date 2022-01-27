@@ -32,7 +32,7 @@ internal class EntityUpdateBatchJdbcRunner<ENTITY : Any, ID : Any, META : Entity
 
     private fun update(config: JdbcDatabaseConfig, entities: List<ENTITY>): Pair<IntArray, LongArray> {
         val statements = entities.map { runner.buildStatement(config, it) }
-        return support.update(config) { it.executeBatch(statements) }
+        return support.update(config) { it.executeBatch(statements, ::customizeBatchCounts) }
     }
 
     private fun postUpdate(entities: List<ENTITY>, counts: IntArray): List<ENTITY> {

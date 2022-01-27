@@ -82,7 +82,7 @@ internal class JdbcExecutor(
         }
     }
 
-    fun executeBatch(statements: List<Statement>): Pair<IntArray, LongArray> {
+    fun executeBatch(statements: List<Statement>, customizeBatchCounts: (IntArray) -> IntArray = { it }): Pair<IntArray, LongArray> {
         require(statements.isNotEmpty())
         @Suppress("NAME_SHADOWING")
         val statements = statements.map { inspect(it) }
@@ -103,7 +103,7 @@ internal class JdbcExecutor(
                         bind(ps, statement)
                         ps.addBatch()
                         if (i == statements.size - 1 || (i + 1) % batchSize == 0) {
-                            val counts = ps.executeBatch()
+                            val counts = ps.executeBatch().let(customizeBatchCounts)
                             val keys = fetchGeneratedKeys(ps)
                             counts.copyInto(allCounts, offset)
                             keys.copyInto(allKeys, offset)
@@ -117,7 +117,7 @@ internal class JdbcExecutor(
         }
     }
 
-    // TODO
+// TODO
     fun execute(statement: Statement) {
         @Suppress("NAME_SHADOWING")
         val statement = inspect(statement)
