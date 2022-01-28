@@ -109,6 +109,7 @@ jobs:
           java-version: 17
 
       - name: Test
+        if: always()
         uses: gradle/gradle-build-action@v2
         with:
           arguments: :integration-test-r2dbc:${{ matrix.driver }}
