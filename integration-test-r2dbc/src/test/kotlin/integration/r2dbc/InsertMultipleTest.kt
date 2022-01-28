@@ -40,7 +40,8 @@ class InsertMultipleTest(private val db: R2dbcDatabase) {
     }
 
     // TODO: MySQL and SQL Server drivers don't return all generated values after a multiple insert statement is issued
-    @Run(unless = [Dbms.MYSQL, Dbms.SQLSERVER])
+    // TODO: ORACLE driver does not support multiple insert when the identity column is used
+    @Run(unless = [Dbms.MYSQL, Dbms.ORACLE, Dbms.SQLSERVER])
     @Test
     fun identity() = inTransaction(db) {
         val i = Meta.identityStrategy
@@ -207,7 +208,8 @@ class InsertMultipleTest(private val db: R2dbcDatabase) {
     }
 
     // TODO: MySQL and SQL Server drivers don't return all generated values after a multiple insert statement is issued
-    @Run(unless = [Dbms.MYSQL, Dbms.SQLSERVER])
+    // TODO: ORACLE driver does not support multiple insert when the identity column is used
+    @Run(unless = [Dbms.MYSQL, Dbms.ORACLE, Dbms.SQLSERVER])
     @Test
     fun identity_onDuplicateKeyUpdate() = inTransaction(db) {
         val i = Meta.identityStrategy
