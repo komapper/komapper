@@ -85,8 +85,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        # Exclude mysql and sqlserver as their drivers seem to be unstable.
-        driver: [h2, mariadb, postgresql]
+        # Exclude mysql driver.
+        driver: [h2, mariadb, oracle, postgresql, sqlserver]
     timeout-minutes: 15
 
     steps:
