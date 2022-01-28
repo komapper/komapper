@@ -19,9 +19,7 @@ class OracleR2dbcSetting : OracleSetting<R2dbcDatabaseConfig> {
             val url = System.getProperty("url") ?: error("The url property is not found.")
             val connectionUrl = ConnectionUrl.newInstance(url)
             val container = OracleContainerProvider().newInstance(connectionUrl) as OracleContainer
-            val r2dbcContainer = OracleR2DBCDatabaseContainer(
-                container.withSharedMemorySize((1024 * 1024 * 1024).toLong())
-            )
+            val r2dbcContainer = OracleR2DBCDatabaseContainer(container)
             r2dbcContainer.start()
             r2dbcContainer.configure(
                 ConnectionFactoryOptions.builder().option(
