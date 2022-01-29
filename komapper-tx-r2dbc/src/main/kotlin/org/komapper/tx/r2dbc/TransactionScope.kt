@@ -56,15 +56,18 @@ internal class TransactionScopeImpl(
         block: suspend TransactionScope.() -> R
     ): R {
         return transactionManager.begin(isolationLevel ?: defaultIsolationLevel) {
-            try {
-                val result = block(this@TransactionScopeImpl)
-                if (!transactionManager.isRollbackOnly) {
-                    transactionManager.commit()
-                }
-                result
-            } finally {
+            val result = try {
+                block(this@TransactionScopeImpl)
+            } catch (e: Throwable) {
                 transactionManager.rollback()
+                throw e
             }
+            if (transactionManager.isRollbackOnly) {
+                transactionManager.rollback()
+            } else {
+                transactionManager.commit()
+            }
+            result
         }
     }
 
