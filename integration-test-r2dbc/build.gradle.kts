@@ -62,22 +62,6 @@ testing {
             }
         }
 
-        register("oracleLowPriority", JvmTestSuite::class) {
-            setup("oracle", includeTags = arrayOf("lowPriority"))
-            dependencies {
-                implementation(project)
-                runtimeOnly(project(":komapper-dialect-oracle-r2dbc"))
-            }
-        }
-
-        register("oracleHighPriority", JvmTestSuite::class) {
-            setup("oracle", excludeTags = arrayOf("lowPriority"))
-            dependencies {
-                implementation(project)
-                runtimeOnly(project(":komapper-dialect-oracle-r2dbc"))
-            }
-        }
-
         register("postgresql", JvmTestSuite::class) {
             setup(name)
             dependencies {

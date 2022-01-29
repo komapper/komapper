@@ -86,7 +86,7 @@ jobs:
     strategy:
       matrix:
         # Exclude mariadb and mysql drivers.
-        driver: [h2, oracleLowPriority, oracleHighPriority, postgresql, sqlserver]
+        driver: [h2, oracle, postgresql, sqlserver]
     timeout-minutes: 15
 
     steps:
@@ -109,7 +109,6 @@ jobs:
           java-version: 17
 
       - name: Test
-        if: always()
         uses: gradle/gradle-build-action@v2
         with:
           arguments: :integration-test-r2dbc:${{ matrix.driver }}

@@ -4,7 +4,6 @@ import integration.booleanTest
 import integration.intTest
 import integration.longTest
 import integration.stringTest
-import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
@@ -15,7 +14,6 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 
-@Tag("lowPriority")
 @ExtendWith(Env::class)
 class LiteralTest(val db: R2dbcDatabase) {
 
