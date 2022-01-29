@@ -19,7 +19,7 @@ class OracleTest(val db: R2dbcDatabase) {
         val config = db.config as DefaultR2dbcDatabaseConfig
         config.connectionFactory.create().awaitFirst().let { con ->
             con.beginTransaction().awaitFirstOrNull()
-            val statement = con.createStatement("select 'a' from address")
+            val statement = con.createStatement("select address_id + address_id from address")
             val result = statement.execute().awaitFirst()
             statement.bind(0, 10)
             val value = result.map { row, _ -> row.get(0) }.awaitFirst()
