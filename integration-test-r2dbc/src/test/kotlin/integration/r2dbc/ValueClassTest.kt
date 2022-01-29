@@ -42,8 +42,7 @@ import kotlin.test.assertNotNull
 )
 @ExtendWith(Env::class)
 class ValueClassTest(val db: R2dbcDatabase) {
-
-    @Tag("suspicious")
+    
     @Test
     fun list() = inTransaction(db) {
         val a = Meta.vAddress
@@ -53,8 +52,7 @@ class ValueClassTest(val db: R2dbcDatabase) {
         assertNotNull(list)
         assertEquals(1, list.size)
     }
-
-    @Tag("suspicious")
+    
     @Test
     fun first() = inTransaction(db) {
         val a = Meta.vAddress
@@ -64,8 +62,7 @@ class ValueClassTest(val db: R2dbcDatabase) {
         assertNotNull(address)
         println(address)
     }
-
-    @Tag("suspicious")
+    
     @Test
     fun insert() = inTransaction(db) {
         val a = Meta.vAddress
@@ -78,8 +75,7 @@ class ValueClassTest(val db: R2dbcDatabase) {
         }
         assertEquals(address, address2)
     }
-
-    @Tag("suspicious")
+    
     @Test
     fun insert_timestamp() = inTransaction(db) {
         val p = Meta.vPerson
@@ -96,8 +92,7 @@ class ValueClassTest(val db: R2dbcDatabase) {
         }
         assertEquals(person2, person3)
     }
-
-    @Tag("suspicious")
+    
     @Test
     fun update() = inTransaction(db) {
         val a = Meta.vAddress
@@ -115,8 +110,7 @@ class ValueClassTest(val db: R2dbcDatabase) {
             address2
         )
     }
-
-    @Tag("suspicious")
+    
     @Test
     fun updated_timestamp() = inTransaction(db) {
         val p = Meta.vPerson
@@ -133,8 +127,7 @@ class ValueClassTest(val db: R2dbcDatabase) {
         assertNotNull(person3.updatedAt)
         assertNotEquals(person2.updatedAt, person3.updatedAt)
     }
-
-    @Tag("suspicious")
+    
     @Test
     fun delete() = inTransaction(db) {
         val a = Meta.vAddress
@@ -153,8 +146,7 @@ class ValueClassTest(val db: R2dbcDatabase) {
             assertEquals(IntId(i), result.id)
         }
     }
-
-    @Tag("suspicious")
+    
     @Run(unless = [Dbms.MYSQL])
     @Test
     fun sequenceGenerator() = inTransaction(db) {
@@ -184,8 +176,7 @@ class ValueClassTest(val db: R2dbcDatabase) {
         assertEquals(2, list.size)
         assertEquals(listOf(1, 11), list.map { it.addressId.value })
     }
-
-    @Tag("suspicious")
+    
     @Test
     fun between() = inTransaction(db) {
         val a = Meta.vAddress
@@ -197,8 +188,7 @@ class ValueClassTest(val db: R2dbcDatabase) {
         assertEquals(5, list.size)
         assertEquals((6..10).toList(), list.map { it.addressId.value })
     }
-
-    @Tag("suspicious")
+    
     @Test
     fun notBetween() = inTransaction(db) {
         val a = Meta.vAddress
@@ -210,8 +200,7 @@ class ValueClassTest(val db: R2dbcDatabase) {
         assertEquals(10, list.size)
         assertEquals(((1..5) + (11..15)).toList(), list.map { it.addressId.value })
     }
-
-    @Tag("suspicious")
+    
     @Test
     fun select_single() = inTransaction(db) {
         val a = Meta.vAddress
@@ -220,8 +209,7 @@ class ValueClassTest(val db: R2dbcDatabase) {
         }
         assertEquals(Street("STREET 1"), result)
     }
-
-    @Tag("suspicious")
+    
     @Test
     fun select_pair() = inTransaction(db) {
         val a = Meta.vAddress
@@ -230,8 +218,7 @@ class ValueClassTest(val db: R2dbcDatabase) {
         }
         assertEquals(IntId(1) to Street("STREET 1"), result)
     }
-
-    @Tag("suspicious")
+    
     @Test
     fun expression_count() = inTransaction(db) {
         val a = Meta.vAddress
@@ -240,8 +227,7 @@ class ValueClassTest(val db: R2dbcDatabase) {
         }
         assertEquals(15, count)
     }
-
-    @Tag("suspicious")
+    
     @Test
     fun expression_max() = inTransaction(db) {
         val a = Meta.vAddress
@@ -251,6 +237,7 @@ class ValueClassTest(val db: R2dbcDatabase) {
         assertEquals(IntId(15), max)
     }
 
+    @Tag("suspicious")
     @Test
     fun expression_plus() = inTransaction(db) {
         val a = Meta.vAddress

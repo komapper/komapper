@@ -108,6 +108,13 @@ testing {
             }
         }
 
+        register("trustworthy", JvmTestSuite::class) {
+            setup("oracle", excludeTags = arrayOf(name))
+            dependencies {
+                implementation(project)
+                runtimeOnly(project(":komapper-dialect-oracle-r2dbc"))
+            }
+        }
     }
 }
 

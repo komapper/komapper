@@ -32,6 +32,7 @@ import kotlin.test.assertEquals
 @ExtendWith(Env::class)
 class OperatorTest(private val db: R2dbcDatabase) {
 
+    @Tag("suspicious")
     @Test
     fun plus() = inTransaction(db) {
         val a = Meta.address
@@ -161,7 +162,6 @@ class OperatorTest(private val db: R2dbcDatabase) {
         assertEquals(0, result)
     }
 
-    @Tag("suspicious")
     @Test
     fun concat() = inTransaction(db) {
         val a = Meta.address
@@ -178,7 +178,6 @@ class OperatorTest(private val db: R2dbcDatabase) {
         assertEquals("[STREET 10]", result)
     }
 
-    @Tag("suspicious")
     @Test
     fun concat_other_column() = inTransaction(db) {
         val a = Meta.address

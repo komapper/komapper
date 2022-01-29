@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        driver: [suspicious]
+        driver: [suspicious, trustworthy]
     timeout-minutes: 10
 
     steps:
