@@ -71,8 +71,6 @@ class OperatorTest(private val db: R2dbcDatabase) {
         assertEquals(20, result)
     }
 
-    @Tag("suspicious")
-    @Order(2)
     @Test
     fun list() = inTransaction(db) {
         val a = Meta.address
@@ -246,6 +244,8 @@ class OperatorTest(private val db: R2dbcDatabase) {
         assertEquals("test ", result)
     }
 
+    @Tag("suspicious")
+    @Order(2)
     @Test
     fun rtrimFunction() = inTransaction(db) {
         val a = Meta.address
