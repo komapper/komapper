@@ -59,7 +59,6 @@ testing {
                 runtimeOnly(project(":komapper-dialect-oracle-r2dbc"))
             }
         }
-
     }
 }
 

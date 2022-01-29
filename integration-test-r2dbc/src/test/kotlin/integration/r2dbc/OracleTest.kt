@@ -1,7 +1,7 @@
 package integration.r2dbc
 
-import integration.setting.Dbms
-import integration.setting.Run
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.reactive.awaitFirst
 import kotlinx.coroutines.reactive.awaitFirstOrNull
 import org.junit.Test
@@ -19,11 +19,10 @@ class OracleTest(val db: R2dbcDatabase) {
         val config = db.config as DefaultR2dbcDatabaseConfig
         config.connectionFactory.create().awaitFirst().let { con ->
             con.beginTransaction().awaitFirstOrNull()
-            val statement = con.createStatement("select address_id + address_id from address")
+            val statement = con.createStatement("select 'a' from address")
             val result = statement.execute().awaitFirst()
-            statement.bind(0, 10)
-            val value = result.map { row, _ -> row.get(0) }.awaitFirst()
-            println(value)
+            val value = result.map { row, _ -> row.get(0) }.asFlow()
+            println(value.first())
             con.rollbackTransaction().awaitFirstOrNull()
             con.close().awaitFirstOrNull()
         }
@@ -31,36 +30,10 @@ class OracleTest(val db: R2dbcDatabase) {
             con.beginTransaction().awaitFirstOrNull()
             val statement = con.createStatement("select 'b' from address")
             val result = statement.execute().awaitFirst()
-            val value = result.map { row, _ -> row.get(0) }.awaitFirst()
-            println(value)
+            val value = result.map { row, _ -> row.get(0) }.asFlow()
+            println(value.first())
             con.rollbackTransaction().awaitFirstOrNull()
             con.close().awaitFirstOrNull()
         }
     }
-
-    @Run(onlyIf = [Dbms.ORACLE])
-    @Tag("reproduction2")
-    @Test
-    fun reproduction2(): Unit = runBlockingWithTimeout {
-        val config = db.config as DefaultR2dbcDatabaseConfig
-        config.connectionFactory.create().awaitFirst().let { con ->
-            con.beginTransaction().awaitFirstOrNull()
-            val statement = con.createStatement("select 'a' from dual")
-            val result = statement.execute().awaitFirst()
-            val value = result.map { row, _ -> row.get(0) }.awaitFirst()
-            println(value)
-            con.rollbackTransaction().awaitFirstOrNull()
-            con.close().awaitFirstOrNull()
-        }
-        config.connectionFactory.create().awaitFirst().let { con ->
-            con.beginTransaction().awaitFirstOrNull()
-            val statement = con.createStatement("select 'b' from dual")
-            val result = statement.execute().awaitFirst()
-            val value = result.map { row, _ -> row.get(0) }.awaitFirst()
-            println(value)
-            con.rollbackTransaction().awaitFirstOrNull()
-            con.close().awaitFirstOrNull()
-        }
-    }
-
 }

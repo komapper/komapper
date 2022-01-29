@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        driver: [reproduction1, reproduction2]
+        driver: [reproduction1]
     timeout-minutes: 10
 
     steps:
