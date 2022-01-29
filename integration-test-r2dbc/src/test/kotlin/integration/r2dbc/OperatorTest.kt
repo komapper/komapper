@@ -1,8 +1,12 @@
 package integration.r2dbc
 
+import integration.Address
 import integration.address
+import org.junit.jupiter.api.MethodOrderer
+import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Tags
+import org.junit.jupiter.api.TestMethodOrder
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
@@ -29,6 +33,7 @@ import kotlin.test.assertEquals
         Tag("operator")
     ]
 )
+@TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 @ExtendWith(Env::class)
 class OperatorTest(private val db: R2dbcDatabase) {
 
@@ -48,6 +53,8 @@ class OperatorTest(private val db: R2dbcDatabase) {
         assertEquals(11, result)
     }
 
+    @Tag("suspicious")
+    @Order(1)
     @Test
     fun plus_other_column() = inTransaction(db) {
         val a = Meta.address
@@ -62,6 +69,16 @@ class OperatorTest(private val db: R2dbcDatabase) {
                 }.first()
         }
         assertEquals(20, result)
+    }
+
+    @Order(2)
+    @Test
+    fun list() = inTransaction(db) {
+        val a = Meta.address
+        val list: List<Address> = db.runQuery {
+            QueryDsl.from(a)
+        }
+        assertEquals(15, list.size)
     }
 
     @Test
@@ -228,7 +245,6 @@ class OperatorTest(private val db: R2dbcDatabase) {
         assertEquals("test ", result)
     }
 
-    @Tag("suspicious")
     @Test
     fun rtrimFunction() = inTransaction(db) {
         val a = Meta.address
