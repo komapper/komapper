@@ -38,7 +38,7 @@ jobs:
         if: always()
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: :integration-test-r2dbc:${{ matrix.driver }}
+          arguments: :integration-test-r2dbc:${{ matrix.driver }} -i
 
       - name: Upload reports
         if: failure()

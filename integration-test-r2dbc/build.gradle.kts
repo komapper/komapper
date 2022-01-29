@@ -104,6 +104,7 @@ testing {
             setup("oracle", includeTags = arrayOf(name))
             dependencies {
                 implementation(project)
+                implementation("com.oracle.database.jdbc.debug:ojdbc11_g:21.3.0.0")
                 runtimeOnly(project(":komapper-dialect-oracle-r2dbc"))
             }
         }
@@ -135,6 +136,10 @@ fun JvmTestSuite.setup(driver: String, includeTags: Array<String> = emptyArray()
                 val url = project.property(urlKey) ?: throw GradleException("The $urlKey property is not found.")
                 systemProperty("driver", driver)
                 systemProperty("url", url)
+                systemProperty("oracle.jdbc.Trace", true)
+                val path = project.file("oracleLog.properties").path
+                println(path)
+                systemProperty("java.util.logging.config.file", path)
                 useJUnitPlatform {
                     includeTags(*includeTags)
                     excludeTags(*excludeTags)
