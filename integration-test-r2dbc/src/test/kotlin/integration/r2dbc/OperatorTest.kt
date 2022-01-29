@@ -244,8 +244,6 @@ class OperatorTest(private val db: R2dbcDatabase) {
         assertEquals("test ", result)
     }
 
-    @Tag("suspicious")
-    @Order(2)
     @Test
     fun rtrimFunction() = inTransaction(db) {
         val a = Meta.address
@@ -254,4 +252,16 @@ class OperatorTest(private val db: R2dbcDatabase) {
         }
         assertEquals(" test", result)
     }
+
+    @Tag("suspicious")
+    @Order(2)
+    @Test
+    fun literal() = inTransaction(db) {
+        val a = Meta.address
+        val result = db.runQuery {
+            QueryDsl.from(a).select(literal("test")).first()
+        }
+        assertEquals("test", result)
+    }
+
 }
