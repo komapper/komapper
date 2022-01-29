@@ -14,6 +14,8 @@ import org.komapper.r2dbc.DefaultR2dbcDatabaseConfig
 import org.komapper.r2dbc.R2dbcDatabaseConfig
 import org.komapper.r2dbc.R2dbcDialects
 import org.reactivestreams.Publisher
+import org.reactivestreams.Subscriber
+import org.reactivestreams.Subscription
 import org.testcontainers.containers.OracleContainer
 import org.testcontainers.containers.OracleContainerProvider
 import org.testcontainers.jdbc.ConnectionUrl
@@ -42,7 +44,16 @@ class OracleR2dbcSetting : OracleSetting<R2dbcDatabaseConfig> {
             }
             val connection = object : Connection by internalConnection {
                 override fun close(): Publisher<Void> {
-                    return emptyFlow<Void>().asPublisher()
+                    return Publisher<Void> { s ->
+                        s.onSubscribe(object : Subscription {
+                            override fun request(n: Long) {
+                            }
+
+                            override fun cancel() {
+                            }
+                        })
+                        s.onComplete()
+                    }
                 }
             }
             object : ConnectionFactory by internalConnectionFactory {
