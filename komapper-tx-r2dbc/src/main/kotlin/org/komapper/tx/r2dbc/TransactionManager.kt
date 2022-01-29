@@ -137,9 +137,8 @@ internal class TransactionManagerImpl(
             connection.rollbackTransaction().awaitFirstOrNull()
             loggerFacade.rollback(tx.id)
         } catch (ignored: Exception) {
-        } finally {
-            release(tx)
         }
+        release(tx)
     }
 
     private suspend fun release(tx: Transaction) {
