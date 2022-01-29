@@ -21,6 +21,7 @@ class OracleTest(val db: R2dbcDatabase) {
             con.beginTransaction().awaitFirstOrNull()
             val statement = con.createStatement("select 'a' from address")
             val result = statement.execute().awaitFirst()
+            statement.bind(0, 10)
             val value = result.map { row, _ -> row.get(0) }.awaitFirst()
             println(value)
             con.rollbackTransaction().awaitFirstOrNull()
