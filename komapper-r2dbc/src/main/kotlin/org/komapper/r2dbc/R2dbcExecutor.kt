@@ -81,16 +81,13 @@ internal class R2dbcExecutor(
         val statement = inspect(statement)
         return config.session.connection.toFlow().flatMapConcat { con ->
             con.use {
-                val batch = con.createBatch()
-                for (each in asSql(statement).split(";")) {
-                    val sql = each.trim()
-                    if (sql.isNotEmpty()) {
-                        batch.add(sql)
-                    }
-                }
-                batch.execute().toFlow().flatMapConcat { result ->
-                    result.rowsUpdated.toFlow()
-                }
+                asSql(statement).split(";")
+                    .asSequence()
+                    .map { it.trim() }
+                    .filter { it.isNotEmpty() }
+                    .map { sql -> con.createStatement(sql).execute().toFlow() }
+                    .map { flow -> flow.flatMapConcat { result -> result.rowsUpdated.toFlow() } }
+                    .reduce { acc, flow -> acc.flatMapConcat { flow } }
             }
         }.onStart {
             log(statement)
