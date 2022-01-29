@@ -5,7 +5,6 @@ import io.r2dbc.spi.Result
 import io.r2dbc.spi.Row
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
@@ -14,6 +13,9 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.reactive.asFlow
+import kotlinx.coroutines.reactive.awaitFirst
+import kotlinx.coroutines.reactive.awaitFirstOrNull
+import kotlinx.coroutines.reactive.awaitSingle
 import org.komapper.core.ExecutionOptionsProvider
 import org.komapper.core.Statement
 import org.komapper.core.UniqueConstraintException
@@ -79,21 +81,25 @@ internal class R2dbcExecutor(
     suspend fun execute(statement: Statement) {
         @Suppress("NAME_SHADOWING")
         val statement = inspect(statement)
-        return config.session.connection.toFlow().flatMapConcat { con ->
-            con.use {
-                asSql(statement).split(";")
-                    .asSequence()
-                    .map { it.trim() }
-                    .filter { it.isNotEmpty() }
-                    .map { sql -> con.createStatement(sql).execute().toFlow() }
-                    .map { flow -> flow.flatMapConcat { result -> result.rowsUpdated.toFlow() } }
-                    .reduce { acc, flow -> acc.flatMapConcat { flow } }
+        log(statement)
+        val sqls = asSql(statement).split(";")
+            .map { it.trim() }
+            .filter { it.isNotEmpty() }
+        val con = config.session.connection.awaitSingle()
+        try {
+            for (sql in sqls) {
+                val r2dbcStmt = con.createStatement(sql)
+                val result: Result = r2dbcStmt.execute().awaitFirst()
+                result.rowsUpdated.awaitFirstOrNull()
             }
-        }.onStart {
-            log(statement)
-        }.catch {
-            handleException(it)
-        }.collect()
+        } catch (cause: Throwable) {
+            handleException(cause)
+        } finally {
+            try {
+                con.close().awaitFirstOrNull()
+            } catch (ignored: Exception) {
+            }
+        }
     }
 
     private fun handleException(cause: Throwable) {
