@@ -33,17 +33,20 @@ https://www.komapper.org/ja/docs/
 - Java 11 or later
 - Gradle 7.2 or later
 
-## Supported connectivity types
-
-- JDBC 4.3
-- R2DBC [Arabba-SR12](https://r2dbc.io/2022/01/13/r2dbc-arabba-sr12-released)
-
 ## Supported Databases
 
-- H2 Database Engine
-- MariaDB
-- MySQL
-- PostgreSQL
+Komapper is tested with the following databases:
+
+| Database           | version | JDBC support | R2DBC support |
+|--------------------|---------|:------------:|:-------------:|
+| H2 Database        | 2.1.210 |      v       |       v       |
+| MariaDB            | 10.6.3  |      v       |      N/A      |
+| MySQL              | 8.0.25  |      v       |      N/A      |
+| Oracle Database XE | 18.4.0  |      v       |       v       |
+| PostgreSQL         | 13.3    |      v       |       v       |
+| SQL Server         | 2019    |      v       |       v       |
+
+Supported connectivity types are JDBC 4.3 and R2DBC Borca-GA.
 
 ## Installation
 
