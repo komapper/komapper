@@ -35,6 +35,14 @@ testing {
                 runtimeOnly(project(":komapper-dialect-h2-r2dbc"))
             }
         }
+
+        register("oracle", JvmTestSuite::class) {
+            setup(name)
+            dependencies {
+                implementation(project)
+                runtimeOnly(project(":komapper-dialect-oracle-r2dbc"))
+            }
+        }
         
         register("composition", JvmTestSuite::class) {
             setup("oracle", includeTags = arrayOf(name))

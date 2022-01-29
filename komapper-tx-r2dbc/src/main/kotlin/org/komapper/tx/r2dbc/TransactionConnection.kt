@@ -23,21 +23,21 @@ internal class TransactionConnectionImpl(
     private val preservedAutoCommitState: Boolean = connection.isAutoCommit
 
     override suspend fun initialize() {
-        if (isolationLevel != null) {
-            connection.setTransactionIsolationLevel(isolationLevel).awaitFirstOrNull()
-        }
-        if (preservedAutoCommitState) {
-            connection.setAutoCommit(false).awaitFirstOrNull()
-        }
+        // if (isolationLevel != null) {
+        //     connection.setTransactionIsolationLevel(isolationLevel).awaitFirstOrNull()
+        // }
+        // if (preservedAutoCommitState) {
+        //     connection.setAutoCommit(false).awaitFirstOrNull()
+        // }
     }
 
     override suspend fun reset() {
-        if (preservedIsolationLevel != null && isolationLevel != null) {
-            connection.setTransactionIsolationLevel(preservedIsolationLevel).awaitFirstOrNull()
-        }
-        if (preservedAutoCommitState) {
-            connection.setAutoCommit(true).awaitFirstOrNull()
-        }
+        // if (preservedIsolationLevel != null && isolationLevel != null) {
+        //     connection.setTransactionIsolationLevel(preservedIsolationLevel).awaitFirstOrNull()
+        // }
+        // if (preservedAutoCommitState) {
+        //     connection.setAutoCommit(true).awaitFirstOrNull()
+        // }
     }
 
     override suspend fun dispose() {

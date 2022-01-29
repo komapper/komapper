@@ -83,7 +83,11 @@ internal class TransactionManagerImpl(
             }
             TransactionImpl(txCon)
         }
-        tx.connection.beginTransaction().awaitFirstOrNull()
+        if (isolationLevel == null) {
+            tx.connection.beginTransaction().awaitFirstOrNull()
+        } else {
+            tx.connection.beginTransaction(isolationLevel).awaitFirstOrNull()
+        }
         loggerFacade.begin(tx.id)
         val context = threadLocal.asContextElement(tx)
         return withContext(context, block)
