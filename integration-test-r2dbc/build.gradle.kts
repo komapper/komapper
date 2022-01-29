@@ -35,63 +35,68 @@ testing {
                 runtimeOnly(project(":komapper-dialect-h2-r2dbc"))
             }
         }
-
-        register("mariadb", JvmTestSuite::class) {
-            setup(name)
-            dependencies {
-                implementation(project)
-                runtimeOnly(project(":komapper-dialect-mariadb-r2dbc"))
-                runtimeOnly("org.mariadb.jdbc:mariadb-java-client:3.0.3")
-            }
-        }
-
-        register("mysql", JvmTestSuite::class) {
-            setup(name)
-            dependencies {
-                implementation(project)
-                runtimeOnly(project(":komapper-dialect-mysql-r2dbc"))
-                runtimeOnly("mysql:mysql-connector-java:8.0.28")
-            }
-        }
-
-        register("oracle", JvmTestSuite::class) {
-            setup(name)
+        
+        register("composition", JvmTestSuite::class) {
+            setup("oracle", includeTags = arrayOf(name))
             dependencies {
                 implementation(project)
                 runtimeOnly(project(":komapper-dialect-oracle-r2dbc"))
             }
         }
 
-        register("oracleLowPriority", JvmTestSuite::class) {
-            setup("oracle", includeTags = arrayOf("lowPriority"))
+        register("literal", JvmTestSuite::class) {
+            setup("oracle", includeTags = arrayOf(name))
             dependencies {
                 implementation(project)
                 runtimeOnly(project(":komapper-dialect-oracle-r2dbc"))
             }
         }
 
-        register("oracleHighPriority", JvmTestSuite::class) {
-            setup("oracle", excludeTags = arrayOf("lowPriority"))
+        register("operator", JvmTestSuite::class) {
+            setup("oracle", includeTags = arrayOf(name))
             dependencies {
                 implementation(project)
                 runtimeOnly(project(":komapper-dialect-oracle-r2dbc"))
             }
         }
 
-        register("postgresql", JvmTestSuite::class) {
-            setup(name)
+        register("quote", JvmTestSuite::class) {
+            setup("oracle", includeTags = arrayOf(name))
             dependencies {
                 implementation(project)
-                runtimeOnly(project(":komapper-dialect-postgresql-r2dbc"))
+                runtimeOnly(project(":komapper-dialect-oracle-r2dbc"))
             }
         }
 
-        register("sqlserver", JvmTestSuite::class) {
-            setup(name)
+        register("dataType", JvmTestSuite::class) {
+            setup("oracle", includeTags = arrayOf(name))
             dependencies {
                 implementation(project)
-                runtimeOnly(project(":komapper-dialect-sqlserver-r2dbc"))
-                runtimeOnly("com.microsoft.sqlserver:mssql-jdbc:9.4.1.jre11")
+                runtimeOnly(project(":komapper-dialect-oracle-r2dbc"))
+            }
+        }
+
+        register("schema", JvmTestSuite::class) {
+            setup("oracle", includeTags = arrayOf(name))
+            dependencies {
+                implementation(project)
+                runtimeOnly(project(":komapper-dialect-oracle-r2dbc"))
+            }
+        }
+
+        register("script", JvmTestSuite::class) {
+            setup("oracle", includeTags = arrayOf(name))
+            dependencies {
+                implementation(project)
+                runtimeOnly(project(":komapper-dialect-oracle-r2dbc"))
+            }
+        }
+
+        register("valueClass", JvmTestSuite::class) {
+            setup("oracle", includeTags = arrayOf(name))
+            dependencies {
+                implementation(project)
+                runtimeOnly(project(":komapper-dialect-oracle-r2dbc"))
             }
         }
     }

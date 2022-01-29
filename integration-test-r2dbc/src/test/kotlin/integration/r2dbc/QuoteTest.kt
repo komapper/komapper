@@ -9,6 +9,7 @@ import integration.schemaOnly
 import integration.setting.Dbms
 import integration.setting.Run
 import org.junit.jupiter.api.Tag
+import org.junit.jupiter.api.Tags
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
@@ -18,7 +19,13 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-@Tag("lowPriority")
+@Tags(
+    value = [
+        Tag("lowPriority"),
+        Tag("quote")
+    ]
+)
+
 @ExtendWith(Env::class)
 class QuoteTest(val db: R2dbcDatabase) {
 

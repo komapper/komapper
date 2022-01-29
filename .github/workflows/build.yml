@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        driver: [oracleLowPriority]
+        driver: [composition, literal, operator, quote, dataType, schema, script, valueClass]
     timeout-minutes: 15
 
     steps:

@@ -8,6 +8,7 @@ import integration.compositeKey
 import integration.sequenceTable
 import org.junit.jupiter.api.RepeatedTest
 import org.junit.jupiter.api.Tag
+import org.junit.jupiter.api.Tags
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
@@ -16,7 +17,12 @@ import org.komapper.core.dsl.query.andThen
 import org.komapper.r2dbc.R2dbcDatabase
 import kotlin.test.Test
 
-@Tag("lowPriority")
+@Tags(
+    value = [
+        Tag("lowPriority"),
+        Tag("schema")
+    ]
+)
 @ExtendWith(Env::class)
 class SchemaTest(private val db: R2dbcDatabase) {
 
