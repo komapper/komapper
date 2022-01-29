@@ -36,24 +36,6 @@ testing {
             }
         }
 
-        register("mariadb", JvmTestSuite::class) {
-            setup(name)
-            dependencies {
-                implementation(project)
-                runtimeOnly(project(":komapper-dialect-mariadb-r2dbc"))
-                runtimeOnly("org.mariadb.jdbc:mariadb-java-client:3.0.3")
-            }
-        }
-
-        register("mysql", JvmTestSuite::class) {
-            setup(name)
-            dependencies {
-                implementation(project)
-                runtimeOnly(project(":komapper-dialect-mysql-r2dbc"))
-                runtimeOnly("mysql:mysql-connector-java:8.0.28")
-            }
-        }
-
         register("oracle", JvmTestSuite::class) {
             setup(name)
             dependencies {
@@ -62,38 +44,22 @@ testing {
             }
         }
 
-        register("oracleLowPriority", JvmTestSuite::class) {
-            setup("oracle", includeTags = arrayOf("lowPriority"))
+        register("reproduction1", JvmTestSuite::class) {
+            setup("oracle", includeTags = arrayOf(name))
             dependencies {
                 implementation(project)
                 runtimeOnly(project(":komapper-dialect-oracle-r2dbc"))
             }
         }
 
-        register("oracleHighPriority", JvmTestSuite::class) {
-            setup("oracle", excludeTags = arrayOf("lowPriority"))
+        register("reproduction2", JvmTestSuite::class) {
+            setup("oracle", includeTags = arrayOf(name))
             dependencies {
                 implementation(project)
                 runtimeOnly(project(":komapper-dialect-oracle-r2dbc"))
             }
         }
 
-        register("postgresql", JvmTestSuite::class) {
-            setup(name)
-            dependencies {
-                implementation(project)
-                runtimeOnly(project(":komapper-dialect-postgresql-r2dbc"))
-            }
-        }
-
-        register("sqlserver", JvmTestSuite::class) {
-            setup(name)
-            dependencies {
-                implementation(project)
-                runtimeOnly(project(":komapper-dialect-sqlserver-r2dbc"))
-                runtimeOnly("com.microsoft.sqlserver:mssql-jdbc:9.4.1.jre11")
-            }
-        }
     }
 }
 

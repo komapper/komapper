@@ -34,7 +34,7 @@ interface R2dbcDatabaseConfig : DatabaseConfig {
 }
 
 class DefaultR2dbcDatabaseConfig(
-    connectionFactory: ConnectionFactory,
+    val connectionFactory: ConnectionFactory,
     override val dialect: R2dbcDialect
 ) : R2dbcDatabaseConfig {
 
