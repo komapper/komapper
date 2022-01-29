@@ -2,9 +2,10 @@ package org.komapper.tx.r2dbc
 
 import io.r2dbc.spi.Connection
 import io.r2dbc.spi.IsolationLevel
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.reactive.asPublisher
 import kotlinx.coroutines.reactive.awaitFirstOrNull
 import org.reactivestreams.Publisher
-import org.reactivestreams.Subscription
 
 interface TransactionConnection : Connection {
     suspend fun initialize()
@@ -44,15 +45,6 @@ internal class TransactionConnectionImpl(
     }
 
     override fun close(): Publisher<Void> {
-        return Publisher<Void> { s ->
-            s.onSubscribe(object : Subscription {
-                override fun request(n: Long) {
-                }
-
-                override fun cancel() {
-                }
-            })
-            s.onComplete()
-        }
+        return emptyFlow<Void>().asPublisher()
     }
 }
