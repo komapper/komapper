@@ -48,7 +48,6 @@ class OperatorTest(private val db: R2dbcDatabase) {
         assertEquals(11, result)
     }
 
-    @Tag("suspicious")
     @Test
     fun plus_other_column() = inTransaction(db) {
         val a = Meta.address
