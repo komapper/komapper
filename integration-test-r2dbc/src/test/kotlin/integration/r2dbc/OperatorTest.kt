@@ -259,7 +259,7 @@ class OperatorTest(private val db: R2dbcDatabase) {
     fun literal() = inTransaction(db) {
         val a = Meta.address
         val result = db.runQuery {
-            QueryDsl.from(a).select(literal("test")).first()
+            QueryDsl.from(a).where { a.addressId eq 1 }.select(literal("test")).first()
         }
         assertEquals("test", result)
     }
