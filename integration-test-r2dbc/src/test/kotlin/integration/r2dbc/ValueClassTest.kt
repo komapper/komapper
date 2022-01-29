@@ -199,7 +199,7 @@ class ValueClassTest(val db: R2dbcDatabase) {
     fun select_single() = inTransaction(db) {
         val a = Meta.vAddress
         val result = db.runQuery {
-            QueryDsl.from(a).orderBy(a.addressId).select(a.street).first()
+            QueryDsl.from(a).where { a.addressId eq IntId(1) }.orderBy(a.addressId).select(a.street).first()
         }
         assertEquals(Street("STREET 1"), result)
     }
@@ -208,7 +208,7 @@ class ValueClassTest(val db: R2dbcDatabase) {
     fun select_pair() = inTransaction(db) {
         val a = Meta.vAddress
         val result = db.runQuery {
-            QueryDsl.from(a).orderBy(a.addressId).select(a.addressId, a.street).first()
+            QueryDsl.from(a).where { a.addressId eq IntId(1) }.orderBy(a.addressId).select(a.addressId, a.street).first()
         }
         assertEquals(IntId(1) to Street("STREET 1"), result)
     }
@@ -235,7 +235,7 @@ class ValueClassTest(val db: R2dbcDatabase) {
     fun expression_plus() = inTransaction(db) {
         val a = Meta.vAddress
         val result = db.runQuery {
-            QueryDsl.from(a).orderBy(a.addressId).select(a.addressId + IntId(100)).first()
+            QueryDsl.from(a).where { a.addressId eq IntId(1) }.orderBy(a.addressId).select(a.addressId + IntId(100)).first()
         }
         assertEquals(IntId(101), result)
     }
@@ -244,7 +244,7 @@ class ValueClassTest(val db: R2dbcDatabase) {
     fun expression_concat() = inTransaction(db) {
         val a = Meta.vAddress
         val result = db.runQuery {
-            QueryDsl.from(a).orderBy(a.addressId).select(concat(Street("["), concat(a.street, Street("]")))).first()
+            QueryDsl.from(a).where { a.addressId eq IntId(1) }.orderBy(a.addressId).select(concat(Street("["), concat(a.street, Street("]")))).first()
         }
         assertEquals(Street("[STREET 1]"), result)
     }
