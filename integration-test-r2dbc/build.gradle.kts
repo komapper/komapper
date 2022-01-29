@@ -62,6 +62,22 @@ testing {
             }
         }
 
+        register("oracleLowPriority", JvmTestSuite::class) {
+            setup("oracle", includeTags = arrayOf("lowPriority"))
+            dependencies {
+                implementation(project)
+                runtimeOnly(project(":komapper-dialect-oracle-r2dbc"))
+            }
+        }
+
+        register("oracleHighPriority", JvmTestSuite::class) {
+            setup("oracle", excludeTags = arrayOf("lowPriority"))
+            dependencies {
+                implementation(project)
+                runtimeOnly(project(":komapper-dialect-oracle-r2dbc"))
+            }
+        }
+
         register("postgresql", JvmTestSuite::class) {
             setup(name)
             dependencies {
@@ -81,7 +97,7 @@ testing {
     }
 }
 
-fun JvmTestSuite.setup(driver: String) {
+fun JvmTestSuite.setup(driver: String, includeTags: Array<String> = emptyArray(), excludeTags: Array<String> = emptyArray()) {
     useJUnitJupiter()
     sources {
         java {
@@ -98,6 +114,10 @@ fun JvmTestSuite.setup(driver: String) {
                 val url = project.property(urlKey) ?: throw GradleException("The $urlKey property is not found.")
                 systemProperty("driver", driver)
                 systemProperty("url", url)
+                useJUnitPlatform {
+                    includeTags(*includeTags)
+                    excludeTags(*excludeTags)
+                }
             }
         }
     }

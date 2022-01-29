@@ -14,6 +14,7 @@ import integration.vIdentityStrategy
 import integration.vPerson
 import integration.vSequenceStrategy
 import kotlinx.coroutines.delay
+import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
@@ -32,6 +33,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 import kotlin.test.assertNotNull
 
+@Tag("lowPriority")
 @ExtendWith(Env::class)
 class ValueClassTest(val db: R2dbcDatabase) {
 

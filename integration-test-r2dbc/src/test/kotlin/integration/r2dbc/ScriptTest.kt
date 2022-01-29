@@ -2,6 +2,7 @@ package integration.r2dbc
 
 import integration.setting.Dbms
 import integration.setting.Run
+import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.ScriptDsl
 import org.komapper.core.dsl.TemplateDsl
@@ -10,6 +11,7 @@ import org.komapper.r2dbc.R2dbcDatabase
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
+@Tag("lowPriority")
 @ExtendWith(Env::class)
 internal class ScriptTest(private val db: R2dbcDatabase) {
 

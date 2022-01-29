@@ -2,6 +2,7 @@ package integration.r2dbc
 
 import integration.Direction
 import integration.enumTest
+import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
@@ -10,6 +11,7 @@ import org.komapper.r2dbc.R2dbcDatabase
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
+@Tag("lowPriority")
 @ExtendWith(Env::class)
 class R2dbcDataTypeTest(val db: R2dbcDatabase) {
 

@@ -86,7 +86,7 @@ jobs:
     strategy:
       matrix:
         # Exclude mariadb and mysql drivers.
-        driver: [h2, oracle, postgresql, sqlserver]
+        driver: [h2, oracleLowPriority, oracleHighPriority, postgresql, sqlserver]
     timeout-minutes: 15
 
     steps:
