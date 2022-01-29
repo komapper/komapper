@@ -71,6 +71,7 @@ class OperatorTest(private val db: R2dbcDatabase) {
         assertEquals(20, result)
     }
 
+    @Tag("suspicious")
     @Order(2)
     @Test
     fun list() = inTransaction(db) {
