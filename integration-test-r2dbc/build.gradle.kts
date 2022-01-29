@@ -24,6 +24,14 @@ tasks {
     check {
         dependsOn(testing.suites.named("h2"))
     }
+    register("checkAll") {
+        dependsOn(
+            testing.suites.named("h2"),
+            testing.suites.named("oracle"),
+            testing.suites.named("postgresql"),
+            testing.suites.named("sqlserver"),
+        )
+    }
 }
 
 testing {
@@ -81,7 +89,11 @@ testing {
     }
 }
 
-fun JvmTestSuite.setup(driver: String, includeTags: Array<String> = emptyArray(), excludeTags: Array<String> = emptyArray()) {
+fun JvmTestSuite.setup(
+    driver: String,
+    includeTags: Array<String> = emptyArray(),
+    excludeTags: Array<String> = emptyArray()
+) {
     useJUnitJupiter()
     sources {
         java {
