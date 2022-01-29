@@ -48,6 +48,7 @@ class OperatorTest(private val db: R2dbcDatabase) {
         assertEquals(11, result)
     }
 
+    @Tag("suspicious")
     @Test
     fun plus_other_column() = inTransaction(db) {
         val a = Meta.address
@@ -160,6 +161,7 @@ class OperatorTest(private val db: R2dbcDatabase) {
         assertEquals(0, result)
     }
 
+    @Tag("suspicious")
     @Test
     fun concat() = inTransaction(db) {
         val a = Meta.address
@@ -176,6 +178,7 @@ class OperatorTest(private val db: R2dbcDatabase) {
         assertEquals("[STREET 10]", result)
     }
 
+    @Tag("suspicious")
     @Test
     fun concat_other_column() = inTransaction(db) {
         val a = Meta.address
@@ -228,6 +231,7 @@ class OperatorTest(private val db: R2dbcDatabase) {
         assertEquals("test ", result)
     }
 
+    @Tag("suspicious")
     @Test
     fun rtrimFunction() = inTransaction(db) {
         val a = Meta.address

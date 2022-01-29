@@ -99,6 +99,15 @@ testing {
                 runtimeOnly(project(":komapper-dialect-oracle-r2dbc"))
             }
         }
+
+        register("suspicious", JvmTestSuite::class) {
+            setup("oracle", includeTags = arrayOf(name))
+            dependencies {
+                implementation(project)
+                runtimeOnly(project(":komapper-dialect-oracle-r2dbc"))
+            }
+        }
+
     }
 }
 

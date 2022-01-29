@@ -12,8 +12,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        driver: [composition, literal, operator, quote, dataType, schema, script, valueClass]
-    timeout-minutes: 15
+        driver: [suspicious]
+    timeout-minutes: 10
 
     steps:
       - uses: actions/checkout@v2
