@@ -237,7 +237,6 @@ class ValueClassTest(val db: R2dbcDatabase) {
         assertEquals(IntId(15), max)
     }
 
-    @Tag("suspicious")
     @Test
     fun expression_plus() = inTransaction(db) {
         val a = Meta.vAddress
@@ -247,7 +246,6 @@ class ValueClassTest(val db: R2dbcDatabase) {
         assertEquals(IntId(101), result)
     }
 
-    @Tag("suspicious")
     @Test
     fun expression_concat() = inTransaction(db) {
         val a = Meta.vAddress

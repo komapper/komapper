@@ -32,7 +32,6 @@ import kotlin.test.assertEquals
 @ExtendWith(Env::class)
 class OperatorTest(private val db: R2dbcDatabase) {
 
-    @Tag("suspicious")
     @Test
     fun plus() = inTransaction(db) {
         val a = Meta.address
