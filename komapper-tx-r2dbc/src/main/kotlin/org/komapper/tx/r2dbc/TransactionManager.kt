@@ -133,11 +133,8 @@ internal class TransactionManagerImpl(
 
     private suspend fun rollbackInternal(tx: Transaction) {
         val connection = tx.connection
-        try {
-            connection.rollbackTransaction().awaitFirstOrNull()
-            loggerFacade.rollback(tx.id)
-        } catch (ignored: Exception) {
-        }
+        connection.rollbackTransaction().awaitFirstOrNull()
+        loggerFacade.rollback(tx.id)
         release(tx)
     }
 
