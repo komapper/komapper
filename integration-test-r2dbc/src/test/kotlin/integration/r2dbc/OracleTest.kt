@@ -23,7 +23,8 @@ class OracleTest(val db: R2dbcDatabase) {
             val result = statement.execute().awaitFirst()
             val value = result.map { row, _ -> row.get(0) }.awaitFirst()
             println(value)
-            con.rollbackTransaction()
+            con.rollbackTransaction().awaitFirstOrNull()
+            con.close().awaitFirstOrNull()
         }
         config.connectionFactory.create().awaitFirst().let { con ->
             con.beginTransaction().awaitFirstOrNull()
@@ -31,7 +32,8 @@ class OracleTest(val db: R2dbcDatabase) {
             val result = statement.execute().awaitFirst()
             val value = result.map { row, _ -> row.get(0) }.awaitFirst()
             println(value)
-            con.rollbackTransaction()
+            con.rollbackTransaction().awaitFirstOrNull()
+            con.close().awaitFirstOrNull()
         }
     }
 
@@ -47,6 +49,7 @@ class OracleTest(val db: R2dbcDatabase) {
             val value = result.map { row, _ -> row.get(0) }.awaitFirst()
             println(value)
             con.rollbackTransaction().awaitFirstOrNull()
+            con.close().awaitFirstOrNull()
         }
         config.connectionFactory.create().awaitFirst().let { con ->
             con.beginTransaction().awaitFirstOrNull()
@@ -55,6 +58,7 @@ class OracleTest(val db: R2dbcDatabase) {
             val value = result.map { row, _ -> row.get(0) }.awaitFirst()
             println(value)
             con.rollbackTransaction().awaitFirstOrNull()
+            con.close().awaitFirstOrNull()
         }
     }
 
