@@ -1,7 +1,7 @@
 package org.komapper.jdbc.dsl.runner
 
 import org.komapper.core.DatabaseConfig
-import org.komapper.core.Statement
+import org.komapper.core.DryRunStatement
 import org.komapper.core.dsl.context.TemplateExecuteContext
 import org.komapper.core.dsl.runner.TemplateExecuteRunner
 import org.komapper.jdbc.JdbcDatabaseConfig
@@ -20,7 +20,7 @@ internal class TemplateExecuteJdbcRunner(
         return count
     }
 
-    override fun dryRun(config: DatabaseConfig): Statement {
+    override fun dryRun(config: DatabaseConfig): DryRunStatement {
         return runner.dryRun(config)
     }
 }

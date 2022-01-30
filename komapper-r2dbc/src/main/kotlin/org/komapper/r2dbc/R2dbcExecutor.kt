@@ -76,24 +76,22 @@ internal class R2dbcExecutor(
     }
 
     @OptIn(kotlinx.coroutines.FlowPreview::class)
-    suspend fun execute(statement: Statement) {
+    suspend fun execute(statements: List<Statement>) {
         @Suppress("NAME_SHADOWING")
-        val statement = inspect(statement)
+        val statements = statements.map { inspect(it) }
         return config.session.connection.toFlow().flatMapConcat { con ->
             con.use {
                 val batch = con.createBatch()
-                for (each in asSql(statement).split(";")) {
-                    val sql = each.trim()
-                    if (sql.isNotEmpty()) {
-                        batch.add(sql)
-                    }
+                for (statement in statements) {
+                    val sql = asSql(statement)
+                    batch.add(sql)
                 }
                 batch.execute().toFlow().flatMapConcat { result ->
                     result.rowsUpdated.toFlow()
                 }
             }
         }.onStart {
-            log(statement)
+            statements.forEach(::log)
         }.catch {
             handleException(it)
         }.collect()

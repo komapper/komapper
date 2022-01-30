@@ -61,24 +61,54 @@ data class Statement(val parts: List<StatementPart>) {
         }
     }
 
-    /**
-     * Composes the SQL statement.
-     *
-     * @param other the other SQL statement
-     */
-    infix operator fun plus(other: Statement): Statement {
-        val separator =
-            if (this.parts.isEmpty() || this.parts.last().trimEnd().endsWith(";")) "" else ";"
-        val parts = this.parts + StatementPart.Text(separator) + other.parts
-        return Statement(parts)
-    }
-
-    /**
+/**
      * Adds a part of the SQL statement.
      *
      * @param text a part of the SQL statement
      */
     infix operator fun plus(text: CharSequence): Statement {
         return copy(parts = parts + StatementPart.Text(text))
+    }
+}
+
+data class DryRunStatement internal constructor(
+    val sql: String = "",
+    val sqlWithArgs: String = "",
+    val args: List<Value> = emptyList(),
+) {
+
+    companion object {
+        val EMPTY = DryRunStatement()
+
+        fun of(statement: Statement, dialect: Dialect): DryRunStatement {
+            val sql = statement.toSql(dialect::createBindVariable)
+            val sqlWithArgs = statement.toSqlWithArgs(dialect::formatValue)
+            return DryRunStatement(sql = sql, sqlWithArgs = sqlWithArgs, args = statement.args)
+        }
+
+        fun of(statements: List<Statement>, dialect: Dialect): DryRunStatement {
+            val sql = statements.joinToString(separator = ";") { it.toSql(dialect::createBindVariable) }
+            val sqlWithArgs = statements.joinToString { it.toSqlWithArgs(dialect::formatValue) }
+            val args = statements.fold(emptyList<Value>()) { acc, statement -> acc + statement.args }
+            return DryRunStatement(sql = sql, sqlWithArgs = sqlWithArgs, args = args)
+        }
+    }
+
+    /**
+     * Composes the statement.
+     *
+     * @param other the other statement
+     */
+    infix operator fun plus(other: DryRunStatement): DryRunStatement {
+        return DryRunStatement(
+            sql = concat(sql, other.sql),
+            sqlWithArgs = concat(sqlWithArgs, other.sqlWithArgs),
+            args = args + other.args
+        )
+    }
+
+    private fun concat(left: String, right: String): String {
+        val separator = if (sql.isEmpty() || sql.trimEnd().endsWith(";")) "" else ";"
+        return left + separator + right
     }
 }

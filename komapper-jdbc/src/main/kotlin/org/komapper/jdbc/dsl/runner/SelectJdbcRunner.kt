@@ -2,7 +2,7 @@ package org.komapper.jdbc.dsl.runner
 
 import kotlinx.coroutines.flow.Flow
 import org.komapper.core.DatabaseConfig
-import org.komapper.core.Statement
+import org.komapper.core.DryRunStatement
 import org.komapper.core.dsl.context.SelectContext
 import org.komapper.core.dsl.runner.SelectRunner
 import org.komapper.jdbc.JdbcDatabaseConfig
@@ -25,7 +25,7 @@ internal class SelectJdbcRunner<T, R>(
         return executor.executeQuery(statement, transform, collect)
     }
 
-    override fun dryRun(config: DatabaseConfig): Statement {
+    override fun dryRun(config: DatabaseConfig): DryRunStatement {
         return runner.dryRun(config)
     }
 }

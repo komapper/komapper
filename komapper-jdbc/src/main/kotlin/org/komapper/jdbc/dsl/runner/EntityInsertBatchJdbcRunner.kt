@@ -1,7 +1,7 @@
 package org.komapper.jdbc.dsl.runner
 
 import org.komapper.core.DatabaseConfig
-import org.komapper.core.Statement
+import org.komapper.core.DryRunStatement
 import org.komapper.core.dsl.context.EntityInsertContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.runner.EntityInsertBatchRunner
@@ -46,7 +46,7 @@ internal class EntityInsertBatchJdbcRunner<ENTITY : Any, ID : Any, META : Entity
         }
     }
 
-    override fun dryRun(config: DatabaseConfig): Statement {
+    override fun dryRun(config: DatabaseConfig): DryRunStatement {
         return runner.dryRun(config)
     }
 }

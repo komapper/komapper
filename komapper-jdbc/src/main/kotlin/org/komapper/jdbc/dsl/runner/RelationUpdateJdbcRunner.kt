@@ -1,7 +1,7 @@
 package org.komapper.jdbc.dsl.runner
 
 import org.komapper.core.DatabaseConfig
-import org.komapper.core.Statement
+import org.komapper.core.DryRunStatement
 import org.komapper.core.dsl.context.RelationUpdateContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.runner.RelationUpdateRunner
@@ -26,7 +26,7 @@ internal class RelationUpdateJdbcRunner<ENTITY : Any, ID : Any, META : EntityMet
         } else 0
     }
 
-    override fun dryRun(config: DatabaseConfig): Statement {
+    override fun dryRun(config: DatabaseConfig): DryRunStatement {
         return runner.dryRun(config)
     }
 }

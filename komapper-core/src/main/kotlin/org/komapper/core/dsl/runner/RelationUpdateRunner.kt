@@ -1,6 +1,7 @@
 package org.komapper.core.dsl.runner
 
 import org.komapper.core.DatabaseConfig
+import org.komapper.core.DryRunStatement
 import org.komapper.core.Statement
 import org.komapper.core.dsl.builder.RelationUpdateStatementBuilder
 import org.komapper.core.dsl.builder.getAssignments
@@ -13,11 +14,12 @@ class RelationUpdateRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY
     private val context: RelationUpdateContext<ENTITY, ID, META>,
 ) : Runner {
 
-    override fun dryRun(config: DatabaseConfig): Statement {
+    override fun dryRun(config: DatabaseConfig): DryRunStatement {
         val clock = config.clockProvider.now()
         val updatedAtAssignment = context.target.updatedAtAssignment(clock)
         val result = buildStatement(config, updatedAtAssignment)
-        return result.getOrThrow()
+        val statement = result.getOrThrow()
+        return DryRunStatement.of(statement, config.dialect)
     }
 
     fun buildStatement(

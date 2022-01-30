@@ -117,20 +117,16 @@ internal class JdbcExecutor(
         }
     }
 
-// TODO
-    fun execute(statement: Statement) {
+    fun execute(statements: List<Statement>) {
         @Suppress("NAME_SHADOWING")
-        val statement = inspect(statement)
+        val statements = statements.map { inspect(it) }
         executeWithExceptionCheck {
             config.session.connection.use { con ->
-                log(statement)
-                con.createStatement().use { s ->
-                    s.let(::setUp)
-                    for (each in asSql(statement).split(";")) {
-                        val sql = each.trim()
-                        if (sql.isNotEmpty()) {
-                            s.execute(sql)
-                        }
+                for (statement in statements) {
+                    log(statement)
+                    con.createStatement().use { s ->
+                        setUp(s)
+                        s.execute(asSql(statement))
                     }
                 }
             }

@@ -1,7 +1,7 @@
 package org.komapper.r2dbc.dsl.runner
 
 import org.komapper.core.DatabaseConfig
-import org.komapper.core.Statement
+import org.komapper.core.DryRunStatement
 import org.komapper.core.dsl.runner.Runner
 import org.komapper.r2dbc.R2dbcDatabaseConfig
 
@@ -18,7 +18,7 @@ internal sealed interface R2dbcRunner<T> : Runner {
             return right.run(config)
         }
 
-        override fun dryRun(config: DatabaseConfig): Statement {
+        override fun dryRun(config: DatabaseConfig): DryRunStatement {
             return left.dryRun(config) + right.dryRun(config)
         }
     }
@@ -33,7 +33,7 @@ internal sealed interface R2dbcRunner<T> : Runner {
             return transform(value)
         }
 
-        override fun dryRun(config: DatabaseConfig): Statement {
+        override fun dryRun(config: DatabaseConfig): DryRunStatement {
             return runner.dryRun(config)
         }
     }
@@ -49,7 +49,7 @@ internal sealed interface R2dbcRunner<T> : Runner {
             return first to second
         }
 
-        override fun dryRun(config: DatabaseConfig): Statement {
+        override fun dryRun(config: DatabaseConfig): DryRunStatement {
             return left.dryRun(config) + right.dryRun(config)
         }
     }
@@ -63,7 +63,7 @@ internal sealed interface R2dbcRunner<T> : Runner {
             return transform(value).run(config)
         }
 
-        override fun dryRun(config: DatabaseConfig): Statement {
+        override fun dryRun(config: DatabaseConfig): DryRunStatement {
             return runner.dryRun(config)
         }
     }
@@ -78,7 +78,7 @@ internal sealed interface R2dbcRunner<T> : Runner {
             return value to transform(value).run(config)
         }
 
-        override fun dryRun(config: DatabaseConfig): Statement {
+        override fun dryRun(config: DatabaseConfig): DryRunStatement {
             return runner.dryRun(config)
         }
     }

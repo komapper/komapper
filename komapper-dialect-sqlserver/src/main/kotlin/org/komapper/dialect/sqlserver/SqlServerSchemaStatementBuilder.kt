@@ -1,5 +1,7 @@
 package org.komapper.dialect.sqlserver
 
+import org.komapper.core.Statement
+import org.komapper.core.StatementBuffer
 import org.komapper.core.dsl.builder.AbstractSchemaStatementBuilder
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.metamodel.IdGenerator
@@ -8,15 +10,18 @@ import org.komapper.core.dsl.metamodel.PropertyMetamodel
 open class SqlServerSchemaStatementBuilder(dialect: SqlServerDialect) :
     AbstractSchemaStatementBuilder<SqlServerDialect>(dialect) {
 
-    override fun createSchema(metamodels: List<EntityMetamodel<*, *, *>>) {
+    override fun createSchema(metamodels: List<EntityMetamodel<*, *, *>>): List<Statement> {
+        val buf = StatementBuffer()
         val schemaNames = extractSchemaNames(metamodels)
         for (name in schemaNames) {
             buf.append("if not exists (select * from information_schema.schemata where schema_name = '$name') ")
-            buf.append("create schema if not exists ${dialect.enquote(name)};")
+            buf.append("create schema if not exists ${dialect.enquote(name)}")
         }
+        return listOf(buf.toStatement())
     }
 
-    override fun createTable(metamodel: EntityMetamodel<*, *, *>) {
+    override fun createTable(metamodel: EntityMetamodel<*, *, *>): List<Statement> {
+        val buf = StatementBuffer()
         val tableSchema = "coalesce(nullif('', '${metamodel.schemaName()}'), schema_name())"
         val tableName = "'${metamodel.tableName()}'"
         buf.append("if not exists (")
@@ -39,7 +44,8 @@ open class SqlServerSchemaStatementBuilder(dialect: SqlServerDialect) :
             p.getCanonicalColumnName(dialect::enquote)
         }
         buf.append(idList)
-        buf.append("));")
+        buf.append("))")
+        return listOf(buf.toStatement())
     }
 
     override fun resolveIdentity(property: PropertyMetamodel<*, *, *>): String {
@@ -50,7 +56,8 @@ open class SqlServerSchemaStatementBuilder(dialect: SqlServerDialect) :
         return if (idGenerator) " identity" else ""
     }
 
-    override fun createSequence(metamodel: EntityMetamodel<*, *, *>) {
+    override fun createSequence(metamodel: EntityMetamodel<*, *, *>): List<Statement> {
+        val buf = StatementBuffer()
         val idGenerator = metamodel.idGenerator()
         if (idGenerator is IdGenerator.Sequence<*, *>) {
             val sequenceSchema = "coalesce(nullif('', '${idGenerator.schemaName}'), schema_name())"
@@ -58,7 +65,8 @@ open class SqlServerSchemaStatementBuilder(dialect: SqlServerDialect) :
             buf.append("if (exists (")
             buf.append("select * from information_schema.sequences where sequence_schema = $sequenceSchema and sequence_name = $sequenceName")
             buf.append(")) ")
-            buf.append("create sequence ${idGenerator.getCanonicalSequenceName(dialect::enquote)} start with ${idGenerator.startWith} increment by ${idGenerator.incrementBy};")
+            buf.append("create sequence ${idGenerator.getCanonicalSequenceName(dialect::enquote)} start with ${idGenerator.startWith} increment by ${idGenerator.incrementBy}")
         }
+        return listOf(buf.toStatement())
     }
 }

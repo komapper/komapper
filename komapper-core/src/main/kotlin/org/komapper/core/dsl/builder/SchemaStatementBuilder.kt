@@ -8,44 +8,47 @@ import org.komapper.core.dsl.metamodel.IdGenerator
 import org.komapper.core.dsl.metamodel.PropertyMetamodel
 
 interface SchemaStatementBuilder {
-    fun create(metamodels: List<EntityMetamodel<*, *, *>>): Statement
-    fun drop(metamodels: List<EntityMetamodel<*, *, *>>): Statement
-    fun dropAll(): Statement
+    fun create(metamodels: List<EntityMetamodel<*, *, *>>): List<Statement>
+    fun drop(metamodels: List<EntityMetamodel<*, *, *>>): List<Statement>
+    fun dropAll(): List<Statement>
 }
 
 abstract class AbstractSchemaStatementBuilder<D : Dialect>(protected val dialect: D) : SchemaStatementBuilder {
 
-    protected val buf = StatementBuffer()
-
-    override fun create(metamodels: List<EntityMetamodel<*, *, *>>): Statement {
-        createSchema(metamodels)
+    override fun create(metamodels: List<EntityMetamodel<*, *, *>>): List<Statement> {
+        val statements = mutableListOf<Statement>()
+        statements.addAll(createSchema(metamodels))
         for (e in metamodels) {
-            createTable(e)
-            createSequence(e)
+            statements.addAll(createTable(e))
+            statements.addAll(createSequence(e))
         }
-        return buf.toStatement()
+        return statements.filter { it.parts.isNotEmpty() }
     }
 
-    override fun drop(metamodels: List<EntityMetamodel<*, *, *>>): Statement {
+    override fun drop(metamodels: List<EntityMetamodel<*, *, *>>): List<Statement> {
+        val statements = mutableListOf<Statement>()
         for (e in metamodels) {
-            dropTable(e)
-            dropSequence(e)
+            statements.addAll(dropTable(e))
+            statements.addAll(dropSequence(e))
         }
-        return buf.toStatement()
+        return statements.filter { it.parts.isNotEmpty() }
     }
 
-    override fun dropAll(): Statement {
+    override fun dropAll(): List<Statement> {
         throw UnsupportedOperationException()
     }
 
-    protected open fun createSchema(metamodels: List<EntityMetamodel<*, *, *>>) {
+    protected open fun createSchema(metamodels: List<EntityMetamodel<*, *, *>>): List<Statement> {
+        val buf = StatementBuffer()
         val schemaNames = extractSchemaNames(metamodels)
         for (name in schemaNames) {
-            buf.append("create schema if not exists ${dialect.enquote(name)};")
+            buf.append("create schema if not exists ${dialect.enquote(name)}")
         }
+        return listOf(buf.toStatement())
     }
 
-    protected open fun createTable(metamodel: EntityMetamodel<*, *, *>) {
+    protected open fun createTable(metamodel: EntityMetamodel<*, *, *>): List<Statement> {
+        val buf = StatementBuffer()
         val tableName = metamodel.getCanonicalTableName(dialect::enquote)
         buf.append("create table if not exists $tableName (")
         val columnDefinition = metamodel.properties().joinToString { p ->
@@ -63,7 +66,8 @@ abstract class AbstractSchemaStatementBuilder<D : Dialect>(protected val dialect
             p.getCanonicalColumnName(dialect::enquote)
         }
         buf.append(idList)
-        buf.append("));")
+        buf.append("))")
+        return listOf(buf.toStatement())
     }
 
     protected open fun resolveDataTypeName(property: PropertyMetamodel<*, *, *>): String {
@@ -78,22 +82,28 @@ abstract class AbstractSchemaStatementBuilder<D : Dialect>(protected val dialect
         return if (idGenerator) " auto_increment" else ""
     }
 
-    protected open fun createSequence(metamodel: EntityMetamodel<*, *, *>) {
+    protected open fun createSequence(metamodel: EntityMetamodel<*, *, *>): List<Statement> {
+        val buf = StatementBuffer()
         val idGenerator = metamodel.idGenerator()
         if (idGenerator is IdGenerator.Sequence<*, *>) {
-            buf.append("create sequence if not exists ${idGenerator.getCanonicalSequenceName(dialect::enquote)} start with ${idGenerator.startWith} increment by ${idGenerator.incrementBy};")
+            buf.append("create sequence if not exists ${idGenerator.getCanonicalSequenceName(dialect::enquote)} start with ${idGenerator.startWith} increment by ${idGenerator.incrementBy}")
         }
+        return listOf(buf.toStatement())
     }
 
-    protected open fun dropTable(metamodel: EntityMetamodel<*, *, *>) {
-        buf.append("drop table if exists ${metamodel.getCanonicalTableName(dialect::enquote)};")
+    protected open fun dropTable(metamodel: EntityMetamodel<*, *, *>): List<Statement> {
+        val buf = StatementBuffer()
+        buf.append("drop table if exists ${metamodel.getCanonicalTableName(dialect::enquote)}")
+        return listOf(buf.toStatement())
     }
 
-    protected open fun dropSequence(metamodel: EntityMetamodel<*, *, *>) {
+    protected open fun dropSequence(metamodel: EntityMetamodel<*, *, *>): List<Statement> {
+        val buf = StatementBuffer()
         val idGenerator = metamodel.idGenerator()
         if (idGenerator is IdGenerator.Sequence<*, *>) {
-            buf.append("drop sequence if exists ${idGenerator.getCanonicalSequenceName(dialect::enquote)};")
+            buf.append("drop sequence if exists ${idGenerator.getCanonicalSequenceName(dialect::enquote)}")
         }
+        return listOf(buf.toStatement())
     }
 
     protected open fun extractSchemaNames(metamodels: List<EntityMetamodel<*, *, *>>): List<String> {
@@ -111,7 +121,7 @@ object DryRunSchemaStatementBuilder : SchemaStatementBuilder {
         "Not supported to invoke the dryRun function with the default value."
     )
 
-    override fun create(metamodels: List<EntityMetamodel<*, *, *>>) = statement
-    override fun drop(metamodels: List<EntityMetamodel<*, *, *>>) = statement
-    override fun dropAll() = statement
+    override fun create(metamodels: List<EntityMetamodel<*, *, *>>): List<Statement> = emptyList()
+    override fun drop(metamodels: List<EntityMetamodel<*, *, *>>): List<Statement> = emptyList()
+    override fun dropAll(): List<Statement> = emptyList()
 }

@@ -1,7 +1,7 @@
 package org.komapper.jdbc.dsl.runner
 
 import org.komapper.core.DatabaseConfig
-import org.komapper.core.Statement
+import org.komapper.core.DryRunStatement
 import org.komapper.core.dsl.context.SelectContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.query.EntityStore
@@ -37,7 +37,7 @@ internal class EntityStoreJdbcRunner<ENTITY : Any, ID : Any, META : EntityMetamo
         return factory.create(metamodels, rows)
     }
 
-    override fun dryRun(config: DatabaseConfig): Statement {
+    override fun dryRun(config: DatabaseConfig): DryRunStatement {
         return runner.dryRun(config)
     }
 }

@@ -5,7 +5,6 @@ import org.komapper.core.DryRunDatabaseConfig
 import org.komapper.core.DryRunResult
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.visitor.DefaultQueryVisitor
-import org.komapper.core.toDryRunResult
 
 internal fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
 EntityMetamodel<ENTITY, ID, META>.checkIdValueNotNull(entity: ENTITY) {
@@ -47,5 +46,11 @@ fun Query<*>.dryRun(config: DatabaseConfig = DryRunDatabaseConfig): DryRunResult
             description = description
         )
     }
-    return statement.toDryRunResult(config.dialect, description)
+    return DryRunResult(
+        sql = statement.sql,
+        sqlWithArgs = statement.sqlWithArgs,
+        args = statement.args,
+        throwable = null,
+        description = description
+    )
 }
