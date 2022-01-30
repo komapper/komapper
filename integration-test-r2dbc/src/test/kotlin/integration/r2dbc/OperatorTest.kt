@@ -188,7 +188,9 @@ class OperatorTest(private val db: R2dbcDatabase) {
     fun lowerFunction() = inTransaction(db) {
         val a = Meta.address
         val result = db.runQuery {
-            QueryDsl.from(a).select(lower(literal("TEST"))).first()
+            QueryDsl.from(a).where {
+                a.addressId eq 10
+            }.select(lower(literal("TEST"))).first()
         }
         assertEquals("test", result)
     }
@@ -197,7 +199,9 @@ class OperatorTest(private val db: R2dbcDatabase) {
     fun upperFunction() = inTransaction(db) {
         val a = Meta.address
         val result = db.runQuery {
-            QueryDsl.from(a).select(upper(literal("test"))).first()
+            QueryDsl.from(a).where {
+                a.addressId eq 10
+            }.select(upper(literal("test"))).first()
         }
         assertEquals("TEST", result)
     }
@@ -206,7 +210,9 @@ class OperatorTest(private val db: R2dbcDatabase) {
     fun trimFunction() = inTransaction(db) {
         val a = Meta.address
         val result = db.runQuery {
-            QueryDsl.from(a).select(trim(literal(" test "))).first()
+            QueryDsl.from(a).where {
+                a.addressId eq 10
+            }.select(trim(literal(" test "))).first()
         }
         assertEquals("test", result)
     }
@@ -215,7 +221,9 @@ class OperatorTest(private val db: R2dbcDatabase) {
     fun ltrimFunction() = inTransaction(db) {
         val a = Meta.address
         val result = db.runQuery {
-            QueryDsl.from(a).select(ltrim(literal(" test "))).first()
+            QueryDsl.from(a).where {
+                a.addressId eq 10
+            }.select(ltrim(literal(" test "))).first()
         }
         assertEquals("test ", result)
     }
@@ -224,7 +232,9 @@ class OperatorTest(private val db: R2dbcDatabase) {
     fun rtrimFunction() = inTransaction(db) {
         val a = Meta.address
         val result = db.runQuery {
-            QueryDsl.from(a).select(rtrim(literal(" test "))).first()
+            QueryDsl.from(a).where {
+                a.addressId eq 10
+            }.select(rtrim(literal(" test "))).first()
         }
         assertEquals(" test", result)
     }

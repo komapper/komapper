@@ -24,6 +24,14 @@ tasks {
     check {
         dependsOn(testing.suites.named("h2"))
     }
+    register("checkAll") {
+        dependsOn(
+            testing.suites.named("h2"),
+            testing.suites.named("oracle"),
+            testing.suites.named("postgresql"),
+            testing.suites.named("sqlserver"),
+        )
+    }
 }
 
 testing {
@@ -81,7 +89,11 @@ testing {
     }
 }
 
-fun JvmTestSuite.setup(driver: String) {
+fun JvmTestSuite.setup(
+    driver: String,
+    includeTags: Array<String> = emptyArray(),
+    excludeTags: Array<String> = emptyArray()
+) {
     useJUnitJupiter()
     sources {
         java {
@@ -98,6 +110,10 @@ fun JvmTestSuite.setup(driver: String) {
                 val url = project.property(urlKey) ?: throw GradleException("The $urlKey property is not found.")
                 systemProperty("driver", driver)
                 systemProperty("url", url)
+                useJUnitPlatform {
+                    includeTags(*includeTags)
+                    excludeTags(*excludeTags)
+                }
             }
         }
     }

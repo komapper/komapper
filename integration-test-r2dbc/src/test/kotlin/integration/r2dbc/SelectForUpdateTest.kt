@@ -17,10 +17,8 @@ class SelectForUpdateTest(private val db: R2dbcDatabase) {
     fun forUpdate() = inTransaction(db) {
         val a = Meta.address
         val list = db.runQuery {
-            QueryDsl.from(a).where { a.addressId greaterEq 1 }
+            QueryDsl.from(a).where { a.addressId inList listOf(9, 10) }
                 .orderBy(a.addressId.desc())
-                .limit(2)
-                .offset(5)
                 .forUpdate()
         }
         assertEquals(
