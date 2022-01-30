@@ -38,11 +38,26 @@ interface LoggerFacade {
     fun commit(transactionId: UUID)
 
     /**
+     * Logs the commit failure of transaction.
+     *
+     * @param transactionId the transaction id     * @param cause the cause of failure
+     */
+    fun commitFailed(transactionId: UUID, cause: Throwable)
+
+    /**
      * Logs the rollback of transaction.
      *
      * @param transactionId the transaction id
      */
     fun rollback(transactionId: UUID)
+
+    /**
+     * Logs the rollback failure of transaction.
+     *
+     * @param transactionId the transaction id
+     * @param cause the cause of failure
+     */
+    fun rollbackFailed(transactionId: UUID, cause: Throwable)
 }
 
 /**
@@ -73,9 +88,21 @@ class DefaultLoggerFacade(private val logger: Logger) : LoggerFacade {
         }
     }
 
+    override fun commitFailed(transactionId: UUID, cause: Throwable) {
+        logger.trace(LogCategory.TRANSACTION.value) {
+            "Commit of the transaction \"$transactionId\" failed."
+        }
+    }
+
     override fun rollback(transactionId: UUID) {
         logger.trace(LogCategory.TRANSACTION.value) {
             "The transaction \"$transactionId\" has rolled back."
+        }
+    }
+
+    override fun rollbackFailed(transactionId: UUID, cause: Throwable) {
+        logger.trace(LogCategory.TRANSACTION.value) {
+            "Rollback of the transaction \"$transactionId\" failed."
         }
     }
 }

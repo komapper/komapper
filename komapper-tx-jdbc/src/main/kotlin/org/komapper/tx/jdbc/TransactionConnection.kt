@@ -1,7 +1,6 @@
 package org.komapper.tx.jdbc
 
 import java.sql.Connection
-import java.sql.SQLException
 
 interface TransactionConnection : Connection {
     fun initialize()
@@ -30,18 +29,21 @@ internal class TransactionConnectionImpl(
     }
 
     override fun reset() {
-        if (isolationLevel != null && isolation != Connection.TRANSACTION_NONE) {
-            connection.transactionIsolation = isolation
-        }
-        if (autoCommitState) {
-            connection.autoCommit = true
+        kotlin.runCatching {
+            if (isolationLevel != null && isolation != Connection.TRANSACTION_NONE) {
+                connection.transactionIsolation = isolation
+            }
+            if (autoCommitState) {
+                connection.autoCommit = true
+            }
         }
     }
 
     override fun dispose() {
-        try {
-            connection.close()
-        } catch (ignored: SQLException) {
+        runCatching {
+            if (!connection.isClosed) {
+                connection.close()
+            }
         }
     }
 

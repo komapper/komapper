@@ -40,11 +40,11 @@ internal class TransactionScopeImpl(
     ): R {
         return if (transactionManager.isActive) {
             val tx = transactionManager.suspend()
-            try {
+            val result = runCatching {
                 executeInNewTransaction(isolationLevel, block)
-            } finally {
-                transactionManager.resume(tx)
             }
+            transactionManager.resume(tx)
+            result.getOrThrow()
         } else {
             executeInNewTransaction(isolationLevel, block)
         }
@@ -55,15 +55,19 @@ internal class TransactionScopeImpl(
         block: TransactionScope.() -> R
     ): R {
         transactionManager.begin(isolationLevel ?: defaultIsolationLevel)
-        try {
-            val result = block(this)
-            if (!transactionManager.isRollbackOnly) {
+        return runCatching {
+            block(this)
+        }.onFailure {
+            runCatching {
+                transactionManager.rollback()
+            }
+        }.onSuccess {
+            if (transactionManager.isRollbackOnly) {
+                transactionManager.rollback()
+            } else {
                 transactionManager.commit()
             }
-            return result
-        } finally {
-            transactionManager.rollback()
-        }
+        }.getOrThrow()
     }
 
     override fun setRollbackOnly() {
