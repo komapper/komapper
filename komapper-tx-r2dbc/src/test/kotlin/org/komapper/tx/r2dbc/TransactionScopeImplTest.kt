@@ -154,7 +154,7 @@ internal class TransactionScopeImplTest {
 
     @Test
     fun isolationLevel() = runBlocking {
-        txScope.run(isolationLevel = IsolationLevel.SERIALIZABLE) {
+        txScope.run(transactionDefinition = IsolationLevel.SERIALIZABLE) {
             repository.delete(15)
         }
         txScope.run {

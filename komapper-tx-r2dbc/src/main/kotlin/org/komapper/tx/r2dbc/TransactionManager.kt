@@ -3,7 +3,7 @@ package org.komapper.tx.r2dbc
 import io.r2dbc.spi.Connection
 import io.r2dbc.spi.ConnectionFactory
 import io.r2dbc.spi.ConnectionFactoryMetadata
-import io.r2dbc.spi.IsolationLevel
+import io.r2dbc.spi.TransactionDefinition
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.asContextElement
 import kotlinx.coroutines.flow.flowOf
@@ -24,7 +24,11 @@ interface TransactionManager {
     val isActive: Boolean
     val isRollbackOnly: Boolean
     fun setRollbackOnly()
-    suspend fun <R> begin(isolationLevel: IsolationLevel? = null, block: suspend CoroutineScope.() -> R): R
+    suspend fun <R> begin(
+        transactionDefinition: TransactionDefinition? = null,
+        block: suspend CoroutineScope.() -> R
+    ): R
+
     suspend fun commit()
     suspend fun suspend(): Transaction
     suspend fun resume(tx: Transaction)
@@ -71,19 +75,28 @@ internal class TransactionManagerImpl(
         }
     }
 
-    override suspend fun <R> begin(isolationLevel: IsolationLevel?, block: suspend CoroutineScope.() -> R): R {
+    override suspend fun <R> begin(
+        transactionDefinition: TransactionDefinition?,
+        block: suspend CoroutineScope.() -> R
+    ): R {
         val currentTx = threadLocal.get()
         if (currentTx.isActive()) {
             rollbackInternal(currentTx)
             error("The transaction \"$currentTx\" already has begun.")
         }
         val tx = internalConnectionFactory.create().awaitFirst().let { con ->
-            val txCon = TransactionConnectionImpl(con, isolationLevel).apply {
-                initialize()
-            }
+            val txCon = TransactionConnectionImpl(con)
             TransactionImpl(txCon)
         }
-        tx.connection.beginTransaction().awaitFirstOrNull()
+        runCatching {
+            if (transactionDefinition == null) {
+                tx.connection.beginTransaction().awaitFirstOrNull()
+            } else {
+                tx.connection.beginTransaction(transactionDefinition).awaitFirstOrNull()
+            }
+        }.onFailure {
+            tx.connection.dispose()
+        }.getOrThrow()
         loggerFacade.begin(tx.id)
         val context = threadLocal.asContextElement(tx)
         return withContext(context, block)
@@ -95,15 +108,17 @@ internal class TransactionManagerImpl(
             error("A transaction hasn't yet begun.")
         }
         val connection = tx.connection
-        try {
+        val result = runCatching {
             connection.commitTransaction().awaitFirstOrNull()
+        }.onFailure {
+            runCatching {
+                loggerFacade.commitFailed(tx.id, it)
+            }
+        }.onSuccess {
             loggerFacade.commit(tx.id)
-        } catch (e: Exception) {
-            rollbackInternal(tx)
-            throw e
-        } finally {
-            release(tx)
         }
+        rollbackInternal(tx)
+        result.getOrThrow()
     }
 
     override suspend fun suspend(): Transaction {
@@ -133,23 +148,21 @@ internal class TransactionManagerImpl(
 
     private suspend fun rollbackInternal(tx: Transaction) {
         val connection = tx.connection
-        try {
+        runCatching {
             connection.rollbackTransaction().awaitFirstOrNull()
+        }.onFailure {
+            runCatching {
+                loggerFacade.rollbackFailed(tx.id, it)
+            }
+        }.onSuccess {
             loggerFacade.rollback(tx.id)
-        } catch (ignored: Exception) {
-        } finally {
-            release(tx)
         }
+        release(tx)
     }
 
     private suspend fun release(tx: Transaction) {
         threadLocal.remove()
-        val connection = tx.connection
-        try {
-            connection.reset()
-        } catch (ignored: Exception) {
-        }
-        connection.dispose()
+        tx.connection.dispose()
     }
 }
 

@@ -1,6 +1,6 @@
 package org.komapper.tx.r2dbc
 
-import io.r2dbc.spi.IsolationLevel
+import io.r2dbc.spi.TransactionDefinition
 import org.komapper.core.ThreadSafe
 
 /**
@@ -15,18 +15,18 @@ interface UserTransaction {
      *
      * @param R the return type of the block
      * @param transactionAttribute the transaction attribute
-     * @param isolationLevel the isolation level
+     * @param transactionDefinition the transaction definition
      * @param block the block executed in the transaction
      * @return the result of the block
      */
     suspend fun <R> run(
         transactionAttribute: TransactionAttribute = TransactionAttribute.REQUIRED,
-        isolationLevel: IsolationLevel? = null,
+        transactionDefinition: TransactionDefinition? = null,
         block: suspend TransactionScope.() -> R
     ): R {
         return when (transactionAttribute) {
-            TransactionAttribute.REQUIRED -> required(isolationLevel, block)
-            TransactionAttribute.REQUIRES_NEW -> requiresNew(isolationLevel, block)
+            TransactionAttribute.REQUIRED -> required(transactionDefinition, block)
+            TransactionAttribute.REQUIRES_NEW -> requiresNew(transactionDefinition, block)
         }
     }
 
@@ -34,12 +34,12 @@ interface UserTransaction {
      * Begins a transaction with [TransactionAttribute.REQUIRED].
      *
      * @param R the return type of the block
-     * @param isolationLevel the isolation level
+     * @param transactionDefinition the transaction definition
      * @param block the block executed in the transaction
      * @return the result of the block
      */
     suspend fun <R> required(
-        isolationLevel: IsolationLevel? = null,
+        transactionDefinition: TransactionDefinition? = null,
         block: suspend TransactionScope.() -> R
     ): R
 
@@ -47,12 +47,12 @@ interface UserTransaction {
      * Begins a transaction with [TransactionAttribute.REQUIRES_NEW].
      *
      * @param R the return type of the block
-     * @param isolationLevel the isolation level
+     * @param transactionDefinition the transaction definition
      * @param block the block executed in the transaction
      * @return the result of the block
      */
     suspend fun <R> requiresNew(
-        isolationLevel: IsolationLevel? = null,
+        transactionDefinition: TransactionDefinition? = null,
         block: suspend TransactionScope.() -> R
     ): R
 }

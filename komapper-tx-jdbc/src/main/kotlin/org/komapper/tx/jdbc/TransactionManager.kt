@@ -3,7 +3,6 @@ package org.komapper.tx.jdbc
 import org.komapper.core.LoggerFacade
 import org.komapper.core.ThreadSafe
 import java.sql.Connection
-import java.sql.SQLException
 import javax.sql.DataSource
 
 /**
@@ -70,18 +69,13 @@ internal class TransactionManagerImpl(
             error("The transaction \"$currentTx\" already has begun.")
         }
         val tx = TransactionImpl {
-            val connection = try {
-                internalDataSource.connection
-            } catch (e: SQLException) {
-                throw e
-            }
+            val connection = internalDataSource.connection
             TransactionConnectionImpl(connection, isolationLevel).apply {
-                try {
+                runCatching {
                     initialize()
-                } catch (e: SQLException) {
+                }.onFailure {
                     dispose()
-                    throw e
-                }
+                }.getOrThrow()
             }
         }
         threadLocal.set(tx)
@@ -93,20 +87,22 @@ internal class TransactionManagerImpl(
         if (!tx.isActive()) {
             error("A transaction hasn't yet begun.")
         }
-        if (tx.isInitialized()) {
+        val result = if (tx.isInitialized()) {
             val connection = tx.connection
-            try {
+            runCatching {
                 connection.commit()
+            }.onFailure {
+                runCatching {
+                    loggerFacade.commitFailed(tx.id, it)
+                }
+            }.onSuccess {
                 loggerFacade.commit(tx.id)
-            } catch (e: SQLException) {
-                rollbackInternal(tx)
-                throw e
-            } finally {
-                release(tx)
             }
         } else {
-            release(tx)
+            Result.success(Unit)
         }
+        release(tx)
+        result.getOrThrow()
     }
 
     override fun suspend(): Transaction {
@@ -137,26 +133,24 @@ internal class TransactionManagerImpl(
     private fun rollbackInternal(tx: Transaction) {
         if (tx.isInitialized()) {
             val connection = tx.connection
-            try {
+            runCatching {
                 connection.rollback()
+            }.onFailure {
+                runCatching {
+                    loggerFacade.rollbackFailed(tx.id, it)
+                }
+            }.onSuccess {
                 loggerFacade.rollback(tx.id)
-            } catch (ignored: SQLException) {
-            } finally {
-                release(tx)
             }
-        } else {
-            release(tx)
         }
+        release(tx)
     }
 
     private fun release(tx: Transaction) {
         threadLocal.remove()
         if (tx.isInitialized()) {
             val connection = tx.connection
-            try {
-                connection.reset()
-            } catch (ignored: SQLException) {
-            }
+            connection.reset()
             connection.dispose()
         }
     }

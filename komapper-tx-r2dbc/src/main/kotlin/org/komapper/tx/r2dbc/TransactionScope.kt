@@ -1,6 +1,6 @@
 package org.komapper.tx.r2dbc
 
-import io.r2dbc.spi.IsolationLevel
+import io.r2dbc.spi.TransactionDefinition
 import org.komapper.core.Scope
 
 /**
@@ -21,50 +21,54 @@ interface TransactionScope : UserTransaction {
 
 internal class TransactionScopeImpl(
     private val transactionManager: TransactionManager,
-    private val defaultIsolationLevel: IsolationLevel? = null
+    private val defaultTransactionDefinition: TransactionDefinition? = null
 ) : TransactionScope {
 
     override suspend fun <R> required(
-        isolationLevel: IsolationLevel?,
+        transactionDefinition: TransactionDefinition?,
         block: suspend TransactionScope.() -> R
     ): R {
         return if (transactionManager.isActive) {
             block(this)
         } else {
-            executeInNewTransaction(isolationLevel, block)
+            executeInNewTransaction(transactionDefinition, block)
         }
     }
 
     override suspend fun <R> requiresNew(
-        isolationLevel: IsolationLevel?,
+        transactionDefinition: TransactionDefinition?,
         block: suspend TransactionScope.() -> R
     ): R {
         return if (transactionManager.isActive) {
             val tx = transactionManager.suspend()
-            try {
-                executeInNewTransaction(isolationLevel, block)
-            } finally {
-                transactionManager.resume(tx)
+            val result = runCatching {
+                executeInNewTransaction(transactionDefinition, block)
             }
+            transactionManager.resume(tx)
+            result.getOrThrow()
         } else {
-            executeInNewTransaction(isolationLevel, block)
+            executeInNewTransaction(transactionDefinition, block)
         }
     }
 
     private suspend fun <R> executeInNewTransaction(
-        isolationLevel: IsolationLevel?,
+        transactionDefinition: TransactionDefinition?,
         block: suspend TransactionScope.() -> R
     ): R {
-        return transactionManager.begin(isolationLevel ?: defaultIsolationLevel) {
-            try {
-                val result = block(this@TransactionScopeImpl)
-                if (!transactionManager.isRollbackOnly) {
+        return transactionManager.begin(transactionDefinition ?: defaultTransactionDefinition) {
+            runCatching {
+                block(this@TransactionScopeImpl)
+            }.onFailure {
+                kotlin.runCatching {
+                    transactionManager.rollback()
+                }
+            }.onSuccess {
+                if (transactionManager.isRollbackOnly) {
+                    transactionManager.rollback()
+                } else {
                     transactionManager.commit()
                 }
-                result
-            } finally {
-                transactionManager.rollback()
-            }
+            }.getOrThrow()
         }
     }
 
@@ -89,11 +93,17 @@ internal class TransactionScopeStub : TransactionScope {
         return isRollbackOnly
     }
 
-    override suspend fun <R> required(isolationLevel: IsolationLevel?, block: suspend TransactionScope.() -> R): R {
+    override suspend fun <R> required(
+        transactionDefinition: TransactionDefinition?,
+        block: suspend TransactionScope.() -> R
+    ): R {
         return block(this)
     }
 
-    override suspend fun <R> requiresNew(isolationLevel: IsolationLevel?, block: suspend TransactionScope.() -> R): R {
+    override suspend fun <R> requiresNew(
+        transactionDefinition: TransactionDefinition?,
+        block: suspend TransactionScope.() -> R
+    ): R {
         return block(this)
     }
 }
