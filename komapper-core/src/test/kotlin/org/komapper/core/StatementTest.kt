@@ -36,26 +36,4 @@ internal class StatementTest {
             statement.toSqlWithArgs { first, _, _ -> first.toString() }
         )
     }
-
-    @Test
-    fun plus() {
-        val a =
-            Statement(
-                listOf(
-                    StatementPart.Text("select * from employee where name = "),
-                    StatementPart.Value(Value("aaa")),
-                    StatementPart.Text(" and age = "),
-                    StatementPart.Value(Value(20))
-                ),
-            )
-        val b =
-            Statement(
-                listOf(
-                    StatementPart.Text("delete from employee where name = "),
-                    StatementPart.Value(Value("bbb"))
-                ),
-            )
-        val c = a + b
-        assertEquals("select * from employee where name = ? and age = ?;delete from employee where name = ?", c.toSql())
-    }
 }

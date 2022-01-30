@@ -1,7 +1,7 @@
 package org.komapper.r2dbc.dsl.runner
 
 import org.komapper.core.DatabaseConfig
-import org.komapper.core.Statement
+import org.komapper.core.DryRunStatement
 import org.komapper.core.dsl.context.EntityInsertContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.runner.EntityInsertSingleRunner
@@ -42,7 +42,7 @@ internal class EntityInsertSingleR2dbcRunner<ENTITY : Any, ID : Any, META : Enti
         }
     }
 
-    override fun dryRun(config: DatabaseConfig): Statement {
+    override fun dryRun(config: DatabaseConfig): DryRunStatement {
         return runner.dryRun(config)
     }
 }

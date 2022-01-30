@@ -1,6 +1,7 @@
 package org.komapper.core.dsl.runner
 
 import org.komapper.core.DatabaseConfig
+import org.komapper.core.DryRunStatement
 import org.komapper.core.Statement
 import org.komapper.core.dsl.context.ScriptContext
 
@@ -9,11 +10,16 @@ data class ScriptExecuteRunner(
 ) :
     Runner {
 
-    override fun dryRun(config: DatabaseConfig): Statement {
-        return buildStatement()
+    override fun dryRun(config: DatabaseConfig): DryRunStatement {
+        val statement = Statement(context.sql)
+        return DryRunStatement.of(statement, config.dialect)
     }
 
-    fun buildStatement(): Statement {
-        return Statement(context.sql)
+    fun buildStatements(): List<Statement> {
+        return context.sql.split(context.options.separator)
+            .asSequence()
+            .filter { it.isNotBlank() }
+            .map { Statement(it) }
+            .toList()
     }
 }
