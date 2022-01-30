@@ -4,8 +4,10 @@ import org.komapper.dialect.oracle.OracleDialect
 import org.komapper.r2dbc.AbstractR2dbcDialect
 import org.komapper.r2dbc.BigDecimalType
 import org.komapper.r2dbc.BigIntegerType
+import org.komapper.r2dbc.BlobType
 import org.komapper.r2dbc.ByteArrayType
 import org.komapper.r2dbc.ByteType
+import org.komapper.r2dbc.ClobType
 import org.komapper.r2dbc.DoubleType
 import org.komapper.r2dbc.FloatType
 import org.komapper.r2dbc.IntType
@@ -30,8 +32,10 @@ open class OracleR2dbcDialect(
         val defaultDataTypes: List<R2dbcDataType<*>> = listOf(
             BigDecimalType("decimal"),
             BigIntegerType("decimal"),
+            BlobType("blob"),
             ByteType("integer"),
             ByteArrayType("raw"),
+            ClobType("clob"),
             DoubleType("float"),
             FloatType("float"),
             IntType("integer"),

@@ -6,9 +6,11 @@ import org.komapper.r2dbc.AnyType
 import org.komapper.r2dbc.ArrayType
 import org.komapper.r2dbc.BigDecimalType
 import org.komapper.r2dbc.BigIntegerType
+import org.komapper.r2dbc.BlobType
 import org.komapper.r2dbc.BooleanType
 import org.komapper.r2dbc.ByteArrayType
 import org.komapper.r2dbc.ByteType
+import org.komapper.r2dbc.ClobType
 import org.komapper.r2dbc.DoubleType
 import org.komapper.r2dbc.FloatType
 import org.komapper.r2dbc.IntType
@@ -37,9 +39,11 @@ open class H2R2dbcDialect(
             ArrayType("array"),
             BigDecimalType("bigint"),
             BigIntegerType("bigint"),
+            BlobType("blob"),
             BooleanType("bool"),
             ByteType("tinyint"),
             ByteArrayType("binary"),
+            ClobType("clob"),
             DoubleType("double"),
             FloatType("float"),
             IntType("integer"),

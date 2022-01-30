@@ -1,5 +1,7 @@
 package org.komapper.r2dbc
 
+import io.r2dbc.spi.Blob
+import io.r2dbc.spi.Clob
 import io.r2dbc.spi.Row
 import io.r2dbc.spi.Statement
 import org.komapper.core.ThreadSafe
@@ -85,7 +87,9 @@ abstract class AbstractDataType<T : Any>(
         return row[columnLabel]?.let { convert(it) }
     }
 
-    protected abstract fun convert(value: Any): T
+    protected open fun convert(value: Any): T {
+        throw UnsupportedOperationException()
+    }
 
     override fun setValue(statement: Statement, index: Int, value: T?) {
         if (value == null) {
@@ -172,6 +176,18 @@ class BigIntegerType(override val name: String) : R2dbcDataType<BigInteger> {
     }
 }
 
+class BlobType(override val name: String) :
+    AbstractDataType<Blob>(Blob::class) {
+
+    override fun getValue(row: Row, index: Int): Blob? {
+        return row.get(index, klass.java)
+    }
+
+    override fun getValue(row: Row, columnLabel: String): Blob? {
+        return row.get(columnLabel, klass.java)
+    }
+}
+
 class BooleanType(override val name: String) :
     AbstractDataType<Boolean>(Boolean::class) {
 
@@ -205,6 +221,18 @@ class ByteArrayType(override val name: String) :
             is ByteArray -> value
             else -> error("Cannot convert. value=$value, type=${value::class.qualifiedName}.")
         }
+    }
+}
+
+class ClobType(override val name: String) :
+    AbstractDataType<Clob>(Clob::class) {
+
+    override fun getValue(row: Row, index: Int): Clob? {
+        return row.get(index, klass.java)
+    }
+
+    override fun getValue(row: Row, columnLabel: String): Clob? {
+        return row.get(columnLabel, klass.java)
     }
 }
 

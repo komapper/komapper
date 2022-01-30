@@ -44,9 +44,11 @@ interface PostgreSqlSetting<CONFIG> : Setting<CONFIG> {
         create table if not exists array_test(id integer not null primary key, value text[]);
         create table if not exists big_decimal_test(id integer not null primary key, value numeric);
         create table if not exists big_integer_test(id integer not null primary key, value numeric);
+        create table if not exists blob_test(id integer not null primary key, value bytea);
         create table if not exists boolean_test(id integer not null primary key, value boolean);
         create table if not exists byte_test(id integer not null primary key, value int2);
         create table if not exists byte_array_test(id integer not null primary key, value bytea);
+        create table if not exists clob_test(id integer not null primary key, value text);
         create table if not exists double_test(id integer not null primary key, value float8);
         create table if not exists enum_test(id integer not null primary key, value varchar(20));
         create table if not exists float_test(id integer not null primary key, value float);

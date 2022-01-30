@@ -24,9 +24,11 @@ interface OracleSetting<CONFIG> : Setting<CONFIG> {
 
         create table big_decimal_test(id integer not null primary key, "value" decimal);
         create table big_integer_test(id integer not null primary key, "value" decimal);
+        create table blob_test(id integer not null primary key, "value" blob);
         create table boolean_test(id integer not null primary key, "value" number(1, 0));
         create table byte_test(id integer not null primary key, "value" integer);
         create table byte_array_test(id integer not null primary key, "value" raw(1000));
+        create table clob_test(id integer not null primary key, "value" clob);
         create table double_test(id integer not null primary key, "value" float);
         create table enum_test(id integer not null primary key, "value" varchar2(20));
         create table float_test(id integer not null primary key, "value" float);

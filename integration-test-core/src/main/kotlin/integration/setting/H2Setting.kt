@@ -42,9 +42,11 @@ interface H2Setting<CONFIG> : Setting<CONFIG> {
         create table if not exists array_test(id integer not null primary key, "value" varchar(10) array);
         create table if not exists big_decimal_test(id integer not null primary key, "value" bigint);
         create table if not exists big_integer_test(id integer not null primary key, "value" bigint);
+        create table if not exists blob_test(id integer not null primary key, "value" blob);
         create table if not exists boolean_test(id integer not null primary key, "value" bool);
         create table if not exists byte_test(id integer not null primary key, "value" tinyint);
         create table if not exists byte_array_test(id integer not null primary key, "value" binary(3));
+        create table if not exists clob_test(id integer not null primary key, "value" clob);
         create table if not exists double_test(id integer not null primary key, "value" double);
         create table if not exists enum_test(id integer not null primary key, "value" varchar(20));
         create table if not exists float_test(id integer not null primary key, "value" float);
