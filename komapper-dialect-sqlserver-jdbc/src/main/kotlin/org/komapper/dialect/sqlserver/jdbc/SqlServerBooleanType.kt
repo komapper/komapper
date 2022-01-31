@@ -5,7 +5,7 @@ import java.sql.JDBCType
 import java.sql.PreparedStatement
 import java.sql.ResultSet
 
-object SqlServerBitType : AbstractDataType<Boolean>(Boolean::class, JDBCType.BOOLEAN) {
+object SqlServerBooleanType : AbstractDataType<Boolean>(Boolean::class, JDBCType.BOOLEAN) {
     override val name: String = "bit"
 
     override fun doGetValue(rs: ResultSet, index: Int): Boolean {

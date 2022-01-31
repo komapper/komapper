@@ -53,7 +53,7 @@ class SqlServerJdbcDialect(
             UByteType("smallint"),
             UIntType("bigint"),
             UShortType("int"),
-            SqlServerBitType,
+            SqlServerBooleanType,
         )
     }
 

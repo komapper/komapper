@@ -53,7 +53,7 @@ class SqlServerR2dbcDialect(
             UByteType("smallint"),
             UIntType("bigint"),
             UShortType("int"),
-            SqlServerBitType,
+            SqlServerBooleanType,
         )
     }
 
