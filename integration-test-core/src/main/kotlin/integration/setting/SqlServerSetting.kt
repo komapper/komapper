@@ -5,7 +5,6 @@ interface SqlServerSetting<CONFIG> : Setting<CONFIG> {
     override val createSql: String
         get() = """
         create sequence sequence_strategy_id start with 1 increment by 100;
-        create sequence my_sequence_strategy_id start with 1 increment by 100;
         create sequence person_id_sequence start with 1 increment by 100;
 
         create table department_archive(department_id int not null primary key, department_no int not null unique,department_name varchar(20),location varchar(20) default 'tokyo', version int);
@@ -20,29 +19,16 @@ interface SqlServerSetting<CONFIG> : Setting<CONFIG> {
         create table comp_key_address(address_id1 int not null, address_id2 int not null, street varchar(20), version int, constraint pk_comp_key_address primary key(address_id1, address_id2));
         create table comp_key_employee(employee_id1 int not null, employee_id2 int not null, employee_no int not null ,employee_name varchar(20),manager_id1 int,manager_id2 int,hiredate date,salary numeric(7,2),department_id1 int,department_id2 int,address_id1 int,address_id2 int,version int, constraint pk_comp_key_employee primary key(employee_id1, employee_id2), constraint fk_comp_key_department_id foreign key(department_id1, department_id2) references comp_key_department(department_id1, department_id2), constraint fk_comp_key_address_id foreign key(address_id1, address_id2) references comp_key_address(address_id1, address_id2));
 
-        create table large_object(id numeric(8) not null primary key, name varchar(20), large_name text, bytes varbinary(2000), large_bytes varbinary(max), dto varbinary(2000), large_dto varbinary(max));
-        create table tense (id int primary key,date_date date, date_time time, date_timestamp datetime2, cal_date date, cal_time time, cal_timestamp datetime2, sql_date date, sql_time time, sql_timestamp datetime2);
-        create table job (id int not null primary key, job_type varchar(20));
-        create table authority (id int not null primary key, authority_type int);
-        create table no_id (value1 int, value2 int);
-        create table owner_of_no_id (id int not null primary key, no_id_value1 int);
-        create table constraint_checking (primary_key int primary key, unique_key int unique, foreign_key int, check_constraint int, not_null int not null, constraint ck_constraint_checking_1 check (check_constraint > 0), constraint fk_job_id foreign key (foreign_key) references job (id));
-        create table pattern (value varchar(10));
-
-        create table id_generator(pk varchar(20) not null primary key, value int not null);
-        create table my_id_generator(my_pk varchar(20) not null primary key, my_value int not null);
-        create table auto_strategy(id int identity primary key, value varchar(10));
         create table identity_strategy(id int identity primary key, value varchar(10));
         create table sequence_strategy(id int not null primary key, value varchar(10));
-        create table sequence_strategy2(id int not null primary key, value varchar(10));
-        create table table_strategy(id int not null primary key, value varchar(10));
-        create table table_strategy2(id int not null primary key, value varchar(10));
 
         create table big_decimal_test(id int not null primary key, value decimal);
         create table big_integer_test(id int not null primary key, value decimal);
+        create table blob_test(id int not null primary key, value varbinary(max));
         create table boolean_test(id int not null primary key, value bit);
         create table byte_test(id int not null primary key, value tinyint);
         create table byte_array_test(id int not null primary key, value varbinary(100));
+        create table clob_test(id int not null primary key, value text);
         create table double_test(id int not null primary key, value real);
         create table enum_test(id int not null primary key, value varchar(20));
         create table float_test(id int not null primary key, value float);
@@ -121,16 +107,6 @@ interface SqlServerSetting<CONFIG> : Setting<CONFIG> {
         insert into comp_key_employee values(12,12,7900,'JAMES',6,6,'1981-12-03',950,3,3,12,12,1);
         insert into comp_key_employee values(13,13,7902,'FORD',4,4,'1981-12-03',3000,2,2,13,13,1);
         insert into comp_key_employee values(14,14,7934,'MILLER',7,7,'1982-01-23',1300,1,1,14,14,1);
-
-        insert into tense values (1, '2005-02-14', '12:11:10', '2005-02-14 12:11:10', '2005-02-14', '12:11:10', '2005-02-14 12:11:10', '2005-02-14', '12:11:10', '2005-02-14 12:11:10');
-        insert into job values (1, 'SALESMAN');
-        insert into job values (2, 'MANAGER');
-        insert into job values (3, 'PRESIDENT');
-        insert into authority values (1, 10);
-        insert into authority values (2, 20);
-        insert into authority values (3, 30);
-        insert into no_id values (1, 1);
-        insert into no_id values (1, 1);
         """.trimIndent()
     override val resetSql: String
         get() = """

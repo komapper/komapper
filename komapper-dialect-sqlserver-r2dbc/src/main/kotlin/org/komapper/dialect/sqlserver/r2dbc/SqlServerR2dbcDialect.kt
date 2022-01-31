@@ -7,9 +7,11 @@ import org.komapper.r2dbc.AtSignBinder
 import org.komapper.r2dbc.BigDecimalType
 import org.komapper.r2dbc.BigIntegerType
 import org.komapper.r2dbc.Binder
+import org.komapper.r2dbc.BlobType
 import org.komapper.r2dbc.BooleanType
 import org.komapper.r2dbc.ByteArrayType
 import org.komapper.r2dbc.ByteType
+import org.komapper.r2dbc.ClobType
 import org.komapper.r2dbc.DoubleType
 import org.komapper.r2dbc.FloatType
 import org.komapper.r2dbc.IntType
@@ -34,9 +36,11 @@ class SqlServerR2dbcDialect(
             ArrayType("array"),
             BigDecimalType("decimal"),
             BigIntegerType("decimal"),
+            BlobType("varbinary(max)"),
             BooleanType("bit"),
             ByteType("smallint"),
             ByteArrayType("varbinary(1000)"),
+            ClobType("text"),
             DoubleType("real"),
             FloatType("float"),
             IntType("int"),

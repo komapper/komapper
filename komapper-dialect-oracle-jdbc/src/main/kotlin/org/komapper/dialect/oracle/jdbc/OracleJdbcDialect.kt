@@ -4,8 +4,10 @@ import org.komapper.dialect.oracle.OracleDialect
 import org.komapper.jdbc.AbstractJdbcDialect
 import org.komapper.jdbc.BigDecimalType
 import org.komapper.jdbc.BigIntegerType
+import org.komapper.jdbc.BlobType
 import org.komapper.jdbc.ByteArrayType
 import org.komapper.jdbc.ByteType
+import org.komapper.jdbc.ClobType
 import org.komapper.jdbc.DoubleType
 import org.komapper.jdbc.FloatType
 import org.komapper.jdbc.IntType
@@ -35,8 +37,10 @@ class OracleJdbcDialect(
         val DEFAULT_DATA_TYPES: List<JdbcDataType<*>> = listOf(
             BigDecimalType("decimal"),
             BigIntegerType("decimal"),
+            BlobType("blob"),
             ByteType("integer"),
             ByteArrayType("raw"),
+            ClobType("clob"),
             DoubleType("float"),
             FloatType("float"),
             IntType("integer"),

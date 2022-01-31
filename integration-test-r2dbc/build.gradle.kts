@@ -2,11 +2,15 @@
 
 plugins {
     `jvm-test-suite`
+    idea
+    id("com.google.devtools.ksp")
 }
 
 dependencies {
     api(project(":integration-test-core"))
     api(project(":komapper-tx-r2dbc"))
+    compileOnly(project(":komapper-annotation"))
+    ksp(project(":komapper-processor"))
     api(platform("org.testcontainers:testcontainers-bom:1.16.3"))
     api("org.jetbrains.kotlin:kotlin-test-junit5")
     api("org.testcontainers:r2dbc")
@@ -15,6 +19,18 @@ dependencies {
     api("org.testcontainers:mysql")
     api("org.testcontainers:oracle-xe")
     api("org.testcontainers:postgresql")
+}
+
+idea {
+    module {
+        sourceDirs = sourceDirs + file("build/generated/ksp/main/kotlin")
+        testSourceDirs = testSourceDirs + file("build/generated/ksp/test/kotlin")
+        generatedSourceDirs = generatedSourceDirs + file("build/generated/ksp/main/kotlin") + file("build/generated/ksp/test/kotlin")
+    }
+}
+
+ksp {
+    arg("komapper.namingStrategy", "lower_snake_case")
 }
 
 tasks {

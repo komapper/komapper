@@ -6,7 +6,6 @@ interface MariaDbSetting<CONFIG> : Setting<CONFIG> {
     override val createSql: String
         get() = """
         create sequence if not exists sequence_strategy_id start with 1 increment by 100;
-        create sequence if not exists my_sequence_strategy_id start with 1 increment by 100;
         create sequence if not exists person_id_sequence start with 1 increment by 100;
 
         create table if not exists department_archive(department_id integer not null primary key, department_no integer not null unique,department_name varchar(20),location varchar(20) default 'tokyo', version integer);
@@ -21,29 +20,16 @@ interface MariaDbSetting<CONFIG> : Setting<CONFIG> {
         create table if not exists comp_key_address(address_id1 integer not null, address_id2 integer not null, street varchar(20), version integer, constraint pk_comp_key_address primary key(address_id1, address_id2));
         create table if not exists comp_key_employee(employee_id1 integer not null, employee_id2 integer not null, employee_no integer not null ,employee_name varchar(20),manager_id1 integer,manager_id2 integer,hiredate date,salary numeric(7,2),department_id1 integer,department_id2 integer,address_id1 integer,address_id2 integer,version integer, constraint pk_comp_key_employee primary key(employee_id1, employee_id2), constraint fk_comp_key_department_id foreign key(department_id1, department_id2) references comp_key_department(department_id1, department_id2), constraint fk_comp_key_address_id foreign key(address_id1, address_id2) references comp_key_address(address_id1, address_id2));
 
-        create table if not exists large_object(id numeric(8) not null primary key, name varchar(20), large_name text, bytes varbinary(2000), large_bytes blob, dto varbinary(2000), large_dto blob);
-        create table if not exists tense (id integer primary key,date_date date, date_time time, date_timestamp datetime, cal_date date, cal_time time, cal_timestamp datetime, sql_date date, sql_time time, sql_timestamp datetime);
-        create table if not exists job (id integer not null primary key, job_type varchar(20));
-        create table if not exists authority (id integer not null primary key, authority_type integer);
-        create table if not exists no_id (value1 integer, value2 integer);
-        create table if not exists owner_of_no_id (id integer not null primary key, no_id_value1 integer);
-        create table if not exists constraint_checking (primary_key integer primary key, unique_key integer unique, foreign_key integer, check_constraint integer, not_null integer not null, constraint ck_constraint_checking_1 check (check_constraint > 0), constraint fk_job_id foreign key (foreign_key) references job (id));
-        create table if not exists pattern (value varchar(10));
-
-        create table if not exists id_generator(pk varchar(20) not null primary key, value integer not null);
-        create table if not exists my_id_generator(my_pk varchar(20) not null primary key, my_value integer not null);
-        create table if not exists auto_strategy(id integer auto_increment primary key, value varchar(10));
         create table if not exists identity_strategy(id integer auto_increment primary key, value varchar(10));
         create table if not exists sequence_strategy(id integer not null primary key, value varchar(10));
-        create table if not exists sequence_strategy2(id integer not null primary key, value varchar(10));
-        create table if not exists table_strategy(id integer not null primary key, value varchar(10));
-        create table if not exists table_strategy2(id integer not null primary key, value varchar(10));
 
         create table if not exists big_decimal_test(id integer not null primary key, value decimal);
         create table if not exists big_integer_test(id integer not null primary key, value decimal);
+        create table if not exists blob_test(id integer not null primary key, value blob);
         create table if not exists boolean_test(id integer not null primary key, value boolean);
         create table if not exists byte_test(id integer not null primary key, value int2);
         create table if not exists byte_array_test(id integer not null primary key, value varbinary(100));
+        create table if not exists clob_test(id integer not null primary key, value text);
         create table if not exists double_test(id integer not null primary key, value double);
         create table if not exists enum_test(id integer not null primary key, value varchar(20));
         create table if not exists float_test(id integer not null primary key, value float);
@@ -122,16 +108,6 @@ interface MariaDbSetting<CONFIG> : Setting<CONFIG> {
         insert into comp_key_employee values(12,12,7900,'JAMES',6,6,'1981-12-03',950,3,3,12,12,1);
         insert into comp_key_employee values(13,13,7902,'FORD',4,4,'1981-12-03',3000,2,2,13,13,1);
         insert into comp_key_employee values(14,14,7934,'MILLER',7,7,'1982-01-23',1300,1,1,14,14,1);
-
-        insert into tense values (1, '2005-02-14', '12:11:10', '2005-02-14 12:11:10', '2005-02-14', '12:11:10', '2005-02-14 12:11:10', '2005-02-14', '12:11:10', '2005-02-14 12:11:10');
-        insert into job values (1, 'SALESMAN');
-        insert into job values (2, 'MANAGER');
-        insert into job values (3, 'PRESIDENT');
-        insert into authority values (1, 10);
-        insert into authority values (2, 20);
-        insert into authority values (3, 30);
-        insert into no_id values (1, 1);
-        insert into no_id values (1, 1);
         """.trimIndent()
     override val resetSql: String
         get() = """

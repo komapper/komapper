@@ -2,14 +2,26 @@
 
 plugins {
     `jvm-test-suite`
+    idea
+    id("com.google.devtools.ksp")
 }
 
 dependencies {
     api(project(":integration-test-core"))
     api(project(":komapper-tx-jdbc"))
+    compileOnly(project(":komapper-annotation"))
+    ksp(project(":komapper-processor"))
     api("org.postgresql:postgresql:42.3.1")
     api(platform("org.testcontainers:testcontainers-bom:1.16.3"))
     api("org.jetbrains.kotlin:kotlin-test-junit5")
+}
+
+idea {
+    module {
+        sourceDirs = sourceDirs + file("build/generated/ksp/main/kotlin")
+        testSourceDirs = testSourceDirs + file("build/generated/ksp/test/kotlin")
+        generatedSourceDirs = generatedSourceDirs + file("build/generated/ksp/main/kotlin") + file("build/generated/ksp/test/kotlin")
+    }
 }
 
 tasks {
