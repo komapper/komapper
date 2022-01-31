@@ -1,4 +1,4 @@
-package org.komapper.dialect.h2.r2dbx
+package org.komapper.dialect.h2.r2dbc
 
 import org.komapper.r2dbc.R2dbcDialect
 import org.komapper.r2dbc.spi.R2dbcDialectFactory

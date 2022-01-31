@@ -4,7 +4,7 @@ import org.komapper.core.ClockProvider
 import org.komapper.core.ExecutionOptions
 import org.komapper.core.Statement
 import org.komapper.core.TemplateStatementBuilder
-import org.komapper.dialect.h2.r2dbx.H2R2dbcDialect
+import org.komapper.dialect.h2.r2dbc.H2R2dbcDialect
 import org.komapper.r2dbc.R2dbcDatabase
 import org.springframework.boot.autoconfigure.r2dbc.R2dbcAutoConfiguration
 import org.springframework.context.annotation.AnnotationConfigApplicationContext
