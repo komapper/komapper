@@ -21,29 +21,29 @@ import org.komapper.core.dsl.query.Query
 import org.komapper.core.dsl.query.Record
 import org.komapper.core.dsl.query.Row
 import org.komapper.core.dsl.visitor.QueryVisitor
-import org.komapper.r2dbc.dsl.runner.EntityDeleteSingleR2dbcRunner
-import org.komapper.r2dbc.dsl.runner.EntityInsertMultipleR2dbcRunner
-import org.komapper.r2dbc.dsl.runner.EntityInsertSingleR2dbcRunner
-import org.komapper.r2dbc.dsl.runner.EntityStoreR2dbcRunner
-import org.komapper.r2dbc.dsl.runner.EntityUpdateSingleR2dbcRunner
-import org.komapper.r2dbc.dsl.runner.EntityUpsertMultipleR2dbcRunner
-import org.komapper.r2dbc.dsl.runner.EntityUpsertSingleIgnoreR2dbcRunner
-import org.komapper.r2dbc.dsl.runner.EntityUpsertSingleR2dbcRunner
-import org.komapper.r2dbc.dsl.runner.EntityUpsertSingleUpdateR2dbcRunner
+import org.komapper.r2dbc.dsl.runner.R2dbcEntityDeleteSingleRunner
+import org.komapper.r2dbc.dsl.runner.R2dbcEntityInsertMultipleRunner
+import org.komapper.r2dbc.dsl.runner.R2dbcEntityInsertSingleRunner
+import org.komapper.r2dbc.dsl.runner.R2dbcEntityStoreRunner
+import org.komapper.r2dbc.dsl.runner.R2dbcEntityUpdateSingleRunner
+import org.komapper.r2dbc.dsl.runner.R2dbcEntityUpsertMultipleRunner
+import org.komapper.r2dbc.dsl.runner.R2dbcEntityUpsertSingleIgnoreRunner
+import org.komapper.r2dbc.dsl.runner.R2dbcEntityUpsertSingleRunner
+import org.komapper.r2dbc.dsl.runner.R2dbcEntityUpsertSingleUpdateRunner
+import org.komapper.r2dbc.dsl.runner.R2dbcRelationDeleteRunner
+import org.komapper.r2dbc.dsl.runner.R2dbcRelationInsertSelectRunner
+import org.komapper.r2dbc.dsl.runner.R2dbcRelationInsertValuesRunner
+import org.komapper.r2dbc.dsl.runner.R2dbcRelationUpdateRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcRowTransformers
 import org.komapper.r2dbc.dsl.runner.R2dbcRunner
-import org.komapper.r2dbc.dsl.runner.RelationDeleteR2dbcRunner
-import org.komapper.r2dbc.dsl.runner.RelationInsertSelectR2dbcRunner
-import org.komapper.r2dbc.dsl.runner.RelationInsertValuesR2dbcRunner
-import org.komapper.r2dbc.dsl.runner.RelationUpdateR2dbcRunner
-import org.komapper.r2dbc.dsl.runner.SchemaCreateR2dbcRunner
-import org.komapper.r2dbc.dsl.runner.SchemaDropAllR2dbcRunner
-import org.komapper.r2dbc.dsl.runner.SchemaDropR2dbcRunner
-import org.komapper.r2dbc.dsl.runner.ScriptExecuteR2dbcRunner
-import org.komapper.r2dbc.dsl.runner.SelectR2dbcRunner
-import org.komapper.r2dbc.dsl.runner.SetOperationR2dbcRunner
-import org.komapper.r2dbc.dsl.runner.TemplateExecuteR2dbcRunner
-import org.komapper.r2dbc.dsl.runner.TemplateSelectR2dbcRunner
+import org.komapper.r2dbc.dsl.runner.R2dbcSchemaCreateRunner
+import org.komapper.r2dbc.dsl.runner.R2dbcSchemaDropAllRunner
+import org.komapper.r2dbc.dsl.runner.R2dbcSchemaDropRunner
+import org.komapper.r2dbc.dsl.runner.R2dbcScriptExecuteRunner
+import org.komapper.r2dbc.dsl.runner.R2dbcSelectRunner
+import org.komapper.r2dbc.dsl.runner.R2dbcSetOperationRunner
+import org.komapper.r2dbc.dsl.runner.R2dbcTemplateExecuteRunner
+import org.komapper.r2dbc.dsl.runner.R2dbcTemplateSelectRunner
 
 internal object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
 
@@ -86,7 +86,7 @@ internal object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityStoreQuery(
         context: SelectContext<ENTITY, ID, META>
     ): R2dbcRunner<*> {
-        return EntityStoreR2dbcRunner(context)
+        return R2dbcEntityStoreRunner(context)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, R> entitySelectQuery(
@@ -94,7 +94,7 @@ internal object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
         collect: suspend (Flow<ENTITY>) -> R
     ): R2dbcRunner<R> {
         val transform = R2dbcRowTransformers.singleEntity(context.target)
-        return SelectR2dbcRunner(context, transform, collect)
+        return R2dbcSelectRunner(context, transform, collect)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
@@ -110,14 +110,14 @@ internal object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
         context: EntityDeleteContext<ENTITY, ID, META>,
         entity: ENTITY
     ): R2dbcRunner<Unit> {
-        return EntityDeleteSingleR2dbcRunner(context, entity)
+        return R2dbcEntityDeleteSingleRunner(context, entity)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityInsertMultipleQuery(
         context: EntityInsertContext<ENTITY, ID, META>,
         entities: List<ENTITY>
     ): R2dbcRunner<List<ENTITY>> {
-        return EntityInsertMultipleR2dbcRunner(context, entities)
+        return R2dbcEntityInsertMultipleRunner(context, entities)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityInsertBatchQuery(
@@ -131,7 +131,7 @@ internal object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
         context: EntityInsertContext<ENTITY, ID, META>,
         entity: ENTITY
     ): R2dbcRunner<ENTITY> {
-        return EntityInsertSingleR2dbcRunner(context, entity)
+        return R2dbcEntityInsertSingleRunner(context, entity)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
@@ -147,7 +147,7 @@ internal object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
         context: EntityUpdateContext<ENTITY, ID, META>,
         entity: ENTITY
     ): R2dbcRunner<ENTITY> {
-        return EntityUpdateSingleR2dbcRunner(context, entity)
+        return R2dbcEntityUpdateSingleRunner(context, entity)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
@@ -163,7 +163,7 @@ internal object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
         context: EntityUpsertContext<ENTITY, ID, META>,
         entities: List<ENTITY>
     ): R2dbcRunner<Int> {
-        return EntityUpsertMultipleR2dbcRunner(context, entities)
+        return R2dbcEntityUpsertMultipleRunner(context, entities)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
@@ -171,43 +171,43 @@ internal object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
         context: EntityUpsertContext<ENTITY, ID, META>,
         entity: ENTITY,
     ): R2dbcRunner<Int> {
-        return EntityUpsertSingleR2dbcRunner(context, entity)
+        return R2dbcEntityUpsertSingleRunner(context, entity)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityUpsertSingleUpdateQuery(
         context: EntityUpsertContext<ENTITY, ID, META>,
         entity: ENTITY
     ): R2dbcRunner<ENTITY> {
-        return EntityUpsertSingleUpdateR2dbcRunner(context, entity)
+        return R2dbcEntityUpsertSingleUpdateRunner(context, entity)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityUpsertSingleIgnoreQuery(
         context: EntityUpsertContext<ENTITY, ID, META>,
         entity: ENTITY
     ): R2dbcRunner<*> {
-        return EntityUpsertSingleIgnoreR2dbcRunner(context, entity)
+        return R2dbcEntityUpsertSingleIgnoreRunner(context, entity)
     }
 
     override fun schemaCreateQuery(
         context: SchemaContext
     ): R2dbcRunner<Unit> {
-        return SchemaCreateR2dbcRunner(context)
+        return R2dbcSchemaCreateRunner(context)
     }
 
     override fun schemaDropQuery(
         context: SchemaContext
     ): R2dbcRunner<Unit> {
-        return SchemaDropR2dbcRunner(context)
+        return R2dbcSchemaDropRunner(context)
     }
 
     override fun schemaDropAllQuery(context: SchemaContext): R2dbcRunner<Unit> {
-        return SchemaDropAllR2dbcRunner(context)
+        return R2dbcSchemaDropAllRunner(context)
     }
 
     override fun scriptExecuteQuery(
         context: ScriptContext
     ): R2dbcRunner<Unit> {
-        return ScriptExecuteR2dbcRunner(context)
+        return R2dbcScriptExecuteRunner(context)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, R>
@@ -216,7 +216,7 @@ internal object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
         collect: suspend (Flow<ENTITY>) -> R
     ): R2dbcRunner<R> {
         val transform = R2dbcRowTransformers.singleEntity(context.target)
-        return SelectR2dbcRunner(context, transform, collect)
+        return R2dbcSelectRunner(context, transform, collect)
     }
 
     override fun <T : Any, R> setOperationQuery(
@@ -225,7 +225,7 @@ internal object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
         collect: suspend (Flow<T>) -> R
     ): R2dbcRunner<R> {
         val provide = R2dbcRowTransformers.singleEntity(metamodel)
-        return SetOperationR2dbcRunner(context, provide, collect)
+        return R2dbcSetOperationRunner(context, provide, collect)
     }
 
     override fun <A : Any, R> singleColumnSelectQuery(
@@ -234,7 +234,7 @@ internal object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
         collect: suspend (Flow<A?>) -> R
     ): R2dbcRunner<R> {
         val transform = R2dbcRowTransformers.singleColumn(expression)
-        return SelectR2dbcRunner(context, transform, collect)
+        return R2dbcSelectRunner(context, transform, collect)
     }
 
     override fun <A : Any, R> singleNotNullColumnSelectQuery(
@@ -243,7 +243,7 @@ internal object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
         collect: suspend (Flow<A>) -> R
     ): R2dbcRunner<R> {
         val transform = R2dbcRowTransformers.singleNotNullColumn(expression)
-        return SelectR2dbcRunner(context, transform, collect)
+        return R2dbcSelectRunner(context, transform, collect)
     }
 
     override fun <A : Any, R> singleColumnSetOperationQuery(
@@ -252,7 +252,7 @@ internal object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
         collect: suspend (Flow<A?>) -> R
     ): R2dbcRunner<R> {
         val transform = R2dbcRowTransformers.singleColumn(expression)
-        return SetOperationR2dbcRunner(context, transform, collect)
+        return R2dbcSetOperationRunner(context, transform, collect)
     }
 
     override fun <A : Any, R> singleNotNullColumnSetOperationQuery(
@@ -261,7 +261,7 @@ internal object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
         collect: suspend (Flow<A>) -> R
     ): R2dbcRunner<R> {
         val transform = R2dbcRowTransformers.singleNotNullColumn(expression)
-        return SetOperationR2dbcRunner(context, transform, collect)
+        return R2dbcSetOperationRunner(context, transform, collect)
     }
 
     override fun <A : Any, B : Any, R> pairColumnsSelectQuery(
@@ -270,7 +270,7 @@ internal object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
         collect: suspend (Flow<Pair<A?, B?>>) -> R
     ): R2dbcRunner<R> {
         val transform = R2dbcRowTransformers.pairColumns(expressions)
-        return SelectR2dbcRunner(context, transform, collect)
+        return R2dbcSelectRunner(context, transform, collect)
     }
 
     override fun <A : Any, B : Any, R> pairNotNullColumnsSelectQuery(
@@ -279,7 +279,7 @@ internal object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
         collect: suspend (Flow<Pair<A, B>>) -> R
     ): R2dbcRunner<R> {
         val transform = R2dbcRowTransformers.pairNotNullColumns(expressions)
-        return SelectR2dbcRunner(context, transform, collect)
+        return R2dbcSelectRunner(context, transform, collect)
     }
 
     override fun <A : Any, B : Any, R> pairColumnsSetOperationQuery(
@@ -288,7 +288,7 @@ internal object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
         collect: suspend (Flow<Pair<A?, B?>>) -> R
     ): R2dbcRunner<R> {
         val transform = R2dbcRowTransformers.pairColumns(expressions)
-        return SetOperationR2dbcRunner(context, transform, collect)
+        return R2dbcSetOperationRunner(context, transform, collect)
     }
 
     override fun <A : Any, B : Any, R> pairNotNullColumnsSetOperationQuery(
@@ -297,7 +297,7 @@ internal object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
         collect: suspend (Flow<Pair<A, B>>) -> R
     ): R2dbcRunner<*> {
         val transform = R2dbcRowTransformers.pairNotNullColumns(expressions)
-        return SetOperationR2dbcRunner(context, transform, collect)
+        return R2dbcSetOperationRunner(context, transform, collect)
     }
 
     override fun <A : Any, B : Any, C : Any, R> tripleColumnsSelectQuery(
@@ -306,7 +306,7 @@ internal object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
         collect: suspend (Flow<Triple<A?, B?, C?>>) -> R
     ): R2dbcRunner<R> {
         val provide = R2dbcRowTransformers.tripleColumns(expressions)
-        return SelectR2dbcRunner(context, provide, collect)
+        return R2dbcSelectRunner(context, provide, collect)
     }
 
     override fun <A : Any, B : Any, C : Any, R> tripleNotNullColumnsSelectQuery(
@@ -315,7 +315,7 @@ internal object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
         collect: suspend (Flow<Triple<A, B, C>>) -> R
     ): R2dbcRunner<R> {
         val provide = R2dbcRowTransformers.tripleNotNullColumns(expressions)
-        return SelectR2dbcRunner(context, provide, collect)
+        return R2dbcSelectRunner(context, provide, collect)
     }
 
     override fun <A : Any, B : Any, C : Any, R> tripleColumnsSetOperationQuery(
@@ -324,7 +324,7 @@ internal object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
         collect: suspend (Flow<Triple<A?, B?, C?>>) -> R
     ): R2dbcRunner<R> {
         val transform = R2dbcRowTransformers.tripleColumns(expressions)
-        return SetOperationR2dbcRunner(context, transform, collect)
+        return R2dbcSetOperationRunner(context, transform, collect)
     }
 
     override fun <A : Any, B : Any, C : Any, R> tripleNotNullColumnsSetOperationQuery(
@@ -333,7 +333,7 @@ internal object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
         collect: suspend (Flow<Triple<A, B, C>>) -> R
     ): R2dbcRunner<R> {
         val transform = R2dbcRowTransformers.tripleNotNullColumns(expressions)
-        return SetOperationR2dbcRunner(context, transform, collect)
+        return R2dbcSetOperationRunner(context, transform, collect)
     }
 
     override fun <R> multipleColumnsSelectQuery(
@@ -342,7 +342,7 @@ internal object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
         collect: suspend (Flow<Record>) -> R
     ): R2dbcRunner<R> {
         val transform = R2dbcRowTransformers.multipleColumns(expressions)
-        return SelectR2dbcRunner(context, transform, collect)
+        return R2dbcSelectRunner(context, transform, collect)
     }
 
     override fun <R> multipleColumnsSetOperationQuery(
@@ -351,37 +351,37 @@ internal object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
         collect: suspend (Flow<Record>) -> R
     ): R2dbcRunner<R> {
         val transform = R2dbcRowTransformers.multipleColumns(expressions)
-        return SetOperationR2dbcRunner(context, transform, collect)
+        return R2dbcSetOperationRunner(context, transform, collect)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> relationDeleteQuery(
         context: RelationDeleteContext<ENTITY, ID, META>
     ): R2dbcRunner<Int> {
-        return RelationDeleteR2dbcRunner(context)
+        return R2dbcRelationDeleteRunner(context)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> relationInsertValuesQuery(
         context: RelationInsertValuesContext<ENTITY, ID, META>
     ): R2dbcRunner<Pair<Int, ID?>> {
-        return RelationInsertValuesR2dbcRunner(context)
+        return R2dbcRelationInsertValuesRunner(context)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> relationInsertSelectQuery(
         context: RelationInsertSelectContext<ENTITY, ID, META>
     ): R2dbcRunner<Pair<Int, List<ID>>> {
-        return RelationInsertSelectR2dbcRunner(context)
+        return R2dbcRelationInsertSelectRunner(context)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> relationUpdateQuery(
         context: RelationUpdateContext<ENTITY, ID, META>
     ): R2dbcRunner<*> {
-        return RelationUpdateR2dbcRunner(context)
+        return R2dbcRelationUpdateRunner(context)
     }
 
     override fun templateExecuteQuery(
         context: TemplateExecuteContext
     ): R2dbcRunner<Int> {
-        return TemplateExecuteR2dbcRunner(context)
+        return R2dbcTemplateExecuteRunner(context)
     }
 
     override fun <T, R> templateSelectQuery(
@@ -389,6 +389,6 @@ internal object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
         transform: (Row) -> T,
         collect: suspend (Flow<T>) -> R
     ): R2dbcRunner<R> {
-        return TemplateSelectR2dbcRunner(context, transform, collect)
+        return R2dbcTemplateSelectRunner(context, transform, collect)
     }
 }

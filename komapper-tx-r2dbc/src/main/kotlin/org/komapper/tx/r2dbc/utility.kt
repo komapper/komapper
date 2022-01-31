@@ -15,13 +15,13 @@ import org.komapper.r2dbc.R2dbcSession
  * @return the result of the block
  */
 suspend fun <R> R2dbc.withTransaction(
-    transactionAttribute: TransactionAttribute = TransactionAttribute.REQUIRED,
+    transactionAttribute: R2dbcTransactionAttribute = R2dbcTransactionAttribute.REQUIRED,
     transactionDefinition: TransactionDefinition? = null,
-    block: suspend TransactionScope.() -> R
+    block: suspend R2dbcTransactionScope.() -> R
 ): R {
     return if (this is R2dbcDatabase) {
         val session = this.config.session
-        return if (session is TransactionSession) {
+        return if (session is R2dbcTransactionSession) {
             session.userTransaction.run(transactionAttribute, transactionDefinition, block)
         } else {
             withoutTransaction(block)
@@ -31,8 +31,8 @@ suspend fun <R> R2dbc.withTransaction(
     }
 }
 
-private suspend fun <R> withoutTransaction(block: suspend TransactionScope.() -> R): R {
-    val transactionScope = TransactionScopeStub()
+private suspend fun <R> withoutTransaction(block: suspend R2dbcTransactionScope.() -> R): R {
+    val transactionScope = R2dbcTransactionScopeStub()
     return block(transactionScope)
 }
 
@@ -41,7 +41,7 @@ private suspend fun <R> withoutTransaction(block: suspend TransactionScope.() ->
  */
 val R2dbcSession.transactionManager: TransactionManager
     get() {
-        return if (this is TransactionSession) {
+        return if (this is R2dbcTransactionSession) {
             this.transactionManager
         } else {
             invalidSession(this)
@@ -50,7 +50,7 @@ val R2dbcSession.transactionManager: TransactionManager
 
 private fun invalidSession(session: R2dbcSession): Nothing {
     error(
-        "DatabaseConfig.session must be an instance of ${TransactionSession::class.qualifiedName}. " +
+        "DatabaseConfig.session must be an instance of ${R2dbcTransactionSession::class.qualifiedName}. " +
             "But it is ${session::class.qualifiedName}"
     )
 }

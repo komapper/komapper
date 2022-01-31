@@ -54,7 +54,7 @@ interface R2dbcDialect : Dialect {
     fun getDataType(klass: KClass<*>): R2dbcDataType<*>
 }
 
-abstract class AbstractR2dbcDialect protected constructor(internalDataTypes: List<R2dbcDataType<*>> = emptyList()) :
+abstract class R2dbcAbstractDialect protected constructor(internalDataTypes: List<R2dbcDataType<*>> = emptyList()) :
     R2dbcDialect {
 
     @Suppress("MemberVisibilityCanBePrivate")

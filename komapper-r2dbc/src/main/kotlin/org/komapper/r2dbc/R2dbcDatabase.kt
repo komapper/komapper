@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.Flow
 import org.komapper.core.dsl.query.FlowQuery
 import org.komapper.core.dsl.query.Query
 import org.komapper.core.dsl.query.QueryScope
-import org.komapper.r2dbc.dsl.runner.FlowBuilder
+import org.komapper.r2dbc.dsl.runner.R2dbcFlowBuilder
 import org.komapper.r2dbc.dsl.runner.R2dbcRunner
 import org.komapper.r2dbc.dsl.visitor.R2dbcFlowQueryVisitor
 import org.komapper.r2dbc.dsl.visitor.R2dbcQueryVisitor
@@ -106,7 +106,7 @@ interface R2dbcDatabase : R2dbc {
      */
     @Suppress("UNCHECKED_CAST")
     fun <T> flow(query: FlowQuery<T>): Flow<T> {
-        val builder = query.accept(R2dbcFlowQueryVisitor) as FlowBuilder<T>
+        val builder = query.accept(R2dbcFlowQueryVisitor) as R2dbcFlowBuilder<T>
         return builder.build(config)
     }
 

@@ -21,33 +21,33 @@ import org.komapper.core.dsl.query.Query
 import org.komapper.core.dsl.query.Record
 import org.komapper.core.dsl.query.Row
 import org.komapper.core.dsl.visitor.QueryVisitor
-import org.komapper.jdbc.dsl.runner.EntityDeleteBatchJdbcRunner
-import org.komapper.jdbc.dsl.runner.EntityDeleteSingleJdbcRunner
-import org.komapper.jdbc.dsl.runner.EntityInsertBatchJdbcRunner
-import org.komapper.jdbc.dsl.runner.EntityInsertMultipleJdbcRunner
-import org.komapper.jdbc.dsl.runner.EntityInsertSingleJdbcRunner
-import org.komapper.jdbc.dsl.runner.EntityStoreJdbcRunner
-import org.komapper.jdbc.dsl.runner.EntityUpdateBatchJdbcRunner
-import org.komapper.jdbc.dsl.runner.EntityUpdateSingleJdbcRunner
-import org.komapper.jdbc.dsl.runner.EntityUpsertBatchJdbcRunner
-import org.komapper.jdbc.dsl.runner.EntityUpsertMultipleJdbcRunner
-import org.komapper.jdbc.dsl.runner.EntityUpsertSingleIgnoreJdbcRunner
-import org.komapper.jdbc.dsl.runner.EntityUpsertSingleJdbcRunner
-import org.komapper.jdbc.dsl.runner.EntityUpsertSingleUpdateJdbcRunner
+import org.komapper.jdbc.dsl.runner.JdbcEntityDeleteBatchRunner
+import org.komapper.jdbc.dsl.runner.JdbcEntityDeleteSingleRunner
+import org.komapper.jdbc.dsl.runner.JdbcEntityInsertBatchRunner
+import org.komapper.jdbc.dsl.runner.JdbcEntityInsertMultipleRunner
+import org.komapper.jdbc.dsl.runner.JdbcEntityInsertSingleRunner
+import org.komapper.jdbc.dsl.runner.JdbcEntityStoreRunner
+import org.komapper.jdbc.dsl.runner.JdbcEntityUpdateBatchRunner
+import org.komapper.jdbc.dsl.runner.JdbcEntityUpdateSingleRunner
+import org.komapper.jdbc.dsl.runner.JdbcEntityUpsertBatchRunner
+import org.komapper.jdbc.dsl.runner.JdbcEntityUpsertMultipleRunner
+import org.komapper.jdbc.dsl.runner.JdbcEntityUpsertSingleIgnoreRunner
+import org.komapper.jdbc.dsl.runner.JdbcEntityUpsertSingleRunner
+import org.komapper.jdbc.dsl.runner.JdbcEntityUpsertSingleUpdateRunner
+import org.komapper.jdbc.dsl.runner.JdbcRelationDeleteRunner
+import org.komapper.jdbc.dsl.runner.JdbcRelationInsertSelectRunner
+import org.komapper.jdbc.dsl.runner.JdbcRelationInsertValuesRunner
+import org.komapper.jdbc.dsl.runner.JdbcRelationUpdateRunner
 import org.komapper.jdbc.dsl.runner.JdbcResultSetTransformers
 import org.komapper.jdbc.dsl.runner.JdbcRunner
-import org.komapper.jdbc.dsl.runner.RelationDeleteJdbcRunner
-import org.komapper.jdbc.dsl.runner.RelationInsertSelectJdbcRunner
-import org.komapper.jdbc.dsl.runner.RelationInsertValuesJdbcRunner
-import org.komapper.jdbc.dsl.runner.RelationUpdateJdbcRunner
-import org.komapper.jdbc.dsl.runner.SchemaCreateJdbcRunner
-import org.komapper.jdbc.dsl.runner.SchemaDropAllJdbcRunner
-import org.komapper.jdbc.dsl.runner.SchemaDropJdbcRunner
-import org.komapper.jdbc.dsl.runner.ScriptExecuteJdbcRunner
-import org.komapper.jdbc.dsl.runner.SelectJdbcRunner
-import org.komapper.jdbc.dsl.runner.SetOperationJdbcRunner
-import org.komapper.jdbc.dsl.runner.TemplateExecuteJdbcRunner
-import org.komapper.jdbc.dsl.runner.TemplateSelectJdbcRunner
+import org.komapper.jdbc.dsl.runner.JdbcSchemaCreateRunner
+import org.komapper.jdbc.dsl.runner.JdbcSchemaDropAllRunner
+import org.komapper.jdbc.dsl.runner.JdbcSchemaDropRunner
+import org.komapper.jdbc.dsl.runner.JdbcScriptExecuteRunner
+import org.komapper.jdbc.dsl.runner.JdbcSelectRunner
+import org.komapper.jdbc.dsl.runner.JdbcSetOperationRunner
+import org.komapper.jdbc.dsl.runner.JdbcTemplateExecuteRunner
+import org.komapper.jdbc.dsl.runner.JdbcTemplateSelectRunner
 
 internal object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
 
@@ -91,7 +91,7 @@ internal object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
     entityStoreQuery(
         context: SelectContext<ENTITY, ID, META>
     ): JdbcRunner<*> {
-        return EntityStoreJdbcRunner(context)
+        return JdbcEntityStoreRunner(context)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, R>
@@ -100,7 +100,7 @@ internal object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
         collect: suspend (Flow<ENTITY>) -> R
     ): JdbcRunner<R> {
         val transformer = JdbcResultSetTransformers.singleEntity(context.target)
-        return SelectJdbcRunner(context, transformer, collect)
+        return JdbcSelectRunner(context, transformer, collect)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
@@ -108,7 +108,7 @@ internal object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
         context: EntityDeleteContext<ENTITY, ID, META>,
         entities: List<ENTITY>
     ): JdbcRunner<Unit> {
-        return EntityDeleteBatchJdbcRunner(context, entities)
+        return JdbcEntityDeleteBatchRunner(context, entities)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
@@ -116,28 +116,28 @@ internal object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
         context: EntityDeleteContext<ENTITY, ID, META>,
         entity: ENTITY
     ): JdbcRunner<Unit> {
-        return EntityDeleteSingleJdbcRunner(context, entity)
+        return JdbcEntityDeleteSingleRunner(context, entity)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityInsertMultipleQuery(
         context: EntityInsertContext<ENTITY, ID, META>,
         entities: List<ENTITY>
     ): JdbcRunner<List<ENTITY>> {
-        return EntityInsertMultipleJdbcRunner(context, entities)
+        return JdbcEntityInsertMultipleRunner(context, entities)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityInsertBatchQuery(
         context: EntityInsertContext<ENTITY, ID, META>,
         entities: List<ENTITY>
     ): JdbcRunner<List<ENTITY>> {
-        return EntityInsertBatchJdbcRunner(context, entities)
+        return JdbcEntityInsertBatchRunner(context, entities)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityInsertSingleQuery(
         context: EntityInsertContext<ENTITY, ID, META>,
         entity: ENTITY
     ): JdbcRunner<ENTITY> {
-        return EntityInsertSingleJdbcRunner(context, entity)
+        return JdbcEntityInsertSingleRunner(context, entity)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
@@ -145,7 +145,7 @@ internal object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
         context: EntityUpdateContext<ENTITY, ID, META>,
         entities: List<ENTITY>
     ): JdbcRunner<*> {
-        return EntityUpdateBatchJdbcRunner(context, entities)
+        return JdbcEntityUpdateBatchRunner(context, entities)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
@@ -153,7 +153,7 @@ internal object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
         context: EntityUpdateContext<ENTITY, ID, META>,
         entity: ENTITY
     ): JdbcRunner<ENTITY> {
-        return EntityUpdateSingleJdbcRunner(context, entity)
+        return JdbcEntityUpdateSingleRunner(context, entity)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
@@ -161,7 +161,7 @@ internal object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
         context: EntityUpsertContext<ENTITY, ID, META>,
         entities: List<ENTITY>
     ): JdbcRunner<List<Int>> {
-        return EntityUpsertBatchJdbcRunner(context, entities)
+        return JdbcEntityUpsertBatchRunner(context, entities)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
@@ -169,7 +169,7 @@ internal object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
         context: EntityUpsertContext<ENTITY, ID, META>,
         entities: List<ENTITY>
     ): JdbcRunner<Int> {
-        return EntityUpsertMultipleJdbcRunner(context, entities)
+        return JdbcEntityUpsertMultipleRunner(context, entities)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
@@ -177,7 +177,7 @@ internal object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
         context: EntityUpsertContext<ENTITY, ID, META>,
         entity: ENTITY,
     ): JdbcRunner<Int> {
-        return EntityUpsertSingleJdbcRunner(context, entity)
+        return JdbcEntityUpsertSingleRunner(context, entity)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
@@ -185,7 +185,7 @@ internal object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
         context: EntityUpsertContext<ENTITY, ID, META>,
         entity: ENTITY
     ): JdbcRunner<ENTITY> {
-        return EntityUpsertSingleUpdateJdbcRunner(context, entity)
+        return JdbcEntityUpsertSingleUpdateRunner(context, entity)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
@@ -193,29 +193,29 @@ internal object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
         context: EntityUpsertContext<ENTITY, ID, META>,
         entity: ENTITY,
     ): JdbcRunner<ENTITY?> {
-        return EntityUpsertSingleIgnoreJdbcRunner(context, entity)
+        return JdbcEntityUpsertSingleIgnoreRunner(context, entity)
     }
 
     override fun schemaCreateQuery(
         context: SchemaContext
     ): JdbcRunner<Unit> {
-        return SchemaCreateJdbcRunner(context)
+        return JdbcSchemaCreateRunner(context)
     }
 
     override fun schemaDropQuery(
         context: SchemaContext
     ): JdbcRunner<Unit> {
-        return SchemaDropJdbcRunner(context)
+        return JdbcSchemaDropRunner(context)
     }
 
     override fun schemaDropAllQuery(context: SchemaContext): JdbcRunner<Unit> {
-        return SchemaDropAllJdbcRunner(context)
+        return JdbcSchemaDropAllRunner(context)
     }
 
     override fun scriptExecuteQuery(
         context: ScriptContext
     ): JdbcRunner<Unit> {
-        return ScriptExecuteJdbcRunner(context)
+        return JdbcScriptExecuteRunner(context)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, R>
@@ -224,7 +224,7 @@ internal object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
         collect: suspend (Flow<ENTITY>) -> R
     ): JdbcRunner<R> {
         val transform = JdbcResultSetTransformers.singleEntity(context.target)
-        return SelectJdbcRunner(context, transform, collect)
+        return JdbcSelectRunner(context, transform, collect)
     }
 
     override fun <T : Any, R> setOperationQuery(
@@ -233,7 +233,7 @@ internal object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
         collect: suspend (Flow<T>) -> R
     ): JdbcRunner<R> {
         val transform = JdbcResultSetTransformers.singleEntity(metamodel)
-        return SetOperationJdbcRunner(context, transform, collect)
+        return JdbcSetOperationRunner(context, transform, collect)
     }
 
     override fun <A : Any, R> singleColumnSelectQuery(
@@ -242,7 +242,7 @@ internal object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
         collect: suspend (Flow<A?>) -> R
     ): JdbcRunner<R> {
         val transform = JdbcResultSetTransformers.singleColumn(expression)
-        return SelectJdbcRunner(context, transform, collect)
+        return JdbcSelectRunner(context, transform, collect)
     }
 
     override fun <A : Any, R> singleNotNullColumnSelectQuery(
@@ -251,7 +251,7 @@ internal object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
         collect: suspend (Flow<A>) -> R
     ): JdbcRunner<R> {
         val transform = JdbcResultSetTransformers.singleNotNullColumn(expression)
-        return SelectJdbcRunner(context, transform, collect)
+        return JdbcSelectRunner(context, transform, collect)
     }
 
     override fun <A : Any, R> singleColumnSetOperationQuery(
@@ -260,7 +260,7 @@ internal object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
         collect: suspend (Flow<A?>) -> R
     ): JdbcRunner<R> {
         val transform = JdbcResultSetTransformers.singleColumn(expression)
-        return SetOperationJdbcRunner(context, transform, collect)
+        return JdbcSetOperationRunner(context, transform, collect)
     }
 
     override fun <A : Any, R> singleNotNullColumnSetOperationQuery(
@@ -269,7 +269,7 @@ internal object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
         collect: suspend (Flow<A>) -> R
     ): JdbcRunner<*> {
         val transform = JdbcResultSetTransformers.singleNotNullColumn(expression)
-        return SetOperationJdbcRunner(context, transform, collect)
+        return JdbcSetOperationRunner(context, transform, collect)
     }
 
     override fun <A : Any, B : Any, R> pairColumnsSelectQuery(
@@ -278,7 +278,7 @@ internal object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
         collect: suspend (Flow<Pair<A?, B?>>) -> R
     ): JdbcRunner<R> {
         val transform = JdbcResultSetTransformers.pairColumns(expressions)
-        return SelectJdbcRunner(context, transform, collect)
+        return JdbcSelectRunner(context, transform, collect)
     }
 
     override fun <A : Any, B : Any, R> pairNotNullColumnsSelectQuery(
@@ -287,7 +287,7 @@ internal object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
         collect: suspend (Flow<Pair<A, B>>) -> R
     ): JdbcRunner<R> {
         val transform = JdbcResultSetTransformers.pairNotNullColumns(expressions)
-        return SelectJdbcRunner(context, transform, collect)
+        return JdbcSelectRunner(context, transform, collect)
     }
 
     override fun <A : Any, B : Any, R> pairColumnsSetOperationQuery(
@@ -296,7 +296,7 @@ internal object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
         collect: suspend (Flow<Pair<A?, B?>>) -> R
     ): JdbcRunner<R> {
         val transform = JdbcResultSetTransformers.pairColumns(expressions)
-        return SetOperationJdbcRunner(context, transform, collect)
+        return JdbcSetOperationRunner(context, transform, collect)
     }
 
     override fun <A : Any, B : Any, R> pairNotNullColumnsSetOperationQuery(
@@ -305,7 +305,7 @@ internal object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
         collect: suspend (Flow<Pair<A, B>>) -> R
     ): JdbcRunner<R> {
         val transform = JdbcResultSetTransformers.pairNotNullColumns(expressions)
-        return SetOperationJdbcRunner(context, transform, collect)
+        return JdbcSetOperationRunner(context, transform, collect)
     }
 
     override fun <A : Any, B : Any, C : Any, R> tripleColumnsSelectQuery(
@@ -314,7 +314,7 @@ internal object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
         collect: suspend (Flow<Triple<A?, B?, C?>>) -> R
     ): JdbcRunner<R> {
         val transform = JdbcResultSetTransformers.tripleColumns(expressions)
-        return SelectJdbcRunner(context, transform, collect)
+        return JdbcSelectRunner(context, transform, collect)
     }
 
     override fun <A : Any, B : Any, C : Any, R> tripleNotNullColumnsSelectQuery(
@@ -323,7 +323,7 @@ internal object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
         collect: suspend (Flow<Triple<A, B, C>>) -> R
     ): JdbcRunner<R> {
         val transform = JdbcResultSetTransformers.tripleNotNullColumns(expressions)
-        return SelectJdbcRunner(context, transform, collect)
+        return JdbcSelectRunner(context, transform, collect)
     }
 
     override fun <A : Any, B : Any, C : Any, R> tripleColumnsSetOperationQuery(
@@ -332,7 +332,7 @@ internal object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
         collect: suspend (Flow<Triple<A?, B?, C?>>) -> R
     ): JdbcRunner<R> {
         val transform = JdbcResultSetTransformers.tripleColumns(expressions)
-        return SetOperationJdbcRunner(context, transform, collect)
+        return JdbcSetOperationRunner(context, transform, collect)
     }
 
     override fun <A : Any, B : Any, C : Any, R> tripleNotNullColumnsSetOperationQuery(
@@ -341,7 +341,7 @@ internal object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
         collect: suspend (Flow<Triple<A, B, C>>) -> R
     ): JdbcRunner<R> {
         val transform = JdbcResultSetTransformers.tripleNotNullColumns(expressions)
-        return SetOperationJdbcRunner(context, transform, collect)
+        return JdbcSetOperationRunner(context, transform, collect)
     }
 
     override fun <R> multipleColumnsSelectQuery(
@@ -350,7 +350,7 @@ internal object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
         collect: suspend (Flow<Record>) -> R
     ): JdbcRunner<R> {
         val transform = JdbcResultSetTransformers.multipleColumns(expressions)
-        return SelectJdbcRunner(context, transform, collect)
+        return JdbcSelectRunner(context, transform, collect)
     }
 
     override fun <R> multipleColumnsSetOperationQuery(
@@ -359,37 +359,37 @@ internal object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
         collect: suspend (Flow<Record>) -> R
     ): JdbcRunner<R> {
         val transform = JdbcResultSetTransformers.multipleColumns(expressions)
-        return SetOperationJdbcRunner(context, transform, collect)
+        return JdbcSetOperationRunner(context, transform, collect)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> relationDeleteQuery(
         context: RelationDeleteContext<ENTITY, ID, META>
     ): JdbcRunner<Int> {
-        return RelationDeleteJdbcRunner(context)
+        return JdbcRelationDeleteRunner(context)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> relationInsertValuesQuery(
         context: RelationInsertValuesContext<ENTITY, ID, META>
     ): JdbcRunner<Pair<Int, ID?>> {
-        return RelationInsertValuesJdbcRunner(context)
+        return JdbcRelationInsertValuesRunner(context)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> relationInsertSelectQuery(
         context: RelationInsertSelectContext<ENTITY, ID, META>
     ): JdbcRunner<Pair<Int, List<ID>>> {
-        return RelationInsertSelectJdbcRunner(context)
+        return JdbcRelationInsertSelectRunner(context)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> relationUpdateQuery(
         context: RelationUpdateContext<ENTITY, ID, META>
     ): JdbcRunner<*> {
-        return RelationUpdateJdbcRunner(context)
+        return JdbcRelationUpdateRunner(context)
     }
 
     override fun templateExecuteQuery(
         context: TemplateExecuteContext
     ): JdbcRunner<Int> {
-        return TemplateExecuteJdbcRunner(context)
+        return JdbcTemplateExecuteRunner(context)
     }
 
     override fun <T, R> templateSelectQuery(
@@ -397,6 +397,6 @@ internal object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
         transform: (Row) -> T,
         collect: suspend (Flow<T>) -> R
     ): JdbcRunner<R> {
-        return TemplateSelectJdbcRunner(context, transform, collect)
+        return JdbcTemplateSelectRunner(context, transform, collect)
     }
 }

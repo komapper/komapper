@@ -4,10 +4,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
 import org.komapper.r2dbc.R2dbcDatabase
-import org.komapper.tx.r2dbc.TransactionScope
+import org.komapper.tx.r2dbc.R2dbcTransactionScope
 import org.komapper.tx.r2dbc.withTransaction
 
-fun <T> inTransaction(db: R2dbcDatabase, block: suspend TransactionScope.() -> T) {
+fun <T> inTransaction(db: R2dbcDatabase, block: suspend R2dbcTransactionScope.() -> T) {
     runBlockingWithTimeout {
         db.withTransaction {
             setRollbackOnly()
