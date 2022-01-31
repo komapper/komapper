@@ -55,6 +55,7 @@ open class PostgreSqlR2dbcDialect(
             UByteType("smallint"),
             UIntType("bigint"),
             UShortType("integer"),
+            PostgreSqlUUIDType
         )
     }
 

@@ -57,6 +57,7 @@ open class H2R2dbcDialect(
             UByteType("smallint"),
             UIntType("bigint"),
             UShortType("integer"),
+            H2UUIDType
         )
     }
 

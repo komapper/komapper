@@ -1,7 +1,11 @@
 package integration.r2dbc
 
 import integration.Direction
+import integration.UUIDTest
 import integration.enumTest
+import integration.setting.Dbms
+import integration.setting.Run
+import integration.uuidTest
 import io.r2dbc.spi.Blob
 import io.r2dbc.spi.Clob
 import kotlinx.coroutines.flow.flowOf
@@ -14,6 +18,7 @@ import org.komapper.core.dsl.query.first
 import org.komapper.r2dbc.R2dbcDatabase
 import java.nio.ByteBuffer
 import java.nio.CharBuffer
+import java.util.UUID
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -63,5 +68,30 @@ class R2dbcDataTypeTest(val db: R2dbcDatabase) {
         assertEquals('a', buffer[0])
         assertEquals('b', buffer[1])
         assertEquals('c', buffer[2])
+    }
+
+    @Run(onlyIf = [Dbms.POSTGRESQL, Dbms.H2])
+    @Test
+    fun uuid() = inTransaction(db) {
+        val m = Meta.uuidTest
+        val value = UUID.randomUUID()
+        val data = UUIDTest(1, value)
+        db.runQuery { QueryDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        assertEquals(data, data2)
+    }
+
+    @Run(onlyIf = [Dbms.POSTGRESQL, Dbms.H2])
+    @Test
+    fun uuid_null() = inTransaction(db) {
+        val m = Meta.uuidTest
+        val data = UUIDTest(1, null)
+        db.runQuery { QueryDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        assertEquals(data, data2)
     }
 }
