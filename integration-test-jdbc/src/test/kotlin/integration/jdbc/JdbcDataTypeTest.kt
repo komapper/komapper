@@ -133,6 +133,23 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
         assertEquals(data, data2)
     }
 
+    @Run(unless = [Dbms.POSTGRESQL])
+    @Test
+    fun blob() {
+        val m = Meta.blobTest
+        val blob = db.dataFactory.createBlob()
+        blob.setBytes(1, byteArrayOf(1, 2, 3))
+        val data = BlobTest(1, blob)
+        db.runQuery { QueryDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        val bytes = data2.value.getBytes(1, 3)
+        assertEquals(1, bytes[0])
+        assertEquals(2, bytes[1])
+        assertEquals(3, bytes[2])
+    }
+
     @Test
     fun boolean() {
         val m = Meta.booleanTest
@@ -165,6 +182,21 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
         }
         assertEquals(data.id, data2.id)
         assertContentEquals(data.value, data2.value)
+    }
+
+    @Run(unless = [Dbms.POSTGRESQL])
+    @Test
+    fun clob() {
+        val m = Meta.clobTest
+        val clob = db.dataFactory.createClob()
+        clob.setString(1, "abc")
+        val data = ClobTest(1, clob)
+        db.runQuery { QueryDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        val string = data2.value.getSubString(1, 3)
+        assertEquals("abc", string)
     }
 
     @Test
