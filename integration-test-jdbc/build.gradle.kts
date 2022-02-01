@@ -11,7 +11,7 @@ dependencies {
     api(project(":komapper-tx-jdbc"))
     compileOnly(project(":komapper-annotation"))
     ksp(project(":komapper-processor"))
-    api("org.postgresql:postgresql:42.3.1")
+    api("org.postgresql:postgresql:42.3.2")
     api(platform("org.testcontainers:testcontainers-bom:1.16.3"))
     api("org.jetbrains.kotlin:kotlin-test-junit5")
 }
