@@ -99,7 +99,7 @@ testing {
             dependencies {
                 implementation(project)
                 runtimeOnly(project(":komapper-dialect-sqlserver-r2dbc"))
-                runtimeOnly("com.microsoft.sqlserver:mssql-jdbc:9.4.1.jre11")
+                runtimeOnly("com.microsoft.sqlserver:mssql-jdbc:10.2.0.jre17")
             }
         }
     }
