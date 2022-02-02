@@ -162,7 +162,7 @@ jobs:
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    needs: [ build, jdbc-test, r2dbc-test ]
+    needs: [ build, test-jdbc, test-r2dbc ]
 
     steps:
       - name: Set up JDK 11
