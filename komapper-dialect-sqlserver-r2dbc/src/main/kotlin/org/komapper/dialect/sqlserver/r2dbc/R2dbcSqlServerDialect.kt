@@ -26,7 +26,7 @@ import org.komapper.r2dbc.R2dbcUByteType
 import org.komapper.r2dbc.R2dbcUIntType
 import org.komapper.r2dbc.R2dbcUShortType
 
-class SqlServerR2dbcDialect(
+class R2dbcSqlServerDialect(
     dataTypes: List<R2dbcDataType<*>> = emptyList(),
     val version: Version = Version.IMPLICIT
 ) : SqlServerDialect, R2dbcAbstractDialect(defaultDataTypes + dataTypes) {
@@ -53,7 +53,7 @@ class SqlServerR2dbcDialect(
             R2dbcUByteType("smallint"),
             R2dbcUIntType("bigint"),
             R2dbcUShortType("int"),
-            SqlServerR2dbcBooleanType,
+            R2dbcSqlServerBooleanType,
         )
     }
 
