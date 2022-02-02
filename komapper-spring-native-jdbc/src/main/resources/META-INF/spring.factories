@@ -1,2 +1,2 @@
 org.springframework.nativex.type.NativeConfiguration=\
-org.komapper.spring.nativex.jdbc.KomapperHints
+org.komapper.spring.nativex.jdbc.JdbcKomapperHints

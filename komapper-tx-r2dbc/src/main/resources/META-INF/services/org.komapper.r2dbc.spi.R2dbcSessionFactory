@@ -1,1 +1,1 @@
-org.komapper.tx.r2dbc.TransactionSessionFactory
+org.komapper.tx.r2dbc.R2dbcTransactionSessionFactory

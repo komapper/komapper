@@ -69,7 +69,7 @@ interface JdbcDialect : Dialect {
     fun supportsReturnGeneratedKeysFlag(): Boolean = true
 }
 
-abstract class AbstractJdbcDialect protected constructor(internalDataTypes: List<JdbcDataType<*>> = emptyList()) :
+abstract class JdbcAbstractDialect protected constructor(internalDataTypes: List<JdbcDataType<*>> = emptyList()) :
     JdbcDialect {
 
     @Suppress("MemberVisibilityCanBePrivate")

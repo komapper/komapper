@@ -14,13 +14,13 @@ import org.komapper.jdbc.JdbcSession
  * @return the result of the block
  */
 fun <R> Jdbc.withTransaction(
-    transactionAttribute: TransactionAttribute = TransactionAttribute.REQUIRED,
-    isolationLevel: IsolationLevel? = null,
-    block: TransactionScope.() -> R
+    transactionAttribute: JdbcTransactionAttribute = JdbcTransactionAttribute.REQUIRED,
+    isolationLevel: JdbcIsolationLevel? = null,
+    block: JdbcTransactionScope.() -> R
 ): R {
     return if (this is JdbcDatabase) {
         val session = this.config.session
-        return if (session is TransactionSession) {
+        return if (session is JdbcTransactionSession) {
             session.userTransaction.run(transactionAttribute, isolationLevel, block)
         } else {
             withoutTransaction(block)
@@ -30,17 +30,17 @@ fun <R> Jdbc.withTransaction(
     }
 }
 
-private fun <R> withoutTransaction(block: TransactionScope.() -> R): R {
-    val transactionScope = TransactionScopeStub()
+private fun <R> withoutTransaction(block: JdbcTransactionScope.() -> R): R {
+    val transactionScope = JdbcTransactionScopeStub()
     return block(transactionScope)
 }
 
 /**
  * The transaction manager.
  */
-val JdbcSession.transactionManager: TransactionManager
+val JdbcSession.transactionManager: JdbcTransactionManager
     get() {
-        return if (this is TransactionSession) {
+        return if (this is JdbcTransactionSession) {
             this.transactionManager
         } else {
             invalidSession(this)
@@ -49,7 +49,7 @@ val JdbcSession.transactionManager: TransactionManager
 
 private fun invalidSession(session: JdbcSession): Nothing {
     error(
-        "DatabaseConfig.session must be an instance of ${TransactionSession::class.qualifiedName}. " +
+        "DatabaseConfig.session must be an instance of ${JdbcTransactionSession::class.qualifiedName}. " +
             "But it is ${session::class.qualifiedName}"
     )
 }
