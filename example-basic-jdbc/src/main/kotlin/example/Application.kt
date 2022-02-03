@@ -9,7 +9,6 @@ import org.komapper.annotation.KomapperUpdatedAt
 import org.komapper.annotation.KomapperVersion
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
-import org.komapper.core.dsl.SchemaDsl
 import org.komapper.core.dsl.query.first
 import org.komapper.jdbc.JdbcDatabase
 import org.komapper.tx.jdbc.withTransaction
@@ -62,7 +61,7 @@ fun main() {
     db.withTransaction {
         // create a schema
         db.runQuery {
-            SchemaDsl.create(a)
+            QueryDsl.create(a)
         }
 
         // CREATE

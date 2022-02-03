@@ -1,23 +1,39 @@
 package org.komapper.core.dsl
 
+import org.komapper.core.ThreadSafe
 import org.komapper.core.dsl.context.EntityDeleteContext
 import org.komapper.core.dsl.context.EntityInsertContext
 import org.komapper.core.dsl.context.EntityUpdateContext
+import org.komapper.core.dsl.context.SchemaContext
+import org.komapper.core.dsl.context.ScriptContext
 import org.komapper.core.dsl.context.SelectContext
+import org.komapper.core.dsl.context.TemplateExecuteContext
+import org.komapper.core.dsl.context.TemplateSelectContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.query.DeleteQueryBuilder
 import org.komapper.core.dsl.query.DeleteQueryBuilderImpl
 import org.komapper.core.dsl.query.InsertQueryBuilder
 import org.komapper.core.dsl.query.InsertQueryBuilderImpl
+import org.komapper.core.dsl.query.SchemaCreateQuery
+import org.komapper.core.dsl.query.SchemaCreateQueryImpl
+import org.komapper.core.dsl.query.SchemaDropQuery
+import org.komapper.core.dsl.query.SchemaDropQueryImpl
+import org.komapper.core.dsl.query.ScriptExecuteQuery
+import org.komapper.core.dsl.query.ScriptExecuteQueryImpl
 import org.komapper.core.dsl.query.SelectQueryBuilder
 import org.komapper.core.dsl.query.SelectQueryBuilderImpl
+import org.komapper.core.dsl.query.TemplateExecuteQuery
+import org.komapper.core.dsl.query.TemplateExecuteQueryImpl
+import org.komapper.core.dsl.query.TemplateSelectQueryBuilder
+import org.komapper.core.dsl.query.TemplateSelectQueryBuilderImpl
 import org.komapper.core.dsl.query.UpdateQueryBuilder
 import org.komapper.core.dsl.query.UpdateQueryBuilderImpl
 
 /**
- * The entry point for constructing SELECT, INSERT, UPDATE, and DELETE queries.
+ * The entry point for constructing queries.
  */
-object QueryDsl : Dsl {
+@ThreadSafe
+object QueryDsl {
 
     /**
      * Creates a SELECT query builder.
@@ -77,5 +93,70 @@ object QueryDsl : Dsl {
         metamodel: META,
     ): DeleteQueryBuilder<ENTITY> {
         return DeleteQueryBuilderImpl(EntityDeleteContext(metamodel))
+    }
+
+/**
+     * Creates a builder for constructing a SELECT query.
+     *
+     * @param sql the sql template
+     * @return the builder
+     */
+    fun fromTemplate(sql: String): TemplateSelectQueryBuilder {
+        return TemplateSelectQueryBuilderImpl(TemplateSelectContext(sql))
+    }
+
+    /**
+     * Creates a query for executing an arbitrary command.
+     *
+     * @param sql the sql template
+     * @return the query
+     */
+    fun executeTemplate(sql: String): TemplateExecuteQuery {
+        return TemplateExecuteQueryImpl(TemplateExecuteContext(sql))
+    }
+
+    /**
+     * Creates a query for executing a script.
+     *
+     * @param sql the script to execute
+     */
+    fun executeScript(sql: String): ScriptExecuteQuery {
+        return ScriptExecuteQueryImpl(ScriptContext(sql))
+    }
+
+    /**
+     * Creates a query for creating tables and their associated constraints.
+     *
+     * @param metamodels the entity metamodels
+     */
+    fun create(metamodels: List<EntityMetamodel<*, *, *>>): SchemaCreateQuery {
+        return SchemaCreateQueryImpl(SchemaContext(metamodels))
+    }
+
+    /**
+     * Creates a query for creating tables and their associated constraints.
+     *
+     * @param metamodels the entity metamodels
+     */
+    fun create(vararg metamodels: EntityMetamodel<*, *, *>): SchemaCreateQuery {
+        return create(metamodels.toList())
+    }
+
+    /**
+     * Creates a query for dropping tables and their associated constraints.
+     *
+     * @param metamodels the entity metamodels
+     */
+    fun drop(metamodels: List<EntityMetamodel<*, *, *>>): SchemaDropQuery {
+        return SchemaDropQueryImpl(SchemaContext(metamodels))
+    }
+
+    /**
+     * Creates a query for dropping tables and their associated constraints.
+     *
+     * @param metamodels the entity metamodels
+     */
+    fun drop(vararg metamodels: EntityMetamodel<*, *, *>): SchemaDropQuery {
+        return drop(metamodels.toList())
     }
 }

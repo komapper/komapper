@@ -9,7 +9,6 @@ import integration.sequenceTable
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
-import org.komapper.core.dsl.SchemaDsl
 import org.komapper.core.dsl.query.andThen
 import org.komapper.jdbc.JdbcDatabase
 import kotlin.test.Test
@@ -30,21 +29,21 @@ class SchemaTest(private val db: JdbcDatabase) {
     @Test
     fun create() {
         db.runQuery {
-            SchemaDsl.create(metamodels)
+            QueryDsl.create(metamodels)
         }
         db.runQuery {
-            SchemaDsl.create(metamodels)
+            QueryDsl.create(metamodels)
         }
         // tear down
         db.runQuery {
-            SchemaDsl.drop(metamodels)
+            QueryDsl.drop(metamodels)
         }
     }
 
     @Test
     fun create_check() {
         db.runQuery {
-            SchemaDsl.create(metamodels)
+            QueryDsl.create(metamodels)
         }
         // check existence
         db.runQuery {
@@ -57,18 +56,18 @@ class SchemaTest(private val db: JdbcDatabase) {
         }
         // tear down
         db.runQuery {
-            SchemaDsl.drop(metamodels)
+            QueryDsl.drop(metamodels)
         }
     }
 
     @Test
     fun drop() {
         db.runQuery {
-            SchemaDsl.drop(metamodels)
+            QueryDsl.drop(metamodels)
         }
         // tear down
         db.runQuery {
-            SchemaDsl.drop(metamodels)
+            QueryDsl.drop(metamodels)
         }
     }
 }

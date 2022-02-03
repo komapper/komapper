@@ -11,7 +11,7 @@ import org.junit.jupiter.api.extension.ExtensionContext
 import org.junit.jupiter.api.extension.ParameterContext
 import org.junit.jupiter.api.extension.ParameterResolver
 import org.junit.platform.commons.support.AnnotationSupport.findAnnotation
-import org.komapper.core.dsl.ScriptDsl
+import org.komapper.core.dsl.QueryDsl
 import org.komapper.r2dbc.R2dbcDatabase
 import org.komapper.tx.r2dbc.withTransaction
 
@@ -36,7 +36,7 @@ internal class Env :
             runBlockingWithTimeout {
                 db.withTransaction {
                     db.runQuery {
-                        ScriptDsl.execute(setting.createSql).options {
+                        QueryDsl.executeScript(setting.createSql).options {
                             it.copy(suppressLogging = true)
                         }
                     }
@@ -51,7 +51,7 @@ internal class Env :
             runBlockingWithTimeout {
                 db.withTransaction {
                     db.runQuery {
-                        ScriptDsl.execute(resetSql).options {
+                        QueryDsl.executeScript(resetSql).options {
                             it.copy(suppressLogging = false)
                         }
                     }

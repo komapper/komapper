@@ -1,10 +1,9 @@
 package org.komapper.jdbc.dsl
 
-import org.komapper.core.dsl.Dsl
 import org.komapper.jdbc.dsl.query.MetadataQuery
 import org.komapper.jdbc.dsl.query.MetadataQueryImpl
 
-object MetadataDsl : Dsl {
+object MetadataDsl {
 
     fun tables(
         catalog: String? = null,
