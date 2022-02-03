@@ -4,8 +4,6 @@ import org.komapper.core.dsl.context.SchemaContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.query.SchemaCreateQuery
 import org.komapper.core.dsl.query.SchemaCreateQueryImpl
-import org.komapper.core.dsl.query.SchemaDropAllQuery
-import org.komapper.core.dsl.query.SchemaDropAllQueryImpl
 import org.komapper.core.dsl.query.SchemaDropQuery
 import org.komapper.core.dsl.query.SchemaDropQueryImpl
 
@@ -48,12 +46,5 @@ object SchemaDsl : Dsl {
      */
     fun drop(vararg metamodels: EntityMetamodel<*, *, *>): SchemaDropQuery {
         return drop(metamodels.toList())
-    }
-
-    /**
-     * Creates a query for dropping all tables and their associated constraints.
-     */
-    fun dropAll(): SchemaDropAllQuery {
-        return SchemaDropAllQueryImpl(SchemaContext())
     }
 }

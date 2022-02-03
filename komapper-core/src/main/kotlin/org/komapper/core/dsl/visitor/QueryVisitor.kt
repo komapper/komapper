@@ -125,8 +125,6 @@ interface QueryVisitor<VISIT_RESULT> {
         context: SchemaContext
     ): VISIT_RESULT
 
-    fun schemaDropAllQuery(context: SchemaContext): VISIT_RESULT
-
     fun scriptExecuteQuery(
         context: ScriptContext
     ): VISIT_RESULT

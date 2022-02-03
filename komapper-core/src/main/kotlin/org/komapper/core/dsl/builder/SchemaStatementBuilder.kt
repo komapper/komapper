@@ -11,7 +11,6 @@ import org.komapper.core.dsl.metamodel.isAutoIncrement
 interface SchemaStatementBuilder {
     fun create(metamodels: List<EntityMetamodel<*, *, *>>): List<Statement>
     fun drop(metamodels: List<EntityMetamodel<*, *, *>>): List<Statement>
-    fun dropAll(): List<Statement>
 }
 
 abstract class AbstractSchemaStatementBuilder<D : Dialect>(protected val dialect: D) : SchemaStatementBuilder {
@@ -32,10 +31,6 @@ abstract class AbstractSchemaStatementBuilder<D : Dialect>(protected val dialect
             statements.addAll(dropSequence(e))
         }
         return statements.filter { it.parts.isNotEmpty() }
-    }
-
-    override fun dropAll(): List<Statement> {
-        throw UnsupportedOperationException()
     }
 
     protected open fun createTable(metamodel: EntityMetamodel<*, *, *>): List<Statement> {
@@ -119,8 +114,6 @@ abstract class AbstractSchemaStatementBuilder<D : Dialect>(protected val dialect
 }
 
 object DryRunSchemaStatementBuilder : SchemaStatementBuilder {
-
     override fun create(metamodels: List<EntityMetamodel<*, *, *>>): List<Statement> = emptyList()
     override fun drop(metamodels: List<EntityMetamodel<*, *, *>>): List<Statement> = emptyList()
-    override fun dropAll(): List<Statement> = emptyList()
 }

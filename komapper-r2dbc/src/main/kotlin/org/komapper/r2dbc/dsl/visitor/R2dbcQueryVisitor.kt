@@ -37,7 +37,6 @@ import org.komapper.r2dbc.dsl.runner.R2dbcRelationUpdateRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcRowTransformers
 import org.komapper.r2dbc.dsl.runner.R2dbcRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcSchemaCreateRunner
-import org.komapper.r2dbc.dsl.runner.R2dbcSchemaDropAllRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcSchemaDropRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcScriptExecuteRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcSelectRunner
@@ -198,10 +197,6 @@ internal object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
         context: SchemaContext
     ): R2dbcRunner<Unit> {
         return R2dbcSchemaDropRunner(context)
-    }
-
-    override fun schemaDropAllQuery(context: SchemaContext): R2dbcRunner<Unit> {
-        return R2dbcSchemaDropAllRunner(context)
     }
 
     override fun scriptExecuteQuery(
