@@ -54,14 +54,34 @@ interface JdbcDialect : Dialect {
     fun getDataType(klass: KClass<*>): JdbcDataType<*>
 
     /**
+     * Returns whether the exception indicates that the sequence already exists.
+     */
+    fun isSequenceExistsError(exception: SQLException): Boolean = false
+
+    /**
+     * Returns whether the exception indicates that the sequence does not exist.
+     */
+    fun isSequenceNotExistsError(exception: SQLException): Boolean = false
+
+    /**
+     * Returns whether the exception indicates that the table already exists.
+     */
+    fun isTableExistsError(exception: SQLException): Boolean = false
+
+    /**
+     * Returns whether the exception indicates that the table does not exist.
+     */
+    fun isTableNotExistsError(exception: SQLException): Boolean = false
+
+    /**
      * Returns whether the exception indicates unique constraint violation.
      *
      * @param exception the exception
      * @return whether the exception indicates unique constraint violation
      */
-    fun isUniqueConstraintViolation(exception: SQLException): Boolean
+    fun isUniqueConstraintViolationError(exception: SQLException): Boolean
 
-    /**
+/**
      * Returns whether the [java.sql.Statement.RETURN_GENERATED_KEYS] flag is supported.
      *
      * @return whether the RETURN_GENERATED_KEYS flat is supported

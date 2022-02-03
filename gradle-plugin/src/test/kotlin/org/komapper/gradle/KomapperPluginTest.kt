@@ -93,7 +93,7 @@ class KomapperPluginTest {
                     register("h2") {
                         val db = JdbcDatabase.create("jdbc:h2:mem:example;DB_CLOSE_DELAY=-1")
                         db.runQuery {
-                            ScriptDsl.execute(""${'"'}
+                            QueryDsl.executeScript(""${'"'}
                                 drop all objects;
                                 create table department(
                                     department_id integer not null primary key, 

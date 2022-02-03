@@ -117,7 +117,7 @@ internal class JdbcExecutor(
         }
     }
 
-    fun execute(statements: List<Statement>) {
+    fun execute(statements: List<Statement>, handler: (SQLException) -> Unit = { throw it }) {
         @Suppress("NAME_SHADOWING")
         val statements = statements.map { inspect(it) }
         executeWithExceptionCheck {
@@ -126,7 +126,12 @@ internal class JdbcExecutor(
                     log(statement)
                     con.createStatement().use { s ->
                         setUp(s)
-                        s.execute(asSql(statement))
+                        val sql = asSql(statement)
+                        try {
+                            s.execute(sql)
+                        } catch (e: SQLException) {
+                            handler(e)
+                        }
                     }
                 }
             }
@@ -137,7 +142,7 @@ internal class JdbcExecutor(
         return try {
             block()
         } catch (e: SQLException) {
-            if (config.dialect.isUniqueConstraintViolation(e)) {
+            if (config.dialect.isUniqueConstraintViolationError(e)) {
                 throw UniqueConstraintException(e)
             } else {
                 throw e

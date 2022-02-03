@@ -64,7 +64,7 @@ open class JdbcMariaDbDialect(
 
     enum class Version { IMPLICIT }
 
-    override fun isUniqueConstraintViolation(exception: SQLException): Boolean {
+    override fun isUniqueConstraintViolationError(exception: SQLException): Boolean {
         return exception.filterIsInstance<SQLException>().any {
             it.errorCode in UNIQUE_CONSTRAINT_VIOLATION_ERROR_CODES
         }

@@ -3,8 +3,7 @@ package integration.jdbc
 import integration.setting.Dbms
 import integration.setting.Run
 import org.junit.jupiter.api.extension.ExtendWith
-import org.komapper.core.dsl.ScriptDsl
-import org.komapper.core.dsl.TemplateDsl
+import org.komapper.core.dsl.QueryDsl
 import org.komapper.core.dsl.query.first
 import org.komapper.jdbc.JdbcDatabase
 import kotlin.test.Test
@@ -21,12 +20,12 @@ internal class ScriptTest(private val db: JdbcDatabase) {
             create table execute_table("value" varchar(20));
             insert into execute_table("value") values('test');
             """
-            ScriptDsl.execute(script)
+            QueryDsl.executeScript(script)
         }
 
         val value = db.runQuery {
             val sql = """select "value" from execute_table"""
-            TemplateDsl.from(sql).select { row ->
+            QueryDsl.fromTemplate(sql).select { row ->
                 row.asString("value")
             }.first()
         }
@@ -36,7 +35,7 @@ internal class ScriptTest(private val db: JdbcDatabase) {
             val script = """
             drop table execute_table;
             """
-            ScriptDsl.execute(script)
+            QueryDsl.executeScript(script)
         }
     }
 
@@ -48,12 +47,12 @@ internal class ScriptTest(private val db: JdbcDatabase) {
             create table execute_table(`value` varchar(20));
             insert into execute_table(`value`) values('test');
             """
-            ScriptDsl.execute(script)
+            QueryDsl.executeScript(script)
         }
 
         val value = db.runQuery {
             val sql = "select `value` from execute_table"
-            TemplateDsl.from(sql).select { row ->
+            QueryDsl.fromTemplate(sql).select { row ->
                 row.asString("value")
             }.first()
         }
@@ -63,7 +62,7 @@ internal class ScriptTest(private val db: JdbcDatabase) {
             val script = """
             drop table execute_table;
             """
-            ScriptDsl.execute(script)
+            QueryDsl.executeScript(script)
         }
     }
 }

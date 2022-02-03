@@ -6,11 +6,9 @@ import integration.bbb
 import integration.ccc
 import integration.compositeKey
 import integration.sequenceTable
-import org.junit.jupiter.api.RepeatedTest
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
-import org.komapper.core.dsl.SchemaDsl
 import org.komapper.core.dsl.query.andThen
 import org.komapper.jdbc.JdbcDatabase
 import kotlin.test.Test
@@ -28,11 +26,24 @@ class SchemaTest(private val db: JdbcDatabase) {
             Meta.sequenceTable
         )
 
-    @RepeatedTest(2)
     @Test
-    fun create_drop() {
+    fun create() {
         db.runQuery {
-            SchemaDsl.create(metamodels)
+            QueryDsl.create(metamodels)
+        }
+        db.runQuery {
+            QueryDsl.create(metamodels)
+        }
+        // tear down
+        db.runQuery {
+            QueryDsl.drop(metamodels)
+        }
+    }
+
+    @Test
+    fun create_check() {
+        db.runQuery {
+            QueryDsl.create(metamodels)
         }
         // check existence
         db.runQuery {
@@ -43,8 +54,20 @@ class SchemaTest(private val db: JdbcDatabase) {
                 .andThen(QueryDsl.from(Meta.autoIncrementTable))
                 .andThen(QueryDsl.from(Meta.sequenceTable))
         }
+        // tear down
         db.runQuery {
-            SchemaDsl.drop(metamodels)
+            QueryDsl.drop(metamodels)
+        }
+    }
+
+    @Test
+    fun drop() {
+        db.runQuery {
+            QueryDsl.drop(metamodels)
+        }
+        // tear down
+        db.runQuery {
+            QueryDsl.drop(metamodels)
         }
     }
 }

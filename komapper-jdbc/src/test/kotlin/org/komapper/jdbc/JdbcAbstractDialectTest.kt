@@ -16,7 +16,7 @@ internal class JdbcAbstractDialectTest {
         override val driver: String
             get() = throw UnsupportedOperationException()
 
-        override fun isUniqueConstraintViolation(exception: SQLException): Boolean {
+        override fun isUniqueConstraintViolationError(exception: SQLException): Boolean {
             throw UnsupportedOperationException()
         }
 

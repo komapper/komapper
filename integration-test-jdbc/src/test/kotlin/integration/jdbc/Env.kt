@@ -11,7 +11,7 @@ import org.junit.jupiter.api.extension.ExtensionContext
 import org.junit.jupiter.api.extension.ParameterContext
 import org.junit.jupiter.api.extension.ParameterResolver
 import org.junit.platform.commons.support.AnnotationSupport.findAnnotation
-import org.komapper.core.dsl.ScriptDsl
+import org.komapper.core.dsl.QueryDsl
 import org.komapper.jdbc.JdbcDatabase
 import org.komapper.tx.jdbc.transactionManager
 import org.komapper.tx.jdbc.withTransaction
@@ -37,7 +37,7 @@ internal class Env :
             initialized = true
             db.withTransaction {
                 db.runQuery {
-                    ScriptDsl.execute(setting.createSql).options {
+                    QueryDsl.executeScript(setting.createSql).options {
                         it.copy(suppressLogging = true)
                     }
                 }
@@ -50,7 +50,7 @@ internal class Env :
         if (resetSql != null) {
             db.withTransaction {
                 db.runQuery {
-                    ScriptDsl.execute(resetSql).options {
+                    QueryDsl.executeScript(resetSql).options {
                         it.copy(suppressLogging = true)
                     }
                 }

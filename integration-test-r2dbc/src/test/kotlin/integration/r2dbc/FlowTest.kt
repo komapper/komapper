@@ -7,7 +7,6 @@ import kotlinx.coroutines.flow.toList
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
-import org.komapper.core.dsl.TemplateDsl
 import org.komapper.r2dbc.R2dbcDatabase
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -224,7 +223,8 @@ class FlowTest(val db: R2dbcDatabase) {
     @Test
     fun template() = inTransaction(db) {
         val flow = db.flow {
-            TemplateDsl.from("select address_id from address order by address_id").select { it.asInt("address_id") }
+            QueryDsl.fromTemplate("select address_id from address order by address_id")
+                .select { it.asInt("address_id") }
         }
         assertEquals((1..15).toList(), flow.toList())
     }

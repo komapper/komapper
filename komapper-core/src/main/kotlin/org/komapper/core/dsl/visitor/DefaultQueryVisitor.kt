@@ -37,7 +37,6 @@ import org.komapper.core.dsl.runner.RelationInsertValuesRunner
 import org.komapper.core.dsl.runner.RelationUpdateRunner
 import org.komapper.core.dsl.runner.Runner
 import org.komapper.core.dsl.runner.SchemaCreateRunner
-import org.komapper.core.dsl.runner.SchemaDropAllRunner
 import org.komapper.core.dsl.runner.SchemaDropRunner
 import org.komapper.core.dsl.runner.ScriptExecuteRunner
 import org.komapper.core.dsl.runner.SelectRunner
@@ -189,10 +188,6 @@ internal object DefaultQueryVisitor : QueryVisitor<Runner> {
         context: SchemaContext
     ): Runner {
         return SchemaDropRunner(context)
-    }
-
-    override fun schemaDropAllQuery(context: SchemaContext): Runner {
-        return SchemaDropAllRunner(context)
     }
 
     override fun scriptExecuteQuery(

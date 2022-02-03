@@ -69,7 +69,7 @@ open class JdbcH2Dialect(
 
     enum class Version { IMPLICIT }
 
-    override fun isUniqueConstraintViolation(exception: SQLException): Boolean {
+    override fun isUniqueConstraintViolationError(exception: SQLException): Boolean {
         return exception.filterIsInstance<SQLException>().any {
             it.errorCode == UNIQUE_CONSTRAINT_VIOLATION_ERROR_CODE
         }

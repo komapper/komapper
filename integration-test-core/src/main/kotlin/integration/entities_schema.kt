@@ -5,7 +5,6 @@ import org.komapper.annotation.KomapperColumn
 import org.komapper.annotation.KomapperEntity
 import org.komapper.annotation.KomapperId
 import org.komapper.annotation.KomapperSequence
-import org.komapper.annotation.KomapperTable
 
 @KomapperEntity
 data class Aaa(
@@ -27,8 +26,21 @@ data class Ccc(
 )
 
 @KomapperEntity
-@KomapperTable(schema = "test")
-data class Ddd(
-    @KomapperId @KomapperAutoIncrement val id: Int,
-    val name: String?,
+data class CompositeKey(
+    @KomapperId val addressId1: Int,
+    @KomapperId val addressId2: Int,
+    val street: String,
+    val version: Int
+)
+
+@KomapperEntity
+data class AutoIncrementTable(
+    @KomapperId @KomapperAutoIncrement val id: Int?,
+    @KomapperColumn(alwaysQuote = true) val value: String
+)
+
+@KomapperEntity
+data class SequenceTable(
+    @KomapperId @KomapperSequence(name = "sequence_table_id", incrementBy = 100) val id: Int,
+    @KomapperColumn(alwaysQuote = true) val value: String
 )

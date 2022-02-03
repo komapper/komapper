@@ -47,7 +47,6 @@ import integration.uuidTest
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
-import org.komapper.core.dsl.TemplateDsl
 import org.komapper.core.dsl.query.first
 import org.komapper.jdbc.JdbcDatabase
 import java.math.BigDecimal
@@ -392,8 +391,7 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
         assertEquals(data, data2)
 
         val result = db.runQuery {
-            TemplateDsl
-                .from("select value->'b' as x from json_test")
+            QueryDsl.fromTemplate("select value->'b' as x from json_test")
                 .select { it.asT("x", Json::class)!! }
                 .first()
         }

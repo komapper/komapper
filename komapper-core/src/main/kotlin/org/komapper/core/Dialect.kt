@@ -142,7 +142,7 @@ interface Dialect {
      */
     fun getSubstringFunction(): String = "substring"
 
-/**
+    /**
      * Returns the statement builder for schema.
      *
      * @return the statement builder
@@ -178,7 +178,7 @@ interface Dialect {
      */
     fun getDefaultLengthForSubstringFunction(): Int? = null
 
-/**
+    /**
      * Returns whether the limit and offset clauses are supported without using the order by clause.
      *
      * @return whether the limit and offset clauses are supported
@@ -207,13 +207,23 @@ interface Dialect {
     fun supportsAsKeywordForTableAlias(): Boolean = true
 
     /**
+     * Returns whether the "create table/sequence if not exists" syntax.
+     */
+    fun supportsCreateIfNotExists(): Boolean = true
+
+    /**
+     * Returns whether the "drop table/sequence if exists" syntax.
+     */
+    fun supportsDropIfExists(): Boolean = true
+
+    /**
      * Returns whether the except set operation is supported.
      *
      * @return whether the except set operation is supported
      */
     fun supportsExceptSetOperation(): Boolean = true
 
-/**
+    /**
      * Returns whether the nulls first and nulls last options are supported in the order by clause.
      *
      * @return whether the nulls first and nulls last options are supported

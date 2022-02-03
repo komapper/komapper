@@ -41,7 +41,6 @@ import org.komapper.jdbc.dsl.runner.JdbcRelationUpdateRunner
 import org.komapper.jdbc.dsl.runner.JdbcResultSetTransformers
 import org.komapper.jdbc.dsl.runner.JdbcRunner
 import org.komapper.jdbc.dsl.runner.JdbcSchemaCreateRunner
-import org.komapper.jdbc.dsl.runner.JdbcSchemaDropAllRunner
 import org.komapper.jdbc.dsl.runner.JdbcSchemaDropRunner
 import org.komapper.jdbc.dsl.runner.JdbcScriptExecuteRunner
 import org.komapper.jdbc.dsl.runner.JdbcSelectRunner
@@ -206,10 +205,6 @@ internal object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
         context: SchemaContext
     ): JdbcRunner<Unit> {
         return JdbcSchemaDropRunner(context)
-    }
-
-    override fun schemaDropAllQuery(context: SchemaContext): JdbcRunner<Unit> {
-        return JdbcSchemaDropAllRunner(context)
     }
 
     override fun scriptExecuteQuery(

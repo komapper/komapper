@@ -16,7 +16,13 @@ internal class JdbcSchemaCreateRunner(
     override fun run(config: JdbcDatabaseConfig) {
         val statements = runner.buildStatements(config)
         val executor = JdbcExecutor(config, context.options)
-        executor.execute(statements)
+        executor.execute(statements) {
+            if (!config.dialect.isTableExistsError(it) &&
+                !config.dialect.isSequenceExistsError(it)
+            ) {
+                throw it
+            }
+        }
     }
 
     override fun dryRun(config: DatabaseConfig): DryRunStatement {
