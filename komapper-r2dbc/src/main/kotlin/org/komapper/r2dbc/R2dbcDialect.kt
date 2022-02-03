@@ -1,5 +1,6 @@
 package org.komapper.r2dbc
 
+import io.r2dbc.spi.R2dbcException
 import io.r2dbc.spi.Row
 import io.r2dbc.spi.Statement
 import org.komapper.core.Dialect
@@ -52,6 +53,26 @@ interface R2dbcDialect : Dialect {
      * @return the data type
      */
     fun getDataType(klass: KClass<*>): R2dbcDataType<*>
+
+    /**
+     * Returns whether the exception indicates that the sequence already exists.
+     */
+    fun isSequenceExistsError(exception: R2dbcException): Boolean = false
+
+    /**
+     * Returns whether the exception indicates that the sequence does not exist.
+     */
+    fun isSequenceNotExistsError(exception: R2dbcException): Boolean = false
+
+    /**
+     * Returns whether the exception indicates that the table already exists.
+     */
+    fun isTableExistsError(exception: R2dbcException): Boolean = false
+
+    /**
+     * Returns whether the exception indicates that the table does not exist.
+     */
+    fun isTableNotExistsError(exception: R2dbcException): Boolean = false
 }
 
 abstract class R2dbcAbstractDialect protected constructor(internalDataTypes: List<R2dbcDataType<*>> = emptyList()) :

@@ -12,6 +12,12 @@ interface OracleDialect : Dialect {
 
     companion object {
         const val DRIVER = "oracle"
+
+        const val TABLE_DOES_NOT_EXIST_ERROR_CODE = 942
+
+        const val NAME_IS_ALREADY_USED_ERROR_CODE = 955
+
+        const val SEQUENCE_DOES_NOT_EXIST_ERROR_CODE = 2289
     }
 
     override val driver: String get() = DRIVER
@@ -50,4 +56,8 @@ interface OracleDialect : Dialect {
     ): EntityUpsertStatementBuilder<ENTITY> {
         return OracleEntityUpsertStatementBuilder(this, context, entities)
     }
+
+    override fun supportsCreateIfNotExists(): Boolean = false
+
+    override fun supportsDropIfExists(): Boolean = false
 }

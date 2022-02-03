@@ -13,6 +13,7 @@ interface SqlServerDialect : Dialect {
         const val DRIVER = "sqlserver"
         const val OPEN_QUOTE = "["
         const val CLOSE_QUOTE = "]"
+        const val OBJECT_ALREADY_EXISTS_ERROR_CODE = 2714
     }
 
     override val driver: String get() = DRIVER
@@ -45,6 +46,8 @@ interface SqlServerDialect : Dialect {
     override fun supportsAliasForDeleteStatement(): Boolean = false
 
     override fun supportsAliasForUpdateStatement(): Boolean = false
+
+    override fun supportsCreateIfNotExists(): Boolean = false
 
     override fun supportsNullOrdering(): Boolean = false
 

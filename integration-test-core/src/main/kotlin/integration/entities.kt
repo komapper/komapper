@@ -31,14 +31,6 @@ data class CompositeKeyAddress(
 )
 
 @KomapperEntity
-data class CompositeKey(
-    @KomapperId val addressId1: Int,
-    @KomapperId val addressId2: Int,
-    val street: String,
-    val version: Int
-)
-
-@KomapperEntity
 @KomapperTable("identity_strategy")
 data class IdentityStrategy(
     @KomapperId @KomapperAutoIncrement val id: Int?,
@@ -99,16 +91,4 @@ data class NoVersionDepartment(
     @KomapperColumn("department_name") val departmentName: String,
     val location: String,
     val version: Int,
-)
-
-@KomapperEntity
-data class AutoIncrementTable(
-    @KomapperId @KomapperAutoIncrement val id: Int?,
-    @KomapperColumn(alwaysQuote = true)val value: String
-)
-
-@KomapperEntity
-data class SequenceTable(
-    @KomapperId @KomapperSequence(name = "sequence_table_id", incrementBy = 100) val id: Int,
-    @KomapperColumn(alwaysQuote = true)val value: String
 )

@@ -60,8 +60,32 @@ class JdbcOracleDialect(
 
     enum class Version { IMPLICIT }
 
-    override fun isUniqueConstraintViolation(exception: SQLException): Boolean {
-        return exception.filterIsInstance<SQLException>().all {
+    override fun isSequenceExistsError(exception: SQLException): Boolean {
+        return exception.filterIsInstance<SQLException>().any {
+            return it.errorCode == OracleDialect.NAME_IS_ALREADY_USED_ERROR_CODE
+        }
+    }
+
+    override fun isSequenceNotExistsError(exception: SQLException): Boolean {
+        return exception.filterIsInstance<SQLException>().any {
+            return it.errorCode == OracleDialect.SEQUENCE_DOES_NOT_EXIST_ERROR_CODE
+        }
+    }
+
+    override fun isTableExistsError(exception: SQLException): Boolean {
+        return exception.filterIsInstance<SQLException>().any {
+            return it.errorCode == OracleDialect.NAME_IS_ALREADY_USED_ERROR_CODE
+        }
+    }
+
+    override fun isTableNotExistsError(exception: SQLException): Boolean {
+        return exception.filterIsInstance<SQLException>().any {
+            return it.errorCode == OracleDialect.TABLE_DOES_NOT_EXIST_ERROR_CODE
+        }
+    }
+
+    override fun isUniqueConstraintViolationError(exception: SQLException): Boolean {
+        return exception.filterIsInstance<SQLException>().any {
             return it.errorCode == UNIQUE_CONSTRAINT_VIOLATION_ERROR_CODE
         }
     }

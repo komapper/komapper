@@ -1,5 +1,6 @@
 package org.komapper.dialect.sqlserver.r2dbc
 
+import io.r2dbc.spi.R2dbcException
 import org.komapper.dialect.sqlserver.SqlServerDialect
 import org.komapper.r2dbc.AtSignBinder
 import org.komapper.r2dbc.Binder
@@ -61,5 +62,13 @@ class R2dbcSqlServerDialect(
 
     override fun getBinder(): Binder {
         return AtSignBinder
+    }
+
+    override fun isSequenceExistsError(exception: R2dbcException): Boolean {
+        return exception.errorCode == SqlServerDialect.OBJECT_ALREADY_EXISTS_ERROR_CODE
+    }
+
+    override fun isTableExistsError(exception: R2dbcException): Boolean {
+        return exception.errorCode == SqlServerDialect.OBJECT_ALREADY_EXISTS_ERROR_CODE
     }
 }

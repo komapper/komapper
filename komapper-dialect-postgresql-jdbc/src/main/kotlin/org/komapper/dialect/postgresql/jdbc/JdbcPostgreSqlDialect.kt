@@ -61,7 +61,7 @@ open class JdbcPostgreSqlDialect(
 
     enum class Version { IMPLICIT }
 
-    override fun isUniqueConstraintViolation(exception: SQLException): Boolean {
+    override fun isUniqueConstraintViolationError(exception: SQLException): Boolean {
         return exception.filterIsInstance<SQLException>().any {
             it.sqlState == UNIQUE_CONSTRAINT_VIOLATION_STATE_CODE
         }

@@ -1,5 +1,6 @@
 package org.komapper.dialect.oracle.r2dbc
 
+import io.r2dbc.spi.R2dbcException
 import org.komapper.dialect.oracle.OracleDialect
 import org.komapper.r2dbc.R2dbcAbstractDialect
 import org.komapper.r2dbc.R2dbcBigDecimalType
@@ -29,6 +30,7 @@ open class R2dbcOracleDialect(
 ) : OracleDialect, R2dbcAbstractDialect(defaultDataTypes + dataTypes) {
 
     companion object {
+
         val defaultDataTypes: List<R2dbcDataType<*>> = listOf(
             R2dbcBigDecimalType("decimal"),
             R2dbcBigIntegerType("decimal"),
@@ -54,4 +56,20 @@ open class R2dbcOracleDialect(
     }
 
     enum class Version { IMPLICIT }
+
+    override fun isSequenceExistsError(exception: R2dbcException): Boolean {
+        return exception.errorCode == OracleDialect.NAME_IS_ALREADY_USED_ERROR_CODE
+    }
+
+    override fun isSequenceNotExistsError(exception: R2dbcException): Boolean {
+        return exception.errorCode == OracleDialect.SEQUENCE_DOES_NOT_EXIST_ERROR_CODE
+    }
+
+    override fun isTableExistsError(exception: R2dbcException): Boolean {
+        return exception.errorCode == OracleDialect.NAME_IS_ALREADY_USED_ERROR_CODE
+    }
+
+    override fun isTableNotExistsError(exception: R2dbcException): Boolean {
+        return exception.errorCode == OracleDialect.TABLE_DOES_NOT_EXIST_ERROR_CODE
+    }
 }

@@ -16,7 +16,12 @@ internal class R2dbcSchemaCreateRunner(
     override suspend fun run(config: R2dbcDatabaseConfig) {
         val statements = runner.buildStatements(config)
         val executor = R2dbcExecutor(config, context.options)
-        executor.execute(statements)
+        executor.execute(statements) {
+            val dialect = config.dialect
+            val exception = it.exception()
+            !dialect.isTableExistsError(exception) &&
+                !dialect.isSequenceExistsError(exception)
+        }
     }
 
     override fun dryRun(config: DatabaseConfig): DryRunStatement {

@@ -76,7 +76,7 @@ internal class R2dbcExecutor(
     }
 
     @OptIn(kotlinx.coroutines.FlowPreview::class)
-    suspend fun execute(statements: List<Statement>) {
+    suspend fun execute(statements: List<Statement>, predicate: (Result.Message) -> Boolean = { true }) {
         @Suppress("NAME_SHADOWING")
         val statements = statements.map { inspect(it) }
         return config.session.connection.toFlow().flatMapConcat { con ->
@@ -87,7 +87,12 @@ internal class R2dbcExecutor(
                     batch.add(sql)
                 }
                 batch.execute().toFlow().flatMapConcat { result ->
-                    result.rowsUpdated.toFlow()
+                    result.filter {
+                        when (it) {
+                            is Result.Message -> predicate(it)
+                            else -> true
+                        }
+                    }.rowsUpdated.toFlow()
                 }
             }
         }.onStart {
