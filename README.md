@@ -46,7 +46,7 @@ Komapper is tested with the following databases:
 | PostgreSQL         | 12.9    |      v       |       v       |
 | SQL Server         | 2019    |      v       |       v       |
 
-Supported connectivity types are JDBC 4.3 and R2DBC 0.9.0.
+Supported connectivity types are JDBC 4.3 and R2DBC 0.9.1.
 
 ## Installation
 
