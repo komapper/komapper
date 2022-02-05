@@ -1,8 +1,8 @@
 package org.komapper.dialect.sqlserver.r2dbc
 
-import org.komapper.r2dbc.R2dbcAbstractDataType
+import org.komapper.r2dbc.R2dbcAbstractType
 
-object R2dbcSqlServerBooleanType : R2dbcAbstractDataType<Boolean>(Boolean::class) {
+object R2dbcSqlServerBooleanType : R2dbcAbstractType<Boolean>(Boolean::class) {
     override val name: String = "bit"
 
     override fun convert(value: Any): Boolean {

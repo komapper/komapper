@@ -18,6 +18,6 @@ object R2dbcSessions {
     fun get(connectionFactory: ConnectionFactory, loggerFacade: LoggerFacade): R2dbcSession {
         val loader = ServiceLoader.load(R2dbcSessionFactory::class.java)
         val factory = loader.findByPriority()
-        return factory?.create(connectionFactory, loggerFacade) ?: DefaultR2DbcSession(connectionFactory)
+        return factory?.create(connectionFactory, loggerFacade) ?: DefaultR2dbcSession(connectionFactory)
     }
 }

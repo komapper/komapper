@@ -4,7 +4,7 @@ import kotlin.test.Test
 import kotlin.test.assertNull
 import kotlin.test.assertSame
 
-internal class UtilityKtTest {
+internal class SpiUtilityTest {
 
     @Test
     fun findByPriority() {

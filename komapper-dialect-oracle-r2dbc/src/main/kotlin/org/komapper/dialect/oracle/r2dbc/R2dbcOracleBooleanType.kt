@@ -1,9 +1,9 @@
 package org.komapper.dialect.oracle.r2dbc
 
 import io.r2dbc.spi.Statement
-import org.komapper.r2dbc.R2dbcAbstractDataType
+import org.komapper.r2dbc.R2dbcAbstractType
 
-object R2dbcOracleBooleanType : R2dbcAbstractDataType<Boolean>(Boolean::class) {
+object R2dbcOracleBooleanType : R2dbcAbstractType<Boolean>(Boolean::class) {
     override val name: String = "integer(1)"
 
     override fun convert(value: Any): Boolean {

@@ -3,7 +3,7 @@ package org.komapper.processor
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-internal class UtilityKtTest {
+internal class ProcessorUtilityTest {
 
     @Test
     fun toPropertyNameFormat() {

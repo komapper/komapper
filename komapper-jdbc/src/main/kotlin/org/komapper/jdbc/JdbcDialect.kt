@@ -81,7 +81,7 @@ interface JdbcDialect : Dialect {
      */
     fun isUniqueConstraintViolationError(exception: SQLException): Boolean
 
-/**
+    /**
      * Returns whether the [java.sql.Statement.RETURN_GENERATED_KEYS] flag is supported.
      *
      * @return whether the RETURN_GENERATED_KEYS flat is supported

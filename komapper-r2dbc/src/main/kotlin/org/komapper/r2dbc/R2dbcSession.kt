@@ -16,7 +16,7 @@ interface R2dbcSession {
     val connection: Publisher<out Connection>
 }
 
-class DefaultR2DbcSession(private val connectionFactory: ConnectionFactory) : R2dbcSession {
+class DefaultR2dbcSession(private val connectionFactory: ConnectionFactory) : R2dbcSession {
     override val connection: Publisher<out Connection>
         get() = connectionFactory.create()
 }

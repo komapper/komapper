@@ -4,7 +4,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 
-class R2DbcDialectsTest {
+class R2dbcDialectsTest {
 
     @Test
     fun extractR2dbcDriver() {
