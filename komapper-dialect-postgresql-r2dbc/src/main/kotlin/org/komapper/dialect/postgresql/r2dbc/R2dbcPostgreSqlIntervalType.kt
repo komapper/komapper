@@ -4,8 +4,8 @@ import io.r2dbc.postgresql.codec.Json
 import io.r2dbc.spi.Row
 import org.komapper.r2dbc.R2dbcAbstractDataType
 
-object R2dbcPostgresqlJsonType : R2dbcAbstractDataType<Json>(Json::class) {
-    override val name: String = "json"
+object R2dbcPostgreSqlIntervalType : R2dbcAbstractDataType<Json>(Json::class) {
+    override val name: String = "interval"
 
     override fun getValue(row: Row, index: Int): Json? {
         return row.get(index, klass.java)

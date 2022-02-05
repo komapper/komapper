@@ -44,6 +44,7 @@ interface PostgreSqlSetting<CONFIG> : Setting<CONFIG> {
         create table if not exists string_test(id integer not null primary key, value varchar(20));
         create table if not exists uuid_test(id integer not null primary key, value uuid);
 
+        create table if not exists interval_test(id integer not null primary key, value interval);
         create table if not exists json_test(id integer not null primary key, value jsonb);
 
         insert into department values(1,10,'ACCOUNTING','NEW YORK',1);
