@@ -1,7 +1,7 @@
 package integration.r2dbc
 
-import integration.address
-import integration.employee
+import integration.core.address
+import integration.core.employee
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.toList
 import org.junit.jupiter.api.extension.ExtendWith

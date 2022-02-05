@@ -1,15 +1,15 @@
 package integration.jdbc
 
-import integration.Address
-import integration.Department
-import integration.IdentityStrategy
-import integration.Person
-import integration.address
-import integration.department
-import integration.identityStrategy
-import integration.person
-import integration.setting.Dbms
-import integration.setting.Run
+import integration.core.Address
+import integration.core.Dbms
+import integration.core.Department
+import integration.core.IdentityStrategy
+import integration.core.Person
+import integration.core.Run
+import integration.core.address
+import integration.core.department
+import integration.core.identityStrategy
+import integration.core.person
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.UniqueConstraintException
 import org.komapper.core.dsl.Meta

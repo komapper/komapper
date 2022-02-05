@@ -1,9 +1,9 @@
 package integration.jdbc
 
-import integration.booleanTest
-import integration.intTest
-import integration.longTest
-import integration.stringTest
+import integration.core.booleanTest
+import integration.core.intTest
+import integration.core.longTest
+import integration.core.stringTest
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl

@@ -1,9 +1,9 @@
 package integration.jdbc
 
-import integration.Address
-import integration.address
-import integration.setting.Dbms
-import integration.setting.Run
+import integration.core.Address
+import integration.core.Dbms
+import integration.core.Run
+import integration.core.address
 import kotlinx.coroutines.flow.toList
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta

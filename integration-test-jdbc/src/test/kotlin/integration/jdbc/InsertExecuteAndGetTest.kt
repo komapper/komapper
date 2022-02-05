@@ -1,11 +1,11 @@
 package integration.jdbc
 
-import integration.Address
-import integration.CompositeKeyAddress
-import integration.Department
-import integration.address
-import integration.compositeKeyAddress
-import integration.department
+import integration.core.Address
+import integration.core.CompositeKeyAddress
+import integration.core.Department
+import integration.core.address
+import integration.core.compositeKeyAddress
+import integration.core.department
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl

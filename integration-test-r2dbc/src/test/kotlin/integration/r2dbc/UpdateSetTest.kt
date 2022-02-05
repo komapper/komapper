@@ -1,10 +1,10 @@
 package integration.r2dbc
 
-import integration.Person
-import integration.address
-import integration.employee
-import integration.identityStrategy
-import integration.person
+import integration.core.Person
+import integration.core.address
+import integration.core.employee
+import integration.core.identityStrategy
+import integration.core.person
 import kotlinx.coroutines.delay
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta

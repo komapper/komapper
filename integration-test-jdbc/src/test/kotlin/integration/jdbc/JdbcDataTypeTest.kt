@@ -1,49 +1,64 @@
 package integration.jdbc
 
-import integration.Direction
-import integration.Json
-import integration.JsonTest
-import integration.SqlXmlTest
-import integration.StringTest
-import integration.UByteTest
-import integration.UIntTest
-import integration.UIntVersion
-import integration.UShortTest
-import integration.UUIDTest
-import integration.UnsignedAddress
-import integration.UnsignedAddress2
-import integration.UnsignedIdentityStrategy
-import integration.UnsignedSequenceStrategy
-import integration.anyTest
-import integration.arrayTest
-import integration.bigDecimalTest
-import integration.bigIntegerTest
-import integration.booleanTest
-import integration.byteArrayTest
-import integration.byteTest
-import integration.doubleTest
-import integration.enumTest
-import integration.floatTest
-import integration.intTest
-import integration.jsonTest
-import integration.localDateTest
-import integration.localDateTimeTest
-import integration.localTimeTest
-import integration.longTest
-import integration.offsetDateTimeTest
-import integration.setting.Dbms
-import integration.setting.Run
-import integration.shortTest
-import integration.sqlXmlTest
-import integration.stringTest
-import integration.uByteTest
-import integration.uIntTest
-import integration.uShortTest
-import integration.unsignedAddress
-import integration.unsignedAddress2
-import integration.unsignedIdentityStrategy
-import integration.unsignedSequenceStrategy
-import integration.uuidTest
+import integration.core.AnyPerson
+import integration.core.AnyTest
+import integration.core.ArrayTest
+import integration.core.BigDecimalTest
+import integration.core.BigIntegerTest
+import integration.core.BooleanTest
+import integration.core.ByteArrayTest
+import integration.core.ByteTest
+import integration.core.Dbms
+import integration.core.Direction
+import integration.core.DoubleTest
+import integration.core.EnumTest
+import integration.core.FloatTest
+import integration.core.IntTest
+import integration.core.LocalDateTest
+import integration.core.LocalDateTimeTest
+import integration.core.LocalTimeTest
+import integration.core.LongTest
+import integration.core.OffsetDateTimeTest
+import integration.core.Run
+import integration.core.ShortTest
+import integration.core.SqlXmlTest
+import integration.core.StringTest
+import integration.core.UByteTest
+import integration.core.UIntTest
+import integration.core.UIntVersion
+import integration.core.UShortTest
+import integration.core.UUIDTest
+import integration.core.UnsignedAddress
+import integration.core.UnsignedAddress2
+import integration.core.UnsignedIdentityStrategy
+import integration.core.UnsignedSequenceStrategy
+import integration.core.anyTest
+import integration.core.arrayTest
+import integration.core.bigDecimalTest
+import integration.core.bigIntegerTest
+import integration.core.booleanTest
+import integration.core.byteArrayTest
+import integration.core.byteTest
+import integration.core.doubleTest
+import integration.core.enumTest
+import integration.core.floatTest
+import integration.core.intTest
+import integration.core.localDateTest
+import integration.core.localDateTimeTest
+import integration.core.localTimeTest
+import integration.core.longTest
+import integration.core.offsetDateTimeTest
+import integration.core.shortTest
+import integration.core.sqlXmlTest
+import integration.core.stringTest
+import integration.core.uByteTest
+import integration.core.uIntTest
+import integration.core.uShortTest
+import integration.core.unsignedAddress
+import integration.core.unsignedAddress2
+import integration.core.unsignedIdentityStrategy
+import integration.core.unsignedSequenceStrategy
+import integration.core.uuidTest
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
@@ -70,9 +85,9 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
     @Test
     fun any() {
         val m = Meta.anyTest
-        val data = integration.AnyTest(
+        val data = AnyTest(
             1,
-            integration.AnyPerson("ABC")
+            AnyPerson("ABC")
         )
         db.runQuery { QueryDsl.insert(m).single(data) }
         val data2 = db.runQuery {
@@ -86,7 +101,7 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
     fun array() {
         val m = Meta.arrayTest
         val array = db.dataFactory.createArrayOf("text", listOf("A", "B", "C"))
-        val data = integration.ArrayTest(1, array)
+        val data = ArrayTest(1, array)
         db.runQuery { QueryDsl.insert(m).single(data) }
         val data2 = db.runQuery {
             QueryDsl.from(m).where { m.id eq 1 }.first()
@@ -102,7 +117,7 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
     @Test
     fun array_null() {
         val m = Meta.arrayTest
-        val data = integration.ArrayTest(1, null)
+        val data = ArrayTest(1, null)
         db.runQuery { QueryDsl.insert(m).single(data) }
         val data2 = db.runQuery {
             QueryDsl.from(m).where { m.id eq 1 }.first()
@@ -113,7 +128,7 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
     @Test
     fun bigDecimal() {
         val m = Meta.bigDecimalTest
-        val data = integration.BigDecimalTest(1, BigDecimal.TEN)
+        val data = BigDecimalTest(1, BigDecimal.TEN)
         db.runQuery { QueryDsl.insert(m).single(data) }
         val data2 = db.runQuery {
             QueryDsl.from(m).where { m.id eq 1 }.first()
@@ -124,7 +139,7 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
     @Test
     fun bigInteger() {
         val m = Meta.bigIntegerTest
-        val data = integration.BigIntegerTest(1, BigInteger.TEN)
+        val data = BigIntegerTest(1, BigInteger.TEN)
         db.runQuery { QueryDsl.insert(m).single(data) }
         val data2 = db.runQuery {
             QueryDsl.from(m).where { m.id eq 1 }.first()
@@ -152,7 +167,7 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
     @Test
     fun boolean() {
         val m = Meta.booleanTest
-        val data = integration.BooleanTest(1, true)
+        val data = BooleanTest(1, true)
         db.runQuery { QueryDsl.insert(m).single(data) }
         val data2 = db.runQuery {
             QueryDsl.from(m).where { m.id eq 1 }.first()
@@ -163,7 +178,7 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
     @Test
     fun byte() {
         val m = Meta.byteTest
-        val data = integration.ByteTest(1, 10)
+        val data = ByteTest(1, 10)
         db.runQuery { QueryDsl.insert(m).single(data) }
         val data2 = db.runQuery {
             QueryDsl.from(m).where { m.id eq 1 }.first()
@@ -174,7 +189,7 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
     @Test
     fun byteArray() {
         val m = Meta.byteArrayTest
-        val data = integration.ByteArrayTest(1, byteArrayOf(10, 20, 30))
+        val data = ByteArrayTest(1, byteArrayOf(10, 20, 30))
         db.runQuery { QueryDsl.insert(m).single(data) }
         val data2 = db.runQuery {
             QueryDsl.from(m).where { m.id eq 1 }.first()
@@ -201,7 +216,7 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
     @Test
     fun double() {
         val m = Meta.doubleTest
-        val data = integration.DoubleTest(1, 10.0)
+        val data = DoubleTest(1, 10.0)
         db.runQuery { QueryDsl.insert(m).single(data) }
         val data2 = db.runQuery {
             QueryDsl.from(m).where { m.id eq 1 }.first()
@@ -212,7 +227,7 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
     @Test
     fun enum() {
         val m = Meta.enumTest
-        val data = integration.EnumTest(1, Direction.EAST)
+        val data = EnumTest(1, Direction.EAST)
         db.runQuery { QueryDsl.insert(m).single(data) }
         val data2 = db.runQuery {
             QueryDsl.from(m).where { m.id eq 1 }.first()
@@ -223,7 +238,7 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
     @Test
     fun float() {
         val m = Meta.floatTest
-        val data = integration.FloatTest(1, 10.0f)
+        val data = FloatTest(1, 10.0f)
         db.runQuery { QueryDsl.insert(m).single(data) }
         val data2 = db.runQuery {
             QueryDsl.from(m).where { m.id eq 1 }.first()
@@ -234,7 +249,7 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
     @Test
     fun int() {
         val m = Meta.intTest
-        val data = integration.IntTest(1, 10)
+        val data = IntTest(1, 10)
         db.runQuery { QueryDsl.insert(m).single(data) }
         val data2 = db.runQuery {
             QueryDsl.from(m).where { m.id eq 1 }.first()
@@ -245,7 +260,7 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
     @Test
     fun localDateTime() {
         val m = Meta.localDateTimeTest
-        val data = integration.LocalDateTimeTest(
+        val data = LocalDateTimeTest(
             1,
             LocalDateTime.of(2019, 6, 1, 12, 11, 10)
         )
@@ -259,7 +274,7 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
     @Test
     fun localDate() {
         val m = Meta.localDateTest
-        val data = integration.LocalDateTest(
+        val data = LocalDateTest(
             1,
             LocalDate.of(2019, 6, 1)
         )
@@ -273,7 +288,7 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
     @Test
     fun localTime() {
         val m = Meta.localTimeTest
-        val data = integration.LocalTimeTest(1, LocalTime.of(12, 11, 10))
+        val data = LocalTimeTest(1, LocalTime.of(12, 11, 10))
         db.runQuery { QueryDsl.insert(m).single(data) }
         val data2 = db.runQuery {
             QueryDsl.from(m).where { m.id eq 1 }.first()
@@ -284,7 +299,7 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
     @Test
     fun long() {
         val m = Meta.longTest
-        val data = integration.LongTest(1, 10L)
+        val data = LongTest(1, 10L)
         db.runQuery { QueryDsl.insert(m).single(data) }
         val data2 = db.runQuery {
             QueryDsl.from(m).where { m.id eq 1 }.first()
@@ -299,7 +314,7 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
         val dateTime = LocalDateTime.of(2019, 6, 1, 12, 11, 10)
         val offset = ZoneOffset.ofHours(9)
         val value = OffsetDateTime.of(dateTime, offset)
-        val data = integration.OffsetDateTimeTest(1, value)
+        val data = OffsetDateTimeTest(1, value)
         db.runQuery { QueryDsl.insert(m).single(data) }
         val data2 = db.runQuery {
             QueryDsl.from(m).where { m.id eq 1 }.first()
@@ -314,7 +329,7 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
         val dateTime = LocalDateTime.of(2019, 6, 1, 12, 11, 10)
         val offset = ZoneOffset.ofHours(9)
         val value = OffsetDateTime.of(dateTime, offset)
-        val data = integration.OffsetDateTimeTest(1, value)
+        val data = OffsetDateTimeTest(1, value)
         db.runQuery { QueryDsl.insert(m).single(data) }
         val data2 = db.runQuery {
             QueryDsl.from(m).where { m.id eq 1 }.first()
@@ -326,7 +341,7 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
     @Test
     fun short() {
         val m = Meta.shortTest
-        val data = integration.ShortTest(1, 10)
+        val data = ShortTest(1, 10)
         db.runQuery { QueryDsl.insert(m).single(data) }
         val data2 = db.runQuery {
             QueryDsl.from(m).where { m.id eq 1 }.first()
@@ -370,32 +385,6 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
             QueryDsl.from(m).where { m.id eq 1 }.first()
         }
         assertEquals(data, data2)
-    }
-
-    @Run(onlyIf = [Dbms.POSTGRESQL])
-    @Test
-    fun json_postgresql() {
-        val m = Meta.jsonTest
-        val data = JsonTest(
-            1,
-            Json(
-                """
-            {"a": 100, "b": "Hello"}
-                """.trimIndent()
-            )
-        )
-        db.runQuery { QueryDsl.insert(m).single(data) }
-        val data2 = db.runQuery {
-            QueryDsl.from(m).where { m.id eq 1 }.first()
-        }
-        assertEquals(data, data2)
-
-        val result = db.runQuery {
-            QueryDsl.fromTemplate("select value->'b' as x from json_test")
-                .select { it.asT("x", Json::class)!! }
-                .first()
-        }
-        assertEquals("\"Hello\"", result.data)
     }
 
     @Test

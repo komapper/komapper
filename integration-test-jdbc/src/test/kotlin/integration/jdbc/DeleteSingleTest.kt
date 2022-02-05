@@ -1,7 +1,7 @@
 package integration.jdbc
 
-import integration.Address
-import integration.address
+import integration.core.Address
+import integration.core.address
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.OptimisticLockException
 import org.komapper.core.dsl.Meta

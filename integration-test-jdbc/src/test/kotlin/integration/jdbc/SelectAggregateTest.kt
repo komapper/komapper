@@ -1,7 +1,7 @@
 package integration.jdbc
 
-import integration.address
-import integration.employee
+import integration.core.address
+import integration.core.employee
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl

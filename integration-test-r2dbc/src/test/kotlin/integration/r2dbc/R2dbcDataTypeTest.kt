@@ -1,11 +1,12 @@
 package integration.r2dbc
 
-import integration.Direction
-import integration.UUIDTest
-import integration.enumTest
-import integration.setting.Dbms
-import integration.setting.Run
-import integration.uuidTest
+import integration.core.Dbms
+import integration.core.Direction
+import integration.core.EnumTest
+import integration.core.Run
+import integration.core.UUIDTest
+import integration.core.enumTest
+import integration.core.uuidTest
 import io.r2dbc.spi.Blob
 import io.r2dbc.spi.Clob
 import kotlinx.coroutines.flow.flowOf
@@ -28,7 +29,7 @@ class R2dbcDataTypeTest(val db: R2dbcDatabase) {
     @Test
     fun enum() = inTransaction(db) {
         val m = Meta.enumTest
-        val data = integration.EnumTest(1, Direction.EAST)
+        val data = EnumTest(1, Direction.EAST)
         db.runQuery { QueryDsl.insert(m).single(data) }
         val data2 = db.runQuery {
             QueryDsl.from(m).where { m.id eq 1 }.first()

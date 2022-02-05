@@ -1,6 +1,6 @@
 package integration.jdbc
 
-import integration.address
+import integration.core.address
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl

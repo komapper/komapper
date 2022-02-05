@@ -1,13 +1,13 @@
 package integration.r2dbc
 
-import integration.Order
-import integration.blankName
-import integration.catalogAndSchema
-import integration.catalogOnly
-import integration.order
-import integration.schemaOnly
-import integration.setting.Dbms
-import integration.setting.Run
+import integration.core.Dbms
+import integration.core.Order
+import integration.core.Run
+import integration.core.blankName
+import integration.core.catalogAndSchema
+import integration.core.catalogOnly
+import integration.core.order
+import integration.core.schemaOnly
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl

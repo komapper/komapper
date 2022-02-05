@@ -1,10 +1,10 @@
 package integration.jdbc
 
-import integration.address
-import integration.department
-import integration.employee
-import integration.manager
-import integration.person
+import integration.core.address
+import integration.core.department
+import integration.core.employee
+import integration.core.manager
+import integration.core.person
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl

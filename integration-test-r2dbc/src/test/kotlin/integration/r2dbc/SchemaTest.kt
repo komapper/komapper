@@ -1,11 +1,11 @@
 package integration.r2dbc
 
-import integration.aaa
-import integration.autoIncrementTable
-import integration.bbb
-import integration.ccc
-import integration.compositeKey
-import integration.sequenceTable
+import integration.core.aaa
+import integration.core.autoIncrementTable
+import integration.core.bbb
+import integration.core.ccc
+import integration.core.compositeKey
+import integration.core.sequenceTable
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
