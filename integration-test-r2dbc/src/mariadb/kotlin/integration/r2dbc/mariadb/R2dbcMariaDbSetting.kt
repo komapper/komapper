@@ -1,6 +1,6 @@
 package integration.r2dbc.mariadb
 
-import integration.setting.MariaDbSetting
+import integration.core.MariaDbSetting
 import io.r2dbc.spi.ConnectionFactories
 import io.r2dbc.spi.ConnectionFactoryOptions
 import org.komapper.r2dbc.DefaultR2dbcDatabaseConfig

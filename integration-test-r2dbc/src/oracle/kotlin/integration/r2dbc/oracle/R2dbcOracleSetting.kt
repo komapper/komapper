@@ -1,6 +1,6 @@
 package integration.r2dbc.oracle
 
-import integration.setting.OracleSetting
+import integration.core.OracleSetting
 import io.r2dbc.spi.Connection
 import io.r2dbc.spi.ConnectionFactories
 import io.r2dbc.spi.ConnectionFactory

@@ -1,6 +1,6 @@
 package integration.jdbc.h2
 
-import integration.setting.H2Setting
+import integration.core.H2Setting
 import org.komapper.jdbc.DefaultJdbcDatabaseConfig
 import org.komapper.jdbc.JdbcDatabaseConfig
 

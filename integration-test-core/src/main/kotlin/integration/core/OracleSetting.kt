@@ -1,4 +1,4 @@
-package integration.setting
+package integration.core
 
 interface OracleSetting<CONFIG> : Setting<CONFIG> {
 

@@ -1,6 +1,6 @@
 package integration.jdbc.sqlserver
 
-import integration.setting.SqlServerSetting
+import integration.core.SqlServerSetting
 import org.komapper.jdbc.DefaultJdbcDatabaseConfig
 import org.komapper.jdbc.JdbcDatabaseConfig
 

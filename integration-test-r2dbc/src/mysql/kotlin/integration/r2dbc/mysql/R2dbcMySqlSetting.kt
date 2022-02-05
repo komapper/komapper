@@ -1,6 +1,6 @@
 package integration.r2dbc.mysql
 
-import integration.setting.MySqlSetting
+import integration.core.MySqlSetting
 import io.r2dbc.spi.ConnectionFactories
 import io.r2dbc.spi.ConnectionFactoryOptions
 import org.komapper.r2dbc.DefaultR2dbcDatabaseConfig

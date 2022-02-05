@@ -1,8 +1,8 @@
 package integration.r2dbc
 
-import integration.Address
-import integration.address
-import integration.employee
+import integration.core.Address
+import integration.core.address
+import integration.core.employee
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith

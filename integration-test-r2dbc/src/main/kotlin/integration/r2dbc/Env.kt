@@ -1,6 +1,6 @@
 package integration.r2dbc
 
-import integration.setting.Run
+import integration.core.Run
 import org.junit.jupiter.api.extension.AfterTestExecutionCallback
 import org.junit.jupiter.api.extension.BeforeAllCallback
 import org.junit.jupiter.api.extension.BeforeTestExecutionCallback

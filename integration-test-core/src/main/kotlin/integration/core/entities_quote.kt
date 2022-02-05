@@ -1,4 +1,4 @@
-package integration
+package integration.core
 
 import org.komapper.annotation.KomapperColumn
 import org.komapper.annotation.KomapperEntity

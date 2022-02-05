@@ -1,6 +1,6 @@
 package integration.r2dbc.sqlserver
 
-import integration.setting.SqlServerSetting
+import integration.core.SqlServerSetting
 import io.r2dbc.spi.ConnectionFactories
 import io.r2dbc.spi.ConnectionFactoryOptions
 import org.komapper.r2dbc.DefaultR2dbcDatabaseConfig

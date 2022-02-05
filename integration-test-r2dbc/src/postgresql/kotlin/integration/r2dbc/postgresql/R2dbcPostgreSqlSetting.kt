@@ -1,6 +1,6 @@
 package integration.r2dbc.postgresql
 
-import integration.setting.PostgreSqlSetting
+import integration.core.PostgreSqlSetting
 import io.r2dbc.spi.ConnectionFactories
 import io.r2dbc.spi.ConnectionFactoryOptions
 import org.komapper.r2dbc.DefaultR2dbcDatabaseConfig

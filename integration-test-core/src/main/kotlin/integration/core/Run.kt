@@ -1,4 +1,4 @@
-package integration.setting
+package integration.core
 
 @Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)
 @Retention(AnnotationRetention.RUNTIME)

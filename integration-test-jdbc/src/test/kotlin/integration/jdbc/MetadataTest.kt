@@ -1,7 +1,7 @@
 package integration.jdbc
 
-import integration.setting.Dbms
-import integration.setting.Run
+import integration.core.Dbms
+import integration.core.Run
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.jdbc.JdbcDatabase
 import org.komapper.jdbc.dsl.MetadataDsl

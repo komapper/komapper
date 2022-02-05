@@ -1,6 +1,6 @@
 package integration.r2dbc.h2
 
-import integration.setting.H2Setting
+import integration.core.H2Setting
 import io.r2dbc.spi.ConnectionFactories
 import org.komapper.r2dbc.DefaultR2dbcDatabaseConfig
 import org.komapper.r2dbc.R2dbcDatabaseConfig

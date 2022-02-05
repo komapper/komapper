@@ -1,4 +1,4 @@
-package integration
+package integration.core
 
 import ch.qos.logback.classic.BasicConfigurator
 import ch.qos.logback.classic.Level

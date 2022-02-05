@@ -1,6 +1,6 @@
 package integration.jdbc.mysql
 
-import integration.setting.MySqlSetting
+import integration.core.MySqlSetting
 import org.komapper.jdbc.DefaultJdbcDatabaseConfig
 import org.komapper.jdbc.JdbcDatabaseConfig
 

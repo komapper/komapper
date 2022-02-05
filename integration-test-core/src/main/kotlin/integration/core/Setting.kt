@@ -1,4 +1,4 @@
-package integration.setting
+package integration.core
 
 interface Setting<CONFIG> {
     val config: CONFIG

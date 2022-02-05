@@ -1,6 +1,6 @@
 package integration.jdbc.oracle
 
-import integration.setting.OracleSetting
+import integration.core.OracleSetting
 import org.komapper.jdbc.DefaultJdbcDatabaseConfig
 import org.komapper.jdbc.JdbcDatabaseConfig
 

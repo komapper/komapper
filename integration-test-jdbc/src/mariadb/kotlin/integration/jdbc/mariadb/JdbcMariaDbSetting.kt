@@ -1,6 +1,6 @@
 package integration.jdbc.mariadb
 
-import integration.setting.MariaDbSetting
+import integration.core.MariaDbSetting
 import org.komapper.jdbc.DefaultJdbcDatabaseConfig
 import org.komapper.jdbc.JdbcDatabaseConfig
 

@@ -1,6 +1,6 @@
 package integration.r2dbc
 
-import integration.address
+import integration.core.address
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.OptimisticLockException
 import org.komapper.core.dsl.Meta

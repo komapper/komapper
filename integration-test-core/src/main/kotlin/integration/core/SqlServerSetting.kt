@@ -1,4 +1,4 @@
-package integration.setting
+package integration.core
 
 interface SqlServerSetting<CONFIG> : Setting<CONFIG> {
     override val dbms: Dbms get() = Dbms.SQLSERVER

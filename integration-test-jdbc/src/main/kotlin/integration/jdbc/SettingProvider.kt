@@ -1,6 +1,6 @@
 package integration.jdbc
 
-import integration.setting.Setting
+import integration.core.Setting
 import org.komapper.jdbc.JdbcDatabaseConfig
 
 object SettingProvider {

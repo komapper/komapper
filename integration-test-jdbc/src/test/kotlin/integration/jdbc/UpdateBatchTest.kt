@@ -1,10 +1,10 @@
 package integration.jdbc
 
-import integration.Address
-import integration.Person
-import integration.address
-import integration.department
-import integration.person
+import integration.core.Address
+import integration.core.Person
+import integration.core.address
+import integration.core.department
+import integration.core.person
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.OptimisticLockException
 import org.komapper.core.UniqueConstraintException

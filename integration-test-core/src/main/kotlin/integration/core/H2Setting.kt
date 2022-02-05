@@ -1,46 +1,49 @@
-package integration.setting
+package integration.core
 
-interface MariaDbSetting<CONFIG> : Setting<CONFIG> {
+interface H2Setting<CONFIG> : Setting<CONFIG> {
 
-    override val dbms: Dbms get() = Dbms.MARIADB
+    override val dbms: Dbms get() = Dbms.H2
     override val createSql: String
         get() = """
         create sequence if not exists sequence_strategy_id start with 1 increment by 100;
         create sequence if not exists person_id_sequence start with 1 increment by 100;
 
-        create table if not exists department_archive(department_id integer not null primary key, department_no integer not null unique,department_name varchar(20),location varchar(20) default 'tokyo', version integer);
         create table if not exists department(department_id integer not null primary key, department_no integer not null unique,department_name varchar(20),location varchar(20) default 'tokyo', version integer);
         create table if not exists address(address_id integer not null primary key, street varchar(20) unique, version integer);
         create table if not exists address_archive(address_id integer not null primary key, street varchar(20) unique, version integer);
-        create table if not exists employee(employee_id integer not null primary key, employee_no integer not null ,employee_name varchar(20),manager_id integer,hiredate date,salary numeric(7,2),department_id integer,address_id integer, version integer, constraint fk_department_id foreign key(department_id) references department(department_id),constraint fk_address_id foreign key(address_id) references address(address_id));
-        create table if not exists person(person_id integer not null primary key, name varchar(20), created_at timestamp(6), updated_at timestamp(6), version integer);
-        create table if not exists `order`(`order_id` integer not null primary key, `value` varchar(20));
+        create table if not exists employee(employee_id integer not null primary key, employee_no integer not null ,employee_name varchar(20),manager_id integer,hiredate date,salary numeric(7,2),department_id integer,address_id integer,version integer, constraint fk_department_id foreign key(department_id) references department(department_id), constraint fk_address_id foreign key(address_id) references address(address_id));
+        create table if not exists person(person_id integer not null primary key, name varchar(20), created_at timestamp, updated_at timestamp, version integer);
+        create table if not exists "order"("order_id" integer not null primary key, "value" varchar(20));
 
         create table if not exists comp_key_department(department_id1 integer not null, department_id2 integer not null, department_no integer not null unique,department_name varchar(20),location varchar(20) default 'tokyo', version integer, constraint pk_comp_key_department primary key(department_id1, department_id2));
         create table if not exists comp_key_address(address_id1 integer not null, address_id2 integer not null, street varchar(20), version integer, constraint pk_comp_key_address primary key(address_id1, address_id2));
         create table if not exists comp_key_employee(employee_id1 integer not null, employee_id2 integer not null, employee_no integer not null ,employee_name varchar(20),manager_id1 integer,manager_id2 integer,hiredate date,salary numeric(7,2),department_id1 integer,department_id2 integer,address_id1 integer,address_id2 integer,version integer, constraint pk_comp_key_employee primary key(employee_id1, employee_id2), constraint fk_comp_key_department_id foreign key(department_id1, department_id2) references comp_key_department(department_id1, department_id2), constraint fk_comp_key_address_id foreign key(address_id1, address_id2) references comp_key_address(address_id1, address_id2));
 
-        create table if not exists identity_strategy(id integer auto_increment primary key, value varchar(10));
-        create table if not exists sequence_strategy(id integer not null primary key, value varchar(10));
+        create table if not exists identity_strategy(id integer not null generated always as identity primary key, "value" varchar(10));
+        create table if not exists sequence_strategy(id integer not null primary key, "value" varchar(10));
 
-        create table if not exists big_decimal_test(id integer not null primary key, value decimal);
-        create table if not exists big_integer_test(id integer not null primary key, value decimal);
-        create table if not exists blob_test(id integer not null primary key, value blob);
-        create table if not exists boolean_test(id integer not null primary key, value boolean);
-        create table if not exists byte_test(id integer not null primary key, value int2);
-        create table if not exists byte_array_test(id integer not null primary key, value varbinary(100));
-        create table if not exists clob_test(id integer not null primary key, value text);
-        create table if not exists double_test(id integer not null primary key, value double);
-        create table if not exists enum_test(id integer not null primary key, value varchar(20));
-        create table if not exists float_test(id integer not null primary key, value float);
-        create table if not exists int_test(id integer not null primary key, value integer);
-        create table if not exists local_date_time_test(id integer not null primary key, value timestamp);
-        create table if not exists local_date_test(id integer not null primary key, value date);
-        create table if not exists local_time_test(id integer not null primary key, value time);
-        create table if not exists long_test(id integer not null primary key, value bigint);
-        create table if not exists offset_date_time_test(id integer not null primary key, value timestamp);
-        create table if not exists short_test(id integer not null primary key, value smallint);
-        create table if not exists string_test(id integer not null primary key, value varchar(20));
+        create table if not exists any_test(id integer not null primary key, "value" other);
+        create table if not exists array_test(id integer not null primary key, "value" varchar(10) array);
+        create table if not exists big_decimal_test(id integer not null primary key, "value" bigint);
+        create table if not exists big_integer_test(id integer not null primary key, "value" bigint);
+        create table if not exists blob_test(id integer not null primary key, "value" blob);
+        create table if not exists boolean_test(id integer not null primary key, "value" bool);
+        create table if not exists byte_test(id integer not null primary key, "value" tinyint);
+        create table if not exists byte_array_test(id integer not null primary key, "value" binary(3));
+        create table if not exists clob_test(id integer not null primary key, "value" clob);
+        create table if not exists double_test(id integer not null primary key, "value" double);
+        create table if not exists enum_test(id integer not null primary key, "value" varchar(20));
+        create table if not exists float_test(id integer not null primary key, "value" float);
+        create table if not exists int_test(id integer not null primary key, "value" integer);
+        create table if not exists local_date_time_test(id integer not null primary key, "value" timestamp);
+        create table if not exists local_date_test(id integer not null primary key, "value" date);
+        create table if not exists local_time_test(id integer not null primary key, "value" time);
+        create table if not exists long_test(id integer not null primary key, "value" bigint);
+        create table if not exists offset_date_time_test(id integer not null primary key, "value" timestamp with time zone);
+        create table if not exists short_test(id integer not null primary key, "value" smallint);
+        create table if not exists sqlxml_test(id integer not null primary key, "value" clob);
+        create table if not exists string_test(id integer not null primary key, "value" varchar(20));
+        create table if not exists uuid_test(id integer not null primary key, "value" uuid);
 
         insert into department values(1,10,'ACCOUNTING','NEW YORK',1);
         insert into department values(2,20,'RESEARCH','DALLAS',1);
@@ -76,10 +79,10 @@ interface MariaDbSetting<CONFIG> : Setting<CONFIG> {
         insert into employee values(13,7902,'FORD',4,'1981-12-03',3000,2,13,1);
         insert into employee values(14,7934,'MILLER',7,'1982-01-23',1300,1,14,1);
 
-        insert into comp_key_department VALUES(1,1,10,'ACCOUNTING','NEW YORK',1);
-        insert into comp_key_department VALUES(2,2,20,'RESEARCH','DALLAS',1);
-        insert into comp_key_department VALUES(3,3,30,'SALES','CHICAGO',1);
-        insert into comp_key_department VALUES(4,4,40,'OPERATIONS','BOSTON',1);
+        insert into comp_key_department values(1,1,10,'ACCOUNTING','NEW YORK',1);
+        insert into comp_key_department values(2,2,20,'RESEARCH','DALLAS',1);
+        insert into comp_key_department values(3,3,30,'SALES','CHICAGO',1);
+        insert into comp_key_department values(4,4,40,'OPERATIONS','BOSTON',1);
         insert into comp_key_address values(1,1,'STREET 1',1);
         insert into comp_key_address values(2,2,'STREET 2',1);
         insert into comp_key_address values(3,3,'STREET 3',1);
@@ -111,7 +114,7 @@ interface MariaDbSetting<CONFIG> : Setting<CONFIG> {
         """.trimIndent()
     override val resetSql: String
         get() = """
-        alter table identity_strategy auto_increment = 1;
-        alter sequence sequence_strategy_id restart with 1;
+        alter table identity_strategy alter column id restart with 1;
+        alter sequence sequence_strategy_id restart with 1
         """.trimIndent()
 }

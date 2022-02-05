@@ -1,6 +1,6 @@
 package integration.r2dbc
 
-import integration.setting.Setting
+import integration.core.Setting
 import org.komapper.r2dbc.R2dbcDatabaseConfig
 
 object SettingProvider {
