@@ -19,7 +19,7 @@ A clear and concise description of what you want to happen.
 
 - Komapper:
 - Kotlin:
-- Java(JRE or JDK):
+- JVM:
 - JDBC Driver or R2DBC Driver:
 - Database:
 - OS:
