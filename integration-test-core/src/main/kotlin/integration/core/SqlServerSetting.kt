@@ -29,9 +29,9 @@ interface SqlServerSetting<CONFIG> : Setting<CONFIG> {
         create table byte_test(id int not null primary key, value tinyint);
         create table byte_array_test(id int not null primary key, value varbinary(100));
         create table clob_test(id int not null primary key, value text);
-        create table double_test(id int not null primary key, value real);
+        create table double_test(id int not null primary key, value float);
         create table enum_test(id int not null primary key, value varchar(20));
-        create table float_test(id int not null primary key, value float);
+        create table float_test(id int not null primary key, value real);
         create table int_test(id int not null primary key, value int);
         create table local_date_time_test(id int not null primary key, value datetime2);
         create table local_date_test(id int not null primary key, value date);
