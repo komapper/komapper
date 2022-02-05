@@ -1,8 +1,6 @@
 package integration.jdbc
 
 import integration.Direction
-import integration.Json
-import integration.JsonTest
 import integration.SqlXmlTest
 import integration.StringTest
 import integration.UByteTest
@@ -25,7 +23,6 @@ import integration.doubleTest
 import integration.enumTest
 import integration.floatTest
 import integration.intTest
-import integration.jsonTest
 import integration.localDateTest
 import integration.localDateTimeTest
 import integration.localTimeTest
@@ -370,32 +367,6 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
             QueryDsl.from(m).where { m.id eq 1 }.first()
         }
         assertEquals(data, data2)
-    }
-
-    @Run(onlyIf = [Dbms.POSTGRESQL])
-    @Test
-    fun json_postgresql() {
-        val m = Meta.jsonTest
-        val data = JsonTest(
-            1,
-            Json(
-                """
-            {"a": 100, "b": "Hello"}
-                """.trimIndent()
-            )
-        )
-        db.runQuery { QueryDsl.insert(m).single(data) }
-        val data2 = db.runQuery {
-            QueryDsl.from(m).where { m.id eq 1 }.first()
-        }
-        assertEquals(data, data2)
-
-        val result = db.runQuery {
-            QueryDsl.fromTemplate("select value->'b' as x from json_test")
-                .select { it.asT("x", Json::class)!! }
-                .first()
-        }
-        assertEquals("\"Hello\"", result.data)
     }
 
     @Test

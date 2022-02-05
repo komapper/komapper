@@ -55,6 +55,7 @@ open class R2dbcPostgreSqlDialect(
             R2dbcUByteType("smallint"),
             R2dbcUIntType("bigint"),
             R2dbcUShortType("integer"),
+            R2dbcPostgresqlJsonType,
             R2dbcPostgreSqlUUIDType
         )
     }

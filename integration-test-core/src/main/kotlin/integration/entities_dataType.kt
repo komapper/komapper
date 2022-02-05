@@ -103,12 +103,6 @@ data class SqlXmlTest(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = tru
 @KomapperTable("string_test")
 data class StringTest(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true)val value: String)
 
-data class Json(val data: String)
-
-@KomapperEntity
-@KomapperTable("json_test")
-data class JsonTest(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true)val value: Json)
-
 @KomapperEntity
 @KomapperTable("short_test")
 data class UByteTest(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true)val value: UByte?)

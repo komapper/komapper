@@ -9,16 +9,11 @@ plugins {
 dependencies {
     api(project(":integration-test-core"))
     api(project(":komapper-tx-r2dbc"))
-    compileOnly(project(":komapper-annotation"))
+    api(project(":komapper-annotation"))
     ksp(project(":komapper-processor"))
     api(platform("org.testcontainers:testcontainers-bom:1.16.3"))
     api("org.jetbrains.kotlin:kotlin-test-junit5")
     api("org.testcontainers:r2dbc")
-    api("org.testcontainers:mariadb")
-    api("org.testcontainers:mssqlserver")
-    api("org.testcontainers:mysql")
-    api("org.testcontainers:oracle-xe")
-    api("org.testcontainers:postgresql")
 }
 
 idea {
@@ -64,6 +59,7 @@ testing {
             setup(name)
             dependencies {
                 implementation(project)
+                implementation("org.testcontainers:mariadb")
                 runtimeOnly(project(":komapper-dialect-mariadb-r2dbc"))
                 runtimeOnly("org.mariadb.jdbc:mariadb-java-client:3.0.3")
             }
@@ -73,6 +69,7 @@ testing {
             setup(name)
             dependencies {
                 implementation(project)
+                implementation("org.testcontainers:mysql")
                 runtimeOnly(project(":komapper-dialect-mysql-r2dbc"))
                 runtimeOnly("mysql:mysql-connector-java:8.0.28")
             }
@@ -82,6 +79,7 @@ testing {
             setup(name)
             dependencies {
                 implementation(project)
+                implementation("org.testcontainers:oracle-xe")
                 runtimeOnly(project(":komapper-dialect-oracle-r2dbc"))
             }
         }
@@ -90,7 +88,8 @@ testing {
             setup(name)
             dependencies {
                 implementation(project)
-                runtimeOnly(project(":komapper-dialect-postgresql-r2dbc"))
+                implementation("org.testcontainers:postgresql")
+                implementation(project(":komapper-dialect-postgresql-r2dbc"))
             }
         }
 
@@ -98,6 +97,7 @@ testing {
             setup(name)
             dependencies {
                 implementation(project)
+                implementation("org.testcontainers:mssqlserver")
                 runtimeOnly(project(":komapper-dialect-sqlserver-r2dbc"))
                 runtimeOnly("com.microsoft.sqlserver:mssql-jdbc:9.4.1.jre11")
             }
@@ -113,7 +113,7 @@ fun JvmTestSuite.setup(
     useJUnitJupiter()
     sources {
         java {
-            setSrcDirs(listOf("src/test/kotlin"))
+            setSrcDirs(listOf("src/test/kotlin", "build/generated/ksp/$driver/kotlin"))
         }
         resources {
             setSrcDirs(listOf("src/test/resources"))

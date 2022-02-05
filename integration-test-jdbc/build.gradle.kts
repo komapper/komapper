@@ -9,9 +9,8 @@ plugins {
 dependencies {
     api(project(":integration-test-core"))
     api(project(":komapper-tx-jdbc"))
-    compileOnly(project(":komapper-annotation"))
+    api(project(":komapper-annotation"))
     ksp(project(":komapper-processor"))
-    api("org.postgresql:postgresql:42.3.2")
     api(platform("org.testcontainers:testcontainers-bom:1.16.3"))
     api("org.jetbrains.kotlin:kotlin-test-junit5")
 }
@@ -84,6 +83,7 @@ testing {
             setup(name)
             dependencies {
                 implementation(project)
+                implementation("org.postgresql:postgresql:42.3.2")
                 runtimeOnly("org.testcontainers:postgresql")
                 runtimeOnly(project(":komapper-dialect-postgresql-jdbc"))
             }
@@ -104,7 +104,7 @@ fun JvmTestSuite.setup(driver: String) {
     useJUnitJupiter()
     sources {
         java {
-            setSrcDirs(listOf("src/test/kotlin"))
+            setSrcDirs(listOf("src/test/kotlin", "build/generated/ksp/$driver/kotlin"))
         }
         resources {
             setSrcDirs(listOf("src/test/resources"))
