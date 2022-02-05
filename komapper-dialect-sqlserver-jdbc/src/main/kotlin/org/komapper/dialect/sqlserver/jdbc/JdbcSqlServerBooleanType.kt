@@ -1,11 +1,11 @@
 package org.komapper.dialect.sqlserver.jdbc
 
-import org.komapper.jdbc.JdbcAbstractDataType
+import org.komapper.jdbc.JdbcAbstractType
 import java.sql.JDBCType
 import java.sql.PreparedStatement
 import java.sql.ResultSet
 
-object JdbcSqlServerBooleanType : JdbcAbstractDataType<Boolean>(Boolean::class, JDBCType.BOOLEAN) {
+object JdbcSqlServerBooleanType : JdbcAbstractType<Boolean>(Boolean::class, JDBCType.BOOLEAN) {
     override val name: String = "bit"
 
     override fun doGetValue(rs: ResultSet, index: Int): Boolean {
