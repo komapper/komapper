@@ -3,6 +3,7 @@ package integration.r2dbc.mysql
 import integration.core.MySqlSetting
 import io.r2dbc.spi.ConnectionFactories
 import io.r2dbc.spi.ConnectionFactoryOptions
+import io.r2dbc.spi.Option
 import org.komapper.r2dbc.DefaultR2dbcDatabaseConfig
 import org.komapper.r2dbc.R2dbcDatabaseConfig
 import org.komapper.r2dbc.R2dbcDialects
@@ -22,9 +23,11 @@ class R2dbcMySqlSetting :
             val r2dbcContainer = MySQLR2DBCDatabaseContainer(container)
             r2dbcContainer.start()
             r2dbcContainer.configure(
-                ConnectionFactoryOptions.builder().option(
-                    ConnectionFactoryOptions.DRIVER, DRIVER
-                ).build()
+                ConnectionFactoryOptions.builder()
+                    .option(ConnectionFactoryOptions.DRIVER, "pool")
+                    .option(ConnectionFactoryOptions.PROTOCOL, DRIVER)
+                    .option(Option.valueOf("initialSize"), 2)
+                    .build()
             )
         }
     }
