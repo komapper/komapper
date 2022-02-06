@@ -24,12 +24,11 @@ class Env :
 
     companion object {
         @Volatile
-        var initialized: Boolean = false
+        private var initialized: Boolean = false
+        private val setting = SettingProvider.get()
+        private val db = JdbcDatabase.create(setting.config)
+        private val txManager = db.config.session.transactionManager
     }
-
-    private val setting = SettingProvider.get()
-    private val db = JdbcDatabase.create(setting.config)
-    private val txManager = db.config.session.transactionManager
 
     override fun beforeAll(context: ExtensionContext?) {
         if (!initialized) {
