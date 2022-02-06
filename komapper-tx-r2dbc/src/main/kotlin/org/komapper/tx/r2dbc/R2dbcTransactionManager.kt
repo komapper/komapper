@@ -8,8 +8,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.asContextElement
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.reactive.asPublisher
-import kotlinx.coroutines.reactive.awaitFirst
 import kotlinx.coroutines.reactive.awaitFirstOrNull
+import kotlinx.coroutines.reactive.awaitSingle
 import kotlinx.coroutines.withContext
 import org.komapper.core.LoggerFacade
 import org.komapper.core.ThreadSafe
@@ -84,7 +84,7 @@ internal class TransactionManagerImpl(
             rollbackInternal(currentTx)
             error("The transaction \"$currentTx\" already has begun.")
         }
-        val tx = internalConnectionFactory.create().awaitFirst().let { con ->
+        val tx = internalConnectionFactory.create().awaitSingle().let { con ->
             val txCon = R2dbcTransactionConnectionImpl(con)
             R2dbcTransactionImpl(txCon)
         }
