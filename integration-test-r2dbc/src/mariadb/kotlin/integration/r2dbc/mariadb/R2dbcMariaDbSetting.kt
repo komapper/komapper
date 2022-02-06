@@ -3,6 +3,7 @@ package integration.r2dbc.mariadb
 import integration.core.MariaDbSetting
 import io.r2dbc.spi.ConnectionFactories
 import io.r2dbc.spi.ConnectionFactoryOptions
+import io.r2dbc.spi.Option
 import org.komapper.r2dbc.DefaultR2dbcDatabaseConfig
 import org.komapper.r2dbc.R2dbcDatabaseConfig
 import org.komapper.r2dbc.R2dbcDialects
@@ -11,6 +12,7 @@ import org.testcontainers.containers.MariaDBContainerProvider
 import org.testcontainers.containers.MariaDBR2DBCDatabaseContainer
 import org.testcontainers.jdbc.ConnectionUrl
 
+@Suppress("unused")
 class R2dbcMariaDbSetting :
     MariaDbSetting<R2dbcDatabaseConfig> {
     companion object {
@@ -22,9 +24,11 @@ class R2dbcMariaDbSetting :
             val r2dbcContainer = MariaDBR2DBCDatabaseContainer(container)
             r2dbcContainer.start()
             r2dbcContainer.configure(
-                ConnectionFactoryOptions.builder().option(
-                    ConnectionFactoryOptions.DRIVER, DRIVER
-                ).build()
+                ConnectionFactoryOptions.builder()
+                    .option(ConnectionFactoryOptions.DRIVER, "pool")
+                    .option(ConnectionFactoryOptions.PROTOCOL, DRIVER)
+                    .option(Option.valueOf("initialSize"), 2)
+                    .build()
             )
         }
     }

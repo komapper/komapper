@@ -23,11 +23,10 @@ class Env :
 
     companion object {
         @Volatile
-        var initialized: Boolean = false
+        private var initialized: Boolean = false
+        private val setting = SettingProvider.get()
+        private val db = R2dbcDatabase.create(setting.config)
     }
-
-    private val setting = SettingProvider.get()
-    private val db = R2dbcDatabase.create(setting.config)
 
     override fun beforeAll(context: ExtensionContext?) {
         if (!initialized) {

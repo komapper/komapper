@@ -7,10 +7,13 @@ plugins {
 }
 
 dependencies {
+    val r2dbcVersion: String by project
     api(project(":integration-test-core"))
     api(project(":komapper-tx-r2dbc"))
     api(project(":komapper-annotation"))
     ksp(project(":komapper-processor"))
+    api("io.r2dbc:r2dbc-bom:$r2dbcVersion")
+    api("io.r2dbc:r2dbc-pool")
     api(platform("org.testcontainers:testcontainers-bom:1.16.3"))
     api("org.jetbrains.kotlin:kotlin-test-junit5")
     api("org.testcontainers:r2dbc")
