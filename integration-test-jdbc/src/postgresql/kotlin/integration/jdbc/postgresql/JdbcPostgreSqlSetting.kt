@@ -4,6 +4,7 @@ import integration.core.PostgreSqlSetting
 import org.komapper.jdbc.DefaultJdbcDatabaseConfig
 import org.komapper.jdbc.JdbcDatabaseConfig
 
+@Suppress("unused")
 class JdbcPostgreSqlSetting(url: String) : PostgreSqlSetting<JdbcDatabaseConfig> {
 
     override val config: JdbcDatabaseConfig =

@@ -4,6 +4,7 @@ import integration.core.MariaDbSetting
 import org.komapper.jdbc.DefaultJdbcDatabaseConfig
 import org.komapper.jdbc.JdbcDatabaseConfig
 
+@Suppress("unused")
 class JdbcMariaDbSetting(url: String) : MariaDbSetting<JdbcDatabaseConfig> {
     override val config: JdbcDatabaseConfig =
         object : DefaultJdbcDatabaseConfig(url, "test", "test") {

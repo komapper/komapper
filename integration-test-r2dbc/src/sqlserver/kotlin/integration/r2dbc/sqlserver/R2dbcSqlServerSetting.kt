@@ -12,6 +12,7 @@ import org.testcontainers.containers.MSSQLServerContainer
 import org.testcontainers.containers.MSSQLServerContainerProvider
 import org.testcontainers.jdbc.ConnectionUrl
 
+@Suppress("unused")
 class R2dbcSqlServerSetting : SqlServerSetting<R2dbcDatabaseConfig> {
     companion object {
         const val DRIVER: String = "sqlserver"

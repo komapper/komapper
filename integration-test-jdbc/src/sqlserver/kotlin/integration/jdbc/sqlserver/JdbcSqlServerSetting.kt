@@ -4,6 +4,7 @@ import integration.core.SqlServerSetting
 import org.komapper.jdbc.DefaultJdbcDatabaseConfig
 import org.komapper.jdbc.JdbcDatabaseConfig
 
+@Suppress("unused")
 class JdbcSqlServerSetting(url: String) : SqlServerSetting<JdbcDatabaseConfig> {
     override val config: JdbcDatabaseConfig =
         object : DefaultJdbcDatabaseConfig(url, "test", "test") {

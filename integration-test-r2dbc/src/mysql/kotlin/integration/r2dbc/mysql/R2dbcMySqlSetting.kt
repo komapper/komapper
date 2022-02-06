@@ -12,6 +12,7 @@ import org.testcontainers.containers.MySQLContainerProvider
 import org.testcontainers.containers.MySQLR2DBCDatabaseContainer
 import org.testcontainers.jdbc.ConnectionUrl
 
+@Suppress("unused")
 class R2dbcMySqlSetting :
     MySqlSetting<R2dbcDatabaseConfig> {
     companion object {

@@ -13,6 +13,7 @@ import org.testcontainers.jdbc.ConnectionUrl
 import org.testcontainers.lifecycle.Startable
 import org.testcontainers.r2dbc.R2DBCDatabaseContainer
 
+@Suppress("unused")
 class R2dbcOracleSetting : OracleSetting<R2dbcDatabaseConfig> {
     companion object {
         const val DRIVER: String = "oracle"

@@ -4,6 +4,7 @@ import integration.core.H2Setting
 import org.komapper.jdbc.DefaultJdbcDatabaseConfig
 import org.komapper.jdbc.JdbcDatabaseConfig
 
+@Suppress("unused")
 class JdbcH2Setting(url: String) : H2Setting<JdbcDatabaseConfig> {
     override val config: JdbcDatabaseConfig =
         object : DefaultJdbcDatabaseConfig(url) {

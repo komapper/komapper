@@ -12,6 +12,7 @@ import org.testcontainers.containers.MariaDBContainerProvider
 import org.testcontainers.containers.MariaDBR2DBCDatabaseContainer
 import org.testcontainers.jdbc.ConnectionUrl
 
+@Suppress("unused")
 class R2dbcMariaDbSetting :
     MariaDbSetting<R2dbcDatabaseConfig> {
     companion object {

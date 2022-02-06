@@ -12,6 +12,7 @@ import org.testcontainers.containers.PostgreSQLContainerProvider
 import org.testcontainers.containers.PostgreSQLR2DBCDatabaseContainer
 import org.testcontainers.jdbc.ConnectionUrl
 
+@Suppress("unused")
 class R2dbcPostgreSqlSetting : PostgreSqlSetting<R2dbcDatabaseConfig> {
     companion object {
         const val DRIVER: String = "postgresql"
