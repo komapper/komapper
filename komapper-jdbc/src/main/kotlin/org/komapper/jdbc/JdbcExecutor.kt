@@ -25,13 +25,15 @@ internal class JdbcExecutor(
     ): T {
         @Suppress("NAME_SHADOWING")
         val statement = inspect(statement)
-        return config.session.connection.use { con ->
-            log(statement)
-            prepare(con, statement).use { ps ->
-                setUp(ps)
-                bind(ps, statement)
-                ps.executeQuery().use { rs ->
-                    transform(rs)
+        return withThrowableTranslator {
+            config.session.connection.use { con ->
+                log(statement)
+                prepare(con, statement).use { ps ->
+                    setUp(ps)
+                    bind(ps, statement)
+                    ps.executeQuery().use { rs ->
+                        transform(rs)
+                    }
                 }
             }
         }
@@ -44,21 +46,23 @@ internal class JdbcExecutor(
     ): R {
         @Suppress("NAME_SHADOWING")
         val statement = inspect(statement)
-        return config.session.connection.use { con ->
-            log(statement)
-            prepare(con, statement).use { ps ->
-                setUp(ps)
-                bind(ps, statement)
-                ps.executeQuery().use { rs ->
-                    val iterator = object : Iterator<T> {
-                        var hasNext = rs.next()
-                        override fun hasNext() = hasNext
-                        override fun next(): T {
-                            return transform(config.dialect, rs).also { hasNext = rs.next() }
+        return withThrowableTranslator {
+            config.session.connection.use { con ->
+                log(statement)
+                prepare(con, statement).use { ps ->
+                    setUp(ps)
+                    bind(ps, statement)
+                    ps.executeQuery().use { rs ->
+                        val iterator = object : Iterator<T> {
+                            var hasNext = rs.next()
+                            override fun hasNext() = hasNext
+                            override fun next(): T {
+                                return transform(config.dialect, rs).also { hasNext = rs.next() }
+                            }
                         }
-                    }
-                    runBlocking {
-                        collect(iterator.asFlow())
+                        runBlocking {
+                            collect(iterator.asFlow())
+                        }
                     }
                 }
             }
@@ -68,7 +72,7 @@ internal class JdbcExecutor(
     fun executeUpdate(statement: Statement): Pair<Int, LongArray> {
         @Suppress("NAME_SHADOWING")
         val statement = inspect(statement)
-        return executeWithExceptionCheck {
+        return withThrowableTranslator {
             config.session.connection.use { con ->
                 log(statement)
                 prepare(con, statement).use { ps ->
@@ -82,11 +86,14 @@ internal class JdbcExecutor(
         }
     }
 
-    fun executeBatch(statements: List<Statement>, customizeBatchCounts: (IntArray) -> IntArray = { it }): Pair<IntArray, LongArray> {
+    fun executeBatch(
+        statements: List<Statement>,
+        customizeBatchCounts: (IntArray) -> IntArray = { it }
+    ): Pair<IntArray, LongArray> {
         require(statements.isNotEmpty())
         @Suppress("NAME_SHADOWING")
         val statements = statements.map { inspect(it) }
-        return executeWithExceptionCheck {
+        return withThrowableTranslator {
             config.session.connection.use { con ->
                 val firstStatement = statements.first()
                 log(firstStatement)
@@ -120,7 +127,7 @@ internal class JdbcExecutor(
     fun execute(statements: List<Statement>, handler: (SQLException) -> Unit = { throw it }) {
         @Suppress("NAME_SHADOWING")
         val statements = statements.map { inspect(it) }
-        executeWithExceptionCheck {
+        withThrowableTranslator {
             config.session.connection.use { con ->
                 for (statement in statements) {
                     log(statement)
@@ -138,15 +145,21 @@ internal class JdbcExecutor(
         }
     }
 
-    private fun <T> executeWithExceptionCheck(block: () -> T): T {
+    /**
+     * Translates a [Throwable] to a [RuntimeException].
+     */
+    private fun <T> withThrowableTranslator(block: () -> T): T {
         return try {
             block()
         } catch (e: SQLException) {
             if (config.dialect.isUniqueConstraintViolationError(e)) {
                 throw UniqueConstraintException(e)
-            } else {
-                throw e
             }
+            throw JdbcException(e)
+        } catch (e: RuntimeException) {
+            throw e
+        } catch (cause: Throwable) {
+            throw RuntimeException(cause)
         }
     }
 

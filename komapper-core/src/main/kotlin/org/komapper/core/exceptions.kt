@@ -5,11 +5,11 @@ package org.komapper.core
  *
  * @param message the detail message
  */
-class OptimisticLockException(message: String) : Exception(message)
+class OptimisticLockException(message: String) : RuntimeException(message)
 
 /**
  * Thrown if a unique constraint is violated.
  *
  * @param cause the cause exception
  */
-class UniqueConstraintException(cause: Exception) : Exception(cause)
+class UniqueConstraintException(cause: Exception) : RuntimeException(cause)
