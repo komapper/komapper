@@ -14,7 +14,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 @ExtendWith(Env::class)
-class PostgreSqlDataTypeTest(val db: R2dbcDatabase) {
+class R2dbcPostgreSqlTypeTest(val db: R2dbcDatabase) {
 
     @Test
     fun interval() = inTransaction(db) {

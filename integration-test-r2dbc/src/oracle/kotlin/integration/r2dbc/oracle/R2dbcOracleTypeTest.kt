@@ -17,7 +17,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 @ExtendWith(Env::class)
-class OracleDataTypeTest(private val db: R2dbcDatabase) {
+class R2dbcOracleTypeTest(private val db: R2dbcDatabase) {
 
     @Test
     fun period() = inTransaction(db) {
