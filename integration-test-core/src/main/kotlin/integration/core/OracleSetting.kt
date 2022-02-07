@@ -32,6 +32,7 @@ interface OracleSetting<CONFIG> : Setting<CONFIG> {
         create table double_test(id integer not null primary key, "value" float);
         create table enum_test(id integer not null primary key, "value" varchar2(20));
         create table float_test(id integer not null primary key, "value" float);
+        create table interval_day_test(id integer not null primary key, "value" interval day to second);
         create table interval_year_test(id integer not null primary key, "value" interval year to month);
         create table int_test(id integer not null primary key, "value" integer);
         create table local_date_time_test(id integer not null primary key, "value" date);

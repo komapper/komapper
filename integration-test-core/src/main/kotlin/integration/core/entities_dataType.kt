@@ -12,6 +12,7 @@ import java.math.BigDecimal
 import java.math.BigInteger
 import java.sql.Array
 import java.sql.SQLXML
+import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -67,6 +68,10 @@ data class EnumTest(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true)
 @KomapperEntity
 @KomapperTable("float_test")
 data class FloatTest(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true)val value: Float)
+
+@KomapperEntity
+@KomapperTable("interval_day_test")
+data class IntervalDayTest(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true)val value: Duration)
 
 @KomapperEntity
 @KomapperTable("interval_year_test")
