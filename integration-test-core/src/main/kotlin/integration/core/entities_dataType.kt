@@ -57,6 +57,10 @@ data class ByteArrayTest(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = 
 @KomapperTable("double_test")
 data class DoubleTest(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true)val value: Double)
 
+@KomapperEntity
+@KomapperTable("duration_test")
+data class DurationTest(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true)val value: Duration)
+
 enum class Direction {
     NORTH, SOUTH, EAST, WEST
 }
@@ -68,14 +72,6 @@ data class EnumTest(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true)
 @KomapperEntity
 @KomapperTable("float_test")
 data class FloatTest(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true)val value: Float)
-
-@KomapperEntity
-@KomapperTable("interval_day_test")
-data class IntervalDayTest(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true)val value: Duration)
-
-@KomapperEntity
-@KomapperTable("interval_year_test")
-data class IntervalYearTest(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true)val value: Period)
 
 @KomapperEntity
 @KomapperTable("int_test")
@@ -100,6 +96,10 @@ data class LongTest(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true)
 @KomapperEntity
 @KomapperTable("offset_date_time_test")
 data class OffsetDateTimeTest(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true)val value: OffsetDateTime)
+
+@KomapperEntity
+@KomapperTable("period_test")
+data class PeriodTest(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true)val value: Period)
 
 @KomapperEntity
 @KomapperTable("short_test")

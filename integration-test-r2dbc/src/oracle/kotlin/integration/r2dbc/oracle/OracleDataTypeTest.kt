@@ -1,9 +1,9 @@
 package integration.r2dbc.oracle
 
-import integration.core.IntervalDayTest
-import integration.core.IntervalYearTest
-import integration.core.intervalDayTest
-import integration.core.intervalYearTest
+import integration.core.DurationTest
+import integration.core.PeriodTest
+import integration.core.durationTest
+import integration.core.periodTest
 import integration.r2dbc.Env
 import integration.r2dbc.inTransaction
 import org.junit.jupiter.api.extension.ExtendWith
@@ -21,8 +21,8 @@ class OracleDataTypeTest(private val db: R2dbcDatabase) {
 
     @Test
     fun period() = inTransaction(db) {
-        val m = Meta.intervalYearTest
-        val data = IntervalYearTest(1, Period.of(11, 2, 0))
+        val m = Meta.periodTest
+        val data = PeriodTest(1, Period.of(11, 2, 0))
         db.runQuery { QueryDsl.insert(m).single(data) }
         val data2 = db.runQuery {
             QueryDsl.from(m).where { m.id eq 1 }.first()
@@ -32,8 +32,8 @@ class OracleDataTypeTest(private val db: R2dbcDatabase) {
 
     @Test
     fun duration() = inTransaction(db) {
-        val m = Meta.intervalDayTest
-        val data = IntervalDayTest(1, Duration.ofDays(11))
+        val m = Meta.durationTest
+        val data = DurationTest(1, Duration.ofDays(11))
         db.runQuery { QueryDsl.insert(m).single(data) }
         val data2 = db.runQuery {
             QueryDsl.from(m).where { m.id eq 1 }.first()
