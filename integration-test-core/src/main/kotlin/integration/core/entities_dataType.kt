@@ -16,6 +16,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.OffsetDateTime
+import java.time.Period
 import java.util.UUID
 
 @KomapperEntity
@@ -66,6 +67,10 @@ data class EnumTest(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true)
 @KomapperEntity
 @KomapperTable("float_test")
 data class FloatTest(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true)val value: Float)
+
+@KomapperEntity
+@KomapperTable("interval_year_test")
+data class IntervalYearTest(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true)val value: Period)
 
 @KomapperEntity
 @KomapperTable("int_test")

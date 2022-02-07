@@ -51,7 +51,8 @@ open class R2dbcOracleDialect(
             R2dbcUByteType("integer"),
             R2dbcUIntType("integer"),
             R2dbcUShortType("integer"),
-            R2dbcOracleBooleanType
+            R2dbcOracleBooleanType,
+            R2dbcOraclePeriodType
         )
     }
 
