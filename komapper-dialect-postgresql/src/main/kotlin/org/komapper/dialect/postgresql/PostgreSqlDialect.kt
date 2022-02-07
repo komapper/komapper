@@ -28,4 +28,6 @@ interface PostgreSqlDialect : Dialect {
     ): EntityUpsertStatementBuilder<ENTITY> {
         return PostgreSqlEntityUpsertStatementBuilder(this, context, entities)
     }
+
+    override fun supportsLockOfTables(): Boolean = true
 }

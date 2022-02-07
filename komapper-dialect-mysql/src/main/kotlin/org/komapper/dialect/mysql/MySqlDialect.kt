@@ -36,5 +36,7 @@ interface MySqlDialect : Dialect {
         return MySqlEntityUpsertStatementBuilder(this, context, entities)
     }
 
+    override fun supportsLockOfTables(): Boolean = true
+
     override fun supportsNullOrdering(): Boolean = false
 }

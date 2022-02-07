@@ -10,6 +10,7 @@ import org.komapper.core.dsl.expression.AggregateFunction
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.expression.Criterion
 import org.komapper.core.dsl.expression.LockOption
+import org.komapper.core.dsl.expression.LockTarget
 import org.komapper.core.dsl.expression.SortItem
 import org.komapper.core.dsl.expression.TableExpression
 import org.komapper.core.dsl.scope.ForUpdateScope
@@ -144,6 +145,34 @@ class SelectStatementBuilder(
         if (dialect.supportsForUpdateClause() && context.forUpdate != null) {
             val scope = ForUpdateScope().apply(context.forUpdate)
             buf.append(" for update")
+            when (val target = scope.lockTarget) {
+                is LockTarget.Empty -> Unit
+                is LockTarget.Metamodels -> {
+                    when (true) {
+                        dialect.supportsLockOfColumns() -> {
+                            if (target.metamodels.isNotEmpty()) {
+                                buf.append(" of ")
+                                for (column in target.metamodels.map { it.idProperties().first() }) {
+                                    support.visitColumnExpression(column)
+                                    buf.append(", ")
+                                }
+                                buf.cutBack(2)
+                            }
+                        }
+                        dialect.supportsLockOfTables() -> {
+                            if (target.metamodels.isNotEmpty()) {
+                                buf.append(" of ")
+                                for (table in target.metamodels) {
+                                    support.visitTableExpression(table, TableNameType.ALIAS_ONLY)
+                                    buf.append(", ")
+                                }
+                                buf.cutBack(2)
+                            }
+                        }
+                        else -> TODO()
+                    }
+                }
+            }
             when (val option = scope.lockOption) {
                 is LockOption.Default -> Unit
                 is LockOption.Nowait -> buf.append(" nowait")

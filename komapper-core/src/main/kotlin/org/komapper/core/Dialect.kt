@@ -238,6 +238,16 @@ interface Dialect {
     fun supportsForUpdateClause(): Boolean = true
 
     /**
+     * Returns whether the "for update of ..column" syntax is supported.
+     */
+    fun supportsLockOfColumns(): Boolean = false
+
+    /**
+     * Returns whether the "for update of ..table" syntax is supported.
+     */
+    fun supportsLockOfTables(): Boolean = false
+
+    /**
      * Returns whether the mod function is supported.
      *
      * @return whether the mod function is supported
@@ -294,4 +304,6 @@ object DryRunDialect : Dialect {
     ): EntityUpsertStatementBuilder<ENTITY> {
         throw UnsupportedOperationException()
     }
+
+    override fun supportsLockOfColumns(): Boolean = true
 }

@@ -60,4 +60,6 @@ interface OracleDialect : Dialect {
     override fun supportsCreateIfNotExists(): Boolean = false
 
     override fun supportsDropIfExists(): Boolean = false
+
+    override fun supportsLockOfColumns(): Boolean = true
 }

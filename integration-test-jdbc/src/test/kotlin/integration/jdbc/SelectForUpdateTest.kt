@@ -4,6 +4,7 @@ import integration.core.Address
 import integration.core.Dbms
 import integration.core.Run
 import integration.core.address
+import integration.core.employee
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
@@ -67,6 +68,40 @@ class SelectForUpdateTest(private val db: JdbcDatabase) {
             QueryDsl.from(a)
                 .where { a.addressId eq 10 }
                 .forUpdate { wait(1) }
+                .first()
+        }
+        assertEquals(Address(10, "STREET 10", 1), address)
+    }
+
+    @Run(onlyIf = [Dbms.ORACLE])
+    @Test
+    fun forUpdate_of_columns_nowait() {
+        val a = Meta.address
+        val e = Meta.employee
+        val address = db.runQuery {
+            QueryDsl.from(a)
+                .innerJoin(e) { a.addressId eq e.addressId }
+                .where { a.addressId eq 10 }
+                .forUpdate {
+                    of(a, e).nowait()
+                }
+                .first()
+        }
+        assertEquals(Address(10, "STREET 10", 1), address)
+    }
+
+    @Run(onlyIf = [Dbms.MYSQL, Dbms.POSTGRESQL])
+    @Test
+    fun forUpdate_of_tables_nowait() {
+        val a = Meta.address
+        val e = Meta.employee
+        val address = db.runQuery {
+            QueryDsl.from(a)
+                .innerJoin(e) { a.addressId eq e.addressId }
+                .where { a.addressId eq 10 }
+                .forUpdate {
+                    of(a, e).nowait()
+                }
                 .first()
         }
         assertEquals(Address(10, "STREET 10", 1), address)
