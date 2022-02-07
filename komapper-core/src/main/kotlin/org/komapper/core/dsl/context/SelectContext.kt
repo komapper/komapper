@@ -1,10 +1,10 @@
 package org.komapper.core.dsl.context
 
 import org.komapper.core.ThreadSafe
-import org.komapper.core.dsl.element.ForUpdate
 import org.komapper.core.dsl.element.Join
 import org.komapper.core.dsl.element.Projection
 import org.komapper.core.dsl.expression.ColumnExpression
+import org.komapper.core.dsl.expression.ForUpdateDeclaration
 import org.komapper.core.dsl.expression.HavingDeclaration
 import org.komapper.core.dsl.expression.SortItem
 import org.komapper.core.dsl.expression.TableExpression
@@ -23,7 +23,7 @@ data class SelectContext<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, 
     val orderBy: List<SortItem> = listOf(),
     val offset: Int = -1,
     val limit: Int = -1,
-    val forUpdate: ForUpdate = ForUpdate(),
+    val forUpdate: ForUpdateDeclaration? = null,
     val distinct: Boolean = false,
     val groupBy: List<ColumnExpression<*, *>> = listOf(),
     val having: HavingDeclaration = {},

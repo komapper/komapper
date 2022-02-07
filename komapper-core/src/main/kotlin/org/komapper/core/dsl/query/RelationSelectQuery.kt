@@ -6,6 +6,7 @@ import org.komapper.core.dsl.element.InnerJoin
 import org.komapper.core.dsl.element.LeftJoin
 import org.komapper.core.dsl.element.Relationship
 import org.komapper.core.dsl.expression.ColumnExpression
+import org.komapper.core.dsl.expression.ForUpdateDeclaration
 import org.komapper.core.dsl.expression.HavingDeclaration
 import org.komapper.core.dsl.expression.ScalarExpression
 import org.komapper.core.dsl.expression.SortExpression
@@ -77,8 +78,8 @@ internal data class RelationSelectQueryImpl<ENTITY : Any, ID : Any, META : Entit
         return copy(context = newContext)
     }
 
-    override fun forUpdate(): RelationSelectQuery<ENTITY> {
-        val newContext = support.forUpdate()
+    override fun forUpdate(declaration: ForUpdateDeclaration): RelationSelectQuery<ENTITY> {
+        val newContext = support.forUpdate(declaration)
         return copy(context = newContext)
     }
 

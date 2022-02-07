@@ -9,8 +9,10 @@ import org.komapper.core.dsl.element.LeftJoin
 import org.komapper.core.dsl.expression.AggregateFunction
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.expression.Criterion
+import org.komapper.core.dsl.expression.LockOption
 import org.komapper.core.dsl.expression.SortItem
 import org.komapper.core.dsl.expression.TableExpression
+import org.komapper.core.dsl.scope.ForUpdateScope
 
 class SelectStatementBuilder(
     private val dialect: Dialect,
@@ -47,7 +49,7 @@ class SelectStatementBuilder(
     private fun fromClause() {
         buf.append(" from ")
         table(context.target)
-        if (dialect.supportsTableHint() && context.forUpdate.options != null) {
+        if (dialect.supportsTableHint() && context.forUpdate != null) {
             buf.append(" with (updlock, rowlock)")
         }
         if (context.joins.isNotEmpty()) {
@@ -133,8 +135,15 @@ class SelectStatementBuilder(
     }
 
     private fun forUpdateClause() {
-        if (dialect.supportsForUpdateClause() && context.forUpdate.options != null) {
+        if (dialect.supportsForUpdateClause() && context.forUpdate != null) {
+            val scope = ForUpdateScope().apply(context.forUpdate)
             buf.append(" for update")
+            when (val option = scope.lockOption) {
+                is LockOption.Default -> Unit
+                is LockOption.Nowait -> buf.append(" nowait")
+                is LockOption.SkipLocked -> buf.append(" skip locked")
+                is LockOption.Wait -> buf.append(" wait ${option.second}")
+            }
         }
     }
 

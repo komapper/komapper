@@ -1,11 +1,14 @@
 package integration.jdbc
 
 import integration.core.Address
+import integration.core.Dbms
+import integration.core.Run
 import integration.core.address
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
 import org.komapper.core.dsl.operator.desc
+import org.komapper.core.dsl.query.first
 import org.komapper.jdbc.JdbcDatabase
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -28,5 +31,44 @@ class SelectForUpdateTest(private val db: JdbcDatabase) {
             ),
             list
         )
+    }
+
+    @Run(onlyIf = [Dbms.MARIADB, Dbms.MYSQL, Dbms.ORACLE, Dbms.POSTGRESQL])
+    @Test
+    fun forUpdate_nowait() {
+        val a = Meta.address
+        val address = db.runQuery {
+            QueryDsl.from(a)
+                .where { a.addressId eq 10 }
+                .forUpdate { nowait() }
+                .first()
+        }
+        assertEquals(Address(10, "STREET 10", 1), address)
+    }
+
+    @Run(onlyIf = [Dbms.MARIADB, Dbms.MYSQL, Dbms.ORACLE, Dbms.POSTGRESQL])
+    @Test
+    fun forUpdate_skipLocked() {
+        val a = Meta.address
+        val address = db.runQuery {
+            QueryDsl.from(a)
+                .where { a.addressId eq 10 }
+                .forUpdate { skipLocked() }
+                .first()
+        }
+        assertEquals(Address(10, "STREET 10", 1), address)
+    }
+
+    @Run(onlyIf = [Dbms.MARIADB, Dbms.ORACLE])
+    @Test
+    fun forUpdate_wait() {
+        val a = Meta.address
+        val address = db.runQuery {
+            QueryDsl.from(a)
+                .where { a.addressId eq 10 }
+                .forUpdate { wait(1) }
+                .first()
+        }
+        assertEquals(Address(10, "STREET 10", 1), address)
     }
 }
