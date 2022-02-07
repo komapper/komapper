@@ -12,10 +12,12 @@ import java.math.BigDecimal
 import java.math.BigInteger
 import java.sql.Array
 import java.sql.SQLXML
+import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.OffsetDateTime
+import java.time.Period
 import java.util.UUID
 
 @KomapperEntity
@@ -55,6 +57,10 @@ data class ByteArrayTest(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = 
 @KomapperTable("double_test")
 data class DoubleTest(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true)val value: Double)
 
+@KomapperEntity
+@KomapperTable("duration_test")
+data class DurationTest(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true)val value: Duration)
+
 enum class Direction {
     NORTH, SOUTH, EAST, WEST
 }
@@ -90,6 +96,10 @@ data class LongTest(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true)
 @KomapperEntity
 @KomapperTable("offset_date_time_test")
 data class OffsetDateTimeTest(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true)val value: OffsetDateTime)
+
+@KomapperEntity
+@KomapperTable("period_test")
+data class PeriodTest(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true)val value: Period)
 
 @KomapperEntity
 @KomapperTable("short_test")

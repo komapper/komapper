@@ -30,6 +30,7 @@ interface OracleSetting<CONFIG> : Setting<CONFIG> {
         create table byte_array_test(id integer not null primary key, "value" raw(1000));
         create table clob_test(id integer not null primary key, "value" clob);
         create table double_test(id integer not null primary key, "value" float);
+        create table duration_test(id integer not null primary key, "value" interval day to second);
         create table enum_test(id integer not null primary key, "value" varchar2(20));
         create table float_test(id integer not null primary key, "value" float);
         create table int_test(id integer not null primary key, "value" integer);
@@ -38,6 +39,7 @@ interface OracleSetting<CONFIG> : Setting<CONFIG> {
         create table local_time_test(id integer not null primary key, "value" timestamp);
         create table long_test(id integer not null primary key, "value" integer);
         create table offset_date_time_test(id integer not null primary key, "value" timestamp with time zone);
+        create table period_test(id integer not null primary key, "value" interval year to month);
         create table short_test(id integer not null primary key, "value" integer);
         create table string_test(id integer not null primary key, "value" varchar2(20));
  
