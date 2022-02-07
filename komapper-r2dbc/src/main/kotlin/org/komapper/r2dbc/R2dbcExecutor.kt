@@ -47,6 +47,8 @@ internal class R2dbcExecutor(
             }
         }.onStart {
             log(statement)
+        }.catch {
+            translateThrowable(it)
         }
     }
 
@@ -71,7 +73,7 @@ internal class R2dbcExecutor(
         }.onStart {
             log(statement)
         }.catch {
-            handleException(it)
+            translateThrowable(it)
         }.single()
     }
 
@@ -98,15 +100,18 @@ internal class R2dbcExecutor(
         }.onStart {
             statements.forEach(::log)
         }.catch {
-            handleException(it)
+            translateThrowable(it)
         }.collect()
     }
 
-    private fun handleException(cause: Throwable) {
-        if (cause is R2dbcDataIntegrityViolationException) {
-            throw UniqueConstraintException(cause)
-        } else {
-            throw cause
+    /**
+     * Translates a [Throwable] to a [RuntimeException].
+     */
+    private fun translateThrowable(cause: Throwable) {
+        when (cause) {
+            is R2dbcDataIntegrityViolationException -> throw UniqueConstraintException(cause)
+            is RuntimeException -> throw cause
+            else -> throw RuntimeException(cause)
         }
     }
 
