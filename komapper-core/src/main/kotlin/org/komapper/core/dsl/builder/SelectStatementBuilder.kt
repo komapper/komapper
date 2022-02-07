@@ -50,7 +50,13 @@ class SelectStatementBuilder(
         buf.append(" from ")
         table(context.target)
         if (dialect.supportsTableHint() && context.forUpdate != null) {
-            buf.append(" with (updlock, rowlock)")
+            val scope = ForUpdateScope().apply(context.forUpdate)
+            buf.append(" with (updlock, rowlock")
+            when (scope.lockOption) {
+                is LockOption.Nowait -> buf.append(", nowait")
+                else -> Unit
+            }
+            buf.append(")")
         }
         if (context.joins.isNotEmpty()) {
             for (join in context.joins) {

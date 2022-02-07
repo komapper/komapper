@@ -33,7 +33,7 @@ class SelectForUpdateTest(private val db: JdbcDatabase) {
         )
     }
 
-    @Run(onlyIf = [Dbms.MARIADB, Dbms.MYSQL, Dbms.ORACLE, Dbms.POSTGRESQL])
+    @Run(onlyIf = [Dbms.MARIADB, Dbms.MYSQL, Dbms.ORACLE, Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun forUpdate_nowait() {
         val a = Meta.address
