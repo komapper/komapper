@@ -38,5 +38,11 @@ interface MariaDbDialect : Dialect {
 
     override fun supportsAliasForDeleteStatement() = false
 
+    override fun supportsLockOptionNowait(): Boolean = true
+
+    override fun supportsLockOptionSkipLocked(): Boolean = true
+
+    override fun supportsLockOptionWait(): Boolean = true
+
     override fun supportsNullOrdering(): Boolean = false
 }

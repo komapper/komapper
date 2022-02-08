@@ -9,8 +9,11 @@ import org.komapper.core.dsl.element.LeftJoin
 import org.komapper.core.dsl.expression.AggregateFunction
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.expression.Criterion
+import org.komapper.core.dsl.expression.LockOption
+import org.komapper.core.dsl.expression.LockTarget
 import org.komapper.core.dsl.expression.SortItem
 import org.komapper.core.dsl.expression.TableExpression
+import org.komapper.core.dsl.scope.ForUpdateScope
 
 class SelectStatementBuilder(
     private val dialect: Dialect,
@@ -47,8 +50,18 @@ class SelectStatementBuilder(
     private fun fromClause() {
         buf.append(" from ")
         table(context.target)
-        if (dialect.supportsTableHint() && context.forUpdate.options != null) {
-            buf.append(" with (updlock, rowlock)")
+        if (dialect.supportsTableHint() && context.forUpdate != null) {
+            val scope = ForUpdateScope().apply(context.forUpdate)
+            buf.append(" with (updlock, rowlock")
+            when (scope.lockOption) {
+                is LockOption.Nowait -> if (dialect.supportsLockOptionNowait()) {
+                    buf.append(", nowait")
+                } else {
+                    throw UnsupportedOperationException("The dialect(driver=${dialect.driver}) does not support the nowait option. sql=$buf")
+                }
+                else -> Unit
+            }
+            buf.append(")")
         }
         if (context.joins.isNotEmpty()) {
             for (join in context.joins) {
@@ -133,8 +146,66 @@ class SelectStatementBuilder(
     }
 
     private fun forUpdateClause() {
-        if (dialect.supportsForUpdateClause() && context.forUpdate.options != null) {
+        if (dialect.supportsForUpdateClause() && context.forUpdate != null) {
+            val scope = ForUpdateScope().apply(context.forUpdate)
             buf.append(" for update")
+            lockTarget(scope.lockTarget)
+            lockOption(scope.lockOption)
+        }
+    }
+
+    private fun lockTarget(lockTarget: LockTarget) {
+        when (lockTarget) {
+            is LockTarget.Empty -> Unit
+            is LockTarget.Metamodels -> {
+                when (true) {
+                    dialect.supportsLockOfColumns() -> {
+                        if (lockTarget.metamodels.isNotEmpty()) {
+                            buf.append(" of ")
+                            for (column in lockTarget.metamodels.map { it.idProperties().first() }) {
+                                support.visitColumnExpression(column)
+                                buf.append(", ")
+                            }
+                            buf.cutBack(2)
+                        }
+                    }
+                    dialect.supportsLockOfTables() -> {
+                        if (lockTarget.metamodels.isNotEmpty()) {
+                            buf.append(" of ")
+                            for (table in lockTarget.metamodels) {
+                                support.visitTableExpression(table, TableNameType.ALIAS_ONLY)
+                                buf.append(", ")
+                            }
+                            buf.cutBack(2)
+                        }
+                    }
+                    else -> throw UnsupportedOperationException("The dialect(driver=${dialect.driver}) does not support the \"for update of\" syntax. sql=$buf")
+                }
+            }
+        }
+    }
+
+    private fun lockOption(lockOption: LockOption) {
+        fun raiseError(optionName: String) {
+            throw UnsupportedOperationException("The dialect(driver=${dialect.driver}) does not support the $optionName option. sql=$buf")
+        }
+        when (lockOption) {
+            is LockOption.Default -> Unit
+            is LockOption.Nowait -> if (dialect.supportsLockOptionNowait()) {
+                buf.append(" nowait")
+            } else {
+                raiseError("nowait")
+            }
+            is LockOption.SkipLocked -> if (dialect.supportsLockOptionSkipLocked()) {
+                buf.append(" skip locked")
+            } else {
+                raiseError("skip locked")
+            }
+            is LockOption.Wait -> if (dialect.supportsLockOptionWait()) {
+                buf.append(" wait ${lockOption.second}")
+            } else {
+                raiseError("wait")
+            }
         }
     }
 

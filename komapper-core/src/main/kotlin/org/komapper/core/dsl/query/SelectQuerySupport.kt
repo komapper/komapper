@@ -1,15 +1,14 @@
 package org.komapper.core.dsl.query
 
 import org.komapper.core.dsl.context.SelectContext
-import org.komapper.core.dsl.element.ForUpdate
 import org.komapper.core.dsl.element.Join
 import org.komapper.core.dsl.expression.ColumnExpression
+import org.komapper.core.dsl.expression.ForUpdateDeclaration
 import org.komapper.core.dsl.expression.SortExpression
 import org.komapper.core.dsl.expression.SortItem
 import org.komapper.core.dsl.expression.WhereDeclaration
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.operator.plus
-import org.komapper.core.dsl.options.ForUpdateOptions
 import org.komapper.core.dsl.options.SelectOptions
 
 internal class SelectQuerySupport<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
@@ -39,9 +38,8 @@ internal class SelectQuerySupport<ENTITY : Any, ID : Any, META : EntityMetamodel
         return context.copy(limit = limit)
     }
 
-    fun forUpdate(): SelectContext<ENTITY, ID, META> {
-        val forUpdate = ForUpdate(ForUpdateOptions.BASIC)
-        return context.copy(forUpdate = forUpdate)
+    fun forUpdate(declaration: ForUpdateDeclaration): SelectContext<ENTITY, ID, META> {
+        return context.copy(forUpdate = declaration)
     }
 
     fun select(vararg expressions: ColumnExpression<*, *>): SelectContext<ENTITY, ID, META> {

@@ -2,6 +2,7 @@ package org.komapper.core.dsl.query
 
 import org.komapper.core.dsl.element.Relationship
 import org.komapper.core.dsl.expression.ColumnExpression
+import org.komapper.core.dsl.expression.ForUpdateDeclaration
 import org.komapper.core.dsl.expression.HavingDeclaration
 import org.komapper.core.dsl.expression.OnDeclaration
 import org.komapper.core.dsl.expression.ScalarExpression
@@ -105,9 +106,9 @@ interface SelectQuery<ENTITY : Any, QUERY : SelectQuery<ENTITY, QUERY>> :
      *
      * @return the query that returns a list of entities
      */
-    fun forUpdate(): QUERY
+    fun forUpdate(declaration: ForUpdateDeclaration = {}): QUERY
 
-    /**
+/**
      * Builds a query with the options applied.
      *
      * @param configure the configure function to apply options
