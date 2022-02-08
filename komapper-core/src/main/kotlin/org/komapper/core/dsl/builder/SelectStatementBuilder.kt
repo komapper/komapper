@@ -54,7 +54,11 @@ class SelectStatementBuilder(
             val scope = ForUpdateScope().apply(context.forUpdate)
             buf.append(" with (updlock, rowlock")
             when (scope.lockOption) {
-                is LockOption.Nowait -> buf.append(", nowait")
+                is LockOption.Nowait -> if (dialect.supportsLockOptionNowait()) {
+                    buf.append(", nowait")
+                } else {
+                    throw UnsupportedOperationException("The dialect(driver=${dialect.driver}) does not support the nowait option. sql=$buf")
+                }
                 else -> Unit
             }
             buf.append(")")
@@ -145,39 +149,62 @@ class SelectStatementBuilder(
         if (dialect.supportsForUpdateClause() && context.forUpdate != null) {
             val scope = ForUpdateScope().apply(context.forUpdate)
             buf.append(" for update")
-            when (val target = scope.lockTarget) {
-                is LockTarget.Empty -> Unit
-                is LockTarget.Metamodels -> {
-                    when (true) {
-                        dialect.supportsLockOfColumns() -> {
-                            if (target.metamodels.isNotEmpty()) {
-                                buf.append(" of ")
-                                for (column in target.metamodels.map { it.idProperties().first() }) {
-                                    support.visitColumnExpression(column)
-                                    buf.append(", ")
-                                }
-                                buf.cutBack(2)
+            lockTarget(scope.lockTarget)
+            lockOption(scope.lockOption)
+        }
+    }
+
+    private fun lockTarget(lockTarget: LockTarget) {
+        when (lockTarget) {
+            is LockTarget.Empty -> Unit
+            is LockTarget.Metamodels -> {
+                when (true) {
+                    dialect.supportsLockOfColumns() -> {
+                        if (lockTarget.metamodels.isNotEmpty()) {
+                            buf.append(" of ")
+                            for (column in lockTarget.metamodels.map { it.idProperties().first() }) {
+                                support.visitColumnExpression(column)
+                                buf.append(", ")
                             }
+                            buf.cutBack(2)
                         }
-                        dialect.supportsLockOfTables() -> {
-                            if (target.metamodels.isNotEmpty()) {
-                                buf.append(" of ")
-                                for (table in target.metamodels) {
-                                    support.visitTableExpression(table, TableNameType.ALIAS_ONLY)
-                                    buf.append(", ")
-                                }
-                                buf.cutBack(2)
-                            }
-                        }
-                        else -> TODO()
                     }
+                    dialect.supportsLockOfTables() -> {
+                        if (lockTarget.metamodels.isNotEmpty()) {
+                            buf.append(" of ")
+                            for (table in lockTarget.metamodels) {
+                                support.visitTableExpression(table, TableNameType.ALIAS_ONLY)
+                                buf.append(", ")
+                            }
+                            buf.cutBack(2)
+                        }
+                    }
+                    else -> throw UnsupportedOperationException("The dialect(driver=${dialect.driver}) does not support the \"for update of\" syntax. sql=$buf")
                 }
             }
-            when (val option = scope.lockOption) {
-                is LockOption.Default -> Unit
-                is LockOption.Nowait -> buf.append(" nowait")
-                is LockOption.SkipLocked -> buf.append(" skip locked")
-                is LockOption.Wait -> buf.append(" wait ${option.second}")
+        }
+    }
+
+    private fun lockOption(lockOption: LockOption) {
+        fun raiseError(optionName: String) {
+            throw UnsupportedOperationException("The dialect(driver=${dialect.driver}) does not support the $optionName option. sql=$buf")
+        }
+        when (lockOption) {
+            is LockOption.Default -> Unit
+            is LockOption.Nowait -> if (dialect.supportsLockOptionNowait()) {
+                buf.append(" nowait")
+            } else {
+                raiseError("nowait")
+            }
+            is LockOption.SkipLocked -> if (dialect.supportsLockOptionSkipLocked()) {
+                buf.append(" skip locked")
+            } else {
+                raiseError("skip locked")
+            }
+            is LockOption.Wait -> if (dialect.supportsLockOptionWait()) {
+                buf.append(" wait ${lockOption.second}")
+            } else {
+                raiseError("wait")
             }
         }
     }

@@ -248,6 +248,21 @@ interface Dialect {
     fun supportsLockOfTables(): Boolean = false
 
     /**
+     * Returns whether the lock option NOWAIT is supported.
+     */
+    fun supportsLockOptionNowait(): Boolean = false
+
+    /**
+     * Returns whether the lock option SKIP LOCKED is supported.
+     */
+    fun supportsLockOptionSkipLocked(): Boolean = false
+
+    /**
+     * Returns whether the lock option WAIT is supported.
+     */
+    fun supportsLockOptionWait(): Boolean = false
+
+    /**
      * Returns whether the mod function is supported.
      *
      * @return whether the mod function is supported
@@ -306,4 +321,10 @@ object DryRunDialect : Dialect {
     }
 
     override fun supportsLockOfColumns(): Boolean = true
+
+    override fun supportsLockOptionNowait(): Boolean = true
+
+    override fun supportsLockOptionSkipLocked(): Boolean = true
+
+    override fun supportsLockOptionWait(): Boolean = true
 }

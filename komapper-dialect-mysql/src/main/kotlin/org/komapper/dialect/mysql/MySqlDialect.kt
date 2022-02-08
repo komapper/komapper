@@ -38,5 +38,9 @@ interface MySqlDialect : Dialect {
 
     override fun supportsLockOfTables(): Boolean = true
 
+    override fun supportsLockOptionNowait(): Boolean = true
+
+    override fun supportsLockOptionSkipLocked(): Boolean = true
+
     override fun supportsNullOrdering(): Boolean = false
 }

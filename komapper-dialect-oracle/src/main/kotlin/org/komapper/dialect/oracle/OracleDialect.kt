@@ -62,4 +62,10 @@ interface OracleDialect : Dialect {
     override fun supportsDropIfExists(): Boolean = false
 
     override fun supportsLockOfColumns(): Boolean = true
+
+    override fun supportsLockOptionNowait(): Boolean = true
+
+    override fun supportsLockOptionSkipLocked(): Boolean = true
+
+    override fun supportsLockOptionWait(): Boolean = true
 }

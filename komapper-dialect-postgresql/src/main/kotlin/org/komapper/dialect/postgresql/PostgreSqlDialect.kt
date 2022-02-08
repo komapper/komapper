@@ -30,4 +30,8 @@ interface PostgreSqlDialect : Dialect {
     }
 
     override fun supportsLockOfTables(): Boolean = true
+
+    override fun supportsLockOptionNowait(): Boolean = true
+
+    override fun supportsLockOptionSkipLocked(): Boolean = true
 }
