@@ -14,6 +14,7 @@ import org.komapper.r2dbc.R2dbcDatabase
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import kotlin.test.assertTrue
 
 @ExtendWith(Env::class)
 class SelectProjectionTest(private val db: R2dbcDatabase) {
@@ -45,6 +46,19 @@ class SelectProjectionTest(private val db: R2dbcDatabase) {
                 .first()
         }
         assertEquals("STREET 1", value)
+    }
+
+    @Test
+    fun selectSingleColumn_null() = inTransaction(db) {
+        val e = Meta.employee
+        val list = db.runQuery {
+            QueryDsl.from(e)
+                .where {
+                    e.managerId.isNull()
+                }
+                .select(e.managerId)
+        }
+        assertTrue(list.all { it == null })
     }
 
     @Test
