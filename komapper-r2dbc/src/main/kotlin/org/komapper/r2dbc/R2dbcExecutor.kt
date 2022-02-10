@@ -17,7 +17,6 @@ import kotlinx.coroutines.reactive.asFlow
 import org.komapper.core.ExecutionOptionsProvider
 import org.komapper.core.Statement
 import org.komapper.core.UniqueConstraintException
-import org.reactivestreams.Publisher
 
 internal class R2dbcExecutor(
     private val config: R2dbcDatabaseConfig,
@@ -34,15 +33,19 @@ internal class R2dbcExecutor(
     ): Flow<T> {
         @Suppress("NAME_SHADOWING")
         val statement = inspect(statement)
-        return config.session.connection.toFlow().flatMapConcat { con ->
+        return config.session.connection.asFlow().flatMapConcat { con ->
             con.use {
                 val r2dbcStmt = prepare(con, statement)
                 setUp(r2dbcStmt)
                 bind(r2dbcStmt, statement)
-                r2dbcStmt.execute().toFlow().flatMapConcat { result ->
+                r2dbcStmt.execute().asFlow().flatMapConcat { result ->
                     result.map { row, _ ->
-                        transform(config.dialect, row)
-                    }.toFlow()
+                        transform(config.dialect, row) ?: Null
+                    }.asFlow().map {
+                        val nullable = if (it is Null) null else it
+                        @Suppress("UNCHECKED_CAST")
+                        nullable as T
+                    }
                 }
             }
         }.onStart {
@@ -56,14 +59,14 @@ internal class R2dbcExecutor(
     suspend fun executeUpdate(statement: Statement): Pair<Int, LongArray> {
         @Suppress("NAME_SHADOWING")
         val statement = inspect(statement)
-        return config.session.connection.toFlow().flatMapConcat { con ->
+        return config.session.connection.asFlow().flatMapConcat { con ->
             con.use {
                 val r2dbcStmt = prepare(con, statement)
                 setUp(r2dbcStmt)
                 bind(r2dbcStmt, statement)
-                r2dbcStmt.execute().toFlow().flatMapConcat { result ->
+                r2dbcStmt.execute().asFlow().flatMapConcat { result ->
                     if (generatedColumn == null) {
-                        result.rowsUpdated.toFlow().map { count -> count to longArrayOf() }
+                        result.rowsUpdated.asFlow().map { count -> count to longArrayOf() }
                     } else {
                         val generatedKeys = fetchGeneratedKeys(result).toList().toLongArray()
                         flowOf(generatedKeys.size to generatedKeys)
@@ -81,20 +84,20 @@ internal class R2dbcExecutor(
     suspend fun execute(statements: List<Statement>, predicate: (Result.Message) -> Boolean = { true }) {
         @Suppress("NAME_SHADOWING")
         val statements = statements.map { inspect(it) }
-        return config.session.connection.toFlow().flatMapConcat { con ->
+        return config.session.connection.asFlow().flatMapConcat { con ->
             con.use {
                 val batch = con.createBatch()
                 for (statement in statements) {
                     val sql = asSql(statement)
                     batch.add(sql)
                 }
-                batch.execute().toFlow().flatMapConcat { result ->
+                batch.execute().asFlow().flatMapConcat { result ->
                     result.filter {
                         when (it) {
                             is Result.Message -> predicate(it)
                             else -> true
                         }
-                    }.rowsUpdated.toFlow()
+                    }.rowsUpdated.asFlow()
                 }
             }
         }.onStart {
@@ -157,14 +160,8 @@ internal class R2dbcExecutor(
                 is Number -> value.toLong()
                 else -> error("Generated value is not Number. generatedColumn=$generatedColumn, value=$value, valueType=${value::class.qualifiedName}")
             }
-        }.toFlow()
+        }.asFlow()
     }
-}
-
-@Suppress("UNCHECKED_CAST")
-private fun <T> Publisher<T>.toFlow(): Flow<T> {
-    val publisher = this as Publisher<*>
-    return publisher.asFlow() as Flow<T>
 }
 
 private fun <T> io.r2dbc.spi.Closeable.use(block: (io.r2dbc.spi.Closeable) -> Flow<T>): Flow<T> {
@@ -175,3 +172,5 @@ private fun <T> io.r2dbc.spi.Closeable.use(block: (io.r2dbc.spi.Closeable) -> Fl
             close()
         }.getOrThrow()
 }
+
+private object Null
