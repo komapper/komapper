@@ -54,6 +54,7 @@ internal class MetadataQueryImpl(
                 config.dialect,
                 con.metaData,
                 // TODO: Remove this workaround in the future
+                // https://jira.mariadb.org/browse/CONJ-921
                 catalog ?: if (config.dialect.driver == "mariadb") { "" } else null,
                 schemaName,
                 tableNamePattern,
