@@ -29,6 +29,8 @@ internal class OracleEntityUpsertStatementBuilder<ENTITY : Any, ID : Any, META :
     private val sourceStatementBuilder = SourceStatementBuilder(dialect, context, entities)
 
     override fun build(assignments: List<Pair<PropertyMetamodel<ENTITY, *, *>, Operand>>): Statement {
+        @Suppress("NAME_SHADOWING")
+        val assignments = assignments.filter { (left, _) -> left !in context.keys }
         buf.append("merge into ")
         table(target, TableNameType.NAME_AND_ALIAS)
         buf.append(" using (")
@@ -45,11 +47,9 @@ internal class OracleEntityUpsertStatementBuilder<ENTITY : Any, ID : Any, META :
         }
         buf.cutBack(5)
         buf.append(")")
-        if (context.duplicateKeyType == DuplicateKeyType.UPDATE) {
+        if (context.duplicateKeyType == DuplicateKeyType.UPDATE && assignments.isNotEmpty()) {
             buf.append(" when matched then update set ")
             for ((left, right) in assignments) {
-                // TODO
-                if (left in context.keys) continue
                 column(left)
                 buf.append(" = ")
                 operand(right)

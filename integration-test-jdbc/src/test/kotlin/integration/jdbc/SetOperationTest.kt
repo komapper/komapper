@@ -24,7 +24,6 @@ import kotlin.test.assertNull
 @ExtendWith(Env::class)
 class SetOperationTest(private val db: JdbcDatabase) {
 
-    // TODO
     @Run(unless = [Dbms.MYSQL])
     @Test
     fun except_entity() {
@@ -42,6 +41,20 @@ class SetOperationTest(private val db: JdbcDatabase) {
         assertEquals(5, e3.employeeId)
     }
 
+    @Run(onlyIf = [Dbms.MYSQL])
+    @Test
+    fun except_entity_unsupportedOperationException() {
+        val e = Meta.employee
+        val q1 = QueryDsl.from(e).where { e.employeeId inList listOf(1, 2, 3, 4, 5) }
+        val q2 = QueryDsl.from(e).where { e.employeeId inList listOf(2, 4, 6, 8) }
+        val query = (q1 except q2).orderBy(e.employeeId)
+        val ex = assertFailsWith<UnsupportedOperationException> {
+            db.runQuery { query }
+            Unit
+        }
+        println(ex)
+    }
+
     @Run(unless = [Dbms.MYSQL])
     @Test
     fun intersect_entity() {
@@ -55,6 +68,20 @@ class SetOperationTest(private val db: JdbcDatabase) {
         val e2 = list[1]
         assertEquals(2, e1.employeeId)
         assertEquals(4, e2.employeeId)
+    }
+
+    @Run(onlyIf = [Dbms.MYSQL])
+    @Test
+    fun intersect_entity_unsupportedOperationException() {
+        val e = Meta.employee
+        val q1 = QueryDsl.from(e).where { e.employeeId inList listOf(1, 2, 3, 4, 5) }
+        val q2 = QueryDsl.from(e).where { e.employeeId inList listOf(2, 4, 6, 8) }
+        val query = (q1 intersect q2).orderBy(e.employeeId)
+        val ex = assertFailsWith<UnsupportedOperationException> {
+            db.runQuery { query }
+            Unit
+        }
+        println(ex)
     }
 
     @Test

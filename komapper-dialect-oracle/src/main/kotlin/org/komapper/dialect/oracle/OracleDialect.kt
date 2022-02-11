@@ -22,12 +22,6 @@ interface OracleDialect : Dialect {
 
     override val driver: String get() = DRIVER
 
-    override fun supportsAsKeywordForTableAlias(): Boolean = false
-
-    override fun supportsExceptSetOperation(): Boolean = false
-
-    override fun supportsModuloOperator(): Boolean = false
-
     override fun getSequenceSql(sequenceName: String): String {
         return "select $sequenceName.nextval from dual"
     }
@@ -57,6 +51,8 @@ interface OracleDialect : Dialect {
         return OracleEntityUpsertStatementBuilder(this, context, entities)
     }
 
+    override fun supportsAsKeywordForTableAlias(): Boolean = false
+
     override fun supportsCreateIfNotExists(): Boolean = false
 
     override fun supportsDropIfExists(): Boolean = false
@@ -68,4 +64,10 @@ interface OracleDialect : Dialect {
     override fun supportsLockOptionSkipLocked(): Boolean = true
 
     override fun supportsLockOptionWait(): Boolean = true
+
+    override fun supportsModuloOperator(): Boolean = false
+
+    override fun supportsSetOperationExcept(): Boolean = false
+
+    override fun supportsSetOperationMinus(): Boolean = true
 }
