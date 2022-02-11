@@ -117,7 +117,7 @@ interface Dialect {
     fun getDataTypeName(klass: KClass<*>): String
 
     /**
-     * Returns the statement builder for creating the offset and limit expression.
+     * Returns the statement builder for creating the OFFSET and LIMIT expression.
      *
      * @param offset the offset
      * @param limit the limit
@@ -136,9 +136,9 @@ interface Dialect {
     fun getSequenceSql(sequenceName: String): String
 
     /**
-     * Returns the substring function.
+     * Returns the SUBSTRING function.
      *
-     * @return the substring function
+     * @return the SUBSTRING function
      */
     fun getSubstringFunction(): String = "substring"
 
@@ -157,7 +157,7 @@ interface Dialect {
     }
 
     /**
-     * Returns the statement builder for the entity upsert command.
+     * Returns the statement builder for the entity UPSERT command.
      *
      * @param ENTITY the entity type
      * @param ID the entity id type
@@ -172,122 +172,104 @@ interface Dialect {
     ): EntityUpsertStatementBuilder<ENTITY>
 
     /**
-     * Returns the default length argument for the substring function.
+     * Returns the default length argument for the SUBSTRING function.
      *
      * @return the default length argument
      */
     fun getDefaultLengthForSubstringFunction(): Int? = null
 
     /**
-     * Returns whether the limit and offset clauses are supported without using the order by clause.
-     *
-     * @return whether the limit and offset clauses are supported
+     * Returns whether the LIMIT and OFFSET clauses are supported without using the ORDER BY clause.
      */
     fun supportsLimitOffsetWithoutOrderByClause(): Boolean = true
 
     /**
-     * Returns whether the alias is supported in the delete statement.
-     *
-     * @return whether the alias is supported
+     * Returns whether the alias is supported in the DELETE statement.
      */
     fun supportsAliasForDeleteStatement() = true
 
     /**
-     * Returns whether the alias is supported in the update statement.
-     *
-     * @return whether the alias is supported
+     * Returns whether the alias is supported in the UPDATE statement.
      */
     fun supportsAliasForUpdateStatement() = true
 
     /**
-     * Returns whether the as keyword is supported for a table alias.
-     *
-     * @return whether the as keyword is supported
+     * Returns whether the AS keyword is supported for a table alias.
      */
     fun supportsAsKeywordForTableAlias(): Boolean = true
 
     /**
-     * Returns whether the "create table/sequence if not exists" syntax.
+     * Returns whether the "CREATE TABLE/SEQUENCE IF NOT EXISTS" syntax is supported.
      */
     fun supportsCreateIfNotExists(): Boolean = true
 
     /**
-     * Returns whether the "drop table/sequence if exists" syntax.
+     * Returns whether the "DROP TABLE/SEQUENCE IF EXISTS" syntax is supported.
      */
     fun supportsDropIfExists(): Boolean = true
 
-/**
-     * Returns whether the set operation "intersect" is supported.
+    /**
+     * Returns whether the INTERSECT set operation is supported.
      */
     fun supportsSetOperationIntersect(): Boolean = true
 
     /**
-     * Returns whether the set operation "except" is supported.
+     * Returns whether the EXCEPT set operation is supported.
      */
     fun supportsSetOperationExcept(): Boolean = true
 
     /**
-     * Returns whether the set operation "minus" is supported.
+     * Returns whether the MINUS set operation is supported.
      */
     fun supportsSetOperationMinus(): Boolean = false
 
     /**
-     * Returns whether the nulls first and nulls last options are supported in the order by clause.
-     *
-     * @return whether the nulls first and nulls last options are supported
+     * Returns whether the NULLS FIRST and NULLS LAST options are supported in the ORDER BY clause.
      */
     fun supportsNullOrdering(): Boolean = true
 
     /**
-     * Returns whether the for update clause is supported.
-     *
-     * @return whether the for update clause is supported
+     * Returns whether the FOR UPDATE clause is supported.
      */
     fun supportsForUpdateClause(): Boolean = true
 
     /**
-     * Returns whether the "for update of ..column" syntax is supported.
+     * Returns whether the "FOR UPDATE OF ..column" syntax is supported.
      */
     fun supportsLockOfColumns(): Boolean = false
 
     /**
-     * Returns whether the "for update of ..table" syntax is supported.
+     * Returns whether the "FOR UPDATE OF ..table" syntax is supported.
      */
     fun supportsLockOfTables(): Boolean = false
 
     /**
-     * Returns whether the lock option NOWAIT is supported.
+     * Returns whether the NOWAIT lock option is supported.
      */
     fun supportsLockOptionNowait(): Boolean = false
 
     /**
-     * Returns whether the lock option SKIP LOCKED is supported.
+     * Returns whether the SKIP LOCKED lock option is supported.
      */
     fun supportsLockOptionSkipLocked(): Boolean = false
 
     /**
-     * Returns whether the lock option WAIT is supported.
+     * Returns whether the WAIT lock option is supported.
      */
     fun supportsLockOptionWait(): Boolean = false
 
     /**
-     * Returns whether the mod function is supported.
-     *
-     * @return whether the mod function is supported
+     * Returns whether the MOD function is supported.
      */
     fun supportsModuloOperator(): Boolean = true
 
     /**
-     * Returns whether the multiple columns are supported in the in predicate.
-     *
-     * @return whether the multiple columns are supported
+     * Returns whether the multiple columns are supported in the IN predicate.
      */
     fun supportsMultipleColumnsInInPredicate(): Boolean = true
 
     /**
      * Returns whether the table hint is supported.
-     *
-     * @return whether the table hint is supported
      */
     fun supportsTableHint(): Boolean = false
 }
