@@ -31,9 +31,14 @@ class SetOperationStatementBuilder(
             is SetOperationContext -> {
                 visitSubqueryContext(subqueryContext.left)
                 val operator = when (subqueryContext.kind) {
-                    SetOperationKind.INTERSECT -> "intersect"
+                    SetOperationKind.INTERSECT -> {
+                        if (dialect.supportsSetOperationIntersect()) "intersect"
+                        else throw UnsupportedOperationException("The dialect(driver=${dialect.driver}) does not support the \"intersect\" set operation.")
+                    }
                     SetOperationKind.EXCEPT -> {
-                        if (dialect.supportsExceptSetOperation()) "except" else "minus"
+                        if (dialect.supportsSetOperationExcept()) "except"
+                        else if (dialect.supportsSetOperationMinus()) "minus"
+                        else throw UnsupportedOperationException("The dialect(driver=${dialect.driver}) does not support the \"except\" and \"minus\" set operations.")
                     }
                     SetOperationKind.UNION -> "union"
                     SetOperationKind.UNION_ALL -> "union all"
@@ -51,5 +56,9 @@ class SetOperationStatementBuilder(
         buf.append("(")
         buf.append(statement)
         buf.append(")")
+    }
+
+    private fun raiseException(keyword: String): Nothing {
+        throw UnsupportedOperationException("The dialect(driver=${dialect.driver}) does not support the \"$keyword\" set operation.")
     }
 }

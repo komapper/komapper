@@ -43,4 +43,8 @@ interface MySqlDialect : Dialect {
     override fun supportsLockOptionSkipLocked(): Boolean = true
 
     override fun supportsNullOrdering(): Boolean = false
+
+    override fun supportsSetOperationIntersect(): Boolean = false
+
+    override fun supportsSetOperationExcept(): Boolean = false
 }

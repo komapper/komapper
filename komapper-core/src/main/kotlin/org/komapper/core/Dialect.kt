@@ -216,12 +216,20 @@ interface Dialect {
      */
     fun supportsDropIfExists(): Boolean = true
 
-    /**
-     * Returns whether the except set operation is supported.
-     *
-     * @return whether the except set operation is supported
+/**
+     * Returns whether the set operation "intersect" is supported.
      */
-    fun supportsExceptSetOperation(): Boolean = true
+    fun supportsSetOperationIntersect(): Boolean = true
+
+    /**
+     * Returns whether the set operation "except" is supported.
+     */
+    fun supportsSetOperationExcept(): Boolean = true
+
+    /**
+     * Returns whether the set operation "minus" is supported.
+     */
+    fun supportsSetOperationMinus(): Boolean = false
 
     /**
      * Returns whether the nulls first and nulls last options are supported in the order by clause.
