@@ -53,4 +53,6 @@ open class R2dbcMariaDbDialect(
     }
 
     enum class Version { IMPLICIT }
+
+    override fun supportsBatchRunOfParameterizedStatement(): Boolean = false
 }

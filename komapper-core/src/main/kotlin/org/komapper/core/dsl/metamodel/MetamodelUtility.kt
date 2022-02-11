@@ -12,6 +12,11 @@ fun <ENTITY : Any> EntityMetamodel<ENTITY, *, *>.getNonAutoIncrementProperties()
     return this.properties().filter { it != property }
 }
 
+fun <ENTITY : Any> EntityMetamodel<ENTITY, *, *>.hasAutoIncrementProperty(): Boolean {
+    val idGenerator = this.idGenerator()
+    return idGenerator is IdGenerator.AutoIncrement<ENTITY, *>
+}
+
 fun PropertyMetamodel<*, *, *>.isAutoIncrement(): Boolean {
     return this == this.owner.getAutoIncrementProperty()
 }

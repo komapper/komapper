@@ -66,4 +66,6 @@ open class R2dbcPostgreSqlDialect(
     override fun getBinder(): Binder {
         return IndexedBinder
     }
+
+    override fun supportsBatchRunOfParameterizedStatement(): Boolean = false
 }

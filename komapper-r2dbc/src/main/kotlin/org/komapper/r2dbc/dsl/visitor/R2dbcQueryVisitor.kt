@@ -21,11 +21,15 @@ import org.komapper.core.dsl.query.Query
 import org.komapper.core.dsl.query.Record
 import org.komapper.core.dsl.query.Row
 import org.komapper.core.dsl.visitor.QueryVisitor
+import org.komapper.r2dbc.dsl.runner.R2dbcEntityDeleteBatchRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcEntityDeleteSingleRunner
+import org.komapper.r2dbc.dsl.runner.R2dbcEntityInsertBatchRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcEntityInsertMultipleRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcEntityInsertSingleRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcEntityStoreRunner
+import org.komapper.r2dbc.dsl.runner.R2dbcEntityUpdateBatchRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcEntityUpdateSingleRunner
+import org.komapper.r2dbc.dsl.runner.R2dbcEntityUpsertBatchRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcEntityUpsertMultipleRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcEntityUpsertSingleIgnoreRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcEntityUpsertSingleRunner
@@ -100,8 +104,8 @@ internal object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
     entityDeleteBatchQuery(
         context: EntityDeleteContext<ENTITY, ID, META>,
         entities: List<ENTITY>
-    ): R2dbcRunner<*> {
-        throw UnsupportedOperationException("Batch delete is not supported.")
+    ): R2dbcRunner<Unit> {
+        return R2dbcEntityDeleteBatchRunner(context, entities)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
@@ -122,8 +126,8 @@ internal object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityInsertBatchQuery(
         context: EntityInsertContext<ENTITY, ID, META>,
         entities: List<ENTITY>
-    ): R2dbcRunner<*> {
-        throw UnsupportedOperationException("Batch insert is not supported. Instead, use multiple insert.")
+    ): R2dbcRunner<List<ENTITY>> {
+        return R2dbcEntityInsertBatchRunner(context, entities)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityInsertSingleQuery(
@@ -137,8 +141,8 @@ internal object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
     entityUpdateBatchQuery(
         context: EntityUpdateContext<ENTITY, ID, META>,
         entities: List<ENTITY>
-    ): R2dbcRunner<*> {
-        throw UnsupportedOperationException("Batch update is not supported. Instead, use multiple update.")
+    ): R2dbcRunner<List<ENTITY>> {
+        return R2dbcEntityUpdateBatchRunner(context, entities)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
@@ -153,8 +157,8 @@ internal object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
     entityUpsertBatchQuery(
         context: EntityUpsertContext<ENTITY, ID, META>,
         entities: List<ENTITY>
-    ): R2dbcRunner<*> {
-        throw UnsupportedOperationException("Batch upsert is not supported. Instead, use multiple upsert.")
+    ): R2dbcRunner<List<Int>> {
+        return R2dbcEntityUpsertBatchRunner(context, entities)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>

@@ -64,4 +64,6 @@ open class R2dbcH2Dialect(
     enum class Version { IMPLICIT }
 
     override val driver: String = DRIVER
+
+    override fun supportsBatchRunOfParameterizedStatement(): Boolean = false
 }

@@ -14,6 +14,8 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.reactive.asFlow
+import kotlinx.coroutines.reactive.awaitFirstOrNull
+import kotlinx.coroutines.reactive.awaitSingle
 import org.komapper.core.ExecutionOptionsProvider
 import org.komapper.core.Statement
 import org.komapper.core.UniqueConstraintException
@@ -81,6 +83,49 @@ internal class R2dbcExecutor(
     }
 
     @OptIn(kotlinx.coroutines.FlowPreview::class)
+    suspend fun executeBatch(
+        statements: List<Statement>,
+        // TODO
+        customizeBatchCounts: (IntArray) -> IntArray = { it }
+    ): List<Pair<Int, Long?>> {
+        require(statements.isNotEmpty())
+        @Suppress("NAME_SHADOWING")
+        val statements = statements.map { inspect(it) }
+        val batchSize = executionOptions.batchSize?.let { if (it > 0) it else null } ?: 10
+        val batchedStatementsList = statements.chunked(batchSize)
+        return withThrowableTranslator {
+            val countAndKeyList = mutableListOf<Pair<Int, Long?>>()
+            config.session.connection.awaitSingle().use2 { con ->
+                for (batchedStatements in batchedStatementsList) {
+                    val firstStatement = batchedStatements.first()
+                    val r2dbcStmt = prepare(con, firstStatement)
+                    setUp(r2dbcStmt)
+                    val iterator = batchedStatements.iterator()
+                    while (iterator.hasNext()) {
+                        val statement = iterator.next()
+                        log(statement)
+                        bind(r2dbcStmt, statement)
+                        if (iterator.hasNext()) {
+                            r2dbcStmt.add()
+                        }
+                    }
+                    for (result in r2dbcStmt.execute().asFlow().toList()) {
+                        val pairs: List<Pair<Int, Long?>> = if (generatedColumn == null) {
+                            val counts = result.rowsUpdated.asFlow().toList()
+                            counts.map { it to null }
+                        } else {
+                            val generatedKeys = fetchGeneratedKeys(result).toList()
+                            generatedKeys.map { 1 to it }
+                        }
+                        countAndKeyList.addAll(pairs)
+                    }
+                }
+            }
+            countAndKeyList
+        }
+    }
+
+    @OptIn(kotlinx.coroutines.FlowPreview::class)
     suspend fun execute(statements: List<Statement>, predicate: (Result.Message) -> Boolean = { true }) {
         @Suppress("NAME_SHADOWING")
         val statements = statements.map { inspect(it) }
@@ -105,6 +150,18 @@ internal class R2dbcExecutor(
         }.catch {
             translateThrowable(it)
         }.collect()
+    }
+
+    private suspend fun <T> withThrowableTranslator(block: suspend () -> T): T {
+        return try {
+            block()
+        } catch (e: R2dbcDataIntegrityViolationException) {
+            throw UniqueConstraintException(e)
+        } catch (e: RuntimeException) {
+            throw e
+        } catch (cause: Throwable) {
+            throw RuntimeException(cause)
+        }
     }
 
     /**
@@ -154,6 +211,17 @@ internal class R2dbcExecutor(
         }
     }
 
+    private fun executeUpdate(r2dbcStmt: io.r2dbc.spi.Statement): Flow<Pair<Int, LongArray>> {
+        return r2dbcStmt.execute().asFlow().flatMapConcat { result ->
+            if (generatedColumn == null) {
+                result.rowsUpdated.asFlow().map { count -> count to longArrayOf() }
+            } else {
+                val generatedKeys = fetchGeneratedKeys(result).toList().toLongArray()
+                flowOf(generatedKeys.size to generatedKeys)
+            }
+        }
+    }
+
     private fun fetchGeneratedKeys(result: Result): Flow<Long> {
         return result.map { row, _ ->
             when (val value = row.get(0)) {
@@ -171,6 +239,19 @@ private fun <T> io.r2dbc.spi.Closeable.use(block: (io.r2dbc.spi.Closeable) -> Fl
         }.onFailure {
             close()
         }.getOrThrow()
+}
+
+// TODO
+private suspend fun <T : io.r2dbc.spi.Closeable, R> T.use2(block: suspend (T) -> R): R {
+    val result = runCatching {
+        block(this)
+    }
+    runCatching {
+        close().awaitFirstOrNull()
+    }.onFailure {
+        if (result.isSuccess) throw it
+    }
+    return result.getOrThrow()
 }
 
 private object Null
