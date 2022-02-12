@@ -18,6 +18,10 @@ internal class R2dbcEntityInsertSingleRunner<ENTITY : Any, ID : Any, META : Enti
     private val support: R2dbcEntityInsertRunnerSupport<ENTITY, ID, META> =
         R2dbcEntityInsertRunnerSupport(context)
 
+    override fun check(config: DatabaseConfig) {
+        runner.check(config)
+    }
+
     override suspend fun run(config: R2dbcDatabaseConfig): ENTITY {
         val newEntity = preInsert(config)
         val (_, generatedKeys) = insert(config, newEntity)
@@ -28,18 +32,13 @@ internal class R2dbcEntityInsertSingleRunner<ENTITY : Any, ID : Any, META : Enti
         return support.preInsert(config, entity)
     }
 
-    private suspend fun insert(config: R2dbcDatabaseConfig, entity: ENTITY): Pair<Int, LongArray> {
+    private suspend fun insert(config: R2dbcDatabaseConfig, entity: ENTITY): Pair<Int, List<Long>> {
         val statement = runner.buildStatement(config, entity)
-        return support.insert(config) { it.executeUpdate(statement) }
+        return support.insert(config, true) { it.executeUpdate(statement) }
     }
 
-    private fun postInsert(entity: ENTITY, generatedKeys: LongArray): ENTITY {
-        val key = generatedKeys.firstOrNull()
-        return if (key != null) {
-            support.postInsert(entity, key)
-        } else {
-            entity
-        }
+    private fun postInsert(entity: ENTITY, generatedKeys: List<Long>): ENTITY {
+        return runner.postInsert(entity, generatedKeys)
     }
 
     override fun dryRun(config: DatabaseConfig): DryRunStatement {

@@ -18,20 +18,24 @@ internal class JdbcEntityUpsertBatchRunner<ENTITY : Any, ID : Any, META : Entity
     private val support: JdbcEntityUpsertRunnerSupport<ENTITY, ID, META> =
         JdbcEntityUpsertRunnerSupport(context)
 
+    override fun check(config: DatabaseConfig) {
+        runner.check(config)
+    }
+
     override fun run(config: JdbcDatabaseConfig): List<Int> {
         if (entities.isEmpty()) return emptyList()
         val newEntities = entities.map { preUpsert(config, it) }
-        val (counts) = upsert(config, newEntities)
-        return counts.toList()
+        val batchResults = upsert(config, newEntities)
+        return batchResults.map { it.first }
     }
 
     private fun preUpsert(config: JdbcDatabaseConfig, entity: ENTITY): ENTITY {
         return support.preUpsert(config, entity)
     }
 
-    private fun upsert(config: JdbcDatabaseConfig, entities: List<ENTITY>): Pair<IntArray, LongArray> {
+    private fun upsert(config: JdbcDatabaseConfig, entities: List<ENTITY>): List<Pair<Int, Long?>> {
         val statements = entities.map { runner.buildStatement(config, it) }
-        return support.upsert(config) { it.executeBatch(statements) }
+        return support.upsert(config, false) { it.executeBatch(statements) }
     }
 
     override fun dryRun(config: DatabaseConfig): DryRunStatement {

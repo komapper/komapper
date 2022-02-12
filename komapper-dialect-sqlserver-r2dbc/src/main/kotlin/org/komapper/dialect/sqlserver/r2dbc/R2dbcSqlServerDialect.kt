@@ -71,4 +71,6 @@ class R2dbcSqlServerDialect(
     override fun isTableExistsError(exception: R2dbcException): Boolean {
         return exception.errorCode == SqlServerDialect.OBJECT_ALREADY_EXISTS_ERROR_CODE
     }
+
+    override fun supportsBatchExecutionReturningGeneratedValues(): Boolean = false
 }

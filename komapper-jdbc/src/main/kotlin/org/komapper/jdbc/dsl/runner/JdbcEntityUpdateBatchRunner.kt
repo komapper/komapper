@@ -5,6 +5,7 @@ import org.komapper.core.DryRunStatement
 import org.komapper.core.dsl.context.EntityUpdateContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.runner.EntityUpdateBatchRunner
+import org.komapper.core.dsl.runner.customizeBatchCount
 import org.komapper.jdbc.JdbcDatabaseConfig
 
 internal class JdbcEntityUpdateBatchRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
@@ -19,32 +20,28 @@ internal class JdbcEntityUpdateBatchRunner<ENTITY : Any, ID : Any, META : Entity
     private val support: JdbcEntityUpdateRunnerSupport<ENTITY, ID, META> =
         JdbcEntityUpdateRunnerSupport(context)
 
+    override fun check(config: DatabaseConfig) {
+        runner.check(config)
+    }
+
     override fun run(config: JdbcDatabaseConfig): List<ENTITY> {
         if (entities.isEmpty()) return emptyList()
         val newEntities = preUpdate(config)
-        val (counts) = update(config, newEntities)
-        return postUpdate(newEntities, counts)
+        val batchResults = update(config, newEntities)
+        return postUpdate(newEntities, batchResults.map { it.first })
     }
 
     private fun preUpdate(config: JdbcDatabaseConfig): List<ENTITY> {
-        return entities.map { support.preUpdate(config, it) }
+        return entities.map { runner.preUpdate(config, it) }
     }
 
-    private fun update(config: JdbcDatabaseConfig, entities: List<ENTITY>): Pair<IntArray, LongArray> {
+    private fun update(config: JdbcDatabaseConfig, entities: List<ENTITY>): List<Pair<Int, Long?>> {
         val statements = entities.map { runner.buildStatement(config, it) }
-        return support.update(config) { it.executeBatch(statements, ::customizeBatchCounts) }
+        return support.update(config) { it.executeBatch(statements, ::customizeBatchCount) }
     }
 
-    private fun postUpdate(entities: List<ENTITY>, counts: IntArray): List<ENTITY> {
-        val iterator = counts.iterator()
-        return entities.mapIndexed { index, entity ->
-            val count = if (iterator.hasNext()) {
-                iterator.nextInt()
-            } else {
-                error("Count value is not found. index=$index")
-            }
-            support.postUpdate(entity, count, index)
-        }
+    private fun postUpdate(entities: List<ENTITY>, counts: List<Int>): List<ENTITY> {
+        return runner.postUpdate(entities, counts)
     }
 
     override fun dryRun(config: DatabaseConfig): DryRunStatement {

@@ -15,6 +15,10 @@ class EntityUpdateBatchRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENT
     private val support: EntityUpdateRunnerSupport<ENTITY, ID, META> =
         EntityUpdateRunnerSupport(context)
 
+    override fun check(config: DatabaseConfig) {
+        checkBatchExecutionOfParameterizedStatement(config)
+    }
+
     override fun dryRun(config: DatabaseConfig): DryRunStatement {
         if (entities.isEmpty()) return DryRunStatement.EMPTY
         val statement = buildStatement(config, entities.first())
@@ -23,5 +27,21 @@ class EntityUpdateBatchRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENT
 
     fun buildStatement(config: DatabaseConfig, entity: ENTITY): Statement {
         return support.buildStatement(config, entity)
+    }
+
+    fun preUpdate(config: DatabaseConfig, entity: ENTITY): ENTITY {
+        return support.preUpdate(config, entity)
+    }
+
+    fun postUpdate(entities: List<ENTITY>, counts: List<Int>): List<ENTITY> {
+        val iterator = counts.iterator()
+        return entities.mapIndexed { index, entity ->
+            val count = if (iterator.hasNext()) {
+                iterator.next()
+            } else {
+                error("Count value is not found. index=$index")
+            }
+            support.postUpdate(entity, count, index)
+        }
     }
 }

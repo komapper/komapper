@@ -20,15 +20,3 @@ internal fun <ENTITY : Any, ID : Any> IdGenerator.Sequence<ENTITY, ID>.execute(
         }
     }
 }
-
-internal fun customizeBatchCounts(counts: IntArray): IntArray {
-    val results = IntArray(counts.size)
-    for ((index, count) in counts.withIndex()) {
-        results[index] = when (count) {
-            java.sql.Statement.EXECUTE_FAILED -> 0
-            java.sql.Statement.SUCCESS_NO_INFO -> 1
-            else -> count
-        }
-    }
-    return results
-}

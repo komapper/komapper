@@ -3,6 +3,7 @@ package org.komapper.jdbc.dsl.runner
 import org.komapper.core.dsl.context.EntityInsertContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.metamodel.IdGenerator
+import org.komapper.core.dsl.metamodel.hasAutoIncrementProperty
 import org.komapper.jdbc.JdbcDatabaseConfig
 import org.komapper.jdbc.JdbcExecutor
 
@@ -23,19 +24,9 @@ internal class JdbcEntityInsertRunnerSupport<ENTITY : Any, ID : Any, META : Enti
         return context.target.preInsert(newEntity ?: entity, clock)
     }
 
-    fun <T> insert(config: JdbcDatabaseConfig, execute: (JdbcExecutor) -> T): T {
-        val requiresGeneratedKeys = context.target.idGenerator() is IdGenerator.AutoIncrement<ENTITY, *>
+    fun <T> insert(config: JdbcDatabaseConfig, usesGeneratedKeys: Boolean, execute: (JdbcExecutor) -> T): T {
+        val requiresGeneratedKeys = usesGeneratedKeys && context.target.hasAutoIncrementProperty()
         val executor = JdbcExecutor(config, context.options, requiresGeneratedKeys)
         return execute(executor)
-    }
-
-    fun postInsert(entity: ENTITY, generatedKey: Long): ENTITY {
-        val idGenerator = context.target.idGenerator()
-        return if (idGenerator is IdGenerator.AutoIncrement<ENTITY, ID>) {
-            val id = context.target.convertToId(generatedKey)!!
-            idGenerator.property.setter(entity, id)
-        } else {
-            entity
-        }
     }
 }

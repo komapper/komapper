@@ -11,6 +11,10 @@ class RelationInsertSelectRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<
     private val context: RelationInsertSelectContext<ENTITY, ID, META>,
 ) : Runner {
 
+    override fun check(config: DatabaseConfig) {
+        checkAutoIncrementWhenInsertingMultipleRows(config, context.target)
+    }
+
     override fun dryRun(config: DatabaseConfig): DryRunStatement {
         val statement = buildStatement(config)
         return DryRunStatement.of(statement, config.dialect)

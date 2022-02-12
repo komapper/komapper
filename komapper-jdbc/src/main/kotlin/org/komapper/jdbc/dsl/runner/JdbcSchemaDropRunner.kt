@@ -13,6 +13,10 @@ internal class JdbcSchemaDropRunner(
 
     private val runner = SchemaDropRunner(context)
 
+    override fun check(config: DatabaseConfig) {
+        runner.check(config)
+    }
+
     override fun run(config: JdbcDatabaseConfig) {
         val statements = runner.buildStatements(config)
         val executor = JdbcExecutor(config, context.options)

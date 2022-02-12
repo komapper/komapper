@@ -9,6 +9,8 @@ class SchemaCreateRunner(
     private val context: SchemaContext,
 ) : Runner {
 
+    override fun check(config: DatabaseConfig) = Unit
+
     override fun dryRun(config: DatabaseConfig): DryRunStatement {
         val statements = buildStatements(config)
         return DryRunStatement.of(statements, config.dialect)

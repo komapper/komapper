@@ -15,6 +15,10 @@ internal class R2dbcTemplateSelectRunner<T, R>(
 
     private val flowBuilder = R2dbcTemplateSelectFlowBuilder(context, transform)
 
+    override fun check(config: DatabaseConfig) {
+        flowBuilder.check(config)
+    }
+
     override suspend fun run(config: R2dbcDatabaseConfig): R {
         val flow = flowBuilder.build(config)
         return collect(flow)

@@ -18,11 +18,12 @@ internal class R2dbcEntityUpsertBatchRunner<ENTITY : Any, ID : Any, META : Entit
     private val support: R2dbcEntityUpsertRunnerSupport<ENTITY, ID, META> =
         R2dbcEntityUpsertRunnerSupport(context)
 
+    override fun check(config: DatabaseConfig) {
+        runner.check(config)
+    }
+
     override suspend fun run(config: R2dbcDatabaseConfig): List<Int> {
         if (entities.isEmpty()) return emptyList()
-        if (!config.dialect.supportsBatchRunOfParameterizedStatement()) {
-            throw UnsupportedOperationException("The dialect(driver=${config.dialect.driver}) does not support a batch run.")
-        }
         val newEntities = entities.map { preUpsert(config, it) }
         val batchResults = upsert(config, newEntities)
         return batchResults.map { it.first }
@@ -34,7 +35,7 @@ internal class R2dbcEntityUpsertBatchRunner<ENTITY : Any, ID : Any, META : Entit
 
     private suspend fun upsert(config: R2dbcDatabaseConfig, entities: List<ENTITY>): List<Pair<Int, Long?>> {
         val statements = entities.map { runner.buildStatement(config, it) }
-        return support.upsert(config) { it.executeBatch(statements) }
+        return support.upsert(config, false) { it.executeBatch(statements) }
     }
 
     override fun dryRun(config: DatabaseConfig): DryRunStatement {

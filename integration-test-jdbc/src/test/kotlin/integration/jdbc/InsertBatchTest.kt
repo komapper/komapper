@@ -55,6 +55,21 @@ class InsertBatchTest(private val db: JdbcDatabase) {
         assertTrue(results1.all { it.id != null })
     }
 
+    @Run(onlyIf = [Dbms.SQLSERVER])
+    @Test
+    fun identity_unsupportedOperationException() {
+        val i = Meta.identityStrategy
+        val strategies = listOf(
+            IdentityStrategy(null, "AAA"),
+            IdentityStrategy(null, "BBB"),
+            IdentityStrategy(null, "CCC")
+        )
+        assertFailsWith<UnsupportedOperationException> {
+            db.runQuery { QueryDsl.insert(i).batch(strategies) }
+            Unit
+        }
+    }
+
     @Test
     fun createdAt_updatedAt() {
         val p = Meta.person

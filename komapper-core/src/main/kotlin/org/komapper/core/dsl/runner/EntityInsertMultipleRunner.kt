@@ -7,10 +7,14 @@ import org.komapper.core.dsl.context.EntityInsertContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 
 class EntityInsertMultipleRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
-    context: EntityInsertContext<ENTITY, ID, META>,
+    private val context: EntityInsertContext<ENTITY, ID, META>,
     private val entities: List<ENTITY>
 ) :
     Runner {
+
+    override fun check(config: DatabaseConfig) {
+        checkAutoIncrementWhenInsertingMultipleRows(config, context.target)
+    }
 
     private val support: EntityInsertRunnerSupport<ENTITY, ID, META> =
         EntityInsertRunnerSupport(context)
@@ -23,5 +27,16 @@ class EntityInsertMultipleRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<
 
     fun buildStatement(config: DatabaseConfig, entities: List<ENTITY>): Statement {
         return support.buildStatement(config, entities)
+    }
+
+    fun postInsert(entities: List<ENTITY>, generatedKeys: List<Long>): List<ENTITY> {
+        val iterator = generatedKeys.iterator()
+        return entities.map {
+            if (iterator.hasNext()) {
+                support.postInsert(it, iterator.next())
+            } else {
+                it
+            }
+        }
     }
 }

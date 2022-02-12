@@ -18,6 +18,10 @@ internal class R2dbcEntityUpdateSingleRunner<ENTITY : Any, ID : Any, META : Enti
     private val support: R2dbcEntityUpdateRunnerSupport<ENTITY, ID, META> =
         R2dbcEntityUpdateRunnerSupport(context)
 
+    override fun check(config: DatabaseConfig) {
+        runner.check(config)
+    }
+
     override suspend fun run(config: R2dbcDatabaseConfig): ENTITY {
         val newEntity = preUpdate(config, entity)
         val (count) = update(config, newEntity)
@@ -25,16 +29,16 @@ internal class R2dbcEntityUpdateSingleRunner<ENTITY : Any, ID : Any, META : Enti
     }
 
     private fun preUpdate(config: R2dbcDatabaseConfig, entity: ENTITY): ENTITY {
-        return support.preUpdate(config, entity)
+        return runner.preUpdate(config, entity)
     }
 
-    private suspend fun update(config: R2dbcDatabaseConfig, entity: ENTITY): Pair<Int, LongArray> {
+    private suspend fun update(config: R2dbcDatabaseConfig, entity: ENTITY): Pair<Int, List<Long>> {
         val statement = runner.buildStatement(config, entity)
         return support.update(config) { it.executeUpdate(statement) }
     }
 
     private fun postUpdate(entity: ENTITY, count: Int): ENTITY {
-        return support.postUpdate(entity, count)
+        return runner.postUpdate(entity, count)
     }
 
     override fun dryRun(config: DatabaseConfig): DryRunStatement {

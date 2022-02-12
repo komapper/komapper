@@ -179,6 +179,21 @@ interface Dialect {
     fun getDefaultLengthForSubstringFunction(): Int? = null
 
     /**
+     * Returns whether the auto-increment is supported when inserting multiple rows.
+     */
+    fun supportsAutoIncrementWhenInsertingMultipleRows(): Boolean = true
+
+    /**
+     * Returns whether the batch execution of parameterized statement is supported.
+     */
+    fun supportsBatchExecutionOfParameterizedStatement(): Boolean = true
+
+    /**
+     * Returns whether the batch execution returning generated values is supported.
+     */
+    fun supportsBatchExecutionReturningGeneratedValues(): Boolean = true
+
+    /**
      * Returns whether the LIMIT and OFFSET clauses are supported without using the ORDER BY clause.
      */
     fun supportsLimitOffsetWithoutOrderByClause(): Boolean = true

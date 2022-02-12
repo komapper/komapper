@@ -13,6 +13,10 @@ internal class R2dbcSchemaDropRunner(
 
     private val runner = SchemaDropRunner(context)
 
+    override fun check(config: DatabaseConfig) {
+        runner.check(config)
+    }
+
     override suspend fun run(config: R2dbcDatabaseConfig) {
         val statements = runner.buildStatements(config)
         val executor = R2dbcExecutor(config, context.options)

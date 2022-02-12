@@ -19,6 +19,10 @@ internal class R2dbcEntityInsertMultipleRunner<ENTITY : Any, ID : Any, META : En
     private val support: R2dbcEntityInsertRunnerSupport<ENTITY, ID, META> =
         R2dbcEntityInsertRunnerSupport(context)
 
+    override fun check(config: DatabaseConfig) {
+        runner.check(config)
+    }
+
     override suspend fun run(config: R2dbcDatabaseConfig): List<ENTITY> {
         if (entities.isEmpty()) return emptyList()
         val newEntities = preInsert(config)
@@ -30,21 +34,14 @@ internal class R2dbcEntityInsertMultipleRunner<ENTITY : Any, ID : Any, META : En
         return entities.map { support.preInsert(config, it) }
     }
 
-    private suspend fun insert(config: R2dbcDatabaseConfig, entities: List<ENTITY>): LongArray {
+    private suspend fun insert(config: R2dbcDatabaseConfig, entities: List<ENTITY>): List<Long> {
         val statement = runner.buildStatement(config, entities)
-        val (_, keys) = support.insert(config) { it.executeUpdate(statement) }
+        val (_, keys) = support.insert(config, true) { it.executeUpdate(statement) }
         return keys
     }
 
-    private fun postInsert(entities: List<ENTITY>, generatedKeys: LongArray): List<ENTITY> {
-        val iterator = generatedKeys.iterator()
-        return entities.map {
-            if (iterator.hasNext()) {
-                support.postInsert(it, iterator.nextLong())
-            } else {
-                it
-            }
-        }
+    private fun postInsert(entities: List<ENTITY>, generatedKeys: List<Long>): List<ENTITY> {
+        return runner.postInsert(entities, generatedKeys)
     }
 
     override fun dryRun(config: DatabaseConfig): DryRunStatement {

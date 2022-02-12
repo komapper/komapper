@@ -65,5 +65,5 @@ open class R2dbcH2Dialect(
 
     override val driver: String = DRIVER
 
-    override fun supportsBatchRunOfParameterizedStatement(): Boolean = false
+    override fun supportsBatchExecutionOfParameterizedStatement(): Boolean = false
 }

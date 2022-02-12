@@ -17,6 +17,10 @@ internal class JdbcTemplateSelectRunner<T, R>(
 
     private val runner = TemplateSelectRunner(context)
 
+    override fun check(config: DatabaseConfig) {
+        runner.check(config)
+    }
+
     override fun run(config: JdbcDatabaseConfig): R {
         val statement = runner.buildStatement(config)
         val executor = JdbcExecutor(config, context.options)

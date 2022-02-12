@@ -17,6 +17,10 @@ internal class JdbcEntityStoreRunner<ENTITY : Any, ID : Any, META : EntityMetamo
     private val runner: SelectRunner = SelectRunner(context)
     private val factory: EntityStoreFactory = EntityStoreFactory()
 
+    override fun check(config: DatabaseConfig) {
+        runner.check(config)
+    }
+
     override fun run(config: JdbcDatabaseConfig): EntityStore {
         val metamodels = context.getProjection().metamodels()
         val statement = runner.buildStatement(config)

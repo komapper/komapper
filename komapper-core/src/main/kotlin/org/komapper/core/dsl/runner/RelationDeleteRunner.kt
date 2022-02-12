@@ -11,6 +11,8 @@ class RelationDeleteRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY
     private val context: RelationDeleteContext<ENTITY, ID, META>,
 ) : Runner {
 
+    override fun check(config: DatabaseConfig) = Unit
+
     override fun dryRun(config: DatabaseConfig): DryRunStatement {
         val statement = buildStatement(config)
         return DryRunStatement.of(statement, config.dialect)

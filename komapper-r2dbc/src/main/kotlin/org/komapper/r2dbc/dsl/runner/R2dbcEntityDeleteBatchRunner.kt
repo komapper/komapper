@@ -5,6 +5,7 @@ import org.komapper.core.DryRunStatement
 import org.komapper.core.dsl.context.EntityDeleteContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.runner.EntityDeleteBatchRunner
+import org.komapper.core.dsl.runner.customizeBatchCount
 import org.komapper.r2dbc.R2dbcDatabaseConfig
 
 internal class R2dbcEntityDeleteBatchRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
@@ -19,24 +20,23 @@ internal class R2dbcEntityDeleteBatchRunner<ENTITY : Any, ID : Any, META : Entit
     private val support: R2dbcEntityDeleteRunnerSupport<ENTITY, ID, META> =
         R2dbcEntityDeleteRunnerSupport(context)
 
+    override fun check(config: DatabaseConfig) {
+        runner.check(config)
+    }
+
     override suspend fun run(config: R2dbcDatabaseConfig) {
         if (entities.isEmpty()) return
-        if (!config.dialect.supportsBatchRunOfParameterizedStatement()) {
-            throw UnsupportedOperationException("The dialect(driver=${config.dialect.driver}) does not support a batch run.")
-        }
-        val results = delete(config)
-        postDelete(results)
+        val batchResults = delete(config)
+        postDelete(batchResults.map { it.first })
     }
 
     private suspend fun delete(config: R2dbcDatabaseConfig): List<Pair<Int, Long?>> {
         val statements = entities.map { runner.buildStatement(config, it) }
-        return support.delete(config) { it.executeBatch(statements) }
+        return support.delete(config) { it.executeBatch(statements, ::customizeBatchCount) }
     }
 
-    private fun postDelete(results: List<Pair<Int, Long?>>) {
-        for ((i, result) in results.withIndex()) {
-            support.postDelete(result.first, i)
-        }
+    private fun postDelete(counts: List<Int>) {
+        runner.postDelete(counts)
     }
 
     override fun dryRun(config: DatabaseConfig): DryRunStatement {

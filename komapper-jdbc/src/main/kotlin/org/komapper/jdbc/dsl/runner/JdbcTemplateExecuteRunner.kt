@@ -13,6 +13,10 @@ internal class JdbcTemplateExecuteRunner(
 
     private val runner = TemplateExecuteRunner(context)
 
+    override fun check(config: DatabaseConfig) {
+        runner.check(config)
+    }
+
     override fun run(config: JdbcDatabaseConfig): Int {
         val statement = runner.buildStatement(config)
         val executor = JdbcExecutor(config, context.options)

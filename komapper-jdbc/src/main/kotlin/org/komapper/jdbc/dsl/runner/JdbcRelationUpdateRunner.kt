@@ -14,6 +14,10 @@ internal class JdbcRelationUpdateRunner<ENTITY : Any, ID : Any, META : EntityMet
 
     private val runner: RelationUpdateRunner<ENTITY, ID, META> = RelationUpdateRunner(context)
 
+    override fun check(config: DatabaseConfig) {
+        runner.check(config)
+    }
+
     override fun run(config: JdbcDatabaseConfig): Int {
         val clock = config.clockProvider.now()
         val updatedAtAssignment = context.target.updatedAtAssignment(clock)

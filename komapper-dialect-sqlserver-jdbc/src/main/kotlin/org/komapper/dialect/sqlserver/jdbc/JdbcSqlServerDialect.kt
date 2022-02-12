@@ -76,4 +76,6 @@ class JdbcSqlServerDialect(
             return it.errorCode == SqlServerDialect.OBJECT_ALREADY_EXISTS_ERROR_CODE
         }
     }
+
+    override fun supportsBatchExecutionReturningGeneratedValues(): Boolean = false
 }

@@ -18,6 +18,10 @@ internal class R2dbcSelectFlowBuilder<T>(
 
     private val runner: SelectRunner = SelectRunner(context)
 
+    override fun check(config: DatabaseConfig) {
+        runner.check(config)
+    }
+
     override fun build(config: R2dbcDatabaseConfig): Flow<T> {
         val statement = runner.buildStatement(config)
         val executor = R2dbcExecutor(config, context.options)

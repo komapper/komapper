@@ -11,6 +11,7 @@ import org.komapper.core.dsl.query.andThen
 import org.komapper.jdbc.JdbcDatabase
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 
 @ExtendWith(Env::class)
 class InsertSelectTest(private val db: JdbcDatabase) {
@@ -41,7 +42,6 @@ class InsertSelectTest(private val db: JdbcDatabase) {
     }
 
     // TODO: MariaDB and SQL Server drivers don't return all generated values after a multiple insert statement is issued
-    // TODO: ORACLE driver does not support multiple insert when the identity column is used
     @Run(unless = [Dbms.MARIADB, Dbms.ORACLE, Dbms.SQLSERVER])
     @Test
     fun generatedKeys() {
@@ -62,5 +62,29 @@ class InsertSelectTest(private val db: JdbcDatabase) {
         }
         assertEquals(2, count)
         assertEquals(listOf(3, 4), ids)
+    }
+
+    @Run(onlyIf = [Dbms.ORACLE])
+    @Test
+    fun generatedKeys_unsupportedOperationException() {
+        val i = Meta.identityStrategy
+        db.runQuery {
+            val q1 = QueryDsl.insert(i).values {
+                i.value eq "test"
+            }
+            val q2 = QueryDsl.insert(i).values {
+                i.value eq "test2"
+            }
+            q1.andThen(q2)
+        }
+        val ex = assertFailsWith<UnsupportedOperationException> {
+            db.runQuery {
+                QueryDsl.insert(i).select {
+                    QueryDsl.from(i)
+                }
+            }
+            Unit
+        }
+        println(ex)
     }
 }

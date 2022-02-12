@@ -9,9 +9,15 @@ internal sealed interface JdbcRunner<T> : Runner {
     fun run(config: JdbcDatabaseConfig): T
 
     data class AndThen<LEFT, RIGHT>(
-        val left: JdbcRunner<LEFT>,
-        val right: JdbcRunner<RIGHT>
+        private val left: JdbcRunner<LEFT>,
+        private val right: JdbcRunner<RIGHT>
     ) : JdbcRunner<RIGHT> {
+
+        private val runner: Runner.AndThen = Runner.AndThen(left, right)
+
+        override fun check(config: DatabaseConfig) {
+            runner.check(config)
+        }
 
         override fun run(config: JdbcDatabaseConfig): RIGHT {
             left.run(config)
@@ -19,14 +25,20 @@ internal sealed interface JdbcRunner<T> : Runner {
         }
 
         override fun dryRun(config: DatabaseConfig): DryRunStatement {
-            return left.dryRun(config) + right.dryRun(config)
+            return runner.dryRun(config)
         }
     }
 
     data class Map<T, S>(
-        val runner: JdbcRunner<T>,
-        val transform: (T) -> S
+        private val runner: JdbcRunner<T>,
+        private val transform: (T) -> S
     ) : JdbcRunner<S> {
+
+        private val _runner: Runner.Map = Runner.Map(runner)
+
+        override fun check(config: DatabaseConfig) {
+            _runner.check(config)
+        }
 
         override fun run(config: JdbcDatabaseConfig): S {
             val value = runner.run(config)
@@ -34,14 +46,20 @@ internal sealed interface JdbcRunner<T> : Runner {
         }
 
         override fun dryRun(config: DatabaseConfig): DryRunStatement {
-            return runner.dryRun(config)
+            return _runner.dryRun(config)
         }
     }
 
     data class Zip<T, S>(
-        val left: JdbcRunner<T>,
-        val right: JdbcRunner<S>
+        private val left: JdbcRunner<T>,
+        private val right: JdbcRunner<S>
     ) : JdbcRunner<Pair<T, S>> {
+
+        private val runner: Runner.Zip = Runner.Zip(left, right)
+
+        override fun check(config: DatabaseConfig) {
+            runner.check(config)
+        }
 
         override fun run(config: JdbcDatabaseConfig): Pair<T, S> {
             val first = left.run(config)
@@ -50,14 +68,20 @@ internal sealed interface JdbcRunner<T> : Runner {
         }
 
         override fun dryRun(config: DatabaseConfig): DryRunStatement {
-            return left.dryRun(config) + right.dryRun(config)
+            return runner.dryRun(config)
         }
     }
 
     data class FlatMap<T, S>(
-        val runner: JdbcRunner<T>,
-        val transform: (T) -> JdbcRunner<S>
+        private val runner: JdbcRunner<T>,
+        private val transform: (T) -> JdbcRunner<S>
     ) : JdbcRunner<S> {
+
+        private val _runner: Runner.FlatMap = Runner.FlatMap(runner)
+
+        override fun check(config: DatabaseConfig) {
+            _runner.check(config)
+        }
 
         override fun run(config: JdbcDatabaseConfig): S {
             val value = runner.run(config)
@@ -65,14 +89,20 @@ internal sealed interface JdbcRunner<T> : Runner {
         }
 
         override fun dryRun(config: DatabaseConfig): DryRunStatement {
-            return runner.dryRun(config)
+            return _runner.dryRun(config)
         }
     }
 
     data class FlatZip<T, S>(
-        val runner: JdbcRunner<T>,
-        val transform: (T) -> JdbcRunner<S>
+        private val runner: JdbcRunner<T>,
+        private val transform: (T) -> JdbcRunner<S>
     ) : JdbcRunner<Pair<T, S>> {
+
+        private val _runner: Runner.FlatZip = Runner.FlatZip(runner)
+
+        override fun check(config: DatabaseConfig) {
+            _runner.check(config)
+        }
 
         override fun run(config: JdbcDatabaseConfig): Pair<T, S> {
             val value = runner.run(config)
@@ -80,7 +110,7 @@ internal sealed interface JdbcRunner<T> : Runner {
         }
 
         override fun dryRun(config: DatabaseConfig): DryRunStatement {
-            return runner.dryRun(config)
+            return _runner.dryRun(config)
         }
     }
 }

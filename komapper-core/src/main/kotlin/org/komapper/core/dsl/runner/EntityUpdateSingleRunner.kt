@@ -14,6 +14,8 @@ class EntityUpdateSingleRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<EN
     private val support: EntityUpdateRunnerSupport<ENTITY, ID, META> =
         EntityUpdateRunnerSupport(context)
 
+    override fun check(config: DatabaseConfig) = Unit
+
     override fun dryRun(config: DatabaseConfig): DryRunStatement {
         val statement = buildStatement(config, entity)
         return DryRunStatement.of(statement, config.dialect)
@@ -21,5 +23,13 @@ class EntityUpdateSingleRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<EN
 
     fun buildStatement(config: DatabaseConfig, entity: ENTITY): Statement {
         return support.buildStatement(config, entity)
+    }
+
+    fun preUpdate(config: DatabaseConfig, entity: ENTITY): ENTITY {
+        return support.preUpdate(config, entity)
+    }
+
+    fun postUpdate(entity: ENTITY, count: Int): ENTITY {
+        return support.postUpdate(entity, count)
     }
 }

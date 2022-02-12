@@ -18,6 +18,10 @@ internal class JdbcEntityInsertSingleRunner<ENTITY : Any, ID : Any, META : Entit
     private val support: JdbcEntityInsertRunnerSupport<ENTITY, ID, META> =
         JdbcEntityInsertRunnerSupport(context)
 
+    override fun check(config: DatabaseConfig) {
+        runner.check(config)
+    }
+
     override fun run(config: JdbcDatabaseConfig): ENTITY {
         val newEntity = preInsert(config)
         val (_, generatedKeys) = insert(config, newEntity)
@@ -28,18 +32,13 @@ internal class JdbcEntityInsertSingleRunner<ENTITY : Any, ID : Any, META : Entit
         return support.preInsert(config, entity)
     }
 
-    private fun insert(config: JdbcDatabaseConfig, entity: ENTITY): Pair<Int, LongArray> {
+    private fun insert(config: JdbcDatabaseConfig, entity: ENTITY): Pair<Int, List<Long>> {
         val statement = runner.buildStatement(config, entity)
-        return support.insert(config) { it.executeUpdate(statement) }
+        return support.insert(config, true) { it.executeUpdate(statement) }
     }
 
-    private fun postInsert(entity: ENTITY, generatedKeys: LongArray): ENTITY {
-        val key = generatedKeys.firstOrNull()
-        return if (key != null) {
-            support.postInsert(entity, key)
-        } else {
-            entity
-        }
+    private fun postInsert(entity: ENTITY, generatedKeys: List<Long>): ENTITY {
+        return runner.postInsert(entity, generatedKeys)
     }
 
     override fun dryRun(config: DatabaseConfig): DryRunStatement {

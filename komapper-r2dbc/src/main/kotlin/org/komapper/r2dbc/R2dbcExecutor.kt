@@ -7,11 +7,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flatMapConcat
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onCompletion
-import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.reactive.awaitFirstOrNull
@@ -39,68 +35,65 @@ internal class R2dbcExecutor(
             con.use {
                 val r2dbcStmt = prepare(con, statement)
                 setUp(r2dbcStmt)
+                log(statement)
                 bind(r2dbcStmt, statement)
-                r2dbcStmt.execute().asFlow().flatMapConcat { result ->
-                    result.map { row, _ ->
-                        transform(config.dialect, row) ?: Null
-                    }.asFlow().map {
-                        val nullable = if (it is Null) null else it
-                        @Suppress("UNCHECKED_CAST")
-                        nullable as T
-                    }
+                val result = r2dbcStmt.execute().awaitSingle()
+                result.map { row, _ ->
+                    transform(config.dialect, row) ?: Null
+                }.asFlow().map {
+                    val nullable = if (it is Null) null else it
+                    @Suppress("UNCHECKED_CAST")
+                    nullable as T
                 }
             }
-        }.onStart {
-            log(statement)
         }.catch {
             translateThrowable(it)
         }
     }
 
-    @OptIn(kotlinx.coroutines.FlowPreview::class)
-    suspend fun executeUpdate(statement: Statement): Pair<Int, LongArray> {
+    suspend fun executeUpdate(statement: Statement): Pair<Int, List<Long>> {
         @Suppress("NAME_SHADOWING")
         val statement = inspect(statement)
-        return config.session.connection.asFlow().flatMapConcat { con ->
-            con.use {
+        return withThrowableTranslator {
+            config.session.connection.awaitSingle().use { con ->
                 val r2dbcStmt = prepare(con, statement)
                 setUp(r2dbcStmt)
+                log(statement)
                 bind(r2dbcStmt, statement)
-                r2dbcStmt.execute().asFlow().flatMapConcat { result ->
-                    if (generatedColumn == null) {
-                        result.rowsUpdated.asFlow().map { count -> count to longArrayOf() }
-                    } else {
-                        val generatedKeys = fetchGeneratedKeys(result).toList().toLongArray()
-                        flowOf(generatedKeys.size to generatedKeys)
-                    }
+                val result = r2dbcStmt.execute().awaitSingle()
+                if (generatedColumn == null) {
+                    val count = result.rowsUpdated.awaitSingle()
+                    count to emptyList()
+                } else {
+                    val generatedKeys = fetchGeneratedKeys(result)
+                    generatedKeys.size to generatedKeys
                 }
             }
-        }.onStart {
-            log(statement)
-        }.catch {
-            translateThrowable(it)
-        }.single()
+        }
     }
 
-    @OptIn(kotlinx.coroutines.FlowPreview::class)
     suspend fun executeBatch(
         statements: List<Statement>,
-        // TODO
-        customizeBatchCounts: (IntArray) -> IntArray = { it }
+        customizeBatchCount: (Int) -> Int = { it }
     ): List<Pair<Int, Long?>> {
         require(statements.isNotEmpty())
         @Suppress("NAME_SHADOWING")
         val statements = statements.map { inspect(it) }
         val batchSize = executionOptions.batchSize?.let { if (it > 0) it else null } ?: 10
-        val batchedStatementsList = statements.chunked(batchSize)
+        val batchStatementsList = statements.chunked(batchSize)
         return withThrowableTranslator {
             val countAndKeyList = mutableListOf<Pair<Int, Long?>>()
-            config.session.connection.awaitSingle().use2 { con ->
-                for (batchedStatements in batchedStatementsList) {
-                    val firstStatement = batchedStatements.first()
-                    val r2dbcStmt = prepare(con, firstStatement)
+            config.session.connection.awaitSingle().use { con ->
+                for (batchStatements in batchStatementsList) {
+                    val iterator = batchStatements.iterator()
+                    val first = iterator.next()
+                    val r2dbcStmt = prepare(con, first)
                     setUp(r2dbcStmt)
-                    val iterator = batchedStatements.iterator()
+                    log(first)
+                    bind(r2dbcStmt, first)
+                    if (iterator.hasNext()) {
+                        r2dbcStmt.add()
+                    }
                     while (iterator.hasNext()) {
                         val statement = iterator.next()
                         log(statement)
@@ -111,10 +104,10 @@ internal class R2dbcExecutor(
                     }
                     for (result in r2dbcStmt.execute().asFlow().toList()) {
                         val pairs: List<Pair<Int, Long?>> = if (generatedColumn == null) {
-                            val counts = result.rowsUpdated.asFlow().toList()
+                            val counts = result.rowsUpdated.asFlow().toList().map(customizeBatchCount)
                             counts.map { it to null }
                         } else {
-                            val generatedKeys = fetchGeneratedKeys(result).toList()
+                            val generatedKeys = fetchGeneratedKeys(result)
                             generatedKeys.map { 1 to it }
                         }
                         countAndKeyList.addAll(pairs)
@@ -125,43 +118,35 @@ internal class R2dbcExecutor(
         }
     }
 
-    @OptIn(kotlinx.coroutines.FlowPreview::class)
     suspend fun execute(statements: List<Statement>, predicate: (Result.Message) -> Boolean = { true }) {
         @Suppress("NAME_SHADOWING")
         val statements = statements.map { inspect(it) }
-        return config.session.connection.asFlow().flatMapConcat { con ->
-            con.use {
+        return withThrowableTranslator {
+            config.session.connection.awaitSingle().use { con ->
                 val batch = con.createBatch()
                 for (statement in statements) {
+                    log(statement)
                     val sql = asSql(statement)
                     batch.add(sql)
                 }
-                batch.execute().asFlow().flatMapConcat { result ->
+                batch.execute().asFlow().collect { result ->
                     result.filter {
                         when (it) {
                             is Result.Message -> predicate(it)
                             else -> true
                         }
-                    }.rowsUpdated.asFlow()
+                    }.rowsUpdated.asFlow().collect()
                 }
             }
-        }.onStart {
-            statements.forEach(::log)
-        }.catch {
-            translateThrowable(it)
-        }.collect()
+        }
     }
 
     private suspend fun <T> withThrowableTranslator(block: suspend () -> T): T {
-        return try {
+        return runCatching {
             block()
-        } catch (e: R2dbcDataIntegrityViolationException) {
-            throw UniqueConstraintException(e)
-        } catch (e: RuntimeException) {
-            throw e
-        } catch (cause: Throwable) {
-            throw RuntimeException(cause)
-        }
+        }.onFailure {
+            translateThrowable(it)
+        }.getOrThrow()
     }
 
     /**
@@ -211,38 +196,17 @@ internal class R2dbcExecutor(
         }
     }
 
-    private fun executeUpdate(r2dbcStmt: io.r2dbc.spi.Statement): Flow<Pair<Int, LongArray>> {
-        return r2dbcStmt.execute().asFlow().flatMapConcat { result ->
-            if (generatedColumn == null) {
-                result.rowsUpdated.asFlow().map { count -> count to longArrayOf() }
-            } else {
-                val generatedKeys = fetchGeneratedKeys(result).toList().toLongArray()
-                flowOf(generatedKeys.size to generatedKeys)
-            }
-        }
-    }
-
-    private fun fetchGeneratedKeys(result: Result): Flow<Long> {
+    private suspend fun fetchGeneratedKeys(result: Result): List<Long> {
         return result.map { row, _ ->
             when (val value = row.get(0)) {
                 is Number -> value.toLong()
                 else -> error("Generated value is not Number. generatedColumn=$generatedColumn, value=$value, valueType=${value::class.qualifiedName}")
             }
-        }.asFlow()
+        }.asFlow().toList()
     }
 }
 
-private fun <T> io.r2dbc.spi.Closeable.use(block: (io.r2dbc.spi.Closeable) -> Flow<T>): Flow<T> {
-    return runCatching(block)
-        .onSuccess { flow ->
-            flow.onCompletion { close() }
-        }.onFailure {
-            close()
-        }.getOrThrow()
-}
-
-// TODO
-private suspend fun <T : io.r2dbc.spi.Closeable, R> T.use2(block: suspend (T) -> R): R {
+private suspend fun <T : io.r2dbc.spi.Closeable, R> T.use(block: suspend (T) -> R): R {
     val result = runCatching {
         block(this)
     }

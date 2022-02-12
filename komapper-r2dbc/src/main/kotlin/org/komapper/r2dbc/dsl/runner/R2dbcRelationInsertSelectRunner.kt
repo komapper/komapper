@@ -15,6 +15,10 @@ internal class R2dbcRelationInsertSelectRunner<ENTITY : Any, ID : Any, META : En
 
     private val runner: RelationInsertSelectRunner<ENTITY, ID, META> = RelationInsertSelectRunner(context)
 
+    override fun check(config: DatabaseConfig) {
+        runner.check(config)
+    }
+
     override suspend fun run(config: R2dbcDatabaseConfig): Pair<Int, List<ID>> {
         val statement = runner.buildStatement(config)
         val generatedColumn = when (val idGenerator = context.target.idGenerator()) {
@@ -23,7 +27,7 @@ internal class R2dbcRelationInsertSelectRunner<ENTITY : Any, ID : Any, META : En
         }
         val executor = R2dbcExecutor(config, context.options, generatedColumn)
         val (count, keys) = executor.executeUpdate(statement)
-        val ids = keys.map { context.target.convertToId(it) }.filterNotNull()
+        val ids = keys.mapNotNull { context.target.convertToId(it) }
         return count to ids
     }
 

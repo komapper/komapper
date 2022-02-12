@@ -74,15 +74,7 @@ interface R2dbcDialect : Dialect {
      */
     fun isTableNotExistsError(exception: R2dbcException): Boolean = false
 
-    /**
-     * Returns whether the batch run of parameterized statement is supported.
-     */
-    fun supportsBatchRunOfParameterizedStatement(): Boolean = true
-
-    /**
-     * Returns whether the batch run returning generated values is supported.
-     */
-    fun supportsBatchRunReturningGeneratedValues(): Boolean = false
+    override fun supportsBatchExecutionReturningGeneratedValues(): Boolean = false
 }
 
 abstract class R2dbcAbstractDialect protected constructor(internalDataTypes: List<R2dbcDataType<*>> = emptyList()) :

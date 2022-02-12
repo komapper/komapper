@@ -18,18 +18,22 @@ internal class R2dbcEntityDeleteSingleRunner<ENTITY : Any, ID : Any, META : Enti
     private val support: R2dbcEntityDeleteRunnerSupport<ENTITY, ID, META> =
         R2dbcEntityDeleteRunnerSupport(context)
 
+    override fun check(config: DatabaseConfig) {
+        runner.check(config)
+    }
+
     override suspend fun run(config: R2dbcDatabaseConfig) {
         val (count) = delete(config)
         postDelete(count)
     }
 
-    private suspend fun delete(config: R2dbcDatabaseConfig): Pair<Int, LongArray> {
+    private suspend fun delete(config: R2dbcDatabaseConfig): Pair<Int, List<Long>> {
         val statement = runner.buildStatement(config)
         return support.delete(config) { it.executeUpdate(statement) }
     }
 
     private fun postDelete(count: Int) {
-        support.postDelete(count)
+        runner.postDelete(count)
     }
 
     override fun dryRun(config: DatabaseConfig): DryRunStatement {

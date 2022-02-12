@@ -17,6 +17,10 @@ internal class R2dbcSetOperationFlowBuilder<T>(
 
     private val runner: SetOperationRunner = SetOperationRunner(context)
 
+    override fun check(config: DatabaseConfig) {
+        runner.check(config)
+    }
+
     override fun build(config: R2dbcDatabaseConfig): Flow<T> {
         val statement = runner.buildStatement(config)
         val executor = R2dbcExecutor(config, context.options)

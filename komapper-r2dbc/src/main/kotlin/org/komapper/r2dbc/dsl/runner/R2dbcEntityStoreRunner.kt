@@ -19,6 +19,10 @@ internal class R2dbcEntityStoreRunner<ENTITY : Any, ID : Any, META : EntityMetam
     private val runner: SelectRunner = SelectRunner(context)
     private val factory: EntityStoreFactory = EntityStoreFactory()
 
+    override fun check(config: DatabaseConfig) {
+        runner.check(config)
+    }
+
     override suspend fun run(config: R2dbcDatabaseConfig): EntityStore {
         val metamodels = context.getProjection().metamodels()
         val statement = runner.buildStatement(config)

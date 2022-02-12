@@ -40,7 +40,6 @@ class InsertMultipleTest(private val db: R2dbcDatabase) {
     }
 
     // TODO: MySQL and SQL Server drivers don't return all generated values after a multiple insert statement is issued
-    // TODO: ORACLE driver does not support multiple insert when the identity column is used
     @Run(unless = [Dbms.MYSQL, Dbms.ORACLE, Dbms.SQLSERVER])
     @Test
     fun identity() = inTransaction(db) {
@@ -54,6 +53,22 @@ class InsertMultipleTest(private val db: R2dbcDatabase) {
         val results2 = db.runQuery { QueryDsl.from(i).orderBy(i.id) }
         assertEquals(results1, results2)
         assertTrue(results1.all { it.id != null })
+    }
+
+    @Run(onlyIf = [Dbms.ORACLE])
+    @Test
+    fun identity_unsupportedOperationException() = inTransaction(db) {
+        val i = Meta.identityStrategy
+        val strategies = listOf(
+            IdentityStrategy(null, "AAA"),
+            IdentityStrategy(null, "BBB"),
+            IdentityStrategy(null, "CCC")
+        )
+        val ex = assertFailsWith<UnsupportedOperationException> {
+            db.runQuery { QueryDsl.insert(i).multiple(strategies) }
+            Unit
+        }
+        println(ex)
     }
 
     @Test
@@ -207,9 +222,6 @@ class InsertMultipleTest(private val db: R2dbcDatabase) {
         )
     }
 
-    // TODO: MySQL and SQL Server drivers don't return all generated values after a multiple insert statement is issued
-    // TODO: ORACLE driver does not support multiple insert when the identity column is used
-    @Run(unless = [Dbms.MYSQL, Dbms.ORACLE, Dbms.SQLSERVER])
     @Test
     fun identity_onDuplicateKeyUpdate() = inTransaction(db) {
         val i = Meta.identityStrategy

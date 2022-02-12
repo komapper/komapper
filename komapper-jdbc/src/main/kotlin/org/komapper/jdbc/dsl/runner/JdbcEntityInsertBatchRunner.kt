@@ -18,32 +18,28 @@ internal class JdbcEntityInsertBatchRunner<ENTITY : Any, ID : Any, META : Entity
     private val support: JdbcEntityInsertRunnerSupport<ENTITY, ID, META> =
         JdbcEntityInsertRunnerSupport(context)
 
+    override fun check(config: DatabaseConfig) {
+        runner.check(config)
+    }
+
     override fun run(config: JdbcDatabaseConfig): List<ENTITY> {
         if (entities.isEmpty()) return emptyList()
         val newEntities = preInsert(config)
-        val generatedKeys = insert(config, newEntities)
-        return postInsert(newEntities, generatedKeys)
+        val batchResults = insert(config, newEntities)
+        return postInsert(newEntities, batchResults.map { it.second })
     }
 
     private fun preInsert(config: JdbcDatabaseConfig): List<ENTITY> {
         return entities.map { support.preInsert(config, it) }
     }
 
-    private fun insert(config: JdbcDatabaseConfig, entities: List<ENTITY>): LongArray {
+    private fun insert(config: JdbcDatabaseConfig, entities: List<ENTITY>): List<Pair<Int, Long?>> {
         val statements = entities.map { runner.buildStatement(config, it) }
-        val (_, keys) = support.insert(config) { it.executeBatch(statements) }
-        return keys
+        return support.insert(config, true) { it.executeBatch(statements) }
     }
 
-    private fun postInsert(entities: List<ENTITY>, generatedKeys: LongArray): List<ENTITY> {
-        val iterator = generatedKeys.iterator()
-        return entities.map {
-            if (iterator.hasNext()) {
-                support.postInsert(it, iterator.nextLong())
-            } else {
-                it
-            }
-        }
+    private fun postInsert(entities: List<ENTITY>, generatedKeys: List<Long?>): List<ENTITY> {
+        return runner.postInsert(entities, generatedKeys)
     }
 
     override fun dryRun(config: DatabaseConfig): DryRunStatement {

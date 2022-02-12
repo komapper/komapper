@@ -14,6 +14,10 @@ internal class JdbcRelationDeleteRunner<ENTITY : Any, ID : Any, META : EntityMet
 
     private val runner: RelationDeleteRunner<ENTITY, ID, META> = RelationDeleteRunner(context)
 
+    override fun check(config: DatabaseConfig) {
+        runner.check(config)
+    }
+
     override fun run(config: JdbcDatabaseConfig): Int {
         val statement = runner.buildStatement(config)
         val executor = JdbcExecutor(config, context.options)

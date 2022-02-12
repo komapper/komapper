@@ -18,6 +18,10 @@ internal class R2dbcEntityUpsertSingleRunner<ENTITY : Any, ID : Any, META : Enti
     private val support: R2dbcEntityUpsertRunnerSupport<ENTITY, ID, META> =
         R2dbcEntityUpsertRunnerSupport(context)
 
+    override fun check(config: DatabaseConfig) {
+        runner.check(config)
+    }
+
     override suspend fun run(config: R2dbcDatabaseConfig): Int {
         val newEntity = preUpsert(config, entity)
         val (count) = upsert(config, newEntity)
@@ -28,9 +32,9 @@ internal class R2dbcEntityUpsertSingleRunner<ENTITY : Any, ID : Any, META : Enti
         return support.preUpsert(config, entity)
     }
 
-    private suspend fun upsert(config: R2dbcDatabaseConfig, entity: ENTITY): Pair<Int, LongArray> {
+    private suspend fun upsert(config: R2dbcDatabaseConfig, entity: ENTITY): Pair<Int, List<Long>> {
         val statement = runner.buildStatement(config, entity)
-        return support.upsert(config) { it.executeUpdate(statement) }
+        return support.upsert(config, false) { it.executeUpdate(statement) }
     }
 
     override fun dryRun(config: DatabaseConfig): DryRunStatement {
