@@ -1,6 +1,6 @@
 package integration.jdbc.postgresql
 
-import integration.jdbc.Env
+import integration.jdbc.JdbcEnv
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
@@ -9,7 +9,7 @@ import org.komapper.core.dsl.query.first
 import org.komapper.jdbc.JdbcDatabase
 import kotlin.test.assertEquals
 
-@ExtendWith(Env::class)
+@ExtendWith(JdbcEnv::class)
 class PostgreSqlDataTypeTest(private val db: JdbcDatabase) {
 
     @Test

@@ -78,7 +78,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
-@ExtendWith(Env::class)
+@ExtendWith(JdbcEnv::class)
 class JdbcDataTypeTest(val db: JdbcDatabase) {
 
     @Run(onlyIf = [Dbms.H2])
