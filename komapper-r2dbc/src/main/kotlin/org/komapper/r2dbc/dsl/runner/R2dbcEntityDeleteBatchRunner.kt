@@ -5,7 +5,6 @@ import org.komapper.core.DryRunStatement
 import org.komapper.core.dsl.context.EntityDeleteContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.runner.EntityDeleteBatchRunner
-import org.komapper.core.dsl.runner.customizeBatchCount
 import org.komapper.r2dbc.R2dbcDatabaseConfig
 
 internal class R2dbcEntityDeleteBatchRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
@@ -32,7 +31,7 @@ internal class R2dbcEntityDeleteBatchRunner<ENTITY : Any, ID : Any, META : Entit
 
     private suspend fun delete(config: R2dbcDatabaseConfig): List<Pair<Int, Long?>> {
         val statements = entities.map { runner.buildStatement(config, it) }
-        return support.delete(config) { it.executeBatch(statements, ::customizeBatchCount) }
+        return support.delete(config) { it.executeBatch(statements) }
     }
 
     private fun postDelete(counts: List<Int>) {

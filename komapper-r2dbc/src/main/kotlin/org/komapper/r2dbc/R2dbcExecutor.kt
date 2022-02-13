@@ -77,10 +77,7 @@ internal class R2dbcExecutor(
     }
 
     @OptIn(kotlinx.coroutines.FlowPreview::class)
-    suspend fun executeBatch(
-        statements: List<Statement>,
-        customizeBatchCount: (Int) -> Int = { it }
-    ): List<Pair<Int, Long?>> {
+    suspend fun executeBatch(statements: List<Statement>): List<Pair<Int, Long?>> {
         require(statements.isNotEmpty())
         @Suppress("NAME_SHADOWING")
         val statements = statements.map { inspect(it) }
@@ -107,7 +104,7 @@ internal class R2dbcExecutor(
                 }
                 r2dbcStmt.execute().asFlow().map { result ->
                     if (generatedColumn == null) {
-                        val counts = result.rowsUpdated.asFlow().toList().map(customizeBatchCount)
+                        val counts = result.rowsUpdated.asFlow().toList()
                         counts.map { it to null }
                     } else {
                         val generatedKeys = fetchGeneratedKeys(result)

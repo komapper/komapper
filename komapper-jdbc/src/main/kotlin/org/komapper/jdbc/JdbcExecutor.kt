@@ -86,10 +86,7 @@ internal class JdbcExecutor(
         }
     }
 
-    fun executeBatch(
-        statements: List<Statement>,
-        customizeBatchCount: (Int) -> Int = { it }
-    ): List<Pair<Int, Long?>> {
+    fun executeBatch(statements: List<Statement>): List<Pair<Int, Long?>> {
         require(statements.isNotEmpty())
         @Suppress("NAME_SHADOWING")
         val statements = statements.map { inspect(it) }
@@ -108,7 +105,7 @@ internal class JdbcExecutor(
                             bind(ps, statement)
                             ps.addBatch()
                         }
-                        val counts = ps.executeBatch().map(customizeBatchCount)
+                        val counts = ps.executeBatch()
                         val pairs = if (requiresGeneratedKeys) {
                             val keys = fetchGeneratedKeys(ps)
                             check(counts.size == keys.size) { "counts.size=${counts.size}, keys.size=${keys.size}" }

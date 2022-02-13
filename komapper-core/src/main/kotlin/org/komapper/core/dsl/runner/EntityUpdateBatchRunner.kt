@@ -7,7 +7,7 @@ import org.komapper.core.dsl.context.EntityUpdateContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 
 class EntityUpdateBatchRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
-    context: EntityUpdateContext<ENTITY, ID, META>,
+    private val context: EntityUpdateContext<ENTITY, ID, META>,
     private val entities: List<ENTITY>
 ) :
     Runner {
@@ -17,6 +17,7 @@ class EntityUpdateBatchRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENT
 
     override fun check(config: DatabaseConfig) {
         checkBatchExecutionOfParameterizedStatement(config)
+        checkOptimisticLockOfBatchExecution(config, context.options)
     }
 
     override fun dryRun(config: DatabaseConfig): DryRunStatement {

@@ -289,6 +289,11 @@ interface Dialect {
     fun supportsMultipleColumnsInInPredicate(): Boolean = true
 
     /**
+     * Returns whether the optimistic lock is supported for batch execution.
+     */
+    fun supportsOptimisticLockOfBatchExecution(): Boolean = true
+
+/**
      * Returns whether the table hint is supported.
      */
     fun supportsTableHint(): Boolean = false

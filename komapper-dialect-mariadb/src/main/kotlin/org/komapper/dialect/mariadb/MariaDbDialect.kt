@@ -47,4 +47,6 @@ interface MariaDbDialect : Dialect {
     override fun supportsLockOptionWait(): Boolean = true
 
     override fun supportsNullOrdering(): Boolean = false
+
+    override fun supportsOptimisticLockOfBatchExecution(): Boolean = false
 }
