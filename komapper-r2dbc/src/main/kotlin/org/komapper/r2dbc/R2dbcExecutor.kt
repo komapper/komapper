@@ -153,7 +153,7 @@ internal class R2dbcExecutor(
         }.collect()
     }
 
-/**
+    /**
      * Translates a [Throwable] to a [RuntimeException].
      */
     private fun translateThrowable(cause: Throwable) {
