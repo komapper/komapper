@@ -6,6 +6,7 @@ import io.r2dbc.spi.Row
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
@@ -16,6 +17,7 @@ import kotlinx.coroutines.reactive.asFlow
 import org.komapper.core.ExecutionOptionsProvider
 import org.komapper.core.Statement
 import org.komapper.core.UniqueConstraintException
+import org.reactivestreams.Publisher
 
 internal class R2dbcExecutor(
     private val config: R2dbcDatabaseConfig,
@@ -58,17 +60,19 @@ internal class R2dbcExecutor(
         @Suppress("NAME_SHADOWING")
         val statement = inspect(statement)
         return config.session.connection.asFlow().flatMapConcat { con ->
-            val r2dbcStmt = prepare(con, statement)
-            setUp(r2dbcStmt)
-            log(statement)
-            bind(r2dbcStmt, statement)
-            r2dbcStmt.execute().asFlow().map { result ->
-                if (generatedColumn == null) {
-                    val count = result.rowsUpdated.asFlow().single()
-                    count to emptyList()
-                } else {
-                    val generatedKeys = fetchGeneratedKeys(result)
-                    generatedKeys.size to generatedKeys
+            con.use {
+                val r2dbcStmt = prepare(con, statement)
+                setUp(r2dbcStmt)
+                log(statement)
+                bind(r2dbcStmt, statement)
+                r2dbcStmt.execute().asFlow().map { result ->
+                    if (generatedColumn == null) {
+                        val count = result.rowsUpdated.asFlow().single()
+                        count to emptyList()
+                    } else {
+                        val keys = fetchGeneratedKeys(result).asFlow().toList()
+                        keys.size to keys
+                    }
                 }
             }
         }.catch {
@@ -84,40 +88,28 @@ internal class R2dbcExecutor(
         val batchSize = executionOptions.batchSize?.let { if (it > 0) it else null } ?: 10
         val batchStatementsList = statements.chunked(batchSize)
         return config.session.connection.asFlow().flatMapConcat { con ->
-            val batchResults = batchStatementsList.map { batchStatements ->
-                val iterator = batchStatements.iterator()
-                val first = iterator.next()
-                val r2dbcStmt = prepare(con, first)
-                setUp(r2dbcStmt)
-                log(first)
-                bind(r2dbcStmt, first)
-                if (iterator.hasNext()) {
-                    r2dbcStmt.add()
-                }
-                while (iterator.hasNext()) {
-                    val statement = iterator.next()
-                    log(statement)
-                    bind(r2dbcStmt, statement)
-                    if (iterator.hasNext()) {
-                        r2dbcStmt.add()
-                    }
-                }
-                r2dbcStmt.execute().asFlow().map { result ->
-                    if (generatedColumn == null) {
-                        val counts = result.rowsUpdated.asFlow().toList()
-                        counts.map { it to null }
-                    } else {
-                        val generatedKeys = fetchGeneratedKeys(result)
-                        generatedKeys.map { 1 to it }
-                    }
-                }
-            }
-            flow {
-                for (batchResult in batchResults) {
-                    batchResult.collect { countAndKeyPairs ->
-                        for (countAndKey in countAndKeyPairs) {
-                            emit(countAndKey)
+            con.use {
+                flow {
+                    for (batchStatements in batchStatementsList) {
+                        val r2dbcStmt = prepare(con, batchStatements.first())
+                        setUp(r2dbcStmt)
+                        val iterator = batchStatements.iterator()
+                        while (iterator.hasNext()) {
+                            val statement = iterator.next()
+                            log(statement)
+                            bind(r2dbcStmt, statement)
+                            if (iterator.hasNext()) {
+                                r2dbcStmt.add()
+                            }
                         }
+                        val countAndKeyPairs = r2dbcStmt.execute().asFlow().flatMapConcat { result ->
+                            if (generatedColumn == null) {
+                                result.rowsUpdated.asFlow().map { count -> count to null }
+                            } else {
+                                fetchGeneratedKeys(result).asFlow().map { key -> 1 to key }
+                            }
+                        }
+                        emitAll(countAndKeyPairs)
                     }
                 }
             }
@@ -131,19 +123,21 @@ internal class R2dbcExecutor(
         @Suppress("NAME_SHADOWING")
         val statements = statements.map { inspect(it) }
         config.session.connection.asFlow().flatMapConcat { con ->
-            val batch = con.createBatch()
-            for (statement in statements) {
-                log(statement)
-                val sql = asSql(statement)
-                batch.add(sql)
-            }
-            batch.execute().asFlow().flatMapConcat { result ->
-                result.filter {
-                    when (it) {
-                        is Result.Message -> predicate(it)
-                        else -> true
-                    }
-                }.rowsUpdated.asFlow()
+            con.use {
+                val batch = con.createBatch()
+                for (statement in statements) {
+                    log(statement)
+                    val sql = asSql(statement)
+                    batch.add(sql)
+                }
+                batch.execute().asFlow().flatMapConcat { result ->
+                    result.filter {
+                        when (it) {
+                            is Result.Message -> predicate(it)
+                            else -> true
+                        }
+                    }.rowsUpdated.asFlow()
+                }
             }
         }.catch {
             translateThrowable(it)
@@ -197,13 +191,13 @@ internal class R2dbcExecutor(
         }
     }
 
-    private suspend fun fetchGeneratedKeys(result: Result): List<Long> {
+    private fun fetchGeneratedKeys(result: Result): Publisher<Long> {
         return result.map { row, _ ->
             when (val value = row.get(0)) {
                 is Number -> value.toLong()
                 else -> error("Generated value is not Number. generatedColumn=$generatedColumn, value=$value, valueType=${value::class.qualifiedName}")
             }
-        }.asFlow().toList()
+        }
     }
 }
 
