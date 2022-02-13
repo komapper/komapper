@@ -38,6 +38,8 @@ interface MariaDbDialect : Dialect {
 
     override fun supportsAliasForDeleteStatement() = false
 
+    override fun supportsGeneratedKeysReturningWhenInsertingMultipleRows(): Boolean = false
+
     override fun supportsLockOptionNowait(): Boolean = true
 
     override fun supportsLockOptionSkipLocked(): Boolean = true

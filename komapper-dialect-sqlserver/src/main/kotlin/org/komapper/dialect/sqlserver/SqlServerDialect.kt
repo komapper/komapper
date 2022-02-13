@@ -49,6 +49,8 @@ interface SqlServerDialect : Dialect {
 
     override fun supportsCreateIfNotExists(): Boolean = false
 
+    override fun supportsGeneratedKeysReturningWhenInsertingMultipleRows(): Boolean = false
+
     override fun supportsNullOrdering(): Boolean = false
 
     override fun supportsForUpdateClause(): Boolean = false

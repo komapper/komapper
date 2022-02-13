@@ -12,6 +12,7 @@ import org.komapper.r2dbc.R2dbcDatabase
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import kotlin.test.assertTrue
 
 @ExtendWith(R2dbcEnv::class)
 class R2dbcInsertSelectTest(private val db: R2dbcDatabase) {
@@ -41,7 +42,6 @@ class R2dbcInsertSelectTest(private val db: R2dbcDatabase) {
         assertEquals(emptyList(), ids)
     }
 
-    // TODO: MySQL and SQL Server drivers don't return all generated values after a multiple insert statement is issued
     @Run(unless = [Dbms.MYSQL, Dbms.ORACLE, Dbms.SQLSERVER])
     @Test
     fun generatedKeys() = inTransaction(db) {
@@ -64,7 +64,7 @@ class R2dbcInsertSelectTest(private val db: R2dbcDatabase) {
         assertEquals(listOf(3, 4), ids)
     }
 
-    @Run(onlyIf = [Dbms.ORACLE])
+    @Run(onlyIf = [Dbms.MYSQL, Dbms.ORACLE, Dbms.SQLSERVER])
     @Test
     fun generatedKeys_unsupportedOperationException() = inTransaction(db) {
         val i = Meta.identityStrategy
@@ -85,5 +85,29 @@ class R2dbcInsertSelectTest(private val db: R2dbcDatabase) {
             }
             Unit
         }
+    }
+
+    @Run(unless = [Dbms.ORACLE])
+    @Test
+    fun generatedKeys_doNotReturnGeneratedKeys() = inTransaction(db) {
+        val i = Meta.identityStrategy
+        db.runQuery {
+            val q1 = QueryDsl.insert(i).values {
+                i.value eq "test"
+            }
+            val q2 = QueryDsl.insert(i).values {
+                i.value eq "test2"
+            }
+            q1.andThen(q2)
+        }
+        val (count, ids) = db.runQuery {
+            QueryDsl.insert(i).select {
+                QueryDsl.from(i)
+            }.options {
+                it.copy(returnGeneratedKeys = false)
+            }
+        }
+        assertEquals(2, count)
+        assertTrue(ids.isEmpty())
     }
 }

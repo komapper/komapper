@@ -59,6 +59,8 @@ interface OracleDialect : Dialect {
 
     override fun supportsDropIfExists(): Boolean = false
 
+    override fun supportsGeneratedKeysReturningWhenInsertingMultipleRows(): Boolean = false
+
     override fun supportsLockOfColumns(): Boolean = true
 
     override fun supportsLockOptionNowait(): Boolean = true

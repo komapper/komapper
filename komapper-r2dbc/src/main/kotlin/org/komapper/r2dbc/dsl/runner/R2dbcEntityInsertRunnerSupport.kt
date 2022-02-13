@@ -25,7 +25,7 @@ internal class R2dbcEntityInsertRunnerSupport<ENTITY : Any, ID : Any, META : Ent
     }
 
     suspend fun <T> insert(config: R2dbcDatabaseConfig, usesGeneratedKeys: Boolean, execute: suspend (R2dbcExecutor) -> T): T {
-        val generatedColumn = if (usesGeneratedKeys) {
+        val generatedColumn = if (usesGeneratedKeys && context.options.returnGeneratedKeys) {
             when (val idGenerator = context.target.idGenerator()) {
                 is IdGenerator.AutoIncrement<ENTITY, *> -> idGenerator.property.columnName
                 else -> null

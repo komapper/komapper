@@ -21,10 +21,12 @@ internal class R2dbcRelationInsertSelectRunner<ENTITY : Any, ID : Any, META : En
 
     override suspend fun run(config: R2dbcDatabaseConfig): Pair<Int, List<ID>> {
         val statement = runner.buildStatement(config)
-        val generatedColumn = when (val idGenerator = context.target.idGenerator()) {
-            is IdGenerator.AutoIncrement<ENTITY, *> -> idGenerator.property.columnName
-            else -> null
-        }
+        val generatedColumn = if (context.options.returnGeneratedKeys) {
+            when (val idGenerator = context.target.idGenerator()) {
+                is IdGenerator.AutoIncrement<ENTITY, *> -> idGenerator.property.columnName
+                else -> null
+            }
+        } else null
         val executor = R2dbcExecutor(config, context.options, generatedColumn)
         val (count, keys) = executor.executeUpdate(statement)
         val ids = keys.mapNotNull { context.target.convertToId(it) }

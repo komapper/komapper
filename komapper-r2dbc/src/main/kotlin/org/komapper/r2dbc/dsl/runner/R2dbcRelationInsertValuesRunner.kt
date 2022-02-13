@@ -30,7 +30,10 @@ internal class R2dbcRelationInsertValuesRunner<ENTITY : Any, ID : Any, META : En
 
         return when (val idGenerator = context.target.idGenerator()) {
             is IdGenerator.AutoIncrement<ENTITY, ID> -> {
-                val (count, keys) = execute(config, generatedColumn = idGenerator.property.columnName)
+                val generatedColumn = if (context.options.returnGeneratedKeys) {
+                    idGenerator.property.columnName
+                } else null
+                val (count, keys) = execute(config, generatedColumn = generatedColumn)
                 val id = keys.firstOrNull()?.let { context.target.convertToId(it) }
                 count to id
             }
