@@ -23,7 +23,7 @@ import java.util.UUID
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-@ExtendWith(Env::class)
+@ExtendWith(R2dbcEnv::class)
 class R2dbcDataTypeTest(val db: R2dbcDatabase) {
 
     @Test

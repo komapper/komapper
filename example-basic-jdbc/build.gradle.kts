@@ -12,7 +12,7 @@ dependencies {
 }
 
 application {
-    mainClass.set("example.ApplicationKt")
+    mainClass.set("example.basic.jdbc.ApplicationKt")
 }
 
 ksp {

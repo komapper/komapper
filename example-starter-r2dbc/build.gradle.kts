@@ -11,7 +11,7 @@ dependencies {
 }
 
 application {
-    mainClass.set("example.ApplicationKt")
+    mainClass.set("example.starter.r2dbc.ApplicationKt")
 }
 
 idea {

@@ -4,7 +4,7 @@ import integration.core.DurationTest
 import integration.core.PeriodTest
 import integration.core.durationTest
 import integration.core.periodTest
-import integration.r2dbc.Env
+import integration.r2dbc.R2dbcEnv
 import integration.r2dbc.inTransaction
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
@@ -16,7 +16,7 @@ import java.time.Period
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-@ExtendWith(Env::class)
+@ExtendWith(R2dbcEnv::class)
 class R2dbcOracleTypeTest(private val db: R2dbcDatabase) {
 
     @Test

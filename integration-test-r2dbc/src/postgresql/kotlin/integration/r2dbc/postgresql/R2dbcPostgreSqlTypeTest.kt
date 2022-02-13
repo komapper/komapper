@@ -1,6 +1,6 @@
 package integration.r2dbc.postgresql
 
-import integration.r2dbc.Env
+import integration.r2dbc.R2dbcEnv
 import integration.r2dbc.inTransaction
 import io.r2dbc.postgresql.codec.Interval
 import io.r2dbc.postgresql.codec.Json
@@ -13,7 +13,7 @@ import java.time.Period
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-@ExtendWith(Env::class)
+@ExtendWith(R2dbcEnv::class)
 class R2dbcPostgreSqlTypeTest(val db: R2dbcDatabase) {
 
     @Test
