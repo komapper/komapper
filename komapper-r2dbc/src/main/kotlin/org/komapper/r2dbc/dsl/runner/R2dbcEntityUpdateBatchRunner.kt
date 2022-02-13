@@ -5,7 +5,6 @@ import org.komapper.core.DryRunStatement
 import org.komapper.core.dsl.context.EntityUpdateContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.runner.EntityUpdateBatchRunner
-import org.komapper.core.dsl.runner.customizeBatchCount
 import org.komapper.r2dbc.R2dbcDatabaseConfig
 
 internal class R2dbcEntityUpdateBatchRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
@@ -37,7 +36,7 @@ internal class R2dbcEntityUpdateBatchRunner<ENTITY : Any, ID : Any, META : Entit
 
     private suspend fun update(config: R2dbcDatabaseConfig, entities: List<ENTITY>): List<Pair<Int, Long?>> {
         val statements = entities.map { runner.buildStatement(config, it) }
-        return support.update(config) { it.executeBatch(statements, ::customizeBatchCount) }
+        return support.update(config) { it.executeBatch(statements) }
     }
 
     private fun postUpdate(entities: List<ENTITY>, counts: List<Int>): List<ENTITY> {

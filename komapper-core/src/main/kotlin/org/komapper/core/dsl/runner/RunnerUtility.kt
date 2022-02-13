@@ -77,10 +77,15 @@ internal fun checkGeneratedKeysReturningWhenInsertingMultipleRows(
     }
 }
 
-fun customizeBatchCount(count: Int): Int {
-    return when (count) {
-        java.sql.Statement.EXECUTE_FAILED -> 0
-        java.sql.Statement.SUCCESS_NO_INFO -> 1
-        else -> count
+internal fun checkOptimisticLockOfBatchExecution(config: DatabaseConfig, options: OptimisticLockOptions) {
+    val dialect = config.dialect
+    if (!config.dialect.supportsOptimisticLockOfBatchExecution() &&
+        !options.disableOptimisticLock &&
+        !options.suppressOptimisticLockException
+    ) {
+        throw UnsupportedOperationException(
+            "The dialect(driver=${dialect.driver}) does not support optimistic lock of batch execution. " +
+                "You can avoid this exception by setting `OptimisticLockOptions.disableOptimisticLock=true` or `OptimisticLockOptions.suppressOptimisticLockException=true`"
+        )
     }
 }
