@@ -18,6 +18,10 @@ internal class JdbcEntityUpsertSingleUpdateRunner<ENTITY : Any, ID : Any, META :
     private val support: JdbcEntityUpsertRunnerSupport<ENTITY, ID, META> =
         JdbcEntityUpsertRunnerSupport(context)
 
+    override fun check(config: DatabaseConfig) {
+        runner.check(config)
+    }
+
     override fun run(config: JdbcDatabaseConfig): ENTITY {
         val newEntity = preUpsert(config, entity)
         val (_, keys) = upsert(config, newEntity)
@@ -28,18 +32,13 @@ internal class JdbcEntityUpsertSingleUpdateRunner<ENTITY : Any, ID : Any, META :
         return support.preUpsert(config, entity)
     }
 
-    private fun upsert(config: JdbcDatabaseConfig, entity: ENTITY): Pair<Int, LongArray> {
+    private fun upsert(config: JdbcDatabaseConfig, entity: ENTITY): Pair<Int, List<Long>> {
         val statement = runner.buildStatement(config, entity)
-        return support.upsert(config) { it.executeUpdate(statement) }
+        return support.upsert(config, true) { it.executeUpdate(statement) }
     }
 
-    private fun postUpsert(entity: ENTITY, generatedKeys: LongArray): ENTITY {
-        val key = generatedKeys.firstOrNull()
-        return if (key != null) {
-            support.postUpsert(entity, key)
-        } else {
-            entity
-        }
+    private fun postUpsert(entity: ENTITY, generatedKeys: List<Long>): ENTITY {
+        return runner.postUpsert(entity, generatedKeys)
     }
 
     override fun dryRun(config: DatabaseConfig): DryRunStatement {

@@ -13,6 +13,8 @@ class SetOperationRunner(
     private val context: SetOperationContext,
 ) : Runner {
 
+    override fun check(config: DatabaseConfig) = Unit
+
     override fun dryRun(config: DatabaseConfig): DryRunStatement {
         val statement = buildStatement(config)
         return DryRunStatement.of(statement, config.dialect)

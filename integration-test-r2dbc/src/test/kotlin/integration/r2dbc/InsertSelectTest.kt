@@ -11,6 +11,7 @@ import org.komapper.core.dsl.query.andThen
 import org.komapper.r2dbc.R2dbcDatabase
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 
 @ExtendWith(Env::class)
 class InsertSelectTest(private val db: R2dbcDatabase) {
@@ -41,7 +42,6 @@ class InsertSelectTest(private val db: R2dbcDatabase) {
     }
 
     // TODO: MySQL and SQL Server drivers don't return all generated values after a multiple insert statement is issued
-    // TODO: ORACLE driver does not support multiple insert when the identity column is used
     @Run(unless = [Dbms.MYSQL, Dbms.ORACLE, Dbms.SQLSERVER])
     @Test
     fun generatedKeys() = inTransaction(db) {
@@ -62,5 +62,28 @@ class InsertSelectTest(private val db: R2dbcDatabase) {
         }
         assertEquals(2, count)
         assertEquals(listOf(3, 4), ids)
+    }
+
+    @Run(onlyIf = [Dbms.ORACLE])
+    @Test
+    fun generatedKeys_unsupportedOperationException() = inTransaction(db) {
+        val i = Meta.identityStrategy
+        db.runQuery {
+            val q1 = QueryDsl.insert(i).values {
+                i.value eq "test"
+            }
+            val q2 = QueryDsl.insert(i).values {
+                i.value eq "test2"
+            }
+            q1.andThen(q2)
+        }
+        assertFailsWith<UnsupportedOperationException> {
+            db.runQuery {
+                QueryDsl.insert(i).select {
+                    QueryDsl.from(i)
+                }
+            }
+            Unit
+        }
     }
 }

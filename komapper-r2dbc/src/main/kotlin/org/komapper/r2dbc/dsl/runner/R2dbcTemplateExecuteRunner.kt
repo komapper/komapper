@@ -13,6 +13,10 @@ internal class R2dbcTemplateExecuteRunner(
 
     private val runner = TemplateExecuteRunner(context)
 
+    override fun check(config: DatabaseConfig) {
+        runner.check(config)
+    }
+
     override suspend fun run(config: R2dbcDatabaseConfig): Int {
         val statement = runner.buildStatement(config)
         val executor = R2dbcExecutor(config, context.options)

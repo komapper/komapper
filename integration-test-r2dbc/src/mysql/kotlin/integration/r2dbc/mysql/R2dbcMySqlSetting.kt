@@ -4,6 +4,7 @@ import integration.core.MySqlSetting
 import io.r2dbc.spi.ConnectionFactories
 import io.r2dbc.spi.ConnectionFactoryOptions
 import io.r2dbc.spi.Option
+import org.komapper.core.ExecutionOptions
 import org.komapper.r2dbc.DefaultR2dbcDatabaseConfig
 import org.komapper.r2dbc.R2dbcDatabaseConfig
 import org.komapper.r2dbc.R2dbcDialects
@@ -34,5 +35,7 @@ class R2dbcMySqlSetting :
     }
 
     override val config: R2dbcDatabaseConfig =
-        DefaultR2dbcDatabaseConfig(ConnectionFactories.get(OPTIONS), R2dbcDialects.get(DRIVER))
+        object : DefaultR2dbcDatabaseConfig(ConnectionFactories.get(OPTIONS), R2dbcDialects.get(DRIVER)) {
+            override val executionOptions: ExecutionOptions = super.executionOptions.copy(batchSize = 2)
+        }
 }

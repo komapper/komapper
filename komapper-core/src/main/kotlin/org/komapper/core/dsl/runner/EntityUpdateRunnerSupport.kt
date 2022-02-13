@@ -14,4 +14,20 @@ internal class EntityUpdateRunnerSupport<ENTITY : Any, ID : Any, META : EntityMe
         val builder = EntityUpdateStatementBuilder(config.dialect, context, entity)
         return builder.build()
     }
+
+    internal fun preUpdate(config: DatabaseConfig, entity: ENTITY): ENTITY {
+        val clock = config.clockProvider.now()
+        return context.target.preUpdate(entity, clock)
+    }
+
+    internal fun postUpdate(entity: ENTITY, count: Int, index: Int? = null): ENTITY {
+        if (context.target.versionProperty() != null) {
+            checkOptimisticLock(context.options, count, index)
+        }
+        return if (!context.options.disableOptimisticLock) {
+            context.target.postUpdate(entity)
+        } else {
+            entity
+        }
+    }
 }

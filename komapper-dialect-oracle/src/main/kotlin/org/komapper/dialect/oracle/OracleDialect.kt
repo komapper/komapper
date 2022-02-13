@@ -53,6 +53,8 @@ interface OracleDialect : Dialect {
 
     override fun supportsAsKeywordForTableAlias(): Boolean = false
 
+    override fun supportsAutoIncrementWhenInsertingMultipleRows(): Boolean = false
+
     override fun supportsCreateIfNotExists(): Boolean = false
 
     override fun supportsDropIfExists(): Boolean = false

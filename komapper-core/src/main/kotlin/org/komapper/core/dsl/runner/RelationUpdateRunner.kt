@@ -14,6 +14,8 @@ class RelationUpdateRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY
     private val context: RelationUpdateContext<ENTITY, ID, META>,
 ) : Runner {
 
+    override fun check(config: DatabaseConfig) = Unit
+
     override fun dryRun(config: DatabaseConfig): DryRunStatement {
         val clock = config.clockProvider.now()
         val updatedAtAssignment = context.target.updatedAtAssignment(clock)

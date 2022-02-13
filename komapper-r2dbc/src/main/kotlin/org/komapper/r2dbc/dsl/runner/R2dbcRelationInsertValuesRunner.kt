@@ -18,6 +18,10 @@ internal class R2dbcRelationInsertValuesRunner<ENTITY : Any, ID : Any, META : En
 
     private val runner: RelationInsertValuesRunner<ENTITY, ID, META> = RelationInsertValuesRunner(context)
 
+    override fun check(config: DatabaseConfig) {
+        runner.check(config)
+    }
+
     override suspend fun run(config: R2dbcDatabaseConfig): Pair<Int, ID?> {
         suspend fun returnWithoutId(): Pair<Int, ID?> {
             val (count, _) = execute(config)
@@ -51,7 +55,7 @@ internal class R2dbcRelationInsertValuesRunner<ENTITY : Any, ID : Any, META : En
         config: R2dbcDatabaseConfig,
         idAssignment: Pair<PropertyMetamodel<ENTITY, ID, *>, Operand>? = null,
         generatedColumn: String? = null
-    ): Pair<Int, LongArray> {
+    ): Pair<Int, List<Long>> {
         val statement = buildStatement(config, idAssignment)
         val executor = R2dbcExecutor(config, context.options, generatedColumn)
         return executor.executeUpdate(statement)

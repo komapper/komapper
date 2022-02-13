@@ -11,6 +11,8 @@ class EntityDeleteSingleRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<EN
     private val entity: ENTITY
 ) : Runner {
 
+    override fun check(config: DatabaseConfig) = Unit
+
     private val support: EntityDeleteRunnerSupport<ENTITY, ID, META> =
         EntityDeleteRunnerSupport(context)
 
@@ -21,5 +23,9 @@ class EntityDeleteSingleRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<EN
 
     fun buildStatement(config: DatabaseConfig): Statement {
         return support.buildStatement(config, entity)
+    }
+
+    fun postDelete(count: Int) {
+        support.postDelete(count)
     }
 }

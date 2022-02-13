@@ -15,6 +15,10 @@ class EntityDeleteBatchRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENT
     private val support: EntityDeleteRunnerSupport<ENTITY, ID, META> =
         EntityDeleteRunnerSupport(context)
 
+    override fun check(config: DatabaseConfig) {
+        checkBatchExecutionOfParameterizedStatement(config)
+    }
+
     override fun dryRun(config: DatabaseConfig): DryRunStatement {
         if (entities.isEmpty()) return DryRunStatement.EMPTY
         val statement = buildStatement(config, entities.first())
@@ -23,5 +27,11 @@ class EntityDeleteBatchRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENT
 
     fun buildStatement(config: DatabaseConfig, entity: ENTITY): Statement {
         return support.buildStatement(config, entity)
+    }
+
+    fun postDelete(counts: List<Int>) {
+        for ((i, count) in counts.withIndex()) {
+            support.postDelete(count, i)
+        }
     }
 }

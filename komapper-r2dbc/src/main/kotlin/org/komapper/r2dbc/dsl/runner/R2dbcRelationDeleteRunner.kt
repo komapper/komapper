@@ -21,6 +21,10 @@ internal class R2dbcRelationDeleteRunner<ENTITY : Any, ID : Any, META : EntityMe
         return count
     }
 
+    override fun check(config: DatabaseConfig) {
+        runner.check(config)
+    }
+
     override fun dryRun(config: DatabaseConfig): DryRunStatement {
         return runner.dryRun(config)
     }

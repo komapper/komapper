@@ -18,18 +18,22 @@ internal class JdbcEntityDeleteSingleRunner<ENTITY : Any, ID : Any, META : Entit
     private val support: JdbcEntityDeleteRunnerSupport<ENTITY, ID, META> =
         JdbcEntityDeleteRunnerSupport(context)
 
+    override fun check(config: DatabaseConfig) {
+        runner.check(config)
+    }
+
     override fun run(config: JdbcDatabaseConfig) {
         val (count) = delete(config)
         postDelete(count)
     }
 
-    private fun delete(config: JdbcDatabaseConfig): Pair<Int, LongArray> {
+    private fun delete(config: JdbcDatabaseConfig): Pair<Int, List<Long>> {
         val statement = runner.buildStatement(config)
         return support.delete(config) { it.executeUpdate(statement) }
     }
 
     private fun postDelete(count: Int) {
-        support.postDelete(count)
+        runner.postDelete(count)
     }
 
     override fun dryRun(config: DatabaseConfig): DryRunStatement {

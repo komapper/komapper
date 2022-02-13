@@ -16,11 +16,7 @@ internal class JdbcEntityUpsertRunnerSupport<ENTITY : Any, ID : Any, META : Enti
         return support.preInsert(config, entity)
     }
 
-    fun <T> upsert(config: JdbcDatabaseConfig, execute: (JdbcExecutor) -> T): T {
-        return support.insert(config, execute)
-    }
-
-    fun postUpsert(entity: ENTITY, generatedKey: Long): ENTITY {
-        return support.postInsert(entity, generatedKey)
+    fun <T> upsert(config: JdbcDatabaseConfig, usesGeneratedKeys: Boolean, execute: (JdbcExecutor) -> T): T {
+        return support.insert(config, usesGeneratedKeys, execute)
     }
 }

@@ -14,6 +14,10 @@ class EntityUpsertBatchRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENT
     private val support: EntityUpsertRunnerSupport<ENTITY, ID, META> =
         EntityUpsertRunnerSupport(context)
 
+    override fun check(config: DatabaseConfig) {
+        checkBatchExecutionOfParameterizedStatement(config)
+    }
+
     override fun dryRun(config: DatabaseConfig): DryRunStatement {
         if (entities.isEmpty()) return DryRunStatement.EMPTY
         val statement = buildStatement(config, entities.first())

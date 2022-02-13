@@ -48,9 +48,9 @@ internal class JdbcExecutor(
         val statement = inspect(statement)
         return withThrowableTranslator {
             config.session.connection.use { con ->
-                log(statement)
                 prepare(con, statement).use { ps ->
                     setUp(ps)
+                    log(statement)
                     bind(ps, statement)
                     ps.executeQuery().use { rs ->
                         val iterator = object : Iterator<T> {
@@ -69,14 +69,14 @@ internal class JdbcExecutor(
         }
     }
 
-    fun executeUpdate(statement: Statement): Pair<Int, LongArray> {
+    fun executeUpdate(statement: Statement): Pair<Int, List<Long>> {
         @Suppress("NAME_SHADOWING")
         val statement = inspect(statement)
         return withThrowableTranslator {
             config.session.connection.use { con ->
-                log(statement)
                 prepare(con, statement).use { ps ->
                     setUp(ps)
+                    log(statement)
                     bind(ps, statement)
                     val count = ps.executeUpdate()
                     val keys = fetchGeneratedKeys(ps)
@@ -88,37 +88,37 @@ internal class JdbcExecutor(
 
     fun executeBatch(
         statements: List<Statement>,
-        customizeBatchCounts: (IntArray) -> IntArray = { it }
-    ): Pair<IntArray, LongArray> {
+        customizeBatchCount: (Int) -> Int = { it }
+    ): List<Pair<Int, Long?>> {
         require(statements.isNotEmpty())
         @Suppress("NAME_SHADOWING")
         val statements = statements.map { inspect(it) }
         return withThrowableTranslator {
             config.session.connection.use { con ->
-                val firstStatement = statements.first()
-                log(firstStatement)
-                prepare(con, firstStatement).use { ps ->
+                prepare(con, statements.first()).use { ps ->
                     setUp(ps)
+                    val countAndKeyList = mutableListOf<Pair<Int, Long?>>()
                     val batchSize = executionOptions.batchSize?.let { if (it > 0) it else null } ?: 10
-                    val allCounts = IntArray(statements.size)
-                    val allKeys = LongArray(statements.size)
-                    var offset = 0
-                    for ((i, statement) in statements.withIndex()) {
-                        if (i > 0) {
+                    val batchStatementsList = statements.chunked(batchSize)
+                    for (batchStatements in batchStatementsList) {
+                        val iterator = batchStatements.iterator()
+                        while (iterator.hasNext()) {
+                            val statement = iterator.next()
                             log(statement)
+                            bind(ps, statement)
+                            ps.addBatch()
                         }
-                        bind(ps, statement)
-                        ps.addBatch()
-                        if (i == statements.size - 1 || (i + 1) % batchSize == 0) {
-                            val counts = ps.executeBatch().let(customizeBatchCounts)
+                        val counts = ps.executeBatch().map(customizeBatchCount)
+                        val pairs = if (requiresGeneratedKeys) {
                             val keys = fetchGeneratedKeys(ps)
-                            counts.copyInto(allCounts, offset)
-                            keys.copyInto(allKeys, offset)
-                            offset = i + 1
+                            check(counts.size == keys.size) { "counts.size=${counts.size}, keys.size=${keys.size}" }
+                            counts.zip(keys)
+                        } else {
+                            counts.map { it to null }
                         }
+                        countAndKeyList.addAll(pairs)
                     }
-                    bind(ps, firstStatement)
-                    allCounts to allKeys
+                    countAndKeyList
                 }
             }
         }
@@ -130,9 +130,9 @@ internal class JdbcExecutor(
         withThrowableTranslator {
             config.session.connection.use { con ->
                 for (statement in statements) {
-                    log(statement)
                     con.createStatement().use { s ->
                         setUp(s)
+                        log(statement)
                         val sql = asSql(statement)
                         try {
                             s.execute(sql)
@@ -204,7 +204,7 @@ internal class JdbcExecutor(
         }
     }
 
-    private fun fetchGeneratedKeys(ps: PreparedStatement): LongArray {
+    private fun fetchGeneratedKeys(ps: PreparedStatement): List<Long> {
         return if (requiresGeneratedKeys) {
             ps.generatedKeys.use { rs ->
                 val keys = mutableListOf<Long>()
@@ -212,10 +212,10 @@ internal class JdbcExecutor(
                     val key = rs.getLong(1)
                     keys.add(key)
                 }
-                keys.toLongArray()
+                keys
             }
         } else {
-            longArrayOf()
+            emptyList()
         }
     }
 }

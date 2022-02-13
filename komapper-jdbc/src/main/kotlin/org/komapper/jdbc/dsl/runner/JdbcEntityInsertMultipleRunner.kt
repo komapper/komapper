@@ -19,6 +19,10 @@ internal class JdbcEntityInsertMultipleRunner<ENTITY : Any, ID : Any, META : Ent
     private val support: JdbcEntityInsertRunnerSupport<ENTITY, ID, META> =
         JdbcEntityInsertRunnerSupport(context)
 
+    override fun check(config: DatabaseConfig) {
+        runner.check(config)
+    }
+
     override fun run(config: JdbcDatabaseConfig): List<ENTITY> {
         if (entities.isEmpty()) return emptyList()
         val newEntities = preInsert(config)
@@ -30,21 +34,14 @@ internal class JdbcEntityInsertMultipleRunner<ENTITY : Any, ID : Any, META : Ent
         return entities.map { support.preInsert(config, it) }
     }
 
-    private fun insert(config: JdbcDatabaseConfig, entities: List<ENTITY>): LongArray {
+    private fun insert(config: JdbcDatabaseConfig, entities: List<ENTITY>): List<Long> {
         val statement = runner.buildStatement(config, entities)
-        val (_, keys) = support.insert(config) { it.executeUpdate(statement) }
+        val (_, keys) = support.insert(config, true) { it.executeUpdate(statement) }
         return keys
     }
 
-    private fun postInsert(entities: List<ENTITY>, generatedKeys: LongArray): List<ENTITY> {
-        val iterator = generatedKeys.iterator()
-        return entities.map {
-            if (iterator.hasNext()) {
-                support.postInsert(it, iterator.nextLong())
-            } else {
-                it
-            }
-        }
+    private fun postInsert(entities: List<ENTITY>, generatedKeys: List<Long>): List<ENTITY> {
+        return runner.postInsert(entities, generatedKeys)
     }
 
     override fun dryRun(config: DatabaseConfig): DryRunStatement {

@@ -18,6 +18,10 @@ internal class JdbcRelationInsertValuesRunner<ENTITY : Any, ID : Any, META : Ent
 
     private val runner: RelationInsertValuesRunner<ENTITY, ID, META> = RelationInsertValuesRunner(context)
 
+    override fun check(config: DatabaseConfig) {
+        runner.check(config)
+    }
+
     override fun run(config: JdbcDatabaseConfig): Pair<Int, ID?> {
         fun returnWithoutId(): Pair<Int, ID?> {
             val (count, _) = execute(config)
@@ -51,7 +55,7 @@ internal class JdbcRelationInsertValuesRunner<ENTITY : Any, ID : Any, META : Ent
         config: JdbcDatabaseConfig,
         idAssignment: Pair<PropertyMetamodel<ENTITY, ID, *>, Operand>? = null,
         requiresGeneratedKeys: Boolean = false
-    ): Pair<Int, LongArray> {
+    ): Pair<Int, List<Long>> {
         val statement = buildStatement(config, idAssignment)
         val executor = JdbcExecutor(config, context.options, requiresGeneratedKeys)
         return executor.executeUpdate(statement)

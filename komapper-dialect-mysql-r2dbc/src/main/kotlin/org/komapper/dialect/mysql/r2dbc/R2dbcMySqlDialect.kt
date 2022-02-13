@@ -53,4 +53,6 @@ open class R2dbcMySqlDialect(
     }
 
     enum class Version { IMPLICIT }
+
+    override fun supportsBatchExecutionOfParameterizedStatement(): Boolean = false
 }

@@ -14,6 +14,8 @@ class EntityUpsertSingleRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<EN
     private val support: EntityUpsertRunnerSupport<ENTITY, ID, META> =
         EntityUpsertRunnerSupport(context)
 
+    override fun check(config: DatabaseConfig) = Unit
+
     override fun dryRun(config: DatabaseConfig): DryRunStatement {
         val statement = buildStatement(config, entity)
         return DryRunStatement.of(statement, config.dialect)
@@ -21,5 +23,14 @@ class EntityUpsertSingleRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<EN
 
     fun buildStatement(config: DatabaseConfig, entity: ENTITY): Statement {
         return support.buildStatement(config, listOf(entity))
+    }
+
+    fun postUpsert(entity: ENTITY, generatedKeys: List<Long>): ENTITY {
+        val key = generatedKeys.firstOrNull()
+        return if (key != null) {
+            support.postInsert(entity, key)
+        } else {
+            entity
+        }
     }
 }

@@ -73,6 +73,8 @@ interface R2dbcDialect : Dialect {
      * Returns whether the exception indicates that the table does not exist.
      */
     fun isTableNotExistsError(exception: R2dbcException): Boolean = false
+
+    override fun supportsBatchExecutionReturningGeneratedValues(): Boolean = false
 }
 
 abstract class R2dbcAbstractDialect protected constructor(internalDataTypes: List<R2dbcDataType<*>> = emptyList()) :

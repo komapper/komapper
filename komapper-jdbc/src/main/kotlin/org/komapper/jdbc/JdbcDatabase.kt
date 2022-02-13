@@ -93,6 +93,7 @@ interface JdbcDatabase : Jdbc {
     @Suppress("UNCHECKED_CAST")
     fun <T> runQuery(query: Query<T>): T {
         val runner = query.accept(JdbcQueryVisitor) as JdbcRunner<T>
+        runner.check(config)
         return runner.run(config)
     }
 

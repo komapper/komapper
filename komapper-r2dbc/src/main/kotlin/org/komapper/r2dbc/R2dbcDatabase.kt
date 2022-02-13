@@ -84,6 +84,7 @@ interface R2dbcDatabase : R2dbc {
     @Suppress("UNCHECKED_CAST")
     suspend fun <T> runQuery(query: Query<T>): T {
         val runner = query.accept(R2dbcQueryVisitor) as R2dbcRunner<T>
+        runner.check(config)
         return runner.run(config)
     }
 
@@ -107,6 +108,7 @@ interface R2dbcDatabase : R2dbc {
     @Suppress("UNCHECKED_CAST")
     fun <T> flow(query: FlowQuery<T>): Flow<T> {
         val builder = query.accept(R2dbcFlowQueryVisitor) as R2dbcFlowBuilder<T>
+        builder.check(config)
         return builder.build(config)
     }
 

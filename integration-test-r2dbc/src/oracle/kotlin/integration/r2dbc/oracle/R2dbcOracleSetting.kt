@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.reactive.asPublisher
 import kotlinx.coroutines.reactive.awaitSingle
 import kotlinx.coroutines.runBlocking
+import org.komapper.core.ExecutionOptions
 import org.komapper.r2dbc.DefaultR2dbcDatabaseConfig
 import org.komapper.r2dbc.R2dbcDatabaseConfig
 import org.komapper.r2dbc.R2dbcDialects
@@ -55,7 +56,9 @@ class R2dbcOracleSetting : OracleSetting<R2dbcDatabaseConfig> {
     }
 
     override val config: R2dbcDatabaseConfig =
-        DefaultR2dbcDatabaseConfig(CONNECTION_FACTORY, R2dbcDialects.get(DRIVER))
+        object : DefaultR2dbcDatabaseConfig(CONNECTION_FACTORY, R2dbcDialects.get(DRIVER)) {
+            override val executionOptions: ExecutionOptions = super.executionOptions.copy(batchSize = 2)
+        }
 }
 
 class OracleR2DBCDatabaseContainer(private val container: OracleContainer) : R2DBCDatabaseContainer {

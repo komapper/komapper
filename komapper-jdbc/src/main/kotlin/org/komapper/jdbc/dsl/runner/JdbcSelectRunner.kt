@@ -19,6 +19,10 @@ internal class JdbcSelectRunner<T, R>(
 
     private val runner: SelectRunner = SelectRunner(context)
 
+    override fun check(config: DatabaseConfig) {
+        runner.check(config)
+    }
+
     override fun run(config: JdbcDatabaseConfig): R {
         val statement = runner.buildStatement(config)
         val executor = JdbcExecutor(config, context.options)

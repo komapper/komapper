@@ -7,12 +7,14 @@ import org.komapper.core.dsl.context.EntityUpsertContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 
 class EntityUpsertMultipleRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
-    context: EntityUpsertContext<ENTITY, ID, META>,
+    private val context: EntityUpsertContext<ENTITY, ID, META>,
     private val entities: List<ENTITY>
 ) : Runner {
 
     private val support: EntityUpsertRunnerSupport<ENTITY, ID, META> =
         EntityUpsertRunnerSupport(context)
+
+    override fun check(config: DatabaseConfig) = Unit
 
     override fun dryRun(config: DatabaseConfig): DryRunStatement {
         if (entities.isEmpty()) return DryRunStatement.EMPTY

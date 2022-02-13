@@ -14,6 +14,10 @@ internal data class R2dbcScriptExecuteRunner(
 
     private val runner = ScriptExecuteRunner(context)
 
+    override fun check(config: DatabaseConfig) {
+        runner.check(config)
+    }
+
     override suspend fun run(config: R2dbcDatabaseConfig) {
         val statements = runner.buildStatements()
         val executor = R2dbcExecutor(config, context.options)

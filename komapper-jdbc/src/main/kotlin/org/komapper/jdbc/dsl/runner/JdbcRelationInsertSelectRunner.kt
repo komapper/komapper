@@ -15,12 +15,16 @@ internal class JdbcRelationInsertSelectRunner<ENTITY : Any, ID : Any, META : Ent
 
     private val runner: RelationInsertSelectRunner<ENTITY, ID, META> = RelationInsertSelectRunner(context)
 
+    override fun check(config: DatabaseConfig) {
+        runner.check(config)
+    }
+
     override fun run(config: JdbcDatabaseConfig): Pair<Int, List<ID>> {
         val statement = runner.buildStatement(config)
         val requiresGeneratedKeys = context.target.idGenerator() is IdGenerator.AutoIncrement<ENTITY, ID>
         val executor = JdbcExecutor(config, context.options, requiresGeneratedKeys)
         val (count, keys) = executor.executeUpdate(statement)
-        val ids = keys.map { context.target.convertToId(it) }.filterNotNull()
+        val ids = keys.mapNotNull { context.target.convertToId(it) }
         return count to ids
     }
 
