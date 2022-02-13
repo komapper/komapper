@@ -1,4 +1,4 @@
-package example
+package example.spring.boot.jdbc
 
 import org.komapper.annotation.KomapperAutoIncrement
 import org.komapper.annotation.KomapperEntityDef

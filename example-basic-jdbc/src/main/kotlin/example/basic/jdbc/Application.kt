@@ -1,4 +1,4 @@
-package example
+package example.basic.jdbc
 
 import org.komapper.annotation.KomapperAutoIncrement
 import org.komapper.annotation.KomapperColumn

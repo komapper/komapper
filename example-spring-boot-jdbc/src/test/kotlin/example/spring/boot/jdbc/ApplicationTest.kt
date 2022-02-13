@@ -1,4 +1,4 @@
-package example
+package example.spring.boot.jdbc
 
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.context.SpringBootTest

@@ -1,4 +1,4 @@
-package example
+package example.basic.r2dbc
 
 import kotlin.test.Test
 

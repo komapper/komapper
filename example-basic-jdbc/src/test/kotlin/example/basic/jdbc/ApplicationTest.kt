@@ -1,4 +1,4 @@
-package example
+package example.basic.jdbc
 
 import kotlin.test.Test
 

@@ -1,4 +1,4 @@
-package example
+package example.starter.r2dbc
 
 import kotlinx.coroutines.runBlocking
 import org.komapper.annotation.KomapperAutoIncrement

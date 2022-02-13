@@ -1,4 +1,4 @@
-package example
+package example.spring.boot.r2dbc
 
 import com.google.cloud.sqlcommenter.interceptors.SpringSQLCommenterInterceptor
 import org.springframework.context.annotation.Bean

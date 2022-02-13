@@ -1,4 +1,4 @@
-package example
+package example.spring.boot.r2dbc
 
 import kotlinx.coroutines.flow.Flow
 import org.komapper.annotation.KomapperAutoIncrement

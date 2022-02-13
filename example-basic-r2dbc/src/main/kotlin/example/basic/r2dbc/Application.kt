@@ -1,5 +1,6 @@
-package example
+package example.basic.r2dbc
 
+import kotlinx.coroutines.runBlocking
 import org.komapper.annotation.KomapperAutoIncrement
 import org.komapper.annotation.KomapperColumn
 import org.komapper.annotation.KomapperCreatedAt
@@ -10,8 +11,8 @@ import org.komapper.annotation.KomapperVersion
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
 import org.komapper.core.dsl.query.first
-import org.komapper.jdbc.JdbcDatabase
-import org.komapper.tx.jdbc.withTransaction
+import org.komapper.r2dbc.R2dbcDatabase
+import org.komapper.tx.r2dbc.withTransaction
 import java.time.LocalDateTime
 
 data class Address(
@@ -31,9 +32,9 @@ data class AddressDef(
     @KomapperUpdatedAt val updatedAt: Nothing,
 )
 
-fun main() {
+fun main() = runBlocking {
     // create a Database instance
-    val db = JdbcDatabase.create("jdbc:h2:mem:example;DB_CLOSE_DELAY=-1")
+    val db = R2dbcDatabase.create("r2dbc:h2:mem:///example;DB_CLOSE_DELAY=-1")
 
     // get a metamodel
     val a = Meta.address
