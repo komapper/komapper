@@ -6,6 +6,7 @@ data class InsertOptions(
      * Whether to disable assigning sequence-numbered values to primary keys.
      */
     val disableSequenceAssignment: Boolean,
+    val returnGeneratedKeys: Boolean,
     override val queryTimeoutSeconds: Int?,
     override val suppressLogging: Boolean,
 ) : BatchOptions, QueryOptions {
@@ -14,6 +15,7 @@ data class InsertOptions(
         val DEFAULT = InsertOptions(
             batchSize = null,
             disableSequenceAssignment = false,
+            returnGeneratedKeys = true,
             queryTimeoutSeconds = null,
             suppressLogging = false
         )

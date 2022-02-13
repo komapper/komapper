@@ -13,6 +13,7 @@ class RelationInsertSelectRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<
 
     override fun check(config: DatabaseConfig) {
         checkAutoIncrementWhenInsertingMultipleRows(config, context.target)
+        checkGeneratedKeysReturningWhenInsertingMultipleRows(config, context.target, context.options)
     }
 
     override fun dryRun(config: DatabaseConfig): DryRunStatement {

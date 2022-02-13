@@ -6,6 +6,7 @@ import org.komapper.core.dsl.builder.getWhereCriteria
 import org.komapper.core.dsl.context.WhereProvider
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.metamodel.hasAutoIncrementProperty
+import org.komapper.core.dsl.options.InsertOptions
 import org.komapper.core.dsl.options.OptimisticLockOptions
 
 fun checkWhereClause(whereProvider: WhereProvider) {
@@ -56,6 +57,23 @@ internal fun checkBatchExecutionReturningGeneratedValues(config: DatabaseConfig,
         metamodel.hasAutoIncrementProperty()
     ) {
         throw UnsupportedOperationException("The dialect(driver=${dialect.driver}) does not support batch execution for entities with auto-increment properties.")
+    }
+}
+
+internal fun checkGeneratedKeysReturningWhenInsertingMultipleRows(
+    config: DatabaseConfig,
+    metamodel: EntityMetamodel<*, *, *>,
+    options: InsertOptions
+) {
+    val dialect = config.dialect
+    if (!dialect.supportsGeneratedKeysReturningWhenInsertingMultipleRows() &&
+        metamodel.hasAutoIncrementProperty() &&
+        options.returnGeneratedKeys
+    ) {
+        throw UnsupportedOperationException(
+            "The dialect(driver=${dialect.driver}) does not support returning generated keys when inserting multiple rows. " +
+                "You can avoid this exception by setting `InsertOption.returnGeneratedKeys=false`."
+        )
     }
 }
 

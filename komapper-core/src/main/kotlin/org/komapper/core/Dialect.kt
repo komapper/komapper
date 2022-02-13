@@ -224,6 +224,11 @@ interface Dialect {
     fun supportsDropIfExists(): Boolean = true
 
     /**
+     * Returns whether the generated keys returning is supported when inserting multiple rows.
+     */
+    fun supportsGeneratedKeysReturningWhenInsertingMultipleRows(): Boolean = true
+
+    /**
      * Returns whether the INTERSECT set operation is supported.
      */
     fun supportsSetOperationIntersect(): Boolean = true

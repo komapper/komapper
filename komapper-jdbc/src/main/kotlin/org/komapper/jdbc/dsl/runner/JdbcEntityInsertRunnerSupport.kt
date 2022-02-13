@@ -25,7 +25,9 @@ internal class JdbcEntityInsertRunnerSupport<ENTITY : Any, ID : Any, META : Enti
     }
 
     fun <T> insert(config: JdbcDatabaseConfig, usesGeneratedKeys: Boolean, execute: (JdbcExecutor) -> T): T {
-        val requiresGeneratedKeys = usesGeneratedKeys && context.target.hasAutoIncrementProperty()
+        val requiresGeneratedKeys = usesGeneratedKeys &&
+            context.target.hasAutoIncrementProperty() &&
+            context.options.returnGeneratedKeys
         val executor = JdbcExecutor(config, context.options, requiresGeneratedKeys)
         return execute(executor)
     }

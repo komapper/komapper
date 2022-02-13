@@ -39,7 +39,6 @@ class JdbcInsertMultipleTest(private val db: JdbcDatabase) {
         assertEquals(addressList, list)
     }
 
-    // TODO: MariaDB and SQL Server drivers don't return all generated values after a multiple insert statement is issued
     @Run(unless = [Dbms.MARIADB, Dbms.ORACLE, Dbms.SQLSERVER])
     @Test
     fun identity() {
@@ -55,7 +54,7 @@ class JdbcInsertMultipleTest(private val db: JdbcDatabase) {
         assertTrue(results1.all { it.id != null })
     }
 
-    @Run(onlyIf = [Dbms.ORACLE])
+    @Run(onlyIf = [Dbms.MARIADB, Dbms.ORACLE, Dbms.SQLSERVER])
     @Test
     fun identity_unsupportedOperationException() {
         val i = Meta.identityStrategy
@@ -69,6 +68,29 @@ class JdbcInsertMultipleTest(private val db: JdbcDatabase) {
             Unit
         }
         println(ex)
+    }
+
+    @Run(unless = [Dbms.ORACLE])
+    @Test
+    fun identity_doNotReturnGeneratedKeys() {
+        val i = Meta.identityStrategy
+        val strategies = listOf(
+            IdentityStrategy(null, "AAA"),
+            IdentityStrategy(null, "BBB"),
+            IdentityStrategy(null, "CCC")
+        )
+        val result1 = db.runQuery {
+            QueryDsl.insert(i).multiple(strategies).options {
+                it.copy(returnGeneratedKeys = false)
+            }
+        }
+        val result2 = db.runQuery {
+            QueryDsl.from(i)
+                .where { i.value inList listOf("AAA", "BBB", "CCC") }
+                .orderBy(i.value)
+        }
+        assertEquals(listOf("AAA", "BBB", "CCC"), result2.map { it.value })
+        assertTrue(result1.all { it.id == null })
     }
 
     @Test
