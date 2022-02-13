@@ -255,5 +255,4 @@ class InsertBatchTest(private val db: JdbcDatabase) {
             else -> assertEquals(listOf(1, 1, 1), counts)
         }
     }
-
 }
