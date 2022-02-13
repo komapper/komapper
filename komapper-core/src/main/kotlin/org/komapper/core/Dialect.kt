@@ -293,7 +293,7 @@ interface Dialect {
      */
     fun supportsOptimisticLockOfBatchExecution(): Boolean = true
 
-/**
+    /**
      * Returns whether the table hint is supported.
      */
     fun supportsTableHint(): Boolean = false
