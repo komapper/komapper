@@ -51,7 +51,7 @@ internal class R2dbcExecutor(
                 }
             }
         }.catch {
-            translateThrowable(it)
+            translateException(it)
         }
     }
 
@@ -76,7 +76,7 @@ internal class R2dbcExecutor(
                 }
             }
         }.catch {
-            translateThrowable(it)
+            translateException(it)
         }.single()
     }
 
@@ -114,7 +114,7 @@ internal class R2dbcExecutor(
                 }
             }
         }.catch {
-            translateThrowable(it)
+            translateException(it)
         }.toList()
     }
 
@@ -140,18 +140,19 @@ internal class R2dbcExecutor(
                 }
             }
         }.catch {
-            translateThrowable(it)
+            translateException(it)
         }.collect()
     }
 
     /**
-     * Translates a [Throwable] to a [RuntimeException].
+     * Translates a [Exception] to a [RuntimeException].
      */
-    private fun translateThrowable(cause: Throwable) {
+    private fun translateException(cause: Throwable) {
         when (cause) {
             is R2dbcDataIntegrityViolationException -> throw UniqueConstraintException(cause)
             is RuntimeException -> throw cause
-            else -> throw RuntimeException(cause)
+            is Exception -> throw RuntimeException(cause)
+            else -> throw cause
         }
     }
 
