@@ -23,7 +23,7 @@ interface JdbcDialect : Dialect {
      * @param valueClass the value class
      * @return the value
      */
-    fun getValue(rs: ResultSet, index: Int, valueClass: KClass<*>): Any?
+    fun <T : Any> getValue(rs: ResultSet, index: Int, valueClass: KClass<out T>): T?
 
     /**
      * Returns the value.
@@ -33,7 +33,7 @@ interface JdbcDialect : Dialect {
      * @param valueClass the value class
      * @return the value
      */
-    fun getValue(rs: ResultSet, columnLabel: String, valueClass: KClass<*>): Any?
+    fun <T : Any> getValue(rs: ResultSet, columnLabel: String, valueClass: KClass<out T>): T?
 
     /**
      * Sets the value.
@@ -43,7 +43,7 @@ interface JdbcDialect : Dialect {
      * @param value the value
      * @param valueClass the value class
      */
-    fun setValue(ps: PreparedStatement, index: Int, value: Any?, valueClass: KClass<*>)
+    fun <T : Any> setValue(ps: PreparedStatement, index: Int, value: T?, valueClass: KClass<out T>)
 
     /**
      * Returns the data type.
@@ -51,7 +51,7 @@ interface JdbcDialect : Dialect {
      * @param klass the value class
      * @return the data type
      */
-    fun getDataType(klass: KClass<*>): JdbcDataType<*>
+    fun <T : Any> getDataType(klass: KClass<out T>): JdbcDataType<T>
 
     /**
      * Returns whether the exception indicates that the sequence already exists.
@@ -96,30 +96,26 @@ abstract class JdbcAbstractDialect protected constructor(internalDataTypes: List
     protected val dataTypeMap: Map<KClass<*>, JdbcDataType<*>> = internalDataTypes.associateBy { it.klass }
     override val dataTypes = internalDataTypes
 
-    override fun getValue(rs: ResultSet, index: Int, valueClass: KClass<*>): Any? {
+    override fun <T : Any> getValue(rs: ResultSet, index: Int, valueClass: KClass<out T>): T? {
         val dataType = getDataType(valueClass)
         return dataType.getValue(rs, index)
     }
 
-    override fun getValue(rs: ResultSet, columnLabel: String, valueClass: KClass<*>): Any? {
+    override fun <T : Any> getValue(rs: ResultSet, columnLabel: String, valueClass: KClass<out T>): T? {
         val dataType = getDataType(valueClass)
         return dataType.getValue(rs, columnLabel)
     }
 
-    override fun setValue(ps: PreparedStatement, index: Int, value: Any?, valueClass: KClass<*>) {
+    override fun <T : Any> setValue(ps: PreparedStatement, index: Int, value: T?, valueClass: KClass<out T>) {
         val dataType = getDataType(valueClass)
-        @Suppress("UNCHECKED_CAST")
-        dataType as JdbcDataType<Any>
         dataType.setValue(ps, index, value)
     }
 
-    override fun formatValue(value: Any?, valueClass: KClass<*>, masking: Boolean): String {
+    override fun <T : Any> formatValue(value: T?, valueClass: KClass<out T>, masking: Boolean): String {
         return if (masking) {
             mask
         } else {
             val dataType = getDataType(valueClass)
-            @Suppress("UNCHECKED_CAST")
-            dataType as JdbcDataType<Any>
             dataType.toString(value)
         }
     }
@@ -129,9 +125,11 @@ abstract class JdbcAbstractDialect protected constructor(internalDataTypes: List
         return dataType.name
     }
 
-    override fun getDataType(klass: KClass<*>): JdbcDataType<*> {
-        return dataTypeMap[klass] ?: error(
+    override fun <T : Any> getDataType(klass: KClass<out T>): JdbcDataType<T> {
+        val dataType = dataTypeMap[klass] ?: error(
             "The dataType is not found for the type \"${klass.qualifiedName}\"."
         )
+        @Suppress("UNCHECKED_CAST")
+        return dataType as JdbcDataType<T>
     }
 }

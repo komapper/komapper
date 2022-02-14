@@ -24,7 +24,7 @@ internal class JdbcAbstractDialectTest {
             throw UnsupportedOperationException()
         }
 
-        override fun getDataType(klass: KClass<*>): JdbcDataType<*> {
+        override fun <T : Any> getDataType(klass: KClass<out T>): JdbcDataType<T> {
             throw UnsupportedOperationException()
         }
 

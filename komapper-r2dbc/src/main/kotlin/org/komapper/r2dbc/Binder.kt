@@ -25,7 +25,7 @@ interface Binder {
      * @param value the value
      * @param dataType the data type
      */
-    fun bind(statement: Statement, index: Int, value: Any?, dataType: R2dbcDataType<Any>)
+    fun <T : Any> bind(statement: Statement, index: Int, value: T?, dataType: R2dbcDataType<T>)
 }
 
 object DefaultBinder : Binder {
@@ -34,7 +34,7 @@ object DefaultBinder : Binder {
         return org.komapper.core.Statement.createBindVariable(index, value)
     }
 
-    override fun bind(statement: Statement, index: Int, value: Any?, dataType: R2dbcDataType<Any>) {
+    override fun <T : Any> bind(statement: Statement, index: Int, value: T?, dataType: R2dbcDataType<T>) {
         dataType.setValue(statement, index, value)
     }
 }
@@ -45,7 +45,7 @@ object IndexedBinder : Binder {
         return "$${index + 1}"
     }
 
-    override fun bind(statement: Statement, index: Int, value: Any?, dataType: R2dbcDataType<Any>) {
+    override fun <T : Any> bind(statement: Statement, index: Int, value: T?, dataType: R2dbcDataType<T>) {
         dataType.setValue(statement, "$${index + 1}", value)
     }
 }
@@ -56,7 +56,7 @@ object AtSignBinder : Binder {
         return "@p${index + 1}"
     }
 
-    override fun bind(statement: Statement, index: Int, value: Any?, dataType: R2dbcDataType<Any>) {
+    override fun <T : Any> bind(statement: Statement, index: Int, value: T?, dataType: R2dbcDataType<T>) {
         dataType.setValue(statement, "@p${index + 1}", value)
     }
 }
