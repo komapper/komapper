@@ -13,13 +13,14 @@ interface PropertyMetamodel<ENTITY : Any, EXTERIOR : Any, INTERIOR : Any> : Prop
     val setter: (ENTITY, EXTERIOR) -> ENTITY
     val nullable: Boolean
 
-    fun toValue(entity: ENTITY): Value {
+    fun toValue(entity: ENTITY): Value<INTERIOR> {
         val exterior = getter(entity)
         val interior = if (exterior == null) null else unwrap(exterior)
         return Value(interior, interiorClass, masking)
     }
 }
 
+@Suppress("unused")
 class PropertyMetamodelImpl<ENTITY : Any, EXTERIOR : Any, INTERIOR : Any>(
     override val owner: EntityMetamodel<ENTITY, *, *>,
     private val descriptor: PropertyDescriptor<ENTITY, EXTERIOR, INTERIOR>

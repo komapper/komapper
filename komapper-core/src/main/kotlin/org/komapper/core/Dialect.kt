@@ -70,7 +70,7 @@ interface Dialect {
      * @param masking whether to mask the value
      * @return the formatted value
      */
-    fun formatValue(value: Any?, valueClass: KClass<*>, masking: Boolean): String
+    fun <T : Any> formatValue(value: T?, valueClass: KClass<out T>, masking: Boolean): String
 
     /**
      * Enclose the sql identifier with the [openQuote] and the [closeQuote].
@@ -303,7 +303,7 @@ object DryRunDialect : Dialect {
 
     override val driver: String = "dry_run"
 
-    override fun formatValue(value: Any?, valueClass: KClass<*>, masking: Boolean): String {
+    override fun <T : Any> formatValue(value: T?, valueClass: KClass<out T>, masking: Boolean): String {
         return if (masking) {
             mask
         } else if (value == null) {

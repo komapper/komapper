@@ -14,7 +14,7 @@ import kotlin.reflect.full.valueParameters
 import kotlin.reflect.jvm.jvmErasure
 
 internal interface ExprEvaluator {
-    fun eval(expression: String, ctx: ExprContext = ExprContext()): Value
+    fun eval(expression: String, ctx: ExprContext = ExprContext()): Value<*>
     fun clearCache()
 }
 
@@ -33,12 +33,12 @@ internal class DefaultExprEvaluator(
         data class EnumRef(override val clazz: Class<Enum<*>>) : ClassRef()
     }
 
-    override fun eval(expression: String, ctx: ExprContext): Value {
+    override fun eval(expression: String, ctx: ExprContext): Value<*> {
         val node = exprNodeFactory.get(expression)
         return visit(node, ctx)
     }
 
-    private fun visit(node: ExprNode, ctx: ExprContext): Value = when (node) {
+    private fun visit(node: ExprNode, ctx: ExprContext): Value<*> = when (node) {
         is ExprNode.Not -> perform(node.location, node.operand, ctx) { !it }
         is ExprNode.And -> perform(node.location, node.left, node.right, ctx) { x, y -> x && y }
         is ExprNode.Or -> perform(node.location, node.left, node.right, ctx) { x, y -> x || y }
@@ -69,7 +69,7 @@ internal class DefaultExprEvaluator(
         operand: ExprNode,
         ctx: ExprContext,
         f: (Boolean) -> Boolean
-    ): Value {
+    ): Value<Boolean> {
         fun checkNull(location: ExprLocation, value: Any?) {
             if (value != null) {
                 return
@@ -95,7 +95,7 @@ internal class DefaultExprEvaluator(
         rightNode: ExprNode,
         ctx: ExprContext,
         f: (Boolean, Boolean) -> Boolean
-    ): Value {
+    ): Value<Boolean> {
         fun checkNull(location: ExprLocation, value: Any?, which: String) {
             if (value != null) {
                 return
@@ -124,7 +124,7 @@ internal class DefaultExprEvaluator(
         rightNode: ExprNode,
         ctx: ExprContext,
         f: (Any?, Any?) -> Boolean
-    ): Value {
+    ): Value<Boolean> {
         val (left) = visit(leftNode, ctx)
         val (right) = visit(rightNode, ctx)
         return Value(f(left, right), Boolean::class)
@@ -137,7 +137,7 @@ internal class DefaultExprEvaluator(
         rightNode: ExprNode,
         ctx: ExprContext,
         f: (Comparable<Any>, Comparable<Any>) -> Boolean
-    ): Value {
+    ): Value<Boolean> {
         fun checkNull(location: ExprLocation, value: Any?, which: String) {
             if (value != null) {
                 return
@@ -162,7 +162,7 @@ internal class DefaultExprEvaluator(
         }
     }
 
-    private fun visitClassRef(node: ExprNode.ClassRef, @Suppress("UNUSED_PARAMETER") ctx: ExprContext): Value {
+    private fun visitClassRef(node: ExprNode.ClassRef, @Suppress("UNUSED_PARAMETER") ctx: ExprContext): Value<*> {
         val clazz =
             try {
                 classResolver(node.name)
@@ -179,11 +179,11 @@ internal class DefaultExprEvaluator(
         }
     }
 
-    private fun visitValue(node: ExprNode.Value, ctx: ExprContext): Value {
+    private fun visitValue(node: ExprNode.Value, ctx: ExprContext): Value<*> {
         return ctx.valueMap[node.name] ?: exprEnvironment.ctx[node.name] ?: Value(null, Any::class)
     }
 
-    private fun visitProperty(node: ExprNode.Property, ctx: ExprContext): Value {
+    private fun visitProperty(node: ExprNode.Property, ctx: ExprContext): Value<*> {
         val (receiver, receiverType) = visit(node.receiver, ctx)
         if (receiver is ClassRef.EnumRef) {
             val enum = receiver.clazz.enumConstants.first { it.name == node.name }
@@ -213,8 +213,8 @@ internal class DefaultExprEvaluator(
             ?: exprEnvironment.topLevelPropertyExtensions.find(::predicate)
     }
 
-    private fun visitFunction(node: ExprNode.Function, ctx: ExprContext): Value {
-        fun call(function: KFunction<*>, arguments: List<Any?>): Value {
+    private fun visitFunction(node: ExprNode.Function, ctx: ExprContext): Value<*> {
+        fun call(function: KFunction<*>, arguments: List<Any?>): Value<*> {
             try {
                 return Value(function.call(*arguments.toTypedArray()), function.returnType.jvmErasure)
             } catch (cause: Exception) {

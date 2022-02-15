@@ -11,11 +11,9 @@ sealed class Operand {
     }
     data class Argument<T : Any, S : Any>(private val expression: ColumnExpression<T, S>, private val exterior: T?) : Operand() {
         override val masking: Boolean get() = expression.masking
-        val value: Value get() = if (exterior == null) {
-            Value(null, expression.interiorClass, expression.masking)
-        } else {
-            val interior = expression.unwrap(exterior)
-            Value(interior, expression.interiorClass, expression.masking)
+        val value: Value<S> get() {
+            val interior = if (exterior == null) null else expression.unwrap(exterior)
+            return Value(interior, expression.interiorClass, expression.masking)
         }
     }
 }

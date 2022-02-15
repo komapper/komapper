@@ -16,7 +16,7 @@ class StatementBuffer {
         return this
     }
 
-    fun bind(value: Value): StatementBuffer {
+    fun bind(value: Value<*>): StatementBuffer {
         parts.add(StatementPart.Value(value))
         return this
     }

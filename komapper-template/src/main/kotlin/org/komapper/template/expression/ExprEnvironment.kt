@@ -6,12 +6,12 @@ import kotlin.reflect.KProperty
 import kotlin.reflect.jvm.isAccessible
 
 internal interface ExprEnvironment {
-    val ctx: Map<String, Value>
+    val ctx: Map<String, Value<*>>
     val topLevelPropertyExtensions: List<KProperty<*>>
     val topLevelFunctionExtensions: List<KFunction<*>>
 }
 
-internal class DefaultExprEnvironment(override val ctx: Map<String, Value> = emptyMap()) : ExprEnvironment {
+internal class DefaultExprEnvironment(override val ctx: Map<String, Value<*>> = emptyMap()) : ExprEnvironment {
 
     override val topLevelPropertyExtensions: List<KProperty<*>> = listOf(
         CharSequence::lastIndex

@@ -25,7 +25,7 @@ internal class JdbcExecutor(
     ): T {
         @Suppress("NAME_SHADOWING")
         val statement = inspect(statement)
-        return withThrowableTranslator {
+        return withExceptionTranslator {
             config.session.connection.use { con ->
                 log(statement)
                 prepare(con, statement).use { ps ->
@@ -46,7 +46,7 @@ internal class JdbcExecutor(
     ): R {
         @Suppress("NAME_SHADOWING")
         val statement = inspect(statement)
-        return withThrowableTranslator {
+        return withExceptionTranslator {
             config.session.connection.use { con ->
                 prepare(con, statement).use { ps ->
                     setUp(ps)
@@ -72,7 +72,7 @@ internal class JdbcExecutor(
     fun executeUpdate(statement: Statement): Pair<Int, List<Long>> {
         @Suppress("NAME_SHADOWING")
         val statement = inspect(statement)
-        return withThrowableTranslator {
+        return withExceptionTranslator {
             config.session.connection.use { con ->
                 prepare(con, statement).use { ps ->
                     setUp(ps)
@@ -90,7 +90,7 @@ internal class JdbcExecutor(
         require(statements.isNotEmpty())
         @Suppress("NAME_SHADOWING")
         val statements = statements.map { inspect(it) }
-        return withThrowableTranslator {
+        return withExceptionTranslator {
             config.session.connection.use { con ->
                 prepare(con, statements.first()).use { ps ->
                     setUp(ps)
@@ -124,7 +124,7 @@ internal class JdbcExecutor(
     fun execute(statements: List<Statement>, handler: (SQLException) -> Unit = { throw it }) {
         @Suppress("NAME_SHADOWING")
         val statements = statements.map { inspect(it) }
-        withThrowableTranslator {
+        withExceptionTranslator {
             config.session.connection.use { con ->
                 for (statement in statements) {
                     con.createStatement().use { s ->
@@ -143,9 +143,9 @@ internal class JdbcExecutor(
     }
 
     /**
-     * Translates a [Throwable] to a [RuntimeException].
+     * Translates a [Exception] to a [RuntimeException].
      */
-    private fun <T> withThrowableTranslator(block: () -> T): T {
+    private fun <T> withExceptionTranslator(block: () -> T): T {
         return try {
             block()
         } catch (e: SQLException) {
@@ -155,8 +155,10 @@ internal class JdbcExecutor(
             throw JdbcException(e)
         } catch (e: RuntimeException) {
             throw e
+        } catch (e: Exception) {
+            throw RuntimeException(e)
         } catch (cause: Throwable) {
-            throw RuntimeException(cause)
+            throw cause
         }
     }
 

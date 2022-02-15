@@ -24,7 +24,7 @@ interface R2dbcDialect : Dialect {
      * @param valueClass the value class
      * @return the value
      */
-    fun getValue(row: Row, index: Int, valueClass: KClass<*>): Any?
+    fun <T : Any> getValue(row: Row, index: Int, valueClass: KClass<out T>): T?
 
     /**
      * Returns the value.
@@ -34,7 +34,7 @@ interface R2dbcDialect : Dialect {
      * @param valueClass the value class
      * @return the value
      */
-    fun getValue(row: Row, columnLabel: String, valueClass: KClass<*>): Any?
+    fun <T : Any> getValue(row: Row, columnLabel: String, valueClass: KClass<out T>): T?
 
     /**
      * Sets the value.
@@ -44,7 +44,7 @@ interface R2dbcDialect : Dialect {
      * @param value the value
      * @param valueClass the value class
      */
-    fun setValue(statement: Statement, index: Int, value: Any?, valueClass: KClass<*>)
+    fun <T : Any> setValue(statement: Statement, index: Int, value: T?, valueClass: KClass<out T>)
 
     /**
      * Returns the data type.
@@ -52,7 +52,7 @@ interface R2dbcDialect : Dialect {
      * @param klass the value class
      * @return the data type
      */
-    fun getDataType(klass: KClass<*>): R2dbcDataType<*>
+    fun <T : Any> getDataType(klass: KClass<out T>): R2dbcDataType<T>
 
     /**
      * Returns whether the exception indicates that the sequence already exists.
@@ -93,39 +93,37 @@ abstract class R2dbcAbstractDialect protected constructor(internalDataTypes: Lis
         return binder.createBindVariable(index, value)
     }
 
-    override fun getValue(row: Row, index: Int, valueClass: KClass<*>): Any? {
+    override fun <T : Any> getValue(row: Row, index: Int, valueClass: KClass<out T>): T? {
         val dataType = getDataType(valueClass)
         return dataType.getValue(row, index)
     }
 
-    override fun getValue(row: Row, columnLabel: String, valueClass: KClass<*>): Any? {
+    override fun <T : Any> getValue(row: Row, columnLabel: String, valueClass: KClass<out T>): T? {
         val dataType = getDataType(valueClass)
         return dataType.getValue(row, columnLabel)
     }
 
-    override fun setValue(statement: Statement, index: Int, value: Any?, valueClass: KClass<*>) {
+    override fun <T : Any> setValue(statement: Statement, index: Int, value: T?, valueClass: KClass<out T>) {
         val dataType = getDataType(valueClass)
-        @Suppress("UNCHECKED_CAST")
-        dataType as R2dbcDataType<Any>
         val bindMarker = getBinder()
         return bindMarker.bind(statement, index, value, dataType)
     }
 
-    override fun formatValue(value: Any?, valueClass: KClass<*>, masking: Boolean): String {
+    override fun <T : Any> formatValue(value: T?, valueClass: KClass<out T>, masking: Boolean): String {
         return if (masking) {
             mask
         } else {
             val dataType = getDataType(valueClass)
-            @Suppress("UNCHECKED_CAST")
-            dataType as R2dbcDataType<Any>
             return dataType.toString(value)
         }
     }
 
-    override fun getDataType(klass: KClass<*>): R2dbcDataType<*> {
-        return dataTypeMap[klass] ?: error(
+    override fun <T : Any> getDataType(klass: KClass<out T>): R2dbcDataType<T> {
+        val dataType = dataTypeMap[klass] ?: error(
             "The dataType is not found for the type \"${klass.qualifiedName}\"."
         )
+        @Suppress("UNCHECKED_CAST")
+        return dataType as R2dbcDataType<T>
     }
 
     override fun getDataTypeName(klass: KClass<*>): String {
