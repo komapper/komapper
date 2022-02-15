@@ -218,7 +218,7 @@ internal class TwoWayTemplateStatementBuilder(
 
     private fun newValue(o: Any?) = Value(o, o?.let { it::class } ?: Any::class)
 
-    private fun eval(location: SqlLocation, expression: String, ctx: ExprContext): Value = try {
+    private fun eval(location: SqlLocation, expression: String, ctx: ExprContext): Value<*> = try {
         exprEvaluator.eval(expression, ctx)
     } catch (e: ExprException) {
         throw SqlException("The expression evaluation was failed at $location.", e)
@@ -233,7 +233,7 @@ internal class TwoWayTemplateStatementBuilder(
         constructor(state: State) : this(ExprContext(state.valueMap))
 
         private val buf = StatementBuffer()
-        val valueMap: MutableMap<String, Value> = HashMap(ctx.valueMap)
+        val valueMap: MutableMap<String, Value<*>> = HashMap(ctx.valueMap)
         var available: Boolean = false
 
         fun asExprContext(): ExprContext {
@@ -250,7 +250,7 @@ internal class TwoWayTemplateStatementBuilder(
             return this
         }
 
-        fun bind(value: Value): State {
+        fun bind(value: Value<*>): State {
             buf.bind(value)
             return this
         }

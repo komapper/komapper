@@ -10,6 +10,6 @@ import kotlin.reflect.KClass
  * @property masking whether the value is masked or not in log
  */
 @ThreadSafe
-data class Value(val any: Any?, val klass: KClass<*>, val masking: Boolean = false) {
-    constructor(any: Any) : this(any, any::class)
+data class Value<T : Any>(val any: T?, val klass: KClass<out T>, val masking: Boolean = false) {
+    constructor(any: T) : this(any, any::class)
 }

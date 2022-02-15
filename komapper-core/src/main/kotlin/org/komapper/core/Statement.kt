@@ -25,7 +25,7 @@ data class Statement(val parts: List<StatementPart>) {
     /**
      * The arguments of the SQL statement.
      */
-    val args: List<Value> = parts.filterIsInstance<StatementPart.Value>().map { it.value }
+    val args: List<Value<*>> = parts.filterIsInstance<StatementPart.Value>().map { it.value }
 
     /**
      * Converts the SQL statement to an SQL string.
@@ -74,7 +74,7 @@ data class Statement(val parts: List<StatementPart>) {
 data class DryRunStatement internal constructor(
     val sql: String = "",
     val sqlWithArgs: String = "",
-    val args: List<Value> = emptyList(),
+    val args: List<Value<*>> = emptyList(),
 ) {
 
     companion object {
@@ -89,7 +89,7 @@ data class DryRunStatement internal constructor(
         fun of(statements: List<Statement>, dialect: Dialect): DryRunStatement {
             val sql = statements.joinToString(separator = ";") { it.toSql(dialect::createBindVariable) }
             val sqlWithArgs = statements.joinToString { it.toSqlWithArgs(dialect::formatValue) }
-            val args = statements.fold(emptyList<Value>()) { acc, statement -> acc + statement.args }
+            val args = statements.fold(emptyList<Value<*>>()) { acc, statement -> acc + statement.args }
             return DryRunStatement(sql = sql, sqlWithArgs = sqlWithArgs, args = args)
         }
     }
