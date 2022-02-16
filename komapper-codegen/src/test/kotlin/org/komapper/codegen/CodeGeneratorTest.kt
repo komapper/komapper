@@ -1,7 +1,6 @@
 package org.komapper.codegen
 
 import org.junit.jupiter.api.io.TempDir
-import org.komapper.jdbc.dsl.query.MetadataQuery
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.sql.Types
@@ -19,17 +18,21 @@ class CodeGeneratorTest {
     fun generateEntities() {
         val destinationDir = tempDir!!.resolve(Paths.get("src", "kotlin", "main"))
         val generator = CodeGenerator(
-            destinationDir = destinationDir,
-            packageName = "entity",
-            tables = createTables()
+            "entity",
+            "",
+            "",
+            createTables()
         )
-        generator.generateEntities {
-            when (it.typeName.lowercase()) {
-                "integer" -> Int::class
-                "uuid" -> UUID::class
-                else -> String::class
+        generator.createNewFile(destinationDir, "entities.kt", false).use { writer ->
+            generator.generateEntities(writer, false) { _, column ->
+                when (column.typeName.lowercase()) {
+                    "integer" -> Int::class.simpleName.toString()
+                    "uuid" -> UUID::class.qualifiedName.toString()
+                    else -> String::class.simpleName.toString()
+                }
             }
         }
+
         val file = destinationDir.resolve(Paths.get("entity", "entities.kt"))
         val expected = """
             package entity
@@ -54,15 +57,18 @@ class CodeGeneratorTest {
     fun generateEntities_declareAsNullable() {
         val destinationDir = tempDir!!.resolve(Paths.get("src", "kotlin", "main"))
         val generator = CodeGenerator(
-            destinationDir = destinationDir,
-            packageName = "entity",
-            tables = createTables()
+            "entity",
+            "",
+            "",
+            createTables()
         )
-        generator.generateEntities(declareAsNullable = true) {
-            when (it.typeName.lowercase()) {
-                "integer" -> Int::class
-                "uuid" -> UUID::class
-                else -> null
+        generator.createNewFile(destinationDir, "entities.kt", false).use { writer ->
+            generator.generateEntities(writer, true) { _, column ->
+                when (column.typeName.lowercase()) {
+                    "integer" -> Int::class.simpleName.toString()
+                    "uuid" -> UUID::class.qualifiedName.toString()
+                    else -> String::class.simpleName.toString()
+                }
             }
         }
         val file = destinationDir.resolve(Paths.get("entity", "entities.kt"))
@@ -89,11 +95,14 @@ class CodeGeneratorTest {
     fun generateEntityDefinition() {
         val destinationDir = tempDir!!.resolve(Paths.get("src", "kotlin", "main"))
         val generator = CodeGenerator(
-            destinationDir = destinationDir,
-            packageName = "entity",
-            tables = createTables()
+            "entity",
+            "",
+            "",
+            createTables()
         )
-        generator.generateDefinitions()
+        generator.createNewFile(destinationDir, "entityDefinitions.kt", false).use { writer ->
+            generator.generateDefinitions(writer, false, false)
+        }
         val file = destinationDir.resolve(Paths.get("entity", "entityDefinitions.kt"))
         val expected = """
             package entity
@@ -124,40 +133,53 @@ class CodeGeneratorTest {
         assertEquals(expected, file.readText())
     }
 
-    private fun createTables(): List<MetadataQuery.Table> {
+    private fun createTables(): List<MutableTable> {
+
         return listOf(
-            MetadataQuery.Table(
-                name = "ADDRESS",
+            MutableTable().apply {
+                name = "ADDRESS"
                 columns = listOf(
-                    MetadataQuery.Column(
-                        name = "ADDRESS_ID",
-                        dataType = Types.INTEGER,
-                        typeName = "integer",
-                        isPrimaryKey = true,
-                        isAutoIncrement = true
-                    ),
-                    MetadataQuery.Column(
-                        name = "STREET",
-                        dataType = Types.VARCHAR,
-                        typeName = "varchar",
-                        nullable = true
-                    ),
-                    MetadataQuery.Column(name = "VERSION", dataType = Types.INTEGER, typeName = "integer"),
-                ),
-            ),
-            MetadataQuery.Table(
-                name = "EMPLOYEE",
-                columns = listOf(
-                    MetadataQuery.Column(
-                        name = "EMPLOYEE_ID",
-                        dataType = Types.OTHER,
-                        typeName = "uuid",
+                    MutableColumn().apply {
+                        name = "ADDRESS_ID"
+                        dataType = Types.INTEGER
+                        typeName = "integer"
                         isPrimaryKey = true
-                    ),
-                    MetadataQuery.Column(name = "NAME", dataType = Types.VARCHAR, typeName = "varchar"),
-                    MetadataQuery.Column(name = "VERSION", dataType = Types.INTEGER, typeName = "integer"),
-                ),
-            )
+                        isAutoIncrement = true
+                    },
+                    MutableColumn().apply {
+                        name = "STREET"
+                        dataType = Types.VARCHAR
+                        typeName = "varchar"
+                        nullable = true
+                    },
+                    MutableColumn().apply {
+                        name = "VERSION"
+                        dataType = Types.INTEGER
+                        typeName = "integer"
+                    }
+                )
+            },
+            MutableTable().apply {
+                name = "EMPLOYEE"
+                columns = listOf(
+                    MutableColumn().apply {
+                        name = "EMPLOYEE_ID"
+                        dataType = Types.OTHER
+                        typeName = "uuid"
+                        isPrimaryKey = true
+                    },
+                    MutableColumn().apply {
+                        name = "NAME"
+                        dataType = Types.VARCHAR
+                        typeName = "varchar"
+                    },
+                    MutableColumn().apply {
+                        name = "VERSION"
+                        dataType = Types.INTEGER
+                        typeName = "integer"
+                    }
+                )
+            }
         )
     }
 }

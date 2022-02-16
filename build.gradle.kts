@@ -20,7 +20,7 @@ val integrationTestProjects = subprojects.filter {
     it.name.startsWith("integration-test")
 }
 val javaProjects = subprojects.filter {
-    it.name.startsWith("komapper-quarkus")
+    it.name.startsWith("komapper-quarkus") || it.name == "komapper-codegen"
 }
 val kotlinProjects = subprojects - platformProject - javaProjects.toSet()
 

@@ -37,14 +37,6 @@ dependencies {
     testImplementation(gradleTestKit())
 }
 
-configurations.all {
-    resolutionStrategy.eachDependency {
-        if (requested.group == "org.jetbrains.kotlin") {
-            useVersion("1.5.31")
-        }
-    }
-}
-
 tasks {
     publishPlugins {
         enabled = isReleaseVersion
