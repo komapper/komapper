@@ -112,7 +112,7 @@ configure(libraryProjects + platformProject) {
                 pom {
                     val projectUrl: String by project
                     name.set(project.name)
-                    description.set("Kotlin SQL Mapper")
+                    description.set(project.description)
                     url.set(projectUrl)
                     licenses {
                         license {

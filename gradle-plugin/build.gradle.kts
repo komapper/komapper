@@ -14,8 +14,8 @@ gradlePlugin {
     plugins {
         create("gradlePlugin") {
             id = "org.komapper.gradle"
-            displayName = "Komapper Gradle Plugin"
-            description = "Komapper Gradle Plugin"
+            displayName = project.description
+            description = project.description
             implementationClass = "org.komapper.gradle.KomapperPlugin"
         }
     }
