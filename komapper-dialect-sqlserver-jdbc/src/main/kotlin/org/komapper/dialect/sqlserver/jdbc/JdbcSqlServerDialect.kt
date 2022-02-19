@@ -55,19 +55,19 @@ class JdbcSqlServerDialect(
 
     override fun isUniqueConstraintViolationError(exception: SQLException): Boolean {
         return exception.filterIsInstance<SQLException>().any {
-            return it.errorCode == SqlServerDialect.UNIQUE_CONSTRAINT_VIOLATION_ERROR_CODE
+            it.errorCode == SqlServerDialect.UNIQUE_CONSTRAINT_VIOLATION_ERROR_CODE
         }
     }
 
     override fun isSequenceExistsError(exception: SQLException): Boolean {
         return exception.filterIsInstance<SQLException>().any {
-            return it.errorCode == SqlServerDialect.OBJECT_ALREADY_EXISTS_ERROR_CODE
+            it.errorCode == SqlServerDialect.OBJECT_ALREADY_EXISTS_ERROR_CODE
         }
     }
 
     override fun isTableExistsError(exception: SQLException): Boolean {
         return exception.filterIsInstance<SQLException>().any {
-            return it.errorCode == SqlServerDialect.OBJECT_ALREADY_EXISTS_ERROR_CODE
+            it.errorCode == SqlServerDialect.OBJECT_ALREADY_EXISTS_ERROR_CODE
         }
     }
 
