@@ -188,10 +188,10 @@ internal class R2dbcExecutor(
     private fun prepare(con: Connection, statement: Statement): io.r2dbc.spi.Statement {
         val sql = asSql(statement)
         val r2dbcStmt = con.createStatement(sql)
-        return if (generatedColumn != null) {
-            r2dbcStmt.returnGeneratedValues(generatedColumn)
-        } else {
+        return if (generatedColumn == null) {
             r2dbcStmt
+        } else {
+            r2dbcStmt.returnGeneratedValues(generatedColumn)
         }
     }
 

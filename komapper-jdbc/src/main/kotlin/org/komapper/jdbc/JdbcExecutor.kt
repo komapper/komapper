@@ -79,10 +79,10 @@ internal class JdbcExecutor(
                     log(statement)
                     bind(ps, statement)
                     val count = ps.executeUpdate()
-                    val keys = if (generatedColumn != null) {
-                        fetchGeneratedKeys(ps)
-                    } else {
+                    val keys = if (generatedColumn == null) {
                         emptyList()
+                    } else {
+                        fetchGeneratedKeys(ps)
                     }
                     count to keys
                 }
@@ -110,12 +110,12 @@ internal class JdbcExecutor(
                             ps.addBatch()
                         }
                         val counts = ps.executeBatch()
-                        val pairs = if (generatedColumn != null) {
+                        val pairs = if (generatedColumn == null) {
+                            counts.map { it to null }
+                        } else {
                             val keys = fetchGeneratedKeys(ps)
                             check(counts.size == keys.size) { "counts.size=${counts.size}, keys.size=${keys.size}" }
                             counts.zip(keys)
-                        } else {
-                            counts.map { it to null }
                         }
                         countAndKeyList.addAll(pairs)
                     }
@@ -184,14 +184,14 @@ internal class JdbcExecutor(
 
     private fun prepare(con: Connection, statement: Statement): PreparedStatement {
         val sql = asSql(statement)
-        return if (generatedColumn != null) {
+        return if (generatedColumn == null) {
+            con.prepareStatement(sql)
+        } else {
             if (config.dialect.supportsReturnGeneratedKeysFlag()) {
                 con.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS)
             } else {
                 con.prepareStatement(sql, arrayOf(generatedColumn))
             }
-        } else {
-            con.prepareStatement(sql)
         }
     }
 
