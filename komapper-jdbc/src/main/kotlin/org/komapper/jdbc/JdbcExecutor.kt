@@ -27,9 +27,9 @@ internal class JdbcExecutor(
         val statement = inspect(statement)
         return withExceptionTranslator {
             config.session.connection.use { con ->
-                log(statement)
                 prepare(con, statement).use { ps ->
                     setUp(ps)
+                    log(statement)
                     bind(ps, statement)
                     ps.executeQuery().use { rs ->
                         transform(rs)

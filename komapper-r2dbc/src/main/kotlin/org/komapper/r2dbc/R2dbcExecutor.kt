@@ -1,19 +1,18 @@
 package org.komapper.r2dbc
 
+import io.r2dbc.spi.Connection
 import io.r2dbc.spi.R2dbcDataIntegrityViolationException
 import io.r2dbc.spi.Result
 import io.r2dbc.spi.Row
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.emitAll
-import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.reactive.asFlow
+import kotlinx.coroutines.reactive.collect
 import org.komapper.core.ExecutionOptionsProvider
 import org.komapper.core.Statement
 import org.komapper.core.UniqueConstraintException
@@ -27,133 +26,108 @@ internal class R2dbcExecutor(
 
     private val executionOptions = config.executionOptions + executionOptionsProvider.getExecutionOptions()
 
-    @OptIn(kotlinx.coroutines.FlowPreview::class)
     fun <T> executeQuery(
         statement: Statement,
         transform: (R2dbcDialect, Row) -> T
     ): Flow<T> {
         @Suppress("NAME_SHADOWING")
         val statement = inspect(statement)
-        return config.session.connection.asFlow().flatMapConcat { con ->
-            con.use {
-                val r2dbcStmt = prepare(con, statement)
-                setUp(r2dbcStmt)
-                log(statement)
-                bind(r2dbcStmt, statement)
-                r2dbcStmt.execute().asFlow().flatMapConcat { result ->
+        return config.session.connection.use { con ->
+            val r2dbcStmt = prepare(con, statement)
+            setUp(r2dbcStmt)
+            log(statement)
+            bind(r2dbcStmt, statement)
+            flow {
+                r2dbcStmt.execute().collect { result ->
                     result.map { row, _ ->
                         transform(config.dialect, row) ?: Null
-                    }.asFlow().map {
+                    }.collect {
                         val nullable = if (it is Null) null else it
                         @Suppress("UNCHECKED_CAST")
                         nullable as T
+                        emit(nullable)
                     }
                 }
             }
-        }.catch {
-            translateException(it)
         }
     }
 
-    @OptIn(kotlinx.coroutines.FlowPreview::class)
     suspend fun executeUpdate(statement: Statement): Pair<Int, List<Long>> {
         @Suppress("NAME_SHADOWING")
         val statement = inspect(statement)
-        return config.session.connection.asFlow().flatMapConcat { con ->
-            con.use {
-                val r2dbcStmt = prepare(con, statement)
-                setUp(r2dbcStmt)
-                log(statement)
-                bind(r2dbcStmt, statement)
-                r2dbcStmt.execute().asFlow().map { result ->
+        return config.session.connection.use { con ->
+            val r2dbcStmt = prepare(con, statement)
+            setUp(r2dbcStmt)
+            log(statement)
+            bind(r2dbcStmt, statement)
+            flow<Pair<Int, List<Long>>> {
+                r2dbcStmt.execute().collect { result ->
                     if (generatedColumn == null) {
-                        val count = result.rowsUpdated.asFlow().single()
-                        count to emptyList()
+                        result.rowsUpdated.collect { count -> emit(count to emptyList()) }
                     } else {
                         val keys = fetchGeneratedKeys(result).asFlow().toList()
-                        keys.size to keys
+                        emit(keys.size to keys)
                     }
                 }
             }
-        }.catch {
-            translateException(it)
         }.single()
     }
 
-    @OptIn(kotlinx.coroutines.FlowPreview::class)
     suspend fun executeBatch(statements: List<Statement>): List<Pair<Int, Long?>> {
         require(statements.isNotEmpty())
         @Suppress("NAME_SHADOWING")
         val statements = statements.map { inspect(it) }
         val batchSize = executionOptions.batchSize?.let { if (it > 0) it else null } ?: 10
         val batchStatementsList = statements.chunked(batchSize)
-        return config.session.connection.asFlow().flatMapConcat { con ->
-            con.use {
-                flow {
-                    for (batchStatements in batchStatementsList) {
-                        val r2dbcStmt = prepare(con, batchStatements.first())
-                        setUp(r2dbcStmt)
-                        val iterator = batchStatements.iterator()
-                        while (iterator.hasNext()) {
-                            val statement = iterator.next()
-                            log(statement)
-                            bind(r2dbcStmt, statement)
-                            if (iterator.hasNext()) {
-                                r2dbcStmt.add()
-                            }
+        return config.session.connection.use { con ->
+            flow {
+                for (batchStatements in batchStatementsList) {
+                    val r2dbcStmt = prepare(con, batchStatements.first())
+                    setUp(r2dbcStmt)
+                    val iterator = batchStatements.iterator()
+                    while (iterator.hasNext()) {
+                        val statement = iterator.next()
+                        log(statement)
+                        bind(r2dbcStmt, statement)
+                        if (iterator.hasNext()) {
+                            r2dbcStmt.add()
                         }
-                        val countAndKeyPairs = r2dbcStmt.execute().asFlow().flatMapConcat { result ->
-                            if (generatedColumn == null) {
-                                result.rowsUpdated.asFlow().map { count -> count to null }
-                            } else {
-                                fetchGeneratedKeys(result).asFlow().map { key -> 1 to key }
-                            }
+                    }
+                    r2dbcStmt.execute().collect { result ->
+                        if (generatedColumn == null) {
+                            result.rowsUpdated.collect { count -> emit(count to null) }
+                        } else {
+                            fetchGeneratedKeys(result).collect { key -> emit(1 to key) }
                         }
-                        emitAll(countAndKeyPairs)
                     }
                 }
             }
-        }.catch {
-            translateException(it)
         }.toList()
     }
 
-    @OptIn(kotlinx.coroutines.FlowPreview::class)
     suspend fun execute(statements: List<Statement>, predicate: (Result.Message) -> Boolean = { true }) {
         @Suppress("NAME_SHADOWING")
         val statements = statements.map { inspect(it) }
-        config.session.connection.asFlow().flatMapConcat { con ->
-            con.use {
-                val batch = con.createBatch()
-                for (statement in statements) {
-                    log(statement)
-                    val sql = asSql(statement)
-                    batch.add(sql)
-                }
-                batch.execute().asFlow().flatMapConcat { result ->
+        config.session.connection.use { con ->
+            val batch = con.createBatch()
+            for (statement in statements) {
+                log(statement)
+                val sql = asSql(statement)
+                batch.add(sql)
+            }
+            flow<Int> {
+                batch.execute().collect { result ->
                     result.filter {
                         when (it) {
                             is Result.Message -> predicate(it)
                             else -> true
                         }
-                    }.rowsUpdated.asFlow()
+                    }.rowsUpdated.collect {
+                        emit(it)
+                    }
                 }
             }
-        }.catch {
-            translateException(it)
         }.collect()
-    }
-
-    /**
-     * Translates a [Exception] to a [RuntimeException].
-     */
-    private fun translateException(cause: Throwable) {
-        when (cause) {
-            is R2dbcDataIntegrityViolationException -> throw UniqueConstraintException(cause)
-            is RuntimeException -> throw cause
-            is Exception -> throw RuntimeException(cause)
-            else -> throw cause
-        }
     }
 
     private fun inspect(statement: Statement): Statement {
@@ -172,7 +146,7 @@ internal class R2dbcExecutor(
         return statement.toSql(config.dialect::createBindVariable)
     }
 
-    private fun prepare(con: io.r2dbc.spi.Connection, statement: Statement): io.r2dbc.spi.Statement {
+    private fun prepare(con: Connection, statement: Statement): io.r2dbc.spi.Statement {
         val sql = asSql(statement)
         val r2dbcStmt = con.createStatement(sql)
         return if (generatedColumn != null) {
@@ -202,14 +176,37 @@ internal class R2dbcExecutor(
     }
 }
 
-private fun <T> io.r2dbc.spi.Closeable.use(block: (io.r2dbc.spi.Closeable) -> Flow<T>): Flow<T> {
-    return runCatching {
-        block(this)
-    }.onSuccess { flow ->
-        flow.onCompletion { close() }
-    }.onFailure {
-        close()
-    }.getOrThrow()
+private fun <T> Publisher<out Connection>.use(block: (Connection) -> Flow<T>): Flow<T> {
+    return flow<T> {
+        val con = this@use.asFlow().single()
+        runCatching {
+            block(con)
+        }.onSuccess { flow ->
+            flow.onCompletion { con.close() }
+        }.onFailure { cause ->
+            runCatching {
+                con.close()
+            }.onFailure {
+                cause.addSuppressed(it)
+            }
+        }.getOrThrow().collect {
+            emit(it)
+        }
+    }.catch {
+        translateException(it)
+    }
+}
+
+/**
+ * Translates a [Exception] to a [RuntimeException].
+ */
+private fun translateException(cause: Throwable) {
+    when (cause) {
+        is R2dbcDataIntegrityViolationException -> throw UniqueConstraintException(cause)
+        is RuntimeException -> throw cause
+        is Exception -> throw RuntimeException(cause)
+        else -> throw cause
+    }
 }
 
 private object Null

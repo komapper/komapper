@@ -152,7 +152,7 @@ jobs:
           arguments: :integration-test-r2dbc:${{ matrix.driver }} -i
 
       - name: Upload reports
-        if: failure()
+        if: always()
         uses: actions/upload-artifact@v2
         with:
           name: r2dbc-${{ matrix.driver }}
