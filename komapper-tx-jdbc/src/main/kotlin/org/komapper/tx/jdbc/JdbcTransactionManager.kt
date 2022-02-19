@@ -14,11 +14,25 @@ interface JdbcTransactionManager {
     val isActive: Boolean
     val isRollbackOnly: Boolean
 
+    /**
+     * This function must not throw an exception.
+     */
     fun setRollbackOnly()
+
     fun begin(isolationLevel: JdbcIsolationLevel? = null)
+
     fun commit()
+
     fun suspend(): JdbcTransaction
+
+    /**
+     * This function must not throw an exception.
+     */
     fun resume(tx: JdbcTransaction)
+
+    /**
+     * This function must not throw an exception.
+     */
     fun rollback()
 }
 
@@ -73,8 +87,12 @@ internal class JdbcTransactionManagerImpl(
             JdbcTransactionConnectionImpl(connection, isolationLevel).apply {
                 runCatching {
                     initialize()
-                }.onFailure {
-                    dispose()
+                }.onFailure { cause ->
+                    runCatching {
+                        dispose()
+                    }.onFailure {
+                        cause.addSuppressed(it)
+                    }
                 }.getOrThrow()
             }
         }
@@ -91,9 +109,11 @@ internal class JdbcTransactionManagerImpl(
             val connection = tx.connection
             runCatching {
                 connection.commit()
-            }.onFailure {
+            }.onFailure { cause ->
                 runCatching {
-                    loggerFacade.commitFailed(tx.id, it)
+                    loggerFacade.commitFailed(tx.id, cause)
+                }.onFailure {
+                    cause.addSuppressed(it)
                 }
             }.onSuccess {
                 loggerFacade.commit(tx.id)
@@ -130,6 +150,9 @@ internal class JdbcTransactionManagerImpl(
         rollbackInternal(tx)
     }
 
+    /**
+     * This function must not throw an exception.
+     */
     private fun rollbackInternal(tx: JdbcTransaction) {
         if (tx.isInitialized()) {
             val connection = tx.connection
@@ -140,18 +163,27 @@ internal class JdbcTransactionManagerImpl(
                     loggerFacade.rollbackFailed(tx.id, it)
                 }
             }.onSuccess {
-                loggerFacade.rollback(tx.id)
+                runCatching {
+                    loggerFacade.rollback(tx.id)
+                }
             }
         }
         release(tx)
     }
 
+    /**
+     * This function must not throw an exception.
+     */
     private fun release(tx: JdbcTransaction) {
         threadLocal.remove()
         if (tx.isInitialized()) {
             val connection = tx.connection
-            connection.reset()
-            connection.dispose()
+            runCatching {
+                connection.reset()
+            }
+            runCatching {
+                connection.dispose()
+            }
         }
     }
 }

@@ -23,15 +23,29 @@ interface TransactionManager {
     val connectionFactory: ConnectionFactory
     val isActive: Boolean
     val isRollbackOnly: Boolean
+
+    /**
+     * This function must not throw an exception.
+     */
     fun setRollbackOnly()
+
     suspend fun <R> begin(
         transactionDefinition: TransactionDefinition? = null,
         block: suspend CoroutineScope.() -> R
     ): R
 
     suspend fun commit()
+
     suspend fun suspend(): R2dbcTransaction
+
+    /**
+     * This function must not throw an exception.
+     */
     suspend fun resume(tx: R2dbcTransaction)
+
+    /**
+     * This function must not throw an exception.
+     */
     suspend fun rollback()
 }
 
@@ -94,8 +108,12 @@ internal class TransactionManagerImpl(
             } else {
                 tx.connection.beginTransaction(transactionDefinition).awaitFirstOrNull()
             }
-        }.onFailure {
-            tx.connection.dispose()
+        }.onFailure { cause ->
+            runCatching {
+                tx.connection.dispose()
+            }.onFailure {
+                cause.addSuppressed(it)
+            }
         }.getOrThrow()
         loggerFacade.begin(tx.id)
         val context = threadLocal.asContextElement(tx)
@@ -110,9 +128,11 @@ internal class TransactionManagerImpl(
         val connection = tx.connection
         val result = runCatching {
             connection.commitTransaction().awaitFirstOrNull()
-        }.onFailure {
+        }.onFailure { cause ->
             runCatching {
-                loggerFacade.commitFailed(tx.id, it)
+                loggerFacade.commitFailed(tx.id, cause)
+            }.onFailure {
+                cause.addSuppressed(it)
             }
         }.onSuccess {
             loggerFacade.commit(tx.id)
@@ -146,6 +166,9 @@ internal class TransactionManagerImpl(
         rollbackInternal(tx)
     }
 
+    /**
+     * This function must not throw an exception.
+     */
     private suspend fun rollbackInternal(tx: R2dbcTransaction) {
         val connection = tx.connection
         runCatching {
@@ -155,14 +178,21 @@ internal class TransactionManagerImpl(
                 loggerFacade.rollbackFailed(tx.id, it)
             }
         }.onSuccess {
-            loggerFacade.rollback(tx.id)
+            runCatching {
+                loggerFacade.rollback(tx.id)
+            }
         }
         release(tx)
     }
 
+    /**
+     * This function must not throw an exception.
+     */
     private suspend fun release(tx: R2dbcTransaction) {
         threadLocal.remove()
-        tx.connection.dispose()
+        runCatching {
+            tx.connection.dispose()
+        }
     }
 }
 

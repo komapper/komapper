@@ -18,11 +18,9 @@ internal class R2dbcTransactionConnectionImpl(
 ) : Connection by connection, R2dbcTransactionConnection {
 
     override suspend fun dispose() {
-        runCatching {
-            val isValid = connection.validate(ValidationDepth.LOCAL).awaitSingle()
-            if (isValid) {
-                connection.close().awaitFirstOrNull()
-            }
+        val isValid = connection.validate(ValidationDepth.LOCAL).awaitSingle()
+        if (isValid) {
+            connection.close().awaitFirstOrNull()
         }
     }
 
