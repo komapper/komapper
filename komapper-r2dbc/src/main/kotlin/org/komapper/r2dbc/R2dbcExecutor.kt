@@ -186,7 +186,7 @@ private fun <T> Publisher<out Connection>.use(block: (Connection) -> Flow<T>): F
         }.onFailure { cause ->
             runCatching {
                 con.close()
-            }.onFailure { 
+            }.onFailure {
                 cause.addSuppressed(it)
             }
         }.getOrThrow().collect {
