@@ -2,7 +2,6 @@ package org.komapper.r2dbc.dsl.runner
 
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.DryRunStatement
-import org.komapper.core.Statement
 import org.komapper.core.dsl.context.RelationInsertValuesContext
 import org.komapper.core.dsl.expression.Operand
 import org.komapper.core.dsl.metamodel.EntityMetamodel
@@ -24,27 +23,23 @@ internal class R2dbcRelationInsertValuesRunner<ENTITY : Any, ID : Any, META : En
 
     override suspend fun run(config: R2dbcDatabaseConfig): Pair<Int, ID?> {
         suspend fun returnWithoutId(): Pair<Int, ID?> {
-            val (count, _) = execute(config)
+            val (count, _) = insert(config)
             return count to null
         }
 
         return when (val idGenerator = context.target.idGenerator()) {
             is IdGenerator.AutoIncrement<ENTITY, ID> -> {
-                val generatedColumn = if (context.options.returnGeneratedKeys) {
-                    idGenerator.property.columnName
-                } else null
-                val (count, keys) = execute(config, generatedColumn = generatedColumn)
-                val id = keys.firstOrNull()?.let { context.target.convertToId(it) }
-                count to id
+                val generatedColumn = runner.preInsertUsingAutoIncrement(idGenerator)
+                val (count, keys) = insert(config, generatedColumn = generatedColumn)
+                runner.postInsertUsingAutoIncrement(count, keys)
             }
             is IdGenerator.Sequence<ENTITY, ID> -> {
                 if (context.target.disableSequenceAssignment() || context.options.disableSequenceAssignment) {
                     returnWithoutId()
                 } else {
                     val id = idGenerator.execute(config, context.options)
-                    val argument = Operand.Argument(idGenerator.property, id)
-                    val idAssignment = idGenerator.property to argument
-                    val (count, _) = execute(config, idAssignment)
+                    val idAssignment = runner.preInsertUsingSequence(idGenerator, id)
+                    val (count, _) = insert(config, idAssignment)
                     count to id
                 }
             }
@@ -54,28 +49,14 @@ internal class R2dbcRelationInsertValuesRunner<ENTITY : Any, ID : Any, META : En
         }
     }
 
-    private suspend fun execute(
+    private suspend fun insert(
         config: R2dbcDatabaseConfig,
         idAssignment: Pair<PropertyMetamodel<ENTITY, ID, *>, Operand>? = null,
         generatedColumn: String? = null
     ): Pair<Int, List<Long>> {
-        val statement = buildStatement(config, idAssignment)
+        val statement = runner.buildStatement(config, idAssignment)
         val executor = R2dbcExecutor(config, context.options, generatedColumn)
         return executor.executeUpdate(statement)
-    }
-
-    private fun buildStatement(
-        config: R2dbcDatabaseConfig,
-        idAssignment: Pair<PropertyMetamodel<ENTITY, ID, *>, Operand>?
-    ): Statement {
-        val clock = config.clockProvider.now()
-        return runner.buildStatement(
-            config,
-            idAssignment,
-            context.target.versionAssignment(),
-            context.target.createdAtAssignment(clock),
-            context.target.updatedAtAssignment(clock)
-        )
     }
 
     override fun dryRun(config: DatabaseConfig): DryRunStatement {

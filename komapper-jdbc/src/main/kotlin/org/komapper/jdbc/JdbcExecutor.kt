@@ -14,7 +14,7 @@ import java.sql.SQLException
 internal class JdbcExecutor(
     private val config: JdbcDatabaseConfig,
     executionOptionProvider: ExecutionOptionsProvider,
-    private val requiresGeneratedKeys: Boolean = false
+    private val generatedColumn: String? = null
 ) {
 
     private val executionOptions = config.executionOptions + executionOptionProvider.getExecutionOptions()
@@ -79,7 +79,11 @@ internal class JdbcExecutor(
                     log(statement)
                     bind(ps, statement)
                     val count = ps.executeUpdate()
-                    val keys = fetchGeneratedKeys(ps)
+                    val keys = if (generatedColumn != null) {
+                        fetchGeneratedKeys(ps)
+                    } else {
+                        emptyList()
+                    }
                     count to keys
                 }
             }
@@ -106,7 +110,7 @@ internal class JdbcExecutor(
                             ps.addBatch()
                         }
                         val counts = ps.executeBatch()
-                        val pairs = if (requiresGeneratedKeys) {
+                        val pairs = if (generatedColumn != null) {
                             val keys = fetchGeneratedKeys(ps)
                             check(counts.size == keys.size) { "counts.size=${counts.size}, keys.size=${keys.size}" }
                             counts.zip(keys)
@@ -180,11 +184,11 @@ internal class JdbcExecutor(
 
     private fun prepare(con: Connection, statement: Statement): PreparedStatement {
         val sql = asSql(statement)
-        return if (requiresGeneratedKeys) {
+        return if (generatedColumn != null) {
             if (config.dialect.supportsReturnGeneratedKeysFlag()) {
                 con.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS)
             } else {
-                con.prepareStatement(sql, intArrayOf(1))
+                con.prepareStatement(sql, arrayOf(generatedColumn))
             }
         } else {
             con.prepareStatement(sql)
@@ -204,17 +208,13 @@ internal class JdbcExecutor(
     }
 
     private fun fetchGeneratedKeys(ps: PreparedStatement): List<Long> {
-        return if (requiresGeneratedKeys) {
-            ps.generatedKeys.use { rs ->
-                val keys = mutableListOf<Long>()
-                while (rs.next()) {
-                    val key = rs.getLong(1)
-                    keys.add(key)
-                }
-                keys
+        return ps.generatedKeys.use { rs ->
+            val keys = mutableListOf<Long>()
+            while (rs.next()) {
+                val key = rs.getLong(1)
+                keys.add(key)
             }
-        } else {
-            emptyList()
+            keys
         }
     }
 }

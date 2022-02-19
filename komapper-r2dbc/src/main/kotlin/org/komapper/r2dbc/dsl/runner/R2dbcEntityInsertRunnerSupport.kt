@@ -3,6 +3,7 @@ package org.komapper.r2dbc.dsl.runner
 import org.komapper.core.dsl.context.EntityInsertContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.metamodel.IdGenerator
+import org.komapper.core.dsl.metamodel.getAutoIncrementProperty
 import org.komapper.r2dbc.R2dbcDatabaseConfig
 import org.komapper.r2dbc.R2dbcExecutor
 
@@ -26,10 +27,7 @@ internal class R2dbcEntityInsertRunnerSupport<ENTITY : Any, ID : Any, META : Ent
 
     suspend fun <T> insert(config: R2dbcDatabaseConfig, usesGeneratedKeys: Boolean, execute: suspend (R2dbcExecutor) -> T): T {
         val generatedColumn = if (usesGeneratedKeys && context.options.returnGeneratedKeys) {
-            when (val idGenerator = context.target.idGenerator()) {
-                is IdGenerator.AutoIncrement<ENTITY, *> -> idGenerator.property.columnName
-                else -> null
-            }
+            context.target.getAutoIncrementProperty()?.columnName
         } else null
         val executor = R2dbcExecutor(config, context.options, generatedColumn)
         return execute(executor)

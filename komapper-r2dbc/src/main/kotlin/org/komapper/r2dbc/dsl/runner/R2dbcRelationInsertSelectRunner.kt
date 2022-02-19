@@ -4,7 +4,7 @@ import org.komapper.core.DatabaseConfig
 import org.komapper.core.DryRunStatement
 import org.komapper.core.dsl.context.RelationInsertSelectContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
-import org.komapper.core.dsl.metamodel.IdGenerator
+import org.komapper.core.dsl.metamodel.getAutoIncrementProperty
 import org.komapper.core.dsl.runner.RelationInsertSelectRunner
 import org.komapper.r2dbc.R2dbcDatabaseConfig
 import org.komapper.r2dbc.R2dbcExecutor
@@ -22,10 +22,7 @@ internal class R2dbcRelationInsertSelectRunner<ENTITY : Any, ID : Any, META : En
     override suspend fun run(config: R2dbcDatabaseConfig): Pair<Int, List<ID>> {
         val statement = runner.buildStatement(config)
         val generatedColumn = if (context.options.returnGeneratedKeys) {
-            when (val idGenerator = context.target.idGenerator()) {
-                is IdGenerator.AutoIncrement<ENTITY, *> -> idGenerator.property.columnName
-                else -> null
-            }
+            context.target.getAutoIncrementProperty()?.columnName
         } else null
         val executor = R2dbcExecutor(config, context.options, generatedColumn)
         val (count, keys) = executor.executeUpdate(statement)
