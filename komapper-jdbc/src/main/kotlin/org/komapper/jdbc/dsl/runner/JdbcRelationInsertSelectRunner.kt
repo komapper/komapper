@@ -4,7 +4,7 @@ import org.komapper.core.DatabaseConfig
 import org.komapper.core.DryRunStatement
 import org.komapper.core.dsl.context.RelationInsertSelectContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
-import org.komapper.core.dsl.metamodel.hasAutoIncrementProperty
+import org.komapper.core.dsl.metamodel.getAutoIncrementProperty
 import org.komapper.core.dsl.runner.RelationInsertSelectRunner
 import org.komapper.jdbc.JdbcDatabaseConfig
 import org.komapper.jdbc.JdbcExecutor
@@ -21,8 +21,10 @@ internal class JdbcRelationInsertSelectRunner<ENTITY : Any, ID : Any, META : Ent
 
     override fun run(config: JdbcDatabaseConfig): Pair<Int, List<ID>> {
         val statement = runner.buildStatement(config)
-        val requiresGeneratedKeys = context.target.hasAutoIncrementProperty() && context.options.returnGeneratedKeys
-        val executor = JdbcExecutor(config, context.options, requiresGeneratedKeys)
+        val generatedColumn = if (context.options.returnGeneratedKeys) {
+            context.target.getAutoIncrementProperty()?.columnName
+        } else null
+        val executor = JdbcExecutor(config, context.options, generatedColumn)
         val (count, keys) = executor.executeUpdate(statement)
         val ids = keys.mapNotNull { context.target.convertToId(it) }
         return count to ids

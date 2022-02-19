@@ -1,5 +1,6 @@
 package org.komapper.dialect.postgresql.r2dbc
 
+import io.r2dbc.spi.R2dbcException
 import org.komapper.dialect.postgresql.PostgreSqlDialect
 import org.komapper.r2dbc.Binder
 import org.komapper.r2dbc.IndexedBinder
@@ -29,7 +30,6 @@ import org.komapper.r2dbc.R2dbcUShortType
 
 open class R2dbcPostgreSqlDialect(
     dataTypes: List<R2dbcDataType<*>> = emptyList(),
-    val version: Version = Version.IMPLICIT
 ) : PostgreSqlDialect, R2dbcAbstractDialect(defaultDataTypes + dataTypes) {
 
     companion object {
@@ -61,10 +61,12 @@ open class R2dbcPostgreSqlDialect(
         )
     }
 
-    enum class Version { IMPLICIT }
-
     override fun getBinder(): Binder {
         return IndexedBinder
+    }
+
+    override fun isUniqueConstraintViolationError(exception: R2dbcException): Boolean {
+        return exception.sqlState == PostgreSqlDialect.UNIQUE_CONSTRAINT_VIOLATION_STATE_CODE
     }
 
     override fun supportsBatchExecutionOfParameterizedStatement(): Boolean = false

@@ -25,13 +25,11 @@ import org.komapper.r2dbc.R2dbcUIntType
 import org.komapper.r2dbc.R2dbcUShortType
 
 open class R2dbcOracleDialect(
-    dataTypes: List<R2dbcDataType<*>> = emptyList(),
-    val version: Version = Version.IMPLICIT
-) : OracleDialect, R2dbcAbstractDialect(defaultDataTypes + dataTypes) {
+    dataTypes: List<R2dbcDataType<*>> = emptyList()
+) : OracleDialect, R2dbcAbstractDialect(DEFAULT_DATA_TYPES + dataTypes) {
 
     companion object {
-
-        val defaultDataTypes: List<R2dbcDataType<*>> = listOf(
+        val DEFAULT_DATA_TYPES: List<R2dbcDataType<*>> = listOf(
             R2dbcBigDecimalType("decimal"),
             R2dbcBigIntegerType("decimal"),
             R2dbcBlobType("blob"),
@@ -57,21 +55,23 @@ open class R2dbcOracleDialect(
         )
     }
 
-    enum class Version { IMPLICIT }
-
     override fun isSequenceExistsError(exception: R2dbcException): Boolean {
-        return exception.errorCode == OracleDialect.NAME_IS_ALREADY_USED_ERROR_CODE
+        return exception.errorCode == OracleDialect.NAME_ALREADY_USED_ERROR_CODE
     }
 
     override fun isSequenceNotExistsError(exception: R2dbcException): Boolean {
-        return exception.errorCode == OracleDialect.SEQUENCE_DOES_NOT_EXIST_ERROR_CODE
+        return exception.errorCode == OracleDialect.SEQUENCE_NOT_EXISTS_ERROR_CODE
     }
 
     override fun isTableExistsError(exception: R2dbcException): Boolean {
-        return exception.errorCode == OracleDialect.NAME_IS_ALREADY_USED_ERROR_CODE
+        return exception.errorCode == OracleDialect.NAME_ALREADY_USED_ERROR_CODE
     }
 
     override fun isTableNotExistsError(exception: R2dbcException): Boolean {
-        return exception.errorCode == OracleDialect.TABLE_DOES_NOT_EXIST_ERROR_CODE
+        return exception.errorCode == OracleDialect.TABLE_NOT_EXISTS_ERROR_CODE
+    }
+
+    override fun isUniqueConstraintViolationError(exception: R2dbcException): Boolean {
+        return exception.errorCode == OracleDialect.UNIQUE_CONSTRAINT_VIOLATION_ERROR_CODE
     }
 }

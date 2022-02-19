@@ -1,5 +1,6 @@
 package org.komapper.dialect.mysql.r2dbc
 
+import io.r2dbc.spi.R2dbcException
 import org.komapper.dialect.mysql.MySqlDialect
 import org.komapper.r2dbc.R2dbcAbstractDialect
 import org.komapper.r2dbc.R2dbcArrayType
@@ -25,7 +26,6 @@ import org.komapper.r2dbc.R2dbcUShortType
 
 open class R2dbcMySqlDialect(
     dataTypes: List<R2dbcDataType<*>> = emptyList(),
-    val version: Version = Version.IMPLICIT
 ) : MySqlDialect, R2dbcAbstractDialect(DEFAULT_DATA_TYPES + dataTypes) {
 
     companion object {
@@ -52,7 +52,9 @@ open class R2dbcMySqlDialect(
         )
     }
 
-    enum class Version { IMPLICIT }
+    override fun isUniqueConstraintViolationError(exception: R2dbcException): Boolean {
+        return exception.errorCode in MySqlDialect.UNIQUE_CONSTRAINT_VIOLATION_ERROR_CODES
+    }
 
     override fun supportsBatchExecutionOfParameterizedStatement(): Boolean = false
 }

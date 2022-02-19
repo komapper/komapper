@@ -26,46 +26,49 @@ class RelationInsertValuesRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<
             }
             else -> null
         }
-        val versionAssignment = context.target.versionAssignment()
-        val clock = config.clockProvider.now()
-        val createdAtAssignment = context.target.createdAtAssignment(clock)
-        val updatedAtAssignment = context.target.updatedAtAssignment(clock)
-        val statement = buildStatement(config, idAssignment, versionAssignment, createdAtAssignment, updatedAtAssignment)
+        val statement = buildStatement(config, idAssignment)
         return DryRunStatement.of(statement, config.dialect)
     }
 
     fun buildStatement(
         config: DatabaseConfig,
-        idAssignment: Pair<PropertyMetamodel<ENTITY, ID, *>, Operand>? = null,
-        versionAssignment: Pair<PropertyMetamodel<ENTITY, *, *>, Operand>? = null,
-        createdAtAssignment: Pair<PropertyMetamodel<ENTITY, *, *>, Operand>? = null,
-        updatedAtAssignment: Pair<PropertyMetamodel<ENTITY, *, *>, Operand>? = null
+        idAssignment: Pair<PropertyMetamodel<ENTITY, ID, *>, Operand>?,
     ): Statement {
-        val assignments = getAssignments(
-            idAssignment,
-            versionAssignment,
-            createdAtAssignment,
-            updatedAtAssignment
-        )
+        val assignments = getAssignments(config, idAssignment)
         val builder = RelationInsertValuesStatementBuilder(config.dialect, context)
         return builder.build(assignments)
     }
 
     private fun getAssignments(
-        idAssignment: Pair<PropertyMetamodel<ENTITY, ID, *>, Operand>? = null,
-        versionAssignment: Pair<PropertyMetamodel<ENTITY, *, *>, Operand>? = null,
-        createdAtAssignment: Pair<PropertyMetamodel<ENTITY, *, *>, Operand>? = null,
-        updatedAtAssignment: Pair<PropertyMetamodel<ENTITY, *, *>, Operand>? = null
+        config: DatabaseConfig,
+        idAssignment: Pair<PropertyMetamodel<ENTITY, ID, *>, Operand>?,
     ): List<Pair<PropertyMetamodel<ENTITY, *, *>, Operand>> {
         val assignments = context.getAssignments()
         val properties = assignments.map { it.first }
+        val clock = config.clockProvider.now()
         val additionalAssignments = listOfNotNull(
             idAssignment,
-            versionAssignment,
-            createdAtAssignment,
-            updatedAtAssignment
+            context.target.versionAssignment(),
+            context.target.createdAtAssignment(clock),
+            context.target.updatedAtAssignment(clock),
         ).filterNot { it.first in properties }
         return (assignments + additionalAssignments)
             .filter { !it.first.isAutoIncrement() }
+    }
+
+    fun preInsertUsingAutoIncrement(idGenerator: IdGenerator.AutoIncrement<ENTITY, ID>): String? {
+        return if (context.options.returnGeneratedKeys) {
+            idGenerator.property.columnName
+        } else null
+    }
+
+    fun postInsertUsingAutoIncrement(count: Int, keys: List<Long>): Pair<Int, ID?> {
+        val id = keys.firstOrNull()?.let { context.target.convertToId(it) }
+        return count to id
+    }
+
+    fun preInsertUsingSequence(idGenerator: IdGenerator.Sequence<ENTITY, ID>, id: ID): Pair<PropertyMetamodel<ENTITY, ID, *>, Operand> {
+        val argument = Operand.Argument(idGenerator.property, id)
+        return idGenerator.property to argument
     }
 }

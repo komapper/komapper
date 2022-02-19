@@ -1,5 +1,6 @@
 package org.komapper.dialect.h2.r2dbc
 
+import io.r2dbc.spi.R2dbcException
 import org.komapper.dialect.h2.H2Dialect
 import org.komapper.r2dbc.R2dbcAbstractDialect
 import org.komapper.r2dbc.R2dbcAnyType
@@ -27,8 +28,7 @@ import org.komapper.r2dbc.R2dbcUIntType
 import org.komapper.r2dbc.R2dbcUShortType
 
 open class R2dbcH2Dialect(
-    dataTypes: List<R2dbcDataType<*>> = emptyList(),
-    val version: Version = Version.IMPLICIT
+    dataTypes: List<R2dbcDataType<*>> = emptyList()
 ) : H2Dialect, R2dbcAbstractDialect(DEFAULT_DATA_TYPES + dataTypes) {
 
     companion object {
@@ -61,9 +61,11 @@ open class R2dbcH2Dialect(
         )
     }
 
-    enum class Version { IMPLICIT }
-
     override val driver: String = DRIVER
+
+    override fun isUniqueConstraintViolationError(exception: R2dbcException): Boolean {
+        return exception.errorCode == H2Dialect.UNIQUE_CONSTRAINT_VIOLATION_ERROR_CODE
+    }
 
     override fun supportsBatchExecutionOfParameterizedStatement(): Boolean = false
 }

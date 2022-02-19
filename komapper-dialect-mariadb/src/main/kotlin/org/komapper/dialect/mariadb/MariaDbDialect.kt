@@ -11,6 +11,8 @@ interface MariaDbDialect : Dialect {
 
     companion object {
         const val DRIVER = "mariadb"
+        /** the error code that represents unique violation  */
+        val UNIQUE_CONSTRAINT_VIOLATION_ERROR_CODES = setOf(1022, 1062)
     }
 
     override val driver: String get() = DRIVER

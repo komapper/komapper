@@ -2,7 +2,6 @@ package org.komapper.jdbc.dsl.runner
 
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.DryRunStatement
-import org.komapper.core.Statement
 import org.komapper.core.dsl.context.RelationInsertValuesContext
 import org.komapper.core.dsl.expression.Operand
 import org.komapper.core.dsl.metamodel.EntityMetamodel
@@ -24,24 +23,23 @@ internal class JdbcRelationInsertValuesRunner<ENTITY : Any, ID : Any, META : Ent
 
     override fun run(config: JdbcDatabaseConfig): Pair<Int, ID?> {
         fun returnWithoutId(): Pair<Int, ID?> {
-            val (count, _) = execute(config)
+            val (count, _) = insert(config)
             return count to null
         }
 
         return when (val idGenerator = context.target.idGenerator()) {
             is IdGenerator.AutoIncrement<ENTITY, ID> -> {
-                val (count, keys) = execute(config, requiresGeneratedKeys = context.options.returnGeneratedKeys)
-                val id = keys.firstOrNull()?.let { context.target.convertToId(it) }
-                count to id
+                val generatedColumn = runner.preInsertUsingAutoIncrement(idGenerator)
+                val (count, keys) = insert(config, generatedColumn = generatedColumn)
+                runner.postInsertUsingAutoIncrement(count, keys)
             }
             is IdGenerator.Sequence<ENTITY, ID> -> {
                 if (context.target.disableSequenceAssignment() || context.options.disableSequenceAssignment) {
                     returnWithoutId()
                 } else {
                     val id = idGenerator.execute(config, context.options)
-                    val argument = Operand.Argument(idGenerator.property, id)
-                    val idAssignment = idGenerator.property to argument
-                    val (count, _) = execute(config, idAssignment)
+                    val idAssignment = runner.preInsertUsingSequence(idGenerator, id)
+                    val (count, _) = insert(config, idAssignment)
                     count to id
                 }
             }
@@ -51,28 +49,14 @@ internal class JdbcRelationInsertValuesRunner<ENTITY : Any, ID : Any, META : Ent
         }
     }
 
-    private fun execute(
+    private fun insert(
         config: JdbcDatabaseConfig,
         idAssignment: Pair<PropertyMetamodel<ENTITY, ID, *>, Operand>? = null,
-        requiresGeneratedKeys: Boolean = false
+        generatedColumn: String? = null
     ): Pair<Int, List<Long>> {
-        val statement = buildStatement(config, idAssignment)
-        val executor = JdbcExecutor(config, context.options, requiresGeneratedKeys)
+        val statement = runner.buildStatement(config, idAssignment)
+        val executor = JdbcExecutor(config, context.options, generatedColumn)
         return executor.executeUpdate(statement)
-    }
-
-    private fun buildStatement(
-        config: JdbcDatabaseConfig,
-        idAssignment: Pair<PropertyMetamodel<ENTITY, ID, *>, Operand>?
-    ): Statement {
-        val clock = config.clockProvider.now()
-        return runner.buildStatement(
-            config,
-            idAssignment,
-            context.target.versionAssignment(),
-            context.target.createdAtAssignment(clock),
-            context.target.updatedAtAssignment(clock)
-        )
     }
 
     override fun dryRun(config: DatabaseConfig): DryRunStatement {
