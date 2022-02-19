@@ -29,21 +29,17 @@ internal class JdbcTransactionConnectionImpl(
     }
 
     override fun reset() {
-        kotlin.runCatching {
-            if (isolationLevel != null && isolation != Connection.TRANSACTION_NONE) {
-                connection.transactionIsolation = isolation
-            }
-            if (autoCommitState) {
-                connection.autoCommit = true
-            }
+        if (isolationLevel != null && isolation != Connection.TRANSACTION_NONE) {
+            connection.transactionIsolation = isolation
+        }
+        if (autoCommitState) {
+            connection.autoCommit = true
         }
     }
 
     override fun dispose() {
-        runCatching {
-            if (!connection.isClosed) {
-                connection.close()
-            }
+        if (!connection.isClosed) {
+            connection.close()
         }
     }
 

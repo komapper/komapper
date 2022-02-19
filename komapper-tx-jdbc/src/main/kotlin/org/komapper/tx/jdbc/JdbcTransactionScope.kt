@@ -57,9 +57,11 @@ internal class JdbcTransactionScopeImpl(
         transactionManager.begin(isolationLevel ?: defaultIsolationLevel)
         return runCatching {
             block(this)
-        }.onFailure {
+        }.onFailure { cause ->
             runCatching {
                 transactionManager.rollback()
+            }.onFailure {
+                cause.addSuppressed(it)
             }
         }.onSuccess {
             if (transactionManager.isRollbackOnly) {

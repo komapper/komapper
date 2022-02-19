@@ -58,9 +58,11 @@ internal class R2dbcTransactionScopeImpl(
         return transactionManager.begin(transactionDefinition ?: defaultTransactionDefinition) {
             runCatching {
                 block(this@R2dbcTransactionScopeImpl)
-            }.onFailure {
-                kotlin.runCatching {
+            }.onFailure { cause ->
+                runCatching {
                     transactionManager.rollback()
+                }.onFailure {
+                    cause.addSuppressed(it)
                 }
             }.onSuccess {
                 if (transactionManager.isRollbackOnly) {
