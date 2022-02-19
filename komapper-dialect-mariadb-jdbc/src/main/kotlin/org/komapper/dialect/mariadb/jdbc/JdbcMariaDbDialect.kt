@@ -28,14 +28,10 @@ import org.komapper.jdbc.JdbcUShortType
 import java.sql.SQLException
 
 open class JdbcMariaDbDialect(
-    dataTypes: List<JdbcDataType<*>> = emptyList(),
-    val version: Version = Version.IMPLICIT
+    dataTypes: List<JdbcDataType<*>> = emptyList()
 ) : MariaDbDialect, JdbcAbstractDialect(DEFAULT_DATA_TYPES + dataTypes) {
 
     companion object {
-        /** the error code that represents unique violation  */
-        val UNIQUE_CONSTRAINT_VIOLATION_ERROR_CODES = setOf(1022, 1062)
-
         val DEFAULT_DATA_TYPES: List<JdbcDataType<*>> = listOf(
             JdbcBigDecimalType("decimal"),
             JdbcBigIntegerType("decimal"),
@@ -62,11 +58,9 @@ open class JdbcMariaDbDialect(
         )
     }
 
-    enum class Version { IMPLICIT }
-
     override fun isUniqueConstraintViolationError(exception: SQLException): Boolean {
         return exception.filterIsInstance<SQLException>().any {
-            it.errorCode in UNIQUE_CONSTRAINT_VIOLATION_ERROR_CODES
+            it.errorCode in MariaDbDialect.UNIQUE_CONSTRAINT_VIOLATION_ERROR_CODES
         }
     }
 }

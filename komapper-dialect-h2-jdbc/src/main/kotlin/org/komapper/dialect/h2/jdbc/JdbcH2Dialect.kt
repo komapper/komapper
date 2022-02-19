@@ -30,14 +30,10 @@ import org.komapper.jdbc.JdbcUShortType
 import java.sql.SQLException
 
 open class JdbcH2Dialect(
-    dataTypes: List<JdbcDataType<*>> = emptyList(),
-    val version: Version = Version.IMPLICIT
+    dataTypes: List<JdbcDataType<*>> = emptyList()
 ) : H2Dialect, JdbcAbstractDialect(DEFAULT_DATA_TYPES + dataTypes) {
 
     companion object {
-        /** the error code that represents unique violation  */
-        const val UNIQUE_CONSTRAINT_VIOLATION_ERROR_CODE = 23505
-
         val DEFAULT_DATA_TYPES: List<JdbcDataType<*>> = listOf(
             JdbcAnyType("other"),
             JdbcArrayType("array"),
@@ -67,11 +63,9 @@ open class JdbcH2Dialect(
         )
     }
 
-    enum class Version { IMPLICIT }
-
     override fun isUniqueConstraintViolationError(exception: SQLException): Boolean {
         return exception.filterIsInstance<SQLException>().any {
-            it.errorCode == UNIQUE_CONSTRAINT_VIOLATION_ERROR_CODE
+            it.errorCode == H2Dialect.UNIQUE_CONSTRAINT_VIOLATION_ERROR_CODE
         }
     }
 }

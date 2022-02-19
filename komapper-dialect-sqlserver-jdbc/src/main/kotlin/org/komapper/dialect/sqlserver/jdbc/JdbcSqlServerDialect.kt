@@ -26,13 +26,9 @@ import java.sql.SQLException
 
 class JdbcSqlServerDialect(
     dataTypes: List<JdbcDataType<*>> = emptyList(),
-    val version: Version = Version.IMPLICIT
 ) : SqlServerDialect, JdbcAbstractDialect(DEFAULT_DATA_TYPES + dataTypes) {
 
     companion object {
-        /** the error code that represents unique violation  */
-        const val UNIQUE_CONSTRAINT_VIOLATION_ERROR_CODE = 2627
-
         val DEFAULT_DATA_TYPES: List<JdbcDataType<*>> = listOf(
             JdbcBigDecimalType("decimal"),
             JdbcBigIntegerType("decimal"),
@@ -57,11 +53,9 @@ class JdbcSqlServerDialect(
         )
     }
 
-    enum class Version { IMPLICIT }
-
     override fun isUniqueConstraintViolationError(exception: SQLException): Boolean {
         return exception.filterIsInstance<SQLException>().any {
-            return it.errorCode == UNIQUE_CONSTRAINT_VIOLATION_ERROR_CODE
+            return it.errorCode == SqlServerDialect.UNIQUE_CONSTRAINT_VIOLATION_ERROR_CODE
         }
     }
 

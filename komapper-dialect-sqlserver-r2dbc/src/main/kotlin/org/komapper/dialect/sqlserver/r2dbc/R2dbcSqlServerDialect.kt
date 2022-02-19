@@ -28,8 +28,7 @@ import org.komapper.r2dbc.R2dbcUIntType
 import org.komapper.r2dbc.R2dbcUShortType
 
 class R2dbcSqlServerDialect(
-    dataTypes: List<R2dbcDataType<*>> = emptyList(),
-    val version: Version = Version.IMPLICIT
+    dataTypes: List<R2dbcDataType<*>> = emptyList()
 ) : SqlServerDialect, R2dbcAbstractDialect(defaultDataTypes + dataTypes) {
 
     companion object {
@@ -58,8 +57,6 @@ class R2dbcSqlServerDialect(
         )
     }
 
-    enum class Version { IMPLICIT }
-
     override fun getBinder(): Binder {
         return AtSignBinder
     }
@@ -70,6 +67,10 @@ class R2dbcSqlServerDialect(
 
     override fun isTableExistsError(exception: R2dbcException): Boolean {
         return exception.errorCode == SqlServerDialect.OBJECT_ALREADY_EXISTS_ERROR_CODE
+    }
+
+    override fun isUniqueConstraintViolationError(exception: R2dbcException): Boolean {
+        return exception.errorCode == SqlServerDialect.UNIQUE_CONSTRAINT_VIOLATION_ERROR_CODE
     }
 
     override fun supportsBatchExecutionReturningGeneratedValues(): Boolean = false

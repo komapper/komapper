@@ -26,13 +26,9 @@ import java.sql.SQLException
 
 class JdbcOracleDialect(
     dataTypes: List<JdbcDataType<*>> = emptyList(),
-    val version: Version = Version.IMPLICIT
 ) : OracleDialect, JdbcAbstractDialect(DEFAULT_DATA_TYPES + dataTypes) {
 
     companion object {
-        /** the error code that represents unique violation  */
-        const val UNIQUE_CONSTRAINT_VIOLATION_ERROR_CODE = 1
-
         val DEFAULT_DATA_TYPES: List<JdbcDataType<*>> = listOf(
             JdbcBigDecimalType("decimal"),
             JdbcBigIntegerType("decimal"),
@@ -56,8 +52,6 @@ class JdbcOracleDialect(
             JdbcOracleBooleanType
         )
     }
-
-    enum class Version { IMPLICIT }
 
     override fun isSequenceExistsError(exception: SQLException): Boolean {
         return exception.filterIsInstance<SQLException>().any {
@@ -85,7 +79,7 @@ class JdbcOracleDialect(
 
     override fun isUniqueConstraintViolationError(exception: SQLException): Boolean {
         return exception.filterIsInstance<SQLException>().any {
-            return it.errorCode == UNIQUE_CONSTRAINT_VIOLATION_ERROR_CODE
+            return it.errorCode == OracleDialect.UNIQUE_CONSTRAINT_VIOLATION_ERROR_CODE
         }
     }
 

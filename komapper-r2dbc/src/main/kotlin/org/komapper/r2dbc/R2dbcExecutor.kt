@@ -1,7 +1,7 @@
 package org.komapper.r2dbc
 
 import io.r2dbc.spi.Connection
-import io.r2dbc.spi.R2dbcDataIntegrityViolationException
+import io.r2dbc.spi.R2dbcException
 import io.r2dbc.spi.Result
 import io.r2dbc.spi.Row
 import kotlinx.coroutines.flow.Flow
@@ -131,6 +131,44 @@ internal class R2dbcExecutor(
         }.collect()
     }
 
+    private fun <T> Publisher<out Connection>.use(block: (Connection) -> Flow<T>): Flow<T> {
+        return flow<T> {
+            val con = this@use.asFlow().single()
+            val value = runCatching {
+                block(con)
+            }.onSuccess { flow ->
+                flow.onCompletion { con.close() }
+            }.onFailure { cause ->
+                runCatching {
+                    con.close()
+                }.onFailure {
+                    cause.addSuppressed(it)
+                }
+            }.getOrThrow()
+            emitAll(value)
+        }.catch {
+            translateException(it)
+        }
+    }
+
+    /**
+     * Translates a [Exception] to a [RuntimeException].
+     */
+    private fun translateException(cause: Throwable) {
+        when (cause) {
+            is R2dbcException -> {
+                if (config.dialect.isUniqueConstraintViolationError(cause)) {
+                    throw UniqueConstraintException(cause)
+                } else {
+                    throw cause
+                }
+            }
+            is RuntimeException -> throw cause
+            is Exception -> throw RuntimeException(cause)
+            else -> throw cause
+        }
+    }
+
     private fun inspect(statement: Statement): Statement {
         return config.statementInspector.inspect(statement)
     }
@@ -174,38 +212,6 @@ internal class R2dbcExecutor(
                 else -> error("Generated value is not Number. generatedColumn=$generatedColumn, value=$value, valueType=${value::class.qualifiedName}")
             }
         }
-    }
-}
-
-private fun <T> Publisher<out Connection>.use(block: (Connection) -> Flow<T>): Flow<T> {
-    return flow<T> {
-        val con = this@use.asFlow().single()
-        val value = runCatching {
-            block(con)
-        }.onSuccess { flow ->
-            flow.onCompletion { con.close() }
-        }.onFailure { cause ->
-            runCatching {
-                con.close()
-            }.onFailure {
-                cause.addSuppressed(it)
-            }
-        }.getOrThrow()
-        emitAll(value)
-    }.catch {
-        translateException(it)
-    }
-}
-
-/**
- * Translates a [Exception] to a [RuntimeException].
- */
-private fun translateException(cause: Throwable) {
-    when (cause) {
-        is R2dbcDataIntegrityViolationException -> throw UniqueConstraintException(cause)
-        is RuntimeException -> throw cause
-        is Exception -> throw RuntimeException(cause)
-        else -> throw cause
     }
 }
 

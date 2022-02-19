@@ -74,6 +74,14 @@ interface R2dbcDialect : Dialect {
      */
     fun isTableNotExistsError(exception: R2dbcException): Boolean = false
 
+    /**
+     * Returns whether the exception indicates unique constraint violation.
+     *
+     * @param exception the exception
+     * @return whether the exception indicates unique constraint violation
+     */
+    fun isUniqueConstraintViolationError(exception: R2dbcException): Boolean
+
     override fun supportsBatchExecutionReturningGeneratedValues(): Boolean = false
 }
 

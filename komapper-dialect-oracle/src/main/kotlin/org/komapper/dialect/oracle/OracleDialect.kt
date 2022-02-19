@@ -13,6 +13,9 @@ interface OracleDialect : Dialect {
     companion object {
         const val DRIVER = "oracle"
 
+        /** the error code that represents unique violation  */
+        const val UNIQUE_CONSTRAINT_VIOLATION_ERROR_CODE = 1
+
         const val TABLE_DOES_NOT_EXIST_ERROR_CODE = 942
 
         const val NAME_IS_ALREADY_USED_ERROR_CODE = 955

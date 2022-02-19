@@ -26,14 +26,10 @@ import org.komapper.jdbc.JdbcUShortType
 import java.sql.SQLException
 
 open class JdbcPostgreSqlDialect(
-    dataTypes: List<JdbcDataType<*>> = emptyList(),
-    val version: Version = Version.IMPLICIT
+    dataTypes: List<JdbcDataType<*>> = emptyList()
 ) : PostgreSqlDialect, JdbcAbstractDialect(DEFAULT_DATA_TYPES + dataTypes) {
 
     companion object {
-        /** the state code that represents unique violation  */
-        const val UNIQUE_CONSTRAINT_VIOLATION_STATE_CODE = "23505"
-
         val DEFAULT_DATA_TYPES: List<JdbcDataType<*>> = listOf(
             JdbcArrayType("text[]"),
             JdbcBigDecimalType("numeric"),
@@ -59,11 +55,9 @@ open class JdbcPostgreSqlDialect(
         )
     }
 
-    enum class Version { IMPLICIT }
-
     override fun isUniqueConstraintViolationError(exception: SQLException): Boolean {
         return exception.filterIsInstance<SQLException>().any {
-            it.sqlState == UNIQUE_CONSTRAINT_VIOLATION_STATE_CODE
+            it.sqlState == PostgreSqlDialect.UNIQUE_CONSTRAINT_VIOLATION_STATE_CODE
         }
     }
 }

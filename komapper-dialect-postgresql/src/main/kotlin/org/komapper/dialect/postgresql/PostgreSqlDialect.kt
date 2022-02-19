@@ -10,6 +10,8 @@ interface PostgreSqlDialect : Dialect {
 
     companion object {
         const val DRIVER = "postgresql"
+        /** the state code that represents unique violation  */
+        const val UNIQUE_CONSTRAINT_VIOLATION_STATE_CODE = "23505"
     }
 
     override val driver: String get() = DRIVER
