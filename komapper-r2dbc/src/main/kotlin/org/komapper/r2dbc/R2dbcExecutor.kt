@@ -7,6 +7,7 @@ import io.r2dbc.spi.Row
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.single
@@ -179,7 +180,7 @@ internal class R2dbcExecutor(
 private fun <T> Publisher<out Connection>.use(block: (Connection) -> Flow<T>): Flow<T> {
     return flow<T> {
         val con = this@use.asFlow().single()
-        runCatching {
+        val value = runCatching {
             block(con)
         }.onSuccess { flow ->
             flow.onCompletion { con.close() }
@@ -189,9 +190,8 @@ private fun <T> Publisher<out Connection>.use(block: (Connection) -> Flow<T>): F
             }.onFailure {
                 cause.addSuppressed(it)
             }
-        }.getOrThrow().collect {
-            emit(it)
-        }
+        }.getOrThrow()
+        emitAll(value)
     }.catch {
         translateException(it)
     }
