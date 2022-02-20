@@ -2,10 +2,11 @@ package org.komapper.tx.r2dbc
 
 import io.r2dbc.spi.Connection
 import io.r2dbc.spi.ValidationDepth
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.single
+import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.reactive.asPublisher
-import kotlinx.coroutines.reactive.awaitFirstOrNull
-import kotlinx.coroutines.reactive.awaitSingle
 import org.reactivestreams.Publisher
 
 interface R2dbcTransactionConnection : Connection {
@@ -18,9 +19,9 @@ internal class R2dbcTransactionConnectionImpl(
 ) : Connection by connection, R2dbcTransactionConnection {
 
     override suspend fun dispose() {
-        val isValid = connection.validate(ValidationDepth.LOCAL).awaitSingle()
+        val isValid = connection.validate(ValidationDepth.LOCAL).asFlow().single()
         if (isValid) {
-            connection.close().awaitFirstOrNull()
+            connection.close().asFlow().collect()
         }
     }
 

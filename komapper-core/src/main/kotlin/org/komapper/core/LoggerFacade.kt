@@ -40,7 +40,8 @@ interface LoggerFacade {
     /**
      * Logs the commit failure of transaction.
      *
-     * @param transactionId the transaction id     * @param cause the cause of failure
+     * @param transactionId the transaction id
+     * @param cause the cause of failure
      */
     fun commitFailed(transactionId: UUID, cause: Throwable)
 
