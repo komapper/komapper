@@ -96,8 +96,8 @@ internal class JdbcTransactionManagerImpl(
                 }.getOrThrow()
             }
         }
-        threadLocal.set(tx)
         loggerFacade.begin(tx.id)
+        threadLocal.set(tx)
     }
 
     override fun commit() {
@@ -105,24 +105,22 @@ internal class JdbcTransactionManagerImpl(
         if (!tx.isActive()) {
             error("A transaction hasn't yet begun.")
         }
-        val result = if (tx.isInitialized()) {
-            val connection = tx.connection
-            runCatching {
+        runCatching {
+            if (tx.isInitialized()) {
+                val connection = tx.connection
                 connection.commit()
-            }.onFailure { cause ->
-                runCatching {
-                    loggerFacade.commitFailed(tx.id, cause)
-                }.onFailure {
-                    cause.addSuppressed(it)
-                }
-            }.onSuccess {
-                loggerFacade.commit(tx.id)
             }
-        } else {
-            Result.success(Unit)
-        }
-        release(tx)
-        result.getOrThrow()
+        }.also {
+            release(tx)
+        }.onSuccess {
+            loggerFacade.commit(tx.id)
+        }.onFailure { cause ->
+            runCatching {
+                loggerFacade.commitFailed(tx.id, cause)
+            }.onFailure {
+                cause.addSuppressed(it)
+            }
+        }.getOrThrow()
     }
 
     override fun suspend(): JdbcTransaction {
@@ -154,21 +152,22 @@ internal class JdbcTransactionManagerImpl(
      * This function must not throw an exception.
      */
     private fun rollbackInternal(tx: JdbcTransaction) {
-        if (tx.isInitialized()) {
-            val connection = tx.connection
-            runCatching {
+        runCatching {
+            if (tx.isInitialized()) {
+                val connection = tx.connection
                 connection.rollback()
-            }.onFailure {
-                runCatching {
-                    loggerFacade.rollbackFailed(tx.id, it)
-                }
-            }.onSuccess {
-                runCatching {
-                    loggerFacade.rollback(tx.id)
-                }
+            }
+        }.also {
+            release(tx)
+        }.onSuccess {
+            runCatching {
+                loggerFacade.rollback(tx.id)
+            }
+        }.onFailure { cause ->
+            runCatching {
+                loggerFacade.rollbackFailed(tx.id, cause)
             }
         }
-        release(tx)
     }
 
     /**

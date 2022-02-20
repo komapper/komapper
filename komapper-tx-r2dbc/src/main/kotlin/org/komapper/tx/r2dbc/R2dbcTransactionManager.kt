@@ -6,10 +6,14 @@ import io.r2dbc.spi.ConnectionFactoryMetadata
 import io.r2dbc.spi.TransactionDefinition
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.asContextElement
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.single
+import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.reactive.asPublisher
-import kotlinx.coroutines.reactive.awaitFirstOrNull
-import kotlinx.coroutines.reactive.awaitSingle
 import kotlinx.coroutines.withContext
 import org.komapper.core.LoggerFacade
 import org.komapper.core.ThreadSafe
@@ -98,24 +102,26 @@ internal class TransactionManagerImpl(
             rollbackInternal(currentTx)
             error("The transaction \"$currentTx\" already has begun.")
         }
-        val tx = internalConnectionFactory.create().awaitSingle().let { con ->
+        val tx = internalConnectionFactory.create().asFlow().map { con ->
             val txCon = R2dbcTransactionConnectionImpl(con)
             R2dbcTransactionImpl(txCon)
+        }.single()
+        val begin = if (transactionDefinition == null) {
+            tx.connection.beginTransaction().asFlow()
+        } else {
+            tx.connection.beginTransaction(transactionDefinition).asFlow()
         }
-        runCatching {
-            if (transactionDefinition == null) {
-                tx.connection.beginTransaction().awaitFirstOrNull()
+        begin.onCompletion { cause ->
+            if (cause == null) {
+                runCatching {
+                    loggerFacade.begin(tx.id)
+                }.onFailure {
+                    release(tx)
+                }.getOrThrow()
             } else {
-                tx.connection.beginTransaction(transactionDefinition).awaitFirstOrNull()
+                release(tx)
             }
-        }.onFailure { cause ->
-            runCatching {
-                tx.connection.dispose()
-            }.onFailure {
-                cause.addSuppressed(it)
-            }
-        }.getOrThrow()
-        loggerFacade.begin(tx.id)
+        }.collect()
         val context = threadLocal.asContextElement(tx)
         return withContext(context, block)
     }
@@ -126,19 +132,19 @@ internal class TransactionManagerImpl(
             error("A transaction hasn't yet begun.")
         }
         val connection = tx.connection
-        val result = runCatching {
-            connection.commitTransaction().awaitFirstOrNull()
-        }.onFailure { cause ->
-            runCatching {
-                loggerFacade.commitFailed(tx.id, cause)
-            }.onFailure {
-                cause.addSuppressed(it)
-            }
-        }.onSuccess {
-            loggerFacade.commit(tx.id)
-        }
-        rollbackInternal(tx)
-        result.getOrThrow()
+        connection.commitTransaction().asFlow()
+            .onCompletion { cause ->
+                release(tx)
+                if (cause == null) {
+                    loggerFacade.commit(tx.id)
+                } else {
+                    runCatching {
+                        loggerFacade.commitFailed(tx.id, cause)
+                    }.onFailure {
+                        cause.addSuppressed(it)
+                    }
+                }
+            }.collect()
     }
 
     override suspend fun suspend(): R2dbcTransaction {
@@ -171,18 +177,20 @@ internal class TransactionManagerImpl(
      */
     private suspend fun rollbackInternal(tx: R2dbcTransaction) {
         val connection = tx.connection
-        runCatching {
-            connection.rollbackTransaction().awaitFirstOrNull()
-        }.onFailure {
-            runCatching {
-                loggerFacade.rollbackFailed(tx.id, it)
+        connection.rollbackTransaction().asFlow()
+            .onCompletion { cause ->
+                release(tx)
+                runCatching {
+                    if (cause == null) {
+                        loggerFacade.rollback(tx.id)
+                    } else {
+                        loggerFacade.rollbackFailed(tx.id, cause)
+                    }
+                }
             }
-        }.onSuccess {
-            runCatching {
-                loggerFacade.rollback(tx.id)
-            }
-        }
-        release(tx)
+            .catch {
+                // ignore
+            }.collect()
     }
 
     /**
