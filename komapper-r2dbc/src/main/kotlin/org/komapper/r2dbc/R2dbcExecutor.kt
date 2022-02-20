@@ -132,19 +132,19 @@ internal class R2dbcExecutor(
     }
 
     private fun <T> Publisher<out Connection>.use(block: (Connection) -> Flow<T>): Flow<T> {
-        return flow<T> {
+        return flow {
             val con = this@use.asFlow().single()
-            val value = runCatching {
-                block(con)
-            }.onSuccess { flow ->
-                flow.onCompletion { con.close() }
-            }.onFailure { cause ->
-                runCatching {
+            val value = block(con).onCompletion { cause ->
+                if (cause == null) {
                     con.close()
-                }.onFailure {
-                    cause.addSuppressed(it)
+                } else {
+                    runCatching {
+                        con.close()
+                    }.onFailure {
+                        cause.addSuppressed(it)
+                    }
                 }
-            }.getOrThrow()
+            }
             emitAll(value)
         }.catch {
             translateException(it)
