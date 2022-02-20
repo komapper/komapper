@@ -6,7 +6,6 @@ import org.komapper.core.ThreadSafe
 
 /**
  * The R2DBC transaction APIs designed to be used in general cases.
- * If the isolationLevel null, the default isolation level is determined by the driver.
  */
 @ThreadSafe
 interface R2dbcUserTransaction {

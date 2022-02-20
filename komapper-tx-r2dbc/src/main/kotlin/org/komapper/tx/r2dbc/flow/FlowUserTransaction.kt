@@ -13,22 +13,21 @@ import org.komapper.tx.r2dbc.R2dbcTransactionAttribute
 import org.komapper.tx.r2dbc.R2dbcTransactionManager
 
 /**
- * The R2DBC transaction APIs designed to be used in general cases.
- * If the isolationLevel null, the default isolation level is determined by the driver.
+ * The transactional [Flow] APIs for R2DBC.
  */
 @ThreadSafe
 interface FlowUserTransaction {
 
     /**
-     * Runs a transaction.
+     * Builds a transactional [Flow].
      *
-     * @param R the return type of the block
+     * @param R the return type of the flow
      * @param transactionAttribute the transaction attribute
      * @param transactionDefinition the transaction definition
      * @param block the block executed in the transaction
-     * @return the result of the block
+     * @return the flow
      */
-    suspend fun <R> run(
+    suspend fun <R> build(
         transactionAttribute: R2dbcTransactionAttribute = R2dbcTransactionAttribute.REQUIRED,
         transactionDefinition: TransactionDefinition? = null,
         block: suspend FlowCollector<R>.(FlowUserTransaction) -> Unit
@@ -43,12 +42,12 @@ interface FlowUserTransaction {
     }
 
     /**
-     * Begins a transaction with [R2dbcTransactionAttribute.REQUIRED].
+     * Build a transactional [Flow] with [R2dbcTransactionAttribute.REQUIRED].
      *
-     * @param R the return type of the block
+     * @param R the return type of the flow
      * @param transactionDefinition the transaction definition
      * @param block the block executed in the transaction
-     * @return the result of the block
+     * @return the flow
      */
     suspend fun <R> required(
         transactionDefinition: TransactionDefinition? = null,
@@ -56,12 +55,12 @@ interface FlowUserTransaction {
     ): Flow<R>
 
     /**
-     * Begins a transaction with [R2dbcTransactionAttribute.REQUIRES_NEW].
+     * Build a transactional [Flow] with [R2dbcTransactionAttribute.REQUIRES_NEW].
      *
-     * @param R the return type of the block
+     * @param R the return type of the flow
      * @param transactionDefinition the transaction definition
      * @param block the block executed in the transaction
-     * @return the result of the block
+     * @return the flow
      */
     suspend fun <R> requiresNew(
         transactionDefinition: TransactionDefinition? = null,
