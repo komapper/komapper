@@ -1,7 +1,6 @@
 package org.komapper.tx.r2dbc.flow
 
 import io.r2dbc.spi.TransactionDefinition
-import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.emitAll
@@ -120,7 +119,6 @@ internal class FlowUserTransactionImpl(
         return flow { block(this@FlowUserTransactionImpl) }
             .flowOn(txContext)
             .onCompletion { cause ->
-                currentCoroutineContext()
                 withContext(txContext) {
                     if (cause == null) {
                         if (transactionManager.isRollbackOnly) {
