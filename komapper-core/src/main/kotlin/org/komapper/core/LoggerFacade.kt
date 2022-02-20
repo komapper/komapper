@@ -91,7 +91,7 @@ class DefaultLoggerFacade(private val logger: Logger) : LoggerFacade {
 
     override fun commitFailed(transactionId: UUID, cause: Throwable) {
         logger.trace(LogCategory.TRANSACTION.value) {
-            "Commit of the transaction \"$transactionId\" failed."
+            "Commit of the transaction \"$transactionId\" failed. $cause"
         }
     }
 
@@ -103,7 +103,7 @@ class DefaultLoggerFacade(private val logger: Logger) : LoggerFacade {
 
     override fun rollbackFailed(transactionId: UUID, cause: Throwable) {
         logger.trace(LogCategory.TRANSACTION.value) {
-            "Rollback of the transaction \"$transactionId\" failed."
+            "Rollback of the transaction \"$transactionId\" failed. $cause"
         }
     }
 }

@@ -39,7 +39,7 @@ private suspend fun <R> withoutTransaction(block: suspend R2dbcTransactionScope.
 /**
  * The transaction manager.
  */
-val R2dbcSession.transactionManager: TransactionManager
+val R2dbcSession.transactionManager: R2dbcTransactionManager
     get() {
         return if (this is R2dbcTransactionSession) {
             this.transactionManager

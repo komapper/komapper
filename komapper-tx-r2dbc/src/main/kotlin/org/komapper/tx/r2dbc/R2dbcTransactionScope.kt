@@ -1,6 +1,7 @@
 package org.komapper.tx.r2dbc
 
 import io.r2dbc.spi.TransactionDefinition
+import kotlinx.coroutines.withContext
 import org.komapper.core.Scope
 
 /**
@@ -20,7 +21,7 @@ interface R2dbcTransactionScope : R2dbcUserTransaction {
 }
 
 internal class R2dbcTransactionScopeImpl(
-    private val transactionManager: TransactionManager,
+    private val transactionManager: R2dbcTransactionManager,
     private val defaultTransactionDefinition: TransactionDefinition? = null
 ) : R2dbcTransactionScope {
 
@@ -40,12 +41,10 @@ internal class R2dbcTransactionScopeImpl(
         block: suspend R2dbcTransactionScope.() -> R
     ): R {
         return if (transactionManager.isActive) {
-            val tx = transactionManager.suspend()
-            val result = runCatching {
+            val txContext = transactionManager.suspend()
+            withContext(txContext) {
                 executeInNewTransaction(transactionDefinition, block)
             }
-            transactionManager.resume(tx)
-            result.getOrThrow()
         } else {
             executeInNewTransaction(transactionDefinition, block)
         }
@@ -55,20 +54,21 @@ internal class R2dbcTransactionScopeImpl(
         transactionDefinition: TransactionDefinition?,
         block: suspend R2dbcTransactionScope.() -> R
     ): R {
-        return transactionManager.begin(transactionDefinition ?: defaultTransactionDefinition) {
+        val txContext = transactionManager.begin(transactionDefinition ?: defaultTransactionDefinition)
+        return withContext(txContext) {
             runCatching {
                 block(this@R2dbcTransactionScopeImpl)
-            }.onFailure { cause ->
-                runCatching {
-                    transactionManager.rollback()
-                }.onFailure {
-                    cause.addSuppressed(it)
-                }
             }.onSuccess {
                 if (transactionManager.isRollbackOnly) {
                     transactionManager.rollback()
                 } else {
                     transactionManager.commit()
+                }
+            }.onFailure { cause ->
+                runCatching {
+                    transactionManager.rollback()
+                }.onFailure {
+                    cause.addSuppressed(it)
                 }
             }.getOrThrow()
         }

@@ -5,6 +5,8 @@ import io.r2dbc.spi.ConnectionFactory
 import io.r2dbc.spi.TransactionDefinition
 import org.komapper.core.LoggerFacade
 import org.komapper.r2dbc.R2dbcSession
+import org.komapper.tx.r2dbc.flow.FlowTransactionScopeImpl
+import org.komapper.tx.r2dbc.flow.FlowUserTransaction
 import org.reactivestreams.Publisher
 
 /**
@@ -23,7 +25,11 @@ class R2dbcTransactionSession(
         R2dbcTransactionScopeImpl(transactionManager, transactionDefinition)
     }
 
-    val transactionManager: TransactionManager by lazy {
-        TransactionManagerImpl(connectionFactory, loggerFacade)
+    val flowUserTransaction: FlowUserTransaction by lazy {
+        FlowTransactionScopeImpl(transactionManager, transactionDefinition)
+    }
+
+    val transactionManager: R2dbcTransactionManager by lazy {
+        R2dbcTransactionManagerImpl(connectionFactory, loggerFacade)
     }
 }
