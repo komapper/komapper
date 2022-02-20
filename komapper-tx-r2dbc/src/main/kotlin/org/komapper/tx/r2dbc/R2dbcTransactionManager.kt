@@ -29,7 +29,7 @@ interface TransactionManager {
     val isRollbackOnly: Boolean
 
     /**
-     * This function must not throw an exception.
+     * This function must not throw any exceptions.
      */
     fun setRollbackOnly()
 
@@ -43,12 +43,12 @@ interface TransactionManager {
     suspend fun suspend(): R2dbcTransaction
 
     /**
-     * This function must not throw an exception.
+     * This function must not throw any exceptions.
      */
     suspend fun resume(tx: R2dbcTransaction)
 
     /**
-     * This function must not throw an exception.
+     * This function must not throw any exceptions.
      */
     suspend fun rollback()
 }
@@ -173,7 +173,7 @@ internal class TransactionManagerImpl(
     }
 
     /**
-     * This function must not throw an exception.
+     * This function must not throw any exceptions.
      */
     private suspend fun rollbackInternal(tx: R2dbcTransaction) {
         val connection = tx.connection
@@ -194,7 +194,7 @@ internal class TransactionManagerImpl(
     }
 
     /**
-     * This function must not throw an exception.
+     * This function must not throw any exceptions.
      */
     private suspend fun release(tx: R2dbcTransaction) {
         threadLocal.remove()

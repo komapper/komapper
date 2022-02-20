@@ -15,7 +15,7 @@ interface JdbcTransactionManager {
     val isRollbackOnly: Boolean
 
     /**
-     * This function must not throw an exception.
+     * This function must not throw any exceptions.
      */
     fun setRollbackOnly()
 
@@ -26,12 +26,12 @@ interface JdbcTransactionManager {
     fun suspend(): JdbcTransaction
 
     /**
-     * This function must not throw an exception.
+     * This function must not throw any exceptions.
      */
     fun resume(tx: JdbcTransaction)
 
     /**
-     * This function must not throw an exception.
+     * This function must not throw any exceptions.
      */
     fun rollback()
 }
@@ -149,7 +149,7 @@ internal class JdbcTransactionManagerImpl(
     }
 
     /**
-     * This function must not throw an exception.
+     * This function must not throw any exceptions.
      */
     private fun rollbackInternal(tx: JdbcTransaction) {
         runCatching {
@@ -171,7 +171,7 @@ internal class JdbcTransactionManagerImpl(
     }
 
     /**
-     * This function must not throw an exception.
+     * This function must not throw any exceptions.
      */
     private fun release(tx: JdbcTransaction) {
         threadLocal.remove()
