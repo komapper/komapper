@@ -17,7 +17,7 @@ class JdbcTransactionSession(
         get() =
             transactionManager.dataSource.connection
     val userTransaction: JdbcUserTransaction by lazy {
-        JdbcTransactionScopeImpl(transactionManager, isolationLevel)
+        JdbcUserTransactionImpl(transactionManager, isolationLevel)
     }
     val transactionManager: JdbcTransactionManager by lazy {
         JdbcTransactionManagerImpl(dataSource, loggerFacade)

@@ -19,7 +19,7 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
-internal class R2dbcTransactionScopeImplTest {
+internal class R2dbcUserTransactionImplTest {
 
     data class Address(val id: Int, val street: String, val version: Int)
 
@@ -56,7 +56,7 @@ internal class R2dbcTransactionScopeImplTest {
 
     private val connectionFactory = ConnectionFactories.get("r2dbc:h2:mem:///transaction-test;DB_CLOSE_DELAY=-1")
     private val txManager = R2dbcTransactionManagerImpl(connectionFactory, DefaultLoggerFacade(StdOutLogger()))
-    private val txScope = R2dbcTransactionScopeImpl(txManager)
+    private val txScope = R2dbcUserTransactionImpl(txManager)
     private val repository = Repository(txManager)
 
     @BeforeTest
@@ -140,11 +140,11 @@ internal class R2dbcTransactionScopeImplTest {
 
     @Test
     fun setRollbackOnly() = runBlocking {
-        txScope.run {
+        txScope.run { tx ->
             repository.delete(15)
-            assertFalse(isRollbackOnly())
-            setRollbackOnly()
-            assertTrue(isRollbackOnly())
+            assertFalse(tx.isRollbackOnly())
+            tx.setRollbackOnly()
+            assertTrue(tx.isRollbackOnly())
         }
         txScope.run {
             val address = repository.selectById(15)
@@ -193,11 +193,11 @@ internal class R2dbcTransactionScopeImplTest {
 
     @Test
     fun required_requiresNew() = runBlocking {
-        txScope.run {
+        txScope.run { tx ->
             repository.delete(15)
             val address = repository.selectById(15)
             assertNull(address)
-            requiresNew {
+            tx.requiresNew {
                 val address2 = repository.selectById(15)
                 assertNotNull(address2)
             }

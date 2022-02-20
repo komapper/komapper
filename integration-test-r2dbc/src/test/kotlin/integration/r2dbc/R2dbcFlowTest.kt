@@ -259,10 +259,10 @@ class R2dbcFlowTest(val db: R2dbcDatabase) {
     fun flowTransaction_setRollbackOnly() = inTransaction(db) {
         val a = Meta.address
         val query = QueryDsl.from(a).where { a.addressId eq 15 }.first()
-        val flow: Flow<Address> = db.flowTransaction(R2dbcTransactionAttribute.REQUIRES_NEW) {
+        val flow: Flow<Address> = db.flowTransaction(R2dbcTransactionAttribute.REQUIRES_NEW) { tx ->
             val address = db.runQuery(query)
             db.runQuery { QueryDsl.update(a).single(address.copy(street = "TOKYO")) }
-            setRollbackOnly()
+            tx.setRollbackOnly()
             val addressFlow = db.flowQuery { QueryDsl.from(a).orderBy(a.addressId) }
             emitAll(addressFlow)
         }

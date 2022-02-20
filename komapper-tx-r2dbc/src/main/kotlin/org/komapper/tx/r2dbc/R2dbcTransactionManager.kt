@@ -194,7 +194,7 @@ private object Null : R2dbcTransaction {
         get() = throw UnsupportedOperationException()
     override var isRollbackOnly: Boolean
         get() = throw UnsupportedOperationException()
-        set(value) {
+        set(_) {
             throw UnsupportedOperationException()
         }
 }
