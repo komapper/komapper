@@ -9,6 +9,6 @@ import org.komapper.r2dbc.R2dbcDatabaseConfig
 @ThreadSafe
 internal sealed interface R2dbcFlowBuilder<T> {
     fun check(config: DatabaseConfig)
-    fun build(config: R2dbcDatabaseConfig): Flow<T>
+    suspend fun build(config: R2dbcDatabaseConfig): Flow<T>
     fun dryRun(config: DatabaseConfig): DryRunStatement
 }

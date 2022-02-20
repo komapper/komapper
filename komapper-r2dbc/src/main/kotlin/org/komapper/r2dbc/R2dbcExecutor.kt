@@ -27,7 +27,7 @@ internal class R2dbcExecutor(
 
     private val executionOptions = config.executionOptions + executionOptionsProvider.getExecutionOptions()
 
-    fun <T> executeQuery(
+    suspend fun <T> executeQuery(
         statement: Statement,
         transform: (R2dbcDialect, Row) -> T
     ): Flow<T> {
