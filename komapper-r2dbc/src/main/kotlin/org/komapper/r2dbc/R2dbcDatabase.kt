@@ -106,7 +106,7 @@ interface R2dbcDatabase : R2dbc {
      * @return the flow
      */
     @Suppress("UNCHECKED_CAST")
-    fun <T> flow(query: FlowQuery<T>): Flow<T> {
+    fun <T> flowQuery(query: FlowQuery<T>): Flow<T> {
         val builder = query.accept(R2dbcFlowQueryVisitor) as R2dbcFlowBuilder<T>
         builder.check(config)
         return builder.build(config)
@@ -118,9 +118,9 @@ interface R2dbcDatabase : R2dbc {
      * @param block the block that returns a query
      * @return the flow
      */
-    fun <T> flow(block: QueryScope.() -> FlowQuery<T>): Flow<T> {
+    fun <T> flowQuery(block: QueryScope.() -> FlowQuery<T>): Flow<T> {
         val query = block(QueryScope)
-        return flow(query)
+        return flowQuery(query)
     }
 }
 

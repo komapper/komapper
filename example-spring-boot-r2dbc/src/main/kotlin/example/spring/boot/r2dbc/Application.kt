@@ -22,7 +22,7 @@ class Application(private val database: R2dbcDatabase) {
 
     @RequestMapping("/")
     fun list(): Flow<Message> {
-        return database.flow {
+        return database.flowQuery {
             val m = Meta.message
             QueryDsl.from(m).orderBy(m.id.desc())
         }
