@@ -29,8 +29,8 @@ https://www.komapper.org/ja/docs/
  
 ## Prerequisite
 
-- Kotlin 1.3.51 or later
-- Java 11 or later
+- Kotlin 1.5.31 or later
+- JRE 11 or later
 - Gradle 7.2 or later
 
 ## Supported Databases
