@@ -27,18 +27,19 @@ internal class R2dbcExecutor(
 
     private val executionOptions = config.executionOptions + executionOptionsProvider.getExecutionOptions()
 
-    suspend fun <T> executeQuery(
+    fun <T> executeQuery(
         statement: Statement,
         transform: (R2dbcDialect, Row) -> T
     ): Flow<T> {
         @Suppress("NAME_SHADOWING")
         val statement = inspect(statement)
-        return config.session.connection.use { con ->
-            val r2dbcStmt = prepare(con, statement)
-            setUp(r2dbcStmt)
-            log(statement)
-            bind(r2dbcStmt, statement)
+        return flow {
+            val con = config.session.connection.asFlow().single()
             flow {
+                val r2dbcStmt = prepare(con, statement)
+                setUp(r2dbcStmt)
+                log(statement)
+                bind(r2dbcStmt, statement)
                 r2dbcStmt.execute().collect { result ->
                     result.map { row, _ ->
                         transform(config.dialect, row) ?: Null
@@ -49,6 +50,20 @@ internal class R2dbcExecutor(
                         emit(nullable)
                     }
                 }
+            }.onCompletion { cause ->
+                if (cause == null) {
+                    con.close()
+                } else {
+                    runCatching {
+                        con.close()
+                    }.onFailure {
+                        cause.addSuppressed(it)
+                    }
+                }
+            }.catch {
+                translateException(it)
+            }.let {
+                emitAll(it)
             }
         }
     }
@@ -57,11 +72,11 @@ internal class R2dbcExecutor(
         @Suppress("NAME_SHADOWING")
         val statement = inspect(statement)
         return config.session.connection.use { con ->
-            val r2dbcStmt = prepare(con, statement)
-            setUp(r2dbcStmt)
-            log(statement)
-            bind(r2dbcStmt, statement)
             flow<Pair<Int, List<Long>>> {
+                val r2dbcStmt = prepare(con, statement)
+                setUp(r2dbcStmt)
+                log(statement)
+                bind(r2dbcStmt, statement)
                 r2dbcStmt.execute().collect { result ->
                     if (generatedColumn == null) {
                         result.rowsUpdated.collect { count -> emit(count to emptyList()) }
@@ -70,8 +85,8 @@ internal class R2dbcExecutor(
                         emit(keys.size to keys)
                     }
                 }
-            }
-        }.single()
+            }.single()
+        }
     }
 
     suspend fun executeBatch(statements: List<Statement>): List<Pair<Int, Long?>> {
@@ -102,21 +117,21 @@ internal class R2dbcExecutor(
                         }
                     }
                 }
-            }
-        }.toList()
+            }.toList()
+        }
     }
 
     suspend fun execute(statements: List<Statement>, predicate: (Result.Message) -> Boolean = { true }) {
         @Suppress("NAME_SHADOWING")
         val statements = statements.map { inspect(it) }
         config.session.connection.use { con ->
-            val batch = con.createBatch()
-            for (statement in statements) {
-                log(statement)
-                val sql = asSql(statement)
-                batch.add(sql)
-            }
-            flow<Int> {
+            flow {
+                val batch = con.createBatch()
+                for (statement in statements) {
+                    log(statement)
+                    val sql = asSql(statement)
+                    batch.add(sql)
+                }
                 batch.execute().collect { result ->
                     result.filter {
                         when (it) {
@@ -127,34 +142,34 @@ internal class R2dbcExecutor(
                         emit(it)
                     }
                 }
-            }
-        }.collect()
+            }.collect()
+        }
     }
 
-    private fun <T> Publisher<out Connection>.use(block: (Connection) -> Flow<T>): Flow<T> {
-        return flow {
-            val con = this@use.asFlow().single()
-            val value = block(con).onCompletion { cause ->
-                if (cause == null) {
-                    con.close()
-                } else {
-                    runCatching {
-                        con.close()
-                    }.onFailure {
-                        cause.addSuppressed(it)
-                    }
-                }
+    private suspend fun <T> Publisher<out Connection>.use(block: suspend (Connection) -> T): T {
+        val con = this.asFlow().single()
+        val result = runCatching {
+            block(con)
+        }.onSuccess {
+            con.close()
+        }.onFailure { cause ->
+            runCatching {
+                con.close()
+            }.onFailure {
+                cause.addSuppressed(cause)
             }
-            emitAll(value)
-        }.catch {
-            translateException(it)
+        }
+        return try {
+            result.getOrThrow()
+        } catch (cause: Throwable) {
+            translateException(cause)
         }
     }
 
     /**
      * Translates a [Exception] to a [RuntimeException].
      */
-    private fun translateException(cause: Throwable) {
+    private fun translateException(cause: Throwable): Nothing {
         when (cause) {
             is R2dbcException -> {
                 if (config.dialect.isUniqueConstraintViolationError(cause)) {

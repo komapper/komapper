@@ -20,7 +20,7 @@ internal class R2dbcTemplateSelectFlowBuilder<T>(
         runner.check(config)
     }
 
-    override suspend fun build(config: R2dbcDatabaseConfig): Flow<T> {
+    override fun build(config: R2dbcDatabaseConfig): Flow<T> {
         val statement = runner.buildStatement(config)
         val executor = R2dbcExecutor(config, context.options)
         return executor.executeQuery(statement) { dialect, row ->
