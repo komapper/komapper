@@ -4,16 +4,15 @@ import io.r2dbc.spi.Connection
 import io.r2dbc.spi.R2dbcException
 import io.r2dbc.spi.Result
 import io.r2dbc.spi.Row
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.reactive.collect
+import kotlinx.coroutines.withContext
 import org.komapper.core.ExecutionOptionsProvider
 import org.komapper.core.Statement
 import org.komapper.core.UniqueConstraintException
@@ -31,11 +30,13 @@ internal class R2dbcExecutor(
         statement: Statement,
         transform: (R2dbcDialect, Row) -> T
     ): Flow<T> {
-        @Suppress("NAME_SHADOWING")
-        val statement = inspect(statement)
         return flow {
-            val con = config.session.connection.asFlow().single()
-            flow {
+            @Suppress("NAME_SHADOWING")
+            val statement = inspect(statement)
+            val con = withContext(currentCoroutineContext()) {
+                config.session.connection.asFlow().single()
+            }
+            val result = runCatching {
                 val r2dbcStmt = prepare(con, statement)
                 setUp(r2dbcStmt)
                 log(statement)
@@ -50,20 +51,19 @@ internal class R2dbcExecutor(
                         emit(nullable)
                     }
                 }
-            }.onCompletion { cause ->
-                if (cause == null) {
+            }.onSuccess {
+                con.close()
+            }.onFailure { cause ->
+                runCatching {
                     con.close()
-                } else {
-                    runCatching {
-                        con.close()
-                    }.onFailure {
-                        cause.addSuppressed(it)
-                    }
+                }.onFailure {
+                    cause.addSuppressed(it)
                 }
-            }.catch {
-                translateException(it)
-            }.let {
-                emitAll(it)
+            }
+            try {
+                result.getOrThrow()
+            } catch (cause: Throwable) {
+                translateException(cause)
             }
         }
     }
@@ -147,7 +147,9 @@ internal class R2dbcExecutor(
     }
 
     private suspend fun <T> Publisher<out Connection>.use(block: suspend (Connection) -> T): T {
-        val con = this.asFlow().single()
+        val con = withContext(currentCoroutineContext()) {
+            this@use.asFlow().single()
+        }
         val result = runCatching {
             block(con)
         }.onSuccess {
