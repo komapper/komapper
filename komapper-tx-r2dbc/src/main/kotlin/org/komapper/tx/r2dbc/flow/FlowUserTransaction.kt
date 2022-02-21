@@ -6,7 +6,6 @@ import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.withContext
 import org.komapper.core.ThreadSafe
 import org.komapper.tx.r2dbc.R2dbcTransactionAttribute
@@ -116,25 +115,23 @@ internal class FlowUserTransactionImpl(
         block: suspend FlowCollector<R>.(FlowUserTransaction) -> Unit
     ): Flow<R> {
         val txContext = transactionManager.begin(transactionDefinition ?: defaultTransactionDefinition)
-        return flow { block(this@FlowUserTransactionImpl) }
-            .flowOn(txContext)
-            .onCompletion { cause ->
-                withContext(txContext) {
-                    if (cause == null) {
-                        if (transactionManager.isRollbackOnly) {
-                            transactionManager.rollback()
-                        } else {
-                            transactionManager.commit()
-                        }
-                    } else {
-                        runCatching {
-                            transactionManager.rollback()
-                        }.onFailure {
-                            cause.addSuppressed(it)
-                        }
-                    }
+        return flow {
+            kotlin.runCatching {
+                block(this@FlowUserTransactionImpl)
+            }.onSuccess {
+                if (transactionManager.isRollbackOnly) {
+                    transactionManager.rollback()
+                } else {
+                    transactionManager.commit()
                 }
-            }
+            }.onFailure { cause ->
+                kotlin.runCatching {
+                    transactionManager.rollback()
+                }.onFailure {
+                    cause.addSuppressed(it)
+                }
+            }.getOrThrow()
+        }.flowOn(txContext)
     }
 
     override fun setRollbackOnly() {
