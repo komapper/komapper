@@ -4,7 +4,6 @@ import io.r2dbc.spi.Connection
 import io.r2dbc.spi.ConnectionFactory
 import io.r2dbc.spi.ConnectionFactoryMetadata
 import io.r2dbc.spi.TransactionDefinition
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.asContextElement
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
@@ -14,16 +13,17 @@ import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.reactive.asPublisher
-import kotlinx.coroutines.withContext
 import org.komapper.core.LoggerFacade
 import org.komapper.core.ThreadSafe
 import org.reactivestreams.Publisher
+import java.util.UUID
+import kotlin.coroutines.CoroutineContext
 
 /**
  * The R2DBC transaction APIs designed for advanced use.
  */
 @ThreadSafe
-interface TransactionManager {
+interface R2dbcTransactionManager {
     val connectionFactory: ConnectionFactory
     val isActive: Boolean
     val isRollbackOnly: Boolean
@@ -33,19 +33,11 @@ interface TransactionManager {
      */
     fun setRollbackOnly()
 
-    suspend fun <R> begin(
-        transactionDefinition: TransactionDefinition? = null,
-        block: suspend CoroutineScope.() -> R
-    ): R
+    suspend fun begin(transactionDefinition: TransactionDefinition? = null): CoroutineContext
 
     suspend fun commit()
 
-    suspend fun suspend(): R2dbcTransaction
-
-    /**
-     * This function must not throw any exceptions.
-     */
-    suspend fun resume(tx: R2dbcTransaction)
+    suspend fun suspend(): CoroutineContext
 
     /**
      * This function must not throw any exceptions.
@@ -53,11 +45,11 @@ interface TransactionManager {
     suspend fun rollback()
 }
 
-internal class TransactionManagerImpl(
+internal class R2dbcTransactionManagerImpl(
     private val internalConnectionFactory: ConnectionFactory,
     private val loggerFacade: LoggerFacade
-) : TransactionManager {
-    private val threadLocal: ThreadLocal<R2dbcTransaction> = ThreadLocal()
+) : R2dbcTransactionManager {
+    private val threadLocal: ThreadLocal<R2dbcTransaction> = ThreadLocal.withInitial { Null }
     override val connectionFactory: ConnectionFactory = object : ConnectionFactory {
         override fun create(): Publisher<out Connection> {
             val tx = threadLocal.get()
@@ -93,10 +85,7 @@ internal class TransactionManagerImpl(
         }
     }
 
-    override suspend fun <R> begin(
-        transactionDefinition: TransactionDefinition?,
-        block: suspend CoroutineScope.() -> R
-    ): R {
+    override suspend fun begin(transactionDefinition: TransactionDefinition?): CoroutineContext {
         val currentTx = threadLocal.get()
         if (currentTx.isActive()) {
             rollbackInternal(currentTx)
@@ -122,8 +111,7 @@ internal class TransactionManagerImpl(
                 release(tx)
             }
         }.collect()
-        val context = threadLocal.asContextElement(tx)
-        return withContext(context, block)
+        return threadLocal.asContextElement(tx)
     }
 
     override suspend fun commit() {
@@ -147,21 +135,12 @@ internal class TransactionManagerImpl(
             }.collect()
     }
 
-    override suspend fun suspend(): R2dbcTransaction {
+    override suspend fun suspend(): CoroutineContext {
         val tx = threadLocal.get()
         if (!tx.isActive()) {
             error("A transaction hasn't yet begun.")
         }
-        threadLocal.remove()
-        return tx
-    }
-
-    override suspend fun resume(tx: R2dbcTransaction) {
-        val currentTx = threadLocal.get()
-        if (currentTx.isActive()) {
-            rollbackInternal(currentTx)
-        }
-        threadLocal.set(tx)
+        return threadLocal.asContextElement(Null)
     }
 
     override suspend fun rollback() {
@@ -205,5 +184,17 @@ internal class TransactionManagerImpl(
 }
 
 private fun R2dbcTransaction?.isActive(): Boolean {
-    return this != null
+    return this != Null
+}
+
+private object Null : R2dbcTransaction {
+    override val id: UUID
+        get() = throw UnsupportedOperationException()
+    override val connection: R2dbcTransactionConnection
+        get() = throw UnsupportedOperationException()
+    override var isRollbackOnly: Boolean
+        get() = throw UnsupportedOperationException()
+        set(_) {
+            throw UnsupportedOperationException()
+        }
 }

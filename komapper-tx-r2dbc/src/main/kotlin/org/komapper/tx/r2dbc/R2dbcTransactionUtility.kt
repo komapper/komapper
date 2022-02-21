@@ -17,7 +17,7 @@ import org.komapper.r2dbc.R2dbcSession
 suspend fun <R> R2dbc.withTransaction(
     transactionAttribute: R2dbcTransactionAttribute = R2dbcTransactionAttribute.REQUIRED,
     transactionDefinition: TransactionDefinition? = null,
-    block: suspend R2dbcTransactionScope.() -> R
+    block: suspend (R2dbcUserTransaction) -> R
 ): R {
     return if (this is R2dbcDatabase) {
         val session = this.config.session
@@ -31,15 +31,16 @@ suspend fun <R> R2dbc.withTransaction(
     }
 }
 
-private suspend fun <R> withoutTransaction(block: suspend R2dbcTransactionScope.() -> R): R {
-    val transactionScope = R2dbcTransactionScopeStub()
+private suspend fun <R> withoutTransaction(block: suspend (R2dbcUserTransaction) -> R): R {
+    val transactionScope = R2dbcUserTransactionStub()
     return block(transactionScope)
 }
 
 /**
  * The transaction manager.
  */
-val R2dbcSession.transactionManager: TransactionManager
+@Suppress("unused")
+val R2dbcSession.transactionManager: R2dbcTransactionManager
     get() {
         return if (this is R2dbcTransactionSession) {
             this.transactionManager

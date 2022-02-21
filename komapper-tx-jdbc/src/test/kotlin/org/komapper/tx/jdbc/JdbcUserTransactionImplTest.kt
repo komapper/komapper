@@ -12,7 +12,7 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
-internal class JdbcTransactionScopeImplTest {
+internal class JdbcUserTransactionImplTest {
 
     data class Address(val id: Int, val street: String, val version: Int)
 
@@ -51,7 +51,7 @@ internal class JdbcTransactionScopeImplTest {
 
     private val dataSource = SimpleDataSource("jdbc:h2:mem:transaction-test;DB_CLOSE_DELAY=-1")
     private val txManager = JdbcTransactionManagerImpl(dataSource, DefaultLoggerFacade(StdOutLogger()))
-    private val txScope = JdbcTransactionScopeImpl(txManager)
+    private val txScope = JdbcUserTransactionImpl(txManager)
     private val repository = Repository(txManager)
 
     @BeforeTest
@@ -129,11 +129,11 @@ internal class JdbcTransactionScopeImplTest {
 
     @Test
     fun setRollbackOnly() {
-        txScope.run {
+        txScope.run { tx ->
             repository.delete(15)
-            assertFalse(isRollbackOnly())
-            setRollbackOnly()
-            assertTrue(isRollbackOnly())
+            assertFalse(tx.isRollbackOnly())
+            tx.setRollbackOnly()
+            assertTrue(tx.isRollbackOnly())
         }
         txScope.run {
             val address = repository.selectById(15)
@@ -182,11 +182,11 @@ internal class JdbcTransactionScopeImplTest {
 
     @Test
     fun required_requiresNew() {
-        txScope.run {
+        txScope.run { tx ->
             repository.delete(15)
             val address = repository.selectById(15)
             assertNull(address)
-            requiresNew {
+            tx.requiresNew {
                 val address2 = repository.selectById(15)
                 assertNotNull(address2)
             }

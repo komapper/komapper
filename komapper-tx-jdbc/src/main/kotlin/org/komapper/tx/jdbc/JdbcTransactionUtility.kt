@@ -16,7 +16,7 @@ import org.komapper.jdbc.JdbcSession
 fun <R> Jdbc.withTransaction(
     transactionAttribute: JdbcTransactionAttribute = JdbcTransactionAttribute.REQUIRED,
     isolationLevel: JdbcIsolationLevel? = null,
-    block: JdbcTransactionScope.() -> R
+    block: (JdbcUserTransaction) -> R
 ): R {
     return if (this is JdbcDatabase) {
         val session = this.config.session
@@ -30,8 +30,8 @@ fun <R> Jdbc.withTransaction(
     }
 }
 
-private fun <R> withoutTransaction(block: JdbcTransactionScope.() -> R): R {
-    val transactionScope = JdbcTransactionScopeStub()
+private fun <R> withoutTransaction(block: (JdbcUserTransaction) -> R): R {
+    val transactionScope = JdbcUserTransactionStub()
     return block(transactionScope)
 }
 
