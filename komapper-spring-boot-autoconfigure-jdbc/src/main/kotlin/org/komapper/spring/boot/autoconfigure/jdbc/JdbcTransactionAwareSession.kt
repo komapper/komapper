@@ -11,6 +11,7 @@ class JdbcTransactionAwareSession(dataSource: DataSource) : JdbcSession {
         else -> TransactionAwareDataSourceProxy(dataSource)
     }
 
-    override val connection: Connection
-        get() = dataSourceProxy.connection
+    override fun getConnection(): Connection {
+        return dataSourceProxy.connection
+    }
 }

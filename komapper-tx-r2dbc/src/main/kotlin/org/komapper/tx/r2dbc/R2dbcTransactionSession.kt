@@ -17,10 +17,6 @@ class R2dbcTransactionSession(
     private val transactionDefinition: TransactionDefinition? = null
 ) : R2dbcSession {
 
-    override suspend fun getConnection(): Connection {
-        return transactionManager.getConnection()
-    }
-
     val userTransaction: R2dbcUserTransaction by lazy {
         R2dbcUserTransactionImpl(transactionManager, transactionDefinition)
     }
@@ -31,5 +27,9 @@ class R2dbcTransactionSession(
 
     val transactionManager: R2dbcTransactionManager by lazy {
         R2dbcTransactionManagerImpl(connectionFactory, loggerFacade)
+    }
+
+    override suspend fun getConnection(): Connection {
+        return transactionManager.getConnection()
     }
 }

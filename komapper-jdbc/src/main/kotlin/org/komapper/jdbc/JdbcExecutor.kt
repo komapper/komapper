@@ -26,7 +26,7 @@ internal class JdbcExecutor(
         @Suppress("NAME_SHADOWING")
         val statement = inspect(statement)
         return withExceptionTranslator {
-            config.session.connection.use { con ->
+            config.session.getConnection().use { con ->
                 prepare(con, statement).use { ps ->
                     setUp(ps)
                     log(statement)
@@ -47,7 +47,7 @@ internal class JdbcExecutor(
         @Suppress("NAME_SHADOWING")
         val statement = inspect(statement)
         return withExceptionTranslator {
-            config.session.connection.use { con ->
+            config.session.getConnection().use { con ->
                 prepare(con, statement).use { ps ->
                     setUp(ps)
                     log(statement)
@@ -73,7 +73,7 @@ internal class JdbcExecutor(
         @Suppress("NAME_SHADOWING")
         val statement = inspect(statement)
         return withExceptionTranslator {
-            config.session.connection.use { con ->
+            config.session.getConnection().use { con ->
                 prepare(con, statement).use { ps ->
                     setUp(ps)
                     log(statement)
@@ -95,7 +95,7 @@ internal class JdbcExecutor(
         @Suppress("NAME_SHADOWING")
         val statements = statements.map { inspect(it) }
         return withExceptionTranslator {
-            config.session.connection.use { con ->
+            config.session.getConnection().use { con ->
                 prepare(con, statements.first()).use { ps ->
                     setUp(ps)
                     val countAndKeyList = mutableListOf<Pair<Int, Long?>>()
@@ -129,7 +129,7 @@ internal class JdbcExecutor(
         @Suppress("NAME_SHADOWING")
         val statements = statements.map { inspect(it) }
         withExceptionTranslator {
-            config.session.connection.use { con ->
+            config.session.getConnection().use { con ->
                 for (statement in statements) {
                     con.createStatement().use { s ->
                         setUp(s)
