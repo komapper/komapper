@@ -58,7 +58,7 @@ class JdbcMetadataReaderTest(val db: JdbcDatabase) {
     }
 
     private fun getTables(schemaPattern: String? = null): List<Table> {
-        return db.config.session.connection.use {
+        return db.config.session.getConnection().use {
             // TODO: Remove this workaround in the future
             // https://jira.mariadb.org/browse/CONJ-921
             val catalog = if (db.config.dialect.driver == "mariadb") "" else null

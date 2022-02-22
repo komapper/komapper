@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.withContext
 import org.komapper.core.ThreadSafe
 import org.komapper.tx.r2dbc.R2dbcTransactionAttribute
@@ -66,12 +67,12 @@ interface FlowUserTransaction {
     /**
      * Marks the transaction as rollback.
      */
-    fun setRollbackOnly()
+    suspend fun setRollbackOnly()
 
     /**
      * Returns true if the transaction is marked as rollback.
      */
-    fun isRollbackOnly(): Boolean
+    suspend fun isRollbackOnly(): Boolean
 }
 
 internal class FlowUserTransactionImpl(
@@ -84,7 +85,7 @@ internal class FlowUserTransactionImpl(
         block: suspend FlowCollector<R>.(FlowUserTransaction) -> Unit
     ): Flow<R> {
         return flow {
-            if (transactionManager.isActive) {
+            if (transactionManager.isActive()) {
                 block(this@FlowUserTransactionImpl)
             } else {
                 val value = executeInNewTransaction(transactionDefinition, block)
@@ -98,10 +99,12 @@ internal class FlowUserTransactionImpl(
         block: suspend FlowCollector<R>.(FlowUserTransaction) -> Unit
     ): Flow<R> {
         return flow {
-            val value = if (transactionManager.isActive) {
+            val value = if (transactionManager.isActive()) {
                 val txContext = transactionManager.suspend()
                 withContext(txContext) {
                     executeInNewTransaction(transactionDefinition, block)
+                }.onCompletion {
+                    transactionManager.resume()
                 }
             } else {
                 executeInNewTransaction(transactionDefinition, block)
@@ -119,7 +122,7 @@ internal class FlowUserTransactionImpl(
             kotlin.runCatching {
                 block(this@FlowUserTransactionImpl)
             }.onSuccess {
-                if (transactionManager.isRollbackOnly) {
+                if (transactionManager.isRollbackOnly()) {
                     transactionManager.rollback()
                 } else {
                     transactionManager.commit()
@@ -134,12 +137,12 @@ internal class FlowUserTransactionImpl(
         }.flowOn(txContext)
     }
 
-    override fun setRollbackOnly() {
+    override suspend fun setRollbackOnly() {
         transactionManager.setRollbackOnly()
     }
 
-    override fun isRollbackOnly(): Boolean {
-        return transactionManager.isRollbackOnly
+    override suspend fun isRollbackOnly(): Boolean {
+        return transactionManager.isRollbackOnly()
     }
 }
 
@@ -147,11 +150,11 @@ internal class FlowUserTransactionStub : FlowUserTransaction {
 
     private var isRollbackOnly = false
 
-    override fun setRollbackOnly() {
+    override suspend fun setRollbackOnly() {
         isRollbackOnly = true
     }
 
-    override fun isRollbackOnly(): Boolean {
+    override suspend fun isRollbackOnly(): Boolean {
         return isRollbackOnly
     }
 

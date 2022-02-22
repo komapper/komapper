@@ -4,7 +4,7 @@ import io.r2dbc.spi.Connection
 import io.r2dbc.spi.R2dbcException
 import io.r2dbc.spi.Result
 import io.r2dbc.spi.Row
-import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
@@ -12,11 +12,11 @@ import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.reactive.collect
-import kotlinx.coroutines.withContext
 import org.komapper.core.ExecutionOptionsProvider
 import org.komapper.core.Statement
 import org.komapper.core.UniqueConstraintException
 import org.reactivestreams.Publisher
+import kotlin.coroutines.coroutineContext
 
 internal class R2dbcExecutor(
     private val config: R2dbcDatabaseConfig,
@@ -33,10 +33,7 @@ internal class R2dbcExecutor(
         return flow {
             @Suppress("NAME_SHADOWING")
             val statement = inspect(statement)
-            val con = withContext(currentCoroutineContext()) {
-                config.session.connection.asFlow().single()
-            }
-            val result = runCatching {
+            config.session.getConnection().use { con ->
                 val r2dbcStmt = prepare(con, statement)
                 setUp(r2dbcStmt)
                 log(statement)
@@ -51,19 +48,6 @@ internal class R2dbcExecutor(
                         emit(nullable)
                     }
                 }
-            }.onSuccess {
-                con.close()
-            }.onFailure { cause ->
-                runCatching {
-                    con.close()
-                }.onFailure {
-                    cause.addSuppressed(it)
-                }
-            }
-            try {
-                result.getOrThrow()
-            } catch (cause: Throwable) {
-                translateException(cause)
             }
         }
     }
@@ -71,7 +55,7 @@ internal class R2dbcExecutor(
     suspend fun executeUpdate(statement: Statement): Pair<Int, List<Long>> {
         @Suppress("NAME_SHADOWING")
         val statement = inspect(statement)
-        return config.session.connection.use { con ->
+        return config.session.getConnection().use { con ->
             flow<Pair<Int, List<Long>>> {
                 val r2dbcStmt = prepare(con, statement)
                 setUp(r2dbcStmt)
@@ -95,7 +79,7 @@ internal class R2dbcExecutor(
         val statements = statements.map { inspect(it) }
         val batchSize = executionOptions.batchSize?.let { if (it > 0) it else null } ?: 10
         val batchStatementsList = statements.chunked(batchSize)
-        return config.session.connection.use { con ->
+        return config.session.getConnection().use { con ->
             flow {
                 for (batchStatements in batchStatementsList) {
                     val r2dbcStmt = prepare(con, batchStatements.first())
@@ -124,7 +108,7 @@ internal class R2dbcExecutor(
     suspend fun execute(statements: List<Statement>, predicate: (Result.Message) -> Boolean = { true }) {
         @Suppress("NAME_SHADOWING")
         val statements = statements.map { inspect(it) }
-        config.session.connection.use { con ->
+        config.session.getConnection().use { con ->
             flow {
                 val batch = con.createBatch()
                 for (statement in statements) {
@@ -146,12 +130,10 @@ internal class R2dbcExecutor(
         }
     }
 
-    private suspend fun <T> Publisher<out Connection>.use(block: suspend (Connection) -> T): T {
-        val con = withContext(currentCoroutineContext()) {
-            this@use.asFlow().single()
-        }
+    private suspend fun <T> Connection.use(block: suspend CoroutineScope.(Connection) -> T): T {
+        val con = this
         val result = runCatching {
-            block(con)
+            block(CoroutineScope(coroutineContext), con)
         }.onSuccess {
             con.close()
         }.onFailure { cause ->

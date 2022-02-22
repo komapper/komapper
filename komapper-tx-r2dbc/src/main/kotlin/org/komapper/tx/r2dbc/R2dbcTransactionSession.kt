@@ -7,7 +7,6 @@ import org.komapper.core.LoggerFacade
 import org.komapper.r2dbc.R2dbcSession
 import org.komapper.tx.r2dbc.flow.FlowUserTransaction
 import org.komapper.tx.r2dbc.flow.FlowUserTransactionImpl
-import org.reactivestreams.Publisher
 
 /**
  * Represents a transactional session for R2DBC.
@@ -17,9 +16,6 @@ class R2dbcTransactionSession(
     private val loggerFacade: LoggerFacade,
     private val transactionDefinition: TransactionDefinition? = null
 ) : R2dbcSession {
-
-    override val connection: Publisher<out Connection>
-        get() = transactionManager.connectionFactory.create()
 
     val userTransaction: R2dbcUserTransaction by lazy {
         R2dbcUserTransactionImpl(transactionManager, transactionDefinition)
@@ -31,5 +27,9 @@ class R2dbcTransactionSession(
 
     val transactionManager: R2dbcTransactionManager by lazy {
         R2dbcTransactionManagerImpl(connectionFactory, loggerFacade)
+    }
+
+    override suspend fun getConnection(): Connection {
+        return transactionManager.getConnection()
     }
 }

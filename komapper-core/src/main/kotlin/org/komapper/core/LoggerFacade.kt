@@ -59,6 +59,20 @@ interface LoggerFacade {
      * @param cause the cause of failure
      */
     fun rollbackFailed(transactionId: UUID, cause: Throwable)
+
+    /**
+     * Logs the suspending of transaction.
+     *
+     * @param transactionId the transaction id
+     */
+    fun suspend(transactionId: UUID)
+
+    /**
+     * Logs the resuming of transaction.
+     *
+     * @param transactionId the transaction id
+     */
+    fun resume(transactionId: UUID)
 }
 
 /**
@@ -104,6 +118,18 @@ class DefaultLoggerFacade(private val logger: Logger) : LoggerFacade {
     override fun rollbackFailed(transactionId: UUID, cause: Throwable) {
         logger.trace(LogCategory.TRANSACTION.value) {
             "Rollback of the transaction \"$transactionId\" failed. $cause"
+        }
+    }
+
+    override fun suspend(transactionId: UUID) {
+        logger.trace(LogCategory.TRANSACTION.value) {
+            "The transaction \"$transactionId\" has suspended."
+        }
+    }
+
+    override fun resume(transactionId: UUID) {
+        logger.trace(LogCategory.TRANSACTION.value) {
+            "The transaction \"$transactionId\" has resumed."
         }
     }
 }

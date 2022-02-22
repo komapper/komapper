@@ -27,7 +27,7 @@ class DefaultJdbcDataFactory(private val session: JdbcSession) : JdbcDataFactory
      * @param elements the elements that populate the returned object
      */
     override fun createArrayOf(typeName: String, elements: List<*>): java.sql.Array {
-        return session.connection.use {
+        return session.getConnection().use {
             it.createArrayOf(typeName, elements.toTypedArray())
         }
     }
@@ -36,7 +36,7 @@ class DefaultJdbcDataFactory(private val session: JdbcSession) : JdbcDataFactory
      * Creates a Blob object.
      */
     override fun createBlob(): Blob {
-        return session.connection.use {
+        return session.getConnection().use {
             it.createBlob()
         }
     }
@@ -45,7 +45,7 @@ class DefaultJdbcDataFactory(private val session: JdbcSession) : JdbcDataFactory
      * Creates a Clob object.
      */
     override fun createClob(): Clob {
-        return session.connection.use {
+        return session.getConnection().use {
             it.createClob()
         }
     }
@@ -54,7 +54,7 @@ class DefaultJdbcDataFactory(private val session: JdbcSession) : JdbcDataFactory
      * Creates a NClob object.
      */
     override fun createNClob(): NClob {
-        return session.connection.use {
+        return session.getConnection().use {
             it.createNClob()
         }
     }
@@ -63,7 +63,7 @@ class DefaultJdbcDataFactory(private val session: JdbcSession) : JdbcDataFactory
      * Creates a SQLXML object.
      */
     override fun createSQLXML(): SQLXML {
-        return session.connection.use {
+        return session.getConnection().use {
             it.createSQLXML()
         }
     }

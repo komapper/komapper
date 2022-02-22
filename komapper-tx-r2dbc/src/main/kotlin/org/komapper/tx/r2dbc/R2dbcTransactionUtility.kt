@@ -1,9 +1,11 @@
 package org.komapper.tx.r2dbc
 
 import io.r2dbc.spi.TransactionDefinition
+import kotlinx.coroutines.CoroutineScope
 import org.komapper.r2dbc.R2dbc
 import org.komapper.r2dbc.R2dbcDatabase
 import org.komapper.r2dbc.R2dbcSession
+import kotlin.coroutines.coroutineContext
 
 /**
  * Begins a R2DBC transaction.
@@ -17,7 +19,7 @@ import org.komapper.r2dbc.R2dbcSession
 suspend fun <R> R2dbc.withTransaction(
     transactionAttribute: R2dbcTransactionAttribute = R2dbcTransactionAttribute.REQUIRED,
     transactionDefinition: TransactionDefinition? = null,
-    block: suspend (R2dbcUserTransaction) -> R
+    block: suspend CoroutineScope.(R2dbcUserTransaction) -> R
 ): R {
     return if (this is R2dbcDatabase) {
         val session = this.config.session
@@ -31,9 +33,9 @@ suspend fun <R> R2dbc.withTransaction(
     }
 }
 
-private suspend fun <R> withoutTransaction(block: suspend (R2dbcUserTransaction) -> R): R {
-    val transactionScope = R2dbcUserTransactionStub()
-    return block(transactionScope)
+private suspend fun <R> withoutTransaction(block: suspend CoroutineScope.(R2dbcUserTransaction) -> R): R {
+    val userTransaction = R2dbcUserTransactionStub()
+    return block(CoroutineScope(coroutineContext), userTransaction)
 }
 
 /**

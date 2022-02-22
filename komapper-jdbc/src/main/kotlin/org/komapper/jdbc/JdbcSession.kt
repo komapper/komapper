@@ -10,11 +10,13 @@ import javax.sql.DataSource
 @ThreadSafe
 interface JdbcSession {
     /**
-     * The JDBC connection.
+     * Returns a JDBC connection.
      */
-    val connection: Connection
+    fun getConnection(): Connection
 }
 
 class DefaultJdbcSession(private val dataSource: DataSource) : JdbcSession {
-    override val connection: Connection get() = dataSource.connection
+    override fun getConnection(): Connection {
+        return dataSource.connection
+    }
 }

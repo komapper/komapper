@@ -25,7 +25,7 @@ internal class R2dbcUserTransactionImplTest {
 
     class Repository(private val txManager: R2dbcTransactionManager) {
         suspend fun selectAll(): List<Address> {
-            val con = txManager.connectionFactory.create().awaitSingle()
+            val con = txManager.getConnection()
             val stmt = con.createStatement("select address_id, street, version from address order by address_id")
             val result = stmt.execute().awaitSingle()
             val flow = result.map { row, _ ->
@@ -44,7 +44,7 @@ internal class R2dbcUserTransactionImplTest {
         }
 
         suspend fun delete(id: Int): Int {
-            val con = txManager.connectionFactory.create().awaitSingle()
+            val con = txManager.getConnection()
             val stmt = con.createStatement("delete from address where address_id = ?")
             stmt.bind(0, id)
             val result = stmt.execute().awaitSingle()

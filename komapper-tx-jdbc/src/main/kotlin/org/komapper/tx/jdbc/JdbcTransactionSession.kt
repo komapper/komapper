@@ -13,13 +13,15 @@ class JdbcTransactionSession(
     private val loggerFacade: LoggerFacade,
     private val isolationLevel: JdbcIsolationLevel? = null
 ) : JdbcSession {
-    override val connection: Connection
-        get() =
-            transactionManager.dataSource.connection
+
     val userTransaction: JdbcUserTransaction by lazy {
         JdbcUserTransactionImpl(transactionManager, isolationLevel)
     }
     val transactionManager: JdbcTransactionManager by lazy {
         JdbcTransactionManagerImpl(dataSource, loggerFacade)
+    }
+
+    override fun getConnection(): Connection {
+        return transactionManager.dataSource.connection
     }
 }

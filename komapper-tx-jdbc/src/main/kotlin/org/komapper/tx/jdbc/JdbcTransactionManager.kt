@@ -129,6 +129,7 @@ internal class JdbcTransactionManagerImpl(
             error("A transaction hasn't yet begun.")
         }
         threadLocal.remove()
+        loggerFacade.suspend(tx.id)
         return tx
     }
 
@@ -138,6 +139,7 @@ internal class JdbcTransactionManagerImpl(
             rollbackInternal(currentTx)
         }
         threadLocal.set(tx)
+        loggerFacade.resume(tx.id)
     }
 
     override fun rollback() {
