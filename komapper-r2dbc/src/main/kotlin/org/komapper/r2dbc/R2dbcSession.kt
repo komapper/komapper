@@ -2,8 +2,9 @@ package org.komapper.r2dbc
 
 import io.r2dbc.spi.Connection
 import io.r2dbc.spi.ConnectionFactory
+import kotlinx.coroutines.flow.single
+import kotlinx.coroutines.reactive.asFlow
 import org.komapper.core.ThreadSafe
-import org.reactivestreams.Publisher
 
 /**
  * Represents a session for R2DBC access.
@@ -11,12 +12,13 @@ import org.reactivestreams.Publisher
 @ThreadSafe
 interface R2dbcSession {
     /**
-     * The R2DBC connection.
+     * Returns a R2DBC connection.
      */
-    val connection: Publisher<out Connection>
+    suspend fun getConnection(): Connection
 }
 
 class DefaultR2dbcSession(private val connectionFactory: ConnectionFactory) : R2dbcSession {
-    override val connection: Publisher<out Connection>
-        get() = connectionFactory.create()
+    override suspend fun getConnection(): Connection {
+        return connectionFactory.create().asFlow().single()
+    }
 }

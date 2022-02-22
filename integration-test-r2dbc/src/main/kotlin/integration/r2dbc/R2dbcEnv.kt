@@ -33,6 +33,7 @@ class R2dbcEnv :
             initialized = true
             runBlockingWithTimeout {
                 db.withTransaction {
+                    println("withTransaction: " + coroutineContext)
                     db.runQuery {
                         QueryDsl.executeScript(setting.createSql).options {
                             it.copy(suppressLogging = true)

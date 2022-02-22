@@ -6,7 +6,6 @@ import integration.core.address
 import integration.core.department
 import integration.core.noVersionDepartment
 import integration.core.person
-import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.ClockProvider
 import org.komapper.core.OptimisticLockException
@@ -98,9 +97,7 @@ class R2dbcUpdateSingleTest(private val db: R2dbcDatabase) {
         val a = Meta.address
         val address = Address(1, "STREET 2", 1)
         assertFailsWith<UniqueConstraintException> {
-            runBlocking {
-                db.runQuery { QueryDsl.update(a).single(address) }.let { }
-            }
+            db.runQuery { QueryDsl.update(a).single(address) }.let { }
         }
     }
 

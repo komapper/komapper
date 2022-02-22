@@ -3,8 +3,6 @@ package integration.r2dbc
 import integration.core.Address
 import integration.core.address
 import integration.core.employee
-import kotlinx.coroutines.runBlocking
-import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.OptimisticLockException
 import org.komapper.core.dsl.Meta
@@ -20,6 +18,7 @@ import org.komapper.core.dsl.query.firstOrNull
 import org.komapper.r2dbc.R2dbcDatabase
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
@@ -171,10 +170,8 @@ class R2dbcSelectTest(private val db: R2dbcDatabase) {
         val a2 = Meta.address.define { a2 ->
             where { a2.version eq 99 }
         }
-        assertThrows<OptimisticLockException> {
-            runBlocking {
-                db.runQuery { QueryDsl.update(a2).single(address) }.run { }
-            }
+        assertFailsWith<OptimisticLockException> {
+            db.runQuery { QueryDsl.update(a2).single(address) }.run { }
         }
     }
 
@@ -194,10 +191,8 @@ class R2dbcSelectTest(private val db: R2dbcDatabase) {
         val a2 = Meta.address.define { a2 ->
             where { a2.version eq 99 }
         }
-        assertThrows<OptimisticLockException> {
-            runBlocking {
-                db.runQuery { QueryDsl.delete(a2).single(address) }
-            }
+        assertFailsWith<OptimisticLockException> {
+            db.runQuery { QueryDsl.delete(a2).single(address) }
         }
     }
 
