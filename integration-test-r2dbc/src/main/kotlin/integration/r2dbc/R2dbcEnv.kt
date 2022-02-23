@@ -51,7 +51,7 @@ class R2dbcEnv :
                 db.withTransaction {
                     db.runQuery {
                         QueryDsl.executeScript(resetSql).options {
-                            it.copy(suppressLogging = false)
+                            it.copy(suppressLogging = true)
                         }
                     }
                 }
