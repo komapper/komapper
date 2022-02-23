@@ -21,6 +21,7 @@ data class ScriptExecuteRunner(
         return context.sql.split(context.options.separator)
             .asSequence()
             .filter { it.isNotBlank() }
+            .map { it.trim() }
             .map { Statement(it) }
             .toList()
     }
