@@ -1,20 +1,13 @@
 package integration.r2dbc.oracle
 
 import integration.core.OracleSetting
-import io.r2dbc.spi.Connection
 import io.r2dbc.spi.ConnectionFactories
-import io.r2dbc.spi.ConnectionFactory
 import io.r2dbc.spi.ConnectionFactoryOptions
-import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.reactive.asPublisher
-import kotlinx.coroutines.reactive.awaitSingle
-import kotlinx.coroutines.runBlocking
+import io.r2dbc.spi.Option
 import org.komapper.core.ExecutionOptions
 import org.komapper.r2dbc.DefaultR2dbcDatabaseConfig
 import org.komapper.r2dbc.R2dbcDatabaseConfig
 import org.komapper.r2dbc.R2dbcDialects
-import org.reactivestreams.Publisher
 import org.testcontainers.containers.OracleContainer
 import org.testcontainers.containers.OracleContainerProvider
 import org.testcontainers.jdbc.ConnectionUrl
@@ -33,30 +26,16 @@ class R2dbcOracleSetting : OracleSetting<R2dbcDatabaseConfig> {
             r2dbcContainer.start()
             r2dbcContainer.configure(
                 ConnectionFactoryOptions.builder()
-                    .option(ConnectionFactoryOptions.DRIVER, DRIVER)
+                    .option(ConnectionFactoryOptions.DRIVER, "pool")
+                    .option(ConnectionFactoryOptions.PROTOCOL, DRIVER)
+                    .option(Option.valueOf("initialSize"), 2)
                     .build()
             )
-        }
-        val CONNECTION_FACTORY: ConnectionFactory by lazy {
-            val internalConnectionFactory = ConnectionFactories.get(OPTIONS)
-            val internalConnection = runBlocking {
-                internalConnectionFactory.create().awaitSingle()
-            }
-            val connection = object : Connection by internalConnection {
-                override fun close(): Publisher<Void> {
-                    return emptyFlow<Void>().asPublisher()
-                }
-            }
-            object : ConnectionFactory by internalConnectionFactory {
-                override fun create(): Publisher<out Connection> {
-                    return flowOf(connection).asPublisher()
-                }
-            }
         }
     }
 
     override val config: R2dbcDatabaseConfig =
-        object : DefaultR2dbcDatabaseConfig(CONNECTION_FACTORY, R2dbcDialects.get(DRIVER)) {
+        object : DefaultR2dbcDatabaseConfig(ConnectionFactories.get(OPTIONS), R2dbcDialects.get(DRIVER)) {
             override val executionOptions: ExecutionOptions = super.executionOptions.copy(batchSize = 2)
         }
 }
