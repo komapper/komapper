@@ -7,7 +7,7 @@ import org.komapper.r2dbc.R2dbcDatabase
 import org.komapper.tx.r2dbc.R2dbcUserTransaction
 import org.komapper.tx.r2dbc.withTransaction
 
-fun <T> inTransaction(db: R2dbcDatabase, block: suspend (R2dbcUserTransaction) -> T) {
+fun <T> inTransaction(db: R2dbcDatabase, block: suspend CoroutineScope.(R2dbcUserTransaction) -> T) {
     runBlockingWithTimeout {
         db.withTransaction {
             it.setRollbackOnly()

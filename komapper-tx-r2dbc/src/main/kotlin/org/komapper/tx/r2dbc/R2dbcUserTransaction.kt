@@ -2,9 +2,9 @@ package org.komapper.tx.r2dbc
 
 import io.r2dbc.spi.TransactionDefinition
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
 import org.komapper.core.ThreadSafe
-import kotlin.coroutines.coroutineContext
 
 /**
  * The R2DBC transaction APIs designed to be used in general cases.
@@ -79,7 +79,9 @@ internal class R2dbcUserTransactionImpl(
         block: suspend CoroutineScope.(R2dbcUserTransaction) -> R
     ): R {
         return if (transactionManager.isActive()) {
-            block(CoroutineScope(coroutineContext), this)
+            coroutineScope {
+                block(this@R2dbcUserTransactionImpl)
+            }
         } else {
             executeInNewTransaction(transactionDefinition, block)
         }
@@ -149,14 +151,14 @@ internal class R2dbcUserTransactionStub : R2dbcUserTransaction {
     override suspend fun <R> required(
         transactionDefinition: TransactionDefinition?,
         block: suspend CoroutineScope.(R2dbcUserTransaction) -> R
-    ): R {
-        return block(CoroutineScope(coroutineContext), this)
+    ): R = coroutineScope {
+        block(this@R2dbcUserTransactionStub)
     }
 
     override suspend fun <R> requiresNew(
         transactionDefinition: TransactionDefinition?,
         block: suspend CoroutineScope.(R2dbcUserTransaction) -> R
-    ): R {
-        return block(CoroutineScope(coroutineContext), this)
+    ): R = coroutineScope {
+        block(this@R2dbcUserTransactionStub)
     }
 }
