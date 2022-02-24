@@ -1,8 +1,6 @@
 package integration.r2dbc
 
 import integration.core.Address
-import integration.core.Dbms
-import integration.core.Run
 import integration.core.address
 import integration.core.employee
 import kotlinx.coroutines.flow.Flow
@@ -253,8 +251,6 @@ class R2dbcFlowTest(val db: R2dbcDatabase) {
         assertEquals(Address(15, "TOKYO", 2), address)
     }
 
-    // TODO configure R2dbcOracleSetting to return multiple connections
-    @Run(unless = [Dbms.ORACLE])
     @Test
     fun flowTransaction_setRollbackOnly() = inTransaction(db) {
         val a = Meta.address
