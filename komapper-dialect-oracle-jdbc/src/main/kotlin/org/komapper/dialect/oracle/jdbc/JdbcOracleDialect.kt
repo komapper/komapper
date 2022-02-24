@@ -83,5 +83,7 @@ class JdbcOracleDialect(
         }
     }
 
+    override fun supportsBatchExecutionReturningGeneratedValues(): Boolean = false
+
     override fun supportsReturnGeneratedKeysFlag(): Boolean = false
 }

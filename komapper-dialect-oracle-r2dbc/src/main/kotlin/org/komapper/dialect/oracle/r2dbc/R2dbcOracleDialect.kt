@@ -74,4 +74,6 @@ open class R2dbcOracleDialect(
     override fun isUniqueConstraintViolationError(exception: R2dbcException): Boolean {
         return exception.errorCode == OracleDialect.UNIQUE_CONSTRAINT_VIOLATION_ERROR_CODE
     }
+
+    override fun supportsBatchExecutionReturningGeneratedValues(): Boolean = false
 }

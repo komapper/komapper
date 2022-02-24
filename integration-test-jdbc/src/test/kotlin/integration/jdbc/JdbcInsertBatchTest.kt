@@ -40,7 +40,7 @@ class JdbcInsertBatchTest(private val db: JdbcDatabase) {
         assertEquals(addressList, list)
     }
 
-    @Run(unless = [Dbms.SQLSERVER])
+    @Run(unless = [Dbms.ORACLE, Dbms.SQLSERVER])
     @Test
     fun identity() {
         val i = Meta.identityStrategy
@@ -55,7 +55,7 @@ class JdbcInsertBatchTest(private val db: JdbcDatabase) {
         assertTrue(results1.all { it.id != null })
     }
 
-    @Run(onlyIf = [Dbms.SQLSERVER])
+    @Run(onlyIf = [Dbms.ORACLE, Dbms.SQLSERVER])
     @Test
     fun identity_unsupportedOperationException() {
         val i = Meta.identityStrategy
