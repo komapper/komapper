@@ -1,10 +1,8 @@
 package org.komapper.tx.r2dbc
 
 import io.r2dbc.spi.TransactionDefinition
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.withContext
 import org.komapper.core.ThreadSafe
-import kotlin.coroutines.coroutineContext
 
 /**
  * The R2DBC transaction APIs designed to be used in general cases.
@@ -24,7 +22,7 @@ interface R2dbcUserTransaction {
     suspend fun <R> run(
         transactionAttribute: R2dbcTransactionAttribute = R2dbcTransactionAttribute.REQUIRED,
         transactionDefinition: TransactionDefinition? = null,
-        block: suspend CoroutineScope.(R2dbcUserTransaction) -> R
+        block: suspend (R2dbcUserTransaction) -> R
     ): R {
         return when (transactionAttribute) {
             R2dbcTransactionAttribute.REQUIRED -> required(transactionDefinition, block)
@@ -42,7 +40,7 @@ interface R2dbcUserTransaction {
      */
     suspend fun <R> required(
         transactionDefinition: TransactionDefinition? = null,
-        block: suspend CoroutineScope.(R2dbcUserTransaction) -> R
+        block: suspend (R2dbcUserTransaction) -> R
     ): R
 
     /**
@@ -55,7 +53,7 @@ interface R2dbcUserTransaction {
      */
     suspend fun <R> requiresNew(
         transactionDefinition: TransactionDefinition? = null,
-        block: suspend CoroutineScope.(R2dbcUserTransaction) -> R
+        block: suspend (R2dbcUserTransaction) -> R
     ): R
 
     /**
@@ -76,10 +74,10 @@ internal class R2dbcUserTransactionImpl(
 
     override suspend fun <R> required(
         transactionDefinition: TransactionDefinition?,
-        block: suspend CoroutineScope.(R2dbcUserTransaction) -> R
+        block: suspend (R2dbcUserTransaction) -> R
     ): R {
         return if (transactionManager.isActive()) {
-            block(CoroutineScope(coroutineContext), this)
+            block(this)
         } else {
             executeInNewTransaction(transactionDefinition, block)
         }
@@ -87,7 +85,7 @@ internal class R2dbcUserTransactionImpl(
 
     override suspend fun <R> requiresNew(
         transactionDefinition: TransactionDefinition?,
-        block: suspend CoroutineScope.(R2dbcUserTransaction) -> R
+        block: suspend (R2dbcUserTransaction) -> R
     ): R {
         return if (transactionManager.isActive()) {
             val txContext = transactionManager.suspend()
@@ -103,7 +101,7 @@ internal class R2dbcUserTransactionImpl(
 
     private suspend fun <R> executeInNewTransaction(
         transactionDefinition: TransactionDefinition?,
-        block: suspend CoroutineScope.(R2dbcUserTransaction) -> R
+        block: suspend (R2dbcUserTransaction) -> R
     ): R {
         val txContext = transactionManager.begin(transactionDefinition ?: defaultTransactionDefinition)
         return withContext(txContext) {
@@ -148,15 +146,15 @@ internal class R2dbcUserTransactionStub : R2dbcUserTransaction {
 
     override suspend fun <R> required(
         transactionDefinition: TransactionDefinition?,
-        block: suspend CoroutineScope.(R2dbcUserTransaction) -> R
+        block: suspend (R2dbcUserTransaction) -> R
     ): R {
-        return block(CoroutineScope(coroutineContext), this)
+        return block(this)
     }
 
     override suspend fun <R> requiresNew(
         transactionDefinition: TransactionDefinition?,
-        block: suspend CoroutineScope.(R2dbcUserTransaction) -> R
+        block: suspend (R2dbcUserTransaction) -> R
     ): R {
-        return block(CoroutineScope(coroutineContext), this)
+        return block(this)
     }
 }
