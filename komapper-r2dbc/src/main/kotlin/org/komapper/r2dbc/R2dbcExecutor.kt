@@ -6,6 +6,7 @@ import io.r2dbc.spi.Result
 import io.r2dbc.spi.Row
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.single
@@ -49,14 +50,16 @@ internal class R2dbcExecutor(
                     }
                 }
             }
+        }.catch {
+            translateException(it)
         }
     }
 
     suspend fun executeUpdate(statement: Statement): Pair<Int, List<Long>> {
-        @Suppress("NAME_SHADOWING")
-        val statement = inspect(statement)
-        return config.session.getConnection().use { con ->
-            flow<Pair<Int, List<Long>>> {
+        return flow<Pair<Int, List<Long>>> {
+            @Suppress("NAME_SHADOWING")
+            val statement = inspect(statement)
+            config.session.getConnection().use { con ->
                 val r2dbcStmt = prepare(con, statement)
                 setUp(r2dbcStmt)
                 log(statement)
@@ -69,18 +72,20 @@ internal class R2dbcExecutor(
                         emit(keys.size to keys)
                     }
                 }
-            }.single()
-        }
+            }
+        }.catch {
+            translateException(it)
+        }.single()
     }
 
     suspend fun executeBatch(statements: List<Statement>): List<Pair<Int, Long?>> {
         require(statements.isNotEmpty())
-        @Suppress("NAME_SHADOWING")
-        val statements = statements.map { inspect(it) }
-        val batchSize = executionOptions.batchSize?.let { if (it > 0) it else null } ?: 10
-        val batchStatementsList = statements.chunked(batchSize)
-        return config.session.getConnection().use { con ->
-            flow {
+        return flow {
+            @Suppress("NAME_SHADOWING")
+            val statements = statements.map { inspect(it) }
+            val batchSize = executionOptions.batchSize?.let { if (it > 0) it else null } ?: 10
+            val batchStatementsList = statements.chunked(batchSize)
+            config.session.getConnection().use { con ->
                 for (batchStatements in batchStatementsList) {
                     val r2dbcStmt = prepare(con, batchStatements.first())
                     setUp(r2dbcStmt)
@@ -101,15 +106,17 @@ internal class R2dbcExecutor(
                         }
                     }
                 }
-            }.toList()
-        }
+            }
+        }.catch {
+            translateException(it)
+        }.toList()
     }
 
     suspend fun execute(statements: List<Statement>, predicate: (Result.Message) -> Boolean = { true }) {
-        @Suppress("NAME_SHADOWING")
-        val statements = statements.map { inspect(it) }
-        config.session.getConnection().use { con ->
-            flow {
+        flow {
+            @Suppress("NAME_SHADOWING")
+            val statements = statements.map { inspect(it) }
+            config.session.getConnection().use { con ->
                 val batch = con.createBatch()
                 for (statement in statements) {
                     log(statement)
@@ -126,13 +133,15 @@ internal class R2dbcExecutor(
                         emit(it)
                     }
                 }
-            }.collect()
-        }
+            }
+        }.catch {
+            translateException(it)
+        }.collect()
     }
 
     private suspend fun <T> Connection.use(block: suspend CoroutineScope.(Connection) -> T): T {
         val con = this
-        val result = runCatching {
+        return runCatching {
             block(CoroutineScope(coroutineContext), con)
         }.onSuccess {
             con.close()
@@ -142,12 +151,7 @@ internal class R2dbcExecutor(
             }.onFailure {
                 cause.addSuppressed(cause)
             }
-        }
-        return try {
-            result.getOrThrow()
-        } catch (cause: Throwable) {
-            translateException(cause)
-        }
+        }.getOrThrow()
     }
 
     /**
