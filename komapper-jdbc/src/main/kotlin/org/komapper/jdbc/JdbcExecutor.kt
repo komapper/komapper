@@ -23,9 +23,9 @@ internal class JdbcExecutor(
         statement: Statement,
         transform: (rs: ResultSet) -> T
     ): T {
-        @Suppress("NAME_SHADOWING")
-        val statement = inspect(statement)
         return withExceptionTranslator {
+            @Suppress("NAME_SHADOWING")
+            val statement = inspect(statement)
             config.session.getConnection().use { con ->
                 prepare(con, statement).use { ps ->
                     setUp(ps)
@@ -44,9 +44,9 @@ internal class JdbcExecutor(
         transform: (JdbcDialect, ResultSet) -> T,
         collect: suspend (Flow<T>) -> R
     ): R {
-        @Suppress("NAME_SHADOWING")
-        val statement = inspect(statement)
         return withExceptionTranslator {
+            @Suppress("NAME_SHADOWING")
+            val statement = inspect(statement)
             config.session.getConnection().use { con ->
                 prepare(con, statement).use { ps ->
                     setUp(ps)
@@ -70,9 +70,9 @@ internal class JdbcExecutor(
     }
 
     fun executeUpdate(statement: Statement): Pair<Int, List<Long>> {
-        @Suppress("NAME_SHADOWING")
-        val statement = inspect(statement)
         return withExceptionTranslator {
+            @Suppress("NAME_SHADOWING")
+            val statement = inspect(statement)
             config.session.getConnection().use { con ->
                 prepare(con, statement).use { ps ->
                     setUp(ps)
@@ -92,9 +92,9 @@ internal class JdbcExecutor(
 
     fun executeBatch(statements: List<Statement>): List<Pair<Int, Long?>> {
         require(statements.isNotEmpty())
-        @Suppress("NAME_SHADOWING")
-        val statements = statements.map { inspect(it) }
         return withExceptionTranslator {
+            @Suppress("NAME_SHADOWING")
+            val statements = statements.map { inspect(it) }
             config.session.getConnection().use { con ->
                 prepare(con, statements.first()).use { ps ->
                     setUp(ps)
@@ -126,9 +126,9 @@ internal class JdbcExecutor(
     }
 
     fun execute(statements: List<Statement>, handler: (SQLException) -> Unit = { throw it }) {
-        @Suppress("NAME_SHADOWING")
-        val statements = statements.map { inspect(it) }
         withExceptionTranslator {
+            @Suppress("NAME_SHADOWING")
+            val statements = statements.map { inspect(it) }
             config.session.getConnection().use { con ->
                 for (statement in statements) {
                     con.createStatement().use { s ->
