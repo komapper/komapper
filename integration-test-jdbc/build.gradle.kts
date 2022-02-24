@@ -11,14 +11,7 @@ dependencies {
     api(project(":komapper-tx-jdbc"))
     api(project(":komapper-annotation"))
     ksp(project(":komapper-processor"))
-    api(project(":komapper-codegen")) {
-        exclude("com.h2database", "h2")
-        exclude("org.mariadb.jdbc", "mariadb-java-client")
-        exclude("mysql", "mysql-connector-java")
-        exclude("com.oracle.database.jdbc", "ojdbc8-production")
-        exclude("org.postgresql", "postgresql")
-        exclude("com.microsoft.sqlserver", "mssql-jdbc")
-    }
+    api(project(":komapper-codegen"))
     api(platform("org.testcontainers:testcontainers-bom:1.16.3"))
     api("org.jetbrains.kotlin:kotlin-test-junit5")
 }
