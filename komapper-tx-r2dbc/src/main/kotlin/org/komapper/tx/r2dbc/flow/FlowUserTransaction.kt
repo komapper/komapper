@@ -27,7 +27,7 @@ interface FlowUserTransaction {
      * @param block the block executed in the transaction
      * @return the flow
      */
-    suspend fun <R> build(
+    fun <R> build(
         transactionAttribute: R2dbcTransactionAttribute = R2dbcTransactionAttribute.REQUIRED,
         transactionDefinition: TransactionDefinition? = null,
         block: suspend FlowCollector<R>.(FlowUserTransaction) -> Unit
@@ -46,7 +46,7 @@ interface FlowUserTransaction {
      * @param block the block executed in the transaction
      * @return the flow
      */
-    suspend fun <R> required(
+    fun <R> required(
         transactionDefinition: TransactionDefinition? = null,
         block: suspend FlowCollector<R>.(FlowUserTransaction) -> Unit
     ): Flow<R>
@@ -59,7 +59,7 @@ interface FlowUserTransaction {
      * @param block the block executed in the transaction
      * @return the flow
      */
-    suspend fun <R> requiresNew(
+    fun <R> requiresNew(
         transactionDefinition: TransactionDefinition? = null,
         block: suspend FlowCollector<R>.(FlowUserTransaction) -> Unit
     ): Flow<R>
@@ -80,7 +80,7 @@ internal class FlowUserTransactionImpl(
     private val defaultTransactionDefinition: TransactionDefinition? = null
 ) : FlowUserTransaction {
 
-    override suspend fun <R> required(
+    override fun <R> required(
         transactionDefinition: TransactionDefinition?,
         block: suspend FlowCollector<R>.(FlowUserTransaction) -> Unit
     ): Flow<R> {
@@ -94,7 +94,7 @@ internal class FlowUserTransactionImpl(
         }
     }
 
-    override suspend fun <R> requiresNew(
+    override fun <R> requiresNew(
         transactionDefinition: TransactionDefinition?,
         block: suspend FlowCollector<R>.(FlowUserTransaction) -> Unit
     ): Flow<R> {
@@ -158,14 +158,14 @@ internal class FlowUserTransactionStub : FlowUserTransaction {
         return isRollbackOnly
     }
 
-    override suspend fun <R> required(
+    override fun <R> required(
         transactionDefinition: TransactionDefinition?,
         block: suspend FlowCollector<R>.(FlowUserTransaction) -> Unit
     ): Flow<R> {
         return flow { block(this@FlowUserTransactionStub) }
     }
 
-    override suspend fun <R> requiresNew(
+    override fun <R> requiresNew(
         transactionDefinition: TransactionDefinition?,
         block: suspend FlowCollector<R>.(FlowUserTransaction) -> Unit
     ): Flow<R> {
