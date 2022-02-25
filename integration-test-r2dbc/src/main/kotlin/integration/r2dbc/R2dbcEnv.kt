@@ -12,7 +12,6 @@ import org.junit.jupiter.api.extension.ParameterResolver
 import org.junit.platform.commons.support.AnnotationSupport.findAnnotation
 import org.komapper.core.dsl.QueryDsl
 import org.komapper.r2dbc.R2dbcDatabase
-import org.komapper.tx.r2dbc.withTransaction
 
 class R2dbcEnv :
     BeforeAllCallback,
