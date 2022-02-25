@@ -21,10 +21,11 @@ class Application(private val database: JdbcDatabase) {
 
     @RequestMapping("/")
     fun list(): List<Message> {
-        return database.runQuery {
+        val list = database.runQuery {
             val m = Meta.message
             QueryDsl.from(m).orderBy(m.id.desc())
         }
+        return list
     }
 
     @RequestMapping(value = ["/"], params = ["text"])

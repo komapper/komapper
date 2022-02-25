@@ -1,2 +1,3 @@
-INSERT INTO message (id, text) VALUES (1, 'Hello')
-INSERT INTO message (id, text) VALUES (2, 'World')
+INSERT INTO message (text) VALUES ('Hello')
+INSERT INTO message (text) VALUES ('World')
+
