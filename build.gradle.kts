@@ -33,6 +33,7 @@ allprojects {
 
     repositories {
         mavenCentral()
+        maven(url = "https://repo.spring.io/milestone")
         maven(url = "https://oss.sonatype.org/content/repositories/snapshots/")
     }
 
