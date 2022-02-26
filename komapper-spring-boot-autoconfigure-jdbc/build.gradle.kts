@@ -4,6 +4,7 @@ dependencies {
     implementation("org.springframework:spring-jdbc:$springVersion")
     implementation("org.springframework.boot:spring-boot-autoconfigure:$springBootVersion")
     implementation(project(":komapper-jdbc"))
+    implementation(project(":komapper-spring-jdbc"))
     testImplementation(project(":komapper-slf4j"))
     testImplementation(project(":komapper-dialect-h2-jdbc"))
     testImplementation("ch.qos.logback:logback-classic:1.2.10")

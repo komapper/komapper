@@ -19,6 +19,7 @@ import org.komapper.jdbc.JdbcDatabaseConfig
 import org.komapper.jdbc.JdbcDialect
 import org.komapper.jdbc.JdbcDialects
 import org.komapper.jdbc.JdbcSession
+import org.komapper.spring.jdbc.JdbcTransactionAwareSession
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
