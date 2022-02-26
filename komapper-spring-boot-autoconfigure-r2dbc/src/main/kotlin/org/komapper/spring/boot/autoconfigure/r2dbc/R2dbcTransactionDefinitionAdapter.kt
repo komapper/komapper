@@ -3,11 +3,15 @@ package org.komapper.spring.boot.autoconfigure.r2dbc
 import io.r2dbc.spi.IsolationLevel
 import io.r2dbc.spi.TransactionDefinition
 import org.komapper.core.TransactionAttribute
+import org.komapper.r2dbc.get
 
 internal typealias R2dbcDefinition = TransactionDefinition
 internal typealias SpringDefinition = org.springframework.transaction.TransactionDefinition
 
-internal fun adaptTransactionDefinition(adaptee: R2dbcDefinition?, transactionAttribute: TransactionAttribute): SpringDefinition {
+internal fun adaptTransactionDefinition(
+    adaptee: R2dbcDefinition?,
+    transactionAttribute: TransactionAttribute
+): SpringDefinition {
     val adapter = if (adaptee == null) {
         SpringDefinition.withDefaults()
     } else {
@@ -29,7 +33,7 @@ private class R2dbcTransactionDefinitionAdapter(
     SpringDefinition {
 
     override fun getIsolationLevel(): Int {
-        val value = adaptee.getAttribute(R2dbcDefinition.ISOLATION_LEVEL)
+        val value = adaptee[R2dbcDefinition.ISOLATION_LEVEL]
         return if (value != null) {
             when (value) {
                 IsolationLevel.READ_UNCOMMITTED -> SpringDefinition.ISOLATION_READ_UNCOMMITTED
@@ -44,7 +48,10 @@ private class R2dbcTransactionDefinitionAdapter(
     }
 
     override fun isReadOnly(): Boolean {
-        val value = adaptee.getAttribute(R2dbcDefinition.READ_ONLY)
-        return value ?: super.isReadOnly()
+        return adaptee[R2dbcDefinition.READ_ONLY] ?: super.isReadOnly()
+    }
+
+    override fun getName(): String? {
+        return adaptee[R2dbcDefinition.NAME] ?: super.getName()
     }
 }

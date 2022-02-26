@@ -19,7 +19,7 @@ interface JdbcTransactionDefinition {
     }
 }
 
-internal data class CombinedJdbcTransactionDefinition(
+private data class CombinedJdbcTransactionDefinition(
     val left: JdbcTransactionDefinition,
     val right: JdbcTransactionDefinition
 ) : JdbcTransactionDefinition {
