@@ -9,6 +9,9 @@ import javax.sql.DataSource
  */
 @ThreadSafe
 interface JdbcSession {
+
+    val transactionalOperator: JdbcTransactionalOperator
+
     /**
      * Returns a JDBC connection.
      */
@@ -16,6 +19,9 @@ interface JdbcSession {
 }
 
 class DefaultJdbcSession(private val dataSource: DataSource) : JdbcSession {
+    override val transactionalOperator: JdbcTransactionalOperator
+        get() = throw UnsupportedOperationException("Use a module that provides transaction management.")
+
     override fun getConnection(): Connection {
         return dataSource.connection
     }

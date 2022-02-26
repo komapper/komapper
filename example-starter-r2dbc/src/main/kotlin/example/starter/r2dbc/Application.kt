@@ -12,7 +12,6 @@ import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
 import org.komapper.core.dsl.query.first
 import org.komapper.r2dbc.R2dbcDatabase
-import org.komapper.tx.r2dbc.withTransaction
 import java.time.LocalDateTime
 
 data class Address(

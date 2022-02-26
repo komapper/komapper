@@ -17,19 +17,21 @@ import org.komapper.r2dbc.R2dbcDatabaseConfig
 import org.komapper.r2dbc.R2dbcDialect
 import org.komapper.r2dbc.R2dbcDialects
 import org.komapper.r2dbc.R2dbcSession
-import org.springframework.boot.autoconfigure.AutoConfigureAfter
+import org.springframework.boot.autoconfigure.ImportAutoConfiguration
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.r2dbc.R2dbcAutoConfiguration
+import org.springframework.boot.autoconfigure.r2dbc.R2dbcTransactionManagerAutoConfiguration
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.env.Environment
+import org.springframework.transaction.ReactiveTransactionManager
 import java.util.UUID
 
 @Suppress("unused")
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnClass(R2dbcDatabase::class)
-@AutoConfigureAfter(R2dbcAutoConfiguration::class)
+@ImportAutoConfiguration(value = [R2dbcAutoConfiguration::class, R2dbcTransactionManagerAutoConfiguration::class])
 open class R2dbcKomapperAutoConfiguration {
 
     companion object {
@@ -74,8 +76,11 @@ open class R2dbcKomapperAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    open fun r2dbcDatabaseSession(connectionFactory: ConnectionFactory): R2dbcSession {
-        return R2dbcTransactionAwareSession(connectionFactory)
+    open fun r2dbcDatabaseSession(
+        transactionManager: ReactiveTransactionManager,
+        connectionFactory: ConnectionFactory
+    ): R2dbcSession {
+        return R2dbcTransactionAwareSession(transactionManager, connectionFactory)
     }
 
     @Bean
@@ -89,12 +94,6 @@ open class R2dbcKomapperAutoConfiguration {
     open fun templateStatementBuilder(dialect: R2dbcDialect): TemplateStatementBuilder {
         return TemplateStatementBuilders.get(dialect)
     }
-
-//    @Bean
-//    @ConditionalOnMissingBean
-//    open fun dataFactory(databaseSession: DatabaseSession): DataFactory {
-//        return DefaultDataFactory(databaseSession)
-//    }
 
     @Bean
     @ConditionalOnMissingBean

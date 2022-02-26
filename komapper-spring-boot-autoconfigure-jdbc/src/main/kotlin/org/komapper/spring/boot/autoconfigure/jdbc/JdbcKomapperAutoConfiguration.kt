@@ -19,20 +19,22 @@ import org.komapper.jdbc.JdbcDatabaseConfig
 import org.komapper.jdbc.JdbcDialect
 import org.komapper.jdbc.JdbcDialects
 import org.komapper.jdbc.JdbcSession
-import org.springframework.boot.autoconfigure.AutoConfigureAfter
+import org.springframework.boot.autoconfigure.ImportAutoConfiguration
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.env.Environment
+import org.springframework.transaction.PlatformTransactionManager
 import java.util.UUID
 import javax.sql.DataSource
 
 @Suppress("unused")
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnClass(JdbcDatabase::class)
-@AutoConfigureAfter(DataSourceAutoConfiguration::class)
+@ImportAutoConfiguration(value = [DataSourceAutoConfiguration::class, DataSourceTransactionManagerAutoConfiguration::class])
 open class JdbcKomapperAutoConfiguration {
 
     companion object {
@@ -76,8 +78,8 @@ open class JdbcKomapperAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    open fun databaseSession(dataSource: DataSource): JdbcSession {
-        return JdbcTransactionAwareSession(dataSource)
+    open fun databaseSession(transactionManager: PlatformTransactionManager, dataSource: DataSource): JdbcSession {
+        return JdbcTransactionAwareSession(transactionManager, dataSource)
     }
 
     @Bean

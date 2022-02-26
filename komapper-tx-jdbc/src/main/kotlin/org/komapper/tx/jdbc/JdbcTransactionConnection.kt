@@ -1,5 +1,6 @@
 package org.komapper.tx.jdbc
 
+import org.komapper.jdbc.JdbcIsolationLevel
 import java.sql.Connection
 
 interface JdbcTransactionConnection : Connection {

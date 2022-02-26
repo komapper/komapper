@@ -1,5 +1,6 @@
 package org.komapper.jdbc
 
+import org.komapper.core.TransactionAttribute
 import org.komapper.core.dsl.query.Query
 import org.komapper.core.dsl.query.QueryScope
 import org.komapper.jdbc.dsl.runner.JdbcRunner
@@ -9,7 +10,7 @@ import javax.sql.DataSource
 /**
  * Represents a database accessed by JDBC.
  */
-interface JdbcDatabase : Jdbc {
+interface JdbcDatabase {
 
     companion object {
         /**
@@ -105,6 +106,27 @@ interface JdbcDatabase : Jdbc {
     fun <T> runQuery(block: QueryScope.() -> Query<T>): T {
         val query = block(QueryScope)
         return runQuery(query)
+    }
+
+    /**
+     * Begins a JDBC transaction.
+     *
+     * @param R the return type of the block
+     * @param transactionAttribute the transaction attribute
+     * @param isolationLevel the isolation level. If null, the default isolation level is determined by the driver.
+     * @param block the block executed in the transaction
+     * @return the result of the block
+     */
+    fun <R> withTransaction(
+        transactionAttribute: TransactionAttribute = TransactionAttribute.REQUIRED,
+        isolationLevel: JdbcIsolationLevel? = null,
+        block: (JdbcTransactionalOperator) -> R
+    ): R {
+        val tx = config.session.transactionalOperator
+        return when (transactionAttribute) {
+            TransactionAttribute.REQUIRED -> tx.required(isolationLevel, block)
+            TransactionAttribute.REQUIRES_NEW -> tx.requiresNew(isolationLevel, block)
+        }
     }
 }
 
