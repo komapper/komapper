@@ -20,7 +20,7 @@ interface JdbcSession {
 
 class DefaultJdbcSession(private val dataSource: DataSource) : JdbcSession {
     override val transactionalOperator: JdbcTransactionalOperator
-        get() = TODO("Not yet implemented")
+        get() = throw UnsupportedOperationException("Use a module that provides transaction management.")
 
     override fun getConnection(): Connection {
         return dataSource.connection

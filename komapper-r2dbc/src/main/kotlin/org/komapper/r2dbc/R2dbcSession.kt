@@ -25,10 +25,10 @@ interface R2dbcSession {
 class DefaultR2dbcSession(private val connectionFactory: ConnectionFactory) : R2dbcSession {
 
     override val coroutineTransactionalOperator: R2dbcCoroutineTransactionalOperator
-        get() = TODO("Not yet implemented")
+        get() = throw UnsupportedOperationException("Use a module that provides transaction management.")
 
     override val flowTransactionalOperator: R2dbcFlowTransactionalOperator
-        get() = TODO("Not yet implemented")
+        get() = throw UnsupportedOperationException("Use a module that provides transaction management.")
 
     override suspend fun getConnection(): Connection {
         return connectionFactory.create().asFlow().single()
