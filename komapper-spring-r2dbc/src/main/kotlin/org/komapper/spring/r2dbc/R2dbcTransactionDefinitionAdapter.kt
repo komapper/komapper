@@ -1,4 +1,4 @@
-package org.komapper.spring.boot.autoconfigure.r2dbc
+package org.komapper.spring.r2dbc
 
 import io.r2dbc.spi.IsolationLevel
 import io.r2dbc.spi.TransactionDefinition

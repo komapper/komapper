@@ -48,6 +48,7 @@ include("komapper-r2dbc")
 include("komapper-spring-boot-autoconfigure-r2dbc")
 include("komapper-spring-boot-starter-r2dbc")
 include("komapper-spring-native-r2dbc")
+include("komapper-spring-r2dbc")
 include("komapper-starter-r2dbc")
 include("komapper-tx-r2dbc")
 
