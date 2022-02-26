@@ -1,4 +1,4 @@
-package org.komapper.spring.boot.autoconfigure.jdbc
+package org.komapper.spring.jdbc
 
 import org.komapper.core.TransactionAttribute
 import org.komapper.jdbc.JdbcIsolationLevel
