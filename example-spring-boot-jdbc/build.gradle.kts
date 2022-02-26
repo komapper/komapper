@@ -30,5 +30,5 @@ ksp {
 }
 
 springBoot {
-    mainClass.set("example.spring.boot.jdbc.ApplicationKt")
+    mainClass.set("example.spring.boot.jdbc.JdbcSpringApplicationKt")
 }

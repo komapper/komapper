@@ -1,53 +1,46 @@
 package example.spring.boot.jdbc
 
-import org.komapper.annotation.KomapperAutoIncrement
-import org.komapper.annotation.KomapperEntityDef
-import org.komapper.annotation.KomapperId
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
 import org.komapper.core.dsl.operator.desc
 import org.komapper.jdbc.JdbcDatabase
-import org.springframework.boot.SpringApplication
-import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.web.bind.annotation.DeleteMapping
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
-@SpringBootApplication
+@Suppress("unused")
 @RestController
 @Transactional
-class Application(private val database: JdbcDatabase) {
+@RequestMapping("/declarative")
+class JdbcDeclarativeTxController(private val db: JdbcDatabase) {
 
-    @RequestMapping("/")
+    @GetMapping("")
     fun list(): List<Message> {
-        val list = database.runQuery {
+        val list = db.runQuery {
             val m = Meta.message
             QueryDsl.from(m).orderBy(m.id.desc())
         }
         return list
     }
 
-    @RequestMapping(value = ["/"], params = ["text"])
+    @GetMapping(value = [""], params = ["text"])
     fun add(@RequestParam text: String): Message {
         val message = Message(text = text)
-        return database.runQuery {
+        return db.runQuery {
             val m = Meta.message
             QueryDsl.insert(m).single(message)
         }
     }
+
+    @DeleteMapping(value = ["/{id}"])
+    fun delete(@PathVariable id: Int) {
+        db.runQuery {
+            val m = Meta.message
+            QueryDsl.delete(m).where { m.id eq id }
+        }
+    }
 }
-
-fun main(args: Array<String>) {
-    SpringApplication.run(Application::class.java, *args)
-}
-
-data class Message(
-    val id: Int? = null,
-    val text: String
-)
-
-@KomapperEntityDef(Message::class)
-data class MessageDef(
-    @KomapperId @KomapperAutoIncrement val id: Nothing,
-)
