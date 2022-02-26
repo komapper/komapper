@@ -1,4 +1,4 @@
-package org.komapper.tx.jdbc
+package org.komapper.jdbc
 
 import java.sql.Connection
 

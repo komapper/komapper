@@ -16,7 +16,7 @@ interface R2dbcSession {
 
     val flowTransaction: FlowTransaction
 
-/**
+    /**
      * Returns a R2DBC connection.
      */
     suspend fun getConnection(): Connection

@@ -1,7 +1,9 @@
 package org.komapper.tx.jdbc
 
 import org.komapper.core.LoggerFacade
+import org.komapper.jdbc.JdbcIsolationLevel
 import org.komapper.jdbc.JdbcSession
+import org.komapper.jdbc.ThreadTransaction
 import java.sql.Connection
 import javax.sql.DataSource
 
@@ -14,11 +16,12 @@ class JdbcTransactionSession(
     private val isolationLevel: JdbcIsolationLevel? = null
 ) : JdbcSession {
 
-    val userTransaction: JdbcUserTransaction by lazy {
-        JdbcUserTransactionImpl(transactionManager, isolationLevel)
-    }
     val transactionManager: JdbcTransactionManager by lazy {
         JdbcTransactionManagerImpl(dataSource, loggerFacade)
+    }
+
+    override val threadTransaction: ThreadTransaction by lazy {
+        ThreadTransactionImpl(transactionManager, isolationLevel)
     }
 
     override fun getConnection(): Connection {

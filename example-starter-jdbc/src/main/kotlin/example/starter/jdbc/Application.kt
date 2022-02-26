@@ -11,7 +11,6 @@ import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
 import org.komapper.core.dsl.query.first
 import org.komapper.jdbc.JdbcDatabase
-import org.komapper.tx.jdbc.withTransaction
 import java.time.LocalDateTime
 
 data class Address(

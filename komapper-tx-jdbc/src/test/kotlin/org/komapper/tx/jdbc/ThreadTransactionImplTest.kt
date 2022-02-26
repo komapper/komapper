@@ -2,6 +2,7 @@ package org.komapper.tx.jdbc
 
 import org.komapper.core.DefaultLoggerFacade
 import org.komapper.core.StdOutLogger
+import org.komapper.jdbc.JdbcIsolationLevel
 import org.komapper.jdbc.SimpleDataSource
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
@@ -12,7 +13,7 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
-internal class JdbcUserTransactionImplTest {
+internal class ThreadTransactionImplTest {
 
     data class Address(val id: Int, val street: String, val version: Int)
 
@@ -51,7 +52,7 @@ internal class JdbcUserTransactionImplTest {
 
     private val dataSource = SimpleDataSource("jdbc:h2:mem:transaction-test;DB_CLOSE_DELAY=-1")
     private val txManager = JdbcTransactionManagerImpl(dataSource, DefaultLoggerFacade(StdOutLogger()))
-    private val txScope = JdbcUserTransactionImpl(txManager)
+    private val tx = ThreadTransactionImpl(txManager)
     private val repository = Repository(txManager)
 
     @BeforeTest
@@ -94,7 +95,7 @@ internal class JdbcUserTransactionImplTest {
 
     @Test
     fun select() {
-        val list = txScope.run {
+        val list = tx.required {
             repository.selectAll()
         }
         assertEquals(15, list.size)
@@ -103,10 +104,10 @@ internal class JdbcUserTransactionImplTest {
 
     @Test
     fun commit() {
-        txScope.run {
+        tx.required {
             repository.delete(15)
         }
-        txScope.run {
+        tx.required {
             val address = repository.selectById(15)
             assertNull(address)
         }
@@ -115,13 +116,13 @@ internal class JdbcUserTransactionImplTest {
     @Test
     fun rollback() {
         try {
-            txScope.run {
+            tx.required {
                 repository.delete(15)
                 throw Exception()
             }
         } catch (ignored: Exception) {
         }
-        txScope.run {
+        tx.required {
             val address = repository.selectById(15)
             assertNotNull(address)
         }
@@ -129,13 +130,13 @@ internal class JdbcUserTransactionImplTest {
 
     @Test
     fun setRollbackOnly() {
-        txScope.run { tx ->
+        tx.required { tx ->
             repository.delete(15)
             assertFalse(tx.isRollbackOnly())
             tx.setRollbackOnly()
             assertTrue(tx.isRollbackOnly())
         }
-        txScope.run {
+        tx.required {
             val address = repository.selectById(15)
             assertNotNull(address)
         }
@@ -143,10 +144,10 @@ internal class JdbcUserTransactionImplTest {
 
     @Test
     fun isolationLevel() {
-        txScope.run(isolationLevel = JdbcIsolationLevel.SERIALIZABLE) {
+        tx.required(isolationLevel = JdbcIsolationLevel.SERIALIZABLE) {
             repository.delete(15)
         }
-        txScope.run {
+        tx.required {
             val address = repository.selectById(15)
             assertNull(address)
         }
@@ -154,14 +155,14 @@ internal class JdbcUserTransactionImplTest {
 
     @Test
     fun required_required() {
-        txScope.run {
+        tx.required {
             repository.delete(15)
-            txScope.required {
+            tx.required {
                 val address = repository.selectById(15)
                 assertNull(address)
             }
         }
-        txScope.run {
+        tx.required {
             val address = repository.selectById(15)
             assertNull(address)
         }
@@ -169,12 +170,12 @@ internal class JdbcUserTransactionImplTest {
 
     @Test
     fun requiresNew() {
-        txScope.run(JdbcTransactionAttribute.REQUIRES_NEW) {
+        tx.requiresNew {
             repository.delete(15)
             val address = repository.selectById(15)
             assertNull(address)
         }
-        txScope.run {
+        tx.required {
             val address = repository.selectById(15)
             assertNull(address)
         }
@@ -182,7 +183,7 @@ internal class JdbcUserTransactionImplTest {
 
     @Test
     fun required_requiresNew() {
-        txScope.run { tx ->
+        tx.required { tx ->
             repository.delete(15)
             val address = repository.selectById(15)
             assertNull(address)
@@ -191,7 +192,7 @@ internal class JdbcUserTransactionImplTest {
                 assertNotNull(address2)
             }
         }
-        txScope.run {
+        tx.required {
             val address = repository.selectById(15)
             assertNull(address)
         }

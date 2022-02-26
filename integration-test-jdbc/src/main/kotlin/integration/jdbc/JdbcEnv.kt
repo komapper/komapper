@@ -12,8 +12,7 @@ import org.junit.jupiter.api.extension.ParameterResolver
 import org.junit.platform.commons.support.AnnotationSupport.findAnnotation
 import org.komapper.core.dsl.QueryDsl
 import org.komapper.jdbc.JdbcDatabase
-import org.komapper.tx.jdbc.transactionManager
-import org.komapper.tx.jdbc.withTransaction
+import org.komapper.tx.jdbc.JdbcTransactionSession
 
 class JdbcEnv :
     BeforeAllCallback,
@@ -27,7 +26,10 @@ class JdbcEnv :
         private var initialized: Boolean = false
         private val setting = JdbcSettingProvider.get()
         private val db = JdbcDatabase.create(setting.config)
-        private val txManager = db.config.session.transactionManager
+        private val txManager = run {
+            val session = setting.config.session as JdbcTransactionSession
+            session.transactionManager
+        }
     }
 
     override fun beforeAll(context: ExtensionContext?) {

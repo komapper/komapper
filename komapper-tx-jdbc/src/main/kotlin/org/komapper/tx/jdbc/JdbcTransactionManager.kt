@@ -2,6 +2,7 @@ package org.komapper.tx.jdbc
 
 import org.komapper.core.LoggerFacade
 import org.komapper.core.ThreadSafe
+import org.komapper.jdbc.JdbcIsolationLevel
 import java.sql.Connection
 import javax.sql.DataSource
 

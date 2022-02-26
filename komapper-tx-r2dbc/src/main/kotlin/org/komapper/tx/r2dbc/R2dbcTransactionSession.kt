@@ -17,16 +17,16 @@ class R2dbcTransactionSession(
     private val transactionDefinition: TransactionDefinition? = null
 ) : R2dbcSession {
 
+    private val transactionManager: R2dbcTransactionManager by lazy {
+        R2dbcTransactionManagerImpl(connectionFactory, loggerFacade)
+    }
+
     override val coroutineTransaction: CoroutineTransaction by lazy {
         CoroutineTransactionImpl(transactionManager, transactionDefinition)
     }
 
     override val flowTransaction: FlowTransaction by lazy {
         FlowUserTransactionImpl(transactionManager, transactionDefinition)
-    }
-
-    val transactionManager: R2dbcTransactionManager by lazy {
-        R2dbcTransactionManagerImpl(connectionFactory, loggerFacade)
     }
 
     override suspend fun getConnection(): Connection {

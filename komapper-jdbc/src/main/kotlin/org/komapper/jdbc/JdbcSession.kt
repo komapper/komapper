@@ -9,6 +9,9 @@ import javax.sql.DataSource
  */
 @ThreadSafe
 interface JdbcSession {
+
+    val threadTransaction: ThreadTransaction
+
     /**
      * Returns a JDBC connection.
      */
@@ -16,6 +19,9 @@ interface JdbcSession {
 }
 
 class DefaultJdbcSession(private val dataSource: DataSource) : JdbcSession {
+    override val threadTransaction: ThreadTransaction
+        get() = TODO("Not yet implemented")
+
     override fun getConnection(): Connection {
         return dataSource.connection
     }
