@@ -1,20 +1,20 @@
 package org.komapper.spring.boot.autoconfigure.jdbc
 
 import org.komapper.core.TransactionAttribute
-import org.komapper.jdbc.JdbcIsolationLevel
+import org.komapper.jdbc.JdbcTransactionDefinition
 import org.komapper.jdbc.JdbcTransactionalOperator
 import org.springframework.transaction.PlatformTransactionManager
 import org.springframework.transaction.support.TransactionTemplate
 
 class TransactionTemplateAdapter(private val transactionManager: PlatformTransactionManager) : JdbcTransactionalOperator {
 
-    override fun <R> required(isolationLevel: JdbcIsolationLevel?, block: (JdbcTransactionalOperator) -> R): R {
-        val definition = adaptTransactionDefinition(isolationLevel, TransactionAttribute.REQUIRED)
+    override fun <R> required(transactionDefinition: JdbcTransactionDefinition?, block: (JdbcTransactionalOperator) -> R): R {
+        val definition = adaptTransactionDefinition(transactionDefinition, TransactionAttribute.REQUIRED)
         return execute(definition, block)
     }
 
-    override fun <R> requiresNew(isolationLevel: JdbcIsolationLevel?, block: (JdbcTransactionalOperator) -> R): R {
-        val definition = adaptTransactionDefinition(isolationLevel, TransactionAttribute.REQUIRES_NEW)
+    override fun <R> requiresNew(transactionDefinition: JdbcTransactionDefinition?, block: (JdbcTransactionalOperator) -> R): R {
+        val definition = adaptTransactionDefinition(transactionDefinition, TransactionAttribute.REQUIRES_NEW)
         return execute(definition, block)
     }
 

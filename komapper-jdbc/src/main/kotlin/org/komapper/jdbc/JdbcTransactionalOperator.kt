@@ -6,12 +6,12 @@ interface JdbcTransactionalOperator {
      * Begins a REQUIRED transaction.
      *
      * @param R the return type of the block
-     * @param isolationLevel the isolation level
+     * @param transactionDefinition the transaction definition
      * @param block the block executed in the transaction
      * @return the result of the block
      */
     fun <R> required(
-        isolationLevel: JdbcIsolationLevel? = null,
+        transactionDefinition: JdbcTransactionDefinition? = null,
         block: (JdbcTransactionalOperator) -> R
     ): R
 
@@ -19,12 +19,12 @@ interface JdbcTransactionalOperator {
      * Begins a REQUIRES_NEW transaction.
      *
      * @param R the return type of the block
-     * @param isolationLevel the isolation level
+     * @param transactionDefinition the transaction definition
      * @param block the block executed in the transaction
      * @return the result of the block
      */
     fun <R> requiresNew(
-        isolationLevel: JdbcIsolationLevel? = null,
+        transactionDefinition: JdbcTransactionDefinition? = null,
         block: (JdbcTransactionalOperator) -> R
     ): R
 

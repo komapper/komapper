@@ -144,7 +144,7 @@ internal class JdbcTransactionalOperatorImplTest {
 
     @Test
     fun isolationLevel() {
-        tx.required(isolationLevel = JdbcIsolationLevel.SERIALIZABLE) {
+        tx.required(transactionDefinition = JdbcIsolationLevel.SERIALIZABLE) {
             repository.delete(15)
         }
         tx.required {

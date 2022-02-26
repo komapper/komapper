@@ -1,45 +1,45 @@
 package org.komapper.tx.jdbc
 
-import org.komapper.jdbc.JdbcIsolationLevel
+import org.komapper.jdbc.JdbcTransactionDefinition
 import org.komapper.jdbc.JdbcTransactionalOperator
 
 internal class JdbcTransactionalOperatorImpl(
     private val transactionManager: JdbcTransactionManager,
-    private val defaultIsolationLevel: JdbcIsolationLevel? = null
+    private val defaultTransactionDefinition: JdbcTransactionDefinition? = null
 ) : JdbcTransactionalOperator {
 
     override fun <R> required(
-        isolationLevel: JdbcIsolationLevel?,
+        transactionDefinition: JdbcTransactionDefinition?,
         block: (JdbcTransactionalOperator) -> R
     ): R {
         return if (transactionManager.isActive) {
             block(this)
         } else {
-            executeInNewTransaction(isolationLevel, block)
+            executeInNewTransaction(transactionDefinition, block)
         }
     }
 
     override fun <R> requiresNew(
-        isolationLevel: JdbcIsolationLevel?,
+        transactionDefinition: JdbcTransactionDefinition?,
         block: (JdbcTransactionalOperator) -> R
     ): R {
         return if (transactionManager.isActive) {
             val tx = transactionManager.suspend()
             val result = runCatching {
-                executeInNewTransaction(isolationLevel, block)
+                executeInNewTransaction(transactionDefinition, block)
             }
             transactionManager.resume(tx)
             result.getOrThrow()
         } else {
-            executeInNewTransaction(isolationLevel, block)
+            executeInNewTransaction(transactionDefinition, block)
         }
     }
 
     private fun <R> executeInNewTransaction(
-        isolationLevel: JdbcIsolationLevel?,
+        transactionDefinition: JdbcTransactionDefinition?,
         block: (JdbcTransactionalOperator) -> R
     ): R {
-        transactionManager.begin(isolationLevel ?: defaultIsolationLevel)
+        transactionManager.begin(transactionDefinition ?: defaultTransactionDefinition)
         return runCatching {
             block(this)
         }.onSuccess {
