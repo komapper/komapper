@@ -10,16 +10,16 @@ import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.reactive.asPublisher
 import org.komapper.core.TransactionAttribute
-import org.komapper.r2dbc.CoroutineTransaction
+import org.komapper.r2dbc.R2dbcCoroutineTransactionalOperator
 import org.springframework.transaction.ReactiveTransactionManager
 import org.springframework.transaction.reactive.TransactionalOperator
 
-internal class CoroutineTransactionalOperator(private val transactionManager: ReactiveTransactionManager) :
-    CoroutineTransaction {
+internal class CoroutineTransactionalOperatorAdapter(private val transactionManager: ReactiveTransactionManager) :
+    R2dbcCoroutineTransactionalOperator {
 
     override suspend fun <R> required(
         transactionDefinition: TransactionDefinition?,
-        block: suspend CoroutineScope.(CoroutineTransaction) -> R
+        block: suspend CoroutineScope.(R2dbcCoroutineTransactionalOperator) -> R
     ): R {
         val definition = adaptTransactionDefinition(transactionDefinition, TransactionAttribute.REQUIRED)
         return execute(definition, block)
@@ -27,7 +27,7 @@ internal class CoroutineTransactionalOperator(private val transactionManager: Re
 
     override suspend fun <R> requiresNew(
         transactionDefinition: TransactionDefinition?,
-        block: suspend CoroutineScope.(CoroutineTransaction) -> R
+        block: suspend CoroutineScope.(R2dbcCoroutineTransactionalOperator) -> R
     ): R {
         val definition = adaptTransactionDefinition(transactionDefinition, TransactionAttribute.REQUIRES_NEW)
         return execute(definition, block)
@@ -35,12 +35,12 @@ internal class CoroutineTransactionalOperator(private val transactionManager: Re
 
     private suspend fun <R> execute(
         definition: SpringDefinition,
-        block: suspend CoroutineScope.(CoroutineTransaction) -> R
+        block: suspend CoroutineScope.(R2dbcCoroutineTransactionalOperator) -> R
     ): R {
         return TransactionalOperator.create(transactionManager, definition).execute {
             flow<Any?> {
                 val value = coroutineScope {
-                    block(this@CoroutineTransactionalOperator)
+                    block(this@CoroutineTransactionalOperatorAdapter)
                 }
                 emit(value)
             }.map { it ?: Null }.asPublisher()

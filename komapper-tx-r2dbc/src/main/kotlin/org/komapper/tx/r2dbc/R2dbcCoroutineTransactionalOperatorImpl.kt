@@ -4,20 +4,20 @@ import io.r2dbc.spi.TransactionDefinition
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
-import org.komapper.r2dbc.CoroutineTransaction
+import org.komapper.r2dbc.R2dbcCoroutineTransactionalOperator
 
-internal class CoroutineTransactionImpl(
+internal class R2dbcCoroutineTransactionalOperatorImpl(
     private val transactionManager: R2dbcTransactionManager,
     private val defaultTransactionDefinition: TransactionDefinition? = null
-) : CoroutineTransaction {
+) : R2dbcCoroutineTransactionalOperator {
 
     override suspend fun <R> required(
         transactionDefinition: TransactionDefinition?,
-        block: suspend CoroutineScope.(CoroutineTransaction) -> R
+        block: suspend CoroutineScope.(R2dbcCoroutineTransactionalOperator) -> R
     ): R {
         return if (transactionManager.isActive()) {
             coroutineScope {
-                block(this@CoroutineTransactionImpl)
+                block(this@R2dbcCoroutineTransactionalOperatorImpl)
             }
         } else {
             executeInNewTransaction(transactionDefinition, block)
@@ -26,7 +26,7 @@ internal class CoroutineTransactionImpl(
 
     override suspend fun <R> requiresNew(
         transactionDefinition: TransactionDefinition?,
-        block: suspend CoroutineScope.(CoroutineTransaction) -> R
+        block: suspend CoroutineScope.(R2dbcCoroutineTransactionalOperator) -> R
     ): R {
         return if (transactionManager.isActive()) {
             val txContext = transactionManager.suspend()
@@ -42,12 +42,12 @@ internal class CoroutineTransactionImpl(
 
     private suspend fun <R> executeInNewTransaction(
         transactionDefinition: TransactionDefinition?,
-        block: suspend CoroutineScope.(CoroutineTransaction) -> R
+        block: suspend CoroutineScope.(R2dbcCoroutineTransactionalOperator) -> R
     ): R {
         val txContext = transactionManager.begin(transactionDefinition ?: defaultTransactionDefinition)
         return withContext(txContext) {
             runCatching {
-                block(this@CoroutineTransactionImpl)
+                block(this@R2dbcCoroutineTransactionalOperatorImpl)
             }.onSuccess {
                 if (transactionManager.isRollbackOnly()) {
                     transactionManager.rollback()

@@ -13,7 +13,7 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
-internal class ThreadTransactionImplTest {
+internal class JdbcTransactionalOperatorImplTest {
 
     data class Address(val id: Int, val street: String, val version: Int)
 
@@ -52,7 +52,7 @@ internal class ThreadTransactionImplTest {
 
     private val dataSource = SimpleDataSource("jdbc:h2:mem:transaction-test;DB_CLOSE_DELAY=-1")
     private val txManager = JdbcTransactionManagerImpl(dataSource, DefaultLoggerFacade(StdOutLogger()))
-    private val tx = ThreadTransactionImpl(txManager)
+    private val tx = JdbcTransactionalOperatorImpl(txManager)
     private val repository = Repository(txManager)
 
     @BeforeTest

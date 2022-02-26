@@ -120,9 +120,9 @@ interface JdbcDatabase {
     fun <R> withTransaction(
         transactionAttribute: TransactionAttribute = TransactionAttribute.REQUIRED,
         isolationLevel: JdbcIsolationLevel? = null,
-        block: (ThreadTransaction) -> R
+        block: (JdbcTransactionalOperator) -> R
     ): R {
-        val tx = config.session.threadTransaction
+        val tx = config.session.transactionalOperator
         return when (transactionAttribute) {
             TransactionAttribute.REQUIRED -> tx.required(isolationLevel, block)
             TransactionAttribute.REQUIRES_NEW -> tx.requiresNew(isolationLevel, block)

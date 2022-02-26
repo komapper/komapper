@@ -1,16 +1,16 @@
 package org.komapper.tx.jdbc
 
 import org.komapper.jdbc.JdbcIsolationLevel
-import org.komapper.jdbc.ThreadTransaction
+import org.komapper.jdbc.JdbcTransactionalOperator
 
-internal class ThreadTransactionImpl(
+internal class JdbcTransactionalOperatorImpl(
     private val transactionManager: JdbcTransactionManager,
     private val defaultIsolationLevel: JdbcIsolationLevel? = null
-) : ThreadTransaction {
+) : JdbcTransactionalOperator {
 
     override fun <R> required(
         isolationLevel: JdbcIsolationLevel?,
-        block: (ThreadTransaction) -> R
+        block: (JdbcTransactionalOperator) -> R
     ): R {
         return if (transactionManager.isActive) {
             block(this)
@@ -21,7 +21,7 @@ internal class ThreadTransactionImpl(
 
     override fun <R> requiresNew(
         isolationLevel: JdbcIsolationLevel?,
-        block: (ThreadTransaction) -> R
+        block: (JdbcTransactionalOperator) -> R
     ): R {
         return if (transactionManager.isActive) {
             val tx = transactionManager.suspend()
@@ -37,7 +37,7 @@ internal class ThreadTransactionImpl(
 
     private fun <R> executeInNewTransaction(
         isolationLevel: JdbcIsolationLevel?,
-        block: (ThreadTransaction) -> R
+        block: (JdbcTransactionalOperator) -> R
     ): R {
         transactionManager.begin(isolationLevel ?: defaultIsolationLevel)
         return runCatching {

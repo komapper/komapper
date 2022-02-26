@@ -11,15 +11,15 @@ import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.reactive.asPublisher
 import kotlinx.coroutines.reactive.collect
 import org.komapper.core.TransactionAttribute
-import org.komapper.r2dbc.FlowTransaction
+import org.komapper.r2dbc.R2dbcFlowTransactionalOperator
 import org.springframework.transaction.ReactiveTransactionManager
 import org.springframework.transaction.reactive.TransactionalOperator
 
-internal class FlowTransactionalOperator(private val transactionManager: ReactiveTransactionManager) : FlowTransaction {
+internal class FlowTransactionalOperatorAdapter(private val transactionManager: ReactiveTransactionManager) : R2dbcFlowTransactionalOperator {
 
     override fun <R> required(
         transactionDefinition: TransactionDefinition?,
-        block: suspend FlowCollector<R>.(FlowTransaction) -> Unit
+        block: suspend FlowCollector<R>.(R2dbcFlowTransactionalOperator) -> Unit
     ): Flow<R> {
         val definition = adaptTransactionDefinition(transactionDefinition, TransactionAttribute.REQUIRED)
         return execute(definition, block)
@@ -27,7 +27,7 @@ internal class FlowTransactionalOperator(private val transactionManager: Reactiv
 
     override fun <R> requiresNew(
         transactionDefinition: TransactionDefinition?,
-        block: suspend FlowCollector<R>.(FlowTransaction) -> Unit
+        block: suspend FlowCollector<R>.(R2dbcFlowTransactionalOperator) -> Unit
     ): Flow<R> {
         val definition = adaptTransactionDefinition(transactionDefinition, TransactionAttribute.REQUIRES_NEW)
         return execute(definition, block)
@@ -35,12 +35,12 @@ internal class FlowTransactionalOperator(private val transactionManager: Reactiv
 
     private fun <R> execute(
         definition: SpringDefinition,
-        block: suspend FlowCollector<R>.(FlowTransaction) -> Unit
+        block: suspend FlowCollector<R>.(R2dbcFlowTransactionalOperator) -> Unit
     ): Flow<R> {
         return flow {
             TransactionalOperator.create(transactionManager, definition).execute {
                 flow {
-                    block(this@FlowTransactionalOperator)
+                    block(this@FlowTransactionalOperatorAdapter)
                 }.map { it ?: Null }.asPublisher()
             }.collect {
                 val value = if (it == Null) null else it

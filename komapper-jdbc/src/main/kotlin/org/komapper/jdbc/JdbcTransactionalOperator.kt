@@ -1,6 +1,6 @@
 package org.komapper.jdbc
 
-interface ThreadTransaction {
+interface JdbcTransactionalOperator {
 
     /**
      * Begins a REQUIRED transaction.
@@ -12,7 +12,7 @@ interface ThreadTransaction {
      */
     fun <R> required(
         isolationLevel: JdbcIsolationLevel? = null,
-        block: (ThreadTransaction) -> R
+        block: (JdbcTransactionalOperator) -> R
     ): R
 
     /**
@@ -25,7 +25,7 @@ interface ThreadTransaction {
      */
     fun <R> requiresNew(
         isolationLevel: JdbcIsolationLevel? = null,
-        block: (ThreadTransaction) -> R
+        block: (JdbcTransactionalOperator) -> R
     ): R
 
     /**

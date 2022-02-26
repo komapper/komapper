@@ -1,7 +1,7 @@
 package org.komapper.spring.boot.autoconfigure.jdbc
 
 import org.komapper.jdbc.JdbcSession
-import org.komapper.jdbc.ThreadTransaction
+import org.komapper.jdbc.JdbcTransactionalOperator
 import org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy
 import org.springframework.transaction.PlatformTransactionManager
 import java.sql.Connection
@@ -15,7 +15,7 @@ class JdbcTransactionAwareSession(transactionManager: PlatformTransactionManager
         else -> TransactionAwareDataSourceProxy(dataSource)
     }
 
-    override val threadTransaction: ThreadTransaction = ThreadTransactionalOperator(transactionManager)
+    override val transactionalOperator: JdbcTransactionalOperator = TransactionTemplateAdapter(transactionManager)
 
     override fun getConnection(): Connection {
         return dataSourceProxy.connection

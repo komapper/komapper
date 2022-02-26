@@ -8,20 +8,20 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.withContext
-import org.komapper.r2dbc.FlowTransaction
+import org.komapper.r2dbc.R2dbcFlowTransactionalOperator
 
-internal class FlowUserTransactionImpl(
+internal class R2dbcFlowTransactionalOperatorImpl(
     private val transactionManager: R2dbcTransactionManager,
     private val defaultTransactionDefinition: TransactionDefinition? = null
-) : FlowTransaction {
+) : R2dbcFlowTransactionalOperator {
 
     override fun <R> required(
         transactionDefinition: TransactionDefinition?,
-        block: suspend FlowCollector<R>.(FlowTransaction) -> Unit
+        block: suspend FlowCollector<R>.(R2dbcFlowTransactionalOperator) -> Unit
     ): Flow<R> {
         return flow {
             if (transactionManager.isActive()) {
-                block(this@FlowUserTransactionImpl)
+                block(this@R2dbcFlowTransactionalOperatorImpl)
             } else {
                 val value = executeInNewTransaction(transactionDefinition, block)
                 emitAll(value)
@@ -31,7 +31,7 @@ internal class FlowUserTransactionImpl(
 
     override fun <R> requiresNew(
         transactionDefinition: TransactionDefinition?,
-        block: suspend FlowCollector<R>.(FlowTransaction) -> Unit
+        block: suspend FlowCollector<R>.(R2dbcFlowTransactionalOperator) -> Unit
     ): Flow<R> {
         return flow {
             val value = if (transactionManager.isActive()) {
@@ -50,12 +50,12 @@ internal class FlowUserTransactionImpl(
 
     private suspend fun <R> executeInNewTransaction(
         transactionDefinition: TransactionDefinition?,
-        block: suspend FlowCollector<R>.(FlowTransaction) -> Unit
+        block: suspend FlowCollector<R>.(R2dbcFlowTransactionalOperator) -> Unit
     ): Flow<R> {
         val txContext = transactionManager.begin(transactionDefinition ?: defaultTransactionDefinition)
         return flow {
             kotlin.runCatching {
-                block(this@FlowUserTransactionImpl)
+                block(this@R2dbcFlowTransactionalOperatorImpl)
             }.onSuccess {
                 if (transactionManager.isRollbackOnly()) {
                     transactionManager.rollback()

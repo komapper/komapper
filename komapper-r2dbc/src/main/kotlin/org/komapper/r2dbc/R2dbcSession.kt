@@ -12,9 +12,9 @@ import org.komapper.core.ThreadSafe
 @ThreadSafe
 interface R2dbcSession {
 
-    val coroutineTransaction: CoroutineTransaction
+    val coroutineTransactionalOperator: R2dbcCoroutineTransactionalOperator
 
-    val flowTransaction: FlowTransaction
+    val flowTransactionalOperator: R2dbcFlowTransactionalOperator
 
     /**
      * Returns a R2DBC connection.
@@ -24,10 +24,10 @@ interface R2dbcSession {
 
 class DefaultR2dbcSession(private val connectionFactory: ConnectionFactory) : R2dbcSession {
 
-    override val coroutineTransaction: CoroutineTransaction
+    override val coroutineTransactionalOperator: R2dbcCoroutineTransactionalOperator
         get() = TODO("Not yet implemented")
 
-    override val flowTransaction: FlowTransaction
+    override val flowTransactionalOperator: R2dbcFlowTransactionalOperator
         get() = TODO("Not yet implemented")
 
     override suspend fun getConnection(): Connection {

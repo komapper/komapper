@@ -1,38 +1,37 @@
 package org.komapper.r2dbc
 
 import io.r2dbc.spi.TransactionDefinition
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.FlowCollector
+import kotlinx.coroutines.CoroutineScope
 import org.komapper.core.ThreadSafe
 
 @ThreadSafe
-interface FlowTransaction {
+interface R2dbcCoroutineTransactionalOperator {
 
     /**
-     * Build a REQUIRED transactional [Flow].
+     * Begins a REQUIRED transaction.
      *
-     * @param R the return type of the flow
+     * @param R the return type of the block
      * @param transactionDefinition the transaction definition
      * @param block the block executed in the transaction
-     * @return the flow
+     * @return the result of the block
      */
-    fun <R> required(
+    suspend fun <R> required(
         transactionDefinition: TransactionDefinition? = null,
-        block: suspend FlowCollector<R>.(FlowTransaction) -> Unit
-    ): Flow<R>
+        block: suspend CoroutineScope.(R2dbcCoroutineTransactionalOperator) -> R
+    ): R
 
     /**
-     * Build a REQUIRES_NEW transactional [Flow].
+     * Begins a REQUIRES_NEW transaction.
      *
-     * @param R the return type of the flow
+     * @param R the return type of the block
      * @param transactionDefinition the transaction definition
      * @param block the block executed in the transaction
-     * @return the flow
+     * @return the result of the block
      */
-    fun <R> requiresNew(
+    suspend fun <R> requiresNew(
         transactionDefinition: TransactionDefinition? = null,
-        block: suspend FlowCollector<R>.(FlowTransaction) -> Unit
-    ): Flow<R>
+        block: suspend CoroutineScope.(R2dbcCoroutineTransactionalOperator) -> R
+    ): R
 
     /**
      * Marks the transaction as rollback.

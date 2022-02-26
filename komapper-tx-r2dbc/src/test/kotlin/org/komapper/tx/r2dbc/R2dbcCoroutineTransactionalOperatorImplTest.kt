@@ -19,7 +19,7 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
-internal class CoroutineTransactionImplTest {
+internal class R2dbcCoroutineTransactionalOperatorImplTest {
 
     data class Address(val id: Int, val street: String, val version: Int)
 
@@ -56,7 +56,7 @@ internal class CoroutineTransactionImplTest {
 
     private val connectionFactory = ConnectionFactories.get("r2dbc:h2:mem:///transaction-test;DB_CLOSE_DELAY=-1")
     private val txManager = R2dbcTransactionManagerImpl(connectionFactory, DefaultLoggerFacade(StdOutLogger()))
-    private val tx = CoroutineTransactionImpl(txManager)
+    private val tx = R2dbcCoroutineTransactionalOperatorImpl(txManager)
     private val repository = Repository(txManager)
 
     @BeforeTest

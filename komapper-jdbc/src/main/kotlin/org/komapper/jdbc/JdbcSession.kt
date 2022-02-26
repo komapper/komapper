@@ -10,7 +10,7 @@ import javax.sql.DataSource
 @ThreadSafe
 interface JdbcSession {
 
-    val threadTransaction: ThreadTransaction
+    val transactionalOperator: JdbcTransactionalOperator
 
     /**
      * Returns a JDBC connection.
@@ -19,7 +19,7 @@ interface JdbcSession {
 }
 
 class DefaultJdbcSession(private val dataSource: DataSource) : JdbcSession {
-    override val threadTransaction: ThreadTransaction
+    override val transactionalOperator: JdbcTransactionalOperator
         get() = TODO("Not yet implemented")
 
     override fun getConnection(): Connection {
