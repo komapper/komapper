@@ -4,7 +4,6 @@ import io.r2dbc.spi.ConnectionFactories
 import io.r2dbc.spi.ConnectionFactory
 import io.r2dbc.spi.ConnectionFactoryOptions
 import io.r2dbc.spi.TransactionDefinition
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
 import org.komapper.core.TransactionAttribute
@@ -139,7 +138,7 @@ interface R2dbcDatabase {
     suspend fun <R> withTransaction(
         transactionAttribute: TransactionAttribute = TransactionAttribute.REQUIRED,
         transactionDefinition: TransactionDefinition? = null,
-        block: suspend CoroutineScope.(R2dbcCoroutineTransactionOperator) -> R
+        block: suspend (R2dbcCoroutineTransactionOperator) -> R
     ): R {
         val tx = config.session.coroutineTransactionOperator
         return when (transactionAttribute) {

@@ -4,7 +4,6 @@ import io.r2dbc.spi.Connection
 import io.r2dbc.spi.R2dbcException
 import io.r2dbc.spi.Result
 import io.r2dbc.spi.Row
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
@@ -17,7 +16,6 @@ import org.komapper.core.ExecutionOptionsProvider
 import org.komapper.core.Statement
 import org.komapper.core.UniqueConstraintException
 import org.reactivestreams.Publisher
-import kotlin.coroutines.coroutineContext
 
 internal class R2dbcExecutor(
     private val config: R2dbcDatabaseConfig,
@@ -139,10 +137,10 @@ internal class R2dbcExecutor(
         }.collect()
     }
 
-    private suspend fun <T> Connection.use(block: suspend CoroutineScope.(Connection) -> T): T {
+    private suspend fun <T> Connection.use(block: suspend (Connection) -> T): T {
         val con = this
         return runCatching {
-            block(CoroutineScope(coroutineContext), con)
+            block(con)
         }.onSuccess {
             con.close()
         }.onFailure { cause ->

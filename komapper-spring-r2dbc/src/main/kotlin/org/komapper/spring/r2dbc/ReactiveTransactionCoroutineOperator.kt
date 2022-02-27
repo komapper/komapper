@@ -1,8 +1,6 @@
 package org.komapper.spring.r2dbc
 
 import io.r2dbc.spi.TransactionDefinition
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
@@ -19,7 +17,7 @@ internal class ReactiveTransactionCoroutineOperator(private val transactionManag
 
     override suspend fun <R> required(
         transactionDefinition: TransactionDefinition?,
-        block: suspend CoroutineScope.(R2dbcCoroutineTransactionOperator) -> R
+        block: suspend (R2dbcCoroutineTransactionOperator) -> R
     ): R {
         val definition = adaptTransactionDefinition(transactionDefinition, TransactionAttribute.REQUIRED)
         return execute(definition, block)
@@ -27,7 +25,7 @@ internal class ReactiveTransactionCoroutineOperator(private val transactionManag
 
     override suspend fun <R> requiresNew(
         transactionDefinition: TransactionDefinition?,
-        block: suspend CoroutineScope.(R2dbcCoroutineTransactionOperator) -> R
+        block: suspend (R2dbcCoroutineTransactionOperator) -> R
     ): R {
         val definition = adaptTransactionDefinition(transactionDefinition, TransactionAttribute.REQUIRES_NEW)
         return execute(definition, block)
@@ -35,13 +33,11 @@ internal class ReactiveTransactionCoroutineOperator(private val transactionManag
 
     private suspend fun <R> execute(
         definition: SpringDefinition,
-        block: suspend CoroutineScope.(R2dbcCoroutineTransactionOperator) -> R
+        block: suspend (R2dbcCoroutineTransactionOperator) -> R
     ): R {
         return TransactionalOperator.create(transactionManager, definition).execute {
             flow<Any?> {
-                val value = coroutineScope {
-                    block(this@ReactiveTransactionCoroutineOperator)
-                }
+                val value = block(this@ReactiveTransactionCoroutineOperator)
                 emit(value)
             }.map { it ?: Null }.asPublisher()
         }.asFlow().map {

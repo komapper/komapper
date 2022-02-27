@@ -1,7 +1,6 @@
 package org.komapper.r2dbc
 
 import io.r2dbc.spi.TransactionDefinition
-import kotlinx.coroutines.CoroutineScope
 import org.komapper.core.ThreadSafe
 
 @ThreadSafe
@@ -17,7 +16,7 @@ interface R2dbcCoroutineTransactionOperator {
      */
     suspend fun <R> required(
         transactionDefinition: TransactionDefinition? = null,
-        block: suspend CoroutineScope.(R2dbcCoroutineTransactionOperator) -> R
+        block: suspend (R2dbcCoroutineTransactionOperator) -> R
     ): R
 
     /**
@@ -30,7 +29,7 @@ interface R2dbcCoroutineTransactionOperator {
      */
     suspend fun <R> requiresNew(
         transactionDefinition: TransactionDefinition? = null,
-        block: suspend CoroutineScope.(R2dbcCoroutineTransactionOperator) -> R
+        block: suspend (R2dbcCoroutineTransactionOperator) -> R
     ): R
 
     /**

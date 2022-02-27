@@ -1,8 +1,6 @@
 package org.komapper.tx.r2dbc
 
 import io.r2dbc.spi.TransactionDefinition
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
 import org.komapper.r2dbc.R2dbcCoroutineTransactionOperator
 
@@ -13,12 +11,10 @@ internal class R2dbcCoroutineTransactionOperatorImpl(
 
     override suspend fun <R> required(
         transactionDefinition: TransactionDefinition?,
-        block: suspend CoroutineScope.(R2dbcCoroutineTransactionOperator) -> R
+        block: suspend (R2dbcCoroutineTransactionOperator) -> R
     ): R {
         return if (transactionManager.isActive()) {
-            coroutineScope {
-                block(this@R2dbcCoroutineTransactionOperatorImpl)
-            }
+            block(this)
         } else {
             executeInNewTransaction(transactionDefinition, block)
         }
@@ -26,7 +22,7 @@ internal class R2dbcCoroutineTransactionOperatorImpl(
 
     override suspend fun <R> requiresNew(
         transactionDefinition: TransactionDefinition?,
-        block: suspend CoroutineScope.(R2dbcCoroutineTransactionOperator) -> R
+        block: suspend (R2dbcCoroutineTransactionOperator) -> R
     ): R {
         return if (transactionManager.isActive()) {
             val txContext = transactionManager.suspend()
@@ -42,7 +38,7 @@ internal class R2dbcCoroutineTransactionOperatorImpl(
 
     private suspend fun <R> executeInNewTransaction(
         transactionDefinition: TransactionDefinition?,
-        block: suspend CoroutineScope.(R2dbcCoroutineTransactionOperator) -> R
+        block: suspend (R2dbcCoroutineTransactionOperator) -> R
     ): R {
         val txContext = transactionManager.begin(transactionDefinition ?: defaultTransactionDefinition)
         return withContext(txContext) {
