@@ -4,6 +4,7 @@ import io.quarkus.agroal.DataSource;
 import io.quarkus.agroal.spi.JdbcDataSourceBuildItem;
 import io.quarkus.arc.deployment.AdditionalBeanBuildItem;
 import io.quarkus.arc.deployment.SyntheticBeanBuildItem;
+import io.quarkus.arc.deployment.UnremovableBeanBuildItem;
 import io.quarkus.deployment.annotations.BuildProducer;
 import io.quarkus.deployment.annotations.BuildStep;
 import io.quarkus.deployment.annotations.ExecutionTime;
@@ -15,6 +16,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import javax.enterprise.inject.Default;
 import javax.inject.Singleton;
+import javax.transaction.TransactionManager;
 import org.jboss.jandex.DotName;
 import org.komapper.jdbc.JdbcDatabase;
 import org.komapper.jdbc.JdbcDatabaseConfig;
@@ -34,6 +36,11 @@ public class KomapperProcessor {
   @BuildStep
   AdditionalBeanBuildItem additionalBeans() {
     return new AdditionalBeanBuildItem(KomapperProducer.class, DefaultDataSourceResolver.class);
+  }
+
+  @BuildStep
+  UnremovableBeanBuildItem unremovable() {
+    return UnremovableBeanBuildItem.beanTypes(TransactionManager.class);
   }
 
   @BuildStep
