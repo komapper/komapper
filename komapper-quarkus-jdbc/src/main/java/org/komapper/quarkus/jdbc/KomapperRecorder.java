@@ -44,7 +44,7 @@ public class KomapperRecorder {
       var dialect = JdbcDialects.INSTANCE.get(dataSourceDefinition.driver, Collections.emptyList());
       var templateStatementBuilder = TemplateStatementBuilders.INSTANCE.get(dialect);
       var session =
-          new TransactionManagerSession(
+          new JtaTransactionSession(
               transactionManager, dataSourceResolver.resolve(dataSourceDefinition.name));
       var dataFactory = new DefaultJdbcDataFactory(session);
       var newExecutionOptions =

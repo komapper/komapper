@@ -1,6 +1,6 @@
 package org.komapper.jdbc
 
-interface JdbcTransactionalOperator {
+interface JdbcTransactionOperator {
 
     /**
      * Begins a REQUIRED transaction.
@@ -12,7 +12,7 @@ interface JdbcTransactionalOperator {
      */
     fun <R> required(
         transactionDefinition: JdbcTransactionDefinition? = null,
-        block: (JdbcTransactionalOperator) -> R
+        block: (JdbcTransactionOperator) -> R
     ): R
 
     /**
@@ -25,7 +25,7 @@ interface JdbcTransactionalOperator {
      */
     fun <R> requiresNew(
         transactionDefinition: JdbcTransactionDefinition? = null,
-        block: (JdbcTransactionalOperator) -> R
+        block: (JdbcTransactionOperator) -> R
     ): R
 
     /**

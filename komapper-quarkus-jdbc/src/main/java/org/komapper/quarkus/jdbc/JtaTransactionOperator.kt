@@ -1,22 +1,22 @@
 package org.komapper.quarkus.jdbc
 
 import org.komapper.jdbc.JdbcTransactionDefinition
-import org.komapper.jdbc.JdbcTransactionalOperator
+import org.komapper.jdbc.JdbcTransactionOperator
 import javax.transaction.Status
 import javax.transaction.TransactionManager
 
-internal class TransactionManagerOperator(private val transactionManager: TransactionManager) : JdbcTransactionalOperator {
+internal class TransactionManagerOperator(private val transactionManager: TransactionManager) : JdbcTransactionOperator {
 
     override fun <R> required(
         transactionDefinition: JdbcTransactionDefinition?,
-        block: (JdbcTransactionalOperator) -> R
+        block: (JdbcTransactionOperator) -> R
     ): R {
         return execute(block)
     }
 
     override fun <R> requiresNew(
         transactionDefinition: JdbcTransactionDefinition?,
-        block: (JdbcTransactionalOperator) -> R
+        block: (JdbcTransactionOperator) -> R
     ): R {
         val tx = transactionManager.suspend()
         return runCatching {
@@ -26,7 +26,7 @@ internal class TransactionManagerOperator(private val transactionManager: Transa
         }.getOrThrow()
     }
 
-    private fun <R> execute(block: (JdbcTransactionalOperator) -> R): R {
+    private fun <R> execute(block: (JdbcTransactionOperator) -> R): R {
         transactionManager.begin()
         return runCatching {
             block(this)
