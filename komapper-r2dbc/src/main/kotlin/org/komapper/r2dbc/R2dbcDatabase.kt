@@ -139,9 +139,9 @@ interface R2dbcDatabase {
     suspend fun <R> withTransaction(
         transactionAttribute: TransactionAttribute = TransactionAttribute.REQUIRED,
         transactionDefinition: TransactionDefinition? = null,
-        block: suspend CoroutineScope.(R2dbcCoroutineTransactionalOperator) -> R
+        block: suspend CoroutineScope.(R2dbcCoroutineTransactionOperator) -> R
     ): R {
-        val tx = config.session.coroutineTransactionalOperator
+        val tx = config.session.coroutineTransactionOperator
         return when (transactionAttribute) {
             TransactionAttribute.REQUIRED -> tx.required(transactionDefinition, block)
             TransactionAttribute.REQUIRES_NEW -> tx.requiresNew(transactionDefinition, block)
@@ -160,9 +160,9 @@ interface R2dbcDatabase {
     fun <R> flowTransaction(
         transactionAttribute: TransactionAttribute = TransactionAttribute.REQUIRED,
         transactionDefinition: TransactionDefinition? = null,
-        block: suspend FlowCollector<R>.(R2dbcFlowTransactionalOperator) -> Unit
+        block: suspend FlowCollector<R>.(R2dbcFlowTransactionOperator) -> Unit
     ): Flow<R> {
-        val tx = config.session.flowTransactionalOperator
+        val tx = config.session.flowTransactionOperator
         return when (transactionAttribute) {
             TransactionAttribute.REQUIRED -> tx.required(transactionDefinition, block)
             TransactionAttribute.REQUIRES_NEW -> tx.requiresNew(transactionDefinition, block)

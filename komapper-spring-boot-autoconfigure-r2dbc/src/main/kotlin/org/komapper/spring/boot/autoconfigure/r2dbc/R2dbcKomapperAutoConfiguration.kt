@@ -17,7 +17,7 @@ import org.komapper.r2dbc.R2dbcDatabaseConfig
 import org.komapper.r2dbc.R2dbcDialect
 import org.komapper.r2dbc.R2dbcDialects
 import org.komapper.r2dbc.R2dbcSession
-import org.komapper.spring.r2dbc.R2dbcTransactionAwareSession
+import org.komapper.spring.r2dbc.ReactiveTransactionSession
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
@@ -81,7 +81,7 @@ open class R2dbcKomapperAutoConfiguration {
         transactionManager: ReactiveTransactionManager,
         connectionFactory: ConnectionFactory
     ): R2dbcSession {
-        return R2dbcTransactionAwareSession(transactionManager, connectionFactory)
+        return ReactiveTransactionSession(transactionManager, connectionFactory)
     }
 
     @Bean

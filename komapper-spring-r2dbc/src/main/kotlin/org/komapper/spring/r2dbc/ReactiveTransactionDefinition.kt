@@ -15,7 +15,7 @@ internal fun adaptTransactionDefinition(
     val adapter = if (adaptee == null) {
         SpringDefinition.withDefaults()
     } else {
-        R2dbcTransactionDefinitionAdapter(adaptee)
+        ReactiveTransactionDefinition(adaptee)
     }
     return object : SpringDefinition by adapter {
         override fun getPropagationBehavior(): Int {
@@ -27,7 +27,7 @@ internal fun adaptTransactionDefinition(
     }
 }
 
-private class R2dbcTransactionDefinitionAdapter(
+private class ReactiveTransactionDefinition(
     private val adaptee: R2dbcDefinition
 ) :
     SpringDefinition {

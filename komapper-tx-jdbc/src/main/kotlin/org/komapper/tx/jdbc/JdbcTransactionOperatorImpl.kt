@@ -1,16 +1,16 @@
 package org.komapper.tx.jdbc
 
 import org.komapper.jdbc.JdbcTransactionDefinition
-import org.komapper.jdbc.JdbcTransactionalOperator
+import org.komapper.jdbc.JdbcTransactionOperator
 
-internal class JdbcTransactionalOperatorImpl(
+internal class JdbcTransactionOperatorImpl(
     private val transactionManager: JdbcTransactionManager,
     private val defaultTransactionDefinition: JdbcTransactionDefinition? = null
-) : JdbcTransactionalOperator {
+) : JdbcTransactionOperator {
 
     override fun <R> required(
         transactionDefinition: JdbcTransactionDefinition?,
-        block: (JdbcTransactionalOperator) -> R
+        block: (JdbcTransactionOperator) -> R
     ): R {
         return if (transactionManager.isActive) {
             block(this)
@@ -21,7 +21,7 @@ internal class JdbcTransactionalOperatorImpl(
 
     override fun <R> requiresNew(
         transactionDefinition: JdbcTransactionDefinition?,
-        block: (JdbcTransactionalOperator) -> R
+        block: (JdbcTransactionOperator) -> R
     ): R {
         return if (transactionManager.isActive) {
             val tx = transactionManager.suspend()
@@ -37,7 +37,7 @@ internal class JdbcTransactionalOperatorImpl(
 
     private fun <R> executeInNewTransaction(
         transactionDefinition: JdbcTransactionDefinition?,
-        block: (JdbcTransactionalOperator) -> R
+        block: (JdbcTransactionOperator) -> R
     ): R {
         transactionManager.begin(transactionDefinition ?: defaultTransactionDefinition)
         return runCatching {

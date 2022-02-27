@@ -94,11 +94,17 @@ module/spring-boot-starter-jdbc:
 module/spring-boot-starter-r2dbc:
   - komapper-spring-boot-starter-r2dbc/**/*
 
+module/spring-jdbc:
+  - komapper-spring-jdbc/**/*
+
 module/spring-native-jdbc:
   - komapper-spring-native-jdbc/**/*
 
 module/spring-native-r2dbc:
   - komapper-spring-native-r2dbc/**/*
+
+module/spring-r2dbc:
+  - komapper-spring-r2dbc/**/*
 
 module/sqlcommenter:
   - komapper-sqlcommenter/**/*

@@ -4,8 +4,8 @@ import io.r2dbc.spi.Connection
 import io.r2dbc.spi.ConnectionFactory
 import io.r2dbc.spi.TransactionDefinition
 import org.komapper.core.LoggerFacade
-import org.komapper.r2dbc.R2dbcCoroutineTransactionalOperator
-import org.komapper.r2dbc.R2dbcFlowTransactionalOperator
+import org.komapper.r2dbc.R2dbcCoroutineTransactionOperator
+import org.komapper.r2dbc.R2dbcFlowTransactionOperator
 import org.komapper.r2dbc.R2dbcSession
 
 /**
@@ -21,12 +21,12 @@ class R2dbcTransactionSession(
         R2dbcTransactionManagerImpl(connectionFactory, loggerFacade)
     }
 
-    override val coroutineTransactionalOperator: R2dbcCoroutineTransactionalOperator by lazy {
-        R2dbcCoroutineTransactionalOperatorImpl(transactionManager, transactionDefinition)
+    override val coroutineTransactionOperator: R2dbcCoroutineTransactionOperator by lazy {
+        R2dbcCoroutineTransactionOperatorImpl(transactionManager, transactionDefinition)
     }
 
-    override val flowTransactionalOperator: R2dbcFlowTransactionalOperator by lazy {
-        R2dbcFlowTransactionalOperatorImpl(transactionManager, transactionDefinition)
+    override val flowTransactionOperator: R2dbcFlowTransactionOperator by lazy {
+        R2dbcFlowTransactionOperatorImpl(transactionManager, transactionDefinition)
     }
 
     override suspend fun getConnection(): Connection {

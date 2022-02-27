@@ -9,6 +9,7 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Supplier;
 import javax.enterprise.inject.Default;
+import javax.transaction.TransactionManager;
 import org.komapper.core.ClockProvider;
 import org.komapper.core.ExecutionOptions;
 import org.komapper.core.Logger;
@@ -17,7 +18,6 @@ import org.komapper.core.StatementInspector;
 import org.komapper.core.TemplateStatementBuilder;
 import org.komapper.core.TemplateStatementBuilders;
 import org.komapper.jdbc.DefaultJdbcDataFactory;
-import org.komapper.jdbc.DefaultJdbcSession;
 import org.komapper.jdbc.JdbcDataFactory;
 import org.komapper.jdbc.JdbcDatabase;
 import org.komapper.jdbc.JdbcDatabaseConfig;
@@ -33,6 +33,7 @@ public class KomapperRecorder {
     Objects.requireNonNull(dataSourceDefinition);
     return () -> {
       var container = Arc.container();
+      var transactionManager = container.instance(TransactionManager.class).get();
       var dataSourceResolver = container.instance(DataSourceResolver.class).get();
       var executionOptions = container.instance(ExecutionOptions.class).get();
       var clockProvider = container.instance(ClockProvider.class).get();
@@ -42,7 +43,9 @@ public class KomapperRecorder {
       var id = UUID.randomUUID();
       var dialect = JdbcDialects.INSTANCE.get(dataSourceDefinition.driver, Collections.emptyList());
       var templateStatementBuilder = TemplateStatementBuilders.INSTANCE.get(dialect);
-      var session = new DefaultJdbcSession(dataSourceResolver.resolve(dataSourceDefinition.name));
+      var session =
+          new JtaTransactionSession(
+              transactionManager, dataSourceResolver.resolve(dataSourceDefinition.name));
       var dataFactory = new DefaultJdbcDataFactory(session);
       var newExecutionOptions =
           executionOptions.plus(
