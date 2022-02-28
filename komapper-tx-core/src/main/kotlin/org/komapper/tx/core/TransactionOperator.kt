@@ -1,31 +1,33 @@
-package org.komapper.jdbc
+package org.komapper.tx.core
 
-interface JdbcTransactionOperator {
+import org.komapper.core.ThreadSafe
 
+@ThreadSafe
+interface TransactionOperator {
     /**
      * Begins a REQUIRED transaction.
      *
      * @param R the return type of the block
-     * @param transactionDefinition the transaction definition
+     * @param transactionProperty the transaction property
      * @param block the block executed in the transaction
      * @return the result of the block
      */
     fun <R> required(
-        transactionDefinition: JdbcTransactionDefinition? = null,
-        block: (JdbcTransactionOperator) -> R
+        transactionProperty: TransactionProperty = EmptyTransactionProperty,
+        block: (TransactionOperator) -> R
     ): R
 
     /**
      * Begins a REQUIRES_NEW transaction.
      *
      * @param R the return type of the block
-     * @param transactionDefinition the transaction definition
+     * @param transactionProperty the transaction property
      * @param block the block executed in the transaction
      * @return the result of the block
      */
     fun <R> requiresNew(
-        transactionDefinition: JdbcTransactionDefinition? = null,
-        block: (JdbcTransactionOperator) -> R
+        transactionProperty: TransactionProperty = EmptyTransactionProperty,
+        block: (TransactionOperator) -> R
     ): R
 
     /**

@@ -1,9 +1,10 @@
 package org.komapper.tx.jdbc
 
 import org.komapper.core.LoggerFacade
-import org.komapper.jdbc.JdbcIsolationLevel
 import org.komapper.jdbc.JdbcSession
-import org.komapper.jdbc.JdbcTransactionOperator
+import org.komapper.tx.core.EmptyTransactionProperty
+import org.komapper.tx.core.TransactionOperator
+import org.komapper.tx.core.TransactionProperty
 import java.sql.Connection
 import javax.sql.DataSource
 
@@ -11,18 +12,16 @@ import javax.sql.DataSource
  * Represents a transactional session for JDBC.
  */
 class JdbcTransactionSession(
-    private val dataSource: DataSource,
-    private val loggerFacade: LoggerFacade,
-    private val isolationLevel: JdbcIsolationLevel? = null
+    dataSource: DataSource,
+    loggerFacade: LoggerFacade,
+    transactionProperty: TransactionProperty = EmptyTransactionProperty
 ) : JdbcSession {
 
-    val transactionManager: JdbcTransactionManager by lazy {
+    val transactionManager: JdbcTransactionManager =
         JdbcTransactionManagerImpl(dataSource, loggerFacade)
-    }
 
-    override val transactionOperator: JdbcTransactionOperator by lazy {
-        JdbcTransactionOperatorImpl(transactionManager, isolationLevel)
-    }
+    override val transactionOperator: TransactionOperator =
+        JdbcTransactionOperator(transactionManager, transactionProperty)
 
     override fun getConnection(): Connection {
         return transactionManager.dataSource.connection

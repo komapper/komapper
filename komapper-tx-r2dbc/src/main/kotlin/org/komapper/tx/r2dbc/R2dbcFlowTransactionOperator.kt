@@ -1,6 +1,5 @@
 package org.komapper.tx.r2dbc
 
-import io.r2dbc.spi.TransactionDefinition
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.emitAll
@@ -8,54 +7,56 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.withContext
-import org.komapper.r2dbc.R2dbcFlowTransactionOperator
+import org.komapper.tx.core.EmptyTransactionProperty
+import org.komapper.tx.core.FlowTransactionOperator
+import org.komapper.tx.core.TransactionProperty
 
-internal class R2dbcFlowTransactionOperatorImpl(
+internal class R2dbcFlowTransactionOperator(
     private val transactionManager: R2dbcTransactionManager,
-    private val defaultTransactionDefinition: TransactionDefinition? = null
-) : R2dbcFlowTransactionOperator {
+    private val defaultTransactionProperty: TransactionProperty = EmptyTransactionProperty
+) : FlowTransactionOperator {
 
     override fun <R> required(
-        transactionDefinition: TransactionDefinition?,
-        block: suspend FlowCollector<R>.(R2dbcFlowTransactionOperator) -> Unit
+        transactionProperty: TransactionProperty,
+        block: suspend FlowCollector<R>.(FlowTransactionOperator) -> Unit
     ): Flow<R> {
         return flow {
             if (transactionManager.isActive()) {
-                block(this@R2dbcFlowTransactionOperatorImpl)
+                block(this@R2dbcFlowTransactionOperator)
             } else {
-                val value = executeInNewTransaction(transactionDefinition, block)
+                val value = executeInNewTransaction(transactionProperty, block)
                 emitAll(value)
             }
         }
     }
 
     override fun <R> requiresNew(
-        transactionDefinition: TransactionDefinition?,
-        block: suspend FlowCollector<R>.(R2dbcFlowTransactionOperator) -> Unit
+        transactionProperty: TransactionProperty,
+        block: suspend FlowCollector<R>.(FlowTransactionOperator) -> Unit
     ): Flow<R> {
         return flow {
             val value = if (transactionManager.isActive()) {
                 val txContext = transactionManager.suspend()
                 withContext(txContext) {
-                    executeInNewTransaction(transactionDefinition, block)
+                    executeInNewTransaction(transactionProperty, block)
                 }.onCompletion {
                     transactionManager.resume()
                 }
             } else {
-                executeInNewTransaction(transactionDefinition, block)
+                executeInNewTransaction(transactionProperty, block)
             }
             emitAll(value)
         }
     }
 
     private suspend fun <R> executeInNewTransaction(
-        transactionDefinition: TransactionDefinition?,
-        block: suspend FlowCollector<R>.(R2dbcFlowTransactionOperator) -> Unit
+        transactionProperty: TransactionProperty,
+        block: suspend FlowCollector<R>.(FlowTransactionOperator) -> Unit
     ): Flow<R> {
-        val txContext = transactionManager.begin(transactionDefinition ?: defaultTransactionDefinition)
+        val txContext = transactionManager.begin(defaultTransactionProperty + transactionProperty)
         return flow {
             kotlin.runCatching {
-                block(this@R2dbcFlowTransactionOperatorImpl)
+                block(this@R2dbcFlowTransactionOperator)
             }.onSuccess {
                 if (transactionManager.isRollbackOnly()) {
                     transactionManager.rollback()

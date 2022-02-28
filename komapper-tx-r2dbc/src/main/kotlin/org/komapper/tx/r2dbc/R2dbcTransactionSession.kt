@@ -2,32 +2,30 @@ package org.komapper.tx.r2dbc
 
 import io.r2dbc.spi.Connection
 import io.r2dbc.spi.ConnectionFactory
-import io.r2dbc.spi.TransactionDefinition
 import org.komapper.core.LoggerFacade
-import org.komapper.r2dbc.R2dbcCoroutineTransactionOperator
-import org.komapper.r2dbc.R2dbcFlowTransactionOperator
 import org.komapper.r2dbc.R2dbcSession
+import org.komapper.tx.core.CoroutineTransactionOperator
+import org.komapper.tx.core.EmptyTransactionProperty
+import org.komapper.tx.core.FlowTransactionOperator
+import org.komapper.tx.core.TransactionProperty
 
 /**
  * Represents a transactional session for R2DBC.
  */
 class R2dbcTransactionSession(
-    private val connectionFactory: ConnectionFactory,
-    private val loggerFacade: LoggerFacade,
-    private val transactionDefinition: TransactionDefinition? = null
+    connectionFactory: ConnectionFactory,
+    loggerFacade: LoggerFacade,
+    transactionProperty: TransactionProperty = EmptyTransactionProperty
 ) : R2dbcSession {
 
-    private val transactionManager: R2dbcTransactionManager by lazy {
+    private val transactionManager: R2dbcTransactionManager =
         R2dbcTransactionManagerImpl(connectionFactory, loggerFacade)
-    }
 
-    override val coroutineTransactionOperator: R2dbcCoroutineTransactionOperator by lazy {
-        R2dbcCoroutineTransactionOperatorImpl(transactionManager, transactionDefinition)
-    }
+    override val coroutineTransactionOperator: CoroutineTransactionOperator =
+        R2dbcCoroutineTransactionOperator(transactionManager, transactionProperty)
 
-    override val flowTransactionOperator: R2dbcFlowTransactionOperator by lazy {
-        R2dbcFlowTransactionOperatorImpl(transactionManager, transactionDefinition)
-    }
+    override val flowTransactionOperator: FlowTransactionOperator =
+        R2dbcFlowTransactionOperator(transactionManager, transactionProperty)
 
     override suspend fun getConnection(): Connection {
         return transactionManager.getConnection()

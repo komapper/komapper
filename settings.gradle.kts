@@ -27,6 +27,7 @@ rootProject.name = "komapper"
 
 // CORE
 include("komapper-core")
+include("komapper-tx-core")
 
 // ANNOTATION & PROCESSOR
 include("komapper-annotation")

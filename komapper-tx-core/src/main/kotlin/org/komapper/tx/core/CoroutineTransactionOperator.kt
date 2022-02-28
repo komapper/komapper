@@ -1,35 +1,33 @@
-package org.komapper.r2dbc
+package org.komapper.tx.core
 
-import io.r2dbc.spi.TransactionDefinition
 import org.komapper.core.ThreadSafe
 
 @ThreadSafe
-interface R2dbcCoroutineTransactionOperator {
-
+interface CoroutineTransactionOperator {
     /**
      * Begins a REQUIRED transaction.
      *
      * @param R the return type of the block
-     * @param transactionDefinition the transaction definition
+     * @param transactionProperty the transaction property
      * @param block the block executed in the transaction
      * @return the result of the block
      */
     suspend fun <R> required(
-        transactionDefinition: TransactionDefinition? = null,
-        block: suspend (R2dbcCoroutineTransactionOperator) -> R
+        transactionProperty: TransactionProperty = EmptyTransactionProperty,
+        block: suspend (CoroutineTransactionOperator) -> R
     ): R
 
     /**
      * Begins a REQUIRES_NEW transaction.
      *
      * @param R the return type of the block
-     * @param transactionDefinition the transaction definition
+     * @param transactionProperty the transaction property
      * @param block the block executed in the transaction
      * @return the result of the block
      */
     suspend fun <R> requiresNew(
-        transactionDefinition: TransactionDefinition? = null,
-        block: suspend (R2dbcCoroutineTransactionOperator) -> R
+        transactionProperty: TransactionProperty = EmptyTransactionProperty,
+        block: suspend (CoroutineTransactionOperator) -> R
     ): R
 
     /**

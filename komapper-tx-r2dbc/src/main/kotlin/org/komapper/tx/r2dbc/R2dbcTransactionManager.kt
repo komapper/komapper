@@ -2,7 +2,6 @@ package org.komapper.tx.r2dbc
 
 import io.r2dbc.spi.Connection
 import io.r2dbc.spi.ConnectionFactory
-import io.r2dbc.spi.TransactionDefinition
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.map
@@ -11,6 +10,8 @@ import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.reactive.asFlow
 import org.komapper.core.LoggerFacade
 import org.komapper.core.ThreadSafe
+import org.komapper.tx.core.EmptyTransactionProperty
+import org.komapper.tx.core.TransactionProperty
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.coroutineContext
 
@@ -37,7 +38,7 @@ interface R2dbcTransactionManager {
      */
     suspend fun setRollbackOnly()
 
-    suspend fun begin(transactionDefinition: TransactionDefinition? = null): CoroutineContext
+    suspend fun begin(transactionProperty: TransactionProperty = EmptyTransactionProperty): CoroutineContext
 
     suspend fun commit()
 
@@ -83,7 +84,7 @@ internal class R2dbcTransactionManagerImpl(
         }
     }
 
-    override suspend fun begin(transactionDefinition: TransactionDefinition?): CoroutineContext {
+    override suspend fun begin(transactionProperty: TransactionProperty): CoroutineContext {
         val currentTxHolder = coroutineContext[TxHolder]
         if (currentTxHolder?.tx != null) {
             rollbackInternal(currentTxHolder.tx)
@@ -93,10 +94,11 @@ internal class R2dbcTransactionManagerImpl(
             val txCon = R2dbcTransactionConnectionImpl(con)
             R2dbcTransactionImpl(txCon)
         }.single()
-        val begin = if (transactionDefinition == null) {
+        val begin = if (transactionProperty == EmptyTransactionProperty) {
             tx.connection.beginTransaction().asFlow()
         } else {
-            tx.connection.beginTransaction(transactionDefinition).asFlow()
+            val definition = transactionProperty.asDefinition()
+            tx.connection.beginTransaction(definition).asFlow()
         }
         begin.onCompletion { cause ->
             if (cause == null) {
@@ -191,5 +193,6 @@ internal class R2dbcTransactionManagerImpl(
 
 private data class TxHolder(val tx: R2dbcTransaction?) : CoroutineContext.Element {
     companion object Key : CoroutineContext.Key<TxHolder>
+
     override val key: CoroutineContext.Key<TxHolder> = Key
 }

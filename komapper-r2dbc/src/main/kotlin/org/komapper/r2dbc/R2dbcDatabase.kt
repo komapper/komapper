@@ -3,7 +3,6 @@ package org.komapper.r2dbc
 import io.r2dbc.spi.ConnectionFactories
 import io.r2dbc.spi.ConnectionFactory
 import io.r2dbc.spi.ConnectionFactoryOptions
-import io.r2dbc.spi.TransactionDefinition
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
 import org.komapper.core.TransactionAttribute
@@ -14,6 +13,10 @@ import org.komapper.r2dbc.dsl.runner.R2dbcFlowBuilder
 import org.komapper.r2dbc.dsl.runner.R2dbcRunner
 import org.komapper.r2dbc.dsl.visitor.R2dbcFlowQueryVisitor
 import org.komapper.r2dbc.dsl.visitor.R2dbcQueryVisitor
+import org.komapper.tx.core.CoroutineTransactionOperator
+import org.komapper.tx.core.EmptyTransactionProperty
+import org.komapper.tx.core.FlowTransactionOperator
+import org.komapper.tx.core.TransactionProperty
 
 /**
  * Represents a database accessed by R2DBC.
@@ -131,19 +134,19 @@ interface R2dbcDatabase {
      *
      * @param R the return type of the block
      * @param transactionAttribute the transaction attribute
-     * @param transactionDefinition the transactionDefinition level
+     * @param transactionOption the transaction option
      * @param block the block executed in the transaction
      * @return the result of the block
      */
     suspend fun <R> withTransaction(
         transactionAttribute: TransactionAttribute = TransactionAttribute.REQUIRED,
-        transactionDefinition: TransactionDefinition? = null,
-        block: suspend (R2dbcCoroutineTransactionOperator) -> R
+        transactionProperty: TransactionProperty = EmptyTransactionProperty,
+        block: suspend (CoroutineTransactionOperator) -> R
     ): R {
         val tx = config.session.coroutineTransactionOperator
         return when (transactionAttribute) {
-            TransactionAttribute.REQUIRED -> tx.required(transactionDefinition, block)
-            TransactionAttribute.REQUIRES_NEW -> tx.requiresNew(transactionDefinition, block)
+            TransactionAttribute.REQUIRED -> tx.required(transactionProperty, block)
+            TransactionAttribute.REQUIRES_NEW -> tx.requiresNew(transactionProperty, block)
         }
     }
 
@@ -152,19 +155,19 @@ interface R2dbcDatabase {
      *
      * @param R the return type of the flow
      * @param transactionAttribute the transaction attribute
-     * @param transactionDefinition the transaction definition
+     * @param transactionOption the transaction option
      * @param block the block executed in the transaction
      * @return the flow
      */
     fun <R> flowTransaction(
         transactionAttribute: TransactionAttribute = TransactionAttribute.REQUIRED,
-        transactionDefinition: TransactionDefinition? = null,
-        block: suspend FlowCollector<R>.(R2dbcFlowTransactionOperator) -> Unit
+        transactionProperty: TransactionProperty = EmptyTransactionProperty,
+        block: suspend FlowCollector<R>.(FlowTransactionOperator) -> Unit
     ): Flow<R> {
         val tx = config.session.flowTransactionOperator
         return when (transactionAttribute) {
-            TransactionAttribute.REQUIRED -> tx.required(transactionDefinition, block)
-            TransactionAttribute.REQUIRES_NEW -> tx.requiresNew(transactionDefinition, block)
+            TransactionAttribute.REQUIRED -> tx.required(transactionProperty, block)
+            TransactionAttribute.REQUIRES_NEW -> tx.requiresNew(transactionProperty, block)
         }
     }
 }

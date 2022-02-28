@@ -1,49 +1,50 @@
 package org.komapper.tx.r2dbc
 
-import io.r2dbc.spi.TransactionDefinition
 import kotlinx.coroutines.withContext
-import org.komapper.r2dbc.R2dbcCoroutineTransactionOperator
+import org.komapper.tx.core.CoroutineTransactionOperator
+import org.komapper.tx.core.EmptyTransactionProperty
+import org.komapper.tx.core.TransactionProperty
 
-internal class R2dbcCoroutineTransactionOperatorImpl(
+internal class R2dbcCoroutineTransactionOperator(
     private val transactionManager: R2dbcTransactionManager,
-    private val defaultTransactionDefinition: TransactionDefinition? = null
-) : R2dbcCoroutineTransactionOperator {
+    private val defaultTransactionProperty: TransactionProperty = EmptyTransactionProperty
+) : CoroutineTransactionOperator {
 
     override suspend fun <R> required(
-        transactionDefinition: TransactionDefinition?,
-        block: suspend (R2dbcCoroutineTransactionOperator) -> R
+        transactionProperty: TransactionProperty,
+        block: suspend (CoroutineTransactionOperator) -> R
     ): R {
         return if (transactionManager.isActive()) {
             block(this)
         } else {
-            executeInNewTransaction(transactionDefinition, block)
+            executeInNewTransaction(transactionProperty, block)
         }
     }
 
     override suspend fun <R> requiresNew(
-        transactionDefinition: TransactionDefinition?,
-        block: suspend (R2dbcCoroutineTransactionOperator) -> R
+        transactionProperty: TransactionProperty,
+        block: suspend (CoroutineTransactionOperator) -> R
     ): R {
         return if (transactionManager.isActive()) {
             val txContext = transactionManager.suspend()
             withContext(txContext) {
-                executeInNewTransaction(transactionDefinition, block)
+                executeInNewTransaction(transactionProperty, block)
             }.also {
                 transactionManager.resume()
             }
         } else {
-            executeInNewTransaction(transactionDefinition, block)
+            executeInNewTransaction(transactionProperty, block)
         }
     }
 
     private suspend fun <R> executeInNewTransaction(
-        transactionDefinition: TransactionDefinition?,
-        block: suspend (R2dbcCoroutineTransactionOperator) -> R
+        transactionProperty: TransactionProperty,
+        block: suspend (CoroutineTransactionOperator) -> R
     ): R {
-        val txContext = transactionManager.begin(transactionDefinition ?: defaultTransactionDefinition)
+        val txContext = transactionManager.begin(defaultTransactionProperty + transactionProperty)
         return withContext(txContext) {
             runCatching {
-                block(this@R2dbcCoroutineTransactionOperatorImpl)
+                block(this@R2dbcCoroutineTransactionOperator)
             }.onSuccess {
                 if (transactionManager.isRollbackOnly()) {
                     transactionManager.rollback()
