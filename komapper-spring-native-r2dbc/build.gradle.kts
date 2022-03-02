@@ -12,5 +12,5 @@ dependencies {
     implementation(project(":komapper-core"))
     implementation(project(":komapper-r2dbc"))
     implementation(project(":komapper-spring-boot-autoconfigure-r2dbc"))
-    compileOnly("org.springframework.experimental:spring-aot:0.11.2")
+    compileOnly("org.springframework.experimental:spring-aot:0.11.3")
 }
