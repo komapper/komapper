@@ -43,13 +43,3 @@ class StdOutLogger : Logger {
         println("${LocalTime.now()} [$threadName] $category - ${message()}")
     }
 }
-
-/**
- * Represents log category.
- */
-enum class LogCategory(val value: String) {
-    SQL("org.komapper.SQL"),
-    SQL_WITH_ARGS("org.komapper.SQL_WITH_ARGS"),
-    TRANSACTION("org.komapper.TRANSACTION"),
-    OTHER("org.komapper.OTHER")
-}

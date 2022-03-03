@@ -80,55 +80,55 @@ interface LoggerFacade {
  */
 class DefaultLoggerFacade(private val logger: Logger) : LoggerFacade {
     override fun sql(statement: Statement, format: (Int, StatementPart.Value) -> CharSequence) {
-        logger.debug(LogCategory.SQL.value) {
+        logger.debug(LogCategory.SQL) {
             statement.toSql(format)
         }
     }
 
     override fun sqlWithArgs(statement: Statement, format: (Any?, KClass<*>, Boolean) -> CharSequence) {
-        logger.trace(LogCategory.SQL_WITH_ARGS.value) {
+        logger.trace(LogCategory.SQL_WITH_ARGS) {
             statement.toSqlWithArgs(format)
         }
     }
 
     override fun begin(transactionId: UUID) {
-        logger.trace(LogCategory.TRANSACTION.value) {
+        logger.trace(LogCategory.TRANSACTION) {
             "The transaction \"$transactionId\" has begun."
         }
     }
 
     override fun commit(transactionId: UUID) {
-        logger.trace(LogCategory.TRANSACTION.value) {
+        logger.trace(LogCategory.TRANSACTION) {
             "The transaction \"$transactionId\" has committed."
         }
     }
 
     override fun commitFailed(transactionId: UUID, cause: Throwable) {
-        logger.trace(LogCategory.TRANSACTION.value) {
+        logger.trace(LogCategory.TRANSACTION) {
             "Commit of the transaction \"$transactionId\" failed. $cause"
         }
     }
 
     override fun rollback(transactionId: UUID) {
-        logger.trace(LogCategory.TRANSACTION.value) {
+        logger.trace(LogCategory.TRANSACTION) {
             "The transaction \"$transactionId\" has rolled back."
         }
     }
 
     override fun rollbackFailed(transactionId: UUID, cause: Throwable) {
-        logger.trace(LogCategory.TRANSACTION.value) {
+        logger.trace(LogCategory.TRANSACTION) {
             "Rollback of the transaction \"$transactionId\" failed. $cause"
         }
     }
 
     override fun suspend(transactionId: UUID) {
-        logger.trace(LogCategory.TRANSACTION.value) {
+        logger.trace(LogCategory.TRANSACTION) {
             "The transaction \"$transactionId\" has suspended."
         }
     }
 
     override fun resume(transactionId: UUID) {
-        logger.trace(LogCategory.TRANSACTION.value) {
+        logger.trace(LogCategory.TRANSACTION) {
             "The transaction \"$transactionId\" has resumed."
         }
     }
