@@ -76,10 +76,10 @@ fun <T> Option<T>.asKey(): TransactionProperty.Key<*> {
 }
 
 fun TransactionProperty.asDefinition(): TransactionDefinition {
-    return TransactionOptionAdapter(this)
+    return TransactionPropertyAdapter(this)
 }
 
-private class TransactionOptionAdapter(val adaptee: TransactionProperty) : TransactionDefinition {
+private class TransactionPropertyAdapter(private val adaptee: TransactionProperty) : TransactionDefinition {
     override fun <T : Any> getAttribute(option: Option<T>): T? {
         val element = adaptee[option.asKey()]
         // handle well-known properties
