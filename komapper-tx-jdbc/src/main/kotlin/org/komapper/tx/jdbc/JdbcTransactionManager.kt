@@ -46,10 +46,11 @@ internal class JdbcTransactionManagerImpl(
     override val dataSource = object : DataSource by internalDataSource {
         override fun getConnection(): Connection {
             val tx = threadLocal.get()
-            if (!tx.isActive()) {
-                error("A transaction hasn't yet begun.")
+            return if (tx.isActive()) {
+                tx.connection
+            } else {
+                internalDataSource.connection
             }
-            return tx.connection
         }
 
         override fun getConnection(username: String?, password: String?): Connection {

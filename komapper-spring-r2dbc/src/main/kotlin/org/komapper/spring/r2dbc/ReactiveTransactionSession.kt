@@ -20,6 +20,7 @@ class ReactiveTransactionSession(
         is TransactionAwareConnectionFactoryProxy -> connectionFactory
         else -> TransactionAwareConnectionFactoryProxy(connectionFactory)
     }
+
     override val coroutineTransactionOperator: CoroutineTransactionOperator =
         ReactiveCoroutineTransactionOperator(transactionManager)
 

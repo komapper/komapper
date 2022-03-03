@@ -31,11 +31,9 @@ class R2dbcEnv :
         if (!initialized) {
             initialized = true
             runBlockingWithTimeout {
-                db.withTransaction {
-                    db.runQuery {
-                        QueryDsl.executeScript(setting.createSql).options {
-                            it.copy(suppressLogging = true)
-                        }
+                db.runQuery {
+                    QueryDsl.executeScript(setting.createSql).options {
+                        it.copy(suppressLogging = true)
                     }
                 }
             }
@@ -46,11 +44,9 @@ class R2dbcEnv :
         val resetSql = setting.resetSql
         if (resetSql != null) {
             runBlockingWithTimeout {
-                db.withTransaction {
-                    db.runQuery {
-                        QueryDsl.executeScript(resetSql).options {
-                            it.copy(suppressLogging = true)
-                        }
+                db.runQuery {
+                    QueryDsl.executeScript(resetSql).options {
+                        it.copy(suppressLogging = true)
                     }
                 }
             }

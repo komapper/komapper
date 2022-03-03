@@ -35,11 +35,9 @@ class JdbcEnv :
     override fun beforeAll(context: ExtensionContext?) {
         if (!initialized) {
             initialized = true
-            db.withTransaction {
-                db.runQuery {
-                    QueryDsl.executeScript(setting.createSql).options {
-                        it.copy(suppressLogging = true)
-                    }
+            db.runQuery {
+                QueryDsl.executeScript(setting.createSql).options {
+                    it.copy(suppressLogging = true)
                 }
             }
         }
@@ -48,11 +46,9 @@ class JdbcEnv :
     override fun beforeTestExecution(context: ExtensionContext?) {
         val resetSql = setting.resetSql
         if (resetSql != null) {
-            db.withTransaction {
-                db.runQuery {
-                    QueryDsl.executeScript(resetSql).options {
-                        it.copy(suppressLogging = true)
-                    }
+            db.runQuery {
+                QueryDsl.executeScript(resetSql).options {
+                    it.copy(suppressLogging = true)
                 }
             }
         }
