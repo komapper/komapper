@@ -118,6 +118,9 @@ module/starter-r2dbc:
 module/template:
   - komapper-template/**/*
 
+module/tx:
+  - komapper-tx/**/*
+
 module/tx-jdbc:
   - komapper-tx-jdbc/**/*
 
