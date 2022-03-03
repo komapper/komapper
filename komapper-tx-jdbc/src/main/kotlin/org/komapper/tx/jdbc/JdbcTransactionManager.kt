@@ -2,8 +2,8 @@ package org.komapper.tx.jdbc
 
 import org.komapper.core.LoggerFacade
 import org.komapper.core.ThreadSafe
-import org.komapper.jdbc.JdbcIsolationLevel
-import org.komapper.jdbc.JdbcTransactionDefinition
+import org.komapper.tx.core.EmptyTransactionProperty
+import org.komapper.tx.core.TransactionProperty
 import java.sql.Connection
 import javax.sql.DataSource
 
@@ -21,7 +21,7 @@ interface JdbcTransactionManager {
      */
     fun setRollbackOnly()
 
-    fun begin(transactionDefinition: JdbcTransactionDefinition? = null)
+    fun begin(transactionProperty: TransactionProperty = EmptyTransactionProperty)
 
     fun commit()
 
@@ -78,7 +78,7 @@ internal class JdbcTransactionManagerImpl(
         }
     }
 
-    override fun begin(transactionDefinition: JdbcTransactionDefinition?) {
+    override fun begin(transactionProperty: TransactionProperty) {
         val currentTx = threadLocal.get()
         if (currentTx.isActive()) {
             rollbackInternal(currentTx)
@@ -86,7 +86,7 @@ internal class JdbcTransactionManagerImpl(
         }
         val tx = JdbcTransactionImpl {
             val connection = internalDataSource.connection
-            val isolationLevel = transactionDefinition?.get(JdbcIsolationLevel)
+            val isolationLevel = transactionProperty[TransactionProperty.IsolationLevel]
             JdbcTransactionConnectionImpl(connection, isolationLevel).apply {
                 runCatching {
                     initialize()

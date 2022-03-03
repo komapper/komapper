@@ -5,6 +5,8 @@ import io.r2dbc.spi.ConnectionFactory
 import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.reactive.asFlow
 import org.komapper.core.ThreadSafe
+import org.komapper.tx.core.CoroutineTransactionOperator
+import org.komapper.tx.core.FlowTransactionOperator
 
 /**
  * Represents a session for R2DBC access.
@@ -12,9 +14,9 @@ import org.komapper.core.ThreadSafe
 @ThreadSafe
 interface R2dbcSession {
 
-    val coroutineTransactionOperator: R2dbcCoroutineTransactionOperator
+    val coroutineTransactionOperator: CoroutineTransactionOperator
 
-    val flowTransactionOperator: R2dbcFlowTransactionOperator
+    val flowTransactionOperator: FlowTransactionOperator
 
     /**
      * Returns a R2DBC connection.
@@ -24,10 +26,10 @@ interface R2dbcSession {
 
 class DefaultR2dbcSession(private val connectionFactory: ConnectionFactory) : R2dbcSession {
 
-    override val coroutineTransactionOperator: R2dbcCoroutineTransactionOperator
+    override val coroutineTransactionOperator: CoroutineTransactionOperator
         get() = throw UnsupportedOperationException("Use a module that provides transaction management.")
 
-    override val flowTransactionOperator: R2dbcFlowTransactionOperator
+    override val flowTransactionOperator: FlowTransactionOperator
         get() = throw UnsupportedOperationException("Use a module that provides transaction management.")
 
     override suspend fun getConnection(): Connection {

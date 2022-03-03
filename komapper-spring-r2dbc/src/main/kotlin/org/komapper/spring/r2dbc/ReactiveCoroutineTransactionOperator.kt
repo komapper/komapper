@@ -1,43 +1,43 @@
 package org.komapper.spring.r2dbc
 
-import io.r2dbc.spi.TransactionDefinition
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.reactive.asPublisher
-import org.komapper.core.TransactionAttribute
-import org.komapper.r2dbc.R2dbcCoroutineTransactionOperator
+import org.komapper.tx.core.CoroutineTransactionOperator
+import org.komapper.tx.core.TransactionAttribute
+import org.komapper.tx.core.TransactionProperty
 import org.springframework.transaction.ReactiveTransactionManager
 import org.springframework.transaction.reactive.TransactionalOperator
 
-internal class ReactiveTransactionCoroutineOperator(private val transactionManager: ReactiveTransactionManager) :
-    R2dbcCoroutineTransactionOperator {
+internal class ReactiveCoroutineTransactionOperator(private val transactionManager: ReactiveTransactionManager) :
+    CoroutineTransactionOperator {
 
     override suspend fun <R> required(
-        transactionDefinition: TransactionDefinition?,
-        block: suspend (R2dbcCoroutineTransactionOperator) -> R
+        transactionProperty: TransactionProperty,
+        block: suspend (CoroutineTransactionOperator) -> R
     ): R {
-        val definition = adaptTransactionDefinition(transactionDefinition, TransactionAttribute.REQUIRED)
+        val definition = ReactiveTransactionDefinition(transactionProperty, TransactionAttribute.REQUIRED)
         return execute(definition, block)
     }
 
     override suspend fun <R> requiresNew(
-        transactionDefinition: TransactionDefinition?,
-        block: suspend (R2dbcCoroutineTransactionOperator) -> R
+        transactionProperty: TransactionProperty,
+        block: suspend (CoroutineTransactionOperator) -> R
     ): R {
-        val definition = adaptTransactionDefinition(transactionDefinition, TransactionAttribute.REQUIRES_NEW)
+        val definition = ReactiveTransactionDefinition(transactionProperty, TransactionAttribute.REQUIRES_NEW)
         return execute(definition, block)
     }
 
     private suspend fun <R> execute(
-        definition: SpringDefinition,
-        block: suspend (R2dbcCoroutineTransactionOperator) -> R
+        definition: org.springframework.transaction.TransactionDefinition,
+        block: suspend (CoroutineTransactionOperator) -> R
     ): R {
         return TransactionalOperator.create(transactionManager, definition).execute {
             flow<Any?> {
-                val value = block(this@ReactiveTransactionCoroutineOperator)
+                val value = block(this@ReactiveCoroutineTransactionOperator)
                 emit(value)
             }.map { it ?: Null }.asPublisher()
         }.asFlow().map {

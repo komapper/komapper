@@ -1,6 +1,7 @@
 package org.komapper.jdbc
 
 import org.komapper.core.ThreadSafe
+import org.komapper.tx.core.TransactionOperator
 import java.sql.Connection
 import javax.sql.DataSource
 
@@ -10,7 +11,7 @@ import javax.sql.DataSource
 @ThreadSafe
 interface JdbcSession {
 
-    val transactionOperator: JdbcTransactionOperator
+    val transactionOperator: TransactionOperator
 
     /**
      * Returns a JDBC connection.
@@ -19,7 +20,7 @@ interface JdbcSession {
 }
 
 class DefaultJdbcSession(private val dataSource: DataSource) : JdbcSession {
-    override val transactionOperator: JdbcTransactionOperator
+    override val transactionOperator: TransactionOperator
         get() = throw UnsupportedOperationException("Use a module that provides transaction management.")
 
     override fun getConnection(): Connection {

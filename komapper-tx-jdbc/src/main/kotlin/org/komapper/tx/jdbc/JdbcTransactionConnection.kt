@@ -1,6 +1,6 @@
 package org.komapper.tx.jdbc
 
-import org.komapper.jdbc.JdbcIsolationLevel
+import org.komapper.tx.core.TransactionProperty
 import java.sql.Connection
 
 interface JdbcTransactionConnection : Connection {
@@ -12,7 +12,7 @@ interface JdbcTransactionConnection : Connection {
 
 internal class JdbcTransactionConnectionImpl(
     private val connection: Connection,
-    private val isolationLevel: JdbcIsolationLevel?
+    private val isolationLevel: TransactionProperty.IsolationLevel?
 ) : Connection by connection, JdbcTransactionConnection {
 
     private var isolation: Int = 0

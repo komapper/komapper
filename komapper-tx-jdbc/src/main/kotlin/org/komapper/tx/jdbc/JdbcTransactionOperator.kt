@@ -1,45 +1,46 @@
 package org.komapper.tx.jdbc
 
-import org.komapper.jdbc.JdbcTransactionDefinition
-import org.komapper.jdbc.JdbcTransactionOperator
+import org.komapper.tx.core.EmptyTransactionProperty
+import org.komapper.tx.core.TransactionOperator
+import org.komapper.tx.core.TransactionProperty
 
-internal class JdbcTransactionOperatorImpl(
+internal class JdbcTransactionOperator(
     private val transactionManager: JdbcTransactionManager,
-    private val defaultTransactionDefinition: JdbcTransactionDefinition? = null
-) : JdbcTransactionOperator {
+    private val defaultTransactionProperty: TransactionProperty = EmptyTransactionProperty
+) : TransactionOperator {
 
     override fun <R> required(
-        transactionDefinition: JdbcTransactionDefinition?,
-        block: (JdbcTransactionOperator) -> R
+        transactionProperty: TransactionProperty,
+        block: (TransactionOperator) -> R
     ): R {
         return if (transactionManager.isActive) {
             block(this)
         } else {
-            executeInNewTransaction(transactionDefinition, block)
+            executeInNewTransaction(transactionProperty, block)
         }
     }
 
     override fun <R> requiresNew(
-        transactionDefinition: JdbcTransactionDefinition?,
-        block: (JdbcTransactionOperator) -> R
+        transactionProperty: TransactionProperty,
+        block: (TransactionOperator) -> R
     ): R {
         return if (transactionManager.isActive) {
             val tx = transactionManager.suspend()
             val result = runCatching {
-                executeInNewTransaction(transactionDefinition, block)
+                executeInNewTransaction(transactionProperty, block)
             }
             transactionManager.resume(tx)
             result.getOrThrow()
         } else {
-            executeInNewTransaction(transactionDefinition, block)
+            executeInNewTransaction(transactionProperty, block)
         }
     }
 
     private fun <R> executeInNewTransaction(
-        transactionDefinition: JdbcTransactionDefinition?,
-        block: (JdbcTransactionOperator) -> R
+        transactionProperty: TransactionProperty,
+        block: (TransactionOperator) -> R
     ): R {
-        transactionManager.begin(transactionDefinition ?: defaultTransactionDefinition)
+        transactionManager.begin(defaultTransactionProperty + transactionProperty)
         return runCatching {
             block(this)
         }.onSuccess {

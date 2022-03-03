@@ -1,47 +1,30 @@
 package org.komapper.spring.jdbc
 
-import org.komapper.core.TransactionAttribute
-import org.komapper.jdbc.JdbcIsolationLevel
-import org.komapper.jdbc.JdbcTransactionDefinition
-import org.komapper.jdbc.JdbcTransactionName
-import org.komapper.jdbc.JdbcTransactionReadOnly
+import org.komapper.tx.core.TransactionAttribute
+import org.komapper.tx.core.TransactionProperty
+import org.springframework.transaction.TransactionDefinition
 
-internal typealias JdbcDefinition = JdbcTransactionDefinition
-internal typealias SpringDefinition = org.springframework.transaction.TransactionDefinition
+internal class PlatformTransactionDefinition(
+    private val transactionProperty: TransactionProperty,
+    private val transactionAttribute: TransactionAttribute
+) : TransactionDefinition by TransactionDefinition.withDefaults() {
 
-internal fun adaptTransactionDefinition(
-    adaptee: JdbcTransactionDefinition?,
-    transactionAttribute: TransactionAttribute
-): SpringDefinition {
-    val adapter = if (adaptee == null) {
-        SpringDefinition.withDefaults()
-    } else {
-        JdbcTransactionDefinitionAdapter(adaptee)
-    }
-    return object : SpringDefinition by adapter {
-        override fun getPropagationBehavior(): Int {
-            return when (transactionAttribute) {
-                TransactionAttribute.REQUIRED -> SpringDefinition.PROPAGATION_REQUIRED
-                TransactionAttribute.REQUIRES_NEW -> SpringDefinition.PROPAGATION_REQUIRES_NEW
-            }
+    override fun getPropagationBehavior(): Int {
+        return when (transactionAttribute) {
+            TransactionAttribute.REQUIRED -> TransactionDefinition.PROPAGATION_REQUIRED
+            TransactionAttribute.REQUIRES_NEW -> TransactionDefinition.PROPAGATION_REQUIRES_NEW
         }
     }
-}
-
-private class JdbcTransactionDefinitionAdapter(
-    private val adaptee: JdbcDefinition
-) :
-    SpringDefinition {
 
     override fun getIsolationLevel(): Int {
-        return adaptee[JdbcIsolationLevel]?.value ?: super.getIsolationLevel()
+        return transactionProperty[TransactionProperty.IsolationLevel]?.value ?: super.getIsolationLevel()
     }
 
     override fun isReadOnly(): Boolean {
-        return adaptee[JdbcTransactionReadOnly]?.value ?: super.isReadOnly()
+        return transactionProperty[TransactionProperty.ReadOnly]?.value ?: super.isReadOnly()
     }
 
     override fun getName(): String? {
-        return adaptee[JdbcTransactionName]?.value ?: super.getName()
+        return transactionProperty[TransactionProperty.Name]?.value ?: super.getName()
     }
 }
