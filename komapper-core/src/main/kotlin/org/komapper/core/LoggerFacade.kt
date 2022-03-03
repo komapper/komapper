@@ -73,6 +73,16 @@ interface LoggerFacade {
      * @param transactionId the transaction id
      */
     fun resume(transactionId: UUID)
+
+    fun trace(message: () -> String)
+
+    fun debug(message: () -> String)
+
+    fun info(message: () -> String)
+
+    fun warn(message: () -> String)
+
+    fun error(message: () -> String)
 }
 
 /**
@@ -131,5 +141,25 @@ class DefaultLoggerFacade(private val logger: Logger) : LoggerFacade {
         logger.trace(LogCategory.TRANSACTION) {
             "The transaction \"$transactionId\" has resumed."
         }
+    }
+
+    override fun trace(message: () -> String) {
+        logger.trace(LogCategory.OTHER, message)
+    }
+
+    override fun debug(message: () -> String) {
+        logger.debug(LogCategory.OTHER, message)
+    }
+
+    override fun info(message: () -> String) {
+        logger.info(LogCategory.OTHER, message)
+    }
+
+    override fun warn(message: () -> String) {
+        logger.warn(LogCategory.OTHER, message)
+    }
+
+    override fun error(message: () -> String) {
+        logger.error(LogCategory.OTHER, message)
     }
 }
