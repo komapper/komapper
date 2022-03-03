@@ -5,7 +5,6 @@ import io.r2dbc.spi.ConnectionFactory
 import io.r2dbc.spi.ConnectionFactoryOptions
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
-import org.komapper.core.TransactionAttribute
 import org.komapper.core.dsl.query.FlowQuery
 import org.komapper.core.dsl.query.Query
 import org.komapper.core.dsl.query.QueryScope
@@ -16,6 +15,7 @@ import org.komapper.r2dbc.dsl.visitor.R2dbcQueryVisitor
 import org.komapper.tx.core.CoroutineTransactionOperator
 import org.komapper.tx.core.EmptyTransactionProperty
 import org.komapper.tx.core.FlowTransactionOperator
+import org.komapper.tx.core.TransactionAttribute
 import org.komapper.tx.core.TransactionProperty
 
 /**
@@ -134,7 +134,7 @@ interface R2dbcDatabase {
      *
      * @param R the return type of the block
      * @param transactionAttribute the transaction attribute
-     * @param transactionOption the transaction option
+     * @param transactionProperty the transaction property
      * @param block the block executed in the transaction
      * @return the result of the block
      */
@@ -155,7 +155,7 @@ interface R2dbcDatabase {
      *
      * @param R the return type of the flow
      * @param transactionAttribute the transaction attribute
-     * @param transactionOption the transaction option
+     * @param transactionProperty the transaction property
      * @param block the block executed in the transaction
      * @return the flow
      */

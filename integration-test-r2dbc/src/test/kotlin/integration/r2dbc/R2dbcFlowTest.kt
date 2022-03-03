@@ -7,11 +7,11 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.toList
 import org.junit.jupiter.api.extension.ExtendWith
-import org.komapper.core.TransactionAttribute
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
 import org.komapper.core.dsl.query.first
 import org.komapper.r2dbc.R2dbcDatabase
+import org.komapper.tx.core.TransactionAttribute
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

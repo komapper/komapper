@@ -1,11 +1,11 @@
 package org.komapper.jdbc
 
-import org.komapper.core.TransactionAttribute
 import org.komapper.core.dsl.query.Query
 import org.komapper.core.dsl.query.QueryScope
 import org.komapper.jdbc.dsl.runner.JdbcRunner
 import org.komapper.jdbc.dsl.visitor.JdbcQueryVisitor
 import org.komapper.tx.core.EmptyTransactionProperty
+import org.komapper.tx.core.TransactionAttribute
 import org.komapper.tx.core.TransactionOperator
 import org.komapper.tx.core.TransactionProperty
 import javax.sql.DataSource

@@ -1,6 +1,6 @@
 package org.komapper.spring.jdbc
 
-import org.komapper.core.TransactionAttribute
+import org.komapper.tx.core.TransactionAttribute
 import org.komapper.tx.core.TransactionProperty
 import org.springframework.transaction.TransactionDefinition
 
