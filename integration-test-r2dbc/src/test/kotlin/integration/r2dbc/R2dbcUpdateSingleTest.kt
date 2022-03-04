@@ -82,7 +82,7 @@ class R2dbcUpdateSingleTest(private val db: R2dbcDatabase) {
                 Clock.fixed(instant, zoneId)
             }
         }
-        val myDb = R2dbcDatabase.create(config)
+        val myDb = R2dbcDatabase(config)
         myDb.runQuery { QueryDsl.update(p).single(person2.copy(name = "DEF")) }
         val person3 = db.runQuery {
             QueryDsl.from(p).where {

@@ -82,7 +82,7 @@ class JdbcUpdateSingleTest(private val db: JdbcDatabase) {
                 Clock.fixed(instant, zoneId)
             }
         }
-        val myDb = JdbcDatabase.create(config)
+        val myDb = JdbcDatabase(config)
         myDb.runQuery { QueryDsl.update(p).single(person2.copy(name = "DEF")) }
         val person3 = db.runQuery {
             QueryDsl.from(p).where {

@@ -15,70 +15,6 @@ import javax.sql.DataSource
  */
 interface JdbcDatabase {
 
-    companion object {
-        /**
-         * Creates a [JdbcDatabase] instance.
-         *
-         * @param config the database configuration
-         */
-        fun create(config: JdbcDatabaseConfig): JdbcDatabase {
-            return JdbcDatabaseImpl(config)
-        }
-
-        /**
-         * Creates a [JdbcDatabase] instance.
-         *
-         * @param dataSource the JDBC data source
-         * @param dialect the dialect
-         */
-        fun create(
-            dataSource: DataSource,
-            dialect: JdbcDialect,
-        ): JdbcDatabase {
-            val config = DefaultJdbcDatabaseConfig(dataSource, dialect)
-            return create(config)
-        }
-
-        /**
-         * Creates a [JdbcDatabase] instance.
-         *
-         * @param url the JDBC URL
-         * @param user the JDBC user
-         * @param password the JDBC password
-         */
-        fun create(
-            url: String,
-            user: String = "",
-            password: String = "",
-            dataTypes: List<JdbcDataType<*>> = emptyList()
-        ): JdbcDatabase {
-            val dataSource = SimpleDataSource(url, user, password)
-            val driver = JdbcDialects.extractJdbcDriver(url)
-            val dialect = JdbcDialects.get(driver, dataTypes)
-            val config = DefaultJdbcDatabaseConfig(dataSource, dialect)
-            return create(config)
-        }
-
-        /**
-         * Creates a [JdbcDatabase] instance.
-         *
-         * @param url the JDBC URL
-         * @param user the JDBC user
-         * @param password the JDBC password
-         * @param dialect the dialect
-         */
-        fun create(
-            url: String,
-            user: String = "",
-            password: String = "",
-            dialect: JdbcDialect
-        ): JdbcDatabase {
-            val dataSource = SimpleDataSource(url, user, password)
-            val config = DefaultJdbcDatabaseConfig(dataSource, dialect)
-            return create(config)
-        }
-    }
-
     /**
      * The database configuration.
      */
@@ -138,4 +74,66 @@ internal class JdbcDatabaseImpl(
 ) : JdbcDatabase {
     override val dataFactory: JdbcDataFactory
         get() = config.dataFactory
+}
+
+/**
+ * Creates a [JdbcDatabase] instance.
+ *
+ * @param config the database configuration
+ */
+fun JdbcDatabase(config: JdbcDatabaseConfig): JdbcDatabase {
+    return JdbcDatabaseImpl(config)
+}
+
+/**
+ * Creates a [JdbcDatabase] instance.
+ *
+ * @param dataSource the JDBC data source
+ * @param dialect the dialect
+ */
+fun JdbcDatabase(
+    dataSource: DataSource,
+    dialect: JdbcDialect,
+): JdbcDatabase {
+    val config = DefaultJdbcDatabaseConfig(dataSource, dialect)
+    return JdbcDatabase(config)
+}
+
+/**
+ * Creates a [JdbcDatabase] instance.
+ *
+ * @param url the JDBC URL
+ * @param user the JDBC user
+ * @param password the JDBC password
+ */
+fun JdbcDatabase(
+    url: String,
+    user: String = "",
+    password: String = "",
+    dataTypes: List<JdbcDataType<*>> = emptyList()
+): JdbcDatabase {
+    val dataSource = SimpleDataSource(url, user, password)
+    val driver = JdbcDialects.extractJdbcDriver(url)
+    val dialect = JdbcDialects.get(driver, dataTypes)
+    val config = DefaultJdbcDatabaseConfig(dataSource, dialect)
+    return JdbcDatabase(config)
+}
+
+/**
+ * Creates a [JdbcDatabase] instance.
+ *
+ * @param url the JDBC URL
+ * @param user the JDBC user
+ * @param password the JDBC password
+ * @param dialect the dialect
+ */
+fun JdbcDatabase(
+    url: String,
+    user: String = "",
+    password: String = "",
+    dialect: JdbcDialect
+): JdbcDatabase {
+    val dataSource = SimpleDataSource(url, user, password)
+    val config = DefaultJdbcDatabaseConfig(dataSource, dialect)
+    return JdbcDatabase(config)
 }

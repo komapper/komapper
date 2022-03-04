@@ -124,6 +124,6 @@ open class R2dbcKomapperAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     open fun r2dbcDatabase(config: R2dbcDatabaseConfig): R2dbcDatabase {
-        return R2dbcDatabase.create(config)
+        return R2dbcDatabase(config)
     }
 }

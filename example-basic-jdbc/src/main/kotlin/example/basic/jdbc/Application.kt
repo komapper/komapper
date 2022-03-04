@@ -51,7 +51,7 @@ data class EmployeeDef(
 
 fun main() {
     // create a Database instance
-    val db = JdbcDatabase.create("jdbc:h2:mem:example;DB_CLOSE_DELAY=-1")
+    val db = JdbcDatabase("jdbc:h2:mem:example;DB_CLOSE_DELAY=-1")
 
     // get a metamodel
     val a = Meta.address

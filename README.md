@@ -86,7 +86,7 @@ https://github.com/komapper/komapper-examples
 ```kotlin
 fun main() {
     // create a Database instance
-    val db = JdbcDatabase.create("jdbc:h2:mem:example;DB_CLOSE_DELAY=-1")
+    val db = JdbcDatabase("jdbc:h2:mem:example;DB_CLOSE_DELAY=-1")
 
     // get a metamodel
     val a = Meta.address
@@ -115,7 +115,7 @@ fun main() {
 ```kotlin
 fun main() = runBlocking {
     // create a Database instance
-    val db = R2dbcDatabase.create("r2dbc:h2:mem:///example;DB_CLOSE_DELAY=-1")
+    val db = R2dbcDatabase("r2dbc:h2:mem:///example;DB_CLOSE_DELAY=-1")
 
     // get a metamodel
     val a = Meta.address
