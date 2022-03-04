@@ -85,23 +85,21 @@ internal class JdbcTransactionManagerImpl(
             rollbackInternal(currentTx)
             error("The transaction \"$currentTx\" already has begun.")
         }
+        val isolationLevel = transactionProperty[TransactionProperty.IsolationLevel]
+        val txCon = JdbcTransactionConnectionImpl(internalDataSource.connection, isolationLevel)
         val name = transactionProperty[TransactionProperty.Name]
-        val tx = JdbcTransactionImpl(name?.value) {
-            val connection = internalDataSource.connection
-            val isolationLevel = transactionProperty[TransactionProperty.IsolationLevel]
-            JdbcTransactionConnectionImpl(connection, isolationLevel).apply {
-                runCatching {
-                    initialize()
-                }.onFailure { cause ->
-                    runCatching {
-                        dispose()
-                    }.onFailure {
-                        cause.addSuppressed(it)
-                    }
-                }.getOrThrow()
+        val tx = JdbcTransactionImpl(name?.value, txCon)
+        runCatching {
+            tx.connection.initialize()
+        }.onSuccess {
+            loggerFacade.begin(tx.toString())
+        }.onFailure { cause ->
+            runCatching {
+                release(tx)
+            }.onFailure {
+                cause.addSuppressed(it)
             }
-        }
-        loggerFacade.begin(tx.toString())
+        }.getOrThrow()
         threadLocal.set(tx)
     }
 
@@ -111,10 +109,8 @@ internal class JdbcTransactionManagerImpl(
             error("A transaction hasn't yet begun.")
         }
         runCatching {
-            if (tx.isInitialized()) {
-                val connection = tx.connection
-                connection.commit()
-            }
+            val connection = tx.connection
+            connection.commit()
         }.also {
             release(tx)
         }.onSuccess {
@@ -160,10 +156,8 @@ internal class JdbcTransactionManagerImpl(
      */
     private fun rollbackInternal(tx: JdbcTransaction) {
         runCatching {
-            if (tx.isInitialized()) {
-                val connection = tx.connection
-                connection.rollback()
-            }
+            val connection = tx.connection
+            connection.rollback()
         }.also {
             release(tx)
         }.onSuccess {
@@ -182,14 +176,12 @@ internal class JdbcTransactionManagerImpl(
      */
     private fun release(tx: JdbcTransaction) {
         threadLocal.remove()
-        if (tx.isInitialized()) {
-            val connection = tx.connection
-            runCatching {
-                connection.reset()
-            }
-            runCatching {
-                connection.dispose()
-            }
+        val connection = tx.connection
+        runCatching {
+            connection.reset()
+        }
+        runCatching {
+            connection.dispose()
         }
     }
 }
