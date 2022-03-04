@@ -23,59 +23,6 @@ import org.komapper.tx.core.TransactionProperty
  */
 interface R2dbcDatabase {
 
-    companion object {
-
-        /**
-         * Creates a [R2dbcDatabase] instance.
-         *
-         * @param config the database configuration
-         */
-        fun create(config: R2dbcDatabaseConfig): R2dbcDatabase {
-            return R2dbcDatabaseImpl(config)
-        }
-
-        /**
-         * Creates a [R2dbcDatabase] instance.
-         *
-         * @param connectionFactory the connection factory
-         * @param dialect the dialect
-         */
-        fun create(
-            connectionFactory: ConnectionFactory,
-            dialect: R2dbcDialect,
-        ): R2dbcDatabase {
-            val config = DefaultR2dbcDatabaseConfig(connectionFactory, dialect)
-            return create(config)
-        }
-
-        /**
-         * Creates a [R2dbcDatabase] instance.
-         *
-         * @param options the connection factory options
-         */
-        fun create(options: ConnectionFactoryOptions): R2dbcDatabase {
-            val driver = options.getValue(ConnectionFactoryOptions.DRIVER)?.toString()
-            checkNotNull(driver) { "The driver option is not found." }
-            val connectionFactory = ConnectionFactories.get(options)
-            val dialect = R2dbcDialects.get(driver)
-            val config = DefaultR2dbcDatabaseConfig(connectionFactory, dialect)
-            return create(config)
-        }
-
-        /**
-         * Creates a [R2dbcDatabase] instance.
-         *
-         * @param url the R2DBC URL
-         */
-        fun create(url: String): R2dbcDatabase {
-            val connectionFactory = ConnectionFactories.get(url)
-            val driver = R2dbcDialects.extractR2dbcDriver(url)
-            val dialect = R2dbcDialects.get(driver)
-            val config = DefaultR2dbcDatabaseConfig(connectionFactory, dialect)
-            return create(config)
-        }
-    }
-
     /**
      * The database configuration.
      */
@@ -173,3 +120,53 @@ interface R2dbcDatabase {
 }
 
 internal class R2dbcDatabaseImpl(override val config: R2dbcDatabaseConfig) : R2dbcDatabase
+
+/**
+ * Creates a [R2dbcDatabase] instance.
+ *
+ * @param config the database configuration
+ */
+fun R2dbcDatabase(config: R2dbcDatabaseConfig): R2dbcDatabase {
+    return R2dbcDatabaseImpl(config)
+}
+
+/**
+ * Creates a [R2dbcDatabase] instance.
+ *
+ * @param connectionFactory the connection factory
+ * @param dialect the dialect
+ */
+fun R2dbcDatabase(
+    connectionFactory: ConnectionFactory,
+    dialect: R2dbcDialect,
+): R2dbcDatabase {
+    val config = DefaultR2dbcDatabaseConfig(connectionFactory, dialect)
+    return R2dbcDatabase(config)
+}
+
+/**
+ * Creates a [R2dbcDatabase] instance.
+ *
+ * @param options the connection factory options
+ */
+fun R2dbcDatabase(options: ConnectionFactoryOptions): R2dbcDatabase {
+    val driver = options.getValue(ConnectionFactoryOptions.DRIVER)?.toString()
+    checkNotNull(driver) { "The driver option is not found." }
+    val connectionFactory = ConnectionFactories.get(options)
+    val dialect = R2dbcDialects.get(driver)
+    val config = DefaultR2dbcDatabaseConfig(connectionFactory, dialect)
+    return R2dbcDatabase(config)
+}
+
+/**
+ * Creates a [R2dbcDatabase] instance.
+ *
+ * @param url the R2DBC URL
+ */
+fun R2dbcDatabase(url: String): R2dbcDatabase {
+    val connectionFactory = ConnectionFactories.get(url)
+    val driver = R2dbcDialects.extractR2dbcDriver(url)
+    val dialect = R2dbcDialects.get(driver)
+    val config = DefaultR2dbcDatabaseConfig(connectionFactory, dialect)
+    return R2dbcDatabase(config)
+}

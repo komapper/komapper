@@ -24,7 +24,7 @@ class R2dbcEnv :
         @Volatile
         private var initialized: Boolean = false
         private val setting = R2dbcSettingProvider.get()
-        private val db = R2dbcDatabase.create(setting.config)
+        private val db = R2dbcDatabase(setting.config)
     }
 
     override fun beforeAll(context: ExtensionContext?) {

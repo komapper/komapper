@@ -94,7 +94,7 @@ class JdbcInsertSingleTest(private val db: JdbcDatabase) {
                 Clock.fixed(instant, zoneId)
             }
         }
-        val myDb = JdbcDatabase.create(config)
+        val myDb = JdbcDatabase(config)
         val person1 = Person(1, "ABC")
         val id = myDb.runQuery { QueryDsl.insert(p).single(person1) }
         val person2 = db.runQuery {

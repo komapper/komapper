@@ -131,6 +131,6 @@ open class JdbcKomapperAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     open fun database(config: JdbcDatabaseConfig): JdbcDatabase {
-        return JdbcDatabase.create(config)
+        return JdbcDatabase(config)
     }
 }

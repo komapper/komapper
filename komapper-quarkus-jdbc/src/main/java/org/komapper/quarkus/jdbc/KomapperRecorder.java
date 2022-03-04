@@ -21,6 +21,7 @@ import org.komapper.jdbc.DefaultJdbcDataFactory;
 import org.komapper.jdbc.JdbcDataFactory;
 import org.komapper.jdbc.JdbcDatabase;
 import org.komapper.jdbc.JdbcDatabaseConfig;
+import org.komapper.jdbc.JdbcDatabaseKt;
 import org.komapper.jdbc.JdbcDialect;
 import org.komapper.jdbc.JdbcDialects;
 import org.komapper.jdbc.JdbcSession;
@@ -114,7 +115,7 @@ public class KomapperRecorder {
     Objects.requireNonNull(dataSourceDefinition);
     return () -> {
       JdbcDatabaseConfig config = resolveJdbcDatabaseConfig(dataSourceDefinition);
-      return JdbcDatabase.Companion.create(config);
+      return JdbcDatabaseKt.JdbcDatabase(config);
     };
   }
 
