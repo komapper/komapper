@@ -19,7 +19,7 @@ internal class JdbcTransactionOperatorTest {
 
     class Repository(private val txManager: JdbcTransactionManager) {
         fun selectAll(): List<Address> {
-            return txManager.dataSource.connection.use { con ->
+            return txManager.getConnection().use { con ->
                 con.prepareStatement("select address_id, street, version from address order by address_id").use { ps ->
                     ps.executeQuery().use { rs ->
                         val list = mutableListOf<Address>()
@@ -41,7 +41,7 @@ internal class JdbcTransactionOperatorTest {
         }
 
         fun delete(id: Int): Int {
-            return txManager.dataSource.connection.use { con ->
+            return txManager.getConnection().use { con ->
                 con.prepareStatement("delete from address where address_id = ?").use { ps ->
                     ps.setInt(1, id)
                     ps.executeUpdate()

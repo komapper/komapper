@@ -53,7 +53,7 @@ interface R2dbcTransactionManager {
 }
 
 internal class R2dbcTransactionManagerImpl(
-    private val internalConnectionFactory: ConnectionFactory,
+    private val connectionFactory: ConnectionFactory,
     private val loggerFacade: LoggerFacade
 ) : R2dbcTransactionManager {
 
@@ -62,7 +62,7 @@ internal class R2dbcTransactionManagerImpl(
         return if (txContext?.tx != null) {
             txContext.tx.connection
         } else {
-            internalConnectionFactory.create().asFlow().single()
+            connectionFactory.create().asFlow().single()
         }
     }
 
@@ -91,7 +91,7 @@ internal class R2dbcTransactionManagerImpl(
             rollbackInternal(currentTxHolder.tx)
             error("The transaction \"${currentTxHolder.tx}\" already has begun.")
         }
-        val tx = internalConnectionFactory.create().asFlow().map { con ->
+        val tx = connectionFactory.create().asFlow().map { con ->
             val txCon = R2dbcTransactionConnectionImpl(con)
             val name = transactionProperty[TransactionProperty.Name]
             R2dbcTransactionImpl(name?.value, txCon)

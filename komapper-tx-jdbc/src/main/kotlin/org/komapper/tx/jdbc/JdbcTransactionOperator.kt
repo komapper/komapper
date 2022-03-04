@@ -13,7 +13,7 @@ internal class JdbcTransactionOperator(
         transactionProperty: TransactionProperty,
         block: (TransactionOperator) -> R
     ): R {
-        return if (transactionManager.isActive) {
+        return if (transactionManager.isActive()) {
             block(this)
         } else {
             executeInNewTransaction(transactionProperty, block)
@@ -24,7 +24,7 @@ internal class JdbcTransactionOperator(
         transactionProperty: TransactionProperty,
         block: (TransactionOperator) -> R
     ): R {
-        return if (transactionManager.isActive) {
+        return if (transactionManager.isActive()) {
             val tx = transactionManager.suspend()
             val result = runCatching {
                 executeInNewTransaction(transactionProperty, block)
@@ -44,7 +44,7 @@ internal class JdbcTransactionOperator(
         return runCatching {
             block(this)
         }.onSuccess {
-            if (transactionManager.isRollbackOnly) {
+            if (transactionManager.isRollbackOnly()) {
                 transactionManager.rollback()
             } else {
                 transactionManager.commit()
@@ -63,6 +63,6 @@ internal class JdbcTransactionOperator(
     }
 
     override fun isRollbackOnly(): Boolean {
-        return transactionManager.isRollbackOnly
+        return transactionManager.isRollbackOnly()
     }
 }

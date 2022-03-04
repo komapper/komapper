@@ -12,9 +12,18 @@ import javax.sql.DataSource
  */
 @ThreadSafe
 interface JdbcTransactionManager {
-    val dataSource: DataSource
-    val isActive: Boolean
-    val isRollbackOnly: Boolean
+
+    fun getConnection(): Connection
+
+    /**
+     * This function must not throw any exceptions.
+     */
+    fun isActive(): Boolean
+
+    /**
+     * This function must not throw any exceptions.
+     */
+    fun isRollbackOnly(): Boolean
 
     /**
      * This function must not throw any exceptions.
@@ -39,38 +48,32 @@ interface JdbcTransactionManager {
 }
 
 internal class JdbcTransactionManagerImpl(
-    private val internalDataSource: DataSource,
+    private val dataSource: DataSource,
     private val loggerFacade: LoggerFacade
 ) : JdbcTransactionManager {
     private val threadLocal = ThreadLocal<JdbcTransaction>()
-    override val dataSource = object : DataSource by internalDataSource {
-        override fun getConnection(): Connection {
-            val tx = threadLocal.get()
-            return if (tx.isActive()) {
-                tx.connection
-            } else {
-                internalDataSource.connection
-            }
-        }
 
-        override fun getConnection(username: String?, password: String?): Connection {
-            throw UnsupportedOperationException()
+    override fun getConnection(): Connection {
+        val tx = threadLocal.get()
+        return if (tx.isActive()) {
+            tx.connection
+        } else {
+            @Suppress("UsePropertyAccessSyntax")
+            dataSource.getConnection()
         }
     }
 
-    override val isActive: Boolean
-        get() {
-            val tx = threadLocal.get()
-            return tx.isActive()
-        }
+    override fun isActive(): Boolean {
+        val tx = threadLocal.get()
+        return tx.isActive()
+    }
 
-    override val isRollbackOnly: Boolean
-        get() {
-            val tx = threadLocal.get()
-            return if (tx.isActive()) {
-                tx.isRollbackOnly
-            } else false
-        }
+    override fun isRollbackOnly(): Boolean {
+        val tx = threadLocal.get()
+        return if (tx.isActive()) {
+            tx.isRollbackOnly
+        } else false
+    }
 
     override fun setRollbackOnly() {
         val tx = threadLocal.get()
@@ -86,19 +89,15 @@ internal class JdbcTransactionManagerImpl(
             error("The transaction \"$currentTx\" already has begun.")
         }
         val isolationLevel = transactionProperty[TransactionProperty.IsolationLevel]
-        val txCon = JdbcTransactionConnectionImpl(internalDataSource.connection, isolationLevel)
+        val txCon = JdbcTransactionConnectionImpl(dataSource.connection, isolationLevel)
         val name = transactionProperty[TransactionProperty.Name]
         val tx = JdbcTransactionImpl(name?.value, txCon)
         runCatching {
             tx.connection.initialize()
         }.onSuccess {
             loggerFacade.begin(tx.toString())
-        }.onFailure { cause ->
-            runCatching {
-                release(tx)
-            }.onFailure {
-                cause.addSuppressed(it)
-            }
+        }.onFailure {
+            release(tx)
         }.getOrThrow()
         threadLocal.set(tx)
     }
@@ -109,8 +108,7 @@ internal class JdbcTransactionManagerImpl(
             error("A transaction hasn't yet begun.")
         }
         runCatching {
-            val connection = tx.connection
-            connection.commit()
+            tx.connection.commit()
         }.also {
             release(tx)
         }.onSuccess {
@@ -156,8 +154,7 @@ internal class JdbcTransactionManagerImpl(
      */
     private fun rollbackInternal(tx: JdbcTransaction) {
         runCatching {
-            val connection = tx.connection
-            connection.rollback()
+            tx.connection.rollback()
         }.also {
             release(tx)
         }.onSuccess {
@@ -176,12 +173,11 @@ internal class JdbcTransactionManagerImpl(
      */
     private fun release(tx: JdbcTransaction) {
         threadLocal.remove()
-        val connection = tx.connection
         runCatching {
-            connection.reset()
+            tx.connection.reset()
         }
         runCatching {
-            connection.dispose()
+            tx.connection.dispose()
         }
     }
 }

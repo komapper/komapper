@@ -24,6 +24,6 @@ class JdbcTransactionSession(
         JdbcTransactionOperator(transactionManager, transactionProperty)
 
     override fun getConnection(): Connection {
-        return transactionManager.dataSource.connection
+        return transactionManager.getConnection()
     }
 }
