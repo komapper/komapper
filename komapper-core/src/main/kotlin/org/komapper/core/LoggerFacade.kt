@@ -1,6 +1,5 @@
 package org.komapper.core
 
-import java.util.UUID
 import kotlin.reflect.KClass
 
 /**
@@ -26,53 +25,53 @@ interface LoggerFacade {
     /**
      * Logs the beginning of transaction.
      *
-     * @param transactionId the transaction id
+     * @param transaction the transaction
      */
-    fun begin(transactionId: UUID)
+    fun begin(transaction: String)
 
     /**
      * Logs the commit of transaction.
      *
-     * @param transactionId the transaction id
+     * @param transaction the transaction
      */
-    fun commit(transactionId: UUID)
+    fun commit(transaction: String)
 
     /**
      * Logs the commit failure of transaction.
      *
-     * @param transactionId the transaction id
+     * @param transaction the transaction
      * @param cause the cause of failure
      */
-    fun commitFailed(transactionId: UUID, cause: Throwable)
+    fun commitFailed(transaction: String, cause: Throwable)
 
     /**
      * Logs the rollback of transaction.
      *
-     * @param transactionId the transaction id
+     * @param transaction the transaction
      */
-    fun rollback(transactionId: UUID)
+    fun rollback(transaction: String)
 
     /**
      * Logs the rollback failure of transaction.
      *
-     * @param transactionId the transaction id
+     * @param transaction the transaction
      * @param cause the cause of failure
      */
-    fun rollbackFailed(transactionId: UUID, cause: Throwable)
+    fun rollbackFailed(transaction: String, cause: Throwable)
 
     /**
      * Logs the suspending of transaction.
      *
-     * @param transactionId the transaction id
+     * @param transaction the transaction
      */
-    fun suspend(transactionId: UUID)
+    fun suspend(transaction: String)
 
     /**
      * Logs the resuming of transaction.
      *
-     * @param transactionId the transaction id
+     * @param transaction the transaction
      */
-    fun resume(transactionId: UUID)
+    fun resume(transaction: String)
 
     fun trace(message: () -> String)
 
@@ -101,45 +100,45 @@ class DefaultLoggerFacade(private val logger: Logger) : LoggerFacade {
         }
     }
 
-    override fun begin(transactionId: UUID) {
+    override fun begin(transaction: String) {
         logger.trace(LogCategory.TRANSACTION) {
-            "The transaction \"$transactionId\" has begun."
+            "Begin: $transaction"
         }
     }
 
-    override fun commit(transactionId: UUID) {
+    override fun commit(transaction: String) {
         logger.trace(LogCategory.TRANSACTION) {
-            "The transaction \"$transactionId\" has committed."
+            "Commit: $transaction"
         }
     }
 
-    override fun commitFailed(transactionId: UUID, cause: Throwable) {
+    override fun commitFailed(transaction: String, cause: Throwable) {
         logger.trace(LogCategory.TRANSACTION) {
-            "Commit of the transaction \"$transactionId\" failed. $cause"
+            "Commit failed: $transaction, $cause"
         }
     }
 
-    override fun rollback(transactionId: UUID) {
+    override fun rollback(transaction: String) {
         logger.trace(LogCategory.TRANSACTION) {
-            "The transaction \"$transactionId\" has rolled back."
+            "Rollback: $transaction"
         }
     }
 
-    override fun rollbackFailed(transactionId: UUID, cause: Throwable) {
+    override fun rollbackFailed(transaction: String, cause: Throwable) {
         logger.trace(LogCategory.TRANSACTION) {
-            "Rollback of the transaction \"$transactionId\" failed. $cause"
+            "Rollback failed: $transaction, $cause"
         }
     }
 
-    override fun suspend(transactionId: UUID) {
+    override fun suspend(transaction: String) {
         logger.trace(LogCategory.TRANSACTION) {
-            "The transaction \"$transactionId\" has suspended."
+            "Suspend: $transaction"
         }
     }
 
-    override fun resume(transactionId: UUID) {
+    override fun resume(transaction: String) {
         logger.trace(LogCategory.TRANSACTION) {
-            "The transaction \"$transactionId\" has resumed."
+            "Resume: $transaction"
         }
     }
 

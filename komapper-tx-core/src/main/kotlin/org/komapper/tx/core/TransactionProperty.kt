@@ -20,7 +20,7 @@ interface TransactionProperty {
                 if (removed === EmptyTransactionProperty) {
                     element
                 } else {
-                    CombinedTransactionOption(removed, element)
+                    CombinedTransactionProperty(removed, element)
                 }
             }
         }
@@ -92,7 +92,7 @@ interface TransactionProperty {
     }
 }
 
-private data class CombinedTransactionOption(
+private data class CombinedTransactionProperty(
     val left: TransactionProperty,
     val element: TransactionProperty.Element<*>
 ) : TransactionProperty {
@@ -102,7 +102,7 @@ private data class CombinedTransactionOption(
         while (true) {
             cur.element[key]?.let { return it }
             val next = cur.left
-            if (next is CombinedTransactionOption) {
+            if (next is CombinedTransactionProperty) {
                 cur = next
             } else {
                 return next[key]
@@ -119,7 +119,7 @@ private data class CombinedTransactionOption(
         return when {
             newLeft === left -> this
             newLeft === EmptyTransactionProperty -> element
-            else -> CombinedTransactionOption(newLeft, element)
+            else -> CombinedTransactionProperty(newLeft, element)
         }
     }
 

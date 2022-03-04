@@ -93,7 +93,8 @@ internal class R2dbcTransactionManagerImpl(
         }
         val tx = internalConnectionFactory.create().asFlow().map { con ->
             val txCon = R2dbcTransactionConnectionImpl(con)
-            R2dbcTransactionImpl(txCon)
+            val name = transactionProperty[TransactionProperty.Name]
+            R2dbcTransactionImpl(name?.value, txCon)
         }.single()
         val begin = if (transactionProperty == EmptyTransactionProperty) {
             tx.connection.beginTransaction().asFlow()
@@ -104,7 +105,7 @@ internal class R2dbcTransactionManagerImpl(
         begin.onCompletion { cause ->
             if (cause == null) {
                 runCatching {
-                    loggerFacade.begin(tx.id)
+                    loggerFacade.begin(tx.toString())
                 }.onFailure {
                     release(tx)
                 }.getOrThrow()
@@ -125,10 +126,10 @@ internal class R2dbcTransactionManagerImpl(
             .onCompletion { cause ->
                 release(txHolder.tx)
                 if (cause == null) {
-                    loggerFacade.commit(txHolder.tx.id)
+                    loggerFacade.commit(txHolder.tx.toString())
                 } else {
                     runCatching {
-                        loggerFacade.commitFailed(txHolder.tx.id, cause)
+                        loggerFacade.commitFailed(txHolder.tx.toString(), cause)
                     }.onFailure {
                         cause.addSuppressed(it)
                     }
@@ -141,7 +142,7 @@ internal class R2dbcTransactionManagerImpl(
         if (txHolder?.tx == null) {
             error("A transaction hasn't yet begun.")
         }
-        loggerFacade.suspend(txHolder.tx.id)
+        loggerFacade.suspend(txHolder.tx.toString())
         return TxHolder(null)
     }
 
@@ -150,7 +151,7 @@ internal class R2dbcTransactionManagerImpl(
         if (txHolder?.tx == null) {
             error("A transaction is not found.")
         }
-        loggerFacade.resume(txHolder.tx.id)
+        loggerFacade.resume(txHolder.tx.toString())
     }
 
     override suspend fun rollback() {
@@ -171,9 +172,9 @@ internal class R2dbcTransactionManagerImpl(
                 release(tx)
                 runCatching {
                     if (cause == null) {
-                        loggerFacade.rollback(tx.id)
+                        loggerFacade.rollback(tx.toString())
                     } else {
-                        loggerFacade.rollbackFailed(tx.id, cause)
+                        loggerFacade.rollbackFailed(tx.toString(), cause)
                     }
                 }
             }
