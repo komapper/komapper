@@ -142,10 +142,10 @@ internal class R2dbcExecutor(
         return runCatching {
             block(con)
         }.onSuccess {
-            con.close()
+            con.closeIfAutoCommitEnabled()
         }.onFailure { cause ->
             runCatching {
-                con.close()
+                con.closeIfAutoCommitEnabled()
             }.onFailure {
                 cause.addSuppressed(cause)
             }
@@ -217,3 +217,12 @@ internal class R2dbcExecutor(
 }
 
 private object Null
+
+// TODO: Remove "isAutoCommit" check in the future.
+// This is a workaround to avoid Spring's IllegalTransactionStateException
+// See https://github.com/spring-projects/spring-framework/issues/28133
+private suspend fun Connection.closeIfAutoCommitEnabled() {
+    if (isAutoCommit) {
+        close().collect {}
+    }
+}

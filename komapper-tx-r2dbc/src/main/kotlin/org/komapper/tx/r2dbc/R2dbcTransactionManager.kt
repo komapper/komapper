@@ -59,10 +59,11 @@ internal class R2dbcTransactionManagerImpl(
 
     override suspend fun getConnection(): Connection {
         val txContext = coroutineContext[TxHolder]
-        if (txContext?.tx == null) {
-            error("A transaction hasn't yet begun")
+        return if (txContext?.tx != null) {
+            txContext.tx.connection
+        } else {
+            internalConnectionFactory.create().asFlow().single()
         }
-        return txContext.tx.connection
     }
 
     override suspend fun isActive(): Boolean {
