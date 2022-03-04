@@ -12,6 +12,7 @@ import org.junit.jupiter.api.extension.ParameterResolver
 import org.junit.platform.commons.support.AnnotationSupport.findAnnotation
 import org.komapper.core.dsl.QueryDsl
 import org.komapper.jdbc.JdbcDatabase
+import org.komapper.tx.core.TransactionProperty
 import org.komapper.tx.jdbc.JdbcTransactionSession
 
 class JdbcEnv :
@@ -52,7 +53,7 @@ class JdbcEnv :
                 }
             }
         }
-        txManager.begin()
+        txManager.begin(TransactionProperty.Name("JDBC_TEST"))
     }
 
     override fun afterTestExecution(context: ExtensionContext?) {

@@ -1,6 +1,5 @@
 package org.komapper.core
 
-import java.util.UUID
 import kotlin.reflect.KClass
 
 /**
@@ -26,53 +25,63 @@ interface LoggerFacade {
     /**
      * Logs the beginning of transaction.
      *
-     * @param transactionId the transaction id
+     * @param transaction the transaction
      */
-    fun begin(transactionId: UUID)
+    fun begin(transaction: String)
 
     /**
      * Logs the commit of transaction.
      *
-     * @param transactionId the transaction id
+     * @param transaction the transaction
      */
-    fun commit(transactionId: UUID)
+    fun commit(transaction: String)
 
     /**
      * Logs the commit failure of transaction.
      *
-     * @param transactionId the transaction id
+     * @param transaction the transaction
      * @param cause the cause of failure
      */
-    fun commitFailed(transactionId: UUID, cause: Throwable)
+    fun commitFailed(transaction: String, cause: Throwable)
 
     /**
      * Logs the rollback of transaction.
      *
-     * @param transactionId the transaction id
+     * @param transaction the transaction
      */
-    fun rollback(transactionId: UUID)
+    fun rollback(transaction: String)
 
     /**
      * Logs the rollback failure of transaction.
      *
-     * @param transactionId the transaction id
+     * @param transaction the transaction
      * @param cause the cause of failure
      */
-    fun rollbackFailed(transactionId: UUID, cause: Throwable)
+    fun rollbackFailed(transaction: String, cause: Throwable)
 
     /**
      * Logs the suspending of transaction.
      *
-     * @param transactionId the transaction id
+     * @param transaction the transaction
      */
-    fun suspend(transactionId: UUID)
+    fun suspend(transaction: String)
 
     /**
      * Logs the resuming of transaction.
      *
-     * @param transactionId the transaction id
+     * @param transaction the transaction
      */
-    fun resume(transactionId: UUID)
+    fun resume(transaction: String)
+
+    fun trace(message: () -> String)
+
+    fun debug(message: () -> String)
+
+    fun info(message: () -> String)
+
+    fun warn(message: () -> String)
+
+    fun error(message: () -> String)
 }
 
 /**
@@ -80,56 +89,76 @@ interface LoggerFacade {
  */
 class DefaultLoggerFacade(private val logger: Logger) : LoggerFacade {
     override fun sql(statement: Statement, format: (Int, StatementPart.Value) -> CharSequence) {
-        logger.debug(LogCategory.SQL.value) {
+        logger.debug(LogCategory.SQL) {
             statement.toSql(format)
         }
     }
 
     override fun sqlWithArgs(statement: Statement, format: (Any?, KClass<*>, Boolean) -> CharSequence) {
-        logger.trace(LogCategory.SQL_WITH_ARGS.value) {
+        logger.trace(LogCategory.SQL_WITH_ARGS) {
             statement.toSqlWithArgs(format)
         }
     }
 
-    override fun begin(transactionId: UUID) {
-        logger.trace(LogCategory.TRANSACTION.value) {
-            "The transaction \"$transactionId\" has begun."
+    override fun begin(transaction: String) {
+        logger.trace(LogCategory.TRANSACTION) {
+            "Begin: $transaction"
         }
     }
 
-    override fun commit(transactionId: UUID) {
-        logger.trace(LogCategory.TRANSACTION.value) {
-            "The transaction \"$transactionId\" has committed."
+    override fun commit(transaction: String) {
+        logger.trace(LogCategory.TRANSACTION) {
+            "Commit: $transaction"
         }
     }
 
-    override fun commitFailed(transactionId: UUID, cause: Throwable) {
-        logger.trace(LogCategory.TRANSACTION.value) {
-            "Commit of the transaction \"$transactionId\" failed. $cause"
+    override fun commitFailed(transaction: String, cause: Throwable) {
+        logger.trace(LogCategory.TRANSACTION) {
+            "Commit failed: $transaction, $cause"
         }
     }
 
-    override fun rollback(transactionId: UUID) {
-        logger.trace(LogCategory.TRANSACTION.value) {
-            "The transaction \"$transactionId\" has rolled back."
+    override fun rollback(transaction: String) {
+        logger.trace(LogCategory.TRANSACTION) {
+            "Rollback: $transaction"
         }
     }
 
-    override fun rollbackFailed(transactionId: UUID, cause: Throwable) {
-        logger.trace(LogCategory.TRANSACTION.value) {
-            "Rollback of the transaction \"$transactionId\" failed. $cause"
+    override fun rollbackFailed(transaction: String, cause: Throwable) {
+        logger.trace(LogCategory.TRANSACTION) {
+            "Rollback failed: $transaction, $cause"
         }
     }
 
-    override fun suspend(transactionId: UUID) {
-        logger.trace(LogCategory.TRANSACTION.value) {
-            "The transaction \"$transactionId\" has suspended."
+    override fun suspend(transaction: String) {
+        logger.trace(LogCategory.TRANSACTION) {
+            "Suspend: $transaction"
         }
     }
 
-    override fun resume(transactionId: UUID) {
-        logger.trace(LogCategory.TRANSACTION.value) {
-            "The transaction \"$transactionId\" has resumed."
+    override fun resume(transaction: String) {
+        logger.trace(LogCategory.TRANSACTION) {
+            "Resume: $transaction"
         }
+    }
+
+    override fun trace(message: () -> String) {
+        logger.trace(LogCategory.OTHER, message)
+    }
+
+    override fun debug(message: () -> String) {
+        logger.debug(LogCategory.OTHER, message)
+    }
+
+    override fun info(message: () -> String) {
+        logger.info(LogCategory.OTHER, message)
+    }
+
+    override fun warn(message: () -> String) {
+        logger.warn(LogCategory.OTHER, message)
+    }
+
+    override fun error(message: () -> String) {
+        logger.error(LogCategory.OTHER, message)
     }
 }

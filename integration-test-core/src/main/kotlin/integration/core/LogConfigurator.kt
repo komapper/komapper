@@ -9,9 +9,9 @@ import org.komapper.core.LogCategory
 class LogConfigurator : BasicConfigurator() {
     override fun configure(lc: LoggerContext) {
         super.configure(lc)
-        val sqlLogger: Logger = lc.getLogger(LogCategory.SQL_WITH_ARGS.value)
+        val sqlLogger: Logger = lc.getLogger(LogCategory.SQL_WITH_ARGS)
         sqlLogger.level = Level.TRACE
-        val txLogger: Logger = lc.getLogger(LogCategory.TRANSACTION.value)
+        val txLogger: Logger = lc.getLogger(LogCategory.TRANSACTION)
         txLogger.level = Level.TRACE
         val rootLogger: Logger = lc.getLogger(Logger.ROOT_LOGGER_NAME)
         rootLogger.level = Level.INFO

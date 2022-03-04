@@ -85,7 +85,8 @@ internal class JdbcTransactionManagerImpl(
             rollbackInternal(currentTx)
             error("The transaction \"$currentTx\" already has begun.")
         }
-        val tx = JdbcTransactionImpl {
+        val name = transactionProperty[TransactionProperty.Name]
+        val tx = JdbcTransactionImpl(name?.value) {
             val connection = internalDataSource.connection
             val isolationLevel = transactionProperty[TransactionProperty.IsolationLevel]
             JdbcTransactionConnectionImpl(connection, isolationLevel).apply {
@@ -100,7 +101,7 @@ internal class JdbcTransactionManagerImpl(
                 }.getOrThrow()
             }
         }
-        loggerFacade.begin(tx.id)
+        loggerFacade.begin(tx.toString())
         threadLocal.set(tx)
     }
 
@@ -117,10 +118,10 @@ internal class JdbcTransactionManagerImpl(
         }.also {
             release(tx)
         }.onSuccess {
-            loggerFacade.commit(tx.id)
+            loggerFacade.commit(tx.toString())
         }.onFailure { cause ->
             runCatching {
-                loggerFacade.commitFailed(tx.id, cause)
+                loggerFacade.commitFailed(tx.toString(), cause)
             }.onFailure {
                 cause.addSuppressed(it)
             }
@@ -133,7 +134,7 @@ internal class JdbcTransactionManagerImpl(
             error("A transaction hasn't yet begun.")
         }
         threadLocal.remove()
-        loggerFacade.suspend(tx.id)
+        loggerFacade.suspend(tx.toString())
         return tx
     }
 
@@ -143,7 +144,7 @@ internal class JdbcTransactionManagerImpl(
             rollbackInternal(currentTx)
         }
         threadLocal.set(tx)
-        loggerFacade.resume(tx.id)
+        loggerFacade.resume(tx.toString())
     }
 
     override fun rollback() {
@@ -167,11 +168,11 @@ internal class JdbcTransactionManagerImpl(
             release(tx)
         }.onSuccess {
             runCatching {
-                loggerFacade.rollback(tx.id)
+                loggerFacade.rollback(tx.toString())
             }
         }.onFailure { cause ->
             runCatching {
-                loggerFacade.rollbackFailed(tx.id, cause)
+                loggerFacade.rollbackFailed(tx.toString(), cause)
             }
         }
     }
