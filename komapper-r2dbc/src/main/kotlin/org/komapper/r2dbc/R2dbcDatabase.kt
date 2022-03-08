@@ -5,6 +5,7 @@ import io.r2dbc.spi.ConnectionFactory
 import io.r2dbc.spi.ConnectionFactoryOptions
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
+import org.komapper.core.Database
 import org.komapper.core.dsl.query.FlowQuery
 import org.komapper.core.dsl.query.Query
 import org.komapper.core.dsl.query.QueryScope
@@ -21,12 +22,12 @@ import org.komapper.tx.core.TransactionProperty
 /**
  * Represents a database accessed by R2DBC.
  */
-interface R2dbcDatabase {
+interface R2dbcDatabase : Database {
 
     /**
      * The database configuration.
      */
-    val config: R2dbcDatabaseConfig
+    override val config: R2dbcDatabaseConfig
 
     /**
      * Runs the given [query] and returns the result.
