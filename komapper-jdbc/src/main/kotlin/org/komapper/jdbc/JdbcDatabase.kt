@@ -1,5 +1,6 @@
 package org.komapper.jdbc
 
+import org.komapper.core.Database
 import org.komapper.core.dsl.query.Query
 import org.komapper.core.dsl.query.QueryScope
 import org.komapper.jdbc.dsl.runner.JdbcRunner
@@ -13,12 +14,12 @@ import javax.sql.DataSource
 /**
  * Represents a database accessed by JDBC.
  */
-interface JdbcDatabase {
+interface JdbcDatabase : Database {
 
     /**
      * The database configuration.
      */
-    val config: JdbcDatabaseConfig
+    override val config: JdbcDatabaseConfig
 
     /**
      * The data factory.
