@@ -1,6 +1,5 @@
 package example.basic.r2dbc
 
-import kotlinx.coroutines.runBlocking
 import org.komapper.annotation.KomapperAutoIncrement
 import org.komapper.annotation.KomapperColumn
 import org.komapper.annotation.KomapperCreatedAt
@@ -31,7 +30,7 @@ data class AddressDef(
     @KomapperUpdatedAt val updatedAt: Nothing,
 )
 
-fun main() = runBlocking {
+suspend fun main() {
     // create a Database instance
     val db = R2dbcDatabase("r2dbc:h2:mem:///example;DB_CLOSE_DELAY=-1")
 

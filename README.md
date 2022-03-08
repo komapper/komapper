@@ -109,7 +109,7 @@ fun main() {
 
 ### Connecting with R2DBC
 ```kotlin
-fun main() = runBlocking {
+suspend fun main() {
     // create a Database instance
     val db = R2dbcDatabase("r2dbc:h2:mem:///example;DB_CLOSE_DELAY=-1")
 
