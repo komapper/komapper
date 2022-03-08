@@ -38,6 +38,7 @@ fun <T, S> Query<T>.flatZip(transform: (T) -> Query<S>): Query<Pair<T, S>> = obj
 
 /**
  * Builds a query that returns the first element.
+ * When the query is executed, it throws [NoSuchElementException] for empty query result.
  *
  * @param T the element type of [List]
  * @return the query
@@ -45,7 +46,7 @@ fun <T, S> Query<T>.flatZip(transform: (T) -> Query<S>): Query<Pair<T, S>> = obj
 fun <T> ListQuery<T>.first(): Query<T> = collect { it.first() }
 
 /**
- * Builds a query that returns the first element or `null`.
+ * Builds a query that returns the first element or `null` if the query result is empty.
  *
  * @param T the element type of [List]
  * @return the query
@@ -54,6 +55,8 @@ fun <T> ListQuery<T>.firstOrNull(): Query<T?> = collect { it.firstOrNull() }
 
 /**
  * Builds a query that returns the single element.
+ * When the query is executed, it throws [NoSuchElementException] for empty query result and [IllegalStateException]
+ * for query result that contains more than one element.
  *
  * @param T the element type of [List]
  * @return the query
@@ -61,7 +64,7 @@ fun <T> ListQuery<T>.firstOrNull(): Query<T?> = collect { it.firstOrNull() }
 fun <T> ListQuery<T>.single(): Query<T> = collect { it.single() }
 
 /**
- * Builds a query that returns the single element or `null`.
+ * Builds a query that returns the single element or `null` if the query result is empty or has more than one element.
  *
  * @param T the element type of [List]
  * @return the query
