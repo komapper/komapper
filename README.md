@@ -26,7 +26,7 @@ https://www.komapper.org/ja/docs/
 
 - Quarkus integration
 - Spring Native integration
- 
+
 ## Prerequisite
 
 - Kotlin 1.5.31 or later
@@ -71,20 +71,6 @@ See also Quickstart for more details:
 
 - https://www.komapper.org/docs/quickstart/ (English)
 - https://www.komapper.org/ja/docs/quickstart/ (日本語)
-
-## Status
-
-This project is still in development, all suggestions and contributions are welcome.
-
-## Roadmap
-
-1.0 GA will be released in May 2022.
-
-The main tasks until the 1.0 GA release are as follows:
-
-- Complete an English version of the documentation
-- Support R2DBC 1.0 GA
-- Support Spring Boot 2.7 GA
 
 ## Sample code
 
@@ -149,3 +135,19 @@ fun main() = runBlocking {
     }
 }
 ```
+
+## Status
+
+This project is still in development, all suggestions and contributions are welcome.
+
+See [DESIGN_DOC](DESIGN_DOC.md) for the design policy of this project.
+
+## Roadmap
+
+1.0 GA will be released in May 2022.
+
+The main tasks until the 1.0 GA release are as follows:
+
+- Complete an English version of the documentation
+- Support R2DBC 1.0 GA
+- Support Spring Boot 2.7 GA
