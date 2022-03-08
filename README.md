@@ -76,6 +76,16 @@ See also Quickstart for more details:
 
 This project is still in development, all suggestions and contributions are welcome.
 
+## Roadmap
+
+1.0 GA will be released in May 2022.
+
+The main tasks until the 1.0 GA release are as follows:
+
+- Complete an English version of the documentation
+- Support R2DBC 1.0 GA
+- Support Spring Boot 2.7 GA
+
 ## Sample code
 
 To get complete code, go to our example repository:  
