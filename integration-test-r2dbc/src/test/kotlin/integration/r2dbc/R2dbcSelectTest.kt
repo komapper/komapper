@@ -15,6 +15,8 @@ import org.komapper.core.dsl.operator.desc
 import org.komapper.core.dsl.operator.literal
 import org.komapper.core.dsl.query.first
 import org.komapper.core.dsl.query.firstOrNull
+import org.komapper.core.dsl.query.single
+import org.komapper.core.dsl.query.singleOrNull
 import org.komapper.r2dbc.R2dbcDatabase
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -48,6 +50,24 @@ class R2dbcSelectTest(private val db: R2dbcDatabase) {
         val a = Meta.address
         val address: Address? = db.runQuery {
             QueryDsl.from(a).where { a.addressId eq 99 }.firstOrNull()
+        }
+        assertNull(address)
+    }
+
+    @Test
+    fun single() = inTransaction(db) {
+        val a = Meta.address
+        val address: Address = db.runQuery {
+            QueryDsl.from(a).where { a.addressId eq 1 }.single()
+        }
+        assertNotNull(address)
+    }
+
+    @Test
+    fun singleOrNull() = inTransaction(db) {
+        val a = Meta.address
+        val address: Address? = db.runQuery {
+            QueryDsl.from(a).where { a.addressId eq 99 }.singleOrNull()
         }
         assertNull(address)
     }

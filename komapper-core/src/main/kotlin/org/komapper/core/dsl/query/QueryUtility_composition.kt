@@ -2,6 +2,8 @@ package org.komapper.core.dsl.query
 
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.single
+import kotlinx.coroutines.flow.singleOrNull
 import org.komapper.core.dsl.visitor.QueryVisitor
 
 fun <T, S> Query<T>.andThen(other: Query<S>): Query<S> = object : Query<S> {
@@ -49,3 +51,19 @@ fun <T> ListQuery<T>.first(): Query<T> = collect { it.first() }
  * @return the query
  */
 fun <T> ListQuery<T>.firstOrNull(): Query<T?> = collect { it.firstOrNull() }
+
+/**
+ * Builds a query that returns the single element.
+ *
+ * @param T the element type of [List]
+ * @return the query
+ */
+fun <T> ListQuery<T>.single(): Query<T> = collect { it.single() }
+
+/**
+ * Builds a query that returns the single element or `null`.
+ *
+ * @param T the element type of [List]
+ * @return the query
+ */
+fun <T> ListQuery<T>.singleOrNull(): Query<T?> = collect { it.singleOrNull() }
