@@ -4,6 +4,7 @@ import org.komapper.core.ClockProvider
 import org.komapper.core.ExecutionOptions
 import org.komapper.core.Statement
 import org.komapper.core.TemplateStatementBuilder
+import org.komapper.core.Value
 import org.komapper.dialect.h2.r2dbc.R2dbcH2Dialect
 import org.komapper.r2dbc.R2dbcDatabase
 import org.springframework.boot.autoconfigure.r2dbc.R2dbcAutoConfiguration
@@ -108,7 +109,11 @@ class R2dbcKomapperAutoConfigurationTest {
     }
 
     class MyStatementBuilder : TemplateStatementBuilder {
-        override fun build(template: CharSequence, data: Any, escape: (String) -> String): Statement {
+        override fun build(
+            template: CharSequence,
+            valueMap: Map<String, Value<*>>,
+            escape: (String) -> String
+        ): Statement {
             throw UnsupportedOperationException()
         }
 

@@ -1,6 +1,7 @@
 package org.komapper.core.dsl.query
 
 import org.komapper.core.ThreadSafe
+import org.komapper.core.Value
 import org.komapper.core.dsl.context.TemplateSelectContext
 import org.komapper.core.dsl.options.TemplateSelectOptions
 
@@ -8,15 +9,7 @@ import org.komapper.core.dsl.options.TemplateSelectOptions
  * The builder of [TemplateSelectQuery].
  */
 @ThreadSafe
-interface TemplateSelectQueryBuilder {
-    /**
-     * Builds a builder that the data is bound.
-     *
-     * @param data data to be bound
-     * @return the builder
-     */
-    fun bind(data: Any): TemplateSelectQueryBuilder
-
+interface TemplateSelectQueryBuilder : TemplateBinder<TemplateSelectQueryBuilder> {
     /**
      * Builds a builder with the options applied.
      *
@@ -44,8 +37,8 @@ internal data class TemplateSelectQueryBuilderImpl(
         return copy(context = newContext)
     }
 
-    override fun bind(data: Any): TemplateSelectQueryBuilder {
-        val newContext = context.copy(data = data)
+    override fun bindValue(name: String, value: Value<*>): TemplateSelectQueryBuilder {
+        val newContext = context.copy(valueMap = context.valueMap + (name to value))
         return copy(context = newContext)
     }
 

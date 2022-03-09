@@ -12,9 +12,6 @@ import org.komapper.template.sql.SqlException
 import org.komapper.template.sql.SqlLocation
 import org.komapper.template.sql.SqlNode
 import org.komapper.template.sql.SqlNodeFactory
-import kotlin.reflect.KVisibility
-import kotlin.reflect.full.memberProperties
-import kotlin.reflect.jvm.jvmErasure
 
 internal class TwoWayTemplateStatementBuilder(
     private val dialect: Dialect,
@@ -26,16 +23,9 @@ internal class TwoWayTemplateStatementBuilder(
         """^(select|from|where|group by|having|order by|for update|option)\s""", RegexOption.IGNORE_CASE
     )
 
-    override fun build(template: CharSequence, data: Any, escape: (String) -> String): Statement {
-        val ctx = createContext(data, escape)
+    override fun build(template: CharSequence, valueMap: Map<String, Value<*>>, escape: (String) -> String): Statement {
+        val ctx = ExprContext(valueMap, escape)
         return build(template.toString(), ctx)
-    }
-
-    private fun createContext(data: Any, escape: (String) -> String): ExprContext {
-        val valueMap = data::class.memberProperties
-            .filter { it.visibility == KVisibility.PUBLIC }
-            .associate { it.name to Value(it.call(data), it.returnType.jvmErasure) }
-        return ExprContext(valueMap, escape)
     }
 
     fun build(
