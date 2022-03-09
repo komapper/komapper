@@ -13,7 +13,7 @@ fun checkWhereClause(whereProvider: WhereProvider) {
     if (!whereProvider.options.allowMissingWhereClause) {
         val criteria = whereProvider.getWhereCriteria()
         if (criteria.isEmpty()) {
-            error("Missing where clause is not allowed.")
+            error("WHERE clause not found. If this is intentional, enable the allowMissingWhereClause option.")
         }
     }
 }

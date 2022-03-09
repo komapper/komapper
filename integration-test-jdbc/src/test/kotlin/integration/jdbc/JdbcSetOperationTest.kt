@@ -167,7 +167,7 @@ class JdbcSetOperationTest(private val db: JdbcDatabase) {
         val ex = assertFailsWith<IllegalStateException> {
             db.runQuery { query }.let { }
         }
-        assertEquals("Missing where clause is not allowed.", ex.message)
+        println(ex)
     }
 
     @Test

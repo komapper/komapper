@@ -110,7 +110,7 @@ class R2dbcUpdateSetTest(private val db: R2dbcDatabase) {
                 }
             }
         }
-        assertEquals("Missing where clause is not allowed.", ex.message)
+        println(ex)
     }
 
     @Test
