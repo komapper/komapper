@@ -100,7 +100,7 @@ class R2dbcUpdateSetTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun allowEmptyWhereClause_default() = inTransaction(db) {
+    fun allowMissingWhereClause_default() = inTransaction(db) {
         val e = Meta.employee
         val ex = assertFailsWith<IllegalStateException> {
             @Suppress("UNUSED_VARIABLE")
@@ -110,16 +110,16 @@ class R2dbcUpdateSetTest(private val db: R2dbcDatabase) {
                 }
             }
         }
-        assertEquals("Empty where clause is not allowed.", ex.message)
+        println(ex)
     }
 
     @Test
-    fun allowEmptyWhereClause_true() = inTransaction(db) {
+    fun missingEmptyWhereClause_true() = inTransaction(db) {
         val e = Meta.employee
         val count = db.runQuery {
             QueryDsl.update(e).set {
                 e.employeeName eq "ABC"
-            }.options { it.copy(allowEmptyWhereClause = true) }
+            }.options { it.copy(allowMissingWhereClause = true) }
         }
         assertEquals(14, count)
     }

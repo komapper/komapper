@@ -150,24 +150,24 @@ class JdbcSetOperationTest(private val db: JdbcDatabase) {
     }
 
     @Test
-    fun emptyWhereClause_top_level_allowEmptyWhereClause_option_is_ignored() {
+    fun missingWhereClause_top_level_missingEmptyWhereClause_option_is_ignored() {
         val e = Meta.employee
         val q1 = QueryDsl.from(e).where { e.employeeId eq 1 }
         val q2 = QueryDsl.from(e)
-        val query = (q1 union q2).options { it.copy(allowEmptyWhereClause = false) }
+        val query = (q1 union q2).options { it.copy(allowMissingWhereClause = false) }
         db.runQuery { query }
     }
 
     @Test
-    fun emptyWhereClause() {
+    fun missingWhereClause() {
         val e = Meta.employee
         val q1 = QueryDsl.from(e).where { e.employeeId eq 1 }
-        val q2 = QueryDsl.from(e).options { it.copy(allowEmptyWhereClause = false) }
+        val q2 = QueryDsl.from(e).options { it.copy(allowMissingWhereClause = false) }
         val query = (q1 union q2)
         val ex = assertFailsWith<IllegalStateException> {
             db.runQuery { query }.let { }
         }
-        assertEquals("Empty where clause is not allowed.", ex.message)
+        println(ex)
     }
 
     @Test

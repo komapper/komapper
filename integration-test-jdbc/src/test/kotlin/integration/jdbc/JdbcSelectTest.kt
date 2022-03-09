@@ -110,7 +110,7 @@ class JdbcSelectTest(private val db: JdbcDatabase) {
                         fetchSize = 10,
                         maxRows = 100,
                         queryTimeoutSeconds = 1000,
-                        allowEmptyWhereClause = true,
+                        allowMissingWhereClause = true,
                     )
                 }
                 .where {

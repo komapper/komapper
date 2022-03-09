@@ -100,7 +100,7 @@ class R2dbcSelectTest(private val db: R2dbcDatabase) {
                         fetchSize = 10,
                         maxRows = 100,
                         queryTimeoutSeconds = 1000,
-                        allowEmptyWhereClause = true,
+                        allowMissingWhereClause = true,
                     )
                 }
                 .where {

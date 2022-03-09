@@ -23,7 +23,7 @@ class R2dbcDeleteWhereTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun allowEmptyWhereClause_default() = inTransaction(db) {
+    fun allowMissingWhereClause_default() = inTransaction(db) {
         val e = Meta.employee
         val ex = assertFailsWith<IllegalStateException> {
             @Suppress("UNUSED_VARIABLE")
@@ -31,14 +31,14 @@ class R2dbcDeleteWhereTest(private val db: R2dbcDatabase) {
                 QueryDsl.delete(e).all()
             }
         }
-        assertEquals("Empty where clause is not allowed.", ex.message)
+        println(ex)
     }
 
     @Test
-    fun allowEmptyWhereClause_true() = inTransaction(db) {
+    fun allowMissingWhereClause_true() = inTransaction(db) {
         val e = Meta.employee
         val count = db.runQuery {
-            QueryDsl.delete(e).all().options { it.copy(allowEmptyWhereClause = true) }
+            QueryDsl.delete(e).all().options { it.copy(allowMissingWhereClause = true) }
         }
         assertEquals(14, count)
     }

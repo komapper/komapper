@@ -1,7 +1,7 @@
 package org.komapper.core.dsl.options
 
 data class DeleteOptions(
-    override val allowEmptyWhereClause: Boolean,
+    override val allowMissingWhereClause: Boolean,
     override val batchSize: Int? = null,
     override val escapeSequence: String?,
     override val disableOptimisticLock: Boolean,
@@ -12,7 +12,7 @@ data class DeleteOptions(
 
     companion object {
         val DEFAULT = DeleteOptions(
-            allowEmptyWhereClause = false,
+            allowMissingWhereClause = false,
             batchSize = null,
             escapeSequence = null,
             disableOptimisticLock = false,

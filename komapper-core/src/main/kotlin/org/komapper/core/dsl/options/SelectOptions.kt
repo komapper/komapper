@@ -1,7 +1,7 @@
 package org.komapper.core.dsl.options
 
 data class SelectOptions(
-    override val allowEmptyWhereClause: Boolean,
+    override val allowMissingWhereClause: Boolean,
     override val escapeSequence: String?,
     override val fetchSize: Int?,
     override val maxRows: Int?,
@@ -11,7 +11,7 @@ data class SelectOptions(
 
     companion object {
         val DEFAULT = SelectOptions(
-            allowEmptyWhereClause = true,
+            allowMissingWhereClause = true,
             escapeSequence = null,
             fetchSize = null,
             maxRows = null,
