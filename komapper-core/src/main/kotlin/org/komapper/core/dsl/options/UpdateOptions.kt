@@ -1,7 +1,7 @@
 package org.komapper.core.dsl.options
 
 data class UpdateOptions(
-    override val allowEmptyWhereClause: Boolean,
+    override val allowMissingWhereClause: Boolean,
     override val batchSize: Int?,
     override val escapeSequence: String?,
     override val disableOptimisticLock: Boolean,
@@ -12,7 +12,7 @@ data class UpdateOptions(
 
     companion object {
         val DEFAULT = UpdateOptions(
-            allowEmptyWhereClause = false,
+            allowMissingWhereClause = false,
             escapeSequence = null,
             batchSize = null,
             disableOptimisticLock = false,

@@ -3,9 +3,9 @@ import org.komapper.core.Dialect
 
 interface WhereOptions : QueryOptions {
     /**
-     * Whether to allow empty where clause.
+     * Whether to allow missing where clause.
      */
-    val allowEmptyWhereClause: Boolean
+    val allowMissingWhereClause: Boolean
 
     /**
      * The escape sequence to be used in the LIKE predicate.

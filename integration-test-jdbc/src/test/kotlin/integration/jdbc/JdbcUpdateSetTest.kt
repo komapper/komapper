@@ -100,7 +100,7 @@ class JdbcUpdateSetTest(private val db: JdbcDatabase) {
     }
 
     @Test
-    fun allowEmptyWhereClause_default() {
+    fun allowMissingWhereClause_default() {
         val e = Meta.employee
         val ex = assertFailsWith<IllegalStateException> {
             @Suppress("UNUSED_VARIABLE")
@@ -110,11 +110,11 @@ class JdbcUpdateSetTest(private val db: JdbcDatabase) {
                 }
             }
         }
-        assertEquals("Empty where clause is not allowed.", ex.message)
+        assertEquals("Missing where clause is not allowed.", ex.message)
     }
 
     @Test
-    fun allowEmptyWhereClause_default_empty() {
+    fun allowMissingWhereClause_default_empty() {
         val e = Meta.employee
         val ex = assertFailsWith<IllegalStateException> {
             @Suppress("UNUSED_VARIABLE")
@@ -124,16 +124,16 @@ class JdbcUpdateSetTest(private val db: JdbcDatabase) {
                 }.where { }
             }
         }
-        assertEquals("Empty where clause is not allowed.", ex.message)
+        assertEquals("Missing where clause is not allowed.", ex.message)
     }
 
     @Test
-    fun allowEmptyWhereClause_true() {
+    fun allowMissingWhereClause_true() {
         val e = Meta.employee
         val count = db.runQuery {
             QueryDsl.update(e).set {
                 e.employeeName eq "ABC"
-            }.options { it.copy(allowEmptyWhereClause = true) }
+            }.options { it.copy(allowMissingWhereClause = true) }
         }
         assertEquals(14, count)
     }

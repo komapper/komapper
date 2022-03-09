@@ -10,10 +10,10 @@ import org.komapper.core.dsl.options.InsertOptions
 import org.komapper.core.dsl.options.OptimisticLockOptions
 
 fun checkWhereClause(whereProvider: WhereProvider) {
-    if (!whereProvider.options.allowEmptyWhereClause) {
+    if (!whereProvider.options.allowMissingWhereClause) {
         val criteria = whereProvider.getWhereCriteria()
         if (criteria.isEmpty()) {
-            error("Empty where clause is not allowed.")
+            error("Missing where clause is not allowed.")
         }
     }
 }
