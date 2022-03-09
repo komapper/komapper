@@ -9,6 +9,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
 import org.komapper.core.dsl.query.Row
+import org.komapper.core.dsl.query.bind
 import org.komapper.core.dsl.query.first
 import org.komapper.jdbc.JdbcDatabase
 import kotlin.test.Test
@@ -71,15 +72,12 @@ class JdbcTemplateTest(private val db: JdbcDatabase) {
     }
 
     @Test
-    fun condition_objectExpression() {
+    fun bind() {
         val list = db.runQuery {
             val sql = "select * from address where street = /*street*/'test'"
-            QueryDsl.fromTemplate(sql).bind(
-                object {
-                    @Suppress("unused")
-                    val street = "STREET 10"
-                }
-            ).select(asAddress)
+            QueryDsl.fromTemplate(sql)
+                .bind("street", "STREET 10")
+                .select(asAddress)
         }
         assertEquals(1, list.size)
         assertEquals(
@@ -93,34 +91,24 @@ class JdbcTemplateTest(private val db: JdbcDatabase) {
     }
 
     @Test
-    fun condition_dataClass() {
+    fun bindNull() {
+        val street: String? = null
         val list = db.runQuery {
-            data class Condition(val street: String)
-
-            val sql = "select * from address where street = /*street*/'test'"
-            QueryDsl.fromTemplate(sql).bind(Condition("STREET 10")).select(asAddress)
+            val sql = "select * from address where /*%if street != null*/ street = /*street*/'test' /*%end*/"
+            QueryDsl.fromTemplate(sql)
+                .bind("street", street)
+                .select(asAddress)
         }
-        assertEquals(1, list.size)
-        assertEquals(
-            Address(
-                10,
-                "STREET 10",
-                1
-            ),
-            list[0]
-        )
+        assertEquals(15, list.size)
     }
 
     @Test
     fun `in`() {
         val list = db.runQuery {
             val sql = "select * from address where address_id in /*list*/(0)"
-            QueryDsl.fromTemplate(sql).bind(
-                object {
-                    @Suppress("unused")
-                    val list = listOf(1, 2)
-                }
-            ).select(asAddress)
+            QueryDsl.fromTemplate(sql)
+                .bind("list", listOf(1, 2))
+                .select(asAddress)
         }
         assertEquals(2, list.size)
         assertEquals(
@@ -146,12 +134,9 @@ class JdbcTemplateTest(private val db: JdbcDatabase) {
     fun in2() {
         val list = db.runQuery {
             val sql = "select * from address where (address_id, street) in /*pairs*/(0, '')"
-            QueryDsl.fromTemplate(sql).bind(
-                object {
-                    @Suppress("unused")
-                    val pairs = listOf(1 to "STREET 1", 2 to "STREET 2")
-                }
-            ).select(asAddress)
+            QueryDsl.fromTemplate(sql)
+                .bind("pairs", listOf(1 to "STREET 1", 2 to "STREET 2"))
+                .select(asAddress)
         }
         assertEquals(2, list.size)
         assertEquals(
@@ -177,15 +162,14 @@ class JdbcTemplateTest(private val db: JdbcDatabase) {
     fun in3() {
         val list = db.runQuery {
             val sql = "select * from address where (address_id, street, version) in /*triples*/(0, '', 0)"
-            QueryDsl.fromTemplate(sql).bind(
-                object {
-                    @Suppress("unused")
-                    val triples = listOf(
+            QueryDsl.fromTemplate(sql)
+                .bind(
+                    "triples",
+                    listOf(
                         Triple(1, "STREET 1", 1),
                         Triple(2, "STREET 2", 1)
                     )
-                }
-            ).select(asAddress)
+                ).select(asAddress)
         }
         assertEquals(2, list.size)
         assertEquals(
@@ -209,8 +193,6 @@ class JdbcTemplateTest(private val db: JdbcDatabase) {
     @Test
     fun escape() {
         val list = db.runQuery {
-            data class Condition(val street: String)
-
             val sql =
                 """
                 select * from address 
@@ -218,7 +200,7 @@ class JdbcTemplateTest(private val db: JdbcDatabase) {
                 order by address_id
                 """.trimIndent()
             QueryDsl.fromTemplate(sql).bind(
-                Condition("STREET 1")
+                "street", "STREET 1"
             ).select(asAddress)
         }
         assertEquals((listOf(1) + (10..15)).toList(), list.map { it.addressId })
@@ -227,10 +209,8 @@ class JdbcTemplateTest(private val db: JdbcDatabase) {
     @Test
     fun asPrefix() {
         val list = db.runQuery {
-            data class Condition(val street: String)
-
             val sql = "select * from address where street like /*street.asPrefix()*/'test' order by address_id"
-            QueryDsl.fromTemplate(sql).bind(Condition("STREET 1")).select(asAddress)
+            QueryDsl.fromTemplate(sql).bind("street", "STREET 1").select(asAddress)
         }
         assertEquals((listOf(1) + (10..15)).toList(), list.map { it.addressId })
     }
@@ -238,10 +218,10 @@ class JdbcTemplateTest(private val db: JdbcDatabase) {
     @Test
     fun execute() {
         val count = db.runQuery {
-            data class Condition(val id: Int, val street: String)
-
             val sql = "update address set street = /*street*/'' where address_id = /*id*/0"
-            QueryDsl.executeTemplate(sql).bind(Condition(15, "NY street"))
+            QueryDsl.executeTemplate(sql)
+                .bind("id", 15)
+                .bind("street", "NY street")
         }
         assertEquals(1, count)
         val a = Meta.address

@@ -1,5 +1,6 @@
 package org.komapper.core.dsl.query
 
+import org.komapper.core.Value
 import org.komapper.core.dsl.context.TemplateExecuteContext
 import org.komapper.core.dsl.options.TemplateExecuteOptions
 import org.komapper.core.dsl.visitor.QueryVisitor
@@ -8,7 +9,7 @@ import org.komapper.core.dsl.visitor.QueryVisitor
  * Represents a query to execute an arbitrary command using sql template.
  * This query returns the number of rows affected.
  */
-interface TemplateExecuteQuery : Query<Int> {
+interface TemplateExecuteQuery : Query<Int>, TemplateBinder<TemplateExecuteQuery> {
     /**
      * Builds a query with the options applied.
      *
@@ -16,14 +17,6 @@ interface TemplateExecuteQuery : Query<Int> {
      * @return the query
      */
     fun options(configure: (TemplateExecuteOptions) -> TemplateExecuteOptions): TemplateExecuteQuery
-
-    /**
-     * Builds a query that the data is bound.
-     *
-     * @param data data to be bound
-     * @return the query
-     */
-    fun bind(data: Any): TemplateExecuteQuery
 }
 
 internal data class TemplateExecuteQueryImpl(
@@ -35,8 +28,8 @@ internal data class TemplateExecuteQueryImpl(
         return copy(context = newContext)
     }
 
-    override fun bind(data: Any): TemplateExecuteQuery {
-        val newContext = context.copy(data = data)
+    override fun bindValue(name: String, value: Value<*>): TemplateExecuteQuery {
+        val newContext = context.copy(valueMap = context.valueMap + (name to value))
         return copy(context = newContext)
     }
 

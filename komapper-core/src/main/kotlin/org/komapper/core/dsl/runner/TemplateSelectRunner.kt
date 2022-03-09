@@ -18,7 +18,7 @@ class TemplateSelectRunner(
 
     fun buildStatement(config: DatabaseConfig): Statement {
         val builder = config.templateStatementBuilder
-        return builder.build(context.sql, context.data) {
+        return builder.build(context.sql, context.valueMap) {
             config.dialect.escape(it, context.options.escapeSequence)
         }
     }
