@@ -3,6 +3,7 @@ package org.komapper.spring.boot.autoconfigure.r2dbc
 import org.komapper.core.ClockProvider
 import org.komapper.core.ExecutionOptions
 import org.komapper.core.Statement
+import org.komapper.core.TemplateBuiltinExtensions
 import org.komapper.core.TemplateStatementBuilder
 import org.komapper.core.Value
 import org.komapper.dialect.h2.r2dbc.R2dbcH2Dialect
@@ -112,7 +113,7 @@ class R2dbcKomapperAutoConfigurationTest {
         override fun build(
             template: CharSequence,
             valueMap: Map<String, Value<*>>,
-            escape: (String) -> String
+            builtinExtensions: TemplateBuiltinExtensions
         ): Statement {
             throw UnsupportedOperationException()
         }

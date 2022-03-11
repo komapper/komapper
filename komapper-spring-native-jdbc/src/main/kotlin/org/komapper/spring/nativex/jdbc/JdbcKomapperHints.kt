@@ -17,6 +17,7 @@ import org.springframework.core.env.Environment
 import org.springframework.nativex.hint.NativeHint
 import org.springframework.nativex.hint.TypeHint
 import org.springframework.nativex.type.NativeConfiguration
+import org.springframework.transaction.PlatformTransactionManager
 
 @NativeHint(
     trigger = JdbcKomapperAutoConfiguration::class,
@@ -33,15 +34,16 @@ import org.springframework.nativex.type.NativeConfiguration
                 JdbcSession::class,
                 Logger::class,
                 LoggerFacade::class,
+                PlatformTransactionManager::class,
                 StatementInspector::class,
                 TemplateStatementBuilder::class,
             ],
-            typeNames = [
-                "org.komapper.jdbc.JdbcDatabase\$Companion",
-                "org.komapper.spring.boot.autoconfigure.jdbc.JdbcKomapperAutoConfiguration\$databaseConfig\$1"
-            ]
         ),
-        TypeHint(types = [Environment::class])
+        TypeHint(
+            types = [
+                Environment::class,
+            ]
+        )
     ]
 )
 class JdbcKomapperHints : NativeConfiguration

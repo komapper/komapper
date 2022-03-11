@@ -13,18 +13,22 @@ internal interface ExprEnvironment {
 
 internal class DefaultExprEnvironment(override val ctx: Map<String, Value<*>> = emptyMap()) : ExprEnvironment {
 
-    override val topLevelPropertyExtensions: List<KProperty<*>> = listOf(
-        CharSequence::lastIndex
-    ).onEach { it.isAccessible = true }
+    override val topLevelPropertyExtensions: List<KProperty<*>> by lazy {
+        listOf(
+            CharSequence::lastIndex
+        ).onEach { it.isAccessible = true }
+    }
 
-    override val topLevelFunctionExtensions: List<KFunction<*>> = listOf(
-        CharSequence::isBlank,
-        CharSequence::isNotBlank,
-        CharSequence::isNullOrBlank,
-        CharSequence::isEmpty,
-        CharSequence::isNotEmpty,
-        CharSequence::isNullOrEmpty,
-        CharSequence::any,
-        CharSequence::none
-    ).onEach { it.isAccessible = true }
+    override val topLevelFunctionExtensions: List<KFunction<*>> by lazy {
+        listOf(
+            CharSequence::isBlank,
+            CharSequence::isNotBlank,
+            CharSequence::isNullOrBlank,
+            CharSequence::isEmpty,
+            CharSequence::isNotEmpty,
+            CharSequence::isNullOrEmpty,
+            CharSequence::any,
+            CharSequence::none
+        ).onEach { it.isAccessible = true }
+    }
 }

@@ -17,6 +17,7 @@ import org.komapper.r2dbc.R2dbcDatabaseConfig
 import org.komapper.r2dbc.R2dbcDialect
 import org.komapper.r2dbc.R2dbcDialects
 import org.komapper.r2dbc.R2dbcSession
+import org.komapper.r2dbc.SimpleR2dbcDatabaseConfig
 import org.komapper.spring.r2dbc.ReactiveTransactionSession
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass
@@ -108,17 +109,17 @@ open class R2dbcKomapperAutoConfiguration {
         statementInspector: StatementInspector,
         templateStatementBuilder: TemplateStatementBuilder
     ): R2dbcDatabaseConfig {
-        return object : R2dbcDatabaseConfig {
-            override val id = UUID.randomUUID()
-            override val dialect = r2dbcDialect
-            override val clockProvider = clockProvider
-            override val executionOptions = executionOptions
-            override val logger = logger
-            override val loggerFacade = loggerFacade
-            override val session = session
-            override val statementInspector = statementInspector
-            override val templateStatementBuilder = templateStatementBuilder
-        }
+        return SimpleR2dbcDatabaseConfig(
+            id = UUID.randomUUID(),
+            dialect = r2dbcDialect,
+            clockProvider = clockProvider,
+            executionOptions = executionOptions,
+            logger = logger,
+            loggerFacade = loggerFacade,
+            session = session,
+            statementInspector = statementInspector,
+            templateStatementBuilder = templateStatementBuilder,
+        )
     }
 
     @Bean

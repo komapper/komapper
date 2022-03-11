@@ -14,7 +14,7 @@ import kotlin.reflect.full.valueParameters
 import kotlin.reflect.jvm.jvmErasure
 
 internal interface ExprEvaluator {
-    fun eval(expression: String, ctx: ExprContext = ExprContext()): Value<*>
+    fun eval(expression: String, ctx: ExprContext): Value<*>
     fun clearCache()
 }
 
@@ -288,7 +288,7 @@ internal class DefaultExprEvaluator(
         }
         return receiverType.memberFunctions.pick(arguments)
             ?: exprEnvironment.topLevelFunctionExtensions.pick(arguments)
-            ?: ctx.functionExtensions::class.memberExtensionFunctions.pick(listOf(ctx.functionExtensions) + arguments)
+            ?: ctx.builtinExtensions::class.memberExtensionFunctions.pick(listOf(ctx.builtinExtensions) + arguments)
     }
 
     override fun clearCache() {
