@@ -19,6 +19,7 @@ import org.komapper.jdbc.JdbcDatabaseConfig
 import org.komapper.jdbc.JdbcDialect
 import org.komapper.jdbc.JdbcDialects
 import org.komapper.jdbc.JdbcSession
+import org.komapper.jdbc.SimpleJdbcDatabaseConfig
 import org.komapper.spring.jdbc.PlatformTransactionSession
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass
@@ -114,18 +115,18 @@ open class JdbcKomapperAutoConfiguration {
         dataFactory: JdbcDataFactory,
         templateStatementBuilder: TemplateStatementBuilder
     ): JdbcDatabaseConfig {
-        return object : JdbcDatabaseConfig {
-            override val id = UUID.randomUUID()
-            override val dialect = dialect
-            override val clockProvider = clockProvider
-            override val executionOptions = executionOptions
-            override val logger = logger
-            override val loggerFacade = loggerFacade
-            override val session = session
-            override val statementInspector = statementInspector
-            override val dataFactory = dataFactory
-            override val templateStatementBuilder = templateStatementBuilder
-        }
+        return SimpleJdbcDatabaseConfig(
+            id = UUID.randomUUID(),
+            dialect = dialect,
+            clockProvider = clockProvider,
+            executionOptions = executionOptions,
+            logger = logger,
+            loggerFacade = loggerFacade,
+            session = session,
+            statementInspector = statementInspector,
+            dataFactory = dataFactory,
+            templateStatementBuilder = templateStatementBuilder,
+        )
     }
 
     @Bean

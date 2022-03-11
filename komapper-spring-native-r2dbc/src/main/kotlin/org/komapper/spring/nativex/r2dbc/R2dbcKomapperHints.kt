@@ -16,6 +16,7 @@ import org.springframework.core.env.Environment
 import org.springframework.nativex.hint.NativeHint
 import org.springframework.nativex.hint.TypeHint
 import org.springframework.nativex.type.NativeConfiguration
+import org.springframework.transaction.ReactiveTransactionManager
 
 @NativeHint(
     trigger = R2dbcKomapperAutoConfiguration::class,
@@ -31,13 +32,10 @@ import org.springframework.nativex.type.NativeConfiguration
                 R2dbcSession::class,
                 Logger::class,
                 LoggerFacade::class,
+                ReactiveTransactionManager::class,
                 StatementInspector::class,
                 TemplateStatementBuilder::class,
             ],
-            typeNames = [
-                "org.komapper.jdbc.R2dbcDatabase\$Companion",
-                "org.komapper.spring.boot.autoconfigure.r2dbc.R2dbcKomapperAutoConfiguration\$databaseConfig\$1"
-            ]
         ),
         TypeHint(types = [Environment::class])
     ]

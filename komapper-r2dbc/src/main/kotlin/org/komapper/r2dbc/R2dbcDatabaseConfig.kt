@@ -57,3 +57,15 @@ open class DefaultR2dbcDatabaseConfig(
         TemplateStatementBuilders.get(dialect)
     }
 }
+
+class SimpleR2dbcDatabaseConfig(
+    override val id: UUID,
+    override val clockProvider: ClockProvider,
+    override val executionOptions: ExecutionOptions,
+    override val logger: Logger,
+    override val loggerFacade: LoggerFacade,
+    override val statementInspector: StatementInspector,
+    override val templateStatementBuilder: TemplateStatementBuilder,
+    override val dialect: R2dbcDialect,
+    override val session: R2dbcSession
+) : R2dbcDatabaseConfig

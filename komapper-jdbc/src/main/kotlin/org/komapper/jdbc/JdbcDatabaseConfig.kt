@@ -71,3 +71,16 @@ open class DefaultJdbcDatabaseConfig(
         TemplateStatementBuilders.get(dialect)
     }
 }
+
+class SimpleJdbcDatabaseConfig(
+    override val id: UUID,
+    override val clockProvider: ClockProvider,
+    override val executionOptions: ExecutionOptions,
+    override val logger: Logger,
+    override val loggerFacade: LoggerFacade,
+    override val statementInspector: StatementInspector,
+    override val templateStatementBuilder: TemplateStatementBuilder,
+    override val dialect: JdbcDialect,
+    override val session: JdbcSession,
+    override val dataFactory: JdbcDataFactory
+) : JdbcDatabaseConfig

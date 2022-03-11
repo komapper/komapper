@@ -1,11 +1,11 @@
-package org.komapper.template.expression
+package org.komapper.core
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-internal class ExprBuiltinFunctionExtensionsTest {
+internal class TemplateBuiltinExtensionsTest {
 
-    private val extensions = ExprBuiltinFunctionExtensions { it }
+    private val extensions = TemplateBuiltinExtensions { it }
 
     @Test
     fun escape() {

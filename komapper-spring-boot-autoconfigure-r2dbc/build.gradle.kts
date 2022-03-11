@@ -2,10 +2,10 @@ dependencies {
     val r2dbcVersion: String by project
     val springVersion: String by project
     val springBootVersion: String by project
-    implementation("org.springframework:spring-r2dbc:$springVersion")
-    implementation("org.springframework.boot:spring-boot-autoconfigure:$springBootVersion")
-    implementation(project(":komapper-r2dbc"))
-    implementation(project(":komapper-spring-r2dbc"))
+    api("org.springframework:spring-r2dbc:$springVersion")
+    api("org.springframework.boot:spring-boot-autoconfigure:$springBootVersion")
+    api(project(":komapper-r2dbc"))
+    api(project(":komapper-spring-r2dbc"))
     testImplementation(platform("io.r2dbc:r2dbc-bom:$r2dbcVersion"))
     testImplementation(project(":komapper-slf4j"))
     testImplementation(project(":komapper-dialect-h2-r2dbc"))

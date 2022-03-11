@@ -9,13 +9,13 @@ interface TemplateStatementBuilder {
      * Builds a [Statement].
      * @param template the template
      * @param valueMap the data for the template
-     * @param escape the escape function for LIKE predicate
+     * @param builtinExtensions the builtin extensions
      * @return the [Statement]
      */
     fun build(
         template: CharSequence,
         valueMap: Map<String, Value<*>>,
-        escape: (String) -> String
+        builtinExtensions: TemplateBuiltinExtensions
     ): Statement
 
     /**
@@ -25,7 +25,7 @@ interface TemplateStatementBuilder {
 }
 
 class DefaultTemplateStatementBuilder : TemplateStatementBuilder {
-    override fun build(template: CharSequence, valueMap: Map<String, Value<*>>, escape: (String) -> String): Statement {
+    override fun build(template: CharSequence, valueMap: Map<String, Value<*>>, builtinExtensions: TemplateBuiltinExtensions): Statement {
         throw UnsupportedOperationException(
             "Appropriate TemplateStatementBuilder is not found. " +
                 "Add komapper-template dependency or override the templateStatementBuilder property."

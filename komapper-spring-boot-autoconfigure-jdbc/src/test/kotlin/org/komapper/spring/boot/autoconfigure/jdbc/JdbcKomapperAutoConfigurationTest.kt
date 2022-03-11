@@ -3,6 +3,7 @@ package org.komapper.spring.boot.autoconfigure.jdbc
 import org.komapper.core.ClockProvider
 import org.komapper.core.ExecutionOptions
 import org.komapper.core.Statement
+import org.komapper.core.TemplateBuiltinExtensions
 import org.komapper.core.TemplateStatementBuilder
 import org.komapper.core.Value
 import org.komapper.dialect.h2.jdbc.JdbcH2Dialect
@@ -121,7 +122,7 @@ class JdbcKomapperAutoConfigurationTest {
         override fun build(
             template: CharSequence,
             valueMap: Map<String, Value<*>>,
-            escape: (String) -> String
+            builtinExtensions: TemplateBuiltinExtensions
         ): Statement {
             throw UnsupportedOperationException()
         }

@@ -3,6 +3,7 @@ package org.komapper.template
 import org.komapper.core.Dialect
 import org.komapper.core.Statement
 import org.komapper.core.StatementBuffer
+import org.komapper.core.TemplateBuiltinExtensions
 import org.komapper.core.TemplateStatementBuilder
 import org.komapper.core.Value
 import org.komapper.template.expression.ExprContext
@@ -23,14 +24,18 @@ internal class TwoWayTemplateStatementBuilder(
         """^(select|from|where|group by|having|order by|for update|option)\s""", RegexOption.IGNORE_CASE
     )
 
-    override fun build(template: CharSequence, valueMap: Map<String, Value<*>>, escape: (String) -> String): Statement {
-        val ctx = ExprContext(valueMap, escape)
+    override fun build(
+        template: CharSequence,
+        valueMap: Map<String, Value<*>>,
+        builtinExtensions: TemplateBuiltinExtensions
+    ): Statement {
+        val ctx = ExprContext(valueMap, builtinExtensions)
         return build(template.toString(), ctx)
     }
 
-    fun build(
+    private fun build(
         sql: CharSequence,
-        ctx: ExprContext = ExprContext()
+        ctx: ExprContext
     ): Statement {
         val node = sqlNodeFactory.get(sql)
         val state = visit(State(ctx), node)
@@ -40,11 +45,11 @@ internal class TwoWayTemplateStatementBuilder(
     private fun visit(state: State, node: SqlNode): State = when (node) {
         is SqlNode.Statement -> node.nodeList.fold(state, ::visit)
         is SqlNode.Set -> {
-            val left = visit(State(state), node.left)
+            val left = visit(State(state.asExprContext()), node.left)
             if (left.available) {
                 state.append(left)
             }
-            val right = visit(State(state), node.right)
+            val right = visit(State(state.asExprContext()), node.right)
             if (right.available) {
                 if (left.available) {
                     state.append(node.keyword)
@@ -66,7 +71,7 @@ internal class TwoWayTemplateStatementBuilder(
             node.nodeList.fold(state, ::visit)
         }
         is SqlNode.Clause -> {
-            val childState = node.nodeList.fold(State(state), ::visit)
+            val childState = node.nodeList.fold(State(state.asExprContext()), ::visit)
             if (childState.available) {
                 state.append(node.keyword).append(childState)
             } else if (childState.startsWithClause()) {
@@ -220,14 +225,13 @@ internal class TwoWayTemplateStatementBuilder(
     }
 
     inner class State(private val ctx: ExprContext) {
-        constructor(state: State) : this(ExprContext(state.valueMap))
 
         private val buf = StatementBuffer()
         val valueMap: MutableMap<String, Value<*>> = HashMap(ctx.valueMap)
         var available: Boolean = false
 
         fun asExprContext(): ExprContext {
-            return ExprContext(valueMap, ctx.functionExtensions)
+            return ExprContext(valueMap, ctx.builtinExtensions)
         }
 
         fun append(state: State): State {
