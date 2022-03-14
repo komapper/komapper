@@ -10,6 +10,7 @@ import org.komapper.tx.core.TransactionAttribute
 import org.komapper.tx.core.TransactionProperty
 import org.springframework.transaction.ReactiveTransactionManager
 import org.springframework.transaction.reactive.TransactionalOperator
+import java.util.Optional
 import kotlin.coroutines.coroutineContext
 
 internal class ReactiveCoroutineTransactionOperator(private val transactionManager: ReactiveTransactionManager) :
@@ -49,11 +50,9 @@ internal class ReactiveCoroutineTransactionOperator(private val transactionManag
                     }
                 })
                 emit(value)
-            }.map { it ?: Null }.asFlux(context)
+            }.map { Optional.ofNullable(it) }.asFlux(context)
         }
-        val value = flux.asFlow().map { if (it == Null) null else it }.single()
-        @Suppress("UNCHECKED_CAST")
-        return value as R
+        return flux.asFlow().map { it.orElse(null) }.single()
     }
 
     override suspend fun setRollbackOnly() {

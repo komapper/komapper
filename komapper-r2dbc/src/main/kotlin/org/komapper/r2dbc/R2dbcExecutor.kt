@@ -16,6 +16,7 @@ import org.komapper.core.ExecutionOptionsProvider
 import org.komapper.core.Statement
 import org.komapper.core.UniqueConstraintException
 import org.reactivestreams.Publisher
+import java.util.Optional
 
 internal class R2dbcExecutor(
     private val config: R2dbcDatabaseConfig,
@@ -39,12 +40,11 @@ internal class R2dbcExecutor(
                 bind(r2dbcStmt, statement)
                 r2dbcStmt.execute().collect { result ->
                     result.map { row, _ ->
-                        transform(config.dialect, row) ?: Null
+                        val value = transform(config.dialect, row)
+                        Optional.ofNullable(value)
                     }.collect {
-                        val nullable = if (it is Null) null else it
-                        @Suppress("UNCHECKED_CAST")
-                        nullable as T
-                        emit(nullable)
+                        val value = it.orElse(null)
+                        emit(value)
                     }
                 }
             }
