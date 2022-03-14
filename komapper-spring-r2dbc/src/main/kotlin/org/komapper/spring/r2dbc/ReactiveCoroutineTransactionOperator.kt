@@ -1,16 +1,16 @@
 package org.komapper.spring.r2dbc
 
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.reactive.asFlow
-import kotlinx.coroutines.reactive.asPublisher
+import kotlinx.coroutines.reactor.asFlux
 import org.komapper.tx.core.CoroutineTransactionOperator
 import org.komapper.tx.core.TransactionAttribute
 import org.komapper.tx.core.TransactionProperty
 import org.springframework.transaction.ReactiveTransactionManager
 import org.springframework.transaction.reactive.TransactionalOperator
+import kotlin.coroutines.coroutineContext
 
 internal class ReactiveCoroutineTransactionOperator(private val transactionManager: ReactiveTransactionManager) :
     CoroutineTransactionOperator {
@@ -35,27 +35,32 @@ internal class ReactiveCoroutineTransactionOperator(private val transactionManag
         definition: org.springframework.transaction.TransactionDefinition,
         block: suspend (CoroutineTransactionOperator) -> R
     ): R {
-        return TransactionalOperator.create(transactionManager, definition).execute {
-            flow<Any?> {
-                val value = block(this@ReactiveCoroutineTransactionOperator)
+        val context = coroutineContext
+        val txOp = TransactionalOperator.create(transactionManager, definition)
+        val flux = txOp.execute { tx ->
+            flow {
+                val value = block(object : CoroutineTransactionOperator by this@ReactiveCoroutineTransactionOperator {
+                    override suspend fun setRollbackOnly() {
+                        tx.setRollbackOnly()
+                    }
+
+                    override suspend fun isRollbackOnly(): Boolean {
+                        return tx.isRollbackOnly
+                    }
+                })
                 emit(value)
-            }.map { it ?: Null }.asPublisher()
-        }.asFlow().map {
-            val value = if (it == Null) null else it
-            @Suppress("UNCHECKED_CAST")
-            value as R
-        }.single()
+            }.map { it ?: Null }.asFlux(context)
+        }
+        val value = flux.asFlow().map { if (it == Null) null else it }.single()
+        @Suppress("UNCHECKED_CAST")
+        return value as R
     }
 
     override suspend fun setRollbackOnly() {
-        transactionManager.getReactiveTransaction(null).asFlow().map {
-            it.setRollbackOnly()
-        }.collect()
+        throw UnsupportedOperationException()
     }
 
     override suspend fun isRollbackOnly(): Boolean {
-        return transactionManager.getReactiveTransaction(null).asFlow().map {
-            it.isRollbackOnly
-        }.single()
+        throw UnsupportedOperationException()
     }
 }
