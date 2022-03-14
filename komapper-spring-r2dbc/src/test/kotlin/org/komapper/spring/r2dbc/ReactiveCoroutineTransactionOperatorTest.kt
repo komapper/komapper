@@ -1,4 +1,4 @@
-package org.komapper.tx.r2dbc
+package org.komapper.spring.r2dbc
 
 import io.r2dbc.spi.ConnectionFactories
 import kotlinx.coroutines.runBlocking
@@ -9,6 +9,7 @@ import org.komapper.dialect.h2.r2dbc.R2dbcH2Dialect
 import org.komapper.r2dbc.DefaultR2dbcDatabaseConfig
 import org.komapper.r2dbc.R2dbcDatabase
 import org.komapper.r2dbc.R2dbcSession
+import org.springframework.r2dbc.connection.R2dbcTransactionManager
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -16,13 +17,12 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-internal class R2dbcCoroutineTransactionOperatorTest {
+internal class ReactiveCoroutineTransactionOperatorTest {
 
     private val connectionFactory = ConnectionFactories.get("r2dbc:h2:mem:///transaction-test;DB_CLOSE_DELAY=-1")
+    private val transactionManager = R2dbcTransactionManager(connectionFactory)
     private val config = object : DefaultR2dbcDatabaseConfig(connectionFactory, R2dbcH2Dialect()) {
-        override val session: R2dbcSession by lazy {
-            R2dbcTransactionSession(connectionFactory, loggerFacade)
-        }
+        override val session: R2dbcSession = ReactiveTransactionSession(transactionManager, connectionFactory)
     }
     private val db = R2dbcDatabase(config)
 

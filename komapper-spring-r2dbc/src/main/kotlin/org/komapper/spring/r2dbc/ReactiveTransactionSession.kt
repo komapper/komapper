@@ -7,19 +7,14 @@ import kotlinx.coroutines.reactive.asFlow
 import org.komapper.r2dbc.R2dbcSession
 import org.komapper.tx.core.CoroutineTransactionOperator
 import org.komapper.tx.core.FlowTransactionOperator
-import org.springframework.r2dbc.connection.TransactionAwareConnectionFactoryProxy
+import org.springframework.r2dbc.connection.ConnectionFactoryUtils
 import org.springframework.transaction.ReactiveTransactionManager
 
 class ReactiveTransactionSession(
     transactionManager: ReactiveTransactionManager,
-    connectionFactory: ConnectionFactory
+    private val connectionFactory: ConnectionFactory
 ) :
     R2dbcSession {
-
-    private val connectionFactoryProxy = when (connectionFactory) {
-        is TransactionAwareConnectionFactoryProxy -> connectionFactory
-        else -> TransactionAwareConnectionFactoryProxy(connectionFactory)
-    }
 
     override val coroutineTransactionOperator: CoroutineTransactionOperator =
         ReactiveCoroutineTransactionOperator(transactionManager)
@@ -28,6 +23,6 @@ class ReactiveTransactionSession(
         ReactiveFlowTransactionOperator(transactionManager)
 
     override suspend fun getConnection(): Connection {
-        return connectionFactoryProxy.create().asFlow().single()
+        return ConnectionFactoryUtils.getConnection(connectionFactory).asFlow().single()
     }
 }

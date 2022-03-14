@@ -2,19 +2,21 @@ package org.komapper.spring.r2dbc
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
+import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.reactive.collect
+import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.reactor.asFlux
 import org.komapper.tx.core.FlowTransactionOperator
 import org.komapper.tx.core.TransactionAttribute
 import org.komapper.tx.core.TransactionProperty
+import org.springframework.transaction.ReactiveTransaction
 import org.springframework.transaction.ReactiveTransactionManager
 import org.springframework.transaction.reactive.TransactionalOperator
 import java.util.Optional
 import kotlin.coroutines.coroutineContext
 
-internal class ReactiveFlowTransactionOperator(private val transactionManager: ReactiveTransactionManager) :
+internal class ReactiveFlowTransactionOperator(private val transactionManager: ReactiveTransactionManager, private val transaction: ReactiveTransaction? = null) :
     FlowTransactionOperator {
 
     override fun <R> required(
@@ -42,29 +44,30 @@ internal class ReactiveFlowTransactionOperator(private val transactionManager: R
             val txOp = TransactionalOperator.create(transactionManager, definition)
             val flux = txOp.execute { tx ->
                 flow {
-                    block(object : FlowTransactionOperator by this@ReactiveFlowTransactionOperator {
-                        override suspend fun setRollbackOnly() {
-                            tx.setRollbackOnly()
-                        }
-
-                        override suspend fun isRollbackOnly(): Boolean {
-                            return tx.isRollbackOnly
-                        }
-                    })
+                    val operator = ReactiveFlowTransactionOperator(transactionManager, tx)
+                    block(operator)
+                    if (!tx.isNewTransaction && tx.isRollbackOnly) {
+                        // Rollback the enclosing transaction
+                        transaction?.setRollbackOnly()
+                    }
                 }.map { Optional.ofNullable(it) }.asFlux(context)
             }
-            flux.collect {
-                val value = it.orElse(null)
-                emit(value)
-            }
+            val flow = flux.asFlow().map { it.orElse(null) }
+            emitAll(flow)
         }
     }
 
     override suspend fun setRollbackOnly() {
-        throw UnsupportedOperationException()
+        if (transaction == null) {
+            error("The transaction is null.")
+        }
+        transaction.setRollbackOnly()
     }
 
     override suspend fun isRollbackOnly(): Boolean {
-        throw UnsupportedOperationException()
+        if (transaction == null) {
+            error("The transaction is null.")
+        }
+        return transaction.isRollbackOnly
     }
 }

@@ -5,7 +5,6 @@ import org.komapper.tx.core.TransactionOperator
 import org.komapper.tx.core.TransactionProperty
 import org.springframework.transaction.PlatformTransactionManager
 import org.springframework.transaction.TransactionDefinition
-import org.springframework.transaction.support.TransactionTemplate
 
 class PlatformTransactionOperator(private val transactionManager: PlatformTransactionManager) : TransactionOperator {
 
@@ -23,20 +22,48 @@ class PlatformTransactionOperator(private val transactionManager: PlatformTransa
         definition: TransactionDefinition,
         block: (TransactionOperator) -> R
     ): R {
-        val template = TransactionTemplate(transactionManager, definition)
-        @Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
-        return template.execute {
-            block(this@PlatformTransactionOperator)
+        val status = transactionManager.getTransaction(definition)
+        val operator = object : TransactionOperator by this@PlatformTransactionOperator {
+            override fun setRollbackOnly() {
+                status.setRollbackOnly()
+            }
+
+            override fun isRollbackOnly(): Boolean {
+                return status.isRollbackOnly
+            }
+        }
+        return if (status.isNewTransaction) {
+            runCatching {
+                block(operator)
+            }.onSuccess {
+                if (status.isRollbackOnly) {
+                    transactionManager.rollback(status)
+                } else {
+                    transactionManager.commit(status)
+                }
+            }.onFailure { cause ->
+                runCatching {
+                    transactionManager.rollback(status)
+                }.onFailure {
+                    cause.addSuppressed(it)
+                }
+            }.getOrThrow()
+        } else {
+            runCatching {
+                block(operator)
+            }.onSuccess {
+                if (status.isRollbackOnly) {
+                    transactionManager.rollback(status)
+                }
+            }.getOrThrow()
         }
     }
 
     override fun setRollbackOnly() {
-        val status = transactionManager.getTransaction(null)
-        status.setRollbackOnly()
+        throw UnsupportedOperationException()
     }
 
     override fun isRollbackOnly(): Boolean {
-        val status = transactionManager.getTransaction(null)
-        return status.isRollbackOnly
+        throw UnsupportedOperationException()
     }
 }

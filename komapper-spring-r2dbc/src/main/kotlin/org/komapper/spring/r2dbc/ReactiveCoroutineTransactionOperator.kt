@@ -8,12 +8,13 @@ import kotlinx.coroutines.reactor.asFlux
 import org.komapper.tx.core.CoroutineTransactionOperator
 import org.komapper.tx.core.TransactionAttribute
 import org.komapper.tx.core.TransactionProperty
+import org.springframework.transaction.ReactiveTransaction
 import org.springframework.transaction.ReactiveTransactionManager
 import org.springframework.transaction.reactive.TransactionalOperator
 import java.util.Optional
 import kotlin.coroutines.coroutineContext
 
-internal class ReactiveCoroutineTransactionOperator(private val transactionManager: ReactiveTransactionManager) :
+internal class ReactiveCoroutineTransactionOperator(private val transactionManager: ReactiveTransactionManager, private val transaction: ReactiveTransaction? = null) :
     CoroutineTransactionOperator {
 
     override suspend fun <R> required(
@@ -40,26 +41,29 @@ internal class ReactiveCoroutineTransactionOperator(private val transactionManag
         val txOp = TransactionalOperator.create(transactionManager, definition)
         val flux = txOp.execute { tx ->
             flow {
-                val value = block(object : CoroutineTransactionOperator by this@ReactiveCoroutineTransactionOperator {
-                    override suspend fun setRollbackOnly() {
-                        tx.setRollbackOnly()
-                    }
-
-                    override suspend fun isRollbackOnly(): Boolean {
-                        return tx.isRollbackOnly
-                    }
-                })
+                val operator = ReactiveCoroutineTransactionOperator(transactionManager, tx)
+                val value = block(operator)
                 emit(value)
+                if (!tx.isNewTransaction && tx.isRollbackOnly) {
+                    // Rollback the enclosing transaction
+                    transaction?.setRollbackOnly()
+                }
             }.map { Optional.ofNullable(it) }.asFlux(context)
         }
         return flux.asFlow().map { it.orElse(null) }.single()
     }
 
     override suspend fun setRollbackOnly() {
-        throw UnsupportedOperationException()
+        if (transaction == null) {
+            error("The transaction is null.")
+        }
+        transaction.setRollbackOnly()
     }
 
     override suspend fun isRollbackOnly(): Boolean {
-        throw UnsupportedOperationException()
+        if (transaction == null) {
+            error("The transaction is null.")
+        }
+        return transaction.isRollbackOnly
     }
 }

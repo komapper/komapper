@@ -28,8 +28,15 @@ internal class JdbcTransactionOperator(
             val tx = transactionManager.suspend()
             val result = runCatching {
                 executeInNewTransaction(transactionProperty, block)
+            }.onSuccess {
+                transactionManager.resume(tx)
+            }.onFailure { cause ->
+                runCatching {
+                    transactionManager.resume(tx)
+                }.onFailure {
+                    cause.addSuppressed(it)
+                }
             }
-            transactionManager.resume(tx)
             result.getOrThrow()
         } else {
             executeInNewTransaction(transactionProperty, block)

@@ -1,59 +1,278 @@
 package org.komapper.tx.jdbc
 
-import org.komapper.core.DefaultLoggerFacade
-import org.komapper.core.StdOutLogger
+import org.komapper.core.dsl.Meta
+import org.komapper.core.dsl.QueryDsl
+import org.komapper.core.dsl.query.single
+import org.komapper.dialect.h2.jdbc.JdbcH2Dialect
+import org.komapper.jdbc.DefaultJdbcDatabaseConfig
+import org.komapper.jdbc.JdbcDatabase
+import org.komapper.jdbc.JdbcSession
 import org.komapper.jdbc.SimpleDataSource
-import org.komapper.tx.core.TransactionProperty
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertNotNull
-import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 internal class JdbcTransactionOperatorTest {
 
-    data class Address(val id: Int, val street: String, val version: Int)
-
-    class Repository(private val txManager: JdbcTransactionManager) {
-        fun selectAll(): List<Address> {
-            return txManager.getConnection().use { con ->
-                con.prepareStatement("select address_id, street, version from address order by address_id").use { ps ->
-                    ps.executeQuery().use { rs ->
-                        val list = mutableListOf<Address>()
-                        while (rs.next()) {
-                            val id = rs.getInt(1)
-                            val street = rs.getString(2)
-                            val version = rs.getInt(3)
-                            val address = Address(id, street, version)
-                            list.add(address)
-                        }
-                        list
-                    }
-                }
-            }
-        }
-
-        fun selectById(id: Int): Address? {
-            return selectAll().firstOrNull { it.id == id }
-        }
-
-        fun delete(id: Int): Int {
-            return txManager.getConnection().use { con ->
-                con.prepareStatement("delete from address where address_id = ?").use { ps ->
-                    ps.setInt(1, id)
-                    ps.executeUpdate()
-                }
-            }
+    private val dataSource = SimpleDataSource("jdbc:h2:mem://transaction-test;DB_CLOSE_DELAY=-1")
+    private val config = object : DefaultJdbcDatabaseConfig(dataSource, JdbcH2Dialect()) {
+        override val session: JdbcSession by lazy {
+            JdbcTransactionSession(dataSource, loggerFacade)
         }
     }
+    private val db = JdbcDatabase(config)
 
-    private val dataSource = SimpleDataSource("jdbc:h2:mem:transaction-test;DB_CLOSE_DELAY=-1")
-    private val txManager = JdbcTransactionManagerImpl(dataSource, DefaultLoggerFacade(StdOutLogger()))
-    private val tx = JdbcTransactionOperator(txManager)
-    private val repository = Repository(txManager)
+    @Test
+    fun commit() {
+        val a = Meta.address
+        db.withTransaction { tx ->
+            kotlin.test.assertFalse(tx.isRollbackOnly())
+            val address = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
+            db.runQuery { QueryDsl.update(a).single(address.copy(street = "TOKYO")) }
+        }
+        val address = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
+        kotlin.test.assertEquals("TOKYO", address.street)
+    }
+
+    @Test
+    fun setRollbackOnly() {
+        val a = Meta.address
+        db.withTransaction { tx ->
+            tx.setRollbackOnly()
+            assertTrue(tx.isRollbackOnly())
+            val address = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
+            db.runQuery { QueryDsl.update(a).single(address.copy(street = "TOKYO")) }
+        }
+        val address = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
+        kotlin.test.assertEquals("STREET 1", address.street)
+    }
+
+    @Test
+    fun setRollbackOnly_required() {
+        val a = Meta.address
+        db.withTransaction { tx ->
+            tx.setRollbackOnly()
+            assertTrue(tx.isRollbackOnly())
+            val address1 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
+            db.runQuery { QueryDsl.update(a).single(address1.copy(street = "TOKYO")) }
+            tx.required {
+                val address2 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 2 }.single() }
+                db.runQuery { QueryDsl.update(a).single(address2.copy(street = "OSAKA")) }
+                Unit
+            }
+        }
+        val address1 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
+        val address2 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 2 }.single() }
+        kotlin.test.assertEquals("STREET 1", address1.street)
+        kotlin.test.assertEquals("STREET 2", address2.street)
+    }
+
+    @Test
+    fun setRollbackOnly_requiresNew() {
+        val a = Meta.address
+        db.withTransaction { tx ->
+            tx.setRollbackOnly()
+            assertTrue(tx.isRollbackOnly())
+            val address1 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
+            db.runQuery { QueryDsl.update(a).single(address1.copy(street = "TOKYO")) }
+            tx.requiresNew {
+                val address2 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 2 }.single() }
+                db.runQuery { QueryDsl.update(a).single(address2.copy(street = "OSAKA")) }
+                Unit
+            }
+        }
+        val address1 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
+        val address2 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 2 }.single() }
+        kotlin.test.assertEquals("STREET 1", address1.street)
+        kotlin.test.assertEquals("OSAKA", address2.street)
+    }
+
+    @Test
+    fun throwRuntimeException() {
+        val a = Meta.address
+        try {
+            db.withTransaction {
+                val address = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
+                db.runQuery { QueryDsl.update(a).single(address.copy(street = "TOKYO")) }
+                throw RuntimeException()
+            }
+        } catch (ignored: Exception) {
+        }
+        val address = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
+        kotlin.test.assertEquals("STREET 1", address.street)
+    }
+
+    @Test
+    fun throwException() {
+        val a = Meta.address
+        try {
+            db.withTransaction {
+                val address = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
+                db.runQuery { QueryDsl.update(a).single(address.copy(street = "TOKYO")) }
+                throw Exception()
+            }
+        } catch (ignored: Exception) {
+        }
+        val address = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
+        kotlin.test.assertEquals("STREET 1", address.street)
+    }
+
+    @Test
+    fun required_commit() {
+        val a = Meta.address
+        db.withTransaction { tx ->
+            val address1 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
+            db.runQuery { QueryDsl.update(a).single(address1.copy(street = "TOKYO")) }
+            tx.required {
+                val address2 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 2 }.single() }
+                db.runQuery { QueryDsl.update(a).single(address2.copy(street = "OSAKA")) }
+            }
+        }
+        val address1 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
+        val address2 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 2 }.single() }
+        kotlin.test.assertEquals("TOKYO", address1.street)
+        kotlin.test.assertEquals("OSAKA", address2.street)
+    }
+
+    @Test
+    fun required_setRollbackOnly() {
+        val a = Meta.address
+        db.withTransaction { tx ->
+            val address1 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
+            db.runQuery { QueryDsl.update(a).single(address1.copy(street = "TOKYO")) }
+            tx.required { tx2 ->
+                tx2.setRollbackOnly()
+                assertTrue(tx2.isRollbackOnly())
+                val address2 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 2 }.single() }
+                db.runQuery { QueryDsl.update(a).single(address2.copy(street = "OSAKA")) }
+            }
+        }
+        val address1 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
+        val address2 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 2 }.single() }
+        kotlin.test.assertEquals("STREET 1", address1.street)
+        kotlin.test.assertEquals("STREET 2", address2.street)
+    }
+
+    @Test
+    fun required_throwRuntimeException() {
+        val a = Meta.address
+        db.withTransaction { tx ->
+            val address1 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
+            db.runQuery { QueryDsl.update(a).single(address1.copy(street = "TOKYO")) }
+            try {
+                tx.required {
+                    val address2 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 2 }.single() }
+                    db.runQuery { QueryDsl.update(a).single(address2.copy(street = "OSAKA")) }
+                    throw RuntimeException()
+                }
+            } catch (ignored: Exception) {
+            }
+        }
+        val address1 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
+        val address2 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 2 }.single() }
+        kotlin.test.assertEquals("TOKYO", address1.street)
+        kotlin.test.assertEquals("OSAKA", address2.street)
+    }
+
+    @Test
+    fun required_throwException() {
+        val a = Meta.address
+        db.withTransaction { tx ->
+            val address1 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
+            db.runQuery { QueryDsl.update(a).single(address1.copy(street = "TOKYO")) }
+            try {
+                tx.required {
+                    val address2 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 2 }.single() }
+                    db.runQuery { QueryDsl.update(a).single(address2.copy(street = "OSAKA")) }
+                    throw Exception()
+                }
+            } catch (ignored: Exception) {
+            }
+        }
+        val address1 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
+        val address2 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 2 }.single() }
+        kotlin.test.assertEquals("TOKYO", address1.street)
+        kotlin.test.assertEquals("OSAKA", address2.street)
+    }
+
+    @Test
+    fun requiresNew_commit() {
+        val a = Meta.address
+        db.withTransaction { tx ->
+            val address1 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
+            db.runQuery { QueryDsl.update(a).single(address1.copy(street = "TOKYO")) }
+            tx.requiresNew {
+                val address2 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 2 }.single() }
+                db.runQuery { QueryDsl.update(a).single(address2.copy(street = "OSAKA")) }
+            }
+        }
+        val address1 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
+        val address2 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 2 }.single() }
+        kotlin.test.assertEquals("TOKYO", address1.street)
+        kotlin.test.assertEquals("OSAKA", address2.street)
+    }
+
+    @Test
+    fun requiresNew_setRollbackOnly() {
+        val a = Meta.address
+        db.withTransaction { tx ->
+            val address1 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
+            db.runQuery { QueryDsl.update(a).single(address1.copy(street = "TOKYO")) }
+            tx.requiresNew { tx2 ->
+                tx2.setRollbackOnly()
+                assertTrue(tx2.isRollbackOnly())
+                val address2 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 2 }.single() }
+                db.runQuery { QueryDsl.update(a).single(address2.copy(street = "OSAKA")) }
+            }
+        }
+        val address1 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
+        val address2 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 2 }.single() }
+        kotlin.test.assertEquals("TOKYO", address1.street)
+        kotlin.test.assertEquals("STREET 2", address2.street)
+    }
+
+    @Test
+    fun requiresNew_throwRuntimeException() {
+        val a = Meta.address
+        db.withTransaction { tx ->
+            val address1 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
+            db.runQuery { QueryDsl.update(a).single(address1.copy(street = "TOKYO")) }
+            try {
+                tx.requiresNew {
+                    val address2 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 2 }.single() }
+                    db.runQuery { QueryDsl.update(a).single(address2.copy(street = "OSAKA")) }
+                    throw RuntimeException()
+                }
+            } catch (ignored: Exception) {
+            }
+        }
+        val address1 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
+        val address2 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 2 }.single() }
+        kotlin.test.assertEquals("TOKYO", address1.street)
+        kotlin.test.assertEquals("STREET 2", address2.street)
+    }
+
+    @Test
+    fun requiresNew_throwException() {
+        val a = Meta.address
+        db.withTransaction { tx ->
+            val address1 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
+            db.runQuery { QueryDsl.update(a).single(address1.copy(street = "TOKYO")) }
+            try {
+                tx.requiresNew {
+                    val address2 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 2 }.single() }
+                    db.runQuery { QueryDsl.update(a).single(address2.copy(street = "OSAKA")) }
+                    throw Exception()
+                }
+            } catch (ignored: Exception) {
+            }
+        }
+        val address1 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
+        val address2 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 2 }.single() }
+        kotlin.test.assertEquals("TOKYO", address1.street)
+        kotlin.test.assertEquals("STREET 2", address2.street)
+    }
 
     @BeforeTest
     fun before() {
@@ -76,125 +295,16 @@ internal class JdbcTransactionOperatorTest {
             INSERT INTO ADDRESS VALUES(15,'STREET 15',1);
         """.trimIndent()
 
-        dataSource.connection.use { con ->
-            con.createStatement().use { stmt ->
-                stmt.execute(sql)
-            }
+        db.runQuery {
+            QueryDsl.executeScript(sql)
         }
     }
 
     @AfterTest
     fun after() {
         val sql = "DROP ALL OBJECTS"
-        dataSource.connection.use { con ->
-            con.createStatement().use { stmt ->
-                stmt.execute(sql)
-            }
-        }
-    }
-
-    @Test
-    fun select() {
-        val list = tx.required {
-            repository.selectAll()
-        }
-        assertEquals(15, list.size)
-        assertEquals(Address(1, "STREET 1", 1), list[0])
-    }
-
-    @Test
-    fun commit() {
-        tx.required {
-            repository.delete(15)
-        }
-        tx.required {
-            val address = repository.selectById(15)
-            assertNull(address)
-        }
-    }
-
-    @Test
-    fun rollback() {
-        try {
-            tx.required {
-                repository.delete(15)
-                throw Exception()
-            }
-        } catch (ignored: Exception) {
-        }
-        tx.required {
-            val address = repository.selectById(15)
-            assertNotNull(address)
-        }
-    }
-
-    @Test
-    fun setRollbackOnly() {
-        tx.required { tx ->
-            repository.delete(15)
-            assertFalse(tx.isRollbackOnly())
-            tx.setRollbackOnly()
-            assertTrue(tx.isRollbackOnly())
-        }
-        tx.required {
-            val address = repository.selectById(15)
-            assertNotNull(address)
-        }
-    }
-
-    @Test
-    fun isolationLevel() {
-        tx.required(transactionProperty = TransactionProperty.IsolationLevel.SERIALIZABLE) {
-            repository.delete(15)
-        }
-        tx.required {
-            val address = repository.selectById(15)
-            assertNull(address)
-        }
-    }
-
-    @Test
-    fun required_required() {
-        tx.required {
-            repository.delete(15)
-            tx.required {
-                val address = repository.selectById(15)
-                assertNull(address)
-            }
-        }
-        tx.required {
-            val address = repository.selectById(15)
-            assertNull(address)
-        }
-    }
-
-    @Test
-    fun requiresNew() {
-        tx.requiresNew {
-            repository.delete(15)
-            val address = repository.selectById(15)
-            assertNull(address)
-        }
-        tx.required {
-            val address = repository.selectById(15)
-            assertNull(address)
-        }
-    }
-
-    @Test
-    fun required_requiresNew() {
-        tx.required { tx ->
-            repository.delete(15)
-            val address = repository.selectById(15)
-            assertNull(address)
-            tx.requiresNew {
-                val address2 = repository.selectById(15)
-                assertNotNull(address2)
-            }
-        }
-        tx.required {
-            val address = repository.selectById(15)
-            assertNull(address)
+        db.runQuery {
+            QueryDsl.executeScript(sql)
         }
     }
 }
