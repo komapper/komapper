@@ -26,7 +26,7 @@ internal class JdbcExecutor(
         return withExceptionTranslator {
             @Suppress("NAME_SHADOWING")
             val statement = inspect(statement)
-            config.session.getConnection().use { con ->
+            config.session.getConnection().useConnection { con ->
                 prepare(con, statement).use { ps ->
                     setUp(ps)
                     log(statement)
@@ -47,7 +47,7 @@ internal class JdbcExecutor(
         return withExceptionTranslator {
             @Suppress("NAME_SHADOWING")
             val statement = inspect(statement)
-            config.session.getConnection().use { con ->
+            config.session.getConnection().useConnection { con ->
                 prepare(con, statement).use { ps ->
                     setUp(ps)
                     log(statement)
@@ -73,7 +73,7 @@ internal class JdbcExecutor(
         return withExceptionTranslator {
             @Suppress("NAME_SHADOWING")
             val statement = inspect(statement)
-            config.session.getConnection().use { con ->
+            config.session.getConnection().useConnection { con ->
                 prepare(con, statement).use { ps ->
                     setUp(ps)
                     log(statement)
@@ -95,7 +95,7 @@ internal class JdbcExecutor(
         return withExceptionTranslator {
             @Suppress("NAME_SHADOWING")
             val statements = statements.map { inspect(it) }
-            config.session.getConnection().use { con ->
+            config.session.getConnection().useConnection { con ->
                 prepare(con, statements.first()).use { ps ->
                     setUp(ps)
                     val countAndKeyList = mutableListOf<Pair<Int, Long?>>()
@@ -129,7 +129,7 @@ internal class JdbcExecutor(
         withExceptionTranslator {
             @Suppress("NAME_SHADOWING")
             val statements = statements.map { inspect(it) }
-            config.session.getConnection().use { con ->
+            config.session.getConnection().useConnection { con ->
                 for (statement in statements) {
                     con.createStatement().use { s ->
                         setUp(s)
@@ -146,6 +146,19 @@ internal class JdbcExecutor(
         }
     }
 
+    private fun <R> Connection.useConnection(block: (Connection) -> R): R {
+        return runCatching {
+            block(this)
+        }.onSuccess {
+            config.session.releaseConnection(this)
+        }.onFailure { cause ->
+            runCatching {
+                config.session.releaseConnection(this)
+            }.onFailure {
+                cause.addSuppressed(it)
+            }
+        }.getOrThrow()
+    }
     /**
      * Translates a [Exception] to a [RuntimeException].
      */

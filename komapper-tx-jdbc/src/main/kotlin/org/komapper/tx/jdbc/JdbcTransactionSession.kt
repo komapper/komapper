@@ -26,4 +26,8 @@ class JdbcTransactionSession(
     override fun getConnection(): Connection {
         return transactionManager.getConnection()
     }
+
+    override fun releaseConnection(connection: Connection) {
+        connection.close()
+    }
 }

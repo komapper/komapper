@@ -17,6 +17,11 @@ interface JdbcSession {
      * Returns a JDBC connection.
      */
     fun getConnection(): Connection
+
+    /**
+     * Releases a JDBC connection.
+     */
+    fun releaseConnection(connection: Connection)
 }
 
 class DefaultJdbcSession(private val dataSource: DataSource) : JdbcSession {
@@ -25,5 +30,9 @@ class DefaultJdbcSession(private val dataSource: DataSource) : JdbcSession {
 
     override fun getConnection(): Connection {
         return dataSource.connection
+    }
+
+    override fun releaseConnection(connection: Connection) {
+        connection.close()
     }
 }

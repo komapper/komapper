@@ -15,4 +15,8 @@ class JtaTransactionSession(
     override fun getConnection(): Connection {
         return dataSource.connection
     }
+
+    override fun releaseConnection(connection: Connection) {
+        connection.close()
+    }
 }
