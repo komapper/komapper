@@ -42,11 +42,14 @@ internal class ReactiveCoroutineTransactionOperator(private val transactionManag
         val flux = txOp.execute { tx ->
             flow {
                 val operator = ReactiveCoroutineTransactionOperator(transactionManager, tx)
-                val value = block(operator)
-                emit(value)
-                if (!tx.isNewTransaction && tx.isRollbackOnly) {
-                    // Rollback the enclosing transaction
-                    transaction?.setRollbackOnly()
+                try {
+                    val value = block(operator)
+                    emit(value)
+                } finally {
+                    if (!tx.isNewTransaction && tx.isRollbackOnly) {
+                        // Rollback the enclosing transaction
+                        transaction?.setRollbackOnly()
+                    }
                 }
             }.map { Optional.ofNullable(it) }.asFlux(context)
         }

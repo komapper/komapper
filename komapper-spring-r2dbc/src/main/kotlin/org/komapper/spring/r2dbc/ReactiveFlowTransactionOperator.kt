@@ -45,10 +45,13 @@ internal class ReactiveFlowTransactionOperator(private val transactionManager: R
             val flux = txOp.execute { tx ->
                 flow {
                     val operator = ReactiveFlowTransactionOperator(transactionManager, tx)
-                    block(operator)
-                    if (!tx.isNewTransaction && tx.isRollbackOnly) {
-                        // Rollback the enclosing transaction
-                        transaction?.setRollbackOnly()
+                    try {
+                        block(operator)
+                    } finally {
+                        if (!tx.isNewTransaction && tx.isRollbackOnly) {
+                            // Rollback the enclosing transaction
+                            transaction?.setRollbackOnly()
+                        }
                     }
                 }.map { Optional.ofNullable(it) }.asFlux(context)
             }
