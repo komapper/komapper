@@ -11,22 +11,36 @@ internal class JtaTransactionOperator(private val transactionManager: Transactio
         transactionProperty: TransactionProperty,
         block: (TransactionOperator) -> R
     ): R {
-        return execute(block)
+        return if (transactionManager.isActive()) {
+            block(this)
+        } else {
+            executeInNewTransaction(block)
+        }
     }
 
     override fun <R> requiresNew(
         transactionProperty: TransactionProperty,
         block: (TransactionOperator) -> R
     ): R {
-        val tx = transactionManager.suspend()
-        return runCatching {
-            execute(block)
-        }.onSuccess {
-            transactionManager.resume(tx)
-        }.getOrThrow()
+        return if (transactionManager.isActive()) {
+            val tx = transactionManager.suspend()
+            runCatching {
+                executeInNewTransaction(block)
+            }.onSuccess {
+                transactionManager.resume(tx)
+            }.onFailure { cause ->
+                runCatching {
+                    transactionManager.resume(tx)
+                }.onFailure { 
+                    cause.addSuppressed(it)
+                }
+            }.getOrThrow()
+        } else {
+            executeInNewTransaction(block)
+        }
     }
 
-    private fun <R> execute(block: (TransactionOperator) -> R): R {
+    private fun <R> executeInNewTransaction(block: (TransactionOperator) -> R): R {
         transactionManager.begin()
         return runCatching {
             block(this)
@@ -56,4 +70,8 @@ internal class JtaTransactionOperator(private val transactionManager: Transactio
 
 private fun TransactionManager.isRollbackOnly(): Boolean {
     return this.status == Status.STATUS_MARKED_ROLLBACK
+}
+
+private fun TransactionManager.isActive(): Boolean {
+    return this.status == Status.STATUS_ACTIVE
 }

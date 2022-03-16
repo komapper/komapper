@@ -6,7 +6,7 @@ import java.sql.Connection
 import javax.sql.DataSource
 import javax.transaction.TransactionManager
 
-internal class JtaTransactionSession(
+class JtaTransactionSession(
     transactionManager: TransactionManager,
     private val dataSource: DataSource
 ) : JdbcSession {
@@ -14,5 +14,9 @@ internal class JtaTransactionSession(
 
     override fun getConnection(): Connection {
         return dataSource.connection
+    }
+
+    override fun releaseConnection(connection: Connection) {
+        connection.close()
     }
 }
