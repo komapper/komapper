@@ -28,12 +28,11 @@ class ReactiveTransactionSession(
     }
 
     override suspend fun releaseConnection(connection: Connection) {
-        val mono = ConnectionFactoryUtils.releaseConnection(connection, connectionFactory)
         // TODO: Remove "isAutoCommit" check in the future.
         // This is a workaround to avoid Spring's IllegalTransactionStateException
         // See https://github.com/spring-projects/spring-framework/issues/28133
         if (connection.isAutoCommit) {
-            mono.collect { }
+            ConnectionFactoryUtils.releaseConnection(connection, connectionFactory).collect { }
         }
     }
 }

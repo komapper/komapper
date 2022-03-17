@@ -28,6 +28,24 @@ interface R2dbcSession {
      * Releases a R2DBC connection.
      */
     suspend fun releaseConnection(connection: Connection)
+
+    /**
+     * Uses a R2DBC connection.
+     */
+    suspend fun <R> useConnection(block: suspend (Connection) -> R): R {
+        val con = getConnection()
+        return runCatching {
+            block(con)
+        }.onSuccess {
+            releaseConnection(con)
+        }.onFailure { cause ->
+            runCatching {
+                releaseConnection(con)
+            }.onFailure {
+                cause.addSuppressed(it)
+            }
+        }.getOrThrow()
+    }
 }
 
 class DefaultR2dbcSession(private val connectionFactory: ConnectionFactory) : R2dbcSession {
