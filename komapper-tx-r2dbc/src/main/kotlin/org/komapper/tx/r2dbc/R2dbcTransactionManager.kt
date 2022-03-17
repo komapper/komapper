@@ -2,7 +2,6 @@ package org.komapper.tx.r2dbc
 
 import io.r2dbc.spi.Connection
 import io.r2dbc.spi.ConnectionFactory
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
@@ -177,9 +176,6 @@ internal class R2dbcTransactionManagerImpl(
                         loggerFacade.rollbackFailed(tx.toString(), cause)
                     }
                 }
-            }
-            .catch {
-                // ignore
             }.collect()
     }
 
