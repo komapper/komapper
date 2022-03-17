@@ -33,7 +33,7 @@ internal class R2dbcExecutor(
         return flow {
             @Suppress("NAME_SHADOWING")
             val statement = inspect(statement)
-            config.session.getConnection().use { con ->
+            config.session.useConnection { con ->
                 val r2dbcStmt = prepare(con, statement)
                 setUp(r2dbcStmt)
                 log(statement)
@@ -57,7 +57,7 @@ internal class R2dbcExecutor(
         return flow<Pair<Int, List<Long>>> {
             @Suppress("NAME_SHADOWING")
             val statement = inspect(statement)
-            config.session.getConnection().use { con ->
+            config.session.useConnection { con ->
                 val r2dbcStmt = prepare(con, statement)
                 setUp(r2dbcStmt)
                 log(statement)
@@ -83,7 +83,7 @@ internal class R2dbcExecutor(
             val statements = statements.map { inspect(it) }
             val batchSize = executionOptions.batchSize?.let { if (it > 0) it else null } ?: 10
             val batchStatementsList = statements.chunked(batchSize)
-            config.session.getConnection().use { con ->
+            config.session.useConnection { con ->
                 for (batchStatements in batchStatementsList) {
                     val r2dbcStmt = prepare(con, batchStatements.first())
                     setUp(r2dbcStmt)
@@ -114,7 +114,7 @@ internal class R2dbcExecutor(
         flow {
             @Suppress("NAME_SHADOWING")
             val statements = statements.map { inspect(it) }
-            config.session.getConnection().use { con ->
+            config.session.useConnection { con ->
                 val batch = con.createBatch()
                 for (statement in statements) {
                     log(statement)
@@ -135,21 +135,6 @@ internal class R2dbcExecutor(
         }.catch {
             translateException(it)
         }.collect()
-    }
-
-    private suspend fun <T> Connection.use(block: suspend (Connection) -> T): T {
-        val con = this
-        return runCatching {
-            block(con)
-        }.onSuccess {
-            config.session.releaseConnection(con)
-        }.onFailure { cause ->
-            runCatching {
-                config.session.releaseConnection(con)
-            }.onFailure {
-                cause.addSuppressed(cause)
-            }
-        }.getOrThrow()
     }
 
     /**

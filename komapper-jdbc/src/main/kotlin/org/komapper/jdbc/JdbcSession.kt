@@ -22,6 +22,24 @@ interface JdbcSession {
      * Releases a JDBC connection.
      */
     fun releaseConnection(connection: Connection)
+
+    /**
+     * Uses a JDBC connection.
+     */
+    fun <R> useConnection(block: (Connection) -> R): R {
+        val con = getConnection()
+        return runCatching {
+            block(con)
+        }.onSuccess {
+            releaseConnection(con)
+        }.onFailure { cause ->
+            runCatching {
+                releaseConnection(con)
+            }.onFailure {
+                cause.addSuppressed(it)
+            }
+        }.getOrThrow()
+    }
 }
 
 class DefaultJdbcSession(private val dataSource: DataSource) : JdbcSession {
