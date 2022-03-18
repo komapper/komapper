@@ -8,7 +8,7 @@ import org.komapper.core.ThreadSafe
 @ThreadSafe
 interface Prioritized {
     companion object {
-        const val defaultPriority: Int = 100
+        const val DEFAULT_PRIORITY: Int = 100
     }
 
     /**
@@ -17,5 +17,5 @@ interface Prioritized {
      *
      * @return the priority
      */
-    val priority: Int get() = defaultPriority
+    val priority: Int get() = DEFAULT_PRIORITY
 }
