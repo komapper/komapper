@@ -14,4 +14,28 @@ internal class ExecutionOptionsTest {
         assertEquals(2, c.fetchSize)
         assertEquals(2, c.maxRows)
     }
+
+    @Test
+    fun getValidBatchSize_default() {
+        val options = ExecutionOptions()
+        assertEquals(10, options.getValidBatchSize())
+    }
+
+    @Test
+    fun getValidBatchSize_zero() {
+        val options = ExecutionOptions(batchSize = 0)
+        assertEquals(10, options.getValidBatchSize())
+    }
+
+    @Test
+    fun getValidBatchSize_negativeNumber() {
+        val options = ExecutionOptions(batchSize = -1)
+        assertEquals(10, options.getValidBatchSize())
+    }
+
+    @Test
+    fun getValidBatchSize_positiveNumber() {
+        val options = ExecutionOptions(batchSize = 1)
+        assertEquals(1, options.getValidBatchSize())
+    }
 }

@@ -13,30 +13,27 @@ import org.testcontainers.containers.MariaDBR2DBCDatabaseContainer
 import org.testcontainers.jdbc.ConnectionUrl
 
 @Suppress("unused")
-class R2dbcMariaDbSetting :
+class R2dbcMariaDbSetting(private val driver: String, private val url: String) :
     MariaDbSetting<R2dbcDatabase> {
-    companion object {
-        const val DRIVER: String = "mariadb"
-        val OPTIONS: ConnectionFactoryOptions by lazy {
-            val url = System.getProperty("url") ?: error("The url property is not found.")
-            val connectionUrl = ConnectionUrl.newInstance(url)
-            val container = MariaDBContainerProvider().newInstance(connectionUrl) as MariaDBContainer<*>
-            val r2dbcContainer = MariaDBR2DBCDatabaseContainer(container)
-            r2dbcContainer.start()
-            r2dbcContainer.configure(
-                ConnectionFactoryOptions.builder()
-                    .option(ConnectionFactoryOptions.DRIVER, "pool")
-                    .option(ConnectionFactoryOptions.PROTOCOL, DRIVER)
-                    .option(Option.valueOf("initialSize"), 2)
-                    .build()
-            )
-        }
+
+    private val options: ConnectionFactoryOptions by lazy {
+        val connectionUrl = ConnectionUrl.newInstance(url)
+        val container = MariaDBContainerProvider().newInstance(connectionUrl) as MariaDBContainer<*>
+        val r2dbcContainer = MariaDBR2DBCDatabaseContainer(container)
+        r2dbcContainer.start()
+        r2dbcContainer.configure(
+            ConnectionFactoryOptions.builder()
+                .option(ConnectionFactoryOptions.DRIVER, "pool")
+                .option(ConnectionFactoryOptions.PROTOCOL, driver)
+                .option(Option.valueOf("initialSize"), 2)
+                .build()
+        )
     }
 
     override val database: R2dbcDatabase
         get() = R2dbcDatabase(
-            ConnectionFactories.get(OPTIONS),
-            R2dbcDialects.get(DRIVER),
+            ConnectionFactories.get(options),
+            R2dbcDialects.get(driver),
             executionOptions = ExecutionOptions(batchSize = 2)
         )
 }

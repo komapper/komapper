@@ -13,29 +13,26 @@ import org.testcontainers.containers.MSSQLServerContainerProvider
 import org.testcontainers.jdbc.ConnectionUrl
 
 @Suppress("unused")
-class R2dbcSqlServerSetting : SqlServerSetting<R2dbcDatabase> {
-    companion object {
-        const val DRIVER: String = "sqlserver"
-        val OPTIONS: ConnectionFactoryOptions by lazy {
-            val url = System.getProperty("url") ?: error("The url property is not found.")
-            val connectionUrl = ConnectionUrl.newInstance(url)
-            val container = MSSQLServerContainerProvider().newInstance(connectionUrl) as MSSQLServerContainer<*>
-            val r2dbcContainer = MSSQLR2DBCDatabaseContainer(container)
-            r2dbcContainer.start()
-            r2dbcContainer.configure(
-                ConnectionFactoryOptions.builder()
-                    .option(ConnectionFactoryOptions.DRIVER, "pool")
-                    .option(ConnectionFactoryOptions.PROTOCOL, DRIVER)
-                    .option(Option.valueOf("initialSize"), 2)
-                    .build()
-            )
-        }
+class R2dbcSqlServerSetting(private val driver: String, private val url: String) : SqlServerSetting<R2dbcDatabase> {
+
+    private val options: ConnectionFactoryOptions by lazy {
+        val connectionUrl = ConnectionUrl.newInstance(url)
+        val container = MSSQLServerContainerProvider().newInstance(connectionUrl) as MSSQLServerContainer<*>
+        val r2dbcContainer = MSSQLR2DBCDatabaseContainer(container)
+        r2dbcContainer.start()
+        r2dbcContainer.configure(
+            ConnectionFactoryOptions.builder()
+                .option(ConnectionFactoryOptions.DRIVER, "pool")
+                .option(ConnectionFactoryOptions.PROTOCOL, driver)
+                .option(Option.valueOf("initialSize"), 2)
+                .build()
+        )
     }
 
     override val database: R2dbcDatabase
         get() = R2dbcDatabase(
-            ConnectionFactories.get(OPTIONS),
-            R2dbcDialects.get(DRIVER),
+            ConnectionFactories.get(options),
+            R2dbcDialects.get(driver),
             executionOptions = ExecutionOptions(batchSize = 2)
         )
 }

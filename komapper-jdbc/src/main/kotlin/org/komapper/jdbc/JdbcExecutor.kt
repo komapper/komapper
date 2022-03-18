@@ -99,7 +99,7 @@ internal class JdbcExecutor(
                 prepare(con, statements.first()).use { ps ->
                     setUp(ps)
                     val countAndKeyList = mutableListOf<Pair<Int, Long?>>()
-                    val batchSize = executionOptions.getBatchSizeOrDefault()
+                    val batchSize = executionOptions.getValidBatchSize()
                     val batchStatementsList = statements.chunked(batchSize)
                     for (batchStatements in batchStatementsList) {
                         val iterator = batchStatements.iterator()

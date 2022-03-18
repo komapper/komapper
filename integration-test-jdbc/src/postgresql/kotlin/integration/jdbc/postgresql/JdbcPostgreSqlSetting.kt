@@ -6,7 +6,7 @@ import org.komapper.jdbc.JdbcDatabase
 import org.komapper.jdbc.JdbcDialects
 
 @Suppress("unused")
-class JdbcPostgreSqlSetting(url: String) : PostgreSqlSetting<JdbcDatabase> {
+class JdbcPostgreSqlSetting(private val driver: String, url: String) : PostgreSqlSetting<JdbcDatabase> {
 
     override val database: JdbcDatabase by lazy {
         val dialect = JdbcDialects.getByUrl(url, listOf(PostgreSqlJsonType()))

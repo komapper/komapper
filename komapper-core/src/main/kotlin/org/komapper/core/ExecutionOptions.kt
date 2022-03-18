@@ -21,7 +21,7 @@ data class ExecutionOptions(
         private const val DEFAULT_BATCH_SIZE = 10
     }
 
-    fun getBatchSizeOrDefault(): Int {
+    fun getValidBatchSize(): Int {
         return batchSize?.let { if (it > 0) it else null } ?: DEFAULT_BATCH_SIZE
     }
 

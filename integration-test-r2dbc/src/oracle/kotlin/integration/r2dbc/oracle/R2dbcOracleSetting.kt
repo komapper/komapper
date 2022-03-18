@@ -14,29 +14,26 @@ import org.testcontainers.lifecycle.Startable
 import org.testcontainers.r2dbc.R2DBCDatabaseContainer
 
 @Suppress("unused")
-class R2dbcOracleSetting : OracleSetting<R2dbcDatabase> {
-    companion object {
-        const val DRIVER: String = "oracle"
-        private val OPTIONS: ConnectionFactoryOptions by lazy {
-            val url = System.getProperty("url") ?: error("The url property is not found.")
-            val connectionUrl = ConnectionUrl.newInstance(url)
-            val container = OracleContainerProvider().newInstance(connectionUrl) as OracleContainer
-            val r2dbcContainer = OracleR2DBCDatabaseContainer(container)
-            r2dbcContainer.start()
-            r2dbcContainer.configure(
-                ConnectionFactoryOptions.builder()
-                    .option(ConnectionFactoryOptions.DRIVER, "pool")
-                    .option(ConnectionFactoryOptions.PROTOCOL, DRIVER)
-                    .option(Option.valueOf("initialSize"), 2)
-                    .build()
-            )
-        }
+class R2dbcOracleSetting(private val driver: String, private val url: String) : OracleSetting<R2dbcDatabase> {
+
+    private val options: ConnectionFactoryOptions by lazy {
+        val connectionUrl = ConnectionUrl.newInstance(url)
+        val container = OracleContainerProvider().newInstance(connectionUrl) as OracleContainer
+        val r2dbcContainer = OracleR2DBCDatabaseContainer(container)
+        r2dbcContainer.start()
+        r2dbcContainer.configure(
+            ConnectionFactoryOptions.builder()
+                .option(ConnectionFactoryOptions.DRIVER, "pool")
+                .option(ConnectionFactoryOptions.PROTOCOL, driver)
+                .option(Option.valueOf("initialSize"), 2)
+                .build()
+        )
     }
 
     override val database: R2dbcDatabase
         get() = R2dbcDatabase(
-            ConnectionFactories.get(OPTIONS),
-            R2dbcDialects.get(DRIVER),
+            ConnectionFactories.get(options),
+            R2dbcDialects.get(driver),
             executionOptions = ExecutionOptions(batchSize = 2)
         )
 }

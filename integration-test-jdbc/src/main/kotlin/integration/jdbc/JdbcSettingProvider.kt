@@ -18,8 +18,8 @@ object JdbcSettingProvider {
             else -> error("Unsupported driver: $driver")
         }
         val clazz = Class.forName(className) ?: error("Invalid className: $className")
-        val constructor = clazz.getDeclaredConstructor(String::class.java)
+        val constructor = clazz.getDeclaredConstructor(String::class.java, String::class.java)
         @Suppress("UNCHECKED_CAST")
-        return constructor.newInstance(url) as Setting<JdbcDatabase>
+        return constructor.newInstance(driver, url) as Setting<JdbcDatabase>
     }
 }

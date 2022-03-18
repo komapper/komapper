@@ -5,7 +5,9 @@ import io.r2dbc.spi.ConnectionFactory
 import io.r2dbc.spi.ConnectionFactoryOptions
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
+import org.komapper.core.ClockProvider
 import org.komapper.core.Database
+import org.komapper.core.DefaultClockProvider
 import org.komapper.core.ExecutionOptions
 import org.komapper.core.dsl.query.FlowQuery
 import org.komapper.core.dsl.query.Query
@@ -137,14 +139,16 @@ fun R2dbcDatabase(config: R2dbcDatabaseConfig): R2dbcDatabase {
  *
  * @param connectionFactory the connection factory
  * @param dialect the dialect
+ * @param clockProvider the clock provider
  * @param executionOptions the execution options
  */
 fun R2dbcDatabase(
     connectionFactory: ConnectionFactory,
     dialect: R2dbcDialect,
+    clockProvider: ClockProvider = DefaultClockProvider(),
     executionOptions: ExecutionOptions = ExecutionOptions()
 ): R2dbcDatabase {
-    val config = DefaultR2dbcDatabaseConfig(connectionFactory, dialect, executionOptions)
+    val config = DefaultR2dbcDatabaseConfig(connectionFactory, dialect, clockProvider, executionOptions)
     return R2dbcDatabase(config)
 }
 
@@ -152,17 +156,19 @@ fun R2dbcDatabase(
  * Creates a [R2dbcDatabase] instance.
  *
  * @param options the connection factory options
+ * @param clockProvider the clock provider
  * @param executionOptions the execution options
  */
 fun R2dbcDatabase(
     options: ConnectionFactoryOptions,
+    clockProvider: ClockProvider = DefaultClockProvider(),
     executionOptions: ExecutionOptions = ExecutionOptions()
 ): R2dbcDatabase {
     val driver = options.getValue(ConnectionFactoryOptions.DRIVER)?.toString()
     checkNotNull(driver) { "The driver option is not found." }
     val connectionFactory = ConnectionFactories.get(options)
     val dialect = R2dbcDialects.get(driver)
-    val config = DefaultR2dbcDatabaseConfig(connectionFactory, dialect, executionOptions)
+    val config = DefaultR2dbcDatabaseConfig(connectionFactory, dialect, clockProvider, executionOptions)
     return R2dbcDatabase(config)
 }
 
@@ -170,15 +176,17 @@ fun R2dbcDatabase(
  * Creates a [R2dbcDatabase] instance.
  *
  * @param url the R2DBC URL
+ * @param clockProvider the clock provider
  * @param executionOptions the execution options
  */
 fun R2dbcDatabase(
     url: String,
+    clockProvider: ClockProvider = DefaultClockProvider(),
     executionOptions: ExecutionOptions = ExecutionOptions()
 ): R2dbcDatabase {
     val connectionFactory = ConnectionFactories.get(url)
     val driver = R2dbcDialects.extractR2dbcDriver(url)
     val dialect = R2dbcDialects.get(driver)
-    val config = DefaultR2dbcDatabaseConfig(connectionFactory, dialect, executionOptions)
+    val config = DefaultR2dbcDatabaseConfig(connectionFactory, dialect, clockProvider, executionOptions)
     return R2dbcDatabase(config)
 }

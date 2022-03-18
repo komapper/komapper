@@ -20,6 +20,26 @@ interface DatabaseConfig {
     val templateStatementBuilder: TemplateStatementBuilder
 }
 
+abstract class AbstractDatabaseConfig<DIALECT : Dialect>(
+    override val dialect: DIALECT,
+    override val clockProvider: ClockProvider = DefaultClockProvider(),
+    override val executionOptions: ExecutionOptions = ExecutionOptions()
+) : DatabaseConfig {
+    override val id: UUID = UUID.randomUUID()
+    override val logger: Logger by lazy {
+        Loggers.get()
+    }
+    override val loggerFacade: LoggerFacade by lazy {
+        DefaultLoggerFacade(logger)
+    }
+    override val statementInspector: StatementInspector by lazy {
+        StatementInspectors.get()
+    }
+    override val templateStatementBuilder: TemplateStatementBuilder by lazy {
+        TemplateStatementBuilders.get(dialect)
+    }
+}
+
 /**
  * Database configuration for a dry run.
  */

@@ -1,6 +1,8 @@
 package org.komapper.jdbc
 
+import org.komapper.core.ClockProvider
 import org.komapper.core.Database
+import org.komapper.core.DefaultClockProvider
 import org.komapper.core.ExecutionOptions
 import org.komapper.core.dsl.query.Query
 import org.komapper.core.dsl.query.QueryScope
@@ -92,14 +94,16 @@ fun JdbcDatabase(config: JdbcDatabaseConfig): JdbcDatabase {
  *
  * @param dataSource the JDBC data source
  * @param dialect the dialect
+ * @param clockProvider the clock provider
  * @param executionOptions the execution options
  */
 fun JdbcDatabase(
     dataSource: DataSource,
     dialect: JdbcDialect,
+    clockProvider: ClockProvider = DefaultClockProvider(),
     executionOptions: ExecutionOptions = ExecutionOptions(),
 ): JdbcDatabase {
-    val config = DefaultJdbcDatabaseConfig(dataSource, dialect, executionOptions)
+    val config = DefaultJdbcDatabaseConfig(dataSource, dialect, clockProvider, executionOptions)
     return JdbcDatabase(config)
 }
 
@@ -109,6 +113,7 @@ fun JdbcDatabase(
  * @param url the JDBC URL
  * @param user the JDBC user
  * @param password the JDBC password
+ * @param clockProvider the clock provider
  * @param executionOptions the execution options
  * @param dataTypes the data types
  */
@@ -116,13 +121,14 @@ fun JdbcDatabase(
     url: String,
     user: String = "",
     password: String = "",
+    clockProvider: ClockProvider = DefaultClockProvider(),
     executionOptions: ExecutionOptions = ExecutionOptions(),
     dataTypes: List<JdbcDataType<*>> = emptyList()
 ): JdbcDatabase {
     val dataSource = SimpleDataSource(url, user, password)
     val driver = JdbcDialects.extractJdbcDriver(url)
     val dialect = JdbcDialects.get(driver, dataTypes)
-    val config = DefaultJdbcDatabaseConfig(dataSource, dialect, executionOptions)
+    val config = DefaultJdbcDatabaseConfig(dataSource, dialect, clockProvider, executionOptions)
     return JdbcDatabase(config)
 }
 
@@ -132,6 +138,7 @@ fun JdbcDatabase(
  * @param url the JDBC URL
  * @param user the JDBC user
  * @param password the JDBC password
+ * @param clockProvider the clock provider
  * @param executionOptions the execution options
  * @param dialect the dialect
  */
@@ -139,10 +146,11 @@ fun JdbcDatabase(
     url: String,
     user: String = "",
     password: String = "",
+    clockProvider: ClockProvider = DefaultClockProvider(),
     executionOptions: ExecutionOptions = ExecutionOptions(),
     dialect: JdbcDialect
 ): JdbcDatabase {
     val dataSource = SimpleDataSource(url, user, password)
-    val config = DefaultJdbcDatabaseConfig(dataSource, dialect, executionOptions)
+    val config = DefaultJdbcDatabaseConfig(dataSource, dialect, clockProvider, executionOptions)
     return JdbcDatabase(config)
 }
