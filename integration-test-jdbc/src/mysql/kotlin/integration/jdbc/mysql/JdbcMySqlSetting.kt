@@ -1,13 +1,10 @@
 package integration.jdbc.mysql
 
 import integration.core.MySqlSetting
-import org.komapper.jdbc.DefaultJdbcDatabaseConfig
-import org.komapper.jdbc.JdbcDatabaseConfig
+import org.komapper.core.ExecutionOptions
+import org.komapper.jdbc.JdbcDatabase
 
 @Suppress("unused")
-class JdbcMySqlSetting(url: String) : MySqlSetting<JdbcDatabaseConfig> {
-    override val config: JdbcDatabaseConfig =
-        object : DefaultJdbcDatabaseConfig(url, "test", "test") {
-            override val executionOptions = super.executionOptions.copy(batchSize = 2)
-        }
+class JdbcMySqlSetting(url: String) : MySqlSetting<JdbcDatabase> {
+    override val database: JdbcDatabase = JdbcDatabase(url, "test", "test", ExecutionOptions(batchSize = 2))
 }

@@ -5,8 +5,7 @@ import io.r2dbc.spi.ConnectionFactories
 import io.r2dbc.spi.ConnectionFactoryOptions
 import io.r2dbc.spi.Option
 import org.komapper.core.ExecutionOptions
-import org.komapper.r2dbc.DefaultR2dbcDatabaseConfig
-import org.komapper.r2dbc.R2dbcDatabaseConfig
+import org.komapper.r2dbc.R2dbcDatabase
 import org.komapper.r2dbc.R2dbcDialects
 import org.testcontainers.containers.OracleContainer
 import org.testcontainers.containers.OracleContainerProvider
@@ -15,7 +14,7 @@ import org.testcontainers.lifecycle.Startable
 import org.testcontainers.r2dbc.R2DBCDatabaseContainer
 
 @Suppress("unused")
-class R2dbcOracleSetting : OracleSetting<R2dbcDatabaseConfig> {
+class R2dbcOracleSetting : OracleSetting<R2dbcDatabase> {
     companion object {
         const val DRIVER: String = "oracle"
         private val OPTIONS: ConnectionFactoryOptions by lazy {
@@ -34,10 +33,12 @@ class R2dbcOracleSetting : OracleSetting<R2dbcDatabaseConfig> {
         }
     }
 
-    override val config: R2dbcDatabaseConfig =
-        object : DefaultR2dbcDatabaseConfig(ConnectionFactories.get(OPTIONS), R2dbcDialects.get(DRIVER)) {
-            override val executionOptions: ExecutionOptions = super.executionOptions.copy(batchSize = 2)
-        }
+    override val database: R2dbcDatabase
+        get() = R2dbcDatabase(
+            ConnectionFactories.get(OPTIONS),
+            R2dbcDialects.get(DRIVER),
+            executionOptions = ExecutionOptions(batchSize = 2)
+        )
 }
 
 class OracleR2DBCDatabaseContainer(private val container: OracleContainer) : R2DBCDatabaseContainer {

@@ -35,12 +35,12 @@ interface R2dbcDatabaseConfig : DatabaseConfig {
 
 open class DefaultR2dbcDatabaseConfig(
     connectionFactory: ConnectionFactory,
-    override val dialect: R2dbcDialect
+    override val dialect: R2dbcDialect,
+    override val executionOptions: ExecutionOptions = ExecutionOptions()
 ) : R2dbcDatabaseConfig {
 
     override val id: UUID = UUID.randomUUID()
     override val clockProvider: ClockProvider = DefaultClockProvider()
-    override val executionOptions: ExecutionOptions = ExecutionOptions()
     override val logger: Logger by lazy {
         Loggers.get()
     }

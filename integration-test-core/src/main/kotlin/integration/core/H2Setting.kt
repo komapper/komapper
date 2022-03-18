@@ -1,7 +1,8 @@
 package integration.core
 
-interface H2Setting<CONFIG> : Setting<CONFIG> {
+import org.komapper.core.Database
 
+interface H2Setting<DATABASE : Database> : Setting<DATABASE> {
     override val dbms: Dbms get() = Dbms.H2
     override val createSql: String
         get() = """

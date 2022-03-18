@@ -1,14 +1,15 @@
 package integration.jdbc.postgresql
 
 import integration.core.PostgreSqlSetting
-import org.komapper.jdbc.DefaultJdbcDatabaseConfig
-import org.komapper.jdbc.JdbcDatabaseConfig
+import org.komapper.core.ExecutionOptions
+import org.komapper.jdbc.JdbcDatabase
+import org.komapper.jdbc.JdbcDialects
 
 @Suppress("unused")
-class JdbcPostgreSqlSetting(url: String) : PostgreSqlSetting<JdbcDatabaseConfig> {
+class JdbcPostgreSqlSetting(url: String) : PostgreSqlSetting<JdbcDatabase> {
 
-    override val config: JdbcDatabaseConfig =
-        object : DefaultJdbcDatabaseConfig(url, "test", "test", listOf(PostgreSqlJsonType())) {
-            override val executionOptions = super.executionOptions.copy(batchSize = 2)
-        }
+    override val database: JdbcDatabase by lazy {
+        val dialect = JdbcDialects.getByUrl(url, listOf(PostgreSqlJsonType()))
+        JdbcDatabase(url, dialect = dialect, executionOptions = ExecutionOptions(batchSize = 2))
+    }
 }

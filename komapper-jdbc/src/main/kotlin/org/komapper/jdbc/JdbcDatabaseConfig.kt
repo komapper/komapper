@@ -39,19 +39,12 @@ interface JdbcDatabaseConfig : DatabaseConfig {
 
 open class DefaultJdbcDatabaseConfig(
     dataSource: DataSource,
-    override val dialect: JdbcDialect
+    override val dialect: JdbcDialect,
+    override val executionOptions: ExecutionOptions = ExecutionOptions()
 ) : JdbcDatabaseConfig {
-
-    constructor(
-        url: String,
-        user: String = "",
-        password: String = "",
-        dataTypes: List<JdbcDataType<*>> = emptyList()
-    ) : this(SimpleDataSource(url, user, password), JdbcDialects.getByUrl(url, dataTypes))
 
     override val id: UUID = UUID.randomUUID()
     override val clockProvider: ClockProvider = DefaultClockProvider()
-    override val executionOptions: ExecutionOptions = ExecutionOptions(batchSize = 10)
     override val logger: Logger by lazy {
         Loggers.get()
     }
