@@ -17,6 +17,14 @@ data class ExecutionOptions(
     val queryTimeoutSeconds: Int? = null,
     val suppressLogging: Boolean? = null
 ) {
+    companion object {
+        private const val DEFAULT_BATCH_SIZE = 10
+    }
+
+    fun getValidBatchSize(): Int {
+        return batchSize?.let { if (it > 0) it else null } ?: DEFAULT_BATCH_SIZE
+    }
+
     infix operator fun plus(other: ExecutionOptions): ExecutionOptions {
         return ExecutionOptions(
             other.batchSize ?: this.batchSize,

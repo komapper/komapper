@@ -1,6 +1,8 @@
 package integration.core
 
-interface SqlServerSetting<CONFIG> : Setting<CONFIG> {
+import org.komapper.core.Database
+
+interface SqlServerSetting<DATABASE : Database> : Setting<DATABASE> {
     override val dbms: Dbms get() = Dbms.SQLSERVER
     override val createSql: String
         get() = """

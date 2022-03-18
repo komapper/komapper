@@ -10,16 +10,16 @@ internal class SpiUtilityTest {
     fun findByPriority() {
         val factory1 = object : Prioritized {}
         val factory2 = object : Prioritized {
-            override val priority: Int = Prioritized.defaultPriority + 1
+            override val priority: Int = Prioritized.DEFAULT_PRIORITY + 1
         }
         val factory3 = object : Prioritized {
-            override val priority: Int = Prioritized.defaultPriority + 2
+            override val priority: Int = Prioritized.DEFAULT_PRIORITY + 2
         }
         val factory4 = object : Prioritized {
-            override val priority: Int = Prioritized.defaultPriority + 2
+            override val priority: Int = Prioritized.DEFAULT_PRIORITY + 2
         }
         val factory5 = object : Prioritized {
-            override val priority: Int = Prioritized.defaultPriority + 1
+            override val priority: Int = Prioritized.DEFAULT_PRIORITY + 1
         }
         val factories = listOf(factory1, factory2, factory3, factory4, factory5)
         assertSame(factory3, factories.findByPriority())

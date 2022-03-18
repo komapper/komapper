@@ -1,11 +1,11 @@
 package integration.jdbc
 
 import integration.core.Setting
-import org.komapper.jdbc.JdbcDatabaseConfig
+import org.komapper.jdbc.JdbcDatabase
 
 object JdbcSettingProvider {
 
-    fun get(): Setting<JdbcDatabaseConfig> {
+    fun get(): Setting<JdbcDatabase> {
         val driver = System.getProperty("driver") ?: error("The driver property is not found.")
         val url = System.getProperty("url") ?: error("The url property is not found.")
         val className = when (driver) {
@@ -18,8 +18,8 @@ object JdbcSettingProvider {
             else -> error("Unsupported driver: $driver")
         }
         val clazz = Class.forName(className) ?: error("Invalid className: $className")
-        val constructor = clazz.getDeclaredConstructor(String::class.java)
+        val constructor = clazz.getDeclaredConstructor(String::class.java, String::class.java)
         @Suppress("UNCHECKED_CAST")
-        return constructor.newInstance(url) as Setting<JdbcDatabaseConfig>
+        return constructor.newInstance(driver, url) as Setting<JdbcDatabase>
     }
 }

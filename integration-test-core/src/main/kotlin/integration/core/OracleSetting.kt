@@ -1,7 +1,8 @@
 package integration.core
 
-interface OracleSetting<CONFIG> : Setting<CONFIG> {
+import org.komapper.core.Database
 
+interface OracleSetting<DATABASE : Database> : Setting<DATABASE> {
     override val dbms: Dbms get() = Dbms.ORACLE
     override val createSql: String
         get() = """

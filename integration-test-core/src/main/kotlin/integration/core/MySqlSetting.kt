@@ -1,7 +1,8 @@
 package integration.core
 
-interface MySqlSetting<CONFIG> : Setting<CONFIG> {
+import org.komapper.core.Database
 
+interface MySqlSetting<DATABASE : Database> : Setting<DATABASE> {
     override val dbms: Dbms get() = Dbms.MYSQL
     override val createSql: String
         get() = """

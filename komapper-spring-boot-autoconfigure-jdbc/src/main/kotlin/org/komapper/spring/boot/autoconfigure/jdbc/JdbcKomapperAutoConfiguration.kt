@@ -2,10 +2,10 @@ package org.komapper.spring.boot.autoconfigure.jdbc
 
 import org.komapper.core.ClockProvider
 import org.komapper.core.DefaultClockProvider
-import org.komapper.core.DefaultLoggerFacade
 import org.komapper.core.ExecutionOptions
 import org.komapper.core.Logger
 import org.komapper.core.LoggerFacade
+import org.komapper.core.LoggerFacades
 import org.komapper.core.Loggers
 import org.komapper.core.StatementInspector
 import org.komapper.core.StatementInspectors
@@ -75,7 +75,7 @@ open class JdbcKomapperAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     open fun loggerFacade(logger: Logger): LoggerFacade {
-        return DefaultLoggerFacade(logger)
+        return LoggerFacades.get(logger)
     }
 
     @Bean

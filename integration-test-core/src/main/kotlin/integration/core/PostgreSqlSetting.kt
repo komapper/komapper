@@ -1,7 +1,8 @@
 package integration.core
 
-interface PostgreSqlSetting<CONFIG> : Setting<CONFIG> {
+import org.komapper.core.Database
 
+interface PostgreSqlSetting<DATABASE : Database> : Setting<DATABASE> {
     override val dbms: Dbms get() = Dbms.POSTGRESQL
     override val createSql: String
         get() = """

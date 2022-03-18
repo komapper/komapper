@@ -26,9 +26,9 @@ class JdbcEnv :
         @Volatile
         private var initialized: Boolean = false
         private val setting = JdbcSettingProvider.get()
-        private val db = JdbcDatabase(setting.config)
+        private val db = setting.database
         private val txManager = run {
-            val session = setting.config.session as JdbcTransactionSession
+            val session = db.config.session as JdbcTransactionSession
             session.transactionManager
         }
     }

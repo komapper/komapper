@@ -81,7 +81,7 @@ internal class R2dbcExecutor(
         return flow {
             @Suppress("NAME_SHADOWING")
             val statements = statements.map { inspect(it) }
-            val batchSize = executionOptions.batchSize?.let { if (it > 0) it else null } ?: 10
+            val batchSize = executionOptions.getValidBatchSize()
             val batchStatementsList = statements.chunked(batchSize)
             config.session.useConnection { con ->
                 for (batchStatements in batchStatementsList) {
