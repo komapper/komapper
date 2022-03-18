@@ -30,7 +30,7 @@ abstract class AbstractDatabaseConfig<DIALECT : Dialect>(
         Loggers.get()
     }
     override val loggerFacade: LoggerFacade by lazy {
-        DefaultLoggerFacade(logger)
+        LoggerFacades.get(logger)
     }
     override val statementInspector: StatementInspector by lazy {
         StatementInspectors.get()
