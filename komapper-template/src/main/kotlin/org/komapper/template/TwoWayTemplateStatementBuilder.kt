@@ -13,6 +13,11 @@ import org.komapper.template.sql.SqlException
 import org.komapper.template.sql.SqlLocation
 import org.komapper.template.sql.SqlNode
 import org.komapper.template.sql.SqlNodeFactory
+import kotlin.reflect.KProperty1
+import kotlin.reflect.full.declaredMemberProperties
+import kotlin.reflect.full.primaryConstructor
+import kotlin.reflect.jvm.isAccessible
+import kotlin.reflect.jvm.jvmErasure
 
 internal class TwoWayTemplateStatementBuilder(
     private val dialect: Dialect,
@@ -133,7 +138,10 @@ internal class TwoWayTemplateStatementBuilder(
                     }
                     state.append(")")
                 }
-                else -> state.bind(result)
+                else -> {
+                    val value = rebuildValue(result)
+                    state.bind(value)
+                }
             }
             node.nodeList.fold(state, ::visit)
         }
@@ -211,7 +219,32 @@ internal class TwoWayTemplateStatementBuilder(
         is SqlNode.ForDirective -> error("unreachable")
     }
 
-    private fun newValue(o: Any?) = Value(o, o?.let { it::class } ?: Any::class)
+    private fun newValue(o: Any?): Value<*> {
+        val value = Value(o, o?.let { it::class } ?: Any::class)
+        return rebuildValue(value)
+    }
+
+    private fun rebuildValue(value: Value<*>): Value<*> {
+        val klass = value.klass
+        return if (klass.isValue) {
+            val parameter = klass.primaryConstructor?.parameters?.firstOrNull()
+                ?: error("The parameter is not found for the primary constructor of ${klass.qualifiedName}.")
+            val property = klass.declaredMemberProperties.firstOrNull { it.name == parameter.name }
+                ?: error("The property is not found. parameter=${parameter.name}, class=${klass.qualifiedName}.")
+            val v = when (val any = value.any) {
+                null -> null
+                else -> {
+                    @Suppress("UNCHECKED_CAST")
+                    property as KProperty1<Any, *>
+                    property.isAccessible = true
+                    property.get(any)
+                }
+            }
+            Value(v, property.returnType.jvmErasure, value.masking)
+        } else {
+            value
+        }
+    }
 
     private fun eval(location: SqlLocation, expression: String, ctx: ExprContext): Value<*> = try {
         exprEvaluator.eval(expression, ctx)

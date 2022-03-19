@@ -24,6 +24,7 @@ import org.komapper.core.dsl.operator.count
 import org.komapper.core.dsl.operator.max
 import org.komapper.core.dsl.operator.plus
 import org.komapper.core.dsl.query.andThen
+import org.komapper.core.dsl.query.bind
 import org.komapper.core.dsl.query.first
 import org.komapper.core.dsl.query.firstOrNull
 import org.komapper.r2dbc.R2dbcDatabase
@@ -206,7 +207,8 @@ class R2dbcValueClassTest(val db: R2dbcDatabase) {
     fun select_pair() = inTransaction(db) {
         val a = Meta.vAddress
         val result = db.runQuery {
-            QueryDsl.from(a).where { a.addressId eq IntId(1) }.orderBy(a.addressId).select(a.addressId, a.street).first()
+            QueryDsl.from(a).where { a.addressId eq IntId(1) }.orderBy(a.addressId).select(a.addressId, a.street)
+                .first()
         }
         assertEquals(IntId(1) to Street("STREET 1"), result)
     }
@@ -233,7 +235,8 @@ class R2dbcValueClassTest(val db: R2dbcDatabase) {
     fun expression_plus() = inTransaction(db) {
         val a = Meta.vAddress
         val result = db.runQuery {
-            QueryDsl.from(a).where { a.addressId eq IntId(1) }.orderBy(a.addressId).select(a.addressId + IntId(100)).first()
+            QueryDsl.from(a).where { a.addressId eq IntId(1) }.orderBy(a.addressId).select(a.addressId + IntId(100))
+                .first()
         }
         assertEquals(IntId(101), result)
     }
@@ -242,7 +245,8 @@ class R2dbcValueClassTest(val db: R2dbcDatabase) {
     fun expression_concat() = inTransaction(db) {
         val a = Meta.vAddress
         val result = db.runQuery {
-            QueryDsl.from(a).where { a.addressId eq IntId(1) }.orderBy(a.addressId).select(concat(Street("["), concat(a.street, Street("]")))).first()
+            QueryDsl.from(a).where { a.addressId eq IntId(1) }.orderBy(a.addressId)
+                .select(concat(Street("["), concat(a.street, Street("]")))).first()
         }
         assertEquals(Street("[STREET 1]"), result)
     }
@@ -269,5 +273,39 @@ class R2dbcValueClassTest(val db: R2dbcDatabase) {
             ),
             list
         )
+    }
+
+    @Test
+    fun list_using_template() = inTransaction(db) {
+        val list: List<VAddress> = db.runQuery {
+            QueryDsl.fromTemplate("select * from address where address_id = /*id*/0")
+                .bind("id", IntId(1))
+                .select { row ->
+                    VAddress(
+                        IntId(row.asInt("address_id")!!),
+                        Street(row.asString("street")!!),
+                        Version(row.asInt("version")!!)
+                    )
+                }
+        }
+        assertNotNull(list)
+        assertEquals(1, list.size)
+    }
+
+    @Test
+    fun inList2_using_template() = inTransaction(db) {
+        val list: List<VAddress> = db.runQuery {
+            QueryDsl.fromTemplate("select * from address where (address_id, street) in /*pairs*/(0, '')")
+                .bind("pairs", listOf(IntId(1) to Street("STREET 1")))
+                .select { row ->
+                    VAddress(
+                        IntId(row.asInt("address_id")!!),
+                        Street(row.asString("street")!!),
+                        Version(row.asInt("version")!!)
+                    )
+                }
+        }
+        assertNotNull(list)
+        assertEquals(1, list.size)
     }
 }
