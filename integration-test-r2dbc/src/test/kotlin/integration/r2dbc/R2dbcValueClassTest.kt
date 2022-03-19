@@ -292,6 +292,7 @@ class R2dbcValueClassTest(val db: R2dbcDatabase) {
         assertEquals(1, list.size)
     }
 
+    @Run(unless = [Dbms.SQLSERVER])
     @Test
     fun inList2_using_template() = inTransaction(db) {
         val list: List<VAddress> = db.runQuery {

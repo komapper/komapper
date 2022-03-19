@@ -288,6 +288,7 @@ class JdbcValueClassTest(val db: JdbcDatabase) {
         assertEquals(1, list.size)
     }
 
+    @Run(unless = [Dbms.SQLSERVER])
     @Test
     fun inList2_using_template() {
         val list: List<VAddress> = db.runQuery {
