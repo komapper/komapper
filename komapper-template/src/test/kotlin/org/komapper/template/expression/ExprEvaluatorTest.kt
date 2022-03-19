@@ -574,4 +574,16 @@ class ExprEvaluatorTest {
             println(exception)
         }
     }
+
+    @Nested
+    inner class ValueClassTest {
+        @Test
+        fun test() {
+            val ctx = ExprContext(
+                mapOf("uInt" to Value(1u)), extensions
+            )
+            val result = evaluator.eval("uInt", ctx)
+            assertEquals(Value(1u), result)
+        }
+    }
 }

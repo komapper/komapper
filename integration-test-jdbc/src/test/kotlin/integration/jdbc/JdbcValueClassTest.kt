@@ -23,6 +23,7 @@ import org.komapper.core.dsl.operator.count
 import org.komapper.core.dsl.operator.max
 import org.komapper.core.dsl.operator.plus
 import org.komapper.core.dsl.query.andThen
+import org.komapper.core.dsl.query.bind
 import org.komapper.core.dsl.query.first
 import org.komapper.core.dsl.query.firstOrNull
 import org.komapper.jdbc.JdbcDatabase
@@ -268,5 +269,40 @@ class JdbcValueClassTest(val db: JdbcDatabase) {
             ),
             list
         )
+    }
+
+    @Test
+    fun list_using_template() {
+        val list: List<VAddress> = db.runQuery {
+            QueryDsl.fromTemplate("select * from address where address_id = /*id*/0")
+                .bind("id", IntId(1))
+                .select { row ->
+                    VAddress(
+                        IntId(row.asInt("address_id")!!),
+                        Street(row.asString("street")!!),
+                        Version(row.asInt("version")!!)
+                    )
+                }
+        }
+        assertNotNull(list)
+        assertEquals(1, list.size)
+    }
+
+    @Run(unless = [Dbms.SQLSERVER])
+    @Test
+    fun inList2_using_template() {
+        val list: List<VAddress> = db.runQuery {
+            QueryDsl.fromTemplate("select * from address where (address_id, street) in /*pairs*/(0, '')")
+                .bind("pairs", listOf(IntId(1) to Street("STREET 1")))
+                .select { row ->
+                    VAddress(
+                        IntId(row.asInt("address_id")!!),
+                        Street(row.asString("street")!!),
+                        Version(row.asInt("version")!!)
+                    )
+                }
+        }
+        assertNotNull(list)
+        assertEquals(1, list.size)
     }
 }
