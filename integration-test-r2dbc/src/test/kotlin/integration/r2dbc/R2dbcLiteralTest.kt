@@ -4,6 +4,7 @@ import integration.core.booleanTest
 import integration.core.intTest
 import integration.core.longTest
 import integration.core.stringTest
+import org.junit.jupiter.api.TestInfo
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
@@ -18,7 +19,7 @@ import kotlin.test.assertFailsWith
 class R2dbcLiteralTest(val db: R2dbcDatabase) {
 
     @Test
-    fun test_boolean() = inTransaction(db) {
+    fun test_boolean(info: TestInfo) = inTransaction(db, info) {
         val m = Meta.booleanTest
         db.runQuery {
             QueryDsl.insert(m).values {
@@ -33,7 +34,7 @@ class R2dbcLiteralTest(val db: R2dbcDatabase) {
     }
 
     @Test
-    fun test_int() = inTransaction(db) {
+    fun test_int(info: TestInfo) = inTransaction(db, info) {
         val m = Meta.intTest
         db.runQuery {
             QueryDsl.insert(m).values {
@@ -48,7 +49,7 @@ class R2dbcLiteralTest(val db: R2dbcDatabase) {
     }
 
     @Test
-    fun test_long() = inTransaction(db) {
+    fun test_long(info: TestInfo) = inTransaction(db, info) {
         val m = Meta.longTest
         db.runQuery {
             QueryDsl.insert(m).values {
@@ -63,7 +64,7 @@ class R2dbcLiteralTest(val db: R2dbcDatabase) {
     }
 
     @Test
-    fun test_string() = inTransaction(db) {
+    fun test_string(info: TestInfo) = inTransaction(db, info) {
         val m = Meta.stringTest
         db.runQuery {
             QueryDsl.insert(m).values {
@@ -78,7 +79,7 @@ class R2dbcLiteralTest(val db: R2dbcDatabase) {
     }
 
     @Test
-    fun test_illegal_string() = inTransaction(db) {
+    fun test_illegal_string(info: TestInfo) = inTransaction(db, info) {
         val ex = assertFailsWith<IllegalArgumentException> {
             literal("I don't like it.")
         }

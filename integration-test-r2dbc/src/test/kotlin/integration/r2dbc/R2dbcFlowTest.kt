@@ -6,6 +6,7 @@ import integration.core.employee
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.toList
+import org.junit.jupiter.api.TestInfo
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
@@ -19,7 +20,7 @@ import kotlin.test.assertEquals
 class R2dbcFlowTest(val db: R2dbcDatabase) {
 
     @Test
-    fun singleEntity() = inTransaction(db) {
+    fun singleEntity(info: TestInfo) = inTransaction(db, info) {
         val flow = db.flowQuery {
             val a = Meta.address
             QueryDsl.from(a).where { a.addressId inList listOf(1, 2) }.orderBy(a.addressId)
@@ -28,7 +29,7 @@ class R2dbcFlowTest(val db: R2dbcDatabase) {
     }
 
     @Test
-    fun singleEntity_union() = inTransaction(db) {
+    fun singleEntity_union(info: TestInfo) = inTransaction(db, info) {
         val flow = db.flowQuery {
             val a = Meta.address
             QueryDsl.from(a).where { a.addressId eq 1 }.union(
@@ -39,7 +40,7 @@ class R2dbcFlowTest(val db: R2dbcDatabase) {
     }
 
     @Test
-    fun singleColumn() = inTransaction(db) {
+    fun singleColumn(info: TestInfo) = inTransaction(db, info) {
         val flow = db.flowQuery {
             val a = Meta.address
             QueryDsl.from(a)
@@ -51,7 +52,7 @@ class R2dbcFlowTest(val db: R2dbcDatabase) {
     }
 
     @Test
-    fun singleNotNullColumn() = inTransaction(db) {
+    fun singleNotNullColumn(info: TestInfo) = inTransaction(db, info) {
         val flow: Flow<Int> = db.flowQuery {
             val a = Meta.address
             QueryDsl.from(a)
@@ -63,7 +64,7 @@ class R2dbcFlowTest(val db: R2dbcDatabase) {
     }
 
     @Test
-    fun singleColumn_union() = inTransaction(db) {
+    fun singleColumn_union(info: TestInfo) = inTransaction(db, info) {
         val flow = db.flowQuery {
             val a = Meta.address
             QueryDsl.from(a)
@@ -78,7 +79,7 @@ class R2dbcFlowTest(val db: R2dbcDatabase) {
     }
 
     @Test
-    fun pairColumns() = inTransaction(db) {
+    fun pairColumns(info: TestInfo) = inTransaction(db, info) {
         val flow = db.flowQuery {
             val a = Meta.address
             QueryDsl.from(a)
@@ -96,7 +97,7 @@ class R2dbcFlowTest(val db: R2dbcDatabase) {
     }
 
     @Test
-    fun pairNotNullColumns() = inTransaction(db) {
+    fun pairNotNullColumns(info: TestInfo) = inTransaction(db, info) {
         val flow: Flow<Pair<Int, String>> = db.flowQuery {
             val a = Meta.address
             QueryDsl.from(a)
@@ -114,7 +115,7 @@ class R2dbcFlowTest(val db: R2dbcDatabase) {
     }
 
     @Test
-    fun pairColumns_union() = inTransaction(db) {
+    fun pairColumns_union(info: TestInfo) = inTransaction(db, info) {
         val flow = db.flowQuery {
             val a = Meta.address
             QueryDsl.from(a)
@@ -135,7 +136,7 @@ class R2dbcFlowTest(val db: R2dbcDatabase) {
     }
 
     @Test
-    fun tripleColumns() = inTransaction(db) {
+    fun tripleColumns(info: TestInfo) = inTransaction(db, info) {
         val flow = db.flowQuery {
             val a = Meta.address
             QueryDsl.from(a)
@@ -153,7 +154,7 @@ class R2dbcFlowTest(val db: R2dbcDatabase) {
     }
 
     @Test
-    fun tripleNotNullColumns() = inTransaction(db) {
+    fun tripleNotNullColumns(info: TestInfo) = inTransaction(db, info) {
         val flow: Flow<Triple<Int, String, Int>> = db.flowQuery {
             val a = Meta.address
             QueryDsl.from(a)
@@ -171,7 +172,7 @@ class R2dbcFlowTest(val db: R2dbcDatabase) {
     }
 
     @Test
-    fun tripleColumns_union() = inTransaction(db) {
+    fun tripleColumns_union(info: TestInfo) = inTransaction(db, info) {
         val flow = db.flowQuery {
             val a = Meta.address
             QueryDsl.from(a)
@@ -192,7 +193,7 @@ class R2dbcFlowTest(val db: R2dbcDatabase) {
     }
 
     @Test
-    fun multipleColumns() = inTransaction(db) {
+    fun multipleColumns(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val flow = db.flowQuery {
             QueryDsl.from(a)
@@ -207,7 +208,7 @@ class R2dbcFlowTest(val db: R2dbcDatabase) {
     }
 
     @Test
-    fun multipleColumns_union() = inTransaction(db) {
+    fun multipleColumns_union(info: TestInfo) = inTransaction(db, info) {
         val e = Meta.employee
         val flow = db.flowQuery {
             QueryDsl.from(e)
@@ -225,7 +226,7 @@ class R2dbcFlowTest(val db: R2dbcDatabase) {
     }
 
     @Test
-    fun template() = inTransaction(db) {
+    fun template(info: TestInfo) = inTransaction(db, info) {
         val flow = db.flowQuery {
             QueryDsl.fromTemplate("select address_id from address order by address_id")
                 .select { it.asInt("address_id") }
@@ -234,7 +235,7 @@ class R2dbcFlowTest(val db: R2dbcDatabase) {
     }
 
     @Test
-    fun flowTransaction() = inTransaction(db) {
+    fun flowTransaction(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val query = QueryDsl.from(a).where { a.addressId eq 15 }.first()
         val flow: Flow<Address> = db.flowTransaction {
@@ -251,7 +252,7 @@ class R2dbcFlowTest(val db: R2dbcDatabase) {
     }
 
     @Test
-    fun flowTransaction_setRollbackOnly() = inTransaction(db) {
+    fun flowTransaction_setRollbackOnly(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val query = QueryDsl.from(a).where { a.addressId eq 15 }.first()
         val flow: Flow<Address> = db.flowTransaction(TransactionAttribute.REQUIRES_NEW) { tx ->

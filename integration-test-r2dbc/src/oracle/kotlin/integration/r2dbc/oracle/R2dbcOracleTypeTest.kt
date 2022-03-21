@@ -6,6 +6,7 @@ import integration.core.durationTest
 import integration.core.periodTest
 import integration.r2dbc.R2dbcEnv
 import integration.r2dbc.inTransaction
+import org.junit.jupiter.api.TestInfo
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
@@ -20,7 +21,7 @@ import kotlin.test.assertEquals
 class R2dbcOracleTypeTest(private val db: R2dbcDatabase) {
 
     @Test
-    fun period() = inTransaction(db) {
+    fun period(info: TestInfo) = inTransaction(db, info) {
         val m = Meta.periodTest
         val data = PeriodTest(1, Period.of(11, 2, 0))
         db.runQuery { QueryDsl.insert(m).single(data) }
@@ -31,7 +32,7 @@ class R2dbcOracleTypeTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun duration() = inTransaction(db) {
+    fun duration(info: TestInfo) = inTransaction(db, info) {
         val m = Meta.durationTest
         val data = DurationTest(1, Duration.ofDays(11))
         db.runQuery { QueryDsl.insert(m).single(data) }

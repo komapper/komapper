@@ -3,6 +3,7 @@ package integration.r2dbc
 import integration.core.Address
 import integration.core.address
 import integration.core.employee
+import org.junit.jupiter.api.TestInfo
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
@@ -21,7 +22,7 @@ import kotlin.test.assertTrue
 class R2dbcCompositionTest(private val db: R2dbcDatabase) {
 
     @Test
-    fun plus() = inTransaction(db) {
+    fun plus(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val address = Address(16, "STREET 16", 0)
         val q1 = QueryDsl.insert(a).single(address)
@@ -37,7 +38,7 @@ class R2dbcCompositionTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun map() = inTransaction(db) {
+    fun map(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val query = QueryDsl.from(a).map { it.map { address -> address.copy(version = 100) } }
         val list = db.runQuery(query)
@@ -45,7 +46,7 @@ class R2dbcCompositionTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun zip() = inTransaction(db) {
+    fun zip(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val address = Address(16, "STREET 16", 0)
         val q1 = QueryDsl.insert(a).single(address)
@@ -58,7 +59,7 @@ class R2dbcCompositionTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun flatMap() = inTransaction(db) {
+    fun flatMap(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val address = Address(16, "STREET 16", 0)
         val query = QueryDsl.insert(a).single(address).flatMap {
@@ -71,7 +72,7 @@ class R2dbcCompositionTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun flatZip() = inTransaction(db) {
+    fun flatZip(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val address = Address(16, "STREET 16", 0)
         val query = QueryDsl.insert(a).single(address).flatZip {

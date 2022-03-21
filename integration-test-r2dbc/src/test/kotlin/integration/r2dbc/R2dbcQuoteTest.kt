@@ -8,6 +8,7 @@ import integration.core.catalogAndSchema
 import integration.core.catalogOnly
 import integration.core.order
 import integration.core.schemaOnly
+import org.junit.jupiter.api.TestInfo
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
@@ -62,7 +63,7 @@ class R2dbcQuoteTest(val db: R2dbcDatabase) {
     }
 
     @Test
-    fun alwaysQuote() = inTransaction(db) {
+    fun alwaysQuote(info: TestInfo) = inTransaction(db, info) {
         val m = Meta.order
         db.runQuery { QueryDsl.insert(m).single(Order(1, "value")) }
         val list = db.runQuery { QueryDsl.from(m) }

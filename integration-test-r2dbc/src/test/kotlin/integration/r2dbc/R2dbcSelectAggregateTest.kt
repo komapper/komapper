@@ -2,6 +2,7 @@ package integration.r2dbc
 
 import integration.core.address
 import integration.core.employee
+import org.junit.jupiter.api.TestInfo
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
@@ -18,7 +19,7 @@ import kotlin.test.assertEquals
 class R2dbcSelectAggregateTest(private val db: R2dbcDatabase) {
 
     @Test
-    fun aggregate_avg() = inTransaction(db) {
+    fun aggregate_avg(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val avg = db.runQuery {
             QueryDsl.from(a).select(avg(a.addressId))
@@ -27,7 +28,7 @@ class R2dbcSelectAggregateTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun aggregate_countAsterisk() = inTransaction(db) {
+    fun aggregate_countAsterisk(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val count = db.runQuery {
             QueryDsl.from(a).select(count())
@@ -36,7 +37,7 @@ class R2dbcSelectAggregateTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun aggregate_count() = inTransaction(db) {
+    fun aggregate_count(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val count = db.runQuery {
             QueryDsl.from(a).select(count(a.street))
@@ -45,28 +46,28 @@ class R2dbcSelectAggregateTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun aggregate_sum() = inTransaction(db) {
+    fun aggregate_sum(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val sum = db.runQuery { QueryDsl.from(a).select(sum(a.addressId)) }
         assertEquals(120, sum)
     }
 
     @Test
-    fun aggregate_max() = inTransaction(db) {
+    fun aggregate_max(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val max = db.runQuery { QueryDsl.from(a).select(max(a.addressId)) }
         assertEquals(15, max)
     }
 
     @Test
-    fun aggregate_min() = inTransaction(db) {
+    fun aggregate_min(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val min = db.runQuery { QueryDsl.from(a).select(min(a.addressId)) }
         assertEquals(1, min)
     }
 
     @Test
-    fun having() = inTransaction(db) {
+    fun having(info: TestInfo) = inTransaction(db, info) {
         val e = Meta.employee
         val list = db.runQuery {
             QueryDsl.from(e)
@@ -81,7 +82,7 @@ class R2dbcSelectAggregateTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun having_empty_groupBy() = inTransaction(db) {
+    fun having_empty_groupBy(info: TestInfo) = inTransaction(db, info) {
         val e = Meta.employee
         val list = db.runQuery {
             QueryDsl.from(e)

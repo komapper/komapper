@@ -4,6 +4,7 @@ import integration.core.Dbms
 import integration.core.Run
 import integration.core.address
 import integration.core.identityStrategy
+import org.junit.jupiter.api.TestInfo
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
@@ -18,7 +19,7 @@ import kotlin.test.assertTrue
 class R2dbcInsertSelectTest(private val db: R2dbcDatabase) {
 
     @Test
-    fun test() = inTransaction(db) {
+    fun test(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val aa = a.clone(table = "address_archive")
         val (count, ids) = db.runQuery {
@@ -30,7 +31,7 @@ class R2dbcInsertSelectTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun test_lambda() = inTransaction(db) {
+    fun test_lambda(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val aa = a.clone(table = "address_archive")
         val (count, ids) = db.runQuery {
@@ -44,7 +45,7 @@ class R2dbcInsertSelectTest(private val db: R2dbcDatabase) {
 
     @Run(unless = [Dbms.MYSQL, Dbms.ORACLE, Dbms.SQLSERVER])
     @Test
-    fun generatedKeys() = inTransaction(db) {
+    fun generatedKeys(info: TestInfo) = inTransaction(db, info) {
         val i = Meta.identityStrategy
         db.runQuery {
             val q1 = QueryDsl.insert(i).values {
@@ -66,7 +67,7 @@ class R2dbcInsertSelectTest(private val db: R2dbcDatabase) {
 
     @Run(onlyIf = [Dbms.MYSQL, Dbms.ORACLE, Dbms.SQLSERVER])
     @Test
-    fun generatedKeys_unsupportedOperationException() = inTransaction(db) {
+    fun generatedKeys_unsupportedOperationException(info: TestInfo) = inTransaction(db, info) {
         val i = Meta.identityStrategy
         db.runQuery {
             val q1 = QueryDsl.insert(i).values {
@@ -89,7 +90,7 @@ class R2dbcInsertSelectTest(private val db: R2dbcDatabase) {
 
     @Run(unless = [Dbms.ORACLE])
     @Test
-    fun generatedKeys_doNotReturnGeneratedKeys() = inTransaction(db) {
+    fun generatedKeys_doNotReturnGeneratedKeys(info: TestInfo) = inTransaction(db, info) {
         val i = Meta.identityStrategy
         db.runQuery {
             val q1 = QueryDsl.insert(i).values {

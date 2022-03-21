@@ -7,6 +7,7 @@ import integration.core.employee
 import integration.core.identityStrategy
 import integration.core.person
 import integration.core.sequenceStrategy
+import org.junit.jupiter.api.TestInfo
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
@@ -25,7 +26,7 @@ import kotlin.test.assertNull
 class R2dbcInsertValuesTest(private val db: R2dbcDatabase) {
 
     @Test
-    fun test() = inTransaction(db) {
+    fun test(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val (count, key) = db.runQuery {
             QueryDsl.insert(a).values {
@@ -39,7 +40,7 @@ class R2dbcInsertValuesTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun setIfNotNull() = inTransaction(db) {
+    fun setIfNotNull(info: TestInfo) = inTransaction(db, info) {
         val e = Meta.employee
         val (count, key) = db.runQuery {
             QueryDsl.insert(e).values {
@@ -62,7 +63,7 @@ class R2dbcInsertValuesTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun generatedKeys_autoIncrement() = inTransaction(db) {
+    fun generatedKeys_autoIncrement(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.identityStrategy
         val (count, id) = db.runQuery {
             QueryDsl.insert(a).values {
@@ -76,7 +77,7 @@ class R2dbcInsertValuesTest(private val db: R2dbcDatabase) {
 
     @Run(unless = [Dbms.MYSQL])
     @Test
-    fun generatedKeys_sequence() = inTransaction(db) {
+    fun generatedKeys_sequence(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.sequenceStrategy
         val (count, id) = db.runQuery {
             QueryDsl.insert(a).values {
@@ -88,7 +89,7 @@ class R2dbcInsertValuesTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun assignTimestamp_auto() = inTransaction(db) {
+    fun assignTimestamp_auto(info: TestInfo) = inTransaction(db, info) {
         val p = Meta.person
         val (count) = db.runQuery {
             QueryDsl.insert(p).values {
@@ -105,7 +106,7 @@ class R2dbcInsertValuesTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun assignTimestamp_manual() = inTransaction(db) {
+    fun assignTimestamp_manual(info: TestInfo) = inTransaction(db, info) {
         val p = Meta.person
         val timestamp = LocalDateTime.of(2020, 1, 1, 0, 0, 0)
         val (count) = db.runQuery {
@@ -125,7 +126,7 @@ class R2dbcInsertValuesTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun assignVersion_auto() = inTransaction(db) {
+    fun assignVersion_auto(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val (count, key) = db.runQuery {
             QueryDsl.insert(a).values {
@@ -140,7 +141,7 @@ class R2dbcInsertValuesTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun assignVersion_manual() = inTransaction(db) {
+    fun assignVersion_manual(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val (count, key) = db.runQuery {
             QueryDsl.insert(a).values {

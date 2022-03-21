@@ -53,7 +53,7 @@ class JdbcEnv :
                 }
             }
         }
-        txManager.begin(TransactionProperty.Name("JDBC_TEST"))
+        txManager.begin(TransactionProperty.Name(context!!.displayName))
     }
 
     override fun afterTestExecution(context: ExtensionContext?) {
