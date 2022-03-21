@@ -12,29 +12,38 @@ interface JdbcTransactionConnection : Connection {
 
 internal class JdbcTransactionConnectionImpl(
     private val connection: Connection,
-    private val isolationLevel: TransactionProperty.IsolationLevel?
+    private val isolationLevelProperty: TransactionProperty.IsolationLevel?,
+    private val readOnlyProperty: TransactionProperty.ReadOnly?
 ) : Connection by connection, JdbcTransactionConnection {
 
     private var isolation: Int = 0
-    private var autoCommitState: Boolean = false
+    private var readOnly: Boolean = false
+    private var autoCommit: Boolean = false
 
     override fun initialize() {
-        isolation = connection.transactionIsolation
-        if (isolationLevel != null) {
-            connection.transactionIsolation = isolationLevel.value
+        readOnly = connection.isReadOnly
+        if (readOnlyProperty != null) {
+            connection.isReadOnly = readOnlyProperty.value
         }
-        autoCommitState = connection.autoCommit
-        if (autoCommitState) {
+        isolation = connection.transactionIsolation
+        if (isolationLevelProperty != null) {
+            connection.transactionIsolation = isolationLevelProperty.value
+        }
+        autoCommit = connection.autoCommit
+        if (autoCommit) {
             connection.autoCommit = false
         }
     }
 
     override fun reset() {
-        if (isolationLevel != null && isolation != Connection.TRANSACTION_NONE) {
+        if (autoCommit) {
+            connection.autoCommit = true
+        }
+        if (isolationLevelProperty != null && isolation != Connection.TRANSACTION_NONE) {
             connection.transactionIsolation = isolation
         }
-        if (autoCommitState) {
-            connection.autoCommit = true
+        if (readOnlyProperty != null) {
+            connection.isReadOnly = readOnly
         }
     }
 

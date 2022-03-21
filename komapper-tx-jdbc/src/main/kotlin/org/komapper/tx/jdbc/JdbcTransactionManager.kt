@@ -89,7 +89,8 @@ internal class JdbcTransactionManagerImpl(
             error("The transaction \"$currentTx\" already has begun.")
         }
         val isolationLevel = transactionProperty[TransactionProperty.IsolationLevel]
-        val txCon = JdbcTransactionConnectionImpl(dataSource.connection, isolationLevel)
+        val readOnly = transactionProperty[TransactionProperty.ReadOnly]
+        val txCon = JdbcTransactionConnectionImpl(dataSource.connection, isolationLevel, readOnly)
         val name = transactionProperty[TransactionProperty.Name]
         val tx = JdbcTransactionImpl(name?.value, txCon)
         runCatching {
