@@ -27,7 +27,7 @@ class R2dbcEnv :
         private val db = setting.database
     }
 
-    override fun beforeAll(context: ExtensionContext?) {
+    override fun beforeAll(context: ExtensionContext) {
         if (!initialized) {
             initialized = true
             runBlockingWithTimeout {
@@ -40,7 +40,7 @@ class R2dbcEnv :
         }
     }
 
-    override fun beforeTestExecution(context: ExtensionContext?) {
+    override fun beforeTestExecution(context: ExtensionContext) {
         val resetSql = setting.resetSql
         if (resetSql != null) {
             runBlockingWithTimeout {
@@ -53,17 +53,17 @@ class R2dbcEnv :
         }
     }
 
-    override fun afterTestExecution(context: ExtensionContext?) {
+    override fun afterTestExecution(context: ExtensionContext) {
     }
 
     override fun supportsParameter(
-        parameterContext: ParameterContext?,
-        extensionContext: ExtensionContext?
-    ): Boolean = parameterContext!!.parameter.type === R2dbcDatabase::class.java
+        parameterContext: ParameterContext,
+        extensionContext: ExtensionContext
+    ): Boolean = parameterContext.parameter.type === R2dbcDatabase::class.java
 
     override fun resolveParameter(
-        parameterContext: ParameterContext?,
-        extensionContext: ExtensionContext?
+        parameterContext: ParameterContext,
+        extensionContext: ExtensionContext
     ): Any = db
 
     override fun evaluateExecutionCondition(context: ExtensionContext): ConditionEvaluationResult? {
