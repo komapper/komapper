@@ -2,6 +2,7 @@ package integration.r2dbc
 
 import integration.core.department
 import integration.core.employee
+import org.junit.jupiter.api.TestInfo
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
@@ -13,7 +14,7 @@ import kotlin.test.assertEquals
 class R2dbcSelectDistinctTest(private val db: R2dbcDatabase) {
 
     @Test
-    fun distinct() = inTransaction(db) {
+    fun distinct(info: TestInfo) = inTransaction(db, info) {
         val d = Meta.department
         val e = Meta.employee
         val query = QueryDsl.from(d).innerJoin(e) { d.departmentId eq e.departmentId }

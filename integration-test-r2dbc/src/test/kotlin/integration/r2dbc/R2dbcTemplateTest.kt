@@ -4,6 +4,7 @@ import integration.core.Address
 import integration.core.Dbms
 import integration.core.Run
 import integration.core.address
+import org.junit.jupiter.api.TestInfo
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
@@ -34,7 +35,7 @@ class R2dbcTemplateTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun test_columnLabel() = inTransaction(db) {
+    fun test_columnLabel(info: TestInfo) = inTransaction(db, info) {
         val list = db.runQuery {
             val sql = "select * from address"
             QueryDsl.fromTemplate(sql).select(asAddress)
@@ -44,7 +45,7 @@ class R2dbcTemplateTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun test_index() = inTransaction(db) {
+    fun test_index(info: TestInfo) = inTransaction(db, info) {
         val list = db.runQuery {
             val sql = "select * from address"
             QueryDsl.fromTemplate(sql).select(asAddressByIndex)
@@ -54,7 +55,7 @@ class R2dbcTemplateTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun bind() = inTransaction(db) {
+    fun bind(info: TestInfo) = inTransaction(db, info) {
         val list = db.runQuery {
             val sql = "select * from address where street = /*street*/'test'"
             QueryDsl.fromTemplate(sql)
@@ -73,7 +74,7 @@ class R2dbcTemplateTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun bindNull() = inTransaction(db) {
+    fun bindNull(info: TestInfo) = inTransaction(db, info) {
         val street: String? = null
         val list = db.runQuery {
             val sql = "select * from address where /*%if street != null*/ street = /*street*/'test' /*%end*/"
@@ -85,7 +86,7 @@ class R2dbcTemplateTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun `in`() = inTransaction(db) {
+    fun `in`(info: TestInfo) = inTransaction(db, info) {
         val list = db.runQuery {
             val sql = "select * from address where address_id in /*list*/(0)"
             QueryDsl.fromTemplate(sql)
@@ -113,7 +114,7 @@ class R2dbcTemplateTest(private val db: R2dbcDatabase) {
 
     @Run(unless = [Dbms.SQLSERVER])
     @Test
-    fun in2() = inTransaction(db) {
+    fun in2(info: TestInfo) = inTransaction(db, info) {
         val list = db.runQuery {
             val sql = "select * from address where (address_id, street) in /*pairs*/(0, '')"
             QueryDsl.fromTemplate(sql)
@@ -141,7 +142,7 @@ class R2dbcTemplateTest(private val db: R2dbcDatabase) {
 
     @Run(unless = [Dbms.SQLSERVER])
     @Test
-    fun in3() = inTransaction(db) {
+    fun in3(info: TestInfo) = inTransaction(db, info) {
         val list = db.runQuery {
             val sql = "select * from address where (address_id, street, version) in /*triples*/(0, '', 0)"
             QueryDsl.fromTemplate(sql)
@@ -174,7 +175,7 @@ class R2dbcTemplateTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun escape() = inTransaction(db) {
+    fun escape(info: TestInfo) = inTransaction(db, info) {
         val list = db.runQuery {
             val sql =
                 """
@@ -190,7 +191,7 @@ class R2dbcTemplateTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun asPrefix() = inTransaction(db) {
+    fun asPrefix(info: TestInfo) = inTransaction(db, info) {
         val list = db.runQuery {
             val sql = "select * from address where street like /*street.asPrefix()*/'test' order by address_id"
             QueryDsl.fromTemplate(sql)
@@ -201,7 +202,7 @@ class R2dbcTemplateTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun execute() = inTransaction(db) {
+    fun execute(info: TestInfo) = inTransaction(db, info) {
         val count = db.runQuery {
             val sql = "update address set street = /*street*/'' where address_id = /*id*/0"
             QueryDsl.executeTemplate(sql)

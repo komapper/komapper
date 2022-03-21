@@ -4,6 +4,7 @@ import integration.core.Address
 import integration.core.Dbms
 import integration.core.Run
 import integration.core.address
+import org.junit.jupiter.api.TestInfo
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.OptimisticLockException
 import org.komapper.core.dsl.Meta
@@ -19,7 +20,7 @@ class R2dbcDeleteBatchTest(private val db: R2dbcDatabase) {
 
     @Run(onlyIf = [Dbms.ORACLE, Dbms.SQLSERVER])
     @Test
-    fun test() = inTransaction(db) {
+    fun test(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val addressList = listOf(
             Address(16, "STREET 16", 0),
@@ -39,7 +40,7 @@ class R2dbcDeleteBatchTest(private val db: R2dbcDatabase) {
 
     @Run(unless = [Dbms.ORACLE, Dbms.SQLSERVER])
     @Test
-    fun test_unsupportedOperationException() = inTransaction(db) {
+    fun test_unsupportedOperationException(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val addressList = listOf(
             Address(16, "STREET 16", 0),
@@ -57,7 +58,7 @@ class R2dbcDeleteBatchTest(private val db: R2dbcDatabase) {
 
     @Run(onlyIf = [Dbms.ORACLE, Dbms.SQLSERVER])
     @Test
-    fun optimisticLockException() = inTransaction(db) {
+    fun optimisticLockException(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val addressList = listOf(
             Address(16, "STREET 16", 0),
@@ -85,7 +86,7 @@ class R2dbcDeleteBatchTest(private val db: R2dbcDatabase) {
 
     @Run(onlyIf = [Dbms.ORACLE, Dbms.SQLSERVER])
     @Test
-    fun suppressOptimisticLockException() = inTransaction(db) {
+    fun suppressOptimisticLockException(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val addressList = listOf(
             Address(16, "STREET 16", 0),

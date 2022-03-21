@@ -1,6 +1,7 @@
 package integration.r2dbc
 
 import integration.core.address
+import org.junit.jupiter.api.TestInfo
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
@@ -25,7 +26,7 @@ import kotlin.test.assertEquals
 class R2dbcOperatorTest(private val db: R2dbcDatabase) {
 
     @Test
-    fun plus() = inTransaction(db) {
+    fun plus(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val result = db.runQuery {
             QueryDsl.from(a)
@@ -41,7 +42,7 @@ class R2dbcOperatorTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun plus_other_column() = inTransaction(db) {
+    fun plus_other_column(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val result = db.runQuery {
             QueryDsl.from(a)
@@ -57,7 +58,7 @@ class R2dbcOperatorTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun minus() = inTransaction(db) {
+    fun minus(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val result = db.runQuery {
             QueryDsl.from(a)
@@ -73,7 +74,7 @@ class R2dbcOperatorTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun minus_other_column() = inTransaction(db) {
+    fun minus_other_column(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val result = db.runQuery {
             QueryDsl.from(a)
@@ -89,7 +90,7 @@ class R2dbcOperatorTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun div() = inTransaction(db) {
+    fun div(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val result = db.runQuery {
             QueryDsl.from(a)
@@ -105,7 +106,7 @@ class R2dbcOperatorTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun div_other_column() = inTransaction(db) {
+    fun div_other_column(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val result = db.runQuery {
             QueryDsl.from(a)
@@ -121,7 +122,7 @@ class R2dbcOperatorTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun rem() = inTransaction(db) {
+    fun rem(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val result = db.runQuery {
             QueryDsl.from(a)
@@ -137,7 +138,7 @@ class R2dbcOperatorTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun rem_other_column() = inTransaction(db) {
+    fun rem_other_column(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val result = db.runQuery {
             QueryDsl.from(a)
@@ -153,7 +154,7 @@ class R2dbcOperatorTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun concat() = inTransaction(db) {
+    fun concat(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val result = db.runQuery {
             QueryDsl.from(a)
@@ -169,7 +170,7 @@ class R2dbcOperatorTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun concat_other_column() = inTransaction(db) {
+    fun concat_other_column(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val result = db.runQuery {
             QueryDsl.from(a)
@@ -185,7 +186,7 @@ class R2dbcOperatorTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun lowerFunction() = inTransaction(db) {
+    fun lowerFunction(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val result = db.runQuery {
             QueryDsl.from(a).where {
@@ -196,7 +197,7 @@ class R2dbcOperatorTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun upperFunction() = inTransaction(db) {
+    fun upperFunction(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val result = db.runQuery {
             QueryDsl.from(a).where {
@@ -207,7 +208,7 @@ class R2dbcOperatorTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun trimFunction() = inTransaction(db) {
+    fun trimFunction(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val result = db.runQuery {
             QueryDsl.from(a).where {
@@ -218,7 +219,7 @@ class R2dbcOperatorTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun ltrimFunction() = inTransaction(db) {
+    fun ltrimFunction(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val result = db.runQuery {
             QueryDsl.from(a).where {
@@ -229,7 +230,7 @@ class R2dbcOperatorTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun rtrimFunction() = inTransaction(db) {
+    fun rtrimFunction(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val result = db.runQuery {
             QueryDsl.from(a).where {

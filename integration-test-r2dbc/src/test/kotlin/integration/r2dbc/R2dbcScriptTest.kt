@@ -2,6 +2,7 @@ package integration.r2dbc
 
 import integration.core.Dbms
 import integration.core.Run
+import org.junit.jupiter.api.TestInfo
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.QueryDsl
 import org.komapper.core.dsl.query.first
@@ -14,7 +15,7 @@ internal class R2dbcScriptTest(private val db: R2dbcDatabase) {
 
     @Run(unless = [Dbms.MARIADB, Dbms.MYSQL])
     @Test
-    fun test_double_quote() = inTransaction(db) {
+    fun test_double_quote(info: TestInfo) = inTransaction(db, info) {
         db.runQuery {
             val script = """
             create table execute_table("value" varchar(20));
@@ -41,7 +42,7 @@ internal class R2dbcScriptTest(private val db: R2dbcDatabase) {
 
     @Run(onlyIf = [Dbms.MARIADB, Dbms.MYSQL])
     @Test
-    fun test_back_quote() = inTransaction(db) {
+    fun test_back_quote(info: TestInfo) = inTransaction(db, info) {
         db.runQuery {
             val script = """
             create table execute_table(`value` varchar(20));

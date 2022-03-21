@@ -4,6 +4,7 @@ import integration.r2dbc.R2dbcEnv
 import integration.r2dbc.inTransaction
 import io.r2dbc.postgresql.codec.Interval
 import io.r2dbc.postgresql.codec.Json
+import org.junit.jupiter.api.TestInfo
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
@@ -17,7 +18,7 @@ import kotlin.test.assertEquals
 class R2dbcPostgreSqlTypeTest(val db: R2dbcDatabase) {
 
     @Test
-    fun interval() = inTransaction(db) {
+    fun interval(info: TestInfo) = inTransaction(db, info) {
         val m = Meta.intervalTest
         val data = IntervalTest(1, Interval.of(Period.of(2022, 2, 5)))
         db.runQuery { QueryDsl.insert(m).single(data) }
@@ -28,7 +29,7 @@ class R2dbcPostgreSqlTypeTest(val db: R2dbcDatabase) {
     }
 
     @Test
-    fun json() = inTransaction(db) {
+    fun json(info: TestInfo) = inTransaction(db, info) {
         val m = Meta.jsonTest
         val data = JsonTest(
             1,

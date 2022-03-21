@@ -6,6 +6,7 @@ import integration.core.Department
 import integration.core.address
 import integration.core.compositeKeyAddress
 import integration.core.department
+import org.junit.jupiter.api.TestInfo
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
@@ -20,7 +21,7 @@ import kotlin.test.assertNull
 class R2dbcInsertExecuteAndGetTest(private val db: R2dbcDatabase) {
 
     @Test
-    fun onDuplicateKeyUpdate_insert() = inTransaction(db) {
+    fun onDuplicateKeyUpdate_insert(info: TestInfo) = inTransaction(db, info) {
         val d = Meta.department
         val department = Department(5, 50, "PLANNING", "TOKYO", 0)
         val query = QueryDsl.insert(d).onDuplicateKeyUpdate().executeAndGet(department)
@@ -31,7 +32,7 @@ class R2dbcInsertExecuteAndGetTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun onDuplicateKeyUpdate_update() = inTransaction(db) {
+    fun onDuplicateKeyUpdate_update(info: TestInfo) = inTransaction(db, info) {
         val d = Meta.department
         val department = Department(1, 50, "PLANNING", "TOKYO", 10)
         val query = QueryDsl.insert(d).onDuplicateKeyUpdate().executeAndGet(department)
@@ -42,7 +43,7 @@ class R2dbcInsertExecuteAndGetTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun onDuplicateKeyUpdate_insert_composite_key() = inTransaction(db) {
+    fun onDuplicateKeyUpdate_insert_composite_key(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.compositeKeyAddress
         val address = CompositeKeyAddress(15, 15, "STREET", 0)
         val query = QueryDsl.insert(a).onDuplicateKeyUpdate().executeAndGet(address)
@@ -58,7 +59,7 @@ class R2dbcInsertExecuteAndGetTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun onDuplicateKeyUpdate_update_composite_key() = inTransaction(db) {
+    fun onDuplicateKeyUpdate_update_composite_key(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.compositeKeyAddress
         val address = CompositeKeyAddress(1, 1, "STREET X", 0)
         val query = QueryDsl.insert(a).onDuplicateKeyUpdate().executeAndGet(address)
@@ -74,7 +75,7 @@ class R2dbcInsertExecuteAndGetTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun onDuplicateKeyUpdate_withKeys_insert() = inTransaction(db) {
+    fun onDuplicateKeyUpdate_withKeys_insert(info: TestInfo) = inTransaction(db, info) {
         val d = Meta.department
         val department = Department(5, 50, "PLANNING", "TOKYO", 0)
         val query = QueryDsl.insert(d).onDuplicateKeyUpdate(d.departmentNo).executeAndGet(department)
@@ -85,7 +86,7 @@ class R2dbcInsertExecuteAndGetTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun onDuplicateKeyUpdate_withKeys_update() = inTransaction(db) {
+    fun onDuplicateKeyUpdate_withKeys_update(info: TestInfo) = inTransaction(db, info) {
         val d = Meta.department
         val department = Department(6, 10, "PLANNING", "TOKYO", 10)
         val query = QueryDsl.insert(d).onDuplicateKeyUpdate(d.departmentNo).executeAndGet(department)
@@ -96,7 +97,7 @@ class R2dbcInsertExecuteAndGetTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun onDuplicateKeyIgnore_insert() = inTransaction(db) {
+    fun onDuplicateKeyIgnore_insert(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val address = Address(16, "STREET 16", 0)
         val query = QueryDsl.insert(a).onDuplicateKeyIgnore().executeAndGet(address)
@@ -105,7 +106,7 @@ class R2dbcInsertExecuteAndGetTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun onDuplicateKeyIgnore_ignore() = inTransaction(db) {
+    fun onDuplicateKeyIgnore_ignore(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val address = Address(1, "STREET 100", 0)
         val query = QueryDsl.insert(a).onDuplicateKeyIgnore().executeAndGet(address)
@@ -114,7 +115,7 @@ class R2dbcInsertExecuteAndGetTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun onDuplicateKeyIgnore_withKeys_ignore() = inTransaction(db) {
+    fun onDuplicateKeyIgnore_withKeys_ignore(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val address = Address(100, "STREET 1", 0)
         val query = QueryDsl.insert(a).onDuplicateKeyIgnore(a.street).executeAndGet(address)

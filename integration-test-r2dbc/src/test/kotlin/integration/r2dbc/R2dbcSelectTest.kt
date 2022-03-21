@@ -3,6 +3,7 @@ package integration.r2dbc
 import integration.core.Address
 import integration.core.address
 import integration.core.employee
+import org.junit.jupiter.api.TestInfo
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.OptimisticLockException
 import org.komapper.core.dsl.Meta
@@ -28,7 +29,7 @@ import kotlin.test.assertNull
 class R2dbcSelectTest(private val db: R2dbcDatabase) {
 
     @Test
-    fun list() = inTransaction(db) {
+    fun list(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val list: List<Address> = db.runQuery {
             QueryDsl.from(a)
@@ -37,7 +38,7 @@ class R2dbcSelectTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun first() = inTransaction(db) {
+    fun first(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val address: Address = db.runQuery {
             QueryDsl.from(a).where { a.addressId eq 1 }.first()
@@ -46,7 +47,7 @@ class R2dbcSelectTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun firstOrNull() = inTransaction(db) {
+    fun firstOrNull(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val address: Address? = db.runQuery {
             QueryDsl.from(a).where { a.addressId eq 99 }.firstOrNull()
@@ -55,7 +56,7 @@ class R2dbcSelectTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun single() = inTransaction(db) {
+    fun single(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val address: Address = db.runQuery {
             QueryDsl.from(a).where { a.addressId eq 1 }.single()
@@ -64,7 +65,7 @@ class R2dbcSelectTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun singleOrNull() = inTransaction(db) {
+    fun singleOrNull(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val address: Address? = db.runQuery {
             QueryDsl.from(a).where { a.addressId eq 99 }.singleOrNull()
@@ -73,7 +74,7 @@ class R2dbcSelectTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun decoupling() = inTransaction(db) {
+    fun decoupling(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val query = QueryDsl.from(a)
             .where { a.addressId greaterEq 1 }
@@ -91,7 +92,7 @@ class R2dbcSelectTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun option() = inTransaction(db) {
+    fun option(info: TestInfo) = inTransaction(db, info) {
         val e = Meta.employee
         val emp = db.runQuery {
             QueryDsl.from(e)
@@ -111,7 +112,7 @@ class R2dbcSelectTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun caseExpression() = inTransaction(db) {
+    fun caseExpression(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val caseExpression = case(
             When(
@@ -131,7 +132,7 @@ class R2dbcSelectTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun caseExpression_multipleWhen() = inTransaction(db) {
+    fun caseExpression_multipleWhen(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val caseExpression = case(
             When(
@@ -155,7 +156,7 @@ class R2dbcSelectTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun caseExpression_otherwiseNotSpecified() = inTransaction(db) {
+    fun caseExpression_otherwiseNotSpecified(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val caseExpression = case(
             When(
@@ -175,7 +176,7 @@ class R2dbcSelectTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun defaultWhere() = inTransaction(db) {
+    fun defaultWhere(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address.define { a ->
             where { a.addressId eq 1 }
         }
@@ -184,7 +185,7 @@ class R2dbcSelectTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun defaultWhere_update_single() = inTransaction(db) {
+    fun defaultWhere_update_single(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val address = db.runQuery { QueryDsl.from(a).where { a.addressId eq 15 }.first() }
         val a2 = Meta.address.define { a2 ->
@@ -196,7 +197,7 @@ class R2dbcSelectTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun defaultWhere_update_set() = inTransaction(db) {
+    fun defaultWhere_update_set(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address.define { a ->
             where { a.addressId eq 15 }
         }
@@ -205,7 +206,7 @@ class R2dbcSelectTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun defaultWhere_delete_single() = inTransaction(db) {
+    fun defaultWhere_delete_single(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val address = db.runQuery { QueryDsl.from(a).where { a.addressId eq 15 }.first() }
         val a2 = Meta.address.define { a2 ->
@@ -217,7 +218,7 @@ class R2dbcSelectTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun defaultWhere_delete_all() = inTransaction(db) {
+    fun defaultWhere_delete_all(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address.define { a ->
             where { a.addressId eq 15 }
         }

@@ -6,6 +6,7 @@ import integration.core.bbb
 import integration.core.ccc
 import integration.core.compositeKey
 import integration.core.sequenceTable
+import org.junit.jupiter.api.TestInfo
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
@@ -27,7 +28,7 @@ class R2dbcSchemaTest(private val db: R2dbcDatabase) {
         )
 
     @Test
-    fun create() = inTransaction(db) {
+    fun create(info: TestInfo) = inTransaction(db, info) {
         db.runQuery {
             QueryDsl.create(metamodels)
         }
@@ -41,7 +42,7 @@ class R2dbcSchemaTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun create_check() = inTransaction(db) {
+    fun create_check(info: TestInfo) = inTransaction(db, info) {
         db.runQuery {
             QueryDsl.create(metamodels)
         }
@@ -61,7 +62,7 @@ class R2dbcSchemaTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun drop() = inTransaction(db) {
+    fun drop(info: TestInfo) = inTransaction(db, info) {
         db.runQuery {
             QueryDsl.drop(metamodels)
         }

@@ -2,6 +2,7 @@ package integration.r2dbc
 
 import integration.core.Address
 import integration.core.address
+import org.junit.jupiter.api.TestInfo
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
@@ -14,7 +15,7 @@ import kotlin.test.assertEquals
 class R2dbcSelectForUpdateTest(private val db: R2dbcDatabase) {
 
     @Test
-    fun forUpdate() = inTransaction(db) {
+    fun forUpdate(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val list = db.runQuery {
             QueryDsl.from(a).where { a.addressId inList listOf(9, 10) }

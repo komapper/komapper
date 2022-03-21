@@ -10,6 +10,7 @@ import integration.core.address
 import integration.core.department
 import integration.core.identityStrategy
 import integration.core.person
+import org.junit.jupiter.api.TestInfo
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.UniqueConstraintException
 import org.komapper.core.dsl.Meta
@@ -25,7 +26,7 @@ import kotlin.test.assertTrue
 class R2dbcInsertMultipleTest(private val db: R2dbcDatabase) {
 
     @Test
-    fun test() = inTransaction(db) {
+    fun test(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val addressList = listOf(
             Address(16, "STREET 16", 0),
@@ -41,7 +42,7 @@ class R2dbcInsertMultipleTest(private val db: R2dbcDatabase) {
 
     @Run(unless = [Dbms.MYSQL, Dbms.ORACLE, Dbms.SQLSERVER])
     @Test
-    fun identity() = inTransaction(db) {
+    fun identity(info: TestInfo) = inTransaction(db, info) {
         val i = Meta.identityStrategy
         val strategies = listOf(
             IdentityStrategy(null, "AAA"),
@@ -56,7 +57,7 @@ class R2dbcInsertMultipleTest(private val db: R2dbcDatabase) {
 
     @Run(onlyIf = [Dbms.MYSQL, Dbms.ORACLE, Dbms.SQLSERVER])
     @Test
-    fun identity_unsupportedOperationException() = inTransaction(db) {
+    fun identity_unsupportedOperationException(info: TestInfo) = inTransaction(db, info) {
         val i = Meta.identityStrategy
         val strategies = listOf(
             IdentityStrategy(null, "AAA"),
@@ -72,7 +73,7 @@ class R2dbcInsertMultipleTest(private val db: R2dbcDatabase) {
 
     @Run(unless = [Dbms.ORACLE])
     @Test
-    fun identity_doNotReturnGeneratedKeys() = inTransaction(db) {
+    fun identity_doNotReturnGeneratedKeys(info: TestInfo) = inTransaction(db, info) {
         val i = Meta.identityStrategy
         val strategies = listOf(
             IdentityStrategy(null, "AAA"),
@@ -94,7 +95,7 @@ class R2dbcInsertMultipleTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun createdAt_updatedAt() = inTransaction(db) {
+    fun createdAt_updatedAt(info: TestInfo) = inTransaction(db, info) {
         val p = Meta.person
         val personList = listOf(
             Person(1, "A"),
@@ -110,7 +111,7 @@ class R2dbcInsertMultipleTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun uniqueConstraintException() = inTransaction(db) {
+    fun uniqueConstraintException(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         assertFailsWith<UniqueConstraintException> {
             db.runQuery {
@@ -128,7 +129,7 @@ class R2dbcInsertMultipleTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun onDuplicateKeyUpdate() = inTransaction(db) {
+    fun onDuplicateKeyUpdate(info: TestInfo) = inTransaction(db, info) {
         val d = Meta.department
         val department1 = Department(5, 50, "PLANNING", "TOKYO", 1)
         val department2 = Department(1, 60, "DEVELOPMENT", "KYOTO", 1)
@@ -145,7 +146,7 @@ class R2dbcInsertMultipleTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun onDuplicateKeyUpdateWithKeys() = inTransaction(db) {
+    fun onDuplicateKeyUpdateWithKeys(info: TestInfo) = inTransaction(db, info) {
         val d = Meta.department
         val department1 = Department(5, 50, "PLANNING", "TOKYO", 1)
         val department2 = Department(10, 10, "DEVELOPMENT", "KYOTO", 1)
@@ -164,7 +165,7 @@ class R2dbcInsertMultipleTest(private val db: R2dbcDatabase) {
 
     @Test
     @Run(unless = [Dbms.MARIADB])
-    fun onDuplicateKeyUpdate_set() = inTransaction(db) {
+    fun onDuplicateKeyUpdate_set(info: TestInfo) = inTransaction(db, info) {
         val d = Meta.department
         val department1 = Department(5, 50, "PLANNING", "TOKYO", 1)
         val department2 = Department(1, 10, "DEVELOPMENT", "KYOTO", 1)
@@ -185,7 +186,7 @@ class R2dbcInsertMultipleTest(private val db: R2dbcDatabase) {
 
     @Test
     @Run(unless = [Dbms.MARIADB])
-    fun onDuplicateKeyUpdateWithKey_set() = inTransaction(db) {
+    fun onDuplicateKeyUpdateWithKey_set(info: TestInfo) = inTransaction(db, info) {
         val d = Meta.department
         val department1 = Department(5, 50, "PLANNING", "TOKYO", 1)
         val department2 = Department(10, 10, "DEVELOPMENT", "KYOTO", 1)
@@ -207,7 +208,7 @@ class R2dbcInsertMultipleTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun onDuplicateKeyIgnore() = inTransaction(db) {
+    fun onDuplicateKeyIgnore(info: TestInfo) = inTransaction(db, info) {
         val d = Meta.department
         val department1 = Department(5, 50, "PLANNING", "TOKYO", 1)
         val department2 = Department(1, 60, "DEVELOPMENT", "KYOTO", 1)
@@ -225,7 +226,7 @@ class R2dbcInsertMultipleTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun onDuplicateKeyIgnoreWithKeys() = inTransaction(db) {
+    fun onDuplicateKeyIgnoreWithKeys(info: TestInfo) = inTransaction(db, info) {
         val d = Meta.department
         val department1 = Department(5, 50, "PLANNING", "TOKYO", 1)
         val department2 = Department(10, 10, "DEVELOPMENT", "KYOTO", 1)
@@ -245,7 +246,7 @@ class R2dbcInsertMultipleTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun identity_onDuplicateKeyUpdate() = inTransaction(db) {
+    fun identity_onDuplicateKeyUpdate(info: TestInfo) = inTransaction(db, info) {
         val i = Meta.identityStrategy
         val strategies = listOf(
             IdentityStrategy(null, "AAA"),

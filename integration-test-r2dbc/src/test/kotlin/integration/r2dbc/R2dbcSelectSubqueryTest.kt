@@ -2,6 +2,7 @@ package integration.r2dbc
 
 import integration.core.department
 import integration.core.employee
+import org.junit.jupiter.api.TestInfo
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
@@ -15,7 +16,7 @@ import kotlin.test.assertEquals
 class R2dbcSelectSubqueryTest(private val db: R2dbcDatabase) {
 
     @Test
-    fun subquery_selectClause() = inTransaction(db) {
+    fun subquery_selectClause(info: TestInfo) = inTransaction(db, info) {
         val d = Meta.department
         val e = Meta.employee
         val subquery = QueryDsl.from(e).where { d.departmentId eq e.departmentId }.select(count())
@@ -28,7 +29,7 @@ class R2dbcSelectSubqueryTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun subquery_whereClause() = inTransaction(db) {
+    fun subquery_whereClause(info: TestInfo) = inTransaction(db, info) {
         val d = Meta.department
         val e = Meta.employee
         val subquery = QueryDsl.from(d)

@@ -6,6 +6,7 @@ import integration.core.employee
 import integration.core.identityStrategy
 import integration.core.person
 import kotlinx.coroutines.delay
+import org.junit.jupiter.api.TestInfo
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
@@ -22,7 +23,7 @@ import kotlin.test.assertNotEquals
 class R2dbcUpdateSetTest(private val db: R2dbcDatabase) {
 
     @Test
-    fun test() = inTransaction(db) {
+    fun test(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val count = db.runQuery {
             QueryDsl.update(a).set {
@@ -41,7 +42,7 @@ class R2dbcUpdateSetTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun setIfNotNull() = inTransaction(db) {
+    fun setIfNotNull(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val count = db.runQuery {
             QueryDsl.update(a).set {
@@ -62,7 +63,7 @@ class R2dbcUpdateSetTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun arithmetic_add() = inTransaction(db) {
+    fun arithmetic_add(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val count = db.runQuery {
             QueryDsl.update(a).set {
@@ -81,7 +82,7 @@ class R2dbcUpdateSetTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun string_concat() = inTransaction(db) {
+    fun string_concat(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val count = db.runQuery {
             QueryDsl.update(a).set {
@@ -100,7 +101,7 @@ class R2dbcUpdateSetTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun allowMissingWhereClause_default() = inTransaction(db) {
+    fun allowMissingWhereClause_default(info: TestInfo) = inTransaction(db, info) {
         val e = Meta.employee
         val ex = assertFailsWith<IllegalStateException> {
             @Suppress("UNUSED_VARIABLE")
@@ -114,7 +115,7 @@ class R2dbcUpdateSetTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun missingEmptyWhereClause_true() = inTransaction(db) {
+    fun missingEmptyWhereClause_true(info: TestInfo) = inTransaction(db, info) {
         val e = Meta.employee
         val count = db.runQuery {
             QueryDsl.update(e).set {
@@ -125,7 +126,7 @@ class R2dbcUpdateSetTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun assignTimestamp_auto() = inTransaction(db) {
+    fun assignTimestamp_auto(info: TestInfo) = inTransaction(db, info) {
         val p = Meta.person
         val person1 = db.runQuery {
             QueryDsl.insert(p).single(Person(1, "abc"))
@@ -148,7 +149,7 @@ class R2dbcUpdateSetTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun assignTimestamp_manual() = inTransaction(db) {
+    fun assignTimestamp_manual(info: TestInfo) = inTransaction(db, info) {
         val p = Meta.person
         val person1 = db.runQuery {
             QueryDsl.insert(p).single(Person(1, "abc"))
@@ -172,7 +173,7 @@ class R2dbcUpdateSetTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun incrementVersion_auto() = inTransaction(db) {
+    fun incrementVersion_auto(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val address1 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.first() }
         assertEquals(1, address1.version)
@@ -195,7 +196,7 @@ class R2dbcUpdateSetTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun incrementVersion_disabled() = inTransaction(db) {
+    fun incrementVersion_disabled(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val address1 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.first() }
         assertEquals(1, address1.version)
@@ -219,7 +220,7 @@ class R2dbcUpdateSetTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun emptySetClause() = inTransaction(db) {
+    fun emptySetClause(info: TestInfo) = inTransaction(db, info) {
         val i = Meta.identityStrategy
         val query = QueryDsl.update(i).set {
         }.where {

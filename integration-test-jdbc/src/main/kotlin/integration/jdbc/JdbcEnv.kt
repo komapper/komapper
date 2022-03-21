@@ -33,7 +33,7 @@ class JdbcEnv :
         }
     }
 
-    override fun beforeAll(context: ExtensionContext?) {
+    override fun beforeAll(context: ExtensionContext) {
         if (!initialized) {
             initialized = true
             db.runQuery {
@@ -44,7 +44,7 @@ class JdbcEnv :
         }
     }
 
-    override fun beforeTestExecution(context: ExtensionContext?) {
+    override fun beforeTestExecution(context: ExtensionContext) {
         val resetSql = setting.resetSql
         if (resetSql != null) {
             db.runQuery {
@@ -53,21 +53,21 @@ class JdbcEnv :
                 }
             }
         }
-        txManager.begin(TransactionProperty.Name("JDBC_TEST"))
+        txManager.begin(TransactionProperty.Name(context.displayName))
     }
 
-    override fun afterTestExecution(context: ExtensionContext?) {
+    override fun afterTestExecution(context: ExtensionContext) {
         txManager.rollback()
     }
 
     override fun supportsParameter(
-        parameterContext: ParameterContext?,
-        extensionContext: ExtensionContext?
-    ): Boolean = parameterContext!!.parameter.type === JdbcDatabase::class.java
+        parameterContext: ParameterContext,
+        extensionContext: ExtensionContext
+    ): Boolean = parameterContext.parameter.type === JdbcDatabase::class.java
 
     override fun resolveParameter(
-        parameterContext: ParameterContext?,
-        extensionContext: ExtensionContext?
+        parameterContext: ParameterContext,
+        extensionContext: ExtensionContext
     ): Any = db
 
     override fun evaluateExecutionCondition(context: ExtensionContext): ConditionEvaluationResult? {

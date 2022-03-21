@@ -12,6 +12,7 @@ import io.r2dbc.spi.Clob
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.reactive.asPublisher
 import kotlinx.coroutines.reactive.awaitFirst
+import org.junit.jupiter.api.TestInfo
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
@@ -27,7 +28,7 @@ import kotlin.test.assertEquals
 class R2dbcDataTypeTest(val db: R2dbcDatabase) {
 
     @Test
-    fun enum() = inTransaction(db) {
+    fun enum(info: TestInfo) = inTransaction(db, info) {
         val m = Meta.enumTest
         val data = EnumTest(1, Direction.EAST)
         db.runQuery { QueryDsl.insert(m).single(data) }
@@ -38,7 +39,7 @@ class R2dbcDataTypeTest(val db: R2dbcDatabase) {
     }
 
     @Test
-    fun blob() = inTransaction(db) {
+    fun blob(info: TestInfo) = inTransaction(db, info) {
         val m = Meta.blobTest
         val p = flowOf(ByteBuffer.wrap(byteArrayOf(1, 2, 3))).asPublisher()
         val data = BlobTest(1, Blob.from(p))
@@ -55,7 +56,7 @@ class R2dbcDataTypeTest(val db: R2dbcDatabase) {
     }
 
     @Test
-    fun clob() = inTransaction(db) {
+    fun clob(info: TestInfo) = inTransaction(db, info) {
         val m = Meta.clobTest
         val p = flowOf(CharBuffer.wrap("abc")).asPublisher()
         val data = ClobTest(1, Clob.from(p))
@@ -73,7 +74,7 @@ class R2dbcDataTypeTest(val db: R2dbcDatabase) {
 
     @Run(onlyIf = [Dbms.POSTGRESQL, Dbms.H2])
     @Test
-    fun uuid() = inTransaction(db) {
+    fun uuid(info: TestInfo) = inTransaction(db, info) {
         val m = Meta.uuidTest
         val value = UUID.randomUUID()
         val data = UUIDTest(1, value)
@@ -86,7 +87,7 @@ class R2dbcDataTypeTest(val db: R2dbcDatabase) {
 
     @Run(onlyIf = [Dbms.POSTGRESQL, Dbms.H2])
     @Test
-    fun uuid_null() = inTransaction(db) {
+    fun uuid_null(info: TestInfo) = inTransaction(db, info) {
         val m = Meta.uuidTest
         val data = UUIDTest(1, null)
         db.runQuery { QueryDsl.insert(m).single(data) }

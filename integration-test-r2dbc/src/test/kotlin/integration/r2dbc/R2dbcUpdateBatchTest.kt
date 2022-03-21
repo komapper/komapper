@@ -7,6 +7,7 @@ import integration.core.Run
 import integration.core.address
 import integration.core.department
 import integration.core.person
+import org.junit.jupiter.api.TestInfo
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.OptimisticLockException
 import org.komapper.core.UniqueConstraintException
@@ -24,7 +25,7 @@ class R2dbcUpdateBatchTest(private val db: R2dbcDatabase) {
 
     @Run(onlyIf = [Dbms.ORACLE, Dbms.SQLSERVER])
     @Test
-    fun test() = inTransaction(db) {
+    fun test(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val addressList = listOf(
             Address(16, "STREET 16", 0),
@@ -49,7 +50,7 @@ class R2dbcUpdateBatchTest(private val db: R2dbcDatabase) {
 
     @Run(unless = [Dbms.ORACLE, Dbms.SQLSERVER])
     @Test
-    fun test_unsupportedOperationException() = inTransaction(db) {
+    fun test_unsupportedOperationException(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val addressList = listOf(
             Address(16, "STREET 16", 0),
@@ -72,7 +73,7 @@ class R2dbcUpdateBatchTest(private val db: R2dbcDatabase) {
 
     @Run(onlyIf = [Dbms.ORACLE, Dbms.SQLSERVER])
     @Test
-    fun updatedAt() = inTransaction(db) {
+    fun updatedAt(info: TestInfo) = inTransaction(db, info) {
         val p = Meta.person
         val personList = listOf(
             Person(1, "A"),
@@ -89,7 +90,7 @@ class R2dbcUpdateBatchTest(private val db: R2dbcDatabase) {
 
     @Run(onlyIf = [Dbms.ORACLE, Dbms.SQLSERVER])
     @Test
-    fun uniqueConstraintException() = inTransaction(db) {
+    fun uniqueConstraintException(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         assertFailsWith<UniqueConstraintException> {
             db.runQuery {
@@ -106,7 +107,7 @@ class R2dbcUpdateBatchTest(private val db: R2dbcDatabase) {
 
     @Run(onlyIf = [Dbms.ORACLE, Dbms.SQLSERVER])
     @Test
-    fun optimisticLockException() = inTransaction(db) {
+    fun optimisticLockException(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val ex = assertFailsWith<OptimisticLockException> {
             db.runQuery {
@@ -124,7 +125,7 @@ class R2dbcUpdateBatchTest(private val db: R2dbcDatabase) {
 
     @Run(onlyIf = [Dbms.ORACLE, Dbms.SQLSERVER])
     @Test
-    fun include() = inTransaction(db) {
+    fun include(info: TestInfo) = inTransaction(db, info) {
         val d = Meta.department
         val selectQuery = QueryDsl.from(d).where { d.departmentId inList listOf(1, 2) }
         val before = db.runQuery { selectQuery }
@@ -147,7 +148,7 @@ class R2dbcUpdateBatchTest(private val db: R2dbcDatabase) {
 
     @Run(onlyIf = [Dbms.ORACLE, Dbms.SQLSERVER])
     @Test
-    fun exclude() = inTransaction(db) {
+    fun exclude(info: TestInfo) = inTransaction(db, info) {
         val d = Meta.department
         val selectQuery = QueryDsl.from(d).where { d.departmentId inList listOf(1, 2) }
         val before = db.runQuery { selectQuery }

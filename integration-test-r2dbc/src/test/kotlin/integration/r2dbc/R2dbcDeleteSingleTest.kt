@@ -1,6 +1,7 @@
 package integration.r2dbc
 
 import integration.core.address
+import org.junit.jupiter.api.TestInfo
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.OptimisticLockException
 import org.komapper.core.dsl.Meta
@@ -15,7 +16,7 @@ import kotlin.test.assertNull
 class R2dbcDeleteSingleTest(private val db: R2dbcDatabase) {
 
     @Test
-    fun optimisticLockException() = inTransaction(db) {
+    fun optimisticLockException(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val address = db.runQuery {
             QueryDsl.from(a).where {
@@ -29,7 +30,7 @@ class R2dbcDeleteSingleTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun testEntity() = inTransaction(db) {
+    fun testEntity(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val query = QueryDsl.from(a).where { a.addressId eq 15 }
         val address = db.runQuery { query.first() }

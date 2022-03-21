@@ -5,6 +5,7 @@ import integration.core.Dbms
 import integration.core.Run
 import integration.core.address
 import integration.core.employee
+import org.junit.jupiter.api.TestInfo
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
@@ -21,7 +22,7 @@ import kotlin.test.assertTrue
 class R2dbcSelectWhereTest(private val db: R2dbcDatabase) {
 
     @Test
-    fun isNull() = inTransaction(db) {
+    fun isNull(info: TestInfo) = inTransaction(db, info) {
         val e = Meta.employee
         val list = db.runQuery {
             QueryDsl.from(e).where {
@@ -32,7 +33,7 @@ class R2dbcSelectWhereTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun isNotNull() = inTransaction(db) {
+    fun isNotNull(info: TestInfo) = inTransaction(db, info) {
         val e = Meta.employee
         val list = db.runQuery {
             QueryDsl.from(e).where {
@@ -43,7 +44,7 @@ class R2dbcSelectWhereTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun between() = inTransaction(db) {
+    fun between(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val idList = db.runQuery {
             QueryDsl.from(a).where {
@@ -54,7 +55,7 @@ class R2dbcSelectWhereTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun notBetween() = inTransaction(db) {
+    fun notBetween(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val idList = db.runQuery {
             QueryDsl.from(a).where {
@@ -66,7 +67,7 @@ class R2dbcSelectWhereTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun like() = inTransaction(db) {
+    fun like(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val list = db.runQuery {
             QueryDsl.from(a).where {
@@ -77,7 +78,7 @@ class R2dbcSelectWhereTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun like_asPrefix() = inTransaction(db) {
+    fun like_asPrefix(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val list = db.runQuery {
             QueryDsl.from(a).where {
@@ -88,7 +89,7 @@ class R2dbcSelectWhereTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun like_asInfix() = inTransaction(db) {
+    fun like_asInfix(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val list = db.runQuery {
             QueryDsl.from(a).where {
@@ -99,7 +100,7 @@ class R2dbcSelectWhereTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun like_asSuffix() = inTransaction(db) {
+    fun like_asSuffix(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val list = db.runQuery {
             QueryDsl.from(a).where {
@@ -110,7 +111,7 @@ class R2dbcSelectWhereTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun like_escape() = inTransaction(db) {
+    fun like_escape(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val insertQuery = QueryDsl.insert(a).single(Address(16, "\\STREET _16%", 1))
         val selectQuery = QueryDsl.from(a).where {
@@ -123,7 +124,7 @@ class R2dbcSelectWhereTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun like_escapeWithEscapeSequence() = inTransaction(db) {
+    fun like_escapeWithEscapeSequence(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val insertQuery = QueryDsl.insert(a).single(Address(16, "\\STREET _16%", 1))
         val selectQuery = QueryDsl.from(a).where {
@@ -138,7 +139,7 @@ class R2dbcSelectWhereTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun notLike() = inTransaction(db) {
+    fun notLike(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val list = db.runQuery {
             QueryDsl.from(a).where {
@@ -149,7 +150,7 @@ class R2dbcSelectWhereTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun notLike_asPrefix() = inTransaction(db) {
+    fun notLike_asPrefix(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val list = db.runQuery {
             QueryDsl.from(a).where {
@@ -160,7 +161,7 @@ class R2dbcSelectWhereTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun notLike_asInfix() = inTransaction(db) {
+    fun notLike_asInfix(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val list = db.runQuery {
             QueryDsl.from(a).where {
@@ -171,7 +172,7 @@ class R2dbcSelectWhereTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun notLike_asSuffix() = inTransaction(db) {
+    fun notLike_asSuffix(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val list = db.runQuery {
             QueryDsl.from(a).where {
@@ -182,7 +183,7 @@ class R2dbcSelectWhereTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun notLike_escape() = inTransaction(db) {
+    fun notLike_escape(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val insertQuery = QueryDsl.insert(a).single(Address(16, "\\STREET _16%", 1))
         val selectQuery = QueryDsl.from(a).where {
@@ -195,7 +196,7 @@ class R2dbcSelectWhereTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun startsWith() = inTransaction(db) {
+    fun startsWith(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val list = db.runQuery {
             QueryDsl.from(a).where {
@@ -206,7 +207,7 @@ class R2dbcSelectWhereTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun startsWith_escape() = inTransaction(db) {
+    fun startsWith_escape(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val insertQuery = QueryDsl.insert(a).single(Address(16, "STREET 1%6", 1))
         val selectQuery = QueryDsl.from(a).where {
@@ -217,7 +218,7 @@ class R2dbcSelectWhereTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun notStartsWith() = inTransaction(db) {
+    fun notStartsWith(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val list = db.runQuery {
             QueryDsl.from(a).where {
@@ -228,7 +229,7 @@ class R2dbcSelectWhereTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun contains() = inTransaction(db) {
+    fun contains(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val list = db.runQuery {
             QueryDsl.from(a).where {
@@ -239,7 +240,7 @@ class R2dbcSelectWhereTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun notContains() = inTransaction(db) {
+    fun notContains(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val list = db.runQuery {
             QueryDsl.from(a).where {
@@ -250,7 +251,7 @@ class R2dbcSelectWhereTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun endsWith() = inTransaction(db) {
+    fun endsWith(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val list = db.runQuery {
             QueryDsl.from(a).where {
@@ -261,7 +262,7 @@ class R2dbcSelectWhereTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun notEndsWith() = inTransaction(db) {
+    fun notEndsWith(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val list = db.runQuery {
             QueryDsl.from(a).where {
@@ -272,7 +273,7 @@ class R2dbcSelectWhereTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun inList() = inTransaction(db) {
+    fun inList(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val list = db.runQuery {
             QueryDsl.from(a).where {
@@ -289,7 +290,7 @@ class R2dbcSelectWhereTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun notInList() = inTransaction(db) {
+    fun notInList(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val list = db.runQuery {
             QueryDsl.from(a).where {
@@ -300,7 +301,7 @@ class R2dbcSelectWhereTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun inList_empty() = inTransaction(db) {
+    fun inList_empty(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val list = db.runQuery {
             QueryDsl.from(a).where {
@@ -311,7 +312,7 @@ class R2dbcSelectWhereTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun inList_SubQuery() = inTransaction(db) {
+    fun inList_SubQuery(info: TestInfo) = inTransaction(db, info) {
         val e = Meta.employee
         val a = Meta.address
         val query =
@@ -329,7 +330,7 @@ class R2dbcSelectWhereTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun notInList_SubQuery() = inTransaction(db) {
+    fun notInList_SubQuery(info: TestInfo) = inTransaction(db, info) {
         val e = Meta.employee
         val a = Meta.address
         val query =
@@ -346,7 +347,7 @@ class R2dbcSelectWhereTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun inList2() = inTransaction(db) {
+    fun inList2(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val list = db.runQuery {
             QueryDsl.from(a).where {
@@ -363,7 +364,7 @@ class R2dbcSelectWhereTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun notInList2() = inTransaction(db) {
+    fun notInList2(info: TestInfo) = inTransaction(db, info) {
         val seq = sequence {
             var i = 0
             while (++i < 10) yield(i to 1)
@@ -379,7 +380,7 @@ class R2dbcSelectWhereTest(private val db: R2dbcDatabase) {
 
     @Run(unless = [Dbms.SQLSERVER])
     @Test
-    fun inList2_SubQuery() = inTransaction(db) {
+    fun inList2_SubQuery(info: TestInfo) = inTransaction(db, info) {
         val e = Meta.employee
         val a = Meta.address
         val query =
@@ -398,7 +399,7 @@ class R2dbcSelectWhereTest(private val db: R2dbcDatabase) {
 
     @Run(unless = [Dbms.SQLSERVER])
     @Test
-    fun notInList_SubQuery2() = inTransaction(db) {
+    fun notInList_SubQuery2(info: TestInfo) = inTransaction(db, info) {
         val e = Meta.employee
         val a = Meta.address
         val query =
@@ -415,7 +416,7 @@ class R2dbcSelectWhereTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun exists() = inTransaction(db) {
+    fun exists(info: TestInfo) = inTransaction(db, info) {
         val e = Meta.employee
         val a = Meta.address
         val query =
@@ -432,7 +433,7 @@ class R2dbcSelectWhereTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun notExists() = inTransaction(db) {
+    fun notExists(info: TestInfo) = inTransaction(db, info) {
         val e = Meta.employee
         val a = Meta.address
         val query =
@@ -449,7 +450,7 @@ class R2dbcSelectWhereTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun not() = inTransaction(db) {
+    fun not(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val idList = db.runQuery {
             QueryDsl.from(a).where {
@@ -463,7 +464,7 @@ class R2dbcSelectWhereTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun and() = inTransaction(db) {
+    fun and(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val list = db.runQuery {
             QueryDsl.from(a).where {
@@ -485,7 +486,7 @@ class R2dbcSelectWhereTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun or() = inTransaction(db) {
+    fun or(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val list = db.runQuery {
             QueryDsl.from(a).where {
@@ -507,7 +508,7 @@ class R2dbcSelectWhereTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun composition() = inTransaction(db) {
+    fun composition(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val w1: WhereDeclaration = {
             a.addressId eq 1

@@ -5,6 +5,7 @@ import integration.core.department
 import integration.core.employee
 import integration.core.manager
 import integration.core.person
+import org.junit.jupiter.api.TestInfo
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
@@ -19,7 +20,7 @@ import kotlin.test.assertTrue
 class R2dbcSelectJoinTest(private val db: R2dbcDatabase) {
 
     @Test
-    fun innerJoin() = inTransaction(db) {
+    fun innerJoin(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val e = Meta.employee
         val list = db.runQuery {
@@ -31,7 +32,7 @@ class R2dbcSelectJoinTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun leftJoin() = inTransaction(db) {
+    fun leftJoin(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val e = Meta.employee
         val list = db.runQuery {
@@ -43,7 +44,7 @@ class R2dbcSelectJoinTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun innerJoin_multiConditions() = inTransaction(db) {
+    fun innerJoin_multiConditions(info: TestInfo) = inTransaction(db, info) {
         val employee = Meta.employee
         val manager = Meta.manager
         val list = db.runQuery {
@@ -57,7 +58,7 @@ class R2dbcSelectJoinTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun include_no_association() = inTransaction(db) {
+    fun include_no_association(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val e = Meta.employee
         val d = Meta.department
@@ -83,7 +84,7 @@ class R2dbcSelectJoinTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun include_one_association() = inTransaction(db) {
+    fun include_one_association(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val e = Meta.employee
         val d = Meta.department
@@ -109,7 +110,7 @@ class R2dbcSelectJoinTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun include_two_associations() = inTransaction(db) {
+    fun include_two_associations(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val e = Meta.employee
         val d = Meta.department
@@ -135,7 +136,7 @@ class R2dbcSelectJoinTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun includeAll() = inTransaction(db) {
+    fun includeAll(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val e = Meta.employee
         val d = Meta.department
@@ -161,7 +162,7 @@ class R2dbcSelectJoinTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun oneToMany() = inTransaction(db) {
+    fun oneToMany(info: TestInfo) = inTransaction(db, info) {
         val d = Meta.department
         val e = Meta.employee
         val store = db.runQuery {
@@ -181,7 +182,7 @@ class R2dbcSelectJoinTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun oneToManyById() = inTransaction(db) {
+    fun oneToManyById(info: TestInfo) = inTransaction(db, info) {
         val d = Meta.department
         val e = Meta.employee
         val store = db.runQuery {
@@ -204,7 +205,7 @@ class R2dbcSelectJoinTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun oneToOne() = inTransaction(db) {
+    fun oneToOne(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val e = Meta.employee
         val store = db.runQuery {
@@ -224,7 +225,7 @@ class R2dbcSelectJoinTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun oneToOneById() = inTransaction(db) {
+    fun oneToOneById(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val e = Meta.employee
         val store = db.runQuery {
@@ -244,7 +245,7 @@ class R2dbcSelectJoinTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun oneToMany_selfJoin() = inTransaction(db) {
+    fun oneToMany_selfJoin(info: TestInfo) = inTransaction(db, info) {
         val e = Meta.employee
         val m = Meta.manager
         val store = db.runQuery {
@@ -263,7 +264,7 @@ class R2dbcSelectJoinTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun get() = inTransaction(db) {
+    fun get(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val e = Meta.employee
         val d = Meta.department

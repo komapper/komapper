@@ -6,6 +6,7 @@ import integration.core.address
 import integration.core.department
 import integration.core.noVersionDepartment
 import integration.core.person
+import org.junit.jupiter.api.TestInfo
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.ClockProvider
 import org.komapper.core.OptimisticLockException
@@ -32,7 +33,7 @@ import kotlin.test.assertTrue
 class R2dbcUpdateSingleTest(private val db: R2dbcDatabase) {
 
     @Test
-    fun test() = inTransaction(db) {
+    fun test(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val query = QueryDsl.from(a).where { a.addressId eq 15 }
         val address = db.runQuery { query.first() }
@@ -50,7 +51,7 @@ class R2dbcUpdateSingleTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun updatedAt() = inTransaction(db) {
+    fun updatedAt(info: TestInfo) = inTransaction(db, info) {
         val p = Meta.person
         val findQuery = QueryDsl.from(p).where { p.personId eq 1 }.first()
         val person1 = Person(1, "ABC")
@@ -65,7 +66,7 @@ class R2dbcUpdateSingleTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun updatedAt_customize() = inTransaction(db) {
+    fun updatedAt_customize(info: TestInfo) = inTransaction(db, info) {
         val instant = Instant.parse("2021-01-01T00:00:00Z")
         val zoneId = ZoneId.of("UTC")
 
@@ -93,7 +94,7 @@ class R2dbcUpdateSingleTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun uniqueConstraintException() = inTransaction(db) {
+    fun uniqueConstraintException(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val address = Address(1, "STREET 2", 1)
         assertFailsWith<UniqueConstraintException> {
@@ -102,7 +103,7 @@ class R2dbcUpdateSingleTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun optimisticLockException() = inTransaction(db) {
+    fun optimisticLockException(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val address = db.runQuery { QueryDsl.from(a).where { a.addressId eq 15 }.first() }
         db.runQuery { QueryDsl.update(a).single(address) }
@@ -112,7 +113,7 @@ class R2dbcUpdateSingleTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun include() = inTransaction(db) {
+    fun include(info: TestInfo) = inTransaction(db, info) {
         val d = Meta.department
         val findQuery = QueryDsl.from(d).where { d.departmentId eq 1 }.first()
         val department = db.runQuery { findQuery }
@@ -125,7 +126,7 @@ class R2dbcUpdateSingleTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun include_emptyTargetProperties() = inTransaction(db) {
+    fun include_emptyTargetProperties(info: TestInfo) = inTransaction(db, info) {
         val d = Meta.noVersionDepartment
         val findQuery = QueryDsl.from(d).where { d.departmentId eq 1 }.first()
         val department = db.runQuery { findQuery }
@@ -136,7 +137,7 @@ class R2dbcUpdateSingleTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun exclude() = inTransaction(db) {
+    fun exclude(info: TestInfo) = inTransaction(db, info) {
         val d = Meta.department
         val findQuery = QueryDsl.from(d).where { d.departmentId eq 1 }.first()
         val department = db.runQuery { findQuery }
@@ -149,7 +150,7 @@ class R2dbcUpdateSingleTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun exclude_emptyTargetProperties() = inTransaction(db) {
+    fun exclude_emptyTargetProperties(info: TestInfo) = inTransaction(db, info) {
         val d = Meta.noVersionDepartment
         val findQuery = QueryDsl.from(d).where { d.departmentId eq 1 }.first()
         val department = db.runQuery { findQuery }

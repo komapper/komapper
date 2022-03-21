@@ -10,6 +10,7 @@ import integration.core.address
 import integration.core.department
 import integration.core.identityStrategy
 import integration.core.person
+import org.junit.jupiter.api.TestInfo
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.UniqueConstraintException
 import org.komapper.core.dsl.Meta
@@ -26,7 +27,7 @@ class R2dbcInsertBatchTest(private val db: R2dbcDatabase) {
 
     @Run(onlyIf = [Dbms.ORACLE, Dbms.SQLSERVER])
     @Test
-    fun test() = inTransaction(db) {
+    fun test(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val addressList = listOf(
             Address(16, "STREET 16", 0),
@@ -41,7 +42,7 @@ class R2dbcInsertBatchTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun identity_unsupportedOperationException() = inTransaction(db) {
+    fun identity_unsupportedOperationException(info: TestInfo) = inTransaction(db, info) {
         val i = Meta.identityStrategy
         val strategies = listOf(
             IdentityStrategy(null, "AAA"),
@@ -57,7 +58,7 @@ class R2dbcInsertBatchTest(private val db: R2dbcDatabase) {
 
     @Run(onlyIf = [Dbms.ORACLE, Dbms.SQLSERVER])
     @Test
-    fun createdAt_updatedAt() = inTransaction(db) {
+    fun createdAt_updatedAt(info: TestInfo) = inTransaction(db, info) {
         val p = Meta.person
         val personList = listOf(
             Person(1, "A"),
@@ -74,7 +75,7 @@ class R2dbcInsertBatchTest(private val db: R2dbcDatabase) {
 
     @Run(onlyIf = [Dbms.ORACLE, Dbms.SQLSERVER])
     @Test
-    fun uniqueConstraintException() = inTransaction(db) {
+    fun uniqueConstraintException(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         assertFailsWith<UniqueConstraintException> {
             db.runQuery {
@@ -93,7 +94,7 @@ class R2dbcInsertBatchTest(private val db: R2dbcDatabase) {
 
     @Run(onlyIf = [Dbms.ORACLE, Dbms.SQLSERVER])
     @Test
-    fun onDuplicateKeyUpdate() = inTransaction(db) {
+    fun onDuplicateKeyUpdate(info: TestInfo) = inTransaction(db, info) {
         val d = Meta.department
         val department1 = Department(5, 50, "PLANNING", "TOKYO", 1)
         val department2 = Department(1, 60, "DEVELOPMENT", "KYOTO", 1)
@@ -116,7 +117,7 @@ class R2dbcInsertBatchTest(private val db: R2dbcDatabase) {
 
     @Run(onlyIf = [Dbms.ORACLE, Dbms.SQLSERVER])
     @Test
-    fun onDuplicateKeyUpdateWithKeys() = inTransaction(db) {
+    fun onDuplicateKeyUpdateWithKeys(info: TestInfo) = inTransaction(db, info) {
         val d = Meta.department
         val department1 = Department(5, 50, "PLANNING", "TOKYO", 1)
         val department2 = Department(10, 10, "DEVELOPMENT", "KYOTO", 1)
@@ -139,7 +140,7 @@ class R2dbcInsertBatchTest(private val db: R2dbcDatabase) {
 
     @Run(onlyIf = [Dbms.ORACLE, Dbms.SQLSERVER])
     @Test
-    fun onDuplicateKeyUpdate_set() = inTransaction(db) {
+    fun onDuplicateKeyUpdate_set(info: TestInfo) = inTransaction(db, info) {
         val d = Meta.department
         val department1 = Department(5, 50, "PLANNING", "TOKYO", 1)
         val department2 = Department(1, 60, "DEVELOPMENT", "KYOTO", 1)
@@ -164,7 +165,7 @@ class R2dbcInsertBatchTest(private val db: R2dbcDatabase) {
 
     @Run(onlyIf = [Dbms.ORACLE, Dbms.SQLSERVER])
     @Test
-    fun onDuplicateKeyUpdateWithKeys_set() = inTransaction(db) {
+    fun onDuplicateKeyUpdateWithKeys_set(info: TestInfo) = inTransaction(db, info) {
         val d = Meta.department
         val department1 = Department(5, 50, "PLANNING", "TOKYO", 1)
         val department2 = Department(10, 10, "DEVELOPMENT", "KYOTO", 1)
@@ -189,7 +190,7 @@ class R2dbcInsertBatchTest(private val db: R2dbcDatabase) {
 
     @Run(onlyIf = [Dbms.ORACLE, Dbms.SQLSERVER])
     @Test
-    fun onDuplicateKeyIgnore() = inTransaction(db) {
+    fun onDuplicateKeyIgnore(info: TestInfo) = inTransaction(db, info) {
         val d = Meta.department
         val department1 = Department(5, 50, "PLANNING", "TOKYO", 1)
         val department2 = Department(1, 60, "DEVELOPMENT", "KYOTO", 1)
@@ -211,7 +212,7 @@ class R2dbcInsertBatchTest(private val db: R2dbcDatabase) {
 
     @Run(onlyIf = [Dbms.ORACLE, Dbms.SQLSERVER])
     @Test
-    fun onDuplicateKeyIgnoreWithKeys() = inTransaction(db) {
+    fun onDuplicateKeyIgnoreWithKeys(info: TestInfo) = inTransaction(db, info) {
         val d = Meta.department
         val department1 = Department(5, 50, "PLANNING", "TOKYO", 1)
         val department2 = Department(10, 10, "DEVELOPMENT", "KYOTO", 1)
@@ -233,7 +234,7 @@ class R2dbcInsertBatchTest(private val db: R2dbcDatabase) {
 
     @Run(unless = [Dbms.ORACLE, Dbms.SQLSERVER])
     @Test
-    fun identity_onDuplicateKeyUpdate_unsupportedOperationException() = inTransaction(db) {
+    fun identity_onDuplicateKeyUpdate_unsupportedOperationException(info: TestInfo) = inTransaction(db, info) {
         val i = Meta.identityStrategy
         val strategies = listOf(
             IdentityStrategy(null, "AAA"),

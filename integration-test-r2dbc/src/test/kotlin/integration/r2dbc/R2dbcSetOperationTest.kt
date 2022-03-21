@@ -5,6 +5,7 @@ import integration.core.Run
 import integration.core.address
 import integration.core.department
 import integration.core.employee
+import org.junit.jupiter.api.TestInfo
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
@@ -20,7 +21,7 @@ class R2dbcSetOperationTest(private val db: R2dbcDatabase) {
 
     @Run(unless = [Dbms.MYSQL])
     @Test
-    fun except_entity() = inTransaction(db) {
+    fun except_entity(info: TestInfo) = inTransaction(db, info) {
         val e = Meta.employee
         val q1 = QueryDsl.from(e).where { e.employeeId inList listOf(1, 2, 3, 4, 5) }
         val q2 = QueryDsl.from(e).where { e.employeeId inList listOf(2, 4, 6, 8) }
@@ -37,7 +38,7 @@ class R2dbcSetOperationTest(private val db: R2dbcDatabase) {
 
     @Run(unless = [Dbms.MYSQL])
     @Test
-    fun intersect_entity() = inTransaction(db) {
+    fun intersect_entity(info: TestInfo) = inTransaction(db, info) {
         val e = Meta.employee
         val q1 = QueryDsl.from(e).where { e.employeeId inList listOf(1, 2, 3, 4, 5) }
         val q2 = QueryDsl.from(e).where { e.employeeId inList listOf(2, 4, 6, 8) }
@@ -51,7 +52,7 @@ class R2dbcSetOperationTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun union_entity() = inTransaction(db) {
+    fun union_entity(info: TestInfo) = inTransaction(db, info) {
         val e = Meta.employee
         val q1 = QueryDsl.from(e).where { e.employeeId eq 1 }
         val q2 = QueryDsl.from(e).where { e.employeeId eq 1 }
@@ -66,7 +67,7 @@ class R2dbcSetOperationTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun union_subquery() = inTransaction(db) {
+    fun union_subquery(info: TestInfo) = inTransaction(db, info) {
         val e = Meta.employee
         val q1 = QueryDsl.from(e).where { e.employeeId eq 1 }.select(e.employeeId)
         val q2 = QueryDsl.from(e).where { e.employeeId eq 6 }.select(e.employeeId)
@@ -79,7 +80,7 @@ class R2dbcSetOperationTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun union_columns() = inTransaction(db) {
+    fun union_columns(info: TestInfo) = inTransaction(db, info) {
         val e = Meta.employee
         val a = Meta.address
         val d = Meta.department
@@ -99,7 +100,7 @@ class R2dbcSetOperationTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun unionAll_entity() = inTransaction(db) {
+    fun unionAll_entity(info: TestInfo) = inTransaction(db, info) {
         val e = Meta.employee
         val q1 = QueryDsl.from(e).where { e.employeeId eq 1 }
         val q2 = QueryDsl.from(e).where { e.employeeId eq 1 }
@@ -116,7 +117,7 @@ class R2dbcSetOperationTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun missingWhereClause_top_level_allowEmptyWhereClause_option_is_ignored() = inTransaction(db) {
+    fun missingWhereClause_top_level_allowEmptyWhereClause_option_is_ignored(info: TestInfo) = inTransaction(db, info) {
         val e = Meta.employee
         val q1 = QueryDsl.from(e).where { e.employeeId eq 1 }
         val q2 = QueryDsl.from(e)
@@ -125,7 +126,7 @@ class R2dbcSetOperationTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun missingWhereClause() = inTransaction(db) {
+    fun missingWhereClause(info: TestInfo) = inTransaction(db, info) {
         val e = Meta.employee
         val q1 = QueryDsl.from(e).where { e.employeeId eq 1 }
         val q2 = QueryDsl.from(e).options { it.copy(allowMissingWhereClause = false) }
