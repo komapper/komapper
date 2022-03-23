@@ -13,7 +13,7 @@ import org.komapper.core.TemplateStatementBuilder
 import org.komapper.core.TemplateStatementBuilders
 import org.komapper.jdbc.DefaultJdbcDataFactory
 import org.komapper.jdbc.JdbcDataFactory
-import org.komapper.jdbc.JdbcDataType
+import org.komapper.jdbc.JdbcDataTypeProvider
 import org.komapper.jdbc.JdbcDatabase
 import org.komapper.jdbc.JdbcDatabaseConfig
 import org.komapper.jdbc.JdbcDialect
@@ -30,6 +30,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.env.Environment
 import org.springframework.transaction.PlatformTransactionManager
+import java.util.Optional
 import java.util.UUID
 import javax.sql.DataSource
 
@@ -45,13 +46,13 @@ open class JdbcKomapperAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    open fun jdbcDialect(environment: Environment, dataTypes: List<JdbcDataType<*>>?): JdbcDialect {
+    open fun dialect(environment: Environment, dataTypeProvider: Optional<JdbcDataTypeProvider>): JdbcDialect {
         val url = environment.getProperty(DATASOURCE_URL_PROPERTY)
             ?: error(
                 "$DATASOURCE_URL_PROPERTY is not found. " +
-                    "Specify it to the application.properties file or define the Dialect bean manually."
+                    "Specify it to the application.properties file or define the JdbcDialect bean manually."
             )
-        return JdbcDialects.getByUrl(url, dataTypes ?: emptyList())
+        return JdbcDialects.getByUrl(url, dataTypeProvider.orElse(null))
     }
 
     @Bean

@@ -11,10 +11,12 @@ import java.sql.NClob
 import java.sql.PreparedStatement
 import java.sql.ResultSet
 import java.sql.SQLXML
+import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.OffsetDateTime
+import java.time.ZoneOffset
 import kotlin.reflect.KClass
 
 /**
@@ -288,6 +290,28 @@ class JdbcFloatType(override val name: String) : JdbcAbstractType<Float>(Float::
 
     override fun doSetValue(ps: PreparedStatement, index: Int, value: Float) {
         ps.setFloat(index, value)
+    }
+}
+
+class JdbcInstantType(override val name: String) : JdbcAbstractType<Instant>(Instant::class, JDBCType.TIMESTAMP) {
+
+    override fun doGetValue(rs: ResultSet, index: Int): Instant {
+        val datetime = rs.getObject(index, LocalDateTime::class.java)
+        return toInstant(datetime)
+    }
+
+    override fun doGetValue(rs: ResultSet, columnLabel: String): Instant {
+        val dateTime = rs.getObject(columnLabel, LocalDateTime::class.java)
+        return toInstant(dateTime)
+    }
+
+    override fun doSetValue(ps: PreparedStatement, index: Int, value: Instant) {
+        val datetime = LocalDateTime.ofInstant(value, ZoneOffset.UTC)
+        ps.setObject(index, datetime)
+    }
+
+    private fun toInstant(dateTime: LocalDateTime): Instant {
+        return dateTime.toInstant(ZoneOffset.UTC)
     }
 }
 

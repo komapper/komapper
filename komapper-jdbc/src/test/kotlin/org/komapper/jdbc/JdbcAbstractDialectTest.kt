@@ -11,7 +11,7 @@ import kotlin.test.assertEquals
 
 internal class JdbcAbstractDialectTest {
 
-    class MyJdbcDialect : JdbcAbstractDialect() {
+    class MyJdbcDialect : JdbcAbstractDialect(JdbcEmptyDataTypeProvider) {
 
         override val driver: String
             get() = throw UnsupportedOperationException()

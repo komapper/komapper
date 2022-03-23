@@ -10,6 +10,7 @@ import org.komapper.annotation.KomapperTable
 import org.komapper.annotation.KomapperUpdatedAt
 import org.komapper.annotation.KomapperVersion
 import java.math.BigDecimal
+import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.OffsetDateTime
@@ -42,6 +43,15 @@ data class IdentityStrategy(
 data class SequenceStrategy(
     @KomapperId @KomapperSequence(name = "sequence_strategy_id", incrementBy = 100) val id: Int,
     @KomapperColumn(alwaysQuote = true)val value: String
+)
+
+@KomapperEntity
+@KomapperTable("person")
+data class Man(
+    @KomapperId @KomapperColumn("person_id") val personId: Int,
+    val name: String,
+    @KomapperCreatedAt @KomapperColumn("created_at") val createdAt: Instant? = null,
+    @KomapperUpdatedAt @KomapperColumn("updated_at") val updatedAt: Instant? = null
 )
 
 @KomapperEntity

@@ -13,6 +13,7 @@ import integration.core.Direction
 import integration.core.DoubleTest
 import integration.core.EnumTest
 import integration.core.FloatTest
+import integration.core.InstantTest
 import integration.core.IntTest
 import integration.core.LocalDateTest
 import integration.core.LocalDateTimeTest
@@ -42,6 +43,7 @@ import integration.core.byteTest
 import integration.core.doubleTest
 import integration.core.enumTest
 import integration.core.floatTest
+import integration.core.instantTest
 import integration.core.intTest
 import integration.core.localDateTest
 import integration.core.localDateTimeTest
@@ -239,6 +241,19 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
     fun float() {
         val m = Meta.floatTest
         val data = FloatTest(1, 10.0f)
+        db.runQuery { QueryDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        assertEquals(data, data2)
+    }
+
+    @Test
+    fun instant() {
+        val m = Meta.instantTest
+        val dateTime = LocalDateTime.of(2019, 6, 1, 12, 11, 10)
+        val value = dateTime.toInstant(ZoneOffset.UTC)
+        val data = InstantTest(1, value)
         db.runQuery { QueryDsl.insert(m).single(data) }
         val data2 = db.runQuery {
             QueryDsl.from(m).where { m.id eq 1 }.first()

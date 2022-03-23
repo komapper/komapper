@@ -10,12 +10,8 @@ import kotlin.reflect.KClass
  * Represents a dialect for JDBC access.
  */
 interface JdbcDialect : Dialect {
-    /**
-     * Data types.
-     */
-    val dataTypes: List<JdbcDataType<*>>
 
-    /**
+/**
      * Returns the value.
      *
      * @param rs the result set
@@ -89,12 +85,8 @@ interface JdbcDialect : Dialect {
     fun supportsReturnGeneratedKeysFlag(): Boolean = true
 }
 
-abstract class JdbcAbstractDialect protected constructor(internalDataTypes: List<JdbcDataType<*>> = emptyList()) :
+abstract class JdbcAbstractDialect protected constructor(val dataTypeProvider: JdbcDataTypeProvider) :
     JdbcDialect {
-
-    @Suppress("MemberVisibilityCanBePrivate")
-    protected val dataTypeMap: Map<KClass<*>, JdbcDataType<*>> = internalDataTypes.associateBy { it.klass }
-    override val dataTypes = internalDataTypes
 
     override fun <T : Any> getValue(rs: ResultSet, index: Int, valueClass: KClass<out T>): T? {
         val dataType = getDataType(valueClass)
@@ -126,10 +118,8 @@ abstract class JdbcAbstractDialect protected constructor(internalDataTypes: List
     }
 
     override fun <T : Any> getDataType(klass: KClass<out T>): JdbcDataType<T> {
-        val dataType = dataTypeMap[klass] ?: error(
+        return dataTypeProvider.get(klass) ?: error(
             "The dataType is not found for the type \"${klass.qualifiedName}\"."
         )
-        @Suppress("UNCHECKED_CAST")
-        return dataType as JdbcDataType<T>
     }
 }

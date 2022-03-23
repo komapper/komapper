@@ -34,6 +34,7 @@ include("komapper-annotation")
 include("komapper-processor")
 
 // JDBC
+include("komapper-datetime-jdbc")
 include("komapper-jdbc")
 include("komapper-quarkus-jdbc")
 include("komapper-quarkus-jdbc-deployment")

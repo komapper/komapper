@@ -10,17 +10,14 @@ import org.komapper.core.dsl.metamodel.EntityMetamodel
 
 interface OracleDialect : Dialect {
 
-    companion object {
-        const val DRIVER = "oracle"
-
+    companion object : Dialect.Identifier {
+        private const val DRIVER = "oracle"
         /** the error code that represents unique violation  */
         const val UNIQUE_CONSTRAINT_VIOLATION_ERROR_CODE = 1
-
         const val TABLE_NOT_EXISTS_ERROR_CODE = 942
-
         const val NAME_ALREADY_USED_ERROR_CODE = 955
-
         const val SEQUENCE_NOT_EXISTS_ERROR_CODE = 2289
+        override val driver: String = DRIVER
     }
 
     override val driver: String get() = DRIVER

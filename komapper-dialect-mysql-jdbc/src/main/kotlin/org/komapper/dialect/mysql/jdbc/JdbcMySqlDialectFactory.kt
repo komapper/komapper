@@ -1,7 +1,7 @@
 package org.komapper.dialect.mysql.jdbc
 
 import org.komapper.dialect.mysql.MySqlDialect
-import org.komapper.jdbc.JdbcDataType
+import org.komapper.jdbc.JdbcDataTypeProvider
 import org.komapper.jdbc.JdbcDialect
 import org.komapper.jdbc.spi.JdbcDialectFactory
 
@@ -10,7 +10,7 @@ class JdbcMySqlDialectFactory : JdbcDialectFactory {
         return driver == MySqlDialect.DRIVER
     }
 
-    override fun create(dataTypes: List<JdbcDataType<*>>): JdbcDialect {
-        return JdbcMySqlDialect(dataTypes)
+    override fun create(dataTypeProvider: JdbcDataTypeProvider): JdbcDialect {
+        return JdbcMySqlDialect(dataTypeProvider)
     }
 }

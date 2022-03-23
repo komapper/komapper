@@ -26,7 +26,11 @@ interface Dialect {
         const val MASK = "*****"
     }
 
-    /**
+    interface Identifier {
+        val driver: String
+    }
+
+/**
      * The name of the driver.
      */
     val driver: String

@@ -552,7 +552,7 @@ class EntityProcessorTest {
     }
 
     @Test
-    fun `The type of @KomapperCreatedAt annotated property must be either LocalDateTime or OffsetDateTime`() {
+    fun `The type of @KomapperCreatedAt annotated property must be either Instant, LocalDateTime or OffsetDateTime`() {
         val result = compile(
             kotlin(
                 "source.kt",
@@ -567,11 +567,11 @@ class EntityProcessorTest {
             )
         )
         assertEquals(result.exitCode, KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertTrue(result.messages.contains("The type of @KomapperCreatedAt annotated property must be either LocalDateTime or OffsetDateTime."))
+        assertTrue(result.messages.contains("The type of @KomapperCreatedAt annotated property must be either Instant, LocalDateTime or OffsetDateTime."))
     }
 
     @Test
-    fun `When the type of @KomapperCreatedAt annotated property is value class, the type of the value class's own property must be either LocalDateTime or OffsetDateTime`() {
+    fun `When the type of @KomapperCreatedAt annotated property is value class, the type of the value class's own property must be either Instant, LocalDateTime or OffsetDateTime`() {
         val result = compile(
             kotlin(
                 "source.kt",
@@ -593,13 +593,13 @@ class EntityProcessorTest {
         assertTrue(
             result.messages.contains(
                 "When the type of @KomapperCreatedAt annotated property is value class, " +
-                    "the type of the value class's own property must be either LocalDateTime or OffsetDateTime."
+                    "the type of the value class's own property must be either Instant, LocalDateTime or OffsetDateTime."
             )
         )
     }
 
     @Test
-    fun `The type of @KomapperUpdatedAt annotated property must be either LocalDateTime or OffsetDateTime`() {
+    fun `The type of @KomapperUpdatedAt annotated property must be either Instant, LocalDateTime or OffsetDateTime`() {
         val result = compile(
             kotlin(
                 "source.kt",
@@ -614,11 +614,11 @@ class EntityProcessorTest {
             )
         )
         assertEquals(result.exitCode, KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertTrue(result.messages.contains("The type of @KomapperUpdatedAt annotated property must be either LocalDateTime or OffsetDateTime."))
+        assertTrue(result.messages.contains("The type of @KomapperUpdatedAt annotated property must be either Instant, LocalDateTime or OffsetDateTime."))
     }
 
     @Test
-    fun `When the type of @KomapperUpdatedAt annotated property is value class, the type of the value class's own property must be either LocalDateTime or OffsetDateTime`() {
+    fun `When the type of @KomapperUpdatedAt annotated property is value class, the type of the value class's own property must be either Instant, LocalDateTime or OffsetDateTime`() {
         val result = compile(
             kotlin(
                 "source.kt",
@@ -640,7 +640,7 @@ class EntityProcessorTest {
         assertTrue(
             result.messages.contains(
                 "When the type of @KomapperUpdatedAt annotated property is value class, " +
-                    "the type of the value class's own property must be either LocalDateTime or OffsetDateTime."
+                    "the type of the value class's own property must be either Instant, LocalDateTime or OffsetDateTime."
             )
         )
     }

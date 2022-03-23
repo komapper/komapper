@@ -8,10 +8,11 @@ import org.komapper.core.dsl.metamodel.EntityMetamodel
 
 interface H2Dialect : Dialect {
 
-    companion object {
-        const val DRIVER = "h2"
+    companion object : Dialect.Identifier {
+        private const val DRIVER = "h2"
         /** the error code that represents unique violation  */
         const val UNIQUE_CONSTRAINT_VIOLATION_ERROR_CODE = 23505
+        override val driver: String = DRIVER
     }
 
     override val driver: String get() = DRIVER

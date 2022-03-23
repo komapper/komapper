@@ -4,7 +4,6 @@ import io.quarkus.agroal.DataSource;
 import io.quarkus.arc.Arc;
 import io.quarkus.runtime.annotations.Recorder;
 import java.lang.annotation.Annotation;
-import java.util.Collections;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Supplier;
@@ -42,7 +41,7 @@ public class KomapperRecorder {
       var loggerFacade = container.instance(LoggerFacade.class).get();
       var statementInspector = container.instance(StatementInspector.class).get();
       var id = UUID.randomUUID();
-      var dialect = JdbcDialects.INSTANCE.get(dataSourceDefinition.driver, Collections.emptyList());
+      var dialect = JdbcDialects.INSTANCE.get(dataSourceDefinition.driver, null);
       var templateStatementBuilder = TemplateStatementBuilders.INSTANCE.get(dialect);
       var session =
           new JtaTransactionSession(

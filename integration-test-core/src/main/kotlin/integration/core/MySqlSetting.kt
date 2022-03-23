@@ -31,6 +31,7 @@ interface MySqlSetting<DATABASE : Database> : Setting<DATABASE> {
         create table if not exists double_test(id integer not null primary key, value double);
         create table if not exists enum_test(id integer not null primary key, value varchar(20));
         create table if not exists float_test(id integer not null primary key, value float);
+        create table if not exists instant_test(id integer not null primary key, value timestamp);
         create table if not exists int_test(id integer not null primary key, value integer);
         create table if not exists local_date_time_test(id integer not null primary key, value timestamp);
         create table if not exists local_date_test(id integer not null primary key, value date);

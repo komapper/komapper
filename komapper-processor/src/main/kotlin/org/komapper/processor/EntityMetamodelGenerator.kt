@@ -11,6 +11,10 @@ import org.komapper.processor.Symbols.EntityMetamodelDeclaration
 import org.komapper.processor.Symbols.EntityMetamodelImplementor
 import org.komapper.processor.Symbols.IdContext
 import org.komapper.processor.Symbols.IdGenerator
+import org.komapper.processor.Symbols.Instant
+import org.komapper.processor.Symbols.KotlinInstant
+import org.komapper.processor.Symbols.KotlinLocalDateTime
+import org.komapper.processor.Symbols.LocalDateTime
 import org.komapper.processor.Symbols.Operand
 import org.komapper.processor.Symbols.PropertyDescriptor
 import org.komapper.processor.Symbols.PropertyMetamodel
@@ -18,6 +22,8 @@ import org.komapper.processor.Symbols.PropertyMetamodelImpl
 import org.komapper.processor.Symbols.Sequence
 import org.komapper.processor.Symbols.UUID
 import org.komapper.processor.Symbols.checkMetamodelVersion
+import org.komapper.processor.Symbols.toKotlinInstant
+import org.komapper.processor.Symbols.toKotlinLocalDateTime
 import java.io.PrintWriter
 import java.time.ZonedDateTime
 
@@ -53,6 +59,9 @@ internal class EntityMetamodelGenerator(
             w.println("package $packageName")
             w.println()
         }
+
+        importStatements()
+
         w.println("// generated at ${ZonedDateTime.now()}")
         w.println("@$EntityMetamodelImplementor($entityTypeName::class)")
         w.println("class $simpleName private constructor($constructorParamList) : $EntityMetamodel<$entityTypeName, $idTypeName, $simpleName> {")
@@ -100,6 +109,25 @@ internal class EntityMetamodelGenerator(
         w.println()
 
         utils()
+    }
+
+    private fun importStatements() {
+        fun usesType(property: Property, typeName: String): Boolean {
+            val propertyTypeName = when (val kotlinClass = property.kotlinClass) {
+                is ValueClass -> kotlinClass.property.typeName
+                else -> property.typeName
+            }
+            return propertyTypeName == typeName
+        }
+
+        val timestampProperties = listOf(entity.createdAtProperty, entity.updatedAtProperty)
+        val usesInstant = timestampProperties.filterNotNull().any { usesType(it, KotlinInstant) }
+        val usesLocalDateTime = timestampProperties.filterNotNull().any { usesType(it, KotlinLocalDateTime) }
+        if (usesInstant || usesLocalDateTime) {
+            if (usesInstant) w.println("import $toKotlinInstant")
+            if (usesLocalDateTime) w.println("import $toKotlinLocalDateTime")
+            w.println()
+        }
     }
 
     private fun entityDescriptor() {
@@ -293,28 +321,14 @@ internal class EntityMetamodelGenerator(
 
     private fun createdAtAssignment() {
         val body = entity.createdAtProperty?.let {
-            when (it.kotlinClass) {
-                is ValueClass -> {
-                    "$it to $Argument($it, ${it.typeName}(${it.kotlinClass.property.typeName}.now(c)))"
-                }
-                else -> {
-                    "$it to $Argument($it, ${it.typeName}.now(c))"
-                }
-            }
+            "$it to $Argument($it, ${now(it)})"
         } ?: "null"
         w.println("    override fun createdAtAssignment(c: $Clock): Pair<$PropertyMetamodel<$entityTypeName, *, *>, $Operand>? = $body")
     }
 
     private fun updatedAtAssignment() {
         val body = entity.updatedAtProperty?.let {
-            when (it.kotlinClass) {
-                is ValueClass -> {
-                    "$it to $Argument($it, ${it.typeName}(${it.kotlinClass.property.typeName}.now(c)))"
-                }
-                else -> {
-                    "$it to $Argument($it, ${it.typeName}.now(c))"
-                }
-            }
+            "$it to $Argument($it, ${now(it)})"
         } ?: "null"
         w.println("    override fun updatedAtAssignment(c: $Clock): Pair<$PropertyMetamodel<$entityTypeName, *, *>, $Operand>? = $body")
     }
@@ -333,26 +347,8 @@ internal class EntityMetamodelGenerator(
                 }
             }
         }
-        val createdAt = entity.createdAtProperty?.let {
-            when (it.kotlinClass) {
-                is ValueClass -> {
-                    "$it = ${it.typeName}(${it.kotlinClass.property.typeName}.now(c))"
-                }
-                else -> {
-                    "$it = ${it.typeName}.now(c)"
-                }
-            }
-        }
-        val updatedAt = entity.updatedAtProperty?.let {
-            when (it.kotlinClass) {
-                is ValueClass -> {
-                    "$it = ${it.typeName}(${it.kotlinClass.property.typeName}.now(c))"
-                }
-                else -> {
-                    "$it = ${it.typeName}.now(c)"
-                }
-            }
-        }
+        val createdAt = entity.createdAtProperty?.let { "$it = ${now(it)}" }
+        val updatedAt = entity.updatedAtProperty?.let { "$it = ${now(it)}" }
         val paramList = listOfNotNull(version, createdAt, updatedAt).joinToString()
         val body = if (paramList == "") {
             "e"
@@ -363,16 +359,7 @@ internal class EntityMetamodelGenerator(
     }
 
     private fun preUpdate() {
-        val updatedAt = entity.updatedAtProperty?.let {
-            when (it.kotlinClass) {
-                is ValueClass -> {
-                    "$it = ${it.typeName}(${it.kotlinClass.property.typeName}.now(c))"
-                }
-                else -> {
-                    "$it = ${it.typeName}.now(c)"
-                }
-            }
-        }
+        val updatedAt = entity.updatedAtProperty?.let { "$it = ${now(it)}" }
         val body = if (updatedAt == null) {
             "e"
         } else {
@@ -401,6 +388,37 @@ internal class EntityMetamodelGenerator(
             "e.copy($version)"
         }
         w.println("    override fun postUpdate(e: $entityTypeName): $entityTypeName = $body")
+    }
+
+    private fun now(property: Property): String {
+        return when (property.kotlinClass) {
+            is ValueClass -> {
+                when (property.kotlinClass.property.typeName) {
+                    KotlinInstant -> {
+                        "${property.typeName}($Instant.now(c).${toKotlinInstant.split(".").last()}())"
+                    }
+                    KotlinLocalDateTime -> {
+                        "${property.typeName}($LocalDateTime.now(c).${toKotlinLocalDateTime.split(".").last()}())"
+                    }
+                    else -> {
+                        "${property.typeName}(${property.kotlinClass.property.typeName}.now(c))"
+                    }
+                }
+            }
+            else -> {
+                when (property.typeName) {
+                    KotlinInstant -> {
+                        "$Instant.now(c).${toKotlinInstant.split(".").last()}()"
+                    }
+                    KotlinLocalDateTime -> {
+                        "$LocalDateTime.now(c).${toKotlinLocalDateTime.split(".").last()}()"
+                    }
+                    else -> {
+                        "${property.typeName}.now(c)"
+                    }
+                }
+            }
+        }
     }
 
     private fun newEntity() {

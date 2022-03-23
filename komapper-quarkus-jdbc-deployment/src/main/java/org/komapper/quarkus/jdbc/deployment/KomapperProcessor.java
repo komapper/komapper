@@ -58,7 +58,7 @@ public class KomapperProcessor {
             "org.komapper.core.spi.LoggerFacadeFactory",
             "org.komapper.core.spi.StatementInspectorFactory",
             "org.komapper.core.spi.TemplateStatementBuilder",
-            "org.komapper.r2dbc.spi.R2dbcDialectFactory",
+            "org.komapper.jdbc.spi.JdbcDataTypeProviderFactory",
             "org.komapper.jdbc.spi.JdbcDialectFactory");
     for (var interfase : serviceInterfaces) {
       var item = ServiceProviderBuildItem.allProvidersFromClassPath(interfase);

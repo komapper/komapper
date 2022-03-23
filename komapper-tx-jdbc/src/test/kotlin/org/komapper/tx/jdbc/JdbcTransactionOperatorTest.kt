@@ -3,9 +3,9 @@ package org.komapper.tx.jdbc
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
 import org.komapper.core.dsl.query.single
-import org.komapper.dialect.h2.jdbc.JdbcH2Dialect
 import org.komapper.jdbc.DefaultJdbcDatabaseConfig
 import org.komapper.jdbc.JdbcDatabase
+import org.komapper.jdbc.JdbcDialects
 import org.komapper.jdbc.JdbcSession
 import org.komapper.jdbc.SimpleDataSource
 import kotlin.test.AfterTest
@@ -16,7 +16,7 @@ import kotlin.test.assertTrue
 internal class JdbcTransactionOperatorTest {
 
     private val dataSource = SimpleDataSource("jdbc:h2:mem://transaction-test;DB_CLOSE_DELAY=-1")
-    private val config = object : DefaultJdbcDatabaseConfig(dataSource, JdbcH2Dialect()) {
+    private val config = object : DefaultJdbcDatabaseConfig(dataSource, JdbcDialects.get("h2")) {
         override val session: JdbcSession by lazy {
             JdbcTransactionSession(dataSource, loggerFacade)
         }

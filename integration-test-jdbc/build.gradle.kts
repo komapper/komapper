@@ -9,6 +9,7 @@ plugins {
 dependencies {
     api(project(":integration-test-core"))
     api(project(":komapper-tx-jdbc"))
+    api(project(":komapper-datetime-jdbc"))
     api(project(":komapper-annotation"))
     ksp(project(":komapper-processor"))
     api(project(":komapper-codegen"))

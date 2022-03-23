@@ -13,6 +13,11 @@ import org.komapper.annotation.KomapperAutoIncrement
 import org.komapper.annotation.KomapperSequence
 import org.komapper.annotation.KomapperVersion
 import org.komapper.core.NamingStrategy
+import org.komapper.processor.Symbols.Instant
+import org.komapper.processor.Symbols.KotlinInstant
+import org.komapper.processor.Symbols.KotlinLocalDateTime
+import org.komapper.processor.Symbols.LocalDateTime
+import org.komapper.processor.Symbols.OffsetDateTime
 
 internal class EntityFactory(config: Config, private val entityDef: EntityDef) {
 
@@ -229,20 +234,20 @@ internal class EntityFactory(config: Config, private val entityDef: EntityDef) {
 
     private fun validateTimestampProperty(property: Property, annotationName: String) {
         when (property.typeName) {
-            "java.time.LocalDateTime", "java.time.OffsetDateTime" -> Unit
+            Instant, LocalDateTime, OffsetDateTime, KotlinInstant, KotlinLocalDateTime -> Unit
             else -> {
                 when (val kotlinClass = property.kotlinClass) {
                     is ValueClass -> {
                         when (kotlinClass.property.typeName) {
-                            "java.time.LocalDateTime", "java.time.OffsetDateTime" -> Unit
+                            Instant, LocalDateTime, OffsetDateTime, KotlinInstant, KotlinLocalDateTime -> Unit
                             else -> report(
-                                "When the type of $annotationName annotated property is value class, the type of the value class's own property must be either LocalDateTime or OffsetDateTime.",
+                                "When the type of $annotationName annotated property is value class, the type of the value class's own property must be either Instant, LocalDateTime or OffsetDateTime.",
                                 property.parameter
                             )
                         }
                     }
                     else -> report(
-                        "The type of $annotationName annotated property must be either LocalDateTime or OffsetDateTime.",
+                        "The type of $annotationName annotated property must be either Instant, LocalDateTime or OffsetDateTime.",
                         property.parameter
                     )
                 }

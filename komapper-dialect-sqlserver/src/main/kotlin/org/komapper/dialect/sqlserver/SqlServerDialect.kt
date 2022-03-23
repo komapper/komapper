@@ -9,13 +9,14 @@ import org.komapper.core.dsl.metamodel.EntityMetamodel
 
 interface SqlServerDialect : Dialect {
 
-    companion object {
-        const val DRIVER = "sqlserver"
+    companion object : Dialect.Identifier {
+        private const val DRIVER = "sqlserver"
         const val OPEN_QUOTE = "["
         const val CLOSE_QUOTE = "]"
         /** the error code that represents unique violation  */
         const val UNIQUE_CONSTRAINT_VIOLATION_ERROR_CODE = 2627
         const val OBJECT_ALREADY_EXISTS_ERROR_CODE = 2714
+        override val driver: String = DRIVER
     }
 
     override val driver: String get() = DRIVER
