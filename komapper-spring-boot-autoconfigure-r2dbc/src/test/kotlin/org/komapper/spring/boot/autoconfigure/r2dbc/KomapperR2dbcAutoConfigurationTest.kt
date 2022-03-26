@@ -1,4 +1,4 @@
-package org.komapper.spring.boot.autoconfigure.jdbc
+package org.komapper.spring.boot.autoconfigure.r2dbc
 
 import org.komapper.core.ClockProvider
 import org.komapper.core.ExecutionOptions
@@ -6,12 +6,9 @@ import org.komapper.core.Statement
 import org.komapper.core.TemplateBuiltinExtensions
 import org.komapper.core.TemplateStatementBuilder
 import org.komapper.core.Value
-import org.komapper.dialect.h2.jdbc.JdbcH2Dialect
-import org.komapper.jdbc.JdbcDataType
-import org.komapper.jdbc.JdbcDataTypeProvider
-import org.komapper.jdbc.JdbcDatabase
-import org.komapper.jdbc.JdbcStringType
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+import org.komapper.dialect.h2.r2dbc.R2dbcH2Dialect
+import org.komapper.r2dbc.R2dbcDatabase
+import org.springframework.boot.autoconfigure.r2dbc.R2dbcAutoConfiguration
 import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -20,89 +17,74 @@ import java.time.Clock
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
-import kotlin.reflect.KClass
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
-class JdbcKomapperAutoConfigurationTest {
+class KomapperR2dbcAutoConfigurationTest {
 
     private val context = AnnotationConfigApplicationContext()
 
     @Test
     fun defaultConfiguration() {
-        val source = mapOf("spring.datasource.url" to "jdbc:h2:mem:example")
+        val source = mapOf("spring.r2dbc.url" to "r2dbc:h2:mem:///test")
         val sources = context.environment.propertySources
         sources.addFirst(MapPropertySource("test", source))
         context.register(
-            JdbcKomapperAutoConfiguration::class.java,
-            DataSourceAutoConfiguration::class.java
+            KomapperR2dbcAutoConfiguration::class.java,
+            R2dbcAutoConfiguration::class.java
         )
         context.refresh()
 
-        val database = context.getBean(JdbcDatabase::class.java)
+        val database = context.getBean(R2dbcDatabase::class.java)
         assertNotNull(database)
-        assertTrue(database.config.dialect is JdbcH2Dialect)
+        assertTrue(database.config.dialect is R2dbcH2Dialect)
         assertNotNull(database.config.templateStatementBuilder)
     }
 
     @Test
     fun customConfiguration() {
-        val source = mapOf("spring.datasource.url" to "jdbc:h2:mem:example")
+        val source = mapOf("spring.r2dbc.url" to "r2dbc:h2:mem:///test")
         val sources = context.environment.propertySources
         sources.addFirst(MapPropertySource("test", source))
         context.register(
             CustomConfigure::class.java,
-            JdbcKomapperAutoConfiguration::class.java,
-            DataSourceAutoConfiguration::class.java
+            KomapperR2dbcAutoConfiguration::class.java,
+            R2dbcAutoConfiguration::class.java
         )
         context.refresh()
 
-        val database = context.getBean(JdbcDatabase::class.java)
+        val database = context.getBean(R2dbcDatabase::class.java)
         assertNotNull(database)
-        val dataType = database.config.dataOperator.getDataType(String::class)
-        assertEquals("abc", dataType.name)
         val clock = database.config.clockProvider.now()
         val timestamp = LocalDateTime.now(clock)
         assertEquals(LocalDateTime.of(2021, 4, 25, 16, 17, 18), timestamp)
-        val jdbcOption = database.config.executionOptions
-        assertEquals(1234, jdbcOption.queryTimeoutSeconds)
+        val executionOption = database.config.executionOptions
+        assertEquals(1234, executionOption.fetchSize)
     }
 
     @Test
     fun templateStatementBuilderConfiguration() {
-        val source = mapOf("spring.datasource.url" to "jdbc:h2:mem:example")
+        val source = mapOf("spring.r2dbc.url" to "r2dbc:h2:mem:///test")
         val sources = context.environment.propertySources
         sources.addFirst(MapPropertySource("test", source))
         context.register(
             TemplateStatementBuilderConfigure::class.java,
-            JdbcKomapperAutoConfiguration::class.java,
-            DataSourceAutoConfiguration::class.java
+            KomapperR2dbcAutoConfiguration::class.java,
+            R2dbcAutoConfiguration::class.java
         )
         context.refresh()
 
-        val database = context.getBean(JdbcDatabase::class.java)
+        val database = context.getBean(R2dbcDatabase::class.java)
         assertNotNull(database)
         val builder = database.config.templateStatementBuilder
         assertTrue(builder is MyStatementBuilder)
     }
 
-    @Suppress("unused", "UNCHECKED_CAST")
+    @Suppress("unused")
     @Configuration
     open class CustomConfigure {
-
-        @Bean
-        open fun dataTypeProvider(): JdbcDataTypeProvider {
-            return object : JdbcDataTypeProvider {
-                private val map: Map<KClass<*>, JdbcDataType<*>> =
-                    listOf(JdbcStringType("abc")).associateBy { it.klass }
-
-                override fun <T : Any> get(klass: KClass<out T>): JdbcDataType<T>? {
-                    return map[klass] as JdbcDataType<T>?
-                }
-            }
-        }
 
         @Bean
         open fun clockProvider(): ClockProvider {
@@ -113,8 +95,8 @@ class JdbcKomapperAutoConfigurationTest {
         }
 
         @Bean
-        open fun jdbcOption(): ExecutionOptions {
-            return ExecutionOptions(queryTimeoutSeconds = 1234)
+        open fun executionOption(): ExecutionOptions {
+            return ExecutionOptions(fetchSize = 1234)
         }
     }
 

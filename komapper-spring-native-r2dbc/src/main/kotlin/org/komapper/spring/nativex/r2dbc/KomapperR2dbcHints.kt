@@ -12,7 +12,7 @@ import org.komapper.r2dbc.R2dbcDatabase
 import org.komapper.r2dbc.R2dbcDatabaseConfig
 import org.komapper.r2dbc.R2dbcDialect
 import org.komapper.r2dbc.R2dbcSession
-import org.komapper.spring.boot.autoconfigure.r2dbc.R2dbcKomapperAutoConfiguration
+import org.komapper.spring.boot.autoconfigure.r2dbc.KomapperR2dbcAutoConfiguration
 import org.springframework.core.env.Environment
 import org.springframework.nativex.hint.NativeHint
 import org.springframework.nativex.hint.TypeHint
@@ -20,7 +20,7 @@ import org.springframework.nativex.type.NativeConfiguration
 import org.springframework.transaction.ReactiveTransactionManager
 
 @NativeHint(
-    trigger = R2dbcKomapperAutoConfiguration::class,
+    trigger = KomapperR2dbcAutoConfiguration::class,
     types = [
         TypeHint(
             types = [
@@ -42,4 +42,4 @@ import org.springframework.transaction.ReactiveTransactionManager
         TypeHint(types = [Environment::class])
     ]
 )
-class R2dbcKomapperHints : NativeConfiguration
+class KomapperR2dbcHints : NativeConfiguration

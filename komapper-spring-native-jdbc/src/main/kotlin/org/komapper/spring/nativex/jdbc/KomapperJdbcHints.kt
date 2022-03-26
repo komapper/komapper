@@ -13,7 +13,7 @@ import org.komapper.jdbc.JdbcDatabase
 import org.komapper.jdbc.JdbcDatabaseConfig
 import org.komapper.jdbc.JdbcDialect
 import org.komapper.jdbc.JdbcSession
-import org.komapper.spring.boot.autoconfigure.jdbc.JdbcKomapperAutoConfiguration
+import org.komapper.spring.boot.autoconfigure.jdbc.KomapperJdbcAutoConfiguration
 import org.springframework.core.env.Environment
 import org.springframework.nativex.hint.NativeHint
 import org.springframework.nativex.hint.TypeHint
@@ -21,7 +21,7 @@ import org.springframework.nativex.type.NativeConfiguration
 import org.springframework.transaction.PlatformTransactionManager
 
 @NativeHint(
-    trigger = JdbcKomapperAutoConfiguration::class,
+    trigger = KomapperJdbcAutoConfiguration::class,
     types = [
         TypeHint(
             types = [
@@ -48,4 +48,4 @@ import org.springframework.transaction.PlatformTransactionManager
         )
     ]
 )
-class JdbcKomapperHints : NativeConfiguration
+class KomapperJdbcHints : NativeConfiguration
