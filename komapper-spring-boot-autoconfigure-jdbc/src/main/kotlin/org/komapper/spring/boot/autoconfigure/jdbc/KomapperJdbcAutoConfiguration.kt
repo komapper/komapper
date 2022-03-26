@@ -42,7 +42,7 @@ import javax.sql.DataSource
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnClass(JdbcDatabase::class)
 @ImportAutoConfiguration(value = [DataSourceAutoConfiguration::class, DataSourceTransactionManagerAutoConfiguration::class])
-open class JdbcKomapperAutoConfiguration {
+open class KomapperJdbcAutoConfiguration {
 
     companion object {
         private const val DATASOURCE_URL_PROPERTY = "spring.datasource.url"
