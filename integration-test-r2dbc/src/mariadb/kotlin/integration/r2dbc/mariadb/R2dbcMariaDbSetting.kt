@@ -1,11 +1,9 @@
 package integration.r2dbc.mariadb
 
 import integration.core.MariaDbSetting
-import io.r2dbc.spi.ConnectionFactories
 import io.r2dbc.spi.ConnectionFactoryOptions
 import io.r2dbc.spi.Option
 import org.komapper.core.ExecutionOptions
-import org.komapper.dialect.mariadb.r2dbc.R2dbcMariaDbDialect
 import org.komapper.r2dbc.R2dbcDatabase
 import org.testcontainers.containers.MariaDBContainer
 import org.testcontainers.containers.MariaDBContainerProvider
@@ -32,8 +30,7 @@ class R2dbcMariaDbSetting(private val driver: String, private val url: String) :
 
     override val database: R2dbcDatabase
         get() = R2dbcDatabase(
-            ConnectionFactories.get(options),
-            R2dbcMariaDbDialect(),
+            options = options,
             executionOptions = ExecutionOptions(batchSize = 2)
         )
 }

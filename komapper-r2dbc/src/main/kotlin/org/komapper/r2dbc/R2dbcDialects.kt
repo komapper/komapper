@@ -1,5 +1,6 @@
 package org.komapper.r2dbc
 
+import io.r2dbc.spi.ConnectionFactoryOptions
 import org.komapper.core.spi.findByPriority
 import org.komapper.r2dbc.spi.R2dbcDialectFactory
 import java.util.ServiceLoader
@@ -16,14 +17,37 @@ object R2dbcDialects {
      * @return the [R2dbcDialect]
      */
     fun get(driver: String): R2dbcDialect {
+        return getOrNull(driver) ?: error(
+            "The dialect is not found. " +
+                "Try to add the 'komapper-dialect-$driver-r2dbc' dependency. " +
+                "driver='$driver'"
+        )
+    }
+
+    private fun getOrNull(driver: String): R2dbcDialect? {
         val loader = ServiceLoader.load(R2dbcDialectFactory::class.java)
         val factory = loader.filter { it.supports(driver) }.findByPriority()
-            ?: error(
-                "The dialect is not found. " +
-                    "Try to add the 'komapper-dialect-$driver-r2dbc' dependency. " +
-                    "driver='$driver'"
-            )
-        return factory.create()
+        return factory?.create()
+    }
+
+    fun getByOptions(options: ConnectionFactoryOptions): R2dbcDialect {
+        val driverOption = options.getValue(ConnectionFactoryOptions.DRIVER)?.toString()
+        val protocolOption = options.getValue(ConnectionFactoryOptions.PROTOCOL)?.toString()
+        val dialect = sequenceOf(driverOption, protocolOption)
+            .filterNotNull()
+            .firstNotNullOfOrNull { getOrNull(it) }
+        return dialect ?: error(
+            "The dialect is not found. " +
+                "driverOption='$driverOption', protocolOption='$protocolOption'"
+        )
+    }
+
+    /**
+     * @param url the R2DBC url
+     */
+    fun getByUrl(url: String): R2dbcDialect {
+        val driver = extractR2dbcDriver(url)
+        return get(driver)
     }
 
     /**
