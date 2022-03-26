@@ -8,7 +8,7 @@ object JdbcDataTypeProviders {
 
     /**
      * @param driver the driver name
-     * @return the [JdbcDialect]
+     * @return the [JdbcDataTypeProvider]
      */
     fun get(driver: String, firstProvider: JdbcDataTypeProvider? = null): JdbcDataTypeProvider {
         val loader = ServiceLoader.load(JdbcDataTypeProviderFactory::class.java)

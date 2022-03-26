@@ -10,6 +10,7 @@ dependencies {
     val r2dbcVersion: String by project
     api(project(":integration-test-core"))
     api(project(":komapper-tx-r2dbc"))
+    api(project(":komapper-datetime-r2dbc"))
     api(project(":komapper-annotation"))
     ksp(project(":komapper-processor"))
     api("io.r2dbc:r2dbc-bom:$r2dbcVersion")

@@ -85,7 +85,7 @@ interface JdbcDialect : Dialect {
     fun supportsReturnGeneratedKeysFlag(): Boolean = true
 }
 
-abstract class JdbcAbstractDialect protected constructor(val dataTypeProvider: JdbcDataTypeProvider) :
+abstract class JdbcAbstractDialect protected constructor(private val dataTypeProvider: JdbcDataTypeProvider) :
     JdbcDialect {
 
     override fun <T : Any> getValue(rs: ResultSet, index: Int, valueClass: KClass<out T>): T? {

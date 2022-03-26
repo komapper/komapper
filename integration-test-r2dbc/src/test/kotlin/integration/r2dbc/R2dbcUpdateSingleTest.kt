@@ -1,9 +1,11 @@
 package integration.r2dbc
 
 import integration.core.Address
+import integration.core.Man
 import integration.core.Person
 import integration.core.address
 import integration.core.department
+import integration.core.man
 import integration.core.noVersionDepartment
 import integration.core.person
 import org.junit.jupiter.api.TestInfo
@@ -51,7 +53,22 @@ class R2dbcUpdateSingleTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun updatedAt(info: TestInfo) = inTransaction(db, info) {
+    fun updatedAt_instant(info: TestInfo) = inTransaction(db, info) {
+        val p = Meta.man
+        val findQuery = QueryDsl.from(p).where { p.personId eq 1 }.first()
+        val person1 = Man(1, "ABC")
+        val person2 = db.runQuery {
+            QueryDsl.insert(p).single(person1).andThen(findQuery)
+        }
+        val person3 = db.runQuery {
+            QueryDsl.update(p).single(person2.copy(name = "DEF")).andThen(findQuery)
+        }
+        assertNotNull(person2.updatedAt)
+        assertNotNull(person3.updatedAt)
+    }
+
+    @Test
+    fun updatedAt_localDateTime(info: TestInfo) = inTransaction(db, info) {
         val p = Meta.person
         val findQuery = QueryDsl.from(p).where { p.personId eq 1 }.first()
         val person1 = Person(1, "ABC")

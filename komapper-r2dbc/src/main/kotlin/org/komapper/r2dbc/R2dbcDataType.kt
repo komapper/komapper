@@ -8,11 +8,13 @@ import org.komapper.core.ThreadSafe
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.sql.Array
+import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.OffsetDateTime
 import java.time.ZoneId
+import java.time.ZoneOffset
 import kotlin.reflect.KClass
 
 /**
@@ -253,6 +255,46 @@ class R2dbcFloatType(override val name: String) :
             is Number -> value.toFloat()
             else -> error("Cannot convert. value=$value, type=${value::class.qualifiedName}.")
         }
+    }
+}
+
+class R2dbcInstantType(override val name: String) : R2dbcDataType<Instant> {
+
+    private companion object {
+        private fun LocalDateTime?.toInstant(): Instant? {
+            return this?.toInstant(ZoneOffset.UTC)
+        }
+
+        private fun Instant?.toLocalDateTime(): LocalDateTime? {
+            return this?.let { LocalDateTime.ofInstant(it, ZoneOffset.UTC) }
+        }
+    }
+
+    private val dataType = R2dbcLocalDateTimeType(name)
+    override val klass: KClass<Instant> = Instant::class
+
+    override fun getValue(row: Row, index: Int): Instant? {
+        val datetime = dataType.getValue(row, index)
+        return datetime.toInstant()
+    }
+
+    override fun getValue(row: Row, columnLabel: String): Instant? {
+        val datetime = dataType.getValue(row, columnLabel)
+        return datetime.toInstant()
+    }
+
+    override fun setValue(statement: Statement, index: Int, value: Instant?) {
+        val datetime = value.toLocalDateTime()
+        dataType.setValue(statement, index, datetime)
+    }
+
+    override fun setValue(statement: Statement, name: String, value: Instant?) {
+        val datetime = value.toLocalDateTime()
+        dataType.setValue(statement, name, datetime)
+    }
+
+    override fun toString(value: Instant?): String {
+        return value.toString()
     }
 }
 

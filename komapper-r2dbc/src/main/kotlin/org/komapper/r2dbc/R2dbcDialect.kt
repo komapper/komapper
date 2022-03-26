@@ -11,10 +11,6 @@ import kotlin.reflect.KClass
  * Represents a dialect for R2DBC access.
  */
 interface R2dbcDialect : Dialect {
-    /**
-     * Data types.
-     */
-    val dataTypes: List<R2dbcDataType<*>>
 
     /**
      * Returns the value.
@@ -85,12 +81,8 @@ interface R2dbcDialect : Dialect {
     override fun supportsBatchExecutionReturningGeneratedValues(): Boolean = false
 }
 
-abstract class R2dbcAbstractDialect protected constructor(internalDataTypes: List<R2dbcDataType<*>> = emptyList()) :
+abstract class R2dbcAbstractDialect protected constructor(private val dataTypeProvider: R2dbcDataTypeProvider) :
     R2dbcDialect {
-
-    @Suppress("MemberVisibilityCanBePrivate")
-    protected val dataTypeMap: Map<KClass<*>, R2dbcDataType<*>> = internalDataTypes.associateBy { it.klass }
-    override val dataTypes = internalDataTypes
 
     protected open fun getBinder(): Binder {
         return DefaultBinder
@@ -127,11 +119,9 @@ abstract class R2dbcAbstractDialect protected constructor(internalDataTypes: Lis
     }
 
     override fun <T : Any> getDataType(klass: KClass<out T>): R2dbcDataType<T> {
-        val dataType = dataTypeMap[klass] ?: error(
+        return dataTypeProvider.get(klass) ?: error(
             "The dataType is not found for the type \"${klass.qualifiedName}\"."
         )
-        @Suppress("UNCHECKED_CAST")
-        return dataType as R2dbcDataType<T>
     }
 
     override fun getDataTypeName(klass: KClass<*>): String {

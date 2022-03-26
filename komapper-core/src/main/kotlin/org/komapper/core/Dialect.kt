@@ -30,7 +30,7 @@ interface Dialect {
         val driver: String
     }
 
-/**
+    /**
      * The name of the driver.
      */
     val driver: String

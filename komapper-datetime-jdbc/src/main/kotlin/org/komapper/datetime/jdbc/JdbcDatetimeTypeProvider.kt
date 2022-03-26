@@ -1,4 +1,4 @@
-package org.komapper.datetime
+package org.komapper.datetime.jdbc
 
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate

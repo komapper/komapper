@@ -1,1 +1,1 @@
-org.komapper.datetime.JdbcDatetimeTypeProviderFactory
+org.komapper.datetime.jdbc.JdbcDatetimeTypeProviderFactory

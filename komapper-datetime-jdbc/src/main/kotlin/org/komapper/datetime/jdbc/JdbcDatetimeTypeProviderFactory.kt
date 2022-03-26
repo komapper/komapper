@@ -1,4 +1,4 @@
-package org.komapper.datetime
+package org.komapper.datetime.jdbc
 
 import org.komapper.core.spi.Prioritized.Companion.DEFAULT_PRIORITY
 import org.komapper.jdbc.JdbcDataTypeProvider

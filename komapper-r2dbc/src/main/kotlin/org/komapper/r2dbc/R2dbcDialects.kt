@@ -15,7 +15,7 @@ object R2dbcDialects {
      * @param driver the R2DBC driver name
      * @return the [R2dbcDialect]
      */
-    fun get(driver: String): R2dbcDialect {
+    fun get(driver: String, dataTypeProvider: R2dbcDataTypeProvider? = null): R2dbcDialect {
         val loader = ServiceLoader.load(R2dbcDialectFactory::class.java)
         val factory = loader.filter { it.supports(driver) }.findByPriority()
             ?: error(
@@ -23,7 +23,8 @@ object R2dbcDialects {
                     "Try to add the 'komapper-dialect-$driver-r2dbc' dependency. " +
                     "driver='$driver'"
             )
-        return factory.create()
+        val nonNullDataTypeProvider = R2dbcDataTypeProviders.get(driver, dataTypeProvider)
+        return factory.create(nonNullDataTypeProvider)
     }
 
     /**

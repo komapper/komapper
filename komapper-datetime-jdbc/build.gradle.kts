@@ -1,4 +1,5 @@
 dependencies {
+    val kotlinxDatetime: String by project
     implementation(project(":komapper-jdbc"))
-    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.3.2")
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:$kotlinxDatetime")
 }
