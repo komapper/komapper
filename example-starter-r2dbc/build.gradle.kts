@@ -5,8 +5,10 @@ plugins {
 }
 
 dependencies {
+    val kotlinxDatetime: String by project
     ksp(project(":komapper-processor"))
     implementation(project(":komapper-starter-r2dbc"))
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:$kotlinxDatetime")
     runtimeOnly(project(":komapper-dialect-h2-r2dbc"))
 }
 
@@ -18,7 +20,8 @@ idea {
     module {
         sourceDirs = sourceDirs + file("build/generated/ksp/main/kotlin")
         testSourceDirs = testSourceDirs + file("build/generated/ksp/test/kotlin")
-        generatedSourceDirs = generatedSourceDirs + file("build/generated/ksp/main/kotlin") + file("build/generated/ksp/test/kotlin")
+        generatedSourceDirs =
+            generatedSourceDirs + file("build/generated/ksp/main/kotlin") + file("build/generated/ksp/test/kotlin")
     }
 }
 

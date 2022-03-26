@@ -1,5 +1,6 @@
 package example.starter.jdbc
 
+import kotlinx.datetime.LocalDateTime
 import org.komapper.annotation.KomapperAutoIncrement
 import org.komapper.annotation.KomapperColumn
 import org.komapper.annotation.KomapperCreatedAt
@@ -11,7 +12,6 @@ import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
 import org.komapper.core.dsl.query.first
 import org.komapper.jdbc.JdbcDatabase
-import java.time.LocalDateTime
 
 data class Address(
     val id: Int = 0,
