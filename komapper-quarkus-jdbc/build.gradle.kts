@@ -17,4 +17,5 @@ dependencies {
     api(project(":komapper-annotation"))
     implementation(project(":komapper-slf4j"))
     runtimeOnly(project(":komapper-datetime-jdbc"))
+    runtimeOnly(project(":komapper-template"))
 }

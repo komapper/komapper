@@ -57,7 +57,7 @@ public class KomapperProcessor {
             "org.komapper.core.spi.LoggerFactory",
             "org.komapper.core.spi.LoggerFacadeFactory",
             "org.komapper.core.spi.StatementInspectorFactory",
-            "org.komapper.core.spi.TemplateStatementBuilder",
+            "org.komapper.core.spi.TemplateStatementBuilderFactory",
             "org.komapper.jdbc.spi.JdbcDataTypeProviderFactory",
             "org.komapper.jdbc.spi.JdbcDialectFactory");
     for (var interfase : serviceInterfaces) {
