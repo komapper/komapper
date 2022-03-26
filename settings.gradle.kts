@@ -46,6 +46,7 @@ include("komapper-starter-jdbc")
 include("komapper-tx-jdbc")
 
 // R2DBC
+include("komapper-datetime-r2dbc")
 include("komapper-r2dbc")
 include("komapper-spring-boot-autoconfigure-r2dbc")
 include("komapper-spring-boot-starter-r2dbc")
@@ -98,4 +99,3 @@ include("example-starter-r2dbc")
 include("integration-test-core")
 include("integration-test-jdbc")
 include("integration-test-r2dbc")
-include("komapper-datetime-r2dbc")
