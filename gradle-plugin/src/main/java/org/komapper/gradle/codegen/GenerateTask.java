@@ -13,11 +13,9 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
-import java.util.regex.Pattern;
 
 public class GenerateTask extends DefaultTask {
 
-  private static final Pattern JDBC_URL_PATTERN = Pattern.compile("^jdbc:(tc:)?([^:]*):.*");
   private final Generator settings;
 
   @Inject
@@ -34,19 +32,11 @@ public class GenerateTask extends DefaultTask {
   private List<Table> read() throws ClassNotFoundException, SQLException {
     var jdbc = settings.getJdbc();
     try (var connection = createConnection(jdbc)) {
-      var url = jdbc.getUrl().get();
-      var driver = extractDriver(url);
-      // TODO: Remove this workaround in the future
-      // https://jira.mariadb.org/browse/CONJ-921
-      var catalog = settings.getCatalog().getOrNull();
-      if (driver.equals("mariadb")) {
-        catalog = "";
-      }
       MetadataReader reader =
           new MetadataReader(
               settings.getEnquote().get(),
               connection.getMetaData(),
-              catalog,
+              settings.getCatalog().getOrNull(),
               settings.getSchemaPattern().getOrNull(),
               settings.getTableNamePattern().getOrNull(),
               settings.getTableTypes().get());
@@ -61,14 +51,6 @@ public class GenerateTask extends DefaultTask {
     String password = jdbc.getPassword().get();
     Class.forName(driverClassName);
     return DriverManager.getConnection(url, user, password);
-  }
-
-  private String extractDriver(String url) {
-    var matcher = JDBC_URL_PATTERN.matcher(url);
-    if (matcher.matches()) {
-      return matcher.group(2).toLowerCase();
-    }
-    throw new IllegalArgumentException("The driver in the JDBC URL is not found. url=$url");
   }
 
   private void generate(List<Table> tables) throws IOException {
