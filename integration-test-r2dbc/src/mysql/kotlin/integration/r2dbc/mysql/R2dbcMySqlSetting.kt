@@ -1,11 +1,9 @@
 package integration.r2dbc.mysql
 
 import integration.core.MySqlSetting
-import io.r2dbc.spi.ConnectionFactories
 import io.r2dbc.spi.ConnectionFactoryOptions
 import io.r2dbc.spi.Option
 import org.komapper.core.ExecutionOptions
-import org.komapper.dialect.mysql.r2dbc.R2dbcMySqlDialect
 import org.komapper.r2dbc.R2dbcDatabase
 import org.testcontainers.containers.MySQLContainer
 import org.testcontainers.containers.MySQLContainerProvider
@@ -32,8 +30,7 @@ class R2dbcMySqlSetting(private val driver: String, private val url: String) :
 
     override val database: R2dbcDatabase
         get() = R2dbcDatabase(
-            ConnectionFactories.get(options),
-            R2dbcMySqlDialect(),
+            options = options,
             executionOptions = ExecutionOptions(batchSize = 2)
         )
 }

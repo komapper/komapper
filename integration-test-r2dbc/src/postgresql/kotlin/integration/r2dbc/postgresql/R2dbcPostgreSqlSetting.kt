@@ -1,11 +1,9 @@
 package integration.r2dbc.postgresql
 
 import integration.core.PostgreSqlSetting
-import io.r2dbc.spi.ConnectionFactories
 import io.r2dbc.spi.ConnectionFactoryOptions
 import io.r2dbc.spi.Option
 import org.komapper.core.ExecutionOptions
-import org.komapper.dialect.postgresql.r2dbc.R2dbcPostgreSqlDialect
 import org.komapper.r2dbc.R2dbcDatabase
 import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.containers.PostgreSQLContainerProvider
@@ -31,8 +29,7 @@ class R2dbcPostgreSqlSetting(private val driver: String, private val url: String
 
     override val database: R2dbcDatabase
         get() = R2dbcDatabase(
-            ConnectionFactories.get(options),
-            R2dbcPostgreSqlDialect(),
+            options = options,
             executionOptions = ExecutionOptions(batchSize = 2)
         )
 }
