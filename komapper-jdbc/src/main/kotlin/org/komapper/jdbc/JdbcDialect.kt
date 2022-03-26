@@ -11,7 +11,7 @@ import kotlin.reflect.KClass
  */
 interface JdbcDialect : Dialect {
 
-/**
+    /**
      * Returns the value.
      *
      * @param rs the result set

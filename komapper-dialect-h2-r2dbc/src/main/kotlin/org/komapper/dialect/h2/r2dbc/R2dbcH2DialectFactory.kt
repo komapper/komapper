@@ -11,6 +11,6 @@ class R2dbcH2DialectFactory : R2dbcDialectFactory {
     }
 
     override fun create(dataTypeProvider: R2dbcDataTypeProvider): R2dbcDialect {
-        return R2dbcH2Dialect(dataTypeProvider)
+        return R2dbcH2DialectImpl(dataTypeProvider)
     }
 }

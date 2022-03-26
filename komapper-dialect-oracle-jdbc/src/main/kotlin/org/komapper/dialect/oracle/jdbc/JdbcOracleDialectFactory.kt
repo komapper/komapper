@@ -11,6 +11,6 @@ class JdbcOracleDialectFactory : JdbcDialectFactory {
     }
 
     override fun create(dataTypeProvider: JdbcDataTypeProvider): JdbcDialect {
-        return JdbcOracleDialect(dataTypeProvider)
+        return JdbcOracleDialectImpl(dataTypeProvider)
     }
 }

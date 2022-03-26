@@ -11,6 +11,6 @@ class R2dbcMariaDbDialectFactory : R2dbcDialectFactory {
     }
 
     override fun create(dataTypeProvider: R2dbcDataTypeProvider): R2dbcDialect {
-        return R2dbcMariaDbDialect(dataTypeProvider)
+        return R2dbcMariaDbDialectImpl(dataTypeProvider)
     }
 }

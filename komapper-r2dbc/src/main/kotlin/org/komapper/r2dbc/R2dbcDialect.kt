@@ -12,6 +12,10 @@ import kotlin.reflect.KClass
  */
 interface R2dbcDialect : Dialect {
 
+    fun getBinder(): Binder {
+        return DefaultBinder
+    }
+
     /**
      * Returns the value.
      *
@@ -83,10 +87,6 @@ interface R2dbcDialect : Dialect {
 
 abstract class R2dbcAbstractDialect protected constructor(private val dataTypeProvider: R2dbcDataTypeProvider) :
     R2dbcDialect {
-
-    protected open fun getBinder(): Binder {
-        return DefaultBinder
-    }
 
     override fun createBindVariable(index: Int, value: StatementPart.Value): CharSequence {
         val binder = getBinder()

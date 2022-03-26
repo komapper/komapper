@@ -11,6 +11,6 @@ class R2dbcPostgreSqlDialectFactory : R2dbcDialectFactory {
     }
 
     override fun create(dataTypeProvider: R2dbcDataTypeProvider): R2dbcDialect {
-        return R2dbcPostgreSqlDialect(dataTypeProvider)
+        return R2dbcPostgreSqlDialectImpl(dataTypeProvider)
     }
 }

@@ -3,7 +3,6 @@ package org.komapper.jdbc
 import org.komapper.core.ClockProvider
 import org.komapper.core.Database
 import org.komapper.core.DefaultClockProvider
-import org.komapper.core.Dialect
 import org.komapper.core.ExecutionOptions
 import org.komapper.core.dsl.query.Query
 import org.komapper.core.dsl.query.QueryScope
@@ -94,17 +93,16 @@ fun JdbcDatabase(config: JdbcDatabaseConfig): JdbcDatabase {
  * Creates a [JdbcDatabase] instance.
  *
  * @param dataSource the JDBC data source
- * @param dialectIdentifier the dialect identifier
+ * @param dialect the dialect
  * @param clockProvider the clock provider
  * @param executionOptions the execution options
  */
 fun JdbcDatabase(
     dataSource: DataSource,
-    dialectIdentifier: Dialect.Identifier,
+    dialect: JdbcDialect,
     clockProvider: ClockProvider = DefaultClockProvider(),
     executionOptions: ExecutionOptions = ExecutionOptions(),
 ): JdbcDatabase {
-    val dialect = JdbcDialects.get(dialectIdentifier.driver)
     val config = DefaultJdbcDatabaseConfig(dataSource, dialect, clockProvider, executionOptions)
     return JdbcDatabase(config)
 }

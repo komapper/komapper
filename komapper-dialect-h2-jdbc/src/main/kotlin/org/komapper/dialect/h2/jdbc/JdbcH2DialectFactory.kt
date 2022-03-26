@@ -11,6 +11,6 @@ class JdbcH2DialectFactory : JdbcDialectFactory {
     }
 
     override fun create(dataTypeProvider: JdbcDataTypeProvider): JdbcDialect {
-        return JdbcH2Dialect(dataTypeProvider)
+        return JdbcH2DialectImpl(dataTypeProvider)
     }
 }

@@ -11,6 +11,6 @@ class R2dbcMySqlDialectFactory : R2dbcDialectFactory {
     }
 
     override fun create(dataTypeProvider: R2dbcDataTypeProvider): R2dbcDialect {
-        return R2dbcMySqlDialect(dataTypeProvider)
+        return R2dbcMySqlDialectImpl(dataTypeProvider)
     }
 }

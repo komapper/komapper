@@ -3,11 +3,11 @@ package org.komapper.dialect.oracle.jdbc
 import org.komapper.dialect.oracle.OracleDialect
 import org.komapper.jdbc.JdbcAbstractDialect
 import org.komapper.jdbc.JdbcDataTypeProvider
+import org.komapper.jdbc.JdbcDialect
+import org.komapper.jdbc.JdbcDialects
 import java.sql.SQLException
 
-class JdbcOracleDialect(
-    dataTypeProvider: JdbcDataTypeProvider
-) : OracleDialect, JdbcAbstractDialect(dataTypeProvider) {
+interface JdbcOracleDialect : JdbcDialect, OracleDialect {
 
     override fun isSequenceExistsError(exception: SQLException): Boolean {
         return exception.filterIsInstance<SQLException>().any {
@@ -42,4 +42,12 @@ class JdbcOracleDialect(
     override fun supportsBatchExecutionReturningGeneratedValues(): Boolean = false
 
     override fun supportsReturnGeneratedKeysFlag(): Boolean = false
+}
+
+internal class JdbcOracleDialectImpl(
+    dataTypeProvider: JdbcDataTypeProvider
+) : JdbcOracleDialect, JdbcAbstractDialect(dataTypeProvider)
+
+fun JdbcOracleDialect(dataTypeProvider: JdbcDataTypeProvider? = null): JdbcOracleDialect {
+    return JdbcDialects.get(OracleDialect.driver, dataTypeProvider) as JdbcOracleDialect
 }

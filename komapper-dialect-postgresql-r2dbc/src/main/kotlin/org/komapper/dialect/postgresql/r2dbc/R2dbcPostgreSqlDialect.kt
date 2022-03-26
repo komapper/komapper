@@ -6,10 +6,10 @@ import org.komapper.r2dbc.Binder
 import org.komapper.r2dbc.IndexedBinder
 import org.komapper.r2dbc.R2dbcAbstractDialect
 import org.komapper.r2dbc.R2dbcDataTypeProvider
+import org.komapper.r2dbc.R2dbcDialect
+import org.komapper.r2dbc.R2dbcDialects
 
-open class R2dbcPostgreSqlDialect(
-    dataTypeProvider: R2dbcDataTypeProvider
-) : PostgreSqlDialect, R2dbcAbstractDialect(dataTypeProvider) {
+interface R2dbcPostgreSqlDialect : R2dbcDialect, PostgreSqlDialect {
 
     override fun getBinder(): Binder {
         return IndexedBinder
@@ -20,4 +20,12 @@ open class R2dbcPostgreSqlDialect(
     }
 
     override fun supportsBatchExecutionOfParameterizedStatement(): Boolean = false
+}
+
+internal class R2dbcPostgreSqlDialectImpl(
+    dataTypeProvider: R2dbcDataTypeProvider
+) : R2dbcPostgreSqlDialect, R2dbcAbstractDialect(dataTypeProvider)
+
+fun R2dbcPostgreSqlDialect(dataTypeProvider: R2dbcDataTypeProvider? = null): R2dbcPostgreSqlDialect {
+    return R2dbcDialects.get(PostgreSqlDialect.driver, dataTypeProvider) as R2dbcPostgreSqlDialect
 }

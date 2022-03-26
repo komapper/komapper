@@ -6,10 +6,10 @@ import org.komapper.r2dbc.AtSignBinder
 import org.komapper.r2dbc.Binder
 import org.komapper.r2dbc.R2dbcAbstractDialect
 import org.komapper.r2dbc.R2dbcDataTypeProvider
+import org.komapper.r2dbc.R2dbcDialect
+import org.komapper.r2dbc.R2dbcDialects
 
-class R2dbcSqlServerDialect(
-    dataTypeProvider: R2dbcDataTypeProvider
-) : SqlServerDialect, R2dbcAbstractDialect(dataTypeProvider) {
+interface R2dbcSqlServerDialect : R2dbcDialect, SqlServerDialect {
 
     override fun getBinder(): Binder {
         return AtSignBinder
@@ -28,4 +28,12 @@ class R2dbcSqlServerDialect(
     }
 
     override fun supportsBatchExecutionReturningGeneratedValues(): Boolean = false
+}
+
+internal class R2dbcSqlServerDialectImpl(
+    dataTypeProvider: R2dbcDataTypeProvider
+) : R2dbcSqlServerDialect, R2dbcAbstractDialect(dataTypeProvider)
+
+fun R2dbcSqlServerDialect(dataTypeProvider: R2dbcDataTypeProvider? = null): R2dbcSqlServerDialect {
+    return R2dbcDialects.get(SqlServerDialect.driver, dataTypeProvider) as R2dbcSqlServerDialect
 }

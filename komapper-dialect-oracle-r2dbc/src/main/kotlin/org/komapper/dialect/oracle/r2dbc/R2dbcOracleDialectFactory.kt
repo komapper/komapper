@@ -11,6 +11,6 @@ class R2dbcOracleDialectFactory : R2dbcDialectFactory {
     }
 
     override fun create(dataTypeProvider: R2dbcDataTypeProvider): R2dbcDialect {
-        return R2dbcOracleDialect(dataTypeProvider)
+        return R2dbcOracleDialectImpl(dataTypeProvider)
     }
 }

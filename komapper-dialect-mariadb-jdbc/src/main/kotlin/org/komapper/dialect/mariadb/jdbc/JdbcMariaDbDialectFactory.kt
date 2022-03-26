@@ -11,6 +11,6 @@ class JdbcMariaDbDialectFactory : JdbcDialectFactory {
     }
 
     override fun create(dataTypeProvider: JdbcDataTypeProvider): JdbcDialect {
-        return JdbcMariaDbDialect(dataTypeProvider)
+        return JdbcMariaDbDialectImpl(dataTypeProvider)
     }
 }

@@ -11,6 +11,6 @@ class R2dbcSqlServerDialectFactory : R2dbcDialectFactory {
     }
 
     override fun create(dataTypeProvider: R2dbcDataTypeProvider): R2dbcDialect {
-        return R2dbcSqlServerDialect(dataTypeProvider)
+        return R2dbcSqlServerDialectImpl(dataTypeProvider)
     }
 }

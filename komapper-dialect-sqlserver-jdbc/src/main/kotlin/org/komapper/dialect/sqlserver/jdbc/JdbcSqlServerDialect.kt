@@ -3,11 +3,11 @@ package org.komapper.dialect.sqlserver.jdbc
 import org.komapper.dialect.sqlserver.SqlServerDialect
 import org.komapper.jdbc.JdbcAbstractDialect
 import org.komapper.jdbc.JdbcDataTypeProvider
+import org.komapper.jdbc.JdbcDialect
+import org.komapper.jdbc.JdbcDialects
 import java.sql.SQLException
 
-class JdbcSqlServerDialect(
-    dataTypeProvider: JdbcDataTypeProvider
-) : SqlServerDialect, JdbcAbstractDialect(dataTypeProvider) {
+interface JdbcSqlServerDialect : JdbcDialect, SqlServerDialect {
 
     override fun isUniqueConstraintViolationError(exception: SQLException): Boolean {
         return exception.filterIsInstance<SQLException>().any {
@@ -28,4 +28,13 @@ class JdbcSqlServerDialect(
     }
 
     override fun supportsBatchExecutionReturningGeneratedValues(): Boolean = false
+}
+
+internal class JdbcSqlServerDialectImpl(
+    dataTypeProvider: JdbcDataTypeProvider
+) : JdbcSqlServerDialect, JdbcAbstractDialect(dataTypeProvider)
+
+
+fun JdbcSqlServerDialect(dataTypeProvider: JdbcDataTypeProvider? = null): JdbcSqlServerDialect {
+    return JdbcDialects.get(SqlServerDialect.driver, dataTypeProvider) as JdbcSqlServerDialect
 }

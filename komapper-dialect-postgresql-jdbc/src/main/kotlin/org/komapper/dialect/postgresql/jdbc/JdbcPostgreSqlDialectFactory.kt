@@ -11,6 +11,6 @@ class JdbcPostgreSqlDialectFactory : JdbcDialectFactory {
     }
 
     override fun create(dataTypeProvider: JdbcDataTypeProvider): JdbcDialect {
-        return JdbcPostgreSqlDialect(dataTypeProvider)
+        return JdbcPostgreSqlDialectImpl(dataTypeProvider)
     }
 }

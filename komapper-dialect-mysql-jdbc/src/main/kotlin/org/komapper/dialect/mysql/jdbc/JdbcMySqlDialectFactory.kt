@@ -11,6 +11,6 @@ class JdbcMySqlDialectFactory : JdbcDialectFactory {
     }
 
     override fun create(dataTypeProvider: JdbcDataTypeProvider): JdbcDialect {
-        return JdbcMySqlDialect(dataTypeProvider)
+        return JdbcMySqlDialectImpl(dataTypeProvider)
     }
 }
