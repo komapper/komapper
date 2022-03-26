@@ -22,4 +22,11 @@ internal object Symbols {
     const val Operand = "org.komapper.core.dsl.expression.Operand"
     const val Argument = "$Operand.Argument"
     const val checkMetamodelVersion = "org.komapper.core.dsl.metamodel.checkMetamodelVersion"
+    const val Instant = "java.time.Instant"
+    const val LocalDateTime = "java.time.LocalDateTime"
+    const val OffsetDateTime = "java.time.OffsetDateTime"
+    const val KotlinInstant = "kotlinx.datetime.Instant"
+    const val KotlinLocalDateTime = "kotlinx.datetime.LocalDateTime"
+    const val toKotlinInstant = "kotlinx.datetime.toKotlinInstant"
+    const val toKotlinLocalDateTime = "kotlinx.datetime.toKotlinLocalDateTime"
 }

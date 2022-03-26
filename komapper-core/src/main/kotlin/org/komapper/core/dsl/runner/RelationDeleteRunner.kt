@@ -1,5 +1,6 @@
 package org.komapper.core.dsl.runner
 
+import org.komapper.core.BuilderDialect
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.DryRunStatement
 import org.komapper.core.Statement
@@ -15,12 +16,12 @@ class RelationDeleteRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY
 
     override fun dryRun(config: DatabaseConfig): DryRunStatement {
         val statement = buildStatement(config)
-        return DryRunStatement.of(statement, config.dialect)
+        return DryRunStatement.of(statement, config)
     }
 
     fun buildStatement(config: DatabaseConfig): Statement {
         checkWhereClause(context)
-        val builder = RelationDeleteStatementBuilder(config.dialect, context)
+        val builder = RelationDeleteStatementBuilder(BuilderDialect(config), context)
         return builder.build()
     }
 }

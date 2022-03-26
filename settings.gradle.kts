@@ -34,6 +34,7 @@ include("komapper-annotation")
 include("komapper-processor")
 
 // JDBC
+include("komapper-datetime-jdbc")
 include("komapper-jdbc")
 include("komapper-quarkus-jdbc")
 include("komapper-quarkus-jdbc-deployment")
@@ -45,6 +46,7 @@ include("komapper-starter-jdbc")
 include("komapper-tx-jdbc")
 
 // R2DBC
+include("komapper-datetime-r2dbc")
 include("komapper-r2dbc")
 include("komapper-spring-boot-autoconfigure-r2dbc")
 include("komapper-spring-boot-starter-r2dbc")

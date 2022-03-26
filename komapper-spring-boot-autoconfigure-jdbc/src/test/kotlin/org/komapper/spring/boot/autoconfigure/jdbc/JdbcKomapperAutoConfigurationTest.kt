@@ -8,6 +8,7 @@ import org.komapper.core.TemplateStatementBuilder
 import org.komapper.core.Value
 import org.komapper.dialect.h2.jdbc.JdbcH2Dialect
 import org.komapper.jdbc.JdbcDataType
+import org.komapper.jdbc.JdbcDataTypeProvider
 import org.komapper.jdbc.JdbcDatabase
 import org.komapper.jdbc.JdbcStringType
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
@@ -19,6 +20,7 @@ import java.time.Clock
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
+import kotlin.reflect.KClass
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -59,7 +61,7 @@ class JdbcKomapperAutoConfigurationTest {
 
         val database = context.getBean(JdbcDatabase::class.java)
         assertNotNull(database)
-        val dataType = database.config.dialect.getDataType(String::class)
+        val dataType = database.config.dataOperator.getDataType(String::class)
         assertEquals("abc", dataType.name)
         val clock = database.config.clockProvider.now()
         val timestamp = LocalDateTime.now(clock)
@@ -86,13 +88,20 @@ class JdbcKomapperAutoConfigurationTest {
         assertTrue(builder is MyStatementBuilder)
     }
 
-    @Suppress("unused")
+    @Suppress("unused", "UNCHECKED_CAST")
     @Configuration
     open class CustomConfigure {
 
         @Bean
-        open fun dataTypes(): List<JdbcDataType<*>> {
-            return listOf(JdbcStringType("abc"))
+        open fun dataTypeProvider(): JdbcDataTypeProvider {
+            return object : JdbcDataTypeProvider {
+                private val map: Map<KClass<*>, JdbcDataType<*>> =
+                    listOf(JdbcStringType("abc")).associateBy { it.klass }
+
+                override fun <T : Any> get(klass: KClass<out T>): JdbcDataType<T>? {
+                    return map[klass] as JdbcDataType<T>?
+                }
+            }
         }
 
         @Bean

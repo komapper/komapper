@@ -1,38 +1,31 @@
 package org.komapper.jdbc
 
+import org.komapper.core.BuilderDialect
+import org.komapper.core.Dialect
 import org.komapper.core.dsl.builder.EntityUpsertStatementBuilder
 import org.komapper.core.dsl.builder.SchemaStatementBuilder
 import org.komapper.core.dsl.context.EntityUpsertContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
-import java.sql.SQLException
-import kotlin.reflect.KClass
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-internal class JdbcAbstractDialectTest {
+internal class DialectTest {
 
-    class MyJdbcDialect : JdbcAbstractDialect() {
+    class MyJdbcDialect : Dialect {
 
         override val driver: String
             get() = throw UnsupportedOperationException()
-
-        override fun isUniqueConstraintViolationError(exception: SQLException): Boolean {
-            throw UnsupportedOperationException()
-        }
 
         override fun getSequenceSql(sequenceName: String): String {
             throw UnsupportedOperationException()
         }
 
-        override fun <T : Any> getDataType(klass: KClass<out T>): JdbcDataType<T> {
-            throw UnsupportedOperationException()
-        }
-
-        override fun getSchemaStatementBuilder(): SchemaStatementBuilder {
+        override fun getSchemaStatementBuilder(dialect: BuilderDialect): SchemaStatementBuilder {
             throw UnsupportedOperationException()
         }
 
         override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> getEntityUpsertStatementBuilder(
+            dialect: BuilderDialect,
             context: EntityUpsertContext<ENTITY, ID, META>,
             entities: List<ENTITY>
         ): EntityUpsertStatementBuilder<ENTITY> {

@@ -25,6 +25,11 @@ interface R2dbcDatabaseConfig : DatabaseConfig {
     override val dialect: R2dbcDialect
 
     /**
+     * The data operator.
+     */
+    override val dataOperator: R2dbcDataOperator
+
+    /**
      * The session to the database.
      */
     val session: R2dbcSession
@@ -33,6 +38,7 @@ interface R2dbcDatabaseConfig : DatabaseConfig {
 open class DefaultR2dbcDatabaseConfig(
     connectionFactory: ConnectionFactory,
     dialect: R2dbcDialect,
+    dataTypeProvider: R2dbcDataTypeProvider? = null,
     clockProvider: ClockProvider = DefaultClockProvider(),
     executionOptions: ExecutionOptions = ExecutionOptions()
 ) : R2dbcDatabaseConfig,
@@ -40,6 +46,11 @@ open class DefaultR2dbcDatabaseConfig(
 
     override val session: R2dbcSession by lazy {
         R2dbcSessions.get(connectionFactory, loggerFacade)
+    }
+
+    override val dataOperator: R2dbcDataOperator by lazy {
+        val provider = R2dbcDataTypeProviders.get(dialect.driver, dataTypeProvider)
+        DefaultR2dbcDataOperator(dialect, provider)
     }
 }
 
@@ -52,5 +63,6 @@ class SimpleR2dbcDatabaseConfig(
     override val statementInspector: StatementInspector,
     override val templateStatementBuilder: TemplateStatementBuilder,
     override val dialect: R2dbcDialect,
-    override val session: R2dbcSession
+    override val session: R2dbcSession,
+    override val dataOperator: R2dbcDataOperator,
 ) : R2dbcDatabaseConfig

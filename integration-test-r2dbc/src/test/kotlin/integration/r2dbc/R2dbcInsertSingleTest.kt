@@ -5,6 +5,7 @@ import integration.core.Dbms
 import integration.core.Department
 import integration.core.Human
 import integration.core.IdentityStrategy
+import integration.core.Man
 import integration.core.Person
 import integration.core.Run
 import integration.core.SequenceStrategy
@@ -12,6 +13,7 @@ import integration.core.address
 import integration.core.department
 import integration.core.human
 import integration.core.identityStrategy
+import integration.core.man
 import integration.core.person
 import integration.core.sequenceStrategy
 import org.junit.jupiter.api.TestInfo
@@ -47,6 +49,23 @@ class R2dbcInsertSingleTest(private val db: R2dbcDatabase) {
             }.first()
         }
         assertEquals(address, address2)
+    }
+
+    @Test
+    fun createdAt_instant(info: TestInfo) = inTransaction(db, info) {
+        val p = Meta.man
+        val person1 = Man(1, "ABC")
+        val id = db.runQuery { QueryDsl.insert(p).single(person1) }.personId
+        val person2 = db.runQuery { QueryDsl.from(p).where { p.personId eq id }.first() }
+        assertNotNull(person2.createdAt)
+        assertNotNull(person2.updatedAt)
+        assertEquals(person2.createdAt, person2.updatedAt)
+        val person3 = db.runQuery {
+            QueryDsl.from(p).where {
+                p.personId to 1
+            }.first()
+        }
+        assertEquals(person2, person3)
     }
 
     @Test

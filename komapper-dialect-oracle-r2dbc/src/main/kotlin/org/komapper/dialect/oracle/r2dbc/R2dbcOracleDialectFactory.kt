@@ -6,10 +6,10 @@ import org.komapper.r2dbc.spi.R2dbcDialectFactory
 
 class R2dbcOracleDialectFactory : R2dbcDialectFactory {
     override fun supports(driver: String): Boolean {
-        return driver.lowercase() == OracleDialect.DRIVER
+        return driver.lowercase() == OracleDialect.driver
     }
 
     override fun create(): R2dbcDialect {
-        return R2dbcOracleDialect()
+        return R2dbcOracleDialectImpl
     }
 }

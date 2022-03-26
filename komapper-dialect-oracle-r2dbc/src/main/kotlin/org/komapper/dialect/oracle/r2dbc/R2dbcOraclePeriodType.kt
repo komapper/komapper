@@ -1,10 +1,10 @@
 package org.komapper.dialect.oracle.r2dbc
 
 import io.r2dbc.spi.Row
-import org.komapper.r2dbc.R2dbcAbstractType
+import org.komapper.r2dbc.AbstractR2dbcDataType
 import java.time.Period
 
-object R2dbcOraclePeriodType : R2dbcAbstractType<Period>(Period::class) {
+object R2dbcOraclePeriodType : AbstractR2dbcDataType<Period>(Period::class) {
     override val name: String = "interval year to month"
 
     override fun getValue(row: Row, index: Int): Period? {

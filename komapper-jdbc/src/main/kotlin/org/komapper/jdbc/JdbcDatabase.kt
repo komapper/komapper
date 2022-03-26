@@ -94,16 +94,24 @@ fun JdbcDatabase(config: JdbcDatabaseConfig): JdbcDatabase {
  *
  * @param dataSource the JDBC data source
  * @param dialect the dialect
+ * @param dataTypeProvider the data type provider
  * @param clockProvider the clock provider
  * @param executionOptions the execution options
  */
 fun JdbcDatabase(
     dataSource: DataSource,
     dialect: JdbcDialect,
+    dataTypeProvider: JdbcDataTypeProvider? = null,
     clockProvider: ClockProvider = DefaultClockProvider(),
     executionOptions: ExecutionOptions = ExecutionOptions(),
 ): JdbcDatabase {
-    val config = DefaultJdbcDatabaseConfig(dataSource, dialect, clockProvider, executionOptions)
+    val config = DefaultJdbcDatabaseConfig(
+        dataSource = dataSource,
+        dialect = dialect,
+        dataTypeProvider = dataTypeProvider,
+        clockProvider = clockProvider,
+        executionOptions = executionOptions
+    )
     return JdbcDatabase(config)
 }
 
@@ -113,44 +121,27 @@ fun JdbcDatabase(
  * @param url the JDBC URL
  * @param user the JDBC user
  * @param password the JDBC password
- * @param clockProvider the clock provider
- * @param executionOptions the execution options
- * @param dataTypes the data types
- */
-fun JdbcDatabase(
-    url: String,
-    user: String = "",
-    password: String = "",
-    clockProvider: ClockProvider = DefaultClockProvider(),
-    executionOptions: ExecutionOptions = ExecutionOptions(),
-    dataTypes: List<JdbcDataType<*>> = emptyList()
-): JdbcDatabase {
-    val dataSource = SimpleDataSource(url, user, password)
-    val driver = JdbcDialects.extractJdbcDriver(url)
-    val dialect = JdbcDialects.get(driver, dataTypes)
-    val config = DefaultJdbcDatabaseConfig(dataSource, dialect, clockProvider, executionOptions)
-    return JdbcDatabase(config)
-}
-
-/**
- * Creates a [JdbcDatabase] instance.
- *
- * @param url the JDBC URL
- * @param user the JDBC user
- * @param password the JDBC password
- * @param clockProvider the clock provider
- * @param executionOptions the execution options
  * @param dialect the dialect
+ * @param dataTypeProvider the data type provider
+ * @param clockProvider the clock provider
+ * @param executionOptions the execution options
  */
 fun JdbcDatabase(
     url: String,
     user: String = "",
     password: String = "",
+    dialect: JdbcDialect = JdbcDialects.getByUrl(url),
+    dataTypeProvider: JdbcDataTypeProvider? = null,
     clockProvider: ClockProvider = DefaultClockProvider(),
     executionOptions: ExecutionOptions = ExecutionOptions(),
-    dialect: JdbcDialect
 ): JdbcDatabase {
     val dataSource = SimpleDataSource(url, user, password)
-    val config = DefaultJdbcDatabaseConfig(dataSource, dialect, clockProvider, executionOptions)
+    val config = DefaultJdbcDatabaseConfig(
+        dataSource = dataSource,
+        dialect = dialect,
+        dataTypeProvider = dataTypeProvider,
+        clockProvider = clockProvider,
+        executionOptions = executionOptions
+    )
     return JdbcDatabase(config)
 }

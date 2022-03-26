@@ -24,6 +24,11 @@ interface JdbcDatabaseConfig : DatabaseConfig {
     override val dialect: JdbcDialect
 
     /**
+     * The data operator.
+     */
+    override val dataOperator: JdbcDataOperator
+
+    /**
      * The session to the database.
      */
     val session: JdbcSession
@@ -37,6 +42,7 @@ interface JdbcDatabaseConfig : DatabaseConfig {
 open class DefaultJdbcDatabaseConfig(
     dataSource: DataSource,
     dialect: JdbcDialect,
+    dataTypeProvider: JdbcDataTypeProvider? = null,
     clockProvider: ClockProvider = DefaultClockProvider(),
     executionOptions: ExecutionOptions = ExecutionOptions()
 ) : JdbcDatabaseConfig,
@@ -47,6 +53,10 @@ open class DefaultJdbcDatabaseConfig(
     }
     override val dataFactory: JdbcDataFactory by lazy {
         DefaultJdbcDataFactory(session)
+    }
+    override val dataOperator: JdbcDataOperator by lazy {
+        val provider = JdbcDataTypeProviders.get(dialect.driver, dataTypeProvider)
+        DefaultJdbcDataOperator(dialect, provider)
     }
 }
 
@@ -60,5 +70,6 @@ class SimpleJdbcDatabaseConfig(
     override val templateStatementBuilder: TemplateStatementBuilder,
     override val dialect: JdbcDialect,
     override val session: JdbcSession,
-    override val dataFactory: JdbcDataFactory
+    override val dataFactory: JdbcDataFactory,
+    override val dataOperator: JdbcDataOperator
 ) : JdbcDatabaseConfig

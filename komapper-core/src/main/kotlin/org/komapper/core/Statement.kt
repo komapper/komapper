@@ -80,15 +80,15 @@ data class DryRunStatement internal constructor(
     companion object {
         val EMPTY = DryRunStatement()
 
-        fun of(statement: Statement, dialect: Dialect): DryRunStatement {
-            val sql = statement.toSql(dialect::createBindVariable)
-            val sqlWithArgs = statement.toSqlWithArgs(dialect::formatValue)
+        fun of(statement: Statement, config: DatabaseConfig): DryRunStatement {
+            val sql = statement.toSql(config.dialect::createBindVariable)
+            val sqlWithArgs = statement.toSqlWithArgs(config.dataOperator::formatValue)
             return DryRunStatement(sql = sql, sqlWithArgs = sqlWithArgs, args = statement.args)
         }
 
-        fun of(statements: List<Statement>, dialect: Dialect): DryRunStatement {
-            val sql = statements.joinToString(separator = ";") { it.toSql(dialect::createBindVariable) }
-            val sqlWithArgs = statements.joinToString { it.toSqlWithArgs(dialect::formatValue) }
+        fun of(statements: List<Statement>, config: DatabaseConfig): DryRunStatement {
+            val sql = statements.joinToString(separator = ";") { it.toSql(config.dialect::createBindVariable) }
+            val sqlWithArgs = statements.joinToString { it.toSqlWithArgs(config.dataOperator::formatValue) }
             val args = statements.fold(emptyList<Value<*>>()) { acc, statement -> acc + statement.args }
             return DryRunStatement(sql = sql, sqlWithArgs = sqlWithArgs, args = args)
         }

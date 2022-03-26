@@ -13,10 +13,9 @@ object JdbcDialects {
 
     /**
      * @param driver the driver name
-     * @param dataTypes the data types
      * @return the [JdbcDialect]
      */
-    fun get(driver: String, dataTypes: List<JdbcDataType<*>>): JdbcDialect {
+    fun get(driver: String): JdbcDialect {
         val loader = ServiceLoader.load(JdbcDialectFactory::class.java)
         val factory = loader.filter { it.supports(driver) }.findByPriority()
             ?: error(
@@ -24,16 +23,15 @@ object JdbcDialects {
                     "Try to add the 'komapper-dialect-$driver-jdbc' dependency. " +
                     "driver='$driver'"
             )
-        return factory.create(dataTypes)
+        return factory.create()
     }
 
     /**
      * @param url the JDBC url
-     * @param dataTypes the data types
      */
-    fun getByUrl(url: String, dataTypes: List<JdbcDataType<*>>): JdbcDialect {
+    fun getByUrl(url: String): JdbcDialect {
         val driver = extractJdbcDriver(url)
-        return get(driver, dataTypes)
+        return get(driver)
     }
 
     /**

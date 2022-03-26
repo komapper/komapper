@@ -1,6 +1,6 @@
 package org.komapper.core.dsl.builder
 
-import org.komapper.core.Dialect
+import org.komapper.core.BuilderDialect
 import org.komapper.core.Statement
 import org.komapper.core.StatementBuffer
 import org.komapper.core.Value
@@ -10,7 +10,7 @@ interface OffsetLimitStatementBuilder {
 }
 
 class OffsetLimitStatementBuilderImpl(
-    @Suppress("unused") private val dialect: Dialect,
+    @Suppress("unused") private val dialect: BuilderDialect,
     private val offset: Int,
     private val limit: Int
 ) : OffsetLimitStatementBuilder {

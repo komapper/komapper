@@ -5,8 +5,8 @@ import io.r2dbc.spi.ConnectionFactories
 import io.r2dbc.spi.ConnectionFactoryOptions
 import io.r2dbc.spi.Option
 import org.komapper.core.ExecutionOptions
+import org.komapper.dialect.sqlserver.r2dbc.R2dbcSqlServerDialect
 import org.komapper.r2dbc.R2dbcDatabase
-import org.komapper.r2dbc.R2dbcDialects
 import org.testcontainers.containers.MSSQLR2DBCDatabaseContainer
 import org.testcontainers.containers.MSSQLServerContainer
 import org.testcontainers.containers.MSSQLServerContainerProvider
@@ -32,7 +32,7 @@ class R2dbcSqlServerSetting(private val driver: String, private val url: String)
     override val database: R2dbcDatabase
         get() = R2dbcDatabase(
             ConnectionFactories.get(options),
-            R2dbcDialects.get(driver),
+            R2dbcSqlServerDialect(),
             executionOptions = ExecutionOptions(batchSize = 2)
         )
 }

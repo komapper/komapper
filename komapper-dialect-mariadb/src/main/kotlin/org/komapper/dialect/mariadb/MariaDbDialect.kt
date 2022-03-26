@@ -1,5 +1,6 @@
 package org.komapper.dialect.mariadb
 
+import org.komapper.core.BuilderDialect
 import org.komapper.core.Dialect
 import org.komapper.core.dsl.builder.EntityUpsertStatementBuilder
 import org.komapper.core.dsl.builder.OffsetLimitStatementBuilder
@@ -9,33 +10,36 @@ import org.komapper.core.dsl.metamodel.EntityMetamodel
 
 interface MariaDbDialect : Dialect {
 
-    companion object {
-        const val DRIVER = "mariadb"
+    companion object : Dialect.Identifier {
+        private const val DRIVER = "mariadb"
+
         /** the error code that represents unique violation  */
         val UNIQUE_CONSTRAINT_VIOLATION_ERROR_CODES = setOf(1022, 1062)
+        override val driver: String = DRIVER
     }
 
     override val driver: String get() = DRIVER
     override val openQuote: String get() = "`"
     override val closeQuote: String get() = "`"
 
-    override fun getOffsetLimitStatementBuilder(offset: Int, limit: Int): OffsetLimitStatementBuilder {
-        return MariaDbOffsetLimitStatementBuilder(this, offset, limit)
+    override fun getOffsetLimitStatementBuilder(dialect: BuilderDialect, offset: Int, limit: Int): OffsetLimitStatementBuilder {
+        return MariaDbOffsetLimitStatementBuilder(dialect, offset, limit)
     }
 
     override fun getSequenceSql(sequenceName: String): String {
         return "select next value for $sequenceName"
     }
 
-    override fun getSchemaStatementBuilder(): SchemaStatementBuilder {
-        return MariaDbSchemaStatementBuilder(this)
+    override fun getSchemaStatementBuilder(dialect: BuilderDialect): SchemaStatementBuilder {
+        return MariaDbSchemaStatementBuilder(dialect)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> getEntityUpsertStatementBuilder(
+        dialect: BuilderDialect,
         context: EntityUpsertContext<ENTITY, ID, META>,
         entities: List<ENTITY>
     ): EntityUpsertStatementBuilder<ENTITY> {
-        return MariaDbEntityUpsertStatementBuilder(this, context, entities)
+        return MariaDbEntityUpsertStatementBuilder(dialect, context, entities)
     }
 
     override fun supportsAliasForDeleteStatement() = false

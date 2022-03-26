@@ -1,6 +1,6 @@
 package org.komapper.core.dsl.builder
 
-import org.komapper.core.Dialect
+import org.komapper.core.BuilderDialect
 import org.komapper.core.Statement
 import org.komapper.core.StatementBuffer
 import org.komapper.core.dsl.metamodel.EntityMetamodel
@@ -13,7 +13,9 @@ interface SchemaStatementBuilder {
     fun drop(metamodels: List<EntityMetamodel<*, *, *>>): List<Statement>
 }
 
-abstract class AbstractSchemaStatementBuilder<D : Dialect>(protected val dialect: D) : SchemaStatementBuilder {
+abstract class AbstractSchemaStatementBuilder(
+    protected val dialect: BuilderDialect
+) : SchemaStatementBuilder {
 
     override fun create(metamodels: List<EntityMetamodel<*, *, *>>): List<Statement> {
         val statements = mutableListOf<Statement>()

@@ -2,9 +2,9 @@ package org.komapper.dialect.postgresql.r2dbc
 
 import io.r2dbc.postgresql.codec.Interval
 import io.r2dbc.spi.Row
-import org.komapper.r2dbc.R2dbcAbstractType
+import org.komapper.r2dbc.AbstractR2dbcDataType
 
-object R2dbcPostgreSqlIntervalType : R2dbcAbstractType<Interval>(Interval::class) {
+object R2dbcPostgreSqlIntervalType : AbstractR2dbcDataType<Interval>(Interval::class) {
     override val name: String = "interval"
 
     override fun getValue(row: Row, index: Int): Interval? {

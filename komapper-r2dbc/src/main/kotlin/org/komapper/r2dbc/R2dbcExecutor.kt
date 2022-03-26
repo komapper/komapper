@@ -28,7 +28,7 @@ internal class R2dbcExecutor(
 
     fun <T> executeQuery(
         statement: Statement,
-        transform: (R2dbcDialect, Row) -> T
+        transform: (R2dbcDataOperator, Row) -> T
     ): Flow<T> {
         return flow {
             @Suppress("NAME_SHADOWING")
@@ -40,7 +40,7 @@ internal class R2dbcExecutor(
                 bind(r2dbcStmt, statement)
                 r2dbcStmt.execute().collect { result ->
                     result.map { row, _ ->
-                        val value = transform(config.dialect, row)
+                        val value = transform(config.dataOperator, row)
                         Optional.ofNullable(value)
                     }.collect {
                         val value = it.orElse(null)
@@ -163,7 +163,7 @@ internal class R2dbcExecutor(
         val suppressLogging = executionOptions.suppressLogging ?: false
         if (!suppressLogging) {
             config.loggerFacade.sql(statement, config.dialect::createBindVariable)
-            config.loggerFacade.sqlWithArgs(statement, config.dialect::formatValue)
+            config.loggerFacade.sqlWithArgs(statement, config.dataOperator::formatValue)
         }
     }
 
@@ -187,7 +187,7 @@ internal class R2dbcExecutor(
 
     private fun bind(r2dbcStmt: io.r2dbc.spi.Statement, statement: Statement) {
         statement.args.forEachIndexed { index, value ->
-            config.dialect.setValue(r2dbcStmt, index, value.any, value.klass)
+            config.dataOperator.setValue(r2dbcStmt, index, value.any, value.klass)
         }
     }
 

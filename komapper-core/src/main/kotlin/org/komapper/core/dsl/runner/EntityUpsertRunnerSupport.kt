@@ -1,5 +1,6 @@
 package org.komapper.core.dsl.runner
 
+import org.komapper.core.BuilderDialect
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.Statement
 import org.komapper.core.dsl.builder.createAssignments
@@ -15,7 +16,7 @@ class EntityUpsertRunnerSupport<ENTITY : Any, ID : Any, META : EntityMetamodel<E
 
     fun buildStatement(config: DatabaseConfig, entities: List<ENTITY>): Statement {
         val assignments = context.getAssignments().ifEmpty { context.createAssignments() }
-        val builder = config.dialect.getEntityUpsertStatementBuilder(context, entities)
+        val builder = config.dialect.getEntityUpsertStatementBuilder(BuilderDialect(config), context, entities)
         return builder.build(assignments)
     }
 

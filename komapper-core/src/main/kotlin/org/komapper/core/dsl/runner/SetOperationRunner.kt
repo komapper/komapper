@@ -1,5 +1,6 @@
 package org.komapper.core.dsl.runner
 
+import org.komapper.core.BuilderDialect
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.DryRunStatement
 import org.komapper.core.Statement
@@ -17,14 +18,14 @@ class SetOperationRunner(
 
     override fun dryRun(config: DatabaseConfig): DryRunStatement {
         val statement = buildStatement(config)
-        return DryRunStatement.of(statement, config.dialect)
+        return DryRunStatement.of(statement, config)
     }
 
     fun buildStatement(config: DatabaseConfig): Statement {
         checkWhereClauses(context.left)
         checkWhereClauses(context.right)
         val aliasManager = DefaultAliasManager(context)
-        val builder = SetOperationStatementBuilder(config.dialect, context, aliasManager)
+        val builder = SetOperationStatementBuilder(BuilderDialect(config), context, aliasManager)
         return builder.build()
     }
 

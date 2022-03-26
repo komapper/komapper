@@ -23,8 +23,8 @@ internal class R2dbcTemplateSelectFlowBuilder<T>(
     override fun build(config: R2dbcDatabaseConfig): Flow<T> {
         val statement = runner.buildStatement(config)
         val executor = R2dbcExecutor(config, context.options)
-        return executor.executeQuery(statement) { dialect, row ->
-            transform(R2dbcRowWrapper(dialect, row))
+        return executor.executeQuery(statement) { dataOperator, row ->
+            transform(R2dbcRowWrapper(dataOperator, row))
         }
     }
 

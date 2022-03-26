@@ -1,5 +1,6 @@
 package org.komapper.core.dsl.runner
 
+import org.komapper.core.BuilderDialect
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.DryRunStatement
 import org.komapper.core.Statement
@@ -21,7 +22,7 @@ class RelationUpdateRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY
         val updatedAtAssignment = context.target.updatedAtAssignment(clock)
         val result = buildStatement(config, updatedAtAssignment)
         val statement = result.getOrThrow()
-        return DryRunStatement.of(statement, config.dialect)
+        return DryRunStatement.of(statement, config)
     }
 
     fun buildStatement(
@@ -35,7 +36,7 @@ class RelationUpdateRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY
                 IllegalStateException("No update statement is generated because no assignment is specified.")
             )
         }
-        val builder = RelationUpdateStatementBuilder(config.dialect, context)
+        val builder = RelationUpdateStatementBuilder(BuilderDialect(config), context)
         val statement = builder.build(assignments)
         return Result.success(statement)
     }

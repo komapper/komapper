@@ -10,6 +10,6 @@ class R2dbcMySqlDialectFactory : R2dbcDialectFactory {
     }
 
     override fun create(): R2dbcDialect {
-        return R2dbcMySqlDialect()
+        return R2dbcMySqlDialectImpl
     }
 }

@@ -1,7 +1,7 @@
 package org.komapper.jdbc.dsl.runner
 
 import org.komapper.core.dsl.query.Row
-import org.komapper.jdbc.JdbcDialect
+import org.komapper.jdbc.JdbcDataOperator
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.sql.Array
@@ -19,7 +19,7 @@ import kotlin.reflect.KClass
 import kotlin.reflect.cast
 
 internal class JdbcResultSetWrapper(
-    private val dialect: JdbcDialect,
+    private val dataOperator: JdbcDataOperator,
     private val rs: ResultSet
 ) : Row {
 
@@ -200,10 +200,10 @@ internal class JdbcResultSetWrapper(
     }
 
     override fun <T : Any> asT(index: Int, klass: KClass<T>): T? {
-        return dialect.getValue(rs, index + 1, klass)?.let { klass.cast(it) }
+        return dataOperator.getValue(rs, index + 1, klass)?.let { klass.cast(it) }
     }
 
     override fun <T : Any> asT(columnLabel: String, klass: KClass<T>): T? {
-        return dialect.getValue(rs, columnLabel, klass)?.let { klass.cast(it) }
+        return dataOperator.getValue(rs, columnLabel, klass)?.let { klass.cast(it) }
     }
 }

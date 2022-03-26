@@ -1,6 +1,8 @@
 package org.komapper.template
 
 import org.junit.jupiter.api.Nested
+import org.komapper.core.BuilderDialect
+import org.komapper.core.DryRunDataOperator
 import org.komapper.core.DryRunDialect
 import org.komapper.core.TemplateBuiltinExtensions
 import org.komapper.core.Value
@@ -17,7 +19,7 @@ import kotlin.test.assertTrue
 class TwoWayTemplateStatementBuilderTest {
 
     private val statementBuilder = TwoWayTemplateStatementBuilder(
-        dialect = DryRunDialect,
+        dialect = BuilderDialect(DryRunDialect, DryRunDataOperator),
         sqlNodeFactory = NoCacheSqlNodeFactory(),
         exprEvaluator = DefaultExprEvaluator(
             NoCacheExprNodeFactory(),

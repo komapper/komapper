@@ -1,6 +1,7 @@
 package org.komapper.spring.boot.autoconfigure.r2dbc
 
 import io.r2dbc.spi.ConnectionFactory
+import org.komapper.core.BuilderDialect
 import org.komapper.core.ClockProvider
 import org.komapper.core.DefaultClockProvider
 import org.komapper.core.ExecutionOptions
@@ -12,6 +13,10 @@ import org.komapper.core.StatementInspector
 import org.komapper.core.StatementInspectors
 import org.komapper.core.TemplateStatementBuilder
 import org.komapper.core.TemplateStatementBuilders
+import org.komapper.r2dbc.DefaultR2dbcDataOperator
+import org.komapper.r2dbc.R2dbcDataOperator
+import org.komapper.r2dbc.R2dbcDataTypeProvider
+import org.komapper.r2dbc.R2dbcDataTypeProviders
 import org.komapper.r2dbc.R2dbcDatabase
 import org.komapper.r2dbc.R2dbcDatabaseConfig
 import org.komapper.r2dbc.R2dbcDialect
@@ -28,6 +33,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.env.Environment
 import org.springframework.transaction.ReactiveTransactionManager
+import java.util.Optional
 import java.util.UUID
 
 @Suppress("unused")
@@ -93,8 +99,18 @@ open class R2dbcKomapperAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    open fun templateStatementBuilder(dialect: R2dbcDialect): TemplateStatementBuilder {
-        return TemplateStatementBuilders.get(dialect)
+    open fun dataOperator(dialect: R2dbcDialect, dataTypeProvider: Optional<R2dbcDataTypeProvider>): R2dbcDataOperator {
+        val provider = R2dbcDataTypeProviders.get(dialect.driver, dataTypeProvider.orElse(null))
+        return DefaultR2dbcDataOperator(dialect, provider)
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    open fun templateStatementBuilder(
+        dialect: R2dbcDialect,
+        dataOperator: R2dbcDataOperator
+    ): TemplateStatementBuilder {
+        return TemplateStatementBuilders.get(BuilderDialect(dialect, dataOperator))
     }
 
     @Bean
@@ -107,6 +123,7 @@ open class R2dbcKomapperAutoConfiguration {
         loggerFacade: LoggerFacade,
         session: R2dbcSession,
         statementInspector: StatementInspector,
+        dataOperator: R2dbcDataOperator,
         templateStatementBuilder: TemplateStatementBuilder
     ): R2dbcDatabaseConfig {
         return SimpleR2dbcDatabaseConfig(
@@ -118,6 +135,7 @@ open class R2dbcKomapperAutoConfiguration {
             loggerFacade = loggerFacade,
             session = session,
             statementInspector = statementInspector,
+            dataOperator = dataOperator,
             templateStatementBuilder = templateStatementBuilder,
         )
     }

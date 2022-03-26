@@ -1,5 +1,6 @@
 package org.komapper.core.dsl.runner
 
+import org.komapper.core.BuilderDialect
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.Statement
 import org.komapper.core.dsl.builder.EntityUpdateStatementBuilder
@@ -11,7 +12,7 @@ internal class EntityUpdateRunnerSupport<ENTITY : Any, ID : Any, META : EntityMe
 ) {
 
     fun buildStatement(config: DatabaseConfig, entity: ENTITY): Statement {
-        val builder = EntityUpdateStatementBuilder(config.dialect, context, entity)
+        val builder = EntityUpdateStatementBuilder(BuilderDialect(config), context, entity)
         return builder.build()
     }
 

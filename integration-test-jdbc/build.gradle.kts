@@ -9,6 +9,7 @@ plugins {
 dependencies {
     api(project(":integration-test-core"))
     api(project(":komapper-tx-jdbc"))
+    api(project(":komapper-datetime-jdbc"))
     api(project(":komapper-annotation"))
     ksp(project(":komapper-processor"))
     api(project(":komapper-codegen"))
@@ -86,7 +87,7 @@ testing {
                 implementation(project)
                 implementation("org.postgresql:postgresql:42.3.3")
                 runtimeOnly("org.testcontainers:postgresql")
-                runtimeOnly(project(":komapper-dialect-postgresql-jdbc"))
+                implementation(project(":komapper-dialect-postgresql-jdbc"))
             }
         }
 

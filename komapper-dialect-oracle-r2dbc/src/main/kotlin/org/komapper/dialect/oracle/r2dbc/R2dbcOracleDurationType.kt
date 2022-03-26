@@ -1,10 +1,10 @@
 package org.komapper.dialect.oracle.r2dbc
 
 import io.r2dbc.spi.Row
-import org.komapper.r2dbc.R2dbcAbstractType
+import org.komapper.r2dbc.AbstractR2dbcDataType
 import java.time.Duration
 
-object R2dbcOracleDurationType : R2dbcAbstractType<Duration>(Duration::class) {
+object R2dbcOracleDurationType : AbstractR2dbcDataType<Duration>(Duration::class) {
     override val name: String = "interval day to second"
 
     override fun getValue(row: Row, index: Int): Duration? {

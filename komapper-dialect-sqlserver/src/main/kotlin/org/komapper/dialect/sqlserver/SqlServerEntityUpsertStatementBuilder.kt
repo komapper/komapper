@@ -1,5 +1,6 @@
 package org.komapper.dialect.sqlserver
 
+import org.komapper.core.BuilderDialect
 import org.komapper.core.Statement
 import org.komapper.core.StatementBuffer
 import org.komapper.core.dsl.builder.AliasManager
@@ -16,9 +17,9 @@ import org.komapper.core.dsl.metamodel.PropertyMetamodel
 import org.komapper.core.dsl.metamodel.getNonAutoIncrementProperties
 
 internal class SqlServerEntityUpsertStatementBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
-    private val dialect: SqlServerDialect,
+    private val dialect: BuilderDialect,
     private val context: EntityUpsertContext<ENTITY, ID, META>,
-    entities: List<ENTITY>
+    entities: List<ENTITY>,
 ) : EntityUpsertStatementBuilder<ENTITY> {
 
     private val target = context.target
@@ -112,7 +113,7 @@ internal class SqlServerEntityUpsertStatementBuilder<ENTITY : Any, ID : Any, MET
     }
 
     private class SourceStatementBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
-        val dialect: SqlServerDialect,
+        val dialect: BuilderDialect,
         val context: EntityUpsertContext<ENTITY, ID, META>,
         val entities: List<ENTITY>
     ) {

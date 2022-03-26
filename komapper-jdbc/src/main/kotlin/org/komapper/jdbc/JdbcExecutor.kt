@@ -41,7 +41,7 @@ internal class JdbcExecutor(
 
     fun <T, R> executeQuery(
         statement: Statement,
-        transform: (JdbcDialect, ResultSet) -> T,
+        transform: (JdbcDataOperator, ResultSet) -> T,
         collect: suspend (Flow<T>) -> R
     ): R {
         return withExceptionTranslator {
@@ -57,7 +57,7 @@ internal class JdbcExecutor(
                             var hasNext = rs.next()
                             override fun hasNext() = hasNext
                             override fun next(): T {
-                                return transform(config.dialect, rs).also { hasNext = rs.next() }
+                                return transform(config.dataOperator, rs).also { hasNext = rs.next() }
                             }
                         }
                         runBlocking {
@@ -174,7 +174,7 @@ internal class JdbcExecutor(
         val suppressLogging = executionOptions.suppressLogging ?: false
         if (!suppressLogging) {
             config.loggerFacade.sql(statement, config.dialect::createBindVariable)
-            config.loggerFacade.sqlWithArgs(statement, config.dialect::formatValue)
+            config.loggerFacade.sqlWithArgs(statement, config.dataOperator::formatValue)
         }
     }
 
@@ -203,7 +203,7 @@ internal class JdbcExecutor(
 
     private fun bind(ps: PreparedStatement, statement: Statement) {
         statement.args.forEachIndexed { index, value ->
-            config.dialect.setValue(ps, index + 1, value.any, value.klass)
+            config.dataOperator.setValue(ps, index + 1, value.any, value.klass)
         }
     }
 

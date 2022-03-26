@@ -10,6 +10,7 @@ dependencies {
     val r2dbcVersion: String by project
     api(project(":integration-test-core"))
     api(project(":komapper-tx-r2dbc"))
+    api(project(":komapper-datetime-r2dbc"))
     api(project(":komapper-annotation"))
     ksp(project(":komapper-processor"))
     api("io.r2dbc:r2dbc-bom:$r2dbcVersion")
@@ -63,7 +64,7 @@ testing {
             dependencies {
                 implementation(project)
                 implementation("org.testcontainers:mariadb")
-                runtimeOnly(project(":komapper-dialect-mariadb-r2dbc"))
+                implementation(project(":komapper-dialect-mariadb-r2dbc"))
                 runtimeOnly("org.mariadb.jdbc:mariadb-java-client:3.0.3")
             }
         }
@@ -73,7 +74,7 @@ testing {
             dependencies {
                 implementation(project)
                 implementation("org.testcontainers:mysql")
-                runtimeOnly(project(":komapper-dialect-mysql-r2dbc"))
+                implementation(project(":komapper-dialect-mysql-r2dbc"))
                 runtimeOnly("mysql:mysql-connector-java:8.0.28")
             }
         }
@@ -83,7 +84,7 @@ testing {
             dependencies {
                 implementation(project)
                 implementation("org.testcontainers:oracle-xe")
-                runtimeOnly(project(":komapper-dialect-oracle-r2dbc"))
+                implementation(project(":komapper-dialect-oracle-r2dbc"))
             }
         }
 
@@ -101,7 +102,7 @@ testing {
             dependencies {
                 implementation(project)
                 implementation("org.testcontainers:mssqlserver")
-                runtimeOnly(project(":komapper-dialect-sqlserver-r2dbc"))
+                implementation(project(":komapper-dialect-sqlserver-r2dbc"))
                 runtimeOnly("com.microsoft.sqlserver:mssql-jdbc:9.4.1.jre11")
             }
         }

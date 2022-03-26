@@ -23,7 +23,7 @@ class EntityDeleteBatchRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENT
     override fun dryRun(config: DatabaseConfig): DryRunStatement {
         if (entities.isEmpty()) return DryRunStatement.EMPTY
         val statement = buildStatement(config, entities.first())
-        return DryRunStatement.of(statement, config.dialect)
+        return DryRunStatement.of(statement, config)
     }
 
     fun buildStatement(config: DatabaseConfig, entity: ENTITY): Statement {
