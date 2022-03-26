@@ -139,16 +139,24 @@ fun R2dbcDatabase(config: R2dbcDatabaseConfig): R2dbcDatabase {
  *
  * @param connectionFactory the connection factory
  * @param dialect the dialect
+ * @param dataTypeProvider the data type provider
  * @param clockProvider the clock provider
  * @param executionOptions the execution options
  */
 fun R2dbcDatabase(
     connectionFactory: ConnectionFactory,
     dialect: R2dbcDialect,
+    dataTypeProvider: R2dbcDataTypeProvider? = null,
     clockProvider: ClockProvider = DefaultClockProvider(),
     executionOptions: ExecutionOptions = ExecutionOptions()
 ): R2dbcDatabase {
-    val config = DefaultR2dbcDatabaseConfig(connectionFactory, dialect, clockProvider, executionOptions)
+    val config = DefaultR2dbcDatabaseConfig(
+        connectionFactory = connectionFactory,
+        dialect = dialect,
+        dataTypeProvider = dataTypeProvider,
+        clockProvider = clockProvider,
+        executionOptions = executionOptions
+    )
     return R2dbcDatabase(config)
 }
 
@@ -156,19 +164,31 @@ fun R2dbcDatabase(
  * Creates a [R2dbcDatabase] instance.
  *
  * @param options the connection factory options
+ * @param dialect the dialect
+ * @param dataTypeProvider the data type provider
  * @param clockProvider the clock provider
  * @param executionOptions the execution options
  */
 fun R2dbcDatabase(
     options: ConnectionFactoryOptions,
+    dialect: R2dbcDialect? = null,
+    dataTypeProvider: R2dbcDataTypeProvider? = null,
     clockProvider: ClockProvider = DefaultClockProvider(),
     executionOptions: ExecutionOptions = ExecutionOptions()
 ): R2dbcDatabase {
-    val driver = options.getValue(ConnectionFactoryOptions.DRIVER)?.toString()
-    checkNotNull(driver) { "The driver option is not found." }
     val connectionFactory = ConnectionFactories.get(options)
-    val dialect = R2dbcDialects.get(driver)
-    val config = DefaultR2dbcDatabaseConfig(connectionFactory, dialect, clockProvider, executionOptions)
+    val foundDialect = if (dialect == null) {
+        val driver = options.getValue(ConnectionFactoryOptions.DRIVER)?.toString()
+        checkNotNull(driver) { "The driver option is not found." }
+        R2dbcDialects.get(driver)
+    } else dialect
+    val config = DefaultR2dbcDatabaseConfig(
+        connectionFactory = connectionFactory,
+        dialect = foundDialect,
+        dataTypeProvider = dataTypeProvider,
+        clockProvider = clockProvider,
+        executionOptions = executionOptions
+    )
     return R2dbcDatabase(config)
 }
 
@@ -176,17 +196,29 @@ fun R2dbcDatabase(
  * Creates a [R2dbcDatabase] instance.
  *
  * @param url the R2DBC URL
+ * @param dialect the dialect
+ * @param dataTypeProvider the data type provider
  * @param clockProvider the clock provider
  * @param executionOptions the execution options
  */
 fun R2dbcDatabase(
     url: String,
+    dialect: R2dbcDialect? = null,
+    dataTypeProvider: R2dbcDataTypeProvider? = null,
     clockProvider: ClockProvider = DefaultClockProvider(),
     executionOptions: ExecutionOptions = ExecutionOptions()
 ): R2dbcDatabase {
     val connectionFactory = ConnectionFactories.get(url)
-    val driver = R2dbcDialects.extractR2dbcDriver(url)
-    val dialect = R2dbcDialects.get(driver)
-    val config = DefaultR2dbcDatabaseConfig(connectionFactory, dialect, clockProvider, executionOptions)
+    val foundDialect = if (dialect == null) {
+        val driver = R2dbcDialects.extractR2dbcDriver(url)
+        R2dbcDialects.get(driver)
+    } else dialect
+    val config = DefaultR2dbcDatabaseConfig(
+        connectionFactory = connectionFactory,
+        dialect = foundDialect,
+        dataTypeProvider = dataTypeProvider,
+        clockProvider = clockProvider,
+        executionOptions = executionOptions
+    )
     return R2dbcDatabase(config)
 }

@@ -5,10 +5,8 @@ import io.r2dbc.spi.ConnectionFactories
 import io.r2dbc.spi.ConnectionFactoryOptions
 import io.r2dbc.spi.Option
 import org.komapper.core.ExecutionOptions
-import org.komapper.dialect.postgresql.PostgreSqlDialect
 import org.komapper.dialect.postgresql.r2dbc.R2dbcPostgreSqlDialect
 import org.komapper.r2dbc.R2dbcDatabase
-import org.komapper.r2dbc.R2dbcDialects
 import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.containers.PostgreSQLContainerProvider
 import org.testcontainers.containers.PostgreSQLR2DBCDatabaseContainer

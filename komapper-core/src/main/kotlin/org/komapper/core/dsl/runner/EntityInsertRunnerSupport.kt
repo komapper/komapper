@@ -1,5 +1,6 @@
 package org.komapper.core.dsl.runner
 
+import org.komapper.core.BuilderDialect
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.Statement
 import org.komapper.core.dsl.context.EntityInsertContext
@@ -10,7 +11,7 @@ internal class EntityInsertRunnerSupport<ENTITY : Any, ID : Any, META : EntityMe
     private val context: EntityInsertContext<ENTITY, ID, META>,
 ) {
     fun buildStatement(config: DatabaseConfig, entities: List<ENTITY>): Statement {
-        val builder = config.dialect.getEntityInsertStatementBuilder(context, entities)
+        val builder = config.dialect.getEntityInsertStatementBuilder(BuilderDialect(config), context, entities)
         return builder.build()
     }
 

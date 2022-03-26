@@ -1,5 +1,6 @@
 package org.komapper.core.dsl.runner
 
+import org.komapper.core.BuilderDialect
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.DryRunStatement
 import org.komapper.core.Statement
@@ -13,11 +14,11 @@ class SchemaDropRunner(
 
     override fun dryRun(config: DatabaseConfig): DryRunStatement {
         val statements = buildStatements(config)
-        return DryRunStatement.of(statements, config.dialect)
+        return DryRunStatement.of(statements, config)
     }
 
     fun buildStatements(config: DatabaseConfig): List<Statement> {
-        val builder = config.dialect.getSchemaStatementBuilder()
+        val builder = config.dialect.getSchemaStatementBuilder(BuilderDialect(config))
         return builder.drop(context.metamodels)
     }
 }

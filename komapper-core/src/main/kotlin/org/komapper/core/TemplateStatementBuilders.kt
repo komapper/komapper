@@ -9,10 +9,10 @@ import java.util.ServiceLoader
  */
 object TemplateStatementBuilders {
     /**
-     * @param dialect the dialect of the database
+     * @param dialect the builder dialect
      * @return the [TemplateStatementBuilder] instance
      */
-    fun get(dialect: Dialect): TemplateStatementBuilder {
+    fun get(dialect: BuilderDialect): TemplateStatementBuilder {
         val loader = ServiceLoader.load(TemplateStatementBuilderFactory::class.java)
         val factory = loader.findByPriority()
         return factory?.create(dialect) ?: DefaultTemplateStatementBuilder()

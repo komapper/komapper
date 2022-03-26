@@ -1,5 +1,6 @@
 package org.komapper.core.dsl.runner
 
+import org.komapper.core.BuilderDialect
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.DryRunStatement
 import org.komapper.core.Statement
@@ -18,11 +19,11 @@ class RelationInsertSelectRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<
 
     override fun dryRun(config: DatabaseConfig): DryRunStatement {
         val statement = buildStatement(config)
-        return DryRunStatement.of(statement, config.dialect)
+        return DryRunStatement.of(statement, config)
     }
 
     fun buildStatement(config: DatabaseConfig): Statement {
-        val builder = RelationInsertSelectStatementBuilder(config.dialect, context)
+        val builder = RelationInsertSelectStatementBuilder(BuilderDialect(config), context)
         return builder.build()
     }
 }

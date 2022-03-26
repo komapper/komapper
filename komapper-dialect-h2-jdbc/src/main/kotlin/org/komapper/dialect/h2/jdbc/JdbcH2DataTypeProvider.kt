@@ -1,6 +1,6 @@
 package org.komapper.dialect.h2.jdbc
 
-import org.komapper.jdbc.JdbcAbstractDataTypeProvider
+import org.komapper.jdbc.AbstractJdbcDataTypeProvider
 import org.komapper.jdbc.JdbcAnyType
 import org.komapper.jdbc.JdbcArrayType
 import org.komapper.jdbc.JdbcBigDecimalType
@@ -30,7 +30,7 @@ import org.komapper.jdbc.JdbcUIntType
 import org.komapper.jdbc.JdbcUShortType
 
 class JdbcH2DataTypeProvider(next: JdbcDataTypeProvider) :
-    JdbcAbstractDataTypeProvider(next, DEFAULT_DATA_TYPES) {
+    AbstractJdbcDataTypeProvider(next, DEFAULT_DATA_TYPES) {
 
     companion object {
         private val DEFAULT_DATA_TYPES: List<JdbcDataType<*>> = listOf(

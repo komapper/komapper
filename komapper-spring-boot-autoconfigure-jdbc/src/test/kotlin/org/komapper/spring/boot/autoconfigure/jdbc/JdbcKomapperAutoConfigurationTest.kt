@@ -61,7 +61,7 @@ class JdbcKomapperAutoConfigurationTest {
 
         val database = context.getBean(JdbcDatabase::class.java)
         assertNotNull(database)
-        val dataType = database.config.dialect.getDataType(String::class)
+        val dataType = database.config.dataOperator.getDataType(String::class)
         assertEquals("abc", dataType.name)
         val clock = database.config.clockProvider.now()
         val timestamp = LocalDateTime.now(clock)

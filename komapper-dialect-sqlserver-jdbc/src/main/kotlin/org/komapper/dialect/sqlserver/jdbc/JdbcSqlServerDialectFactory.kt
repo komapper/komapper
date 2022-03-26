@@ -1,7 +1,6 @@
 package org.komapper.dialect.sqlserver.jdbc
 
 import org.komapper.dialect.sqlserver.SqlServerDialect
-import org.komapper.jdbc.JdbcDataTypeProvider
 import org.komapper.jdbc.JdbcDialect
 import org.komapper.jdbc.spi.JdbcDialectFactory
 
@@ -10,7 +9,7 @@ class JdbcSqlServerDialectFactory : JdbcDialectFactory {
         return driver.lowercase() == SqlServerDialect.driver
     }
 
-    override fun create(dataTypeProvider: JdbcDataTypeProvider): JdbcDialect {
-        return JdbcSqlServerDialectImpl(dataTypeProvider)
+    override fun create(): JdbcDialect {
+        return JdbcSqlServerDialectImpl
     }
 }

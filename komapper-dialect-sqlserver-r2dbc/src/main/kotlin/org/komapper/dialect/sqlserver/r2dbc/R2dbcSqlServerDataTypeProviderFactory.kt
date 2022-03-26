@@ -6,7 +6,7 @@ import org.komapper.r2dbc.spi.R2dbcDataTypeProviderFactory
 
 class R2dbcSqlServerDataTypeProviderFactory : R2dbcDataTypeProviderFactory {
     override fun supports(driver: String): Boolean {
-        return driver == SqlServerDialect.driver
+        return driver.lowercase() == SqlServerDialect.driver
     }
 
     override fun create(next: R2dbcDataTypeProvider): R2dbcDataTypeProvider {

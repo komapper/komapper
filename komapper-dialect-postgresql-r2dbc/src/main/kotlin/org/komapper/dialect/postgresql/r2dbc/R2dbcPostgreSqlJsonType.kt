@@ -2,9 +2,9 @@ package org.komapper.dialect.postgresql.r2dbc
 
 import io.r2dbc.postgresql.codec.Json
 import io.r2dbc.spi.Row
-import org.komapper.r2dbc.R2dbcAbstractType
+import org.komapper.r2dbc.AbstractR2dbcDataType
 
-object R2dbcPostgreSqlJsonType : R2dbcAbstractType<Json>(Json::class) {
+object R2dbcPostgreSqlJsonType : AbstractR2dbcDataType<Json>(Json::class) {
     override val name: String = "json"
 
     override fun getValue(row: Row, index: Int): Json? {

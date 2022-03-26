@@ -1,6 +1,6 @@
 package org.komapper.dialect.postgresql.jdbc
 
-import org.komapper.jdbc.JdbcAbstractDataTypeProvider
+import org.komapper.jdbc.AbstractJdbcDataTypeProvider
 import org.komapper.jdbc.JdbcArrayType
 import org.komapper.jdbc.JdbcBigDecimalType
 import org.komapper.jdbc.JdbcBigIntegerType
@@ -26,7 +26,7 @@ import org.komapper.jdbc.JdbcUIntType
 import org.komapper.jdbc.JdbcUShortType
 
 class JdbcPostgreSqlDataTypeProvider(next: JdbcDataTypeProvider) :
-    JdbcAbstractDataTypeProvider(next, DEFAULT_DATA_TYPES) {
+    AbstractJdbcDataTypeProvider(next, DEFAULT_DATA_TYPES) {
 
     companion object {
         val DEFAULT_DATA_TYPES: List<JdbcDataType<*>> = listOf(
@@ -38,7 +38,7 @@ class JdbcPostgreSqlDataTypeProvider(next: JdbcDataTypeProvider) :
             JdbcByteArrayType("bytea"),
             JdbcDoubleType("double precision"),
             JdbcFloatType("real"),
-            JdbcInstantType("timestamp with time zone"),
+            JdbcInstantType("timestamp"),
             JdbcIntType("integer"),
             JdbcLocalDateTimeType("timestamp"),
             JdbcLocalDateType("date"),

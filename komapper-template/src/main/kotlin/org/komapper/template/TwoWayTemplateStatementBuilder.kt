@@ -1,6 +1,6 @@
 package org.komapper.template
 
-import org.komapper.core.Dialect
+import org.komapper.core.BuilderDialect
 import org.komapper.core.Statement
 import org.komapper.core.StatementBuffer
 import org.komapper.core.TemplateBuiltinExtensions
@@ -20,7 +20,7 @@ import kotlin.reflect.jvm.isAccessible
 import kotlin.reflect.jvm.jvmErasure
 
 internal class TwoWayTemplateStatementBuilder(
-    private val dialect: Dialect,
+    private val dialect: BuilderDialect,
     private val sqlNodeFactory: SqlNodeFactory,
     private val exprEvaluator: ExprEvaluator
 ) : TemplateStatementBuilder {

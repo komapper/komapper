@@ -14,7 +14,7 @@ data class ScriptExecuteRunner(
 
     override fun dryRun(config: DatabaseConfig): DryRunStatement {
         val statement = Statement(context.sql)
-        return DryRunStatement.of(statement, config.dialect)
+        return DryRunStatement.of(statement, config)
     }
 
     fun buildStatements(): List<Statement> {

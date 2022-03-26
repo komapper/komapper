@@ -26,8 +26,8 @@ internal class JdbcTemplateSelectRunner<T, R>(
         val executor = JdbcExecutor(config, context.options)
         return executor.executeQuery(
             statement,
-            { dialect, rs ->
-                val row = JdbcResultSetWrapper(dialect, rs)
+            { dataOperator, rs ->
+                val row = JdbcResultSetWrapper(dataOperator, rs)
                 transform(row)
             },
             collect

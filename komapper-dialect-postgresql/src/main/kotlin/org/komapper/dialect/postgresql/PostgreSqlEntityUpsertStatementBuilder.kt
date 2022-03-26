@@ -1,6 +1,6 @@
 package org.komapper.dialect.postgresql
 
-import org.komapper.core.Dialect
+import org.komapper.core.BuilderDialect
 import org.komapper.core.Statement
 import org.komapper.core.StatementBuffer
 import org.komapper.core.dsl.builder.AliasManager
@@ -17,9 +17,9 @@ import org.komapper.core.dsl.metamodel.PropertyMetamodel
 import org.komapper.core.dsl.metamodel.getNonAutoIncrementProperties
 
 class PostgreSqlEntityUpsertStatementBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
-    private val dialect: Dialect,
     private val context: EntityUpsertContext<ENTITY, ID, META>,
-    private val entities: List<ENTITY>
+    private val entities: List<ENTITY>,
+    private val dialect: BuilderDialect,
 ) : EntityUpsertStatementBuilder<ENTITY> {
 
     private val target = context.target

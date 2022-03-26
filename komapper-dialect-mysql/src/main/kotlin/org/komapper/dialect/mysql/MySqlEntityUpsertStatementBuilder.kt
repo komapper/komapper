@@ -1,5 +1,6 @@
 package org.komapper.dialect.mysql
 
+import org.komapper.core.BuilderDialect
 import org.komapper.core.Statement
 import org.komapper.core.StatementBuffer
 import org.komapper.core.dsl.builder.AliasManager
@@ -16,7 +17,7 @@ import org.komapper.core.dsl.metamodel.PropertyMetamodel
 import org.komapper.core.dsl.metamodel.getNonAutoIncrementProperties
 
 class MySqlEntityUpsertStatementBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
-    private val dialect: MySqlDialect,
+    private val dialect: BuilderDialect,
     private val context: EntityUpsertContext<ENTITY, ID, META>,
     private val entities: List<ENTITY>
 ) : EntityUpsertStatementBuilder<ENTITY> {
@@ -81,7 +82,7 @@ class MySqlEntityUpsertStatementBuilder<ENTITY : Any, ID : Any, META : EntityMet
     }
 
     private class UpsertAliasManager(
-        dialect: MySqlDialect,
+        dialect: BuilderDialect,
         target: TableExpression<*>,
         excluded: TableExpression<*>
     ) : AliasManager {

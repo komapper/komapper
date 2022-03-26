@@ -7,7 +7,6 @@ import io.r2dbc.spi.Option
 import org.komapper.core.ExecutionOptions
 import org.komapper.dialect.sqlserver.r2dbc.R2dbcSqlServerDialect
 import org.komapper.r2dbc.R2dbcDatabase
-import org.komapper.r2dbc.R2dbcDialects
 import org.testcontainers.containers.MSSQLR2DBCDatabaseContainer
 import org.testcontainers.containers.MSSQLServerContainer
 import org.testcontainers.containers.MSSQLServerContainerProvider

@@ -5,12 +5,12 @@ import kotlinx.coroutines.flow.Flow
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.DryRunStatement
 import org.komapper.core.dsl.context.SelectContext
+import org.komapper.r2dbc.R2dbcDataOperator
 import org.komapper.r2dbc.R2dbcDatabaseConfig
-import org.komapper.r2dbc.R2dbcDialect
 
 internal class R2dbcSelectRunner<T, R>(
     context: SelectContext<*, *, *>,
-    transform: (R2dbcDialect, Row) -> T,
+    transform: (R2dbcDataOperator, Row) -> T,
     private val collect: suspend (Flow<T>) -> R
 ) :
     R2dbcRunner<R> {

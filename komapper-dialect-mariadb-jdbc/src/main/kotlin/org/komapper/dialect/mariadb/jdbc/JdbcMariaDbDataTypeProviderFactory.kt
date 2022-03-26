@@ -6,7 +6,7 @@ import org.komapper.jdbc.spi.JdbcDataTypeProviderFactory
 
 class JdbcMariaDbDataTypeProviderFactory : JdbcDataTypeProviderFactory {
     override fun supports(driver: String): Boolean {
-        return driver == MariaDbDialect.driver
+        return driver.lowercase() == MariaDbDialect.driver
     }
 
     override fun create(next: JdbcDataTypeProvider): JdbcDataTypeProvider {

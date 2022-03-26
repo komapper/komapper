@@ -11,7 +11,7 @@ import kotlinx.datetime.toJavaLocalDateTime
 import kotlinx.datetime.toKotlinInstant
 import kotlinx.datetime.toKotlinLocalDate
 import kotlinx.datetime.toKotlinLocalDateTime
-import org.komapper.r2dbc.R2dbcAbstractType
+import org.komapper.r2dbc.AbstractR2dbcDataType
 import org.komapper.r2dbc.R2dbcDataType
 import org.komapper.r2dbc.R2dbcDataTypeProvider
 import kotlin.reflect.KClass
@@ -43,7 +43,7 @@ class R2dbcDatetimeTypeProvider(val next: R2dbcDataTypeProvider) : R2dbcDataType
 }
 
 internal class JdbcKotlinInstantType(private val dataType: R2dbcDataType<java.time.Instant>) :
-    R2dbcAbstractType<Instant>(Instant::class) {
+    AbstractR2dbcDataType<Instant>(Instant::class) {
     override val name: String = dataType.name
 
     override fun getValue(row: Row, index: Int): Instant? {
@@ -66,7 +66,7 @@ internal class JdbcKotlinInstantType(private val dataType: R2dbcDataType<java.ti
 }
 
 internal class JdbcKotlinLocalDateType(private val dataType: R2dbcDataType<java.time.LocalDate>) :
-    R2dbcAbstractType<LocalDate>(LocalDate::class) {
+    AbstractR2dbcDataType<LocalDate>(LocalDate::class) {
     override val name: String = dataType.name
 
     override fun getValue(row: Row, index: Int): LocalDate? {
@@ -89,7 +89,7 @@ internal class JdbcKotlinLocalDateType(private val dataType: R2dbcDataType<java.
 }
 
 internal class JdbcKotlinLocalDateTimeType(private val dataType: R2dbcDataType<java.time.LocalDateTime>) :
-    R2dbcAbstractType<LocalDateTime>(LocalDateTime::class) {
+    AbstractR2dbcDataType<LocalDateTime>(LocalDateTime::class) {
     override val name: String = dataType.name
 
     override fun getValue(row: Row, index: Int): LocalDateTime? {

@@ -1,10 +1,7 @@
 package org.komapper.dialect.oracle.jdbc
 
 import org.komapper.dialect.oracle.OracleDialect
-import org.komapper.jdbc.JdbcAbstractDialect
-import org.komapper.jdbc.JdbcDataTypeProvider
 import org.komapper.jdbc.JdbcDialect
-import org.komapper.jdbc.JdbcDialects
 import java.sql.SQLException
 
 interface JdbcOracleDialect : JdbcDialect, OracleDialect {
@@ -44,10 +41,8 @@ interface JdbcOracleDialect : JdbcDialect, OracleDialect {
     override fun supportsReturnGeneratedKeysFlag(): Boolean = false
 }
 
-internal class JdbcOracleDialectImpl(
-    dataTypeProvider: JdbcDataTypeProvider
-) : JdbcOracleDialect, JdbcAbstractDialect(dataTypeProvider)
+internal object JdbcOracleDialectImpl : JdbcOracleDialect
 
-fun JdbcOracleDialect(dataTypeProvider: JdbcDataTypeProvider? = null): JdbcOracleDialect {
-    return JdbcDialects.get(OracleDialect.driver, dataTypeProvider) as JdbcOracleDialect
+fun JdbcOracleDialect(): JdbcOracleDialect {
+    return JdbcOracleDialectImpl
 }

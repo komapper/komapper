@@ -19,7 +19,7 @@ class EntityUpsertMultipleRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<
     override fun dryRun(config: DatabaseConfig): DryRunStatement {
         if (entities.isEmpty()) return DryRunStatement.EMPTY
         val statement = buildStatement(config, entities)
-        return DryRunStatement.of(statement, config.dialect)
+        return DryRunStatement.of(statement, config)
     }
 
     fun buildStatement(config: DatabaseConfig, entities: List<ENTITY>): Statement {

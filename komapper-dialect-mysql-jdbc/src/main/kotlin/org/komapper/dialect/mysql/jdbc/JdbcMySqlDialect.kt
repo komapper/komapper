@@ -1,10 +1,7 @@
 package org.komapper.dialect.mysql.jdbc
 
 import org.komapper.dialect.mysql.MySqlDialect
-import org.komapper.jdbc.JdbcAbstractDialect
-import org.komapper.jdbc.JdbcDataTypeProvider
 import org.komapper.jdbc.JdbcDialect
-import org.komapper.jdbc.JdbcDialects
 import java.sql.SQLException
 
 interface JdbcMySqlDialect : JdbcDialect, MySqlDialect {
@@ -16,10 +13,8 @@ interface JdbcMySqlDialect : JdbcDialect, MySqlDialect {
     }
 }
 
-internal class JdbcMySqlDialectImpl(
-    dataTypeProvider: JdbcDataTypeProvider
-) : JdbcMySqlDialect, JdbcAbstractDialect(dataTypeProvider) 
+internal object JdbcMySqlDialectImpl : JdbcMySqlDialect
 
-fun JdbcMySqlDialect(dataTypeProvider: JdbcDataTypeProvider? = null): JdbcMySqlDialect {
-    return JdbcDialects.get(MySqlDialect.driver, dataTypeProvider) as JdbcMySqlDialect
+fun JdbcMySqlDialect(): JdbcMySqlDialect {
+    return JdbcMySqlDialectImpl
 }

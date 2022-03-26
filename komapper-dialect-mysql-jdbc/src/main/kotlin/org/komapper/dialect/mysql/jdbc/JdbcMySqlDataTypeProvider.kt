@@ -1,6 +1,6 @@
 package org.komapper.dialect.mysql.jdbc
 
-import org.komapper.jdbc.JdbcAbstractDataTypeProvider
+import org.komapper.jdbc.AbstractJdbcDataTypeProvider
 import org.komapper.jdbc.JdbcBigDecimalType
 import org.komapper.jdbc.JdbcBigIntegerType
 import org.komapper.jdbc.JdbcBlobType
@@ -27,7 +27,7 @@ import org.komapper.jdbc.JdbcUByteType
 import org.komapper.jdbc.JdbcUIntType
 import org.komapper.jdbc.JdbcUShortType
 
-class JdbcMySqlDataTypeProvider(next: JdbcDataTypeProvider) : JdbcAbstractDataTypeProvider(next, DEFAULT_DATA_TYPES) {
+class JdbcMySqlDataTypeProvider(next: JdbcDataTypeProvider) : AbstractJdbcDataTypeProvider(next, DEFAULT_DATA_TYPES) {
 
     companion object {
         val DEFAULT_DATA_TYPES: List<JdbcDataType<*>> = listOf(
@@ -40,14 +40,14 @@ class JdbcMySqlDataTypeProvider(next: JdbcDataTypeProvider) : JdbcAbstractDataTy
             JdbcDoubleType("double precision"),
             JdbcClobType("text"),
             JdbcFloatType("real"),
-            JdbcInstantType("timestamp"),
+            JdbcInstantType("timestamp(6)"),
             JdbcIntType("integer"),
             JdbcLocalDateTimeType("timestamp(6)"),
             JdbcLocalDateType("date"),
             JdbcLocalTimeType("time"),
             JdbcLongType("bigint"),
             JdbcNClobType("text"),
-            JdbcOffsetDateTimeType("timestamp"),
+            JdbcOffsetDateTimeType("timestamp(6)"),
             JdbcShortType("smallint"),
             JdbcStringType("varchar(500)"),
             JdbcSQLXMLType("text"),

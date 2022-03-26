@@ -6,7 +6,7 @@ import org.komapper.r2dbc.spi.R2dbcDataTypeProviderFactory
 
 class R2dbcMariaDbDataTypeProviderFactory : R2dbcDataTypeProviderFactory {
     override fun supports(driver: String): Boolean {
-        return driver == MariaDbDialect.driver
+        return driver.lowercase() == MariaDbDialect.driver
     }
 
     override fun create(next: R2dbcDataTypeProvider): R2dbcDataTypeProvider {

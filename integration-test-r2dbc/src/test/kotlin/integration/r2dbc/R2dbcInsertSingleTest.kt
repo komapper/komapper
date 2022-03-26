@@ -52,7 +52,7 @@ class R2dbcInsertSingleTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun createdAt_instant (info: TestInfo) = inTransaction(db, info) {
+    fun createdAt_instant(info: TestInfo) = inTransaction(db, info) {
         val p = Meta.man
         val person1 = Man(1, "ABC")
         val id = db.runQuery { QueryDsl.insert(p).single(person1) }.personId

@@ -1,6 +1,6 @@
 package org.komapper.core.dsl.builder
 
-import org.komapper.core.Dialect
+import org.komapper.core.BuilderDialect
 import org.komapper.core.Statement
 import org.komapper.core.StatementBuffer
 import org.komapper.core.Value
@@ -23,7 +23,7 @@ import org.komapper.core.dsl.expression.SubqueryExpression
 import org.komapper.core.dsl.expression.TableExpression
 
 class BuilderSupport(
-    private val dialect: Dialect,
+    private val dialect: BuilderDialect,
     private val aliasManager: AliasManager,
     private val buf: StatementBuffer,
     private val escapeSequence: String? = null

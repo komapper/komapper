@@ -7,7 +7,6 @@ import io.r2dbc.spi.Option
 import org.komapper.core.ExecutionOptions
 import org.komapper.dialect.oracle.r2dbc.R2dbcOracleDialect
 import org.komapper.r2dbc.R2dbcDatabase
-import org.komapper.r2dbc.R2dbcDialects
 import org.testcontainers.containers.OracleContainer
 import org.testcontainers.containers.OracleContainerProvider
 import org.testcontainers.jdbc.ConnectionUrl

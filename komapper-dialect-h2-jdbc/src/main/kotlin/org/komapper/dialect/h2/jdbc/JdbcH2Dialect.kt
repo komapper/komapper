@@ -1,10 +1,7 @@
 package org.komapper.dialect.h2.jdbc
 
 import org.komapper.dialect.h2.H2Dialect
-import org.komapper.jdbc.JdbcAbstractDialect
-import org.komapper.jdbc.JdbcDataTypeProvider
 import org.komapper.jdbc.JdbcDialect
-import org.komapper.jdbc.JdbcDialects
 import java.sql.SQLException
 
 interface JdbcH2Dialect : JdbcDialect, H2Dialect {
@@ -16,10 +13,8 @@ interface JdbcH2Dialect : JdbcDialect, H2Dialect {
     }
 }
 
-internal class JdbcH2DialectImpl(
-    dataTypeProvider: JdbcDataTypeProvider
-) : JdbcH2Dialect, JdbcAbstractDialect(dataTypeProvider)
+internal object JdbcH2DialectImpl : JdbcH2Dialect
 
-fun JdbcH2Dialect(dataTypeProvider: JdbcDataTypeProvider? = null): JdbcH2Dialect {
-    return JdbcDialects.get(H2Dialect.driver, dataTypeProvider) as JdbcH2Dialect
+fun JdbcH2Dialect(): JdbcH2Dialect {
+    return JdbcH2DialectImpl
 }

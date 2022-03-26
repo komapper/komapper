@@ -9,7 +9,7 @@ import kotlinx.datetime.toJavaLocalDateTime
 import kotlinx.datetime.toKotlinInstant
 import kotlinx.datetime.toKotlinLocalDate
 import kotlinx.datetime.toKotlinLocalDateTime
-import org.komapper.jdbc.JdbcAbstractType
+import org.komapper.jdbc.AbstractJdbcDataType
 import org.komapper.jdbc.JdbcDataType
 import org.komapper.jdbc.JdbcDataTypeProvider
 import java.sql.PreparedStatement
@@ -43,7 +43,7 @@ class JdbcDatetimeTypeProvider(val next: JdbcDataTypeProvider) : JdbcDataTypePro
 }
 
 internal class JdbcKotlinInstantType(private val dataType: JdbcDataType<java.time.Instant>) :
-    JdbcAbstractType<Instant>(Instant::class, dataType.jdbcType) {
+    AbstractJdbcDataType<Instant>(Instant::class, dataType.jdbcType) {
     override val name: String = dataType.name
 
     override fun doGetValue(rs: ResultSet, index: Int): Instant? {
@@ -62,7 +62,7 @@ internal class JdbcKotlinInstantType(private val dataType: JdbcDataType<java.tim
 }
 
 internal class JdbcKotlinLocalDateType(private val dataType: JdbcDataType<java.time.LocalDate>) :
-    JdbcAbstractType<LocalDate>(LocalDate::class, dataType.jdbcType) {
+    AbstractJdbcDataType<LocalDate>(LocalDate::class, dataType.jdbcType) {
     override val name: String = dataType.name
 
     override fun doGetValue(rs: ResultSet, index: Int): LocalDate? {
@@ -81,7 +81,7 @@ internal class JdbcKotlinLocalDateType(private val dataType: JdbcDataType<java.t
 }
 
 internal class JdbcKotlinLocalDateTimeType(private val dataType: JdbcDataType<java.time.LocalDateTime>) :
-    JdbcAbstractType<LocalDateTime>(LocalDateTime::class, dataType.jdbcType) {
+    AbstractJdbcDataType<LocalDateTime>(LocalDateTime::class, dataType.jdbcType) {
     override val name: String = dataType.name
 
     override fun doGetValue(rs: ResultSet, index: Int): LocalDateTime? {

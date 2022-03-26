@@ -6,7 +6,7 @@ import org.komapper.jdbc.spi.JdbcDataTypeProviderFactory
 
 class JdbcPostgreSqlDataTypeProviderFactory : JdbcDataTypeProviderFactory {
     override fun supports(driver: String): Boolean {
-        return driver == PostgreSqlDialect.driver
+        return driver.lowercase() == PostgreSqlDialect.driver
     }
 
     override fun create(next: JdbcDataTypeProvider): JdbcDataTypeProvider {

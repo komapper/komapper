@@ -6,7 +6,8 @@ import org.komapper.core.Logger
 import org.komapper.core.LoggerFacade
 import org.komapper.core.StatementInspector
 import org.komapper.core.TemplateStatementBuilder
-import org.komapper.r2dbc.R2dbcDataType
+import org.komapper.r2dbc.R2dbcDataOperator
+import org.komapper.r2dbc.R2dbcDataTypeProvider
 import org.komapper.r2dbc.R2dbcDatabase
 import org.komapper.r2dbc.R2dbcDatabaseConfig
 import org.komapper.r2dbc.R2dbcDialect
@@ -27,7 +28,8 @@ import org.springframework.transaction.ReactiveTransactionManager
                 ExecutionOptions::class,
                 R2dbcDatabase::class,
                 R2dbcDatabaseConfig::class,
-                R2dbcDataType::class,
+                R2dbcDataOperator::class,
+                R2dbcDataTypeProvider::class,
                 R2dbcDialect::class,
                 R2dbcSession::class,
                 Logger::class,

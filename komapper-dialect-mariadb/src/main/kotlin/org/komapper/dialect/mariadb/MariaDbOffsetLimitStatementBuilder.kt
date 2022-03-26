@@ -1,12 +1,13 @@
 package org.komapper.dialect.mariadb
 
+import org.komapper.core.BuilderDialect
 import org.komapper.core.Statement
 import org.komapper.core.StatementBuffer
 import org.komapper.core.Value
 import org.komapper.core.dsl.builder.OffsetLimitStatementBuilder
 
 class MariaDbOffsetLimitStatementBuilder(
-    private val dialect: MariaDbDialect,
+    private val dialect: BuilderDialect,
     private val offset: Int,
     private val limit: Int
 ) : OffsetLimitStatementBuilder {

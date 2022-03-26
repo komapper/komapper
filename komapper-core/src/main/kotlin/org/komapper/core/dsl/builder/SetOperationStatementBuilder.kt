@@ -1,6 +1,6 @@
 package org.komapper.core.dsl.builder
 
-import org.komapper.core.Dialect
+import org.komapper.core.BuilderDialect
 import org.komapper.core.Statement
 import org.komapper.core.StatementBuffer
 import org.komapper.core.dsl.context.SelectContext
@@ -10,7 +10,7 @@ import org.komapper.core.dsl.context.SubqueryContext
 import org.komapper.core.dsl.expression.ColumnExpression
 
 class SetOperationStatementBuilder(
-    private val dialect: Dialect,
+    private val dialect: BuilderDialect,
     private val context: SetOperationContext,
     private val aliasManager: AliasManager,
     private val projectionPredicate: (ColumnExpression<*, *>) -> Boolean = { true }

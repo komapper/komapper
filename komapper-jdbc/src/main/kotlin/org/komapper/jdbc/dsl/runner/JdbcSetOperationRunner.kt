@@ -5,14 +5,14 @@ import org.komapper.core.DatabaseConfig
 import org.komapper.core.DryRunStatement
 import org.komapper.core.dsl.context.SetOperationContext
 import org.komapper.core.dsl.runner.SetOperationRunner
+import org.komapper.jdbc.JdbcDataOperator
 import org.komapper.jdbc.JdbcDatabaseConfig
-import org.komapper.jdbc.JdbcDialect
 import org.komapper.jdbc.JdbcExecutor
 import java.sql.ResultSet
 
 internal class JdbcSetOperationRunner<T : Any?, R>(
     private val context: SetOperationContext,
-    private val transform: (JdbcDialect, ResultSet) -> T,
+    private val transform: (JdbcDataOperator, ResultSet) -> T,
     private val collect: suspend (Flow<T>) -> R
 ) : JdbcRunner<R> {
 

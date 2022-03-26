@@ -1,6 +1,6 @@
 package org.komapper.template
 
-import org.komapper.core.Dialect
+import org.komapper.core.BuilderDialect
 import org.komapper.core.TemplateStatementBuilder
 import org.komapper.core.spi.TemplateStatementBuilderFactory
 import org.komapper.template.expression.CacheExprNodeFactory
@@ -12,7 +12,7 @@ import org.komapper.template.sql.NoCacheSqlNodeFactory
 
 class TwoWayTemplateStatementBuilderFactory : TemplateStatementBuilderFactory {
 
-    override fun create(dialect: Dialect, enableCache: Boolean): TemplateStatementBuilder {
+    override fun create(dialect: BuilderDialect, enableCache: Boolean): TemplateStatementBuilder {
         val sqlNodeFactory = if (enableCache) CacheSqlNodeFactory() else NoCacheSqlNodeFactory()
         val exprNodeFactory = if (enableCache) CacheExprNodeFactory() else NoCacheExprNodeFactory()
         val exprEnvironment = DefaultExprEnvironment()

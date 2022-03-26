@@ -1,6 +1,6 @@
 package org.komapper.dialect.sqlserver.jdbc
 
-import org.komapper.jdbc.JdbcAbstractDataTypeProvider
+import org.komapper.jdbc.AbstractJdbcDataTypeProvider
 import org.komapper.jdbc.JdbcBigDecimalType
 import org.komapper.jdbc.JdbcBigIntegerType
 import org.komapper.jdbc.JdbcBlobType
@@ -25,7 +25,7 @@ import org.komapper.jdbc.JdbcUIntType
 import org.komapper.jdbc.JdbcUShortType
 
 class JdbcSqlServerDataTypeProvider(next: JdbcDataTypeProvider) :
-    JdbcAbstractDataTypeProvider(next, DEFAULT_DATA_TYPES) {
+    AbstractJdbcDataTypeProvider(next, DEFAULT_DATA_TYPES) {
 
     companion object {
         val DEFAULT_DATA_TYPES: List<JdbcDataType<*>> = listOf(
@@ -39,7 +39,7 @@ class JdbcSqlServerDataTypeProvider(next: JdbcDataTypeProvider) :
             JdbcFloatType("real"),
             JdbcInstantType("datetime2"),
             JdbcIntType("int"),
-            JdbcLocalDateTimeType("datetime"),
+            JdbcLocalDateTimeType("datetime2"),
             JdbcLocalDateType("date"),
             JdbcLocalTimeType("time"),
             JdbcLongType("bigint"),

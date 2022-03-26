@@ -6,7 +6,7 @@ import org.komapper.jdbc.spi.JdbcDataTypeProviderFactory
 
 class JdbcMySqlDataTypeProviderFactory : JdbcDataTypeProviderFactory {
     override fun supports(driver: String): Boolean {
-        return driver == MySqlDialect.DRIVER
+        return driver.lowercase() == MySqlDialect.DRIVER
     }
 
     override fun create(next: JdbcDataTypeProvider): JdbcDataTypeProvider {

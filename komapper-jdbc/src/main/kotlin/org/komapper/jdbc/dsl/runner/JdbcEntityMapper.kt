@@ -2,11 +2,11 @@ package org.komapper.jdbc.dsl.runner
 
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.metamodel.PropertyMetamodel
-import org.komapper.jdbc.JdbcDialect
+import org.komapper.jdbc.JdbcDataOperator
 import java.sql.ResultSet
 
-internal class JdbcEntityMapper(val dialect: JdbcDialect, resultSet: ResultSet) {
-    private val propertyMapper = JdbcPropertyMapper(dialect, resultSet)
+internal class JdbcEntityMapper(dataOperator: JdbcDataOperator, resultSet: ResultSet) {
+    private val propertyMapper = JdbcPropertyMapper(dataOperator, resultSet)
 
     fun <E : Any> execute(metamodel: EntityMetamodel<E, *, *>, forceMapping: Boolean = false): E? {
         val valueMap = mutableMapOf<PropertyMetamodel<*, *, *>, Any?>()

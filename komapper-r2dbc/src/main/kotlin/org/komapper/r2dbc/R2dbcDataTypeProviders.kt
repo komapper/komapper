@@ -22,7 +22,3 @@ object R2dbcDataTypeProviders {
         }
     }
 }
-
-object R2dbcEmptyDataTypeProvider : R2dbcDataTypeProvider {
-    override fun <T : Any> get(klass: KClass<out T>): R2dbcDataType<T>? = null
-}

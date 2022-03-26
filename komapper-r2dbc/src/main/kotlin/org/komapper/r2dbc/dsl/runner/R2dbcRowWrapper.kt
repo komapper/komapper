@@ -1,7 +1,7 @@
 package org.komapper.r2dbc.dsl.runner
 
 import org.komapper.core.dsl.query.Row
-import org.komapper.r2dbc.R2dbcDialect
+import org.komapper.r2dbc.R2dbcDataOperator
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.sql.Array
@@ -18,7 +18,7 @@ import kotlin.reflect.KClass
 import kotlin.reflect.cast
 
 internal class R2dbcRowWrapper(
-    private val dialect: R2dbcDialect,
+    private val dataOperator: R2dbcDataOperator,
     private val row: io.r2dbc.spi.Row
 ) : Row {
 
@@ -199,10 +199,10 @@ internal class R2dbcRowWrapper(
     }
 
     override fun <T : Any> asT(index: Int, klass: KClass<T>): T? {
-        return dialect.getValue(row, index, klass)?.let { klass.cast(it) }
+        return dataOperator.getValue(row, index, klass)?.let { klass.cast(it) }
     }
 
     override fun <T : Any> asT(columnLabel: String, klass: KClass<T>): T? {
-        return dialect.getValue(row, columnLabel, klass)?.let { klass.cast(it) }
+        return dataOperator.getValue(row, columnLabel, klass)?.let { klass.cast(it) }
     }
 }

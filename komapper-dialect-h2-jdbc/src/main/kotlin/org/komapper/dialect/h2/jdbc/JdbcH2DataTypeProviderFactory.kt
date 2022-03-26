@@ -6,7 +6,7 @@ import org.komapper.jdbc.spi.JdbcDataTypeProviderFactory
 
 class JdbcH2DataTypeProviderFactory : JdbcDataTypeProviderFactory {
     override fun supports(driver: String): Boolean {
-        return driver == H2Dialect.driver
+        return driver.lowercase() == H2Dialect.driver
     }
 
     override fun create(next: JdbcDataTypeProvider): JdbcDataTypeProvider {

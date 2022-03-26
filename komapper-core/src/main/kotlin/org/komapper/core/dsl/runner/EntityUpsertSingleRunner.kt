@@ -18,7 +18,7 @@ class EntityUpsertSingleRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<EN
 
     override fun dryRun(config: DatabaseConfig): DryRunStatement {
         val statement = buildStatement(config, entity)
-        return DryRunStatement.of(statement, config.dialect)
+        return DryRunStatement.of(statement, config)
     }
 
     fun buildStatement(config: DatabaseConfig, entity: ENTITY): Statement {

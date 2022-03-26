@@ -1,6 +1,6 @@
 package org.komapper.dialect.mariadb.jdbc
 
-import org.komapper.jdbc.JdbcAbstractDataTypeProvider
+import org.komapper.jdbc.AbstractJdbcDataTypeProvider
 import org.komapper.jdbc.JdbcBigDecimalType
 import org.komapper.jdbc.JdbcBigIntegerType
 import org.komapper.jdbc.JdbcBlobType
@@ -27,7 +27,7 @@ import org.komapper.jdbc.JdbcUByteType
 import org.komapper.jdbc.JdbcUIntType
 import org.komapper.jdbc.JdbcUShortType
 
-class JdbcMariaDbDataTypeProvider(next: JdbcDataTypeProvider) : JdbcAbstractDataTypeProvider(next, DEFAULT_DATA_TYPES) {
+class JdbcMariaDbDataTypeProvider(next: JdbcDataTypeProvider) : AbstractJdbcDataTypeProvider(next, DEFAULT_DATA_TYPES) {
 
     companion object {
         val DEFAULT_DATA_TYPES: List<JdbcDataType<*>> = listOf(

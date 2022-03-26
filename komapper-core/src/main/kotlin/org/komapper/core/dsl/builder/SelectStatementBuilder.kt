@@ -1,6 +1,6 @@
 package org.komapper.core.dsl.builder
 
-import org.komapper.core.Dialect
+import org.komapper.core.BuilderDialect
 import org.komapper.core.Statement
 import org.komapper.core.StatementBuffer
 import org.komapper.core.dsl.context.SelectContext
@@ -16,7 +16,7 @@ import org.komapper.core.dsl.expression.TableExpression
 import org.komapper.core.dsl.scope.ForUpdateScope
 
 class SelectStatementBuilder(
-    private val dialect: Dialect,
+    private val dialect: BuilderDialect,
     private val context: SelectContext<*, *, *>,
     private val aliasManager: AliasManager = DefaultAliasManager(context),
     private val projectionPredicate: (ColumnExpression<*, *>) -> Boolean = { true }
@@ -140,7 +140,7 @@ class SelectStatementBuilder(
     }
 
     private fun offsetLimitClause() {
-        val builder = dialect.getOffsetLimitStatementBuilder(context.offset, context.limit)
+        val builder = dialect.getOffsetLimitStatementBuilder(dialect, context.offset, context.limit)
         val statement = builder.build()
         buf.append(statement)
     }
@@ -223,7 +223,7 @@ class SelectStatementBuilder(
 }
 
 internal class OrderByBuilderSupport(
-    private val dialect: Dialect,
+    private val dialect: BuilderDialect,
     private val sortItems: List<SortItem>,
     aliasManager: AliasManager,
     private val buf: StatementBuffer

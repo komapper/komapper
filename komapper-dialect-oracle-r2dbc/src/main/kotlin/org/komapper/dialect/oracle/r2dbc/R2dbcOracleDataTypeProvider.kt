@@ -1,6 +1,6 @@
 package org.komapper.dialect.oracle.r2dbc
 
-import org.komapper.r2dbc.R2dbcAbstractDataTypeProvider
+import org.komapper.r2dbc.AbstractR2dbcDataTypeProvider
 import org.komapper.r2dbc.R2dbcBigDecimalType
 import org.komapper.r2dbc.R2dbcBigIntegerType
 import org.komapper.r2dbc.R2dbcBlobType
@@ -25,7 +25,7 @@ import org.komapper.r2dbc.R2dbcUIntType
 import org.komapper.r2dbc.R2dbcUShortType
 
 class R2dbcOracleDataTypeProvider(next: R2dbcDataTypeProvider) :
-    R2dbcAbstractDataTypeProvider(next, DEFAULT_DATA_TYPES) {
+    AbstractR2dbcDataTypeProvider(next, DEFAULT_DATA_TYPES) {
 
     companion object {
         val DEFAULT_DATA_TYPES: List<R2dbcDataType<*>> = listOf(

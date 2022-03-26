@@ -9,6 +9,7 @@ import java.util.UUID;
 import java.util.function.Supplier;
 import javax.enterprise.inject.Default;
 import javax.transaction.TransactionManager;
+import org.komapper.core.BuilderDialectKt;
 import org.komapper.core.ClockProvider;
 import org.komapper.core.ExecutionOptions;
 import org.komapper.core.Logger;
@@ -17,7 +18,10 @@ import org.komapper.core.StatementInspector;
 import org.komapper.core.TemplateStatementBuilder;
 import org.komapper.core.TemplateStatementBuilders;
 import org.komapper.jdbc.DefaultJdbcDataFactory;
+import org.komapper.jdbc.DefaultJdbcDataOperator;
 import org.komapper.jdbc.JdbcDataFactory;
+import org.komapper.jdbc.JdbcDataOperator;
+import org.komapper.jdbc.JdbcDataTypeProviders;
 import org.komapper.jdbc.JdbcDatabase;
 import org.komapper.jdbc.JdbcDatabaseConfig;
 import org.komapper.jdbc.JdbcDatabaseKt;
@@ -41,8 +45,12 @@ public class KomapperRecorder {
       var loggerFacade = container.instance(LoggerFacade.class).get();
       var statementInspector = container.instance(StatementInspector.class).get();
       var id = UUID.randomUUID();
-      var dialect = JdbcDialects.INSTANCE.get(dataSourceDefinition.driver, null);
-      var templateStatementBuilder = TemplateStatementBuilders.INSTANCE.get(dialect);
+      var dialect = JdbcDialects.INSTANCE.get(dataSourceDefinition.driver);
+      var dataTypeProvider = JdbcDataTypeProviders.INSTANCE.get(dialect.getDriver(), null);
+      var dataOperator = new DefaultJdbcDataOperator(dialect, dataTypeProvider);
+      var templateStatementBuilder =
+          TemplateStatementBuilders.INSTANCE.get(
+              BuilderDialectKt.BuilderDialect(dialect, dataOperator));
       var session =
           new JtaTransactionSession(
               transactionManager, dataSourceResolver.resolve(dataSourceDefinition.name));
@@ -60,6 +68,11 @@ public class KomapperRecorder {
         @Override
         public JdbcDataFactory getDataFactory() {
           return dataFactory;
+        }
+
+        @Override
+        public JdbcDataOperator getDataOperator() {
+          return dataOperator;
         }
 
         @Override

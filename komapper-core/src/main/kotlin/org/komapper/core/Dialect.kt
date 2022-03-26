@@ -11,7 +11,6 @@ import org.komapper.core.dsl.context.EntityInsertContext
 import org.komapper.core.dsl.context.EntityUpsertContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import java.util.regex.Pattern
-import kotlin.reflect.KClass
 
 /**
  * Dialect for database.
@@ -67,16 +66,6 @@ interface Dialect {
     }
 
     /**
-     * Formats the value.
-     *
-     * @param value the value
-     * @param valueClass the class of the value
-     * @param masking whether to mask the value
-     * @return the formatted value
-     */
-    fun <T : Any> formatValue(value: T?, valueClass: KClass<out T>, masking: Boolean): String
-
-    /**
      * Enclose the sql identifier with the [openQuote] and the [closeQuote].
      *
      * @param name the identifier
@@ -113,22 +102,15 @@ interface Dialect {
     }
 
     /**
-     * Returns the data type name.
-     *
-     * @param klass the class corresponding the data type
-     * @return the data type name
-     */
-    fun getDataTypeName(klass: KClass<*>): String
-
-    /**
      * Returns the statement builder for creating the OFFSET and LIMIT expression.
      *
+     * @param dialect the builder dialect
      * @param offset the offset
      * @param limit the limit
      * @return the statement builder
      */
-    fun getOffsetLimitStatementBuilder(offset: Int, limit: Int): OffsetLimitStatementBuilder {
-        return OffsetLimitStatementBuilderImpl(this, offset, limit)
+    fun getOffsetLimitStatementBuilder(dialect: BuilderDialect, offset: Int, limit: Int): OffsetLimitStatementBuilder {
+        return OffsetLimitStatementBuilderImpl(dialect, offset, limit)
     }
 
     /**
@@ -149,15 +131,17 @@ interface Dialect {
     /**
      * Returns the statement builder for schema.
      *
+     * @param dialect the builder dialect
      * @return the statement builder
      */
-    fun getSchemaStatementBuilder(): SchemaStatementBuilder
+    fun getSchemaStatementBuilder(dialect: BuilderDialect): SchemaStatementBuilder
 
     fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> getEntityInsertStatementBuilder(
+        dialect: BuilderDialect,
         context: EntityInsertContext<ENTITY, ID, META>,
         entities: List<ENTITY>
     ): EntityInsertStatementBuilder<ENTITY, ID, META> {
-        return DefaultEntityInsertStatementBuilder(this, context, entities)
+        return DefaultEntityInsertStatementBuilder(dialect, context, entities)
     }
 
     /**
@@ -166,11 +150,13 @@ interface Dialect {
      * @param ENTITY the entity type
      * @param ID the entity id type
      * @param META the entity metamodel type
+     * @param dialect the builder dialect
      * @param context the context
      * @param entities the entities
      * @return the statement builder
      */
     fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> getEntityUpsertStatementBuilder(
+        dialect: BuilderDialect,
         context: EntityUpsertContext<ENTITY, ID, META>,
         entities: List<ENTITY>
     ): EntityUpsertStatementBuilder<ENTITY>
@@ -307,32 +293,16 @@ object DryRunDialect : Dialect {
 
     override val driver: String = "dry_run"
 
-    override fun <T : Any> formatValue(value: T?, valueClass: KClass<out T>, masking: Boolean): String {
-        return if (masking) {
-            mask
-        } else if (value == null) {
-            "null"
-        } else {
-            when (valueClass) {
-                String::class -> "'$value'"
-                else -> value.toString()
-            }
-        }
-    }
-
-    override fun getDataTypeName(klass: KClass<*>): String {
-        throw UnsupportedOperationException()
-    }
-
     override fun getSequenceSql(sequenceName: String): String {
         throw UnsupportedOperationException()
     }
 
-    override fun getSchemaStatementBuilder(): SchemaStatementBuilder {
+    override fun getSchemaStatementBuilder(dialect: BuilderDialect): SchemaStatementBuilder {
         return DryRunSchemaStatementBuilder
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> getEntityUpsertStatementBuilder(
+        dialect: BuilderDialect,
         context: EntityUpsertContext<ENTITY, ID, META>,
         entities: List<ENTITY>
     ): EntityUpsertStatementBuilder<ENTITY> {

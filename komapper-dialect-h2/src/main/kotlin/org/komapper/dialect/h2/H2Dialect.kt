@@ -1,5 +1,6 @@
 package org.komapper.dialect.h2
 
+import org.komapper.core.BuilderDialect
 import org.komapper.core.Dialect
 import org.komapper.core.dsl.builder.EntityUpsertStatementBuilder
 import org.komapper.core.dsl.builder.SchemaStatementBuilder
@@ -21,14 +22,15 @@ interface H2Dialect : Dialect {
         return "call next value for $sequenceName"
     }
 
-    override fun getSchemaStatementBuilder(): SchemaStatementBuilder {
-        return H2SchemaStatementBuilder(this)
+    override fun getSchemaStatementBuilder(dialect: BuilderDialect): SchemaStatementBuilder {
+        return H2SchemaStatementBuilder(dialect)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> getEntityUpsertStatementBuilder(
+        dialect: BuilderDialect,
         context: EntityUpsertContext<ENTITY, ID, META>,
         entities: List<ENTITY>
     ): EntityUpsertStatementBuilder<ENTITY> {
-        return H2EntityUpsertStatementBuilder(this, context, entities)
+        return H2EntityUpsertStatementBuilder(dialect, context, entities)
     }
 }

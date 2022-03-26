@@ -1,5 +1,6 @@
 package org.komapper.spring.boot.autoconfigure.jdbc
 
+import org.komapper.core.BuilderDialect
 import org.komapper.core.ClockProvider
 import org.komapper.core.DefaultClockProvider
 import org.komapper.core.ExecutionOptions
@@ -12,8 +13,11 @@ import org.komapper.core.StatementInspectors
 import org.komapper.core.TemplateStatementBuilder
 import org.komapper.core.TemplateStatementBuilders
 import org.komapper.jdbc.DefaultJdbcDataFactory
+import org.komapper.jdbc.DefaultJdbcDataOperator
 import org.komapper.jdbc.JdbcDataFactory
+import org.komapper.jdbc.JdbcDataOperator
 import org.komapper.jdbc.JdbcDataTypeProvider
+import org.komapper.jdbc.JdbcDataTypeProviders
 import org.komapper.jdbc.JdbcDatabase
 import org.komapper.jdbc.JdbcDatabaseConfig
 import org.komapper.jdbc.JdbcDialect
@@ -46,13 +50,13 @@ open class JdbcKomapperAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    open fun dialect(environment: Environment, dataTypeProvider: Optional<JdbcDataTypeProvider>): JdbcDialect {
+    open fun dialect(environment: Environment): JdbcDialect {
         val url = environment.getProperty(DATASOURCE_URL_PROPERTY)
             ?: error(
                 "$DATASOURCE_URL_PROPERTY is not found. " +
                     "Specify it to the application.properties file or define the JdbcDialect bean manually."
             )
-        return JdbcDialects.getByUrl(url, dataTypeProvider.orElse(null))
+        return JdbcDialects.getByUrl(url)
     }
 
     @Bean
@@ -99,8 +103,15 @@ open class JdbcKomapperAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    open fun templateStatementBuilder(dialect: JdbcDialect): TemplateStatementBuilder {
-        return TemplateStatementBuilders.get(dialect)
+    open fun dataOperator(dialect: JdbcDialect, dataTypeProvider: Optional<JdbcDataTypeProvider>): JdbcDataOperator {
+        val provider = JdbcDataTypeProviders.get(dialect.driver, dataTypeProvider.orElse(null))
+        return DefaultJdbcDataOperator(dialect, provider)
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    open fun templateStatementBuilder(dialect: JdbcDialect, dataOperator: JdbcDataOperator): TemplateStatementBuilder {
+        return TemplateStatementBuilders.get(BuilderDialect(dialect, dataOperator))
     }
 
     @Bean
@@ -114,6 +125,7 @@ open class JdbcKomapperAutoConfiguration {
         session: JdbcSession,
         statementInspector: StatementInspector,
         dataFactory: JdbcDataFactory,
+        dataOperator: JdbcDataOperator,
         templateStatementBuilder: TemplateStatementBuilder
     ): JdbcDatabaseConfig {
         return SimpleJdbcDatabaseConfig(
@@ -126,6 +138,7 @@ open class JdbcKomapperAutoConfiguration {
             session = session,
             statementInspector = statementInspector,
             dataFactory = dataFactory,
+            dataOperator = dataOperator,
             templateStatementBuilder = templateStatementBuilder,
         )
     }

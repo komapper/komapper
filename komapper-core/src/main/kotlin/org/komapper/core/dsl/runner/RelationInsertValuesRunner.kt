@@ -1,5 +1,6 @@
 package org.komapper.core.dsl.runner
 
+import org.komapper.core.BuilderDialect
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.DryRunStatement
 import org.komapper.core.Statement
@@ -27,7 +28,7 @@ class RelationInsertValuesRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<
             else -> null
         }
         val statement = buildStatement(config, idAssignment)
-        return DryRunStatement.of(statement, config.dialect)
+        return DryRunStatement.of(statement, config)
     }
 
     fun buildStatement(
@@ -35,7 +36,7 @@ class RelationInsertValuesRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<
         idAssignment: Pair<PropertyMetamodel<ENTITY, ID, *>, Operand>?,
     ): Statement {
         val assignments = getAssignments(config, idAssignment)
-        val builder = RelationInsertValuesStatementBuilder(config.dialect, context)
+        val builder = RelationInsertValuesStatementBuilder(BuilderDialect(config), context)
         return builder.build(assignments)
     }
 

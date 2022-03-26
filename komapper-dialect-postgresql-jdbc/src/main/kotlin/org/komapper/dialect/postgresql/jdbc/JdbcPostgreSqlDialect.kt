@@ -1,10 +1,7 @@
 package org.komapper.dialect.postgresql.jdbc
 
 import org.komapper.dialect.postgresql.PostgreSqlDialect
-import org.komapper.jdbc.JdbcAbstractDialect
-import org.komapper.jdbc.JdbcDataTypeProvider
 import org.komapper.jdbc.JdbcDialect
-import org.komapper.jdbc.JdbcDialects
 import java.sql.SQLException
 
 interface JdbcPostgreSqlDialect : JdbcDialect, PostgreSqlDialect {
@@ -16,10 +13,8 @@ interface JdbcPostgreSqlDialect : JdbcDialect, PostgreSqlDialect {
     }
 }
 
-internal class JdbcPostgreSqlDialectImpl(
-    dataTypeProvider: JdbcDataTypeProvider
-) : JdbcPostgreSqlDialect, JdbcAbstractDialect(dataTypeProvider)
+internal object JdbcPostgreSqlDialectImpl : JdbcPostgreSqlDialect
 
-fun JdbcPostgreSqlDialect(dataTypeProvider: JdbcDataTypeProvider? = null): JdbcPostgreSqlDialect {
-    return JdbcDialects.get(PostgreSqlDialect.driver, dataTypeProvider) as JdbcPostgreSqlDialect
+fun JdbcPostgreSqlDialect(): JdbcPostgreSqlDialect {
+    return JdbcPostgreSqlDialectImpl
 }

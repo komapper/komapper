@@ -77,7 +77,7 @@ interface R2dbcDataType<T : Any> {
     fun toString(value: T?): String
 }
 
-abstract class R2dbcAbstractType<T : Any>(
+abstract class AbstractR2dbcDataType<T : Any>(
     override val klass: KClass<T>,
 ) : R2dbcDataType<T> {
 
@@ -127,14 +127,14 @@ abstract class R2dbcAbstractType<T : Any>(
 }
 
 class R2dbcAnyType(override val name: String) :
-    R2dbcAbstractType<Any>(Any::class) {
+    AbstractR2dbcDataType<Any>(Any::class) {
     override fun convert(value: Any): Any {
         return value
     }
 }
 
 class R2dbcArrayType(override val name: String) :
-    R2dbcAbstractType<Array>(Array::class) {
+    AbstractR2dbcDataType<Array>(Array::class) {
     override fun convert(value: Any): Array {
         return when (value) {
             is Array -> value
@@ -144,7 +144,7 @@ class R2dbcArrayType(override val name: String) :
 }
 
 class R2dbcBigDecimalType(override val name: String) :
-    R2dbcAbstractType<BigDecimal>(BigDecimal::class) {
+    AbstractR2dbcDataType<BigDecimal>(BigDecimal::class) {
     override fun convert(value: Any): BigDecimal {
         return when (value) {
             is BigDecimal -> value
@@ -179,7 +179,7 @@ class R2dbcBigIntegerType(override val name: String) : R2dbcDataType<BigInteger>
 }
 
 class R2dbcBlobType(override val name: String) :
-    R2dbcAbstractType<Blob>(Blob::class) {
+    AbstractR2dbcDataType<Blob>(Blob::class) {
 
     override fun getValue(row: Row, index: Int): Blob? {
         return row.get(index, klass.java)
@@ -191,7 +191,7 @@ class R2dbcBlobType(override val name: String) :
 }
 
 class R2dbcBooleanType(override val name: String) :
-    R2dbcAbstractType<Boolean>(Boolean::class) {
+    AbstractR2dbcDataType<Boolean>(Boolean::class) {
 
     override fun convert(value: Any): Boolean {
         return when (value) {
@@ -207,7 +207,7 @@ class R2dbcBooleanType(override val name: String) :
 }
 
 class R2dbcByteType(override val name: String) :
-    R2dbcAbstractType<Byte>(Byte::class) {
+    AbstractR2dbcDataType<Byte>(Byte::class) {
     override fun convert(value: Any): Byte {
         return when (value) {
             is Number -> value.toByte()
@@ -217,7 +217,7 @@ class R2dbcByteType(override val name: String) :
 }
 
 class R2dbcByteArrayType(override val name: String) :
-    R2dbcAbstractType<ByteArray>(ByteArray::class) {
+    AbstractR2dbcDataType<ByteArray>(ByteArray::class) {
     override fun convert(value: Any): ByteArray {
         return when (value) {
             is ByteArray -> value
@@ -227,7 +227,7 @@ class R2dbcByteArrayType(override val name: String) :
 }
 
 class R2dbcClobType(override val name: String) :
-    R2dbcAbstractType<Clob>(Clob::class) {
+    AbstractR2dbcDataType<Clob>(Clob::class) {
 
     override fun getValue(row: Row, index: Int): Clob? {
         return row.get(index, klass.java)
@@ -239,7 +239,7 @@ class R2dbcClobType(override val name: String) :
 }
 
 class R2dbcDoubleType(override val name: String) :
-    R2dbcAbstractType<Double>(Double::class) {
+    AbstractR2dbcDataType<Double>(Double::class) {
     override fun convert(value: Any): Double {
         return when (value) {
             is Number -> value.toDouble()
@@ -249,7 +249,7 @@ class R2dbcDoubleType(override val name: String) :
 }
 
 class R2dbcFloatType(override val name: String) :
-    R2dbcAbstractType<Float>(Float::class) {
+    AbstractR2dbcDataType<Float>(Float::class) {
     override fun convert(value: Any): Float {
         return when (value) {
             is Number -> value.toFloat()
@@ -299,7 +299,7 @@ class R2dbcInstantType(override val name: String) : R2dbcDataType<Instant> {
 }
 
 class R2dbcIntType(override val name: String) :
-    R2dbcAbstractType<Int>(Int::class) {
+    AbstractR2dbcDataType<Int>(Int::class) {
 
     override fun convert(value: Any): Int {
         return when (value) {
@@ -310,7 +310,7 @@ class R2dbcIntType(override val name: String) :
 }
 
 class R2dbcLocalDateTimeType(override val name: String) :
-    R2dbcAbstractType<LocalDateTime>(LocalDateTime::class) {
+    AbstractR2dbcDataType<LocalDateTime>(LocalDateTime::class) {
 
     override fun convert(value: Any): LocalDateTime {
         return when (value) {
@@ -325,7 +325,7 @@ class R2dbcLocalDateTimeType(override val name: String) :
 }
 
 class R2dbcLocalDateType(override val name: String) :
-    R2dbcAbstractType<LocalDate>(LocalDate::class) {
+    AbstractR2dbcDataType<LocalDate>(LocalDate::class) {
 
     override fun convert(value: Any): LocalDate {
         return when (value) {
@@ -341,7 +341,7 @@ class R2dbcLocalDateType(override val name: String) :
 }
 
 class R2dbcLocalTimeType(override val name: String) :
-    R2dbcAbstractType<LocalTime>(LocalTime::class) {
+    AbstractR2dbcDataType<LocalTime>(LocalTime::class) {
 
     override fun convert(value: Any): LocalTime {
         return when (value) {
@@ -356,7 +356,7 @@ class R2dbcLocalTimeType(override val name: String) :
 }
 
 class R2dbcLongType(override val name: String) :
-    R2dbcAbstractType<Long>(Long::class) {
+    AbstractR2dbcDataType<Long>(Long::class) {
     override fun convert(value: Any): Long {
         return when (value) {
             is Number -> value.toLong()
@@ -366,7 +366,7 @@ class R2dbcLongType(override val name: String) :
 }
 
 class R2dbcOffsetDateTimeType(override val name: String) :
-    R2dbcAbstractType<OffsetDateTime>(OffsetDateTime::class) {
+    AbstractR2dbcDataType<OffsetDateTime>(OffsetDateTime::class) {
 
     override fun convert(value: Any): OffsetDateTime {
         return when (value) {
@@ -386,7 +386,7 @@ class R2dbcOffsetDateTimeType(override val name: String) :
 }
 
 class R2dbcShortType(override val name: String) :
-    R2dbcAbstractType<Short>(Short::class) {
+    AbstractR2dbcDataType<Short>(Short::class) {
     override fun convert(value: Any): Short {
         return when (value) {
             is Number -> value.toShort()
@@ -396,7 +396,7 @@ class R2dbcShortType(override val name: String) :
 }
 
 class R2dbcStringType(override val name: String) :
-    R2dbcAbstractType<String>(String::class) {
+    AbstractR2dbcDataType<String>(String::class) {
 
     override fun convert(value: Any): String {
         return when (value) {
@@ -410,7 +410,7 @@ class R2dbcStringType(override val name: String) :
     }
 }
 
-class R2dbcUByteType(override val name: String) : R2dbcAbstractType<UByte>(UByte::class) {
+class R2dbcUByteType(override val name: String) : AbstractR2dbcDataType<UByte>(UByte::class) {
     override fun convert(value: Any): UByte {
         return when (value) {
             is Number -> value.toLong().also {
@@ -425,7 +425,7 @@ class R2dbcUByteType(override val name: String) : R2dbcAbstractType<UByte>(UByte
     }
 }
 
-class R2dbcUIntType(override val name: String) : R2dbcAbstractType<UInt>(UInt::class) {
+class R2dbcUIntType(override val name: String) : AbstractR2dbcDataType<UInt>(UInt::class) {
     override fun convert(value: Any): UInt {
         return when (value) {
             is Number -> value.toLong().also {
@@ -440,7 +440,7 @@ class R2dbcUIntType(override val name: String) : R2dbcAbstractType<UInt>(UInt::c
     }
 }
 
-class R2dbcUShortType(override val name: String) : R2dbcAbstractType<UShort>(UShort::class) {
+class R2dbcUShortType(override val name: String) : AbstractR2dbcDataType<UShort>(UShort::class) {
     override fun convert(value: Any): UShort {
         return when (value) {
             is Number -> value.toLong().also {

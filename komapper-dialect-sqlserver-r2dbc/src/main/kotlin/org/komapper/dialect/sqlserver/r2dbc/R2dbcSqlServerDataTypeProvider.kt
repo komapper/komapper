@@ -1,6 +1,6 @@
 package org.komapper.dialect.sqlserver.r2dbc
 
-import org.komapper.r2dbc.R2dbcAbstractDataTypeProvider
+import org.komapper.r2dbc.AbstractR2dbcDataTypeProvider
 import org.komapper.r2dbc.R2dbcArrayType
 import org.komapper.r2dbc.R2dbcBigDecimalType
 import org.komapper.r2dbc.R2dbcBigIntegerType
@@ -26,7 +26,7 @@ import org.komapper.r2dbc.R2dbcUIntType
 import org.komapper.r2dbc.R2dbcUShortType
 
 class R2dbcSqlServerDataTypeProvider(next: R2dbcDataTypeProvider) :
-    R2dbcAbstractDataTypeProvider(next, DEFAULT_DATA_TYPES) {
+    AbstractR2dbcDataTypeProvider(next, DEFAULT_DATA_TYPES) {
 
     companion object {
         val DEFAULT_DATA_TYPES: List<R2dbcDataType<*>> = listOf(
@@ -40,9 +40,9 @@ class R2dbcSqlServerDataTypeProvider(next: R2dbcDataTypeProvider) :
             R2dbcClobType("text"),
             R2dbcDoubleType("real"),
             R2dbcFloatType("float"),
+            R2dbcInstantType("datetime2"),
             R2dbcIntType("int"),
-            R2dbcInstantType("timestamp"),
-            R2dbcLocalDateTimeType("datetime"),
+            R2dbcLocalDateTimeType("datetime2"),
             R2dbcLocalDateType("date"),
             R2dbcLocalTimeType("time"),
             R2dbcLongType("bigint"),

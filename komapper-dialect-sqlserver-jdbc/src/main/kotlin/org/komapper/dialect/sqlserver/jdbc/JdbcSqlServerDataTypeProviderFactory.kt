@@ -6,7 +6,7 @@ import org.komapper.jdbc.spi.JdbcDataTypeProviderFactory
 
 class JdbcSqlServerDataTypeProviderFactory : JdbcDataTypeProviderFactory {
     override fun supports(driver: String): Boolean {
-        return driver == SqlServerDialect.driver
+        return driver.lowercase() == SqlServerDialect.driver
     }
 
     override fun create(next: JdbcDataTypeProvider): JdbcDataTypeProvider {

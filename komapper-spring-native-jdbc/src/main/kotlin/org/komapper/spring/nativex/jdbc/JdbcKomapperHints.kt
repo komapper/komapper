@@ -7,6 +7,7 @@ import org.komapper.core.LoggerFacade
 import org.komapper.core.StatementInspector
 import org.komapper.core.TemplateStatementBuilder
 import org.komapper.jdbc.JdbcDataFactory
+import org.komapper.jdbc.JdbcDataOperator
 import org.komapper.jdbc.JdbcDataTypeProvider
 import org.komapper.jdbc.JdbcDatabase
 import org.komapper.jdbc.JdbcDatabaseConfig
@@ -29,6 +30,7 @@ import org.springframework.transaction.PlatformTransactionManager
                 JdbcDatabase::class,
                 JdbcDatabaseConfig::class,
                 JdbcDataFactory::class,
+                JdbcDataOperator::class,
                 JdbcDataTypeProvider::class,
                 JdbcDialect::class,
                 JdbcSession::class,

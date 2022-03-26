@@ -13,6 +13,7 @@ interface DatabaseConfig {
     val id: UUID
     val dialect: Dialect
     val clockProvider: ClockProvider
+    val dataOperator: DataOperator
     val executionOptions: ExecutionOptions
     val logger: Logger
     val loggerFacade: LoggerFacade
@@ -36,7 +37,7 @@ abstract class AbstractDatabaseConfig<DIALECT : Dialect>(
         StatementInspectors.get()
     }
     override val templateStatementBuilder: TemplateStatementBuilder by lazy {
-        TemplateStatementBuilders.get(dialect)
+        TemplateStatementBuilders.get(BuilderDialect(dialect, dataOperator))
     }
 }
 
@@ -46,6 +47,7 @@ abstract class AbstractDatabaseConfig<DIALECT : Dialect>(
 object DryRunDatabaseConfig : DatabaseConfig {
     override val id: UUID
         get() = throw UnsupportedOperationException()
+    override val dataOperator: DataOperator = DryRunDataOperator
     override val dialect: Dialect = DryRunDialect
     override val logger: Logger
         get() = throw UnsupportedOperationException()

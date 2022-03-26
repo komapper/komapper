@@ -223,8 +223,8 @@ internal object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
         metamodel: EntityMetamodel<T, *, *>,
         collect: suspend (Flow<T>) -> R
     ): R2dbcRunner<R> {
-        val provide = R2dbcRowTransformers.singleEntity(metamodel)
-        return R2dbcSetOperationRunner(context, provide, collect)
+        val transform = R2dbcRowTransformers.singleEntity(metamodel)
+        return R2dbcSetOperationRunner(context, transform, collect)
     }
 
     override fun <A : Any, R> singleColumnSelectQuery(

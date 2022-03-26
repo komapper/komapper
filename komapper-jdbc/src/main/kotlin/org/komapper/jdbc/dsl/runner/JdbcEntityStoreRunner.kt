@@ -29,7 +29,7 @@ internal class JdbcEntityStoreRunner<ENTITY : Any, ID : Any, META : EntityMetamo
             val rows = mutableListOf<Map<EntityMetamodel<*, *, *>, Any>>()
             while (rs.next()) {
                 val row = mutableMapOf<EntityMetamodel<*, *, *>, Any>()
-                val mapper = JdbcEntityMapper(config.dialect, rs)
+                val mapper = JdbcEntityMapper(config.dataOperator, rs)
                 for (metamodel in metamodels) {
                     val entity = mapper.execute(metamodel) ?: continue
                     row[metamodel] = entity

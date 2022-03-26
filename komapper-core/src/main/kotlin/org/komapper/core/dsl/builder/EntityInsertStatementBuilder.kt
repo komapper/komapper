@@ -1,6 +1,6 @@
 package org.komapper.core.dsl.builder
 
-import org.komapper.core.Dialect
+import org.komapper.core.BuilderDialect
 import org.komapper.core.Statement
 import org.komapper.core.StatementBuffer
 import org.komapper.core.dsl.context.EntityInsertContext
@@ -13,7 +13,7 @@ interface EntityInsertStatementBuilder<ENTITY : Any, ID : Any, META : EntityMeta
 }
 
 class DefaultEntityInsertStatementBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
-    private val dialect: Dialect,
+    private val dialect: BuilderDialect,
     private val context: EntityInsertContext<ENTITY, ID, META>,
     private val entities: List<ENTITY>
 ) : EntityInsertStatementBuilder<ENTITY, ID, META> {

@@ -7,7 +7,6 @@ import io.r2dbc.spi.Option
 import org.komapper.core.ExecutionOptions
 import org.komapper.dialect.mysql.r2dbc.R2dbcMySqlDialect
 import org.komapper.r2dbc.R2dbcDatabase
-import org.komapper.r2dbc.R2dbcDialects
 import org.testcontainers.containers.MySQLContainer
 import org.testcontainers.containers.MySQLContainerProvider
 import org.testcontainers.containers.MySQLR2DBCDatabaseContainer

@@ -18,7 +18,7 @@ class EntityDeleteSingleRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<EN
 
     override fun dryRun(config: DatabaseConfig): DryRunStatement {
         val statement = buildStatement(config)
-        return DryRunStatement.of(statement, config.dialect)
+        return DryRunStatement.of(statement, config)
     }
 
     fun buildStatement(config: DatabaseConfig): Statement {

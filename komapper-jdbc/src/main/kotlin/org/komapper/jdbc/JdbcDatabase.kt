@@ -94,16 +94,24 @@ fun JdbcDatabase(config: JdbcDatabaseConfig): JdbcDatabase {
  *
  * @param dataSource the JDBC data source
  * @param dialect the dialect
+ * @param dataTypeProvider the data type provider
  * @param clockProvider the clock provider
  * @param executionOptions the execution options
  */
 fun JdbcDatabase(
     dataSource: DataSource,
     dialect: JdbcDialect,
+    dataTypeProvider: JdbcDataTypeProvider? = null,
     clockProvider: ClockProvider = DefaultClockProvider(),
     executionOptions: ExecutionOptions = ExecutionOptions(),
 ): JdbcDatabase {
-    val config = DefaultJdbcDatabaseConfig(dataSource, dialect, clockProvider, executionOptions)
+    val config = DefaultJdbcDatabaseConfig(
+        dataSource = dataSource,
+        dialect = dialect,
+        dataTypeProvider = dataTypeProvider,
+        clockProvider = clockProvider,
+        executionOptions = executionOptions
+    )
     return JdbcDatabase(config)
 }
 
@@ -114,6 +122,7 @@ fun JdbcDatabase(
  * @param user the JDBC user
  * @param password the JDBC password
  * @param dialect the dialect
+ * @param dataTypeProvider the data type provider
  * @param clockProvider the clock provider
  * @param executionOptions the execution options
  */
@@ -121,12 +130,18 @@ fun JdbcDatabase(
     url: String,
     user: String = "",
     password: String = "",
-    dialect: JdbcDialect? = null,
+    dialect: JdbcDialect = JdbcDialects.getByUrl(url),
+    dataTypeProvider: JdbcDataTypeProvider? = null,
     clockProvider: ClockProvider = DefaultClockProvider(),
     executionOptions: ExecutionOptions = ExecutionOptions(),
 ): JdbcDatabase {
     val dataSource = SimpleDataSource(url, user, password)
-    val nonNullDialect = dialect ?: JdbcDialects.getByUrl(url)
-    val config = DefaultJdbcDatabaseConfig(dataSource, nonNullDialect, clockProvider, executionOptions)
+    val config = DefaultJdbcDatabaseConfig(
+        dataSource = dataSource,
+        dialect = dialect,
+        dataTypeProvider = dataTypeProvider,
+        clockProvider = clockProvider,
+        executionOptions = executionOptions
+    )
     return JdbcDatabase(config)
 }

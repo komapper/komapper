@@ -1,5 +1,6 @@
 package org.komapper.dialect.postgresql
 
+import org.komapper.core.BuilderDialect
 import org.komapper.core.Dialect
 import org.komapper.core.dsl.builder.EntityUpsertStatementBuilder
 import org.komapper.core.dsl.builder.SchemaStatementBuilder
@@ -21,15 +22,16 @@ interface PostgreSqlDialect : Dialect {
         return "select nextval('$sequenceName')"
     }
 
-    override fun getSchemaStatementBuilder(): SchemaStatementBuilder {
-        return PostgreSqlSchemaStatementBuilder(this)
+    override fun getSchemaStatementBuilder(dialect: BuilderDialect): SchemaStatementBuilder {
+        return PostgreSqlSchemaStatementBuilder(dialect)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> getEntityUpsertStatementBuilder(
+        dialect: BuilderDialect,
         context: EntityUpsertContext<ENTITY, ID, META>,
         entities: List<ENTITY>
     ): EntityUpsertStatementBuilder<ENTITY> {
-        return PostgreSqlEntityUpsertStatementBuilder(this, context, entities)
+        return PostgreSqlEntityUpsertStatementBuilder(context, entities, dialect)
     }
 
     override fun supportsLockOfTables(): Boolean = true
