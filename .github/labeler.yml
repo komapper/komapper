@@ -10,8 +10,11 @@ module/codegen:
 module/core:
   - komapper-core/**/*
 
-module/jdbc:
-  - komapper-jdbc/**/*
+module/datetime-jdbc:
+  - komapper-datetime-jdbc/**/*
+
+module/datetime-r2dbc:
+  - komapper-datetime-r2dbc/**/*
 
 module/dialect-h2:
   - komapper-dialect-h2/**/*
@@ -67,6 +70,9 @@ module/dialect-sqlserver-jdbc:
 module/dialect-sqlserver-r2dbc:
   - komapper-dialect-sqlserver-r2dbc/**/*
 
+module/jdbc:
+  - komapper-jdbc/**/*
+
 module/platform:
   - komapper-platform/**/*
 
@@ -118,12 +124,11 @@ module/starter-r2dbc:
 module/template:
   - komapper-template/**/*
 
-module/tx:
-  - komapper-tx/**/*
+module/tx-core:
+  - komapper-tx-core/**/*
 
 module/tx-jdbc:
   - komapper-tx-jdbc/**/*
 
 module/tx-r2dbc:
   - komapper-tx-r2dbc/**/*
-
