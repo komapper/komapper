@@ -7,7 +7,6 @@ import io.r2dbc.spi.Statement
 import org.komapper.core.ThreadSafe
 import java.math.BigDecimal
 import java.math.BigInteger
-import java.sql.Array
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -130,16 +129,6 @@ class R2dbcAnyType(override val name: String) :
     AbstractR2dbcDataType<Any>(Any::class) {
     override fun convert(value: Any): Any {
         return value
-    }
-}
-
-class R2dbcArrayType(override val name: String) :
-    AbstractR2dbcDataType<Array>(Array::class) {
-    override fun convert(value: Any): Array {
-        return when (value) {
-            is Array -> value
-            else -> error("Cannot convert. value=$value, type=${value::class.qualifiedName}.")
-        }
     }
 }
 

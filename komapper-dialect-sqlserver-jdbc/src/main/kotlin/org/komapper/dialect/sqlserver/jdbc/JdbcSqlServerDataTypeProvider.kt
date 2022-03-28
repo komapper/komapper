@@ -17,6 +17,7 @@ import org.komapper.jdbc.JdbcLocalDateTimeType
 import org.komapper.jdbc.JdbcLocalDateType
 import org.komapper.jdbc.JdbcLocalTimeType
 import org.komapper.jdbc.JdbcLongType
+import org.komapper.jdbc.JdbcNClobType
 import org.komapper.jdbc.JdbcSQLXMLType
 import org.komapper.jdbc.JdbcShortType
 import org.komapper.jdbc.JdbcStringType
@@ -43,6 +44,7 @@ class JdbcSqlServerDataTypeProvider(next: JdbcDataTypeProvider) :
             JdbcLocalDateType("date"),
             JdbcLocalTimeType("time"),
             JdbcLongType("bigint"),
+            JdbcNClobType("ntext"),
             JdbcShortType("smallint"),
             JdbcSQLXMLType("xml"),
             JdbcStringType("varchar(1000)"),
