@@ -1,6 +1,6 @@
 package org.komapper.dialect.oracle
 
-import org.komapper.core.Dialect
+import org.komapper.core.BuilderDialect
 import org.komapper.core.Statement
 import org.komapper.core.StatementBuffer
 import org.komapper.core.dsl.builder.EntityInsertStatementBuilder
@@ -10,7 +10,7 @@ import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.metamodel.getNonAutoIncrementProperties
 
 class OracleEntityInsertStatementBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
-    private val dialect: Dialect,
+    private val dialect: BuilderDialect,
     private val context: EntityInsertContext<ENTITY, ID, META>,
     private val entities: List<ENTITY>
 ) :
