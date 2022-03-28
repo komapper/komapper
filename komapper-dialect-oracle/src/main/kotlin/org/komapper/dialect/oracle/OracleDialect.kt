@@ -44,7 +44,7 @@ interface OracleDialect : Dialect {
         if (entities.size == 1) {
             return super.getEntityInsertStatementBuilder(dialect, context, entities)
         }
-        return OracleEntityInsertStatementBuilder(this, context, entities)
+        return OracleEntityInsertStatementBuilder(dialect, context, entities)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> getEntityUpsertStatementBuilder(

@@ -31,7 +31,7 @@ interface PostgreSqlDialect : Dialect {
         context: EntityUpsertContext<ENTITY, ID, META>,
         entities: List<ENTITY>
     ): EntityUpsertStatementBuilder<ENTITY> {
-        return PostgreSqlEntityUpsertStatementBuilder(context, entities, dialect)
+        return PostgreSqlEntityUpsertStatementBuilder(dialect, context, entities)
     }
 
     override fun supportsLockOfTables(): Boolean = true
