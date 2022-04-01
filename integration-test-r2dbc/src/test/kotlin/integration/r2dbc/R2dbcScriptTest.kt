@@ -6,6 +6,7 @@ import org.junit.jupiter.api.TestInfo
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.QueryDsl
 import org.komapper.core.dsl.query.first
+import org.komapper.core.dsl.query.string
 import org.komapper.r2dbc.R2dbcDatabase
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -27,7 +28,7 @@ internal class R2dbcScriptTest(private val db: R2dbcDatabase) {
         val value = db.runQuery {
             val sql = """select "value" from execute_table"""
             QueryDsl.fromTemplate(sql).select { row ->
-                row.asString("value")
+                row.string("value")
             }.first()
         }
         assertEquals("test", value)
@@ -54,7 +55,7 @@ internal class R2dbcScriptTest(private val db: R2dbcDatabase) {
         val value = db.runQuery {
             val sql = "select `value` from execute_table"
             QueryDsl.fromTemplate(sql).select { row ->
-                row.asString("value")
+                row.string("value")
             }.first()
         }
         assertEquals("test", value)

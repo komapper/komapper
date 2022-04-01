@@ -26,6 +26,7 @@ import org.komapper.core.dsl.query.andThen
 import org.komapper.core.dsl.query.bind
 import org.komapper.core.dsl.query.first
 import org.komapper.core.dsl.query.firstOrNull
+import org.komapper.core.dsl.query.getNotNull
 import org.komapper.jdbc.JdbcDatabase
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -278,9 +279,9 @@ class JdbcValueClassTest(val db: JdbcDatabase) {
                 .bind("id", IntId(1))
                 .select { row ->
                     VAddress(
-                        IntId(row.asInt("address_id")!!),
-                        Street(row.asString("street")!!),
-                        Version(row.asInt("version")!!)
+                        IntId(row.getNotNull("address_id")),
+                        Street(row.getNotNull("street")),
+                        Version(row.getNotNull("version"))
                     )
                 }
         }
@@ -296,9 +297,9 @@ class JdbcValueClassTest(val db: JdbcDatabase) {
                 .bind("pairs", listOf(IntId(1) to Street("STREET 1")))
                 .select { row ->
                     VAddress(
-                        IntId(row.asInt("address_id")!!),
-                        Street(row.asString("street")!!),
-                        Version(row.asInt("version")!!)
+                        IntId(row.getNotNull("address_id")),
+                        Street(row.getNotNull("street")),
+                        Version(row.getNotNull("version"))
                     )
                 }
         }

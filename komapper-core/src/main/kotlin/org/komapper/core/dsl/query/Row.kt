@@ -2,11 +2,6 @@ package org.komapper.core.dsl.query
 
 import java.math.BigDecimal
 import java.math.BigInteger
-import java.sql.Array
-import java.sql.Blob
-import java.sql.Clob
-import java.sql.NClob
-import java.sql.SQLXML
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -21,50 +16,296 @@ import kotlin.reflect.KClass
  * Note that columns are numbered from 0.
  */
 interface Row {
-    fun asAny(index: Int): Any?
-    fun asAny(columnLabel: String): Any?
-    fun asArray(index: Int): Array?
-    fun asArray(columnLabel: String): Array?
-    fun asBigDecimal(index: Int): BigDecimal?
-    fun asBigDecimal(columnLabel: String): BigDecimal?
-    fun asBigInteger(index: Int): BigInteger?
-    fun asBigInteger(columnLabel: String): BigInteger?
-    fun asBlob(index: Int): Blob?
-    fun asBlob(columnLabel: String): Blob?
-    fun asBoolean(index: Int): Boolean?
-    fun asBoolean(columnLabel: String): Boolean?
-    fun asByte(index: Int): Byte?
-    fun asByte(columnLabel: String): Byte?
-    fun asByteArray(index: Int): ByteArray?
-    fun asByteArray(columnLabel: String): ByteArray?
-    fun asClob(index: Int): Clob?
-    fun asClob(columnLabel: String): Clob?
-    fun asDouble(index: Int): Double?
-    fun asDouble(columnLabel: String): Double?
-    fun asFloat(index: Int): Float?
-    fun asFloat(columnLabel: String): Float?
-    fun asInt(index: Int): Int?
-    fun asInt(columnLabel: String): Int?
-    fun asLocalDateTime(index: Int): LocalDateTime?
-    fun asLocalDateTime(columnLabel: String): LocalDateTime?
-    fun asLocalDate(index: Int): LocalDate?
-    fun asLocalDate(columnLabel: String): LocalDate?
-    fun asLocalTime(index: Int): LocalTime?
-    fun asLocalTime(columnLabel: String): LocalTime?
-    fun asLong(index: Int): Long?
-    fun asLong(columnLabel: String): Long?
-    fun asNClob(index: Int): NClob?
-    fun asNClob(columnLabel: String): NClob?
-    fun asOffsetDateTime(index: Int): OffsetDateTime?
-    fun asOffsetDateTime(columnLabel: String): OffsetDateTime?
-    fun asShort(index: Int): Short?
-    fun asShort(columnLabel: String): Short?
-    fun asString(index: Int): String?
-    fun asString(columnLabel: String): String?
-    fun asSQLXML(index: Int): SQLXML?
-    fun asSQLXML(columnLabel: String): SQLXML?
-    fun asUUID(index: Int): UUID?
-    fun asUUID(columnLabel: String): UUID?
-    fun <T : Any> asT(index: Int, klass: KClass<T>): T?
-    fun <T : Any> asT(columnLabel: String, klass: KClass<T>): T?
+    fun <T : Any> get(index: Int, klass: KClass<T>): T?
+    fun <T : Any> get(columnLabel: String, klass: KClass<T>): T?
+}
+
+inline fun <reified T : Any> Row.get(index: Int): T? {
+    return get(index, T::class)
+}
+
+inline fun <reified T : Any> Row.get(columnLabel: String): T? {
+    return get(columnLabel, T::class)
+}
+
+inline fun <reified T : Any> Row.getNotNull(index: Int): T {
+    val nullable = get(index, T::class)
+    return checkNotNull(nullable) { "The returning value is null. index=$index" }
+}
+
+inline fun <reified T : Any> Row.getNotNull(columnLabel: String): T {
+    val nullable = get(columnLabel, T::class)
+    return checkNotNull(nullable) { "The returning value is null. columnLabel=$columnLabel" }
+}
+
+fun Row.any(index: Int): Any? {
+    return get(index)
+}
+
+fun Row.any(columnLabel: String): Any? {
+    return get(columnLabel)
+}
+
+fun Row.anyNotNull(index: Int): Any {
+    return getNotNull(index)
+}
+
+fun Row.anyNotNull(columnLabel: String): Any {
+    return getNotNull(columnLabel)
+}
+
+fun Row.bigDecimal(index: Int): BigDecimal? {
+    return get(index)
+}
+
+fun Row.bigDecimal(columnLabel: String): BigDecimal? {
+    return get(columnLabel)
+}
+
+fun Row.bigDecimalNotNull(index: Int): BigDecimal {
+    return getNotNull(index)
+}
+
+fun Row.bigDecimalNotNull(columnLabel: String): BigDecimal {
+    return getNotNull(columnLabel)
+}
+
+fun Row.bigInteger(index: Int): BigInteger? {
+    return get(index)
+}
+
+fun Row.bigInteger(columnLabel: String): BigInteger? {
+    return get(columnLabel)
+}
+
+fun Row.bigIntegerNotNull(index: Int): BigInteger {
+    return getNotNull(index)
+}
+
+fun Row.bigIntegerNotNull(columnLabel: String): BigInteger {
+    return getNotNull(columnLabel)
+}
+
+fun Row.boolean(index: Int): Boolean? {
+    return get(index)
+}
+
+fun Row.boolean(columnLabel: String): Boolean? {
+    return get(columnLabel)
+}
+
+fun Row.booleanNotNull(index: Int): Boolean {
+    return getNotNull(index)
+}
+
+fun Row.booleanNotNull(columnLabel: String): Boolean {
+    return getNotNull(columnLabel)
+}
+
+fun Row.byte(index: Int): Byte? {
+    return get(index)
+}
+
+fun Row.byte(columnLabel: String): Byte? {
+    return get(columnLabel)
+}
+
+fun Row.byteNotNull(index: Int): Byte {
+    return getNotNull(index)
+}
+
+fun Row.byteNotNull(columnLabel: String): Byte {
+    return getNotNull(columnLabel)
+}
+
+fun Row.byteArray(index: Int): ByteArray? {
+    return get(index)
+}
+
+fun Row.byteArray(columnLabel: String): ByteArray? {
+    return get(columnLabel)
+}
+
+fun Row.byteArrayNotNull(index: Int): ByteArray {
+    return getNotNull(index)
+}
+
+fun Row.byteArrayNotNull(columnLabel: String): ByteArray {
+    return getNotNull(columnLabel)
+}
+
+fun Row.double(index: Int): Double? {
+    return get(index)
+}
+
+fun Row.double(columnLabel: String): Double? {
+    return get(columnLabel)
+}
+
+fun Row.doubleNotNull(index: Int): Double {
+    return getNotNull(index)
+}
+
+fun Row.doubleNotNull(columnLabel: String): Double {
+    return getNotNull(columnLabel)
+}
+
+fun Row.float(index: Int): Float? {
+    return get(index)
+}
+
+fun Row.float(columnLabel: String): Float? {
+    return get(columnLabel)
+}
+
+fun Row.floatNotNull(index: Int): Float {
+    return getNotNull(index)
+}
+
+fun Row.floatNotNull(columnLabel: String): Float {
+    return getNotNull(columnLabel)
+}
+
+fun Row.int(index: Int): Int? {
+    return get(index)
+}
+
+fun Row.int(columnLabel: String): Int? {
+    return get(columnLabel)
+}
+
+fun Row.intNotNull(index: Int): Int {
+    return getNotNull(index)
+}
+
+fun Row.intNotNull(columnLabel: String): Int {
+    return getNotNull(columnLabel)
+}
+
+fun Row.localDateTime(index: Int): LocalDateTime? {
+    return get(index)
+}
+
+fun Row.localDateTime(columnLabel: String): LocalDateTime? {
+    return get(columnLabel)
+}
+
+fun Row.localDateTimeNotNull(index: Int): LocalDateTime {
+    return getNotNull(index)
+}
+
+fun Row.localDateTimeNotNull(columnLabel: String): LocalDateTime {
+    return getNotNull(columnLabel)
+}
+
+fun Row.localDate(index: Int): LocalDate? {
+    return get(index)
+}
+
+fun Row.localDate(columnLabel: String): LocalDate? {
+    return get(columnLabel)
+}
+
+fun Row.localDateNotNull(index: Int): LocalDate {
+    return getNotNull(index)
+}
+
+fun Row.localDateNotNull(columnLabel: String): LocalDate {
+    return getNotNull(columnLabel)
+}
+
+fun Row.localTime(index: Int): LocalTime? {
+    return get(index)
+}
+
+fun Row.localTime(columnLabel: String): LocalTime? {
+    return get(columnLabel)
+}
+
+fun Row.localTimeNotNull(index: Int): LocalTime {
+    return getNotNull(index)
+}
+
+fun Row.localTimeNotNull(columnLabel: String): LocalTime {
+    return getNotNull(columnLabel)
+}
+
+fun Row.long(index: Int): Long? {
+    return get(index)
+}
+
+fun Row.long(columnLabel: String): Long? {
+    return get(columnLabel)
+}
+
+fun Row.longNotNull(index: Int): Long {
+    return getNotNull(index)
+}
+
+fun Row.longNotNull(columnLabel: String): Long {
+    return getNotNull(columnLabel)
+}
+
+fun Row.offsetDateTime(index: Int): OffsetDateTime? {
+    return get(index)
+}
+
+fun Row.offsetDateTime(columnLabel: String): OffsetDateTime? {
+    return get(columnLabel)
+}
+
+fun Row.offsetDateTimeNotNull(index: Int): OffsetDateTime {
+    return getNotNull(index)
+}
+
+fun Row.offsetDateTimeNotNull(columnLabel: String): OffsetDateTime {
+    return getNotNull(columnLabel)
+}
+
+fun Row.short(index: Int): Short? {
+    return get(index)
+}
+
+fun Row.short(columnLabel: String): Short? {
+    return get(columnLabel)
+}
+
+fun Row.shortNotNull(index: Int): Short {
+    return getNotNull(index)
+}
+
+fun Row.shortNotNull(columnLabel: String): Short {
+    return getNotNull(columnLabel)
+}
+
+fun Row.string(index: Int): String? {
+    return get(index)
+}
+
+fun Row.string(columnLabel: String): String? {
+    return get(columnLabel)
+}
+
+fun Row.stringNotNull(index: Int): String {
+    return getNotNull(index)
+}
+
+fun Row.stringNotNull(columnLabel: String): String {
+    return getNotNull(columnLabel)
+}
+
+fun Row.uuid(index: Int): UUID? {
+    return get(index)
+}
+
+fun Row.uuid(columnLabel: String): UUID? {
+    return get(columnLabel)
+}
+
+fun Row.uuidNotNull(index: Int): UUID {
+    return getNotNull(index)
+}
+
+fun Row.uuidNotNull(columnLabel: String): UUID {
+    return getNotNull(columnLabel)
 }

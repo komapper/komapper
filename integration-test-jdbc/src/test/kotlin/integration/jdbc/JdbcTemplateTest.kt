@@ -11,26 +11,31 @@ import org.komapper.core.dsl.QueryDsl
 import org.komapper.core.dsl.query.Row
 import org.komapper.core.dsl.query.bind
 import org.komapper.core.dsl.query.first
+import org.komapper.core.dsl.query.get
+import org.komapper.core.dsl.query.getNotNull
 import org.komapper.jdbc.JdbcDatabase
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 
 @ExtendWith(JdbcEnv::class)
 class JdbcTemplateTest(private val db: JdbcDatabase) {
 
+    data class NullAddress(val addressId: Int?, val street: String?, val version: String?)
+
     private val asAddress: (Row) -> Address = { row ->
         Address(
-            row.asInt("address_id")!!,
-            row.asString("street")!!,
-            row.asInt("version")!!
+            row.getNotNull("address_id"),
+            row.getNotNull("street"),
+            row.getNotNull("version")
         )
     }
 
     private val asAddressByIndex: (Row) -> Address = { row ->
         Address(
-            row.asInt(0)!!,
-            row.asString(1)!!,
-            row.asInt(2)!!
+            row.getNotNull(0),
+            row.getNotNull(1),
+            row.getNotNull(2)
         )
     }
 
@@ -45,6 +50,26 @@ class JdbcTemplateTest(private val db: JdbcDatabase) {
     }
 
     @Test
+    fun test_columnLabel_null() {
+        val list = db.runQuery {
+            val sql = "select null as a, null as b, null as c from address"
+            QueryDsl.fromTemplate(sql).select { row ->
+                NullAddress(
+                    row.get("a"),
+                    row.get("b"),
+                    row.get("c")
+                )
+            }
+        }
+        assertEquals(15, list.size)
+        list.forEach { address ->
+            assertNull(address.addressId)
+            assertNull(address.street)
+            assertNull(address.version)
+        }
+    }
+
+    @Test
     fun test_index() {
         val list = db.runQuery {
             val sql = "select * from address"
@@ -52,6 +77,22 @@ class JdbcTemplateTest(private val db: JdbcDatabase) {
         }
         assertEquals(15, list.size)
         assertEquals(Address(1, "STREET 1", 1), list[0])
+    }
+
+    @Test
+    fun test_index_null() {
+        val list = db.runQuery {
+            val sql = "select null, null, null from address"
+            QueryDsl.fromTemplate(sql).select { row ->
+                NullAddress(row.get(0), row.get(1), row.get(2))
+            }
+        }
+        assertEquals(15, list.size)
+        list.forEach { address ->
+            assertNull(address.addressId)
+            assertNull(address.street)
+            assertNull(address.version)
+        }
     }
 
     @Test

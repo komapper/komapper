@@ -5,6 +5,7 @@ import integration.core.Run
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.QueryDsl
 import org.komapper.core.dsl.query.first
+import org.komapper.core.dsl.query.string
 import org.komapper.jdbc.JdbcDatabase
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -26,7 +27,7 @@ internal class JdbcScriptTest(private val db: JdbcDatabase) {
         val value = db.runQuery {
             val sql = """select "value" from execute_table"""
             QueryDsl.fromTemplate(sql).select { row ->
-                row.asString("value")
+                row.string("value")
             }.first()
         }
         assertEquals("test", value)
@@ -53,7 +54,7 @@ internal class JdbcScriptTest(private val db: JdbcDatabase) {
         val value = db.runQuery {
             val sql = "select `value` from execute_table"
             QueryDsl.fromTemplate(sql).select { row ->
-                row.asString("value")
+                row.string("value")
             }.first()
         }
         assertEquals("test", value)

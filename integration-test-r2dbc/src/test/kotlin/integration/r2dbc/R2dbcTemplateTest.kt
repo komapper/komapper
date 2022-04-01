@@ -11,6 +11,8 @@ import org.komapper.core.dsl.QueryDsl
 import org.komapper.core.dsl.query.Row
 import org.komapper.core.dsl.query.bind
 import org.komapper.core.dsl.query.first
+import org.komapper.core.dsl.query.get
+import org.komapper.core.dsl.query.getNotNull
 import org.komapper.r2dbc.R2dbcDatabase
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -20,17 +22,17 @@ class R2dbcTemplateTest(private val db: R2dbcDatabase) {
 
     private val asAddress: (Row) -> Address = { row ->
         Address(
-            row.asInt("address_id")!!,
-            row.asString("street")!!,
-            row.asInt("version")!!
+            row.getNotNull("address_id"),
+            row.getNotNull("street"),
+            row.getNotNull("version")
         )
     }
 
     private val asAddressByIndex: (Row) -> Address = { row ->
         Address(
-            row.asInt(0)!!,
-            row.asString(1)!!,
-            row.asInt(2)!!
+            row.getNotNull(0),
+            row.getNotNull(1),
+            row.getNotNull(2)
         )
     }
 
