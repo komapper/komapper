@@ -31,7 +31,7 @@ class PostgreSqlDataTypeTest(private val db: JdbcDatabase) {
 
         val result = db.runQuery {
             QueryDsl.fromTemplate("select value->'b' as x from json_test")
-                .select { it.asT("x", Json::class)!! }
+                .select { it.get("x", Json::class)!! }
                 .first()
         }
         assertEquals("\"Hello\"", result.data)

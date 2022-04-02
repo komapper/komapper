@@ -11,6 +11,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
 import org.komapper.core.dsl.query.first
+import org.komapper.core.dsl.query.int
 import org.komapper.r2dbc.R2dbcDatabase
 import org.komapper.tx.core.TransactionAttribute
 import kotlin.test.Test
@@ -229,7 +230,7 @@ class R2dbcFlowTest(val db: R2dbcDatabase) {
     fun template(info: TestInfo) = inTransaction(db, info) {
         val flow = db.flowQuery {
             QueryDsl.fromTemplate("select address_id from address order by address_id")
-                .select { it.asInt("address_id") }
+                .select { it.int("address_id") }
         }
         assertEquals((1..15).toList(), flow.toList())
     }
