@@ -36,7 +36,7 @@ class JdbcOracleDataTypeProvider(next: JdbcDataTypeProvider) : AbstractJdbcDataT
             JdbcClobType("clob"),
             JdbcDoubleType("float"),
             JdbcFloatType("float"),
-            JdbcInstantType("timestamp with time zone"),
+            JdbcInstantType("timestamp"),
             JdbcIntType("integer"),
             JdbcLocalDateTimeType("timestamp"),
             JdbcLocalDateType("date"),

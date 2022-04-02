@@ -1,7 +1,6 @@
 package org.komapper.dialect.sqlserver.r2dbc
 
 import org.komapper.r2dbc.AbstractR2dbcDataTypeProvider
-import org.komapper.r2dbc.R2dbcArrayType
 import org.komapper.r2dbc.R2dbcBigDecimalType
 import org.komapper.r2dbc.R2dbcBigIntegerType
 import org.komapper.r2dbc.R2dbcBlobType
@@ -30,7 +29,6 @@ class R2dbcSqlServerDataTypeProvider(next: R2dbcDataTypeProvider) :
 
     companion object {
         val DEFAULT_DATA_TYPES: List<R2dbcDataType<*>> = listOf(
-            R2dbcArrayType("array"),
             R2dbcBigDecimalType("decimal"),
             R2dbcBigIntegerType("decimal"),
             R2dbcBlobType("varbinary(max)"),

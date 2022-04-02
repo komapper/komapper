@@ -34,8 +34,8 @@ class JdbcH2DataTypeProvider(next: JdbcDataTypeProvider) :
 
     companion object {
         private val DEFAULT_DATA_TYPES: List<JdbcDataType<*>> = listOf(
-            JdbcAnyType("other"),
-            JdbcArrayType("array"),
+            JdbcAnyType("java_object"),
+            JdbcArrayType("varchar(100) array"),
             JdbcBigDecimalType("bigint"),
             JdbcBigIntegerType("bigint"),
             JdbcBlobType("blob"),
@@ -45,7 +45,7 @@ class JdbcH2DataTypeProvider(next: JdbcDataTypeProvider) :
             JdbcDoubleType("double"),
             JdbcClobType("clob"),
             JdbcFloatType("float"),
-            JdbcInstantType("timestamp with time zone"),
+            JdbcInstantType("timestamp"),
             JdbcIntType("integer"),
             JdbcLocalDateTimeType("timestamp"),
             JdbcLocalDateType("date"),
