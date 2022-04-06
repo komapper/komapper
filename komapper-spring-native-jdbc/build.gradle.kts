@@ -10,5 +10,5 @@ dependencies {
     val springBootVersion: String by project
     implementation("org.springframework.boot:spring-boot-autoconfigure:$springBootVersion")
     implementation(project(":komapper-spring-boot-autoconfigure-jdbc"))
-    compileOnly("org.springframework.experimental:spring-aot:0.11.3")
+    compileOnly("org.springframework.experimental:spring-aot:0.11.4")
 }
