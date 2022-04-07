@@ -5,7 +5,7 @@ import org.komapper.r2dbc.AbstractR2dbcDataType
 object R2dbcSqlServerBooleanType : AbstractR2dbcDataType<Boolean>(Boolean::class) {
     override val name: String = "bit"
 
-    override fun convert(value: Any): Boolean {
+    override fun convertBeforeGetting(value: Any): Boolean {
         return when (value) {
             is Boolean -> value
             is Number -> value.toInt() == 1

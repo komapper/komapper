@@ -10,13 +10,12 @@ import org.komapper.r2dbc.R2dbcDataType
 import org.komapper.r2dbc.R2dbcDataTypeProvider
 import org.komapper.r2dbc.R2dbcDoubleType
 import org.komapper.r2dbc.R2dbcFloatType
-import org.komapper.r2dbc.R2dbcInstantType
+import org.komapper.r2dbc.R2dbcInstantAsTimestampType
 import org.komapper.r2dbc.R2dbcIntType
 import org.komapper.r2dbc.R2dbcLocalDateTimeType
 import org.komapper.r2dbc.R2dbcLocalDateType
 import org.komapper.r2dbc.R2dbcLocalTimeType
 import org.komapper.r2dbc.R2dbcLongType
-import org.komapper.r2dbc.R2dbcOffsetDateTimeType
 import org.komapper.r2dbc.R2dbcShortType
 import org.komapper.r2dbc.R2dbcStringType
 import org.komapper.r2dbc.R2dbcUByteType
@@ -35,13 +34,12 @@ class R2dbcMariaDbDataTypeProvider(next: R2dbcDataTypeProvider) :
             R2dbcByteArrayType("bytea"),
             R2dbcDoubleType("double precision"),
             R2dbcFloatType("real"),
-            R2dbcInstantType("timestamp(6)"),
+            R2dbcInstantAsTimestampType("timestamp(6)"),
             R2dbcIntType("integer"),
-            R2dbcLocalDateTimeType("timestamp(6)"),
+            R2dbcLocalDateTimeType("datetime(6)"),
             R2dbcLocalDateType("date"),
             R2dbcLocalTimeType("time"),
             R2dbcLongType("bigint"),
-            R2dbcOffsetDateTimeType("timestamp(6)"),
             R2dbcShortType("smallint"),
             R2dbcStringType("varchar(500)"),
             R2dbcUByteType("smallint"),

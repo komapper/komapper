@@ -41,7 +41,7 @@ class R2dbcH2DataTypeProvider(next: R2dbcDataTypeProvider) :
             R2dbcClobType("clob"),
             R2dbcDoubleType("double"),
             R2dbcFloatType("float"),
-            R2dbcInstantType("timestamp"),
+            R2dbcInstantType("timestamp with time zone"),
             R2dbcIntType("integer"),
             R2dbcLocalDateTimeType("timestamp"),
             R2dbcLocalDateType("date"),

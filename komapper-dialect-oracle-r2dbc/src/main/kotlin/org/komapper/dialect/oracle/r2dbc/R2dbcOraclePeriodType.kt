@@ -8,10 +8,10 @@ object R2dbcOraclePeriodType : AbstractR2dbcDataType<Period>(Period::class) {
     override val name: String = "interval year to month"
 
     override fun getValue(row: Row, index: Int): Period? {
-        return row.get(index, klass.java)
+        return row.get(index, Period::class.java)
     }
 
     override fun getValue(row: Row, columnLabel: String): Period? {
-        return row.get(columnLabel, klass.java)
+        return row.get(columnLabel, Period::class.java)
     }
 }

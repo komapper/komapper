@@ -12,12 +12,13 @@ import org.komapper.r2dbc.R2dbcDataType
 import org.komapper.r2dbc.R2dbcDataTypeProvider
 import org.komapper.r2dbc.R2dbcDoubleType
 import org.komapper.r2dbc.R2dbcFloatType
-import org.komapper.r2dbc.R2dbcInstantType
+import org.komapper.r2dbc.R2dbcInstantAsTimestampWithTimezoneType
 import org.komapper.r2dbc.R2dbcIntType
 import org.komapper.r2dbc.R2dbcLocalDateTimeType
 import org.komapper.r2dbc.R2dbcLocalDateType
 import org.komapper.r2dbc.R2dbcLocalTimeType
 import org.komapper.r2dbc.R2dbcLongType
+import org.komapper.r2dbc.R2dbcOffsetDateTimeType
 import org.komapper.r2dbc.R2dbcShortType
 import org.komapper.r2dbc.R2dbcStringType
 import org.komapper.r2dbc.R2dbcUByteType
@@ -38,12 +39,13 @@ class R2dbcSqlServerDataTypeProvider(next: R2dbcDataTypeProvider) :
             R2dbcClobType("text"),
             R2dbcDoubleType("real"),
             R2dbcFloatType("float"),
-            R2dbcInstantType("datetime2"),
+            R2dbcInstantAsTimestampWithTimezoneType("datetimeoffset"),
             R2dbcIntType("int"),
             R2dbcLocalDateTimeType("datetime2"),
             R2dbcLocalDateType("date"),
             R2dbcLocalTimeType("time"),
             R2dbcLongType("bigint"),
+            R2dbcOffsetDateTimeType("datetimeoffset"),
             R2dbcShortType("smallint"),
             R2dbcStringType("varchar(1000)"),
             R2dbcUByteType("smallint"),

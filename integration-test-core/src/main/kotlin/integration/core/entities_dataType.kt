@@ -76,7 +76,7 @@ data class FloatTest(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true
 
 @KomapperEntity
 @KomapperTable("instant_test")
-data class InstantTest(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true) val value: Instant)
+data class InstantTest(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true) val value: Instant?)
 
 @KomapperEntity
 @KomapperTable("int_test")
@@ -100,7 +100,7 @@ data class LongTest(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true)
 
 @KomapperEntity
 @KomapperTable("offset_date_time_test")
-data class OffsetDateTimeTest(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true) val value: OffsetDateTime)
+data class OffsetDateTimeTest(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true) val value: OffsetDateTime?)
 
 @KomapperEntity
 @KomapperTable("period_test")

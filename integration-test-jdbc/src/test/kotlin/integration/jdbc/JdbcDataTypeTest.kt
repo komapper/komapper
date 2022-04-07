@@ -352,7 +352,7 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
         }
         println(data2)
         assertNotEquals(data, data2)
-        assertEquals(data.value.toInstant(), data2.value.toInstant())
+        assertEquals(value.toInstant(), data2.value!!.toInstant())
     }
 
     @Test

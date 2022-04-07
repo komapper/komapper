@@ -4,10 +4,12 @@ import integration.core.Dbms
 import integration.core.Direction
 import integration.core.EnumTest
 import integration.core.InstantTest
+import integration.core.OffsetDateTimeTest
 import integration.core.Run
 import integration.core.UUIDTest
 import integration.core.enumTest
 import integration.core.instantTest
+import integration.core.offsetDateTimeTest
 import integration.core.uuidTest
 import io.r2dbc.spi.Blob
 import io.r2dbc.spi.Clob
@@ -23,6 +25,7 @@ import org.komapper.r2dbc.R2dbcDatabase
 import java.nio.ByteBuffer
 import java.nio.CharBuffer
 import java.time.LocalDateTime
+import java.time.OffsetDateTime
 import java.time.ZoneOffset
 import java.util.UUID
 import kotlin.test.Test
@@ -76,12 +79,12 @@ class R2dbcDataTypeTest(val db: R2dbcDatabase) {
         assertEquals('c', buffer[2])
     }
 
-    @Run(onlyIf = [Dbms.POSTGRESQL, Dbms.H2])
     @Test
-    fun uuid(info: TestInfo) = inTransaction(db, info) {
-        val m = Meta.uuidTest
-        val value = UUID.randomUUID()
-        val data = UUIDTest(1, value)
+    fun instant(info: TestInfo) = inTransaction(db, info) {
+        val m = Meta.instantTest
+        val dateTime = LocalDateTime.of(2019, 6, 1, 12, 11, 10)
+        val value = dateTime.toInstant(ZoneOffset.UTC)
+        val data = InstantTest(1, value)
         db.runQuery { QueryDsl.insert(m).single(data) }
         val data2 = db.runQuery {
             QueryDsl.from(m).where { m.id eq 1 }.first()
@@ -90,11 +93,47 @@ class R2dbcDataTypeTest(val db: R2dbcDatabase) {
     }
 
     @Test
-    fun instant(info: TestInfo) = inTransaction(db, info) {
+    fun instant_null(info: TestInfo) = inTransaction(db, info) {
         val m = Meta.instantTest
+        val data = InstantTest(1, null)
+        db.runQuery { QueryDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        assertEquals(data, data2)
+    }
+
+    @Test
+    fun offsetDateTime(info: TestInfo) = inTransaction(db, info) {
+        val m = Meta.offsetDateTimeTest
         val dateTime = LocalDateTime.of(2019, 6, 1, 12, 11, 10)
-        val value = dateTime.toInstant(ZoneOffset.UTC)
-        val data = InstantTest(1, value)
+        val offset = ZoneOffset.ofHours(9)
+        val value = OffsetDateTime.of(dateTime, offset)
+        val data = OffsetDateTimeTest(1, value)
+        db.runQuery { QueryDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        assertEquals(data, data2)
+    }
+
+    @Test
+    fun offsetDateTime_null(info: TestInfo) = inTransaction(db, info) {
+        val m = Meta.offsetDateTimeTest
+        val data = OffsetDateTimeTest(1, null)
+        db.runQuery { QueryDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        assertEquals(data, data2)
+    }
+
+    @Run(onlyIf = [Dbms.POSTGRESQL, Dbms.H2])
+    @Test
+    fun uuid(info: TestInfo) = inTransaction(db, info) {
+        val m = Meta.uuidTest
+        val value = UUID.randomUUID()
+        val data = UUIDTest(1, value)
         db.runQuery { QueryDsl.insert(m).single(data) }
         val data2 = db.runQuery {
             QueryDsl.from(m).where { m.id eq 1 }.first()
