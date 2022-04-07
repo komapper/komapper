@@ -11,13 +11,14 @@ import org.komapper.jdbc.JdbcDataType
 import org.komapper.jdbc.JdbcDataTypeProvider
 import org.komapper.jdbc.JdbcDoubleType
 import org.komapper.jdbc.JdbcFloatType
-import org.komapper.jdbc.JdbcInstantType
+import org.komapper.jdbc.JdbcInstantAsTimestampWithTimezoneType
 import org.komapper.jdbc.JdbcIntType
 import org.komapper.jdbc.JdbcLocalDateTimeType
 import org.komapper.jdbc.JdbcLocalDateType
 import org.komapper.jdbc.JdbcLocalTimeType
 import org.komapper.jdbc.JdbcLongType
 import org.komapper.jdbc.JdbcNClobType
+import org.komapper.jdbc.JdbcOffsetDateTimeType
 import org.komapper.jdbc.JdbcSQLXMLType
 import org.komapper.jdbc.JdbcShortType
 import org.komapper.jdbc.JdbcStringType
@@ -38,13 +39,14 @@ class JdbcSqlServerDataTypeProvider(next: JdbcDataTypeProvider) :
             JdbcClobType("text"),
             JdbcDoubleType("float"),
             JdbcFloatType("real"),
-            JdbcInstantType("datetime2"),
+            JdbcInstantAsTimestampWithTimezoneType("datetimeoffset"),
             JdbcIntType("int"),
             JdbcLocalDateTimeType("datetime2"),
             JdbcLocalDateType("date"),
             JdbcLocalTimeType("time"),
             JdbcLongType("bigint"),
             JdbcNClobType("ntext"),
+            JdbcOffsetDateTimeType("datetimeoffset"),
             JdbcShortType("smallint"),
             JdbcSQLXMLType("xml"),
             JdbcStringType("varchar(1000)"),

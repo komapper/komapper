@@ -12,7 +12,7 @@ import org.komapper.jdbc.JdbcDataType
 import org.komapper.jdbc.JdbcDataTypeProvider
 import org.komapper.jdbc.JdbcDoubleType
 import org.komapper.jdbc.JdbcFloatType
-import org.komapper.jdbc.JdbcInstantType
+import org.komapper.jdbc.JdbcInstantAsTimestampType
 import org.komapper.jdbc.JdbcIntType
 import org.komapper.jdbc.JdbcLocalDateTimeType
 import org.komapper.jdbc.JdbcLocalDateType
@@ -40,9 +40,9 @@ class JdbcMySqlDataTypeProvider(next: JdbcDataTypeProvider) : AbstractJdbcDataTy
             JdbcDoubleType("double precision"),
             JdbcClobType("text"),
             JdbcFloatType("real"),
-            JdbcInstantType("timestamp(6)"),
+            JdbcInstantAsTimestampType("timestamp(6)"),
             JdbcIntType("integer"),
-            JdbcLocalDateTimeType("timestamp(6)"),
+            JdbcLocalDateTimeType("datetime(6)"),
             JdbcLocalDateType("date"),
             JdbcLocalTimeType("time"),
             JdbcLongType("bigint"),

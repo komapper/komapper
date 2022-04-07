@@ -55,7 +55,7 @@ class R2dbcUpdateSingleTest(private val db: R2dbcDatabase) {
     @Test
     fun updatedAt_instant(info: TestInfo) = inTransaction(db, info) {
         val p = Meta.man
-        val findQuery = QueryDsl.from(p).where { p.personId eq 1 }.first()
+        val findQuery = QueryDsl.from(p).where { p.manId eq 1 }.first()
         val person1 = Man(1, "ABC")
         val person2 = db.runQuery {
             QueryDsl.insert(p).single(person1).andThen(findQuery)

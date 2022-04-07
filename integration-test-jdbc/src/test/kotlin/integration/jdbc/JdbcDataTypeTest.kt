@@ -77,6 +77,7 @@ import java.util.UUID
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
+import kotlin.test.assertNotEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
@@ -322,7 +323,7 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
         assertEquals(data, data2)
     }
 
-    @Run(onlyIf = [Dbms.H2])
+    @Run(onlyIf = [Dbms.H2, Dbms.MYSQL, Dbms.ORACLE, Dbms.SQLSERVER])
     @Test
     fun offsetDateTime() {
         val m = Meta.offsetDateTimeTest
@@ -337,7 +338,7 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
         assertEquals(data, data2)
     }
 
-    @Run(unless = [Dbms.H2, Dbms.MARIADB, Dbms.SQLSERVER])
+    @Run(onlyIf = [Dbms.POSTGRESQL])
     @Test
     fun offsetDateTime_offsetLost() {
         val m = Meta.offsetDateTimeTest
@@ -350,7 +351,8 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
             QueryDsl.from(m).where { m.id eq 1 }.first()
         }
         println(data2)
-        assertNotNull(data2)
+        assertNotEquals(data, data2)
+        assertEquals(data.value.toInstant(), data2.value.toInstant())
     }
 
     @Test

@@ -14,7 +14,6 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
-import java.time.OffsetDateTime
 
 @KomapperEntity
 @KomapperTable
@@ -34,7 +33,6 @@ data class JdbcMariaDbMapping(
     @KomapperColumn(alwaysQuote = true) val localTime: LocalTime,
     @KomapperColumn(alwaysQuote = true) val long: Long,
     @KomapperColumn(alwaysQuote = true) val nClob: NClob,
-    @KomapperColumn(alwaysQuote = true) val offsetDateTime: OffsetDateTime,
     @KomapperColumn(alwaysQuote = true) val short: Short,
     @KomapperColumn(alwaysQuote = true) val string: String,
     @KomapperColumn(alwaysQuote = true) val sqlxml: SQLXML,

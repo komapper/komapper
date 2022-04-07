@@ -73,7 +73,7 @@ class R2dbcKotlinDatetimeTest(val db: R2dbcDatabase) {
     fun createdAt_instant(info: TestInfo) = inTransaction(db, info) {
         val p = Meta.kotlinInstantPerson
         val person1 = KotlinInstantPerson(1, "ABC")
-        val id = db.runQuery { QueryDsl.insert(p).single(person1) }.personId
+        val id = db.runQuery { QueryDsl.insert(p).single(person1) }.humanId
         val person2 = db.runQuery { QueryDsl.from(p).where { p.personId eq id }.first() }
         assertNotNull(person2.createdAt)
         assertNotNull(person2.updatedAt)

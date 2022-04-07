@@ -54,14 +54,14 @@ class JdbcInsertSingleTest(private val db: JdbcDatabase) {
     fun createdAt_instant() {
         val p = Meta.man
         val person1 = Man(1, "ABC")
-        val id = db.runQuery { QueryDsl.insert(p).single(person1) }.personId
-        val person2 = db.runQuery { QueryDsl.from(p).where { p.personId eq id }.first() }
+        val id = db.runQuery { QueryDsl.insert(p).single(person1) }.manId
+        val person2 = db.runQuery { QueryDsl.from(p).where { p.manId eq id }.first() }
         assertNotNull(person2.createdAt)
         assertNotNull(person2.updatedAt)
         assertEquals(person2.createdAt, person2.updatedAt)
         val person3 = db.runQuery {
             QueryDsl.from(p).where {
-                p.personId to 1
+                p.manId to 1
             }.first()
         }
         assertEquals(person2, person3)

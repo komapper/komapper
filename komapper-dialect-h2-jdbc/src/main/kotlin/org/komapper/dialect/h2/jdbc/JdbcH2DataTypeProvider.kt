@@ -45,7 +45,7 @@ class JdbcH2DataTypeProvider(next: JdbcDataTypeProvider) :
             JdbcDoubleType("double"),
             JdbcClobType("clob"),
             JdbcFloatType("float"),
-            JdbcInstantType("timestamp"),
+            JdbcInstantType("timestamp with time zone"),
             JdbcIntType("integer"),
             JdbcLocalDateTimeType("timestamp"),
             JdbcLocalDateType("date"),

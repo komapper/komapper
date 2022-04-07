@@ -14,7 +14,8 @@ interface MariaDbSetting<DATABASE : Database> : Setting<DATABASE> {
         create table if not exists address(address_id integer not null primary key, street varchar(20) unique, version integer);
         create table if not exists address_archive(address_id integer not null primary key, street varchar(20) unique, version integer);
         create table if not exists employee(employee_id integer not null primary key, employee_no integer not null ,employee_name varchar(20),manager_id integer,hiredate date,salary numeric(7,2),department_id integer,address_id integer, version integer, constraint fk_department_id foreign key(department_id) references department(department_id),constraint fk_address_id foreign key(address_id) references address(address_id));
-        create table if not exists person(person_id integer not null primary key, name varchar(20), created_at timestamp(6), updated_at timestamp(6), version integer);
+        create table if not exists human(human_id integer not null primary key, name varchar(20), created_at timestamp(6), updated_at timestamp(6), version integer);
+        create table if not exists person(person_id integer not null primary key, name varchar(20), created_at datetime(6), updated_at datetime(6), version integer);
         create table if not exists `order`(`order_id` integer not null primary key, `value` varchar(20));
 
         create table if not exists comp_key_department(department_id1 integer not null, department_id2 integer not null, department_no integer not null unique,department_name varchar(20),location varchar(20) default 'tokyo', version integer, constraint pk_comp_key_department primary key(department_id1, department_id2));
@@ -36,7 +37,7 @@ interface MariaDbSetting<DATABASE : Database> : Setting<DATABASE> {
         create table if not exists float_test(id integer not null primary key, value float);
         create table if not exists instant_test(id integer not null primary key, value timestamp);
         create table if not exists int_test(id integer not null primary key, value integer);
-        create table if not exists local_date_time_test(id integer not null primary key, value timestamp);
+        create table if not exists local_date_time_test(id integer not null primary key, value datetime);
         create table if not exists local_date_test(id integer not null primary key, value date);
         create table if not exists local_time_test(id integer not null primary key, value time);
         create table if not exists long_test(id integer not null primary key, value bigint);
