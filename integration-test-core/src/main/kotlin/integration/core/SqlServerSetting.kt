@@ -14,6 +14,7 @@ interface SqlServerSetting<DATABASE : Database> : Setting<DATABASE> {
         create table address(address_id int not null primary key, street varchar(20) unique, version int);
         create table address_archive(address_id int not null primary key, street varchar(20) unique, version int);
         create table employee(employee_id int not null primary key, employee_no int not null ,employee_name varchar(20),manager_id int,hiredate date,salary numeric(7,2),department_id int,address_id int, version int, constraint fk_department_id foreign key(department_id) references department(department_id),constraint fk_address_id foreign key(address_id) references address(address_id));
+        create table human(human_id int not null primary key, name varchar(20), created_at datetimeoffset, updated_at datetimeoffset, version int);
         create table person(person_id int not null primary key, name varchar(20), created_at datetime2, updated_at datetime2, version int);
         create table [order]([order_id] int not null primary key, [value] varchar(20));
 
@@ -34,13 +35,13 @@ interface SqlServerSetting<DATABASE : Database> : Setting<DATABASE> {
         create table double_test(id int not null primary key, value float);
         create table enum_test(id int not null primary key, value varchar(20));
         create table float_test(id int not null primary key, value real);
-        create table instant_test(id int not null primary key, value datetime2);
+        create table instant_test(id int not null primary key, value datetimeoffset);
         create table int_test(id int not null primary key, value int);
         create table local_date_time_test(id int not null primary key, value datetime2);
         create table local_date_test(id int not null primary key, value date);
         create table local_time_test(id int not null primary key, value time);
         create table long_test(id int not null primary key, value bigint);
-        create table offset_date_time_test(id int not null primary key, value datetime2);
+        create table offset_date_time_test(id int not null primary key, value datetimeoffset);
         create table short_test(id int not null primary key, value smallint);
         create table string_test(id int not null primary key, value varchar(20));
 

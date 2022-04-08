@@ -26,9 +26,9 @@ data class KotlinLocalDateTimeTest(
 )
 
 @KomapperEntity
-@KomapperTable("person")
+@KomapperTable("human")
 data class KotlinInstantPerson(
-    @KomapperId @KomapperColumn("person_id") val personId: Int,
+    @KomapperId @KomapperColumn("human_id") val humanId: Int,
     val name: String,
     @KomapperCreatedAt @KomapperColumn("created_at") val createdAt: Instant? = null,
     @KomapperUpdatedAt @KomapperColumn("updated_at") val updatedAt: Instant? = null

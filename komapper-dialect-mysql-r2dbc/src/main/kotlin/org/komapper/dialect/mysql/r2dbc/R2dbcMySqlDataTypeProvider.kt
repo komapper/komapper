@@ -10,7 +10,7 @@ import org.komapper.r2dbc.R2dbcDataType
 import org.komapper.r2dbc.R2dbcDataTypeProvider
 import org.komapper.r2dbc.R2dbcDoubleType
 import org.komapper.r2dbc.R2dbcFloatType
-import org.komapper.r2dbc.R2dbcInstantType
+import org.komapper.r2dbc.R2dbcInstantAsTimestampType
 import org.komapper.r2dbc.R2dbcIntType
 import org.komapper.r2dbc.R2dbcLocalDateTimeType
 import org.komapper.r2dbc.R2dbcLocalDateType
@@ -35,9 +35,9 @@ class R2dbcMySqlDataTypeProvider(next: R2dbcDataTypeProvider) :
             R2dbcByteArrayType("bytea"),
             R2dbcDoubleType("double precision"),
             R2dbcFloatType("real"),
-            R2dbcInstantType("timestamp"),
+            R2dbcInstantAsTimestampType("timestamp"),
             R2dbcIntType("integer"),
-            R2dbcLocalDateTimeType("timestamp(6)"),
+            R2dbcLocalDateTimeType("datetime(6)"),
             R2dbcLocalDateType("date"),
             R2dbcLocalTimeType("time"),
             R2dbcLongType("bigint"),

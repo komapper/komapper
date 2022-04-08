@@ -293,16 +293,33 @@ class JdbcFloatType(override val name: String) : AbstractJdbcDataType<Float>(Flo
     }
 }
 
-class JdbcInstantType(override val name: String) : AbstractJdbcDataType<Instant>(Instant::class, JDBCType.TIMESTAMP) {
+class JdbcInstantType(override val name: String) :
+    AbstractJdbcDataType<Instant>(Instant::class, JDBCType.TIMESTAMP_WITH_TIMEZONE) {
 
-    override fun doGetValue(rs: ResultSet, index: Int): Instant {
-        val datetime = rs.getObject(index, LocalDateTime::class.java)
-        return toInstant(datetime)
+    override fun doGetValue(rs: ResultSet, index: Int): Instant? {
+        return rs.getObject(index, Instant::class.java)
     }
 
-    override fun doGetValue(rs: ResultSet, columnLabel: String): Instant {
-        val dateTime = rs.getObject(columnLabel, LocalDateTime::class.java)
-        return toInstant(dateTime)
+    override fun doGetValue(rs: ResultSet, columnLabel: String): Instant? {
+        return rs.getObject(columnLabel, Instant::class.java)
+    }
+
+    override fun doSetValue(ps: PreparedStatement, index: Int, value: Instant) {
+        ps.setObject(index, value)
+    }
+}
+
+class JdbcInstantAsTimestampType(override val name: String) :
+    AbstractJdbcDataType<Instant>(Instant::class, JDBCType.TIMESTAMP) {
+
+    override fun doGetValue(rs: ResultSet, index: Int): Instant? {
+        val dateTime: LocalDateTime? = rs.getObject(index, LocalDateTime::class.java)
+        return dateTime?.let { toInstant(it) }
+    }
+
+    override fun doGetValue(rs: ResultSet, columnLabel: String): Instant? {
+        val dateTime: LocalDateTime? = rs.getObject(columnLabel, LocalDateTime::class.java)
+        return dateTime?.let { toInstant(it) }
     }
 
     override fun doSetValue(ps: PreparedStatement, index: Int, value: Instant) {
@@ -312,6 +329,25 @@ class JdbcInstantType(override val name: String) : AbstractJdbcDataType<Instant>
 
     private fun toInstant(dateTime: LocalDateTime): Instant {
         return dateTime.toInstant(ZoneOffset.UTC)
+    }
+}
+
+class JdbcInstantAsTimestampWithTimezoneType(override val name: String) :
+    AbstractJdbcDataType<Instant>(Instant::class, JDBCType.TIMESTAMP_WITH_TIMEZONE) {
+
+    override fun doGetValue(rs: ResultSet, index: Int): Instant? {
+        val dateTime: OffsetDateTime? = rs.getObject(index, OffsetDateTime::class.java)
+        return dateTime?.toInstant()
+    }
+
+    override fun doGetValue(rs: ResultSet, columnLabel: String): Instant? {
+        val dateTime: OffsetDateTime? = rs.getObject(columnLabel, OffsetDateTime::class.java)
+        return dateTime?.toInstant()
+    }
+
+    override fun doSetValue(ps: PreparedStatement, index: Int, value: Instant) {
+        val dateTime = value.atOffset(ZoneOffset.UTC)
+        ps.setObject(index, dateTime)
     }
 }
 

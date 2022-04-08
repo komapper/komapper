@@ -46,9 +46,9 @@ data class SequenceStrategy(
 )
 
 @KomapperEntity
-@KomapperTable("person")
+@KomapperTable("human")
 data class Man(
-    @KomapperId @KomapperColumn("person_id") val personId: Int,
+    @KomapperId @KomapperColumn("human_id") val manId: Int,
     val name: String,
     @KomapperCreatedAt @KomapperColumn("created_at") val createdAt: Instant? = null,
     @KomapperUpdatedAt @KomapperColumn("updated_at") val updatedAt: Instant? = null
@@ -63,9 +63,9 @@ data class Person(
 )
 
 @KomapperEntity
-@KomapperTable("person")
+@KomapperTable("human")
 data class Human(
-    @KomapperId @KomapperColumn("person_id") val humanId: Int,
+    @KomapperId @KomapperColumn("human_id") val humanId: Int,
     val name: String,
     @KomapperCreatedAt val createdAt: OffsetDateTime? = null,
     @KomapperUpdatedAt val updatedAt: OffsetDateTime? = null

@@ -73,14 +73,14 @@ class R2dbcKotlinDatetimeTest(val db: R2dbcDatabase) {
     fun createdAt_instant(info: TestInfo) = inTransaction(db, info) {
         val p = Meta.kotlinInstantPerson
         val person1 = KotlinInstantPerson(1, "ABC")
-        val id = db.runQuery { QueryDsl.insert(p).single(person1) }.personId
-        val person2 = db.runQuery { QueryDsl.from(p).where { p.personId eq id }.first() }
+        val id = db.runQuery { QueryDsl.insert(p).single(person1) }.humanId
+        val person2 = db.runQuery { QueryDsl.from(p).where { p.humanId eq id }.first() }
         assertNotNull(person2.createdAt)
         assertNotNull(person2.updatedAt)
         assertEquals(person2.createdAt, person2.updatedAt)
         val person3 = db.runQuery {
             QueryDsl.from(p).where {
-                p.personId to 1
+                p.humanId to 1
             }.first()
         }
         assertEquals(person2, person3)
@@ -89,7 +89,7 @@ class R2dbcKotlinDatetimeTest(val db: R2dbcDatabase) {
     @Test
     fun updatedAt_instance(info: TestInfo) = inTransaction(db, info) {
         val p = Meta.kotlinInstantPerson
-        val findQuery = QueryDsl.from(p).where { p.personId eq 1 }.first()
+        val findQuery = QueryDsl.from(p).where { p.humanId eq 1 }.first()
         val person1 = KotlinInstantPerson(1, "ABC")
         val person2 = db.runQuery {
             QueryDsl.insert(p).single(person1).andThen(findQuery)

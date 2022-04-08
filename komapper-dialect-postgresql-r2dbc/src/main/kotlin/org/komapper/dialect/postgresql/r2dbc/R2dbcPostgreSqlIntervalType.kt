@@ -8,10 +8,10 @@ object R2dbcPostgreSqlIntervalType : AbstractR2dbcDataType<Interval>(Interval::c
     override val name: String = "interval"
 
     override fun getValue(row: Row, index: Int): Interval? {
-        return row.get(index, klass.java)
+        return row.get(index, Interval::class.java)
     }
 
     override fun getValue(row: Row, columnLabel: String): Interval? {
-        return row.get(columnLabel, klass.java)
+        return row.get(columnLabel, Interval::class.java)
     }
 }

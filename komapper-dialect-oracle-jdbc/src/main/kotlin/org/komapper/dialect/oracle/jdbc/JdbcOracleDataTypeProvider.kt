@@ -11,7 +11,7 @@ import org.komapper.jdbc.JdbcDataType
 import org.komapper.jdbc.JdbcDataTypeProvider
 import org.komapper.jdbc.JdbcDoubleType
 import org.komapper.jdbc.JdbcFloatType
-import org.komapper.jdbc.JdbcInstantType
+import org.komapper.jdbc.JdbcInstantAsTimestampWithTimezoneType
 import org.komapper.jdbc.JdbcIntType
 import org.komapper.jdbc.JdbcLocalDateTimeType
 import org.komapper.jdbc.JdbcLocalDateType
@@ -36,7 +36,7 @@ class JdbcOracleDataTypeProvider(next: JdbcDataTypeProvider) : AbstractJdbcDataT
             JdbcClobType("clob"),
             JdbcDoubleType("float"),
             JdbcFloatType("float"),
-            JdbcInstantType("timestamp"),
+            JdbcInstantAsTimestampWithTimezoneType("timestamp with time zone"),
             JdbcIntType("integer"),
             JdbcLocalDateTimeType("timestamp"),
             JdbcLocalDateType("date"),

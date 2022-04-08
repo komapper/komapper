@@ -5,7 +5,7 @@ import java.sql.JDBCType
 import java.sql.PreparedStatement
 import java.sql.ResultSet
 
-object JdbcOracleBooleanType : AbstractJdbcDataType<Boolean>(Boolean::class, JDBCType.BOOLEAN) {
+object JdbcOracleBooleanType : AbstractJdbcDataType<Boolean>(Boolean::class, JDBCType.INTEGER) {
     override val name: String = "number(1, 0)"
 
     override fun doGetValue(rs: ResultSet, index: Int): Boolean {

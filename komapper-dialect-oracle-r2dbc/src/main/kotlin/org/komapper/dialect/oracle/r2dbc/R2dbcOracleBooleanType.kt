@@ -6,7 +6,7 @@ import org.komapper.r2dbc.AbstractR2dbcDataType
 object R2dbcOracleBooleanType : AbstractR2dbcDataType<Boolean>(Boolean::class) {
     override val name: String = "number(1, 0)"
 
-    override fun convert(value: Any): Boolean {
+    override fun convertBeforeGetting(value: Any): Boolean {
         return when (value) {
             is Number -> value.toInt() == 1
             else -> false

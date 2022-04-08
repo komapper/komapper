@@ -12,14 +12,13 @@ import org.komapper.jdbc.JdbcDataType
 import org.komapper.jdbc.JdbcDataTypeProvider
 import org.komapper.jdbc.JdbcDoubleType
 import org.komapper.jdbc.JdbcFloatType
-import org.komapper.jdbc.JdbcInstantType
+import org.komapper.jdbc.JdbcInstantAsTimestampType
 import org.komapper.jdbc.JdbcIntType
 import org.komapper.jdbc.JdbcLocalDateTimeType
 import org.komapper.jdbc.JdbcLocalDateType
 import org.komapper.jdbc.JdbcLocalTimeType
 import org.komapper.jdbc.JdbcLongType
 import org.komapper.jdbc.JdbcNClobType
-import org.komapper.jdbc.JdbcOffsetDateTimeType
 import org.komapper.jdbc.JdbcSQLXMLType
 import org.komapper.jdbc.JdbcShortType
 import org.komapper.jdbc.JdbcStringType
@@ -40,14 +39,13 @@ class JdbcMariaDbDataTypeProvider(next: JdbcDataTypeProvider) : AbstractJdbcData
             JdbcDoubleType("double precision"),
             JdbcClobType("text"),
             JdbcFloatType("real"),
-            JdbcInstantType("timestamp"),
+            JdbcInstantAsTimestampType("timestamp"),
             JdbcIntType("integer"),
-            JdbcLocalDateTimeType("timestamp(6)"),
+            JdbcLocalDateTimeType("datetime(6)"),
             JdbcLocalDateType("date"),
             JdbcLocalTimeType("time"),
             JdbcLongType("bigint"),
             JdbcNClobType("text"),
-            JdbcOffsetDateTimeType("timestamp"),
             JdbcShortType("smallint"),
             JdbcStringType("varchar(500)"),
             JdbcSQLXMLType("text"),

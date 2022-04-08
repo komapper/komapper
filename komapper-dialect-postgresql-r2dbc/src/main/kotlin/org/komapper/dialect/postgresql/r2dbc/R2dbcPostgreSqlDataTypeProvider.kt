@@ -12,7 +12,7 @@ import org.komapper.r2dbc.R2dbcDataType
 import org.komapper.r2dbc.R2dbcDataTypeProvider
 import org.komapper.r2dbc.R2dbcDoubleType
 import org.komapper.r2dbc.R2dbcFloatType
-import org.komapper.r2dbc.R2dbcInstantType
+import org.komapper.r2dbc.R2dbcInstantAsTimestampWithTimezoneType
 import org.komapper.r2dbc.R2dbcIntType
 import org.komapper.r2dbc.R2dbcLocalDateTimeType
 import org.komapper.r2dbc.R2dbcLocalDateType
@@ -39,7 +39,7 @@ class R2dbcPostgreSqlDataTypeProvider(next: R2dbcDataTypeProvider) :
             R2dbcClobType("text"),
             R2dbcDoubleType("double precision"),
             R2dbcFloatType("real"),
-            R2dbcInstantType("timestamp"),
+            R2dbcInstantAsTimestampWithTimezoneType("timestamp with time zone"),
             R2dbcIntType("integer"),
             R2dbcLocalDateTimeType("timestamp"),
             R2dbcLocalDateType("date"),

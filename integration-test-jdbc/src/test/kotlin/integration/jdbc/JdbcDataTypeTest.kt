@@ -2,7 +2,6 @@ package integration.jdbc
 
 import integration.core.AnyPerson
 import integration.core.AnyTest
-import integration.core.ArrayTest
 import integration.core.BigDecimalTest
 import integration.core.BigIntegerTest
 import integration.core.BooleanTest
@@ -22,7 +21,6 @@ import integration.core.LongTest
 import integration.core.OffsetDateTimeTest
 import integration.core.Run
 import integration.core.ShortTest
-import integration.core.SqlXmlTest
 import integration.core.StringTest
 import integration.core.UByteTest
 import integration.core.UIntTest
@@ -34,7 +32,6 @@ import integration.core.UnsignedAddress2
 import integration.core.UnsignedIdentityStrategy
 import integration.core.UnsignedSequenceStrategy
 import integration.core.anyTest
-import integration.core.arrayTest
 import integration.core.bigDecimalTest
 import integration.core.bigIntegerTest
 import integration.core.booleanTest
@@ -51,7 +48,6 @@ import integration.core.localTimeTest
 import integration.core.longTest
 import integration.core.offsetDateTimeTest
 import integration.core.shortTest
-import integration.core.sqlXmlTest
 import integration.core.stringTest
 import integration.core.uByteTest
 import integration.core.uIntTest
@@ -72,11 +68,13 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.OffsetDateTime
+import java.time.ZoneId
 import java.time.ZoneOffset
 import java.util.UUID
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
+import kotlin.test.assertNotEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
@@ -91,6 +89,18 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
             1,
             AnyPerson("ABC")
         )
+        db.runQuery { QueryDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        assertEquals(data, data2)
+    }
+
+    @Run(onlyIf = [Dbms.H2])
+    @Test
+    fun any_null() {
+        val m = Meta.anyTest
+        val data = AnyTest(1, null)
         db.runQuery { QueryDsl.insert(m).single(data) }
         val data2 = db.runQuery {
             QueryDsl.from(m).where { m.id eq 1 }.first()
@@ -139,9 +149,31 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
     }
 
     @Test
+    fun bigDecimal_null() {
+        val m = Meta.bigDecimalTest
+        val data = BigDecimalTest(1, null)
+        db.runQuery { QueryDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        assertEquals(data, data2)
+    }
+
+    @Test
     fun bigInteger() {
         val m = Meta.bigIntegerTest
         val data = BigIntegerTest(1, BigInteger.TEN)
+        db.runQuery { QueryDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        assertEquals(data, data2)
+    }
+
+    @Test
+    fun bigInteger_null() {
+        val m = Meta.bigIntegerTest
+        val data = BigIntegerTest(1, null)
         db.runQuery { QueryDsl.insert(m).single(data) }
         val data2 = db.runQuery {
             QueryDsl.from(m).where { m.id eq 1 }.first()
@@ -160,16 +192,39 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
         val data2 = db.runQuery {
             QueryDsl.from(m).where { m.id eq 1 }.first()
         }
-        val bytes = data2.value.getBytes(1, 3)
+        val bytes = data2.value!!.getBytes(1, 3)
         assertEquals(1, bytes[0])
         assertEquals(2, bytes[1])
         assertEquals(3, bytes[2])
+    }
+
+    @Run(unless = [Dbms.POSTGRESQL])
+    @Test
+    fun blob_null() {
+        val m = Meta.blobTest
+        val data = BlobTest(1, null)
+        db.runQuery { QueryDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        assertEquals(data, data2)
     }
 
     @Test
     fun boolean() {
         val m = Meta.booleanTest
         val data = BooleanTest(1, true)
+        db.runQuery { QueryDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        assertEquals(data, data2)
+    }
+
+    @Test
+    fun boolean_null() {
+        val m = Meta.booleanTest
+        val data = BooleanTest(1, null)
         db.runQuery { QueryDsl.insert(m).single(data) }
         val data2 = db.runQuery {
             QueryDsl.from(m).where { m.id eq 1 }.first()
@@ -189,6 +244,17 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
     }
 
     @Test
+    fun byte_null() {
+        val m = Meta.byteTest
+        val data = ByteTest(1, null)
+        db.runQuery { QueryDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        assertEquals(data, data2)
+    }
+
+    @Test
     fun byteArray() {
         val m = Meta.byteArrayTest
         val data = ByteArrayTest(1, byteArrayOf(10, 20, 30))
@@ -197,6 +263,17 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
             QueryDsl.from(m).where { m.id eq 1 }.first()
         }
         assertEquals(data.id, data2.id)
+        assertContentEquals(data.value, data2.value)
+    }
+
+    @Test
+    fun byteArray_null() {
+        val m = Meta.byteArrayTest
+        val data = ByteArrayTest(1, null)
+        db.runQuery { QueryDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
         assertContentEquals(data.value, data2.value)
     }
 
@@ -211,14 +288,37 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
         val data2 = db.runQuery {
             QueryDsl.from(m).where { m.id eq 1 }.first()
         }
-        val string = data2.value.getSubString(1, 3)
+        val string = data2.value!!.getSubString(1, 3)
         assertEquals("abc", string)
+    }
+
+    @Run(unless = [Dbms.POSTGRESQL])
+    @Test
+    fun clob_null() {
+        val m = Meta.clobTest
+        val data = ClobTest(1, null)
+        db.runQuery { QueryDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        assertEquals(data, data2)
     }
 
     @Test
     fun double() {
         val m = Meta.doubleTest
         val data = DoubleTest(1, 10.0)
+        db.runQuery { QueryDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        assertEquals(data, data2)
+    }
+
+    @Test
+    fun double_null() {
+        val m = Meta.doubleTest
+        val data = DoubleTest(1, null)
         db.runQuery { QueryDsl.insert(m).single(data) }
         val data2 = db.runQuery {
             QueryDsl.from(m).where { m.id eq 1 }.first()
@@ -238,9 +338,31 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
     }
 
     @Test
+    fun enum_null() {
+        val m = Meta.enumTest
+        val data = EnumTest(1, null)
+        db.runQuery { QueryDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        assertEquals(data, data2)
+    }
+
+    @Test
     fun float() {
         val m = Meta.floatTest
         val data = FloatTest(1, 10.0f)
+        db.runQuery { QueryDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        assertEquals(data, data2)
+    }
+
+    @Test
+    fun float_null() {
+        val m = Meta.floatTest
+        val data = FloatTest(1, null)
         db.runQuery { QueryDsl.insert(m).single(data) }
         val data2 = db.runQuery {
             QueryDsl.from(m).where { m.id eq 1 }.first()
@@ -261,10 +383,45 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
         assertEquals(data, data2)
     }
 
+    @Run(unless = [Dbms.MARIADB])
+    @Test
+    fun instant_null() {
+        val m = Meta.instantTest
+        val data = InstantTest(1, null)
+        db.runQuery { QueryDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        assertEquals(data, data2)
+    }
+
+    @Run(onlyIf = [Dbms.MARIADB])
+    @Test
+    fun instant_automatic() {
+        val m = Meta.instantTest
+        val data = InstantTest(1, null)
+        db.runQuery { QueryDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        assertNotNull(data2.value)
+    }
+
     @Test
     fun int() {
         val m = Meta.intTest
         val data = IntTest(1, 10)
+        db.runQuery { QueryDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        assertEquals(data, data2)
+    }
+
+    @Test
+    fun int_null() {
+        val m = Meta.intTest
+        val data = IntTest(1, null)
         db.runQuery { QueryDsl.insert(m).single(data) }
         val data2 = db.runQuery {
             QueryDsl.from(m).where { m.id eq 1 }.first()
@@ -287,12 +444,34 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
     }
 
     @Test
+    fun localDateTime_null() {
+        val m = Meta.localDateTimeTest
+        val data = LocalDateTimeTest(1, null)
+        db.runQuery { QueryDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        assertEquals(data, data2)
+    }
+
+    @Test
     fun localDate() {
         val m = Meta.localDateTest
         val data = LocalDateTest(
             1,
             LocalDate.of(2019, 6, 1)
         )
+        db.runQuery { QueryDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        assertEquals(data, data2)
+    }
+
+    @Test
+    fun localDate_null() {
+        val m = Meta.localDateTest
+        val data = LocalDateTest(1, null)
         db.runQuery { QueryDsl.insert(m).single(data) }
         val data2 = db.runQuery {
             QueryDsl.from(m).where { m.id eq 1 }.first()
@@ -312,6 +491,17 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
     }
 
     @Test
+    fun localTime_null() {
+        val m = Meta.localTimeTest
+        val data = LocalTimeTest(1, null)
+        db.runQuery { QueryDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        assertEquals(data, data2)
+    }
+
+    @Test
     fun long() {
         val m = Meta.longTest
         val data = LongTest(1, 10L)
@@ -322,12 +512,23 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
         assertEquals(data, data2)
     }
 
-    @Run(onlyIf = [Dbms.H2])
+    @Test
+    fun long_null() {
+        val m = Meta.longTest
+        val data = LongTest(1, null)
+        db.runQuery { QueryDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        assertEquals(data, data2)
+    }
+
+    @Run(onlyIf = [Dbms.H2, Dbms.ORACLE, Dbms.SQLSERVER])
     @Test
     fun offsetDateTime() {
         val m = Meta.offsetDateTimeTest
         val dateTime = LocalDateTime.of(2019, 6, 1, 12, 11, 10)
-        val offset = ZoneOffset.ofHours(9)
+        val offset = ZoneOffset.ofHours(3)
         val value = OffsetDateTime.of(dateTime, offset)
         val data = OffsetDateTimeTest(1, value)
         db.runQuery { QueryDsl.insert(m).single(data) }
@@ -337,12 +538,28 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
         assertEquals(data, data2)
     }
 
-    @Run(unless = [Dbms.H2, Dbms.MARIADB, Dbms.SQLSERVER])
+    @Run(onlyIf = [Dbms.MYSQL])
     @Test
-    fun offsetDateTime_offsetLost() {
+    fun offsetDateTime_mysql() {
         val m = Meta.offsetDateTimeTest
         val dateTime = LocalDateTime.of(2019, 6, 1, 12, 11, 10)
-        val offset = ZoneOffset.ofHours(9)
+        val offset = ZoneOffset.ofHours(3)
+        val value = OffsetDateTime.of(dateTime, offset)
+        val data = OffsetDateTimeTest(1, value)
+        db.runQuery { QueryDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        val expected = OffsetDateTime.ofInstant(value.toInstant(), ZoneId.systemDefault())
+        assertEquals(expected, data2.value)
+    }
+
+    @Run(onlyIf = [Dbms.POSTGRESQL])
+    @Test
+    fun offsetDateTime_postgresql() {
+        val m = Meta.offsetDateTimeTest
+        val dateTime = LocalDateTime.of(2019, 6, 1, 12, 11, 10)
+        val offset = ZoneOffset.ofHours(3)
         val value = OffsetDateTime.of(dateTime, offset)
         val data = OffsetDateTimeTest(1, value)
         db.runQuery { QueryDsl.insert(m).single(data) }
@@ -350,13 +567,37 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
             QueryDsl.from(m).where { m.id eq 1 }.first()
         }
         println(data2)
-        assertNotNull(data2)
+        assertNotEquals(data, data2)
+        assertEquals(value.toInstant(), data2.value!!.toInstant())
+    }
+
+    @Run(onlyIf = [Dbms.H2, Dbms.MYSQL, Dbms.ORACLE, Dbms.POSTGRESQL, Dbms.SQLSERVER])
+    @Test
+    fun offsetDateTime_null() {
+        val m = Meta.offsetDateTimeTest
+        val data = OffsetDateTimeTest(1, null)
+        db.runQuery { QueryDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        assertEquals(data, data2)
     }
 
     @Test
     fun short() {
         val m = Meta.shortTest
         val data = ShortTest(1, 10)
+        db.runQuery { QueryDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        assertEquals(data, data2)
+    }
+
+    @Test
+    fun short_null() {
+        val m = Meta.shortTest
+        val data = ShortTest(1, null)
         db.runQuery { QueryDsl.insert(m).single(data) }
         val data2 = db.runQuery {
             QueryDsl.from(m).where { m.id eq 1 }.first()
@@ -395,6 +636,17 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
     fun string() {
         val m = Meta.stringTest
         val data = StringTest(1, "ABC")
+        db.runQuery { QueryDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        assertEquals(data, data2)
+    }
+
+    @Test
+    fun string_null() {
+        val m = Meta.stringTest
+        val data = StringTest(1, null)
         db.runQuery { QueryDsl.insert(m).single(data) }
         val data2 = db.runQuery {
             QueryDsl.from(m).where { m.id eq 1 }.first()
