@@ -46,6 +46,7 @@ jobs:
   test-jdbc:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         driver: [h2, mariadb, mysql, oracle, postgresql, sqlserver]
     timeout-minutes: 15
@@ -84,6 +85,7 @@ jobs:
   test-r2dbc:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         driver: [h2, oracle, postgresql]
     timeout-minutes: 15
