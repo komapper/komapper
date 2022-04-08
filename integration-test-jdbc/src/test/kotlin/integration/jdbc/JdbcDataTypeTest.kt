@@ -522,7 +522,7 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
         assertEquals(data, data2)
     }
 
-    @Run(onlyIf = [Dbms.H2, Dbms.MYSQL, Dbms.ORACLE, Dbms.SQLSERVER])
+    @Run(onlyIf = [Dbms.H2, Dbms.ORACLE, Dbms.SQLSERVER])
     @Test
     fun offsetDateTime() {
         val m = Meta.offsetDateTimeTest
@@ -537,9 +537,24 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
         assertEquals(data, data2)
     }
 
+    @Run(onlyIf = [Dbms.MYSQL])
+    @Test
+    fun offsetDateTime_mysql() {
+        val m = Meta.offsetDateTimeTest
+        val dateTime = LocalDateTime.of(2019, 6, 1, 12, 11, 10)
+        val offset = ZoneOffset.ofHours(9)
+        val value = OffsetDateTime.of(dateTime, offset)
+        val data = OffsetDateTimeTest(1, value)
+        db.runQuery { QueryDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        assertEquals(data, data2)
+    }
+
     @Run(onlyIf = [Dbms.POSTGRESQL])
     @Test
-    fun offsetDateTime_offsetLost() {
+    fun offsetDateTime_postgresql() {
         val m = Meta.offsetDateTimeTest
         val dateTime = LocalDateTime.of(2019, 6, 1, 12, 11, 10)
         val offset = ZoneOffset.ofHours(9)

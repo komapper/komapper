@@ -460,8 +460,24 @@ class R2dbcDataTypeTest(val db: R2dbcDatabase) {
         assertEquals(data, data2)
     }
 
+    @Run(onlyIf = [Dbms.H2, Dbms.ORACLE, Dbms.SQLSERVER])
     @Test
     fun offsetDateTime(info: TestInfo) = inTransaction(db, info) {
+        val m = Meta.offsetDateTimeTest
+        val dateTime = LocalDateTime.of(2019, 6, 1, 12, 11, 10)
+        val offset = ZoneOffset.ofHours(9)
+        val value = OffsetDateTime.of(dateTime, offset)
+        val data = OffsetDateTimeTest(1, value)
+        db.runQuery { QueryDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        assertEquals(data, data2)
+    }
+
+    @Run(onlyIf = [Dbms.POSTGRESQL])
+    @Test
+    fun offsetDateTime_postgresql(info: TestInfo) = inTransaction(db, info) {
         val m = Meta.offsetDateTimeTest
         val dateTime = LocalDateTime.of(2019, 6, 1, 12, 11, 10)
         val offset = ZoneOffset.ofHours(9)
