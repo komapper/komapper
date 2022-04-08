@@ -73,6 +73,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.OffsetDateTime
+import java.time.ZoneId
 import java.time.ZoneOffset
 import java.util.UUID
 import kotlin.test.Test
@@ -465,7 +466,7 @@ class R2dbcDataTypeTest(val db: R2dbcDatabase) {
     fun offsetDateTime(info: TestInfo) = inTransaction(db, info) {
         val m = Meta.offsetDateTimeTest
         val dateTime = LocalDateTime.of(2019, 6, 1, 12, 11, 10)
-        val offset = ZoneOffset.ofHours(9)
+        val offset = ZoneOffset.ofHours(3)
         val value = OffsetDateTime.of(dateTime, offset)
         val data = OffsetDateTimeTest(1, value)
         db.runQuery { QueryDsl.insert(m).single(data) }
@@ -480,14 +481,15 @@ class R2dbcDataTypeTest(val db: R2dbcDatabase) {
     fun offsetDateTime_postgresql(info: TestInfo) = inTransaction(db, info) {
         val m = Meta.offsetDateTimeTest
         val dateTime = LocalDateTime.of(2019, 6, 1, 12, 11, 10)
-        val offset = ZoneOffset.ofHours(9)
+        val offset = ZoneOffset.ofHours(3)
         val value = OffsetDateTime.of(dateTime, offset)
         val data = OffsetDateTimeTest(1, value)
         db.runQuery { QueryDsl.insert(m).single(data) }
         val data2 = db.runQuery {
             QueryDsl.from(m).where { m.id eq 1 }.first()
         }
-        assertEquals(data, data2)
+        val expected = OffsetDateTime.ofInstant(value.toInstant(), ZoneId.systemDefault())
+        assertEquals(expected, data2.value)
     }
 
     @Test
