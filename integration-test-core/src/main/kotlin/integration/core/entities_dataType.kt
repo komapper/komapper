@@ -10,8 +10,6 @@ import org.komapper.annotation.KomapperVersion
 import java.io.Serializable
 import java.math.BigDecimal
 import java.math.BigInteger
-import java.sql.Array
-import java.sql.SQLXML
 import java.time.Duration
 import java.time.Instant
 import java.time.LocalDate
@@ -27,11 +25,7 @@ data class AnyPerson(@KomapperId val name: String) : Serializable
 
 @KomapperEntity
 @KomapperTable("any_test")
-data class AnyTest(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true) val value: Any)
-
-@KomapperEntity
-@KomapperTable("array_test")
-data class ArrayTest(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true) val value: Array?)
+data class AnyTest(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true) val value: Any?)
 
 @KomapperEntity
 @KomapperTable("big_decimal_test")
@@ -109,10 +103,6 @@ data class PeriodTest(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = tru
 @KomapperEntity
 @KomapperTable("short_test")
 data class ShortTest(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true) val value: Short?)
-
-@KomapperEntity
-@KomapperTable("sqlxml_test")
-data class SqlXmlTest(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true) val value: SQLXML?)
 
 @KomapperEntity
 @KomapperTable("string_test")

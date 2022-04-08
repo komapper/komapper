@@ -312,14 +312,14 @@ class JdbcInstantType(override val name: String) :
 class JdbcInstantAsTimestampType(override val name: String) :
     AbstractJdbcDataType<Instant>(Instant::class, JDBCType.TIMESTAMP) {
 
-    override fun doGetValue(rs: ResultSet, index: Int): Instant {
-        val datetime = rs.getObject(index, LocalDateTime::class.java)
-        return toInstant(datetime)
+    override fun doGetValue(rs: ResultSet, index: Int): Instant? {
+        val dateTime: LocalDateTime? = rs.getObject(index, LocalDateTime::class.java)
+        return dateTime?.let { toInstant(it) }
     }
 
-    override fun doGetValue(rs: ResultSet, columnLabel: String): Instant {
-        val dateTime = rs.getObject(columnLabel, LocalDateTime::class.java)
-        return toInstant(dateTime)
+    override fun doGetValue(rs: ResultSet, columnLabel: String): Instant? {
+        val dateTime: LocalDateTime? = rs.getObject(columnLabel, LocalDateTime::class.java)
+        return dateTime?.let { toInstant(it) }
     }
 
     override fun doSetValue(ps: PreparedStatement, index: Int, value: Instant) {
@@ -335,19 +335,19 @@ class JdbcInstantAsTimestampType(override val name: String) :
 class JdbcInstantAsTimestampWithTimezoneType(override val name: String) :
     AbstractJdbcDataType<Instant>(Instant::class, JDBCType.TIMESTAMP_WITH_TIMEZONE) {
 
-    override fun doGetValue(rs: ResultSet, index: Int): Instant {
-        val datetime = rs.getObject(index, OffsetDateTime::class.java)
-        return datetime.toInstant()
+    override fun doGetValue(rs: ResultSet, index: Int): Instant? {
+        val dateTime: OffsetDateTime? = rs.getObject(index, OffsetDateTime::class.java)
+        return dateTime?.toInstant()
     }
 
-    override fun doGetValue(rs: ResultSet, columnLabel: String): Instant {
-        val dateTime = rs.getObject(columnLabel, OffsetDateTime::class.java)
-        return dateTime.toInstant()
+    override fun doGetValue(rs: ResultSet, columnLabel: String): Instant? {
+        val dateTime: OffsetDateTime? = rs.getObject(columnLabel, OffsetDateTime::class.java)
+        return dateTime?.toInstant()
     }
 
     override fun doSetValue(ps: PreparedStatement, index: Int, value: Instant) {
-        val datetime = value.atOffset(ZoneOffset.UTC)
-        ps.setObject(index, datetime)
+        val dateTime = value.atOffset(ZoneOffset.UTC)
+        ps.setObject(index, dateTime)
     }
 }
 
