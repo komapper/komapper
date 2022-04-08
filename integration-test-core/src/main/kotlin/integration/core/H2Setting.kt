@@ -26,8 +26,8 @@ interface H2Setting<DATABASE : Database> : Setting<DATABASE> {
 
         create table if not exists any_test(id integer not null primary key, "value" other);
         create table if not exists array_test(id integer not null primary key, "value" varchar(10) array);
-        create table if not exists big_decimal_test(id integer not null primary key, "value" bigint);
-        create table if not exists big_integer_test(id integer not null primary key, "value" bigint);
+        create table if not exists big_decimal_test(id integer not null primary key, "value" numeric);
+        create table if not exists big_integer_test(id integer not null primary key, "value" numeric);
         create table if not exists blob_test(id integer not null primary key, "value" blob);
         create table if not exists boolean_test(id integer not null primary key, "value" bool);
         create table if not exists byte_test(id integer not null primary key, "value" tinyint);

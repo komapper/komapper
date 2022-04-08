@@ -29,6 +29,17 @@ class R2dbcPostgreSqlTypeTest(val db: R2dbcDatabase) {
     }
 
     @Test
+    fun interval_null(info: TestInfo) = inTransaction(db, info) {
+        val m = Meta.intervalTest
+        val data = IntervalTest(1, null)
+        db.runQuery { QueryDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        assertEquals(data, data2)
+    }
+
+    @Test
     fun json(info: TestInfo) = inTransaction(db, info) {
         val m = Meta.jsonTest
         val data = JsonTest(
@@ -43,7 +54,7 @@ class R2dbcPostgreSqlTypeTest(val db: R2dbcDatabase) {
         val data2 = db.runQuery {
             QueryDsl.from(m).where { m.id eq 1 }.first()
         }
-        assertEquals(data.value.asString(), data2.value.asString())
+        assertEquals(data.value!!.asString(), data2.value!!.asString())
 
         val result = db.runQuery {
             QueryDsl.fromTemplate("select value->'b' as x from json_test")
@@ -51,5 +62,16 @@ class R2dbcPostgreSqlTypeTest(val db: R2dbcDatabase) {
                 .first()
         }
         assertEquals("\"Hello\"", result.asString())
+    }
+
+    @Test
+    fun json_null(info: TestInfo) = inTransaction(db, info) {
+        val m = Meta.jsonTest
+        val data = JsonTest(1, null)
+        db.runQuery { QueryDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        assertEquals(data, data2)
     }
 }

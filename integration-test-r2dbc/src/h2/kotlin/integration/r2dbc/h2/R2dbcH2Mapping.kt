@@ -19,7 +19,6 @@ import java.util.UUID
 @KomapperTable
 data class R2dbcH2Mapping(
     @KomapperId val id: Int,
-    @KomapperColumn(alwaysQuote = true) val any: Any,
     @KomapperColumn(alwaysQuote = true) val bigDecimal: BigDecimal,
     @KomapperColumn(alwaysQuote = true) val bigInteger: BigInteger,
     @KomapperColumn(alwaysQuote = true) val blob: Blob,

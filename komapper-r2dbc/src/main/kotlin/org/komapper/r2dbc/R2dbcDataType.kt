@@ -7,6 +7,7 @@ import io.r2dbc.spi.Statement
 import org.komapper.core.ThreadSafe
 import java.math.BigDecimal
 import java.math.BigInteger
+import java.nio.ByteBuffer
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -130,17 +131,14 @@ abstract class AbstractR2dbcDataType<T : Any>(
     }
 }
 
-class R2dbcAnyType(override val name: String) :
-    AbstractR2dbcDataType<Any>(Any::class) {
-    override fun convertBeforeGetting(value: Any): Any {
-        return value
-    }
-}
-
 class R2dbcBigDecimalType(override val name: String) :
     AbstractR2dbcDataType<BigDecimal>(BigDecimal::class) {
     override fun convertBeforeGetting(value: Any): BigDecimal {
         return when (value) {
+            is Double -> value.toBigDecimal()
+            is Float -> value.toBigDecimal()
+            is Int -> value.toBigDecimal()
+            is Long -> value.toBigDecimal()
             is BigDecimal -> value
             else -> error("Cannot convert. value=$value, type=${value::class.qualifiedName}.")
         }
@@ -215,6 +213,7 @@ class R2dbcByteArrayType(override val name: String) :
     override fun convertBeforeGetting(value: Any): ByteArray {
         return when (value) {
             is ByteArray -> value
+            is ByteBuffer -> value.array()
             else -> error("Cannot convert. value=$value, type=${value::class.qualifiedName}.")
         }
     }
@@ -342,6 +341,7 @@ class R2dbcLocalTimeType(override val name: String) :
     override fun convertBeforeGetting(value: Any): LocalTime {
         return when (value) {
             is LocalTime -> value
+            is LocalDateTime -> value.toLocalTime()
             else -> error("Cannot convert. value=$value, type=${value::class.qualifiedName}.")
         }
     }
@@ -406,7 +406,8 @@ class R2dbcStringType(override val name: String) :
     }
 }
 
-class R2dbcUByteType(override val name: String) : AbstractR2dbcDataType<UByte>(UByte::class) {
+class R2dbcUByteType(override val name: String) :
+    AbstractR2dbcDataType<UByte>(UByte::class, Short::class.javaObjectType) {
     override fun convertBeforeGetting(value: Any): UByte {
         return when (value) {
             is Number -> value.toLong().also {
@@ -416,12 +417,12 @@ class R2dbcUByteType(override val name: String) : AbstractR2dbcDataType<UByte>(U
         }
     }
 
-    override fun bind(statement: Statement, index: Int, value: UByte) {
-        statement.bind(index, value.toShort())
+    override fun convertBeforeBinding(value: UByte): Any {
+        return value.toShort()
     }
 }
 
-class R2dbcUIntType(override val name: String) : AbstractR2dbcDataType<UInt>(UInt::class) {
+class R2dbcUIntType(override val name: String) : AbstractR2dbcDataType<UInt>(UInt::class, Long::class.javaObjectType) {
     override fun convertBeforeGetting(value: Any): UInt {
         return when (value) {
             is Number -> value.toLong().also {
@@ -431,12 +432,13 @@ class R2dbcUIntType(override val name: String) : AbstractR2dbcDataType<UInt>(UIn
         }
     }
 
-    override fun bind(statement: Statement, index: Int, value: UInt) {
-        statement.bind(index, value.toLong())
+    override fun convertBeforeBinding(value: UInt): Any {
+        return value.toLong()
     }
 }
 
-class R2dbcUShortType(override val name: String) : AbstractR2dbcDataType<UShort>(UShort::class) {
+class R2dbcUShortType(override val name: String) :
+    AbstractR2dbcDataType<UShort>(UShort::class, Int::class.javaObjectType) {
     override fun convertBeforeGetting(value: Any): UShort {
         return when (value) {
             is Number -> value.toLong().also {
@@ -446,7 +448,7 @@ class R2dbcUShortType(override val name: String) : AbstractR2dbcDataType<UShort>
         }
     }
 
-    override fun bind(statement: Statement, index: Int, value: UShort) {
-        statement.bind(index, value.toInt())
+    override fun convertBeforeBinding(value: UShort): Any {
+        return value.toInt()
     }
 }

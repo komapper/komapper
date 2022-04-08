@@ -9,8 +9,8 @@ import org.komapper.annotation.KomapperTable
 
 @KomapperEntity
 @KomapperTable("blob_test")
-data class BlobTest(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true)val value: Blob)
+data class BlobTest(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true)val value: Blob?)
 
 @KomapperEntity
 @KomapperTable("clob_test")
-data class ClobTest(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true)val value: Clob)
+data class ClobTest(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true)val value: Clob?)

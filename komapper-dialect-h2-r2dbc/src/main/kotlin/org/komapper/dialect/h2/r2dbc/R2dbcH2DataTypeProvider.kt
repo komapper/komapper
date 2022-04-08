@@ -1,7 +1,6 @@
 package org.komapper.dialect.h2.r2dbc
 
 import org.komapper.r2dbc.AbstractR2dbcDataTypeProvider
-import org.komapper.r2dbc.R2dbcAnyType
 import org.komapper.r2dbc.R2dbcBigDecimalType
 import org.komapper.r2dbc.R2dbcBigIntegerType
 import org.komapper.r2dbc.R2dbcBlobType
@@ -31,7 +30,6 @@ class R2dbcH2DataTypeProvider(next: R2dbcDataTypeProvider) :
 
     companion object {
         val DEFAULT_DATA_TYPES: List<R2dbcDataType<*>> = listOf(
-            R2dbcAnyType("java_object"),
             R2dbcBigDecimalType("bigint"),
             R2dbcBigIntegerType("bigint"),
             R2dbcBlobType("blob"),

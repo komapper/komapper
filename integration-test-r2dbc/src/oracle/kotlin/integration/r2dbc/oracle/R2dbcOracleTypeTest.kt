@@ -32,9 +32,31 @@ class R2dbcOracleTypeTest(private val db: R2dbcDatabase) {
     }
 
     @Test
+    fun period_null(info: TestInfo) = inTransaction(db, info) {
+        val m = Meta.periodTest
+        val data = PeriodTest(1, null)
+        db.runQuery { QueryDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        assertEquals(data, data2)
+    }
+
+    @Test
     fun duration(info: TestInfo) = inTransaction(db, info) {
         val m = Meta.durationTest
         val data = DurationTest(1, Duration.ofDays(11))
+        db.runQuery { QueryDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        assertEquals(data, data2)
+    }
+
+    @Test
+    fun duration_null(info: TestInfo) = inTransaction(db, info) {
+        val m = Meta.durationTest
+        val data = DurationTest(1, null)
         db.runQuery { QueryDsl.insert(m).single(data) }
         val data2 = db.runQuery {
             QueryDsl.from(m).where { m.id eq 1 }.first()
