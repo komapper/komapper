@@ -52,8 +52,8 @@ Add the following code to the Gradle build script (gradle.build.kts).
 
 ```kotlin
 plugins {
-    kotlin("jvm") version "1.5.31"
-    id("com.google.devtools.ksp") version "1.5.31-1.0.1"
+    kotlin("jvm") version "1.6.20"
+    id("com.google.devtools.ksp") version "1.6.20-1.0.5"
 }
 
 val komapperVersion = "0.32.0"
