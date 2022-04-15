@@ -85,7 +85,7 @@ testing {
             setup(name)
             dependencies {
                 implementation(project)
-                implementation("org.postgresql:postgresql:42.3.3")
+                implementation("org.postgresql:postgresql:42.3.4")
                 runtimeOnly("org.testcontainers:postgresql")
                 implementation(project(":komapper-dialect-postgresql-jdbc"))
             }
