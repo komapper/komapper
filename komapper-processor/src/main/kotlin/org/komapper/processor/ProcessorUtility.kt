@@ -3,7 +3,11 @@ package org.komapper.processor
 import com.google.devtools.ksp.symbol.KSAnnotated
 import com.google.devtools.ksp.symbol.KSAnnotation
 import com.google.devtools.ksp.symbol.KSClassDeclaration
+import com.google.devtools.ksp.symbol.KSNode
+import com.google.devtools.ksp.symbol.KSType
+import com.google.devtools.ksp.symbol.KSTypeAlias
 import com.google.devtools.ksp.symbol.Modifier
+import com.google.devtools.ksp.visitor.KSEmptyVisitor
 import java.nio.CharBuffer
 import kotlin.reflect.KClass
 
@@ -28,6 +32,21 @@ internal fun KSAnnotated.findAnnotation(klass: KClass<*>): KSAnnotation? {
 
 internal fun KSAnnotated.findAnnotation(simpleName: String): KSAnnotation? {
     return this.annotations.firstOrNull { it.shortName.asString() == simpleName }
+}
+
+internal fun KSType.normalize(): KSType {
+    return this.declaration.accept(
+        object : KSEmptyVisitor<Unit, KSType>() {
+            override fun defaultHandler(node: KSNode, data: Unit): KSType {
+                return this@normalize
+            }
+
+            override fun visitTypeAlias(typeAlias: KSTypeAlias, data: Unit): KSType {
+                return typeAlias.type.resolve().normalize()
+            }
+        },
+        Unit
+    )
 }
 
 internal fun toCamelCase(text: String): String {

@@ -836,6 +836,47 @@ class EntityProcessorTest {
         assertTrue(result.messages.contains("The property type must not have any type parameters."))
     }
 
+    @Test
+    fun allow_typealias_for_property() {
+        val result = compile(
+            kotlin(
+                "source.kt",
+                """
+                package test
+                import org.komapper.annotation.*
+                typealias Snowflake = Long
+                @KomapperEntity
+                data class Dept(
+                    @KomapperAutoIncrement @KomapperId
+                    val id: Snowflake
+                )
+                """
+            )
+        )
+        assertEquals(result.exitCode, KotlinCompilation.ExitCode.OK, result.messages)
+    }
+
+    @Test
+    fun allow_typealias_for_typealias() {
+        val result = compile(
+            kotlin(
+                "source.kt",
+                """
+                package test
+                import org.komapper.annotation.*
+                typealias Snowflake = Long
+                typealias Snowball = Snowflake
+                @KomapperEntity
+                data class Dept(
+                    @KomapperAutoIncrement @KomapperId
+                    val id: Snowball
+                )
+                """
+            )
+        )
+        assertEquals(result.exitCode, KotlinCompilation.ExitCode.OK, result.messages)
+    }
+
     private fun prepareCompilation(vararg sourceFiles: SourceFile): KotlinCompilation {
         return KotlinCompilation()
             .apply {
