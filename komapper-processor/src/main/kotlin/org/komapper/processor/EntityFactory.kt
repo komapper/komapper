@@ -58,7 +58,7 @@ internal class EntityFactory(config: Config, private val entityDef: EntityDef) {
                 val declaration = propertyDeclarationMap[parameter.name]
                     ?: report("The corresponding property declaration is not found.", parameter)
                 val column = getColumn(propertyDef, parameter)
-                val type = parameter.type.resolve()
+                val type = parameter.type.resolve().normalize()
                 val kotlinClass = createEnumClass(type) ?: createValueClass(type) ?: PlainClass(type.declaration)
                 val literalTag = resolveLiteralTag(kotlinClass.exteriorTypeName)
                 val nullability = type.nullability
