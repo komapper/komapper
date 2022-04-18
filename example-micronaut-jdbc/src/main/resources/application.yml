@@ -1,0 +1,17 @@
+micronaut:
+  application:
+    name: jdbcMicronaut
+netty:
+  default:
+    allocator:
+      max-order: 3
+datasources:
+  default:
+    url: jdbc:h2:mem:default;DB_CLOSE_DELAY=-1
+    username: ""
+    password: ""
+    driverClassName: org.h2.Driver
+flyway:
+  datasources:
+    default:
+      enabled: true

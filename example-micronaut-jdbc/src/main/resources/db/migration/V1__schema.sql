@@ -1,0 +1,7 @@
+CREATE TABLE IF NOT EXISTS message (
+  id   INT GENERATED ALWAYS AS IDENTITY(START WITH 1) PRIMARY KEY,
+  text VARCHAR(255)
+);
+
+INSERT INTO message (text) VALUES ('Hello');
+INSERT INTO message (text) VALUES ('World');
