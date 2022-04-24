@@ -61,22 +61,22 @@ internal class ContextAwareJdbcTransactionManagerImpl(
 ) : ContextAwareJdbcTransactionManager {
 
     context(JdbcTransactionContext)
-        override fun getConnection(): Connection {
+    override fun getConnection(): Connection {
         return transaction?.connection ?: dataSource.connection
     }
 
     context(JdbcTransactionContext)
-        override fun isActive(): Boolean {
+    override fun isActive(): Boolean {
         return transaction != null
     }
 
     context(JdbcTransactionContext)
-        override fun isRollbackOnly(): Boolean {
+    override fun isRollbackOnly(): Boolean {
         return transaction?.isRollbackOnly ?: false
     }
 
     context(JdbcTransactionContext)
-        override fun setRollbackOnly() {
+    override fun setRollbackOnly() {
         val tx = transaction
         if (tx != null) {
             tx.isRollbackOnly = true
@@ -84,7 +84,7 @@ internal class ContextAwareJdbcTransactionManagerImpl(
     }
 
     context(JdbcTransactionContext)
-        override fun begin(transactionProperty: TransactionProperty): JdbcTransactionContext {
+    override fun begin(transactionProperty: TransactionProperty): JdbcTransactionContext {
         val currentTx = transaction
         if (currentTx != null) {
             rollbackInternal(currentTx)
@@ -106,7 +106,7 @@ internal class ContextAwareJdbcTransactionManagerImpl(
     }
 
     context(JdbcTransactionContext)
-        override fun commit() {
+    override fun commit() {
         val tx = transaction ?: error("A transaction hasn't yet begun.")
         runCatching {
             tx.connection.commit()
@@ -124,14 +124,14 @@ internal class ContextAwareJdbcTransactionManagerImpl(
     }
 
     context(JdbcTransactionContext)
-        override fun suspend(): JdbcTransactionContext {
+    override fun suspend(): JdbcTransactionContext {
         val tx = transaction ?: error("A transaction hasn't yet begun.")
         loggerFacade.suspend(tx.toString())
         return EmptyJdbcTransactionContext
     }
 
     context(JdbcTransactionContext)
-        override fun resume() {
+    override fun resume() {
         if (transaction == null) {
             error("A transaction is not found.")
         }
@@ -139,7 +139,7 @@ internal class ContextAwareJdbcTransactionManagerImpl(
     }
 
     context(JdbcTransactionContext)
-        override fun rollback() {
+    override fun rollback() {
         val tx = transaction ?: return
         rollbackInternal(tx)
     }
@@ -175,4 +175,3 @@ internal class ContextAwareJdbcTransactionManagerImpl(
         }
     }
 }
-

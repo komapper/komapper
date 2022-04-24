@@ -62,12 +62,12 @@ internal class ContextAwareJdbcDatabaseImpl(
 
     override val config: JdbcDatabaseConfig
         get() = database.config
-    
+
     override val dataFactory: JdbcDataFactory
         get() = database.dataFactory
 
     context(JdbcTransactionContext)
-        override fun <T> runQuery(query: Query<T>): T {
+    override fun <T> runQuery(query: Query<T>): T {
         val runtimeConfig = object : JdbcDatabaseConfig by config {
             override val session: JdbcSession = object : JdbcSession {
                 override val transactionOperator: TransactionOperator
@@ -90,7 +90,7 @@ internal class ContextAwareJdbcDatabaseImpl(
     }
 
     context(JdbcTransactionContext)
-        override fun <T> runQuery(block: QueryScope.() -> Query<T>): T {
+    override fun <T> runQuery(block: QueryScope.() -> Query<T>): T {
         val query = block(QueryScope)
         return runQuery(query)
     }
