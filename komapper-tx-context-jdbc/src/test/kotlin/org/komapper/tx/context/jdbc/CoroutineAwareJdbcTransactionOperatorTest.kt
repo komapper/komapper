@@ -13,9 +13,9 @@ import org.komapper.tx.jdbc.JdbcTransactionSession
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
-import kotlin.test.assertTrue
-import kotlin.test.assertFalse
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 internal class CoroutineAwareJdbcTransactionOperatorTest {
 
@@ -101,7 +101,7 @@ internal class CoroutineAwareJdbcTransactionOperatorTest {
     }
 
     @Test
-    fun throwRuntimeException() = runBlocking{
+    fun throwRuntimeException() = runBlocking {
         val a = Meta.address
         try {
             db.withTransaction {
@@ -118,7 +118,7 @@ internal class CoroutineAwareJdbcTransactionOperatorTest {
     }
 
     @Test
-    fun throwException() = runBlocking{
+    fun throwException() = runBlocking {
         val a = Meta.address
         try {
             db.withTransaction {
@@ -135,7 +135,7 @@ internal class CoroutineAwareJdbcTransactionOperatorTest {
     }
 
     @Test
-    fun required_commit() = runBlocking{
+    fun required_commit() = runBlocking {
         val a = Meta.address
         db.withTransaction { tx ->
             val address1 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
@@ -175,7 +175,7 @@ internal class CoroutineAwareJdbcTransactionOperatorTest {
     }
 
     @Test
-    fun required_throwRuntimeException() = runBlocking{
+    fun required_throwRuntimeException() = runBlocking {
         val a = Meta.address
         db.withTransaction { tx ->
             val address1 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
@@ -198,7 +198,7 @@ internal class CoroutineAwareJdbcTransactionOperatorTest {
     }
 
     @Test
-    fun required_throwException() = runBlocking{
+    fun required_throwException() = runBlocking {
         val a = Meta.address
         db.withTransaction { tx ->
             val address1 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
@@ -221,7 +221,7 @@ internal class CoroutineAwareJdbcTransactionOperatorTest {
     }
 
     @Test
-    fun requiresNew_commit() = runBlocking{
+    fun requiresNew_commit() = runBlocking {
         val a = Meta.address
         db.withTransaction { tx ->
             val address1 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
@@ -240,7 +240,7 @@ internal class CoroutineAwareJdbcTransactionOperatorTest {
     }
 
     @Test
-    fun requiresNew_setRollbackOnly() = runBlocking{
+    fun requiresNew_setRollbackOnly() = runBlocking {
         val a = Meta.address
         db.withTransaction { tx ->
             val address1 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
@@ -261,7 +261,7 @@ internal class CoroutineAwareJdbcTransactionOperatorTest {
     }
 
     @Test
-    fun requiresNew_throwRuntimeException() = runBlocking{
+    fun requiresNew_throwRuntimeException() = runBlocking {
         val a = Meta.address
         db.withTransaction { tx ->
             val address1 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
@@ -284,7 +284,7 @@ internal class CoroutineAwareJdbcTransactionOperatorTest {
     }
 
     @Test
-    fun requiresNew_throwException() = runBlocking{
+    fun requiresNew_throwException() = runBlocking {
         val a = Meta.address
         db.withTransaction { tx ->
             val address1 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
@@ -307,7 +307,7 @@ internal class CoroutineAwareJdbcTransactionOperatorTest {
     }
 
     @BeforeTest
-    fun before() = runBlocking{
+    fun before() = runBlocking {
         val sql = """
             CREATE TABLE ADDRESS(ADDRESS_ID INTEGER NOT NULL PRIMARY KEY, STREET VARCHAR(20) UNIQUE, VERSION INTEGER);
             INSERT INTO ADDRESS VALUES(1,'STREET 1',1);
@@ -335,7 +335,7 @@ internal class CoroutineAwareJdbcTransactionOperatorTest {
     }
 
     @AfterTest
-    fun after() = runBlocking{
+    fun after() = runBlocking {
         val sql = "DROP ALL OBJECTS"
         db.withTransaction {
             db.runQuery {

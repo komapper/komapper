@@ -12,9 +12,9 @@ import org.komapper.tx.jdbc.JdbcTransactionSession
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
-import kotlin.test.assertTrue
-import kotlin.test.assertFalse
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 internal class ContextAwareJdbcTransactionOperatorTest {
 

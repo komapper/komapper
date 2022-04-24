@@ -14,7 +14,7 @@ interface CoroutineAwareJdbcTransactionOperator {
      * @return the result of the block
      */
     context(JdbcTransactionContext)
-        suspend fun <R> required(
+    suspend fun <R> required(
         transactionProperty: TransactionProperty = EmptyTransactionProperty,
         block: suspend context(JdbcTransactionContext)(tx: CoroutineAwareJdbcTransactionOperator) -> R
     ): R
@@ -28,7 +28,7 @@ interface CoroutineAwareJdbcTransactionOperator {
      * @return the result of the block
      */
     context(JdbcTransactionContext)
-        suspend fun <R> requiresNew(
+    suspend fun <R> requiresNew(
         transactionProperty: TransactionProperty = EmptyTransactionProperty,
         block: suspend context(JdbcTransactionContext)(tx: CoroutineAwareJdbcTransactionOperator) -> R
     ): R
@@ -52,7 +52,7 @@ internal class CoroutineAwareJdbcTransactionOperatorImpl(
 ) : CoroutineAwareJdbcTransactionOperator {
 
     context(JdbcTransactionContext)
-        override suspend fun <R> required(
+    override suspend fun <R> required(
         transactionProperty: TransactionProperty,
         block: suspend context(JdbcTransactionContext) (CoroutineAwareJdbcTransactionOperator) -> R
     ): R {
@@ -64,7 +64,7 @@ internal class CoroutineAwareJdbcTransactionOperatorImpl(
     }
 
     context(JdbcTransactionContext)
-        override suspend fun <R> requiresNew(
+    override suspend fun <R> requiresNew(
         transactionProperty: TransactionProperty,
         block: suspend context(JdbcTransactionContext) (CoroutineAwareJdbcTransactionOperator) -> R
     ): R {
@@ -90,7 +90,7 @@ internal class CoroutineAwareJdbcTransactionOperatorImpl(
     }
 
     context(JdbcTransactionContext)
-        private suspend fun <R> executeInNewTransaction(
+    private suspend fun <R> executeInNewTransaction(
         transactionProperty: TransactionProperty,
         block: suspend context(JdbcTransactionContext) (CoroutineAwareJdbcTransactionOperator) -> R
     ): R {
@@ -115,12 +115,12 @@ internal class CoroutineAwareJdbcTransactionOperatorImpl(
     }
 
     context(JdbcTransactionContext)
-        override fun setRollbackOnly() {
+    override fun setRollbackOnly() {
         transactionManager.setRollbackOnly()
     }
 
     context(JdbcTransactionContext)
-        override fun isRollbackOnly(): Boolean {
+    override fun isRollbackOnly(): Boolean {
         return transactionManager.isRollbackOnly()
     }
 }

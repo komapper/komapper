@@ -19,7 +19,9 @@ internal class JdbcTransactionImpl(
     override fun toString() = "JdbcTransaction(id=$id, name=$name)"
 }
 
-fun JdbcTransaction(name: String?, connection: JdbcTransactionConnection
+fun JdbcTransaction(
+    name: String?,
+    connection: JdbcTransactionConnection
 ): JdbcTransaction {
     return JdbcTransactionImpl(name, connection)
 }

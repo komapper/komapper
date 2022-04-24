@@ -52,7 +52,7 @@ internal class ContextAwareJdbcTransactionOperatorImpl(
 ) : ContextAwareJdbcTransactionOperator {
 
     context(JdbcTransactionContext)
-        override fun <R> required(
+    override fun <R> required(
         transactionProperty: TransactionProperty,
         block: context(JdbcTransactionContext) (ContextAwareJdbcTransactionOperator) -> R
     ): R {
@@ -64,7 +64,7 @@ internal class ContextAwareJdbcTransactionOperatorImpl(
     }
 
     context(JdbcTransactionContext)
-        override fun <R> requiresNew(
+    override fun <R> requiresNew(
         transactionProperty: TransactionProperty,
         block: context(JdbcTransactionContext) (ContextAwareJdbcTransactionOperator) -> R
     ): R {
@@ -90,7 +90,7 @@ internal class ContextAwareJdbcTransactionOperatorImpl(
     }
 
     context(JdbcTransactionContext)
-        private fun <R> executeInNewTransaction(
+    private fun <R> executeInNewTransaction(
         transactionProperty: TransactionProperty,
         block: context(JdbcTransactionContext) (ContextAwareJdbcTransactionOperator) -> R
     ): R {
