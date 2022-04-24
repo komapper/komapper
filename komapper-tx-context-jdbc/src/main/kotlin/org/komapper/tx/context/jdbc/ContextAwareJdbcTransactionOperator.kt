@@ -13,10 +13,10 @@ interface ContextAwareJdbcTransactionOperator {
      * @param block the block executed in the transaction
      * @return the result of the block
      */
-    context(JdbcTransactionContext)
+    context(JdbcContext)
     fun <R> required(
         transactionProperty: TransactionProperty = EmptyTransactionProperty,
-        block: context(JdbcTransactionContext)(tx: ContextAwareJdbcTransactionOperator) -> R
+        block: context(JdbcContext)(tx: ContextAwareJdbcTransactionOperator) -> R
     ): R
 
     /**
@@ -27,22 +27,22 @@ interface ContextAwareJdbcTransactionOperator {
      * @param block the block executed in the transaction
      * @return the result of the block
      */
-    context(JdbcTransactionContext)
+    context(JdbcContext)
     fun <R> requiresNew(
         transactionProperty: TransactionProperty = EmptyTransactionProperty,
-        block: context(JdbcTransactionContext)(tx: ContextAwareJdbcTransactionOperator) -> R
+        block: context(JdbcContext)(tx: ContextAwareJdbcTransactionOperator) -> R
     ): R
 
     /**
      * Marks the transaction as rollback.
      */
-    context(JdbcTransactionContext)
+    context(JdbcContext)
     fun setRollbackOnly()
 
     /**
      * Returns true if the transaction is marked as rollback.
      */
-    context(JdbcTransactionContext)
+    context(JdbcContext)
     fun isRollbackOnly(): Boolean
 }
 
@@ -51,27 +51,28 @@ internal class ContextAwareJdbcTransactionOperatorImpl(
     private val defaultTransactionProperty: TransactionProperty = EmptyTransactionProperty
 ) : ContextAwareJdbcTransactionOperator {
 
-    context(JdbcTransactionContext)
+    context(JdbcContext)
     override fun <R> required(
         transactionProperty: TransactionProperty,
-        block: context(JdbcTransactionContext) (ContextAwareJdbcTransactionOperator) -> R
+        block: context(JdbcContext) (ContextAwareJdbcTransactionOperator) -> R
     ): R {
         return if (transactionManager.isActive()) {
-            block(this@JdbcTransactionContext, this@ContextAwareJdbcTransactionOperatorImpl)
+            block(this@JdbcContext, this@ContextAwareJdbcTransactionOperatorImpl)
         } else {
             executeInNewTransaction(transactionProperty, block)
         }
     }
 
-    context(JdbcTransactionContext)
+    context(JdbcContext)
     override fun <R> requiresNew(
         transactionProperty: TransactionProperty,
-        block: context(JdbcTransactionContext) (ContextAwareJdbcTransactionOperator) -> R
+        block: context(JdbcContext) (ContextAwareJdbcTransactionOperator) -> R
     ): R {
         return if (transactionManager.isActive()) {
-            val txContext = transactionManager.suspend()
+            val transactionContext = transactionManager.suspend()
+            val jdbcContext = JdbcContext(database, transactionContext.transaction)
             val result = runCatching {
-                with(txContext) {
+                with(jdbcContext) {
                     executeInNewTransaction(transactionProperty, block)
                 }
             }.onSuccess {
@@ -89,15 +90,16 @@ internal class ContextAwareJdbcTransactionOperatorImpl(
         }
     }
 
-    context(JdbcTransactionContext)
+    context(JdbcContext)
     private fun <R> executeInNewTransaction(
         transactionProperty: TransactionProperty,
-        block: context(JdbcTransactionContext) (ContextAwareJdbcTransactionOperator) -> R
+        block: context(JdbcContext) (ContextAwareJdbcTransactionOperator) -> R
     ): R {
-        val txContext = transactionManager.begin(defaultTransactionProperty + transactionProperty)
-        return with(txContext) {
+        val transactionContext = transactionManager.begin(defaultTransactionProperty + transactionProperty)
+        val jdbcContext = JdbcContext(database, transactionContext.transaction)
+        return with(jdbcContext) {
             runCatching {
-                block(txContext, this@ContextAwareJdbcTransactionOperatorImpl)
+                block(jdbcContext, this@ContextAwareJdbcTransactionOperatorImpl)
             }.onSuccess {
                 if (transactionManager.isRollbackOnly()) {
                     transactionManager.rollback()
@@ -114,12 +116,12 @@ internal class ContextAwareJdbcTransactionOperatorImpl(
         }
     }
 
-    context(JdbcTransactionContext)
+    context(JdbcContext)
     override fun setRollbackOnly() {
         transactionManager.setRollbackOnly()
     }
 
-    context(JdbcTransactionContext)
+    context(JdbcContext)
     override fun isRollbackOnly(): Boolean {
         return transactionManager.isRollbackOnly()
     }

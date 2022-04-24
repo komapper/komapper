@@ -25,7 +25,7 @@ interface CoroutineAwareJdbcDatabase {
      * @param query the query
      * @return the result represented by the query
      */
-    context(JdbcTransactionContext)
+    context(CoroutineJdbcContext)
     fun <T> runQuery(query: Query<T>): T
 
     /**
@@ -33,8 +33,20 @@ interface CoroutineAwareJdbcDatabase {
      * @param block the block that returns a query
      * @return the result represented by the query
      */
-    context(JdbcTransactionContext)
+    context(CoroutineJdbcContext)
     fun <T> runQuery(block: QueryScope.() -> Query<T>): T
+
+    context(CoroutineJdbcContext)
+    suspend fun <R> required(
+        transactionProperty: TransactionProperty = EmptyTransactionProperty,
+        block: suspend context(CoroutineJdbcContext) (tx: CoroutineAwareJdbcTransactionOperator) -> R
+    ): R
+
+    context(CoroutineJdbcContext)
+    suspend fun <R> requiresNew(
+        transactionProperty: TransactionProperty = EmptyTransactionProperty,
+        block: suspend context(CoroutineJdbcContext) (tx: CoroutineAwareJdbcTransactionOperator) -> R
+    ): R
 
     /**
      * Begins a JDBC transaction.
@@ -48,7 +60,7 @@ interface CoroutineAwareJdbcDatabase {
     suspend fun <R> withTransaction(
         transactionAttribute: TransactionAttribute = TransactionAttribute.REQUIRED,
         transactionProperty: TransactionProperty = EmptyTransactionProperty,
-        block: suspend context(JdbcTransactionContext) (tx: CoroutineAwareJdbcTransactionOperator) -> R
+        block: suspend context(CoroutineJdbcContext) (tx: CoroutineAwareJdbcTransactionOperator) -> R
     ): R
 
     fun unwrap(): JdbcDatabase
@@ -66,7 +78,7 @@ internal class CoroutineAwareJdbcDatabaseImpl(
     override val dataFactory: JdbcDataFactory
         get() = database.dataFactory
 
-    context(JdbcTransactionContext)
+    context(CoroutineJdbcContext)
     override fun <T> runQuery(query: Query<T>): T {
         val runtimeConfig = object : JdbcDatabaseConfig by config {
             override val session: JdbcSession = object : JdbcSession {
@@ -89,21 +101,35 @@ internal class CoroutineAwareJdbcDatabaseImpl(
         return runner.run(runtimeConfig)
     }
 
-    context(JdbcTransactionContext)
+    context(CoroutineJdbcContext)
     override fun <T> runQuery(block: QueryScope.() -> Query<T>): T {
         val query = block(QueryScope)
         return runQuery(query)
     }
 
+    context(CoroutineJdbcContext) override suspend fun <R> required(
+        transactionProperty: TransactionProperty,
+        block: suspend context(CoroutineJdbcContext) (tx: CoroutineAwareJdbcTransactionOperator) -> R
+    ): R {
+        return transactionOperator.required(transactionProperty, block)
+    }
+
+    context(CoroutineJdbcContext) override suspend fun <R> requiresNew(
+        transactionProperty: TransactionProperty,
+        block: suspend context(CoroutineJdbcContext) (tx: CoroutineAwareJdbcTransactionOperator) -> R
+    ): R {
+        return transactionOperator.requiresNew(transactionProperty, block)
+    }
+
     override suspend fun <R> withTransaction(
         transactionAttribute: TransactionAttribute,
         transactionProperty: TransactionProperty,
-        block: suspend context(JdbcTransactionContext) (CoroutineAwareJdbcTransactionOperator) -> R
+        block: suspend context(CoroutineJdbcContext) (CoroutineAwareJdbcTransactionOperator) -> R
     ): R {
-        with(EmptyJdbcTransactionContext) {
+        with(CoroutineJdbcContext(this)) {
             return when (transactionAttribute) {
-                TransactionAttribute.REQUIRED -> transactionOperator.required(transactionProperty, block)
-                TransactionAttribute.REQUIRES_NEW -> transactionOperator.requiresNew(transactionProperty, block)
+                TransactionAttribute.REQUIRED -> required(transactionProperty, block)
+                TransactionAttribute.REQUIRES_NEW -> requiresNew(transactionProperty, block)
             }
         }
     }
