@@ -34,22 +34,14 @@ interface JdbcDatabase : Database {
      * @param query the query
      * @return the result represented by the query
      */
-    @Suppress("UNCHECKED_CAST")
-    fun <T> runQuery(query: Query<T>): T {
-        val runner = query.accept(JdbcQueryVisitor) as JdbcRunner<T>
-        runner.check(config)
-        return runner.run(config)
-    }
+    fun <T> runQuery(query: Query<T>): T
 
     /**
      * Runs the given [block] and returns the result.
      * @param block the block that returns a query
      * @return the result represented by the query
      */
-    fun <T> runQuery(block: QueryScope.() -> Query<T>): T {
-        val query = block(QueryScope)
-        return runQuery(query)
-    }
+    fun <T> runQuery(block: QueryScope.() -> Query<T>): T
 
     /**
      * Begins a JDBC transaction.
@@ -64,13 +56,7 @@ interface JdbcDatabase : Database {
         transactionAttribute: TransactionAttribute = TransactionAttribute.REQUIRED,
         transactionProperty: TransactionProperty = EmptyTransactionProperty,
         block: (TransactionOperator) -> R
-    ): R {
-        val tx = config.session.transactionOperator
-        return when (transactionAttribute) {
-            TransactionAttribute.REQUIRED -> tx.required(transactionProperty, block)
-            TransactionAttribute.REQUIRES_NEW -> tx.requiresNew(transactionProperty, block)
-        }
-    }
+    ): R
 }
 
 internal class JdbcDatabaseImpl(
@@ -78,6 +64,30 @@ internal class JdbcDatabaseImpl(
 ) : JdbcDatabase {
     override val dataFactory: JdbcDataFactory
         get() = config.dataFactory
+
+    @Suppress("UNCHECKED_CAST")
+    override fun <T> runQuery(query: Query<T>): T {
+        val runner = query.accept(JdbcQueryVisitor) as JdbcRunner<T>
+        runner.check(config)
+        return runner.run(config)
+    }
+
+    override fun <T> runQuery(block: QueryScope.() -> Query<T>): T {
+        val query = block(QueryScope)
+        return runQuery(query)
+    }
+
+    override fun <R> withTransaction(
+        transactionAttribute: TransactionAttribute,
+        transactionProperty: TransactionProperty,
+        block: (TransactionOperator) -> R
+    ): R {
+        val tx = config.session.transactionOperator
+        return when (transactionAttribute) {
+            TransactionAttribute.REQUIRED -> tx.required(transactionProperty, block)
+            TransactionAttribute.REQUIRES_NEW -> tx.requiresNew(transactionProperty, block)
+        }
+    }
 }
 
 /**
