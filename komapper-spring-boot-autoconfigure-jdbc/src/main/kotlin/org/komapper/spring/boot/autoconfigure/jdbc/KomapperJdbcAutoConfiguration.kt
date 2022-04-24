@@ -126,6 +126,7 @@ open class KomapperJdbcAutoConfiguration {
         statementInspector: StatementInspector,
         dataFactory: JdbcDataFactory,
         dataOperator: JdbcDataOperator,
+        dataSource: DataSource,
         templateStatementBuilder: TemplateStatementBuilder
     ): JdbcDatabaseConfig {
         return SimpleJdbcDatabaseConfig(
@@ -139,6 +140,7 @@ open class KomapperJdbcAutoConfiguration {
             statementInspector = statementInspector,
             dataFactory = dataFactory,
             dataOperator = dataOperator,
+            dataSource = dataSource,
             templateStatementBuilder = templateStatementBuilder,
         )
     }

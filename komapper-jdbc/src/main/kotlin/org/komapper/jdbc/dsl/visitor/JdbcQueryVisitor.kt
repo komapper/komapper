@@ -48,7 +48,7 @@ import org.komapper.jdbc.dsl.runner.JdbcSetOperationRunner
 import org.komapper.jdbc.dsl.runner.JdbcTemplateExecuteRunner
 import org.komapper.jdbc.dsl.runner.JdbcTemplateSelectRunner
 
-internal object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
+object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
 
     @Suppress("UNCHECKED_CAST")
     override fun <T, S> andThenQuery(left: Query<T>, right: Query<S>): JdbcRunner<S> {

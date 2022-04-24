@@ -51,9 +51,8 @@ public class KomapperRecorder {
       var templateStatementBuilder =
           TemplateStatementBuilders.INSTANCE.get(
               BuilderDialectKt.BuilderDialect(dialect, dataOperator));
-      var session =
-          new JtaTransactionSession(
-              transactionManager, dataSourceResolver.resolve(dataSourceDefinition.name));
+      var dataSource = dataSourceResolver.resolve(dataSourceDefinition.name);
+      var session = new JtaTransactionSession(transactionManager, dataSource);
       var dataFactory = new DefaultJdbcDataFactory(session);
       var newExecutionOptions =
           executionOptions.plus(
@@ -73,6 +72,11 @@ public class KomapperRecorder {
         @Override
         public JdbcDataOperator getDataOperator() {
           return dataOperator;
+        }
+
+        @Override
+        public javax.sql.DataSource getDataSource() {
+          return dataSource;
         }
 
         @Override

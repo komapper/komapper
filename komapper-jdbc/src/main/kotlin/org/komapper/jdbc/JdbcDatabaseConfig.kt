@@ -37,10 +37,15 @@ interface JdbcDatabaseConfig : DatabaseConfig {
      * The data factory.
      */
     val dataFactory: JdbcDataFactory
+
+    /**
+     * The data source.
+     */
+    val dataSource: DataSource
 }
 
 open class DefaultJdbcDatabaseConfig(
-    dataSource: DataSource,
+    override val dataSource: DataSource,
     dialect: JdbcDialect,
     dataTypeProvider: JdbcDataTypeProvider? = null,
     clockProvider: ClockProvider = DefaultClockProvider(),
@@ -71,5 +76,6 @@ class SimpleJdbcDatabaseConfig(
     override val dialect: JdbcDialect,
     override val session: JdbcSession,
     override val dataFactory: JdbcDataFactory,
-    override val dataOperator: JdbcDataOperator
+    override val dataOperator: JdbcDataOperator,
+    override val dataSource: DataSource
 ) : JdbcDatabaseConfig

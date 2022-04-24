@@ -43,6 +43,7 @@ include("komapper-spring-boot-starter-jdbc")
 include("komapper-spring-jdbc")
 include("komapper-spring-native-jdbc")
 include("komapper-starter-jdbc")
+include("komapper-tx-context-jdbc")
 include("komapper-tx-jdbc")
 
 // R2DBC
