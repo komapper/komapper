@@ -50,15 +50,21 @@ interface CoroutineAwareJdbcDatabase {
         transactionProperty: TransactionProperty = EmptyTransactionProperty,
         block: suspend context(JdbcTransactionContext) (tx: CoroutineAwareJdbcTransactionOperator) -> R
     ): R
+    
+    fun unwrap(): JdbcDatabase
 }
 
 internal class CoroutineAwareJdbcDatabaseImpl(
-    override val config: JdbcDatabaseConfig,
+    private val database: JdbcDatabase,
     private val transactionManager: ContextAwareJdbcTransactionManager,
     private val transactionOperator: CoroutineAwareJdbcTransactionOperator
 ) : CoroutineAwareJdbcDatabase {
+
+    override val config: JdbcDatabaseConfig
+        get() = database.config
+    
     override val dataFactory: JdbcDataFactory
-        get() = config.dataFactory
+        get() = database.dataFactory
 
     context(JdbcTransactionContext)
         override fun <T> runQuery(query: Query<T>): T {
@@ -101,10 +107,14 @@ internal class CoroutineAwareJdbcDatabaseImpl(
             }
         }
     }
+
+    override fun unwrap(): JdbcDatabase {
+        return database
+    }
 }
 
 fun JdbcDatabase.asCoroutineAwareDatabase(): CoroutineAwareJdbcDatabase {
     val manager = ContextAwareJdbcTransactionManagerImpl(config.dataSource, config.loggerFacade)
     val operator = CoroutineAwareJdbcTransactionOperatorImpl(manager)
-    return CoroutineAwareJdbcDatabaseImpl(config, manager, operator)
+    return CoroutineAwareJdbcDatabaseImpl(this, manager, operator)
 }
