@@ -80,10 +80,10 @@ configure(libraryProjects + gradlePluginProject) {
 
 configure(kotlinProjects) {
     spotless {
-        kotlin {
-            ktlint(ktlintVersion)
-            targetExclude("build/**")
-        }
+        // kotlin {
+        //     ktlint(ktlintVersion)
+        //     targetExclude("build/**")
+        // }
     }
 }
 

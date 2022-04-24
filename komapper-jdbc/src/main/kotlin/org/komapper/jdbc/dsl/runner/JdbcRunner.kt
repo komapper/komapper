@@ -5,7 +5,7 @@ import org.komapper.core.DryRunStatement
 import org.komapper.core.dsl.runner.Runner
 import org.komapper.jdbc.JdbcDatabaseConfig
 
-internal sealed interface JdbcRunner<T> : Runner {
+sealed interface JdbcRunner<T> : Runner {
     fun run(config: JdbcDatabaseConfig): T
 
     data class AndThen<LEFT, RIGHT>(

@@ -14,6 +14,12 @@ internal class JdbcTransactionImpl(
     override val connection: JdbcTransactionConnection
 ) : JdbcTransaction {
     override val id: UUID = UUID.randomUUID()
+    @Volatile
     override var isRollbackOnly: Boolean = false
     override fun toString() = "JdbcTransaction(id=$id, name=$name)"
+}
+
+fun JdbcTransaction(name: String?, connection: JdbcTransactionConnection
+): JdbcTransaction {
+    return JdbcTransactionImpl(name, connection)
 }

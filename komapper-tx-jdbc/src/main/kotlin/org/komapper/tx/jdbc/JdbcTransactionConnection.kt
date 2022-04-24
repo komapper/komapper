@@ -16,8 +16,11 @@ internal class JdbcTransactionConnectionImpl(
     private val readOnlyProperty: TransactionProperty.ReadOnly?
 ) : Connection by connection, JdbcTransactionConnection {
 
+    @Volatile
     private var isolation: Int = 0
+    @Volatile
     private var readOnly: Boolean = false
+    @Volatile
     private var autoCommit: Boolean = false
 
     override fun initialize() {
@@ -55,4 +58,12 @@ internal class JdbcTransactionConnectionImpl(
 
     // do nothing
     override fun close() = Unit
+}
+
+fun JdbcTransactionConnection(
+    connection: Connection,
+    isolationLevelProperty: TransactionProperty.IsolationLevel?,
+    readOnlyProperty: TransactionProperty.ReadOnly?
+): JdbcTransactionConnection {
+    return JdbcTransactionConnectionImpl(connection, isolationLevelProperty, readOnlyProperty)
 }

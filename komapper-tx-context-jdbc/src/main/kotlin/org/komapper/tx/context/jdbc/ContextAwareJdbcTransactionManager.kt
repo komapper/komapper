@@ -1,90 +1,92 @@
-package org.komapper.tx.jdbc
+package org.komapper.tx.context.jdbc
 
 import org.komapper.core.LoggerFacade
 import org.komapper.core.ThreadSafe
 import org.komapper.tx.core.EmptyTransactionProperty
 import org.komapper.tx.core.TransactionProperty
+import org.komapper.tx.jdbc.JdbcTransaction
+import org.komapper.tx.jdbc.JdbcTransactionConnection
 import java.sql.Connection
 import javax.sql.DataSource
 
-/**
- * The JDBC transaction APIs designed for advanced use.
- */
 @ThreadSafe
-interface JdbcTransactionManager {
+interface ContextAwareJdbcTransactionManager {
 
+    context(JdbcTransactionContext)
     fun getConnection(): Connection
 
     /**
      * This function must not throw any exceptions.
      */
+    context(JdbcTransactionContext)
     fun isActive(): Boolean
 
     /**
      * This function must not throw any exceptions.
      */
+    context(JdbcTransactionContext)
     fun isRollbackOnly(): Boolean
 
     /**
      * This function must not throw any exceptions.
      */
+    context(JdbcTransactionContext)
     fun setRollbackOnly()
 
-    fun begin(transactionProperty: TransactionProperty = EmptyTransactionProperty)
+    context(JdbcTransactionContext)
+    fun begin(transactionProperty: TransactionProperty = EmptyTransactionProperty): JdbcTransactionContext
 
+    context(JdbcTransactionContext)
     fun commit()
 
-    fun suspend(): JdbcTransaction
+    context(JdbcTransactionContext)
+    fun suspend(): JdbcTransactionContext
 
     /**
      * This function must not throw any exceptions.
      */
-    fun resume(tx: JdbcTransaction)
+    context(JdbcTransactionContext)
+    fun resume()
 
     /**
      * This function must not throw any exceptions.
      */
+    context(JdbcTransactionContext)
     fun rollback()
 }
 
-internal class JdbcTransactionManagerImpl(
+internal class ContextAwareJdbcTransactionManagerImpl(
     private val dataSource: DataSource,
     private val loggerFacade: LoggerFacade
-) : JdbcTransactionManager {
-    private val threadLocal = ThreadLocal<JdbcTransaction>()
+) : ContextAwareJdbcTransactionManager {
 
-    override fun getConnection(): Connection {
-        val tx = threadLocal.get()
-        return if (tx.isActive()) {
-            tx.connection
-        } else {
-            @Suppress("UsePropertyAccessSyntax")
-            dataSource.getConnection()
-        }
+    context(JdbcTransactionContext)
+        override fun getConnection(): Connection {
+        return transaction?.connection ?: dataSource.connection
     }
 
-    override fun isActive(): Boolean {
-        val tx = threadLocal.get()
-        return tx.isActive()
+    context(JdbcTransactionContext)
+        override fun isActive(): Boolean {
+        return transaction != null
     }
 
-    override fun isRollbackOnly(): Boolean {
-        val tx = threadLocal.get()
-        return if (tx.isActive()) {
-            tx.isRollbackOnly
-        } else false
+    context(JdbcTransactionContext)
+        override fun isRollbackOnly(): Boolean {
+        return transaction?.isRollbackOnly ?: false
     }
 
-    override fun setRollbackOnly() {
-        val tx = threadLocal.get()
-        if (tx.isActive()) {
+    context(JdbcTransactionContext)
+        override fun setRollbackOnly() {
+        val tx = transaction
+        if (tx != null) {
             tx.isRollbackOnly = true
         }
     }
 
-    override fun begin(transactionProperty: TransactionProperty) {
-        val currentTx = threadLocal.get()
-        if (currentTx.isActive()) {
+    context(JdbcTransactionContext)
+        override fun begin(transactionProperty: TransactionProperty): JdbcTransactionContext {
+        val currentTx = transaction
+        if (currentTx != null) {
             rollbackInternal(currentTx)
             error("The transaction \"$currentTx\" already has begun.")
         }
@@ -100,14 +102,12 @@ internal class JdbcTransactionManagerImpl(
         }.onFailure {
             release(tx)
         }.getOrThrow()
-        threadLocal.set(tx)
+        return JdbcTransactionContext(tx)
     }
 
-    override fun commit() {
-        val tx = threadLocal.get()
-        if (!tx.isActive()) {
-            error("A transaction hasn't yet begun.")
-        }
+    context(JdbcTransactionContext)
+        override fun commit() {
+        val tx = transaction ?: error("A transaction hasn't yet begun.")
         runCatching {
             tx.connection.commit()
         }.also {
@@ -123,30 +123,24 @@ internal class JdbcTransactionManagerImpl(
         }.getOrThrow()
     }
 
-    override fun suspend(): JdbcTransaction {
-        val tx = threadLocal.get()
-        if (!tx.isActive()) {
-            error("A transaction hasn't yet begun.")
-        }
-        threadLocal.remove()
+    context(JdbcTransactionContext)
+        override fun suspend(): JdbcTransactionContext {
+        val tx = transaction ?: error("A transaction hasn't yet begun.")
         loggerFacade.suspend(tx.toString())
-        return tx
+        return EmptyJdbcTransactionContext
     }
 
-    override fun resume(tx: JdbcTransaction) {
-        val currentTx = threadLocal.get()
-        if (currentTx.isActive()) {
-            rollbackInternal(currentTx)
+    context(JdbcTransactionContext)
+        override fun resume() {
+        if (transaction == null) {
+            error("A transaction is not found.")
         }
-        threadLocal.set(tx)
-        loggerFacade.resume(tx.toString())
+        loggerFacade.resume(transaction.toString())
     }
 
-    override fun rollback() {
-        val tx = threadLocal.get()
-        if (!tx.isActive()) {
-            return
-        }
+    context(JdbcTransactionContext)
+        override fun rollback() {
+        val tx = transaction ?: return
         rollbackInternal(tx)
     }
 
@@ -173,7 +167,6 @@ internal class JdbcTransactionManagerImpl(
      * This function must not throw any exceptions.
      */
     private fun release(tx: JdbcTransaction) {
-        threadLocal.remove()
         runCatching {
             tx.connection.reset()
         }
@@ -183,6 +176,3 @@ internal class JdbcTransactionManagerImpl(
     }
 }
 
-private fun JdbcTransaction?.isActive(): Boolean {
-    return this != null
-}
