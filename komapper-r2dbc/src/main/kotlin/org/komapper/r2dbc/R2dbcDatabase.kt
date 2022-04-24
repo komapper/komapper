@@ -39,11 +39,7 @@ interface R2dbcDatabase : Database {
      * @return the result represented by the query
      */
     @Suppress("UNCHECKED_CAST")
-    suspend fun <T> runQuery(query: Query<T>): T {
-        val runner = query.accept(R2dbcQueryVisitor) as R2dbcRunner<T>
-        runner.check(config)
-        return runner.run(config)
-    }
+    suspend fun <T> runQuery(query: Query<T>): T
 
     /**
      * Runs the given [block] and returns the result.
@@ -51,10 +47,7 @@ interface R2dbcDatabase : Database {
      * @param block the block that returns a query
      * @return the result represented by the query
      */
-    suspend fun <T> runQuery(block: QueryScope.() -> Query<T>): T {
-        val query = block(QueryScope)
-        return runQuery(query)
-    }
+    suspend fun <T> runQuery(block: QueryScope.() -> Query<T>): T
 
     /**
      * Converts the given [query] to [Flow].
@@ -63,11 +56,7 @@ interface R2dbcDatabase : Database {
      * @return the flow
      */
     @Suppress("UNCHECKED_CAST")
-    fun <T> flowQuery(query: FlowQuery<T>): Flow<T> {
-        val builder = query.accept(R2dbcFlowQueryVisitor) as R2dbcFlowBuilder<T>
-        builder.check(config)
-        return builder.build(config)
-    }
+    fun <T> flowQuery(query: FlowQuery<T>): Flow<T>
 
     /**
      * Converts the given [block] to [Flow].
@@ -75,10 +64,7 @@ interface R2dbcDatabase : Database {
      * @param block the block that returns a query
      * @return the flow
      */
-    fun <T> flowQuery(block: QueryScope.() -> FlowQuery<T>): Flow<T> {
-        val query = block(QueryScope)
-        return flowQuery(query)
-    }
+    fun <T> flowQuery(block: QueryScope.() -> FlowQuery<T>): Flow<T>
 
     /**
      * Begins a R2DBC transaction.
@@ -93,13 +79,7 @@ interface R2dbcDatabase : Database {
         transactionAttribute: TransactionAttribute = TransactionAttribute.REQUIRED,
         transactionProperty: TransactionProperty = EmptyTransactionProperty,
         block: suspend (CoroutineTransactionOperator) -> R
-    ): R {
-        val tx = config.session.coroutineTransactionOperator
-        return when (transactionAttribute) {
-            TransactionAttribute.REQUIRED -> tx.required(transactionProperty, block)
-            TransactionAttribute.REQUIRES_NEW -> tx.requiresNew(transactionProperty, block)
-        }
-    }
+    ): R
 
     /**
      * Builds a transactional [Flow].
@@ -114,6 +94,50 @@ interface R2dbcDatabase : Database {
         transactionAttribute: TransactionAttribute = TransactionAttribute.REQUIRED,
         transactionProperty: TransactionProperty = EmptyTransactionProperty,
         block: suspend FlowCollector<R>.(FlowTransactionOperator) -> Unit
+    ): Flow<R>
+}
+
+internal class R2dbcDatabaseImpl(override val config: R2dbcDatabaseConfig) : R2dbcDatabase {
+    @Suppress("UNCHECKED_CAST")
+    override suspend fun <T> runQuery(query: Query<T>): T {
+        val runner = query.accept(R2dbcQueryVisitor) as R2dbcRunner<T>
+        runner.check(config)
+        return runner.run(config)
+    }
+
+    override suspend fun <T> runQuery(block: QueryScope.() -> Query<T>): T {
+        val query = block(QueryScope)
+        return runQuery(query)
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    override fun <T> flowQuery(query: FlowQuery<T>): Flow<T> {
+        val builder = query.accept(R2dbcFlowQueryVisitor) as R2dbcFlowBuilder<T>
+        builder.check(config)
+        return builder.build(config)
+    }
+
+    override fun <T> flowQuery(block: QueryScope.() -> FlowQuery<T>): Flow<T> {
+        val query = block(QueryScope)
+        return flowQuery(query)
+    }
+
+    override suspend fun <R> withTransaction(
+        transactionAttribute: TransactionAttribute,
+        transactionProperty: TransactionProperty,
+        block: suspend (CoroutineTransactionOperator) -> R
+    ): R {
+        val tx = config.session.coroutineTransactionOperator
+        return when (transactionAttribute) {
+            TransactionAttribute.REQUIRED -> tx.required(transactionProperty, block)
+            TransactionAttribute.REQUIRES_NEW -> tx.requiresNew(transactionProperty, block)
+        }
+    }
+
+    override fun <R> flowTransaction(
+        transactionAttribute: TransactionAttribute,
+        transactionProperty: TransactionProperty,
+        block: suspend FlowCollector<R>.(FlowTransactionOperator) -> Unit
     ): Flow<R> {
         val tx = config.session.flowTransactionOperator
         return when (transactionAttribute) {
@@ -122,8 +146,6 @@ interface R2dbcDatabase : Database {
         }
     }
 }
-
-internal class R2dbcDatabaseImpl(override val config: R2dbcDatabaseConfig) : R2dbcDatabase
 
 /**
  * Creates a [R2dbcDatabase] instance.
