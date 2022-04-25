@@ -25,7 +25,7 @@ interface ContextAwareJdbcDatabase {
      * @param query the query
      * @return the result represented by the query
      */
-    context(JdbcTransactionContext)
+    context(JdbcContext)
     fun <T> runQuery(query: Query<T>): T
 
     /**
@@ -33,8 +33,20 @@ interface ContextAwareJdbcDatabase {
      * @param block the block that returns a query
      * @return the result represented by the query
      */
-    context(JdbcTransactionContext)
+    context(JdbcContext)
     fun <T> runQuery(block: QueryScope.() -> Query<T>): T
+
+    context(JdbcContext)
+    fun <R> required(
+        transactionProperty: TransactionProperty = EmptyTransactionProperty,
+        block: context(JdbcContext) (tx: ContextAwareJdbcTransactionOperator) -> R
+    ): R
+
+    context(JdbcContext)
+    fun <R> requiresNew(
+        transactionProperty: TransactionProperty = EmptyTransactionProperty,
+        block: context(JdbcContext) (tx: ContextAwareJdbcTransactionOperator) -> R
+    ): R
 
     /**
      * Begins a JDBC transaction.
@@ -48,7 +60,7 @@ interface ContextAwareJdbcDatabase {
     fun <R> withTransaction(
         transactionAttribute: TransactionAttribute = TransactionAttribute.REQUIRED,
         transactionProperty: TransactionProperty = EmptyTransactionProperty,
-        block: context(JdbcTransactionContext) (tx: ContextAwareJdbcTransactionOperator) -> R
+        block: context(JdbcContext) (tx: ContextAwareJdbcTransactionOperator) -> R
     ): R
 
     fun unwrap(): JdbcDatabase
@@ -66,7 +78,7 @@ internal class ContextAwareJdbcDatabaseImpl(
     override val dataFactory: JdbcDataFactory
         get() = database.dataFactory
 
-    context(JdbcTransactionContext)
+    context(JdbcContext)
     override fun <T> runQuery(query: Query<T>): T {
         val runtimeConfig = object : JdbcDatabaseConfig by config {
             override val session: JdbcSession = object : JdbcSession {
@@ -89,21 +101,36 @@ internal class ContextAwareJdbcDatabaseImpl(
         return runner.run(runtimeConfig)
     }
 
-    context(JdbcTransactionContext)
+    context(JdbcContext)
     override fun <T> runQuery(block: QueryScope.() -> Query<T>): T {
         val query = block(QueryScope)
         return runQuery(query)
     }
 
+    context(JdbcContext) override fun <R> required(
+        transactionProperty: TransactionProperty,
+        block: context(JdbcContext) (tx: ContextAwareJdbcTransactionOperator) -> R
+    ): R {
+        return transactionOperator.required(transactionProperty, block)
+    }
+
+    context(JdbcContext) override fun <R> requiresNew(
+        transactionProperty: TransactionProperty,
+        block: context(JdbcContext) (tx: ContextAwareJdbcTransactionOperator) -> R
+    ): R {
+        return transactionOperator.requiresNew(transactionProperty, block)
+    }
+
     override fun <R> withTransaction(
         transactionAttribute: TransactionAttribute,
         transactionProperty: TransactionProperty,
-        block: context(JdbcTransactionContext) (ContextAwareJdbcTransactionOperator) -> R
+        block: context(JdbcContext) (ContextAwareJdbcTransactionOperator) -> R
     ): R {
-        with(EmptyJdbcTransactionContext) {
+        val context = JdbcContext(this)
+        with(context) {
             return when (transactionAttribute) {
-                TransactionAttribute.REQUIRED -> transactionOperator.required(transactionProperty, block)
-                TransactionAttribute.REQUIRES_NEW -> transactionOperator.requiresNew(transactionProperty, block)
+                TransactionAttribute.REQUIRED -> required(transactionProperty, block)
+                TransactionAttribute.REQUIRES_NEW -> requiresNew(transactionProperty, block)
             }
         }
     }
