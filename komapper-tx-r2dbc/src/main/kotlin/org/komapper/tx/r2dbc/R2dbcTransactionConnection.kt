@@ -29,3 +29,7 @@ internal class R2dbcTransactionConnectionImpl(
         return emptyFlow<Void>().asPublisher()
     }
 }
+
+fun R2dbcTransactionConnection(connection: Connection): R2dbcTransactionConnection {
+    return R2dbcTransactionConnectionImpl(connection)
+}

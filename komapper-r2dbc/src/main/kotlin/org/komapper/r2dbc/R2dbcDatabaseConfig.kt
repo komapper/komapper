@@ -33,10 +33,15 @@ interface R2dbcDatabaseConfig : DatabaseConfig {
      * The session to the database.
      */
     val session: R2dbcSession
+
+    /**
+     * The connection factory.
+     */
+    val connectionFactory: ConnectionFactory
 }
 
 open class DefaultR2dbcDatabaseConfig(
-    connectionFactory: ConnectionFactory,
+    override val connectionFactory: ConnectionFactory,
     dialect: R2dbcDialect,
     dataTypeProvider: R2dbcDataTypeProvider? = null,
     clockProvider: ClockProvider = DefaultClockProvider(),
@@ -65,4 +70,5 @@ class SimpleR2dbcDatabaseConfig(
     override val dialect: R2dbcDialect,
     override val session: R2dbcSession,
     override val dataOperator: R2dbcDataOperator,
+    override val connectionFactory: ConnectionFactory
 ) : R2dbcDatabaseConfig

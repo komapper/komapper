@@ -124,6 +124,7 @@ open class KomapperR2dbcAutoConfiguration {
         session: R2dbcSession,
         statementInspector: StatementInspector,
         dataOperator: R2dbcDataOperator,
+        connectionFactory: ConnectionFactory,
         templateStatementBuilder: TemplateStatementBuilder
     ): R2dbcDatabaseConfig {
         return SimpleR2dbcDatabaseConfig(
@@ -136,6 +137,7 @@ open class KomapperR2dbcAutoConfiguration {
             session = session,
             statementInspector = statementInspector,
             dataOperator = dataOperator,
+            connectionFactory = connectionFactory,
             templateStatementBuilder = templateStatementBuilder,
         )
     }

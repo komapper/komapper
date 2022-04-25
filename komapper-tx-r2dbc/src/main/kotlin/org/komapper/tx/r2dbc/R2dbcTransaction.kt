@@ -14,6 +14,11 @@ internal class R2dbcTransactionImpl(
     override val connection: R2dbcTransactionConnection
 ) : R2dbcTransaction {
     override val id: UUID = UUID.randomUUID()
+    @Volatile
     override var isRollbackOnly: Boolean = false
     override fun toString() = "R2dbcTransaction(id=$id, name=$name)"
+}
+
+fun R2dbcTransaction(name: String?, connection: R2dbcTransactionConnection): R2dbcTransaction {
+    return R2dbcTransactionImpl(name, connection)
 }
