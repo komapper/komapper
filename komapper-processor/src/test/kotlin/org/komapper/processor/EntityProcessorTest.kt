@@ -837,6 +837,29 @@ class EntityProcessorTest {
     }
 
     @Test
+    fun `Ignore properties`() {
+        val result = compile(
+            kotlin(
+                "source.kt",
+                """
+                package test
+                import org.komapper.annotation.*
+                @KomapperEntity
+                data class Dept(
+                    @KomapperId val id: Int,
+                    @KomapperIgnore private val foo: String = "", // private
+                    @KomapperIgnore val bar: List<Int> = listOf(1, 2, 3), // type parameters
+                    @KomapperIgnore val baz: Baz? = Baz(1) // value class has nullable property
+                )
+                @JvmInline
+                value class Baz(val value: Int?)
+                """
+            )
+        )
+        assertEquals(result.exitCode, KotlinCompilation.ExitCode.OK)
+    }
+
+    @Test
     fun allow_typealias_for_property() {
         val result = compile(
             kotlin(
