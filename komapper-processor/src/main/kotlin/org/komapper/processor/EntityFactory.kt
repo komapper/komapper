@@ -145,14 +145,16 @@ internal class EntityFactory(config: Config, private val entityDef: EntityDef) {
     }
 
     private fun validateProperty(property: Property) {
-        if (property.isPrivate()) {
-            report("The property must not be private.", property.parameter)
-        }
-        if (property.kotlinClass.declaration.typeParameters.isNotEmpty()) {
-            report("The property type must not have any type parameters.", property.parameter)
-        }
-        if (property.kotlinClass is ValueClass) {
-            validateValueClassProperty(property, property.kotlinClass.property)
+        if (property.kind !is PropertyKind.Ignore) {
+            if (property.isPrivate()) {
+                report("The property must not be private.", property.parameter)
+            }
+            if (property.kotlinClass.declaration.typeParameters.isNotEmpty()) {
+                report("The property type must not have any type parameters.", property.parameter)
+            }
+            if (property.kotlinClass is ValueClass) {
+                validateValueClassProperty(property, property.kotlinClass.property)
+            }
         }
         when (val kind = property.kind) {
             is PropertyKind.Id -> validateIdProperty(property, kind.idKind)
