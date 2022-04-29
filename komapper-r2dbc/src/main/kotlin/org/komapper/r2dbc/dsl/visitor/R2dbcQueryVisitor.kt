@@ -17,6 +17,7 @@ import org.komapper.core.dsl.context.TemplateExecuteContext
 import org.komapper.core.dsl.context.TemplateSelectContext
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
+import org.komapper.core.dsl.query.EntityStore
 import org.komapper.core.dsl.query.Query
 import org.komapper.core.dsl.query.Record
 import org.komapper.core.dsl.query.Row
@@ -88,7 +89,7 @@ object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityStoreQuery(
         context: SelectContext<ENTITY, ID, META>
-    ): R2dbcRunner<*> {
+    ): R2dbcRunner<EntityStore> {
         return R2dbcEntityStoreRunner(context)
     }
 
@@ -187,7 +188,7 @@ object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityUpsertSingleIgnoreQuery(
         context: EntityUpsertContext<ENTITY, ID, META>,
         entity: ENTITY
-    ): R2dbcRunner<*> {
+    ): R2dbcRunner<ENTITY?> {
         return R2dbcEntityUpsertSingleIgnoreRunner(context, entity)
     }
 
@@ -294,7 +295,7 @@ object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
         context: SetOperationContext,
         expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
         collect: suspend (Flow<Pair<A, B>>) -> R
-    ): R2dbcRunner<*> {
+    ): R2dbcRunner<R> {
         val transform = R2dbcRowTransformers.pairNotNullColumns(expressions)
         return R2dbcSetOperationRunner(context, transform, collect)
     }
@@ -373,7 +374,7 @@ object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> relationUpdateQuery(
         context: RelationUpdateContext<ENTITY, ID, META>
-    ): R2dbcRunner<*> {
+    ): R2dbcRunner<Long> {
         return R2dbcRelationUpdateRunner(context)
     }
 
