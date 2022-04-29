@@ -25,14 +25,14 @@ internal class R2dbcEntityUpsertSingleIgnoreRunner<ENTITY : Any, ID : Any, META 
     override suspend fun run(config: R2dbcDatabaseConfig): ENTITY? {
         val newEntity = preUpsert(config, entity)
         val (count, keys) = upsert(config, newEntity)
-        return if (count == 0) null else postUpsert(newEntity, keys)
+        return if (count == 0L) null else postUpsert(newEntity, keys)
     }
 
     private suspend fun preUpsert(config: R2dbcDatabaseConfig, entity: ENTITY): ENTITY {
         return support.preUpsert(config, entity)
     }
 
-    private suspend fun upsert(config: R2dbcDatabaseConfig, entity: ENTITY): Pair<Int, List<Long>> {
+    private suspend fun upsert(config: R2dbcDatabaseConfig, entity: ENTITY): Pair<Long, List<Long>> {
         val statement = runner.buildStatement(config, entity)
         return support.upsert(config, true) { it.executeUpdate(statement) }
     }

@@ -24,8 +24,8 @@ interface EntityUpsertQuery<T> : Query<T> {
 internal data class EntityUpsertSingleQuery<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityUpsertContext<ENTITY, ID, META>,
     private val entity: ENTITY
-) : EntityUpsertQuery<Int> {
-    override fun options(configure: (InsertOptions) -> InsertOptions): EntityUpsertQuery<Int> {
+) : EntityUpsertQuery<Long> {
+    override fun options(configure: (InsertOptions) -> InsertOptions): EntityUpsertQuery<Long> {
         return copy(context = context.copy(configure))
     }
 
@@ -60,8 +60,8 @@ internal data class EntityUpsertSingleIgnoreQuery<ENTITY : Any, ID : Any, META :
 internal data class EntityUpsertMultipleQuery<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityUpsertContext<ENTITY, ID, META>,
     private val entities: List<ENTITY>
-) : EntityUpsertQuery<Int> {
-    override fun options(configure: (InsertOptions) -> InsertOptions): EntityUpsertQuery<Int> {
+) : EntityUpsertQuery<Long> {
+    override fun options(configure: (InsertOptions) -> InsertOptions): EntityUpsertQuery<Long> {
         return copy(context = context.copy(configure))
     }
 
@@ -73,8 +73,8 @@ internal data class EntityUpsertMultipleQuery<ENTITY : Any, ID : Any, META : Ent
 data class EntityUpsertBatchQuery<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityUpsertContext<ENTITY, ID, META>,
     private val entities: List<ENTITY>,
-) : EntityUpsertQuery<List<Int>> {
-    override fun options(configure: (InsertOptions) -> InsertOptions): EntityUpsertQuery<List<Int>> {
+) : EntityUpsertQuery<List<Long>> {
+    override fun options(configure: (InsertOptions) -> InsertOptions): EntityUpsertQuery<List<Long>> {
         return copy(context = context.copy(configure))
     }
 

@@ -32,12 +32,12 @@ internal class JdbcEntityUpdateSingleRunner<ENTITY : Any, ID : Any, META : Entit
         return runner.preUpdate(config, entity)
     }
 
-    private fun update(config: JdbcDatabaseConfig, entity: ENTITY): Pair<Int, List<Long>> {
+    private fun update(config: JdbcDatabaseConfig, entity: ENTITY): Pair<Long, List<Long>> {
         val statement = runner.buildStatement(config, entity)
         return support.update(config) { it.executeUpdate(statement) }
     }
 
-    private fun postUpdate(entity: ENTITY, count: Int): ENTITY {
+    private fun postUpdate(entity: ENTITY, count: Long): ENTITY {
         return runner.postUpdate(entity, count)
     }
 

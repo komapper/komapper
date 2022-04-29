@@ -10,7 +10,7 @@ import org.komapper.jdbc.JdbcExecutor
 
 internal class JdbcRelationUpdateRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: RelationUpdateContext<ENTITY, ID, META>,
-) : JdbcRunner<Int> {
+) : JdbcRunner<Long> {
 
     private val runner: RelationUpdateRunner<ENTITY, ID, META> = RelationUpdateRunner(context)
 
@@ -18,7 +18,7 @@ internal class JdbcRelationUpdateRunner<ENTITY : Any, ID : Any, META : EntityMet
         runner.check(config)
     }
 
-    override fun run(config: JdbcDatabaseConfig): Int {
+    override fun run(config: JdbcDatabaseConfig): Long {
         val clock = config.clockProvider.now()
         val updatedAtAssignment = context.target.updatedAtAssignment(clock)
         val result = runner.buildStatement(config, updatedAtAssignment)

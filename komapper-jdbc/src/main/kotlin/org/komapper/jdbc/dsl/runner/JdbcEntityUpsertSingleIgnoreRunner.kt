@@ -25,14 +25,14 @@ internal class JdbcEntityUpsertSingleIgnoreRunner<ENTITY : Any, ID : Any, META :
     override fun run(config: JdbcDatabaseConfig): ENTITY? {
         val newEntity = preUpsert(config, entity)
         val (count, keys) = upsert(config, newEntity)
-        return if (count == 0) null else postUpsert(newEntity, keys)
+        return if (count == 0L) null else postUpsert(newEntity, keys)
     }
 
     private fun preUpsert(config: JdbcDatabaseConfig, entity: ENTITY): ENTITY {
         return support.preUpsert(config, entity)
     }
 
-    private fun upsert(config: JdbcDatabaseConfig, entity: ENTITY): Pair<Int, List<Long>> {
+    private fun upsert(config: JdbcDatabaseConfig, entity: ENTITY): Pair<Long, List<Long>> {
         val statement = runner.buildStatement(config, entity)
         return support.upsert(config, true) { it.executeUpdate(statement) }
     }

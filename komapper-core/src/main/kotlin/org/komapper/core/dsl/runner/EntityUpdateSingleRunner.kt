@@ -29,7 +29,7 @@ class EntityUpdateSingleRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<EN
         return support.preUpdate(config, entity)
     }
 
-    fun postUpdate(entity: ENTITY, count: Int): ENTITY {
+    fun postUpdate(entity: ENTITY, count: Long): ENTITY {
         return support.postUpdate(entity, count)
     }
 }

@@ -63,7 +63,7 @@ class RelationInsertValuesRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<
         } else null
     }
 
-    fun postInsertUsingAutoIncrement(count: Int, keys: List<Long>): Pair<Int, ID?> {
+    fun postInsertUsingAutoIncrement(count: Long, keys: List<Long>): Pair<Long, ID?> {
         val id = keys.firstOrNull()?.let { context.target.convertToId(it) }
         return count to id
     }

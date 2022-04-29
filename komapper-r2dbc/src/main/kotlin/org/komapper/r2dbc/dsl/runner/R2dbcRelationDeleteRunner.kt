@@ -10,11 +10,11 @@ import org.komapper.r2dbc.R2dbcExecutor
 
 internal class R2dbcRelationDeleteRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: RelationDeleteContext<ENTITY, ID, META>,
-) : R2dbcRunner<Int> {
+) : R2dbcRunner<Long> {
 
     private val runner: RelationDeleteRunner<ENTITY, ID, META> = RelationDeleteRunner(context)
 
-    override suspend fun run(config: R2dbcDatabaseConfig): Int {
+    override suspend fun run(config: R2dbcDatabaseConfig): Long {
         val statement = runner.buildStatement(config)
         val executor = R2dbcExecutor(config, context.options)
         val (count) = executor.executeUpdate(statement)

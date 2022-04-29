@@ -11,7 +11,7 @@ import org.komapper.jdbc.JdbcExecutor
 
 internal class JdbcRelationInsertSelectRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: RelationInsertSelectContext<ENTITY, ID, META>,
-) : JdbcRunner<Pair<Int, List<ID>>> {
+) : JdbcRunner<Pair<Long, List<ID>>> {
 
     private val runner: RelationInsertSelectRunner<ENTITY, ID, META> = RelationInsertSelectRunner(context)
 
@@ -19,7 +19,7 @@ internal class JdbcRelationInsertSelectRunner<ENTITY : Any, ID : Any, META : Ent
         runner.check(config)
     }
 
-    override fun run(config: JdbcDatabaseConfig): Pair<Int, List<ID>> {
+    override fun run(config: JdbcDatabaseConfig): Pair<Long, List<ID>> {
         val statement = runner.buildStatement(config)
         val generatedColumn = if (context.options.returnGeneratedKeys) {
             context.target.getAutoIncrementProperty()?.columnName

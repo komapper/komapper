@@ -32,7 +32,7 @@ internal class JdbcEntityUpsertSingleUpdateRunner<ENTITY : Any, ID : Any, META :
         return support.preUpsert(config, entity)
     }
 
-    private fun upsert(config: JdbcDatabaseConfig, entity: ENTITY): Pair<Int, List<Long>> {
+    private fun upsert(config: JdbcDatabaseConfig, entity: ENTITY): Pair<Long, List<Long>> {
         val statement = runner.buildStatement(config, entity)
         return support.upsert(config, true) { it.executeUpdate(statement) }
     }

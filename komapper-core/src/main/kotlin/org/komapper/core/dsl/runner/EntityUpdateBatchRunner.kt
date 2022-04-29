@@ -34,7 +34,7 @@ class EntityUpdateBatchRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENT
         return support.preUpdate(config, entity)
     }
 
-    fun postUpdate(entities: List<ENTITY>, counts: List<Int>): List<ENTITY> {
+    fun postUpdate(entities: List<ENTITY>, counts: List<Long>): List<ENTITY> {
         val iterator = counts.iterator()
         return entities.mapIndexed { index, entity ->
             val count = if (iterator.hasNext()) {

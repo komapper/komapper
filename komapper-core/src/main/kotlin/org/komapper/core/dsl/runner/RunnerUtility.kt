@@ -20,11 +20,11 @@ fun checkWhereClause(whereProvider: WhereProvider) {
 
 fun checkOptimisticLock(
     option: OptimisticLockOptions,
-    count: Int,
+    count: Long,
     index: Int?
 ) {
     if (!option.disableOptimisticLock && !option.suppressOptimisticLockException) {
-        if (count != 1) {
+        if (count != 1L) {
             val message = if (index == null) {
                 "count=$count"
             } else {

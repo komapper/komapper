@@ -32,7 +32,7 @@ internal class JdbcEntityInsertSingleRunner<ENTITY : Any, ID : Any, META : Entit
         return support.preInsert(config, entity)
     }
 
-    private fun insert(config: JdbcDatabaseConfig, entity: ENTITY): Pair<Int, List<Long>> {
+    private fun insert(config: JdbcDatabaseConfig, entity: ENTITY): Pair<Long, List<Long>> {
         val statement = runner.buildStatement(config, entity)
         return support.insert(config, true) { it.executeUpdate(statement) }
     }

@@ -32,7 +32,7 @@ interface InsertOnDuplicateKeyUpdateQueryBuilder<ENTITY : Any, ID : Any, META : 
      * @param entity the entity to be inserted or updated
      * @return the query
      */
-    fun single(entity: ENTITY): EntityUpsertQuery<Int>
+    fun single(entity: ENTITY): EntityUpsertQuery<Long>
 
     /**
      * Builds a query to bulk insert or update a list of entities.
@@ -40,7 +40,7 @@ interface InsertOnDuplicateKeyUpdateQueryBuilder<ENTITY : Any, ID : Any, META : 
      * @param entities the entities to be inserted or updated
      * @return the query
      */
-    fun multiple(entities: List<ENTITY>): EntityUpsertQuery<Int>
+    fun multiple(entities: List<ENTITY>): EntityUpsertQuery<Long>
 
     /**
      * Builds a query to bulk insert or update an array of entities.
@@ -48,7 +48,7 @@ interface InsertOnDuplicateKeyUpdateQueryBuilder<ENTITY : Any, ID : Any, META : 
      * @param entities the entities to be inserted or updated
      * @return the query
      */
-    fun multiple(vararg entities: ENTITY): EntityUpsertQuery<Int>
+    fun multiple(vararg entities: ENTITY): EntityUpsertQuery<Long>
 
     /**
      * Builds a query to insert or update a list of entities in a batch.
@@ -56,7 +56,7 @@ interface InsertOnDuplicateKeyUpdateQueryBuilder<ENTITY : Any, ID : Any, META : 
      * @param entities the entities to be inserted or updated
      * @return the query
      */
-    fun batch(entities: List<ENTITY>, batchSize: Int? = null): EntityUpsertQuery<List<Int>>
+    fun batch(entities: List<ENTITY>, batchSize: Int? = null): EntityUpsertQuery<List<Long>>
 
     /**
      * Builds a query to insert or update an array of entities in a batch.
@@ -64,7 +64,7 @@ interface InsertOnDuplicateKeyUpdateQueryBuilder<ENTITY : Any, ID : Any, META : 
      * @param entities the entities to be inserted or updated
      * @return the query
      */
-    fun batch(vararg entities: ENTITY, batchSize: Int? = null): EntityUpsertQuery<List<Int>>
+    fun batch(vararg entities: ENTITY, batchSize: Int? = null): EntityUpsertQuery<List<Long>>
 
     /**
      * Builds a query to insert or update a single entity and get the result as a new entity.
@@ -86,23 +86,23 @@ internal data class InsertOnDuplicateKeyUpdateQueryBuilderImpl<ENTITY : Any, ID 
         return copy(context = newContext)
     }
 
-    override fun single(entity: ENTITY): EntityUpsertQuery<Int> {
+    override fun single(entity: ENTITY): EntityUpsertQuery<Long> {
         return builder.single(entity)
     }
 
-    override fun multiple(entities: List<ENTITY>): EntityUpsertQuery<Int> {
+    override fun multiple(entities: List<ENTITY>): EntityUpsertQuery<Long> {
         return builder.multiple(entities)
     }
 
-    override fun multiple(vararg entities: ENTITY): EntityUpsertQuery<Int> {
+    override fun multiple(vararg entities: ENTITY): EntityUpsertQuery<Long> {
         return builder.multiple(entities.toList())
     }
 
-    override fun batch(entities: List<ENTITY>, batchSize: Int?): EntityUpsertQuery<List<Int>> {
+    override fun batch(entities: List<ENTITY>, batchSize: Int?): EntityUpsertQuery<List<Long>> {
         return builder.batch(entities, batchSize)
     }
 
-    override fun batch(vararg entities: ENTITY, batchSize: Int?): EntityUpsertQuery<List<Int>> {
+    override fun batch(vararg entities: ENTITY, batchSize: Int?): EntityUpsertQuery<List<Long>> {
         return builder.batch(entities.toList(), batchSize)
     }
 

@@ -21,7 +21,7 @@ internal class EntityUpdateRunnerSupport<ENTITY : Any, ID : Any, META : EntityMe
         return context.target.preUpdate(entity, clock)
     }
 
-    internal fun postUpdate(entity: ENTITY, count: Int, index: Int? = null): ENTITY {
+    internal fun postUpdate(entity: ENTITY, count: Long, index: Int? = null): ENTITY {
         if (context.target.versionProperty() != null) {
             checkOptimisticLock(context.options, count, index)
         }

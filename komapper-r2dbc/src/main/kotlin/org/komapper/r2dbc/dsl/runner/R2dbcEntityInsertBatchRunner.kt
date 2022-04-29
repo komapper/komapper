@@ -33,7 +33,7 @@ internal class R2dbcEntityInsertBatchRunner<ENTITY : Any, ID : Any, META : Entit
         return entities.map { support.preInsert(config, it) }
     }
 
-    private suspend fun insert(config: R2dbcDatabaseConfig, entities: List<ENTITY>): List<Pair<Int, Long?>> {
+    private suspend fun insert(config: R2dbcDatabaseConfig, entities: List<ENTITY>): List<Pair<Long, Long?>> {
         val statements = entities.map { runner.buildStatement(config, it) }
         return support.insert(config, true) { it.executeBatch(statements) }
     }

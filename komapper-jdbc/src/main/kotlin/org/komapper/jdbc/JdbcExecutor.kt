@@ -69,7 +69,7 @@ internal class JdbcExecutor(
         }
     }
 
-    fun executeUpdate(statement: Statement): Pair<Int, List<Long>> {
+    fun executeUpdate(statement: Statement): Pair<Long, List<Long>> {
         return withExceptionTranslator {
             @Suppress("NAME_SHADOWING")
             val statement = inspect(statement)
@@ -84,13 +84,13 @@ internal class JdbcExecutor(
                     } else {
                         fetchGeneratedKeys(ps)
                     }
-                    count to keys
+                    count.toLong() to keys
                 }
             }
         }
     }
 
-    fun executeBatch(statements: List<Statement>): List<Pair<Int, Long?>> {
+    fun executeBatch(statements: List<Statement>): List<Pair<Long, Long?>> {
         require(statements.isNotEmpty())
         return withExceptionTranslator {
             @Suppress("NAME_SHADOWING")
@@ -98,7 +98,7 @@ internal class JdbcExecutor(
             config.session.useConnection { con ->
                 prepare(con, statements.first()).use { ps ->
                     setUp(ps)
-                    val countAndKeyList = mutableListOf<Pair<Int, Long?>>()
+                    val countAndKeyList = mutableListOf<Pair<Long, Long?>>()
                     val batchSize = executionOptions.getValidBatchSize()
                     val batchStatementsList = statements.chunked(batchSize)
                     for (batchStatements in batchStatementsList) {
@@ -111,11 +111,11 @@ internal class JdbcExecutor(
                         }
                         val counts = ps.executeBatch()
                         val pairs = if (generatedColumn == null) {
-                            counts.map { it to null }
+                            counts.map { it.toLong() to null }
                         } else {
                             val keys = fetchGeneratedKeys(ps)
                             check(counts.size == keys.size) { "counts.size=${counts.size}, keys.size=${keys.size}" }
-                            counts.zip(keys)
+                            counts.zip(keys) { a, b -> a.toLong() to b }
                         }
                         countAndKeyList.addAll(pairs)
                     }

@@ -29,12 +29,12 @@ internal class JdbcEntityDeleteBatchRunner<ENTITY : Any, ID : Any, META : Entity
         postDelete(batchResults.map { it.first })
     }
 
-    private fun delete(config: JdbcDatabaseConfig): List<Pair<Int, Long?>> {
+    private fun delete(config: JdbcDatabaseConfig): List<Pair<Long, Long?>> {
         val statements = entities.map { runner.buildStatement(config, it) }
         return support.delete(config) { it.executeBatch(statements) }
     }
 
-    private fun postDelete(counts: List<Int>) {
+    private fun postDelete(counts: List<Long>) {
         runner.postDelete(counts)
     }
 

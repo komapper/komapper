@@ -53,8 +53,8 @@ internal class R2dbcExecutor(
         }
     }
 
-    suspend fun executeUpdate(statement: Statement): Pair<Int, List<Long>> {
-        return flow<Pair<Int, List<Long>>> {
+    suspend fun executeUpdate(statement: Statement): Pair<Long, List<Long>> {
+        return flow<Pair<Long, List<Long>>> {
             @Suppress("NAME_SHADOWING")
             val statement = inspect(statement)
             config.session.useConnection { con ->
@@ -64,10 +64,12 @@ internal class R2dbcExecutor(
                 bind(r2dbcStmt, statement)
                 r2dbcStmt.execute().collect { result ->
                     if (generatedColumn == null) {
-                        result.rowsUpdated.collect { count -> emit(count to emptyList()) }
+                        result.rowsUpdated.collect { count: Number ->
+                            emit(count.toLong() to emptyList())
+                        }
                     } else {
                         val keys = fetchGeneratedKeys(result).asFlow().toList()
-                        emit(keys.size to keys)
+                        emit(keys.size.toLong() to keys)
                     }
                 }
             }
@@ -76,7 +78,7 @@ internal class R2dbcExecutor(
         }.single()
     }
 
-    suspend fun executeBatch(statements: List<Statement>): List<Pair<Int, Long?>> {
+    suspend fun executeBatch(statements: List<Statement>): List<Pair<Long, Long?>> {
         require(statements.isNotEmpty())
         return flow {
             @Suppress("NAME_SHADOWING")
@@ -98,9 +100,13 @@ internal class R2dbcExecutor(
                     }
                     r2dbcStmt.execute().collect { result ->
                         if (generatedColumn == null) {
-                            result.rowsUpdated.collect { count -> emit(count to null) }
+                            result.rowsUpdated.collect { count: Number ->
+                                emit(count.toLong() to null)
+                            }
                         } else {
-                            fetchGeneratedKeys(result).collect { key -> emit(1 to key) }
+                            fetchGeneratedKeys(result).collect { key ->
+                                emit(1L to key)
+                            }
                         }
                     }
                 }
@@ -127,8 +133,8 @@ internal class R2dbcExecutor(
                             is Result.Message -> predicate(it)
                             else -> true
                         }
-                    }.rowsUpdated.collect {
-                        emit(it)
+                    }.rowsUpdated.collect { count: Number ->
+                        emit(count.toLong())
                     }
                 }
             }

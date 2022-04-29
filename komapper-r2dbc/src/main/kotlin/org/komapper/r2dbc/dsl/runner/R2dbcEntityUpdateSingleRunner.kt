@@ -32,12 +32,12 @@ internal class R2dbcEntityUpdateSingleRunner<ENTITY : Any, ID : Any, META : Enti
         return runner.preUpdate(config, entity)
     }
 
-    private suspend fun update(config: R2dbcDatabaseConfig, entity: ENTITY): Pair<Int, List<Long>> {
+    private suspend fun update(config: R2dbcDatabaseConfig, entity: ENTITY): Pair<Long, List<Long>> {
         val statement = runner.buildStatement(config, entity)
         return support.update(config) { it.executeUpdate(statement) }
     }
 
-    private fun postUpdate(entity: ENTITY, count: Int): ENTITY {
+    private fun postUpdate(entity: ENTITY, count: Long): ENTITY {
         return runner.postUpdate(entity, count)
     }
 

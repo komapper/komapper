@@ -79,7 +79,7 @@ interface InsertQueryBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTI
      * @param subquery the subquery expression
      * @return the query
      */
-    fun select(subquery: SubqueryExpression<ENTITY>): RelationInsertQuery<ENTITY, ID, META, Pair<Int, List<ID>>>
+    fun select(subquery: SubqueryExpression<ENTITY>): RelationInsertQuery<ENTITY, ID, META, Pair<Long, List<ID>>>
 
     /**
      * Builds a query with a SELECT clause.
@@ -87,7 +87,7 @@ interface InsertQueryBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTI
      * @param block the block that returns a subquery expression
      * @return the query
      */
-    fun select(block: () -> SubqueryExpression<ENTITY>): RelationInsertQuery<ENTITY, ID, META, Pair<Int, List<ID>>>
+    fun select(block: () -> SubqueryExpression<ENTITY>): RelationInsertQuery<ENTITY, ID, META, Pair<Long, List<ID>>>
 
     /**
      * Builds a query with a VALUES clause.
@@ -95,7 +95,7 @@ interface InsertQueryBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTI
      * @param declaration the assignment declaration
      * @return the query
      */
-    fun values(declaration: AssignmentDeclaration<ENTITY, META>): RelationInsertQuery<ENTITY, ID, META, Pair<Int, ID?>>
+    fun values(declaration: AssignmentDeclaration<ENTITY, META>): RelationInsertQuery<ENTITY, ID, META, Pair<Long, ID?>>
 }
 
 internal data class InsertQueryBuilderImpl<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
@@ -136,17 +136,17 @@ internal data class InsertQueryBuilderImpl<ENTITY : Any, ID : Any, META : Entity
         return batch(entities.toList(), batchSize)
     }
 
-    override fun select(subquery: SubqueryExpression<ENTITY>): RelationInsertQuery<ENTITY, ID, META, Pair<Int, List<ID>>> {
+    override fun select(subquery: SubqueryExpression<ENTITY>): RelationInsertQuery<ENTITY, ID, META, Pair<Long, List<ID>>> {
         val newContext = context.asRelationInsertSelectContext(subquery)
         return RelationInsertSelectQuery(newContext)
     }
 
-    override fun select(block: () -> SubqueryExpression<ENTITY>): RelationInsertQuery<ENTITY, ID, META, Pair<Int, List<ID>>> {
+    override fun select(block: () -> SubqueryExpression<ENTITY>): RelationInsertQuery<ENTITY, ID, META, Pair<Long, List<ID>>> {
         val newContext = context.asRelationInsertSelectContext(block())
         return RelationInsertSelectQuery(newContext)
     }
 
-    override fun values(declaration: AssignmentDeclaration<ENTITY, META>): RelationInsertQuery<ENTITY, ID, META, Pair<Int, ID?>> {
+    override fun values(declaration: AssignmentDeclaration<ENTITY, META>): RelationInsertQuery<ENTITY, ID, META, Pair<Long, ID?>> {
         val newContext = context.asRelationInsertValuesContext(declaration)
         return RelationInsertValuesQuery(newContext)
     }

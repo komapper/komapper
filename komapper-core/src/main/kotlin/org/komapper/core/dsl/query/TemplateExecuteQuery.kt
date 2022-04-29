@@ -9,7 +9,7 @@ import org.komapper.core.dsl.visitor.QueryVisitor
  * Represents a query to execute an arbitrary command using sql template.
  * This query returns the number of rows affected.
  */
-interface TemplateExecuteQuery : Query<Int>, TemplateBinder<TemplateExecuteQuery> {
+interface TemplateExecuteQuery : Query<Long>, TemplateBinder<TemplateExecuteQuery> {
     /**
      * Builds a query with the options applied.
      *

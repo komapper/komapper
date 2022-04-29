@@ -11,7 +11,7 @@ import org.komapper.core.dsl.visitor.QueryVisitor
  * Represents a query to delete rows.
  * This query returns the number of rows affected.
  */
-interface RelationDeleteQuery : Query<Int> {
+interface RelationDeleteQuery : Query<Long> {
     /**
      * Builds a query with a WHERE clause.
      *

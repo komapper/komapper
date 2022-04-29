@@ -16,7 +16,7 @@ internal class EntityDeleteRunnerSupport<ENTITY : Any, ID : Any, META : EntityMe
         return builder.build()
     }
 
-    internal fun postDelete(count: Int, index: Int? = null) {
+    internal fun postDelete(count: Long, index: Int? = null) {
         if (context.target.versionProperty() != null) {
             checkOptimisticLock(context.options, count, index)
         }

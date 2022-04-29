@@ -112,9 +112,9 @@ class JdbcInsertBatchTest(private val db: JdbcDatabase) {
         val query = QueryDsl.insert(d).onDuplicateKeyUpdate().batch(department1, department2)
         val counts = db.runQuery { query }
         when (db.config.dialect.driver) {
-            "mariadb" -> assertEquals(listOf(Statement.SUCCESS_NO_INFO, Statement.SUCCESS_NO_INFO), counts)
-            "mysql" -> assertEquals(listOf(1, 2), counts)
-            else -> assertEquals(listOf(1, 1), counts)
+            "mariadb" -> assertEquals(listOf(Statement.SUCCESS_NO_INFO.toLong(), Statement.SUCCESS_NO_INFO.toLong()), counts)
+            "mysql" -> assertEquals(listOf(1L, 2L), counts)
+            else -> assertEquals(listOf(1L, 1L), counts)
         }
         val list = db.runQuery {
             QueryDsl.from(d).where { d.departmentId inList listOf(1, 5) }.orderBy(d.departmentId)
@@ -134,9 +134,9 @@ class JdbcInsertBatchTest(private val db: JdbcDatabase) {
         val query = QueryDsl.insert(d).onDuplicateKeyUpdate(d.departmentNo).batch(department1, department2)
         val counts = db.runQuery { query }
         when (db.config.dialect.driver) {
-            "mariadb" -> assertEquals(listOf(Statement.SUCCESS_NO_INFO, Statement.SUCCESS_NO_INFO), counts)
-            "mysql" -> assertEquals(listOf(1, 2), counts)
-            else -> assertEquals(listOf(1, 1), counts)
+            "mariadb" -> assertEquals(listOf(Statement.SUCCESS_NO_INFO.toLong(), Statement.SUCCESS_NO_INFO.toLong()), counts)
+            "mysql" -> assertEquals(listOf(1L, 2L), counts)
+            else -> assertEquals(listOf(1L, 1L), counts)
         }
         val list = db.runQuery {
             QueryDsl.from(d).where { d.departmentNo inList listOf(10, 50) }.orderBy(d.departmentNo)
@@ -160,8 +160,8 @@ class JdbcInsertBatchTest(private val db: JdbcDatabase) {
             }.batch(listOf(department1, department2))
         val counts = db.runQuery { query }
         when (db.config.dialect.driver) {
-            "mysql", "mariadb" -> assertEquals(listOf(1, 2), counts)
-            else -> assertEquals(listOf(1, 1), counts)
+            "mysql", "mariadb" -> assertEquals(listOf(1L, 2L), counts)
+            else -> assertEquals(listOf(1L, 1L), counts)
         }
         val list = db.runQuery {
             QueryDsl.from(d).where { d.departmentId inList listOf(1, 5) }.orderBy(d.departmentId)
@@ -185,8 +185,8 @@ class JdbcInsertBatchTest(private val db: JdbcDatabase) {
             }.batch(department1, department2)
         val counts = db.runQuery { query }
         when (db.config.dialect.driver) {
-            "mysql", "mariadb" -> assertEquals(listOf(1, 2), counts)
-            else -> assertEquals(listOf(1, 1), counts)
+            "mysql", "mariadb" -> assertEquals(listOf(1L, 2L), counts)
+            else -> assertEquals(listOf(1L, 1L), counts)
         }
         val list = db.runQuery {
             QueryDsl.from(d).where { d.departmentNo inList listOf(10, 50) }.orderBy(d.departmentNo)
@@ -206,8 +206,8 @@ class JdbcInsertBatchTest(private val db: JdbcDatabase) {
         val query = QueryDsl.insert(d).onDuplicateKeyIgnore().batch(listOf(department1, department2))
         val counts = db.runQuery { query }
         when (db.config.dialect.driver) {
-            "mariadb" -> assertEquals(listOf(Statement.SUCCESS_NO_INFO, Statement.SUCCESS_NO_INFO), counts)
-            else -> assertEquals(listOf(1, 0), counts)
+            "mariadb" -> assertEquals(listOf(Statement.SUCCESS_NO_INFO.toLong(), Statement.SUCCESS_NO_INFO.toLong()), counts)
+            else -> assertEquals(listOf(1L, 0L), counts)
         }
         val list = db.runQuery {
             QueryDsl.from(d).where { d.departmentId inList listOf(1, 5) }.orderBy(d.departmentId)
@@ -227,8 +227,8 @@ class JdbcInsertBatchTest(private val db: JdbcDatabase) {
         val query = QueryDsl.insert(d).onDuplicateKeyIgnore(d.departmentNo).batch(listOf(department1, department2))
         val counts = db.runQuery { query }
         when (db.config.dialect.driver) {
-            "mariadb" -> assertEquals(listOf(Statement.SUCCESS_NO_INFO, Statement.SUCCESS_NO_INFO), counts)
-            else -> assertEquals(listOf(1, 0), counts)
+            "mariadb" -> assertEquals(listOf(Statement.SUCCESS_NO_INFO.toLong(), Statement.SUCCESS_NO_INFO.toLong()), counts)
+            else -> assertEquals(listOf(1L, 0L), counts)
         }
         val list = db.runQuery {
             QueryDsl.from(d).where { d.departmentNo inList listOf(10, 50) }.orderBy(d.departmentNo)
@@ -251,8 +251,8 @@ class JdbcInsertBatchTest(private val db: JdbcDatabase) {
         val query = QueryDsl.insert(i).onDuplicateKeyUpdate().batch(strategies)
         val counts = db.runQuery { query }
         when (db.config.dialect.driver) {
-            "mariadb" -> assertEquals(listOf(Statement.SUCCESS_NO_INFO, Statement.SUCCESS_NO_INFO, 1), counts)
-            else -> assertEquals(listOf(1, 1, 1), counts)
+            "mariadb" -> assertEquals(listOf(Statement.SUCCESS_NO_INFO.toLong(), Statement.SUCCESS_NO_INFO.toLong(), 1L), counts)
+            else -> assertEquals(listOf(1L, 1L, 1L), counts)
         }
     }
 }

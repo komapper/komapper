@@ -16,7 +16,7 @@ import org.komapper.core.dsl.visitor.QueryVisitor
  * @param ID the entity id type
  * @param META the entity metamodel type
  */
-interface RelationUpdateQuery<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> : Query<Int> {
+interface RelationUpdateQuery<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> : Query<Long> {
     /**
      * Builds a query with a SET clause.
      *
