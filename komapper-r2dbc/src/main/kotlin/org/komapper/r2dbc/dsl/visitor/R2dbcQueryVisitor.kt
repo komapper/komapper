@@ -48,7 +48,7 @@ import org.komapper.r2dbc.dsl.runner.R2dbcSetOperationRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcTemplateExecuteRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcTemplateSelectRunner
 
-internal object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
+object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
 
     @Suppress("UNCHECKED_CAST")
     override fun <T, S> andThenQuery(left: Query<T>, right: Query<S>): R2dbcRunner<S> {

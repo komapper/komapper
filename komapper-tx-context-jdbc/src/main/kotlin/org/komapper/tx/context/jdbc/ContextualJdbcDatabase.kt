@@ -1,5 +1,6 @@
 package org.komapper.tx.context.jdbc
 
+import org.komapper.core.Database
 import org.komapper.core.dsl.query.Query
 import org.komapper.core.dsl.query.QueryScope
 import org.komapper.jdbc.JdbcDataFactory
@@ -14,9 +15,7 @@ import org.komapper.tx.core.TransactionOperator
 import org.komapper.tx.core.TransactionProperty
 import java.sql.Connection
 
-interface CoroutineAwareJdbcDatabase {
-
-    val config: JdbcDatabaseConfig
+interface ContextualJdbcDatabase : Database {
 
     val dataFactory: JdbcDataFactory
 
@@ -25,7 +24,7 @@ interface CoroutineAwareJdbcDatabase {
      * @param query the query
      * @return the result represented by the query
      */
-    context(CoroutineJdbcContext)
+    context(JdbcContext)
     fun <T> runQuery(query: Query<T>): T
 
     /**
@@ -33,19 +32,19 @@ interface CoroutineAwareJdbcDatabase {
      * @param block the block that returns a query
      * @return the result represented by the query
      */
-    context(CoroutineJdbcContext)
+    context(JdbcContext)
     fun <T> runQuery(block: QueryScope.() -> Query<T>): T
 
-    context(CoroutineJdbcContext)
-    suspend fun <R> required(
+    context(JdbcContext)
+    fun <R> required(
         transactionProperty: TransactionProperty = EmptyTransactionProperty,
-        block: suspend context(CoroutineJdbcContext) (tx: CoroutineAwareJdbcTransactionOperator) -> R
+        block: context(JdbcContext) (tx: ContextualJdbcTransactionOperator) -> R
     ): R
 
-    context(CoroutineJdbcContext)
-    suspend fun <R> requiresNew(
+    context(JdbcContext)
+    fun <R> requiresNew(
         transactionProperty: TransactionProperty = EmptyTransactionProperty,
-        block: suspend context(CoroutineJdbcContext) (tx: CoroutineAwareJdbcTransactionOperator) -> R
+        block: context(JdbcContext) (tx: ContextualJdbcTransactionOperator) -> R
     ): R
 
     /**
@@ -57,20 +56,20 @@ interface CoroutineAwareJdbcDatabase {
      * @param block the block executed in the transaction
      * @return the result of the block
      */
-    suspend fun <R> withTransaction(
+    fun <R> withTransaction(
         transactionAttribute: TransactionAttribute = TransactionAttribute.REQUIRED,
         transactionProperty: TransactionProperty = EmptyTransactionProperty,
-        block: suspend context(CoroutineJdbcContext) (tx: CoroutineAwareJdbcTransactionOperator) -> R
+        block: context(JdbcContext) (tx: ContextualJdbcTransactionOperator) -> R
     ): R
 
     fun unwrap(): JdbcDatabase
 }
 
-internal class CoroutineAwareJdbcDatabaseImpl(
+internal class ContextualJdbcDatabaseImpl(
     private val database: JdbcDatabase,
-    private val transactionManager: ContextAwareJdbcTransactionManager,
-    private val transactionOperator: CoroutineAwareJdbcTransactionOperator
-) : CoroutineAwareJdbcDatabase {
+    private val transactionManager: ContextualJdbcTransactionManager,
+    private val transactionOperator: ContextualJdbcTransactionOperator
+) : ContextualJdbcDatabase {
 
     override val config: JdbcDatabaseConfig
         get() = database.config
@@ -78,7 +77,7 @@ internal class CoroutineAwareJdbcDatabaseImpl(
     override val dataFactory: JdbcDataFactory
         get() = database.dataFactory
 
-    context(CoroutineJdbcContext)
+    context(JdbcContext)
     override fun <T> runQuery(query: Query<T>): T {
         val runtimeConfig = object : JdbcDatabaseConfig by config {
             override val session: JdbcSession = object : JdbcSession {
@@ -101,32 +100,33 @@ internal class CoroutineAwareJdbcDatabaseImpl(
         return runner.run(runtimeConfig)
     }
 
-    context(CoroutineJdbcContext)
+    context(JdbcContext)
     override fun <T> runQuery(block: QueryScope.() -> Query<T>): T {
         val query = block(QueryScope)
         return runQuery(query)
     }
 
-    context(CoroutineJdbcContext) override suspend fun <R> required(
+    context(JdbcContext) override fun <R> required(
         transactionProperty: TransactionProperty,
-        block: suspend context(CoroutineJdbcContext) (tx: CoroutineAwareJdbcTransactionOperator) -> R
+        block: context(JdbcContext) (tx: ContextualJdbcTransactionOperator) -> R
     ): R {
         return transactionOperator.required(transactionProperty, block)
     }
 
-    context(CoroutineJdbcContext) override suspend fun <R> requiresNew(
+    context(JdbcContext) override fun <R> requiresNew(
         transactionProperty: TransactionProperty,
-        block: suspend context(CoroutineJdbcContext) (tx: CoroutineAwareJdbcTransactionOperator) -> R
+        block: context(JdbcContext) (tx: ContextualJdbcTransactionOperator) -> R
     ): R {
         return transactionOperator.requiresNew(transactionProperty, block)
     }
 
-    override suspend fun <R> withTransaction(
+    override fun <R> withTransaction(
         transactionAttribute: TransactionAttribute,
         transactionProperty: TransactionProperty,
-        block: suspend context(CoroutineJdbcContext) (CoroutineAwareJdbcTransactionOperator) -> R
+        block: context(JdbcContext) (ContextualJdbcTransactionOperator) -> R
     ): R {
-        with(CoroutineJdbcContext(this)) {
+        val context = JdbcContext(this)
+        with(context) {
             return when (transactionAttribute) {
                 TransactionAttribute.REQUIRED -> required(transactionProperty, block)
                 TransactionAttribute.REQUIRES_NEW -> requiresNew(transactionProperty, block)
@@ -139,8 +139,8 @@ internal class CoroutineAwareJdbcDatabaseImpl(
     }
 }
 
-fun JdbcDatabase.asCoroutineAwareDatabase(): CoroutineAwareJdbcDatabase {
-    val manager = ContextAwareJdbcTransactionManagerImpl(config.dataSource, config.loggerFacade)
-    val operator = CoroutineAwareJdbcTransactionOperatorImpl(manager)
-    return CoroutineAwareJdbcDatabaseImpl(this, manager, operator)
+fun JdbcDatabase.asContextualDatabase(): ContextualJdbcDatabase {
+    val transactionManager = ContextualJdbcTransactionManagerImpl(config.dataSource, config.loggerFacade)
+    val transactionOperator = ContextualJdbcTransactionOperatorImpl(transactionManager)
+    return ContextualJdbcDatabaseImpl(this, transactionManager, transactionOperator)
 }

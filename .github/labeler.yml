@@ -127,6 +127,9 @@ module/template:
 module/tx-context-jdbc:
   - komapper-tx-context-jdbc/**/*
 
+module/tx-context-r2dbc:
+  - komapper-tx-context-r2dbc/**/*
+
 module/tx-core:
   - komapper-tx-core/**/*
 

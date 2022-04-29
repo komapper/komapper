@@ -14,7 +14,7 @@ interface R2dbcTransactionConnection : Connection {
     override fun close(): Publisher<Void>
 }
 
-internal class R2dbcTransactionConnectionImpl(
+private class R2dbcTransactionConnectionImpl(
     private val connection: Connection,
 ) : Connection by connection, R2dbcTransactionConnection {
 
@@ -28,4 +28,8 @@ internal class R2dbcTransactionConnectionImpl(
     override fun close(): Publisher<Void> {
         return emptyFlow<Void>().asPublisher()
     }
+}
+
+fun R2dbcTransactionConnection(connection: Connection): R2dbcTransactionConnection {
+    return R2dbcTransactionConnectionImpl(connection)
 }

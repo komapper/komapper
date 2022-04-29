@@ -1,4 +1,4 @@
-package org.komapper.tx.r2dbc
+package org.komapper.tx.context.r2dbc
 
 import io.r2dbc.spi.Connection
 import io.r2dbc.spi.ConnectionFactory
@@ -11,84 +11,92 @@ import org.komapper.core.LoggerFacade
 import org.komapper.core.ThreadSafe
 import org.komapper.tx.core.EmptyTransactionProperty
 import org.komapper.tx.core.TransactionProperty
-import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.coroutineContext
+import org.komapper.tx.r2dbc.R2dbcTransaction
+import org.komapper.tx.r2dbc.R2dbcTransactionConnection
+import org.komapper.tx.r2dbc.asDefinition
 
 /**
  * The R2DBC transaction APIs designed for advanced use.
  */
 @ThreadSafe
-interface R2dbcTransactionManager {
+interface ContextualR2dbcTransactionManager {
 
+    context(R2dbcTransactionContext)
     suspend fun getConnection(): Connection
 
     /**
      * This function must not throw any exceptions.
      */
+    context(R2dbcTransactionContext)
     suspend fun isActive(): Boolean
 
     /**
      * This function must not throw any exceptions.
      */
+    context(R2dbcTransactionContext)
     suspend fun isRollbackOnly(): Boolean
 
     /**
      * This function must not throw any exceptions.
      */
+    context(R2dbcTransactionContext)
     suspend fun setRollbackOnly()
 
-    suspend fun begin(transactionProperty: TransactionProperty = EmptyTransactionProperty): CoroutineContext
+    context(R2dbcTransactionContext)
+    suspend fun begin(transactionProperty: TransactionProperty = EmptyTransactionProperty): R2dbcTransactionContext
 
+    context(R2dbcTransactionContext)
     suspend fun commit()
 
-    suspend fun suspend(): CoroutineContext
+    context(R2dbcTransactionContext)
+    suspend fun suspend(): R2dbcTransactionContext
 
+    context(R2dbcTransactionContext)
     suspend fun resume()
 
     /**
      * This function must not throw any exceptions.
      */
+    context(R2dbcTransactionContext)
     suspend fun rollback()
 }
 
-internal class R2dbcTransactionManagerImpl(
+internal class ContextualR2dbcTransactionManagerImpl(
     private val connectionFactory: ConnectionFactory,
     private val loggerFacade: LoggerFacade
-) : R2dbcTransactionManager {
+) : ContextualR2dbcTransactionManager {
 
+    context(R2dbcTransactionContext)
     override suspend fun getConnection(): Connection {
-        val txContext = coroutineContext[TxHolder]
-        return if (txContext?.tx != null) {
-            txContext.tx.connection
-        } else {
-            connectionFactory.create().asFlow().single()
-        }
+        val tx = transaction
+        return tx?.connection ?: connectionFactory.create().asFlow().single()
     }
 
+    context(R2dbcTransactionContext)
     override suspend fun isActive(): Boolean {
-        val txContext = coroutineContext[TxHolder]
-        return txContext?.tx != null
+        return transaction != null
     }
 
+    context(R2dbcTransactionContext)
     override suspend fun isRollbackOnly(): Boolean {
-        val txContext = coroutineContext[TxHolder]
-        return if (txContext?.tx != null) {
-            txContext.tx.isRollbackOnly
-        } else false
+        val tx = transaction
+        return tx?.isRollbackOnly ?: false
     }
 
+    context(R2dbcTransactionContext)
     override suspend fun setRollbackOnly() {
-        val txContext = coroutineContext[TxHolder]
-        if (txContext?.tx != null) {
-            txContext.tx.isRollbackOnly = true
+        val tx = transaction
+        if (tx != null) {
+            tx.isRollbackOnly = true
         }
     }
 
-    override suspend fun begin(transactionProperty: TransactionProperty): CoroutineContext {
-        val currentTxHolder = coroutineContext[TxHolder]
-        if (currentTxHolder?.tx != null) {
-            rollbackInternal(currentTxHolder.tx)
-            error("The transaction \"${currentTxHolder.tx}\" already has begun.")
+    context(R2dbcTransactionContext)
+    override suspend fun begin(transactionProperty: TransactionProperty): R2dbcTransactionContext {
+        val currentTx = transaction
+        if (currentTx != null) {
+            rollbackInternal(currentTx)
+            error("The transaction \"${currentTx}\" already has begun.")
         }
         val tx = connectionFactory.create().asFlow().map { con ->
             val txCon = R2dbcTransactionConnection(con)
@@ -112,23 +120,21 @@ internal class R2dbcTransactionManagerImpl(
                 release(tx)
             }
         }.collect()
-        return TxHolder(tx)
+        return R2dbcTransactionContext(tx)
     }
 
+    context(R2dbcTransactionContext)
     override suspend fun commit() {
-        val txHolder = coroutineContext[TxHolder]
-        if (txHolder?.tx == null) {
-            error("A transaction hasn't yet begun.")
-        }
-        val connection = txHolder.tx.connection
+        val tx = transaction ?: error("A transaction hasn't yet begun.")
+        val connection = tx.connection
         connection.commitTransaction().asFlow()
             .onCompletion { cause ->
-                release(txHolder.tx)
+                release(tx)
                 if (cause == null) {
-                    loggerFacade.commit(txHolder.tx.toString())
+                    loggerFacade.commit(tx.toString())
                 } else {
                     runCatching {
-                        loggerFacade.commitFailed(txHolder.tx.toString(), cause)
+                        loggerFacade.commitFailed(tx.toString(), cause)
                     }.onFailure {
                         cause.addSuppressed(it)
                     }
@@ -136,29 +142,23 @@ internal class R2dbcTransactionManagerImpl(
             }.collect()
     }
 
-    override suspend fun suspend(): CoroutineContext {
-        val txHolder = coroutineContext[TxHolder]
-        if (txHolder?.tx == null) {
-            error("A transaction hasn't yet begun.")
-        }
-        loggerFacade.suspend(txHolder.tx.toString())
-        return TxHolder(null)
+    context(R2dbcTransactionContext)
+    override suspend fun suspend(): R2dbcTransactionContext {
+        val tx = transaction ?: error("A transaction hasn't yet begun.")
+        loggerFacade.suspend(tx.toString())
+        return EmptyR2dbcTransactionContext
     }
 
+    context(R2dbcTransactionContext)
     override suspend fun resume() {
-        val txHolder = coroutineContext[TxHolder]
-        if (txHolder?.tx == null) {
-            error("A transaction is not found.")
-        }
-        loggerFacade.resume(txHolder.tx.toString())
+        val tx = transaction ?: error("A transaction is not found.")
+        loggerFacade.resume(tx.toString())
     }
 
+    context(R2dbcTransactionContext)
     override suspend fun rollback() {
-        val txHolder = coroutineContext[TxHolder]
-        if (txHolder?.tx == null) {
-            return
-        }
-        rollbackInternal(txHolder.tx)
+        val tx = transaction ?: return
+        rollbackInternal(tx)
     }
 
     /**
@@ -187,10 +187,4 @@ internal class R2dbcTransactionManagerImpl(
             tx.connection.dispose()
         }
     }
-}
-
-private data class TxHolder(val tx: R2dbcTransaction?) : CoroutineContext.Element {
-    companion object Key : CoroutineContext.Key<TxHolder>
-
-    override val key: CoroutineContext.Key<TxHolder> = Key
 }

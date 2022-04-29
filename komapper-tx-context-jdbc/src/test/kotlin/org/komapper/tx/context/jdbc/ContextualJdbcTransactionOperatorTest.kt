@@ -14,9 +14,10 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
-internal class ContextAwareJdbcTransactionOperatorTest {
+internal class ContextualJdbcTransactionOperatorTest {
 
     private val dataSource = SimpleDataSource("jdbc:h2:mem://transaction-test;DB_CLOSE_DELAY=-1")
     private val config = object : DefaultJdbcDatabaseConfig(dataSource, JdbcDialects.get("h2")) {
@@ -24,7 +25,29 @@ internal class ContextAwareJdbcTransactionOperatorTest {
             JdbcTransactionSession(dataSource, loggerFacade)
         }
     }
-    private val db = JdbcDatabase(config).asContextAwareDatabase()
+    private val db = JdbcDatabase(config).asContextualDatabase()
+
+    @Test
+    fun contextPropagation() {
+        val a = Meta.address
+        db.withTransaction {
+            contextPropagated()
+        }
+        db.withTransaction {
+            val address = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
+            assertEquals("TOKYO", address.street)
+        }
+    }
+
+    context(JdbcContext)
+    private fun contextPropagated() {
+        val a = Meta.address
+        val tx = transaction
+        assertNotNull(tx)
+        assertFalse(tx.isRollbackOnly)
+        val address = database.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
+        database.runQuery { QueryDsl.update(a).single(address.copy(street = "TOKYO")) }
+    }
 
     @Test
     fun commit() {

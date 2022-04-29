@@ -10,7 +10,7 @@ interface JdbcTransactionConnection : Connection {
     override fun close()
 }
 
-internal class JdbcTransactionConnectionImpl(
+private class JdbcTransactionConnectionImpl(
     private val connection: Connection,
     private val isolationLevelProperty: TransactionProperty.IsolationLevel?,
     private val readOnlyProperty: TransactionProperty.ReadOnly?

@@ -5,7 +5,7 @@ import org.komapper.core.DryRunStatement
 import org.komapper.core.dsl.runner.Runner
 import org.komapper.r2dbc.R2dbcDatabaseConfig
 
-internal sealed interface R2dbcRunner<T> : Runner {
+sealed interface R2dbcRunner<T> : Runner {
     suspend fun run(config: R2dbcDatabaseConfig): T
 
     data class AndThen<LEFT, RIGHT>(
