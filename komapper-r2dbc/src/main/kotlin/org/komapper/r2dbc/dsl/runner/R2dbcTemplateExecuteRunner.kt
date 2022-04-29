@@ -9,7 +9,7 @@ import org.komapper.r2dbc.R2dbcExecutor
 
 internal class R2dbcTemplateExecuteRunner(
     private val context: TemplateExecuteContext
-) : R2dbcRunner<Int> {
+) : R2dbcRunner<Long> {
 
     private val runner = TemplateExecuteRunner(context)
 
@@ -17,7 +17,7 @@ internal class R2dbcTemplateExecuteRunner(
         runner.check(config)
     }
 
-    override suspend fun run(config: R2dbcDatabaseConfig): Int {
+    override suspend fun run(config: R2dbcDatabaseConfig): Long {
         val statement = runner.buildStatement(config)
         val executor = R2dbcExecutor(config, context.options)
         val (count) = executor.executeUpdate(statement)

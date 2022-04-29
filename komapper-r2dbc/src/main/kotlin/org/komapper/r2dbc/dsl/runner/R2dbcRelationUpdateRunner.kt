@@ -10,7 +10,7 @@ import org.komapper.r2dbc.R2dbcExecutor
 
 internal class R2dbcRelationUpdateRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: RelationUpdateContext<ENTITY, ID, META>,
-) : R2dbcRunner<Int> {
+) : R2dbcRunner<Long> {
 
     private val runner: RelationUpdateRunner<ENTITY, ID, META> = RelationUpdateRunner(context)
 
@@ -18,7 +18,7 @@ internal class R2dbcRelationUpdateRunner<ENTITY : Any, ID : Any, META : EntityMe
         runner.check(config)
     }
 
-    override suspend fun run(config: R2dbcDatabaseConfig): Int {
+    override suspend fun run(config: R2dbcDatabaseConfig): Long {
         val clock = config.clockProvider.now()
         val updatedAtAssignment = context.target.updatedAtAssignment(clock)
         val result = runner.buildStatement(config, updatedAtAssignment)

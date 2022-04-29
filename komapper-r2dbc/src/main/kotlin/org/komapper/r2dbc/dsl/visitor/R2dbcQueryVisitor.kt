@@ -17,6 +17,7 @@ import org.komapper.core.dsl.context.TemplateExecuteContext
 import org.komapper.core.dsl.context.TemplateSelectContext
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
+import org.komapper.core.dsl.query.EntityStore
 import org.komapper.core.dsl.query.Query
 import org.komapper.core.dsl.query.Record
 import org.komapper.core.dsl.query.Row
@@ -88,7 +89,7 @@ object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityStoreQuery(
         context: SelectContext<ENTITY, ID, META>
-    ): R2dbcRunner<*> {
+    ): R2dbcRunner<EntityStore> {
         return R2dbcEntityStoreRunner(context)
     }
 
@@ -157,7 +158,7 @@ object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
     entityUpsertBatchQuery(
         context: EntityUpsertContext<ENTITY, ID, META>,
         entities: List<ENTITY>
-    ): R2dbcRunner<List<Int>> {
+    ): R2dbcRunner<List<Long>> {
         return R2dbcEntityUpsertBatchRunner(context, entities)
     }
 
@@ -165,7 +166,7 @@ object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
     entityUpsertMultipleQuery(
         context: EntityUpsertContext<ENTITY, ID, META>,
         entities: List<ENTITY>
-    ): R2dbcRunner<Int> {
+    ): R2dbcRunner<Long> {
         return R2dbcEntityUpsertMultipleRunner(context, entities)
     }
 
@@ -173,7 +174,7 @@ object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
     entityUpsertSingleQuery(
         context: EntityUpsertContext<ENTITY, ID, META>,
         entity: ENTITY,
-    ): R2dbcRunner<Int> {
+    ): R2dbcRunner<Long> {
         return R2dbcEntityUpsertSingleRunner(context, entity)
     }
 
@@ -187,7 +188,7 @@ object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityUpsertSingleIgnoreQuery(
         context: EntityUpsertContext<ENTITY, ID, META>,
         entity: ENTITY
-    ): R2dbcRunner<*> {
+    ): R2dbcRunner<ENTITY?> {
         return R2dbcEntityUpsertSingleIgnoreRunner(context, entity)
     }
 
@@ -294,7 +295,7 @@ object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
         context: SetOperationContext,
         expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
         collect: suspend (Flow<Pair<A, B>>) -> R
-    ): R2dbcRunner<*> {
+    ): R2dbcRunner<R> {
         val transform = R2dbcRowTransformers.pairNotNullColumns(expressions)
         return R2dbcSetOperationRunner(context, transform, collect)
     }
@@ -355,31 +356,31 @@ object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> relationDeleteQuery(
         context: RelationDeleteContext<ENTITY, ID, META>
-    ): R2dbcRunner<Int> {
+    ): R2dbcRunner<Long> {
         return R2dbcRelationDeleteRunner(context)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> relationInsertValuesQuery(
         context: RelationInsertValuesContext<ENTITY, ID, META>
-    ): R2dbcRunner<Pair<Int, ID?>> {
+    ): R2dbcRunner<Pair<Long, ID?>> {
         return R2dbcRelationInsertValuesRunner(context)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> relationInsertSelectQuery(
         context: RelationInsertSelectContext<ENTITY, ID, META>
-    ): R2dbcRunner<Pair<Int, List<ID>>> {
+    ): R2dbcRunner<Pair<Long, List<ID>>> {
         return R2dbcRelationInsertSelectRunner(context)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> relationUpdateQuery(
         context: RelationUpdateContext<ENTITY, ID, META>
-    ): R2dbcRunner<*> {
+    ): R2dbcRunner<Long> {
         return R2dbcRelationUpdateRunner(context)
     }
 
     override fun templateExecuteQuery(
         context: TemplateExecuteContext
-    ): R2dbcRunner<Int> {
+    ): R2dbcRunner<Long> {
         return R2dbcTemplateExecuteRunner(context)
     }
 

@@ -95,7 +95,7 @@ object QueryDsl {
         return DeleteQueryBuilderImpl(EntityDeleteContext(metamodel))
     }
 
-/**
+    /**
      * Creates a builder for constructing a SELECT query.
      *
      * @param sql the sql template

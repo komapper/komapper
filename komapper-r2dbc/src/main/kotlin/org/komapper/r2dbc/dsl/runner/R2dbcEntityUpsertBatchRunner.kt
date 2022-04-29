@@ -10,7 +10,7 @@ import org.komapper.r2dbc.R2dbcDatabaseConfig
 internal class R2dbcEntityUpsertBatchRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     context: EntityUpsertContext<ENTITY, ID, META>,
     private val entities: List<ENTITY>
-) : R2dbcRunner<List<Int>> {
+) : R2dbcRunner<List<Long>> {
 
     private val runner: EntityUpsertBatchRunner<ENTITY, ID, META> =
         EntityUpsertBatchRunner(context, entities)
@@ -22,7 +22,7 @@ internal class R2dbcEntityUpsertBatchRunner<ENTITY : Any, ID : Any, META : Entit
         runner.check(config)
     }
 
-    override suspend fun run(config: R2dbcDatabaseConfig): List<Int> {
+    override suspend fun run(config: R2dbcDatabaseConfig): List<Long> {
         if (entities.isEmpty()) return emptyList()
         val newEntities = entities.map { preUpsert(config, it) }
         val batchResults = upsert(config, newEntities)
@@ -33,7 +33,7 @@ internal class R2dbcEntityUpsertBatchRunner<ENTITY : Any, ID : Any, META : Entit
         return support.preUpsert(config, entity)
     }
 
-    private suspend fun upsert(config: R2dbcDatabaseConfig, entities: List<ENTITY>): List<Pair<Int, Long?>> {
+    private suspend fun upsert(config: R2dbcDatabaseConfig, entities: List<ENTITY>): List<Pair<Long, Long?>> {
         val statements = entities.map { runner.buildStatement(config, it) }
         return support.upsert(config, false) { it.executeBatch(statements) }
     }

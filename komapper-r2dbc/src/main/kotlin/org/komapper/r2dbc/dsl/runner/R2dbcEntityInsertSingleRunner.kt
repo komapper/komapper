@@ -32,7 +32,7 @@ internal class R2dbcEntityInsertSingleRunner<ENTITY : Any, ID : Any, META : Enti
         return support.preInsert(config, entity)
     }
 
-    private suspend fun insert(config: R2dbcDatabaseConfig, entity: ENTITY): Pair<Int, List<Long>> {
+    private suspend fun insert(config: R2dbcDatabaseConfig, entity: ENTITY): Pair<Long, List<Long>> {
         val statement = runner.buildStatement(config, entity)
         return support.insert(config, true) { it.executeUpdate(statement) }
     }

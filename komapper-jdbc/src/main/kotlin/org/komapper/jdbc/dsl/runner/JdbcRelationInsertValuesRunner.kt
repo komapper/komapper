@@ -13,7 +13,7 @@ import org.komapper.jdbc.JdbcExecutor
 
 internal class JdbcRelationInsertValuesRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: RelationInsertValuesContext<ENTITY, ID, META>,
-) : JdbcRunner<Pair<Int, ID?>> {
+) : JdbcRunner<Pair<Long, ID?>> {
 
     private val runner: RelationInsertValuesRunner<ENTITY, ID, META> = RelationInsertValuesRunner(context)
 
@@ -21,8 +21,8 @@ internal class JdbcRelationInsertValuesRunner<ENTITY : Any, ID : Any, META : Ent
         runner.check(config)
     }
 
-    override fun run(config: JdbcDatabaseConfig): Pair<Int, ID?> {
-        fun returnWithoutId(): Pair<Int, ID?> {
+    override fun run(config: JdbcDatabaseConfig): Pair<Long, ID?> {
+        fun returnWithoutId(): Pair<Long, ID?> {
             val (count, _) = insert(config)
             return count to null
         }
@@ -53,7 +53,7 @@ internal class JdbcRelationInsertValuesRunner<ENTITY : Any, ID : Any, META : Ent
         config: JdbcDatabaseConfig,
         idAssignment: Pair<PropertyMetamodel<ENTITY, ID, *>, Operand>? = null,
         generatedColumn: String? = null
-    ): Pair<Int, List<Long>> {
+    ): Pair<Long, List<Long>> {
         val statement = runner.buildStatement(config, idAssignment)
         val executor = JdbcExecutor(config, context.options, generatedColumn)
         return executor.executeUpdate(statement)

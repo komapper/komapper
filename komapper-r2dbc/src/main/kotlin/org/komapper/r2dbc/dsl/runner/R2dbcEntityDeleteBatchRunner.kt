@@ -29,12 +29,12 @@ internal class R2dbcEntityDeleteBatchRunner<ENTITY : Any, ID : Any, META : Entit
         postDelete(batchResults.map { it.first })
     }
 
-    private suspend fun delete(config: R2dbcDatabaseConfig): List<Pair<Int, Long?>> {
+    private suspend fun delete(config: R2dbcDatabaseConfig): List<Pair<Long, Long?>> {
         val statements = entities.map { runner.buildStatement(config, it) }
         return support.delete(config) { it.executeBatch(statements) }
     }
 
-    private fun postDelete(counts: List<Int>) {
+    private fun postDelete(counts: List<Long>) {
         runner.postDelete(counts)
     }
 

@@ -9,7 +9,7 @@ import org.komapper.jdbc.JdbcExecutor
 
 internal class JdbcTemplateExecuteRunner(
     private val context: TemplateExecuteContext,
-) : JdbcRunner<Int> {
+) : JdbcRunner<Long> {
 
     private val runner = TemplateExecuteRunner(context)
 
@@ -17,7 +17,7 @@ internal class JdbcTemplateExecuteRunner(
         runner.check(config)
     }
 
-    override fun run(config: JdbcDatabaseConfig): Int {
+    override fun run(config: JdbcDatabaseConfig): Long {
         val statement = runner.buildStatement(config)
         val executor = JdbcExecutor(config, context.options)
         val (count) = executor.executeUpdate(statement)

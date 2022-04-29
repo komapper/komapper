@@ -25,7 +25,7 @@ class EntityDeleteSingleRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<EN
         return support.buildStatement(config, entity)
     }
 
-    fun postDelete(count: Int) {
+    fun postDelete(count: Long) {
         support.postDelete(count)
     }
 }

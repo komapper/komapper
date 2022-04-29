@@ -10,7 +10,7 @@ import org.komapper.r2dbc.R2dbcDatabaseConfig
 internal class R2dbcEntityUpsertMultipleRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     context: EntityUpsertContext<ENTITY, ID, META>,
     private val entities: List<ENTITY>
-) : R2dbcRunner<Int> {
+) : R2dbcRunner<Long> {
 
     private val runner: EntityUpsertMultipleRunner<ENTITY, ID, META> =
         EntityUpsertMultipleRunner(context, entities)
@@ -22,7 +22,7 @@ internal class R2dbcEntityUpsertMultipleRunner<ENTITY : Any, ID : Any, META : En
         runner.check(config)
     }
 
-    override suspend fun run(config: R2dbcDatabaseConfig): Int {
+    override suspend fun run(config: R2dbcDatabaseConfig): Long {
         if (entities.isEmpty()) return 0
         val newEntities = entities.map { preUpsert(config, it) }
         return upsert(config, newEntities)
@@ -32,7 +32,7 @@ internal class R2dbcEntityUpsertMultipleRunner<ENTITY : Any, ID : Any, META : En
         return support.preUpsert(config, entity)
     }
 
-    private suspend fun upsert(config: R2dbcDatabaseConfig, entities: List<ENTITY>): Int {
+    private suspend fun upsert(config: R2dbcDatabaseConfig, entities: List<ENTITY>): Long {
         val statement = runner.buildStatement(config, entities)
         val (count) = support.upsert(config, false) { it.executeUpdate(statement) }
         return count

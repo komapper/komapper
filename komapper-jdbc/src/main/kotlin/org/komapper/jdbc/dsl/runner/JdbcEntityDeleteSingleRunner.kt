@@ -27,12 +27,12 @@ internal class JdbcEntityDeleteSingleRunner<ENTITY : Any, ID : Any, META : Entit
         postDelete(count)
     }
 
-    private fun delete(config: JdbcDatabaseConfig): Pair<Int, List<Long>> {
+    private fun delete(config: JdbcDatabaseConfig): Pair<Long, List<Long>> {
         val statement = runner.buildStatement(config)
         return support.delete(config) { it.executeUpdate(statement) }
     }
 
-    private fun postDelete(count: Int) {
+    private fun postDelete(count: Long) {
         runner.postDelete(count)
     }
 

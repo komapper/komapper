@@ -13,7 +13,7 @@ import org.komapper.r2dbc.R2dbcExecutor
 
 internal class R2dbcRelationInsertValuesRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: RelationInsertValuesContext<ENTITY, ID, META>,
-) : R2dbcRunner<Pair<Int, ID?>> {
+) : R2dbcRunner<Pair<Long, ID?>> {
 
     private val runner: RelationInsertValuesRunner<ENTITY, ID, META> = RelationInsertValuesRunner(context)
 
@@ -21,8 +21,8 @@ internal class R2dbcRelationInsertValuesRunner<ENTITY : Any, ID : Any, META : En
         runner.check(config)
     }
 
-    override suspend fun run(config: R2dbcDatabaseConfig): Pair<Int, ID?> {
-        suspend fun returnWithoutId(): Pair<Int, ID?> {
+    override suspend fun run(config: R2dbcDatabaseConfig): Pair<Long, ID?> {
+        suspend fun returnWithoutId(): Pair<Long, ID?> {
             val (count, _) = insert(config)
             return count to null
         }
@@ -53,7 +53,7 @@ internal class R2dbcRelationInsertValuesRunner<ENTITY : Any, ID : Any, META : En
         config: R2dbcDatabaseConfig,
         idAssignment: Pair<PropertyMetamodel<ENTITY, ID, *>, Operand>? = null,
         generatedColumn: String? = null
-    ): Pair<Int, List<Long>> {
+    ): Pair<Long, List<Long>> {
         val statement = runner.buildStatement(config, idAssignment)
         val executor = R2dbcExecutor(config, context.options, generatedColumn)
         return executor.executeUpdate(statement)

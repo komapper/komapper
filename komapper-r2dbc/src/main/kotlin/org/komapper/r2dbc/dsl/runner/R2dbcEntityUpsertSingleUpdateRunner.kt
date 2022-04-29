@@ -32,7 +32,7 @@ internal class R2dbcEntityUpsertSingleUpdateRunner<ENTITY : Any, ID : Any, META 
         return support.preUpsert(config, entity)
     }
 
-    private suspend fun upsert(config: R2dbcDatabaseConfig, entity: ENTITY): Pair<Int, List<Long>> {
+    private suspend fun upsert(config: R2dbcDatabaseConfig, entity: ENTITY): Pair<Long, List<Long>> {
         val statement = runner.buildStatement(config, entity)
         return support.upsert(config, true) { it.executeUpdate(statement) }
     }

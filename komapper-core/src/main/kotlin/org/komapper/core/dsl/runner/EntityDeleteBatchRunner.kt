@@ -30,7 +30,7 @@ class EntityDeleteBatchRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENT
         return support.buildStatement(config, entity)
     }
 
-    fun postDelete(counts: List<Int>) {
+    fun postDelete(counts: List<Long>) {
         for ((i, count) in counts.withIndex()) {
             support.postDelete(count, i)
         }

@@ -33,7 +33,7 @@ internal class JdbcEntityInsertBatchRunner<ENTITY : Any, ID : Any, META : Entity
         return entities.map { support.preInsert(config, it) }
     }
 
-    private fun insert(config: JdbcDatabaseConfig, entities: List<ENTITY>): List<Pair<Int, Long?>> {
+    private fun insert(config: JdbcDatabaseConfig, entities: List<ENTITY>): List<Pair<Long, Long?>> {
         val statements = entities.map { runner.buildStatement(config, it) }
         return support.insert(config, true) { it.executeBatch(statements) }
     }

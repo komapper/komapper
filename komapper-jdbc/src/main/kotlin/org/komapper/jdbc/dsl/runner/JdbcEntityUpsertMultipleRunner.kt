@@ -10,7 +10,7 @@ import org.komapper.jdbc.JdbcDatabaseConfig
 internal class JdbcEntityUpsertMultipleRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     context: EntityUpsertContext<ENTITY, ID, META>,
     private val entities: List<ENTITY>
-) : JdbcRunner<Int> {
+) : JdbcRunner<Long> {
 
     private val runner: EntityUpsertMultipleRunner<ENTITY, ID, META> =
         EntityUpsertMultipleRunner(context, entities)
@@ -22,7 +22,7 @@ internal class JdbcEntityUpsertMultipleRunner<ENTITY : Any, ID : Any, META : Ent
         runner.check(config)
     }
 
-    override fun run(config: JdbcDatabaseConfig): Int {
+    override fun run(config: JdbcDatabaseConfig): Long {
         if (entities.isEmpty()) return 0
         val newEntities = entities.map { preUpsert(config, it) }
         return upsert(config, newEntities)
@@ -32,7 +32,7 @@ internal class JdbcEntityUpsertMultipleRunner<ENTITY : Any, ID : Any, META : Ent
         return support.preUpsert(config, entity)
     }
 
-    private fun upsert(config: JdbcDatabaseConfig, entities: List<ENTITY>): Int {
+    private fun upsert(config: JdbcDatabaseConfig, entities: List<ENTITY>): Long {
         val statement = runner.buildStatement(config, entities)
         val (count) = support.upsert(config, false) { it.executeUpdate(statement) }
         return count

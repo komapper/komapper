@@ -11,7 +11,7 @@ import org.komapper.r2dbc.R2dbcExecutor
 
 internal class R2dbcRelationInsertSelectRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: RelationInsertSelectContext<ENTITY, ID, META>,
-) : R2dbcRunner<Pair<Int, List<ID>>> {
+) : R2dbcRunner<Pair<Long, List<ID>>> {
 
     private val runner: RelationInsertSelectRunner<ENTITY, ID, META> = RelationInsertSelectRunner(context)
 
@@ -19,7 +19,7 @@ internal class R2dbcRelationInsertSelectRunner<ENTITY : Any, ID : Any, META : En
         runner.check(config)
     }
 
-    override suspend fun run(config: R2dbcDatabaseConfig): Pair<Int, List<ID>> {
+    override suspend fun run(config: R2dbcDatabaseConfig): Pair<Long, List<ID>> {
         val statement = runner.buildStatement(config)
         val generatedColumn = if (context.options.returnGeneratedKeys) {
             context.target.getAutoIncrementProperty()?.columnName

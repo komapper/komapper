@@ -10,7 +10,7 @@ import org.komapper.jdbc.JdbcDatabaseConfig
 internal class JdbcEntityUpsertBatchRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     context: EntityUpsertContext<ENTITY, ID, META>,
     private val entities: List<ENTITY>
-) : JdbcRunner<List<Int>> {
+) : JdbcRunner<List<Long>> {
 
     private val runner: EntityUpsertBatchRunner<ENTITY, ID, META> =
         EntityUpsertBatchRunner(context, entities)
@@ -22,7 +22,7 @@ internal class JdbcEntityUpsertBatchRunner<ENTITY : Any, ID : Any, META : Entity
         runner.check(config)
     }
 
-    override fun run(config: JdbcDatabaseConfig): List<Int> {
+    override fun run(config: JdbcDatabaseConfig): List<Long> {
         if (entities.isEmpty()) return emptyList()
         val newEntities = entities.map { preUpsert(config, it) }
         val batchResults = upsert(config, newEntities)
@@ -33,7 +33,7 @@ internal class JdbcEntityUpsertBatchRunner<ENTITY : Any, ID : Any, META : Entity
         return support.preUpsert(config, entity)
     }
 
-    private fun upsert(config: JdbcDatabaseConfig, entities: List<ENTITY>): List<Pair<Int, Long?>> {
+    private fun upsert(config: JdbcDatabaseConfig, entities: List<ENTITY>): List<Pair<Long, Long?>> {
         val statements = entities.map { runner.buildStatement(config, it) }
         return support.upsert(config, false) { it.executeBatch(statements) }
     }
