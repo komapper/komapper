@@ -4,7 +4,6 @@ plugins {
 }
 
 dependencies {
-    val r2dbcVersion: String by project
     api(project(":komapper-r2dbc"))
     testImplementation(project(":komapper-annotation"))
     testImplementation(project(":komapper-slf4j"))
