@@ -62,17 +62,20 @@ internal class ContextualJdbcTransactionManagerImpl(
 
     context(JdbcTransactionContext)
     override fun getConnection(): Connection {
-        return transaction?.connection ?: dataSource.connection
+        val tx = transaction
+        return tx?.connection ?: dataSource.connection
     }
 
     context(JdbcTransactionContext)
     override fun isActive(): Boolean {
-        return transaction != null
+        val tx = transaction
+        return tx != null
     }
 
     context(JdbcTransactionContext)
     override fun isRollbackOnly(): Boolean {
-        return transaction?.isRollbackOnly ?: false
+        val tx = transaction
+        return tx?.isRollbackOnly ?: false
     }
 
     context(JdbcTransactionContext)
@@ -132,10 +135,8 @@ internal class ContextualJdbcTransactionManagerImpl(
 
     context(JdbcTransactionContext)
     override fun resume() {
-        if (transaction == null) {
-            error("A transaction is not found.")
-        }
-        loggerFacade.resume(transaction.toString())
+        val tx = transaction ?: error("A transaction is not found.")
+        loggerFacade.resume(tx.toString())
     }
 
     context(JdbcTransactionContext)

@@ -57,38 +57,32 @@ internal class R2dbcTransactionManagerImpl(
 ) : R2dbcTransactionManager {
 
     override suspend fun getConnection(): Connection {
-        val txContext = coroutineContext[TxHolder]
-        return if (txContext?.tx != null) {
-            txContext.tx.connection
-        } else {
-            connectionFactory.create().asFlow().single()
-        }
+        val tx = coroutineContext[TxHolder]?.tx
+        return tx?.connection ?: connectionFactory.create().asFlow().single()
     }
 
     override suspend fun isActive(): Boolean {
-        val txContext = coroutineContext[TxHolder]
-        return txContext?.tx != null
+        val tx = coroutineContext[TxHolder]?.tx
+        return tx != null
     }
 
     override suspend fun isRollbackOnly(): Boolean {
-        val txContext = coroutineContext[TxHolder]
-        return if (txContext?.tx != null) {
-            txContext.tx.isRollbackOnly
-        } else false
+        val tx = coroutineContext[TxHolder]?.tx
+        return tx?.isRollbackOnly ?: false
     }
 
     override suspend fun setRollbackOnly() {
-        val txContext = coroutineContext[TxHolder]
-        if (txContext?.tx != null) {
-            txContext.tx.isRollbackOnly = true
+        val tx = coroutineContext[TxHolder]?.tx
+        if (tx != null) {
+            tx.isRollbackOnly = true
         }
     }
 
     override suspend fun begin(transactionProperty: TransactionProperty): CoroutineContext {
-        val currentTxHolder = coroutineContext[TxHolder]
-        if (currentTxHolder?.tx != null) {
-            rollbackInternal(currentTxHolder.tx)
-            error("The transaction \"${currentTxHolder.tx}\" already has begun.")
+        val currentTx = coroutineContext[TxHolder]?.tx
+        if (currentTx != null) {
+            rollbackInternal(currentTx)
+            error("The transaction \"${currentTx}\" already has begun.")
         }
         val tx = connectionFactory.create().asFlow().map { con ->
             val txCon = R2dbcTransactionConnection(con)
@@ -116,19 +110,16 @@ internal class R2dbcTransactionManagerImpl(
     }
 
     override suspend fun commit() {
-        val txHolder = coroutineContext[TxHolder]
-        if (txHolder?.tx == null) {
-            error("A transaction hasn't yet begun.")
-        }
-        val connection = txHolder.tx.connection
+        val tx = coroutineContext[TxHolder]?.tx ?: error("A transaction hasn't yet begun.")
+        val connection = tx.connection
         connection.commitTransaction().asFlow()
             .onCompletion { cause ->
-                release(txHolder.tx)
+                release(tx)
                 if (cause == null) {
-                    loggerFacade.commit(txHolder.tx.toString())
+                    loggerFacade.commit(tx.toString())
                 } else {
                     runCatching {
-                        loggerFacade.commitFailed(txHolder.tx.toString(), cause)
+                        loggerFacade.commitFailed(tx.toString(), cause)
                     }.onFailure {
                         cause.addSuppressed(it)
                     }
@@ -137,28 +128,19 @@ internal class R2dbcTransactionManagerImpl(
     }
 
     override suspend fun suspend(): CoroutineContext {
-        val txHolder = coroutineContext[TxHolder]
-        if (txHolder?.tx == null) {
-            error("A transaction hasn't yet begun.")
-        }
-        loggerFacade.suspend(txHolder.tx.toString())
+        val tx = coroutineContext[TxHolder]?.tx ?: error("A transaction hasn't yet begun.")
+        loggerFacade.suspend(tx.toString())
         return TxHolder(null)
     }
 
     override suspend fun resume() {
-        val txHolder = coroutineContext[TxHolder]
-        if (txHolder?.tx == null) {
-            error("A transaction is not found.")
-        }
-        loggerFacade.resume(txHolder.tx.toString())
+        val tx = coroutineContext[TxHolder]?.tx ?: error("A transaction is not found.")
+        loggerFacade.resume(tx.toString())
     }
 
     override suspend fun rollback() {
-        val txHolder = coroutineContext[TxHolder]
-        if (txHolder?.tx == null) {
-            return
-        }
-        rollbackInternal(txHolder.tx)
+        val tx = coroutineContext[TxHolder]?.tx ?: return
+        rollbackInternal(tx)
     }
 
     /**

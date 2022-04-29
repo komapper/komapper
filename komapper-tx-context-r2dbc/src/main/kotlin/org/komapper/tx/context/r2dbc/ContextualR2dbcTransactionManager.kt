@@ -74,7 +74,8 @@ internal class ContextualR2dbcTransactionManagerImpl(
 
     context(R2dbcTransactionContext)
     override suspend fun isActive(): Boolean {
-        return transaction != null
+        val tx = transaction
+        return tx != null
     }
 
     context(R2dbcTransactionContext)
