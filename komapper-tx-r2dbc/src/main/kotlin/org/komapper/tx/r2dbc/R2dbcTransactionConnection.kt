@@ -14,7 +14,7 @@ interface R2dbcTransactionConnection : Connection {
     override fun close(): Publisher<Void>
 }
 
-internal class R2dbcTransactionConnectionImpl(
+private class R2dbcTransactionConnectionImpl(
     private val connection: Connection,
 ) : Connection by connection, R2dbcTransactionConnection {
 

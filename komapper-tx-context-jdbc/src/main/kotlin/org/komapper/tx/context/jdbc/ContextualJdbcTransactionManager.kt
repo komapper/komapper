@@ -10,7 +10,7 @@ import java.sql.Connection
 import javax.sql.DataSource
 
 @ThreadSafe
-interface ContextAwareJdbcTransactionManager {
+interface ContextualJdbcTransactionManager {
 
     context(JdbcTransactionContext)
     fun getConnection(): Connection
@@ -55,10 +55,10 @@ interface ContextAwareJdbcTransactionManager {
     fun rollback()
 }
 
-internal class ContextAwareJdbcTransactionManagerImpl(
+internal class ContextualJdbcTransactionManagerImpl(
     private val dataSource: DataSource,
     private val loggerFacade: LoggerFacade
-) : ContextAwareJdbcTransactionManager {
+) : ContextualJdbcTransactionManager {
 
     context(JdbcTransactionContext)
     override fun getConnection(): Connection {

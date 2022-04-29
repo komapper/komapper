@@ -91,9 +91,9 @@ internal class R2dbcTransactionManagerImpl(
             error("The transaction \"${currentTxHolder.tx}\" already has begun.")
         }
         val tx = connectionFactory.create().asFlow().map { con ->
-            val txCon = R2dbcTransactionConnectionImpl(con)
+            val txCon = R2dbcTransactionConnection(con)
             val name = transactionProperty[TransactionProperty.Name]
-            R2dbcTransactionImpl(name?.value, txCon)
+            R2dbcTransaction(name?.value, txCon)
         }.single()
         val begin = if (transactionProperty == EmptyTransactionProperty) {
             tx.connection.beginTransaction().asFlow()

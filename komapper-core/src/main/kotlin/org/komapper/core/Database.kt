@@ -3,6 +3,7 @@ package org.komapper.core
 /**
  * Represents a database.
  */
+@ThreadSafe
 interface Database {
 
     /**

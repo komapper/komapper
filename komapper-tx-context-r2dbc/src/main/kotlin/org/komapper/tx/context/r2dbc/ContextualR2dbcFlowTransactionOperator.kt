@@ -5,21 +5,23 @@ import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.onCompletion
+import org.komapper.core.ThreadSafe
 import org.komapper.tx.core.EmptyTransactionProperty
 import org.komapper.tx.core.TransactionProperty
 
-interface ContextAwareR2dbcFlowTransactionOperator {
+@ThreadSafe
+interface ContextualR2dbcFlowTransactionOperator {
 
     context(R2dbcContext)
     fun <R> required(
         transactionProperty: TransactionProperty = EmptyTransactionProperty,
-        block: suspend context(R2dbcContext) FlowCollector<R>.(ContextAwareR2dbcFlowTransactionOperator) -> Unit
+        block: suspend context(R2dbcContext) FlowCollector<R>.(ContextualR2dbcFlowTransactionOperator) -> Unit
     ): Flow<R>
 
     context(R2dbcContext)
     fun <R> requiresNew(
         transactionProperty: TransactionProperty = EmptyTransactionProperty,
-        block: suspend context(R2dbcContext) FlowCollector<R>.(ContextAwareR2dbcFlowTransactionOperator) -> Unit
+        block: suspend context(R2dbcContext) FlowCollector<R>.(ContextualR2dbcFlowTransactionOperator) -> Unit
     ): Flow<R>
 
     context(R2dbcContext)
@@ -29,19 +31,19 @@ interface ContextAwareR2dbcFlowTransactionOperator {
     suspend fun isRollbackOnly(): Boolean
 }
 
-internal class ContextAwareR2dbcFlowTransactionOperatorImpl(
-    private val transactionManager: ContextAwareR2dbcTransactionManager,
+internal class ContextualR2dbcFlowTransactionOperatorImpl(
+    private val transactionManager: ContextualR2dbcTransactionManager,
     private val defaultTransactionProperty: TransactionProperty = EmptyTransactionProperty
-) : ContextAwareR2dbcFlowTransactionOperator {
+) : ContextualR2dbcFlowTransactionOperator {
 
     context(R2dbcContext)
     override fun <R> required(
         transactionProperty: TransactionProperty,
-        block: suspend context(R2dbcContext) FlowCollector<R>.(ContextAwareR2dbcFlowTransactionOperator) -> Unit
+        block: suspend context(R2dbcContext) FlowCollector<R>.(ContextualR2dbcFlowTransactionOperator) -> Unit
     ): Flow<R> {
         return flow {
             if (transactionManager.isActive()) {
-                block(this@R2dbcContext, this@flow, this@ContextAwareR2dbcFlowTransactionOperatorImpl)
+                block(this@R2dbcContext, this@flow, this@ContextualR2dbcFlowTransactionOperatorImpl)
             } else {
                 val value = executeInNewTransaction(transactionProperty, block)
                 emitAll(value)
@@ -52,7 +54,7 @@ internal class ContextAwareR2dbcFlowTransactionOperatorImpl(
     context(R2dbcContext)
     override fun <R> requiresNew(
         transactionProperty: TransactionProperty,
-        block: suspend context(R2dbcContext) FlowCollector<R>.(ContextAwareR2dbcFlowTransactionOperator) -> Unit
+        block: suspend context(R2dbcContext) FlowCollector<R>.(ContextualR2dbcFlowTransactionOperator) -> Unit
     ): Flow<R> {
         return flow {
             val value = if (transactionManager.isActive()) {
@@ -73,14 +75,14 @@ internal class ContextAwareR2dbcFlowTransactionOperatorImpl(
     context(R2dbcContext)
     private suspend fun <R> executeInNewTransaction(
         transactionProperty: TransactionProperty,
-        block: suspend context(R2dbcContext) FlowCollector<R>.(ContextAwareR2dbcFlowTransactionOperator) -> Unit
+        block: suspend context(R2dbcContext) FlowCollector<R>.(ContextualR2dbcFlowTransactionOperator) -> Unit
     ): Flow<R> {
         val transactionContext = transactionManager.begin(defaultTransactionProperty + transactionProperty)
         val r2dbcContext = R2dbcContext(database, transactionContext.transaction)
         return flow {
             with(r2dbcContext) {
                 kotlin.runCatching {
-                    block(r2dbcContext, this@flow, this@ContextAwareR2dbcFlowTransactionOperatorImpl)
+                    block(this@with, this@flow, this@ContextualR2dbcFlowTransactionOperatorImpl)
                 }.onSuccess {
                     if (transactionManager.isRollbackOnly()) {
                         transactionManager.rollback()

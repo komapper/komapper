@@ -4,14 +4,14 @@ import org.komapper.tx.jdbc.JdbcTransaction
 
 interface JdbcContext : JdbcDatabaseContext, JdbcTransactionContext
 
-internal class DefaultJdbcContext(
-    override val database: ContextAwareJdbcDatabase,
+private class JdbcContextImpl(
+    override val database: ContextualJdbcDatabase,
     override val transaction: JdbcTransaction?
 ) : JdbcContext
 
-fun JdbcContext(
-    database: ContextAwareJdbcDatabase,
+internal fun JdbcContext(
+    database: ContextualJdbcDatabase,
     transaction: JdbcTransaction? = null
 ): JdbcContext {
-    return DefaultJdbcContext(database, transaction)
+    return JdbcContextImpl(database, transaction)
 }

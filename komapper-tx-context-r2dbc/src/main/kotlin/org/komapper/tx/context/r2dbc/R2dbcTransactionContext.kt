@@ -14,6 +14,6 @@ object EmptyR2dbcTransactionContext : R2dbcTransactionContext {
     override val transaction: R2dbcTransaction? = null
 }
 
-fun R2dbcTransactionContext(transaction: R2dbcTransaction): R2dbcTransactionContext {
+internal fun R2dbcTransactionContext(transaction: R2dbcTransaction): R2dbcTransactionContext {
     return DefaultR2dbcTransactionContext(transaction)
 }

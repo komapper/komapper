@@ -1,33 +1,57 @@
-package org.komapper.tx.context.jdbc
+package org.komapper.tx.context.r2dbc
 
+import io.r2dbc.spi.ConnectionFactories
+import kotlinx.coroutines.runBlocking
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
 import org.komapper.core.dsl.query.single
-import org.komapper.jdbc.DefaultJdbcDatabaseConfig
-import org.komapper.jdbc.JdbcDatabase
-import org.komapper.jdbc.JdbcDialects
-import org.komapper.jdbc.JdbcSession
-import org.komapper.jdbc.SimpleDataSource
-import org.komapper.tx.jdbc.JdbcTransactionSession
+import org.komapper.dialect.h2.r2dbc.R2dbcH2Dialect
+import org.komapper.r2dbc.DefaultR2dbcDatabaseConfig
+import org.komapper.r2dbc.R2dbcDatabase
+import org.komapper.r2dbc.R2dbcSession
+import org.komapper.tx.r2dbc.R2dbcTransactionSession
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
-internal class ContextAwareJdbcTransactionOperatorTest {
+internal class ContextualR2dbcCoroutineTransactionOperatorTest {
 
-    private val dataSource = SimpleDataSource("jdbc:h2:mem://transaction-test;DB_CLOSE_DELAY=-1")
-    private val config = object : DefaultJdbcDatabaseConfig(dataSource, JdbcDialects.get("h2")) {
-        override val session: JdbcSession by lazy {
-            JdbcTransactionSession(dataSource, loggerFacade)
+    private val connectionFactory = ConnectionFactories.get("r2dbc:h2:mem:///transaction-test;DB_CLOSE_DELAY=-1")
+    private val config = object : DefaultR2dbcDatabaseConfig(connectionFactory, R2dbcH2Dialect()) {
+        override val session: R2dbcSession by lazy {
+            R2dbcTransactionSession(connectionFactory, loggerFacade)
         }
     }
-    private val db = JdbcDatabase(config).asContextAwareDatabase()
+    private val db = R2dbcDatabase(config).asContextualDatabase()
 
     @Test
-    fun commit() {
+    fun contextPropagation() = runBlocking {
+        val a = Meta.address
+        db.withTransaction {
+            contextPropagated()
+        }
+        db.withTransaction {
+            val address = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
+            assertEquals("TOKYO", address.street)
+        }
+    }
+
+    context(R2dbcContext)
+    private suspend fun contextPropagated() {
+        val a = Meta.address
+        val tx = transaction
+        assertNotNull(tx)
+        assertFalse(tx.isRollbackOnly)
+        val address = database.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
+        database.runQuery { QueryDsl.update(a).single(address.copy(street = "TOKYO")) }
+    }
+
+    @Test
+    fun commit() = runBlocking {
         val a = Meta.address
         db.withTransaction { tx ->
             assertFalse(tx.isRollbackOnly())
@@ -41,7 +65,7 @@ internal class ContextAwareJdbcTransactionOperatorTest {
     }
 
     @Test
-    fun setRollbackOnly() {
+    fun setRollbackOnly() = runBlocking {
         val a = Meta.address
         db.withTransaction { tx ->
             tx.setRollbackOnly()
@@ -56,7 +80,7 @@ internal class ContextAwareJdbcTransactionOperatorTest {
     }
 
     @Test
-    fun setRollbackOnly_required() {
+    fun setRollbackOnly_required() = runBlocking {
         val a = Meta.address
         db.withTransaction { tx ->
             tx.setRollbackOnly()
@@ -78,7 +102,7 @@ internal class ContextAwareJdbcTransactionOperatorTest {
     }
 
     @Test
-    fun setRollbackOnly_requiresNew() {
+    fun setRollbackOnly_requiresNew() = runBlocking {
         val a = Meta.address
         db.withTransaction { tx ->
             tx.setRollbackOnly()
@@ -100,7 +124,7 @@ internal class ContextAwareJdbcTransactionOperatorTest {
     }
 
     @Test
-    fun throwRuntimeException() {
+    fun throwRuntimeException() = runBlocking {
         val a = Meta.address
         try {
             db.withTransaction {
@@ -117,7 +141,7 @@ internal class ContextAwareJdbcTransactionOperatorTest {
     }
 
     @Test
-    fun throwException() {
+    fun throwException() = runBlocking {
         val a = Meta.address
         try {
             db.withTransaction {
@@ -134,7 +158,7 @@ internal class ContextAwareJdbcTransactionOperatorTest {
     }
 
     @Test
-    fun required_commit() {
+    fun required_commit() = runBlocking {
         val a = Meta.address
         db.withTransaction { tx ->
             val address1 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
@@ -153,7 +177,7 @@ internal class ContextAwareJdbcTransactionOperatorTest {
     }
 
     @Test
-    fun required_setRollbackOnly() {
+    fun required_setRollbackOnly() = runBlocking {
         val a = Meta.address
         db.withTransaction { tx ->
             val address1 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
@@ -174,7 +198,7 @@ internal class ContextAwareJdbcTransactionOperatorTest {
     }
 
     @Test
-    fun required_throwRuntimeException() {
+    fun required_throwRuntimeException() = runBlocking {
         val a = Meta.address
         db.withTransaction { tx ->
             val address1 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
@@ -197,7 +221,7 @@ internal class ContextAwareJdbcTransactionOperatorTest {
     }
 
     @Test
-    fun required_throwException() {
+    fun required_throwException() = runBlocking {
         val a = Meta.address
         db.withTransaction { tx ->
             val address1 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
@@ -220,7 +244,7 @@ internal class ContextAwareJdbcTransactionOperatorTest {
     }
 
     @Test
-    fun requiresNew_commit() {
+    fun requiresNew_commit() = runBlocking {
         val a = Meta.address
         db.withTransaction { tx ->
             val address1 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
@@ -239,7 +263,7 @@ internal class ContextAwareJdbcTransactionOperatorTest {
     }
 
     @Test
-    fun requiresNew_setRollbackOnly() {
+    fun requiresNew_setRollbackOnly() = runBlocking {
         val a = Meta.address
         db.withTransaction { tx ->
             val address1 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
@@ -260,7 +284,7 @@ internal class ContextAwareJdbcTransactionOperatorTest {
     }
 
     @Test
-    fun requiresNew_throwRuntimeException() {
+    fun requiresNew_throwRuntimeException() = runBlocking {
         val a = Meta.address
         db.withTransaction { tx ->
             val address1 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
@@ -283,7 +307,7 @@ internal class ContextAwareJdbcTransactionOperatorTest {
     }
 
     @Test
-    fun requiresNew_throwException() {
+    fun requiresNew_throwException() = runBlocking {
         val a = Meta.address
         db.withTransaction { tx ->
             val address1 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
@@ -326,9 +350,11 @@ internal class ContextAwareJdbcTransactionOperatorTest {
             INSERT INTO ADDRESS VALUES(15,'STREET 15',1);
         """.trimIndent()
 
-        db.withTransaction {
-            db.runQuery {
-                QueryDsl.executeScript(sql)
+        runBlocking {
+            db.withTransaction {
+                db.runQuery {
+                    QueryDsl.executeScript(sql)
+                }
             }
         }
     }
@@ -336,9 +362,11 @@ internal class ContextAwareJdbcTransactionOperatorTest {
     @AfterTest
     fun after() {
         val sql = "DROP ALL OBJECTS"
-        db.withTransaction {
-            db.runQuery {
-                QueryDsl.executeScript(sql)
+        runBlocking {
+            db.withTransaction {
+                db.runQuery {
+                    QueryDsl.executeScript(sql)
+                }
             }
         }
     }

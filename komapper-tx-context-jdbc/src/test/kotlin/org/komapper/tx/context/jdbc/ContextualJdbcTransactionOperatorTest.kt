@@ -1,6 +1,5 @@
 package org.komapper.tx.context.jdbc
 
-import kotlinx.coroutines.runBlocking
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
 import org.komapper.core.dsl.query.single
@@ -15,9 +14,10 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
-internal class CoroutineAwareJdbcTransactionOperatorTest {
+internal class ContextualJdbcTransactionOperatorTest {
 
     private val dataSource = SimpleDataSource("jdbc:h2:mem://transaction-test;DB_CLOSE_DELAY=-1")
     private val config = object : DefaultJdbcDatabaseConfig(dataSource, JdbcDialects.get("h2")) {
@@ -25,10 +25,32 @@ internal class CoroutineAwareJdbcTransactionOperatorTest {
             JdbcTransactionSession(dataSource, loggerFacade)
         }
     }
-    private val db = JdbcDatabase(config).asCoroutineAwareDatabase()
+    private val db = JdbcDatabase(config).asContextualDatabase()
 
     @Test
-    fun commit() = runBlocking {
+    fun contextPropagation() {
+        val a = Meta.address
+        db.withTransaction {
+            contextPropagated()
+        }
+        db.withTransaction {
+            val address = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
+            assertEquals("TOKYO", address.street)
+        }
+    }
+
+    context(JdbcContext)
+    private fun contextPropagated() {
+        val a = Meta.address
+        val tx = transaction
+        assertNotNull(tx)
+        assertFalse(tx.isRollbackOnly)
+        val address = database.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
+        database.runQuery { QueryDsl.update(a).single(address.copy(street = "TOKYO")) }
+    }
+
+    @Test
+    fun commit() {
         val a = Meta.address
         db.withTransaction { tx ->
             assertFalse(tx.isRollbackOnly())
@@ -42,7 +64,7 @@ internal class CoroutineAwareJdbcTransactionOperatorTest {
     }
 
     @Test
-    fun setRollbackOnly() = runBlocking {
+    fun setRollbackOnly() {
         val a = Meta.address
         db.withTransaction { tx ->
             tx.setRollbackOnly()
@@ -57,7 +79,7 @@ internal class CoroutineAwareJdbcTransactionOperatorTest {
     }
 
     @Test
-    fun setRollbackOnly_required() = runBlocking {
+    fun setRollbackOnly_required() {
         val a = Meta.address
         db.withTransaction { tx ->
             tx.setRollbackOnly()
@@ -79,7 +101,7 @@ internal class CoroutineAwareJdbcTransactionOperatorTest {
     }
 
     @Test
-    fun setRollbackOnly_requiresNew() = runBlocking {
+    fun setRollbackOnly_requiresNew() {
         val a = Meta.address
         db.withTransaction { tx ->
             tx.setRollbackOnly()
@@ -101,7 +123,7 @@ internal class CoroutineAwareJdbcTransactionOperatorTest {
     }
 
     @Test
-    fun throwRuntimeException() = runBlocking {
+    fun throwRuntimeException() {
         val a = Meta.address
         try {
             db.withTransaction {
@@ -118,7 +140,7 @@ internal class CoroutineAwareJdbcTransactionOperatorTest {
     }
 
     @Test
-    fun throwException() = runBlocking {
+    fun throwException() {
         val a = Meta.address
         try {
             db.withTransaction {
@@ -135,7 +157,7 @@ internal class CoroutineAwareJdbcTransactionOperatorTest {
     }
 
     @Test
-    fun required_commit() = runBlocking {
+    fun required_commit() {
         val a = Meta.address
         db.withTransaction { tx ->
             val address1 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
@@ -154,7 +176,7 @@ internal class CoroutineAwareJdbcTransactionOperatorTest {
     }
 
     @Test
-    fun required_setRollbackOnly() = runBlocking {
+    fun required_setRollbackOnly() {
         val a = Meta.address
         db.withTransaction { tx ->
             val address1 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
@@ -175,7 +197,7 @@ internal class CoroutineAwareJdbcTransactionOperatorTest {
     }
 
     @Test
-    fun required_throwRuntimeException() = runBlocking {
+    fun required_throwRuntimeException() {
         val a = Meta.address
         db.withTransaction { tx ->
             val address1 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
@@ -198,7 +220,7 @@ internal class CoroutineAwareJdbcTransactionOperatorTest {
     }
 
     @Test
-    fun required_throwException() = runBlocking {
+    fun required_throwException() {
         val a = Meta.address
         db.withTransaction { tx ->
             val address1 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
@@ -221,7 +243,7 @@ internal class CoroutineAwareJdbcTransactionOperatorTest {
     }
 
     @Test
-    fun requiresNew_commit() = runBlocking {
+    fun requiresNew_commit() {
         val a = Meta.address
         db.withTransaction { tx ->
             val address1 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
@@ -240,7 +262,7 @@ internal class CoroutineAwareJdbcTransactionOperatorTest {
     }
 
     @Test
-    fun requiresNew_setRollbackOnly() = runBlocking {
+    fun requiresNew_setRollbackOnly() {
         val a = Meta.address
         db.withTransaction { tx ->
             val address1 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
@@ -261,7 +283,7 @@ internal class CoroutineAwareJdbcTransactionOperatorTest {
     }
 
     @Test
-    fun requiresNew_throwRuntimeException() = runBlocking {
+    fun requiresNew_throwRuntimeException() {
         val a = Meta.address
         db.withTransaction { tx ->
             val address1 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
@@ -284,7 +306,7 @@ internal class CoroutineAwareJdbcTransactionOperatorTest {
     }
 
     @Test
-    fun requiresNew_throwException() = runBlocking {
+    fun requiresNew_throwException() {
         val a = Meta.address
         db.withTransaction { tx ->
             val address1 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
@@ -307,7 +329,7 @@ internal class CoroutineAwareJdbcTransactionOperatorTest {
     }
 
     @BeforeTest
-    fun before() = runBlocking {
+    fun before() {
         val sql = """
             CREATE TABLE ADDRESS(ADDRESS_ID INTEGER NOT NULL PRIMARY KEY, STREET VARCHAR(20) UNIQUE, VERSION INTEGER);
             INSERT INTO ADDRESS VALUES(1,'STREET 1',1);
@@ -335,7 +357,7 @@ internal class CoroutineAwareJdbcTransactionOperatorTest {
     }
 
     @AfterTest
-    fun after() = runBlocking {
+    fun after() {
         val sql = "DROP ALL OBJECTS"
         db.withTransaction {
             db.runQuery {

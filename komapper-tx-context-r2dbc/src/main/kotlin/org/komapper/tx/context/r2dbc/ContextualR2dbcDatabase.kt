@@ -20,7 +20,7 @@ import org.komapper.tx.core.FlowTransactionOperator
 import org.komapper.tx.core.TransactionAttribute
 import org.komapper.tx.core.TransactionProperty
 
-interface ContextAwareR2dbcDatabase : Database {
+interface ContextualR2dbcDatabase : Database {
 
     /**
      * Runs the given [query] and returns the result.
@@ -59,6 +59,34 @@ interface ContextAwareR2dbcDatabase : Database {
     fun <T> flowQuery(block: QueryScope.() -> FlowQuery<T>): Flow<T>
 
     /**
+     * Begins a REQUIRED transaction.
+     *
+     * @param R the return type of the block
+     * @param transactionProperty the transaction property
+     * @param block the block executed in the transaction
+     * @return the result of the block
+     */
+    context(R2dbcContext)
+    suspend fun <R> required(
+        transactionProperty: TransactionProperty = EmptyTransactionProperty,
+        block: suspend context(R2dbcContext) (tx: ContextualR2dbcCoroutineTransactionOperator) -> R
+    ): R
+
+    /**
+     * Begins a REQUIRES_NEW transaction.
+     *
+     * @param R the return type of the block
+     * @param transactionProperty the transaction property
+     * @param block the block executed in the transaction
+     * @return the result of the block
+     */
+    context(R2dbcContext)
+    suspend fun <R> requiresNew(
+        transactionProperty: TransactionProperty = EmptyTransactionProperty,
+        block: suspend context(R2dbcContext) (tx: ContextualR2dbcCoroutineTransactionOperator) -> R
+    ): R
+
+    /**
      * Begins a R2DBC transaction.
      *
      * @param R the return type of the block
@@ -70,7 +98,7 @@ interface ContextAwareR2dbcDatabase : Database {
     suspend fun <R> withTransaction(
         transactionAttribute: TransactionAttribute = TransactionAttribute.REQUIRED,
         transactionProperty: TransactionProperty = EmptyTransactionProperty,
-        block: suspend context(R2dbcContext) (tx: ContextAwareR2dbcCoroutineTransactionOperator) -> R
+        block: suspend context(R2dbcContext) (tx: ContextualR2dbcCoroutineTransactionOperator) -> R
     ): R
 
     /**
@@ -85,18 +113,18 @@ interface ContextAwareR2dbcDatabase : Database {
     fun <R> flowTransaction(
         transactionAttribute: TransactionAttribute = TransactionAttribute.REQUIRED,
         transactionProperty: TransactionProperty = EmptyTransactionProperty,
-        block: suspend context(R2dbcContext) FlowCollector<R>.(tx: ContextAwareR2dbcFlowTransactionOperator) -> Unit
+        block: suspend context(R2dbcContext) FlowCollector<R>.(tx: ContextualR2dbcFlowTransactionOperator) -> Unit
     ): Flow<R>
 
     fun unwrap(): R2dbcDatabase
 }
 
-internal class ContextAwareR2dbcDatabaseImpl(
+internal class ContextualR2dbcDatabaseImpl(
     private val database: R2dbcDatabase,
-    private val transactionManager: ContextAwareR2dbcTransactionManager,
-    private val coroutineTransactionOperator: ContextAwareR2dbcCoroutineTransactionOperator,
-    private val flowTransactionOperator: ContextAwareR2dbcFlowTransactionOperator,
-) : ContextAwareR2dbcDatabase {
+    private val transactionManager: ContextualR2dbcTransactionManager,
+    private val coroutineTransactionOperator: ContextualR2dbcCoroutineTransactionOperator,
+    private val flowTransactionOperator: ContextualR2dbcFlowTransactionOperator,
+) : ContextualR2dbcDatabase {
 
     override val config: R2dbcDatabaseConfig
         get() = database.config
@@ -147,16 +175,30 @@ internal class ContextAwareR2dbcDatabaseImpl(
         return flowQuery(query)
     }
 
+    context(R2dbcContext) override suspend fun <R> required(
+        transactionProperty: TransactionProperty,
+        block: suspend context(R2dbcContext) (tx: ContextualR2dbcCoroutineTransactionOperator) -> R
+    ): R {
+        return coroutineTransactionOperator.required(transactionProperty, block)
+    }
+
+    context(R2dbcContext) override suspend fun <R> requiresNew(
+        transactionProperty: TransactionProperty,
+        block: suspend context(R2dbcContext) (tx: ContextualR2dbcCoroutineTransactionOperator) -> R
+    ): R {
+        return coroutineTransactionOperator.requiresNew(transactionProperty, block)
+    }
+
     override suspend fun <R> withTransaction(
         transactionAttribute: TransactionAttribute,
         transactionProperty: TransactionProperty,
-        block: suspend context(R2dbcContext) (ContextAwareR2dbcCoroutineTransactionOperator) -> R
+        block: suspend context(R2dbcContext) (ContextualR2dbcCoroutineTransactionOperator) -> R
     ): R {
         val r2dbcContext = R2dbcContext(this)
         return with(r2dbcContext) {
             when (transactionAttribute) {
-                TransactionAttribute.REQUIRED -> coroutineTransactionOperator.required(transactionProperty, block)
-                TransactionAttribute.REQUIRES_NEW -> coroutineTransactionOperator.requiresNew(
+                TransactionAttribute.REQUIRED -> required(transactionProperty, block)
+                TransactionAttribute.REQUIRES_NEW -> requiresNew(
                     transactionProperty,
                     block
                 )
@@ -167,7 +209,7 @@ internal class ContextAwareR2dbcDatabaseImpl(
     override fun <R> flowTransaction(
         transactionAttribute: TransactionAttribute,
         transactionProperty: TransactionProperty,
-        block: suspend context(R2dbcContext) FlowCollector<R>.(ContextAwareR2dbcFlowTransactionOperator) -> Unit
+        block: suspend context(R2dbcContext) FlowCollector<R>.(ContextualR2dbcFlowTransactionOperator) -> Unit
     ): Flow<R> {
         val r2dbcContext = R2dbcContext(this)
         return with(r2dbcContext) {
@@ -183,11 +225,11 @@ internal class ContextAwareR2dbcDatabaseImpl(
     }
 }
 
-fun R2dbcDatabase.asContextAwareDatabase(): ContextAwareR2dbcDatabase {
-    val transactionManager = ContextAwareR2dbcTransactionManagerImpl(config.connectionFactory, config.loggerFacade)
-    val coroutineTransactionOperator = ContextAwareR2dbcCoroutineTransactionOperatorImpl(transactionManager)
-    val flowTransactionOperator = ContextAwareR2dbcFlowTransactionOperatorImpl(transactionManager)
-    return ContextAwareR2dbcDatabaseImpl(
+fun R2dbcDatabase.asContextualDatabase(): ContextualR2dbcDatabase {
+    val transactionManager = ContextualR2dbcTransactionManagerImpl(config.connectionFactory, config.loggerFacade)
+    val coroutineTransactionOperator = ContextualR2dbcCoroutineTransactionOperatorImpl(transactionManager)
+    val flowTransactionOperator = ContextualR2dbcFlowTransactionOperatorImpl(transactionManager)
+    return ContextualR2dbcDatabaseImpl(
         this,
         transactionManager, coroutineTransactionOperator, flowTransactionOperator
     )

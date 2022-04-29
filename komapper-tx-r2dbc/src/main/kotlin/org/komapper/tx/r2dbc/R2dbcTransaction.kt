@@ -9,7 +9,7 @@ interface R2dbcTransaction {
     var isRollbackOnly: Boolean
 }
 
-internal class R2dbcTransactionImpl(
+private class R2dbcTransactionImpl(
     override val name: String?,
     override val connection: R2dbcTransactionConnection
 ) : R2dbcTransaction {

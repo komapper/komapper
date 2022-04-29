@@ -1,5 +1,8 @@
 package org.komapper.tx.context.r2dbc
 
+import org.komapper.core.ThreadSafe
+
+@ThreadSafe
 interface R2dbcDatabaseContext {
-    val database: ContextAwareR2dbcDatabase
+    val database: ContextualR2dbcDatabase
 }

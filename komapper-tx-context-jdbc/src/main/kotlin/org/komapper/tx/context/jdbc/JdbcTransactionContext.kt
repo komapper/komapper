@@ -6,7 +6,7 @@ interface JdbcTransactionContext {
     val transaction: JdbcTransaction?
 }
 
-internal class DefaultJdbcTransactionContext(
+private class DefaultJdbcTransactionContext(
     override val transaction: JdbcTransaction
 ) : JdbcTransactionContext
 
@@ -14,6 +14,6 @@ internal object EmptyJdbcTransactionContext : JdbcTransactionContext {
     override val transaction: JdbcTransaction? = null
 }
 
-fun JdbcTransactionContext(transaction: JdbcTransaction): JdbcTransactionContext {
+internal fun JdbcTransactionContext(transaction: JdbcTransaction): JdbcTransactionContext {
     return DefaultJdbcTransactionContext(transaction)
 }

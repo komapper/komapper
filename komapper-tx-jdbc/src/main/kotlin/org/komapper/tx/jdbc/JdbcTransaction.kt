@@ -9,7 +9,7 @@ interface JdbcTransaction {
     var isRollbackOnly: Boolean
 }
 
-internal class JdbcTransactionImpl(
+private class JdbcTransactionImpl(
     override val name: String?,
     override val connection: JdbcTransactionConnection
 ) : JdbcTransaction {

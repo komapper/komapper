@@ -19,7 +19,7 @@ import org.komapper.tx.r2dbc.asDefinition
  * The R2DBC transaction APIs designed for advanced use.
  */
 @ThreadSafe
-interface ContextAwareR2dbcTransactionManager {
+interface ContextualR2dbcTransactionManager {
 
     context(R2dbcTransactionContext)
     suspend fun getConnection(): Connection
@@ -61,10 +61,10 @@ interface ContextAwareR2dbcTransactionManager {
     suspend fun rollback()
 }
 
-internal class ContextAwareR2dbcTransactionManagerImpl(
+internal class ContextualR2dbcTransactionManagerImpl(
     private val connectionFactory: ConnectionFactory,
     private val loggerFacade: LoggerFacade
-) : ContextAwareR2dbcTransactionManager {
+) : ContextualR2dbcTransactionManager {
 
     context(R2dbcTransactionContext)
     override suspend fun getConnection(): Connection {
