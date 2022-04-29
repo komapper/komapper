@@ -48,141 +48,60 @@ interface JdbcTransactionManager {
 }
 
 internal class JdbcTransactionManagerImpl(
-    private val dataSource: DataSource,
-    private val loggerFacade: LoggerFacade
+    dataSource: DataSource,
+    loggerFacade: LoggerFacade
 ) : JdbcTransactionManager {
-    private val threadLocal = ThreadLocal<JdbcTransaction>()
+
+    private val transactionContext = ThreadLocal<JdbcTransaction>()
+
+    private val management: JdbcTransactionManagement =
+        JdbcTransactionManagement(dataSource, loggerFacade) { transactionContext.remove() }
 
     override fun getConnection(): Connection {
-        val tx = threadLocal.get()
-        return if (tx.isActive()) {
-            tx.connection
-        } else {
-            @Suppress("UsePropertyAccessSyntax")
-            dataSource.getConnection()
-        }
+        val tx = transactionContext.get()
+        return management.getConnection(tx)
     }
 
     override fun isActive(): Boolean {
-        val tx = threadLocal.get()
-        return tx.isActive()
+        val tx = transactionContext.get()
+        return management.isActive(tx)
     }
 
     override fun isRollbackOnly(): Boolean {
-        val tx = threadLocal.get()
-        return if (tx.isActive()) {
-            tx.isRollbackOnly
-        } else false
+        val tx = transactionContext.get()
+        return management.isRollbackOnly(tx)
     }
 
     override fun setRollbackOnly() {
-        val tx = threadLocal.get()
-        if (tx.isActive()) {
-            tx.isRollbackOnly = true
-        }
+        val tx = transactionContext.get()
+        management.setRollbackOnly(tx)
     }
 
     override fun begin(transactionProperty: TransactionProperty) {
-        val currentTx = threadLocal.get()
-        if (currentTx.isActive()) {
-            rollbackInternal(currentTx)
-            error("The transaction \"$currentTx\" already has begun.")
-        }
-        val isolationLevel = transactionProperty[TransactionProperty.IsolationLevel]
-        val readOnly = transactionProperty[TransactionProperty.ReadOnly]
-        val txCon = JdbcTransactionConnection(dataSource.connection, isolationLevel, readOnly)
-        val name = transactionProperty[TransactionProperty.Name]
-        val tx = JdbcTransaction(name?.value, txCon)
-        runCatching {
-            tx.connection.initialize()
-        }.onSuccess {
-            loggerFacade.begin(tx.toString())
-        }.onFailure {
-            release(tx)
-        }.getOrThrow()
-        threadLocal.set(tx)
+        val currentTx = transactionContext.get()
+        val tx = management.begin(currentTx, transactionProperty)
+        transactionContext.set(tx)
     }
 
     override fun commit() {
-        val tx = threadLocal.get()
-        if (!tx.isActive()) {
-            error("A transaction hasn't yet begun.")
-        }
-        runCatching {
-            tx.connection.commit()
-        }.also {
-            release(tx)
-        }.onSuccess {
-            loggerFacade.commit(tx.toString())
-        }.onFailure { cause ->
-            runCatching {
-                loggerFacade.commitFailed(tx.toString(), cause)
-            }.onFailure {
-                cause.addSuppressed(it)
-            }
-        }.getOrThrow()
+        val tx = transactionContext.get()
+        management.commit(tx)
     }
 
     override fun suspend(): JdbcTransaction {
-        val tx = threadLocal.get()
-        if (!tx.isActive()) {
-            error("A transaction hasn't yet begun.")
-        }
-        threadLocal.remove()
-        loggerFacade.suspend(tx.toString())
+        val tx = transactionContext.get()
+        management.suspend(tx)
+        transactionContext.remove()
         return tx
     }
 
     override fun resume(tx: JdbcTransaction) {
-        val currentTx = threadLocal.get()
-        if (currentTx.isActive()) {
-            rollbackInternal(currentTx)
-        }
-        threadLocal.set(tx)
-        loggerFacade.resume(tx.toString())
+        management.resume(tx)
+        transactionContext.set(tx)
     }
 
     override fun rollback() {
-        val tx = threadLocal.get()
-        if (!tx.isActive()) {
-            return
-        }
-        rollbackInternal(tx)
+        val tx = transactionContext.get()
+        management.rollback(tx)
     }
-
-    /**
-     * This function must not throw any exceptions.
-     */
-    private fun rollbackInternal(tx: JdbcTransaction) {
-        runCatching {
-            tx.connection.rollback()
-        }.also {
-            release(tx)
-        }.onSuccess {
-            runCatching {
-                loggerFacade.rollback(tx.toString())
-            }
-        }.onFailure { cause ->
-            runCatching {
-                loggerFacade.rollbackFailed(tx.toString(), cause)
-            }
-        }
-    }
-
-    /**
-     * This function must not throw any exceptions.
-     */
-    private fun release(tx: JdbcTransaction) {
-        threadLocal.remove()
-        runCatching {
-            tx.connection.reset()
-        }
-        runCatching {
-            tx.connection.dispose()
-        }
-    }
-}
-
-private fun JdbcTransaction?.isActive(): Boolean {
-    return this != null
 }
