@@ -1,42 +1,45 @@
-package org.komapper.spring.jdbc
+package org.komapper.spring.r2dbc
 
+import io.r2dbc.spi.ConnectionFactories
+import kotlinx.coroutines.runBlocking
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
 import org.komapper.core.dsl.query.single
-import org.komapper.jdbc.DefaultJdbcDatabaseConfig
-import org.komapper.jdbc.JdbcDatabase
-import org.komapper.jdbc.JdbcDialects
-import org.komapper.jdbc.JdbcSession
-import org.komapper.jdbc.SimpleDataSource
-import org.springframework.jdbc.datasource.DataSourceTransactionManager
+import org.komapper.dialect.h2.r2dbc.R2dbcH2Dialect
+import org.komapper.r2dbc.DefaultR2dbcDatabaseConfig
+import org.komapper.r2dbc.R2dbcDatabase
+import org.komapper.r2dbc.R2dbcSession
+import org.springframework.r2dbc.connection.R2dbcTransactionManager
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-internal class PlatformTransactionOperatorTest {
+internal class SpringR2dbcCoroutineTransactionOperatorTest {
 
-    private val dataSource = SimpleDataSource("jdbc:h2:mem://transaction-test;DB_CLOSE_DELAY=-1")
-    private val transactionManager = DataSourceTransactionManager(dataSource)
-    private val config = object : DefaultJdbcDatabaseConfig(dataSource, JdbcDialects.get("h2")) {
-        override val session: JdbcSession = PlatformTransactionSession(transactionManager, dataSource)
+    private val connectionFactory = ConnectionFactories.get("r2dbc:h2:mem:///transaction-test;DB_CLOSE_DELAY=-1")
+    private val transactionManager = R2dbcTransactionManager(connectionFactory)
+    private val config = object : DefaultR2dbcDatabaseConfig(connectionFactory, R2dbcH2Dialect()) {
+        override val session: R2dbcSession = SpringR2dbcTransactionSession(transactionManager, connectionFactory)
     }
-    private val db = JdbcDatabase(config)
+    private val db = R2dbcDatabase(config)
 
     @Test
-    fun commit() {
+    fun commit() = runBlocking {
         val a = Meta.address
         db.withTransaction { tx ->
-            kotlin.test.assertFalse(tx.isRollbackOnly())
+            assertFalse(tx.isRollbackOnly())
             val address = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
             db.runQuery { QueryDsl.update(a).single(address.copy(street = "TOKYO")) }
         }
         val address = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
-        kotlin.test.assertEquals("TOKYO", address.street)
+        assertEquals("TOKYO", address.street)
     }
 
     @Test
-    fun setRollbackOnly() {
+    fun setRollbackOnly() = runBlocking {
         val a = Meta.address
         db.withTransaction { tx ->
             tx.setRollbackOnly()
@@ -45,11 +48,11 @@ internal class PlatformTransactionOperatorTest {
             db.runQuery { QueryDsl.update(a).single(address.copy(street = "TOKYO")) }
         }
         val address = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
-        kotlin.test.assertEquals("STREET 1", address.street)
+        assertEquals("STREET 1", address.street)
     }
 
     @Test
-    fun setRollbackOnly_required() {
+    fun setRollbackOnly_required() = runBlocking {
         val a = Meta.address
         db.withTransaction { tx ->
             tx.setRollbackOnly()
@@ -64,12 +67,12 @@ internal class PlatformTransactionOperatorTest {
         }
         val address1 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
         val address2 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 2 }.single() }
-        kotlin.test.assertEquals("STREET 1", address1.street)
-        kotlin.test.assertEquals("STREET 2", address2.street)
+        assertEquals("STREET 1", address1.street)
+        assertEquals("STREET 2", address2.street)
     }
 
     @Test
-    fun setRollbackOnly_requiresNew() {
+    fun setRollbackOnly_requiresNew() = runBlocking {
         val a = Meta.address
         db.withTransaction { tx ->
             tx.setRollbackOnly()
@@ -84,12 +87,12 @@ internal class PlatformTransactionOperatorTest {
         }
         val address1 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
         val address2 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 2 }.single() }
-        kotlin.test.assertEquals("STREET 1", address1.street)
-        kotlin.test.assertEquals("OSAKA", address2.street)
+        assertEquals("STREET 1", address1.street)
+        assertEquals("OSAKA", address2.street)
     }
 
     @Test
-    fun throwRuntimeException() {
+    fun throwRuntimeException() = runBlocking {
         val a = Meta.address
         try {
             db.withTransaction {
@@ -100,11 +103,11 @@ internal class PlatformTransactionOperatorTest {
         } catch (ignored: Exception) {
         }
         val address = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
-        kotlin.test.assertEquals("STREET 1", address.street)
+        assertEquals("STREET 1", address.street)
     }
 
     @Test
-    fun throwException() {
+    fun throwException() = runBlocking {
         val a = Meta.address
         try {
             db.withTransaction {
@@ -115,11 +118,11 @@ internal class PlatformTransactionOperatorTest {
         } catch (ignored: Exception) {
         }
         val address = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
-        kotlin.test.assertEquals("STREET 1", address.street)
+        assertEquals("STREET 1", address.street)
     }
 
     @Test
-    fun required_commit() {
+    fun required_commit() = runBlocking {
         val a = Meta.address
         db.withTransaction { tx ->
             val address1 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
@@ -131,12 +134,12 @@ internal class PlatformTransactionOperatorTest {
         }
         val address1 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
         val address2 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 2 }.single() }
-        kotlin.test.assertEquals("TOKYO", address1.street)
-        kotlin.test.assertEquals("OSAKA", address2.street)
+        assertEquals("TOKYO", address1.street)
+        assertEquals("OSAKA", address2.street)
     }
 
     @Test
-    fun required_setRollbackOnly() {
+    fun required_setRollbackOnly() = runBlocking {
         val a = Meta.address
         db.withTransaction { tx ->
             val address1 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
@@ -150,12 +153,12 @@ internal class PlatformTransactionOperatorTest {
         }
         val address1 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
         val address2 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 2 }.single() }
-        kotlin.test.assertEquals("STREET 1", address1.street)
-        kotlin.test.assertEquals("STREET 2", address2.street)
+        assertEquals("STREET 1", address1.street)
+        assertEquals("STREET 2", address2.street)
     }
 
     @Test
-    fun required_throwRuntimeException() {
+    fun required_throwRuntimeException() = runBlocking {
         val a = Meta.address
         db.withTransaction { tx ->
             val address1 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
@@ -171,12 +174,12 @@ internal class PlatformTransactionOperatorTest {
         }
         val address1 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
         val address2 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 2 }.single() }
-        kotlin.test.assertEquals("TOKYO", address1.street)
-        kotlin.test.assertEquals("OSAKA", address2.street)
+        assertEquals("TOKYO", address1.street)
+        assertEquals("OSAKA", address2.street)
     }
 
     @Test
-    fun required_throwException() {
+    fun required_throwException() = runBlocking {
         val a = Meta.address
         db.withTransaction { tx ->
             val address1 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
@@ -192,12 +195,12 @@ internal class PlatformTransactionOperatorTest {
         }
         val address1 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
         val address2 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 2 }.single() }
-        kotlin.test.assertEquals("TOKYO", address1.street)
-        kotlin.test.assertEquals("OSAKA", address2.street)
+        assertEquals("TOKYO", address1.street)
+        assertEquals("OSAKA", address2.street)
     }
 
     @Test
-    fun requiresNew_commit() {
+    fun requiresNew_commit() = runBlocking {
         val a = Meta.address
         db.withTransaction { tx ->
             val address1 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
@@ -209,12 +212,12 @@ internal class PlatformTransactionOperatorTest {
         }
         val address1 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
         val address2 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 2 }.single() }
-        kotlin.test.assertEquals("TOKYO", address1.street)
-        kotlin.test.assertEquals("OSAKA", address2.street)
+        assertEquals("TOKYO", address1.street)
+        assertEquals("OSAKA", address2.street)
     }
 
     @Test
-    fun requiresNew_setRollbackOnly() {
+    fun requiresNew_setRollbackOnly() = runBlocking {
         val a = Meta.address
         db.withTransaction { tx ->
             val address1 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
@@ -228,12 +231,12 @@ internal class PlatformTransactionOperatorTest {
         }
         val address1 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
         val address2 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 2 }.single() }
-        kotlin.test.assertEquals("TOKYO", address1.street)
-        kotlin.test.assertEquals("STREET 2", address2.street)
+        assertEquals("TOKYO", address1.street)
+        assertEquals("STREET 2", address2.street)
     }
 
     @Test
-    fun requiresNew_throwRuntimeException() {
+    fun requiresNew_throwRuntimeException() = runBlocking {
         val a = Meta.address
         db.withTransaction { tx ->
             val address1 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
@@ -249,12 +252,12 @@ internal class PlatformTransactionOperatorTest {
         }
         val address1 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
         val address2 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 2 }.single() }
-        kotlin.test.assertEquals("TOKYO", address1.street)
-        kotlin.test.assertEquals("STREET 2", address2.street)
+        assertEquals("TOKYO", address1.street)
+        assertEquals("STREET 2", address2.street)
     }
 
     @Test
-    fun requiresNew_throwException() {
+    fun requiresNew_throwException() = runBlocking {
         val a = Meta.address
         db.withTransaction { tx ->
             val address1 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
@@ -270,8 +273,8 @@ internal class PlatformTransactionOperatorTest {
         }
         val address1 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
         val address2 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 2 }.single() }
-        kotlin.test.assertEquals("TOKYO", address1.street)
-        kotlin.test.assertEquals("STREET 2", address2.street)
+        assertEquals("TOKYO", address1.street)
+        assertEquals("STREET 2", address2.street)
     }
 
     @BeforeTest
@@ -295,16 +298,20 @@ internal class PlatformTransactionOperatorTest {
             INSERT INTO ADDRESS VALUES(15,'STREET 15',1);
         """.trimIndent()
 
-        db.runQuery {
-            QueryDsl.executeScript(sql)
+        runBlocking {
+            db.runQuery {
+                QueryDsl.executeScript(sql)
+            }
         }
     }
 
     @AfterTest
     fun after() {
         val sql = "DROP ALL OBJECTS"
-        db.runQuery {
-            QueryDsl.executeScript(sql)
+        runBlocking {
+            db.runQuery {
+                QueryDsl.executeScript(sql)
+            }
         }
     }
 }

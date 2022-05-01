@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.reactor.asFlux
+import org.komapper.spring.SpringTransactionDefinition
 import org.komapper.tx.core.CoroutineTransactionOperator
 import org.komapper.tx.core.TransactionAttribute
 import org.komapper.tx.core.TransactionProperty
@@ -14,14 +15,14 @@ import org.springframework.transaction.reactive.TransactionalOperator
 import java.util.Optional
 import kotlin.coroutines.coroutineContext
 
-internal class ReactiveCoroutineTransactionOperator(private val transactionManager: ReactiveTransactionManager, private val transaction: ReactiveTransaction? = null) :
+internal class SpringR2dbcCoroutineTransactionOperator(private val transactionManager: ReactiveTransactionManager, private val transaction: ReactiveTransaction? = null) :
     CoroutineTransactionOperator {
 
     override suspend fun <R> required(
         transactionProperty: TransactionProperty,
         block: suspend (CoroutineTransactionOperator) -> R
     ): R {
-        val definition = ReactiveTransactionDefinition(transactionProperty, TransactionAttribute.REQUIRED)
+        val definition = SpringTransactionDefinition(transactionProperty, TransactionAttribute.REQUIRED)
         return execute(definition, block)
     }
 
@@ -29,7 +30,7 @@ internal class ReactiveCoroutineTransactionOperator(private val transactionManag
         transactionProperty: TransactionProperty,
         block: suspend (CoroutineTransactionOperator) -> R
     ): R {
-        val definition = ReactiveTransactionDefinition(transactionProperty, TransactionAttribute.REQUIRES_NEW)
+        val definition = SpringTransactionDefinition(transactionProperty, TransactionAttribute.REQUIRES_NEW)
         return execute(definition, block)
     }
 
@@ -41,7 +42,7 @@ internal class ReactiveCoroutineTransactionOperator(private val transactionManag
         val txOp = TransactionalOperator.create(transactionManager, definition)
         val flux = txOp.execute { tx ->
             flow {
-                val operator = ReactiveCoroutineTransactionOperator(transactionManager, tx)
+                val operator = SpringR2dbcCoroutineTransactionOperator(transactionManager, tx)
                 try {
                     val value = block(operator)
                     emit(value)

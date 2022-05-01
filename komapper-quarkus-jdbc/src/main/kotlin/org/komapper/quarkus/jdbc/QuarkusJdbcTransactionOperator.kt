@@ -5,7 +5,7 @@ import org.komapper.tx.core.TransactionProperty
 import javax.transaction.Status
 import javax.transaction.TransactionManager
 
-internal class JtaTransactionOperator(private val transactionManager: TransactionManager) : TransactionOperator {
+internal class QuarkusJdbcTransactionOperator(private val transactionManager: TransactionManager) : TransactionOperator {
 
     override fun <R> required(
         transactionProperty: TransactionProperty,

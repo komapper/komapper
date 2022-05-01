@@ -6,11 +6,11 @@ import java.sql.Connection
 import javax.sql.DataSource
 import javax.transaction.TransactionManager
 
-class JtaTransactionSession(
+class QuarkusJdbcTransactionSession(
     transactionManager: TransactionManager,
     private val dataSource: DataSource
 ) : JdbcSession {
-    override val transactionOperator: TransactionOperator = JtaTransactionOperator(transactionManager)
+    override val transactionOperator: TransactionOperator = QuarkusJdbcTransactionOperator(transactionManager)
 
     override fun getConnection(): Connection {
         return dataSource.connection

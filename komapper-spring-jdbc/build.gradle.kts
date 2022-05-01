@@ -7,6 +7,7 @@ dependencies {
     val springVersion: String by project
     implementation("org.springframework:spring-jdbc:$springVersion")
     implementation(project(":komapper-jdbc"))
+    implementation(project(":komapper-spring"))
     testImplementation(project(":komapper-annotation"))
     testImplementation(project(":komapper-slf4j"))
     testRuntimeOnly("ch.qos.logback:logback-classic:1.2.11")

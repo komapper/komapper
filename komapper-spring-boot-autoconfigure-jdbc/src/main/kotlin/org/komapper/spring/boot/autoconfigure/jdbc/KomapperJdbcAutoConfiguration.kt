@@ -24,7 +24,7 @@ import org.komapper.jdbc.JdbcDialect
 import org.komapper.jdbc.JdbcDialects
 import org.komapper.jdbc.JdbcSession
 import org.komapper.jdbc.SimpleJdbcDatabaseConfig
-import org.komapper.spring.jdbc.PlatformTransactionSession
+import org.komapper.spring.jdbc.SpringJdbcTransactionSession
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
@@ -85,8 +85,8 @@ open class KomapperJdbcAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    open fun databaseSession(transactionManager: PlatformTransactionManager, dataSource: DataSource): JdbcSession {
-        return PlatformTransactionSession(transactionManager, dataSource)
+    open fun session(transactionManager: PlatformTransactionManager, dataSource: DataSource): JdbcSession {
+        return SpringJdbcTransactionSession(transactionManager, dataSource)
     }
 
     @Bean

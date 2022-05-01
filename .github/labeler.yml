@@ -88,6 +88,9 @@ module/r2dbc:
 module/slf4j:
   - komapper-slf4j/**/*
 
+module/spring:
+  - komapper-spring/**/*
+
 module/spring-boot-autoconfigure-jdbc:
   - komapper-spring-boot-autoconfigure-jdbc/**/*
 

@@ -1,5 +1,6 @@
 package org.komapper.spring.jdbc
 
+import org.komapper.spring.SpringTransactionDefinition
 import org.komapper.tx.core.TransactionAttribute
 import org.komapper.tx.core.TransactionOperator
 import org.komapper.tx.core.TransactionProperty
@@ -8,18 +9,18 @@ import org.springframework.transaction.TransactionDefinition
 import org.springframework.transaction.TransactionStatus
 import org.springframework.transaction.support.TransactionTemplate
 
-class PlatformTransactionOperator(
+class SpringJdbcTransactionOperator(
     private val transactionManager: PlatformTransactionManager,
     private val status: TransactionStatus? = null
 ) : TransactionOperator {
 
     override fun <R> required(transactionProperty: TransactionProperty, block: (TransactionOperator) -> R): R {
-        val definition = PlatformTransactionDefinition(transactionProperty, TransactionAttribute.REQUIRED)
+        val definition = SpringTransactionDefinition(transactionProperty, TransactionAttribute.REQUIRED)
         return execute(definition, block)
     }
 
     override fun <R> requiresNew(transactionProperty: TransactionProperty, block: (TransactionOperator) -> R): R {
-        val definition = PlatformTransactionDefinition(transactionProperty, TransactionAttribute.REQUIRES_NEW)
+        val definition = SpringTransactionDefinition(transactionProperty, TransactionAttribute.REQUIRES_NEW)
         return execute(definition, block)
     }
 
@@ -30,7 +31,7 @@ class PlatformTransactionOperator(
         val txOp = TransactionTemplate(transactionManager, definition)
         @Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
         val result: Result<R> = txOp.execute { s ->
-            val operator = PlatformTransactionOperator(transactionManager, s)
+            val operator = SpringJdbcTransactionOperator(transactionManager, s)
             runCatching {
                 block(operator)
             }.onSuccess {

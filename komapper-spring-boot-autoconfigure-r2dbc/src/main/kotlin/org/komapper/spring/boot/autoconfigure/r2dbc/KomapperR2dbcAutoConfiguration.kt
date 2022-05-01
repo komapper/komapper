@@ -23,7 +23,7 @@ import org.komapper.r2dbc.R2dbcDialect
 import org.komapper.r2dbc.R2dbcDialects
 import org.komapper.r2dbc.R2dbcSession
 import org.komapper.r2dbc.SimpleR2dbcDatabaseConfig
-import org.komapper.spring.r2dbc.ReactiveTransactionSession
+import org.komapper.spring.r2dbc.SpringR2dbcTransactionSession
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
@@ -48,7 +48,7 @@ open class KomapperR2dbcAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    open fun r2dbcDialect(environment: Environment): R2dbcDialect {
+    open fun dialect(environment: Environment): R2dbcDialect {
         val url = environment.getProperty(R2DBC_URL_PROPERTY)
             ?: error(
                 "$R2DBC_URL_PROPERTY is not found. " +
@@ -84,11 +84,11 @@ open class KomapperR2dbcAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    open fun r2dbcDatabaseSession(
+    open fun session(
         transactionManager: ReactiveTransactionManager,
         connectionFactory: ConnectionFactory
     ): R2dbcSession {
-        return ReactiveTransactionSession(transactionManager, connectionFactory)
+        return SpringR2dbcTransactionSession(transactionManager, connectionFactory)
     }
 
     @Bean
@@ -116,7 +116,7 @@ open class KomapperR2dbcAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     open fun databaseConfig(
-        r2dbcDialect: R2dbcDialect,
+        dialect: R2dbcDialect,
         clockProvider: ClockProvider,
         executionOptions: ExecutionOptions,
         logger: Logger,
@@ -129,7 +129,7 @@ open class KomapperR2dbcAutoConfiguration {
     ): R2dbcDatabaseConfig {
         return SimpleR2dbcDatabaseConfig(
             id = UUID.randomUUID(),
-            dialect = r2dbcDialect,
+            dialect = dialect,
             clockProvider = clockProvider,
             executionOptions = executionOptions,
             logger = logger,

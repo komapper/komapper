@@ -1,10 +1,10 @@
-package org.komapper.spring.jdbc
+package org.komapper.spring
 
 import org.komapper.tx.core.TransactionAttribute
 import org.komapper.tx.core.TransactionProperty
 import org.springframework.transaction.TransactionDefinition
 
-internal class PlatformTransactionDefinition(
+class SpringTransactionDefinition(
     private val transactionProperty: TransactionProperty,
     private val transactionAttribute: TransactionAttribute
 ) : TransactionDefinition by TransactionDefinition.withDefaults() {
@@ -17,7 +17,13 @@ internal class PlatformTransactionDefinition(
     }
 
     override fun getIsolationLevel(): Int {
-        return transactionProperty[TransactionProperty.IsolationLevel]?.value ?: super.getIsolationLevel()
+        return when (transactionProperty[TransactionProperty.IsolationLevel]) {
+            TransactionProperty.IsolationLevel.READ_UNCOMMITTED -> TransactionDefinition.ISOLATION_READ_UNCOMMITTED
+            TransactionProperty.IsolationLevel.READ_COMMITTED -> TransactionDefinition.ISOLATION_READ_COMMITTED
+            TransactionProperty.IsolationLevel.REPEATABLE_READ -> TransactionDefinition.ISOLATION_REPEATABLE_READ
+            TransactionProperty.IsolationLevel.SERIALIZABLE -> TransactionDefinition.ISOLATION_SERIALIZABLE
+            else -> super.getIsolationLevel()
+        }
     }
 
     override fun isReadOnly(): Boolean {

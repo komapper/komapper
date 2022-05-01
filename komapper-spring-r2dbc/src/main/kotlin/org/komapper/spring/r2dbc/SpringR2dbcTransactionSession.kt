@@ -11,17 +11,17 @@ import org.komapper.tx.core.FlowTransactionOperator
 import org.springframework.r2dbc.connection.ConnectionFactoryUtils
 import org.springframework.transaction.ReactiveTransactionManager
 
-class ReactiveTransactionSession(
+class SpringR2dbcTransactionSession(
     transactionManager: ReactiveTransactionManager,
     private val connectionFactory: ConnectionFactory
 ) :
     R2dbcSession {
 
     override val coroutineTransactionOperator: CoroutineTransactionOperator =
-        ReactiveCoroutineTransactionOperator(transactionManager)
+        SpringR2dbcCoroutineTransactionOperator(transactionManager)
 
     override val flowTransactionOperator: FlowTransactionOperator =
-        ReactiveFlowTransactionOperator(transactionManager)
+        SpringR2dbcFlowTransactionOperator(transactionManager)
 
     override suspend fun getConnection(): Connection {
         return ConnectionFactoryUtils.getConnection(connectionFactory).asFlow().single()

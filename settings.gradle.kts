@@ -35,18 +35,12 @@ include("komapper-processor")
 // JDBC
 include("komapper-datetime-jdbc")
 include("komapper-jdbc")
-include("komapper-spring-boot-autoconfigure-jdbc")
-include("komapper-spring-boot-starter-jdbc")
-include("komapper-spring-jdbc")
 include("komapper-starter-jdbc")
 include("komapper-tx-jdbc")
 
 // R2DBC
 include("komapper-datetime-r2dbc")
 include("komapper-r2dbc")
-include("komapper-spring-boot-autoconfigure-r2dbc")
-include("komapper-spring-boot-starter-r2dbc")
-include("komapper-spring-r2dbc")
 include("komapper-starter-r2dbc")
 include("komapper-tx-r2dbc")
 
@@ -69,6 +63,15 @@ include("komapper-dialect-postgresql-jdbc")
 include("komapper-dialect-sqlserver")
 include("komapper-dialect-sqlserver-jdbc")
 include("komapper-dialect-sqlserver-r2dbc")
+
+// SPRING
+include("komapper-spring")
+include("komapper-spring-jdbc")
+include("komapper-spring-r2dbc")
+include("komapper-spring-boot-autoconfigure-jdbc")
+include("komapper-spring-boot-autoconfigure-r2dbc")
+include("komapper-spring-boot-starter-jdbc")
+include("komapper-spring-boot-starter-r2dbc")
 
 // OPTIONAL
 include("komapper-template")
