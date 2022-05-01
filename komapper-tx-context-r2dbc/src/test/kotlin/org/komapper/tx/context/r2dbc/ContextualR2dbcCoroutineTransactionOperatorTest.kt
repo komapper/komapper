@@ -53,8 +53,8 @@ internal class ContextualR2dbcCoroutineTransactionOperatorTest {
     @Test
     fun commit() = runBlocking {
         val a = Meta.address
-        db.withTransaction { tx ->
-            assertFalse(tx.isRollbackOnly())
+        db.withTransaction {
+            assertFalse(transactionOperator.isRollbackOnly())
             val address = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
             db.runQuery { QueryDsl.update(a).single(address.copy(street = "TOKYO")) }
         }
@@ -67,9 +67,9 @@ internal class ContextualR2dbcCoroutineTransactionOperatorTest {
     @Test
     fun setRollbackOnly() = runBlocking {
         val a = Meta.address
-        db.withTransaction { tx ->
-            tx.setRollbackOnly()
-            assertTrue(tx.isRollbackOnly())
+        db.withTransaction {
+            transactionOperator.setRollbackOnly()
+            assertTrue(transactionOperator.isRollbackOnly())
             val address = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
             db.runQuery { QueryDsl.update(a).single(address.copy(street = "TOKYO")) }
         }
@@ -82,12 +82,12 @@ internal class ContextualR2dbcCoroutineTransactionOperatorTest {
     @Test
     fun setRollbackOnly_required() = runBlocking {
         val a = Meta.address
-        db.withTransaction { tx ->
-            tx.setRollbackOnly()
-            assertTrue(tx.isRollbackOnly())
+        db.withTransaction {
+            transactionOperator.setRollbackOnly()
+            assertTrue(transactionOperator.isRollbackOnly())
             val address1 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
             db.runQuery { QueryDsl.update(a).single(address1.copy(street = "TOKYO")) }
-            tx.required {
+            transactionOperator.required {
                 val address2 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 2 }.single() }
                 db.runQuery { QueryDsl.update(a).single(address2.copy(street = "OSAKA")) }
                 Unit
@@ -104,12 +104,12 @@ internal class ContextualR2dbcCoroutineTransactionOperatorTest {
     @Test
     fun setRollbackOnly_requiresNew() = runBlocking {
         val a = Meta.address
-        db.withTransaction { tx ->
-            tx.setRollbackOnly()
-            assertTrue(tx.isRollbackOnly())
+        db.withTransaction {
+            transactionOperator.setRollbackOnly()
+            assertTrue(transactionOperator.isRollbackOnly())
             val address1 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
             db.runQuery { QueryDsl.update(a).single(address1.copy(street = "TOKYO")) }
-            tx.requiresNew {
+            transactionOperator.requiresNew {
                 val address2 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 2 }.single() }
                 db.runQuery { QueryDsl.update(a).single(address2.copy(street = "OSAKA")) }
                 Unit
@@ -160,10 +160,10 @@ internal class ContextualR2dbcCoroutineTransactionOperatorTest {
     @Test
     fun required_commit() = runBlocking {
         val a = Meta.address
-        db.withTransaction { tx ->
+        db.withTransaction {
             val address1 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
             db.runQuery { QueryDsl.update(a).single(address1.copy(street = "TOKYO")) }
-            tx.required {
+            transactionOperator.required {
                 val address2 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 2 }.single() }
                 db.runQuery { QueryDsl.update(a).single(address2.copy(street = "OSAKA")) }
             }
@@ -179,12 +179,12 @@ internal class ContextualR2dbcCoroutineTransactionOperatorTest {
     @Test
     fun required_setRollbackOnly() = runBlocking {
         val a = Meta.address
-        db.withTransaction { tx ->
+        db.withTransaction {
             val address1 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
             db.runQuery { QueryDsl.update(a).single(address1.copy(street = "TOKYO")) }
-            tx.required { tx2 ->
-                tx2.setRollbackOnly()
-                assertTrue(tx2.isRollbackOnly())
+            transactionOperator.required {
+                transactionOperator.setRollbackOnly()
+                assertTrue(transactionOperator.isRollbackOnly())
                 val address2 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 2 }.single() }
                 db.runQuery { QueryDsl.update(a).single(address2.copy(street = "OSAKA")) }
             }
@@ -200,11 +200,11 @@ internal class ContextualR2dbcCoroutineTransactionOperatorTest {
     @Test
     fun required_throwRuntimeException() = runBlocking {
         val a = Meta.address
-        db.withTransaction { tx ->
+        db.withTransaction {
             val address1 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
             db.runQuery { QueryDsl.update(a).single(address1.copy(street = "TOKYO")) }
             try {
-                tx.required {
+                transactionOperator.required {
                     val address2 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 2 }.single() }
                     db.runQuery { QueryDsl.update(a).single(address2.copy(street = "OSAKA")) }
                     throw RuntimeException()
@@ -223,11 +223,11 @@ internal class ContextualR2dbcCoroutineTransactionOperatorTest {
     @Test
     fun required_throwException() = runBlocking {
         val a = Meta.address
-        db.withTransaction { tx ->
+        db.withTransaction {
             val address1 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
             db.runQuery { QueryDsl.update(a).single(address1.copy(street = "TOKYO")) }
             try {
-                tx.required {
+                transactionOperator.required {
                     val address2 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 2 }.single() }
                     db.runQuery { QueryDsl.update(a).single(address2.copy(street = "OSAKA")) }
                     throw Exception()
@@ -246,10 +246,10 @@ internal class ContextualR2dbcCoroutineTransactionOperatorTest {
     @Test
     fun requiresNew_commit() = runBlocking {
         val a = Meta.address
-        db.withTransaction { tx ->
+        db.withTransaction {
             val address1 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
             db.runQuery { QueryDsl.update(a).single(address1.copy(street = "TOKYO")) }
-            tx.requiresNew {
+            transactionOperator.requiresNew {
                 val address2 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 2 }.single() }
                 db.runQuery { QueryDsl.update(a).single(address2.copy(street = "OSAKA")) }
             }
@@ -265,12 +265,12 @@ internal class ContextualR2dbcCoroutineTransactionOperatorTest {
     @Test
     fun requiresNew_setRollbackOnly() = runBlocking {
         val a = Meta.address
-        db.withTransaction { tx ->
+        db.withTransaction {
             val address1 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
             db.runQuery { QueryDsl.update(a).single(address1.copy(street = "TOKYO")) }
-            tx.requiresNew { tx2 ->
-                tx2.setRollbackOnly()
-                assertTrue(tx2.isRollbackOnly())
+            transactionOperator.requiresNew {
+                transactionOperator.setRollbackOnly()
+                assertTrue(transactionOperator.isRollbackOnly())
                 val address2 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 2 }.single() }
                 db.runQuery { QueryDsl.update(a).single(address2.copy(street = "OSAKA")) }
             }
@@ -286,11 +286,11 @@ internal class ContextualR2dbcCoroutineTransactionOperatorTest {
     @Test
     fun requiresNew_throwRuntimeException() = runBlocking {
         val a = Meta.address
-        db.withTransaction { tx ->
+        db.withTransaction {
             val address1 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
             db.runQuery { QueryDsl.update(a).single(address1.copy(street = "TOKYO")) }
             try {
-                tx.requiresNew {
+                transactionOperator.requiresNew {
                     val address2 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 2 }.single() }
                     db.runQuery { QueryDsl.update(a).single(address2.copy(street = "OSAKA")) }
                     throw RuntimeException()
@@ -309,11 +309,11 @@ internal class ContextualR2dbcCoroutineTransactionOperatorTest {
     @Test
     fun requiresNew_throwException() = runBlocking {
         val a = Meta.address
-        db.withTransaction { tx ->
+        db.withTransaction {
             val address1 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 1 }.single() }
             db.runQuery { QueryDsl.update(a).single(address1.copy(street = "TOKYO")) }
             try {
-                tx.requiresNew {
+                transactionOperator.requiresNew {
                     val address2 = db.runQuery { QueryDsl.from(a).where { a.addressId eq 2 }.single() }
                     db.runQuery { QueryDsl.update(a).single(address2.copy(street = "OSAKA")) }
                     throw Exception()

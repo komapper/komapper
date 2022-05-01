@@ -35,18 +35,6 @@ interface ContextualJdbcDatabase : Database {
     context(JdbcContext)
     fun <T> runQuery(block: QueryScope.() -> Query<T>): T
 
-    context(JdbcContext)
-    fun <R> required(
-        transactionProperty: TransactionProperty = EmptyTransactionProperty,
-        block: context(JdbcContext) (tx: ContextualJdbcTransactionOperator) -> R
-    ): R
-
-    context(JdbcContext)
-    fun <R> requiresNew(
-        transactionProperty: TransactionProperty = EmptyTransactionProperty,
-        block: context(JdbcContext) (tx: ContextualJdbcTransactionOperator) -> R
-    ): R
-
     /**
      * Begins a JDBC transaction.
      *
@@ -59,7 +47,7 @@ interface ContextualJdbcDatabase : Database {
     fun <R> withTransaction(
         transactionAttribute: TransactionAttribute = TransactionAttribute.REQUIRED,
         transactionProperty: TransactionProperty = EmptyTransactionProperty,
-        block: context(JdbcContext) (tx: ContextualJdbcTransactionOperator) -> R
+        block: context(JdbcContext) () -> R
     ): R
 
     fun unwrap(): JdbcDatabase
@@ -106,30 +94,16 @@ internal class ContextualJdbcDatabaseImpl(
         return runQuery(query)
     }
 
-    context(JdbcContext) override fun <R> required(
-        transactionProperty: TransactionProperty,
-        block: context(JdbcContext) (tx: ContextualJdbcTransactionOperator) -> R
-    ): R {
-        return transactionOperator.required(transactionProperty, block)
-    }
-
-    context(JdbcContext) override fun <R> requiresNew(
-        transactionProperty: TransactionProperty,
-        block: context(JdbcContext) (tx: ContextualJdbcTransactionOperator) -> R
-    ): R {
-        return transactionOperator.requiresNew(transactionProperty, block)
-    }
-
     override fun <R> withTransaction(
         transactionAttribute: TransactionAttribute,
         transactionProperty: TransactionProperty,
-        block: context(JdbcContext) (ContextualJdbcTransactionOperator) -> R
+        block: context(JdbcContext) () -> R
     ): R {
-        val context = JdbcContext(this)
+        val context = JdbcContext(this, transactionOperator)
         with(context) {
             return when (transactionAttribute) {
-                TransactionAttribute.REQUIRED -> required(transactionProperty, block)
-                TransactionAttribute.REQUIRES_NEW -> requiresNew(transactionProperty, block)
+                TransactionAttribute.REQUIRED -> transactionOperator.required(transactionProperty, block)
+                TransactionAttribute.REQUIRES_NEW -> transactionOperator.requiresNew(transactionProperty, block)
             }
         }
     }

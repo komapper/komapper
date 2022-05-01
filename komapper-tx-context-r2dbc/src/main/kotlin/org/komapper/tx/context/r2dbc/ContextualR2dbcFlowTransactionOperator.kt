@@ -15,13 +15,13 @@ interface ContextualR2dbcFlowTransactionOperator {
     context(R2dbcContext)
     fun <R> required(
         transactionProperty: TransactionProperty = EmptyTransactionProperty,
-        block: suspend context(R2dbcContext) FlowCollector<R>.(ContextualR2dbcFlowTransactionOperator) -> Unit
+        block: suspend context(R2dbcContext) FlowCollector<R>.() -> Unit
     ): Flow<R>
 
     context(R2dbcContext)
     fun <R> requiresNew(
         transactionProperty: TransactionProperty = EmptyTransactionProperty,
-        block: suspend context(R2dbcContext) FlowCollector<R>.(ContextualR2dbcFlowTransactionOperator) -> Unit
+        block: suspend context(R2dbcContext) FlowCollector<R>.() -> Unit
     ): Flow<R>
 
     context(R2dbcContext)
@@ -39,11 +39,11 @@ internal class ContextualR2dbcFlowTransactionOperatorImpl(
     context(R2dbcContext)
     override fun <R> required(
         transactionProperty: TransactionProperty,
-        block: suspend context(R2dbcContext) FlowCollector<R>.(ContextualR2dbcFlowTransactionOperator) -> Unit
+        block: suspend context(R2dbcContext) FlowCollector<R>.() -> Unit
     ): Flow<R> {
         return flow {
             if (transactionManager.isActive()) {
-                block(this@R2dbcContext, this@flow, this@ContextualR2dbcFlowTransactionOperatorImpl)
+                block(this@R2dbcContext, this@flow)
             } else {
                 val value = executeInNewTransaction(transactionProperty, block)
                 emitAll(value)
@@ -54,12 +54,12 @@ internal class ContextualR2dbcFlowTransactionOperatorImpl(
     context(R2dbcContext)
     override fun <R> requiresNew(
         transactionProperty: TransactionProperty,
-        block: suspend context(R2dbcContext) FlowCollector<R>.(ContextualR2dbcFlowTransactionOperator) -> Unit
+        block: suspend context(R2dbcContext) FlowCollector<R>.() -> Unit
     ): Flow<R> {
         return flow {
             val value = if (transactionManager.isActive()) {
                 val transactionContext = transactionManager.suspend()
-                val r2dbcContext = R2dbcContext(database, transactionContext.transaction)
+                val r2dbcContext = R2dbcContext(database, transactionOperator, flowTransactionOperator, transactionContext.transaction)
                 with(r2dbcContext) {
                     executeInNewTransaction(transactionProperty, block)
                 }.onCompletion {
@@ -75,14 +75,14 @@ internal class ContextualR2dbcFlowTransactionOperatorImpl(
     context(R2dbcContext)
     private suspend fun <R> executeInNewTransaction(
         transactionProperty: TransactionProperty,
-        block: suspend context(R2dbcContext) FlowCollector<R>.(ContextualR2dbcFlowTransactionOperator) -> Unit
+        block: suspend context(R2dbcContext) FlowCollector<R>.() -> Unit
     ): Flow<R> {
         val transactionContext = transactionManager.begin(defaultTransactionProperty + transactionProperty)
-        val r2dbcContext = R2dbcContext(database, transactionContext.transaction)
+        val r2dbcContext = R2dbcContext(database, transactionOperator, flowTransactionOperator, transactionContext.transaction)
         return flow {
             with(r2dbcContext) {
                 kotlin.runCatching {
-                    block(this@with, this@flow, this@ContextualR2dbcFlowTransactionOperatorImpl)
+                    block(this@with, this@flow)
                 }.onSuccess {
                     if (transactionManager.isRollbackOnly()) {
                         transactionManager.rollback()

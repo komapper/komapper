@@ -52,7 +52,7 @@ public class KomapperRecorder {
           TemplateStatementBuilders.INSTANCE.get(
               BuilderDialectKt.BuilderDialect(dialect, dataOperator));
       var dataSource = dataSourceResolver.resolve(dataSourceDefinition.name);
-      var session = new JtaTransactionSession(transactionManager, dataSource);
+      var session = new QuarkusJdbcTransactionSession(transactionManager, dataSource);
       var dataFactory = new DefaultJdbcDataFactory(session);
       var newExecutionOptions =
           executionOptions.plus(

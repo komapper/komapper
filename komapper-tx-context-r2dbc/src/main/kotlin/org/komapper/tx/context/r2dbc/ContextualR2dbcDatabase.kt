@@ -59,34 +59,6 @@ interface ContextualR2dbcDatabase : Database {
     fun <T> flowQuery(block: QueryScope.() -> FlowQuery<T>): Flow<T>
 
     /**
-     * Begins a REQUIRED transaction.
-     *
-     * @param R the return type of the block
-     * @param transactionProperty the transaction property
-     * @param block the block executed in the transaction
-     * @return the result of the block
-     */
-    context(R2dbcContext)
-    suspend fun <R> required(
-        transactionProperty: TransactionProperty = EmptyTransactionProperty,
-        block: suspend context(R2dbcContext) (tx: ContextualR2dbcCoroutineTransactionOperator) -> R
-    ): R
-
-    /**
-     * Begins a REQUIRES_NEW transaction.
-     *
-     * @param R the return type of the block
-     * @param transactionProperty the transaction property
-     * @param block the block executed in the transaction
-     * @return the result of the block
-     */
-    context(R2dbcContext)
-    suspend fun <R> requiresNew(
-        transactionProperty: TransactionProperty = EmptyTransactionProperty,
-        block: suspend context(R2dbcContext) (tx: ContextualR2dbcCoroutineTransactionOperator) -> R
-    ): R
-
-    /**
      * Begins a R2DBC transaction.
      *
      * @param R the return type of the block
@@ -98,7 +70,7 @@ interface ContextualR2dbcDatabase : Database {
     suspend fun <R> withTransaction(
         transactionAttribute: TransactionAttribute = TransactionAttribute.REQUIRED,
         transactionProperty: TransactionProperty = EmptyTransactionProperty,
-        block: suspend context(R2dbcContext) (tx: ContextualR2dbcCoroutineTransactionOperator) -> R
+        block: suspend context(R2dbcContext) () -> R
     ): R
 
     /**
@@ -113,7 +85,7 @@ interface ContextualR2dbcDatabase : Database {
     fun <R> flowTransaction(
         transactionAttribute: TransactionAttribute = TransactionAttribute.REQUIRED,
         transactionProperty: TransactionProperty = EmptyTransactionProperty,
-        block: suspend context(R2dbcContext) FlowCollector<R>.(tx: ContextualR2dbcFlowTransactionOperator) -> Unit
+        block: suspend context(R2dbcContext) FlowCollector<R>.() -> Unit
     ): Flow<R>
 
     fun unwrap(): R2dbcDatabase
@@ -175,30 +147,16 @@ internal class ContextualR2dbcDatabaseImpl(
         return flowQuery(query)
     }
 
-    context(R2dbcContext) override suspend fun <R> required(
-        transactionProperty: TransactionProperty,
-        block: suspend context(R2dbcContext) (tx: ContextualR2dbcCoroutineTransactionOperator) -> R
-    ): R {
-        return coroutineTransactionOperator.required(transactionProperty, block)
-    }
-
-    context(R2dbcContext) override suspend fun <R> requiresNew(
-        transactionProperty: TransactionProperty,
-        block: suspend context(R2dbcContext) (tx: ContextualR2dbcCoroutineTransactionOperator) -> R
-    ): R {
-        return coroutineTransactionOperator.requiresNew(transactionProperty, block)
-    }
-
     override suspend fun <R> withTransaction(
         transactionAttribute: TransactionAttribute,
         transactionProperty: TransactionProperty,
-        block: suspend context(R2dbcContext) (ContextualR2dbcCoroutineTransactionOperator) -> R
+        block: suspend context(R2dbcContext) () -> R
     ): R {
-        val r2dbcContext = R2dbcContext(this)
-        return with(r2dbcContext) {
+        val context = R2dbcContext(this, coroutineTransactionOperator, flowTransactionOperator)
+        return with(context) {
             when (transactionAttribute) {
-                TransactionAttribute.REQUIRED -> required(transactionProperty, block)
-                TransactionAttribute.REQUIRES_NEW -> requiresNew(
+                TransactionAttribute.REQUIRED -> coroutineTransactionOperator.required(transactionProperty, block)
+                TransactionAttribute.REQUIRES_NEW -> coroutineTransactionOperator.requiresNew(
                     transactionProperty,
                     block
                 )
@@ -209,10 +167,10 @@ internal class ContextualR2dbcDatabaseImpl(
     override fun <R> flowTransaction(
         transactionAttribute: TransactionAttribute,
         transactionProperty: TransactionProperty,
-        block: suspend context(R2dbcContext) FlowCollector<R>.(ContextualR2dbcFlowTransactionOperator) -> Unit
+        block: suspend context(R2dbcContext) FlowCollector<R>.() -> Unit
     ): Flow<R> {
-        val r2dbcContext = R2dbcContext(this)
-        return with(r2dbcContext) {
+        val context = R2dbcContext(this, coroutineTransactionOperator, flowTransactionOperator)
+        return with(context) {
             when (transactionAttribute) {
                 TransactionAttribute.REQUIRED -> flowTransactionOperator.required(transactionProperty, block)
                 TransactionAttribute.REQUIRES_NEW -> flowTransactionOperator.requiresNew(transactionProperty, block)

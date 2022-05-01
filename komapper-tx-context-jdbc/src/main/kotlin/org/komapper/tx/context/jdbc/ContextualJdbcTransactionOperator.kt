@@ -18,7 +18,7 @@ interface ContextualJdbcTransactionOperator {
     context(JdbcContext)
     fun <R> required(
         transactionProperty: TransactionProperty = EmptyTransactionProperty,
-        block: context(JdbcContext)(tx: ContextualJdbcTransactionOperator) -> R
+        block: context(JdbcContext)() -> R
     ): R
 
     /**
@@ -32,7 +32,7 @@ interface ContextualJdbcTransactionOperator {
     context(JdbcContext)
     fun <R> requiresNew(
         transactionProperty: TransactionProperty = EmptyTransactionProperty,
-        block: context(JdbcContext)(tx: ContextualJdbcTransactionOperator) -> R
+        block: context(JdbcContext)() -> R
     ): R
 
     /**
@@ -56,10 +56,10 @@ internal class ContextualJdbcTransactionOperatorImpl(
     context(JdbcContext)
     override fun <R> required(
         transactionProperty: TransactionProperty,
-        block: context(JdbcContext) (ContextualJdbcTransactionOperator) -> R
+        block: context(JdbcContext) () -> R
     ): R {
         return if (transactionManager.isActive()) {
-            block(this@JdbcContext, this@ContextualJdbcTransactionOperatorImpl)
+            block(this@JdbcContext)
         } else {
             executeInNewTransaction(transactionProperty, block)
         }
@@ -68,11 +68,11 @@ internal class ContextualJdbcTransactionOperatorImpl(
     context(JdbcContext)
     override fun <R> requiresNew(
         transactionProperty: TransactionProperty,
-        block: context(JdbcContext) (ContextualJdbcTransactionOperator) -> R
+        block: context(JdbcContext) () -> R
     ): R {
         return if (transactionManager.isActive()) {
             val transactionContext = transactionManager.suspend()
-            val jdbcContext = JdbcContext(database, transactionContext.transaction)
+            val jdbcContext = JdbcContext(database, transactionOperator, transactionContext.transaction)
             val result = runCatching {
                 with(jdbcContext) {
                     executeInNewTransaction(transactionProperty, block)
@@ -95,13 +95,13 @@ internal class ContextualJdbcTransactionOperatorImpl(
     context(JdbcContext)
     private fun <R> executeInNewTransaction(
         transactionProperty: TransactionProperty,
-        block: context(JdbcContext) (ContextualJdbcTransactionOperator) -> R
+        block: context(JdbcContext) () -> R
     ): R {
         val transactionContext = transactionManager.begin(defaultTransactionProperty + transactionProperty)
-        val jdbcContext = JdbcContext(database, transactionContext.transaction)
+        val jdbcContext = JdbcContext(database, transactionOperator, transactionContext.transaction)
         return with(jdbcContext) {
             runCatching {
-                block(this@with, this@ContextualJdbcTransactionOperatorImpl)
+                block(this@with)
             }.onSuccess {
                 if (transactionManager.isRollbackOnly()) {
                     transactionManager.rollback()

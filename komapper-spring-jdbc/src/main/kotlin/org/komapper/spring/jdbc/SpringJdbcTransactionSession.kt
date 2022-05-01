@@ -7,13 +7,13 @@ import org.springframework.transaction.PlatformTransactionManager
 import java.sql.Connection
 import javax.sql.DataSource
 
-class PlatformTransactionSession(
+class SpringJdbcTransactionSession(
     transactionManager: PlatformTransactionManager,
     private val dataSource: DataSource
 ) :
     JdbcSession {
 
-    override val transactionOperator: TransactionOperator = PlatformTransactionOperator(transactionManager)
+    override val transactionOperator: TransactionOperator = SpringJdbcTransactionOperator(transactionManager)
 
     override fun getConnection(): Connection {
         return DataSourceUtils.getConnection(dataSource)
