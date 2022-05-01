@@ -1,1 +1,1 @@
-org.komapper.dialect.sqlserver.jdbc.JdbcSqlServerDialectFactory
+org.komapper.dialect.sqlserver.jdbc.SqlServerJdbcDialectFactory

@@ -6,7 +6,7 @@ import org.komapper.core.Statement
 import org.komapper.core.TemplateBuiltinExtensions
 import org.komapper.core.TemplateStatementBuilder
 import org.komapper.core.Value
-import org.komapper.dialect.h2.jdbc.JdbcH2Dialect
+import org.komapper.dialect.h2.jdbc.H2JdbcDialect
 import org.komapper.jdbc.JdbcDataType
 import org.komapper.jdbc.JdbcDataTypeProvider
 import org.komapper.jdbc.JdbcDatabase
@@ -43,7 +43,7 @@ class KomapperJdbcAutoConfigurationTest {
 
         val database = context.getBean(JdbcDatabase::class.java)
         assertNotNull(database)
-        assertTrue(database.config.dialect is JdbcH2Dialect)
+        assertTrue(database.config.dialect is H2JdbcDialect)
         assertNotNull(database.config.templateStatementBuilder)
     }
 

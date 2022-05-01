@@ -1,7 +1,7 @@
 package org.komapper.tx.context.r2dbc
 
 import io.r2dbc.spi.ConnectionFactories
-import org.komapper.dialect.h2.r2dbc.R2dbcH2Dialect
+import org.komapper.dialect.h2.r2dbc.H2R2dbcDialect
 import org.komapper.r2dbc.DefaultR2dbcDatabaseConfig
 import org.komapper.r2dbc.R2dbcDatabase
 import org.komapper.r2dbc.R2dbcSession
@@ -11,7 +11,7 @@ import org.komapper.tx.r2dbc.R2dbcTransactionSession
 internal class ContextualR2dbcFlowTransactionOperatorTest {
 
     private val connectionFactory = ConnectionFactories.get("r2dbc:h2:mem:///transaction-test;DB_CLOSE_DELAY=-1")
-    private val config = object : DefaultR2dbcDatabaseConfig(connectionFactory, R2dbcH2Dialect()) {
+    private val config = object : DefaultR2dbcDatabaseConfig(connectionFactory, H2R2dbcDialect()) {
         override val session: R2dbcSession by lazy {
             R2dbcTransactionSession(connectionFactory, loggerFacade)
         }

@@ -1,2 +1,2 @@
-org.komapper.dialect.mysql.jdbc.JdbcMySqlDialectFactory
+org.komapper.dialect.mysql.jdbc.MySqlJdbcDialectFactory
 

@@ -6,7 +6,7 @@ import org.komapper.core.Statement
 import org.komapper.core.TemplateBuiltinExtensions
 import org.komapper.core.TemplateStatementBuilder
 import org.komapper.core.Value
-import org.komapper.dialect.h2.r2dbc.R2dbcH2Dialect
+import org.komapper.dialect.h2.r2dbc.H2R2dbcDialect
 import org.komapper.r2dbc.R2dbcDatabase
 import org.springframework.boot.autoconfigure.r2dbc.R2dbcAutoConfiguration
 import org.springframework.context.annotation.AnnotationConfigApplicationContext
@@ -39,7 +39,7 @@ class KomapperR2dbcAutoConfigurationTest {
 
         val database = context.getBean(R2dbcDatabase::class.java)
         assertNotNull(database)
-        assertTrue(database.config.dialect is R2dbcH2Dialect)
+        assertTrue(database.config.dialect is H2R2dbcDialect)
         assertNotNull(database.config.templateStatementBuilder)
     }
 

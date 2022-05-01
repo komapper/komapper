@@ -1,1 +1,1 @@
-org.komapper.dialect.mariadb.r2dbc.R2dbcMariaDbDataTypeProviderFactory
+org.komapper.dialect.mariadb.r2dbc.MariaDbR2dbcDataTypeProviderFactory
