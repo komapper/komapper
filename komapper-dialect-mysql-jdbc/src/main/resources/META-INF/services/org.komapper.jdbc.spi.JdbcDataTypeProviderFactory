@@ -1,1 +1,1 @@
-org.komapper.dialect.mysql.jdbc.JdbcMySqlDataTypeProviderFactory
+org.komapper.dialect.mysql.jdbc.MySqlJdbcDataTypeProviderFactory

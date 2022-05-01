@@ -1,1 +1,1 @@
-org.komapper.dialect.oracle.r2dbc.R2dbcOracleDataTypeProviderFactory
+org.komapper.dialect.oracle.r2dbc.OracleR2dbcDataTypeProviderFactory

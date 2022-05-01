@@ -5,7 +5,7 @@ import kotlinx.coroutines.runBlocking
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
 import org.komapper.core.dsl.query.single
-import org.komapper.dialect.h2.r2dbc.R2dbcH2Dialect
+import org.komapper.dialect.h2.r2dbc.H2R2dbcDialect
 import org.komapper.r2dbc.DefaultR2dbcDatabaseConfig
 import org.komapper.r2dbc.R2dbcDatabase
 import org.komapper.r2dbc.R2dbcSession
@@ -21,7 +21,7 @@ internal class SpringR2dbcCoroutineTransactionOperatorTest {
 
     private val connectionFactory = ConnectionFactories.get("r2dbc:h2:mem:///transaction-test;DB_CLOSE_DELAY=-1")
     private val transactionManager = R2dbcTransactionManager(connectionFactory)
-    private val config = object : DefaultR2dbcDatabaseConfig(connectionFactory, R2dbcH2Dialect()) {
+    private val config = object : DefaultR2dbcDatabaseConfig(connectionFactory, H2R2dbcDialect()) {
         override val session: R2dbcSession = SpringR2dbcTransactionSession(transactionManager, connectionFactory)
     }
     private val db = R2dbcDatabase(config)

@@ -1,1 +1,1 @@
-org.komapper.dialect.sqlserver.r2dbc.R2dbcSqlServerDataTypeProviderFactory
+org.komapper.dialect.sqlserver.r2dbc.SqlServerR2dbcDataTypeProviderFactory

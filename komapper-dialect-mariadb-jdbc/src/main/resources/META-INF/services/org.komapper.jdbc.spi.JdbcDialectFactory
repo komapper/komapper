@@ -1,2 +1,2 @@
-org.komapper.dialect.mariadb.jdbc.JdbcMariaDbDialectFactory
+org.komapper.dialect.mariadb.jdbc.MariaDbJdbcDialectFactory
 
