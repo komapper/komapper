@@ -141,9 +141,7 @@ suspend fun main() {
 }
 ```
 
-## Status
-
-This project is still in development, all suggestions and contributions are welcome.
+## Design Policy
 
 See [DESIGN_DOC](DESIGN_DOC.md) for the design policy of this project.
 
