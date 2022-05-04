@@ -141,8 +141,13 @@ class JdbcUpdateSetTest(private val db: JdbcDatabase) {
     @Test
     fun assignTimestamp_auto() {
         val p = Meta.person
-        val person1 = db.runQuery {
+        db.runQuery {
             QueryDsl.insert(p).single(Person(1, "abc"))
+        }
+        val person1 = db.runQuery {
+            QueryDsl.from(p).where {
+                p.personId eq 1
+            }.first()
         }
         Thread.sleep(10)
         val count = db.runQuery {
@@ -164,8 +169,13 @@ class JdbcUpdateSetTest(private val db: JdbcDatabase) {
     @Test
     fun assignTimestamp_manual() {
         val p = Meta.person
-        val person1 = db.runQuery {
+        db.runQuery {
             QueryDsl.insert(p).single(Person(1, "abc"))
+        }
+        val person1 = db.runQuery {
+            QueryDsl.from(p).where {
+                p.personId eq 1
+            }.first()
         }
         Thread.sleep(10)
         val count = db.runQuery {
