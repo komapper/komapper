@@ -15,16 +15,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Set up JDK 11
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'temurin'
-          java-version: 11
-
-      - name: Prepare JDK11 env var
-        shell: bash
-        run: echo "JDK11=$JAVA_HOME" >> $GITHUB_ENV
-
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
@@ -34,7 +24,7 @@ jobs:
       - name: Check
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: check -x h2 -x :integration-test-jdbc:check -x :integration-test-r2dbc:check
+          arguments: javatoolchain check -x h2 -x :integration-test-jdbc:check -x :integration-test-r2dbc:check
 
       - name: Upload reports
         if: failure()
@@ -54,16 +44,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Set up JDK 11
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'temurin'
-          java-version: 11
-
-      - name: Prepare JDK11 env var
-        shell: bash
-        run: echo "JDK11=$JAVA_HOME" >> $GITHUB_ENV
-
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
@@ -73,7 +53,7 @@ jobs:
       - name: Test
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: :integration-test-jdbc:${{ matrix.driver }}
+          arguments: javatoolchain :integration-test-jdbc:${{ matrix.driver }}
 
       - name: Upload reports
         if: failure()
@@ -93,16 +73,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Set up JDK 11
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'temurin'
-          java-version: 11
-
-      - name: Prepare JDK11 env var
-        shell: bash
-        run: echo "JDK11=$JAVA_HOME" >> $GITHUB_ENV
-
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
@@ -112,7 +82,7 @@ jobs:
       - name: Test
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: :integration-test-r2dbc:${{ matrix.driver }}
+          arguments: javatoolchain :integration-test-r2dbc:${{ matrix.driver }}
 
       - name: Upload reports
         if: failure()
@@ -121,44 +91,34 @@ jobs:
           name: r2dbc-${{ matrix.driver }}
           path: ./**/build/reports
 
-  unstable-test-r2dbc:
-    runs-on: ubuntu-latest
-    continue-on-error: true
-    strategy:
-      matrix:
-        driver: [sqlserver]
-    timeout-minutes: 15
-
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Set up JDK 11
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'temurin'
-          java-version: 11
-
-      - name: Prepare JDK11 env var
-        shell: bash
-        run: echo "JDK11=$JAVA_HOME" >> $GITHUB_ENV
-
-      - name: Set up JDK 17
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'temurin'
-          java-version: 17
-
-      - name: Test
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: :integration-test-r2dbc:${{ matrix.driver }} -i
-
-      - name: Upload reports
-        if: always()
-        uses: actions/upload-artifact@v3
-        with:
-          name: r2dbc-${{ matrix.driver }}
-          path: ./**/build/reports
+#  unstable-test-r2dbc:
+#    runs-on: ubuntu-latest
+#    continue-on-error: true
+#    strategy:
+#      matrix:
+#        driver: [sqlserver]
+#    timeout-minutes: 15
+#
+#    steps:
+#      - uses: actions/checkout@v3
+#
+#      - name: Set up JDK 17
+#        uses: actions/setup-java@v3
+#        with:
+#          distribution: 'temurin'
+#          java-version: 17
+#
+#      - name: Test
+#        uses: gradle/gradle-build-action@v2
+#        with:
+#          arguments: javatoolchain :integration-test-r2dbc:${{ matrix.driver }} -i
+#
+#      - name: Upload reports
+#        if: always()
+#        uses: actions/upload-artifact@v3
+#        with:
+#          name: r2dbc-${{ matrix.driver }}
+#          path: ./**/build/reports
 
   publish:
     if: github.event_name == 'push'
@@ -167,16 +127,6 @@ jobs:
     needs: [ build, test-jdbc, test-r2dbc ]
 
     steps:
-      - name: Set up JDK 11
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'temurin'
-          java-version: 11
-
-      - name: Prepare JDK11 env var
-        shell: bash
-        run: echo "JDK11=$JAVA_HOME" >> $GITHUB_ENV
-
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:

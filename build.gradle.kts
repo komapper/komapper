@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
     java
     `maven-publish`
@@ -21,7 +23,7 @@ val integrationTestProjects = subprojects.filter {
 }
 val javaProjects = subprojects.filter {
     it.name.startsWith("komapper-quarkus") || it.name == "komapper-codegen"
-}
+} + gradlePluginProject
 val kotlinProjects = subprojects - platformProject - javaProjects.toSet()
 
 val isReleaseVersion = !version.toString().endsWith("SNAPSHOT")
@@ -60,13 +62,24 @@ configure(libraryProjects + gradlePluginProject + exampleProjects + integrationT
 
     java {
         toolchain {
-            languageVersion.set(JavaLanguageVersion.of(11))
+            languageVersion.set(JavaLanguageVersion.of(17))
+            vendor.set(JvmVendorSpec.ADOPTIUM)
         }
     }
+
+    val jvmTarget = 11
 
     tasks {
         withType<Test>().configureEach {
             useJUnitPlatform()
+        }
+
+        withType<JavaCompile>().configureEach {
+            options.release.set(jvmTarget)
+        }
+
+        withType<KotlinCompile>().configureEach {
+            kotlinOptions.jvmTarget = jvmTarget.toString()
         }
     }
 }
@@ -91,6 +104,14 @@ configure(javaProjects) {
     spotless {
         java {
             googleJavaFormat("1.13.0")
+        }
+    }
+
+    tasks {
+        javadoc {
+            (options as StandardJavadocDocletOptions).apply {
+                addStringOption("Xdoclint:none", "-quiet")
+            }
         }
     }
 }

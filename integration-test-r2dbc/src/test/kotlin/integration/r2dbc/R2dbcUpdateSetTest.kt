@@ -128,8 +128,13 @@ class R2dbcUpdateSetTest(private val db: R2dbcDatabase) {
     @Test
     fun assignTimestamp_auto(info: TestInfo) = inTransaction(db, info) {
         val p = Meta.person
-        val person1 = db.runQuery {
+        db.runQuery {
             QueryDsl.insert(p).single(Person(1, "abc"))
+        }
+        val person1 = db.runQuery {
+            QueryDsl.from(p).where {
+                p.personId eq 1
+            }.first()
         }
         delay(10)
         val count = db.runQuery {
@@ -151,8 +156,13 @@ class R2dbcUpdateSetTest(private val db: R2dbcDatabase) {
     @Test
     fun assignTimestamp_manual(info: TestInfo) = inTransaction(db, info) {
         val p = Meta.person
-        val person1 = db.runQuery {
+        db.runQuery {
             QueryDsl.insert(p).single(Person(1, "abc"))
+        }
+        val person1 = db.runQuery {
+            QueryDsl.from(p).where {
+                p.personId eq 1
+            }.first()
         }
         delay(10)
         val count = db.runQuery {
