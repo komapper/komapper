@@ -1,18 +1,17 @@
 package org.komapper.gradle.codegen;
 
-import org.gradle.api.DefaultTask;
-import org.gradle.api.tasks.TaskAction;
-import org.komapper.codegen.CodeGenerator;
-import org.komapper.codegen.MetadataReader;
-import org.komapper.codegen.Table;
-
-import javax.inject.Inject;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
+import javax.inject.Inject;
+import org.gradle.api.DefaultTask;
+import org.gradle.api.tasks.TaskAction;
+import org.komapper.codegen.CodeGenerator;
+import org.komapper.codegen.MetadataReader;
+import org.komapper.codegen.Table;
 
 public class GenerateTask extends DefaultTask {
 

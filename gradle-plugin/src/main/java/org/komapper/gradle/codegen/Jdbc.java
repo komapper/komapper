@@ -1,10 +1,9 @@
 package org.komapper.gradle.codegen;
 
+import java.util.Objects;
+import javax.inject.Inject;
 import org.gradle.api.model.ObjectFactory;
 import org.gradle.api.provider.Property;
-
-import javax.inject.Inject;
-import java.util.Objects;
 
 public class Jdbc {
   private final Property<String> driver;

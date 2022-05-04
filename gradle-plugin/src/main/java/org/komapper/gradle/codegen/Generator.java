@@ -1,17 +1,16 @@
 package org.komapper.gradle.codegen;
 
+import java.util.Collections;
+import java.util.Objects;
+import javax.inject.Inject;
 import org.gradle.api.Action;
 import org.gradle.api.Project;
 import org.gradle.api.file.DirectoryProperty;
 import org.gradle.api.model.ObjectFactory;
 import org.gradle.api.provider.ListProperty;
 import org.gradle.api.provider.Property;
-import org.komapper.codegen.PropertyTypeResolver;
 import org.komapper.codegen.Enquote;
-
-import javax.inject.Inject;
-import java.util.Collections;
-import java.util.Objects;
+import org.komapper.codegen.PropertyTypeResolver;
 
 public class Generator {
   private final String name;

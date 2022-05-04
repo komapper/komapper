@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
     java
     `maven-publish`
@@ -21,7 +23,7 @@ val integrationTestProjects = subprojects.filter {
 }
 val javaProjects = subprojects.filter {
     it.name.startsWith("komapper-quarkus") || it.name == "komapper-codegen"
-}
+} + gradlePluginProject
 val kotlinProjects = subprojects - platformProject - javaProjects.toSet()
 
 val isReleaseVersion = !version.toString().endsWith("SNAPSHOT")
@@ -101,6 +103,14 @@ configure(javaProjects) {
     spotless {
         java {
             googleJavaFormat("1.13.0")
+        }
+    }
+
+    tasks {
+        javadoc {
+            (options as StandardJavadocDocletOptions).apply {
+                addStringOption("Xdoclint:none", "-quiet")
+            }
         }
     }
 }
