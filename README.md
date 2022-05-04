@@ -12,7 +12,7 @@ For more documentation, go to our site:
 
 ## Features
 
-### Highlighted features
+### Highlighted
 
 - Support for both JDBC and R2DBC
 - Code generation at compile-time using [Kotlin Symbol Processing API](https://github.com/google/ksp)
@@ -20,10 +20,11 @@ For more documentation, go to our site:
 - Support for Kotlin value classes
 - Easy Spring Boot integration
 
-### Experimentally supported features
+### Experimental
 
 - Quarkus integration
 - Spring Native integration
+- Transaction management using context receivers
 
 ## Prerequisite
 
@@ -44,7 +45,10 @@ Komapper is tested with the following databases:
 | PostgreSQL         | 12.9    |      v       |       v       |
 | SQL Server         | 2019    |      v       |       v       |
 
-Supported connectivity types are JDBC 4.3 and R2DBC 0.9.1.
+Supported connectivity types:
+
+- JDBC 4.3
+- R2DBC 0.9.1 or later
 
 ## Installation
 
@@ -59,9 +63,13 @@ plugins {
 val komapperVersion = "0.33.0"
 
 dependencies {
-    implementation("org.komapper:komapper-starter-jdbc:$komapperVersion")
-    implementation("org.komapper:komapper-dialect-h2-jdbc:$komapperVersion")
-    ksp("org.komapper:komapper-processor:$komapperVersion")
+    platform("org.komapper:komapper-platform:$komapperVersion").let {
+        implementation(it)
+        ksp(it)
+    }
+    implementation("org.komapper:komapper-starter-jdbc")
+    implementation("org.komapper:komapper-dialect-h2-jdbc")
+    ksp("org.komapper:komapper-processor")
 }
 ```
 
@@ -133,18 +141,15 @@ suspend fun main() {
 }
 ```
 
-## Status
-
-This project is still in development, all suggestions and contributions are welcome.
+## Design Policy
 
 See [DESIGN_DOC](DESIGN_DOC.md) for the design policy of this project.
 
 ## Roadmap
 
-1.0 GA will be released in May 2022.
+1.0 GA will be released in late May 2022.
 
 The main tasks until the 1.0 GA release are as follows:
 
 - Improve the documentation
-- Support R2DBC 1.0 GA
 - Support Spring Boot 2.7 GA
