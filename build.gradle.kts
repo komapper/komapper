@@ -60,13 +60,23 @@ configure(libraryProjects + gradlePluginProject + exampleProjects + integrationT
 
     java {
         toolchain {
-            languageVersion.set(JavaLanguageVersion.of(11))
+            languageVersion.set(JavaLanguageVersion.of(17))
         }
     }
+
+    val jvmTarget = 11
 
     tasks {
         withType<Test>().configureEach {
             useJUnitPlatform()
+        }
+
+        withType<JavaCompile>().configureEach {
+            options.release.set(jvmTarget)
+        }
+
+        withType<KotlinCompile>().configureEach {
+            kotlinOptions.jvmTarget = jvmTarget.toString()
         }
     }
 }
