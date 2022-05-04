@@ -91,34 +91,34 @@ jobs:
           name: r2dbc-${{ matrix.driver }}
           path: ./**/build/reports
 
-  unstable-test-r2dbc:
-    runs-on: ubuntu-latest
-    continue-on-error: true
-    strategy:
-      matrix:
-        driver: [sqlserver]
-    timeout-minutes: 15
-
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Set up JDK 17
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'temurin'
-          java-version: 17
-
-      - name: Test
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: javatoolchain :integration-test-r2dbc:${{ matrix.driver }} -i
-
-      - name: Upload reports
-        if: always()
-        uses: actions/upload-artifact@v3
-        with:
-          name: r2dbc-${{ matrix.driver }}
-          path: ./**/build/reports
+#  unstable-test-r2dbc:
+#    runs-on: ubuntu-latest
+#    continue-on-error: true
+#    strategy:
+#      matrix:
+#        driver: [sqlserver]
+#    timeout-minutes: 15
+#
+#    steps:
+#      - uses: actions/checkout@v3
+#
+#      - name: Set up JDK 17
+#        uses: actions/setup-java@v3
+#        with:
+#          distribution: 'temurin'
+#          java-version: 17
+#
+#      - name: Test
+#        uses: gradle/gradle-build-action@v2
+#        with:
+#          arguments: javatoolchain :integration-test-r2dbc:${{ matrix.driver }} -i
+#
+#      - name: Upload reports
+#        if: always()
+#        uses: actions/upload-artifact@v3
+#        with:
+#          name: r2dbc-${{ matrix.driver }}
+#          path: ./**/build/reports
 
   publish:
     if: github.event_name == 'push'
