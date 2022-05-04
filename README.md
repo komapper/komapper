@@ -12,7 +12,7 @@ For more documentation, go to our site:
 
 ## Features
 
-### Highlighted features
+### Highlighted
 
 - Support for both JDBC and R2DBC
 - Code generation at compile-time using [Kotlin Symbol Processing API](https://github.com/google/ksp)
@@ -20,10 +20,11 @@ For more documentation, go to our site:
 - Support for Kotlin value classes
 - Easy Spring Boot integration
 
-### Experimentally supported features
+### Experimental
 
 - Quarkus integration
 - Spring Native integration
+- Transaction management using context receivers
 
 ## Prerequisite
 
