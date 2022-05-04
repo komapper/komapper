@@ -24,7 +24,7 @@ jobs:
       - name: Check
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: check -x h2 -x :integration-test-jdbc:check -x :integration-test-r2dbc:check
+          arguments: javatoolchain check -x h2 -x :integration-test-jdbc:check -x :integration-test-r2dbc:check
 
       - name: Upload reports
         if: failure()
@@ -53,7 +53,7 @@ jobs:
       - name: Test
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: :integration-test-jdbc:${{ matrix.driver }}
+          arguments: javatoolchain :integration-test-jdbc:${{ matrix.driver }}
 
       - name: Upload reports
         if: failure()
@@ -82,7 +82,7 @@ jobs:
       - name: Test
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: :integration-test-r2dbc:${{ matrix.driver }}
+          arguments: javatoolchain :integration-test-r2dbc:${{ matrix.driver }}
 
       - name: Upload reports
         if: failure()
@@ -111,7 +111,7 @@ jobs:
       - name: Test
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: :integration-test-r2dbc:${{ matrix.driver }} -i
+          arguments: javatoolchain :integration-test-r2dbc:${{ matrix.driver }} -i
 
       - name: Upload reports
         if: always()
