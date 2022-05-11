@@ -51,11 +51,10 @@ internal class EntityFactory(config: Config, private val entityDef: EntityDef) {
         val propertyDefMap = entityDef.properties.associateBy { it.declaration.simpleName }
         val (_, entityDeclaration) = entityDef.definitionSource
         val propertyDeclarationMap = entityDeclaration.getDeclaredProperties().associateBy { it.simpleName }
-        // TODO: invoked multiple times?
-        return entityDeclaration.primaryConstructor?.parameters
-            ?.asSequence()
-            ?.map { propertyDefMap[it.name!!] to it }
-            ?.map { (propertyDef, parameter) ->
+        val parameters = entityDeclaration.primaryConstructor?.parameters ?: return emptyList()
+        return parameters.asSequence()
+            .map { propertyDefMap[it.name!!] to it }
+            .map { (propertyDef, parameter) ->
                 val declaration = propertyDeclarationMap[parameter.name]
                     ?: report("The corresponding property declaration is not found.", parameter)
                 val column = getColumn(propertyDef, parameter)
@@ -72,12 +71,8 @@ internal class EntityFactory(config: Config, private val entityDef: EntityDef) {
                     literalTag = literalTag,
                     nullability = nullability,
                     kind = kind
-                ).also {
-                    validateProperty(it)
-                }
-            }?.also {
-                validateAllProperties(it)
-            }?.toList() ?: emptyList()
+                ).also { validateProperty(it) }
+            }.toList().also { validateAllProperties(it) }
     }
 
     private fun createEnumClass(type: KSType): EnumClass? {
@@ -273,7 +268,7 @@ internal class EntityFactory(config: Config, private val entityDef: EntityDef) {
         }
     }
 
-    private fun validateAllProperties(properties: Sequence<Property>) {
+    private fun validateAllProperties(properties: List<Property>) {
         val propertyDefMap = entityDef.properties.associateBy { it.declaration.simpleName }
         val propertyMap = properties.associateBy { it.declaration.simpleName }
         for ((key, value) in propertyDefMap) {
