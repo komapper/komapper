@@ -1,6 +1,5 @@
 package org.komapper.dialect.postgresql.r2dbc
 
-import org.komapper.r2dbc.AbstractR2dbcDataTypeProvider
 import org.komapper.r2dbc.R2dbcBigDecimalType
 import org.komapper.r2dbc.R2dbcBigIntegerType
 import org.komapper.r2dbc.R2dbcBlobType
@@ -24,9 +23,10 @@ import org.komapper.r2dbc.R2dbcStringType
 import org.komapper.r2dbc.R2dbcUByteType
 import org.komapper.r2dbc.R2dbcUIntType
 import org.komapper.r2dbc.R2dbcUShortType
+import kotlin.reflect.KClass
 
-class PostgreSqlR2dbcDataTypeProvider(next: R2dbcDataTypeProvider) :
-    AbstractR2dbcDataTypeProvider(next, DEFAULT_DATA_TYPES) {
+class PostgreSqlR2dbcDataTypeProvider(private val next: R2dbcDataTypeProvider) :
+    R2dbcDataTypeProvider {
 
     companion object {
         val DEFAULT_DATA_TYPES: List<R2dbcDataType<*>> = listOf(
@@ -55,5 +55,25 @@ class PostgreSqlR2dbcDataTypeProvider(next: R2dbcDataTypeProvider) :
             PostgreSqlR2dbcJsonType,
             PostgreSqlR2dbcUUIDType
         )
+    }
+
+    private val dataTypeMap: Map<KClass<*>, R2dbcDataType<*>> = DEFAULT_DATA_TYPES.associateBy { it.klass }
+
+    override fun <T : Any> get(klass: KClass<out T>): R2dbcDataType<T>? {
+        return if (Array::class.java.isAssignableFrom(klass.java)) {
+            val componentType = klass.java.componentType.kotlin
+            val componentDataType = getDataType(componentType)
+            checkNotNull(componentDataType) { "The dataType is not found for the component type \"${componentType.qualifiedName}\"." }
+            @Suppress("UNCHECKED_CAST")
+            PostgreSqlR2dbcArrayType(klass, componentDataType) as R2dbcDataType<T>?
+        } else {
+            getDataType(klass)
+        }
+    }
+
+    private fun <T : Any> getDataType(klass: KClass<out T>): R2dbcDataType<T>? {
+        @Suppress("UNCHECKED_CAST")
+        val dataType = dataTypeMap[klass] as R2dbcDataType<T>?
+        return dataType ?: next.get(klass)
     }
 }

@@ -5,6 +5,7 @@ import com.google.devtools.ksp.symbol.KSAnnotation
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSDeclaration
 import com.google.devtools.ksp.symbol.KSPropertyDeclaration
+import com.google.devtools.ksp.symbol.KSType
 import com.google.devtools.ksp.symbol.KSValueParameter
 import com.google.devtools.ksp.symbol.Nullability
 
@@ -57,41 +58,46 @@ internal data class Property(
     }
 }
 
-internal sealed class KotlinClass {
-    abstract val declaration: KSDeclaration
+internal sealed interface KotlinClass {
+    val type: KSType
+    val declaration: KSDeclaration get() = type.declaration
     val exteriorTypeName: String get() = (declaration.qualifiedName ?: declaration.simpleName).asString()
-    abstract val interiorTypeName: String
-    override fun toString(): String {
-        return exteriorTypeName
-    }
+    val interiorTypeName: String
 }
 
 internal data class EnumClass(
-    override val declaration: KSClassDeclaration
-) : KotlinClass() {
+    override val type: KSType,
+) : KotlinClass {
     override val interiorTypeName: String = "String"
-    override fun toString(): String {
-        return super.toString()
-    }
+    override fun toString(): String = exteriorTypeName
 }
 
 internal data class ValueClass(
-    override val declaration: KSClassDeclaration,
+    override val type: KSType,
     val property: ValueClassProperty,
-) : KotlinClass() {
+) : KotlinClass {
     override val interiorTypeName: String get() = property.typeName
-    override fun toString(): String {
-        return super.toString()
-    }
+    override fun toString(): String = exteriorTypeName
 }
 
 internal data class PlainClass(
-    override val declaration: KSDeclaration
-) : KotlinClass() {
+    override val type: KSType,
+) : KotlinClass {
+    val isArray: Boolean = declaration.qualifiedName?.asString() == "kotlin.Array"
+
+    override val exteriorTypeName: String
+        get() {
+            return if (isArray) {
+                val nonNullableType =
+                    if (type.isMarkedNullable) { type.makeNotNullable() } else type
+                nonNullableType.buildQualifiedName()
+            } else {
+                super.exteriorTypeName
+            }
+        }
+
     override val interiorTypeName: String get() = exteriorTypeName
-    override fun toString(): String {
-        return super.toString()
-    }
+    override fun toString(): String = exteriorTypeName
 }
 
 internal data class ValueClassProperty(

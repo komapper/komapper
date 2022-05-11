@@ -80,9 +80,68 @@ import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 
 @ExtendWith(R2dbcEnv::class)
 class R2dbcDataTypeTest(val db: R2dbcDatabase) {
+
+    @Run(onlyIf = [Dbms.POSTGRESQL])
+    @Test
+    fun array(info: TestInfo) = inTransaction(db, info) {
+        val m = Meta.arrayTest
+        val array = arrayOf("A", "B", "C")
+        val data = ArrayTest(1, array)
+        db.runQuery { QueryDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        val value = data2.value!!
+        assertEquals(3, value.size)
+        assertEquals("A", value[0])
+        assertEquals("B", value[1])
+        assertEquals("C", value[2])
+    }
+
+    @Run(onlyIf = [Dbms.POSTGRESQL])
+    @Test
+    fun array_null(info: TestInfo) = inTransaction(db, info) {
+        val m = Meta.arrayTest
+        val data = ArrayTest(1, null)
+        db.runQuery { QueryDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        assertNull(data2.value)
+    }
+
+    @Run(onlyIf = [Dbms.POSTGRESQL])
+    @Test
+    fun arrayOfNullable(info: TestInfo) = inTransaction(db, info) {
+        val m = Meta.arrayOfNullableTest
+        val array = arrayOf("A", null, "C")
+        val data = ArrayOfNullableTest(1, array)
+        db.runQuery { QueryDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        val value = data2.value!!
+        assertEquals(3, value.size)
+        assertEquals("A", value[0])
+        assertNull(value[1])
+        assertEquals("C", value[2])
+    }
+
+    @Run(onlyIf = [Dbms.POSTGRESQL])
+    @Test
+    fun arrayOfNullable_null(info: TestInfo) = inTransaction(db, info) {
+        val m = Meta.arrayOfNullableTest
+        val data = ArrayOfNullableTest(1, null)
+        db.runQuery { QueryDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        assertNull(data2.value)
+    }
 
     @Test
     fun bigDecimal(info: TestInfo) = inTransaction(db, info) {

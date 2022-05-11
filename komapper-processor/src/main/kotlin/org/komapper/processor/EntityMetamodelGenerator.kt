@@ -53,7 +53,7 @@ internal class EntityMetamodelGenerator(
     ).joinToString(", ")
 
     override fun run() {
-        w.println("@file:Suppress(\"ClassName\", \"PrivatePropertyName\", \"UNUSED_PARAMETER\", \"unused\", \"RemoveRedundantQualifierName\", \"MemberVisibilityCanBePrivate\", \"RedundantNullableReturnType\", \"USELESS_CAST\")")
+        w.println("@file:Suppress(\"ClassName\", \"PrivatePropertyName\", \"UNUSED_PARAMETER\", \"unused\", \"RemoveRedundantQualifierName\", \"MemberVisibilityCanBePrivate\", \"RedundantNullableReturnType\", \"USELESS_CAST\", \"UNCHECKED_CAST\")")
 
         if (packageName.isNotEmpty()) {
             w.println("package $packageName")
