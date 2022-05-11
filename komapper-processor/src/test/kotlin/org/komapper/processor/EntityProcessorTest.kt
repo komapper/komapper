@@ -817,7 +817,7 @@ class EntityProcessorTest {
     }
 
     @Test
-    fun `The property type must not have any type parameters`() {
+    fun `The non-array property type must not have any type parameters`() {
         val result = compile(
             kotlin(
                 "source.kt",
@@ -833,7 +833,25 @@ class EntityProcessorTest {
             )
         )
         assertEquals(result.exitCode, KotlinCompilation.ExitCode.COMPILATION_ERROR)
-        assertTrue(result.messages.contains("The property type must not have any type parameters."))
+        assertTrue(result.messages.contains("The non-array property type must not have any type parameters."))
+    }
+    @Test
+    fun `The array property type can have a type parameter`() {
+        val result = compile(
+            kotlin(
+                "source.kt",
+                """
+                package test
+                import org.komapper.annotation.*
+                @KomapperEntity
+                data class Dept(
+                    @KomapperId val id: Int,
+                    @Suppress("ArrayInDataClass") val names: Array<String>,
+                )
+                """
+            )
+        )
+        assertEquals(result.exitCode, KotlinCompilation.ExitCode.OK)
     }
 
     @Test

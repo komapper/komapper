@@ -49,6 +49,16 @@ internal fun KSType.normalize(): KSType {
     )
 }
 
+internal fun KSType.buildQualifiedName(): String {
+    val parentDeclaration = declaration.parentDeclaration
+    val base = if (parentDeclaration == null) {
+        declaration.packageName.asString()
+    } else {
+        (parentDeclaration.qualifiedName ?: parentDeclaration.simpleName).asString()
+    }
+    return "$base.$this"
+}
+
 internal fun toCamelCase(text: String): String {
     val builder = StringBuilder()
     val buf = CharBuffer.wrap(text)

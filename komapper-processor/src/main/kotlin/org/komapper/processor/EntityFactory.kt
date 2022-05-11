@@ -51,15 +51,15 @@ internal class EntityFactory(config: Config, private val entityDef: EntityDef) {
         val propertyDefMap = entityDef.properties.associateBy { it.declaration.simpleName }
         val (_, entityDeclaration) = entityDef.definitionSource
         val propertyDeclarationMap = entityDeclaration.getDeclaredProperties().associateBy { it.simpleName }
-        return entityDeclaration.primaryConstructor?.parameters
-            ?.asSequence()
-            ?.map { propertyDefMap[it.name!!] to it }
-            ?.map { (propertyDef, parameter) ->
+        val parameters = entityDeclaration.primaryConstructor?.parameters ?: return emptyList()
+        return parameters.asSequence()
+            .map { propertyDefMap[it.name!!] to it }
+            .map { (propertyDef, parameter) ->
                 val declaration = propertyDeclarationMap[parameter.name]
                     ?: report("The corresponding property declaration is not found.", parameter)
                 val column = getColumn(propertyDef, parameter)
                 val type = parameter.type.resolve().normalize()
-                val kotlinClass = createEnumClass(type) ?: createValueClass(type) ?: PlainClass(type.declaration)
+                val kotlinClass = createEnumClass(type) ?: createValueClass(type) ?: PlainClass(type)
                 val literalTag = resolveLiteralTag(kotlinClass.exteriorTypeName)
                 val nullability = type.nullability
                 val kind = propertyDef?.kind
@@ -71,12 +71,8 @@ internal class EntityFactory(config: Config, private val entityDef: EntityDef) {
                     literalTag = literalTag,
                     nullability = nullability,
                     kind = kind
-                ).also {
-                    validateProperty(it)
-                }
-            }?.also {
-                validateAllProperties(it)
-            }?.toList() ?: emptyList()
+                ).also { validateProperty(it) }
+            }.toList().also { validateAllProperties(it) }
     }
 
     private fun createEnumClass(type: KSType): EnumClass? {
@@ -88,7 +84,7 @@ internal class EntityFactory(config: Config, private val entityDef: EntityDef) {
 
                 override fun visitClassDeclaration(classDeclaration: KSClassDeclaration, data: Unit): EnumClass? {
                     return if (classDeclaration.classKind == ClassKind.ENUM_CLASS) {
-                        return EnumClass(classDeclaration)
+                        EnumClass(type)
                     } else {
                         null
                     }
@@ -112,12 +108,15 @@ internal class EntityFactory(config: Config, private val entityDef: EntityDef) {
                     val declaration = classDeclaration.getDeclaredProperties().firstOrNull()
                     return if (classDeclaration.isValueClass() && isPublic && parameter != null && declaration != null) {
                         val interiorType = parameter.type.resolve()
-                        val typeName =
-                            (interiorType.declaration.qualifiedName ?: interiorType.declaration.simpleName).asString()
+                        val nonNullableInteriorType =
+                            if (interiorType.isMarkedNullable) {
+                                interiorType.makeNotNullable()
+                            } else interiorType
+                        val typeName = nonNullableInteriorType.buildQualifiedName()
                         val literalTag = resolveLiteralTag(typeName)
                         val nullability = interiorType.nullability
                         val property = ValueClassProperty(parameter, declaration, typeName, literalTag, nullability)
-                        return ValueClass(classDeclaration, property)
+                        ValueClass(type, property)
                     } else {
                         null
                     }
@@ -149,11 +148,10 @@ internal class EntityFactory(config: Config, private val entityDef: EntityDef) {
             if (property.isPrivate()) {
                 report("The property must not be private.", property.parameter)
             }
-            if (property.kotlinClass.declaration.typeParameters.isNotEmpty()) {
-                report("The property type must not have any type parameters.", property.parameter)
-            }
-            if (property.kotlinClass is ValueClass) {
-                validateValueClassProperty(property, property.kotlinClass.property)
+            when (val kotlinClass = property.kotlinClass) {
+                is EnumClass -> Unit
+                is ValueClass -> validateValueClassProperty(property, kotlinClass)
+                is PlainClass -> validatePlainClassProperty(property, kotlinClass)
             }
         }
         when (val kind = property.kind) {
@@ -166,7 +164,8 @@ internal class EntityFactory(config: Config, private val entityDef: EntityDef) {
         }
     }
 
-    private fun validateValueClassProperty(property: Property, valueClassProperty: ValueClassProperty) {
+    private fun validateValueClassProperty(property: Property, valueClass: ValueClass) {
+        val valueClassProperty = valueClass.property
         if (valueClassProperty.isPrivate()) {
             report(
                 "The value class's own property '$valueClassProperty' must not be private.",
@@ -178,6 +177,12 @@ internal class EntityFactory(config: Config, private val entityDef: EntityDef) {
                 "The value class's own property '$valueClassProperty' must not be nullable.",
                 property.parameter
             )
+        }
+    }
+
+    private fun validatePlainClassProperty(property: Property, plainClass: PlainClass) {
+        if (!plainClass.isArray && plainClass.declaration.typeParameters.isNotEmpty()) {
+            report("The non-array property type must not have any type parameters.", property.parameter)
         }
     }
 
@@ -263,7 +268,7 @@ internal class EntityFactory(config: Config, private val entityDef: EntityDef) {
         }
     }
 
-    private fun validateAllProperties(properties: Sequence<Property>) {
+    private fun validateAllProperties(properties: List<Property>) {
         val propertyDefMap = entityDef.properties.associateBy { it.declaration.simpleName }
         val propertyMap = properties.associateBy { it.declaration.simpleName }
         for ((key, value) in propertyDefMap) {
