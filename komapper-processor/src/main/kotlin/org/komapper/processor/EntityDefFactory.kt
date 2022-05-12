@@ -52,21 +52,18 @@ internal class EntityDefFactory(
 
     private fun createAllProperties(): List<PropertyDef> {
         val propertyDeclarationMap = defDeclaration.getDeclaredProperties().associateBy { it.simpleName }
-        return defDeclaration.primaryConstructor?.parameters
-            ?.asSequence()
-            ?.map { parameter ->
-                val declaration = propertyDeclarationMap[parameter.name]
-                    ?: report("The corresponding property declaration is not found.", parameter)
-                val column = getColumn(parameter)
-                val idKind = createIdKind(parameter)
-                val kind = createPropertyKind(parameter, idKind)
-                PropertyDef(parameter, declaration, column, kind)
-            }?.also {
-                validateProperties(it)
-            }?.toList() ?: emptyList()
+        val parameters = defDeclaration.primaryConstructor?.parameters ?: return emptyList()
+        return parameters.map { parameter ->
+            val declaration = propertyDeclarationMap[parameter.name]
+                ?: report("The corresponding property declaration is not found.", parameter)
+            val column = getColumn(parameter)
+            val idKind = createIdKind(parameter)
+            val kind = createPropertyKind(parameter, idKind)
+            PropertyDef(parameter, declaration, column, kind)
+        }.also { validateProperties(it) }
     }
 
-    private fun validateProperties(properties: Sequence<PropertyDef>) {
+    private fun validateProperties(properties: List<PropertyDef>) {
         if (properties.hasDuplicates { it.kind is PropertyKind.Version }) {
             report("Multiple @${KomapperVersion::class.simpleName} cannot coexist in a single class.", defDeclaration)
         }
