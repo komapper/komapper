@@ -11,7 +11,7 @@ import com.google.devtools.ksp.visitor.KSEmptyVisitor
 import java.nio.CharBuffer
 import kotlin.reflect.KClass
 
-internal fun <T> Sequence<T>.hasDuplicates(predicate: (T) -> Boolean): Boolean {
+internal fun <T> Iterable<T>.hasDuplicates(predicate: (T) -> Boolean): Boolean {
     return this.filter(predicate).take(2).count() == 2
 }
 
