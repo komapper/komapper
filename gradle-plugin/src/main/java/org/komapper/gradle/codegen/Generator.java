@@ -9,7 +9,9 @@ import org.gradle.api.file.DirectoryProperty;
 import org.gradle.api.model.ObjectFactory;
 import org.gradle.api.provider.ListProperty;
 import org.gradle.api.provider.Property;
+import org.komapper.codegen.ClassNameResolver;
 import org.komapper.codegen.Enquote;
+import org.komapper.codegen.PropertyNameResolver;
 import org.komapper.codegen.PropertyTypeResolver;
 
 public class Generator {
@@ -30,6 +32,9 @@ public class Generator {
   private final Property<Boolean> useSchema;
   private final Property<PropertyTypeResolver> propertyTypeResolver;
   private final Property<Enquote> enquote;
+
+  private final Property<ClassNameResolver> classNameResolver;
+  private final Property<PropertyNameResolver> propertyNameResolver;
 
   @Inject
   public Generator(String name, Project project) {
@@ -58,6 +63,10 @@ public class Generator {
         objects.property(PropertyTypeResolver.class).value(PropertyTypeResolver.of());
     this.enquote = objects.property(Enquote.class);
     enquote.set(jdbc.getUrl().map(Enquote::of));
+    this.classNameResolver = objects.property(ClassNameResolver.class);
+    classNameResolver.set(prefix.zip(suffix, ClassNameResolver::of));
+    this.propertyNameResolver =
+        objects.property(PropertyNameResolver.class).value(PropertyNameResolver.of());
   }
 
   public String getName() {
@@ -126,6 +135,14 @@ public class Generator {
 
   public Property<Enquote> getEnquote() {
     return enquote;
+  }
+
+  public Property<ClassNameResolver> getClassNameResolver() {
+    return classNameResolver;
+  }
+
+  public Property<PropertyNameResolver> getPropertyNameResolver() {
+    return propertyNameResolver;
   }
 
   public void jdbc(Action<Jdbc> action) {

@@ -56,9 +56,9 @@ public class GenerateTask extends DefaultTask {
     CodeGenerator generator =
         new CodeGenerator(
             settings.getPackageName().getOrNull(),
-            settings.getPrefix().get(),
-            settings.getSuffix().get(),
-            tables);
+            tables,
+            settings.getClassNameResolver().get(),
+            settings.getPropertyNameResolver().get());
     var destinationDir = settings.getDestinationDir().get().getAsFile().toPath();
     try (var writer =
         generator.createNewFile(
