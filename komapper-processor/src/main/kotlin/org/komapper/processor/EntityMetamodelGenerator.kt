@@ -149,8 +149,8 @@ internal class EntityMetamodelGenerator(
             val columnName = "\"${p.column.name}\""
             val alwaysQuote = "${p.column.alwaysQuote}"
             val masking = "${p.column.masking}"
-            val getter = "{ it.$p }"
-            val setter = "{ e, v -> e.copy($p = v) }"
+            val getter = "{ it.`$p` }"
+            val setter = "{ e, v -> e.copy(`$p` = v) }"
             val wrap = when (p.kotlinClass) {
                 is EnumClass -> "{ ${p.kotlinClass.declaration}.valueOf(it) }"
                 is ValueClass -> "{ ${p.kotlinClass}(it) }"
@@ -164,7 +164,7 @@ internal class EntityMetamodelGenerator(
             val nullable = if (p.nullability == Nullability.NULLABLE) "true" else "false"
             val propertyDescriptor =
                 "$PropertyDescriptor<$entityTypeName, $exteriorTypeName, $interiorTypeName>"
-            w.println("        val $p = $propertyDescriptor($exteriorClass, $interiorClass, \"$p\", $columnName, $alwaysQuote, $masking, $getter, $setter, $wrap, $unwrap, $nullable)")
+            w.println("        val `$p` = $propertyDescriptor($exteriorClass, $interiorClass, \"$p\", $columnName, $alwaysQuote, $masking, $getter, $setter, $wrap, $unwrap, $nullable)")
         }
         w.println("    }")
     }
@@ -175,7 +175,7 @@ internal class EntityMetamodelGenerator(
             val interiorTypeName = p.interiorTypeName
             val propertyMetamodel =
                 "$PropertyMetamodel<$entityTypeName, $exteriorTypeName, $interiorTypeName>"
-            w.println("    val $p: $propertyMetamodel by lazy { $PropertyMetamodelImpl(this, $EntityDescriptor.$p) }")
+            w.println("    val `$p`: $propertyMetamodel by lazy { $PropertyMetamodelImpl(this, $EntityDescriptor.`$p`) }")
         }
     }
 
@@ -223,11 +223,11 @@ internal class EntityMetamodelGenerator(
             val (p, idKind) = pair
             val assignment = when (idKind) {
                 is IdKind.AutoIncrement -> {
-                    "$AutoIncrement($p)"
+                    "$AutoIncrement(`$p`)"
                 }
                 is IdKind.Sequence -> {
                     val paramList = listOf(
-                        "$p",
+                        "`$p`",
                         "::convertToId",
                         "$EntityDescriptor.__idContextMap",
                         "\"${idKind.name}\"",
@@ -247,24 +247,27 @@ internal class EntityMetamodelGenerator(
     }
 
     private fun idProperties() {
-        val idNameList = entity.idProperties.joinToString { it.toString() }
+        val idNameList = entity.idProperties.joinToString { "`$it`" }
         w.println("    override fun idProperties(): List<$PropertyMetamodel<$entityTypeName, *, *>> = listOf($idNameList)")
     }
 
     private fun versionProperty() {
-        w.println("    override fun versionProperty(): $PropertyMetamodel<$entityTypeName, *, *>? = ${entity.versionProperty}")
+        val body = if (entity.versionProperty == null) "null" else "`${entity.versionProperty}`"
+        w.println("    override fun versionProperty(): $PropertyMetamodel<$entityTypeName, *, *>? = $body")
     }
 
     private fun createdAtProperty() {
-        w.println("    override fun createdAtProperty(): $PropertyMetamodel<$entityTypeName, *, *>? = ${entity.createdAtProperty}")
+        val body = if (entity.createdAtProperty == null) "null" else "`${entity.createdAtProperty}`"
+        w.println("    override fun createdAtProperty(): $PropertyMetamodel<$entityTypeName, *, *>? = $body")
     }
 
     private fun updatedAtProperty() {
-        w.println("    override fun updatedAtProperty(): $PropertyMetamodel<$entityTypeName, *, *>? = ${entity.updatedAtProperty}")
+        val body = if (entity.updatedAtProperty == null) "null" else "`${entity.updatedAtProperty}`"
+        w.println("    override fun updatedAtProperty(): $PropertyMetamodel<$entityTypeName, *, *>? = $body")
     }
 
     private fun properties() {
-        val nameList = entity.properties.joinToString(",\n        ", prefix = "\n        ") { it.toString() }
+        val nameList = entity.properties.joinToString(",\n        ", prefix = "\n        ") { "`$it`" }
         w.println("    override fun properties(): List<$PropertyMetamodel<$entityTypeName, *, *>> = listOf($nameList)")
     }
 
@@ -272,11 +275,11 @@ internal class EntityMetamodelGenerator(
         val body = if (entity.idProperties.size == 1) {
             val p = entity.idProperties[0]
             val nullable = p.nullability == Nullability.NULLABLE
-            "e.$p" + if (nullable) " ?: error(\"The id property '$p' must not null.\")" else ""
+            "e.`$p`" + if (nullable) " ?: error(\"The id property '$p' must not null.\")" else ""
         } else {
             val list = entity.idProperties.joinToString {
                 val nullable = it.nullability == Nullability.NULLABLE
-                "e.$it" + if (nullable) " ?: error(\"The id property '$it' must not null.\")" else ""
+                "e.`$it`" + if (nullable) " ?: error(\"The id property '$it' must not null.\")" else ""
             }
             "listOf($list)"
         }
@@ -296,7 +299,7 @@ internal class EntityMetamodelGenerator(
                 "kotlin.UInt" -> "generatedKey.toUInt()"
                 else -> null
             }
-            if (id == null) "null" else "this.$p.wrap($id)"
+            if (id == null) "null" else "this.`$p`.wrap($id)"
         } else {
             "null"
         }
@@ -308,11 +311,11 @@ internal class EntityMetamodelGenerator(
             when (it.kotlinClass) {
                 is ValueClass -> {
                     val tag = it.kotlinClass.property.literalTag
-                    "$it to $Argument($it, ${it.kotlinClass}(0$tag))"
+                    "`$it` to $Argument(`$it`, ${it.kotlinClass}(0$tag))"
                 }
                 else -> {
                     val tag = it.literalTag
-                    "$it to $Argument($it, 0$tag)"
+                    "`$it` to $Argument(`$it`, 0$tag)"
                 }
             }
         } ?: "null"
@@ -321,14 +324,14 @@ internal class EntityMetamodelGenerator(
 
     private fun createdAtAssignment() {
         val body = entity.createdAtProperty?.let {
-            "$it to $Argument($it, ${now(it)})"
+            "`$it` to $Argument(`$it`, ${now(it)})"
         } ?: "null"
         w.println("    override fun createdAtAssignment(c: $Clock): Pair<$PropertyMetamodel<$entityTypeName, *, *>, $Operand>? = $body")
     }
 
     private fun updatedAtAssignment() {
         val body = entity.updatedAtProperty?.let {
-            "$it to $Argument($it, ${now(it)})"
+            "`$it` to $Argument(`$it`, ${now(it)})"
         } ?: "null"
         w.println("    override fun updatedAtAssignment(c: $Clock): Pair<$PropertyMetamodel<$entityTypeName, *, *>, $Operand>? = $body")
     }
@@ -339,16 +342,16 @@ internal class EntityMetamodelGenerator(
             when (it.kotlinClass) {
                 is ValueClass -> {
                     val tag = it.kotlinClass.property.literalTag
-                    "$it = e.$it${if (nullable) " ?: ${it.kotlinClass}(0$tag)" else ""}"
+                    "`$it` = e.`$it`${if (nullable) " ?: ${it.kotlinClass}(0$tag)" else ""}"
                 }
                 else -> {
                     val tag = it.literalTag
-                    "$it = e.$it${if (nullable) " ?: 0$tag" else ""}"
+                    "`$it` = e.`$it`${if (nullable) " ?: 0$tag" else ""}"
                 }
             }
         }
-        val createdAt = entity.createdAtProperty?.let { "$it = ${now(it)}" }
-        val updatedAt = entity.updatedAtProperty?.let { "$it = ${now(it)}" }
+        val createdAt = entity.createdAtProperty?.let { "`$it` = ${now(it)}" }
+        val updatedAt = entity.updatedAtProperty?.let { "`$it` = ${now(it)}" }
         val paramList = listOfNotNull(version, createdAt, updatedAt).joinToString()
         val body = if (paramList == "") {
             "e"
@@ -359,7 +362,7 @@ internal class EntityMetamodelGenerator(
     }
 
     private fun preUpdate() {
-        val updatedAt = entity.updatedAtProperty?.let { "$it = ${now(it)}" }
+        val updatedAt = entity.updatedAtProperty?.let { "`$it` = ${now(it)}" }
         val body = if (updatedAt == null) {
             "e"
         } else {
@@ -374,11 +377,11 @@ internal class EntityMetamodelGenerator(
             when (it.kotlinClass) {
                 is ValueClass -> {
                     val tag = it.kotlinClass.property.literalTag
-                    "$it = ${it.kotlinClass}(e.$it${if (nullable) "?" else ""}.${it.kotlinClass.property}${if (nullable) "?" else ""}.inc()${if (nullable) " ?: 0$tag" else ""})"
+                    "`$it` = ${it.kotlinClass}(e.`$it`${if (nullable) "?" else ""}.${it.kotlinClass.property}${if (nullable) "?" else ""}.inc()${if (nullable) " ?: 0$tag" else ""})"
                 }
                 else -> {
                     val tag = it.literalTag
-                    "$it = e.$it${if (nullable) "?" else ""}.inc()${if (nullable) " ?: 0$tag" else ""}"
+                    "`$it` = e.`$it`${if (nullable) "?" else ""}.inc()${if (nullable) " ?: 0$tag" else ""}"
                 }
             }
         }
@@ -424,7 +427,7 @@ internal class EntityMetamodelGenerator(
     private fun newEntity() {
         val argList = entity.properties.joinToString(",\n        ", prefix = "\n        ") { p ->
             val nullability = if (p.nullability == Nullability.NULLABLE) "?" else ""
-            "$p = m[this.$p] as ${p.typeName}$nullability"
+            "`$p` = m[this.`$p`] as ${p.typeName}$nullability"
         }
         w.println("    override fun newEntity(m: Map<$PropertyMetamodel<*, *, *>, Any?>) = $entityTypeName($argList)")
     }
@@ -445,14 +448,14 @@ internal class EntityMetamodelGenerator(
         w.println("            $checkMetamodelVersion(\"$packageName.$simpleName\", ${org.komapper.core.dsl.metamodel.EntityMetamodel.METAMODEL_VERSION})")
         w.println("        }")
         for (alias in aliases) {
-            w.println("        val $alias = $simpleName()")
+            w.println("        val `$alias` = $simpleName()")
         }
         w.println("    }")
     }
 
     private fun utils() {
         for (alias in aliases) {
-            w.println("val $metaObject.$alias get() = $simpleName.$alias")
+            w.println("val $metaObject.`$alias` get() = $simpleName.`$alias`")
         }
     }
 }
