@@ -39,16 +39,16 @@ Komapper is tested with the following databases:
 | Database           | version | JDBC support | R2DBC support |
 |--------------------|---------|:------------:|:-------------:|
 | H2 Database        | 2.1.212 |      v       |       v       |
-| MariaDB            | 10.6.3  |      v       |      N/A      |
-| MySQL              | 8.0.25  |      v       |      N/A      |
+| MariaDB            | 10.6.3  |      v       | (not working) |
+| MySQL              | 8.0.25  |      v       | (not working) |
 | Oracle Database XE | 18.4.0  |      v       |       v       |
 | PostgreSQL         | 12.9    |      v       |       v       |
-| SQL Server         | 2019    |      v       |       v       |
+| SQL Server         | 2019    |      v       |  (unstable)   |
 
 Supported connectivity types:
 
 - JDBC 4.3
-- R2DBC 0.9.1 or later
+- R2DBC 0.9.1 and 1.0.0
 
 ## Installation
 
