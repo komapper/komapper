@@ -144,12 +144,3 @@ suspend fun main() {
 ## Design Policy
 
 See [DESIGN_DOC](DESIGN_DOC.md) for the design policy of this project.
-
-## Roadmap
-
-1.0 GA will be released in late May 2022.
-
-The main tasks until the 1.0 GA release are as follows:
-
-- Improve the documentation
-- Support Spring Boot 2.7 GA
