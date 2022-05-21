@@ -3,8 +3,10 @@ package integration.jdbc
 import integration.core.Dbms
 import integration.core.Run
 import org.junit.jupiter.api.extension.ExtendWith
+import org.komapper.codegen.ClassNameResolver
 import org.komapper.codegen.CodeGenerator
 import org.komapper.codegen.MetadataReader
+import org.komapper.codegen.PropertyNameResolver
 import org.komapper.codegen.PropertyTypeResolver
 import org.komapper.codegen.Table
 import org.komapper.jdbc.JdbcDatabase
@@ -27,7 +29,7 @@ class JdbcMetadataReaderTest(val db: JdbcDatabase) {
     @Test
     fun dump() {
         val tables = getTables()
-        val generator = CodeGenerator(null, "", "", tables)
+        val generator = CodeGenerator(null, tables, ClassNameResolver.of("", ""), PropertyNameResolver.of())
         val writer = StringWriter()
         generator.generateEntities(writer, false, PropertyTypeResolver.of())
         println(writer)
@@ -37,7 +39,7 @@ class JdbcMetadataReaderTest(val db: JdbcDatabase) {
     @Test
     fun dump_h2() {
         val tables = getTables("PUBLIC")
-        val generator = CodeGenerator(null, "", "", tables)
+        val generator = CodeGenerator(null, tables, ClassNameResolver.of("", ""), PropertyNameResolver.of())
         val writer = StringWriter()
         generator.generateEntities(writer, false, PropertyTypeResolver.of())
         println(writer)
@@ -59,7 +61,8 @@ class JdbcMetadataReaderTest(val db: JdbcDatabase) {
 
     private fun getTables(schemaPattern: String? = null): List<Table> {
         return db.config.session.useConnection {
-            val reader = MetadataReader(db.config.dialect::enquote, it.metaData, null, schemaPattern, null, listOf("TABLE"))
+            val reader =
+                MetadataReader(db.config.dialect::enquote, it.metaData, null, schemaPattern, null, listOf("TABLE"))
             reader.read()
         }
     }

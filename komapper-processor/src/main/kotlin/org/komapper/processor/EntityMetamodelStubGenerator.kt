@@ -41,19 +41,19 @@ internal class EntityMetamodelStubGenerator(
         if (parameters != null) {
             for (p in parameters) {
                 val typeName = p.type.resolve().declaration.qualifiedName?.asString()
-                w.println("    val $p: $PropertyMetamodel<$entityTypeName, $typeName, $typeName> = $PropertyMetamodelStub<$entityTypeName, $typeName>()")
+                w.println("    val `$p`: $PropertyMetamodel<$entityTypeName, $typeName, $typeName> = $PropertyMetamodelStub<$entityTypeName, $typeName>()")
             }
         }
         w.println("    fun clone($constructorParamList) = $simpleName()")
         w.println("    companion object {")
         for (alias in aliases) {
-            w.println("        val $alias = $simpleName()")
+            w.println("        val `$alias` = $simpleName()")
         }
         w.println("    }")
         w.println("}")
         w.println("")
         for (alias in aliases) {
-            w.println("val $metaObject.$alias get() = $simpleName.$alias")
+            w.println("val $metaObject.`$alias` get() = $simpleName.`$alias`")
         }
     }
 }

@@ -19,9 +19,9 @@ class CodeGeneratorTest {
         val destinationDir = tempDir!!.resolve(Paths.get("src", "kotlin", "main"))
         val generator = CodeGenerator(
             "entity",
-            "",
-            "",
-            createTables()
+            createTables(),
+            ClassNameResolver.of("", ""),
+            PropertyNameResolver.of()
         )
         generator.createNewFile(destinationDir, "entities.kt", false).use { writer ->
             generator.generateEntities(writer, false) { _, column ->
@@ -49,6 +49,12 @@ class CodeGeneratorTest {
                 val version: Int,
             )
             
+            data class Class (
+                val classId: Int,
+                val `super`: String?,
+                val `val`: String,
+            )
+            
         """.trimIndent()
         assertEquals(expected, file.readText())
     }
@@ -58,9 +64,9 @@ class CodeGeneratorTest {
         val destinationDir = tempDir!!.resolve(Paths.get("src", "kotlin", "main"))
         val generator = CodeGenerator(
             "entity",
-            "",
-            "",
-            createTables()
+            createTables(),
+            ClassNameResolver.of("", ""),
+            PropertyNameResolver.of()
         )
         generator.createNewFile(destinationDir, "entities.kt", false).use { writer ->
             generator.generateEntities(writer, true) { _, column ->
@@ -87,6 +93,12 @@ class CodeGeneratorTest {
                 val version: Int?,
             )
             
+            data class Class (
+                val classId: Int?,
+                val `super`: String?,
+                val `val`: String?,
+            )
+            
         """.trimIndent()
         assertEquals(expected, file.readText())
     }
@@ -96,9 +108,9 @@ class CodeGeneratorTest {
         val destinationDir = tempDir!!.resolve(Paths.get("src", "kotlin", "main"))
         val generator = CodeGenerator(
             "entity",
-            "",
-            "",
-            createTables()
+            createTables(),
+            ClassNameResolver.of("", ""),
+            PropertyNameResolver.of()
         )
         generator.createNewFile(destinationDir, "entityDefinitions.kt", false).use { writer ->
             generator.generateDefinitions(writer, false, false)
@@ -127,6 +139,14 @@ class CodeGeneratorTest {
                 @KomapperId @KomapperColumn("EMPLOYEE_ID") val employeeId: Nothing,
                 @KomapperColumn("NAME") val name: Nothing,
                 @KomapperColumn("VERSION") val version: Nothing,
+            )
+            
+            @KomapperEntityDef(Class::class)
+            @KomapperTable("CLASS")
+            data class ClassDef (
+                @KomapperId @KomapperAutoIncrement @KomapperColumn("CLASS_ID") val classId: Nothing,
+                @KomapperColumn("SUPER") val `super`: Nothing,
+                @KomapperColumn("VAL") val `val`: Nothing,
             )
             
         """.trimIndent()
@@ -177,6 +197,28 @@ class CodeGeneratorTest {
                         name = "VERSION"
                         dataType = Types.INTEGER
                         typeName = "integer"
+                    }
+                )
+            }, MutableTable().apply {
+                name = "CLASS"
+                columns = listOf(
+                    MutableColumn().apply {
+                        name = "CLASS_ID"
+                        dataType = Types.INTEGER
+                        typeName = "integer"
+                        isPrimaryKey = true
+                        isAutoIncrement = true
+                    },
+                    MutableColumn().apply {
+                        name = "SUPER"
+                        dataType = Types.VARCHAR
+                        typeName = "varchar"
+                        nullable = true
+                    },
+                    MutableColumn().apply {
+                        name = "VAL"
+                        dataType = Types.VARCHAR
+                        typeName = "varchar"
                     }
                 )
             }

@@ -16,19 +16,19 @@ import org.jetbrains.annotations.Nullable;
 public class CodeGenerator {
 
   private final String packageName;
-  private final String prefix;
-  private final String suffix;
   private final List<Table> tables;
+  private final ClassNameResolver classNameResolver;
+  private final PropertyNameResolver propertyNameResolver;
 
   public CodeGenerator(
       @Nullable String packageName,
-      @NotNull String prefix,
-      @NotNull String suffix,
-      @NotNull List<Table> tables) {
+      @NotNull List<Table> tables,
+      @NotNull ClassNameResolver classNameResolver,
+      @NotNull PropertyNameResolver propertyNameResolver) {
     this.packageName = packageName;
-    this.prefix = Objects.requireNonNull(prefix);
-    this.suffix = Objects.requireNonNull(suffix);
     this.tables = new ArrayList<>(Objects.requireNonNull(tables));
+    this.classNameResolver = Objects.requireNonNull(classNameResolver);
+    this.propertyNameResolver = Objects.requireNonNull(propertyNameResolver);
   }
 
   @NotNull
@@ -54,10 +54,10 @@ public class CodeGenerator {
     }
     for (Table table : tables) {
       p.println();
-      var className = StringUtil.snakeToUpperCamelCase(table.getName());
-      p.println("data class " + prefix + className + suffix + " (");
+      var className = classNameResolver.resolve(table);
+      p.println("data class " + className + " (");
       for (Column column : table.getColumns()) {
-        var propertyName = StringUtil.snakeToLowerCamelCase(column.getName());
+        var propertyName = propertyNameResolver.resolve(column);
         var nullable = (declareAsNullable || column.isNullable()) ? "?" : "";
         var propertyClassName = resolver.resolve(table, column);
         p.println("    val " + propertyName + ": " + propertyClassName + nullable + ",");
@@ -80,7 +80,7 @@ public class CodeGenerator {
     p.println("import org.komapper.annotation.KomapperTable");
     for (Table table : tables) {
       p.println();
-      var className = StringUtil.snakeToUpperCamelCase(table.getName());
+      var className = classNameResolver.resolve(table);
       p.println("@KomapperEntityDef(" + className + "::class)");
       var tableArgs = new StringBuilder();
       tableArgs.append('"').append(table.getName()).append('"');
@@ -93,9 +93,9 @@ public class CodeGenerator {
         tableArgs.append('"').append(table.getSchema()).append('"');
       }
       p.println("@KomapperTable(" + tableArgs + ")");
-      p.println("data class " + prefix + className + suffix + "Def (");
+      p.println("data class " + className + "Def (");
       for (Column column : table.getColumns()) {
-        var propertyName = StringUtil.snakeToLowerCamelCase(column.getName());
+        var propertyName = propertyNameResolver.resolve(column);
         var id = column.isPrimaryKey() ? "@KomapperId " : "";
         var autoIncrement = column.isAutoIncrement() ? "@KomapperAutoIncrement " : "";
         p.println(
