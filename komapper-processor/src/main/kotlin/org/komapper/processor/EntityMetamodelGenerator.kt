@@ -157,7 +157,7 @@ internal class EntityMetamodelGenerator(
                 else -> "{ it }"
             }
             val unwrap = when (p.kotlinClass) {
-                is EnumClass -> "{ it.toString() }"
+                is EnumClass -> "{ it.name }"
                 is ValueClass -> "{ it.${p.kotlinClass.property} }"
                 else -> "{ it }"
             }
