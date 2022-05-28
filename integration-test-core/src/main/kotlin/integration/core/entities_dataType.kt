@@ -26,36 +26,36 @@ import java.util.UUID
 data class AnyPerson(@KomapperId val name: String) : Serializable
 
 @KomapperEntity
-@KomapperTable("any_test")
+@KomapperTable("any_data")
 data class AnyData(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true) val value: Any?)
 
 @KomapperEntity
-@KomapperTable("big_decimal_test")
+@KomapperTable("big_decimal_data")
 data class BigDecimalData(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true) val value: BigDecimal?)
 
 @KomapperEntity
-@KomapperTable("big_integer_test")
+@KomapperTable("big_integer_data")
 data class BigIntegerData(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true) val value: BigInteger?)
 
 @KomapperEntity
-@KomapperTable("boolean_test")
+@KomapperTable("boolean_data")
 data class BooleanData(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true) val value: Boolean?)
 
 @KomapperEntity
-@KomapperTable("byte_test")
+@KomapperTable("byte_data")
 data class ByteData(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true) val value: Byte?)
 
 @KomapperEntity
-@KomapperTable("byte_array_test")
+@KomapperTable("byte_array_data")
 @Suppress("ArrayInDataClass")
 data class ByteArrayData(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true) val value: ByteArray?)
 
 @KomapperEntity
-@KomapperTable("double_test")
+@KomapperTable("double_data")
 data class DoubleData(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true) val value: Double?)
 
 @KomapperEntity
-@KomapperTable("duration_test")
+@KomapperTable("duration_data")
 data class DurationData(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true) val value: Duration?)
 
 enum class Direction {
@@ -63,71 +63,71 @@ enum class Direction {
 }
 
 @KomapperEntity
-@KomapperTable("enum_test")
+@KomapperTable("enum_data")
 data class EnumData(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true) val value: Direction?)
 
 @KomapperEntity
-@KomapperTable("enum_ordinal_test")
+@KomapperTable("enum_ordinal_data")
 data class EnumOrdinalData(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true) @KomapperEnum(EnumType.ORDINAL) val value: Direction?)
 
 @KomapperEntity
-@KomapperTable("float_test")
+@KomapperTable("float_data")
 data class FloatData(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true) val value: Float?)
 
 @KomapperEntity
-@KomapperTable("instant_test")
+@KomapperTable("instant_data")
 data class InstantData(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true) val value: Instant?)
 
 @KomapperEntity
-@KomapperTable("int_test")
+@KomapperTable("int_data")
 data class IntData(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true) val value: Int?)
 
 @KomapperEntity
-@KomapperTable("local_date_time_test")
+@KomapperTable("local_date_time_data")
 data class LocalDateTimeData(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true) val value: LocalDateTime?)
 
 @KomapperEntity
-@KomapperTable("local_date_test")
+@KomapperTable("local_date_data")
 data class LocalDateData(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true) val value: LocalDate?)
 
 @KomapperEntity
-@KomapperTable("local_time_test")
+@KomapperTable("local_time_data")
 data class LocalTimeData(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true) val value: LocalTime?)
 
 @KomapperEntity
-@KomapperTable("long_test")
+@KomapperTable("long_data")
 data class LongData(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true) val value: Long?)
 
 @KomapperEntity
-@KomapperTable("offset_date_time_test")
+@KomapperTable("offset_date_time_data")
 data class OffsetDateTimeData(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true) val value: OffsetDateTime?)
 
 @KomapperEntity
-@KomapperTable("period_test")
+@KomapperTable("period_data")
 data class PeriodData(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true) val value: Period?)
 
 @KomapperEntity
-@KomapperTable("short_test")
+@KomapperTable("short_data")
 data class ShortData(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true) val value: Short?)
 
 @KomapperEntity
-@KomapperTable("string_test")
+@KomapperTable("string_data")
 data class StringData(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true) val value: String?)
 
 @KomapperEntity
-@KomapperTable("short_test")
+@KomapperTable("short_data")
 data class UByteData(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true) val value: UByte?)
 
 @KomapperEntity
-@KomapperTable("long_test")
+@KomapperTable("long_data")
 data class UIntData(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true) val value: UInt?)
 
 @KomapperEntity
-@KomapperTable("int_test")
+@KomapperTable("int_data")
 data class UShortData(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true) val value: UShort?)
 
 @KomapperEntity
-@KomapperTable("uuid_test")
+@KomapperTable("uuid_data")
 data class UUIDData(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true) val value: UUID?)
 
 @KomapperEntity

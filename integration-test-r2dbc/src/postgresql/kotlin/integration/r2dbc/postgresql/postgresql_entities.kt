@@ -8,9 +8,9 @@ import org.komapper.annotation.KomapperId
 import org.komapper.annotation.KomapperTable
 
 @KomapperEntity
-@KomapperTable("json_test")
+@KomapperTable("json_data")
 data class JsonData(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true) val value: Json?)
 
 @KomapperEntity
-@KomapperTable("interval_test")
+@KomapperTable("interval_data")
 data class IntervalData(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true) val value: Interval?)

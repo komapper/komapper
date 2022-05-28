@@ -10,17 +10,17 @@ import java.sql.Clob
 import java.sql.SQLXML
 
 @KomapperEntity
-@KomapperTable("array_test")
+@KomapperTable("array_data")
 data class ArrayData(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true) val value: Array?)
 
 @KomapperEntity
-@KomapperTable("blob_test")
+@KomapperTable("blob_data")
 data class BlobData(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true) val value: Blob?)
 
 @KomapperEntity
-@KomapperTable("clob_test")
+@KomapperTable("clob_data")
 data class ClobData(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true) val value: Clob?)
 
 @KomapperEntity
-@KomapperTable("sqlxml_test")
+@KomapperTable("sqlxml_data")
 data class SqlXmlData(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true) val value: SQLXML?)

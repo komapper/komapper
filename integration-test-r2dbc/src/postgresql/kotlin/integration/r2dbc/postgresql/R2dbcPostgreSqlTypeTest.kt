@@ -57,7 +57,7 @@ class R2dbcPostgreSqlTypeTest(val db: R2dbcDatabase) {
         assertEquals(data.value!!.asString(), data2.value!!.asString())
 
         val result = db.runQuery {
-            QueryDsl.fromTemplate("select value->'b' as x from json_test")
+            QueryDsl.fromTemplate("select value->'b' as x from json_data")
                 .select { it.get("x", Json::class)!! }
                 .first()
         }
