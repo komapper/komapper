@@ -34,6 +34,10 @@ internal fun KSAnnotated.findAnnotation(simpleName: String): KSAnnotation? {
     return this.annotations.firstOrNull { it.shortName.asString() == simpleName }
 }
 
+internal fun KSAnnotated.hasAnnotation(klass: KClass<*>): Boolean {
+    return findAnnotation(klass) != null
+}
+
 internal fun KSType.normalize(): KSType {
     return this.declaration.accept(
         object : KSEmptyVisitor<Unit, KSType>() {

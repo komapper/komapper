@@ -1,8 +1,10 @@
 package integration.core
 
+import org.komapper.annotation.EnumType
 import org.komapper.annotation.KomapperAutoIncrement
 import org.komapper.annotation.KomapperColumn
 import org.komapper.annotation.KomapperEntity
+import org.komapper.annotation.KomapperEnum
 import org.komapper.annotation.KomapperId
 import org.komapper.annotation.KomapperSequence
 import org.komapper.annotation.KomapperTable
@@ -63,6 +65,10 @@ enum class Direction {
 @KomapperEntity
 @KomapperTable("enum_test")
 data class EnumTest(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true) val value: Direction?)
+
+@KomapperEntity
+@KomapperTable("enum_ordinal_test")
+data class EnumOrdinalTest(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true) @KomapperEnum(EnumType.ORDINAL) val value: Direction?)
 
 @KomapperEntity
 @KomapperTable("float_test")

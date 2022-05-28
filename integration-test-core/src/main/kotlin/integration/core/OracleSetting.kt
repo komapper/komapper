@@ -34,6 +34,7 @@ interface OracleSetting<DATABASE : Database> : Setting<DATABASE> {
         create table double_test(id integer not null primary key, "value" float);
         create table duration_test(id integer not null primary key, "value" interval day to second);
         create table enum_test(id integer not null primary key, "value" varchar2(20));
+        create table enum_ordinal_test(id integer not null primary key, "value" integer);
         create table float_test(id integer not null primary key, "value" float);
         create table instant_test(id integer not null primary key, "value" timestamp with time zone);
         create table int_test(id integer not null primary key, "value" integer);

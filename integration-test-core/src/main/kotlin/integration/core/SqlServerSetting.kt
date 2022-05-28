@@ -34,6 +34,7 @@ interface SqlServerSetting<DATABASE : Database> : Setting<DATABASE> {
         create table clob_test(id int not null primary key, value text);
         create table double_test(id int not null primary key, value float);
         create table enum_test(id int not null primary key, value varchar(20));
+        create table enum_ordinal_test(id int not null primary key, value int);
         create table float_test(id int not null primary key, value real);
         create table instant_test(id int not null primary key, value datetimeoffset);
         create table int_test(id int not null primary key, value int);

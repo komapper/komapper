@@ -11,7 +11,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-class EntityProcessorTest {
+class EntityProcessorErrorTest {
 
     @TempDir
     @JvmField
@@ -817,6 +817,50 @@ class EntityProcessorTest {
     }
 
     @Test
+    fun `@KomapperEnum is valid only for enum property types - value class`() {
+        val result = compile(
+            kotlin(
+                "source.kt",
+                """
+                package test
+                import org.komapper.annotation.*
+                @JvmInline
+                value class Name(val name: String)
+                @KomapperEntity
+                data class Dept(
+                    @KomapperId val id: Int,
+                    @KomapperEnum
+                    val name: Name,
+                )
+                """
+            )
+        )
+        assertEquals(result.exitCode, KotlinCompilation.ExitCode.COMPILATION_ERROR)
+        assertTrue(result.messages.contains("@KomapperEnum is valid only for enum property types."))
+    }
+
+    @Test
+    fun `@KomapperEnum is valid only for enum property types - plain class`() {
+        val result = compile(
+            kotlin(
+                "source.kt",
+                """
+                package test
+                import org.komapper.annotation.*
+                @KomapperEntity
+                data class Dept(
+                    @KomapperId val id: Int,
+                    @KomapperEnum
+                    val name: String,
+                )
+                """
+            )
+        )
+        assertEquals(result.exitCode, KotlinCompilation.ExitCode.COMPILATION_ERROR)
+        assertTrue(result.messages.contains("@KomapperEnum is valid only for enum property types."))
+    }
+
+    @Test
     fun `The non-array property type must not have any type parameters`() {
         val result = compile(
             kotlin(
@@ -834,88 +878,6 @@ class EntityProcessorTest {
         )
         assertEquals(result.exitCode, KotlinCompilation.ExitCode.COMPILATION_ERROR)
         assertTrue(result.messages.contains("The non-array property type must not have any type parameters."))
-    }
-    @Test
-    fun `The array property type can have a type parameter`() {
-        val result = compile(
-            kotlin(
-                "source.kt",
-                """
-                package test
-                import org.komapper.annotation.*
-                @KomapperEntity
-                data class Dept(
-                    @KomapperId val id: Int,
-                    @Suppress("ArrayInDataClass") val names: Array<String>,
-                )
-                """
-            )
-        )
-        assertEquals(result.exitCode, KotlinCompilation.ExitCode.OK)
-    }
-
-    @Test
-    fun `Ignore properties`() {
-        val result = compile(
-            kotlin(
-                "source.kt",
-                """
-                package test
-                import org.komapper.annotation.*
-                @KomapperEntity
-                data class Dept(
-                    @KomapperId val id: Int,
-                    @KomapperIgnore private val foo: String = "", // private
-                    @KomapperIgnore val bar: List<Int> = listOf(1, 2, 3), // type parameters
-                    @KomapperIgnore val baz: Baz? = Baz(1) // value class has nullable property
-                )
-                @JvmInline
-                value class Baz(val value: Int?)
-                """
-            )
-        )
-        assertEquals(result.exitCode, KotlinCompilation.ExitCode.OK)
-    }
-
-    @Test
-    fun allow_typealias_for_property() {
-        val result = compile(
-            kotlin(
-                "source.kt",
-                """
-                package test
-                import org.komapper.annotation.*
-                typealias Snowflake = Long
-                @KomapperEntity
-                data class Dept(
-                    @KomapperAutoIncrement @KomapperId
-                    val id: Snowflake
-                )
-                """
-            )
-        )
-        assertEquals(result.exitCode, KotlinCompilation.ExitCode.OK, result.messages)
-    }
-
-    @Test
-    fun allow_typealias_for_typealias() {
-        val result = compile(
-            kotlin(
-                "source.kt",
-                """
-                package test
-                import org.komapper.annotation.*
-                typealias Snowflake = Long
-                typealias Snowball = Snowflake
-                @KomapperEntity
-                data class Dept(
-                    @KomapperAutoIncrement @KomapperId
-                    val id: Snowball
-                )
-                """
-            )
-        )
-        assertEquals(result.exitCode, KotlinCompilation.ExitCode.OK, result.messages)
     }
 
     private fun prepareCompilation(vararg sourceFiles: SourceFile): KotlinCompilation {

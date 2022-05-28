@@ -40,6 +40,14 @@ annotation class KomapperId
 annotation class KomapperVersion
 
 /**
+ * Indicates that the annotated property is an enum class.
+ * * @property type the mapping strategy
+ */
+@Target(AnnotationTarget.VALUE_PARAMETER)
+@Retention(AnnotationRetention.SOURCE)
+annotation class KomapperEnum(val type: EnumType)
+
+/**
  * Adds table information.
  *
  * @property name the table name
