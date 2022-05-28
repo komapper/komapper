@@ -8,5 +8,5 @@ import org.komapper.annotation.KomapperTable
 data class Json(val data: String)
 
 @KomapperEntity
-@KomapperTable("json_test")
-data class JsonTest(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true) val value: Json)
+@KomapperTable("json_data")
+data class JsonData(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true) val value: Json)
