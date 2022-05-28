@@ -1,9 +1,9 @@
 package integration.r2dbc
 
-import integration.core.booleanTest
-import integration.core.intTest
-import integration.core.longTest
-import integration.core.stringTest
+import integration.core.booleanData
+import integration.core.intData
+import integration.core.longData
+import integration.core.stringData
 import org.junit.jupiter.api.TestInfo
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
@@ -20,7 +20,7 @@ class R2dbcLiteralTest(val db: R2dbcDatabase) {
 
     @Test
     fun test_boolean(info: TestInfo) = inTransaction(db, info) {
-        val m = Meta.booleanTest
+        val m = Meta.booleanData
         db.runQuery {
             QueryDsl.insert(m).values {
                 m.id eq 1
@@ -35,7 +35,7 @@ class R2dbcLiteralTest(val db: R2dbcDatabase) {
 
     @Test
     fun test_int(info: TestInfo) = inTransaction(db, info) {
-        val m = Meta.intTest
+        val m = Meta.intData
         db.runQuery {
             QueryDsl.insert(m).values {
                 m.id eq 1
@@ -50,7 +50,7 @@ class R2dbcLiteralTest(val db: R2dbcDatabase) {
 
     @Test
     fun test_long(info: TestInfo) = inTransaction(db, info) {
-        val m = Meta.longTest
+        val m = Meta.longData
         db.runQuery {
             QueryDsl.insert(m).values {
                 m.id eq 1
@@ -65,7 +65,7 @@ class R2dbcLiteralTest(val db: R2dbcDatabase) {
 
     @Test
     fun test_string(info: TestInfo) = inTransaction(db, info) {
-        val m = Meta.stringTest
+        val m = Meta.stringData
         db.runQuery {
             QueryDsl.insert(m).values {
                 m.id eq 1

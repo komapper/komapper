@@ -1,9 +1,9 @@
 package integration.jdbc
 
-import integration.core.booleanTest
-import integration.core.intTest
-import integration.core.longTest
-import integration.core.stringTest
+import integration.core.booleanData
+import integration.core.intData
+import integration.core.longData
+import integration.core.stringData
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
@@ -19,7 +19,7 @@ class JdbcLiteralTest(val db: JdbcDatabase) {
 
     @Test
     fun test_boolean() {
-        val m = Meta.booleanTest
+        val m = Meta.booleanData
         db.runQuery {
             QueryDsl.insert(m).values {
                 m.id eq 1
@@ -34,7 +34,7 @@ class JdbcLiteralTest(val db: JdbcDatabase) {
 
     @Test
     fun test_int() {
-        val m = Meta.intTest
+        val m = Meta.intData
         db.runQuery {
             QueryDsl.insert(m).values {
                 m.id eq 1
@@ -49,7 +49,7 @@ class JdbcLiteralTest(val db: JdbcDatabase) {
 
     @Test
     fun test_long() {
-        val m = Meta.longTest
+        val m = Meta.longData
         db.runQuery {
             QueryDsl.insert(m).values {
                 m.id eq 1
@@ -64,7 +64,7 @@ class JdbcLiteralTest(val db: JdbcDatabase) {
 
     @Test
     fun test_string() {
-        val m = Meta.stringTest
+        val m = Meta.stringData
         db.runQuery {
             QueryDsl.insert(m).values {
                 m.id eq 1

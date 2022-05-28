@@ -19,8 +19,8 @@ class R2dbcPostgreSqlTypeTest(val db: R2dbcDatabase) {
 
     @Test
     fun interval(info: TestInfo) = inTransaction(db, info) {
-        val m = Meta.intervalTest
-        val data = IntervalTest(1, Interval.of(Period.of(2022, 2, 5)))
+        val m = Meta.intervalData
+        val data = IntervalData(1, Interval.of(Period.of(2022, 2, 5)))
         db.runQuery { QueryDsl.insert(m).single(data) }
         val data2 = db.runQuery {
             QueryDsl.from(m).where { m.id eq 1 }.first()
@@ -30,8 +30,8 @@ class R2dbcPostgreSqlTypeTest(val db: R2dbcDatabase) {
 
     @Test
     fun interval_null(info: TestInfo) = inTransaction(db, info) {
-        val m = Meta.intervalTest
-        val data = IntervalTest(1, null)
+        val m = Meta.intervalData
+        val data = IntervalData(1, null)
         db.runQuery { QueryDsl.insert(m).single(data) }
         val data2 = db.runQuery {
             QueryDsl.from(m).where { m.id eq 1 }.first()
@@ -41,8 +41,8 @@ class R2dbcPostgreSqlTypeTest(val db: R2dbcDatabase) {
 
     @Test
     fun json(info: TestInfo) = inTransaction(db, info) {
-        val m = Meta.jsonTest
-        val data = JsonTest(
+        val m = Meta.jsonData
+        val data = JsonData(
             1,
             Json.of(
                 """
@@ -66,8 +66,8 @@ class R2dbcPostgreSqlTypeTest(val db: R2dbcDatabase) {
 
     @Test
     fun json_null(info: TestInfo) = inTransaction(db, info) {
-        val m = Meta.jsonTest
-        val data = JsonTest(1, null)
+        val m = Meta.jsonData
+        val data = JsonData(1, null)
         db.runQuery { QueryDsl.insert(m).single(data) }
         val data2 = db.runQuery {
             QueryDsl.from(m).where { m.id eq 1 }.first()

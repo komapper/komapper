@@ -1,15 +1,15 @@
 package integration.r2dbc
 
 import integration.core.KotlinDatetimePerson
+import integration.core.KotlinInstantData
 import integration.core.KotlinInstantPerson
-import integration.core.KotlinInstantTest
-import integration.core.KotlinLocalDateTest
-import integration.core.KotlinLocalDateTimeTest
+import integration.core.KotlinLocalDateData
+import integration.core.KotlinLocalDateTimeData
 import integration.core.kotlinDatetimePerson
+import integration.core.kotlinInstantData
 import integration.core.kotlinInstantPerson
-import integration.core.kotlinInstantTest
-import integration.core.kotlinLocalDateTest
-import integration.core.kotlinLocalDateTimeTest
+import integration.core.kotlinLocalDateData
+import integration.core.kotlinLocalDateTimeData
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
@@ -30,10 +30,10 @@ class R2dbcKotlinDatetimeTest(val db: R2dbcDatabase) {
 
     @Test
     fun instant(info: TestInfo) = inTransaction(db, info) {
-        val m = Meta.kotlinInstantTest
+        val m = Meta.kotlinInstantData
         val datetime = LocalDateTime(2019, 6, 1, 12, 11, 10)
         val instant = datetime.toInstant(TimeZone.UTC)
-        val data = KotlinInstantTest(1, instant)
+        val data = KotlinInstantData(1, instant)
         db.runQuery { QueryDsl.insert(m).single(data) }
         val data2 = db.runQuery {
             QueryDsl.from(m).where { m.id eq 1 }.first()
@@ -43,8 +43,8 @@ class R2dbcKotlinDatetimeTest(val db: R2dbcDatabase) {
 
     @Test
     fun localDate(info: TestInfo) = inTransaction(db, info) {
-        val m = Meta.kotlinLocalDateTest
-        val data = KotlinLocalDateTest(
+        val m = Meta.kotlinLocalDateData
+        val data = KotlinLocalDateData(
             1,
             LocalDate(2019, 6, 1)
         )
@@ -57,8 +57,8 @@ class R2dbcKotlinDatetimeTest(val db: R2dbcDatabase) {
 
     @Test
     fun localDateTime(info: TestInfo) = inTransaction(db, info) {
-        val m = Meta.kotlinLocalDateTimeTest
-        val data = KotlinLocalDateTimeTest(
+        val m = Meta.kotlinLocalDateTimeData
+        val data = KotlinLocalDateTimeData(
             1,
             LocalDateTime(2019, 6, 1, 12, 11, 10)
         )

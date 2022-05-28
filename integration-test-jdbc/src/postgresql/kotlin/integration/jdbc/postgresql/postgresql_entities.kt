@@ -9,4 +9,4 @@ data class Json(val data: String)
 
 @KomapperEntity
 @KomapperTable("json_test")
-data class JsonTest(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true) val value: Json)
+data class JsonData(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true) val value: Json)

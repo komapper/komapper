@@ -1,9 +1,9 @@
 package integration.r2dbc.oracle
 
-import integration.core.DurationTest
-import integration.core.PeriodTest
-import integration.core.durationTest
-import integration.core.periodTest
+import integration.core.DurationData
+import integration.core.PeriodData
+import integration.core.durationData
+import integration.core.periodData
 import integration.r2dbc.R2dbcEnv
 import integration.r2dbc.inTransaction
 import org.junit.jupiter.api.TestInfo
@@ -22,8 +22,8 @@ class R2dbcOracleTypeTest(private val db: R2dbcDatabase) {
 
     @Test
     fun period(info: TestInfo) = inTransaction(db, info) {
-        val m = Meta.periodTest
-        val data = PeriodTest(1, Period.of(11, 2, 0))
+        val m = Meta.periodData
+        val data = PeriodData(1, Period.of(11, 2, 0))
         db.runQuery { QueryDsl.insert(m).single(data) }
         val data2 = db.runQuery {
             QueryDsl.from(m).where { m.id eq 1 }.first()
@@ -33,8 +33,8 @@ class R2dbcOracleTypeTest(private val db: R2dbcDatabase) {
 
     @Test
     fun period_null(info: TestInfo) = inTransaction(db, info) {
-        val m = Meta.periodTest
-        val data = PeriodTest(1, null)
+        val m = Meta.periodData
+        val data = PeriodData(1, null)
         db.runQuery { QueryDsl.insert(m).single(data) }
         val data2 = db.runQuery {
             QueryDsl.from(m).where { m.id eq 1 }.first()
@@ -44,8 +44,8 @@ class R2dbcOracleTypeTest(private val db: R2dbcDatabase) {
 
     @Test
     fun duration(info: TestInfo) = inTransaction(db, info) {
-        val m = Meta.durationTest
-        val data = DurationTest(1, Duration.ofDays(11))
+        val m = Meta.durationData
+        val data = DurationData(1, Duration.ofDays(11))
         db.runQuery { QueryDsl.insert(m).single(data) }
         val data2 = db.runQuery {
             QueryDsl.from(m).where { m.id eq 1 }.first()
@@ -55,8 +55,8 @@ class R2dbcOracleTypeTest(private val db: R2dbcDatabase) {
 
     @Test
     fun duration_null(info: TestInfo) = inTransaction(db, info) {
-        val m = Meta.durationTest
-        val data = DurationTest(1, null)
+        val m = Meta.durationData
+        val data = DurationData(1, null)
         db.runQuery { QueryDsl.insert(m).single(data) }
         val data2 = db.runQuery {
             QueryDsl.from(m).where { m.id eq 1 }.first()

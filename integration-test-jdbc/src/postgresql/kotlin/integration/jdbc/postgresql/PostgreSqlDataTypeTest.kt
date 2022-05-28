@@ -14,8 +14,8 @@ class PostgreSqlDataTypeTest(private val db: JdbcDatabase) {
 
     @Test
     fun json() {
-        val m = Meta.jsonTest
-        val data = JsonTest(
+        val m = Meta.jsonData
+        val data = JsonData(
             1,
             Json(
                 """

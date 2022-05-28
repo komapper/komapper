@@ -12,15 +12,15 @@ import org.komapper.annotation.KomapperUpdatedAt
 
 @KomapperEntity
 @KomapperTable("instant_test")
-data class KotlinInstantTest(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true) val value: Instant)
+data class KotlinInstantData(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true) val value: Instant)
 
 @KomapperEntity
 @KomapperTable("local_date_test")
-data class KotlinLocalDateTest(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true) val value: LocalDate)
+data class KotlinLocalDateData(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true) val value: LocalDate)
 
 @KomapperEntity
 @KomapperTable("local_date_time_test")
-data class KotlinLocalDateTimeTest(
+data class KotlinLocalDateTimeData(
     @KomapperId val id: Int,
     @KomapperColumn(alwaysQuote = true) val value: LocalDateTime
 )
