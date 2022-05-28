@@ -102,3 +102,9 @@ data class NoVersionDepartment(
     val location: String,
     val version: Int,
 )
+
+data class Place(
+    val id: Int,
+    val street: String,
+    val version: Int
+)

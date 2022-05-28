@@ -59,7 +59,7 @@ internal class EntityProcessor(private val environment: SymbolProcessorEnvironme
             listOf(alias)
         }
         val (packageName, simpleName) = createClassName()
-        val dependencies = Dependencies(false, declaration.containingFile!!)
+        val dependencies = Dependencies(false, *model.containingFiles.toTypedArray())
         environment.codeGenerator.createNewFile(dependencies, packageName, simpleName).use { out ->
             PrintWriter(out).use {
                 val entityTypeName = model.definitionSource.entityDeclaration.qualifiedName?.asString() ?: ""
