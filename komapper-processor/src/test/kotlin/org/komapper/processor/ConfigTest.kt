@@ -14,6 +14,7 @@ class ConfigTest {
         val config = Config.create(options)
         assertEquals("_", config.prefix)
         assertEquals("", config.suffix)
+        assertEquals(EnumStrategy.NAME, config.enumStrategy)
         assertEquals(CamelToLowerSnakeCase, config.namingStrategy)
     }
 
@@ -29,6 +30,22 @@ class ConfigTest {
         val options = mapOf("komapper.suffix" to "A")
         val config = Config.create(options)
         assertEquals("A", config.suffix)
+    }
+
+    @Test
+    fun enumStrategy() {
+        val options = mapOf("komapper.enumStrategy" to "ordinal")
+        val config = Config.create(options)
+        assertEquals(EnumStrategy.ORDINAL, config.enumStrategy)
+    }
+
+    @Test
+    fun enumStrategy_error() {
+        val options = mapOf("komapper.enumStrategy" to "unknown")
+        val e = assertFailsWith<IllegalStateException> {
+            Config.create(options)
+        }
+        assertEquals("'unknown' is illegal value as a komapper.enumStrategy option.", e.message)
     }
 
     @Test

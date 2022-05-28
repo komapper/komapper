@@ -10,18 +10,18 @@ import com.google.devtools.ksp.symbol.KSValueParameter
 import com.google.devtools.ksp.symbol.Nullability
 import com.google.devtools.ksp.visitor.KSEmptyVisitor
 import org.komapper.annotation.KomapperAutoIncrement
+import org.komapper.annotation.KomapperEnum
 import org.komapper.annotation.KomapperSequence
 import org.komapper.annotation.KomapperVersion
-import org.komapper.core.NamingStrategy
+import org.komapper.processor.Symbols.EnumType_NAME
+import org.komapper.processor.Symbols.EnumType_ORDINAL
 import org.komapper.processor.Symbols.Instant
 import org.komapper.processor.Symbols.KotlinInstant
 import org.komapper.processor.Symbols.KotlinLocalDateTime
 import org.komapper.processor.Symbols.LocalDateTime
 import org.komapper.processor.Symbols.OffsetDateTime
 
-internal class EntityFactory(config: Config, private val entityDef: EntityDef) {
-
-    private val namingStrategy: NamingStrategy = config.namingStrategy
+internal class EntityFactory(private val config: Config, private val entityDef: EntityDef) {
 
     fun create(): Entity {
         val allProperties = createAllProperties()
@@ -59,7 +59,7 @@ internal class EntityFactory(config: Config, private val entityDef: EntityDef) {
                     ?: report("The corresponding property declaration is not found.", parameter)
                 val column = getColumn(propertyDef, parameter)
                 val type = parameter.type.resolve().normalize()
-                val kotlinClass = createEnumClass(type) ?: createValueClass(type) ?: PlainClass(type)
+                val kotlinClass = createEnumClass(propertyDef, type) ?: createValueClass(type) ?: PlainClass(type)
                 val literalTag = resolveLiteralTag(kotlinClass.exteriorTypeName)
                 val nullability = type.nullability
                 val kind = propertyDef?.kind
@@ -75,7 +75,7 @@ internal class EntityFactory(config: Config, private val entityDef: EntityDef) {
             }.toList().also { validateAllProperties(it) }
     }
 
-    private fun createEnumClass(type: KSType): EnumClass? {
+    private fun createEnumClass(propertyDef: PropertyDef?, type: KSType): EnumClass? {
         return type.declaration.accept(
             object : KSEmptyVisitor<Unit, EnumClass?>() {
                 override fun defaultHandler(node: KSNode, data: Unit): EnumClass? {
@@ -84,7 +84,19 @@ internal class EntityFactory(config: Config, private val entityDef: EntityDef) {
 
                 override fun visitClassDeclaration(classDeclaration: KSClassDeclaration, data: Unit): EnumClass? {
                     return if (classDeclaration.classKind == ClassKind.ENUM_CLASS) {
-                        EnumClass(type)
+                        val strategy =
+                            when (
+                                propertyDef
+                                    ?.declaration
+                                    ?.findAnnotation(KomapperEnum::class)
+                                    ?.findValue("type")
+                                    ?.toString()
+                            ) {
+                                EnumType_NAME -> EnumStrategy.NAME
+                                EnumType_ORDINAL -> EnumStrategy.ORDINAL
+                                else -> config.enumStrategy
+                            }
+                        EnumClass(type, strategy)
                     } else {
                         null
                     }
@@ -137,7 +149,7 @@ internal class EntityFactory(config: Config, private val entityDef: EntityDef) {
     private fun getColumn(propertyDef: PropertyDef?, parameter: KSValueParameter): Column {
         return if (propertyDef == null) {
             val name = parameter.name?.asString() ?: report("The name is not found.", parameter)
-            Column(namingStrategy.apply(name), alwaysQuote = false, masking = false)
+            Column(config.namingStrategy.apply(name), alwaysQuote = false, masking = false)
         } else {
             propertyDef.column
         }
@@ -178,11 +190,19 @@ internal class EntityFactory(config: Config, private val entityDef: EntityDef) {
                 property.parameter
             )
         }
+        checkEnumAnnotation(property)
     }
 
     private fun validatePlainClassProperty(property: Property, plainClass: PlainClass) {
         if (!plainClass.isArray && plainClass.declaration.typeParameters.isNotEmpty()) {
             report("The non-array property type must not have any type parameters.", property.parameter)
+        }
+        checkEnumAnnotation(property)
+    }
+
+    private fun checkEnumAnnotation(property: Property) {
+        if (property.declaration.hasAnnotation(KomapperEnum::class)) {
+            report("@KomapperEnum is valid only for enum property types.", property.parameter)
         }
     }
 

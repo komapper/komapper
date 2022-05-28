@@ -8,6 +8,7 @@ import integration.core.ByteTest
 import integration.core.Dbms
 import integration.core.Direction
 import integration.core.DoubleTest
+import integration.core.EnumOrdinalTest
 import integration.core.EnumTest
 import integration.core.FloatTest
 import integration.core.InstantTest
@@ -35,6 +36,7 @@ import integration.core.booleanTest
 import integration.core.byteArrayTest
 import integration.core.byteTest
 import integration.core.doubleTest
+import integration.core.enumOrdinalTest
 import integration.core.enumTest
 import integration.core.floatTest
 import integration.core.instantTest
@@ -358,6 +360,27 @@ class R2dbcDataTypeTest(val db: R2dbcDatabase) {
         assertEquals(data, data2)
     }
 
+    @Test
+    fun enum_ordinal(info: TestInfo) = inTransaction(db, info) {
+        val m = Meta.enumOrdinalTest
+        val data = EnumOrdinalTest(1, Direction.EAST)
+        db.runQuery { QueryDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        assertEquals(data, data2)
+    }
+
+    @Test
+    fun enum_ordinal_null(info: TestInfo) = inTransaction(db, info) {
+        val m = Meta.enumOrdinalTest
+        val data = EnumOrdinalTest(1, null)
+        db.runQuery { QueryDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        assertEquals(data, data2)
+    }
     @Test
     fun float(info: TestInfo) = inTransaction(db, info) {
         val m = Meta.floatTest

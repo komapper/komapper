@@ -8,18 +8,27 @@ import org.komapper.core.NamingStrategy
 internal data class Config(
     val prefix: String,
     val suffix: String,
+    val enumStrategy: EnumStrategy,
     val namingStrategy: NamingStrategy,
     val metaObject: String
 ) {
     companion object {
         private const val PREFIX = "komapper.prefix"
         private const val SUFFIX = "komapper.suffix"
+        private const val ENUM_STRATEGY = "komapper.enumStrategy"
         private const val NAMING_STRATEGY = "komapper.namingStrategy"
         private const val META_OBJECT = "komapper.metaObject"
 
         fun create(options: Map<String, String>): Config {
             val prefix = options.getOrDefault(PREFIX, "_")
             val suffix = options.getOrDefault(SUFFIX, "")
+            val enumStrategy = options.getOrDefault(ENUM_STRATEGY, "name").let {
+                when (it) {
+                    "name" -> EnumStrategy.NAME
+                    "ordinal" -> EnumStrategy.ORDINAL
+                    else -> error("'$it' is illegal value as a $ENUM_STRATEGY option.")
+                }
+            }
             val namingStrategy = options.getOrDefault(NAMING_STRATEGY, "lower_snake_case").let {
                 when (it) {
                     "lower_snake_case" -> CamelToLowerSnakeCase
@@ -29,7 +38,7 @@ internal data class Config(
                 }
             }
             val metaObject = options.getOrDefault(META_OBJECT, Symbols.Meta)
-            return Config(prefix, suffix, namingStrategy, metaObject)
+            return Config(prefix, suffix, enumStrategy, namingStrategy, metaObject)
         }
     }
 }

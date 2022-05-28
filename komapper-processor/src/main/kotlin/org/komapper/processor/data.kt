@@ -67,8 +67,9 @@ internal sealed interface KotlinClass {
 
 internal data class EnumClass(
     override val type: KSType,
+    val strategy: EnumStrategy
 ) : KotlinClass {
-    override val interiorTypeName: String = "String"
+    override val interiorTypeName: String get() = strategy.typeName
     override fun toString(): String = exteriorTypeName
 }
 
@@ -98,6 +99,11 @@ internal data class PlainClass(
 
     override val interiorTypeName: String get() = exteriorTypeName
     override fun toString(): String = exteriorTypeName
+}
+
+enum class EnumStrategy(val propertyName: String, val typeName: String) {
+    NAME("name", "String"),
+    ORDINAL("ordinal", "Int")
 }
 
 internal data class ValueClassProperty(

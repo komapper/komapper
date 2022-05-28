@@ -817,6 +817,50 @@ class EntityProcessorTest {
     }
 
     @Test
+    fun `@KomapperEnum is valid only for enum property types - value class`() {
+        val result = compile(
+            kotlin(
+                "source.kt",
+                """
+                package test
+                import org.komapper.annotation.*
+                @JvmInline
+                value class Name(val name: String)
+                @KomapperEntity
+                data class Dept(
+                    @KomapperId val id: Int,
+                    @KomapperEnum
+                    val name: Name,
+                )
+                """
+            )
+        )
+        assertEquals(result.exitCode, KotlinCompilation.ExitCode.COMPILATION_ERROR)
+        assertTrue(result.messages.contains("@KomapperEnum is valid only for enum property types."))
+    }
+
+    @Test
+    fun `@KomapperEnum is valid only for enum property types - plain class`() {
+        val result = compile(
+            kotlin(
+                "source.kt",
+                """
+                package test
+                import org.komapper.annotation.*
+                @KomapperEntity
+                data class Dept(
+                    @KomapperId val id: Int,
+                    @KomapperEnum
+                    val name: String,
+                )
+                """
+            )
+        )
+        assertEquals(result.exitCode, KotlinCompilation.ExitCode.COMPILATION_ERROR)
+        assertTrue(result.messages.contains("@KomapperEnum is valid only for enum property types."))
+    }
+
+    @Test
     fun `The non-array property type must not have any type parameters`() {
         val result = compile(
             kotlin(
@@ -835,6 +879,28 @@ class EntityProcessorTest {
         assertEquals(result.exitCode, KotlinCompilation.ExitCode.COMPILATION_ERROR)
         assertTrue(result.messages.contains("The non-array property type must not have any type parameters."))
     }
+
+    @Test
+    fun `The enum property can be annotated with @KomapperEnum`() {
+        val result = compile(
+            kotlin(
+                "source.kt",
+                """
+                package test
+                import org.komapper.annotation.*
+                enum class Color { BLUE, RED }
+                @KomapperEntity
+                data class Dept(
+                    @KomapperId val id: Int,
+                    @KomapperEnum(type = EnumType.ORDINAL)
+                    val color: Color,
+                )
+                """
+            )
+        )
+        assertEquals(result.exitCode, KotlinCompilation.ExitCode.OK)
+    }
+
     @Test
     fun `The array property type can have a type parameter`() {
         val result = compile(

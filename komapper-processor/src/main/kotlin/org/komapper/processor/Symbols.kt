@@ -29,4 +29,6 @@ internal object Symbols {
     const val KotlinLocalDateTime = "kotlinx.datetime.LocalDateTime"
     const val toKotlinInstant = "kotlinx.datetime.toKotlinInstant"
     const val toKotlinLocalDateTime = "kotlinx.datetime.toKotlinLocalDateTime"
+    const val EnumType_NAME = "org.komapper.annotation.EnumType.NAME"
+    const val EnumType_ORDINAL = "org.komapper.annotation.EnumType.ORDINAL"
 }

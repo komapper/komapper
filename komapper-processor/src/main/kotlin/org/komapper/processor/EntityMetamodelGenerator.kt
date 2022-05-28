@@ -152,12 +152,17 @@ internal class EntityMetamodelGenerator(
             val getter = "{ it.`$p` }"
             val setter = "{ e, v -> e.copy(`$p` = v) }"
             val wrap = when (p.kotlinClass) {
-                is EnumClass -> "{ ${p.kotlinClass.declaration}.valueOf(it) }"
+                is EnumClass -> {
+                    when (p.kotlinClass.strategy) {
+                        EnumStrategy.NAME -> "{ ${p.kotlinClass.declaration}.valueOf(it) }"
+                        EnumStrategy.ORDINAL -> "{ ${p.kotlinClass.declaration}.values()[it] }"
+                    }
+                }
                 is ValueClass -> "{ ${p.kotlinClass}(it) }"
                 else -> "{ it }"
             }
             val unwrap = when (p.kotlinClass) {
-                is EnumClass -> "{ it.name }"
+                is EnumClass -> "{ it.${p.kotlinClass.strategy.propertyName } }"
                 is ValueClass -> "{ it.${p.kotlinClass.property} }"
                 else -> "{ it }"
             }
