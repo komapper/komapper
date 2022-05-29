@@ -44,32 +44,23 @@ internal class EntityProcessor(private val environment: SymbolProcessorEnvironme
     }
 
     private fun generateMetamodel(model: EntityModel) {
-        fun createClassName(): Pair<String, String> {
-            val defDeclaration = model.definitionSource.defDeclaration
-            val packageName = defDeclaration.packageName.asString()
-            val qualifiedName = defDeclaration.qualifiedName?.asString() ?: ""
-            val packageRemovedQualifiedName = qualifiedName.removePrefix("$packageName.")
-            val simpleName = config.prefix + packageRemovedQualifiedName.replace(".", "_") + config.suffix
-            return packageName to simpleName
-        }
-
-        val declaration = model.definitionSource.entityDeclaration
-        val aliases = model.definitionSource.aliases.ifEmpty {
-            val alias = toCamelCase(declaration.simpleName.asString())
-            listOf(alias)
-        }
-        val (packageName, simpleName) = createClassName()
         val dependencies = Dependencies(false, *model.containingFiles.toTypedArray())
+        val (packageName, simpleName) = model.createMetamodelClassName(config.prefix, config.suffix)
         environment.codeGenerator.createNewFile(dependencies, packageName, simpleName).use { out ->
-            PrintWriter(out).use {
-                val entityTypeName = model.definitionSource.entityDeclaration.qualifiedName?.asString() ?: ""
-                val runnable = if (model.definitionSource.stubAnnotation != null || model.entity == null) {
+            PrintWriter(out).use { writer ->
+                val runnable = if (model.hasStubAnnotation || model.entity == null) {
                     EntityMetamodelStubGenerator(
-                        declaration, config.metaObject, aliases, packageName, simpleName, entityTypeName, it
+                        model.entityDeclaration,
+                        config.metaObject,
+                        model.aliases,
+                        packageName,
+                        simpleName,
+                        model.typeName,
+                        writer
                     )
                 } else {
                     EntityMetamodelGenerator(
-                        model.entity, config.metaObject, aliases, packageName, simpleName, entityTypeName, it
+                        model.entity, config.metaObject, model.aliases, packageName, simpleName, model.typeName, writer
                     )
                 }
                 runnable.run()
