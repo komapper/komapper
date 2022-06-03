@@ -115,7 +115,7 @@ jobs:
           ORG_GRADLE_PROJECT_sonatypeUsername: ${{ secrets.SONATYPE_USERNAME }}
           ORG_GRADLE_PROJECT_sonatypePassword: ${{ secrets.SONATYPE_PASSWORD }}
         with:
-          arguments: publish closeAndReleaseStagingRepository
+          arguments: publishToSonatype closeAndReleaseSonatypeStagingRepository
 
       - name: Publish plugin
         uses: gradle/gradle-build-action@v2
