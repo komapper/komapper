@@ -1,5 +1,6 @@
 package integration.core
 
+import integration.core.enumclass.Direction
 import org.komapper.annotation.EnumType
 import org.komapper.annotation.KomapperAutoIncrement
 import org.komapper.annotation.KomapperColumn
@@ -57,10 +58,6 @@ data class DoubleData(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = tru
 @KomapperEntity
 @KomapperTable("duration_data")
 data class DurationData(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true) val value: Duration?)
-
-enum class Direction {
-    NORTH, SOUTH, EAST, WEST
-}
 
 @KomapperEntity
 @KomapperTable("enum_data")

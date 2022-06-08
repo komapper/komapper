@@ -154,8 +154,8 @@ internal class EntityMetamodelGenerator(
             val wrap = when (p.kotlinClass) {
                 is EnumClass -> {
                     when (p.kotlinClass.strategy) {
-                        EnumStrategy.NAME -> "{ ${p.kotlinClass.declaration}.valueOf(it) }"
-                        EnumStrategy.ORDINAL -> "{ ${p.kotlinClass.declaration}.values()[it] }"
+                        EnumStrategy.NAME -> "{ $exteriorTypeName.valueOf(it) }"
+                        EnumStrategy.ORDINAL -> "{ $exteriorTypeName.values()[it] }"
                     }
                 }
                 is ValueClass -> "{ ${p.kotlinClass}(it) }"
