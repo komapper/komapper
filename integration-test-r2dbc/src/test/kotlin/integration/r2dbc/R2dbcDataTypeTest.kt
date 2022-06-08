@@ -6,7 +6,6 @@ import integration.core.BooleanData
 import integration.core.ByteArrayData
 import integration.core.ByteData
 import integration.core.Dbms
-import integration.core.Direction
 import integration.core.DoubleData
 import integration.core.EnumData
 import integration.core.EnumOrdinalData
@@ -38,6 +37,7 @@ import integration.core.byteData
 import integration.core.doubleData
 import integration.core.enumData
 import integration.core.enumOrdinalData
+import integration.core.enumclass.Direction
 import integration.core.floatData
 import integration.core.instantData
 import integration.core.intData
