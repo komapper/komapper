@@ -67,7 +67,7 @@ configure(libraryProjects + gradlePluginProject + exampleProjects + integrationT
         }
     }
 
-    val jvmTarget = 11
+    val jvmTargetVersion = 11
 
     tasks {
         withType<Test>().configureEach {
@@ -75,11 +75,14 @@ configure(libraryProjects + gradlePluginProject + exampleProjects + integrationT
         }
 
         withType<JavaCompile>().configureEach {
-            options.release.set(jvmTarget)
+            options.release.set(jvmTargetVersion)
         }
 
         withType<KotlinCompile>().configureEach {
-            kotlinOptions.jvmTarget = jvmTarget.toString()
+            kotlinOptions {
+                jvmTarget = jvmTargetVersion.toString()
+                apiVersion = "1.5"
+            }
         }
     }
 }
