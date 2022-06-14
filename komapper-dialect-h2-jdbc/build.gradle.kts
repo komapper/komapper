@@ -1,5 +1,5 @@
 dependencies {
     api(project(":komapper-dialect-h2"))
     api(project(":komapper-jdbc"))
-    implementation("com.h2database:h2:2.1.212")
+    implementation("com.h2database:h2:2.1.214")
 }
