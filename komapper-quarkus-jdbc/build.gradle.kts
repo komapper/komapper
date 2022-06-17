@@ -4,7 +4,7 @@ plugins {
 }
 
 quarkusExtension {
-    deploymentModule = "komapper-quarkus-jdbc-deployment"
+    deploymentModule.set("komapper-quarkus-jdbc-deployment")
 }
 
 dependencies {
