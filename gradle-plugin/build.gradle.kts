@@ -25,11 +25,6 @@ pluginBundle {
     website = "https://github.com/komapper/komapper"
     vcsUrl = "https://github.com/komapper/komapper.git"
     tags = listOf("komapper", "code generator")
-
-    mavenCoordinates {
-        groupId = project.group.toString()
-        artifactId = project.name
-    }
 }
 
 dependencies {
