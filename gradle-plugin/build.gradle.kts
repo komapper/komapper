@@ -1,7 +1,4 @@
 plugins {
-    `java-gradle-plugin`
-    // use this plugin to enable the "publishToMavenLocal" task
-    `maven-publish`
     id("com.gradle.plugin-publish") version "1.0.0"
 }
 
