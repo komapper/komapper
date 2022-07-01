@@ -1,8 +1,5 @@
 plugins {
-    `java-gradle-plugin`
-    // use this plugin to enable the "publishToMavenLocal" task
-    `maven-publish`
-    id("com.gradle.plugin-publish") version "0.21.0"
+    id("com.gradle.plugin-publish") version "1.0.0"
 }
 
 // we don't publish this project to sonatype
@@ -25,11 +22,6 @@ pluginBundle {
     website = "https://github.com/komapper/komapper"
     vcsUrl = "https://github.com/komapper/komapper.git"
     tags = listOf("komapper", "code generator")
-
-    mavenCoordinates {
-        groupId = project.group.toString()
-        artifactId = project.name
-    }
 }
 
 dependencies {
