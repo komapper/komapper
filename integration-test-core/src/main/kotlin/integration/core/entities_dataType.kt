@@ -159,3 +159,15 @@ data class UnsignedSequenceStrategy(
     @KomapperId @KomapperSequence(name = "sequence_strategy_id", incrementBy = 100) val id: UInt,
     @KomapperColumn(alwaysQuote = true) val value: String
 )
+
+@KomapperEntity
+@KomapperTable("int_data")
+data class UserIntData(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true) val value: UserInt?)
+
+data class UserInt(val value: Int)
+
+@KomapperEntity
+@KomapperTable("string_data")
+data class UserStringData(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true) val value: UserString?)
+
+data class UserString(val value: String)
