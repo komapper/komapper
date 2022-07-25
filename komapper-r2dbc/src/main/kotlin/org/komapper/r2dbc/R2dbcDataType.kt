@@ -31,7 +31,7 @@ interface R2dbcDataType<T : Any> {
     /**
      * The corresponding class.
      */
-    val klass: KClass<*>
+    val klass: KClass<T>
 
     /**
      * Returns the value.
@@ -457,7 +457,7 @@ class R2dbcUShortType(override val name: String) :
 class R2dbcUserDataTypeAdapter<T : Any>(private val dataType: R2dbcUserDefinedDataType<T>) : R2dbcDataType<T> {
     override val name: String get() = dataType.name
 
-    override val klass: KClass<*> get() = dataType.klass
+    override val klass: KClass<T> get() = dataType.klass
 
     override fun getValue(row: Row, index: Int): T? {
         return dataType.getValue(row, index)

@@ -5,6 +5,9 @@ import io.r2dbc.spi.Statement
 import org.komapper.core.ThreadSafe
 import kotlin.reflect.KClass
 
+/**
+ * Represents a user-defined data type for R2DBC access.
+ */
 @ThreadSafe
 interface R2dbcUserDefinedDataType<T : Any> {
     /**
@@ -13,12 +16,13 @@ interface R2dbcUserDefinedDataType<T : Any> {
     val name: String
 
     /**
-     * The corresponding class.
+     * The user-defined class.
      */
-    val klass: KClass<*>
+    val klass: KClass<T>
 
     /**
-     * The R2DBC codec type. The type must be a nullable type.
+     * The R2DBC codec type.
+     * The type must be a nullable type.
      */
     val r2dbcType: Class<*>
 
