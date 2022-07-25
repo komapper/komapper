@@ -35,6 +35,8 @@ import integration.core.UserDefinedInt
 import integration.core.UserDefinedIntData
 import integration.core.UserDefinedString
 import integration.core.UserDefinedStringData
+import integration.core.WrappedString
+import integration.core.WrappedStringData
 import integration.core.anyData
 import integration.core.bigDecimalData
 import integration.core.bigIntegerData
@@ -65,6 +67,7 @@ import integration.core.unsignedSequenceStrategy
 import integration.core.userDefinedIntData
 import integration.core.userDefinedStringData
 import integration.core.uuidData
+import integration.core.wrappedStringData
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
@@ -898,6 +901,28 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
     fun userDefinedString_null() {
         val m = Meta.userDefinedStringData
         val data = UserDefinedStringData(1, null)
+        db.runQuery { QueryDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        assertEquals(data, data2)
+    }
+
+    @Test
+    fun wrapperString() {
+        val m = Meta.wrappedStringData
+        val data = WrappedStringData(1, WrappedString("ABC"))
+        db.runQuery { QueryDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        assertEquals(data, data2)
+    }
+
+    @Test
+    fun wrappedString_null() {
+        val m = Meta.wrappedStringData
+        val data = WrappedStringData(1, null)
         db.runQuery { QueryDsl.insert(m).single(data) }
         val data2 = db.runQuery {
             QueryDsl.from(m).where { m.id eq 1 }.first()

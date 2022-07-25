@@ -1,6 +1,7 @@
 package org.komapper.jdbc
 
 import org.komapper.core.ThreadSafe
+import org.komapper.core.spi.DataConverter
 import org.komapper.jdbc.spi.JdbcUserDefinedDataType
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -583,6 +584,7 @@ class JdbcUShortType(override val name: String) : AbstractJdbcDataType<UShort>(U
     }
 }
 
+// TODO
 class JdbcUserDataTypeAdapter<T : Any>(
     private val dataType: JdbcUserDefinedDataType<T>,
 ) : JdbcDataType<T> {
@@ -616,5 +618,39 @@ class JdbcUserDataTypeAdapter<T : Any>(
 
     override fun toString(value: T?): String {
         return if (value == null) "null" else dataType.toString(value)
+    }
+}
+
+class JdbcDataConverter<EXTERIOR : Any, INTERIOR : Any>(
+    private val converter: DataConverter<EXTERIOR, INTERIOR>,
+    private val dataType: JdbcDataType<INTERIOR>,
+) : JdbcDataType<EXTERIOR> {
+
+    override val name: String get() = dataType.name
+
+    override val klass: KClass<EXTERIOR> get() = converter.exteriorClass
+
+    override val jdbcType: JDBCType get() = dataType.jdbcType
+
+    override fun getValue(rs: ResultSet, index: Int): EXTERIOR? {
+        val value = dataType.getValue(rs, index)
+        return if (rs.wasNull() || value == null) null else converter.wrap(value)
+    }
+
+    override fun getValue(rs: ResultSet, columnLabel: String): EXTERIOR? {
+        val value = dataType.getValue(rs, columnLabel)
+        return if (rs.wasNull() || value == null) null else converter.wrap(value)
+    }
+
+    override fun setValue(ps: PreparedStatement, index: Int, value: EXTERIOR?) {
+        if (value == null) {
+            ps.setNull(index, dataType.jdbcType.vendorTypeNumber)
+        } else {
+            dataType.setValue(ps, index, converter.unwrap(value))
+        }
+    }
+
+    override fun toString(value: EXTERIOR?): String {
+        return if (value == null) "null" else dataType.toString(converter.unwrap(value))
     }
 }
