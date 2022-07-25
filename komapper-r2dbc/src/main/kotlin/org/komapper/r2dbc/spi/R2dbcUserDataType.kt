@@ -1,0 +1,68 @@
+package org.komapper.r2dbc.spi
+
+import io.r2dbc.spi.Row
+import io.r2dbc.spi.Statement
+import org.komapper.core.ThreadSafe
+import kotlin.reflect.KClass
+
+@ThreadSafe
+interface R2dbcUserDataType<T : Any> {
+    /**
+     * The data type name.
+     */
+    val name: String
+
+    /**
+     * The corresponding class.
+     */
+    val klass: KClass<*>
+
+    /**
+     * The java object type. The type must be a nullable type.
+     */
+    val javaObjectType: Class<*>
+
+    /**
+     * Returns the value.
+     *
+     * @param row the row
+     * @param index the index
+     * @return the value
+     */
+    fun getValue(row: Row, index: Int): T?
+
+    /**
+     * Returns the value.
+     *
+     * @param row the row
+     * @param columnLabel the column label
+     * @return the value
+     */
+    fun getValue(row: Row, columnLabel: String): T?
+
+    /**
+     * Sets the value.
+     *
+     * @param statement the statement
+     * @param index the index
+     * @param value the value
+     */
+    fun setValue(statement: Statement, index: Int, value: T)
+
+    /**
+     * Sets the value.
+     *
+     * @param statement the statement
+     * @param name the name of identifier to bind to
+     * @param value the value
+     */
+    fun setValue(statement: Statement, name: String, value: T)
+
+    /**
+     * Returns the string presentation of the value.
+     *
+     * @param value the value
+     * @return the string presentation of the value
+     */
+    fun toString(value: T): String
+}

@@ -5,6 +5,7 @@ import io.r2dbc.spi.Clob
 import io.r2dbc.spi.Row
 import io.r2dbc.spi.Statement
 import org.komapper.core.ThreadSafe
+import org.komapper.r2dbc.spi.R2dbcUserDataType
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.nio.ByteBuffer
@@ -450,5 +451,39 @@ class R2dbcUShortType(override val name: String) :
 
     override fun convertBeforeBinding(value: UShort): Any {
         return value.toInt()
+    }
+}
+
+class R2dbcUserDataTypeAdapter<T : Any>(private val userDataType: R2dbcUserDataType<T>) : R2dbcDataType<T> {
+    override val name: String get() = userDataType.name
+
+    override val klass: KClass<*> get() = userDataType.klass
+
+    override fun getValue(row: Row, index: Int): T? {
+        return userDataType.getValue(row, index)
+    }
+
+    override fun getValue(row: Row, columnLabel: String): T? {
+        return userDataType.getValue(row, columnLabel)
+    }
+
+    override fun setValue(statement: Statement, index: Int, value: T?) {
+        if (value == null) {
+            statement.bindNull(index, userDataType.javaObjectType)
+        } else {
+            userDataType.setValue(statement, index, value)
+        }
+    }
+
+    override fun setValue(statement: Statement, name: String, value: T?) {
+        if (value == null) {
+            statement.bindNull(name, userDataType.javaObjectType)
+        } else {
+            userDataType.setValue(statement, name, value)
+        }
+    }
+
+    override fun toString(value: T?): String {
+        return if (value == null) "null" else userDataType.toString(value)
     }
 }
