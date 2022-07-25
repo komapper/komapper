@@ -31,10 +31,10 @@ import integration.core.UnsignedAddress
 import integration.core.UnsignedAddress2
 import integration.core.UnsignedIdentityStrategy
 import integration.core.UnsignedSequenceStrategy
-import integration.core.UserInt
-import integration.core.UserIntData
-import integration.core.UserString
-import integration.core.UserStringData
+import integration.core.UserDefinedInt
+import integration.core.UserDefinedIntData
+import integration.core.UserDefinedString
+import integration.core.UserDefinedStringData
 import integration.core.anyData
 import integration.core.bigDecimalData
 import integration.core.bigIntegerData
@@ -62,8 +62,8 @@ import integration.core.unsignedAddress
 import integration.core.unsignedAddress2
 import integration.core.unsignedIdentityStrategy
 import integration.core.unsignedSequenceStrategy
-import integration.core.userIntData
-import integration.core.userStringData
+import integration.core.userDefinedIntData
+import integration.core.userDefinedStringData
 import integration.core.uuidData
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
@@ -862,9 +862,9 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
     }
 
     @Test
-    fun userInt() {
-        val m = Meta.userIntData
-        val data = UserIntData(1, UserInt(123))
+    fun userDefinedInt() {
+        val m = Meta.userDefinedIntData
+        val data = UserDefinedIntData(1, UserDefinedInt(123))
         db.runQuery { QueryDsl.insert(m).single(data) }
         val data2 = db.runQuery {
             QueryDsl.from(m).where { m.id eq 1 }.first()
@@ -873,9 +873,9 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
     }
 
     @Test
-    fun userInt_null() {
-        val m = Meta.userIntData
-        val data = UserIntData(1, null)
+    fun userDefinedInt_null() {
+        val m = Meta.userDefinedIntData
+        val data = UserDefinedIntData(1, null)
         db.runQuery { QueryDsl.insert(m).single(data) }
         val data2 = db.runQuery {
             QueryDsl.from(m).where { m.id eq 1 }.first()
@@ -884,9 +884,9 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
     }
 
     @Test
-    fun userString() {
-        val m = Meta.userStringData
-        val data = UserStringData(1, UserString("ABC"))
+    fun userDefinedString() {
+        val m = Meta.userDefinedStringData
+        val data = UserDefinedStringData(1, UserDefinedString("ABC"))
         db.runQuery { QueryDsl.insert(m).single(data) }
         val data2 = db.runQuery {
             QueryDsl.from(m).where { m.id eq 1 }.first()
@@ -895,9 +895,9 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
     }
 
     @Test
-    fun userString_null() {
-        val m = Meta.userStringData
-        val data = UserStringData(1, null)
+    fun userDefinedString_null() {
+        val m = Meta.userDefinedStringData
+        val data = UserDefinedStringData(1, null)
         db.runQuery { QueryDsl.insert(m).single(data) }
         val data2 = db.runQuery {
             QueryDsl.from(m).where { m.id eq 1 }.first()

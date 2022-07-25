@@ -1,7 +1,7 @@
 package org.komapper.jdbc
 
 import org.komapper.core.ThreadSafe
-import org.komapper.jdbc.spi.JdbcUserDataType
+import org.komapper.jdbc.spi.JdbcUserDefinedDataType
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.sql.Array
@@ -584,37 +584,37 @@ class JdbcUShortType(override val name: String) : AbstractJdbcDataType<UShort>(U
 }
 
 class JdbcUserDataTypeAdapter<T : Any>(
-    private val userDataType: JdbcUserDataType<T>,
+    private val dataType: JdbcUserDefinedDataType<T>,
 ) : JdbcDataType<T> {
 
     override val name: String
-        get() = userDataType.name
+        get() = dataType.name
 
     override val klass: KClass<T>
-        get() = userDataType.klass
+        get() = dataType.klass
 
     override val jdbcType: JDBCType
-        get() = userDataType.jdbcType
+        get() = dataType.jdbcType
 
     override fun getValue(rs: ResultSet, index: Int): T? {
-        val value = userDataType.getValue(rs, index)
+        val value = dataType.getValue(rs, index)
         return if (rs.wasNull()) null else value
     }
 
     override fun getValue(rs: ResultSet, columnLabel: String): T? {
-        val value = userDataType.getValue(rs, columnLabel)
+        val value = dataType.getValue(rs, columnLabel)
         return if (rs.wasNull()) null else value
     }
 
     override fun setValue(ps: PreparedStatement, index: Int, value: T?) {
         if (value == null) {
-            ps.setNull(index, userDataType.jdbcType.vendorTypeNumber)
+            ps.setNull(index, dataType.jdbcType.vendorTypeNumber)
         } else {
-            userDataType.setValue(ps, index, value)
+            dataType.setValue(ps, index, value)
         }
     }
 
     override fun toString(value: T?): String {
-        return if (value == null) "null" else userDataType.toString(value)
+        return if (value == null) "null" else dataType.toString(value)
     }
 }

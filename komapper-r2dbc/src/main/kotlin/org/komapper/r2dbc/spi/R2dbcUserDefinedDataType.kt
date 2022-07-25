@@ -6,7 +6,7 @@ import org.komapper.core.ThreadSafe
 import kotlin.reflect.KClass
 
 @ThreadSafe
-interface R2dbcUserDataType<T : Any> {
+interface R2dbcUserDefinedDataType<T : Any> {
     /**
      * The data type name.
      */
@@ -18,9 +18,9 @@ interface R2dbcUserDataType<T : Any> {
     val klass: KClass<*>
 
     /**
-     * The java object type. The type must be a nullable type.
+     * The R2DBC codec type. The type must be a nullable type.
      */
-    val javaObjectType: Class<*>
+    val r2dbcType: Class<*>
 
     /**
      * Returns the value.

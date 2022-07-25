@@ -60,7 +60,7 @@ public class KomapperProcessor {
             "org.komapper.core.spi.TemplateStatementBuilderFactory",
             "org.komapper.jdbc.spi.JdbcDataTypeProviderFactory",
             "org.komapper.jdbc.spi.JdbcDialectFactory",
-            "org.komapper.jdbc.spi.JdbcUserDataType");
+            "org.komapper.jdbc.spi.JdbcUserDefinedDataType");
     for (var interfase : serviceInterfaces) {
       var item = ServiceProviderBuildItem.allProvidersFromClassPath(interfase);
       serviceProvider.produce(item);

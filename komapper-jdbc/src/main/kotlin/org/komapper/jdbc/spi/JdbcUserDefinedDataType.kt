@@ -7,7 +7,7 @@ import java.sql.ResultSet
 import kotlin.reflect.KClass
 
 @ThreadSafe
-interface JdbcUserDataType<T : Any> {
+interface JdbcUserDefinedDataType<T : Any> {
     /**
      * The data type name.
      */
