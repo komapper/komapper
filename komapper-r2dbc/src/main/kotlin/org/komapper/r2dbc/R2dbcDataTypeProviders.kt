@@ -1,7 +1,7 @@
 package org.komapper.r2dbc
 
 import org.komapper.r2dbc.spi.R2dbcDataTypeProviderFactory
-import org.komapper.r2dbc.spi.R2dbcUserDataType
+import org.komapper.r2dbc.spi.R2dbcUserDefinedDataType
 import java.util.ServiceLoader
 import kotlin.reflect.KClass
 
@@ -26,9 +26,9 @@ object R2dbcDataTypeProviders {
 }
 
 private object R2dbcUserDataTypeProvider : R2dbcDataTypeProvider {
-    val userDataTypes = R2dbcUserDataTypes.get().associateBy { it.klass }
+    val dataTypes = R2dbcUserDefinedDataTypes.get().associateBy { it.klass }
     override fun <T : Any> get(klass: KClass<out T>): R2dbcDataType<T>? {
-        @Suppress("UNCHECKED_CAST") val userDataType = userDataTypes[klass] as R2dbcUserDataType<T>?
-        return if (userDataType == null) null else R2dbcUserDataTypeAdapter(userDataType)
+        @Suppress("UNCHECKED_CAST") val dataType = dataTypes[klass] as R2dbcUserDefinedDataType<T>?
+        return if (dataType == null) null else R2dbcUserDataTypeAdapter(dataType)
     }
 }

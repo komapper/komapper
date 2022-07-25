@@ -1,7 +1,7 @@
 package org.komapper.jdbc
 
 import org.komapper.jdbc.spi.JdbcDataTypeProviderFactory
-import org.komapper.jdbc.spi.JdbcUserDataType
+import org.komapper.jdbc.spi.JdbcUserDefinedDataType
 import java.util.ServiceLoader
 import kotlin.reflect.KClass
 
@@ -26,10 +26,10 @@ object JdbcDataTypeProviders {
 }
 
 private object JdbcUserDataTypeProvider : JdbcDataTypeProvider {
-    val userDataTypes = JdbcUserDataTypes.get().associateBy { it.klass }
+    val dataTypes = JdbcUserDefinedDataTypes.get().associateBy { it.klass }
     override fun <T : Any> get(klass: KClass<out T>): JdbcDataType<T>? {
         @Suppress("UNCHECKED_CAST")
-        val userDataType = userDataTypes[klass] as JdbcUserDataType<T>?
-        return if (userDataType == null) null else JdbcUserDataTypeAdapter(userDataType)
+        val dataType = dataTypes[klass] as JdbcUserDefinedDataType<T>?
+        return if (dataType == null) null else JdbcUserDataTypeAdapter(dataType)
     }
 }

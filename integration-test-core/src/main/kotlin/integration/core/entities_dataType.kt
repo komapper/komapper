@@ -162,12 +162,12 @@ data class UnsignedSequenceStrategy(
 
 @KomapperEntity
 @KomapperTable("int_data")
-data class UserIntData(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true) val value: UserInt?)
+data class UserDefinedIntData(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true) val value: UserDefinedInt?)
 
-data class UserInt(val value: Int)
+data class UserDefinedInt(val value: Int)
 
 @KomapperEntity
 @KomapperTable("string_data")
-data class UserStringData(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true) val value: UserString?)
+data class UserDefinedStringData(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true) val value: UserDefinedString?)
 
-data class UserString(val value: String)
+data class UserDefinedString(val value: String)

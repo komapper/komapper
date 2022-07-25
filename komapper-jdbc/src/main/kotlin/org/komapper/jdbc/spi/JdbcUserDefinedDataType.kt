@@ -6,15 +6,18 @@ import java.sql.PreparedStatement
 import java.sql.ResultSet
 import kotlin.reflect.KClass
 
+/**
+ * Represents a user-defined data type for JDBC access.
+ */
 @ThreadSafe
-interface JdbcUserDataType<T : Any> {
+interface JdbcUserDefinedDataType<T : Any> {
     /**
      * The data type name.
      */
     val name: String
 
     /**
-     * The corresponding class.
+     * The user-defined class.
      */
     val klass: KClass<T>
 
