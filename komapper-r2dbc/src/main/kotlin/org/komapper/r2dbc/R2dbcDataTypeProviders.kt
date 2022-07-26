@@ -1,7 +1,7 @@
 package org.komapper.r2dbc
 
-import org.komapper.core.DataConverters
-import org.komapper.core.spi.DataConverter
+import org.komapper.core.DataTypeConverters
+import org.komapper.core.spi.DataTypeConverter
 import org.komapper.r2dbc.spi.R2dbcDataTypeProviderFactory
 import org.komapper.r2dbc.spi.R2dbcUserDefinedDataType
 import java.util.ServiceLoader
@@ -19,12 +19,12 @@ object R2dbcDataTypeProviders {
         val lastProvider: R2dbcDataTypeProvider = R2dbcEmptyDataTypeProvider
         val chainedProviders = factories.fold(lastProvider) { acc, factory -> factory.create(acc) }
         val secondProvider = R2dbcUserDefinedDataTypeProvider
-        val converters = DataConverters.get().associateBy { it.exteriorClass }
+        val converters = DataTypeConverters.get().associateBy { it.exteriorClass }
         return object : R2dbcDataTypeProvider {
 
             override fun <T : Any> get(klass: KClass<out T>): R2dbcDataType<T>? {
                 @Suppress("UNCHECKED_CAST")
-                val converter = converters[klass] as DataConverter<T, Any>?
+                val converter = converters[klass] as DataTypeConverter<T, Any>?
                 return if (converter == null) {
                     find(klass)
                 } else {

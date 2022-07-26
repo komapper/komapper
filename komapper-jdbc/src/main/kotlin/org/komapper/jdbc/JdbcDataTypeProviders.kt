@@ -1,7 +1,7 @@
 package org.komapper.jdbc
 
-import org.komapper.core.DataConverters
-import org.komapper.core.spi.DataConverter
+import org.komapper.core.DataTypeConverters
+import org.komapper.core.spi.DataTypeConverter
 import org.komapper.jdbc.spi.JdbcDataTypeProviderFactory
 import org.komapper.jdbc.spi.JdbcUserDefinedDataType
 import java.util.ServiceLoader
@@ -19,12 +19,12 @@ object JdbcDataTypeProviders {
         val lastProvider: JdbcDataTypeProvider = EmptyJdbcDataTypeProvider
         val chainedProviders = factories.fold(lastProvider) { acc, factory -> factory.create(acc) }
         val secondProvider = JdbcUserDefinedDataTypeProvider
-        val converters = DataConverters.get().associateBy { it.exteriorClass }
+        val converters = DataTypeConverters.get().associateBy { it.exteriorClass }
         return object : JdbcDataTypeProvider {
 
             override fun <T : Any> get(klass: KClass<out T>): JdbcDataType<T>? {
                 @Suppress("UNCHECKED_CAST")
-                val converter = converters[klass] as DataConverter<T, Any>?
+                val converter = converters[klass] as DataTypeConverter<T, Any>?
                 return if (converter == null) {
                     find(klass)
                 } else {

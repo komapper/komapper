@@ -2,7 +2,7 @@ package org.komapper.core.spi
 
 import kotlin.reflect.KClass
 
-interface DataConverter<EXTERIOR : Any, INTERIOR : Any> {
+interface DataTypeConverter<EXTERIOR : Any, INTERIOR : Any> {
 
     val exteriorClass: KClass<EXTERIOR>
 

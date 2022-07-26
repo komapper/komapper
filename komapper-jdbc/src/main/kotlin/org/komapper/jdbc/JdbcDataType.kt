@@ -1,7 +1,7 @@
 package org.komapper.jdbc
 
 import org.komapper.core.ThreadSafe
-import org.komapper.core.spi.DataConverter
+import org.komapper.core.spi.DataTypeConverter
 import org.komapper.jdbc.spi.JdbcUserDefinedDataType
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -621,7 +621,7 @@ class JdbcUserDefinedDataTypeAdapter<T : Any>(
 }
 
 class JdbcDataTypeProxy<EXTERIOR : Any, INTERIOR : Any>(
-    private val converter: DataConverter<EXTERIOR, INTERIOR>,
+    private val converter: DataTypeConverter<EXTERIOR, INTERIOR>,
     private val dataType: JdbcDataType<INTERIOR>,
 ) : JdbcDataType<EXTERIOR> {
 

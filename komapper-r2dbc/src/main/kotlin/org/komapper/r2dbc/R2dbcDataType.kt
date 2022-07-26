@@ -5,7 +5,7 @@ import io.r2dbc.spi.Clob
 import io.r2dbc.spi.Row
 import io.r2dbc.spi.Statement
 import org.komapper.core.ThreadSafe
-import org.komapper.core.spi.DataConverter
+import org.komapper.core.spi.DataTypeConverter
 import org.komapper.r2dbc.spi.R2dbcUserDefinedDataType
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -490,7 +490,7 @@ class R2dbcUserDefinedDataTypeAdapter<T : Any>(private val dataType: R2dbcUserDe
 }
 
 class R2dbcDataTypeProxy<EXTERIOR : Any, INTERIOR : Any>(
-    private val converter: DataConverter<EXTERIOR, INTERIOR>,
+    private val converter: DataTypeConverter<EXTERIOR, INTERIOR>,
     private val dataType: R2dbcDataType<INTERIOR>,
 ) : R2dbcDataType<EXTERIOR> {
 
