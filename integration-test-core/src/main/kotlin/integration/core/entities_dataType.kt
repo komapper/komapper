@@ -171,3 +171,9 @@ data class UserDefinedInt(val value: Int)
 data class UserDefinedStringData(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true) val value: UserDefinedString?)
 
 data class UserDefinedString(val value: String)
+
+@KomapperEntity
+@KomapperTable("string_data")
+data class WrappedStringData(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true) val value: WrappedString?)
+
+data class WrappedString(val value: String)

@@ -5,6 +5,7 @@ import io.r2dbc.spi.Clob
 import io.r2dbc.spi.Row
 import io.r2dbc.spi.Statement
 import org.komapper.core.ThreadSafe
+import org.komapper.core.spi.DataTypeConverter
 import org.komapper.r2dbc.spi.R2dbcUserDefinedDataType
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -454,7 +455,7 @@ class R2dbcUShortType(override val name: String) :
     }
 }
 
-class R2dbcUserDataTypeAdapter<T : Any>(private val dataType: R2dbcUserDefinedDataType<T>) : R2dbcDataType<T> {
+class R2dbcUserDefinedDataTypeAdapter<T : Any>(private val dataType: R2dbcUserDefinedDataType<T>) : R2dbcDataType<T> {
     override val name: String get() = dataType.name
 
     override val klass: KClass<T> get() = dataType.klass
@@ -485,5 +486,35 @@ class R2dbcUserDataTypeAdapter<T : Any>(private val dataType: R2dbcUserDefinedDa
 
     override fun toString(value: T?): String {
         return if (value == null) "null" else dataType.toString(value)
+    }
+}
+
+class R2dbcDataTypeProxy<EXTERIOR : Any, INTERIOR : Any>(
+    private val converter: DataTypeConverter<EXTERIOR, INTERIOR>,
+    private val dataType: R2dbcDataType<INTERIOR>,
+) : R2dbcDataType<EXTERIOR> {
+
+    override val name: String get() = dataType.name
+
+    override val klass: KClass<EXTERIOR> get() = converter.exteriorClass
+
+    override fun getValue(row: Row, index: Int): EXTERIOR? {
+        return dataType.getValue(row, index)?.let { converter.wrap(it) }
+    }
+
+    override fun getValue(row: Row, columnLabel: String): EXTERIOR? {
+        return dataType.getValue(row, columnLabel)?.let { converter.wrap(it) }
+    }
+
+    override fun setValue(statement: Statement, index: Int, value: EXTERIOR?) {
+        dataType.setValue(statement, index, value?.let { converter.unwrap(value) })
+    }
+
+    override fun setValue(statement: Statement, name: String, value: EXTERIOR?) {
+        dataType.setValue(statement, name, value?.let { converter.unwrap(value) })
+    }
+
+    override fun toString(value: EXTERIOR?): String {
+        return if (value == null) "null" else dataType.toString(converter.unwrap(value))
     }
 }
