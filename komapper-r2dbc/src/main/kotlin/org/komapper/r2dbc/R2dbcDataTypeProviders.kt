@@ -18,7 +18,7 @@ object R2dbcDataTypeProviders {
         val factories = loader.filter { it.supports(driver) }.sortedBy { it.priority }
         val lastProvider: R2dbcDataTypeProvider = R2dbcEmptyDataTypeProvider
         val chainedProviders = factories.fold(lastProvider) { acc, factory -> factory.create(acc) }
-        val secondProvider = R2dbcUserDataTypeProvider
+        val secondProvider = R2dbcUserDefinedDataTypeProvider
         val converters = DataConverters.get().associateBy { it.exteriorClass }
         return object : R2dbcDataTypeProvider {
 
@@ -30,7 +30,7 @@ object R2dbcDataTypeProviders {
                 } else {
                     val dataType = find(converter.interiorClass)
                         ?: error("The dataType is not found for the type \"${converter.interiorClass.qualifiedName}\".")
-                    R2dbcDataConverter(converter, dataType)
+                    R2dbcDataTypeProxy(converter, dataType)
                 }
             }
 
@@ -41,11 +41,10 @@ object R2dbcDataTypeProviders {
     }
 }
 
-// TODO
-private object R2dbcUserDataTypeProvider : R2dbcDataTypeProvider {
+private object R2dbcUserDefinedDataTypeProvider : R2dbcDataTypeProvider {
     val dataTypes = R2dbcUserDefinedDataTypes.get().associateBy { it.klass }
     override fun <T : Any> get(klass: KClass<out T>): R2dbcDataType<T>? {
         @Suppress("UNCHECKED_CAST") val dataType = dataTypes[klass] as R2dbcUserDefinedDataType<T>?
-        return if (dataType == null) null else R2dbcUserDataTypeAdapter(dataType)
+        return if (dataType == null) null else R2dbcUserDefinedDataTypeAdapter(dataType)
     }
 }

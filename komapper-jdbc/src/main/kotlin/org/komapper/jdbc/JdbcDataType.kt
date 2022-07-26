@@ -584,8 +584,7 @@ class JdbcUShortType(override val name: String) : AbstractJdbcDataType<UShort>(U
     }
 }
 
-// TODO
-class JdbcUserDataTypeAdapter<T : Any>(
+class JdbcUserDefinedDataTypeAdapter<T : Any>(
     private val dataType: JdbcUserDefinedDataType<T>,
 ) : JdbcDataType<T> {
 
@@ -621,7 +620,7 @@ class JdbcUserDataTypeAdapter<T : Any>(
     }
 }
 
-class JdbcDataConverter<EXTERIOR : Any, INTERIOR : Any>(
+class JdbcDataTypeProxy<EXTERIOR : Any, INTERIOR : Any>(
     private val converter: DataConverter<EXTERIOR, INTERIOR>,
     private val dataType: JdbcDataType<INTERIOR>,
 ) : JdbcDataType<EXTERIOR> {

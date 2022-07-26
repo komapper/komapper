@@ -18,7 +18,7 @@ object JdbcDataTypeProviders {
         val factories = loader.filter { it.supports(driver) }.sortedBy { it.priority }
         val lastProvider: JdbcDataTypeProvider = EmptyJdbcDataTypeProvider
         val chainedProviders = factories.fold(lastProvider) { acc, factory -> factory.create(acc) }
-        val secondProvider = JdbcUserDataTypeProvider
+        val secondProvider = JdbcUserDefinedDataTypeProvider
         val converters = DataConverters.get().associateBy { it.exteriorClass }
         return object : JdbcDataTypeProvider {
 
@@ -30,7 +30,7 @@ object JdbcDataTypeProviders {
                 } else {
                     val dataType = find(converter.interiorClass)
                         ?: error("The dataType is not found for the type \"${converter.interiorClass.qualifiedName}\".")
-                    JdbcDataConverter(converter, dataType)
+                    JdbcDataTypeProxy(converter, dataType)
                 }
             }
 
@@ -41,12 +41,11 @@ object JdbcDataTypeProviders {
     }
 }
 
-// TODO
-private object JdbcUserDataTypeProvider : JdbcDataTypeProvider {
+private object JdbcUserDefinedDataTypeProvider : JdbcDataTypeProvider {
     val dataTypes = JdbcUserDefinedDataTypes.get().associateBy { it.klass }
     override fun <T : Any> get(klass: KClass<out T>): JdbcDataType<T>? {
         @Suppress("UNCHECKED_CAST")
         val dataType = dataTypes[klass] as JdbcUserDefinedDataType<T>?
-        return if (dataType == null) null else JdbcUserDataTypeAdapter(dataType)
+        return if (dataType == null) null else JdbcUserDefinedDataTypeAdapter(dataType)
     }
 }

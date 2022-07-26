@@ -455,8 +455,7 @@ class R2dbcUShortType(override val name: String) :
     }
 }
 
-// TODO
-class R2dbcUserDataTypeAdapter<T : Any>(private val dataType: R2dbcUserDefinedDataType<T>) : R2dbcDataType<T> {
+class R2dbcUserDefinedDataTypeAdapter<T : Any>(private val dataType: R2dbcUserDefinedDataType<T>) : R2dbcDataType<T> {
     override val name: String get() = dataType.name
 
     override val klass: KClass<T> get() = dataType.klass
@@ -490,8 +489,7 @@ class R2dbcUserDataTypeAdapter<T : Any>(private val dataType: R2dbcUserDefinedDa
     }
 }
 
-// TODO
-class R2dbcDataConverter<EXTERIOR : Any, INTERIOR : Any>(
+class R2dbcDataTypeProxy<EXTERIOR : Any, INTERIOR : Any>(
     private val converter: DataConverter<EXTERIOR, INTERIOR>,
     private val dataType: R2dbcDataType<INTERIOR>,
 ) : R2dbcDataType<EXTERIOR> {
