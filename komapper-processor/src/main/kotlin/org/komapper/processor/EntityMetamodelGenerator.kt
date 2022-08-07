@@ -30,7 +30,7 @@ import java.io.PrintWriter
 import java.time.ZonedDateTime
 
 internal class EntityMetamodelGenerator(
-    private val logger: KSPLogger,
+    @Suppress("unused") private val logger: KSPLogger,
     private val entity: Entity,
     private val metaObject: String,
     private val aliases: List<String>,
