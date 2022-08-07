@@ -1,6 +1,7 @@
 package org.komapper.processor
 
 import com.google.devtools.ksp.processing.Dependencies
+import com.google.devtools.ksp.processing.KSPLogger
 import com.google.devtools.ksp.processing.Resolver
 import com.google.devtools.ksp.processing.SymbolProcessor
 import com.google.devtools.ksp.processing.SymbolProcessorEnvironment
@@ -11,6 +12,7 @@ import java.io.PrintWriter
 
 internal class EntityProcessor(private val environment: SymbolProcessorEnvironment) : SymbolProcessor {
 
+    private val logger: KSPLogger = environment.logger
     private val config: Config = Config.create(environment.options)
 
     override fun process(resolver: Resolver): List<KSAnnotated> {
@@ -20,7 +22,7 @@ internal class EntityProcessor(private val environment: SymbolProcessorEnvironme
         )
         for ((annotation, definitionSourceResolver) in pairs) {
             val symbols = resolver.getSymbolsWithAnnotation(annotation)
-            val analyzer = EntityAnalyzer(config, definitionSourceResolver)
+            val analyzer = EntityAnalyzer(logger, config, definitionSourceResolver)
             for (symbol in symbols) {
                 val model = when (val result = analyzer.analyze(symbol)) {
                     is EntityAnalysisResult.Success -> result.model
@@ -40,7 +42,7 @@ internal class EntityProcessor(private val environment: SymbolProcessorEnvironme
     }
 
     private fun log(exit: Exit) {
-        environment.logger.error(exit.report.message, exit.report.node)
+        logger.error(exit.report.message, exit.report.node)
     }
 
     private fun generateMetamodel(model: EntityModel) {
@@ -50,6 +52,7 @@ internal class EntityProcessor(private val environment: SymbolProcessorEnvironme
             PrintWriter(out).use { writer ->
                 val runnable = if (model.hasStubAnnotation || model.entity == null) {
                     EntityMetamodelStubGenerator(
+                        logger,
                         model.entityDeclaration,
                         config.metaObject,
                         model.aliases,
@@ -60,7 +63,14 @@ internal class EntityProcessor(private val environment: SymbolProcessorEnvironme
                     )
                 } else {
                     EntityMetamodelGenerator(
-                        model.entity, config.metaObject, model.aliases, packageName, simpleName, model.typeName, writer
+                        logger,
+                        model.entity,
+                        config.metaObject,
+                        model.aliases,
+                        packageName,
+                        simpleName,
+                        model.typeName,
+                        writer
                     )
                 }
                 runnable.run()

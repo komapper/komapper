@@ -21,7 +21,7 @@ class EntityProcessorOkTest : AbstractKspTest(EntityProcessorProvider()) {
             )
             """
         )
-        assertEquals(result.exitCode, KotlinCompilation.ExitCode.OK)
+        assertEquals(KotlinCompilation.ExitCode.OK, result.exitCode)
     }
 
     @Test
@@ -37,7 +37,7 @@ class EntityProcessorOkTest : AbstractKspTest(EntityProcessorProvider()) {
             )
             """
         )
-        assertEquals(result.exitCode, KotlinCompilation.ExitCode.OK)
+        assertEquals(KotlinCompilation.ExitCode.OK, result.exitCode)
     }
 
     @Test
@@ -57,7 +57,7 @@ class EntityProcessorOkTest : AbstractKspTest(EntityProcessorProvider()) {
             value class Baz(val value: Int?)
             """
         )
-        assertEquals(result.exitCode, KotlinCompilation.ExitCode.OK)
+        assertEquals(KotlinCompilation.ExitCode.OK, result.exitCode)
     }
 
     @Test
@@ -89,6 +89,32 @@ class EntityProcessorOkTest : AbstractKspTest(EntityProcessorProvider()) {
             data class Dept(
                 @KomapperAutoIncrement @KomapperId
                 val id: Snowball
+            )
+            """
+        )
+        assertEquals(result.exitCode, KotlinCompilation.ExitCode.OK, result.messages)
+    }
+
+    @Test
+    fun `Allow embeddable values`() {
+        val result = compile(
+            """
+            package test
+            import org.komapper.annotation.*
+            data class DeptId(
+                val id1: Int,
+                val id2: Int
+            )
+            data class DeptInfo(
+                val name: String,
+                val location: String
+            )
+            @KomapperEntity
+            data class Dept(
+                @KomapperEmbeddedId
+                val id: DeptId,
+                @KomapperEmbedded
+                val info: DeptInfo
             )
             """
         )

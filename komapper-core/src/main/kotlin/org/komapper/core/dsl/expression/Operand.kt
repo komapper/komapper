@@ -9,7 +9,7 @@ sealed class Operand {
     data class Column(val expression: ColumnExpression<*, *>) : Operand() {
         override val masking: Boolean get() = expression.masking
     }
-    data class Argument<T : Any, S : Any>(private val expression: ColumnExpression<T, S>, private val exterior: T?) : Operand() {
+    data class Argument<T : Any, S : Any>(val expression: ColumnExpression<T, S>, val exterior: T?) : Operand() {
         override val masking: Boolean get() = expression.masking
         val value: Value<S> get() {
             val interior = if (exterior == null) null else expression.unwrap(exterior)

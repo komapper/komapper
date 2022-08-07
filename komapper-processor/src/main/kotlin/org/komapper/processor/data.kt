@@ -22,37 +22,80 @@ internal data class EntityDef(
     val properties: List<PropertyDef>
 )
 
-internal data class PropertyDef(
-    val parameter: KSValueParameter,
-    val declaration: KSPropertyDeclaration,
-    val column: Column,
-    val kind: PropertyKind?,
+internal data class EmbeddableDef(
+    val declaration: KSClassDeclaration,
+    val properties: List<LeafPropertyDef>
 )
+
+internal sealed interface PropertyDef {
+    val parameter: KSValueParameter
+    val declaration: KSPropertyDeclaration
+    val kind: PropertyKind?
+}
+
+internal data class LeafPropertyDef(
+    override val parameter: KSValueParameter,
+    override val declaration: KSPropertyDeclaration,
+    override val kind: PropertyKind?,
+    val column: Column,
+    val enumStrategy: EnumStrategy?
+) : PropertyDef
+
+internal data class CompositePropertyDef(
+    override val parameter: KSValueParameter,
+    override val declaration: KSPropertyDeclaration,
+    override val kind: PropertyKind?,
+    val embeddableDef: EmbeddableDef,
+) : PropertyDef
 
 internal data class Entity(
     val declaration: KSClassDeclaration,
     val table: Table,
     val properties: List<Property>,
-    val idProperties: List<Property>,
-    val versionProperty: Property?,
-    val createdAtProperty: Property?,
-    val updatedAtProperty: Property?,
+    val embeddedIdProperty: CompositeProperty?,
+    val idProperties: List<LeafProperty>,
+    val versionProperty: LeafProperty?,
+    val createdAtProperty: LeafProperty?,
+    val updatedAtProperty: LeafProperty?,
 )
 
-internal data class Property(
-    val parameter: KSValueParameter,
-    val declaration: KSPropertyDeclaration,
+internal data class Embeddable(
+    val declaration: KSClassDeclaration,
+    val properties: List<LeafProperty>,
+)
+
+internal sealed interface Property {
+    val parameter: KSValueParameter
+    val declaration: KSPropertyDeclaration
+    val nullability: Nullability
+    val kind: PropertyKind?
+}
+internal data class LeafProperty(
+    override val parameter: KSValueParameter,
+    override val declaration: KSPropertyDeclaration,
+    override val nullability: Nullability,
+    override val kind: PropertyKind?,
     val column: Column,
     val kotlinClass: KotlinClass,
     val literalTag: String,
-    val nullability: Nullability,
-    val kind: PropertyKind?,
-) {
+) : Property {
     val typeName get() = kotlinClass.exteriorTypeName
     val exteriorTypeName get() = kotlinClass.exteriorTypeName
     val interiorTypeName get() = kotlinClass.interiorTypeName
     fun isPrivate() = declaration.isPrivate()
 
+    override fun toString(): String {
+        return parameter.toString()
+    }
+}
+
+internal data class CompositeProperty(
+    override val parameter: KSValueParameter,
+    override val declaration: KSPropertyDeclaration,
+    override val nullability: Nullability,
+    override val kind: PropertyKind?,
+    val embeddable: Embeddable,
+) : Property {
     override fun toString(): String {
         return parameter.toString()
     }
@@ -122,7 +165,8 @@ internal data class ValueClassProperty(
 
 internal sealed class PropertyKind {
     abstract val annotation: KSAnnotation
-
+    data class Embedded(override val annotation: KSAnnotation) : PropertyKind()
+    data class EmbeddedId(override val annotation: KSAnnotation) : PropertyKind()
     data class Id(override val annotation: KSAnnotation, val idKind: IdKind?) : PropertyKind()
     data class Version(override val annotation: KSAnnotation) : PropertyKind()
     data class UpdatedAt(override val annotation: KSAnnotation) : PropertyKind()

@@ -8,6 +8,7 @@ import integration.core.department
 import integration.core.man
 import integration.core.noVersionDepartment
 import integration.core.person
+import integration.core.robot
 import org.junit.jupiter.api.TestInfo
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.ClockProvider
@@ -22,6 +23,7 @@ import org.komapper.r2dbc.R2dbcDatabase
 import org.komapper.r2dbc.R2dbcDatabaseConfig
 import java.time.Clock
 import java.time.Instant
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
 import kotlin.test.Test
@@ -50,6 +52,25 @@ class R2dbcUpdateSingleTest(private val db: R2dbcDatabase) {
             ),
             address2
         )
+    }
+
+    @Test
+    fun embedded(info: TestInfo) = inTransaction(db, info) {
+        val r = Meta.robot
+        val count = db.runQuery {
+            QueryDsl.update(r).set {
+                r.info2.hiredate eq LocalDate.parse("2001-01-23")
+            }.where {
+                r.employeeId eq 1
+            }
+        }
+        assertEquals(1, count)
+        val robot = db.runQuery {
+            QueryDsl.from(r).where {
+                r.employeeId eq 1
+            }.first()
+        }
+        assertEquals(LocalDate.parse("2001-01-23"), robot.info2?.hiredate)
     }
 
     @Test

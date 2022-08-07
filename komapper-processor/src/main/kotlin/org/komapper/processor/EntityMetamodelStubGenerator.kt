@@ -1,5 +1,6 @@
 package org.komapper.processor
 
+import com.google.devtools.ksp.processing.KSPLogger
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import org.komapper.processor.Symbols.EntityMetamodelImplementor
 import org.komapper.processor.Symbols.EntityMetamodelStub
@@ -9,6 +10,8 @@ import java.io.PrintWriter
 import java.time.ZonedDateTime
 
 internal class EntityMetamodelStubGenerator(
+    @Suppress("unused")
+    private val logger: KSPLogger,
     private val declaration: KSClassDeclaration,
     private val metaObject: String,
     private val aliases: List<String>,
