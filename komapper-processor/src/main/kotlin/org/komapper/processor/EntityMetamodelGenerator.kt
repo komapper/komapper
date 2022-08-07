@@ -184,7 +184,7 @@ internal class EntityMetamodelGenerator(
                             val setter = "{ e, v -> e.copy(`$p` = e.`$p`${if (nullable) "?" else ""}.copy(`$ep` = v)) }"
                             "`$ep` = ${leafPropertyDescriptor(ep, getter, setter, p.nullability)}"
                         }
-                    w.println("        val `$p` = __${embeddable.declaration.simpleName.asString()}($argList)")
+                    w.println("        val `$p` = __${embeddable.simpleName}($argList)")
                 }
                 is LeafProperty -> {
                     val getter = "{ it.`$p` }"
@@ -200,7 +200,7 @@ internal class EntityMetamodelGenerator(
             val paramList = embeddable.properties.joinToString { ep ->
                 "val `$ep`: $PropertyDescriptor<$entityTypeName, ${ep.exteriorTypeName}, ${ep.interiorTypeName}>"
             }
-            w.println("        class __${embeddable.declaration.simpleName.asString()}($paramList)")
+            w.println("        class __${embeddable.simpleName}($paramList)")
         }
         w.println("    }")
     }
@@ -213,7 +213,7 @@ internal class EntityMetamodelGenerator(
                     val argList = embeddable.properties.joinToString(",\n        ", prefix = "\n        ") { ep ->
                         "`$ep` = $PropertyMetamodelImpl(this, $EntityDescriptor.`$p`.`$ep`)"
                     }
-                    w.println("    val `$p`:  __${embeddable.declaration.simpleName.asString()} by lazy { __${embeddable.declaration.simpleName.asString()}($argList) }")
+                    w.println("    val `$p`:  __${embeddable.simpleName} by lazy { __${embeddable.simpleName}($argList) }")
                 }
                 is LeafProperty -> {
                     val propertyMetamodel =
@@ -231,9 +231,9 @@ internal class EntityMetamodelGenerator(
             }
             val columnList = embeddable.properties.joinToString()
             val argumentList = embeddable.properties.joinToString { ep -> "$Argument(this.`$ep`, composite?.`$ep`)" }
-            w.println("    class __${embeddable.declaration.simpleName.asString()}($paramList): $EmbeddableMetamodel<${embeddable.declaration}> {")
+            w.println("    class __${embeddable.simpleName}($paramList): $EmbeddableMetamodel<${embeddable.qualifiedName}> {")
             w.println("         override fun columns() = listOf($columnList)")
-            w.println("         override fun arguments(composite: ${embeddable.declaration}?) = listOf($argumentList)")
+            w.println("         override fun arguments(composite: ${embeddable.qualifiedName}?) = listOf($argumentList)")
             w.println("    }")
         }
     }
@@ -513,9 +513,9 @@ internal class EntityMetamodelGenerator(
                         val condition = p.embeddable.properties.joinToString(" && ") { ep ->
                             "m[this.`$p`.`$ep`] == null"
                         }
-                        "`$p` = if ($condition) null else ${p.embeddable.declaration}($args)"
+                        "`$p` = if ($condition) null else ${p.embeddable.qualifiedName}($args)"
                     } else {
-                        "`$p` = ${p.embeddable.declaration}($args)"
+                        "`$p` = ${p.embeddable.qualifiedName}($args)"
                     }
                 }
                 is LeafProperty -> {

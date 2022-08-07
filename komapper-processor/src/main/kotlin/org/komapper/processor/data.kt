@@ -62,7 +62,10 @@ internal data class Entity(
 internal data class Embeddable(
     val declaration: KSClassDeclaration,
     val properties: List<LeafProperty>,
-)
+) {
+    val qualifiedName get() = declaration.qualifiedName?.asString() ?: simpleName
+    val simpleName get() = declaration.simpleName.asString()
+}
 
 internal sealed interface Property {
     val parameter: KSValueParameter
