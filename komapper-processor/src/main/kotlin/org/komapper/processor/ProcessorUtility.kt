@@ -3,10 +3,14 @@ package org.komapper.processor
 import com.google.devtools.ksp.symbol.KSAnnotated
 import com.google.devtools.ksp.symbol.KSAnnotation
 import com.google.devtools.ksp.symbol.KSClassDeclaration
+import com.google.devtools.ksp.symbol.KSDeclaration
 import com.google.devtools.ksp.symbol.KSNode
 import com.google.devtools.ksp.symbol.KSType
 import com.google.devtools.ksp.symbol.KSTypeAlias
+import com.google.devtools.ksp.symbol.KSTypeArgument
+import com.google.devtools.ksp.symbol.KSTypeParameter
 import com.google.devtools.ksp.symbol.Modifier
+import com.google.devtools.ksp.symbol.Nullability
 import com.google.devtools.ksp.visitor.KSEmptyVisitor
 import java.nio.CharBuffer
 import kotlin.reflect.KClass
@@ -38,29 +42,72 @@ internal fun KSAnnotated.hasAnnotation(klass: KClass<*>): Boolean {
     return findAnnotation(klass) != null
 }
 
-internal fun KSType.normalize(): KSType {
+internal fun KSType.normalize(parent: TypeArgumentResolver = TypeArgumentResolver()): Pair<KSType, TypeArgumentResolver> {
+
     return this.declaration.accept(
-        object : KSEmptyVisitor<Unit, KSType>() {
-            override fun defaultHandler(node: KSNode, data: Unit): KSType {
-                return this@normalize
+        object : KSEmptyVisitor<Unit, Pair<KSType, TypeArgumentResolver>>() {
+            override fun defaultHandler(node: KSNode, data: Unit): Pair<KSType, TypeArgumentResolver> {
+                val resolver = TypeArgumentResolver(parent, this@normalize.declaration.typeParameters, this@normalize.arguments)
+                return this@normalize to resolver
             }
 
-            override fun visitTypeAlias(typeAlias: KSTypeAlias, data: Unit): KSType {
-                return typeAlias.type.resolve().normalize()
+            override fun visitTypeAlias(typeAlias: KSTypeAlias, data: Unit): Pair<KSType, TypeArgumentResolver> {
+                val resolver = TypeArgumentResolver(parent, typeAlias.typeParameters, this@normalize.arguments)
+                return typeAlias.type.resolve().normalize(resolver)
             }
         },
         Unit
     )
 }
 
-internal fun KSType.buildQualifiedName(): String {
-    val parentDeclaration = declaration.parentDeclaration
-    val base = if (parentDeclaration == null) {
-        declaration.packageName.asString()
-    } else {
-        (parentDeclaration.qualifiedName ?: parentDeclaration.simpleName).asString()
+internal class TypeArgumentResolver(
+    private val parent: TypeArgumentResolver? = null,
+    typeParameters: List<KSTypeParameter> = emptyList(),
+    typeArguments: List<KSTypeArgument> = emptyList()
+) {
+
+    private val context = typeParameters.map { it.name.asString() }.zip(typeArguments).toMap()
+
+    fun resolve(declaration: KSDeclaration): KSTypeArgument? {
+        val typeArgument = context[declaration.simpleName.asString()]
+        return if (typeArgument != null) {
+            if (parent != null) {
+                val mayBeTypeParameter = typeArgument.type?.resolve()?.declaration
+                if (mayBeTypeParameter != null) {
+                    parent.resolve(mayBeTypeParameter) ?: typeArgument
+                } else {
+                    typeArgument
+                }
+            } else {
+                typeArgument
+            }
+        } else {
+            null
+        }
     }
-    return "$base.$this"
+}
+
+internal val KSType.name: String get() {
+    fun asString(type: KSType): String {
+        return (type.declaration.qualifiedName ?: type.declaration.simpleName).asString()
+    }
+
+    val buf = StringBuilder()
+    buf.append(asString(this))
+    if (this.arguments.isNotEmpty()) {
+        buf.append("<")
+        this.arguments.joinTo(buf) {
+            val type = it.type?.resolve()
+            if (type == null) {
+                it.variance.label
+            } else {
+                val mark = if (type.nullability == Nullability.NULLABLE) "?" else ""
+                type.name + mark
+            }
+        }
+        buf.append(">")
+    }
+    return buf.toString()
 }
 
 internal fun toCamelCase(text: String): String {

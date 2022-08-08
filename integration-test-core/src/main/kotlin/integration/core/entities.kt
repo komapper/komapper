@@ -7,6 +7,7 @@ import org.komapper.annotation.KomapperCreatedAt
 import org.komapper.annotation.KomapperEmbedded
 import org.komapper.annotation.KomapperEmbeddedId
 import org.komapper.annotation.KomapperEntity
+import org.komapper.annotation.KomapperEntityDef
 import org.komapper.annotation.KomapperId
 import org.komapper.annotation.KomapperSequence
 import org.komapper.annotation.KomapperTable
@@ -44,6 +45,17 @@ data class AddressId(
 data class EmbeddedIdAddress(
     @KomapperEmbeddedId
     val id: AddressId,
+    val street: String,
+    val version: Int
+)
+
+@KomapperEntity
+@KomapperTable(name = "comp_key_address")
+data class GenericEmbeddedIdAddress(
+    @KomapperEmbeddedId
+    @KomapperColumnOverride("first", KomapperColumn("address_id1"))
+    @KomapperColumnOverride("second", KomapperColumn("address_id2"))
+    val id: Pair<Int, Int>,
     val street: String,
     val version: Int
 )
@@ -125,6 +137,55 @@ data class Robot(
     @KomapperColumn("department_id") val departmentId: Int,
     @KomapperColumn("address_id") val addressId: Int,
     @KomapperVersion val version: Int,
+)
+
+@KomapperEntity
+@KomapperTable("employee")
+data class Android(
+    @KomapperId @KomapperColumn("employee_id") val employeeId: Int,
+    @KomapperEmbedded
+    @KomapperColumnOverride("first", KomapperColumn("employee_no"))
+    @KomapperColumnOverride("second", KomapperColumn("employee_name"))
+    val info1: Pair<Int, String>,
+    @KomapperEmbedded
+    @KomapperColumnOverride("first", KomapperColumn("hiredate"))
+    @KomapperColumnOverride("second", KomapperColumn("salary"))
+    val info2: Pair<LocalDate?, BigDecimal?>?,
+    @KomapperColumn("manager_id") val managerId: Int?,
+    @KomapperColumn("department_id") val departmentId: Int,
+    @KomapperColumn("address_id") val addressId: Int,
+    @KomapperVersion val version: Int,
+)
+
+typealias CyborgInfo1 = Pair<Int, String>
+typealias CyborgInfo2 = Pair<LocalDate?, BigDecimal?>
+
+data class Cyborg(
+    val employeeId: Int,
+    val info1: CyborgInfo1,
+    val info2: CyborgInfo2?,
+    val managerId: Int?,
+    val departmentId: Int,
+    val addressId: Int,
+    val version: Int,
+)
+
+@KomapperEntityDef(Cyborg::class)
+@KomapperTable("employee")
+data class CyborgDef(
+    @KomapperId @KomapperColumn("employee_id") val employeeId: Nothing,
+    @KomapperEmbedded
+    @KomapperColumnOverride("first", KomapperColumn("employee_no"))
+    @KomapperColumnOverride("second", KomapperColumn("employee_name"))
+    val info1: Nothing,
+    @KomapperEmbedded
+    @KomapperColumnOverride("first", KomapperColumn("hiredate"))
+    @KomapperColumnOverride("second", KomapperColumn("salary"))
+    val info2: Nothing,
+    @KomapperColumn("manager_id") val managerId: Nothing,
+    @KomapperColumn("department_id") val departmentId: Nothing,
+    @KomapperColumn("address_id") val addressId: Nothing,
+    @KomapperVersion val version: Nothing,
 )
 
 @KomapperEntity

@@ -2,6 +2,7 @@ package integration.r2dbc
 
 import integration.core.Address
 import integration.core.AddressId
+import integration.core.Android
 import integration.core.Dbms
 import integration.core.Department
 import integration.core.EmbeddedIdAddress
@@ -14,6 +15,7 @@ import integration.core.RobotInfo1
 import integration.core.Run
 import integration.core.SequenceStrategy
 import integration.core.address
+import integration.core.android
 import integration.core.department
 import integration.core.embeddedIdAddress
 import integration.core.human
@@ -77,8 +79,8 @@ class R2dbcInsertSingleTest(private val db: R2dbcDatabase) {
         val robot = Robot(
             employeeId = 99, managerId = null, departmentId = 1, addressId = 1, version = 0,
             info1 = RobotInfo1(
-                employeeName = "a",
                 employeeNo = 9999,
+                employeeName = "a",
             ),
             info2 = null
         )
@@ -90,6 +92,24 @@ class R2dbcInsertSingleTest(private val db: R2dbcDatabase) {
         }
         assertEquals(robot, robot2)
     }
+
+    @Test
+    fun embedded_generics(info: TestInfo) = inTransaction(db, info) {
+        val a = Meta.android
+        val android = Android(
+            employeeId = 99, managerId = null, departmentId = 1, addressId = 1, version = 0,
+            info1 = 9999 to "a",
+            info2 = null
+        )
+        db.runQuery { QueryDsl.insert(a).single(android) }
+        val android2 = db.runQuery {
+            QueryDsl.from(a).where {
+                a.employeeId eq 99
+            }.first()
+        }
+        assertEquals(android, android2)
+    }
+
     @Test
     fun createdAt_instant(info: TestInfo) = inTransaction(db, info) {
         val p = Meta.man

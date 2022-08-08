@@ -7,12 +7,12 @@ import com.google.devtools.ksp.symbol.KSDeclaration
 import com.google.devtools.ksp.symbol.KSNode
 import com.google.devtools.ksp.symbol.Modifier
 
-internal fun validateContainerClass(classDeclaration: KSClassDeclaration, recipient: KSNode) {
+internal fun validateContainerClass(classDeclaration: KSClassDeclaration, recipient: KSNode, allowTypeParameters: Boolean = false) {
     val modifiers = classDeclaration.modifiers
     if (!modifiers.contains(Modifier.DATA)) {
         report("The class \"${classDeclaration.simpleName.asString()}\" must be a data class.", recipient)
     }
-    if (classDeclaration.typeParameters.isNotEmpty()) {
+    if (!allowTypeParameters && classDeclaration.typeParameters.isNotEmpty()) {
         report("The class \"${classDeclaration.simpleName.asString()}\" must not have type parameters.", recipient)
     }
     if (classDeclaration.isPrivate()) {

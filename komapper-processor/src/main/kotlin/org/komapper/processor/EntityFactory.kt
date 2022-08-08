@@ -4,12 +4,18 @@ import com.google.devtools.ksp.getDeclaredProperties
 import com.google.devtools.ksp.isPublic
 import com.google.devtools.ksp.processing.KSPLogger
 import com.google.devtools.ksp.symbol.ClassKind
+import com.google.devtools.ksp.symbol.KSAnnotation
+import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSPropertyDeclaration
 import com.google.devtools.ksp.symbol.KSType
+import com.google.devtools.ksp.symbol.KSTypeReference
 import com.google.devtools.ksp.symbol.KSValueParameter
 import com.google.devtools.ksp.symbol.Nullability
+import org.komapper.annotation.KomapperColumnOverride
+import org.komapper.annotation.KomapperEmbedded
 import org.komapper.annotation.KomapperEmbeddedId
 import org.komapper.annotation.KomapperEnum
+import org.komapper.annotation.KomapperEnumOverride
 import org.komapper.annotation.KomapperId
 import org.komapper.annotation.KomapperVersion
 import org.komapper.processor.Symbols.Instant
@@ -24,6 +30,8 @@ internal class EntityFactory(
     private val config: Config,
     private val entityDef: EntityDef
 ) {
+
+    private val annotationSupport = AnnotationSupport(config)
 
     fun create(): Entity {
         val allProperties = createAllProperties()
@@ -65,9 +73,29 @@ internal class EntityFactory(
                 val declaration = propertyDeclarationMap[parameter.name]
                     ?: report("The corresponding property declaration is not found.", parameter)
                 when (propertyDef) {
-                    is CompositePropertyDef -> createCompositeProperty(propertyDef, parameter)
-                    is LeafPropertyDef -> createLeafProperty(propertyDef, parameter, declaration)
-                    else -> createLeafProperty(null, parameter, declaration)
+                    is CompositePropertyDef -> createCompositeProperty(
+                        propertyDef = propertyDef,
+                        parameter = parameter,
+                        declaration = declaration
+                    )
+                    is LeafPropertyDef -> createLeafProperty(
+                        parameter = parameter,
+                        declaration = declaration,
+                        kind = propertyDef.kind,
+                        typeReference = propertyDef.type,
+                        column = propertyDef.column,
+                        enumStrategy = propertyDef.enumStrategy,
+                        parent = null,
+                    )
+                    else -> createLeafProperty(
+                        parameter = parameter,
+                        declaration = declaration,
+                        kind = null,
+                        typeReference = null,
+                        column = null,
+                        enumStrategy = null,
+                        parent = null,
+                    )
                 }
             }
             .toList()
@@ -75,50 +103,117 @@ internal class EntityFactory(
 
     private fun createCompositeProperty(
         propertyDef: CompositePropertyDef,
-        parameter: KSValueParameter
+        parameter: KSValueParameter,
+        declaration: KSPropertyDeclaration,
     ): CompositeProperty {
-        val type = parameter.type.resolve().normalize()
-        val embeddableDef = propertyDef.embeddableDef
-        val properties = embeddableDef.properties.map {
-            createLeafProperty(it, it.parameter, it.declaration)
-        }
-        val embeddable = Embeddable(embeddableDef.declaration, properties)
+        val type = parameter.type.resolve()
+        val (normalizedType, typeArgumentResolver) = type.normalize()
+        val embeddableDeclaration = normalizedType.declaration.accept(ClassDeclarationVisitor(), Unit) ?: report(
+            "@${propertyDef.kind.annotation.shortName} cannot be applied to this element. " +
+                "${normalizedType.name} must be a data class.",
+            declaration
+        )
+        val embeddable = createEmbeddable(
+            parent = parameter,
+            embeddableDeclaration = embeddableDeclaration,
+            typeArgumentResolver = typeArgumentResolver,
+            columns = annotationSupport.getColumns(propertyDef.parameter),
+            enumStrategies = annotationSupport.getEnumStrategies(propertyDef.parameter),
+        )
+        val nullability =
+            if (type.nullability == Nullability.NULLABLE || normalizedType.nullability == Nullability.NULLABLE) {
+                Nullability.NULLABLE
+            } else {
+                normalizedType.nullability
+            }
         return CompositeProperty(
             propertyDef.parameter,
             propertyDef.declaration,
-            type.nullability,
             propertyDef.kind,
+            nullability,
             embeddable
-        )
+        ).also {
+            validateContainerClass(embeddableDeclaration, propertyDef.kind.annotation, allowTypeParameters = true)
+        }
+    }
+
+    private fun createEmbeddable(
+        parent: KSValueParameter,
+        embeddableDeclaration: KSClassDeclaration,
+        typeArgumentResolver: TypeArgumentResolver,
+        columns: List<Triple<String, Column, KSAnnotation>>,
+        enumStrategies: List<Triple<String, EnumStrategy, KSAnnotation>>,
+    ): Embeddable {
+        val columnMap = columns.associate { it.first to it.second }
+        val enumStrategyMap = enumStrategies.associate { it.first to it.second }
+        val propertyDeclarationMap = embeddableDeclaration.getDeclaredProperties().associateBy { it.simpleName }
+        val parameters = embeddableDeclaration.primaryConstructor?.parameters ?: emptyList()
+        val (properties, typeArguments) = parameters.map { parameter ->
+            val declaration = propertyDeclarationMap[parameter.name]
+                ?: report("The corresponding property declaration is not found.", parameter)
+            val typeArgument = typeArgumentResolver.resolve(parameter.type.resolve().declaration)
+            val name = parameter.toString()
+            createLeafProperty(
+                parameter = parameter,
+                declaration = declaration,
+                kind = null,
+                typeReference = typeArgument?.type,
+                column = columnMap[name] ?: annotationSupport.getColumn(null, name),
+                enumStrategy = enumStrategyMap[name],
+                parent = parent,
+            ) to typeArgument
+        }.unzip()
+        val type = embeddableDeclaration.asType(typeArguments.filterNotNull())
+        return Embeddable(type, properties).also {
+            validateEmbeddable(it, columns, enumStrategies)
+        }
+    }
+
+    private fun validateEmbeddable(
+        embeddable: Embeddable,
+        columns: List<Triple<String, Column, KSAnnotation>>,
+        enumStrategies: List<Triple<String, EnumStrategy, KSAnnotation>>,
+    ) {
+        val propertyNames = embeddable.properties.map { it.parameter.toString() }.toSet()
+        fun checkPropertyName(name: String, annotation: KSAnnotation) {
+            if (name !in propertyNames) {
+                report(
+                    "The property \"$name\" is not found in the class \"${embeddable.type.declaration.simpleName.asString()}\".",
+                    annotation
+                )
+            }
+        }
+        columns.forEach { checkPropertyName(it.first, it.third) }
+        enumStrategies.forEach { checkPropertyName(it.first, it.third) }
     }
 
     private fun createLeafProperty(
-        propertyDef: LeafPropertyDef?,
+        parent: KSValueParameter?,
         parameter: KSValueParameter,
-        declaration: KSPropertyDeclaration
+        declaration: KSPropertyDeclaration,
+        kind: PropertyKind?,
+        typeReference: KSTypeReference?,
+        column: Column?,
+        enumStrategy: EnumStrategy?
     ): LeafProperty {
-        val column = getColumn(propertyDef, parameter)
-        val type = parameter.type.resolve().normalize()
-        val kotlinClass = createEnumClass(propertyDef, type) ?: createValueClass(type) ?: PlainClass(type)
-        val literalTag = resolveLiteralTag(kotlinClass.exteriorTypeName)
-        val nullability = type.nullability
-        val kind = propertyDef?.kind
+        val (type) = (typeReference ?: parameter.type).resolve().normalize()
+        val kotlinClass = createEnumClass(enumStrategy, type) ?: createValueClass(type) ?: PlainClass(type)
         return LeafProperty(
             parameter = parameter,
             declaration = declaration,
-            nullability = nullability,
-            column = column,
+            nullability = type.nullability,
+            column = getColumn(column, parameter),
             kotlinClass = kotlinClass,
-            literalTag = literalTag,
-            kind = kind
+            literalTag = resolveLiteralTag(kotlinClass.exteriorTypeName),
+            kind = kind,
+            parent = parent
         ).also { validateLeafProperty(it) }
     }
 
-    private fun createEnumClass(propertyDef: LeafPropertyDef?, type: KSType): EnumClass? {
+    private fun createEnumClass(enumStrategy: EnumStrategy?, type: KSType): EnumClass? {
         val classDeclaration = type.declaration.accept(ClassDeclarationVisitor(), Unit)
         return if (classDeclaration != null && classDeclaration.classKind == ClassKind.ENUM_CLASS) {
-            val enumStrategy = propertyDef?.enumStrategy ?: config.enumStrategy
-            EnumClass(type, enumStrategy)
+            EnumClass(type, enumStrategy ?: config.enumStrategy)
         } else null
     }
 
@@ -135,7 +230,7 @@ internal class EntityFactory(
                     if (interiorType.isMarkedNullable) {
                         interiorType.makeNotNullable()
                     } else interiorType
-                val typeName = nonNullableInteriorType.buildQualifiedName()
+                val typeName = nonNullableInteriorType.name
                 val literalTag = resolveLiteralTag(typeName)
                 val nullability = interiorType.nullability
                 val property = ValueClassProperty(parameter, declaration, typeName, literalTag, nullability)
@@ -152,19 +247,19 @@ internal class EntityFactory(
         }
     }
 
-    private fun getColumn(propertyDef: LeafPropertyDef?, parameter: KSValueParameter): Column {
-        return if (propertyDef == null) {
+    private fun getColumn(column: Column?, parameter: KSValueParameter): Column {
+        return if (column == null) {
             val name = parameter.name?.asString() ?: report("The name is not found.", parameter)
             Column(config.namingStrategy.apply(name), alwaysQuote = false, masking = false)
         } else {
-            propertyDef.column
+            column
         }
     }
 
     private fun validateLeafProperty(property: LeafProperty) {
         if (property.kind !is PropertyKind.Ignore) {
             if (property.isPrivate()) {
-                report("The property must not be private.", property.parameter)
+                report("The property must not be private.", property.node)
             }
             when (val kotlinClass = property.kotlinClass) {
                 is EnumClass -> Unit
@@ -186,14 +281,14 @@ internal class EntityFactory(
         val valueClassProperty = valueClass.property
         if (valueClassProperty.isPrivate()) {
             report(
-                "The value class's own property '$valueClassProperty' must not be private.",
-                property.parameter
+                "The property \"${property.path}\" is invalid. The value class's own property '$valueClassProperty' must not be private.",
+                property.node
             )
         }
         if (valueClassProperty.nullability == Nullability.NULLABLE) {
             report(
-                "The value class's own property '$valueClassProperty' must not be nullable.",
-                property.parameter
+                "The property \"${property.path}\" is invalid. The value class's own property '$valueClassProperty' must not be nullable.",
+                property.node
             )
         }
         checkEnumAnnotation(property)
@@ -201,14 +296,17 @@ internal class EntityFactory(
 
     private fun validatePlainClassProperty(property: LeafProperty, plainClass: PlainClass) {
         if (!plainClass.isArray && plainClass.declaration.typeParameters.isNotEmpty()) {
-            report("The non-array property type must not have any type parameters.", property.parameter)
+            report(
+                "The property \"${property.path}\" must not have any type parameters.",
+                property.node
+            )
         }
         checkEnumAnnotation(property)
     }
 
     private fun checkEnumAnnotation(property: LeafProperty) {
         if (property.declaration.hasAnnotation(KomapperEnum::class)) {
-            report("@KomapperEnum is valid only for enum property types.", property.parameter)
+            report("@KomapperEnum is valid only for enum property types.", property.node)
         }
     }
 
@@ -224,13 +322,13 @@ internal class EntityFactory(
                                 "kotlin.Int", "kotlin.Long", "kotlin.UInt" -> Unit
                                 else -> report(
                                     "When the type of $annotationName annotated property is value class, the type of the value class's own property must be either Int, Long or UInt.",
-                                    property.parameter
+                                    property.node
                                 )
                             }
                         }
                         else -> report(
                             "The type of $annotationName annotated property must be either Int, Long, UInt or value class.",
-                            property.parameter
+                            property.node
                         )
                     }
                 }
@@ -252,13 +350,13 @@ internal class EntityFactory(
                             "kotlin.Int", "kotlin.Long", "kotlin.UInt" -> Unit
                             else -> report(
                                 "When the type of @${KomapperVersion::class.simpleName} annotated property is value class, the type of the value class's own property must be either Int, Long or UInt.",
-                                property.parameter
+                                property.node
                             )
                         }
                     }
                     else -> report(
                         "The type of @${KomapperVersion::class.simpleName} annotated property must be either Int, Long, UInt or value class.",
-                        property.parameter
+                        property.node
                     )
                 }
             }
@@ -275,13 +373,13 @@ internal class EntityFactory(
                             Instant, LocalDateTime, OffsetDateTime, KotlinInstant, KotlinLocalDateTime -> Unit
                             else -> report(
                                 "When the type of $annotationName annotated property is value class, the type of the value class's own property must be either Instant, LocalDateTime or OffsetDateTime.",
-                                property.parameter
+                                property.node
                             )
                         }
                     }
                     else -> report(
                         "The type of $annotationName annotated property must be either Instant, LocalDateTime or OffsetDateTime.",
-                        property.parameter
+                        property.node
                     )
                 }
             }
@@ -290,7 +388,7 @@ internal class EntityFactory(
 
     private fun validateIgnoreProperty(property: LeafProperty) {
         if (!property.parameter.hasDefault) {
-            report("The ignored property must have a default value.", property.parameter)
+            report("The ignored property must have a default value.", property.node)
         }
     }
 
@@ -301,6 +399,17 @@ internal class EntityFactory(
             propertyMap[key]
                 ?: report("The same name property is not found in the entity.", value.parameter)
         }
+
+        for (annotation in listOf(KomapperColumnOverride::class, KomapperEnumOverride::class)) {
+            for (p in properties.filterIsInstance<LeafProperty>()) {
+                if (p.parameter.hasAnnotation(annotation)) {
+                    report(
+                        "@${annotation.simpleName} must be used with either @${KomapperEmbedded::class.simpleName} or @${KomapperEmbeddedId::class.simpleName}.",
+                        p.parameter
+                    )
+                }
+            }
+        }
     }
 
     private fun validateEntity(entity: Entity) {
@@ -310,7 +419,7 @@ internal class EntityFactory(
         for (p in entity.properties) {
             val name = (p.declaration.simpleName).asString()
             if (name.startsWith("__")) {
-                report("The property name cannot start with '__'.", p.parameter)
+                report("The property name cannot start with '__'.", p.node)
             }
         }
         if (entity.embeddedIdProperty == null && entity.idProperties.isEmpty()) {

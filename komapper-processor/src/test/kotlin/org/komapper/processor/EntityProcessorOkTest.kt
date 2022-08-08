@@ -120,4 +120,46 @@ class EntityProcessorOkTest : AbstractKspTest(EntityProcessorProvider()) {
         )
         assertEquals(result.exitCode, KotlinCompilation.ExitCode.OK, result.messages)
     }
+
+    @Test
+    fun `Allow type parameters for embedded values`() {
+        val result = compile(
+            """
+            package test
+            import org.komapper.annotation.*
+            data class DeptInfo<T>(
+                val name: T
+            )
+            @KomapperEntity
+            data class Dept(
+                @KomapperId
+                val id: Int,
+                @KomapperEmbedded
+                val info: DeptInfo<String>
+            )
+            """
+        )
+        assertEquals(result.exitCode, KotlinCompilation.ExitCode.OK, result.messages)
+    }
+
+    @Test
+    fun `Allow typealias for embedded values`() {
+        val result = compile(
+            """
+            package test
+            import org.komapper.annotation.*
+            typealias Snowflake = Pair<String, Int>
+            @KomapperEntity
+            data class Dept(
+                @KomapperAutoIncrement @KomapperId
+                val id: Int,
+                @KomapperEmbedded
+                @KomapperColumnOverride("first", KomapperColumn("color"))
+                @KomapperColumnOverride("second", KomapperColumn("size"))
+                val snowflake: Snowflake
+            )
+            """
+        )
+        assertEquals(result.exitCode, KotlinCompilation.ExitCode.OK, result.messages)
+    }
 }

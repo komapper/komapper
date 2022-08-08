@@ -2,7 +2,9 @@ package example.basic.jdbc
 
 import org.komapper.annotation.KomapperAutoIncrement
 import org.komapper.annotation.KomapperColumn
+import org.komapper.annotation.KomapperColumnOverride
 import org.komapper.annotation.KomapperCreatedAt
+import org.komapper.annotation.KomapperEmbedded
 import org.komapper.annotation.KomapperEntityDef
 import org.komapper.annotation.KomapperId
 import org.komapper.annotation.KomapperUpdatedAt
@@ -16,6 +18,7 @@ import java.time.LocalDateTime
 data class Address(
     val id: Int = 0,
     val street: String,
+    val info: Pair<String, String>? = null,
     val version: Int = 0,
     val createdAt: LocalDateTime? = null,
     val updatedAt: LocalDateTime? = null,
@@ -25,6 +28,10 @@ data class Address(
 data class AddressDef(
     @KomapperId @KomapperAutoIncrement @KomapperColumn(name = "ADDRESS_ID")
     val id: Nothing,
+    @KomapperEmbedded
+    @KomapperColumnOverride("first", KomapperColumn(name = "ZIP_CODE"))
+    @KomapperColumnOverride("second", KomapperColumn(name = "PHONE_NUMBER"))
+    val info: Nothing,
     @KomapperVersion val version: Nothing,
     @KomapperCreatedAt val createdAt: Nothing,
     @KomapperUpdatedAt val updatedAt: Nothing,

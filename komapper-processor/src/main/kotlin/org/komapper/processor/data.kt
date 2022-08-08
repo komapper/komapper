@@ -4,8 +4,10 @@ import com.google.devtools.ksp.isPrivate
 import com.google.devtools.ksp.symbol.KSAnnotation
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSDeclaration
+import com.google.devtools.ksp.symbol.KSNode
 import com.google.devtools.ksp.symbol.KSPropertyDeclaration
 import com.google.devtools.ksp.symbol.KSType
+import com.google.devtools.ksp.symbol.KSTypeReference
 import com.google.devtools.ksp.symbol.KSValueParameter
 import com.google.devtools.ksp.symbol.Nullability
 
@@ -22,11 +24,6 @@ internal data class EntityDef(
     val properties: List<PropertyDef>
 )
 
-internal data class EmbeddableDef(
-    val declaration: KSClassDeclaration,
-    val properties: List<LeafPropertyDef>
-)
-
 internal sealed interface PropertyDef {
     val parameter: KSValueParameter
     val declaration: KSPropertyDeclaration
@@ -37,6 +34,7 @@ internal data class LeafPropertyDef(
     override val parameter: KSValueParameter,
     override val declaration: KSPropertyDeclaration,
     override val kind: PropertyKind?,
+    val type: KSTypeReference?,
     val column: Column,
     val enumStrategy: EnumStrategy?
 ) : PropertyDef
@@ -44,8 +42,7 @@ internal data class LeafPropertyDef(
 internal data class CompositePropertyDef(
     override val parameter: KSValueParameter,
     override val declaration: KSPropertyDeclaration,
-    override val kind: PropertyKind?,
-    val embeddableDef: EmbeddableDef,
+    override val kind: PropertyKind
 ) : PropertyDef
 
 internal data class Entity(
@@ -60,11 +57,11 @@ internal data class Entity(
 )
 
 internal data class Embeddable(
-    val declaration: KSClassDeclaration,
+    val type: KSType,
     val properties: List<LeafProperty>,
 ) {
-    val qualifiedName get() = declaration.qualifiedName?.asString() ?: simpleName
-    val simpleName get() = declaration.simpleName.asString()
+    val typeName = type.name
+    val simpleName get() = type.declaration.simpleName.asString()
 }
 
 internal sealed interface Property {
@@ -72,7 +69,9 @@ internal sealed interface Property {
     val declaration: KSPropertyDeclaration
     val nullability: Nullability
     val kind: PropertyKind?
+    val node: KSNode
 }
+
 internal data class LeafProperty(
     override val parameter: KSValueParameter,
     override val declaration: KSPropertyDeclaration,
@@ -81,10 +80,15 @@ internal data class LeafProperty(
     val column: Column,
     val kotlinClass: KotlinClass,
     val literalTag: String,
+    val parent: KSValueParameter? = null
 ) : Property {
     val typeName get() = kotlinClass.exteriorTypeName
     val exteriorTypeName get() = kotlinClass.exteriorTypeName
     val interiorTypeName get() = kotlinClass.interiorTypeName
+    val name get() = parameter.toString()
+    val path get() = if (parent == null) name else "$parent.$name"
+    override val node get() = parent ?: parameter
+
     fun isPrivate() = declaration.isPrivate()
 
     override fun toString(): String {
@@ -95,10 +99,12 @@ internal data class LeafProperty(
 internal data class CompositeProperty(
     override val parameter: KSValueParameter,
     override val declaration: KSPropertyDeclaration,
-    override val nullability: Nullability,
     override val kind: PropertyKind?,
+    override val nullability: Nullability,
     val embeddable: Embeddable,
 ) : Property {
+    override val node = parameter
+
     override fun toString(): String {
         return parameter.toString()
     }
@@ -107,7 +113,7 @@ internal data class CompositeProperty(
 internal sealed interface KotlinClass {
     val type: KSType
     val declaration: KSDeclaration get() = type.declaration
-    val exteriorTypeName: String get() = (declaration.qualifiedName ?: declaration.simpleName).asString()
+    val exteriorTypeName: String get() = type.name
     val interiorTypeName: String
 }
 
@@ -136,8 +142,10 @@ internal data class PlainClass(
         get() {
             return if (isArray) {
                 val nonNullableType =
-                    if (type.isMarkedNullable) { type.makeNotNullable() } else type
-                nonNullableType.buildQualifiedName()
+                    if (type.isMarkedNullable) {
+                        type.makeNotNullable()
+                    } else type
+                nonNullableType.name
             } else {
                 super.exteriorTypeName
             }
@@ -168,6 +176,7 @@ internal data class ValueClassProperty(
 
 internal sealed class PropertyKind {
     abstract val annotation: KSAnnotation
+
     data class Embedded(override val annotation: KSAnnotation) : PropertyKind()
     data class EmbeddedId(override val annotation: KSAnnotation) : PropertyKind()
     data class Id(override val annotation: KSAnnotation, val idKind: IdKind?) : PropertyKind()

@@ -1,10 +1,12 @@
 package integration.jdbc
 
 import integration.core.Address
+import integration.core.Android
 import integration.core.Robot
 import integration.core.RobotInfo1
 import integration.core.RobotInfo2
 import integration.core.address
+import integration.core.android
 import integration.core.employee
 import integration.core.robot
 import kotlinx.coroutines.flow.count
@@ -269,6 +271,26 @@ class JdbcSelectTest(private val db: JdbcDatabase) {
         val r = Meta.robot
         val list: List<Robot> = db.runQuery {
             QueryDsl.from(r).where { r.info2 eq RobotInfo2(salary = BigDecimal(3000)) }
+        }
+        assertEquals(2, list.size)
+        assertEquals(listOf(8, 13), list.map { it.employeeId })
+    }
+
+    @Test
+    fun embedded_generics() {
+        val a = Meta.android
+        val list: List<Android> = db.runQuery {
+            QueryDsl.from(a).where { a.info1 eq (7839 to "KING") }
+        }
+        assertEquals(1, list.size)
+        assertEquals(9, list[0].employeeId)
+    }
+
+    @Test
+    fun embedded_generics_null() {
+        val a = Meta.android
+        val list: List<Android> = db.runQuery {
+            QueryDsl.from(a).where { a.info2 eq (null to BigDecimal(3000)) }
         }
         assertEquals(2, list.size)
         assertEquals(listOf(8, 13), list.map { it.employeeId })

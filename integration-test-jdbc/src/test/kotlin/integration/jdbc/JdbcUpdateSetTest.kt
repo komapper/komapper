@@ -2,6 +2,7 @@ package integration.jdbc
 
 import integration.core.Person
 import integration.core.address
+import integration.core.android
 import integration.core.employee
 import integration.core.identityStrategy
 import integration.core.person
@@ -59,6 +60,25 @@ class JdbcUpdateSetTest(private val db: JdbcDatabase) {
             }.first()
         }
         assertEquals(LocalDate.parse("2001-01-23"), robot.info2?.hiredate)
+    }
+
+    @Test
+    fun embedded_generics() {
+        val a = Meta.android
+        val count = db.runQuery {
+            QueryDsl.update(a).set {
+                a.info2.first eq LocalDate.parse("2001-01-23")
+            }.where {
+                a.employeeId eq 1
+            }
+        }
+        assertEquals(1, count)
+        val android = db.runQuery {
+            QueryDsl.from(a).where {
+                a.employeeId eq 1
+            }.first()
+        }
+        assertEquals(LocalDate.parse("2001-01-23"), android.info2?.first)
     }
 
     @Test

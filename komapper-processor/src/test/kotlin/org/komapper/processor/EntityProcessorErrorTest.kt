@@ -363,28 +363,6 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
     }
 
     @Test
-    fun `The class must not have type parameters, @KomapperEmbedded`() {
-        val result = compile(
-            """
-            package test
-            import org.komapper.annotation.*
-            data class DeptInfo<T>(
-                val name: T
-            )
-            @KomapperEntity
-            data class Dept(
-                @KomapperId
-                val id: Int,
-                @KomapperEmbedded
-                val info: DeptInfo<String>
-            )
-            """
-        )
-        assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
-        assertTrue(result.messages.contains("The class \"DeptInfo\" must not have type parameters."))
-    }
-
-    @Test
     fun `Multiple @KomapperEmbeddedId cannot coexist in a single class`() {
         val result = compile(
             """
@@ -864,7 +842,7 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
     }
 
     @Test
-    fun `The non-array property type must not have any type parameters`() {
+    fun `The property must not have any type parameters`() {
         val result = compile(
             """
             package test
@@ -877,11 +855,11 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
             """
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
-        assertTrue(result.messages.contains("The non-array property type must not have any type parameters."))
+        assertTrue(result.messages.contains("The property \"names\" must not have any type parameters."))
     }
 
     @Test
-    fun `The property is not found in the class, @KomapperColumnAttribute`() {
+    fun `The property is not found in the class, @KomapperColumnOverride`() {
         val result = compile(
             """
             package test
@@ -905,7 +883,7 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
     }
 
     @Test
-    fun `The property is not found in the class, @KomapperEnumAttribute`() {
+    fun `The property is not found in the class, @KomapperEnumOverride`() {
         val result = compile(
             """
             package test
@@ -927,5 +905,51 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
         assertTrue(result.messages.contains("The property \"address\" is not found in the class \"DeptInfo\"."))
+    }
+
+    @Test
+    fun `@KomapperColumnOverride must be used with either @KomapperEmbedded or @KomapperEmbeddedId`() {
+        val result = compile(
+            """
+            package test
+            import org.komapper.annotation.*
+            data class DeptInfo(
+                val name: String,
+                val location: String
+            )
+            @KomapperEntity
+            data class Dept(
+                @KomapperId
+                val id: Int,
+                @KomapperColumnOverride("address", KomapperColumn("ADDRESS"))
+                val info: DeptInfo
+            )
+            """
+        )
+        assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
+        assertTrue(result.messages.contains("@KomapperColumnOverride must be used with either @KomapperEmbedded or @KomapperEmbeddedId."))
+    }
+
+    @Test
+    fun `@KomapperEnumOverride must be used with either @KomapperEmbedded or @KomapperEmbeddedId`() {
+        val result = compile(
+            """
+            package test
+            import org.komapper.annotation.*
+            data class DeptInfo(
+                val name: String,
+                val location: String
+            )
+            @KomapperEntity
+            data class Dept(
+                @KomapperId
+                val id: Int,
+                @KomapperEnumOverride("address", KomapperEnum(EnumType.ORDINAL))
+                val info: DeptInfo
+            )
+            """
+        )
+        assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
+        assertTrue(result.messages.contains("@KomapperEnumOverride must be used with either @KomapperEmbedded or @KomapperEmbeddedId."))
     }
 }
