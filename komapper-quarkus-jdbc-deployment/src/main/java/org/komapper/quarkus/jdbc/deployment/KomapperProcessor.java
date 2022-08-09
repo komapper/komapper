@@ -54,6 +54,7 @@ public class KomapperProcessor {
   void registerNativeImageResources(BuildProducer<ServiceProviderBuildItem> serviceProvider) {
     var serviceInterfaces =
         List.of(
+            "org.komapper.core.spi.DataTypeConverter",
             "org.komapper.core.spi.LoggerFactory",
             "org.komapper.core.spi.LoggerFacadeFactory",
             "org.komapper.core.spi.StatementInspectorFactory",
