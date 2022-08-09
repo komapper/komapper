@@ -104,15 +104,12 @@ internal class EntityFactory(
     private fun createCompositeProperty(
         propertyDef: CompositePropertyDef,
         parameter: KSValueParameter,
-        declaration: KSPropertyDeclaration,
+        @Suppress("UNUSED_PARAMETER") declaration: KSPropertyDeclaration,
     ): CompositeProperty {
-        val type = parameter.type.resolve()
-        val (normalizedType, typeArgumentResolver) = type.normalize()
-        val embeddableDeclaration = normalizedType.declaration.accept(ClassDeclarationVisitor(), Unit) ?: report(
-            "@${propertyDef.kind.annotation.shortName} cannot be applied to this element. " +
-                "${normalizedType.name} must be a data class.",
-            declaration
-        )
+        val parameterType = parameter.type.resolve()
+        val (type, typeArgumentResolver) = parameterType.normalize()
+        val embeddableDeclaration = type.declaration.accept(ClassDeclarationVisitor(), Unit)
+            ?: report("${type.name} must be a data class.", parameter)
         val embeddable = createEmbeddable(
             parent = parameter,
             embeddableDeclaration = embeddableDeclaration,
@@ -121,10 +118,10 @@ internal class EntityFactory(
             enumStrategies = annotationSupport.getEnumStrategies(propertyDef.parameter),
         )
         val nullability =
-            if (type.nullability == Nullability.NULLABLE || normalizedType.nullability == Nullability.NULLABLE) {
+            if (parameterType.nullability == Nullability.NULLABLE || type.nullability == Nullability.NULLABLE) {
                 Nullability.NULLABLE
             } else {
-                normalizedType.nullability
+                type.nullability
             }
         return CompositeProperty(
             propertyDef.parameter,
@@ -249,7 +246,7 @@ internal class EntityFactory(
 
     private fun getColumn(column: Column?, parameter: KSValueParameter): Column {
         return if (column == null) {
-            val name = parameter.name?.asString() ?: report("The name is not found.", parameter)
+            val name = parameter.toString()
             Column(config.namingStrategy.apply(name), alwaysQuote = false, masking = false)
         } else {
             column
