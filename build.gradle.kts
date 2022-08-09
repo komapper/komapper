@@ -189,23 +189,31 @@ rootProject.apply {
         tagTemplate.set("v\$version")
     }
 
+    fun replaceVersion(version: String, prefix: String, suffix: String = "\"") {
+        ant.withGroovyBuilder {
+            "replaceregexp"(
+                "match" to """($prefix)[^"]*($suffix)""",
+                "replace" to "\\1${version}\\2",
+                "encoding" to "UTF-8",
+                "flags" to "g"
+            ) {
+                "fileset"("dir" to ".") {
+                    "include"("name" to "README.md")
+                }
+            }
+        }
+    }
+
     tasks {
         val replaceVersion by registering {
             doLast {
                 val releaseVersion = project.properties["release.releaseVersion"]?.toString()
                 checkNotNull(releaseVersion) { "release.releaseVersion is not set" }
-                ant.withGroovyBuilder {
-                    "replaceregexp"(
-                        "match" to """(val komapperVersion = ")[^"]*(")""",
-                        "replace" to "\\1${releaseVersion}\\2",
-                        "encoding" to "UTF-8",
-                        "flags" to "g"
-                    ) {
-                        "fileset"("dir" to ".") {
-                            "include"("name" to "README.md")
-                        }
-                    }
-                }
+                replaceVersion(releaseVersion, """val komapperVersion = """")
+                val kotlinVersion: String by project
+                replaceVersion(kotlinVersion, """kotlin\("jvm"\) version """")
+                val kspVersion: String by project
+                replaceVersion(kspVersion, """id\("com.google.devtools.ksp"\) version """")
             }
         }
 
