@@ -21,7 +21,7 @@ class EntityProcessorOkTest : AbstractKspTest(EntityProcessorProvider()) {
             )
             """
         )
-        assertEquals(result.exitCode, KotlinCompilation.ExitCode.OK)
+        assertEquals(KotlinCompilation.ExitCode.OK, result.exitCode)
     }
 
     @Test
@@ -37,7 +37,7 @@ class EntityProcessorOkTest : AbstractKspTest(EntityProcessorProvider()) {
             )
             """
         )
-        assertEquals(result.exitCode, KotlinCompilation.ExitCode.OK)
+        assertEquals(KotlinCompilation.ExitCode.OK, result.exitCode)
     }
 
     @Test
@@ -57,7 +57,7 @@ class EntityProcessorOkTest : AbstractKspTest(EntityProcessorProvider()) {
             value class Baz(val value: Int?)
             """
         )
-        assertEquals(result.exitCode, KotlinCompilation.ExitCode.OK)
+        assertEquals(KotlinCompilation.ExitCode.OK, result.exitCode)
     }
 
     @Test
@@ -89,6 +89,74 @@ class EntityProcessorOkTest : AbstractKspTest(EntityProcessorProvider()) {
             data class Dept(
                 @KomapperAutoIncrement @KomapperId
                 val id: Snowball
+            )
+            """
+        )
+        assertEquals(result.exitCode, KotlinCompilation.ExitCode.OK, result.messages)
+    }
+
+    @Test
+    fun `Allow embeddable values`() {
+        val result = compile(
+            """
+            package test
+            import org.komapper.annotation.*
+            data class DeptId(
+                val id1: Int,
+                val id2: Int
+            )
+            data class DeptInfo(
+                val name: String,
+                val location: String
+            )
+            @KomapperEntity
+            data class Dept(
+                @KomapperEmbeddedId
+                val id: DeptId,
+                @KomapperEmbedded
+                val info: DeptInfo
+            )
+            """
+        )
+        assertEquals(result.exitCode, KotlinCompilation.ExitCode.OK, result.messages)
+    }
+
+    @Test
+    fun `Allow type parameters for embedded values`() {
+        val result = compile(
+            """
+            package test
+            import org.komapper.annotation.*
+            data class DeptInfo<T>(
+                val name: T
+            )
+            @KomapperEntity
+            data class Dept(
+                @KomapperId
+                val id: Int,
+                @KomapperEmbedded
+                val info: DeptInfo<String>
+            )
+            """
+        )
+        assertEquals(result.exitCode, KotlinCompilation.ExitCode.OK, result.messages)
+    }
+
+    @Test
+    fun `Allow typealias for embedded values`() {
+        val result = compile(
+            """
+            package test
+            import org.komapper.annotation.*
+            typealias Snowflake = Pair<String, Int>
+            @KomapperEntity
+            data class Dept(
+                @KomapperAutoIncrement @KomapperId
+                val id: Int,
+                @KomapperEmbedded
+                @KomapperColumnOverride("first", KomapperColumn("color"))
+                @KomapperColumnOverride("second", KomapperColumn("size"))
+                val snowflake: Snowflake
             )
             """
         )

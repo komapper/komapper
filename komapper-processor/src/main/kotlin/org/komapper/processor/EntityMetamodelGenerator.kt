@@ -1,10 +1,12 @@
 package org.komapper.processor
 
+import com.google.devtools.ksp.processing.KSPLogger
 import com.google.devtools.ksp.symbol.Nullability
 import org.komapper.processor.Symbols.Argument
 import org.komapper.processor.Symbols.AutoIncrement
 import org.komapper.processor.Symbols.Clock
 import org.komapper.processor.Symbols.ConcurrentHashMap
+import org.komapper.processor.Symbols.EmbeddableMetamodel
 import org.komapper.processor.Symbols.EntityDescriptor
 import org.komapper.processor.Symbols.EntityMetamodel
 import org.komapper.processor.Symbols.EntityMetamodelDeclaration
@@ -28,6 +30,7 @@ import java.io.PrintWriter
 import java.time.ZonedDateTime
 
 internal class EntityMetamodelGenerator(
+    @Suppress("unused") private val logger: KSPLogger,
     private val entity: Entity,
     private val metaObject: String,
     private val aliases: List<String>,
@@ -42,6 +45,10 @@ internal class EntityMetamodelGenerator(
     } else {
         "List<Any>"
     }
+
+    private val embeddableIndexMap: Map<Embeddable, Int> = entity.properties.filterIsInstance<CompositeProperty>().map { it.embeddable }
+        .mapIndexed { index, embeddable -> embeddable to index }
+        .toMap()
 
     private val constructorParamList = listOf(
         "table: String = \"${entity.table.name}\"",
@@ -112,7 +119,7 @@ internal class EntityMetamodelGenerator(
     }
 
     private fun importStatements() {
-        fun usesType(property: Property, typeName: String): Boolean {
+        fun usesType(property: LeafProperty, typeName: String): Boolean {
             val propertyTypeName = when (val kotlinClass = property.kotlinClass) {
                 is ValueClass -> kotlinClass.property.typeName
                 else -> property.typeName
@@ -131,17 +138,7 @@ internal class EntityMetamodelGenerator(
     }
 
     private fun entityDescriptor() {
-        w.println("    private object $EntityDescriptor {")
-        val sequenceIdExists = entity.properties.any {
-            when (it.kind) {
-                is PropertyKind.Id -> it.kind.idKind is IdKind.Sequence
-                else -> false
-            }
-        }
-        if (sequenceIdExists) {
-            w.println("        val __idContextMap: $ConcurrentHashMap<$UUID, $IdContext> = $ConcurrentHashMap()")
-        }
-        for (p in entity.properties) {
+        fun leafPropertyDescriptor(p: LeafProperty, getter: String, setter: String, nullability: Nullability): String {
             val exteriorTypeName = p.exteriorTypeName
             val interiorTypeName = p.interiorTypeName
             val exteriorClass = "$exteriorTypeName::class"
@@ -149,8 +146,6 @@ internal class EntityMetamodelGenerator(
             val columnName = "\"${p.column.name}\""
             val alwaysQuote = "${p.column.alwaysQuote}"
             val masking = "${p.column.masking}"
-            val getter = "{ it.`$p` }"
-            val setter = "{ e, v -> e.copy(`$p` = v) }"
             val wrap = when (p.kotlinClass) {
                 is EnumClass -> {
                     when (p.kotlinClass.strategy) {
@@ -162,25 +157,84 @@ internal class EntityMetamodelGenerator(
                 else -> "{ it }"
             }
             val unwrap = when (p.kotlinClass) {
-                is EnumClass -> "{ it.${p.kotlinClass.strategy.propertyName } }"
+                is EnumClass -> "{ it.${p.kotlinClass.strategy.propertyName} }"
                 is ValueClass -> "{ it.${p.kotlinClass.property} }"
                 else -> "{ it }"
             }
-            val nullable = if (p.nullability == Nullability.NULLABLE) "true" else "false"
+            val nullable = if (nullability == Nullability.NULLABLE) "true" else "false"
             val propertyDescriptor =
                 "$PropertyDescriptor<$entityTypeName, $exteriorTypeName, $interiorTypeName>"
-            w.println("        val `$p` = $propertyDescriptor($exteriorClass, $interiorClass, \"$p\", $columnName, $alwaysQuote, $masking, $getter, $setter, $wrap, $unwrap, $nullable)")
+            return "$propertyDescriptor($exteriorClass, $interiorClass, \"$p\", $columnName, $alwaysQuote, $masking, $getter, $setter, $wrap, $unwrap, $nullable)"
+        }
+
+        w.println("    private object $EntityDescriptor {")
+        val sequenceIdExists = entity.properties.filterIsInstance<LeafProperty>().any {
+            when (it.kind) {
+                is PropertyKind.Id -> it.kind.idKind is IdKind.Sequence
+                else -> false
+            }
+        }
+        if (sequenceIdExists) {
+            w.println("        val __idContextMap: $ConcurrentHashMap<$UUID, $IdContext> = $ConcurrentHashMap()")
+        }
+        for (p in entity.properties) {
+            when (p) {
+                is CompositeProperty -> {
+                    val nullable = p.nullability == Nullability.NULLABLE
+                    val embeddable = p.embeddable
+                    val argList =
+                        embeddable.properties.joinToString(",\n            ", prefix = "\n            ") { ep ->
+                            val getter = "{ it.`$p`${if (nullable) "?" else ""}.`$ep` }"
+                            val setter = "{ e, v -> e.copy(`$p` = e.`$p`${if (nullable) "?" else ""}.copy(`$ep` = v)) }"
+                            "`$ep` = ${leafPropertyDescriptor(ep, getter, setter, p.nullability)}"
+                        }
+                    val index = embeddableIndexMap[embeddable]
+                    w.println("        val `$p` = __${embeddable.simpleName}$index($argList)")
+                }
+                is LeafProperty -> {
+                    val getter = "{ it.`$p` }"
+                    val setter = "{ e, v -> e.copy(`$p` = v) }"
+                    w.println("        val `$p` = ${leafPropertyDescriptor(p, getter, setter, p.nullability)}")
+                }
+            }
+        }
+        for ((embeddable, index) in embeddableIndexMap) {
+            val paramList = embeddable.properties.joinToString { ep ->
+                "val `$ep`: $PropertyDescriptor<$entityTypeName, ${ep.exteriorTypeName}, ${ep.interiorTypeName}>"
+            }
+            w.println("        class __${embeddable.simpleName}$index($paramList)")
         }
         w.println("    }")
     }
 
     private fun propertyMetamodels() {
         for (p in entity.properties) {
-            val exteriorTypeName = p.exteriorTypeName
-            val interiorTypeName = p.interiorTypeName
-            val propertyMetamodel =
-                "$PropertyMetamodel<$entityTypeName, $exteriorTypeName, $interiorTypeName>"
-            w.println("    val `$p`: $propertyMetamodel by lazy { $PropertyMetamodelImpl(this, $EntityDescriptor.`$p`) }")
+            when (p) {
+                is CompositeProperty -> {
+                    val embeddable = p.embeddable
+                    val argList = embeddable.properties.joinToString(",\n        ", prefix = "\n        ") { ep ->
+                        "`$ep` = $PropertyMetamodelImpl(this, $EntityDescriptor.`$p`.`$ep`)"
+                    }
+                    val index = embeddableIndexMap[embeddable]
+                    w.println("    val `$p`:  __${embeddable.simpleName}$index by lazy { __${embeddable.simpleName}$index($argList) }")
+                }
+                is LeafProperty -> {
+                    val propertyMetamodel =
+                        "$PropertyMetamodel<$entityTypeName, ${p.exteriorTypeName}, ${p.interiorTypeName}>"
+                    w.println("    val `$p`: $propertyMetamodel by lazy { $PropertyMetamodelImpl(this, $EntityDescriptor.`$p`) }")
+                }
+            }
+        }
+        for ((embeddable, index) in embeddableIndexMap) {
+            val paramList = embeddable.properties.joinToString { ep ->
+                "val `$ep`: $PropertyMetamodel<$entityTypeName, ${ep.exteriorTypeName}, ${ep.interiorTypeName}>"
+            }
+            val columnList = embeddable.properties.joinToString { "`$it`" }
+            val argumentList = embeddable.properties.joinToString { ep -> "$Argument(this.`$ep`, composite?.`$ep`)" }
+            w.println("    class __${embeddable.simpleName}$index($paramList): $EmbeddableMetamodel<${embeddable.typeName}> {")
+            w.println("         override fun columns() = listOf($columnList)")
+            w.println("         override fun arguments(composite: ${embeddable.typeName}?) = listOf($argumentList)")
+            w.println("    }")
         }
     }
 
@@ -213,7 +267,7 @@ internal class EntityMetamodelGenerator(
     }
 
     private fun idGenerator() {
-        val pair = entity.properties.firstNotNullOfOrNull {
+        val pair = entity.properties.filterIsInstance<LeafProperty>().firstNotNullOfOrNull {
             when (it.kind) {
                 is PropertyKind.Id -> {
                     val idKind = it.kind.idKind
@@ -252,7 +306,12 @@ internal class EntityMetamodelGenerator(
     }
 
     private fun idProperties() {
-        val idNameList = entity.idProperties.joinToString { "`$it`" }
+        val idNameList = if (entity.embeddedIdProperty != null) {
+            val p = entity.embeddedIdProperty
+            p.embeddable.properties.joinToString { "`$p`.`$it`" }
+        } else {
+            entity.idProperties.joinToString { "`$it`" }
+        }
         w.println("    override fun idProperties(): List<$PropertyMetamodel<$entityTypeName, *, *>> = listOf($idNameList)")
     }
 
@@ -272,12 +331,26 @@ internal class EntityMetamodelGenerator(
     }
 
     private fun properties() {
-        val nameList = entity.properties.joinToString(",\n        ", prefix = "\n        ") { "`$it`" }
+        val properties = entity.properties.flatMap { p ->
+            when (p) {
+                is CompositeProperty -> p.embeddable.properties.map { "`$p`.`$it`" }
+                is LeafProperty -> listOf("`$p`")
+            }
+        }
+        val nameList = properties.joinToString(",\n        ", prefix = "\n        ")
         w.println("    override fun properties(): List<$PropertyMetamodel<$entityTypeName, *, *>> = listOf($nameList)")
     }
 
     private fun extractId() {
-        val body = if (entity.idProperties.size == 1) {
+        val body = if (entity.embeddedIdProperty != null) {
+            val p = entity.embeddedIdProperty
+            val list = p.embeddable.properties.joinToString { ep ->
+                val nullable1 = p.nullability == Nullability.NULLABLE
+                val nullable2 = ep.nullability == Nullability.NULLABLE
+                "e.`$p`${if (nullable1) "?" else ""}.`$ep`" + if (nullable1 || nullable2) " ?: error(\"The id property '$p.$ep' must not null.\")" else ""
+            }
+            "listOf($list)"
+        } else if (entity.idProperties.size == 1) {
             val p = entity.idProperties[0]
             val nullable = p.nullability == Nullability.NULLABLE
             "e.`$p`" + if (nullable) " ?: error(\"The id property '$p' must not null.\")" else ""
@@ -398,7 +471,7 @@ internal class EntityMetamodelGenerator(
         w.println("    override fun postUpdate(e: $entityTypeName): $entityTypeName = $body")
     }
 
-    private fun now(property: Property): String {
+    private fun now(property: LeafProperty): String {
         return when (property.kotlinClass) {
             is ValueClass -> {
                 when (property.kotlinClass.property.typeName) {
@@ -431,8 +504,27 @@ internal class EntityMetamodelGenerator(
 
     private fun newEntity() {
         val argList = entity.properties.joinToString(",\n        ", prefix = "\n        ") { p ->
-            val nullability = if (p.nullability == Nullability.NULLABLE) "?" else ""
-            "`$p` = m[this.`$p`] as ${p.typeName}$nullability"
+            when (p) {
+                is CompositeProperty -> {
+                    val args =
+                        p.embeddable.properties.joinToString(",\n            ", prefix = "\n            ") { ep ->
+                            val nullable = ep.nullability == Nullability.NULLABLE
+                            "`$ep` = m[this.`$p`.`$ep`] as ${ep.typeName}${if (nullable) "?" else ""}"
+                        }
+                    if (p.nullability == Nullability.NULLABLE) {
+                        val condition = p.embeddable.properties.joinToString(" && ") { ep ->
+                            "m[this.`$p`.`$ep`] == null"
+                        }
+                        "`$p` = if ($condition) null else ${p.embeddable.typeName}($args)"
+                    } else {
+                        "`$p` = ${p.embeddable.typeName}($args)"
+                    }
+                }
+                is LeafProperty -> {
+                    val nullability = if (p.nullability == Nullability.NULLABLE) "?" else ""
+                    "`$p` = m[this.`$p`] as ${p.typeName}$nullability"
+                }
+            }
         }
         w.println("    override fun newEntity(m: Map<$PropertyMetamodel<*, *, *>, Any?>) = $entityTypeName($argList)")
     }

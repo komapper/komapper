@@ -8,7 +8,9 @@ import integration.core.BooleanData
 import integration.core.ByteArrayData
 import integration.core.ByteData
 import integration.core.Dbms
+import integration.core.DirectionInfo
 import integration.core.DoubleData
+import integration.core.EmbeddedEnumOrdinalData
 import integration.core.EnumData
 import integration.core.EnumOrdinalData
 import integration.core.FloatData
@@ -44,6 +46,7 @@ import integration.core.booleanData
 import integration.core.byteArrayData
 import integration.core.byteData
 import integration.core.doubleData
+import integration.core.embeddedEnumOrdinalData
 import integration.core.enumData
 import integration.core.enumOrdinalData
 import integration.core.enumclass.Direction
@@ -374,6 +377,28 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
     fun enum_ordinal_null() {
         val m = Meta.enumOrdinalData
         val data = EnumOrdinalData(1, null)
+        db.runQuery { QueryDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        assertEquals(data, data2)
+    }
+
+    @Test
+    fun embedded_enum_ordinal() {
+        val m = Meta.embeddedEnumOrdinalData
+        val data = EmbeddedEnumOrdinalData(1, DirectionInfo(Direction.EAST))
+        db.runQuery { QueryDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        assertEquals(data, data2)
+    }
+
+    @Test
+    fun embedded_enum_ordinal_null() {
+        val m = Meta.embeddedEnumOrdinalData
+        val data = EmbeddedEnumOrdinalData(1, null)
         db.runQuery { QueryDsl.insert(m).single(data) }
         val data2 = db.runQuery {
             QueryDsl.from(m).where { m.id eq 1 }.first()

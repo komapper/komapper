@@ -48,6 +48,40 @@ annotation class KomapperVersion
 annotation class KomapperEnum(val type: EnumType)
 
 /**
+ * Indicates that the annotated property is an embedded value.
+ */
+@Target(AnnotationTarget.VALUE_PARAMETER)
+@Retention(AnnotationRetention.SOURCE)
+annotation class KomapperEmbedded
+
+/**
+ * Indicates that the annotated property is an embedded value for composite identifiers.
+ */
+@Target(AnnotationTarget.VALUE_PARAMETER)
+@Retention(AnnotationRetention.SOURCE)
+annotation class KomapperEmbeddedId
+
+/**
+ * Used to override the column of an embeddable class`s property.
+ * * @property name the property name
+ * @property column the column
+ */
+@Target(AnnotationTarget.VALUE_PARAMETER)
+@Retention(AnnotationRetention.SOURCE)
+@Repeatable
+annotation class KomapperColumnOverride(val name: String, val column: KomapperColumn)
+
+/**
+ * Used to override the enum of an embeddable class`s property.
+ * * @property name the property name
+ * @property enum the enum
+ */
+@Target(AnnotationTarget.VALUE_PARAMETER)
+@Retention(AnnotationRetention.SOURCE)
+@Repeatable
+annotation class KomapperEnumOverride(val name: String, val enum: KomapperEnum)
+
+/**
  * Adds table information.
  *
  * @property name the table name

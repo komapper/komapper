@@ -4,8 +4,11 @@ import integration.core.enumclass.Direction
 import org.komapper.annotation.EnumType
 import org.komapper.annotation.KomapperAutoIncrement
 import org.komapper.annotation.KomapperColumn
+import org.komapper.annotation.KomapperColumnOverride
+import org.komapper.annotation.KomapperEmbedded
 import org.komapper.annotation.KomapperEntity
 import org.komapper.annotation.KomapperEnum
+import org.komapper.annotation.KomapperEnumOverride
 import org.komapper.annotation.KomapperId
 import org.komapper.annotation.KomapperSequence
 import org.komapper.annotation.KomapperTable
@@ -65,7 +68,24 @@ data class EnumData(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true)
 
 @KomapperEntity
 @KomapperTable("enum_ordinal_data")
-data class EnumOrdinalData(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true) @KomapperEnum(EnumType.ORDINAL) val value: Direction?)
+data class EnumOrdinalData(
+    @KomapperId val id: Int,
+    @KomapperColumn(alwaysQuote = true) @KomapperEnum(EnumType.ORDINAL) val value: Direction?
+)
+
+data class DirectionInfo(
+    val direction: Direction
+)
+
+@KomapperEntity
+@KomapperTable("enum_ordinal_data")
+data class EmbeddedEnumOrdinalData(
+    @KomapperId val id: Int,
+    @KomapperEmbedded
+    @KomapperColumnOverride(name = "direction", KomapperColumn(name = "value", alwaysQuote = true))
+    @KomapperEnumOverride(name = "direction", KomapperEnum(EnumType.ORDINAL))
+    val value: DirectionInfo?
+)
 
 @KomapperEntity
 @KomapperTable("float_data")
@@ -168,7 +188,10 @@ data class UserDefinedInt(val value: Int)
 
 @KomapperEntity
 @KomapperTable("string_data")
-data class UserDefinedStringData(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true) val value: UserDefinedString?)
+data class UserDefinedStringData(
+    @KomapperId val id: Int,
+    @KomapperColumn(alwaysQuote = true) val value: UserDefinedString?
+)
 
 data class UserDefinedString(val value: String)
 

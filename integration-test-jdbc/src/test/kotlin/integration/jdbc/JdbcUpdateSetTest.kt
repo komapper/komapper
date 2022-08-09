@@ -2,9 +2,11 @@ package integration.jdbc
 
 import integration.core.Person
 import integration.core.address
+import integration.core.android
 import integration.core.employee
 import integration.core.identityStrategy
 import integration.core.person
+import integration.core.robot
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
@@ -13,6 +15,7 @@ import org.komapper.core.dsl.operator.plus
 import org.komapper.core.dsl.query.dryRun
 import org.komapper.core.dsl.query.first
 import org.komapper.jdbc.JdbcDatabase
+import java.time.LocalDate
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -38,6 +41,44 @@ class JdbcUpdateSetTest(private val db: JdbcDatabase) {
             }.first()
         }
         assertEquals("STREET 16", address.street)
+    }
+
+    @Test
+    fun embedded() {
+        val r = Meta.robot
+        val count = db.runQuery {
+            QueryDsl.update(r).set {
+                r.info2.hiredate eq LocalDate.parse("2001-01-23")
+            }.where {
+                r.employeeId eq 1
+            }
+        }
+        assertEquals(1, count)
+        val robot = db.runQuery {
+            QueryDsl.from(r).where {
+                r.employeeId eq 1
+            }.first()
+        }
+        assertEquals(LocalDate.parse("2001-01-23"), robot.info2?.hiredate)
+    }
+
+    @Test
+    fun embedded_generics() {
+        val a = Meta.android
+        val count = db.runQuery {
+            QueryDsl.update(a).set {
+                a.info2.first eq LocalDate.parse("2001-01-23")
+            }.where {
+                a.employeeId eq 1
+            }
+        }
+        assertEquals(1, count)
+        val android = db.runQuery {
+            QueryDsl.from(a).where {
+                a.employeeId eq 1
+            }.first()
+        }
+        assertEquals(LocalDate.parse("2001-01-23"), android.info2?.first)
     }
 
     @Test

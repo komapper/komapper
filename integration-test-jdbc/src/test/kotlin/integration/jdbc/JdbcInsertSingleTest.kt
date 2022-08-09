@@ -1,20 +1,32 @@
 package integration.jdbc
 
 import integration.core.Address
+import integration.core.AddressId
+import integration.core.Android
+import integration.core.Cyborg
 import integration.core.Dbms
 import integration.core.Department
+import integration.core.EmbeddedIdAddress
+import integration.core.GenericEmbeddedIdAddress
 import integration.core.Human
 import integration.core.IdentityStrategy
 import integration.core.Man
 import integration.core.Person
+import integration.core.Robot
+import integration.core.RobotInfo1
 import integration.core.Run
 import integration.core.SequenceStrategy
 import integration.core.address
+import integration.core.android
+import integration.core.cyborg
 import integration.core.department
+import integration.core.embeddedIdAddress
+import integration.core.genericEmbeddedIdAddress
 import integration.core.human
 import integration.core.identityStrategy
 import integration.core.man
 import integration.core.person
+import integration.core.robot
 import integration.core.sequenceStrategy
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.ClockProvider
@@ -48,6 +60,88 @@ class JdbcInsertSingleTest(private val db: JdbcDatabase) {
             }.first()
         }
         assertEquals(address, address2)
+    }
+
+    @Test
+    fun embeddedId() {
+        val a = Meta.embeddedIdAddress
+        val address = EmbeddedIdAddress(AddressId(16, 1), "STREET 16", 0)
+        db.runQuery { QueryDsl.insert(a).single(address) }
+        val address2 = db.runQuery {
+            QueryDsl.from(a).where {
+                a.id.addressId1 eq 16
+                a.id.addressId2 eq 1
+            }.first()
+        }
+        assertEquals(address, address2)
+    }
+
+    @Test
+    fun generic_embeddedId() {
+        val a = Meta.genericEmbeddedIdAddress
+        val address = GenericEmbeddedIdAddress(16 to 1, "STREET 16", 0)
+        db.runQuery { QueryDsl.insert(a).single(address) }
+        val address2 = db.runQuery {
+            QueryDsl.from(a).where {
+                a.id.first eq 16
+                a.id.second eq 1
+            }.first()
+        }
+        assertEquals(address, address2)
+    }
+
+    @Test
+    fun embedded() {
+        val r = Meta.robot
+        val robot = Robot(
+            employeeId = 99, managerId = null, departmentId = 1, addressId = 1, version = 0,
+            info1 = RobotInfo1(
+                employeeNo = 9999,
+                employeeName = "a"
+            ),
+            info2 = null
+        )
+        db.runQuery { QueryDsl.insert(r).single(robot) }
+        val robot2 = db.runQuery {
+            QueryDsl.from(r).where {
+                r.employeeId eq 99
+            }.first()
+        }
+        assertEquals(robot, robot2)
+    }
+
+    @Test
+    fun embedded_generics() {
+        val a = Meta.android
+        val android = Android(
+            employeeId = 99, managerId = null, departmentId = 1, addressId = 1, version = 0,
+            info1 = 9999 to "a",
+            info2 = null
+        )
+        db.runQuery { QueryDsl.insert(a).single(android) }
+        val android2 = db.runQuery {
+            QueryDsl.from(a).where {
+                a.employeeId eq 99
+            }.first()
+        }
+        assertEquals(android, android2)
+    }
+
+    @Test
+    fun embedded_generics_separation_mapping() {
+        val c = Meta.cyborg
+        val cyborg = Cyborg(
+            employeeId = 99, managerId = null, departmentId = 1, addressId = 1, version = 0,
+            info1 = 9999 to "a",
+            info2 = null
+        )
+        db.runQuery { QueryDsl.insert(c).single(cyborg) }
+        val cyborg2 = db.runQuery {
+            QueryDsl.from(c).where {
+                c.employeeId eq 99
+            }.first()
+        }
+        assertEquals(cyborg, cyborg2)
     }
 
     @Test

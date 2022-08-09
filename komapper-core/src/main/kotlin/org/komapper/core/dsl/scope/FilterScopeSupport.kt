@@ -1,6 +1,7 @@
 package org.komapper.core.dsl.scope
 
 import org.komapper.core.dsl.expression.ColumnExpression
+import org.komapper.core.dsl.expression.CompositeColumnExpression
 import org.komapper.core.dsl.expression.Criterion
 import org.komapper.core.dsl.expression.EscapeExpression
 import org.komapper.core.dsl.expression.Operand
@@ -62,6 +63,22 @@ class FilterScopeSupport(
     override infix fun <T : Any, S : Any> T?.eq(operand: ColumnExpression<T, S>) {
         if (this == null) return
         add(Criterion::Eq, this, operand)
+    }
+
+    override fun <T : Any> CompositeColumnExpression<T>.eq(operand: T?) {
+        if (operand == null) return
+        this.arguments(operand).filter { it.exterior != null }.forEach {
+            val column = Operand.Column(it.expression)
+            add(Criterion.Eq(column, it))
+        }
+    }
+
+    override fun <T : Any> T?.eq(operand: CompositeColumnExpression<T>) {
+        if (this == null) return
+        operand.arguments(this).filter { it.exterior != null }.forEach {
+            val column = Operand.Column(it.expression)
+            add(Criterion.Eq(it, column))
+        }
     }
 
     override infix fun <T : Any, S : Any> ColumnExpression<T, S>.notEq(operand: ColumnExpression<T, S>) {

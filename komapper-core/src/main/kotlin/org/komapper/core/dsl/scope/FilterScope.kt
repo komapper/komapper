@@ -1,6 +1,7 @@
 package org.komapper.core.dsl.scope
 
 import org.komapper.core.dsl.expression.ColumnExpression
+import org.komapper.core.dsl.expression.CompositeColumnExpression
 import org.komapper.core.dsl.expression.EscapeExpression
 import org.komapper.core.dsl.expression.SubqueryExpression
 
@@ -22,6 +23,16 @@ interface FilterScope {
      * Applies the `=` operator.
      */
     infix fun <T : Any, S : Any> T?.eq(operand: ColumnExpression<T, S>)
+
+    /**
+     * Applies the `=` operator.
+     */
+    infix fun <T : Any> CompositeColumnExpression<T>.eq(operand: T?)
+
+    /**
+     * Applies the `=` operator.
+     */
+    infix fun <T : Any> T?.eq(operand: CompositeColumnExpression<T>)
 
     /**
      * Applies the `<>` operator.
