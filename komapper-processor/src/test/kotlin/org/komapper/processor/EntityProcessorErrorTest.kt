@@ -952,4 +952,23 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
         assertTrue(result.messages.contains("@KomapperEnumOverride must be used with either @KomapperEmbedded or @KomapperEmbeddedId."))
     }
+
+    @Test
+    fun `The property must not be a star-projected type`() {
+        val result = compile(
+            """
+            package test
+            import org.komapper.annotation.*
+            @KomapperEntity
+            data class Dept(
+                @KomapperId
+                val id: Int,
+                @KomapperEmbedded
+                val info: Pair<Int, *>
+            )
+            """
+        )
+        assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
+        assertTrue(result.messages.contains("The property \"info.second\" must not be a star-projected type."))
+    }
 }

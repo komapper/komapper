@@ -8,9 +8,10 @@ import com.google.devtools.ksp.symbol.KSAnnotation
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSPropertyDeclaration
 import com.google.devtools.ksp.symbol.KSType
-import com.google.devtools.ksp.symbol.KSTypeReference
+import com.google.devtools.ksp.symbol.KSTypeArgument
 import com.google.devtools.ksp.symbol.KSValueParameter
 import com.google.devtools.ksp.symbol.Nullability
+import com.google.devtools.ksp.symbol.Variance
 import org.komapper.annotation.KomapperColumnOverride
 import org.komapper.annotation.KomapperEmbedded
 import org.komapper.annotation.KomapperEmbeddedId
@@ -82,7 +83,7 @@ internal class EntityFactory(
                         parameter = parameter,
                         declaration = declaration,
                         kind = propertyDef.kind,
-                        typeReference = propertyDef.type,
+                        typeArgument = null,
                         column = propertyDef.column,
                         enumStrategy = propertyDef.enumStrategy,
                         parent = null,
@@ -91,7 +92,7 @@ internal class EntityFactory(
                         parameter = parameter,
                         declaration = declaration,
                         kind = null,
-                        typeReference = null,
+                        typeArgument = null,
                         column = null,
                         enumStrategy = null,
                         parent = null,
@@ -154,7 +155,7 @@ internal class EntityFactory(
                 parameter = parameter,
                 declaration = declaration,
                 kind = null,
-                typeReference = typeArgument?.type,
+                typeArgument = typeArgument,
                 column = columnMap[name] ?: annotationSupport.getColumn(null, name),
                 enumStrategy = enumStrategyMap[name],
                 parent = parent,
@@ -189,16 +190,17 @@ internal class EntityFactory(
         parameter: KSValueParameter,
         declaration: KSPropertyDeclaration,
         kind: PropertyKind?,
-        typeReference: KSTypeReference?,
+        typeArgument: KSTypeArgument?,
         column: Column?,
         enumStrategy: EnumStrategy?
     ): LeafProperty {
-        val (type) = (typeReference ?: parameter.type).resolve().normalize()
+        val (type) = (typeArgument?.type ?: parameter.type).resolve().normalize()
         val kotlinClass = createEnumClass(enumStrategy, type) ?: createValueClass(type) ?: PlainClass(type)
         return LeafProperty(
             parameter = parameter,
             declaration = declaration,
             nullability = type.nullability,
+            typeArgument = typeArgument,
             column = getColumn(column, parameter),
             kotlinClass = kotlinClass,
             literalTag = resolveLiteralTag(kotlinClass.exteriorTypeName),
@@ -254,6 +256,9 @@ internal class EntityFactory(
     }
 
     private fun validateLeafProperty(property: LeafProperty) {
+        if (property.typeArgument?.variance == Variance.STAR) {
+            report("The property \"${property.path}\" must not be a star-projected type.", property.node)
+        }
         if (property.kind !is PropertyKind.Ignore) {
             if (property.isPrivate()) {
                 report("The property must not be private.", property.node)
