@@ -842,7 +842,7 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
     }
 
     @Test
-    fun `The property must not have any type parameters`() {
+    fun `The property must not be a generic type`() {
         val result = compile(
             """
             package test
@@ -855,7 +855,24 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
             """
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
-        assertTrue(result.messages.contains("The property \"names\" must not have any type parameters."))
+        assertTrue(result.messages.contains("The property \"names\" must not be a generic type \"List<String>\"."))
+    }
+
+    @Test
+    fun `The property must not be a generic type, @KomapperEmbedded`() {
+        val result = compile(
+            """
+            package test
+            import org.komapper.annotation.*
+            @KomapperEntity
+            data class Dept(
+                @KomapperId val id: Int,
+                @KomapperEmbedded val info: Pair<String, List<Int>>,
+            )
+            """
+        )
+        assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
+        assertTrue(result.messages.contains("The property \"info.second\" must not be a generic type \"List<Int>\"."))
     }
 
     @Test
@@ -951,5 +968,24 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
         assertTrue(result.messages.contains("@KomapperEnumOverride must be used with either @KomapperEmbedded or @KomapperEmbeddedId."))
+    }
+
+    @Test
+    fun `The property must not be a star-projected type`() {
+        val result = compile(
+            """
+            package test
+            import org.komapper.annotation.*
+            @KomapperEntity
+            data class Dept(
+                @KomapperId
+                val id: Int,
+                @KomapperEmbedded
+                val info: Pair<Int, *>
+            )
+            """
+        )
+        assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
+        assertTrue(result.messages.contains("The property \"info.second\" must not be a star-projected type."))
     }
 }

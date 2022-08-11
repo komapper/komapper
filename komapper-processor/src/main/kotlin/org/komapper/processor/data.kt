@@ -7,7 +7,7 @@ import com.google.devtools.ksp.symbol.KSDeclaration
 import com.google.devtools.ksp.symbol.KSNode
 import com.google.devtools.ksp.symbol.KSPropertyDeclaration
 import com.google.devtools.ksp.symbol.KSType
-import com.google.devtools.ksp.symbol.KSTypeReference
+import com.google.devtools.ksp.symbol.KSTypeArgument
 import com.google.devtools.ksp.symbol.KSValueParameter
 import com.google.devtools.ksp.symbol.Nullability
 
@@ -34,7 +34,6 @@ internal data class LeafPropertyDef(
     override val parameter: KSValueParameter,
     override val declaration: KSPropertyDeclaration,
     override val kind: PropertyKind?,
-    val type: KSTypeReference?,
     val column: Column,
     val enumStrategy: EnumStrategy?
 ) : PropertyDef
@@ -77,6 +76,7 @@ internal data class LeafProperty(
     override val declaration: KSPropertyDeclaration,
     override val nullability: Nullability,
     override val kind: PropertyKind?,
+    val typeArgument: KSTypeArgument?,
     val column: Column,
     val kotlinClass: KotlinClass,
     val literalTag: String,

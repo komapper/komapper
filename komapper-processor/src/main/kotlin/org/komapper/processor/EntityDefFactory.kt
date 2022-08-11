@@ -52,7 +52,7 @@ internal class EntityDefFactory(
         val kind = createPropertyKind(parameter, idKind)
         val column = annotationSupport.getColumn(parameter)
         val enumStrategy = annotationSupport.getEnumStrategy(parameter)
-        return LeafPropertyDef(parameter, declaration, kind, null, column, enumStrategy)
+        return LeafPropertyDef(parameter, declaration, kind, column, enumStrategy)
     }
 
     private fun validateCompositeProperties(properties: List<CompositePropertyDef>) {
