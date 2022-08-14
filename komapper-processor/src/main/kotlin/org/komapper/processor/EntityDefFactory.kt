@@ -16,7 +16,7 @@ import org.komapper.annotation.KomapperVersion
 
 internal class EntityDefFactory(
     @Suppress("unused") private val logger: KSPLogger,
-    @Suppress("unused") private val config: Config,
+    private val config: Config,
     private val definitionSource: EntityDefinitionSource
 ) {
     private val annotationSupport: AnnotationSupport = AnnotationSupport(config)
@@ -102,7 +102,7 @@ internal class EntityDefFactory(
                     val catalog = a.findValue("catalog")?.toString()?.trim() ?: KomapperSequence.CATALOG
                     val schema = a.findValue("schema")?.toString()?.trim() ?: KomapperSequence.SCHEMA
                     val alwaysQuote =
-                        a.findValue("alwaysQuote")?.toString()?.toBooleanStrict() ?: KomapperSequence.ALWAYS_QUOTE
+                        a.findValue("alwaysQuote")?.toString()?.toBooleanStrict() ?: config.alwaysQuote
                     IdKind.Sequence(a, name, startWith, incrementBy, catalog, schema, alwaysQuote)
                 }
             }

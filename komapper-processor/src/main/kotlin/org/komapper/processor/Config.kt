@@ -10,7 +10,8 @@ internal data class Config(
     val suffix: String,
     val enumStrategy: EnumStrategy,
     val namingStrategy: NamingStrategy,
-    val metaObject: String
+    val metaObject: String,
+    val alwaysQuote: Boolean
 ) {
     companion object {
         private const val PREFIX = "komapper.prefix"
@@ -18,6 +19,7 @@ internal data class Config(
         private const val ENUM_STRATEGY = "komapper.enumStrategy"
         private const val NAMING_STRATEGY = "komapper.namingStrategy"
         private const val META_OBJECT = "komapper.metaObject"
+        private const val ALWAYS_QUOTE = "komapper.alwaysQuote"
 
         fun create(options: Map<String, String>): Config {
             val prefix = options.getOrDefault(PREFIX, "_")
@@ -38,7 +40,8 @@ internal data class Config(
                 }
             }
             val metaObject = options.getOrDefault(META_OBJECT, Symbols.Meta)
-            return Config(prefix, suffix, enumStrategy, namingStrategy, metaObject)
+            val alwaysQuote = options[ALWAYS_QUOTE]?.toBooleanStrict() ?: false
+            return Config(prefix, suffix, enumStrategy, namingStrategy, metaObject, alwaysQuote)
         }
     }
 }
