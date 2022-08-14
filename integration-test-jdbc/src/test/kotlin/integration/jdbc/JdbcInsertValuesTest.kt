@@ -1,12 +1,16 @@
 package integration.jdbc
 
 import integration.core.Dbms
+import integration.core.RobotInfo1
+import integration.core.RobotInfo2
 import integration.core.Run
 import integration.core.address
 import integration.core.employee
 import integration.core.identityStrategy
 import integration.core.person
+import integration.core.robot
 import integration.core.sequenceStrategy
+import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
@@ -21,6 +25,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertIs
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 @ExtendWith(JdbcEnv::class)
 class JdbcInsertValuesTest(private val db: JdbcDatabase) {
@@ -189,5 +194,81 @@ class JdbcInsertValuesTest(private val db: JdbcDatabase) {
         val result = query.dryRun()
         val expected = "insert into address (address_id, street, version) values (?, ?, ?)"
         assertEquals(expected, result.sql)
+    }
+
+    @Test
+    fun embedded_eq() {
+        val r = Meta.robot
+        val query = QueryDsl.insert(r).values {
+            r.employeeId eq 99
+            r.info1 eq RobotInfo1(9999, "ABC")
+            r.info2 eq null
+            r.addressId eq 1
+            r.departmentId eq 1
+            r.version eq 0
+        }
+        val (count, key) = db.runQuery(query)
+        assertEquals(1, count)
+        assertNull(key)
+        val sql = query.dryRun(db.config)
+        assertTrue(sql.sql.contains("hiredate"))
+        assertTrue(sql.sql.contains("salary"))
+    }
+
+    @Test
+    fun embedded_eq_partial_null() {
+        val r = Meta.robot
+        val query = QueryDsl.insert(r).values {
+            r.employeeId eq 99
+            r.info1 eq RobotInfo1(9999, "ABC")
+            r.info2 eq RobotInfo2(null, BigDecimal(3_000))
+            r.addressId eq 1
+            r.departmentId eq 1
+            r.version eq 0
+        }
+        val (count, key) = db.runQuery(query)
+        assertEquals(1, count)
+        assertNull(key)
+        val sql = query.dryRun(db.config)
+        assertTrue(sql.sql.contains("hiredate"))
+        assertTrue(sql.sql.contains("salary"))
+    }
+
+    @Test
+    fun embedded_eqIfNotNull() {
+        val r = Meta.robot
+        val query = QueryDsl.insert(r).values {
+            r.employeeId eq 99
+            r.info1 eq RobotInfo1(9999, "ABC")
+            r.info2 eqIfNotNull null
+            r.addressId eq 1
+            r.departmentId eq 1
+            r.version eq 0
+        }
+        val (count, key) = db.runQuery(query)
+        assertEquals(1, count)
+        assertNull(key)
+        val sql = query.dryRun(db.config)
+        assertFalse(sql.sql.contains("hiredate"))
+        assertFalse(sql.sql.contains("salary"))
+    }
+
+    @Test
+    fun embedded_eqIfNotNull_partial_null() {
+        val r = Meta.robot
+        val query = QueryDsl.insert(r).values {
+            r.employeeId eq 99
+            r.info1 eq RobotInfo1(9999, "ABC")
+            r.info2 eqIfNotNull RobotInfo2(null, BigDecimal(3_000))
+            r.addressId eq 1
+            r.departmentId eq 1
+            r.version eq 0
+        }
+        val (count, key) = db.runQuery(query)
+        assertEquals(1, count)
+        assertNull(key)
+        val sql = query.dryRun(db.config)
+        assertFalse(sql.sql.contains("hiredate"))
+        assertTrue(sql.sql.contains("salary"))
     }
 }

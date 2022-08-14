@@ -2,7 +2,9 @@ package org.komapper.core.dsl.scope
 
 import org.komapper.core.Scope
 import org.komapper.core.dsl.expression.ColumnExpression
+import org.komapper.core.dsl.expression.CompositeColumnExpression
 import org.komapper.core.dsl.expression.Operand
+import org.komapper.core.dsl.metamodel.EmbeddedMetamodel
 import org.komapper.core.dsl.metamodel.PropertyMetamodel
 
 /**
@@ -30,6 +32,28 @@ class AssignmentScope<ENTITY : Any>(
     }
 
     /**
+     * The `=` operator.
+     */
+    infix fun <EMBEDDABLE : Any> EmbeddedMetamodel<ENTITY, EMBEDDABLE>.eq(value: EMBEDDABLE?) {
+        val properties = this.properties()
+        val arguments = this.arguments(value)
+        properties.zip(arguments).forEach {
+            assignments.add(it)
+        }
+    }
+
+    /**
+     * The `=` operator.
+     */
+    infix fun <EMBEDDABLE : Any> EmbeddedMetamodel<ENTITY, EMBEDDABLE>.eq(operand: CompositeColumnExpression<EMBEDDABLE>) {
+        val properties = this.properties()
+        val columns = operand.columns().map { Operand.Column(it) }
+        properties.zip(columns).forEach {
+            assignments.add(it)
+        }
+    }
+
+    /**
      * Behaves like the `=` operator only if the value is not `null`.
      * If the value is `null`, the assignment is ignored.
      */
@@ -37,5 +61,20 @@ class AssignmentScope<ENTITY : Any>(
         if (value == null) return
         val right = Operand.Argument(this, value)
         assignments.add(this to right)
+    }
+
+    /**
+     * Behaves like the `=` operator only if the value is not `null`.
+     * If the value is `null`, the assignment is ignored.
+     */
+    infix fun <EMBEDDABLE : Any> EmbeddedMetamodel<ENTITY, EMBEDDABLE>.eqIfNotNull(value: EMBEDDABLE?) {
+        if (value == null) return
+        val properties = this.properties()
+        val arguments = this.arguments(value)
+        properties.zip(arguments).forEach {
+            if (it.second.exterior != null) {
+                assignments.add(it)
+            }
+        }
     }
 }

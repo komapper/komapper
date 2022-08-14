@@ -3,6 +3,7 @@ package org.komapper.processor
 internal object Symbols {
     const val ConcurrentHashMap = "java.util.concurrent.ConcurrentHashMap"
     const val EmbeddableMetamodel = "org.komapper.core.dsl.metamodel.EmbeddableMetamodel"
+    const val EmbeddedMetamodel = "org.komapper.core.dsl.metamodel.EmbeddedMetamodel"
     const val EntityMetamodel = "org.komapper.core.dsl.metamodel.EntityMetamodel"
     const val EntityMetamodelStub = "org.komapper.core.dsl.metamodel.EntityMetamodelStub"
     const val EntityMetamodelImplementor = "org.komapper.core.dsl.metamodel.EntityMetamodelImplementor"

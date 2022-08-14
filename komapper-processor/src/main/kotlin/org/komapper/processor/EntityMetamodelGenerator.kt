@@ -7,6 +7,7 @@ import org.komapper.processor.Symbols.AutoIncrement
 import org.komapper.processor.Symbols.Clock
 import org.komapper.processor.Symbols.ConcurrentHashMap
 import org.komapper.processor.Symbols.EmbeddableMetamodel
+import org.komapper.processor.Symbols.EmbeddedMetamodel
 import org.komapper.processor.Symbols.EntityDescriptor
 import org.komapper.processor.Symbols.EntityMetamodel
 import org.komapper.processor.Symbols.EntityMetamodelDeclaration
@@ -229,10 +230,11 @@ internal class EntityMetamodelGenerator(
             val paramList = embeddable.properties.joinToString { ep ->
                 "val `$ep`: $PropertyMetamodel<$entityTypeName, ${ep.exteriorTypeName}, ${ep.interiorTypeName}>"
             }
-            val columnList = embeddable.properties.joinToString { "`$it`" }
+            val propertyList = embeddable.properties.joinToString { "`$it`" }
             val argumentList = embeddable.properties.joinToString { ep -> "$Argument(this.`$ep`, composite?.`$ep`)" }
-            w.println("    class __${embeddable.simpleName}$index($paramList): $EmbeddableMetamodel<${embeddable.typeName}> {")
-            w.println("         override fun columns() = listOf($columnList)")
+            w.println("    class __${embeddable.simpleName}$index($paramList): $EmbeddedMetamodel<$entityTypeName, ${embeddable.typeName}>, $EmbeddableMetamodel<${embeddable.typeName}> {")
+            w.println("         override fun properties() = listOf($propertyList)")
+            w.println("         override fun columns() = properties()")
             w.println("         override fun arguments(composite: ${embeddable.typeName}?) = listOf($argumentList)")
             w.println("    }")
         }

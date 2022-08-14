@@ -5,6 +5,7 @@ import integration.core.address
 import integration.core.employee
 import integration.core.identityStrategy
 import integration.core.person
+import integration.core.robot
 import kotlinx.coroutines.delay
 import org.junit.jupiter.api.TestInfo
 import org.junit.jupiter.api.extension.ExtendWith
@@ -12,12 +13,16 @@ import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
 import org.komapper.core.dsl.operator.concat
 import org.komapper.core.dsl.operator.plus
+import org.komapper.core.dsl.operator.times
+import org.komapper.core.dsl.query.dryRun
 import org.komapper.core.dsl.query.first
 import org.komapper.r2dbc.R2dbcDatabase
+import java.math.BigDecimal
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertNotEquals
+import kotlin.test.assertTrue
 
 @ExtendWith(R2dbcEnv::class)
 class R2dbcUpdateSetTest(private val db: R2dbcDatabase) {
@@ -238,5 +243,21 @@ class R2dbcUpdateSetTest(private val db: R2dbcDatabase) {
         }
         val count = db.runQuery { query }
         assertEquals(0, count)
+    }
+
+    @Test
+    fun embedded_CompositeColumnExpression(info: TestInfo) = inTransaction(db, info) {
+        val r = Meta.robot
+        val query = QueryDsl.update(r).set {
+            r.info1 eq r.info1
+            r.info2.salary eq r.info2.salary * BigDecimal(2)
+        }.where {
+            r.employeeId eq 1
+        }
+        val count = db.runQuery(query)
+        assertEquals(1, count)
+        val sql = query.dryRun(db.config)
+        assertTrue(sql.sql.contains("employee_no"))
+        assertTrue(sql.sql.contains("employee_name"))
     }
 }
