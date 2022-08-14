@@ -12,14 +12,17 @@ import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
 import org.komapper.core.dsl.operator.concat
 import org.komapper.core.dsl.operator.plus
+import org.komapper.core.dsl.operator.times
 import org.komapper.core.dsl.query.dryRun
 import org.komapper.core.dsl.query.first
 import org.komapper.jdbc.JdbcDatabase
+import java.math.BigDecimal
 import java.time.LocalDate
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertNotEquals
+import kotlin.test.assertTrue
 
 @ExtendWith(JdbcEnv::class)
 class JdbcUpdateSetTest(private val db: JdbcDatabase) {
@@ -329,5 +332,21 @@ class JdbcUpdateSetTest(private val db: JdbcDatabase) {
         }
         val count = db.runQuery { query }
         assertEquals(0, count)
+    }
+
+    @Test
+    fun embedded_CompositeColumnExpression() {
+        val r = Meta.robot
+        val query = QueryDsl.update(r).set {
+            r.info1 eq r.info1
+            r.info2.salary eq r.info2.salary * BigDecimal(2)
+        }.where {
+            r.employeeId eq 1
+        }
+        val count = db.runQuery(query)
+        assertEquals(1, count)
+        val sql = query.dryRun(db.config)
+        assertTrue(sql.sql.contains("employee_no"))
+        assertTrue(sql.sql.contains("employee_name"))
     }
 }
