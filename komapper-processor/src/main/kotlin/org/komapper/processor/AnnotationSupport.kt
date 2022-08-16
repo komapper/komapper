@@ -24,7 +24,7 @@ internal class AnnotationSupport(
         val catalog = annotation?.findValue("catalog")?.toString()?.trim() ?: KomapperTable.CATALOG
         val schema = annotation?.findValue("schema")?.toString()?.trim() ?: KomapperTable.SCHEMA
         val alwaysQuote =
-            annotation?.findValue("alwaysQuote")?.toString()?.toBooleanStrict() ?: KomapperTable.ALWAYS_QUOTE
+            annotation?.findValue("alwaysQuote")?.toString()?.toBooleanStrict() ?: config.alwaysQuote
         return Table(name, catalog, schema, alwaysQuote)
     }
 
@@ -38,7 +38,7 @@ internal class AnnotationSupport(
             if (it.isNullOrBlank()) null else it
         } ?: namingStrategy.apply(propertyName)
         val alwaysQuote =
-            columnAnnotation?.findValue("alwaysQuote")?.toString()?.toBooleanStrict() ?: KomapperColumn.ALWAYS_QUOTE
+            columnAnnotation?.findValue("alwaysQuote")?.toString()?.toBooleanStrict() ?: config.alwaysQuote
         val masking =
             columnAnnotation?.findValue("masking")?.toString()?.toBooleanStrict() ?: KomapperColumn.MASKING
         return Column(name, alwaysQuote, masking)

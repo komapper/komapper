@@ -16,6 +16,7 @@ class ConfigTest {
         assertEquals("", config.suffix)
         assertEquals(EnumStrategy.NAME, config.enumStrategy)
         assertEquals(CamelToLowerSnakeCase, config.namingStrategy)
+        assertEquals(false, config.alwaysQuote)
     }
 
     @Test
@@ -62,5 +63,12 @@ class ConfigTest {
             Config.create(options)
         }
         assertEquals("'unknown' is illegal value as a komapper.namingStrategy option.", e.message)
+    }
+
+    @Test
+    fun alwaysQuote() {
+        val options = mapOf("komapper.alwaysQuote" to "true")
+        val config = Config.create(options)
+        assertEquals(true, config.alwaysQuote)
     }
 }
