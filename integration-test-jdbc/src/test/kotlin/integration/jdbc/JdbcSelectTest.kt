@@ -8,6 +8,7 @@ import integration.core.RobotInfo2
 import integration.core.address
 import integration.core.android
 import integration.core.employee
+import integration.core.location
 import integration.core.robot
 import kotlinx.coroutines.flow.count
 import org.junit.jupiter.api.assertThrows
@@ -294,5 +295,14 @@ class JdbcSelectTest(private val db: JdbcDatabase) {
         }
         assertEquals(2, list.size)
         assertEquals(listOf(8, 13), list.map { it.employeeId })
+    }
+
+    @Test
+    fun `use typealias`() {
+        val a = Meta.location
+        val list = db.runQuery {
+            QueryDsl.from(a)
+        }
+        assertEquals(15, list.size)
     }
 }

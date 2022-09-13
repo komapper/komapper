@@ -212,3 +212,16 @@ data class Place(
     val street: String,
     val version: Int
 )
+
+typealias LocationInt = Int
+typealias LocationString = String
+
+@KomapperEntity
+@KomapperTable("address")
+data class Location(
+    @KomapperId @KomapperColumn(name = "address_id")
+    val id: LocationInt?,
+    val street: LocationString,
+    @KomapperVersion
+    val version: LocationInt
+)

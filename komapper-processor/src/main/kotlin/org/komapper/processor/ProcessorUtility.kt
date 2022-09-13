@@ -47,13 +47,21 @@ internal fun KSType.normalize(parent: TypeArgumentResolver = TypeArgumentResolve
     return this.declaration.accept(
         object : KSEmptyVisitor<Unit, Pair<KSType, TypeArgumentResolver>>() {
             override fun defaultHandler(node: KSNode, data: Unit): Pair<KSType, TypeArgumentResolver> {
-                val resolver = TypeArgumentResolver(parent, this@normalize.declaration.typeParameters, this@normalize.arguments)
+                val resolver =
+                    TypeArgumentResolver(parent, this@normalize.declaration.typeParameters, this@normalize.arguments)
                 return this@normalize to resolver
             }
 
             override fun visitTypeAlias(typeAlias: KSTypeAlias, data: Unit): Pair<KSType, TypeArgumentResolver> {
                 val resolver = TypeArgumentResolver(parent, typeAlias.typeParameters, this@normalize.arguments)
-                return typeAlias.type.resolve().normalize(resolver)
+                val type = typeAlias.type.resolve().let {
+                    if (this@normalize.isMarkedNullable) {
+                        it.makeNullable()
+                    } else {
+                        it
+                    }
+                }
+                return type.normalize(resolver)
             }
         },
         Unit
@@ -87,28 +95,29 @@ internal class TypeArgumentResolver(
     }
 }
 
-internal val KSType.name: String get() {
-    fun asString(type: KSType): String {
-        return (type.declaration.qualifiedName ?: type.declaration.simpleName).asString()
-    }
-
-    val buf = StringBuilder()
-    buf.append(asString(this))
-    if (this.arguments.isNotEmpty()) {
-        buf.append("<")
-        this.arguments.joinTo(buf) {
-            val type = it.type?.resolve()
-            if (type == null) {
-                it.variance.label
-            } else {
-                val mark = if (type.nullability == Nullability.NULLABLE) "?" else ""
-                type.name + mark
-            }
+internal val KSType.name: String
+    get() {
+        fun asString(type: KSType): String {
+            return (type.declaration.qualifiedName ?: type.declaration.simpleName).asString()
         }
-        buf.append(">")
+
+        val buf = StringBuilder()
+        buf.append(asString(this))
+        if (this.arguments.isNotEmpty()) {
+            buf.append("<")
+            this.arguments.joinTo(buf) {
+                val type = it.type?.resolve()
+                if (type == null) {
+                    it.variance.label
+                } else {
+                    val mark = if (type.nullability == Nullability.NULLABLE) "?" else ""
+                    type.name + mark
+                }
+            }
+            buf.append(">")
+        }
+        return buf.toString()
     }
-    return buf.toString()
-}
 
 internal fun toCamelCase(text: String): String {
     val builder = StringBuilder()
