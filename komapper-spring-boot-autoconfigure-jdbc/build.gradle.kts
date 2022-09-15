@@ -7,6 +7,6 @@ dependencies {
     api(project(":komapper-spring-jdbc"))
     testImplementation(project(":komapper-slf4j"))
     testImplementation(project(":komapper-dialect-h2-jdbc"))
-    testImplementation("ch.qos.logback:logback-classic:1.4.0")
+    testImplementation("ch.qos.logback:logback-classic:1.4.1")
     testImplementation("com.zaxxer:HikariCP:4.0.3")
 }
