@@ -9,7 +9,7 @@ dependencies {
     ksp(project(":komapper-processor"))
     api(project(":komapper-core"))
     api("org.jetbrains.kotlinx:kotlinx-datetime:$kotlinxDatetime")
-    implementation("ch.qos.logback:logback-classic:1.4.2")
+    implementation("ch.qos.logback:logback-classic:1.4.3")
     runtimeOnly(project(":komapper-slf4j"))
     runtimeOnly(project(":komapper-template"))
 }
