@@ -30,9 +30,9 @@ For more documentation, go to our site:
 
 ## Prerequisite
 
-- Kotlin 1.5.31 or later
+- Kotlin 1.6.21 or later
 - JRE 11 or later
-- Gradle 7.2 or later
+- Gradle 6.7.1 or later
 
 ## Supported Databases
 
@@ -160,3 +160,10 @@ suspend fun main() {
 ## Design Policy
 
 See [DESIGN_DOC](DESIGN_DOC.md) for the design policy of this project.
+
+## Compatibility Matrix
+
+| Komapper version | Kotlin version                | KSP version | JRE min version | Gradle min version |
+|:-----------------|:------------------------------|:------------|:----------------|--------------------|
+| 1.3.x            | 1.6.21, 1.7.0, 1.7.10, 1.7.20 | 1.0.6       | 11              | 6.7.1              |
+| 1.4.x            | 1.6.21, 1.7.0, 1.7.10, 1.7.20 | 1.0.6       | 11              | 6.7.1              |
