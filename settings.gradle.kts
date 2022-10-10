@@ -15,7 +15,7 @@ pluginManagement {
         kotlin("plugin.spring") version kotlinVersion
         kotlin("plugin.allopen") version kotlinVersion
         kotlin("plugin.serialization") version kotlinVersion
-        id("com.google.devtools.ksp") version kspVersion
+        id("com.google.devtools.ksp") version "$kotlinVersion-$kspVersion"
         id("io.quarkus") version quarkusVersion
         id("io.quarkus.extension") version quarkusVersion
         id("org.springframework.boot") version springBootVersion
