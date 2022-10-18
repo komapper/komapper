@@ -75,7 +75,7 @@ testing {
                 implementation(project)
                 implementation("org.testcontainers:mysql")
                 implementation(project(":komapper-dialect-mysql-r2dbc"))
-                runtimeOnly("mysql:mysql-connector-java:8.0.30")
+                runtimeOnly("mysql:mysql-connector-java:8.0.31")
             }
         }
 
