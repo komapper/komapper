@@ -54,7 +54,7 @@ internal class EntityProcessor(private val environment: SymbolProcessorEnvironme
                     EntityMetamodelStubGenerator(
                         logger,
                         model.entityDeclaration,
-                        config.metaObject,
+                        model.unitTypeName,
                         model.aliases,
                         packageName,
                         simpleName,
@@ -65,7 +65,7 @@ internal class EntityProcessor(private val environment: SymbolProcessorEnvironme
                     EntityMetamodelGenerator(
                         logger,
                         model.entity,
-                        config.metaObject,
+                        model.unitTypeName,
                         model.aliases,
                         packageName,
                         simpleName,

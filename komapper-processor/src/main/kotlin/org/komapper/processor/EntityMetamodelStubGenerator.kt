@@ -13,7 +13,7 @@ internal class EntityMetamodelStubGenerator(
     @Suppress("unused")
     private val logger: KSPLogger,
     private val declaration: KSClassDeclaration,
-    private val metaObject: String,
+    private val unitTypeName: String,
     private val aliases: List<String>,
     private val packageName: String,
     private val simpleName: String,
@@ -56,7 +56,7 @@ internal class EntityMetamodelStubGenerator(
         w.println("}")
         w.println("")
         for (alias in aliases) {
-            w.println("val $metaObject.`$alias` get() = $simpleName.`$alias`")
+            w.println("val $unitTypeName.`$alias` get() = $simpleName.`$alias`")
         }
     }
 }
