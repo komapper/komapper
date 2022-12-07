@@ -25,7 +25,6 @@ For more documentation, go to our site:
 ### Experimental
 
 - Quarkus integration
-- Spring Native integration
 - Transaction management using context receivers
 
 ## Prerequisite
