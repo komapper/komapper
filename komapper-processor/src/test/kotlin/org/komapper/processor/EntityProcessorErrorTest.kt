@@ -988,4 +988,41 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
         assertTrue(result.messages.contains("The property \"info.second\" must not be a star-projected type."))
     }
+
+    @Test
+    fun `The unit value of @KomapperEntity must be an object`() {
+        val result = compile(
+            """
+            package test
+            import org.komapper.annotation.*
+            @KomapperEntity(unit = String::class)
+            data class Dept(
+                @KomapperId
+                val id: Int,
+            )
+            """
+        )
+        assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
+        assertTrue(result.messages.contains("The unit value of @KomapperEntity must be an object."))
+    }
+
+    @Test
+    fun `The unit value of @KomapperEntityDef must be an object`() {
+        val result = compile(
+            """
+            package test
+            import org.komapper.annotation.*
+            data class Dept(
+                val id: Int,
+            )
+            @KomapperEntityDef(entity = Dept::class, unit = String::class)
+            data class DeptDef(
+                @KomapperId
+                val id: Int,
+            )
+            """
+        )
+        assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
+        assertTrue(result.messages.contains("The unit value of @KomapperEntityDef must be an object."))
+    }
 }

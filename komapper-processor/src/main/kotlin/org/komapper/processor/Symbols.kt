@@ -33,4 +33,5 @@ internal object Symbols {
     const val toKotlinLocalDateTime = "kotlinx.datetime.toKotlinLocalDateTime"
     const val EnumType_NAME = "org.komapper.annotation.EnumType.NAME"
     const val EnumType_ORDINAL = "org.komapper.annotation.EnumType.ORDINAL"
+    const val DefaultUnit = "org.komapper.annotation.DefaultUnit"
 }

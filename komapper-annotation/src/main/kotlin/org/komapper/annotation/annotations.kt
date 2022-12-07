@@ -12,11 +12,13 @@ import kotlin.reflect.KClass
  * The annotated class must be a data class.
  *
  * @param aliases the names of the entity metamodel instances
+ * @param unit the unit object class
  */
 @Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.SOURCE)
 annotation class KomapperEntity(
     val aliases: Array<String> = [],
+    val unit: KClass<*> = DefaultUnit::class
 )
 
 /**
@@ -212,10 +214,12 @@ annotation class KomapperAutoIncrement
  *
  * @property entity the entity class
  * @property aliases the names of the entity metamodel instances
+ * @property unit the unit object class
  */
 @Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.SOURCE)
 annotation class KomapperEntityDef(
     val entity: KClass<*>,
-    val aliases: Array<String> = []
+    val aliases: Array<String> = [],
+    val unit: KClass<*> = DefaultUnit::class
 )

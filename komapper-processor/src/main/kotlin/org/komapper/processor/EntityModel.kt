@@ -4,6 +4,7 @@ import com.google.devtools.ksp.symbol.KSFile
 
 internal class EntityModel(
     private val definitionSource: EntityDefinitionSource,
+    defaultUnitName: String,
     val entity: Entity? = null,
 ) {
     val hasStubAnnotation: Boolean = definitionSource.stubAnnotation != null
@@ -16,6 +17,8 @@ internal class EntityModel(
     }
 
     val typeName = definitionSource.entityDeclaration.qualifiedName?.asString() ?: ""
+
+    val unitTypeName = definitionSource.unitDeclaration?.qualifiedName?.asString() ?: defaultUnitName
 
     val containingFiles: List<KSFile>
         get() {
