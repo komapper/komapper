@@ -1,5 +1,5 @@
 dependencies {
     api(project(":komapper-dialect-oracle"))
     api(project(":komapper-jdbc"))
-    implementation("com.oracle.database.jdbc:ojdbc11:21.7.0.0")
+    implementation("com.oracle.database.jdbc:ojdbc11:21.8.0.0")
 }
