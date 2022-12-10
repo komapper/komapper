@@ -57,11 +57,11 @@ Add the following code to the Gradle build script (gradle.build.kts).
 
 ```kotlin
 plugins {
-    kotlin("jvm") version "1.7.10"
-    id("com.google.devtools.ksp") version "1.7.10-1.0.6"
+    kotlin("jvm") version "1.7.20"
+    id("com.google.devtools.ksp") version "1.0.6"
 }
 
-val komapperVersion = "1.4.0"
+val komapperVersion = "1.5.0"
 
 dependencies {
     platform("org.komapper:komapper-platform:$komapperVersion").let {
