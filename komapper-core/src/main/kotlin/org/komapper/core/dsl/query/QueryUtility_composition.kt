@@ -55,7 +55,7 @@ fun <T> ListQuery<T>.firstOrNull(): Query<T?> = collect { it.firstOrNull() }
 
 /**
  * Builds a query that returns the single element.
- * When the query is executed, it throws [NoSuchElementException] for empty query result and [IllegalStateException]
+ * When the query is executed, it throws [NoSuchElementException] for empty query result and [IllegalArgumentException]
  * for query result that contains more than one element.
  *
  * @param T the element type of [List]
