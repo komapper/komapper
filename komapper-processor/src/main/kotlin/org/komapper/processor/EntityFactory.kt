@@ -40,7 +40,9 @@ internal class EntityFactory(
         val topLevelLeafProperties = allProperties.filterIsInstance<LeafProperty>()
         val compositeProperties = allProperties.filterIsInstance<CompositeProperty>()
         val embeddedIdProperty = compositeProperties.firstOrNull { it.kind is PropertyKind.EmbeddedId }
+        val virtualEmbeddedIdProperty = embeddedIdProperty?.let { if (it.kind is PropertyKind.EmbeddedId && it.kind.virtual) it else null }
         val idProperties = topLevelLeafProperties.filter { it.kind is PropertyKind.Id }
+        val virtualIdProperties = idProperties.filter { it.kind is PropertyKind.Id && it.kind.virtual }
         val versionProperty: LeafProperty? = topLevelLeafProperties.firstOrNull { it.kind is PropertyKind.Version }
         val createdAtProperty: LeafProperty? = topLevelLeafProperties.firstOrNull { it.kind is PropertyKind.CreatedAt }
         val updatedAtProperty: LeafProperty? = topLevelLeafProperties.firstOrNull { it.kind is PropertyKind.UpdatedAt }
@@ -54,7 +56,9 @@ internal class EntityFactory(
             entityDef.table,
             properties,
             embeddedIdProperty,
+            virtualEmbeddedIdProperty,
             idProperties,
+            virtualIdProperties,
             versionProperty,
             createdAtProperty,
             updatedAtProperty,

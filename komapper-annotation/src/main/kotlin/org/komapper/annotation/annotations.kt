@@ -23,10 +23,13 @@ annotation class KomapperEntity(
 
 /**
  * Indicates that the annotated property is a primary key.
+ * @param virtual If `true`, the annotated property does not actually map to a primary key
  */
 @Target(AnnotationTarget.VALUE_PARAMETER)
 @Retention(AnnotationRetention.SOURCE)
-annotation class KomapperId
+annotation class KomapperId(
+    val virtual: Boolean = false
+)
 
 /**
  * Indicates that the annotated property is a version number of the optimistic lock.
@@ -58,10 +61,13 @@ annotation class KomapperEmbedded
 
 /**
  * Indicates that the annotated property is an embedded value for composite identifiers.
+ * @param virtual If `true`, the annotated property does not actually map to composite primary keys
  */
 @Target(AnnotationTarget.VALUE_PARAMETER)
 @Retention(AnnotationRetention.SOURCE)
-annotation class KomapperEmbeddedId
+annotation class KomapperEmbeddedId(
+    val virtual: Boolean = false
+)
 
 /**
  * Used to override the column of an embeddable class`s property.
