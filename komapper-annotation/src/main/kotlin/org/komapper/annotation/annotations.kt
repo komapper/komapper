@@ -46,6 +46,7 @@ annotation class KomapperVersion
 
 /**
  * Indicates that the annotated property is an enum class.
+ *
  * @property type the mapping strategy
  */
 @Target(AnnotationTarget.VALUE_PARAMETER)
@@ -61,7 +62,7 @@ annotation class KomapperEmbedded
 
 /**
  * Indicates that the annotated property is an embedded value for composite identifiers.
- * 
+ *
  * @property virtual If `true`, the annotated property does not actually map to composite primary keys
  */
 @Target(AnnotationTarget.VALUE_PARAMETER)
@@ -72,7 +73,7 @@ annotation class KomapperEmbeddedId(
 
 /**
  * Used to override the column of an embeddable class`s property.
- * 
+ *
  * @property name the property name
  * @property column the column
  */
@@ -83,7 +84,7 @@ annotation class KomapperColumnOverride(val name: String, val column: KomapperCo
 
 /**
  * Used to override the enum of an embeddable class`s property.
- * 
+ *
  * @property name the property name
  * @property enum the enum
  */
