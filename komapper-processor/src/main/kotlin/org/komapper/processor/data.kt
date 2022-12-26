@@ -50,7 +50,9 @@ internal data class Entity(
     val table: Table,
     val properties: List<Property>,
     val embeddedIdProperty: CompositeProperty?,
+    val virtualEmbeddedIdProperty: CompositeProperty?,
     val idProperties: List<LeafProperty>,
+    val virtualIdProperties: List<LeafProperty>,
     val versionProperty: LeafProperty?,
     val createdAtProperty: LeafProperty?,
     val updatedAtProperty: LeafProperty?,
@@ -179,8 +181,8 @@ internal sealed class PropertyKind {
     abstract val annotation: KSAnnotation
 
     data class Embedded(override val annotation: KSAnnotation) : PropertyKind()
-    data class EmbeddedId(override val annotation: KSAnnotation) : PropertyKind()
-    data class Id(override val annotation: KSAnnotation, val idKind: IdKind?) : PropertyKind()
+    data class EmbeddedId(override val annotation: KSAnnotation, val virtual: Boolean) : PropertyKind()
+    data class Id(override val annotation: KSAnnotation, val idKind: IdKind?, val virtual: Boolean) : PropertyKind()
     data class Version(override val annotation: KSAnnotation) : PropertyKind()
     data class UpdatedAt(override val annotation: KSAnnotation) : PropertyKind()
     data class CreatedAt(override val annotation: KSAnnotation) : PropertyKind()

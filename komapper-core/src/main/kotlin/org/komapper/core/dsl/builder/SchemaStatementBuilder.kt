@@ -51,14 +51,18 @@ abstract class AbstractSchemaStatementBuilder(
             "$columnName ${dataTypeName}$identity$notNull"
         }
         buf.append(columnDefinition)
-        buf.append(", ")
-        val primaryKeyName = "pk_${metamodel.tableName()}"
-        buf.append("constraint $primaryKeyName primary key(")
-        val idList = metamodel.idProperties().joinToString { p ->
-            p.getCanonicalColumnName(dialect::enquote)
+        val primaryKeys = metamodel.idProperties() - metamodel.virtualIdProperties().toSet()
+        if (primaryKeys.isNotEmpty()) {
+            buf.append(", ")
+            val primaryKeyName = "pk_${metamodel.tableName()}"
+            buf.append("constraint $primaryKeyName primary key(")
+            val pkList = primaryKeys.joinToString { p ->
+                p.getCanonicalColumnName(dialect::enquote)
+            }
+            buf.append(pkList)
+            buf.append(")")
         }
-        buf.append(idList)
-        buf.append("))")
+        buf.append(")")
         return listOf(buf.toStatement())
     }
 

@@ -128,8 +128,14 @@ internal class EntityDefFactory(
         for (a in parameter.annotations) {
             when (a.shortName.asString()) {
                 KomapperEmbedded::class.simpleName -> embedded = PropertyKind.Embedded(a)
-                KomapperEmbeddedId::class.simpleName -> embeddedId = PropertyKind.EmbeddedId(a)
-                KomapperId::class.simpleName -> id = PropertyKind.Id(a, idKind)
+                KomapperEmbeddedId::class.simpleName -> {
+                    val virtual = a.findValue("virtual")
+                    embeddedId = PropertyKind.EmbeddedId(a, virtual == true)
+                }
+                KomapperId::class.simpleName -> {
+                    val virtual = a.findValue("virtual")
+                    id = PropertyKind.Id(a, idKind, virtual == true)
+                }
                 KomapperVersion::class.simpleName -> version = PropertyKind.Version(a)
                 KomapperCreatedAt::class.simpleName -> createdAt = PropertyKind.CreatedAt(a)
                 KomapperUpdatedAt::class.simpleName -> updatedAt = PropertyKind.UpdatedAt(a)

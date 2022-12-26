@@ -11,8 +11,8 @@ import kotlin.reflect.KClass
  *
  * The annotated class must be a data class.
  *
- * @param aliases the names of the entity metamodel instances
- * @param unit the unit object class
+ * @property aliases the names of the entity metamodel instances
+ * @property unit the unit object class
  */
 @Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.SOURCE)
@@ -23,10 +23,13 @@ annotation class KomapperEntity(
 
 /**
  * Indicates that the annotated property is a primary key.
+ * @property virtual If `true`, the annotated property does not actually map to a primary key
  */
 @Target(AnnotationTarget.VALUE_PARAMETER)
 @Retention(AnnotationRetention.SOURCE)
-annotation class KomapperId
+annotation class KomapperId(
+    val virtual: Boolean = false
+)
 
 /**
  * Indicates that the annotated property is a version number of the optimistic lock.
@@ -43,7 +46,8 @@ annotation class KomapperVersion
 
 /**
  * Indicates that the annotated property is an enum class.
- * * @property type the mapping strategy
+ *
+ * @property type the mapping strategy
  */
 @Target(AnnotationTarget.VALUE_PARAMETER)
 @Retention(AnnotationRetention.SOURCE)
@@ -58,14 +62,19 @@ annotation class KomapperEmbedded
 
 /**
  * Indicates that the annotated property is an embedded value for composite identifiers.
+ *
+ * @property virtual If `true`, the annotated property does not actually map to composite primary keys
  */
 @Target(AnnotationTarget.VALUE_PARAMETER)
 @Retention(AnnotationRetention.SOURCE)
-annotation class KomapperEmbeddedId
+annotation class KomapperEmbeddedId(
+    val virtual: Boolean = false
+)
 
 /**
  * Used to override the column of an embeddable class`s property.
- * * @property name the property name
+ *
+ * @property name the property name
  * @property column the column
  */
 @Target(AnnotationTarget.VALUE_PARAMETER)
@@ -75,7 +84,8 @@ annotation class KomapperColumnOverride(val name: String, val column: KomapperCo
 
 /**
  * Used to override the enum of an embeddable class`s property.
- * * @property name the property name
+ *
+ * @property name the property name
  * @property enum the enum
  */
 @Target(AnnotationTarget.VALUE_PARAMETER)

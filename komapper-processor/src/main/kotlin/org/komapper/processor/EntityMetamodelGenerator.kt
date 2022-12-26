@@ -94,6 +94,7 @@ internal class EntityMetamodelGenerator(
 
         idGenerator()
         idProperties()
+        virtualIdProperties()
         versionProperty()
         createdAtProperty()
         updatedAtProperty()
@@ -315,6 +316,16 @@ internal class EntityMetamodelGenerator(
             entity.idProperties.joinToString { "`$it`" }
         }
         w.println("    override fun idProperties(): List<$PropertyMetamodel<$entityTypeName, *, *>> = listOf($idNameList)")
+    }
+
+    private fun virtualIdProperties() {
+        val idNameList = if (entity.virtualEmbeddedIdProperty != null) {
+            val p = entity.virtualEmbeddedIdProperty
+            p.embeddable.properties.joinToString { "`$p`.`$it`" }
+        } else {
+            entity.virtualIdProperties.joinToString { "`$it`" }
+        }
+        w.println("    override fun virtualIdProperties(): List<$PropertyMetamodel<$entityTypeName, *, *>> = listOf($idNameList)")
     }
 
     private fun versionProperty() {
