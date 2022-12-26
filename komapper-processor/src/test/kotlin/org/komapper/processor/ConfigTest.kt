@@ -14,7 +14,7 @@ class ConfigTest {
         val config = Config.create(options)
         assertEquals("_", config.prefix)
         assertEquals("", config.suffix)
-        assertEquals(EnumStrategy.NAME, config.enumStrategy)
+        assertEquals(EnumStrategy.Name, config.enumStrategy)
         assertEquals(CamelToLowerSnakeCase, config.namingStrategy)
         assertEquals(false, config.alwaysQuote)
     }
@@ -37,7 +37,7 @@ class ConfigTest {
     fun enumStrategy() {
         val options = mapOf("komapper.enumStrategy" to "ordinal")
         val config = Config.create(options)
-        assertEquals(EnumStrategy.ORDINAL, config.enumStrategy)
+        assertEquals(EnumStrategy.Ordinal, config.enumStrategy)
     }
 
     @Test

@@ -13,4 +13,9 @@ enum class EnumType {
      * The value of `Enum.ordinal` is written to database.
      */
     ORDINAL,
+
+    /**
+     * The value of arbitrary Enum property is written to database.
+     */
+    PROPERTY
 }

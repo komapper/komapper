@@ -35,6 +35,7 @@ interface OracleSetting<DATABASE : Database> : Setting<DATABASE> {
         create table duration_data(id integer not null primary key, "value" interval day to second);
         create table enum_data(id integer not null primary key, "value" varchar2(20));
         create table enum_ordinal_data(id integer not null primary key, "value" integer);
+        create table enum_property_data(id integer not null primary key, "value" integer);
         create table float_data(id integer not null primary key, "value" float);
         create table instant_data(id integer not null primary key, "value" timestamp with time zone);
         create table int_data(id integer not null primary key, "value" integer);

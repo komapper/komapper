@@ -150,16 +150,17 @@ internal class EntityMetamodelGenerator(
             val masking = "${p.column.masking}"
             val wrap = when (p.kotlinClass) {
                 is EnumClass -> {
-                    when (p.kotlinClass.strategy) {
-                        EnumStrategy.NAME -> "{ $exteriorTypeName.valueOf(it) }"
-                        EnumStrategy.ORDINAL -> "{ $exteriorTypeName.values()[it] }"
+                    when (val strategy = p.kotlinClass.strategy) {
+                        EnumStrategy.Name -> "{ $exteriorTypeName.valueOf(it) }"
+                        EnumStrategy.Ordinal -> "{ $exteriorTypeName.values()[it] }"
+                        is EnumStrategy.Property -> "{ v -> $exteriorTypeName.values().first { it.${strategy.propertyName} == v }  }"
                     }
                 }
                 is ValueClass -> "{ ${p.kotlinClass}(it) }"
                 else -> "{ it }"
             }
             val unwrap = when (p.kotlinClass) {
-                is EnumClass -> "{ it.${p.kotlinClass.strategy.propertyName} }"
+                is EnumClass -> "{ it.${p.kotlinClass.strategy.propertyName } }"
                 is ValueClass -> "{ it.${p.kotlinClass.property} }"
                 else -> "{ it }"
             }

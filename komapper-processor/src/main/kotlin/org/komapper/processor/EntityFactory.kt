@@ -40,7 +40,8 @@ internal class EntityFactory(
         val topLevelLeafProperties = allProperties.filterIsInstance<LeafProperty>()
         val compositeProperties = allProperties.filterIsInstance<CompositeProperty>()
         val embeddedIdProperty = compositeProperties.firstOrNull { it.kind is PropertyKind.EmbeddedId }
-        val virtualEmbeddedIdProperty = embeddedIdProperty?.let { if (it.kind is PropertyKind.EmbeddedId && it.kind.virtual) it else null }
+        val virtualEmbeddedIdProperty =
+            embeddedIdProperty?.let { if (it.kind is PropertyKind.EmbeddedId && it.kind.virtual) it else null }
         val idProperties = topLevelLeafProperties.filter { it.kind is PropertyKind.Id }
         val virtualIdProperties = idProperties.filter { it.kind is PropertyKind.Id && it.kind.virtual }
         val versionProperty: LeafProperty? = topLevelLeafProperties.firstOrNull { it.kind is PropertyKind.Version }
@@ -216,7 +217,23 @@ internal class EntityFactory(
     private fun createEnumClass(enumStrategy: EnumStrategy?, type: KSType): EnumClass? {
         val classDeclaration = type.declaration.accept(ClassDeclarationVisitor(), Unit)
         return if (classDeclaration != null && classDeclaration.classKind == ClassKind.ENUM_CLASS) {
-            EnumClass(type, enumStrategy ?: config.enumStrategy)
+            when (val strategy = enumStrategy ?: config.enumStrategy) {
+                EnumStrategy.Name -> EnumClass(type, EnumStrategy.Name.typeName, strategy)
+                EnumStrategy.Ordinal -> EnumClass(type, EnumStrategy.Ordinal.typeName, strategy)
+                is EnumStrategy.Property -> {
+                    val propertyName = strategy.propertyName
+                    val propertyType = classDeclaration.getDeclaredProperties()
+                        .filter { it.simpleName.asString() == propertyName }
+                        .map { it.type.resolve() }
+                        .firstOrNull()
+                        ?: report(
+                            "The property \"$propertyName\" is not found in the ${classDeclaration.qualifiedName?.asString()}. " +
+                                "KomapperEnum's hint property is incorrect.",
+                            strategy.annotation
+                        )
+                    EnumClass(type, propertyType.name, strategy)
+                }
+            }
         } else null
     }
 

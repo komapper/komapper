@@ -35,6 +35,7 @@ interface PostgreSqlSetting<DATABASE : Database> : Setting<DATABASE> {
         create table if not exists double_data(id integer not null primary key, value float8);
         create table if not exists enum_data(id integer not null primary key, value varchar(20));
         create table if not exists enum_ordinal_data(id integer not null primary key, value integer);
+        create table if not exists enum_property_data(id integer not null primary key, value integer);
         create table if not exists float_data(id integer not null primary key, value float);
         create table if not exists instant_data(id integer not null primary key, value timestamp with time zone);
         create table if not exists int_data(id integer not null primary key, value integer);

@@ -7,12 +7,15 @@ import integration.core.BigIntegerData
 import integration.core.BooleanData
 import integration.core.ByteArrayData
 import integration.core.ByteData
+import integration.core.ColorInfo
 import integration.core.Dbms
 import integration.core.DirectionInfo
 import integration.core.DoubleData
 import integration.core.EmbeddedEnumOrdinalData
+import integration.core.EmbeddedEnumPropertyData
 import integration.core.EnumData
 import integration.core.EnumOrdinalData
+import integration.core.EnumPropertyData
 import integration.core.FloatData
 import integration.core.InstantData
 import integration.core.IntData
@@ -47,8 +50,11 @@ import integration.core.byteArrayData
 import integration.core.byteData
 import integration.core.doubleData
 import integration.core.embeddedEnumOrdinalData
+import integration.core.embeddedEnumPropertyData
 import integration.core.enumData
 import integration.core.enumOrdinalData
+import integration.core.enumPropertyData
+import integration.core.enumclass.Color
 import integration.core.enumclass.Direction
 import integration.core.floatData
 import integration.core.instantData
@@ -385,6 +391,28 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
     }
 
     @Test
+    fun enum_property() {
+        val m = Meta.enumPropertyData
+        val data = EnumPropertyData(1, Color.BLUE)
+        db.runQuery { QueryDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        assertEquals(data, data2)
+    }
+
+    @Test
+    fun enum_property_null() {
+        val m = Meta.enumPropertyData
+        val data = EnumPropertyData(1, null)
+        db.runQuery { QueryDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        assertEquals(data, data2)
+    }
+
+    @Test
     fun embedded_enum_ordinal() {
         val m = Meta.embeddedEnumOrdinalData
         val data = EmbeddedEnumOrdinalData(1, DirectionInfo(Direction.EAST))
@@ -399,6 +427,28 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
     fun embedded_enum_ordinal_null() {
         val m = Meta.embeddedEnumOrdinalData
         val data = EmbeddedEnumOrdinalData(1, null)
+        db.runQuery { QueryDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        assertEquals(data, data2)
+    }
+
+    @Test
+    fun embedded_enum_property() {
+        val m = Meta.embeddedEnumPropertyData
+        val data = EmbeddedEnumPropertyData(1, ColorInfo(Color.BLUE))
+        db.runQuery { QueryDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        assertEquals(data, data2)
+    }
+
+    @Test
+    fun embedded_enum_property_null() {
+        val m = Meta.embeddedEnumPropertyData
+        val data = EmbeddedEnumPropertyData(1, null)
         db.runQuery { QueryDsl.insert(m).single(data) }
         val data2 = db.runQuery {
             QueryDsl.from(m).where { m.id eq 1 }.first()

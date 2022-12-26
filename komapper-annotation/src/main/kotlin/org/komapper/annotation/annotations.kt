@@ -47,11 +47,21 @@ annotation class KomapperVersion
 /**
  * Indicates that the annotated property is an enum class.
  *
+ * The hint property has a different meaning depending on the type.
+ * - When the type is [EnumType.NAME], it is ignored.
+ * - When the type is [EnumType.ORDINAL], it is ignored.
+ * - When the type is [EnumType.PROPERTY], it means a property name of the annotated enum class.
+ *
  * @property type the mapping strategy
+ * @property hint the hint for the mapping strategy
  */
 @Target(AnnotationTarget.VALUE_PARAMETER)
 @Retention(AnnotationRetention.SOURCE)
-annotation class KomapperEnum(val type: EnumType)
+annotation class KomapperEnum(val type: EnumType, val hint: String = HINT) {
+    companion object {
+        const val HINT: String = ""
+    }
+}
 
 /**
  * Indicates that the annotated property is an embedded value.

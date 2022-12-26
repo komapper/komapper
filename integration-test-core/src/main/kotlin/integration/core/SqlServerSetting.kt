@@ -35,6 +35,7 @@ interface SqlServerSetting<DATABASE : Database> : Setting<DATABASE> {
         create table double_data(id int not null primary key, value float);
         create table enum_data(id int not null primary key, value varchar(20));
         create table enum_ordinal_data(id int not null primary key, value int);
+        create table enum_property_data(id int not null primary key, value int);
         create table float_data(id int not null primary key, value real);
         create table instant_data(id int not null primary key, value datetimeoffset);
         create table int_data(id int not null primary key, value int);
