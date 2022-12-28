@@ -26,8 +26,8 @@ internal data class Config(
             val suffix = options.getOrDefault(SUFFIX, "")
             val enumStrategy = options.getOrDefault(ENUM_STRATEGY, "name").let {
                 when (it) {
-                    "name" -> EnumStrategy.NAME
-                    "ordinal" -> EnumStrategy.ORDINAL
+                    "name" -> EnumStrategy.Name
+                    "ordinal" -> EnumStrategy.Ordinal
                     else -> error("'$it' is illegal value as a $ENUM_STRATEGY option.")
                 }
             }

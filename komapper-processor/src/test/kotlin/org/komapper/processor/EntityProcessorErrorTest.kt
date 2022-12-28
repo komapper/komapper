@@ -1025,4 +1025,24 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
         assertTrue(result.messages.contains("The unit value of @KomapperEntityDef must be an object."))
     }
+
+    @Test
+    fun `The property is not found in the enum class`() {
+        val result = compile(
+            """
+            package test
+            import org.komapper.annotation.*
+            enum class Color { RED, BLUE }
+            @KomapperEntity
+            data class Dept(
+                @KomapperId
+                val id: Int,
+                @KomapperEnum(EnumType.PROPERTY, "unknown")
+                val color: Color
+            )
+            """
+        )
+        assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
+        assertTrue(result.messages.contains("The property \"unknown\" is not found in the test.Color. KomapperEnum's hint property is incorrect."))
+    }
 }

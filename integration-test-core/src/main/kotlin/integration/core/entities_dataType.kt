@@ -1,5 +1,6 @@
 package integration.core
 
+import integration.core.enumclass.Color
 import integration.core.enumclass.Direction
 import org.komapper.annotation.EnumType
 import org.komapper.annotation.KomapperAutoIncrement
@@ -73,8 +74,19 @@ data class EnumOrdinalData(
     @KomapperColumn(alwaysQuote = true) @KomapperEnum(EnumType.ORDINAL) val value: Direction?
 )
 
+@KomapperEntity
+@KomapperTable("enum_property_data")
+data class EnumPropertyData(
+    @KomapperId val id: Int,
+    @KomapperColumn(alwaysQuote = true) @KomapperEnum(EnumType.PROPERTY, hint = "value") val value: Color?
+)
+
 data class DirectionInfo(
     val direction: Direction
+)
+
+data class ColorInfo(
+    val color: Color
 )
 
 @KomapperEntity
@@ -85,6 +97,16 @@ data class EmbeddedEnumOrdinalData(
     @KomapperColumnOverride(name = "direction", KomapperColumn(name = "value", alwaysQuote = true))
     @KomapperEnumOverride(name = "direction", KomapperEnum(EnumType.ORDINAL))
     val value: DirectionInfo?
+)
+
+@KomapperEntity
+@KomapperTable("enum_property_data")
+data class EmbeddedEnumPropertyData(
+    @KomapperId val id: Int,
+    @KomapperEmbedded
+    @KomapperColumnOverride(name = "color", KomapperColumn(name = "value", alwaysQuote = true))
+    @KomapperEnumOverride(name = "color", KomapperEnum(EnumType.PROPERTY, "value"))
+    val value: ColorInfo?
 )
 
 @KomapperEntity

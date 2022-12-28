@@ -5,12 +5,17 @@ package org.komapper.annotation
  */
 enum class EnumType {
     /**
-     * The value of `Enum.name` is written to database.
+     * The value of `Enum.name` is mapped to database.
      */
     NAME,
 
     /**
-     * The value of `Enum.ordinal` is written to database.
+     * The value of `Enum.ordinal` is mapped to database.
      */
     ORDINAL,
+
+    /**
+     * The value of arbitrary Enum property is mapped to database.
+     */
+    PROPERTY
 }
