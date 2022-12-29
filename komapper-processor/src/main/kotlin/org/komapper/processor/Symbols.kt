@@ -35,4 +35,5 @@ internal object Symbols {
     const val EnumType_ORDINAL = "org.komapper.annotation.EnumType.ORDINAL"
     const val EnumType_PROPERTY = "org.komapper.annotation.EnumType.PROPERTY"
     const val DefaultUnit = "org.komapper.annotation.DefaultUnit"
+    const val EnumMappingException = "org.komapper.core.dsl.runner.EnumMappingException"
 }

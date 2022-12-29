@@ -31,8 +31,8 @@ internal object JdbcResultSetTransformers {
         transform: (A?) -> R
     ): (JdbcDataOperator, ResultSet) -> R =
         { dataOperator, rs ->
-            val mapper = JdbcPropertyMapper(dataOperator, rs)
-            val value = mapper.execute(expression)
+            val extractor = JdbcValueExtractor(dataOperator, rs)
+            val value = extractor.execute(expression)
             transform(value)
         }
 
@@ -53,9 +53,9 @@ internal object JdbcResultSetTransformers {
         transform: (Pair<A?, B?>) -> Pair<AR, BR>
     ): (JdbcDataOperator, ResultSet) -> Pair<AR, BR> =
         { dataOperator, rs ->
-            val mapper = JdbcPropertyMapper(dataOperator, rs)
-            val first = mapper.execute(expressions.first)
-            val second = mapper.execute(expressions.second)
+            val extractor = JdbcValueExtractor(dataOperator, rs)
+            val first = extractor.execute(expressions.first)
+            val second = extractor.execute(expressions.second)
             transform(first to second)
         }
 
@@ -77,17 +77,17 @@ internal object JdbcResultSetTransformers {
         transform: (Triple<A?, B?, C?>) -> Triple<AR, BR, CR>
     ): (JdbcDataOperator, ResultSet) -> Triple<AR, BR, CR> =
         { dataOperator, rs ->
-            val mapper = JdbcPropertyMapper(dataOperator, rs)
-            val first = mapper.execute(expressions.first)
-            val second = mapper.execute(expressions.second)
-            val third = mapper.execute(expressions.third)
+            val extractor = JdbcValueExtractor(dataOperator, rs)
+            val first = extractor.execute(expressions.first)
+            val second = extractor.execute(expressions.second)
+            val third = extractor.execute(expressions.third)
             transform(Triple(first, second, third))
         }
 
     fun multipleColumns(expressions: List<ColumnExpression<*, *>>): (JdbcDataOperator, ResultSet) -> Record =
         { dataOperator, rs ->
-            val mapper = JdbcPropertyMapper(dataOperator, rs)
-            val map = expressions.associateWith { mapper.execute(it) }
+            val extractor = JdbcValueExtractor(dataOperator, rs)
+            val map = expressions.associateWith { extractor.execute(it) }
             RecordImpl(map)
         }
 }

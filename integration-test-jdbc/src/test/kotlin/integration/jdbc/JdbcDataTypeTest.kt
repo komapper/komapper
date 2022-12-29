@@ -81,6 +81,9 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
 import org.komapper.core.dsl.query.first
+import org.komapper.core.dsl.runner.EnumMappingException
+import org.komapper.core.dsl.runner.PropertyMappingException
+import org.komapper.core.dsl.runner.ValueExtractingException
 import org.komapper.jdbc.JdbcDatabase
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -94,9 +97,11 @@ import java.util.UUID
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertNotEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 @ExtendWith(JdbcEnv::class)
 class JdbcDataTypeTest(val db: JdbcDatabase) {
@@ -369,6 +374,26 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
     }
 
     @Test
+    @Run(onlyIf = [Dbms.H2])
+    fun enum_mapping_error() {
+        val m = Meta.enumData
+        db.runQuery { QueryDsl.executeScript("insert into enum_data (id, \"value\") values (1, 'unknown')") }
+        val ex = assertFailsWith<PropertyMappingException> {
+            db.runQuery {
+                QueryDsl.from(m).where { m.id eq 1 }.first()
+            }
+            Unit
+        }
+        assertEquals("Failed to map a value to the property \"value\" of the entity class \"integration.core.EnumData\".", ex.message)
+        val cause = ex.cause
+        assertTrue(cause is ValueExtractingException)
+        assertEquals("Failed to extract a value from column. The column index is 1.", cause.message)
+        val cause2 = cause.cause
+        assertTrue(cause2 is EnumMappingException)
+        assertEquals("Failed to map the value \"unknown\" to the property \"name\" of the enum class \"integration.core.enumclass.Direction\".", cause2.message)
+    }
+
+    @Test
     fun enum_ordinal() {
         val m = Meta.enumOrdinalData
         val data = EnumOrdinalData(1, Direction.EAST)
@@ -391,6 +416,26 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
     }
 
     @Test
+    @Run(onlyIf = [Dbms.H2])
+    fun enum_ordinal_mapping_error() {
+        val m = Meta.enumOrdinalData
+        db.runQuery { QueryDsl.executeScript("insert into enum_ordinal_data (id, \"value\") values (1, 90)") }
+        val ex = assertFailsWith<PropertyMappingException> {
+            db.runQuery {
+                QueryDsl.from(m).where { m.id eq 1 }.first()
+            }
+            Unit
+        }
+        assertEquals("Failed to map a value to the property \"value\" of the entity class \"integration.core.EnumOrdinalData\".", ex.message)
+        val cause = ex.cause
+        assertTrue(cause is ValueExtractingException)
+        assertEquals("Failed to extract a value from column. The column index is 1.", cause.message)
+        val cause2 = cause.cause
+        assertTrue(cause2 is EnumMappingException)
+        assertEquals("Failed to map the value \"90\" to the property \"ordinal\" of the enum class \"integration.core.enumclass.Direction\".", cause2.message)
+    }
+
+    @Test
     fun enum_property() {
         val m = Meta.enumPropertyData
         val data = EnumPropertyData(1, Color.BLUE)
@@ -410,6 +455,26 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
             QueryDsl.from(m).where { m.id eq 1 }.first()
         }
         assertEquals(data, data2)
+    }
+
+    @Test
+    @Run(onlyIf = [Dbms.H2])
+    fun enum_property_mapping_error() {
+        val m = Meta.enumPropertyData
+        db.runQuery { QueryDsl.executeScript("insert into enum_property_data (id, \"value\") values (1, 90)") }
+        val ex = assertFailsWith<PropertyMappingException> {
+            db.runQuery {
+                QueryDsl.from(m).where { m.id eq 1 }.first()
+            }
+            Unit
+        }
+        assertEquals("Failed to map a value to the property \"value\" of the entity class \"integration.core.EnumPropertyData\".", ex.message)
+        val cause = ex.cause
+        assertTrue(cause is ValueExtractingException)
+        assertEquals("Failed to extract a value from column. The column index is 1.", cause.message)
+        val cause2 = cause.cause
+        assertTrue(cause2 is EnumMappingException)
+        assertEquals("Failed to map the value \"90\" to the property \"value\" of the enum class \"integration.core.enumclass.Color\".", cause2.message)
     }
 
     @Test
