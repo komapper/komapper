@@ -7,13 +7,13 @@ import org.komapper.jdbc.JdbcDataOperator
 import java.sql.ResultSet
 
 internal class JdbcEntityMapper(dataOperator: JdbcDataOperator, resultSet: ResultSet) {
-    private val propertyMapper = JdbcPropertyMapper(dataOperator, resultSet)
+    private val valueExtractor = JdbcValueExtractor(dataOperator, resultSet)
 
     fun <E : Any> execute(metamodel: EntityMetamodel<E, *, *>, forceMapping: Boolean = false): E? {
         val valueMap = mutableMapOf<PropertyMetamodel<*, *, *>, Any?>()
         for (p in metamodel.properties()) {
             val value = try {
-                propertyMapper.execute(p)
+                valueExtractor.execute(p)
             } catch (e: Exception) {
                 throw PropertyMappingException(metamodel.klass(), p.name, e)
             }

@@ -7,13 +7,13 @@ import org.komapper.core.dsl.runner.PropertyMappingException
 import org.komapper.r2dbc.R2dbcDataOperator
 
 internal class R2dbcEntityMapper(dataOperator: R2dbcDataOperator, row: Row) {
-    private val propertyMapper = R2dbcPropertyMapper(dataOperator, row)
+    private val valueExtractor = R2dbcValueExtractor(dataOperator, row)
 
     fun <E : Any> execute(metamodel: EntityMetamodel<E, *, *>, forceMapping: Boolean = false): E? {
         val valueMap = mutableMapOf<PropertyMetamodel<*, *, *>, Any?>()
         for (p in metamodel.properties()) {
             val value = try {
-                propertyMapper.execute(p)
+                valueExtractor.execute(p)
             } catch (e: Exception) {
                 throw PropertyMappingException(metamodel.klass(), p.name, e)
             }

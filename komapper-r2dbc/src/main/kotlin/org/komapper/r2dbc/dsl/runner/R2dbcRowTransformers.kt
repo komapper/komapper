@@ -30,8 +30,8 @@ internal object R2dbcRowTransformers {
         transform: (A?) -> R
     ): (R2dbcDataOperator, Row) -> R =
         { dataOperator, row ->
-            val mapper = R2dbcPropertyMapper(dataOperator, row)
-            val value = mapper.execute(expression)
+            val extractor = R2dbcValueExtractor(dataOperator, row)
+            val value = extractor.execute(expression)
             transform(value)
         }
 
@@ -52,9 +52,9 @@ internal object R2dbcRowTransformers {
         transform: (Pair<A?, B?>) -> Pair<AR, BR>
     ): (R2dbcDataOperator, Row) -> Pair<AR, BR> =
         { dataOperator, row ->
-            val mapper = R2dbcPropertyMapper(dataOperator, row)
-            val first = mapper.execute(expressions.first)
-            val second = mapper.execute(expressions.second)
+            val extractor = R2dbcValueExtractor(dataOperator, row)
+            val first = extractor.execute(expressions.first)
+            val second = extractor.execute(expressions.second)
             transform(first to second)
         }
 
@@ -76,16 +76,16 @@ internal object R2dbcRowTransformers {
         transform: (Triple<A?, B?, C?>) -> Triple<AR, BR, CR>
     ): (R2dbcDataOperator, Row) -> Triple<AR, BR, CR> =
         { dataOperator, row ->
-            val mapper = R2dbcPropertyMapper(dataOperator, row)
-            val first = mapper.execute(expressions.first)
-            val second = mapper.execute(expressions.second)
-            val third = mapper.execute(expressions.third)
+            val extractor = R2dbcValueExtractor(dataOperator, row)
+            val first = extractor.execute(expressions.first)
+            val second = extractor.execute(expressions.second)
+            val third = extractor.execute(expressions.third)
             transform(Triple(first, second, third))
         }
 
     fun multipleColumns(expressions: List<ColumnExpression<*, *>>): (R2dbcDataOperator, Row) -> Record = { dataOperator, row ->
-        val mapper = R2dbcPropertyMapper(dataOperator, row)
-        val map = expressions.associateWith { mapper.execute(it) }
+        val extractor = R2dbcValueExtractor(dataOperator, row)
+        val map = expressions.associateWith { extractor.execute(it) }
         RecordImpl(map)
     }
 }
