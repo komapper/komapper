@@ -12,6 +12,7 @@ import org.komapper.processor.Symbols.EntityDescriptor
 import org.komapper.processor.Symbols.EntityMetamodel
 import org.komapper.processor.Symbols.EntityMetamodelDeclaration
 import org.komapper.processor.Symbols.EntityMetamodelImplementor
+import org.komapper.processor.Symbols.EnumMappingException
 import org.komapper.processor.Symbols.IdContext
 import org.komapper.processor.Symbols.IdGenerator
 import org.komapper.processor.Symbols.Instant
@@ -150,10 +151,12 @@ internal class EntityMetamodelGenerator(
             val masking = "${p.column.masking}"
             val wrap = when (p.kotlinClass) {
                 is EnumClass -> {
-                    when (val strategy = p.kotlinClass.strategy) {
-                        EnumStrategy.Name -> "{ $exteriorTypeName.valueOf(it) }"
-                        EnumStrategy.Ordinal -> "{ $exteriorTypeName.values()[it] }"
-                        is EnumStrategy.Property -> "{ v -> $exteriorTypeName.values().first { it.${strategy.propertyName} == v }  }"
+                    val enumPropertyName = p.kotlinClass.strategy.propertyName
+                    fun throwException(value: String, cause: String) = "throw $EnumMappingException($exteriorClass, \"$enumPropertyName\", $value, $cause)"
+                    when (p.kotlinClass.strategy) {
+                        EnumStrategy.Name -> "{ try { $exteriorTypeName.valueOf(it) } catch (e: IllegalArgumentException) { ${throwException("it", "e")} } }"
+                        EnumStrategy.Ordinal -> "{ try { $exteriorTypeName.values()[it] } catch (e: ArrayIndexOutOfBoundsException) { ${throwException("it", "e")} } }"
+                        is EnumStrategy.Property -> "{ v -> $exteriorTypeName.values().firstOrNull { it.$enumPropertyName == v } ?: ${throwException("v", "null")} }"
                     }
                 }
                 is ValueClass -> "{ ${p.kotlinClass}(it) }"

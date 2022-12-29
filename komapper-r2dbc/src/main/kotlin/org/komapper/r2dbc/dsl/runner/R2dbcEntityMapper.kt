@@ -3,6 +3,7 @@ package org.komapper.r2dbc.dsl.runner
 import io.r2dbc.spi.Row
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.metamodel.PropertyMetamodel
+import org.komapper.core.dsl.runner.PropertyMappingException
 import org.komapper.r2dbc.R2dbcDataOperator
 
 internal class R2dbcEntityMapper(dataOperator: R2dbcDataOperator, row: Row) {
@@ -11,7 +12,11 @@ internal class R2dbcEntityMapper(dataOperator: R2dbcDataOperator, row: Row) {
     fun <E : Any> execute(metamodel: EntityMetamodel<E, *, *>, forceMapping: Boolean = false): E? {
         val valueMap = mutableMapOf<PropertyMetamodel<*, *, *>, Any?>()
         for (p in metamodel.properties()) {
-            val value = propertyMapper.execute(p)
+            val value = try {
+                propertyMapper.execute(p)
+            } catch (e: Exception) {
+                throw PropertyMappingException(metamodel.klass(), p.name, e)
+            }
             valueMap[p] = value
         }
         return if (forceMapping || valueMap.values.any { it != null }) {
