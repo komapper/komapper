@@ -44,7 +44,8 @@ object R2dbcDataTypeProviders {
 private object R2dbcUserDefinedDataTypeProvider : R2dbcDataTypeProvider {
     val dataTypes = R2dbcUserDefinedDataTypes.get().associateBy { it.klass }
     override fun <T : Any> get(klass: KClass<out T>): R2dbcDataType<T>? {
-        @Suppress("UNCHECKED_CAST") val dataType = dataTypes[klass] as R2dbcUserDefinedDataType<T>?
+        @Suppress("UNCHECKED_CAST")
+        val dataType = dataTypes[klass] as R2dbcUserDefinedDataType<T>?
         return if (dataType == null) null else R2dbcUserDefinedDataTypeAdapter(dataType)
     }
 }

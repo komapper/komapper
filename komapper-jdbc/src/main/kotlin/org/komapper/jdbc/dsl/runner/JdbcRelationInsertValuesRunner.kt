@@ -52,7 +52,7 @@ internal class JdbcRelationInsertValuesRunner<ENTITY : Any, ID : Any, META : Ent
     private fun insert(
         config: JdbcDatabaseConfig,
         idAssignment: Pair<PropertyMetamodel<ENTITY, ID, *>, Operand>? = null,
-        generatedColumn: String? = null
+        generatedColumn: String? = null,
     ): Pair<Long, List<Long>> {
         val statement = runner.buildStatement(config, idAssignment)
         val executor = JdbcExecutor(config, context.options, generatedColumn)

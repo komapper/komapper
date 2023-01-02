@@ -33,7 +33,7 @@ interface SelectQuery<ENTITY : Any, QUERY : SelectQuery<ENTITY, QUERY>> :
      */
     fun <ENTITY2 : Any, ID2 : Any, META2 : EntityMetamodel<ENTITY2, ID2, META2>> innerJoin(
         metamodel: META2,
-        on: OnDeclaration
+        on: OnDeclaration,
     ): QUERY = innerJoin(Relationship(metamodel, on))
 
     /**
@@ -43,7 +43,7 @@ interface SelectQuery<ENTITY : Any, QUERY : SelectQuery<ENTITY, QUERY>> :
      */
     fun <ENTITY2 : Any, ID2 : Any, META2 : EntityMetamodel<ENTITY2, ID2, META2>> leftJoin(
         metamodel: META2,
-        on: OnDeclaration
+        on: OnDeclaration,
     ): QUERY = leftJoin(Relationship(metamodel, on))
 
     /**
@@ -144,7 +144,7 @@ interface SelectQuery<ENTITY : Any, QUERY : SelectQuery<ENTITY, QUERY>> :
      * @return the query that returns a nullable scalar value
      */
     fun <T : Any, S : Any> select(
-        expression: ScalarExpression<T, S>
+        expression: ScalarExpression<T, S>,
     ): ScalarQuery<T?, T, S>
 
     /**
@@ -154,7 +154,7 @@ interface SelectQuery<ENTITY : Any, QUERY : SelectQuery<ENTITY, QUERY>> :
      * @return the query that returns a non-null scalar value
      */
     fun <T : Any, S : Any> selectNotNull(
-        expression: ScalarExpression<T, S>
+        expression: ScalarExpression<T, S>,
     ): ScalarQuery<T, T, S>
 
     /**
@@ -164,7 +164,7 @@ interface SelectQuery<ENTITY : Any, QUERY : SelectQuery<ENTITY, QUERY>> :
      * @return the query that returns a list of nullable values
      */
     fun <A : Any> select(
-        expression: ColumnExpression<A, *>
+        expression: ColumnExpression<A, *>,
     ): FlowSubquery<A?>
 
     /**
@@ -174,7 +174,7 @@ interface SelectQuery<ENTITY : Any, QUERY : SelectQuery<ENTITY, QUERY>> :
      * @return the query that returns a list of non-null values
      */
     fun <A : Any> selectNotNull(
-        expression: ColumnExpression<A, *>
+        expression: ColumnExpression<A, *>,
     ): FlowSubquery<A>
 
     /**
@@ -186,7 +186,7 @@ interface SelectQuery<ENTITY : Any, QUERY : SelectQuery<ENTITY, QUERY>> :
      */
     fun <A : Any, B : Any> select(
         expression1: ColumnExpression<A, *>,
-        expression2: ColumnExpression<B, *>
+        expression2: ColumnExpression<B, *>,
     ): FlowSubquery<Pair<A?, B?>>
 
     /**
@@ -198,7 +198,7 @@ interface SelectQuery<ENTITY : Any, QUERY : SelectQuery<ENTITY, QUERY>> :
      */
     fun <A : Any, B : Any> selectNotNull(
         expression1: ColumnExpression<A, *>,
-        expression2: ColumnExpression<B, *>
+        expression2: ColumnExpression<B, *>,
     ): FlowSubquery<Pair<A, B>>
 
     /**
@@ -212,7 +212,7 @@ interface SelectQuery<ENTITY : Any, QUERY : SelectQuery<ENTITY, QUERY>> :
     fun <A : Any, B : Any, C : Any> select(
         expression1: ColumnExpression<A, *>,
         expression2: ColumnExpression<B, *>,
-        expression3: ColumnExpression<C, *>
+        expression3: ColumnExpression<C, *>,
     ): FlowSubquery<Triple<A?, B?, C?>>
 
     /**
@@ -226,7 +226,7 @@ interface SelectQuery<ENTITY : Any, QUERY : SelectQuery<ENTITY, QUERY>> :
     fun <A : Any, B : Any, C : Any> selectNotNull(
         expression1: ColumnExpression<A, *>,
         expression2: ColumnExpression<B, *>,
-        expression3: ColumnExpression<C, *>
+        expression3: ColumnExpression<C, *>,
     ): FlowSubquery<Triple<A, B, C>>
 
     /**

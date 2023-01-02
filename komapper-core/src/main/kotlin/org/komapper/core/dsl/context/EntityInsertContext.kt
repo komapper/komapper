@@ -20,13 +20,13 @@ data class EntityInsertContext<ENTITY : Any, ID : Any, META : EntityMetamodel<EN
 
     fun asEntityUpsertContext(
         keys: List<PropertyMetamodel<ENTITY, *, *>>,
-        duplicateKeyType: DuplicateKeyType
+        duplicateKeyType: DuplicateKeyType,
     ): EntityUpsertContext<ENTITY, ID, META> {
         return EntityUpsertContext(
             insertContext = this,
             target = target,
             keys = keys.ifEmpty { target.idProperties() },
-            duplicateKeyType = duplicateKeyType
+            duplicateKeyType = duplicateKeyType,
         )
     }
 
@@ -34,7 +34,7 @@ data class EntityInsertContext<ENTITY : Any, ID : Any, META : EntityMetamodel<EN
         return RelationInsertValuesContext(
             target = target,
             values = declaration,
-            options = options
+            options = options,
         )
     }
 
@@ -42,7 +42,7 @@ data class EntityInsertContext<ENTITY : Any, ID : Any, META : EntityMetamodel<EN
         return RelationInsertSelectContext(
             target = target,
             select = subquery,
-            options = options.copy(disableSequenceAssignment = true)
+            options = options.copy(disableSequenceAssignment = true),
         )
     }
 }

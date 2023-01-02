@@ -6,8 +6,8 @@ class EnumMappingException(
     enumClass: KClass<out Enum<*>>,
     propertyName: String,
     value: Any,
-    cause: Exception?
+    cause: Exception?,
 ) : RuntimeException(
     "Failed to map the value \"$value\" to the property \"$propertyName\" of the enum class \"${enumClass.qualifiedName}\".",
-    cause
+    cause,
 )

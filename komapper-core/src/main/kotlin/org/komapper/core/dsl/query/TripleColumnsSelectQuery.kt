@@ -9,7 +9,7 @@ import org.komapper.core.dsl.visitor.QueryVisitor
 
 internal class TripleColumnsSelectQuery<A : Any, B : Any, C : Any>(
     override val context: SelectContext<*, *, *>,
-    private val expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>
+    private val expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
 ) : FlowSubquery<Triple<A?, B?, C?>> {
 
     private val support: FlowSubquerySupport<Triple<A?, B?, C?>> =

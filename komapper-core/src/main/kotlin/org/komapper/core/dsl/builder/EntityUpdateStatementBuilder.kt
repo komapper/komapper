@@ -12,7 +12,7 @@ import org.komapper.core.dsl.metamodel.EntityMetamodel
 class EntityUpdateStatementBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val dialect: BuilderDialect,
     private val context: EntityUpdateContext<ENTITY, ID, META>,
-    private val entity: ENTITY
+    private val entity: ENTITY,
 ) {
     private val buf = StatementBuffer()
     private val support = BuilderSupport(dialect, EmptyAliasManager, buf)

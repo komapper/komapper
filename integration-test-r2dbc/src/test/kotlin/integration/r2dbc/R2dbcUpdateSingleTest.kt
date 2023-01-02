@@ -48,9 +48,9 @@ class R2dbcUpdateSingleTest(private val db: R2dbcDatabase) {
             Address(
                 15,
                 "NY street",
-                2
+                2,
             ),
-            address2
+            address2,
         )
     }
 

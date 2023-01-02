@@ -13,7 +13,7 @@ import org.springframework.transaction.ReactiveTransactionManager
 
 class SpringR2dbcTransactionSession(
     transactionManager: ReactiveTransactionManager,
-    private val connectionFactory: ConnectionFactory
+    private val connectionFactory: ConnectionFactory,
 ) :
     R2dbcSession {
 

@@ -9,9 +9,11 @@ import org.komapper.annotation.KomapperVersion
 @KomapperEntity
 @KomapperTable(catalog = "catalog", schema = "schema", alwaysQuote = true)
 data class CatalogAndSchema(
-    @KomapperId @KomapperColumn(name = "address_id") val addressId: Int,
+    @KomapperId
+    @KomapperColumn(name = "address_id")
+    val addressId: Int,
     val street: String,
-    @KomapperVersion val version: Int
+    @KomapperVersion val version: Int,
 )
 
 @KomapperEntity
@@ -29,12 +31,16 @@ data class SchemaOnly(
 @KomapperEntity
 @KomapperTable("    ", alwaysQuote = true)
 data class BlankName(
-    @KomapperId @KomapperColumn("    ", alwaysQuote = true) val id: Int,
+    @KomapperId
+    @KomapperColumn("    ", alwaysQuote = true)
+    val id: Int,
 )
 
 @KomapperEntity
 @KomapperTable(alwaysQuote = true)
 data class Order(
-    @KomapperId @KomapperColumn(alwaysQuote = true) val orderId: Int,
-    @KomapperColumn(alwaysQuote = true) val value: String
+    @KomapperId
+    @KomapperColumn(alwaysQuote = true)
+    val orderId: Int,
+    @KomapperColumn(alwaysQuote = true) val value: String,
 )

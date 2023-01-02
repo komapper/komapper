@@ -139,7 +139,7 @@ interface Dialect {
     fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> getEntityInsertStatementBuilder(
         dialect: BuilderDialect,
         context: EntityInsertContext<ENTITY, ID, META>,
-        entities: List<ENTITY>
+        entities: List<ENTITY>,
     ): EntityInsertStatementBuilder<ENTITY, ID, META> {
         return DefaultEntityInsertStatementBuilder(dialect, context, entities)
     }
@@ -158,7 +158,7 @@ interface Dialect {
     fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> getEntityUpsertStatementBuilder(
         dialect: BuilderDialect,
         context: EntityUpsertContext<ENTITY, ID, META>,
-        entities: List<ENTITY>
+        entities: List<ENTITY>,
     ): EntityUpsertStatementBuilder<ENTITY>
 
     /**
@@ -304,7 +304,7 @@ object DryRunDialect : Dialect {
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> getEntityUpsertStatementBuilder(
         dialect: BuilderDialect,
         context: EntityUpsertContext<ENTITY, ID, META>,
-        entities: List<ENTITY>
+        entities: List<ENTITY>,
     ): EntityUpsertStatementBuilder<ENTITY> {
         throw UnsupportedOperationException()
     }

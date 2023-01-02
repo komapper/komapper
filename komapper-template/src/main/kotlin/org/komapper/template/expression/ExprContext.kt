@@ -5,5 +5,5 @@ import org.komapper.core.Value
 
 internal class ExprContext(
     val valueMap: Map<String, Value<*>>,
-    val builtinExtensions: TemplateBuiltinExtensions
+    val builtinExtensions: TemplateBuiltinExtensions,
 )

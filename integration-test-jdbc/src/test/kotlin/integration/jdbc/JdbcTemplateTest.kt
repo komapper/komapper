@@ -27,7 +27,7 @@ class JdbcTemplateTest(private val db: JdbcDatabase) {
         Address(
             row.getNotNull("address_id"),
             row.getNotNull("street"),
-            row.getNotNull("version")
+            row.getNotNull("version"),
         )
     }
 
@@ -35,7 +35,7 @@ class JdbcTemplateTest(private val db: JdbcDatabase) {
         Address(
             row.getNotNull(0),
             row.getNotNull(1),
-            row.getNotNull(2)
+            row.getNotNull(2),
         )
     }
 
@@ -57,7 +57,7 @@ class JdbcTemplateTest(private val db: JdbcDatabase) {
                 NullAddress(
                     row.get("a"),
                     row.get("b"),
-                    row.get("c")
+                    row.get("c"),
                 )
             }
         }
@@ -106,9 +106,9 @@ class JdbcTemplateTest(private val db: JdbcDatabase) {
             Address(
                 1,
                 "STREET 1",
-                1
+                1,
             ),
-            list[0]
+            list[0],
         )
     }
 
@@ -125,9 +125,9 @@ class JdbcTemplateTest(private val db: JdbcDatabase) {
             Address(
                 10,
                 "STREET 10",
-                1
+                1,
             ),
-            list[0]
+            list[0],
         )
     }
 
@@ -156,17 +156,17 @@ class JdbcTemplateTest(private val db: JdbcDatabase) {
             Address(
                 1,
                 "STREET 1",
-                1
+                1,
             ),
-            list[0]
+            list[0],
         )
         assertEquals(
             Address(
                 2,
                 "STREET 2",
-                1
+                1,
             ),
-            list[1]
+            list[1],
         )
     }
 
@@ -184,17 +184,17 @@ class JdbcTemplateTest(private val db: JdbcDatabase) {
             Address(
                 1,
                 "STREET 1",
-                1
+                1,
             ),
-            list[0]
+            list[0],
         )
         assertEquals(
             Address(
                 2,
                 "STREET 2",
-                1
+                1,
             ),
-            list[1]
+            list[1],
         )
     }
 
@@ -208,8 +208,8 @@ class JdbcTemplateTest(private val db: JdbcDatabase) {
                     "triples",
                     listOf(
                         Triple(1, "STREET 1", 1),
-                        Triple(2, "STREET 2", 1)
-                    )
+                        Triple(2, "STREET 2", 1),
+                    ),
                 ).select(asAddress)
         }
         assertEquals(2, list.size)
@@ -217,17 +217,17 @@ class JdbcTemplateTest(private val db: JdbcDatabase) {
             Address(
                 1,
                 "STREET 1",
-                1
+                1,
             ),
-            list[0]
+            list[0],
         )
         assertEquals(
             Address(
                 2,
                 "STREET 2",
-                1
+                1,
             ),
-            list[1]
+            list[1],
         )
     }
 
@@ -241,7 +241,8 @@ class JdbcTemplateTest(private val db: JdbcDatabase) {
                 order by address_id
                 """.trimIndent()
             QueryDsl.fromTemplate(sql).bind(
-                "street", "STREET 1"
+                "street",
+                "STREET 1",
             ).select(asAddress)
         }
         assertEquals((listOf(1) + (10..15)).toList(), list.map { it.addressId })
@@ -275,9 +276,9 @@ class JdbcTemplateTest(private val db: JdbcDatabase) {
             Address(
                 15,
                 "NY street",
-                1
+                1,
             ),
-            address
+            address,
         )
     }
 }

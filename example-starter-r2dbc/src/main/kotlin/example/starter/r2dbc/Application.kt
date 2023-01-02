@@ -23,7 +23,9 @@ data class Address(
 
 @KomapperEntityDef(Address::class)
 data class AddressDef(
-    @KomapperId @KomapperAutoIncrement @KomapperColumn(name = "ADDRESS_ID")
+    @KomapperId
+    @KomapperAutoIncrement
+    @KomapperColumn(name = "ADDRESS_ID")
     val id: Nothing,
     @KomapperVersion val version: Nothing,
     @KomapperCreatedAt val createdAt: Nothing,

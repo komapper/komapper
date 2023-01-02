@@ -19,7 +19,9 @@ import java.util.UUID
 @KomapperTable
 data class R2dbcPostgreSqlMapping(
     @KomapperId val id: Int,
-    @KomapperColumn(alwaysQuote = true) @Suppress("ArrayInDataClass") val array: Array<String>,
+    @KomapperColumn(alwaysQuote = true)
+    @Suppress("ArrayInDataClass")
+    val array: Array<String>,
     @KomapperColumn(alwaysQuote = true) val bigDecimal: BigDecimal,
     @KomapperColumn(alwaysQuote = true) val bigInteger: BigInteger,
     @KomapperColumn(alwaysQuote = true) val blob: Blob,

@@ -18,7 +18,7 @@ data class DeleteOptions(
             disableOptimisticLock = false,
             queryTimeoutSeconds = null,
             suppressLogging = false,
-            suppressOptimisticLockException = false
+            suppressOptimisticLockException = false,
         )
     }
 }

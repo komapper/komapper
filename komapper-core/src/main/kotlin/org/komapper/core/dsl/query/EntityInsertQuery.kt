@@ -23,7 +23,7 @@ interface EntityInsertQuery<T> : Query<T> {
 
 internal data class EntityInsertSingleQuery<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityInsertContext<ENTITY, ID, META>,
-    private val entity: ENTITY
+    private val entity: ENTITY,
 ) : EntityInsertQuery<ENTITY> {
     override fun options(configure: (InsertOptions) -> InsertOptions): EntityInsertQuery<ENTITY> {
         val newContext = context.copy(options = configure(context.options))
@@ -37,7 +37,7 @@ internal data class EntityInsertSingleQuery<ENTITY : Any, ID : Any, META : Entit
 
 internal data class EntityInsertMultipleQuery<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityInsertContext<ENTITY, ID, META>,
-    private val entities: List<ENTITY>
+    private val entities: List<ENTITY>,
 ) : EntityInsertQuery<List<ENTITY>> {
     override fun options(configure: (InsertOptions) -> InsertOptions): EntityInsertQuery<List<ENTITY>> {
         val newContext = context.copy(options = configure(context.options))

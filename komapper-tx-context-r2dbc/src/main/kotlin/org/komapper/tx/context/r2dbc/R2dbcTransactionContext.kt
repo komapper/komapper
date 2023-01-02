@@ -7,7 +7,7 @@ interface R2dbcTransactionContext {
 }
 
 private class DefaultR2dbcTransactionContext(
-    override val transaction: R2dbcTransaction
+    override val transaction: R2dbcTransaction,
 ) : R2dbcTransactionContext
 
 object EmptyR2dbcTransactionContext : R2dbcTransactionContext {

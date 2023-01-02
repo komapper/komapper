@@ -283,9 +283,9 @@ class R2dbcSelectWhereTest(private val db: R2dbcDatabase) {
         assertEquals(
             listOf(
                 Address(10, "STREET 10", 1),
-                Address(9, "STREET 9", 1)
+                Address(9, "STREET 9", 1),
             ),
-            list
+            list,
         )
     }
 
@@ -357,9 +357,9 @@ class R2dbcSelectWhereTest(private val db: R2dbcDatabase) {
         assertEquals(
             listOf(
                 Address(10, "STREET 10", 1),
-                Address(9, "STREET 9", 1)
+                Address(9, "STREET 9", 1),
             ),
-            list
+            list,
         )
     }
 
@@ -479,9 +479,9 @@ class R2dbcSelectWhereTest(private val db: R2dbcDatabase) {
         assertEquals(
             listOf(
                 Address(10, "STREET 10", 1),
-                Address(9, "STREET 9", 1)
+                Address(9, "STREET 9", 1),
             ),
-            list
+            list,
         )
     }
 
@@ -501,9 +501,9 @@ class R2dbcSelectWhereTest(private val db: R2dbcDatabase) {
         assertEquals(
             listOf(
                 Address(10, "STREET 10", 1),
-                Address(9, "STREET 9", 1)
+                Address(9, "STREET 9", 1),
             ),
-            list
+            list,
         )
     }
 

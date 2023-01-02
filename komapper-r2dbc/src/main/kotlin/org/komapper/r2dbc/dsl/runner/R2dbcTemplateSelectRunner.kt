@@ -10,7 +10,7 @@ import org.komapper.r2dbc.R2dbcDatabaseConfig
 internal class R2dbcTemplateSelectRunner<T, R>(
     context: TemplateSelectContext,
     transform: (Row) -> T,
-    private val collect: suspend (Flow<T>) -> R
+    private val collect: suspend (Flow<T>) -> R,
 ) : R2dbcRunner<R> {
 
     private val flowBuilder = R2dbcTemplateSelectFlowBuilder(context, transform)

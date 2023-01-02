@@ -12,7 +12,7 @@ interface OffsetLimitStatementBuilder {
 class OffsetLimitStatementBuilderImpl(
     @Suppress("unused") private val dialect: BuilderDialect,
     private val offset: Int,
-    private val limit: Int
+    private val limit: Int,
 ) : OffsetLimitStatementBuilder {
 
     private val buf = StatementBuffer()

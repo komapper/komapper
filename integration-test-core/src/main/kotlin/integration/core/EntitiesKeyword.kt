@@ -36,12 +36,15 @@ data class KeywordsMultipleId(
 
 @KomapperEntity
 data class KeywordsAutoIncrementId(
-    @KomapperId @KomapperAutoIncrement val `fun`: Int,
+    @KomapperId @KomapperAutoIncrement
+    val `fun`: Int,
     val `class`: String,
 )
 
 @KomapperEntity
 data class KeywordsSequenceId(
-    @KomapperId @KomapperSequence(name = "SEQ") val `fun`: Int,
+    @KomapperId
+    @KomapperSequence(name = "SEQ")
+    val `fun`: Int,
     val `class`: String,
 )

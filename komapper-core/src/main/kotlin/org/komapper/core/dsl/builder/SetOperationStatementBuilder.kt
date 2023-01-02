@@ -13,7 +13,7 @@ class SetOperationStatementBuilder(
     private val dialect: BuilderDialect,
     private val context: SetOperationContext,
     private val aliasManager: AliasManager,
-    private val projectionPredicate: (ColumnExpression<*, *>) -> Boolean = { true }
+    private val projectionPredicate: (ColumnExpression<*, *>) -> Boolean = { true },
 ) {
 
     private val buf = StatementBuffer()
@@ -32,13 +32,20 @@ class SetOperationStatementBuilder(
                 visitSubqueryContext(subqueryContext.left)
                 val operator = when (subqueryContext.kind) {
                     SetOperationKind.INTERSECT -> {
-                        if (dialect.supportsSetOperationIntersect()) "intersect"
-                        else throw UnsupportedOperationException("The dialect(driver=${dialect.driver}) does not support the \"intersect\" set operation.")
+                        if (dialect.supportsSetOperationIntersect()) {
+                            "intersect"
+                        } else {
+                            throw UnsupportedOperationException("The dialect(driver=${dialect.driver}) does not support the \"intersect\" set operation.")
+                        }
                     }
                     SetOperationKind.EXCEPT -> {
-                        if (dialect.supportsSetOperationExcept()) "except"
-                        else if (dialect.supportsSetOperationMinus()) "minus"
-                        else throw UnsupportedOperationException("The dialect(driver=${dialect.driver}) does not support the \"except\" and \"minus\" set operations.")
+                        if (dialect.supportsSetOperationExcept()) {
+                            "except"
+                        } else if (dialect.supportsSetOperationMinus()) {
+                            "minus"
+                        } else {
+                            throw UnsupportedOperationException("The dialect(driver=${dialect.driver}) does not support the \"except\" and \"minus\" set operations.")
+                        }
                     }
                     SetOperationKind.UNION -> "union"
                     SetOperationKind.UNION_ALL -> "union all"

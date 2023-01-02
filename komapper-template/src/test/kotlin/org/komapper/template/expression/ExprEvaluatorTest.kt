@@ -14,7 +14,7 @@ class ExprEvaluatorTest {
 
     private val evaluator = DefaultExprEvaluator(
         NoCacheExprNodeFactory(),
-        DefaultExprEnvironment(mapOf("global" to Value("hello")))
+        DefaultExprEnvironment(mapOf("global" to Value("hello"))),
     )
 
     data class Person(val id: Int, val name: String, val age: Int?)
@@ -214,7 +214,8 @@ class ExprEvaluatorTest {
         @Test
         fun `Cannot compare because the right operand is null`() {
             val ctx = ExprContext(
-                mapOf("a" to Value(null, Any::class)), extensions
+                mapOf("a" to Value(null, Any::class)),
+                extensions,
             )
             val exception = assertFailsWith<ExprException> {
                 evaluator
@@ -427,10 +428,10 @@ class ExprEvaluatorTest {
             val ctx = ExprContext(
                 mapOf(
                     "p" to Value(
-                        Person(1, "aaa", 20)
-                    )
+                        Person(1, "aaa", 20),
+                    ),
                 ),
-                extensions
+                extensions,
             )
             val result = evaluator.eval("p.name", ctx)
             assertEquals(Value("aaa"), result)
@@ -440,9 +441,9 @@ class ExprEvaluatorTest {
         fun property_nullable() {
             val ctx = ExprContext(
                 mapOf(
-                    "p" to Value(Person(1, "aaa", null))
+                    "p" to Value(Person(1, "aaa", null)),
                 ),
-                extensions
+                extensions,
             )
             val result = evaluator.eval("p.age", ctx)
             assertEquals(Value(null, Int::class), result)
@@ -451,7 +452,8 @@ class ExprEvaluatorTest {
         @Test
         fun safeCall() {
             val ctx = ExprContext(
-                mapOf("a" to Value(null, String::class)), extensions
+                mapOf("a" to Value(null, String::class)),
+                extensions,
             )
             val result = evaluator.eval("a?.length", ctx)
             assertEquals(Value(null, Int::class), result)
@@ -460,7 +462,8 @@ class ExprEvaluatorTest {
         @Test
         fun extensionProperty() {
             val ctx = ExprContext(
-                mapOf("a" to Value("abc")), extensions
+                mapOf("a" to Value("abc")),
+                extensions,
             )
             val result = evaluator.eval("a.lastIndex", ctx)
             assertEquals(Value(2), result)
@@ -469,7 +472,8 @@ class ExprEvaluatorTest {
         @Test
         fun `Failed to call the property`() {
             val ctx = ExprContext(
-                mapOf("a" to Value(null, String::class)), extensions
+                mapOf("a" to Value(null, String::class)),
+                extensions,
             )
             val exception = assertFailsWith<ExprException> {
                 evaluator.eval("a.length", ctx)
@@ -480,7 +484,8 @@ class ExprEvaluatorTest {
         @Test
         fun `The property is not found`() {
             val ctx = ExprContext(
-                mapOf("a" to Value("string")), extensions
+                mapOf("a" to Value("string")),
+                extensions,
             )
             val exception = assertFailsWith<ExprException> {
                 evaluator.eval("a.notFound", ctx)
@@ -494,7 +499,8 @@ class ExprEvaluatorTest {
         @Test
         fun function_1parameter() {
             val ctx = ExprContext(
-                mapOf("h" to Value(Hello()), "w" to Value("world")), extensions
+                mapOf("h" to Value(Hello()), "w" to Value("world")),
+                extensions,
             )
             val result = evaluator.eval("h.say(w)", ctx)
             assertEquals(Value("hello world"), result)
@@ -506,9 +512,9 @@ class ExprEvaluatorTest {
                 mapOf(
                     "h" to Value(Hello(), Hello::class),
                     "w" to Value("world", String::class),
-                    "m" to Value("good luck", String::class)
+                    "m" to Value("good luck", String::class),
                 ),
-                extensions
+                extensions,
             )
             val result = evaluator.eval("h.say(w, m)", ctx)
             assertEquals(Value("hello world, good luck"), result)
@@ -517,7 +523,8 @@ class ExprEvaluatorTest {
         @Test
         fun safeCall() {
             val ctx = ExprContext(
-                mapOf("a" to Value(null, String::class)), extensions
+                mapOf("a" to Value(null, String::class)),
+                extensions,
             )
             val result = evaluator.eval("a?.subSequence(0, 1)", ctx)
             assertEquals(Value(null, CharSequence::class), result)
@@ -526,7 +533,8 @@ class ExprEvaluatorTest {
         @Test
         fun extensionFunction() {
             val ctx = ExprContext(
-                mapOf("s" to Value("")), extensions
+                mapOf("s" to Value("")),
+                extensions,
             )
             val result = evaluator.eval("s.isBlank()", ctx)
             assertEquals(Value(true), result)
@@ -535,7 +543,8 @@ class ExprEvaluatorTest {
         @Test
         fun memberExtensionFunction() {
             val ctx = ExprContext(
-                mapOf("s" to Value("abc")), extensions
+                mapOf("s" to Value("abc")),
+                extensions,
             )
             val result = evaluator.eval("s.asPrefix()", ctx)
             assertEquals(Value("abc%", String::class), result)
@@ -544,7 +553,8 @@ class ExprEvaluatorTest {
         @Test
         fun `Call an extension function when the receiver is null`() {
             val ctx = ExprContext(
-                mapOf("s" to Value(null, Any::class)), extensions
+                mapOf("s" to Value(null, Any::class)),
+                extensions,
             )
             val result = evaluator.eval("s.isNullOrEmpty()", ctx)
             assertEquals(Value(true), result)
@@ -553,7 +563,8 @@ class ExprEvaluatorTest {
         @Test
         fun `Failed to call the function`() {
             val ctx = ExprContext(
-                mapOf("a" to Value(null, String::class)), extensions
+                mapOf("a" to Value(null, String::class)),
+                extensions,
             )
             val exception = assertFailsWith<ExprException> {
                 evaluator
@@ -565,7 +576,8 @@ class ExprEvaluatorTest {
         @Test
         fun `The function is not found`() {
             val ctx = ExprContext(
-                mapOf("a" to Value("string")), extensions
+                mapOf("a" to Value("string")),
+                extensions,
             )
             val exception = assertFailsWith<ExprException> {
                 evaluator
@@ -580,7 +592,8 @@ class ExprEvaluatorTest {
         @Test
         fun test() {
             val ctx = ExprContext(
-                mapOf("uInt" to Value(1u)), extensions
+                mapOf("uInt" to Value(1u)),
+                extensions,
             )
             val result = evaluator.eval("uInt", ctx)
             assertEquals(Value(1u), result)

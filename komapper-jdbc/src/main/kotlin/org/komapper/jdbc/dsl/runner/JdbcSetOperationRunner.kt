@@ -13,7 +13,7 @@ import java.sql.ResultSet
 internal class JdbcSetOperationRunner<T : Any?, R>(
     private val context: SetOperationContext,
     private val transform: (JdbcDataOperator, ResultSet) -> T,
-    private val collect: suspend (Flow<T>) -> R
+    private val collect: suspend (Flow<T>) -> R,
 ) : JdbcRunner<R> {
 
     private val runner: SetOperationRunner = SetOperationRunner(context)

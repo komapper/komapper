@@ -604,7 +604,7 @@ class R2dbcDataTypeTest(val db: R2dbcDatabase) {
         val m = Meta.localDateTimeData
         val data = LocalDateTimeData(
             1,
-            LocalDateTime.of(2019, 6, 1, 12, 11, 10)
+            LocalDateTime.of(2019, 6, 1, 12, 11, 10),
         )
         db.runQuery { QueryDsl.insert(m).single(data) }
         val data2 = db.runQuery {
@@ -629,7 +629,7 @@ class R2dbcDataTypeTest(val db: R2dbcDatabase) {
         val m = Meta.localDateData
         val data = LocalDateData(
             1,
-            LocalDate.of(2019, 6, 1)
+            LocalDate.of(2019, 6, 1),
         )
         db.runQuery { QueryDsl.insert(m).single(data) }
         val data2 = db.runQuery {

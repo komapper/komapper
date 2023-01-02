@@ -16,7 +16,7 @@ data class Statement(val parts: List<StatementPart>) {
 
         fun createBindVariable(
             @Suppress("UNUSED_PARAMETER") index: Int,
-            value: StatementPart.Value
+            value: StatementPart.Value,
         ): CharSequence {
             return value
         }
@@ -103,7 +103,7 @@ data class DryRunStatement internal constructor(
         return DryRunStatement(
             sql = concat(sql, other.sql),
             sqlWithArgs = concat(sqlWithArgs, other.sqlWithArgs),
-            args = args + other.args
+            args = args + other.args,
         )
     }
 

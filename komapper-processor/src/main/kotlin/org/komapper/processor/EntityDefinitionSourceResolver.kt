@@ -30,7 +30,7 @@ internal class SeparateDefinitionSourceResolver : EntityDefinitionSourceResolver
         val unitDeclaration = toUnitDeclaration(unit) {
             report(
                 "The unit value of @${KomapperEntityDef::class.simpleName} must be an object.",
-                defDeclaration
+                defDeclaration,
             )
         }
         val entityDeclaration = entity.declaration.accept(ClassDeclarationVisitor(), Unit)
@@ -42,7 +42,7 @@ internal class SeparateDefinitionSourceResolver : EntityDefinitionSourceResolver
             entityDeclaration = entityDeclaration,
             aliases = aliases.map { it.toString() },
             unitDeclaration = unitDeclaration,
-            stubAnnotation = stubAnnotation
+            stubAnnotation = stubAnnotation,
         )
     }
 }
@@ -60,7 +60,7 @@ internal class SelfDefinitionSourceResolver : EntityDefinitionSourceResolver {
         val unitDeclaration = toUnitDeclaration(unit) {
             report(
                 "The unit value of @${KomapperEntity::class.simpleName} must be an object.",
-                entityDeclaration
+                entityDeclaration,
             )
         }
         validateContainerClass(entityDeclaration, entityDeclaration)
@@ -70,7 +70,7 @@ internal class SelfDefinitionSourceResolver : EntityDefinitionSourceResolver {
             entityDeclaration = entityDeclaration,
             aliases = aliases.map { it.toString() },
             unitDeclaration = unitDeclaration,
-            stubAnnotation = stubAnnotation
+            stubAnnotation = stubAnnotation,
         )
     }
 }

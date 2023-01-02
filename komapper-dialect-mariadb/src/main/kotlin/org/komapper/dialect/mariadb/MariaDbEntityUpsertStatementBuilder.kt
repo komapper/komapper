@@ -20,7 +20,7 @@ import org.komapper.core.dsl.metamodel.getNonAutoIncrementProperties
 class MariaDbEntityUpsertStatementBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val dialect: BuilderDialect,
     private val context: EntityUpsertContext<ENTITY, ID, META>,
-    private val entities: List<ENTITY>
+    private val entities: List<ENTITY>,
 ) : EntityUpsertStatementBuilder<ENTITY> {
 
     private val target = context.target

@@ -13,13 +13,15 @@ interface JdbcTransactionConnection : Connection {
 private class JdbcTransactionConnectionImpl(
     private val connection: Connection,
     private val isolationLevelProperty: TransactionProperty.IsolationLevel?,
-    private val readOnlyProperty: TransactionProperty.ReadOnly?
+    private val readOnlyProperty: TransactionProperty.ReadOnly?,
 ) : Connection by connection, JdbcTransactionConnection {
 
     @Volatile
     private var isolation: Int = 0
+
     @Volatile
     private var readOnly: Boolean = false
+
     @Volatile
     private var autoCommit: Boolean = false
 
@@ -63,7 +65,7 @@ private class JdbcTransactionConnectionImpl(
 fun JdbcTransactionConnection(
     connection: Connection,
     isolationLevelProperty: TransactionProperty.IsolationLevel?,
-    readOnlyProperty: TransactionProperty.ReadOnly?
+    readOnlyProperty: TransactionProperty.ReadOnly?,
 ): JdbcTransactionConnection {
     return JdbcTransactionConnectionImpl(connection, isolationLevelProperty, readOnlyProperty)
 }

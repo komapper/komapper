@@ -15,7 +15,7 @@ data class ExecutionOptions(
     val fetchSize: Int? = null,
     val maxRows: Int? = null,
     val queryTimeoutSeconds: Int? = null,
-    val suppressLogging: Boolean? = null
+    val suppressLogging: Boolean? = null,
 ) {
     companion object {
         private const val DEFAULT_BATCH_SIZE = 10
@@ -31,7 +31,7 @@ data class ExecutionOptions(
             other.fetchSize ?: this.fetchSize,
             other.maxRows ?: this.maxRows,
             other.queryTimeoutSeconds ?: this.queryTimeoutSeconds,
-            other.suppressLogging ?: this.suppressLogging
+            other.suppressLogging ?: this.suppressLogging,
         )
     }
 }

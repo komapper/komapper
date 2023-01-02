@@ -98,9 +98,9 @@ class JdbcValueClassTest(val db: JdbcDatabase) {
             VAddress(
                 IntId(15),
                 Street("NY street"),
-                Version(2)
+                Version(2),
             ),
-            address2
+            address2,
         )
     }
 
@@ -254,8 +254,8 @@ class JdbcValueClassTest(val db: JdbcDatabase) {
         val caseExpression = case(
             When(
                 { a.street eq Street("STREET 2"); a.addressId greater IntId(1) },
-                concat(a.street, Street("!!!"))
-            )
+                concat(a.street, Street("!!!")),
+            ),
         ) { a.street }
         val list = db.runQuery {
             QueryDsl.from(a).where { a.addressId inList listOf(IntId(1), IntId(2), IntId(3)) }
@@ -266,9 +266,9 @@ class JdbcValueClassTest(val db: JdbcDatabase) {
             listOf(
                 Street("STREET 1") to Street("STREET 1"),
                 Street("STREET 2") to Street("STREET 2!!!"),
-                Street("STREET 3") to Street("STREET 3")
+                Street("STREET 3") to Street("STREET 3"),
             ),
-            list
+            list,
         )
     }
 
@@ -281,7 +281,7 @@ class JdbcValueClassTest(val db: JdbcDatabase) {
                     VAddress(
                         IntId(row.getNotNull("address_id")),
                         Street(row.getNotNull("street")),
-                        Version(row.getNotNull("version"))
+                        Version(row.getNotNull("version")),
                     )
                 }
         }
@@ -299,7 +299,7 @@ class JdbcValueClassTest(val db: JdbcDatabase) {
                     VAddress(
                         IntId(row.getNotNull("address_id")),
                         Street(row.getNotNull("street")),
-                        Version(row.getNotNull("version"))
+                        Version(row.getNotNull("version")),
                     )
                 }
         }

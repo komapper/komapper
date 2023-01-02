@@ -12,7 +12,7 @@ import org.komapper.core.dsl.query.Row
 interface FlowQueryVisitor<VISIT_RESULT> {
 
     fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> relationSelectQuery(
-        context: SelectContext<ENTITY, ID, META>
+        context: SelectContext<ENTITY, ID, META>,
     ): VISIT_RESULT
 
     fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> setOperationQuery(
@@ -84,16 +84,16 @@ interface FlowQueryVisitor<VISIT_RESULT> {
 
     fun multipleColumnsSelectQuery(
         context: SelectContext<*, *, *>,
-        expressions: List<ColumnExpression<*, *>>
+        expressions: List<ColumnExpression<*, *>>,
     ): VISIT_RESULT
 
     fun multipleColumnsSetOperationQuery(
         context: SetOperationContext,
-        expressions: List<ColumnExpression<*, *>>
+        expressions: List<ColumnExpression<*, *>>,
     ): VISIT_RESULT
 
     fun <T> templateSelectQuery(
         context: TemplateSelectContext,
-        transform: (Row) -> T
+        transform: (Row) -> T,
     ): VISIT_RESULT
 }

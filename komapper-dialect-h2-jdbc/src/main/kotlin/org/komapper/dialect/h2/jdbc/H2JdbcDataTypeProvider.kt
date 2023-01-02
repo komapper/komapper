@@ -59,7 +59,7 @@ class H2JdbcDataTypeProvider(next: JdbcDataTypeProvider) :
             JdbcUByteType("smallint"),
             JdbcUIntType("bigint"),
             JdbcUShortType("integer"),
-            H2JdbcUUIDType
+            H2JdbcUUIDType,
         )
     }
 }

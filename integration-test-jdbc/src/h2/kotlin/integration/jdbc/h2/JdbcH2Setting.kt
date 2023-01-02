@@ -8,6 +8,6 @@ import org.komapper.jdbc.JdbcDatabase
 class JdbcH2Setting(private val driver: String, url: String) : H2Setting<JdbcDatabase> {
     override val database: JdbcDatabase = JdbcDatabase(
         url,
-        executionOptions = ExecutionOptions(batchSize = 2)
+        executionOptions = ExecutionOptions(batchSize = 2),
     )
 }

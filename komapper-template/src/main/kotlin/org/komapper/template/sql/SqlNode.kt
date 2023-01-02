@@ -22,49 +22,49 @@ internal sealed class SqlNode {
         data class Select(
             override val location: Loc,
             override val keyword: String,
-            override val nodeList: List<SqlNode>
+            override val nodeList: List<SqlNode>,
         ) : Clause()
 
         data class From(
             override val location: Loc,
             override val keyword: String,
-            override val nodeList: List<SqlNode>
+            override val nodeList: List<SqlNode>,
         ) : Clause()
 
         data class Where(
             override val location: Loc,
             override val keyword: String,
-            override val nodeList: List<SqlNode>
+            override val nodeList: List<SqlNode>,
         ) : Clause()
 
         data class Having(
             override val location: Loc,
             override val keyword: String,
-            override val nodeList: List<SqlNode>
+            override val nodeList: List<SqlNode>,
         ) : Clause()
 
         data class GroupBy(
             override val location: Loc,
             override val keyword: String,
-            override val nodeList: List<SqlNode>
+            override val nodeList: List<SqlNode>,
         ) : Clause()
 
         data class OrderBy(
             override val location: Loc,
             override val keyword: String,
-            override val nodeList: List<SqlNode>
+            override val nodeList: List<SqlNode>,
         ) : Clause()
 
         data class ForUpdate(
             override val location: Loc,
             override val keyword: String,
-            override val nodeList: List<SqlNode>
+            override val nodeList: List<SqlNode>,
         ) : Clause()
 
         data class Option(
             override val location: Loc,
             override val keyword: String,
-            override val nodeList: List<SqlNode>
+            override val nodeList: List<SqlNode>,
         ) : Clause()
     }
 
@@ -77,13 +77,13 @@ internal sealed class SqlNode {
         data class And(
             override val location: Loc,
             override val keyword: String,
-            override val nodeList: List<SqlNode>
+            override val nodeList: List<SqlNode>,
         ) : BiLogicalOp()
 
         data class Or(
             override val location: Loc,
             override val keyword: String,
-            override val nodeList: List<SqlNode>
+            override val nodeList: List<SqlNode>,
         ) : BiLogicalOp()
     }
 
@@ -95,7 +95,7 @@ internal sealed class SqlNode {
         val ifDirective: IfDirective,
         val elseifDirectives: List<ElseifDirective>,
         val elseDirective: ElseDirective?,
-        val endDirective: EndDirective
+        val endDirective: EndDirective,
     ) : SqlNode() {
         override fun toText(): String =
             ifDirective.toText() + elseifDirectives.toText() + (elseDirective?.toText() ?: "") + endDirective.toText()
@@ -103,7 +103,7 @@ internal sealed class SqlNode {
 
     data class ForBlock(
         val forDirective: ForDirective,
-        val endDirective: EndDirective
+        val endDirective: EndDirective,
     ) : SqlNode() {
         override fun toText(): String = forDirective.toText() + endDirective.toText()
     }
@@ -112,7 +112,7 @@ internal sealed class SqlNode {
         val location: Loc,
         val token: String,
         val expression: String,
-        val nodeList: List<SqlNode>
+        val nodeList: List<SqlNode>,
     ) : SqlNode() {
         override fun toText(): String = token + nodeList.toText()
     }
@@ -121,7 +121,7 @@ internal sealed class SqlNode {
         val location: Loc,
         val token: String,
         val expression: String,
-        val nodeList: List<SqlNode>
+        val nodeList: List<SqlNode>,
     ) : SqlNode() {
         override fun toText(): String = token + nodeList.toText()
     }
@@ -139,7 +139,7 @@ internal sealed class SqlNode {
         val token: String,
         val identifier: String,
         val expression: String,
-        val nodeList: List<SqlNode>
+        val nodeList: List<SqlNode>,
     ) : SqlNode() {
         override fun toText(): String = token + nodeList.toText()
     }
@@ -149,7 +149,7 @@ internal sealed class SqlNode {
         val token: String,
         val expression: String,
         val node: SqlNode,
-        val nodeList: List<SqlNode>
+        val nodeList: List<SqlNode>,
     ) : SqlNode() {
         override fun toText(): String = token + node.toText() + nodeList.toText()
     }
@@ -163,7 +163,7 @@ internal sealed class SqlNode {
         val token: String,
         val expression: String,
         val node: SqlNode,
-        val nodeList: List<SqlNode>
+        val nodeList: List<SqlNode>,
     ) : SqlNode() {
         override fun toText(): String = token + node.toText() + nodeList.toText()
     }
@@ -184,12 +184,12 @@ internal sealed class SqlNode {
                     "\u001D",
                     "\u001E",
                     "\u001F",
-                    "\u0020"
+                    "\u0020",
                 ).associateWith(Token::Space)
 
                 fun of(token: String): Space = MAP.getOrElse(token) {
                     Space(
-                        token
+                        token,
                     )
                 }
             }
@@ -202,7 +202,7 @@ internal sealed class SqlNode {
 
                 fun of(token: String): Other = MAP.getOrElse(token) {
                     Other(
-                        token
+                        token,
                     )
                 }
             }

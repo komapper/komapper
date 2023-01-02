@@ -282,9 +282,9 @@ class JdbcSelectWhereTest(private val db: JdbcDatabase) {
         assertEquals(
             listOf(
                 Address(10, "STREET 10", 1),
-                Address(9, "STREET 9", 1)
+                Address(9, "STREET 9", 1),
             ),
-            list
+            list,
         )
     }
 
@@ -389,9 +389,9 @@ class JdbcSelectWhereTest(private val db: JdbcDatabase) {
         assertEquals(
             listOf(
                 Address(10, "STREET 10", 1),
-                Address(9, "STREET 9", 1)
+                Address(9, "STREET 9", 1),
             ),
-            list
+            list,
         )
     }
 
@@ -589,9 +589,9 @@ class JdbcSelectWhereTest(private val db: JdbcDatabase) {
         assertEquals(
             listOf(
                 Address(10, "STREET 10", 1),
-                Address(9, "STREET 9", 1)
+                Address(9, "STREET 9", 1),
             ),
-            list
+            list,
         )
     }
 
@@ -611,9 +611,9 @@ class JdbcSelectWhereTest(private val db: JdbcDatabase) {
         assertEquals(
             listOf(
                 Address(10, "STREET 10", 1),
-                Address(9, "STREET 9", 1)
+                Address(9, "STREET 9", 1),
             ),
-            list
+            list,
         )
     }
 

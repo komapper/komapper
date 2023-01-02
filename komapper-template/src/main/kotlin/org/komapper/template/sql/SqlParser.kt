@@ -39,7 +39,7 @@ import kotlin.reflect.full.isSubclassOf
 
 internal class SqlParser constructor(
     val sql: String,
-    private val tokenizer: SqlTokenizer = SqlTokenizer(sql)
+    private val tokenizer: SqlTokenizer = SqlTokenizer(sql),
 ) {
 
     private val reducers: LinkedList<SqlReducer> = LinkedList()

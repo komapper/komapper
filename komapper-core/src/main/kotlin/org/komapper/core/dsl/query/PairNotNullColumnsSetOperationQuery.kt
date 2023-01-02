@@ -11,7 +11,7 @@ import org.komapper.core.dsl.visitor.QueryVisitor
 
 internal data class PairNotNullColumnsSetOperationQuery<A : Any, B : Any>(
     override val context: SetOperationContext,
-    private val expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>
+    private val expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
 ) : FlowSetOperationQuery<Pair<A, B>> {
 
     private val support: SetOperationQuerySupport<Pair<A, B>> = SetOperationQuerySupport(context)

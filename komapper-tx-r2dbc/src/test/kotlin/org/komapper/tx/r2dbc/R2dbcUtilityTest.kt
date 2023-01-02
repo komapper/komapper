@@ -15,7 +15,7 @@ class R2dbcUtilityTest {
         val property = TransactionProperty.IsolationLevel.READ_COMMITTED
         assertEquals(
             TransactionProperty.IsolationLevel.READ_COMMITTED,
-            property[TransactionProperty.IsolationLevel]
+            property[TransactionProperty.IsolationLevel],
         )
         val definition = property.asDefinition()
         assertEquals(IsolationLevel.READ_COMMITTED, definition.getAttribute(TransactionDefinition.ISOLATION_LEVEL))
@@ -26,7 +26,7 @@ class R2dbcUtilityTest {
         val property = defineTransactionProperty(TransactionDefinition.ISOLATION_LEVEL, IsolationLevel.READ_COMMITTED)
         assertEquals(
             TransactionProperty.IsolationLevel.READ_COMMITTED,
-            property[TransactionProperty.IsolationLevel]
+            property[TransactionProperty.IsolationLevel],
         )
         val definition = property.asDefinition()
         assertEquals(IsolationLevel.READ_COMMITTED, definition.getAttribute(TransactionDefinition.ISOLATION_LEVEL))
@@ -39,7 +39,7 @@ class R2dbcUtilityTest {
         val prop = prop1 + prop2
         assertEquals(
             TransactionProperty.IsolationLevel.SERIALIZABLE,
-            prop[TransactionProperty.IsolationLevel]
+            prop[TransactionProperty.IsolationLevel],
         )
     }
 

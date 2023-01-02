@@ -26,7 +26,7 @@ class BuilderSupport(
     private val dialect: BuilderDialect,
     private val aliasManager: AliasManager,
     private val buf: StatementBuffer,
-    private val escapeSequence: String? = null
+    private val escapeSequence: String? = null,
 ) {
     private val operation = CriterionOperation()
 
@@ -211,7 +211,7 @@ class BuilderSupport(
 
     fun buildSubqueryStatement(
         expression: SubqueryExpression<*>,
-        projectionPredicate: (ColumnExpression<*, *>) -> Boolean = { true }
+        projectionPredicate: (ColumnExpression<*, *>) -> Boolean = { true },
     ): Statement {
         return when (val context = expression.context) {
             is SelectContext<*, *, *> -> {
@@ -404,7 +404,7 @@ class BuilderSupport(
         fun inList2(
             left: Pair<Operand, Operand>,
             right: List<Pair<Operand, Operand>>,
-            not: Boolean = false
+            not: Boolean = false,
         ) {
             if (dialect.supportsMultipleColumnsInInPredicate()) {
                 buf.append("(")

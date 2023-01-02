@@ -14,7 +14,7 @@ interface SchemaStatementBuilder {
 }
 
 abstract class AbstractSchemaStatementBuilder(
-    protected val dialect: BuilderDialect
+    protected val dialect: BuilderDialect,
 ) : SchemaStatementBuilder {
 
     override fun create(metamodels: List<EntityMetamodel<*, *, *>>): List<Statement> {

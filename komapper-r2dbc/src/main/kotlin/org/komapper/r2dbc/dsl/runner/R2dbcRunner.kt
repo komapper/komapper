@@ -10,7 +10,7 @@ sealed interface R2dbcRunner<T> : Runner {
 
     data class AndThen<LEFT, RIGHT>(
         private val left: R2dbcRunner<LEFT>,
-        private val right: R2dbcRunner<RIGHT>
+        private val right: R2dbcRunner<RIGHT>,
     ) : R2dbcRunner<RIGHT> {
 
         private val runner: Runner.AndThen = Runner.AndThen(left, right)
@@ -32,7 +32,7 @@ sealed interface R2dbcRunner<T> : Runner {
 
     data class Map<T, S>(
         private val runner: R2dbcRunner<T>,
-        private val transform: (T) -> S
+        private val transform: (T) -> S,
     ) : R2dbcRunner<S> {
 
         private val _runner: Runner.Map = Runner.Map(runner)
@@ -53,7 +53,7 @@ sealed interface R2dbcRunner<T> : Runner {
 
     data class Zip<T, S>(
         private val left: R2dbcRunner<T>,
-        private val right: R2dbcRunner<S>
+        private val right: R2dbcRunner<S>,
     ) : R2dbcRunner<Pair<T, S>> {
 
         private val runner: Runner.Zip = Runner.Zip(left, right)
@@ -74,7 +74,7 @@ sealed interface R2dbcRunner<T> : Runner {
     }
     data class FlatMap<T, S>(
         val runner: R2dbcRunner<T>,
-        val transform: (T) -> R2dbcRunner<S>
+        val transform: (T) -> R2dbcRunner<S>,
     ) : R2dbcRunner<S> {
 
         private val _runner: Runner.FlatMap = Runner.FlatMap(runner)
@@ -95,7 +95,7 @@ sealed interface R2dbcRunner<T> : Runner {
 
     data class FlatZip<T, S>(
         val runner: R2dbcRunner<T>,
-        val transform: (T) -> R2dbcRunner<S>
+        val transform: (T) -> R2dbcRunner<S>,
     ) : R2dbcRunner<Pair<T, S>> {
 
         private val _runner: Runner.FlatZip = Runner.FlatZip(runner)

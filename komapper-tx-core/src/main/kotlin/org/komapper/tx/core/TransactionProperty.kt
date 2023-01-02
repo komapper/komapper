@@ -50,7 +50,7 @@ interface TransactionProperty {
         READ_UNCOMMITTED(Connection.TRANSACTION_READ_UNCOMMITTED),
         READ_COMMITTED(Connection.TRANSACTION_READ_COMMITTED),
         REPEATABLE_READ(Connection.TRANSACTION_REPEATABLE_READ),
-        SERIALIZABLE(Connection.TRANSACTION_SERIALIZABLE);
+        SERIALIZABLE(Connection.TRANSACTION_SERIALIZABLE), ;
 
         companion object Key : TransactionProperty.Key<IsolationLevel>
 
@@ -94,7 +94,7 @@ interface TransactionProperty {
 
 private data class CombinedTransactionProperty(
     val left: TransactionProperty,
-    val element: TransactionProperty.Element<*>
+    val element: TransactionProperty.Element<*>,
 ) : TransactionProperty {
 
     override fun <E : TransactionProperty.Element<*>> get(key: TransactionProperty.Key<E>): E? {

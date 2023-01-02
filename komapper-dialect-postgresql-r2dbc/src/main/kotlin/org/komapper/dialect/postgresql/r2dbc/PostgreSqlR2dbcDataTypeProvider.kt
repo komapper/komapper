@@ -53,7 +53,7 @@ class PostgreSqlR2dbcDataTypeProvider(private val next: R2dbcDataTypeProvider) :
             R2dbcUShortType("integer"),
             PostgreSqlR2dbcIntervalType,
             PostgreSqlR2dbcJsonType,
-            PostgreSqlR2dbcUUIDType
+            PostgreSqlR2dbcUUIDType,
         )
     }
 

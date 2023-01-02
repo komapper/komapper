@@ -35,7 +35,7 @@ interface R2dbcTransactionManagement {
 
 private class R2dbcTransactionManagementImpl(
     private val connectionFactory: ConnectionFactory,
-    private val loggerFacade: LoggerFacade
+    private val loggerFacade: LoggerFacade,
 ) : R2dbcTransactionManagement {
 
     override suspend fun getConnection(tx: R2dbcTransaction?): Connection {
@@ -58,7 +58,7 @@ private class R2dbcTransactionManagementImpl(
 
     override suspend fun begin(
         currentTx: R2dbcTransaction?,
-        transactionProperty: TransactionProperty
+        transactionProperty: TransactionProperty,
     ): R2dbcTransaction {
         if (currentTx != null) {
             rollbackInternal(currentTx)

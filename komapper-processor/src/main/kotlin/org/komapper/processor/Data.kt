@@ -22,7 +22,7 @@ internal data class EntityDefinitionSource(
 internal data class EntityDef(
     val definitionSource: EntityDefinitionSource,
     val table: Table,
-    val properties: List<PropertyDef>
+    val properties: List<PropertyDef>,
 )
 
 internal sealed interface PropertyDef {
@@ -36,13 +36,13 @@ internal data class LeafPropertyDef(
     override val declaration: KSPropertyDeclaration,
     override val kind: PropertyKind?,
     val column: Column,
-    val enumStrategy: EnumStrategy?
+    val enumStrategy: EnumStrategy?,
 ) : PropertyDef
 
 internal data class CompositePropertyDef(
     override val parameter: KSValueParameter,
     override val declaration: KSPropertyDeclaration,
-    override val kind: PropertyKind
+    override val kind: PropertyKind,
 ) : PropertyDef
 
 internal data class Entity(
@@ -83,7 +83,7 @@ internal data class LeafProperty(
     val column: Column,
     val kotlinClass: KotlinClass,
     val literalTag: String,
-    val parent: KSValueParameter? = null
+    val parent: KSValueParameter? = null,
 ) : Property {
     val typeName get() = kotlinClass.exteriorTypeName
     val exteriorTypeName get() = kotlinClass.exteriorTypeName
@@ -147,7 +147,9 @@ internal data class PlainClass(
                 val nonNullableType =
                     if (type.isMarkedNullable) {
                         type.makeNotNullable()
-                    } else type
+                    } else {
+                        type
+                    }
                 nonNullableType.name
             } else {
                 super.exteriorTypeName
@@ -173,7 +175,7 @@ sealed interface EnumStrategy {
 
     data class Property(
         override val propertyName: String,
-        val annotation: KSAnnotation
+        val annotation: KSAnnotation,
     ) : EnumStrategy
 }
 
@@ -207,7 +209,7 @@ internal sealed class IdKind {
     abstract val annotation: KSAnnotation
 
     data class AutoIncrement(
-        override val annotation: KSAnnotation
+        override val annotation: KSAnnotation,
     ) : IdKind()
 
     data class Sequence(
@@ -217,7 +219,7 @@ internal sealed class IdKind {
         val incrementBy: Any,
         val catalog: String,
         val schema: String,
-        val alwaysQuote: Boolean
+        val alwaysQuote: Boolean,
     ) :
         IdKind()
 }
@@ -226,11 +228,11 @@ internal data class Table(
     val name: String,
     val catalog: String,
     val schema: String,
-    val alwaysQuote: Boolean
+    val alwaysQuote: Boolean,
 )
 
 internal data class Column(
     val name: String,
     val alwaysQuote: Boolean,
-    val masking: Boolean
+    val masking: Boolean,
 )

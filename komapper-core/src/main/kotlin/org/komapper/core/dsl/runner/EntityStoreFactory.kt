@@ -10,7 +10,7 @@ class EntityStoreFactory {
 
     fun create(
         metamodels: Set<EntityMetamodel<*, *, *>>,
-        rows: List<Map<EntityMetamodel<*, *, *>, Any>>
+        rows: List<Map<EntityMetamodel<*, *, *>, Any>>,
     ): EntityStore {
         val entitySets: Map<EntityMetamodel<*, *, *>, MutableSet<Any>> =
             metamodels.associateWith { mutableSetOf() }

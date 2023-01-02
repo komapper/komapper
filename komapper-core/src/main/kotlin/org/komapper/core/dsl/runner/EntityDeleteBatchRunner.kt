@@ -8,7 +8,7 @@ import org.komapper.core.dsl.metamodel.EntityMetamodel
 
 class EntityDeleteBatchRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityDeleteContext<ENTITY, ID, META>,
-    private val entities: List<ENTITY>
+    private val entities: List<ENTITY>,
 ) :
     Runner {
 

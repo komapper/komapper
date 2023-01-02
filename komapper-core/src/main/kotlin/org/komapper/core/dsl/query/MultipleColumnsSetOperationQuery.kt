@@ -11,7 +11,7 @@ import org.komapper.core.dsl.visitor.QueryVisitor
 
 internal data class MultipleColumnsSetOperationQuery(
     override val context: SetOperationContext,
-    private val expressions: List<ColumnExpression<*, *>>
+    private val expressions: List<ColumnExpression<*, *>>,
 ) : FlowSetOperationQuery<Record> {
 
     private val support: SetOperationQuerySupport<Record> = SetOperationQuerySupport(context)

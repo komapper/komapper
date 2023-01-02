@@ -24,13 +24,13 @@ class R2dbcMariaDbSetting(private val driver: String, private val url: String) :
                 .option(ConnectionFactoryOptions.DRIVER, "pool")
                 .option(ConnectionFactoryOptions.PROTOCOL, driver)
                 .option(Option.valueOf("initialSize"), 2)
-                .build()
+                .build(),
         )
     }
 
     override val database: R2dbcDatabase
         get() = R2dbcDatabase(
             options = options,
-            executionOptions = ExecutionOptions(batchSize = 2)
+            executionOptions = ExecutionOptions(batchSize = 2),
         )
 }

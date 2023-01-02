@@ -49,7 +49,7 @@ open class DefaultJdbcDatabaseConfig(
     dialect: JdbcDialect,
     dataTypeProvider: JdbcDataTypeProvider? = null,
     clockProvider: ClockProvider = DefaultClockProvider(),
-    executionOptions: ExecutionOptions = ExecutionOptions()
+    executionOptions: ExecutionOptions = ExecutionOptions(),
 ) : JdbcDatabaseConfig,
     AbstractDatabaseConfig<JdbcDialect>(dialect, clockProvider, executionOptions) {
 
@@ -77,5 +77,5 @@ class SimpleJdbcDatabaseConfig(
     override val session: JdbcSession,
     override val dataFactory: JdbcDataFactory,
     override val dataOperator: JdbcDataOperator,
-    override val dataSource: DataSource
+    override val dataSource: DataSource,
 ) : JdbcDatabaseConfig

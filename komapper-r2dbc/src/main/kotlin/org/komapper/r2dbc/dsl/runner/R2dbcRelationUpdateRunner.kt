@@ -27,7 +27,9 @@ internal class R2dbcRelationUpdateRunner<ENTITY : Any, ID : Any, META : EntityMe
             val executor = R2dbcExecutor(config, context.options)
             val (count) = executor.executeUpdate(statement)
             count
-        } else 0
+        } else {
+            0
+        }
     }
 
     override fun dryRun(config: DatabaseConfig): DryRunStatement {

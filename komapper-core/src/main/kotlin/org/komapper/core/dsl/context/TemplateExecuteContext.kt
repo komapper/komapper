@@ -8,5 +8,5 @@ import org.komapper.core.dsl.options.TemplateExecuteOptions
 data class TemplateExecuteContext(
     val sql: String,
     val valueMap: Map<String, Value<*>> = emptyMap(),
-    val options: TemplateExecuteOptions = TemplateExecuteOptions.DEFAULT
+    val options: TemplateExecuteOptions = TemplateExecuteOptions.DEFAULT,
 )

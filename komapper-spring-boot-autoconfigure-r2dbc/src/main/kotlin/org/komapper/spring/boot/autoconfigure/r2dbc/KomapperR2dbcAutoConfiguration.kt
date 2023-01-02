@@ -52,7 +52,7 @@ open class KomapperR2dbcAutoConfiguration {
         val url = environment.getProperty(R2DBC_URL_PROPERTY)
             ?: error(
                 "$R2DBC_URL_PROPERTY is not found. " +
-                    "Specify it to the application.properties file or define the R2dbcDialect bean manually."
+                    "Specify it to the application.properties file or define the R2dbcDialect bean manually.",
             )
         val driver = R2dbcDialects.extractR2dbcDriver(url)
         return R2dbcDialects.get(driver)
@@ -86,7 +86,7 @@ open class KomapperR2dbcAutoConfiguration {
     @ConditionalOnMissingBean
     open fun session(
         transactionManager: ReactiveTransactionManager,
-        connectionFactory: ConnectionFactory
+        connectionFactory: ConnectionFactory,
     ): R2dbcSession {
         return SpringR2dbcTransactionSession(transactionManager, connectionFactory)
     }
@@ -108,7 +108,7 @@ open class KomapperR2dbcAutoConfiguration {
     @ConditionalOnMissingBean
     open fun templateStatementBuilder(
         dialect: R2dbcDialect,
-        dataOperator: R2dbcDataOperator
+        dataOperator: R2dbcDataOperator,
     ): TemplateStatementBuilder {
         return TemplateStatementBuilders.get(BuilderDialect(dialect, dataOperator))
     }
@@ -125,7 +125,7 @@ open class KomapperR2dbcAutoConfiguration {
         statementInspector: StatementInspector,
         dataOperator: R2dbcDataOperator,
         connectionFactory: ConnectionFactory,
-        templateStatementBuilder: TemplateStatementBuilder
+        templateStatementBuilder: TemplateStatementBuilder,
     ): R2dbcDatabaseConfig {
         return SimpleR2dbcDatabaseConfig(
             id = UUID.randomUUID(),

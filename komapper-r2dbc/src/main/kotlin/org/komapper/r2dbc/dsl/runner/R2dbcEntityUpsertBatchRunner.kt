@@ -9,7 +9,7 @@ import org.komapper.r2dbc.R2dbcDatabaseConfig
 
 internal class R2dbcEntityUpsertBatchRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     context: EntityUpsertContext<ENTITY, ID, META>,
-    private val entities: List<ENTITY>
+    private val entities: List<ENTITY>,
 ) : R2dbcRunner<List<Long>> {
 
     private val runner: EntityUpsertBatchRunner<ENTITY, ID, META> =

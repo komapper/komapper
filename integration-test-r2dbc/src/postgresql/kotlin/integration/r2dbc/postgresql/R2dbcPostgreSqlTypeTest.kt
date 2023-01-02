@@ -47,8 +47,8 @@ class R2dbcPostgreSqlTypeTest(val db: R2dbcDatabase) {
             Json.of(
                 """
             {"a": 100, "b": "Hello"}
-                """.trimIndent()
-            )
+                """.trimIndent(),
+            ),
         )
         db.runQuery { QueryDsl.insert(m).single(data) }
         val data2 = db.runQuery {

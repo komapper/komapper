@@ -10,6 +10,6 @@ class JdbcMariaDbSetting(private val driver: String, url: String) : MariaDbSetti
         url,
         "test",
         "test",
-        executionOptions = ExecutionOptions(batchSize = 2)
+        executionOptions = ExecutionOptions(batchSize = 2),
     )
 }

@@ -15,7 +15,7 @@ internal class DefaultExprEnvironment(override val ctx: Map<String, Value<*>> = 
 
     override val topLevelPropertyExtensions: List<KProperty<*>> by lazy {
         listOf(
-            CharSequence::lastIndex
+            CharSequence::lastIndex,
         ).onEach { it.isAccessible = true }
     }
 
@@ -28,7 +28,7 @@ internal class DefaultExprEnvironment(override val ctx: Map<String, Value<*>> = 
             CharSequence::isNotEmpty,
             CharSequence::isNullOrEmpty,
             CharSequence::any,
-            CharSequence::none
+            CharSequence::none,
         ).onEach { it.isAccessible = true }
     }
 }

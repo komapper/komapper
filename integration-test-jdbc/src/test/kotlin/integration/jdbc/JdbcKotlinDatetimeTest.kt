@@ -45,7 +45,7 @@ class JdbcKotlinDatetimeTest(val db: JdbcDatabase) {
         val m = Meta.kotlinLocalDateData
         val data = KotlinLocalDateData(
             1,
-            LocalDate(2019, 6, 1)
+            LocalDate(2019, 6, 1),
         )
         db.runQuery { QueryDsl.insert(m).single(data) }
         val data2 = db.runQuery {
@@ -59,7 +59,7 @@ class JdbcKotlinDatetimeTest(val db: JdbcDatabase) {
         val m = Meta.kotlinLocalDateTimeData
         val data = KotlinLocalDateTimeData(
             1,
-            LocalDateTime(2019, 6, 1, 12, 11, 10)
+            LocalDateTime(2019, 6, 1, 12, 11, 10),
         )
         db.runQuery { QueryDsl.insert(m).single(data) }
         val data2 = db.runQuery {

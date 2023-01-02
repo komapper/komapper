@@ -21,14 +21,14 @@ import java.util.Optional
 internal class R2dbcExecutor(
     private val config: R2dbcDatabaseConfig,
     executionOptionsProvider: ExecutionOptionsProvider,
-    private val generatedColumn: String? = null
+    private val generatedColumn: String? = null,
 ) {
 
     private val executionOptions = config.executionOptions + executionOptionsProvider.getExecutionOptions()
 
     fun <T> executeQuery(
         statement: Statement,
-        transform: (R2dbcDataOperator, Row) -> T
+        transform: (R2dbcDataOperator, Row) -> T,
     ): Flow<T> {
         return flow {
             @Suppress("NAME_SHADOWING")

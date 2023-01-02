@@ -51,7 +51,7 @@ class OracleR2dbcDataTypeProvider(next: R2dbcDataTypeProvider) :
             R2dbcUShortType("integer"),
             OracleR2dbcBooleanType,
             OracleR2dbcDurationType,
-            OracleR2dbcPeriodType
+            OracleR2dbcPeriodType,
         )
     }
 }

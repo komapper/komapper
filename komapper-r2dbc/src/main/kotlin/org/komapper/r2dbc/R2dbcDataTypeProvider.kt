@@ -10,7 +10,7 @@ interface R2dbcDataTypeProvider {
 
 abstract class AbstractR2dbcDataTypeProvider(
     private val next: R2dbcDataTypeProvider,
-    dataTypes: List<R2dbcDataType<*>>
+    dataTypes: List<R2dbcDataType<*>>,
 ) : R2dbcDataTypeProvider {
 
     private val dataTypeMap: Map<KClass<*>, R2dbcDataType<*>> = dataTypes.associateBy { it.klass }
@@ -24,7 +24,7 @@ abstract class AbstractR2dbcDataTypeProvider(
 
 class DefaultR2dbcDataTypeProvider(
     next: R2dbcDataTypeProvider,
-    dataTypes: List<R2dbcDataType<*>>
+    dataTypes: List<R2dbcDataType<*>>,
 ) : AbstractR2dbcDataTypeProvider(next, dataTypes)
 
 fun R2dbcDataTypeProvider(vararg dataTypes: R2dbcDataType<*>): R2dbcDataTypeProvider {

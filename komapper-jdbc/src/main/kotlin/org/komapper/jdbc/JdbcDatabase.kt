@@ -55,12 +55,12 @@ interface JdbcDatabase : Database {
     fun <R> withTransaction(
         transactionAttribute: TransactionAttribute = TransactionAttribute.REQUIRED,
         transactionProperty: TransactionProperty = EmptyTransactionProperty,
-        block: (TransactionOperator) -> R
+        block: (TransactionOperator) -> R,
     ): R
 }
 
 internal class JdbcDatabaseImpl(
-    override val config: JdbcDatabaseConfig
+    override val config: JdbcDatabaseConfig,
 ) : JdbcDatabase {
     override val dataFactory: JdbcDataFactory
         get() = config.dataFactory
@@ -80,7 +80,7 @@ internal class JdbcDatabaseImpl(
     override fun <R> withTransaction(
         transactionAttribute: TransactionAttribute,
         transactionProperty: TransactionProperty,
-        block: (TransactionOperator) -> R
+        block: (TransactionOperator) -> R,
     ): R {
         val tx = config.session.transactionOperator
         return when (transactionAttribute) {
@@ -120,7 +120,7 @@ fun JdbcDatabase(
         dialect = dialect,
         dataTypeProvider = dataTypeProvider,
         clockProvider = clockProvider,
-        executionOptions = executionOptions
+        executionOptions = executionOptions,
     )
     return JdbcDatabase(config)
 }
@@ -151,7 +151,7 @@ fun JdbcDatabase(
         dialect = dialect,
         dataTypeProvider = dataTypeProvider,
         clockProvider = clockProvider,
-        executionOptions = executionOptions
+        executionOptions = executionOptions,
     )
     return JdbcDatabase(config)
 }

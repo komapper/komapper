@@ -10,6 +10,6 @@ class JdbcSqlServerSetting(private val driver: String, url: String) : SqlServerS
         url,
         "test",
         "test",
-        executionOptions = ExecutionOptions(batchSize = 2)
+        executionOptions = ExecutionOptions(batchSize = 2),
     )
 }

@@ -32,7 +32,7 @@ class R2dbcInsertBatchTest(private val db: R2dbcDatabase) {
         val addressList = listOf(
             Address(16, "STREET 16", 0),
             Address(17, "STREET 17", 0),
-            Address(18, "STREET 18", 0)
+            Address(18, "STREET 18", 0),
         )
         val ids = db.runQuery { QueryDsl.insert(a).batch(addressList) }.map { it.addressId }
         val list = db.runQuery {
@@ -47,7 +47,7 @@ class R2dbcInsertBatchTest(private val db: R2dbcDatabase) {
         val strategies = listOf(
             IdentityStrategy(null, "AAA"),
             IdentityStrategy(null, "BBB"),
-            IdentityStrategy(null, "CCC")
+            IdentityStrategy(null, "CCC"),
         )
         val ex = assertFailsWith<UnsupportedOperationException> {
             db.runQuery { QueryDsl.insert(i).batch(strategies) }
@@ -63,7 +63,7 @@ class R2dbcInsertBatchTest(private val db: R2dbcDatabase) {
         val personList = listOf(
             Person(1, "A"),
             Person(2, "B"),
-            Person(3, "C")
+            Person(3, "C"),
         )
         val ids = db.runQuery { QueryDsl.insert(p).batch(personList) }.map { it.personId }
         val list = db.runQuery { QueryDsl.from(p).where { p.personId inList ids } }
@@ -80,13 +80,13 @@ class R2dbcInsertBatchTest(private val db: R2dbcDatabase) {
         assertFailsWith<UniqueConstraintException> {
             db.runQuery {
                 QueryDsl.insert(
-                    a
+                    a,
                 ).batch(
                     listOf(
                         Address(16, "STREET 16", 0),
                         Address(17, "STREET 17", 0),
-                        Address(18, "STREET 1", 0)
-                    )
+                        Address(18, "STREET 1", 0),
+                    ),
                 )
             }.let { }
         }
@@ -111,7 +111,7 @@ class R2dbcInsertBatchTest(private val db: R2dbcDatabase) {
         assertEquals(2, list.size)
         assertEquals(
             listOf("DEVELOPMENT" to "KYOTO", "PLANNING" to "TOKYO"),
-            list.map { it.departmentName to it.location }
+            list.map { it.departmentName to it.location },
         )
     }
 
@@ -134,7 +134,7 @@ class R2dbcInsertBatchTest(private val db: R2dbcDatabase) {
         assertEquals(2, list.size)
         assertEquals(
             listOf("DEVELOPMENT" to "KYOTO", "PLANNING" to "TOKYO"),
-            list.map { it.departmentName to it.location }
+            list.map { it.departmentName to it.location },
         )
     }
 
@@ -159,7 +159,7 @@ class R2dbcInsertBatchTest(private val db: R2dbcDatabase) {
         assertEquals(2, list.size)
         assertEquals(
             listOf("DEVELOPMENT" to "NEW YORK", "PLANNING" to "TOKYO"),
-            list.map { it.departmentName to it.location }
+            list.map { it.departmentName to it.location },
         )
     }
 
@@ -184,7 +184,7 @@ class R2dbcInsertBatchTest(private val db: R2dbcDatabase) {
         assertEquals(2, list.size)
         assertEquals(
             listOf("DEVELOPMENT" to "NEW YORK", "PLANNING" to "TOKYO"),
-            list.map { it.departmentName to it.location }
+            list.map { it.departmentName to it.location },
         )
     }
 
@@ -206,7 +206,7 @@ class R2dbcInsertBatchTest(private val db: R2dbcDatabase) {
         assertEquals(2, list.size)
         assertEquals(
             listOf("ACCOUNTING" to "NEW YORK", "PLANNING" to "TOKYO"),
-            list.map { it.departmentName to it.location }
+            list.map { it.departmentName to it.location },
         )
     }
 
@@ -228,7 +228,7 @@ class R2dbcInsertBatchTest(private val db: R2dbcDatabase) {
         assertEquals(2, list.size)
         assertEquals(
             listOf("ACCOUNTING" to "NEW YORK", "PLANNING" to "TOKYO"),
-            list.map { it.departmentName to it.location }
+            list.map { it.departmentName to it.location },
         )
     }
 
@@ -239,7 +239,7 @@ class R2dbcInsertBatchTest(private val db: R2dbcDatabase) {
         val strategies = listOf(
             IdentityStrategy(null, "AAA"),
             IdentityStrategy(null, "BBB"),
-            IdentityStrategy(null, "CCC")
+            IdentityStrategy(null, "CCC"),
         )
         assertFailsWith<UnsupportedOperationException> {
             val query = QueryDsl.insert(i).onDuplicateKeyUpdate().batch(strategies)

@@ -9,7 +9,7 @@ import org.komapper.core.dsl.expression.WhereDeclaration
  */
 @Scope
 class WhereScope(
-    private val support: FilterScopeSupport
+    private val support: FilterScopeSupport,
 ) : FilterScope by support {
 
     fun and(declaration: WhereDeclaration) {

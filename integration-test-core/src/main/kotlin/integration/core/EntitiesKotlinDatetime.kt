@@ -22,23 +22,35 @@ data class KotlinLocalDateData(@KomapperId val id: Int, @KomapperColumn(alwaysQu
 @KomapperTable("local_date_time_data")
 data class KotlinLocalDateTimeData(
     @KomapperId val id: Int,
-    @KomapperColumn(alwaysQuote = true) val value: LocalDateTime
+    @KomapperColumn(alwaysQuote = true) val value: LocalDateTime,
 )
 
 @KomapperEntity
 @KomapperTable("human")
 data class KotlinInstantPerson(
-    @KomapperId @KomapperColumn("human_id") val humanId: Int,
+    @KomapperId
+    @KomapperColumn("human_id")
+    val humanId: Int,
     val name: String,
-    @KomapperCreatedAt @KomapperColumn("created_at") val createdAt: Instant? = null,
-    @KomapperUpdatedAt @KomapperColumn("updated_at") val updatedAt: Instant? = null
+    @KomapperCreatedAt
+    @KomapperColumn("created_at")
+    val createdAt: Instant? = null,
+    @KomapperUpdatedAt
+    @KomapperColumn("updated_at")
+    val updatedAt: Instant? = null,
 )
 
 @KomapperEntity
 @KomapperTable("person")
 data class KotlinDatetimePerson(
-    @KomapperId @KomapperColumn("person_id") val personId: Int,
+    @KomapperId
+    @KomapperColumn("person_id")
+    val personId: Int,
     val name: String,
-    @KomapperCreatedAt @KomapperColumn("created_at") val createdAt: LocalDateTime? = null,
-    @KomapperUpdatedAt @KomapperColumn("updated_at") val updatedAt: LocalDateTime? = null
+    @KomapperCreatedAt
+    @KomapperColumn("created_at")
+    val createdAt: LocalDateTime? = null,
+    @KomapperUpdatedAt
+    @KomapperColumn("updated_at")
+    val updatedAt: LocalDateTime? = null,
 )

@@ -13,7 +13,7 @@ class JdbcPostgreSqlSetting(private val driver: String, url: String) : PostgreSq
         JdbcDatabase(
             url = url,
             dataTypeProvider = dataTypeProvider,
-            executionOptions = ExecutionOptions(batchSize = 2)
+            executionOptions = ExecutionOptions(batchSize = 2),
         )
     }
 }

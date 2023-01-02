@@ -102,9 +102,9 @@ class JdbcSelectTest(private val db: JdbcDatabase) {
         assertEquals(
             listOf(
                 Address(10, "STREET 10", 1),
-                Address(9, "STREET 9", 1)
+                Address(9, "STREET 9", 1),
             ),
-            list
+            list,
         )
     }
 
@@ -134,8 +134,8 @@ class JdbcSelectTest(private val db: JdbcDatabase) {
         val caseExpression = case(
             When(
                 { a.street eq "STREET 2"; a.addressId greater 1 },
-                literal("HIT")
-            )
+                literal("HIT"),
+            ),
         ) { literal("NO HIT") }
         val list = db.runQuery {
             QueryDsl.from(a).where { a.addressId inList listOf(1, 2, 3) }
@@ -144,7 +144,7 @@ class JdbcSelectTest(private val db: JdbcDatabase) {
         }
         assertEquals(
             listOf("STREET 1" to "NO HIT", "STREET 2" to "HIT", "STREET 3" to "NO HIT"),
-            list
+            list,
         )
     }
 
@@ -154,12 +154,12 @@ class JdbcSelectTest(private val db: JdbcDatabase) {
         val caseExpression = case(
             When(
                 { a.street eq "STREET 2"; a.addressId greater 1 },
-                literal("HIT")
+                literal("HIT"),
             ),
             When(
                 { a.street eq "STREET 3" },
-                concat(a.street, "!!!")
-            )
+                concat(a.street, "!!!"),
+            ),
         ) { literal("NO HIT") }
         val list = db.runQuery {
             QueryDsl.from(a).where { a.addressId inList listOf(1, 2, 3) }
@@ -168,7 +168,7 @@ class JdbcSelectTest(private val db: JdbcDatabase) {
         }
         assertEquals(
             listOf("STREET 1" to "NO HIT", "STREET 2" to "HIT", "STREET 3" to "STREET 3!!!"),
-            list
+            list,
         )
     }
 
@@ -178,8 +178,8 @@ class JdbcSelectTest(private val db: JdbcDatabase) {
         val caseExpression = case(
             When(
                 { a.street eq "STREET 2"; a.addressId greater 1 },
-                literal("HIT")
-            )
+                literal("HIT"),
+            ),
         )
         val list = db.runQuery {
             QueryDsl.from(a).where { a.addressId inList listOf(1, 2, 3) }
@@ -188,7 +188,7 @@ class JdbcSelectTest(private val db: JdbcDatabase) {
         }
         assertEquals(
             listOf("STREET 1" to null, "STREET 2" to "HIT", "STREET 3" to null),
-            list
+            list,
         )
     }
 

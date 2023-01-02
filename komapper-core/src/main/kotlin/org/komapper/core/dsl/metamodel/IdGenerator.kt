@@ -29,7 +29,7 @@ sealed class IdGenerator<ENTITY : Any, ID : Any> {
         suspend fun generate(
             key: UUID,
             enquote: (String) -> String,
-            sequenceNextValue: suspend (String) -> Long
+            sequenceNextValue: suspend (String) -> Long,
         ): ID {
             val context = idContextMap.computeIfAbsent(key) {
                 IdContext(startWith, incrementBy)

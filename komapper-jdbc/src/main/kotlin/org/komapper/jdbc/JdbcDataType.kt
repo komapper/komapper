@@ -77,7 +77,7 @@ interface JdbcDataType<T : Any> {
 
 abstract class AbstractJdbcDataType<T : Any>(
     override val klass: KClass<T>,
-    override val jdbcType: JDBCType
+    override val jdbcType: JDBCType,
 ) : JdbcDataType<T> {
 
     override fun getValue(rs: ResultSet, index: Int): T? {

@@ -7,6 +7,6 @@ import org.komapper.r2dbc.R2dbcDatabase
 class R2dbcH2Setting(private val driver: String, url: String) : H2Setting<R2dbcDatabase> {
     override val database: R2dbcDatabase = R2dbcDatabase(
         url = url,
-        executionOptions = ExecutionOptions(batchSize = 2)
+        executionOptions = ExecutionOptions(batchSize = 2),
     )
 }

@@ -12,7 +12,7 @@ import org.komapper.core.dsl.metamodel.PropertyMetamodel
  */
 @Scope
 class AssignmentScope<ENTITY : Any>(
-    private val assignments: MutableList<Pair<PropertyMetamodel<ENTITY, *, *>, Operand>> = mutableListOf()
+    private val assignments: MutableList<Pair<PropertyMetamodel<ENTITY, *, *>, Operand>> = mutableListOf(),
 ) {
 
     /**

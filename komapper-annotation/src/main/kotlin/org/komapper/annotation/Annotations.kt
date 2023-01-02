@@ -18,7 +18,7 @@ import kotlin.reflect.KClass
 @Retention(AnnotationRetention.SOURCE)
 annotation class KomapperEntity(
     val aliases: Array<String> = [],
-    val unit: KClass<*> = DefaultUnit::class
+    val unit: KClass<*> = DefaultUnit::class,
 )
 
 /**
@@ -28,7 +28,7 @@ annotation class KomapperEntity(
 @Target(AnnotationTarget.VALUE_PARAMETER)
 @Retention(AnnotationRetention.SOURCE)
 annotation class KomapperId(
-    val virtual: Boolean = false
+    val virtual: Boolean = false,
 )
 
 /**
@@ -78,7 +78,7 @@ annotation class KomapperEmbedded
 @Target(AnnotationTarget.VALUE_PARAMETER)
 @Retention(AnnotationRetention.SOURCE)
 annotation class KomapperEmbeddedId(
-    val virtual: Boolean = false
+    val virtual: Boolean = false,
 )
 
 /**
@@ -117,7 +117,7 @@ annotation class KomapperTable(
     val name: String = NAME,
     val catalog: String = CATALOG,
     val schema: String = SCHEMA,
-    val alwaysQuote: Boolean = ALWAYS_QUOTE
+    val alwaysQuote: Boolean = ALWAYS_QUOTE,
 ) {
     companion object {
         const val NAME: String = ""
@@ -203,7 +203,7 @@ annotation class KomapperSequence(
     val incrementBy: Int = INCREMENT_BY,
     val catalog: String = CATALOG,
     val schema: String = SCHEMA,
-    val alwaysQuote: Boolean = ALWAYS_QUOTE
+    val alwaysQuote: Boolean = ALWAYS_QUOTE,
 ) {
     companion object {
         const val START_WITH: Int = 1
@@ -241,5 +241,5 @@ annotation class KomapperAutoIncrement
 annotation class KomapperEntityDef(
     val entity: KClass<*>,
     val aliases: Array<String> = [],
-    val unit: KClass<*> = DefaultUnit::class
+    val unit: KClass<*> = DefaultUnit::class,
 )

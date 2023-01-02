@@ -24,7 +24,7 @@ interface DatabaseConfig {
 abstract class AbstractDatabaseConfig<DIALECT : Dialect>(
     override val dialect: DIALECT,
     override val clockProvider: ClockProvider = DefaultClockProvider(),
-    override val executionOptions: ExecutionOptions = ExecutionOptions()
+    override val executionOptions: ExecutionOptions = ExecutionOptions(),
 ) : DatabaseConfig {
     override val id: UUID = UUID.randomUUID()
     override val logger: Logger by lazy {

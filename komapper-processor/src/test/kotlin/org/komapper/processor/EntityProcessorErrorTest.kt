@@ -17,7 +17,7 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
             data class Dept(
                 val id: Int
             )
-            """
+            """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
         assertTrue(result.messages.contains("The entity class must have at least one id property."))
@@ -40,11 +40,12 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
                 @KomapperEmbeddedId
                 val id2: DeptId
             )
-            """
+            """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
         assertTrue(result.messages.contains("The entity class can have either @KomapperEmbeddedId or @KomapperId."))
     }
+
     @Test
     fun `The enclosing declaration of the class must be public`() {
         val result = compile(
@@ -57,7 +58,7 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
                     val id: Int
                 )
             }
-            """
+            """,
         )
 
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
@@ -78,7 +79,7 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
                 val id: Int,
                 val version: Int
             )
-            """
+            """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
         assertTrue(result.messages.contains("The same name property is not found in the entity."))
@@ -95,7 +96,7 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
             data class __Dept(
                 val id: Int
             )
-            """
+            """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
         assertTrue(result.messages.contains("The class name cannot start with '__'."))
@@ -115,7 +116,7 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
             data class DeptDef(
                 val id: Int
             )
-            """
+            """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
         assertTrue(result.messages.contains("The class name cannot start with '__'."))
@@ -131,7 +132,7 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
             data class Dept(
                 val __id: Int
             )
-            """
+            """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
         assertTrue(result.messages.contains("The property name cannot start with '__'."))
@@ -151,7 +152,7 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
             data class DeptDef(
                 val id: Int
             )
-            """
+            """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
         assertTrue(result.messages.contains("The property name cannot start with '__'."))
@@ -167,7 +168,7 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
             class Dept(
                 val id: Int
             )
-            """
+            """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
         assertTrue(result.messages.contains("The class \"Dept\" must be a data class."))
@@ -186,7 +187,7 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
             data class DeptDef(
                 val id: Int
             )
-            """
+            """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
         assertTrue(result.messages.contains("The class \"Dept\" must be a data class."))
@@ -209,7 +210,7 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
                 @KomapperEmbedded
                 val info: DeptInfo
             )
-            """
+            """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
         assertTrue(result.messages.contains("The class \"DeptInfo\" must be a data class."))
@@ -230,7 +231,7 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
                 @KomapperEmbeddedId
                 val id: DeptId
             )
-            """
+            """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
         assertTrue(result.messages.contains("The class \"DeptId\" must be a data class."))
@@ -245,7 +246,7 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
             class Dept(
                 @KomapperEntity val id: Int
             )
-            """
+            """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
         assertTrue(result.messages.contains("@KomapperEntity cannot be applied to this element."))
@@ -263,7 +264,7 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
             class DeptDef(
                 @KomapperEntityDef(entity = Dept::class) val id: Int
             )
-            """
+            """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
         assertTrue(result.messages.contains("@KomapperEntityDef cannot be applied to this element."))
@@ -279,7 +280,7 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
             private data class Dept(
                 val id: Int
             )
-            """
+            """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
         assertTrue(result.messages.contains("The class \"Dept\" must not be private."))
@@ -298,7 +299,7 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
             data class DeptDef(
                 val id: Int
             )
-            """
+            """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
         assertTrue(result.messages.contains("The class \"Dept\" must not be private."))
@@ -321,7 +322,7 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
                 @KomapperEmbedded
                 val info: DeptInfo
             )
-            """
+            """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
         assertTrue(result.messages.contains("The class \"DeptInfo\" must not be private."))
@@ -337,7 +338,7 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
             data class Dept<T>(
                 val id: T
             )
-            """
+            """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
         assertTrue(result.messages.contains("The class \"Dept\" must not have type parameters."))
@@ -356,7 +357,7 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
             data class DeptDef<T>(
                 val id: T
             )
-            """
+            """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
         assertTrue(result.messages.contains("The class \"Dept\" must not have type parameters."))
@@ -377,7 +378,7 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
                 @KomapperEmbeddedId val aaa: DeptId,
                 @KomapperEmbeddedId val bbb: DeptId
             )
-            """
+            """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
         assertTrue(result.messages.contains("Multiple @KomapperEmbeddedId cannot coexist in a single class."))
@@ -394,7 +395,7 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
                 @KomapperVersion val aaa: Int,
                 @KomapperVersion val bbb: Int
             )
-            """
+            """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
         assertTrue(result.messages.contains("Multiple @KomapperVersion cannot coexist in a single class."))
@@ -412,7 +413,7 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
                 @KomapperCreatedAt val aaa: LocalDateTime,
                 @KomapperCreatedAt val bbb: LocalDateTime
             )
-            """
+            """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
         assertTrue(result.messages.contains("Multiple @KomapperCreatedAt cannot coexist in a single class."))
@@ -429,7 +430,7 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
                 @KomapperUpdatedAt val aaa: LocalDateTime,
                 @KomapperUpdatedAt val bbb: LocalDateTime
             )
-            """
+            """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
         assertTrue(result.messages.contains("Multiple @KomapperUpdatedAt cannot coexist in a single class."))
@@ -446,7 +447,7 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
                 @KomapperIgnore val aaa: Int = 0,
                 @KomapperIgnore val bbb: Int = 0
             )
-            """
+            """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
         assertTrue(result.messages.contains("Any persistent properties are not found."))
@@ -462,7 +463,7 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
             data class Dept(
                 private val aaa: Int
             )
-            """
+            """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
         assertTrue(result.messages.contains("The property must not be private."))
@@ -478,7 +479,7 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
             data class Dept(
                 @KomapperId @KomapperVersion val id: Int
             )
-            """
+            """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
         assertTrue(result.messages.contains("@KomapperId and @KomapperVersion cannot coexist on the same property."))
@@ -494,7 +495,7 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
             data class Dept(
                 @KomapperAutoIncrement val id: Int
             )
-            """
+            """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
         assertTrue(result.messages.contains("@KomapperAutoIncrement and @KomapperId must coexist on the same property."))
@@ -510,7 +511,7 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
             data class Dept(
                 @KomapperAutoIncrement @KomapperSequence("ID", 1, 100) val id: Int
             )
-            """
+            """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
         assertTrue(result.messages.contains("@KomapperAutoIncrement and @KomapperSequence cannot coexist on the same property."))
@@ -527,7 +528,7 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
                 @KomapperId @KomapperAutoIncrement val id1: Int,
                 @KomapperId @KomapperSequence("ID", 1, 100) val id2: Int
             )
-            """
+            """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
         assertTrue(result.messages.contains("@KomapperAutoIncrement and @KomapperSequence cannot coexist in a single class."))
@@ -543,7 +544,7 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
             data class Dept(
                 @KomapperVersion val aaa: String
             )
-            """
+            """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
         assertTrue(result.messages.contains("The type of @KomapperVersion annotated property must be either Int, Long, UInt or value class."))
@@ -563,14 +564,14 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
             data class Dept(
                 @KomapperVersion val version: MyVersion
             )
-            """
+            """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
         assertTrue(
             result.messages.contains(
                 "When the type of @KomapperVersion annotated property is value class, " +
-                    "the type of the value class's own property must be either Int, Long or UInt."
-            )
+                    "the type of the value class's own property must be either Int, Long or UInt.",
+            ),
         )
     }
 
@@ -584,7 +585,7 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
             data class Dept(
                 @KomapperCreatedAt val aaa: String
             )
-            """
+            """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
         assertTrue(result.messages.contains("The type of @KomapperCreatedAt annotated property must be either Instant, LocalDateTime or OffsetDateTime."))
@@ -604,14 +605,14 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
             data class Dept(
                 @KomapperCreatedAt val dataTime: MyDateTime
             )
-            """
+            """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
         assertTrue(
             result.messages.contains(
                 "When the type of @KomapperCreatedAt annotated property is value class, " +
-                    "the type of the value class's own property must be either Instant, LocalDateTime or OffsetDateTime."
-            )
+                    "the type of the value class's own property must be either Instant, LocalDateTime or OffsetDateTime.",
+            ),
         )
     }
 
@@ -625,7 +626,7 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
             data class Dept(
                 @KomapperUpdatedAt val aaa: String
             )
-            """
+            """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
         assertTrue(result.messages.contains("The type of @KomapperUpdatedAt annotated property must be either Instant, LocalDateTime or OffsetDateTime."))
@@ -645,14 +646,14 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
             data class Dept(
                 @KomapperUpdatedAt val dataTime: MyDateTime
             )
-            """
+            """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
         assertTrue(
             result.messages.contains(
                 "When the type of @KomapperUpdatedAt annotated property is value class, " +
-                    "the type of the value class's own property must be either Instant, LocalDateTime or OffsetDateTime."
-            )
+                    "the type of the value class's own property must be either Instant, LocalDateTime or OffsetDateTime.",
+            ),
         )
     }
 
@@ -666,7 +667,7 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
             data class Dept(
                 @KomapperIgnore val aaa: String
             )
-            """
+            """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
         assertTrue(result.messages.contains("The ignored property must have a default value."))
@@ -682,7 +683,7 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
             data class Dept(
                 @KomapperId @KomapperAutoIncrement val id: String
             )
-            """
+            """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
         assertTrue(result.messages.contains("The type of @KomapperAutoIncrement annotated property must be either Int, Long, UInt or value class."))
@@ -698,7 +699,7 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
             data class Dept(
                 @KomapperId @KomapperSequence("ID", 1, 100) val id: String
             )
-            """
+            """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
         assertTrue(result.messages.contains("The type of @KomapperSequence annotated property must be either Int, Long, UInt or value class."))
@@ -718,7 +719,7 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
             data class Dept(
                 @KomapperId @KomapperAutoIncrement val id: MyId
             )
-            """
+            """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
         assertTrue(result.messages.contains("When the type of @KomapperAutoIncrement annotated property is value class, the type of the value class's own property must be either Int, Long or UInt."))
@@ -738,14 +739,14 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
             data class Dept(
                 @KomapperId @KomapperSequence("my_seq") val id: MyId
             )
-            """
+            """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
         assertTrue(
             result.messages.contains(
                 "When the type of @KomapperSequence annotated property is value class, " +
-                    "the type of the value class's own property must be either Int, Long or UInt."
-            )
+                    "the type of the value class's own property must be either Int, Long or UInt.",
+            ),
         )
     }
 
@@ -759,7 +760,7 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
             data class Dept(
                 @KomapperId @KomapperSequence() val id: Int
             )
-            """
+            """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
         assertTrue(result.messages.contains("@KomapperSequence.name is not found."))
@@ -778,7 +779,7 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
                 @KomapperId val id: Int,
                 val name: Name,
             )
-            """
+            """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
         assertTrue(result.messages.contains("The value class's own property 'name' must not be private."))
@@ -797,7 +798,7 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
                 @KomapperId val id: Int,
                 val name: Name,
             )
-            """
+            """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
         assertTrue(result.messages.contains("The value class's own property 'name' must not be nullable."))
@@ -817,7 +818,7 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
                 @KomapperEnum
                 val name: Name,
             )
-            """
+            """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
         assertTrue(result.messages.contains("@KomapperEnum is valid only for enum property types."))
@@ -835,7 +836,7 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
                 @KomapperEnum
                 val name: String,
             )
-            """
+            """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
         assertTrue(result.messages.contains("@KomapperEnum is valid only for enum property types."))
@@ -852,7 +853,7 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
                 @KomapperId val id: Int,
                 val names: List<String>,
             )
-            """
+            """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
         assertTrue(result.messages.contains("The property \"names\" must not be a generic type \"List<String>\"."))
@@ -869,7 +870,7 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
                 @KomapperId val id: Int,
                 @KomapperEmbedded val info: Pair<String, List<Int>>,
             )
-            """
+            """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
         assertTrue(result.messages.contains("The property \"info.second\" must not be a generic type \"List<Int>\"."))
@@ -893,7 +894,7 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
                 @KomapperColumnOverride("address", KomapperColumn("ADDRESS"))
                 val info: DeptInfo
             )
-            """
+            """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
         assertTrue(result.messages.contains("The property \"address\" is not found in the class \"DeptInfo\"."))
@@ -918,7 +919,7 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
                 @KomapperEnumOverride("address", KomapperEnum(EnumType.ORDINAL))
                 val info: DeptInfo
             )
-            """
+            """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
         assertTrue(result.messages.contains("The property \"address\" is not found in the class \"DeptInfo\"."))
@@ -941,7 +942,7 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
                 @KomapperColumnOverride("address", KomapperColumn("ADDRESS"))
                 val info: DeptInfo
             )
-            """
+            """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
         assertTrue(result.messages.contains("@KomapperColumnOverride must be used with either @KomapperEmbedded or @KomapperEmbeddedId."))
@@ -964,7 +965,7 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
                 @KomapperEnumOverride("address", KomapperEnum(EnumType.ORDINAL))
                 val info: DeptInfo
             )
-            """
+            """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
         assertTrue(result.messages.contains("@KomapperEnumOverride must be used with either @KomapperEmbedded or @KomapperEmbeddedId."))
@@ -983,7 +984,7 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
                 @KomapperEmbedded
                 val info: Pair<Int, *>
             )
-            """
+            """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
         assertTrue(result.messages.contains("The property \"info.second\" must not be a star-projected type."))
@@ -1000,7 +1001,7 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
                 @KomapperId
                 val id: Int,
             )
-            """
+            """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
         assertTrue(result.messages.contains("The unit value of @KomapperEntity must be an object."))
@@ -1020,7 +1021,7 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
                 @KomapperId
                 val id: Int,
             )
-            """
+            """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
         assertTrue(result.messages.contains("The unit value of @KomapperEntityDef must be an object."))
@@ -1040,7 +1041,7 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
                 @KomapperEnum(EnumType.PROPERTY, "unknown")
                 val color: Color
             )
-            """
+            """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
         assertTrue(result.messages.contains("The property \"unknown\" is not found in the test.Color. KomapperEnum's hint property is incorrect."))

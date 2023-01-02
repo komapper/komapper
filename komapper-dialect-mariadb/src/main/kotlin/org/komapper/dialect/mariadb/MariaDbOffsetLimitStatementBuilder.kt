@@ -9,7 +9,7 @@ import org.komapper.core.dsl.builder.OffsetLimitStatementBuilder
 class MariaDbOffsetLimitStatementBuilder(
     private val dialect: BuilderDialect,
     private val offset: Int,
-    private val limit: Int
+    private val limit: Int,
 ) : OffsetLimitStatementBuilder {
 
     private val buf = StatementBuffer()

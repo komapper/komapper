@@ -45,9 +45,9 @@ class JdbcUpdateSingleTest(private val db: JdbcDatabase) {
             Address(
                 15,
                 "NY street",
-                2
+                2,
             ),
-            address2
+            address2,
         )
     }
 

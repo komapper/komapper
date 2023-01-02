@@ -14,14 +14,14 @@ import java.sql.SQLException
 internal class JdbcExecutor(
     private val config: JdbcDatabaseConfig,
     executionOptionProvider: ExecutionOptionsProvider,
-    private val generatedColumn: String? = null
+    private val generatedColumn: String? = null,
 ) {
 
     private val executionOptions = config.executionOptions + executionOptionProvider.getExecutionOptions()
 
     fun <T> executeQuery(
         statement: Statement,
-        transform: (rs: ResultSet) -> T
+        transform: (rs: ResultSet) -> T,
     ): T {
         return withExceptionTranslator {
             @Suppress("NAME_SHADOWING")
@@ -42,7 +42,7 @@ internal class JdbcExecutor(
     fun <T, R> executeQuery(
         statement: Statement,
         transform: (JdbcDataOperator, ResultSet) -> T,
-        collect: suspend (Flow<T>) -> R
+        collect: suspend (Flow<T>) -> R,
     ): R {
         return withExceptionTranslator {
             @Suppress("NAME_SHADOWING")

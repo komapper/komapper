@@ -7,13 +7,13 @@ interface JdbcContext : JdbcDatabaseContext, JdbcTransactionContext, JdbcTransac
 private class JdbcContextImpl(
     override val database: ContextualJdbcDatabase,
     override val transactionOperator: ContextualJdbcTransactionOperator,
-    override val transaction: JdbcTransaction?
+    override val transaction: JdbcTransaction?,
 ) : JdbcContext
 
 internal fun JdbcContext(
     database: ContextualJdbcDatabase,
     operator: ContextualJdbcTransactionOperator,
-    transaction: JdbcTransaction? = null
+    transaction: JdbcTransaction? = null,
 ): JdbcContext {
     return JdbcContextImpl(database, operator, transaction)
 }

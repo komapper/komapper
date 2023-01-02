@@ -34,7 +34,7 @@ fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> META.defi
         schema = schemaName(),
         alwaysQuote = alwaysQuote(),
         disableSequenceAssignment = disableSequenceAssignment(),
-        declaration = declaration() + declaration
+        declaration = declaration() + declaration,
     )
 }
 
@@ -62,7 +62,7 @@ fun checkMetamodelVersion(metamodelName: String, version: Int) {
     if (version != EntityMetamodel.METAMODEL_VERSION) {
         throw IllegalArgumentException(
             "The metamodel version of \"$metamodelName\" is not compatible. expected: ${EntityMetamodel.METAMODEL_VERSION}, actual: $version. " +
-                "Regenerate \"$metamodelName\"."
+                "Regenerate \"$metamodelName\".",
         )
     }
 }

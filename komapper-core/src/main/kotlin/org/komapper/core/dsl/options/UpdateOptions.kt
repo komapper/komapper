@@ -7,7 +7,7 @@ data class UpdateOptions(
     override val disableOptimisticLock: Boolean,
     override val queryTimeoutSeconds: Int?,
     override val suppressLogging: Boolean,
-    override val suppressOptimisticLockException: Boolean
+    override val suppressOptimisticLockException: Boolean,
 ) : BatchOptions, OptimisticLockOptions, WhereOptions {
 
     companion object {
@@ -18,7 +18,7 @@ data class UpdateOptions(
             disableOptimisticLock = false,
             queryTimeoutSeconds = null,
             suppressLogging = false,
-            suppressOptimisticLockException = false
+            suppressOptimisticLockException = false,
         )
     }
 }

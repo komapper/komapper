@@ -32,5 +32,5 @@ internal enum class ExprTokenType {
     GE,
     LE,
     OTHER,
-    EOE
+    EOE,
 }

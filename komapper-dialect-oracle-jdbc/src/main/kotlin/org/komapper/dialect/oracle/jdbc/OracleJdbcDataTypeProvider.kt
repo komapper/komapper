@@ -48,7 +48,7 @@ class OracleJdbcDataTypeProvider(next: JdbcDataTypeProvider) : AbstractJdbcDataT
             JdbcUByteType("integer"),
             JdbcUIntType("integer"),
             JdbcUShortType("integer"),
-            OracleJdbcBooleanType
+            OracleJdbcBooleanType,
         )
     }
 }

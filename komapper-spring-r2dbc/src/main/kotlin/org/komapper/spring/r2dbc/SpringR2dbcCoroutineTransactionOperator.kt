@@ -20,7 +20,7 @@ internal class SpringR2dbcCoroutineTransactionOperator(private val transactionMa
 
     override suspend fun <R> required(
         transactionProperty: TransactionProperty,
-        block: suspend (CoroutineTransactionOperator) -> R
+        block: suspend (CoroutineTransactionOperator) -> R,
     ): R {
         val definition = SpringTransactionDefinition(transactionProperty, TransactionAttribute.REQUIRED)
         return execute(definition, block)
@@ -28,7 +28,7 @@ internal class SpringR2dbcCoroutineTransactionOperator(private val transactionMa
 
     override suspend fun <R> requiresNew(
         transactionProperty: TransactionProperty,
-        block: suspend (CoroutineTransactionOperator) -> R
+        block: suspend (CoroutineTransactionOperator) -> R,
     ): R {
         val definition = SpringTransactionDefinition(transactionProperty, TransactionAttribute.REQUIRES_NEW)
         return execute(definition, block)
@@ -36,7 +36,7 @@ internal class SpringR2dbcCoroutineTransactionOperator(private val transactionMa
 
     private suspend fun <R> execute(
         definition: org.springframework.transaction.TransactionDefinition,
-        block: suspend (CoroutineTransactionOperator) -> R
+        block: suspend (CoroutineTransactionOperator) -> R,
     ): R {
         val context = coroutineContext
         val txOp = TransactionalOperator.create(transactionManager, definition)

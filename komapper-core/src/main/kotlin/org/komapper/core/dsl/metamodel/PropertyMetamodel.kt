@@ -23,7 +23,7 @@ interface PropertyMetamodel<ENTITY : Any, EXTERIOR : Any, INTERIOR : Any> : Prop
 @Suppress("unused")
 class PropertyMetamodelImpl<ENTITY : Any, EXTERIOR : Any, INTERIOR : Any>(
     override val owner: EntityMetamodel<ENTITY, *, *>,
-    private val descriptor: PropertyDescriptor<ENTITY, EXTERIOR, INTERIOR>
+    private val descriptor: PropertyDescriptor<ENTITY, EXTERIOR, INTERIOR>,
 ) : PropertyMetamodel<ENTITY, EXTERIOR, INTERIOR> {
     override val exteriorClass: KClass<EXTERIOR> get() = descriptor.exteriorClass
     override val interiorClass: KClass<INTERIOR> get() = descriptor.interiorClass

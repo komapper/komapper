@@ -11,7 +11,7 @@ internal data class Config(
     val enumStrategy: EnumStrategy,
     val namingStrategy: NamingStrategy,
     val metaObject: String,
-    val alwaysQuote: Boolean
+    val alwaysQuote: Boolean,
 ) {
     companion object {
         private const val PREFIX = "komapper.prefix"

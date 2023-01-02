@@ -49,7 +49,7 @@ interface JdbcTransactionManager {
 
 internal class JdbcTransactionManagerImpl(
     dataSource: DataSource,
-    loggerFacade: LoggerFacade
+    loggerFacade: LoggerFacade,
 ) : JdbcTransactionManager {
 
     private val transactionContext = ThreadLocal<JdbcTransaction>()

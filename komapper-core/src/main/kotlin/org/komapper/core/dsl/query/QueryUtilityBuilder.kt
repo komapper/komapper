@@ -11,12 +11,12 @@ import org.komapper.core.dsl.metamodel.EntityMetamodel
 
 fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> set(
     @Suppress("UNUSED_PARAMETER") metamodel: META,
-    declaration: AssignmentDeclaration<ENTITY, META>
+    declaration: AssignmentDeclaration<ENTITY, META>,
 ): AssignmentDeclaration<ENTITY, META> = declaration
 
 fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> values(
     @Suppress("UNUSED_PARAMETER") metamodel: META,
-    declaration: AssignmentDeclaration<ENTITY, META>
+    declaration: AssignmentDeclaration<ENTITY, META>,
 ): AssignmentDeclaration<ENTITY, META> = declaration
 
 fun on(declaration: OnDeclaration): OnDeclaration = declaration
@@ -31,7 +31,7 @@ fun groupBy(vararg expressions: ColumnExpression<*, *>): List<ColumnExpression<*
 
 fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> join(
     metamodel: META,
-    declaration: OnDeclaration
+    declaration: OnDeclaration,
 ): Relationship<ENTITY, ID, META> {
     return Relationship(metamodel, declaration)
 }

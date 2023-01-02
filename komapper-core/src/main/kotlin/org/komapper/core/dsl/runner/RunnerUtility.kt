@@ -21,7 +21,7 @@ fun checkWhereClause(whereProvider: WhereProvider) {
 fun checkOptimisticLock(
     option: OptimisticLockOptions,
     count: Long,
-    index: Int?
+    index: Int?,
 ) {
     if (!option.disableOptimisticLock && !option.suppressOptimisticLockException) {
         if (count != 1L) {
@@ -63,7 +63,7 @@ internal fun checkBatchExecutionReturningGeneratedValues(config: DatabaseConfig,
 internal fun checkGeneratedKeysReturningWhenInsertingMultipleRows(
     config: DatabaseConfig,
     metamodel: EntityMetamodel<*, *, *>,
-    options: InsertOptions
+    options: InsertOptions,
 ) {
     val dialect = config.dialect
     if (!dialect.supportsGeneratedKeysReturningWhenInsertingMultipleRows() &&
@@ -72,7 +72,7 @@ internal fun checkGeneratedKeysReturningWhenInsertingMultipleRows(
     ) {
         throw UnsupportedOperationException(
             "The dialect(driver=${dialect.driver}) does not support returning generated keys when inserting multiple rows. " +
-                "You can avoid this exception by setting `InsertOption.returnGeneratedKeys=false`."
+                "You can avoid this exception by setting `InsertOption.returnGeneratedKeys=false`.",
         )
     }
 }
@@ -85,7 +85,7 @@ internal fun checkOptimisticLockOfBatchExecution(config: DatabaseConfig, options
     ) {
         throw UnsupportedOperationException(
             "The dialect(driver=${dialect.driver}) does not support optimistic lock of batch execution. " +
-                "You can avoid this exception by setting `OptimisticLockOptions.disableOptimisticLock=true` or `OptimisticLockOptions.suppressOptimisticLockException=true`"
+                "You can avoid this exception by setting `OptimisticLockOptions.disableOptimisticLock=true` or `OptimisticLockOptions.suppressOptimisticLockException=true`",
         )
     }
 }

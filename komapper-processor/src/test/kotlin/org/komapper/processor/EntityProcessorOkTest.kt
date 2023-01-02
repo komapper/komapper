@@ -19,7 +19,7 @@ class EntityProcessorOkTest : AbstractKspTest(EntityProcessorProvider()) {
                 @KomapperEnum(type = EnumType.ORDINAL)
                 val color: Color,
             )
-            """
+            """,
         )
         assertEquals(KotlinCompilation.ExitCode.OK, result.exitCode)
     }
@@ -35,7 +35,7 @@ class EntityProcessorOkTest : AbstractKspTest(EntityProcessorProvider()) {
                 @KomapperId val id: Int,
                 @Suppress("ArrayInDataClass") val names: Array<String>,
             )
-            """
+            """,
         )
         assertEquals(KotlinCompilation.ExitCode.OK, result.exitCode)
     }
@@ -55,7 +55,7 @@ class EntityProcessorOkTest : AbstractKspTest(EntityProcessorProvider()) {
             )
             @JvmInline
             value class Baz(val value: Int?)
-            """
+            """,
         )
         assertEquals(KotlinCompilation.ExitCode.OK, result.exitCode)
     }
@@ -72,7 +72,7 @@ class EntityProcessorOkTest : AbstractKspTest(EntityProcessorProvider()) {
                 @KomapperAutoIncrement @KomapperId
                 val id: Snowflake
             )
-            """
+            """,
         )
         assertEquals(result.exitCode, KotlinCompilation.ExitCode.OK, result.messages)
     }
@@ -90,7 +90,7 @@ class EntityProcessorOkTest : AbstractKspTest(EntityProcessorProvider()) {
                 @KomapperAutoIncrement @KomapperId
                 val id: Snowball
             )
-            """
+            """,
         )
         assertEquals(result.exitCode, KotlinCompilation.ExitCode.OK, result.messages)
     }
@@ -116,7 +116,7 @@ class EntityProcessorOkTest : AbstractKspTest(EntityProcessorProvider()) {
                 @KomapperEmbedded
                 val info: DeptInfo
             )
-            """
+            """,
         )
         assertEquals(result.exitCode, KotlinCompilation.ExitCode.OK, result.messages)
     }
@@ -137,7 +137,7 @@ class EntityProcessorOkTest : AbstractKspTest(EntityProcessorProvider()) {
                 @KomapperEmbedded
                 val info: DeptInfo<String>
             )
-            """
+            """,
         )
         assertEquals(result.exitCode, KotlinCompilation.ExitCode.OK, result.messages)
     }
@@ -158,7 +158,7 @@ class EntityProcessorOkTest : AbstractKspTest(EntityProcessorProvider()) {
                 @KomapperColumnOverride("second", KomapperColumn("size"))
                 val snowflake: Snowflake
             )
-            """
+            """,
         )
         assertEquals(result.exitCode, KotlinCompilation.ExitCode.OK, result.messages)
     }

@@ -16,7 +16,7 @@ data class SelectOptions(
             fetchSize = null,
             maxRows = null,
             queryTimeoutSeconds = null,
-            suppressLogging = false
+            suppressLogging = false,
         )
     }
 }

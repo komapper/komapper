@@ -33,7 +33,7 @@ class KomapperR2dbcAutoConfigurationTest {
         sources.addFirst(MapPropertySource("test", source))
         context.register(
             KomapperR2dbcAutoConfiguration::class.java,
-            R2dbcAutoConfiguration::class.java
+            R2dbcAutoConfiguration::class.java,
         )
         context.refresh()
 
@@ -51,7 +51,7 @@ class KomapperR2dbcAutoConfigurationTest {
         context.register(
             CustomConfigure::class.java,
             KomapperR2dbcAutoConfiguration::class.java,
-            R2dbcAutoConfiguration::class.java
+            R2dbcAutoConfiguration::class.java,
         )
         context.refresh()
 
@@ -72,7 +72,7 @@ class KomapperR2dbcAutoConfigurationTest {
         context.register(
             TemplateStatementBuilderConfigure::class.java,
             KomapperR2dbcAutoConfiguration::class.java,
-            R2dbcAutoConfiguration::class.java
+            R2dbcAutoConfiguration::class.java,
         )
         context.refresh()
 
@@ -113,7 +113,7 @@ class KomapperR2dbcAutoConfigurationTest {
         override fun build(
             template: CharSequence,
             valueMap: Map<String, Value<*>>,
-            builtinExtensions: TemplateBuiltinExtensions
+            builtinExtensions: TemplateBuiltinExtensions,
         ): Statement {
             throw UnsupportedOperationException()
         }

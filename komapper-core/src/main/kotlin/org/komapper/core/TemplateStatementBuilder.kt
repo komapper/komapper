@@ -15,7 +15,7 @@ interface TemplateStatementBuilder {
     fun build(
         template: CharSequence,
         valueMap: Map<String, Value<*>>,
-        builtinExtensions: TemplateBuiltinExtensions
+        builtinExtensions: TemplateBuiltinExtensions,
     ): Statement
 
     /**
@@ -28,7 +28,7 @@ class DefaultTemplateStatementBuilder : TemplateStatementBuilder {
     override fun build(template: CharSequence, valueMap: Map<String, Value<*>>, builtinExtensions: TemplateBuiltinExtensions): Statement {
         throw UnsupportedOperationException(
             "Appropriate TemplateStatementBuilder is not found. " +
-                "Add komapper-template dependency or override the templateStatementBuilder property."
+                "Add komapper-template dependency or override the templateStatementBuilder property.",
         )
     }
 

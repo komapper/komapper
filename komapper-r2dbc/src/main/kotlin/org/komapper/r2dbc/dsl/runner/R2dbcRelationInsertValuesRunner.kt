@@ -52,7 +52,7 @@ internal class R2dbcRelationInsertValuesRunner<ENTITY : Any, ID : Any, META : En
     private suspend fun insert(
         config: R2dbcDatabaseConfig,
         idAssignment: Pair<PropertyMetamodel<ENTITY, ID, *>, Operand>? = null,
-        generatedColumn: String? = null
+        generatedColumn: String? = null,
     ): Pair<Long, List<Long>> {
         val statement = runner.buildStatement(config, idAssignment)
         val executor = R2dbcExecutor(config, context.options, generatedColumn)

@@ -27,13 +27,13 @@ class RelationUpdateRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY
 
     fun buildStatement(
         config: DatabaseConfig,
-        updatedAtAssignment: Pair<PropertyMetamodel<ENTITY, *, *>, Operand>? = null
+        updatedAtAssignment: Pair<PropertyMetamodel<ENTITY, *, *>, Operand>? = null,
     ): Result<Statement> {
         checkWhereClause(context)
         val assignments = getAssignments(updatedAtAssignment)
         if (assignments.isEmpty() && context.target.versionProperty() == null) {
             return Result.failure(
-                IllegalStateException("No update statement is generated because no assignment is specified.")
+                IllegalStateException("No update statement is generated because no assignment is specified."),
             )
         }
         val builder = RelationUpdateStatementBuilder(BuilderDialect(config), context)

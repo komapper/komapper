@@ -30,7 +30,7 @@ class R2dbcUpdateBatchTest(private val db: R2dbcDatabase) {
         val addressList = listOf(
             Address(16, "STREET 16", 0),
             Address(17, "STREET 17", 0),
-            Address(18, "STREET 18", 0)
+            Address(18, "STREET 18", 0),
         )
         for (address in addressList) {
             db.runQuery { QueryDsl.insert(a).single(address) }
@@ -55,7 +55,7 @@ class R2dbcUpdateBatchTest(private val db: R2dbcDatabase) {
         val addressList = listOf(
             Address(16, "STREET 16", 0),
             Address(17, "STREET 17", 0),
-            Address(18, "STREET 18", 0)
+            Address(18, "STREET 18", 0),
         )
         for (address in addressList) {
             db.runQuery { QueryDsl.insert(a).single(address) }
@@ -78,7 +78,7 @@ class R2dbcUpdateBatchTest(private val db: R2dbcDatabase) {
         val personList = listOf(
             Person(1, "A"),
             Person(2, "B"),
-            Person(3, "C")
+            Person(3, "C"),
         )
         for (person in personList) {
             db.runQuery { QueryDsl.insert(p).single(person) }
@@ -98,8 +98,8 @@ class R2dbcUpdateBatchTest(private val db: R2dbcDatabase) {
                     listOf(
                         Address(1, "A", 1),
                         Address(2, "B", 1),
-                        Address(3, "B", 1)
-                    )
+                        Address(3, "B", 1),
+                    ),
                 )
             }.let { }
         }
@@ -115,8 +115,8 @@ class R2dbcUpdateBatchTest(private val db: R2dbcDatabase) {
                     listOf(
                         Address(1, "A", 1),
                         Address(2, "B", 1),
-                        Address(3, "C", 2)
-                    )
+                        Address(3, "C", 2),
+                    ),
                 )
             }.let { }
         }
@@ -132,7 +132,7 @@ class R2dbcUpdateBatchTest(private val db: R2dbcDatabase) {
         val updateList = before.map {
             it.copy(
                 departmentName = "[" + it.departmentName + "]",
-                location = "[" + it.location + "]"
+                location = "[" + it.location + "]",
             )
         }
         db.runQuery { QueryDsl.update(d).include(d.departmentName).batch(updateList) }
@@ -155,7 +155,7 @@ class R2dbcUpdateBatchTest(private val db: R2dbcDatabase) {
         val updateList = before.map {
             it.copy(
                 departmentName = "[" + it.departmentName + "]",
-                location = "[" + it.location + "]"
+                location = "[" + it.location + "]",
             )
         }
         db.runQuery { QueryDsl.update(d).exclude(d.location, d.version).batch(updateList) }

@@ -28,7 +28,7 @@ internal object JdbcResultSetTransformers {
 
     private fun <A : Any, R> singleColumn(
         expression: ColumnExpression<A, *>,
-        transform: (A?) -> R
+        transform: (A?) -> R,
     ): (JdbcDataOperator, ResultSet) -> R =
         { dataOperator, rs ->
             val extractor = JdbcValueExtractor(dataOperator, rs)
@@ -50,7 +50,7 @@ internal object JdbcResultSetTransformers {
 
     private fun <A : Any, B : Any, AR, BR> pairColumns(
         expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
-        transform: (Pair<A?, B?>) -> Pair<AR, BR>
+        transform: (Pair<A?, B?>) -> Pair<AR, BR>,
     ): (JdbcDataOperator, ResultSet) -> Pair<AR, BR> =
         { dataOperator, rs ->
             val extractor = JdbcValueExtractor(dataOperator, rs)
@@ -74,7 +74,7 @@ internal object JdbcResultSetTransformers {
 
     private fun <A : Any, B : Any, C : Any, AR, BR, CR> tripleColumns(
         expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
-        transform: (Triple<A?, B?, C?>) -> Triple<AR, BR, CR>
+        transform: (Triple<A?, B?, C?>) -> Triple<AR, BR, CR>,
     ): (JdbcDataOperator, ResultSet) -> Triple<AR, BR, CR> =
         { dataOperator, rs ->
             val extractor = JdbcValueExtractor(dataOperator, rs)

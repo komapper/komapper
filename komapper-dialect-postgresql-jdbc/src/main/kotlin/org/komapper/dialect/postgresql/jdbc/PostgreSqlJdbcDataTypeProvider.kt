@@ -51,7 +51,7 @@ class PostgreSqlJdbcDataTypeProvider(next: JdbcDataTypeProvider) :
             JdbcUByteType("smallint"),
             JdbcUIntType("bigint"),
             JdbcUShortType("integer"),
-            PostgreSqlJdbcUUIDType
+            PostgreSqlJdbcUUIDType,
         )
     }
 }

@@ -10,6 +10,6 @@ class JdbcOracleSetting(private val driver: String, url: String) : OracleSetting
         url,
         "test",
         "test",
-        executionOptions = ExecutionOptions(batchSize = 2)
+        executionOptions = ExecutionOptions(batchSize = 2),
     )
 }

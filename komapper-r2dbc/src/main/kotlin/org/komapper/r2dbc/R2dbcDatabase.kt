@@ -78,7 +78,7 @@ interface R2dbcDatabase : Database {
     suspend fun <R> withTransaction(
         transactionAttribute: TransactionAttribute = TransactionAttribute.REQUIRED,
         transactionProperty: TransactionProperty = EmptyTransactionProperty,
-        block: suspend (CoroutineTransactionOperator) -> R
+        block: suspend (CoroutineTransactionOperator) -> R,
     ): R
 
     /**
@@ -93,7 +93,7 @@ interface R2dbcDatabase : Database {
     fun <R> flowTransaction(
         transactionAttribute: TransactionAttribute = TransactionAttribute.REQUIRED,
         transactionProperty: TransactionProperty = EmptyTransactionProperty,
-        block: suspend FlowCollector<R>.(FlowTransactionOperator) -> Unit
+        block: suspend FlowCollector<R>.(FlowTransactionOperator) -> Unit,
     ): Flow<R>
 }
 
@@ -125,7 +125,7 @@ internal class R2dbcDatabaseImpl(override val config: R2dbcDatabaseConfig) : R2d
     override suspend fun <R> withTransaction(
         transactionAttribute: TransactionAttribute,
         transactionProperty: TransactionProperty,
-        block: suspend (CoroutineTransactionOperator) -> R
+        block: suspend (CoroutineTransactionOperator) -> R,
     ): R {
         val tx = config.session.coroutineTransactionOperator
         return when (transactionAttribute) {
@@ -137,7 +137,7 @@ internal class R2dbcDatabaseImpl(override val config: R2dbcDatabaseConfig) : R2d
     override fun <R> flowTransaction(
         transactionAttribute: TransactionAttribute,
         transactionProperty: TransactionProperty,
-        block: suspend FlowCollector<R>.(FlowTransactionOperator) -> Unit
+        block: suspend FlowCollector<R>.(FlowTransactionOperator) -> Unit,
     ): Flow<R> {
         val tx = config.session.flowTransactionOperator
         return when (transactionAttribute) {
@@ -170,14 +170,14 @@ fun R2dbcDatabase(
     dialect: R2dbcDialect,
     dataTypeProvider: R2dbcDataTypeProvider? = null,
     clockProvider: ClockProvider = DefaultClockProvider(),
-    executionOptions: ExecutionOptions = ExecutionOptions()
+    executionOptions: ExecutionOptions = ExecutionOptions(),
 ): R2dbcDatabase {
     val config = DefaultR2dbcDatabaseConfig(
         connectionFactory = connectionFactory,
         dialect = dialect,
         dataTypeProvider = dataTypeProvider,
         clockProvider = clockProvider,
-        executionOptions = executionOptions
+        executionOptions = executionOptions,
     )
     return R2dbcDatabase(config)
 }
@@ -196,7 +196,7 @@ fun R2dbcDatabase(
     dialect: R2dbcDialect = R2dbcDialects.getByOptions(options),
     dataTypeProvider: R2dbcDataTypeProvider? = null,
     clockProvider: ClockProvider = DefaultClockProvider(),
-    executionOptions: ExecutionOptions = ExecutionOptions()
+    executionOptions: ExecutionOptions = ExecutionOptions(),
 ): R2dbcDatabase {
     val connectionFactory = ConnectionFactories.get(options)
     val config = DefaultR2dbcDatabaseConfig(
@@ -204,7 +204,7 @@ fun R2dbcDatabase(
         dialect = dialect,
         dataTypeProvider = dataTypeProvider,
         clockProvider = clockProvider,
-        executionOptions = executionOptions
+        executionOptions = executionOptions,
     )
     return R2dbcDatabase(config)
 }
@@ -223,7 +223,7 @@ fun R2dbcDatabase(
     dialect: R2dbcDialect = R2dbcDialects.getByUrl(url),
     dataTypeProvider: R2dbcDataTypeProvider? = null,
     clockProvider: ClockProvider = DefaultClockProvider(),
-    executionOptions: ExecutionOptions = ExecutionOptions()
+    executionOptions: ExecutionOptions = ExecutionOptions(),
 ): R2dbcDatabase {
     val connectionFactory = ConnectionFactories.get(url)
     val config = DefaultR2dbcDatabaseConfig(
@@ -231,7 +231,7 @@ fun R2dbcDatabase(
         dialect = dialect,
         dataTypeProvider = dataTypeProvider,
         clockProvider = clockProvider,
-        executionOptions = executionOptions
+        executionOptions = executionOptions,
     )
     return R2dbcDatabase(config)
 }

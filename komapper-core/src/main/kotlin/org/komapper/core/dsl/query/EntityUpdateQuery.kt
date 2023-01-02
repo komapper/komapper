@@ -23,7 +23,7 @@ interface EntityUpdateQuery<T> : Query<T> {
 
 internal data class EntityUpdateSingleQuery<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityUpdateContext<ENTITY, ID, META>,
-    private val entity: ENTITY
+    private val entity: ENTITY,
 ) : EntityUpdateQuery<ENTITY> {
     override fun options(configure: (UpdateOptions) -> UpdateOptions): EntityUpdateQuery<ENTITY> {
         val newContext = context.copy(options = configure(context.options))

@@ -90,9 +90,9 @@ class R2dbcSelectProjectionTest(private val db: R2dbcDatabase) {
         assertEquals(
             listOf(
                 Triple(1, "STREET 1", 1),
-                Triple(2, "STREET 2", 1)
+                Triple(2, "STREET 2", 1),
             ),
-            tripleList
+            tripleList,
         )
     }
 
@@ -193,9 +193,9 @@ class R2dbcSelectProjectionTest(private val db: R2dbcDatabase) {
         assertEquals(
             listOf(
                 Triple(1, "STREET 1", 1),
-                Triple(2, "STREET 2", 1)
+                Triple(2, "STREET 2", 1),
             ),
-            tripleList
+            tripleList,
         )
     }
 

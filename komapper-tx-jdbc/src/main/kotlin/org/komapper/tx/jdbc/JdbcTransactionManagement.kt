@@ -30,7 +30,7 @@ interface JdbcTransactionManagement {
 private class JdbcTransactionManagementImpl(
     private val dataSource: DataSource,
     private val loggerFacade: LoggerFacade,
-    private val releaseAction: JdbcTransactionReleaseAction
+    private val releaseAction: JdbcTransactionReleaseAction,
 ) : JdbcTransactionManagement {
 
     override fun getConnection(tx: JdbcTransaction?): Connection {
@@ -139,7 +139,7 @@ private class JdbcTransactionManagementImpl(
 fun JdbcTransactionManagement(
     dataSource: DataSource,
     loggerFacade: LoggerFacade,
-    releaseAction: JdbcTransactionReleaseAction = JdbcTransactionReleaseAction { }
+    releaseAction: JdbcTransactionReleaseAction = JdbcTransactionReleaseAction { },
 ): JdbcTransactionManagement {
     return JdbcTransactionManagementImpl(dataSource, loggerFacade, releaseAction)
 }

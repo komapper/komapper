@@ -38,7 +38,7 @@ interface EntityMetamodel<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY,
         schema: String,
         alwaysQuote: Boolean,
         disableSequenceAssignment: Boolean,
-        declaration: EntityMetamodelDeclaration<META>
+        declaration: EntityMetamodelDeclaration<META>,
     ): META
 }
 
@@ -73,7 +73,7 @@ abstract class EntityMetamodelStub<ENTITY : Any, META : EntityMetamodelStub<ENTI
         schema: String,
         alwaysQuote: Boolean,
         disableSequenceAssignment: Boolean,
-        declaration: EntityMetamodelDeclaration<META>
+        declaration: EntityMetamodelDeclaration<META>,
     ): META = fail()
 
     private fun fail(): Nothing {

@@ -71,22 +71,26 @@ data class EnumData(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true)
 @KomapperTable("enum_ordinal_data")
 data class EnumOrdinalData(
     @KomapperId val id: Int,
-    @KomapperColumn(alwaysQuote = true) @KomapperEnum(EnumType.ORDINAL) val value: Direction?
+    @KomapperColumn(alwaysQuote = true)
+    @KomapperEnum(EnumType.ORDINAL)
+    val value: Direction?,
 )
 
 @KomapperEntity
 @KomapperTable("enum_property_data")
 data class EnumPropertyData(
     @KomapperId val id: Int,
-    @KomapperColumn(alwaysQuote = true) @KomapperEnum(EnumType.PROPERTY, hint = "value") val value: Color?
+    @KomapperColumn(alwaysQuote = true)
+    @KomapperEnum(EnumType.PROPERTY, hint = "value")
+    val value: Color?,
 )
 
 data class DirectionInfo(
-    val direction: Direction
+    val direction: Direction,
 )
 
 data class ColorInfo(
-    val color: Color
+    val color: Color,
 )
 
 @KomapperEntity
@@ -96,7 +100,7 @@ data class EmbeddedEnumOrdinalData(
     @KomapperEmbedded
     @KomapperColumnOverride(name = "direction", KomapperColumn(name = "value", alwaysQuote = true))
     @KomapperEnumOverride(name = "direction", KomapperEnum(EnumType.ORDINAL))
-    val value: DirectionInfo?
+    val value: DirectionInfo?,
 )
 
 @KomapperEntity
@@ -106,7 +110,7 @@ data class EmbeddedEnumPropertyData(
     @KomapperEmbedded
     @KomapperColumnOverride(name = "color", KomapperColumn(name = "value", alwaysQuote = true))
     @KomapperEnumOverride(name = "color", KomapperEnum(EnumType.PROPERTY, "value"))
-    val value: ColorInfo?
+    val value: ColorInfo?,
 )
 
 @KomapperEntity
@@ -172,9 +176,11 @@ data class UUIDData(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true)
 @KomapperEntity
 @KomapperTable("address")
 data class UnsignedAddress(
-    @KomapperId @KomapperColumn(name = "address_id") val addressId: UInt,
+    @KomapperId
+    @KomapperColumn(name = "address_id")
+    val addressId: UInt,
     val street: String,
-    @KomapperVersion val version: UInt?
+    @KomapperVersion val version: UInt?,
 )
 
 @JvmInline
@@ -183,23 +189,28 @@ value class UIntVersion(@KomapperColumn(alwaysQuote = true) val value: UInt)
 @KomapperEntity
 @KomapperTable("address")
 data class UnsignedAddress2(
-    @KomapperId @KomapperColumn(name = "address_id") val addressId: UInt,
+    @KomapperId
+    @KomapperColumn(name = "address_id")
+    val addressId: UInt,
     val street: String,
-    @KomapperVersion val version: UIntVersion?
+    @KomapperVersion val version: UIntVersion?,
 )
 
 @KomapperEntity
 @KomapperTable("identity_strategy")
 data class UnsignedIdentityStrategy(
-    @KomapperId @KomapperAutoIncrement val id: UInt?,
-    @KomapperColumn(alwaysQuote = true) val value: String
+    @KomapperId @KomapperAutoIncrement
+    val id: UInt?,
+    @KomapperColumn(alwaysQuote = true) val value: String,
 )
 
 @KomapperEntity
 @KomapperTable("sequence_strategy")
 data class UnsignedSequenceStrategy(
-    @KomapperId @KomapperSequence(name = "sequence_strategy_id", incrementBy = 100) val id: UInt,
-    @KomapperColumn(alwaysQuote = true) val value: String
+    @KomapperId
+    @KomapperSequence(name = "sequence_strategy_id", incrementBy = 100)
+    val id: UInt,
+    @KomapperColumn(alwaysQuote = true) val value: String,
 )
 
 @KomapperEntity
@@ -212,7 +223,7 @@ data class UserDefinedInt(val value: Int)
 @KomapperTable("string_data")
 data class UserDefinedStringData(
     @KomapperId val id: Int,
-    @KomapperColumn(alwaysQuote = true) val value: UserDefinedString?
+    @KomapperColumn(alwaysQuote = true) val value: UserDefinedString?,
 )
 
 data class UserDefinedString(val value: String)

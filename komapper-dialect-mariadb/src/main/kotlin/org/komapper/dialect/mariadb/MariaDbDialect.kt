@@ -37,7 +37,7 @@ interface MariaDbDialect : Dialect {
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> getEntityUpsertStatementBuilder(
         dialect: BuilderDialect,
         context: EntityUpsertContext<ENTITY, ID, META>,
-        entities: List<ENTITY>
+        entities: List<ENTITY>,
     ): EntityUpsertStatementBuilder<ENTITY> {
         return MariaDbEntityUpsertStatementBuilder(dialect, context, entities)
     }

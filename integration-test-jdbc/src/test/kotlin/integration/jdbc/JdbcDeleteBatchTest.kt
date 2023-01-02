@@ -24,7 +24,7 @@ class JdbcDeleteBatchTest(private val db: JdbcDatabase) {
         val addressList = listOf(
             Address(16, "STREET 16", 0),
             Address(17, "STREET 17", 0),
-            Address(18, "STREET 18", 0)
+            Address(18, "STREET 18", 0),
         )
         for (address in addressList) {
             db.runQuery { QueryDsl.insert(a).single(address) }
@@ -42,7 +42,7 @@ class JdbcDeleteBatchTest(private val db: JdbcDatabase) {
         val addressList = listOf(
             Address(16, "STREET 16", 0),
             Address(17, "STREET 17", 0),
-            Address(18, "STREET 18", 0)
+            Address(18, "STREET 18", 0),
         )
         for (address in addressList) {
             db.runQuery { QueryDsl.insert(a).single(address) }
@@ -62,7 +62,7 @@ class JdbcDeleteBatchTest(private val db: JdbcDatabase) {
         val addressList = listOf(
             Address(16, "STREET 16", 0),
             Address(17, "STREET 17", 0),
-            Address(18, "STREET 18", 0)
+            Address(18, "STREET 18", 0),
         )
         for (address in addressList) {
             db.runQuery { QueryDsl.insert(a).single(address) }
@@ -75,8 +75,8 @@ class JdbcDeleteBatchTest(private val db: JdbcDatabase) {
                     listOf(
                         addressList[0],
                         addressList[1],
-                        addressList[2].copy(version = 1)
-                    )
+                        addressList[2].copy(version = 1),
+                    ),
                 )
             }
         }
@@ -89,7 +89,7 @@ class JdbcDeleteBatchTest(private val db: JdbcDatabase) {
         val addressList = listOf(
             Address(16, "STREET 16", 0),
             Address(17, "STREET 17", 0),
-            Address(18, "STREET 18", 0)
+            Address(18, "STREET 18", 0),
         )
         for (address in addressList) {
             db.runQuery { QueryDsl.insert(a).single(address) }
@@ -102,8 +102,8 @@ class JdbcDeleteBatchTest(private val db: JdbcDatabase) {
                     listOf(
                         addressList[0],
                         addressList[1],
-                        addressList[2].copy(version = 1)
-                    )
+                        addressList[2].copy(version = 1),
+                    ),
                 )
                 .options {
                     it.copy(suppressOptimisticLockException = true)
@@ -117,7 +117,7 @@ class JdbcDeleteBatchTest(private val db: JdbcDatabase) {
         val addressList = listOf(
             Address(16, "STREET 16", 0),
             Address(17, "STREET 17", 0),
-            Address(18, "STREET 18", 0)
+            Address(18, "STREET 18", 0),
         )
         for (address in addressList) {
             db.runQuery { QueryDsl.insert(a).single(address) }
@@ -130,8 +130,8 @@ class JdbcDeleteBatchTest(private val db: JdbcDatabase) {
                     listOf(
                         addressList[0],
                         addressList[1],
-                        addressList[2].copy(version = 1)
-                    )
+                        addressList[2].copy(version = 1),
+                    ),
                 )
                 .options {
                     it.copy(disableOptimisticLock = true)

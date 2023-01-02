@@ -94,12 +94,16 @@ class JdbcInsertSingleTest(private val db: JdbcDatabase) {
     fun embedded() {
         val r = Meta.robot
         val robot = Robot(
-            employeeId = 99, managerId = null, departmentId = 1, addressId = 1, version = 0,
+            employeeId = 99,
+            managerId = null,
+            departmentId = 1,
+            addressId = 1,
+            version = 0,
             info1 = RobotInfo1(
                 employeeNo = 9999,
-                employeeName = "a"
+                employeeName = "a",
             ),
-            info2 = null
+            info2 = null,
         )
         db.runQuery { QueryDsl.insert(r).single(robot) }
         val robot2 = db.runQuery {
@@ -114,9 +118,13 @@ class JdbcInsertSingleTest(private val db: JdbcDatabase) {
     fun embedded_generics() {
         val a = Meta.android
         val android = Android(
-            employeeId = 99, managerId = null, departmentId = 1, addressId = 1, version = 0,
+            employeeId = 99,
+            managerId = null,
+            departmentId = 1,
+            addressId = 1,
+            version = 0,
             info1 = 9999 to "a",
-            info2 = null
+            info2 = null,
         )
         db.runQuery { QueryDsl.insert(a).single(android) }
         val android2 = db.runQuery {
@@ -131,9 +139,13 @@ class JdbcInsertSingleTest(private val db: JdbcDatabase) {
     fun embedded_generics_separation_mapping() {
         val c = Meta.cyborg
         val cyborg = Cyborg(
-            employeeId = 99, managerId = null, departmentId = 1, addressId = 1, version = 0,
+            employeeId = 99,
+            managerId = null,
+            departmentId = 1,
+            addressId = 1,
+            version = 0,
             info1 = 9999 to "a",
-            info2 = null
+            info2 = null,
         )
         db.runQuery { QueryDsl.insert(c).single(cyborg) }
         val cyborg2 = db.runQuery {

@@ -17,7 +17,7 @@ data class InsertOptions(
             disableSequenceAssignment = false,
             returnGeneratedKeys = true,
             queryTimeoutSeconds = null,
-            suppressLogging = false
+            suppressLogging = false,
         )
     }
 }

@@ -7,7 +7,7 @@ interface JdbcTransactionContext {
 }
 
 private class DefaultJdbcTransactionContext(
-    override val transaction: JdbcTransaction
+    override val transaction: JdbcTransaction,
 ) : JdbcTransactionContext
 
 internal object EmptyJdbcTransactionContext : JdbcTransactionContext {

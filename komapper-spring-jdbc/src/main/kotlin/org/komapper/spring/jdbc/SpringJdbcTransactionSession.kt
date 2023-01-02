@@ -9,7 +9,7 @@ import javax.sql.DataSource
 
 class SpringJdbcTransactionSession(
     transactionManager: PlatformTransactionManager,
-    private val dataSource: DataSource
+    private val dataSource: DataSource,
 ) :
     JdbcSession {
 
