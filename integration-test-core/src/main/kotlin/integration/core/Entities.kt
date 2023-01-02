@@ -21,9 +21,11 @@ import java.time.OffsetDateTime
 
 @KomapperEntity
 data class Address(
-    @KomapperId @KomapperColumn(name = "address_id") val addressId: Int,
+    @KomapperId
+    @KomapperColumn(name = "address_id")
+    val addressId: Int,
     val street: String,
-    @KomapperVersion val version: Int
+    @KomapperVersion val version: Int,
 )
 
 @KomapperEntity
@@ -32,7 +34,7 @@ data class CompositeKeyAddress(
     @KomapperId val addressId1: Int,
     @KomapperId val addressId2: Int,
     val street: String,
-    val version: Int
+    val version: Int,
 )
 
 data class AddressId(
@@ -46,7 +48,7 @@ data class EmbeddedIdAddress(
     @KomapperEmbeddedId
     val id: AddressId,
     val street: String,
-    val version: Int
+    val version: Int,
 )
 
 @KomapperEntity
@@ -57,52 +59,71 @@ data class GenericEmbeddedIdAddress(
     @KomapperColumnOverride("second", KomapperColumn("address_id2"))
     val id: Pair<Int, Int>,
     val street: String,
-    val version: Int
+    val version: Int,
 )
 
 @KomapperEntity
 @KomapperTable("identity_strategy")
 data class IdentityStrategy(
-    @KomapperId @KomapperAutoIncrement val id: Int?,
-    @KomapperColumn(alwaysQuote = true) val value: String
+    @KomapperId @KomapperAutoIncrement
+    val id: Int?,
+    @KomapperColumn(alwaysQuote = true) val value: String,
 )
 
 @KomapperEntity
 @KomapperTable("sequence_strategy")
 data class SequenceStrategy(
-    @KomapperId @KomapperSequence(name = "sequence_strategy_id", incrementBy = 100) val id: Int,
-    @KomapperColumn(alwaysQuote = true) val value: String
+    @KomapperId
+    @KomapperSequence(name = "sequence_strategy_id", incrementBy = 100)
+    val id: Int,
+    @KomapperColumn(alwaysQuote = true) val value: String,
 )
 
 @KomapperEntity
 @KomapperTable("human")
 data class Man(
-    @KomapperId @KomapperColumn("human_id") val manId: Int,
+    @KomapperId
+    @KomapperColumn("human_id")
+    val manId: Int,
     val name: String,
-    @KomapperCreatedAt @KomapperColumn("created_at") val createdAt: Instant? = null,
-    @KomapperUpdatedAt @KomapperColumn("updated_at") val updatedAt: Instant? = null
+    @KomapperCreatedAt
+    @KomapperColumn("created_at")
+    val createdAt: Instant? = null,
+    @KomapperUpdatedAt
+    @KomapperColumn("updated_at")
+    val updatedAt: Instant? = null,
 )
 
 @KomapperEntity
 data class Person(
-    @KomapperId @KomapperColumn("person_id") val personId: Int,
+    @KomapperId
+    @KomapperColumn("person_id")
+    val personId: Int,
     val name: String,
-    @KomapperCreatedAt @KomapperColumn("created_at") val createdAt: LocalDateTime? = null,
-    @KomapperUpdatedAt @KomapperColumn("updated_at") val updatedAt: LocalDateTime? = null
+    @KomapperCreatedAt
+    @KomapperColumn("created_at")
+    val createdAt: LocalDateTime? = null,
+    @KomapperUpdatedAt
+    @KomapperColumn("updated_at")
+    val updatedAt: LocalDateTime? = null,
 )
 
 @KomapperEntity
 @KomapperTable("human")
 data class Human(
-    @KomapperId @KomapperColumn("human_id") val humanId: Int,
+    @KomapperId
+    @KomapperColumn("human_id")
+    val humanId: Int,
     val name: String,
     @KomapperCreatedAt val createdAt: OffsetDateTime? = null,
-    @KomapperUpdatedAt val updatedAt: OffsetDateTime? = null
+    @KomapperUpdatedAt val updatedAt: OffsetDateTime? = null,
 )
 
 @KomapperEntity(["employee", "manager"])
 data class Employee(
-    @KomapperId @KomapperColumn("employee_id") val employeeId: Int,
+    @KomapperId
+    @KomapperColumn("employee_id")
+    val employeeId: Int,
     @KomapperColumn("employee_no") val employeeNo: Int,
     @KomapperColumn("employee_name") val employeeName: String,
     @KomapperColumn("manager_id") val managerId: Int?,
@@ -120,13 +141,15 @@ data class RobotInfo1(
 
 data class RobotInfo2(
     val hiredate: LocalDate? = null,
-    val salary: BigDecimal? = null
+    val salary: BigDecimal? = null,
 )
 
 @KomapperEntity
 @KomapperTable("employee")
 data class Robot(
-    @KomapperId @KomapperColumn("employee_id") val employeeId: Int,
+    @KomapperId
+    @KomapperColumn("employee_id")
+    val employeeId: Int,
     @KomapperEmbedded
     @KomapperColumnOverride("employeeNo", KomapperColumn("employee_no"))
     @KomapperColumnOverride("employeeName", KomapperColumn("employee_name"))
@@ -142,7 +165,9 @@ data class Robot(
 @KomapperEntity
 @KomapperTable("employee")
 data class Android(
-    @KomapperId @KomapperColumn("employee_id") val employeeId: Int,
+    @KomapperId
+    @KomapperColumn("employee_id")
+    val employeeId: Int,
     @KomapperEmbedded
     @KomapperColumnOverride("first", KomapperColumn("employee_no"))
     @KomapperColumnOverride("second", KomapperColumn("employee_name"))
@@ -173,7 +198,9 @@ data class Cyborg(
 @KomapperEntityDef(Cyborg::class)
 @KomapperTable("employee")
 data class CyborgDef(
-    @KomapperId @KomapperColumn("employee_id") val employeeId: Nothing,
+    @KomapperId
+    @KomapperColumn("employee_id")
+    val employeeId: Nothing,
     @KomapperEmbedded
     @KomapperColumnOverride("first", KomapperColumn("employee_no"))
     @KomapperColumnOverride("second", KomapperColumn("employee_name"))
@@ -190,7 +217,9 @@ data class CyborgDef(
 
 @KomapperEntity
 data class Department(
-    @KomapperId @KomapperColumn("department_id") val departmentId: Int,
+    @KomapperId
+    @KomapperColumn("department_id")
+    val departmentId: Int,
     @KomapperColumn("department_no") val departmentNo: Int,
     @KomapperColumn("department_name") val departmentName: String,
     val location: String,
@@ -200,7 +229,9 @@ data class Department(
 @KomapperEntity
 @KomapperTable("department")
 data class NoVersionDepartment(
-    @KomapperId @KomapperColumn("department_id") val departmentId: Int,
+    @KomapperId
+    @KomapperColumn("department_id")
+    val departmentId: Int,
     @KomapperColumn("department_no") val departmentNo: Int,
     @KomapperColumn("department_name") val departmentName: String,
     val location: String,
@@ -210,7 +241,7 @@ data class NoVersionDepartment(
 data class Place(
     val id: Int,
     val street: String,
-    val version: Int
+    val version: Int,
 )
 
 typealias LocationInt = Int
@@ -219,9 +250,10 @@ typealias LocationString = String
 @KomapperEntity
 @KomapperTable("address")
 data class Location(
-    @KomapperId @KomapperColumn(name = "address_id")
+    @KomapperId
+    @KomapperColumn(name = "address_id")
     val id: LocationInt?,
     val street: LocationString,
     @KomapperVersion
-    val version: LocationInt
+    val version: LocationInt,
 )

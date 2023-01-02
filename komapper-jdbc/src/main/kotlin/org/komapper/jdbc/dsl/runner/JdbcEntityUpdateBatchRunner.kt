@@ -9,7 +9,7 @@ import org.komapper.jdbc.JdbcDatabaseConfig
 
 internal class JdbcEntityUpdateBatchRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     context: EntityUpdateContext<ENTITY, ID, META>,
-    private val entities: List<ENTITY>
+    private val entities: List<ENTITY>,
 ) :
     JdbcRunner<List<ENTITY>> {
 

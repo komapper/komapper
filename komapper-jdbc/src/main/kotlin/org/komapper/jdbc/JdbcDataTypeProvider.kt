@@ -10,7 +10,7 @@ interface JdbcDataTypeProvider {
 
 abstract class AbstractJdbcDataTypeProvider(
     private val next: JdbcDataTypeProvider,
-    dataTypes: List<JdbcDataType<*>>
+    dataTypes: List<JdbcDataType<*>>,
 ) : JdbcDataTypeProvider {
 
     private val dataTypeMap: Map<KClass<*>, JdbcDataType<*>> = dataTypes.associateBy { it.klass }
@@ -24,7 +24,7 @@ abstract class AbstractJdbcDataTypeProvider(
 
 class DefaultJdbcDataTypeProvider(
     next: JdbcDataTypeProvider,
-    dataTypes: List<JdbcDataType<*>>
+    dataTypes: List<JdbcDataType<*>>,
 ) : AbstractJdbcDataTypeProvider(next, dataTypes)
 
 fun JdbcDataTypeProvider(vararg dataTypes: JdbcDataType<*>): JdbcDataTypeProvider {

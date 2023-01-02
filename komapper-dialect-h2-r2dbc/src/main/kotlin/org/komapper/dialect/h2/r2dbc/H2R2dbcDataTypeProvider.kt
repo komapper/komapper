@@ -51,7 +51,7 @@ class H2R2dbcDataTypeProvider(next: R2dbcDataTypeProvider) :
             R2dbcUByteType("smallint"),
             R2dbcUIntType("bigint"),
             R2dbcUShortType("integer"),
-            H2R2dbcUUIDType
+            H2R2dbcUUIDType,
         )
     }
 }

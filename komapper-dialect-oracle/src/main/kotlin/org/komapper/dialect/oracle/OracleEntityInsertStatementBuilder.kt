@@ -12,7 +12,7 @@ import org.komapper.core.dsl.metamodel.getNonAutoIncrementProperties
 class OracleEntityInsertStatementBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val dialect: BuilderDialect,
     private val context: EntityInsertContext<ENTITY, ID, META>,
-    private val entities: List<ENTITY>
+    private val entities: List<ENTITY>,
 ) :
     EntityInsertStatementBuilder<ENTITY, ID, META> {
 

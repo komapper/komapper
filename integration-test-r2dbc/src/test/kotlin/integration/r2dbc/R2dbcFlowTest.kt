@@ -34,7 +34,7 @@ class R2dbcFlowTest(val db: R2dbcDatabase) {
         val flow = db.flowQuery {
             val a = Meta.address
             QueryDsl.from(a).where { a.addressId eq 1 }.union(
-                QueryDsl.from(a).where { a.addressId eq 2 }
+                QueryDsl.from(a).where { a.addressId eq 2 },
             ).orderBy(a.addressId)
         }
         assertEquals(listOf(1, 2), flow.toList().map { it.addressId })
@@ -73,7 +73,7 @@ class R2dbcFlowTest(val db: R2dbcDatabase) {
                 .select(a.addressId).union(
                     QueryDsl.from(Meta.address)
                         .where { a.addressId eq 2 }
-                        .select(a.addressId)
+                        .select(a.addressId),
                 ).orderBy(a.addressId)
         }
         assertEquals(listOf(1, 2), flow.toList())
@@ -91,9 +91,9 @@ class R2dbcFlowTest(val db: R2dbcDatabase) {
         assertEquals(
             listOf(
                 1 to "STREET 1",
-                2 to "STREET 2"
+                2 to "STREET 2",
             ),
-            flow.toList()
+            flow.toList(),
         )
     }
 
@@ -109,9 +109,9 @@ class R2dbcFlowTest(val db: R2dbcDatabase) {
         assertEquals(
             listOf(
                 1 to "STREET 1",
-                2 to "STREET 2"
+                2 to "STREET 2",
             ),
-            flow.toList()
+            flow.toList(),
         )
     }
 
@@ -124,15 +124,15 @@ class R2dbcFlowTest(val db: R2dbcDatabase) {
                 .select(a.addressId, a.street).union(
                     QueryDsl.from(Meta.address)
                         .where { a.addressId eq 2 }
-                        .select(a.addressId, a.street)
+                        .select(a.addressId, a.street),
                 ).orderBy(a.addressId)
         }
         assertEquals(
             listOf(
                 1 to "STREET 1",
-                2 to "STREET 2"
+                2 to "STREET 2",
             ),
-            flow.toList()
+            flow.toList(),
         )
     }
 
@@ -148,9 +148,9 @@ class R2dbcFlowTest(val db: R2dbcDatabase) {
         assertEquals(
             listOf(
                 Triple(1, "STREET 1", 1),
-                Triple(2, "STREET 2", 1)
+                Triple(2, "STREET 2", 1),
             ),
-            flow.toList()
+            flow.toList(),
         )
     }
 
@@ -166,9 +166,9 @@ class R2dbcFlowTest(val db: R2dbcDatabase) {
         assertEquals(
             listOf(
                 Triple(1, "STREET 1", 1),
-                Triple(2, "STREET 2", 1)
+                Triple(2, "STREET 2", 1),
             ),
-            flow.toList()
+            flow.toList(),
         )
     }
 
@@ -181,15 +181,15 @@ class R2dbcFlowTest(val db: R2dbcDatabase) {
                 .select(a.addressId, a.street, a.version).union(
                     QueryDsl.from(a)
                         .where { a.addressId eq 2 }
-                        .select(a.addressId, a.street, a.version)
+                        .select(a.addressId, a.street, a.version),
                 ).orderBy(a.addressId)
         }
         assertEquals(
             listOf(
                 Triple(1, "STREET 1", 1),
-                Triple(2, "STREET 2", 1)
+                Triple(2, "STREET 2", 1),
             ),
-            flow.toList()
+            flow.toList(),
         )
     }
 
@@ -217,7 +217,7 @@ class R2dbcFlowTest(val db: R2dbcDatabase) {
                 .select(e.employeeId, e.employeeNo, e.employeeName, e.salary).union(
                     QueryDsl.from(e)
                         .where { e.employeeId eq 2 }
-                        .select(e.employeeId, e.employeeNo, e.employeeName, e.salary)
+                        .select(e.employeeId, e.employeeNo, e.employeeName, e.salary),
                 ).orderBy(e.employeeId)
         }
         val list = flow.toList()

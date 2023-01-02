@@ -8,7 +8,7 @@ import org.komapper.core.dsl.metamodel.EntityMetamodel
 
 class EntityDeleteSingleRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     context: EntityDeleteContext<ENTITY, ID, META>,
-    private val entity: ENTITY
+    private val entity: ENTITY,
 ) : Runner {
 
     override fun check(config: DatabaseConfig) = Unit

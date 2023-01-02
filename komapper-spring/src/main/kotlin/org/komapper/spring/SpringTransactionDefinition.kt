@@ -6,7 +6,7 @@ import org.springframework.transaction.TransactionDefinition
 
 class SpringTransactionDefinition(
     private val transactionProperty: TransactionProperty,
-    private val transactionAttribute: TransactionAttribute
+    private val transactionAttribute: TransactionAttribute,
 ) : TransactionDefinition by TransactionDefinition.withDefaults() {
 
     override fun getPropagationBehavior(): Int {

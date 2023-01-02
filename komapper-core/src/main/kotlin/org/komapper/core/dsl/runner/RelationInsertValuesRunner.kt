@@ -60,7 +60,9 @@ class RelationInsertValuesRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<
     fun preInsertUsingAutoIncrement(idGenerator: IdGenerator.AutoIncrement<ENTITY, ID>): String? {
         return if (context.options.returnGeneratedKeys) {
             idGenerator.property.columnName
-        } else null
+        } else {
+            null
+        }
     }
 
     fun postInsertUsingAutoIncrement(count: Long, keys: List<Long>): Pair<Long, ID?> {

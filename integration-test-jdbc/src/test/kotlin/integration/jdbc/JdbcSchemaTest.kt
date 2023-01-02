@@ -27,7 +27,7 @@ class JdbcSchemaTest(private val db: JdbcDatabase) {
             Meta.ccc,
             Meta.compositeKey,
             Meta.autoIncrementTable,
-            Meta.sequenceTable
+            Meta.sequenceTable,
         )
 
     @Test

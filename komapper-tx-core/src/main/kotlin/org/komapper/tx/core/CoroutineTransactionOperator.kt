@@ -14,7 +14,7 @@ interface CoroutineTransactionOperator {
      */
     suspend fun <R> required(
         transactionProperty: TransactionProperty = EmptyTransactionProperty,
-        block: suspend (CoroutineTransactionOperator) -> R
+        block: suspend (CoroutineTransactionOperator) -> R,
     ): R
 
     /**
@@ -27,7 +27,7 @@ interface CoroutineTransactionOperator {
      */
     suspend fun <R> requiresNew(
         transactionProperty: TransactionProperty = EmptyTransactionProperty,
-        block: suspend (CoroutineTransactionOperator) -> R
+        block: suspend (CoroutineTransactionOperator) -> R,
     ): R
 
     /**

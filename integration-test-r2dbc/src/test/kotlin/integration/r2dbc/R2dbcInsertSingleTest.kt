@@ -77,12 +77,16 @@ class R2dbcInsertSingleTest(private val db: R2dbcDatabase) {
     fun embedded(info: TestInfo) = inTransaction(db, info) {
         val r = Meta.robot
         val robot = Robot(
-            employeeId = 99, managerId = null, departmentId = 1, addressId = 1, version = 0,
+            employeeId = 99,
+            managerId = null,
+            departmentId = 1,
+            addressId = 1,
+            version = 0,
             info1 = RobotInfo1(
                 employeeNo = 9999,
                 employeeName = "a",
             ),
-            info2 = null
+            info2 = null,
         )
         db.runQuery { QueryDsl.insert(r).single(robot) }
         val robot2 = db.runQuery {
@@ -97,9 +101,13 @@ class R2dbcInsertSingleTest(private val db: R2dbcDatabase) {
     fun embedded_generics(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.android
         val android = Android(
-            employeeId = 99, managerId = null, departmentId = 1, addressId = 1, version = 0,
+            employeeId = 99,
+            managerId = null,
+            departmentId = 1,
+            addressId = 1,
+            version = 0,
             info1 = 9999 to "a",
-            info2 = null
+            info2 = null,
         )
         db.runQuery { QueryDsl.insert(a).single(android) }
         val android2 = db.runQuery {

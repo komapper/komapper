@@ -11,7 +11,7 @@ import org.komapper.core.dsl.visitor.QueryVisitor
 
 internal data class TripleColumnsSetOperationQuery<A : Any, B : Any, C : Any>(
     override val context: SetOperationContext,
-    private val expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>
+    private val expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
 ) : FlowSetOperationQuery<Triple<A?, B?, C?>> {
 
     private val support: SetOperationQuerySupport<Triple<A?, B?, C?>> = SetOperationQuerySupport(context)

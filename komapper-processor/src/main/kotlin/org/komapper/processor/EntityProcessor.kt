@@ -18,7 +18,7 @@ internal class EntityProcessor(private val environment: SymbolProcessorEnvironme
     override fun process(resolver: Resolver): List<KSAnnotated> {
         val pairs = listOf(
             KomapperEntityDef::class.qualifiedName!! to SeparateDefinitionSourceResolver(),
-            KomapperEntity::class.qualifiedName!! to SelfDefinitionSourceResolver()
+            KomapperEntity::class.qualifiedName!! to SelfDefinitionSourceResolver(),
         )
         for ((annotation, definitionSourceResolver) in pairs) {
             val symbols = resolver.getSymbolsWithAnnotation(annotation)
@@ -59,7 +59,7 @@ internal class EntityProcessor(private val environment: SymbolProcessorEnvironme
                         packageName,
                         simpleName,
                         model.typeName,
-                        writer
+                        writer,
                     )
                 } else {
                     EntityMetamodelGenerator(
@@ -70,7 +70,7 @@ internal class EntityProcessor(private val environment: SymbolProcessorEnvironme
                         packageName,
                         simpleName,
                         model.typeName,
-                        writer
+                        writer,
                     )
                 }
                 runnable.run()

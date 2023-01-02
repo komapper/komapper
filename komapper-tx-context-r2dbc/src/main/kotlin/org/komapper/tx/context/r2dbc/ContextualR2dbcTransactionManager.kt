@@ -56,7 +56,7 @@ interface ContextualR2dbcTransactionManager {
 
 internal class ContextualR2dbcTransactionManagerImpl(
     connectionFactory: ConnectionFactory,
-    loggerFacade: LoggerFacade
+    loggerFacade: LoggerFacade,
 ) : ContextualR2dbcTransactionManager {
 
     private val management: R2dbcTransactionManagement =

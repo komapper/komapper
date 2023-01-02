@@ -43,7 +43,6 @@ internal fun KSAnnotated.hasAnnotation(klass: KClass<*>): Boolean {
 }
 
 internal fun KSType.normalize(parent: TypeArgumentResolver = TypeArgumentResolver()): Pair<KSType, TypeArgumentResolver> {
-
     return this.declaration.accept(
         object : KSEmptyVisitor<Unit, Pair<KSType, TypeArgumentResolver>>() {
             override fun defaultHandler(node: KSNode, data: Unit): Pair<KSType, TypeArgumentResolver> {
@@ -64,14 +63,14 @@ internal fun KSType.normalize(parent: TypeArgumentResolver = TypeArgumentResolve
                 return type.normalize(resolver)
             }
         },
-        Unit
+        Unit,
     )
 }
 
 internal class TypeArgumentResolver(
     private val parent: TypeArgumentResolver? = null,
     typeParameters: List<KSTypeParameter> = emptyList(),
-    typeArguments: List<KSTypeArgument> = emptyList()
+    typeArguments: List<KSTypeArgument> = emptyList(),
 ) {
 
     private val context = typeParameters.map { it.name.asString() }.zip(typeArguments).toMap()

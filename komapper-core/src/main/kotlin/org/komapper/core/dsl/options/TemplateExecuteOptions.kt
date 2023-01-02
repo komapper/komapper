@@ -16,7 +16,7 @@ data class TemplateExecuteOptions(
         val DEFAULT = TemplateExecuteOptions(
             escapeSequence = null,
             queryTimeoutSeconds = null,
-            suppressLogging = false
+            suppressLogging = false,
         )
     }
 }

@@ -10,7 +10,7 @@ data class ScriptOptions(
         val DEFAULT = ScriptOptions(
             separator = ";",
             queryTimeoutSeconds = null,
-            suppressLogging = false
+            suppressLogging = false,
         )
     }
 }

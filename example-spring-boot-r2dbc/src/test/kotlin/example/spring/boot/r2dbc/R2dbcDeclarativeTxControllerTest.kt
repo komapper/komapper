@@ -32,7 +32,7 @@ class R2dbcDeclarativeTxControllerTest {
         // add
         val (id, text) = restTemplate.getForObject(
             UriComponentsBuilder.fromUriString(baseUri).port(port).queryParam("text", "Hi!").build().toUri(),
-            Message::class.java
+            Message::class.java,
         )
         assertNotNull(id)
         assertEquals("Hi!", text)
@@ -40,11 +40,12 @@ class R2dbcDeclarativeTxControllerTest {
         // list
         val messages = restTemplate.exchange(
             UriComponentsBuilder.fromUriString(baseUri).port(port).build().toUri(),
-            HttpMethod.GET, HttpEntity.EMPTY,
-            typedReference
+            HttpMethod.GET,
+            HttpEntity.EMPTY,
+            typedReference,
         ).body!!
         assertEquals(3, messages.size)
-        assertEquals(listOf("Hi!", "World", "Hello",), messages.map { it.text })
+        assertEquals(listOf("Hi!", "World", "Hello"), messages.map { it.text })
 
         return id
     }
@@ -53,23 +54,25 @@ class R2dbcDeclarativeTxControllerTest {
         // delete
         restTemplate.exchange(
             UriComponentsBuilder.fromUriString("$baseUri/{id}").port(port).build(id),
-            HttpMethod.DELETE, HttpEntity.EMPTY, Void::class.java
+            HttpMethod.DELETE,
+            HttpEntity.EMPTY,
+            Void::class.java,
         )
 
         // list
         val messages = restTemplate.exchange(
             UriComponentsBuilder.fromUriString(baseUri).port(port).build().toUri(),
-            HttpMethod.GET, HttpEntity.EMPTY,
-            typedReference
+            HttpMethod.GET,
+            HttpEntity.EMPTY,
+            typedReference,
         ).body!!
         assertEquals(2, messages.size)
         assertEquals(
-            listOf
-            (
+            listOf(
                 Message(2, "World"),
                 Message(1, "Hello"),
             ),
-            messages
+            messages,
         )
     }
 }

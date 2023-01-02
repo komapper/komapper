@@ -39,7 +39,7 @@ interface OracleDialect : Dialect {
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> getEntityInsertStatementBuilder(
         dialect: BuilderDialect,
         context: EntityInsertContext<ENTITY, ID, META>,
-        entities: List<ENTITY>
+        entities: List<ENTITY>,
     ): EntityInsertStatementBuilder<ENTITY, ID, META> {
         if (entities.size == 1) {
             return super.getEntityInsertStatementBuilder(dialect, context, entities)
@@ -50,7 +50,7 @@ interface OracleDialect : Dialect {
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> getEntityUpsertStatementBuilder(
         dialect: BuilderDialect,
         context: EntityUpsertContext<ENTITY, ID, META>,
-        entities: List<ENTITY>
+        entities: List<ENTITY>,
     ): EntityUpsertStatementBuilder<ENTITY> {
         return OracleEntityUpsertStatementBuilder(dialect, context, entities)
     }

@@ -18,7 +18,7 @@ class JdbcReadOnlyTest(private val db: JdbcDatabase) {
     fun list() {
         db.withTransaction(
             TransactionAttribute.REQUIRES_NEW,
-            TransactionProperty.ReadOnly(true)
+            TransactionProperty.ReadOnly(true),
         ) {
             val a = Meta.address
             val list: List<Address> = db.runQuery {

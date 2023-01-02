@@ -128,7 +128,9 @@ internal data class InsertQueryBuilderImpl<ENTITY : Any, ID : Any, META : Entity
     override fun batch(entities: List<ENTITY>, batchSize: Int?): EntityInsertQuery<List<ENTITY>> {
         val context = if (batchSize != null) {
             context.copy(options = context.options.copy(batchSize = batchSize))
-        } else context
+        } else {
+            context
+        }
         return EntityInsertBatchQuery(context, entities)
     }
 

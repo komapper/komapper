@@ -7,12 +7,12 @@ import org.komapper.tx.core.TransactionProperty
 
 internal class R2dbcCoroutineTransactionOperator(
     private val transactionManager: R2dbcTransactionManager,
-    private val defaultTransactionProperty: TransactionProperty = EmptyTransactionProperty
+    private val defaultTransactionProperty: TransactionProperty = EmptyTransactionProperty,
 ) : CoroutineTransactionOperator {
 
     override suspend fun <R> required(
         transactionProperty: TransactionProperty,
-        block: suspend (CoroutineTransactionOperator) -> R
+        block: suspend (CoroutineTransactionOperator) -> R,
     ): R {
         return if (transactionManager.isActive()) {
             block(this)
@@ -23,7 +23,7 @@ internal class R2dbcCoroutineTransactionOperator(
 
     override suspend fun <R> requiresNew(
         transactionProperty: TransactionProperty,
-        block: suspend (CoroutineTransactionOperator) -> R
+        block: suspend (CoroutineTransactionOperator) -> R,
     ): R {
         return if (transactionManager.isActive()) {
             val txContext = transactionManager.suspend()
@@ -39,7 +39,7 @@ internal class R2dbcCoroutineTransactionOperator(
 
     private suspend fun <R> executeInNewTransaction(
         transactionProperty: TransactionProperty,
-        block: suspend (CoroutineTransactionOperator) -> R
+        block: suspend (CoroutineTransactionOperator) -> R,
     ): R {
         val txContext = transactionManager.begin(defaultTransactionProperty + transactionProperty)
         return withContext(txContext) {

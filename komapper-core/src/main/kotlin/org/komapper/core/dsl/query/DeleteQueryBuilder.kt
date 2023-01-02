@@ -69,7 +69,9 @@ internal data class DeleteQueryBuilderImpl<ENTITY : Any, ID : Any, META : Entity
         context.target.checkIdValueNotNull(entities)
         val context = if (batchSize != null) {
             context.copy(options = context.options.copy(batchSize = batchSize))
-        } else context
+        } else {
+            context
+        }
         return EntityDeleteBatchQuery(context, entities)
     }
 

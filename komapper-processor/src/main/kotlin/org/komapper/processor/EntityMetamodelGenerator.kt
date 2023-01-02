@@ -39,7 +39,7 @@ internal class EntityMetamodelGenerator(
     private val packageName: String,
     private val simpleName: String,
     private val entityTypeName: String,
-    private val w: PrintWriter
+    private val w: PrintWriter,
 ) : Runnable {
 
     private val idTypeName: String = if (entity.idProperties.size == 1) {
@@ -58,7 +58,7 @@ internal class EntityMetamodelGenerator(
         "schema: String = \"${entity.table.schema}\"",
         "alwaysQuote: Boolean = ${entity.table.alwaysQuote}",
         "disableSequenceAssignment: Boolean = false",
-        "declaration: $EntityMetamodelDeclaration<$simpleName> = {}"
+        "declaration: $EntityMetamodelDeclaration<$simpleName> = {}",
     ).joinToString(", ")
 
     override fun run() {

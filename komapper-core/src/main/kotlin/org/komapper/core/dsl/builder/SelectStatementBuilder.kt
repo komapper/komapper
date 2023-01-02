@@ -19,7 +19,7 @@ class SelectStatementBuilder(
     private val dialect: BuilderDialect,
     private val context: SelectContext<*, *, *>,
     private val aliasManager: AliasManager = DefaultAliasManager(context),
-    private val projectionPredicate: (ColumnExpression<*, *>) -> Boolean = { true }
+    private val projectionPredicate: (ColumnExpression<*, *>) -> Boolean = { true },
 ) {
     private val buf = StatementBuffer()
     private val support = BuilderSupport(dialect, aliasManager, buf, context.options.escapeSequence)
@@ -226,7 +226,7 @@ internal class OrderByBuilderSupport(
     private val dialect: BuilderDialect,
     private val sortItems: List<SortItem>,
     aliasManager: AliasManager,
-    private val buf: StatementBuffer
+    private val buf: StatementBuffer,
 ) {
     private val support = BuilderSupport(dialect, aliasManager, buf)
 

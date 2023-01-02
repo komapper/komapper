@@ -27,7 +27,9 @@ internal class JdbcRelationUpdateRunner<ENTITY : Any, ID : Any, META : EntityMet
             val executor = JdbcExecutor(config, context.options)
             val (count) = executor.executeUpdate(statement)
             count
-        } else 0
+        } else {
+            0
+        }
     }
 
     override fun dryRun(config: DatabaseConfig): DryRunStatement {

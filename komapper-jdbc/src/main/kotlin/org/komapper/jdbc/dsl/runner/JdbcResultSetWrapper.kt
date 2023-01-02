@@ -8,7 +8,7 @@ import kotlin.reflect.cast
 
 internal class JdbcResultSetWrapper(
     private val dataOperator: JdbcDataOperator,
-    private val rs: ResultSet
+    private val rs: ResultSet,
 ) : Row {
 
     override fun <T : Any> get(index: Int, klass: KClass<T>): T? {

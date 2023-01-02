@@ -90,7 +90,7 @@ internal data class UpdateQueryBuilderImpl<ENTITY : Any, ID : Any, META : Entity
         if (context.getTargetProperties().isEmpty()) {
             error(
                 "Illegal SQL will be generated. The set clause is empty. " +
-                    "Include or exclude appropriate properties."
+                    "Include or exclude appropriate properties.",
             )
         }
     }
@@ -104,7 +104,9 @@ internal data class UpdateQueryBuilderImpl<ENTITY : Any, ID : Any, META : Entity
         context.target.checkIdValueNotNull(entities)
         val context = if (batchSize != null) {
             context.copy(options = context.options.copy(batchSize = batchSize))
-        } else context
+        } else {
+            context
+        }
         return EntityUpdateBatchQuery(context, entities)
     }
 

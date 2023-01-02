@@ -81,7 +81,7 @@ interface R2dbcDataType<T : Any> {
 
 abstract class AbstractR2dbcDataType<T : Any>(
     override val klass: KClass<T>,
-    val typeOfNull: Class<*> = klass.javaObjectType
+    val typeOfNull: Class<*> = klass.javaObjectType,
 ) : R2dbcDataType<T> {
 
     override fun getValue(row: Row, index: Int): T? {

@@ -73,7 +73,7 @@ internal class OrReducer(private val location: SqlLocation, private val keyword:
 internal class BindValueDirectiveReducer(
     private val location: SqlLocation,
     private val token: String,
-    private val expression: String
+    private val expression: String,
 ) :
     SqlReducer() {
     override fun reduce(): SqlNode = when (val node = nodeList.poll()) {
@@ -82,7 +82,7 @@ internal class BindValueDirectiveReducer(
             token,
             expression,
             node,
-            nodeList
+            nodeList,
         )
         else -> throw SqlException("The test value must follow the bind value directive at $location. node=$node")
     }
@@ -91,7 +91,7 @@ internal class BindValueDirectiveReducer(
 internal class LiteralValueDirectiveReducer(
     private val location: SqlLocation,
     val token: String,
-    private val expression: String
+    private val expression: String,
 ) : SqlReducer() {
     override fun reduce(): SqlNode = when (val node = nodeList.poll()) {
         is SqlNode.Token.Word -> SqlNode.LiteralValueDirective(
@@ -99,7 +99,7 @@ internal class LiteralValueDirectiveReducer(
             token,
             expression,
             node,
-            nodeList
+            nodeList,
         )
         else -> throw SqlException("The test value must follow the literal value directive at $location")
     }
@@ -113,7 +113,8 @@ internal class IfBlockReducer(private val location: SqlLocation) : BlockReducer(
         is SqlNode.IfDirective,
         is SqlNode.ElseifDirective,
         is SqlNode.ElseDirective,
-        is SqlNode.EndDirective -> super.addNode(node)
+        is SqlNode.EndDirective,
+        -> super.addNode(node)
         else -> error(node)
     }
 
@@ -194,7 +195,7 @@ internal class IfDirectiveReducer(private val location: SqlLocation, private val
 internal class ElseifDirectiveReducer(
     private val location: SqlLocation,
     private val token: String,
-    private val expression: String
+    private val expression: String,
 ) :
     SqlReducer() {
     override fun reduce(): SqlNode =
@@ -210,7 +211,7 @@ internal class ForDirectiveReducer(
     private val location: SqlLocation,
     private val token: String,
     private val identifier: String,
-    private val expression: String
+    private val expression: String,
 ) :
     SqlReducer() {
     override fun reduce(): SqlNode =

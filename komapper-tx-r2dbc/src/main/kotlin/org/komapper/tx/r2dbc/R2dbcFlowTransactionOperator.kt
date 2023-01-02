@@ -13,12 +13,12 @@ import org.komapper.tx.core.TransactionProperty
 
 internal class R2dbcFlowTransactionOperator(
     private val transactionManager: R2dbcTransactionManager,
-    private val defaultTransactionProperty: TransactionProperty = EmptyTransactionProperty
+    private val defaultTransactionProperty: TransactionProperty = EmptyTransactionProperty,
 ) : FlowTransactionOperator {
 
     override fun <R> required(
         transactionProperty: TransactionProperty,
-        block: suspend FlowCollector<R>.(FlowTransactionOperator) -> Unit
+        block: suspend FlowCollector<R>.(FlowTransactionOperator) -> Unit,
     ): Flow<R> {
         return flow {
             if (transactionManager.isActive()) {
@@ -32,7 +32,7 @@ internal class R2dbcFlowTransactionOperator(
 
     override fun <R> requiresNew(
         transactionProperty: TransactionProperty,
-        block: suspend FlowCollector<R>.(FlowTransactionOperator) -> Unit
+        block: suspend FlowCollector<R>.(FlowTransactionOperator) -> Unit,
     ): Flow<R> {
         return flow {
             val value = if (transactionManager.isActive()) {
@@ -51,7 +51,7 @@ internal class R2dbcFlowTransactionOperator(
 
     private suspend fun <R> executeInNewTransaction(
         transactionProperty: TransactionProperty,
-        block: suspend FlowCollector<R>.(FlowTransactionOperator) -> Unit
+        block: suspend FlowCollector<R>.(FlowTransactionOperator) -> Unit,
     ): Flow<R> {
         val txContext = transactionManager.begin(defaultTransactionProperty + transactionProperty)
         return flow {

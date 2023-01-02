@@ -45,7 +45,7 @@ open class DefaultR2dbcDatabaseConfig(
     dialect: R2dbcDialect,
     dataTypeProvider: R2dbcDataTypeProvider? = null,
     clockProvider: ClockProvider = DefaultClockProvider(),
-    executionOptions: ExecutionOptions = ExecutionOptions()
+    executionOptions: ExecutionOptions = ExecutionOptions(),
 ) : R2dbcDatabaseConfig,
     AbstractDatabaseConfig<R2dbcDialect>(dialect, clockProvider, executionOptions) {
 
@@ -70,5 +70,5 @@ class SimpleR2dbcDatabaseConfig(
     override val dialect: R2dbcDialect,
     override val session: R2dbcSession,
     override val dataOperator: R2dbcDataOperator,
-    override val connectionFactory: ConnectionFactory
+    override val connectionFactory: ConnectionFactory,
 ) : R2dbcDatabaseConfig

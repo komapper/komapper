@@ -9,7 +9,7 @@ import org.komapper.core.dsl.expression.HavingDeclaration
  */
 @Scope
 class HavingScope(
-    private val support: FilterScopeSupport
+    private val support: FilterScopeSupport,
 ) : FilterScope by support {
 
     fun and(declaration: HavingDeclaration) {

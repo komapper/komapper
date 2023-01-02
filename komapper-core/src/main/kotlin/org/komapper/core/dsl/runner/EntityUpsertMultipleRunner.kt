@@ -8,7 +8,7 @@ import org.komapper.core.dsl.metamodel.EntityMetamodel
 
 class EntityUpsertMultipleRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityUpsertContext<ENTITY, ID, META>,
-    private val entities: List<ENTITY>
+    private val entities: List<ENTITY>,
 ) : Runner {
 
     private val support: EntityUpsertRunnerSupport<ENTITY, ID, META> =

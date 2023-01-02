@@ -14,7 +14,7 @@ interface TransactionOperator {
      */
     fun <R> required(
         transactionProperty: TransactionProperty = EmptyTransactionProperty,
-        block: (TransactionOperator) -> R
+        block: (TransactionOperator) -> R,
     ): R
 
     /**
@@ -27,7 +27,7 @@ interface TransactionOperator {
      */
     fun <R> requiresNew(
         transactionProperty: TransactionProperty = EmptyTransactionProperty,
-        block: (TransactionOperator) -> R
+        block: (TransactionOperator) -> R,
     ): R
 
     /**

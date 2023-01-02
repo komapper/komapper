@@ -12,7 +12,7 @@ import org.komapper.core.dsl.metamodel.EntityMetamodel
 class EntityDeleteStatementBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     dialect: BuilderDialect,
     private val context: EntityDeleteContext<ENTITY, ID, META>,
-    private val entity: ENTITY
+    private val entity: ENTITY,
 ) {
 
     private val aliasManager =

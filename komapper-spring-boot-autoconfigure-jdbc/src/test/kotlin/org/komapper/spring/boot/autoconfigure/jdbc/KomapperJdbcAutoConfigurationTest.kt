@@ -37,7 +37,7 @@ class KomapperJdbcAutoConfigurationTest {
         sources.addFirst(MapPropertySource("test", source))
         context.register(
             KomapperJdbcAutoConfiguration::class.java,
-            DataSourceAutoConfiguration::class.java
+            DataSourceAutoConfiguration::class.java,
         )
         context.refresh()
 
@@ -55,7 +55,7 @@ class KomapperJdbcAutoConfigurationTest {
         context.register(
             CustomConfigure::class.java,
             KomapperJdbcAutoConfiguration::class.java,
-            DataSourceAutoConfiguration::class.java
+            DataSourceAutoConfiguration::class.java,
         )
         context.refresh()
 
@@ -78,7 +78,7 @@ class KomapperJdbcAutoConfigurationTest {
         context.register(
             TemplateStatementBuilderConfigure::class.java,
             KomapperJdbcAutoConfiguration::class.java,
-            DataSourceAutoConfiguration::class.java
+            DataSourceAutoConfiguration::class.java,
         )
         context.refresh()
 
@@ -131,7 +131,7 @@ class KomapperJdbcAutoConfigurationTest {
         override fun build(
             template: CharSequence,
             valueMap: Map<String, Value<*>>,
-            builtinExtensions: TemplateBuiltinExtensions
+            builtinExtensions: TemplateBuiltinExtensions,
         ): Statement {
             throw UnsupportedOperationException()
         }

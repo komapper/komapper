@@ -9,7 +9,7 @@ import org.komapper.jdbc.JdbcDatabaseConfig
 
 internal class JdbcEntityUpsertMultipleRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     context: EntityUpsertContext<ENTITY, ID, META>,
-    private val entities: List<ENTITY>
+    private val entities: List<ENTITY>,
 ) : JdbcRunner<Long> {
 
     private val runner: EntityUpsertMultipleRunner<ENTITY, ID, META> =

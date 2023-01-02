@@ -14,7 +14,7 @@ import javax.sql.DataSource
 class JdbcTransactionSession(
     dataSource: DataSource,
     loggerFacade: LoggerFacade,
-    transactionProperty: TransactionProperty = EmptyTransactionProperty
+    transactionProperty: TransactionProperty = EmptyTransactionProperty,
 ) : JdbcSession {
 
     val transactionManager: JdbcTransactionManager =

@@ -23,8 +23,8 @@ class TwoWayTemplateStatementBuilderTest {
         sqlNodeFactory = NoCacheSqlNodeFactory(),
         exprEvaluator = DefaultExprEvaluator(
             NoCacheExprNodeFactory(),
-            DefaultExprEnvironment()
-        )
+            DefaultExprEnvironment(),
+        ),
     )
 
     private val extensions = TemplateBuiltinExtensions { it }
@@ -43,7 +43,7 @@ class TwoWayTemplateStatementBuilderTest {
         val statement = statementBuilder.build(template, emptyMap(), extensions)
         assertEquals(
             "select name, age from person where name = ? and age > 1 order by name, age for update",
-            statement.toSql()
+            statement.toSql(),
         )
     }
 
@@ -86,9 +86,9 @@ class TwoWayTemplateStatementBuilderTest {
                 listOf(
                     Value("x"),
                     Value("y"),
-                    Value("z")
+                    Value("z"),
                 ),
-                statement.args
+                statement.args,
             )
         }
 
@@ -113,19 +113,23 @@ class TwoWayTemplateStatementBuilderTest {
         fun pairValues() {
             val statement = statementBuilder.build(
                 "select name, age from person where (name, age) in /*pairs*/(('a', 'b'), ('c', 'd'))",
-                mapOf("pairs" to Value(listOf("x" to 1, "y" to 2, "z" to 3))), extensions
+                mapOf("pairs" to Value(listOf("x" to 1, "y" to 2, "z" to 3))),
+                extensions,
             )
             assertEquals(
                 "select name, age from person where (name, age) in ((?, ?), (?, ?), (?, ?))",
-                statement.toSql()
+                statement.toSql(),
             )
             assertEquals(
                 listOf(
-                    Value("x"), Value(1),
-                    Value("y"), Value(2),
-                    Value("z"), Value(3)
+                    Value("x"),
+                    Value(1),
+                    Value("y"),
+                    Value(2),
+                    Value("z"),
+                    Value(3),
                 ),
-                statement.args
+                statement.args,
             )
         }
 
@@ -138,23 +142,23 @@ class TwoWayTemplateStatementBuilderTest {
                         listOf(
                             Triple("x", 1, 10),
                             Triple("y", 2, 20),
-                            Triple("z", 3, 30)
-                        )
-                    )
+                            Triple("z", 3, 30),
+                        ),
+                    ),
                 ),
-                extensions
+                extensions,
             )
             assertEquals(
                 "select name, age from person where (name, age, weight) in ((?, ?, ?), (?, ?, ?), (?, ?, ?))",
-                statement.toSql()
+                statement.toSql(),
             )
             assertEquals(
                 listOf(
                     Value("x"), Value(1), Value(10),
                     Value("y"), Value(2), Value(20),
-                    Value("z"), Value(3), Value(30)
+                    Value("z"), Value(3), Value(30),
                 ),
-                statement.args
+                statement.args,
             )
         }
     }
@@ -246,9 +250,9 @@ class TwoWayTemplateStatementBuilderTest {
                 listOf(
                     Value(1),
                     Value(2),
-                    Value(3)
+                    Value(3),
                 ),
-                statement.args
+                statement.args,
             )
         }
     }

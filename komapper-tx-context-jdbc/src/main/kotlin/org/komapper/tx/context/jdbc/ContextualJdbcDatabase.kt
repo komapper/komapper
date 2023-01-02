@@ -47,7 +47,7 @@ interface ContextualJdbcDatabase : Database {
     fun <R> withTransaction(
         transactionAttribute: TransactionAttribute = TransactionAttribute.REQUIRED,
         transactionProperty: TransactionProperty = EmptyTransactionProperty,
-        block: context(JdbcContext) () -> R
+        block: context(JdbcContext) () -> R,
     ): R
 
     fun unwrap(): JdbcDatabase
@@ -56,7 +56,7 @@ interface ContextualJdbcDatabase : Database {
 internal class ContextualJdbcDatabaseImpl(
     private val database: JdbcDatabase,
     private val transactionManager: ContextualJdbcTransactionManager,
-    private val transactionOperator: ContextualJdbcTransactionOperator
+    private val transactionOperator: ContextualJdbcTransactionOperator,
 ) : ContextualJdbcDatabase {
 
     override val config: JdbcDatabaseConfig
@@ -97,7 +97,7 @@ internal class ContextualJdbcDatabaseImpl(
     override fun <R> withTransaction(
         transactionAttribute: TransactionAttribute,
         transactionProperty: TransactionProperty,
-        block: context(JdbcContext) () -> R
+        block: context(JdbcContext) () -> R,
     ): R {
         val context = JdbcContext(this, transactionOperator)
         with(context) {

@@ -9,7 +9,7 @@ import org.komapper.core.dsl.visitor.QueryVisitor
 
 internal class SingleNotNullColumnSelectQuery<A : Any>(
     override val context: SelectContext<*, *, *>,
-    private val expression: ColumnExpression<A, *>
+    private val expression: ColumnExpression<A, *>,
 ) : FlowSubquery<A> {
 
     private val support: FlowSubquerySupport<A> =

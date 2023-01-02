@@ -78,7 +78,7 @@ class DefaultJdbcDataOperator(private val dialect: JdbcDialect, private val data
 
     override fun <T : Any> getDataType(klass: KClass<out T>): JdbcDataType<T> {
         return dataTypeProvider.get(klass) ?: error(
-            "The dataType is not found for the type \"${klass.qualifiedName}\"."
+            "The dataType is not found for the type \"${klass.qualifiedName}\".",
         )
     }
 }

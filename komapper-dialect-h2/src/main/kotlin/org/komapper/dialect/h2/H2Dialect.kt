@@ -11,6 +11,7 @@ interface H2Dialect : Dialect {
 
     companion object : Dialect.Identifier {
         private const val DRIVER = "h2"
+
         /** the error code that represents unique violation  */
         const val UNIQUE_CONSTRAINT_VIOLATION_ERROR_CODE = 23505
         override val driver: String = DRIVER
@@ -29,7 +30,7 @@ interface H2Dialect : Dialect {
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> getEntityUpsertStatementBuilder(
         dialect: BuilderDialect,
         context: EntityUpsertContext<ENTITY, ID, META>,
-        entities: List<ENTITY>
+        entities: List<ENTITY>,
     ): EntityUpsertStatementBuilder<ENTITY> {
         return H2EntityUpsertStatementBuilder(dialect, context, entities)
     }

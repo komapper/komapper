@@ -9,7 +9,7 @@ import org.komapper.jdbc.JdbcDatabaseConfig
 
 internal class JdbcEntityDeleteSingleRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     context: EntityDeleteContext<ENTITY, ID, META>,
-    entity: ENTITY
+    entity: ENTITY,
 ) : JdbcRunner<Unit> {
 
     private val runner: EntityDeleteSingleRunner<ENTITY, ID, META> =

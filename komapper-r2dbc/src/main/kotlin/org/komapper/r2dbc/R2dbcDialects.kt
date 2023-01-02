@@ -20,7 +20,7 @@ object R2dbcDialects {
         return getOrNull(driver) ?: error(
             "The dialect is not found. " +
                 "Try to add the 'komapper-dialect-$driver-r2dbc' dependency. " +
-                "driver='$driver'"
+                "driver='$driver'",
         )
     }
 
@@ -38,7 +38,7 @@ object R2dbcDialects {
             .firstNotNullOfOrNull { getOrNull(it) }
         return dialect ?: error(
             "The dialect is not found. " +
-                "driverOption='$driverOption', protocolOption='$protocolOption'"
+                "driverOption='$driverOption', protocolOption='$protocolOption'",
         )
     }
 

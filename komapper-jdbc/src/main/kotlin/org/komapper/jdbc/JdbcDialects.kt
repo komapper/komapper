@@ -21,7 +21,7 @@ object JdbcDialects {
             ?: error(
                 "The dialect is not found for the JDBC url. " +
                     "Try to add the 'komapper-dialect-$driver-jdbc' dependency. " +
-                    "driver='$driver'"
+                    "driver='$driver'",
             )
         return factory.create()
     }

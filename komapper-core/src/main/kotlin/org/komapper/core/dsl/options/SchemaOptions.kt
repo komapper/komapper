@@ -8,7 +8,7 @@ data class SchemaOptions(
     companion object {
         val DEFAULT = SchemaOptions(
             queryTimeoutSeconds = null,
-            suppressLogging = false
+            suppressLogging = false,
         )
     }
 }

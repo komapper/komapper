@@ -56,7 +56,7 @@ interface ContextualJdbcTransactionManager {
 
 internal class ContextualJdbcTransactionManagerImpl(
     dataSource: DataSource,
-    loggerFacade: LoggerFacade
+    loggerFacade: LoggerFacade,
 ) : ContextualJdbcTransactionManager {
 
     private val management: JdbcTransactionManagement = JdbcTransactionManagement(dataSource, loggerFacade)

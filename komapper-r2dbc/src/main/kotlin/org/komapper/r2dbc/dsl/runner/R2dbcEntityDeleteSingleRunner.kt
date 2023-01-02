@@ -9,7 +9,7 @@ import org.komapper.r2dbc.R2dbcDatabaseConfig
 
 internal class R2dbcEntityDeleteSingleRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     context: EntityDeleteContext<ENTITY, ID, META>,
-    entity: ENTITY
+    entity: ENTITY,
 ) : R2dbcRunner<Unit> {
 
     private val runner: EntityDeleteSingleRunner<ENTITY, ID, META> =

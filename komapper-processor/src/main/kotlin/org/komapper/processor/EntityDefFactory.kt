@@ -17,7 +17,7 @@ import org.komapper.annotation.KomapperVersion
 internal class EntityDefFactory(
     @Suppress("unused") private val logger: KSPLogger,
     private val config: Config,
-    private val definitionSource: EntityDefinitionSource
+    private val definitionSource: EntityDefinitionSource,
 ) {
     private val annotationSupport: AnnotationSupport = AnnotationSupport(config)
     private val defDeclaration = definitionSource.defDeclaration
@@ -59,7 +59,7 @@ internal class EntityDefFactory(
         if (properties.hasDuplicates { it.kind is PropertyKind.EmbeddedId }) {
             report(
                 "Multiple @${KomapperEmbeddedId::class.simpleName} cannot coexist in a single class.",
-                defDeclaration
+                defDeclaration,
             )
         }
     }
@@ -83,7 +83,7 @@ internal class EntityDefFactory(
         if (idKinds.count() > 1) {
             report(
                 "@${KomapperAutoIncrement::class.simpleName} and @${KomapperSequence::class.simpleName} cannot coexist in a single class.",
-                defDeclaration
+                defDeclaration,
             )
         }
     }
@@ -153,7 +153,7 @@ internal class EntityDefFactory(
             if (idKind != null && kind !is PropertyKind.Id) {
                 report(
                     "${idKind.annotation} and @${KomapperId::class.simpleName} must coexist on the same property.",
-                    parameter
+                    parameter,
                 )
             }
         }

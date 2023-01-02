@@ -9,7 +9,7 @@ import org.komapper.r2dbc.R2dbcDatabaseConfig
 
 internal class R2dbcEntityInsertSingleRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     context: EntityInsertContext<ENTITY, ID, META>,
-    private val entity: ENTITY
+    private val entity: ENTITY,
 ) : R2dbcRunner<ENTITY> {
 
     private val runner: EntityInsertSingleRunner<ENTITY, ID, META> =

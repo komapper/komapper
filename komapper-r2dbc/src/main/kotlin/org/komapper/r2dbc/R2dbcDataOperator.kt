@@ -76,7 +76,7 @@ class DefaultR2dbcDataOperator(private val dialect: R2dbcDialect, private val da
 
     override fun <T : Any> getDataType(klass: KClass<out T>): R2dbcDataType<T> {
         return dataTypeProvider.get(klass) ?: error(
-            "The dataType is not found for the type \"${klass.qualifiedName}\"."
+            "The dataType is not found for the type \"${klass.qualifiedName}\".",
         )
     }
 

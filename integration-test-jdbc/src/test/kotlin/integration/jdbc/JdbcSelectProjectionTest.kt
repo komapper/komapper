@@ -75,9 +75,9 @@ class JdbcSelectProjectionTest(private val db: JdbcDatabase) {
         assertEquals(
             listOf(
                 Triple(1, "STREET 1", 1),
-                Triple(2, "STREET 2", 1)
+                Triple(2, "STREET 2", 1),
             ),
-            tripleList
+            tripleList,
         )
     }
 
@@ -200,9 +200,9 @@ class JdbcSelectProjectionTest(private val db: JdbcDatabase) {
         assertEquals(
             listOf(
                 Triple(1, "STREET 1", 1),
-                Triple(2, "STREET 2", 1)
+                Triple(2, "STREET 2", 1),
             ),
-            tripleList
+            tripleList,
         )
     }
 

@@ -22,7 +22,7 @@ class FilterScopeSupport(
     private fun <T : Any, S : Any> add(
         operator: (Operand, Operand) -> Criterion,
         left: ColumnExpression<T, S>,
-        right: ColumnExpression<T, S>
+        right: ColumnExpression<T, S>,
     ) {
         criteria.add(operator(Operand.Column(left), Operand.Column(right)))
     }
@@ -30,7 +30,7 @@ class FilterScopeSupport(
     private fun <T : Any, S : Any> add(
         operator: (Operand, Operand) -> Criterion,
         left: ColumnExpression<T, S>,
-        right: T
+        right: T,
     ) {
         criteria.add(operator(Operand.Column(left), Operand.Argument(left, right)))
     }
@@ -38,7 +38,7 @@ class FilterScopeSupport(
     private fun <T : Any, S : Any> add(
         operator: (Operand, Operand) -> Criterion,
         left: T,
-        right: ColumnExpression<T, S>
+        right: ColumnExpression<T, S>,
     ) {
         criteria.add(operator(Operand.Argument(right, left), Operand.Column(right)))
     }
@@ -252,7 +252,7 @@ class FilterScopeSupport(
         val right = values.map {
             Operand.Argument(this.first, it.first) to Operand.Argument(
                 this.second,
-                it.second
+                it.second,
             )
         }
         add(Criterion.InList2(left, right))
@@ -274,7 +274,7 @@ class FilterScopeSupport(
         val right = values.map {
             Operand.Argument(this.first, it.first) to Operand.Argument(
                 this.second,
-                it.second
+                it.second,
             )
         }
         add(Criterion.NotInList2(left, right))

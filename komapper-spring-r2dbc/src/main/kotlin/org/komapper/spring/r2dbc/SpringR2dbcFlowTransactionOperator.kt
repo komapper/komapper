@@ -22,7 +22,7 @@ internal class SpringR2dbcFlowTransactionOperator(private val transactionManager
 
     override fun <R> required(
         transactionProperty: TransactionProperty,
-        block: suspend FlowCollector<R>.(FlowTransactionOperator) -> Unit
+        block: suspend FlowCollector<R>.(FlowTransactionOperator) -> Unit,
     ): Flow<R> {
         val definition = SpringTransactionDefinition(transactionProperty, TransactionAttribute.REQUIRED)
         return execute(definition, block)
@@ -30,7 +30,7 @@ internal class SpringR2dbcFlowTransactionOperator(private val transactionManager
 
     override fun <R> requiresNew(
         transactionProperty: TransactionProperty,
-        block: suspend FlowCollector<R>.(FlowTransactionOperator) -> Unit
+        block: suspend FlowCollector<R>.(FlowTransactionOperator) -> Unit,
     ): Flow<R> {
         val definition = SpringTransactionDefinition(transactionProperty, TransactionAttribute.REQUIRES_NEW)
         return execute(definition, block)
@@ -38,7 +38,7 @@ internal class SpringR2dbcFlowTransactionOperator(private val transactionManager
 
     private fun <R> execute(
         definition: org.springframework.transaction.TransactionDefinition,
-        block: suspend FlowCollector<R>.(FlowTransactionOperator) -> Unit
+        block: suspend FlowCollector<R>.(FlowTransactionOperator) -> Unit,
     ): Flow<R> {
         return flow {
             val context = coroutineContext

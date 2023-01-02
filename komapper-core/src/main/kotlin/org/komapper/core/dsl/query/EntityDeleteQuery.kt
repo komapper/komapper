@@ -21,7 +21,7 @@ interface EntityDeleteQuery : Query<Unit> {
 
 internal data class EntityDeleteSingleQuery<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityDeleteContext<ENTITY, ID, META>,
-    private val entity: ENTITY
+    private val entity: ENTITY,
 ) : EntityDeleteQuery {
 
     override fun options(configure: (DeleteOptions) -> DeleteOptions): EntityDeleteQuery {

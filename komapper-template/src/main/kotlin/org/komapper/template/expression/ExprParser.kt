@@ -38,7 +38,7 @@ import java.util.LinkedList
 
 internal class ExprParser(
     private val expression: String,
-    private val tokenizer: ExprTokenizer = ExprTokenizer(expression)
+    private val tokenizer: ExprTokenizer = ExprTokenizer(expression),
 ) {
 
     private val nodes: Deque<ExprNode> = LinkedList()

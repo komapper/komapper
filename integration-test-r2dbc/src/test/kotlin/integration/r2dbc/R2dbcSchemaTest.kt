@@ -24,7 +24,7 @@ class R2dbcSchemaTest(private val db: R2dbcDatabase) {
             Meta.ccc,
             Meta.compositeKey,
             Meta.autoIncrementTable,
-            Meta.sequenceTable
+            Meta.sequenceTable,
         )
 
     @Test

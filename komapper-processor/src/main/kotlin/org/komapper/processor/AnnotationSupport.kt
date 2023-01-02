@@ -11,7 +11,7 @@ import org.komapper.annotation.KomapperTable
 import org.komapper.core.NamingStrategy
 
 internal class AnnotationSupport(
-    @Suppress("unused") private val config: Config
+    @Suppress("unused") private val config: Config,
 ) {
 
     private val namingStrategy: NamingStrategy = config.namingStrategy

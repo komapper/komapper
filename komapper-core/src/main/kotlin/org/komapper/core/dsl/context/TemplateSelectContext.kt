@@ -8,5 +8,5 @@ import org.komapper.core.dsl.options.TemplateSelectOptions
 data class TemplateSelectContext(
     val sql: String,
     val valueMap: Map<String, Value<*>> = emptyMap(),
-    val options: TemplateSelectOptions = TemplateSelectOptions.DEFAULT
+    val options: TemplateSelectOptions = TemplateSelectOptions.DEFAULT,
 )

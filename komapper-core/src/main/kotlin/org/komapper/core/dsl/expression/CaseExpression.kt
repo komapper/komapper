@@ -6,7 +6,7 @@ import org.komapper.core.dsl.scope.WhenScope
 internal class CaseExpression<T : Any, S : Any>(
     private val firstWhen: When<T, S>,
     remainingWhen: List<When<T, S>>,
-    val otherwise: ColumnExpression<T, S>?
+    val otherwise: ColumnExpression<T, S>?,
 ) :
     ColumnExpression<T, S> by firstWhen.then {
     val whenList: List<When<T, S>> = listOf(firstWhen) + remainingWhen

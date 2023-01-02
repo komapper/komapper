@@ -195,7 +195,7 @@ rootProject.apply {
                 "match" to """($prefix)[^"]*($suffix)""",
                 "replace" to "\\1${version}\\2",
                 "encoding" to "UTF-8",
-                "flags" to "g"
+                "flags" to "g",
             ) {
                 "fileset"("dir" to ".") {
                     "include"("name" to "README.md")

@@ -117,7 +117,7 @@ internal data class SelectQueryBuilderImpl<ENTITY : Any, ID : Any, META : Entity
     private fun setOperation(
         kind: SetOperationKind,
         left: SubqueryExpression<ENTITY>,
-        right: SubqueryExpression<ENTITY>
+        right: SubqueryExpression<ENTITY>,
     ): FlowSetOperationQuery<ENTITY> {
         val setOperatorContext = SetOperationContext(kind, left.context, right.context)
         return RelationSetOperationQueryImpl(setOperatorContext, metamodel = context.target)
@@ -149,14 +149,14 @@ internal data class SelectQueryBuilderImpl<ENTITY : Any, ID : Any, META : Entity
 
     override fun <A : Any, B : Any> select(
         expression1: ColumnExpression<A, *>,
-        expression2: ColumnExpression<B, *>
+        expression2: ColumnExpression<B, *>,
     ): FlowSubquery<Pair<A?, B?>> {
         return asRelationSelectQuery().select(expression1, expression2)
     }
 
     override fun <A : Any, B : Any> selectNotNull(
         expression1: ColumnExpression<A, *>,
-        expression2: ColumnExpression<B, *>
+        expression2: ColumnExpression<B, *>,
     ): FlowSubquery<Pair<A, B>> {
         return asRelationSelectQuery().selectNotNull(expression1, expression2)
     }
@@ -164,7 +164,7 @@ internal data class SelectQueryBuilderImpl<ENTITY : Any, ID : Any, META : Entity
     override fun <A : Any, B : Any, C : Any> select(
         expression1: ColumnExpression<A, *>,
         expression2: ColumnExpression<B, *>,
-        expression3: ColumnExpression<C, *>
+        expression3: ColumnExpression<C, *>,
     ): FlowSubquery<Triple<A?, B?, C?>> {
         return asRelationSelectQuery().select(expression1, expression2, expression3)
     }
@@ -172,7 +172,7 @@ internal data class SelectQueryBuilderImpl<ENTITY : Any, ID : Any, META : Entity
     override fun <A : Any, B : Any, C : Any> selectNotNull(
         expression1: ColumnExpression<A, *>,
         expression2: ColumnExpression<B, *>,
-        expression3: ColumnExpression<C, *>
+        expression3: ColumnExpression<C, *>,
     ): FlowSubquery<Triple<A, B, C>> {
         return asRelationSelectQuery().selectNotNull(expression1, expression2, expression3)
     }

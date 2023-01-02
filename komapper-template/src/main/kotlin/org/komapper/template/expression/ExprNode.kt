@@ -25,7 +25,7 @@ internal sealed class ExprNode {
         override val location: Loc,
         val name: String,
         val safeCall: Boolean,
-        val receiver: ExprNode
+        val receiver: ExprNode,
     ) : ExprNode()
 
     data class Function(
@@ -33,6 +33,6 @@ internal sealed class ExprNode {
         val name: String,
         val safeCall: Boolean,
         val receiver: ExprNode,
-        val args: ExprNode
+        val args: ExprNode,
     ) : ExprNode()
 }

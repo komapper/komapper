@@ -9,7 +9,7 @@ import org.komapper.core.dsl.expression.StringFunction
  */
 fun <T : Any> concat(
     left: ColumnExpression<T, String>,
-    right: T
+    right: T,
 ): ColumnExpression<T, String> {
     val o1 = Operand.Column(left)
     val o2 = Operand.Argument(left, right)
@@ -30,7 +30,7 @@ fun <T : Any> concat(left: T, right: ColumnExpression<T, String>): ColumnExpress
  */
 fun <T : Any> concat(
     left: ColumnExpression<T, String>,
-    right: ColumnExpression<T, String>
+    right: ColumnExpression<T, String>,
 ): ColumnExpression<T, String> {
     val o1 = Operand.Column(left)
     val o2 = Operand.Column(right)
@@ -41,7 +41,7 @@ fun <T : Any> concat(
  * Builds a LOWER function.
  */
 fun <T : Any> lower(
-    expression: ColumnExpression<T, String>
+    expression: ColumnExpression<T, String>,
 ): ColumnExpression<T, String> {
     val operand = Operand.Column(expression)
     return StringFunction.Lower(expression, operand)
@@ -51,7 +51,7 @@ fun <T : Any> lower(
  * Builds an UPPER function.
  */
 fun <T : Any> upper(
-    expression: ColumnExpression<T, String>
+    expression: ColumnExpression<T, String>,
 ): ColumnExpression<T, String> {
     val operand = Operand.Column(expression)
     return StringFunction.Upper(expression, operand)
@@ -63,7 +63,7 @@ fun <T : Any> upper(
 fun <T : Any> substring(
     expression: ColumnExpression<T, String>,
     startIndex: Int,
-    length: Int? = null
+    length: Int? = null,
 ): ColumnExpression<T, String> {
     val target = Operand.Column(expression)
     val o1 = Operand.Argument(literal(startIndex), startIndex)
@@ -72,21 +72,21 @@ fun <T : Any> substring(
 }
 
 fun <T : Any> trim(
-    expression: ColumnExpression<T, String>
+    expression: ColumnExpression<T, String>,
 ): ColumnExpression<T, String> {
     val operand = Operand.Column(expression)
     return StringFunction.Trim(expression, operand)
 }
 
 fun <T : Any> ltrim(
-    expression: ColumnExpression<T, String>
+    expression: ColumnExpression<T, String>,
 ): ColumnExpression<T, String> {
     val operand = Operand.Column(expression)
     return StringFunction.Ltrim(expression, operand)
 }
 
 fun <T : Any> rtrim(
-    expression: ColumnExpression<T, String>
+    expression: ColumnExpression<T, String>,
 ): ColumnExpression<T, String> {
     val operand = Operand.Column(expression)
     return StringFunction.Rtrim(expression, operand)

@@ -24,7 +24,7 @@ class R2dbcTemplateTest(private val db: R2dbcDatabase) {
         Address(
             row.getNotNull("address_id"),
             row.getNotNull("street"),
-            row.getNotNull("version")
+            row.getNotNull("version"),
         )
     }
 
@@ -32,7 +32,7 @@ class R2dbcTemplateTest(private val db: R2dbcDatabase) {
         Address(
             row.getNotNull(0),
             row.getNotNull(1),
-            row.getNotNull(2)
+            row.getNotNull(2),
         )
     }
 
@@ -69,9 +69,9 @@ class R2dbcTemplateTest(private val db: R2dbcDatabase) {
             Address(
                 10,
                 "STREET 10",
-                1
+                1,
             ),
-            list[0]
+            list[0],
         )
     }
 
@@ -100,17 +100,17 @@ class R2dbcTemplateTest(private val db: R2dbcDatabase) {
             Address(
                 1,
                 "STREET 1",
-                1
+                1,
             ),
-            list[0]
+            list[0],
         )
         assertEquals(
             Address(
                 2,
                 "STREET 2",
-                1
+                1,
             ),
-            list[1]
+            list[1],
         )
     }
 
@@ -128,17 +128,17 @@ class R2dbcTemplateTest(private val db: R2dbcDatabase) {
             Address(
                 1,
                 "STREET 1",
-                1
+                1,
             ),
-            list[0]
+            list[0],
         )
         assertEquals(
             Address(
                 2,
                 "STREET 2",
-                1
+                1,
             ),
-            list[1]
+            list[1],
         )
     }
 
@@ -152,8 +152,8 @@ class R2dbcTemplateTest(private val db: R2dbcDatabase) {
                     "triples",
                     listOf(
                         Triple(1, "STREET 1", 1),
-                        Triple(2, "STREET 2", 1)
-                    )
+                        Triple(2, "STREET 2", 1),
+                    ),
                 )
                 .select(asAddress)
         }
@@ -162,17 +162,17 @@ class R2dbcTemplateTest(private val db: R2dbcDatabase) {
             Address(
                 1,
                 "STREET 1",
-                1
+                1,
             ),
-            list[0]
+            list[0],
         )
         assertEquals(
             Address(
                 2,
                 "STREET 2",
-                1
+                1,
             ),
-            list[1]
+            list[1],
         )
     }
 
@@ -222,9 +222,9 @@ class R2dbcTemplateTest(private val db: R2dbcDatabase) {
             Address(
                 15,
                 "NY street",
-                1
+                1,
             ),
-            address
+            address,
         )
     }
 }

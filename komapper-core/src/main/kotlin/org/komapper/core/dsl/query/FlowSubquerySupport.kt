@@ -28,7 +28,7 @@ internal class FlowSubquerySupport<T>(
 
     private fun setOperation(
         kind: SetOperationKind,
-        other: SubqueryExpression<T>
+        other: SubqueryExpression<T>,
     ): FlowSetOperationQuery<T> {
         val setOperatorContext = SetOperationContext(kind, context, other.context)
         return transform(setOperatorContext)

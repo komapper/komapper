@@ -90,7 +90,7 @@ internal class H2EntityUpsertStatementBuilder<ENTITY : Any, ID : Any, META : Ent
 
     private class UpsertAliasManager(
         val target: TableExpression<*>,
-        val excluded: TableExpression<*>
+        val excluded: TableExpression<*>,
     ) : AliasManager {
 
         override val index: Int = 0
@@ -107,7 +107,7 @@ internal class H2EntityUpsertStatementBuilder<ENTITY : Any, ID : Any, META : Ent
     private class SourceStatementBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
         val dialect: BuilderDialect,
         val context: EntityUpsertContext<ENTITY, ID, META>,
-        val entities: List<ENTITY>
+        val entities: List<ENTITY>,
     ) {
 
         private val buf = StatementBuffer()

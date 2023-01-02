@@ -8,7 +8,7 @@ import org.komapper.core.dsl.metamodel.EntityMetamodel
 
 class EntityUpdateSingleRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     context: EntityUpdateContext<ENTITY, ID, META>,
-    private val entity: ENTITY
+    private val entity: ENTITY,
 ) : Runner {
 
     private val support: EntityUpdateRunnerSupport<ENTITY, ID, META> =

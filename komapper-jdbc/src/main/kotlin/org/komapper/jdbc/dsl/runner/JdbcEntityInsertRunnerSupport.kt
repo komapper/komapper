@@ -17,7 +17,9 @@ internal class JdbcEntityInsertRunnerSupport<ENTITY : Any, ID : Any, META : Enti
                 if (!context.target.disableSequenceAssignment() && !context.options.disableSequenceAssignment) {
                     val id = idGenerator.execute(config, context.options)
                     idGenerator.property.setter(entity, id)
-                } else null
+                } else {
+                    null
+                }
             else -> null
         }
         val clock = config.clockProvider.now()
@@ -27,7 +29,9 @@ internal class JdbcEntityInsertRunnerSupport<ENTITY : Any, ID : Any, META : Enti
     fun <T> insert(config: JdbcDatabaseConfig, usesGeneratedKeys: Boolean, execute: (JdbcExecutor) -> T): T {
         val generatedColumn = if (usesGeneratedKeys && context.options.returnGeneratedKeys) {
             context.target.getAutoIncrementProperty()?.columnName
-        } else null
+        } else {
+            null
+        }
         val executor = JdbcExecutor(config, context.options, generatedColumn)
         return execute(executor)
     }

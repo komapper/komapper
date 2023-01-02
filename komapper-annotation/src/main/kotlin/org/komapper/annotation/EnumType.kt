@@ -17,5 +17,5 @@ enum class EnumType {
     /**
      * The value of arbitrary Enum property is mapped to database.
      */
-    PROPERTY
+    PROPERTY,
 }

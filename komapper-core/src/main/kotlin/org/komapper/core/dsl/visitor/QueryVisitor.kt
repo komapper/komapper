@@ -36,67 +36,67 @@ interface QueryVisitor<VISIT_RESULT> {
     fun <T, S> flatZipQuery(query: Query<T>, transform: (T) -> Query<S>): VISIT_RESULT
 
     fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityStoreQuery(
-        context: SelectContext<ENTITY, ID, META>
+        context: SelectContext<ENTITY, ID, META>,
     ): VISIT_RESULT
 
     fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, R>
     entitySelectQuery(
         context: SelectContext<ENTITY, ID, META>,
-        collect: suspend (Flow<ENTITY>) -> R
+        collect: suspend (Flow<ENTITY>) -> R,
     ): VISIT_RESULT
 
     fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
     entityDeleteBatchQuery(
         context: EntityDeleteContext<ENTITY, ID, META>,
-        entities: List<ENTITY>
+        entities: List<ENTITY>,
     ): VISIT_RESULT
 
     fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
     entityDeleteSingleQuery(
         context: EntityDeleteContext<ENTITY, ID, META>,
-        entity: ENTITY
+        entity: ENTITY,
     ): VISIT_RESULT
 
     fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
     entityInsertMultipleQuery(
         context: EntityInsertContext<ENTITY, ID, META>,
-        entities: List<ENTITY>
+        entities: List<ENTITY>,
     ): VISIT_RESULT
 
     fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
     entityInsertBatchQuery(
         context: EntityInsertContext<ENTITY, ID, META>,
-        entities: List<ENTITY>
+        entities: List<ENTITY>,
     ): VISIT_RESULT
 
     fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
     entityInsertSingleQuery(
         context: EntityInsertContext<ENTITY, ID, META>,
-        entity: ENTITY
+        entity: ENTITY,
     ): VISIT_RESULT
 
     fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
     entityUpdateBatchQuery(
         context: EntityUpdateContext<ENTITY, ID, META>,
-        entities: List<ENTITY>
+        entities: List<ENTITY>,
     ): VISIT_RESULT
 
     fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
     entityUpdateSingleQuery(
         context: EntityUpdateContext<ENTITY, ID, META>,
-        entity: ENTITY
+        entity: ENTITY,
     ): VISIT_RESULT
 
     fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
     entityUpsertBatchQuery(
         context: EntityUpsertContext<ENTITY, ID, META>,
-        entities: List<ENTITY>
+        entities: List<ENTITY>,
     ): VISIT_RESULT
 
     fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
     entityUpsertMultipleQuery(
         context: EntityUpsertContext<ENTITY, ID, META>,
-        entities: List<ENTITY>
+        entities: List<ENTITY>,
     ): VISIT_RESULT
 
     fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
@@ -118,153 +118,153 @@ interface QueryVisitor<VISIT_RESULT> {
     ): VISIT_RESULT
 
     fun schemaCreateQuery(
-        context: SchemaContext
+        context: SchemaContext,
     ): VISIT_RESULT
 
     fun schemaDropQuery(
-        context: SchemaContext
+        context: SchemaContext,
     ): VISIT_RESULT
 
     fun scriptExecuteQuery(
-        context: ScriptContext
+        context: ScriptContext,
     ): VISIT_RESULT
 
     fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, R>
     relationSelectQuery(
         context: SelectContext<ENTITY, ID, META>,
-        collect: suspend (Flow<ENTITY>) -> R
+        collect: suspend (Flow<ENTITY>) -> R,
     ): VISIT_RESULT
 
     fun <T : Any, R>
     setOperationQuery(
         context: SetOperationContext,
         metamodel: EntityMetamodel<T, *, *>,
-        collect: suspend (Flow<T>) -> R
+        collect: suspend (Flow<T>) -> R,
     ): VISIT_RESULT
 
     fun <A : Any, R>
     singleColumnSelectQuery(
         context: SelectContext<*, *, *>,
         expression: ColumnExpression<A, *>,
-        collect: suspend (Flow<A?>) -> R
+        collect: suspend (Flow<A?>) -> R,
     ): VISIT_RESULT
 
     fun <A : Any, R>
     singleNotNullColumnSelectQuery(
         context: SelectContext<*, *, *>,
         expression: ColumnExpression<A, *>,
-        collect: suspend (Flow<A>) -> R
+        collect: suspend (Flow<A>) -> R,
     ): VISIT_RESULT
 
     fun <A : Any, R>
     singleColumnSetOperationQuery(
         context: SetOperationContext,
         expression: ColumnExpression<A, *>,
-        collect: suspend (Flow<A?>) -> R
+        collect: suspend (Flow<A?>) -> R,
     ): VISIT_RESULT
 
     fun <A : Any, R>
     singleNotNullColumnSetOperationQuery(
         context: SetOperationContext,
         expression: ColumnExpression<A, *>,
-        collect: suspend (Flow<A>) -> R
+        collect: suspend (Flow<A>) -> R,
     ): VISIT_RESULT
 
     fun <A : Any, B : Any, R>
     pairColumnsSelectQuery(
         context: SelectContext<*, *, *>,
         expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
-        collect: suspend (Flow<Pair<A?, B?>>) -> R
+        collect: suspend (Flow<Pair<A?, B?>>) -> R,
     ): VISIT_RESULT
 
     fun <A : Any, B : Any, R>
     pairNotNullColumnsSelectQuery(
         context: SelectContext<*, *, *>,
         expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
-        collect: suspend (Flow<Pair<A, B>>) -> R
+        collect: suspend (Flow<Pair<A, B>>) -> R,
     ): VISIT_RESULT
 
     fun <A : Any, B : Any, R>
     pairColumnsSetOperationQuery(
         context: SetOperationContext,
         expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
-        collect: suspend (Flow<Pair<A?, B?>>) -> R
+        collect: suspend (Flow<Pair<A?, B?>>) -> R,
     ): VISIT_RESULT
 
     fun <A : Any, B : Any, R>
     pairNotNullColumnsSetOperationQuery(
         context: SetOperationContext,
         expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
-        collect: suspend (Flow<Pair<A, B>>) -> R
+        collect: suspend (Flow<Pair<A, B>>) -> R,
     ): VISIT_RESULT
 
     fun <A : Any, B : Any, C : Any, R>
     tripleColumnsSelectQuery(
         context: SelectContext<*, *, *>,
         expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
-        collect: suspend (Flow<Triple<A?, B?, C?>>) -> R
+        collect: suspend (Flow<Triple<A?, B?, C?>>) -> R,
     ): VISIT_RESULT
 
     fun <A : Any, B : Any, C : Any, R>
     tripleNotNullColumnsSelectQuery(
         context: SelectContext<*, *, *>,
         expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
-        collect: suspend (Flow<Triple<A, B, C>>) -> R
+        collect: suspend (Flow<Triple<A, B, C>>) -> R,
     ): VISIT_RESULT
 
     fun <A : Any, B : Any, C : Any, R>
     tripleColumnsSetOperationQuery(
         context: SetOperationContext,
         expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
-        collect: suspend (Flow<Triple<A?, B?, C?>>) -> R
+        collect: suspend (Flow<Triple<A?, B?, C?>>) -> R,
     ): VISIT_RESULT
 
     fun <A : Any, B : Any, C : Any, R>
     tripleNotNullColumnsSetOperationQuery(
         context: SetOperationContext,
         expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
-        collect: suspend (Flow<Triple<A, B, C>>) -> R
+        collect: suspend (Flow<Triple<A, B, C>>) -> R,
     ): VISIT_RESULT
 
     fun <R> multipleColumnsSelectQuery(
         context: SelectContext<*, *, *>,
         expressions: List<ColumnExpression<*, *>>,
-        collect: suspend (Flow<Record>) -> R
+        collect: suspend (Flow<Record>) -> R,
     ): VISIT_RESULT
 
     fun <R> multipleColumnsSetOperationQuery(
         context: SetOperationContext,
         expressions: List<ColumnExpression<*, *>>,
-        collect: suspend (Flow<Record>) -> R
+        collect: suspend (Flow<Record>) -> R,
     ): VISIT_RESULT
 
     fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
     relationDeleteQuery(
-        context: RelationDeleteContext<ENTITY, ID, META>
+        context: RelationDeleteContext<ENTITY, ID, META>,
     ): VISIT_RESULT
 
     fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
     relationInsertValuesQuery(
-        context: RelationInsertValuesContext<ENTITY, ID, META>
+        context: RelationInsertValuesContext<ENTITY, ID, META>,
     ): VISIT_RESULT
 
     fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
     relationInsertSelectQuery(
-        context: RelationInsertSelectContext<ENTITY, ID, META>
+        context: RelationInsertSelectContext<ENTITY, ID, META>,
     ): VISIT_RESULT
 
     fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
     relationUpdateQuery(
-        context: RelationUpdateContext<ENTITY, ID, META>
+        context: RelationUpdateContext<ENTITY, ID, META>,
     ): VISIT_RESULT
 
     fun templateExecuteQuery(
-        context: TemplateExecuteContext
+        context: TemplateExecuteContext,
     ): VISIT_RESULT
 
     fun <T, R> templateSelectQuery(
         context: TemplateSelectContext,
         transform: (Row) -> T,
-        collect: suspend (Flow<T>) -> R
+        collect: suspend (Flow<T>) -> R,
     ): VISIT_RESULT
 }

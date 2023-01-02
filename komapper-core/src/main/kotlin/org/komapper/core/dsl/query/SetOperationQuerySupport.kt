@@ -7,7 +7,7 @@ import org.komapper.core.dsl.expression.SortItem
 import org.komapper.core.dsl.expression.SubqueryExpression
 
 internal data class SetOperationQuerySupport<T : Any?>(
-    private val context: SetOperationContext
+    private val context: SetOperationContext,
 ) {
 
     fun except(other: SubqueryExpression<T>): SetOperationContext {
@@ -30,7 +30,7 @@ internal data class SetOperationQuerySupport<T : Any?>(
         return context.copy(
             kind = kind,
             left = context,
-            right = other.context
+            right = other.context,
         )
     }
 

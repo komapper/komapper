@@ -15,22 +15,30 @@ object MyMeta
 @KomapperEntity(unit = MyMeta::class)
 @KomapperTable("address")
 data class MyAddress(
-    @KomapperId @KomapperColumn(name = "address_id") val addressId: Int,
+    @KomapperId
+    @KomapperColumn(name = "address_id")
+    val addressId: Int,
     val street: String,
-    @KomapperVersion val version: Int
+    @KomapperVersion val version: Int,
 )
 
 data class MyPerson(
     val personId: Int,
     val name: String,
     val createdAt: LocalDateTime? = null,
-    val updatedAt: LocalDateTime? = null
+    val updatedAt: LocalDateTime? = null,
 )
 
 @KomapperEntityDef(entity = MyPerson::class, unit = MyMeta::class)
 @KomapperTable("person")
 data class MyPersonDef(
-    @KomapperId @KomapperColumn("person_id") val personId: Nothing,
-    @KomapperCreatedAt @KomapperColumn("created_at") val createdAt: Nothing,
-    @KomapperUpdatedAt @KomapperColumn("updated_at") val updatedAt: Nothing
+    @KomapperId
+    @KomapperColumn("person_id")
+    val personId: Nothing,
+    @KomapperCreatedAt
+    @KomapperColumn("created_at")
+    val createdAt: Nothing,
+    @KomapperUpdatedAt
+    @KomapperColumn("updated_at")
+    val updatedAt: Nothing,
 )

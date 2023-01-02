@@ -26,7 +26,9 @@ data class Address(
 
 @KomapperEntityDef(Address::class)
 data class AddressDef(
-    @KomapperId @KomapperAutoIncrement @KomapperColumn(name = "ADDRESS_ID")
+    @KomapperId
+    @KomapperAutoIncrement
+    @KomapperColumn(name = "ADDRESS_ID")
     val id: Nothing,
     @KomapperEmbedded
     @KomapperColumnOverride("first", KomapperColumn(name = "ZIP_CODE"))
@@ -50,7 +52,8 @@ annotation class KomapperStub
 @KomapperEntityDef(Employee::class)
 @KomapperStub
 data class EmployeeDef(
-    @KomapperId @KomapperAutoIncrement val id: Nothing,
+    @KomapperId @KomapperAutoIncrement
+    val id: Nothing,
     @KomapperVersion val version: Nothing,
     @KomapperCreatedAt val createdAt: Nothing,
     @KomapperUpdatedAt val updatedAt: Nothing,

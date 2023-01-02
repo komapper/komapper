@@ -15,10 +15,11 @@ fun main(args: Array<String>) {
 
 data class Message(
     val id: Int? = null,
-    val text: String
+    val text: String,
 )
 
 @KomapperEntityDef(Message::class)
 data class MessageDef(
-    @KomapperId @KomapperAutoIncrement val id: Nothing,
+    @KomapperId @KomapperAutoIncrement
+    val id: Nothing,
 )

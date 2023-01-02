@@ -12,7 +12,7 @@ import org.komapper.r2dbc.R2dbcExecutor
 
 internal class R2dbcSetOperationFlowBuilder<T>(
     private val context: SetOperationContext,
-    private val transform: (R2dbcDataOperator, Row) -> T
+    private val transform: (R2dbcDataOperator, Row) -> T,
 ) : R2dbcFlowBuilder<T> {
 
     private val runner: SetOperationRunner = SetOperationRunner(context)

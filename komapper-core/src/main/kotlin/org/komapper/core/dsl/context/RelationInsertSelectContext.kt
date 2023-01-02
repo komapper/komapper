@@ -22,7 +22,7 @@ data class RelationInsertSelectContext<ENTITY : Any, ID : Any, META : EntityMeta
         return RelationInsertValuesContext(
             target = target,
             values = declaration,
-            options = options
+            options = options,
         )
     }
 }

@@ -34,7 +34,7 @@ interface EntityStore {
      */
     fun <T : Any, S : Any> oneToOne(
         first: EntityMetamodel<T, *, *>,
-        second: EntityMetamodel<S, *, *>
+        second: EntityMetamodel<S, *, *>,
     ): Map<T, S?>
 
     /**
@@ -46,7 +46,7 @@ interface EntityStore {
      */
     fun <T : Any, ID : Any, S : Any> oneToOneById(
         first: EntityMetamodel<T, ID, *>,
-        second: EntityMetamodel<S, *, *>
+        second: EntityMetamodel<S, *, *>,
     ): Map<ID, S?>
 
     /**
@@ -58,7 +58,7 @@ interface EntityStore {
      */
     fun <T : Any, S : Any> oneToMany(
         first: EntityMetamodel<T, *, *>,
-        second: EntityMetamodel<S, *, *>
+        second: EntityMetamodel<S, *, *>,
     ): Map<T, Set<S>>
 
     /**
@@ -70,13 +70,13 @@ interface EntityStore {
      */
     fun <T : Any, ID : Any, S : Any> oneToManyById(
         first: EntityMetamodel<T, ID, *>,
-        second: EntityMetamodel<S, *, *>
+        second: EntityMetamodel<S, *, *>,
     ): Map<ID, Set<S>>
 }
 
 internal class EntityStoreImpl(
     private val entitySets: Map<EntityMetamodel<*, *, *>, Set<Any>>,
-    private val rows: List<Map<EntityMetamodel<*, *, *>, Any>>
+    private val rows: List<Map<EntityMetamodel<*, *, *>, Any>>,
 ) : EntityStore {
 
     override operator fun contains(metamodel: EntityMetamodel<*, *, *>): Boolean {
@@ -94,7 +94,7 @@ internal class EntityStoreImpl(
 
     override fun <T : Any, S : Any> oneToOne(
         first: EntityMetamodel<T, *, *>,
-        second: EntityMetamodel<S, *, *>
+        second: EntityMetamodel<S, *, *>,
     ): Map<T, S?> {
         val oneToMany = createOneToMany(first, second)
         return oneToMany.mapValues { it.value.firstOrNull() }
@@ -102,7 +102,7 @@ internal class EntityStoreImpl(
 
     override fun <T : Any, ID : Any, S : Any> oneToOneById(
         first: EntityMetamodel<T, ID, *>,
-        second: EntityMetamodel<S, *, *>
+        second: EntityMetamodel<S, *, *>,
     ): Map<ID, S?> {
         val oneToMany = createOneToMany(first, second)
         return oneToMany.mapKeys { first.extractId(it.key) }.mapValues { it.value.firstOrNull() }
@@ -110,14 +110,14 @@ internal class EntityStoreImpl(
 
     override fun <T : Any, S : Any> oneToMany(
         first: EntityMetamodel<T, *, *>,
-        second: EntityMetamodel<S, *, *>
+        second: EntityMetamodel<S, *, *>,
     ): Map<T, Set<S>> {
         return createOneToMany(first, second)
     }
 
     override fun <T : Any, ID : Any, S : Any> oneToManyById(
         first: EntityMetamodel<T, ID, *>,
-        second: EntityMetamodel<S, *, *>
+        second: EntityMetamodel<S, *, *>,
     ): Map<ID, Set<S>> {
         val oneToMany = createOneToMany(first, second)
         return oneToMany.mapKeys { first.extractId(it.key) }
@@ -125,7 +125,7 @@ internal class EntityStoreImpl(
 
     private fun <T : Any, S : Any> createOneToMany(
         first: EntityMetamodel<T, *, *>,
-        second: EntityMetamodel<S, *, *>
+        second: EntityMetamodel<S, *, *>,
     ): Map<T, Set<S>> {
         if (!contains(first, second)) {
             return emptyMap()

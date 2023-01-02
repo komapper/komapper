@@ -17,7 +17,9 @@ internal class R2dbcEntityInsertRunnerSupport<ENTITY : Any, ID : Any, META : Ent
                 if (!context.target.disableSequenceAssignment() && !context.options.disableSequenceAssignment) {
                     val id = idGenerator.execute(config, context.options)
                     idGenerator.property.setter(entity, id)
-                } else null
+                } else {
+                    null
+                }
             }
             else -> null
         }
@@ -28,7 +30,9 @@ internal class R2dbcEntityInsertRunnerSupport<ENTITY : Any, ID : Any, META : Ent
     suspend fun <T> insert(config: R2dbcDatabaseConfig, usesGeneratedKeys: Boolean, execute: suspend (R2dbcExecutor) -> T): T {
         val generatedColumn = if (usesGeneratedKeys && context.options.returnGeneratedKeys) {
             context.target.getAutoIncrementProperty()?.columnName
-        } else null
+        } else {
+            null
+        }
         val executor = R2dbcExecutor(config, context.options, generatedColumn)
         return execute(executor)
     }

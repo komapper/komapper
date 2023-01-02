@@ -11,7 +11,7 @@ import org.komapper.r2dbc.R2dbcDatabaseConfig
 internal class R2dbcSetOperationRunner<T, R>(
     context: SetOperationContext,
     transform: (R2dbcDataOperator, Row) -> T,
-    private val collect: suspend (Flow<T>) -> R
+    private val collect: suspend (Flow<T>) -> R,
 ) : R2dbcRunner<R> {
 
     private val flowBuilder: R2dbcSetOperationFlowBuilder<T> = R2dbcSetOperationFlowBuilder(context, transform)

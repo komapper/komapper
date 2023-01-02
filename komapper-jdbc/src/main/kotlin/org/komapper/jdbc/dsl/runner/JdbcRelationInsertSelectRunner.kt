@@ -23,7 +23,9 @@ internal class JdbcRelationInsertSelectRunner<ENTITY : Any, ID : Any, META : Ent
         val statement = runner.buildStatement(config)
         val generatedColumn = if (context.options.returnGeneratedKeys) {
             context.target.getAutoIncrementProperty()?.columnName
-        } else null
+        } else {
+            null
+        }
         val executor = JdbcExecutor(config, context.options, generatedColumn)
         val (count, keys) = executor.executeUpdate(statement)
         val ids = keys.mapNotNull { context.target.convertToId(it) }

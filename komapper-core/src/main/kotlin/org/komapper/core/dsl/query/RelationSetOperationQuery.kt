@@ -18,7 +18,7 @@ interface RelationSetOperationQuery<ENTITY : Any> : FlowSetOperationQuery<ENTITY
 
 internal data class RelationSetOperationQueryImpl<ENTITY : Any>(
     override val context: SetOperationContext,
-    private val metamodel: EntityMetamodel<ENTITY, *, *>
+    private val metamodel: EntityMetamodel<ENTITY, *, *>,
 ) : RelationSetOperationQuery<ENTITY> {
 
     private val support: SetOperationQuerySupport<ENTITY> = SetOperationQuerySupport(context)

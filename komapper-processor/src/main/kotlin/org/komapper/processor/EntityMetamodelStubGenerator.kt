@@ -18,7 +18,7 @@ internal class EntityMetamodelStubGenerator(
     private val packageName: String,
     private val simpleName: String,
     private val entityTypeName: String,
-    private val w: PrintWriter
+    private val w: PrintWriter,
 ) : Runnable {
 
     private val constructorParamList = listOf(
@@ -27,7 +27,7 @@ internal class EntityMetamodelStubGenerator(
         "schema: String = \"\"",
         "alwaysQuote: Boolean = false",
         "disableSequenceAssignment: Boolean = false",
-        "declarations: List<${Symbols.EntityMetamodelDeclaration}<$simpleName>> = emptyList()"
+        "declarations: List<${Symbols.EntityMetamodelDeclaration}<$simpleName>> = emptyList()",
     ).joinToString(", ")
 
     override fun run() {

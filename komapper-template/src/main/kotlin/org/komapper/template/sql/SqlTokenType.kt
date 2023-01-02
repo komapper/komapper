@@ -33,5 +33,5 @@ internal enum class SqlTokenType {
     OTHER,
     SPACE,
     EOL,
-    EOF;
+    EOF,
 }

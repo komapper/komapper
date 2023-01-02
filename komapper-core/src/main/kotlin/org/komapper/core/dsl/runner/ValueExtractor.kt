@@ -6,7 +6,7 @@ object ValueExtractor {
     inline fun <EXTERIOR : Any, INTERIOR : Any> execute(
         expression: ColumnExpression<EXTERIOR, INTERIOR>,
         index: Int,
-        block: () -> INTERIOR?
+        block: () -> INTERIOR?,
     ): EXTERIOR? {
         return try {
             val value = block()

@@ -54,7 +54,7 @@ open class KomapperJdbcAutoConfiguration {
         val url = environment.getProperty(DATASOURCE_URL_PROPERTY)
             ?: error(
                 "$DATASOURCE_URL_PROPERTY is not found. " +
-                    "Specify it to the application.properties file or define the JdbcDialect bean manually."
+                    "Specify it to the application.properties file or define the JdbcDialect bean manually.",
             )
         return JdbcDialects.getByUrl(url)
     }
@@ -127,7 +127,7 @@ open class KomapperJdbcAutoConfiguration {
         dataFactory: JdbcDataFactory,
         dataOperator: JdbcDataOperator,
         dataSource: DataSource,
-        templateStatementBuilder: TemplateStatementBuilder
+        templateStatementBuilder: TemplateStatementBuilder,
     ): JdbcDatabaseConfig {
         return SimpleJdbcDatabaseConfig(
             id = UUID.randomUUID(),

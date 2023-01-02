@@ -6,7 +6,7 @@ import com.google.devtools.ksp.symbol.KSAnnotated
 internal class EntityAnalyzer(
     private val logger: KSPLogger,
     private val config: Config,
-    private val definitionSourceResolver: EntityDefinitionSourceResolver
+    private val definitionSourceResolver: EntityDefinitionSourceResolver,
 ) {
 
     fun analyze(symbol: KSAnnotated): EntityAnalysisResult {

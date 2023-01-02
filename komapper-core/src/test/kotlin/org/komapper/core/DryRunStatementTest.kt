@@ -11,13 +11,13 @@ class DryRunStatementTest {
             DryRunStatement(
                 sql = "select * from employee where name = ? and age = ?",
                 sqlWithArgs = "select * from employee where name = 'aaa' and age = 20",
-                args = listOf(Value("aaa"), Value(20))
+                args = listOf(Value("aaa"), Value(20)),
             )
         val b =
             DryRunStatement(
                 sql = "delete from employee where name = ?",
                 sqlWithArgs = "delete from employee where name = 'bbb'",
-                args = listOf(Value("bbb"))
+                args = listOf(Value("bbb")),
             )
         val c = a + b
         assertEquals("select * from employee where name = ? and age = ?;delete from employee where name = ?", c.sql)

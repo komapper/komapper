@@ -27,7 +27,7 @@ internal object R2dbcRowTransformers {
 
     private fun <A : Any, R> singleColumn(
         expression: ColumnExpression<A, *>,
-        transform: (A?) -> R
+        transform: (A?) -> R,
     ): (R2dbcDataOperator, Row) -> R =
         { dataOperator, row ->
             val extractor = R2dbcValueExtractor(dataOperator, row)
@@ -49,7 +49,7 @@ internal object R2dbcRowTransformers {
 
     private fun <A : Any, B : Any, AR, BR> pairColumns(
         expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
-        transform: (Pair<A?, B?>) -> Pair<AR, BR>
+        transform: (Pair<A?, B?>) -> Pair<AR, BR>,
     ): (R2dbcDataOperator, Row) -> Pair<AR, BR> =
         { dataOperator, row ->
             val extractor = R2dbcValueExtractor(dataOperator, row)
@@ -73,7 +73,7 @@ internal object R2dbcRowTransformers {
 
     private fun <A : Any, B : Any, C : Any, AR, BR, CR> tripleColumns(
         expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
-        transform: (Triple<A?, B?, C?>) -> Triple<AR, BR, CR>
+        transform: (Triple<A?, B?, C?>) -> Triple<AR, BR, CR>,
     ): (R2dbcDataOperator, Row) -> Triple<AR, BR, CR> =
         { dataOperator, row ->
             val extractor = R2dbcValueExtractor(dataOperator, row)

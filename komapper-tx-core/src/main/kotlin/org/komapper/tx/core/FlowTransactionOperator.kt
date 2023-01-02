@@ -16,7 +16,7 @@ interface FlowTransactionOperator {
      */
     fun <R> required(
         transactionProperty: TransactionProperty = EmptyTransactionProperty,
-        block: suspend FlowCollector<R>.(FlowTransactionOperator) -> Unit
+        block: suspend FlowCollector<R>.(FlowTransactionOperator) -> Unit,
     ): Flow<R>
 
     /**
@@ -29,7 +29,7 @@ interface FlowTransactionOperator {
      */
     fun <R> requiresNew(
         transactionProperty: TransactionProperty = EmptyTransactionProperty,
-        block: suspend FlowCollector<R>.(FlowTransactionOperator) -> Unit
+        block: suspend FlowCollector<R>.(FlowTransactionOperator) -> Unit,
     ): Flow<R>
 
     /**

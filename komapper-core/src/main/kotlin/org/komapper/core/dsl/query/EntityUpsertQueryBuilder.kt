@@ -35,7 +35,9 @@ internal data class EntityUpsertQueryBuilderImpl<ENTITY : Any, ID : Any, META : 
             val options = context.insertContext.options.copy(batchSize = batchSize)
             val insertContext = context.insertContext.copy(options = options)
             context.copy(insertContext = insertContext)
-        } else context
+        } else {
+            context
+        }
 
         return EntityUpsertBatchQuery(context, entities)
     }

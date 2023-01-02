@@ -19,7 +19,7 @@ interface QueryOptions : ExecutionOptionsProvider {
     override fun getExecutionOptions(): ExecutionOptions {
         return ExecutionOptions(
             queryTimeoutSeconds = queryTimeoutSeconds,
-            suppressLogging = suppressLogging
+            suppressLogging = suppressLogging,
         )
     }
 }

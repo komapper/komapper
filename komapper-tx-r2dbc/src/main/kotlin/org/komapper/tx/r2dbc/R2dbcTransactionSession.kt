@@ -16,7 +16,7 @@ import org.komapper.tx.core.TransactionProperty
 class R2dbcTransactionSession(
     connectionFactory: ConnectionFactory,
     loggerFacade: LoggerFacade,
-    transactionProperty: TransactionProperty = EmptyTransactionProperty
+    transactionProperty: TransactionProperty = EmptyTransactionProperty,
 ) : R2dbcSession {
 
     private val transactionManager: R2dbcTransactionManager =

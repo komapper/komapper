@@ -22,17 +22,18 @@ import kotlin.reflect.jvm.jvmErasure
 internal class TwoWayTemplateStatementBuilder(
     private val dialect: BuilderDialect,
     private val sqlNodeFactory: SqlNodeFactory,
-    private val exprEvaluator: ExprEvaluator
+    private val exprEvaluator: ExprEvaluator,
 ) : TemplateStatementBuilder {
 
     private val clauseRegex = Regex(
-        """^(select|from|where|group by|having|order by|for update|option)\s""", RegexOption.IGNORE_CASE
+        """^(select|from|where|group by|having|order by|for update|option)\s""",
+        RegexOption.IGNORE_CASE,
     )
 
     override fun build(
         template: CharSequence,
         valueMap: Map<String, Value<*>>,
-        builtinExtensions: TemplateBuiltinExtensions
+        builtinExtensions: TemplateBuiltinExtensions,
     ): Statement {
         val ctx = ExprContext(valueMap, builtinExtensions)
         return build(template.toString(), ctx)
@@ -40,7 +41,7 @@ internal class TwoWayTemplateStatementBuilder(
 
     private fun build(
         sql: CharSequence,
-        ctx: ExprContext
+        ctx: ExprContext,
     ): Statement {
         val node = sqlNodeFactory.get(sql)
         val state = visit(State(ctx), node)
@@ -216,7 +217,8 @@ internal class TwoWayTemplateStatementBuilder(
         is SqlNode.ElseifDirective,
         is SqlNode.ElseDirective,
         is SqlNode.EndDirective,
-        is SqlNode.ForDirective -> error("unreachable")
+        is SqlNode.ForDirective,
+        -> error("unreachable")
     }
 
     private fun newValue(o: Any?): Value<*> {

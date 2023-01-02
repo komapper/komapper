@@ -17,7 +17,7 @@ interface ContextualR2dbcCoroutineTransactionOperator {
     context(R2dbcContext)
     suspend fun <R> required(
         transactionProperty: TransactionProperty = EmptyTransactionProperty,
-        block: suspend context(R2dbcContext) () -> R
+        block: suspend context(R2dbcContext) () -> R,
     ): R
 
     /**
@@ -31,7 +31,7 @@ interface ContextualR2dbcCoroutineTransactionOperator {
     context(R2dbcContext)
     suspend fun <R> requiresNew(
         transactionProperty: TransactionProperty = EmptyTransactionProperty,
-        block: suspend context(R2dbcContext) () -> R
+        block: suspend context(R2dbcContext) () -> R,
     ): R
 
     /**
@@ -49,13 +49,13 @@ interface ContextualR2dbcCoroutineTransactionOperator {
 
 internal class ContextualR2dbcCoroutineTransactionOperatorImpl(
     private val transactionManager: ContextualR2dbcTransactionManager,
-    private val defaultTransactionProperty: TransactionProperty = EmptyTransactionProperty
+    private val defaultTransactionProperty: TransactionProperty = EmptyTransactionProperty,
 ) : ContextualR2dbcCoroutineTransactionOperator {
 
     context(R2dbcContext)
     override suspend fun <R> required(
         transactionProperty: TransactionProperty,
-        block: suspend context(R2dbcContext) () -> R
+        block: suspend context(R2dbcContext) () -> R,
     ): R {
         return if (transactionManager.isActive()) {
             block(this@R2dbcContext)
@@ -67,7 +67,7 @@ internal class ContextualR2dbcCoroutineTransactionOperatorImpl(
     context(R2dbcContext)
     override suspend fun <R> requiresNew(
         transactionProperty: TransactionProperty,
-        block: suspend context(R2dbcContext) () -> R
+        block: suspend context(R2dbcContext) () -> R,
     ): R {
         return if (transactionManager.isActive()) {
             val transactionContext = transactionManager.suspend()
@@ -86,7 +86,7 @@ internal class ContextualR2dbcCoroutineTransactionOperatorImpl(
     context(R2dbcContext)
     private suspend fun <R> executeInNewTransaction(
         transactionProperty: TransactionProperty,
-        block: suspend context(R2dbcContext) () -> R
+        block: suspend context(R2dbcContext) () -> R,
     ): R {
         val transactionContext = transactionManager.begin(defaultTransactionProperty + transactionProperty)
         val r2dbcContext =

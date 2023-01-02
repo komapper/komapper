@@ -7,7 +7,7 @@ import kotlin.reflect.cast
 
 internal class R2dbcRowWrapper(
     private val dataOperator: R2dbcDataOperator,
-    private val row: io.r2dbc.spi.Row
+    private val row: io.r2dbc.spi.Row,
 ) : Row {
 
     override fun <T : Any> get(index: Int, klass: KClass<T>): T? {

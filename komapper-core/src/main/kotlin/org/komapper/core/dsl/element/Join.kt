@@ -15,10 +15,10 @@ sealed interface Join<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID,
 
 data class InnerJoin<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     override val target: META,
-    override val on: OnDeclaration
+    override val on: OnDeclaration,
 ) : Join<ENTITY, ID, META>
 
 data class LeftJoin<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     override val target: META,
-    override val on: OnDeclaration
+    override val on: OnDeclaration,
 ) : Join<ENTITY, ID, META>

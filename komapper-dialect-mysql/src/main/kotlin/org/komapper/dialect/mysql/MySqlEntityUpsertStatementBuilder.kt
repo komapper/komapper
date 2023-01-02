@@ -19,7 +19,7 @@ import org.komapper.core.dsl.metamodel.getNonAutoIncrementProperties
 class MySqlEntityUpsertStatementBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val dialect: BuilderDialect,
     private val context: EntityUpsertContext<ENTITY, ID, META>,
-    private val entities: List<ENTITY>
+    private val entities: List<ENTITY>,
 ) : EntityUpsertStatementBuilder<ENTITY> {
 
     private val target = context.target
@@ -84,12 +84,12 @@ class MySqlEntityUpsertStatementBuilder<ENTITY : Any, ID : Any, META : EntityMet
     private class UpsertAliasManager(
         dialect: BuilderDialect,
         target: TableExpression<*>,
-        excluded: TableExpression<*>
+        excluded: TableExpression<*>,
     ) : AliasManager {
 
         private val aliasMap: Map<TableExpression<*>, String> = mapOf(
             target to target.getCanonicalTableName(dialect::enquote),
-            excluded to excluded.tableName()
+            excluded to excluded.tableName(),
         )
 
         override val index: Int = 0

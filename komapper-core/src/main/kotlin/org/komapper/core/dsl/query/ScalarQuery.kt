@@ -22,7 +22,7 @@ interface ScalarQuery<A, B : Any, C : Any> : Query<A>, ScalarQueryExpression<A, 
 
 internal data class NullableScalarQuery<A, B : Any, C : Any>(
     val query: Subquery<A>,
-    val expression: ScalarExpression<B, C>
+    val expression: ScalarExpression<B, C>,
 ) :
     ScalarQuery<A?, B, C>,
     Query<A?> by query.firstOrNull() {
@@ -48,7 +48,7 @@ internal data class NullableScalarQuery<A, B : Any, C : Any>(
 
 internal data class NotNullScalarQuery<A, B : Any, C : Any>(
     val query: FlowSubquery<A>,
-    val expression: ScalarExpression<B, C>
+    val expression: ScalarExpression<B, C>,
 ) :
     ScalarQuery<A, B, C>,
     Query<A> by query.first() {

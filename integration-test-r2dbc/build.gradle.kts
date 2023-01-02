@@ -112,7 +112,7 @@ testing {
 fun JvmTestSuite.setup(
     driver: String,
     includeTags: Array<String> = emptyArray(),
-    excludeTags: Array<String> = emptyArray()
+    excludeTags: Array<String> = emptyArray(),
 ) {
     useJUnitJupiter()
     sources {

@@ -48,7 +48,7 @@ interface R2dbcTransactionManager {
 
 internal class R2dbcTransactionManagerImpl(
     connectionFactory: ConnectionFactory,
-    loggerFacade: LoggerFacade
+    loggerFacade: LoggerFacade,
 ) : R2dbcTransactionManager {
 
     private val management: R2dbcTransactionManagement = R2dbcTransactionManagement(connectionFactory, loggerFacade)

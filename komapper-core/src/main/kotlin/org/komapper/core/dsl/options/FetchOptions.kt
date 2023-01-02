@@ -16,7 +16,7 @@ interface FetchOptions : QueryOptions {
     override fun getExecutionOptions(): ExecutionOptions {
         return super.getExecutionOptions().copy(
             fetchSize = fetchSize,
-            maxRows = maxRows
+            maxRows = maxRows,
         )
     }
 }

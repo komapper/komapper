@@ -31,7 +31,7 @@ class JdbcInsertBatchTest(private val db: JdbcDatabase) {
         val addressList = listOf(
             Address(16, "STREET 16", 0),
             Address(17, "STREET 17", 0),
-            Address(18, "STREET 18", 0)
+            Address(18, "STREET 18", 0),
         )
         val ids = db.runQuery { QueryDsl.insert(a).batch(addressList) }.map { it.addressId }
         val list = db.runQuery {
@@ -47,7 +47,7 @@ class JdbcInsertBatchTest(private val db: JdbcDatabase) {
         val strategies = listOf(
             IdentityStrategy(null, "AAA"),
             IdentityStrategy(null, "BBB"),
-            IdentityStrategy(null, "CCC")
+            IdentityStrategy(null, "CCC"),
         )
         val results1 = db.runQuery { QueryDsl.insert(i).batch(strategies) }
         val results2 = db.runQuery { QueryDsl.from(i).orderBy(i.id) }
@@ -62,7 +62,7 @@ class JdbcInsertBatchTest(private val db: JdbcDatabase) {
         val strategies = listOf(
             IdentityStrategy(null, "AAA"),
             IdentityStrategy(null, "BBB"),
-            IdentityStrategy(null, "CCC")
+            IdentityStrategy(null, "CCC"),
         )
         assertFailsWith<UnsupportedOperationException> {
             db.runQuery { QueryDsl.insert(i).batch(strategies) }
@@ -76,7 +76,7 @@ class JdbcInsertBatchTest(private val db: JdbcDatabase) {
         val personList = listOf(
             Person(1, "A"),
             Person(2, "B"),
-            Person(3, "C")
+            Person(3, "C"),
         )
         val ids = db.runQuery { QueryDsl.insert(p).batch(personList) }.map { it.personId }
         val list = db.runQuery { QueryDsl.from(p).where { p.personId inList ids } }
@@ -92,13 +92,13 @@ class JdbcInsertBatchTest(private val db: JdbcDatabase) {
         assertFailsWith<UniqueConstraintException> {
             db.runQuery {
                 QueryDsl.insert(
-                    a
+                    a,
                 ).batch(
                     listOf(
                         Address(16, "STREET 16", 0),
                         Address(17, "STREET 17", 0),
-                        Address(18, "STREET 1", 0)
-                    )
+                        Address(18, "STREET 1", 0),
+                    ),
                 )
             }.let { }
         }
@@ -122,7 +122,7 @@ class JdbcInsertBatchTest(private val db: JdbcDatabase) {
         assertEquals(2, list.size)
         assertEquals(
             listOf("DEVELOPMENT" to "KYOTO", "PLANNING" to "TOKYO"),
-            list.map { it.departmentName to it.location }
+            list.map { it.departmentName to it.location },
         )
     }
 
@@ -144,7 +144,7 @@ class JdbcInsertBatchTest(private val db: JdbcDatabase) {
         assertEquals(2, list.size)
         assertEquals(
             listOf("DEVELOPMENT" to "KYOTO", "PLANNING" to "TOKYO"),
-            list.map { it.departmentName to it.location }
+            list.map { it.departmentName to it.location },
         )
     }
 
@@ -169,7 +169,7 @@ class JdbcInsertBatchTest(private val db: JdbcDatabase) {
         assertEquals(2, list.size)
         assertEquals(
             listOf("DEVELOPMENT" to "NEW YORK", "PLANNING" to "TOKYO"),
-            list.map { it.departmentName to it.location }
+            list.map { it.departmentName to it.location },
         )
     }
 
@@ -194,7 +194,7 @@ class JdbcInsertBatchTest(private val db: JdbcDatabase) {
         assertEquals(2, list.size)
         assertEquals(
             listOf("DEVELOPMENT" to "NEW YORK", "PLANNING" to "TOKYO"),
-            list.map { it.departmentName to it.location }
+            list.map { it.departmentName to it.location },
         )
     }
 
@@ -215,7 +215,7 @@ class JdbcInsertBatchTest(private val db: JdbcDatabase) {
         assertEquals(2, list.size)
         assertEquals(
             listOf("ACCOUNTING" to "NEW YORK", "PLANNING" to "TOKYO"),
-            list.map { it.departmentName to it.location }
+            list.map { it.departmentName to it.location },
         )
     }
 
@@ -236,7 +236,7 @@ class JdbcInsertBatchTest(private val db: JdbcDatabase) {
         assertEquals(2, list.size)
         assertEquals(
             listOf("ACCOUNTING" to "NEW YORK", "PLANNING" to "TOKYO"),
-            list.map { it.departmentName to it.location }
+            list.map { it.departmentName to it.location },
         )
     }
 
@@ -246,7 +246,7 @@ class JdbcInsertBatchTest(private val db: JdbcDatabase) {
         val strategies = listOf(
             IdentityStrategy(null, "AAA"),
             IdentityStrategy(null, "BBB"),
-            IdentityStrategy(null, "CCC")
+            IdentityStrategy(null, "CCC"),
         )
         val query = QueryDsl.insert(i).onDuplicateKeyUpdate().batch(strategies)
         val counts = db.runQuery { query }

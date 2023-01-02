@@ -12,7 +12,7 @@ import org.komapper.core.dsl.operator.plus
 import org.komapper.core.dsl.options.SelectOptions
 
 internal class SelectQuerySupport<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
-    private val context: SelectContext<ENTITY, ID, META>
+    private val context: SelectContext<ENTITY, ID, META>,
 ) {
 
     fun <ENTITY2 : Any, ID2 : Any, META2 : EntityMetamodel<ENTITY2, ID2, META2>> join(

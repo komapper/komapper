@@ -10,7 +10,7 @@ sealed interface JdbcRunner<T> : Runner {
 
     data class AndThen<LEFT, RIGHT>(
         private val left: JdbcRunner<LEFT>,
-        private val right: JdbcRunner<RIGHT>
+        private val right: JdbcRunner<RIGHT>,
     ) : JdbcRunner<RIGHT> {
 
         private val runner: Runner.AndThen = Runner.AndThen(left, right)
@@ -31,7 +31,7 @@ sealed interface JdbcRunner<T> : Runner {
 
     data class Map<T, S>(
         private val runner: JdbcRunner<T>,
-        private val transform: (T) -> S
+        private val transform: (T) -> S,
     ) : JdbcRunner<S> {
 
         private val _runner: Runner.Map = Runner.Map(runner)
@@ -52,7 +52,7 @@ sealed interface JdbcRunner<T> : Runner {
 
     data class Zip<T, S>(
         private val left: JdbcRunner<T>,
-        private val right: JdbcRunner<S>
+        private val right: JdbcRunner<S>,
     ) : JdbcRunner<Pair<T, S>> {
 
         private val runner: Runner.Zip = Runner.Zip(left, right)
@@ -74,7 +74,7 @@ sealed interface JdbcRunner<T> : Runner {
 
     data class FlatMap<T, S>(
         private val runner: JdbcRunner<T>,
-        private val transform: (T) -> JdbcRunner<S>
+        private val transform: (T) -> JdbcRunner<S>,
     ) : JdbcRunner<S> {
 
         private val _runner: Runner.FlatMap = Runner.FlatMap(runner)
@@ -95,7 +95,7 @@ sealed interface JdbcRunner<T> : Runner {
 
     data class FlatZip<T, S>(
         private val runner: JdbcRunner<T>,
-        private val transform: (T) -> JdbcRunner<S>
+        private val transform: (T) -> JdbcRunner<S>,
     ) : JdbcRunner<Pair<T, S>> {
 
         private val _runner: Runner.FlatZip = Runner.FlatZip(runner)

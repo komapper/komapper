@@ -9,7 +9,7 @@ import org.komapper.core.dsl.visitor.QueryVisitor
 
 internal class MultipleColumnsSelectQuery(
     override val context: SelectContext<*, *, *>,
-    private val expressions: List<ColumnExpression<*, *>>
+    private val expressions: List<ColumnExpression<*, *>>,
 ) : FlowSubquery<Record> {
 
     private val support: FlowSubquerySupport<Record> =

@@ -10,8 +10,9 @@ import org.komapper.annotation.KomapperVersion
 @KomapperEntityDef(Place::class)
 @KomapperTable("address")
 data class PlaceDef(
-    @KomapperId @KomapperColumn(name = "address_id")
+    @KomapperId
+    @KomapperColumn(name = "address_id")
     val id: Nothing,
     @KomapperVersion
-    val version: Nothing
+    val version: Nothing,
 )

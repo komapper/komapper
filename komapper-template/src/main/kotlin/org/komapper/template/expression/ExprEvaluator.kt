@@ -21,7 +21,7 @@ internal interface ExprEvaluator {
 internal class DefaultExprEvaluator(
     private val exprNodeFactory: ExprNodeFactory,
     private val exprEnvironment: ExprEnvironment,
-    private val classResolver: (String) -> Class<*> = { Class.forName(it) }
+    private val classResolver: (String) -> Class<*> = { Class.forName(it) },
 ) : ExprEvaluator {
 
     // used to distinguish multiple arguments from a single List
@@ -54,7 +54,7 @@ internal class DefaultExprEvaluator(
         }.map { it.any }.toCollection(ArgList()).let {
             Value(
                 it,
-                List::class
+                List::class,
             )
         }
         is ExprNode.ClassRef -> visitClassRef(node, ctx)
@@ -68,14 +68,14 @@ internal class DefaultExprEvaluator(
         location: ExprLocation,
         operand: ExprNode,
         ctx: ExprContext,
-        f: (Boolean) -> Boolean
+        f: (Boolean) -> Boolean,
     ): Value<Boolean> {
         fun checkNull(location: ExprLocation, value: Any?) {
             if (value != null) {
                 return
             }
             throw ExprException(
-                "Cannot perform the logical operator because the operand is null at $location"
+                "Cannot perform the logical operator because the operand is null at $location",
             )
         }
 
@@ -83,7 +83,7 @@ internal class DefaultExprEvaluator(
         checkNull(operand.location, value)
         if (value !is Boolean) {
             throw ExprException(
-                "Cannot perform the logical operator because the operands is not Boolean at $location"
+                "Cannot perform the logical operator because the operands is not Boolean at $location",
             )
         }
         return Value(f(value), Boolean::class)
@@ -94,14 +94,14 @@ internal class DefaultExprEvaluator(
         leftNode: ExprNode,
         rightNode: ExprNode,
         ctx: ExprContext,
-        f: (Boolean, Boolean) -> Boolean
+        f: (Boolean, Boolean) -> Boolean,
     ): Value<Boolean> {
         fun checkNull(location: ExprLocation, value: Any?, which: String) {
             if (value != null) {
                 return
             }
             throw ExprException(
-                "Cannot perform the logical operator because the $which operand is null at $location"
+                "Cannot perform the logical operator because the $which operand is null at $location",
             )
         }
 
@@ -111,7 +111,7 @@ internal class DefaultExprEvaluator(
         checkNull(rightNode.location, right, "right")
         if (left !is Boolean || right !is Boolean) {
             throw ExprException(
-                "Cannot perform the logical operator because either operands is not Boolean at $location"
+                "Cannot perform the logical operator because either operands is not Boolean at $location",
             )
         }
         return Value(f(left, right), Boolean::class)
@@ -123,7 +123,7 @@ internal class DefaultExprEvaluator(
         leftNode: ExprNode,
         rightNode: ExprNode,
         ctx: ExprContext,
-        f: (Any?, Any?) -> Boolean
+        f: (Any?, Any?) -> Boolean,
     ): Value<Boolean> {
         val (left) = visit(leftNode, ctx)
         val (right) = visit(rightNode, ctx)
@@ -136,14 +136,14 @@ internal class DefaultExprEvaluator(
         leftNode: ExprNode,
         rightNode: ExprNode,
         ctx: ExprContext,
-        f: (Comparable<Any>, Comparable<Any>) -> Boolean
+        f: (Comparable<Any>, Comparable<Any>) -> Boolean,
     ): Value<Boolean> {
         fun checkNull(location: ExprLocation, value: Any?, which: String) {
             if (value != null) {
                 return
             }
             throw ExprException(
-                "Cannot compare because the $which operand is null at $location"
+                "Cannot compare because the $which operand is null at $location",
             )
         }
 
@@ -157,7 +157,7 @@ internal class DefaultExprEvaluator(
             return Value(f(left, right), Boolean::class)
         } catch (e: ClassCastException) {
             throw ExprException(
-                "Cannot compare because the operands are not comparable to each other at $location"
+                "Cannot compare because the operands are not comparable to each other at $location",
             )
         }
     }
@@ -196,10 +196,11 @@ internal class DefaultExprEvaluator(
         }
         try {
             // a const property of an object declaration doesn't accept a receiver
-            val obj = if (property.isConst && !receiverType.isCompanion)
+            val obj = if (property.isConst && !receiverType.isCompanion) {
                 property.call()
-            else
+            } else {
                 property.call(receiver)
+            }
             return Value(obj, property.returnType.jvmErasure)
         } catch (cause: Exception) {
             throw ExprException("Failed to call the property \"${node.name}\" at ${node.location}. The cause is $cause")
@@ -244,7 +245,7 @@ internal class DefaultExprEvaluator(
     private fun findStaticFunction(
         name: String,
         receiverType: KClass<*>,
-        args: Any?
+        args: Any?,
     ): Pair<KFunction<*>, List<Any?>>? {
         fun Collection<KFunction<*>>.pick(arguments: List<Any?>): Pair<KFunction<*>, List<Any?>>? {
             return this.filter { function ->
@@ -252,7 +253,9 @@ internal class DefaultExprEvaluator(
                     arguments.zip(function.parameters).all { (argument, param) ->
                         argument == null || argument::class.isSubclassOf(param.type.jvmErasure)
                     }
-                } else false
+                } else {
+                    false
+                }
             }.map { it to arguments }.firstOrNull()
         }
 
@@ -269,7 +272,7 @@ internal class DefaultExprEvaluator(
         receiverType: KClass<*>,
         receiver: Any?,
         args: Any?,
-        ctx: ExprContext
+        ctx: ExprContext,
     ): Pair<KFunction<*>, List<Any?>>? {
         fun Collection<KFunction<*>>.pick(arguments: List<Any?>): Pair<KFunction<*>, List<Any?>>? {
             return this.filter { function ->
@@ -277,7 +280,9 @@ internal class DefaultExprEvaluator(
                     arguments.zip(function.parameters).all { (argument, param) ->
                         argument == null || argument::class.isSubclassOf(param.type.jvmErasure)
                     }
-                } else false
+                } else {
+                    false
+                }
             }.map { it to arguments }.firstOrNull()
         }
 

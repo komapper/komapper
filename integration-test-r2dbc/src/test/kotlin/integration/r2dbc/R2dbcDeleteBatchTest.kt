@@ -25,7 +25,7 @@ class R2dbcDeleteBatchTest(private val db: R2dbcDatabase) {
         val addressList = listOf(
             Address(16, "STREET 16", 0),
             Address(17, "STREET 17", 0),
-            Address(18, "STREET 18", 0)
+            Address(18, "STREET 18", 0),
         )
         for (address in addressList) {
             db.runQuery { QueryDsl.insert(a).single(address) }
@@ -45,7 +45,7 @@ class R2dbcDeleteBatchTest(private val db: R2dbcDatabase) {
         val addressList = listOf(
             Address(16, "STREET 16", 0),
             Address(17, "STREET 17", 0),
-            Address(18, "STREET 18", 0)
+            Address(18, "STREET 18", 0),
         )
         for (address in addressList) {
             db.runQuery { QueryDsl.insert(a).single(address) }
@@ -63,7 +63,7 @@ class R2dbcDeleteBatchTest(private val db: R2dbcDatabase) {
         val addressList = listOf(
             Address(16, "STREET 16", 0),
             Address(17, "STREET 17", 0),
-            Address(18, "STREET 18", 0)
+            Address(18, "STREET 18", 0),
         )
         for (address in addressList) {
             db.runQuery { QueryDsl.insert(a).single(address) }
@@ -76,8 +76,8 @@ class R2dbcDeleteBatchTest(private val db: R2dbcDatabase) {
                     listOf(
                         addressList[0],
                         addressList[1],
-                        addressList[2].copy(version = 1)
-                    )
+                        addressList[2].copy(version = 1),
+                    ),
                 )
             }
         }
@@ -91,7 +91,7 @@ class R2dbcDeleteBatchTest(private val db: R2dbcDatabase) {
         val addressList = listOf(
             Address(16, "STREET 16", 0),
             Address(17, "STREET 17", 0),
-            Address(18, "STREET 18", 0)
+            Address(18, "STREET 18", 0),
         )
         for (address in addressList) {
             db.runQuery { QueryDsl.insert(a).single(address) }
@@ -104,8 +104,8 @@ class R2dbcDeleteBatchTest(private val db: R2dbcDatabase) {
                     listOf(
                         addressList[0],
                         addressList[1],
-                        addressList[2].copy(version = 1)
-                    )
+                        addressList[2].copy(version = 1),
+                    ),
                 )
                 .options {
                     it.copy(suppressOptimisticLockException = true)

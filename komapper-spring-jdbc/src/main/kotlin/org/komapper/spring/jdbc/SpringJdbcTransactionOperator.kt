@@ -11,7 +11,7 @@ import org.springframework.transaction.support.TransactionTemplate
 
 class SpringJdbcTransactionOperator(
     private val transactionManager: PlatformTransactionManager,
-    private val status: TransactionStatus? = null
+    private val status: TransactionStatus? = null,
 ) : TransactionOperator {
 
     override fun <R> required(transactionProperty: TransactionProperty, block: (TransactionOperator) -> R): R {
@@ -26,9 +26,10 @@ class SpringJdbcTransactionOperator(
 
     private fun <R> execute(
         definition: TransactionDefinition,
-        block: (TransactionOperator) -> R
+        block: (TransactionOperator) -> R,
     ): R {
         val txOp = TransactionTemplate(transactionManager, definition)
+
         @Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
         val result: Result<R> = txOp.execute { s ->
             val operator = SpringJdbcTransactionOperator(transactionManager, s)

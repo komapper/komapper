@@ -30,7 +30,7 @@ internal class JdbcTemplateSelectRunner<T, R>(
                 val row = JdbcResultSetWrapper(dataOperator, rs)
                 transform(row)
             },
-            collect
+            collect,
         )
     }
 

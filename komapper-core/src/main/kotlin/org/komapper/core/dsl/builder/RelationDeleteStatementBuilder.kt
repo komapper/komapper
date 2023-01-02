@@ -10,7 +10,7 @@ import org.komapper.core.dsl.metamodel.EntityMetamodel
 
 class RelationDeleteStatementBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     dialect: BuilderDialect,
-    private val context: RelationDeleteContext<ENTITY, ID, META>
+    private val context: RelationDeleteContext<ENTITY, ID, META>,
 ) {
     private val aliasManager = if (dialect.supportsAliasForDeleteStatement()) {
         DefaultAliasManager(context)

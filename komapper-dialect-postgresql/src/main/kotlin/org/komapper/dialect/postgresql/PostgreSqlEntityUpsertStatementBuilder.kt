@@ -89,12 +89,12 @@ class PostgreSqlEntityUpsertStatementBuilder<ENTITY : Any, ID : Any, META : Enti
 
     private class UpsertAliasManager(
         target: TableExpression<*>,
-        excluded: TableExpression<*>
+        excluded: TableExpression<*>,
     ) : AliasManager {
 
         private val aliasMap: Map<TableExpression<*>, String> = mapOf(
             target to "t0_",
-            excluded to excluded.tableName()
+            excluded to excluded.tableName(),
         )
 
         override val index: Int = 1

@@ -138,7 +138,7 @@ internal data class RelationSelectQueryImpl<ENTITY : Any, ID : Any, META : Entit
 
     override fun <A : Any, B : Any> select(
         expression1: ColumnExpression<A, *>,
-        expression2: ColumnExpression<B, *>
+        expression2: ColumnExpression<B, *>,
     ): FlowSubquery<Pair<A?, B?>> {
         val newContext = support.select(expression1, expression2)
         return PairColumnsSelectQuery(newContext, expression1 to expression2)
@@ -146,7 +146,7 @@ internal data class RelationSelectQueryImpl<ENTITY : Any, ID : Any, META : Entit
 
     override fun <A : Any, B : Any> selectNotNull(
         expression1: ColumnExpression<A, *>,
-        expression2: ColumnExpression<B, *>
+        expression2: ColumnExpression<B, *>,
     ): FlowSubquery<Pair<A, B>> {
         val newContext = support.select(expression1, expression2)
         return PairNotNullColumnsSelectQuery(newContext, expression1 to expression2)
@@ -155,7 +155,7 @@ internal data class RelationSelectQueryImpl<ENTITY : Any, ID : Any, META : Entit
     override fun <A : Any, B : Any, C : Any> select(
         expression1: ColumnExpression<A, *>,
         expression2: ColumnExpression<B, *>,
-        expression3: ColumnExpression<C, *>
+        expression3: ColumnExpression<C, *>,
     ): FlowSubquery<Triple<A?, B?, C?>> {
         val newContext = support.select(expression1, expression2, expression3)
         return TripleColumnsSelectQuery(newContext, Triple(expression1, expression2, expression3))
@@ -164,7 +164,7 @@ internal data class RelationSelectQueryImpl<ENTITY : Any, ID : Any, META : Entit
     override fun <A : Any, B : Any, C : Any> selectNotNull(
         expression1: ColumnExpression<A, *>,
         expression2: ColumnExpression<B, *>,
-        expression3: ColumnExpression<C, *>
+        expression3: ColumnExpression<C, *>,
     ): FlowSubquery<Triple<A, B, C>> {
         val newContext = support.select(expression1, expression2, expression3)
         return TripleNotNullColumnsSelectQuery(newContext, Triple(expression1, expression2, expression3))

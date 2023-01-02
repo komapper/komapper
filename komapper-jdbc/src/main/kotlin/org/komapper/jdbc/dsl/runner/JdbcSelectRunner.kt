@@ -13,7 +13,7 @@ import java.sql.ResultSet
 internal class JdbcSelectRunner<T, R>(
     private val context: SelectContext<*, *, *>,
     private val transform: (JdbcDataOperator, ResultSet) -> T,
-    private val collect: suspend (Flow<T>) -> R
+    private val collect: suspend (Flow<T>) -> R,
 ) :
     JdbcRunner<R> {
 

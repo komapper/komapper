@@ -10,6 +10,6 @@ class JdbcMySqlSetting(private val driver: String, url: String) : MySqlSetting<J
         url,
         "test",
         "test",
-        executionOptions = ExecutionOptions(batchSize = 2)
+        executionOptions = ExecutionOptions(batchSize = 2),
     )
 }

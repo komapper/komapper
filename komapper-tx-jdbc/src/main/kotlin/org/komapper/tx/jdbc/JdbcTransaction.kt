@@ -11,9 +11,10 @@ interface JdbcTransaction {
 
 private class JdbcTransactionImpl(
     override val name: String?,
-    override val connection: JdbcTransactionConnection
+    override val connection: JdbcTransactionConnection,
 ) : JdbcTransaction {
     override val id: UUID = UUID.randomUUID()
+
     @Volatile
     override var isRollbackOnly: Boolean = false
     override fun toString() = "JdbcTransaction(id=$id, name=$name)"
@@ -21,7 +22,7 @@ private class JdbcTransactionImpl(
 
 fun JdbcTransaction(
     name: String?,
-    connection: JdbcTransactionConnection
+    connection: JdbcTransactionConnection,
 ): JdbcTransaction {
     return JdbcTransactionImpl(name, connection)
 }

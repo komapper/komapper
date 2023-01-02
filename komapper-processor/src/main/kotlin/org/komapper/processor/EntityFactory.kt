@@ -29,7 +29,7 @@ internal class EntityFactory(
     @Suppress("unused")
     private val logger: KSPLogger,
     private val config: Config,
-    private val entityDef: EntityDef
+    private val entityDef: EntityDef,
 ) {
 
     private val annotationSupport = AnnotationSupport(config)
@@ -82,7 +82,7 @@ internal class EntityFactory(
                     is CompositePropertyDef -> createCompositeProperty(
                         propertyDef = propertyDef,
                         parameter = parameter,
-                        declaration = declaration
+                        declaration = declaration,
                     )
                     is LeafPropertyDef -> createLeafProperty(
                         parameter = parameter,
@@ -134,7 +134,7 @@ internal class EntityFactory(
             propertyDef.declaration,
             propertyDef.kind,
             nullability,
-            embeddable
+            embeddable,
         ).also {
             validateContainerClass(embeddableDeclaration, propertyDef.kind.annotation, allowTypeParameters = true)
         }
@@ -182,7 +182,7 @@ internal class EntityFactory(
             if (name !in propertyNames) {
                 report(
                     "The property \"$name\" is not found in the class \"${embeddable.type.declaration.simpleName.asString()}\".",
-                    annotation
+                    annotation,
                 )
             }
         }
@@ -197,7 +197,7 @@ internal class EntityFactory(
         kind: PropertyKind?,
         typeArgument: KSTypeArgument?,
         column: Column?,
-        enumStrategy: EnumStrategy?
+        enumStrategy: EnumStrategy?,
     ): LeafProperty {
         val (type) = (typeArgument?.type ?: parameter.type).resolve().normalize()
         val kotlinClass = createEnumClass(enumStrategy, type) ?: createValueClass(type) ?: PlainClass(type)
@@ -210,7 +210,7 @@ internal class EntityFactory(
             kotlinClass = kotlinClass,
             literalTag = resolveLiteralTag(kotlinClass.exteriorTypeName),
             kind = kind,
-            parent = parent
+            parent = parent,
         ).also { validateLeafProperty(it) }
     }
 
@@ -229,12 +229,14 @@ internal class EntityFactory(
                         ?: report(
                             "The property \"$propertyName\" is not found in the ${classDeclaration.qualifiedName?.asString()}. " +
                                 "KomapperEnum's hint property is incorrect.",
-                            strategy.annotation
+                            strategy.annotation,
                         )
                     EnumClass(type, propertyType.name, strategy)
                 }
             }
-        } else null
+        } else {
+            null
+        }
     }
 
     private fun createValueClass(type: KSType): ValueClass? {
@@ -249,14 +251,20 @@ internal class EntityFactory(
                 val nonNullableInteriorType =
                     if (interiorType.isMarkedNullable) {
                         interiorType.makeNotNullable()
-                    } else interiorType
+                    } else {
+                        interiorType
+                    }
                 val typeName = nonNullableInteriorType.name
                 val literalTag = resolveLiteralTag(typeName)
                 val nullability = interiorType.nullability
                 val property = ValueClassProperty(parameter, declaration, typeName, literalTag, nullability)
                 ValueClass(type, property)
-            } else null
-        } else null
+            } else {
+                null
+            }
+        } else {
+            null
+        }
     }
 
     private fun resolveLiteralTag(typeName: String): String {
@@ -305,13 +313,13 @@ internal class EntityFactory(
         if (valueClassProperty.isPrivate()) {
             report(
                 "The property \"${property.path}\" is invalid. The value class's own property '$valueClassProperty' must not be private.",
-                property.node
+                property.node,
             )
         }
         if (valueClassProperty.nullability == Nullability.NULLABLE) {
             report(
                 "The property \"${property.path}\" is invalid. The value class's own property '$valueClassProperty' must not be nullable.",
-                property.node
+                property.node,
             )
         }
         checkEnumAnnotation(property)
@@ -321,7 +329,7 @@ internal class EntityFactory(
         if (!plainClass.isArray && plainClass.declaration.typeParameters.isNotEmpty()) {
             report(
                 "The property \"${property.path}\" must not be a generic type \"${plainClass.type}\".",
-                property.node
+                property.node,
             )
         }
         checkEnumAnnotation(property)
@@ -345,13 +353,13 @@ internal class EntityFactory(
                                 "kotlin.Int", "kotlin.Long", "kotlin.UInt" -> Unit
                                 else -> report(
                                     "When the type of $annotationName annotated property is value class, the type of the value class's own property must be either Int, Long or UInt.",
-                                    property.node
+                                    property.node,
                                 )
                             }
                         }
                         else -> report(
                             "The type of $annotationName annotated property must be either Int, Long, UInt or value class.",
-                            property.node
+                            property.node,
                         )
                     }
                 }
@@ -373,13 +381,13 @@ internal class EntityFactory(
                             "kotlin.Int", "kotlin.Long", "kotlin.UInt" -> Unit
                             else -> report(
                                 "When the type of @${KomapperVersion::class.simpleName} annotated property is value class, the type of the value class's own property must be either Int, Long or UInt.",
-                                property.node
+                                property.node,
                             )
                         }
                     }
                     else -> report(
                         "The type of @${KomapperVersion::class.simpleName} annotated property must be either Int, Long, UInt or value class.",
-                        property.node
+                        property.node,
                     )
                 }
             }
@@ -396,13 +404,13 @@ internal class EntityFactory(
                             Instant, LocalDateTime, OffsetDateTime, KotlinInstant, KotlinLocalDateTime -> Unit
                             else -> report(
                                 "When the type of $annotationName annotated property is value class, the type of the value class's own property must be either Instant, LocalDateTime or OffsetDateTime.",
-                                property.node
+                                property.node,
                             )
                         }
                     }
                     else -> report(
                         "The type of $annotationName annotated property must be either Instant, LocalDateTime or OffsetDateTime.",
-                        property.node
+                        property.node,
                     )
                 }
             }
@@ -428,7 +436,7 @@ internal class EntityFactory(
                 if (p.parameter.hasAnnotation(annotation)) {
                     report(
                         "@${annotation.simpleName} must be used with either @${KomapperEmbedded::class.simpleName} or @${KomapperEmbeddedId::class.simpleName}.",
-                        p.parameter
+                        p.parameter,
                     )
                 }
             }
@@ -451,7 +459,7 @@ internal class EntityFactory(
         if (entity.embeddedIdProperty != null && entity.idProperties.isNotEmpty()) {
             report(
                 "The entity class can have either @${KomapperEmbeddedId::class.simpleName} or @${KomapperId::class.simpleName}.",
-                entity.declaration
+                entity.declaration,
             )
         }
     }

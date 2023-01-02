@@ -58,12 +58,12 @@ class R2dbcEnv :
 
     override fun supportsParameter(
         parameterContext: ParameterContext,
-        extensionContext: ExtensionContext
+        extensionContext: ExtensionContext,
     ): Boolean = parameterContext.parameter.type === R2dbcDatabase::class.java
 
     override fun resolveParameter(
         parameterContext: ParameterContext,
-        extensionContext: ExtensionContext
+        extensionContext: ExtensionContext,
     ): Any = db
 
     override fun evaluateExecutionCondition(context: ExtensionContext): ConditionEvaluationResult? {

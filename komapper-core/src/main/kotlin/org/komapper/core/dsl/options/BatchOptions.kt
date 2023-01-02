@@ -11,7 +11,7 @@ interface BatchOptions : QueryOptions {
 
     override fun getExecutionOptions(): ExecutionOptions {
         return super.getExecutionOptions().copy(
-            batchSize = batchSize
+            batchSize = batchSize,
         )
     }
 }
