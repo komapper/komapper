@@ -67,7 +67,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        driver: [h2, oracle, postgresql]
+        driver: [h2, mariadb, oracle, postgresql]
     timeout-minutes: 15
 
     steps:
