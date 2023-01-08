@@ -567,6 +567,7 @@ class R2dbcDataTypeTest(val db: R2dbcDatabase) {
     }
 
     @Test
+    @Run(unless = [Dbms.MARIADB])
     fun instant_null(info: TestInfo) = inTransaction(db, info) {
         val m = Meta.instantData
         val data = InstantData(1, null)
