@@ -49,7 +49,7 @@ Komapper is tested with the following databases:
 Supported connectivity types:
 
 - JDBC 4.3
-- R2DBC 0.9.1 and 1.0.0
+- R2DBC 1.0.0
 
 ## Installation
 

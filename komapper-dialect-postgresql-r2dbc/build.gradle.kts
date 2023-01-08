@@ -1,7 +1,5 @@
 dependencies {
-    val r2dbcBomVersion: String by project
     api(project(":komapper-dialect-postgresql"))
     api(project(":komapper-r2dbc"))
-    implementation(platform("io.r2dbc:r2dbc-bom:$r2dbcBomVersion"))
-    api("org.postgresql:r2dbc-postgresql")
+    api("org.postgresql:r2dbc-postgresql:1.0.0.RELEASE")
 }
