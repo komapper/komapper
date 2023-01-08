@@ -1,5 +1,5 @@
 dependencies {
     api(project(":komapper-dialect-mysql"))
     api(project(":komapper-jdbc"))
-    implementation("mysql:mysql-connector-java:8.0.31")
+    api("mysql:mysql-connector-java:8.0.31")
 }

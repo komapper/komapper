@@ -1,5 +1,5 @@
 dependencies {
     api(project(":komapper-dialect-mariadb"))
     api(project(":komapper-jdbc"))
-    implementation("org.mariadb.jdbc:mariadb-java-client:3.1.0")
+    api("org.mariadb.jdbc:mariadb-java-client:3.1.0")
 }
