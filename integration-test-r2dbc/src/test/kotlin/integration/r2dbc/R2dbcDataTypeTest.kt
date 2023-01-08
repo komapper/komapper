@@ -725,6 +725,7 @@ class R2dbcDataTypeTest(val db: R2dbcDatabase) {
         assertEquals(expected, data2.value)
     }
 
+    @Run(onlyIf = [Dbms.H2, Dbms.POSTGRESQL, Dbms.ORACLE, Dbms.SQLSERVER])
     @Test
     fun offsetDateTime_null(info: TestInfo) = inTransaction(db, info) {
         val m = Meta.offsetDateTimeData
