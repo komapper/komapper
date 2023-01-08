@@ -7,6 +7,7 @@ import org.komapper.r2dbc.R2dbcBlobType
 import org.komapper.r2dbc.R2dbcBooleanType
 import org.komapper.r2dbc.R2dbcByteArrayType
 import org.komapper.r2dbc.R2dbcByteType
+import org.komapper.r2dbc.R2dbcClobType
 import org.komapper.r2dbc.R2dbcDataType
 import org.komapper.r2dbc.R2dbcDataTypeProvider
 import org.komapper.r2dbc.R2dbcDoubleType
@@ -34,6 +35,7 @@ class MariaDbR2dbcDataTypeProvider(next: R2dbcDataTypeProvider) :
             R2dbcBooleanType("bit(1)"),
             R2dbcByteType("tinyint"),
             R2dbcByteArrayType("bytea"),
+            R2dbcClobType("text"),
             R2dbcDoubleType("double precision"),
             R2dbcFloatType("real"),
             R2dbcInstantAsTimestampType("timestamp(6)"),
