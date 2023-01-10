@@ -30,15 +30,16 @@ object R2dbcDialects {
         return factory?.create()
     }
 
-    fun getByOptions(options: ConnectionFactoryOptions): R2dbcDialect {
-        val driverOption = options.getValue(ConnectionFactoryOptions.DRIVER)?.toString()
-        val protocolOption = options.getValue(ConnectionFactoryOptions.PROTOCOL)?.toString()
-        val dialect = sequenceOf(driverOption, protocolOption)
+    fun getByOptions(options: ConnectionFactoryOptions, getOrNull: (String) -> R2dbcDialect? = ::getOrNull): R2dbcDialect {
+        val driver = options.getValue(ConnectionFactoryOptions.DRIVER)?.toString()
+        val protocol = options.getValue(ConnectionFactoryOptions.PROTOCOL)?.toString()
+        val driverDelegate = protocol?.split(":", limit = 2)?.first()
+        val dialect = sequenceOf(driver, driverDelegate)
             .filterNotNull()
             .firstNotNullOfOrNull { getOrNull(it) }
         return dialect ?: error(
             "The dialect is not found. " +
-                "driverOption='$driverOption', protocolOption='$protocolOption'",
+                "driver='$driver', protocol='$protocol', driverDelegate='$driverDelegate'",
         )
     }
 
