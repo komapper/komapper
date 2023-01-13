@@ -31,7 +31,7 @@ internal class EntityMetamodelStubGenerator(
     ).joinToString(", ")
 
     override fun run() {
-        w.println("@file:Suppress(\"ClassName\", \"PrivatePropertyName\", \"UNUSED_PARAMETER\", \"unused\", \"RemoveRedundantQualifierName\", \"MemberVisibilityCanBePrivate\", \"RedundantNullableReturnType\", \"RemoveRedundantBackticks\")")
+        w.println("@file:Suppress(\"ClassName\", \"PrivatePropertyName\", \"UNUSED_PARAMETER\", \"unused\", \"RemoveRedundantQualifierName\", \"MemberVisibilityCanBePrivate\", \"RedundantNullableReturnType\", \"RemoveRedundantBackticks\", \"NO_EXPLICIT_VISIBILITY_IN_API_MODE\", \"NO_EXPLICIT_RETURN_TYPE_IN_API_MODE\", \"NO_EXPLICIT_VISIBILITY_IN_API_MODE_WARNING\", \"NO_EXPLICIT_RETURN_TYPE_IN_API_MODE_WARNING\")")
 
         if (packageName.isNotEmpty()) {
             w.println("package $packageName")
