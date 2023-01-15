@@ -11,6 +11,8 @@ interface MySqlR2dbcDialect : MySqlDialect, R2dbcDialect {
     }
 
     override fun supportsBatchExecutionOfParameterizedStatement(): Boolean = false
+
+    override fun supportsGeneratedKeysReturningWhenInsertingMultipleRows(): Boolean = false
 }
 
 private object MySqlR2dbcDialectImpl : MySqlR2dbcDialect

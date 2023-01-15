@@ -212,6 +212,8 @@ class R2dbcDataTypeTest(val db: R2dbcDatabase) {
         assertEquals(data, data2)
     }
 
+    // jasync-r2dbc-mysql does not support blob type
+    @Run(unless = [Dbms.MYSQL])
     @Test
     fun blob(info: TestInfo) = inTransaction(db, info) {
         val m = Meta.blobData
@@ -309,6 +311,8 @@ class R2dbcDataTypeTest(val db: R2dbcDatabase) {
         assertEquals(data, data2)
     }
 
+    // jasync-r2dbc-mysql does not support blob type
+    @Run(unless = [Dbms.MYSQL])
     @Test
     fun clob(info: TestInfo) = inTransaction(db, info) {
         val m = Meta.clobData
@@ -650,6 +654,8 @@ class R2dbcDataTypeTest(val db: R2dbcDatabase) {
         assertEquals(data, data2)
     }
 
+    // TODO: jasync-r2dbc-mysql returns a Duration object for the LocalTime type
+    @Run(unless = [Dbms.MYSQL])
     @Test
     fun localTime(info: TestInfo) = inTransaction(db, info) {
         val m = Meta.localTimeData
