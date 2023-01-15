@@ -52,7 +52,6 @@ class JdbcInsertMultipleTest(private val db: JdbcDatabase) {
         val results2 = db.runQuery { QueryDsl.from(i).orderBy(i.id) }
         assertEquals(results1, results2)
         assertTrue(results1.all { it.id != null })
-        println(results1)
     }
 
     @Run(onlyIf = [Dbms.MARIADB, Dbms.ORACLE, Dbms.SQLSERVER])
@@ -71,7 +70,7 @@ class JdbcInsertMultipleTest(private val db: JdbcDatabase) {
         println(ex)
     }
 
-    // @Run(unless = [Dbms.ORACLE])
+    @Run(unless = [Dbms.ORACLE])
     @Test
     fun identity_doNotReturnGeneratedKeys() {
         val i = Meta.identityStrategy
@@ -82,7 +81,7 @@ class JdbcInsertMultipleTest(private val db: JdbcDatabase) {
         )
         val result1 = db.runQuery {
             QueryDsl.insert(i).multiple(strategies).options {
-                it.copy(returnGeneratedKeys = true)
+                it.copy(returnGeneratedKeys = false)
             }
         }
         val result2 = db.runQuery {
@@ -91,8 +90,7 @@ class JdbcInsertMultipleTest(private val db: JdbcDatabase) {
                 .orderBy(i.value)
         }
         assertEquals(listOf("AAA", "BBB", "CCC"), result2.map { it.value })
-        // assertTrue(result1.all { it.id == null })
-        println(result1)
+        assertTrue(result1.all { it.id == null })
     }
 
     @Test
