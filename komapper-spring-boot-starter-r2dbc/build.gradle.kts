@@ -11,7 +11,7 @@ dependencies {
     api("org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinCoroutinesVersion")
     api("org.jetbrains.kotlinx:kotlinx-coroutines-reactive:$kotlinCoroutinesVersion")
     api("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:$kotlinCoroutinesVersion")
-    api("io.r2dbc:r2dbc-pool")
+    api("io.r2dbc:r2dbc-pool:1.0.0.RELEASE")
     api(project(":komapper-annotation"))
     api(project(":komapper-r2dbc"))
     runtimeOnly(project(":komapper-datetime-r2dbc"))
