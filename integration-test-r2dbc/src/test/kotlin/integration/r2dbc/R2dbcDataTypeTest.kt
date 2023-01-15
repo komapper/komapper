@@ -212,6 +212,8 @@ class R2dbcDataTypeTest(val db: R2dbcDatabase) {
         assertEquals(data, data2)
     }
 
+    // jasync-r2dbc-mysql does not support blob type
+    @Run(unless = [Dbms.MYSQL])
     @Test
     fun blob(info: TestInfo) = inTransaction(db, info) {
         val m = Meta.blobData
