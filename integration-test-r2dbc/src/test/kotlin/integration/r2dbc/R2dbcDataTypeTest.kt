@@ -654,6 +654,8 @@ class R2dbcDataTypeTest(val db: R2dbcDatabase) {
         assertEquals(data, data2)
     }
 
+    // TODO: jasync-r2dbc-mysql returns a Duration object for the LocalTime type
+    @Run(unless = [Dbms.MYSQL])
     @Test
     fun localTime(info: TestInfo) = inTransaction(db, info) {
         val m = Meta.localTimeData
