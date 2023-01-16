@@ -16,8 +16,7 @@ class R2dbcMySqlSetting(private val driver: String, private val url: String) :
 
     private val options: ConnectionFactoryOptions by lazy {
         val connectionUrl = ConnectionUrl.newInstance(url)
-        val container = MySQLContainerProvider().newInstance(connectionUrl)
-            .withCommand("mysqld --default-authentication-plugin=mysql_native_password") as MySQLContainer<*>
+        val container = MySQLContainerProvider().newInstance(connectionUrl) as MySQLContainer<*>
         val r2dbcContainer = MySQLR2DBCDatabaseContainer(container)
         r2dbcContainer.start()
         r2dbcContainer.configure(
