@@ -7,6 +7,7 @@ import org.komapper.r2dbc.R2dbcBlobType
 import org.komapper.r2dbc.R2dbcBooleanType
 import org.komapper.r2dbc.R2dbcByteArrayType
 import org.komapper.r2dbc.R2dbcByteType
+import org.komapper.r2dbc.R2dbcClobStringType
 import org.komapper.r2dbc.R2dbcClobType
 import org.komapper.r2dbc.R2dbcDataType
 import org.komapper.r2dbc.R2dbcDataTypeProvider
@@ -37,6 +38,7 @@ class SqlServerR2dbcDataTypeProvider(next: R2dbcDataTypeProvider) :
             R2dbcByteType("smallint"),
             R2dbcByteArrayType("varbinary(1000)"),
             R2dbcClobType("text"),
+            R2dbcClobStringType("text"),
             R2dbcDoubleType("real"),
             R2dbcFloatType("float"),
             R2dbcInstantAsTimestampWithTimezoneType("datetimeoffset"),

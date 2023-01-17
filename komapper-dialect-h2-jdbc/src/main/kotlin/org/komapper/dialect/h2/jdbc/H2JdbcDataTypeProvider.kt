@@ -9,6 +9,7 @@ import org.komapper.jdbc.JdbcBlobType
 import org.komapper.jdbc.JdbcBooleanType
 import org.komapper.jdbc.JdbcByteArrayType
 import org.komapper.jdbc.JdbcByteType
+import org.komapper.jdbc.JdbcClobStringType
 import org.komapper.jdbc.JdbcClobType
 import org.komapper.jdbc.JdbcDataType
 import org.komapper.jdbc.JdbcDataTypeProvider
@@ -44,6 +45,7 @@ class H2JdbcDataTypeProvider(next: JdbcDataTypeProvider) :
             JdbcByteArrayType("binary"),
             JdbcDoubleType("double"),
             JdbcClobType("clob"),
+            JdbcClobStringType("clob"),
             JdbcFloatType("float"),
             JdbcInstantType("timestamp with time zone"),
             JdbcIntType("integer"),

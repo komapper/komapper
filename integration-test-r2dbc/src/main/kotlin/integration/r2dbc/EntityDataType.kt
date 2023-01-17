@@ -6,6 +6,7 @@ import org.komapper.annotation.KomapperColumn
 import org.komapper.annotation.KomapperEntity
 import org.komapper.annotation.KomapperId
 import org.komapper.annotation.KomapperTable
+import org.komapper.annotation.MappingType
 
 @Suppress("ArrayInDataClass")
 @KomapperEntity
@@ -24,3 +25,7 @@ data class BlobData(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true)
 @KomapperEntity
 @KomapperTable("clob_data")
 data class ClobData(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true)val value: Clob?)
+
+@KomapperEntity
+@KomapperTable("clob_data")
+data class ClobStringData(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true, mapping = MappingType.CLOB_STRING)val value: String?)

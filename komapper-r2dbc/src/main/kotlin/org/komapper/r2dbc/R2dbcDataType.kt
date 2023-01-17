@@ -6,6 +6,7 @@ import io.r2dbc.spi.Row
 import io.r2dbc.spi.Statement
 import org.komapper.core.ThreadSafe
 import org.komapper.core.spi.DataTypeConverter
+import org.komapper.core.value.ClobString
 import org.komapper.r2dbc.spi.R2dbcUserDefinedDataType
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -230,6 +231,24 @@ class R2dbcClobType(override val name: String) :
 
     override fun getValue(row: Row, columnLabel: String): Clob? {
         return row.get(columnLabel, Clob::class.java)
+    }
+}
+
+class R2dbcClobStringType(override val name: String) :
+    AbstractR2dbcDataType<ClobString>(ClobString::class, Clob::class.javaObjectType) {
+
+    override fun getValue(row: Row, index: Int): ClobString? {
+        val text = row.get(index, String::class.java)
+        return if (text == null) null else ClobString.of(text)
+    }
+
+    override fun getValue(row: Row, columnLabel: String): ClobString? {
+        val text = row.get(columnLabel, String::class.java)
+        return if (text == null) null else ClobString.of(text)
+    }
+
+    override fun convertBeforeBinding(value: ClobString): Any {
+        return value.value
     }
 }
 

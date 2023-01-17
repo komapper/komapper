@@ -200,7 +200,7 @@ internal class EntityFactory(
         enumStrategy: EnumStrategy?,
     ): LeafProperty {
         val (type) = (typeArgument?.type ?: parameter.type).resolve().normalize()
-        val kotlinClass = createEnumClass(enumStrategy, type) ?: createValueClass(type) ?: PlainClass(type)
+        val kotlinClass = createEnumClass(enumStrategy, type) ?: createValueClass(type) ?: PlainClass(type, column)
         return LeafProperty(
             parameter = parameter,
             declaration = declaration,
@@ -278,7 +278,12 @@ internal class EntityFactory(
     private fun getColumn(column: Column?, parameter: KSValueParameter): Column {
         return if (column == null) {
             val name = parameter.toString()
-            Column(config.namingStrategy.apply(name), alwaysQuote = false, masking = false)
+            Column(
+                config.namingStrategy.apply(name),
+                alwaysQuote = false,
+                masking = false,
+                mappingStrategy = MappingStrategy.Default,
+            )
         } else {
             column
         }

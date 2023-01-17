@@ -140,6 +140,7 @@ annotation class KomapperColumn(
     val name: String = NAME,
     val alwaysQuote: Boolean = ALWAYS_QUOTE,
     val masking: Boolean = MASKING,
+    val mapping: MappingType = MappingType.DEFAULT,
 ) {
     companion object {
         const val NAME = ""

@@ -2,6 +2,7 @@ package org.komapper.jdbc
 
 import org.komapper.core.ThreadSafe
 import org.komapper.core.spi.DataTypeConverter
+import org.komapper.core.value.ClobString
 import org.komapper.jdbc.spi.JdbcUserDefinedDataType
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -261,6 +262,23 @@ class JdbcClobType(override val name: String) : AbstractJdbcDataType<Clob>(Clob:
 
     override fun doSetValue(ps: PreparedStatement, index: Int, value: Clob) {
         ps.setClob(index, value)
+    }
+}
+
+class JdbcClobStringType(override val name: String) : AbstractJdbcDataType<ClobString>(ClobString::class, JDBCType.CLOB) {
+
+    override fun doGetValue(rs: ResultSet, index: Int): ClobString? {
+        val text = rs.getString(index)
+        return if (text == null) null else ClobString.of(text)
+    }
+
+    override fun doGetValue(rs: ResultSet, columnLabel: String): ClobString? {
+        val text = rs.getString(columnLabel)
+        return if (text == null) null else ClobString.of(text)
+    }
+
+    override fun doSetValue(ps: PreparedStatement, index: Int, value: ClobString) {
+        ps.setString(index, value.value)
     }
 }
 

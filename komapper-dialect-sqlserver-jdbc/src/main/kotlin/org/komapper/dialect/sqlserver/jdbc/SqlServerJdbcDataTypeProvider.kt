@@ -6,6 +6,7 @@ import org.komapper.jdbc.JdbcBigIntegerType
 import org.komapper.jdbc.JdbcBlobType
 import org.komapper.jdbc.JdbcByteArrayType
 import org.komapper.jdbc.JdbcByteType
+import org.komapper.jdbc.JdbcClobStringType
 import org.komapper.jdbc.JdbcClobType
 import org.komapper.jdbc.JdbcDataType
 import org.komapper.jdbc.JdbcDataTypeProvider
@@ -37,6 +38,7 @@ class SqlServerJdbcDataTypeProvider(next: JdbcDataTypeProvider) :
             JdbcByteType("tinyint"),
             JdbcByteArrayType("varbinary(1000)"),
             JdbcClobType("text"),
+            JdbcClobStringType("text"),
             JdbcDoubleType("float"),
             JdbcFloatType("real"),
             JdbcInstantAsTimestampWithTimezoneType("datetimeoffset"),

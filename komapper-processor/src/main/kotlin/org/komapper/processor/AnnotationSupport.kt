@@ -41,7 +41,11 @@ internal class AnnotationSupport(
             columnAnnotation?.findValue("alwaysQuote")?.toString()?.toBooleanStrict() ?: config.alwaysQuote
         val masking =
             columnAnnotation?.findValue("masking")?.toString()?.toBooleanStrict() ?: KomapperColumn.MASKING
-        return Column(name, alwaysQuote, masking)
+        val mappingStrategy = when (columnAnnotation?.findValue("mapping")?.toString()) {
+            Symbols.MappingType_CLOB_STRING -> MappingStrategy.ClobString
+            else -> MappingStrategy.Default
+        }
+        return Column(name, alwaysQuote, masking, mappingStrategy)
     }
 
     fun getColumns(parameter: KSValueParameter): List<Triple<String, Column, KSAnnotation>> {

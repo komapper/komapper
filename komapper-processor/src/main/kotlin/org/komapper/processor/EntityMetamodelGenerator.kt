@@ -48,9 +48,10 @@ internal class EntityMetamodelGenerator(
         "List<Any>"
     }
 
-    private val embeddableIndexMap: Map<Embeddable, Int> = entity.properties.filterIsInstance<CompositeProperty>().map { it.embeddable }
-        .mapIndexed { index, embeddable -> embeddable to index }
-        .toMap()
+    private val embeddableIndexMap: Map<Embeddable, Int> =
+        entity.properties.filterIsInstance<CompositeProperty>().map { it.embeddable }
+            .mapIndexed { index, embeddable -> embeddable to index }
+            .toMap()
 
     private val constructorParamList = listOf(
         "table: String = \"${entity.table.name}\"",
@@ -152,20 +153,45 @@ internal class EntityMetamodelGenerator(
             val wrap = when (p.kotlinClass) {
                 is EnumClass -> {
                     val enumPropertyName = p.kotlinClass.strategy.propertyName
-                    fun throwException(value: String, cause: String) = "throw $EnumMappingException($exteriorClass, \"$enumPropertyName\", $value, $cause)"
+                    fun throwException(value: String, cause: String) =
+                        "throw $EnumMappingException($exteriorClass, \"$enumPropertyName\", $value, $cause)"
                     when (p.kotlinClass.strategy) {
-                        EnumStrategy.Name -> "{ try { $exteriorTypeName.valueOf(it) } catch (e: IllegalArgumentException) { ${throwException("it", "e")} } }"
-                        EnumStrategy.Ordinal -> "{ try { $exteriorTypeName.values()[it] } catch (e: ArrayIndexOutOfBoundsException) { ${throwException("it", "e")} } }"
-                        is EnumStrategy.Property -> "{ v -> $exteriorTypeName.values().firstOrNull { it.$enumPropertyName == v } ?: ${throwException("v", "null")} }"
+                        EnumStrategy.Name ->
+                            "{ try { $exteriorTypeName.valueOf(it) } catch (e: IllegalArgumentException) { ${
+                                throwException(
+                                    "it",
+                                    "e",
+                                )
+                            } } }"
+                        EnumStrategy.Ordinal ->
+                            "{ try { $exteriorTypeName.values()[it] } catch (e: ArrayIndexOutOfBoundsException) { ${
+                                throwException(
+                                    "it",
+                                    "e",
+                                )
+                            } } }"
+                        is EnumStrategy.Property ->
+                            "{ v -> $exteriorTypeName.values().firstOrNull { it.$enumPropertyName == v } ?: ${
+                                throwException(
+                                    "v",
+                                    "null",
+                                )
+                            } }"
                     }
                 }
                 is ValueClass -> "{ ${p.kotlinClass}(it) }"
-                else -> "{ it }"
+                else -> when (p.column.mappingStrategy) {
+                    is MappingStrategy.ClobString -> "{ it.value }"
+                    else -> "{ it }"
+                }
             }
             val unwrap = when (p.kotlinClass) {
-                is EnumClass -> "{ it.${p.kotlinClass.strategy.propertyName } }"
+                is EnumClass -> "{ it.${p.kotlinClass.strategy.propertyName} }"
                 is ValueClass -> "{ it.${p.kotlinClass.property} }"
-                else -> "{ it }"
+                else -> when (val strategy = p.column.mappingStrategy) {
+                    is MappingStrategy.ClobString -> "{ ${strategy.interiorTypeName}.of(it) }"
+                    else -> "{ it }"
+                }
             }
             val nullable = if (nullability == Nullability.NULLABLE) "true" else "false"
             val propertyDescriptor =

@@ -138,6 +138,7 @@ internal data class ValueClass(
 
 internal data class PlainClass(
     override val type: KSType,
+    val column: Column?,
 ) : KotlinClass {
     val isArray: Boolean = declaration.qualifiedName?.asString() == "kotlin.Array"
 
@@ -156,7 +157,12 @@ internal data class PlainClass(
             }
         }
 
-    override val interiorTypeName: String get() = exteriorTypeName
+    override val interiorTypeName: String get() {
+        return when (val strategy = column?.mappingStrategy) {
+            is MappingStrategy.ClobString -> strategy.interiorTypeName
+            else -> exteriorTypeName
+        }
+    }
     override fun toString(): String = exteriorTypeName
 }
 
@@ -177,6 +183,13 @@ sealed interface EnumStrategy {
         override val propertyName: String,
         val annotation: KSAnnotation,
     ) : EnumStrategy
+}
+
+sealed interface MappingStrategy {
+    object Default : MappingStrategy
+    object ClobString : MappingStrategy {
+        val interiorTypeName = Symbols.ClobString
+    }
 }
 
 internal data class ValueClassProperty(
@@ -235,4 +248,5 @@ internal data class Column(
     val name: String,
     val alwaysQuote: Boolean,
     val masking: Boolean,
+    val mappingStrategy: MappingStrategy,
 )

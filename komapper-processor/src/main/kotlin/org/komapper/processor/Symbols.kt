@@ -36,4 +36,6 @@ internal object Symbols {
     const val EnumType_PROPERTY = "org.komapper.annotation.EnumType.PROPERTY"
     const val DefaultUnit = "org.komapper.annotation.DefaultUnit"
     const val EnumMappingException = "org.komapper.core.dsl.runner.EnumMappingException"
+    const val MappingType_CLOB_STRING = "org.komapper.annotation.MappingType.CLOB_STRING"
+    const val ClobString = "org.komapper.core.value.ClobString"
 }

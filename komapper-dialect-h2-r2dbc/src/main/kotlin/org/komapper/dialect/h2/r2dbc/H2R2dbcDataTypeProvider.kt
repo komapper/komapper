@@ -7,6 +7,7 @@ import org.komapper.r2dbc.R2dbcBlobType
 import org.komapper.r2dbc.R2dbcBooleanType
 import org.komapper.r2dbc.R2dbcByteArrayType
 import org.komapper.r2dbc.R2dbcByteType
+import org.komapper.r2dbc.R2dbcClobStringType
 import org.komapper.r2dbc.R2dbcClobType
 import org.komapper.r2dbc.R2dbcDataType
 import org.komapper.r2dbc.R2dbcDataTypeProvider
@@ -37,6 +38,7 @@ class H2R2dbcDataTypeProvider(next: R2dbcDataTypeProvider) :
             R2dbcByteType("tinyint"),
             R2dbcByteArrayType("binary"),
             R2dbcClobType("clob"),
+            R2dbcClobStringType("clob"),
             R2dbcDoubleType("double"),
             R2dbcFloatType("float"),
             R2dbcInstantType("timestamp with time zone"),
