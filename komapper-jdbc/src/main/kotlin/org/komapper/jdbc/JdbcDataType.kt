@@ -1,8 +1,8 @@
 package org.komapper.jdbc
 
 import org.komapper.core.ThreadSafe
-import org.komapper.core.spi.DataTypeConverter
 import org.komapper.core.alternate.ClobString
+import org.komapper.core.spi.DataTypeConverter
 import org.komapper.jdbc.spi.JdbcUserDefinedDataType
 import java.math.BigDecimal
 import java.math.BigInteger

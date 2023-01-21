@@ -5,8 +5,8 @@ import io.r2dbc.spi.Clob
 import io.r2dbc.spi.Row
 import io.r2dbc.spi.Statement
 import org.komapper.core.ThreadSafe
-import org.komapper.core.spi.DataTypeConverter
 import org.komapper.core.alternate.ClobString
+import org.komapper.core.spi.DataTypeConverter
 import org.komapper.r2dbc.spi.R2dbcUserDefinedDataType
 import java.math.BigDecimal
 import java.math.BigInteger
