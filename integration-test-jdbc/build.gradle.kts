@@ -25,6 +25,10 @@ idea {
     }
 }
 
+ksp {
+    arg("komapper.enableEntityMetamodelListing", "true")
+}
+
 tasks {
     test {
         enabled = false

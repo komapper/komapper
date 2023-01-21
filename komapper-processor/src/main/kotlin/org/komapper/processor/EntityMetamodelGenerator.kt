@@ -11,6 +11,8 @@ import org.komapper.processor.Symbols.EmbeddedMetamodel
 import org.komapper.processor.Symbols.EntityDescriptor
 import org.komapper.processor.Symbols.EntityMetamodel
 import org.komapper.processor.Symbols.EntityMetamodelDeclaration
+import org.komapper.processor.Symbols.EntityMetamodelFactory
+import org.komapper.processor.Symbols.EntityMetamodelFactorySpi
 import org.komapper.processor.Symbols.EntityMetamodelImplementor
 import org.komapper.processor.Symbols.EnumMappingException
 import org.komapper.processor.Symbols.IdContext
@@ -34,7 +36,7 @@ import java.time.ZonedDateTime
 internal class EntityMetamodelGenerator(
     @Suppress("unused") private val logger: KSPLogger,
     private val entity: Entity,
-    private val metaObject: String,
+    private val unitTypeName: String,
     private val aliases: List<String>,
     private val packageName: String,
     private val simpleName: String,
@@ -119,6 +121,7 @@ internal class EntityMetamodelGenerator(
         w.println()
 
         utils()
+        provider()
     }
 
     private fun importStatements() {
@@ -569,7 +572,15 @@ internal class EntityMetamodelGenerator(
 
     private fun utils() {
         for (alias in aliases) {
-            w.println("val $metaObject.`$alias` get() = $simpleName.`$alias`")
+            w.println("val $unitTypeName.`$alias` get() = $simpleName.`$alias`")
         }
+        w.println()
+    }
+
+    private fun provider() {
+        w.println("@$EntityMetamodelFactory")
+        w.println("class ${simpleName}_Factory: $EntityMetamodelFactorySpi {")
+        w.println("    override fun create() = listOf(${aliases.joinToString { "$unitTypeName to $simpleName.`$it`" }})")
+        w.println("}")
     }
 }

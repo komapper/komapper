@@ -10,10 +10,9 @@ import org.komapper.annotation.KomapperEntity
 import org.komapper.annotation.KomapperEntityDef
 import java.io.PrintWriter
 
-internal class EntityProcessor(private val environment: SymbolProcessorEnvironment) : SymbolProcessor {
+internal class EntityProcessor(private val environment: SymbolProcessorEnvironment, private val config: Config) : SymbolProcessor {
 
     private val logger: KSPLogger = environment.logger
-    private val config: Config = Config.create(environment.options)
 
     override fun process(resolver: Resolver): List<KSAnnotated> {
         val pairs = listOf(

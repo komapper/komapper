@@ -6,9 +6,13 @@ import com.google.devtools.ksp.processing.SymbolProcessorProvider
 import org.komapper.core.ThreadSafe
 
 @ThreadSafe
-class EntityProcessorProvider : SymbolProcessorProvider {
+class EntityMetamodelFactoryProcessorProvider : SymbolProcessorProvider {
     override fun create(environment: SymbolProcessorEnvironment): SymbolProcessor {
         val config = Config.create(environment.options)
-        return EntityProcessor(environment, config)
+        return if (config.enableEntityMetamodelListing) {
+            EntityMetamodelFactoryProcessor(environment, config)
+        } else {
+            EmptySymbolProcessor
+        }
     }
 }
