@@ -37,6 +37,7 @@ internal data class LeafPropertyDef(
     override val kind: PropertyKind?,
     val column: Column,
     val enumStrategy: EnumStrategy?,
+    val alternate: ValueClass?,
 ) : PropertyDef
 
 internal data class CompositePropertyDef(
@@ -131,13 +132,19 @@ internal data class EnumClass(
 internal data class ValueClass(
     override val type: KSType,
     val property: ValueClassProperty,
+    val alternate: ValueClass?,
 ) : KotlinClass {
-    override val interiorTypeName: String get() = property.typeName
+    override val interiorTypeName: String
+        get() {
+            return alternate?.exteriorTypeName ?: property.typeName
+        }
+
     override fun toString(): String = exteriorTypeName
 }
 
 internal data class PlainClass(
     override val type: KSType,
+    val alternate: ValueClass?,
 ) : KotlinClass {
     val isArray: Boolean = declaration.qualifiedName?.asString() == "kotlin.Array"
 
@@ -156,7 +163,11 @@ internal data class PlainClass(
             }
         }
 
-    override val interiorTypeName: String get() = exteriorTypeName
+    override val interiorTypeName: String
+        get() {
+            return alternate?.exteriorTypeName ?: exteriorTypeName
+        }
+
     override fun toString(): String = exteriorTypeName
 }
 
@@ -180,6 +191,7 @@ sealed interface EnumStrategy {
 }
 
 internal data class ValueClassProperty(
+    val type: KSType,
     val parameter: KSValueParameter,
     val declaration: KSPropertyDeclaration,
     val typeName: String,

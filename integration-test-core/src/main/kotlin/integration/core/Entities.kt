@@ -1,5 +1,7 @@
 package integration.core
 
+import org.komapper.annotation.KomapperAlternate
+import org.komapper.annotation.KomapperAlternateOverride
 import org.komapper.annotation.KomapperAutoIncrement
 import org.komapper.annotation.KomapperColumn
 import org.komapper.annotation.KomapperColumnOverride
@@ -13,6 +15,7 @@ import org.komapper.annotation.KomapperSequence
 import org.komapper.annotation.KomapperTable
 import org.komapper.annotation.KomapperUpdatedAt
 import org.komapper.annotation.KomapperVersion
+import org.komapper.core.alternate.ClobString
 import java.math.BigDecimal
 import java.time.Instant
 import java.time.LocalDate
@@ -213,6 +216,35 @@ data class CyborgDef(
     @KomapperColumn("department_id") val departmentId: Nothing,
     @KomapperColumn("address_id") val addressId: Nothing,
     @KomapperVersion val version: Nothing,
+)
+
+data class MachineInfo1(
+    val employeeNo: Int,
+    val employeeName: String,
+)
+
+data class MachineInfo2(
+    val hiredate: LocalDate? = null,
+    val salary: BigDecimal? = null,
+)
+
+@KomapperEntity
+@KomapperTable("employee")
+data class Machine(
+    @KomapperId
+    @KomapperColumn("employee_id")
+    val employeeId: Int,
+    @KomapperEmbedded
+    @KomapperColumnOverride("employeeNo", KomapperColumn("employee_no"))
+    @KomapperColumnOverride("employeeName", KomapperColumn("employee_name"))
+    @KomapperAlternateOverride("employeeName", KomapperAlternate(ClobString::class))
+    val info1: MachineInfo1,
+    @KomapperEmbedded
+    val info2: MachineInfo2?,
+    @KomapperColumn("manager_id") val managerId: Int?,
+    @KomapperColumn("department_id") val departmentId: Int,
+    @KomapperColumn("address_id") val addressId: Int,
+    @KomapperVersion val version: Int,
 )
 
 @KomapperEntity

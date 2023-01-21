@@ -7,6 +7,7 @@ import org.komapper.jdbc.JdbcBlobType
 import org.komapper.jdbc.JdbcBooleanType
 import org.komapper.jdbc.JdbcByteArrayType
 import org.komapper.jdbc.JdbcByteType
+import org.komapper.jdbc.JdbcClobStringType
 import org.komapper.jdbc.JdbcClobType
 import org.komapper.jdbc.JdbcDataType
 import org.komapper.jdbc.JdbcDataTypeProvider
@@ -39,6 +40,7 @@ class MySqlJdbcDataTypeProvider(next: JdbcDataTypeProvider) : AbstractJdbcDataTy
             JdbcByteArrayType("varbinary(500)"),
             JdbcDoubleType("double precision"),
             JdbcClobType("text"),
+            JdbcClobStringType("text"),
             JdbcFloatType("real"),
             JdbcInstantAsTimestampType("timestamp(6)"),
             JdbcIntType("integer"),

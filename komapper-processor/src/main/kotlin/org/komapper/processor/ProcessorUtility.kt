@@ -142,3 +142,11 @@ internal fun toCamelCase(text: String): String {
     }
     return builder.toString()
 }
+
+internal fun resolveLiteralTag(typeName: String): String {
+    return when (typeName) {
+        "kotlin.Long" -> "L"
+        "kotlin.UInt" -> "u"
+        else -> ""
+    }
+}
