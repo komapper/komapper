@@ -72,6 +72,17 @@ interface EntityStore {
         first: EntityMetamodel<T, ID, *>,
         second: EntityMetamodel<S, *, *>,
     ): Map<ID, Set<S>>
+
+    fun <T : Any, S : Any> manyToOne(
+        first: EntityMetamodel<T, *, *>,
+        second: EntityMetamodel<S, *, *>,
+    ): Map<T, S?>
+
+    fun <T : Any, ID : Any, S : Any> manyToOneById(
+        first: EntityMetamodel<T, ID, *>,
+        second: EntityMetamodel<S, *, *>,
+    ): Map<ID, S?>
+
 }
 
 internal class EntityStoreImpl(
@@ -144,5 +155,40 @@ internal class EntityStoreImpl(
             }
         }
         return oneToMany
+    }
+
+    override fun <T : Any, S : Any> manyToOne(
+        first: EntityMetamodel<T, *, *>,
+        second: EntityMetamodel<S, *, *>
+    ): Map<T, S?> {
+        return createManyToOne(first, second)
+    }
+
+    override fun <T : Any, ID : Any, S : Any> manyToOneById(
+        first: EntityMetamodel<T, ID, *>,
+        second: EntityMetamodel<S, *, *>
+    ): Map<ID, S?> {
+        val manyToOne = createManyToOne(first, second)
+        return manyToOne.mapKeys { first.extractId(it.key) }
+    }
+    
+    private fun <T : Any, S : Any> createManyToOne(
+        first: EntityMetamodel<T, *, *>,
+        second: EntityMetamodel<S, *, *>,
+    ): Map<T, S?> {
+        if (!contains(first, second)) {
+            return emptyMap()
+        }
+        val manyToOne = mutableMapOf<T, S?>()
+        for (row in rows) {
+            val entity1 = row[first]
+            val entity2 = row[second]
+            if (entity1 != null) {
+                val key = first.klass().cast(entity1)
+                val value = entity2?.let { second.klass().cast(it) }
+                manyToOne[key] = value
+            }
+        }
+        return manyToOne
     }
 }
