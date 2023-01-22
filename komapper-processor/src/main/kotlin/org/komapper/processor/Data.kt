@@ -22,6 +22,7 @@ internal data class EntityDefinitionSource(
 internal data class EntityDef(
     val definitionSource: EntityDefinitionSource,
     val table: Table,
+    val associations: List<Association>,
     val properties: List<PropertyDef>,
 )
 
@@ -48,6 +49,7 @@ internal data class CompositePropertyDef(
 internal data class Entity(
     val declaration: KSClassDeclaration,
     val table: Table,
+    val associations: List<Association>,
     val properties: List<Property>,
     val embeddedIdProperty: CompositeProperty?,
     val virtualEmbeddedIdProperty: CompositeProperty?,
@@ -236,3 +238,15 @@ internal data class Column(
     val alwaysQuote: Boolean,
     val masking: Boolean,
 )
+
+internal data class Association(
+    val targetEntity: KSClassDeclaration,
+    val kind: AssociationKind,
+    val name: String,
+)
+
+enum class AssociationKind {
+    ONE_TO_ONE,
+    ONE_TO_MANY,
+    MANY_TO_ONE,
+}

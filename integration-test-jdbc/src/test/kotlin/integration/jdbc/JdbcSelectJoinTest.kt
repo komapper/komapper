@@ -3,6 +3,7 @@ package integration.jdbc
 import integration.core.address
 import integration.core.department
 import integration.core.employee
+import integration.core.employees
 import integration.core.manager
 import integration.core.person
 import org.junit.jupiter.api.extension.ExtendWith
@@ -282,5 +283,27 @@ class JdbcSelectJoinTest(private val db: JdbcDatabase) {
         assertEquals(14, store[a].size)
         assertEquals(14, store[e].size)
         assertEquals(3, store[d].size)
+    }
+
+    @Test
+    fun associationHelper() {
+        val d = Meta.department
+        val e = Meta.employee
+        val a = Meta.address
+        val store = db.runQuery {
+            QueryDsl.from(d)
+                .innerJoin(e) {
+                    d.departmentId eq e.departmentId
+                }.innerJoin(a) {
+                    e.addressId eq a.addressId
+                }.includeAll()
+        }
+        for (department in store[d]) {
+            val employees = department.employees(store, d, e)
+            for (employee in employees) {
+                val address = employee.address(store, e, a)
+                println("department=${department.departmentName}, employee=${employee.employeeName}, address=${address?.street}")
+            }
+        }
     }
 }

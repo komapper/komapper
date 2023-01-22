@@ -2,7 +2,9 @@ package org.komapper.processor
 
 import com.google.devtools.ksp.symbol.KSAnnotation
 import com.google.devtools.ksp.symbol.KSNode
+import com.google.devtools.ksp.symbol.KSType
 import com.google.devtools.ksp.symbol.KSValueParameter
+import org.komapper.annotation.KomapperAssociation
 import org.komapper.annotation.KomapperColumn
 import org.komapper.annotation.KomapperColumnOverride
 import org.komapper.annotation.KomapperEnum
@@ -26,6 +28,33 @@ internal class AnnotationSupport(
         val alwaysQuote =
             annotation?.findValue("alwaysQuote")?.toString()?.toBooleanStrict() ?: config.alwaysQuote
         return Table(name, catalog, schema, alwaysQuote)
+    }
+
+    fun getAssociations(definitionSource: EntityDefinitionSource): List<Association> {
+        return definitionSource.defDeclaration
+            .findAnnotations(KomapperAssociation::class)
+            .map { annotation ->
+                val targetEntity = annotation.findValue("targetEntity").let {
+                    if (it !is KSType) report("targetEntity is not KSType: $it", annotation)
+                    it.declaration.accept(ClassDeclarationVisitor(), Unit) ?: report("targetEntity is not KSClassDeclaration: ${it.declaration}", annotation)
+                }
+                val name = annotation.findValue("name")?.toString()?.trim().let { name ->
+                    if (name.isNullOrBlank()) {
+                        targetEntity.simpleName.asString().replaceFirstChar { it.lowercaseChar() }
+                    } else {
+                        name
+                    }
+                }
+                val kind = annotation.findValue("type").let {
+                    when (val type = it?.toString()) {
+                        Symbols.AssociationType_ONE_TO_ONE -> AssociationKind.ONE_TO_ONE
+                        Symbols.AssociationType_ONE_TO_MANY -> AssociationKind.ONE_TO_MANY
+                        Symbols.AssociationType_MANY_TO_ONE -> AssociationKind.MANY_TO_ONE
+                        else -> report("Unknown association type is found: $type", annotation)
+                    }
+                }
+                Association(targetEntity, kind, name)
+            }
     }
 
     fun getColumn(parameter: KSValueParameter): Column {

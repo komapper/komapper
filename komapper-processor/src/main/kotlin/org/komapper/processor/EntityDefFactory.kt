@@ -24,12 +24,14 @@ internal class EntityDefFactory(
 
     fun create(): EntityDef {
         val table = annotationSupport.getTable(definitionSource)
+        // TODO: Check for name duplication
+        val associations = annotationSupport.getAssociations(definitionSource)
         val allProperties = createAllProperties()
         val compositeProperties = allProperties.filterIsInstance<CompositePropertyDef>()
         val leafProperties = allProperties.filterIsInstance<LeafPropertyDef>()
         validateCompositeProperties(compositeProperties)
         validateLeafProperties(leafProperties)
-        return EntityDef(definitionSource, table, allProperties)
+        return EntityDef(definitionSource, table, associations, allProperties)
     }
 
     private fun createAllProperties(): List<PropertyDef> {

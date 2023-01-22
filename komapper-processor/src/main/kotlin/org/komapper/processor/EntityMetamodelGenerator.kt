@@ -119,6 +119,7 @@ internal class EntityMetamodelGenerator(
         w.println()
 
         utils()
+        associations()
     }
 
     private fun importStatements() {
@@ -570,6 +571,33 @@ internal class EntityMetamodelGenerator(
     private fun utils() {
         for (alias in aliases) {
             w.println("val $metaObject.`$alias` get() = $simpleName.`$alias`")
+        }
+        w.println()
+    }
+
+    private fun associations() {
+        for (association in entity.associations) {
+            val targetEntityTypeName = association.targetEntity.qualifiedName?.asString()
+            val returnType = when (association.kind) {
+                AssociationKind.ONE_TO_ONE,
+                AssociationKind.MANY_TO_ONE,
+                -> "$targetEntityTypeName?"
+                AssociationKind.ONE_TO_MANY -> "Set<$targetEntityTypeName>"
+            }
+            val expression = when (association.kind) {
+                AssociationKind.ONE_TO_ONE -> "store.oneToOne(thisSide, thatSide)[this]"
+                AssociationKind.MANY_TO_ONE -> "store.oneToMany(thatSide, thisSide).asSequence().firstOrNull { it.value.contains(this) }?.key"
+                AssociationKind.ONE_TO_MANY -> "store.oneToMany(thisSide, thatSide)[this] ?: emptySet()"
+            }
+            w.println(
+                "fun $entityTypeName.`${association.name}`(" +
+                    "store: org.komapper.core.dsl.query.EntityStore," +
+                    "thisSide: $simpleName," +
+                    "thatSide: $EntityMetamodel<${association.targetEntity.qualifiedName?.asString()}, *, *>," +
+                    "): $returnType {",
+            )
+            w.println("    return $expression")
+            w.println("}")
         }
     }
 }

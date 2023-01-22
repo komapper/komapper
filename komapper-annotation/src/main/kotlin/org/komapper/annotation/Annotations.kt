@@ -243,3 +243,17 @@ annotation class KomapperEntityDef(
     val aliases: Array<String> = [],
     val unit: KClass<*> = DefaultUnit::class,
 )
+
+// TODO: KDoc comment
+@Target(AnnotationTarget.CLASS)
+@Retention(AnnotationRetention.SOURCE)
+@Repeatable
+annotation class KomapperAssociation(
+    val type: AssociationType,
+    val targetEntity: KClass<*>,
+    val name: String = NAME,
+) {
+    companion object {
+        const val NAME: String = ""
+    }
+}

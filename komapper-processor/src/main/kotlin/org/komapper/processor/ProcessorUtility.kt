@@ -30,6 +30,10 @@ internal fun KSAnnotation.findValue(name: String): Any? {
         .firstOrNull()
 }
 
+internal fun KSAnnotated.findAnnotations(klass: KClass<*>): List<KSAnnotation> {
+    return this.annotations.filter { it.shortName.asString() == klass.simpleName }.toList()
+}
+
 internal fun KSAnnotated.findAnnotation(klass: KClass<*>): KSAnnotation? {
     return this.annotations.firstOrNull { it.shortName.asString() == klass.simpleName }
 }

@@ -1,5 +1,7 @@
 package integration.core
 
+import org.komapper.annotation.AssociationType
+import org.komapper.annotation.KomapperAssociation
 import org.komapper.annotation.KomapperAutoIncrement
 import org.komapper.annotation.KomapperColumn
 import org.komapper.annotation.KomapperColumnOverride
@@ -119,6 +121,8 @@ data class Human(
     @KomapperUpdatedAt val updatedAt: OffsetDateTime? = null,
 )
 
+@KomapperAssociation(AssociationType.MANY_TO_ONE, Department::class)
+@KomapperAssociation(AssociationType.ONE_TO_ONE, Address::class)
 @KomapperEntity(["employee", "manager"])
 data class Employee(
     @KomapperId
@@ -215,6 +219,7 @@ data class CyborgDef(
     @KomapperVersion val version: Nothing,
 )
 
+@KomapperAssociation(AssociationType.ONE_TO_MANY, Employee::class, "employees")
 @KomapperEntity
 data class Department(
     @KomapperId
