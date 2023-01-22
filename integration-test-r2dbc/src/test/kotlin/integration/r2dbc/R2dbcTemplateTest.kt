@@ -16,6 +16,7 @@ import org.komapper.core.dsl.query.getNotNull
 import org.komapper.r2dbc.R2dbcDatabase
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 
 @ExtendWith(R2dbcEnv::class)
 class R2dbcTemplateTest(private val db: R2dbcDatabase) {
@@ -85,6 +86,23 @@ class R2dbcTemplateTest(private val db: R2dbcDatabase) {
                 .select(asAddress)
         }
         assertEquals(15, list.size)
+    }
+
+    @Test
+    fun bind_unknownBindVariable(info: TestInfo) = inTransaction(db, info) {
+        val ex = assertFailsWith<Exception> {
+            db.runQuery {
+                val sql = "select * from address where street = /*street*/'test'"
+                QueryDsl.fromTemplate(sql)
+                    .bind("unknown", "STREET 10")
+                    .select(asAddress)
+            }
+            Unit
+        }
+        val message = ex.message!!
+        assertEquals("The expression evaluation was failed at <select * from address where street = /*street*/'test'>:1:47.", message)
+        val causeMessage = ex.cause!!.message
+        assertEquals("The variable \"street\" is not found. Make sure the variable name is correct. <street>:6", causeMessage)
     }
 
     @Test

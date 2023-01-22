@@ -180,7 +180,8 @@ internal class DefaultExprEvaluator(
     }
 
     private fun visitValue(node: ExprNode.Value, ctx: ExprContext): Value<*> {
-        return ctx.valueMap[node.name] ?: exprEnvironment.ctx[node.name] ?: Value(null, Any::class)
+        return ctx.valueMap[node.name] ?: exprEnvironment.ctx[node.name]
+            ?: throw ExprException("The variable \"${node.name}\" is not found. Make sure the variable name is correct. ${node.location}")
     }
 
     private fun visitProperty(node: ExprNode.Property, ctx: ExprContext): Value<*> {
