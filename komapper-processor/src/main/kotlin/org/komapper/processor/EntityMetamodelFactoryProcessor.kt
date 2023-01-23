@@ -10,17 +10,17 @@ import org.komapper.processor.Symbols.EntityMetamodelFactory
 import org.komapper.processor.Symbols.EntityMetamodelFactorySpi
 import java.io.PrintWriter
 
-internal class EntityMetamodelFactoryProcessor(private val environment: SymbolProcessorEnvironment, private val config: Config) :
+internal class EntityMetamodelFactoryProcessor(
+    private val environment: SymbolProcessorEnvironment,
+) :
     SymbolProcessor {
 
     private val classDeclarations: MutableList<KSClassDeclaration> = mutableListOf()
 
     override fun process(resolver: Resolver): List<KSAnnotated> {
-        if (config.enableEntityMetamodelListing) {
-            val symbols = resolver.getSymbolsWithAnnotation(EntityMetamodelFactory)
-            val declarations = symbols.map { it.accept(ClassDeclarationVisitor(), Unit) }.filterNotNull().toList()
-            classDeclarations.addAll(declarations)
-        }
+        val symbols = resolver.getSymbolsWithAnnotation(EntityMetamodelFactory)
+        val declarations = symbols.map { it.accept(ClassDeclarationVisitor(), Unit) }.filterNotNull().toList()
+        classDeclarations.addAll(declarations)
         return emptyList()
     }
 

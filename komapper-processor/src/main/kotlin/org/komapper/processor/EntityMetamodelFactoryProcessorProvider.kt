@@ -10,7 +10,7 @@ class EntityMetamodelFactoryProcessorProvider : SymbolProcessorProvider {
     override fun create(environment: SymbolProcessorEnvironment): SymbolProcessor {
         val config = Config.create(environment.options)
         return if (config.enableEntityMetamodelListing) {
-            EntityMetamodelFactoryProcessor(environment, config)
+            EntityMetamodelFactoryProcessor(environment)
         } else {
             EmptySymbolProcessor
         }
