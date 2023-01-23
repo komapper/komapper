@@ -7,6 +7,8 @@ internal object Symbols {
     const val EntityMetamodel = "org.komapper.core.dsl.metamodel.EntityMetamodel"
     const val EntityMetamodelStub = "org.komapper.core.dsl.metamodel.EntityMetamodelStub"
     const val EntityMetamodelImplementor = "org.komapper.core.dsl.metamodel.EntityMetamodelImplementor"
+    const val EntityMetamodelFactory = "org.komapper.core.dsl.metamodel.EntityMetamodelFactory"
+    const val EntityMetamodelFactorySpi = "org.komapper.core.spi.EntityMetamodelFactory"
     const val IdGenerator = "org.komapper.core.dsl.metamodel.IdGenerator"
     const val AutoIncrement = "org.komapper.core.dsl.metamodel.IdGenerator.AutoIncrement"
     const val Sequence = "org.komapper.core.dsl.metamodel.IdGenerator.Sequence"
