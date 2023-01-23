@@ -414,12 +414,12 @@ class ExprEvaluatorTest {
         }
 
         @Test
-        fun `The value cannot be resolved`() {
+        fun `The template variable is not bound to a value`() {
             val ctx = ExprContext(emptyMap(), extensions)
             val ex = assertFailsWith<ExprException> {
                 evaluator.eval("a", ctx)
             }
-            assertEquals("The variable \"a\" is not found. Make sure the variable name is correct. <a>:1", ex.message)
+            assertEquals("The template variable \"a\" is not bound to a value. Make sure the variable name is correct. <a>:1", ex.message)
         }
     }
 
