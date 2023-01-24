@@ -1048,7 +1048,7 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
     }
 
     @Test
-    fun `The valueClass property must be a value class`() {
+    fun `The alternateType property must be a value class`() {
         val result = compile(
             """
             package test
@@ -1058,13 +1058,13 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
             data class Dept(
                 @KomapperAutoIncrement @KomapperId
                 val id: Int,
-                @KomapperAlternate(ClobString::class)
+                @KomapperColumn(alternateType = ClobString::class)
                 val description: String
             )
             """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
-        assertTrue(result.messages.contains("The valueClass property must be a value class."))
+        assertTrue(result.messages.contains("The alternateType property must be a value class."))
     }
 
     @Test
@@ -1078,7 +1078,7 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
             data class Dept(
                 @KomapperAutoIncrement @KomapperId
                 val id: Int,
-                @KomapperAlternate(ClobString::class)
+                @KomapperColumn(alternateType = ClobString::class)
                 val description: String
             )
             """,
@@ -1098,7 +1098,7 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
             data class Dept(
                 @KomapperAutoIncrement @KomapperId
                 val id: Int,
-                @KomapperAlternate(ClobString::class)
+                @KomapperColumn(alternateType = ClobString::class)
                 val description: String
             )
             """,
@@ -1118,7 +1118,7 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
             data class Dept(
                 @KomapperAutoIncrement @KomapperId
                 val id: Int,
-                @KomapperAlternate(ClobString::class)
+                @KomapperColumn(alternateType = ClobString::class)
                 val description: String
             )
             """,
@@ -1138,7 +1138,7 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
             data class Dept(
                 @KomapperAutoIncrement @KomapperId
                 val id: Int,
-                @KomapperAlternate(ClobString::class)
+                @KomapperColumn(alternateType = ClobString::class)
                 val number: Int
             )
             """,
@@ -1148,7 +1148,7 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
     }
 
     @Test
-    fun `KomapperAlternate is invalid for enum property types`() {
+    fun `KomapperColumn alternateType is invalid for enum property types`() {
         val result = compile(
             """
             package test
@@ -1159,13 +1159,13 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
             data class Dept(
                 @KomapperAutoIncrement @KomapperId
                 val id: Int,
-                @KomapperAlternate(ClobString::class)
+                @KomapperColumn(alternateType = ClobString::class)
                 val color: Color
             )
             """,
         )
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
-        assertTrue(result.messages.contains("@KomapperAlternate is invalid for enum property types."))
+        assertTrue(result.messages.contains("@KomapperColumn.alternateType is invalid for enum property types."))
     }
 
     @Test
@@ -1180,7 +1180,7 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
             data class Dept(
                 @KomapperAutoIncrement @KomapperId
                 val id: Int,
-                @KomapperAlternate(ClobString::class)
+                @KomapperColumn(alternateType = ClobString::class)
                 val color: Color
             )
             """,

@@ -37,7 +37,6 @@ internal data class LeafPropertyDef(
     override val kind: PropertyKind?,
     val column: Column,
     val enumStrategy: EnumStrategy?,
-    val alternate: ValueClass?,
 ) : PropertyDef
 
 internal data class CompositePropertyDef(
@@ -132,11 +131,11 @@ internal data class EnumClass(
 internal data class ValueClass(
     override val type: KSType,
     val property: ValueClassProperty,
-    val alternate: ValueClass?,
+    val alternateType: ValueClass?,
 ) : KotlinClass {
     override val interiorTypeName: String
         get() {
-            return alternate?.exteriorTypeName ?: property.typeName
+            return alternateType?.exteriorTypeName ?: property.typeName
         }
 
     override fun toString(): String = exteriorTypeName
@@ -247,4 +246,5 @@ internal data class Column(
     val name: String,
     val alwaysQuote: Boolean,
     val masking: Boolean,
+    val alternateType: ValueClass?,
 )

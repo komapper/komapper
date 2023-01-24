@@ -1,7 +1,5 @@
 package integration.core
 
-import org.komapper.annotation.KomapperAlternate
-import org.komapper.annotation.KomapperAlternateOverride
 import org.komapper.annotation.KomapperAutoIncrement
 import org.komapper.annotation.KomapperColumn
 import org.komapper.annotation.KomapperColumnOverride
@@ -236,8 +234,7 @@ data class Machine(
     val employeeId: Int,
     @KomapperEmbedded
     @KomapperColumnOverride("employeeNo", KomapperColumn("employee_no"))
-    @KomapperColumnOverride("employeeName", KomapperColumn("employee_name"))
-    @KomapperAlternateOverride("employeeName", KomapperAlternate(ClobString::class))
+    @KomapperColumnOverride("employeeName", KomapperColumn("employee_name", alternateType = ClobString::class))
     val info1: MachineInfo1,
     @KomapperEmbedded
     val info2: MachineInfo2?,

@@ -6,8 +6,6 @@ import com.google.devtools.ksp.symbol.KSAnnotation
 import com.google.devtools.ksp.symbol.KSNode
 import com.google.devtools.ksp.symbol.KSType
 import com.google.devtools.ksp.symbol.KSValueParameter
-import org.komapper.annotation.KomapperAlternate
-import org.komapper.annotation.KomapperAlternateOverride
 import org.komapper.annotation.KomapperColumn
 import org.komapper.annotation.KomapperColumnOverride
 import org.komapper.annotation.KomapperEnum
@@ -46,7 +44,52 @@ internal class AnnotationSupport(
             columnAnnotation?.findValue("alwaysQuote")?.toString()?.toBooleanStrict() ?: config.alwaysQuote
         val masking =
             columnAnnotation?.findValue("masking")?.toString()?.toBooleanStrict() ?: KomapperColumn.MASKING
-        return Column(name, alwaysQuote, masking)
+        val alternateType = columnAnnotation?.findValue("alternateType")?.let { type ->
+            if (type !is KSType) report("The alternateType is not KSType.", columnAnnotation)
+            val classDeclaration = type.declaration.accept(ClassDeclarationVisitor(), Unit)
+            when {
+                classDeclaration == null ->
+                    report("The alternateType property is illegal.", columnAnnotation)
+                classDeclaration.qualifiedName?.asString() == Symbols.Void ->
+                    null
+                !classDeclaration.isValueClass() ->
+                    report("The alternateType property must be a value class. ${classDeclaration.qualifiedName?.asString()}", columnAnnotation)
+                else -> {
+                    val constructor = classDeclaration.primaryConstructor
+                    val isPublic = constructor?.isPublic() ?: false
+                    if (!isPublic) {
+                        report(
+                            "The constructor of \"${classDeclaration.qualifiedName?.asString()}\" must be public.",
+                            columnAnnotation,
+                        )
+                    }
+                    val parameter = constructor?.parameters?.firstOrNull()
+                        ?: error("No parameter is found in the class \"${classDeclaration.qualifiedName?.asString()}\"")
+                    val declaration = classDeclaration.getDeclaredProperties().firstOrNull()
+                        ?: error("No property is found in the class \"${classDeclaration.qualifiedName?.asString()}\"")
+                    if (!declaration.isPublic()) {
+                        report(
+                            "The property parameter of \"${classDeclaration.qualifiedName?.asString()}\" must be public.",
+                            columnAnnotation,
+                        )
+                    }
+                    val propertyType = declaration.type.resolve()
+                    if (propertyType.isMarkedNullable) {
+                        report(
+                            "The property parameter of \"${classDeclaration.qualifiedName?.asString()}\" must not be nullable.",
+                            columnAnnotation,
+                        )
+                    }
+                    val typeName = propertyType.name
+                    val literalTag = resolveLiteralTag(typeName)
+                    val nullability = propertyType.nullability
+                    val property =
+                        ValueClassProperty(propertyType, parameter, declaration, typeName, literalTag, nullability)
+                    ValueClass(type, property, null)
+                }
+            }
+        }
+        return Column(name, alwaysQuote, masking, alternateType)
     }
 
     fun getColumns(parameter: KSValueParameter): List<Triple<String, Column, KSAnnotation>> {
@@ -97,51 +140,5 @@ internal class AnnotationSupport(
                 val enumStrategy = getEnumStrategy(it.second)
                 Triple(it.first!!, enumStrategy, it.third)
             }.toList()
-    }
-
-    fun getAlternate(parameter: KSValueParameter): ValueClass? {
-        val annotation = parameter.findAnnotation(KomapperAlternate::class)
-        return getAlternate(annotation)
-    }
-
-    private fun getAlternate(annotation: KSAnnotation?): ValueClass? {
-        if (annotation == null) return null
-        val type = annotation.findValue("valueClass")
-        if (type !is KSType) report("The valueClass is not KSType.", annotation)
-        val classDeclaration = type.declaration.accept(ClassDeclarationVisitor(), Unit)
-        if (classDeclaration == null || !classDeclaration.isValueClass()) {
-            report("The valueClass property must be a value class.", annotation)
-        }
-        val constructor = classDeclaration.primaryConstructor
-        val isPublic = constructor?.isPublic() ?: false
-        if (!isPublic) report("The constructor of \"${classDeclaration.qualifiedName?.asString()}\" must be public.", annotation)
-        val parameter = constructor?.parameters?.firstOrNull()
-            ?: error("No parameter is found in the class \"${classDeclaration.qualifiedName?.asString()}\"")
-        val declaration = classDeclaration.getDeclaredProperties().firstOrNull()
-            ?: error("No property is found in the class \"${classDeclaration.qualifiedName?.asString()}\"")
-        if (!declaration.isPublic()) report("The property parameter of \"${classDeclaration.qualifiedName?.asString()}\" must be public.", annotation)
-        val propertyType = declaration.type.resolve()
-        if (propertyType.isMarkedNullable) report("The property parameter of \"${classDeclaration.qualifiedName?.asString()}\" must not be nullable.", annotation)
-        val typeName = propertyType.name
-        val literalTag = resolveLiteralTag(typeName)
-        val nullability = propertyType.nullability
-        val property = ValueClassProperty(propertyType, parameter, declaration, typeName, literalTag, nullability)
-        return ValueClass(type, property, null)
-    }
-
-    fun getAlternates(parameter: KSValueParameter): List<Triple<String, ValueClass, KSAnnotation>> {
-        return parameter.annotations
-            .filter { it.shortName.asString() == KomapperAlternateOverride::class.simpleName }
-            .map {
-                val name = it.findValue("name")?.toString()
-                val alternateNode = it.findValue("alternate") as? KSNode
-                val alternateAnnotation = alternateNode?.accept(AnnotationVisitor(), Unit)
-                Triple(name, alternateAnnotation, it)
-            }.filter {
-                it.first != null && it.second != null
-            }.map {
-                val alternate = getAlternate(it.second)
-                if (alternate == null) null else Triple(it.first!!, alternate, it.third)
-            }.filterNotNull().toList()
     }
 }

@@ -2,7 +2,6 @@ package integration.r2dbc
 
 import io.r2dbc.spi.Blob
 import io.r2dbc.spi.Clob
-import org.komapper.annotation.KomapperAlternate
 import org.komapper.annotation.KomapperColumn
 import org.komapper.annotation.KomapperEntity
 import org.komapper.annotation.KomapperId
@@ -31,7 +30,6 @@ data class ClobData(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true)
 @KomapperTable("clob_data")
 data class ClobStringData(
     @KomapperId val id: Int,
-    @KomapperAlternate(ClobString::class)
-    @KomapperColumn(alwaysQuote = true)
+    @KomapperColumn(alwaysQuote = true, alternateType = ClobString::class)
     val value: String?,
 )

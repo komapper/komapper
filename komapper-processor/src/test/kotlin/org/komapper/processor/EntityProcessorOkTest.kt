@@ -174,7 +174,7 @@ class EntityProcessorOkTest : AbstractKspTest(EntityProcessorProvider()) {
             data class Dept(
                 @KomapperAutoIncrement @KomapperId
                 val id: Int,
-                @KomapperAlternate(ClobString::class)
+                @KomapperColumn(alternateType = ClobString::class)
                 val description: String
             )
             """,
@@ -193,7 +193,7 @@ class EntityProcessorOkTest : AbstractKspTest(EntityProcessorProvider()) {
             data class Dept(
                 @KomapperAutoIncrement @KomapperId
                 val id: Int,
-                @KomapperAlternate(ClobString::class)
+                @KomapperColumn(alternateType = ClobString::class)
                 val description: String?
             )
             """,

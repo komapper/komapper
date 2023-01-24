@@ -71,15 +71,6 @@ annotation class KomapperEnum(val type: EnumType, val hint: String = HINT) {
 annotation class KomapperEmbedded
 
 /**
- * Indicates that the `valueClass` is used for mapping as an alternative to the annotated property type.
- *
- * @property valueClass the value class
- */
-@Target(AnnotationTarget.VALUE_PARAMETER)
-@Retention(AnnotationRetention.SOURCE)
-annotation class KomapperAlternate(val valueClass: KClass<*>)
-
-/**
  * Indicates that the annotated property is an embedded value for composite identifiers.
  *
  * @property virtual If `true`, the annotated property does not actually map to composite primary keys
@@ -113,16 +104,6 @@ annotation class KomapperColumnOverride(val name: String, val column: KomapperCo
 annotation class KomapperEnumOverride(val name: String, val enum: KomapperEnum)
 
 /**
- * Used to override the alternate of an embeddable class`s property.
- *
- * @property name the property name
- * @property alternate the alternate
- */
-@Target(AnnotationTarget.VALUE_PARAMETER)
-@Retention(AnnotationRetention.SOURCE)
-annotation class KomapperAlternateOverride(val name: String, val alternate: KomapperAlternate)
-
-/**
  * Adds table information.
  *
  * @property name the table name
@@ -152,6 +133,7 @@ annotation class KomapperTable(
  * @property name the table name
  * @property alwaysQuote whether to quote the [name]
  * @property masking whether to mask the value that corresponds to the annotated property in logs
+ * @property alternateType the alternate type. This type must be a value class.
  */
 @Target(AnnotationTarget.VALUE_PARAMETER)
 @Retention(AnnotationRetention.SOURCE)
@@ -159,6 +141,7 @@ annotation class KomapperColumn(
     val name: String = NAME,
     val alwaysQuote: Boolean = ALWAYS_QUOTE,
     val masking: Boolean = MASKING,
+    val alternateType: KClass<*> = Void::class,
 ) {
     companion object {
         const val NAME = ""

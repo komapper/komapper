@@ -180,7 +180,7 @@ internal class EntityMetamodelGenerator(
                     }
                 }
                 is ValueClass -> {
-                    val alternate = p.kotlinClass.alternate
+                    val alternate = p.kotlinClass.alternateType
                     if (alternate != null) {
                         "{ ${p.kotlinClass}(it.${alternate.property.declaration.simpleName.asString()}) }"
                     } else {
@@ -199,7 +199,7 @@ internal class EntityMetamodelGenerator(
             val unwrap = when (p.kotlinClass) {
                 is EnumClass -> "{ it.${p.kotlinClass.strategy.propertyName} }"
                 is ValueClass -> {
-                    val alternate = p.kotlinClass.alternate
+                    val alternate = p.kotlinClass.alternateType
                     if (alternate != null) {
                         "{ ${alternate.exteriorTypeName}(it.${p.kotlinClass.property}) }"
                     } else {
