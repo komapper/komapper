@@ -19,13 +19,13 @@ internal class EntityDefFactory(
     private val config: Config,
     private val definitionSource: EntityDefinitionSource,
 ) {
-    private val annotationSupport: AnnotationSupport = AnnotationSupport(config)
+    private val annotationSupport: AnnotationSupport = AnnotationSupport(logger, config)
     private val defDeclaration = definitionSource.defDeclaration
 
     fun create(): EntityDef {
         val table = annotationSupport.getTable(definitionSource)
-        // TODO: Check for name duplication
         val associations = annotationSupport.getAssociations(definitionSource)
+        validateAssociations(associations)
         val allProperties = createAllProperties()
         val compositeProperties = allProperties.filterIsInstance<CompositePropertyDef>()
         val leafProperties = allProperties.filterIsInstance<LeafPropertyDef>()
@@ -55,6 +55,14 @@ internal class EntityDefFactory(
         val column = annotationSupport.getColumn(parameter)
         val enumStrategy = annotationSupport.getEnumStrategy(parameter)
         return LeafPropertyDef(parameter, declaration, kind, column, enumStrategy)
+    }
+
+    private fun validateAssociations(association: List<Association>) {
+        for (entry in association.groupingBy { it.navigator }.eachCount()) {
+            if (entry.value > 1) {
+                report("The navigator \"${entry.key}\" is found multiple times in the association annotations.", defDeclaration)
+            }
+        }
     }
 
     private fun validateCompositeProperties(properties: List<CompositePropertyDef>) {

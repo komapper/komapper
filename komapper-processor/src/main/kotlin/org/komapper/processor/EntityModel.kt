@@ -4,21 +4,13 @@ import com.google.devtools.ksp.symbol.KSFile
 
 internal class EntityModel(
     private val definitionSource: EntityDefinitionSource,
-    defaultUnitName: String,
     val entity: Entity? = null,
 ) {
     val hasStubAnnotation: Boolean = definitionSource.stubAnnotation != null
-
     val entityDeclaration = definitionSource.entityDeclaration
-
-    val aliases = definitionSource.aliases.ifEmpty {
-        val alias = toCamelCase(definitionSource.entityDeclaration.simpleName.asString())
-        listOf(alias)
-    }
-
-    val typeName = definitionSource.entityDeclaration.qualifiedName?.asString() ?: ""
-
-    val unitTypeName = definitionSource.unitDeclaration?.qualifiedName?.asString() ?: defaultUnitName
+    val aliases = definitionSource.names
+    val typeName = definitionSource.typeName
+    val unitTypeName = definitionSource.unitTypeName
 
     val containingFiles: List<KSFile>
         get() {
@@ -31,12 +23,7 @@ internal class EntityModel(
             }
         }
 
-    fun createMetamodelClassName(prefix: String, suffix: String): Pair<String, String> {
-        val defDeclaration = definitionSource.defDeclaration
-        val packageName = defDeclaration.packageName.asString()
-        val qualifiedName = defDeclaration.qualifiedName?.asString() ?: ""
-        val packageRemovedQualifiedName = qualifiedName.removePrefix("$packageName.")
-        val simpleName = prefix + packageRemovedQualifiedName.replace(".", "_") + suffix
-        return packageName to simpleName
+    fun createMetamodelClassName(): Pair<String, String> {
+        return definitionSource.packageName to definitionSource.metamodelSimpleName
     }
 }

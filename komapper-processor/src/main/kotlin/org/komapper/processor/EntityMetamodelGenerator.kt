@@ -12,6 +12,7 @@ import org.komapper.processor.Symbols.EntityDescriptor
 import org.komapper.processor.Symbols.EntityMetamodel
 import org.komapper.processor.Symbols.EntityMetamodelDeclaration
 import org.komapper.processor.Symbols.EntityMetamodelImplementor
+import org.komapper.processor.Symbols.EntityStore
 import org.komapper.processor.Symbols.EnumMappingException
 import org.komapper.processor.Symbols.IdContext
 import org.komapper.processor.Symbols.IdGenerator
@@ -577,27 +578,31 @@ internal class EntityMetamodelGenerator(
 
     private fun associations() {
         for (association in entity.associations) {
-            val targetEntityTypeName = association.targetEntity.qualifiedName?.asString()
+            val sourceEntity = association.sourceEntity
+            val targetEntity = association.targetEntity
             val returnType = when (association.kind) {
                 AssociationKind.ONE_TO_ONE,
                 AssociationKind.MANY_TO_ONE,
-                -> "$targetEntityTypeName?"
-                AssociationKind.ONE_TO_MANY -> "Set<$targetEntityTypeName>"
+                -> "${targetEntity.typeName}?"
+                AssociationKind.ONE_TO_MANY -> "Set<${targetEntity.typeName}>"
             }
             val expression = when (association.kind) {
-                AssociationKind.ONE_TO_ONE -> "store.oneToOne(thisSide, thatSide)[this]"
-                AssociationKind.MANY_TO_ONE -> "store.manyToOne(thisSide, thatSide)[this]"
-                AssociationKind.ONE_TO_MANY -> "store.oneToMany(thisSide, thatSide)[this] ?: emptySet()"
+                AssociationKind.ONE_TO_ONE -> "store.oneToOne(source, target)[this]"
+                AssociationKind.MANY_TO_ONE -> "store.manyToOne(source, target)[this]"
+                AssociationKind.ONE_TO_MANY -> "store.oneToMany(source, target)[this] ?: emptySet()"
             }
             w.println(
-                "fun $entityTypeName.`${association.name}`(" +
-                    "store: org.komapper.core.dsl.query.EntityStore," +
-                    "thisSide: $simpleName," +
-                    "thatSide: $EntityMetamodel<${association.targetEntity.qualifiedName?.asString()}, *, *>," +
-                    "): $returnType {",
+                """
+                fun $entityTypeName.`${association.navigator}`(
+                    store: $EntityStore,
+                    source: ${sourceEntity.packageName}.${sourceEntity.metamodelSimpleName} = ${sourceEntity.unitTypeName}.`${association.link.source}`,
+                    target: ${targetEntity.packageName}.${targetEntity.metamodelSimpleName} = ${targetEntity.unitTypeName}.`${association.link.target}`,
+                    ): $returnType {
+                """.trimIndent(),
             )
             w.println("    return $expression")
             w.println("}")
+            w.println()
         }
     }
 }

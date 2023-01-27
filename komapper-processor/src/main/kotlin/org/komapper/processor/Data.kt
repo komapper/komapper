@@ -14,8 +14,11 @@ import com.google.devtools.ksp.symbol.Nullability
 internal data class EntityDefinitionSource(
     val defDeclaration: KSClassDeclaration,
     val entityDeclaration: KSClassDeclaration,
+    val packageName: String,
+    val metamodelSimpleName: String,
     val aliases: List<String>,
     val unitDeclaration: KSClassDeclaration?,
+    val unitTypeName: String,
     val stubAnnotation: KSAnnotation?,
 )
 
@@ -239,10 +242,18 @@ internal data class Column(
     val masking: Boolean,
 )
 
+internal data class Link(
+    val source: String,
+    val target: String,
+)
+
 internal data class Association(
-    val targetEntity: KSClassDeclaration,
+    val annotation: KSAnnotation,
+    val navigator: String,
+    val sourceEntity: EntityDefinitionSource,
+    val targetEntity: EntityDefinitionSource,
+    val link: Link,
     val kind: AssociationKind,
-    val name: String,
 )
 
 enum class AssociationKind {

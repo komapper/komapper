@@ -162,4 +162,55 @@ class EntityProcessorOkTest : AbstractKspTest(EntityProcessorProvider()) {
         )
         assertEquals(result.exitCode, KotlinCompilation.ExitCode.OK, result.messages)
     }
+
+    @Test
+    fun `The targetEntity is annotated with @KomapperEntity`() {
+        val result = compile(
+            """
+            package test
+            import org.komapper.annotation.*
+            @KomapperEntity
+            data class Dept(
+                @KomapperId
+                val id: Int,
+                val name: String,
+            )
+            @KomapperEntity
+            @KomapperManyToOne(Dept::class)
+            data class Emp(
+                @KomapperId
+                val id: Int,
+                val name: String,
+            )
+            """,
+        )
+        assertEquals(KotlinCompilation.ExitCode.OK, result.exitCode)
+    }
+
+    @Test
+    fun `The targetEntity is annotated with @KomapperEntityDef`() {
+        val result = compile(
+            """
+            package test
+            import org.komapper.annotation.*
+            data class Dept(
+                val id: Int,
+                val name: String,
+            )
+            @KomapperEntityDef(Dept::class)
+            data class DeptDef(
+                @KomapperId
+                val id: Nothing,
+            )
+            @KomapperEntity
+            @KomapperManyToOne(DeptDef::class)
+            data class Emp(
+                @KomapperId
+                val id: Int,
+                val name: String,
+            )
+            """,
+        )
+        assertEquals(KotlinCompilation.ExitCode.OK, result.exitCode)
+    }
 }

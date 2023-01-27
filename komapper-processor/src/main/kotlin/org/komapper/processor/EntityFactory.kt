@@ -32,7 +32,7 @@ internal class EntityFactory(
     private val entityDef: EntityDef,
 ) {
 
-    private val annotationSupport = AnnotationSupport(config)
+    private val annotationSupport = AnnotationSupport(logger, config)
 
     fun create(): Entity {
         val allProperties = createAllProperties()

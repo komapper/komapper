@@ -36,7 +36,5 @@ internal object Symbols {
     const val EnumType_PROPERTY = "org.komapper.annotation.EnumType.PROPERTY"
     const val DefaultUnit = "org.komapper.annotation.DefaultUnit"
     const val EnumMappingException = "org.komapper.core.dsl.runner.EnumMappingException"
-    const val AssociationType_ONE_TO_ONE = "org.komapper.annotation.AssociationType.ONE_TO_ONE"
-    const val AssociationType_ONE_TO_MANY = "org.komapper.annotation.AssociationType.ONE_TO_MANY"
-    const val AssociationType_MANY_TO_ONE = "org.komapper.annotation.AssociationType.MANY_TO_ONE"
+    const val EntityStore = "org.komapper.core.dsl.query.EntityStore"
 }

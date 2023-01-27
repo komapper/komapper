@@ -122,6 +122,17 @@ internal val KSType.name: String
         return buf.toString()
     }
 
+internal val EntityDefinitionSource.names: List<String>
+    get() = this.aliases.ifEmpty {
+        val alias = toCamelCase(this.entityDeclaration.simpleName.asString())
+        listOf(alias)
+    }
+
+internal val EntityDefinitionSource.typeName get() = this.entityDeclaration.qualifiedName?.asString() ?: ""
+
+internal fun EntityDefinitionSource.createUnitTypeName(config: Config) =
+    this.unitDeclaration?.qualifiedName?.asString() ?: config.metaObject
+
 internal fun toCamelCase(text: String): String {
     val builder = StringBuilder()
     val buf = CharBuffer.wrap(text)

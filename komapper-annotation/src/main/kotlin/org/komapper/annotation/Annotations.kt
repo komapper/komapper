@@ -244,16 +244,79 @@ annotation class KomapperEntityDef(
     val unit: KClass<*> = DefaultUnit::class,
 )
 
-// TODO: KDoc comment
+/**
+ * Indicates an association link.
+ *
+ * @property source the source name of an entity metamodel instance. The source is inferred from the annotated class.
+ * @property target the target name of an entity metamodel instance. The target is inferred from the targetEntity property of association annotation.
+ */
+@Retention(AnnotationRetention.SOURCE)
+annotation class KomapperLink(
+    val source: String = SOURCE,
+    val target: String = TARGET,
+) {
+    companion object {
+        const val SOURCE: String = ""
+        const val TARGET: String = ""
+    }
+}
+
+/**
+ * Indicates a one-to-one association.
+ *
+ * @property targetEntity the target entity class. The class must be annotated with [KomapperEntity] or [KomapperEntityDef].
+ * @property navigator the function name for navigation. The navigator is inferred from the [KomapperLink.target] value.
+ * @property link the association link
+ */
 @Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.SOURCE)
 @Repeatable
-annotation class KomapperAssociation(
-    val type: AssociationType,
+annotation class KomapperOneToOne(
     val targetEntity: KClass<*>,
-    val name: String = NAME,
+    val navigator: String = NAVIGATOR,
+    val link: KomapperLink = KomapperLink(),
 ) {
     companion object {
-        const val NAME: String = ""
+        const val NAVIGATOR: String = ""
+    }
+}
+
+/**
+ * Indicates a one-to-many association.
+ *
+ * @property targetEntity the target entity class. The class must be annotated with [KomapperEntity] or [KomapperEntityDef].
+ * @property navigator the function name for navigation. The navigator is inferred from the [KomapperLink.target] value.
+ * @property link the association link
+ */
+@Target(AnnotationTarget.CLASS)
+@Retention(AnnotationRetention.SOURCE)
+@Repeatable
+annotation class KomapperOneToMany(
+    val targetEntity: KClass<*>,
+    val navigator: String = NAVIGATOR,
+    val link: KomapperLink = KomapperLink(),
+) {
+    companion object {
+        const val NAVIGATOR: String = ""
+    }
+}
+
+/**
+ * Indicates a many-to-one association.
+ *
+ * @property targetEntity the target entity class. The class must be annotated with [KomapperEntity] or [KomapperEntityDef].
+ * @property navigator the function name for navigation. The navigator is inferred from the [KomapperLink.target] value.
+ * @property link the association link
+ */
+@Target(AnnotationTarget.CLASS)
+@Retention(AnnotationRetention.SOURCE)
+@Repeatable
+annotation class KomapperManyToOne(
+    val targetEntity: KClass<*>,
+    val navigator: String = NAVIGATOR,
+    val link: KomapperLink = KomapperLink(),
+) {
+    companion object {
+        const val NAVIGATOR: String = ""
     }
 }
