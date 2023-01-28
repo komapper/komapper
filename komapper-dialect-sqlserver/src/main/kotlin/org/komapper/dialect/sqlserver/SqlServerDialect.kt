@@ -70,4 +70,6 @@ interface SqlServerDialect : Dialect {
     override fun supportsTableHint(): Boolean = true
 
     override fun supportsLockOptionNowait(): Boolean = true
+
+    override fun supportsSearchConditionInUpsertStatement(): Boolean = true
 }

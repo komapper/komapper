@@ -78,4 +78,6 @@ interface OracleDialect : Dialect {
     override fun supportsSetOperationExcept(): Boolean = false
 
     override fun supportsSetOperationMinus(): Boolean = true
+
+    override fun supportsSearchConditionInUpsertStatement(): Boolean = true
 }

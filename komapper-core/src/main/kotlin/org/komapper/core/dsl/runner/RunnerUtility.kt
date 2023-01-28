@@ -89,3 +89,15 @@ internal fun checkOptimisticLockOfBatchExecution(config: DatabaseConfig, options
         )
     }
 }
+
+internal fun checkSearchConditionInUpsertStatement(config: DatabaseConfig, whereProvider: WhereProvider) {
+    val dialect = config.dialect
+    if (!config.dialect.supportsSearchConditionInUpsertStatement()) {
+        val criteria = whereProvider.getWhereCriteria()
+        if (criteria.isNotEmpty()) {
+            throw UnsupportedOperationException(
+                "The dialect(driver=${dialect.driver}) does not support specifying search conditions in upsert statements.",
+            )
+        }
+    }
+}

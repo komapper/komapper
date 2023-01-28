@@ -50,6 +50,8 @@ interface MySqlDialect : Dialect {
 
     override fun supportsNullOrdering(): Boolean = false
 
+    override fun supportsSearchConditionInUpsertStatement(): Boolean = false
+
     override fun supportsSetOperationIntersect(): Boolean = false
 
     override fun supportsSetOperationExcept(): Boolean = false

@@ -284,6 +284,11 @@ interface Dialect {
     fun supportsOptimisticLockOfBatchExecution(): Boolean = true
 
     /**
+     * Returns whether the search condition is supported in the UPSERT statement.
+     */
+    fun supportsSearchConditionInUpsertStatement(): Boolean = false
+
+    /**
      * Returns whether the table hint is supported.
      */
     fun supportsTableHint(): Boolean = false

@@ -16,7 +16,7 @@ import org.komapper.core.dsl.scope.HavingScope
 import org.komapper.core.dsl.scope.OnScope
 import org.komapper.core.dsl.scope.WhereScope
 
-internal fun WhereProvider.getWhereCriteria(): List<Criterion> {
+fun WhereProvider.getWhereCriteria(): List<Criterion> {
     val where = getCompositeWhere()
     val support = FilterScopeSupport()
     WhereScope(support).apply(where)

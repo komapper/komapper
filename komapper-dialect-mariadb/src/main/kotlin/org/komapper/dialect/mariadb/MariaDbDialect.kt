@@ -55,4 +55,6 @@ interface MariaDbDialect : Dialect {
     override fun supportsNullOrdering(): Boolean = false
 
     override fun supportsOptimisticLockOfBatchExecution(): Boolean = false
+
+    override fun supportsSearchConditionInUpsertStatement(): Boolean = false
 }

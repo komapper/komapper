@@ -40,4 +40,6 @@ interface PostgreSqlDialect : Dialect {
     override fun supportsLockOptionNowait(): Boolean = true
 
     override fun supportsLockOptionSkipLocked(): Boolean = true
+
+    override fun supportsSearchConditionInUpsertStatement(): Boolean = true
 }

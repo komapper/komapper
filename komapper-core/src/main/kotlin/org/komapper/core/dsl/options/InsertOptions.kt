@@ -9,7 +9,9 @@ data class InsertOptions(
     val returnGeneratedKeys: Boolean,
     override val queryTimeoutSeconds: Int?,
     override val suppressLogging: Boolean,
-) : BatchOptions, QueryOptions {
+    override val allowMissingWhereClause: Boolean,
+    override val escapeSequence: String?,
+) : WhereOptions, BatchOptions, QueryOptions {
 
     companion object {
         val DEFAULT = InsertOptions(
@@ -18,6 +20,8 @@ data class InsertOptions(
             returnGeneratedKeys = true,
             queryTimeoutSeconds = null,
             suppressLogging = false,
+            allowMissingWhereClause = true,
+            escapeSequence = null,
         )
     }
 }

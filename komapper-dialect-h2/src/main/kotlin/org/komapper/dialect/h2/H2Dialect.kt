@@ -34,4 +34,6 @@ interface H2Dialect : Dialect {
     ): EntityUpsertStatementBuilder<ENTITY> {
         return H2EntityUpsertStatementBuilder(dialect, context, entities)
     }
+
+    override fun supportsSearchConditionInUpsertStatement(): Boolean = true
 }
