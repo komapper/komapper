@@ -1,7 +1,10 @@
 package org.komapper.processor
 
+import com.google.devtools.ksp.getDeclaredProperties
+import com.google.devtools.ksp.isPublic
 import com.google.devtools.ksp.symbol.KSAnnotation
 import com.google.devtools.ksp.symbol.KSNode
+import com.google.devtools.ksp.symbol.KSType
 import com.google.devtools.ksp.symbol.KSValueParameter
 import org.komapper.annotation.KomapperColumn
 import org.komapper.annotation.KomapperColumnOverride
@@ -41,7 +44,52 @@ internal class AnnotationSupport(
             columnAnnotation?.findValue("alwaysQuote")?.toString()?.toBooleanStrict() ?: config.alwaysQuote
         val masking =
             columnAnnotation?.findValue("masking")?.toString()?.toBooleanStrict() ?: KomapperColumn.MASKING
-        return Column(name, alwaysQuote, masking)
+        val alternateType = columnAnnotation?.findValue("alternateType")?.let { type ->
+            if (type !is KSType) report("The alternateType is not KSType.", columnAnnotation)
+            val classDeclaration = type.declaration.accept(ClassDeclarationVisitor(), Unit)
+            when {
+                classDeclaration == null ->
+                    report("The alternateType property is illegal.", columnAnnotation)
+                classDeclaration.qualifiedName?.asString() == Symbols.Void ->
+                    null
+                !classDeclaration.isValueClass() ->
+                    report("The alternateType property must be a value class. ${classDeclaration.qualifiedName?.asString()}", columnAnnotation)
+                else -> {
+                    val constructor = classDeclaration.primaryConstructor
+                    val isPublic = constructor?.isPublic() ?: false
+                    if (!isPublic) {
+                        report(
+                            "The constructor of \"${classDeclaration.qualifiedName?.asString()}\" must be public.",
+                            columnAnnotation,
+                        )
+                    }
+                    val parameter = constructor?.parameters?.firstOrNull()
+                        ?: error("No parameter is found in the class \"${classDeclaration.qualifiedName?.asString()}\"")
+                    val declaration = classDeclaration.getDeclaredProperties().firstOrNull()
+                        ?: error("No property is found in the class \"${classDeclaration.qualifiedName?.asString()}\"")
+                    if (!declaration.isPublic()) {
+                        report(
+                            "The property parameter of \"${classDeclaration.qualifiedName?.asString()}\" must be public.",
+                            columnAnnotation,
+                        )
+                    }
+                    val propertyType = declaration.type.resolve()
+                    if (propertyType.isMarkedNullable) {
+                        report(
+                            "The property parameter of \"${classDeclaration.qualifiedName?.asString()}\" must not be nullable.",
+                            columnAnnotation,
+                        )
+                    }
+                    val typeName = propertyType.name
+                    val literalTag = resolveLiteralTag(typeName)
+                    val nullability = propertyType.nullability
+                    val property =
+                        ValueClassProperty(propertyType, parameter, declaration, typeName, literalTag, nullability)
+                    ValueClass(type, property, null)
+                }
+            }
+        }
+        return Column(name, alwaysQuote, masking, alternateType)
     }
 
     fun getColumns(parameter: KSValueParameter): List<Triple<String, Column, KSAnnotation>> {

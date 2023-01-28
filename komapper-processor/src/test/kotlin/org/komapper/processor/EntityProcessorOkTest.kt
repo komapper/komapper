@@ -162,4 +162,42 @@ class EntityProcessorOkTest : AbstractKspTest(EntityProcessorProvider()) {
         )
         assertEquals(result.exitCode, KotlinCompilation.ExitCode.OK, result.messages)
     }
+
+    @Test
+    fun `Allow alternate type mapping`() {
+        val result = compile(
+            """
+            package test
+            import org.komapper.annotation.*
+            value class ClobString(val value: String)
+            @KomapperEntity
+            data class Dept(
+                @KomapperAutoIncrement @KomapperId
+                val id: Int,
+                @KomapperColumn(alternateType = ClobString::class)
+                val description: String
+            )
+            """,
+        )
+        assertEquals(result.exitCode, KotlinCompilation.ExitCode.OK, result.messages)
+    }
+
+    @Test
+    fun `Allow alternate type mapping - nullable`() {
+        val result = compile(
+            """
+            package test
+            import org.komapper.annotation.*
+            value class ClobString(val value: String)
+            @KomapperEntity
+            data class Dept(
+                @KomapperAutoIncrement @KomapperId
+                val id: Int,
+                @KomapperColumn(alternateType = ClobString::class)
+                val description: String?
+            )
+            """,
+        )
+        assertEquals(result.exitCode, KotlinCompilation.ExitCode.OK, result.messages)
+    }
 }

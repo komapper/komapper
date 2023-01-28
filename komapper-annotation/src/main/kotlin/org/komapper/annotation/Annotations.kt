@@ -133,6 +133,7 @@ annotation class KomapperTable(
  * @property name the table name
  * @property alwaysQuote whether to quote the [name]
  * @property masking whether to mask the value that corresponds to the annotated property in logs
+ * @property alternateType the alternate type. This type must be a value class.
  */
 @Target(AnnotationTarget.VALUE_PARAMETER)
 @Retention(AnnotationRetention.SOURCE)
@@ -140,6 +141,7 @@ annotation class KomapperColumn(
     val name: String = NAME,
     val alwaysQuote: Boolean = ALWAYS_QUOTE,
     val masking: Boolean = MASKING,
+    val alternateType: KClass<*> = Void::class,
 ) {
     companion object {
         const val NAME = ""

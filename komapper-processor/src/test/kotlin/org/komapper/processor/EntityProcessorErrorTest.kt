@@ -1046,4 +1046,146 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
         assertTrue(result.messages.contains("The property \"unknown\" is not found in the test.Color. KomapperEnum's hint property is incorrect."))
     }
+
+    @Test
+    fun `The alternateType property must be a value class`() {
+        val result = compile(
+            """
+            package test
+            import org.komapper.annotation.*
+            data class ClobString(val value: String)
+            @KomapperEntity
+            data class Dept(
+                @KomapperAutoIncrement @KomapperId
+                val id: Int,
+                @KomapperColumn(alternateType = ClobString::class)
+                val description: String
+            )
+            """,
+        )
+        assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
+        assertTrue(result.messages.contains("The alternateType property must be a value class."))
+    }
+
+    @Test
+    fun `The constructor must be public`() {
+        val result = compile(
+            """
+            package test
+            import org.komapper.annotation.*
+            value class ClobString private constructor(val value: String)
+            @KomapperEntity
+            data class Dept(
+                @KomapperAutoIncrement @KomapperId
+                val id: Int,
+                @KomapperColumn(alternateType = ClobString::class)
+                val description: String
+            )
+            """,
+        )
+        assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
+        assertTrue(result.messages.contains("The constructor of \"test.ClobString\" must be public."))
+    }
+
+    @Test
+    fun `The property parameter must be public`() {
+        val result = compile(
+            """
+            package test
+            import org.komapper.annotation.*
+            value class ClobString (private val value: String)
+            @KomapperEntity
+            data class Dept(
+                @KomapperAutoIncrement @KomapperId
+                val id: Int,
+                @KomapperColumn(alternateType = ClobString::class)
+                val description: String
+            )
+            """,
+        )
+        assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
+        assertTrue(result.messages.contains("The property parameter of \"test.ClobString\" must be public."))
+    }
+
+    @Test
+    fun `The property parameter must not be nullable`() {
+        val result = compile(
+            """
+            package test
+            import org.komapper.annotation.*
+            value class ClobString (val value: String?)
+            @KomapperEntity
+            data class Dept(
+                @KomapperAutoIncrement @KomapperId
+                val id: Int,
+                @KomapperColumn(alternateType = ClobString::class)
+                val description: String
+            )
+            """,
+        )
+        assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
+        assertTrue(result.messages.contains("The property parameter of \"test.ClobString\" must not be nullable."))
+    }
+
+    @Test
+    fun `The property type does not match the parameter property type in the value class`() {
+        val result = compile(
+            """
+            package test
+            import org.komapper.annotation.*
+            value class ClobString (val value: String)
+            @KomapperEntity
+            data class Dept(
+                @KomapperAutoIncrement @KomapperId
+                val id: Int,
+                @KomapperColumn(alternateType = ClobString::class)
+                val number: Int
+            )
+            """,
+        )
+        assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
+        assertTrue(result.messages.contains("The property \"number\" is invalid. The property type does not match the parameter property type in \"test.ClobString\"."))
+    }
+
+    @Test
+    fun `KomapperColumn alternateType is invalid for enum property types`() {
+        val result = compile(
+            """
+            package test
+            import org.komapper.annotation.*
+            value class ClobString (val value: String)
+            enum class Color { RED }
+            @KomapperEntity
+            data class Dept(
+                @KomapperAutoIncrement @KomapperId
+                val id: Int,
+                @KomapperColumn(alternateType = ClobString::class)
+                val color: Color
+            )
+            """,
+        )
+        assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
+        assertTrue(result.messages.contains("@KomapperColumn.alternateType is invalid for enum property types."))
+    }
+
+    @Test
+    fun `The parameter property type does not match between value classes`() {
+        val result = compile(
+            """
+            package test
+            import org.komapper.annotation.*
+            value class ClobString (val value: String)
+            value class Color(val value: ClobString)
+            @KomapperEntity
+            data class Dept(
+                @KomapperAutoIncrement @KomapperId
+                val id: Int,
+                @KomapperColumn(alternateType = ClobString::class)
+                val color: Color
+            )
+            """,
+        )
+        assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
+        assertTrue(result.messages.contains("The property \"color\" is invalid. The parameter property type does not match between \"test.Color\" and \"test.ClobString\"."))
+    }
 }
