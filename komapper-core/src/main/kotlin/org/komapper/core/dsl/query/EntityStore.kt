@@ -2,6 +2,8 @@ package org.komapper.core.dsl.query
 
 import org.komapper.core.ThreadSafe
 import org.komapper.core.dsl.metamodel.EntityMetamodel
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.ConcurrentMap
 import kotlin.reflect.cast
 
 /**
@@ -89,8 +91,8 @@ internal class EntityStoreImpl(
     private val rows: List<Map<EntityMetamodel<*, *, *>, Any>>,
 ) : EntityStore {
 
-    private val oneToManyCache: MutableMap<Pair<*, *>, Map<*, Set<*>>> = mutableMapOf()
-    private val manyToOneCache: MutableMap<Pair<*, *>, Map<*, *>> = mutableMapOf()
+    private val oneToManyCache: ConcurrentMap<Pair<*, *>, Map<*, Set<*>>> = ConcurrentHashMap()
+    private val manyToOneCache: ConcurrentMap<Pair<*, *>, Map<*, *>> = ConcurrentHashMap()
 
     override operator fun contains(metamodel: EntityMetamodel<*, *, *>): Boolean {
         return entitySets.containsKey(metamodel)
@@ -149,26 +151,24 @@ internal class EntityStoreImpl(
         if (!contains(first, second)) {
             return emptyMap()
         }
-        val cached = oneToManyCache[first to second]
-        if (cached != null) {
-            @Suppress("UNCHECKED_CAST")
-            return cached as Map<T, Set<S>>
-        }
-        val oneToMany = mutableMapOf<T, MutableSet<S>>()
-        for (row in rows) {
-            val entity1 = row[first]
-            val entity2 = row[second]
-            if (entity1 != null) {
-                val key = first.klass().cast(entity1)
-                val values = oneToMany.computeIfAbsent(key) { mutableSetOf() }
-                if (entity2 != null) {
-                    val value = second.klass().cast(entity2)
-                    values.add(value)
+        val cached = oneToManyCache.computeIfAbsent(first to second) {
+            val oneToMany = mutableMapOf<T, MutableSet<S>>()
+            for (row in rows) {
+                val entity1 = row[first]
+                val entity2 = row[second]
+                if (entity1 != null) {
+                    val key = first.klass().cast(entity1)
+                    val values = oneToMany.computeIfAbsent(key) { mutableSetOf() }
+                    if (entity2 != null) {
+                        val value = second.klass().cast(entity2)
+                        values.add(value)
+                    }
                 }
             }
+            oneToMany
         }
-        oneToManyCache[first to second] = oneToMany
-        return oneToMany
+        @Suppress("UNCHECKED_CAST")
+        return cached as Map<T, Set<S>>
     }
 
     override fun <T : Any, S : Any> manyToOne(
@@ -193,22 +193,20 @@ internal class EntityStoreImpl(
         if (!contains(first, second)) {
             return emptyMap()
         }
-        val cached = manyToOneCache[first to second]
-        if (cached != null) {
-            @Suppress("UNCHECKED_CAST")
-            return cached as Map<T, S?>
-        }
-        val manyToOne = mutableMapOf<T, S?>()
-        for (row in rows) {
-            val entity1 = row[first]
-            val entity2 = row[second]
-            if (entity1 != null) {
-                val key = first.klass().cast(entity1)
-                val value = entity2?.let { second.klass().cast(it) }
-                manyToOne[key] = value
+        val cached = manyToOneCache.computeIfAbsent(first to second) {
+            val manyToOne = mutableMapOf<T, S?>()
+            for (row in rows) {
+                val entity1 = row[first]
+                val entity2 = row[second]
+                if (entity1 != null) {
+                    val key = first.klass().cast(entity1)
+                    val value = entity2?.let { second.klass().cast(it) }
+                    manyToOne[key] = value
+                }
             }
+            manyToOne
         }
-        manyToOneCache[first to second] = manyToOne
-        return manyToOne
+        @Suppress("UNCHECKED_CAST")
+        return cached as Map<T, S?>
     }
 }
