@@ -13,6 +13,7 @@ import org.komapper.processor.Symbols.EntityMetamodel
 import org.komapper.processor.Symbols.EntityMetamodelDeclaration
 import org.komapper.processor.Symbols.EntityMetamodelImplementor
 import org.komapper.processor.Symbols.EntityStore
+import org.komapper.processor.Symbols.EntityStoreContext
 import org.komapper.processor.Symbols.EnumMappingException
 import org.komapper.processor.Symbols.IdContext
 import org.komapper.processor.Symbols.IdGenerator
@@ -34,6 +35,7 @@ import java.time.ZonedDateTime
 
 internal class EntityMetamodelGenerator(
     @Suppress("unused") private val logger: KSPLogger,
+    private val config: Config,
     private val entity: Entity,
     private val metaObject: String,
     private val aliases: List<String>,
@@ -603,6 +605,20 @@ internal class EntityMetamodelGenerator(
             w.println("    return $expression")
             w.println("}")
             w.println()
+            if (config.enableEntityStoreContext) {
+                w.println(
+                    """
+                context($EntityStoreContext)
+                fun $entityTypeName.`${association.navigator}`(
+                    source: ${sourceEntity.packageName}.${sourceEntity.metamodelSimpleName} = ${sourceEntity.unitTypeName}.`${association.link.source}`,
+                    target: ${targetEntity.packageName}.${targetEntity.metamodelSimpleName} = ${targetEntity.unitTypeName}.`${association.link.target}`,
+                    ): $returnType {
+                    """.trimIndent(),
+                )
+                w.println("    return $expression")
+                w.println("}")
+                w.println()
+            }
         }
     }
 }

@@ -64,6 +64,7 @@ internal class EntityProcessor(private val environment: SymbolProcessorEnvironme
                 } else {
                     EntityMetamodelGenerator(
                         logger,
+                        config,
                         model.entity,
                         model.unitTypeName,
                         model.aliases,
