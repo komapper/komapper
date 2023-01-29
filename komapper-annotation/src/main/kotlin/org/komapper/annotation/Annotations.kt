@@ -320,3 +320,15 @@ annotation class KomapperManyToOne(
         const val NAVIGATOR: String = ""
     }
 }
+
+// TODO
+@Target(AnnotationTarget.CLASS)
+@Retention(AnnotationRetention.SOURCE)
+@Repeatable
+annotation class KomapperAggregateRoot(
+    val navigator: String = NAVIGATOR,
+) {
+    companion object {
+        const val NAVIGATOR: String = ""
+    }
+}

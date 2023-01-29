@@ -51,9 +51,10 @@ internal class EntityMetamodelGenerator(
         "List<Any>"
     }
 
-    private val embeddableIndexMap: Map<Embeddable, Int> = entity.properties.filterIsInstance<CompositeProperty>().map { it.embeddable }
-        .mapIndexed { index, embeddable -> embeddable to index }
-        .toMap()
+    private val embeddableIndexMap: Map<Embeddable, Int> =
+        entity.properties.filterIsInstance<CompositeProperty>().map { it.embeddable }
+            .mapIndexed { index, embeddable -> embeddable to index }
+            .toMap()
 
     private val constructorParamList = listOf(
         "table: String = \"${entity.table.name}\"",
@@ -123,6 +124,7 @@ internal class EntityMetamodelGenerator(
 
         utils()
         associations()
+        aggregationRoot()
     }
 
     private fun importStatements() {
@@ -156,18 +158,37 @@ internal class EntityMetamodelGenerator(
             val wrap = when (p.kotlinClass) {
                 is EnumClass -> {
                     val enumPropertyName = p.kotlinClass.strategy.propertyName
-                    fun throwException(value: String, cause: String) = "throw $EnumMappingException($exteriorClass, \"$enumPropertyName\", $value, $cause)"
+                    fun throwException(value: String, cause: String) =
+                        "throw $EnumMappingException($exteriorClass, \"$enumPropertyName\", $value, $cause)"
                     when (p.kotlinClass.strategy) {
-                        EnumStrategy.Name -> "{ try { $exteriorTypeName.valueOf(it) } catch (e: IllegalArgumentException) { ${throwException("it", "e")} } }"
-                        EnumStrategy.Ordinal -> "{ try { $exteriorTypeName.values()[it] } catch (e: ArrayIndexOutOfBoundsException) { ${throwException("it", "e")} } }"
-                        is EnumStrategy.Property -> "{ v -> $exteriorTypeName.values().firstOrNull { it.$enumPropertyName == v } ?: ${throwException("v", "null")} }"
+                        EnumStrategy.Name ->
+                            "{ try { $exteriorTypeName.valueOf(it) } catch (e: IllegalArgumentException) { ${
+                                throwException(
+                                    "it",
+                                    "e",
+                                )
+                            } } }"
+                        EnumStrategy.Ordinal ->
+                            "{ try { $exteriorTypeName.values()[it] } catch (e: ArrayIndexOutOfBoundsException) { ${
+                                throwException(
+                                    "it",
+                                    "e",
+                                )
+                            } } }"
+                        is EnumStrategy.Property ->
+                            "{ v -> $exteriorTypeName.values().firstOrNull { it.$enumPropertyName == v } ?: ${
+                                throwException(
+                                    "v",
+                                    "null",
+                                )
+                            } }"
                     }
                 }
                 is ValueClass -> "{ ${p.kotlinClass}(it) }"
                 else -> "{ it }"
             }
             val unwrap = when (p.kotlinClass) {
-                is EnumClass -> "{ it.${p.kotlinClass.strategy.propertyName } }"
+                is EnumClass -> "{ it.${p.kotlinClass.strategy.propertyName} }"
                 is ValueClass -> "{ it.${p.kotlinClass.property} }"
                 else -> "{ it }"
             }
@@ -620,5 +641,19 @@ internal class EntityMetamodelGenerator(
                 w.println()
             }
         }
+    }
+
+    private fun aggregationRoot() {
+        val aggregateRoot = entity.aggregateRoot ?: return
+        val targetEntity = aggregateRoot.targetEntity
+        w.println(
+            """
+                fun $EntityStore.`${aggregateRoot.navigator}`(
+                    target: ${targetEntity.packageName}.${targetEntity.metamodelSimpleName} = ${targetEntity.unitTypeName}.`${aggregateRoot.target}`,
+                    ): Set<${targetEntity.typeName}> {
+            """.trimIndent(),
+        )
+        w.println("    return this[target]")
+        w.println("}")
     }
 }

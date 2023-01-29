@@ -2,6 +2,7 @@ package integration.jdbc
 
 import integration.core.address
 import integration.core.department
+import integration.core.departments
 import integration.core.employee
 import integration.core.employees
 import integration.core.manager
@@ -298,7 +299,7 @@ class JdbcSelectJoinTest(private val db: JdbcDatabase) {
                     e.addressId eq a.addressId
                 }.includeAll()
         }
-        for (department in store[d]) {
+        for (department in store.departments()) {
             val employees = department.employees(store)
             for (employee in employees) {
                 val address = employee.address(store)

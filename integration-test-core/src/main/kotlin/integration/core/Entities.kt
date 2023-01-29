@@ -1,5 +1,6 @@
 package integration.core
 
+import org.komapper.annotation.KomapperAggregateRoot
 import org.komapper.annotation.KomapperAutoIncrement
 import org.komapper.annotation.KomapperColumn
 import org.komapper.annotation.KomapperColumnOverride
@@ -223,6 +224,7 @@ data class CyborgDef(
     @KomapperVersion val version: Nothing,
 )
 
+@KomapperAggregateRoot("departments")
 @KomapperOneToMany(Employee::class, navigator = "employees")
 @KomapperEntity
 data class Department(

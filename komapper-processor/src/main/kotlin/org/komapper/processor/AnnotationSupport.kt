@@ -6,6 +6,7 @@ import com.google.devtools.ksp.symbol.KSDeclaration
 import com.google.devtools.ksp.symbol.KSNode
 import com.google.devtools.ksp.symbol.KSType
 import com.google.devtools.ksp.symbol.KSValueParameter
+import org.komapper.annotation.KomapperAggregateRoot
 import org.komapper.annotation.KomapperColumn
 import org.komapper.annotation.KomapperColumnOverride
 import org.komapper.annotation.KomapperEntity
@@ -36,6 +37,19 @@ internal class AnnotationSupport(
         val alwaysQuote =
             annotation?.findValue("alwaysQuote")?.toString()?.toBooleanStrict() ?: config.alwaysQuote
         return Table(name, catalog, schema, alwaysQuote)
+    }
+
+    fun getAggregateRoot(definitionSource: EntityDefinitionSource): AggregateRoot? {
+        val annotation = definitionSource.defDeclaration.findAnnotation(KomapperAggregateRoot::class)
+        return if (annotation == null) {
+            null
+        } else {
+            val target = definitionSource.names.first()
+            val navigator = annotation.findValue("navigator")?.toString()?.trim().let { navigator ->
+                if (navigator.isNullOrBlank()) target else navigator
+            }
+            AggregateRoot(navigator, definitionSource, target)
+        }
     }
 
     fun getAssociations(definitionSource: EntityDefinitionSource): List<Association> {

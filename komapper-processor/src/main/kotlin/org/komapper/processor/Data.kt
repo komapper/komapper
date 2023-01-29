@@ -25,6 +25,7 @@ internal data class EntityDefinitionSource(
 internal data class EntityDef(
     val definitionSource: EntityDefinitionSource,
     val table: Table,
+    val aggregateRoot: AggregateRoot?,
     val associations: List<Association>,
     val properties: List<PropertyDef>,
 )
@@ -52,6 +53,7 @@ internal data class CompositePropertyDef(
 internal data class Entity(
     val declaration: KSClassDeclaration,
     val table: Table,
+    val aggregateRoot: AggregateRoot?,
     val associations: List<Association>,
     val properties: List<Property>,
     val embeddedIdProperty: CompositeProperty?,
@@ -261,3 +263,9 @@ enum class AssociationKind {
     ONE_TO_MANY,
     MANY_TO_ONE,
 }
+
+internal data class AggregateRoot(
+    val navigator: String,
+    val targetEntity: EntityDefinitionSource,
+    val target: String,
+)
