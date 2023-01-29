@@ -204,6 +204,11 @@ interface Dialect {
     fun supportsAsKeywordForTableAlias(): Boolean = true
 
     /**
+     * Returns whether the conflict_target is supported in the UPSERT statement.
+     */
+    fun supportsConflictTargetInUpsertStatement(): Boolean = false
+
+    /**
      * Returns whether the "CREATE TABLE/SEQUENCE IF NOT EXISTS" syntax is supported.
      */
     fun supportsCreateIfNotExists(): Boolean = true

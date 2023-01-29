@@ -42,6 +42,8 @@ interface MySqlDialect : Dialect {
         return MySqlEntityUpsertStatementBuilder(dialect, context, entities)
     }
 
+    override fun supportsConflictTargetInUpsertStatement(): Boolean = false
+
     override fun supportsLockOfTables(): Boolean = true
 
     override fun supportsLockOptionNowait(): Boolean = true

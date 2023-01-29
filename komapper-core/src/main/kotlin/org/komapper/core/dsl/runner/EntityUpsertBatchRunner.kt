@@ -17,6 +17,7 @@ class EntityUpsertBatchRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENT
     override fun check(config: DatabaseConfig) {
         checkBatchExecutionOfParameterizedStatement(config)
         checkSearchConditionInUpsertStatement(config, context)
+        checkConflictTargetInUpsertStatement(config, context.conflictTarget)
     }
 
     override fun dryRun(config: DatabaseConfig): DryRunStatement {

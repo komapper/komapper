@@ -35,6 +35,8 @@ interface PostgreSqlDialect : Dialect {
         return PostgreSqlEntityUpsertStatementBuilder(dialect, context, entities)
     }
 
+    override fun supportsConflictTargetInUpsertStatement(): Boolean = true
+
     override fun supportsLockOfTables(): Boolean = true
 
     override fun supportsLockOptionNowait(): Boolean = true

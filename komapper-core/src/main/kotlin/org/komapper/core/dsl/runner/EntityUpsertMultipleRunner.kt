@@ -16,6 +16,7 @@ class EntityUpsertMultipleRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<
 
     override fun check(config: DatabaseConfig) {
         checkSearchConditionInUpsertStatement(config, context)
+        checkConflictTargetInUpsertStatement(config, context.conflictTarget)
     }
 
     override fun dryRun(config: DatabaseConfig): DryRunStatement {

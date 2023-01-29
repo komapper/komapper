@@ -447,6 +447,21 @@ class JdbcInsertSingleTest(private val db: JdbcDatabase) {
     }
 
     @Test
+    @Run(unless = [Dbms.POSTGRESQL])
+    fun dangerouslyOnDuplicateKeyUpdate() {
+        val d = Meta.department
+        val department = Department(5, 10, "PLANNING", "TOKYO", 10)
+        val query = QueryDsl.insert(d)
+            .dangerouslyOnDuplicateKeyUpdate("test")
+            .single(department)
+        val ex = assertFailsWith<UnsupportedOperationException> {
+            db.runQuery(query)
+            Unit
+        }
+        println(ex)
+    }
+
+    @Test
     fun onDuplicateKeyIgnore_inserted() {
         val a = Meta.address
         val address = Address(16, "STREET 16", 0)

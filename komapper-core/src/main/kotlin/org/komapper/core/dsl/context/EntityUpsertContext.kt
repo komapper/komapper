@@ -21,6 +21,7 @@ data class EntityUpsertContext<ENTITY : Any, ID : Any, META : EntityMetamodel<EN
         declaration = {},
     ),
     val keys: List<PropertyMetamodel<ENTITY, *, *>> = emptyList(),
+    val conflictTarget: String? = null,
     val duplicateKeyType: DuplicateKeyType,
     val set: AssignmentDeclaration<ENTITY, META> = {},
     val where: WhereDeclaration = {},
