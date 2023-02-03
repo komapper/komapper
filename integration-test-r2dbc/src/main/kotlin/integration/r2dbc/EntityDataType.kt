@@ -6,7 +6,7 @@ import org.komapper.annotation.KomapperColumn
 import org.komapper.annotation.KomapperEntity
 import org.komapper.annotation.KomapperId
 import org.komapper.annotation.KomapperTable
-import org.komapper.core.alternate.ClobString
+import org.komapper.core.type.ClobString
 
 @Suppress("ArrayInDataClass")
 @KomapperEntity
