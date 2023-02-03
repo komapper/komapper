@@ -13,7 +13,7 @@ import org.komapper.annotation.KomapperSequence
 import org.komapper.annotation.KomapperTable
 import org.komapper.annotation.KomapperUpdatedAt
 import org.komapper.annotation.KomapperVersion
-import org.komapper.core.type.ClobString
+import org.komapper.core.alternate.ClobString
 import java.math.BigDecimal
 import java.time.Instant
 import java.time.LocalDate
