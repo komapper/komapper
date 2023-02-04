@@ -343,10 +343,10 @@ internal class EntityFactory(
                 property.node,
             )
         }
-        if (plainClass.alternate != null) {
-            if (plainClass.declaration != plainClass.alternate.property.type.declaration) {
+        if (plainClass.alternateType != null) {
+            if (plainClass.declaration != plainClass.alternateType.property.type.declaration) {
                 report(
-                    "The property \"${property.path}\" is invalid. The property type does not match the parameter property type in \"${plainClass.alternate.type.name}\".",
+                    "The property \"${property.path}\" is invalid. The property type does not match the parameter property type in \"${plainClass.alternateType.type.name}\".",
                     property.node,
                 )
             }

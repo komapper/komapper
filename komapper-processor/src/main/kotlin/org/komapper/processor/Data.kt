@@ -150,7 +150,7 @@ internal data class ValueClass(
 
 internal data class PlainClass(
     override val type: KSType,
-    val alternate: ValueClass?,
+    val alternateType: ValueClass?,
 ) : KotlinClass {
     val isArray: Boolean = declaration.qualifiedName?.asString() == "kotlin.Array"
 
@@ -171,7 +171,7 @@ internal data class PlainClass(
 
     override val interiorTypeName: String
         get() {
-            return alternate?.exteriorTypeName ?: exteriorTypeName
+            return alternateType?.exteriorTypeName ?: exteriorTypeName
         }
 
     override fun toString(): String = exteriorTypeName

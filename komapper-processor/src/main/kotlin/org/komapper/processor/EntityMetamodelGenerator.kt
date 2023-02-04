@@ -124,10 +124,10 @@ internal class EntityMetamodelGenerator(
         w.println("}")
         w.println()
 
-        utils()
-        provider()
+        metamodels()
         associations()
         aggregationRoot()
+        factory()
     }
 
     private fun importStatements() {
@@ -188,17 +188,17 @@ internal class EntityMetamodelGenerator(
                     }
                 }
                 is ValueClass -> {
-                    val alternate = p.kotlinClass.alternateType
-                    if (alternate != null) {
-                        "{ ${p.kotlinClass}(it.${alternate.property.declaration.simpleName.asString()}) }"
+                    val alternateType = p.kotlinClass.alternateType
+                    if (alternateType != null) {
+                        "{ ${p.kotlinClass}(it.${alternateType.property.declaration.simpleName.asString()}) }"
                     } else {
                         "{ ${p.kotlinClass}(it) }"
                     }
                 }
                 is PlainClass -> {
-                    val alternate = p.kotlinClass.alternate
-                    if (alternate != null) {
-                        "{ it.${alternate.property.declaration.simpleName.asString()} }"
+                    val alternateType = p.kotlinClass.alternateType
+                    if (alternateType != null) {
+                        "{ it.${alternateType.property.declaration.simpleName.asString()} }"
                     } else {
                         "{ it }"
                     }
@@ -207,24 +207,21 @@ internal class EntityMetamodelGenerator(
             val unwrap = when (p.kotlinClass) {
                 is EnumClass -> "{ it.${p.kotlinClass.strategy.propertyName} }"
                 is ValueClass -> {
-                    val alternate = p.kotlinClass.alternateType
-                    if (alternate != null) {
-                        "{ ${alternate.exteriorTypeName}(it.${p.kotlinClass.property}) }"
+                    val alternateType = p.kotlinClass.alternateType
+                    if (alternateType != null) {
+                        "{ ${alternateType.exteriorTypeName}(it.${p.kotlinClass.property}) }"
                     } else {
                         "{ it.${p.kotlinClass.property} }"
                     }
                 }
                 is PlainClass -> {
-                    val alternate = p.kotlinClass.alternate
-                    if (alternate != null) {
-                        "{ ${alternate.exteriorTypeName}(it) }"
+                    val alternateType = p.kotlinClass.alternateType
+                    if (alternateType != null) {
+                        "{ ${alternateType.exteriorTypeName}(it) }"
                     } else {
                         "{ it }"
                     }
                 }
-                is EnumClass -> "{ it.${p.kotlinClass.strategy.propertyName} }"
-                is ValueClass -> "{ it.${p.kotlinClass.property} }"
-                else -> "{ it }"
             }
             val nullable = if (nullability == Nullability.NULLABLE) "true" else "false"
             val propertyDescriptor =
@@ -626,18 +623,10 @@ internal class EntityMetamodelGenerator(
         w.println("    }")
     }
 
-    private fun utils() {
+    private fun metamodels() {
         for (alias in aliases) {
             w.println("val $unitTypeName.`$alias` get() = $simpleName.`$alias`")
         }
-        w.println()
-    }
-
-    private fun provider() {
-        w.println("@$EntityMetamodelFactory")
-        w.println("class ${simpleName}_Factory: $EntityMetamodelFactorySpi {")
-        w.println("    override fun create() = listOf(${aliases.joinToString { "$unitTypeName to $simpleName.`$it`" }})")
-        w.println("}")
         w.println()
     }
 
@@ -697,5 +686,13 @@ internal class EntityMetamodelGenerator(
         )
         w.println("    return this[target]")
         w.println("}")
+    }
+
+    private fun factory() {
+        w.println("@$EntityMetamodelFactory")
+        w.println("class ${simpleName}_Factory: $EntityMetamodelFactorySpi {")
+        w.println("    override fun create() = listOf(${aliases.joinToString { "$unitTypeName to $simpleName.`$it`" }})")
+        w.println("}")
+        w.println()
     }
 }
