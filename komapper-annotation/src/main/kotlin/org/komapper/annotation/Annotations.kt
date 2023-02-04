@@ -18,7 +18,7 @@ import kotlin.reflect.KClass
 @Retention(AnnotationRetention.SOURCE)
 annotation class KomapperEntity(
     val aliases: Array<String> = [],
-    val unit: KClass<*> = DefaultUnit::class,
+    val unit: KClass<*> = Void::class,
 )
 
 /**
@@ -243,7 +243,7 @@ annotation class KomapperAutoIncrement
 annotation class KomapperEntityDef(
     val entity: KClass<*>,
     val aliases: Array<String> = [],
-    val unit: KClass<*> = DefaultUnit::class,
+    val unit: KClass<*> = Void::class,
 )
 
 /**
