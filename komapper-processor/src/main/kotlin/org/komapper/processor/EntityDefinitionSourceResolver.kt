@@ -6,8 +6,8 @@ import com.google.devtools.ksp.symbol.KSNode
 import com.google.devtools.ksp.symbol.KSType
 import org.komapper.annotation.KomapperEntity
 import org.komapper.annotation.KomapperEntityDef
-import org.komapper.processor.Symbols.DefaultUnit
 import org.komapper.processor.Symbols.KomapperStub
+import org.komapper.processor.Symbols.Void
 
 internal interface EntityDefinitionSourceResolver {
     fun resolve(symbol: KSNode): EntityDefinitionSource
@@ -89,7 +89,7 @@ private fun toUnitDeclaration(symbol: Any?, errorHandler: () -> Nothing): KSClas
     return when (symbol) {
         is KSType -> symbol.declaration.accept(ClassDeclarationVisitor(), Unit)?.let {
             when {
-                it.qualifiedName?.asString() == DefaultUnit -> null
+                it.qualifiedName?.asString() == Void -> null
                 it.classKind == ClassKind.OBJECT -> it
                 else -> errorHandler()
             }
