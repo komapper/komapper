@@ -1188,4 +1188,110 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
         assertTrue(result.messages.contains("The property \"color\" is invalid. The parameter property type does not match between \"test.Color\" and \"test.ClobString\"."))
     }
+
+    @Test
+    fun `The targetEntity must be annotated with either @KomapperEntity or @KomapperEntityDef`() {
+        val result = compile(
+            """
+            package test
+            import org.komapper.annotation.*
+            data class Dept(
+                @KomapperId
+                val id: Int,
+                val name: String,
+            )
+            @KomapperEntity
+            @KomapperManyToOne(Dept::class)
+            data class Emp(
+                @KomapperId
+                val id: Int,
+                val name: String,
+            )
+            """,
+        )
+        assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
+        assertTrue(result.messages.contains("The targetEntity must be annotated with either @KomapperEntity or @KomapperEntityDef."))
+    }
+
+    @Test
+    fun `@KomapperLink source is invalid`() {
+        val result = compile(
+            """
+            package test
+            import org.komapper.annotation.*
+            @KomapperEntity
+            data class Dept(
+                @KomapperId
+                val id: Int,
+                val name: String,
+            )
+            @KomapperEntity
+            @KomapperManyToOne(Dept::class, link = KomapperLink("unknown"))
+            data class Emp(
+                @KomapperId
+                val id: Int,
+                val name: String,
+            )
+            """,
+        )
+        assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
+        assertTrue(result.messages.contains("@KomapperLink.source \"unknown\" is invalid. It must be one of [emp]."))
+    }
+
+    @Test
+    fun `@KomapperLink target is invalid`() {
+        val result = compile(
+            """
+            package test
+            import org.komapper.annotation.*
+            @KomapperEntity
+            data class Dept(
+                @KomapperId
+                val id: Int,
+                val name: String,
+            )
+            @KomapperEntity
+            @KomapperManyToOne(Dept::class, link = KomapperLink(target = "unknown"))
+            data class Emp(
+                @KomapperId
+                val id: Int,
+                val name: String,
+            )
+            """,
+        )
+        assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
+        assertTrue(result.messages.contains("@KomapperLink.target \"unknown\" is invalid. It must be one of [dept]."))
+    }
+
+    @Test
+    fun `The navigator is found multiple times in the association annotations`() {
+        val result = compile(
+            """
+            package test
+            import org.komapper.annotation.*
+            @KomapperEntity
+            data class Dept(
+                @KomapperId
+                val id: Int,
+                val name: String,
+            )
+            @KomapperEntity
+            data class Address(
+                @KomapperId
+                val id: Int,
+                val name: String,
+            )
+            @KomapperEntity
+            @KomapperManyToOne(Dept::class, navigator="hello")
+            @KomapperOneToOne(Address::class, navigator = "hello")
+            data class Emp(
+                @KomapperId
+                val id: Int,
+                val name: String,
+            )
+            """,
+        )
+        assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
+        assertTrue(result.messages.contains("The navigator \"hello\" is found multiple times in the association annotations."))
+    }
 }

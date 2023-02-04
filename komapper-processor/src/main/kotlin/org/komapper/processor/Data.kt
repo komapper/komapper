@@ -14,14 +14,19 @@ import com.google.devtools.ksp.symbol.Nullability
 internal data class EntityDefinitionSource(
     val defDeclaration: KSClassDeclaration,
     val entityDeclaration: KSClassDeclaration,
+    val packageName: String,
+    val metamodelSimpleName: String,
     val aliases: List<String>,
     val unitDeclaration: KSClassDeclaration?,
+    val unitTypeName: String,
     val stubAnnotation: KSAnnotation?,
 )
 
 internal data class EntityDef(
     val definitionSource: EntityDefinitionSource,
     val table: Table,
+    val aggregateRoot: AggregateRoot?,
+    val associations: List<Association>,
     val properties: List<PropertyDef>,
 )
 
@@ -48,6 +53,8 @@ internal data class CompositePropertyDef(
 internal data class Entity(
     val declaration: KSClassDeclaration,
     val table: Table,
+    val aggregateRoot: AggregateRoot?,
+    val associations: List<Association>,
     val properties: List<Property>,
     val embeddedIdProperty: CompositeProperty?,
     val virtualEmbeddedIdProperty: CompositeProperty?,
@@ -143,7 +150,7 @@ internal data class ValueClass(
 
 internal data class PlainClass(
     override val type: KSType,
-    val alternate: ValueClass?,
+    val alternateType: ValueClass?,
 ) : KotlinClass {
     val isArray: Boolean = declaration.qualifiedName?.asString() == "kotlin.Array"
 
@@ -164,7 +171,7 @@ internal data class PlainClass(
 
     override val interiorTypeName: String
         get() {
-            return alternate?.exteriorTypeName ?: exteriorTypeName
+            return alternateType?.exteriorTypeName ?: exteriorTypeName
         }
 
     override fun toString(): String = exteriorTypeName
@@ -247,4 +254,30 @@ internal data class Column(
     val alwaysQuote: Boolean,
     val masking: Boolean,
     val alternateType: ValueClass?,
+)
+
+internal data class Link(
+    val source: String,
+    val target: String,
+)
+
+internal data class Association(
+    val annotation: KSAnnotation,
+    val navigator: String,
+    val sourceEntity: EntityDefinitionSource,
+    val targetEntity: EntityDefinitionSource,
+    val link: Link,
+    val kind: AssociationKind,
+)
+
+enum class AssociationKind {
+    ONE_TO_ONE,
+    ONE_TO_MANY,
+    MANY_TO_ONE,
+}
+
+internal data class AggregateRoot(
+    val navigator: String,
+    val targetEntity: EntityDefinitionSource,
+    val target: String,
 )

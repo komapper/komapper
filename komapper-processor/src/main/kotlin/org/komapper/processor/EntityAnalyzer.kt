@@ -18,10 +18,10 @@ internal class EntityAnalyzer(
         return try {
             val entityDef = EntityDefFactory(logger, config, definitionSource).create()
             val entity = EntityFactory(logger, config, entityDef).create()
-            val model = EntityModel(definitionSource, config.metaObject, entity)
+            val model = EntityModel(definitionSource, entity)
             EntityAnalysisResult.Success(model)
         } catch (e: Exit) {
-            val model = EntityModel(definitionSource, config.metaObject)
+            val model = EntityModel(definitionSource)
             EntityAnalysisResult.Failure(model, e)
         }
     }

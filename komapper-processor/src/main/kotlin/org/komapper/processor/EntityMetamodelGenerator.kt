@@ -14,10 +14,13 @@ import org.komapper.processor.Symbols.EntityMetamodelDeclaration
 import org.komapper.processor.Symbols.EntityMetamodelFactory
 import org.komapper.processor.Symbols.EntityMetamodelFactorySpi
 import org.komapper.processor.Symbols.EntityMetamodelImplementor
+import org.komapper.processor.Symbols.EntityStore
+import org.komapper.processor.Symbols.EntityStoreContext
 import org.komapper.processor.Symbols.EnumMappingException
 import org.komapper.processor.Symbols.IdContext
 import org.komapper.processor.Symbols.IdGenerator
 import org.komapper.processor.Symbols.Instant
+import org.komapper.processor.Symbols.KomapperExperimentalAssociation
 import org.komapper.processor.Symbols.KotlinInstant
 import org.komapper.processor.Symbols.KotlinLocalDateTime
 import org.komapper.processor.Symbols.LocalDateTime
@@ -35,6 +38,7 @@ import java.time.ZonedDateTime
 
 internal class EntityMetamodelGenerator(
     @Suppress("unused") private val logger: KSPLogger,
+    private val config: Config,
     private val entity: Entity,
     private val unitTypeName: String,
     private val aliases: List<String>,
@@ -121,8 +125,10 @@ internal class EntityMetamodelGenerator(
         w.println("}")
         w.println()
 
-        utils()
-        provider()
+        metamodels()
+        associations()
+        aggregationRoot()
+        factory()
     }
 
     private fun importStatements() {
@@ -183,17 +189,17 @@ internal class EntityMetamodelGenerator(
                     }
                 }
                 is ValueClass -> {
-                    val alternate = p.kotlinClass.alternateType
-                    if (alternate != null) {
-                        "{ ${p.kotlinClass}(it.${alternate.property.declaration.simpleName.asString()}) }"
+                    val alternateType = p.kotlinClass.alternateType
+                    if (alternateType != null) {
+                        "{ ${p.kotlinClass}(it.${alternateType.property.declaration.simpleName.asString()}) }"
                     } else {
                         "{ ${p.kotlinClass}(it) }"
                     }
                 }
                 is PlainClass -> {
-                    val alternate = p.kotlinClass.alternate
-                    if (alternate != null) {
-                        "{ it.${alternate.property.declaration.simpleName.asString()} }"
+                    val alternateType = p.kotlinClass.alternateType
+                    if (alternateType != null) {
+                        "{ it.${alternateType.property.declaration.simpleName.asString()} }"
                     } else {
                         "{ it }"
                     }
@@ -202,17 +208,17 @@ internal class EntityMetamodelGenerator(
             val unwrap = when (p.kotlinClass) {
                 is EnumClass -> "{ it.${p.kotlinClass.strategy.propertyName} }"
                 is ValueClass -> {
-                    val alternate = p.kotlinClass.alternateType
-                    if (alternate != null) {
-                        "{ ${alternate.exteriorTypeName}(it.${p.kotlinClass.property}) }"
+                    val alternateType = p.kotlinClass.alternateType
+                    if (alternateType != null) {
+                        "{ ${alternateType.exteriorTypeName}(it.${p.kotlinClass.property}) }"
                     } else {
                         "{ it.${p.kotlinClass.property} }"
                     }
                 }
                 is PlainClass -> {
-                    val alternate = p.kotlinClass.alternate
-                    if (alternate != null) {
-                        "{ ${alternate.exteriorTypeName}(it) }"
+                    val alternateType = p.kotlinClass.alternateType
+                    if (alternateType != null) {
+                        "{ ${alternateType.exteriorTypeName}(it) }"
                     } else {
                         "{ it }"
                     }
@@ -618,17 +624,79 @@ internal class EntityMetamodelGenerator(
         w.println("    }")
     }
 
-    private fun utils() {
+    private fun metamodels() {
         for (alias in aliases) {
             w.println("val $unitTypeName.`$alias` get() = $simpleName.`$alias`")
         }
         w.println()
     }
 
-    private fun provider() {
+    private fun associations() {
+        for (association in entity.associations) {
+            val sourceEntity = association.sourceEntity
+            val targetEntity = association.targetEntity
+            val returnType = when (association.kind) {
+                AssociationKind.ONE_TO_ONE,
+                AssociationKind.MANY_TO_ONE,
+                -> "${targetEntity.typeName}?"
+                AssociationKind.ONE_TO_MANY -> "Set<${targetEntity.typeName}>"
+            }
+            val expression = when (association.kind) {
+                AssociationKind.ONE_TO_ONE -> "store.oneToOne(source, target)[this]"
+                AssociationKind.MANY_TO_ONE -> "store.manyToOne(source, target)[this]"
+                AssociationKind.ONE_TO_MANY -> "store.oneToMany(source, target)[this] ?: emptySet()"
+            }
+            w.println(
+                """
+                @$KomapperExperimentalAssociation
+                fun $entityTypeName.`${association.navigator}`(
+                    store: $EntityStore,
+                    source: ${sourceEntity.packageName}.${sourceEntity.metamodelSimpleName} = ${sourceEntity.unitTypeName}.`${association.link.source}`,
+                    target: ${targetEntity.packageName}.${targetEntity.metamodelSimpleName} = ${targetEntity.unitTypeName}.`${association.link.target}`,
+                    ): $returnType {
+                """.trimIndent(),
+            )
+            w.println("    return $expression")
+            w.println("}")
+            w.println()
+            if (config.enableEntityStoreContext) {
+                w.println(
+                    """
+                @$KomapperExperimentalAssociation
+                context($EntityStoreContext)
+                fun $entityTypeName.`${association.navigator}`(
+                    source: ${sourceEntity.packageName}.${sourceEntity.metamodelSimpleName} = ${sourceEntity.unitTypeName}.`${association.link.source}`,
+                    target: ${targetEntity.packageName}.${targetEntity.metamodelSimpleName} = ${targetEntity.unitTypeName}.`${association.link.target}`,
+                    ): $returnType {
+                    """.trimIndent(),
+                )
+                w.println("    return $expression")
+                w.println("}")
+                w.println()
+            }
+        }
+    }
+
+    private fun aggregationRoot() {
+        val aggregateRoot = entity.aggregateRoot ?: return
+        val targetEntity = aggregateRoot.targetEntity
+        w.println(
+            """
+                @$KomapperExperimentalAssociation
+                fun $EntityStore.`${aggregateRoot.navigator}`(
+                    target: ${targetEntity.packageName}.${targetEntity.metamodelSimpleName} = ${targetEntity.unitTypeName}.`${aggregateRoot.target}`,
+                    ): Set<${targetEntity.typeName}> {
+            """.trimIndent(),
+        )
+        w.println("    return this[target]")
+        w.println("}")
+    }
+
+    private fun factory() {
         w.println("@$EntityMetamodelFactory")
         w.println("class ${simpleName}_Factory: $EntityMetamodelFactorySpi {")
         w.println("    override fun create() = listOf(${aliases.joinToString { "$unitTypeName to $simpleName.`$it`" }})")
         w.println("}")
+        w.println()
     }
 }

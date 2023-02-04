@@ -26,3 +26,9 @@ ksp {
     arg("komapper.namingStrategy", "lower_snake_case")
     arg("komapper.enableEntityMetamodelListing", "true")
 }
+
+tasks {
+    withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+        kotlinOptions.freeCompilerArgs += listOf("-opt-in=org.komapper.annotation.KomapperExperimentalAssociation")
+    }
+}

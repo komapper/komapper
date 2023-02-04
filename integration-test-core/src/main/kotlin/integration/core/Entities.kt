@@ -1,5 +1,6 @@
 package integration.core
 
+import org.komapper.annotation.KomapperAggregateRoot
 import org.komapper.annotation.KomapperAutoIncrement
 import org.komapper.annotation.KomapperColumn
 import org.komapper.annotation.KomapperColumnOverride
@@ -9,6 +10,10 @@ import org.komapper.annotation.KomapperEmbeddedId
 import org.komapper.annotation.KomapperEntity
 import org.komapper.annotation.KomapperEntityDef
 import org.komapper.annotation.KomapperId
+import org.komapper.annotation.KomapperLink
+import org.komapper.annotation.KomapperManyToOne
+import org.komapper.annotation.KomapperOneToMany
+import org.komapper.annotation.KomapperOneToOne
 import org.komapper.annotation.KomapperSequence
 import org.komapper.annotation.KomapperTable
 import org.komapper.annotation.KomapperUpdatedAt
@@ -120,6 +125,10 @@ data class Human(
     @KomapperUpdatedAt val updatedAt: OffsetDateTime? = null,
 )
 
+@KomapperManyToOne(Department::class)
+@KomapperOneToOne(Address::class)
+@KomapperManyToOne(Employee::class, link = KomapperLink(target = "manager"))
+@KomapperOneToMany(Employee::class, navigator = "employees", link = KomapperLink(source = "manager", target = "employee"))
 @KomapperEntity(["employee", "manager"])
 data class Employee(
     @KomapperId
@@ -244,6 +253,8 @@ data class Machine(
     @KomapperVersion val version: Int,
 )
 
+@KomapperAggregateRoot("departments")
+@KomapperOneToMany(Employee::class, navigator = "employees")
 @KomapperEntity
 data class Department(
     @KomapperId

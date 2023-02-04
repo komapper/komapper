@@ -2,7 +2,9 @@ package integration.jdbc
 
 import integration.core.address
 import integration.core.department
+import integration.core.departments
 import integration.core.employee
+import integration.core.employees
 import integration.core.manager
 import integration.core.person
 import org.junit.jupiter.api.extension.ExtendWith
@@ -282,5 +284,88 @@ class JdbcSelectJoinTest(private val db: JdbcDatabase) {
         assertEquals(14, store[a].size)
         assertEquals(14, store[e].size)
         assertEquals(3, store[d].size)
+    }
+
+    @Test
+    fun navigation_oneToMany_oneToOne() {
+        val d = Meta.department
+        val e = Meta.employee
+        val a = Meta.address
+        val store = db.runQuery {
+            QueryDsl.from(d)
+                .innerJoin(e) {
+                    d.departmentId eq e.departmentId
+                }.innerJoin(a) {
+                    e.addressId eq a.addressId
+                }.includeAll()
+        }
+        for (department in store.departments()) {
+            val employees = department.employees(store)
+            for (employee in employees) {
+                val address = employee.address(store)
+                println("department=${department.departmentName}, employee=${employee.employeeName}, address=${address?.street}")
+            }
+        }
+        val addresses = store[d].flatMap { it.employees(store) }.mapNotNull { it.address(store) }
+        assertEquals(14, addresses.size)
+    }
+
+    @Test
+    fun navigation_manyToOne_oneToOne() {
+        val d = Meta.department
+        val e = Meta.employee
+        val a = Meta.address
+        val store = db.runQuery {
+            QueryDsl.from(d)
+                .innerJoin(e) {
+                    d.departmentId eq e.departmentId
+                }.innerJoin(a) {
+                    e.addressId eq a.addressId
+                }.includeAll()
+        }
+        for (employee in store[e]) {
+            val department = employee.department(store)
+            val address = employee.address(store)
+            println("department=${department?.departmentName}, employee=${employee.employeeName}, address=${address?.street}")
+        }
+        val departments = store[e].mapNotNull { it.department(store) }.distinct()
+        assertEquals(3, departments.size)
+    }
+
+    @Test
+    fun navigation_selfJoin_manyToOne() {
+        val e = Meta.employee
+        val m = Meta.manager
+        val store = db.runQuery {
+            QueryDsl.from(e)
+                .leftJoin(m) {
+                    e.managerId eq m.employeeId
+                }.includeAll()
+        }
+        for (employee in store[e]) {
+            val manager = employee.manager(store)
+            println("employee=${employee.employeeName}, manager=${manager?.employeeName}")
+        }
+        val managers = store[e].mapNotNull { it.manager(store) }.distinct()
+        assertEquals(6, managers.size)
+    }
+
+    @Test
+    fun navigation_selfJoin_oneToMany() {
+        val e = Meta.employee
+        val m = Meta.manager
+        val store = db.runQuery {
+            QueryDsl.from(e)
+                .leftJoin(m) {
+                    e.managerId eq m.employeeId
+                }.includeAll()
+        }
+        for (manager in store[m]) {
+            for (employee in manager.employees(store)) {
+                println("employee=${employee.employeeName}, manager=${manager.employeeName}")
+            }
+        }
+        val employees = store[m].flatMap { it.employees(store) }
+        assertEquals(13, employees.size)
     }
 }

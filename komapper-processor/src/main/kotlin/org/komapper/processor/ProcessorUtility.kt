@@ -30,6 +30,10 @@ internal fun KSAnnotation.findValue(name: String): Any? {
         .firstOrNull()
 }
 
+internal fun KSAnnotated.findAnnotations(klass: KClass<*>): List<KSAnnotation> {
+    return this.annotations.filter { it.shortName.asString() == klass.simpleName }.toList()
+}
+
 internal fun KSAnnotated.findAnnotation(klass: KClass<*>): KSAnnotation? {
     return this.annotations.firstOrNull { it.shortName.asString() == klass.simpleName }
 }
@@ -117,6 +121,17 @@ internal val KSType.name: String
         }
         return buf.toString()
     }
+
+internal val EntityDefinitionSource.names: List<String>
+    get() = this.aliases.ifEmpty {
+        val alias = toCamelCase(this.entityDeclaration.simpleName.asString())
+        listOf(alias)
+    }
+
+internal val EntityDefinitionSource.typeName get() = this.entityDeclaration.qualifiedName?.asString() ?: ""
+
+internal fun EntityDefinitionSource.createUnitTypeName(config: Config) =
+    this.unitDeclaration?.qualifiedName?.asString() ?: config.metaObject
 
 internal fun toCamelCase(text: String): String {
     val builder = StringBuilder()

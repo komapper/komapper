@@ -2,6 +2,8 @@ package org.komapper.core.dsl.query
 
 import org.komapper.core.ThreadSafe
 import org.komapper.core.dsl.metamodel.EntityMetamodel
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.ConcurrentMap
 import kotlin.reflect.cast
 
 /**
@@ -72,12 +74,25 @@ interface EntityStore {
         first: EntityMetamodel<T, ID, *>,
         second: EntityMetamodel<S, *, *>,
     ): Map<ID, Set<S>>
+
+    fun <T : Any, S : Any> manyToOne(
+        first: EntityMetamodel<T, *, *>,
+        second: EntityMetamodel<S, *, *>,
+    ): Map<T, S?>
+
+    fun <T : Any, ID : Any, S : Any> manyToOneById(
+        first: EntityMetamodel<T, ID, *>,
+        second: EntityMetamodel<S, *, *>,
+    ): Map<ID, S?>
 }
 
 internal class EntityStoreImpl(
     private val entitySets: Map<EntityMetamodel<*, *, *>, Set<Any>>,
     private val rows: List<Map<EntityMetamodel<*, *, *>, Any>>,
 ) : EntityStore {
+
+    private val oneToManyCache: ConcurrentMap<Pair<*, *>, Map<*, Set<*>>> = ConcurrentHashMap()
+    private val manyToOneCache: ConcurrentMap<Pair<*, *>, Map<*, *>> = ConcurrentHashMap()
 
     override operator fun contains(metamodel: EntityMetamodel<*, *, *>): Boolean {
         return entitySets.containsKey(metamodel)
@@ -96,16 +111,22 @@ internal class EntityStoreImpl(
         first: EntityMetamodel<T, *, *>,
         second: EntityMetamodel<S, *, *>,
     ): Map<T, S?> {
-        val oneToMany = createOneToMany(first, second)
-        return oneToMany.mapValues { it.value.firstOrNull() }
+        return createOneToOne(first, second)
     }
 
     override fun <T : Any, ID : Any, S : Any> oneToOneById(
         first: EntityMetamodel<T, ID, *>,
         second: EntityMetamodel<S, *, *>,
     ): Map<ID, S?> {
-        val oneToMany = createOneToMany(first, second)
-        return oneToMany.mapKeys { first.extractId(it.key) }.mapValues { it.value.firstOrNull() }
+        val oneToOne = createOneToOne(first, second)
+        return oneToOne.mapKeys { first.extractId(it.key) }
+    }
+
+    private fun <T : Any, S : Any> createOneToOne(
+        first: EntityMetamodel<T, *, *>,
+        second: EntityMetamodel<S, *, *>,
+    ): Map<T, S?> {
+        return createManyToOne(first, second)
     }
 
     override fun <T : Any, S : Any> oneToMany(
@@ -130,19 +151,62 @@ internal class EntityStoreImpl(
         if (!contains(first, second)) {
             return emptyMap()
         }
-        val oneToMany = mutableMapOf<T, MutableSet<S>>()
-        for (row in rows) {
-            val entity1 = row[first]
-            val entity2 = row[second]
-            if (entity1 != null) {
-                val key = first.klass().cast(entity1)
-                val values = oneToMany.computeIfAbsent(key) { mutableSetOf() }
-                if (entity2 != null) {
-                    val value = second.klass().cast(entity2)
-                    values.add(value)
+        val cached = oneToManyCache.computeIfAbsent(first to second) {
+            val oneToMany = mutableMapOf<T, MutableSet<S>>()
+            for (row in rows) {
+                val entity1 = row[first]
+                val entity2 = row[second]
+                if (entity1 != null) {
+                    val key = first.klass().cast(entity1)
+                    val values = oneToMany.computeIfAbsent(key) { mutableSetOf() }
+                    if (entity2 != null) {
+                        val value = second.klass().cast(entity2)
+                        values.add(value)
+                    }
                 }
             }
+            oneToMany
         }
-        return oneToMany
+        @Suppress("UNCHECKED_CAST")
+        return cached as Map<T, Set<S>>
+    }
+
+    override fun <T : Any, S : Any> manyToOne(
+        first: EntityMetamodel<T, *, *>,
+        second: EntityMetamodel<S, *, *>,
+    ): Map<T, S?> {
+        return createManyToOne(first, second)
+    }
+
+    override fun <T : Any, ID : Any, S : Any> manyToOneById(
+        first: EntityMetamodel<T, ID, *>,
+        second: EntityMetamodel<S, *, *>,
+    ): Map<ID, S?> {
+        val manyToOne = createManyToOne(first, second)
+        return manyToOne.mapKeys { first.extractId(it.key) }
+    }
+
+    private fun <T : Any, S : Any> createManyToOne(
+        first: EntityMetamodel<T, *, *>,
+        second: EntityMetamodel<S, *, *>,
+    ): Map<T, S?> {
+        if (!contains(first, second)) {
+            return emptyMap()
+        }
+        val cached = manyToOneCache.computeIfAbsent(first to second) {
+            val manyToOne = mutableMapOf<T, S?>()
+            for (row in rows) {
+                val entity1 = row[first]
+                val entity2 = row[second]
+                if (entity1 != null) {
+                    val key = first.klass().cast(entity1)
+                    val value = entity2?.let { second.klass().cast(it) }
+                    manyToOne[key] = value
+                }
+            }
+            manyToOne
+        }
+        @Suppress("UNCHECKED_CAST")
+        return cached as Map<T, S?>
     }
 }

@@ -39,4 +39,7 @@ internal object Symbols {
     const val DefaultUnit = "org.komapper.annotation.DefaultUnit"
     const val EnumMappingException = "org.komapper.core.dsl.runner.EnumMappingException"
     const val Void = "java.lang.Void"
+    const val EntityStore = "org.komapper.core.dsl.query.EntityStore"
+    const val EntityStoreContext = "org.komapper.core.dsl.query.EntityStoreContext"
+    const val KomapperExperimentalAssociation = "org.komapper.annotation.KomapperExperimentalAssociation"
 }

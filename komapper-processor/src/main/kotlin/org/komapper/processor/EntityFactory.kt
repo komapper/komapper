@@ -32,7 +32,7 @@ internal class EntityFactory(
     private val entityDef: EntityDef,
 ) {
 
-    private val annotationSupport = AnnotationSupport(config)
+    private val annotationSupport = AnnotationSupport(logger, config)
 
     fun create(): Entity {
         val allProperties = createAllProperties()
@@ -55,6 +55,8 @@ internal class EntityFactory(
         return Entity(
             entityDef.definitionSource.entityDeclaration,
             entityDef.table,
+            entityDef.aggregateRoot,
+            entityDef.associations,
             properties,
             embeddedIdProperty,
             virtualEmbeddedIdProperty,
@@ -341,10 +343,10 @@ internal class EntityFactory(
                 property.node,
             )
         }
-        if (plainClass.alternate != null) {
-            if (plainClass.declaration != plainClass.alternate.property.type.declaration) {
+        if (plainClass.alternateType != null) {
+            if (plainClass.declaration != plainClass.alternateType.property.type.declaration) {
                 report(
-                    "The property \"${property.path}\" is invalid. The property type does not match the parameter property type in \"${plainClass.alternate.type.name}\".",
+                    "The property \"${property.path}\" is invalid. The property type does not match the parameter property type in \"${plainClass.alternateType.type.name}\".",
                     property.node,
                 )
             }
