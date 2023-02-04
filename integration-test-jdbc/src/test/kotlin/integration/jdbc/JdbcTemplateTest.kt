@@ -16,6 +16,7 @@ import org.komapper.core.dsl.query.getNotNull
 import org.komapper.jdbc.JdbcDatabase
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertNull
 
 @ExtendWith(JdbcEnv::class)
@@ -141,6 +142,23 @@ class JdbcTemplateTest(private val db: JdbcDatabase) {
                 .select(asAddress)
         }
         assertEquals(15, list.size)
+    }
+
+    @Test
+    fun bind_unknownBindVariable() {
+        val ex = assertFailsWith<Exception> {
+            db.runQuery {
+                val sql = "select * from address where street = /*street*/'test'"
+                QueryDsl.fromTemplate(sql)
+                    .bind("unknown", "STREET 10")
+                    .select(asAddress)
+            }
+            Unit
+        }
+        val message = ex.message!!
+        assertEquals("The expression evaluation was failed at <select * from address where street = /*street*/'test'>:1:47.", message)
+        val causeMessage = ex.cause!!.message
+        assertEquals("The template variable \"street\" is not bound to a value. Make sure the variable name is correct. <street>:6", causeMessage)
     }
 
     @Test

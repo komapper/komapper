@@ -55,6 +55,7 @@ public class KomapperProcessor {
     var serviceInterfaces =
         List.of(
             "org.komapper.core.spi.DataTypeConverter",
+            "org.komapper.core.spi.EntityMetamodelFactory",
             "org.komapper.core.spi.LoggerFactory",
             "org.komapper.core.spi.LoggerFacadeFactory",
             "org.komapper.core.spi.StatementInspectorFactory",

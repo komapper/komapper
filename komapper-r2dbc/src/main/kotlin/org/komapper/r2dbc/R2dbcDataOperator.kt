@@ -44,6 +44,14 @@ interface R2dbcDataOperator : DataOperator {
      * @return the data type
      */
     fun <T : Any> getDataType(klass: KClass<out T>): R2dbcDataType<T>
+
+    /**
+     * Returns the data type or null.
+     *
+     * @param klass the value class
+     * @return the data type or null
+     */
+    fun <T : Any> getDataTypeOrNull(klass: KClass<out T>): R2dbcDataType<T>?
 }
 
 class DefaultR2dbcDataOperator(private val dialect: R2dbcDialect, private val dataTypeProvider: R2dbcDataTypeProvider) :
@@ -69,15 +77,19 @@ class DefaultR2dbcDataOperator(private val dialect: R2dbcDialect, private val da
         return if (masking) {
             dialect.mask
         } else {
-            val dataType = getDataType(valueClass)
-            return dataType.toString(value)
+            val dataType = getDataTypeOrNull(valueClass)
+            dataType?.toString(value) ?: value.toString()
         }
     }
 
     override fun <T : Any> getDataType(klass: KClass<out T>): R2dbcDataType<T> {
-        return dataTypeProvider.get(klass) ?: error(
+        return getDataTypeOrNull(klass) ?: error(
             "The dataType is not found for the type \"${klass.qualifiedName}\".",
         )
+    }
+
+    override fun <T : Any> getDataTypeOrNull(klass: KClass<out T>): R2dbcDataType<T>? {
+        return dataTypeProvider.get(klass)
     }
 
     override fun getDataTypeName(klass: KClass<*>): String {

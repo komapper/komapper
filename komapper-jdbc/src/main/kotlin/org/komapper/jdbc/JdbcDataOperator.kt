@@ -43,6 +43,14 @@ interface JdbcDataOperator : DataOperator {
      * @return the data type
      */
     fun <T : Any> getDataType(klass: KClass<out T>): JdbcDataType<T>
+
+    /**
+     * Returns the data type or null.
+     *
+     * @param klass the value class
+     * @return the data type or null
+     */
+    fun <T : Any> getDataTypeOrNull(klass: KClass<out T>): JdbcDataType<T>?
 }
 
 class DefaultJdbcDataOperator(private val dialect: JdbcDialect, private val dataTypeProvider: JdbcDataTypeProvider) :
@@ -66,8 +74,8 @@ class DefaultJdbcDataOperator(private val dialect: JdbcDialect, private val data
         return if (masking) {
             dialect.mask
         } else {
-            val dataType = getDataType(valueClass)
-            dataType.toString(value)
+            val dataType = getDataTypeOrNull(valueClass)
+            dataType?.toString(value) ?: value.toString()
         }
     }
 
@@ -77,8 +85,12 @@ class DefaultJdbcDataOperator(private val dialect: JdbcDialect, private val data
     }
 
     override fun <T : Any> getDataType(klass: KClass<out T>): JdbcDataType<T> {
-        return dataTypeProvider.get(klass) ?: error(
+        return getDataTypeOrNull(klass) ?: error(
             "The dataType is not found for the type \"${klass.qualifiedName}\".",
         )
+    }
+
+    override fun <T : Any> getDataTypeOrNull(klass: KClass<out T>): JdbcDataType<T>? {
+        return dataTypeProvider.get(klass)
     }
 }

@@ -202,7 +202,9 @@ internal class EntityFactory(
         enumStrategy: EnumStrategy?,
     ): LeafProperty {
         val (type) = (typeArgument?.type ?: parameter.type).resolve().normalize()
-        val kotlinClass = createEnumClass(enumStrategy, type) ?: createValueClass(type) ?: PlainClass(type)
+        val alternateType = column?.alternateType
+        val kotlinClass =
+            createEnumClass(enumStrategy, type) ?: createValueClass(type, alternateType) ?: PlainClass(type, alternateType)
         return LeafProperty(
             parameter = parameter,
             declaration = declaration,
@@ -241,7 +243,7 @@ internal class EntityFactory(
         }
     }
 
-    private fun createValueClass(type: KSType): ValueClass? {
+    private fun createValueClass(type: KSType, alternateType: ValueClass?): ValueClass? {
         val classDeclaration = type.declaration.accept(ClassDeclarationVisitor(), Unit)
         return if (classDeclaration != null) {
             val constructor = classDeclaration.primaryConstructor
@@ -249,18 +251,19 @@ internal class EntityFactory(
             val parameter = constructor?.parameters?.firstOrNull()
             val declaration = classDeclaration.getDeclaredProperties().firstOrNull()
             if (classDeclaration.isValueClass() && isPublic && parameter != null && declaration != null) {
-                val interiorType = parameter.type.resolve()
+                val propertyType = declaration.type.resolve()
                 val nonNullableInteriorType =
-                    if (interiorType.isMarkedNullable) {
-                        interiorType.makeNotNullable()
+                    if (propertyType.isMarkedNullable) {
+                        propertyType.makeNotNullable()
                     } else {
-                        interiorType
+                        propertyType
                     }
                 val typeName = nonNullableInteriorType.name
                 val literalTag = resolveLiteralTag(typeName)
-                val nullability = interiorType.nullability
-                val property = ValueClassProperty(parameter, declaration, typeName, literalTag, nullability)
-                ValueClass(type, property)
+                val nullability = propertyType.nullability
+                val property =
+                    ValueClassProperty(propertyType, parameter, declaration, typeName, literalTag, nullability)
+                ValueClass(type, property, alternateType)
             } else {
                 null
             }
@@ -269,18 +272,10 @@ internal class EntityFactory(
         }
     }
 
-    private fun resolveLiteralTag(typeName: String): String {
-        return when (typeName) {
-            "kotlin.Long" -> "L"
-            "kotlin.UInt" -> "u"
-            else -> ""
-        }
-    }
-
     private fun getColumn(column: Column?, parameter: KSValueParameter): Column {
         return if (column == null) {
             val name = parameter.toString()
-            Column(config.namingStrategy.apply(name), alwaysQuote = false, masking = false)
+            Column(config.namingStrategy.apply(name), alwaysQuote = false, masking = false, alternateType = null)
         } else {
             column
         }
@@ -295,7 +290,7 @@ internal class EntityFactory(
                 report("The property must not be private.", property.node)
             }
             when (val kotlinClass = property.kotlinClass) {
-                is EnumClass -> Unit
+                is EnumClass -> validateEnumClassProperty(property, kotlinClass)
                 is ValueClass -> validateValueClassProperty(property, kotlinClass)
                 is PlainClass -> validatePlainClassProperty(property, kotlinClass)
             }
@@ -307,6 +302,12 @@ internal class EntityFactory(
             is PropertyKind.UpdatedAt -> validateTimestampProperty(property, "@KomapperUpdatedAt")
             is PropertyKind.Ignore -> validateIgnoreProperty(property)
             else -> Unit
+        }
+    }
+
+    private fun validateEnumClassProperty(property: LeafProperty, @Suppress("UNUSED_PARAMETER") enumClass: EnumClass) {
+        if (property.column.alternateType != null) {
+            report("@KomapperColumn.alternateType is invalid for enum property types.", property.node)
         }
     }
 
@@ -324,6 +325,14 @@ internal class EntityFactory(
                 property.node,
             )
         }
+        if (valueClass.alternateType != null) {
+            if (valueClassProperty.type.declaration != valueClass.alternateType.property.type.declaration) {
+                report(
+                    "The property \"${property.path}\" is invalid. The parameter property type does not match between \"${valueClass.type.name}\" and \"${valueClass.alternateType.type.name}\".",
+                    property.node,
+                )
+            }
+        }
         checkEnumAnnotation(property)
     }
 
@@ -333,6 +342,14 @@ internal class EntityFactory(
                 "The property \"${property.path}\" must not be a generic type \"${plainClass.type}\".",
                 property.node,
             )
+        }
+        if (plainClass.alternate != null) {
+            if (plainClass.declaration != plainClass.alternate.property.type.declaration) {
+                report(
+                    "The property \"${property.path}\" is invalid. The property type does not match the parameter property type in \"${plainClass.alternate.type.name}\".",
+                    property.node,
+                )
+            }
         }
         checkEnumAnnotation(property)
     }

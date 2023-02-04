@@ -12,6 +12,7 @@ internal data class Config(
     val namingStrategy: NamingStrategy,
     val metaObject: String,
     val alwaysQuote: Boolean,
+    val enableEntityMetamodelListing: Boolean,
     val enableEntityStoreContext: Boolean,
 ) {
     companion object {
@@ -21,6 +22,7 @@ internal data class Config(
         private const val NAMING_STRATEGY = "komapper.namingStrategy"
         private const val META_OBJECT = "komapper.metaObject"
         private const val ALWAYS_QUOTE = "komapper.alwaysQuote"
+        private const val ENABLE_ENTITY_METAMODEL_LISTING = "komapper.enableEntityMetamodelListing"
         private const val ENABLE_ENTITY_STORE_CONTEXT = "komapper.enableEntityStoreContext"
 
         fun create(options: Map<String, String>): Config {
@@ -43,8 +45,9 @@ internal data class Config(
             }
             val metaObject = options.getOrDefault(META_OBJECT, Symbols.Meta)
             val alwaysQuote = options[ALWAYS_QUOTE]?.toBooleanStrict() ?: false
+            val enableEntityMetamodelListing = options[ENABLE_ENTITY_METAMODEL_LISTING]?.toBooleanStrict() ?: false
             val enableEntityStoreContext = options[ENABLE_ENTITY_STORE_CONTEXT]?.toBooleanStrict() ?: false
-            return Config(prefix, suffix, enumStrategy, namingStrategy, metaObject, alwaysQuote, enableEntityStoreContext)
+            return Config(prefix, suffix, enumStrategy, namingStrategy, metaObject, alwaysQuote, enableEntityMetamodelListing, enableEntityStoreContext)
         }
     }
 }

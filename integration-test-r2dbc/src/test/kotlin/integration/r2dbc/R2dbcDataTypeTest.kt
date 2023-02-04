@@ -344,6 +344,32 @@ class R2dbcDataTypeTest(val db: R2dbcDatabase) {
     }
 
     @Test
+    fun clobString(info: TestInfo) = inTransaction(db, info) {
+        val m = Meta.clobStringData
+        val data = ClobStringData(1, "abc")
+        db.runQuery {
+            QueryDsl.insert(m).single(data)
+        }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        assertEquals(data, data2)
+    }
+
+    @Test
+    fun clobString_null(info: TestInfo) = inTransaction(db, info) {
+        val m = Meta.clobStringData
+        val data = ClobStringData(1, null)
+        db.runQuery {
+            QueryDsl.insert(m).single(data)
+        }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        assertEquals(data, data2)
+    }
+
+    @Test
     fun double(info: TestInfo) = inTransaction(db, info) {
         val m = Meta.doubleData
         val data = DoubleData(1, 10.0)

@@ -11,6 +11,8 @@ import org.komapper.processor.Symbols.EmbeddedMetamodel
 import org.komapper.processor.Symbols.EntityDescriptor
 import org.komapper.processor.Symbols.EntityMetamodel
 import org.komapper.processor.Symbols.EntityMetamodelDeclaration
+import org.komapper.processor.Symbols.EntityMetamodelFactory
+import org.komapper.processor.Symbols.EntityMetamodelFactorySpi
 import org.komapper.processor.Symbols.EntityMetamodelImplementor
 import org.komapper.processor.Symbols.EntityStore
 import org.komapper.processor.Symbols.EntityStoreContext
@@ -37,7 +39,7 @@ internal class EntityMetamodelGenerator(
     @Suppress("unused") private val logger: KSPLogger,
     private val config: Config,
     private val entity: Entity,
-    private val metaObject: String,
+    private val unitTypeName: String,
     private val aliases: List<String>,
     private val packageName: String,
     private val simpleName: String,
@@ -123,6 +125,7 @@ internal class EntityMetamodelGenerator(
         w.println()
 
         utils()
+        provider()
         associations()
         aggregationRoot()
     }
@@ -184,10 +187,41 @@ internal class EntityMetamodelGenerator(
                             } }"
                     }
                 }
-                is ValueClass -> "{ ${p.kotlinClass}(it) }"
-                else -> "{ it }"
+                is ValueClass -> {
+                    val alternate = p.kotlinClass.alternateType
+                    if (alternate != null) {
+                        "{ ${p.kotlinClass}(it.${alternate.property.declaration.simpleName.asString()}) }"
+                    } else {
+                        "{ ${p.kotlinClass}(it) }"
+                    }
+                }
+                is PlainClass -> {
+                    val alternate = p.kotlinClass.alternate
+                    if (alternate != null) {
+                        "{ it.${alternate.property.declaration.simpleName.asString()} }"
+                    } else {
+                        "{ it }"
+                    }
+                }
             }
             val unwrap = when (p.kotlinClass) {
+                is EnumClass -> "{ it.${p.kotlinClass.strategy.propertyName} }"
+                is ValueClass -> {
+                    val alternate = p.kotlinClass.alternateType
+                    if (alternate != null) {
+                        "{ ${alternate.exteriorTypeName}(it.${p.kotlinClass.property}) }"
+                    } else {
+                        "{ it.${p.kotlinClass.property} }"
+                    }
+                }
+                is PlainClass -> {
+                    val alternate = p.kotlinClass.alternate
+                    if (alternate != null) {
+                        "{ ${alternate.exteriorTypeName}(it) }"
+                    } else {
+                        "{ it }"
+                    }
+                }
                 is EnumClass -> "{ it.${p.kotlinClass.strategy.propertyName} }"
                 is ValueClass -> "{ it.${p.kotlinClass.property} }"
                 else -> "{ it }"
@@ -594,8 +628,16 @@ internal class EntityMetamodelGenerator(
 
     private fun utils() {
         for (alias in aliases) {
-            w.println("val $metaObject.`$alias` get() = $simpleName.`$alias`")
+            w.println("val $unitTypeName.`$alias` get() = $simpleName.`$alias`")
         }
+        w.println()
+    }
+
+    private fun provider() {
+        w.println("@$EntityMetamodelFactory")
+        w.println("class ${simpleName}_Factory: $EntityMetamodelFactorySpi {")
+        w.println("    override fun create() = listOf(${aliases.joinToString { "$unitTypeName to $simpleName.`$it`" }})")
+        w.println("}")
         w.println()
     }
 

@@ -10,6 +10,8 @@ import integration.core.EmbeddedIdAddress
 import integration.core.GenericEmbeddedIdAddress
 import integration.core.Human
 import integration.core.IdentityStrategy
+import integration.core.Machine
+import integration.core.MachineInfo1
 import integration.core.Man
 import integration.core.Person
 import integration.core.Robot
@@ -24,6 +26,7 @@ import integration.core.embeddedIdAddress
 import integration.core.genericEmbeddedIdAddress
 import integration.core.human
 import integration.core.identityStrategy
+import integration.core.machine
 import integration.core.man
 import integration.core.person
 import integration.core.robot
@@ -154,6 +157,30 @@ class JdbcInsertSingleTest(private val db: JdbcDatabase) {
             }.first()
         }
         assertEquals(cyborg, cyborg2)
+    }
+
+    @Test
+    fun embedded_alternate() {
+        val m = Meta.machine
+        val robot = Machine(
+            employeeId = 99,
+            managerId = null,
+            departmentId = 1,
+            addressId = 1,
+            version = 0,
+            info1 = MachineInfo1(
+                employeeNo = 9999,
+                employeeName = "a",
+            ),
+            info2 = null,
+        )
+        db.runQuery { QueryDsl.insert(m).single(robot) }
+        val robot2 = db.runQuery {
+            QueryDsl.from(m).where {
+                m.employeeId eq 99
+            }.first()
+        }
+        assertEquals(robot, robot2)
     }
 
     @Test

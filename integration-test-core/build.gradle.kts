@@ -24,4 +24,5 @@ idea {
 
 ksp {
     arg("komapper.namingStrategy", "lower_snake_case")
+    arg("komapper.enableEntityMetamodelListing", "true")
 }

@@ -63,7 +63,7 @@ testing {
                 implementation(project)
                 implementation("org.testcontainers:mariadb")
                 implementation(project(":komapper-dialect-mariadb-r2dbc"))
-                runtimeOnly("org.mariadb.jdbc:mariadb-java-client:3.1.1")
+                runtimeOnly("org.mariadb.jdbc:mariadb-java-client:3.1.2")
             }
         }
 
@@ -101,7 +101,7 @@ testing {
                 implementation(project)
                 implementation("org.testcontainers:mssqlserver")
                 implementation(project(":komapper-dialect-sqlserver-r2dbc"))
-                runtimeOnly("com.microsoft.sqlserver:mssql-jdbc:11.2.0.jre11")
+                runtimeOnly("com.microsoft.sqlserver:mssql-jdbc:12.2.0.jre11")
             }
         }
     }
