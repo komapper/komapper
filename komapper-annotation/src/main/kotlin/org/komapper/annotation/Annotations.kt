@@ -252,6 +252,7 @@ annotation class KomapperEntityDef(
  * @property source the source name of an entity metamodel instance. The source is inferred from the annotated class.
  * @property target the target name of an entity metamodel instance. The target is inferred from the targetEntity property of association annotation.
  */
+@KomapperExperimentalAssociation
 @Retention(AnnotationRetention.SOURCE)
 annotation class KomapperLink(
     val source: String = SOURCE,
@@ -270,6 +271,7 @@ annotation class KomapperLink(
  * @property navigator the function name for navigation. The navigator is inferred from the [KomapperLink.target] value.
  * @property link the association link
  */
+@KomapperExperimentalAssociation
 @Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.SOURCE)
 @Repeatable
@@ -290,6 +292,7 @@ annotation class KomapperOneToOne(
  * @property navigator the function name for navigation. The navigator is inferred from the [KomapperLink.target] value.
  * @property link the association link
  */
+@KomapperExperimentalAssociation
 @Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.SOURCE)
 @Repeatable
@@ -310,6 +313,7 @@ annotation class KomapperOneToMany(
  * @property navigator the function name for navigation. The navigator is inferred from the [KomapperLink.target] value.
  * @property link the association link
  */
+@KomapperExperimentalAssociation
 @Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.SOURCE)
 @Repeatable
@@ -323,10 +327,14 @@ annotation class KomapperManyToOne(
     }
 }
 
-// TODO
+/**
+ * Indicates an aggregate root.
+ *
+ * @property navigator the function name for navigation. The navigator is inferred from the annotated class.
+ */
+@KomapperExperimentalAssociation
 @Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.SOURCE)
-@Repeatable
 annotation class KomapperAggregateRoot(
     val navigator: String = NAVIGATOR,
 ) {
@@ -334,3 +342,9 @@ annotation class KomapperAggregateRoot(
         const val NAVIGATOR: String = ""
     }
 }
+
+/**
+ * Indicates that the annotated element uses the experimental association API.
+ */
+@RequiresOptIn(level = RequiresOptIn.Level.WARNING)
+annotation class KomapperExperimentalAssociation

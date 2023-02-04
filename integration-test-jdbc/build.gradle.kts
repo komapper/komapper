@@ -46,6 +46,9 @@ tasks {
             testing.suites.named("sqlserver"),
         )
     }
+    withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+        kotlinOptions.freeCompilerArgs += listOf("-opt-in=org.komapper.annotation.KomapperExperimentalAssociation")
+    }
 }
 
 testing {

@@ -20,6 +20,7 @@ import org.komapper.processor.Symbols.EnumMappingException
 import org.komapper.processor.Symbols.IdContext
 import org.komapper.processor.Symbols.IdGenerator
 import org.komapper.processor.Symbols.Instant
+import org.komapper.processor.Symbols.KomapperExperimentalAssociation
 import org.komapper.processor.Symbols.KotlinInstant
 import org.komapper.processor.Symbols.KotlinLocalDateTime
 import org.komapper.processor.Symbols.LocalDateTime
@@ -647,6 +648,7 @@ internal class EntityMetamodelGenerator(
             }
             w.println(
                 """
+                @$KomapperExperimentalAssociation
                 fun $entityTypeName.`${association.navigator}`(
                     store: $EntityStore,
                     source: ${sourceEntity.packageName}.${sourceEntity.metamodelSimpleName} = ${sourceEntity.unitTypeName}.`${association.link.source}`,
@@ -660,6 +662,7 @@ internal class EntityMetamodelGenerator(
             if (config.enableEntityStoreContext) {
                 w.println(
                     """
+                @$KomapperExperimentalAssociation
                 context($EntityStoreContext)
                 fun $entityTypeName.`${association.navigator}`(
                     source: ${sourceEntity.packageName}.${sourceEntity.metamodelSimpleName} = ${sourceEntity.unitTypeName}.`${association.link.source}`,
@@ -679,6 +682,7 @@ internal class EntityMetamodelGenerator(
         val targetEntity = aggregateRoot.targetEntity
         w.println(
             """
+                @$KomapperExperimentalAssociation
                 fun $EntityStore.`${aggregateRoot.navigator}`(
                     target: ${targetEntity.packageName}.${targetEntity.metamodelSimpleName} = ${targetEntity.unitTypeName}.`${aggregateRoot.target}`,
                     ): Set<${targetEntity.typeName}> {
