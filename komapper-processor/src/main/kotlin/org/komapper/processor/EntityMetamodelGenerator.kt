@@ -412,7 +412,7 @@ internal class EntityMetamodelGenerator(
             }
         }
         val nameList = properties.joinToString(",\n        ", prefix = "\n        ")
-        w.println("    override fun properties(): List<$PropertyMetamodel<$entityTypeName, *, *>> = listOf($nameList)")
+        w.println("    override fun properties(): List<$PropertyMetamodel<$entityTypeName, *, *>> = listOf($nameList\n    )")
     }
 
     private fun extractId() {
@@ -600,7 +600,7 @@ internal class EntityMetamodelGenerator(
                 }
             }
         }
-        w.println("    override fun newEntity(m: Map<$PropertyMetamodel<*, *, *>, Any?>) = $entityTypeName($argList)")
+        w.println("    override fun newEntity(m: Map<$PropertyMetamodel<*, *, *>, Any?>) = $entityTypeName($argList\n    )")
     }
 
     private fun newMetamodel() {
