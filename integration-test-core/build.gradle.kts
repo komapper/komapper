@@ -25,10 +25,14 @@ idea {
 ksp {
     arg("komapper.namingStrategy", "lower_snake_case")
     arg("komapper.enableEntityMetamodelListing", "true")
+    arg("komapper.enableEntityStoreContext", "true")
 }
 
 tasks {
     withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
-        kotlinOptions.freeCompilerArgs += listOf("-opt-in=org.komapper.annotation.KomapperExperimentalAssociation")
+        kotlinOptions.freeCompilerArgs += listOf(
+            "-opt-in=org.komapper.annotation.KomapperExperimentalAssociation",
+            "-Xcontext-receivers",
+        )
     }
 }

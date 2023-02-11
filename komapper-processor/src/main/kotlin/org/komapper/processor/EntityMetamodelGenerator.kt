@@ -662,8 +662,8 @@ internal class EntityMetamodelGenerator(
             if (config.enableEntityStoreContext) {
                 w.println(
                     """
-                @$KomapperExperimentalAssociation
                 context($EntityStoreContext)
+                @$KomapperExperimentalAssociation
                 fun $entityTypeName.`${association.navigator}`(
                     source: ${sourceEntity.packageName}.${sourceEntity.metamodelSimpleName} = ${sourceEntity.unitTypeName}.`${association.link.source}`,
                     target: ${targetEntity.packageName}.${targetEntity.metamodelSimpleName} = ${targetEntity.unitTypeName}.`${association.link.target}`,

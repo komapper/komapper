@@ -10,6 +10,7 @@ import integration.core.person
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
+import org.komapper.core.dsl.query.asContext
 import org.komapper.jdbc.JdbcDatabase
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -330,6 +331,30 @@ class JdbcSelectJoinTest(private val db: JdbcDatabase) {
         }
         val departments = store[e].mapNotNull { it.department(store) }.distinct()
         assertEquals(3, departments.size)
+    }
+
+    @Test
+    fun navigation_manyToOne_oneToOne_using_context_receiver() {
+        val d = Meta.department
+        val e = Meta.employee
+        val a = Meta.address
+        val store = db.runQuery {
+            QueryDsl.from(d)
+                .innerJoin(e) {
+                    d.departmentId eq e.departmentId
+                }.innerJoin(a) {
+                    e.addressId eq a.addressId
+                }.includeAll()
+        }
+        with(store.asContext()) {
+            for (employee in store[e]) {
+                val department = employee.department()
+                val address = employee.address()
+                println("department=${department?.departmentName}, employee=${employee.employeeName}, address=${address?.street}")
+            }
+            val departments = store[e].mapNotNull { it.department() }.distinct()
+            assertEquals(3, departments.size)
+        }
     }
 
     @Test
