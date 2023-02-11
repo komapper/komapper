@@ -690,6 +690,7 @@ internal class EntityMetamodelGenerator(
         )
         w.println("    return this[target]")
         w.println("}")
+        w.println()
     }
 
     private fun factory() {
