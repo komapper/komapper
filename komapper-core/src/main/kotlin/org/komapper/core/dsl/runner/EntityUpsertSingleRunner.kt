@@ -7,14 +7,17 @@ import org.komapper.core.dsl.context.EntityUpsertContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 
 class EntityUpsertSingleRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
-    context: EntityUpsertContext<ENTITY, ID, META>,
+    private val context: EntityUpsertContext<ENTITY, ID, META>,
     private val entity: ENTITY,
 ) : Runner {
 
     private val support: EntityUpsertRunnerSupport<ENTITY, ID, META> =
         EntityUpsertRunnerSupport(context)
 
-    override fun check(config: DatabaseConfig) = Unit
+    override fun check(config: DatabaseConfig) {
+        checkSearchConditionInUpsertStatement(config, context)
+        checkConflictTargetInUpsertStatement(config, context.conflictTarget)
+    }
 
     override fun dryRun(config: DatabaseConfig): DryRunStatement {
         val statement = buildStatement(config, entity)

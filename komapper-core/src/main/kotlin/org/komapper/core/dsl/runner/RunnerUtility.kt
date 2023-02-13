@@ -44,6 +44,15 @@ internal fun checkAutoIncrementWhenInsertingMultipleRows(config: DatabaseConfig,
     }
 }
 
+internal fun checkConflictTargetInUpsertStatement(config: DatabaseConfig, conflictTarget: String?) {
+    val dialect = config.dialect
+    if (!config.dialect.supportsConflictTargetInUpsertStatement() && conflictTarget != null) {
+        throw UnsupportedOperationException(
+            "The dialect(driver=${dialect.driver}) does not support specifying a conflict target in upsert statements.",
+        )
+    }
+}
+
 internal fun checkBatchExecutionOfParameterizedStatement(config: DatabaseConfig) {
     val dialect = config.dialect
     if (!config.dialect.supportsBatchExecutionOfParameterizedStatement()) {
@@ -87,5 +96,17 @@ internal fun checkOptimisticLockOfBatchExecution(config: DatabaseConfig, options
             "The dialect(driver=${dialect.driver}) does not support optimistic lock of batch execution. " +
                 "You can avoid this exception by setting `OptimisticLockOptions.disableOptimisticLock=true` or `OptimisticLockOptions.suppressOptimisticLockException=true`",
         )
+    }
+}
+
+internal fun checkSearchConditionInUpsertStatement(config: DatabaseConfig, whereProvider: WhereProvider) {
+    val dialect = config.dialect
+    if (!config.dialect.supportsSearchConditionInUpsertStatement()) {
+        val criteria = whereProvider.getWhereCriteria()
+        if (criteria.isNotEmpty()) {
+            throw UnsupportedOperationException(
+                "The dialect(driver=${dialect.driver}) does not support specifying search conditions in upsert statements.",
+            )
+        }
     }
 }

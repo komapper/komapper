@@ -14,7 +14,10 @@ class EntityUpsertMultipleRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<
     private val support: EntityUpsertRunnerSupport<ENTITY, ID, META> =
         EntityUpsertRunnerSupport(context)
 
-    override fun check(config: DatabaseConfig) = Unit
+    override fun check(config: DatabaseConfig) {
+        checkSearchConditionInUpsertStatement(config, context)
+        checkConflictTargetInUpsertStatement(config, context.conflictTarget)
+    }
 
     override fun dryRun(config: DatabaseConfig): DryRunStatement {
         if (entities.isEmpty()) return DryRunStatement.EMPTY

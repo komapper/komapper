@@ -44,6 +44,8 @@ interface MariaDbDialect : Dialect {
 
     override fun supportsAliasForDeleteStatement() = false
 
+    override fun supportsConflictTargetInUpsertStatement(): Boolean = false
+
     override fun supportsGeneratedKeysReturningWhenInsertingMultipleRows(): Boolean = false
 
     override fun supportsLockOptionNowait(): Boolean = true
@@ -55,4 +57,6 @@ interface MariaDbDialect : Dialect {
     override fun supportsNullOrdering(): Boolean = false
 
     override fun supportsOptimisticLockOfBatchExecution(): Boolean = false
+
+    override fun supportsSearchConditionInUpsertStatement(): Boolean = false
 }

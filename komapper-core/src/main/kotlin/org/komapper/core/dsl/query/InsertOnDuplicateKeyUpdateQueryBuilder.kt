@@ -5,6 +5,7 @@ import org.komapper.core.dsl.QueryDsl
 import org.komapper.core.dsl.context.EntityUpsertContext
 import org.komapper.core.dsl.expression.AssignmentDeclaration
 import org.komapper.core.dsl.expression.ColumnExpression
+import org.komapper.core.dsl.expression.WhereDeclaration
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.operator.plus
 import org.komapper.core.dsl.scope.AssignmentScope
@@ -25,6 +26,14 @@ interface InsertOnDuplicateKeyUpdateQueryBuilder<ENTITY : Any, ID : Any, META : 
      * @return the builder
      */
     fun set(declaration: AssignmentScope<ENTITY>.(META) -> Unit): InsertOnDuplicateKeyUpdateQueryBuilder<ENTITY, ID, META>
+
+    /**
+     * Sets search conditions.
+     *
+     * @param declaration the where declaration
+     * @return the builder
+     * */
+    fun where(declaration: WhereDeclaration): InsertOnDuplicateKeyUpdateQueryBuilder<ENTITY, ID, META>
 
     /**
      * Builds a query to insert or update a single entity.
@@ -83,6 +92,11 @@ internal data class InsertOnDuplicateKeyUpdateQueryBuilderImpl<ENTITY : Any, ID 
 
     override fun set(declaration: AssignmentDeclaration<ENTITY, META>): InsertOnDuplicateKeyUpdateQueryBuilder<ENTITY, ID, META> {
         val newContext = context.copy(set = context.set + declaration)
+        return copy(context = newContext)
+    }
+
+    override fun where(declaration: WhereDeclaration): InsertOnDuplicateKeyUpdateQueryBuilder<ENTITY, ID, META> {
+        val newContext = context.copy(where = context.where + declaration)
         return copy(context = newContext)
     }
 

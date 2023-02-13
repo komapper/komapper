@@ -47,6 +47,7 @@ import java.time.ZoneId
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import kotlin.test.assertNotEquals
 import kotlin.test.assertNotNull
 
 @ExtendWith(JdbcEnv::class)
@@ -384,6 +385,80 @@ class JdbcInsertSingleTest(private val db: JdbcDatabase) {
         assertEquals("PLANNING2", found.departmentName)
         assertEquals("NEW YORK_TOKYO", found.location)
         assertEquals(1, found.version)
+    }
+
+    @Test
+    @Run(onlyIf = [Dbms.H2, Dbms.ORACLE, Dbms.POSTGRESQL, Dbms.SQLSERVER])
+    fun onDuplicateKeyUpdateWithKey_update_set_where_success() {
+        val d = Meta.department
+        val department = Department(5, 10, "PLANNING", "TOKYO", 10)
+        val query = QueryDsl.insert(d)
+            .onDuplicateKeyUpdate(d.departmentNo)
+            .set { excluded ->
+                d.departmentName eq "PLANNING2"
+                d.location eq concat(d.location, concat("_", excluded.location))
+            }.where {
+                d.location eq "NEW YORK"
+            }.single(department)
+        db.runQuery { query }
+        val found = db.runQuery { QueryDsl.from(d).where { d.departmentNo eq 10 }.first() }
+        assertEquals(1, found.departmentId)
+        assertEquals("PLANNING2", found.departmentName)
+        assertEquals("NEW YORK_TOKYO", found.location)
+        assertEquals(1, found.version)
+    }
+
+    @Test
+    @Run(onlyIf = [Dbms.H2, Dbms.ORACLE, Dbms.POSTGRESQL, Dbms.SQLSERVER])
+    fun onDuplicateKeyUpdateWithKey_update_set_where_fail() {
+        val d = Meta.department
+        val department = Department(5, 10, "PLANNING", "TOKYO", 10)
+        val query = QueryDsl.insert(d)
+            .onDuplicateKeyUpdate(d.departmentNo)
+            .set { excluded ->
+                d.departmentName eq "PLANNING2"
+                d.location eq concat(d.location, concat("_", excluded.location))
+            }.where {
+                d.location eq "KYOTO"
+            }.single(department)
+        db.runQuery { query }
+        val found = db.runQuery { QueryDsl.from(d).where { d.departmentNo eq 10 }.first() }
+        assertEquals(1, found.departmentId)
+        assertNotEquals("PLANNING2", found.departmentName)
+        assertNotEquals("NEW YORK_TOKYO", found.location)
+        assertEquals(1, found.version)
+    }
+
+    @Test
+    @Run(onlyIf = [Dbms.MARIADB, Dbms.MYSQL])
+    fun onDuplicateKeyUpdateWithKey_update_set_where_unsupported() {
+        val d = Meta.department
+        val department = Department(5, 10, "PLANNING", "TOKYO", 10)
+        val query = QueryDsl.insert(d)
+            .onDuplicateKeyUpdate(d.departmentNo)
+            .where {
+                d.location eq "NEW YORK"
+            }.single(department)
+        val ex = assertFailsWith<UnsupportedOperationException> {
+            db.runQuery(query)
+            Unit
+        }
+        println(ex)
+    }
+
+    @Test
+    @Run(unless = [Dbms.POSTGRESQL])
+    fun dangerouslyOnDuplicateKeyUpdate() {
+        val d = Meta.department
+        val department = Department(5, 10, "PLANNING", "TOKYO", 10)
+        val query = QueryDsl.insert(d)
+            .dangerouslyOnDuplicateKeyUpdate("test")
+            .single(department)
+        val ex = assertFailsWith<UnsupportedOperationException> {
+            db.runQuery(query)
+            Unit
+        }
+        println(ex)
     }
 
     @Test

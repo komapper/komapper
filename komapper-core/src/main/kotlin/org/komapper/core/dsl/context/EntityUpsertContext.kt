@@ -3,8 +3,10 @@ package org.komapper.core.dsl.context
 import org.komapper.core.ThreadSafe
 import org.komapper.core.dsl.expression.AssignmentDeclaration
 import org.komapper.core.dsl.expression.TableExpression
+import org.komapper.core.dsl.expression.WhereDeclaration
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.metamodel.PropertyMetamodel
+import org.komapper.core.dsl.options.WhereOptions
 
 @ThreadSafe
 data class EntityUpsertContext<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
@@ -19,12 +21,21 @@ data class EntityUpsertContext<ENTITY : Any, ID : Any, META : EntityMetamodel<EN
         declaration = {},
     ),
     val keys: List<PropertyMetamodel<ENTITY, *, *>> = emptyList(),
+    val conflictTarget: String? = null,
     val duplicateKeyType: DuplicateKeyType,
     val set: AssignmentDeclaration<ENTITY, META> = {},
-) : TablesProvider {
+    val where: WhereDeclaration = {},
+) : WhereProvider, TablesProvider {
+
+    override val options: WhereOptions
+        get() = insertContext.options
 
     override fun getTables(): Set<TableExpression<*>> {
         return setOf(target)
+    }
+
+    override fun getCompositeWhere(): WhereDeclaration {
+        return where
     }
 }
 

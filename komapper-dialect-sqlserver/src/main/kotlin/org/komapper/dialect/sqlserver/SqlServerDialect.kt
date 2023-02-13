@@ -51,6 +51,8 @@ interface SqlServerDialect : Dialect {
 
     override fun getDefaultLengthForSubstringFunction(): Int? = Int.MAX_VALUE
 
+    override fun supportsConflictTargetInUpsertStatement(): Boolean = false
+
     override fun supportsLimitOffsetWithoutOrderByClause(): Boolean = false
 
     override fun supportsAliasForDeleteStatement(): Boolean = false
@@ -70,4 +72,6 @@ interface SqlServerDialect : Dialect {
     override fun supportsTableHint(): Boolean = true
 
     override fun supportsLockOptionNowait(): Boolean = true
+
+    override fun supportsSearchConditionInUpsertStatement(): Boolean = true
 }

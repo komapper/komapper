@@ -7,9 +7,11 @@ import org.komapper.core.dsl.builder.AliasManager
 import org.komapper.core.dsl.builder.BuilderSupport
 import org.komapper.core.dsl.builder.EntityUpsertStatementBuilder
 import org.komapper.core.dsl.builder.TableNameType
+import org.komapper.core.dsl.builder.getWhereCriteria
 import org.komapper.core.dsl.context.DuplicateKeyType
 import org.komapper.core.dsl.context.EntityUpsertContext
 import org.komapper.core.dsl.expression.ColumnExpression
+import org.komapper.core.dsl.expression.Criterion
 import org.komapper.core.dsl.expression.Operand
 import org.komapper.core.dsl.expression.TableExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
@@ -26,7 +28,7 @@ internal class OracleEntityUpsertStatementBuilder<ENTITY : Any, ID : Any, META :
     private val excluded = context.excluded
     private val aliasManager = UpsertAliasManager(target, excluded)
     private val buf = StatementBuffer()
-    private val support = BuilderSupport(dialect, aliasManager, buf)
+    private val support = BuilderSupport(dialect, aliasManager, buf, context.insertContext.options.escapeSequence)
     private val sourceStatementBuilder = SourceStatementBuilder(dialect, context, entities)
 
     override fun build(assignments: List<Pair<PropertyMetamodel<ENTITY, *, *>, Operand>>): Statement {
@@ -57,6 +59,15 @@ internal class OracleEntityUpsertStatementBuilder<ENTITY : Any, ID : Any, META :
                 buf.append(", ")
             }
             buf.cutBack(2)
+            val criteria = context.getWhereCriteria()
+            if (criteria.isNotEmpty()) {
+                buf.append(" where ")
+                for ((index, criterion) in criteria.withIndex()) {
+                    criterion(index, criterion)
+                    buf.append(" and ")
+                }
+                buf.cutBack(5)
+            }
         }
         buf.append(" when not matched then insert (")
         for (p in target.getNonAutoIncrementProperties()) {
@@ -89,6 +100,10 @@ internal class OracleEntityUpsertStatementBuilder<ENTITY : Any, ID : Any, META :
 
     private fun operand(operand: Operand) {
         support.visitOperand(operand)
+    }
+
+    private fun criterion(index: Int, c: Criterion) {
+        support.visitCriterion(index, c)
     }
 
     private class UpsertAliasManager(

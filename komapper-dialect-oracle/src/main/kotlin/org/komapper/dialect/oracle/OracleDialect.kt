@@ -59,6 +59,8 @@ interface OracleDialect : Dialect {
 
     override fun supportsAutoIncrementWhenInsertingMultipleRows(): Boolean = false
 
+    override fun supportsConflictTargetInUpsertStatement(): Boolean = false
+
     override fun supportsCreateIfNotExists(): Boolean = false
 
     override fun supportsDropIfExists(): Boolean = false
@@ -78,4 +80,6 @@ interface OracleDialect : Dialect {
     override fun supportsSetOperationExcept(): Boolean = false
 
     override fun supportsSetOperationMinus(): Boolean = true
+
+    override fun supportsSearchConditionInUpsertStatement(): Boolean = true
 }

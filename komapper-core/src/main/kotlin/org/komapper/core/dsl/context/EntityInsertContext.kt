@@ -30,6 +30,18 @@ data class EntityInsertContext<ENTITY : Any, ID : Any, META : EntityMetamodel<EN
         )
     }
 
+    fun asEntityUpsertContext(
+        conflictTarget: String,
+        duplicateKeyType: DuplicateKeyType,
+    ): EntityUpsertContext<ENTITY, ID, META> {
+        return EntityUpsertContext(
+            insertContext = this,
+            target = target,
+            conflictTarget = conflictTarget,
+            duplicateKeyType = duplicateKeyType,
+        )
+    }
+
     fun asRelationInsertValuesContext(declaration: AssignmentDeclaration<ENTITY, META>): RelationInsertValuesContext<ENTITY, ID, META> {
         return RelationInsertValuesContext(
             target = target,

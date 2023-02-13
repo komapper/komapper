@@ -7,7 +7,7 @@ import org.komapper.core.dsl.context.EntityUpsertContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 
 class EntityUpsertBatchRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
-    context: EntityUpsertContext<ENTITY, ID, META>,
+    private val context: EntityUpsertContext<ENTITY, ID, META>,
     private val entities: List<ENTITY>,
 ) : Runner {
 
@@ -16,6 +16,8 @@ class EntityUpsertBatchRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENT
 
     override fun check(config: DatabaseConfig) {
         checkBatchExecutionOfParameterizedStatement(config)
+        checkSearchConditionInUpsertStatement(config, context)
+        checkConflictTargetInUpsertStatement(config, context.conflictTarget)
     }
 
     override fun dryRun(config: DatabaseConfig): DryRunStatement {
