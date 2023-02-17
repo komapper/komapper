@@ -1,5 +1,6 @@
 package org.komapper.tx.context.r2dbc
 
+import io.r2dbc.spi.ConnectionFactory
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.reactive.collect
@@ -106,6 +107,9 @@ internal class ContextualR2dbcDatabaseImpl(
     override suspend fun <T> runQuery(query: Query<T>): T {
         val runtimeConfig = object : R2dbcDatabaseConfig by config {
             override val session: R2dbcSession = object : R2dbcSession {
+                override val connectionFactory: ConnectionFactory
+                    get() = config.session.connectionFactory
+
                 override val coroutineTransactionOperator: CoroutineTransactionOperator
                     get() = throw UnsupportedOperationException()
 
