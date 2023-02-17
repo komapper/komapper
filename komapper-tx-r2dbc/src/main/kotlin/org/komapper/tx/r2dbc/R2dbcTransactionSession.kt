@@ -14,7 +14,7 @@ import org.komapper.tx.core.TransactionProperty
  * Represents a transactional session for R2DBC.
  */
 class R2dbcTransactionSession(
-    connectionFactory: ConnectionFactory,
+    override val connectionFactory: ConnectionFactory,
     loggerFacade: LoggerFacade,
     transactionProperty: TransactionProperty = EmptyTransactionProperty,
 ) : R2dbcSession {

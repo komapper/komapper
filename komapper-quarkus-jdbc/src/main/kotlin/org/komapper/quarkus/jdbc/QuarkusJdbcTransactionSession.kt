@@ -8,7 +8,7 @@ import javax.transaction.TransactionManager
 
 class QuarkusJdbcTransactionSession(
     transactionManager: TransactionManager,
-    private val dataSource: DataSource
+    override val dataSource: DataSource
 ) : JdbcSession {
     override val transactionOperator: TransactionOperator = QuarkusJdbcTransactionOperator(transactionManager)
 
