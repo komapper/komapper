@@ -40,6 +40,8 @@ tasks {
     register("checkAll") {
         dependsOn(
             testing.suites.named("h2"),
+            testing.suites.named("mariadb"),
+            testing.suites.named("mysql"),
             testing.suites.named("oracle"),
             testing.suites.named("postgresql"),
             testing.suites.named("sqlserver"),
