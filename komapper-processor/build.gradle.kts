@@ -9,3 +9,11 @@ dependencies {
     testImplementation("com.google.devtools.ksp:symbol-processing:$kspFullVersion")
     testImplementation("com.github.tschuchortdev:kotlin-compile-testing-ksp:1.4.9")
 }
+
+tasks {
+    withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+        kotlinOptions.freeCompilerArgs += listOf(
+            "-opt-in=org.komapper.annotation.KomapperExperimentalAssociation",
+        )
+    }
+}
