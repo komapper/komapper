@@ -58,7 +58,7 @@ Add the following code to the Gradle build script (gradle.build.kts).
 ```kotlin
 plugins {
     kotlin("jvm") version "1.8.10"
-    id("com.google.devtools.ksp") version "1.0.9"
+    id("com.google.devtools.ksp") version "1.8.10-1.0.9"
 }
 
 val komapperVersion = "1.7.1"
@@ -88,12 +88,17 @@ To get complete code, go to our [example repository](https://github.com/komapper
 ```kotlin
 @KomapperEntity
 data class Address(
-    @KomapperId @KomapperAutoIncrement @KomapperColumn(name = "ADDRESS_ID")
+    @KomapperId
+    @KomapperAutoIncrement
+    @KomapperColumn(name = "ADDRESS_ID")
     val id: Int = 0,
     val street: String,
-    @KomapperVersion val version: Int = 0,
-    @KomapperCreatedAt val createdAt: LocalDateTime? = null,
-    @KomapperUpdatedAt val updatedAt: LocalDateTime? = null,
+    @KomapperVersion
+    val version: Int = 0,
+    @KomapperCreatedAt
+    val createdAt: LocalDateTime? = null,
+    @KomapperUpdatedAt
+    val updatedAt: LocalDateTime? = null,
 )
 ```
 
