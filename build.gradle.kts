@@ -210,10 +210,6 @@ rootProject.apply {
                 val releaseVersion = project.properties["release.releaseVersion"]?.toString()
                 checkNotNull(releaseVersion) { "release.releaseVersion is not set" }
                 replaceVersion(releaseVersion, """val komapperVersion = """")
-                val kotlinVersion: String by project
-                replaceVersion(kotlinVersion, """kotlin\("jvm"\) version """")
-                val kspVersion: String by project
-                replaceVersion(kspVersion, """id\("com.google.devtools.ksp"\) version """")
             }
         }
 
