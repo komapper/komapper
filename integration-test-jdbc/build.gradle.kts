@@ -59,7 +59,8 @@ testing {
         register("h2", JvmTestSuite::class) {
             setup(name)
             dependencies {
-                implementation(project)
+                implementation(project())
+                implementation
                 runtimeOnly(project(":komapper-dialect-h2-jdbc"))
             }
         }
@@ -67,7 +68,7 @@ testing {
         register("mariadb", JvmTestSuite::class) {
             setup(name)
             dependencies {
-                implementation(project)
+                implementation(project())
                 runtimeOnly("org.testcontainers:mariadb")
                 runtimeOnly(project(":komapper-dialect-mariadb-jdbc"))
             }
@@ -76,7 +77,7 @@ testing {
         register("mysql", JvmTestSuite::class) {
             setup(name)
             dependencies {
-                implementation(project)
+                implementation(project())
                 runtimeOnly("org.testcontainers:mysql")
                 runtimeOnly(project(":komapper-dialect-mysql-jdbc"))
             }
@@ -85,7 +86,7 @@ testing {
         register("oracle", JvmTestSuite::class) {
             setup(name)
             dependencies {
-                implementation(project)
+                implementation(project())
                 runtimeOnly("org.testcontainers:oracle-xe")
                 runtimeOnly(project(":komapper-dialect-oracle-jdbc"))
             }
@@ -94,7 +95,7 @@ testing {
         register("postgresql", JvmTestSuite::class) {
             setup(name)
             dependencies {
-                implementation(project)
+                implementation.add(project())
                 runtimeOnly("org.testcontainers:postgresql")
                 implementation(project(":komapper-dialect-postgresql-jdbc"))
             }
@@ -103,7 +104,7 @@ testing {
         register("sqlserver", JvmTestSuite::class) {
             setup(name)
             dependencies {
-                implementation(project)
+                implementation(project())
                 runtimeOnly("org.testcontainers:mssqlserver")
                 runtimeOnly(project(":komapper-dialect-sqlserver-jdbc"))
             }
@@ -112,7 +113,6 @@ testing {
 }
 
 fun JvmTestSuite.setup(driver: String) {
-    useJUnitJupiter()
     sources {
         java {
             setSrcDirs(listOf("src/test/kotlin", "build/generated/ksp/$driver/kotlin"))

@@ -52,7 +52,7 @@ testing {
         register("h2", JvmTestSuite::class) {
             setup(name)
             dependencies {
-                implementation(project)
+                implementation(project())
                 runtimeOnly(project(":komapper-dialect-h2-r2dbc"))
             }
         }
@@ -60,7 +60,7 @@ testing {
         register("mariadb", JvmTestSuite::class) {
             setup(name)
             dependencies {
-                implementation(project)
+                implementation(project())
                 implementation("org.testcontainers:mariadb")
                 implementation(project(":komapper-dialect-mariadb-r2dbc"))
                 runtimeOnly("org.mariadb.jdbc:mariadb-java-client:3.1.2")
@@ -70,7 +70,7 @@ testing {
         register("mysql", JvmTestSuite::class) {
             setup(name)
             dependencies {
-                implementation(project)
+                implementation(project())
                 implementation("org.testcontainers:mysql")
                 implementation(project(":komapper-dialect-mysql-r2dbc"))
                 runtimeOnly("mysql:mysql-connector-java:8.0.32")
@@ -80,7 +80,7 @@ testing {
         register("oracle", JvmTestSuite::class) {
             setup(name)
             dependencies {
-                implementation(project)
+                implementation(project())
                 implementation("org.testcontainers:oracle-xe")
                 implementation(project(":komapper-dialect-oracle-r2dbc"))
             }
@@ -89,7 +89,7 @@ testing {
         register("postgresql", JvmTestSuite::class) {
             setup(name)
             dependencies {
-                implementation(project)
+                implementation(project())
                 implementation("org.testcontainers:postgresql")
                 implementation(project(":komapper-dialect-postgresql-r2dbc"))
             }
@@ -98,7 +98,7 @@ testing {
         register("sqlserver", JvmTestSuite::class) {
             setup(name)
             dependencies {
-                implementation(project)
+                implementation(project())
                 implementation("org.testcontainers:mssqlserver")
                 implementation(project(":komapper-dialect-sqlserver-r2dbc"))
                 runtimeOnly("com.microsoft.sqlserver:mssql-jdbc:12.2.0.jre11")
@@ -109,10 +109,7 @@ testing {
 
 fun JvmTestSuite.setup(
     driver: String,
-    includeTags: Array<String> = emptyArray(),
-    excludeTags: Array<String> = emptyArray(),
 ) {
-    useJUnitJupiter()
     sources {
         java {
             setSrcDirs(listOf("src/test/kotlin", "build/generated/ksp/$driver/kotlin"))
@@ -128,10 +125,6 @@ fun JvmTestSuite.setup(
                 val url = project.property(urlKey) ?: throw GradleException("The $urlKey property is not found.")
                 systemProperty("driver", driver)
                 systemProperty("url", url)
-                useJUnitPlatform {
-                    includeTags(*includeTags)
-                    excludeTags(*excludeTags)
-                }
             }
         }
     }
