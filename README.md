@@ -88,12 +88,17 @@ To get complete code, go to our [example repository](https://github.com/komapper
 ```kotlin
 @KomapperEntity
 data class Address(
-    @KomapperId @KomapperAutoIncrement @KomapperColumn(name = "ADDRESS_ID")
+    @KomapperId
+    @KomapperAutoIncrement
+    @KomapperColumn(name = "ADDRESS_ID")
     val id: Int = 0,
     val street: String,
-    @KomapperVersion val version: Int = 0,
-    @KomapperCreatedAt val createdAt: LocalDateTime? = null,
-    @KomapperUpdatedAt val updatedAt: LocalDateTime? = null,
+    @KomapperVersion
+    val version: Int = 0,
+    @KomapperCreatedAt
+    val createdAt: LocalDateTime? = null,
+    @KomapperUpdatedAt
+    val updatedAt: LocalDateTime? = null,
 )
 ```
 
