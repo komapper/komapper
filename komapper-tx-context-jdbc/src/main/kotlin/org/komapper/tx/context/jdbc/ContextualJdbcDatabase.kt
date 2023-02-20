@@ -14,6 +14,7 @@ import org.komapper.tx.core.TransactionAttribute
 import org.komapper.tx.core.TransactionOperator
 import org.komapper.tx.core.TransactionProperty
 import java.sql.Connection
+import javax.sql.DataSource
 
 interface ContextualJdbcDatabase : Database {
 
@@ -69,6 +70,9 @@ internal class ContextualJdbcDatabaseImpl(
     override fun <T> runQuery(query: Query<T>): T {
         val runtimeConfig = object : JdbcDatabaseConfig by config {
             override val session: JdbcSession = object : JdbcSession {
+                override val dataSource: DataSource
+                    get() = config.session.dataSource
+
                 override val transactionOperator: TransactionOperator
                     get() = throw UnsupportedOperationException()
 

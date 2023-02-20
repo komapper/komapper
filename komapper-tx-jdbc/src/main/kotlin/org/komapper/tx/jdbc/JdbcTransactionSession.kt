@@ -12,7 +12,7 @@ import javax.sql.DataSource
  * Represents a transactional session for JDBC.
  */
 class JdbcTransactionSession(
-    dataSource: DataSource,
+    override val dataSource: DataSource,
     loggerFacade: LoggerFacade,
     transactionProperty: TransactionProperty = EmptyTransactionProperty,
 ) : JdbcSession {
