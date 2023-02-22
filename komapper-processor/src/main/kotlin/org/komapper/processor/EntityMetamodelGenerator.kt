@@ -691,6 +691,19 @@ internal class EntityMetamodelGenerator(
         w.println("    return this[target]")
         w.println("}")
         w.println()
+        if (config.enableEntityStoreContext) {
+            w.println(
+                """
+                @$KomapperExperimentalAssociation
+                fun $EntityStoreContext.`${aggregateRoot.navigator}`(
+                    target: ${targetEntity.packageName}.${targetEntity.metamodelSimpleName} = ${targetEntity.unitTypeName}.`${aggregateRoot.target}`,
+                    ): Set<${targetEntity.typeName}> {
+                """.trimIndent(),
+            )
+            w.println("    return store[target]")
+            w.println("}")
+            w.println()
+        }
     }
 
     private fun factory() {

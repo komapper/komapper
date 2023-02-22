@@ -334,7 +334,7 @@ class JdbcSelectJoinTest(private val db: JdbcDatabase) {
     }
 
     @Test
-    fun navigation_manyToOne_oneToOne_using_context_receiver() {
+    fun navigation_using_context_receiver() {
         val d = Meta.department
         val e = Meta.employee
         val a = Meta.address
@@ -347,13 +347,13 @@ class JdbcSelectJoinTest(private val db: JdbcDatabase) {
                 }.includeAll()
         }
         with(store.asContext()) {
-            for (employee in store[e]) {
-                val department = employee.department()
-                val address = employee.address()
-                println("department=${department?.departmentName}, employee=${employee.employeeName}, address=${address?.street}")
+            assertEquals(3, departments().size)
+            for (department in departments()) {
+                for (employee in department.employees()) {
+                    val address = employee.address()
+                    println("department=${department.departmentName}, employee=${employee.employeeName}, address=${address?.street}")
+                }
             }
-            val departments = store[e].mapNotNull { it.department() }.distinct()
-            assertEquals(3, departments.size)
         }
     }
 
