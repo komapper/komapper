@@ -173,3 +173,10 @@ See [DESIGN_DOC](DESIGN_DOC.md) for the design policy of this project.
 | 1.3.x, 1.4.x, 1.5.x, 1.6.x, 1.7.x | 1.8.0-1.0.8, 1.8.0-1.0.9, 1.8.10-1.0.9                                                                        | 11              | 6.8.3              |
 
 Compatibility testing is performed in the [komapper/compatibility-test](https://github.com/komapper/compatibility-test/) repository.
+
+## Backers & Sponsors
+
+If you use Komapper in your project or enterprise and would like to support ongoing development, please consider becoming a backer or a sponsor.
+Sponsor logos will show up here with a link to your website.
+
+[[Become a backer or a sponsor](https://opencollective.com/komapper#category-CONTRIBUTE)]
