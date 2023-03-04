@@ -1,5 +1,6 @@
 package org.komapper.core.dsl
 
+import org.intellij.lang.annotations.Language
 import org.komapper.core.ThreadSafe
 import org.komapper.core.dsl.context.EntityDeleteContext
 import org.komapper.core.dsl.context.EntityInsertContext
@@ -101,7 +102,7 @@ object QueryDsl {
      * @param sql the sql template
      * @return the builder
      */
-    fun fromTemplate(sql: String): TemplateSelectQueryBuilder {
+    fun fromTemplate(@Language("sql") sql: String): TemplateSelectQueryBuilder {
         return TemplateSelectQueryBuilderImpl(TemplateSelectContext(sql))
     }
 
@@ -111,7 +112,7 @@ object QueryDsl {
      * @param sql the sql template
      * @return the query
      */
-    fun executeTemplate(sql: String): TemplateExecuteQuery {
+    fun executeTemplate(@Language("sql") sql: String): TemplateExecuteQuery {
         return TemplateExecuteQueryImpl(TemplateExecuteContext(sql))
     }
 
@@ -120,7 +121,7 @@ object QueryDsl {
      *
      * @param sql the script to execute
      */
-    fun executeScript(sql: String): ScriptExecuteQuery {
+    fun executeScript(@Language("sql") sql: String): ScriptExecuteQuery {
         return ScriptExecuteQueryImpl(ScriptContext(sql))
     }
 
