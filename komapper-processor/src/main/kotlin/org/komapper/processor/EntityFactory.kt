@@ -355,7 +355,7 @@ internal class EntityFactory(
     }
 
     private fun checkEnumAnnotation(property: LeafProperty) {
-        if (property.declaration.hasAnnotation(KomapperEnum::class)) {
+        if (property.parameter.hasAnnotation(KomapperEnum::class)) {
             report("@KomapperEnum is valid only for enum property types.", property.node)
         }
     }
