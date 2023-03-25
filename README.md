@@ -9,8 +9,7 @@ Komapper: Kotlin ORM for JDBC and R2DBC
 Komapper is an ORM library for server-side Kotlin.
 
 For more documentation, go to our site:  
-- https://www.komapper.org/docs/ (English version)
-- https://www.komapper.org/ja/docs/ (Japanese version)
+- https://www.komapper.org/docs/
 
 ## Features
 
@@ -76,8 +75,7 @@ dependencies {
 
 See also Quickstart for more details:
 
-- https://www.komapper.org/docs/quickstart/ (English version)
-- https://www.komapper.org/ja/docs/quickstart/ (Japanese version)
+- https://www.komapper.org/docs/quickstart/
 
 ## Sample code
 
