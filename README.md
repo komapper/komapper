@@ -9,8 +9,7 @@ Komapper: Kotlin ORM for JDBC and R2DBC
 Komapper is an ORM library for server-side Kotlin.
 
 For more documentation, go to our site:  
-- https://www.komapper.org/docs/ (English version)
-- https://www.komapper.org/ja/docs/ (Japanese version)
+- https://www.komapper.org/docs/
 
 ## Features
 
@@ -76,8 +75,7 @@ dependencies {
 
 See also Quickstart for more details:
 
-- https://www.komapper.org/docs/quickstart/ (English version)
-- https://www.komapper.org/ja/docs/quickstart/ (Japanese version)
+- https://www.komapper.org/docs/quickstart/
 
 ## Sample code
 
@@ -167,10 +165,10 @@ See [DESIGN_DOC](DESIGN_DOC.md) for the design policy of this project.
 
 ## Compatibility Matrix
 
-| Komapper version                  | Kotlin and KSP version                                                                                        | JRE min version | Gradle min version |
-|:----------------------------------|:--------------------------------------------------------------------------------------------------------------|:----------------|--------------------|
-| 1.3.x, 1.4.x, 1.5.x, 1.6.x, 1.7.x | 1.6.21-1.0.6, 1.7.0-1.0.6, 1.7.10-1.0.6, 1.7.20-1.0.6, 1.7.20-1.0.7, 1.7.20-1.0.8, 1.7.21-1.0.8, 1.7.22-1.0.8 | 11              | 6.7.1              |
-| 1.3.x, 1.4.x, 1.5.x, 1.6.x, 1.7.x | 1.8.0-1.0.8, 1.8.0-1.0.9, 1.8.10-1.0.9                                                                        | 11              | 6.8.3              |
+| Komapper version | Kotlin and KSP version                                                                                        | JRE min version | Gradle min version |
+|:-----------------|:--------------------------------------------------------------------------------------------------------------|:----------------|--------------------|
+| 1.3.x - 1.8.x    | 1.6.21-1.0.6, 1.7.0-1.0.6, 1.7.10-1.0.6, 1.7.20-1.0.6, 1.7.20-1.0.7, 1.7.20-1.0.8, 1.7.21-1.0.8, 1.7.22-1.0.8 | 11              | 6.7.1              |
+| 1.3.x - 1.8.x    | 1.8.0-1.0.8, 1.8.0-1.0.9, 1.8.10-1.0.9                                                                        | 11              | 6.8.3              |
 
 Compatibility testing is performed in the [komapper/compatibility-test](https://github.com/komapper/compatibility-test/) repository.
 
