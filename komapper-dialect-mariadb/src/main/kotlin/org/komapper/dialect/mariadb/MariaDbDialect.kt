@@ -26,6 +26,8 @@ interface MariaDbDialect : Dialect {
         return MariaDbOffsetLimitStatementBuilder(dialect, offset, limit)
     }
 
+    override fun getRandomFunction(): String = "rand"
+
     override fun getSequenceSql(sequenceName: String): String {
         return "select next value for $sequenceName"
     }

@@ -114,6 +114,13 @@ interface Dialect {
     }
 
     /**
+     * Returns the RANDOM function.
+     *
+     * @return the RANDOM function
+     */
+    fun getRandomFunction(): String = "random"
+
+    /**
      * Returns the SQL string for retrieving a new sequence number.
      *
      * @param sequenceName the sequence name

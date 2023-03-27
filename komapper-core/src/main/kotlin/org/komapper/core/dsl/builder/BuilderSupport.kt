@@ -14,6 +14,7 @@ import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.expression.Criterion
 import org.komapper.core.dsl.expression.EscapeExpression
 import org.komapper.core.dsl.expression.LiteralExpression
+import org.komapper.core.dsl.expression.MathematicalFunction
 import org.komapper.core.dsl.expression.Operand
 import org.komapper.core.dsl.expression.PropertyExpression
 import org.komapper.core.dsl.expression.ScalarExpression
@@ -66,6 +67,9 @@ class BuilderSupport(
             }
             is LiteralExpression<*> -> {
                 visitLiteralExpression(expression)
+            }
+            is MathematicalFunction<*, *> -> {
+                visitMathematicalFunction(expression)
             }
             is ScalarExpression<*, *> -> {
                 visitScalarExpression(expression)
@@ -156,6 +160,16 @@ class BuilderSupport(
     private fun visitLiteralExpression(expression: LiteralExpression<*>) {
         val string = dialect.formatValue(expression.value, expression.interiorClass, false)
         buf.append(string)
+    }
+
+    private fun visitMathematicalFunction(function: MathematicalFunction<*, *>) {
+        @Suppress("USELESS_IS_CHECK")
+        when (function) {
+            is MathematicalFunction<*, *> -> {
+                val random = dialect.getRandomFunction()
+                buf.append("$random()")
+            }
+        }
     }
 
     private fun visitScalarExpression(expression: ScalarExpression<*, *>) {
