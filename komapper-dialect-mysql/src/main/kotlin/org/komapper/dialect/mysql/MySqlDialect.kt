@@ -26,6 +26,8 @@ interface MySqlDialect : Dialect {
         return MySqlOffsetLimitStatementBuilder(dialect, offset, limit)
     }
 
+    override fun getRandomFunction(): String = "rand"
+
     override fun getSequenceSql(sequenceName: String): String {
         throw UnsupportedOperationException()
     }

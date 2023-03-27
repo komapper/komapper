@@ -51,6 +51,8 @@ interface SqlServerDialect : Dialect {
 
     override fun getDefaultLengthForSubstringFunction(): Int? = Int.MAX_VALUE
 
+    override fun getRandomFunction(): String = "rand"
+
     override fun supportsConflictTargetInUpsertStatement(): Boolean = false
 
     override fun supportsLimitOffsetWithoutOrderByClause(): Boolean = false

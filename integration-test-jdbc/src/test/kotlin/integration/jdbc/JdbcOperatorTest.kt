@@ -11,6 +11,7 @@ import org.komapper.core.dsl.operator.lower
 import org.komapper.core.dsl.operator.ltrim
 import org.komapper.core.dsl.operator.minus
 import org.komapper.core.dsl.operator.plus
+import org.komapper.core.dsl.operator.random
 import org.komapper.core.dsl.operator.rem
 import org.komapper.core.dsl.operator.rtrim
 import org.komapper.core.dsl.operator.substring
@@ -19,8 +20,10 @@ import org.komapper.core.dsl.operator.upper
 import org.komapper.core.dsl.query.dryRun
 import org.komapper.core.dsl.query.first
 import org.komapper.jdbc.JdbcDatabase
+import java.math.BigDecimal
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 @ExtendWith(JdbcEnv::class)
 class JdbcOperatorTest(private val db: JdbcDatabase) {
@@ -246,5 +249,23 @@ class JdbcOperatorTest(private val db: JdbcDatabase) {
             QueryDsl.from(a).select(rtrim(literal(" test "))).first()
         }
         assertEquals(" test", result)
+    }
+
+    @Test
+    fun randomFunction() {
+        val a = Meta.address
+        val result = db.runQuery {
+            QueryDsl.from(a).selectNotNull(random()).first()
+        }
+        assertTrue(result < BigDecimal.ONE)
+    }
+
+    @Test
+    fun orderByRandomFunction() {
+        val a = Meta.address
+        val result = db.runQuery {
+            QueryDsl.from(a).orderBy(random())
+        }
+        println(result)
     }
 }

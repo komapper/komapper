@@ -24,6 +24,8 @@ interface OracleDialect : Dialect {
 
     override val driver: String get() = DRIVER
 
+    override fun getRandomFunction(): String = "dbms_random.value"
+
     override fun getSequenceSql(sequenceName: String): String {
         return "select $sequenceName.nextval from dual"
     }
