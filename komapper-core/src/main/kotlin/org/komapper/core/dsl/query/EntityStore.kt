@@ -91,7 +91,7 @@ internal class EntityStoreImpl(
     private val rows: List<Map<EntityMetamodel<*, *, *>, Any>>,
 ) : EntityStore {
 
-    private val oneToManyCache: ConcurrentMap<Pair<*, *>, Map<*, Set<*>>> = ConcurrentHashMap()
+    private val oneToManyCache: ConcurrentMap<Pair<*, *>, Map<EntityRef<*, *>, Set<*>>> = ConcurrentHashMap()
     private val manyToOneCache: ConcurrentMap<Pair<*, *>, Map<EntityRef<*, *>, *>> = ConcurrentHashMap()
 
     override operator fun contains(metamodel: EntityMetamodel<*, *, *>): Boolean {
