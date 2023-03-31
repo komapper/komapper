@@ -254,9 +254,9 @@ internal class EntityStoreImpl(
         second: EntityMetamodel<S, *, *>,
         entity: T,
     ): Set<S> {
-        val oneToOne = createOneToMany(first, second)
+        val oneToMany = createOneToMany(first, second)
         val ref = EntityRef(first, entity)
-        return oneToOne[ref] ?: emptySet()
+        return oneToMany[ref] ?: emptySet()
     }
 }
 
