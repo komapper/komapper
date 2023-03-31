@@ -642,9 +642,9 @@ internal class EntityMetamodelGenerator(
                 AssociationKind.ONE_TO_MANY -> "Set<${targetEntity.typeName}>"
             }
             val expression = when (association.kind) {
-                AssociationKind.ONE_TO_ONE -> "store.oneToOneById(source, target)[source.extractId(this)]"
-                AssociationKind.MANY_TO_ONE -> "store.manyToOneById(source, target)[source.extractId(this)]"
-                AssociationKind.ONE_TO_MANY -> "store.oneToManyById(source, target)[source.extractId(this)] ?: emptySet()"
+                AssociationKind.ONE_TO_ONE -> "store.findOne(source, target, this)"
+                AssociationKind.MANY_TO_ONE -> "store.findOne(source, target, this)"
+                AssociationKind.ONE_TO_MANY -> "store.findMany(source, target, this)"
             }
             w.println(
                 """

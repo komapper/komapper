@@ -84,6 +84,34 @@ interface EntityStore {
         first: EntityMetamodel<T, ID, *>,
         second: EntityMetamodel<S, *, *>,
     ): Map<ID, S?>
+
+    /**
+     * Finds a single entity of another side.
+     *
+     * @param first the entity metamodel of the base side
+     * @param second the entity metamodel of another side
+     * @param entity the entity of the base side
+     * @return the single entity
+     */
+    fun <T : Any, ID : Any, S : Any> findOne(
+        first: EntityMetamodel<T, ID, *>,
+        second: EntityMetamodel<S, *, *>,
+        entity: T,
+    ): S?
+
+    /**
+     * Finds multiple entities of another side.
+     *
+     * @param first the entity metamodel of the base side
+     * @param second the entity metamodel of another side
+     * @param entity the entity of the base side
+     * @return multiple entities
+     */
+    fun <T : Any, ID : Any, S : Any> findMany(
+        first: EntityMetamodel<T, ID, *>,
+        second: EntityMetamodel<S, *, *>,
+        entity: T,
+    ): Set<S>
 }
 
 internal class EntityStoreImpl(
@@ -91,8 +119,8 @@ internal class EntityStoreImpl(
     private val rows: List<Map<EntityMetamodel<*, *, *>, Any>>,
 ) : EntityStore {
 
-    private val oneToManyCache: ConcurrentMap<Pair<*, *>, Map<EntityRef<*, *>, Set<*>>> = ConcurrentHashMap()
-    private val manyToOneCache: ConcurrentMap<Pair<*, *>, Map<EntityRef<*, *>, *>> = ConcurrentHashMap()
+    private val oneToManyCache: ConcurrentMap<Pair<*, *>, Map<EntityRef<*, *, *>, Set<*>>> = ConcurrentHashMap()
+    private val manyToOneCache: ConcurrentMap<Pair<*, *>, Map<EntityRef<*, *, *>, *>> = ConcurrentHashMap()
 
     override operator fun contains(metamodel: EntityMetamodel<*, *, *>): Boolean {
         return entitySets.containsKey(metamodel)
@@ -121,10 +149,10 @@ internal class EntityStoreImpl(
         return createOneToOne(first, second).mapKeys { it.key.id }
     }
 
-    private fun <T : Any, ID : Any, S : Any> createOneToOne(
+    private fun <META : EntityMetamodel<T, ID, *>, T : Any, ID : Any, S : Any> createOneToOne(
         first: EntityMetamodel<T, ID, *>,
         second: EntityMetamodel<S, *, *>,
-    ): Map<EntityRef<T, ID>, S?> {
+    ): Map<EntityRef<META, T, ID>, S?> {
         return createManyToOne(first, second)
     }
 
@@ -142,21 +170,21 @@ internal class EntityStoreImpl(
         return createOneToMany(first, second).mapKeys { it.key.id }
     }
 
-    private fun <T : Any, ID : Any, S : Any> createOneToMany(
+    private fun <META : EntityMetamodel<T, ID, *>, T : Any, ID : Any, S : Any> createOneToMany(
         first: EntityMetamodel<T, ID, *>,
         second: EntityMetamodel<S, *, *>,
-    ): Map<EntityRef<T, ID>, Set<S>> {
+    ): Map<EntityRef<META, T, ID>, Set<S>> {
         if (!contains(first, second)) {
             return emptyMap()
         }
         val cached = oneToManyCache.computeIfAbsent(first to second) {
-            val oneToMany = mutableMapOf<EntityRef<*, *>, MutableSet<S>>()
+            val oneToMany = mutableMapOf<EntityRef<*, *, *>, MutableSet<S>>()
             for (row in rows) {
                 val entity1 = row[first]
                 val entity2 = row[second]
                 if (entity1 != null) {
                     val key = first.klass().cast(entity1).let {
-                        EntityRef(it, first.extractId(it))
+                        EntityRef(first, it)
                     }
                     val values = oneToMany.computeIfAbsent(key) { mutableSetOf() }
                     if (entity2 != null) {
@@ -168,7 +196,7 @@ internal class EntityStoreImpl(
             oneToMany
         }
         @Suppress("UNCHECKED_CAST")
-        return cached as Map<EntityRef<T, ID>, Set<S>>
+        return cached as Map<EntityRef<META, T, ID>, Set<S>>
     }
 
     override fun <T : Any, S : Any> manyToOne(
@@ -185,21 +213,21 @@ internal class EntityStoreImpl(
         return createManyToOne(first, second).mapKeys { it.key.id }
     }
 
-    private fun <T : Any, ID : Any, S : Any> createManyToOne(
+    private fun <META : EntityMetamodel<T, ID, *>, T : Any, ID : Any, S : Any> createManyToOne(
         first: EntityMetamodel<T, ID, *>,
         second: EntityMetamodel<S, *, *>,
-    ): Map<EntityRef<T, ID>, S?> {
+    ): Map<EntityRef<META, T, ID>, S?> {
         if (!contains(first, second)) {
             return emptyMap()
         }
         val cached = manyToOneCache.computeIfAbsent(first to second) {
-            val manyToOne = mutableMapOf<EntityRef<*, *>, S?>()
+            val manyToOne = mutableMapOf<EntityRef<*, *, *>, S?>()
             for (row in rows) {
                 val entity1 = row[first]
                 val entity2 = row[second]
                 if (entity1 != null) {
                     val key = first.klass().cast(entity1).let {
-                        EntityRef(it, first.extractId(it))
+                        EntityRef(first, it)
                     }
                     val value = entity2?.let { second.klass().cast(it) }
                     manyToOne[key] = value
@@ -208,23 +236,51 @@ internal class EntityStoreImpl(
             manyToOne
         }
         @Suppress("UNCHECKED_CAST")
-        return cached as Map<EntityRef<T, ID>, S?>
+        return cached as Map<EntityRef<META, T, ID>, S?>
+    }
+
+    override fun <T : Any, ID : Any, S : Any> findOne(
+        first: EntityMetamodel<T, ID, *>,
+        second: EntityMetamodel<S, *, *>,
+        entity: T,
+    ): S? {
+        val manyToOne = createManyToOne(first, second)
+        val ref = EntityRef(first, entity)
+        return manyToOne[ref]
+    }
+
+    override fun <T : Any, ID : Any, S : Any> findMany(
+        first: EntityMetamodel<T, ID, *>,
+        second: EntityMetamodel<S, *, *>,
+        entity: T,
+    ): Set<S> {
+        val oneToOne = createOneToMany(first, second)
+        val ref = EntityRef(first, entity)
+        return oneToOne[ref] ?: emptySet()
     }
 }
 
-private class EntityRef<ENTITY : Any, ID : Any>(val entity: ENTITY, val id: ID) {
+private class EntityRef<META : EntityMetamodel<ENTITY, ID, *>, ENTITY : Any, ID : Any>(
+    val metamodel: META,
+    val entity: ENTITY,
+) {
+    val id: ID = metamodel.extractId(entity)
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
-        other as EntityRef<*, *>
+        other as EntityRef<*, *, *>
 
+        if (metamodel != other.metamodel) return false
         if (id != other.id) return false
 
         return true
     }
 
     override fun hashCode(): Int {
-        return id.hashCode()
+        var result = metamodel.hashCode()
+        result = 31 * result + id.hashCode()
+        return result
     }
 }
