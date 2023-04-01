@@ -23,6 +23,7 @@ import org.komapper.jdbc.JdbcDatabase
 import java.math.BigDecimal
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 @ExtendWith(JdbcEnv::class)
@@ -257,6 +258,17 @@ class JdbcOperatorTest(private val db: JdbcDatabase) {
         val result = db.runQuery {
             QueryDsl.from(a).selectNotNull(random()).first()
         }
+        assertTrue(result < BigDecimal.ONE)
+    }
+
+    @Test
+    fun randomFunction_getFromRecord() {
+        val a = Meta.address
+        val record = db.runQuery {
+            QueryDsl.from(a).selectAsRecord(random()).first()
+        }
+        val result = record[random()]
+        assertNotNull(result)
         assertTrue(result < BigDecimal.ONE)
     }
 
