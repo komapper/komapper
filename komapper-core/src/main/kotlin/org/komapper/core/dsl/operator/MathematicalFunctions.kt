@@ -8,5 +8,5 @@ import java.math.BigDecimal
  * Builds a RANDOM function.
  */
 fun random(): ColumnExpression<BigDecimal, BigDecimal> {
-    return MathematicalFunction.Random()
+    return MathematicalFunction.Random
 }

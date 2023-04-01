@@ -4,7 +4,7 @@ import java.math.BigDecimal
 import kotlin.reflect.KClass
 
 internal sealed class MathematicalFunction<T : Any, S : Any> : ColumnExpression<T, S> {
-    internal class Random : MathematicalFunction<BigDecimal, BigDecimal>() {
+    internal object Random : MathematicalFunction<BigDecimal, BigDecimal>() {
         override val owner: TableExpression<*> get() = throw UnsupportedOperationException()
         override val exteriorClass: KClass<BigDecimal> get() = BigDecimal::class
         override val interiorClass: KClass<BigDecimal> get() = BigDecimal::class
