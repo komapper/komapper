@@ -11,7 +11,7 @@ jobs:
     timeout-minutes: 10
     steps:
       - name: tweet
-        uses: m1ner79/Github-Twittction@v1.0.1
+        uses: m1ner79/Github-Twittction@v2.0.0
         with:
           twitter_status: "Komapper ${{ github.event.release.tag_name }} is out! #komapper ${{ github.event.release.html_url }}"
           twitter_consumer_key: ${{ secrets.TWITTER_API_KEY }}
