@@ -1,5 +1,5 @@
 plugins {
-    id("com.gradle.plugin-publish") version "1.1.0"
+    id("com.gradle.plugin-publish") version "1.2.0"
 }
 
 // we don't publish this project to sonatype
