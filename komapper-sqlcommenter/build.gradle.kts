@@ -1,5 +1,5 @@
 dependencies {
     api(project(":komapper-core"))
     api("com.google.cloud:sqlcommenter:2.0.1")
-    implementation("io.opentelemetry:opentelemetry-api:1.24.0")
+    implementation("io.opentelemetry:opentelemetry-api:1.25.0")
 }
