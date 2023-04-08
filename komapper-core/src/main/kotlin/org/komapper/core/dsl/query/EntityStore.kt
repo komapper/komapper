@@ -4,7 +4,6 @@ import org.komapper.core.ThreadSafe
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentMap
-import kotlin.reflect.cast
 
 /**
  * The store containing the retrieved entities.
@@ -116,7 +115,7 @@ interface EntityStore {
 
 internal class EntityStoreImpl(
     private val entitySets: Map<EntityMetamodel<*, *, *>, Set<Any>>,
-    private val rows: List<Map<EntityMetamodel<*, *, *>, Any>>,
+    private val rows: List<Map<EntityMetamodel<*, *, *>, EntityRef<*, *, *>>>,
 ) : EntityStore {
 
     private val oneToManyCache: ConcurrentMap<Pair<*, *>, Map<EntityRef<*, *, *>, Set<*>>> = ConcurrentHashMap()
@@ -178,18 +177,14 @@ internal class EntityStoreImpl(
             return emptyMap()
         }
         val cached = oneToManyCache.computeIfAbsent(first to second) {
-            val oneToMany = mutableMapOf<EntityRef<*, *, *>, MutableSet<S>>()
+            val oneToMany = mutableMapOf<EntityRef<*, *, *>, MutableSet<Any>>()
             for (row in rows) {
-                val entity1 = row[first]
-                val entity2 = row[second]
-                if (entity1 != null) {
-                    val key = first.klass().cast(entity1).let {
-                        EntityRef(first, it)
-                    }
-                    val values = oneToMany.computeIfAbsent(key) { mutableSetOf() }
-                    if (entity2 != null) {
-                        val value = second.klass().cast(entity2)
-                        values.add(value)
+                val ref1 = row[first]
+                val ref2 = row[second]
+                if (ref1 != null) {
+                    val values = oneToMany.computeIfAbsent(ref1) { mutableSetOf() }
+                    if (ref2 != null) {
+                        values.add(ref2.entity)
                     }
                 }
             }
@@ -221,16 +216,12 @@ internal class EntityStoreImpl(
             return emptyMap()
         }
         val cached = manyToOneCache.computeIfAbsent(first to second) {
-            val manyToOne = mutableMapOf<EntityRef<*, *, *>, S?>()
+            val manyToOne = mutableMapOf<EntityRef<*, *, *>, Any?>()
             for (row in rows) {
-                val entity1 = row[first]
-                val entity2 = row[second]
-                if (entity1 != null) {
-                    val key = first.klass().cast(entity1).let {
-                        EntityRef(first, it)
-                    }
-                    val value = entity2?.let { second.klass().cast(it) }
-                    manyToOne[key] = value
+                val ref1 = row[first]
+                val ref2 = row[second]
+                if (ref1 != null) {
+                    manyToOne[ref1] = ref2?.entity
                 }
             }
             manyToOne
@@ -245,8 +236,8 @@ internal class EntityStoreImpl(
         entity: T,
     ): S? {
         val manyToOne = createManyToOne(first, second)
-        val ref = EntityRef(first, entity)
-        return manyToOne[ref]
+        val key = EntityRef(first, entity)
+        return manyToOne[key]
     }
 
     override fun <T : Any, ID : Any, S : Any> findMany(
@@ -255,12 +246,12 @@ internal class EntityStoreImpl(
         entity: T,
     ): Set<S> {
         val oneToMany = createOneToMany(first, second)
-        val ref = EntityRef(first, entity)
-        return oneToMany[ref] ?: emptySet()
+        val key = EntityRef(first, entity)
+        return oneToMany[key] ?: emptySet()
     }
 }
 
-private class EntityRef<META : EntityMetamodel<ENTITY, ID, *>, ENTITY : Any, ID : Any>(
+internal class EntityRef<META : EntityMetamodel<ENTITY, ID, *>, ENTITY : Any, ID : Any>(
     val metamodel: META,
     val entity: ENTITY,
 ) {
