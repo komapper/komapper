@@ -18,14 +18,6 @@ dependencies {
     api("org.testcontainers:r2dbc")
 }
 
-idea {
-    module {
-        sourceDirs = sourceDirs + file("build/generated/ksp/main/kotlin")
-        testSourceDirs = testSourceDirs + file("build/generated/ksp/test/kotlin")
-        generatedSourceDirs = generatedSourceDirs + file("build/generated/ksp/main/kotlin") + file("build/generated/ksp/test/kotlin")
-    }
-}
-
 ksp {
     arg("komapper.namingStrategy", "lower_snake_case")
 }
