@@ -74,11 +74,25 @@ interface EntityStore {
         second: EntityMetamodel<S, *, *>,
     ): Map<ID, Set<S>>
 
+    /**
+     * Returns a many-to-one association.
+     *
+     * @param first the entity metamodel of the base side
+     * @param second the entity metamodel of another side
+     * @return the many-to-one association
+     */
     fun <T : Any, S : Any> manyToOne(
         first: EntityMetamodel<T, *, *>,
         second: EntityMetamodel<S, *, *>,
     ): Map<T, S?>
 
+    /**
+     * Returns a many-to-one association with the entity ID as the base-side type.
+     *
+     * @param first the entity metamodel of the base side
+     * @param second the entity metamodel of another side
+     * @return the many-to-one association
+     */
     fun <T : Any, ID : Any, S : Any> manyToOneById(
         first: EntityMetamodel<T, ID, *>,
         second: EntityMetamodel<S, *, *>,
