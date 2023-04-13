@@ -1,8 +1,7 @@
 package org.komapper.core.dsl.operator
 
-import org.komapper.core.dsl.expression.CaseExpression
-import org.komapper.core.dsl.expression.CoalesceExpression
 import org.komapper.core.dsl.expression.ColumnExpression
+import org.komapper.core.dsl.expression.ConditionalExpression
 import org.komapper.core.dsl.expression.When
 
 /**
@@ -13,15 +12,15 @@ fun <T : Any, S : Any> case(
     vararg remainingWhen: When<T, S>,
     otherwise: (() -> ColumnExpression<T, S>)? = null,
 ): ColumnExpression<T, S> {
-    return CaseExpression(firstWhen, remainingWhen.toList(), otherwise?.invoke())
+    return ConditionalExpression.Case(firstWhen, remainingWhen.toList(), otherwise?.invoke())
 }
 
 /**
- * Builds a coalesce expression.
+ * Builds a coalesce function.
  */
 fun <T : Any, S : Any> coalesce(
     expression: ColumnExpression<T, S>,
     vararg expressions: ColumnExpression<T, S>,
 ): ColumnExpression<T, S> {
-    return CoalesceExpression(expression, expressions.toList())
+    return ConditionalExpression.Coalesce(expression, expressions.toList())
 }

@@ -9,9 +9,8 @@ import org.komapper.core.dsl.context.SetOperationContext
 import org.komapper.core.dsl.expression.AggregateFunction
 import org.komapper.core.dsl.expression.AliasExpression
 import org.komapper.core.dsl.expression.ArithmeticExpression
-import org.komapper.core.dsl.expression.CaseExpression
-import org.komapper.core.dsl.expression.CoalesceExpression
 import org.komapper.core.dsl.expression.ColumnExpression
+import org.komapper.core.dsl.expression.ConditionalExpression
 import org.komapper.core.dsl.expression.Criterion
 import org.komapper.core.dsl.expression.EscapeExpression
 import org.komapper.core.dsl.expression.LiteralExpression
@@ -63,14 +62,9 @@ class BuilderSupport(
             is ArithmeticExpression<*, *> -> {
                 visitArithmeticExpression(expression)
             }
-            is CaseExpression<*, *> -> {
-                visitCaseExpression(expression)
+            is ConditionalExpression<*, *> -> {
+                visitConditionalExpression(expression)
             }
-
-            is CoalesceExpression<*, *> -> {
-                visitCoalesceExpression(expression)
-            }
-
             is LiteralExpression<*> -> {
                 visitLiteralExpression(expression)
             }
@@ -142,7 +136,18 @@ class BuilderSupport(
         buf.append(")")
     }
 
-    private fun visitCaseExpression(expression: CaseExpression<*, *>) {
+    private fun visitConditionalExpression(expression: ConditionalExpression<*, *>) {
+        when (expression) {
+            is ConditionalExpression.Case<*, *> -> {
+                visitCaseExpression(expression)
+            }
+            is ConditionalExpression.Coalesce<*, *> -> {
+                visitCoalesceExpression(expression)
+            }
+        }
+    }
+
+    private fun visitCaseExpression(expression: ConditionalExpression.Case<*, *>) {
         buf.append("case")
         for (`when` in expression.whenList) {
             if (`when`.criteria.isNotEmpty()) {
@@ -163,7 +168,7 @@ class BuilderSupport(
         buf.append(" end")
     }
 
-    private fun visitCoalesceExpression(expression: CoalesceExpression<*, *>) {
+    private fun visitCoalesceExpression(expression: ConditionalExpression.Coalesce<*, *>) {
         buf.append("coalesce(")
         visitColumnExpression(expression.expression)
         for (e in expression.expressions) {
