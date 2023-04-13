@@ -1,9 +1,11 @@
 package integration.jdbc
 
 import integration.core.address
+import integration.core.employee
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
+import org.komapper.core.dsl.operator.coalesce
 import org.komapper.core.dsl.operator.concat
 import org.komapper.core.dsl.operator.div
 import org.komapper.core.dsl.operator.literal
@@ -279,5 +281,15 @@ class JdbcOperatorTest(private val db: JdbcDatabase) {
             QueryDsl.from(a).orderBy(random())
         }
         println(result)
+    }
+
+    @Test
+    fun coalesceFunction() {
+        val e = Meta.employee
+        val list = db.runQuery {
+            QueryDsl.from(e).where { e.managerId.isNull() }.select(coalesce(e.managerId, literal(-1)))
+        }
+        assertEquals(1, list.size)
+        assertEquals(-1, list[0])
     }
 }

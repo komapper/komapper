@@ -10,6 +10,7 @@ import org.komapper.core.dsl.expression.AggregateFunction
 import org.komapper.core.dsl.expression.AliasExpression
 import org.komapper.core.dsl.expression.ArithmeticExpression
 import org.komapper.core.dsl.expression.CaseExpression
+import org.komapper.core.dsl.expression.CoalesceExpression
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.expression.Criterion
 import org.komapper.core.dsl.expression.EscapeExpression
@@ -65,6 +66,11 @@ class BuilderSupport(
             is CaseExpression<*, *> -> {
                 visitCaseExpression(expression)
             }
+
+            is CoalesceExpression<*, *> -> {
+                visitCoalesceExpression(expression)
+            }
+
             is LiteralExpression<*> -> {
                 visitLiteralExpression(expression)
             }
@@ -155,6 +161,16 @@ class BuilderSupport(
             visitColumnExpression(expression.otherwise)
         }
         buf.append(" end")
+    }
+
+    private fun visitCoalesceExpression(expression: CoalesceExpression<*, *>) {
+        buf.append("coalesce(")
+        visitColumnExpression(expression.expression)
+        for (e in expression.expressions) {
+            buf.append(", ")
+            visitColumnExpression(e)
+        }
+        buf.append(")")
     }
 
     private fun visitLiteralExpression(expression: LiteralExpression<*>) {
