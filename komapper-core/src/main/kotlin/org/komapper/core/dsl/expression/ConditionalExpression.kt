@@ -14,9 +14,10 @@ internal sealed interface ConditionalExpression<T : Any, S : Any> : ColumnExpres
     }
 
     class Coalesce<T : Any, S : Any>(
-        val expression: ColumnExpression<T, S>,
+        val first: ColumnExpression<T, S>,
+        val second: ColumnExpression<T, S>,
         val expressions: List<ColumnExpression<T, S>>,
-    ) : ConditionalExpression<T, S>, ColumnExpression<T, S> by expression
+    ) : ConditionalExpression<T, S>, ColumnExpression<T, S> by first
 }
 
 class When<S : Any, T : Any>(val declaration: WhenDeclaration, internal val then: ColumnExpression<S, T>) {

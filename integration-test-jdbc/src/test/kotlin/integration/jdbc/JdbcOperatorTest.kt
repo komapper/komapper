@@ -27,7 +27,6 @@ import java.math.BigDecimal
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
-import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 @ExtendWith(JdbcEnv::class)
@@ -286,20 +285,20 @@ class JdbcOperatorTest(private val db: JdbcDatabase) {
     }
 
     @Test
-    fun coalesceFunction_select_one_arg() {
-        val e = Meta.employee
-        val list = db.runQuery {
-            QueryDsl.from(e).where { e.managerId.isNull() }.select(coalesce(e.managerId))
-        }
-        assertEquals(1, list.size)
-        assertNull(list[0])
-    }
-
-    @Test
-    fun coalesceFunction_select_two_args() {
+    fun coalesceFunction_select() {
         val e = Meta.employee
         val list = db.runQuery {
             QueryDsl.from(e).where { e.managerId.isNull() }.select(coalesce(e.managerId, literal(-1)))
+        }
+        assertEquals(1, list.size)
+        assertEquals(-1, list[0])
+    }
+
+    @Test
+    fun coalesceFunction_select_3_args() {
+        val e = Meta.employee
+        val list = db.runQuery {
+            QueryDsl.from(e).where { e.managerId.isNull() }.select(coalesce(e.managerId, e.managerId, literal(-1)))
         }
         assertEquals(1, list.size)
         assertEquals(-1, list[0])

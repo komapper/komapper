@@ -170,7 +170,9 @@ class BuilderSupport(
 
     private fun visitCoalesceExpression(expression: ConditionalExpression.Coalesce<*, *>) {
         buf.append("coalesce(")
-        visitColumnExpression(expression.expression)
+        visitColumnExpression(expression.first)
+        buf.append(", ")
+        visitColumnExpression(expression.second)
         for (e in expression.expressions) {
             buf.append(", ")
             visitColumnExpression(e)

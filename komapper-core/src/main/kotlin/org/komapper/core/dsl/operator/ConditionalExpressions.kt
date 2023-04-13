@@ -19,8 +19,9 @@ fun <T : Any, S : Any> case(
  * Builds a coalesce function.
  */
 fun <T : Any, S : Any> coalesce(
-    expression: ColumnExpression<T, S>,
+    first: ColumnExpression<T, S>,
+    second: ColumnExpression<T, S>,
     vararg expressions: ColumnExpression<T, S>,
 ): ColumnExpression<T, S> {
-    return ConditionalExpression.Coalesce(expression, expressions.toList())
+    return ConditionalExpression.Coalesce(first, second, expressions.toList())
 }
