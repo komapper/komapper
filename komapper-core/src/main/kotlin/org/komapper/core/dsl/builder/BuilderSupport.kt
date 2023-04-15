@@ -9,8 +9,8 @@ import org.komapper.core.dsl.context.SetOperationContext
 import org.komapper.core.dsl.expression.AggregateFunction
 import org.komapper.core.dsl.expression.AliasExpression
 import org.komapper.core.dsl.expression.ArithmeticExpression
-import org.komapper.core.dsl.expression.CaseExpression
 import org.komapper.core.dsl.expression.ColumnExpression
+import org.komapper.core.dsl.expression.ConditionalExpression
 import org.komapper.core.dsl.expression.Criterion
 import org.komapper.core.dsl.expression.EscapeExpression
 import org.komapper.core.dsl.expression.LiteralExpression
@@ -62,8 +62,8 @@ class BuilderSupport(
             is ArithmeticExpression<*, *> -> {
                 visitArithmeticExpression(expression)
             }
-            is CaseExpression<*, *> -> {
-                visitCaseExpression(expression)
+            is ConditionalExpression<*, *> -> {
+                visitConditionalExpression(expression)
             }
             is LiteralExpression<*> -> {
                 visitLiteralExpression(expression)
@@ -136,7 +136,18 @@ class BuilderSupport(
         buf.append(")")
     }
 
-    private fun visitCaseExpression(expression: CaseExpression<*, *>) {
+    private fun visitConditionalExpression(expression: ConditionalExpression<*, *>) {
+        when (expression) {
+            is ConditionalExpression.Case<*, *> -> {
+                visitCaseExpression(expression)
+            }
+            is ConditionalExpression.Coalesce<*, *> -> {
+                visitCoalesceExpression(expression)
+            }
+        }
+    }
+
+    private fun visitCaseExpression(expression: ConditionalExpression.Case<*, *>) {
         buf.append("case")
         for (`when` in expression.whenList) {
             if (`when`.criteria.isNotEmpty()) {
@@ -155,6 +166,18 @@ class BuilderSupport(
             visitColumnExpression(expression.otherwise)
         }
         buf.append(" end")
+    }
+
+    private fun visitCoalesceExpression(expression: ConditionalExpression.Coalesce<*, *>) {
+        buf.append("coalesce(")
+        visitColumnExpression(expression.first)
+        buf.append(", ")
+        visitColumnExpression(expression.second)
+        for (e in expression.expressions) {
+            buf.append(", ")
+            visitColumnExpression(e)
+        }
+        buf.append(")")
     }
 
     private fun visitLiteralExpression(expression: LiteralExpression<*>) {

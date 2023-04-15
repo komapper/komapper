@@ -1,10 +1,13 @@
 package integration.jdbc
 
 import integration.core.address
+import integration.core.employee
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
+import org.komapper.core.dsl.operator.coalesce
 import org.komapper.core.dsl.operator.concat
+import org.komapper.core.dsl.operator.count
 import org.komapper.core.dsl.operator.div
 import org.komapper.core.dsl.operator.literal
 import org.komapper.core.dsl.operator.lower
@@ -279,5 +282,42 @@ class JdbcOperatorTest(private val db: JdbcDatabase) {
             QueryDsl.from(a).orderBy(random())
         }
         println(result)
+    }
+
+    @Test
+    fun coalesceFunction_select() {
+        val e = Meta.employee
+        val list = db.runQuery {
+            QueryDsl.from(e).where { e.managerId.isNull() }.select(coalesce(e.managerId, literal(-1)))
+        }
+        assertEquals(1, list.size)
+        assertEquals(-1, list[0])
+    }
+
+    @Test
+    fun coalesceFunction_select_3_args() {
+        val e = Meta.employee
+        val list = db.runQuery {
+            QueryDsl.from(e).where { e.managerId.isNull() }.select(coalesce(e.managerId, e.managerId, literal(-1)))
+        }
+        assertEquals(1, list.size)
+        assertEquals(-1, list[0])
+    }
+
+    @Test
+    fun coalesceFunction_update() {
+        val e = Meta.employee
+        val affectedRows = db.runQuery {
+            QueryDsl.update(e).set {
+                e.managerId eq coalesce(e.managerId, literal(-1))
+            }.where {
+                e.managerId.isNull()
+            }
+        }
+        assertEquals(1, affectedRows)
+        val result = db.runQuery {
+            QueryDsl.from(e).where { e.managerId eq -1 }.select(count())
+        }
+        assertEquals(1, result)
     }
 }
