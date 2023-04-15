@@ -2,10 +2,13 @@ package org.komapper.dialect.postgresql
 
 import org.komapper.core.BuilderDialect
 import org.komapper.core.Dialect
+import org.komapper.core.dsl.builder.EntityInsertStatementBuilder
 import org.komapper.core.dsl.builder.EntityUpsertStatementBuilder
 import org.komapper.core.dsl.builder.SchemaStatementBuilder
+import org.komapper.core.dsl.context.EntityInsertContext
 import org.komapper.core.dsl.context.EntityUpsertContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
+import org.komapper.dialect.h2.PostgreSqlEntityInsertStatementBuilder
 
 interface PostgreSqlDialect : Dialect {
 
@@ -27,6 +30,14 @@ interface PostgreSqlDialect : Dialect {
         return PostgreSqlSchemaStatementBuilder(dialect)
     }
 
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> getEntityInsertStatementBuilder(
+        dialect: BuilderDialect,
+        context: EntityInsertContext<ENTITY, ID, META>,
+        entities: List<ENTITY>,
+    ): EntityInsertStatementBuilder<ENTITY, ID, META> {
+        return PostgreSqlEntityInsertStatementBuilder(dialect, context, entities)
+    }
+
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> getEntityUpsertStatementBuilder(
         dialect: BuilderDialect,
         context: EntityUpsertContext<ENTITY, ID, META>,
@@ -42,6 +53,8 @@ interface PostgreSqlDialect : Dialect {
     override fun supportsLockOptionNowait(): Boolean = true
 
     override fun supportsLockOptionSkipLocked(): Boolean = true
+
+    override fun supportsInsertReturning(): Boolean = true
 
     override fun supportsSearchConditionInUpsertStatement(): Boolean = true
 }

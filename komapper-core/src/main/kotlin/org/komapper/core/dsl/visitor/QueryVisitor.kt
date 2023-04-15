@@ -64,6 +64,12 @@ interface QueryVisitor<VISIT_RESULT> {
     ): VISIT_RESULT
 
     fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
+    entityInsertMultipleReturningQuery(
+        context: EntityInsertContext<ENTITY, ID, META>,
+        entities: List<ENTITY>,
+    ): VISIT_RESULT
+
+    fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
     entityInsertBatchQuery(
         context: EntityInsertContext<ENTITY, ID, META>,
         entities: List<ENTITY>,
@@ -71,6 +77,12 @@ interface QueryVisitor<VISIT_RESULT> {
 
     fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
     entityInsertSingleQuery(
+        context: EntityInsertContext<ENTITY, ID, META>,
+        entity: ENTITY,
+    ): VISIT_RESULT
+
+    fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
+    entityInsertSingleReturningQuery(
         context: EntityInsertContext<ENTITY, ID, META>,
         entity: ENTITY,
     ): VISIT_RESULT
@@ -100,7 +112,19 @@ interface QueryVisitor<VISIT_RESULT> {
     ): VISIT_RESULT
 
     fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
+    entityUpsertMultipleReturningQuery(
+        context: EntityUpsertContext<ENTITY, ID, META>,
+        entities: List<ENTITY>,
+    ): VISIT_RESULT
+
+    fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
     entityUpsertSingleQuery(
+        context: EntityUpsertContext<ENTITY, ID, META>,
+        entity: ENTITY,
+    ): VISIT_RESULT
+
+    fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
+    entityUpsertSingleReturningQuery(
         context: EntityUpsertContext<ENTITY, ID, META>,
         entity: ENTITY,
     ): VISIT_RESULT

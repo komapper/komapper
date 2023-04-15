@@ -25,14 +25,18 @@ import org.komapper.core.dsl.visitor.QueryVisitor
 import org.komapper.jdbc.dsl.runner.JdbcEntityDeleteBatchRunner
 import org.komapper.jdbc.dsl.runner.JdbcEntityDeleteSingleRunner
 import org.komapper.jdbc.dsl.runner.JdbcEntityInsertBatchRunner
+import org.komapper.jdbc.dsl.runner.JdbcEntityInsertMultipleReturningRunner
 import org.komapper.jdbc.dsl.runner.JdbcEntityInsertMultipleRunner
+import org.komapper.jdbc.dsl.runner.JdbcEntityInsertSingleReturningRunner
 import org.komapper.jdbc.dsl.runner.JdbcEntityInsertSingleRunner
 import org.komapper.jdbc.dsl.runner.JdbcEntityStoreRunner
 import org.komapper.jdbc.dsl.runner.JdbcEntityUpdateBatchRunner
 import org.komapper.jdbc.dsl.runner.JdbcEntityUpdateSingleRunner
 import org.komapper.jdbc.dsl.runner.JdbcEntityUpsertBatchRunner
+import org.komapper.jdbc.dsl.runner.JdbcEntityUpsertMultipleReturningRunner
 import org.komapper.jdbc.dsl.runner.JdbcEntityUpsertMultipleRunner
 import org.komapper.jdbc.dsl.runner.JdbcEntityUpsertSingleIgnoreRunner
+import org.komapper.jdbc.dsl.runner.JdbcEntityUpsertSingleReturningRunner
 import org.komapper.jdbc.dsl.runner.JdbcEntityUpsertSingleRunner
 import org.komapper.jdbc.dsl.runner.JdbcEntityUpsertSingleUpdateRunner
 import org.komapper.jdbc.dsl.runner.JdbcRelationDeleteRunner
@@ -126,6 +130,13 @@ object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
         return JdbcEntityInsertMultipleRunner(context, entities)
     }
 
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityInsertMultipleReturningQuery(
+        context: EntityInsertContext<ENTITY, ID, META>,
+        entities: List<ENTITY>,
+    ): JdbcRunner<List<ENTITY>> {
+        return JdbcEntityInsertMultipleReturningRunner(context, entities)
+    }
+
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityInsertBatchQuery(
         context: EntityInsertContext<ENTITY, ID, META>,
         entities: List<ENTITY>,
@@ -138,6 +149,13 @@ object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
         entity: ENTITY,
     ): JdbcRunner<ENTITY> {
         return JdbcEntityInsertSingleRunner(context, entity)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityInsertSingleReturningQuery(
+        context: EntityInsertContext<ENTITY, ID, META>,
+        entity: ENTITY,
+    ): JdbcRunner<*> {
+        return JdbcEntityInsertSingleReturningRunner(context, entity)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
@@ -172,12 +190,26 @@ object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
         return JdbcEntityUpsertMultipleRunner(context, entities)
     }
 
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityUpsertMultipleReturningQuery(
+        context: EntityUpsertContext<ENTITY, ID, META>,
+        entities: List<ENTITY>,
+    ): JdbcRunner<List<ENTITY>> {
+        return JdbcEntityUpsertMultipleReturningRunner(context, entities)
+    }
+
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
     entityUpsertSingleQuery(
         context: EntityUpsertContext<ENTITY, ID, META>,
         entity: ENTITY,
     ): JdbcRunner<Long> {
         return JdbcEntityUpsertSingleRunner(context, entity)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityUpsertSingleReturningQuery(
+        context: EntityUpsertContext<ENTITY, ID, META>,
+        entity: ENTITY,
+    ): JdbcRunner<*> {
+        return JdbcEntityUpsertSingleReturningRunner(context, entity)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>

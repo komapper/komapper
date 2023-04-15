@@ -24,12 +24,16 @@ import org.komapper.core.dsl.query.Row
 import org.komapper.core.dsl.runner.EntityDeleteBatchRunner
 import org.komapper.core.dsl.runner.EntityDeleteSingleRunner
 import org.komapper.core.dsl.runner.EntityInsertBatchRunner
+import org.komapper.core.dsl.runner.EntityInsertMultipleReturningRunner
 import org.komapper.core.dsl.runner.EntityInsertMultipleRunner
+import org.komapper.core.dsl.runner.EntityInsertSingleReturningRunner
 import org.komapper.core.dsl.runner.EntityInsertSingleRunner
 import org.komapper.core.dsl.runner.EntityUpdateBatchRunner
 import org.komapper.core.dsl.runner.EntityUpdateSingleRunner
 import org.komapper.core.dsl.runner.EntityUpsertBatchRunner
+import org.komapper.core.dsl.runner.EntityUpsertMultipleReturningRunner
 import org.komapper.core.dsl.runner.EntityUpsertMultipleRunner
+import org.komapper.core.dsl.runner.EntityUpsertSingleReturningRunner
 import org.komapper.core.dsl.runner.EntityUpsertSingleRunner
 import org.komapper.core.dsl.runner.RelationDeleteRunner
 import org.komapper.core.dsl.runner.RelationInsertSelectRunner
@@ -110,6 +114,13 @@ internal object DefaultQueryVisitor : QueryVisitor<Runner> {
         return EntityInsertMultipleRunner(context, entities)
     }
 
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityInsertMultipleReturningQuery(
+        context: EntityInsertContext<ENTITY, ID, META>,
+        entities: List<ENTITY>,
+    ): Runner {
+        return EntityInsertMultipleReturningRunner(context, entities)
+    }
+
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityInsertBatchQuery(
         context: EntityInsertContext<ENTITY, ID, META>,
         entities: List<ENTITY>,
@@ -122,6 +133,13 @@ internal object DefaultQueryVisitor : QueryVisitor<Runner> {
         entity: ENTITY,
     ): Runner {
         return EntityInsertSingleRunner(context, entity)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityInsertSingleReturningQuery(
+        context: EntityInsertContext<ENTITY, ID, META>,
+        entity: ENTITY,
+    ): Runner {
+        return EntityInsertSingleReturningRunner(context, entity)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
@@ -156,12 +174,26 @@ internal object DefaultQueryVisitor : QueryVisitor<Runner> {
         return EntityUpsertMultipleRunner(context, entities)
     }
 
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityUpsertMultipleReturningQuery(
+        context: EntityUpsertContext<ENTITY, ID, META>,
+        entities: List<ENTITY>,
+    ): Runner {
+        return EntityUpsertMultipleReturningRunner(context, entities)
+    }
+
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
     entityUpsertSingleQuery(
         context: EntityUpsertContext<ENTITY, ID, META>,
         entity: ENTITY,
     ): Runner {
         return EntityUpsertSingleRunner(context, entity)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityUpsertSingleReturningQuery(
+        context: EntityUpsertContext<ENTITY, ID, META>,
+        entity: ENTITY,
+    ): Runner {
+        return EntityUpsertSingleReturningRunner(context, entity)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityUpsertSingleUpdateQuery(

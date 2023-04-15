@@ -23,7 +23,7 @@ interface InsertQueryBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTI
      * @param keys the keys used for duplicate checking
      * @return the query
      */
-    fun onDuplicateKeyUpdate(vararg keys: PropertyMetamodel<ENTITY, *, *> = emptyArray()): InsertOnDuplicateKeyUpdateQueryBuilder<ENTITY, ID, META>
+    fun onDuplicateKeyUpdate(vararg keys: PropertyMetamodel<ENTITY, *, *> = emptyArray()): InsertOnDuplicateKeyUpdateQueryBuilderReturningSingle<ENTITY, ID, META>
 
     /**
      * Creates a builder of the query that inserts or updates entities.
@@ -32,7 +32,7 @@ interface InsertQueryBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTI
      * @param conflictTarget the hint to perform unique index inference
      * @return the query
      */
-    fun dangerouslyOnDuplicateKeyUpdate(conflictTarget: String): InsertOnDuplicateKeyUpdateQueryBuilder<ENTITY, ID, META>
+    fun dangerouslyOnDuplicateKeyUpdate(conflictTarget: String): InsertOnDuplicateKeyUpdateQueryBuilderReturningSingle<ENTITY, ID, META>
 
     /**
      * Creates a builder of the query that inserts entities and ignores duplicate keys.
@@ -57,7 +57,7 @@ interface InsertQueryBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTI
      * @param entity the entity to be inserted
      * @return the query
      */
-    fun single(entity: ENTITY): EntityInsertQuery<ENTITY>
+    fun single(entity: ENTITY): EntityInsertSingleQuery<ENTITY>
 
     /**
      * Builds a query to bulk insert a list of entities.
@@ -65,7 +65,7 @@ interface InsertQueryBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTI
      * @param entities the entities to be inserted
      * @return the query
      */
-    fun multiple(entities: List<ENTITY>): EntityInsertQuery<List<ENTITY>>
+    fun multiple(entities: List<ENTITY>): EntityInsertMultipleQuery<ENTITY>
 
     /**
      * Builds a query to bulk insert an array of entities.
@@ -121,14 +121,14 @@ internal data class InsertQueryBuilderImpl<ENTITY : Any, ID : Any, META : Entity
 ) :
     InsertQueryBuilder<ENTITY, ID, META> {
 
-    override fun onDuplicateKeyUpdate(vararg keys: PropertyMetamodel<ENTITY, *, *>): InsertOnDuplicateKeyUpdateQueryBuilder<ENTITY, ID, META> {
+    override fun onDuplicateKeyUpdate(vararg keys: PropertyMetamodel<ENTITY, *, *>): InsertOnDuplicateKeyUpdateQueryBuilderReturningSingle<ENTITY, ID, META> {
         val newContext = context.asEntityUpsertContext(keys.toList(), DuplicateKeyType.UPDATE)
-        return InsertOnDuplicateKeyUpdateQueryBuilderImpl(newContext)
+        return InsertOnDuplicateKeyUpdateQueryBuilderReturningSingleImpl(newContext)
     }
 
-    override fun dangerouslyOnDuplicateKeyUpdate(conflictTarget: String): InsertOnDuplicateKeyUpdateQueryBuilder<ENTITY, ID, META> {
+    override fun dangerouslyOnDuplicateKeyUpdate(conflictTarget: String): InsertOnDuplicateKeyUpdateQueryBuilderReturningSingle<ENTITY, ID, META> {
         val newContext = context.asEntityUpsertContext(conflictTarget, DuplicateKeyType.UPDATE)
-        return InsertOnDuplicateKeyUpdateQueryBuilderImpl(newContext)
+        return InsertOnDuplicateKeyUpdateQueryBuilderReturningSingleImpl(newContext)
     }
 
     override fun onDuplicateKeyIgnore(vararg keys: PropertyMetamodel<ENTITY, *, *>): InsertOnDuplicateKeyIgnoreQueryBuilder<ENTITY, ID, META> {
@@ -141,15 +141,15 @@ internal data class InsertQueryBuilderImpl<ENTITY : Any, ID : Any, META : Entity
         return InsertOnDuplicateKeyIgnoreQueryBuilderImpl(newContext)
     }
 
-    override fun single(entity: ENTITY): EntityInsertQuery<ENTITY> {
-        return EntityInsertSingleQuery(context, entity)
+    override fun single(entity: ENTITY): EntityInsertSingleQuery<ENTITY> {
+        return EntityInsertSingleQueryImpl(context, entity)
     }
 
-    override fun multiple(entities: List<ENTITY>): EntityInsertQuery<List<ENTITY>> {
-        return EntityInsertMultipleQuery(context, entities)
+    override fun multiple(entities: List<ENTITY>): EntityInsertMultipleQuery<ENTITY> {
+        return EntityInsertMultipleQueryImpl(context, entities)
     }
 
-    override fun multiple(vararg entities: ENTITY): EntityInsertQuery<List<ENTITY>> {
+    override fun multiple(vararg entities: ENTITY): EntityInsertMultipleQuery<ENTITY> {
         return multiple(entities.toList())
     }
 

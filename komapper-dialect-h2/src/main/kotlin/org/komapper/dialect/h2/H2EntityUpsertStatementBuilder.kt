@@ -32,6 +32,15 @@ internal class H2EntityUpsertStatementBuilder<ENTITY : Any, ID : Any, META : Ent
     private val sourceStatementBuilder = SourceStatementBuilder(dialect, context, entities)
 
     override fun build(assignments: List<Pair<PropertyMetamodel<ENTITY, *, *>, Operand>>): Statement {
+        if (context.returning) {
+            buf.append("select ")
+            for (p in target.properties()) {
+                buf.append(p.getCanonicalColumnName(dialect::enquote))
+                buf.append(", ")
+            }
+            buf.cutBack(2)
+            buf.append(" from final table (")
+        }
         buf.append("merge into ")
         table(target, TableNameType.NAME_AND_ALIAS)
         buf.append(" using (")
@@ -77,6 +86,9 @@ internal class H2EntityUpsertStatementBuilder<ENTITY : Any, ID : Any, META : Ent
                 buf.append(", ")
             }
             buf.cutBack(2)
+        }
+        if (context.returning) {
+            buf.append(")")
         }
         return buf.toStatement()
     }

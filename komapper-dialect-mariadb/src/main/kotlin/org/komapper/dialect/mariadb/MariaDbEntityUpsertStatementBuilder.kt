@@ -66,6 +66,14 @@ class MariaDbEntityUpsertStatementBuilder<ENTITY : Any, ID : Any, META : EntityM
             }
             buf.cutBack(2)
         }
+        if (context.returning) {
+            buf.append(" returning ")
+            for (p in target.properties()) {
+                column(p)
+                buf.append(", ")
+            }
+            buf.cutBack(2)
+        }
         return buf.toStatement()
     }
 

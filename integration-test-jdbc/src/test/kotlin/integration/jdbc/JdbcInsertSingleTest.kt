@@ -36,6 +36,7 @@ import org.komapper.core.ClockProvider
 import org.komapper.core.UniqueConstraintException
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
+import org.komapper.core.dsl.metamodel.IdGenerator
 import org.komapper.core.dsl.operator.concat
 import org.komapper.core.dsl.query.first
 import org.komapper.jdbc.JdbcDatabase
@@ -283,6 +284,9 @@ class JdbcInsertSingleTest(private val db: JdbcDatabase) {
     @Run(unless = [Dbms.MYSQL])
     @Test
     fun sequenceGenerator() {
+        val generator = Meta.sequenceStrategy.idGenerator() as IdGenerator.Sequence<*, *>
+        generator.clear()
+
         for (i in 1..201) {
             val m = Meta.sequenceStrategy
             val strategy = SequenceStrategy(0, "test")

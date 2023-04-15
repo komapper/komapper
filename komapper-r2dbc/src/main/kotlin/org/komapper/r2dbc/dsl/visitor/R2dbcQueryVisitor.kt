@@ -124,6 +124,13 @@ object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
         return R2dbcEntityInsertMultipleRunner(context, entities)
     }
 
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityInsertMultipleReturningQuery(
+        context: EntityInsertContext<ENTITY, ID, META>,
+        entities: List<ENTITY>,
+    ): R2dbcRunner<*> {
+        TODO("Not yet implemented")
+    }
+
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityInsertBatchQuery(
         context: EntityInsertContext<ENTITY, ID, META>,
         entities: List<ENTITY>,
@@ -136,6 +143,13 @@ object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
         entity: ENTITY,
     ): R2dbcRunner<ENTITY> {
         return R2dbcEntityInsertSingleRunner(context, entity)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityInsertSingleReturningQuery(
+        context: EntityInsertContext<ENTITY, ID, META>,
+        entity: ENTITY,
+    ): R2dbcRunner<*> {
+        TODO("Not yet implemented")
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
@@ -170,12 +184,26 @@ object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
         return R2dbcEntityUpsertMultipleRunner(context, entities)
     }
 
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityUpsertMultipleReturningQuery(
+        context: EntityUpsertContext<ENTITY, ID, META>,
+        entities: List<ENTITY>,
+    ): R2dbcRunner<List<ENTITY>> {
+        TODO("Not yet implemented")
+    }
+
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
     entityUpsertSingleQuery(
         context: EntityUpsertContext<ENTITY, ID, META>,
         entity: ENTITY,
     ): R2dbcRunner<Long> {
         return R2dbcEntityUpsertSingleRunner(context, entity)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityUpsertSingleReturningQuery(
+        context: EntityUpsertContext<ENTITY, ID, META>,
+        entity: ENTITY,
+    ): R2dbcRunner<*> {
+        TODO("Not yet implemented")
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityUpsertSingleUpdateQuery(

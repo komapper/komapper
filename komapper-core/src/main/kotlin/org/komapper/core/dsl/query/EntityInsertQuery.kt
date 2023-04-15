@@ -9,7 +9,7 @@ import org.komapper.core.dsl.visitor.QueryVisitor
  * Represents a query to insert entities.
  * This query returns new entity or entities.
  *
- * @param T the entity type
+ * @param T the result type
  */
 interface EntityInsertQuery<T> : Query<T> {
     /**
@@ -21,10 +21,39 @@ interface EntityInsertQuery<T> : Query<T> {
     fun options(configure: (InsertOptions) -> InsertOptions): EntityInsertQuery<T>
 }
 
-internal data class EntityInsertSingleQuery<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
+/**
+ * Represents a query to insert a single entity.
+ *
+ * @param ENTITY the entity type
+ */
+interface EntityInsertSingleQuery<ENTITY : Any> : EntityInsertQuery<ENTITY> {
+    /**
+     * Indicates to retrieve an inserted entity.
+     */
+    fun returning(): EntityInsertReturningQuery<ENTITY>
+}
+
+/**
+ * Represents a query to insert multiple entities.
+ *
+ * @param ENTITY the entity type
+ */
+interface EntityInsertMultipleQuery<ENTITY : Any> : EntityInsertQuery<List<ENTITY>> {
+    /**
+     * Indicates to retrieve inserted entities.
+     */
+    fun returning(): EntityInsertReturningQuery<List<ENTITY>>
+}
+
+internal data class EntityInsertSingleQueryImpl<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityInsertContext<ENTITY, ID, META>,
     private val entity: ENTITY,
-) : EntityInsertQuery<ENTITY> {
+) : EntityInsertSingleQuery<ENTITY> {
+    override fun returning(): EntityInsertReturningQuery<ENTITY> {
+        val newContext = context.copy(returning = true)
+        return EntityInsertSingleReturningQuery(newContext, entity)
+    }
+
     override fun options(configure: (InsertOptions) -> InsertOptions): EntityInsertQuery<ENTITY> {
         val newContext = context.copy(options = configure(context.options))
         return copy(context = newContext)
@@ -35,11 +64,16 @@ internal data class EntityInsertSingleQuery<ENTITY : Any, ID : Any, META : Entit
     }
 }
 
-internal data class EntityInsertMultipleQuery<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
+internal data class EntityInsertMultipleQueryImpl<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityInsertContext<ENTITY, ID, META>,
     private val entities: List<ENTITY>,
-) : EntityInsertQuery<List<ENTITY>> {
-    override fun options(configure: (InsertOptions) -> InsertOptions): EntityInsertQuery<List<ENTITY>> {
+) : EntityInsertMultipleQuery<ENTITY> {
+    override fun returning(): EntityInsertReturningQuery<List<ENTITY>> {
+        val newContext = context.copy(returning = true)
+        return EntityInsertMultipleReturningQuery(newContext, entities)
+    }
+
+    override fun options(configure: (InsertOptions) -> InsertOptions): EntityInsertMultipleQuery<ENTITY> {
         val newContext = context.copy(options = configure(context.options))
         return copy(context = newContext)
     }

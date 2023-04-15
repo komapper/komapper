@@ -230,6 +230,8 @@ interface Dialect {
      */
     fun supportsGeneratedKeysReturningWhenInsertingMultipleRows(): Boolean = true
 
+    fun supportsInsertReturning(): Boolean = false
+
     /**
      * Returns whether the INTERSECT set operation is supported.
      */

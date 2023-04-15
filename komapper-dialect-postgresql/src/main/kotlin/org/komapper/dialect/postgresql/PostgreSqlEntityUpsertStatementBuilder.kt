@@ -88,6 +88,14 @@ class PostgreSqlEntityUpsertStatementBuilder<ENTITY : Any, ID : Any, META : Enti
                 }
             }
         }
+        if (context.returning) {
+            buf.append(" returning ")
+            for (p in target.properties()) {
+                column(p)
+                buf.append(", ")
+            }
+            buf.cutBack(2)
+        }
         return buf.toStatement()
     }
 
