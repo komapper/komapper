@@ -25,14 +25,18 @@ import org.komapper.core.dsl.visitor.QueryVisitor
 import org.komapper.r2dbc.dsl.runner.R2dbcEntityDeleteBatchRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcEntityDeleteSingleRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcEntityInsertBatchRunner
+import org.komapper.r2dbc.dsl.runner.R2dbcEntityInsertMultipleReturningRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcEntityInsertMultipleRunner
+import org.komapper.r2dbc.dsl.runner.R2dbcEntityInsertSingleReturningRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcEntityInsertSingleRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcEntityStoreRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcEntityUpdateBatchRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcEntityUpdateSingleRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcEntityUpsertBatchRunner
+import org.komapper.r2dbc.dsl.runner.R2dbcEntityUpsertMultipleReturningRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcEntityUpsertMultipleRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcEntityUpsertSingleIgnoreRunner
+import org.komapper.r2dbc.dsl.runner.R2dbcEntityUpsertSingleReturningRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcEntityUpsertSingleRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcEntityUpsertSingleUpdateRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcRelationDeleteRunner
@@ -127,8 +131,8 @@ object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityInsertMultipleReturningQuery(
         context: EntityInsertContext<ENTITY, ID, META>,
         entities: List<ENTITY>,
-    ): R2dbcRunner<*> {
-        TODO("Not yet implemented")
+    ): R2dbcRunner<List<ENTITY>> {
+        return R2dbcEntityInsertMultipleReturningRunner(context, entities)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityInsertBatchQuery(
@@ -148,8 +152,8 @@ object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityInsertSingleReturningQuery(
         context: EntityInsertContext<ENTITY, ID, META>,
         entity: ENTITY,
-    ): R2dbcRunner<*> {
-        TODO("Not yet implemented")
+    ): R2dbcRunner<ENTITY> {
+        return R2dbcEntityInsertSingleReturningRunner(context, entity)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
@@ -188,7 +192,7 @@ object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
         context: EntityUpsertContext<ENTITY, ID, META>,
         entities: List<ENTITY>,
     ): R2dbcRunner<List<ENTITY>> {
-        TODO("Not yet implemented")
+        return R2dbcEntityUpsertMultipleReturningRunner(context, entities)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
@@ -203,7 +207,7 @@ object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
         context: EntityUpsertContext<ENTITY, ID, META>,
         entity: ENTITY,
     ): R2dbcRunner<*> {
-        TODO("Not yet implemented")
+        return R2dbcEntityUpsertSingleReturningRunner(context, entity)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityUpsertSingleUpdateQuery(
