@@ -31,6 +31,8 @@ interface EntityInsertSingleQuery<ENTITY : Any> : EntityInsertQuery<ENTITY> {
      * Indicates to retrieve an inserted entity.
      */
     fun returning(): EntityInsertReturningQuery<ENTITY>
+
+    override fun options(configure: (InsertOptions) -> InsertOptions): EntityInsertSingleQuery<ENTITY>
 }
 
 /**
@@ -43,6 +45,8 @@ interface EntityInsertMultipleQuery<ENTITY : Any> : EntityInsertQuery<List<ENTIT
      * Indicates to retrieve inserted entities.
      */
     fun returning(): EntityInsertReturningQuery<List<ENTITY>>
+
+    override fun options(configure: (InsertOptions) -> InsertOptions): EntityInsertMultipleQuery<ENTITY>
 }
 
 internal data class EntityInsertSingleQueryImpl<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
@@ -54,7 +58,7 @@ internal data class EntityInsertSingleQueryImpl<ENTITY : Any, ID : Any, META : E
         return EntityInsertSingleReturningQuery(newContext, entity)
     }
 
-    override fun options(configure: (InsertOptions) -> InsertOptions): EntityInsertQuery<ENTITY> {
+    override fun options(configure: (InsertOptions) -> InsertOptions): EntityInsertSingleQuery<ENTITY> {
         val newContext = context.copy(options = configure(context.options))
         return copy(context = newContext)
     }

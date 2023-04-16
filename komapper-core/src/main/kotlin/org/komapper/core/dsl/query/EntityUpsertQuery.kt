@@ -31,6 +31,8 @@ interface EntityUpsertSingleQuery<ENTITY> : EntityUpsertQuery<Long> {
      * Indicates to retrieve an upserted entity.
      */
     fun returning(): EntityUpsertReturningQuery<ENTITY>
+
+    override fun options(configure: (InsertOptions) -> InsertOptions): EntityUpsertSingleQuery<ENTITY>
 }
 
 /**
@@ -43,6 +45,8 @@ interface EntityUpsertMultipleQuery<ENTITY : Any> : EntityUpsertQuery<Long> {
      * Indicates to retrieve upserted entities.
      */
     fun returning(): EntityUpsertReturningQuery<List<ENTITY>>
+
+    override fun options(configure: (InsertOptions) -> InsertOptions): EntityUpsertMultipleQuery<ENTITY>
 }
 
 internal data class EntityUpsertSingleQueryImpl<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, T>(
@@ -95,7 +99,7 @@ internal data class EntityUpsertMultipleQueryImpl<ENTITY : Any, ID : Any, META :
         return EntityUpsertMultipleReturningQuery(newContext, entities)
     }
 
-    override fun options(configure: (InsertOptions) -> InsertOptions): EntityUpsertQuery<Long> {
+    override fun options(configure: (InsertOptions) -> InsertOptions): EntityUpsertMultipleQuery<ENTITY> {
         return copy(context = context.copyConfigure(configure))
     }
 
