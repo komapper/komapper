@@ -14,6 +14,7 @@ data class EntityUpdateContext<ENTITY : Any, ID : Any, META : EntityMetamodel<EN
     val target: META,
     val includedProperties: List<PropertyMetamodel<ENTITY, *, *>> = emptyList(),
     val excludedProperties: List<PropertyMetamodel<ENTITY, *, *>> = emptyList(),
+    val returning: Boolean = false,
     override val options: UpdateOptions = UpdateOptions.DEFAULT,
 ) : TablesProvider, WhereProvider {
 

@@ -120,3 +120,13 @@ internal fun checkSearchConditionInUpsertStatement(config: DatabaseConfig, where
         }
     }
 }
+
+internal fun checkUpdateReturning(config: DatabaseConfig) {
+    val dialect = config.dialect
+    if (!config.dialect.supportsUpdateReturning()) {
+        throw UnsupportedOperationException(
+            "The dialect(driver=${dialect.driver}) does not support `UPDATE RETURNING`. " +
+                "Do not use the `returning` function in your query.",
+        )
+    }
+}

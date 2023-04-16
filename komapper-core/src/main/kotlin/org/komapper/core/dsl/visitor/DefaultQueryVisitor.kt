@@ -29,6 +29,7 @@ import org.komapper.core.dsl.runner.EntityInsertMultipleRunner
 import org.komapper.core.dsl.runner.EntityInsertSingleReturningRunner
 import org.komapper.core.dsl.runner.EntityInsertSingleRunner
 import org.komapper.core.dsl.runner.EntityUpdateBatchRunner
+import org.komapper.core.dsl.runner.EntityUpdateSingleReturningRunner
 import org.komapper.core.dsl.runner.EntityUpdateSingleRunner
 import org.komapper.core.dsl.runner.EntityUpsertBatchRunner
 import org.komapper.core.dsl.runner.EntityUpsertMultipleReturningRunner
@@ -156,6 +157,13 @@ internal object DefaultQueryVisitor : QueryVisitor<Runner> {
         entity: ENTITY,
     ): Runner {
         return EntityUpdateSingleRunner(context, entity)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityUpdateSingleReturningQuery(
+        context: EntityUpdateContext<ENTITY, ID, META>,
+        entity: ENTITY,
+    ): Runner {
+        return EntityUpdateSingleReturningRunner(context, entity)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>

@@ -21,11 +21,22 @@ interface EntityUpdateQuery<T> : Query<T> {
     fun options(configure: (UpdateOptions) -> UpdateOptions): EntityUpdateQuery<T>
 }
 
-internal data class EntityUpdateSingleQuery<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
+interface EntityUpdateSingleQuery<ENTITY> :
+    EntityUpdateQuery<ENTITY> {
+    fun returning(): EntityUpdateReturningQuery<ENTITY>
+    override fun options(configure: (UpdateOptions) -> UpdateOptions): EntityUpdateSingleQuery<ENTITY>
+}
+
+internal data class EntityUpdateSingleQueryImpl<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, T>(
     private val context: EntityUpdateContext<ENTITY, ID, META>,
     private val entity: ENTITY,
-) : EntityUpdateQuery<ENTITY> {
-    override fun options(configure: (UpdateOptions) -> UpdateOptions): EntityUpdateQuery<ENTITY> {
+) : EntityUpdateSingleQuery<T> {
+    override fun returning(): EntityUpdateReturningQuery<T> {
+        val newContext = context.copy(returning = true)
+        return EntityUpdateSingleReturningQuery(newContext, entity)
+    }
+
+    override fun options(configure: (UpdateOptions) -> UpdateOptions): EntityUpdateSingleQuery<T> {
         val newContext = context.copy(options = configure(context.options))
         return copy(context = newContext)
     }

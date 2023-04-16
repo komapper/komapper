@@ -38,7 +38,7 @@ interface UpdateQueryBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTI
      * @param entity the entity to be updated
      * @return the query
      */
-    fun single(entity: ENTITY): EntityUpdateQuery<ENTITY>
+    fun single(entity: ENTITY): EntityUpdateSingleQuery<ENTITY?>
 
     /**
      * Builds a query to update a list of entities in a batch.
@@ -95,9 +95,9 @@ internal data class UpdateQueryBuilderImpl<ENTITY : Any, ID : Any, META : Entity
         }
     }
 
-    override fun single(entity: ENTITY): EntityUpdateQuery<ENTITY> {
+    override fun single(entity: ENTITY): EntityUpdateSingleQuery<ENTITY?> {
         context.target.checkIdValueNotNull(entity)
-        return EntityUpdateSingleQuery(context, entity)
+        return EntityUpdateSingleQueryImpl(context, entity)
     }
 
     override fun batch(entities: List<ENTITY>, batchSize: Int?): EntityUpdateQuery<List<ENTITY>> {

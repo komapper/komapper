@@ -3,12 +3,15 @@ package org.komapper.dialect.postgresql
 import org.komapper.core.BuilderDialect
 import org.komapper.core.Dialect
 import org.komapper.core.dsl.builder.EntityInsertStatementBuilder
+import org.komapper.core.dsl.builder.EntityUpdateStatementBuilder
 import org.komapper.core.dsl.builder.EntityUpsertStatementBuilder
 import org.komapper.core.dsl.builder.SchemaStatementBuilder
 import org.komapper.core.dsl.context.EntityInsertContext
+import org.komapper.core.dsl.context.EntityUpdateContext
 import org.komapper.core.dsl.context.EntityUpsertContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.dialect.h2.PostgreSqlEntityInsertStatementBuilder
+import org.komapper.dialect.h2.PostgreSqlEntityUpdateStatementBuilder
 
 interface PostgreSqlDialect : Dialect {
 
@@ -38,6 +41,14 @@ interface PostgreSqlDialect : Dialect {
         return PostgreSqlEntityInsertStatementBuilder(dialect, context, entities)
     }
 
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> getEntityUpdateStatementBuilder(
+        dialect: BuilderDialect,
+        context: EntityUpdateContext<ENTITY, ID, META>,
+        entity: ENTITY,
+    ): EntityUpdateStatementBuilder<ENTITY, ID, META> {
+        return PostgreSqlEntityUpdateStatementBuilder(dialect, context, entity)
+    }
+
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> getEntityUpsertStatementBuilder(
         dialect: BuilderDialect,
         context: EntityUpsertContext<ENTITY, ID, META>,
@@ -57,4 +68,6 @@ interface PostgreSqlDialect : Dialect {
     override fun supportsInsertReturning(): Boolean = true
 
     override fun supportsSearchConditionInUpsertStatement(): Boolean = true
+
+    override fun supportsUpdateReturning(): Boolean = true
 }

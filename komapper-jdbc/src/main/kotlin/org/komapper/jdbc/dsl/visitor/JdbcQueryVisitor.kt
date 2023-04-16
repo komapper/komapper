@@ -31,6 +31,7 @@ import org.komapper.jdbc.dsl.runner.JdbcEntityInsertSingleReturningRunner
 import org.komapper.jdbc.dsl.runner.JdbcEntityInsertSingleRunner
 import org.komapper.jdbc.dsl.runner.JdbcEntityStoreRunner
 import org.komapper.jdbc.dsl.runner.JdbcEntityUpdateBatchRunner
+import org.komapper.jdbc.dsl.runner.JdbcEntityUpdateSingleReturningRunner
 import org.komapper.jdbc.dsl.runner.JdbcEntityUpdateSingleRunner
 import org.komapper.jdbc.dsl.runner.JdbcEntityUpsertBatchRunner
 import org.komapper.jdbc.dsl.runner.JdbcEntityUpsertMultipleReturningRunner
@@ -172,6 +173,13 @@ object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
         entity: ENTITY,
     ): JdbcRunner<ENTITY> {
         return JdbcEntityUpdateSingleRunner(context, entity)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityUpdateSingleReturningQuery(
+        context: EntityUpdateContext<ENTITY, ID, META>,
+        entity: ENTITY,
+    ): JdbcRunner<ENTITY?> {
+        return JdbcEntityUpdateSingleReturningRunner(context, entity)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>

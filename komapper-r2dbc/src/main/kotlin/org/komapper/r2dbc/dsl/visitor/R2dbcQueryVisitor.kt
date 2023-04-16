@@ -172,6 +172,13 @@ object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
         return R2dbcEntityUpdateSingleRunner(context, entity)
     }
 
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityUpdateSingleReturningQuery(
+        context: EntityUpdateContext<ENTITY, ID, META>,
+        entity: ENTITY,
+    ): R2dbcRunner<*> {
+        TODO("Not yet implemented")
+    }
+
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
     entityUpsertBatchQuery(
         context: EntityUpsertContext<ENTITY, ID, META>,

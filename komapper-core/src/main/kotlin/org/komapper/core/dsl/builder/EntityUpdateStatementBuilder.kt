@@ -9,15 +9,19 @@ import org.komapper.core.dsl.expression.Criterion
 import org.komapper.core.dsl.expression.TableExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 
-class EntityUpdateStatementBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
+interface EntityUpdateStatementBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> {
+    fun build(): Statement
+}
+
+class DefaultEntityUpdateStatementBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val dialect: BuilderDialect,
     private val context: EntityUpdateContext<ENTITY, ID, META>,
     private val entity: ENTITY,
-) {
+) : EntityUpdateStatementBuilder<ENTITY, ID, META> {
     private val buf = StatementBuffer()
     private val support = BuilderSupport(dialect, EmptyAliasManager, buf)
 
-    fun build(): Statement {
+    override fun build(): Statement {
         val target = context.target
         val idProperties = target.idProperties()
         val versionProperty = target.versionProperty()

@@ -1,13 +1,16 @@
 package org.komapper.core
 
 import org.komapper.core.dsl.builder.DefaultEntityInsertStatementBuilder
+import org.komapper.core.dsl.builder.DefaultEntityUpdateStatementBuilder
 import org.komapper.core.dsl.builder.DryRunSchemaStatementBuilder
 import org.komapper.core.dsl.builder.EntityInsertStatementBuilder
+import org.komapper.core.dsl.builder.EntityUpdateStatementBuilder
 import org.komapper.core.dsl.builder.EntityUpsertStatementBuilder
 import org.komapper.core.dsl.builder.OffsetLimitStatementBuilder
 import org.komapper.core.dsl.builder.OffsetLimitStatementBuilderImpl
 import org.komapper.core.dsl.builder.SchemaStatementBuilder
 import org.komapper.core.dsl.context.EntityInsertContext
+import org.komapper.core.dsl.context.EntityUpdateContext
 import org.komapper.core.dsl.context.EntityUpsertContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import java.util.regex.Pattern
@@ -149,6 +152,14 @@ interface Dialect {
         entities: List<ENTITY>,
     ): EntityInsertStatementBuilder<ENTITY, ID, META> {
         return DefaultEntityInsertStatementBuilder(dialect, context, entities)
+    }
+
+    fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> getEntityUpdateStatementBuilder(
+        dialect: BuilderDialect,
+        context: EntityUpdateContext<ENTITY, ID, META>,
+        entity: ENTITY,
+    ): EntityUpdateStatementBuilder<ENTITY, ID, META> {
+        return DefaultEntityUpdateStatementBuilder(dialect, context, entity)
     }
 
     /**
@@ -306,6 +317,8 @@ interface Dialect {
      * Returns whether the table hint is supported.
      */
     fun supportsTableHint(): Boolean = false
+
+    fun supportsUpdateReturning(): Boolean = false
 }
 
 object DryRunDialect : Dialect {

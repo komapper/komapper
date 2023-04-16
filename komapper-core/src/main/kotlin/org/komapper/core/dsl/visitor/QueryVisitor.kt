@@ -100,6 +100,12 @@ interface QueryVisitor<VISIT_RESULT> {
     ): VISIT_RESULT
 
     fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
+    entityUpdateSingleReturningQuery(
+        context: EntityUpdateContext<ENTITY, ID, META>,
+        entity: ENTITY,
+    ): VISIT_RESULT
+
+    fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
     entityUpsertBatchQuery(
         context: EntityUpsertContext<ENTITY, ID, META>,
         entities: List<ENTITY>,
