@@ -31,6 +31,7 @@ import org.komapper.r2dbc.dsl.runner.R2dbcEntityInsertSingleReturningRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcEntityInsertSingleRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcEntityStoreRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcEntityUpdateBatchRunner
+import org.komapper.r2dbc.dsl.runner.R2dbcEntityUpdateSingleReturningRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcEntityUpdateSingleRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcEntityUpsertBatchRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcEntityUpsertMultipleReturningRunner
@@ -175,8 +176,8 @@ object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityUpdateSingleReturningQuery(
         context: EntityUpdateContext<ENTITY, ID, META>,
         entity: ENTITY,
-    ): R2dbcRunner<*> {
-        TODO("Not yet implemented")
+    ): R2dbcRunner<ENTITY?> {
+        return R2dbcEntityUpdateSingleReturningRunner(context, entity)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
