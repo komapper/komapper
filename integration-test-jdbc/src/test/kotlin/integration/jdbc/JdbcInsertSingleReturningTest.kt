@@ -12,6 +12,7 @@ import integration.core.identityStrategy
 import integration.core.sequenceStrategy
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.UniqueConstraintException
+import org.komapper.core.dryRunQuery
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
 import org.komapper.core.dsl.metamodel.IdGenerator
@@ -180,5 +181,13 @@ class JdbcInsertSingleReturningTest(private val db: JdbcDatabase) {
             Unit
         }
         println(ex)
+    }
+
+    @Test
+    fun dryRun() {
+        val a = Meta.address
+        val address = Address(16, "STREET 16", 0)
+        val query = QueryDsl.insert(a).single(address).returning()
+        println(db.dryRunQuery(query))
     }
 }

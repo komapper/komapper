@@ -11,6 +11,7 @@ import integration.core.department
 import integration.core.identityStrategy
 import integration.core.sequenceStrategy
 import org.junit.jupiter.api.extension.ExtendWith
+import org.komapper.core.dryRunQuery
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
 import org.komapper.core.dsl.metamodel.IdGenerator
@@ -136,5 +137,17 @@ class JdbcInsertMultipleReturningTest(private val db: JdbcDatabase) {
             Unit
         }
         println(ex)
+    }
+
+    @Test
+    fun dryRun() {
+        val a = Meta.address
+        val addressList = listOf(
+            Address(16, "STREET 16", 0),
+            Address(17, "STREET 17", 0),
+            Address(18, "STREET 18", 0),
+        )
+        val query = QueryDsl.insert(a).multiple(addressList).returning()
+        println(db.dryRunQuery(query))
     }
 }

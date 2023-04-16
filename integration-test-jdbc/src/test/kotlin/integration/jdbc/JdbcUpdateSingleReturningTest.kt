@@ -7,6 +7,7 @@ import integration.core.address
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.OptimisticLockException
 import org.komapper.core.UniqueConstraintException
+import org.komapper.core.dryRunQuery
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
 import org.komapper.core.dsl.query.first
@@ -71,5 +72,13 @@ class JdbcUpdateSingleReturningTest(private val db: JdbcDatabase) {
             Unit
         }
         println(ex)
+    }
+
+    @Test
+    fun dryRun() {
+        val a = Meta.address
+        val address = Address(addressId = 1, street = "STREET 123", version = 0)
+        val query = QueryDsl.update(a).single(address).returning()
+        println(db.dryRunQuery(query))
     }
 }
