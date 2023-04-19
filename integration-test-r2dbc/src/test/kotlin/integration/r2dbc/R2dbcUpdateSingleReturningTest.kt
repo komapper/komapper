@@ -17,6 +17,7 @@ import org.komapper.r2dbc.R2dbcDatabase
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import kotlin.test.assertNull
 
 @ExtendWith(R2dbcEnv::class)
 class R2dbcUpdateSingleReturningTest(private val db: R2dbcDatabase) {
@@ -39,6 +40,77 @@ class R2dbcUpdateSingleReturningTest(private val db: R2dbcDatabase) {
             address2,
         )
         assertEquals(address2, returningAddress)
+    }
+
+    @Run(onlyIf = [Dbms.POSTGRESQL])
+    @Test
+    fun testReturningSingleColumn(info: TestInfo) = inTransaction(db, info) {
+        val a = Meta.address
+        val query = QueryDsl.from(a).where { a.addressId eq 15 }
+        val address = db.runQuery { query.first() }
+        val newAddress = address.copy(street = "NY street")
+        val street = db.runQuery { QueryDsl.update(a).single(newAddress).returning(a.street) }
+        val address2 = db.runQuery { query.firstOrNull() }
+        assertEquals("NY street", street)
+        assertEquals(
+            Address(
+                15,
+                "NY street",
+                2,
+            ),
+            address2,
+        )
+    }
+
+    @Run(onlyIf = [Dbms.POSTGRESQL])
+    @Test
+    fun testReturningPairColumns(info: TestInfo) = inTransaction(db, info) {
+        val a = Meta.address
+        val query = QueryDsl.from(a).where { a.addressId eq 15 }
+        val address = db.runQuery { query.first() }
+        val newAddress = address.copy(street = "NY street")
+        val pair = db.runQuery { QueryDsl.update(a).single(newAddress).returning(a.street, a.version) }
+        val address2 = db.runQuery { query.firstOrNull() }
+        assertEquals("NY street" to 2, pair)
+        assertEquals(
+            Address(
+                15,
+                "NY street",
+                2,
+            ),
+            address2,
+        )
+    }
+
+    @Run(onlyIf = [Dbms.POSTGRESQL])
+    @Test
+    fun testReturningTripleColumns(info: TestInfo) = inTransaction(db, info) {
+        val a = Meta.address
+        val query = QueryDsl.from(a).where { a.addressId eq 15 }
+        val address = db.runQuery { query.first() }
+        val newAddress = address.copy(street = "NY street")
+        val triple = db.runQuery { QueryDsl.update(a).single(newAddress).returning(a.street, a.version, a.addressId) }
+        val address2 = db.runQuery { query.firstOrNull() }
+        assertEquals(Triple("NY street", 2, 15), triple)
+        assertEquals(
+            Address(
+                15,
+                "NY street",
+                2,
+            ),
+            address2,
+        )
+    }
+
+    @Run(onlyIf = [Dbms.POSTGRESQL])
+    @Test
+    fun suppressOptimisticLockException(info: TestInfo) = inTransaction(db, info) {
+        val a = Meta.address
+        val query = QueryDsl.from(a).where { a.addressId eq 15 }
+        val address = db.runQuery { query.first() }
+        val newAddress = address.copy(street = "NY street", version = address.version + 1)
+        val returningAddress = db.runQuery { QueryDsl.update(a).single(newAddress).returning().options { it.copy(suppressOptimisticLockException = true) } }
+        assertNull(returningAddress)
     }
 
     @Run(onlyIf = [Dbms.POSTGRESQL])

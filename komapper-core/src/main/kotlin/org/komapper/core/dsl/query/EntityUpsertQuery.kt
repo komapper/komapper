@@ -1,7 +1,11 @@
 package org.komapper.core.dsl.query
 
+import kotlinx.coroutines.flow.single
+import kotlinx.coroutines.flow.singleOrNull
 import org.komapper.core.dsl.context.EntityUpsertContext
+import org.komapper.core.dsl.element.Output
 import org.komapper.core.dsl.metamodel.EntityMetamodel
+import org.komapper.core.dsl.metamodel.PropertyMetamodel
 import org.komapper.core.dsl.options.InsertOptions
 import org.komapper.core.dsl.visitor.QueryVisitor
 
@@ -26,13 +30,48 @@ interface EntityUpsertQuery<T> : Query<T> {
  *
  * @param ENTITY the entity type
  */
-interface EntityUpsertSingleQuery<ENTITY> : EntityUpsertQuery<Long> {
+interface EntityUpsertSingleQueryNonNull<ENTITY : Any> : EntityUpsertQuery<Long> {
     /**
      * Indicates to retrieve an upserted entity.
      */
     fun returning(): EntityUpsertReturningQuery<ENTITY>
 
-    override fun options(configure: (InsertOptions) -> InsertOptions): EntityUpsertSingleQuery<ENTITY>
+    fun <A : Any> returning(expression: PropertyMetamodel<ENTITY, A, *>): EntityUpsertReturningQuery<A?>
+
+    fun <A : Any, B : Any> returning(
+        expression1: PropertyMetamodel<ENTITY, A, *>,
+        expression2: PropertyMetamodel<ENTITY, B, *>,
+    ): EntityUpsertReturningQuery<Pair<A?, B?>>
+
+    fun <A : Any, B : Any, C : Any> returning(
+        expression1: PropertyMetamodel<ENTITY, A, *>,
+        expression2: PropertyMetamodel<ENTITY, B, *>,
+        expression3: PropertyMetamodel<ENTITY, C, *>,
+    ): EntityUpsertReturningQuery<Triple<A?, B?, C?>>
+
+    override fun options(configure: (InsertOptions) -> InsertOptions): EntityUpsertSingleQueryNonNull<ENTITY>
+}
+
+interface EntityUpsertSingleQueryNullable<ENTITY : Any> : EntityUpsertQuery<Long> {
+    /**
+     * Indicates to retrieve an upserted entity.
+     */
+    fun returning(): EntityUpsertReturningQuery<ENTITY?>
+
+    fun <A : Any> returning(expression: PropertyMetamodel<ENTITY, A, *>): EntityUpsertReturningQuery<A?>
+
+    fun <A : Any, B : Any> returning(
+        expression1: PropertyMetamodel<ENTITY, A, *>,
+        expression2: PropertyMetamodel<ENTITY, B, *>,
+    ): EntityUpsertReturningQuery<Pair<A?, B?>?>
+
+    fun <A : Any, B : Any, C : Any> returning(
+        expression1: PropertyMetamodel<ENTITY, A, *>,
+        expression2: PropertyMetamodel<ENTITY, B, *>,
+        expression3: PropertyMetamodel<ENTITY, C, *>,
+    ): EntityUpsertReturningQuery<Triple<A?, B?, C?>?>
+
+    override fun options(configure: (InsertOptions) -> InsertOptions): EntityUpsertSingleQueryNullable<ENTITY>
 }
 
 /**
@@ -46,19 +85,98 @@ interface EntityUpsertMultipleQuery<ENTITY : Any> : EntityUpsertQuery<Long> {
      */
     fun returning(): EntityUpsertReturningQuery<List<ENTITY>>
 
+    fun <A : Any> returning(expression: PropertyMetamodel<ENTITY, A, *>): EntityUpsertReturningQuery<List<A?>>
+
+    fun <A : Any, B : Any> returning(
+        expression1: PropertyMetamodel<ENTITY, A, *>,
+        expression2: PropertyMetamodel<ENTITY, B, *>,
+    ): EntityUpsertReturningQuery<List<Pair<A?, B?>>>
+
+    fun <A : Any, B : Any, C : Any> returning(
+        expression1: PropertyMetamodel<ENTITY, A, *>,
+        expression2: PropertyMetamodel<ENTITY, B, *>,
+        expression3: PropertyMetamodel<ENTITY, C, *>,
+    ): EntityUpsertReturningQuery<List<Triple<A?, B?, C?>>>
+
     override fun options(configure: (InsertOptions) -> InsertOptions): EntityUpsertMultipleQuery<ENTITY>
 }
 
-internal data class EntityUpsertSingleQueryImpl<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, T>(
+internal data class EntityUpsertSingleQueryNonNullImpl<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityUpsertContext<ENTITY, ID, META>,
     private val entity: ENTITY,
-) : EntityUpsertSingleQuery<T> {
-    override fun returning(): EntityUpsertReturningQuery<T> {
-        val newContext = context.copy(returning = true)
-        return EntityUpsertSingleReturningQuery(newContext, entity)
+) : EntityUpsertSingleQueryNonNull<ENTITY> {
+    override fun returning(): EntityUpsertReturningQuery<ENTITY> {
+        val newContext = context.copy(returning = Output.Metamodel(context.target))
+        return EntityUpsertSingleReturningQuery(newContext, entity) { it.single() }
     }
 
-    override fun options(configure: (InsertOptions) -> InsertOptions): EntityUpsertSingleQuery<T> {
+    override fun <A : Any> returning(expression: PropertyMetamodel<ENTITY, A, *>): EntityUpsertReturningQuery<A?> {
+        val newContext = context.copy(returning = Output.Expressions(listOf(expression)))
+        return EntityUpsertSingleReturningSingleColumnQuery(newContext, entity, expression) { it.single() }
+    }
+
+    override fun <A : Any, B : Any> returning(
+        expression1: PropertyMetamodel<ENTITY, A, *>,
+        expression2: PropertyMetamodel<ENTITY, B, *>,
+    ): EntityUpsertReturningQuery<Pair<A?, B?>> {
+        val expressions = expression1 to expression2
+        val newContext = context.copy(returning = Output.Expressions(expressions.toList()))
+        return EntityUpsertSingleReturningPairColumnsQuery(newContext, entity, expressions) { it.single() }
+    }
+
+    override fun <A : Any, B : Any, C : Any> returning(
+        expression1: PropertyMetamodel<ENTITY, A, *>,
+        expression2: PropertyMetamodel<ENTITY, B, *>,
+        expression3: PropertyMetamodel<ENTITY, C, *>,
+    ): EntityUpsertReturningQuery<Triple<A?, B?, C?>> {
+        val expressions = Triple(expression1, expression2, expression3)
+        val newContext = context.copy(returning = Output.Expressions(expressions.toList()))
+        return EntityUpsertSingleReturningTripleColumnsQuery(newContext, entity, expressions) { it.single() }
+    }
+
+    override fun options(configure: (InsertOptions) -> InsertOptions): EntityUpsertSingleQueryNonNull<ENTITY> {
+        return copy(context = context.copyConfigure(configure))
+    }
+
+    override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
+        return visitor.entityUpsertSingleQuery(context, entity)
+    }
+}
+
+internal data class EntityUpsertSingleQueryNullableImpl<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
+    private val context: EntityUpsertContext<ENTITY, ID, META>,
+    private val entity: ENTITY,
+) : EntityUpsertSingleQueryNullable<ENTITY> {
+    override fun returning(): EntityUpsertReturningQuery<ENTITY?> {
+        val newContext = context.copy(returning = Output.Metamodel(context.target))
+        return EntityUpsertSingleReturningQuery(newContext, entity) { it.singleOrNull() }
+    }
+
+    override fun <A : Any> returning(expression: PropertyMetamodel<ENTITY, A, *>): EntityUpsertReturningQuery<A?> {
+        val newContext = context.copy(returning = Output.Expressions(listOf(expression)))
+        return EntityUpsertSingleReturningSingleColumnQuery(newContext, entity, expression) { it.singleOrNull() }
+    }
+
+    override fun <A : Any, B : Any> returning(
+        expression1: PropertyMetamodel<ENTITY, A, *>,
+        expression2: PropertyMetamodel<ENTITY, B, *>,
+    ): EntityUpsertReturningQuery<Pair<A?, B?>?> {
+        val expressions = expression1 to expression2
+        val newContext = context.copy(returning = Output.Expressions(expressions.toList()))
+        return EntityUpsertSingleReturningPairColumnsQuery(newContext, entity, expressions) { it.singleOrNull() }
+    }
+
+    override fun <A : Any, B : Any, C : Any> returning(
+        expression1: PropertyMetamodel<ENTITY, A, *>,
+        expression2: PropertyMetamodel<ENTITY, B, *>,
+        expression3: PropertyMetamodel<ENTITY, C, *>,
+    ): EntityUpsertReturningQuery<Triple<A?, B?, C?>?> {
+        val expressions = Triple(expression1, expression2, expression3)
+        val newContext = context.copy(returning = Output.Expressions(expressions.toList()))
+        return EntityUpsertSingleReturningTripleColumnsQuery(newContext, entity, expressions) { it.single() }
+    }
+
+    override fun options(configure: (InsertOptions) -> InsertOptions): EntityUpsertSingleQueryNullable<ENTITY> {
         return copy(context = context.copyConfigure(configure))
     }
 
@@ -95,8 +213,32 @@ internal data class EntityUpsertMultipleQueryImpl<ENTITY : Any, ID : Any, META :
     private val entities: List<ENTITY>,
 ) : EntityUpsertMultipleQuery<ENTITY> {
     override fun returning(): EntityUpsertReturningQuery<List<ENTITY>> {
-        val newContext = context.copy(returning = true)
+        val newContext = context.copy(returning = Output.Metamodel(context.target))
         return EntityUpsertMultipleReturningQuery(newContext, entities)
+    }
+
+    override fun <A : Any> returning(expression: PropertyMetamodel<ENTITY, A, *>): EntityUpsertReturningQuery<List<A?>> {
+        val newContext = context.copy(returning = Output.Expressions(listOf(expression)))
+        return EntityUpsertMultipleReturningSingleColumnQuery(newContext, entities, expression)
+    }
+
+    override fun <A : Any, B : Any> returning(
+        expression1: PropertyMetamodel<ENTITY, A, *>,
+        expression2: PropertyMetamodel<ENTITY, B, *>,
+    ): EntityUpsertReturningQuery<List<Pair<A?, B?>>> {
+        val expressions = expression1 to expression2
+        val newContext = context.copy(returning = Output.Expressions(expressions.toList()))
+        return EntityUpsertMultipleReturningPairColumnsQuery(newContext, entities, expressions)
+    }
+
+    override fun <A : Any, B : Any, C : Any> returning(
+        expression1: PropertyMetamodel<ENTITY, A, *>,
+        expression2: PropertyMetamodel<ENTITY, B, *>,
+        expression3: PropertyMetamodel<ENTITY, C, *>,
+    ): EntityUpsertReturningQuery<List<Triple<A?, B?, C?>>> {
+        val expressions = Triple(expression1, expression2, expression3)
+        val newContext = context.copy(returning = Output.Expressions(expressions.toList()))
+        return EntityUpsertMultipleReturningTripleColumnsQuery(newContext, entities, expressions)
     }
 
     override fun options(configure: (InsertOptions) -> InsertOptions): EntityUpsertMultipleQuery<ENTITY> {

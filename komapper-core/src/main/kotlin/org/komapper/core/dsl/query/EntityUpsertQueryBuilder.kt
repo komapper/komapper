@@ -17,20 +17,20 @@ internal interface EntityUpsertQueryBuilder<ENTITY : Any, ID : Any, META : Entit
     fun batch(entities: List<ENTITY>, batchSize: Int? = null): EntityUpsertQuery<List<Long>>
 }
 
-internal interface EntityUpsertQueryBuilderReturningSingle<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> : EntityUpsertQueryBuilder<ENTITY, ID, META> {
-    fun single(entity: ENTITY): EntityUpsertSingleQuery<ENTITY>
+internal interface EntityUpsertQueryBuilderNonNull<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> : EntityUpsertQueryBuilder<ENTITY, ID, META> {
+    fun single(entity: ENTITY): EntityUpsertSingleQueryNonNull<ENTITY>
 }
 
-internal interface EntityUpsertQueryBuilderReturningSingleOrNull<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> : EntityUpsertQueryBuilder<ENTITY, ID, META> {
-    fun single(entity: ENTITY): EntityUpsertSingleQuery<ENTITY?>
+internal interface EntityUpsertQueryBuilderNullable<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> : EntityUpsertQueryBuilder<ENTITY, ID, META> {
+    fun single(entity: ENTITY): EntityUpsertSingleQueryNullable<ENTITY>
 }
 
-internal data class EntityUpsertQueryBuilderReturningSingleImpl<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
+internal data class EntityUpsertQueryBuilderNonNullImpl<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityUpsertContext<ENTITY, ID, META>,
-) : EntityUpsertQueryBuilderReturningSingle<ENTITY, ID, META> {
+) : EntityUpsertQueryBuilderNonNull<ENTITY, ID, META> {
 
-    override fun single(entity: ENTITY): EntityUpsertSingleQuery<ENTITY> {
-        return EntityUpsertSingleQueryImpl(context, entity)
+    override fun single(entity: ENTITY): EntityUpsertSingleQueryNonNull<ENTITY> {
+        return EntityUpsertSingleQueryNonNullImpl(context, entity)
     }
 
     override fun multiple(entities: List<ENTITY>): EntityUpsertMultipleQuery<ENTITY> {
@@ -42,12 +42,12 @@ internal data class EntityUpsertQueryBuilderReturningSingleImpl<ENTITY : Any, ID
     }
 }
 
-internal data class EntityUpsertQueryBuilderReturningSingleOrNullImpl<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
+internal data class EntityUpsertQueryBuilderNullableImpl<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityUpsertContext<ENTITY, ID, META>,
-) : EntityUpsertQueryBuilderReturningSingleOrNull<ENTITY, ID, META> {
+) : EntityUpsertQueryBuilderNullable<ENTITY, ID, META> {
 
-    override fun single(entity: ENTITY): EntityUpsertSingleQuery<ENTITY?> {
-        return EntityUpsertSingleQueryImpl(context, entity)
+    override fun single(entity: ENTITY): EntityUpsertSingleQueryNullable<ENTITY> {
+        return EntityUpsertSingleQueryNullableImpl(context, entity)
     }
 
     override fun multiple(entities: List<ENTITY>): EntityUpsertMultipleQuery<ENTITY> {

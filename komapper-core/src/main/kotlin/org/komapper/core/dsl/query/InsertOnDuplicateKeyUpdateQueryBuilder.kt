@@ -34,7 +34,7 @@ interface InsertOnDuplicateKeyUpdateQueryBuilder<ENTITY : Any, ID : Any, META : 
      * @param declaration the where declaration
      * @return the builder
      * */
-    fun where(declaration: WhereDeclaration): InsertOnDuplicateKeyUpdateQueryBuilderReturningSingleOrNull<ENTITY, ID, META>
+    fun where(declaration: WhereDeclaration): InsertOnDuplicateKeyUpdateQueryBuilderNullable<ENTITY, ID, META>
 
     /**
      * Builds a query to bulk insert or update a list of entities.
@@ -85,53 +85,45 @@ interface InsertOnDuplicateKeyUpdateQueryBuilder<ENTITY : Any, ID : Any, META : 
  * @param ID the entity id type
  * @param META the entity metamodel type
  */
-interface InsertOnDuplicateKeyUpdateQueryBuilderReturningSingle<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> : InsertOnDuplicateKeyUpdateQueryBuilder<ENTITY, ID, META, InsertOnDuplicateKeyUpdateQueryBuilderReturningSingle<ENTITY, ID, META>> {
+interface InsertOnDuplicateKeyUpdateQueryBuilderNonNull<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> : InsertOnDuplicateKeyUpdateQueryBuilder<ENTITY, ID, META, InsertOnDuplicateKeyUpdateQueryBuilderNonNull<ENTITY, ID, META>> {
     /**
      * Builds a query to insert or update a single entity.
-     * The query returns a non-nullable entity if [EntityUpsertSingleQuery.returning] is called.
+     * The query returns a non-nullable entity if [EntityUpsertSingleQueryNonNull.returning] is called.
      *
      * @param entity the entity to be inserted or updated
      * @return the query
      */
-    fun single(entity: ENTITY): EntityUpsertSingleQuery<ENTITY>
+    fun single(entity: ENTITY): EntityUpsertSingleQueryNonNull<ENTITY>
 }
 
-/**
- * The builder of the query that inserts or updates entities.
- * This builder provides the function to retrieve an inserted or updated entity as a nullable instance.
- *
- * @param ENTITY the entity type
- * @param ID the entity id type
- * @param META the entity metamodel type
- */
-interface InsertOnDuplicateKeyUpdateQueryBuilderReturningSingleOrNull<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> : InsertOnDuplicateKeyUpdateQueryBuilder<ENTITY, ID, META, InsertOnDuplicateKeyUpdateQueryBuilderReturningSingleOrNull<ENTITY, ID, META>> {
+interface InsertOnDuplicateKeyUpdateQueryBuilderNullable<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> : InsertOnDuplicateKeyUpdateQueryBuilder<ENTITY, ID, META, InsertOnDuplicateKeyUpdateQueryBuilderNullable<ENTITY, ID, META>> {
     /**
      * Builds a query to insert or update a single entity.
-     * The query returns a nullable entity if [EntityUpsertSingleQuery.returning] is called.
+     * The query returns a non-nullable entity if [EntityUpsertSingleQueryNullable.returning] is called.
      *
      * @param entity the entity to be inserted or updated
      * @return the query
      */
-    fun single(entity: ENTITY): EntityUpsertSingleQuery<ENTITY?>
+    fun single(entity: ENTITY): EntityUpsertSingleQueryNullable<ENTITY>
 }
 
-internal data class InsertOnDuplicateKeyUpdateQueryBuilderReturningSingleImpl<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
+internal data class InsertOnDuplicateKeyUpdateQueryBuilderNonNullImpl<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityUpsertContext<ENTITY, ID, META>,
-) : InsertOnDuplicateKeyUpdateQueryBuilderReturningSingle<ENTITY, ID, META> {
+) : InsertOnDuplicateKeyUpdateQueryBuilderNonNull<ENTITY, ID, META> {
 
-    private val builder: EntityUpsertQueryBuilderReturningSingle<ENTITY, ID, META> = EntityUpsertQueryBuilderReturningSingleImpl(context)
+    private val builder: EntityUpsertQueryBuilderNonNull<ENTITY, ID, META> = EntityUpsertQueryBuilderNonNullImpl(context)
 
-    override fun set(declaration: AssignmentDeclaration<ENTITY, META>): InsertOnDuplicateKeyUpdateQueryBuilderReturningSingle<ENTITY, ID, META> {
+    override fun set(declaration: AssignmentDeclaration<ENTITY, META>): InsertOnDuplicateKeyUpdateQueryBuilderNonNull<ENTITY, ID, META> {
         val newContext = context.copy(set = context.set + declaration)
         return copy(context = newContext)
     }
 
-    override fun where(declaration: WhereDeclaration): InsertOnDuplicateKeyUpdateQueryBuilderReturningSingleOrNull<ENTITY, ID, META> {
+    override fun where(declaration: WhereDeclaration): InsertOnDuplicateKeyUpdateQueryBuilderNullable<ENTITY, ID, META> {
         val newContext = context.copy(where = context.where + declaration)
-        return InsertOnDuplicateKeyUpdateQueryBuilderReturningSingleOrNullImpl(newContext)
+        return InsertOnDuplicateKeyUpdateQueryBuilderNullableImpl(newContext)
     }
 
-    override fun single(entity: ENTITY): EntityUpsertSingleQuery<ENTITY> {
+    override fun single(entity: ENTITY): EntityUpsertSingleQueryNonNull<ENTITY> {
         return builder.single(entity)
     }
 
@@ -156,23 +148,23 @@ internal data class InsertOnDuplicateKeyUpdateQueryBuilderReturningSingleImpl<EN
     }
 }
 
-internal data class InsertOnDuplicateKeyUpdateQueryBuilderReturningSingleOrNullImpl<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
+internal data class InsertOnDuplicateKeyUpdateQueryBuilderNullableImpl<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityUpsertContext<ENTITY, ID, META>,
-) : InsertOnDuplicateKeyUpdateQueryBuilderReturningSingleOrNull<ENTITY, ID, META> {
+) : InsertOnDuplicateKeyUpdateQueryBuilderNullable<ENTITY, ID, META> {
 
-    private val builder: EntityUpsertQueryBuilderReturningSingleOrNull<ENTITY, ID, META> = EntityUpsertQueryBuilderReturningSingleOrNullImpl(context)
+    private val builder: EntityUpsertQueryBuilderNullable<ENTITY, ID, META> = EntityUpsertQueryBuilderNullableImpl(context)
 
-    override fun set(declaration: AssignmentDeclaration<ENTITY, META>): InsertOnDuplicateKeyUpdateQueryBuilderReturningSingleOrNull<ENTITY, ID, META> {
+    override fun set(declaration: AssignmentDeclaration<ENTITY, META>): InsertOnDuplicateKeyUpdateQueryBuilderNullable<ENTITY, ID, META> {
         val newContext = context.copy(set = context.set + declaration)
         return copy(context = newContext)
     }
 
-    override fun where(declaration: WhereDeclaration): InsertOnDuplicateKeyUpdateQueryBuilderReturningSingleOrNull<ENTITY, ID, META> {
+    override fun where(declaration: WhereDeclaration): InsertOnDuplicateKeyUpdateQueryBuilderNullable<ENTITY, ID, META> {
         val newContext = context.copy(where = context.where + declaration)
         return copy(context = newContext)
     }
 
-    override fun single(entity: ENTITY): EntityUpsertSingleQuery<ENTITY?> {
+    override fun single(entity: ENTITY): EntityUpsertSingleQueryNullable<ENTITY> {
         return builder.single(entity)
     }
 

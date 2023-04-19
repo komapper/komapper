@@ -9,7 +9,6 @@ import org.komapper.core.dsl.builder.SchemaStatementBuilder
 import org.komapper.core.dsl.context.EntityInsertContext
 import org.komapper.core.dsl.context.EntityUpsertContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
-import org.komapper.dialect.h2.MariaDbEntityInsertStatementBuilder
 
 interface MariaDbDialect : Dialect {
 

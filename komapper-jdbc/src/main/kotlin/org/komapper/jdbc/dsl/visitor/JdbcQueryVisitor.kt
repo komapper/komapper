@@ -135,7 +135,35 @@ object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
         context: EntityInsertContext<ENTITY, ID, META>,
         entities: List<ENTITY>,
     ): JdbcRunner<List<ENTITY>> {
-        return JdbcEntityInsertMultipleReturningRunner(context, entities)
+        val transform = JdbcResultSetTransformers.singleEntity(context.target)
+        return JdbcEntityInsertMultipleReturningRunner(context, entities, transform)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, A : Any> entityInsertMultipleReturningSingleColumnQuery(
+        context: EntityInsertContext<ENTITY, ID, META>,
+        entities: List<ENTITY>,
+        expression: ColumnExpression<A, *>,
+    ): JdbcRunner<List<A?>> {
+        val transform = JdbcResultSetTransformers.singleColumn(expression)
+        return JdbcEntityInsertMultipleReturningRunner(context, entities, transform)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, A : Any, B : Any> entityInsertMultipleReturningPairColumnsQuery(
+        context: EntityInsertContext<ENTITY, ID, META>,
+        entities: List<ENTITY>,
+        expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
+    ): JdbcRunner<List<Pair<A?, B?>>> {
+        val transform = JdbcResultSetTransformers.pairColumns(expressions)
+        return JdbcEntityInsertMultipleReturningRunner(context, entities, transform)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, A : Any, B : Any, C : Any> entityInsertMultipleReturningTripleColumnsQuery(
+        context: EntityInsertContext<ENTITY, ID, META>,
+        entities: List<ENTITY>,
+        expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
+    ): JdbcRunner<List<Triple<A?, B?, C?>>> {
+        val transform = JdbcResultSetTransformers.tripleColumns(expressions)
+        return JdbcEntityInsertMultipleReturningRunner(context, entities, transform)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityInsertBatchQuery(
@@ -155,8 +183,36 @@ object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityInsertSingleReturningQuery(
         context: EntityInsertContext<ENTITY, ID, META>,
         entity: ENTITY,
-    ): JdbcRunner<*> {
-        return JdbcEntityInsertSingleReturningRunner(context, entity)
+    ): JdbcRunner<ENTITY> {
+        val transform = JdbcResultSetTransformers.singleEntity(context.target)
+        return JdbcEntityInsertSingleReturningRunner(context, entity, transform)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, A : Any> entityInsertSingleReturningSingleColumnQuery(
+        context: EntityInsertContext<ENTITY, ID, META>,
+        entity: ENTITY,
+        expression: ColumnExpression<A, *>,
+    ): JdbcRunner<A?> {
+        val transform = JdbcResultSetTransformers.singleColumn(expression)
+        return JdbcEntityInsertSingleReturningRunner(context, entity, transform)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, A : Any, B : Any> entityInsertSingleReturningPairColumnsQuery(
+        context: EntityInsertContext<ENTITY, ID, META>,
+        entity: ENTITY,
+        expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
+    ): JdbcRunner<Pair<A?, B?>> {
+        val transform = JdbcResultSetTransformers.pairColumns(expressions)
+        return JdbcEntityInsertSingleReturningRunner(context, entity, transform)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, A : Any, B : Any, C : Any> entityInsertSingleReturningTripleColumnsQuery(
+        context: EntityInsertContext<ENTITY, ID, META>,
+        entity: ENTITY,
+        expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
+    ): JdbcRunner<Triple<A?, B?, C?>> {
+        val transform = JdbcResultSetTransformers.tripleColumns(expressions)
+        return JdbcEntityInsertSingleReturningRunner(context, entity, transform)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
@@ -179,7 +235,35 @@ object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
         context: EntityUpdateContext<ENTITY, ID, META>,
         entity: ENTITY,
     ): JdbcRunner<ENTITY?> {
-        return JdbcEntityUpdateSingleReturningRunner(context, entity)
+        val transform = JdbcResultSetTransformers.singleEntity(context.target)
+        return JdbcEntityUpdateSingleReturningRunner(context, entity, transform)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, A : Any> entityUpdateSingleReturningSingleColumnQuery(
+        context: EntityUpdateContext<ENTITY, ID, META>,
+        entity: ENTITY,
+        expression: ColumnExpression<A, *>,
+    ): JdbcRunner<A?> {
+        val transform = JdbcResultSetTransformers.singleColumn(expression)
+        return JdbcEntityUpdateSingleReturningRunner(context, entity, transform)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, A : Any, B : Any> entityUpdateSingleReturningPairColumnsQuery(
+        context: EntityUpdateContext<ENTITY, ID, META>,
+        entity: ENTITY,
+        expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
+    ): JdbcRunner<Pair<A?, B?>?> {
+        val transform = JdbcResultSetTransformers.pairColumns(expressions)
+        return JdbcEntityUpdateSingleReturningRunner(context, entity, transform)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, A : Any, B : Any, C : Any> entityUpdateSingleReturningTripleColumnsQuery(
+        context: EntityUpdateContext<ENTITY, ID, META>,
+        entity: ENTITY,
+        expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
+    ): JdbcRunner<Triple<A?, B?, C?>?> {
+        val transform = JdbcResultSetTransformers.tripleColumns(expressions)
+        return JdbcEntityUpdateSingleReturningRunner(context, entity, transform)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
@@ -202,7 +286,35 @@ object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
         context: EntityUpsertContext<ENTITY, ID, META>,
         entities: List<ENTITY>,
     ): JdbcRunner<List<ENTITY>> {
-        return JdbcEntityUpsertMultipleReturningRunner(context, entities)
+        val transform = JdbcResultSetTransformers.singleEntity(context.target)
+        return JdbcEntityUpsertMultipleReturningRunner(context, entities, transform)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, A : Any> entityUpsertMultipleReturningSingleColumnQuery(
+        context: EntityUpsertContext<ENTITY, ID, META>,
+        entities: List<ENTITY>,
+        expression: ColumnExpression<A, *>,
+    ): JdbcRunner<List<A?>> {
+        val transform = JdbcResultSetTransformers.singleColumn(expression)
+        return JdbcEntityUpsertMultipleReturningRunner(context, entities, transform)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, A : Any, B : Any> entityUpsertMultipleReturningPairColumnsQuery(
+        context: EntityUpsertContext<ENTITY, ID, META>,
+        entities: List<ENTITY>,
+        expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
+    ): JdbcRunner<List<Pair<A?, B?>>> {
+        val transform = JdbcResultSetTransformers.pairColumns(expressions)
+        return JdbcEntityUpsertMultipleReturningRunner(context, entities, transform)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, A : Any, B : Any, C : Any> entityUpsertMultipleReturningTripleColumnsQuery(
+        context: EntityUpsertContext<ENTITY, ID, META>,
+        entities: List<ENTITY>,
+        expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
+    ): JdbcRunner<List<Triple<A?, B?, C?>>> {
+        val transform = JdbcResultSetTransformers.tripleColumns(expressions)
+        return JdbcEntityUpsertMultipleReturningRunner(context, entities, transform)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
@@ -213,11 +325,43 @@ object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
         return JdbcEntityUpsertSingleRunner(context, entity)
     }
 
-    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityUpsertSingleReturningQuery(
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, R> entityUpsertSingleReturningQuery(
         context: EntityUpsertContext<ENTITY, ID, META>,
         entity: ENTITY,
-    ): JdbcRunner<*> {
-        return JdbcEntityUpsertSingleReturningRunner(context, entity)
+        collect: suspend (Flow<ENTITY>) -> R,
+    ): JdbcRunner<R> {
+        val transform = JdbcResultSetTransformers.singleEntity(context.target)
+        return JdbcEntityUpsertSingleReturningRunner(context, entity, transform, collect)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, A : Any, R> entityUpsertSingleReturningSingleColumnQuery(
+        context: EntityUpsertContext<ENTITY, ID, META>,
+        entity: ENTITY,
+        expression: ColumnExpression<A, *>,
+        collect: suspend (Flow<A?>) -> R,
+    ): JdbcRunner<R> {
+        val transform = JdbcResultSetTransformers.singleColumn(expression)
+        return JdbcEntityUpsertSingleReturningRunner(context, entity, transform, collect)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, A : Any, B : Any, R> entityUpsertSingleReturningPairColumnsQuery(
+        context: EntityUpsertContext<ENTITY, ID, META>,
+        entity: ENTITY,
+        expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
+        collect: suspend (Flow<Pair<A?, B?>>) -> R,
+    ): JdbcRunner<R> {
+        val transform = JdbcResultSetTransformers.pairColumns(expressions)
+        return JdbcEntityUpsertSingleReturningRunner(context, entity, transform, collect)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, A : Any, B : Any, C : Any, R> entityUpsertSingleReturningTripleColumnsQuery(
+        context: EntityUpsertContext<ENTITY, ID, META>,
+        entity: ENTITY,
+        expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
+        collect: suspend (Flow<Triple<A?, B?, C?>>) -> R,
+    ): JdbcRunner<R> {
+        val transform = JdbcResultSetTransformers.tripleColumns(expressions)
+        return JdbcEntityUpsertSingleReturningRunner(context, entity, transform, collect)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>

@@ -19,7 +19,7 @@ interface InsertOnDuplicateKeyIgnoreQueryBuilder<ENTITY : Any, ID : Any, META : 
      * @param entity the entity to be inserted
      * @return the query
      */
-    fun single(entity: ENTITY): EntityUpsertSingleQuery<ENTITY?>
+    fun single(entity: ENTITY): EntityUpsertSingleQueryNullable<ENTITY>
 
     /**
      * Builds a query to bulk insert a list of entities.
@@ -66,9 +66,9 @@ internal data class InsertOnDuplicateKeyIgnoreQueryBuilderImpl<ENTITY : Any, ID 
     private val context: EntityUpsertContext<ENTITY, ID, META>,
 ) : InsertOnDuplicateKeyIgnoreQueryBuilder<ENTITY, ID, META> {
 
-    private val builder: EntityUpsertQueryBuilderReturningSingleOrNull<ENTITY, ID, META> = EntityUpsertQueryBuilderReturningSingleOrNullImpl(context)
+    private val builder: EntityUpsertQueryBuilderNullable<ENTITY, ID, META> = EntityUpsertQueryBuilderNullableImpl(context)
 
-    override fun single(entity: ENTITY): EntityUpsertSingleQuery<ENTITY?> {
+    override fun single(entity: ENTITY): EntityUpsertSingleQueryNullable<ENTITY> {
         return builder.single(entity)
     }
 

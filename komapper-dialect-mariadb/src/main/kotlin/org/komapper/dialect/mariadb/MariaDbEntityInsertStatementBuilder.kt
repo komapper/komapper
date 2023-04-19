@@ -1,4 +1,4 @@
-package org.komapper.dialect.h2
+package org.komapper.dialect.mariadb
 
 import org.komapper.core.BuilderDialect
 import org.komapper.core.Statement
@@ -20,10 +20,11 @@ class MariaDbEntityInsertStatementBuilder<ENTITY : Any, ID : Any, META : EntityM
 
     override fun build(): Statement {
         buf.append(builder.build())
-        if (context.returning) {
+        val outputExpressions = context.returning.expressions()
+        if (outputExpressions.isNotEmpty()) {
             buf.append(" returning ")
-            for (p in context.target.properties()) {
-                column(p)
+            for (e in outputExpressions) {
+                column(e)
                 buf.append(", ")
             }
             buf.cutBack(2)

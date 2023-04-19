@@ -19,17 +19,18 @@ class H2EntityInsertStatementBuilder<ENTITY : Any, ID : Any, META : EntityMetamo
     private val builder = DefaultEntityInsertStatementBuilder(dialect, context, entities)
 
     override fun build(): Statement {
-        if (context.returning) {
+        val outputExpressions = context.returning.expressions()
+        if (outputExpressions.isNotEmpty()) {
             buf.append("select ")
-            for (p in context.target.properties()) {
-                column(p)
+            for (e in outputExpressions) {
+                column(e)
                 buf.append(", ")
             }
             buf.cutBack(2)
             buf.append(" from final table (")
         }
         buf.append(builder.build())
-        if (context.returning) {
+        if (outputExpressions.isNotEmpty()) {
             buf.append(")")
         }
         return buf.toStatement()

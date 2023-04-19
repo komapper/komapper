@@ -32,10 +32,11 @@ internal class H2EntityUpsertStatementBuilder<ENTITY : Any, ID : Any, META : Ent
     private val sourceStatementBuilder = SourceStatementBuilder(dialect, context, entities)
 
     override fun build(assignments: List<Pair<PropertyMetamodel<ENTITY, *, *>, Operand>>): Statement {
-        if (context.returning) {
+        val outputExpressions = context.returning.expressions()
+        if (outputExpressions.isNotEmpty()) {
             buf.append("select ")
-            for (p in target.properties()) {
-                buf.append(p.getCanonicalColumnName(dialect::enquote))
+            for (e in outputExpressions) {
+                buf.append(e.getCanonicalColumnName(dialect::enquote))
                 buf.append(", ")
             }
             buf.cutBack(2)
@@ -87,7 +88,7 @@ internal class H2EntityUpsertStatementBuilder<ENTITY : Any, ID : Any, META : Ent
             }
             buf.cutBack(2)
         }
-        if (context.returning) {
+        if (outputExpressions.isNotEmpty()) {
             buf.append(")")
         }
         return buf.toStatement()

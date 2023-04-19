@@ -1,17 +1,21 @@
 package org.komapper.jdbc.dsl.runner
 
+import kotlinx.coroutines.flow.toList
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.DryRunStatement
 import org.komapper.core.dsl.context.EntityInsertContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.runner.EntityInsertMultipleReturningRunner
+import org.komapper.jdbc.JdbcDataOperator
 import org.komapper.jdbc.JdbcDatabaseConfig
+import java.sql.ResultSet
 
-internal class JdbcEntityInsertMultipleReturningRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
-    private val context: EntityInsertContext<ENTITY, ID, META>,
+internal class JdbcEntityInsertMultipleReturningRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, T>(
+    context: EntityInsertContext<ENTITY, ID, META>,
     private val entities: List<ENTITY>,
+    private val transform: (JdbcDataOperator, ResultSet) -> T,
 ) :
-    JdbcRunner<List<ENTITY>> {
+    JdbcRunner<List<T>> {
 
     private val runner: EntityInsertMultipleReturningRunner<ENTITY, ID, META> =
         EntityInsertMultipleReturningRunner(context, entities)
@@ -23,7 +27,7 @@ internal class JdbcEntityInsertMultipleReturningRunner<ENTITY : Any, ID : Any, M
         runner.check(config)
     }
 
-    override fun run(config: JdbcDatabaseConfig): List<ENTITY> {
+    override fun run(config: JdbcDatabaseConfig): List<T> {
         if (entities.isEmpty()) return emptyList()
         val newEntities = preInsert(config)
         return insert(config, newEntities)
@@ -33,11 +37,10 @@ internal class JdbcEntityInsertMultipleReturningRunner<ENTITY : Any, ID : Any, M
         return entities.map { support.preInsert(config, it) }
     }
 
-    private fun insert(config: JdbcDatabaseConfig, entities: List<ENTITY>): List<ENTITY> {
+    private fun insert(config: JdbcDatabaseConfig, entities: List<ENTITY>): List<T> {
         val statement = runner.buildStatement(config, entities)
         return support.insert(config) { executor ->
-            val transform = JdbcResultSetTransformers.singleEntity(context.target)
-            executor.execute(statement, transform) { it.toList() }
+            executor.executeQuery(statement, transform) { it.toList() }
         }
     }
 

@@ -39,6 +39,45 @@ class R2dbcInsertMultipleReturningTest(private val db: R2dbcDatabase) {
 
     @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL])
     @Test
+    fun testReturningSingleColumn(info: TestInfo) = inTransaction(db, info) {
+        val a = Meta.address
+        val addressList = listOf(
+            Address(16, "STREET 16", 0),
+            Address(17, "STREET 17", 0),
+            Address(18, "STREET 18", 0),
+        )
+        val streets = db.runQuery { QueryDsl.insert(a).multiple(addressList).returning(a.street) }
+        assertEquals(addressList.map { it.street }, streets)
+    }
+
+    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL])
+    @Test
+    fun testReturningPairColumns(info: TestInfo) = inTransaction(db, info) {
+        val a = Meta.address
+        val addressList = listOf(
+            Address(16, "STREET 16", 0),
+            Address(17, "STREET 17", 0),
+            Address(18, "STREET 18", 0),
+        )
+        val pairs = db.runQuery { QueryDsl.insert(a).multiple(addressList).returning(a.street, a.version) }
+        assertEquals(addressList.map { it.street to it.version }, pairs)
+    }
+
+    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL])
+    @Test
+    fun testReturningTripleColumns(info: TestInfo) = inTransaction(db, info) {
+        val a = Meta.address
+        val addressList = listOf(
+            Address(16, "STREET 16", 0),
+            Address(17, "STREET 17", 0),
+            Address(18, "STREET 18", 0),
+        )
+        val triples = db.runQuery { QueryDsl.insert(a).multiple(addressList).returning(a.street, a.version, a.addressId) }
+        assertEquals(addressList.map { Triple(it.street, it.version, it.addressId) }, triples)
+    }
+
+    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL])
+    @Test
     fun identity(info: TestInfo) = inTransaction(db, info) {
         val i = Meta.identityStrategy
         val strategies = listOf(
@@ -90,6 +129,69 @@ class R2dbcInsertMultipleReturningTest(private val db: R2dbcDatabase) {
 
     @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL])
     @Test
+    fun onDuplicateKeyUpdateReturningSingleColumn(info: TestInfo) = inTransaction(db, info) {
+        val d = Meta.department
+        val departments = listOf(
+            Department(5, 50, "PLANNING", "TOKYO", 1),
+            Department(1, 60, "DEVELOPMENT", "KYOTO", 1),
+        )
+        val query = QueryDsl.insert(d).onDuplicateKeyUpdate().multiple(departments).returning(d.departmentName)
+        val departmentNameList = db.runQuery { query }
+        assertEquals(departments.map { it.departmentName }, departmentNameList)
+        val list = db.runQuery {
+            QueryDsl.from(d).where { d.departmentId inList listOf(1, 5) }.orderBy(d.departmentId)
+        }
+        assertEquals(2, list.size)
+        assertEquals(
+            listOf("DEVELOPMENT" to "KYOTO", "PLANNING" to "TOKYO"),
+            list.map { it.departmentName to it.location },
+        )
+    }
+
+    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL])
+    @Test
+    fun onDuplicateKeyUpdateReturningPairColumns(info: TestInfo) = inTransaction(db, info) {
+        val d = Meta.department
+        val departments = listOf(
+            Department(5, 50, "PLANNING", "TOKYO", 1),
+            Department(1, 60, "DEVELOPMENT", "KYOTO", 1),
+        )
+        val query = QueryDsl.insert(d).onDuplicateKeyUpdate().multiple(departments).returning(d.departmentName, d.location)
+        val pairList = db.runQuery { query }
+        assertEquals(departments.map { it.departmentName to it.location }, pairList)
+        val list = db.runQuery {
+            QueryDsl.from(d).where { d.departmentId inList listOf(1, 5) }.orderBy(d.departmentId)
+        }
+        assertEquals(2, list.size)
+        assertEquals(
+            listOf("DEVELOPMENT" to "KYOTO", "PLANNING" to "TOKYO"),
+            list.map { it.departmentName to it.location },
+        )
+    }
+
+    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL])
+    @Test
+    fun onDuplicateKeyUpdateReturningTripleColumns(info: TestInfo) = inTransaction(db, info) {
+        val d = Meta.department
+        val departments = listOf(
+            Department(5, 50, "PLANNING", "TOKYO", 1),
+            Department(1, 60, "DEVELOPMENT", "KYOTO", 1),
+        )
+        val query = QueryDsl.insert(d).onDuplicateKeyUpdate().multiple(departments).returning(d.departmentName, d.location, d.departmentNo)
+        val tripleList = db.runQuery { query }
+        assertEquals(departments.map { Triple(it.departmentName, it.location, it.departmentNo) }, tripleList)
+        val list = db.runQuery {
+            QueryDsl.from(d).where { d.departmentId inList listOf(1, 5) }.orderBy(d.departmentId)
+        }
+        assertEquals(2, list.size)
+        assertEquals(
+            listOf("DEVELOPMENT" to "KYOTO", "PLANNING" to "TOKYO"),
+            list.map { it.departmentName to it.location },
+        )
+    }
+
+    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL])
+    @Test
     fun onDuplicateKeyIgnore(info: TestInfo) = inTransaction(db, info) {
         val d = Meta.department
         val department1 = Department(5, 50, "PLANNING", "TOKYO", 1)
@@ -97,6 +199,63 @@ class R2dbcInsertMultipleReturningTest(private val db: R2dbcDatabase) {
         val query = QueryDsl.insert(d).onDuplicateKeyIgnore().multiple(listOf(department1, department2)).returning()
         val departments = db.runQuery { query }
         assertEquals(listOf(department1), departments)
+        val list = db.runQuery {
+            QueryDsl.from(d).where { d.departmentId inList listOf(1, 5) }.orderBy(d.departmentId)
+        }
+        assertEquals(2, list.size)
+        assertEquals(
+            listOf("ACCOUNTING" to "NEW YORK", "PLANNING" to "TOKYO"),
+            list.map { it.departmentName to it.location },
+        )
+    }
+
+    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL])
+    @Test
+    fun onDuplicateKeyIgnoreReturningSingleColumn(info: TestInfo) = inTransaction(db, info) {
+        val d = Meta.department
+        val department1 = Department(5, 50, "PLANNING", "TOKYO", 1)
+        val department2 = Department(1, 60, "DEVELOPMENT", "KYOTO", 1)
+        val query = QueryDsl.insert(d).onDuplicateKeyIgnore().multiple(listOf(department1, department2)).returning(d.departmentName)
+        val departmentNameList = db.runQuery { query }
+        assertEquals(listOf(department1.departmentName), departmentNameList)
+        val list = db.runQuery {
+            QueryDsl.from(d).where { d.departmentId inList listOf(1, 5) }.orderBy(d.departmentId)
+        }
+        assertEquals(2, list.size)
+        assertEquals(
+            listOf("ACCOUNTING" to "NEW YORK", "PLANNING" to "TOKYO"),
+            list.map { it.departmentName to it.location },
+        )
+    }
+
+    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL])
+    @Test
+    fun onDuplicateKeyIgnoreReturningPairColumns(info: TestInfo) = inTransaction(db, info) {
+        val d = Meta.department
+        val department1 = Department(5, 50, "PLANNING", "TOKYO", 1)
+        val department2 = Department(1, 60, "DEVELOPMENT", "KYOTO", 1)
+        val query = QueryDsl.insert(d).onDuplicateKeyIgnore().multiple(listOf(department1, department2)).returning(d.departmentName, d.location)
+        val pairList = db.runQuery { query }
+        assertEquals(listOf(department1.departmentName to department1.location), pairList)
+        val list = db.runQuery {
+            QueryDsl.from(d).where { d.departmentId inList listOf(1, 5) }.orderBy(d.departmentId)
+        }
+        assertEquals(2, list.size)
+        assertEquals(
+            listOf("ACCOUNTING" to "NEW YORK", "PLANNING" to "TOKYO"),
+            list.map { it.departmentName to it.location },
+        )
+    }
+
+    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL])
+    @Test
+    fun onDuplicateKeyIgnoreReturningTripleColumns(info: TestInfo) = inTransaction(db, info) {
+        val d = Meta.department
+        val department1 = Department(5, 50, "PLANNING", "TOKYO", 1)
+        val department2 = Department(1, 60, "DEVELOPMENT", "KYOTO", 1)
+        val query = QueryDsl.insert(d).onDuplicateKeyIgnore().multiple(listOf(department1, department2)).returning(d.departmentName, d.location, d.departmentNo)
+        val tripleList = db.runQuery { query }
+        assertEquals(listOf(Triple(department1.departmentName, department1.location, department1.departmentNo)), tripleList)
         val list = db.runQuery {
             QueryDsl.from(d).where { d.departmentId inList listOf(1, 5) }.orderBy(d.departmentId)
         }

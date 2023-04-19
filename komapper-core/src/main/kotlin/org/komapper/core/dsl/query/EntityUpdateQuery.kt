@@ -1,7 +1,9 @@
 package org.komapper.core.dsl.query
 
 import org.komapper.core.dsl.context.EntityUpdateContext
+import org.komapper.core.dsl.element.Output
 import org.komapper.core.dsl.metamodel.EntityMetamodel
+import org.komapper.core.dsl.metamodel.PropertyMetamodel
 import org.komapper.core.dsl.options.UpdateOptions
 import org.komapper.core.dsl.visitor.QueryVisitor
 
@@ -21,22 +23,57 @@ interface EntityUpdateQuery<T> : Query<T> {
     fun options(configure: (UpdateOptions) -> UpdateOptions): EntityUpdateQuery<T>
 }
 
-interface EntityUpdateSingleQuery<ENTITY> :
-    EntityUpdateQuery<ENTITY> {
-    fun returning(): EntityUpdateReturningQuery<ENTITY>
+interface EntityUpdateSingleQuery<ENTITY : Any> : EntityUpdateQuery<ENTITY> {
+    fun returning(): EntityUpdateReturningQuery<ENTITY?>
+    fun <A : Any> returning(expression: PropertyMetamodel<ENTITY, A, *>): EntityUpdateReturningQuery<A?>
+
+    fun <A : Any, B : Any> returning(
+        expression1: PropertyMetamodel<ENTITY, A, *>,
+        expression2: PropertyMetamodel<ENTITY, B, *>,
+    ): EntityUpdateReturningQuery<Pair<A?, B?>?>
+
+    fun <A : Any, B : Any, C : Any> returning(
+        expression1: PropertyMetamodel<ENTITY, A, *>,
+        expression2: PropertyMetamodel<ENTITY, B, *>,
+        expression3: PropertyMetamodel<ENTITY, C, *>,
+    ): EntityUpdateReturningQuery<Triple<A?, B?, C?>?>
     override fun options(configure: (UpdateOptions) -> UpdateOptions): EntityUpdateSingleQuery<ENTITY>
 }
 
-internal data class EntityUpdateSingleQueryImpl<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, T>(
+internal data class EntityUpdateSingleQueryImpl<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: EntityUpdateContext<ENTITY, ID, META>,
     private val entity: ENTITY,
-) : EntityUpdateSingleQuery<T> {
-    override fun returning(): EntityUpdateReturningQuery<T> {
-        val newContext = context.copy(returning = true)
+) : EntityUpdateSingleQuery<ENTITY> {
+    override fun returning(): EntityUpdateReturningQuery<ENTITY?> {
+        val newContext = context.copy(returning = Output.Metamodel(context.target))
         return EntityUpdateSingleReturningQuery(newContext, entity)
     }
 
-    override fun options(configure: (UpdateOptions) -> UpdateOptions): EntityUpdateSingleQuery<T> {
+    override fun <A : Any> returning(expression: PropertyMetamodel<ENTITY, A, *>): EntityUpdateReturningQuery<A?> {
+        val newContext = context.copy(returning = Output.Expressions(listOf(expression)))
+        return EntityUpdateSingleReturningSingleColumnQuery(newContext, entity, expression)
+    }
+
+    override fun <A : Any, B : Any> returning(
+        expression1: PropertyMetamodel<ENTITY, A, *>,
+        expression2: PropertyMetamodel<ENTITY, B, *>,
+    ): EntityUpdateReturningQuery<Pair<A?, B?>?> {
+        val expressions = expression1 to expression2
+        val newContext = context.copy(returning = Output.Expressions(expressions.toList()))
+        return EntityUpdateSingleReturningPairColumnsQuery(newContext, entity, expressions)
+    }
+
+    override fun <A : Any, B : Any, C : Any> returning(
+        expression1: PropertyMetamodel<ENTITY, A, *>,
+        expression2: PropertyMetamodel<ENTITY, B, *>,
+        expression3: PropertyMetamodel<ENTITY, C, *>,
+    ): EntityUpdateReturningQuery<Triple<A?, B?, C?>?> {
+        val expressions = Triple(expression1, expression2, expression3)
+        val newContext = context.copy(returning = Output.Expressions(expressions.toList()))
+        return EntityUpdateSingleReturningTripleColumnsQuery(newContext, entity, expressions)
+    }
+
+    override fun options(configure: (UpdateOptions) -> UpdateOptions): EntityUpdateSingleQuery<ENTITY> {
         val newContext = context.copy(options = configure(context.options))
         return copy(context = newContext)
     }

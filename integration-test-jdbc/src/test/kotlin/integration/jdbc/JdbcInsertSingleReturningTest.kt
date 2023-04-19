@@ -39,6 +39,36 @@ class JdbcInsertSingleReturningTest(private val db: JdbcDatabase) {
 
     @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL])
     @Test
+    fun testReturningSingleColumn() {
+        val a = Meta.address
+        val address = Address(16, "STREET 16", 0)
+        val street = db.runQuery { QueryDsl.insert(a).single(address).returning(a.street) }
+        assertEquals(address.street, street)
+    }
+
+    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL])
+    @Test
+    fun testReturningPairColumns() {
+        val a = Meta.address
+        val address = Address(16, "STREET 16", 0)
+        val (street, version) = db.runQuery { QueryDsl.insert(a).single(address).returning(a.street, a.version) }
+        assertEquals(address.street, street)
+        assertEquals(address.version, version)
+    }
+
+    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL])
+    @Test
+    fun testReturningTripleColumns() {
+        val a = Meta.address
+        val address = Address(16, "STREET 16", 0)
+        val (street, version, addressId) = db.runQuery { QueryDsl.insert(a).single(address).returning(a.street, a.version, a.addressId) }
+        assertEquals(address.street, street)
+        assertEquals(address.version, version)
+        assertEquals(address.addressId, addressId)
+    }
+
+    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL])
+    @Test
     fun uniqueConstraintException() {
         val a = Meta.address
         val address = Address(1, "STREET 1", 0)
@@ -86,6 +116,45 @@ class JdbcInsertSingleReturningTest(private val db: JdbcDatabase) {
 
     @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL])
     @Test
+    fun onDuplicateKeyUpdate_insert_returningSingleColumn() {
+        val d = Meta.department
+        val department = Department(5, 50, "PLANNING", "TOKYO", 0)
+        val query = QueryDsl.insert(d).onDuplicateKeyUpdate().single(department).returning(d.departmentName)
+        val departmentName = db.runQuery { query }
+        assertEquals(department.departmentName, departmentName)
+        val found = db.runQuery { QueryDsl.from(d).where { d.departmentId eq 5 }.first() }
+        assertNotNull(found)
+    }
+
+    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL])
+    @Test
+    fun onDuplicateKeyUpdate_insert_returningPairColumns() {
+        val d = Meta.department
+        val department = Department(5, 50, "PLANNING", "TOKYO", 0)
+        val query = QueryDsl.insert(d).onDuplicateKeyUpdate().single(department).returning(d.departmentName, d.location)
+        val (departmentName, location) = db.runQuery { query }
+        assertEquals(department.departmentName, departmentName)
+        assertEquals(department.location, location)
+        val found = db.runQuery { QueryDsl.from(d).where { d.departmentId eq 5 }.first() }
+        assertNotNull(found)
+    }
+
+    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL])
+    @Test
+    fun onDuplicateKeyUpdate_insert_returningThirdColumns() {
+        val d = Meta.department
+        val department = Department(5, 50, "PLANNING", "TOKYO", 0)
+        val query = QueryDsl.insert(d).onDuplicateKeyUpdate().single(department).returning(d.departmentName, d.location, d.departmentNo)
+        val (departmentName, location, departmentNo) = db.runQuery { query }
+        assertEquals(department.departmentName, departmentName)
+        assertEquals(department.location, location)
+        assertEquals(department.departmentNo, departmentNo)
+        val found = db.runQuery { QueryDsl.from(d).where { d.departmentId eq 5 }.first() }
+        assertNotNull(found)
+    }
+
+    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL])
+    @Test
     fun onDuplicateKeyUpdate_update() {
         val d = Meta.department
         val department = Department(1, 50, "PLANNING", "TOKYO", 10)
@@ -116,6 +185,30 @@ class JdbcInsertSingleReturningTest(private val db: JdbcDatabase) {
         assertNotNull(department2)
         val found = db.runQuery { QueryDsl.from(d).where { d.departmentNo eq 10 }.first() }
         assertEquals(department2, found)
+        assertEquals(1, found.departmentId)
+        assertEquals("PLANNING2", found.departmentName)
+        assertEquals("NEW YORK_TOKYO", found.location)
+        assertEquals(1, found.version)
+    }
+
+    @Run(onlyIf = [Dbms.H2, Dbms.POSTGRESQL])
+    @Test
+    fun onDuplicateKeyUpdateWithKey_update_set_where_success_returningPairColumns() {
+        val d = Meta.department
+        val department = Department(5, 10, "PLANNING", "TOKYO", 10)
+        val query = QueryDsl.insert(d)
+            .onDuplicateKeyUpdate(d.departmentNo)
+            .set { excluded ->
+                d.departmentName eq "PLANNING2"
+                d.location eq concat(d.location, concat("_", excluded.location))
+            }.where {
+                d.location eq "NEW YORK"
+            }.single(department).returning(d.departmentName, d.location)
+        val pair = db.runQuery { query }
+        assertNotNull(pair)
+        val found = db.runQuery { QueryDsl.from(d).where { d.departmentNo eq 10 }.first() }
+        assertEquals(pair.first, found.departmentName)
+        assertEquals(pair.second, found.location)
         assertEquals(1, found.departmentId)
         assertEquals("PLANNING2", found.departmentName)
         assertEquals("NEW YORK_TOKYO", found.location)

@@ -39,6 +39,36 @@ class R2dbcInsertSingleReturningTest(private val db: R2dbcDatabase) {
 
     @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL])
     @Test
+    fun testReturningSingleColumn(info: TestInfo) = inTransaction(db, info) {
+        val a = Meta.address
+        val address = Address(16, "STREET 16", 0)
+        val street = db.runQuery { QueryDsl.insert(a).single(address).returning(a.street) }
+        assertEquals(address.street, street)
+    }
+
+    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL])
+    @Test
+    fun testReturningPairColumns(info: TestInfo) = inTransaction(db, info) {
+        val a = Meta.address
+        val address = Address(16, "STREET 16", 0)
+        val (street, version) = db.runQuery { QueryDsl.insert(a).single(address).returning(a.street, a.version) }
+        assertEquals(address.street, street)
+        assertEquals(address.version, version)
+    }
+
+    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL])
+    @Test
+    fun testReturningTripleColumns(info: TestInfo) = inTransaction(db, info) {
+        val a = Meta.address
+        val address = Address(16, "STREET 16", 0)
+        val (street, version, addressId) = db.runQuery { QueryDsl.insert(a).single(address).returning(a.street, a.version, a.addressId) }
+        assertEquals(address.street, street)
+        assertEquals(address.version, version)
+        assertEquals(address.addressId, addressId)
+    }
+
+    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL])
+    @Test
     fun uniqueConstraintException(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val address = Address(1, "STREET 1", 0)

@@ -23,7 +23,7 @@ interface InsertQueryBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTI
      * @param keys the keys used for duplicate checking
      * @return the query
      */
-    fun onDuplicateKeyUpdate(vararg keys: PropertyMetamodel<ENTITY, *, *> = emptyArray()): InsertOnDuplicateKeyUpdateQueryBuilderReturningSingle<ENTITY, ID, META>
+    fun onDuplicateKeyUpdate(vararg keys: PropertyMetamodel<ENTITY, *, *> = emptyArray()): InsertOnDuplicateKeyUpdateQueryBuilderNonNull<ENTITY, ID, META>
 
     /**
      * Creates a builder of the query that inserts or updates entities.
@@ -32,7 +32,7 @@ interface InsertQueryBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTI
      * @param conflictTarget the hint to perform unique index inference
      * @return the query
      */
-    fun dangerouslyOnDuplicateKeyUpdate(conflictTarget: String): InsertOnDuplicateKeyUpdateQueryBuilderReturningSingle<ENTITY, ID, META>
+    fun dangerouslyOnDuplicateKeyUpdate(conflictTarget: String): InsertOnDuplicateKeyUpdateQueryBuilderNonNull<ENTITY, ID, META>
 
     /**
      * Creates a builder of the query that inserts entities and ignores duplicate keys.
@@ -121,14 +121,14 @@ internal data class InsertQueryBuilderImpl<ENTITY : Any, ID : Any, META : Entity
 ) :
     InsertQueryBuilder<ENTITY, ID, META> {
 
-    override fun onDuplicateKeyUpdate(vararg keys: PropertyMetamodel<ENTITY, *, *>): InsertOnDuplicateKeyUpdateQueryBuilderReturningSingle<ENTITY, ID, META> {
+    override fun onDuplicateKeyUpdate(vararg keys: PropertyMetamodel<ENTITY, *, *>): InsertOnDuplicateKeyUpdateQueryBuilderNonNull<ENTITY, ID, META> {
         val newContext = context.asEntityUpsertContext(keys.toList(), DuplicateKeyType.UPDATE)
-        return InsertOnDuplicateKeyUpdateQueryBuilderReturningSingleImpl(newContext)
+        return InsertOnDuplicateKeyUpdateQueryBuilderNonNullImpl(newContext)
     }
 
-    override fun dangerouslyOnDuplicateKeyUpdate(conflictTarget: String): InsertOnDuplicateKeyUpdateQueryBuilderReturningSingle<ENTITY, ID, META> {
+    override fun dangerouslyOnDuplicateKeyUpdate(conflictTarget: String): InsertOnDuplicateKeyUpdateQueryBuilderNonNull<ENTITY, ID, META> {
         val newContext = context.asEntityUpsertContext(conflictTarget, DuplicateKeyType.UPDATE)
-        return InsertOnDuplicateKeyUpdateQueryBuilderReturningSingleImpl(newContext)
+        return InsertOnDuplicateKeyUpdateQueryBuilderNonNullImpl(newContext)
     }
 
     override fun onDuplicateKeyIgnore(vararg keys: PropertyMetamodel<ENTITY, *, *>): InsertOnDuplicateKeyIgnoreQueryBuilder<ENTITY, ID, META> {

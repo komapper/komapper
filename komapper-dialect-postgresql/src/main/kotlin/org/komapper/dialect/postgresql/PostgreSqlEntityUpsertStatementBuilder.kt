@@ -88,10 +88,11 @@ class PostgreSqlEntityUpsertStatementBuilder<ENTITY : Any, ID : Any, META : Enti
                 }
             }
         }
-        if (context.returning) {
+        val outputExpressions = context.returning.expressions()
+        if (outputExpressions.isNotEmpty()) {
             buf.append(" returning ")
-            for (p in target.properties()) {
-                column(p)
+            for (e in outputExpressions) {
+                column(e)
                 buf.append(", ")
             }
             buf.cutBack(2)

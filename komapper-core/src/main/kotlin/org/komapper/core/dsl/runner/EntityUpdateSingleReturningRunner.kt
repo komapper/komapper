@@ -30,11 +30,10 @@ class EntityUpdateSingleReturningRunner<ENTITY : Any, ID : Any, META : EntityMet
         return runner.preUpdate(config, entity)
     }
 
-    fun postUpdate(entity: ENTITY?): ENTITY? {
+    fun postUpdate(result: Any?) {
         if (context.target.versionProperty() != null) {
-            val count = if (entity == null) 0L else 1L
+            val count = if (result == null) 0L else 1L
             checkOptimisticLock(context.options, count, null)
         }
-        return entity
     }
 }

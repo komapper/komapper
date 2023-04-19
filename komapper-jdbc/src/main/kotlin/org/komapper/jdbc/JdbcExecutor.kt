@@ -53,7 +53,11 @@ internal class JdbcExecutor(
                     log(statement)
                     bind(ps, statement)
                     ps.executeQuery().use { rs ->
-                        val sequence = createSequence(rs, transform)
+                        val sequence = sequence {
+                            while (rs.next()) {
+                                this.yield(transform(config.dataOperator, rs))
+                            }
+                        }
                         runBlocking {
                             collect(sequence.asFlow())
                         }
@@ -140,29 +144,6 @@ internal class JdbcExecutor(
         }
     }
 
-    fun <T, R> execute(
-        statement: Statement,
-        transform: (JdbcDataOperator, ResultSet) -> T,
-        handle: (Sequence<T>) -> R,
-    ): R {
-        return withExceptionTranslator {
-            @Suppress("NAME_SHADOWING")
-            val statement = inspect(statement)
-            config.session.useConnection { con ->
-                prepare(con, statement).use { ps ->
-                    setUp(ps)
-                    log(statement)
-                    bind(ps, statement)
-                    ps.execute()
-                    ps.resultSet.use { rs ->
-                        val sequence = createSequence(rs, transform)
-                        handle(sequence)
-                    }
-                }
-            }
-        }
-    }
-
     /**
      * Translates a [Exception] to a [RuntimeException].
      */
@@ -232,14 +213,6 @@ internal class JdbcExecutor(
                 keys.add(key)
             }
             keys
-        }
-    }
-
-    private fun <T> createSequence(rs: ResultSet, transform: (JdbcDataOperator, ResultSet) -> T): Sequence<T> {
-        return sequence {
-            while (rs.next()) {
-                yield(transform(config.dataOperator, rs))
-            }
         }
     }
 }
