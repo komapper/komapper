@@ -1,6 +1,7 @@
 package org.komapper.core.dsl.context
 
 import org.komapper.core.ThreadSafe
+import org.komapper.core.dsl.element.Output
 import org.komapper.core.dsl.expression.AssignmentDeclaration
 import org.komapper.core.dsl.expression.TableExpression
 import org.komapper.core.dsl.expression.WhereDeclaration
@@ -14,6 +15,7 @@ data class RelationUpdateContext<ENTITY : Any, ID : Any, META : EntityMetamodel<
     val target: META,
     val set: AssignmentDeclaration<ENTITY, META> = {},
     val where: WhereDeclaration = { },
+    val returning: Output = Output.Expressions(emptyList()),
     override val options: UpdateOptions = UpdateOptions.DEFAULT,
 ) : TablesProvider, WhereProvider {
 

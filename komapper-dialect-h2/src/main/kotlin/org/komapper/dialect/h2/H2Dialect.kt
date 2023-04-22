@@ -4,9 +4,11 @@ import org.komapper.core.BuilderDialect
 import org.komapper.core.Dialect
 import org.komapper.core.dsl.builder.EntityInsertStatementBuilder
 import org.komapper.core.dsl.builder.EntityUpsertStatementBuilder
+import org.komapper.core.dsl.builder.RelationInsertValuesStatementBuilder
 import org.komapper.core.dsl.builder.SchemaStatementBuilder
 import org.komapper.core.dsl.context.EntityInsertContext
 import org.komapper.core.dsl.context.EntityUpsertContext
+import org.komapper.core.dsl.context.RelationInsertValuesContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 
 interface H2Dialect : Dialect {
@@ -43,6 +45,13 @@ interface H2Dialect : Dialect {
         entities: List<ENTITY>,
     ): EntityUpsertStatementBuilder<ENTITY> {
         return H2EntityUpsertStatementBuilder(dialect, context, entities)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> getRelationInsertValuesStatementBuilder(
+        dialect: BuilderDialect,
+        context: RelationInsertValuesContext<ENTITY, ID, META>,
+    ): RelationInsertValuesStatementBuilder<ENTITY, ID, META> {
+        return H2RelationInsertValuesStatementBuilder(dialect, context)
     }
 
     override fun supportsConflictTargetInUpsertStatement(): Boolean = false

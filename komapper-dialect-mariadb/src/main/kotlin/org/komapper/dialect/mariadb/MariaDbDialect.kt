@@ -5,9 +5,11 @@ import org.komapper.core.Dialect
 import org.komapper.core.dsl.builder.EntityInsertStatementBuilder
 import org.komapper.core.dsl.builder.EntityUpsertStatementBuilder
 import org.komapper.core.dsl.builder.OffsetLimitStatementBuilder
+import org.komapper.core.dsl.builder.RelationInsertValuesStatementBuilder
 import org.komapper.core.dsl.builder.SchemaStatementBuilder
 import org.komapper.core.dsl.context.EntityInsertContext
 import org.komapper.core.dsl.context.EntityUpsertContext
+import org.komapper.core.dsl.context.RelationInsertValuesContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 
 interface MariaDbDialect : Dialect {
@@ -52,6 +54,13 @@ interface MariaDbDialect : Dialect {
         entities: List<ENTITY>,
     ): EntityUpsertStatementBuilder<ENTITY> {
         return MariaDbEntityUpsertStatementBuilder(dialect, context, entities)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> getRelationInsertValuesStatementBuilder(
+        dialect: BuilderDialect,
+        context: RelationInsertValuesContext<ENTITY, ID, META>,
+    ): RelationInsertValuesStatementBuilder<ENTITY, ID, META> {
+        return MariaDbRelationInsertValuesStatementBuilder(dialect, context)
     }
 
     override fun supportsAliasForDeleteStatement() = false

@@ -30,14 +30,37 @@ interface EntityInsertQuery<T> : Query<T> {
  */
 interface EntityInsertSingleQuery<ENTITY : Any> : EntityInsertQuery<ENTITY> {
     /**
-     * Indicates to retrieve an inserted entity.
+     * Indicates to retrieve an entity.
+     *
+     * @return the query
      */
     fun returning(): EntityInsertReturningQuery<ENTITY>
 
+    /**
+     * Indicates to retrieve a property.
+     *
+     * @param expression the property
+     * @return the query
+     */
     fun <A : Any> returning(expression: PropertyMetamodel<ENTITY, A, *>): EntityInsertReturningQuery<A?>
 
+    /**
+     * Indicates to retrieve a property pair.
+     *
+     * @param expression1 the first property
+     * @param expression2 the second property
+     * @return the query
+     */
     fun <A : Any, B : Any> returning(expression1: PropertyMetamodel<ENTITY, A, *>, expression2: PropertyMetamodel<ENTITY, B, *>): EntityInsertReturningQuery<Pair<A?, B?>>
 
+    /**
+     * Indicates to retrieve a property triple.
+     *
+     * @param expression1 the first property
+     * @param expression2 the second property
+     * @param expression3 the third property
+     * @return the query
+     */
     fun <A : Any, B : Any, C : Any> returning(expression1: PropertyMetamodel<ENTITY, A, *>, expression2: PropertyMetamodel<ENTITY, B, *>, expression3: PropertyMetamodel<ENTITY, C, *>): EntityInsertReturningQuery<Triple<A?, B?, C?>>
 
     override fun options(configure: (InsertOptions) -> InsertOptions): EntityInsertSingleQuery<ENTITY>
@@ -50,14 +73,37 @@ interface EntityInsertSingleQuery<ENTITY : Any> : EntityInsertQuery<ENTITY> {
  */
 interface EntityInsertMultipleQuery<ENTITY : Any> : EntityInsertQuery<List<ENTITY>> {
     /**
-     * Indicates to retrieve inserted entities.
+     * Indicates to retrieve a list of entity.
+     *
+     * @return the query
      */
     fun returning(): EntityInsertReturningQuery<List<ENTITY>>
 
+    /**
+     * Indicates to retrieve a list of property.
+     *
+     * @param expression the property
+     * @return the query
+     */
     fun <A : Any> returning(expression: PropertyMetamodel<ENTITY, A, *>): EntityInsertReturningQuery<List<A?>>
 
+    /**
+     * Indicates to retrieve a list of property pair.
+     *
+     * @param expression1 the first property
+     * @param expression2 the second property
+     * @return the query
+     */
     fun <A : Any, B : Any> returning(expression1: PropertyMetamodel<ENTITY, A, *>, expression2: PropertyMetamodel<ENTITY, B, *>): EntityInsertReturningQuery<List<Pair<A?, B?>>>
 
+    /**
+     * Indicates to retrieve a list of property triple.
+     *
+     * @param expression1 the first property
+     * @param expression2 the second property
+     * @param expression3 the third property
+     * @return the query
+     */
     fun <A : Any, B : Any, C : Any> returning(expression1: PropertyMetamodel<ENTITY, A, *>, expression2: PropertyMetamodel<ENTITY, B, *>, expression3: PropertyMetamodel<ENTITY, C, *>): EntityInsertReturningQuery<List<Triple<A?, B?, C?>>>
 
     override fun options(configure: (InsertOptions) -> InsertOptions): EntityInsertMultipleQuery<ENTITY>

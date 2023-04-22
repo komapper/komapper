@@ -27,22 +27,45 @@ interface EntityUpsertQuery<T> : Query<T> {
 
 /**
  * Represents a query to upsert a single entity.
+ * The [returning] functions fetch the result with the [single] function.
  *
  * @param ENTITY the entity type
  */
 interface EntityUpsertSingleQueryNonNull<ENTITY : Any> : EntityUpsertQuery<Long> {
     /**
-     * Indicates to retrieve an upserted entity.
+     * Indicates to retrieve an entity.
+     * @return the query
      */
     fun returning(): EntityUpsertReturningQuery<ENTITY>
 
+    /**
+     * Indicates to retrieve a property.
+     *
+     * @param expression the property
+     * @return the query
+     */
     fun <A : Any> returning(expression: PropertyMetamodel<ENTITY, A, *>): EntityUpsertReturningQuery<A?>
 
+    /**
+     * Indicates to retrieve a property pair.
+     *
+     * @param expression1 the first property
+     * @param expression2 the second property
+     * @return the query
+     */
     fun <A : Any, B : Any> returning(
         expression1: PropertyMetamodel<ENTITY, A, *>,
         expression2: PropertyMetamodel<ENTITY, B, *>,
     ): EntityUpsertReturningQuery<Pair<A?, B?>>
 
+    /**
+     * Indicates to retrieve a property triple.
+     *
+     * @param expression1 the first property
+     * @param expression2 the second property
+     * @param expression3 the third property
+     * @return the query
+     */
     fun <A : Any, B : Any, C : Any> returning(
         expression1: PropertyMetamodel<ENTITY, A, *>,
         expression2: PropertyMetamodel<ENTITY, B, *>,
@@ -52,19 +75,47 @@ interface EntityUpsertSingleQueryNonNull<ENTITY : Any> : EntityUpsertQuery<Long>
     override fun options(configure: (InsertOptions) -> InsertOptions): EntityUpsertSingleQueryNonNull<ENTITY>
 }
 
+/**
+ * Represents a query to upsert a single entity.
+ * The [returning] functions fetch the result with the [singleOrNull] function.
+ *
+ * @param ENTITY the entity type
+ */
 interface EntityUpsertSingleQueryNullable<ENTITY : Any> : EntityUpsertQuery<Long> {
     /**
-     * Indicates to retrieve an upserted entity.
+     * Indicates to retrieve an entity.
+     * @return the query
      */
     fun returning(): EntityUpsertReturningQuery<ENTITY?>
 
+    /**
+     * Indicates to retrieve a property.
+     *
+     * @param expression the property
+     * @return the query
+     */
     fun <A : Any> returning(expression: PropertyMetamodel<ENTITY, A, *>): EntityUpsertReturningQuery<A?>
 
+    /**
+     * Indicates to retrieve a property pair.
+     *
+     * @param expression1 the first property
+     * @param expression2 the second property
+     * @return the query
+     */
     fun <A : Any, B : Any> returning(
         expression1: PropertyMetamodel<ENTITY, A, *>,
         expression2: PropertyMetamodel<ENTITY, B, *>,
     ): EntityUpsertReturningQuery<Pair<A?, B?>?>
 
+    /**
+     * Indicates to retrieve a property triple.
+     *
+     * @param expression1 the first property
+     * @param expression2 the second property
+     * @param expression3 the third property
+     * @return the query
+     */
     fun <A : Any, B : Any, C : Any> returning(
         expression1: PropertyMetamodel<ENTITY, A, *>,
         expression2: PropertyMetamodel<ENTITY, B, *>,
@@ -81,17 +132,39 @@ interface EntityUpsertSingleQueryNullable<ENTITY : Any> : EntityUpsertQuery<Long
  */
 interface EntityUpsertMultipleQuery<ENTITY : Any> : EntityUpsertQuery<Long> {
     /**
-     * Indicates to retrieve upserted entities.
+     * Indicates to retrieve an entity.
+     * @return the query
      */
     fun returning(): EntityUpsertReturningQuery<List<ENTITY>>
 
+    /**
+     * Indicates to retrieve a property.
+     *
+     * @param expression the property
+     * @return the query
+     */
     fun <A : Any> returning(expression: PropertyMetamodel<ENTITY, A, *>): EntityUpsertReturningQuery<List<A?>>
 
+    /**
+     * Indicates to retrieve a property pair.
+     *
+     * @param expression1 the first property
+     * @param expression2 the second property
+     * @return the query
+     */
     fun <A : Any, B : Any> returning(
         expression1: PropertyMetamodel<ENTITY, A, *>,
         expression2: PropertyMetamodel<ENTITY, B, *>,
     ): EntityUpsertReturningQuery<List<Pair<A?, B?>>>
 
+    /**
+     * Indicates to retrieve a property triple.
+     *
+     * @param expression1 the first property
+     * @param expression2 the second property
+     * @param expression3 the third property
+     * @return the query
+     */
     fun <A : Any, B : Any, C : Any> returning(
         expression1: PropertyMetamodel<ENTITY, A, *>,
         expression2: PropertyMetamodel<ENTITY, B, *>,

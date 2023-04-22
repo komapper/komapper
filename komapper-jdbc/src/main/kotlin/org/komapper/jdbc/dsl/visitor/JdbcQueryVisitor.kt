@@ -42,7 +42,9 @@ import org.komapper.jdbc.dsl.runner.JdbcEntityUpsertSingleRunner
 import org.komapper.jdbc.dsl.runner.JdbcEntityUpsertSingleUpdateRunner
 import org.komapper.jdbc.dsl.runner.JdbcRelationDeleteRunner
 import org.komapper.jdbc.dsl.runner.JdbcRelationInsertSelectRunner
+import org.komapper.jdbc.dsl.runner.JdbcRelationInsertValuesReturningRunner
 import org.komapper.jdbc.dsl.runner.JdbcRelationInsertValuesRunner
+import org.komapper.jdbc.dsl.runner.JdbcRelationUpdateReturningRunner
 import org.komapper.jdbc.dsl.runner.JdbcRelationUpdateRunner
 import org.komapper.jdbc.dsl.runner.JdbcResultSetTransformers
 import org.komapper.jdbc.dsl.runner.JdbcRunner
@@ -554,6 +556,37 @@ object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
         return JdbcRelationInsertValuesRunner(context)
     }
 
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> relationInsertValuesReturningQuery(
+        context: RelationInsertValuesContext<ENTITY, ID, META>,
+    ): JdbcRunner<ENTITY> {
+        val transform = JdbcResultSetTransformers.singleEntity(context.target)
+        return JdbcRelationInsertValuesReturningRunner(context, transform)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, A : Any> relationInsertValuesReturningSingleColumnQuery(
+        context: RelationInsertValuesContext<ENTITY, ID, META>,
+        expression: ColumnExpression<A, *>,
+    ): JdbcRunner<A?> {
+        val transform = JdbcResultSetTransformers.singleColumn(expression)
+        return JdbcRelationInsertValuesReturningRunner(context, transform)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, A : Any, B : Any> relationInsertValuesReturningPairColumnsQuery(
+        context: RelationInsertValuesContext<ENTITY, ID, META>,
+        expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
+    ): JdbcRunner<Pair<A?, B?>> {
+        val transform = JdbcResultSetTransformers.pairColumns(expressions)
+        return JdbcRelationInsertValuesReturningRunner(context, transform)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, A : Any, B : Any, C : Any> relationInsertValuesReturningTripleColumnsQuery(
+        context: RelationInsertValuesContext<ENTITY, ID, META>,
+        expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
+    ): JdbcRunner<Triple<A?, B?, C?>> {
+        val transform = JdbcResultSetTransformers.tripleColumns(expressions)
+        return JdbcRelationInsertValuesReturningRunner(context, transform)
+    }
+
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> relationInsertSelectQuery(
         context: RelationInsertSelectContext<ENTITY, ID, META>,
     ): JdbcRunner<Pair<Long, List<ID>>> {
@@ -564,6 +597,35 @@ object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
         context: RelationUpdateContext<ENTITY, ID, META>,
     ): JdbcRunner<Long> {
         return JdbcRelationUpdateRunner(context)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> relationUpdateReturningQuery(context: RelationUpdateContext<ENTITY, ID, META>): JdbcRunner<List<ENTITY>> {
+        val transform = JdbcResultSetTransformers.singleEntity(context.target)
+        return JdbcRelationUpdateReturningRunner(context, transform)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, A : Any> relationUpdateReturningSingleColumnQuery(
+        context: RelationUpdateContext<ENTITY, ID, META>,
+        expression: ColumnExpression<A, *>,
+    ): JdbcRunner<List<A?>> {
+        val transform = JdbcResultSetTransformers.singleColumn(expression)
+        return JdbcRelationUpdateReturningRunner(context, transform)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, A : Any, B : Any> relationUpdateReturningPairColumnsQuery(
+        context: RelationUpdateContext<ENTITY, ID, META>,
+        expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
+    ): JdbcRunner<List<Pair<A?, B?>>> {
+        val transform = JdbcResultSetTransformers.pairColumns(expressions)
+        return JdbcRelationUpdateReturningRunner(context, transform)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, A : Any, B : Any, C : Any> relationUpdateReturningTripleColumnsQuery(
+        context: RelationUpdateContext<ENTITY, ID, META>,
+        expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
+    ): JdbcRunner<List<Triple<A?, B?, C?>>> {
+        val transform = JdbcResultSetTransformers.tripleColumns(expressions)
+        return JdbcRelationUpdateReturningRunner(context, transform)
     }
 
     override fun templateExecuteQuery(

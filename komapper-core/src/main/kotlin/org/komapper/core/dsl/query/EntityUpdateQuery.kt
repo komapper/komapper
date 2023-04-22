@@ -11,7 +11,7 @@ import org.komapper.core.dsl.visitor.QueryVisitor
  * Represents a query to update entities.
  * This query returns new entity or entities.
  *
- * @param T the entity type
+ * @param T the result type
  */
 interface EntityUpdateQuery<T> : Query<T> {
     /**
@@ -23,20 +23,52 @@ interface EntityUpdateQuery<T> : Query<T> {
     fun options(configure: (UpdateOptions) -> UpdateOptions): EntityUpdateQuery<T>
 }
 
+/**
+ * Represents a query to update a single entity.
+ *
+ * @param ENTITY the entity type
+ */
 interface EntityUpdateSingleQuery<ENTITY : Any> : EntityUpdateQuery<ENTITY> {
+    /**
+     * Indicates to retrieve an entity.
+     * @return the query
+     */
     fun returning(): EntityUpdateReturningQuery<ENTITY?>
+
+    /**
+     * Indicates to retrieve a property.
+     *
+     * @param expression the property
+     * @return the query
+     */
     fun <A : Any> returning(expression: PropertyMetamodel<ENTITY, A, *>): EntityUpdateReturningQuery<A?>
 
+    /**
+     * Indicates to retrieve a property pair.
+     *
+     * @param expression1 the first property
+     * @param expression2 the second property
+     * @return the query
+     */
     fun <A : Any, B : Any> returning(
         expression1: PropertyMetamodel<ENTITY, A, *>,
         expression2: PropertyMetamodel<ENTITY, B, *>,
     ): EntityUpdateReturningQuery<Pair<A?, B?>?>
 
+    /**
+     * Indicates to retrieve a property triple.
+     *
+     * @param expression1 the first property
+     * @param expression2 the second property
+     * @param expression3 the third property
+     * @return the query
+     */
     fun <A : Any, B : Any, C : Any> returning(
         expression1: PropertyMetamodel<ENTITY, A, *>,
         expression2: PropertyMetamodel<ENTITY, B, *>,
         expression3: PropertyMetamodel<ENTITY, C, *>,
     ): EntityUpdateReturningQuery<Triple<A?, B?, C?>?>
+
     override fun options(configure: (UpdateOptions) -> UpdateOptions): EntityUpdateSingleQuery<ENTITY>
 }
 

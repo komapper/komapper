@@ -38,7 +38,9 @@ import org.komapper.core.dsl.runner.EntityUpsertSingleReturningRunner
 import org.komapper.core.dsl.runner.EntityUpsertSingleRunner
 import org.komapper.core.dsl.runner.RelationDeleteRunner
 import org.komapper.core.dsl.runner.RelationInsertSelectRunner
+import org.komapper.core.dsl.runner.RelationInsertValuesReturningRunner
 import org.komapper.core.dsl.runner.RelationInsertValuesRunner
+import org.komapper.core.dsl.runner.RelationUpdateReturningRunner
 import org.komapper.core.dsl.runner.RelationUpdateRunner
 import org.komapper.core.dsl.runner.Runner
 import org.komapper.core.dsl.runner.SchemaCreateRunner
@@ -500,6 +502,33 @@ internal object DefaultQueryVisitor : QueryVisitor<Runner> {
         return RelationInsertValuesRunner(context)
     }
 
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> relationInsertValuesReturningQuery(
+        context: RelationInsertValuesContext<ENTITY, ID, META>,
+    ): Runner {
+        return RelationInsertValuesReturningRunner(context)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, A : Any> relationInsertValuesReturningSingleColumnQuery(
+        context: RelationInsertValuesContext<ENTITY, ID, META>,
+        expression: ColumnExpression<A, *>,
+    ): Runner {
+        return RelationInsertValuesReturningRunner(context)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, A : Any, B : Any> relationInsertValuesReturningPairColumnsQuery(
+        context: RelationInsertValuesContext<ENTITY, ID, META>,
+        expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
+    ): Runner {
+        return RelationInsertValuesReturningRunner(context)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, A : Any, B : Any, C : Any> relationInsertValuesReturningTripleColumnsQuery(
+        context: RelationInsertValuesContext<ENTITY, ID, META>,
+        expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
+    ): Runner {
+        return RelationInsertValuesReturningRunner(context)
+    }
+
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> relationInsertSelectQuery(context: RelationInsertSelectContext<ENTITY, ID, META>): Runner {
         return RelationInsertSelectRunner(context)
     }
@@ -508,6 +537,31 @@ internal object DefaultQueryVisitor : QueryVisitor<Runner> {
         context: RelationUpdateContext<ENTITY, ID, META>,
     ): Runner {
         return RelationUpdateRunner(context)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> relationUpdateReturningQuery(context: RelationUpdateContext<ENTITY, ID, META>): Runner {
+        return RelationUpdateReturningRunner(context)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, A : Any> relationUpdateReturningSingleColumnQuery(
+        context: RelationUpdateContext<ENTITY, ID, META>,
+        expression: ColumnExpression<A, *>,
+    ): Runner {
+        return RelationUpdateReturningRunner(context)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, A : Any, B : Any> relationUpdateReturningPairColumnsQuery(
+        context: RelationUpdateContext<ENTITY, ID, META>,
+        expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
+    ): Runner {
+        return RelationUpdateReturningRunner(context)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, A : Any, B : Any, C : Any> relationUpdateReturningTripleColumnsQuery(
+        context: RelationUpdateContext<ENTITY, ID, META>,
+        expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
+    ): Runner {
+        return RelationUpdateReturningRunner(context)
     }
 
     override fun templateExecuteQuery(

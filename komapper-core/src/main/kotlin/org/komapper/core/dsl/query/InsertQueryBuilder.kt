@@ -113,7 +113,7 @@ interface InsertQueryBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTI
      * @param declaration the assignment declaration
      * @return the query
      */
-    fun values(declaration: AssignmentDeclaration<ENTITY, META>): RelationInsertQuery<ENTITY, ID, META, Pair<Long, ID?>>
+    fun values(declaration: AssignmentDeclaration<ENTITY, META>): RelationInsertValuesQuery<ENTITY, ID, META>
 }
 
 internal data class InsertQueryBuilderImpl<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
@@ -176,8 +176,8 @@ internal data class InsertQueryBuilderImpl<ENTITY : Any, ID : Any, META : Entity
         return RelationInsertSelectQuery(newContext)
     }
 
-    override fun values(declaration: AssignmentDeclaration<ENTITY, META>): RelationInsertQuery<ENTITY, ID, META, Pair<Long, ID?>> {
+    override fun values(declaration: AssignmentDeclaration<ENTITY, META>): RelationInsertValuesQuery<ENTITY, ID, META> {
         val newContext = context.asRelationInsertValuesContext(declaration)
-        return RelationInsertValuesQuery(newContext)
+        return RelationInsertValuesQueryImpl(newContext)
     }
 }

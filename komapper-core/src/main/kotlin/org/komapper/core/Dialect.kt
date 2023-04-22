@@ -8,10 +8,14 @@ import org.komapper.core.dsl.builder.EntityUpdateStatementBuilder
 import org.komapper.core.dsl.builder.EntityUpsertStatementBuilder
 import org.komapper.core.dsl.builder.OffsetLimitStatementBuilder
 import org.komapper.core.dsl.builder.OffsetLimitStatementBuilderImpl
+import org.komapper.core.dsl.builder.RelationInsertValuesStatementBuilder
+import org.komapper.core.dsl.builder.RelationUpdateStatementBuilder
 import org.komapper.core.dsl.builder.SchemaStatementBuilder
 import org.komapper.core.dsl.context.EntityInsertContext
 import org.komapper.core.dsl.context.EntityUpdateContext
 import org.komapper.core.dsl.context.EntityUpsertContext
+import org.komapper.core.dsl.context.RelationInsertValuesContext
+import org.komapper.core.dsl.context.RelationUpdateContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import java.util.regex.Pattern
 
@@ -178,6 +182,20 @@ interface Dialect {
         context: EntityUpsertContext<ENTITY, ID, META>,
         entities: List<ENTITY>,
     ): EntityUpsertStatementBuilder<ENTITY>
+
+    fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> getRelationInsertValuesStatementBuilder(
+        dialect: BuilderDialect,
+        context: RelationInsertValuesContext<ENTITY, ID, META>,
+    ): RelationInsertValuesStatementBuilder<ENTITY, ID, META> {
+        return RelationInsertValuesStatementBuilder(dialect, context)
+    }
+
+    fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> getRelationUpdateStatementBuilder(
+        dialect: BuilderDialect,
+        context: RelationUpdateContext<ENTITY, ID, META>,
+    ): RelationUpdateStatementBuilder<ENTITY, ID, META> {
+        return RelationUpdateStatementBuilder(dialect, context)
+    }
 
     /**
      * Returns the default length argument for the SUBSTRING function.

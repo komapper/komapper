@@ -388,6 +388,29 @@ interface QueryVisitor<VISIT_RESULT> {
     ): VISIT_RESULT
 
     fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
+    relationInsertValuesReturningQuery(
+        context: RelationInsertValuesContext<ENTITY, ID, META>,
+    ): VISIT_RESULT
+
+    fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, A : Any>
+    relationInsertValuesReturningSingleColumnQuery(
+        context: RelationInsertValuesContext<ENTITY, ID, META>,
+        expression: ColumnExpression<A, *>,
+    ): VISIT_RESULT
+
+    fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, A : Any, B : Any>
+    relationInsertValuesReturningPairColumnsQuery(
+        context: RelationInsertValuesContext<ENTITY, ID, META>,
+        expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
+    ): VISIT_RESULT
+
+    fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, A : Any, B : Any, C : Any>
+    relationInsertValuesReturningTripleColumnsQuery(
+        context: RelationInsertValuesContext<ENTITY, ID, META>,
+        expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
+    ): VISIT_RESULT
+
+    fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
     relationInsertSelectQuery(
         context: RelationInsertSelectContext<ENTITY, ID, META>,
     ): VISIT_RESULT
@@ -395,6 +418,29 @@ interface QueryVisitor<VISIT_RESULT> {
     fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
     relationUpdateQuery(
         context: RelationUpdateContext<ENTITY, ID, META>,
+    ): VISIT_RESULT
+
+    fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
+    relationUpdateReturningQuery(
+        context: RelationUpdateContext<ENTITY, ID, META>,
+    ): VISIT_RESULT
+
+    fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, A : Any>
+    relationUpdateReturningSingleColumnQuery(
+        context: RelationUpdateContext<ENTITY, ID, META>,
+        expression: ColumnExpression<A, *>,
+    ): VISIT_RESULT
+
+    fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, A : Any, B : Any>
+    relationUpdateReturningPairColumnsQuery(
+        context: RelationUpdateContext<ENTITY, ID, META>,
+        expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
+    ): VISIT_RESULT
+
+    fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, A : Any, B : Any, C : Any>
+    relationUpdateReturningTripleColumnsQuery(
+        context: RelationUpdateContext<ENTITY, ID, META>,
+        expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
     ): VISIT_RESULT
 
     fun templateExecuteQuery(

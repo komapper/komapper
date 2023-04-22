@@ -48,6 +48,7 @@ data class EntityInsertContext<ENTITY : Any, ID : Any, META : EntityMetamodel<EN
         return RelationInsertValuesContext(
             target = target,
             values = declaration,
+            returning = returning,
             options = options,
         )
     }

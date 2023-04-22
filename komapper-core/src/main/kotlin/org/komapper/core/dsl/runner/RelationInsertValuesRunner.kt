@@ -4,7 +4,6 @@ import org.komapper.core.BuilderDialect
 import org.komapper.core.DatabaseConfig
 import org.komapper.core.DryRunStatement
 import org.komapper.core.Statement
-import org.komapper.core.dsl.builder.RelationInsertValuesStatementBuilder
 import org.komapper.core.dsl.builder.getAssignments
 import org.komapper.core.dsl.context.RelationInsertValuesContext
 import org.komapper.core.dsl.expression.Operand
@@ -36,7 +35,7 @@ class RelationInsertValuesRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<
         idAssignment: Pair<PropertyMetamodel<ENTITY, ID, *>, Operand>?,
     ): Statement {
         val assignments = getAssignments(config, idAssignment)
-        val builder = RelationInsertValuesStatementBuilder(BuilderDialect(config), context)
+        val builder = config.dialect.getRelationInsertValuesStatementBuilder(BuilderDialect(config), context)
         return builder.build(assignments)
     }
 

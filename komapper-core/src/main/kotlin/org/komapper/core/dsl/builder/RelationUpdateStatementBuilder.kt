@@ -11,10 +11,21 @@ import org.komapper.core.dsl.expression.TableExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.metamodel.PropertyMetamodel
 
-class RelationUpdateStatementBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
+interface RelationUpdateStatementBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> {
+    fun build(assignments: List<Pair<PropertyMetamodel<ENTITY, *, *>, Operand>>): Statement
+}
+
+fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> RelationUpdateStatementBuilder(
+    dialect: BuilderDialect,
+    context: RelationUpdateContext<ENTITY, ID, META>,
+): RelationUpdateStatementBuilder<ENTITY, ID, META> {
+    return DefaultRelationUpdateStatementBuilder(dialect, context)
+}
+
+internal class DefaultRelationUpdateStatementBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val dialect: BuilderDialect,
     private val context: RelationUpdateContext<ENTITY, ID, META>,
-) {
+) : RelationUpdateStatementBuilder<ENTITY, ID, META> {
 
     private val aliasManager = if (dialect.supportsAliasForUpdateStatement()) {
         DefaultAliasManager(context)
@@ -25,7 +36,7 @@ class RelationUpdateStatementBuilder<ENTITY : Any, ID : Any, META : EntityMetamo
     private val buf = StatementBuffer()
     private val support = BuilderSupport(dialect, aliasManager, buf, context.options.escapeSequence)
 
-    fun build(assignments: List<Pair<PropertyMetamodel<ENTITY, *, *>, Operand>>): Statement {
+    override fun build(assignments: List<Pair<PropertyMetamodel<ENTITY, *, *>, Operand>>): Statement {
         buf.append("update ")
         table(context.target)
         buf.append(" set ")
