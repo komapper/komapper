@@ -15,17 +15,12 @@ class SqlServerEntityInsertStatementBuilder<ENTITY : Any, ID : Any, META : Entit
 ) : EntityInsertStatementBuilder<ENTITY, ID, META> {
 
     private val builder = DefaultEntityInsertStatementBuilder(dialect, context, entities)
-
     private val support = SqlServerStatementBuilderSupport(dialect, context)
 
     override fun build(): Statement {
         val buf = StatementBuffer()
         buf.append(builder.buildInsertInto())
-        val outputStatement = support.buildOutput()
-        if (outputStatement.parts.isNotEmpty()) {
-            buf.append(" ")
-            buf.append(outputStatement)
-        }
+        buf.appendIfNotEmpty(support.buildOutput())
         buf.append(" ")
         buf.append(builder.buildValues())
         return buf.toStatement()

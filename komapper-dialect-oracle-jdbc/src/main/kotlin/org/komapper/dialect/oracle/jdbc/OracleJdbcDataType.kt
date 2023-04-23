@@ -42,7 +42,6 @@ object OracleJdbcBooleanType : AbstractJdbcDataType<Boolean>(Boolean::class, JDB
     }
 }
 
-// TODO
 fun <T : Any> wrap(jdbcDataType: JdbcDataType<T>): OracleJdbcDataType<T> {
     return if (jdbcDataType is OracleJdbcDataType<T>) {
         jdbcDataType

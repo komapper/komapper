@@ -16,17 +16,12 @@ class SqlServerRelationInsertValuesStatementBuilder<ENTITY : Any, ID : Any, META
 ) : RelationInsertValuesStatementBuilder<ENTITY, ID, META> {
 
     private val builder = DefaultRelationInsertValuesStatementBuilder(dialect, context)
-
     private val support = SqlServerStatementBuilderSupport(dialect, context)
 
     override fun build(assignments: List<Pair<PropertyMetamodel<ENTITY, *, *>, Operand>>): Statement {
         val buf = StatementBuffer()
         buf.append(builder.buildInsertInto(assignments))
-        val outputStatement = support.buildOutput()
-        if (outputStatement.parts.isNotEmpty()) {
-            buf.append(" ")
-            buf.append(outputStatement)
-        }
+        buf.appendIfNotEmpty(support.buildOutput())
         buf.append(" ")
         buf.append(builder.buildValues(assignments))
         return buf.toStatement()

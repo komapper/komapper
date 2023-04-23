@@ -18,6 +18,16 @@ class StatementBuffer {
         return this
     }
 
+    fun appendIfNotEmpty(statement: Statement, prefix: CharSequence = " "): StatementBuffer {
+        if (statement.parts.isNotEmpty()) {
+            if (prefix.isNotEmpty()) {
+                append(prefix)
+            }
+            parts.addAll(statement.parts)
+        }
+        return this
+    }
+
     fun bind(value: Value<*>): StatementBuffer {
         parts.add(StatementPart.Value(value))
         return this

@@ -34,11 +34,7 @@ class OracleEntityInsertStatementBuilder<ENTITY : Any, ID : Any, META : EntityMe
         val support = OracleStatementBuilderSupport(dialect, context)
         return with(StatementBuffer()) {
             append(builder.build())
-            val returningStatement = support.buildReturning()
-            if (returningStatement.parts.isNotEmpty()) {
-                append(" ")
-                append(returningStatement)
-            }
+            appendIfNotEmpty(support.buildReturning())
             toStatement()
         }
     }

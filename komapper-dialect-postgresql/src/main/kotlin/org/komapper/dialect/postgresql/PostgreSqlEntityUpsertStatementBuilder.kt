@@ -29,6 +29,7 @@ class PostgreSqlEntityUpsertStatementBuilder<ENTITY : Any, ID : Any, META : Enti
     private val aliasManager = UpsertAliasManager(target, excluded)
     private val buf = StatementBuffer()
     private val support = BuilderSupport(dialect, aliasManager, buf, context.insertContext.options.escapeSequence)
+    private val postgreSqlSupport = PostgreSqlStatementBuilderSupport(dialect, context)
 
     override fun build(assignments: List<Pair<PropertyMetamodel<ENTITY, *, *>, Operand>>): Statement {
         val properties = target.getNonAutoIncrementProperties()
@@ -88,15 +89,7 @@ class PostgreSqlEntityUpsertStatementBuilder<ENTITY : Any, ID : Any, META : Enti
                 }
             }
         }
-        val expressions = context.returning.expressions()
-        if (expressions.isNotEmpty()) {
-            buf.append(" returning ")
-            for (e in expressions) {
-                column(e)
-                buf.append(", ")
-            }
-            buf.cutBack(2)
-        }
+        buf.appendIfNotEmpty(postgreSqlSupport.buildReturning())
         return buf.toStatement()
     }
 

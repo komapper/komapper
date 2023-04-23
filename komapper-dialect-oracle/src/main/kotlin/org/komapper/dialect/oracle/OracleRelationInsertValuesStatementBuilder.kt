@@ -19,11 +19,7 @@ class OracleRelationInsertValuesStatementBuilder<ENTITY : Any, ID : Any, META : 
 
     override fun build(assignments: List<Pair<PropertyMetamodel<ENTITY, *, *>, Operand>>): Statement {
         buf.append(builder.build(assignments))
-        val returningStatement = support.buildReturning()
-        if (returningStatement.parts.isNotEmpty()) {
-            buf.append(" ")
-            buf.append(returningStatement)
-        }
+        buf.appendIfNotEmpty(support.buildReturning())
         return buf.toStatement()
     }
 }

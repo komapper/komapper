@@ -20,11 +20,7 @@ class OracleEntityUpdateStatementBuilder<ENTITY : Any, ID : Any, META : EntityMe
 
     override fun build(): Statement {
         buf.append(builder.build())
-        val returningStatement = support.buildReturning()
-        if (returningStatement.parts.isNotEmpty()) {
-            buf.append(" ")
-            buf.append(returningStatement)
-        }
+        buf.appendIfNotEmpty(support.buildReturning())
         return buf.toStatement()
     }
 }
