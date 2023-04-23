@@ -2,7 +2,6 @@
 
 plugins {
     `jvm-test-suite`
-    idea
     id("com.google.devtools.ksp")
 }
 

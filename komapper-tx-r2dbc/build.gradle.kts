@@ -1,5 +1,4 @@
 plugins {
-    idea
     id("com.google.devtools.ksp")
 }
 
@@ -10,14 +9,6 @@ dependencies {
     testRuntimeOnly("ch.qos.logback:logback-classic:1.4.7")
     testImplementation(project(":komapper-dialect-h2-r2dbc"))
     kspTest(project(":komapper-processor"))
-}
-
-idea {
-    module {
-        sourceDirs = sourceDirs + file("build/generated/ksp/main/kotlin")
-        testSourceDirs = testSourceDirs + file("build/generated/ksp/test/kotlin")
-        generatedSourceDirs = generatedSourceDirs + file("build/generated/ksp/main/kotlin") + file("build/generated/ksp/test/kotlin")
-    }
 }
 
 ksp {

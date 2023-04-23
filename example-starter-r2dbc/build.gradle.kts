@@ -1,5 +1,4 @@
 plugins {
-    idea
     application
     id("com.google.devtools.ksp")
 }
