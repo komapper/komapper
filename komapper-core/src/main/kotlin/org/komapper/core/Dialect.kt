@@ -259,7 +259,9 @@ interface Dialect {
      */
     fun supportsGeneratedKeysReturningWhenInsertingMultipleRows(): Boolean = true
 
-    fun supportsInsertReturning(): Boolean = false
+    fun supportsInsertMultipleReturning(): Boolean = false
+
+    fun supportsInsertSingleReturning(): Boolean = false
 
     /**
      * Returns whether the INTERSECT set operation is supported.
@@ -337,6 +339,10 @@ interface Dialect {
     fun supportsTableHint(): Boolean = false
 
     fun supportsUpdateReturning(): Boolean = false
+
+    fun supportsUpsertMultipleReturning(): Boolean = false
+
+    fun supportsUpsertSingleReturning(): Boolean = false
 }
 
 object DryRunDialect : Dialect {

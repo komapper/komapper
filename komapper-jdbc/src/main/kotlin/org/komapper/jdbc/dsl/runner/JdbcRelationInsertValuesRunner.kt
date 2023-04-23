@@ -9,7 +9,6 @@ import org.komapper.core.dsl.metamodel.IdGenerator
 import org.komapper.core.dsl.metamodel.PropertyMetamodel
 import org.komapper.core.dsl.runner.RelationInsertValuesRunner
 import org.komapper.jdbc.JdbcDatabaseConfig
-import org.komapper.jdbc.JdbcExecutor
 
 internal class JdbcRelationInsertValuesRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: RelationInsertValuesContext<ENTITY, ID, META>,
@@ -53,7 +52,7 @@ internal class JdbcRelationInsertValuesRunner<ENTITY : Any, ID : Any, META : Ent
         generatedColumn: String? = null,
     ): Pair<Long, List<Long>> {
         val statement = runner.buildStatement(config, idAssignment)
-        val executor = JdbcExecutor(config, context.options, generatedColumn)
+        val executor = config.dialect.createExecutor(config, context.options, generatedColumn)
         return executor.executeUpdate(statement)
     }
 

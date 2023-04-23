@@ -28,6 +28,11 @@ data class Statement(val parts: List<StatementPart>) {
     val args: List<Value<*>> = parts.filterIsInstance<StatementPart.Value>().map { it.value }
 
     /**
+     * The return parameters of the SQL statement.
+     */
+    val returnParamTypes: List<KClass<*>> = parts.filterIsInstance<StatementPart.ReturnParameter>().map { it.dataType }
+
+    /**
      * Converts the SQL statement to an SQL string.
      *
      * @param format the format function of the bind values
@@ -40,6 +45,7 @@ data class Statement(val parts: List<StatementPart>) {
                 is StatementPart.Value -> {
                     format(index++, part)
                 }
+                is StatementPart.ReturnParameter -> part
             }
         }
     }
@@ -57,6 +63,7 @@ data class Statement(val parts: List<StatementPart>) {
                     val value = part.value
                     format(value.any, value.klass, value.masking)
                 }
+                is StatementPart.ReturnParameter -> part
             }
         }
     }

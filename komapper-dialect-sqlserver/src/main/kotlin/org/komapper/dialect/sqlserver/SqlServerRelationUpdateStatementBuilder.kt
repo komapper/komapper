@@ -17,7 +17,7 @@ class SqlServerRelationUpdateStatementBuilder<ENTITY : Any, ID : Any, META : Ent
 
     private val builder = DefaultRelationUpdateStatementBuilder(dialect, context)
 
-    private val support = SqlServerBuilderSupport(dialect, context)
+    private val support = SqlServerStatementBuilderSupport(dialect, context)
 
     override fun build(assignments: List<Pair<PropertyMetamodel<ENTITY, *, *>, Operand>>): Statement {
         val buf = StatementBuffer()

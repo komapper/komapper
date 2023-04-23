@@ -8,7 +8,6 @@ import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.runner.RelationUpdateReturningRunner
 import org.komapper.jdbc.JdbcDataOperator
 import org.komapper.jdbc.JdbcDatabaseConfig
-import org.komapper.jdbc.JdbcExecutor
 import java.sql.ResultSet
 
 internal class JdbcRelationUpdateReturningRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, T>(
@@ -28,8 +27,8 @@ internal class JdbcRelationUpdateReturningRunner<ENTITY : Any, ID : Any, META : 
         val result = runner.buildStatement(config, updatedAtAssignment)
         val statement = result.getOrNull()
         return if (statement != null) {
-            val executor = JdbcExecutor(config, context.options)
-            executor.executeQuery(statement, transform) { it.toList() }
+            val executor = config.dialect.createExecutor(config, context.options)
+            executor.executeReturning(statement, transform) { it.toList() }
         } else {
             emptyList()
         }

@@ -16,7 +16,7 @@ class SqlServerEntityInsertStatementBuilder<ENTITY : Any, ID : Any, META : Entit
 
     private val builder = DefaultEntityInsertStatementBuilder(dialect, context, entities)
 
-    private val support = SqlServerBuilderSupport(dialect, context)
+    private val support = SqlServerStatementBuilderSupport(dialect, context)
 
     override fun build(): Statement {
         val buf = StatementBuffer()

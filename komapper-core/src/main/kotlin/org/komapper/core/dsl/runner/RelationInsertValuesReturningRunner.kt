@@ -16,7 +16,7 @@ class RelationInsertValuesReturningRunner<ENTITY : Any, ID : Any, META : EntityM
     private val runner: RelationInsertValuesRunner<ENTITY, ID, META> = RelationInsertValuesRunner(context)
 
     override fun check(config: DatabaseConfig) {
-        checkInsertReturning(config)
+        checkInsertSingleReturning(config)
     }
 
     override fun dryRun(config: DatabaseConfig): DryRunStatement {

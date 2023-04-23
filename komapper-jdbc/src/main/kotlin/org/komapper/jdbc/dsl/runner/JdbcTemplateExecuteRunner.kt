@@ -5,7 +5,6 @@ import org.komapper.core.DryRunStatement
 import org.komapper.core.dsl.context.TemplateExecuteContext
 import org.komapper.core.dsl.runner.TemplateExecuteRunner
 import org.komapper.jdbc.JdbcDatabaseConfig
-import org.komapper.jdbc.JdbcExecutor
 
 internal class JdbcTemplateExecuteRunner(
     private val context: TemplateExecuteContext,
@@ -19,7 +18,7 @@ internal class JdbcTemplateExecuteRunner(
 
     override fun run(config: JdbcDatabaseConfig): Long {
         val statement = runner.buildStatement(config)
-        val executor = JdbcExecutor(config, context.options)
+        val executor = config.dialect.createExecutor(config, context.options)
         val (count) = executor.executeUpdate(statement)
         return count
     }

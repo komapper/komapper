@@ -11,15 +11,42 @@ import java.sql.PreparedStatement
 import java.sql.ResultSet
 import java.sql.SQLException
 
-internal class JdbcExecutor(
+interface JdbcExecutor {
+    fun <T> executeQuery(
+        statement: Statement,
+        transform: (rs: ResultSet) -> T,
+    ): T
+
+    fun <T, R> executeQuery(
+        statement: Statement,
+        transform: (JdbcDataOperator, ResultSet) -> T,
+        collect: suspend (Flow<T>) -> R,
+    ): R
+
+    fun <T, R> executeReturning(
+        statement: Statement,
+        transform: (JdbcDataOperator, ResultSet) -> T,
+        collect: suspend (Flow<T>) -> R,
+    ): R {
+        return executeQuery(statement, transform, collect)
+    }
+
+    fun executeUpdate(statement: Statement): Pair<Long, List<Long>>
+
+    fun executeBatch(statements: List<Statement>): List<Pair<Long, Long?>>
+
+    fun execute(statements: List<Statement>, handler: (SQLException) -> Unit = { throw it })
+}
+
+class DefaultJdbcExecutor(
     private val config: JdbcDatabaseConfig,
     executionOptionProvider: ExecutionOptionsProvider,
-    private val generatedColumn: String? = null,
-) {
+    private val generatedColumn: String?,
+) : JdbcExecutor {
 
     private val executionOptions = config.executionOptions + executionOptionProvider.getExecutionOptions()
 
-    fun <T> executeQuery(
+    override fun <T> executeQuery(
         statement: Statement,
         transform: (rs: ResultSet) -> T,
     ): T {
@@ -39,7 +66,7 @@ internal class JdbcExecutor(
         }
     }
 
-    fun <T, R> executeQuery(
+    override fun <T, R> executeQuery(
         statement: Statement,
         transform: (JdbcDataOperator, ResultSet) -> T,
         collect: suspend (Flow<T>) -> R,
@@ -67,7 +94,7 @@ internal class JdbcExecutor(
         }
     }
 
-    fun executeUpdate(statement: Statement): Pair<Long, List<Long>> {
+    override fun executeUpdate(statement: Statement): Pair<Long, List<Long>> {
         return withExceptionTranslator {
             @Suppress("NAME_SHADOWING")
             val statement = inspect(statement)
@@ -88,7 +115,7 @@ internal class JdbcExecutor(
         }
     }
 
-    fun executeBatch(statements: List<Statement>): List<Pair<Long, Long?>> {
+    override fun executeBatch(statements: List<Statement>): List<Pair<Long, Long?>> {
         require(statements.isNotEmpty())
         return withExceptionTranslator {
             @Suppress("NAME_SHADOWING")
@@ -123,7 +150,7 @@ internal class JdbcExecutor(
         }
     }
 
-    fun execute(statements: List<Statement>, handler: (SQLException) -> Unit = { throw it }) {
+    override fun execute(statements: List<Statement>, handler: (SQLException) -> Unit) {
         withExceptionTranslator {
             @Suppress("NAME_SHADOWING")
             val statements = statements.map { inspect(it) }
@@ -147,7 +174,7 @@ internal class JdbcExecutor(
     /**
      * Translates a [Exception] to a [RuntimeException].
      */
-    private fun <T> withExceptionTranslator(block: () -> T): T {
+    fun <T> withExceptionTranslator(block: () -> T): T {
         return try {
             block()
         } catch (e: SQLException) {
@@ -164,11 +191,11 @@ internal class JdbcExecutor(
         }
     }
 
-    private fun inspect(statement: Statement): Statement {
+    fun inspect(statement: Statement): Statement {
         return config.statementInspector.inspect(statement)
     }
 
-    private fun log(statement: Statement) {
+    fun log(statement: Statement) {
         val suppressLogging = executionOptions.suppressLogging ?: false
         if (!suppressLogging) {
             config.loggerFacade.sql(statement, config.dialect::createBindVariable)
@@ -180,7 +207,7 @@ internal class JdbcExecutor(
         return statement.toSql(config.dialect::createBindVariable)
     }
 
-    private fun prepare(con: Connection, statement: Statement): PreparedStatement {
+    fun prepare(con: Connection, statement: Statement): PreparedStatement {
         val sql = asSql(statement)
         return if (generatedColumn == null) {
             con.prepareStatement(sql)
@@ -193,13 +220,13 @@ internal class JdbcExecutor(
         }
     }
 
-    private fun setUp(statement: java.sql.Statement) {
+    fun setUp(statement: java.sql.Statement) {
         executionOptions.fetchSize?.let { if (it > 0) statement.fetchSize = it }
         executionOptions.maxRows?.let { if (it > 0) statement.maxRows = it }
         executionOptions.queryTimeoutSeconds?.let { if (it > 0) statement.queryTimeout = it }
     }
 
-    private fun bind(ps: PreparedStatement, statement: Statement) {
+    fun bind(ps: PreparedStatement, statement: Statement) {
         statement.args.forEachIndexed { index, value ->
             config.dataOperator.setValue(ps, index + 1, value.any, value.klass)
         }

@@ -5,7 +5,6 @@ import org.komapper.core.Statement
 import org.komapper.core.dsl.metamodel.IdGenerator
 import org.komapper.core.dsl.options.QueryOptions
 import org.komapper.jdbc.JdbcDatabaseConfig
-import org.komapper.jdbc.JdbcExecutor
 
 internal fun <ENTITY : Any, ID : Any> IdGenerator.Sequence<ENTITY, ID>.execute(
     config: JdbcDatabaseConfig,
@@ -14,7 +13,7 @@ internal fun <ENTITY : Any, ID : Any> IdGenerator.Sequence<ENTITY, ID>.execute(
     generate(config.id, config.dialect::enquote) { sequenceName ->
         val sql = config.dialect.getSequenceSql(sequenceName)
         val statement = Statement(sql)
-        val executor = JdbcExecutor(config, options)
+        val executor = config.dialect.createExecutor(config, options)
         executor.executeQuery(statement) { rs ->
             if (rs.next()) rs.getLong(1) else error("No result: ${statement.toSql()}")
         }

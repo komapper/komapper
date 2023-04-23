@@ -7,7 +7,6 @@ import org.komapper.core.dsl.context.TemplateSelectContext
 import org.komapper.core.dsl.query.Row
 import org.komapper.core.dsl.runner.TemplateSelectRunner
 import org.komapper.jdbc.JdbcDatabaseConfig
-import org.komapper.jdbc.JdbcExecutor
 
 internal class JdbcTemplateSelectRunner<T, R>(
     private val context: TemplateSelectContext,
@@ -23,7 +22,7 @@ internal class JdbcTemplateSelectRunner<T, R>(
 
     override fun run(config: JdbcDatabaseConfig): R {
         val statement = runner.buildStatement(config)
-        val executor = JdbcExecutor(config, context.options)
+        val executor = config.dialect.createExecutor(config, context.options)
         return executor.executeQuery(
             statement,
             { dataOperator, rs ->

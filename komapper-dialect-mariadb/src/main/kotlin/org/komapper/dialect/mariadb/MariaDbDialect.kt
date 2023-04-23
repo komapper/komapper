@@ -69,7 +69,9 @@ interface MariaDbDialect : Dialect {
 
     override fun supportsGeneratedKeysReturningWhenInsertingMultipleRows(): Boolean = false
 
-    override fun supportsInsertReturning(): Boolean = true
+    override fun supportsInsertMultipleReturning(): Boolean = true
+
+    override fun supportsInsertSingleReturning(): Boolean = true
 
     override fun supportsLockOptionNowait(): Boolean = true
 
@@ -82,4 +84,8 @@ interface MariaDbDialect : Dialect {
     override fun supportsOptimisticLockOfBatchExecution(): Boolean = false
 
     override fun supportsSearchConditionInUpsertStatement(): Boolean = false
+
+    override fun supportsUpsertMultipleReturning(): Boolean = true
+
+    override fun supportsUpsertSingleReturning(): Boolean = true
 }

@@ -1,4 +1,4 @@
-package org.komapper.dialect.sqlserver
+package org.komapper.dialect.oracle
 
 import org.komapper.core.BuilderDialect
 import org.komapper.core.Statement
@@ -8,25 +8,23 @@ import org.komapper.core.dsl.builder.EntityUpdateStatementBuilder
 import org.komapper.core.dsl.context.EntityUpdateContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 
-class SqlServerEntityUpdateStatementBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
-    dialect: BuilderDialect,
-    context: EntityUpdateContext<ENTITY, ID, META>,
+class OracleEntityUpdateStatementBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
+    private val dialect: BuilderDialect,
+    private val context: EntityUpdateContext<ENTITY, ID, META>,
     entity: ENTITY,
 ) : EntityUpdateStatementBuilder<ENTITY, ID, META> {
 
+    private val buf = StatementBuffer()
     private val builder = DefaultEntityUpdateStatementBuilder(dialect, context, entity)
-    private val support = SqlServerStatementBuilderSupport(dialect, context)
+    private val support = OracleStatementBuilderSupport(dialect, context)
 
     override fun build(): Statement {
-        val buf = StatementBuffer()
-        buf.append(builder.buildUpdateSet())
-        val outputStatement = support.buildOutput()
-        if (outputStatement.parts.isNotEmpty()) {
+        buf.append(builder.build())
+        val returningStatement = support.buildReturning()
+        if (returningStatement.parts.isNotEmpty()) {
             buf.append(" ")
-            buf.append(outputStatement)
+            buf.append(returningStatement)
         }
-        buf.append(" ")
-        buf.append(builder.buildWhere())
         return buf.toStatement()
     }
 }

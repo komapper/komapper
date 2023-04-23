@@ -8,7 +8,6 @@ import org.komapper.core.dsl.query.EntityStore
 import org.komapper.core.dsl.runner.EntityStoreFactory
 import org.komapper.core.dsl.runner.SelectRunner
 import org.komapper.jdbc.JdbcDatabaseConfig
-import org.komapper.jdbc.JdbcExecutor
 
 internal class JdbcEntityStoreRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: SelectContext<ENTITY, ID, META>,
@@ -24,7 +23,7 @@ internal class JdbcEntityStoreRunner<ENTITY : Any, ID : Any, META : EntityMetamo
     override fun run(config: JdbcDatabaseConfig): EntityStore {
         val metamodels = context.getProjection().metamodels()
         val statement = runner.buildStatement(config)
-        val executor = JdbcExecutor(config, context.options)
+        val executor = config.dialect.createExecutor(config, context.options)
         val rows = executor.executeQuery(statement) { rs ->
             val rows = mutableListOf<Map<EntityMetamodel<*, *, *>, Any>>()
             while (rs.next()) {

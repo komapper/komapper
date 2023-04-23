@@ -28,7 +28,7 @@ import kotlin.test.assertNull
 @ExtendWith(JdbcEnv::class)
 class JdbcInsertSingleReturningTest(private val db: JdbcDatabase) {
 
-    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL, Dbms.SQLSERVER])
+    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.ORACLE, Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun test() {
         val a = Meta.address
@@ -37,7 +37,7 @@ class JdbcInsertSingleReturningTest(private val db: JdbcDatabase) {
         assertEquals(address, address2)
     }
 
-    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL, Dbms.SQLSERVER])
+    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.ORACLE, Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun testReturningSingleColumn() {
         val a = Meta.address
@@ -46,7 +46,7 @@ class JdbcInsertSingleReturningTest(private val db: JdbcDatabase) {
         assertEquals(address.street, street)
     }
 
-    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL, Dbms.SQLSERVER])
+    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.ORACLE, Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun testReturningPairColumns() {
         val a = Meta.address
@@ -56,7 +56,7 @@ class JdbcInsertSingleReturningTest(private val db: JdbcDatabase) {
         assertEquals(address.version, version)
     }
 
-    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL, Dbms.SQLSERVER])
+    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.ORACLE, Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun testReturningTripleColumns() {
         val a = Meta.address
@@ -67,7 +67,7 @@ class JdbcInsertSingleReturningTest(private val db: JdbcDatabase) {
         assertEquals(address.addressId, addressId)
     }
 
-    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL, Dbms.SQLSERVER])
+    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.ORACLE, Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun uniqueConstraintException() {
         val a = Meta.address
@@ -77,7 +77,7 @@ class JdbcInsertSingleReturningTest(private val db: JdbcDatabase) {
         }
     }
 
-    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL, Dbms.SQLSERVER])
+    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.ORACLE, Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun sequenceGenerator() {
         val generator = Meta.sequenceStrategy.idGenerator() as IdGenerator.Sequence<*, *>
@@ -91,7 +91,7 @@ class JdbcInsertSingleReturningTest(private val db: JdbcDatabase) {
         }
     }
 
-    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL, Dbms.SQLSERVER])
+    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.ORACLE, Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun identityGenerator() {
         for (i in 1..201) {
@@ -252,7 +252,7 @@ class JdbcInsertSingleReturningTest(private val db: JdbcDatabase) {
         assertNull(address2)
     }
 
-    @Run(unless = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL, Dbms.SQLSERVER])
+    @Run(unless = [Dbms.H2, Dbms.MARIADB, Dbms.ORACLE, Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun unsupportedOperationException_insertReturning() {
         val a = Meta.address

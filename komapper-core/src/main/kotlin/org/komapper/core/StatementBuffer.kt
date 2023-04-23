@@ -1,5 +1,7 @@
 package org.komapper.core
 
+import kotlin.reflect.KClass
+
 /**
  * The buffer for the SQL statement.
  */
@@ -18,6 +20,11 @@ class StatementBuffer {
 
     fun bind(value: Value<*>): StatementBuffer {
         parts.add(StatementPart.Value(value))
+        return this
+    }
+
+    fun registerReturnParameter(dataType: KClass<*>): StatementBuffer {
+        parts.add(StatementPart.ReturnParameter(dataType))
         return this
     }
 

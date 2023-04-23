@@ -11,7 +11,6 @@ import org.komapper.core.dsl.metamodel.PropertyMetamodel
 import org.komapper.core.dsl.runner.RelationInsertValuesReturningRunner
 import org.komapper.jdbc.JdbcDataOperator
 import org.komapper.jdbc.JdbcDatabaseConfig
-import org.komapper.jdbc.JdbcExecutor
 import java.sql.ResultSet
 
 internal class JdbcRelationInsertValuesReturningRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, T>(
@@ -52,8 +51,8 @@ internal class JdbcRelationInsertValuesReturningRunner<ENTITY : Any, ID : Any, M
         idAssignment: Pair<PropertyMetamodel<ENTITY, ID, *>, Operand>? = null,
     ): T {
         val statement = runner.buildStatement(config, idAssignment)
-        val executor = JdbcExecutor(config, context.options)
-        return executor.executeQuery(statement, transform) { it.single() }
+        val executor = config.dialect.createExecutor(config, context.options)
+        return executor.executeReturning(statement, transform) { it.single() }
     }
 
     override fun dryRun(config: DatabaseConfig): DryRunStatement {

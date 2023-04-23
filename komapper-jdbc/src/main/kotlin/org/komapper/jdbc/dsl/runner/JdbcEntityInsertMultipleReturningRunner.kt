@@ -40,7 +40,7 @@ internal class JdbcEntityInsertMultipleReturningRunner<ENTITY : Any, ID : Any, M
     private fun insert(config: JdbcDatabaseConfig, entities: List<ENTITY>): List<T> {
         val statement = runner.buildStatement(config, entities)
         return support.insert(config) { executor ->
-            executor.executeQuery(statement, transform) { it.toList() }
+            executor.executeReturning(statement, transform) { it.toList() }
         }
     }
 

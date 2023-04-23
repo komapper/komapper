@@ -81,9 +81,15 @@ interface PostgreSqlDialect : Dialect {
 
     override fun supportsLockOptionSkipLocked(): Boolean = true
 
-    override fun supportsInsertReturning(): Boolean = true
+    override fun supportsInsertMultipleReturning(): Boolean = true
+
+    override fun supportsInsertSingleReturning(): Boolean = true
 
     override fun supportsSearchConditionInUpsertStatement(): Boolean = true
 
     override fun supportsUpdateReturning(): Boolean = true
+
+    override fun supportsUpsertMultipleReturning(): Boolean = true
+
+    override fun supportsUpsertSingleReturning(): Boolean = true
 }

@@ -1,10 +1,23 @@
 package org.komapper.dialect.oracle.jdbc
 
+import org.komapper.core.ExecutionOptionsProvider
 import org.komapper.dialect.oracle.OracleDialect
+import org.komapper.jdbc.DefaultJdbcExecutor
+import org.komapper.jdbc.JdbcDatabaseConfig
 import org.komapper.jdbc.JdbcDialect
+import org.komapper.jdbc.JdbcExecutor
 import java.sql.SQLException
 
 interface OracleJdbcDialect : OracleDialect, JdbcDialect {
+
+    override fun createExecutor(
+        config: JdbcDatabaseConfig,
+        executionOptionProvider: ExecutionOptionsProvider,
+        generatedColumn: String?,
+    ): JdbcExecutor {
+        val executor = DefaultJdbcExecutor(config, executionOptionProvider, generatedColumn)
+        return OracleJdbcExecutor(config, executor)
+    }
 
     override fun isSequenceExistsError(exception: SQLException): Boolean {
         return exception.filterIsInstance<SQLException>().any {

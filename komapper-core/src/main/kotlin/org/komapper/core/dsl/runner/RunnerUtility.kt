@@ -86,11 +86,21 @@ internal fun checkGeneratedKeysReturningWhenInsertingMultipleRows(
     }
 }
 
-internal fun checkInsertReturning(config: DatabaseConfig) {
+internal fun checkInsertSingleReturning(config: DatabaseConfig) {
     val dialect = config.dialect
-    if (!config.dialect.supportsInsertReturning()) {
+    if (!config.dialect.supportsInsertSingleReturning()) {
         throw UnsupportedOperationException(
-            "The dialect(driver=${dialect.driver}) does not support `INSERT RETURNING`. " +
+            "The dialect(driver=${dialect.driver}) does not support `returning` for inserting single row. " +
+                "Do not use the `returning` function in your query.",
+        )
+    }
+}
+
+internal fun checkInsertMultipleReturning(config: DatabaseConfig) {
+    val dialect = config.dialect
+    if (!config.dialect.supportsInsertMultipleReturning()) {
+        throw UnsupportedOperationException(
+            "The dialect(driver=${dialect.driver}) does not support `returning` for inserting multiple rows. " +
                 "Do not use the `returning` function in your query.",
         )
     }
@@ -125,7 +135,27 @@ internal fun checkUpdateReturning(config: DatabaseConfig) {
     val dialect = config.dialect
     if (!config.dialect.supportsUpdateReturning()) {
         throw UnsupportedOperationException(
-            "The dialect(driver=${dialect.driver}) does not support `UPDATE RETURNING`. " +
+            "The dialect(driver=${dialect.driver}) does not support `returning` for update statements. " +
+                "Do not use the `returning` function in your query.",
+        )
+    }
+}
+
+internal fun checkUpsertSingleReturning(config: DatabaseConfig) {
+    val dialect = config.dialect
+    if (!config.dialect.supportsUpsertSingleReturning()) {
+        throw UnsupportedOperationException(
+            "The dialect(driver=${dialect.driver}) does not support `returning` in combination with `onDuplicateKeyIgnore` or `onDuplicateKeyUpdate` for single row. " +
+                "Do not use the `returning` function in your query.",
+        )
+    }
+}
+
+internal fun checkUpsertMultipleReturning(config: DatabaseConfig) {
+    val dialect = config.dialect
+    if (!config.dialect.supportsUpsertMultipleReturning()) {
+        throw UnsupportedOperationException(
+            "The dialect(driver=${dialect.driver}) does not support `returning` in combination with `onDuplicateKeyIgnore` or `onDuplicateKeyUpdate` for multiple rows. " +
                 "Do not use the `returning` function in your query.",
         )
     }

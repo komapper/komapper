@@ -29,7 +29,7 @@ internal class SqlServerEntityUpsertStatementBuilder<ENTITY : Any, ID : Any, MET
     private val aliasManager = UpsertAliasManager(target, excluded)
     private val buf = StatementBuffer()
     private val support = BuilderSupport(dialect, aliasManager, buf, context.insertContext.options.escapeSequence)
-    private val sqlServerSupport = SqlServerBuilderSupport(dialect, context)
+    private val sqlServerSupport = SqlServerStatementBuilderSupport(dialect, context)
     private val sourceStatementBuilder = SourceStatementBuilder(dialect, context, entities)
 
     override fun build(assignments: List<Pair<PropertyMetamodel<ENTITY, *, *>, Operand>>): Statement {

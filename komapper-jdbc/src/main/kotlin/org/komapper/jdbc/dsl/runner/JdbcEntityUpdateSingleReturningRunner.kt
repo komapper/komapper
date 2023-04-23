@@ -40,7 +40,7 @@ internal class JdbcEntityUpdateSingleReturningRunner<ENTITY : Any, ID : Any, MET
     private fun update(config: JdbcDatabaseConfig, entity: ENTITY): T? {
         val statement = runner.buildStatement(config, entity)
         return support.update(config) { executor ->
-            executor.executeQuery(statement, transform) { it.singleOrNull() }
+            executor.executeReturning(statement, transform) { it.singleOrNull() }
         }
     }
 
