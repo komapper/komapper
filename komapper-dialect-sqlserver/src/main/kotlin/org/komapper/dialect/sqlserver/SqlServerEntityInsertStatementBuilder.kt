@@ -3,62 +3,31 @@ package org.komapper.dialect.sqlserver
 import org.komapper.core.BuilderDialect
 import org.komapper.core.Statement
 import org.komapper.core.StatementBuffer
+import org.komapper.core.dsl.builder.DefaultEntityInsertStatementBuilder
 import org.komapper.core.dsl.builder.EntityInsertStatementBuilder
 import org.komapper.core.dsl.context.EntityInsertContext
-import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
-import org.komapper.core.dsl.metamodel.getNonAutoIncrementProperties
 
 class SqlServerEntityInsertStatementBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
-    private val dialect: BuilderDialect,
-    private val context: EntityInsertContext<ENTITY, ID, META>,
-    private val entities: List<ENTITY>,
+    dialect: BuilderDialect,
+    context: EntityInsertContext<ENTITY, ID, META>,
+    entities: List<ENTITY>,
 ) : EntityInsertStatementBuilder<ENTITY, ID, META> {
 
-    private val buf = StatementBuffer()
+    private val builder = DefaultEntityInsertStatementBuilder(dialect, context, entities)
+
+    private val support = SqlServerBuilderSupport(dialect, context)
 
     override fun build(): Statement {
-        val target = context.target
-        val properties = target.getNonAutoIncrementProperties()
-        buf.append("insert into ")
-        table(target)
-        buf.append(" (")
-        for (p in properties) {
-            column(p)
-            buf.append(", ")
+        val buf = StatementBuffer()
+        buf.append(builder.buildInsertInto())
+        val outputStatement = support.buildOutput()
+        if (outputStatement.parts.isNotEmpty()) {
+            buf.append(" ")
+            buf.append(outputStatement)
         }
-        buf.cutBack(2)
-        buf.append(")")
-        val outputExpressions = context.returning.expressions()
-        if (outputExpressions.isNotEmpty()) {
-            buf.append(" output ")
-            for (e in outputExpressions) {
-                buf.append("inserted.")
-                column(e)
-                buf.append(", ")
-            }
-            buf.cutBack(2)
-        }
-        buf.append(" values ")
-        for (entity in entities) {
-            buf.append("(")
-            for (p in properties) {
-                buf.bind(p.toValue(entity))
-                buf.append(", ")
-            }
-            buf.cutBack(2)
-            buf.append("), ")
-        }
-        buf.cutBack(2)
+        buf.append(" ")
+        buf.append(builder.buildValues())
         return buf.toStatement()
     }
-
-    private fun table(metamodel: EntityMetamodel<*, *, *>) {
-        val name = metamodel.getCanonicalTableName(dialect::enquote)
-        buf.append(name)
-    }
-
-    private fun column(expression: ColumnExpression<*, *>) {
-        val name = expression.getCanonicalColumnName(dialect::enquote)
-        buf.append(name)
-    } }
+}

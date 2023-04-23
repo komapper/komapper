@@ -1,7 +1,7 @@
 package org.komapper.core.dsl.query
 
 import org.komapper.core.dsl.context.RelationUpdateContext
-import org.komapper.core.dsl.element.Output
+import org.komapper.core.dsl.element.Returning
 import org.komapper.core.dsl.expression.AssignmentDeclaration
 import org.komapper.core.dsl.expression.WhereDeclaration
 import org.komapper.core.dsl.metamodel.EntityMetamodel
@@ -105,12 +105,12 @@ internal data class RelationUpdateQueryImpl<ENTITY : Any, ID : Any, META : Entit
     }
 
     override fun returning(): RelationUpdateReturningQuery<List<ENTITY>> {
-        val newContext = context.copy(returning = Output.Metamodel(context.target))
+        val newContext = context.copy(returning = Returning.Metamodel(context.target))
         return RelationUpdateReturningQueryImpl(newContext)
     }
 
     override fun <A : Any> returning(expression: PropertyMetamodel<ENTITY, A, *>): RelationUpdateReturningQuery<List<A?>> {
-        val newContext = context.copy(returning = Output.Expressions(listOf(expression)))
+        val newContext = context.copy(returning = Returning.Expressions(listOf(expression)))
         return RelationUpdateReturningSingleColumnQuery(newContext, expression)
     }
 
@@ -119,7 +119,7 @@ internal data class RelationUpdateQueryImpl<ENTITY : Any, ID : Any, META : Entit
         expression2: PropertyMetamodel<ENTITY, B, *>,
     ): RelationUpdateReturningQuery<List<Pair<A?, B?>>> {
         val expressions = expression1 to expression2
-        val newContext = context.copy(returning = Output.Expressions(expressions.toList()))
+        val newContext = context.copy(returning = Returning.Expressions(expressions.toList()))
         return RelationUpdateReturningPairColumnsQuery(newContext, expressions)
     }
 
@@ -129,7 +129,7 @@ internal data class RelationUpdateQueryImpl<ENTITY : Any, ID : Any, META : Entit
         expression3: PropertyMetamodel<ENTITY, C, *>,
     ): RelationUpdateReturningQuery<List<Triple<A?, B?, C?>>> {
         val expressions = Triple(expression1, expression2, expression3)
-        val newContext = context.copy(returning = Output.Expressions(expressions.toList()))
+        val newContext = context.copy(returning = Returning.Expressions(expressions.toList()))
         return RelationUpdateReturningTripleColumnsQuery(newContext, expressions)
     }
 

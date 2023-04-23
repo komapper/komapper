@@ -61,7 +61,7 @@ data class Statement(val parts: List<StatementPart>) {
         }
     }
 
-/**
+    /**
      * Adds a part of the SQL statement.
      *
      * @param text a part of the SQL statement

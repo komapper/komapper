@@ -20,10 +20,10 @@ class MariaDbEntityInsertStatementBuilder<ENTITY : Any, ID : Any, META : EntityM
 
     override fun build(): Statement {
         buf.append(builder.build())
-        val outputExpressions = context.returning.expressions()
-        if (outputExpressions.isNotEmpty()) {
+        val expressions = context.returning.expressions()
+        if (expressions.isNotEmpty()) {
             buf.append(" returning ")
-            for (e in outputExpressions) {
+            for (e in expressions) {
                 column(e)
                 buf.append(", ")
             }

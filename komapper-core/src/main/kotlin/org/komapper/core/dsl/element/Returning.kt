@@ -5,9 +5,9 @@ import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 
 @ThreadSafe
-sealed class Output {
-    data class Expressions(val expressions: List<ColumnExpression<*, *>>) : Output()
-    data class Metamodel(val metamodel: EntityMetamodel<*, *, *>) : Output()
+sealed class Returning {
+    data class Expressions(val expressions: List<ColumnExpression<*, *>>) : Returning()
+    data class Metamodel(val metamodel: EntityMetamodel<*, *, *>) : Returning()
 
     fun expressions(): List<ColumnExpression<*, *>> {
         return when (this) {

@@ -19,10 +19,10 @@ class MariaDbRelationInsertValuesStatementBuilder<ENTITY : Any, ID : Any, META :
 
     override fun build(assignments: List<Pair<PropertyMetamodel<ENTITY, *, *>, Operand>>): Statement {
         buf.append(builder.build(assignments))
-        val outputExpressions = context.returning.expressions()
-        if (outputExpressions.isNotEmpty()) {
+        val expressions = context.returning.expressions()
+        if (expressions.isNotEmpty()) {
             buf.append(" returning ")
-            for (e in outputExpressions) {
+            for (e in expressions) {
                 column(e)
                 buf.append(", ")
             }

@@ -18,65 +18,83 @@ class DefaultEntityUpdateStatementBuilder<ENTITY : Any, ID : Any, META : EntityM
     private val context: EntityUpdateContext<ENTITY, ID, META>,
     private val entity: ENTITY,
 ) : EntityUpdateStatementBuilder<ENTITY, ID, META> {
-    private val buf = StatementBuffer()
-    private val support = BuilderSupport(dialect, EmptyAliasManager, buf)
 
     override fun build(): Statement {
-        val target = context.target
-        val idProperties = target.idProperties()
-        val versionProperty = target.versionProperty()
-        buf.append("update ")
-        table(target)
-        buf.append(" set ")
-        for (p in context.getTargetProperties()) {
-            column(p)
-            buf.append(" = ")
-            buf.bind(p.toValue(entity))
-            if (p == versionProperty) {
-                buf.append(" + 1")
-            }
-            buf.append(", ")
-        }
-        buf.cutBack(2)
-        val criteria = context.getWhereCriteria()
-        val versionRequired = versionProperty != null && !context.options.disableOptimisticLock
-        if (criteria.isNotEmpty() || idProperties.isNotEmpty() || versionRequired) {
-            buf.append(" where ")
-            for ((index, criterion) in criteria.withIndex()) {
-                criterion(index, criterion)
-                buf.append(" and ")
-            }
-            if (idProperties.isNotEmpty()) {
-                for (p in idProperties) {
-                    column(p)
-                    buf.append(" = ")
-                    buf.bind(p.toValue(entity))
-                    buf.append(" and ")
-                }
-                if (!versionRequired) {
-                    buf.cutBack(5)
-                }
-            }
-            if (versionRequired) {
-                checkNotNull(versionProperty)
-                column(versionProperty)
-                buf.append(" = ")
-                buf.bind(versionProperty.toValue(entity))
-            }
-        }
+        val buf = StatementBuffer()
+        buf.append(buildUpdateSet())
+        buf.append(" ")
+        buf.append(buildWhere())
         return buf.toStatement()
     }
 
-    private fun table(expression: TableExpression<*>) {
+    fun buildUpdateSet(): Statement {
+        val target = context.target
+        val versionProperty = target.versionProperty()
+        return with(StatementBuffer()) {
+            val support = BuilderSupport(dialect, EmptyAliasManager, this)
+            append("update ")
+            table(target, support)
+            append(" set ")
+            for (p in context.getTargetProperties()) {
+                column(p)
+                append(" = ")
+                bind(p.toValue(entity))
+                if (p == versionProperty) {
+                    append(" + 1")
+                }
+                append(", ")
+            }
+            cutBack(2)
+            toStatement()
+        }
+    }
+
+    fun buildWhere(): Statement {
+        val target = context.target
+        val idProperties = target.idProperties()
+        val versionProperty = target.versionProperty()
+        val criteria = context.getWhereCriteria()
+        val versionRequired = versionProperty != null && !context.options.disableOptimisticLock
+        return with(StatementBuffer()) {
+            val support = BuilderSupport(dialect, EmptyAliasManager, this)
+            if (criteria.isNotEmpty() || idProperties.isNotEmpty() || versionRequired) {
+                append("where ")
+                for ((index, criterion) in criteria.withIndex()) {
+                    criterion(index, criterion, support)
+                    append(" and ")
+                }
+                if (idProperties.isNotEmpty()) {
+                    for (p in idProperties) {
+                        column(p)
+                        append(" = ")
+                        bind(p.toValue(entity))
+                        append(" and ")
+                    }
+                    if (!versionRequired) {
+                        cutBack(5)
+                    }
+                }
+                if (versionRequired) {
+                    checkNotNull(versionProperty)
+                    column(versionProperty)
+                    append(" = ")
+                    bind(versionProperty.toValue(entity))
+                }
+            }
+            toStatement()
+        }
+    }
+
+    private fun table(expression: TableExpression<*>, support: BuilderSupport) {
         support.visitTableExpression(expression, TableNameType.NAME_ONLY)
     }
 
-    private fun column(expression: ColumnExpression<*, *>) {
+    private fun StatementBuffer.column(expression: ColumnExpression<*, *>) {
         val name = expression.getCanonicalColumnName(dialect::enquote)
-        buf.append(name)
+        append(name)
     }
 
-    private fun criterion(index: Int, c: Criterion) {
+    private fun criterion(index: Int, c: Criterion, support: BuilderSupport) {
         support.visitCriterion(index, c)
     }
 }

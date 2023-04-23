@@ -1,7 +1,7 @@
 package org.komapper.core.dsl.context
 
 import org.komapper.core.ThreadSafe
-import org.komapper.core.dsl.element.Output
+import org.komapper.core.dsl.element.Returning
 import org.komapper.core.dsl.expression.AssignmentDeclaration
 import org.komapper.core.dsl.expression.TableExpression
 import org.komapper.core.dsl.expression.WhereDeclaration
@@ -27,8 +27,8 @@ data class EntityUpsertContext<ENTITY : Any, ID : Any, META : EntityMetamodel<EN
     val duplicateKeyType: DuplicateKeyType,
     val set: AssignmentDeclaration<ENTITY, META> = {},
     val where: WhereDeclaration = {},
-    val returning: Output = Output.Expressions(emptyList()),
-) : WhereProvider, TablesProvider {
+    override val returning: Returning = Returning.Expressions(emptyList()),
+) : WhereProvider, TablesProvider, ReturningProvider {
 
     override val options: WhereOptions
         get() = insertContext.options

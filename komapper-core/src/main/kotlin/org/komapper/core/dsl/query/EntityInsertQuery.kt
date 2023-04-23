@@ -1,7 +1,7 @@
 package org.komapper.core.dsl.query
 
 import org.komapper.core.dsl.context.EntityInsertContext
-import org.komapper.core.dsl.element.Output
+import org.komapper.core.dsl.element.Returning
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.metamodel.PropertyMetamodel
 import org.komapper.core.dsl.options.InsertOptions
@@ -114,12 +114,12 @@ internal data class EntityInsertSingleQueryImpl<ENTITY : Any, ID : Any, META : E
     private val entity: ENTITY,
 ) : EntityInsertSingleQuery<ENTITY> {
     override fun returning(): EntityInsertReturningQuery<ENTITY> {
-        val newContext = context.copy(returning = Output.Metamodel(context.target))
+        val newContext = context.copy(returning = Returning.Metamodel(context.target))
         return EntityInsertSingleReturningQuery(newContext, entity)
     }
 
     override fun <A : Any> returning(expression: PropertyMetamodel<ENTITY, A, *>): EntityInsertReturningQuery<A?> {
-        val newContext = context.copy(returning = Output.Expressions(listOf(expression)))
+        val newContext = context.copy(returning = Returning.Expressions(listOf(expression)))
         return EntityInsertSingleReturningSingleColumnQuery(newContext, entity, expression)
     }
 
@@ -128,7 +128,7 @@ internal data class EntityInsertSingleQueryImpl<ENTITY : Any, ID : Any, META : E
         expression2: PropertyMetamodel<ENTITY, B, *>,
     ): EntityInsertReturningQuery<Pair<A?, B?>> {
         val expressions = expression1 to expression2
-        val newContext = context.copy(returning = Output.Expressions(expressions.toList()))
+        val newContext = context.copy(returning = Returning.Expressions(expressions.toList()))
         return EntityInsertSingleReturningPairColumnsQuery(newContext, entity, expressions)
     }
 
@@ -138,7 +138,7 @@ internal data class EntityInsertSingleQueryImpl<ENTITY : Any, ID : Any, META : E
         expression3: PropertyMetamodel<ENTITY, C, *>,
     ): EntityInsertReturningQuery<Triple<A?, B?, C?>> {
         val expressions = Triple(expression1, expression2, expression3)
-        val newContext = context.copy(returning = Output.Expressions(expressions.toList()))
+        val newContext = context.copy(returning = Returning.Expressions(expressions.toList()))
         return EntityInsertSingleReturningTripleColumnsQuery(newContext, entity, expressions)
     }
 
@@ -157,12 +157,12 @@ internal data class EntityInsertMultipleQueryImpl<ENTITY : Any, ID : Any, META :
     private val entities: List<ENTITY>,
 ) : EntityInsertMultipleQuery<ENTITY> {
     override fun returning(): EntityInsertReturningQuery<List<ENTITY>> {
-        val newContext = context.copy(returning = Output.Metamodel(context.target))
+        val newContext = context.copy(returning = Returning.Metamodel(context.target))
         return EntityInsertMultipleReturningQuery(newContext, entities)
     }
 
     override fun <A : Any> returning(expression: PropertyMetamodel<ENTITY, A, *>): EntityInsertReturningQuery<List<A?>> {
-        val newContext = context.copy(returning = Output.Expressions(listOf(expression)))
+        val newContext = context.copy(returning = Returning.Expressions(listOf(expression)))
         return EntityInsertMultipleReturningSingleColumnQuery(newContext, entities, expression)
     }
 
@@ -171,7 +171,7 @@ internal data class EntityInsertMultipleQueryImpl<ENTITY : Any, ID : Any, META :
         expression2: PropertyMetamodel<ENTITY, B, *>,
     ): EntityInsertReturningQuery<List<Pair<A?, B?>>> {
         val expressions = expression1 to expression2
-        val newContext = context.copy(returning = Output.Expressions(expressions.toList()))
+        val newContext = context.copy(returning = Returning.Expressions(expressions.toList()))
         return EntityInsertMultipleReturningPairColumnsQuery(newContext, entities, expressions)
     }
 
@@ -181,7 +181,7 @@ internal data class EntityInsertMultipleQueryImpl<ENTITY : Any, ID : Any, META :
         expression3: PropertyMetamodel<ENTITY, C, *>,
     ): EntityInsertReturningQuery<List<Triple<A?, B?, C?>>> {
         val expressions = Triple(expression1, expression2, expression3)
-        val newContext = context.copy(returning = Output.Expressions(expressions.toList()))
+        val newContext = context.copy(returning = Returning.Expressions(expressions.toList()))
         return EntityInsertMultipleReturningTripleColumnsQuery(newContext, entities, expressions)
     }
 

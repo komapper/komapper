@@ -22,7 +22,7 @@ fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> RelationU
     return DefaultRelationUpdateStatementBuilder(dialect, context)
 }
 
-internal class DefaultRelationUpdateStatementBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
+class DefaultRelationUpdateStatementBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val dialect: BuilderDialect,
     private val context: RelationUpdateContext<ENTITY, ID, META>,
 ) : RelationUpdateStatementBuilder<ENTITY, ID, META> {
@@ -33,58 +33,73 @@ internal class DefaultRelationUpdateStatementBuilder<ENTITY : Any, ID : Any, MET
         EmptyAliasManager
     }
 
-    private val buf = StatementBuffer()
-    private val support = BuilderSupport(dialect, aliasManager, buf, context.options.escapeSequence)
-
     override fun build(assignments: List<Pair<PropertyMetamodel<ENTITY, *, *>, Operand>>): Statement {
-        buf.append("update ")
-        table(context.target)
-        buf.append(" set ")
-        if (assignments.isNotEmpty()) {
-            for ((left, right) in assignments) {
-                column(left)
-                buf.append(" = ")
-                operand(right)
-                buf.append(", ")
-            }
-            buf.cutBack(2)
-        }
-        val version = context.target.versionProperty()
-        if (version != null && version !in assignments.map { it.first }) {
-            if (assignments.isNotEmpty()) {
-                buf.append(", ")
-            }
-            column(version)
-            buf.append(" = ")
-            column(version)
-            buf.append(" + 1")
-        }
-        val criteria = context.getWhereCriteria()
-        if (criteria.isNotEmpty()) {
-            buf.append(" where ")
-            for ((index, criterion) in criteria.withIndex()) {
-                criterion(index, criterion)
-                buf.append(" and ")
-            }
-            buf.cutBack(5)
-        }
+        val buf = StatementBuffer()
+        buf.append(buildUpdateSet(assignments))
+        buf.append(" ")
+        buf.append(buildWhere())
         return buf.toStatement()
     }
 
-    private fun table(expression: TableExpression<*>) {
+    fun buildUpdateSet(assignments: List<Pair<PropertyMetamodel<ENTITY, *, *>, Operand>>): Statement {
+        return with(StatementBuffer()) {
+            val support = BuilderSupport(dialect, aliasManager, this, context.options.escapeSequence)
+            append("update ")
+            table(context.target, support)
+            append(" set ")
+            if (assignments.isNotEmpty()) {
+                for ((left, right) in assignments) {
+                    column(left)
+                    append(" = ")
+                    operand(right, support)
+                    append(", ")
+                }
+                cutBack(2)
+            }
+            val version = context.target.versionProperty()
+            if (version != null && version !in assignments.map { it.first }) {
+                if (assignments.isNotEmpty()) {
+                    append(", ")
+                }
+                column(version)
+                append(" = ")
+                column(version)
+                append(" + 1")
+            }
+            toStatement()
+        }
+    }
+
+    fun buildWhere(): Statement {
+        return with(StatementBuffer()) {
+            val support = BuilderSupport(dialect, aliasManager, this, context.options.escapeSequence)
+            val criteria = context.getWhereCriteria()
+            if (criteria.isNotEmpty()) {
+                append("where ")
+                for ((index, criterion) in criteria.withIndex()) {
+                    criterion(index, criterion, support)
+                    append(" and ")
+                }
+                cutBack(5)
+            }
+            toStatement()
+        }
+    }
+
+    private fun table(expression: TableExpression<*>, support: BuilderSupport) {
         support.visitTableExpression(expression, TableNameType.NAME_AND_ALIAS)
     }
 
-    private fun column(expression: ColumnExpression<*, *>) {
+    private fun StatementBuffer.column(expression: ColumnExpression<*, *>) {
         val name = expression.getCanonicalColumnName(dialect::enquote)
-        buf.append(name)
+        append(name)
     }
 
-    private fun criterion(index: Int, c: Criterion) {
+    private fun criterion(index: Int, c: Criterion, support: BuilderSupport) {
         return support.visitCriterion(index, c)
     }
 
-    private fun operand(operand: Operand) {
+    private fun operand(operand: Operand, support: BuilderSupport) {
         support.visitOperand(operand)
     }
 }

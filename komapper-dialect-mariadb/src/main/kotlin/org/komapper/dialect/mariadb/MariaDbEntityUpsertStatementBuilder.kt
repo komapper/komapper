@@ -66,10 +66,10 @@ class MariaDbEntityUpsertStatementBuilder<ENTITY : Any, ID : Any, META : EntityM
             }
             buf.cutBack(2)
         }
-        val outputExpressions = context.returning.expressions()
-        if (outputExpressions.isNotEmpty()) {
+        val expressions = context.returning.expressions()
+        if (expressions.isNotEmpty()) {
             buf.append(" returning ")
-            for (e in outputExpressions) {
+            for (e in expressions) {
                 column(e)
                 buf.append(", ")
             }
