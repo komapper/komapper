@@ -5,7 +5,6 @@ import org.komapper.core.DryRunStatement
 import org.komapper.core.dsl.context.ScriptContext
 import org.komapper.core.dsl.runner.ScriptExecuteRunner
 import org.komapper.jdbc.JdbcDatabaseConfig
-import org.komapper.jdbc.JdbcExecutor
 
 internal class JdbcScriptExecuteRunner(
     private val context: ScriptContext,
@@ -20,7 +19,7 @@ internal class JdbcScriptExecuteRunner(
 
     override fun run(config: JdbcDatabaseConfig) {
         val statements = runner.buildStatements()
-        val executor = JdbcExecutor(config, context.options)
+        val executor = config.dialect.createExecutor(config, context.options)
         return executor.execute(statements)
     }
 

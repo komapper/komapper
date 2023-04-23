@@ -37,6 +37,15 @@ interface JdbcDataOperator : DataOperator {
     fun <T : Any> setValue(ps: PreparedStatement, index: Int, value: T?, valueClass: KClass<out T>)
 
     /**
+     * Registers the return parameter.
+     *
+     * @param ps the prepared statement
+     * @param index the column index
+     * @param parameterClass the parameter class
+     */
+    fun <T : Any> registerReturnParameter(ps: PreparedStatement, index: Int, parameterClass: KClass<out T>)
+
+    /**
      * Returns the data type.
      *
      * @param klass the value class
@@ -68,6 +77,11 @@ class DefaultJdbcDataOperator(private val dialect: JdbcDialect, private val data
     override fun <T : Any> setValue(ps: PreparedStatement, index: Int, value: T?, valueClass: KClass<out T>) {
         val dataType = getDataType(valueClass)
         dataType.setValue(ps, index, value)
+    }
+
+    override fun <T : Any> registerReturnParameter(ps: PreparedStatement, index: Int, valueClass: KClass<out T>) {
+        val dataType = getDataType(valueClass)
+        dataType.registerReturnParameter(ps, index)
     }
 
     override fun <T : Any> formatValue(value: T?, valueClass: KClass<out T>, masking: Boolean): String {

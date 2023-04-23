@@ -1,12 +1,21 @@
 package org.komapper.jdbc
 
 import org.komapper.core.Dialect
+import org.komapper.core.ExecutionOptionsProvider
 import java.sql.SQLException
 
 /**
  * Represents a dialect for JDBC access.
  */
 interface JdbcDialect : Dialect {
+
+    fun createExecutor(
+        config: JdbcDatabaseConfig,
+        executionOptionProvider: ExecutionOptionsProvider,
+        generatedColumn: String? = null,
+    ): JdbcExecutor {
+        return DefaultJdbcExecutor(config, executionOptionProvider, generatedColumn)
+    }
 
     /**
      * Returns whether the exception indicates that the sequence already exists.

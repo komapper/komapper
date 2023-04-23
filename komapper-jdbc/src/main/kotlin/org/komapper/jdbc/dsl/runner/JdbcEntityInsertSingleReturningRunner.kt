@@ -38,7 +38,7 @@ internal class JdbcEntityInsertSingleReturningRunner<ENTITY : Any, ID : Any, MET
     private fun insert(config: JdbcDatabaseConfig, entity: ENTITY): T {
         val statement = runner.buildStatement(config, entity)
         return support.insert(config) { executor ->
-            executor.executeQuery(statement, transform) { it.first() }
+            executor.executeReturning(statement, transform) { it.first() }
         }
     }
 

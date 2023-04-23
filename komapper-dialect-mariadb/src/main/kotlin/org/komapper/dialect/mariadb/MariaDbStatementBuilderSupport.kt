@@ -1,4 +1,4 @@
-package org.komapper.dialect.sqlserver
+package org.komapper.dialect.mariadb
 
 import org.komapper.core.BuilderDialect
 import org.komapper.core.Statement
@@ -6,26 +6,24 @@ import org.komapper.core.StatementBuffer
 import org.komapper.core.dsl.context.ReturningProvider
 import org.komapper.core.dsl.expression.ColumnExpression
 
-class SqlServerBuilderSupport(
+class MariaDbStatementBuilderSupport(
     private val dialect: BuilderDialect,
     private val returningProvider: ReturningProvider,
 ) {
 
-    fun buildOutput(): Statement {
-        val buf = StatementBuffer()
-        with(buf) {
+    fun buildReturning(): Statement {
+        return with(StatementBuffer()) {
             val expressions = returningProvider.returning.expressions()
             if (expressions.isNotEmpty()) {
-                append(" output ")
+                append(" returning ")
                 for (e in expressions) {
-                    append("inserted.")
                     column(e)
                     append(", ")
                 }
                 cutBack(2)
             }
+            toStatement()
         }
-        return buf.toStatement()
     }
 
     private fun StatementBuffer.column(expression: ColumnExpression<*, *>) {

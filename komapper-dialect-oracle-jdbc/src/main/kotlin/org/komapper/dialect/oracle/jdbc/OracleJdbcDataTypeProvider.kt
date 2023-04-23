@@ -51,6 +51,6 @@ class OracleJdbcDataTypeProvider(next: JdbcDataTypeProvider) : AbstractJdbcDataT
             JdbcUIntType("integer"),
             JdbcUShortType("integer"),
             OracleJdbcBooleanType,
-        )
+        ).map { wrap(it) }
     }
 }

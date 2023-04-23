@@ -3,6 +3,7 @@ package org.komapper.dialect.oracle
 import org.komapper.core.BuilderDialect
 import org.komapper.core.Statement
 import org.komapper.core.StatementBuffer
+import org.komapper.core.dsl.builder.DefaultEntityInsertStatementBuilder
 import org.komapper.core.dsl.builder.EntityInsertStatementBuilder
 import org.komapper.core.dsl.context.EntityInsertContext
 import org.komapper.core.dsl.expression.ColumnExpression
@@ -20,40 +21,58 @@ class OracleEntityInsertStatementBuilder<ENTITY : Any, ID : Any, META : EntityMe
         require(entities.isNotEmpty()) { "entities must not be empty." }
     }
 
-    private val buf = StatementBuffer()
-
     override fun build(): Statement {
+        return if (entities.size == 1) {
+            buildForSingleEntity()
+        } else {
+            buildForMultipleEntities()
+        }
+    }
+
+    private fun buildForSingleEntity(): Statement {
+        val builder = DefaultEntityInsertStatementBuilder(dialect, context, entities)
+        val support = OracleStatementBuilderSupport(dialect, context)
+        return with(StatementBuffer()) {
+            append(builder.build())
+            appendIfNotEmpty(support.buildReturning())
+            toStatement()
+        }
+    }
+
+    private fun buildForMultipleEntities(): Statement {
         val target = context.target
         val properties = target.getNonAutoIncrementProperties()
-        buf.append("insert all ")
-        for (entity in entities) {
-            buf.append("into ")
-            table(target)
-            buf.append(" (")
-            for (p in properties) {
-                column(p)
-                buf.append(", ")
+        return with(StatementBuffer()) {
+            append("insert all ")
+            for (entity in entities) {
+                append("into ")
+                table(target)
+                append(" (")
+                for (p in properties) {
+                    column(p)
+                    append(", ")
+                }
+                cutBack(2)
+                append(") values (")
+                for (p in properties) {
+                    bind(p.toValue(entity))
+                    append(", ")
+                }
+                cutBack(2)
+                append(") ")
             }
-            buf.cutBack(2)
-            buf.append(") values (")
-            for (p in properties) {
-                buf.bind(p.toValue(entity))
-                buf.append(", ")
-            }
-            buf.cutBack(2)
-            buf.append(") ")
+            append("select 1 from dual")
+            toStatement()
         }
-        buf.append("select 1 from dual")
-        return buf.toStatement()
     }
 
-    private fun table(metamodel: EntityMetamodel<*, *, *>) {
+    private fun StatementBuffer.table(metamodel: EntityMetamodel<*, *, *>) {
         val name = metamodel.getCanonicalTableName(dialect::enquote)
-        buf.append(name)
+        append(name)
     }
 
-    private fun column(expression: ColumnExpression<*, *>) {
+    private fun StatementBuffer.column(expression: ColumnExpression<*, *>) {
         val name = expression.getCanonicalColumnName(dialect::enquote)
-        buf.append(name)
+        append(name)
     }
 }

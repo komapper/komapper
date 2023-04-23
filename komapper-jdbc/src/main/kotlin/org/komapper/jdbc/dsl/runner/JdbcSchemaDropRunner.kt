@@ -5,7 +5,6 @@ import org.komapper.core.DryRunStatement
 import org.komapper.core.dsl.context.SchemaContext
 import org.komapper.core.dsl.runner.SchemaDropRunner
 import org.komapper.jdbc.JdbcDatabaseConfig
-import org.komapper.jdbc.JdbcExecutor
 
 internal class JdbcSchemaDropRunner(
     private val context: SchemaContext,
@@ -19,7 +18,7 @@ internal class JdbcSchemaDropRunner(
 
     override fun run(config: JdbcDatabaseConfig) {
         val statements = runner.buildStatements(config)
-        val executor = JdbcExecutor(config, context.options)
+        val executor = config.dialect.createExecutor(config, context.options)
         executor.execute(statements) {
             if (!config.dialect.isTableNotExistsError(it) &&
                 !config.dialect.isSequenceNotExistsError(it)

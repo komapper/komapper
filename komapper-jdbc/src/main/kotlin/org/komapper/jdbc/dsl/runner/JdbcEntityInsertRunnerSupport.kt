@@ -32,7 +32,7 @@ internal class JdbcEntityInsertRunnerSupport<ENTITY : Any, ID : Any, META : Enti
         } else {
             null
         }
-        val executor = JdbcExecutor(config, context.options, generatedColumn)
+        val executor = config.dialect.createExecutor(config, context.options, generatedColumn)
         return execute(executor)
     }
 }

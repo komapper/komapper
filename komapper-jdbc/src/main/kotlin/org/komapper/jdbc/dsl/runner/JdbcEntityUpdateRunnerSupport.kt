@@ -10,7 +10,7 @@ internal class JdbcEntityUpdateRunnerSupport<ENTITY : Any, ID : Any, META : Enti
 ) {
 
     fun <T> update(config: JdbcDatabaseConfig, execute: (JdbcExecutor) -> T): T {
-        val executor = JdbcExecutor(config, context.options)
+        val executor = config.dialect.createExecutor(config, context.options)
         return execute(executor)
     }
 }

@@ -15,16 +15,12 @@ class SqlServerEntityUpdateStatementBuilder<ENTITY : Any, ID : Any, META : Entit
 ) : EntityUpdateStatementBuilder<ENTITY, ID, META> {
 
     private val builder = DefaultEntityUpdateStatementBuilder(dialect, context, entity)
-    private val support = SqlServerBuilderSupport(dialect, context)
+    private val support = SqlServerStatementBuilderSupport(dialect, context)
 
     override fun build(): Statement {
         val buf = StatementBuffer()
         buf.append(builder.buildUpdateSet())
-        val outputStatement = support.buildOutput()
-        if (outputStatement.parts.isNotEmpty()) {
-            buf.append(" ")
-            buf.append(outputStatement)
-        }
+        buf.appendIfNotEmpty(support.buildOutput())
         buf.append(" ")
         buf.append(builder.buildWhere())
         return buf.toStatement()

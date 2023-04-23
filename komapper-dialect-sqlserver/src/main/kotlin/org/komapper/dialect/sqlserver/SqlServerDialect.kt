@@ -107,7 +107,9 @@ interface SqlServerDialect : Dialect {
 
     override fun supportsForUpdateClause(): Boolean = false
 
-    override fun supportsInsertReturning(): Boolean = true
+    override fun supportsInsertMultipleReturning(): Boolean = true
+
+    override fun supportsInsertSingleReturning(): Boolean = true
 
     override fun supportsMultipleColumnsInInPredicate(): Boolean = false
 
@@ -118,4 +120,8 @@ interface SqlServerDialect : Dialect {
     override fun supportsLockOptionNowait(): Boolean = true
 
     override fun supportsSearchConditionInUpsertStatement(): Boolean = true
+
+    override fun supportsUpsertMultipleReturning(): Boolean = true
+
+    override fun supportsUpsertSingleReturning(): Boolean = true
 }

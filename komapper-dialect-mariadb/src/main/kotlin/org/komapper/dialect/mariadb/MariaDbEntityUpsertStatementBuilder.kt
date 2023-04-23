@@ -27,6 +27,7 @@ class MariaDbEntityUpsertStatementBuilder<ENTITY : Any, ID : Any, META : EntityM
     private val aliasManager = EmptyAliasManager
     private val buf = StatementBuffer()
     private val support = BuilderSupport(dialect, aliasManager, buf)
+    private val mariaDbSupport = MariaDbStatementBuilderSupport(dialect, context)
 
     override fun build(assignments: List<Pair<PropertyMetamodel<ENTITY, *, *>, Operand>>): Statement {
         if (context.getAssignments().isNotEmpty()) {
@@ -66,15 +67,7 @@ class MariaDbEntityUpsertStatementBuilder<ENTITY : Any, ID : Any, META : EntityM
             }
             buf.cutBack(2)
         }
-        val expressions = context.returning.expressions()
-        if (expressions.isNotEmpty()) {
-            buf.append(" returning ")
-            for (e in expressions) {
-                column(e)
-                buf.append(", ")
-            }
-            buf.cutBack(2)
-        }
+        buf.appendIfNotEmpty(mariaDbSupport.buildReturning())
         return buf.toStatement()
     }
 

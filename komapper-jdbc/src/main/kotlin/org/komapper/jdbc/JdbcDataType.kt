@@ -68,6 +68,16 @@ interface JdbcDataType<T : Any> {
     fun setValue(ps: PreparedStatement, index: Int, value: T?)
 
     /**
+     * Registers the return parameter.
+     *
+     * @param ps the prepared statement
+     * @param index the index
+     */
+    fun registerReturnParameter(ps: PreparedStatement, index: Int) {
+        throw UnsupportedOperationException()
+    }
+
+    /**
      * Returns the string presentation of the value.
      *
      * @param value the value

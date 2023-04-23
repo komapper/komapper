@@ -22,7 +22,7 @@ import kotlin.test.assertNull
 @ExtendWith(JdbcEnv::class)
 class JdbcUpdateSingleReturningTest(private val db: JdbcDatabase) {
 
-    @Run(onlyIf = [Dbms.POSTGRESQL, Dbms.SQLSERVER])
+    @Run(onlyIf = [Dbms.ORACLE, Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun test() {
         val a = Meta.address
@@ -42,7 +42,7 @@ class JdbcUpdateSingleReturningTest(private val db: JdbcDatabase) {
         assertEquals(address2, returningAddress)
     }
 
-    @Run(onlyIf = [Dbms.POSTGRESQL, Dbms.SQLSERVER])
+    @Run(onlyIf = [Dbms.ORACLE, Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun testReturningSingleColumn() {
         val a = Meta.address
@@ -62,7 +62,7 @@ class JdbcUpdateSingleReturningTest(private val db: JdbcDatabase) {
         )
     }
 
-    @Run(onlyIf = [Dbms.POSTGRESQL, Dbms.SQLSERVER])
+    @Run(onlyIf = [Dbms.ORACLE, Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun testReturningPairColumns() {
         val a = Meta.address
@@ -82,7 +82,7 @@ class JdbcUpdateSingleReturningTest(private val db: JdbcDatabase) {
         )
     }
 
-    @Run(onlyIf = [Dbms.POSTGRESQL, Dbms.SQLSERVER])
+    @Run(onlyIf = [Dbms.ORACLE, Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun testReturningTripleColumns() {
         val a = Meta.address
@@ -102,7 +102,7 @@ class JdbcUpdateSingleReturningTest(private val db: JdbcDatabase) {
         )
     }
 
-    @Run(onlyIf = [Dbms.POSTGRESQL, Dbms.SQLSERVER])
+    @Run(onlyIf = [Dbms.ORACLE, Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun suppressOptimisticLockException() {
         val a = Meta.address
@@ -113,7 +113,7 @@ class JdbcUpdateSingleReturningTest(private val db: JdbcDatabase) {
         assertNull(returningAddress)
     }
 
-    @Run(onlyIf = [Dbms.POSTGRESQL, Dbms.SQLSERVER])
+    @Run(onlyIf = [Dbms.ORACLE, Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun uniqueConstraintException() {
         val a = Meta.address
@@ -123,7 +123,7 @@ class JdbcUpdateSingleReturningTest(private val db: JdbcDatabase) {
         }
     }
 
-    @Run(onlyIf = [Dbms.POSTGRESQL, Dbms.SQLSERVER])
+    @Run(onlyIf = [Dbms.ORACLE, Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun optimisticLockException() {
         val a = Meta.address
@@ -134,7 +134,7 @@ class JdbcUpdateSingleReturningTest(private val db: JdbcDatabase) {
         }
     }
 
-    @Run(unless = [Dbms.POSTGRESQL, Dbms.SQLSERVER])
+    @Run(unless = [Dbms.ORACLE, Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun unsupportedOperationException_updateReturning() {
         val a = Meta.address

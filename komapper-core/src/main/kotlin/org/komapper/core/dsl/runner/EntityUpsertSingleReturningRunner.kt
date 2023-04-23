@@ -14,7 +14,7 @@ class EntityUpsertSingleReturningRunner<ENTITY : Any, ID : Any, META : EntityMet
     private val runner: EntityUpsertSingleRunner<ENTITY, ID, META> = EntityUpsertSingleRunner(context, entity)
 
     override fun check(config: DatabaseConfig) {
-        checkInsertReturning(config)
+        checkUpsertSingleReturning(config)
         runner.check(config)
     }
 

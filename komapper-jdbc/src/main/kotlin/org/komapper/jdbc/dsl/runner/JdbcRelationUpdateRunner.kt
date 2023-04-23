@@ -6,7 +6,6 @@ import org.komapper.core.dsl.context.RelationUpdateContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.runner.RelationUpdateRunner
 import org.komapper.jdbc.JdbcDatabaseConfig
-import org.komapper.jdbc.JdbcExecutor
 
 internal class JdbcRelationUpdateRunner<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val context: RelationUpdateContext<ENTITY, ID, META>,
@@ -24,7 +23,7 @@ internal class JdbcRelationUpdateRunner<ENTITY : Any, ID : Any, META : EntityMet
         val result = runner.buildStatement(config, updatedAtAssignment)
         val statement = result.getOrNull()
         return if (statement != null) {
-            val executor = JdbcExecutor(config, context.options)
+            val executor = config.dialect.createExecutor(config, context.options)
             val (count) = executor.executeUpdate(statement)
             count
         } else {

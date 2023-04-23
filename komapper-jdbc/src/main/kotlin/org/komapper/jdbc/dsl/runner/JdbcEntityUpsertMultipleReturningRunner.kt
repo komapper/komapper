@@ -39,7 +39,7 @@ internal class JdbcEntityUpsertMultipleReturningRunner<ENTITY : Any, ID : Any, M
     private fun upsert(config: JdbcDatabaseConfig, entities: List<ENTITY>): List<T> {
         val statement = runner.buildStatement(config, entities)
         return support.upsert(config) { executor ->
-            executor.executeQuery(statement, transform) { it.toList() }
+            executor.executeReturning(statement, transform) { it.toList() }
         }
     }
 

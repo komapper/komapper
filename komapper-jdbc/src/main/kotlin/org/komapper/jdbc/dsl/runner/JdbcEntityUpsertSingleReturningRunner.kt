@@ -39,7 +39,7 @@ internal class JdbcEntityUpsertSingleReturningRunner<ENTITY : Any, ID : Any, MET
     private fun upsert(config: JdbcDatabaseConfig, entity: ENTITY): R {
         val statement = runner.buildStatement(config, entity)
         return support.upsert(config) { executor ->
-            executor.executeQuery(statement, transform, collect)
+            executor.executeReturning(statement, transform, collect)
         }
     }
 

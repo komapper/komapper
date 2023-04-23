@@ -26,7 +26,7 @@ internal class JdbcEntityInsertReturningRunnerSupport<ENTITY : Any, ID : Any, ME
     }
 
     fun <T> insert(config: JdbcDatabaseConfig, execute: (JdbcExecutor) -> T): T {
-        val executor = JdbcExecutor(config, context.options)
+        val executor = config.dialect.createExecutor(config, context.options)
         return execute(executor)
     }
 }
