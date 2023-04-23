@@ -1,5 +1,4 @@
 plugins {
-    idea
     id("com.google.devtools.ksp")
 }
 
@@ -18,14 +17,6 @@ tasks {
         kotlinOptions {
             freeCompilerArgs = freeCompilerArgs + "-Xcontext-receivers"
         }
-    }
-}
-
-idea {
-    module {
-        sourceDirs = sourceDirs + file("build/generated/ksp/main/kotlin")
-        testSourceDirs = testSourceDirs + file("build/generated/ksp/test/kotlin")
-        generatedSourceDirs = generatedSourceDirs + file("build/generated/ksp/main/kotlin") + file("build/generated/ksp/test/kotlin")
     }
 }
 

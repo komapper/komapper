@@ -1,5 +1,4 @@
 plugins {
-    idea
     id("org.springframework.boot")
     id("com.google.devtools.ksp")
     kotlin("plugin.spring")
