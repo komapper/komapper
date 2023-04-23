@@ -4,8 +4,8 @@ import io.quarkus.agroal.runtime.DataSources;
 import io.quarkus.arc.DefaultBean;
 import io.quarkus.arc.Unremovable;
 import java.util.Objects;
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import javax.sql.DataSource;
 
 @Singleton
