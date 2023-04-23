@@ -50,5 +50,9 @@ sealed class IdGenerator<ENTITY : Any, ID : Any> {
             return listOf(catalogName, schemaName, name)
                 .filter { it.isNotBlank() }.joinToString(".", transform = transform)
         }
+
+        fun clear() {
+            idContextMap.clear()
+        }
     }
 }

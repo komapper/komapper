@@ -53,15 +53,13 @@ internal class JdbcExecutor(
                     log(statement)
                     bind(ps, statement)
                     ps.executeQuery().use { rs ->
-                        val iterator = object : Iterator<T> {
-                            var hasNext = rs.next()
-                            override fun hasNext() = hasNext
-                            override fun next(): T {
-                                return transform(config.dataOperator, rs).also { hasNext = rs.next() }
+                        val sequence = sequence {
+                            while (rs.next()) {
+                                this.yield(transform(config.dataOperator, rs))
                             }
                         }
                         runBlocking {
-                            collect(iterator.asFlow())
+                            collect(sequence.asFlow())
                         }
                     }
                 }

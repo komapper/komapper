@@ -1,14 +1,21 @@
 package org.komapper.core
 
 import org.komapper.core.dsl.builder.DefaultEntityInsertStatementBuilder
+import org.komapper.core.dsl.builder.DefaultEntityUpdateStatementBuilder
 import org.komapper.core.dsl.builder.DryRunSchemaStatementBuilder
 import org.komapper.core.dsl.builder.EntityInsertStatementBuilder
+import org.komapper.core.dsl.builder.EntityUpdateStatementBuilder
 import org.komapper.core.dsl.builder.EntityUpsertStatementBuilder
 import org.komapper.core.dsl.builder.OffsetLimitStatementBuilder
 import org.komapper.core.dsl.builder.OffsetLimitStatementBuilderImpl
+import org.komapper.core.dsl.builder.RelationInsertValuesStatementBuilder
+import org.komapper.core.dsl.builder.RelationUpdateStatementBuilder
 import org.komapper.core.dsl.builder.SchemaStatementBuilder
 import org.komapper.core.dsl.context.EntityInsertContext
+import org.komapper.core.dsl.context.EntityUpdateContext
 import org.komapper.core.dsl.context.EntityUpsertContext
+import org.komapper.core.dsl.context.RelationInsertValuesContext
+import org.komapper.core.dsl.context.RelationUpdateContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import java.util.regex.Pattern
 
@@ -151,6 +158,14 @@ interface Dialect {
         return DefaultEntityInsertStatementBuilder(dialect, context, entities)
     }
 
+    fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> getEntityUpdateStatementBuilder(
+        dialect: BuilderDialect,
+        context: EntityUpdateContext<ENTITY, ID, META>,
+        entity: ENTITY,
+    ): EntityUpdateStatementBuilder<ENTITY, ID, META> {
+        return DefaultEntityUpdateStatementBuilder(dialect, context, entity)
+    }
+
     /**
      * Returns the statement builder for the entity UPSERT command.
      *
@@ -167,6 +182,20 @@ interface Dialect {
         context: EntityUpsertContext<ENTITY, ID, META>,
         entities: List<ENTITY>,
     ): EntityUpsertStatementBuilder<ENTITY>
+
+    fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> getRelationInsertValuesStatementBuilder(
+        dialect: BuilderDialect,
+        context: RelationInsertValuesContext<ENTITY, ID, META>,
+    ): RelationInsertValuesStatementBuilder<ENTITY, ID, META> {
+        return RelationInsertValuesStatementBuilder(dialect, context)
+    }
+
+    fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> getRelationUpdateStatementBuilder(
+        dialect: BuilderDialect,
+        context: RelationUpdateContext<ENTITY, ID, META>,
+    ): RelationUpdateStatementBuilder<ENTITY, ID, META> {
+        return RelationUpdateStatementBuilder(dialect, context)
+    }
 
     /**
      * Returns the default length argument for the SUBSTRING function.
@@ -229,6 +258,8 @@ interface Dialect {
      * Returns whether the generated keys returning is supported when inserting multiple rows.
      */
     fun supportsGeneratedKeysReturningWhenInsertingMultipleRows(): Boolean = true
+
+    fun supportsInsertReturning(): Boolean = false
 
     /**
      * Returns whether the INTERSECT set operation is supported.
@@ -304,6 +335,8 @@ interface Dialect {
      * Returns whether the table hint is supported.
      */
     fun supportsTableHint(): Boolean = false
+
+    fun supportsUpdateReturning(): Boolean = false
 }
 
 object DryRunDialect : Dialect {

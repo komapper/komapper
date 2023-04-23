@@ -25,19 +25,26 @@ import org.komapper.core.dsl.visitor.QueryVisitor
 import org.komapper.r2dbc.dsl.runner.R2dbcEntityDeleteBatchRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcEntityDeleteSingleRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcEntityInsertBatchRunner
+import org.komapper.r2dbc.dsl.runner.R2dbcEntityInsertMultipleReturningRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcEntityInsertMultipleRunner
+import org.komapper.r2dbc.dsl.runner.R2dbcEntityInsertSingleReturningRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcEntityInsertSingleRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcEntityStoreRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcEntityUpdateBatchRunner
+import org.komapper.r2dbc.dsl.runner.R2dbcEntityUpdateSingleReturningRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcEntityUpdateSingleRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcEntityUpsertBatchRunner
+import org.komapper.r2dbc.dsl.runner.R2dbcEntityUpsertMultipleReturningRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcEntityUpsertMultipleRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcEntityUpsertSingleIgnoreRunner
+import org.komapper.r2dbc.dsl.runner.R2dbcEntityUpsertSingleReturningRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcEntityUpsertSingleRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcEntityUpsertSingleUpdateRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcRelationDeleteRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcRelationInsertSelectRunner
+import org.komapper.r2dbc.dsl.runner.R2dbcRelationInsertValuesReturningRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcRelationInsertValuesRunner
+import org.komapper.r2dbc.dsl.runner.R2dbcRelationUpdateReturningRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcRelationUpdateRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcRowTransformers
 import org.komapper.r2dbc.dsl.runner.R2dbcRunner
@@ -124,6 +131,41 @@ object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
         return R2dbcEntityInsertMultipleRunner(context, entities)
     }
 
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityInsertMultipleReturningQuery(
+        context: EntityInsertContext<ENTITY, ID, META>,
+        entities: List<ENTITY>,
+    ): R2dbcRunner<List<ENTITY>> {
+        val transform = R2dbcRowTransformers.singleEntity(context.target)
+        return R2dbcEntityInsertMultipleReturningRunner(context, entities, transform)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, A : Any> entityInsertMultipleReturningSingleColumnQuery(
+        context: EntityInsertContext<ENTITY, ID, META>,
+        entities: List<ENTITY>,
+        expression: ColumnExpression<A, *>,
+    ): R2dbcRunner<List<A?>> {
+        val transform = R2dbcRowTransformers.singleColumn(expression)
+        return R2dbcEntityInsertMultipleReturningRunner(context, entities, transform)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, A : Any, B : Any> entityInsertMultipleReturningPairColumnsQuery(
+        context: EntityInsertContext<ENTITY, ID, META>,
+        entities: List<ENTITY>,
+        expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
+    ): R2dbcRunner<List<Pair<A?, B?>>> {
+        val transform = R2dbcRowTransformers.pairColumns(expressions)
+        return R2dbcEntityInsertMultipleReturningRunner(context, entities, transform)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, A : Any, B : Any, C : Any> entityInsertMultipleReturningTripleColumnsQuery(
+        context: EntityInsertContext<ENTITY, ID, META>,
+        entities: List<ENTITY>,
+        expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
+    ): R2dbcRunner<List<Triple<A?, B?, C?>>> {
+        val transform = R2dbcRowTransformers.tripleColumns(expressions)
+        return R2dbcEntityInsertMultipleReturningRunner(context, entities, transform)
+    }
+
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityInsertBatchQuery(
         context: EntityInsertContext<ENTITY, ID, META>,
         entities: List<ENTITY>,
@@ -136,6 +178,41 @@ object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
         entity: ENTITY,
     ): R2dbcRunner<ENTITY> {
         return R2dbcEntityInsertSingleRunner(context, entity)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityInsertSingleReturningQuery(
+        context: EntityInsertContext<ENTITY, ID, META>,
+        entity: ENTITY,
+    ): R2dbcRunner<ENTITY> {
+        val transform = R2dbcRowTransformers.singleEntity(context.target)
+        return R2dbcEntityInsertSingleReturningRunner(context, entity, transform)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, A : Any> entityInsertSingleReturningSingleColumnQuery(
+        context: EntityInsertContext<ENTITY, ID, META>,
+        entity: ENTITY,
+        expression: ColumnExpression<A, *>,
+    ): R2dbcRunner<*> {
+        val transform = R2dbcRowTransformers.singleColumn(expression)
+        return R2dbcEntityInsertSingleReturningRunner(context, entity, transform)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, A : Any, B : Any> entityInsertSingleReturningPairColumnsQuery(
+        context: EntityInsertContext<ENTITY, ID, META>,
+        entity: ENTITY,
+        expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
+    ): R2dbcRunner<*> {
+        val transform = R2dbcRowTransformers.pairColumns(expressions)
+        return R2dbcEntityInsertSingleReturningRunner(context, entity, transform)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, A : Any, B : Any, C : Any> entityInsertSingleReturningTripleColumnsQuery(
+        context: EntityInsertContext<ENTITY, ID, META>,
+        entity: ENTITY,
+        expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
+    ): R2dbcRunner<*> {
+        val transform = R2dbcRowTransformers.tripleColumns(expressions)
+        return R2dbcEntityInsertSingleReturningRunner(context, entity, transform)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
@@ -154,6 +231,41 @@ object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
         return R2dbcEntityUpdateSingleRunner(context, entity)
     }
 
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityUpdateSingleReturningQuery(
+        context: EntityUpdateContext<ENTITY, ID, META>,
+        entity: ENTITY,
+    ): R2dbcRunner<ENTITY?> {
+        val transform = R2dbcRowTransformers.singleEntity(context.target)
+        return R2dbcEntityUpdateSingleReturningRunner(context, entity, transform)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, A : Any> entityUpdateSingleReturningSingleColumnQuery(
+        context: EntityUpdateContext<ENTITY, ID, META>,
+        entity: ENTITY,
+        expression: ColumnExpression<A, *>,
+    ): R2dbcRunner<A?> {
+        val transform = R2dbcRowTransformers.singleColumn(expression)
+        return R2dbcEntityUpdateSingleReturningRunner(context, entity, transform)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, A : Any, B : Any> entityUpdateSingleReturningPairColumnsQuery(
+        context: EntityUpdateContext<ENTITY, ID, META>,
+        entity: ENTITY,
+        expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
+    ): R2dbcRunner<Pair<A?, B?>?> {
+        val transform = R2dbcRowTransformers.pairColumns(expressions)
+        return R2dbcEntityUpdateSingleReturningRunner(context, entity, transform)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, A : Any, B : Any, C : Any> entityUpdateSingleReturningTripleColumnsQuery(
+        context: EntityUpdateContext<ENTITY, ID, META>,
+        entity: ENTITY,
+        expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
+    ): R2dbcRunner<Triple<A?, B?, C?>?> {
+        val transform = R2dbcRowTransformers.tripleColumns(expressions)
+        return R2dbcEntityUpdateSingleReturningRunner(context, entity, transform)
+    }
+
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
     entityUpsertBatchQuery(
         context: EntityUpsertContext<ENTITY, ID, META>,
@@ -170,12 +282,86 @@ object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
         return R2dbcEntityUpsertMultipleRunner(context, entities)
     }
 
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityUpsertMultipleReturningQuery(
+        context: EntityUpsertContext<ENTITY, ID, META>,
+        entities: List<ENTITY>,
+    ): R2dbcRunner<List<ENTITY>> {
+        val transform = R2dbcRowTransformers.singleEntity(context.target)
+        return R2dbcEntityUpsertMultipleReturningRunner(context, entities, transform)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, A : Any> entityUpsertMultipleReturningSingleColumnQuery(
+        context: EntityUpsertContext<ENTITY, ID, META>,
+        entities: List<ENTITY>,
+        expression: ColumnExpression<A, *>,
+    ): R2dbcRunner<List<A?>> {
+        val transform = R2dbcRowTransformers.singleColumn(expression)
+        return R2dbcEntityUpsertMultipleReturningRunner(context, entities, transform)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, A : Any, B : Any> entityUpsertMultipleReturningPairColumnsQuery(
+        context: EntityUpsertContext<ENTITY, ID, META>,
+        entities: List<ENTITY>,
+        expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
+    ): R2dbcRunner<List<Pair<A?, B?>>> {
+        val transform = R2dbcRowTransformers.pairColumns(expressions)
+        return R2dbcEntityUpsertMultipleReturningRunner(context, entities, transform)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, A : Any, B : Any, C : Any> entityUpsertMultipleReturningTripleColumnsQuery(
+        context: EntityUpsertContext<ENTITY, ID, META>,
+        entities: List<ENTITY>,
+        expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
+    ): R2dbcRunner<List<Triple<A?, B?, C?>>> {
+        val transform = R2dbcRowTransformers.tripleColumns(expressions)
+        return R2dbcEntityUpsertMultipleReturningRunner(context, entities, transform)
+    }
+
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
     entityUpsertSingleQuery(
         context: EntityUpsertContext<ENTITY, ID, META>,
         entity: ENTITY,
     ): R2dbcRunner<Long> {
         return R2dbcEntityUpsertSingleRunner(context, entity)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, R> entityUpsertSingleReturningQuery(
+        context: EntityUpsertContext<ENTITY, ID, META>,
+        entity: ENTITY,
+        collect: suspend (Flow<ENTITY>) -> R,
+    ): R2dbcRunner<R> {
+        val transform = R2dbcRowTransformers.singleEntity(context.target)
+        return R2dbcEntityUpsertSingleReturningRunner(context, entity, transform, collect)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, A : Any, R> entityUpsertSingleReturningSingleColumnQuery(
+        context: EntityUpsertContext<ENTITY, ID, META>,
+        entity: ENTITY,
+        expression: ColumnExpression<A, *>,
+        collect: suspend (Flow<A?>) -> R,
+    ): R2dbcRunner<R> {
+        val transform = R2dbcRowTransformers.singleColumn(expression)
+        return R2dbcEntityUpsertSingleReturningRunner(context, entity, transform, collect)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, A : Any, B : Any, R> entityUpsertSingleReturningPairColumnsQuery(
+        context: EntityUpsertContext<ENTITY, ID, META>,
+        entity: ENTITY,
+        expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
+        collect: suspend (Flow<Pair<A?, B?>>) -> R,
+    ): R2dbcRunner<R> {
+        val transform = R2dbcRowTransformers.pairColumns(expressions)
+        return R2dbcEntityUpsertSingleReturningRunner(context, entity, transform, collect)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, A : Any, B : Any, C : Any, R> entityUpsertSingleReturningTripleColumnsQuery(
+        context: EntityUpsertContext<ENTITY, ID, META>,
+        entity: ENTITY,
+        expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
+        collect: suspend (Flow<Triple<A?, B?, C?>>) -> R,
+    ): R2dbcRunner<R> {
+        val transform = R2dbcRowTransformers.tripleColumns(expressions)
+        return R2dbcEntityUpsertSingleReturningRunner(context, entity, transform, collect)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityUpsertSingleUpdateQuery(
@@ -366,6 +552,37 @@ object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
         return R2dbcRelationInsertValuesRunner(context)
     }
 
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> relationInsertValuesReturningQuery(
+        context: RelationInsertValuesContext<ENTITY, ID, META>,
+    ): R2dbcRunner<ENTITY> {
+        val transform = R2dbcRowTransformers.singleEntity(context.target)
+        return R2dbcRelationInsertValuesReturningRunner(context, transform)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, A : Any> relationInsertValuesReturningSingleColumnQuery(
+        context: RelationInsertValuesContext<ENTITY, ID, META>,
+        expression: ColumnExpression<A, *>,
+    ): R2dbcRunner<A?> {
+        val transform = R2dbcRowTransformers.singleColumn(expression)
+        return R2dbcRelationInsertValuesReturningRunner(context, transform)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, A : Any, B : Any> relationInsertValuesReturningPairColumnsQuery(
+        context: RelationInsertValuesContext<ENTITY, ID, META>,
+        expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
+    ): R2dbcRunner<Pair<A?, B?>> {
+        val transform = R2dbcRowTransformers.pairColumns(expressions)
+        return R2dbcRelationInsertValuesReturningRunner(context, transform)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, A : Any, B : Any, C : Any> relationInsertValuesReturningTripleColumnsQuery(
+        context: RelationInsertValuesContext<ENTITY, ID, META>,
+        expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
+    ): R2dbcRunner<Triple<A?, B?, C?>> {
+        val transform = R2dbcRowTransformers.tripleColumns(expressions)
+        return R2dbcRelationInsertValuesReturningRunner(context, transform)
+    }
+
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> relationInsertSelectQuery(
         context: RelationInsertSelectContext<ENTITY, ID, META>,
     ): R2dbcRunner<Pair<Long, List<ID>>> {
@@ -376,6 +593,35 @@ object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
         context: RelationUpdateContext<ENTITY, ID, META>,
     ): R2dbcRunner<Long> {
         return R2dbcRelationUpdateRunner(context)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> relationUpdateReturningQuery(context: RelationUpdateContext<ENTITY, ID, META>): R2dbcRunner<List<ENTITY>> {
+        val transform = R2dbcRowTransformers.singleEntity(context.target)
+        return R2dbcRelationUpdateReturningRunner(context, transform)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, A : Any> relationUpdateReturningSingleColumnQuery(
+        context: RelationUpdateContext<ENTITY, ID, META>,
+        expression: ColumnExpression<A, *>,
+    ): R2dbcRunner<List<A?>> {
+        val transform = R2dbcRowTransformers.singleColumn(expression)
+        return R2dbcRelationUpdateReturningRunner(context, transform)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, A : Any, B : Any> relationUpdateReturningPairColumnsQuery(
+        context: RelationUpdateContext<ENTITY, ID, META>,
+        expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
+    ): R2dbcRunner<List<Pair<A?, B?>>> {
+        val transform = R2dbcRowTransformers.pairColumns(expressions)
+        return R2dbcRelationUpdateReturningRunner(context, transform)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, A : Any, B : Any, C : Any> relationUpdateReturningTripleColumnsQuery(
+        context: RelationUpdateContext<ENTITY, ID, META>,
+        expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
+    ): R2dbcRunner<List<Triple<A?, B?, C?>>> {
+        val transform = R2dbcRowTransformers.tripleColumns(expressions)
+        return R2dbcRelationUpdateReturningRunner(context, transform)
     }
 
     override fun templateExecuteQuery(

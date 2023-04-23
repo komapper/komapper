@@ -1,6 +1,7 @@
 package org.komapper.core.dsl.context
 
 import org.komapper.core.ThreadSafe
+import org.komapper.core.dsl.element.Returning
 import org.komapper.core.dsl.expression.AssignmentDeclaration
 import org.komapper.core.dsl.expression.SubqueryExpression
 import org.komapper.core.dsl.expression.TableExpression
@@ -11,8 +12,9 @@ import org.komapper.core.dsl.options.InsertOptions
 @ThreadSafe
 data class EntityInsertContext<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     val target: META,
+    override val returning: Returning = Returning.Expressions(emptyList()),
     val options: InsertOptions = InsertOptions.DEFAULT,
-) : TablesProvider {
+) : TablesProvider, ReturningProvider {
 
     override fun getTables(): Set<TableExpression<*>> {
         return setOf(target)
@@ -46,6 +48,7 @@ data class EntityInsertContext<ENTITY : Any, ID : Any, META : EntityMetamodel<EN
         return RelationInsertValuesContext(
             target = target,
             values = declaration,
+            returning = returning,
             options = options,
         )
     }

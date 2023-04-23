@@ -2,10 +2,18 @@ package org.komapper.dialect.sqlserver
 
 import org.komapper.core.BuilderDialect
 import org.komapper.core.Dialect
+import org.komapper.core.dsl.builder.EntityInsertStatementBuilder
+import org.komapper.core.dsl.builder.EntityUpdateStatementBuilder
 import org.komapper.core.dsl.builder.EntityUpsertStatementBuilder
 import org.komapper.core.dsl.builder.OffsetLimitStatementBuilder
+import org.komapper.core.dsl.builder.RelationInsertValuesStatementBuilder
+import org.komapper.core.dsl.builder.RelationUpdateStatementBuilder
 import org.komapper.core.dsl.builder.SchemaStatementBuilder
+import org.komapper.core.dsl.context.EntityInsertContext
+import org.komapper.core.dsl.context.EntityUpdateContext
 import org.komapper.core.dsl.context.EntityUpsertContext
+import org.komapper.core.dsl.context.RelationInsertValuesContext
+import org.komapper.core.dsl.context.RelationUpdateContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 
 interface SqlServerDialect : Dialect {
@@ -41,12 +49,42 @@ interface SqlServerDialect : Dialect {
         return SqlServerSchemaStatementBuilder(dialect)
     }
 
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> getEntityInsertStatementBuilder(
+        dialect: BuilderDialect,
+        context: EntityInsertContext<ENTITY, ID, META>,
+        entities: List<ENTITY>,
+    ): EntityInsertStatementBuilder<ENTITY, ID, META> {
+        return SqlServerEntityInsertStatementBuilder(dialect, context, entities)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> getEntityUpdateStatementBuilder(
+        dialect: BuilderDialect,
+        context: EntityUpdateContext<ENTITY, ID, META>,
+        entity: ENTITY,
+    ): EntityUpdateStatementBuilder<ENTITY, ID, META> {
+        return SqlServerEntityUpdateStatementBuilder(dialect, context, entity)
+    }
+
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> getEntityUpsertStatementBuilder(
         dialect: BuilderDialect,
         context: EntityUpsertContext<ENTITY, ID, META>,
         entities: List<ENTITY>,
     ): EntityUpsertStatementBuilder<ENTITY> {
         return SqlServerEntityUpsertStatementBuilder(dialect, context, entities)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> getRelationInsertValuesStatementBuilder(
+        dialect: BuilderDialect,
+        context: RelationInsertValuesContext<ENTITY, ID, META>,
+    ): RelationInsertValuesStatementBuilder<ENTITY, ID, META> {
+        return SqlServerRelationInsertValuesStatementBuilder(dialect, context)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> getRelationUpdateStatementBuilder(
+        dialect: BuilderDialect,
+        context: RelationUpdateContext<ENTITY, ID, META>,
+    ): RelationUpdateStatementBuilder<ENTITY, ID, META> {
+        return SqlServerRelationUpdateStatementBuilder(dialect, context)
     }
 
     override fun getDefaultLengthForSubstringFunction(): Int? = Int.MAX_VALUE
@@ -69,9 +107,13 @@ interface SqlServerDialect : Dialect {
 
     override fun supportsForUpdateClause(): Boolean = false
 
+    override fun supportsInsertReturning(): Boolean = true
+
     override fun supportsMultipleColumnsInInPredicate(): Boolean = false
 
     override fun supportsTableHint(): Boolean = true
+
+    override fun supportsUpdateReturning(): Boolean = true
 
     override fun supportsLockOptionNowait(): Boolean = true
 

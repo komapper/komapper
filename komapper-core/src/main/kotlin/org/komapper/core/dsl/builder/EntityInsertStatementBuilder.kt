@@ -18,40 +18,57 @@ class DefaultEntityInsertStatementBuilder<ENTITY : Any, ID : Any, META : EntityM
     private val entities: List<ENTITY>,
 ) : EntityInsertStatementBuilder<ENTITY, ID, META> {
 
-    private val buf = StatementBuffer()
-
     override fun build(): Statement {
-        val target = context.target
-        val properties = target.getNonAutoIncrementProperties()
-        buf.append("insert into ")
-        table(target)
-        buf.append(" (")
-        for (p in properties) {
-            column(p)
-            buf.append(", ")
-        }
-        buf.cutBack(2)
-        buf.append(") values ")
-        for (entity in entities) {
-            buf.append("(")
-            for (p in properties) {
-                buf.bind(p.toValue(entity))
-                buf.append(", ")
-            }
-            buf.cutBack(2)
-            buf.append("), ")
-        }
-        buf.cutBack(2)
+        val buf = StatementBuffer()
+        buf.append(buildInsertInto())
+        buf.append(" ")
+        buf.append(buildValues())
         return buf.toStatement()
     }
 
-    private fun table(metamodel: EntityMetamodel<*, *, *>) {
-        val name = metamodel.getCanonicalTableName(dialect::enquote)
-        buf.append(name)
+    fun buildInsertInto(): Statement {
+        val target = context.target
+        val properties = target.getNonAutoIncrementProperties()
+        return with(StatementBuffer()) {
+            append("insert into ")
+            table(target)
+            append(" (")
+            for (p in properties) {
+                column(p)
+                append(", ")
+            }
+            cutBack(2)
+            append(")")
+            toStatement()
+        }
     }
 
-    private fun column(expression: ColumnExpression<*, *>) {
+    fun buildValues(): Statement {
+        val target = context.target
+        val properties = target.getNonAutoIncrementProperties()
+        return with(StatementBuffer()) {
+            append("values ")
+            for (entity in entities) {
+                append("(")
+                for (p in properties) {
+                    bind(p.toValue(entity))
+                    append(", ")
+                }
+                cutBack(2)
+                append("), ")
+            }
+            cutBack(2)
+            toStatement()
+        }
+    }
+
+    private fun StatementBuffer.table(metamodel: EntityMetamodel<*, *, *>) {
+        val name = metamodel.getCanonicalTableName(dialect::enquote)
+        append(name)
+    }
+
+    private fun StatementBuffer.column(expression: ColumnExpression<*, *>) {
         val name = expression.getCanonicalColumnName(dialect::enquote)
-        buf.append(name)
+        append(name)
     }
 }

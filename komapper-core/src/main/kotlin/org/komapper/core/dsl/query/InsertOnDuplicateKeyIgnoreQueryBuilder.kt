@@ -19,7 +19,7 @@ interface InsertOnDuplicateKeyIgnoreQueryBuilder<ENTITY : Any, ID : Any, META : 
      * @param entity the entity to be inserted
      * @return the query
      */
-    fun single(entity: ENTITY): EntityUpsertQuery<Long>
+    fun single(entity: ENTITY): EntityUpsertSingleQueryNullable<ENTITY>
 
     /**
      * Builds a query to bulk insert a list of entities.
@@ -27,7 +27,7 @@ interface InsertOnDuplicateKeyIgnoreQueryBuilder<ENTITY : Any, ID : Any, META : 
      * @param entities the entities to be inserted
      * @return the query
      */
-    fun multiple(entities: List<ENTITY>): EntityUpsertQuery<Long>
+    fun multiple(entities: List<ENTITY>): EntityUpsertMultipleQuery<ENTITY>
 
     /**
      * Builds a query to bulk insert an array of entities.
@@ -66,17 +66,17 @@ internal data class InsertOnDuplicateKeyIgnoreQueryBuilderImpl<ENTITY : Any, ID 
     private val context: EntityUpsertContext<ENTITY, ID, META>,
 ) : InsertOnDuplicateKeyIgnoreQueryBuilder<ENTITY, ID, META> {
 
-    private val builder: EntityUpsertQueryBuilder<ENTITY, ID, META> = EntityUpsertQueryBuilderImpl(context)
+    private val builder: EntityUpsertQueryBuilderNullable<ENTITY, ID, META> = EntityUpsertQueryBuilderNullableImpl(context)
 
-    override fun single(entity: ENTITY): EntityUpsertQuery<Long> {
+    override fun single(entity: ENTITY): EntityUpsertSingleQueryNullable<ENTITY> {
         return builder.single(entity)
     }
 
-    override fun multiple(entities: List<ENTITY>): EntityUpsertQuery<Long> {
+    override fun multiple(entities: List<ENTITY>): EntityUpsertMultipleQuery<ENTITY> {
         return builder.multiple(entities)
     }
 
-    override fun multiple(vararg entities: ENTITY): EntityUpsertQuery<Long> {
+    override fun multiple(vararg entities: ENTITY): EntityUpsertMultipleQuery<ENTITY> {
         return builder.multiple(entities.toList())
     }
 

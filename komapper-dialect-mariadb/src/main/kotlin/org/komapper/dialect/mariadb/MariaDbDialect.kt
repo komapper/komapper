@@ -2,10 +2,14 @@ package org.komapper.dialect.mariadb
 
 import org.komapper.core.BuilderDialect
 import org.komapper.core.Dialect
+import org.komapper.core.dsl.builder.EntityInsertStatementBuilder
 import org.komapper.core.dsl.builder.EntityUpsertStatementBuilder
 import org.komapper.core.dsl.builder.OffsetLimitStatementBuilder
+import org.komapper.core.dsl.builder.RelationInsertValuesStatementBuilder
 import org.komapper.core.dsl.builder.SchemaStatementBuilder
+import org.komapper.core.dsl.context.EntityInsertContext
 import org.komapper.core.dsl.context.EntityUpsertContext
+import org.komapper.core.dsl.context.RelationInsertValuesContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 
 interface MariaDbDialect : Dialect {
@@ -36,6 +40,14 @@ interface MariaDbDialect : Dialect {
         return MariaDbSchemaStatementBuilder(dialect)
     }
 
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> getEntityInsertStatementBuilder(
+        dialect: BuilderDialect,
+        context: EntityInsertContext<ENTITY, ID, META>,
+        entities: List<ENTITY>,
+    ): EntityInsertStatementBuilder<ENTITY, ID, META> {
+        return MariaDbEntityInsertStatementBuilder(dialect, context, entities)
+    }
+
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> getEntityUpsertStatementBuilder(
         dialect: BuilderDialect,
         context: EntityUpsertContext<ENTITY, ID, META>,
@@ -44,11 +56,20 @@ interface MariaDbDialect : Dialect {
         return MariaDbEntityUpsertStatementBuilder(dialect, context, entities)
     }
 
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> getRelationInsertValuesStatementBuilder(
+        dialect: BuilderDialect,
+        context: RelationInsertValuesContext<ENTITY, ID, META>,
+    ): RelationInsertValuesStatementBuilder<ENTITY, ID, META> {
+        return MariaDbRelationInsertValuesStatementBuilder(dialect, context)
+    }
+
     override fun supportsAliasForDeleteStatement() = false
 
     override fun supportsConflictTargetInUpsertStatement(): Boolean = false
 
     override fun supportsGeneratedKeysReturningWhenInsertingMultipleRows(): Boolean = false
+
+    override fun supportsInsertReturning(): Boolean = true
 
     override fun supportsLockOptionNowait(): Boolean = true
 

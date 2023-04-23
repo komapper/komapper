@@ -86,6 +86,16 @@ internal fun checkGeneratedKeysReturningWhenInsertingMultipleRows(
     }
 }
 
+internal fun checkInsertReturning(config: DatabaseConfig) {
+    val dialect = config.dialect
+    if (!config.dialect.supportsInsertReturning()) {
+        throw UnsupportedOperationException(
+            "The dialect(driver=${dialect.driver}) does not support `INSERT RETURNING`. " +
+                "Do not use the `returning` function in your query.",
+        )
+    }
+}
+
 internal fun checkOptimisticLockOfBatchExecution(config: DatabaseConfig, options: OptimisticLockOptions) {
     val dialect = config.dialect
     if (!config.dialect.supportsOptimisticLockOfBatchExecution() &&
@@ -108,5 +118,15 @@ internal fun checkSearchConditionInUpsertStatement(config: DatabaseConfig, where
                 "The dialect(driver=${dialect.driver}) does not support specifying search conditions in upsert statements.",
             )
         }
+    }
+}
+
+internal fun checkUpdateReturning(config: DatabaseConfig) {
+    val dialect = config.dialect
+    if (!config.dialect.supportsUpdateReturning()) {
+        throw UnsupportedOperationException(
+            "The dialect(driver=${dialect.driver}) does not support `UPDATE RETURNING`. " +
+                "Do not use the `returning` function in your query.",
+        )
     }
 }
