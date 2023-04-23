@@ -85,6 +85,16 @@ internal class SqlServerEntityUpsertStatementBuilder<ENTITY : Any, ID : Any, MET
         }
         buf.cutBack(2)
         buf.append(")")
+        val outputExpressions = context.returning.expressions()
+        if (outputExpressions.isNotEmpty()) {
+            buf.append(" output ")
+            for (e in outputExpressions) {
+                buf.append("inserted.")
+                columnWithoutAlias(e)
+                buf.append(", ")
+            }
+            buf.cutBack(2)
+        }
         buf.append(";")
         return buf.toStatement()
     }

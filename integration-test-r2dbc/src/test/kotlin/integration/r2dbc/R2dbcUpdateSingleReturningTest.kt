@@ -22,7 +22,7 @@ import kotlin.test.assertNull
 @ExtendWith(R2dbcEnv::class)
 class R2dbcUpdateSingleReturningTest(private val db: R2dbcDatabase) {
 
-    @Run(onlyIf = [Dbms.POSTGRESQL])
+    @Run(onlyIf = [Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun test(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
@@ -42,7 +42,7 @@ class R2dbcUpdateSingleReturningTest(private val db: R2dbcDatabase) {
         assertEquals(address2, returningAddress)
     }
 
-    @Run(onlyIf = [Dbms.POSTGRESQL])
+    @Run(onlyIf = [Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun testReturningSingleColumn(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
@@ -62,7 +62,7 @@ class R2dbcUpdateSingleReturningTest(private val db: R2dbcDatabase) {
         )
     }
 
-    @Run(onlyIf = [Dbms.POSTGRESQL])
+    @Run(onlyIf = [Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun testReturningPairColumns(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
@@ -82,7 +82,7 @@ class R2dbcUpdateSingleReturningTest(private val db: R2dbcDatabase) {
         )
     }
 
-    @Run(onlyIf = [Dbms.POSTGRESQL])
+    @Run(onlyIf = [Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun testReturningTripleColumns(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
@@ -102,7 +102,7 @@ class R2dbcUpdateSingleReturningTest(private val db: R2dbcDatabase) {
         )
     }
 
-    @Run(onlyIf = [Dbms.POSTGRESQL])
+    @Run(onlyIf = [Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun suppressOptimisticLockException(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
@@ -113,7 +113,7 @@ class R2dbcUpdateSingleReturningTest(private val db: R2dbcDatabase) {
         assertNull(returningAddress)
     }
 
-    @Run(onlyIf = [Dbms.POSTGRESQL])
+    @Run(onlyIf = [Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun uniqueConstraintException(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
@@ -123,7 +123,7 @@ class R2dbcUpdateSingleReturningTest(private val db: R2dbcDatabase) {
         }
     }
 
-    @Run(onlyIf = [Dbms.POSTGRESQL])
+    @Run(onlyIf = [Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun optimisticLockException(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
@@ -134,7 +134,7 @@ class R2dbcUpdateSingleReturningTest(private val db: R2dbcDatabase) {
         }
     }
 
-    @Run(unless = [Dbms.POSTGRESQL])
+    @Run(unless = [Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun unsupportedOperationException_updateReturning(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address

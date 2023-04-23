@@ -24,7 +24,7 @@ import kotlin.test.assertTrue
 @ExtendWith(R2dbcEnv::class)
 class R2dbcInsertMultipleReturningTest(private val db: R2dbcDatabase) {
 
-    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL])
+    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun test(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
@@ -37,7 +37,7 @@ class R2dbcInsertMultipleReturningTest(private val db: R2dbcDatabase) {
         assertEquals(addressList, addressList2)
     }
 
-    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL])
+    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun testReturningSingleColumn(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
@@ -50,7 +50,7 @@ class R2dbcInsertMultipleReturningTest(private val db: R2dbcDatabase) {
         assertEquals(addressList.map { it.street }, streets)
     }
 
-    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL])
+    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun testReturningPairColumns(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
@@ -63,7 +63,7 @@ class R2dbcInsertMultipleReturningTest(private val db: R2dbcDatabase) {
         assertEquals(addressList.map { it.street to it.version }, pairs)
     }
 
-    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL])
+    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun testReturningTripleColumns(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
@@ -76,7 +76,7 @@ class R2dbcInsertMultipleReturningTest(private val db: R2dbcDatabase) {
         assertEquals(addressList.map { Triple(it.street, it.version, it.addressId) }, triples)
     }
 
-    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL])
+    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun identity(info: TestInfo) = inTransaction(db, info) {
         val i = Meta.identityStrategy
@@ -91,7 +91,7 @@ class R2dbcInsertMultipleReturningTest(private val db: R2dbcDatabase) {
         assertTrue(results1.all { it.id != null })
     }
 
-    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL])
+    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun sequenceGenerator(info: TestInfo) = inTransaction(db, info) {
         val generator = Meta.sequenceStrategy.idGenerator() as IdGenerator.Sequence<*, *>
@@ -106,7 +106,7 @@ class R2dbcInsertMultipleReturningTest(private val db: R2dbcDatabase) {
         assertEquals(strategies3, strategies2)
     }
 
-    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL])
+    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun onDuplicateKeyUpdate(info: TestInfo) = inTransaction(db, info) {
         val d = Meta.department
@@ -116,7 +116,7 @@ class R2dbcInsertMultipleReturningTest(private val db: R2dbcDatabase) {
         )
         val query = QueryDsl.insert(d).onDuplicateKeyUpdate().multiple(departments).returning()
         val departments2 = db.runQuery { query }
-        assertEquals(departments, departments2)
+        assertEquals(departments.toSet(), departments2.toSet())
         val list = db.runQuery {
             QueryDsl.from(d).where { d.departmentId inList listOf(1, 5) }.orderBy(d.departmentId)
         }
@@ -127,7 +127,7 @@ class R2dbcInsertMultipleReturningTest(private val db: R2dbcDatabase) {
         )
     }
 
-    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL])
+    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun onDuplicateKeyUpdateReturningSingleColumn(info: TestInfo) = inTransaction(db, info) {
         val d = Meta.department
@@ -137,7 +137,7 @@ class R2dbcInsertMultipleReturningTest(private val db: R2dbcDatabase) {
         )
         val query = QueryDsl.insert(d).onDuplicateKeyUpdate().multiple(departments).returning(d.departmentName)
         val departmentNameList = db.runQuery { query }
-        assertEquals(departments.map { it.departmentName }, departmentNameList)
+        assertEquals(departments.map { it.departmentName }.toSet(), departmentNameList.toSet())
         val list = db.runQuery {
             QueryDsl.from(d).where { d.departmentId inList listOf(1, 5) }.orderBy(d.departmentId)
         }
@@ -148,7 +148,7 @@ class R2dbcInsertMultipleReturningTest(private val db: R2dbcDatabase) {
         )
     }
 
-    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL])
+    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun onDuplicateKeyUpdateReturningPairColumns(info: TestInfo) = inTransaction(db, info) {
         val d = Meta.department
@@ -158,7 +158,7 @@ class R2dbcInsertMultipleReturningTest(private val db: R2dbcDatabase) {
         )
         val query = QueryDsl.insert(d).onDuplicateKeyUpdate().multiple(departments).returning(d.departmentName, d.location)
         val pairList = db.runQuery { query }
-        assertEquals(departments.map { it.departmentName to it.location }, pairList)
+        assertEquals(departments.map { it.departmentName to it.location }.toSet(), pairList.toSet())
         val list = db.runQuery {
             QueryDsl.from(d).where { d.departmentId inList listOf(1, 5) }.orderBy(d.departmentId)
         }
@@ -169,7 +169,7 @@ class R2dbcInsertMultipleReturningTest(private val db: R2dbcDatabase) {
         )
     }
 
-    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL])
+    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun onDuplicateKeyUpdateReturningTripleColumns(info: TestInfo) = inTransaction(db, info) {
         val d = Meta.department
@@ -179,7 +179,7 @@ class R2dbcInsertMultipleReturningTest(private val db: R2dbcDatabase) {
         )
         val query = QueryDsl.insert(d).onDuplicateKeyUpdate().multiple(departments).returning(d.departmentName, d.location, d.departmentNo)
         val tripleList = db.runQuery { query }
-        assertEquals(departments.map { Triple(it.departmentName, it.location, it.departmentNo) }, tripleList)
+        assertEquals(departments.map { Triple(it.departmentName, it.location, it.departmentNo) }.toSet(), tripleList.toSet())
         val list = db.runQuery {
             QueryDsl.from(d).where { d.departmentId inList listOf(1, 5) }.orderBy(d.departmentId)
         }
@@ -190,7 +190,7 @@ class R2dbcInsertMultipleReturningTest(private val db: R2dbcDatabase) {
         )
     }
 
-    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL])
+    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun onDuplicateKeyIgnore(info: TestInfo) = inTransaction(db, info) {
         val d = Meta.department
@@ -209,7 +209,7 @@ class R2dbcInsertMultipleReturningTest(private val db: R2dbcDatabase) {
         )
     }
 
-    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL])
+    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun onDuplicateKeyIgnoreReturningSingleColumn(info: TestInfo) = inTransaction(db, info) {
         val d = Meta.department
@@ -228,7 +228,7 @@ class R2dbcInsertMultipleReturningTest(private val db: R2dbcDatabase) {
         )
     }
 
-    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL])
+    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun onDuplicateKeyIgnoreReturningPairColumns(info: TestInfo) = inTransaction(db, info) {
         val d = Meta.department
@@ -247,7 +247,7 @@ class R2dbcInsertMultipleReturningTest(private val db: R2dbcDatabase) {
         )
     }
 
-    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL])
+    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun onDuplicateKeyIgnoreReturningTripleColumns(info: TestInfo) = inTransaction(db, info) {
         val d = Meta.department
@@ -266,7 +266,7 @@ class R2dbcInsertMultipleReturningTest(private val db: R2dbcDatabase) {
         )
     }
 
-    @Run(unless = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL])
+    @Run(unless = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun unsupportedOperationException_insertReturning(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
@@ -282,7 +282,7 @@ class R2dbcInsertMultipleReturningTest(private val db: R2dbcDatabase) {
         println(ex)
     }
 
-    @Run(unless = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL])
+    @Run(unless = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun unsupportedOperationException_onDuplicateKeyUpdate_insertReturning(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address

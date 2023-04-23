@@ -18,7 +18,7 @@ import kotlin.test.assertTrue
 @ExtendWith(R2dbcEnv::class)
 class R2dbcUpdateSetReturningTest(private val db: R2dbcDatabase) {
 
-    @Run(onlyIf = [Dbms.POSTGRESQL])
+    @Run(onlyIf = [Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun test(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
@@ -38,7 +38,7 @@ class R2dbcUpdateSetReturningTest(private val db: R2dbcDatabase) {
         assertEquals(list.single(), address)
     }
 
-    @Run(onlyIf = [Dbms.POSTGRESQL])
+    @Run(onlyIf = [Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun testReturningSingleColumn(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
@@ -58,7 +58,7 @@ class R2dbcUpdateSetReturningTest(private val db: R2dbcDatabase) {
         assertEquals(list.single(), address.street)
     }
 
-    @Run(onlyIf = [Dbms.POSTGRESQL])
+    @Run(onlyIf = [Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun testReturningPairColumns(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
@@ -78,7 +78,7 @@ class R2dbcUpdateSetReturningTest(private val db: R2dbcDatabase) {
         assertEquals(list.single(), address.street to address.version)
     }
 
-    @Run(onlyIf = [Dbms.POSTGRESQL])
+    @Run(onlyIf = [Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun testReturningTripleColumns(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
@@ -98,7 +98,7 @@ class R2dbcUpdateSetReturningTest(private val db: R2dbcDatabase) {
         assertEquals(list.single(), Triple(address.street, address.version, address.addressId))
     }
 
-    @Run(onlyIf = [Dbms.POSTGRESQL])
+    @Run(onlyIf = [Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun testMultipleUpdate(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
@@ -119,7 +119,7 @@ class R2dbcUpdateSetReturningTest(private val db: R2dbcDatabase) {
         assertEquals(list.toSet(), list2.toSet())
     }
 
-    @Run(onlyIf = [Dbms.POSTGRESQL])
+    @Run(onlyIf = [Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun incrementVersion_auto(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
@@ -144,7 +144,7 @@ class R2dbcUpdateSetReturningTest(private val db: R2dbcDatabase) {
         assertEquals(2, address2.version)
     }
 
-    @Run(unless = [Dbms.POSTGRESQL])
+    @Run(unless = [Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun unsupportedOperationException_updateReturning(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address

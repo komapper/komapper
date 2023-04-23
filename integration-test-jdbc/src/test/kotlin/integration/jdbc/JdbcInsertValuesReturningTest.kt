@@ -21,7 +21,7 @@ import kotlin.test.assertFailsWith
 @ExtendWith(JdbcEnv::class)
 class JdbcInsertValuesReturningTest(private val db: JdbcDatabase) {
 
-    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL])
+    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun test() {
         val a = Meta.address
@@ -35,7 +35,7 @@ class JdbcInsertValuesReturningTest(private val db: JdbcDatabase) {
         assertEquals(Address(19, "STREET 16", 0), address)
     }
 
-    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL])
+    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun testReturningSingleColumn() {
         val a = Meta.address
@@ -49,7 +49,7 @@ class JdbcInsertValuesReturningTest(private val db: JdbcDatabase) {
         assertEquals("STREET 16", street)
     }
 
-    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL])
+    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun testReturningPairColumns() {
         val a = Meta.address
@@ -64,7 +64,7 @@ class JdbcInsertValuesReturningTest(private val db: JdbcDatabase) {
         assertEquals(0, version)
     }
 
-    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL])
+    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun testReturningTripleColumns() {
         val a = Meta.address
@@ -80,7 +80,7 @@ class JdbcInsertValuesReturningTest(private val db: JdbcDatabase) {
         assertEquals(19, addressId)
     }
 
-    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL])
+    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun generatedKeys_autoIncrement() {
         val a = Meta.identityStrategy
@@ -93,7 +93,7 @@ class JdbcInsertValuesReturningTest(private val db: JdbcDatabase) {
         assertEquals(IdentityStrategy(1, "test"), strategy)
     }
 
-    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL])
+    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun generatedKeys_sequence() {
         val generator = Meta.sequenceStrategy.idGenerator() as IdGenerator.Sequence<*, *>
@@ -108,7 +108,7 @@ class JdbcInsertValuesReturningTest(private val db: JdbcDatabase) {
         assertEquals(SequenceStrategy(1, "test"), strategy)
     }
 
-    @Run(unless = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL])
+    @Run(unless = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun unsupportedOperationException() {
         val a = Meta.address

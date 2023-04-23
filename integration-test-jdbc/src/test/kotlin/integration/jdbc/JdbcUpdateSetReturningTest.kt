@@ -17,7 +17,7 @@ import kotlin.test.assertTrue
 @ExtendWith(JdbcEnv::class)
 class JdbcUpdateSetReturningTest(private val db: JdbcDatabase) {
 
-    @Run(onlyIf = [Dbms.POSTGRESQL])
+    @Run(onlyIf = [Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun test() {
         val a = Meta.address
@@ -37,7 +37,7 @@ class JdbcUpdateSetReturningTest(private val db: JdbcDatabase) {
         assertEquals(list.single(), address)
     }
 
-    @Run(onlyIf = [Dbms.POSTGRESQL])
+    @Run(onlyIf = [Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun testReturningSingleColumn() {
         val a = Meta.address
@@ -57,7 +57,7 @@ class JdbcUpdateSetReturningTest(private val db: JdbcDatabase) {
         assertEquals(list.single(), address.street)
     }
 
-    @Run(onlyIf = [Dbms.POSTGRESQL])
+    @Run(onlyIf = [Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun testReturningPairColumns() {
         val a = Meta.address
@@ -77,7 +77,7 @@ class JdbcUpdateSetReturningTest(private val db: JdbcDatabase) {
         assertEquals(list.single(), address.street to address.version)
     }
 
-    @Run(onlyIf = [Dbms.POSTGRESQL])
+    @Run(onlyIf = [Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun testReturningTripleColumns() {
         val a = Meta.address
@@ -97,7 +97,7 @@ class JdbcUpdateSetReturningTest(private val db: JdbcDatabase) {
         assertEquals(list.single(), Triple(address.street, address.version, address.addressId))
     }
 
-    @Run(onlyIf = [Dbms.POSTGRESQL])
+    @Run(onlyIf = [Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun testMultipleUpdate() {
         val a = Meta.address
@@ -118,7 +118,7 @@ class JdbcUpdateSetReturningTest(private val db: JdbcDatabase) {
         assertEquals(list.toSet(), list2.toSet())
     }
 
-    @Run(onlyIf = [Dbms.POSTGRESQL])
+    @Run(onlyIf = [Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun incrementVersion_auto() {
         val a = Meta.address
@@ -143,7 +143,7 @@ class JdbcUpdateSetReturningTest(private val db: JdbcDatabase) {
         assertEquals(2, address2.version)
     }
 
-    @Run(unless = [Dbms.POSTGRESQL])
+    @Run(unless = [Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun unsupportedOperationException_updateReturning() {
         val a = Meta.address

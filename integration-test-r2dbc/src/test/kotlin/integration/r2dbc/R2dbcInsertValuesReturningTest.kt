@@ -22,7 +22,7 @@ import kotlin.test.assertFailsWith
 @ExtendWith(R2dbcEnv::class)
 class R2dbcInsertValuesReturningTest(private val db: R2dbcDatabase) {
 
-    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL])
+    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun test(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
@@ -36,7 +36,7 @@ class R2dbcInsertValuesReturningTest(private val db: R2dbcDatabase) {
         assertEquals(Address(19, "STREET 16", 0), address)
     }
 
-    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL])
+    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun testReturningSingleColumn(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
@@ -50,7 +50,7 @@ class R2dbcInsertValuesReturningTest(private val db: R2dbcDatabase) {
         assertEquals("STREET 16", street)
     }
 
-    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL])
+    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun testReturningPairColumns(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
@@ -65,7 +65,7 @@ class R2dbcInsertValuesReturningTest(private val db: R2dbcDatabase) {
         assertEquals(0, version)
     }
 
-    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL])
+    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun testReturningTripleColumns(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
@@ -81,7 +81,7 @@ class R2dbcInsertValuesReturningTest(private val db: R2dbcDatabase) {
         assertEquals(19, addressId)
     }
 
-    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL])
+    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun generatedKeys_autoIncrement(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.identityStrategy
@@ -94,7 +94,7 @@ class R2dbcInsertValuesReturningTest(private val db: R2dbcDatabase) {
         assertEquals(IdentityStrategy(1, "test"), strategy)
     }
 
-    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL])
+    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun generatedKeys_sequence(info: TestInfo) = inTransaction(db, info) {
         val generator = Meta.sequenceStrategy.idGenerator() as IdGenerator.Sequence<*, *>
@@ -109,7 +109,7 @@ class R2dbcInsertValuesReturningTest(private val db: R2dbcDatabase) {
         assertEquals(SequenceStrategy(1, "test"), strategy)
     }
 
-    @Run(unless = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL])
+    @Run(unless = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun unsupportedOperationException(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address

@@ -28,7 +28,7 @@ import kotlin.test.assertNull
 @ExtendWith(R2dbcEnv::class)
 class R2dbcInsertSingleReturningTest(private val db: R2dbcDatabase) {
 
-    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL])
+    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun test(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
@@ -37,7 +37,7 @@ class R2dbcInsertSingleReturningTest(private val db: R2dbcDatabase) {
         assertEquals(address, address2)
     }
 
-    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL])
+    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun testReturningSingleColumn(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
@@ -46,7 +46,7 @@ class R2dbcInsertSingleReturningTest(private val db: R2dbcDatabase) {
         assertEquals(address.street, street)
     }
 
-    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL])
+    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun testReturningPairColumns(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
@@ -56,7 +56,7 @@ class R2dbcInsertSingleReturningTest(private val db: R2dbcDatabase) {
         assertEquals(address.version, version)
     }
 
-    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL])
+    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun testReturningTripleColumns(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
@@ -67,7 +67,7 @@ class R2dbcInsertSingleReturningTest(private val db: R2dbcDatabase) {
         assertEquals(address.addressId, addressId)
     }
 
-    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL])
+    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun uniqueConstraintException(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
@@ -77,7 +77,7 @@ class R2dbcInsertSingleReturningTest(private val db: R2dbcDatabase) {
         }
     }
 
-    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL])
+    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun sequenceGenerator(info: TestInfo) = inTransaction(db, info) {
         val generator = Meta.sequenceStrategy.idGenerator() as IdGenerator.Sequence<*, *>
@@ -91,7 +91,7 @@ class R2dbcInsertSingleReturningTest(private val db: R2dbcDatabase) {
         }
     }
 
-    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL])
+    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun identityGenerator(info: TestInfo) = inTransaction(db, info) {
         for (i in 1..201) {
@@ -102,7 +102,7 @@ class R2dbcInsertSingleReturningTest(private val db: R2dbcDatabase) {
         }
     }
 
-    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL])
+    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun onDuplicateKeyUpdate_insert(info: TestInfo) = inTransaction(db, info) {
         val d = Meta.department
@@ -114,7 +114,7 @@ class R2dbcInsertSingleReturningTest(private val db: R2dbcDatabase) {
         assertNotNull(found)
     }
 
-    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL])
+    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun onDuplicateKeyUpdate_update(info: TestInfo) = inTransaction(db, info) {
         val d = Meta.department
@@ -129,7 +129,7 @@ class R2dbcInsertSingleReturningTest(private val db: R2dbcDatabase) {
         assertEquals(10, found.version)
     }
 
-    @Run(onlyIf = [Dbms.H2, Dbms.POSTGRESQL])
+    @Run(onlyIf = [Dbms.H2, Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun onDuplicateKeyUpdateWithKey_update_set_where_success(info: TestInfo) = inTransaction(db, info) {
         val d = Meta.department
@@ -152,7 +152,7 @@ class R2dbcInsertSingleReturningTest(private val db: R2dbcDatabase) {
         assertEquals(1, found.version)
     }
 
-    @Run(onlyIf = [Dbms.H2, Dbms.POSTGRESQL])
+    @Run(onlyIf = [Dbms.H2, Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun onDuplicateKeyUpdateWithKey_update_set_where_fail(info: TestInfo) = inTransaction(db, info) {
         val d = Meta.department
@@ -169,7 +169,7 @@ class R2dbcInsertSingleReturningTest(private val db: R2dbcDatabase) {
         assertNull(department2)
     }
 
-    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL])
+    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun onDuplicateKeyIgnore_inserted(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
@@ -179,7 +179,7 @@ class R2dbcInsertSingleReturningTest(private val db: R2dbcDatabase) {
         assertEquals(address, address2)
     }
 
-    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL])
+    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun onDuplicateKeyIgnore_ignored(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
@@ -189,7 +189,7 @@ class R2dbcInsertSingleReturningTest(private val db: R2dbcDatabase) {
         assertNull(address2)
     }
 
-    @Run(unless = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL])
+    @Run(unless = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun unsupportedOperationException_insertReturning(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
@@ -201,7 +201,7 @@ class R2dbcInsertSingleReturningTest(private val db: R2dbcDatabase) {
         println(ex)
     }
 
-    @Run(unless = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL])
+    @Run(unless = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
     fun unsupportedOperationException_onDuplicateKeyUpdate_insertReturning(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
