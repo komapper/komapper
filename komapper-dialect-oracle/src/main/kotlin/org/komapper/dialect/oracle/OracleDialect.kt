@@ -94,8 +94,6 @@ interface OracleDialect : Dialect {
 
     override fun supportsGeneratedKeysReturningWhenInsertingMultipleRows(): Boolean = false
 
-    override fun supportsInsertSingleReturning(): Boolean = true
-
     override fun supportsLockOfColumns(): Boolean = true
 
     override fun supportsLockOptionNowait(): Boolean = true
@@ -111,6 +109,4 @@ interface OracleDialect : Dialect {
     override fun supportsSetOperationMinus(): Boolean = true
 
     override fun supportsSearchConditionInUpsertStatement(): Boolean = true
-
-    override fun supportsUpdateReturning(): Boolean = true
 }
