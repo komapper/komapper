@@ -29,19 +29,11 @@ internal class H2EntityUpsertStatementBuilder<ENTITY : Any, ID : Any, META : Ent
     private val aliasManager = UpsertAliasManager(target, excluded)
     private val buf = StatementBuffer()
     private val support = BuilderSupport(dialect, aliasManager, buf, context.insertContext.options.escapeSequence)
+    private val h2Support = H2StatementBuilderSupport(dialect, context)
     private val sourceStatementBuilder = SourceStatementBuilder(dialect, context, entities)
 
     override fun build(assignments: List<Pair<PropertyMetamodel<ENTITY, *, *>, Operand>>): Statement {
-        val outputExpressions = context.returning.expressions()
-        if (outputExpressions.isNotEmpty()) {
-            buf.append("select ")
-            for (e in outputExpressions) {
-                buf.append(e.getCanonicalColumnName(dialect::enquote))
-                buf.append(", ")
-            }
-            buf.cutBack(2)
-            buf.append(" from final table (")
-        }
+        buf.append(h2Support.buildReturningFirstFragment())
         buf.append("merge into ")
         table(target, TableNameType.NAME_AND_ALIAS)
         buf.append(" using (")
@@ -88,9 +80,7 @@ internal class H2EntityUpsertStatementBuilder<ENTITY : Any, ID : Any, META : Ent
             }
             buf.cutBack(2)
         }
-        if (outputExpressions.isNotEmpty()) {
-            buf.append(")")
-        }
+        buf.append(h2Support.buildReturningLastFragment())
         return buf.toStatement()
     }
 
