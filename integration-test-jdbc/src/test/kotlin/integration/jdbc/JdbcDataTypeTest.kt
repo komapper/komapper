@@ -744,10 +744,19 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
             QueryDsl.from(m).where { m.id eq 1 }.first()
         }
         assertEquals(data, data2)
-        val data3 = db.runQuery {
+    }
+
+    @Run(unless = [Dbms.SQLSERVER])
+    @Test
+    fun localTime_findByValue() {
+        val m = Meta.localTimeData
+        val value = LocalTime.of(12, 11, 10)
+        val data = LocalTimeData(1, value)
+        db.runQuery { QueryDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
             QueryDsl.from(m).where { m.value eq value }.first()
         }
-        assertEquals(data, data3)
+        assertEquals(data, data2)
     }
 
     @Test
