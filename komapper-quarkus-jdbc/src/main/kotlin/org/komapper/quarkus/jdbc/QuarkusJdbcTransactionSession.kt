@@ -4,7 +4,7 @@ import org.komapper.jdbc.JdbcSession
 import org.komapper.tx.core.TransactionOperator
 import java.sql.Connection
 import javax.sql.DataSource
-import jakarta.transaction.TransactionManager
+import javax.transaction.TransactionManager
 
 class QuarkusJdbcTransactionSession(
     transactionManager: TransactionManager,
