@@ -177,6 +177,10 @@ class R2dbcDataTypeTest(val db: R2dbcDatabase) {
             QueryDsl.from(m).where { m.id eq 1 }.first()
         }
         assertEquals(data, data2)
+        val data3 = db.runQuery {
+            QueryDsl.from(m).where { m.value eq BigDecimal.TEN }.first()
+        }
+        assertEquals(data, data3)
     }
 
     @Test
@@ -199,6 +203,10 @@ class R2dbcDataTypeTest(val db: R2dbcDatabase) {
             QueryDsl.from(m).where { m.id eq 1 }.first()
         }
         assertEquals(data, data2)
+        val data3 = db.runQuery {
+            QueryDsl.from(m).where { m.value eq BigInteger.TEN }.first()
+        }
+        assertEquals(data, data3)
     }
 
     @Test
@@ -253,6 +261,10 @@ class R2dbcDataTypeTest(val db: R2dbcDatabase) {
             QueryDsl.from(m).where { m.id eq 1 }.first()
         }
         assertEquals(data, data2)
+        val data3 = db.runQuery {
+            QueryDsl.from(m).where { m.value eq true }.first()
+        }
+        assertEquals(data, data3)
     }
 
     @Test
@@ -275,6 +287,10 @@ class R2dbcDataTypeTest(val db: R2dbcDatabase) {
             QueryDsl.from(m).where { m.id eq 1 }.first()
         }
         assertEquals(data, data2)
+        val data3 = db.runQuery {
+            QueryDsl.from(m).where { m.value eq 10 }.first()
+        }
+        assertEquals(data, data3)
     }
 
     @Test
@@ -378,6 +394,10 @@ class R2dbcDataTypeTest(val db: R2dbcDatabase) {
             QueryDsl.from(m).where { m.id eq 1 }.first()
         }
         assertEquals(data, data2)
+        val data3 = db.runQuery {
+            QueryDsl.from(m).where { m.value eq 10.0 }.first()
+        }
+        assertEquals(data, data3)
     }
 
     @Test
@@ -400,6 +420,10 @@ class R2dbcDataTypeTest(val db: R2dbcDatabase) {
             QueryDsl.from(m).where { m.id eq 1 }.first()
         }
         assertEquals(data, data2)
+        val data3 = db.runQuery {
+            QueryDsl.from(m).where { m.value eq Direction.EAST }.first()
+        }
+        assertEquals(data, data3)
     }
 
     @Test
@@ -442,6 +466,10 @@ class R2dbcDataTypeTest(val db: R2dbcDatabase) {
             QueryDsl.from(m).where { m.id eq 1 }.first()
         }
         assertEquals(data, data2)
+        val data3 = db.runQuery {
+            QueryDsl.from(m).where { m.value eq Direction.EAST }.first()
+        }
+        assertEquals(data, data3)
     }
 
     @Test
@@ -484,6 +512,10 @@ class R2dbcDataTypeTest(val db: R2dbcDatabase) {
             QueryDsl.from(m).where { m.id eq 1 }.first()
         }
         assertEquals(data, data2)
+        val data3 = db.runQuery {
+            QueryDsl.from(m).where { m.value eq Color.BLUE }.first()
+        }
+        assertEquals(data, data3)
     }
 
     @Test
@@ -526,6 +558,10 @@ class R2dbcDataTypeTest(val db: R2dbcDatabase) {
             QueryDsl.from(m).where { m.id eq 1 }.first()
         }
         assertEquals(data, data2)
+        val data3 = db.runQuery {
+            QueryDsl.from(m).where { m.value eq DirectionInfo(Direction.EAST) }.first()
+        }
+        assertEquals(data, data3)
     }
 
     @Test
@@ -548,6 +584,10 @@ class R2dbcDataTypeTest(val db: R2dbcDatabase) {
             QueryDsl.from(m).where { m.id eq 1 }.first()
         }
         assertEquals(data, data2)
+        val data3 = db.runQuery {
+            QueryDsl.from(m).where { m.value eq ColorInfo(Color.BLUE) }.first()
+        }
+        assertEquals(data, data3)
     }
 
     @Test
@@ -570,6 +610,10 @@ class R2dbcDataTypeTest(val db: R2dbcDatabase) {
             QueryDsl.from(m).where { m.id eq 1 }.first()
         }
         assertEquals(data, data2)
+        val data3 = db.runQuery {
+            QueryDsl.from(m).where { m.value eq 10.0f }.first()
+        }
+        assertEquals(data, data3)
     }
 
     @Test
@@ -594,6 +638,10 @@ class R2dbcDataTypeTest(val db: R2dbcDatabase) {
             QueryDsl.from(m).where { m.id eq 1 }.first()
         }
         assertEquals(data, data2)
+        val data3 = db.runQuery {
+            QueryDsl.from(m).where { m.value eq value }.first()
+        }
+        assertEquals(data, data3)
     }
 
     @Test
@@ -617,6 +665,10 @@ class R2dbcDataTypeTest(val db: R2dbcDatabase) {
             QueryDsl.from(m).where { m.id eq 1 }.first()
         }
         assertEquals(data, data2)
+        val data3 = db.runQuery {
+            QueryDsl.from(m).where { m.value eq 10 }.first()
+        }
+        assertEquals(data, data3)
     }
 
     @Test
@@ -633,15 +685,17 @@ class R2dbcDataTypeTest(val db: R2dbcDatabase) {
     @Test
     fun localDateTime(info: TestInfo) = inTransaction(db, info) {
         val m = Meta.localDateTimeData
-        val data = LocalDateTimeData(
-            1,
-            LocalDateTime.of(2019, 6, 1, 12, 11, 10),
-        )
+        val value = LocalDateTime.of(2019, 6, 1, 12, 11, 10)
+        val data = LocalDateTimeData(1, value)
         db.runQuery { QueryDsl.insert(m).single(data) }
         val data2 = db.runQuery {
             QueryDsl.from(m).where { m.id eq 1 }.first()
         }
         assertEquals(data, data2)
+        val data3 = db.runQuery {
+            QueryDsl.from(m).where { m.value eq value }.first()
+        }
+        assertEquals(data, data3)
     }
 
     @Test
@@ -658,15 +712,17 @@ class R2dbcDataTypeTest(val db: R2dbcDatabase) {
     @Test
     fun localDate(info: TestInfo) = inTransaction(db, info) {
         val m = Meta.localDateData
-        val data = LocalDateData(
-            1,
-            LocalDate.of(2019, 6, 1),
-        )
+        val value = LocalDate.of(2019, 6, 1)
+        val data = LocalDateData(1, value)
         db.runQuery { QueryDsl.insert(m).single(data) }
         val data2 = db.runQuery {
             QueryDsl.from(m).where { m.id eq 1 }.first()
         }
         assertEquals(data, data2)
+        val data3 = db.runQuery {
+            QueryDsl.from(m).where { m.value eq value }.first()
+        }
+        assertEquals(data, data3)
     }
 
     @Test
@@ -685,12 +741,17 @@ class R2dbcDataTypeTest(val db: R2dbcDatabase) {
     @Test
     fun localTime(info: TestInfo) = inTransaction(db, info) {
         val m = Meta.localTimeData
-        val data = LocalTimeData(1, LocalTime.of(12, 11, 10))
+        val value = LocalTime.of(12, 11, 10)
+        val data = LocalTimeData(1, value)
         db.runQuery { QueryDsl.insert(m).single(data) }
         val data2 = db.runQuery {
             QueryDsl.from(m).where { m.id eq 1 }.first()
         }
         assertEquals(data, data2)
+        val data3 = db.runQuery {
+            QueryDsl.from(m).where { m.value eq value }.first()
+        }
+        assertEquals(data, data3)
     }
 
     @Test
@@ -713,6 +774,10 @@ class R2dbcDataTypeTest(val db: R2dbcDatabase) {
             QueryDsl.from(m).where { m.id eq 1 }.first()
         }
         assertEquals(data, data2)
+        val data3 = db.runQuery {
+            QueryDsl.from(m).where { m.value eq 10L }.first()
+        }
+        assertEquals(data, data3)
     }
 
     @Test
@@ -739,6 +804,10 @@ class R2dbcDataTypeTest(val db: R2dbcDatabase) {
             QueryDsl.from(m).where { m.id eq 1 }.first()
         }
         assertEquals(data, data2)
+        val data3 = db.runQuery {
+            QueryDsl.from(m).where { m.value eq value }.first()
+        }
+        assertEquals(data, data3)
     }
 
     @Run(onlyIf = [Dbms.POSTGRESQL])
@@ -778,6 +847,10 @@ class R2dbcDataTypeTest(val db: R2dbcDatabase) {
             QueryDsl.from(m).where { m.id eq 1 }.first()
         }
         assertEquals(data, data2)
+        val data3 = db.runQuery {
+            QueryDsl.from(m).where { m.value eq 10 }.first()
+        }
+        assertEquals(data, data3)
     }
 
     @Test
@@ -800,6 +873,10 @@ class R2dbcDataTypeTest(val db: R2dbcDatabase) {
             QueryDsl.from(m).where { m.id eq 1 }.first()
         }
         assertEquals(data, data2)
+        val data3 = db.runQuery {
+            QueryDsl.from(m).where { m.value eq "ABC" }.first()
+        }
+        assertEquals(data, data3)
     }
 
     @Test
@@ -822,6 +899,10 @@ class R2dbcDataTypeTest(val db: R2dbcDatabase) {
             QueryDsl.from(m).where { m.id eq 1 }.first()
         }
         assertEquals(data, data2)
+        val data3 = db.runQuery {
+            QueryDsl.from(m).where { m.value eq 10u }.first()
+        }
+        assertEquals(data, data3)
     }
 
     @Test
@@ -855,6 +936,10 @@ class R2dbcDataTypeTest(val db: R2dbcDatabase) {
             QueryDsl.from(m).where { m.id eq 1 }.first()
         }
         assertEquals(data, data2)
+        val data3 = db.runQuery {
+            QueryDsl.from(m).where { m.value eq 10u }.first()
+        }
+        assertEquals(data, data3)
     }
 
     @Test
@@ -888,6 +973,10 @@ class R2dbcDataTypeTest(val db: R2dbcDatabase) {
             QueryDsl.from(m).where { m.id eq 1 }.first()
         }
         assertEquals(data, data2)
+        val data3 = db.runQuery {
+            QueryDsl.from(m).where { m.value eq 10u }.first()
+        }
+        assertEquals(data, data3)
     }
 
     @Test
@@ -976,6 +1065,10 @@ class R2dbcDataTypeTest(val db: R2dbcDatabase) {
             QueryDsl.from(m).where { m.id eq 1 }.first()
         }
         assertEquals(data, data2)
+        val data3 = db.runQuery {
+            QueryDsl.from(m).where { m.value eq value }.first()
+        }
+        assertEquals(data, data3)
     }
 
     @Run(onlyIf = [Dbms.POSTGRESQL, Dbms.H2])
@@ -999,6 +1092,10 @@ class R2dbcDataTypeTest(val db: R2dbcDatabase) {
             QueryDsl.from(m).where { m.id eq 1 }.first()
         }
         assertEquals(data, data2)
+        val data3 = db.runQuery {
+            QueryDsl.from(m).where { m.value eq UserDefinedInt(123) }.first()
+        }
+        assertEquals(data, data3)
     }
 
     @Test
@@ -1021,6 +1118,10 @@ class R2dbcDataTypeTest(val db: R2dbcDatabase) {
             QueryDsl.from(m).where { m.id eq 1 }.first()
         }
         assertEquals(data, data2)
+        val data3 = db.runQuery {
+            QueryDsl.from(m).where { m.value eq UserDefinedString("ABC") }.first()
+        }
+        assertEquals(data, data3)
     }
 
     @Test
@@ -1043,6 +1144,10 @@ class R2dbcDataTypeTest(val db: R2dbcDatabase) {
             QueryDsl.from(m).where { m.id eq 1 }.first()
         }
         assertEquals(data, data2)
+        val data3 = db.runQuery {
+            QueryDsl.from(m).where { m.value eq WrappedString("ABC") }.first()
+        }
+        assertEquals(data, data3)
     }
 
     @Test
