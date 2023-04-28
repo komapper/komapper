@@ -2,7 +2,7 @@ package org.komapper.quarkus.jdbc;
 
 import io.quarkus.arc.DefaultBean;
 import io.quarkus.arc.Unremovable;
-import jakarta.inject.Singleton;
+import javax.inject.Singleton;
 import org.komapper.core.ClockProvider;
 import org.komapper.core.DefaultClockProvider;
 import org.komapper.core.ExecutionOptions;
