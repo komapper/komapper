@@ -11,14 +11,19 @@ class SqlServerStatementBuilderSupport(
     private val returningProvider: ReturningProvider,
 ) {
 
-    fun buildOutput(): Statement {
+    fun buildOutput(tablePrefix: TablePrefix = TablePrefix.INSERTED): Statement {
         val buf = StatementBuffer()
         with(buf) {
             val expressions = returningProvider.returning.expressions()
             if (expressions.isNotEmpty()) {
-                append(" output ")
+                append("output ")
+                val prefix = when (tablePrefix) {
+                    TablePrefix.DELETED -> "deleted"
+                    TablePrefix.INSERTED -> "inserted"
+                }
                 for (e in expressions) {
-                    append("inserted.")
+                    append(prefix)
+                    append(".")
                     column(e)
                     append(", ")
                 }
@@ -31,5 +36,9 @@ class SqlServerStatementBuilderSupport(
     private fun StatementBuffer.column(expression: ColumnExpression<*, *>) {
         val name = expression.getCanonicalColumnName(dialect::enquote)
         append(name)
+    }
+
+    enum class TablePrefix {
+        DELETED, INSERTED
     }
 }

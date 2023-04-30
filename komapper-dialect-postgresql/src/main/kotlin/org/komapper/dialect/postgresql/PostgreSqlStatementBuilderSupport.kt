@@ -15,7 +15,7 @@ class PostgreSqlStatementBuilderSupport(
         return with(StatementBuffer()) {
             val expressions = returningProvider.returning.expressions()
             if (expressions.isNotEmpty()) {
-                append(" returning ")
+                append("returning ")
                 for (e in expressions) {
                     column(e)
                     append(", ")

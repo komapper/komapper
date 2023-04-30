@@ -2,13 +2,17 @@ package org.komapper.dialect.mariadb
 
 import org.komapper.core.BuilderDialect
 import org.komapper.core.Dialect
+import org.komapper.core.dsl.builder.EntityDeleteStatementBuilder
 import org.komapper.core.dsl.builder.EntityInsertStatementBuilder
 import org.komapper.core.dsl.builder.EntityUpsertStatementBuilder
 import org.komapper.core.dsl.builder.OffsetLimitStatementBuilder
+import org.komapper.core.dsl.builder.RelationDeleteStatementBuilder
 import org.komapper.core.dsl.builder.RelationInsertValuesStatementBuilder
 import org.komapper.core.dsl.builder.SchemaStatementBuilder
+import org.komapper.core.dsl.context.EntityDeleteContext
 import org.komapper.core.dsl.context.EntityInsertContext
 import org.komapper.core.dsl.context.EntityUpsertContext
+import org.komapper.core.dsl.context.RelationDeleteContext
 import org.komapper.core.dsl.context.RelationInsertValuesContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 
@@ -40,6 +44,14 @@ interface MariaDbDialect : Dialect {
         return MariaDbSchemaStatementBuilder(dialect)
     }
 
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> getEntityDeleteStatementBuilder(
+        dialect: BuilderDialect,
+        context: EntityDeleteContext<ENTITY, ID, META>,
+        entity: ENTITY,
+    ): EntityDeleteStatementBuilder<ENTITY, ID, META> {
+        return MariaDbEntityDeleteStatementBuilder(dialect, context, entity)
+    }
+
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> getEntityInsertStatementBuilder(
         dialect: BuilderDialect,
         context: EntityInsertContext<ENTITY, ID, META>,
@@ -56,6 +68,13 @@ interface MariaDbDialect : Dialect {
         return MariaDbEntityUpsertStatementBuilder(dialect, context, entities)
     }
 
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> getRelationDeleteStatementBuilder(
+        dialect: BuilderDialect,
+        context: RelationDeleteContext<ENTITY, ID, META>,
+    ): RelationDeleteStatementBuilder<ENTITY, ID, META> {
+        return MariaDbRelationDeleteStatementBuilder(dialect, context)
+    }
+
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> getRelationInsertValuesStatementBuilder(
         dialect: BuilderDialect,
         context: RelationInsertValuesContext<ENTITY, ID, META>,
@@ -66,6 +85,8 @@ interface MariaDbDialect : Dialect {
     override fun supportsAliasForDeleteStatement() = false
 
     override fun supportsConflictTargetInUpsertStatement(): Boolean = false
+
+    override fun supportsDeleteReturning(): Boolean = true
 
     override fun supportsGeneratedKeysReturningWhenInsertingMultipleRows(): Boolean = false
 

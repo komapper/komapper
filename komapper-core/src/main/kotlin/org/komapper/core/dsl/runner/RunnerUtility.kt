@@ -69,6 +69,16 @@ internal fun checkBatchExecutionReturningGeneratedValues(config: DatabaseConfig,
     }
 }
 
+internal fun checkDeleteReturning(config: DatabaseConfig) {
+    val dialect = config.dialect
+    if (!config.dialect.supportsDeleteReturning()) {
+        throw UnsupportedOperationException(
+            "The dialect(driver=${dialect.driver}) does not support `returning` for delete statements. " +
+                "Do not use the `returning` function in your query.",
+        )
+    }
+}
+
 internal fun checkGeneratedKeysReturningWhenInsertingMultipleRows(
     config: DatabaseConfig,
     metamodel: EntityMetamodel<*, *, *>,

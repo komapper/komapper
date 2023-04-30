@@ -19,7 +19,7 @@ interface DeleteQueryBuilder<ENTITY : Any> {
      * @param entity the entity to be deleted
      * @return the query
      */
-    fun single(entity: ENTITY): EntityDeleteQuery
+    fun single(entity: ENTITY): EntityDeleteSingleQuery<ENTITY>
 
     /**
      * Builds a query to delete a list of entities in a batch.
@@ -45,14 +45,14 @@ interface DeleteQueryBuilder<ENTITY : Any> {
      * @param declaration the where declaration
      * @return the query
      */
-    fun where(declaration: WhereDeclaration): RelationDeleteQuery
+    fun where(declaration: WhereDeclaration): RelationDeleteQuery<ENTITY>
 
     /**
      * Builds a query to delete all rows.
      *
      * @return the query
      */
-    fun all(): RelationDeleteQuery
+    fun all(): RelationDeleteQuery<ENTITY>
 }
 
 internal data class DeleteQueryBuilderImpl<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
@@ -60,9 +60,9 @@ internal data class DeleteQueryBuilderImpl<ENTITY : Any, ID : Any, META : Entity
 ) :
     DeleteQueryBuilder<ENTITY> {
 
-    override fun single(entity: ENTITY): EntityDeleteQuery {
+    override fun single(entity: ENTITY): EntityDeleteSingleQuery<ENTITY> {
         context.target.checkIdValueNotNull(entity)
-        return EntityDeleteSingleQuery(context, entity)
+        return EntityDeleteSingleQueryImpl(context, entity)
     }
 
     override fun batch(entities: List<ENTITY>, batchSize: Int?): EntityDeleteQuery {
@@ -79,15 +79,15 @@ internal data class DeleteQueryBuilderImpl<ENTITY : Any, ID : Any, META : Entity
         return batch(entities.toList(), batchSize)
     }
 
-    override fun where(declaration: WhereDeclaration): RelationDeleteQuery {
+    override fun where(declaration: WhereDeclaration): RelationDeleteQuery<ENTITY> {
         return asRelationDeleteQuery().where(declaration)
     }
 
-    override fun all(): RelationDeleteQuery {
+    override fun all(): RelationDeleteQuery<ENTITY> {
         return asRelationDeleteQuery()
     }
 
-    private fun asRelationDeleteQuery(): RelationDeleteQuery {
+    private fun asRelationDeleteQuery(): RelationDeleteQuery<ENTITY> {
         return RelationDeleteQueryImpl(context.asRelationDeleteContext())
     }
 }

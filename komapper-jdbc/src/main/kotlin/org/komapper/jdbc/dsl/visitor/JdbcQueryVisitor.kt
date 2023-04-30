@@ -23,6 +23,7 @@ import org.komapper.core.dsl.query.Record
 import org.komapper.core.dsl.query.Row
 import org.komapper.core.dsl.visitor.QueryVisitor
 import org.komapper.jdbc.dsl.runner.JdbcEntityDeleteBatchRunner
+import org.komapper.jdbc.dsl.runner.JdbcEntityDeleteSingleReturningRunner
 import org.komapper.jdbc.dsl.runner.JdbcEntityDeleteSingleRunner
 import org.komapper.jdbc.dsl.runner.JdbcEntityInsertBatchRunner
 import org.komapper.jdbc.dsl.runner.JdbcEntityInsertMultipleReturningRunner
@@ -40,6 +41,7 @@ import org.komapper.jdbc.dsl.runner.JdbcEntityUpsertSingleIgnoreRunner
 import org.komapper.jdbc.dsl.runner.JdbcEntityUpsertSingleReturningRunner
 import org.komapper.jdbc.dsl.runner.JdbcEntityUpsertSingleRunner
 import org.komapper.jdbc.dsl.runner.JdbcEntityUpsertSingleUpdateRunner
+import org.komapper.jdbc.dsl.runner.JdbcRelationDeleteReturningRunner
 import org.komapper.jdbc.dsl.runner.JdbcRelationDeleteRunner
 import org.komapper.jdbc.dsl.runner.JdbcRelationInsertSelectRunner
 import org.komapper.jdbc.dsl.runner.JdbcRelationInsertValuesReturningRunner
@@ -124,6 +126,41 @@ object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
         entity: ENTITY,
     ): JdbcRunner<Unit> {
         return JdbcEntityDeleteSingleRunner(context, entity)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityDeleteSingleReturningQuery(
+        context: EntityDeleteContext<ENTITY, ID, META>,
+        entity: ENTITY,
+    ): JdbcRunner<ENTITY?> {
+        val transform = JdbcResultSetTransformers.singleEntity(context.target)
+        return JdbcEntityDeleteSingleReturningRunner(context, entity, transform)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, A : Any> entityDeleteSingleReturningSingleColumnQuery(
+        context: EntityDeleteContext<ENTITY, ID, META>,
+        entity: ENTITY,
+        expression: ColumnExpression<A, *>,
+    ): JdbcRunner<A?> {
+        val transform = JdbcResultSetTransformers.singleColumn(expression)
+        return JdbcEntityDeleteSingleReturningRunner(context, entity, transform)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, A : Any, B : Any> entityDeleteSingleReturningPairColumnsQuery(
+        context: EntityDeleteContext<ENTITY, ID, META>,
+        entity: ENTITY,
+        expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
+    ): JdbcRunner<Pair<A?, B?>?> {
+        val transform = JdbcResultSetTransformers.pairColumns(expressions)
+        return JdbcEntityDeleteSingleReturningRunner(context, entity, transform)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, A : Any, B : Any, C : Any> entityDeleteSingleReturningTripleColumnsQuery(
+        context: EntityDeleteContext<ENTITY, ID, META>,
+        entity: ENTITY,
+        expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
+    ): JdbcRunner<Triple<A?, B?, C?>?> {
+        val transform = JdbcResultSetTransformers.tripleColumns(expressions)
+        return JdbcEntityDeleteSingleReturningRunner(context, entity, transform)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityInsertMultipleQuery(
@@ -548,6 +585,35 @@ object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
         context: RelationDeleteContext<ENTITY, ID, META>,
     ): JdbcRunner<Long> {
         return JdbcRelationDeleteRunner(context)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> relationDeleteReturningQuery(context: RelationDeleteContext<ENTITY, ID, META>): JdbcRunner<List<ENTITY>> {
+        val transform = JdbcResultSetTransformers.singleEntity(context.target)
+        return JdbcRelationDeleteReturningRunner(context, transform)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, A : Any> relationDeleteReturningSingleColumnQuery(
+        context: RelationDeleteContext<ENTITY, ID, META>,
+        expression: ColumnExpression<A, *>,
+    ): JdbcRunner<List<A?>> {
+        val transform = JdbcResultSetTransformers.singleColumn(expression)
+        return JdbcRelationDeleteReturningRunner(context, transform)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, A : Any, B : Any> relationDeleteReturningPairColumnsQuery(
+        context: RelationDeleteContext<ENTITY, ID, META>,
+        expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
+    ): JdbcRunner<List<Pair<A?, B?>>> {
+        val transform = JdbcResultSetTransformers.pairColumns(expressions)
+        return JdbcRelationDeleteReturningRunner(context, transform)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, A : Any, B : Any, C : Any> relationDeleteReturningTripleColumnsQuery(
+        context: RelationDeleteContext<ENTITY, ID, META>,
+        expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
+    ): JdbcRunner<List<Triple<A?, B?, C?>>> {
+        val transform = JdbcResultSetTransformers.tripleColumns(expressions)
+        return JdbcRelationDeleteReturningRunner(context, transform)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> relationInsertValuesQuery(

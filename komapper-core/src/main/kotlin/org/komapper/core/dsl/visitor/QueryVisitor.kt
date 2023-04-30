@@ -58,6 +58,33 @@ interface QueryVisitor<VISIT_RESULT> {
     ): VISIT_RESULT
 
     fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
+    entityDeleteSingleReturningQuery(
+        context: EntityDeleteContext<ENTITY, ID, META>,
+        entity: ENTITY,
+    ): VISIT_RESULT
+
+    fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, A : Any>
+    entityDeleteSingleReturningSingleColumnQuery(
+        context: EntityDeleteContext<ENTITY, ID, META>,
+        entity: ENTITY,
+        expression: ColumnExpression<A, *>,
+    ): VISIT_RESULT
+
+    fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, A : Any, B : Any>
+    entityDeleteSingleReturningPairColumnsQuery(
+        context: EntityDeleteContext<ENTITY, ID, META>,
+        entity: ENTITY,
+        expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
+    ): VISIT_RESULT
+
+    fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, A : Any, B : Any, C : Any>
+    entityDeleteSingleReturningTripleColumnsQuery(
+        context: EntityDeleteContext<ENTITY, ID, META>,
+        entity: ENTITY,
+        expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
+    ): VISIT_RESULT
+
+    fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
     entityInsertMultipleQuery(
         context: EntityInsertContext<ENTITY, ID, META>,
         entities: List<ENTITY>,
@@ -380,6 +407,29 @@ interface QueryVisitor<VISIT_RESULT> {
     fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
     relationDeleteQuery(
         context: RelationDeleteContext<ENTITY, ID, META>,
+    ): VISIT_RESULT
+
+    fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
+    relationDeleteReturningQuery(
+        context: RelationDeleteContext<ENTITY, ID, META>,
+    ): VISIT_RESULT
+
+    fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, A : Any>
+    relationDeleteReturningSingleColumnQuery(
+        context: RelationDeleteContext<ENTITY, ID, META>,
+        expression: ColumnExpression<A, *>,
+    ): VISIT_RESULT
+
+    fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, A : Any, B : Any>
+    relationDeleteReturningPairColumnsQuery(
+        context: RelationDeleteContext<ENTITY, ID, META>,
+        expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
+    ): VISIT_RESULT
+
+    fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, A : Any, B : Any, C : Any>
+    relationDeleteReturningTripleColumnsQuery(
+        context: RelationDeleteContext<ENTITY, ID, META>,
+        expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
     ): VISIT_RESULT
 
     fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
