@@ -2,15 +2,19 @@ package org.komapper.dialect.oracle
 
 import org.komapper.core.BuilderDialect
 import org.komapper.core.Dialect
+import org.komapper.core.dsl.builder.EntityDeleteStatementBuilder
 import org.komapper.core.dsl.builder.EntityInsertStatementBuilder
 import org.komapper.core.dsl.builder.EntityUpdateStatementBuilder
 import org.komapper.core.dsl.builder.EntityUpsertStatementBuilder
+import org.komapper.core.dsl.builder.RelationDeleteStatementBuilder
 import org.komapper.core.dsl.builder.RelationInsertValuesStatementBuilder
 import org.komapper.core.dsl.builder.RelationUpdateStatementBuilder
 import org.komapper.core.dsl.builder.SchemaStatementBuilder
+import org.komapper.core.dsl.context.EntityDeleteContext
 import org.komapper.core.dsl.context.EntityInsertContext
 import org.komapper.core.dsl.context.EntityUpdateContext
 import org.komapper.core.dsl.context.EntityUpsertContext
+import org.komapper.core.dsl.context.RelationDeleteContext
 import org.komapper.core.dsl.context.RelationInsertValuesContext
 import org.komapper.core.dsl.context.RelationUpdateContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
@@ -44,6 +48,14 @@ interface OracleDialect : Dialect {
         return OracleSchemaStatementBuilder(dialect)
     }
 
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> getEntityDeleteStatementBuilder(
+        dialect: BuilderDialect,
+        context: EntityDeleteContext<ENTITY, ID, META>,
+        entity: ENTITY,
+    ): EntityDeleteStatementBuilder<ENTITY, ID, META> {
+        return OracleEntityDeleteStatementBuilder(dialect, context, entity)
+    }
+
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> getEntityInsertStatementBuilder(
         dialect: BuilderDialect,
         context: EntityInsertContext<ENTITY, ID, META>,
@@ -66,6 +78,13 @@ interface OracleDialect : Dialect {
         entities: List<ENTITY>,
     ): EntityUpsertStatementBuilder<ENTITY> {
         return OracleEntityUpsertStatementBuilder(dialect, context, entities)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> getRelationDeleteStatementBuilder(
+        dialect: BuilderDialect,
+        context: RelationDeleteContext<ENTITY, ID, META>,
+    ): RelationDeleteStatementBuilder<ENTITY, ID, META> {
+        return OracleRelationDeleteStatementBuilder(dialect, context)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> getRelationInsertValuesStatementBuilder(

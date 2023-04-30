@@ -2,16 +2,20 @@ package org.komapper.dialect.sqlserver
 
 import org.komapper.core.BuilderDialect
 import org.komapper.core.Dialect
+import org.komapper.core.dsl.builder.EntityDeleteStatementBuilder
 import org.komapper.core.dsl.builder.EntityInsertStatementBuilder
 import org.komapper.core.dsl.builder.EntityUpdateStatementBuilder
 import org.komapper.core.dsl.builder.EntityUpsertStatementBuilder
 import org.komapper.core.dsl.builder.OffsetLimitStatementBuilder
+import org.komapper.core.dsl.builder.RelationDeleteStatementBuilder
 import org.komapper.core.dsl.builder.RelationInsertValuesStatementBuilder
 import org.komapper.core.dsl.builder.RelationUpdateStatementBuilder
 import org.komapper.core.dsl.builder.SchemaStatementBuilder
+import org.komapper.core.dsl.context.EntityDeleteContext
 import org.komapper.core.dsl.context.EntityInsertContext
 import org.komapper.core.dsl.context.EntityUpdateContext
 import org.komapper.core.dsl.context.EntityUpsertContext
+import org.komapper.core.dsl.context.RelationDeleteContext
 import org.komapper.core.dsl.context.RelationInsertValuesContext
 import org.komapper.core.dsl.context.RelationUpdateContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
@@ -49,6 +53,14 @@ interface SqlServerDialect : Dialect {
         return SqlServerSchemaStatementBuilder(dialect)
     }
 
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> getEntityDeleteStatementBuilder(
+        dialect: BuilderDialect,
+        context: EntityDeleteContext<ENTITY, ID, META>,
+        entity: ENTITY,
+    ): EntityDeleteStatementBuilder<ENTITY, ID, META> {
+        return SqlServerEntityDeleteStatementBuilder(dialect, context, entity)
+    }
+
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> getEntityInsertStatementBuilder(
         dialect: BuilderDialect,
         context: EntityInsertContext<ENTITY, ID, META>,
@@ -73,6 +85,13 @@ interface SqlServerDialect : Dialect {
         return SqlServerEntityUpsertStatementBuilder(dialect, context, entities)
     }
 
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> getRelationDeleteStatementBuilder(
+        dialect: BuilderDialect,
+        context: RelationDeleteContext<ENTITY, ID, META>,
+    ): RelationDeleteStatementBuilder<ENTITY, ID, META> {
+        return SqlServerRelationDeleteStatementBuilder(dialect, context)
+    }
+
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> getRelationInsertValuesStatementBuilder(
         dialect: BuilderDialect,
         context: RelationInsertValuesContext<ENTITY, ID, META>,
@@ -92,6 +111,8 @@ interface SqlServerDialect : Dialect {
     override fun getRandomFunction(): String = "rand"
 
     override fun supportsConflictTargetInUpsertStatement(): Boolean = false
+
+    override fun supportsDeleteReturning(): Boolean = true
 
     override fun supportsLimitOffsetWithoutOrderByClause(): Boolean = false
 

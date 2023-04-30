@@ -2,15 +2,19 @@ package org.komapper.dialect.postgresql
 
 import org.komapper.core.BuilderDialect
 import org.komapper.core.Dialect
+import org.komapper.core.dsl.builder.EntityDeleteStatementBuilder
 import org.komapper.core.dsl.builder.EntityInsertStatementBuilder
 import org.komapper.core.dsl.builder.EntityUpdateStatementBuilder
 import org.komapper.core.dsl.builder.EntityUpsertStatementBuilder
+import org.komapper.core.dsl.builder.RelationDeleteStatementBuilder
 import org.komapper.core.dsl.builder.RelationInsertValuesStatementBuilder
 import org.komapper.core.dsl.builder.RelationUpdateStatementBuilder
 import org.komapper.core.dsl.builder.SchemaStatementBuilder
+import org.komapper.core.dsl.context.EntityDeleteContext
 import org.komapper.core.dsl.context.EntityInsertContext
 import org.komapper.core.dsl.context.EntityUpdateContext
 import org.komapper.core.dsl.context.EntityUpsertContext
+import org.komapper.core.dsl.context.RelationDeleteContext
 import org.komapper.core.dsl.context.RelationInsertValuesContext
 import org.komapper.core.dsl.context.RelationUpdateContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
@@ -33,6 +37,14 @@ interface PostgreSqlDialect : Dialect {
 
     override fun getSchemaStatementBuilder(dialect: BuilderDialect): SchemaStatementBuilder {
         return PostgreSqlSchemaStatementBuilder(dialect)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> getEntityDeleteStatementBuilder(
+        dialect: BuilderDialect,
+        context: EntityDeleteContext<ENTITY, ID, META>,
+        entity: ENTITY,
+    ): EntityDeleteStatementBuilder<ENTITY, ID, META> {
+        return PostgreSqlEntityDeleteStatementBuilder(dialect, context, entity)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> getEntityInsertStatementBuilder(
@@ -59,6 +71,13 @@ interface PostgreSqlDialect : Dialect {
         return PostgreSqlEntityUpsertStatementBuilder(dialect, context, entities)
     }
 
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> getRelationDeleteStatementBuilder(
+        dialect: BuilderDialect,
+        context: RelationDeleteContext<ENTITY, ID, META>,
+    ): RelationDeleteStatementBuilder<ENTITY, ID, META> {
+        return PostgreSqlRelationDeleteStatementBuilder(dialect, context)
+    }
+
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> getRelationInsertValuesStatementBuilder(
         dialect: BuilderDialect,
         context: RelationInsertValuesContext<ENTITY, ID, META>,
@@ -74,6 +93,8 @@ interface PostgreSqlDialect : Dialect {
     }
 
     override fun supportsConflictTargetInUpsertStatement(): Boolean = true
+
+    override fun supportsDeleteReturning(): Boolean = true
 
     override fun supportsLockOfTables(): Boolean = true
 

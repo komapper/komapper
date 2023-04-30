@@ -51,6 +51,8 @@ interface OracleJdbcDialect : OracleDialect, JdbcDialect {
 
     override fun supportsBatchExecutionReturningGeneratedValues(): Boolean = false
 
+    override fun supportsDeleteReturning(): Boolean = true
+
     override fun supportsInsertSingleReturning(): Boolean = true
 
     override fun supportsReturnGeneratedKeysFlag(): Boolean = false

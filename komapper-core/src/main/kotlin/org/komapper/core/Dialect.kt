@@ -1,19 +1,24 @@
 package org.komapper.core
 
+import org.komapper.core.dsl.builder.DefaultEntityDeleteStatementBuilder
 import org.komapper.core.dsl.builder.DefaultEntityInsertStatementBuilder
 import org.komapper.core.dsl.builder.DefaultEntityUpdateStatementBuilder
 import org.komapper.core.dsl.builder.DryRunSchemaStatementBuilder
+import org.komapper.core.dsl.builder.EntityDeleteStatementBuilder
 import org.komapper.core.dsl.builder.EntityInsertStatementBuilder
 import org.komapper.core.dsl.builder.EntityUpdateStatementBuilder
 import org.komapper.core.dsl.builder.EntityUpsertStatementBuilder
 import org.komapper.core.dsl.builder.OffsetLimitStatementBuilder
 import org.komapper.core.dsl.builder.OffsetLimitStatementBuilderImpl
+import org.komapper.core.dsl.builder.RelationDeleteStatementBuilder
 import org.komapper.core.dsl.builder.RelationInsertValuesStatementBuilder
 import org.komapper.core.dsl.builder.RelationUpdateStatementBuilder
 import org.komapper.core.dsl.builder.SchemaStatementBuilder
+import org.komapper.core.dsl.context.EntityDeleteContext
 import org.komapper.core.dsl.context.EntityInsertContext
 import org.komapper.core.dsl.context.EntityUpdateContext
 import org.komapper.core.dsl.context.EntityUpsertContext
+import org.komapper.core.dsl.context.RelationDeleteContext
 import org.komapper.core.dsl.context.RelationInsertValuesContext
 import org.komapper.core.dsl.context.RelationUpdateContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
@@ -150,6 +155,14 @@ interface Dialect {
      */
     fun getSchemaStatementBuilder(dialect: BuilderDialect): SchemaStatementBuilder
 
+    fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> getEntityDeleteStatementBuilder(
+        dialect: BuilderDialect,
+        context: EntityDeleteContext<ENTITY, ID, META>,
+        entity: ENTITY,
+    ): EntityDeleteStatementBuilder<ENTITY, ID, META> {
+        return DefaultEntityDeleteStatementBuilder(dialect, context, entity)
+    }
+
     fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> getEntityInsertStatementBuilder(
         dialect: BuilderDialect,
         context: EntityInsertContext<ENTITY, ID, META>,
@@ -182,6 +195,13 @@ interface Dialect {
         context: EntityUpsertContext<ENTITY, ID, META>,
         entities: List<ENTITY>,
     ): EntityUpsertStatementBuilder<ENTITY>
+
+    fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> getRelationDeleteStatementBuilder(
+        dialect: BuilderDialect,
+        context: RelationDeleteContext<ENTITY, ID, META>,
+    ): RelationDeleteStatementBuilder<ENTITY, ID, META> {
+        return RelationDeleteStatementBuilder(dialect, context)
+    }
 
     fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> getRelationInsertValuesStatementBuilder(
         dialect: BuilderDialect,
@@ -248,6 +268,8 @@ interface Dialect {
      * Returns whether the "CREATE TABLE/SEQUENCE IF NOT EXISTS" syntax is supported.
      */
     fun supportsCreateIfNotExists(): Boolean = true
+
+    fun supportsDeleteReturning(): Boolean = false
 
     /**
      * Returns whether the "DROP TABLE/SEQUENCE IF EXISTS" syntax is supported.

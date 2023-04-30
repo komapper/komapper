@@ -23,6 +23,7 @@ import org.komapper.core.dsl.query.Record
 import org.komapper.core.dsl.query.Row
 import org.komapper.core.dsl.visitor.QueryVisitor
 import org.komapper.r2dbc.dsl.runner.R2dbcEntityDeleteBatchRunner
+import org.komapper.r2dbc.dsl.runner.R2dbcEntityDeleteSingleReturningRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcEntityDeleteSingleRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcEntityInsertBatchRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcEntityInsertMultipleReturningRunner
@@ -40,6 +41,7 @@ import org.komapper.r2dbc.dsl.runner.R2dbcEntityUpsertSingleIgnoreRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcEntityUpsertSingleReturningRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcEntityUpsertSingleRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcEntityUpsertSingleUpdateRunner
+import org.komapper.r2dbc.dsl.runner.R2dbcRelationDeleteReturningRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcRelationDeleteRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcRelationInsertSelectRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcRelationInsertValuesReturningRunner
@@ -122,6 +124,41 @@ object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
         entity: ENTITY,
     ): R2dbcRunner<Unit> {
         return R2dbcEntityDeleteSingleRunner(context, entity)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityDeleteSingleReturningQuery(
+        context: EntityDeleteContext<ENTITY, ID, META>,
+        entity: ENTITY,
+    ): R2dbcRunner<ENTITY?> {
+        val transform = R2dbcRowTransformers.singleEntity(context.target)
+        return R2dbcEntityDeleteSingleReturningRunner(context, entity, transform)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, A : Any> entityDeleteSingleReturningSingleColumnQuery(
+        context: EntityDeleteContext<ENTITY, ID, META>,
+        entity: ENTITY,
+        expression: ColumnExpression<A, *>,
+    ): R2dbcRunner<A?> {
+        val transform = R2dbcRowTransformers.singleColumn(expression)
+        return R2dbcEntityDeleteSingleReturningRunner(context, entity, transform)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, A : Any, B : Any> entityDeleteSingleReturningPairColumnsQuery(
+        context: EntityDeleteContext<ENTITY, ID, META>,
+        entity: ENTITY,
+        expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
+    ): R2dbcRunner<Pair<A?, B?>?> {
+        val transform = R2dbcRowTransformers.pairColumns(expressions)
+        return R2dbcEntityDeleteSingleReturningRunner(context, entity, transform)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, A : Any, B : Any, C : Any> entityDeleteSingleReturningTripleColumnsQuery(
+        context: EntityDeleteContext<ENTITY, ID, META>,
+        entity: ENTITY,
+        expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
+    ): R2dbcRunner<Triple<A?, B?, C?>?> {
+        val transform = R2dbcRowTransformers.tripleColumns(expressions)
+        return R2dbcEntityDeleteSingleReturningRunner(context, entity, transform)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityInsertMultipleQuery(
@@ -544,6 +581,35 @@ object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
         context: RelationDeleteContext<ENTITY, ID, META>,
     ): R2dbcRunner<Long> {
         return R2dbcRelationDeleteRunner(context)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> relationDeleteReturningQuery(context: RelationDeleteContext<ENTITY, ID, META>): R2dbcRunner<List<ENTITY>> {
+        val transform = R2dbcRowTransformers.singleEntity(context.target)
+        return R2dbcRelationDeleteReturningRunner(context, transform)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, A : Any> relationDeleteReturningSingleColumnQuery(
+        context: RelationDeleteContext<ENTITY, ID, META>,
+        expression: ColumnExpression<A, *>,
+    ): R2dbcRunner<List<A?>> {
+        val transform = R2dbcRowTransformers.singleColumn(expression)
+        return R2dbcRelationDeleteReturningRunner(context, transform)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, A : Any, B : Any> relationDeleteReturningPairColumnsQuery(
+        context: RelationDeleteContext<ENTITY, ID, META>,
+        expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
+    ): R2dbcRunner<List<Pair<A?, B?>>> {
+        val transform = R2dbcRowTransformers.pairColumns(expressions)
+        return R2dbcRelationDeleteReturningRunner(context, transform)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, A : Any, B : Any, C : Any> relationDeleteReturningTripleColumnsQuery(
+        context: RelationDeleteContext<ENTITY, ID, META>,
+        expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
+    ): R2dbcRunner<List<Triple<A?, B?, C?>>> {
+        val transform = R2dbcRowTransformers.tripleColumns(expressions)
+        return R2dbcRelationDeleteReturningRunner(context, transform)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> relationInsertValuesQuery(

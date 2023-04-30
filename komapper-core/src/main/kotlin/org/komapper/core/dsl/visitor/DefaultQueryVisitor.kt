@@ -22,6 +22,7 @@ import org.komapper.core.dsl.query.Query
 import org.komapper.core.dsl.query.Record
 import org.komapper.core.dsl.query.Row
 import org.komapper.core.dsl.runner.EntityDeleteBatchRunner
+import org.komapper.core.dsl.runner.EntityDeleteSingleReturningRunner
 import org.komapper.core.dsl.runner.EntityDeleteSingleRunner
 import org.komapper.core.dsl.runner.EntityInsertBatchRunner
 import org.komapper.core.dsl.runner.EntityInsertMultipleReturningRunner
@@ -36,6 +37,7 @@ import org.komapper.core.dsl.runner.EntityUpsertMultipleReturningRunner
 import org.komapper.core.dsl.runner.EntityUpsertMultipleRunner
 import org.komapper.core.dsl.runner.EntityUpsertSingleReturningRunner
 import org.komapper.core.dsl.runner.EntityUpsertSingleRunner
+import org.komapper.core.dsl.runner.RelationDeleteReturningRunner
 import org.komapper.core.dsl.runner.RelationDeleteRunner
 import org.komapper.core.dsl.runner.RelationInsertSelectRunner
 import org.komapper.core.dsl.runner.RelationInsertValuesReturningRunner
@@ -108,6 +110,37 @@ internal object DefaultQueryVisitor : QueryVisitor<Runner> {
         entity: ENTITY,
     ): Runner {
         return EntityDeleteSingleRunner(context, entity)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityDeleteSingleReturningQuery(
+        context: EntityDeleteContext<ENTITY, ID, META>,
+        entity: ENTITY,
+    ): Runner {
+        return EntityDeleteSingleReturningRunner(context, entity)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, A : Any> entityDeleteSingleReturningSingleColumnQuery(
+        context: EntityDeleteContext<ENTITY, ID, META>,
+        entity: ENTITY,
+        expression: ColumnExpression<A, *>,
+    ): Runner {
+        return EntityDeleteSingleReturningRunner(context, entity)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, A : Any, B : Any> entityDeleteSingleReturningPairColumnsQuery(
+        context: EntityDeleteContext<ENTITY, ID, META>,
+        entity: ENTITY,
+        expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
+    ): Runner {
+        return EntityDeleteSingleReturningRunner(context, entity)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, A : Any, B : Any, C : Any> entityDeleteSingleReturningTripleColumnsQuery(
+        context: EntityDeleteContext<ENTITY, ID, META>,
+        entity: ENTITY,
+        expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
+    ): Runner {
+        return EntityDeleteSingleReturningRunner(context, entity)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> entityInsertMultipleQuery(
@@ -494,6 +527,31 @@ internal object DefaultQueryVisitor : QueryVisitor<Runner> {
         context: RelationDeleteContext<ENTITY, ID, META>,
     ): Runner {
         return RelationDeleteRunner(context)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> relationDeleteReturningQuery(context: RelationDeleteContext<ENTITY, ID, META>): Runner {
+        return RelationDeleteReturningRunner(context)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, A : Any> relationDeleteReturningSingleColumnQuery(
+        context: RelationDeleteContext<ENTITY, ID, META>,
+        expression: ColumnExpression<A, *>,
+    ): Runner {
+        return RelationDeleteReturningRunner(context)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, A : Any, B : Any> relationDeleteReturningPairColumnsQuery(
+        context: RelationDeleteContext<ENTITY, ID, META>,
+        expressions: Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>,
+    ): Runner {
+        return RelationDeleteReturningRunner(context)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>, A : Any, B : Any, C : Any> relationDeleteReturningTripleColumnsQuery(
+        context: RelationDeleteContext<ENTITY, ID, META>,
+        expressions: Triple<ColumnExpression<A, *>, ColumnExpression<B, *>, ColumnExpression<C, *>>,
+    ): Runner {
+        return RelationDeleteReturningRunner(context)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> relationInsertValuesQuery(
