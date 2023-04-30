@@ -16,7 +16,7 @@ class SqlServerStatementBuilderSupport(
         with(buf) {
             val expressions = returningProvider.returning.expressions()
             if (expressions.isNotEmpty()) {
-                append(" output ")
+                append("output ")
                 val prefix = when (tablePrefix) {
                     TablePrefix.DELETED -> "deleted"
                     TablePrefix.INSERTED -> "inserted"
