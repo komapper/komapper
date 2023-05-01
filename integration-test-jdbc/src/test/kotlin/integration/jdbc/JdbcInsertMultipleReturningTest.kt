@@ -26,7 +26,7 @@ class JdbcInsertMultipleReturningTest(private val db: JdbcDatabase) {
 
     @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
-    fun test() {
+    fun test_list() {
         val a = Meta.address
         val addressList = listOf(
             Address(16, "STREET 16", 0),
@@ -34,6 +34,27 @@ class JdbcInsertMultipleReturningTest(private val db: JdbcDatabase) {
             Address(18, "STREET 18", 0),
         )
         val addressList2 = db.runQuery { QueryDsl.insert(a).multiple(addressList).returning() }
+        assertEquals(addressList, addressList2)
+    }
+
+    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL, Dbms.SQLSERVER])
+    @Test
+    fun test_vararg() {
+        val a = Meta.address
+        val addressList = listOf(
+            Address(16, "STREET 16", 0),
+            Address(17, "STREET 17", 0),
+            Address(18, "STREET 18", 0),
+        )
+        val addressList2 = db.runQuery {
+            QueryDsl.insert(a)
+                .multiple(
+                    Address(16, "STREET 16", 0),
+                    Address(17, "STREET 17", 0),
+                    Address(18, "STREET 18", 0),
+                )
+                .returning()
+        }
         assertEquals(addressList, addressList2)
     }
 
@@ -72,7 +93,8 @@ class JdbcInsertMultipleReturningTest(private val db: JdbcDatabase) {
             Address(17, "STREET 17", 0),
             Address(18, "STREET 18", 0),
         )
-        val triples = db.runQuery { QueryDsl.insert(a).multiple(addressList).returning(a.street, a.version, a.addressId) }
+        val triples =
+            db.runQuery { QueryDsl.insert(a).multiple(addressList).returning(a.street, a.version, a.addressId) }
         assertEquals(addressList.map { Triple(it.street, it.version, it.addressId) }, triples)
     }
 
@@ -156,7 +178,8 @@ class JdbcInsertMultipleReturningTest(private val db: JdbcDatabase) {
             Department(5, 50, "PLANNING", "TOKYO", 1),
             Department(1, 60, "DEVELOPMENT", "KYOTO", 1),
         )
-        val query = QueryDsl.insert(d).onDuplicateKeyUpdate().multiple(departments).returning(d.departmentName, d.location)
+        val query =
+            QueryDsl.insert(d).onDuplicateKeyUpdate().multiple(departments).returning(d.departmentName, d.location)
         val pairList = db.runQuery { query }
         assertEquals(departments.map { it.departmentName to it.location }.toSet(), pairList.toSet())
         val list = db.runQuery {
@@ -177,9 +200,13 @@ class JdbcInsertMultipleReturningTest(private val db: JdbcDatabase) {
             Department(5, 50, "PLANNING", "TOKYO", 1),
             Department(1, 60, "DEVELOPMENT", "KYOTO", 1),
         )
-        val query = QueryDsl.insert(d).onDuplicateKeyUpdate().multiple(departments).returning(d.departmentName, d.location, d.departmentNo)
+        val query = QueryDsl.insert(d).onDuplicateKeyUpdate().multiple(departments)
+            .returning(d.departmentName, d.location, d.departmentNo)
         val tripleList = db.runQuery { query }
-        assertEquals(departments.map { Triple(it.departmentName, it.location, it.departmentNo) }.toSet(), tripleList.toSet())
+        assertEquals(
+            departments.map { Triple(it.departmentName, it.location, it.departmentNo) }.toSet(),
+            tripleList.toSet(),
+        )
         val list = db.runQuery {
             QueryDsl.from(d).where { d.departmentId inList listOf(1, 5) }.orderBy(d.departmentId)
         }
@@ -215,7 +242,8 @@ class JdbcInsertMultipleReturningTest(private val db: JdbcDatabase) {
         val d = Meta.department
         val department1 = Department(5, 50, "PLANNING", "TOKYO", 1)
         val department2 = Department(1, 60, "DEVELOPMENT", "KYOTO", 1)
-        val query = QueryDsl.insert(d).onDuplicateKeyIgnore().multiple(listOf(department1, department2)).returning(d.departmentName)
+        val query = QueryDsl.insert(d).onDuplicateKeyIgnore().multiple(listOf(department1, department2))
+            .returning(d.departmentName)
         val departmentNameList = db.runQuery { query }
         assertEquals(listOf(department1.departmentName), departmentNameList)
         val list = db.runQuery {
@@ -234,7 +262,8 @@ class JdbcInsertMultipleReturningTest(private val db: JdbcDatabase) {
         val d = Meta.department
         val department1 = Department(5, 50, "PLANNING", "TOKYO", 1)
         val department2 = Department(1, 60, "DEVELOPMENT", "KYOTO", 1)
-        val query = QueryDsl.insert(d).onDuplicateKeyIgnore().multiple(listOf(department1, department2)).returning(d.departmentName, d.location)
+        val query = QueryDsl.insert(d).onDuplicateKeyIgnore().multiple(listOf(department1, department2))
+            .returning(d.departmentName, d.location)
         val pairList = db.runQuery { query }
         assertEquals(listOf(department1.departmentName to department1.location), pairList)
         val list = db.runQuery {
@@ -253,9 +282,13 @@ class JdbcInsertMultipleReturningTest(private val db: JdbcDatabase) {
         val d = Meta.department
         val department1 = Department(5, 50, "PLANNING", "TOKYO", 1)
         val department2 = Department(1, 60, "DEVELOPMENT", "KYOTO", 1)
-        val query = QueryDsl.insert(d).onDuplicateKeyIgnore().multiple(listOf(department1, department2)).returning(d.departmentName, d.location, d.departmentNo)
+        val query = QueryDsl.insert(d).onDuplicateKeyIgnore().multiple(listOf(department1, department2))
+            .returning(d.departmentName, d.location, d.departmentNo)
         val tripleList = db.runQuery { query }
-        assertEquals(listOf(Triple(department1.departmentName, department1.location, department1.departmentNo)), tripleList)
+        assertEquals(
+            listOf(Triple(department1.departmentName, department1.location, department1.departmentNo)),
+            tripleList,
+        )
         val list = db.runQuery {
             QueryDsl.from(d).where { d.departmentId inList listOf(1, 5) }.orderBy(d.departmentId)
         }

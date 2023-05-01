@@ -73,7 +73,7 @@ interface InsertQueryBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTI
      * @param entities the entities to be inserted
      * @return the query
      */
-    fun multiple(vararg entities: ENTITY): EntityInsertQuery<List<ENTITY>>
+    fun multiple(vararg entities: ENTITY): EntityInsertMultipleQuery<ENTITY>
 
     /**
      * Builds a query to insert a list of entities in a batch.
