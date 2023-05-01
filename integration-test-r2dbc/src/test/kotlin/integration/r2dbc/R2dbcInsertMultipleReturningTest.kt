@@ -26,7 +26,7 @@ class R2dbcInsertMultipleReturningTest(private val db: R2dbcDatabase) {
 
     @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
-    fun test(info: TestInfo) = inTransaction(db, info) {
+    fun test_list(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val addressList = listOf(
             Address(16, "STREET 16", 0),
@@ -34,6 +34,27 @@ class R2dbcInsertMultipleReturningTest(private val db: R2dbcDatabase) {
             Address(18, "STREET 18", 0),
         )
         val addressList2 = db.runQuery { QueryDsl.insert(a).multiple(addressList).returning() }
+        assertEquals(addressList, addressList2)
+    }
+
+    @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL, Dbms.SQLSERVER])
+    @Test
+    fun test_vararg(info: TestInfo) = inTransaction(db, info) {
+        val a = Meta.address
+        val addressList = listOf(
+            Address(16, "STREET 16", 0),
+            Address(17, "STREET 17", 0),
+            Address(18, "STREET 18", 0),
+        )
+        val addressList2 = db.runQuery {
+            QueryDsl.insert(a)
+                .multiple(
+                    Address(16, "STREET 16", 0),
+                    Address(17, "STREET 17", 0),
+                    Address(18, "STREET 18", 0),
+                )
+                .returning()
+        }
         assertEquals(addressList, addressList2)
     }
 
