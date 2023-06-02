@@ -5,8 +5,6 @@ pluginManagement {
     val springBootVersion: String by settings
     repositories {
         mavenLocal()
-        maven { url = uri("https://repo.spring.io/release") }
-        maven { url = uri("https://repo.spring.io/milestone") }
         gradlePluginPortal()
         mavenCentral()
     }
