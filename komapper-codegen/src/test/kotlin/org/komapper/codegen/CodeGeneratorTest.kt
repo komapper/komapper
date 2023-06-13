@@ -55,7 +55,7 @@ class CodeGeneratorTest {
                 val `val`: String,
             )
             
-        """.trimIndent()
+        """.trimIndent().normalizeLineSeparator()
         assertEquals(expected, file.readText())
     }
 
@@ -99,7 +99,7 @@ class CodeGeneratorTest {
                 val `val`: String?,
             )
             
-        """.trimIndent()
+        """.trimIndent().normalizeLineSeparator()
         assertEquals(expected, file.readText())
     }
 
@@ -149,7 +149,7 @@ class CodeGeneratorTest {
                 @KomapperColumn("VAL") val `val`: Nothing,
             )
             
-        """.trimIndent()
+        """.trimIndent().normalizeLineSeparator()
         assertEquals(expected, file.readText())
     }
 
@@ -224,4 +224,7 @@ class CodeGeneratorTest {
             }
         )
     }
+
+    private fun String.normalizeLineSeparator(): String =
+        replace(Regex("\r?\n"), System.lineSeparator())
 }
