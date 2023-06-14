@@ -10,7 +10,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -116,10 +115,7 @@ public class CodeGenerator {
   }
 
   private String createTableAnnotation(
-      @NotNull Table table,
-      boolean useCatalog,
-      boolean useSchema
-  ) {
+      @NotNull Table table, boolean useCatalog, boolean useSchema) {
     var tableArgs = new StringBuilder();
     tableArgs.append('"').append(table.getName()).append('"');
     if (useCatalog && table.getCatalog() != null) {
@@ -134,10 +130,7 @@ public class CodeGenerator {
   }
 
   private String createPropertyDefinition(
-      @NotNull Column column,
-      @NotNull String propertyName,
-      @NotNull String propertyType
-  ) {
+      @NotNull Column column, @NotNull String propertyName, @NotNull String propertyType) {
     var id = column.isPrimaryKey() ? "@KomapperId " : "";
     var autoIncrement = column.isAutoIncrement() ? "@KomapperAutoIncrement " : "";
     return "    "
