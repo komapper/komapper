@@ -64,13 +64,21 @@ public class GenerateTask extends DefaultTask {
         generator.createNewFile(
             destinationDir, "entities.kt", settings.getOverwriteEntities().get())) {
       generator.generateEntities(
-          writer, settings.getDeclareAsNullable().get(), settings.getPropertyTypeResolver().get());
+          writer,
+          settings.getDeclareAsNullable().get(),
+          settings.getUseSelfMapping().get(),
+          settings.getUseCatalog().get(),
+          settings.getUseSchema().get(),
+          settings.getPropertyTypeResolver().get()
+      );
     }
-    try (var writer =
-        generator.createNewFile(
-            destinationDir, "entityDefinitions.kt", settings.getOverwriteDefinitions().get())) {
-      generator.generateDefinitions(
-          writer, settings.getUseCatalog().get(), settings.getUseSchema().get());
+    if (!settings.getUseSelfMapping().get()) {
+      try (var writer =
+          generator.createNewFile(
+              destinationDir, "entityDefinitions.kt", settings.getOverwriteDefinitions().get())) {
+        generator.generateDefinitions(
+            writer, settings.getUseCatalog().get(), settings.getUseSchema().get());
+      }
     }
   }
 }
