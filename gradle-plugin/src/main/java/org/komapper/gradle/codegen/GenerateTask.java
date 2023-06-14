@@ -69,8 +69,7 @@ public class GenerateTask extends DefaultTask {
           settings.getUseSelfMapping().get(),
           settings.getUseCatalog().get(),
           settings.getUseSchema().get(),
-          settings.getPropertyTypeResolver().get()
-      );
+          settings.getPropertyTypeResolver().get());
     }
     if (!settings.getUseSelfMapping().get()) {
       try (var writer =
