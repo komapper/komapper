@@ -45,22 +45,44 @@ public class CodeGenerator {
   }
 
   public void generateEntities(
-      @NotNull Writer writer, boolean declareAsNullable, @NotNull PropertyTypeResolver resolver) {
+      @NotNull Writer writer,
+      boolean declareAsNullable,
+      boolean useSelfMapping,
+      boolean useCatalog,
+      boolean useSchema,
+      @NotNull PropertyTypeResolver resolver) {
     Objects.requireNonNull(writer);
     Objects.requireNonNull(resolver);
     var p = new PrintWriter(writer);
     if (packageName != null) {
       p.println("package " + packageName);
     }
+    if (useSelfMapping) {
+      p.println();
+      p.println("import org.komapper.annotation.KomapperAutoIncrement");
+      p.println("import org.komapper.annotation.KomapperColumn");
+      p.println("import org.komapper.annotation.KomapperEntity");
+      p.println("import org.komapper.annotation.KomapperId");
+      p.println("import org.komapper.annotation.KomapperTable");
+    }
     for (Table table : tables) {
       p.println();
       var className = classNameResolver.resolve(table);
+      if (useSelfMapping) {
+        p.println("@KomapperEntity");
+        p.println(createTableAnnotation(table, useCatalog, useSchema));
+      }
       p.println("data class " + className + " (");
       for (Column column : table.getColumns()) {
         var propertyName = propertyNameResolver.resolve(column);
         var nullable = (declareAsNullable || column.isNullable()) ? "?" : "";
         var propertyClassName = resolver.resolve(table, column);
-        p.println("    val " + propertyName + ": " + propertyClassName + nullable + ",");
+        var propertyType = propertyClassName + nullable;
+        if (useSelfMapping) {
+          p.println(createPropertyDefinition(column, propertyName, propertyType));
+        } else {
+          p.println("    val " + propertyName + ": " + propertyType + ",");
+        }
       }
       p.println(")");
     }
@@ -82,36 +104,47 @@ public class CodeGenerator {
       p.println();
       var className = classNameResolver.resolve(table);
       p.println("@KomapperEntityDef(" + className + "::class)");
-      var tableArgs = new StringBuilder();
-      tableArgs.append('"').append(table.getName()).append('"');
-      if (useCatalog && table.getCatalog() != null) {
-        tableArgs.append(", ");
-        tableArgs.append('"').append(table.getCatalog()).append('"');
-      }
-      if (useSchema && table.getSchema() != null) {
-        tableArgs.append(", ");
-        tableArgs.append('"').append(table.getSchema()).append('"');
-      }
-      p.println("@KomapperTable(" + tableArgs + ")");
+      p.println(createTableAnnotation(table, useCatalog, useSchema));
       p.println("data class " + className + "Def (");
       for (Column column : table.getColumns()) {
         var propertyName = propertyNameResolver.resolve(column);
-        var id = column.isPrimaryKey() ? "@KomapperId " : "";
-        var autoIncrement = column.isAutoIncrement() ? "@KomapperAutoIncrement " : "";
-        p.println(
-            "    "
-                + id
-                + autoIncrement
-                + "@KomapperColumn("
-                + '"'
-                + column.getName()
-                + '"'
-                + ") val "
-                + propertyName
-                + ": Nothing,");
+        p.println(createPropertyDefinition(column, propertyName, "Nothing"));
       }
       p.println(")");
     }
+  }
+
+  private String createTableAnnotation(
+      @NotNull Table table, boolean useCatalog, boolean useSchema) {
+    var tableArgs = new StringBuilder();
+    tableArgs.append('"').append(table.getName()).append('"');
+    if (useCatalog && table.getCatalog() != null) {
+      tableArgs.append(", ");
+      tableArgs.append('"').append(table.getCatalog()).append('"');
+    }
+    if (useSchema && table.getSchema() != null) {
+      tableArgs.append(", ");
+      tableArgs.append('"').append(table.getSchema()).append('"');
+    }
+    return "@KomapperTable(" + tableArgs + ")";
+  }
+
+  private String createPropertyDefinition(
+      @NotNull Column column, @NotNull String propertyName, @NotNull String propertyType) {
+    var id = column.isPrimaryKey() ? "@KomapperId " : "";
+    var autoIncrement = column.isAutoIncrement() ? "@KomapperAutoIncrement " : "";
+    return "    "
+        + id
+        + autoIncrement
+        + "@KomapperColumn("
+        + '"'
+        + column.getName()
+        + '"'
+        + ") val "
+        + propertyName
+        + ": "
+        + propertyType
+        + ",";
   }
 
   private Path createFilePath(Path destinationDir, String name) {
