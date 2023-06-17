@@ -52,7 +52,6 @@ class CodeGeneratorTest {
             )
             
         """.trimIndent().normalizeLineSeparator()
-        println(file.readText())
         assertEquals(expected, file.readText())
     }
 
@@ -93,7 +92,6 @@ class CodeGeneratorTest {
             )
             
         """.trimIndent().normalizeLineSeparator()
-        println(file.readText())
         assertEquals(expected, file.readText())
     }
 
@@ -146,7 +144,6 @@ class CodeGeneratorTest {
             )
             
         """.trimIndent().normalizeLineSeparator()
-        println(file.readText())
         assertEquals(expected, file.readText())
     }
 
@@ -199,7 +196,6 @@ class CodeGeneratorTest {
             )
             
         """.trimIndent().normalizeLineSeparator()
-        println(file.readText())
         assertEquals(expected, file.readText())
     }
 
@@ -255,7 +251,6 @@ class CodeGeneratorTest {
             )
             
         """.trimIndent().normalizeLineSeparator()
-        println(file.readText())
         assertEquals(expected, file.readText())
     }
 
