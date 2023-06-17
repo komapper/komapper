@@ -36,6 +36,9 @@ public class Generator {
 
   private final Property<ClassNameResolver> classNameResolver;
   private final Property<PropertyNameResolver> propertyNameResolver;
+  private final Property<String> versionPropertyName;
+  private final Property<String> createdAtPropertyName;
+  private final Property<String> updatedAtPropertyName;
 
   @Inject
   public Generator(String name, Project project) {
@@ -69,6 +72,9 @@ public class Generator {
     classNameResolver.set(prefix.zip(suffix, ClassNameResolver::of));
     this.propertyNameResolver =
         objects.property(PropertyNameResolver.class).value(PropertyNameResolver.of());
+    this.versionPropertyName = objects.property(String.class).value("");
+    this.createdAtPropertyName = objects.property(String.class).value("");
+    this.updatedAtPropertyName = objects.property(String.class).value("");
   }
 
   public String getName() {
@@ -149,6 +155,18 @@ public class Generator {
 
   public Property<PropertyNameResolver> getPropertyNameResolver() {
     return propertyNameResolver;
+  }
+
+  public Property<String> getVersionPropertyName() {
+    return versionPropertyName;
+  }
+
+  public Property<String> getCreatedAtPropertyName() {
+    return createdAtPropertyName;
+  }
+
+  public Property<String> getUpdatedAtPropertyName() {
+    return updatedAtPropertyName;
   }
 
   public void jdbc(Action<Jdbc> action) {

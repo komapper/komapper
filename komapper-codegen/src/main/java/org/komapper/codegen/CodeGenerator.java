@@ -50,7 +50,10 @@ public class CodeGenerator {
       boolean useSelfMapping,
       boolean useCatalog,
       boolean useSchema,
-      @NotNull PropertyTypeResolver resolver) {
+      @NotNull PropertyTypeResolver resolver,
+      @NotNull String versionPropertyName,
+      @NotNull String createdAtPropertyName,
+      @NotNull String updatedAtPropertyName) {
     Objects.requireNonNull(writer);
     Objects.requireNonNull(resolver);
     var p = new PrintWriter(writer);
@@ -59,11 +62,8 @@ public class CodeGenerator {
     }
     if (useSelfMapping) {
       p.println();
-      p.println("import org.komapper.annotation.KomapperAutoIncrement");
-      p.println("import org.komapper.annotation.KomapperColumn");
-      p.println("import org.komapper.annotation.KomapperEntity");
-      p.println("import org.komapper.annotation.KomapperId");
-      p.println("import org.komapper.annotation.KomapperTable");
+      p.print(
+          createImports(true, versionPropertyName, createdAtPropertyName, updatedAtPropertyName));
     }
     for (Table table : tables) {
       p.println();
@@ -79,7 +79,14 @@ public class CodeGenerator {
         var propertyClassName = resolver.resolve(table, column);
         var propertyType = propertyClassName + nullable;
         if (useSelfMapping) {
-          p.println(createPropertyDefinition(column, propertyName, propertyType));
+          p.println(
+              createPropertyDefinition(
+                  column,
+                  propertyName,
+                  propertyType,
+                  versionPropertyName,
+                  createdAtPropertyName,
+                  updatedAtPropertyName));
         } else {
           p.println("    val " + propertyName + ": " + propertyType + ",");
         }
@@ -88,18 +95,21 @@ public class CodeGenerator {
     }
   }
 
-  public void generateDefinitions(@NotNull Writer writer, boolean useCatalog, boolean useSchema) {
+  public void generateDefinitions(
+      @NotNull Writer writer,
+      boolean useCatalog,
+      boolean useSchema,
+      @NotNull String versionPropertyName,
+      @NotNull String createdAtPropertyName,
+      @NotNull String updatedAtPropertyName) {
     Objects.requireNonNull(writer);
     var p = new PrintWriter(writer);
     if (packageName != null) {
       p.println("package " + packageName);
       p.println();
     }
-    p.println("import org.komapper.annotation.KomapperAutoIncrement");
-    p.println("import org.komapper.annotation.KomapperColumn");
-    p.println("import org.komapper.annotation.KomapperEntityDef");
-    p.println("import org.komapper.annotation.KomapperId");
-    p.println("import org.komapper.annotation.KomapperTable");
+    p.print(
+        createImports(false, versionPropertyName, createdAtPropertyName, updatedAtPropertyName));
     for (Table table : tables) {
       p.println();
       var className = classNameResolver.resolve(table);
@@ -108,10 +118,45 @@ public class CodeGenerator {
       p.println("data class " + className + "Def (");
       for (Column column : table.getColumns()) {
         var propertyName = propertyNameResolver.resolve(column);
-        p.println(createPropertyDefinition(column, propertyName, "Nothing"));
+        p.println(
+            createPropertyDefinition(
+                column,
+                propertyName,
+                "Nothing",
+                versionPropertyName,
+                createdAtPropertyName,
+                updatedAtPropertyName));
       }
       p.println(")");
     }
+  }
+
+  private String createImports(
+      boolean isEntity,
+      @NotNull String versionPropertyName,
+      @NotNull String createdAtPropertyName,
+      @NotNull String updatedAtPropertyName) {
+    var sb = new StringBuilder();
+    sb.append("import org.komapper.annotation.KomapperAutoIncrement")
+        .append(System.lineSeparator());
+    sb.append("import org.komapper.annotation.KomapperColumn").append(System.lineSeparator());
+    if (!createdAtPropertyName.isBlank()) {
+      sb.append("import org.komapper.annotation.KomapperCreatedAt").append(System.lineSeparator());
+    }
+    if (isEntity) {
+      sb.append("import org.komapper.annotation.KomapperEntity").append(System.lineSeparator());
+    } else {
+      sb.append("import org.komapper.annotation.KomapperEntityDef").append(System.lineSeparator());
+    }
+    sb.append("import org.komapper.annotation.KomapperId").append(System.lineSeparator());
+    sb.append("import org.komapper.annotation.KomapperTable").append(System.lineSeparator());
+    if (!updatedAtPropertyName.isBlank()) {
+      sb.append("import org.komapper.annotation.KomapperUpdatedAt").append(System.lineSeparator());
+    }
+    if (!versionPropertyName.isBlank()) {
+      sb.append("import org.komapper.annotation.KomapperVersion").append(System.lineSeparator());
+    }
+    return sb.toString();
   }
 
   private String createTableAnnotation(
@@ -130,12 +175,23 @@ public class CodeGenerator {
   }
 
   private String createPropertyDefinition(
-      @NotNull Column column, @NotNull String propertyName, @NotNull String propertyType) {
+      @NotNull Column column,
+      @NotNull String propertyName,
+      @NotNull String propertyType,
+      @NotNull String versionPropertyName,
+      @NotNull String createdAtPropertyName,
+      @NotNull String updatedAtPropertyName) {
     var id = column.isPrimaryKey() ? "@KomapperId " : "";
     var autoIncrement = column.isAutoIncrement() ? "@KomapperAutoIncrement " : "";
+    var version = propertyName.equals(versionPropertyName) ? "@KomapperVersion " : "";
+    var createdAt = propertyName.equals(createdAtPropertyName) ? "@KomapperCreatedAt " : "";
+    var updatedAt = propertyName.equals(updatedAtPropertyName) ? "@KomapperUpdatedAt " : "";
     return "    "
         + id
         + autoIncrement
+        + version
+        + createdAt
+        + updatedAt
         + "@KomapperColumn("
         + '"'
         + column.getName()

@@ -69,14 +69,22 @@ public class GenerateTask extends DefaultTask {
           settings.getUseSelfMapping().get(),
           settings.getUseCatalog().get(),
           settings.getUseSchema().get(),
-          settings.getPropertyTypeResolver().get());
+          settings.getPropertyTypeResolver().get(),
+          settings.getVersionPropertyName().get(),
+          settings.getCreatedAtPropertyName().get(),
+          settings.getUpdatedAtPropertyName().get());
     }
     if (!settings.getUseSelfMapping().get()) {
       try (var writer =
           generator.createNewFile(
               destinationDir, "entityDefinitions.kt", settings.getOverwriteDefinitions().get())) {
         generator.generateDefinitions(
-            writer, settings.getUseCatalog().get(), settings.getUseSchema().get());
+            writer,
+            settings.getUseCatalog().get(),
+            settings.getUseSchema().get(),
+            settings.getVersionPropertyName().get(),
+            settings.getCreatedAtPropertyName().get(),
+            settings.getUpdatedAtPropertyName().get());
       }
     }
   }

@@ -24,13 +24,7 @@ class CodeGeneratorTest {
             PropertyNameResolver.of()
         )
         generator.createNewFile(destinationDir, "entities.kt", false).use { writer ->
-            generator.generateEntities(writer, false, false, false, false) { _, column ->
-                when (column.typeName.lowercase()) {
-                    "integer" -> Int::class.simpleName.toString()
-                    "uuid" -> UUID::class.qualifiedName.toString()
-                    else -> String::class.simpleName.toString()
-                }
-            }
+            generator.generateEntities(writer, false, false, false, false, DummyPropertyTypeResolver(), "", "", "")
         }
 
         val file = destinationDir.resolve(Paths.get("entity", "entities.kt"))
@@ -41,6 +35,8 @@ class CodeGeneratorTest {
                 val addressId: Int,
                 val street: String?,
                 val version: Int,
+                val createdAt: java.time.LocalDateTime,
+                val updatedAt: java.time.LocalDateTime,
             )
             
             data class Employee (
@@ -69,13 +65,7 @@ class CodeGeneratorTest {
             PropertyNameResolver.of()
         )
         generator.createNewFile(destinationDir, "entities.kt", false).use { writer ->
-            generator.generateEntities(writer, true, false, false, false) { _, column ->
-                when (column.typeName.lowercase()) {
-                    "integer" -> Int::class.simpleName.toString()
-                    "uuid" -> UUID::class.qualifiedName.toString()
-                    else -> String::class.simpleName.toString()
-                }
-            }
+            generator.generateEntities(writer, true, false, false, false, DummyPropertyTypeResolver(), "", "", "")
         }
         val file = destinationDir.resolve(Paths.get("entity", "entities.kt"))
         val expected = """
@@ -85,6 +75,8 @@ class CodeGeneratorTest {
                 val addressId: Int?,
                 val street: String?,
                 val version: Int?,
+                val createdAt: java.time.LocalDateTime?,
+                val updatedAt: java.time.LocalDateTime?,
             )
             
             data class Employee (
@@ -113,13 +105,7 @@ class CodeGeneratorTest {
             PropertyNameResolver.of()
         )
         generator.createNewFile(destinationDir, "entities.kt", false).use { writer ->
-            generator.generateEntities(writer, false, true, false, false) { _, column ->
-                when (column.typeName.lowercase()) {
-                    "integer" -> Int::class.simpleName.toString()
-                    "uuid" -> UUID::class.qualifiedName.toString()
-                    else -> String::class.simpleName.toString()
-                }
-            }
+            generator.generateEntities(writer, false, true, false, false, DummyPropertyTypeResolver(), "", "", "")
         }
         val file = destinationDir.resolve(Paths.get("entity", "entities.kt"))
         val expected = """
@@ -137,6 +123,8 @@ class CodeGeneratorTest {
                 @KomapperId @KomapperAutoIncrement @KomapperColumn("ADDRESS_ID") val addressId: Int,
                 @KomapperColumn("STREET") val street: String?,
                 @KomapperColumn("VERSION") val version: Int,
+                @KomapperColumn("CREATED_AT") val createdAt: java.time.LocalDateTime,
+                @KomapperColumn("UPDATED_AT") val updatedAt: java.time.LocalDateTime,
             )
             
             @KomapperEntity
@@ -169,7 +157,7 @@ class CodeGeneratorTest {
             PropertyNameResolver.of()
         )
         generator.createNewFile(destinationDir, "entityDefinitions.kt", false).use { writer ->
-            generator.generateDefinitions(writer, false, false)
+            generator.generateDefinitions(writer, false, false, "", "", "")
         }
         val file = destinationDir.resolve(Paths.get("entity", "entityDefinitions.kt"))
         val expected = """
@@ -187,6 +175,8 @@ class CodeGeneratorTest {
                 @KomapperId @KomapperAutoIncrement @KomapperColumn("ADDRESS_ID") val addressId: Nothing,
                 @KomapperColumn("STREET") val street: Nothing,
                 @KomapperColumn("VERSION") val version: Nothing,
+                @KomapperColumn("CREATED_AT") val createdAt: Nothing,
+                @KomapperColumn("UPDATED_AT") val updatedAt: Nothing,
             )
             
             @KomapperEntityDef(Employee::class)
@@ -195,6 +185,61 @@ class CodeGeneratorTest {
                 @KomapperId @KomapperColumn("EMPLOYEE_ID") val employeeId: Nothing,
                 @KomapperColumn("NAME") val name: Nothing,
                 @KomapperColumn("VERSION") val version: Nothing,
+            )
+            
+            @KomapperEntityDef(Class::class)
+            @KomapperTable("CLASS")
+            data class ClassDef (
+                @KomapperId @KomapperAutoIncrement @KomapperColumn("CLASS_ID") val classId: Nothing,
+                @KomapperColumn("SUPER") val `super`: Nothing,
+                @KomapperColumn("VAL") val `val`: Nothing,
+            )
+            
+        """.trimIndent().normalizeLineSeparator()
+        assertEquals(expected, file.readText())
+    }
+
+    @Test
+    fun generateEntityDefinition_moreAnnotations() {
+        val destinationDir = tempDir!!.resolve(Paths.get("src", "kotlin", "main"))
+        val generator = CodeGenerator(
+            "entity",
+            createTables(),
+            ClassNameResolver.of("", ""),
+            PropertyNameResolver.of()
+        )
+        generator.createNewFile(destinationDir, "entityDefinitions.kt", false).use { writer ->
+            generator.generateDefinitions(writer, false, false, "version", "createdAt", "updatedAt")
+        }
+        val file = destinationDir.resolve(Paths.get("entity", "entityDefinitions.kt"))
+        val expected = """
+            package entity
+            
+            import org.komapper.annotation.KomapperAutoIncrement
+            import org.komapper.annotation.KomapperColumn
+            import org.komapper.annotation.KomapperCreatedAt
+            import org.komapper.annotation.KomapperEntityDef
+            import org.komapper.annotation.KomapperId
+            import org.komapper.annotation.KomapperTable
+            import org.komapper.annotation.KomapperUpdatedAt
+            import org.komapper.annotation.KomapperVersion
+            
+            @KomapperEntityDef(Address::class)
+            @KomapperTable("ADDRESS")
+            data class AddressDef (
+                @KomapperId @KomapperAutoIncrement @KomapperColumn("ADDRESS_ID") val addressId: Nothing,
+                @KomapperColumn("STREET") val street: Nothing,
+                @KomapperVersion @KomapperColumn("VERSION") val version: Nothing,
+                @KomapperCreatedAt @KomapperColumn("CREATED_AT") val createdAt: Nothing,
+                @KomapperUpdatedAt @KomapperColumn("UPDATED_AT") val updatedAt: Nothing,
+            )
+            
+            @KomapperEntityDef(Employee::class)
+            @KomapperTable("EMPLOYEE")
+            data class EmployeeDef (
+                @KomapperId @KomapperColumn("EMPLOYEE_ID") val employeeId: Nothing,
+                @KomapperColumn("NAME") val name: Nothing,
+                @KomapperVersion @KomapperColumn("VERSION") val version: Nothing,
             )
             
             @KomapperEntityDef(Class::class)
@@ -232,6 +277,16 @@ class CodeGeneratorTest {
                         name = "VERSION"
                         dataType = Types.INTEGER
                         typeName = "integer"
+                    },
+                    MutableColumn().apply {
+                        name = "CREATED_AT"
+                        dataType = Types.TIMESTAMP
+                        typeName = "timestamp"
+                    },
+                    MutableColumn().apply {
+                        name = "UPDATED_AT"
+                        dataType = Types.TIMESTAMP
+                        typeName = "timestamp"
                     }
                 )
             },
@@ -283,4 +338,15 @@ class CodeGeneratorTest {
 
     private fun String.normalizeLineSeparator(): String =
         replace(Regex("\r?\n"), System.lineSeparator())
+
+    private class DummyPropertyTypeResolver : PropertyTypeResolver {
+        override fun resolve(table: Table, column: Column): String {
+            return when (column.typeName.lowercase()) {
+                "integer" -> Int::class.simpleName.toString()
+                "uuid" -> UUID::class.qualifiedName.toString()
+                "timestamp" -> java.time.LocalDateTime::class.qualifiedName.toString()
+                else -> String::class.simpleName.toString()
+            }
+        }
+    }
 }
