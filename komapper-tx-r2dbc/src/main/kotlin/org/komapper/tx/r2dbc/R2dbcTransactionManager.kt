@@ -51,58 +51,59 @@ internal class R2dbcTransactionManagerImpl(
     loggerFacade: LoggerFacade,
 ) : R2dbcTransactionManager {
 
+    private val key = object : CoroutineContext.Key<TxHolder> {}
+
     private val management: R2dbcTransactionManagement = R2dbcTransactionManagement(connectionFactory, loggerFacade)
 
     override suspend fun getConnection(): Connection {
-        val tx = coroutineContext[TxHolder]?.tx
+        val tx = coroutineContext[key]?.tx
         return management.getConnection(tx)
     }
 
     override suspend fun isActive(): Boolean {
-        val tx = coroutineContext[TxHolder]?.tx
+        val tx = coroutineContext[key]?.tx
         return management.isActive(tx)
     }
 
     override suspend fun isRollbackOnly(): Boolean {
-        val tx = coroutineContext[TxHolder]?.tx
+        val tx = coroutineContext[key]?.tx
         return management.isRollbackOnly(tx)
     }
 
     override suspend fun setRollbackOnly() {
-        val tx = coroutineContext[TxHolder]?.tx
+        val tx = coroutineContext[key]?.tx
         management.setRollbackOnly(tx)
     }
 
     override suspend fun begin(transactionProperty: TransactionProperty): CoroutineContext {
-        val currentTx = coroutineContext[TxHolder]?.tx
+        val currentTx = coroutineContext[key]?.tx
         val tx = management.begin(currentTx, transactionProperty)
-        return TxHolder(tx)
+        return TxHolder(key, tx)
     }
 
     override suspend fun commit() {
-        val tx = coroutineContext[TxHolder]?.tx
+        val tx = coroutineContext[key]?.tx
         management.commit(tx)
     }
 
     override suspend fun suspend(): CoroutineContext {
-        val tx = coroutineContext[TxHolder]?.tx
+        val tx = coroutineContext[key]?.tx
         management.suspend(tx)
-        return TxHolder(null)
+        return TxHolder(key, null)
     }
 
     override suspend fun resume() {
-        val tx = coroutineContext[TxHolder]?.tx
+        val tx = coroutineContext[key]?.tx
         management.resume(tx)
     }
 
     override suspend fun rollback() {
-        val tx = coroutineContext[TxHolder]?.tx
+        val tx = coroutineContext[key]?.tx
         management.rollback(tx)
     }
 }
 
-private data class TxHolder(val tx: R2dbcTransaction?) : CoroutineContext.Element {
-    companion object Key : CoroutineContext.Key<TxHolder>
-
-    override val key: CoroutineContext.Key<TxHolder> = Key
-}
+private data class TxHolder(
+    override val key: CoroutineContext.Key<*>,
+    val tx: R2dbcTransaction?,
+) : CoroutineContext.Element
