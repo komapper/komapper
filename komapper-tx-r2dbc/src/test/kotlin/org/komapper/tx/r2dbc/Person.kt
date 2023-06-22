@@ -5,10 +5,10 @@ import org.komapper.annotation.KomapperId
 import org.komapper.annotation.KomapperVersion
 
 @KomapperEntity
-data class Address(
+data class Person(
     @KomapperId
-    val addressId: Int,
-    val street: String,
+    val personId: Int,
+    val name: String,
     @KomapperVersion
     val version: Int = 0,
 )
