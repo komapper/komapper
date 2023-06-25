@@ -69,7 +69,8 @@ public class CodeGenerator {
       p.println();
       var className = classNameResolver.resolve(table);
       if (useSelfMapping) {
-        p.println("@KomapperEntity");
+        p.println(
+            "@KomapperEntity([\"" + StringUtil.snakeToLowerCamelCase(table.getName()) + "\"])");
         p.println(createTableAnnotation(table, useCatalog, useSchema));
       }
       p.println("data class " + className + " (");
@@ -113,7 +114,12 @@ public class CodeGenerator {
     for (Table table : tables) {
       p.println();
       var className = classNameResolver.resolve(table);
-      p.println("@KomapperEntityDef(" + className + "::class)");
+      p.println(
+          "@KomapperEntityDef("
+              + className
+              + "::class, [\""
+              + StringUtil.snakeToLowerCamelCase(table.getName())
+              + "\"])");
       p.println(createTableAnnotation(table, useCatalog, useSchema));
       p.println("data class " + className + "Def (");
       for (Column column : table.getColumns()) {

@@ -20,7 +20,7 @@ class CodeGeneratorTest {
         val generator = CodeGenerator(
             "entity",
             createTables(),
-            ClassNameResolver.of("", ""),
+            ClassNameResolver.of("", "", false),
             PropertyNameResolver.of()
         )
         generator.createNewFile(destinationDir, "entities.kt", false).use { writer ->
@@ -61,7 +61,7 @@ class CodeGeneratorTest {
         val generator = CodeGenerator(
             "entity",
             createTables(),
-            ClassNameResolver.of("", ""),
+            ClassNameResolver.of("", "", false),
             PropertyNameResolver.of()
         )
         generator.createNewFile(destinationDir, "entities.kt", false).use { writer ->
@@ -101,7 +101,7 @@ class CodeGeneratorTest {
         val generator = CodeGenerator(
             "entity",
             createTables(),
-            ClassNameResolver.of("", ""),
+            ClassNameResolver.of("", "", false),
             PropertyNameResolver.of()
         )
         generator.createNewFile(destinationDir, "entities.kt", false).use { writer ->
@@ -117,7 +117,7 @@ class CodeGeneratorTest {
             import org.komapper.annotation.KomapperId
             import org.komapper.annotation.KomapperTable
             
-            @KomapperEntity
+            @KomapperEntity(["address"])
             @KomapperTable("ADDRESS")
             data class Address (
                 @KomapperId @KomapperAutoIncrement @KomapperColumn("ADDRESS_ID") val addressId: Int,
@@ -127,7 +127,7 @@ class CodeGeneratorTest {
                 @KomapperColumn("UPDATED_AT") val updatedAt: java.time.LocalDateTime,
             )
             
-            @KomapperEntity
+            @KomapperEntity(["employee"])
             @KomapperTable("EMPLOYEE")
             data class Employee (
                 @KomapperId @KomapperColumn("EMPLOYEE_ID") val employeeId: java.util.UUID,
@@ -135,7 +135,7 @@ class CodeGeneratorTest {
                 @KomapperColumn("VERSION") val version: Int,
             )
             
-            @KomapperEntity
+            @KomapperEntity(["class"])
             @KomapperTable("CLASS")
             data class Class (
                 @KomapperId @KomapperAutoIncrement @KomapperColumn("CLASS_ID") val classId: Int,
@@ -148,12 +148,53 @@ class CodeGeneratorTest {
     }
 
     @Test
+    fun generateEntities_singularize() {
+        val destinationDir = tempDir!!.resolve(Paths.get("src", "kotlin", "main"))
+        val generator = CodeGenerator(
+            "entity",
+            createTablesWithPluralNames(),
+            ClassNameResolver.of("", "", true),
+            PropertyNameResolver.of()
+        )
+        generator.createNewFile(destinationDir, "entities.kt", false).use { writer ->
+            generator.generateEntities(writer, false, false, false, false, DummyPropertyTypeResolver(), "", "", "")
+        }
+
+        val file = destinationDir.resolve(Paths.get("entity", "entities.kt"))
+        val expected = """
+            package entity
+            
+            data class Address (
+                val addressId: Int,
+                val street: String?,
+                val version: Int,
+                val createdAt: java.time.LocalDateTime,
+                val updatedAt: java.time.LocalDateTime,
+            )
+            
+            data class Employee (
+                val employeeId: java.util.UUID,
+                val name: String,
+                val version: Int,
+            )
+            
+            data class Class (
+                val classId: Int,
+                val `super`: String?,
+                val `val`: String,
+            )
+            
+        """.trimIndent().normalizeLineSeparator()
+        assertEquals(expected, file.readText())
+    }
+
+    @Test
     fun generateEntityDefinition() {
         val destinationDir = tempDir!!.resolve(Paths.get("src", "kotlin", "main"))
         val generator = CodeGenerator(
             "entity",
             createTables(),
-            ClassNameResolver.of("", ""),
+            ClassNameResolver.of("", "", false),
             PropertyNameResolver.of()
         )
         generator.createNewFile(destinationDir, "entityDefinitions.kt", false).use { writer ->
@@ -169,7 +210,7 @@ class CodeGeneratorTest {
             import org.komapper.annotation.KomapperId
             import org.komapper.annotation.KomapperTable
             
-            @KomapperEntityDef(Address::class)
+            @KomapperEntityDef(Address::class, ["address"])
             @KomapperTable("ADDRESS")
             data class AddressDef (
                 @KomapperId @KomapperAutoIncrement @KomapperColumn("ADDRESS_ID") val addressId: Nothing,
@@ -179,7 +220,7 @@ class CodeGeneratorTest {
                 @KomapperColumn("UPDATED_AT") val updatedAt: Nothing,
             )
             
-            @KomapperEntityDef(Employee::class)
+            @KomapperEntityDef(Employee::class, ["employee"])
             @KomapperTable("EMPLOYEE")
             data class EmployeeDef (
                 @KomapperId @KomapperColumn("EMPLOYEE_ID") val employeeId: Nothing,
@@ -187,7 +228,7 @@ class CodeGeneratorTest {
                 @KomapperColumn("VERSION") val version: Nothing,
             )
             
-            @KomapperEntityDef(Class::class)
+            @KomapperEntityDef(Class::class, ["class"])
             @KomapperTable("CLASS")
             data class ClassDef (
                 @KomapperId @KomapperAutoIncrement @KomapperColumn("CLASS_ID") val classId: Nothing,
@@ -205,7 +246,7 @@ class CodeGeneratorTest {
         val generator = CodeGenerator(
             "entity",
             createTables(),
-            ClassNameResolver.of("", ""),
+            ClassNameResolver.of("", "", false),
             PropertyNameResolver.of()
         )
         generator.createNewFile(destinationDir, "entityDefinitions.kt", false).use { writer ->
@@ -224,7 +265,7 @@ class CodeGeneratorTest {
             import org.komapper.annotation.KomapperUpdatedAt
             import org.komapper.annotation.KomapperVersion
             
-            @KomapperEntityDef(Address::class)
+            @KomapperEntityDef(Address::class, ["address"])
             @KomapperTable("ADDRESS")
             data class AddressDef (
                 @KomapperId @KomapperAutoIncrement @KomapperColumn("ADDRESS_ID") val addressId: Nothing,
@@ -234,7 +275,7 @@ class CodeGeneratorTest {
                 @KomapperUpdatedAt @KomapperColumn("UPDATED_AT") val updatedAt: Nothing,
             )
             
-            @KomapperEntityDef(Employee::class)
+            @KomapperEntityDef(Employee::class, ["employee"])
             @KomapperTable("EMPLOYEE")
             data class EmployeeDef (
                 @KomapperId @KomapperColumn("EMPLOYEE_ID") val employeeId: Nothing,
@@ -242,7 +283,7 @@ class CodeGeneratorTest {
                 @KomapperVersion @KomapperColumn("VERSION") val version: Nothing,
             )
             
-            @KomapperEntityDef(Class::class)
+            @KomapperEntityDef(Class::class, ["class"])
             @KomapperTable("CLASS")
             data class ClassDef (
                 @KomapperId @KomapperAutoIncrement @KomapperColumn("CLASS_ID") val classId: Nothing,
@@ -254,8 +295,59 @@ class CodeGeneratorTest {
         assertEquals(expected, file.readText())
     }
 
-    private fun createTables(): List<MutableTable> {
+    @Test
+    fun generateEntityDefinition_singularize() {
+        val destinationDir = tempDir!!.resolve(Paths.get("src", "kotlin", "main"))
+        val generator = CodeGenerator(
+            "entity",
+            createTablesWithPluralNames(),
+            ClassNameResolver.of("", "", true),
+            PropertyNameResolver.of()
+        )
+        generator.createNewFile(destinationDir, "entityDefinitions.kt", false).use { writer ->
+            generator.generateDefinitions(writer, false, false, "", "", "")
+        }
+        val file = destinationDir.resolve(Paths.get("entity", "entityDefinitions.kt"))
+        val expected = """
+            package entity
+            
+            import org.komapper.annotation.KomapperAutoIncrement
+            import org.komapper.annotation.KomapperColumn
+            import org.komapper.annotation.KomapperEntityDef
+            import org.komapper.annotation.KomapperId
+            import org.komapper.annotation.KomapperTable
+            
+            @KomapperEntityDef(Address::class, ["addresses"])
+            @KomapperTable("ADDRESSES")
+            data class AddressDef (
+                @KomapperId @KomapperAutoIncrement @KomapperColumn("ADDRESS_ID") val addressId: Nothing,
+                @KomapperColumn("STREET") val street: Nothing,
+                @KomapperColumn("VERSION") val version: Nothing,
+                @KomapperColumn("CREATED_AT") val createdAt: Nothing,
+                @KomapperColumn("UPDATED_AT") val updatedAt: Nothing,
+            )
+            
+            @KomapperEntityDef(Employee::class, ["employees"])
+            @KomapperTable("EMPLOYEES")
+            data class EmployeeDef (
+                @KomapperId @KomapperColumn("EMPLOYEE_ID") val employeeId: Nothing,
+                @KomapperColumn("NAME") val name: Nothing,
+                @KomapperColumn("VERSION") val version: Nothing,
+            )
+            
+            @KomapperEntityDef(Class::class, ["classes"])
+            @KomapperTable("CLASSES")
+            data class ClassDef (
+                @KomapperId @KomapperAutoIncrement @KomapperColumn("CLASS_ID") val classId: Nothing,
+                @KomapperColumn("SUPER") val `super`: Nothing,
+                @KomapperColumn("VAL") val `val`: Nothing,
+            )
+            
+        """.trimIndent().normalizeLineSeparator()
+        assertEquals(expected, file.readText())
+    }
 
+    private fun createTables(): List<MutableTable> {
         return listOf(
             MutableTable().apply {
                 name = "ADDRESS"
@@ -310,7 +402,8 @@ class CodeGeneratorTest {
                         typeName = "integer"
                     }
                 )
-            }, MutableTable().apply {
+            },
+            MutableTable().apply {
                 name = "CLASS"
                 columns = listOf(
                     MutableColumn().apply {
@@ -334,6 +427,14 @@ class CodeGeneratorTest {
                 )
             }
         )
+    }
+
+    private fun createTablesWithPluralNames(): List<MutableTable> {
+        val tables = createTables()
+        tables[0].name = "ADDRESSES"
+        tables[1].name = "EMPLOYEES"
+        tables[2].name = "CLASSES"
+        return tables;
     }
 
     private fun String.normalizeLineSeparator(): String =
