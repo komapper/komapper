@@ -29,7 +29,7 @@ class JdbcMetadataReaderTest(val db: JdbcDatabase) {
     @Test
     fun dump() {
         val tables = getTables()
-        val generator = CodeGenerator(null, tables, ClassNameResolver.of("", ""), PropertyNameResolver.of())
+        val generator = CodeGenerator(null, tables, ClassNameResolver.of("", "", false), PropertyNameResolver.of())
         val writer = StringWriter()
         generator.generateEntities(writer, false, false, false, false, PropertyTypeResolver.of(), "", "", "")
         println(writer)
@@ -39,7 +39,7 @@ class JdbcMetadataReaderTest(val db: JdbcDatabase) {
     @Test
     fun dump_h2() {
         val tables = getTables("PUBLIC")
-        val generator = CodeGenerator(null, tables, ClassNameResolver.of("", ""), PropertyNameResolver.of())
+        val generator = CodeGenerator(null, tables, ClassNameResolver.of("", "", false), PropertyNameResolver.of())
         val writer = StringWriter()
         generator.generateEntities(writer, false, false, false, false, PropertyTypeResolver.of(), "", "", "")
         println(writer)
