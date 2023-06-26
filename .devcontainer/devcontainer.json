@@ -1,0 +1,15 @@
+{
+  "name": "Java",
+  "image": "mcr.microsoft.com/devcontainers/java:0-17",
+
+  "features": {
+    "ghcr.io/devcontainers/features/java:1.2.1": {
+      "version": "17",
+      "jdkDistro": "tem"
+    },
+    "ghcr.io/devcontainers/features/sshd:1": {
+      "version": "latest"
+    },
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+  }
+}
