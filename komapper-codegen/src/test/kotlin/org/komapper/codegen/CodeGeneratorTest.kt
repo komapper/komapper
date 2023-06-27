@@ -24,7 +24,7 @@ class CodeGeneratorTest {
             PropertyNameResolver.of()
         )
         generator.createNewFile(destinationDir, "entities.kt", false).use { writer ->
-            generator.generateEntities(writer, false, false, false, false, DummyPropertyTypeResolver(), "", "", "")
+            generator.generateEntities(writer, false, false, false, false, false, DummyPropertyTypeResolver(), "", "", "")
         }
 
         val file = destinationDir.resolve(Paths.get("entity", "entities.kt"))
@@ -65,7 +65,7 @@ class CodeGeneratorTest {
             PropertyNameResolver.of()
         )
         generator.createNewFile(destinationDir, "entities.kt", false).use { writer ->
-            generator.generateEntities(writer, true, false, false, false, DummyPropertyTypeResolver(), "", "", "")
+            generator.generateEntities(writer, true, false, false, false, false, DummyPropertyTypeResolver(), "", "", "")
         }
         val file = destinationDir.resolve(Paths.get("entity", "entities.kt"))
         val expected = """
@@ -105,7 +105,7 @@ class CodeGeneratorTest {
             PropertyNameResolver.of()
         )
         generator.createNewFile(destinationDir, "entities.kt", false).use { writer ->
-            generator.generateEntities(writer, false, true, false, false, DummyPropertyTypeResolver(), "", "", "")
+            generator.generateEntities(writer, false, true, false, false, false, DummyPropertyTypeResolver(), "", "", "")
         }
         val file = destinationDir.resolve(Paths.get("entity", "entities.kt"))
         val expected = """
@@ -117,7 +117,7 @@ class CodeGeneratorTest {
             import org.komapper.annotation.KomapperId
             import org.komapper.annotation.KomapperTable
             
-            @KomapperEntity(["address"])
+            @KomapperEntity
             @KomapperTable("ADDRESS")
             data class Address (
                 @KomapperId @KomapperAutoIncrement @KomapperColumn("ADDRESS_ID") val addressId: Int,
@@ -127,7 +127,7 @@ class CodeGeneratorTest {
                 @KomapperColumn("UPDATED_AT") val updatedAt: java.time.LocalDateTime,
             )
             
-            @KomapperEntity(["employee"])
+            @KomapperEntity
             @KomapperTable("EMPLOYEE")
             data class Employee (
                 @KomapperId @KomapperColumn("EMPLOYEE_ID") val employeeId: java.util.UUID,
@@ -135,7 +135,7 @@ class CodeGeneratorTest {
                 @KomapperColumn("VERSION") val version: Int,
             )
             
-            @KomapperEntity(["class"])
+            @KomapperEntity
             @KomapperTable("CLASS")
             data class Class (
                 @KomapperId @KomapperAutoIncrement @KomapperColumn("CLASS_ID") val classId: Int,
@@ -157,7 +157,7 @@ class CodeGeneratorTest {
             PropertyNameResolver.of()
         )
         generator.createNewFile(destinationDir, "entities.kt", false).use { writer ->
-            generator.generateEntities(writer, false, false, false, false, DummyPropertyTypeResolver(), "", "", "")
+            generator.generateEntities(writer, false, false, true, false, false, DummyPropertyTypeResolver(), "", "", "")
         }
 
         val file = destinationDir.resolve(Paths.get("entity", "entities.kt"))
@@ -198,7 +198,7 @@ class CodeGeneratorTest {
             PropertyNameResolver.of()
         )
         generator.createNewFile(destinationDir, "entityDefinitions.kt", false).use { writer ->
-            generator.generateDefinitions(writer, false, false, "", "", "")
+            generator.generateDefinitions(writer, false, false, false, "", "", "")
         }
         val file = destinationDir.resolve(Paths.get("entity", "entityDefinitions.kt"))
         val expected = """
@@ -210,7 +210,7 @@ class CodeGeneratorTest {
             import org.komapper.annotation.KomapperId
             import org.komapper.annotation.KomapperTable
             
-            @KomapperEntityDef(Address::class, ["address"])
+            @KomapperEntityDef(Address::class)
             @KomapperTable("ADDRESS")
             data class AddressDef (
                 @KomapperId @KomapperAutoIncrement @KomapperColumn("ADDRESS_ID") val addressId: Nothing,
@@ -220,7 +220,7 @@ class CodeGeneratorTest {
                 @KomapperColumn("UPDATED_AT") val updatedAt: Nothing,
             )
             
-            @KomapperEntityDef(Employee::class, ["employee"])
+            @KomapperEntityDef(Employee::class)
             @KomapperTable("EMPLOYEE")
             data class EmployeeDef (
                 @KomapperId @KomapperColumn("EMPLOYEE_ID") val employeeId: Nothing,
@@ -228,7 +228,7 @@ class CodeGeneratorTest {
                 @KomapperColumn("VERSION") val version: Nothing,
             )
             
-            @KomapperEntityDef(Class::class, ["class"])
+            @KomapperEntityDef(Class::class)
             @KomapperTable("CLASS")
             data class ClassDef (
                 @KomapperId @KomapperAutoIncrement @KomapperColumn("CLASS_ID") val classId: Nothing,
@@ -250,7 +250,7 @@ class CodeGeneratorTest {
             PropertyNameResolver.of()
         )
         generator.createNewFile(destinationDir, "entityDefinitions.kt", false).use { writer ->
-            generator.generateDefinitions(writer, false, false, "version", "createdAt", "updatedAt")
+            generator.generateDefinitions(writer, false, false, false, "version", "createdAt", "updatedAt")
         }
         val file = destinationDir.resolve(Paths.get("entity", "entityDefinitions.kt"))
         val expected = """
@@ -265,7 +265,7 @@ class CodeGeneratorTest {
             import org.komapper.annotation.KomapperUpdatedAt
             import org.komapper.annotation.KomapperVersion
             
-            @KomapperEntityDef(Address::class, ["address"])
+            @KomapperEntityDef(Address::class)
             @KomapperTable("ADDRESS")
             data class AddressDef (
                 @KomapperId @KomapperAutoIncrement @KomapperColumn("ADDRESS_ID") val addressId: Nothing,
@@ -275,7 +275,7 @@ class CodeGeneratorTest {
                 @KomapperUpdatedAt @KomapperColumn("UPDATED_AT") val updatedAt: Nothing,
             )
             
-            @KomapperEntityDef(Employee::class, ["employee"])
+            @KomapperEntityDef(Employee::class)
             @KomapperTable("EMPLOYEE")
             data class EmployeeDef (
                 @KomapperId @KomapperColumn("EMPLOYEE_ID") val employeeId: Nothing,
@@ -283,7 +283,7 @@ class CodeGeneratorTest {
                 @KomapperVersion @KomapperColumn("VERSION") val version: Nothing,
             )
             
-            @KomapperEntityDef(Class::class, ["class"])
+            @KomapperEntityDef(Class::class)
             @KomapperTable("CLASS")
             data class ClassDef (
                 @KomapperId @KomapperAutoIncrement @KomapperColumn("CLASS_ID") val classId: Nothing,
@@ -305,7 +305,7 @@ class CodeGeneratorTest {
             PropertyNameResolver.of()
         )
         generator.createNewFile(destinationDir, "entityDefinitions.kt", false).use { writer ->
-            generator.generateDefinitions(writer, false, false, "", "", "")
+            generator.generateDefinitions(writer, true, false, false, "", "", "")
         }
         val file = destinationDir.resolve(Paths.get("entity", "entityDefinitions.kt"))
         val expected = """

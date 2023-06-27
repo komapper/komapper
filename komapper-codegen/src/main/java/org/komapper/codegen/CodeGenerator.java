@@ -48,6 +48,7 @@ public class CodeGenerator {
       @NotNull Writer writer,
       boolean declareAsNullable,
       boolean useSelfMapping,
+      boolean singularize,
       boolean useCatalog,
       boolean useSchema,
       @NotNull PropertyTypeResolver resolver,
@@ -69,8 +70,11 @@ public class CodeGenerator {
       p.println();
       var className = classNameResolver.resolve(table);
       if (useSelfMapping) {
-        p.println(
-            "@KomapperEntity([\"" + StringUtil.snakeToLowerCamelCase(table.getName()) + "\"])");
+        p.print("@KomapperEntity");
+        if (singularize) {
+          p.print("([\"" + StringUtil.snakeToLowerCamelCase(table.getName()) + "\"])");
+        }
+        p.println();
         p.println(createTableAnnotation(table, useCatalog, useSchema));
       }
       p.println("data class " + className + " (");
@@ -98,6 +102,7 @@ public class CodeGenerator {
 
   public void generateDefinitions(
       @NotNull Writer writer,
+      boolean singularize,
       boolean useCatalog,
       boolean useSchema,
       @NotNull String versionPropertyName,
@@ -114,12 +119,11 @@ public class CodeGenerator {
     for (Table table : tables) {
       p.println();
       var className = classNameResolver.resolve(table);
-      p.println(
-          "@KomapperEntityDef("
-              + className
-              + "::class, [\""
-              + StringUtil.snakeToLowerCamelCase(table.getName())
-              + "\"])");
+      p.print("@KomapperEntityDef(" + className + "::class");
+      if (singularize) {
+        p.print(", [\"" + StringUtil.snakeToLowerCamelCase(table.getName()) + "\"]");
+      }
+      p.println(")");
       p.println(createTableAnnotation(table, useCatalog, useSchema));
       p.println("data class " + className + "Def (");
       for (Column column : table.getColumns()) {

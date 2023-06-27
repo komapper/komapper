@@ -9,7 +9,6 @@ import org.gradle.api.file.DirectoryProperty;
 import org.gradle.api.model.ObjectFactory;
 import org.gradle.api.provider.ListProperty;
 import org.gradle.api.provider.Property;
-import org.gradle.internal.Pair;
 import org.komapper.codegen.ClassNameResolver;
 import org.komapper.codegen.Enquote;
 import org.komapper.codegen.PropertyNameResolver;
@@ -73,9 +72,7 @@ public class Generator {
     enquote.set(jdbc.getUrl().map(Enquote::of));
     this.classNameResolver = objects.property(ClassNameResolver.class);
     classNameResolver.set(
-        prefix
-            .zip(suffix, Pair::of)
-            .zip(singularize, (ab, c) -> ClassNameResolver.of(ab.left, ab.right, c)));
+        prefix.zip(suffix, Pair::of).zip(singularize, (a, b) -> ClassNameResolver.of(a.a, a.b, b)));
     this.propertyNameResolver =
         objects.property(PropertyNameResolver.class).value(PropertyNameResolver.of());
     this.versionPropertyName = objects.property(String.class).value("");

@@ -9,6 +9,9 @@ public interface ClassNameResolver {
 
   @NotNull
   static ClassNameResolver of(@NotNull String prefix, @NotNull String suffix, boolean singularize) {
-    return new ClassNameResolverImpl(prefix, suffix, singularize);
+    if (singularize) {
+      return new SingularClassNameResolver(prefix, suffix);
+    }
+    return new ClassNameResolverImpl(prefix, suffix);
   }
 }
