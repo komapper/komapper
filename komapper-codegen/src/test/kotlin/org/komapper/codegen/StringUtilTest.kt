@@ -20,4 +20,5 @@ class StringUtilTest {
         assertEquals("abc", StringUtil.snakeToLowerCamelCase("abc"))
         assertEquals("aa1BbbCcc", StringUtil.snakeToLowerCamelCase("aa1_bbb_ccc"))
     }
+
 }

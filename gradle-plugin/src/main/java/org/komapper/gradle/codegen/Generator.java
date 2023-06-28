@@ -25,6 +25,7 @@ public class Generator {
   private final Property<String> packageName;
   private final Property<String> prefix;
   private final Property<String> suffix;
+  private final Property<Boolean> singularize;
   private final Property<Boolean> overwriteEntities;
   private final Property<Boolean> declareAsNullable;
   private final Property<Boolean> useSelfMapping;
@@ -58,6 +59,7 @@ public class Generator {
     this.packageName = objects.property(String.class);
     this.prefix = objects.property(String.class).value("");
     this.suffix = objects.property(String.class).value("");
+    this.singularize = objects.property(Boolean.class).value(false);
     this.overwriteEntities = objects.property(Boolean.class).value(false);
     this.declareAsNullable = objects.property(Boolean.class).value(false);
     this.useSelfMapping = objects.property(Boolean.class).value(false);
@@ -69,7 +71,8 @@ public class Generator {
     this.enquote = objects.property(Enquote.class);
     enquote.set(jdbc.getUrl().map(Enquote::of));
     this.classNameResolver = objects.property(ClassNameResolver.class);
-    classNameResolver.set(prefix.zip(suffix, ClassNameResolver::of));
+    classNameResolver.set(
+        prefix.zip(suffix, Pair::of).zip(singularize, (a, b) -> ClassNameResolver.of(a.a, a.b, b)));
     this.propertyNameResolver =
         objects.property(PropertyNameResolver.class).value(PropertyNameResolver.of());
     this.versionPropertyName = objects.property(String.class).value("");
@@ -115,6 +118,10 @@ public class Generator {
 
   public Property<String> getSuffix() {
     return suffix;
+  }
+
+  public Property<Boolean> getSingularize() {
+    return singularize;
   }
 
   public Property<Boolean> getOverwriteEntities() {
