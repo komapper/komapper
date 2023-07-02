@@ -67,7 +67,7 @@ public class GenerateTask extends DefaultTask {
           writer,
           settings.getDeclareAsNullable().get(),
           settings.getUseSelfMapping().get(),
-          settings.getSingularize().get(),
+          settings.getUseTableNameAsAlias().get(),
           settings.getUseCatalog().get(),
           settings.getUseSchema().get(),
           settings.getPropertyTypeResolver().get(),
@@ -81,7 +81,7 @@ public class GenerateTask extends DefaultTask {
               destinationDir, "entityDefinitions.kt", settings.getOverwriteDefinitions().get())) {
         generator.generateDefinitions(
             writer,
-            settings.getSingularize().get(),
+            settings.getUseTableNameAsAlias().get(),
             settings.getUseCatalog().get(),
             settings.getUseSchema().get(),
             settings.getVersionPropertyName().get(),

@@ -48,7 +48,7 @@ public class CodeGenerator {
       @NotNull Writer writer,
       boolean declareAsNullable,
       boolean useSelfMapping,
-      boolean singularize,
+      boolean useTableNameAsAlias,
       boolean useCatalog,
       boolean useSchema,
       @NotNull PropertyTypeResolver resolver,
@@ -71,7 +71,7 @@ public class CodeGenerator {
       var className = classNameResolver.resolve(table);
       if (useSelfMapping) {
         p.print("@KomapperEntity");
-        if (singularize) {
+        if (useTableNameAsAlias) {
           p.print("([\"" + StringUtil.snakeToLowerCamelCase(table.getName()) + "\"])");
         }
         p.println();
@@ -102,7 +102,7 @@ public class CodeGenerator {
 
   public void generateDefinitions(
       @NotNull Writer writer,
-      boolean singularize,
+      boolean useTableNameAsAlias,
       boolean useCatalog,
       boolean useSchema,
       @NotNull String versionPropertyName,
@@ -120,7 +120,7 @@ public class CodeGenerator {
       p.println();
       var className = classNameResolver.resolve(table);
       p.print("@KomapperEntityDef(" + className + "::class");
-      if (singularize) {
+      if (useTableNameAsAlias) {
         p.print(", [\"" + StringUtil.snakeToLowerCamelCase(table.getName()) + "\"]");
       }
       p.println(")");

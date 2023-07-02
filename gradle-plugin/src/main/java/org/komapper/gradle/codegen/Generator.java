@@ -29,6 +29,7 @@ public class Generator {
   private final Property<Boolean> overwriteEntities;
   private final Property<Boolean> declareAsNullable;
   private final Property<Boolean> useSelfMapping;
+  private final Property<Boolean> useTableNameAsAlias;
   private final Property<Boolean> overwriteDefinitions;
   private final Property<Boolean> useCatalog;
   private final Property<Boolean> useSchema;
@@ -63,6 +64,7 @@ public class Generator {
     this.overwriteEntities = objects.property(Boolean.class).value(false);
     this.declareAsNullable = objects.property(Boolean.class).value(false);
     this.useSelfMapping = objects.property(Boolean.class).value(false);
+    this.useTableNameAsAlias = objects.property(Boolean.class).value(false);
     this.overwriteDefinitions = objects.property(Boolean.class).value(false);
     this.useCatalog = objects.property(Boolean.class).value(false);
     this.useSchema = objects.property(Boolean.class).value(false);
@@ -134,6 +136,10 @@ public class Generator {
 
   public Property<Boolean> getUseSelfMapping() {
     return useSelfMapping;
+  }
+
+  public Property<Boolean> getUseTableNameAsAlias() {
+    return useTableNameAsAlias;
   }
 
   public Property<Boolean> getOverwriteDefinitions() {

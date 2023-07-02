@@ -157,7 +157,7 @@ class CodeGeneratorTest {
             PropertyNameResolver.of()
         )
         generator.createNewFile(destinationDir, "entities.kt", false).use { writer ->
-            generator.generateEntities(writer, false, false, true, false, false, DummyPropertyTypeResolver(), "", "", "")
+            generator.generateEntities(writer, false, false, false, false, false, DummyPropertyTypeResolver(), "", "", "")
         }
 
         val file = destinationDir.resolve(Paths.get("entity", "entities.kt"))
@@ -305,6 +305,58 @@ class CodeGeneratorTest {
             PropertyNameResolver.of()
         )
         generator.createNewFile(destinationDir, "entityDefinitions.kt", false).use { writer ->
+            generator.generateDefinitions(writer, false, false, false, "", "", "")
+        }
+        val file = destinationDir.resolve(Paths.get("entity", "entityDefinitions.kt"))
+        val expected = """
+            package entity
+            
+            import org.komapper.annotation.KomapperAutoIncrement
+            import org.komapper.annotation.KomapperColumn
+            import org.komapper.annotation.KomapperEntityDef
+            import org.komapper.annotation.KomapperId
+            import org.komapper.annotation.KomapperTable
+            
+            @KomapperEntityDef(Address::class)
+            @KomapperTable("ADDRESSES")
+            data class AddressDef (
+                @KomapperId @KomapperAutoIncrement @KomapperColumn("ADDRESS_ID") val addressId: Nothing,
+                @KomapperColumn("STREET") val street: Nothing,
+                @KomapperColumn("VERSION") val version: Nothing,
+                @KomapperColumn("CREATED_AT") val createdAt: Nothing,
+                @KomapperColumn("UPDATED_AT") val updatedAt: Nothing,
+            )
+            
+            @KomapperEntityDef(Employee::class)
+            @KomapperTable("EMPLOYEES")
+            data class EmployeeDef (
+                @KomapperId @KomapperColumn("EMPLOYEE_ID") val employeeId: Nothing,
+                @KomapperColumn("NAME") val name: Nothing,
+                @KomapperColumn("VERSION") val version: Nothing,
+            )
+            
+            @KomapperEntityDef(Class::class)
+            @KomapperTable("CLASSES")
+            data class ClassDef (
+                @KomapperId @KomapperAutoIncrement @KomapperColumn("CLASS_ID") val classId: Nothing,
+                @KomapperColumn("SUPER") val `super`: Nothing,
+                @KomapperColumn("VAL") val `val`: Nothing,
+            )
+            
+        """.trimIndent().normalizeLineSeparator()
+        assertEquals(expected, file.readText())
+    }
+
+    @Test
+    fun generateEntityDefinition_useTableNameAsAlias() {
+        val destinationDir = tempDir!!.resolve(Paths.get("src", "kotlin", "main"))
+        val generator = CodeGenerator(
+            "entity",
+            createTables(),
+            ClassNameResolver.of("", "Entity", false),
+            PropertyNameResolver.of()
+        )
+        generator.createNewFile(destinationDir, "entityDefinitions.kt", false).use { writer ->
             generator.generateDefinitions(writer, true, false, false, "", "", "")
         }
         val file = destinationDir.resolve(Paths.get("entity", "entityDefinitions.kt"))
@@ -317,9 +369,9 @@ class CodeGeneratorTest {
             import org.komapper.annotation.KomapperId
             import org.komapper.annotation.KomapperTable
             
-            @KomapperEntityDef(Address::class, ["addresses"])
-            @KomapperTable("ADDRESSES")
-            data class AddressDef (
+            @KomapperEntityDef(AddressEntity::class, ["address"])
+            @KomapperTable("ADDRESS")
+            data class AddressEntityDef (
                 @KomapperId @KomapperAutoIncrement @KomapperColumn("ADDRESS_ID") val addressId: Nothing,
                 @KomapperColumn("STREET") val street: Nothing,
                 @KomapperColumn("VERSION") val version: Nothing,
@@ -327,17 +379,17 @@ class CodeGeneratorTest {
                 @KomapperColumn("UPDATED_AT") val updatedAt: Nothing,
             )
             
-            @KomapperEntityDef(Employee::class, ["employees"])
-            @KomapperTable("EMPLOYEES")
-            data class EmployeeDef (
+            @KomapperEntityDef(EmployeeEntity::class, ["employee"])
+            @KomapperTable("EMPLOYEE")
+            data class EmployeeEntityDef (
                 @KomapperId @KomapperColumn("EMPLOYEE_ID") val employeeId: Nothing,
                 @KomapperColumn("NAME") val name: Nothing,
                 @KomapperColumn("VERSION") val version: Nothing,
             )
             
-            @KomapperEntityDef(Class::class, ["classes"])
-            @KomapperTable("CLASSES")
-            data class ClassDef (
+            @KomapperEntityDef(ClassEntity::class, ["class"])
+            @KomapperTable("CLASS")
+            data class ClassEntityDef (
                 @KomapperId @KomapperAutoIncrement @KomapperColumn("CLASS_ID") val classId: Nothing,
                 @KomapperColumn("SUPER") val `super`: Nothing,
                 @KomapperColumn("VAL") val `val`: Nothing,
