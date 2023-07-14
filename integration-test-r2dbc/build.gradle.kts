@@ -11,7 +11,7 @@ dependencies {
     api(project(":komapper-datetime-r2dbc"))
     api(project(":komapper-annotation"))
     ksp(project(":komapper-processor"))
-    api("io.r2dbc:r2dbc-pool:1.0.0.RELEASE")
+    api("io.r2dbc:r2dbc-pool:1.0.1.RELEASE")
     api(platform("org.testcontainers:testcontainers-bom:1.18.3"))
     api("org.jetbrains.kotlin:kotlin-test-junit5")
     api("org.testcontainers:r2dbc")
