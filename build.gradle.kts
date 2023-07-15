@@ -81,7 +81,7 @@ configure(libraryProjects + gradlePluginProject + exampleProjects + integrationT
             kotlinOptions {
                 freeCompilerArgs = freeCompilerArgs + "-Xjdk-release=$jvmTargetVersion"
                 jvmTarget = jvmTargetVersion.toString()
-                apiVersion = "1.5"
+                apiVersion = "1.6"
             }
         }
     }

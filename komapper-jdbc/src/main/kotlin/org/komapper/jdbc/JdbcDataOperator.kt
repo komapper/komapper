@@ -79,8 +79,8 @@ class DefaultJdbcDataOperator(private val dialect: JdbcDialect, private val data
         dataType.setValue(ps, index, value)
     }
 
-    override fun <T : Any> registerReturnParameter(ps: PreparedStatement, index: Int, valueClass: KClass<out T>) {
-        val dataType = getDataType(valueClass)
+    override fun <T : Any> registerReturnParameter(ps: PreparedStatement, index: Int, parameterClass: KClass<out T>) {
+        val dataType = getDataType(parameterClass)
         dataType.registerReturnParameter(ps, index)
     }
 
