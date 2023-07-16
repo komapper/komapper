@@ -28,7 +28,7 @@ For more documentation, go to our site:
 
 ## Prerequisite
 
-- Kotlin 1.6.21 or later
+- Kotlin 1.7.22 or later
 - JRE 11 or later
 - Gradle 6.7.1 or later
 
@@ -165,11 +165,11 @@ See [DESIGN_DOC](DESIGN_DOC.md) for the design policy of this project.
 
 ## Compatibility Matrix
 
-| Komapper version | Kotlin and KSP version      | JRE min version | Gradle min version |
-|:-----------------|:----------------------------|:----------------|--------------------|
-| 1.3.x - 1.8.x    | 1.6.21-1.0.6                | 11              | 6.7.1              |
-| 1.3.x - 1.11.x   | 1.7.22-1.0.8                | 11              | 6.7.1              |
-| 1.3.x - 1.12.x   | 1.8.22-1.0.11, 1.9.0-1.0.11 | 11              | 6.8.3              |
+| Kotlin and KSP version | Komapper version | JRE min version | Gradle min version |
+|:-----------------------|:-----------------|:----------------|--------------------|
+| 1.7.22-1.0.8           | 1.3.x - 1.11.x   | 11              | 6.7.1              |
+| 1.8.22-1.0.11          | 1.3.x - 1.12.x   | 11              | 6.8.3              |
+| 1.9.0-1.0.11           | 1.3.x - 1.12.x   | 11              | 6.8.3              |
 
 Compatibility testing is performed in the [komapper/compatibility-test](https://github.com/komapper/compatibility-test/) repository.
 
