@@ -2,8 +2,8 @@ package org.komapper.quarkus.jdbc
 
 import org.komapper.tx.core.TransactionOperator
 import org.komapper.tx.core.TransactionProperty
-import javax.transaction.Status
-import javax.transaction.TransactionManager
+import jakarta.transaction.Status
+import jakarta.transaction.TransactionManager
 
 internal class QuarkusJdbcTransactionOperator(private val transactionManager: TransactionManager) : TransactionOperator {
 
