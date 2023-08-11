@@ -123,7 +123,10 @@ class R2dbcSelectTest(private val db: R2dbcDatabase) {
         val a = Meta.address
         val caseExpression = case(
             When(
-                { a.street eq "STREET 2"; a.addressId greater 1 },
+                {
+                    a.street eq "STREET 2"
+                    a.addressId greater 1
+                },
                 literal("HIT"),
             ),
         ) { literal("NO HIT") }
@@ -143,7 +146,10 @@ class R2dbcSelectTest(private val db: R2dbcDatabase) {
         val a = Meta.address
         val caseExpression = case(
             When(
-                { a.street eq "STREET 2"; a.addressId greater 1 },
+                {
+                    a.street eq "STREET 2"
+                    a.addressId greater 1
+                },
                 literal("HIT"),
             ),
             When(
@@ -167,7 +173,10 @@ class R2dbcSelectTest(private val db: R2dbcDatabase) {
         val a = Meta.address
         val caseExpression = case(
             When(
-                { a.street eq "STREET 2"; a.addressId greater 1 },
+                {
+                    a.street eq "STREET 2"
+                    a.addressId greater 1
+                },
                 literal("HIT"),
             ),
         )

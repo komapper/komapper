@@ -41,7 +41,8 @@ internal class R2dbcRelationInsertValuesRunner<ENTITY : Any, ID : Any, META : En
 
                 override suspend fun other(): Pair<Long, ID?> {
                     val (count, _) = insert(config)
-                    return count to null }
+                    return count to null
+                }
             },
         )
     }
