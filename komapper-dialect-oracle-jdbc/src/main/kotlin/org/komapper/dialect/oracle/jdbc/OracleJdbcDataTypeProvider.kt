@@ -33,7 +33,7 @@ class OracleJdbcDataTypeProvider(next: JdbcDataTypeProvider) : AbstractJdbcDataT
             JdbcBigIntegerType("decimal"),
             JdbcBlobType("blob"),
             JdbcByteType("integer"),
-            JdbcByteArrayType("raw"),
+            JdbcByteArrayType("raw(500)"),
             JdbcClobType("clob"),
             JdbcClobStringType("clob"),
             JdbcDoubleType("float"),

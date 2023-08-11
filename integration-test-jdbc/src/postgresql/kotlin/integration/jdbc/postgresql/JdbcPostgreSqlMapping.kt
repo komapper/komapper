@@ -24,6 +24,8 @@ data class JdbcPostgreSqlMapping(
     @KomapperColumn(alwaysQuote = true) val bigInteger: BigInteger,
     @KomapperColumn(alwaysQuote = true) val boolean: Boolean,
     @KomapperColumn(alwaysQuote = true) val byte: Byte,
+    @Suppress("ArrayInDataClass")
+    @KomapperColumn(alwaysQuote = true) val byteArray: ByteArray,
     @KomapperColumn(alwaysQuote = true) val double: Double,
     @KomapperColumn(alwaysQuote = true) val float: Float,
     @KomapperColumn(alwaysQuote = true) val instant: Instant,

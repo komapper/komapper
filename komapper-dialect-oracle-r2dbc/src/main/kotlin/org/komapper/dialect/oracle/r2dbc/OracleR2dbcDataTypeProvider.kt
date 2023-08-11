@@ -34,7 +34,7 @@ class OracleR2dbcDataTypeProvider(next: R2dbcDataTypeProvider) :
             R2dbcBigIntegerType("decimal"),
             R2dbcBlobType("blob"),
             R2dbcByteType("integer"),
-            R2dbcByteArrayType("raw"),
+            R2dbcByteArrayType("raw(500)"),
             R2dbcClobType("clob"),
             R2dbcClobStringType("clob"),
             R2dbcDoubleType("float"),
