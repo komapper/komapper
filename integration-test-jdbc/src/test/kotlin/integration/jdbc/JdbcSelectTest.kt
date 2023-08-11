@@ -133,7 +133,10 @@ class JdbcSelectTest(private val db: JdbcDatabase) {
         val a = Meta.address
         val caseExpression = case(
             When(
-                { a.street eq "STREET 2"; a.addressId greater 1 },
+                {
+                    a.street eq "STREET 2"
+                    a.addressId greater 1
+                },
                 literal("HIT"),
             ),
         ) { literal("NO HIT") }
@@ -153,7 +156,10 @@ class JdbcSelectTest(private val db: JdbcDatabase) {
         val a = Meta.address
         val caseExpression = case(
             When(
-                { a.street eq "STREET 2"; a.addressId greater 1 },
+                {
+                    a.street eq "STREET 2"
+                    a.addressId greater 1
+                },
                 literal("HIT"),
             ),
             When(
@@ -177,7 +183,10 @@ class JdbcSelectTest(private val db: JdbcDatabase) {
         val a = Meta.address
         val caseExpression = case(
             When(
-                { a.street eq "STREET 2"; a.addressId greater 1 },
+                {
+                    a.street eq "STREET 2"
+                    a.addressId greater 1
+                },
                 literal("HIT"),
             ),
         )

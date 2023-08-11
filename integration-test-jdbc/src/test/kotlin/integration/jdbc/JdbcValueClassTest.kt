@@ -253,7 +253,10 @@ class JdbcValueClassTest(val db: JdbcDatabase) {
         val a = Meta.vAddress
         val caseExpression = case(
             When(
-                { a.street eq Street("STREET 2"); a.addressId greater IntId(1) },
+                {
+                    a.street eq Street("STREET 2")
+                    a.addressId greater IntId(1)
+                },
                 concat(a.street, Street("!!!")),
             ),
         ) { a.street }
