@@ -36,7 +36,7 @@ class MySqlR2dbcDataTypeProvider(next: R2dbcDataTypeProvider) :
             R2dbcBlobType("blob"),
             R2dbcBooleanType("bit(1)"),
             R2dbcByteType("tinyint"),
-            R2dbcByteArrayType("bytea"),
+            R2dbcByteArrayType("varbinary(500)"),
             R2dbcClobType("text"),
             R2dbcClobStringType("text"),
             R2dbcDoubleType("double precision"),

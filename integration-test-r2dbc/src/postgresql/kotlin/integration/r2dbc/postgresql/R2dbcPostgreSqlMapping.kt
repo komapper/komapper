@@ -27,6 +27,8 @@ data class R2dbcPostgreSqlMapping(
     @KomapperColumn(alwaysQuote = true) val blob: Blob,
     @KomapperColumn(alwaysQuote = true) val boolean: Boolean,
     @KomapperColumn(alwaysQuote = true) val byte: Byte,
+    @Suppress("ArrayInDataClass")
+    @KomapperColumn(alwaysQuote = true) val byteArray: ByteArray,
     @KomapperColumn(alwaysQuote = true) val double: Double,
     @KomapperColumn(alwaysQuote = true) val clob: Clob,
     @KomapperColumn(alwaysQuote = true) val float: Float,
