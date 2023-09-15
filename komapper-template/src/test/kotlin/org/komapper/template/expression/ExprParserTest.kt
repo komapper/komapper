@@ -43,8 +43,57 @@ class ExprParserTest {
     fun property() {
         when (val expr = ExprParser("aaa.age").parse()) {
             is ExprNode.Property -> {
-                assertEquals(expr.name, "age")
+                assertEquals("age", expr.name)
                 assertTrue(expr.receiver is ExprNode.Value)
+                assertEquals("aaa", expr.receiver.name)
+            }
+            else -> throw AssertionError()
+        }
+    }
+
+    @Test
+    fun nestedProperty() {
+        when (val expr = ExprParser("aaa.age.int").parse()) {
+            is ExprNode.Property -> {
+                assertEquals("int", expr.name)
+                val parent = expr.receiver
+                assertTrue(parent is ExprNode.Property)
+                assertEquals("age", parent.name)
+                val grandParent = parent.receiver
+                assertTrue(grandParent is ExprNode.Value)
+                assertEquals("aaa", grandParent.name)
+            }
+            else -> throw AssertionError()
+        }
+    }
+
+    @Test
+    fun function() {
+        when (val expr = ExprParser("aaa.hello(1, 2, 3)").parse()) {
+            is ExprNode.Function -> {
+                assertEquals("hello", expr.name)
+                assertTrue(expr.receiver is ExprNode.Value)
+                assertEquals("aaa", expr.receiver.name)
+            }
+            else -> throw AssertionError()
+        }
+    }
+
+    @Test
+    fun nestedFunction() {
+        when (val expr = ExprParser("aaa.hello(1, 2, 3).bye(4)").parse()) {
+            is ExprNode.Function -> {
+                assertEquals("bye", expr.name)
+                assertTrue(expr.args is ExprNode.Literal)
+                assertEquals(4, expr.args.value)
+                val parent = expr.receiver
+                assertTrue(parent is ExprNode.Function)
+                assertEquals("hello", parent.name)
+                assertTrue(parent.args is ExprNode.Comma)
+                assertEquals(3, parent.args.nodeList.size)
+                val grandParent = parent.receiver
+                assertTrue(grandParent is ExprNode.Value)
+                assertEquals("aaa", grandParent.name)
             }
             else -> throw AssertionError()
         }

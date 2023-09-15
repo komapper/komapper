@@ -98,11 +98,12 @@ internal class OrReducer(location: ExprLocation) : ExprReducer(10, location) {
 }
 
 internal class CommaReducer(location: ExprLocation) : ExprReducer(0, location) {
+    @Suppress("MoveVariableDeclarationIntoWhen")
     override fun reduce(deque: Deque<ExprNode>): ExprNode {
         val right = pop(deque)
         val left = pop(deque)
-        val exprList = when (right) {
-            is ExprNode.Comma -> listOf(left) + right.nodeList
+        val exprList = when (left) {
+            is ExprNode.Comma -> left.nodeList + right
             else -> listOf(left, right)
         }
         return ExprNode.Comma(location, exprList)
