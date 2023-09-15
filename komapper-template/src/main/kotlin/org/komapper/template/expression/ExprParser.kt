@@ -187,9 +187,9 @@ internal class ExprParser(
     private fun parseFunction(safeCall: Boolean = false) {
         val name = token.substring(if (safeCall) 2 else 1)
         val reducer = FunctionReducer(location, name, safeCall)
+        pushReducer(reducer)
         tokenType = tokenizer.next()
         parseParen()
-        pushReducer(reducer)
     }
 
     private fun parseProperty(safeCall: Boolean = false) {
@@ -201,11 +201,11 @@ internal class ExprParser(
     private fun pushReducer(reducer: ExprReducer) {
         if (reducers.isNotEmpty()) {
             val first = reducers.peek()
-            if (first.priority > reducer.priority) {
+            if (first.priority >= reducer.priority) {
                 val it = reducers.iterator()
                 while (it.hasNext()) {
                     val r = it.next()
-                    if (r.priority > reducer.priority) {
+                    if (r.priority >= reducer.priority) {
                         it.remove()
                         reduce(r)
                     }

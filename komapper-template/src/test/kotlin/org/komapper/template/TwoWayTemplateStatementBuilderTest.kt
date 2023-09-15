@@ -257,6 +257,35 @@ class TwoWayTemplateStatementBuilderTest {
                 statement.args,
             )
         }
+
+        @Test
+        fun nestedProperty() {
+            val template = """
+            /*%for item in items*/
+                SELECT
+                    /*item.a.b.c*/0 AS id,
+                    /*item.description*/'' AS description
+                FROM DUAL
+                /*%if item_has_next*/
+                    /*# "UNION"*/
+                /*%end */
+            /*%end*/
+            """.trimIndent()
+            val items = listOf(
+                Item(Product1(Product2(1)), "Item1"),
+                Item(Product1(Product2(2)), "Item2"),
+                Item(Product1(Product2(3)), "Item3"),
+            )
+            val valueMap = mapOf("items" to Value(items))
+            val statement = statementBuilder.build(template, valueMap, extensions)
+            assertEquals(6, statement.args.size)
+            assertEquals(1, statement.args[0].any)
+            assertEquals("Item1", statement.args[1].any)
+            assertEquals(2, statement.args[2].any)
+            assertEquals("Item2", statement.args[3].any)
+            assertEquals(3, statement.args[4].any)
+            assertEquals("Item3", statement.args[5].any)
+        }
     }
 
     @Nested
@@ -293,3 +322,16 @@ class TwoWayTemplateStatementBuilderTest {
         }
     }
 }
+
+data class Item(
+    val a: Product1,
+    val description: String,
+)
+
+data class Product1(
+    val b: Product2,
+)
+
+data class Product2(
+    val c: Int,
+)
