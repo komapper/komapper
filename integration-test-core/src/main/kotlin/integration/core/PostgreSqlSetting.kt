@@ -6,6 +6,8 @@ interface PostgreSqlSetting<DATABASE : Database> : Setting<DATABASE> {
     override val dbms: Dbms get() = Dbms.POSTGRESQL
     override val createSql: String
         get() = """
+        create type mood as enum ('SAD', 'OK', 'HAPPY');
+
         create sequence if not exists sequence_strategy_id increment by 100 start with 1;
         create sequence if not exists person_id increment by 100 start with 1;
 
@@ -36,6 +38,7 @@ interface PostgreSqlSetting<DATABASE : Database> : Setting<DATABASE> {
         create table if not exists enum_data(id integer not null primary key, value varchar(20));
         create table if not exists enum_ordinal_data(id integer not null primary key, value integer);
         create table if not exists enum_property_data(id integer not null primary key, value integer);
+        create table if not exists enum_udt_data(id integer not null primary key, value mood);
         create table if not exists float_data(id integer not null primary key, value float);
         create table if not exists instant_data(id integer not null primary key, value timestamp with time zone);
         create table if not exists int_data(id integer not null primary key, value integer);

@@ -2,6 +2,7 @@ package integration.core
 
 import integration.core.enumclass.Color
 import integration.core.enumclass.Direction
+import integration.core.enumclass.Mood
 import org.komapper.annotation.EnumType
 import org.komapper.annotation.KomapperAutoIncrement
 import org.komapper.annotation.KomapperColumn
@@ -83,6 +84,15 @@ data class EnumPropertyData(
     @KomapperColumn(alwaysQuote = true)
     @KomapperEnum(EnumType.PROPERTY, hint = "value")
     val value: Color?,
+)
+
+@KomapperEntity
+@KomapperTable("enum_udt_data")
+data class EnumUdtData(
+    @KomapperId val id: Int,
+    @KomapperColumn(alwaysQuote = true)
+    @KomapperEnum(EnumType.TYPE)
+    val value: Mood?,
 )
 
 data class DirectionInfo(

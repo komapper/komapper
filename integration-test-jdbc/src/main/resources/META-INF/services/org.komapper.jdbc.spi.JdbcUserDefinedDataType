@@ -1,2 +1,3 @@
+integration.jdbc.MoodType
 integration.jdbc.UserDefinedIntType
 integration.jdbc.UserDefinedStringType

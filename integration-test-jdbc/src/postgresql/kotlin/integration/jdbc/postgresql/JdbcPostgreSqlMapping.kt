@@ -1,7 +1,10 @@
 package integration.jdbc.postgresql
 
+import integration.core.enumclass.Mood
+import org.komapper.annotation.EnumType
 import org.komapper.annotation.KomapperColumn
 import org.komapper.annotation.KomapperEntity
+import org.komapper.annotation.KomapperEnum
 import org.komapper.annotation.KomapperId
 import org.komapper.annotation.KomapperTable
 import java.math.BigDecimal
@@ -27,6 +30,10 @@ data class JdbcPostgreSqlMapping(
     @Suppress("ArrayInDataClass")
     @KomapperColumn(alwaysQuote = true) val byteArray: ByteArray,
     @KomapperColumn(alwaysQuote = true) val double: Double,
+    @KomapperColumn(alwaysQuote = true) @KomapperEnum(EnumType.NAME) val enumAsName: Mood,
+    @KomapperColumn(alwaysQuote = true) @KomapperEnum(EnumType.ORDINAL) val enumAsOrdinal: Mood,
+    @KomapperColumn(alwaysQuote = true) @KomapperEnum(EnumType.PROPERTY, "abbr") val enumAsProperty: Mood,
+    @KomapperColumn(alwaysQuote = true) @KomapperEnum(EnumType.TYPE) val enumAsType: Mood,
     @KomapperColumn(alwaysQuote = true) val float: Float,
     @KomapperColumn(alwaysQuote = true) val instant: Instant,
     @KomapperColumn(alwaysQuote = true) val localDateTime: LocalDateTime,

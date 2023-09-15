@@ -230,6 +230,7 @@ internal class AnnotationSupport(
     private fun getEnumStrategy(annotation: KSAnnotation?): EnumStrategy {
         return when (annotation?.findValue("type")?.toString()) {
             Symbols.EnumType_NAME -> EnumStrategy.Name
+            Symbols.EnumType_TYPE -> EnumStrategy.Type
             Symbols.EnumType_ORDINAL -> EnumStrategy.Ordinal
             Symbols.EnumType_PROPERTY -> {
                 val hint = annotation.findValue("hint")?.toString()

@@ -161,31 +161,35 @@ internal class EntityMetamodelGenerator(
             val masking = "${p.column.masking}"
             val wrap = when (p.kotlinClass) {
                 is EnumClass -> {
-                    val enumPropertyName = p.kotlinClass.strategy.propertyName
-                    fun throwException(value: String, cause: String) =
-                        "throw $EnumMappingException($exteriorClass, \"$enumPropertyName\", $value, $cause)"
-                    when (p.kotlinClass.strategy) {
-                        EnumStrategy.Name ->
+                    fun throwException(value: String, propertyName: String, cause: String) =
+                        "throw $EnumMappingException($exteriorClass, $propertyName, $value, $cause)"
+                    when (val strategy = p.kotlinClass.strategy) {
+                        is EnumStrategy.Name ->
                             "{ try { $exteriorTypeName.valueOf(it) } catch (e: IllegalArgumentException) { ${
                                 throwException(
                                     "it",
+                                    "\"${strategy.propertyName}\"",
                                     "e",
                                 )
                             } } }"
-                        EnumStrategy.Ordinal ->
+                        is EnumStrategy.Ordinal ->
                             "{ try { $exteriorTypeName.values()[it] } catch (e: ArrayIndexOutOfBoundsException) { ${
                                 throwException(
                                     "it",
+                                    "\"${strategy.propertyName}\"",
                                     "e",
                                 )
                             } } }"
                         is EnumStrategy.Property ->
-                            "{ v -> $exteriorTypeName.values().firstOrNull { it.$enumPropertyName == v } ?: ${
+                            "{ v -> $exteriorTypeName.values().firstOrNull { it.${strategy.propertyName} == v } ?: ${
                                 throwException(
                                     "v",
+                                    "\"${strategy.propertyName}\"",
                                     "null",
                                 )
                             } }"
+                        is EnumStrategy.Type ->
+                            "{ it }"
                     }
                 }
                 is ValueClass -> {
@@ -206,7 +210,14 @@ internal class EntityMetamodelGenerator(
                 }
             }
             val unwrap = when (p.kotlinClass) {
-                is EnumClass -> "{ it.${p.kotlinClass.strategy.propertyName} }"
+                is EnumClass -> {
+                    when (val strategy = p.kotlinClass.strategy) {
+                        is EnumStrategy.Type -> "{ it }"
+                        is EnumStrategy.Name -> "{ it.${strategy.propertyName} }"
+                        is EnumStrategy.Ordinal -> "{ it.${strategy.propertyName} }"
+                        is EnumStrategy.Property -> "{ it.${strategy.propertyName} }"
+                    }
+                }
                 is ValueClass -> {
                     val alternateType = p.kotlinClass.alternateType
                     if (alternateType != null) {

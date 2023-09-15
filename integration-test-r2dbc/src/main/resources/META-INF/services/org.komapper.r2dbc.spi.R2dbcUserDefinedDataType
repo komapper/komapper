@@ -1,2 +1,3 @@
+integration.r2dbc.MoodType
 integration.r2dbc.UserDefinedIntType
 integration.r2dbc.UserDefinedStringType
