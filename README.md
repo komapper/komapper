@@ -38,7 +38,7 @@ Komapper is tested with the following databases:
 
 | Database           | version | JDBC support | R2DBC support |
 |--------------------|---------|:------------:|:-------------:|
-| H2 Database        | 2.1.212 |      v       |       v       |
+| H2 Database        | 2.2.222 |      v       |       v       |
 | MariaDB            | 10.6.3  |      v       |       v       |
 | MySQL              | 8.0.25  |      v       |       v       |
 | Oracle Database XE | 18.4.0  |      v       |       v       |
@@ -56,8 +56,8 @@ Add the following code to the Gradle build script (gradle.build.kts).
 
 ```kotlin
 plugins {
-    kotlin("jvm") version "1.9.0"
-    id("com.google.devtools.ksp") version "1.9.0-1.0.11"
+    kotlin("jvm") version "1.9.10"
+    id("com.google.devtools.ksp") version "1.9.10-1.0.13"
 }
 
 val komapperVersion = "1.13.0"
@@ -168,8 +168,8 @@ See [DESIGN_DOC](DESIGN_DOC.md) for the design policy of this project.
 | Kotlin and KSP version | Komapper version | JRE min version | Gradle min version |
 |:-----------------------|:-----------------|:----------------|--------------------|
 | 1.7.22-1.0.8           | 1.3.x - 1.11.x   | 11              | 6.7.1              |
-| 1.8.22-1.0.11          | 1.3.x - 1.12.x   | 11              | 6.8.3              |
-| 1.9.0-1.0.11           | 1.3.x - 1.12.x   | 11              | 6.8.3              |
+| 1.8.22-1.0.11          | 1.3.x - 1.13.x   | 11              | 6.8.3              |
+| 1.9.10-1.0.13          | 1.3.x - 1.13.x   | 11              | 6.8.3              |
 
 Compatibility testing is performed in the [komapper/compatibility-test](https://github.com/komapper/compatibility-test/) repository.
 
