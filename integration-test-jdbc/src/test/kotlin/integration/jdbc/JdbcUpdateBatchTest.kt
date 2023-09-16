@@ -1,9 +1,7 @@
 package integration.jdbc
 
 import integration.core.Address
-import integration.core.Dbms
 import integration.core.Person
-import integration.core.Run
 import integration.core.address
 import integration.core.department
 import integration.core.person
@@ -22,7 +20,6 @@ import kotlin.test.assertTrue
 @ExtendWith(JdbcEnv::class)
 class JdbcUpdateBatchTest(private val db: JdbcDatabase) {
 
-    @Run(unless = [Dbms.MARIADB])
     @Test
     fun test() {
         val a = Meta.address
@@ -45,30 +42,6 @@ class JdbcUpdateBatchTest(private val db: JdbcDatabase) {
             assertTrue(each.street.startsWith("["))
             assertTrue(each.street.endsWith("]"))
         }
-    }
-
-    @Run(onlyIf = [Dbms.MARIADB])
-    @Test
-    fun test_unsupportedOperationException() {
-        val a = Meta.address
-        val addressList = listOf(
-            Address(16, "STREET 16", 0),
-            Address(17, "STREET 17", 0),
-            Address(18, "STREET 18", 0),
-        )
-        for (address in addressList) {
-            db.runQuery { QueryDsl.insert(a).single(address) }
-        }
-        val query = QueryDsl.from(a).where { a.addressId inList listOf(16, 17, 18) }
-        val before = db.runQuery { query }
-        val ex = assertFailsWith<UnsupportedOperationException> {
-            db.runQuery {
-                val updateList = before.map { it.copy(street = "[" + it.street + "]") }
-                QueryDsl.update(a).batch(updateList)
-            }
-            Unit
-        }
-        println(ex)
     }
 
     @Test
@@ -127,7 +100,6 @@ class JdbcUpdateBatchTest(private val db: JdbcDatabase) {
         }
     }
 
-    @Run(unless = [Dbms.MARIADB])
     @Test
     fun updatedAt() {
         val p = Meta.person
@@ -144,7 +116,6 @@ class JdbcUpdateBatchTest(private val db: JdbcDatabase) {
         assertTrue(list.all { it.updatedAt != null })
     }
 
-    @Run(unless = [Dbms.MARIADB])
     @Test
     fun uniqueConstraintException() {
         val a = Meta.address
@@ -161,7 +132,6 @@ class JdbcUpdateBatchTest(private val db: JdbcDatabase) {
         }
     }
 
-    @Run(unless = [Dbms.MARIADB])
     @Test
     fun optimisticLockException() {
         val a = Meta.address
@@ -179,7 +149,6 @@ class JdbcUpdateBatchTest(private val db: JdbcDatabase) {
         assertEquals("index=2, count=0", ex.message)
     }
 
-    @Run(unless = [Dbms.MARIADB])
     @Test
     fun include() {
         val d = Meta.department
@@ -202,7 +171,6 @@ class JdbcUpdateBatchTest(private val db: JdbcDatabase) {
         }
     }
 
-    @Run(unless = [Dbms.MARIADB])
     @Test
     fun exclude() {
         val d = Meta.department
