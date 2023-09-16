@@ -250,9 +250,6 @@ class JdbcInsertBatchTest(private val db: JdbcDatabase) {
         )
         val query = QueryDsl.insert(i).onDuplicateKeyUpdate().batch(strategies)
         val counts = db.runQuery { query }
-        when (db.config.dialect.driver) {
-            "mariadb" -> assertEquals(listOf(Statement.SUCCESS_NO_INFO.toLong(), Statement.SUCCESS_NO_INFO.toLong(), 1L), counts)
-            else -> assertEquals(listOf(1L, 1L, 1L), counts)
-        }
+        assertEquals(listOf(1L, 1L, 1L), counts)
     }
 }
