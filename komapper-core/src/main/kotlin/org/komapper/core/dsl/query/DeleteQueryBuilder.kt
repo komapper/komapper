@@ -84,7 +84,7 @@ internal data class DeleteQueryBuilderImpl<ENTITY : Any, ID : Any, META : Entity
     }
 
     override fun all(): RelationDeleteQuery<ENTITY> {
-        return asRelationDeleteQuery()
+        return asRelationDeleteQuery().options { it.copy(allowMissingWhereClause = true) }
     }
 
     private fun asRelationDeleteQuery(): RelationDeleteQuery<ENTITY> {

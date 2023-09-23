@@ -23,19 +23,16 @@ class JdbcDeleteWhereTest(private val db: JdbcDatabase) {
     }
 
     @Test
-    fun allowMissingWhereClause_default() {
+    fun all() {
         val e = Meta.employee
-        val ex = assertFailsWith<IllegalStateException> {
-            @Suppress("UNUSED_VARIABLE")
-            val count = db.runQuery {
-                QueryDsl.delete(e).all()
-            }
+        val count = db.runQuery {
+            QueryDsl.delete(e).all()
         }
-        println(ex)
+        assertEquals(14, count)
     }
 
     @Test
-    fun allowMissingWhereClause_default_empty() {
+    fun allowMissingWhereClause_default() {
         val e = Meta.employee
         val ex = assertFailsWith<IllegalStateException> {
             @Suppress("UNUSED_VARIABLE")
@@ -50,7 +47,7 @@ class JdbcDeleteWhereTest(private val db: JdbcDatabase) {
     fun allowMissingWhereClause_true() {
         val e = Meta.employee
         val count = db.runQuery {
-            QueryDsl.delete(e).all().options { it.copy(allowMissingWhereClause = true) }
+            QueryDsl.delete(e).where { }.options { it.copy(allowMissingWhereClause = true) }
         }
         assertEquals(14, count)
     }

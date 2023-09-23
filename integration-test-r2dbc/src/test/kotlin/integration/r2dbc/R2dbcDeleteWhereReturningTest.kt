@@ -92,20 +92,17 @@ class R2dbcDeleteWhereReturningTest(private val db: R2dbcDatabase) {
 
     @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
-    fun allowMissingWhereClause_default(info: TestInfo) = inTransaction(db, info) {
+    fun all(info: TestInfo) = inTransaction(db, info) {
         val e = Meta.employee
-        val ex = assertFailsWith<IllegalStateException> {
-            @Suppress("UNUSED_VARIABLE")
-            val count = db.runQuery {
-                QueryDsl.delete(e).all().returning()
-            }
+        val list = db.runQuery {
+            QueryDsl.delete(e).all().returning()
         }
-        println(ex)
+        assertEquals(14, list.size)
     }
 
     @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
-    fun allowMissingWhereClause_default_empty(info: TestInfo) = inTransaction(db, info) {
+    fun allowMissingWhereClause_default(info: TestInfo) = inTransaction(db, info) {
         val e = Meta.employee
         val ex = assertFailsWith<IllegalStateException> {
             @Suppress("UNUSED_VARIABLE")
@@ -121,7 +118,7 @@ class R2dbcDeleteWhereReturningTest(private val db: R2dbcDatabase) {
     fun allowMissingWhereClause_true(info: TestInfo) = inTransaction(db, info) {
         val e = Meta.employee
         val list = db.runQuery {
-            QueryDsl.delete(e).all().returning().options { it.copy(allowMissingWhereClause = true) }
+            QueryDsl.delete(e).where { }.returning().options { it.copy(allowMissingWhereClause = true) }
         }
         assertEquals(14, list.size)
     }
