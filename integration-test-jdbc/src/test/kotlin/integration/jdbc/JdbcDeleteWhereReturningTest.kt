@@ -91,20 +91,17 @@ class JdbcDeleteWhereReturningTest(private val db: JdbcDatabase) {
 
     @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.ORACLE, Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
-    fun allowMissingWhereClause_default() {
+    fun all() {
         val e = Meta.employee
-        val ex = assertFailsWith<IllegalStateException> {
-            @Suppress("UNUSED_VARIABLE")
-            val count = db.runQuery {
-                QueryDsl.delete(e).all().returning()
-            }
+        val list = db.runQuery {
+            QueryDsl.delete(e).all().returning()
         }
-        println(ex)
+        assertEquals(14, list.size)
     }
 
     @Run(onlyIf = [Dbms.H2, Dbms.MARIADB, Dbms.ORACLE, Dbms.POSTGRESQL, Dbms.SQLSERVER])
     @Test
-    fun allowMissingWhereClause_default_empty() {
+    fun allowMissingWhereClause_default() {
         val e = Meta.employee
         val ex = assertFailsWith<IllegalStateException> {
             @Suppress("UNUSED_VARIABLE")
@@ -120,7 +117,7 @@ class JdbcDeleteWhereReturningTest(private val db: JdbcDatabase) {
     fun allowMissingWhereClause_true() {
         val e = Meta.employee
         val list = db.runQuery {
-            QueryDsl.delete(e).all().returning().options { it.copy(allowMissingWhereClause = true) }
+            QueryDsl.delete(e).where { }.returning().options { it.copy(allowMissingWhereClause = true) }
         }
         assertEquals(14, list.size)
     }
