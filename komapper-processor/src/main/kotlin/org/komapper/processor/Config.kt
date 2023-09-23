@@ -31,7 +31,7 @@ internal data class Config(
             val enumStrategy = options.getOrDefault(ENUM_STRATEGY, "name").let {
                 when (it) {
                     "name" -> EnumStrategy.Name
-                    "enum" -> EnumStrategy.Type
+                    "type" -> EnumStrategy.Type
                     "ordinal" -> EnumStrategy.Ordinal
                     else -> error("'$it' is illegal value as a $ENUM_STRATEGY option.")
                 }
