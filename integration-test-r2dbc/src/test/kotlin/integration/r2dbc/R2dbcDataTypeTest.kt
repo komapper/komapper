@@ -14,6 +14,7 @@ import integration.core.EmbeddedEnumPropertyData
 import integration.core.EnumData
 import integration.core.EnumOrdinalData
 import integration.core.EnumPropertyData
+import integration.core.EnumUdtData
 import integration.core.FloatData
 import integration.core.InstantData
 import integration.core.IntData
@@ -51,8 +52,10 @@ import integration.core.embeddedEnumPropertyData
 import integration.core.enumData
 import integration.core.enumOrdinalData
 import integration.core.enumPropertyData
+import integration.core.enumUdtData
 import integration.core.enumclass.Color
 import integration.core.enumclass.Direction
+import integration.core.enumclass.Mood
 import integration.core.floatData
 import integration.core.instantData
 import integration.core.intData
@@ -594,6 +597,34 @@ class R2dbcDataTypeTest(val db: R2dbcDatabase) {
     fun embedded_enum_property_null(info: TestInfo) = inTransaction(db, info) {
         val m = Meta.embeddedEnumPropertyData
         val data = EmbeddedEnumPropertyData(1, null)
+        db.runQuery { QueryDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        assertEquals(data, data2)
+    }
+
+    @Test
+    @Run(onlyIf = [Dbms.POSTGRESQL])
+    fun enum_udt(info: TestInfo) = inTransaction(db, info) {
+        val m = Meta.enumUdtData
+        val data = EnumUdtData(1, Mood.HAPPY)
+        db.runQuery { QueryDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        assertEquals(data, data2)
+        val data3 = db.runQuery {
+            QueryDsl.from(m).where { m.value eq Mood.HAPPY }.first()
+        }
+        assertEquals(data, data3)
+    }
+
+    @Test
+    @Run(onlyIf = [Dbms.POSTGRESQL])
+    fun enum_udt_null(info: TestInfo) = inTransaction(db, info) {
+        val m = Meta.enumUdtData
+        val data = EnumUdtData(1, null)
         db.runQuery { QueryDsl.insert(m).single(data) }
         val data2 = db.runQuery {
             QueryDsl.from(m).where { m.id eq 1 }.first()

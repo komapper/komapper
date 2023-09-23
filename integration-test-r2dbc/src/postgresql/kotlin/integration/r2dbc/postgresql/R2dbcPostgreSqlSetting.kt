@@ -2,7 +2,6 @@ package integration.r2dbc.postgresql
 
 import integration.core.PostgreSqlSetting
 import io.r2dbc.spi.ConnectionFactoryOptions
-import io.r2dbc.spi.Option
 import org.komapper.core.ExecutionOptions
 import org.komapper.r2dbc.R2dbcDatabase
 import org.testcontainers.containers.PostgreSQLContainer
@@ -19,10 +18,9 @@ class R2dbcPostgreSqlSetting(private val driver: String, private val url: String
         val r2dbcContainer = PostgreSQLR2DBCDatabaseContainer(container)
         r2dbcContainer.start()
         r2dbcContainer.configure(
+            // We do not use connection pool to use the `mood` enum codec
             ConnectionFactoryOptions.builder()
-                .option(ConnectionFactoryOptions.DRIVER, "pool")
-                .option(ConnectionFactoryOptions.PROTOCOL, driver)
-                .option(Option.valueOf("initialSize"), 2)
+                .option(ConnectionFactoryOptions.DRIVER, driver)
                 .build(),
         )
     }

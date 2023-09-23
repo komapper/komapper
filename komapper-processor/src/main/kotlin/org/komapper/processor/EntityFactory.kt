@@ -223,6 +223,7 @@ internal class EntityFactory(
         return if (classDeclaration != null && classDeclaration.classKind == ClassKind.ENUM_CLASS) {
             when (val strategy = enumStrategy ?: config.enumStrategy) {
                 EnumStrategy.Name -> EnumClass(type, EnumStrategy.Name.typeName, strategy)
+                EnumStrategy.Type -> EnumClass(type, type.name, strategy)
                 EnumStrategy.Ordinal -> EnumClass(type, EnumStrategy.Ordinal.typeName, strategy)
                 is EnumStrategy.Property -> {
                     val propertyName = strategy.propertyName

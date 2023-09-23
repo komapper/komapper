@@ -178,22 +178,23 @@ internal data class PlainClass(
 }
 
 sealed interface EnumStrategy {
-    val propertyName: String
 
     object Name : EnumStrategy {
-        override val propertyName: String = "name"
+        const val propertyName: String = "name"
         const val typeName: String = "String"
     }
 
     object Ordinal : EnumStrategy {
-        override val propertyName: String = "ordinal"
+        const val propertyName: String = "ordinal"
         const val typeName: String = "Int"
     }
 
     data class Property(
-        override val propertyName: String,
+        val propertyName: String,
         val annotation: KSAnnotation,
     ) : EnumStrategy
+
+    object Type : EnumStrategy
 }
 
 internal data class ValueClassProperty(
