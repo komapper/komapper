@@ -148,6 +148,12 @@ internal class EntityMetamodelGenerator(
             if (usesLocalDateTime) w.println("import $toKotlinLocalDateTime")
             w.println()
         }
+
+        for (a in entity.associations) {
+            if (a.sourceEntity.packageName != a.targetEntity.packageName) {
+                w.println("import ${a.targetEntity.packageName}.`${a.link.target}`")
+            }
+        }
     }
 
     private fun entityDescriptor() {
