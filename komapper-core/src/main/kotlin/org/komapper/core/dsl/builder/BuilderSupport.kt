@@ -20,9 +20,11 @@ import org.komapper.core.dsl.expression.Operand
 import org.komapper.core.dsl.expression.PropertyExpression
 import org.komapper.core.dsl.expression.ScalarExpression
 import org.komapper.core.dsl.expression.ScalarQueryExpression
+import org.komapper.core.dsl.expression.SqlBuilderScopeImpl
 import org.komapper.core.dsl.expression.StringFunction
 import org.komapper.core.dsl.expression.SubqueryExpression
 import org.komapper.core.dsl.expression.TableExpression
+import org.komapper.core.dsl.expression.UserDefinedExpression
 
 class BuilderSupport(
     private val dialect: BuilderDialect,
@@ -78,6 +80,11 @@ class BuilderSupport(
             is StringFunction -> {
                 visitStringFunction(expression)
             }
+
+            is UserDefinedExpression -> {
+                visitUserDefinedExpression(expression)
+            }
+
             is PropertyExpression<*, *> -> {
                 val name = expression.getCanonicalColumnName(dialect::enquote)
                 val owner = expression.owner
@@ -365,6 +372,13 @@ class BuilderSupport(
                 buf.append(")")
             }
         }
+        buf.append(")")
+    }
+
+    private fun visitUserDefinedExpression(expression: UserDefinedExpression<*, *>) {
+        buf.append("(")
+        val scope = SqlBuilderScopeImpl(dialect, buf, ::visitOperand)
+        expression.build(scope)
         buf.append(")")
     }
 
