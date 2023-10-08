@@ -2,6 +2,7 @@ package org.komapper.dialect.oracle
 
 import org.komapper.core.BuilderDialect
 import org.komapper.core.Dialect
+import org.komapper.core.LocateFunctionType
 import org.komapper.core.dsl.builder.EntityDeleteStatementBuilder
 import org.komapper.core.dsl.builder.EntityInsertStatementBuilder
 import org.komapper.core.dsl.builder.EntityUpdateStatementBuilder
@@ -33,6 +34,10 @@ interface OracleDialect : Dialect {
     }
 
     override val driver: String get() = DRIVER
+
+    override fun getLocateFunctionType(): LocateFunctionType {
+        return LocateFunctionType.INSTR
+    }
 
     override fun getRandomFunction(): String = "dbms_random.value"
 

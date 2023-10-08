@@ -114,6 +114,13 @@ interface Dialect {
     }
 
     /**
+     * Returns the type of LOCATE function.
+     */
+    fun getLocateFunctionType(): LocateFunctionType {
+        return LocateFunctionType.LOCATE
+    }
+
+    /**
      * Returns the statement builder for creating the OFFSET and LIMIT expression.
      *
      * @param dialect the builder dialect
@@ -394,4 +401,14 @@ object DryRunDialect : Dialect {
     override fun supportsLockOptionSkipLocked(): Boolean = true
 
     override fun supportsLockOptionWait(): Boolean = true
+}
+
+/**
+ * Type of LOCATE function.
+ */
+enum class LocateFunctionType(val functionName: String) {
+    LOCATE("locate"),
+    INSTR("instr"),
+    CHARINDEX("charindex"),
+    POSITION("position"),
 }

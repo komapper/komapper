@@ -2,6 +2,7 @@ package org.komapper.dialect.sqlserver
 
 import org.komapper.core.BuilderDialect
 import org.komapper.core.Dialect
+import org.komapper.core.LocateFunctionType
 import org.komapper.core.dsl.builder.EntityDeleteStatementBuilder
 import org.komapper.core.dsl.builder.EntityInsertStatementBuilder
 import org.komapper.core.dsl.builder.EntityUpdateStatementBuilder
@@ -36,6 +37,10 @@ interface SqlServerDialect : Dialect {
     override val driver: String get() = DRIVER
     override val openQuote: String get() = OPEN_QUOTE
     override val closeQuote: String get() = CLOSE_QUOTE
+
+    override fun getLocateFunctionType(): LocateFunctionType {
+        return LocateFunctionType.CHARINDEX
+    }
 
     override fun getOffsetLimitStatementBuilder(
         dialect: BuilderDialect,
