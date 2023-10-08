@@ -2,7 +2,6 @@ package org.komapper.core.dsl.expression
 
 import org.komapper.core.Dialect
 import org.komapper.core.StatementBuffer
-import org.komapper.core.Value
 import kotlin.reflect.KClass
 
 internal class UserDefinedExpression<EXTERIOR : Any, INTERIOR : Any>(
@@ -46,7 +45,6 @@ interface SqlBuilderScope {
     val dialect: Dialect
     fun append(text: CharSequence)
     fun cutBack(length: Int)
-    fun bind(value: Value<*>)
     fun visit(operand: Operand)
 }
 
@@ -61,10 +59,6 @@ internal class SqlBuilderScopeImpl(
 
     override fun cutBack(length: Int) {
         buf.cutBack(length)
-    }
-
-    override fun bind(value: Value<*>) {
-        buf.bind(value)
     }
 
     override fun visit(operand: Operand) {
