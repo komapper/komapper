@@ -261,7 +261,7 @@ interface FilterScope {
      */
     fun <S : CharSequence> text(value: S): EscapeExpression {
         if (value is EscapeExpression) return value
-        return EscapeExpression.Text(value)
+        return EscapeExpression.Text(value.toString())
     }
 
     /**
@@ -269,7 +269,7 @@ interface FilterScope {
      */
     fun <S : CharSequence> escape(value: S): EscapeExpression {
         if (value is EscapeExpression) return value
-        return EscapeExpression.Escape(value)
+        return EscapeExpression.Escape(value.toString())
     }
 
     /**

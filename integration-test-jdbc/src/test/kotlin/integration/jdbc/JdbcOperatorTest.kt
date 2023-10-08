@@ -254,24 +254,30 @@ class JdbcOperatorTest(private val db: JdbcDatabase) {
     @Test
     fun userDefinedExpression() {
         val a = Meta.address
-        val value = "world"
         val result = db.runQuery {
-            QueryDsl.from(a).select(myConcat(literal("hello"), value)).first()
+            QueryDsl.from(a)
+                .where { a.addressId eq 1 }
+                .select(replace(a.street, "STREET", "St.")).first()
         }
-        assertEquals("helloworld", result)
+        assertEquals("St. 1", result)
     }
 
-    private fun myConcat(
-        left: ColumnExpression<String, String>,
-        @Suppress("SameParameterValue") right: String,
-    ): ColumnExpression<String, String> {
-        val o1 = Operand.Column(left)
-        val o2 = Operand.Argument(left, right)
-        return columnExpression(String::class, listOf(o1, o2)) {
-            append("concat(")
+    private fun <T : Any> replace(
+        expression: ColumnExpression<T, String>,
+        from: T,
+        to: T,
+    ): ColumnExpression<T, String> {
+        val name = "replace"
+        val o1 = Operand.Column(expression)
+        val o2 = Operand.Argument(expression, from)
+        val o3 = Operand.Argument(expression, to)
+        return columnExpression(expression, name, listOf(o1, o2, o3)) {
+            append("$name(")
             visit(o1)
             append(", ")
             visit(o2)
+            append(", ")
+            visit(o3)
             append(")")
         }
     }

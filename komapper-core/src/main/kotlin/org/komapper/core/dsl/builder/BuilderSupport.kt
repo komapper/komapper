@@ -383,6 +383,31 @@ class BuilderSupport(
         buf.append(")")
     }
 
+    private fun buildEscapedValuePair(
+        escapeExpression: EscapeExpression,
+        masking: Boolean,
+    ): Pair<Value<String>, Value<String>> {
+        val patternBuf = StringBuilder(escapeExpression.length + 10)
+        val finalEscapeSequence = escapeSequence ?: dialect.escapeSequence
+        fun visit(e: EscapeExpression) {
+            when (e) {
+                is EscapeExpression.Text -> patternBuf.append(e.value)
+                is EscapeExpression.Escape -> {
+                    val escaped = dialect.escape(e.value.toString(), finalEscapeSequence)
+                    patternBuf.append(escaped)
+                }
+                is EscapeExpression.Composite -> {
+                    visit(e.left)
+                    visit(e.right)
+                }
+            }
+        }
+        visit(escapeExpression)
+        val first = Value(patternBuf.toString(), String::class, masking)
+        val second = Value(finalEscapeSequence, String::class)
+        return first to second
+    }
+
     fun visitOperand(operand: Operand) {
         when (operand) {
             is Operand.Column -> {
@@ -390,6 +415,16 @@ class BuilderSupport(
             }
             is Operand.Argument<*, *> -> {
                 buf.bind(operand.value)
+            }
+            is Operand.Escape -> {
+                val values = buildEscapedValuePair(operand.escapeExpression, operand.masking)
+                buf.bind(values.first)
+                buf.append(" escape ")
+                buf.bind(values.second)
+            }
+            is Operand.Subquery -> {
+                val statement = buildSubqueryStatement(operand.subqueryExpression)
+                buf.append(statement)
             }
         }
     }
@@ -416,8 +451,8 @@ class BuilderSupport(
             is Criterion.NotInSubQuery -> operation.inSubQuery(c.left, c.right, true)
             is Criterion.InSubQuery2 -> operation.inSubQuery2(c.left, c.right)
             is Criterion.NotInSubQuery2 -> operation.inSubQuery2(c.left, c.right, true)
-            is Criterion.Exists -> operation.exists(c.expression)
-            is Criterion.NotExists -> operation.exists(c.expression, true)
+            is Criterion.Exists -> operation.exists(c.operand)
+            is Criterion.NotExists -> operation.exists(c.operand, true)
             is Criterion.And -> operation.logicalBinary("and", c.criteria, index)
             is Criterion.Or -> operation.logicalBinary("or", c.criteria, index)
             is Criterion.Not -> operation.not(c.criteria)
@@ -443,33 +478,13 @@ class BuilderSupport(
             buf.append(predicate)
         }
 
-        fun like(left: Operand, right: EscapeExpression, not: Boolean = false) {
+        fun like(left: Operand, right: Operand, not: Boolean = false) {
             visitOperand(left)
             if (not) {
                 buf.append(" not")
             }
             buf.append(" like ")
-            val finalEscapeSequence = escapeSequence ?: dialect.escapeSequence
-            val newValue = escape(right) { dialect.escape(it, finalEscapeSequence) }
-            buf.bind(Value(newValue, String::class, left.masking))
-            buf.append(" escape ")
-            buf.bind(Value(finalEscapeSequence, String::class))
-        }
-
-        private fun escape(expression: EscapeExpression, escape: (String) -> String): String {
-            val buf = StringBuilder(expression.length + 10)
-            fun visit(e: EscapeExpression) {
-                when (e) {
-                    is EscapeExpression.Text -> buf.append(e.value)
-                    is EscapeExpression.Escape -> buf.append(escape(e.value.toString()))
-                    is EscapeExpression.Composite -> {
-                        visit(e.left)
-                        visit(e.right)
-                    }
-                }
-            }
-            visit(expression)
-            return buf.toString()
+            visitOperand(right)
         }
 
         fun between(left: Operand, right: Pair<Operand, Operand>, not: Boolean = false) {
@@ -561,18 +576,17 @@ class BuilderSupport(
             }
         }
 
-        fun inSubQuery(left: Operand, right: SubqueryExpression<*>, not: Boolean = false) {
+        fun inSubQuery(left: Operand, right: Operand, not: Boolean = false) {
             visitOperand(left)
             if (not) {
                 buf.append(" not")
             }
             buf.append(" in (")
-            val statement = buildSubqueryStatement(right)
-            buf.append(statement)
+            visitOperand(right)
             buf.append(")")
         }
 
-        fun inSubQuery2(left: Pair<Operand, Operand>, right: SubqueryExpression<*>, not: Boolean = false) {
+        fun inSubQuery2(left: Pair<Operand, Operand>, right: Operand, not: Boolean = false) {
             if (!dialect.supportsMultipleColumnsInInPredicate()) {
                 throw UnsupportedOperationException("Dialect(driver=${dialect.driver}) does not support multiple columns in IN predicate.")
             }
@@ -585,18 +599,16 @@ class BuilderSupport(
                 buf.append(" not")
             }
             buf.append(" in (")
-            val statement = buildSubqueryStatement(right)
-            buf.append(statement)
+            visitOperand(right)
             buf.append(")")
         }
 
-        fun exists(expression: SubqueryExpression<*>, not: Boolean = false) {
+        fun exists(operand: Operand, not: Boolean = false) {
             if (not) {
                 buf.append("not ")
             }
             buf.append("exists (")
-            val statement = buildSubqueryStatement(expression)
-            buf.append(statement)
+            visitOperand(operand)
             buf.append(")")
         }
 

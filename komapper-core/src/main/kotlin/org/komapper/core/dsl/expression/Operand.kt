@@ -16,4 +16,10 @@ sealed class Operand {
             return Value(interior, expression.interiorClass, expression.masking)
         }
     }
+    data class Escape(val expression: ColumnExpression<*, *>, val escapeExpression: EscapeExpression) : Operand() {
+        override val masking: Boolean get() = expression.masking
+    }
+    data class Subquery(val subqueryExpression: SubqueryExpression<*>) : Operand() {
+        override val masking: Boolean = false
+    }
 }

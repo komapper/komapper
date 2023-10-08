@@ -14,16 +14,16 @@ interface CriteriaContext {
     val scope: FilterScope
 
     /**
-     * Adds a SQL builder
+     * Adds a SQL builder.
+     *
      * @param build the SQL builder
      */
     fun add(build: SqlBuilderScope.() -> Unit)
 }
 
-class CriteriaContextImpl(
+internal class CriteriaContextImpl(
     override val scope: FilterScope,
-    val
-    criteria: MutableList<Criterion>,
+    private val criteria: MutableList<Criterion>,
 ) : CriteriaContext {
     override fun add(build: SqlBuilderScope.() -> Unit) {
         val criterion = Criterion.UserDefined(build)
