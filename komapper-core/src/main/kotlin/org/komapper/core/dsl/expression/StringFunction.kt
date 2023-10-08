@@ -11,27 +11,18 @@ internal sealed class StringFunction<T : Any, S : Any> : ColumnExpression<T, S> 
         ColumnExpression<T, String> by expression, StringFunction<T, String>()
 
     internal data class Locate(
-        val expression: ColumnExpression<*, String>,
         val pattern: Operand,
         val string: Operand,
         val startIndex: Operand?,
     ) : StringFunction<Int, Int>() {
-        override val owner: TableExpression<*>
-            get() = expression.owner
-        override val exteriorClass: KClass<Int>
-            get() = Int::class
-        override val interiorClass: KClass<Int>
-            get() = Int::class
-        override val wrap: (Int) -> Int
-            get() = { it }
-        override val unwrap: (Int) -> Int
-            get() = { it }
-        override val columnName: String
-            get() = expression.columnName
-        override val alwaysQuote: Boolean
-            get() = expression.masking
-        override val masking: Boolean
-            get() = expression.masking
+        override val owner: TableExpression<*> get() = throw UnsupportedOperationException()
+        override val exteriorClass: KClass<Int> get() = Int::class
+        override val interiorClass: KClass<Int> get() = Int::class
+        override val wrap: (Int) -> Int get() = { it }
+        override val unwrap: (Int) -> Int get() = { it }
+        override val columnName: String get() = throw UnsupportedOperationException()
+        override val alwaysQuote: Boolean get() = throw UnsupportedOperationException()
+        override val masking: Boolean get() = throw UnsupportedOperationException()
     }
 
     internal data class Lower<T : Any>(

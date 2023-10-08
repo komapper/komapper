@@ -50,7 +50,7 @@ fun <T : Any> locate(
     val o1 = Operand.Column(pattern)
     val o2 = Operand.Argument(pattern, string)
     val o3 = startIndex?.let { Operand.Argument(literal(it), it) }
-    return StringFunction.Locate(pattern, o1, o2, o3)
+    return StringFunction.Locate(o1, o2, o3)
 }
 
 /**
@@ -66,7 +66,7 @@ fun <T : Any> locate(
     val o1 = Operand.Argument(string, pattern)
     val o2 = Operand.Column(string)
     val o3 = startIndex?.let { Operand.Argument(literal(it), it) }
-    return StringFunction.Locate(string, o1, o2, o3)
+    return StringFunction.Locate(o1, o2, o3)
 }
 
 /**
@@ -82,7 +82,7 @@ fun <T : Any> locate(
     val o1 = Operand.Column(pattern)
     val o2 = Operand.Column(string)
     val o3 = startIndex?.let { Operand.Argument(literal(it), it) }
-    return StringFunction.Locate(pattern, o1, o2, o3)
+    return StringFunction.Locate(o1, o2, o3)
 }
 
 /**
