@@ -2,6 +2,12 @@ package org.komapper.core.dsl.expression
 
 import kotlin.reflect.KClass
 
+/**
+ * The column expression.
+ *
+ * @param EXTERIOR the exterior type of expression evaluation
+ * @param INTERIOR the interior type of expression evaluation
+ */
 sealed interface ColumnExpression<EXTERIOR : Any, INTERIOR : Any> : SortExpression {
     val owner: TableExpression<*>
     val exteriorClass: KClass<EXTERIOR>

@@ -2,7 +2,7 @@ package org.komapper.core.dsl.expression
 
 import kotlin.reflect.KClass
 
-internal class LiteralExpression<T : Any>(val value: T, klass: KClass<T>) :
+internal data class LiteralExpression<T : Any>(val value: T, private val klass: KClass<T>) :
     ColumnExpression<T, T> {
     override val owner: TableExpression<*>
         get() = throw UnsupportedOperationException()

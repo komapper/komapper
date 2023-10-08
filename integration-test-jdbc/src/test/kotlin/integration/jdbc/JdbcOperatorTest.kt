@@ -5,7 +5,10 @@ import integration.core.employee
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
+import org.komapper.core.dsl.expression.ColumnExpression
+import org.komapper.core.dsl.expression.Operand
 import org.komapper.core.dsl.operator.coalesce
+import org.komapper.core.dsl.operator.columnExpression
 import org.komapper.core.dsl.operator.concat
 import org.komapper.core.dsl.operator.count
 import org.komapper.core.dsl.operator.div
@@ -200,6 +203,7 @@ class JdbcOperatorTest(private val db: JdbcDatabase) {
             QueryDsl.from(a).select(locate(literal("bar"), literal("foobarbar"))).first()
         }
         assertEquals(4, result)
+        assertEquals(locate(literal("bar"), literal("foobarbar")), locate(literal("bar"), literal("foobarbar")))
     }
 
     @Test
@@ -245,6 +249,31 @@ class JdbcOperatorTest(private val db: JdbcDatabase) {
             QueryDsl.from(a).select(locate(literal("bar"), "foobarbar", 5)).first()
         }
         assertEquals(7, result)
+    }
+
+    @Test
+    fun userDefinedExpression() {
+        val a = Meta.address
+        val value = "world"
+        val result = db.runQuery {
+            QueryDsl.from(a).select(myConcat(literal("hello"), value)).first()
+        }
+        assertEquals("helloworld", result)
+    }
+
+    private fun myConcat(
+        left: ColumnExpression<String, String>,
+        @Suppress("SameParameterValue") right: String,
+    ): ColumnExpression<String, String> {
+        val o1 = Operand.Column(left)
+        val o2 = Operand.Argument(left, right)
+        return columnExpression(String::class, listOf(o1, o2)) {
+            append("concat(")
+            visit(o1)
+            append(", ")
+            visit(o2)
+            append(")")
+        }
     }
 
     @Test
