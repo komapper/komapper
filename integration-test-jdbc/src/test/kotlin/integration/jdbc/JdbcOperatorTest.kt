@@ -10,6 +10,7 @@ import org.komapper.core.dsl.operator.concat
 import org.komapper.core.dsl.operator.count
 import org.komapper.core.dsl.operator.div
 import org.komapper.core.dsl.operator.literal
+import org.komapper.core.dsl.operator.locate
 import org.komapper.core.dsl.operator.lower
 import org.komapper.core.dsl.operator.ltrim
 import org.komapper.core.dsl.operator.minus
@@ -190,6 +191,60 @@ class JdbcOperatorTest(private val db: JdbcDatabase) {
                 }.first()
         }
         assertEquals("STREET 10STREET 10STREET 10", result)
+    }
+
+    @Test
+    fun locateFunction_2parameters() {
+        val a = Meta.address
+        val result = db.runQuery {
+            QueryDsl.from(a).select(locate(literal("bar"), literal("foobarbar"))).first()
+        }
+        assertEquals(4, result)
+    }
+
+    @Test
+    fun locateFunction_2parameters_when_1st_parameter_is_value() {
+        val a = Meta.address
+        val result = db.runQuery {
+            QueryDsl.from(a).select(locate("bar", literal("foobarbar"))).first()
+        }
+        assertEquals(4, result)
+    }
+
+    @Test
+    fun locateFunction_2parameters_when_2nd_parameter_is_value() {
+        val a = Meta.address
+        val result = db.runQuery {
+            QueryDsl.from(a).select(locate(literal("bar"), "foobarbar")).first()
+        }
+        assertEquals(4, result)
+    }
+
+    @Test
+    fun locateFunction_3parameters() {
+        val a = Meta.address
+        val result = db.runQuery {
+            QueryDsl.from(a).select(locate(literal("bar"), literal("foobarbar"), 5)).first()
+        }
+        assertEquals(7, result)
+    }
+
+    @Test
+    fun locateFunction_3parameters_when_1st_parameter_is_value() {
+        val a = Meta.address
+        val result = db.runQuery {
+            QueryDsl.from(a).select(locate("bar", literal("foobarbar"), 5)).first()
+        }
+        assertEquals(7, result)
+    }
+
+    @Test
+    fun locateFunction_3parameters_when_2nd_parameter_is_value() {
+        val a = Meta.address
+        val result = db.runQuery {
+            QueryDsl.from(a).select(locate(literal("bar"), "foobarbar", 5)).first()
+        }
+        assertEquals(7, result)
     }
 
     @Test

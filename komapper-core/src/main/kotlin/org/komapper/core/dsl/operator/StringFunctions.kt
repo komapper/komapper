@@ -38,6 +38,54 @@ fun <T : Any> concat(
 }
 
 /**
+ * Builds a LOCATE function.
+ *
+ * Depending on the Dialect, either the INSTR, CHARINDE, or POSITION function may be created instead of the LOCATE function.
+ */
+fun <T : Any> locate(
+    pattern: ColumnExpression<T, String>,
+    string: T,
+    startIndex: Int? = null,
+): ColumnExpression<Int, Int> {
+    val o1 = Operand.Column(pattern)
+    val o2 = Operand.Argument(pattern, string)
+    val o3 = startIndex?.let { Operand.Argument(literal(it), it) }
+    return StringFunction.Locate(pattern, o1, o2, o3)
+}
+
+/**
+ * Builds a LOCATE function.
+ *
+ * Depending on the Dialect, either the INSTR, CHARINDE, or POSITION function may be created instead of the LOCATE function.
+ */
+fun <T : Any> locate(
+    pattern: T,
+    string: ColumnExpression<T, String>,
+    startIndex: Int? = null,
+): ColumnExpression<Int, Int> {
+    val o1 = Operand.Argument(string, pattern)
+    val o2 = Operand.Column(string)
+    val o3 = startIndex?.let { Operand.Argument(literal(it), it) }
+    return StringFunction.Locate(string, o1, o2, o3)
+}
+
+/**
+ * Builds a LOCATE function.
+ *
+ * Depending on the Dialect, either the INSTR, CHARINDE, or POSITION function may be created instead of the LOCATE function.
+ */
+fun <T : Any> locate(
+    pattern: ColumnExpression<T, String>,
+    string: ColumnExpression<T, String>,
+    startIndex: Int? = null,
+): ColumnExpression<Int, Int> {
+    val o1 = Operand.Column(pattern)
+    val o2 = Operand.Column(string)
+    val o3 = startIndex?.let { Operand.Argument(literal(it), it) }
+    return StringFunction.Locate(pattern, o1, o2, o3)
+}
+
+/**
  * Builds a LOWER function.
  */
 fun <T : Any> lower(

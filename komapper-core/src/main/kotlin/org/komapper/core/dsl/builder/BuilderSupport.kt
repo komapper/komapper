@@ -1,6 +1,7 @@
 package org.komapper.core.dsl.builder
 
 import org.komapper.core.BuilderDialect
+import org.komapper.core.LocateFunctionType
 import org.komapper.core.Statement
 import org.komapper.core.StatementBuffer
 import org.komapper.core.Value
@@ -263,7 +264,7 @@ class BuilderSupport(
         }
     }
 
-    private fun visitStringFunction(function: StringFunction<*>) {
+    private fun visitStringFunction(function: StringFunction<*, *>) {
         buf.append("(")
         when (function) {
             is StringFunction.Concat -> {
@@ -272,6 +273,53 @@ class BuilderSupport(
                 buf.append(", ")
                 visitOperand(function.right)
                 buf.append(")")
+            }
+            is StringFunction.Locate -> {
+                when (val type = dialect.getLocateFunctionType()) {
+                    LocateFunctionType.LOCATE,
+                    LocateFunctionType.CHARINDEX,
+                    -> {
+                        buf.append("${type.functionName}(")
+                        visitOperand(function.pattern)
+                        buf.append(", ")
+                        visitOperand(function.string)
+                        if (function.startIndex != null) {
+                            buf.append(", ")
+                            visitOperand(function.startIndex)
+                        }
+                        buf.append(")")
+                    }
+                    LocateFunctionType.INSTR -> {
+                        buf.append("${type.functionName}(")
+                        visitOperand(function.string)
+                        buf.append(", ")
+                        visitOperand(function.pattern)
+                        if (function.startIndex != null) {
+                            buf.append(", ")
+                            visitOperand(function.startIndex)
+                        }
+                        buf.append(")")
+                    }
+                    LocateFunctionType.POSITION -> {
+                        if (function.startIndex == null) {
+                            buf.append("${type.functionName}(")
+                            visitOperand(function.pattern)
+                            buf.append(" in ")
+                            visitOperand(function.string)
+                            buf.append(")")
+                        } else {
+                            buf.append("${type.functionName}(")
+                            visitOperand(function.pattern)
+                            buf.append(" in substring(")
+                            visitOperand(function.string)
+                            buf.append(" from ")
+                            visitOperand(function.startIndex)
+                            buf.append(")) + ")
+                            visitOperand(function.startIndex)
+                            buf.append(" - 1")
+                        }
+                    }
+                }
             }
             is StringFunction.Lower -> {
                 buf.append("lower(")
