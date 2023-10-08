@@ -4,6 +4,7 @@ import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.expression.CompositeColumnExpression
 import org.komapper.core.dsl.expression.EscapeExpression
 import org.komapper.core.dsl.expression.SubqueryExpression
+import org.komapper.core.dsl.operator.CriteriaContext
 
 /**
  * Provides operators and predicates for HAVING, ON, WHEN, and WHERE clauses.
@@ -291,4 +292,13 @@ interface FilterScope {
     fun CharSequence.asSuffix(): EscapeExpression {
         return text("%") + escape(this)
     }
+
+    /**
+     * Adds an extension scope constructor.
+     *
+     * @param SCOPE the type of extension scope
+     * @param construct the extension scope constructor
+     * @param declaration the filter declaration
+     */
+    fun <SCOPE> extension(construct: (context: CriteriaContext) -> SCOPE, declaration: SCOPE.() -> Unit)
 }

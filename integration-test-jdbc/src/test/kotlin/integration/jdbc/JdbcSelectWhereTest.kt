@@ -8,11 +8,15 @@ import integration.core.employee
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
+import org.komapper.core.dsl.expression.ColumnExpression
+import org.komapper.core.dsl.expression.Operand
 import org.komapper.core.dsl.expression.WhereDeclaration
+import org.komapper.core.dsl.operator.CriteriaContext
 import org.komapper.core.dsl.operator.desc
 import org.komapper.core.dsl.operator.plus
 import org.komapper.core.dsl.query.andThen
 import org.komapper.jdbc.JdbcDatabase
+import java.math.BigDecimal
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -628,5 +632,62 @@ class JdbcSelectWhereTest(private val db: JdbcDatabase) {
         }
         val list = db.runQuery { QueryDsl.from(a).where(w1 + w2) }
         assertEquals(1, list.size)
+    }
+
+    @Test
+    @Run(onlyIf = [Dbms.POSTGRESQL])
+    fun userDefinedComparison() {
+        val e = Meta.employee
+        val list = db.runQuery {
+            QueryDsl.from(e).where {
+                e.salary greaterEq BigDecimal(1000)
+                extension(::MyExtension) {
+                    e.employeeName `~` "S"
+                    e.employeeName `!~` "T"
+                }
+            }.orderBy(e.employeeName)
+        }
+        assertEquals(listOf("ADAMS", "JONES"), list.map { it.employeeName })
+    }
+
+    @Test
+    @Run(onlyIf = [Dbms.POSTGRESQL])
+    fun userDefinedComparison_use_builtin_operator_in_extension_block() {
+        val e = Meta.employee
+        val list = db.runQuery {
+            QueryDsl.from(e).where {
+                extension(::MyExtension) {
+                    e.salary greaterEq BigDecimal(1000)
+                    e.employeeName `~` "S"
+                    e.employeeName `!~` "T"
+                }
+            }.orderBy(e.employeeName)
+        }
+        assertEquals(listOf("ADAMS", "JONES"), list.map { it.employeeName })
+    }
+
+    class MyExtension(private val context: CriteriaContext) {
+
+        infix fun <T : Any> ColumnExpression<T, String>.`~`(pattern: T?) {
+            if (pattern == null) return
+            val o1 = Operand.Column(this)
+            val o2 = Operand.Argument(this, pattern)
+            context.add {
+                visit(o1)
+                append(" ~ ")
+                visit(o2)
+            }
+        }
+
+        infix fun <T : Any> ColumnExpression<T, String>.`!~`(pattern: T?) {
+            if (pattern == null) return
+            val o1 = Operand.Column(this)
+            val o2 = Operand.Argument(this, pattern)
+            context.add {
+                visit(o1)
+                append(" !~ ")
+                visit(o2)
+            }
+        }
     }
 }

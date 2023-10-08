@@ -30,4 +30,6 @@ sealed class Criterion {
     data class And(val criteria: List<Criterion>) : Criterion()
     data class Or(val criteria: List<Criterion>) : Criterion()
     data class Not(val criteria: List<Criterion>) : Criterion()
+
+    data class UserDefined(val build: SqlBuilderScope.() -> Unit) : Criterion()
 }

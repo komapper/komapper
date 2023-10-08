@@ -20,6 +20,7 @@ import org.komapper.core.dsl.expression.Operand
 import org.komapper.core.dsl.expression.PropertyExpression
 import org.komapper.core.dsl.expression.ScalarExpression
 import org.komapper.core.dsl.expression.ScalarQueryExpression
+import org.komapper.core.dsl.expression.SqlBuilderScope
 import org.komapper.core.dsl.expression.SqlBuilderScopeImpl
 import org.komapper.core.dsl.expression.StringFunction
 import org.komapper.core.dsl.expression.SubqueryExpression
@@ -420,6 +421,7 @@ class BuilderSupport(
             is Criterion.And -> operation.logicalBinary("and", c.criteria, index)
             is Criterion.Or -> operation.logicalBinary("or", c.criteria, index)
             is Criterion.Not -> operation.not(c.criteria)
+            is Criterion.UserDefined -> operation.userDefined(c.build)
         }
     }
 
@@ -627,6 +629,11 @@ class BuilderSupport(
                 buf.cutBack(5)
                 buf.append(")")
             }
+        }
+
+        fun userDefined(build: SqlBuilderScope.() -> Unit) {
+            val scope = SqlBuilderScopeImpl(dialect, buf, ::visitOperand)
+            scope.build()
         }
     }
 }
