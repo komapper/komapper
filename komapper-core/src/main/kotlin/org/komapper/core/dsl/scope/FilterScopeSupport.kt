@@ -46,11 +46,11 @@ class FilterScopeSupport(
     }
 
     private fun <T : Any, S : CharSequence> addLikeOperator(left: ColumnExpression<T, S>, right: EscapeExpression) {
-        criteria.add(Criterion.Like(Operand.Column(left), right))
+        criteria.add(Criterion.Like(Operand.Column(left), Operand.Escape(left, right)))
     }
 
     private fun <T : Any, S : CharSequence> addNotLikeOperator(left: ColumnExpression<T, S>, right: EscapeExpression) {
-        criteria.add(Criterion.NotLike(Operand.Column(left), right))
+        criteria.add(Criterion.NotLike(Operand.Column(left), Operand.Escape(left, right)))
     }
 
     override infix fun <T : Any, S : Any> ColumnExpression<T, S>.eq(operand: ColumnExpression<T, S>) {
@@ -223,12 +223,13 @@ class FilterScopeSupport(
 
     override fun <T : Any, S : Any> ColumnExpression<T, S>.inList(subquery: SubqueryExpression<T?>) {
         val left = Operand.Column(this)
-        add(Criterion.InSubQuery(left, subquery))
+        val right = Operand.Subquery(subquery)
+        add(Criterion.InSubQuery(left, right))
     }
 
     override infix fun <T : Any, S : Any> ColumnExpression<T, S>.inList(block: () -> SubqueryExpression<T?>) {
         val left = Operand.Column(this)
-        val right = block()
+        val right = Operand.Subquery(block())
         add(Criterion.InSubQuery(left, right))
     }
 
@@ -240,12 +241,13 @@ class FilterScopeSupport(
 
     override fun <T : Any, S : Any> ColumnExpression<T, S>.notInList(subquery: SubqueryExpression<T?>) {
         val left = Operand.Column(this)
-        add(Criterion.NotInSubQuery(left, subquery))
+        val right = Operand.Subquery(subquery)
+        add(Criterion.NotInSubQuery(left, right))
     }
 
     override infix fun <T : Any, S : Any> ColumnExpression<T, S>.notInList(block: () -> SubqueryExpression<T?>) {
         val left = Operand.Column(this)
-        val right = block()
+        val right = Operand.Subquery(block())
         add(Criterion.NotInSubQuery(left, right))
     }
 
@@ -262,12 +264,13 @@ class FilterScopeSupport(
 
     override fun <A : Any, B : Any> Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>.inList2(subquery: SubqueryExpression<Pair<A?, B?>>) {
         val left = Operand.Column(this.first) to Operand.Column(this.second)
-        add(Criterion.InSubQuery2(left, subquery))
+        val right = Operand.Subquery(subquery)
+        add(Criterion.InSubQuery2(left, right))
     }
 
     override infix fun <A : Any, B : Any> Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>.inList2(block: () -> SubqueryExpression<Pair<A?, B?>>) {
         val left = Operand.Column(this.first) to Operand.Column(this.second)
-        val right = block()
+        val right = Operand.Subquery(block())
         add(Criterion.InSubQuery2(left, right))
     }
 
@@ -284,31 +287,34 @@ class FilterScopeSupport(
 
     override fun <A : Any, B : Any> Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>.notInList2(subquery: SubqueryExpression<Pair<A?, B?>>) {
         val left = Operand.Column(this.first) to Operand.Column(this.second)
-        add(Criterion.NotInSubQuery2(left, subquery))
+        val right = Operand.Subquery(subquery)
+        add(Criterion.NotInSubQuery2(left, right))
     }
 
     override infix fun <A : Any, B : Any> Pair<ColumnExpression<A, *>, ColumnExpression<B, *>>.notInList2(block: () -> SubqueryExpression<Pair<A?, B?>>) {
         val left = Operand.Column(this.first) to Operand.Column(this.second)
-        val right = block()
+        val right = Operand.Subquery(block())
         add(Criterion.NotInSubQuery2(left, right))
     }
 
     override fun exists(subquery: SubqueryExpression<*>) {
-        add(Criterion.Exists(subquery))
+        val operand = Operand.Subquery(subquery)
+        add(Criterion.Exists(operand))
     }
 
     override fun exists(block: () -> SubqueryExpression<*>) {
-        val expression = block()
-        add(Criterion.Exists(expression))
+        val operand = Operand.Subquery(block())
+        add(Criterion.Exists(operand))
     }
 
     override fun notExists(subquery: SubqueryExpression<*>) {
-        add(Criterion.NotExists(subquery))
+        val operand = Operand.Subquery(subquery)
+        add(Criterion.NotExists(operand))
     }
 
     override fun notExists(block: () -> SubqueryExpression<*>) {
-        val expression = block()
-        add(Criterion.NotExists(expression))
+        val operand = Operand.Subquery(block())
+        add(Criterion.NotExists(operand))
     }
 
     override fun <SCOPE> extension(construct: (context: CriteriaContext) -> SCOPE, declaration: SCOPE.() -> Unit) {

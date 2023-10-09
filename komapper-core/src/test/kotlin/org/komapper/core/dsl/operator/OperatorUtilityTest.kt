@@ -21,7 +21,7 @@ class OperatorUtilityTest {
     ): ColumnExpression<String, String> {
         val o1 = Operand.Column(left)
         val o2 = Operand.Argument(left, right)
-        return columnExpression(String::class, listOf(o1, o2)) {
+        return columnExpression(left, "concat", listOf(o1, o2)) {
             append("concat(")
             visit(o1)
             append(", ")
