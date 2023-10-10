@@ -9,7 +9,7 @@ import org.komapper.core.dsl.operator.CriteriaContext
 /**
  * Provides operators and predicates for HAVING, ON, WHEN, and WHERE clauses.
  */
-interface FilterScope {
+interface FilterScope<F : FilterScope<F>> {
     /**
      * Applies the `=` operator.
      */
@@ -257,6 +257,21 @@ interface FilterScope {
     fun notExists(block: () -> SubqueryExpression<*>)
 
     /**
+     * Applies the `AND` operator.
+     */
+    fun and(declaration: F.() -> Unit)
+
+    /**
+     * Applies the `OR` operator.
+     */
+    fun or(declaration: F.() -> Unit)
+
+    /**
+     * Applies the `NOT` operator.
+     */
+    fun not(declaration: F.() -> Unit)
+
+    /**
      * Does not escape the given string.
      */
     fun <S : CharSequence> text(value: S): EscapeExpression {
@@ -294,11 +309,11 @@ interface FilterScope {
     }
 
     /**
-     * Adds an extension scope constructor.
+     * Adds an extension.
      *
-     * @param SCOPE the type of extension scope
-     * @param construct the extension scope constructor
+     * @param EXTENSION the type of extension
+     * @param construct the extension constructor
      * @param declaration the filter declaration
      */
-    fun <SCOPE> extension(construct: (context: CriteriaContext) -> SCOPE, declaration: SCOPE.() -> Unit)
+    fun <EXTENSION> extension(construct: (context: CriteriaContext) -> EXTENSION, declaration: EXTENSION.() -> Unit)
 }

@@ -18,19 +18,19 @@ import org.komapper.core.dsl.scope.WhereScope
 
 fun WhereProvider.getWhereCriteria(): List<Criterion> {
     val where = getCompositeWhere()
-    val support = FilterScopeSupport()
+    val support = FilterScopeSupport(::WhereScope)
     WhereScope(support).apply(where)
     return support.toList()
 }
 
 internal fun Join<*, *, *>.getOnCriteria(): List<Criterion> {
-    val support = FilterScopeSupport()
+    val support = FilterScopeSupport(::OnScope)
     OnScope(support).apply(on)
     return support.toList()
 }
 
 internal fun SelectContext<*, *, *>.getHavingCriteria(): List<Criterion> {
-    val support = FilterScopeSupport()
+    val support = FilterScopeSupport(::HavingScope)
     HavingScope(support).apply(having)
     return support.toList()
 }
