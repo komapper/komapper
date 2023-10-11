@@ -13,10 +13,9 @@ import java.util.LinkedList
 
 class FilterScopeSupport<F : FilterScope<F>>(
     private val constructFilterScope: (FilterScopeSupport<F>) -> F,
+    private val deque: Deque<MutableList<Criterion>> = LinkedList(),
     private val criteria: MutableList<Criterion> = mutableListOf(),
 ) : FilterScope<F> {
-
-    private val deque: Deque<MutableList<Criterion>> = LinkedList()
 
     fun toList(): List<Criterion> {
         return criteria.toList()
@@ -336,7 +335,7 @@ class FilterScopeSupport<F : FilterScope<F>>(
 
     private fun addCriteria(declaration: F.() -> Unit, operator: (List<Criterion>) -> Criterion) {
         val newCriteria = mutableListOf<Criterion>()
-        val newSupport = FilterScopeSupport(constructFilterScope, newCriteria)
+        val newSupport = FilterScopeSupport(constructFilterScope, deque, newCriteria)
 
         deque.push(newCriteria)
         constructFilterScope(newSupport).apply(declaration)

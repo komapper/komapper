@@ -688,6 +688,27 @@ class JdbcSelectWhereTest(private val db: JdbcDatabase) {
 
     @Test
     @Run(onlyIf = [Dbms.POSTGRESQL])
+    fun userDefinedComparison_or_and() {
+        val e = Meta.employee
+        val list = db.runQuery {
+            QueryDsl.from(e).where {
+                e.salary greaterEq BigDecimal(1000)
+                extension(::MyExtension) {
+                    e.employeeName `~` "S"
+                    or {
+                        e.employeeName `~` "T"
+                        and {
+                            e.employeeName `~` "S"
+                        }
+                    }
+                }
+            }.orderBy(e.employeeName)
+        }
+        assertEquals(listOf("ADAMS", "JONES", "SCOTT", "SMITH"), list.map { it.employeeName })
+    }
+
+    @Test
+    @Run(onlyIf = [Dbms.POSTGRESQL])
     fun userDefinedComparison_use_builtin_operator_in_extension_block() {
         val e = Meta.employee
         val list = db.runQuery {
