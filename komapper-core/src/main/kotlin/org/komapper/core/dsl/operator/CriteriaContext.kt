@@ -1,17 +1,11 @@
 package org.komapper.core.dsl.operator
 
-import org.komapper.core.dsl.expression.Criterion
 import org.komapper.core.dsl.expression.SqlBuilderScope
-import org.komapper.core.dsl.scope.FilterScope
 
 /**
  * The context for criteria.
  */
 interface CriteriaContext {
-    /**
-     * The parent scope.
-     */
-    val scope: FilterScope
 
     /**
      * Adds a SQL builder.
@@ -19,14 +13,4 @@ interface CriteriaContext {
      * @param build the SQL builder
      */
     fun add(build: SqlBuilderScope.() -> Unit)
-}
-
-internal class CriteriaContextImpl(
-    override val scope: FilterScope,
-    private val criteria: MutableList<Criterion>,
-) : CriteriaContext {
-    override fun add(build: SqlBuilderScope.() -> Unit) {
-        val criterion = Criterion.UserDefined(build)
-        criteria.add(criterion)
-    }
 }

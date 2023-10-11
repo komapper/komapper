@@ -5,11 +5,14 @@ import org.komapper.core.dsl.expression.CompositeColumnExpression
 import org.komapper.core.dsl.expression.EscapeExpression
 import org.komapper.core.dsl.expression.SubqueryExpression
 import org.komapper.core.dsl.operator.CriteriaContext
+import org.komapper.core.dsl.operator.asInfix as asInfixFunction
+import org.komapper.core.dsl.operator.asPrefix as asPrefixFunction
+import org.komapper.core.dsl.operator.asSuffix as asSuffixFunction
 
 /**
  * Provides operators and predicates for HAVING, ON, WHEN, and WHERE clauses.
  */
-interface FilterScope {
+interface FilterScope<F : FilterScope<F>> {
     /**
      * Applies the `=` operator.
      */
@@ -257,48 +260,51 @@ interface FilterScope {
     fun notExists(block: () -> SubqueryExpression<*>)
 
     /**
+     * Applies the `AND` operator.
+     */
+    fun and(declaration: F.() -> Unit)
+
+    /**
+     * Applies the `OR` operator.
+     */
+    fun or(declaration: F.() -> Unit)
+
+    /**
+     * Applies the `NOT` operator.
+     */
+    fun not(declaration: F.() -> Unit)
+
+    /**
      * Does not escape the given string.
      */
-    fun <S : CharSequence> text(value: S): EscapeExpression {
-        if (value is EscapeExpression) return value
-        return EscapeExpression.Text(value.toString())
-    }
+    fun <S : CharSequence> text(value: S): EscapeExpression = org.komapper.core.dsl.operator.text(value)
 
     /**
      * Escapes the given string.
      */
-    fun <S : CharSequence> escape(value: S): EscapeExpression {
-        if (value is EscapeExpression) return value
-        return EscapeExpression.Escape(value.toString())
-    }
+    fun <S : CharSequence> escape(value: S): EscapeExpression = org.komapper.core.dsl.operator.escape(value)
 
     /**
      * Escapes the given string and appends a wildcard character at the end.
      */
-    fun CharSequence.asPrefix(): EscapeExpression {
-        return escape(this) + text("%")
-    }
+    fun CharSequence.asPrefix(): EscapeExpression = this.asPrefixFunction()
 
     /**
      * Escapes the given string and encloses it with wildcard characters.
      */
-    fun CharSequence.asInfix(): EscapeExpression {
-        return text("%") + escape(this) + text("%")
-    }
+    fun CharSequence.asInfix(): EscapeExpression = this.asInfixFunction()
 
     /**
      * Escapes the given string and appends a wildcard character at the beginning.
      */
-    fun CharSequence.asSuffix(): EscapeExpression {
-        return text("%") + escape(this)
-    }
+    fun CharSequence.asSuffix(): EscapeExpression = this.asSuffixFunction()
 
     /**
-     * Adds an extension scope constructor.
+     * Adds an extension.
      *
-     * @param SCOPE the type of extension scope
-     * @param construct the extension scope constructor
+     * @param EXTENSION the type of extension
+     * @param construct the extension constructor
      * @param declaration the filter declaration
      */
-    fun <SCOPE> extension(construct: (context: CriteriaContext) -> SCOPE, declaration: SCOPE.() -> Unit)
+    fun <EXTENSION> extension(construct: (context: CriteriaContext) -> EXTENSION, declaration: EXTENSION.() -> Unit)
 }

@@ -23,7 +23,7 @@ internal sealed interface ConditionalExpression<T : Any, S : Any> : ColumnExpres
 class When<S : Any, T : Any>(val declaration: WhenDeclaration, internal val then: ColumnExpression<S, T>) {
     val criteria: List<Criterion>
         get() {
-            val support = FilterScopeSupport()
+            val support = FilterScopeSupport(::WhenScope)
             WhenScope(support).apply(declaration)
             return support.toList()
         }

@@ -5,13 +5,17 @@ import org.komapper.core.dsl.expression.CompositeColumnExpression
 import org.komapper.core.dsl.expression.Criterion
 import org.komapper.core.dsl.expression.EscapeExpression
 import org.komapper.core.dsl.expression.Operand
+import org.komapper.core.dsl.expression.SqlBuilderScope
 import org.komapper.core.dsl.expression.SubqueryExpression
 import org.komapper.core.dsl.operator.CriteriaContext
-import org.komapper.core.dsl.operator.CriteriaContextImpl
+import java.util.Deque
+import java.util.LinkedList
 
-class FilterScopeSupport(
+class FilterScopeSupport<F : FilterScope<F>>(
+    private val constructFilterScope: (FilterScopeSupport<F>) -> F,
+    private val deque: Deque<MutableList<Criterion>> = LinkedList(),
     private val criteria: MutableList<Criterion> = mutableListOf(),
-) : FilterScope {
+) : FilterScope<F> {
 
     fun toList(): List<Criterion> {
         return criteria.toList()
@@ -317,8 +321,38 @@ class FilterScopeSupport(
         add(Criterion.NotExists(operand))
     }
 
-    override fun <SCOPE> extension(construct: (context: CriteriaContext) -> SCOPE, declaration: SCOPE.() -> Unit) {
-        val context = CriteriaContextImpl(this, criteria)
+    override fun and(declaration: F.() -> Unit) {
+        addCriteria(declaration, Criterion::And)
+    }
+
+    override fun or(declaration: F.() -> Unit) {
+        addCriteria(declaration, Criterion::Or)
+    }
+
+    override fun not(declaration: F.() -> Unit) {
+        addCriteria(declaration, Criterion::Not)
+    }
+
+    private fun addCriteria(declaration: F.() -> Unit, operator: (List<Criterion>) -> Criterion) {
+        val newCriteria = mutableListOf<Criterion>()
+        val newSupport = FilterScopeSupport(constructFilterScope, deque, newCriteria)
+
+        deque.push(newCriteria)
+        constructFilterScope(newSupport).apply(declaration)
+        deque.pop()
+
+        val criterion = operator(newCriteria.toList())
+        add(criterion)
+    }
+
+    override fun <EXTENSION> extension(construct: (context: CriteriaContext) -> EXTENSION, declaration: EXTENSION.() -> Unit) {
+        val context = object : CriteriaContext {
+            override fun add(build: SqlBuilderScope.() -> Unit) {
+                val criterion = Criterion.UserDefined(build)
+                val target = deque.peek() ?: criteria
+                target.add(criterion)
+            }
+        }
         val scope = construct(context)
         scope.declaration()
     }
