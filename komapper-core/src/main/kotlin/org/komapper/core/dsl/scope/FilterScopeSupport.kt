@@ -353,8 +353,6 @@ class FilterScopeSupport<F : FilterScope<F>>(
                 val target = deque.peek() ?: criteria
                 target.add(criterion)
             }
-            override fun <S : CharSequence> text(value: S): EscapeExpression = this@FilterScopeSupport.text(value)
-            override fun <S : CharSequence> escape(value: S): EscapeExpression = this@FilterScopeSupport.escape(value)
         }
         val scope = construct(context)
         scope.declaration()

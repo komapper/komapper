@@ -5,6 +5,9 @@ import org.komapper.core.dsl.expression.CompositeColumnExpression
 import org.komapper.core.dsl.expression.EscapeExpression
 import org.komapper.core.dsl.expression.SubqueryExpression
 import org.komapper.core.dsl.operator.CriteriaContext
+import org.komapper.core.dsl.operator.asInfix as asInfixFunction
+import org.komapper.core.dsl.operator.asPrefix as asPrefixFunction
+import org.komapper.core.dsl.operator.asSuffix as asSuffixFunction
 
 /**
  * Provides operators and predicates for HAVING, ON, WHEN, and WHERE clauses.
@@ -274,39 +277,27 @@ interface FilterScope<F : FilterScope<F>> {
     /**
      * Does not escape the given string.
      */
-    fun <S : CharSequence> text(value: S): EscapeExpression {
-        if (value is EscapeExpression) return value
-        return EscapeExpression.Text(value.toString())
-    }
+    fun <S : CharSequence> text(value: S): EscapeExpression = org.komapper.core.dsl.operator.text(value)
 
     /**
      * Escapes the given string.
      */
-    fun <S : CharSequence> escape(value: S): EscapeExpression {
-        if (value is EscapeExpression) return value
-        return EscapeExpression.Escape(value.toString())
-    }
+    fun <S : CharSequence> escape(value: S): EscapeExpression = org.komapper.core.dsl.operator.escape(value)
 
     /**
      * Escapes the given string and appends a wildcard character at the end.
      */
-    fun CharSequence.asPrefix(): EscapeExpression {
-        return escape(this) + text("%")
-    }
+    fun CharSequence.asPrefix(): EscapeExpression = this.asPrefixFunction()
 
     /**
      * Escapes the given string and encloses it with wildcard characters.
      */
-    fun CharSequence.asInfix(): EscapeExpression {
-        return text("%") + escape(this) + text("%")
-    }
+    fun CharSequence.asInfix(): EscapeExpression = this.asInfixFunction()
 
     /**
      * Escapes the given string and appends a wildcard character at the beginning.
      */
-    fun CharSequence.asSuffix(): EscapeExpression {
-        return text("%") + escape(this)
-    }
+    fun CharSequence.asSuffix(): EscapeExpression = this.asSuffixFunction()
 
     /**
      * Adds an extension.
