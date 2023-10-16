@@ -60,7 +60,7 @@ plugins {
     id("com.google.devtools.ksp") version "1.9.10-1.0.13"
 }
 
-val komapperVersion = "1.14.0"
+val komapperVersion = "1.14.1"
 
 dependencies {
     platform("org.komapper:komapper-platform:$komapperVersion").let {
