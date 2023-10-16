@@ -15,10 +15,12 @@ import org.komapper.core.dsl.operator.CriteriaContext
 import org.komapper.core.dsl.operator.desc
 import org.komapper.core.dsl.operator.plus
 import org.komapper.core.dsl.query.andThen
+import org.komapper.core.dsl.query.firstOrNull
 import org.komapper.jdbc.JdbcDatabase
 import java.math.BigDecimal
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 @ExtendWith(JdbcEnv::class)
@@ -139,6 +141,24 @@ class JdbcSelectWhereTest(private val db: JdbcDatabase) {
             insertQuery.andThen(selectQuery)
         }
         assertEquals(listOf(16), list.map { it.addressId })
+    }
+
+    @Test
+    fun like_for_ClobString() {
+        val m = Meta.clobStringData
+        db.runQuery {
+            QueryDsl.insert(m).multiple(
+                ClobStringData(1, "abc"),
+                ClobStringData(2, "efg"),
+            )
+        }
+        val result = db.runQuery {
+            QueryDsl.from(m).where {
+                m.value like "e%"
+            }.firstOrNull()
+        }
+        assertNotNull(result)
+        assertEquals(2, result.id)
     }
 
     @Test

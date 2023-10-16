@@ -179,7 +179,7 @@ internal class AnnotationSupport(
                     }
                     val parameter = constructor?.parameters?.firstOrNull()
                         ?: error("No parameter is found in the class \"${classDeclaration.qualifiedName?.asString()}\"")
-                    val declaration = classDeclaration.getDeclaredProperties().firstOrNull()
+                    val declaration = classDeclaration.getDeclaredProperties().firstOrNull { it.simpleName == parameter.name }
                         ?: error("No property is found in the class \"${classDeclaration.qualifiedName?.asString()}\"")
                     if (!declaration.isPublic()) {
                         report(
