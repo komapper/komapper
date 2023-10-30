@@ -12,6 +12,7 @@ object JdbcSettingProvider {
             "h2" -> "integration.jdbc.h2.JdbcH2Setting"
             "mariadb" -> "integration.jdbc.mariadb.JdbcMariaDbSetting"
             "mysql" -> "integration.jdbc.mysql.JdbcMySqlSetting"
+            "mysql5" -> "integration.jdbc.mysql5.JdbcMySql5Setting"
             "oracle" -> "integration.jdbc.oracle.JdbcOracleSetting"
             "postgresql" -> "integration.jdbc.postgresql.JdbcPostgreSqlSetting"
             "sqlserver" -> "integration.jdbc.sqlserver.JdbcSqlServerSetting"

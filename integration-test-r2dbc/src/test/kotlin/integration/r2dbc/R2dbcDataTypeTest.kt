@@ -224,7 +224,7 @@ class R2dbcDataTypeTest(val db: R2dbcDatabase) {
     }
 
     // jasync-r2dbc-mysql does not support blob type
-    @Run(unless = [Dbms.MYSQL])
+    @Run(unless = [Dbms.MYSQL, Dbms.MYSQL_5])
     @Test
     fun blob(info: TestInfo) = inTransaction(db, info) {
         val m = Meta.blobData
@@ -331,7 +331,7 @@ class R2dbcDataTypeTest(val db: R2dbcDatabase) {
     }
 
     // jasync-r2dbc-mysql does not support blob type
-    @Run(unless = [Dbms.MYSQL])
+    @Run(unless = [Dbms.MYSQL, Dbms.MYSQL_5])
     @Test
     fun clob(info: TestInfo) = inTransaction(db, info) {
         val m = Meta.clobData
@@ -676,7 +676,7 @@ class R2dbcDataTypeTest(val db: R2dbcDatabase) {
     }
 
     @Test
-    @Run(unless = [Dbms.MARIADB])
+    @Run(unless = [Dbms.MARIADB, Dbms.MYSQL_5])
     fun instant_null(info: TestInfo) = inTransaction(db, info) {
         val m = Meta.instantData
         val data = InstantData(1, null)
@@ -768,7 +768,7 @@ class R2dbcDataTypeTest(val db: R2dbcDatabase) {
     }
 
     // TODO: jasync-r2dbc-mysql returns a Duration object for the LocalTime type
-    @Run(unless = [Dbms.MYSQL])
+    @Run(unless = [Dbms.MYSQL, Dbms.MYSQL_5])
     @Test
     fun localTime(info: TestInfo) = inTransaction(db, info) {
         val m = Meta.localTimeData
@@ -1021,7 +1021,7 @@ class R2dbcDataTypeTest(val db: R2dbcDatabase) {
         assertNotNull(data2)
     }
 
-    @Run(unless = [Dbms.MYSQL])
+    @Run(unless = [Dbms.MYSQL, Dbms.MYSQL_5])
     @Test
     fun unsigned_sequence(info: TestInfo) = inTransaction(db, info) {
         val m = Meta.unsignedSequenceStrategy

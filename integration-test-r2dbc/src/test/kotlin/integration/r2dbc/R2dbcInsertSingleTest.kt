@@ -242,7 +242,7 @@ class R2dbcInsertSingleTest(private val db: R2dbcDatabase) {
         }
     }
 
-    @Run(unless = [Dbms.MYSQL])
+    @Run(unless = [Dbms.MYSQL, Dbms.MYSQL_5])
     @Test
     fun sequenceGenerator(info: TestInfo) = inTransaction(db, info) {
         val generator = Meta.sequenceStrategy.idGenerator() as IdGenerator.Sequence<*, *>
@@ -256,7 +256,7 @@ class R2dbcInsertSingleTest(private val db: R2dbcDatabase) {
         }
     }
 
-    @Run(unless = [Dbms.MYSQL])
+    @Run(unless = [Dbms.MYSQL, Dbms.MYSQL_5])
     @Test
     fun sequenceGenerator_disableSequenceAssignment(info: TestInfo) = inTransaction(db, info) {
         val m = Meta.sequenceStrategy
@@ -317,7 +317,7 @@ class R2dbcInsertSingleTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    @Run(unless = [Dbms.MARIADB])
+    @Run(unless = [Dbms.MARIADB, Dbms.MYSQL_5])
     fun onDuplicateKeyUpdate_update_set(info: TestInfo) = inTransaction(db, info) {
         val d = Meta.department
         val department = Department(1, 50, "PLANNING", "TOKYO", 10)
@@ -334,7 +334,7 @@ class R2dbcInsertSingleTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    @Run(unless = [Dbms.MARIADB])
+    @Run(unless = [Dbms.MARIADB, Dbms.MYSQL_5])
     fun onDuplicateKeyUpdateWithKey_update_set(info: TestInfo) = inTransaction(db, info) {
         val d = Meta.department
         val department = Department(5, 10, "PLANNING", "TOKYO", 10)

@@ -24,7 +24,7 @@ import kotlin.test.assertNull
 @ExtendWith(JdbcEnv::class)
 class JdbcSetOperationTest(private val db: JdbcDatabase) {
 
-    @Run(unless = [Dbms.MYSQL])
+    @Run(unless = [Dbms.MYSQL, Dbms.MYSQL_5])
     @Test
     fun except_entity() {
         val e = Meta.employee
@@ -41,7 +41,7 @@ class JdbcSetOperationTest(private val db: JdbcDatabase) {
         assertEquals(5, e3.employeeId)
     }
 
-    @Run(onlyIf = [Dbms.MYSQL])
+    @Run(onlyIf = [Dbms.MYSQL, Dbms.MYSQL_5])
     @Test
     fun except_entity_unsupportedOperationException() {
         val e = Meta.employee
@@ -55,7 +55,7 @@ class JdbcSetOperationTest(private val db: JdbcDatabase) {
         println(ex)
     }
 
-    @Run(unless = [Dbms.MYSQL])
+    @Run(unless = [Dbms.MYSQL, Dbms.MYSQL_5])
     @Test
     fun intersect_entity() {
         val e = Meta.employee
@@ -70,7 +70,7 @@ class JdbcSetOperationTest(private val db: JdbcDatabase) {
         assertEquals(4, e2.employeeId)
     }
 
-    @Run(onlyIf = [Dbms.MYSQL])
+    @Run(onlyIf = [Dbms.MYSQL, Dbms.MYSQL_5])
     @Test
     fun intersect_entity_unsupportedOperationException() {
         val e = Meta.employee
@@ -100,6 +100,7 @@ class JdbcSetOperationTest(private val db: JdbcDatabase) {
     }
 
     @Test
+    @Run(unless = [Dbms.MYSQL_5])
     fun union_subquery() {
         val e = Meta.employee
         val q1 = QueryDsl.from(e).where { e.employeeId eq 1 }.select(e.employeeId)

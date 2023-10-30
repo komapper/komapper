@@ -5,6 +5,7 @@ import org.komapper.core.Statement
 import org.komapper.core.StatementBuffer
 import org.komapper.core.dsl.builder.AliasManager
 import org.komapper.core.dsl.builder.BuilderSupport
+import org.komapper.core.dsl.builder.EmptyAliasManager
 import org.komapper.core.dsl.builder.EntityUpsertStatementBuilder
 import org.komapper.core.dsl.builder.TableNameType
 import org.komapper.core.dsl.context.DuplicateKeyType
@@ -20,11 +21,15 @@ class MySqlEntityUpsertStatementBuilder<ENTITY : Any, ID : Any, META : EntityMet
     private val dialect: BuilderDialect,
     private val context: EntityUpsertContext<ENTITY, ID, META>,
     private val entities: List<ENTITY>,
+    private val version: MySqlVersion = MySqlVersion.V8,
 ) : EntityUpsertStatementBuilder<ENTITY> {
 
     private val target = context.target
     private val excluded = context.excluded
-    private val aliasManager = UpsertAliasManager(dialect, target, excluded)
+    private val aliasManager = when (version) {
+        MySqlVersion.V5 -> EmptyAliasManager
+        MySqlVersion.V8 -> UpsertAliasManager(dialect, target, excluded)
+    }
     private val buf = StatementBuffer()
     private val support = BuilderSupport(dialect, aliasManager, buf)
 
@@ -53,14 +58,30 @@ class MySqlEntityUpsertStatementBuilder<ENTITY : Any, ID : Any, META : EntityMet
             buf.append("), ")
         }
         buf.cutBack(2)
-        buf.append(" as ")
-        table(excluded, TableNameType.ALIAS_ONLY)
+        when (version) {
+            MySqlVersion.V5 -> {
+                // do nothing
+            }
+            MySqlVersion.V8 -> {
+                buf.append(" as ")
+                table(excluded, TableNameType.ALIAS_ONLY)
+            }
+        }
         if (context.duplicateKeyType == DuplicateKeyType.UPDATE) {
             buf.append(" on duplicate key update ")
             for ((left, right) in assignments) {
                 column(left)
                 buf.append(" = ")
-                operand(right)
+                when (version) {
+                    MySqlVersion.V5 -> {
+                        buf.append("values(")
+                        operand(right)
+                        buf.append(")")
+                    }
+                    MySqlVersion.V8 -> {
+                        operand(right)
+                    }
+                }
                 buf.append(", ")
             }
             buf.cutBack(2)

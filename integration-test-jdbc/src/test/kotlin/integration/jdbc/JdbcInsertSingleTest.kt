@@ -281,7 +281,7 @@ class JdbcInsertSingleTest(private val db: JdbcDatabase) {
         }
     }
 
-    @Run(unless = [Dbms.MYSQL])
+    @Run(unless = [Dbms.MYSQL, Dbms.MYSQL_5])
     @Test
     fun sequenceGenerator() {
         val generator = Meta.sequenceStrategy.idGenerator() as IdGenerator.Sequence<*, *>
@@ -295,7 +295,7 @@ class JdbcInsertSingleTest(private val db: JdbcDatabase) {
         }
     }
 
-    @Run(unless = [Dbms.MYSQL])
+    @Run(unless = [Dbms.MYSQL, Dbms.MYSQL_5])
     @Test
     fun sequenceGenerator_disableSequenceAssignment() {
         val m = Meta.sequenceStrategy
@@ -356,7 +356,7 @@ class JdbcInsertSingleTest(private val db: JdbcDatabase) {
     }
 
     @Test
-    @Run(unless = [Dbms.MARIADB])
+    @Run(unless = [Dbms.MARIADB, Dbms.MYSQL_5])
     fun onDuplicateKeyUpdate_update_set() {
         val d = Meta.department
         val department = Department(1, 50, "PLANNING", "TOKYO", 10)
@@ -373,7 +373,7 @@ class JdbcInsertSingleTest(private val db: JdbcDatabase) {
     }
 
     @Test
-    @Run(unless = [Dbms.MARIADB])
+    @Run(unless = [Dbms.MARIADB, Dbms.MYSQL_5])
     fun onDuplicateKeyUpdateWithKey_update_set() {
         val d = Meta.department
         val department = Department(5, 10, "PLANNING", "TOKYO", 10)
@@ -434,7 +434,7 @@ class JdbcInsertSingleTest(private val db: JdbcDatabase) {
     }
 
     @Test
-    @Run(onlyIf = [Dbms.MARIADB, Dbms.MYSQL])
+    @Run(onlyIf = [Dbms.MARIADB, Dbms.MYSQL, Dbms.MYSQL_5])
     fun onDuplicateKeyUpdateWithKey_update_set_where_unsupported() {
         val d = Meta.department
         val department = Department(5, 10, "PLANNING", "TOKYO", 10)

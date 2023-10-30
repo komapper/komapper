@@ -142,7 +142,7 @@ class R2dbcValueClassTest(val db: R2dbcDatabase) {
         }
     }
 
-    @Run(unless = [Dbms.MYSQL])
+    @Run(unless = [Dbms.MYSQL, Dbms.MYSQL_5])
     @Test
     fun sequenceGenerator(info: TestInfo) = inTransaction(db, info) {
         for (i in 1..201) {

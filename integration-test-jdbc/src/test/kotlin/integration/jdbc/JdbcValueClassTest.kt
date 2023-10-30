@@ -140,7 +140,7 @@ class JdbcValueClassTest(val db: JdbcDatabase) {
         }
     }
 
-    @Run(unless = [Dbms.MYSQL])
+    @Run(unless = [Dbms.MYSQL, Dbms.MYSQL_5])
     @Test
     fun sequenceGenerator() {
         for (i in 1..201) {

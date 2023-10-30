@@ -40,7 +40,7 @@ class R2dbcInsertMultipleTest(private val db: R2dbcDatabase) {
         assertEquals(addressList, list)
     }
 
-    @Run(unless = [Dbms.MYSQL, Dbms.MARIADB, Dbms.ORACLE, Dbms.SQLSERVER])
+    @Run(unless = [Dbms.MYSQL, Dbms.MYSQL_5, Dbms.MARIADB, Dbms.ORACLE, Dbms.SQLSERVER])
     @Test
     fun identity(info: TestInfo) = inTransaction(db, info) {
         val i = Meta.identityStrategy
@@ -55,7 +55,7 @@ class R2dbcInsertMultipleTest(private val db: R2dbcDatabase) {
         assertTrue(results1.all { it.id != null })
     }
 
-    @Run(onlyIf = [Dbms.MYSQL, Dbms.MARIADB, Dbms.ORACLE, Dbms.SQLSERVER])
+    @Run(onlyIf = [Dbms.MYSQL, Dbms.MYSQL_5, Dbms.MARIADB, Dbms.ORACLE, Dbms.SQLSERVER])
     @Test
     fun identity_unsupportedOperationException(info: TestInfo) = inTransaction(db, info) {
         val i = Meta.identityStrategy

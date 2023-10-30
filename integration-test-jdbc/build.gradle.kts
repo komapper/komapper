@@ -74,6 +74,15 @@ testing {
             }
         }
 
+        register("mysql5", JvmTestSuite::class) {
+            setup(name)
+            dependencies {
+                implementation(project())
+                runtimeOnly("org.testcontainers:mysql")
+                implementation(project(":komapper-dialect-mysql-jdbc"))
+            }
+        }
+
         register("oracle", JvmTestSuite::class) {
             setup(name)
             dependencies {

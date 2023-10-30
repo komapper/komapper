@@ -661,7 +661,7 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
         assertEquals(data, data3)
     }
 
-    @Run(unless = [Dbms.MARIADB])
+    @Run(unless = [Dbms.MARIADB, Dbms.MYSQL_5])
     @Test
     fun instant_null() {
         val m = Meta.instantData
@@ -846,7 +846,7 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
         assertEquals(data, data3)
     }
 
-    @Run(onlyIf = [Dbms.MYSQL])
+    @Run(onlyIf = [Dbms.MYSQL, Dbms.MYSQL_5])
     @Test
     fun offsetDateTime_mysql() {
         val m = Meta.offsetDateTimeData
@@ -879,7 +879,7 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
         assertEquals(value.toInstant(), data2.value!!.toInstant())
     }
 
-    @Run(onlyIf = [Dbms.H2, Dbms.MYSQL, Dbms.ORACLE, Dbms.POSTGRESQL, Dbms.SQLSERVER])
+    @Run(unless = [Dbms.MARIADB, Dbms.MYSQL_5])
     @Test
     fun offsetDateTime_null() {
         val m = Meta.offsetDateTimeData
@@ -1070,7 +1070,7 @@ class JdbcDataTypeTest(val db: JdbcDatabase) {
         assertNotNull(data2)
     }
 
-    @Run(unless = [Dbms.MYSQL])
+    @Run(unless = [Dbms.MYSQL, Dbms.MYSQL_5])
     @Test
     fun unsigned_sequence() {
         val m = Meta.unsignedSequenceStrategy

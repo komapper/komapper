@@ -18,6 +18,8 @@ interface MySqlDialect : Dialect {
         override val driver: String = DRIVER
     }
 
+    val version: MySqlVersion
+
     override val driver: String get() = DRIVER
     override val openQuote: String get() = "`"
     override val closeQuote: String get() = "`"
@@ -41,16 +43,32 @@ interface MySqlDialect : Dialect {
         context: EntityUpsertContext<ENTITY, ID, META>,
         entities: List<ENTITY>,
     ): EntityUpsertStatementBuilder<ENTITY> {
-        return MySqlEntityUpsertStatementBuilder(dialect, context, entities)
+        return MySqlEntityUpsertStatementBuilder(dialect, context, entities, version)
+    }
+
+    override fun supportsAliasForDeleteStatement(): Boolean {
+        return when (version) {
+            MySqlVersion.V5 -> false
+            MySqlVersion.V8 -> true
+        }
     }
 
     override fun supportsConflictTargetInUpsertStatement(): Boolean = false
 
-    override fun supportsLockOfTables(): Boolean = true
+    override fun supportsLockOfTables(): Boolean = when (version) {
+        MySqlVersion.V5 -> false
+        MySqlVersion.V8 -> true
+    }
 
-    override fun supportsLockOptionNowait(): Boolean = true
+    override fun supportsLockOptionNowait(): Boolean = when (version) {
+        MySqlVersion.V5 -> false
+        MySqlVersion.V8 -> true
+    }
 
-    override fun supportsLockOptionSkipLocked(): Boolean = true
+    override fun supportsLockOptionSkipLocked(): Boolean = when (version) {
+        MySqlVersion.V5 -> false
+        MySqlVersion.V8 -> true
+    }
 
     override fun supportsNullOrdering(): Boolean = false
 

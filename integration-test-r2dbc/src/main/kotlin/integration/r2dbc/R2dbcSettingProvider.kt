@@ -12,6 +12,7 @@ object R2dbcSettingProvider {
             "h2" -> "integration.r2dbc.h2.R2dbcH2Setting"
             "mariadb" -> "integration.r2dbc.mariadb.R2dbcMariaDbSetting"
             "mysql" -> "integration.r2dbc.mysql.R2dbcMySqlSetting"
+            "mysql5" -> "integration.r2dbc.mysql5.R2dbcMySql5Setting"
             "oracle" -> "integration.r2dbc.oracle.R2dbcOracleSetting"
             "postgresql" -> "integration.r2dbc.postgresql.R2dbcPostgreSqlSetting"
             "sqlserver" -> "integration.r2dbc.sqlserver.R2dbcSqlServerSetting"

@@ -70,6 +70,16 @@ testing {
             }
         }
 
+        register("mysql5", JvmTestSuite::class) {
+            setup(name)
+            dependencies {
+                implementation(project())
+                implementation("org.testcontainers:mysql")
+                implementation(project(":komapper-dialect-mysql-r2dbc"))
+                runtimeOnly("mysql:mysql-connector-java:8.0.33")
+            }
+        }
+
         register("oracle", JvmTestSuite::class) {
             setup(name)
             dependencies {

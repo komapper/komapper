@@ -14,7 +14,7 @@ import kotlin.test.assertEquals
 @ExtendWith(R2dbcEnv::class)
 internal class R2dbcScriptTest(private val db: R2dbcDatabase) {
 
-    @Run(unless = [Dbms.MARIADB, Dbms.MYSQL])
+    @Run(unless = [Dbms.MARIADB, Dbms.MYSQL, Dbms.MYSQL_5])
     @Test
     fun test_double_quote(info: TestInfo) = inTransaction(db, info) {
         db.runQuery {
@@ -41,7 +41,7 @@ internal class R2dbcScriptTest(private val db: R2dbcDatabase) {
         }
     }
 
-    @Run(onlyIf = [Dbms.MARIADB, Dbms.MYSQL])
+    @Run(onlyIf = [Dbms.MARIADB, Dbms.MYSQL, Dbms.MYSQL_5])
     @Test
     fun test_back_quote(info: TestInfo) = inTransaction(db, info) {
         db.runQuery {
