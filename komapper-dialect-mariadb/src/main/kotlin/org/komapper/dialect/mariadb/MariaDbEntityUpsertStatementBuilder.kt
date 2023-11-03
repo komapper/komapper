@@ -3,11 +3,10 @@ package org.komapper.dialect.mariadb
 import org.komapper.core.BuilderDialect
 import org.komapper.core.Statement
 import org.komapper.core.StatementBuffer
+import org.komapper.core.dsl.builder.AliasManager
 import org.komapper.core.dsl.builder.BuilderSupport
-import org.komapper.core.dsl.builder.EmptyAliasManager
 import org.komapper.core.dsl.builder.EntityUpsertStatementBuilder
 import org.komapper.core.dsl.builder.TableNameType
-import org.komapper.core.dsl.builder.getAssignments
 import org.komapper.core.dsl.context.DuplicateKeyType
 import org.komapper.core.dsl.context.EntityUpsertContext
 import org.komapper.core.dsl.expression.ColumnExpression
@@ -24,15 +23,12 @@ class MariaDbEntityUpsertStatementBuilder<ENTITY : Any, ID : Any, META : EntityM
 ) : EntityUpsertStatementBuilder<ENTITY> {
 
     private val target = context.target
-    private val aliasManager = EmptyAliasManager
+    private val aliasManager = UpsertAliasManager(dialect, target, context.excluded)
     private val buf = StatementBuffer()
     private val support = BuilderSupport(dialect, aliasManager, buf)
     private val mariaDbSupport = MariaDbStatementBuilderSupport(dialect, context)
 
     override fun build(assignments: List<Pair<PropertyMetamodel<ENTITY, *, *>, Operand>>): Statement {
-        if (context.getAssignments().isNotEmpty()) {
-            error("The 'EntityUpsertQueryBuilder#set' call is not supported. MariaDB cannot refer to the row to be inserted.")
-        }
         val properties = target.getNonAutoIncrementProperties()
         buf.append("insert")
         if (context.duplicateKeyType == DuplicateKeyType.IGNORE) {
@@ -59,11 +55,11 @@ class MariaDbEntityUpsertStatementBuilder<ENTITY : Any, ID : Any, META : EntityM
         buf.cutBack(2)
         if (context.duplicateKeyType == DuplicateKeyType.UPDATE) {
             buf.append(" on duplicate key update ")
-            for ((left) in assignments) {
+            for ((left, right) in assignments) {
                 column(left)
-                buf.append(" = values(")
-                column(left)
-                buf.append("), ")
+                buf.append(" = ")
+                operand(right)
+                buf.append(", ")
             }
             buf.cutBack(2)
         }
@@ -79,4 +75,27 @@ class MariaDbEntityUpsertStatementBuilder<ENTITY : Any, ID : Any, META : EntityM
         val name = expression.getCanonicalColumnName(dialect::enquote)
         buf.append(name)
     }
+
+    private fun operand(operand: Operand) {
+        support.visitOperand(operand)
+    }
+
+    private class UpsertAliasManager(
+        dialect: BuilderDialect,
+        target: TableExpression<*>,
+        excluded: TableExpression<*>,
+    ) : AliasManager {
+
+        private val aliasMap: Map<TableExpression<*>, String> = mapOf(
+            target to target.getCanonicalTableName(dialect::enquote),
+            excluded to excluded.tableName(),
+        )
+
+        override val index: Int = 0
+
+        override fun getAlias(expression: TableExpression<*>): String? {
+            return aliasMap[expression]
+        }
+    }
+
 }

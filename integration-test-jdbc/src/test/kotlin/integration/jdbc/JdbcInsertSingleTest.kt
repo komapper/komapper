@@ -356,7 +356,6 @@ class JdbcInsertSingleTest(private val db: JdbcDatabase) {
     }
 
     @Test
-    @Run(unless = [Dbms.MARIADB])
     fun onDuplicateKeyUpdate_update_set() {
         val d = Meta.department
         val department = Department(1, 50, "PLANNING", "TOKYO", 10)
@@ -373,7 +372,6 @@ class JdbcInsertSingleTest(private val db: JdbcDatabase) {
     }
 
     @Test
-    @Run(unless = [Dbms.MARIADB])
     fun onDuplicateKeyUpdateWithKey_update_set() {
         val d = Meta.department
         val department = Department(5, 10, "PLANNING", "TOKYO", 10)
