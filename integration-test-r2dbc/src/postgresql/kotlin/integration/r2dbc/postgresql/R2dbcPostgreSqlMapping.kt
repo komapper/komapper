@@ -13,6 +13,7 @@ import org.komapper.annotation.KomapperColumn
 import org.komapper.annotation.KomapperEntity
 import org.komapper.annotation.KomapperId
 import org.komapper.annotation.KomapperTable
+import org.locationtech.jts.geom.Geometry
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.time.Instant
@@ -37,10 +38,11 @@ data class R2dbcPostgreSqlMapping(
     @KomapperColumn(alwaysQuote = true) val byte: Byte,
     @Suppress("ArrayInDataClass")
     @KomapperColumn(alwaysQuote = true) val byteArray: ByteArray,
-    @KomapperColumn(alwaysQuote = true) val double: Double,
     @KomapperColumn(alwaysQuote = true) val circle: Circle,
     @KomapperColumn(alwaysQuote = true) val clob: Clob,
+    @KomapperColumn(alwaysQuote = true) val double: Double,
     @KomapperColumn(alwaysQuote = true) val float: Float,
+    @KomapperColumn(alwaysQuote = true) val geometory: Geometry,
     @KomapperColumn(alwaysQuote = true) val instant: Instant,
     @KomapperColumn(alwaysQuote = true) val line: Line,
     @KomapperColumn(alwaysQuote = true) val lseg: Lseg,

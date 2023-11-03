@@ -13,6 +13,7 @@ import org.komapper.annotation.KomapperColumn
 import org.komapper.annotation.KomapperEntity
 import org.komapper.annotation.KomapperId
 import org.komapper.annotation.KomapperTable
+import org.locationtech.jts.geom.Geometry
 
 @KomapperEntity
 @KomapperTable("box_data")
@@ -21,6 +22,10 @@ data class BoxData(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true) 
 @KomapperEntity
 @KomapperTable("circle_data")
 data class CircleData(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true) val value: Circle?)
+
+@KomapperEntity
+@KomapperTable("geometry_data")
+data class GeometryData(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true) val value: Geometry?)
 
 @KomapperEntity
 @KomapperTable("line_data")

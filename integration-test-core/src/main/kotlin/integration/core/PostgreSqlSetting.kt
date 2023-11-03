@@ -54,6 +54,7 @@ interface PostgreSqlSetting<DATABASE : Database> : Setting<DATABASE> {
 
         create table if not exists box_data(id integer not null primary key, value box);
         create table if not exists circle_data(id integer not null primary key, value circle);
+        create table if not exists geometry_data(id integer not null primary key, value geometry);
         create table if not exists line_data(id integer not null primary key, value line);
         create table if not exists lseg_data(id integer not null primary key, value lseg);
         create table if not exists interval_data(id integer not null primary key, value interval);

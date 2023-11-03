@@ -4,8 +4,8 @@ import integration.core.PostgreSqlSetting
 import io.r2dbc.spi.ConnectionFactoryOptions
 import org.komapper.core.ExecutionOptions
 import org.komapper.r2dbc.R2dbcDatabase
+import org.testcontainers.containers.PostgisContainerProvider
 import org.testcontainers.containers.PostgreSQLContainer
-import org.testcontainers.containers.PostgreSQLContainerProvider
 import org.testcontainers.containers.PostgreSQLR2DBCDatabaseContainer
 import org.testcontainers.jdbc.ConnectionUrl
 
@@ -14,7 +14,7 @@ class R2dbcPostgreSqlSetting(private val url: String) : PostgreSqlSetting<R2dbcD
 
     private val options: ConnectionFactoryOptions by lazy {
         val connectionUrl = ConnectionUrl.newInstance(url)
-        val container = PostgreSQLContainerProvider().newInstance(connectionUrl) as PostgreSQLContainer<*>
+        val container = PostgisContainerProvider().newInstance(connectionUrl) as PostgreSQLContainer<*>
         val r2dbcContainer = PostgreSQLR2DBCDatabaseContainer(container)
         r2dbcContainer.start()
         r2dbcContainer.configure(

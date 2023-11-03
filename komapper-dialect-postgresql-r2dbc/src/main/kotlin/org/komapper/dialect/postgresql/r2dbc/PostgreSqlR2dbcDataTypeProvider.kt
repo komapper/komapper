@@ -55,6 +55,7 @@ class PostgreSqlR2dbcDataTypeProvider(private val next: R2dbcDataTypeProvider) :
             R2dbcUShortType("integer"),
             PostgreSqlR2dbcBoxType,
             PostgreSqlR2dbcCircleType,
+            PostgreSqlR2dbcGeometryType,
             PostgreSqlR2dbcIntervalType,
             PostgreSqlR2dbcJsonType,
             PostgreSqlR2dbcLineType,

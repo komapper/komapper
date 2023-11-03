@@ -17,6 +17,8 @@ import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
 import org.komapper.core.dsl.query.first
 import org.komapper.r2dbc.R2dbcDatabase
+import org.locationtech.jts.geom.Coordinate
+import org.locationtech.jts.geom.GeometryFactory
 import java.time.Period
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -75,6 +77,32 @@ class R2dbcPostgreSqlTypeTest(val db: R2dbcDatabase) {
             QueryDsl.from(m).where { m.id eq 1 }.first()
         }
         assertEquals(data, data2)
+    }
+
+    @Test
+    fun geometry(info: TestInfo) = inTransaction(db, info) {
+        val m = Meta.geometryData
+        val factory = GeometryFactory()
+        val data = GeometryData(
+            1,
+            factory.createPoint(Coordinate(1.0, 2.0)),
+        )
+        db.runQuery { QueryDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        assertEquals(data.value, data2.value)
+    }
+
+    @Test
+    fun geometry_null(info: TestInfo) = inTransaction(db, info) {
+        val m = Meta.geometryData
+        val data = GeometryData(1, null)
+        db.runQuery { QueryDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        assertEquals(data.value, data2.value)
     }
 
     @Test
