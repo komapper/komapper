@@ -97,5 +97,4 @@ class MariaDbEntityUpsertStatementBuilder<ENTITY : Any, ID : Any, META : EntityM
             return aliasMap[expression]
         }
     }
-
 }
