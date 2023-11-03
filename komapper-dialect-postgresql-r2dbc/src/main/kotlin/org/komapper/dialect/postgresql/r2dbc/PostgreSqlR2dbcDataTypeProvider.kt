@@ -53,8 +53,15 @@ class PostgreSqlR2dbcDataTypeProvider(private val next: R2dbcDataTypeProvider) :
             R2dbcUByteType("smallint"),
             R2dbcUIntType("bigint"),
             R2dbcUShortType("integer"),
+            PostgreSqlR2dbcBoxType,
+            PostgreSqlR2dbcCircleType,
             PostgreSqlR2dbcIntervalType,
             PostgreSqlR2dbcJsonType,
+            PostgreSqlR2dbcLineType,
+            PostgreSqlR2dbcLsegType,
+            PostgreSqlR2dbcPathType,
+            PostgreSqlR2dbcPointType,
+            PostgreSqlR2dbcPolygonType,
             PostgreSqlR2dbcUUIDType,
         )
     }

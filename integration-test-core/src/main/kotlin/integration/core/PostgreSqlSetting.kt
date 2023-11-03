@@ -52,8 +52,15 @@ interface PostgreSqlSetting<DATABASE : Database> : Setting<DATABASE> {
         create table if not exists string_data(id integer not null primary key, value varchar(20));
         create table if not exists uuid_data(id integer not null primary key, value uuid);
 
+        create table if not exists box_data(id integer not null primary key, value box);
+        create table if not exists circle_data(id integer not null primary key, value circle);
+        create table if not exists line_data(id integer not null primary key, value line);
+        create table if not exists lseg_data(id integer not null primary key, value lseg);
         create table if not exists interval_data(id integer not null primary key, value interval);
         create table if not exists json_data(id integer not null primary key, value jsonb);
+        create table if not exists path_data(id integer not null primary key, value path);
+        create table if not exists point_data(id integer not null primary key, value point);
+        create table if not exists polygon_data(id integer not null primary key, value polygon);
 
         create table if not exists friend(uuid1 uuid, uuid2 uuid, pending boolean, constraint pk_friend primary key(uuid1, uuid2));
         create unique index friend_unique_idx on friend (greatest(uuid1, uuid2), least(uuid1, uuid2));
