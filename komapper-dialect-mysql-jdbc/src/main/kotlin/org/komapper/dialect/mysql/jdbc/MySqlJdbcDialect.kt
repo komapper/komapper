@@ -1,6 +1,7 @@
 package org.komapper.dialect.mysql.jdbc
 
 import org.komapper.dialect.mysql.MySqlDialect
+import org.komapper.dialect.mysql.MySqlVersion
 import org.komapper.jdbc.JdbcDialect
 import java.sql.SQLException
 
@@ -13,8 +14,8 @@ interface MySqlJdbcDialect : MySqlDialect, JdbcDialect {
     }
 }
 
-private object MySqlJdbcDialectImpl : MySqlJdbcDialect
+private class MySqlJdbcDialectImpl(override val version: MySqlVersion) : MySqlJdbcDialect
 
-fun MySqlJdbcDialect(): MySqlJdbcDialect {
-    return MySqlJdbcDialectImpl
+fun MySqlJdbcDialect(version: MySqlVersion = MySqlVersion.V8): MySqlJdbcDialect {
+    return MySqlJdbcDialectImpl(version)
 }

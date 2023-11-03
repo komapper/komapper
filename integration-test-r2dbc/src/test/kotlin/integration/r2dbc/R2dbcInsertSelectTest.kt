@@ -43,7 +43,7 @@ class R2dbcInsertSelectTest(private val db: R2dbcDatabase) {
         assertEquals(emptyList(), ids)
     }
 
-    @Run(unless = [Dbms.MYSQL, Dbms.MARIADB, Dbms.ORACLE, Dbms.SQLSERVER])
+    @Run(unless = [Dbms.MYSQL, Dbms.MYSQL_5, Dbms.MARIADB, Dbms.ORACLE, Dbms.SQLSERVER])
     @Test
     fun generatedKeys(info: TestInfo) = inTransaction(db, info) {
         val i = Meta.identityStrategy
@@ -65,7 +65,7 @@ class R2dbcInsertSelectTest(private val db: R2dbcDatabase) {
         assertEquals(listOf(3, 4), ids)
     }
 
-    @Run(onlyIf = [Dbms.MYSQL, Dbms.MARIADB, Dbms.ORACLE, Dbms.SQLSERVER])
+    @Run(onlyIf = [Dbms.MYSQL, Dbms.MYSQL_5, Dbms.MARIADB, Dbms.ORACLE, Dbms.SQLSERVER])
     @Test
     fun generatedKeys_unsupportedOperationException(info: TestInfo) = inTransaction(db, info) {
         val i = Meta.identityStrategy

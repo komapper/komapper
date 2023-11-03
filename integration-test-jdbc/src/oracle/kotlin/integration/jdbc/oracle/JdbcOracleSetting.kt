@@ -5,7 +5,7 @@ import org.komapper.core.ExecutionOptions
 import org.komapper.jdbc.JdbcDatabase
 
 @Suppress("unused")
-class JdbcOracleSetting(private val driver: String, url: String) : OracleSetting<JdbcDatabase> {
+class JdbcOracleSetting(url: String) : OracleSetting<JdbcDatabase> {
     override val database: JdbcDatabase = JdbcDatabase(
         url,
         "test",

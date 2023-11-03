@@ -94,7 +94,11 @@ class BuilderSupport(
                 if (alias.isBlank()) {
                     buf.append(name)
                 } else {
-                    buf.append("$alias.$name")
+                    if (alias == "excluded" && !dialect.supportsExcludedTable()) {
+                        buf.append("values($name)")
+                    } else {
+                        buf.append("$alias.$name")
+                    }
                 }
             }
         }

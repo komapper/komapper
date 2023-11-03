@@ -5,7 +5,7 @@ import org.komapper.core.ExecutionOptions
 import org.komapper.jdbc.JdbcDatabase
 
 @Suppress("unused")
-class JdbcH2Setting(private val driver: String, url: String) : H2Setting<JdbcDatabase> {
+class JdbcH2Setting(url: String) : H2Setting<JdbcDatabase> {
     override val database: JdbcDatabase = JdbcDatabase(
         url,
         executionOptions = ExecutionOptions(batchSize = 2),

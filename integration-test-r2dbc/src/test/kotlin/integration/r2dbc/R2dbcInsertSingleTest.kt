@@ -242,7 +242,7 @@ class R2dbcInsertSingleTest(private val db: R2dbcDatabase) {
         }
     }
 
-    @Run(unless = [Dbms.MYSQL])
+    @Run(unless = [Dbms.MYSQL, Dbms.MYSQL_5])
     @Test
     fun sequenceGenerator(info: TestInfo) = inTransaction(db, info) {
         val generator = Meta.sequenceStrategy.idGenerator() as IdGenerator.Sequence<*, *>
@@ -256,7 +256,7 @@ class R2dbcInsertSingleTest(private val db: R2dbcDatabase) {
         }
     }
 
-    @Run(unless = [Dbms.MYSQL])
+    @Run(unless = [Dbms.MYSQL, Dbms.MYSQL_5])
     @Test
     fun sequenceGenerator_disableSequenceAssignment(info: TestInfo) = inTransaction(db, info) {
         val m = Meta.sequenceStrategy

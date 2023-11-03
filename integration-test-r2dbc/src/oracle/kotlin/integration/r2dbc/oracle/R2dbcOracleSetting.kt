@@ -12,7 +12,7 @@ import org.testcontainers.lifecycle.Startable
 import org.testcontainers.r2dbc.R2DBCDatabaseContainer
 
 @Suppress("unused")
-class R2dbcOracleSetting(private val driver: String, private val url: String) : OracleSetting<R2dbcDatabase> {
+class R2dbcOracleSetting(private val url: String) : OracleSetting<R2dbcDatabase> {
 
     private val options: ConnectionFactoryOptions by lazy {
         val connectionUrl = ConnectionUrl.newInstance(url)
@@ -22,7 +22,7 @@ class R2dbcOracleSetting(private val driver: String, private val url: String) : 
         r2dbcContainer.configure(
             ConnectionFactoryOptions.builder()
                 .option(ConnectionFactoryOptions.DRIVER, "pool")
-                .option(ConnectionFactoryOptions.PROTOCOL, driver)
+                .option(ConnectionFactoryOptions.PROTOCOL, "oracle")
                 .option(Option.valueOf("initialSize"), 2)
                 .build(),
         )

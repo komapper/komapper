@@ -2,6 +2,7 @@ package org.komapper.dialect.mysql.r2dbc
 
 import io.r2dbc.spi.R2dbcException
 import org.komapper.dialect.mysql.MySqlDialect
+import org.komapper.dialect.mysql.MySqlVersion
 import org.komapper.r2dbc.R2dbcDialect
 
 interface MySqlR2dbcDialect : MySqlDialect, R2dbcDialect {
@@ -15,8 +16,8 @@ interface MySqlR2dbcDialect : MySqlDialect, R2dbcDialect {
     override fun supportsGeneratedKeysReturningWhenInsertingMultipleRows(): Boolean = false
 }
 
-private object MySqlR2dbcDialectImpl : MySqlR2dbcDialect
+private class MySqlR2dbcDialectImpl(override val version: MySqlVersion) : MySqlR2dbcDialect
 
-fun MySqlR2dbcDialect(): MySqlR2dbcDialect {
-    return MySqlR2dbcDialectImpl
+fun MySqlR2dbcDialect(version: MySqlVersion = MySqlVersion.V8): MySqlR2dbcDialect {
+    return MySqlR2dbcDialectImpl(version)
 }

@@ -20,6 +20,7 @@ class MySqlEntityUpsertStatementBuilder<ENTITY : Any, ID : Any, META : EntityMet
     private val dialect: BuilderDialect,
     private val context: EntityUpsertContext<ENTITY, ID, META>,
     private val entities: List<ENTITY>,
+    private val version: MySqlVersion = MySqlVersion.V8,
 ) : EntityUpsertStatementBuilder<ENTITY> {
 
     private val target = context.target
@@ -53,8 +54,15 @@ class MySqlEntityUpsertStatementBuilder<ENTITY : Any, ID : Any, META : EntityMet
             buf.append("), ")
         }
         buf.cutBack(2)
-        buf.append(" as ")
-        table(excluded, TableNameType.ALIAS_ONLY)
+        when (version) {
+            MySqlVersion.V5 -> {
+                // do nothing
+            }
+            MySqlVersion.V8 -> {
+                buf.append(" as ")
+                table(excluded, TableNameType.ALIAS_ONLY)
+            }
+        }
         if (context.duplicateKeyType == DuplicateKeyType.UPDATE) {
             buf.append(" on duplicate key update ")
             for ((left, right) in assignments) {

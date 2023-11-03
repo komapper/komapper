@@ -13,7 +13,7 @@ import kotlin.test.assertEquals
 @ExtendWith(JdbcEnv::class)
 internal class JdbcScriptTest(private val db: JdbcDatabase) {
 
-    @Run(unless = [Dbms.MARIADB, Dbms.MYSQL])
+    @Run(unless = [Dbms.MARIADB, Dbms.MYSQL, Dbms.MYSQL_5])
     @Test
     fun test_double_quote() {
         db.runQuery {
@@ -40,7 +40,7 @@ internal class JdbcScriptTest(private val db: JdbcDatabase) {
         }
     }
 
-    @Run(onlyIf = [Dbms.MARIADB, Dbms.MYSQL])
+    @Run(onlyIf = [Dbms.MARIADB, Dbms.MYSQL, Dbms.MYSQL_5])
     @Test
     fun test_back_quote() {
         db.runQuery {

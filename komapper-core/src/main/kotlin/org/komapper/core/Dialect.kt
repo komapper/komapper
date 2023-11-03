@@ -283,6 +283,8 @@ interface Dialect {
      */
     fun supportsDropIfExists(): Boolean = true
 
+    fun supportsExcludedTable(): Boolean = true
+
     /**
      * Returns whether the generated keys returning is supported when inserting multiple rows.
      */

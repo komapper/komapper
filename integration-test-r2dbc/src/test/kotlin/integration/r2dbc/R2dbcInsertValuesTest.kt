@@ -81,7 +81,7 @@ class R2dbcInsertValuesTest(private val db: R2dbcDatabase) {
         assertIs<Int>(id)
     }
 
-    @Run(unless = [Dbms.MYSQL])
+    @Run(unless = [Dbms.MYSQL, Dbms.MYSQL_5])
     @Test
     fun generatedKeys_sequence(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.sequenceStrategy

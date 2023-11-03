@@ -1,9 +1,11 @@
-package integration.r2dbc.mysql
+package integration.r2dbc.mysql5
 
-import integration.core.MySqlSetting
+import integration.core.MySql5Setting
 import io.r2dbc.spi.ConnectionFactoryOptions
 import io.r2dbc.spi.Option
 import org.komapper.core.ExecutionOptions
+import org.komapper.dialect.mysql.MySqlVersion
+import org.komapper.dialect.mysql.r2dbc.MySqlR2dbcDialect
 import org.komapper.r2dbc.R2dbcDatabase
 import org.testcontainers.containers.MySQLContainer
 import org.testcontainers.containers.MySQLContainerProvider
@@ -11,8 +13,8 @@ import org.testcontainers.containers.MySQLR2DBCDatabaseContainer
 import org.testcontainers.jdbc.ConnectionUrl
 
 @Suppress("unused")
-class R2dbcMySqlSetting(private val url: String) :
-    MySqlSetting<R2dbcDatabase> {
+class R2dbcMySql5Setting(private val url: String) :
+    MySql5Setting<R2dbcDatabase> {
 
     private val options: ConnectionFactoryOptions by lazy {
         val connectionUrl = ConnectionUrl.newInstance(url)
@@ -31,6 +33,7 @@ class R2dbcMySqlSetting(private val url: String) :
     override val database: R2dbcDatabase
         get() = R2dbcDatabase(
             options = options,
+            dialect = MySqlR2dbcDialect(version = MySqlVersion.V5),
             executionOptions = ExecutionOptions(batchSize = 2),
         )
 }

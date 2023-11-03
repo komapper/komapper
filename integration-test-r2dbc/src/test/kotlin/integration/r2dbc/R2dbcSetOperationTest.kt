@@ -19,7 +19,7 @@ import kotlin.test.assertFailsWith
 @ExtendWith(R2dbcEnv::class)
 class R2dbcSetOperationTest(private val db: R2dbcDatabase) {
 
-    @Run(unless = [Dbms.MYSQL])
+    @Run(unless = [Dbms.MYSQL, Dbms.MYSQL_5])
     @Test
     fun except_entity(info: TestInfo) = inTransaction(db, info) {
         val e = Meta.employee
@@ -36,7 +36,7 @@ class R2dbcSetOperationTest(private val db: R2dbcDatabase) {
         assertEquals(5, e3.employeeId)
     }
 
-    @Run(unless = [Dbms.MYSQL])
+    @Run(unless = [Dbms.MYSQL, Dbms.MYSQL_5])
     @Test
     fun intersect_entity(info: TestInfo) = inTransaction(db, info) {
         val e = Meta.employee
@@ -66,6 +66,7 @@ class R2dbcSetOperationTest(private val db: R2dbcDatabase) {
         assertEquals(1, e2.employeeId)
     }
 
+    @Run(unless = [Dbms.MYSQL_5])
     @Test
     fun union_subquery(info: TestInfo) = inTransaction(db, info) {
         val e = Meta.employee
