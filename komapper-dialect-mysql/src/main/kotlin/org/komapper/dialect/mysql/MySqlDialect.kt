@@ -24,7 +24,11 @@ interface MySqlDialect : Dialect {
     override val openQuote: String get() = "`"
     override val closeQuote: String get() = "`"
 
-    override fun getOffsetLimitStatementBuilder(dialect: BuilderDialect, offset: Int, limit: Int): OffsetLimitStatementBuilder {
+    override fun getOffsetLimitStatementBuilder(
+        dialect: BuilderDialect,
+        offset: Int,
+        limit: Int,
+    ): OffsetLimitStatementBuilder {
         return MySqlOffsetLimitStatementBuilder(dialect, offset, limit)
     }
 
@@ -46,14 +50,17 @@ interface MySqlDialect : Dialect {
         return MySqlEntityUpsertStatementBuilder(dialect, context, entities, version)
     }
 
-    override fun supportsAliasForDeleteStatement(): Boolean {
-        return when (version) {
-            MySqlVersion.V5 -> false
-            MySqlVersion.V8 -> true
-        }
+    override fun supportsAliasForDeleteStatement(): Boolean = when (version) {
+        MySqlVersion.V5 -> false
+        MySqlVersion.V8 -> true
     }
 
     override fun supportsConflictTargetInUpsertStatement(): Boolean = false
+
+    override fun supportsExcludedTable(): Boolean = when (version) {
+        MySqlVersion.V5 -> false
+        MySqlVersion.V8 -> true
+    }
 
     override fun supportsLockOfTables(): Boolean = when (version) {
         MySqlVersion.V5 -> false

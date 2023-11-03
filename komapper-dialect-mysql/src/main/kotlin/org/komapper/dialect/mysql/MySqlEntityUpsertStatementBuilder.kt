@@ -5,7 +5,6 @@ import org.komapper.core.Statement
 import org.komapper.core.StatementBuffer
 import org.komapper.core.dsl.builder.AliasManager
 import org.komapper.core.dsl.builder.BuilderSupport
-import org.komapper.core.dsl.builder.EmptyAliasManager
 import org.komapper.core.dsl.builder.EntityUpsertStatementBuilder
 import org.komapper.core.dsl.builder.TableNameType
 import org.komapper.core.dsl.context.DuplicateKeyType
@@ -26,10 +25,7 @@ class MySqlEntityUpsertStatementBuilder<ENTITY : Any, ID : Any, META : EntityMet
 
     private val target = context.target
     private val excluded = context.excluded
-    private val aliasManager = when (version) {
-        MySqlVersion.V5 -> EmptyAliasManager
-        MySqlVersion.V8 -> UpsertAliasManager(dialect, target, excluded)
-    }
+    private val aliasManager = UpsertAliasManager(dialect, target, excluded)
     private val buf = StatementBuffer()
     private val support = BuilderSupport(dialect, aliasManager, buf)
 
@@ -72,16 +68,7 @@ class MySqlEntityUpsertStatementBuilder<ENTITY : Any, ID : Any, META : EntityMet
             for ((left, right) in assignments) {
                 column(left)
                 buf.append(" = ")
-                when (version) {
-                    MySqlVersion.V5 -> {
-                        buf.append("values(")
-                        operand(right)
-                        buf.append(")")
-                    }
-                    MySqlVersion.V8 -> {
-                        operand(right)
-                    }
-                }
+                operand(right)
                 buf.append(", ")
             }
             buf.cutBack(2)
