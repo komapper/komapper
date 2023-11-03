@@ -13,7 +13,7 @@ import org.testcontainers.containers.MySQLR2DBCDatabaseContainer
 import org.testcontainers.jdbc.ConnectionUrl
 
 @Suppress("unused")
-class R2dbcMySql5Setting(private val driver: String, private val url: String) :
+class R2dbcMySql5Setting(private val url: String) :
     MySql5Setting<R2dbcDatabase> {
 
     private val options: ConnectionFactoryOptions by lazy {

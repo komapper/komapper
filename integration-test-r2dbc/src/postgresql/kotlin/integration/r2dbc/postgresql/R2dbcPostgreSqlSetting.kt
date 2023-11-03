@@ -10,7 +10,7 @@ import org.testcontainers.containers.PostgreSQLR2DBCDatabaseContainer
 import org.testcontainers.jdbc.ConnectionUrl
 
 @Suppress("unused")
-class R2dbcPostgreSqlSetting(private val driver: String, private val url: String) : PostgreSqlSetting<R2dbcDatabase> {
+class R2dbcPostgreSqlSetting(private val url: String) : PostgreSqlSetting<R2dbcDatabase> {
 
     private val options: ConnectionFactoryOptions by lazy {
         val connectionUrl = ConnectionUrl.newInstance(url)
@@ -20,7 +20,7 @@ class R2dbcPostgreSqlSetting(private val driver: String, private val url: String
         r2dbcContainer.configure(
             // We do not use connection pool to use the `mood` enum codec
             ConnectionFactoryOptions.builder()
-                .option(ConnectionFactoryOptions.DRIVER, driver)
+                .option(ConnectionFactoryOptions.DRIVER, "postgresql")
                 .build(),
         )
     }

@@ -7,7 +7,7 @@ import org.komapper.dialect.mysql.jdbc.MySqlJdbcDialect
 import org.komapper.jdbc.JdbcDatabase
 
 @Suppress("unused")
-class JdbcMySql5Setting(private val driver: String, url: String) : MySql5Setting<JdbcDatabase> {
+class JdbcMySql5Setting(url: String) : MySql5Setting<JdbcDatabase> {
     override val database: JdbcDatabase = JdbcDatabase(
         url,
         "test",

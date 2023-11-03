@@ -11,7 +11,7 @@ import org.testcontainers.containers.MSSQLServerContainerProvider
 import org.testcontainers.jdbc.ConnectionUrl
 
 @Suppress("unused")
-class R2dbcSqlServerSetting(private val driver: String, private val url: String) : SqlServerSetting<R2dbcDatabase> {
+class R2dbcSqlServerSetting(private val url: String) : SqlServerSetting<R2dbcDatabase> {
 
     private val options: ConnectionFactoryOptions by lazy {
         val connectionUrl = ConnectionUrl.newInstance(url)
@@ -21,7 +21,7 @@ class R2dbcSqlServerSetting(private val driver: String, private val url: String)
         r2dbcContainer.configure(
             ConnectionFactoryOptions.builder()
                 .option(ConnectionFactoryOptions.DRIVER, "pool")
-                .option(ConnectionFactoryOptions.PROTOCOL, driver)
+                .option(ConnectionFactoryOptions.PROTOCOL, "sqlserver")
                 .option(Option.valueOf("initialSize"), 2)
                 .build(),
         )

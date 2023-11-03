@@ -112,10 +112,10 @@ testing {
     }
 }
 
-fun JvmTestSuite.setup(driver: String) {
+fun JvmTestSuite.setup(identifier: String) {
     sources {
         java {
-            setSrcDirs(listOf("src/test/kotlin", "build/generated/ksp/$driver/kotlin"))
+            setSrcDirs(listOf("src/test/kotlin", "build/generated/ksp/$identifier/kotlin"))
         }
         resources {
             setSrcDirs(listOf("src/test/resources"))
@@ -124,9 +124,9 @@ fun JvmTestSuite.setup(driver: String) {
     targets {
         all {
             testTask.configure {
-                val urlKey = "$driver.url"
+                val urlKey = "$identifier.url"
                 val url = project.property(urlKey) ?: throw GradleException("The $urlKey property is not found.")
-                systemProperty("driver", driver)
+                systemProperty("identifier", identifier)
                 systemProperty("url", url)
             }
         }

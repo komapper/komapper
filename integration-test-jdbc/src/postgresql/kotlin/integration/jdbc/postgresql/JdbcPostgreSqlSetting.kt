@@ -6,7 +6,7 @@ import org.komapper.jdbc.JdbcDataTypeProvider
 import org.komapper.jdbc.JdbcDatabase
 
 @Suppress("unused")
-class JdbcPostgreSqlSetting(private val driver: String, url: String) : PostgreSqlSetting<JdbcDatabase> {
+class JdbcPostgreSqlSetting(url: String) : PostgreSqlSetting<JdbcDatabase> {
 
     override val database: JdbcDatabase by lazy {
         val dataTypeProvider = JdbcDataTypeProvider(PostgreSqlJsonType())

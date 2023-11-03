@@ -11,7 +11,7 @@ import org.testcontainers.containers.MariaDBR2DBCDatabaseContainer
 import org.testcontainers.jdbc.ConnectionUrl
 
 @Suppress("unused")
-class R2dbcMariaDbSetting(private val driver: String, private val url: String) :
+class R2dbcMariaDbSetting(private val url: String) :
     MariaDbSetting<R2dbcDatabase> {
 
     private val options: ConnectionFactoryOptions by lazy {
@@ -22,7 +22,7 @@ class R2dbcMariaDbSetting(private val driver: String, private val url: String) :
         r2dbcContainer.configure(
             ConnectionFactoryOptions.builder()
                 .option(ConnectionFactoryOptions.DRIVER, "pool")
-                .option(ConnectionFactoryOptions.PROTOCOL, driver)
+                .option(ConnectionFactoryOptions.PROTOCOL, "mariadb")
                 .option(Option.valueOf("initialSize"), 2)
                 .build(),
         )
