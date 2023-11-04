@@ -7,6 +7,8 @@ import org.komapper.core.StatementBuffer
 import org.komapper.core.Value
 import org.komapper.core.dsl.context.SelectContext
 import org.komapper.core.dsl.context.SetOperationContext
+import org.komapper.core.dsl.context.SubqueryContext
+import org.komapper.core.dsl.context.columnAndAliasPairs
 import org.komapper.core.dsl.expression.AggregateFunction
 import org.komapper.core.dsl.expression.AliasExpression
 import org.komapper.core.dsl.expression.ArithmeticExpression
@@ -26,6 +28,7 @@ import org.komapper.core.dsl.expression.StringFunction
 import org.komapper.core.dsl.expression.SubqueryExpression
 import org.komapper.core.dsl.expression.TableExpression
 import org.komapper.core.dsl.expression.UserDefinedExpression
+import org.komapper.core.dsl.metamodel.InlineViewMetamodel
 
 class BuilderSupport(
     private val dialect: BuilderDialect,
@@ -36,6 +39,9 @@ class BuilderSupport(
     private val operation = CriterionOperation()
 
     fun visitTableExpression(expression: TableExpression<*>, nameType: TableNameType) {
+        if (expression is InlineViewMetamodel) {
+            visitInlineViewMetamodel(expression)
+        }
         val name = expression.getCanonicalTableName(dialect::enquote)
         when (nameType) {
             TableNameType.NAME_ONLY -> {
@@ -56,6 +62,27 @@ class BuilderSupport(
                 }
             }
         }
+    }
+
+    private fun visitInlineViewMetamodel(expression: InlineViewMetamodel) {
+        val context = when (val context = expression.context) {
+            is SelectContext<*, *, *> -> {
+                val aliasExpressions = context.columnAndAliasPairs.map { (column, alias) ->
+                    if (column is AliasExpression<*, *>) {
+                        column
+                    } else {
+                        @Suppress("UNCHECKED_CAST")
+                        AliasExpression(column as ColumnExpression<Any, Any>, alias)
+                    }
+                }
+                context.copy(select = aliasExpressions)
+            }
+            is SetOperationContext -> context
+        }
+        val statement = buildSubqueryStatement(context)
+        buf.append("(")
+        buf.append(statement)
+        buf.append(")")
     }
 
     fun visitColumnExpression(expression: ColumnExpression<*, *>) {
@@ -263,7 +290,14 @@ class BuilderSupport(
         expression: SubqueryExpression<*>,
         projectionPredicate: (ColumnExpression<*, *>) -> Boolean = { true },
     ): Statement {
-        return when (val context = expression.context) {
+        return buildSubqueryStatement(expression.context, projectionPredicate)
+    }
+
+    private fun buildSubqueryStatement(
+        context: SubqueryContext,
+        projectionPredicate: (ColumnExpression<*, *>) -> Boolean = { true },
+    ): Statement {
+        return when (context) {
             is SelectContext<*, *, *> -> {
                 val childAliasManager = DefaultAliasManager(context, aliasManager)
                 val builder = SelectStatementBuilder(dialect, context, childAliasManager, projectionPredicate)

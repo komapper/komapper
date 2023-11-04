@@ -64,4 +64,8 @@ class RecordImpl(private val map: Map<ColumnExpression<*, *>, Any?>) : Record {
         val value = map[key]
         return if (value == null) null else key.exteriorClass.cast(value)
     }
+
+    override fun toString(): String {
+        return map.entries.map { (key, value) -> key.columnName to value }.toString()
+    }
 }

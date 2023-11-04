@@ -10,11 +10,16 @@ import org.komapper.core.dsl.context.ScriptContext
 import org.komapper.core.dsl.context.SelectContext
 import org.komapper.core.dsl.context.TemplateExecuteContext
 import org.komapper.core.dsl.context.TemplateSelectContext
+import org.komapper.core.dsl.context.inlineViewMetamodel
+import org.komapper.core.dsl.expression.SubqueryExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.query.DeleteQueryBuilder
 import org.komapper.core.dsl.query.DeleteQueryBuilderImpl
+import org.komapper.core.dsl.query.InlineViewSelectQuery
 import org.komapper.core.dsl.query.InsertQueryBuilder
 import org.komapper.core.dsl.query.InsertQueryBuilderImpl
+import org.komapper.core.dsl.query.Record
+import org.komapper.core.dsl.query.RelationSelectQuery
 import org.komapper.core.dsl.query.SchemaCreateQuery
 import org.komapper.core.dsl.query.SchemaCreateQueryImpl
 import org.komapper.core.dsl.query.SchemaDropQuery
@@ -49,6 +54,19 @@ object QueryDsl {
         metamodel: META,
     ): SelectQueryBuilder<ENTITY, ID, META> {
         return SelectQueryBuilderImpl(SelectContext(metamodel))
+    }
+
+    /**
+     * Creates a SELECT query using an inline view.
+     *
+     * @param subquery the inline vie
+     * @return the query
+     */
+    fun from(
+        subquery: SubqueryExpression<*>,
+    ): RelationSelectQuery<Record> {
+        val metamodel = subquery.context.inlineViewMetamodel
+        return InlineViewSelectQuery(SelectContext(metamodel))
     }
 
     /**
