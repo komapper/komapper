@@ -1,5 +1,7 @@
 package integration.jdbc
 
+import integration.core.Dbms
+import integration.core.Run
 import integration.core.department
 import integration.core.employee
 import org.junit.jupiter.api.extension.ExtendWith
@@ -228,6 +230,7 @@ class JdbcSelectWindowFunctionTest(private val db: JdbcDatabase) {
         assertEquals(expected, list)
     }
 
+    @Run(unless = [Dbms.MARIADB])
     @Test
     fun testLead() {
         val d = Meta.department
@@ -270,6 +273,45 @@ class JdbcSelectWindowFunctionTest(private val db: JdbcDatabase) {
         }
     }
 
+    @Run(onlyIf = [Dbms.MARIADB])
+    @Test
+    fun testLeadWithoutDefaultValue() {
+        val d = Meta.department
+
+        val c1 = d.departmentId
+        val c2 = lead(d.departmentId).over { orderBy(d.departmentId) }
+        val c3 = lead(d.departmentId, 2).over { orderBy(d.departmentId) }
+
+        val list = db.runQuery {
+            QueryDsl.from(d)
+                .orderBy(d.departmentId)
+                .selectAsRecord(c1, c2, c3)
+        }
+        println(list)
+        assertEquals(4, list.size)
+        list[0].let {
+            assertEquals(1, it[c1])
+            assertEquals(2, it[c2])
+            assertEquals(3, it[c3])
+        }
+        list[1].let {
+            assertEquals(2, it[c1])
+            assertEquals(3, it[c2])
+            assertEquals(4, it[c3])
+        }
+        list[2].let {
+            assertEquals(3, it[c1])
+            assertEquals(4, it[c2])
+            assertEquals(null, it[c3])
+        }
+        list[3].let {
+            assertEquals(4, it[c1])
+            assertEquals(null, it[c2])
+            assertEquals(null, it[c3])
+        }
+    }
+
+    @Run(unless = [Dbms.MARIADB])
     @Test
     fun testLag() {
         val d = Meta.department
@@ -309,6 +351,44 @@ class JdbcSelectWindowFunctionTest(private val db: JdbcDatabase) {
             assertEquals(3, it[c2])
             assertEquals(2, it[c3])
             assertEquals(2, it[c4])
+        }
+    }
+
+    @Run(onlyIf = [Dbms.MARIADB])
+    @Test
+    fun testLagWithoutDefaultValue() {
+        val d = Meta.department
+
+        val c1 = d.departmentId
+        val c2 = lag(d.departmentId).over { orderBy(d.departmentId) }
+        val c3 = lag(d.departmentId, 2).over { orderBy(d.departmentId) }
+
+        val list = db.runQuery {
+            QueryDsl.from(d)
+                .orderBy(d.departmentId)
+                .selectAsRecord(c1, c2, c3)
+        }
+        println(list)
+        assertEquals(4, list.size)
+        list[0].let {
+            assertEquals(1, it[c1])
+            assertEquals(null, it[c2])
+            assertEquals(null, it[c3])
+        }
+        list[1].let {
+            assertEquals(2, it[c1])
+            assertEquals(1, it[c2])
+            assertEquals(null, it[c3])
+        }
+        list[2].let {
+            assertEquals(3, it[c1])
+            assertEquals(2, it[c2])
+            assertEquals(1, it[c3])
+        }
+        list[3].let {
+            assertEquals(4, it[c1])
+            assertEquals(3, it[c2])
+            assertEquals(2, it[c3])
         }
     }
 
