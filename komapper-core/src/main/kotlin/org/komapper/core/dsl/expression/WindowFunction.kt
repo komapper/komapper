@@ -17,6 +17,50 @@ internal object RowNumber : WindowFunction<Long, Long> {
     override val masking: Boolean get() = throw UnsupportedOperationException()
 }
 
+internal object Rank : WindowFunction<Long, Long> {
+    override val owner: TableExpression<*> get() = throw UnsupportedOperationException()
+    override val exteriorClass: KClass<Long> = Long::class
+    override val interiorClass: KClass<Long> = Long::class
+    override val wrap: (Long) -> Long = { it }
+    override val unwrap: (Long) -> Long = { it }
+    override val columnName: String get() = throw UnsupportedOperationException()
+    override val alwaysQuote: Boolean get() = throw UnsupportedOperationException()
+    override val masking: Boolean get() = throw UnsupportedOperationException()
+}
+
+internal object DenseRank : WindowFunction<Long, Long> {
+    override val owner: TableExpression<*> get() = throw UnsupportedOperationException()
+    override val exteriorClass: KClass<Long> = Long::class
+    override val interiorClass: KClass<Long> = Long::class
+    override val wrap: (Long) -> Long = { it }
+    override val unwrap: (Long) -> Long = { it }
+    override val columnName: String get() = throw UnsupportedOperationException()
+    override val alwaysQuote: Boolean get() = throw UnsupportedOperationException()
+    override val masking: Boolean get() = throw UnsupportedOperationException()
+}
+
+internal object PercentRank : WindowFunction<Double, Double> {
+    override val owner: TableExpression<*> get() = throw UnsupportedOperationException()
+    override val exteriorClass: KClass<Double> = Double::class
+    override val interiorClass: KClass<Double> = Double::class
+    override val wrap: (Double) -> Double = { it }
+    override val unwrap: (Double) -> Double = { it }
+    override val columnName: String get() = throw UnsupportedOperationException()
+    override val alwaysQuote: Boolean get() = throw UnsupportedOperationException()
+    override val masking: Boolean get() = throw UnsupportedOperationException()
+}
+
+internal object CumeDist : WindowFunction<Double, Double> {
+    override val owner: TableExpression<*> get() = throw UnsupportedOperationException()
+    override val exteriorClass: KClass<Double> = Double::class
+    override val interiorClass: KClass<Double> = Double::class
+    override val wrap: (Double) -> Double = { it }
+    override val unwrap: (Double) -> Double = { it }
+    override val columnName: String get() = throw UnsupportedOperationException()
+    override val alwaysQuote: Boolean get() = throw UnsupportedOperationException()
+    override val masking: Boolean get() = throw UnsupportedOperationException()
+}
+
 interface WindowDefinition<T : Any, S : Any> : ColumnExpression<T, S> {
     val function: WindowFunction<T, S>
     val partitionBy: List<ColumnExpression<*, *>>

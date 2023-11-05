@@ -15,11 +15,15 @@ import org.komapper.core.dsl.expression.ArithmeticExpression
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.expression.ConditionalExpression
 import org.komapper.core.dsl.expression.Criterion
+import org.komapper.core.dsl.expression.CumeDist
+import org.komapper.core.dsl.expression.DenseRank
 import org.komapper.core.dsl.expression.EscapeExpression
 import org.komapper.core.dsl.expression.LiteralExpression
 import org.komapper.core.dsl.expression.MathematicalFunction
 import org.komapper.core.dsl.expression.Operand
+import org.komapper.core.dsl.expression.PercentRank
 import org.komapper.core.dsl.expression.PropertyExpression
+import org.komapper.core.dsl.expression.Rank
 import org.komapper.core.dsl.expression.RowNumber
 import org.komapper.core.dsl.expression.ScalarExpression
 import org.komapper.core.dsl.expression.ScalarQueryExpression
@@ -483,13 +487,12 @@ class BuilderSupport(
 
     private fun visitWindowFunction(function: WindowFunction<*, *>) {
         when (function) {
-            is RowNumber -> {
-                buf.append("row_number()")
-            }
-
-            is AggregateFunction<*, *> -> {
-                visitAggregateFunction(function)
-            }
+            is RowNumber -> buf.append("row_number()")
+            is Rank -> buf.append("rank()")
+            is DenseRank -> buf.append("dense_rank()")
+            is PercentRank -> buf.append("percent_rank()")
+            is CumeDist -> buf.append("cume_dist()")
+            is AggregateFunction<*, *> -> visitAggregateFunction(function)
         }
     }
 

@@ -7,9 +7,12 @@ import org.komapper.core.dsl.QueryDsl
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.operator.alias
 import org.komapper.core.dsl.operator.avg
-import org.komapper.core.dsl.operator.desc
+import org.komapper.core.dsl.operator.cumeDist
+import org.komapper.core.dsl.operator.denseRank
 import org.komapper.core.dsl.operator.min
 import org.komapper.core.dsl.operator.over
+import org.komapper.core.dsl.operator.percentRank
+import org.komapper.core.dsl.operator.rank
 import org.komapper.core.dsl.operator.rowNumber
 import org.komapper.jdbc.JdbcDatabase
 import java.math.BigDecimal
@@ -92,11 +95,101 @@ class JdbcSelectWindowFunctionTest(private val db: JdbcDatabase) {
         val e = Meta.employee
         val list = db.runQuery {
             QueryDsl.from(e)
-                .orderBy(e.employeeId)
-                .selectNotNull(e.employeeId, rowNumber().over { orderBy(e.employeeId.desc()) })
+                .orderBy(e.departmentId)
+                .selectNotNull(e.departmentId, rowNumber().over { orderBy(e.departmentId) })
         }
-        val numbers = 1..14
-        val expected = numbers.zip(numbers.reversed().map { it.toLong() })
+        val expected = listOf(
+            (1 to 1L),
+            (1 to 2L),
+            (1 to 3L),
+            (2 to 4L),
+            (2 to 5L),
+            (2 to 6L),
+            (2 to 7L),
+            (2 to 8L),
+            (3 to 9L),
+            (3 to 10L),
+            (3 to 11L),
+            (3 to 12L),
+            (3 to 13L),
+            (3 to 14L),
+        )
         assertEquals(expected, list)
+    }
+
+    @Test
+    fun testRank() {
+        val e = Meta.employee
+        val list = db.runQuery {
+            QueryDsl.from(e)
+                .orderBy(e.departmentId)
+                .selectNotNull(e.departmentId, rank().over { orderBy(e.departmentId) })
+        }
+        val expected = listOf(
+            (1 to 1L),
+            (1 to 1L),
+            (1 to 1L),
+            (2 to 4L),
+            (2 to 4L),
+            (2 to 4L),
+            (2 to 4L),
+            (2 to 4L),
+            (3 to 9L),
+            (3 to 9L),
+            (3 to 9L),
+            (3 to 9L),
+            (3 to 9L),
+            (3 to 9L),
+        )
+        assertEquals(expected, list)
+    }
+
+    @Test
+    fun testDenseRank() {
+        val e = Meta.employee
+        val list = db.runQuery {
+            QueryDsl.from(e)
+                .orderBy(e.departmentId)
+                .selectNotNull(e.departmentId, denseRank().over { orderBy(e.departmentId) })
+        }
+        val expected = listOf(
+            (1 to 1L),
+            (1 to 1L),
+            (1 to 1L),
+            (2 to 2L),
+            (2 to 2L),
+            (2 to 2L),
+            (2 to 2L),
+            (2 to 2L),
+            (3 to 3L),
+            (3 to 3L),
+            (3 to 3L),
+            (3 to 3L),
+            (3 to 3L),
+            (3 to 3L),
+        )
+        assertEquals(expected, list)
+    }
+
+    @Test
+    fun testPercentRank() {
+        val e = Meta.employee
+        val list = db.runQuery {
+            QueryDsl.from(e)
+                .orderBy(e.departmentId)
+                .selectNotNull(e.departmentId, percentRank().over { orderBy(e.departmentId) })
+        }
+        println(list)
+    }
+
+    @Test
+    fun testCumeDist() {
+        val e = Meta.employee
+        val list = db.runQuery {
+            QueryDsl.from(e)
+                .orderBy(e.departmentId)
+                .selectNotNull(e.departmentId, cumeDist().over { orderBy(e.departmentId) })
+        }
+        println(list)
     }
 }
