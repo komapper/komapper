@@ -10,10 +10,13 @@ import org.komapper.core.dsl.operator.alias
 import org.komapper.core.dsl.operator.avg
 import org.komapper.core.dsl.operator.cumeDist
 import org.komapper.core.dsl.operator.denseRank
+import org.komapper.core.dsl.operator.firstValue
 import org.komapper.core.dsl.operator.lag
+import org.komapper.core.dsl.operator.lastValue
 import org.komapper.core.dsl.operator.lead
 import org.komapper.core.dsl.operator.literal
 import org.komapper.core.dsl.operator.min
+import org.komapper.core.dsl.operator.nthValue
 import org.komapper.core.dsl.operator.ntile
 import org.komapper.core.dsl.operator.over
 import org.komapper.core.dsl.operator.percentRank
@@ -228,12 +231,12 @@ class JdbcSelectWindowFunctionTest(private val db: JdbcDatabase) {
     @Test
     fun testLead() {
         val d = Meta.department
-        
+
         val c1 = d.departmentId
         val c2 = lead(d.departmentId).over { orderBy(d.departmentId) }
         val c3 = lead(d.departmentId, 2).over { orderBy(d.departmentId) }
         val c4 = lead(d.departmentId, 2, literal(-1)).over { orderBy(d.departmentId) }
-        
+
         val list = db.runQuery {
             QueryDsl.from(d)
                 .orderBy(d.departmentId)
@@ -241,7 +244,7 @@ class JdbcSelectWindowFunctionTest(private val db: JdbcDatabase) {
         }
         println(list)
         assertEquals(4, list.size)
-        list[0].let { 
+        list[0].let {
             assertEquals(1, it[c1])
             assertEquals(2, it[c2])
             assertEquals(3, it[c3])
@@ -309,4 +312,86 @@ class JdbcSelectWindowFunctionTest(private val db: JdbcDatabase) {
         }
     }
 
+    @Test
+    fun testFirstValue() {
+        val d = Meta.department
+
+        val c1 = d.departmentId
+        val c2 = firstValue(d.departmentId).over { orderBy(d.departmentId) }
+        val c3 = firstValue(d.departmentId).over {
+            orderBy(d.departmentId)
+            rows(preceding(1))
+        }
+
+        val list = db.runQuery {
+            QueryDsl.from(d)
+                .orderBy(d.departmentId)
+                .select(c1, c2, c3)
+        }
+        println(list)
+        val expected = listOf(
+            Triple(1, 1, 1),
+            Triple(2, 1, 1),
+            Triple(3, 1, 2),
+            Triple(4, 1, 3),
+        )
+        assertEquals(expected, list)
+    }
+
+    @Test
+    fun testLastValue() {
+        val d = Meta.department
+
+        val c1 = d.departmentId
+        val c2 = lastValue(d.departmentId).over {
+            orderBy(d.departmentId)
+            rowsBetween(unboundedPreceding, unboundedFollowing)
+        }
+        val c3 = lastValue(d.departmentId).over {
+            orderBy(d.departmentId)
+            rowsBetween(currentRow, following(1))
+        }
+
+        val list = db.runQuery {
+            QueryDsl.from(d)
+                .orderBy(d.departmentId)
+                .select(c1, c2, c3)
+        }
+        println(list)
+        val expected = listOf(
+            Triple(1, 4, 2),
+            Triple(2, 4, 3),
+            Triple(3, 4, 4),
+            Triple(4, 4, 4),
+        )
+        assertEquals(expected, list)
+    }
+
+    @Test
+    fun testNthValue() {
+        val d = Meta.department
+
+        val c1 = d.departmentId
+        val c2 = nthValue(d.departmentId, 2).over {
+            orderBy(d.departmentId)
+        }
+        val c3 = nthValue(d.departmentId, 2).over {
+            orderBy(d.departmentId)
+            rows(preceding(2))
+        }
+
+        val list = db.runQuery {
+            QueryDsl.from(d)
+                .orderBy(d.departmentId)
+                .select(c1, c2, c3)
+        }
+        println(list)
+        val expected = listOf(
+            Triple(1, null, null),
+            Triple(2, 2, 2),
+            Triple(3, 2, 2),
+            Triple(4, 2, 3),
+        )
+        assertEquals(expected, list)
+    }
 }

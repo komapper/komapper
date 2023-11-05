@@ -18,10 +18,13 @@ import org.komapper.core.dsl.expression.Criterion
 import org.komapper.core.dsl.expression.CumeDist
 import org.komapper.core.dsl.expression.DenseRank
 import org.komapper.core.dsl.expression.EscapeExpression
+import org.komapper.core.dsl.expression.FirstValue
 import org.komapper.core.dsl.expression.Lag
+import org.komapper.core.dsl.expression.LastValue
 import org.komapper.core.dsl.expression.Lead
 import org.komapper.core.dsl.expression.LiteralExpression
 import org.komapper.core.dsl.expression.MathematicalFunction
+import org.komapper.core.dsl.expression.NthValue
 import org.komapper.core.dsl.expression.Ntile
 import org.komapper.core.dsl.expression.Operand
 import org.komapper.core.dsl.expression.PercentRank
@@ -528,6 +531,23 @@ class BuilderSupport(
                     buf.append(", ")
                     visitOperand(default)
                 }
+                buf.append(")")
+            }
+            is FirstValue -> {
+                buf.append("first_value(")
+                visitColumnExpression(function.expression)
+                buf.append(")")
+            }
+            is LastValue -> {
+                buf.append("last_value(")
+                visitColumnExpression(function.expression)
+                buf.append(")")
+            }
+            is NthValue -> {
+                buf.append("nth_value(")
+                visitColumnExpression(function.expression)
+                buf.append(", ")
+                visitOperand(function.offset)
                 buf.append(")")
             }
             is AggregateFunction<*, *> -> visitAggregateFunction(function)

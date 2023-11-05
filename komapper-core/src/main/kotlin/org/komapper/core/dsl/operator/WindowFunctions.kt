@@ -3,8 +3,11 @@ package org.komapper.core.dsl.operator
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.expression.CumeDist
 import org.komapper.core.dsl.expression.DenseRank
+import org.komapper.core.dsl.expression.FirstValue
 import org.komapper.core.dsl.expression.Lag
+import org.komapper.core.dsl.expression.LastValue
 import org.komapper.core.dsl.expression.Lead
+import org.komapper.core.dsl.expression.NthValue
 import org.komapper.core.dsl.expression.Ntile
 import org.komapper.core.dsl.expression.Operand
 import org.komapper.core.dsl.expression.OverDeclaration
@@ -49,7 +52,7 @@ fun ntile(bucketSize: Int): WindowFunction<Int, Int> {
 fun <T : Any, S : Any> lead(
     expression: ColumnExpression<T, S>,
     offset: Int? = null,
-    default: ColumnExpression<T, S>? = null
+    default: ColumnExpression<T, S>? = null,
 ): WindowFunction<T, S> {
     val o1 = offset?.let { Operand.Argument(literal(offset), offset) }
     val o2 = default?.let { Operand.Column(it) }
@@ -59,9 +62,25 @@ fun <T : Any, S : Any> lead(
 fun <T : Any, S : Any> lag(
     expression: ColumnExpression<T, S>,
     offset: Int? = null,
-    default: ColumnExpression<T, S>? = null
+    default: ColumnExpression<T, S>? = null,
 ): WindowFunction<T, S> {
     val o1 = offset?.let { Operand.Argument(literal(offset), offset) }
     val o2 = default?.let { Operand.Column(it) }
     return Lag(expression, o1, o2)
+}
+
+fun <T : Any, S : Any> firstValue(expression: ColumnExpression<T, S>): WindowFunction<T, S> {
+    return FirstValue(expression)
+}
+
+fun <T : Any, S : Any> lastValue(expression: ColumnExpression<T, S>): WindowFunction<T, S> {
+    return LastValue(expression)
+}
+
+fun <T : Any, S : Any> nthValue(
+    expression: ColumnExpression<T, S>,
+    offset: Int,
+): WindowFunction<T, S> {
+    val o = Operand.Argument(literal(offset), offset)
+    return NthValue(expression, o)
 }
