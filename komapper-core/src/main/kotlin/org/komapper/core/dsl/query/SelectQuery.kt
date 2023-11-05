@@ -17,7 +17,7 @@ import org.komapper.core.dsl.options.SelectOptions
  * @param ENTITY the entity type
  * @param QUERY the query type
  */
-interface SelectQuery<ENTITY : Any, QUERY : SelectQuery<ENTITY, QUERY>> :
+interface SelectQuery<ENTITY, QUERY : SelectQuery<ENTITY, QUERY>> :
     FlowSubquery<ENTITY> {
     /**
      * Builds a query with the DISTINCT keyword specified.
