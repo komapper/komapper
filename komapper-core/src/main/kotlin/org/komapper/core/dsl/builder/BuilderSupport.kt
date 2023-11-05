@@ -15,11 +15,22 @@ import org.komapper.core.dsl.expression.ArithmeticExpression
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.expression.ConditionalExpression
 import org.komapper.core.dsl.expression.Criterion
+import org.komapper.core.dsl.expression.CumeDist
+import org.komapper.core.dsl.expression.DenseRank
 import org.komapper.core.dsl.expression.EscapeExpression
+import org.komapper.core.dsl.expression.FirstValue
+import org.komapper.core.dsl.expression.Lag
+import org.komapper.core.dsl.expression.LastValue
+import org.komapper.core.dsl.expression.Lead
 import org.komapper.core.dsl.expression.LiteralExpression
 import org.komapper.core.dsl.expression.MathematicalFunction
+import org.komapper.core.dsl.expression.NthValue
+import org.komapper.core.dsl.expression.Ntile
 import org.komapper.core.dsl.expression.Operand
+import org.komapper.core.dsl.expression.PercentRank
 import org.komapper.core.dsl.expression.PropertyExpression
+import org.komapper.core.dsl.expression.Rank
+import org.komapper.core.dsl.expression.RowNumber
 import org.komapper.core.dsl.expression.ScalarExpression
 import org.komapper.core.dsl.expression.ScalarQueryExpression
 import org.komapper.core.dsl.expression.SqlBuilderScope
@@ -28,6 +39,12 @@ import org.komapper.core.dsl.expression.StringFunction
 import org.komapper.core.dsl.expression.SubqueryExpression
 import org.komapper.core.dsl.expression.TableExpression
 import org.komapper.core.dsl.expression.UserDefinedExpression
+import org.komapper.core.dsl.expression.WindowDefinition
+import org.komapper.core.dsl.expression.WindowFrame
+import org.komapper.core.dsl.expression.WindowFrameBound
+import org.komapper.core.dsl.expression.WindowFrameExclusion
+import org.komapper.core.dsl.expression.WindowFrameKind
+import org.komapper.core.dsl.expression.WindowFunction
 import org.komapper.core.dsl.metamodel.InlineViewMetamodel
 
 class BuilderSupport(
@@ -47,10 +64,12 @@ class BuilderSupport(
             TableNameType.NAME_ONLY -> {
                 buf.append(name)
             }
+
             TableNameType.ALIAS_ONLY -> {
                 val alias = aliasManager.getAlias(expression) ?: error("Alias is not found. table=$name ,sql=$buf")
                 buf.append(alias)
             }
+
             TableNameType.NAME_AND_ALIAS -> {
                 buf.append(name)
                 val alias = aliasManager.getAlias(expression) ?: error("Alias is not found. table=$name ,sql=$buf")
@@ -77,6 +96,7 @@ class BuilderSupport(
                 }
                 context.copy(select = aliasExpressions)
             }
+
             is SetOperationContext -> context
         }
         val statement = buildSubqueryStatement(context)
@@ -90,23 +110,37 @@ class BuilderSupport(
             is AliasExpression<*, *> -> {
                 visitAliasExpression(expression)
             }
+
             is ArithmeticExpression<*, *> -> {
                 visitArithmeticExpression(expression)
             }
+
             is ConditionalExpression<*, *> -> {
                 visitConditionalExpression(expression)
             }
+
             is LiteralExpression<*> -> {
                 visitLiteralExpression(expression)
             }
+
             is MathematicalFunction<*, *> -> {
                 visitMathematicalFunction(expression)
             }
+
             is ScalarExpression<*, *> -> {
                 visitScalarExpression(expression)
             }
+
             is StringFunction -> {
                 visitStringFunction(expression)
+            }
+
+            is WindowFunction<*, *> -> {
+                visitWindowFunction(expression)
+            }
+
+            is WindowDefinition<*, *> -> {
+                visitWindowDefinition(expression)
             }
 
             is UserDefinedExpression -> {
@@ -144,21 +178,25 @@ class BuilderSupport(
                 buf.append(" + ")
                 visitOperand(expression.right)
             }
+
             is ArithmeticExpression.Minus<*, *> -> {
                 visitOperand(expression.left)
                 buf.append(" - ")
                 visitOperand(expression.right)
             }
+
             is ArithmeticExpression.Times<*, *> -> {
                 visitOperand(expression.left)
                 buf.append(" * ")
                 visitOperand(expression.right)
             }
+
             is ArithmeticExpression.Div<*, *> -> {
                 visitOperand(expression.left)
                 buf.append(" / ")
                 visitOperand(expression.right)
             }
+
             is ArithmeticExpression.Mod<*, *> -> {
                 if (dialect.supportsModuloOperator()) {
                     visitOperand(expression.left)
@@ -181,6 +219,7 @@ class BuilderSupport(
             is ConditionalExpression.Case<*, *> -> {
                 visitCaseExpression(expression)
             }
+
             is ConditionalExpression.Coalesce<*, *> -> {
                 visitCoalesceExpression(expression)
             }
@@ -240,6 +279,7 @@ class BuilderSupport(
             is AggregateFunction<*, *> -> {
                 visitAggregateFunction(expression)
             }
+
             is ScalarQueryExpression<*, *, *> -> {
                 visitScalarQueryExpression(expression)
             }
@@ -253,24 +293,29 @@ class BuilderSupport(
                 visitColumnExpression(function.expression)
                 buf.append(")")
             }
+
             is AggregateFunction.CountAsterisk -> {
                 buf.append("count(*)")
             }
+
             is AggregateFunction.Count -> {
                 buf.append("count(")
                 visitColumnExpression(function.expression)
                 buf.append(")")
             }
+
             is AggregateFunction.Max<*, *> -> {
                 buf.append("max(")
                 visitColumnExpression(function.expression)
                 buf.append(")")
             }
+
             is AggregateFunction.Min<*, *> -> {
                 buf.append("min(")
                 visitColumnExpression(function.expression)
                 buf.append(")")
             }
+
             is AggregateFunction.Sum<*, *> -> {
                 buf.append("sum(")
                 visitColumnExpression(function.expression)
@@ -303,6 +348,7 @@ class BuilderSupport(
                 val builder = SelectStatementBuilder(dialect, context, childAliasManager, projectionPredicate)
                 builder.build()
             }
+
             is SetOperationContext -> {
                 val builder = SetOperationStatementBuilder(dialect, context, aliasManager, projectionPredicate)
                 builder.build()
@@ -320,6 +366,7 @@ class BuilderSupport(
                 visitOperand(function.right)
                 buf.append(")")
             }
+
             is StringFunction.Locate -> {
                 when (val type = dialect.getLocateFunctionType()) {
                     LocateFunctionType.LOCATE,
@@ -335,6 +382,7 @@ class BuilderSupport(
                         }
                         buf.append(")")
                     }
+
                     LocateFunctionType.INSTR -> {
                         buf.append("${type.functionName}(")
                         visitOperand(function.string)
@@ -346,6 +394,7 @@ class BuilderSupport(
                         }
                         buf.append(")")
                     }
+
                     LocateFunctionType.POSITION -> {
                         if (function.startIndex == null) {
                             buf.append("${type.functionName}(")
@@ -367,21 +416,25 @@ class BuilderSupport(
                     }
                 }
             }
+
             is StringFunction.Lower -> {
                 buf.append("lower(")
                 visitOperand(function.operand)
                 buf.append(")")
             }
+
             is StringFunction.Ltrim -> {
                 buf.append("ltrim(")
                 visitOperand(function.operand)
                 buf.append(")")
             }
+
             is StringFunction.Rtrim -> {
                 buf.append("rtrim(")
                 visitOperand(function.operand)
                 buf.append(")")
             }
+
             is StringFunction.Substring -> {
                 val substring = dialect.getSubstringFunction()
                 buf.append("$substring(")
@@ -400,11 +453,13 @@ class BuilderSupport(
                 }
                 buf.append(")")
             }
+
             is StringFunction.Trim -> {
                 buf.append("trim(")
                 visitOperand(function.operand)
                 buf.append(")")
             }
+
             is StringFunction.Upper -> {
                 buf.append("upper(")
                 visitOperand(function.operand)
@@ -412,6 +467,147 @@ class BuilderSupport(
             }
         }
         buf.append(")")
+    }
+
+    private fun visitWindowDefinition(definition: WindowDefinition<*, *>) {
+        visitWindowFunction(definition.function)
+        buf.append(" over(")
+        if (definition.partitionBy.isNotEmpty()) {
+            buf.append("partition by ")
+            for (expression in definition.partitionBy) {
+                visitColumnExpression(expression)
+                buf.append(", ")
+            }
+            buf.cutBack(2)
+        }
+        if (definition.orderBy.isNotEmpty()) {
+            val orderBySupport = OrderByBuilderSupport(dialect, definition.orderBy, aliasManager, buf)
+            orderBySupport.orderByClause()
+        }
+        val frame = definition.frame
+        if (frame != null) {
+            visitWindowFrame(frame)
+        }
+        buf.append(")")
+    }
+
+    private fun visitWindowFunction(function: WindowFunction<*, *>) {
+        when (function) {
+            is RowNumber -> buf.append("row_number()")
+            is Rank -> buf.append("rank()")
+            is DenseRank -> buf.append("dense_rank()")
+            is PercentRank -> buf.append("percent_rank()")
+            is CumeDist -> buf.append("cume_dist()")
+            is Ntile -> {
+                buf.append("ntile(")
+                visitOperand(function.bucketSize)
+                buf.append(")")
+            }
+            is Lead -> {
+                buf.append("lead(")
+                visitColumnExpression(function.expression)
+                val offset = function.offset
+                if (offset != null) {
+                    buf.append(", ")
+                    visitOperand(offset)
+                }
+                val default = function.default
+                if (default != null) {
+                    buf.append(", ")
+                    visitOperand(default)
+                }
+                buf.append(")")
+            }
+            is Lag -> {
+                buf.append("lag(")
+                visitColumnExpression(function.expression)
+                val offset = function.offset
+                if (offset != null) {
+                    buf.append(", ")
+                    visitOperand(offset)
+                }
+                val default = function.default
+                if (default != null) {
+                    buf.append(", ")
+                    visitOperand(default)
+                }
+                buf.append(")")
+            }
+            is FirstValue -> {
+                buf.append("first_value(")
+                visitColumnExpression(function.expression)
+                buf.append(")")
+            }
+            is LastValue -> {
+                buf.append("last_value(")
+                visitColumnExpression(function.expression)
+                buf.append(")")
+            }
+            is NthValue -> {
+                buf.append("nth_value(")
+                visitColumnExpression(function.expression)
+                buf.append(", ")
+                visitOperand(function.offset)
+                buf.append(")")
+            }
+            is AggregateFunction<*, *> -> visitAggregateFunction(function)
+        }
+    }
+
+    private fun visitWindowFrame(frame: WindowFrame) {
+        buf.append(" ")
+        when (frame.kind) {
+            WindowFrameKind.GROUPS -> buf.append("groups")
+            WindowFrameKind.RANGE -> buf.append("range")
+            WindowFrameKind.ROWS -> buf.append("rows")
+        }
+        buf.append(" ")
+        if (frame.end == null) {
+            visitWindowFrameBound(frame.start)
+        } else {
+            buf.append("between ")
+            visitWindowFrameBound(frame.start)
+            buf.append(" and ")
+            visitWindowFrameBound(frame.end)
+        }
+        if (frame.exclusion != null) {
+            buf.append(" ")
+            visitWindowFrameExclusion(frame.exclusion)
+        }
+    }
+
+    private fun visitWindowFrameBound(bound: WindowFrameBound) {
+        when (bound) {
+            is WindowFrameBound.CurrentRow -> buf.append("current row")
+            is WindowFrameBound.UnboundedFollowing -> buf.append("unbounded following")
+            is WindowFrameBound.UnboundedPreceding -> buf.append("unbounded preceding")
+            is WindowFrameBound.Following -> {
+                if (dialect.supportsParameterBindingForWindowFrameBoundOffset()) {
+                    buf.bind(Value(bound.offset, Int::class))
+                } else {
+                    buf.append(bound.offset.toString())
+                }
+                buf.append(" following")
+            }
+            is WindowFrameBound.Preceding -> {
+                if (dialect.supportsParameterBindingForWindowFrameBoundOffset()) {
+                    buf.bind(Value(bound.offset, Int::class))
+                } else {
+                    buf.append(bound.offset.toString())
+                }
+                buf.append(" preceding")
+            }
+        }
+    }
+
+    private fun visitWindowFrameExclusion(exclusion: WindowFrameExclusion) {
+        buf.append("exclude ")
+        when (exclusion) {
+            is WindowFrameExclusion.CurrentRow -> buf.append("current row")
+            is WindowFrameExclusion.Group -> buf.append("group")
+            is WindowFrameExclusion.NoOthers -> buf.append("no others")
+            is WindowFrameExclusion.Ties -> buf.append("ties")
+        }
     }
 
     private fun visitUserDefinedExpression(expression: UserDefinedExpression<*, *>) {
@@ -434,6 +630,7 @@ class BuilderSupport(
                     val escaped = dialect.escape(e.value.toString(), finalEscapeSequence)
                     patternBuf.append(escaped)
                 }
+
                 is EscapeExpression.Composite -> {
                     visit(e.left)
                     visit(e.right)
@@ -451,15 +648,18 @@ class BuilderSupport(
             is Operand.Column -> {
                 visitColumnExpression(operand.expression)
             }
+
             is Operand.Argument<*, *> -> {
                 buf.bind(operand.value)
             }
+
             is Operand.Escape -> {
                 val values = buildEscapedValuePair(operand.escapeExpression, operand.masking)
                 buf.bind(values.first)
                 buf.append(" escape ")
                 buf.bind(values.second)
             }
+
             is Operand.Subquery -> {
                 val statement = buildSubqueryStatement(operand.subqueryExpression)
                 buf.append(statement)

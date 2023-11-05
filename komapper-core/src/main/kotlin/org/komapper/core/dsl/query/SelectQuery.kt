@@ -108,7 +108,7 @@ interface SelectQuery<ENTITY, QUERY : SelectQuery<ENTITY, QUERY>> :
      */
     fun forUpdate(declaration: ForUpdateDeclaration = {}): QUERY
 
-/**
+    /**
      * Builds a query with the options applied.
      *
      * @param configure the configure function to apply options

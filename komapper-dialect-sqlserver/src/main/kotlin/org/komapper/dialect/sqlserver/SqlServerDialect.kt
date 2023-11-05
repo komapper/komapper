@@ -115,6 +115,8 @@ interface SqlServerDialect : Dialect {
 
     override fun getRandomFunction(): String = "rand"
 
+    override fun supportsParameterBindingForWindowFrameBoundOffset(): Boolean = false
+
     override fun supportsConflictTargetInUpsertStatement(): Boolean = false
 
     override fun supportsDeleteReturning(): Boolean = true

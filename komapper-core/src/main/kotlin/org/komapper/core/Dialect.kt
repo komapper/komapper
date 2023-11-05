@@ -236,6 +236,8 @@ interface Dialect {
      */
     fun supportsAutoIncrementWhenInsertingMultipleRows(): Boolean = true
 
+    fun supportsParameterBindingForWindowFrameBoundOffset(): Boolean = true
+
     /**
      * Returns whether the batch execution of parameterized statement is supported.
      */
