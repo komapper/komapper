@@ -21,7 +21,7 @@ interface OverScope {
     fun orderBy(vararg expressions: SortExpression)
     fun groups(start: WindowFrameBound, end: WindowFrameBound? = null, exclusion: WindowFrameExclusion? = null)
     fun range(start: WindowFrameBound, end: WindowFrameBound? = null, exclusion: WindowFrameExclusion? = null)
-    fun rows(start: WindowFrameBound, end: WindowFrameBound? = null,exclusion: WindowFrameExclusion? = null)
+    fun rows(start: WindowFrameBound, end: WindowFrameBound? = null, exclusion: WindowFrameExclusion? = null)
 }
 
 internal class OverScopeImpl : OverScope {
