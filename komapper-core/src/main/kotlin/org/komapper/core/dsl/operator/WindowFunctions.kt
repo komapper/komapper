@@ -3,6 +3,8 @@ package org.komapper.core.dsl.operator
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.expression.CumeDist
 import org.komapper.core.dsl.expression.DenseRank
+import org.komapper.core.dsl.expression.Ntile
+import org.komapper.core.dsl.expression.Operand
 import org.komapper.core.dsl.expression.OverDeclaration
 import org.komapper.core.dsl.expression.PercentRank
 import org.komapper.core.dsl.expression.Rank
@@ -35,4 +37,9 @@ fun percentRank(): WindowFunction<Double, Double> {
 
 fun cumeDist(): WindowFunction<Double, Double> {
     return CumeDist
+}
+
+fun ntile(bucketSize: Int): WindowFunction<Int, Int> {
+    val argument = Operand.Argument(literal(bucketSize), bucketSize)
+    return Ntile(argument)
 }

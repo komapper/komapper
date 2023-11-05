@@ -10,6 +10,7 @@ import org.komapper.core.dsl.operator.avg
 import org.komapper.core.dsl.operator.cumeDist
 import org.komapper.core.dsl.operator.denseRank
 import org.komapper.core.dsl.operator.min
+import org.komapper.core.dsl.operator.ntile
 import org.komapper.core.dsl.operator.over
 import org.komapper.core.dsl.operator.percentRank
 import org.komapper.core.dsl.operator.rank
@@ -191,5 +192,32 @@ class JdbcSelectWindowFunctionTest(private val db: JdbcDatabase) {
                 .selectNotNull(e.departmentId, cumeDist().over { orderBy(e.departmentId) })
         }
         println(list)
+    }
+
+    @Test
+    fun testNtile() {
+        val e = Meta.employee
+        val list = db.runQuery {
+            QueryDsl.from(e)
+                .orderBy(e.departmentId)
+                .selectNotNull(e.departmentId, ntile(5).over { orderBy(e.departmentId) })
+        }
+        val expected = listOf(
+            (1 to 1),
+            (1 to 1),
+            (1 to 1),
+            (2 to 2),
+            (2 to 2),
+            (2 to 2),
+            (2 to 3),
+            (2 to 3),
+            (3 to 3),
+            (3 to 4),
+            (3 to 4),
+            (3 to 4),
+            (3 to 5),
+            (3 to 5),
+        )
+        assertEquals(expected, list)
     }
 }

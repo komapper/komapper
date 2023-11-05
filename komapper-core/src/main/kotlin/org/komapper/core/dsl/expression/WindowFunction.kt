@@ -61,6 +61,17 @@ internal object CumeDist : WindowFunction<Double, Double> {
     override val masking: Boolean get() = throw UnsupportedOperationException()
 }
 
+internal data class Ntile(val bucketSize: Operand) : WindowFunction<Int, Int> {
+    override val owner: TableExpression<*> get() = throw UnsupportedOperationException()
+    override val exteriorClass: KClass<Int> = Int::class
+    override val interiorClass: KClass<Int> = Int::class
+    override val wrap: (Int) -> Int = { it }
+    override val unwrap: (Int) -> Int = { it }
+    override val columnName: String get() = throw UnsupportedOperationException()
+    override val alwaysQuote: Boolean get() = throw UnsupportedOperationException()
+    override val masking: Boolean get() = throw UnsupportedOperationException()
+}
+
 interface WindowDefinition<T : Any, S : Any> : ColumnExpression<T, S> {
     val function: WindowFunction<T, S>
     val partitionBy: List<ColumnExpression<*, *>>

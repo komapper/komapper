@@ -20,6 +20,7 @@ import org.komapper.core.dsl.expression.DenseRank
 import org.komapper.core.dsl.expression.EscapeExpression
 import org.komapper.core.dsl.expression.LiteralExpression
 import org.komapper.core.dsl.expression.MathematicalFunction
+import org.komapper.core.dsl.expression.Ntile
 import org.komapper.core.dsl.expression.Operand
 import org.komapper.core.dsl.expression.PercentRank
 import org.komapper.core.dsl.expression.PropertyExpression
@@ -492,6 +493,11 @@ class BuilderSupport(
             is DenseRank -> buf.append("dense_rank()")
             is PercentRank -> buf.append("percent_rank()")
             is CumeDist -> buf.append("cume_dist()")
+            is Ntile -> {
+                buf.append("ntile(")
+                visitOperand(function.bucketSize)
+                buf.append(")")
+            }
             is AggregateFunction<*, *> -> visitAggregateFunction(function)
         }
     }
