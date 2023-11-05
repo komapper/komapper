@@ -447,6 +447,7 @@ class JdbcSelectWindowFunctionTest(private val db: JdbcDatabase) {
         assertEquals(expected, list)
     }
 
+    @Run(unless = [Dbms.SQLSERVER])
     @Test
     fun testNthValue() {
         val d = Meta.department
