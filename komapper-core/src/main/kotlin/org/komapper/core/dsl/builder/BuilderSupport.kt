@@ -18,6 +18,8 @@ import org.komapper.core.dsl.expression.Criterion
 import org.komapper.core.dsl.expression.CumeDist
 import org.komapper.core.dsl.expression.DenseRank
 import org.komapper.core.dsl.expression.EscapeExpression
+import org.komapper.core.dsl.expression.Lag
+import org.komapper.core.dsl.expression.Lead
 import org.komapper.core.dsl.expression.LiteralExpression
 import org.komapper.core.dsl.expression.MathematicalFunction
 import org.komapper.core.dsl.expression.Ntile
@@ -496,6 +498,36 @@ class BuilderSupport(
             is Ntile -> {
                 buf.append("ntile(")
                 visitOperand(function.bucketSize)
+                buf.append(")")
+            }
+            is Lead -> {
+                buf.append("lead(")
+                visitColumnExpression(function.expression)
+                val offset = function.offset
+                if (offset != null) {
+                    buf.append(", ")
+                    visitOperand(offset)
+                }
+                val default = function.default
+                if (default != null) {
+                    buf.append(", ")
+                    visitOperand(default)
+                }
+                buf.append(")")
+            }
+            is Lag -> {
+                buf.append("lag(")
+                visitColumnExpression(function.expression)
+                val offset = function.offset
+                if (offset != null) {
+                    buf.append(", ")
+                    visitOperand(offset)
+                }
+                val default = function.default
+                if (default != null) {
+                    buf.append(", ")
+                    visitOperand(default)
+                }
                 buf.append(")")
             }
             is AggregateFunction<*, *> -> visitAggregateFunction(function)

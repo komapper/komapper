@@ -1,5 +1,6 @@
 package integration.jdbc
 
+import integration.core.department
 import integration.core.employee
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
@@ -9,6 +10,9 @@ import org.komapper.core.dsl.operator.alias
 import org.komapper.core.dsl.operator.avg
 import org.komapper.core.dsl.operator.cumeDist
 import org.komapper.core.dsl.operator.denseRank
+import org.komapper.core.dsl.operator.lag
+import org.komapper.core.dsl.operator.lead
+import org.komapper.core.dsl.operator.literal
 import org.komapper.core.dsl.operator.min
 import org.komapper.core.dsl.operator.ntile
 import org.komapper.core.dsl.operator.over
@@ -220,4 +224,89 @@ class JdbcSelectWindowFunctionTest(private val db: JdbcDatabase) {
         )
         assertEquals(expected, list)
     }
+
+    @Test
+    fun testLead() {
+        val d = Meta.department
+        
+        val c1 = d.departmentId
+        val c2 = lead(d.departmentId).over { orderBy(d.departmentId) }
+        val c3 = lead(d.departmentId, 2).over { orderBy(d.departmentId) }
+        val c4 = lead(d.departmentId, 2, literal(-1)).over { orderBy(d.departmentId) }
+        
+        val list = db.runQuery {
+            QueryDsl.from(d)
+                .orderBy(d.departmentId)
+                .select(c1, c2, c3, c4)
+        }
+        println(list)
+        assertEquals(4, list.size)
+        list[0].let { 
+            assertEquals(1, it[c1])
+            assertEquals(2, it[c2])
+            assertEquals(3, it[c3])
+            assertEquals(3, it[c4])
+        }
+        list[1].let {
+            assertEquals(2, it[c1])
+            assertEquals(3, it[c2])
+            assertEquals(4, it[c3])
+            assertEquals(4, it[c4])
+        }
+        list[2].let {
+            assertEquals(3, it[c1])
+            assertEquals(4, it[c2])
+            assertEquals(null, it[c3])
+            assertEquals(-1, it[c4])
+        }
+        list[3].let {
+            assertEquals(4, it[c1])
+            assertEquals(null, it[c2])
+            assertEquals(null, it[c3])
+            assertEquals(-1, it[c4])
+        }
+    }
+
+    @Test
+    fun testLag() {
+        val d = Meta.department
+
+        val c1 = d.departmentId
+        val c2 = lag(d.departmentId).over { orderBy(d.departmentId) }
+        val c3 = lag(d.departmentId, 2).over { orderBy(d.departmentId) }
+        val c4 = lag(d.departmentId, 2, literal(-1)).over { orderBy(d.departmentId) }
+
+        val list = db.runQuery {
+            QueryDsl.from(d)
+                .orderBy(d.departmentId)
+                .select(c1, c2, c3, c4)
+        }
+        println(list)
+        assertEquals(4, list.size)
+        list[0].let {
+            assertEquals(1, it[c1])
+            assertEquals(null, it[c2])
+            assertEquals(null, it[c3])
+            assertEquals(-1, it[c4])
+        }
+        list[1].let {
+            assertEquals(2, it[c1])
+            assertEquals(1, it[c2])
+            assertEquals(null, it[c3])
+            assertEquals(-1, it[c4])
+        }
+        list[2].let {
+            assertEquals(3, it[c1])
+            assertEquals(2, it[c2])
+            assertEquals(1, it[c3])
+            assertEquals(1, it[c4])
+        }
+        list[3].let {
+            assertEquals(4, it[c1])
+            assertEquals(3, it[c2])
+            assertEquals(2, it[c3])
+            assertEquals(2, it[c4])
+        }
+    }
+
 }

@@ -72,6 +72,16 @@ internal data class Ntile(val bucketSize: Operand) : WindowFunction<Int, Int> {
     override val masking: Boolean get() = throw UnsupportedOperationException()
 }
 
+internal data class Lead<T: Any, S: Any>(
+    val expression: ColumnExpression<T, S>, 
+    val offset : Operand?,
+    val default: Operand?) : WindowFunction<T, S>, ColumnExpression<T, S> by expression
+
+internal data class Lag<T: Any, S: Any>(
+    val expression: ColumnExpression<T, S>,
+    val offset : Operand?,
+    val default: Operand?) : WindowFunction<T, S>, ColumnExpression<T, S> by expression
+
 interface WindowDefinition<T : Any, S : Any> : ColumnExpression<T, S> {
     val function: WindowFunction<T, S>
     val partitionBy: List<ColumnExpression<*, *>>
