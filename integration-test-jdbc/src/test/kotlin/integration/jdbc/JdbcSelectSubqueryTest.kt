@@ -71,15 +71,15 @@ class JdbcSelectSubqueryTest(private val db: JdbcDatabase) {
         assertEquals(3, list.size)
         list[0].let { record ->
             assertEquals("ACCOUNTING", record[v[d.departmentName]])
-            assertEquals(BigDecimal("8750.00"), record[v[sum(e.salary)]])
+            assertEqualsBigDecimal(BigDecimal("8750.00"), record[v[sum(e.salary)]])
         }
         list[1].let { record ->
             assertEquals("RESEARCH", record[v[d.departmentName]])
-            assertEquals(BigDecimal("10875.00"), record[v[sum(e.salary)]])
+            assertEqualsBigDecimal(BigDecimal("10875.00"), record[v[sum(e.salary)]])
         }
         list[2].let { record ->
             assertEquals("SALES", record[v[d.departmentName]])
-            assertEquals(BigDecimal("9400.00"), record[v[sum(e.salary)]])
+            assertEqualsBigDecimal(BigDecimal("9400.00"), record[v[sum(e.salary)]])
         }
     }
 
@@ -96,15 +96,15 @@ class JdbcSelectSubqueryTest(private val db: JdbcDatabase) {
         assertEquals(3, list.size)
         list[0].let { record ->
             assertEquals("ACCOUNTING", record[v[d.departmentName alias "a"]])
-            assertEquals(BigDecimal("8750.00"), record[v[sum(e.salary) alias "b"]])
+            assertEqualsBigDecimal(BigDecimal("8750.00"), record[v[sum(e.salary) alias "b"]])
         }
         list[1].let { record ->
             assertEquals("RESEARCH", record[v[d.departmentName alias "a"]])
-            assertEquals(BigDecimal("10875.00"), record[v[sum(e.salary) alias "b"]])
+            assertEqualsBigDecimal(BigDecimal("10875.00"), record[v[sum(e.salary) alias "b"]])
         }
         list[2].let { record ->
             assertEquals("SALES", record[v[d.departmentName alias "a"]])
-            assertEquals(BigDecimal("9400.00"), record[v[sum(e.salary) alias "b"]])
+            assertEqualsBigDecimal(BigDecimal("9400.00"), record[v[sum(e.salary) alias "b"]])
         }
     }
 
@@ -130,12 +130,16 @@ class JdbcSelectSubqueryTest(private val db: JdbcDatabase) {
         list[0].let { record ->
             assertEquals(1, record[q3[e.employeeId alias "ID"]])
             assertEquals("SMITH", record[q3[e.employeeName alias "NAME"]])
-            assertEquals(BigDecimal("800.00"), record[e.salary])
+            assertEqualsBigDecimal(BigDecimal("800.00"), record[e.salary])
         }
         list[1].let { record ->
             assertEquals(3, record[q3[e.employeeId alias "ID"]])
             assertEquals("SALES", record[q3[e.employeeName alias "NAME"]])
-            assertEquals(BigDecimal("1250.00"), record[e.salary])
+            assertEqualsBigDecimal(BigDecimal("1250.00"), record[e.salary])
         }
+    }
+
+    private fun assertEqualsBigDecimal(expected: BigDecimal, actual: BigDecimal?) {
+        assertEquals(0, expected.compareTo(actual))
     }
 }
