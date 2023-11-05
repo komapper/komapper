@@ -521,12 +521,19 @@ class BuilderSupport(
             is WindowFrameBound.UnboundedFollowing -> buf.append("unbounded following")
             is WindowFrameBound.UnboundedPreceding -> buf.append("unbounded preceding")
             is WindowFrameBound.Following -> {
-                buf.bind(Value(bound.offset, Int::class))
+                if (dialect.supportsParameterBindingForWindowFrameBoundOffset()) {
+                    buf.bind(Value(bound.offset, Int::class))
+                } else {
+                    buf.append(bound.offset.toString())
+                }
                 buf.append(" following")
             }
-
             is WindowFrameBound.Preceding -> {
-                buf.bind(Value(bound.offset, Int::class))
+                if (dialect.supportsParameterBindingForWindowFrameBoundOffset()) {
+                    buf.bind(Value(bound.offset, Int::class))
+                } else {
+                    buf.append(bound.offset.toString())
+                }
                 buf.append(" preceding")
             }
         }
