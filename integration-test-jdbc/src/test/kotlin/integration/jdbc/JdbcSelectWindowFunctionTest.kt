@@ -39,7 +39,7 @@ class JdbcSelectWindowFunctionTest(private val db: JdbcDatabase) {
                 @Suppress("UNCHECKED_CAST")
                 v[e.salary] greater (v[averageSalary] as ColumnExpression<BigDecimal, BigDecimal>)
             }
-            .orderBy(v[e.departmentId])
+            .orderBy(v[e.departmentId], v[e.employeeName])
             .select(
                 v[e.departmentId],
                 v[e.employeeName],
