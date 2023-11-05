@@ -81,7 +81,7 @@ class JdbcSelectWindowFunctionTest(private val db: JdbcDatabase) {
         val currentDate = e.hiredate alias "currentDate"
         val latestDate = min(e.hiredate).over {
             orderBy(e.hiredate)
-            rowsBetween(preceding(1), preceding(1))
+            rows(preceding(1), preceding(1))
         } alias "latestDate"
 
         val pairs = db.runQuery {
@@ -345,11 +345,11 @@ class JdbcSelectWindowFunctionTest(private val db: JdbcDatabase) {
         val c1 = d.departmentId
         val c2 = lastValue(d.departmentId).over {
             orderBy(d.departmentId)
-            rowsBetween(unboundedPreceding, unboundedFollowing)
+            rows(unboundedPreceding, unboundedFollowing)
         }
         val c3 = lastValue(d.departmentId).over {
             orderBy(d.departmentId)
-            rowsBetween(currentRow, following(1))
+            rows(currentRow, following(1))
         }
 
         val list = db.runQuery {

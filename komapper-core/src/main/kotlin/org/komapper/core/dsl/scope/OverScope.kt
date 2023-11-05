@@ -19,12 +19,9 @@ interface OverScope {
 
     fun partitionBy(vararg expressions: ColumnExpression<*, *>)
     fun orderBy(vararg expressions: SortExpression)
-    fun groups(start: WindowFrameBound, exclusion: WindowFrameExclusion? = null)
-    fun groupsBetween(start: WindowFrameBound, end: WindowFrameBound, exclusion: WindowFrameExclusion? = null)
-    fun range(start: WindowFrameBound, exclusion: WindowFrameExclusion? = null)
-    fun rangeBetween(start: WindowFrameBound, end: WindowFrameBound, exclusion: WindowFrameExclusion? = null)
-    fun rows(start: WindowFrameBound, exclusion: WindowFrameExclusion? = null)
-    fun rowsBetween(start: WindowFrameBound, end: WindowFrameBound, exclusion: WindowFrameExclusion? = null)
+    fun groups(start: WindowFrameBound, end: WindowFrameBound? = null, exclusion: WindowFrameExclusion? = null)
+    fun range(start: WindowFrameBound, end: WindowFrameBound? = null, exclusion: WindowFrameExclusion? = null)
+    fun rows(start: WindowFrameBound, end: WindowFrameBound? = null,exclusion: WindowFrameExclusion? = null)
 }
 
 internal class OverScopeImpl : OverScope {
@@ -41,27 +38,15 @@ internal class OverScopeImpl : OverScope {
         orderBy.addAll(items)
     }
 
-    override fun groups(start: WindowFrameBound, exclusion: WindowFrameExclusion?) {
-        this.frame = WindowFrame(WindowFrameKind.GROUPS, start, null, exclusion)
-    }
-
-    override fun groupsBetween(start: WindowFrameBound, end: WindowFrameBound, exclusion: WindowFrameExclusion?) {
+    override fun groups(start: WindowFrameBound, end: WindowFrameBound?, exclusion: WindowFrameExclusion?) {
         this.frame = WindowFrame(WindowFrameKind.GROUPS, start, end, exclusion)
     }
 
-    override fun range(start: WindowFrameBound, exclusion: WindowFrameExclusion?) {
-        this.frame = WindowFrame(WindowFrameKind.RANGE, start, null, exclusion)
-    }
-
-    override fun rangeBetween(start: WindowFrameBound, end: WindowFrameBound, exclusion: WindowFrameExclusion?) {
+    override fun range(start: WindowFrameBound, end: WindowFrameBound?, exclusion: WindowFrameExclusion?) {
         this.frame = WindowFrame(WindowFrameKind.RANGE, start, end, exclusion)
     }
 
-    override fun rows(start: WindowFrameBound, exclusion: WindowFrameExclusion?) {
-        this.frame = WindowFrame(WindowFrameKind.ROWS, start, null, exclusion)
-    }
-
-    override fun rowsBetween(start: WindowFrameBound, end: WindowFrameBound, exclusion: WindowFrameExclusion?) {
+    override fun rows(start: WindowFrameBound, end: WindowFrameBound?, exclusion: WindowFrameExclusion?) {
         this.frame = WindowFrame(WindowFrameKind.ROWS, start, end, exclusion)
     }
 }
