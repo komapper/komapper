@@ -4,6 +4,7 @@ import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.expression.CompositeColumnExpression
 import org.komapper.core.dsl.expression.Criterion
 import org.komapper.core.dsl.expression.EscapeExpression
+import org.komapper.core.dsl.expression.InteriorExpression
 import org.komapper.core.dsl.expression.Operand
 import org.komapper.core.dsl.expression.SqlBuilderScope
 import org.komapper.core.dsl.expression.SubqueryExpression
@@ -25,10 +26,10 @@ class FilterScopeSupport<F : FilterScope<F>>(
         criteria.add(criterion)
     }
 
-    private fun <T : Any, S : Any> add(
+    private fun add(
         operator: (Operand, Operand) -> Criterion,
-        left: ColumnExpression<T, S>,
-        right: ColumnExpression<T, S>,
+        left: ColumnExpression<*, *>,
+        right: ColumnExpression<*, *>,
     ) {
         criteria.add(operator(Operand.Column(left), Operand.Column(right)))
     }
@@ -87,6 +88,10 @@ class FilterScopeSupport<F : FilterScope<F>>(
         }
     }
 
+    override fun InteriorExpression<Number>.eq(operand: InteriorExpression<Number>) {
+        add(Criterion::Eq, this as ColumnExpression<*, *>, operand as ColumnExpression<*, *>)
+    }
+
     override infix fun <T : Any, S : Any> ColumnExpression<T, S>.notEq(operand: ColumnExpression<T, S>) {
         add(Criterion::NotEq, this, operand)
     }
@@ -99,6 +104,10 @@ class FilterScopeSupport<F : FilterScope<F>>(
     override infix fun <T : Any, S : Any> T?.notEq(operand: ColumnExpression<T, S>) {
         if (this == null) return
         add(Criterion::NotEq, this, operand)
+    }
+
+    override fun InteriorExpression<Number>.notEq(operand: InteriorExpression<Number>) {
+        add(Criterion::NotEq, this as ColumnExpression<*, *>, operand as ColumnExpression<*, *>)
     }
 
     override infix fun <T : Any, S : Any> ColumnExpression<T, S>.less(operand: ColumnExpression<T, S>) {
@@ -115,6 +124,10 @@ class FilterScopeSupport<F : FilterScope<F>>(
         add(Criterion::Less, this, operand)
     }
 
+    override fun InteriorExpression<Number>.less(operand: InteriorExpression<Number>) {
+        add(Criterion::Less, this as ColumnExpression<*, *>, operand as ColumnExpression<*, *>)
+    }
+
     override infix fun <T : Any, S : Any> ColumnExpression<T, S>.lessEq(operand: ColumnExpression<T, S>) {
         add(Criterion::LessEq, this, operand)
     }
@@ -127,6 +140,10 @@ class FilterScopeSupport<F : FilterScope<F>>(
     override infix fun <T : Any, S : Any> T?.lessEq(operand: ColumnExpression<T, S>) {
         if (this == null) return
         add(Criterion::LessEq, this, operand)
+    }
+
+    override fun InteriorExpression<Number>.lessEq(operand: InteriorExpression<Number>) {
+        add(Criterion::LessEq, this as ColumnExpression<*, *>, operand as ColumnExpression<*, *>)
     }
 
     override infix fun <T : Any, S : Any> ColumnExpression<T, S>.greater(operand: ColumnExpression<T, S>) {
@@ -143,6 +160,10 @@ class FilterScopeSupport<F : FilterScope<F>>(
         add(Criterion::Greater, this, operand)
     }
 
+    override fun InteriorExpression<Number>.greater(operand: InteriorExpression<Number>) {
+        add(Criterion::Greater, this as ColumnExpression<*, *>, operand as ColumnExpression<*, *>)
+    }
+
     override infix fun <T : Any, S : Any> ColumnExpression<T, S>.greaterEq(operand: ColumnExpression<T, S>) {
         add(Criterion::GreaterEq, this, operand)
     }
@@ -155,6 +176,10 @@ class FilterScopeSupport<F : FilterScope<F>>(
     override infix fun <T : Any, S : Any> T?.greaterEq(operand: ColumnExpression<T, S>) {
         if (this == null) return
         add(Criterion::GreaterEq, this, operand)
+    }
+
+    override fun InteriorExpression<Number>.greaterEq(operand: InteriorExpression<Number>) {
+        add(Criterion::GreaterEq, this as ColumnExpression<*, *>, operand as ColumnExpression<*, *>)
     }
 
     override fun <T : Any, S : Any> ColumnExpression<T, S>.isNull() {

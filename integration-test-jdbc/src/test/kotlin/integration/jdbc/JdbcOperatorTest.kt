@@ -410,4 +410,22 @@ class JdbcOperatorTest(private val db: JdbcDatabase) {
         }
         assertEquals(1, result)
     }
+
+    @Test
+    fun operator_for_number_expressions() {
+        val e = Meta.employee
+
+        val result = db.runQuery {
+            QueryDsl.from(e)
+                .where {
+                    e.employeeId eq e.salary
+                    e.employeeId notEq e.salary
+                    e.employeeId less e.salary
+                    e.employeeId lessEq e.salary
+                    e.employeeId greater e.salary
+                    e.employeeId greaterEq e.salary
+                }
+        }
+        assertEquals(0, result.size)
+    }
 }
