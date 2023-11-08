@@ -7,7 +7,6 @@ import integration.core.employee
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
-import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.operator.alias
 import org.komapper.core.dsl.operator.avg
 import org.komapper.core.dsl.operator.cumeDist
@@ -25,7 +24,6 @@ import org.komapper.core.dsl.operator.percentRank
 import org.komapper.core.dsl.operator.rank
 import org.komapper.core.dsl.operator.rowNumber
 import org.komapper.jdbc.JdbcDatabase
-import java.math.BigDecimal
 import java.time.LocalDate
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -49,8 +47,7 @@ class JdbcSelectWindowFunctionTest(private val db: JdbcDatabase) {
 
         val query = QueryDsl.from(v)
             .where {
-                @Suppress("UNCHECKED_CAST")
-                v[e.salary] greater (v[averageSalary] as ColumnExpression<BigDecimal, BigDecimal>)
+                v[e.salary] greater v[averageSalary]
             }
             .orderBy(v[e.departmentId], v[e.employeeName])
             .select(

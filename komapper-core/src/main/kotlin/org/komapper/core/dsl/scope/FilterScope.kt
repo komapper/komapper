@@ -3,6 +3,7 @@ package org.komapper.core.dsl.scope
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.expression.CompositeColumnExpression
 import org.komapper.core.dsl.expression.EscapeExpression
+import org.komapper.core.dsl.expression.InteriorExpression
 import org.komapper.core.dsl.expression.SubqueryExpression
 import org.komapper.core.dsl.operator.CriteriaContext
 import org.komapper.core.dsl.operator.asInfix as asInfixFunction
@@ -39,6 +40,11 @@ interface FilterScope<F : FilterScope<F>> {
     infix fun <T : Any> T?.eq(operand: CompositeColumnExpression<T>)
 
     /**
+     * Applies the `=` operator for [Number] expression.
+     */
+    infix fun InteriorExpression<Number>.eq(operand: InteriorExpression<Number>)
+
+    /**
      * Applies the `<>` operator.
      */
     infix fun <T : Any, S : Any> ColumnExpression<T, S>.notEq(operand: ColumnExpression<T, S>)
@@ -52,6 +58,11 @@ interface FilterScope<F : FilterScope<F>> {
      * Applies the `<>` operator.
      */
     infix fun <T : Any, S : Any> T?.notEq(operand: ColumnExpression<T, S>)
+
+    /**
+     * Applies the `<>` operator for [Number] expression.
+     */
+    infix fun InteriorExpression<Number>.notEq(operand: InteriorExpression<Number>)
 
     /**
      * Applies the `<` operator.
@@ -69,6 +80,11 @@ interface FilterScope<F : FilterScope<F>> {
     infix fun <T : Any, S : Any> T?.less(operand: ColumnExpression<T, S>)
 
     /**
+     * Applies the `<` operator for [Number] expression.
+     */
+    infix fun InteriorExpression<Number>.less(operand: InteriorExpression<Number>)
+
+    /**
      * Applies the `<=` operator.
      */
     infix fun <T : Any, S : Any> ColumnExpression<T, S>.lessEq(operand: ColumnExpression<T, S>)
@@ -82,6 +98,11 @@ interface FilterScope<F : FilterScope<F>> {
      * Applies the `<=` operator.
      */
     infix fun <T : Any, S : Any> T?.lessEq(operand: ColumnExpression<T, S>)
+
+    /**
+     * Applies the `<=` operator for [Number] expression.
+     */
+    infix fun InteriorExpression<Number>.lessEq(operand: InteriorExpression<Number>)
 
     /**
      * Applies the `>` operator.
@@ -99,6 +120,11 @@ interface FilterScope<F : FilterScope<F>> {
     infix fun <T : Any, S : Any> T?.greater(operand: ColumnExpression<T, S>)
 
     /**
+     * Applies the `>` operator for [Number] expression.
+     */
+    infix fun InteriorExpression<Number>.greater(operand: InteriorExpression<Number>)
+
+    /**
      * Applies the `>=` operator.
      */
     infix fun <T : Any, S : Any> ColumnExpression<T, S>.greaterEq(operand: ColumnExpression<T, S>)
@@ -112,6 +138,11 @@ interface FilterScope<F : FilterScope<F>> {
      * Applies the `>=` operator.
      */
     infix fun <T : Any, S : Any> T?.greaterEq(operand: ColumnExpression<T, S>)
+
+    /**
+     * Applies the `>=` operator for [Number] expression.
+     */
+    infix fun InteriorExpression<Number>.greaterEq(operand: InteriorExpression<Number>)
 
     /**
      * Applies the `IS NULL` predicate.
