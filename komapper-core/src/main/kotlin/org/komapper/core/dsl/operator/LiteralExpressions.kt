@@ -2,6 +2,7 @@ package org.komapper.core.dsl.operator
 
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.expression.LiteralExpression
+import java.math.BigDecimal
 
 /**
  * Builds a [Boolean] literal.
@@ -22,6 +23,13 @@ fun literal(value: Int): ColumnExpression<Int, Int> {
  */
 fun literal(value: Long): ColumnExpression<Long, Long> {
     return LiteralExpression(value, Long::class)
+}
+
+/**
+ * Builds a [BigDecimal] literal.
+ */
+fun literal(value: BigDecimal): ColumnExpression<BigDecimal, BigDecimal> {
+    return LiteralExpression(value, BigDecimal::class)
 }
 
 /**

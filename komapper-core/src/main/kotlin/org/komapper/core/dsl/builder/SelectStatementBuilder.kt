@@ -4,9 +4,12 @@ import org.komapper.core.BuilderDialect
 import org.komapper.core.Statement
 import org.komapper.core.StatementBuffer
 import org.komapper.core.dsl.context.SelectContext
+import org.komapper.core.dsl.context.SetOperationContext
+import org.komapper.core.dsl.context.columns
 import org.komapper.core.dsl.element.InnerJoin
 import org.komapper.core.dsl.element.LeftJoin
 import org.komapper.core.dsl.expression.AggregateFunction
+import org.komapper.core.dsl.expression.AliasExpression
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.expression.Criterion
 import org.komapper.core.dsl.expression.LockOption
@@ -53,7 +56,7 @@ class SelectStatementBuilder(
                 }
                 buf.cutBack(2)
                 buf.append(") as (")
-                val statement = support.buildSubqueryStatement(subquery)
+                val statement = support.buildSubqueryStatement(subquery.context)
                 buf.append(statement)
                 buf.append("), ")
             }
@@ -83,7 +86,33 @@ class SelectStatementBuilder(
         }
 
         buf.append(" from ")
-        table(context.target)
+        if (context.derivedTable == null) {
+            table(context.target)
+        } else {
+            val subqueryContext = when (val subqueryContext = context.derivedTable.context) {
+                is SelectContext<*, *, *> -> {
+                    val aliases = context.target.properties().zip(subqueryContext.columns).map { (outer, inner) ->
+                        @Suppress("UNCHECKED_CAST")
+                        (AliasExpression(inner as ColumnExpression<Any, Any>, outer.columnName, outer.alwaysQuote))
+                    }
+                    subqueryContext.copy(select = aliases)
+                }
+
+                is SetOperationContext -> subqueryContext
+            }
+            val statement = support.buildSubqueryStatement(subqueryContext)
+            buf.append("(")
+            buf.append(statement)
+            buf.append(")")
+            val alias = aliasManager.getAlias(context.target)
+            if (!alias.isNullOrBlank()) {
+                if (dialect.supportsAsKeywordForTableAlias()) {
+                    buf.append(" as")
+                }
+                buf.append(" $alias")
+            }
+        }
+
         if (dialect.supportsTableHint() && context.forUpdate != null) {
             val scope = ForUpdateScope().apply(context.forUpdate)
             buf.append(" with (updlock, rowlock")

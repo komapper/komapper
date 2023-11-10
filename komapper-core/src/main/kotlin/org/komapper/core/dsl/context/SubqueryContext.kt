@@ -1,29 +1,15 @@
 package org.komapper.core.dsl.context
 
 import org.komapper.core.ThreadSafe
-import org.komapper.core.dsl.expression.AliasExpression
 import org.komapper.core.dsl.expression.ColumnExpression
-import org.komapper.core.dsl.metamodel.InlineViewMetamodel
 
 @ThreadSafe
 sealed interface SubqueryContext
-
-internal val SubqueryContext.inlineViewMetamodel: InlineViewMetamodel
-    get() = InlineViewMetamodel(this)
 
 internal val SubqueryContext.columns: List<ColumnExpression<*, *>>
     get() = when (this) {
         is SelectContext<*, *, *> -> getProjection().expressions()
         is SetOperationContext -> left.columns
-    }
-
-internal val SubqueryContext.columnAndAliasPairs: List<Pair<ColumnExpression<*, *>, String>>
-    get() = columns.mapIndexed { index, column ->
-        val alias = when (column) {
-            is AliasExpression<*, *> -> column.alias
-            else -> buildAlias(column, index)
-        }
-        column to alias
     }
 
 internal fun SubqueryContext.makeAlias(column: ColumnExpression<*, *>): String {

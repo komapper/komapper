@@ -4,6 +4,7 @@ import integration.core.Dbms
 import integration.core.Run
 import integration.core.department
 import integration.core.employee
+import integration.core.employeeSalary
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
@@ -36,40 +37,35 @@ class JdbcSelectWindowFunctionTest(private val db: JdbcDatabase) {
     @Test
     fun testPartitionBy() {
         val e = Meta.employee
-        val averageSalary = avg(e.salary).over { partitionBy(e.departmentId) }
 
-        val v = QueryDsl.from(e).select(
+        val subquery = QueryDsl.from(e).select(
             e.departmentId,
             e.employeeName,
             e.salary,
-            averageSalary,
+            avg(e.salary).over { partitionBy(e.departmentId) },
         )
 
-        val query = QueryDsl.from(v)
+        val t = Meta.employeeSalary
+
+        val query = QueryDsl.from(t, subquery)
             .where {
-                v[e.salary] greater v[averageSalary]
+                t.salary greater t.averageSalary
             }
-            .orderBy(v[e.departmentId], v[e.employeeName])
-            .select(
-                v[e.departmentId],
-                v[e.employeeName],
-                v[e.salary],
-                v[averageSalary],
-            )
+            .orderBy(t.departmentId, t.employeeName)
 
         val list = db.runQuery { query }
         println(list)
         assertEquals(6, list.size)
         list[0].let {
-            assertEquals(1, it[v[e.departmentId]])
-            assertEquals("KING", it[v[e.employeeName]])
+            assertEquals(1, it.departmentId)
+            assertEquals("KING", it.employeeName)
         }
         list[5].let {
-            assertEquals(3, it[v[e.departmentId]])
-            assertEquals("BLAKE", it[v[e.employeeName]])
+            assertEquals(3, it.departmentId)
+            assertEquals("BLAKE", it.employeeName)
         }
         for (each in list) {
-            assertTrue(each[v[e.salary]]!!.toDouble() > each[v[averageSalary]]!!)
+            assertTrue(each.salary.toDouble() > each.averageSalary.toDouble())
         }
     }
 
