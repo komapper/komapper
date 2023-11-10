@@ -297,3 +297,17 @@ data class Location(
     @KomapperVersion
     val version: LocationInt,
 )
+
+@KomapperEntity
+data class T(
+    @KomapperId(virtual = true)
+    val n: Int,
+)
+
+@KomapperEntity
+data class IntPair(
+    @KomapperId(virtual = true)
+    val first: Int,
+    @KomapperId(virtual = true)
+    val second: Int,
+)

@@ -361,6 +361,10 @@ interface Dialect {
      */
     fun supportsOptimisticLockOfBatchExecution(): Boolean = true
 
+    fun supportsRecursiveKeywordInCommonTableExpression(): Boolean = true
+
+    fun supportsSelectStatementWithoutFromClause(): Boolean = true
+
     /**
      * Returns whether the search condition is supported in the UPSERT statement.
      */

@@ -80,3 +80,104 @@ abstract class EntityMetamodelStub<ENTITY : Any, META : EntityMetamodelStub<ENTI
         error("Fix google/ksp compile errors.")
     }
 }
+
+internal object EmptyMetamodel : EntityMetamodel<Nothing, Nothing, EmptyMetamodel> {
+    override fun declaration(): EntityMetamodelDeclaration<EmptyMetamodel> {
+        return {}
+    }
+
+    override fun idGenerator(): IdGenerator<Nothing, Nothing>? {
+        return null
+    }
+
+    override fun idProperties(): List<PropertyMetamodel<Nothing, *, *>> {
+        return emptyList()
+    }
+
+    override fun versionProperty(): PropertyMetamodel<Nothing, *, *>? {
+        return null
+    }
+
+    override fun createdAtProperty(): PropertyMetamodel<Nothing, *, *>? {
+        return null
+    }
+
+    override fun updatedAtProperty(): PropertyMetamodel<Nothing, *, *>? {
+        return null
+    }
+
+    override fun properties(): List<PropertyMetamodel<Nothing, *, *>> {
+        return emptyList()
+    }
+
+    override fun convertToId(generatedKey: Long): Nothing? {
+        return null
+    }
+
+    override fun versionAssignment(): Pair<PropertyMetamodel<Nothing, *, *>, Operand>? {
+        return null
+    }
+
+    override fun createdAtAssignment(c: Clock): Pair<PropertyMetamodel<Nothing, *, *>, Operand>? {
+        return null
+    }
+
+    override fun updatedAtAssignment(c: Clock): Pair<PropertyMetamodel<Nothing, *, *>, Operand>? {
+        return null
+    }
+
+    override fun newEntity(m: Map<PropertyMetamodel<*, *, *>, Any?>): Nothing {
+        throw UnsupportedOperationException()
+    }
+
+    override fun newMetamodel(
+        table: String,
+        catalog: String,
+        schema: String,
+        alwaysQuote: Boolean,
+        disableSequenceAssignment: Boolean,
+        declaration: EntityMetamodelDeclaration<EmptyMetamodel>,
+    ): EmptyMetamodel {
+        throw UnsupportedOperationException()
+    }
+
+    override fun postUpdate(e: Nothing): Nothing {
+        return e
+    }
+
+    override fun preUpdate(e: Nothing, c: Clock): Nothing {
+        return e
+    }
+
+    override fun preInsert(e: Nothing, c: Clock): Nothing {
+        return e
+    }
+
+    override fun extractId(e: Nothing): Nothing {
+        throw UnsupportedOperationException()
+    }
+
+    override fun klass(): KClass<Nothing> {
+        throw UnsupportedOperationException()
+    }
+
+    override fun tableName(): String {
+        throw UnsupportedOperationException()
+    }
+
+    override fun catalogName(): String {
+        throw UnsupportedOperationException()
+    }
+
+    override fun schemaName(): String {
+        throw UnsupportedOperationException()
+    }
+
+    override fun alwaysQuote(): Boolean {
+        return false
+    }
+
+    override fun disableSequenceAssignment(): Boolean {
+        return false
+    }
+}

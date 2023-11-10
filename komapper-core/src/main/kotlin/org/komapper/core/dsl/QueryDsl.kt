@@ -11,10 +11,14 @@ import org.komapper.core.dsl.context.SelectContext
 import org.komapper.core.dsl.context.TemplateExecuteContext
 import org.komapper.core.dsl.context.TemplateSelectContext
 import org.komapper.core.dsl.context.inlineViewMetamodel
+import org.komapper.core.dsl.element.With
+import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.expression.SubqueryExpression
+import org.komapper.core.dsl.metamodel.EmptyMetamodel
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.query.DeleteQueryBuilder
 import org.komapper.core.dsl.query.DeleteQueryBuilderImpl
+import org.komapper.core.dsl.query.FlowSubquery
 import org.komapper.core.dsl.query.InlineViewSelectQuery
 import org.komapper.core.dsl.query.InsertQueryBuilder
 import org.komapper.core.dsl.query.InsertQueryBuilderImpl
@@ -40,6 +44,36 @@ import org.komapper.core.dsl.query.UpdateQueryBuilderImpl
  */
 @ThreadSafe
 object QueryDsl {
+
+    fun with(
+        metamodel: EntityMetamodel<*, *, *>,
+        subquery: SubqueryExpression<*>,
+    ): WithQueryDsl {
+        val with = With(false, listOf(metamodel to subquery))
+        return WithQueryDslImpl(with)
+    }
+
+    fun with(
+        vararg pairs: Pair<EntityMetamodel<*, *, *>, SubqueryExpression<*>>,
+    ): WithQueryDsl {
+        val with = With(false, pairs.toList())
+        return WithQueryDslImpl(with)
+    }
+
+    fun withRecursive(
+        metamodel: EntityMetamodel<*, *, *>,
+        subquery: SubqueryExpression<*>,
+    ): WithQueryDsl {
+        val with = With(true, listOf(metamodel to subquery))
+        return WithQueryDslImpl(with)
+    }
+
+    fun withRecursive(
+        vararg pairs: Pair<EntityMetamodel<*, *, *>, SubqueryExpression<*>>,
+    ): WithQueryDsl {
+        val with = With(true, pairs.toList())
+        return WithQueryDslImpl(with)
+    }
 
     /**
      * Creates a SELECT query builder.
@@ -67,6 +101,10 @@ object QueryDsl {
     ): RelationSelectQuery<Record> {
         val metamodel = subquery.context.inlineViewMetamodel
         return InlineViewSelectQuery(SelectContext(metamodel))
+    }
+
+    fun <A : Any> select(expression: ColumnExpression<A, *>): FlowSubquery<A?> {
+        return from(EmptyMetamodel).select(expression)
     }
 
     /**
@@ -177,5 +215,28 @@ object QueryDsl {
      */
     fun drop(vararg metamodels: EntityMetamodel<*, *, *>): SchemaDropQuery {
         return drop(metamodels.toList())
+    }
+}
+
+interface WithQueryDsl {
+    /**
+     * Creates a SELECT query builder.
+     *
+     * @param ENTITY the entity type
+     * @param ID the entity id type
+     * @param META the entity metamodel type
+     * @param metamodel the entity metamodel
+     * @return the query builder
+     */
+    fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> from(
+        metamodel: META,
+    ): SelectQueryBuilder<ENTITY, ID, META>
+}
+
+internal data class WithQueryDslImpl(private val with: With) : WithQueryDsl {
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> from(
+        metamodel: META,
+    ): SelectQueryBuilder<ENTITY, ID, META> {
+        return SelectQueryBuilderImpl(SelectContext(metamodel, with))
     }
 }
