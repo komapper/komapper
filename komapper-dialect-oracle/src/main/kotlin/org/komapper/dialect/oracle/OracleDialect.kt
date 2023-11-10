@@ -128,6 +128,10 @@ interface OracleDialect : Dialect {
 
     override fun supportsModuloOperator(): Boolean = false
 
+    override fun supportsRecursiveKeywordInCommonTableExpression(): Boolean = false
+
+    override fun supportsSelectStatementWithoutFromClause(): Boolean = false
+
     override fun supportsSetOperationExcept(): Boolean = false
 
     override fun supportsSetOperationMinus(): Boolean = true

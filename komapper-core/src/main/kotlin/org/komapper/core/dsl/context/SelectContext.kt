@@ -3,6 +3,7 @@ package org.komapper.core.dsl.context
 import org.komapper.core.ThreadSafe
 import org.komapper.core.dsl.element.Join
 import org.komapper.core.dsl.element.Projection
+import org.komapper.core.dsl.element.With
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.expression.ForUpdateDeclaration
 import org.komapper.core.dsl.expression.HavingDeclaration
@@ -17,6 +18,7 @@ import org.komapper.core.dsl.options.SelectOptions
 @ThreadSafe
 data class SelectContext<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     val target: META,
+    val with: With? = null,
     val select: List<ColumnExpression<*, *>> = listOf(),
     val joins: List<Join<*, *, *>> = listOf(),
     val where: WhereDeclaration = {},

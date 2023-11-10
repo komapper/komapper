@@ -147,6 +147,8 @@ interface SqlServerDialect : Dialect {
 
     override fun supportsLockOptionNowait(): Boolean = true
 
+    override fun supportsRecursiveKeywordInCommonTableExpression(): Boolean = false
+
     override fun supportsSearchConditionInUpsertStatement(): Boolean = true
 
     override fun supportsUpsertMultipleReturning(): Boolean = true

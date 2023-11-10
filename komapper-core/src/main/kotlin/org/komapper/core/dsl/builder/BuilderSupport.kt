@@ -66,14 +66,18 @@ class BuilderSupport(
             }
 
             TableNameType.ALIAS_ONLY -> {
-                val alias = aliasManager.getAlias(expression) ?: error("Alias is not found. table=$name ,sql=$buf")
-                buf.append(alias)
+                val alias = aliasManager.getAlias(expression)
+                if (alias == null) {
+                    buf.append(name)
+                } else {
+                    buf.append(alias)
+                }
             }
 
             TableNameType.NAME_AND_ALIAS -> {
                 buf.append(name)
-                val alias = aliasManager.getAlias(expression) ?: error("Alias is not found. table=$name ,sql=$buf")
-                if (alias.isNotBlank()) {
+                val alias = aliasManager.getAlias(expression)
+                if (!alias.isNullOrBlank()) {
                     if (dialect.supportsAsKeywordForTableAlias()) {
                         buf.append(" as")
                     }
@@ -151,8 +155,10 @@ class BuilderSupport(
                 val name = expression.getCanonicalColumnName(dialect::enquote)
                 val owner = expression.owner
                 val alias = aliasManager.getAlias(owner)
-                    ?: error("Alias is not found. table=${owner.getCanonicalTableName(dialect::enquote)}, column=$name ,sql=$buf")
-                if (alias.isBlank()) {
+                if (alias == null) {
+                    val tableName = owner.getCanonicalTableName(dialect::enquote)
+                    buf.append("$tableName.$name")
+                } else if (alias.isBlank()) {
                     buf.append(name)
                 } else {
                     if (alias == "excluded" && !dialect.supportsExcludedTable()) {
@@ -503,6 +509,7 @@ class BuilderSupport(
                 visitOperand(function.bucketSize)
                 buf.append(")")
             }
+
             is Lead -> {
                 buf.append("lead(")
                 visitColumnExpression(function.expression)
@@ -518,6 +525,7 @@ class BuilderSupport(
                 }
                 buf.append(")")
             }
+
             is Lag -> {
                 buf.append("lag(")
                 visitColumnExpression(function.expression)
@@ -533,16 +541,19 @@ class BuilderSupport(
                 }
                 buf.append(")")
             }
+
             is FirstValue -> {
                 buf.append("first_value(")
                 visitColumnExpression(function.expression)
                 buf.append(")")
             }
+
             is LastValue -> {
                 buf.append("last_value(")
                 visitColumnExpression(function.expression)
                 buf.append(")")
             }
+
             is NthValue -> {
                 buf.append("nth_value(")
                 visitColumnExpression(function.expression)
@@ -550,6 +561,7 @@ class BuilderSupport(
                 visitOperand(function.offset)
                 buf.append(")")
             }
+
             is AggregateFunction<*, *> -> visitAggregateFunction(function)
         }
     }
@@ -589,6 +601,7 @@ class BuilderSupport(
                 }
                 buf.append(" following")
             }
+
             is WindowFrameBound.Preceding -> {
                 if (dialect.supportsParameterBindingForWindowFrameBoundOffset()) {
                     buf.bind(Value(bound.offset, Int::class))

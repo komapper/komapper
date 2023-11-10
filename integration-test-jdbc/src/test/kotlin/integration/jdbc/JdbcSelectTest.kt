@@ -37,6 +37,14 @@ import kotlin.test.assertNull
 class JdbcSelectTest(private val db: JdbcDatabase) {
 
     @Test
+    fun select() {
+        val result = db.runQuery {
+            QueryDsl.select(literal("hello")).single()
+        }
+        assertEquals("hello", result)
+    }
+
+    @Test
     fun list() {
         val a = Meta.address
         val list: List<Address> = db.runQuery {

@@ -13,6 +13,7 @@ import org.komapper.core.dsl.expression.LockOption
 import org.komapper.core.dsl.expression.LockTarget
 import org.komapper.core.dsl.expression.SortItem
 import org.komapper.core.dsl.expression.TableExpression
+import org.komapper.core.dsl.metamodel.EmptyMetamodel
 import org.komapper.core.dsl.scope.ForUpdateScope
 
 class SelectStatementBuilder(
@@ -25,6 +26,7 @@ class SelectStatementBuilder(
     private val support = BuilderSupport(dialect, aliasManager, buf, context.options.escapeSequence)
 
     fun build(): Statement {
+        withClause()
         selectClause()
         fromClause()
         whereClause()
@@ -33,6 +35,31 @@ class SelectStatementBuilder(
         offsetLimitClause()
         forUpdateClause()
         return buf.toStatement()
+    }
+
+    private fun withClause() {
+        if (context.with != null && context.with.pairs.isNotEmpty()) {
+            buf.append("with ")
+            if (context.with.recursive && dialect.supportsRecursiveKeywordInCommonTableExpression()) {
+                buf.append("recursive ")
+            }
+            for ((table, subquery) in context.with.pairs) {
+                table(table, TableNameType.NAME_ONLY)
+                buf.append(" (")
+                for (p in table.properties()) {
+                    val columnName = p.getCanonicalColumnName(dialect::enquote)
+                    buf.append(columnName)
+                    buf.append(", ")
+                }
+                buf.cutBack(2)
+                buf.append(") as (")
+                val statement = support.buildSubqueryStatement(subquery)
+                buf.append(statement)
+                buf.append("), ")
+            }
+            buf.cutBack(2)
+            buf.append(" ")
+        }
     }
 
     private fun selectClause() {
@@ -48,6 +75,13 @@ class SelectStatementBuilder(
     }
 
     private fun fromClause() {
+        if (context.target == EmptyMetamodel) {
+            if (!dialect.supportsSelectStatementWithoutFromClause()) {
+                buf.append(" from dual")
+            }
+            return
+        }
+
         buf.append(" from ")
         table(context.target)
         if (dialect.supportsTableHint() && context.forUpdate != null) {
@@ -209,8 +243,8 @@ class SelectStatementBuilder(
         }
     }
 
-    private fun table(expression: TableExpression<*>) {
-        support.visitTableExpression(expression, TableNameType.NAME_AND_ALIAS)
+    private fun table(expression: TableExpression<*>, tableNameType: TableNameType = TableNameType.NAME_AND_ALIAS) {
+        support.visitTableExpression(expression, tableNameType)
     }
 
     private fun column(expression: ColumnExpression<*, *>) {
