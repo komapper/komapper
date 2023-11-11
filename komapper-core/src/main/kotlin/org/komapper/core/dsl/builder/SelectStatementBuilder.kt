@@ -96,7 +96,7 @@ class SelectStatementBuilder(
                         val columns = subqueryContext.getProjection().expressions()
                         val aliases = properties.zip(columns).map { (outer, inner) ->
                             if (inner is AliasExpression) {
-                                AliasExpression(inner.expression, outer.columnName, outer.alwaysQuote)
+                                error("The alias operand is found. Komapper does not allow the use of alias operand in derived tables.")
                             } else {
                                 AliasExpression(inner, outer.columnName, outer.alwaysQuote)
                             }
