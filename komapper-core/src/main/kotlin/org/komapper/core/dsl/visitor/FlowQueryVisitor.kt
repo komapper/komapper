@@ -106,4 +106,9 @@ interface FlowQueryVisitor<VISIT_RESULT> {
         context: TemplateSelectContext,
         transform: (Row) -> T,
     ): VISIT_RESULT
+
+    fun <T : Any> templateEntityConversionSelectQuery(
+        context: TemplateSelectContext,
+        metamodel: EntityMetamodel<T, *, *>,
+    ): VISIT_RESULT
 }

@@ -245,4 +245,15 @@ class R2dbcTemplateTest(private val db: R2dbcDatabase) {
             address,
         )
     }
+
+    @Test
+    fun selectAsEntity(info: TestInfo) = inTransaction(db, info) {
+        val a = Meta.address
+        val list = db.runQuery {
+            val sql = "select address_id, street, version from address order by address_id"
+            QueryDsl.fromTemplate(sql).selectAsEntity(a)
+        }
+        assertEquals(15, list.size)
+        assertEquals(Address(1, "STREET 1", 1), list[0])
+    }
 }

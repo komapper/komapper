@@ -3,6 +3,7 @@ package org.komapper.core.dsl.query
 import org.komapper.core.ThreadSafe
 import org.komapper.core.Value
 import org.komapper.core.dsl.context.TemplateSelectContext
+import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.options.TemplateSelectOptions
 
 /**
@@ -26,6 +27,17 @@ interface TemplateSelectQueryBuilder : TemplateBinder<TemplateSelectQueryBuilder
      * @return the query
      */
     fun <T> select(transform: (Row) -> T): TemplateSelectQuery<T>
+
+    /**
+     * Builds a query that selects multiple columns and transforms a row into an entity.
+     *
+     * The type, number, and order of columns in the row must match the constructor of the entity.
+     *
+     * @param ENTITY the entity type
+     * @param metamodel the entity metamodel
+     * @return the query that returns a list of entity
+     */
+    fun <ENTITY : Any> selectAsEntity(metamodel: EntityMetamodel<ENTITY, *, *>): TemplateSelectQuery<ENTITY>
 }
 
 internal data class TemplateSelectQueryBuilderImpl(
@@ -44,5 +56,9 @@ internal data class TemplateSelectQueryBuilderImpl(
 
     override fun <T> select(transform: (Row) -> T): TemplateSelectQuery<T> {
         return TemplateSelectQueryImpl(context, transform)
+    }
+
+    override fun <ENTITY : Any> selectAsEntity(metamodel: EntityMetamodel<ENTITY, *, *>): TemplateSelectQuery<ENTITY> {
+        return TemplateEntityConversionSelectQuery(context, metamodel)
     }
 }
