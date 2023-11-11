@@ -581,6 +581,24 @@ object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
         return JdbcSetOperationRunner(context, transform, collect)
     }
 
+    override fun <ENTITY : Any, R> entityConversionSelectQuery(
+        context: SelectContext<*, *, *>,
+        metamodel: EntityMetamodel<ENTITY, *, *>,
+        collect: suspend (Flow<ENTITY>) -> R,
+    ): JdbcRunner<*> {
+        val transform = JdbcResultSetTransformers.intoEntity(metamodel)
+        return JdbcSelectRunner(context, transform, collect)
+    }
+
+    override fun <ENTITY : Any, R> entityConversionSetOperationQuery(
+        context: SetOperationContext,
+        metamodel: EntityMetamodel<ENTITY, *, *>,
+        collect: suspend (Flow<ENTITY>) -> R,
+    ): JdbcRunner<*> {
+        val transform = JdbcResultSetTransformers.intoEntity(metamodel)
+        return JdbcSetOperationRunner(context, transform, collect)
+    }
+
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> relationDeleteQuery(
         context: RelationDeleteContext<ENTITY, ID, META>,
     ): JdbcRunner<Long> {

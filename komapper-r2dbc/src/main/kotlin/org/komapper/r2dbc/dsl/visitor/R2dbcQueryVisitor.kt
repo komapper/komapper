@@ -577,6 +577,24 @@ object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
         return R2dbcSetOperationRunner(context, transform, collect)
     }
 
+    override fun <ENTITY : Any, R> entityConversionSelectQuery(
+        context: SelectContext<*, *, *>,
+        metamodel: EntityMetamodel<ENTITY, *, *>,
+        collect: suspend (Flow<ENTITY>) -> R,
+    ): R2dbcRunner<*> {
+        val transform = R2dbcRowTransformers.intoEntity(metamodel)
+        return R2dbcSelectRunner(context, transform, collect)
+    }
+
+    override fun <ENTITY : Any, R> entityConversionSetOperationQuery(
+        context: SetOperationContext,
+        metamodel: EntityMetamodel<ENTITY, *, *>,
+        collect: suspend (Flow<ENTITY>) -> R,
+    ): R2dbcRunner<*> {
+        val transform = R2dbcRowTransformers.intoEntity(metamodel)
+        return R2dbcSetOperationRunner(context, transform, collect)
+    }
+
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> relationDeleteQuery(
         context: RelationDeleteContext<ENTITY, ID, META>,
     ): R2dbcRunner<Long> {

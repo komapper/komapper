@@ -92,6 +92,16 @@ interface FlowQueryVisitor<VISIT_RESULT> {
         expressions: List<ColumnExpression<*, *>>,
     ): VISIT_RESULT
 
+    fun <ENTITY : Any> entityConversionSelectQuery(
+        context: SelectContext<*, *, *>,
+        metamodel: EntityMetamodel<ENTITY, *, *>,
+    ): VISIT_RESULT
+
+    fun <ENTITY : Any> entityConversionSetOperationQuery(
+        context: SetOperationContext,
+        metamodel: EntityMetamodel<ENTITY, *, *>,
+    ): VISIT_RESULT
+
     fun <T> templateSelectQuery(
         context: TemplateSelectContext,
         transform: (Row) -> T,

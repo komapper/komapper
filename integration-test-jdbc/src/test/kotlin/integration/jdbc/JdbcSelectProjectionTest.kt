@@ -265,4 +265,42 @@ class JdbcSelectProjectionTest(private val db: JdbcDatabase) {
         }
         println(ex3.message)
     }
+
+    @Test
+    fun selectAsEntity() {
+        val a = Meta.address
+        val e = Meta.employee
+
+        val query = QueryDsl.from(e)
+            .where { e.employeeName startsWith "S" }
+            .selectAsEntity(a, e.employeeId, concat(e.employeeName, " STREET"), e.version)
+
+        val list = db.runQuery(query)
+        val expected = listOf(
+            Address(1, "SMITH STREET", 1),
+            Address(8, "SCOTT STREET", 1),
+        )
+        assertEquals(expected, list)
+    }
+
+    @Test
+    fun selectAsEntity_union() {
+        val a = Meta.address
+        val e = Meta.employee
+
+        val q1 = QueryDsl.from(e)
+            .where { e.employeeName startsWith "S" }
+            .selectAsEntity(a, e.employeeId, concat(e.employeeName, " STREET"), e.version)
+        val q2 = QueryDsl.from(e)
+            .where { e.employeeName startsWith "T" }
+            .selectAsEntity(a, e.employeeId, concat(e.employeeName, " STREET"), e.version)
+
+        val list = db.runQuery(q1.union(q2).orderBy(e.employeeId))
+        val expected = listOf(
+            Address(1, "SMITH STREET", 1),
+            Address(8, "SCOTT STREET", 1),
+            Address(10, "TURNER STREET", 1),
+        )
+        assertEquals(expected, list)
+    }
 }

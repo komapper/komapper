@@ -143,6 +143,22 @@ object R2dbcFlowQueryVisitor : FlowQueryVisitor<R2dbcFlowBuilder<*>> {
         return R2dbcSetOperationFlowBuilder(context, transform)
     }
 
+    override fun <ENTITY : Any> entityConversionSelectQuery(
+        context: SelectContext<*, *, *>,
+        metamodel: EntityMetamodel<ENTITY, *, *>,
+    ): R2dbcFlowBuilder<*> {
+        val transform = R2dbcRowTransformers.intoEntity(metamodel)
+        return R2dbcSelectFlowBuilder(context, transform)
+    }
+
+    override fun <ENTITY : Any> entityConversionSetOperationQuery(
+        context: SetOperationContext,
+        metamodel: EntityMetamodel<ENTITY, *, *>,
+    ): R2dbcFlowBuilder<*> {
+        val transform = R2dbcRowTransformers.intoEntity(metamodel)
+        return R2dbcSetOperationFlowBuilder(context, transform)
+    }
+
     override fun <T> templateSelectQuery(
         context: TemplateSelectContext,
         transform: (Row) -> T,

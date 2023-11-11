@@ -88,4 +88,10 @@ internal object R2dbcRowTransformers {
         val map = expressions.associateWith { extractor.execute(it) }
         RecordImpl(map)
     }
+
+    fun <ENTITY : Any> intoEntity(metamodel: EntityMetamodel<ENTITY, *, *>): (R2dbcDataOperator, Row) -> ENTITY =
+        { dataOperator, row ->
+            val mapper = R2dbcEntityMapper(dataOperator, row)
+            mapper.execute(metamodel, true) as ENTITY
+        }
 }
