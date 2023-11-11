@@ -2,6 +2,7 @@ package org.komapper.core.dsl.query
 
 import kotlinx.coroutines.flow.Flow
 import org.komapper.core.dsl.context.TemplateSelectContext
+import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.visitor.FlowQueryVisitor
 import org.komapper.core.dsl.visitor.QueryVisitor
 
@@ -25,6 +26,22 @@ internal data class TemplateSelectQueryImpl<T>(
     override fun <R> collect(collect: suspend (Flow<T>) -> R): Query<R> = object : Query<R> {
         override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
             return visitor.templateSelectQuery(context, transform, collect)
+        }
+    }
+}
+
+internal data class TemplateEntityConversionSelectQuery<ENTITY : Any>(
+    private val context: TemplateSelectContext,
+    private val metamodel: EntityMetamodel<ENTITY, *, *>,
+) : TemplateSelectQuery<ENTITY> {
+
+    override fun <VISIT_RESULT> accept(visitor: FlowQueryVisitor<VISIT_RESULT>): VISIT_RESULT {
+        return visitor.templateEntityConversionSelectQuery(context, metamodel)
+    }
+
+    override fun <R> collect(collect: suspend (Flow<ENTITY>) -> R): Query<R> = object : Query<R> {
+        override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
+            return visitor.templateEntityConversionSelectQuery(context, metamodel, collect)
         }
     }
 }

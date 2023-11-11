@@ -55,6 +55,7 @@ import org.komapper.r2dbc.dsl.runner.R2dbcSchemaDropRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcScriptExecuteRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcSelectRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcSetOperationRunner
+import org.komapper.r2dbc.dsl.runner.R2dbcTemplateEntityConversionSelectRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcTemplateExecuteRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcTemplateSelectRunner
 
@@ -582,7 +583,7 @@ object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
         metamodel: EntityMetamodel<ENTITY, *, *>,
         collect: suspend (Flow<ENTITY>) -> R,
     ): R2dbcRunner<*> {
-        val transform = R2dbcRowTransformers.intoEntity(metamodel)
+        val transform = R2dbcRowTransformers.singleEntity(metamodel)
         return R2dbcSelectRunner(context, transform, collect)
     }
 
@@ -591,7 +592,7 @@ object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
         metamodel: EntityMetamodel<ENTITY, *, *>,
         collect: suspend (Flow<ENTITY>) -> R,
     ): R2dbcRunner<*> {
-        val transform = R2dbcRowTransformers.intoEntity(metamodel)
+        val transform = R2dbcRowTransformers.singleEntity(metamodel)
         return R2dbcSetOperationRunner(context, transform, collect)
     }
 
@@ -720,5 +721,14 @@ object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
         collect: suspend (Flow<T>) -> R,
     ): R2dbcRunner<R> {
         return R2dbcTemplateSelectRunner(context, transform, collect)
+    }
+
+    override fun <T : Any, R> templateEntityConversionSelectQuery(
+        context: TemplateSelectContext,
+        metamodel: EntityMetamodel<T, *, *>,
+        collect: suspend (Flow<T>) -> R,
+    ): R2dbcRunner<*> {
+        val transform = R2dbcRowTransformers.singleEntity(metamodel)
+        return R2dbcTemplateEntityConversionSelectRunner(context, transform, collect)
     }
 }

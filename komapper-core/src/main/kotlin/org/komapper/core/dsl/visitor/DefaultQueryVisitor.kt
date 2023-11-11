@@ -651,4 +651,12 @@ internal object DefaultQueryVisitor : QueryVisitor<Runner> {
     ): Runner {
         return TemplateSelectRunner(context)
     }
+
+    override fun <T : Any, R> templateEntityConversionSelectQuery(
+        context: TemplateSelectContext,
+        metamodel: EntityMetamodel<T, *, *>,
+        collect: suspend (Flow<T>) -> R,
+    ): Runner {
+        return TemplateSelectRunner(context)
+    }
 }

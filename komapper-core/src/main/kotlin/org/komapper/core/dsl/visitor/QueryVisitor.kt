@@ -514,4 +514,10 @@ interface QueryVisitor<VISIT_RESULT> {
         transform: (Row) -> T,
         collect: suspend (Flow<T>) -> R,
     ): VISIT_RESULT
+
+    fun <T : Any, R> templateEntityConversionSelectQuery(
+        context: TemplateSelectContext,
+        metamodel: EntityMetamodel<T, *, *>,
+        collect: suspend (Flow<T>) -> R,
+    ): VISIT_RESULT
 }

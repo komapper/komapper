@@ -55,6 +55,7 @@ import org.komapper.jdbc.dsl.runner.JdbcSchemaDropRunner
 import org.komapper.jdbc.dsl.runner.JdbcScriptExecuteRunner
 import org.komapper.jdbc.dsl.runner.JdbcSelectRunner
 import org.komapper.jdbc.dsl.runner.JdbcSetOperationRunner
+import org.komapper.jdbc.dsl.runner.JdbcTemplateEntityConversionSelectRunner
 import org.komapper.jdbc.dsl.runner.JdbcTemplateExecuteRunner
 import org.komapper.jdbc.dsl.runner.JdbcTemplateSelectRunner
 
@@ -586,7 +587,7 @@ object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
         metamodel: EntityMetamodel<ENTITY, *, *>,
         collect: suspend (Flow<ENTITY>) -> R,
     ): JdbcRunner<*> {
-        val transform = JdbcResultSetTransformers.intoEntity(metamodel)
+        val transform = JdbcResultSetTransformers.singleEntity(metamodel)
         return JdbcSelectRunner(context, transform, collect)
     }
 
@@ -595,7 +596,7 @@ object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
         metamodel: EntityMetamodel<ENTITY, *, *>,
         collect: suspend (Flow<ENTITY>) -> R,
     ): JdbcRunner<*> {
-        val transform = JdbcResultSetTransformers.intoEntity(metamodel)
+        val transform = JdbcResultSetTransformers.singleEntity(metamodel)
         return JdbcSetOperationRunner(context, transform, collect)
     }
 
@@ -724,5 +725,14 @@ object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
         collect: suspend (Flow<T>) -> R,
     ): JdbcRunner<R> {
         return JdbcTemplateSelectRunner(context, transform, collect)
+    }
+
+    override fun <T : Any, R> templateEntityConversionSelectQuery(
+        context: TemplateSelectContext,
+        metamodel: EntityMetamodel<T, *, *>,
+        collect: suspend (Flow<T>) -> R,
+    ): JdbcRunner<*> {
+        val transform = JdbcResultSetTransformers.singleEntity(metamodel)
+        return JdbcTemplateEntityConversionSelectRunner(context, transform, collect)
     }
 }
