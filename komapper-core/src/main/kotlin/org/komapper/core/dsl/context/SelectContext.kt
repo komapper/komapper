@@ -8,6 +8,7 @@ import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.expression.ForUpdateDeclaration
 import org.komapper.core.dsl.expression.HavingDeclaration
 import org.komapper.core.dsl.expression.SortItem
+import org.komapper.core.dsl.expression.SubqueryExpression
 import org.komapper.core.dsl.expression.TableExpression
 import org.komapper.core.dsl.expression.WhereDeclaration
 import org.komapper.core.dsl.metamodel.EntityMetamodel
@@ -18,6 +19,7 @@ import org.komapper.core.dsl.options.SelectOptions
 @ThreadSafe
 data class SelectContext<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     val target: META,
+    val derivedTable: SubqueryExpression<*>? = null,
     val with: With? = null,
     val select: List<ColumnExpression<*, *>> = listOf(),
     val joins: List<Join<*, *, *>> = listOf(),

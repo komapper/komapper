@@ -52,7 +52,7 @@ class RelationInsertSelectStatementBuilder<ENTITY : Any, ID : Any, META : Entity
                 { true }
             }
         }
-        val statement = support.buildSubqueryStatement(expression, predicate)
+        val statement = support.buildSubqueryStatement(expression.context, predicate)
         buf.append(statement)
     }
 }

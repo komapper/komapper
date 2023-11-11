@@ -311,3 +311,39 @@ data class IntPair(
     @KomapperId(virtual = true)
     val second: Int,
 )
+
+@KomapperEntity
+data class NameAndAmount(
+    @KomapperId(virtual = true)
+    val name: String,
+    val amount: BigDecimal,
+) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as NameAndAmount
+
+        if (name != other.name) return false
+        if (amount.compareTo(other.amount) != 0) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = name.hashCode()
+        result = 31 * result + amount.hashCode()
+        return result
+    }
+}
+
+@KomapperEntity
+data class EmployeeSalary(
+    @KomapperId(virtual = true)
+    val departmentId: Int,
+    @KomapperId(virtual = true)
+    val employeeName: String,
+    @KomapperId(virtual = true)
+    val salary: BigDecimal,
+    val averageSalary: BigDecimal,
+)

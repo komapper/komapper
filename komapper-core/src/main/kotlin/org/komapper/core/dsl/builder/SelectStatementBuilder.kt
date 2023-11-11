@@ -4,9 +4,12 @@ import org.komapper.core.BuilderDialect
 import org.komapper.core.Statement
 import org.komapper.core.StatementBuffer
 import org.komapper.core.dsl.context.SelectContext
+import org.komapper.core.dsl.context.SetOperationContext
+import org.komapper.core.dsl.context.SubqueryContext
 import org.komapper.core.dsl.element.InnerJoin
 import org.komapper.core.dsl.element.LeftJoin
 import org.komapper.core.dsl.expression.AggregateFunction
+import org.komapper.core.dsl.expression.AliasExpression
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.expression.Criterion
 import org.komapper.core.dsl.expression.LockOption
@@ -53,7 +56,7 @@ class SelectStatementBuilder(
                 }
                 buf.cutBack(2)
                 buf.append(") as (")
-                val statement = support.buildSubqueryStatement(subquery)
+                val statement = support.buildSubqueryStatement(subquery.context)
                 buf.append(statement)
                 buf.append("), ")
             }
@@ -83,7 +86,47 @@ class SelectStatementBuilder(
         }
 
         buf.append(" from ")
-        table(context.target)
+        if (context.derivedTable == null) {
+            table(context.target)
+        } else {
+            fun copySubqueryContext(subqueryContext: SubqueryContext): SubqueryContext {
+                return when (subqueryContext) {
+                    is SelectContext<*, *, *> -> {
+                        val properties = context.target.properties()
+                        val columns = subqueryContext.getProjection().expressions()
+                        val aliases = properties.zip(columns).map { (outer, inner) ->
+                            if (inner is AliasExpression) {
+                                error("The alias operand is found. Komapper does not allow the use of alias operand in derived tables.")
+                            } else {
+                                AliasExpression(inner, outer.columnName, outer.alwaysQuote)
+                            }
+                        }
+                        subqueryContext.copy(select = aliases)
+                    }
+
+                    is SetOperationContext -> {
+                        subqueryContext.copy(
+                            left = copySubqueryContext(subqueryContext.left),
+                            right = copySubqueryContext(subqueryContext.right),
+                        )
+                    }
+                }
+            }
+
+            val subqueryContext = copySubqueryContext(context.derivedTable.context)
+            val statement = support.buildSubqueryStatement(subqueryContext)
+            buf.append("(")
+            buf.append(statement)
+            buf.append(")")
+            val alias = aliasManager.getAlias(context.target)
+            if (!alias.isNullOrBlank()) {
+                if (dialect.supportsAsKeywordForTableAlias()) {
+                    buf.append(" as")
+                }
+                buf.append(" $alias")
+            }
+        }
+
         if (dialect.supportsTableHint() && context.forUpdate != null) {
             val scope = ForUpdateScope().apply(context.forUpdate)
             buf.append(" with (updlock, rowlock")
@@ -93,10 +136,12 @@ class SelectStatementBuilder(
                 } else {
                     throw UnsupportedOperationException("The dialect(driver=${dialect.driver}) does not support the nowait option. sql=$buf")
                 }
+
                 else -> Unit
             }
             buf.append(")")
         }
+
         if (context.joins.isNotEmpty()) {
             for (join in context.joins) {
                 when (join) {
@@ -203,6 +248,7 @@ class SelectStatementBuilder(
                             buf.cutBack(2)
                         }
                     }
+
                     dialect.supportsLockOfTables() -> {
                         if (lockTarget.metamodels.isNotEmpty()) {
                             buf.append(" of ")
@@ -213,6 +259,7 @@ class SelectStatementBuilder(
                             buf.cutBack(2)
                         }
                     }
+
                     else -> throw UnsupportedOperationException("The dialect(driver=${dialect.driver}) does not support the \"for update of\" syntax. sql=$buf")
                 }
             }
@@ -230,11 +277,13 @@ class SelectStatementBuilder(
             } else {
                 raiseError("nowait")
             }
+
             is LockOption.SkipLocked -> if (dialect.supportsLockOptionSkipLocked()) {
                 buf.append(" skip locked")
             } else {
                 raiseError("skip locked")
             }
+
             is LockOption.Wait -> if (dialect.supportsLockOptionWait()) {
                 buf.append(" wait ${lockOption.second}")
             } else {
@@ -280,6 +329,7 @@ internal class OrderByBuilderSupport(
                             is SortItem.Column.DescNullsLast -> descNullsLast(appendColumn)
                         }
                     }
+
                     is SortItem.Alias -> {
                         val appendColumn: () -> Unit = { buf.append(dialect.enquote(item.alias)) }
                         when (item) {
