@@ -179,4 +179,13 @@ internal data class RelationSelectQueryImpl<ENTITY : Any, ID : Any, META : Entit
         val newContext = support.select(*list.toTypedArray())
         return MultipleColumnsSelectQuery(newContext, list)
     }
+
+    override fun <ENTITY2 : Any> selectAsEntity(
+        metamodel: EntityMetamodel<ENTITY2, *, *>,
+        vararg expressions: ColumnExpression<*, *>,
+    ): FlowSubquery<ENTITY2> {
+        val list = expressions.toList()
+        val newContext = support.select(*list.toTypedArray())
+        return EntityConversionSelectQuery(newContext, metamodel)
+    }
 }

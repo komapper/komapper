@@ -404,6 +404,18 @@ interface QueryVisitor<VISIT_RESULT> {
         collect: suspend (Flow<Record>) -> R,
     ): VISIT_RESULT
 
+    fun <ENTITY : Any, R> entityConversionSelectQuery(
+        context: SelectContext<*, *, *>,
+        metamodel: EntityMetamodel<ENTITY, *, *>,
+        collect: suspend (Flow<ENTITY>) -> R,
+    ): VISIT_RESULT
+
+    fun <ENTITY : Any, R> entityConversionSetOperationQuery(
+        context: SetOperationContext,
+        metamodel: EntityMetamodel<ENTITY, *, *>,
+        collect: suspend (Flow<ENTITY>) -> R,
+    ): VISIT_RESULT
+
     fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>
     relationDeleteQuery(
         context: RelationDeleteContext<ENTITY, ID, META>,

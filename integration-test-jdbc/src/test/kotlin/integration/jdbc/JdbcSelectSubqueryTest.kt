@@ -7,7 +7,6 @@ import integration.core.nameAndAmount
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
-import org.komapper.core.dsl.operator.alias
 import org.komapper.core.dsl.operator.count
 import org.komapper.core.dsl.operator.literal
 import org.komapper.core.dsl.operator.max

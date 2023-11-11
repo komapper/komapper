@@ -248,4 +248,16 @@ interface SelectQuery<ENTITY, QUERY : SelectQuery<ENTITY, QUERY>> :
     fun selectAsRecord(
         vararg expressions: ColumnExpression<*, *>,
     ): FlowSubquery<Record>
+
+    /**
+     * Builds a query that selects multiple columns and transforms a row into an entity.
+     *
+     * The type, number, and order of [expressions] must match the constructor of the entity.
+     *
+     * @param ENTITY2 the entity type
+     * @param metamodel the entity metamodel
+     * @param expressions the column expressions
+     * @return the query that returns a list of entity
+     */
+    fun <ENTITY2 : Any> selectAsEntity(metamodel: EntityMetamodel<ENTITY2, *, *>, vararg expressions: ColumnExpression<*, *>): FlowSubquery<ENTITY2>
 }

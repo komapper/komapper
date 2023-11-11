@@ -90,4 +90,11 @@ internal object JdbcResultSetTransformers {
             val map = expressions.associateWith { extractor.execute(it) }
             RecordImpl(map)
         }
+
+    fun <ENTITY : Any> intoEntity(metamodel: EntityMetamodel<ENTITY, *, *>): (JdbcDataOperator, ResultSet) -> ENTITY =
+        { dataOperator, rs ->
+            val mapper = JdbcEntityMapper(dataOperator, rs)
+            val entity = mapper.execute(metamodel, true)
+            checkNotNull(entity)
+        }
 }

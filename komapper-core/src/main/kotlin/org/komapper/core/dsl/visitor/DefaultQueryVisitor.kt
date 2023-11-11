@@ -523,6 +523,22 @@ internal object DefaultQueryVisitor : QueryVisitor<Runner> {
         return SetOperationRunner(context)
     }
 
+    override fun <ENTITY : Any, R> entityConversionSelectQuery(
+        context: SelectContext<*, *, *>,
+        metamodel: EntityMetamodel<ENTITY, *, *>,
+        collect: suspend (Flow<ENTITY>) -> R,
+    ): Runner {
+        return SelectRunner(context)
+    }
+
+    override fun <ENTITY : Any, R> entityConversionSetOperationQuery(
+        context: SetOperationContext,
+        metamodel: EntityMetamodel<ENTITY, *, *>,
+        collect: suspend (Flow<ENTITY>) -> R,
+    ): Runner {
+        return SetOperationRunner(context)
+    }
+
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> relationDeleteQuery(
         context: RelationDeleteContext<ENTITY, ID, META>,
     ): Runner {
