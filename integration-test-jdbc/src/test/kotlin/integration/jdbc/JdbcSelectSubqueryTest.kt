@@ -86,8 +86,8 @@ class JdbcSelectSubqueryTest(private val db: JdbcDatabase) {
     fun subquery_as_derived_table_union() {
         val t = Meta.nameAndAmount
 
-        val q1 = QueryDsl.select(literal("one") alias "name", literal(BigDecimal.ONE) alias "amount")
-        val q2 = QueryDsl.select(literal("ten") alias "name", literal(BigDecimal.TEN) alias "amount")
+        val q1 = QueryDsl.select(literal("one"), literal(BigDecimal.ONE))
+        val q2 = QueryDsl.select(literal("ten"), literal(BigDecimal.TEN))
         val subquery = q1.union(q2)
 
         val query = QueryDsl.from(t, subquery).where { t.name eq "ten" }

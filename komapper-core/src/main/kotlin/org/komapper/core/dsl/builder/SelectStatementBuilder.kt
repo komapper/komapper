@@ -5,7 +5,7 @@ import org.komapper.core.Statement
 import org.komapper.core.StatementBuffer
 import org.komapper.core.dsl.context.SelectContext
 import org.komapper.core.dsl.context.SetOperationContext
-import org.komapper.core.dsl.context.columns
+import org.komapper.core.dsl.context.SubqueryContext
 import org.komapper.core.dsl.element.InnerJoin
 import org.komapper.core.dsl.element.LeftJoin
 import org.komapper.core.dsl.expression.AggregateFunction
@@ -89,17 +89,31 @@ class SelectStatementBuilder(
         if (context.derivedTable == null) {
             table(context.target)
         } else {
-            val subqueryContext = when (val subqueryContext = context.derivedTable.context) {
-                is SelectContext<*, *, *> -> {
-                    val aliases = context.target.properties().zip(subqueryContext.columns).map { (outer, inner) ->
-                        @Suppress("UNCHECKED_CAST")
-                        (AliasExpression(inner as ColumnExpression<Any, Any>, outer.columnName, outer.alwaysQuote))
+            fun copySubqueryContext(subqueryContext: SubqueryContext): SubqueryContext {
+                return when (subqueryContext) {
+                    is SelectContext<*, *, *> -> {
+                        val properties = context.target.properties()
+                        val columns = subqueryContext.getProjection().expressions()
+                        val aliases = properties.zip(columns).map { (outer, inner) ->
+                            if (inner is AliasExpression) {
+                                AliasExpression(inner.expression, outer.columnName, outer.alwaysQuote)
+                            } else {
+                                AliasExpression(inner, outer.columnName, outer.alwaysQuote)
+                            }
+                        }
+                        subqueryContext.copy(select = aliases)
                     }
-                    subqueryContext.copy(select = aliases)
-                }
 
-                is SetOperationContext -> subqueryContext
+                    is SetOperationContext -> {
+                        subqueryContext.copy(
+                            left = copySubqueryContext(subqueryContext.left),
+                            right = copySubqueryContext(subqueryContext.right),
+                        )
+                    }
+                }
             }
+
+            val subqueryContext = copySubqueryContext(context.derivedTable.context)
             val statement = support.buildSubqueryStatement(subqueryContext)
             buf.append("(")
             buf.append(statement)
@@ -122,10 +136,12 @@ class SelectStatementBuilder(
                 } else {
                     throw UnsupportedOperationException("The dialect(driver=${dialect.driver}) does not support the nowait option. sql=$buf")
                 }
+
                 else -> Unit
             }
             buf.append(")")
         }
+
         if (context.joins.isNotEmpty()) {
             for (join in context.joins) {
                 when (join) {
@@ -232,6 +248,7 @@ class SelectStatementBuilder(
                             buf.cutBack(2)
                         }
                     }
+
                     dialect.supportsLockOfTables() -> {
                         if (lockTarget.metamodels.isNotEmpty()) {
                             buf.append(" of ")
@@ -242,6 +259,7 @@ class SelectStatementBuilder(
                             buf.cutBack(2)
                         }
                     }
+
                     else -> throw UnsupportedOperationException("The dialect(driver=${dialect.driver}) does not support the \"for update of\" syntax. sql=$buf")
                 }
             }
@@ -259,11 +277,13 @@ class SelectStatementBuilder(
             } else {
                 raiseError("nowait")
             }
+
             is LockOption.SkipLocked -> if (dialect.supportsLockOptionSkipLocked()) {
                 buf.append(" skip locked")
             } else {
                 raiseError("skip locked")
             }
+
             is LockOption.Wait -> if (dialect.supportsLockOptionWait()) {
                 buf.append(" wait ${lockOption.second}")
             } else {
@@ -309,6 +329,7 @@ internal class OrderByBuilderSupport(
                             is SortItem.Column.DescNullsLast -> descNullsLast(appendColumn)
                         }
                     }
+
                     is SortItem.Alias -> {
                         val appendColumn: () -> Unit = { buf.append(dialect.enquote(item.alias)) }
                         when (item) {
