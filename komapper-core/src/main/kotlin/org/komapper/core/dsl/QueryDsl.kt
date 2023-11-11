@@ -86,6 +86,16 @@ object QueryDsl {
         return SelectQueryBuilderImpl(SelectContext(metamodel))
     }
 
+    /**
+     * Creates a SELECT query builder which uses a derived table.
+     *
+     * @param ENTITY the entity type
+     * @param ID the entity id type
+     * @param META the entity metamodel type
+     * @param metamodel the entity metamodel
+     * @param subquery the derived table
+     * @return the query builder
+     */
     fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> from(
         metamodel: META,
         subquery: SubqueryExpression<*>,
