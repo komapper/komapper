@@ -32,6 +32,7 @@ import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 @ExtendWith(JdbcEnv::class)
+@Run(unless = [Dbms.MYSQL_5])
 class JdbcSelectWindowFunctionTest(private val db: JdbcDatabase) {
 
     @Test
