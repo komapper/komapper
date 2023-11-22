@@ -142,15 +142,15 @@ internal object EmptyMetamodel : EntityMetamodel<Nothing, Nothing, EmptyMetamode
     }
 
     override fun postUpdate(e: Nothing): Nothing {
-        return e
+        throw UnsupportedOperationException()
     }
 
     override fun preUpdate(e: Nothing, c: Clock): Nothing {
-        return e
+        throw UnsupportedOperationException()
     }
 
     override fun preInsert(e: Nothing, c: Clock): Nothing {
-        return e
+        throw UnsupportedOperationException()
     }
 
     override fun extractId(e: Nothing): Nothing {
