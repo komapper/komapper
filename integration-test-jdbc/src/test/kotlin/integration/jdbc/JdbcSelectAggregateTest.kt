@@ -7,8 +7,10 @@ import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
 import org.komapper.core.dsl.operator.avg
 import org.komapper.core.dsl.operator.count
+import org.komapper.core.dsl.operator.literal
 import org.komapper.core.dsl.operator.max
 import org.komapper.core.dsl.operator.min
+import org.komapper.core.dsl.operator.plus
 import org.komapper.core.dsl.operator.sum
 import org.komapper.jdbc.JdbcDatabase
 import kotlin.test.Test
@@ -49,6 +51,27 @@ class JdbcSelectAggregateTest(private val db: JdbcDatabase) {
         val a = Meta.address
         val sum = db.runQuery { QueryDsl.from(a).select(sum(a.addressId)) }
         assertEquals(120, sum)
+    }
+
+    @Test
+    fun aggregate_sum_plus_value() {
+        val a = Meta.address
+        val sum = db.runQuery { QueryDsl.from(a).select(sum(a.addressId) + 1) }
+        assertEquals(121, sum)
+    }
+
+    @Test
+    fun aggregate_sum_plus_right_hand_side_literal() {
+        val a = Meta.address
+        val sum = db.runQuery { QueryDsl.from(a).select(sum(a.addressId) + literal(1)) }
+        assertEquals(121, sum)
+    }
+
+    @Test
+    fun aggregate_sum_plus_left_hand_side_literal() {
+        val a = Meta.address
+        val sum = db.runQuery { QueryDsl.from(a).select(literal(1) + sum(a.addressId)) }
+        assertEquals(121, sum)
     }
 
     @Test
