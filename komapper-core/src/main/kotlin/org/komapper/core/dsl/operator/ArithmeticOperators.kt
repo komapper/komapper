@@ -30,7 +30,7 @@ infix operator fun <T : Any, S : Number> ColumnExpression<T, S>.plus(other: Colu
 infix operator fun <T : Any, S : Number> ScalarExpression<T, S>.plus(value: T): ScalarExpression<T, S> {
     val left = Operand.Column(this)
     val right = Operand.Argument(this, value)
-    return ScalarArithmeticExpression(ArithmeticExpression.Plus(this, left, right), this)
+    return ScalarArithmeticExpression(ArithmeticExpression.Plus(this, left, right))
 }
 
 /**
@@ -39,7 +39,7 @@ infix operator fun <T : Any, S : Number> ScalarExpression<T, S>.plus(value: T): 
 infix operator fun <T : Any, S : Number> ScalarExpression<T, S>.plus(other: ColumnExpression<T, S>): ScalarExpression<T, S> {
     val left = Operand.Column(this)
     val right = Operand.Column(other)
-    return ScalarArithmeticExpression(ArithmeticExpression.Plus(this, left, right), this)
+    return ScalarArithmeticExpression(ArithmeticExpression.Plus(this, left, right))
 }
 
 /**
@@ -48,7 +48,7 @@ infix operator fun <T : Any, S : Number> ScalarExpression<T, S>.plus(other: Colu
 infix operator fun <T : Any, S : Number> ColumnExpression<T, S>.plus(other: ScalarExpression<T, S>): ScalarExpression<T, S> {
     val left = Operand.Column(this)
     val right = Operand.Column(other)
-    return ScalarArithmeticExpression(ArithmeticExpression.Plus(this, left, right), other)
+    return ScalarArithmeticExpression(ArithmeticExpression.Plus(this, left, right))
 }
 
 /**
@@ -75,7 +75,7 @@ infix operator fun <T : Any, S : Number> ColumnExpression<T, S>.minus(other: Col
 infix operator fun <T : Any, S : Number> ScalarExpression<T, S>.minus(value: T): ScalarExpression<T, S> {
     val left = Operand.Column(this)
     val right = Operand.Argument(this, value)
-    return ScalarArithmeticExpression(ArithmeticExpression.Minus(this, left, right), this)
+    return ScalarArithmeticExpression(ArithmeticExpression.Minus(this, left, right))
 }
 
 /**
@@ -84,7 +84,7 @@ infix operator fun <T : Any, S : Number> ScalarExpression<T, S>.minus(value: T):
 infix operator fun <T : Any, S : Number> ScalarExpression<T, S>.minus(other: ColumnExpression<T, S>): ScalarExpression<T, S> {
     val left = Operand.Column(this)
     val right = Operand.Column(other)
-    return ScalarArithmeticExpression(ArithmeticExpression.Minus(this, left, right), this)
+    return ScalarArithmeticExpression(ArithmeticExpression.Minus(this, left, right))
 }
 
 /**
@@ -93,7 +93,7 @@ infix operator fun <T : Any, S : Number> ScalarExpression<T, S>.minus(other: Col
 infix operator fun <T : Any, S : Number> ColumnExpression<T, S>.minus(other: ScalarExpression<T, S>): ScalarExpression<T, S> {
     val left = Operand.Column(this)
     val right = Operand.Column(other)
-    return ScalarArithmeticExpression(ArithmeticExpression.Minus(this, left, right), other)
+    return ScalarArithmeticExpression(ArithmeticExpression.Minus(this, left, right))
 }
 
 /**
@@ -120,7 +120,7 @@ infix operator fun <T : Any, S : Number> ColumnExpression<T, S>.times(other: Col
 infix operator fun <T : Any, S : Number> ScalarExpression<T, S>.times(value: T): ScalarExpression<T, S> {
     val left = Operand.Column(this)
     val right = Operand.Argument(this, value)
-    return ScalarArithmeticExpression(ArithmeticExpression.Times(this, left, right), this)
+    return ScalarArithmeticExpression(ArithmeticExpression.Times(this, left, right))
 }
 
 /**
@@ -129,7 +129,7 @@ infix operator fun <T : Any, S : Number> ScalarExpression<T, S>.times(value: T):
 infix operator fun <T : Any, S : Number> ScalarExpression<T, S>.times(other: ColumnExpression<T, S>): ScalarExpression<T, S> {
     val left = Operand.Column(this)
     val right = Operand.Column(other)
-    return ScalarArithmeticExpression(ArithmeticExpression.Times(this, left, right), this)
+    return ScalarArithmeticExpression(ArithmeticExpression.Times(this, left, right))
 }
 
 /**
@@ -138,7 +138,7 @@ infix operator fun <T : Any, S : Number> ScalarExpression<T, S>.times(other: Col
 infix operator fun <T : Any, S : Number> ColumnExpression<T, S>.times(other: ScalarExpression<T, S>): ScalarExpression<T, S> {
     val left = Operand.Column(this)
     val right = Operand.Column(other)
-    return ScalarArithmeticExpression(ArithmeticExpression.Times(this, left, right), other)
+    return ScalarArithmeticExpression(ArithmeticExpression.Times(this, left, right))
 }
 
 /**
@@ -165,7 +165,7 @@ infix operator fun <T : Any, S : Number> ColumnExpression<T, S>.div(other: Colum
 infix operator fun <T : Any, S : Number> ScalarExpression<T, S>.div(value: T): ScalarExpression<T, S> {
     val left = Operand.Column(this)
     val right = Operand.Argument(this, value)
-    return ScalarArithmeticExpression(ArithmeticExpression.Div(this, left, right), this)
+    return ScalarArithmeticExpression(ArithmeticExpression.Div(this, left, right))
 }
 
 /**
@@ -174,7 +174,7 @@ infix operator fun <T : Any, S : Number> ScalarExpression<T, S>.div(value: T): S
 infix operator fun <T : Any, S : Number> ScalarExpression<T, S>.div(other: ColumnExpression<T, S>): ScalarExpression<T, S> {
     val left = Operand.Column(this)
     val right = Operand.Column(other)
-    return ScalarArithmeticExpression(ArithmeticExpression.Div(this, left, right), this)
+    return ScalarArithmeticExpression(ArithmeticExpression.Div(this, left, right))
 }
 
 /**
@@ -183,7 +183,7 @@ infix operator fun <T : Any, S : Number> ScalarExpression<T, S>.div(other: Colum
 infix operator fun <T : Any, S : Number> ColumnExpression<T, S>.div(other: ScalarExpression<T, S>): ScalarExpression<T, S> {
     val left = Operand.Column(this)
     val right = Operand.Column(other)
-    return ScalarArithmeticExpression(ArithmeticExpression.Div(this, left, right), other)
+    return ScalarArithmeticExpression(ArithmeticExpression.Div(this, left, right))
 }
 
 /**
@@ -210,7 +210,7 @@ infix operator fun <T : Any, S : Number> ColumnExpression<T, S>.rem(other: Colum
 infix operator fun <T : Any, S : Number> ScalarExpression<T, S>.rem(value: T): ScalarExpression<T, S> {
     val left = Operand.Column(this)
     val right = Operand.Argument(this, value)
-    return ScalarArithmeticExpression(ArithmeticExpression.Mod(this, left, right), this)
+    return ScalarArithmeticExpression(ArithmeticExpression.Mod(this, left, right))
 }
 
 /**
@@ -219,7 +219,7 @@ infix operator fun <T : Any, S : Number> ScalarExpression<T, S>.rem(value: T): S
 infix operator fun <T : Any, S : Number> ScalarExpression<T, S>.rem(other: ColumnExpression<T, S>): ScalarExpression<T, S> {
     val left = Operand.Column(this)
     val right = Operand.Column(other)
-    return ScalarArithmeticExpression(ArithmeticExpression.Mod(this, left, right), this)
+    return ScalarArithmeticExpression(ArithmeticExpression.Mod(this, left, right))
 }
 
 /**
@@ -228,5 +228,5 @@ infix operator fun <T : Any, S : Number> ScalarExpression<T, S>.rem(other: Colum
 infix operator fun <T : Any, S : Number> ColumnExpression<T, S>.rem(other: ScalarExpression<T, S>): ScalarExpression<T, S> {
     val left = Operand.Column(this)
     val right = Operand.Column(other)
-    return ScalarArithmeticExpression(ArithmeticExpression.Mod(this, left, right), other)
+    return ScalarArithmeticExpression(ArithmeticExpression.Mod(this, left, right))
 }

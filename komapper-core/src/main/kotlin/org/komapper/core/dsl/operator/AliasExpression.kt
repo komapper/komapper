@@ -16,5 +16,5 @@ infix fun <T : Any, S : Any> ColumnExpression<T, S>.alias(alias: String): Column
  * Builds an alias expression.
  */
 infix fun <T : Any, S : Any> ScalarExpression<T, S>.alias(alias: String): ScalarExpression<T, S> {
-    return ScalarAliasExpression(AliasExpression(this, alias, true), this)
+    return ScalarAliasExpression(AliasExpression(this, alias, true))
 }

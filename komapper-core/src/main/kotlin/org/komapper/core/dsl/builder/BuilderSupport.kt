@@ -262,11 +262,11 @@ class BuilderSupport(
             }
 
             is ScalarAliasExpression -> {
-                visitAliasExpression(expression.aliasExpression)
+                visitAliasExpression(expression.expression)
             }
 
             is ScalarArithmeticExpression -> {
-                visitArithmeticExpression(expression.arithmeticExpression)
+                visitArithmeticExpression(expression.expression)
             }
 
             is ScalarQueryExpression<*, *, *> -> {
