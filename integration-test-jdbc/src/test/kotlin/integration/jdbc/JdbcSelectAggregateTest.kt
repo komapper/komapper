@@ -5,6 +5,7 @@ import integration.core.employee
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
+import org.komapper.core.dsl.operator.alias
 import org.komapper.core.dsl.operator.avg
 import org.komapper.core.dsl.operator.count
 import org.komapper.core.dsl.operator.literal
@@ -72,6 +73,13 @@ class JdbcSelectAggregateTest(private val db: JdbcDatabase) {
         val a = Meta.address
         val sum = db.runQuery { QueryDsl.from(a).select(literal(1) + sum(a.addressId)) }
         assertEquals(121, sum)
+    }
+
+    @Test
+    fun aggregate_sum_alias() {
+        val a = Meta.address
+        val sum = db.runQuery { QueryDsl.from(a).select(sum(a.addressId) alias "sum") }
+        assertEquals(120, sum)
     }
 
     @Test
