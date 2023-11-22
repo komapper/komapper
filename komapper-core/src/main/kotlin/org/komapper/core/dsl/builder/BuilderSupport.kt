@@ -30,6 +30,8 @@ import org.komapper.core.dsl.expression.PercentRank
 import org.komapper.core.dsl.expression.PropertyExpression
 import org.komapper.core.dsl.expression.Rank
 import org.komapper.core.dsl.expression.RowNumber
+import org.komapper.core.dsl.expression.ScalarAliasExpression
+import org.komapper.core.dsl.expression.ScalarArithmeticExpression
 import org.komapper.core.dsl.expression.ScalarExpression
 import org.komapper.core.dsl.expression.ScalarQueryExpression
 import org.komapper.core.dsl.expression.SqlBuilderScope
@@ -257,6 +259,14 @@ class BuilderSupport(
         when (expression) {
             is AggregateFunction<*, *> -> {
                 visitAggregateFunction(expression)
+            }
+
+            is ScalarAliasExpression -> {
+                visitAliasExpression(expression.expression)
+            }
+
+            is ScalarArithmeticExpression -> {
+                visitArithmeticExpression(expression.expression)
             }
 
             is ScalarQueryExpression<*, *, *> -> {
