@@ -38,7 +38,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        driver: [h2, mariadb, mysql, oracle, postgresql, sqlserver]
+        driver: [h2, mariadb, mysql, mysql5, oracle, postgresql, sqlserver]
     timeout-minutes: 15
 
     steps:
@@ -67,7 +67,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        driver: [h2, mariadb, mysql, oracle, postgresql, sqlserver]
+        driver: [h2, mariadb, mysql, mysql5, oracle, postgresql, sqlserver]
     timeout-minutes: 15
 
     steps:
