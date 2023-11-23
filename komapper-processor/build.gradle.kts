@@ -7,13 +7,12 @@ dependencies {
     implementation("com.google.devtools.ksp:symbol-processing-api:$kspFullVersion")
     testImplementation(project(":komapper-annotation"))
     testImplementation("com.google.devtools.ksp:symbol-processing:$kspFullVersion")
-    testImplementation("com.github.tschuchortdev:kotlin-compile-testing-ksp:1.5.0")
+    testImplementation("dev.zacsweers.kctfork:ksp:0.4.0")
 }
 
-tasks {
-    withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
-        kotlinOptions.freeCompilerArgs += listOf(
-            "-opt-in=org.komapper.annotation.KomapperExperimentalAssociation",
-        )
+kotlin {
+    compilerOptions {
+        optIn.add("org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi")
+        optIn.add("org.komapper.annotation.KomapperExperimentalAssociation")
     }
 }

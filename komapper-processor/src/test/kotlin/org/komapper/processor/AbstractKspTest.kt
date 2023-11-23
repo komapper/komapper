@@ -1,6 +1,7 @@
 package org.komapper.processor
 
 import com.google.devtools.ksp.processing.SymbolProcessorProvider
+import com.tschuchort.compiletesting.JvmCompilationResult
 import com.tschuchort.compiletesting.KotlinCompilation
 import com.tschuchort.compiletesting.SourceFile
 import com.tschuchort.compiletesting.kspIncremental
@@ -15,7 +16,7 @@ abstract class AbstractKspTest(private vararg val providers: SymbolProcessorProv
     @JvmField
     protected var tempDir: Path? = null
 
-    protected fun compile(@Language("kotlin") contents: String): KotlinCompilation.Result {
+    protected fun compile(@Language("kotlin") contents: String): JvmCompilationResult {
         val sourceFile = SourceFile.kotlin("source.kt", contents)
         val compilation = KotlinCompilation()
             .apply {
