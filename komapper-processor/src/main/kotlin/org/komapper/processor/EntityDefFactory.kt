@@ -24,6 +24,7 @@ internal class EntityDefFactory(
 
     fun create(): EntityDef {
         val table = annotationSupport.getTable(definitionSource)
+        val projection = annotationSupport.getProjection(definitionSource)
         val aggregateRoot = annotationSupport.getAggregateRoot(definitionSource)
         val associations = annotationSupport.getAssociations(definitionSource)
         validateAssociations(associations)
@@ -32,7 +33,7 @@ internal class EntityDefFactory(
         val leafProperties = allProperties.filterIsInstance<LeafPropertyDef>()
         validateCompositeProperties(compositeProperties)
         validateLeafProperties(leafProperties)
-        return EntityDef(definitionSource, table, aggregateRoot, associations, allProperties)
+        return EntityDef(definitionSource, table, projection, aggregateRoot, associations, allProperties)
     }
 
     private fun createAllProperties(): List<PropertyDef> {

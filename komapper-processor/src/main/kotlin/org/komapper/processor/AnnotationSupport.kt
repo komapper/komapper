@@ -19,6 +19,7 @@ import org.komapper.annotation.KomapperLink
 import org.komapper.annotation.KomapperManyToOne
 import org.komapper.annotation.KomapperOneToMany
 import org.komapper.annotation.KomapperOneToOne
+import org.komapper.annotation.KomapperProjection
 import org.komapper.annotation.KomapperTable
 import org.komapper.core.NamingStrategy
 
@@ -39,6 +40,18 @@ internal class AnnotationSupport(
         val alwaysQuote =
             annotation?.findValue("alwaysQuote")?.toString()?.toBooleanStrict() ?: config.alwaysQuote
         return Table(name, catalog, schema, alwaysQuote)
+    }
+
+    fun getProjection(definitionSource: EntityDefinitionSource): Projection? {
+        val defaultFunction = "selectAs${definitionSource.entityDeclaration.simpleName.asString()}"
+        val annotation = definitionSource.defDeclaration.findAnnotation(KomapperProjection::class)
+        return if (annotation == null) {
+            if (config.enableEntityProjection) Projection(defaultFunction) else null
+        } else {
+            annotation.findValue("function")?.toString()?.trim()
+                .let { if (it.isNullOrBlank()) defaultFunction else it }
+                .let { Projection(it) }
+        }
     }
 
     fun getAggregateRoot(definitionSource: EntityDefinitionSource): AggregateRoot? {
@@ -94,6 +107,7 @@ internal class AnnotationSupport(
                                         "@KomapperLink.source \"$it\" is invalid. It must be one of ${sourceEntity.names}.",
                                         node,
                                     )
+
                                 else -> it
                             }
                         }
@@ -105,12 +119,14 @@ internal class AnnotationSupport(
                                         "@KomapperLink.target \"$it\" is invalid. It must be one of ${targetEntity.names}.",
                                         node,
                                     )
+
                                 else -> it
                             }
                         }
                         Link(source, target)
                     }
                 }
+
                 else -> null
             }
         } ?: report("Cannot get a value from the link property", annotation)
@@ -132,6 +148,7 @@ internal class AnnotationSupport(
                         null
                     }
                 }
+
                 KomapperEntityDef::class.simpleName -> {
                     try {
                         separateDefinitionSourceResolver.resolve(declaration)
@@ -139,6 +156,7 @@ internal class AnnotationSupport(
                         null
                     }
                 }
+
                 else -> null
             }
         }
@@ -164,10 +182,16 @@ internal class AnnotationSupport(
             when {
                 classDeclaration == null ->
                     report("The alternateType property is illegal.", columnAnnotation)
+
                 classDeclaration.qualifiedName?.asString() == Symbols.Void ->
                     null
+
                 !classDeclaration.isValueClass() ->
-                    report("The alternateType property must be a value class. ${classDeclaration.qualifiedName?.asString()}", columnAnnotation)
+                    report(
+                        "The alternateType property must be a value class. ${classDeclaration.qualifiedName?.asString()}",
+                        columnAnnotation,
+                    )
+
                 else -> {
                     val constructor = classDeclaration.primaryConstructor
                     val isPublic = constructor?.isPublic() ?: false
@@ -179,8 +203,9 @@ internal class AnnotationSupport(
                     }
                     val parameter = constructor?.parameters?.firstOrNull()
                         ?: error("No parameter is found in the class \"${classDeclaration.qualifiedName?.asString()}\"")
-                    val declaration = classDeclaration.getDeclaredProperties().firstOrNull { it.simpleName == parameter.name }
-                        ?: error("No property is found in the class \"${classDeclaration.qualifiedName?.asString()}\"")
+                    val declaration =
+                        classDeclaration.getDeclaredProperties().firstOrNull { it.simpleName == parameter.name }
+                            ?: error("No property is found in the class \"${classDeclaration.qualifiedName?.asString()}\"")
                     if (!declaration.isPublic()) {
                         report(
                             "The property parameter of \"${classDeclaration.qualifiedName?.asString()}\" must be public.",
@@ -237,6 +262,7 @@ internal class AnnotationSupport(
                     ?: report("The hint property is missing", annotation)
                 EnumStrategy.Property(hint, annotation)
             }
+
             else -> config.enumStrategy
         }
     }

@@ -42,4 +42,7 @@ internal object Symbols {
     const val EntityStore = "org.komapper.core.dsl.query.EntityStore"
     const val EntityStoreContext = "org.komapper.core.dsl.query.EntityStoreContext"
     const val KomapperExperimentalAssociation = "org.komapper.annotation.KomapperExperimentalAssociation"
+    const val SelectQuery = "org.komapper.core.dsl.query.SelectQuery"
+    const val FlowSubquery = "org.komapper.core.dsl.query.FlowSubquery"
+    const val ColumnExpression = "org.komapper.core.dsl.expression.ColumnExpression"
 }

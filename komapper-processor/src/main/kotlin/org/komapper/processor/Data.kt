@@ -25,6 +25,7 @@ internal data class EntityDefinitionSource(
 internal data class EntityDef(
     val definitionSource: EntityDefinitionSource,
     val table: Table,
+    val projection: Projection?,
     val aggregateRoot: AggregateRoot?,
     val associations: List<Association>,
     val properties: List<PropertyDef>,
@@ -53,6 +54,7 @@ internal data class CompositePropertyDef(
 internal data class Entity(
     val declaration: KSClassDeclaration,
     val table: Table,
+    val projection: Projection?,
     val aggregateRoot: AggregateRoot?,
     val associations: List<Association>,
     val properties: List<Property>,
@@ -281,4 +283,8 @@ internal data class AggregateRoot(
     val navigator: String,
     val targetEntity: EntityDefinitionSource,
     val target: String,
+)
+
+internal data class Projection(
+    val function: String,
 )

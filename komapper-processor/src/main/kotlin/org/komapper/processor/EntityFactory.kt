@@ -55,6 +55,7 @@ internal class EntityFactory(
         return Entity(
             entityDef.definitionSource.entityDeclaration,
             entityDef.table,
+            entityDef.projection,
             entityDef.aggregateRoot,
             entityDef.associations,
             properties,
