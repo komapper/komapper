@@ -14,6 +14,7 @@ internal data class Config(
     val alwaysQuote: Boolean,
     val enableEntityMetamodelListing: Boolean,
     val enableEntityStoreContext: Boolean,
+    val enableEntityProjection: Boolean,
 ) {
     companion object {
         private const val PREFIX = "komapper.prefix"
@@ -24,6 +25,7 @@ internal data class Config(
         private const val ALWAYS_QUOTE = "komapper.alwaysQuote"
         private const val ENABLE_ENTITY_METAMODEL_LISTING = "komapper.enableEntityMetamodelListing"
         private const val ENABLE_ENTITY_STORE_CONTEXT = "komapper.enableEntityStoreContext"
+        private const val ENABLE_ENTITY_PROJECTION = "komapper.enableEntityProjection"
 
         fun create(options: Map<String, String>): Config {
             val prefix = options.getOrDefault(PREFIX, "_")
@@ -48,7 +50,18 @@ internal data class Config(
             val alwaysQuote = options[ALWAYS_QUOTE]?.toBooleanStrict() ?: false
             val enableEntityMetamodelListing = options[ENABLE_ENTITY_METAMODEL_LISTING]?.toBooleanStrict() ?: false
             val enableEntityStoreContext = options[ENABLE_ENTITY_STORE_CONTEXT]?.toBooleanStrict() ?: false
-            return Config(prefix, suffix, enumStrategy, namingStrategy, metaObject, alwaysQuote, enableEntityMetamodelListing, enableEntityStoreContext)
+            val enableEntityProjection = options[ENABLE_ENTITY_PROJECTION]?.toBooleanStrict() ?: false
+            return Config(
+                prefix,
+                suffix,
+                enumStrategy,
+                namingStrategy,
+                metaObject,
+                alwaysQuote,
+                enableEntityMetamodelListing,
+                enableEntityStoreContext,
+                enableEntityProjection,
+            )
         }
     }
 }

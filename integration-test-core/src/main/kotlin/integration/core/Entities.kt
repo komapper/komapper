@@ -14,6 +14,7 @@ import org.komapper.annotation.KomapperLink
 import org.komapper.annotation.KomapperManyToOne
 import org.komapper.annotation.KomapperOneToMany
 import org.komapper.annotation.KomapperOneToOne
+import org.komapper.annotation.KomapperProjection
 import org.komapper.annotation.KomapperSequence
 import org.komapper.annotation.KomapperTable
 import org.komapper.annotation.KomapperUpdatedAt
@@ -26,6 +27,7 @@ import java.time.LocalDateTime
 import java.time.OffsetDateTime
 
 @KomapperEntity
+@KomapperProjection
 data class Address(
     @KomapperId
     @KomapperColumn(name = "address_id")
@@ -128,7 +130,11 @@ data class Human(
 @KomapperManyToOne(Department::class)
 @KomapperOneToOne(Address::class)
 @KomapperManyToOne(Employee::class, link = KomapperLink(target = "manager"))
-@KomapperOneToMany(Employee::class, navigator = "employees", link = KomapperLink(source = "manager", target = "employee"))
+@KomapperOneToMany(
+    Employee::class,
+    navigator = "employees",
+    link = KomapperLink(source = "manager", target = "employee"),
+)
 @KomapperEntity(["employee", "manager"])
 data class Employee(
     @KomapperId
@@ -155,6 +161,7 @@ data class RobotInfo2(
 )
 
 @KomapperEntity
+@KomapperProjection
 @KomapperTable("employee")
 data class Robot(
     @KomapperId

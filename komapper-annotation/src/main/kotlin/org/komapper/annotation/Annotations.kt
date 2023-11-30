@@ -22,6 +22,18 @@ annotation class KomapperEntity(
 )
 
 /**
+ * Indicates that the result of a SELECT query can be projected into an instance of an annotated entity class.
+ *
+ * @property function the function name for performing projection.
+ * The default function name is a concatenation of "selectAs" and the simple name of the entity class.
+ */
+@Target(AnnotationTarget.CLASS)
+@Retention(AnnotationRetention.SOURCE)
+annotation class KomapperProjection(
+    val function: String = "",
+)
+
+/**
  * Indicates that the annotated property is a primary key.
  * @property virtual If `true`, the annotated property does not actually map to a primary key
  */
@@ -237,6 +249,7 @@ annotation class KomapperAutoIncrement
  * @property entity the entity class
  * @property aliases the names of the entity metamodel instances
  * @property unit the unit object class
+ * @property projectable whether it is possible to project the results of the SELECT statement onto an entity
  */
 @Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.SOURCE)
@@ -244,6 +257,7 @@ annotation class KomapperEntityDef(
     val entity: KClass<*>,
     val aliases: Array<String> = [],
     val unit: KClass<*> = Void::class,
+    val projectable: Boolean = false,
 )
 
 /**

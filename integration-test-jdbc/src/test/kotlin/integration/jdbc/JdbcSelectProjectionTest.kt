@@ -4,6 +4,8 @@ import integration.core.Address
 import integration.core.address
 import integration.core.department
 import integration.core.employee
+import integration.core.selectAsAddress
+import integration.core.selectAsRobot
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
@@ -294,6 +296,79 @@ class JdbcSelectProjectionTest(private val db: JdbcDatabase) {
         val q2 = QueryDsl.from(e)
             .where { e.employeeName startsWith "T" }
             .selectAsEntity(a, e.employeeId, concat(e.employeeName, " STREET"), e.version)
+
+        val list = db.runQuery(q1.union(q2).orderBy(e.employeeId))
+        val expected = listOf(
+            Address(1, "SMITH STREET", 1),
+            Address(8, "SCOTT STREET", 1),
+            Address(10, "TURNER STREET", 1),
+        )
+        assertEquals(expected, list)
+    }
+
+    @Test
+    fun selectAsEntity_typeSafe() {
+        val e = Meta.employee
+
+        val query = QueryDsl.from(e)
+            .where { e.employeeName startsWith "S" }
+            .selectAsAddress(
+                version = e.version,
+                addressId = e.employeeId,
+                street = concat(e.employeeName, " STREET"),
+            )
+
+        val list = db.runQuery(query)
+        val expected = listOf(
+            Address(1, "SMITH STREET", 1),
+            Address(8, "SCOTT STREET", 1),
+        )
+        assertEquals(expected, list)
+    }
+
+    @Test
+    fun selectAsEntity_typeSafe_embeddable() {
+        val e = Meta.employee
+
+        val query = QueryDsl.from(e)
+            .where { e.employeeName startsWith "S" }
+            .orderBy(e.employeeName)
+            .selectAsRobot(
+                employeeId = e.employeeId,
+                addressId = e.addressId,
+                version = e.version,
+                departmentId = e.departmentId,
+                `info1#employeeName` = e.employeeName,
+                `info1#employeeNo` = e.employeeNo,
+                `info2#hiredate` = e.hiredate,
+                `info2#salary` = e.salary,
+                managerId = e.managerId,
+            )
+
+        val list = db.runQuery(query)
+        assertEquals(2, list.size)
+        assertEquals("SCOTT", list[0].info1.employeeName)
+        assertEquals("SMITH", list[1].info1.employeeName)
+    }
+
+    @Test
+    fun selectAsEntity_union_typeSafe() {
+        val e = Meta.employee
+
+        val q1 = QueryDsl.from(e)
+            .where { e.employeeName startsWith "S" }
+            .selectAsAddress(
+                version = e.version,
+                addressId = e.employeeId,
+                street = concat(e.employeeName, " STREET"),
+            )
+        val q2 = QueryDsl.from(e)
+            .where { e.employeeName startsWith "T" }
+            .selectAsAddress(
+                street = concat(e.employeeName, " STREET"),
+                version = e.version,
+                addressId = e.employeeId,
+            )
 
         val list = db.runQuery(q1.union(q2).orderBy(e.employeeId))
         val expected = listOf(

@@ -5,6 +5,7 @@ import com.google.devtools.ksp.symbol.Nullability
 import org.komapper.processor.Symbols.Argument
 import org.komapper.processor.Symbols.AutoIncrement
 import org.komapper.processor.Symbols.Clock
+import org.komapper.processor.Symbols.ColumnExpression
 import org.komapper.processor.Symbols.ConcurrentHashMap
 import org.komapper.processor.Symbols.EmbeddableMetamodel
 import org.komapper.processor.Symbols.EmbeddedMetamodel
@@ -17,6 +18,7 @@ import org.komapper.processor.Symbols.EntityMetamodelImplementor
 import org.komapper.processor.Symbols.EntityStore
 import org.komapper.processor.Symbols.EntityStoreContext
 import org.komapper.processor.Symbols.EnumMappingException
+import org.komapper.processor.Symbols.FlowSubquery
 import org.komapper.processor.Symbols.IdContext
 import org.komapper.processor.Symbols.IdGenerator
 import org.komapper.processor.Symbols.Instant
@@ -28,6 +30,7 @@ import org.komapper.processor.Symbols.Operand
 import org.komapper.processor.Symbols.PropertyDescriptor
 import org.komapper.processor.Symbols.PropertyMetamodel
 import org.komapper.processor.Symbols.PropertyMetamodelImpl
+import org.komapper.processor.Symbols.SelectQuery
 import org.komapper.processor.Symbols.Sequence
 import org.komapper.processor.Symbols.UUID
 import org.komapper.processor.Symbols.checkMetamodelVersion
@@ -129,6 +132,7 @@ internal class EntityMetamodelGenerator(
         associations()
         aggregationRoot()
         factory()
+        projection()
     }
 
     private fun importStatements() {
@@ -728,6 +732,30 @@ internal class EntityMetamodelGenerator(
         w.println("@$EntityMetamodelFactory")
         w.println("class ${simpleName}_Factory: $EntityMetamodelFactorySpi {")
         w.println("    override fun create() = listOf(${aliases.joinToString { "$unitTypeName to $simpleName.`$it`" }})")
+        w.println("}")
+        w.println()
+    }
+
+    private fun projection() {
+        if (entity.projection == null) return
+        val function = entity.projection.function
+        val params = entity.properties.flatMap { p ->
+            when (p) {
+                is CompositeProperty -> {
+                    p.embeddable.properties.map {
+                        "`$p#$it`" to "$ColumnExpression<${it.exteriorTypeName}, ${it.interiorTypeName}>"
+                    }
+                }
+                is LeafProperty -> {
+                    listOf("`$p`" to "$ColumnExpression<${p.exteriorTypeName}, ${p.interiorTypeName}>")
+                }
+            }
+        }
+        val paramList = params.joinToString(",\n        ", prefix = "\n        ") { "${it.first}: ${it.second}" }
+        val argList = params.joinToString(",\n        ", prefix = "\n        ") { it.first }
+        w.println("fun <E, Q: $SelectQuery<E, Q>> $SelectQuery<E, Q>.$function($paramList")
+        w.println("    ): $FlowSubquery<$entityTypeName> {")
+        w.println("    return selectAsEntity($unitTypeName.`${aliases.first()}`,$argList)")
         w.println("}")
         w.println()
     }
