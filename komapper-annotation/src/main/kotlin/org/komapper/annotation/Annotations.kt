@@ -249,7 +249,6 @@ annotation class KomapperAutoIncrement
  * @property entity the entity class
  * @property aliases the names of the entity metamodel instances
  * @property unit the unit object class
- * @property projectable whether it is possible to project the results of the SELECT statement onto an entity
  */
 @Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.SOURCE)
@@ -257,7 +256,6 @@ annotation class KomapperEntityDef(
     val entity: KClass<*>,
     val aliases: Array<String> = [],
     val unit: KClass<*> = Void::class,
-    val projectable: Boolean = false,
 )
 
 /**
