@@ -7,21 +7,21 @@ import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.visitor.FlowQueryVisitor
 import org.komapper.core.dsl.visitor.QueryVisitor
 
-internal class EntityConversionSelectQuery<ENTITY : Any>(
+internal class EntityProjectionSelectQuery<ENTITY : Any>(
     override val context: SelectContext<*, *, *>,
     private val metamodel: EntityMetamodel<ENTITY, *, *>,
 ) : FlowSubquery<ENTITY> {
 
     private val support: FlowSubquerySupport<ENTITY> =
-        FlowSubquerySupport(context) { EntityConversionSetOperationQuery(it, metamodel) }
+        FlowSubquerySupport(context) { EntityProjectionSetOperationQuery(it, metamodel) }
 
     override fun <VISIT_RESULT> accept(visitor: FlowQueryVisitor<VISIT_RESULT>): VISIT_RESULT {
-        return visitor.entityConversionSelectQuery(context, metamodel)
+        return visitor.entityProjectionSelectQuery(context, metamodel)
     }
 
     override fun <R> collect(collect: suspend (Flow<ENTITY>) -> R): Query<R> = object : Query<R> {
         override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
-            return visitor.entityConversionSelectQuery(context, metamodel, collect)
+            return visitor.entityProjectionSelectQuery(context, metamodel, collect)
         }
     }
 

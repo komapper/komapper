@@ -92,12 +92,12 @@ interface FlowQueryVisitor<VISIT_RESULT> {
         expressions: List<ColumnExpression<*, *>>,
     ): VISIT_RESULT
 
-    fun <ENTITY : Any> entityConversionSelectQuery(
+    fun <ENTITY : Any> entityProjectionSelectQuery(
         context: SelectContext<*, *, *>,
         metamodel: EntityMetamodel<ENTITY, *, *>,
     ): VISIT_RESULT
 
-    fun <ENTITY : Any> entityConversionSetOperationQuery(
+    fun <ENTITY : Any> entityProjectionSetOperationQuery(
         context: SetOperationContext,
         metamodel: EntityMetamodel<ENTITY, *, *>,
     ): VISIT_RESULT
@@ -107,7 +107,7 @@ interface FlowQueryVisitor<VISIT_RESULT> {
         transform: (Row) -> T,
     ): VISIT_RESULT
 
-    fun <T : Any> templateEntityConversionSelectQuery(
+    fun <T : Any> templateEntityProjectionSelectQuery(
         context: TemplateSelectContext,
         metamodel: EntityMetamodel<T, *, *>,
     ): VISIT_RESULT

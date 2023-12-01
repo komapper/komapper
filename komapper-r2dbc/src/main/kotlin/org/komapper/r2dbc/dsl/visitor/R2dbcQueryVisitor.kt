@@ -55,7 +55,7 @@ import org.komapper.r2dbc.dsl.runner.R2dbcSchemaDropRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcScriptExecuteRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcSelectRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcSetOperationRunner
-import org.komapper.r2dbc.dsl.runner.R2dbcTemplateEntityConversionSelectRunner
+import org.komapper.r2dbc.dsl.runner.R2dbcTemplateEntityProjectionSelectRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcTemplateExecuteRunner
 import org.komapper.r2dbc.dsl.runner.R2dbcTemplateSelectRunner
 
@@ -578,7 +578,7 @@ object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
         return R2dbcSetOperationRunner(context, transform, collect)
     }
 
-    override fun <ENTITY : Any, R> entityConversionSelectQuery(
+    override fun <ENTITY : Any, R> entityProjectionSelectQuery(
         context: SelectContext<*, *, *>,
         metamodel: EntityMetamodel<ENTITY, *, *>,
         collect: suspend (Flow<ENTITY>) -> R,
@@ -587,7 +587,7 @@ object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
         return R2dbcSelectRunner(context, transform, collect)
     }
 
-    override fun <ENTITY : Any, R> entityConversionSetOperationQuery(
+    override fun <ENTITY : Any, R> entityProjectionSetOperationQuery(
         context: SetOperationContext,
         metamodel: EntityMetamodel<ENTITY, *, *>,
         collect: suspend (Flow<ENTITY>) -> R,
@@ -723,12 +723,12 @@ object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
         return R2dbcTemplateSelectRunner(context, transform, collect)
     }
 
-    override fun <T : Any, R> templateEntityConversionSelectQuery(
+    override fun <T : Any, R> templateEntityProjectionSelectQuery(
         context: TemplateSelectContext,
         metamodel: EntityMetamodel<T, *, *>,
         collect: suspend (Flow<T>) -> R,
     ): R2dbcRunner<*> {
         val transform = R2dbcRowTransformers.singleEntity(metamodel)
-        return R2dbcTemplateEntityConversionSelectRunner(context, transform, collect)
+        return R2dbcTemplateEntityProjectionSelectRunner(context, transform, collect)
     }
 }

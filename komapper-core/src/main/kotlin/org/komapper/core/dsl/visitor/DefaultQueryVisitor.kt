@@ -523,7 +523,7 @@ internal object DefaultQueryVisitor : QueryVisitor<Runner> {
         return SetOperationRunner(context)
     }
 
-    override fun <ENTITY : Any, R> entityConversionSelectQuery(
+    override fun <ENTITY : Any, R> entityProjectionSelectQuery(
         context: SelectContext<*, *, *>,
         metamodel: EntityMetamodel<ENTITY, *, *>,
         collect: suspend (Flow<ENTITY>) -> R,
@@ -531,7 +531,7 @@ internal object DefaultQueryVisitor : QueryVisitor<Runner> {
         return SelectRunner(context)
     }
 
-    override fun <ENTITY : Any, R> entityConversionSetOperationQuery(
+    override fun <ENTITY : Any, R> entityProjectionSetOperationQuery(
         context: SetOperationContext,
         metamodel: EntityMetamodel<ENTITY, *, *>,
         collect: suspend (Flow<ENTITY>) -> R,
@@ -652,7 +652,7 @@ internal object DefaultQueryVisitor : QueryVisitor<Runner> {
         return TemplateSelectRunner(context)
     }
 
-    override fun <T : Any, R> templateEntityConversionSelectQuery(
+    override fun <T : Any, R> templateEntityProjectionSelectQuery(
         context: TemplateSelectContext,
         metamodel: EntityMetamodel<T, *, *>,
         collect: suspend (Flow<T>) -> R,

@@ -186,6 +186,6 @@ internal data class RelationSelectQueryImpl<ENTITY : Any, ID : Any, META : Entit
     ): FlowSubquery<ENTITY2> {
         val list = expressions.toList()
         val newContext = support.select(*list.toTypedArray())
-        return EntityConversionSelectQuery(newContext, metamodel)
+        return EntityProjectionSelectQuery(newContext, metamodel)
     }
 }

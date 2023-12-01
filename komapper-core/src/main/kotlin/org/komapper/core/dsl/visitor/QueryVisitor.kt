@@ -404,13 +404,13 @@ interface QueryVisitor<VISIT_RESULT> {
         collect: suspend (Flow<Record>) -> R,
     ): VISIT_RESULT
 
-    fun <ENTITY : Any, R> entityConversionSelectQuery(
+    fun <ENTITY : Any, R> entityProjectionSelectQuery(
         context: SelectContext<*, *, *>,
         metamodel: EntityMetamodel<ENTITY, *, *>,
         collect: suspend (Flow<ENTITY>) -> R,
     ): VISIT_RESULT
 
-    fun <ENTITY : Any, R> entityConversionSetOperationQuery(
+    fun <ENTITY : Any, R> entityProjectionSetOperationQuery(
         context: SetOperationContext,
         metamodel: EntityMetamodel<ENTITY, *, *>,
         collect: suspend (Flow<ENTITY>) -> R,
@@ -515,7 +515,7 @@ interface QueryVisitor<VISIT_RESULT> {
         collect: suspend (Flow<T>) -> R,
     ): VISIT_RESULT
 
-    fun <T : Any, R> templateEntityConversionSelectQuery(
+    fun <T : Any, R> templateEntityProjectionSelectQuery(
         context: TemplateSelectContext,
         metamodel: EntityMetamodel<T, *, *>,
         collect: suspend (Flow<T>) -> R,

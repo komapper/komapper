@@ -9,7 +9,7 @@ import org.komapper.core.dsl.options.SelectOptions
 import org.komapper.core.dsl.visitor.FlowQueryVisitor
 import org.komapper.core.dsl.visitor.QueryVisitor
 
-internal data class EntityConversionSetOperationQuery<ENTITY : Any>(
+internal data class EntityProjectionSetOperationQuery<ENTITY : Any>(
     override val context: SetOperationContext,
     private val metamodel: EntityMetamodel<ENTITY, *, *>,
 ) : FlowSetOperationQuery<ENTITY> {
@@ -17,12 +17,12 @@ internal data class EntityConversionSetOperationQuery<ENTITY : Any>(
     private val support: SetOperationQuerySupport<ENTITY> = SetOperationQuerySupport(context)
 
     override fun <VISIT_RESULT> accept(visitor: FlowQueryVisitor<VISIT_RESULT>): VISIT_RESULT {
-        return visitor.entityConversionSetOperationQuery(context, metamodel)
+        return visitor.entityProjectionSetOperationQuery(context, metamodel)
     }
 
     override fun <R> collect(collect: suspend (Flow<ENTITY>) -> R): Query<R> = object : Query<R> {
         override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
-            return visitor.entityConversionSetOperationQuery(context, metamodel, collect)
+            return visitor.entityProjectionSetOperationQuery(context, metamodel, collect)
         }
     }
 

@@ -59,6 +59,6 @@ internal data class TemplateSelectQueryBuilderImpl(
     }
 
     override fun <ENTITY : Any> selectAsEntity(metamodel: EntityMetamodel<ENTITY, *, *>): TemplateSelectQuery<ENTITY> {
-        return TemplateEntityConversionSelectQuery(context, metamodel)
+        return TemplateEntityProjectionSelectQuery(context, metamodel)
     }
 }

@@ -10,7 +10,7 @@ import org.komapper.r2dbc.R2dbcDataOperator
 import org.komapper.r2dbc.R2dbcDatabaseConfig
 import org.komapper.r2dbc.R2dbcExecutor
 
-internal class R2dbcTemplateEntityConversionSelectFlowBuilder<T>(
+internal class R2dbcTemplateEntityProjectionSelectFlowBuilder<T>(
     private val context: TemplateSelectContext,
     private val transform: (R2dbcDataOperator, Row) -> T,
 ) : R2dbcFlowBuilder<T> {
