@@ -112,8 +112,7 @@ class JdbcInsertBatchTest(private val db: JdbcDatabase) {
         val query = QueryDsl.insert(d).onDuplicateKeyUpdate().batch(department1, department2)
         val counts = db.runQuery { query }
         when (db.config.dialect.driver) {
-            "mariadb" -> assertEquals(listOf(Statement.SUCCESS_NO_INFO.toLong(), Statement.SUCCESS_NO_INFO.toLong()), counts)
-            "mysql" -> assertEquals(listOf(1L, 2L), counts)
+            "mariadb", "mysql" -> assertEquals(listOf(1L, 2L), counts)
             else -> assertEquals(listOf(1L, 1L), counts)
         }
         val list = db.runQuery {
@@ -134,8 +133,7 @@ class JdbcInsertBatchTest(private val db: JdbcDatabase) {
         val query = QueryDsl.insert(d).onDuplicateKeyUpdate(d.departmentNo).batch(department1, department2)
         val counts = db.runQuery { query }
         when (db.config.dialect.driver) {
-            "mariadb" -> assertEquals(listOf(Statement.SUCCESS_NO_INFO.toLong(), Statement.SUCCESS_NO_INFO.toLong()), counts)
-            "mysql" -> assertEquals(listOf(1L, 2L), counts)
+            "mariadb", "mysql" -> assertEquals(listOf(1L, 2L), counts)
             else -> assertEquals(listOf(1L, 1L), counts)
         }
         val list = db.runQuery {
