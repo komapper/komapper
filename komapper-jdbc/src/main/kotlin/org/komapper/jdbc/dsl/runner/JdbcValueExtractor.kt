@@ -5,12 +5,25 @@ import org.komapper.core.dsl.runner.ValueExtractor
 import org.komapper.jdbc.JdbcDataOperator
 import java.sql.ResultSet
 
-internal class JdbcValueExtractor(private val dataOperator: JdbcDataOperator, private val resultSet: ResultSet) {
+internal interface JdbcValueExtractor {
+    fun <EXTERIOR : Any, INTERIOR : Any> execute(expression: ColumnExpression<EXTERIOR, INTERIOR>): EXTERIOR?
+}
+
+internal class JdbcIndexedValueExtractor(private val dataOperator: JdbcDataOperator, private val resultSet: ResultSet) : JdbcValueExtractor {
     private var index = 0
 
-    fun <EXTERIOR : Any, INTERIOR : Any> execute(expression: ColumnExpression<EXTERIOR, INTERIOR>): EXTERIOR? {
-        return ValueExtractor.execute(expression, index) {
+    override fun <EXTERIOR : Any, INTERIOR : Any> execute(expression: ColumnExpression<EXTERIOR, INTERIOR>): EXTERIOR? {
+        return ValueExtractor.getByIndex(expression, index) {
             dataOperator.getValue(resultSet, ++index, expression.interiorClass)
+        }
+    }
+}
+
+internal class JdbcNamedValueExtractor(private val dataOperator: JdbcDataOperator, private val resultSet: ResultSet) : JdbcValueExtractor {
+
+    override fun <EXTERIOR : Any, INTERIOR : Any> execute(expression: ColumnExpression<EXTERIOR, INTERIOR>): EXTERIOR? {
+        return ValueExtractor.getByName(expression) {
+            dataOperator.getValue(resultSet, expression.columnName, expression.interiorClass)
         }
     }
 }

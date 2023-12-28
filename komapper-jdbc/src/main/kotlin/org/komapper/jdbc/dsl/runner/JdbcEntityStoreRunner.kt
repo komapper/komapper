@@ -5,6 +5,7 @@ import org.komapper.core.DryRunStatement
 import org.komapper.core.dsl.context.SelectContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.query.EntityStore
+import org.komapper.core.dsl.query.ProjectionType
 import org.komapper.core.dsl.runner.EntityStoreFactory
 import org.komapper.core.dsl.runner.SelectRunner
 import org.komapper.jdbc.JdbcDatabaseConfig
@@ -28,7 +29,7 @@ internal class JdbcEntityStoreRunner<ENTITY : Any, ID : Any, META : EntityMetamo
             val rows = mutableListOf<Map<EntityMetamodel<*, *, *>, Any>>()
             while (rs.next()) {
                 val row = mutableMapOf<EntityMetamodel<*, *, *>, Any>()
-                val mapper = JdbcEntityMapper(config.dataOperator, rs)
+                val mapper = JdbcEntityMapper(ProjectionType.INDEX, config.dataOperator, rs)
                 for (metamodel in metamodels) {
                     val entity = mapper.execute(metamodel) ?: continue
                     row[metamodel] = entity

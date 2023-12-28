@@ -18,6 +18,7 @@ import org.komapper.core.dsl.context.TemplateSelectContext
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.query.EntityStore
+import org.komapper.core.dsl.query.ProjectionType
 import org.komapper.core.dsl.query.Query
 import org.komapper.core.dsl.query.Record
 import org.komapper.core.dsl.query.Row
@@ -726,9 +727,10 @@ object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
     override fun <T : Any, R> templateEntityProjectionSelectQuery(
         context: TemplateSelectContext,
         metamodel: EntityMetamodel<T, *, *>,
+        strategy: ProjectionType,
         collect: suspend (Flow<T>) -> R,
     ): R2dbcRunner<*> {
-        val transform = R2dbcRowTransformers.singleEntity(metamodel)
+        val transform = R2dbcRowTransformers.singleEntity(metamodel, strategy)
         return R2dbcTemplateEntityProjectionSelectRunner(context, transform, collect)
     }
 }

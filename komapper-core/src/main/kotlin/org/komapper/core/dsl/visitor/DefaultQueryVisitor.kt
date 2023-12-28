@@ -18,6 +18,7 @@ import org.komapper.core.dsl.context.TemplateExecuteContext
 import org.komapper.core.dsl.context.TemplateSelectContext
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
+import org.komapper.core.dsl.query.ProjectionType
 import org.komapper.core.dsl.query.Query
 import org.komapper.core.dsl.query.Record
 import org.komapper.core.dsl.query.Row
@@ -655,6 +656,7 @@ internal object DefaultQueryVisitor : QueryVisitor<Runner> {
     override fun <T : Any, R> templateEntityProjectionSelectQuery(
         context: TemplateSelectContext,
         metamodel: EntityMetamodel<T, *, *>,
+        strategy: ProjectionType,
         collect: suspend (Flow<T>) -> R,
     ): Runner {
         return TemplateSelectRunner(context)

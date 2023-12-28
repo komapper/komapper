@@ -2,6 +2,7 @@ package org.komapper.jdbc.dsl.runner
 
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
+import org.komapper.core.dsl.query.ProjectionType
 import org.komapper.core.dsl.query.Record
 import org.komapper.core.dsl.query.RecordImpl
 import org.komapper.jdbc.JdbcDataOperator
@@ -9,9 +10,9 @@ import java.sql.ResultSet
 
 internal object JdbcResultSetTransformers {
 
-    fun <T : Any> singleEntity(metamodel: EntityMetamodel<T, *, *>): (JdbcDataOperator, ResultSet) -> T =
+    fun <T : Any> singleEntity(metamodel: EntityMetamodel<T, *, *>, strategy: ProjectionType = ProjectionType.INDEX): (JdbcDataOperator, ResultSet) -> T =
         { dataOperator, rs ->
-            val mapper = JdbcEntityMapper(dataOperator, rs)
+            val mapper = JdbcEntityMapper(strategy, dataOperator, rs)
             val entity = mapper.execute(metamodel, true)
             checkNotNull(entity)
         }
@@ -31,7 +32,7 @@ internal object JdbcResultSetTransformers {
         transform: (A?) -> R,
     ): (JdbcDataOperator, ResultSet) -> R =
         { dataOperator, rs ->
-            val extractor = JdbcValueExtractor(dataOperator, rs)
+            val extractor = JdbcIndexedValueExtractor(dataOperator, rs)
             val value = extractor.execute(expression)
             transform(value)
         }
@@ -53,7 +54,7 @@ internal object JdbcResultSetTransformers {
         transform: (Pair<A?, B?>) -> Pair<AR, BR>,
     ): (JdbcDataOperator, ResultSet) -> Pair<AR, BR> =
         { dataOperator, rs ->
-            val extractor = JdbcValueExtractor(dataOperator, rs)
+            val extractor = JdbcIndexedValueExtractor(dataOperator, rs)
             val first = extractor.execute(expressions.first)
             val second = extractor.execute(expressions.second)
             transform(first to second)
@@ -77,7 +78,7 @@ internal object JdbcResultSetTransformers {
         transform: (Triple<A?, B?, C?>) -> Triple<AR, BR, CR>,
     ): (JdbcDataOperator, ResultSet) -> Triple<AR, BR, CR> =
         { dataOperator, rs ->
-            val extractor = JdbcValueExtractor(dataOperator, rs)
+            val extractor = JdbcIndexedValueExtractor(dataOperator, rs)
             val first = extractor.execute(expressions.first)
             val second = extractor.execute(expressions.second)
             val third = extractor.execute(expressions.third)
@@ -86,7 +87,7 @@ internal object JdbcResultSetTransformers {
 
     fun multipleColumns(expressions: List<ColumnExpression<*, *>>): (JdbcDataOperator, ResultSet) -> Record =
         { dataOperator, rs ->
-            val extractor = JdbcValueExtractor(dataOperator, rs)
+            val extractor = JdbcIndexedValueExtractor(dataOperator, rs)
             val map = expressions.associateWith { extractor.execute(it) }
             RecordImpl(map)
         }

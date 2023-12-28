@@ -18,6 +18,7 @@ import org.komapper.core.dsl.context.TemplateSelectContext
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.query.EntityStore
+import org.komapper.core.dsl.query.ProjectionType
 import org.komapper.core.dsl.query.Query
 import org.komapper.core.dsl.query.Record
 import org.komapper.core.dsl.query.Row
@@ -730,9 +731,10 @@ object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
     override fun <T : Any, R> templateEntityProjectionSelectQuery(
         context: TemplateSelectContext,
         metamodel: EntityMetamodel<T, *, *>,
+        strategy: ProjectionType,
         collect: suspend (Flow<T>) -> R,
     ): JdbcRunner<*> {
-        val transform = JdbcResultSetTransformers.singleEntity(metamodel)
+        val transform = JdbcResultSetTransformers.singleEntity(metamodel, strategy)
         return JdbcTemplateEntityProjectionSelectRunner(context, transform, collect)
     }
 }

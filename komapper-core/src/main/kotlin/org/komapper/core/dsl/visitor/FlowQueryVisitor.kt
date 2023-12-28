@@ -6,6 +6,7 @@ import org.komapper.core.dsl.context.SetOperationContext
 import org.komapper.core.dsl.context.TemplateSelectContext
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
+import org.komapper.core.dsl.query.ProjectionType
 import org.komapper.core.dsl.query.Row
 
 @ThreadSafe
@@ -110,5 +111,6 @@ interface FlowQueryVisitor<VISIT_RESULT> {
     fun <T : Any> templateEntityProjectionSelectQuery(
         context: TemplateSelectContext,
         metamodel: EntityMetamodel<T, *, *>,
+        strategy: ProjectionType,
     ): VISIT_RESULT
 }
