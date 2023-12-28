@@ -27,11 +27,15 @@ import org.komapper.processor.Symbols.KotlinInstant
 import org.komapper.processor.Symbols.KotlinLocalDateTime
 import org.komapper.processor.Symbols.LocalDateTime
 import org.komapper.processor.Symbols.Operand
+import org.komapper.processor.Symbols.ProjectionType
+import org.komapper.processor.Symbols.ProjectionType_INDEX
 import org.komapper.processor.Symbols.PropertyDescriptor
 import org.komapper.processor.Symbols.PropertyMetamodel
 import org.komapper.processor.Symbols.PropertyMetamodelImpl
 import org.komapper.processor.Symbols.SelectQuery
 import org.komapper.processor.Symbols.Sequence
+import org.komapper.processor.Symbols.TemplateSelectQuery
+import org.komapper.processor.Symbols.TemplateSelectQueryBuilder
 import org.komapper.processor.Symbols.UUID
 import org.komapper.processor.Symbols.checkMetamodelVersion
 import org.komapper.processor.Symbols.toKotlinInstant
@@ -737,6 +741,11 @@ internal class EntityMetamodelGenerator(
     }
 
     private fun projection() {
+        projectionForSelectQuery()
+        projectionForTemplateSelectQueryBuilder()
+    }
+
+    private fun projectionForSelectQuery() {
         if (entity.projection == null) return
         val function = entity.projection.function
         val params = entity.properties.flatMap { p ->
@@ -756,6 +765,17 @@ internal class EntityMetamodelGenerator(
         w.println("fun <E, Q: $SelectQuery<E, Q>> $SelectQuery<E, Q>.$function($paramList")
         w.println("    ): $FlowSubquery<$entityTypeName> {")
         w.println("    return selectAsEntity($unitTypeName.`${aliases.first()}`,$argList)")
+        w.println("}")
+        w.println()
+    }
+
+    private fun projectionForTemplateSelectQueryBuilder() {
+        if (entity.projection == null) return
+        val function = entity.projection.function
+        w.println("fun $TemplateSelectQueryBuilder.$function(")
+        w.println("        strategy: $ProjectionType = $ProjectionType_INDEX")
+        w.println("    ): $TemplateSelectQuery<$entityTypeName> {")
+        w.println("    return selectAsEntity($unitTypeName.`${aliases.first()}`, strategy)")
         w.println("}")
         w.println()
     }

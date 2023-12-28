@@ -4,10 +4,12 @@ import integration.core.Address
 import integration.core.Dbms
 import integration.core.Run
 import integration.core.address
+import integration.core.selectAsAddress
 import org.junit.jupiter.api.TestInfo
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
+import org.komapper.core.dsl.query.ProjectionType
 import org.komapper.core.dsl.query.Row
 import org.komapper.core.dsl.query.bind
 import org.komapper.core.dsl.query.first
@@ -247,11 +249,42 @@ class R2dbcTemplateTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    fun selectAsEntity(info: TestInfo) = inTransaction(db, info) {
+    fun selectAsEntity_byIndex(info: TestInfo) = inTransaction(db, info) {
         val a = Meta.address
         val list = db.runQuery {
             val sql = "select address_id, street, version from address order by address_id"
             QueryDsl.fromTemplate(sql).selectAsEntity(a)
+        }
+        assertEquals(15, list.size)
+        assertEquals(Address(1, "STREET 1", 1), list[0])
+    }
+
+    @Test
+    fun selectAsEntity_byName(info: TestInfo) = inTransaction(db, info) {
+        val a = Meta.address
+        val list = db.runQuery {
+            val sql = "select street, version, address_id from address order by address_id"
+            QueryDsl.fromTemplate(sql).selectAsEntity(a, ProjectionType.NAME)
+        }
+        assertEquals(15, list.size)
+        assertEquals(Address(1, "STREET 1", 1), list[0])
+    }
+
+    @Test
+    fun selectAsAddress_byIndex(info: TestInfo) = inTransaction(db, info) {
+        val list = db.runQuery {
+            val sql = "select address_id, street, version from address order by address_id"
+            QueryDsl.fromTemplate(sql).selectAsAddress()
+        }
+        assertEquals(15, list.size)
+        assertEquals(Address(1, "STREET 1", 1), list[0])
+    }
+
+    @Test
+    fun selectAsAddress_byName(info: TestInfo) = inTransaction(db, info) {
+        val list = db.runQuery {
+            val sql = "select street, version, address_id from address order by address_id"
+            QueryDsl.fromTemplate(sql).selectAsAddress(ProjectionType.NAME)
         }
         assertEquals(15, list.size)
         assertEquals(Address(1, "STREET 1", 1), list[0])

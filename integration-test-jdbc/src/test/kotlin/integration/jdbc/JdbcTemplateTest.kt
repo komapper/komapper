@@ -4,10 +4,12 @@ import integration.core.Address
 import integration.core.Dbms
 import integration.core.Run
 import integration.core.address
+import integration.core.selectAsAddress
 import kotlinx.coroutines.flow.toList
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
+import org.komapper.core.dsl.query.ProjectionType
 import org.komapper.core.dsl.query.Row
 import org.komapper.core.dsl.query.bind
 import org.komapper.core.dsl.query.first
@@ -301,11 +303,42 @@ class JdbcTemplateTest(private val db: JdbcDatabase) {
     }
 
     @Test
-    fun selectAsEntity() {
+    fun selectAsEntity_byIndex() {
         val a = Meta.address
         val list = db.runQuery {
             val sql = "select address_id, street, version from address order by address_id"
             QueryDsl.fromTemplate(sql).selectAsEntity(a)
+        }
+        assertEquals(15, list.size)
+        assertEquals(Address(1, "STREET 1", 1), list[0])
+    }
+
+    @Test
+    fun selectAsEntity_byName() {
+        val a = Meta.address
+        val list = db.runQuery {
+            val sql = "select street, version, address_id from address order by address_id"
+            QueryDsl.fromTemplate(sql).selectAsEntity(a, ProjectionType.NAME)
+        }
+        assertEquals(15, list.size)
+        assertEquals(Address(1, "STREET 1", 1), list[0])
+    }
+
+    @Test
+    fun selectAsAddress_byIndex() {
+        val list = db.runQuery {
+            val sql = "select address_id, street, version from address order by address_id"
+            QueryDsl.fromTemplate(sql).selectAsAddress()
+        }
+        assertEquals(15, list.size)
+        assertEquals(Address(1, "STREET 1", 1), list[0])
+    }
+
+    @Test
+    fun selectAsAddress_byName() {
+        val list = db.runQuery {
+            val sql = "select street, version, address_id from address order by address_id"
+            QueryDsl.fromTemplate(sql).selectAsAddress(ProjectionType.NAME)
         }
         assertEquals(15, list.size)
         assertEquals(Address(1, "STREET 1", 1), list[0])

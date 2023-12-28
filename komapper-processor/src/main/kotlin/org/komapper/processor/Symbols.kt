@@ -44,5 +44,9 @@ internal object Symbols {
     const val KomapperExperimentalAssociation = "org.komapper.annotation.KomapperExperimentalAssociation"
     const val SelectQuery = "org.komapper.core.dsl.query.SelectQuery"
     const val FlowSubquery = "org.komapper.core.dsl.query.FlowSubquery"
+    const val TemplateSelectQueryBuilder = "org.komapper.core.dsl.query.TemplateSelectQueryBuilder"
+    const val TemplateSelectQuery = "org.komapper.core.dsl.query.TemplateSelectQuery"
+    const val ProjectionType = "org.komapper.core.dsl.query.ProjectionType"
+    const val ProjectionType_INDEX = "org.komapper.core.dsl.query.ProjectionType.INDEX"
     const val ColumnExpression = "org.komapper.core.dsl.expression.ColumnExpression"
 }
