@@ -11,7 +11,8 @@ import kotlin.reflect.KClass
  *
  * The [name] and [operands] are used to determine identity of the expression.
  *
- * @param T the type of expression evaluation
+ * @param T the exterior type of expression evaluation
+ * @param S the interior type of expression evaluation
  * @param baseExpression the base column expression
  * @param name the name that must be unique among user-defined column expressions
  * @param operands the operand list used in the expression
@@ -25,6 +26,27 @@ fun <T : Any, S : Any> columnExpression(
     build: SqlBuilderScope.() -> Unit,
 ): ColumnExpression<T, S> {
     return columnExpression(baseExpression.exteriorClass, baseExpression.interiorClass, baseExpression.wrap, name, operands, build)
+}
+
+/**
+ * Define a new column expression.
+ *
+ * The [name] and [operands] are used to determine identity of the expression.
+ *
+ * @param T the exterior type and interior type of expression evaluation
+ * @param klass the class of [T]
+ * @param name the name that must be unique among user-defined column expressions
+ * @param operands the operand list used in the expression
+ * @param build the SQL builder
+ * @return column expression
+ */
+fun <T : Any> columnExpression(
+    klass: KClass<T>,
+    name: String,
+    operands: List<Operand>,
+    build: SqlBuilderScope.() -> Unit,
+): ColumnExpression<T, T> {
+    return columnExpression(klass, klass, { it }, name, operands, build)
 }
 
 /**

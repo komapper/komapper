@@ -341,7 +341,7 @@ class JdbcSelectTest(private val db: JdbcDatabase) {
     private fun fromUnixTime(value: Long): ColumnExpression<LocalDateTime, LocalDateTime> {
         val name = "fromUnixTime"
         val o1 = Operand.SimpleArgument(Long::class, value)
-        return columnExpression(LocalDateTime::class, LocalDateTime::class, { it }, name, listOf(o1)) {
+        return columnExpression(LocalDateTime::class, name, listOf(o1)) {
             append("FROM_UNIXTIME(")
             visit(o1)
             append(")")
