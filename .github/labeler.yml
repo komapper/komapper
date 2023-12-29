@@ -1,143 +1,191 @@
 module/gradle-plugin:
-  - gradle-plugin/**/*
+- changed-files:
+  - any-glob-to-any-file: 'gradle-plugin/**/*'
 
 module/annotation:
-  - komapper-annotation/**/*
+- changed-files:
+  - any-glob-to-any-file: 'komapper-annotation/**/*'
 
 module/codegen:
-  - komapper-codegen/**/*
+- changed-files:
+  - any-glob-to-any-file: 'komapper-codegen/**/*'
 
 module/core:
-  - komapper-core/**/*
+- changed-files:
+  - any-glob-to-any-file: 'komapper-core/**/*'
 
 module/datetime-jdbc:
-  - komapper-datetime-jdbc/**/*
+- changed-files:
+  - any-glob-to-any-file: 'komapper-datetime-jdbc/**/*'
 
 module/datetime-r2dbc:
-  - komapper-datetime-r2dbc/**/*
+- changed-files:
+  - any-glob-to-any-file: 'komapper-datetime-r2dbc/**/*'
 
 module/dialect-h2:
-  - komapper-dialect-h2/**/*
+- changed-files:
+  - any-glob-to-any-file: 'komapper-dialect-h2/**/*'
 
 module/dialect-h2-jdbc:
-  - komapper-dialect-h2-jdbc/**/*
+- changed-files:
+  - any-glob-to-any-file: 'komapper-dialect-h2-jdbc/**/*'
 
 module/dialect-h2-r2dbc:
-  - komapper-dialect-h2-r2dbc/**/*
+- changed-files:
+  - any-glob-to-any-file: 'komapper-dialect-h2-r2dbc/**/*'
 
 module/dialect-mariadb:
-  - komapper-dialect-mariadb/**/*
+- changed-files:
+  - any-glob-to-any-file: 'komapper-dialect-mariadb/**/*'
 
 module/dialect-mariadb-jdbc:
-  - komapper-dialect-mariadb-jdbc/**/*
+- changed-files:
+  - any-glob-to-any-file: 'komapper-dialect-mariadb-jdbc/**/*'
 
 module/dialect-mariadb-r2dbc:
-  - komapper-dialect-mariadb-r2dbc/**/*
+- changed-files:
+  - any-glob-to-any-file: 'komapper-dialect-mariadb-r2dbc/**/*'
 
 module/dialect-mysql:
-  - komapper-dialect-mysql/**/*
+- changed-files:
+  - any-glob-to-any-file: 'komapper-dialect-mysql/**/*'
 
 module/dialect-mysql-jdbc:
-  - komapper-dialect-mysql-jdbc/**/*
+- changed-files:
+  - any-glob-to-any-file: 'komapper-dialect-mysql-jdbc/**/*'
 
 module/dialect-mysql-r2dbc:
-  - komapper-dialect-mysql-r2dbc/**/*
+- changed-files:
+  - any-glob-to-any-file: 'komapper-dialect-mysql-r2dbc/**/*'
 
 module/dialect-oracle:
-  - komapper-dialect-oracle/**/*
+- changed-files:
+  - any-glob-to-any-file: 'komapper-dialect-oracle/**/*'
 
 module/dialect-oracle-jdbc:
-  - komapper-dialect-oracle-jdbc/**/*
+- changed-files:
+  - any-glob-to-any-file: 'komapper-dialect-oracle-jdbc/**/*'
 
 module/dialect-oracle-r2dbc:
-  - komapper-dialect-oracle-r2dbc/**/*
+- changed-files:
+  - any-glob-to-any-file: 'komapper-dialect-oracle-r2dbc/**/*'
 
 module/dialect-postgresql:
-  - komapper-dialect-postgresql/**/*
+- changed-files:
+  - any-glob-to-any-file: 'komapper-dialect-postgresql/**/*'
 
 module/dialect-postgresql-jdbc:
-  - komapper-dialect-postgresql-jdbc/**/*
+- changed-files:
+  - any-glob-to-any-file: 'komapper-dialect-postgresql-jdbc/**/*'
 
 module/dialect-postgresql-r2dbc:
-  - komapper-dialect-postgresql-r2dbc/**/*
+- changed-files:
+  - any-glob-to-any-file: 'komapper-dialect-postgresql-r2dbc/**/*'
 
 module/dialect-sqlserver:
-  - komapper-dialect-sqlserver/**/*
+- changed-files:
+  - any-glob-to-any-file: 'komapper-dialect-sqlserver/**/*'
 
 module/dialect-sqlserver-jdbc:
-  - komapper-dialect-sqlserver-jdbc/**/*
+- changed-files:
+  - any-glob-to-any-file: 'komapper-dialect-sqlserver-jdbc/**/*'
 
 module/dialect-sqlserver-r2dbc:
-  - komapper-dialect-sqlserver-r2dbc/**/*
+- changed-files:
+  - any-glob-to-any-file: 'komapper-dialect-sqlserver-r2dbc/**/*'
 
 module/jdbc:
-  - komapper-jdbc/**/*
+- changed-files:
+  - any-glob-to-any-file: 'komapper-jdbc/**/*'
 
 module/platform:
-  - komapper-platform/**/*
+- changed-files:
+  - any-glob-to-any-file: 'komapper-platform/**/*'
 
 module/processor:
-  - komapper-processor/**/*
+- changed-files:
+  - any-glob-to-any-file: 'komapper-processor/**/*'
 
 module/quarkus-jdbc:
-  - komapper-quarkus-jdbc/**/*
+- changed-files:
+  - any-glob-to-any-file: 'komapper-quarkus-jdbc/**/*'
 
 module/r2dbc:
-  - komapper-r2dbc/**/*
+- changed-files:
+  - any-glob-to-any-file: 'komapper-r2dbc/**/*'
 
 module/slf4j:
-  - komapper-slf4j/**/*
+- changed-files:
+  - any-glob-to-any-file: 'komapper-slf4j/**/*'
 
 module/spring:
-  - komapper-spring/**/*
+- changed-files:
+  - any-glob-to-any-file: 'komapper-spring/**/*'
 
 module/spring-boot-autoconfigure-jdbc:
-  - komapper-spring-boot-autoconfigure-jdbc/**/*
+- changed-files:
+  - any-glob-to-any-file: 'komapper-spring-boot-autoconfigure-jdbc/**/*'
 
 module/spring-boot-autoconfigure-r2dbc:
-  - komapper-spring-boot-autoconfigure-r2dbc/**/*
+- changed-files:
+  - any-glob-to-any-file: 'komapper-spring-boot-autoconfigure-r2dbc/**/*'
 
 module/spring-boot-starter-jdbc:
-  - komapper-spring-boot-starter-jdbc/**/*
+- changed-files:
+  - any-glob-to-any-file: 'komapper-spring-boot-starter-jdbc/**/*'
 
 module/spring-boot-starter-r2dbc:
-  - komapper-spring-boot-starter-r2dbc/**/*
+- changed-files:
+  - any-glob-to-any-file: 'komapper-spring-boot-starter-r2dbc/**/*'
 
 module/spring-jdbc:
-  - komapper-spring-jdbc/**/*
+- changed-files:
+  - any-glob-to-any-file: 'komapper-spring-jdbc/**/*'
 
 module/spring-native-jdbc:
-  - komapper-spring-native-jdbc/**/*
+- changed-files:
+  - any-glob-to-any-file: 'komapper-spring-native-jdbc/**/*'
 
 module/spring-native-r2dbc:
-  - komapper-spring-native-r2dbc/**/*
+- changed-files:
+  - any-glob-to-any-file: 'komapper-spring-native-r2dbc/**/*'
 
 module/spring-r2dbc:
-  - komapper-spring-r2dbc/**/*
+- changed-files:
+  - any-glob-to-any-file: 'komapper-spring-r2dbc/**/*'
 
 module/sqlcommenter:
-  - komapper-sqlcommenter/**/*
+- changed-files:
+  - any-glob-to-any-file: 'komapper-sqlcommenter/**/*'
 
 module/starter-jdbc:
-  - komapper-starter-jdbc/**/*
+- changed-files:
+  - any-glob-to-any-file: 'komapper-starter-jdbc/**/*'
 
 module/starter-r2dbc:
-  - komapper-starter-r2dbc/**/*
+- changed-files:
+  - any-glob-to-any-file: 'komapper-starter-r2dbc/**/*'
 
 module/template:
-  - komapper-template/**/*
+- changed-files:
+  - any-glob-to-any-file: 'komapper-template/**/*'
 
 module/tx-context-jdbc:
-  - komapper-tx-context-jdbc/**/*
+- changed-files:
+  - any-glob-to-any-file: 'komapper-tx-context-jdbc/**/*'
 
 module/tx-context-r2dbc:
-  - komapper-tx-context-r2dbc/**/*
+- changed-files:
+  - any-glob-to-any-file: 'komapper-tx-context-r2dbc/**/*'
 
 module/tx-core:
-  - komapper-tx-core/**/*
+- changed-files:
+  - any-glob-to-any-file: 'komapper-tx-core/**/*'
 
 module/tx-jdbc:
-  - komapper-tx-jdbc/**/*
+- changed-files:
+  - any-glob-to-any-file: 'komapper-tx-jdbc/**/*'
 
 module/tx-r2dbc:
-  - komapper-tx-r2dbc/**/*
+- changed-files:
+  - any-glob-to-any-file: 'komapper-tx-r2dbc/**/*'
