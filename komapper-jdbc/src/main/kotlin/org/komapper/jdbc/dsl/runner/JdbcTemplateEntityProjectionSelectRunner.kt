@@ -9,7 +9,7 @@ import org.komapper.jdbc.JdbcDataOperator
 import org.komapper.jdbc.JdbcDatabaseConfig
 import java.sql.ResultSet
 
-internal class JdbcTemplateEntityConversionSelectRunner<T, R>(
+internal class JdbcTemplateEntityProjectionSelectRunner<T, R>(
     private val context: TemplateSelectContext,
     private val transform: (JdbcDataOperator, ResultSet) -> T,
     private val collect: suspend (Flow<T>) -> R,

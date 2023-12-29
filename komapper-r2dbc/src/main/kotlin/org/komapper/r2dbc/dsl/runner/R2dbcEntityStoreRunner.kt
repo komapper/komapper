@@ -7,6 +7,7 @@ import org.komapper.core.DryRunStatement
 import org.komapper.core.dsl.context.SelectContext
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.query.EntityStore
+import org.komapper.core.dsl.query.ProjectionType
 import org.komapper.core.dsl.runner.EntityStoreFactory
 import org.komapper.core.dsl.runner.SelectRunner
 import org.komapper.r2dbc.R2dbcDatabaseConfig
@@ -29,7 +30,7 @@ internal class R2dbcEntityStoreRunner<ENTITY : Any, ID : Any, META : EntityMetam
         val executor = R2dbcExecutor(config, context.options)
         val rows: Flow<Map<EntityMetamodel<*, *, *>, Any>> = executor.executeQuery(statement) { dataOperator, r2dbcRow ->
             val row = mutableMapOf<EntityMetamodel<*, *, *>, Any>()
-            val mapper = R2dbcEntityMapper(dataOperator, r2dbcRow)
+            val mapper = R2dbcEntityMapper(ProjectionType.INDEX, dataOperator, r2dbcRow)
             for (metamodel in metamodels) {
                 val entity = mapper.execute(metamodel) ?: continue
                 row[metamodel] = entity

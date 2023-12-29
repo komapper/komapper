@@ -5,6 +5,7 @@ import org.komapper.core.dsl.context.SetOperationContext
 import org.komapper.core.dsl.context.TemplateSelectContext
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
+import org.komapper.core.dsl.query.ProjectionType
 import org.komapper.core.dsl.query.Record
 import org.komapper.core.dsl.query.Row
 import org.komapper.core.dsl.visitor.FlowQueryVisitor
@@ -12,7 +13,7 @@ import org.komapper.r2dbc.dsl.runner.R2dbcFlowBuilder
 import org.komapper.r2dbc.dsl.runner.R2dbcRowTransformers
 import org.komapper.r2dbc.dsl.runner.R2dbcSelectFlowBuilder
 import org.komapper.r2dbc.dsl.runner.R2dbcSetOperationFlowBuilder
-import org.komapper.r2dbc.dsl.runner.R2dbcTemplateEntityConversionSelectFlowBuilder
+import org.komapper.r2dbc.dsl.runner.R2dbcTemplateEntityProjectionSelectFlowBuilder
 import org.komapper.r2dbc.dsl.runner.R2dbcTemplateSelectFlowBuilder
 
 object R2dbcFlowQueryVisitor : FlowQueryVisitor<R2dbcFlowBuilder<*>> {
@@ -144,7 +145,7 @@ object R2dbcFlowQueryVisitor : FlowQueryVisitor<R2dbcFlowBuilder<*>> {
         return R2dbcSetOperationFlowBuilder(context, transform)
     }
 
-    override fun <ENTITY : Any> entityConversionSelectQuery(
+    override fun <ENTITY : Any> entityProjectionSelectQuery(
         context: SelectContext<*, *, *>,
         metamodel: EntityMetamodel<ENTITY, *, *>,
     ): R2dbcFlowBuilder<*> {
@@ -152,7 +153,7 @@ object R2dbcFlowQueryVisitor : FlowQueryVisitor<R2dbcFlowBuilder<*>> {
         return R2dbcSelectFlowBuilder(context, transform)
     }
 
-    override fun <ENTITY : Any> entityConversionSetOperationQuery(
+    override fun <ENTITY : Any> entityProjectionSetOperationQuery(
         context: SetOperationContext,
         metamodel: EntityMetamodel<ENTITY, *, *>,
     ): R2dbcFlowBuilder<*> {
@@ -167,11 +168,12 @@ object R2dbcFlowQueryVisitor : FlowQueryVisitor<R2dbcFlowBuilder<*>> {
         return R2dbcTemplateSelectFlowBuilder(context, transform)
     }
 
-    override fun <T : Any> templateEntityConversionSelectQuery(
+    override fun <T : Any> templateEntityProjectionSelectQuery(
         context: TemplateSelectContext,
         metamodel: EntityMetamodel<T, *, *>,
+        strategy: ProjectionType,
     ): R2dbcFlowBuilder<*> {
-        val transform = R2dbcRowTransformers.singleEntity(metamodel)
-        return R2dbcTemplateEntityConversionSelectFlowBuilder(context, transform)
+        val transform = R2dbcRowTransformers.singleEntity(metamodel, strategy)
+        return R2dbcTemplateEntityProjectionSelectFlowBuilder(context, transform)
     }
 }

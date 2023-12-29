@@ -18,6 +18,7 @@ import org.komapper.core.dsl.context.TemplateSelectContext
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.query.EntityStore
+import org.komapper.core.dsl.query.ProjectionType
 import org.komapper.core.dsl.query.Query
 import org.komapper.core.dsl.query.Record
 import org.komapper.core.dsl.query.Row
@@ -55,7 +56,7 @@ import org.komapper.jdbc.dsl.runner.JdbcSchemaDropRunner
 import org.komapper.jdbc.dsl.runner.JdbcScriptExecuteRunner
 import org.komapper.jdbc.dsl.runner.JdbcSelectRunner
 import org.komapper.jdbc.dsl.runner.JdbcSetOperationRunner
-import org.komapper.jdbc.dsl.runner.JdbcTemplateEntityConversionSelectRunner
+import org.komapper.jdbc.dsl.runner.JdbcTemplateEntityProjectionSelectRunner
 import org.komapper.jdbc.dsl.runner.JdbcTemplateExecuteRunner
 import org.komapper.jdbc.dsl.runner.JdbcTemplateSelectRunner
 
@@ -582,7 +583,7 @@ object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
         return JdbcSetOperationRunner(context, transform, collect)
     }
 
-    override fun <ENTITY : Any, R> entityConversionSelectQuery(
+    override fun <ENTITY : Any, R> entityProjectionSelectQuery(
         context: SelectContext<*, *, *>,
         metamodel: EntityMetamodel<ENTITY, *, *>,
         collect: suspend (Flow<ENTITY>) -> R,
@@ -591,7 +592,7 @@ object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
         return JdbcSelectRunner(context, transform, collect)
     }
 
-    override fun <ENTITY : Any, R> entityConversionSetOperationQuery(
+    override fun <ENTITY : Any, R> entityProjectionSetOperationQuery(
         context: SetOperationContext,
         metamodel: EntityMetamodel<ENTITY, *, *>,
         collect: suspend (Flow<ENTITY>) -> R,
@@ -727,12 +728,13 @@ object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
         return JdbcTemplateSelectRunner(context, transform, collect)
     }
 
-    override fun <T : Any, R> templateEntityConversionSelectQuery(
+    override fun <T : Any, R> templateEntityProjectionSelectQuery(
         context: TemplateSelectContext,
         metamodel: EntityMetamodel<T, *, *>,
+        strategy: ProjectionType,
         collect: suspend (Flow<T>) -> R,
     ): JdbcRunner<*> {
-        val transform = JdbcResultSetTransformers.singleEntity(metamodel)
-        return JdbcTemplateEntityConversionSelectRunner(context, transform, collect)
+        val transform = JdbcResultSetTransformers.singleEntity(metamodel, strategy)
+        return JdbcTemplateEntityProjectionSelectRunner(context, transform, collect)
     }
 }

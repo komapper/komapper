@@ -6,6 +6,7 @@ import org.komapper.core.dsl.context.SetOperationContext
 import org.komapper.core.dsl.context.TemplateSelectContext
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
+import org.komapper.core.dsl.query.ProjectionType
 import org.komapper.core.dsl.query.Row
 
 @ThreadSafe
@@ -92,12 +93,12 @@ interface FlowQueryVisitor<VISIT_RESULT> {
         expressions: List<ColumnExpression<*, *>>,
     ): VISIT_RESULT
 
-    fun <ENTITY : Any> entityConversionSelectQuery(
+    fun <ENTITY : Any> entityProjectionSelectQuery(
         context: SelectContext<*, *, *>,
         metamodel: EntityMetamodel<ENTITY, *, *>,
     ): VISIT_RESULT
 
-    fun <ENTITY : Any> entityConversionSetOperationQuery(
+    fun <ENTITY : Any> entityProjectionSetOperationQuery(
         context: SetOperationContext,
         metamodel: EntityMetamodel<ENTITY, *, *>,
     ): VISIT_RESULT
@@ -107,8 +108,9 @@ interface FlowQueryVisitor<VISIT_RESULT> {
         transform: (Row) -> T,
     ): VISIT_RESULT
 
-    fun <T : Any> templateEntityConversionSelectQuery(
+    fun <T : Any> templateEntityProjectionSelectQuery(
         context: TemplateSelectContext,
         metamodel: EntityMetamodel<T, *, *>,
+        strategy: ProjectionType,
     ): VISIT_RESULT
 }

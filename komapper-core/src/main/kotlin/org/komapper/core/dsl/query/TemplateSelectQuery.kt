@@ -30,18 +30,19 @@ internal data class TemplateSelectQueryImpl<T>(
     }
 }
 
-internal data class TemplateEntityConversionSelectQuery<ENTITY : Any>(
+internal data class TemplateEntityProjectionSelectQuery<ENTITY : Any>(
     private val context: TemplateSelectContext,
     private val metamodel: EntityMetamodel<ENTITY, *, *>,
+    private val strategy: ProjectionType,
 ) : TemplateSelectQuery<ENTITY> {
 
     override fun <VISIT_RESULT> accept(visitor: FlowQueryVisitor<VISIT_RESULT>): VISIT_RESULT {
-        return visitor.templateEntityConversionSelectQuery(context, metamodel)
+        return visitor.templateEntityProjectionSelectQuery(context, metamodel, strategy)
     }
 
     override fun <R> collect(collect: suspend (Flow<ENTITY>) -> R): Query<R> = object : Query<R> {
         override fun <VISIT_RESULT> accept(visitor: QueryVisitor<VISIT_RESULT>): VISIT_RESULT {
-            return visitor.templateEntityConversionSelectQuery(context, metamodel, collect)
+            return visitor.templateEntityProjectionSelectQuery(context, metamodel, strategy, collect)
         }
     }
 }

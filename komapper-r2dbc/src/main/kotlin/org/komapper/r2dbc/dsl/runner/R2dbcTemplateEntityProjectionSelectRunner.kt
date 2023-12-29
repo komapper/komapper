@@ -8,13 +8,13 @@ import org.komapper.core.dsl.context.TemplateSelectContext
 import org.komapper.r2dbc.R2dbcDataOperator
 import org.komapper.r2dbc.R2dbcDatabaseConfig
 
-internal class R2dbcTemplateEntityConversionSelectRunner<T, R>(
+internal class R2dbcTemplateEntityProjectionSelectRunner<T, R>(
     context: TemplateSelectContext,
     transform: (R2dbcDataOperator, Row) -> T,
     private val collect: suspend (Flow<T>) -> R,
 ) : R2dbcRunner<R> {
 
-    private val flowBuilder = R2dbcTemplateEntityConversionSelectFlowBuilder(context, transform)
+    private val flowBuilder = R2dbcTemplateEntityProjectionSelectFlowBuilder(context, transform)
 
     override fun check(config: DatabaseConfig) {
         flowBuilder.check(config)

@@ -35,9 +35,10 @@ interface TemplateSelectQueryBuilder : TemplateBinder<TemplateSelectQueryBuilder
      *
      * @param ENTITY the entity type
      * @param metamodel the entity metamodel
+     * @param strategy the projection strategy
      * @return the query that returns a list of entity
      */
-    fun <ENTITY : Any> selectAsEntity(metamodel: EntityMetamodel<ENTITY, *, *>): TemplateSelectQuery<ENTITY>
+    fun <ENTITY : Any> selectAsEntity(metamodel: EntityMetamodel<ENTITY, *, *>, strategy: ProjectionType = ProjectionType.INDEX): TemplateSelectQuery<ENTITY>
 }
 
 internal data class TemplateSelectQueryBuilderImpl(
@@ -58,7 +59,7 @@ internal data class TemplateSelectQueryBuilderImpl(
         return TemplateSelectQueryImpl(context, transform)
     }
 
-    override fun <ENTITY : Any> selectAsEntity(metamodel: EntityMetamodel<ENTITY, *, *>): TemplateSelectQuery<ENTITY> {
-        return TemplateEntityConversionSelectQuery(context, metamodel)
+    override fun <ENTITY : Any> selectAsEntity(metamodel: EntityMetamodel<ENTITY, *, *>, strategy: ProjectionType): TemplateSelectQuery<ENTITY> {
+        return TemplateEntityProjectionSelectQuery(context, metamodel, strategy)
     }
 }

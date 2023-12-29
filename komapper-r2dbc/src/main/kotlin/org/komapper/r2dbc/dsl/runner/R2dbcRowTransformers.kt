@@ -3,15 +3,16 @@ package org.komapper.r2dbc.dsl.runner
 import io.r2dbc.spi.Row
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
+import org.komapper.core.dsl.query.ProjectionType
 import org.komapper.core.dsl.query.Record
 import org.komapper.core.dsl.query.RecordImpl
 import org.komapper.r2dbc.R2dbcDataOperator
 
 internal object R2dbcRowTransformers {
 
-    fun <ENTITY : Any> singleEntity(metamodel: EntityMetamodel<ENTITY, *, *>): (R2dbcDataOperator, Row) -> ENTITY =
+    fun <ENTITY : Any> singleEntity(metamodel: EntityMetamodel<ENTITY, *, *>, strategy: ProjectionType = ProjectionType.INDEX): (R2dbcDataOperator, Row) -> ENTITY =
         { dataOperator, row ->
-            val mapper = R2dbcEntityMapper(dataOperator, row)
+            val mapper = R2dbcEntityMapper(strategy, dataOperator, row)
             mapper.execute(metamodel, true) as ENTITY
         }
 
@@ -30,7 +31,7 @@ internal object R2dbcRowTransformers {
         transform: (A?) -> R,
     ): (R2dbcDataOperator, Row) -> R =
         { dataOperator, row ->
-            val extractor = R2dbcValueExtractor(dataOperator, row)
+            val extractor = R2dbcIndexedValueExtractor(dataOperator, row)
             val value = extractor.execute(expression)
             transform(value)
         }
@@ -52,7 +53,7 @@ internal object R2dbcRowTransformers {
         transform: (Pair<A?, B?>) -> Pair<AR, BR>,
     ): (R2dbcDataOperator, Row) -> Pair<AR, BR> =
         { dataOperator, row ->
-            val extractor = R2dbcValueExtractor(dataOperator, row)
+            val extractor = R2dbcIndexedValueExtractor(dataOperator, row)
             val first = extractor.execute(expressions.first)
             val second = extractor.execute(expressions.second)
             transform(first to second)
@@ -76,7 +77,7 @@ internal object R2dbcRowTransformers {
         transform: (Triple<A?, B?, C?>) -> Triple<AR, BR, CR>,
     ): (R2dbcDataOperator, Row) -> Triple<AR, BR, CR> =
         { dataOperator, row ->
-            val extractor = R2dbcValueExtractor(dataOperator, row)
+            val extractor = R2dbcIndexedValueExtractor(dataOperator, row)
             val first = extractor.execute(expressions.first)
             val second = extractor.execute(expressions.second)
             val third = extractor.execute(expressions.third)
@@ -84,7 +85,7 @@ internal object R2dbcRowTransformers {
         }
 
     fun multipleColumns(expressions: List<ColumnExpression<*, *>>): (R2dbcDataOperator, Row) -> Record = { dataOperator, row ->
-        val extractor = R2dbcValueExtractor(dataOperator, row)
+        val extractor = R2dbcIndexedValueExtractor(dataOperator, row)
         val map = expressions.associateWith { extractor.execute(it) }
         RecordImpl(map)
     }

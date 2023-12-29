@@ -1,8 +1,8 @@
 package org.komapper.core.dsl.runner
 
 /**
- * @param index the index of the column starting at 0
+ * @param message the message
  * @param cause the cause
  */
-class ValueExtractingException(index: Int, cause: Exception) :
-    RuntimeException("Failed to extract a value from column. The column index is $index.", cause)
+class ValueExtractingException(message: String, cause: Exception) :
+    RuntimeException(message, cause)
