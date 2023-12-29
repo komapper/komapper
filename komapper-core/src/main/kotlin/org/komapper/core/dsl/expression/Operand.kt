@@ -2,6 +2,7 @@ package org.komapper.core.dsl.expression
 
 import org.komapper.core.ThreadSafe
 import org.komapper.core.Value
+import kotlin.reflect.KClass
 
 /**
  * Represents operands in Komapper Query DSL.
@@ -37,6 +38,23 @@ sealed class Operand {
         val value: Value<S> get() {
             val interior = if (exterior == null) null else expression.unwrap(exterior)
             return Value(interior, expression.interiorClass, expression.masking)
+        }
+    }
+
+    /**
+     * A simple argument to be bound to a prepared statement.
+     *
+     * @param interiorClass the interior class
+     * @param interior the argument value
+     */
+    data class SimpleArgument<S : Any>(val interiorClass: KClass<S>, val interior: S?) : Operand() {
+        override val masking: Boolean get() = false
+
+        /**
+         * The bindable format of the argument.
+         */
+        val value: Value<S> get() {
+            return Value(interior, interiorClass, masking)
         }
     }
 
