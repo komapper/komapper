@@ -642,6 +642,10 @@ class BuilderSupport(
                 buf.bind(operand.value)
             }
 
+            is Operand.SimpleArgument<*> -> {
+                buf.bind(operand.value)
+            }
+
             is Operand.Escape -> {
                 val values = buildEscapedValuePair(operand.escapeExpression, operand.masking)
                 buf.bind(values.first)

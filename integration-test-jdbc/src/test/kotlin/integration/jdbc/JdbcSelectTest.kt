@@ -2,9 +2,11 @@ package integration.jdbc
 
 import integration.core.Address
 import integration.core.Android
+import integration.core.Dbms
 import integration.core.Robot
 import integration.core.RobotInfo1
 import integration.core.RobotInfo2
+import integration.core.Run
 import integration.core.address
 import integration.core.android
 import integration.core.employee
@@ -16,9 +18,12 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.OptimisticLockException
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
+import org.komapper.core.dsl.expression.ColumnExpression
+import org.komapper.core.dsl.expression.Operand
 import org.komapper.core.dsl.expression.When
 import org.komapper.core.dsl.metamodel.define
 import org.komapper.core.dsl.operator.case
+import org.komapper.core.dsl.operator.columnExpression
 import org.komapper.core.dsl.operator.concat
 import org.komapper.core.dsl.operator.desc
 import org.komapper.core.dsl.operator.literal
@@ -28,6 +33,7 @@ import org.komapper.core.dsl.query.single
 import org.komapper.core.dsl.query.singleOrNull
 import org.komapper.jdbc.JdbcDatabase
 import java.math.BigDecimal
+import java.time.LocalDateTime
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -321,5 +327,24 @@ class JdbcSelectTest(private val db: JdbcDatabase) {
             QueryDsl.from(a)
         }
         assertEquals(15, list.size)
+    }
+
+    @Test
+    @Run(onlyIf = [Dbms.MYSQL])
+    fun simpleArgument() {
+        val value = db.runQuery {
+            QueryDsl.select(fromUnixTime(1447430881L)).single()
+        }
+        assertEquals(LocalDateTime.of(2015, 11, 13, 16, 8, 1), value)
+    }
+
+    private fun fromUnixTime(value: Long): ColumnExpression<LocalDateTime, LocalDateTime> {
+        val name = "fromUnixTime"
+        val o1 = Operand.SimpleArgument(Long::class, value)
+        return columnExpression(LocalDateTime::class, name, listOf(o1)) {
+            append("FROM_UNIXTIME(")
+            visit(o1)
+            append(")")
+        }
     }
 }
