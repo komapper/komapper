@@ -37,6 +37,16 @@ data class Address(
 )
 
 @KomapperEntity
+@KomapperTable(name = "address")
+data class IdColumnOnlyAddress(
+    @KomapperId
+    @KomapperColumn(name = "address_id")
+    val addressId: Int,
+    @KomapperId val street: String,
+    @KomapperId val version: Int,
+)
+
+@KomapperEntity
 @KomapperTable(name = "comp_key_address")
 data class CompositeKeyAddress(
     @KomapperId val addressId1: Int,
