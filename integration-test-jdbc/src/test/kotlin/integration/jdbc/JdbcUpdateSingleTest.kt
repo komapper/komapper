@@ -5,9 +5,11 @@ import integration.core.Man
 import integration.core.Person
 import integration.core.address
 import integration.core.department
+import integration.core.idColumnOnlyAddress
 import integration.core.man
 import integration.core.noVersionDepartment
 import integration.core.person
+import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.ClockProvider
 import org.komapper.core.OptimisticLockException
@@ -17,6 +19,7 @@ import org.komapper.core.dsl.QueryDsl
 import org.komapper.core.dsl.query.andThen
 import org.komapper.core.dsl.query.first
 import org.komapper.core.dsl.query.firstOrNull
+import org.komapper.core.dsl.query.single
 import org.komapper.jdbc.JdbcDatabase
 import org.komapper.jdbc.JdbcDatabaseConfig
 import java.time.Clock
@@ -178,5 +181,17 @@ class JdbcUpdateSingleTest(private val db: JdbcDatabase) {
                     .single(department2)
             }.let { }
         }
+    }
+
+    @Test
+    fun idColumnOnlyEntity() {
+        val a = Meta.idColumnOnlyAddress
+        val query = QueryDsl.from(a).limit(1)
+        val address = db.runQuery { query.single() }
+        val ex = assertThrows<IllegalArgumentException> {
+            val updateQuery = QueryDsl.update(a).single(address)
+            db.runQuery { updateQuery }.run { }
+        }
+        println(ex)
     }
 }

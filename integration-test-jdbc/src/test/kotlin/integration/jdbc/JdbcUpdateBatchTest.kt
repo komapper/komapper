@@ -1,10 +1,13 @@
 package integration.jdbc
 
 import integration.core.Address
+import integration.core.IdColumnOnlyAddress
 import integration.core.Person
 import integration.core.address
 import integration.core.department
+import integration.core.idColumnOnlyAddress
 import integration.core.person
+import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.OptimisticLockException
 import org.komapper.core.UniqueConstraintException
@@ -191,5 +194,17 @@ class JdbcUpdateBatchTest(private val db: JdbcDatabase) {
             assertFalse(a.location.startsWith("["))
             assertFalse(a.location.endsWith("]"))
         }
+    }
+
+    @Test
+    fun idColumnOnlyEntity() {
+        val a = Meta.idColumnOnlyAddress
+        val query = QueryDsl.from(a)
+        val address: List<IdColumnOnlyAddress> = db.runQuery { query }
+        val ex = assertThrows<IllegalArgumentException> {
+            val updateQuery = QueryDsl.update(a).batch(address)
+            db.runQuery { updateQuery }.run { }
+        }
+        println(ex)
     }
 }

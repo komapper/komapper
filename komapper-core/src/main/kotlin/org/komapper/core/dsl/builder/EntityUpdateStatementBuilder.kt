@@ -35,7 +35,11 @@ class DefaultEntityUpdateStatementBuilder<ENTITY : Any, ID : Any, META : EntityM
             append("update ")
             table(target, support)
             append(" set ")
-            for (p in context.getTargetProperties()) {
+            val targetProperties = context.getTargetProperties()
+            require(targetProperties.isNotEmpty()) {
+                "There are no entity properties to specify in the SET clause of the UPDATE statement"
+            }
+            for (p in targetProperties) {
                 column(p)
                 append(" = ")
                 bind(p.toValue(entity))
