@@ -48,14 +48,18 @@ class SelectStatementBuilder(
             }
             for ((table, subquery) in context.with.pairs) {
                 table(table, TableNameType.NAME_ONLY)
-                buf.append(" (")
-                for (p in table.properties()) {
-                    val columnName = p.getCanonicalColumnName(dialect::enquote)
-                    buf.append(columnName)
-                    buf.append(", ")
+
+                if (dialect.supportsColumnNamesInCteDefinition()) {
+                    buf.append(" (")
+                    for (p in table.properties()) {
+                        val columnName = p.getCanonicalColumnName(dialect::enquote)
+                        buf.append(columnName)
+                        buf.append(", ")
+                    }
+                    buf.cutBack(2)
+                    buf.append(")")
                 }
-                buf.cutBack(2)
-                buf.append(") as (")
+                buf.append(" as (")
                 val statement = support.buildSubqueryStatement(subquery.context)
                 buf.append(statement)
                 buf.append("), ")

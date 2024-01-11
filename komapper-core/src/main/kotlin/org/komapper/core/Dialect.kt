@@ -269,6 +269,11 @@ interface Dialect {
     fun supportsAsKeywordForTableAlias(): Boolean = true
 
     /**
+     * Returns whether the list of column names is supported after the name of a common table expression.
+     */
+    fun supportsColumnNamesInCteDefinition(): Boolean = true
+
+    /**
      * Returns whether the conflict_target is supported in the UPSERT statement.
      */
     fun supportsConflictTargetInUpsertStatement(): Boolean = false
