@@ -12,6 +12,8 @@ import org.komapper.core.dsl.operator.literal
 import org.komapper.core.dsl.operator.plus
 import org.komapper.core.dsl.operator.sum
 import org.komapper.jdbc.JdbcDatabase
+import org.komapper.jdbc.JdbcDatabaseConfig
+import org.komapper.jdbc.JdbcDialect
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -31,6 +33,38 @@ class JdbcSelectWithTest(private val db: JdbcDatabase) {
             .orderBy(e.employeeName)
             .select(sales.departmentName, e.employeeName)
         val list = db.runQuery(query)
+        assertEquals(
+            listOf(
+                "SALES" to "ALLEN",
+                "SALES" to "BLAKE",
+                "SALES" to "JAMES",
+                "SALES" to "MARTIN",
+                "SALES" to "TURNER",
+                "SALES" to "WARD",
+            ),
+            list,
+        )
+    }
+
+    @Test
+    fun with_supportsColumnNamesInCteDefinitionIsFalse() {
+        val config = object : JdbcDatabaseConfig by db.config {
+            override val dialect = object : JdbcDialect by db.config.dialect {
+                override fun supportsColumnNamesInCteDefinition() = false
+            }
+        }
+        val newDb = JdbcDatabase(config)
+
+        val e = Meta.employee
+        val d = Meta.department
+        val sales = d.clone(table = "sales")
+        val subquery = QueryDsl.from(d).where { d.departmentName eq "SALES" }
+        val query = QueryDsl.with(sales, subquery)
+            .from(sales)
+            .innerJoin(e) { sales.departmentId eq e.departmentId }
+            .orderBy(e.employeeName)
+            .select(sales.departmentName, e.employeeName)
+        val list = newDb.runQuery(query)
         assertEquals(
             listOf(
                 "SALES" to "ALLEN",
