@@ -48,17 +48,26 @@ class SelectStatementBuilder(
             }
             for ((table, subquery) in context.with.pairs) {
                 table(table, TableNameType.NAME_ONLY)
-                buf.append(" (")
-                for (p in table.properties()) {
-                    val columnName = p.getCanonicalColumnName(dialect::enquote)
-                    buf.append(columnName)
-                    buf.append(", ")
+
+                if (dialect.supportsColumnNamesInCteDefinition()) {
+                    buf.append(" (")
+                    for (p in table.properties()) {
+                        val columnName = p.getCanonicalColumnName(dialect::enquote)
+                        buf.append(columnName)
+                        buf.append(", ")
+                    }
+                    buf.cutBack(2)
+                    buf.append(") as (")
+                    val statement = support.buildSubqueryStatement(subquery.context)
+                    buf.append(statement)
+                    buf.append("), ")
+                } else {
+                    buf.append(" as (")
+                    val subqueryContext = assignAliasesToSubqueryColumns(subquery.context, table.properties())
+                    val statement = support.buildSubqueryStatement(subqueryContext)
+                    buf.append(statement)
+                    buf.append("), ")
                 }
-                buf.cutBack(2)
-                buf.append(") as (")
-                val statement = support.buildSubqueryStatement(subquery.context)
-                buf.append(statement)
-                buf.append("), ")
             }
             buf.cutBack(2)
             buf.append(" ")
@@ -89,31 +98,7 @@ class SelectStatementBuilder(
         if (context.derivedTable == null) {
             table(context.target)
         } else {
-            fun copySubqueryContext(subqueryContext: SubqueryContext): SubqueryContext {
-                return when (subqueryContext) {
-                    is SelectContext<*, *, *> -> {
-                        val properties = context.target.properties()
-                        val columns = subqueryContext.getProjection().expressions()
-                        val aliases = properties.zip(columns).map { (outer, inner) ->
-                            if (inner is AliasExpression) {
-                                error("The alias operand is found. Komapper does not allow the use of alias operand in derived tables.")
-                            } else {
-                                AliasExpression(inner, outer.columnName, outer.alwaysQuote)
-                            }
-                        }
-                        subqueryContext.copy(select = aliases)
-                    }
-
-                    is SetOperationContext -> {
-                        subqueryContext.copy(
-                            left = copySubqueryContext(subqueryContext.left),
-                            right = copySubqueryContext(subqueryContext.right),
-                        )
-                    }
-                }
-            }
-
-            val subqueryContext = copySubqueryContext(context.derivedTable.context)
+            val subqueryContext = assignAliasesToSubqueryColumns(context.derivedTable.context, context.target.properties())
             val statement = support.buildSubqueryStatement(subqueryContext)
             buf.append("(")
             buf.append(statement)
@@ -288,6 +273,29 @@ class SelectStatementBuilder(
                 buf.append(" wait ${lockOption.second}")
             } else {
                 raiseError("wait")
+            }
+        }
+    }
+
+    private fun assignAliasesToSubqueryColumns(subqueryContext: SubqueryContext, outerColumns: List<ColumnExpression<*, *>>): SubqueryContext {
+        return when (subqueryContext) {
+            is SelectContext<*, *, *> -> {
+                val innerColumns = subqueryContext.getProjection().expressions()
+                val aliases = outerColumns.zip(innerColumns).map { (outer, inner) ->
+                    if (inner is AliasExpression) {
+                        error("The alias operand is found. Komapper does not allow the use of alias operand in derived tables.")
+                    } else {
+                        AliasExpression(inner, outer.columnName, outer.alwaysQuote)
+                    }
+                }
+                subqueryContext.copy(select = aliases)
+            }
+
+            is SetOperationContext -> {
+                subqueryContext.copy(
+                    left = assignAliasesToSubqueryColumns(subqueryContext.left, outerColumns),
+                    right = assignAliasesToSubqueryColumns(subqueryContext.right, outerColumns),
+                )
             }
         }
     }
