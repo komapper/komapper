@@ -6,36 +6,42 @@ import com.google.devtools.ksp.processing.Resolver
 import com.google.devtools.ksp.processing.SymbolProcessor
 import com.google.devtools.ksp.processing.SymbolProcessorEnvironment
 import com.google.devtools.ksp.symbol.KSAnnotated
-import org.komapper.annotation.KomapperEntity
-import org.komapper.annotation.KomapperEntityDef
 import java.io.PrintWriter
 
-internal class EntityProcessor(private val environment: SymbolProcessorEnvironment, private val config: Config) : SymbolProcessor {
+internal class EntityProcessor(
+    private val environment: SymbolProcessorEnvironment,
+    private val config: Config,
+    private val processingAnnotations: List<ProcessingAnnotation>,
+) : SymbolProcessor {
 
     private val logger: KSPLogger = environment.logger
+    private val processedSymbols = mutableSetOf<KSAnnotated>()
 
     override fun process(resolver: Resolver): List<KSAnnotated> {
-        val pairs = listOf(
-            KomapperEntityDef::class.qualifiedName!! to SeparateDefinitionSourceResolver(config),
-            KomapperEntity::class.qualifiedName!! to SelfDefinitionSourceResolver(config),
-        )
-        for ((annotation, definitionSourceResolver) in pairs) {
-            val symbols = resolver.getSymbolsWithAnnotation(annotation)
-            val analyzer = EntityAnalyzer(logger, config, definitionSourceResolver)
-            for (symbol in symbols) {
+        for (annotation in processingAnnotations) {
+            val annotationName = annotation.annotationClass.qualifiedName!!
+            val symbols = resolver.getSymbolsWithAnnotation(annotationName)
+            val analyzer = EntityAnalyzer(logger, resolver, config, annotation.definitionSourceResolver, annotation.requiresIdValidation)
+            for (symbol in (symbols - processedSymbols)) {
                 val model = when (val result = analyzer.analyze(symbol)) {
                     is EntityAnalysisResult.Success -> result.model
                     is EntityAnalysisResult.Failure -> {
                         log(result.exit)
                         result.model
                     }
+
                     is EntityAnalysisResult.Error -> {
                         log(result.exit)
+                        continue
+                    }
+
+                    is EntityAnalysisResult.Skip -> {
                         continue
                     }
                 }
                 generateMetamodel(model)
             }
+            processedSymbols.addAll(symbols)
         }
         return emptyList()
     }

@@ -1,20 +1,24 @@
 package org.komapper.processor
 
+import com.google.devtools.ksp.processing.Resolver
 import com.google.devtools.ksp.symbol.ClassKind
+import com.google.devtools.ksp.symbol.KSAnnotated
 import com.google.devtools.ksp.symbol.KSClassDeclaration
-import com.google.devtools.ksp.symbol.KSNode
 import com.google.devtools.ksp.symbol.KSType
 import org.komapper.annotation.KomapperEntity
 import org.komapper.annotation.KomapperEntityDef
+import org.komapper.annotation.KomapperProjection
+import org.komapper.annotation.KomapperProjectionDef
 import org.komapper.processor.Symbols.KomapperStub
+import org.komapper.processor.Symbols.ProjectionMeta
 import org.komapper.processor.Symbols.Void
 
 internal interface EntityDefinitionSourceResolver {
-    fun resolve(symbol: KSNode): EntityDefinitionSource
+    fun resolve(resolver: Resolver, symbol: KSAnnotated): EntityDefinitionSource?
 }
 
 internal class SeparateDefinitionSourceResolver(val config: Config) : EntityDefinitionSourceResolver {
-    override fun resolve(symbol: KSNode): EntityDefinitionSource {
+    override fun resolve(resolver: Resolver, symbol: KSAnnotated): EntityDefinitionSource {
         val defDeclaration = symbol.accept(ClassDeclarationVisitor(), Unit)
             ?: report("@${KomapperEntityDef::class.simpleName} cannot be applied to this element.", symbol)
         val defAnnotation = defDeclaration.findAnnotation(KomapperEntityDef::class)
@@ -47,13 +51,14 @@ internal class SeparateDefinitionSourceResolver(val config: Config) : EntityDefi
             aliases = aliases.map { it.toString() },
             unitDeclaration = unitDeclaration,
             unitTypeName = unitTypeName,
+            projection = null,
             stubAnnotation = stubAnnotation,
         )
     }
 }
 
 internal class SelfDefinitionSourceResolver(val config: Config) : EntityDefinitionSourceResolver {
-    override fun resolve(symbol: KSNode): EntityDefinitionSource {
+    override fun resolve(resolver: Resolver, symbol: KSAnnotated): EntityDefinitionSource {
         val entityDeclaration = symbol.accept(ClassDeclarationVisitor(), Unit)
             ?: report("@${KomapperEntity::class.simpleName} cannot be applied to this element.", symbol)
         val annotation = entityDeclaration.findAnnotation(KomapperEntity::class)
@@ -80,6 +85,68 @@ internal class SelfDefinitionSourceResolver(val config: Config) : EntityDefiniti
             aliases = aliases.map { it.toString() },
             unitDeclaration = unitDeclaration,
             unitTypeName = unitTypeName,
+            projection = null,
+            stubAnnotation = stubAnnotation,
+        )
+    }
+}
+
+internal class SeparateProjectionDefinitionSourceResolver(val config: Config) : EntityDefinitionSourceResolver {
+
+    override fun resolve(resolver: Resolver, symbol: KSAnnotated): EntityDefinitionSource? {
+        val defDeclaration = symbol.accept(ClassDeclarationVisitor(), Unit)
+            ?: report("@${KomapperProjectionDef::class.simpleName} cannot be applied to this element.", symbol)
+
+        val defAnnotation = defDeclaration.findAnnotation(KomapperProjectionDef::class)
+        val projectionType = defAnnotation?.findValue("projection")
+        if (projectionType !is KSType) {
+            report("The projection value of @${KomapperProjectionDef::class.simpleName} is not found.", defDeclaration)
+        }
+        val unitName = resolver.getKSNameFromString(ProjectionMeta)
+        val unitDeclaration = resolver.getClassDeclarationByName(unitName) ?: error("$ProjectionMeta not found.")
+        val unitTypeName = createUnitTypeName(config, unitDeclaration)
+        val entityDeclaration = projectionType.declaration.accept(ClassDeclarationVisitor(), Unit)
+            ?: report("The projection value of @${KomapperProjectionDef::class.simpleName} is not found.", defDeclaration)
+        validateContainerClass(entityDeclaration, defAnnotation)
+        val projection = AnnotationSupport.createProjection(defAnnotation, entityDeclaration)
+        val stubAnnotation = defDeclaration.findAnnotation(KomapperStub)
+        val (packageName, simpleName) = createMetamodelClassName(config, defDeclaration)
+        return EntityDefinitionSource(
+            defDeclaration = defDeclaration,
+            entityDeclaration = entityDeclaration,
+            packageName = packageName,
+            metamodelSimpleName = simpleName,
+            aliases = emptyList(),
+            unitDeclaration = unitDeclaration,
+            unitTypeName = unitTypeName,
+            projection = projection,
+            stubAnnotation = stubAnnotation,
+        )
+    }
+}
+
+internal class SelfProjectionDefinitionSourceResolver(val config: Config) : EntityDefinitionSourceResolver {
+    override fun resolve(resolver: Resolver, symbol: KSAnnotated): EntityDefinitionSource? {
+        val entityDeclaration = symbol.accept(ClassDeclarationVisitor(), Unit)
+            ?: report("@${KomapperProjection::class.simpleName} cannot be applied to this element.", symbol)
+
+        val unitName = resolver.getKSNameFromString(ProjectionMeta)
+        val unitDeclaration = resolver.getClassDeclarationByName(unitName) ?: error("$ProjectionMeta not found.")
+        val unitTypeName = createUnitTypeName(config, unitDeclaration)
+        validateContainerClass(entityDeclaration, entityDeclaration)
+        val annotation = symbol.findAnnotation(KomapperProjection::class)
+        val projection = AnnotationSupport.createProjection(annotation, entityDeclaration)
+        val stubAnnotation = entityDeclaration.findAnnotation(KomapperStub)
+        val (packageName, simpleName) = createMetamodelClassName(config, entityDeclaration)
+        return EntityDefinitionSource(
+            defDeclaration = entityDeclaration,
+            entityDeclaration = entityDeclaration,
+            packageName = packageName,
+            metamodelSimpleName = simpleName,
+            aliases = emptyList(),
+            unitDeclaration = unitDeclaration,
+            unitTypeName = unitTypeName,
+            projection = projection,
             stubAnnotation = stubAnnotation,
         )
     }

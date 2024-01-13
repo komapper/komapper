@@ -3,6 +3,7 @@ package org.komapper.processor
 import com.google.devtools.ksp.getDeclaredProperties
 import com.google.devtools.ksp.isPublic
 import com.google.devtools.ksp.processing.KSPLogger
+import com.google.devtools.ksp.processing.Resolver
 import com.google.devtools.ksp.symbol.ClassKind
 import com.google.devtools.ksp.symbol.KSAnnotation
 import com.google.devtools.ksp.symbol.KSClassDeclaration
@@ -17,7 +18,6 @@ import org.komapper.annotation.KomapperEmbedded
 import org.komapper.annotation.KomapperEmbeddedId
 import org.komapper.annotation.KomapperEnum
 import org.komapper.annotation.KomapperEnumOverride
-import org.komapper.annotation.KomapperId
 import org.komapper.annotation.KomapperVersion
 import org.komapper.processor.Symbols.Instant
 import org.komapper.processor.Symbols.KotlinInstant
@@ -29,10 +29,11 @@ internal class EntityFactory(
     @Suppress("unused")
     private val logger: KSPLogger,
     private val config: Config,
+    private val resolver: Resolver,
     private val entityDef: EntityDef,
 ) {
 
-    private val annotationSupport = AnnotationSupport(logger, config)
+    private val annotationSupport = AnnotationSupport(logger, config, resolver)
 
     fun create(): Entity {
         val allProperties = createAllProperties()
@@ -66,9 +67,7 @@ internal class EntityFactory(
             versionProperty,
             createdAtProperty,
             updatedAtProperty,
-        ).also {
-            validateEntity(it)
-        }
+        )
     }
 
     private fun createAllProperties(): List<Property> {
@@ -461,27 +460,6 @@ internal class EntityFactory(
                     )
                 }
             }
-        }
-    }
-
-    private fun validateEntity(entity: Entity) {
-        if (entity.declaration.simpleName.asString().startsWith("__")) {
-            report("The class name cannot start with '__'.", entity.declaration)
-        }
-        for (p in entity.properties) {
-            val name = (p.declaration.simpleName).asString()
-            if (name.startsWith("__")) {
-                report("The property name cannot start with '__'.", p.node)
-            }
-        }
-        if (entity.embeddedIdProperty == null && entity.idProperties.isEmpty()) {
-            report("The entity class must have at least one id property.", entity.declaration)
-        }
-        if (entity.embeddedIdProperty != null && entity.idProperties.isNotEmpty()) {
-            report(
-                "The entity class can have either @${KomapperEmbeddedId::class.simpleName} or @${KomapperId::class.simpleName}.",
-                entity.declaration,
-            )
         }
     }
 }

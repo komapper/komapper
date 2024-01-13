@@ -1,10 +1,13 @@
 package integration.jdbc
 
 import integration.core.Address
+import integration.core.AddressDto
 import integration.core.address
 import integration.core.department
 import integration.core.employee
 import integration.core.selectAsAddress
+import integration.core.selectAsAddressDto
+import integration.core.selectAsDepartmentDto
 import integration.core.selectAsRobot
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
@@ -12,6 +15,7 @@ import org.komapper.core.dsl.QueryDsl
 import org.komapper.core.dsl.operator.concat
 import org.komapper.core.dsl.operator.count
 import org.komapper.core.dsl.query.first
+import org.komapper.core.dsl.query.single
 import org.komapper.jdbc.JdbcDatabase
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -377,5 +381,38 @@ class JdbcSelectProjectionTest(private val db: JdbcDatabase) {
             Address(10, "TURNER STREET", 1),
         )
         assertEquals(expected, list)
+    }
+
+    @Test
+    fun selectAsDto_projection() {
+        val a = Meta.address
+
+        val query = QueryDsl.from(a)
+            .where { a.addressId eq 10 }
+            .selectAsAddressDto(
+                idValue = a.addressId,
+                streetValue = a.street,
+            ).single()
+
+        val dto = db.runQuery(query)
+        assertEquals(AddressDto(10, "STREET 10"), dto)
+    }
+
+    @Test
+    fun selectAsDto_projectionDef() {
+        val e = Meta.employee
+        val d = Meta.department
+
+        val query = QueryDsl.from(d)
+            .innerJoin(e) { d.departmentId eq e.departmentId }
+            .groupBy(d.departmentId, d.departmentName)
+            .having { d.departmentId eq 1 }
+            .selectAsDepartmentDto(
+                department = d.departmentName,
+                memberCount = count(),
+            ).single()
+
+        val dto = db.runQuery(query)
+        assertEquals(3, dto.memberCount)
     }
 }

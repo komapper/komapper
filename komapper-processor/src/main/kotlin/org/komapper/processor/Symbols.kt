@@ -22,6 +22,7 @@ internal object Symbols {
     const val EntityDescriptor = "__EntityDescriptor"
     const val EntityMetamodelDeclaration = "org.komapper.core.dsl.metamodel.EntityMetamodelDeclaration"
     const val Meta = "org.komapper.core.dsl.Meta"
+    const val ProjectionMeta = "org.komapper.core.dsl.ProjectionMeta"
     const val KomapperStub = "KomapperStub"
     const val Operand = "org.komapper.core.dsl.expression.Operand"
     const val Argument = "$Operand.Argument"
