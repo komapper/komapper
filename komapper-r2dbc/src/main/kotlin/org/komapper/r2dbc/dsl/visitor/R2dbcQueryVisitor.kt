@@ -584,7 +584,8 @@ object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
         metamodel: EntityMetamodel<ENTITY, *, *>,
         collect: suspend (Flow<ENTITY>) -> R,
     ): R2dbcRunner<*> {
-        val transform = R2dbcRowTransformers.singleEntity(metamodel)
+        val columns = context.getProjection().expressions()
+        val transform = R2dbcRowTransformers.singleEntity(metamodel, columns)
         return R2dbcSelectRunner(context, transform, collect)
     }
 
@@ -593,7 +594,8 @@ object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
         metamodel: EntityMetamodel<ENTITY, *, *>,
         collect: suspend (Flow<ENTITY>) -> R,
     ): R2dbcRunner<*> {
-        val transform = R2dbcRowTransformers.singleEntity(metamodel)
+        val columns = context.getProjection().expressions()
+        val transform = R2dbcRowTransformers.singleEntity(metamodel, columns)
         return R2dbcSetOperationRunner(context, transform, collect)
     }
 
@@ -730,7 +732,7 @@ object R2dbcQueryVisitor : QueryVisitor<R2dbcRunner<*>> {
         strategy: ProjectionType,
         collect: suspend (Flow<T>) -> R,
     ): R2dbcRunner<*> {
-        val transform = R2dbcRowTransformers.singleEntity(metamodel, strategy)
+        val transform = R2dbcRowTransformers.singleEntity(metamodel, strategy = strategy)
         return R2dbcTemplateEntityProjectionSelectRunner(context, transform, collect)
     }
 }

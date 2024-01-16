@@ -29,6 +29,7 @@ import org.komapper.core.dsl.expression.Operand
 import org.komapper.core.dsl.expression.PercentRank
 import org.komapper.core.dsl.expression.PropertyExpression
 import org.komapper.core.dsl.expression.Rank
+import org.komapper.core.dsl.expression.ReadOnlyColumnExpression
 import org.komapper.core.dsl.expression.RowNumber
 import org.komapper.core.dsl.expression.ScalarAliasExpression
 import org.komapper.core.dsl.expression.ScalarArithmeticExpression
@@ -125,7 +126,9 @@ class BuilderSupport(
                 visitUserDefinedExpression(expression)
             }
 
-            is PropertyExpression<*, *> -> {
+            is ReadOnlyColumnExpression<*, *>,
+            is PropertyExpression<*, *>,
+            -> {
                 val name = expression.getCanonicalColumnName(dialect::enquote)
                 val owner = expression.owner
                 val alias = aliasManager.getAlias(owner)

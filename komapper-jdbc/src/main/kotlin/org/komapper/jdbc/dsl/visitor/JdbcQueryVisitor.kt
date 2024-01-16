@@ -588,7 +588,8 @@ object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
         metamodel: EntityMetamodel<ENTITY, *, *>,
         collect: suspend (Flow<ENTITY>) -> R,
     ): JdbcRunner<*> {
-        val transform = JdbcResultSetTransformers.singleEntity(metamodel)
+        val columns = context.getProjection().expressions()
+        val transform = JdbcResultSetTransformers.singleEntity(metamodel, columns)
         return JdbcSelectRunner(context, transform, collect)
     }
 
@@ -597,7 +598,8 @@ object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
         metamodel: EntityMetamodel<ENTITY, *, *>,
         collect: suspend (Flow<ENTITY>) -> R,
     ): JdbcRunner<*> {
-        val transform = JdbcResultSetTransformers.singleEntity(metamodel)
+        val columns = context.getProjection().expressions()
+        val transform = JdbcResultSetTransformers.singleEntity(metamodel, columns)
         return JdbcSetOperationRunner(context, transform, collect)
     }
 
@@ -734,7 +736,7 @@ object JdbcQueryVisitor : QueryVisitor<JdbcRunner<*>> {
         strategy: ProjectionType,
         collect: suspend (Flow<T>) -> R,
     ): JdbcRunner<*> {
-        val transform = JdbcResultSetTransformers.singleEntity(metamodel, strategy)
+        val transform = JdbcResultSetTransformers.singleEntity(metamodel, strategy = strategy)
         return JdbcTemplateEntityProjectionSelectRunner(context, transform, collect)
     }
 }

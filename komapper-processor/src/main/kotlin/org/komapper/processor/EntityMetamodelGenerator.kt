@@ -752,11 +752,11 @@ internal class EntityMetamodelGenerator(
             when (p) {
                 is CompositeProperty -> {
                     p.embeddable.properties.map {
-                        "`$p#$it`" to "$ColumnExpression<${it.exteriorTypeName}, ${it.interiorTypeName}>"
+                        "`$p#$it`" to "$ColumnExpression<${it.exteriorTypeName}, *>"
                     }
                 }
                 is LeafProperty -> {
-                    listOf("`$p`" to "$ColumnExpression<${p.exteriorTypeName}, ${p.interiorTypeName}>")
+                    listOf("`$p`" to "$ColumnExpression<${p.exteriorTypeName}, *>")
                 }
             }
         }

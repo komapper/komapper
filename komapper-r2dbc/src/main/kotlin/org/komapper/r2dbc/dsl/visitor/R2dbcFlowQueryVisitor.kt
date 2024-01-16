@@ -173,7 +173,7 @@ object R2dbcFlowQueryVisitor : FlowQueryVisitor<R2dbcFlowBuilder<*>> {
         metamodel: EntityMetamodel<T, *, *>,
         strategy: ProjectionType,
     ): R2dbcFlowBuilder<*> {
-        val transform = R2dbcRowTransformers.singleEntity(metamodel, strategy)
+        val transform = R2dbcRowTransformers.singleEntity(metamodel, strategy = strategy)
         return R2dbcTemplateEntityProjectionSelectFlowBuilder(context, transform)
     }
 }

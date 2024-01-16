@@ -1,6 +1,7 @@
 package org.komapper.r2dbc.dsl.runner
 
 import io.r2dbc.spi.Row
+import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.metamodel.PropertyMetamodel
 import org.komapper.core.dsl.query.ProjectionType
@@ -13,11 +14,12 @@ internal class R2dbcEntityMapper(strategy: ProjectionType, dataOperator: R2dbcDa
         ProjectionType.NAME -> R2dbcNamedValueExtractor(dataOperator, row)
     }
 
-    fun <E : Any> execute(metamodel: EntityMetamodel<E, *, *>, forceMapping: Boolean = false): E? {
+    fun <E : Any> execute(metamodel: EntityMetamodel<E, *, *>, columns: List<ColumnExpression<*, *>> = emptyList(), forceMapping: Boolean = false): E? {
         val valueMap = mutableMapOf<PropertyMetamodel<*, *, *>, Any?>()
-        for (p in metamodel.properties()) {
+        val properties = metamodel.properties()
+        for ((p, c) in properties.zip(columns.ifEmpty { properties })) {
             val value = try {
-                valueExtractor.execute(p)
+                valueExtractor.execute(c)
             } catch (e: Exception) {
                 throw PropertyMappingException(metamodel.klass(), p.name, e)
             }

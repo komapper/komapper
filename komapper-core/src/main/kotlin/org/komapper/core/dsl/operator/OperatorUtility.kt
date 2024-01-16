@@ -2,6 +2,7 @@ package org.komapper.core.dsl.operator
 
 import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.expression.Operand
+import org.komapper.core.dsl.expression.ReadOnlyColumnExpression
 import org.komapper.core.dsl.expression.SqlBuilderScope
 import org.komapper.core.dsl.expression.UserDefinedExpression
 import kotlin.reflect.KClass
@@ -25,7 +26,14 @@ fun <T : Any, S : Any> columnExpression(
     operands: List<Operand>,
     build: SqlBuilderScope.() -> Unit,
 ): ColumnExpression<T, S> {
-    return columnExpression(baseExpression.exteriorClass, baseExpression.interiorClass, baseExpression.wrap, name, operands, build)
+    return columnExpression(
+        baseExpression.exteriorClass,
+        baseExpression.interiorClass,
+        baseExpression.wrap,
+        name,
+        operands,
+        build,
+    )
 }
 
 /**
@@ -73,4 +81,23 @@ fun <EXTERIOR : Any, INTERIOR : Any> columnExpression(
     build: SqlBuilderScope.() -> Unit,
 ): ColumnExpression<EXTERIOR, INTERIOR> {
     return UserDefinedExpression(exteriorClass, interiorClass, wrap, name, operands, build)
+}
+
+/**
+ * Transforms a [ColumnExpression<*, IN_INTERIOR>] to a [ColumnExpression<OUT_EXTERIOR, *>].
+ *
+ * @param wrap the mapping function
+ */
+inline fun <reified OUT_EXTERIOR : Any, IN_INTERIOR : Any> ColumnExpression<*, IN_INTERIOR>.transform(
+    noinline wrap: (IN_INTERIOR) -> OUT_EXTERIOR,
+): ColumnExpression<OUT_EXTERIOR, *> {
+    return ReadOnlyColumnExpression(
+        owner = this.owner,
+        exteriorClass = OUT_EXTERIOR::class,
+        interiorClass = this.interiorClass,
+        wrap = wrap,
+        alwaysQuote = this.alwaysQuote,
+        columnName = this.columnName,
+        masking = this.masking,
+    )
 }
