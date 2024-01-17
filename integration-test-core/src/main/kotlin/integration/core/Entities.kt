@@ -369,7 +369,7 @@ data class EmployeeSalary(
 @KomapperProjection
 data class AddressDto(
     @KomapperColumn("address_id") val idValue: Int,
-    @KomapperColumn("street") val streetValue: String,
+    @KomapperColumn("street") val streetValue: String?,
 )
 
 data class DepartmentDto(

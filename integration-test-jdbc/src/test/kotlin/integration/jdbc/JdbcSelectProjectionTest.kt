@@ -14,6 +14,7 @@ import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
 import org.komapper.core.dsl.operator.concat
 import org.komapper.core.dsl.operator.count
+import org.komapper.core.dsl.operator.nullLiteral
 import org.komapper.core.dsl.operator.transform
 import org.komapper.core.dsl.query.first
 import org.komapper.core.dsl.query.single
@@ -430,5 +431,20 @@ class JdbcSelectProjectionTest(private val db: JdbcDatabase) {
 
         val dto = db.runQuery(query)
         assertEquals(AddressDto(10, "10"), dto)
+    }
+
+    @Test
+    fun selectAsDto_projection_nullLiteral() {
+        val a = Meta.address
+
+        val query = QueryDsl.from(a)
+            .where { a.addressId eq 10 }
+            .selectAsAddressDto(
+                idValue = a.addressId,
+                streetValue = nullLiteral(),
+            ).single()
+
+        val dto = db.runQuery(query)
+        assertEquals(AddressDto(10, null), dto)
     }
 }
