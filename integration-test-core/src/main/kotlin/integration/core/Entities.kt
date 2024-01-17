@@ -15,6 +15,7 @@ import org.komapper.annotation.KomapperManyToOne
 import org.komapper.annotation.KomapperOneToMany
 import org.komapper.annotation.KomapperOneToOne
 import org.komapper.annotation.KomapperProjection
+import org.komapper.annotation.KomapperProjectionDef
 import org.komapper.annotation.KomapperSequence
 import org.komapper.annotation.KomapperTable
 import org.komapper.annotation.KomapperUpdatedAt
@@ -364,3 +365,17 @@ data class EmployeeSalary(
     val salary: BigDecimal,
     val averageSalary: BigDecimal,
 )
+
+@KomapperProjection
+data class AddressDto(
+    @KomapperColumn("address_id") val idValue: Int,
+    @KomapperColumn("street") val streetValue: String?,
+)
+
+data class DepartmentDto(
+    val department: String,
+    val memberCount: Long,
+)
+
+@KomapperProjectionDef(DepartmentDto::class)
+object DepartmentDtoDef

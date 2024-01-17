@@ -1,6 +1,7 @@
 package org.komapper.core.dsl.context
 
 import org.komapper.core.ThreadSafe
+import org.komapper.core.dsl.element.Projection
 import org.komapper.core.dsl.expression.SortItem
 import org.komapper.core.dsl.expression.TableExpression
 import org.komapper.core.dsl.options.SelectOptions
@@ -14,17 +15,26 @@ data class SetOperationContext(
     val options: SelectOptions = SelectOptions.DEFAULT,
 ) : TablesProvider, SubqueryContext {
 
-    override fun getTables(): Set<TableExpression<*>> {
-        return visitSubqueryContext(left) + visitSubqueryContext(right)
-    }
-
-    private fun visitSubqueryContext(subqueryContext: SubqueryContext): Set<TableExpression<*>> {
-        return when (subqueryContext) {
-            is SelectContext<*, *, *> -> setOf(subqueryContext.target)
-            is SetOperationContext -> {
-                visitSubqueryContext(subqueryContext.left) + visitSubqueryContext(subqueryContext.right)
+    fun getProjection(): Projection {
+        fun visitSubqueryContext(subqueryContext: SubqueryContext): Projection {
+            return when (subqueryContext) {
+                is SelectContext<*, *, *> -> subqueryContext.getProjection()
+                is SetOperationContext -> visitSubqueryContext(subqueryContext.left)
             }
         }
+        return visitSubqueryContext(left)
+    }
+
+    override fun getTables(): Set<TableExpression<*>> {
+        fun visitSubqueryContext(subqueryContext: SubqueryContext): Set<TableExpression<*>> {
+            return when (subqueryContext) {
+                is SelectContext<*, *, *> -> setOf(subqueryContext.target)
+                is SetOperationContext -> {
+                    visitSubqueryContext(subqueryContext.left) + visitSubqueryContext(subqueryContext.right)
+                }
+            }
+        }
+        return visitSubqueryContext(left) + visitSubqueryContext(right)
     }
 }
 

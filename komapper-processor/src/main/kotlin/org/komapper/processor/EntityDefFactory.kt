@@ -2,6 +2,7 @@ package org.komapper.processor
 
 import com.google.devtools.ksp.getDeclaredProperties
 import com.google.devtools.ksp.processing.KSPLogger
+import com.google.devtools.ksp.processing.Resolver
 import com.google.devtools.ksp.symbol.KSPropertyDeclaration
 import com.google.devtools.ksp.symbol.KSValueParameter
 import org.komapper.annotation.KomapperAutoIncrement
@@ -17,9 +18,10 @@ import org.komapper.annotation.KomapperVersion
 internal class EntityDefFactory(
     @Suppress("unused") private val logger: KSPLogger,
     private val config: Config,
+    private val resolver: Resolver,
     private val definitionSource: EntityDefinitionSource,
 ) {
-    private val annotationSupport: AnnotationSupport = AnnotationSupport(logger, config)
+    private val annotationSupport: AnnotationSupport = AnnotationSupport(logger, config, resolver)
     private val defDeclaration = definitionSource.defDeclaration
 
     fun create(): EntityDef {

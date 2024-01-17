@@ -22,10 +22,10 @@ annotation class KomapperEntity(
 )
 
 /**
- * Indicates that the result of a SELECT query can be projected into an instance of an annotated entity class.
+ * Indicates that the result of a SELECT query can be projected into an instance of an annotated class.
+ * The default function name is a concatenation of "selectAs" and the simple name of the class.
  *
  * @property function the function name for performing projection.
- * The default function name is a concatenation of "selectAs" and the simple name of the entity class.
  */
 @Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.SOURCE)
@@ -256,6 +256,22 @@ annotation class KomapperEntityDef(
     val entity: KClass<*>,
     val aliases: Array<String> = [],
     val unit: KClass<*> = Void::class,
+)
+
+/**
+ * Indicates that the result of a SELECT query can be projected into an instance of a [projection] class.
+ * The default function name is a concatenation of "selectAs" and the simple name of the [projection] class.
+ *
+ * The [projection] class must be a data class.
+ *
+ * @property projection the projection class
+ * @property function the function name for performing projection
+ */
+@Target(AnnotationTarget.CLASS)
+@Retention(AnnotationRetention.SOURCE)
+annotation class KomapperProjectionDef(
+    val projection: KClass<*>,
+    val function: String = "",
 )
 
 /**

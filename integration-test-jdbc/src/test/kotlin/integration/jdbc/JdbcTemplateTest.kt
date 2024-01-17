@@ -1,10 +1,12 @@
 package integration.jdbc
 
 import integration.core.Address
+import integration.core.AddressDto
 import integration.core.Dbms
 import integration.core.Run
 import integration.core.address
 import integration.core.selectAsAddress
+import integration.core.selectAsAddressDto
 import kotlinx.coroutines.flow.toList
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
@@ -342,5 +344,25 @@ class JdbcTemplateTest(private val db: JdbcDatabase) {
         }
         assertEquals(15, list.size)
         assertEquals(Address(1, "STREET 1", 1), list[0])
+    }
+
+    @Test
+    fun selectAsAddressDto_byIndex() {
+        val list = db.runQuery {
+            val sql = "select address_id, street from address order by address_id"
+            QueryDsl.fromTemplate(sql).selectAsAddressDto()
+        }
+        assertEquals(15, list.size)
+        assertEquals(AddressDto(1, "STREET 1"), list[0])
+    }
+
+    @Test
+    fun selectAsAddressDto_byName() {
+        val list = db.runQuery {
+            val sql = "select street, address_id from address order by address_id"
+            QueryDsl.fromTemplate(sql).selectAsAddressDto(ProjectionType.NAME)
+        }
+        assertEquals(15, list.size)
+        assertEquals(AddressDto(1, "STREET 1"), list[0])
     }
 }

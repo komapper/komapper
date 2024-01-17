@@ -23,12 +23,15 @@ import org.komapper.core.dsl.expression.LastValue
 import org.komapper.core.dsl.expression.Lead
 import org.komapper.core.dsl.expression.LiteralExpression
 import org.komapper.core.dsl.expression.MathematicalFunction
+import org.komapper.core.dsl.expression.NonNullLiteralExpression
 import org.komapper.core.dsl.expression.NthValue
 import org.komapper.core.dsl.expression.Ntile
+import org.komapper.core.dsl.expression.NullLiteralExpression
 import org.komapper.core.dsl.expression.Operand
 import org.komapper.core.dsl.expression.PercentRank
 import org.komapper.core.dsl.expression.PropertyExpression
 import org.komapper.core.dsl.expression.Rank
+import org.komapper.core.dsl.expression.ReadOnlyColumnExpression
 import org.komapper.core.dsl.expression.RowNumber
 import org.komapper.core.dsl.expression.ScalarAliasExpression
 import org.komapper.core.dsl.expression.ScalarArithmeticExpression
@@ -97,7 +100,7 @@ class BuilderSupport(
                 visitConditionalExpression(expression)
             }
 
-            is LiteralExpression<*> -> {
+            is LiteralExpression<*, *> -> {
                 visitLiteralExpression(expression)
             }
 
@@ -125,7 +128,9 @@ class BuilderSupport(
                 visitUserDefinedExpression(expression)
             }
 
-            is PropertyExpression<*, *> -> {
+            is ReadOnlyColumnExpression<*, *>,
+            is PropertyExpression<*, *>,
+            -> {
                 val name = expression.getCanonicalColumnName(dialect::enquote)
                 val owner = expression.owner
                 val alias = aliasManager.getAlias(owner)
@@ -240,9 +245,12 @@ class BuilderSupport(
         buf.append(")")
     }
 
-    private fun visitLiteralExpression(expression: LiteralExpression<*>) {
-        val string = dialect.formatValue(expression.value, expression.interiorClass, false)
-        buf.append(string)
+    private fun visitLiteralExpression(expression: LiteralExpression<*, *>) {
+        val literal = when (expression) {
+            is NullLiteralExpression -> "null"
+            is NonNullLiteralExpression -> dialect.formatValue(expression.value, expression.interiorClass, false)
+        }
+        buf.append(literal)
     }
 
     private fun visitMathematicalFunction(function: MathematicalFunction<*, *>) {

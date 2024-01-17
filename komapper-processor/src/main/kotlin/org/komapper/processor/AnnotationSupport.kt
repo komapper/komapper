@@ -3,7 +3,9 @@ package org.komapper.processor
 import com.google.devtools.ksp.getDeclaredProperties
 import com.google.devtools.ksp.isPublic
 import com.google.devtools.ksp.processing.KSPLogger
+import com.google.devtools.ksp.processing.Resolver
 import com.google.devtools.ksp.symbol.KSAnnotation
+import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSDeclaration
 import com.google.devtools.ksp.symbol.KSNode
 import com.google.devtools.ksp.symbol.KSType
@@ -26,6 +28,7 @@ import org.komapper.core.NamingStrategy
 internal class AnnotationSupport(
     @Suppress("unused") private val logger: KSPLogger,
     private val config: Config,
+    private val resolver: Resolver,
 ) {
 
     private val namingStrategy: NamingStrategy = config.namingStrategy
@@ -43,14 +46,15 @@ internal class AnnotationSupport(
     }
 
     fun getProjection(definitionSource: EntityDefinitionSource): Projection? {
-        val defaultFunction = "selectAs${definitionSource.entityDeclaration.simpleName.asString()}"
-        val annotation = definitionSource.defDeclaration.findAnnotation(KomapperProjection::class)
-        return if (annotation == null) {
-            if (config.enableEntityProjection) Projection(defaultFunction) else null
+        return if (definitionSource.projection != null) {
+            return definitionSource.projection
         } else {
-            annotation.findValue("function")?.toString()?.trim()
-                .let { if (it.isNullOrBlank()) defaultFunction else it }
-                .let { Projection(it) }
+            val annotation = definitionSource.defDeclaration.findAnnotation(KomapperProjection::class)
+            if (annotation != null || config.enableEntityProjection) {
+                createProjection(annotation, definitionSource.entityDeclaration)
+            } else {
+                null
+            }
         }
     }
 
@@ -143,7 +147,7 @@ internal class AnnotationSupport(
             when (annotation.shortName.asString()) {
                 KomapperEntity::class.simpleName -> {
                     try {
-                        selfDefinitionSourceResolver.resolve(declaration)
+                        selfDefinitionSourceResolver.resolve(resolver, declaration)
                     } catch (e: Exit) {
                         null
                     }
@@ -151,7 +155,7 @@ internal class AnnotationSupport(
 
                 KomapperEntityDef::class.simpleName -> {
                     try {
-                        separateDefinitionSourceResolver.resolve(declaration)
+                        separateDefinitionSourceResolver.resolve(resolver, declaration)
                     } catch (e: Exit) {
                         null
                     }
@@ -281,5 +285,18 @@ internal class AnnotationSupport(
                 val enumStrategy = getEnumStrategy(it.second)
                 Triple(it.first!!, enumStrategy, it.third)
             }.toList()
+    }
+
+    companion object {
+        fun createProjection(annotation: KSAnnotation?, declaration: KSClassDeclaration): Projection {
+            val defaultFunction = "selectAs${declaration.simpleName.asString()}"
+            return if (annotation == null) {
+                Projection(defaultFunction)
+            } else {
+                annotation.findValue("function")?.toString()?.trim()
+                    .let { if (it.isNullOrBlank()) defaultFunction else it }
+                    .let { Projection(it) }
+            }
+        }
     }
 }

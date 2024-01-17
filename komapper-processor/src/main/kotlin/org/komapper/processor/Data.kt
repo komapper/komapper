@@ -19,6 +19,7 @@ internal data class EntityDefinitionSource(
     val aliases: List<String>,
     val unitDeclaration: KSClassDeclaration?,
     val unitTypeName: String,
+    val projection: Projection?,
     val stubAnnotation: KSAnnotation?,
 )
 

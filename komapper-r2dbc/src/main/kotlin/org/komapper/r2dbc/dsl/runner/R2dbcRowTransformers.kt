@@ -10,10 +10,10 @@ import org.komapper.r2dbc.R2dbcDataOperator
 
 internal object R2dbcRowTransformers {
 
-    fun <ENTITY : Any> singleEntity(metamodel: EntityMetamodel<ENTITY, *, *>, strategy: ProjectionType = ProjectionType.INDEX): (R2dbcDataOperator, Row) -> ENTITY =
+    fun <ENTITY : Any> singleEntity(metamodel: EntityMetamodel<ENTITY, *, *>, columns: List<ColumnExpression<*, *>> = emptyList(), strategy: ProjectionType = ProjectionType.INDEX): (R2dbcDataOperator, Row) -> ENTITY =
         { dataOperator, row ->
             val mapper = R2dbcEntityMapper(strategy, dataOperator, row)
-            mapper.execute(metamodel, true) as ENTITY
+            mapper.execute(metamodel, columns, true) as ENTITY
         }
 
     fun <A : Any> singleColumn(expression: ColumnExpression<A, *>): (R2dbcDataOperator, Row) -> A? {
