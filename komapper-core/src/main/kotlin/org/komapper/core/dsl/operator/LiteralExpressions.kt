@@ -4,12 +4,27 @@ import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.expression.NonNullLiteralExpression
 import org.komapper.core.dsl.expression.NullLiteralExpression
 import java.math.BigDecimal
+import kotlin.reflect.KClass
 
 /**
  * Builds a null literal.
  */
 inline fun <reified EXTERIOR : Any> nullLiteral(): ColumnExpression<EXTERIOR, *> {
     return NullLiteralExpression(EXTERIOR::class, String::class)
+}
+
+/**
+ * Builds a null literal.
+ */
+fun <T : Any> nullLiteral(klass: KClass<T>): ColumnExpression<T, T> {
+    return NullLiteralExpression(klass, klass)
+}
+
+/**
+ * Builds a null literal.
+ */
+fun <EXTERIOR : Any, INTERIOR : Any> nullLiteral(exteriorClass: KClass<EXTERIOR>, interiorClass: KClass<INTERIOR>): ColumnExpression<EXTERIOR, INTERIOR> {
+    return NullLiteralExpression(exteriorClass, interiorClass)
 }
 
 /**

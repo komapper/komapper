@@ -1,6 +1,8 @@
 package integration.jdbc
 
 import integration.core.booleanData
+import integration.core.enumData
+import integration.core.enumclass.Direction
 import integration.core.intData
 import integration.core.longData
 import integration.core.stringData
@@ -8,6 +10,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
 import org.komapper.core.dsl.operator.literal
+import org.komapper.core.dsl.operator.nullLiteral
 import org.komapper.core.dsl.query.first
 import org.komapper.jdbc.JdbcDatabase
 import kotlin.test.Test
@@ -83,5 +86,35 @@ class JdbcLiteralTest(val db: JdbcDatabase) {
             literal("I don't like it.")
         }
         assertEquals("The value must not contain the single quotation.", ex.message)
+    }
+
+    @Test
+    fun test_string_null() {
+        val m = Meta.stringData
+        db.runQuery {
+            QueryDsl.insert(m).values {
+                m.id eq 1
+                m.value eq nullLiteral(String::class)
+            }
+        }
+        val result = db.runQuery {
+            QueryDsl.from(m).select(m.value, nullLiteral()).first()
+        }
+        assertEquals(null to null, result)
+    }
+
+    @Test
+    fun test_enum_null() {
+        val m = Meta.enumData
+        db.runQuery {
+            QueryDsl.insert(m).values {
+                m.id eq 1
+                m.value eq nullLiteral(Direction::class, String::class)
+            }
+        }
+        val result = db.runQuery {
+            QueryDsl.from(m).select(m.value, nullLiteral()).first()
+        }
+        assertEquals(null to null, result)
     }
 }
