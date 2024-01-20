@@ -4,6 +4,9 @@ template: |
   # What's Changed
 
   $CHANGES
+  
+  **Full Changelog**: https://github.com/$OWNER/$REPOSITORY/compare/$PREVIOUS_TAG...v$RESOLVED_VERSION
+
 categories:
   - title: 'New Features'
     labels:
@@ -24,9 +27,7 @@ categories:
     label: 'docs'
   - title: 'Dependency Upgrades'
     label: 'dependencies'
-exclude-labels:
-  - 'skip-changelog'
-change-template: '* $TITLE (#$NUMBER)'
+
 version-resolver:
   major:
     labels:
@@ -40,3 +41,6 @@ version-resolver:
     labels:
       - 'patch'
   default: patch
+
+exclude-labels:
+  - 'skip-changelog'
