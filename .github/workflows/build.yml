@@ -22,7 +22,7 @@ jobs:
           java-version: 17
 
       - name: Check
-        uses: gradle/gradle-build-action@v2.11.1
+        uses: gradle/gradle-build-action@v2.12.0
         with:
           arguments: javatoolchain check -x h2 -x :integration-test-jdbc:check -x :integration-test-r2dbc:check
 
@@ -51,7 +51,7 @@ jobs:
           java-version: 17
 
       - name: Test
-        uses: gradle/gradle-build-action@v2.11.1
+        uses: gradle/gradle-build-action@v2.12.0
         with:
           arguments: javatoolchain :integration-test-jdbc:${{ matrix.driver }}
 
@@ -80,7 +80,7 @@ jobs:
           java-version: 17
 
       - name: Test
-        uses: gradle/gradle-build-action@v2.11.1
+        uses: gradle/gradle-build-action@v2.12.0
         with:
           arguments: javatoolchain :integration-test-r2dbc:${{ matrix.driver }}
 
@@ -108,7 +108,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Publish packages
-        uses: gradle/gradle-build-action@v2.11.1
+        uses: gradle/gradle-build-action@v2.12.0
         env:
           ORG_GRADLE_PROJECT_signingKey: ${{ secrets.SIGNING_KEY }}
           ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.SIGNING_PASSWORD }}
@@ -118,7 +118,7 @@ jobs:
           arguments: publishToSonatype closeAndReleaseSonatypeStagingRepository
 
       - name: Publish plugin
-        uses: gradle/gradle-build-action@v2.11.1
+        uses: gradle/gradle-build-action@v2.12.0
         with:
           arguments: |
             -Pgradle.publish.key=${{ secrets.GRADLE_PUBLISH_KEY }}
