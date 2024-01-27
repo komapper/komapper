@@ -31,7 +31,7 @@ class H2R2dbcDataTypeProvider(next: R2dbcDataTypeProvider) :
 
     companion object {
         val DEFAULT_DATA_TYPES: List<R2dbcDataType<*>> = listOf(
-            R2dbcBigDecimalType("bigint"),
+            R2dbcBigDecimalType("numeric"),
             R2dbcBigIntegerType("bigint"),
             R2dbcBlobType("blob"),
             R2dbcBooleanType("bool"),

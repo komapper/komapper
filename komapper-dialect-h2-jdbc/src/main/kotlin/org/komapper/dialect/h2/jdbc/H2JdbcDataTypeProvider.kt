@@ -37,7 +37,7 @@ class H2JdbcDataTypeProvider(next: JdbcDataTypeProvider) :
         private val DEFAULT_DATA_TYPES: List<JdbcDataType<*>> = listOf(
             JdbcAnyType("java_object"),
             JdbcArrayType("varchar(100) array"),
-            JdbcBigDecimalType("bigint"),
+            JdbcBigDecimalType("numeric"),
             JdbcBigIntegerType("bigint"),
             JdbcBlobType("blob"),
             JdbcBooleanType("bool"),
