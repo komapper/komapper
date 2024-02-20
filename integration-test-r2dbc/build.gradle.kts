@@ -57,7 +57,7 @@ testing {
                 implementation(project())
                 implementation("org.testcontainers:mariadb")
                 implementation(project(":komapper-dialect-mariadb-r2dbc"))
-                runtimeOnly("org.mariadb.jdbc:mariadb-java-client:3.3.2")
+                runtimeOnly("org.mariadb.jdbc:mariadb-java-client:3.3.3")
             }
         }
 
