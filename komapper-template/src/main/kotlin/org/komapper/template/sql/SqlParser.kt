@@ -26,6 +26,7 @@ import org.komapper.template.sql.SqlTokenType.OPTION
 import org.komapper.template.sql.SqlTokenType.OR
 import org.komapper.template.sql.SqlTokenType.ORDER_BY
 import org.komapper.template.sql.SqlTokenType.OTHER
+import org.komapper.template.sql.SqlTokenType.PARSER_LEVEL_COMMENT_DIRECTIVE
 import org.komapper.template.sql.SqlTokenType.QUOTE
 import org.komapper.template.sql.SqlTokenType.SELECT
 import org.komapper.template.sql.SqlTokenType.SINGLE_LINE_COMMENT
@@ -94,6 +95,7 @@ internal class SqlParser constructor(
                 ELSE_DIRECTIVE -> parseElseDirective()
                 END_DIRECTIVE -> parseEndDirective()
                 FOR_DIRECTIVE -> parseForDirective()
+                PARSER_LEVEL_COMMENT_DIRECTIVE -> Unit // do nothing
             }
         }
         return reduceAll()

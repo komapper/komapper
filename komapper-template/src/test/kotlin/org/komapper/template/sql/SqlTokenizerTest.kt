@@ -21,6 +21,7 @@ import org.komapper.template.sql.SqlTokenType.OPEN_PAREN
 import org.komapper.template.sql.SqlTokenType.OPTION
 import org.komapper.template.sql.SqlTokenType.OR
 import org.komapper.template.sql.SqlTokenType.ORDER_BY
+import org.komapper.template.sql.SqlTokenType.PARSER_LEVEL_COMMENT_DIRECTIVE
 import org.komapper.template.sql.SqlTokenType.QUOTE
 import org.komapper.template.sql.SqlTokenType.SELECT
 import org.komapper.template.sql.SqlTokenType.SINGLE_LINE_COMMENT
@@ -110,6 +111,21 @@ class SqlTokenizerTest {
         assertEquals(" ", tokenizer.token)
         assertEquals(MULTI_LINE_COMMENT, tokenizer.next())
         assertEquals("/**/", tokenizer.token)
+        assertEquals(WORD, tokenizer.next())
+        assertEquals("bbb", tokenizer.token)
+        assertEquals(EOF, tokenizer.next())
+        assertEquals("", tokenizer.token)
+    }
+
+    @Test
+    fun testParserLevelBlockComment() {
+        val tokenizer = SqlTokenizer("where /*%!aaa*/bbb")
+        assertEquals(WHERE, tokenizer.next())
+        assertEquals("where", tokenizer.token)
+        assertEquals(SPACE, tokenizer.next())
+        assertEquals(" ", tokenizer.token)
+        assertEquals(PARSER_LEVEL_COMMENT_DIRECTIVE, tokenizer.next())
+        assertEquals("/*%!aaa*/", tokenizer.token)
         assertEquals(WORD, tokenizer.next())
         assertEquals("bbb", tokenizer.token)
         assertEquals(EOF, tokenizer.next())
