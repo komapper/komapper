@@ -198,6 +198,13 @@ class SqlParserTest {
             val node = SqlParser(sql).parse()
             assertEquals(sql, node.toText())
         }
+
+        @Test
+        fun parserLevelComment() {
+            val sql = "select a/*%! comment */ from b"
+            val node = SqlParser(sql).parse()
+            assertEquals("select a from b", node.toText())
+        }
     }
 
     class SetTest {

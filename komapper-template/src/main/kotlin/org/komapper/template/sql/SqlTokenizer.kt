@@ -26,6 +26,7 @@ import org.komapper.template.sql.SqlTokenType.OPTION
 import org.komapper.template.sql.SqlTokenType.OR
 import org.komapper.template.sql.SqlTokenType.ORDER_BY
 import org.komapper.template.sql.SqlTokenType.OTHER
+import org.komapper.template.sql.SqlTokenType.PARSER_LEVEL_COMMENT_DIRECTIVE
 import org.komapper.template.sql.SqlTokenType.QUOTE
 import org.komapper.template.sql.SqlTokenType.SELECT
 import org.komapper.template.sql.SqlTokenType.SINGLE_LINE_COMMENT
@@ -293,7 +294,9 @@ internal class SqlTokenizer(private val sql: String) {
                 } else if (c2 == '%') {
                     if (buf.hasRemaining()) {
                         val c3 = buf.get()
-                        if (buf.hasRemaining()) {
+                        if (c3 == '!') {
+                            type = PARSER_LEVEL_COMMENT_DIRECTIVE
+                        } else if (buf.hasRemaining()) {
                             val c4 = buf.get()
                             if (c3 == 'i' && c4 == 'f') {
                                 if (isDirectiveTerminated()) {
@@ -344,7 +347,8 @@ internal class SqlTokenizer(private val sql: String) {
                             buf.position(buf.position() - 1)
                         }
                     }
-                    if (type !== IF_DIRECTIVE &&
+                    if (type !== PARSER_LEVEL_COMMENT_DIRECTIVE &&
+                        type !== IF_DIRECTIVE &&
                         type !== FOR_DIRECTIVE &&
                         type !== END_DIRECTIVE &&
                         type !== ELSE_DIRECTIVE &&
