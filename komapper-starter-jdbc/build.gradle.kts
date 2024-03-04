@@ -5,5 +5,5 @@ dependencies {
     api(project(":komapper-slf4j"))
     runtimeOnly(project(":komapper-datetime-jdbc"))
     runtimeOnly(project(":komapper-template"))
-    runtimeOnly("ch.qos.logback:logback-classic:1.5.1")
+    runtimeOnly("ch.qos.logback:logback-classic:1.5.2")
 }
