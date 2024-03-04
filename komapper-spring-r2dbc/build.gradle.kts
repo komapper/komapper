@@ -11,7 +11,7 @@ dependencies {
     implementation(project(":komapper-spring"))
     testImplementation(project(":komapper-annotation"))
     testImplementation(project(":komapper-slf4j"))
-    testRuntimeOnly("ch.qos.logback:logback-classic:1.5.2")
+    testRuntimeOnly("ch.qos.logback:logback-classic:1.5.3")
     testImplementation(project(":komapper-dialect-h2-r2dbc"))
     kspTest(project(":komapper-processor"))
 }
