@@ -172,6 +172,7 @@ internal sealed class SqlNode {
         abstract val token: String
         override fun toText(): String = token
 
+        data class Eol(override val token: String) : Token()
         data class Comment(override val token: String) : Token()
         data class Word(override val token: String) : Token()
         data class Space(override val token: String) : Token() {

@@ -53,6 +53,7 @@ internal class TwoWayTemplateStatementBuilder(
         is SqlNode.Set -> {
             val left = visit(State(state.asExprContext()), node.left)
             if (left.available) {
+                state.available = true
                 state.append(left)
             }
             val right = visit(State(state.asExprContext()), node.right)
@@ -60,6 +61,7 @@ internal class TwoWayTemplateStatementBuilder(
                 if (left.available) {
                     state.append(node.keyword)
                 }
+                state.available = true
                 state.append(right)
             }
             state
