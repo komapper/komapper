@@ -320,6 +320,41 @@ class TwoWayTemplateStatementBuilderTest {
             val statement = statementBuilder.build(template, emptyMap(), extensions)
             assertEquals("select name from a ", statement.toSql())
         }
+
+        @Test
+        fun `Handle multiple 'union' keywords`() {
+            val template = """
+                select name from a 
+                union 
+                select name from b
+                union
+                select name from c
+            """.trimIndent()
+            val statement = statementBuilder.build(template, emptyMap(), extensions)
+            assertEquals(template, statement.toSql())
+        }
+
+        @Test
+        fun `Handle multiple 'union' keywords and remove a 'union' keyword automatically`() {
+            val template = """
+                select name from a 
+                union
+                /*%if false*/
+                select name from b
+                /*%end*/
+                union
+                select name from c
+            """.trimIndent()
+            val statement = statementBuilder.build(template, emptyMap(), extensions)
+            assertEquals(
+                """
+                select name from a 
+                union
+                select name from c
+                """.trimIndent(),
+                statement.toSql(),
+            )
+        }
     }
 }
 

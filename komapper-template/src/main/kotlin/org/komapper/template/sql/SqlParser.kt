@@ -70,7 +70,8 @@ internal class SqlParser constructor(
                 CLOSE_PAREN -> break@outer
                 WORD, QUOTE -> pushNode(SqlNode.Token.Word(token))
                 SPACE -> pushNode(SqlNode.Token.Space.of(token))
-                OTHER, EOL -> pushNode(SqlNode.Token.Other.of(token))
+                OTHER -> pushNode(SqlNode.Token.Other.of(token))
+                EOL -> pushNode(SqlNode.Token.Eol(token))
                 MULTI_LINE_COMMENT, SINGLE_LINE_COMMENT -> pushNode(SqlNode.Token.Comment(token))
                 SELECT -> reducers.push(SelectReducer(location, token))
                 FROM -> reducers.push(FromReducer(location, token))
