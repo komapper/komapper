@@ -12,7 +12,7 @@ dependencies {
     api(project(":komapper-annotation"))
     ksp(project(":komapper-processor"))
     api(project(":komapper-codegen"))
-    api(platform("org.testcontainers:testcontainers-bom:1.19.6"))
+    api(platform("org.testcontainers:testcontainers-bom:1.19.7"))
     api("org.jetbrains.kotlin:kotlin-test-junit5")
 }
 
