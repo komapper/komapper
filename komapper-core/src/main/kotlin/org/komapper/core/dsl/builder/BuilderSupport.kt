@@ -16,6 +16,7 @@ import org.komapper.core.dsl.expression.ConditionalExpression
 import org.komapper.core.dsl.expression.Criterion
 import org.komapper.core.dsl.expression.CumeDist
 import org.komapper.core.dsl.expression.DenseRank
+import org.komapper.core.dsl.expression.DistinctExpression
 import org.komapper.core.dsl.expression.EscapeExpression
 import org.komapper.core.dsl.expression.FirstValue
 import org.komapper.core.dsl.expression.Lag
@@ -98,6 +99,10 @@ class BuilderSupport(
 
             is ConditionalExpression<*, *> -> {
                 visitConditionalExpression(expression)
+            }
+
+            is DistinctExpression<*, *> -> {
+                visitDistinctExpression(expression)
             }
 
             is LiteralExpression<*, *> -> {
@@ -243,6 +248,11 @@ class BuilderSupport(
             visitColumnExpression(e)
         }
         buf.append(")")
+    }
+
+    private fun visitDistinctExpression(expression: DistinctExpression<*, *>) {
+        buf.append("distinct ")
+        visitColumnExpression(expression.expression)
     }
 
     private fun visitLiteralExpression(expression: LiteralExpression<*, *>) {

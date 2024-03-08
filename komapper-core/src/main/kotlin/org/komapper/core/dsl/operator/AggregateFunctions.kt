@@ -2,6 +2,7 @@ package org.komapper.core.dsl.operator
 
 import org.komapper.core.dsl.expression.AggregateFunction
 import org.komapper.core.dsl.expression.ColumnExpression
+import org.komapper.core.dsl.expression.DistinctExpression
 
 /**
  * Builds an AVG function.
@@ -22,6 +23,14 @@ fun count(): AggregateFunction<Long, Long> {
  */
 fun count(expression: ColumnExpression<*, *>): AggregateFunction<Long, Long> {
     return AggregateFunction.Count(expression)
+}
+
+/**
+ * Builds an COUNT(DISTINCT columnName) function.
+ */
+fun countDistinct(expression: ColumnExpression<*, *>): AggregateFunction<Long, Long> {
+    val distinct = DistinctExpression(expression)
+    return AggregateFunction.Count(distinct)
 }
 
 /**

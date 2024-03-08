@@ -8,6 +8,7 @@ import org.komapper.core.dsl.QueryDsl
 import org.komapper.core.dsl.operator.alias
 import org.komapper.core.dsl.operator.avg
 import org.komapper.core.dsl.operator.count
+import org.komapper.core.dsl.operator.countDistinct
 import org.komapper.core.dsl.operator.literal
 import org.komapper.core.dsl.operator.max
 import org.komapper.core.dsl.operator.min
@@ -45,6 +46,15 @@ class JdbcSelectAggregateTest(private val db: JdbcDatabase) {
             QueryDsl.from(a).select(count(a.street))
         }
         assertEquals(15, count)
+    }
+
+    @Test
+    fun aggregate_count_distinct() {
+        val e = Meta.employee
+        val count = db.runQuery {
+            QueryDsl.from(e).select(countDistinct(e.managerId))
+        }
+        assertEquals(6, count)
     }
 
     @Test
