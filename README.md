@@ -170,7 +170,7 @@ See [DESIGN_DOC](DESIGN_DOC.md) for the design policy of this project.
 |:-----------------------|:-----------------|:----------------|--------------------|
 | 1.7.22-1.0.8           | 1.3.x - 1.11.x   | 11              | 6.7.1              |
 | 1.8.22-1.0.11          | 1.3.x - 1.15.x   | 11              | 6.8.3              |
-| 1.9.22-1.0.17          | 1.3.x - 1.16.x   | 11              | 6.8.3              |
+| 1.9.23-1.0.19          | 1.3.x - 1.17.x   | 11              | 6.8.3              |
 
 Compatibility testing is performed in the [komapper/compatibility-test](https://github.com/komapper/compatibility-test/) repository.
 
