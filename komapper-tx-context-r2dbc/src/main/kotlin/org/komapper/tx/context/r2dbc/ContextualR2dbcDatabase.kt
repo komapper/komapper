@@ -3,7 +3,8 @@ package org.komapper.tx.context.r2dbc
 import io.r2dbc.spi.ConnectionFactory
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
-import kotlinx.coroutines.reactive.collect
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.reactive.asFlow
 import org.komapper.core.Database
 import org.komapper.core.dsl.query.FlowQuery
 import org.komapper.core.dsl.query.Query
@@ -121,7 +122,7 @@ internal class ContextualR2dbcDatabaseImpl(
                 }
 
                 override suspend fun releaseConnection(connection: io.r2dbc.spi.Connection) {
-                    connection.close().collect { }
+                    connection.close().asFlow().collect()
                 }
             }
         }

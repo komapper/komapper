@@ -2,9 +2,9 @@ package org.komapper.r2dbc
 
 import io.r2dbc.spi.Connection
 import io.r2dbc.spi.ConnectionFactory
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.reactive.asFlow
-import kotlinx.coroutines.reactive.collect
 import org.komapper.core.ThreadSafe
 import org.komapper.tx.core.CoroutineTransactionOperator
 import org.komapper.tx.core.FlowTransactionOperator
@@ -63,6 +63,6 @@ class DefaultR2dbcSession(override val connectionFactory: ConnectionFactory) : R
     }
 
     override suspend fun releaseConnection(connection: Connection) {
-        connection.close().collect { }
+        connection.close().asFlow().collect()
     }
 }
