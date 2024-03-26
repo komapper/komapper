@@ -7,7 +7,7 @@ dependencies {
     implementation("com.google.devtools.ksp:symbol-processing-api:$kspFullVersion")
     testImplementation(project(":komapper-annotation"))
     testImplementation("com.google.devtools.ksp:symbol-processing:$kspFullVersion")
-    testImplementation("dev.zacsweers.kctfork:ksp:0.4.0")
+    testImplementation("dev.zacsweers.kctfork:ksp:0.4.1")
 }
 
 kotlin {
