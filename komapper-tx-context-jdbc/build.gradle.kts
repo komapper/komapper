@@ -7,7 +7,7 @@ dependencies {
     api(project(":komapper-tx-jdbc"))
     testImplementation(project(":komapper-annotation"))
     testImplementation(project(":komapper-slf4j"))
-    testRuntimeOnly("ch.qos.logback:logback-classic:1.5.4")
+    testRuntimeOnly("ch.qos.logback:logback-classic:1.5.5")
     testImplementation(project(":komapper-dialect-h2-jdbc"))
     kspTest(project(":komapper-processor"))
 }
