@@ -281,6 +281,16 @@ class JdbcInsertSingleTest(private val db: JdbcDatabase) {
         }
     }
 
+    @Test
+    fun identityGenerator2() {
+        for (i in 1..201) {
+            val m = Meta.identityStrategy.clone(disableAutoIncrement = true)
+            val strategy = IdentityStrategy(i + 10, "test")
+            val result = db.runQuery { QueryDsl.insert(m).single(strategy) }
+            assertEquals(i + 10, result.id, "i = $i")
+        }
+    }
+
     @Run(unless = [Dbms.MYSQL, Dbms.MYSQL_5])
     @Test
     fun sequenceGenerator() {

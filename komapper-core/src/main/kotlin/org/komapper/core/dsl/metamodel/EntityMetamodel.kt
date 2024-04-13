@@ -32,6 +32,8 @@ interface EntityMetamodel<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY,
     fun preUpdate(e: ENTITY, c: Clock): ENTITY
     fun postUpdate(e: ENTITY): ENTITY
     fun newEntity(m: Map<PropertyMetamodel<*, *, *>, Any?>): ENTITY
+
+    @Deprecated("Use another newMetamodel function.")
     fun newMetamodel(
         table: String,
         catalog: String,
@@ -40,6 +42,17 @@ interface EntityMetamodel<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY,
         disableSequenceAssignment: Boolean,
         declaration: EntityMetamodelDeclaration<META>,
     ): META
+
+    @Suppress("DEPRECATION")
+    fun newMetamodel(
+        table: String,
+        catalog: String,
+        schema: String,
+        alwaysQuote: Boolean,
+        disableSequenceAssignment: Boolean,
+        declaration: EntityMetamodelDeclaration<META>,
+        disableAutoIncrement: Boolean = false,
+    ): META = newMetamodel(table, catalog, schema, alwaysQuote, disableSequenceAssignment, declaration)
 }
 
 @Suppress("unused")
@@ -67,6 +80,8 @@ abstract class EntityMetamodelStub<ENTITY : Any, META : EntityMetamodelStub<ENTI
     override fun preInsert(e: ENTITY, c: Clock): ENTITY = fail()
     override fun preUpdate(e: ENTITY, c: Clock): ENTITY = fail()
     override fun postUpdate(e: ENTITY): ENTITY = fail()
+
+    @Deprecated("Use another newMetamodel function.")
     override fun newMetamodel(
         table: String,
         catalog: String,
@@ -74,6 +89,16 @@ abstract class EntityMetamodelStub<ENTITY : Any, META : EntityMetamodelStub<ENTI
         alwaysQuote: Boolean,
         disableSequenceAssignment: Boolean,
         declaration: EntityMetamodelDeclaration<META>,
+    ): META = fail()
+
+    override fun newMetamodel(
+        table: String,
+        catalog: String,
+        schema: String,
+        alwaysQuote: Boolean,
+        disableSequenceAssignment: Boolean,
+        declaration: EntityMetamodelDeclaration<META>,
+        disableAutoIncrement: Boolean,
     ): META = fail()
 
     private fun fail(): Nothing {
@@ -130,6 +155,7 @@ internal object EmptyMetamodel : EntityMetamodel<Nothing, Nothing, EmptyMetamode
         throw UnsupportedOperationException()
     }
 
+    @Deprecated("Use another newMetamodel function.")
     override fun newMetamodel(
         table: String,
         catalog: String,
@@ -137,6 +163,18 @@ internal object EmptyMetamodel : EntityMetamodel<Nothing, Nothing, EmptyMetamode
         alwaysQuote: Boolean,
         disableSequenceAssignment: Boolean,
         declaration: EntityMetamodelDeclaration<EmptyMetamodel>,
+    ): EmptyMetamodel {
+        throw UnsupportedOperationException()
+    }
+
+    override fun newMetamodel(
+        table: String,
+        catalog: String,
+        schema: String,
+        alwaysQuote: Boolean,
+        disableSequenceAssignment: Boolean,
+        declaration: EntityMetamodelDeclaration<EmptyMetamodel>,
+        disableAutoIncrement: Boolean,
     ): EmptyMetamodel {
         throw UnsupportedOperationException()
     }

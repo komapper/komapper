@@ -35,6 +35,7 @@ fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> META.defi
         alwaysQuote = alwaysQuote(),
         disableSequenceAssignment = disableSequenceAssignment(),
         declaration = declaration() + declaration,
+        disableAutoIncrement = disableAutoIncrement(),
     )
 }
 
