@@ -54,7 +54,7 @@ jobs:
           git config --local user.name "GitHub Action"
 
       - name: Release ${{ env.RELEASE_VERSION }}
-        uses: gradle/gradle-build-action@v3.2.1
+        uses: gradle/gradle-build-action@v3.3.0
         with:
           arguments: release -Prelease.releaseVersion=${{ env.RELEASE_VERSION }}
 
