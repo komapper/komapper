@@ -11,6 +11,7 @@ interface TableExpression<T : Any> {
     fun schemaName(): String
     fun alwaysQuote(): Boolean
     fun disableSequenceAssignment(): Boolean
+    fun disableAutoIncrement(): Boolean = false
     fun getCanonicalTableName(enquote: (String) -> String): String {
         val transform = if (alwaysQuote()) {
             enquote

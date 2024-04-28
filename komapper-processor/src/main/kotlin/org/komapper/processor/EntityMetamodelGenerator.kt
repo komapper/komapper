@@ -73,6 +73,7 @@ internal class EntityMetamodelGenerator(
         "alwaysQuote: Boolean = ${entity.table.alwaysQuote}",
         "disableSequenceAssignment: Boolean = false",
         "declaration: $EntityMetamodelDeclaration<$simpleName> = {}",
+        "disableAutoIncrement: Boolean = false",
     ).joinToString(", ")
 
     override fun run() {
@@ -94,6 +95,7 @@ internal class EntityMetamodelGenerator(
         w.println("    private val __alwaysQuote = alwaysQuote")
         w.println("    private val __disableSequenceAssignment = disableSequenceAssignment")
         w.println("    private val __declaration = declaration")
+        w.println("    private val __disableAutoIncrement = disableAutoIncrement")
 
         entityDescriptor()
 
@@ -106,6 +108,7 @@ internal class EntityMetamodelGenerator(
         alwaysQuote()
         disableSequenceAssignment()
         declaration()
+        disableAutoIncrement()
 
         idGenerator()
         idProperties()
@@ -355,6 +358,10 @@ internal class EntityMetamodelGenerator(
         w.println("    override fun declaration() = __declaration")
     }
 
+    private fun disableAutoIncrement() {
+        w.println("    override fun disableAutoIncrement() = __disableAutoIncrement")
+    }
+
     private fun idGenerator() {
         val pair = entity.properties.filterIsInstance<LeafProperty>().firstNotNullOfOrNull {
             when (it.kind) {
@@ -371,7 +378,7 @@ internal class EntityMetamodelGenerator(
             val (p, idKind) = pair
             val assignment = when (idKind) {
                 is IdKind.AutoIncrement -> {
-                    "$AutoIncrement(`$p`)"
+                    "if (__disableAutoIncrement) null else $AutoIncrement(`$p`)"
                 }
                 is IdKind.Sequence -> {
                     val paramList = listOf(
@@ -631,11 +638,13 @@ internal class EntityMetamodelGenerator(
     private fun newMetamodel() {
         val paramList =
             "table: String, catalog: String, schema: String, alwaysQuote: Boolean, disableSequenceAssignment: Boolean, declaration: $EntityMetamodelDeclaration<$simpleName>"
-        w.println("    override fun newMetamodel($paramList) = $simpleName(table, catalog, schema, alwaysQuote, disableSequenceAssignment, declaration)")
+        w.println("    @Deprecated(\"Use another newMetamodel function.\")")
+        w.println("    override fun newMetamodel($paramList) = $simpleName(table, catalog, schema, alwaysQuote, disableSequenceAssignment, declaration, false)")
+        w.println("    override fun newMetamodel($paramList, disableAutoIncrement: Boolean) = $simpleName(table, catalog, schema, alwaysQuote, disableSequenceAssignment, declaration, disableAutoIncrement)")
     }
 
     private fun clone() {
-        w.println("    fun clone($constructorParamList) = $simpleName(table, catalog, schema, alwaysQuote, disableSequenceAssignment, declaration)")
+        w.println("    fun clone($constructorParamList) = $simpleName(table, catalog, schema, alwaysQuote, disableSequenceAssignment, declaration, disableAutoIncrement)")
     }
 
     private fun companionObject() {
