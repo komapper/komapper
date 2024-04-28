@@ -281,8 +281,9 @@ class JdbcInsertSingleTest(private val db: JdbcDatabase) {
         }
     }
 
+    @Run(onlyIf = [Dbms.H2])
     @Test
-    fun identityGenerator2() {
+    fun identityGenerator_disableAutoIncrement() {
         for (i in 1..201) {
             val m = Meta.identityStrategy.clone(disableAutoIncrement = true)
             val strategy = IdentityStrategy(i + 10, "test")
