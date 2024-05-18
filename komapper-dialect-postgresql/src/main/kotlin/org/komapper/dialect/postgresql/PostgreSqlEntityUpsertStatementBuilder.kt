@@ -91,7 +91,7 @@ class PostgreSqlEntityUpsertStatementBuilder<ENTITY : Any, ID : Any, META : Enti
         } else {
             if (keys.isNotEmpty()) {
                 buf.append(" (")
-                for (p in context.keys) {
+                for (p in keys) {
                     column(p)
                     buf.append(", ")
                 }
