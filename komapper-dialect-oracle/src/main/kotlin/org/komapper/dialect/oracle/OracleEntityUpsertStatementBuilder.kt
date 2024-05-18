@@ -32,8 +32,10 @@ internal class OracleEntityUpsertStatementBuilder<ENTITY : Any, ID : Any, META :
     private val sourceStatementBuilder = SourceStatementBuilder(dialect, context, entities)
 
     override fun build(assignments: List<Pair<PropertyMetamodel<ENTITY, *, *>, Operand>>): Statement {
+        val keys = context.keys.ifEmpty { context.target.idProperties() }
+
         @Suppress("NAME_SHADOWING")
-        val assignments = assignments.filter { (left, _) -> left !in context.keys }
+        val assignments = assignments.filter { (left, _) -> left !in keys }
         buf.append("merge into ")
         table(target, TableNameType.NAME_AND_ALIAS)
         buf.append(" using (")
@@ -42,7 +44,7 @@ internal class OracleEntityUpsertStatementBuilder<ENTITY : Any, ID : Any, META :
         table(excluded, TableNameType.ALIAS_ONLY)
         buf.append(" on (")
         val excludedPropertyMap = excluded.properties().associateBy { it.name }
-        for (key in context.keys) {
+        for (key in keys) {
             column(key)
             buf.append(" = ")
             column(excludedPropertyMap[key.name]!!)

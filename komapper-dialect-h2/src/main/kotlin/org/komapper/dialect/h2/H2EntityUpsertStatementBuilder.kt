@@ -42,7 +42,7 @@ internal class H2EntityUpsertStatementBuilder<ENTITY : Any, ID : Any, META : Ent
         table(excluded, TableNameType.ALIAS_ONLY)
         buf.append(" on ")
         val excludedPropertyMap = excluded.properties().associateBy { it.name }
-        for (key in context.keys) {
+        for (key in context.keys.ifEmpty { context.target.idProperties() }) {
             column(key)
             buf.append(" = ")
             column(excludedPropertyMap[key.name]!!)

@@ -484,9 +484,19 @@ class JdbcInsertSingleTest(private val db: JdbcDatabase) {
     }
 
     @Test
-    fun onDuplicateKeyIgnore_ignored() {
+    fun onDuplicateKeyIgnore_ignored_primaryKeyCollision() {
         val a = Meta.address
         val address = Address(1, "STREET 100", 0)
+        val query = QueryDsl.insert(a).onDuplicateKeyIgnore().single(address)
+        val count = db.runQuery { query }
+        assertEquals(0, count)
+    }
+
+    @Test
+    @Run(onlyIf = [Dbms.MARIADB, Dbms.MYSQL, Dbms.MYSQL_5, Dbms.POSTGRESQL])
+    fun onDuplicateKeyIgnore_ignored_uniqueKeyCollision() {
+        val a = Meta.address
+        val address = Address(16, "STREET 1", 0)
         val query = QueryDsl.insert(a).onDuplicateKeyIgnore().single(address)
         val count = db.runQuery { query }
         assertEquals(0, count)
