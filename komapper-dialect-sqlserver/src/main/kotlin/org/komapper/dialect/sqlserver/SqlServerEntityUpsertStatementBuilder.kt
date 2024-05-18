@@ -48,7 +48,7 @@ internal class SqlServerEntityUpsertStatementBuilder<ENTITY : Any, ID : Any, MET
         buf.append(")")
         buf.append(" on ")
         val excludedPropertyMap = excluded.properties().associateBy { it.name }
-        for (key in context.keys) {
+        for (key in context.keys.ifEmpty { context.target.idProperties() }) {
             column(key)
             buf.append(" = ")
             column(excludedPropertyMap[key.name]!!)

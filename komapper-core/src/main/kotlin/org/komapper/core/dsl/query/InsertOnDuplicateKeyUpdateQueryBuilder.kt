@@ -209,7 +209,7 @@ private fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> e
     entity: ENTITY,
 ): Query<ENTITY> {
     return EntityUpsertSingleUpdateQuery(context, entity).flatMap { newEntity ->
-        val keys = context.keys.map { it to it.getter(newEntity) }
+        val keys = context.keys.ifEmpty { context.target.idProperties() }.map { it to it.getter(newEntity) }
         QueryDsl.from(context.target).where {
             for ((property, value) in keys) {
                 @Suppress("UNCHECKED_CAST")

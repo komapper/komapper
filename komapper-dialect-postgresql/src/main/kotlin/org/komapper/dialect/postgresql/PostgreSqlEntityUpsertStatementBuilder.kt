@@ -52,24 +52,13 @@ class PostgreSqlEntityUpsertStatementBuilder<ENTITY : Any, ID : Any, META : Enti
             buf.append("), ")
         }
         buf.cutBack(2)
-        buf.append(" on conflict ")
-        val conflictTarget = context.conflictTarget
-        if (conflictTarget != null) {
-            buf.append(conflictTarget)
-        } else if (context.keys.isNotEmpty()) {
-            buf.append("(")
-            for (p in context.keys) {
-                column(p)
-                buf.append(", ")
-            }
-            buf.cutBack(2)
-            buf.append(")")
-        }
         when (context.duplicateKeyType) {
             DuplicateKeyType.IGNORE -> {
+                onConflict(context.keys)
                 buf.append(" do nothing")
             }
             DuplicateKeyType.UPDATE -> {
+                onConflict(context.keys.ifEmpty { context.target.idProperties() })
                 buf.append(" do update set ")
                 for ((left, right) in assignments) {
                     column(left)
@@ -91,6 +80,25 @@ class PostgreSqlEntityUpsertStatementBuilder<ENTITY : Any, ID : Any, META : Enti
         }
         buf.appendIfNotEmpty(postgreSqlSupport.buildReturning())
         return buf.toStatement()
+    }
+
+    private fun onConflict(keys: List<PropertyMetamodel<ENTITY, *, *>>) {
+        buf.append(" on conflict")
+        val conflictTarget = context.conflictTarget
+        if (conflictTarget != null) {
+            buf.append(" ")
+            buf.append(conflictTarget)
+        } else {
+            if (keys.isNotEmpty()) {
+                buf.append(" (")
+                for (p in context.keys) {
+                    column(p)
+                    buf.append(", ")
+                }
+                buf.cutBack(2)
+                buf.append(")")
+            }
+        }
     }
 
     private fun table(expression: TableExpression<*>) {
