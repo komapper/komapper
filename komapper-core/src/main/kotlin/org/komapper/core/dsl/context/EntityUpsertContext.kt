@@ -21,6 +21,7 @@ data class EntityUpsertContext<ENTITY : Any, ID : Any, META : EntityMetamodel<EN
         alwaysQuote = false,
         disableSequenceAssignment = false,
         declaration = {},
+        disableAutoIncrement = false,
     ),
     val keys: List<PropertyMetamodel<ENTITY, *, *>> = emptyList(),
     val conflictTarget: String? = null,
