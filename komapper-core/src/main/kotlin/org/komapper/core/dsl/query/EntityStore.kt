@@ -7,6 +7,8 @@ import java.util.concurrent.ConcurrentMap
 
 /**
  * The store containing the retrieved entities.
+ * All Maps and Sets returned by this interface preserve the order of elements.
+ * This also applies to Sets contained within the values of the Maps.
  */
 @ThreadSafe
 interface EntityStore {
