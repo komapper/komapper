@@ -89,26 +89,7 @@ internal class EntityMetamodelGenerator(
     }
 
     private fun suppress() {
-        val suppressList = listOf(
-            "BooleanLiteralArgument",
-            "ClassName",
-            "MemberVisibilityCanBePrivate",
-            "NO_EXPLICIT_RETURN_TYPE_IN_API_MODE",
-            "NO_EXPLICIT_RETURN_TYPE_IN_API_MODE_WARNING",
-            "NO_EXPLICIT_VISIBILITY_IN_API_MODE",
-            "NO_EXPLICIT_VISIBILITY_IN_API_MODE_WARNING",
-            "ObjectPropertyName",
-            "PrivatePropertyName",
-            "PropertyName",
-            "RedundantNullableReturnType",
-            "RemoveRedundantBackticks",
-            "RemoveRedundantQualifierName",
-            "UNCHECKED_CAST",
-            "UNUSED_PARAMETER",
-            "USELESS_CAST",
-            "unused",
-        )
-        w.println("@file:Suppress(${suppressList.joinToString(prefix = "\"", postfix = "\"")})")
+        w.println("@file:Suppress(\"warnings\")")
     }
 
     private fun packageDeclaration() {
