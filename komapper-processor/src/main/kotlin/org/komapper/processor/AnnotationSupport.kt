@@ -224,10 +224,11 @@ internal class AnnotationSupport(
                         )
                     }
                     val typeName = propertyType.name
+                    val backquotedTypeName = propertyType.backquotedName
                     val literalTag = resolveLiteralTag(typeName)
                     val nullability = propertyType.nullability
                     val property =
-                        ValueClassProperty(propertyType, parameter, declaration, typeName, literalTag, nullability)
+                        ValueClassProperty(propertyType, parameter, declaration, typeName, backquotedTypeName, literalTag, nullability)
                     ValueClass(type, property, null)
                 }
             }

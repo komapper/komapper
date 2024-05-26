@@ -212,7 +212,7 @@ internal class EntityFactory(
             typeArgument = typeArgument,
             column = getColumn(column, parameter),
             kotlinClass = kotlinClass,
-            literalTag = resolveLiteralTag(kotlinClass.exteriorTypeName),
+            literalTag = resolveLiteralTag(kotlinClass.typeName),
             kind = kind,
             parent = parent,
         ).also { validateLeafProperty(it) }
@@ -223,7 +223,7 @@ internal class EntityFactory(
         return if (classDeclaration != null && classDeclaration.classKind == ClassKind.ENUM_CLASS) {
             when (val strategy = enumStrategy ?: config.enumStrategy) {
                 EnumStrategy.Name -> EnumClass(type, EnumStrategy.Name.typeName, strategy)
-                EnumStrategy.Type -> EnumClass(type, type.name, strategy)
+                EnumStrategy.Type -> EnumClass(type, type.backquotedName, strategy)
                 EnumStrategy.Ordinal -> EnumClass(type, EnumStrategy.Ordinal.typeName, strategy)
                 is EnumStrategy.Property -> {
                     val propertyName = strategy.propertyName
@@ -236,7 +236,7 @@ internal class EntityFactory(
                                 "KomapperEnum's hint property is incorrect.",
                             strategy.annotation,
                         )
-                    EnumClass(type, propertyType.name, strategy)
+                    EnumClass(type, propertyType.backquotedName, strategy)
                 }
             }
         } else {
@@ -260,10 +260,11 @@ internal class EntityFactory(
                         propertyType
                     }
                 val typeName = nonNullableInteriorType.name
+                val backquotedTypeName = nonNullableInteriorType.backquotedName
                 val literalTag = resolveLiteralTag(typeName)
                 val nullability = propertyType.nullability
                 val property =
-                    ValueClassProperty(propertyType, parameter, declaration, typeName, literalTag, nullability)
+                    ValueClassProperty(propertyType, parameter, declaration, typeName, backquotedTypeName, literalTag, nullability)
                 ValueClass(type, property, alternateType)
             } else {
                 null

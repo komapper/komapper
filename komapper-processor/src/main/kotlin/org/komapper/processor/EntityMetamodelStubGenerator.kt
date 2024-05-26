@@ -2,10 +2,10 @@ package org.komapper.processor
 
 import com.google.devtools.ksp.processing.KSPLogger
 import com.google.devtools.ksp.symbol.KSClassDeclaration
-import org.komapper.processor.Symbols.EntityMetamodelImplementor
-import org.komapper.processor.Symbols.EntityMetamodelStub
-import org.komapper.processor.Symbols.PropertyMetamodel
-import org.komapper.processor.Symbols.PropertyMetamodelStub
+import org.komapper.processor.BackquotedSymbols.EntityMetamodelImplementor
+import org.komapper.processor.BackquotedSymbols.EntityMetamodelStub
+import org.komapper.processor.BackquotedSymbols.PropertyMetamodel
+import org.komapper.processor.BackquotedSymbols.PropertyMetamodelStub
 import java.io.PrintWriter
 import java.time.ZonedDateTime
 

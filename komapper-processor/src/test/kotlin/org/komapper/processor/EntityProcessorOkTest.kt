@@ -251,4 +251,70 @@ class EntityProcessorOkTest : AbstractKspTest(EntityProcessorProvider()) {
         )
         assertEquals(KotlinCompilation.ExitCode.OK, result.exitCode)
     }
+
+    @Test
+    fun `Allow the use of the property named 'java', when the Instant types are used`() {
+        val result = compile(
+            """
+            package test
+            import org.komapper.annotation.*
+            import java.time.Instant
+            @KomapperEntity
+            data class Dept(
+                @KomapperId
+                val id: Int,
+                val java: String,
+                @KomapperCreatedAt
+                val created: Instant,
+                @KomapperUpdatedAt
+                val updated: Instant,
+            )
+            """,
+        )
+        assertEquals(KotlinCompilation.ExitCode.OK, result.exitCode)
+    }
+
+    @Test
+    fun `Allow the use of the property named 'java', when LocalDateTime types are used`() {
+        val result = compile(
+            """
+            package test
+            import org.komapper.annotation.*
+            import java.time.LocalDateTime
+            @KomapperEntity
+            data class Dept(
+                @KomapperId
+                val id: Int,
+                val java: String,
+                @KomapperCreatedAt
+                val created: LocalDateTime,
+                @KomapperUpdatedAt
+                val updated: LocalDateTime,
+            )
+            """,
+        )
+        assertEquals(KotlinCompilation.ExitCode.OK, result.exitCode)
+    }
+
+    @Test
+    fun `Allow the use of the property named 'java', when OffsetDateTime types are used`() {
+        val result = compile(
+            """
+            package test
+            import org.komapper.annotation.*
+            import java.time.OffsetDateTime
+            @KomapperEntity
+            data class Dept(
+                @KomapperId
+                val id: Int,
+                val java: String,
+                @KomapperCreatedAt
+                val created: OffsetDateTime,
+                @KomapperUpdatedAt
+                val updated: OffsetDateTime,
+            )
+            """,
+        )
+        assertEquals(KotlinCompilation.ExitCode.OK, result.exitCode)
+    }
 }
