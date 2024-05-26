@@ -95,7 +95,7 @@ internal data class LeafProperty(
     val literalTag: String,
     val parent: KSValueParameter? = null,
 ) : Property {
-    val typeName get() = kotlinClass.exteriorTypeName
+    val typeName get() = kotlinClass.typeName
     val exteriorTypeName get() = kotlinClass.exteriorTypeName
     val interiorTypeName get() = kotlinClass.interiorTypeName
     val name get() = parameter.toString()
@@ -126,7 +126,8 @@ internal data class CompositeProperty(
 internal sealed interface KotlinClass {
     val type: KSType
     val declaration: KSDeclaration get() = type.declaration
-    val exteriorTypeName: String get() = type.name
+    val typeName: String get() = type.name
+    val exteriorTypeName: String get() = type.backquotedName
     val interiorTypeName: String
 }
 
@@ -143,6 +144,7 @@ internal data class ValueClass(
     val property: ValueClassProperty,
     val alternateType: ValueClass?,
 ) : KotlinClass {
+
     override val interiorTypeName: String
         get() {
             return alternateType?.exteriorTypeName ?: property.typeName
@@ -157,16 +159,21 @@ internal data class PlainClass(
 ) : KotlinClass {
     val isArray: Boolean = declaration.qualifiedName?.asString() == "kotlin.Array"
 
+    override val typeName: String
+        get() {
+            return if (isArray) {
+                val nonNullableType = makeNonNullableType(type)
+                nonNullableType.name
+            } else {
+                super.typeName
+            }
+        }
+
     override val exteriorTypeName: String
         get() {
             return if (isArray) {
-                val nonNullableType =
-                    if (type.isMarkedNullable) {
-                        type.makeNotNullable()
-                    } else {
-                        type
-                    }
-                nonNullableType.name
+                val nonNullableType = makeNonNullableType(type)
+                nonNullableType.backquotedName
             } else {
                 super.exteriorTypeName
             }
@@ -178,6 +185,14 @@ internal data class PlainClass(
         }
 
     override fun toString(): String = exteriorTypeName
+
+    private fun makeNonNullableType(type: KSType): KSType {
+        return if (type.isMarkedNullable) {
+            type.makeNotNullable()
+        } else {
+            type
+        }
+    }
 }
 
 sealed interface EnumStrategy {
@@ -205,6 +220,7 @@ internal data class ValueClassProperty(
     val parameter: KSValueParameter,
     val declaration: KSPropertyDeclaration,
     val typeName: String,
+    val backquotedTypeName: String,
     val literalTag: String,
     val nullability: Nullability,
 ) {

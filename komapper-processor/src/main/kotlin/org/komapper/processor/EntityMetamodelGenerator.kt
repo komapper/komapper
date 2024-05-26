@@ -2,41 +2,41 @@ package org.komapper.processor
 
 import com.google.devtools.ksp.processing.KSPLogger
 import com.google.devtools.ksp.symbol.Nullability
-import org.komapper.processor.Symbols.Argument
-import org.komapper.processor.Symbols.AutoIncrement
-import org.komapper.processor.Symbols.Clock
-import org.komapper.processor.Symbols.ColumnExpression
-import org.komapper.processor.Symbols.ConcurrentHashMap
-import org.komapper.processor.Symbols.EmbeddableMetamodel
-import org.komapper.processor.Symbols.EmbeddedMetamodel
-import org.komapper.processor.Symbols.EntityDescriptor
-import org.komapper.processor.Symbols.EntityMetamodel
-import org.komapper.processor.Symbols.EntityMetamodelDeclaration
-import org.komapper.processor.Symbols.EntityMetamodelFactory
-import org.komapper.processor.Symbols.EntityMetamodelFactorySpi
-import org.komapper.processor.Symbols.EntityMetamodelImplementor
-import org.komapper.processor.Symbols.EntityStore
-import org.komapper.processor.Symbols.EntityStoreContext
-import org.komapper.processor.Symbols.EnumMappingException
-import org.komapper.processor.Symbols.FlowSubquery
-import org.komapper.processor.Symbols.IdContext
-import org.komapper.processor.Symbols.IdGenerator
-import org.komapper.processor.Symbols.Instant
-import org.komapper.processor.Symbols.KomapperExperimentalAssociation
+import org.komapper.processor.BackquotedSymbols.Argument
+import org.komapper.processor.BackquotedSymbols.AutoIncrement
+import org.komapper.processor.BackquotedSymbols.Clock
+import org.komapper.processor.BackquotedSymbols.ColumnExpression
+import org.komapper.processor.BackquotedSymbols.ConcurrentHashMap
+import org.komapper.processor.BackquotedSymbols.EmbeddableMetamodel
+import org.komapper.processor.BackquotedSymbols.EmbeddedMetamodel
+import org.komapper.processor.BackquotedSymbols.EntityDescriptor
+import org.komapper.processor.BackquotedSymbols.EntityMetamodel
+import org.komapper.processor.BackquotedSymbols.EntityMetamodelDeclaration
+import org.komapper.processor.BackquotedSymbols.EntityMetamodelFactory
+import org.komapper.processor.BackquotedSymbols.EntityMetamodelFactorySpi
+import org.komapper.processor.BackquotedSymbols.EntityMetamodelImplementor
+import org.komapper.processor.BackquotedSymbols.EntityStore
+import org.komapper.processor.BackquotedSymbols.EntityStoreContext
+import org.komapper.processor.BackquotedSymbols.EnumMappingException
+import org.komapper.processor.BackquotedSymbols.FlowSubquery
+import org.komapper.processor.BackquotedSymbols.IdContext
+import org.komapper.processor.BackquotedSymbols.IdGenerator
+import org.komapper.processor.BackquotedSymbols.Instant
+import org.komapper.processor.BackquotedSymbols.KomapperExperimentalAssociation
+import org.komapper.processor.BackquotedSymbols.LocalDateTime
+import org.komapper.processor.BackquotedSymbols.Operand
+import org.komapper.processor.BackquotedSymbols.ProjectionType
+import org.komapper.processor.BackquotedSymbols.ProjectionType_INDEX
+import org.komapper.processor.BackquotedSymbols.PropertyDescriptor
+import org.komapper.processor.BackquotedSymbols.PropertyMetamodel
+import org.komapper.processor.BackquotedSymbols.PropertyMetamodelImpl
+import org.komapper.processor.BackquotedSymbols.SelectQuery
+import org.komapper.processor.BackquotedSymbols.Sequence
+import org.komapper.processor.BackquotedSymbols.TemplateSelectQuery
+import org.komapper.processor.BackquotedSymbols.TemplateSelectQueryBuilder
+import org.komapper.processor.BackquotedSymbols.UUID
 import org.komapper.processor.Symbols.KotlinInstant
 import org.komapper.processor.Symbols.KotlinLocalDateTime
-import org.komapper.processor.Symbols.LocalDateTime
-import org.komapper.processor.Symbols.Operand
-import org.komapper.processor.Symbols.ProjectionType
-import org.komapper.processor.Symbols.ProjectionType_INDEX
-import org.komapper.processor.Symbols.PropertyDescriptor
-import org.komapper.processor.Symbols.PropertyMetamodel
-import org.komapper.processor.Symbols.PropertyMetamodelImpl
-import org.komapper.processor.Symbols.SelectQuery
-import org.komapper.processor.Symbols.Sequence
-import org.komapper.processor.Symbols.TemplateSelectQuery
-import org.komapper.processor.Symbols.TemplateSelectQueryBuilder
-import org.komapper.processor.Symbols.UUID
 import org.komapper.processor.Symbols.checkMetamodelVersion
 import org.komapper.processor.Symbols.toKotlinInstant
 import org.komapper.processor.Symbols.toKotlinLocalDateTime
@@ -238,7 +238,7 @@ internal class EntityMetamodelGenerator(
                 is ValueClass -> {
                     val alternateType = p.kotlinClass.alternateType
                     if (alternateType != null) {
-                        "{ ${alternateType.exteriorTypeName}(it.${p.kotlinClass.property}) }"
+                        "{ ${alternateType.typeName}(it.${p.kotlinClass.property}) }"
                     } else {
                         "{ it.${p.kotlinClass.property} }"
                     }
@@ -246,7 +246,7 @@ internal class EntityMetamodelGenerator(
                 is PlainClass -> {
                     val alternateType = p.kotlinClass.alternateType
                     if (alternateType != null) {
-                        "{ ${alternateType.exteriorTypeName}(it) }"
+                        "{ ${alternateType.typeName}(it) }"
                     } else {
                         "{ it }"
                     }
@@ -578,6 +578,15 @@ internal class EntityMetamodelGenerator(
     }
 
     private fun now(property: LeafProperty): String {
+        fun applyBackticks(s: String): String {
+            return when (s) {
+                Symbols.Instant -> BackquotedSymbols.Instant
+                Symbols.LocalDateTime -> BackquotedSymbols.LocalDateTime
+                Symbols.OffsetDateTime -> BackquotedSymbols.OffsetDateTime
+                else -> s
+            }
+        }
+
         return when (property.kotlinClass) {
             is ValueClass -> {
                 when (property.kotlinClass.property.typeName) {
@@ -588,7 +597,8 @@ internal class EntityMetamodelGenerator(
                         "${property.typeName}($LocalDateTime.now(c).${toKotlinLocalDateTime.split(".").last()}())"
                     }
                     else -> {
-                        "${property.typeName}(${property.kotlinClass.property.typeName}.now(c))"
+                        val typeName = applyBackticks(property.kotlinClass.property.typeName)
+                        "${property.typeName}($typeName.now(c))"
                     }
                 }
             }
@@ -601,7 +611,7 @@ internal class EntityMetamodelGenerator(
                         "$LocalDateTime.now(c).${toKotlinLocalDateTime.split(".").last()}()"
                     }
                     else -> {
-                        "${property.typeName}.now(c)"
+                        "${applyBackticks(property.typeName)}.now(c)"
                     }
                 }
             }
