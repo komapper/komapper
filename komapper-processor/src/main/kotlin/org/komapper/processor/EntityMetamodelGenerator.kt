@@ -77,7 +77,7 @@ internal class EntityMetamodelGenerator(
     ).joinToString(", ")
 
     override fun run() {
-        w.println("@file:Suppress(\"ClassName\", \"PrivatePropertyName\", \"UNUSED_PARAMETER\", \"unused\", \"RemoveRedundantQualifierName\", \"MemberVisibilityCanBePrivate\", \"RedundantNullableReturnType\", \"USELESS_CAST\", \"UNCHECKED_CAST\", \"RemoveRedundantBackticks\", \"NO_EXPLICIT_VISIBILITY_IN_API_MODE\", \"NO_EXPLICIT_RETURN_TYPE_IN_API_MODE\", \"NO_EXPLICIT_VISIBILITY_IN_API_MODE_WARNING\", \"NO_EXPLICIT_RETURN_TYPE_IN_API_MODE_WARNING\")")
+        suppress()
 
         if (packageName.isNotEmpty()) {
             w.println("package $packageName")
@@ -142,6 +142,29 @@ internal class EntityMetamodelGenerator(
         projection()
     }
 
+    private fun suppress() {
+        val suppressList = listOf(
+            "BooleanLiteralArgument",
+            "ClassName",
+            "MemberVisibilityCanBePrivate",
+            "NO_EXPLICIT_RETURN_TYPE_IN_API_MODE",
+            "NO_EXPLICIT_RETURN_TYPE_IN_API_MODE_WARNING",
+            "NO_EXPLICIT_VISIBILITY_IN_API_MODE",
+            "NO_EXPLICIT_VISIBILITY_IN_API_MODE_WARNING",
+            "ObjectPropertyName",
+            "PrivatePropertyName",
+            "PropertyName",
+            "RedundantNullableReturnType",
+            "RemoveRedundantBackticks",
+            "RemoveRedundantQualifierName",
+            "UNCHECKED_CAST",
+            "UNUSED_PARAMETER",
+            "USELESS_CAST",
+            "unused",
+        )
+        w.println("@file:Suppress(${suppressList.joinToString(prefix = "\"", postfix = "\"")})")
+    }
+
     private fun importStatements() {
         fun usesType(property: LeafProperty, typeName: String): Boolean {
             val propertyTypeName = when (val kotlinClass = property.kotlinClass) {
@@ -189,6 +212,7 @@ internal class EntityMetamodelGenerator(
                                     "e",
                                 )
                             } } }"
+
                         is EnumStrategy.Ordinal ->
                             "{ try { $exteriorTypeName.values()[it] } catch (e: ArrayIndexOutOfBoundsException) { ${
                                 throwException(
@@ -197,6 +221,7 @@ internal class EntityMetamodelGenerator(
                                     "e",
                                 )
                             } } }"
+
                         is EnumStrategy.Property ->
                             "{ v -> $exteriorTypeName.values().firstOrNull { it.${strategy.propertyName} == v } ?: ${
                                 throwException(
@@ -205,10 +230,12 @@ internal class EntityMetamodelGenerator(
                                     "null",
                                 )
                             } }"
+
                         is EnumStrategy.Type ->
                             "{ it }"
                     }
                 }
+
                 is ValueClass -> {
                     val alternateType = p.kotlinClass.alternateType
                     if (alternateType != null) {
@@ -217,6 +244,7 @@ internal class EntityMetamodelGenerator(
                         "{ ${p.kotlinClass}(it) }"
                     }
                 }
+
                 is PlainClass -> {
                     val alternateType = p.kotlinClass.alternateType
                     if (alternateType != null) {
@@ -235,6 +263,7 @@ internal class EntityMetamodelGenerator(
                         is EnumStrategy.Property -> "{ it.${strategy.propertyName} }"
                     }
                 }
+
                 is ValueClass -> {
                     val alternateType = p.kotlinClass.alternateType
                     if (alternateType != null) {
@@ -243,6 +272,7 @@ internal class EntityMetamodelGenerator(
                         "{ it.${p.kotlinClass.property} }"
                     }
                 }
+
                 is PlainClass -> {
                     val alternateType = p.kotlinClass.alternateType
                     if (alternateType != null) {
@@ -282,6 +312,7 @@ internal class EntityMetamodelGenerator(
                     val index = embeddableIndexMap[embeddable]
                     w.println("        val `__$p` = __${embeddable.simpleName}$index($argList)")
                 }
+
                 is LeafProperty -> {
                     val getter = "{ it.`$p` }"
                     val setter = "{ e, v -> e.copy(`$p` = v) }"
@@ -309,6 +340,7 @@ internal class EntityMetamodelGenerator(
                     val index = embeddableIndexMap[embeddable]
                     w.println("    val `$p`:  __${embeddable.simpleName}$index by lazy { __${embeddable.simpleName}$index($argList) }")
                 }
+
                 is LeafProperty -> {
                     val propertyMetamodel =
                         "$PropertyMetamodel<$entityTypeName, ${p.exteriorTypeName}, ${p.interiorTypeName}>"
@@ -369,6 +401,7 @@ internal class EntityMetamodelGenerator(
                     val idKind = it.kind.idKind
                     if (idKind != null) it to idKind else null
                 }
+
                 else -> null
             }
         }
@@ -380,6 +413,7 @@ internal class EntityMetamodelGenerator(
                 is IdKind.AutoIncrement -> {
                     "if (__disableAutoIncrement) null else $AutoIncrement(`$p`)"
                 }
+
                 is IdKind.Sequence -> {
                     val paramList = listOf(
                         "`$p`",
@@ -497,6 +531,7 @@ internal class EntityMetamodelGenerator(
                     val tag = it.kotlinClass.property.literalTag
                     "`$it` to $Argument(`$it`, ${it.kotlinClass}(0$tag))"
                 }
+
                 else -> {
                     val tag = it.literalTag
                     "`$it` to $Argument(`$it`, 0$tag)"
@@ -528,6 +563,7 @@ internal class EntityMetamodelGenerator(
                     val tag = it.kotlinClass.property.literalTag
                     "`$it` = e.`$it`${if (nullable) " ?: ${it.kotlinClass}(0$tag)" else ""}"
                 }
+
                 else -> {
                     val tag = it.literalTag
                     "`$it` = e.`$it`${if (nullable) " ?: 0$tag" else ""}"
@@ -563,6 +599,7 @@ internal class EntityMetamodelGenerator(
                     val tag = it.kotlinClass.property.literalTag
                     "`$it` = ${it.kotlinClass}(e.`$it`${if (nullable) "?" else ""}.${it.kotlinClass.property}${if (nullable) "?" else ""}.inc()${if (nullable) " ?: 0$tag" else ""})"
                 }
+
                 else -> {
                     val tag = it.literalTag
                     "`$it` = e.`$it`${if (nullable) "?" else ""}.inc()${if (nullable) " ?: 0$tag" else ""}"
@@ -584,22 +621,27 @@ internal class EntityMetamodelGenerator(
                     KotlinInstant -> {
                         "${property.typeName}($Instant.now(c).${toKotlinInstant.split(".").last()}())"
                     }
+
                     KotlinLocalDateTime -> {
                         "${property.typeName}($LocalDateTime.now(c).${toKotlinLocalDateTime.split(".").last()}())"
                     }
+
                     else -> {
                         "${property.typeName}(${property.kotlinClass.property.backquotedTypeName}.now(c))"
                     }
                 }
             }
+
             else -> {
                 when (property.typeName) {
                     KotlinInstant -> {
                         "$Instant.now(c).${toKotlinInstant.split(".").last()}()"
                     }
+
                     KotlinLocalDateTime -> {
                         "$LocalDateTime.now(c).${toKotlinLocalDateTime.split(".").last()}()"
                     }
+
                     else -> {
                         "${property.exteriorTypeName}.now(c)"
                     }
@@ -626,6 +668,7 @@ internal class EntityMetamodelGenerator(
                         "`$p` = ${p.embeddable.typeName}($args)"
                     }
                 }
+
                 is LeafProperty -> {
                     val nullability = if (p.nullability == Nullability.NULLABLE) "?" else ""
                     "`$p` = m[this.`$p`] as ${p.typeName}$nullability"
@@ -673,6 +716,7 @@ internal class EntityMetamodelGenerator(
                 AssociationKind.ONE_TO_ONE,
                 AssociationKind.MANY_TO_ONE,
                 -> "${targetEntity.typeName}?"
+
                 AssociationKind.ONE_TO_MANY -> "Set<${targetEntity.typeName}>"
             }
             val expression = when (association.kind) {
@@ -764,6 +808,7 @@ internal class EntityMetamodelGenerator(
                         "`$p#$it`" to "$ColumnExpression<${it.exteriorTypeName}, *>"
                     }
                 }
+
                 is LeafProperty -> {
                     listOf("`$p`" to "$ColumnExpression<${p.exteriorTypeName}, *>")
                 }
