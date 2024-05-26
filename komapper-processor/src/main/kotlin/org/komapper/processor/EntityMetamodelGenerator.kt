@@ -578,15 +578,6 @@ internal class EntityMetamodelGenerator(
     }
 
     private fun now(property: LeafProperty): String {
-        fun applyBackticks(s: String): String {
-            return when (s) {
-                Symbols.Instant -> BackquotedSymbols.Instant
-                Symbols.LocalDateTime -> BackquotedSymbols.LocalDateTime
-                Symbols.OffsetDateTime -> BackquotedSymbols.OffsetDateTime
-                else -> s
-            }
-        }
-
         return when (property.kotlinClass) {
             is ValueClass -> {
                 when (property.kotlinClass.property.typeName) {
@@ -597,8 +588,7 @@ internal class EntityMetamodelGenerator(
                         "${property.typeName}($LocalDateTime.now(c).${toKotlinLocalDateTime.split(".").last()}())"
                     }
                     else -> {
-                        val typeName = applyBackticks(property.kotlinClass.property.typeName)
-                        "${property.typeName}($typeName.now(c))"
+                        "${property.typeName}(${property.kotlinClass.property.backquotedTypeName}.now(c))"
                     }
                 }
             }
@@ -611,7 +601,7 @@ internal class EntityMetamodelGenerator(
                         "$LocalDateTime.now(c).${toKotlinLocalDateTime.split(".").last()}()"
                     }
                     else -> {
-                        "${applyBackticks(property.typeName)}.now(c)"
+                        "${property.exteriorTypeName}.now(c)"
                     }
                 }
             }

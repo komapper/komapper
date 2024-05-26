@@ -24,7 +24,6 @@ internal object BackquotedSymbols {
     const val Instant = "`java.time`.Instant"
     const val KomapperExperimentalAssociation = "`org.komapper.annotation`.KomapperExperimentalAssociation"
     const val LocalDateTime = "`java.time`.LocalDateTime"
-    const val OffsetDateTime = "`java.time`.OffsetDateTime"
     const val Operand = "`org.komapper.core.dsl.expression`.Operand"
     const val ProjectionType = "`org.komapper.core.dsl.query`.ProjectionType"
     const val ProjectionType_INDEX = "`org.komapper.core.dsl.query`.ProjectionType.INDEX"
