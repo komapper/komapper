@@ -78,14 +78,72 @@ internal class EntityMetamodelGenerator(
 
     override fun run() {
         suppress()
+        packageDeclaration()
+        importStatements()
+        classDeclaration()
+        metamodels()
+        associations()
+        aggregationRoot()
+        factory()
+        projection()
+    }
 
+    private fun suppress() {
+        val suppressList = listOf(
+            "BooleanLiteralArgument",
+            "ClassName",
+            "MemberVisibilityCanBePrivate",
+            "NO_EXPLICIT_RETURN_TYPE_IN_API_MODE",
+            "NO_EXPLICIT_RETURN_TYPE_IN_API_MODE_WARNING",
+            "NO_EXPLICIT_VISIBILITY_IN_API_MODE",
+            "NO_EXPLICIT_VISIBILITY_IN_API_MODE_WARNING",
+            "ObjectPropertyName",
+            "PrivatePropertyName",
+            "PropertyName",
+            "RedundantNullableReturnType",
+            "RemoveRedundantBackticks",
+            "RemoveRedundantQualifierName",
+            "UNCHECKED_CAST",
+            "UNUSED_PARAMETER",
+            "USELESS_CAST",
+            "unused",
+        )
+        w.println("@file:Suppress(${suppressList.joinToString(prefix = "\"", postfix = "\"")})")
+    }
+
+    private fun packageDeclaration() {
         if (packageName.isNotEmpty()) {
             w.println("package $packageName")
             w.println()
         }
+    }
 
-        importStatements()
+    private fun importStatements() {
+        fun usesType(property: LeafProperty, typeName: String): Boolean {
+            val propertyTypeName = when (val kotlinClass = property.kotlinClass) {
+                is ValueClass -> kotlinClass.property.typeName
+                else -> property.typeName
+            }
+            return propertyTypeName == typeName
+        }
 
+        val timestampProperties = listOf(entity.createdAtProperty, entity.updatedAtProperty)
+        val usesInstant = timestampProperties.filterNotNull().any { usesType(it, KotlinInstant) }
+        val usesLocalDateTime = timestampProperties.filterNotNull().any { usesType(it, KotlinLocalDateTime) }
+        if (usesInstant || usesLocalDateTime) {
+            if (usesInstant) w.println("import $toKotlinInstant")
+            if (usesLocalDateTime) w.println("import $toKotlinLocalDateTime")
+            w.println()
+        }
+
+        for (a in entity.associations) {
+            if (a.sourceEntity.packageName != a.targetEntity.packageName) {
+                w.println("import ${a.targetEntity.packageName}.`${a.link.target}`")
+            }
+        }
+    }
+
+    private fun classDeclaration() {
         w.println("// generated at ${ZonedDateTime.now()}")
         w.println("@$EntityMetamodelImplementor($entityTypeName::class)")
         w.println("class $simpleName private constructor($constructorParamList) : $EntityMetamodel<$entityTypeName, $idTypeName, $simpleName> {")
@@ -134,60 +192,6 @@ internal class EntityMetamodelGenerator(
 
         w.println("}")
         w.println()
-
-        metamodels()
-        associations()
-        aggregationRoot()
-        factory()
-        projection()
-    }
-
-    private fun suppress() {
-        val suppressList = listOf(
-            "BooleanLiteralArgument",
-            "ClassName",
-            "MemberVisibilityCanBePrivate",
-            "NO_EXPLICIT_RETURN_TYPE_IN_API_MODE",
-            "NO_EXPLICIT_RETURN_TYPE_IN_API_MODE_WARNING",
-            "NO_EXPLICIT_VISIBILITY_IN_API_MODE",
-            "NO_EXPLICIT_VISIBILITY_IN_API_MODE_WARNING",
-            "ObjectPropertyName",
-            "PrivatePropertyName",
-            "PropertyName",
-            "RedundantNullableReturnType",
-            "RemoveRedundantBackticks",
-            "RemoveRedundantQualifierName",
-            "UNCHECKED_CAST",
-            "UNUSED_PARAMETER",
-            "USELESS_CAST",
-            "unused",
-        )
-        w.println("@file:Suppress(${suppressList.joinToString(prefix = "\"", postfix = "\"")})")
-    }
-
-    private fun importStatements() {
-        fun usesType(property: LeafProperty, typeName: String): Boolean {
-            val propertyTypeName = when (val kotlinClass = property.kotlinClass) {
-                is ValueClass -> kotlinClass.property.typeName
-                else -> property.typeName
-            }
-            return propertyTypeName == typeName
-        }
-
-        val timestampProperties = listOf(entity.createdAtProperty, entity.updatedAtProperty)
-        val usesInstant = timestampProperties.filterNotNull().any { usesType(it, KotlinInstant) }
-        val usesLocalDateTime = timestampProperties.filterNotNull().any { usesType(it, KotlinLocalDateTime) }
-        if (usesInstant || usesLocalDateTime) {
-            if (usesInstant) w.println("import $toKotlinInstant")
-            if (usesLocalDateTime) w.println("import $toKotlinLocalDateTime")
-            w.println()
-        }
-
-        for (a in entity.associations) {
-            if (a.sourceEntity.packageName != a.targetEntity.packageName) {
-                w.println("import ${a.targetEntity.packageName}.`${a.link.target}`")
-            }
-        }
     }
 
     private fun entityDescriptor() {
