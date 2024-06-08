@@ -28,9 +28,9 @@ For more documentation, go to our site:
 
 ## Prerequisite
 
-- Kotlin 1.7.22 or later
+- Kotlin 1.8.22 or later
 - JRE 11 or later
-- Gradle 6.7.1 or later
+- Gradle 6.8.3 or later
 
 ## Supported Databases
 
