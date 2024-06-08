@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -79,10 +81,10 @@ configure(libraryProjects + gradlePluginProject + exampleProjects + integrationT
         }
 
         withType<KotlinCompile>().configureEach {
-            kotlinOptions {
-                freeCompilerArgs = freeCompilerArgs + "-Xjdk-release=$jvmTargetVersion"
-                jvmTarget = jvmTargetVersion.toString()
-                apiVersion = "1.7"
+            compilerOptions {
+                freeCompilerArgs.add("-Xjdk-release=$jvmTargetVersion")
+                jvmTarget.set(JvmTarget.fromTarget(jvmTargetVersion.toString()))
+                apiVersion.set(KotlinVersion.KOTLIN_1_7)
             }
         }
     }
