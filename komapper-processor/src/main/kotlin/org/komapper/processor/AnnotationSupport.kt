@@ -258,26 +258,16 @@ internal class AnnotationSupport(
     }
 
     private fun getEnumStrategy(annotation: KSAnnotation?): EnumStrategy {
-        if (annotation == null) return config.enumStrategy
-        val declaration = when (val type = annotation.findValue("type")) {
-            is KSType -> type.declaration // KSP 1
-            is KSDeclaration -> type // KSP 2
-            else -> null
-        }
-        return when (declaration?.parentDeclaration?.qualifiedName?.asString()) {
-            Symbols.EnumType -> {
-                when (declaration.simpleName.asString()) {
-                    Symbols.EnumType_NAME -> return EnumStrategy.Name
-                    Symbols.EnumType_TYPE -> return EnumStrategy.Type
-                    Symbols.EnumType_ORDINAL -> return EnumStrategy.Ordinal
-                    Symbols.EnumType_PROPERTY -> {
-                        val hint = annotation.findValue("hint")?.toString()
-                            ?: report("The hint property is missing", annotation)
-                        EnumStrategy.Property(hint, annotation)
-                    }
-                    else -> config.enumStrategy
-                }
+        return when (annotation?.findValue("type")?.toString()) {
+            Symbols.EnumType_NAME -> EnumStrategy.Name
+            Symbols.EnumType_TYPE -> EnumStrategy.Type
+            Symbols.EnumType_ORDINAL -> EnumStrategy.Ordinal
+            Symbols.EnumType_PROPERTY -> {
+                val hint = annotation.findValue("hint")?.toString()
+                    ?: report("The hint property is missing", annotation)
+                EnumStrategy.Property(hint, annotation)
             }
+
             else -> config.enumStrategy
         }
     }
