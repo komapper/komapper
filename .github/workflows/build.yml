@@ -122,7 +122,7 @@ jobs:
         run: ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository
 
       - name: Publish plugin
-        run: |
+        run: >
             ./gradlew
             -Pgradle.publish.key=${{ secrets.GRADLE_PUBLISH_KEY }}
             -Pgradle.publish.secret=${{ secrets.GRADLE_PUBLISH_SECRET }}
