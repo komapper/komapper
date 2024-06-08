@@ -21,10 +21,11 @@ jobs:
           distribution: 'temurin'
           java-version: 17
 
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3.3.2
+
       - name: Check
-        uses: gradle/gradle-build-action@v3.3.2
-        with:
-          arguments: javatoolchain check -x h2 -x :integration-test-jdbc:check -x :integration-test-r2dbc:check
+        run: ./gradlew javatoolchain check -x h2 -x :integration-test-jdbc:check -x :integration-test-r2dbc:check
 
       - name: Upload reports
         if: failure()
@@ -50,10 +51,11 @@ jobs:
           distribution: 'temurin'
           java-version: 17
 
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3.3.2
+
       - name: Test
-        uses: gradle/gradle-build-action@v3.3.2
-        with:
-          arguments: javatoolchain :integration-test-jdbc:${{ matrix.driver }}
+        run: ./gradlew javatoolchain :integration-test-jdbc:${{ matrix.driver }}
 
       - name: Upload reports
         if: failure()
@@ -79,10 +81,11 @@ jobs:
           distribution: 'temurin'
           java-version: 17
 
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3.3.2
+
       - name: Test
-        uses: gradle/gradle-build-action@v3.3.2
-        with:
-          arguments: javatoolchain :integration-test-r2dbc:${{ matrix.driver }}
+        run: ./gradlew javatoolchain :integration-test-r2dbc:${{ matrix.driver }}
 
       - name: Upload reports
         if: failure()
@@ -107,20 +110,20 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3.3.2
+
       - name: Publish packages
-        uses: gradle/gradle-build-action@v3.3.2
         env:
           ORG_GRADLE_PROJECT_signingKey: ${{ secrets.SIGNING_KEY }}
           ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.SIGNING_PASSWORD }}
           ORG_GRADLE_PROJECT_sonatypeUsername: ${{ secrets.SONATYPE_USERNAME }}
           ORG_GRADLE_PROJECT_sonatypePassword: ${{ secrets.SONATYPE_PASSWORD }}
-        with:
-          arguments: publishToSonatype closeAndReleaseSonatypeStagingRepository
+        run: ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository
 
       - name: Publish plugin
-        uses: gradle/gradle-build-action@v3.3.2
-        with:
-          arguments: |
+        run: |
+            ./gradlew
             -Pgradle.publish.key=${{ secrets.GRADLE_PUBLISH_KEY }}
             -Pgradle.publish.secret=${{ secrets.GRADLE_PUBLISH_SECRET }}
             publishPlugins
