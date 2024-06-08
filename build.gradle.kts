@@ -71,6 +71,7 @@ configure(libraryProjects + gradlePluginProject + exampleProjects + integrationT
     tasks {
         withType<Test>().configureEach {
             useJUnitPlatform()
+            jvmArgs("-Xmx2g")
         }
 
         withType<JavaCompile>().configureEach {
@@ -81,7 +82,7 @@ configure(libraryProjects + gradlePluginProject + exampleProjects + integrationT
             kotlinOptions {
                 freeCompilerArgs = freeCompilerArgs + "-Xjdk-release=$jvmTargetVersion"
                 jvmTarget = jvmTargetVersion.toString()
-                apiVersion = "1.6"
+                apiVersion = "1.7"
             }
         }
     }

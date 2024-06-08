@@ -105,8 +105,8 @@ internal class AnnotationSupport(
                     linkAnnotation?.let { annotation ->
                         val source = annotation.findValue("source")?.toString().let {
                             when (it) {
-                                KomapperLink.SOURCE -> defaultSource
-                                null, !in sourceEntity.names ->
+                                KomapperLink.SOURCE, null -> defaultSource
+                                !in sourceEntity.names ->
                                     report(
                                         "@KomapperLink.source \"$it\" is invalid. It must be one of ${sourceEntity.names}.",
                                         node,
@@ -117,8 +117,8 @@ internal class AnnotationSupport(
                         }
                         val target = annotation.findValue("target")?.toString().let {
                             when (it) {
-                                KomapperLink.TARGET -> defaultTarget
-                                null, !in targetEntity.names ->
+                                KomapperLink.TARGET, null -> defaultTarget
+                                !in targetEntity.names ->
                                     report(
                                         "@KomapperLink.target \"$it\" is invalid. It must be one of ${targetEntity.names}.",
                                         node,

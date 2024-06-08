@@ -169,6 +169,7 @@ class EntityProcessorOkTest : AbstractKspTest(EntityProcessorProvider()) {
             """
             package test
             import org.komapper.annotation.*
+            @JvmInline
             value class ClobString(val value: String)
             @KomapperEntity
             data class Dept(
@@ -188,6 +189,7 @@ class EntityProcessorOkTest : AbstractKspTest(EntityProcessorProvider()) {
             """
             package test
             import org.komapper.annotation.*
+            @JvmInline
             value class ClobString(val value: String)
             @KomapperEntity
             data class Dept(
