@@ -192,7 +192,7 @@ internal class AnnotationSupport(
 
                 !classDeclaration.isValueClass() ->
                     report(
-                        "The alternateType property must be a value class. ${classDeclaration.qualifiedName?.asString()}",
+                        "The alternateType property must be a value class. class=${classDeclaration.qualifiedName?.asString()}, modifiers=${classDeclaration.modifiers}",
                         columnAnnotation,
                     )
 
