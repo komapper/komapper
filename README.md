@@ -166,11 +166,12 @@ See [DESIGN_DOC](DESIGN_DOC.md) for the design policy of this project.
 
 ## Compatibility Matrix
 
-| Kotlin and KSP version | Komapper version | JRE min version | Gradle min version |
-|:-----------------------|:-----------------|:----------------|--------------------|
-| 1.7.22-1.0.8           | 1.3.x - 1.11.x   | 11              | 6.7.1              |
-| 1.8.22-1.0.11          | 1.3.x - 1.15.x   | 11              | 6.8.3              |
-| 1.9.23-1.0.19          | 1.3.x - 1.17.x   | 11              | 6.8.3              |
+| Kotlin and KSP version | Komapper version | KSP2 support? | JRE min version | Gradle min version |
+|:-----------------------|:-----------------|---------------|:----------------|--------------------|
+| 1.8.22-1.0.11          | 1.3.x - 1.16.x   | No            | 11              | 6.8.3              |
+| 1.9.24-1.0.20          | 1.3.x - 1.18.x   | No            | 11              | 6.8.3              |
+| 2.0.0-1.0.22           | 1.3.x - 1.18.0   | No            | 11              | 6.8.3              |
+| 2.0.0-1.0.22           | 1.18.1           | Yes           | 11              | 6.8.3              |
 
 Compatibility testing is performed in the [komapper/compatibility-test](https://github.com/komapper/compatibility-test/) repository.
 
