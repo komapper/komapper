@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -71,6 +73,7 @@ configure(libraryProjects + gradlePluginProject + exampleProjects + integrationT
     tasks {
         withType<Test>().configureEach {
             useJUnitPlatform()
+            jvmArgs("-Xmx2g")
         }
 
         withType<JavaCompile>().configureEach {
@@ -78,10 +81,10 @@ configure(libraryProjects + gradlePluginProject + exampleProjects + integrationT
         }
 
         withType<KotlinCompile>().configureEach {
-            kotlinOptions {
-                freeCompilerArgs = freeCompilerArgs + "-Xjdk-release=$jvmTargetVersion"
-                jvmTarget = jvmTargetVersion.toString()
-                apiVersion = "1.6"
+            compilerOptions {
+                freeCompilerArgs.add("-Xjdk-release=$jvmTargetVersion")
+                jvmTarget.set(JvmTarget.fromTarget(jvmTargetVersion.toString()))
+                apiVersion.set(KotlinVersion.KOTLIN_1_7)
             }
         }
     }

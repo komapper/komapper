@@ -20,7 +20,14 @@ internal fun <T> Iterable<T>.hasDuplicates(predicate: (T) -> Boolean): Boolean {
 }
 
 internal fun KSClassDeclaration.isValueClass(): Boolean {
-    return this.modifiers.contains(Modifier.VALUE)
+    return if (this.modifiers.contains(Modifier.VALUE)) {
+        true
+    } else {
+        // TODO: Remove this condition.
+        // The VALUE modifier is not found in KSP 2.
+        // Check for the presence of the INLINE modifier until this issue is fixed.
+        this.modifiers.contains(Modifier.INLINE)
+    }
 }
 
 internal fun KSAnnotation.findValue(name: String): Any? {

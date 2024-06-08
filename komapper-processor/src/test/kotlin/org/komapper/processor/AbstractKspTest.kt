@@ -6,6 +6,7 @@ import com.tschuchort.compiletesting.KotlinCompilation
 import com.tschuchort.compiletesting.SourceFile
 import com.tschuchort.compiletesting.kspIncremental
 import com.tschuchort.compiletesting.symbolProcessorProviders
+import com.tschuchort.compiletesting.useKsp2
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.io.TempDir
 import java.nio.file.Path
@@ -20,8 +21,9 @@ abstract class AbstractKspTest(private vararg val providers: SymbolProcessorProv
         val sourceFile = SourceFile.kotlin("source.kt", contents)
         val compilation = KotlinCompilation()
             .apply {
-                languageVersion = "1.9"
-                apiVersion = "1.6"
+                useKsp2()
+                languageVersion = "2.0"
+                apiVersion = "1.7"
                 workingDir = tempDir!!.toFile()
                 inheritClassPath = true
                 symbolProcessorProviders = providers.toMutableList()

@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 dependencies {
     val kotlinVersion: String by project
     val kspVersion: String by project
@@ -10,9 +12,13 @@ dependencies {
     testImplementation("dev.zacsweers.kctfork:ksp:0.5.0")
 }
 
-kotlin {
-    compilerOptions {
-        optIn.add("org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi")
-        optIn.add("org.komapper.annotation.KomapperExperimentalAssociation")
+tasks {
+    withType<KotlinCompile>().configureEach {
+        compilerOptions {
+            if (name == "compileTestKotlin") {
+                optIn.add("org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi")
+            }
+            optIn.add("org.komapper.annotation.KomapperExperimentalAssociation")
+        }
     }
 }
