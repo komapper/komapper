@@ -1,6 +1,5 @@
 package org.komapper.processor
 
-import com.google.devtools.ksp.processing.Resolver
 import com.google.devtools.ksp.symbol.ClassKind
 import com.google.devtools.ksp.symbol.KSAnnotated
 import com.google.devtools.ksp.symbol.KSClassDeclaration
@@ -14,11 +13,11 @@ import org.komapper.processor.Symbols.ProjectionMeta
 import org.komapper.processor.Symbols.Void
 
 internal interface EntityDefinitionSourceResolver {
-    fun resolve(resolver: Resolver, symbol: KSAnnotated): EntityDefinitionSource?
+    fun resolve(symbol: KSAnnotated): EntityDefinitionSource?
 }
 
-internal class SeparateDefinitionSourceResolver(val config: Config) : EntityDefinitionSourceResolver {
-    override fun resolve(resolver: Resolver, symbol: KSAnnotated): EntityDefinitionSource {
+internal class SeparateDefinitionSourceResolver(private val context: Context) : EntityDefinitionSourceResolver {
+    override fun resolve(symbol: KSAnnotated): EntityDefinitionSource {
         val defDeclaration = symbol.accept(ClassDeclarationVisitor(), Unit)
             ?: report("@${KomapperEntityDef::class.simpleName} cannot be applied to this element.", symbol)
         val defAnnotation = defDeclaration.findAnnotation(KomapperEntityDef::class)
@@ -37,12 +36,12 @@ internal class SeparateDefinitionSourceResolver(val config: Config) : EntityDefi
                 defDeclaration,
             )
         }
-        val unitTypeName = createUnitTypeName(config, unitDeclaration)
+        val unitTypeName = createUnitTypeName(context, unitDeclaration)
         val entityDeclaration = entity.declaration.accept(ClassDeclarationVisitor(), Unit)
             ?: report("The entity value of @${KomapperEntityDef::class.simpleName} is not found.", defDeclaration)
         validateContainerClass(entityDeclaration, defAnnotation)
         val stubAnnotation = defDeclaration.findAnnotation(KomapperStub)
-        val (packageName, simpleName) = createMetamodelClassName(config, defDeclaration)
+        val (packageName, simpleName) = createMetamodelClassName(context, defDeclaration)
         return EntityDefinitionSource(
             defDeclaration = defDeclaration,
             entityDeclaration = entityDeclaration,
@@ -57,8 +56,8 @@ internal class SeparateDefinitionSourceResolver(val config: Config) : EntityDefi
     }
 }
 
-internal class SelfDefinitionSourceResolver(val config: Config) : EntityDefinitionSourceResolver {
-    override fun resolve(resolver: Resolver, symbol: KSAnnotated): EntityDefinitionSource {
+internal class SelfDefinitionSourceResolver(private val context: Context) : EntityDefinitionSourceResolver {
+    override fun resolve(symbol: KSAnnotated): EntityDefinitionSource {
         val entityDeclaration = symbol.accept(ClassDeclarationVisitor(), Unit)
             ?: report("@${KomapperEntity::class.simpleName} cannot be applied to this element.", symbol)
         val annotation = entityDeclaration.findAnnotation(KomapperEntity::class)
@@ -73,10 +72,10 @@ internal class SelfDefinitionSourceResolver(val config: Config) : EntityDefiniti
                 entityDeclaration,
             )
         }
-        val unitTypeName = createUnitTypeName(config, unitDeclaration)
+        val unitTypeName = createUnitTypeName(context, unitDeclaration)
         validateContainerClass(entityDeclaration, entityDeclaration)
         val stubAnnotation = entityDeclaration.findAnnotation(KomapperStub)
-        val (packageName, simpleName) = createMetamodelClassName(config, entityDeclaration)
+        val (packageName, simpleName) = createMetamodelClassName(context, entityDeclaration)
         return EntityDefinitionSource(
             defDeclaration = entityDeclaration,
             entityDeclaration = entityDeclaration,
@@ -91,9 +90,9 @@ internal class SelfDefinitionSourceResolver(val config: Config) : EntityDefiniti
     }
 }
 
-internal class SeparateProjectionDefinitionSourceResolver(val config: Config) : EntityDefinitionSourceResolver {
+internal class SeparateProjectionDefinitionSourceResolver(private val context: Context) : EntityDefinitionSourceResolver {
 
-    override fun resolve(resolver: Resolver, symbol: KSAnnotated): EntityDefinitionSource? {
+    override fun resolve(symbol: KSAnnotated): EntityDefinitionSource? {
         val defDeclaration = symbol.accept(ClassDeclarationVisitor(), Unit)
             ?: report("@${KomapperProjectionDef::class.simpleName} cannot be applied to this element.", symbol)
 
@@ -102,15 +101,15 @@ internal class SeparateProjectionDefinitionSourceResolver(val config: Config) : 
         if (projectionType !is KSType) {
             report("The projection value of @${KomapperProjectionDef::class.simpleName} is not found.", defDeclaration)
         }
-        val unitName = resolver.getKSNameFromString(ProjectionMeta)
-        val unitDeclaration = resolver.getClassDeclarationByName(unitName) ?: error("$ProjectionMeta not found.")
-        val unitTypeName = createUnitTypeName(config, unitDeclaration)
+        val unitName = context.resolver.getKSNameFromString(ProjectionMeta)
+        val unitDeclaration = context.resolver.getClassDeclarationByName(unitName) ?: error("$ProjectionMeta not found.")
+        val unitTypeName = createUnitTypeName(context, unitDeclaration)
         val entityDeclaration = projectionType.declaration.accept(ClassDeclarationVisitor(), Unit)
             ?: report("The projection value of @${KomapperProjectionDef::class.simpleName} is not found.", defDeclaration)
         validateContainerClass(entityDeclaration, defAnnotation)
         val projection = AnnotationSupport.createProjection(defAnnotation, entityDeclaration)
         val stubAnnotation = defDeclaration.findAnnotation(KomapperStub)
-        val (packageName, simpleName) = createMetamodelClassName(config, defDeclaration)
+        val (packageName, simpleName) = createMetamodelClassName(context, defDeclaration)
         return EntityDefinitionSource(
             defDeclaration = defDeclaration,
             entityDeclaration = entityDeclaration,
@@ -125,19 +124,19 @@ internal class SeparateProjectionDefinitionSourceResolver(val config: Config) : 
     }
 }
 
-internal class SelfProjectionDefinitionSourceResolver(val config: Config) : EntityDefinitionSourceResolver {
-    override fun resolve(resolver: Resolver, symbol: KSAnnotated): EntityDefinitionSource? {
+internal class SelfProjectionDefinitionSourceResolver(private val context: Context) : EntityDefinitionSourceResolver {
+    override fun resolve(symbol: KSAnnotated): EntityDefinitionSource? {
         val entityDeclaration = symbol.accept(ClassDeclarationVisitor(), Unit)
             ?: report("@${KomapperProjection::class.simpleName} cannot be applied to this element.", symbol)
 
-        val unitName = resolver.getKSNameFromString(ProjectionMeta)
-        val unitDeclaration = resolver.getClassDeclarationByName(unitName) ?: error("$ProjectionMeta not found.")
-        val unitTypeName = createUnitTypeName(config, unitDeclaration)
+        val unitName = context.resolver.getKSNameFromString(ProjectionMeta)
+        val unitDeclaration = context.resolver.getClassDeclarationByName(unitName) ?: error("$ProjectionMeta not found.")
+        val unitTypeName = createUnitTypeName(context, unitDeclaration)
         validateContainerClass(entityDeclaration, entityDeclaration)
         val annotation = symbol.findAnnotation(KomapperProjection::class)
         val projection = AnnotationSupport.createProjection(annotation, entityDeclaration)
         val stubAnnotation = entityDeclaration.findAnnotation(KomapperStub)
-        val (packageName, simpleName) = createMetamodelClassName(config, entityDeclaration)
+        val (packageName, simpleName) = createMetamodelClassName(context, entityDeclaration)
         return EntityDefinitionSource(
             defDeclaration = entityDeclaration,
             entityDeclaration = entityDeclaration,
@@ -165,14 +164,14 @@ private fun toUnitDeclaration(symbol: Any?, errorHandler: () -> Nothing): KSClas
     }
 }
 
-private fun createMetamodelClassName(config: Config, defDeclaration: KSClassDeclaration): Pair<String, String> {
+private fun createMetamodelClassName(context: Context, defDeclaration: KSClassDeclaration): Pair<String, String> {
     val packageName = defDeclaration.packageName.asString()
     val qualifiedName = defDeclaration.qualifiedName?.asString() ?: ""
     val packageRemovedQualifiedName = qualifiedName.removePrefix("$packageName.")
-    val simpleName = config.prefix + packageRemovedQualifiedName.replace(".", "_") + config.suffix
+    val simpleName = context.config.prefix + packageRemovedQualifiedName.replace(".", "_") + context.config.suffix
     return packageName to simpleName
 }
 
-private fun createUnitTypeName(config: Config, unitDeclaration: KSClassDeclaration?): String {
-    return unitDeclaration?.qualifiedName?.asString() ?: config.metaObject
+private fun createUnitTypeName(context: Context, unitDeclaration: KSClassDeclaration?): String {
+    return unitDeclaration?.qualifiedName?.asString() ?: context.config.metaObject
 }
