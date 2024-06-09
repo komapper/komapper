@@ -1,8 +1,6 @@
 package org.komapper.processor
 
 import com.google.devtools.ksp.getDeclaredProperties
-import com.google.devtools.ksp.processing.KSPLogger
-import com.google.devtools.ksp.processing.Resolver
 import com.google.devtools.ksp.symbol.KSPropertyDeclaration
 import com.google.devtools.ksp.symbol.KSValueParameter
 import org.komapper.annotation.KomapperAutoIncrement
@@ -16,12 +14,10 @@ import org.komapper.annotation.KomapperUpdatedAt
 import org.komapper.annotation.KomapperVersion
 
 internal class EntityDefFactory(
-    @Suppress("unused") private val logger: KSPLogger,
-    private val config: Config,
-    private val resolver: Resolver,
+    private val context: Context,
     private val definitionSource: EntityDefinitionSource,
 ) {
-    private val annotationSupport: AnnotationSupport = AnnotationSupport(logger, config, resolver)
+    private val annotationSupport: AnnotationSupport = AnnotationSupport(context)
     private val defDeclaration = definitionSource.defDeclaration
 
     fun create(): EntityDef {
@@ -116,7 +112,7 @@ internal class EntityDefFactory(
                     val catalog = a.findValue("catalog")?.toString()?.trim() ?: KomapperSequence.CATALOG
                     val schema = a.findValue("schema")?.toString()?.trim() ?: KomapperSequence.SCHEMA
                     val alwaysQuote =
-                        a.findValue("alwaysQuote")?.toString()?.toBooleanStrict() ?: config.alwaysQuote
+                        a.findValue("alwaysQuote")?.toString()?.toBooleanStrict() ?: context.config.alwaysQuote
                     IdKind.Sequence(a, name, startWith, incrementBy, catalog, schema, alwaysQuote)
                 }
             }

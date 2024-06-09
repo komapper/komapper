@@ -1,22 +1,18 @@
 package org.komapper.processor
 
-import com.google.devtools.ksp.processing.KSPLogger
-import com.google.devtools.ksp.processing.Resolver
 import com.google.devtools.ksp.symbol.KSAnnotated
 import org.komapper.annotation.KomapperEmbeddedId
 import org.komapper.annotation.KomapperId
 
 internal class EntityAnalyzer(
-    private val logger: KSPLogger,
-    private val resolver: Resolver,
-    private val config: Config,
+    private val context: Context,
     private val definitionSourceResolver: EntityDefinitionSourceResolver,
     private val requiresIdValidation: Boolean,
 ) {
 
     fun analyze(symbol: KSAnnotated): EntityAnalysisResult {
         val definitionSource = try {
-            definitionSourceResolver.resolve(resolver, symbol)
+            definitionSourceResolver.resolve(symbol)
         } catch (e: Exit) {
             return EntityAnalysisResult.Error(e)
         }
@@ -24,8 +20,8 @@ internal class EntityAnalyzer(
             EntityAnalysisResult.Skip
         } else {
             try {
-                val entityDef = EntityDefFactory(logger, config, resolver, definitionSource).create()
-                val entity = EntityFactory(logger, config, resolver, entityDef).create()
+                val entityDef = EntityDefFactory(context, definitionSource).create()
+                val entity = EntityFactory(context, entityDef).create()
                 validateEntity(entity)
                 val model = EntityModel(definitionSource, entity)
                 EntityAnalysisResult.Success(model)

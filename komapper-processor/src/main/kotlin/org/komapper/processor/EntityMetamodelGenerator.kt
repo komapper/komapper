@@ -1,6 +1,5 @@
 package org.komapper.processor
 
-import com.google.devtools.ksp.processing.KSPLogger
 import com.google.devtools.ksp.symbol.Nullability
 import org.komapper.processor.BackquotedSymbols.Argument
 import org.komapper.processor.BackquotedSymbols.AutoIncrement
@@ -44,8 +43,7 @@ import java.io.PrintWriter
 import java.time.ZonedDateTime
 
 internal class EntityMetamodelGenerator(
-    @Suppress("unused") private val logger: KSPLogger,
-    private val config: Config,
+    private val context: Context,
     private val entity: Entity,
     private val unitTypeName: String,
     private val aliases: List<String>,
@@ -722,7 +720,7 @@ internal class EntityMetamodelGenerator(
             w.println("    return $expression")
             w.println("}")
             w.println()
-            if (config.enableEntityStoreContext) {
+            if (context.config.enableEntityStoreContext) {
                 w.println(
                     """
                 context($EntityStoreContext)
@@ -754,7 +752,7 @@ internal class EntityMetamodelGenerator(
         w.println("    return this[target]")
         w.println("}")
         w.println()
-        if (config.enableEntityStoreContext) {
+        if (context.config.enableEntityStoreContext) {
             w.println(
                 """
                 context($EntityStoreContext)

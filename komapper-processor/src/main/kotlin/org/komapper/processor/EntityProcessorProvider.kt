@@ -1,5 +1,6 @@
 package org.komapper.processor
 
+import com.google.devtools.ksp.processing.Resolver
 import com.google.devtools.ksp.processing.SymbolProcessor
 import com.google.devtools.ksp.processing.SymbolProcessorEnvironment
 import com.google.devtools.ksp.processing.SymbolProcessorProvider
@@ -13,28 +14,33 @@ import org.komapper.core.ThreadSafe
 class EntityProcessorProvider : SymbolProcessorProvider {
     override fun create(environment: SymbolProcessorEnvironment): SymbolProcessor {
         val config = Config.create(environment.options)
+        val factory = object : ContextFactory {
+            override fun create(resolver: Resolver): Context {
+                return Context(environment, config, resolver)
+            }
+        }
         val processingAnnotations = listOf(
             ProcessingAnnotation(
                 KomapperEntityDef::class,
-                SeparateDefinitionSourceResolver(config),
+                ::SeparateDefinitionSourceResolver,
                 true,
             ),
             ProcessingAnnotation(
                 KomapperEntity::class,
-                SelfDefinitionSourceResolver(config),
+                ::SelfDefinitionSourceResolver,
                 true,
             ),
             ProcessingAnnotation(
                 KomapperProjectionDef::class,
-                SeparateProjectionDefinitionSourceResolver(config),
+                ::SeparateProjectionDefinitionSourceResolver,
                 false,
             ),
             ProcessingAnnotation(
                 KomapperProjection::class,
-                SelfProjectionDefinitionSourceResolver(config),
+                ::SelfProjectionDefinitionSourceResolver,
                 false,
             ),
         )
-        return EntityProcessor(environment, config, processingAnnotations)
+        return EntityProcessor(factory, processingAnnotations)
     }
 }

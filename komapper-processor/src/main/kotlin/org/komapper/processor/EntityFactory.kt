@@ -2,8 +2,6 @@ package org.komapper.processor
 
 import com.google.devtools.ksp.getDeclaredProperties
 import com.google.devtools.ksp.isPublic
-import com.google.devtools.ksp.processing.KSPLogger
-import com.google.devtools.ksp.processing.Resolver
 import com.google.devtools.ksp.symbol.ClassKind
 import com.google.devtools.ksp.symbol.KSAnnotation
 import com.google.devtools.ksp.symbol.KSClassDeclaration
@@ -26,14 +24,11 @@ import org.komapper.processor.Symbols.LocalDateTime
 import org.komapper.processor.Symbols.OffsetDateTime
 
 internal class EntityFactory(
-    @Suppress("unused")
-    private val logger: KSPLogger,
-    private val config: Config,
-    private val resolver: Resolver,
+    private val context: Context,
     private val entityDef: EntityDef,
 ) {
 
-    private val annotationSupport = AnnotationSupport(logger, config, resolver)
+    private val annotationSupport = AnnotationSupport(context)
 
     fun create(): Entity {
         val allProperties = createAllProperties()
@@ -221,7 +216,7 @@ internal class EntityFactory(
     private fun createEnumClass(enumStrategy: EnumStrategy?, type: KSType): EnumClass? {
         val classDeclaration = type.declaration.accept(ClassDeclarationVisitor(), Unit)
         return if (classDeclaration != null && classDeclaration.classKind == ClassKind.ENUM_CLASS) {
-            when (val strategy = enumStrategy ?: config.enumStrategy) {
+            when (val strategy = enumStrategy ?: context.config.enumStrategy) {
                 EnumStrategy.Name -> EnumClass(type, EnumStrategy.Name.typeName, strategy)
                 EnumStrategy.Type -> EnumClass(type, type.backquotedName, strategy)
                 EnumStrategy.Ordinal -> EnumClass(type, EnumStrategy.Ordinal.typeName, strategy)
@@ -277,7 +272,7 @@ internal class EntityFactory(
     private fun getColumn(column: Column?, parameter: KSValueParameter): Column {
         return if (column == null) {
             val name = parameter.toString()
-            Column(config.namingStrategy.apply(name), alwaysQuote = false, masking = false, alternateType = null)
+            Column(context.config.namingStrategy.apply(name), alwaysQuote = false, masking = false, alternateType = null)
         } else {
             column
         }

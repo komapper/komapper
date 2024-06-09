@@ -4,6 +4,6 @@ import kotlin.reflect.KClass
 
 internal data class ProcessingAnnotation(
     val annotationClass: KClass<*>,
-    val definitionSourceResolver: EntityDefinitionSourceResolver,
+    val createEntityDefinitionSourceResolver: (context: Context) -> EntityDefinitionSourceResolver,
     val requiresIdValidation: Boolean,
 )

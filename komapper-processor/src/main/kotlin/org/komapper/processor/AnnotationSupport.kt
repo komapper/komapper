@@ -2,8 +2,6 @@ package org.komapper.processor
 
 import com.google.devtools.ksp.getDeclaredProperties
 import com.google.devtools.ksp.isPublic
-import com.google.devtools.ksp.processing.KSPLogger
-import com.google.devtools.ksp.processing.Resolver
 import com.google.devtools.ksp.symbol.KSAnnotation
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSDeclaration
@@ -26,12 +24,10 @@ import org.komapper.annotation.KomapperTable
 import org.komapper.core.NamingStrategy
 
 internal class AnnotationSupport(
-    @Suppress("unused") private val logger: KSPLogger,
-    private val config: Config,
-    private val resolver: Resolver,
+    private val context: Context,
 ) {
 
-    private val namingStrategy: NamingStrategy = config.namingStrategy
+    private val namingStrategy: NamingStrategy = context.config.namingStrategy
 
     fun getTable(definitionSource: EntityDefinitionSource): Table {
         val annotation = definitionSource.defDeclaration.findAnnotation(KomapperTable::class)
@@ -41,7 +37,7 @@ internal class AnnotationSupport(
         val catalog = annotation?.findValue("catalog")?.toString()?.trim() ?: KomapperTable.CATALOG
         val schema = annotation?.findValue("schema")?.toString()?.trim() ?: KomapperTable.SCHEMA
         val alwaysQuote =
-            annotation?.findValue("alwaysQuote")?.toString()?.toBooleanStrict() ?: config.alwaysQuote
+            annotation?.findValue("alwaysQuote")?.toString()?.toBooleanStrict() ?: context.config.alwaysQuote
         return Table(name, catalog, schema, alwaysQuote)
     }
 
@@ -50,7 +46,7 @@ internal class AnnotationSupport(
             return definitionSource.projection
         } else {
             val annotation = definitionSource.defDeclaration.findAnnotation(KomapperProjection::class)
-            if (annotation != null || config.enableEntityProjection) {
+            if (annotation != null || context.config.enableEntityProjection) {
                 createProjection(annotation, definitionSource.entityDeclaration)
             } else {
                 null
@@ -141,13 +137,13 @@ internal class AnnotationSupport(
     }
 
     private fun resolveEntityDefinitionSource(declaration: KSDeclaration): EntityDefinitionSource? {
-        val selfDefinitionSourceResolver = SelfDefinitionSourceResolver(config)
-        val separateDefinitionSourceResolver = SeparateDefinitionSourceResolver(config)
+        val selfDefinitionSourceResolver = SelfDefinitionSourceResolver(context)
+        val separateDefinitionSourceResolver = SeparateDefinitionSourceResolver(context)
         val definitionSource = declaration.annotations.firstNotNullOfOrNull { annotation ->
             when (annotation.shortName.asString()) {
                 KomapperEntity::class.simpleName -> {
                     try {
-                        selfDefinitionSourceResolver.resolve(resolver, declaration)
+                        selfDefinitionSourceResolver.resolve(declaration)
                     } catch (e: Exit) {
                         null
                     }
@@ -155,7 +151,7 @@ internal class AnnotationSupport(
 
                 KomapperEntityDef::class.simpleName -> {
                     try {
-                        separateDefinitionSourceResolver.resolve(resolver, declaration)
+                        separateDefinitionSourceResolver.resolve(declaration)
                     } catch (e: Exit) {
                         null
                     }
@@ -177,7 +173,7 @@ internal class AnnotationSupport(
             if (it.isNullOrBlank()) null else it
         } ?: namingStrategy.apply(propertyName)
         val alwaysQuote =
-            columnAnnotation?.findValue("alwaysQuote")?.toString()?.toBooleanStrict() ?: config.alwaysQuote
+            columnAnnotation?.findValue("alwaysQuote")?.toString()?.toBooleanStrict() ?: context.config.alwaysQuote
         val masking =
             columnAnnotation?.findValue("masking")?.toString()?.toBooleanStrict() ?: KomapperColumn.MASKING
         val alternateType = columnAnnotation?.findValue("alternateType")?.let { type ->
@@ -258,7 +254,7 @@ internal class AnnotationSupport(
     }
 
     private fun getEnumStrategy(annotation: KSAnnotation?): EnumStrategy {
-        if (annotation == null) return config.enumStrategy
+        if (annotation == null) return context.config.enumStrategy
         val declaration = when (val type = annotation.findValue("type")) {
             is KSType -> type.declaration // KSP 1
             is KSDeclaration -> type // KSP 2
@@ -275,10 +271,10 @@ internal class AnnotationSupport(
                             ?: report("The hint property is missing", annotation)
                         EnumStrategy.Property(hint, annotation)
                     }
-                    else -> config.enumStrategy
+                    else -> context.config.enumStrategy
                 }
             }
-            else -> config.enumStrategy
+            else -> context.config.enumStrategy
         }
     }
 
