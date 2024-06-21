@@ -1,5 +1,5 @@
 dependencies {
     api(project(":komapper-dialect-sqlserver"))
     api(project(":komapper-jdbc"))
-    api("com.microsoft.sqlserver:mssql-jdbc:12.6.2.jre11")
+    api("com.microsoft.sqlserver:mssql-jdbc:12.6.3.jre11")
 }
