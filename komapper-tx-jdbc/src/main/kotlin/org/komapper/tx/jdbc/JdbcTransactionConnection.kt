@@ -17,22 +17,28 @@ private class JdbcTransactionConnectionImpl(
 ) : Connection by connection, JdbcTransactionConnection {
 
     @Volatile
-    private var isolation: Int = 0
+    private var isolation: Int? = null
 
     @Volatile
-    private var readOnly: Boolean = false
+    private var readOnly: Boolean? = null
 
     @Volatile
     private var autoCommit: Boolean = false
 
     override fun initialize() {
-        readOnly = connection.isReadOnly
         if (readOnlyProperty != null) {
-            connection.isReadOnly = readOnlyProperty.value
+            val currentReadOnly = connection.isReadOnly
+            if (readOnlyProperty.value != currentReadOnly) {
+                connection.isReadOnly = readOnlyProperty.value
+                readOnly = currentReadOnly
+            }
         }
-        isolation = connection.transactionIsolation
         if (isolationLevelProperty != null) {
-            connection.transactionIsolation = isolationLevelProperty.value
+            val currentIsolationLevel = connection.transactionIsolation
+            if (isolationLevelProperty.value != currentIsolationLevel) {
+                connection.transactionIsolation = isolationLevelProperty.value
+                isolation = currentIsolationLevel
+            }
         }
         autoCommit = connection.autoCommit
         if (autoCommit) {
@@ -44,11 +50,13 @@ private class JdbcTransactionConnectionImpl(
         if (autoCommit) {
             connection.autoCommit = true
         }
-        if (isolationLevelProperty != null && isolation != Connection.TRANSACTION_NONE) {
-            connection.transactionIsolation = isolation
+        val preservedIsolation = isolation
+        if (preservedIsolation != null && preservedIsolation != Connection.TRANSACTION_NONE) {
+            connection.transactionIsolation = preservedIsolation
         }
-        if (readOnlyProperty != null) {
-            connection.isReadOnly = readOnly
+        val preservedReadOnly = readOnly
+        if (preservedReadOnly != null) {
+            connection.isReadOnly = preservedReadOnly
         }
     }
 
