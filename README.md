@@ -175,9 +175,18 @@ See [DESIGN_DOC](DESIGN_DOC.md) for the design policy of this project.
 
 Compatibility testing is performed in the [komapper/compatibility-test](https://github.com/komapper/compatibility-test/) repository.
 
-## Backers & Sponsors
+## Backers
 
-If you use Komapper in your project or enterprise and would like to support ongoing development, please consider becoming a backer or a sponsor.
-Sponsor logos will show up here with a link to your website.
+If you use Komapper in your project or enterprise and would like to support ongoing development, 
+please consider becoming a backer. [[Become a backer](https://opencollective.com/komapper#category-CONTRIBUTE)]
 
-[[Become a backer or a sponsor](https://opencollective.com/komapper#category-CONTRIBUTE)]
+Our top backers are shown below!
+
+<a href="https://opencollective.com/komapper/backer/0/website" target="_blank"><img src="https://opencollective.com/komapper/backer/0/avatar.svg"></a>
+<a href="https://opencollective.com/komapper/backer/1/website" target="_blank"><img src="https://opencollective.com/komapper/backer/1/avatar.svg"></a>
+<a href="https://opencollective.com/komapper/backer/2/website" target="_blank"><img src="https://opencollective.com/komapper/backer/2/avatar.svg"></a>
+<a href="https://opencollective.com/komapper/backer/3/website" target="_blank"><img src="https://opencollective.com/komapper/backer/3/avatar.svg"></a>
+<a href="https://opencollective.com/komapper/backer/4/website" target="_blank"><img src="https://opencollective.com/komapper/backer/4/avatar.svg"></a>
+<a href="https://opencollective.com/komapper/backer/5/website" target="_blank"><img src="https://opencollective.com/komapper/backer/5/avatar.svg"></a>
+<a href="https://opencollective.com/komapper/backer/6/website" target="_blank"><img src="https://opencollective.com/komapper/backer/6/avatar.svg"></a>
+
