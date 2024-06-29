@@ -13,7 +13,7 @@ import kotlin.reflect.KType
 @ThreadSafe
 data class Value<T : Any>(val any: T?, val type: KType, val masking: Boolean = false) {
     init {
-        require( !type.isMarkedNullable) { "The type must not be nullable." }
+        require(!type.isMarkedNullable) { "The type must not be nullable." }
         require(type.classifier as? KClass<*> != null) { "The type must be a class." }
     }
 }

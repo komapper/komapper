@@ -71,7 +71,7 @@ class PostgreSqlR2dbcDataTypeProvider(private val next: R2dbcDataTypeProvider) :
     private val dataTypeMap: Map<KType, R2dbcDataType<*>> = DEFAULT_DATA_TYPES.associateBy { it.type }
 
     private val dataTypeMapByKClass: Map<KClass<*>, R2dbcDataType<*>> = DEFAULT_DATA_TYPES.associateBy { it.type.classifier as KClass<*> }
-    
+
     override fun <T : Any> get(type: KType): R2dbcDataType<T>? {
         return if (Array::class.java.isAssignableFrom((type.classifier as KClass<*>).java)) {
             val componentType = (type.classifier as KClass<*>).java.componentType.kotlin
