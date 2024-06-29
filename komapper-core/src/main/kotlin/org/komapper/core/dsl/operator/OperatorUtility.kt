@@ -5,7 +5,8 @@ import org.komapper.core.dsl.expression.Operand
 import org.komapper.core.dsl.expression.ReadOnlyColumnExpression
 import org.komapper.core.dsl.expression.SqlBuilderScope
 import org.komapper.core.dsl.expression.UserDefinedExpression
-import kotlin.reflect.KClass
+import kotlin.reflect.KType
+import kotlin.reflect.typeOf
 
 /**
  * Define a new column expression.
@@ -27,8 +28,8 @@ fun <T : Any, S : Any> columnExpression(
     build: SqlBuilderScope.() -> Unit,
 ): ColumnExpression<T, S> {
     return columnExpression(
-        baseExpression.exteriorClass,
-        baseExpression.interiorClass,
+        baseExpression.exteriorType,
+        baseExpression.interiorType,
         baseExpression.wrap,
         name,
         operands,
@@ -42,19 +43,19 @@ fun <T : Any, S : Any> columnExpression(
  * The [name] and [operands] are used to determine identity of the expression.
  *
  * @param T the exterior type and interior type of expression evaluation
- * @param klass the class of [T]
+ * @param type the type of [T]
  * @param name the name that must be unique among user-defined column expressions
  * @param operands the operand list used in the expression
  * @param build the SQL builder
  * @return column expression
  */
 fun <T : Any> columnExpression(
-    klass: KClass<T>,
+    type: KType,
     name: String,
     operands: List<Operand>,
     build: SqlBuilderScope.() -> Unit,
 ): ColumnExpression<T, T> {
-    return columnExpression(klass, klass, { it }, name, operands, build)
+    return columnExpression(type, type, { it }, name, operands, build)
 }
 
 /**
@@ -64,8 +65,8 @@ fun <T : Any> columnExpression(
  *
  * @param EXTERIOR the exterior type of expression evaluation
  * @param INTERIOR the interior type of expression evaluation
- * @param exteriorClass the class of [EXTERIOR]
- * @param interiorClass the class of [INTERIOR]
+ * @param exteriorType the type of [EXTERIOR]
+ * @param interiorType the type of [INTERIOR]
  * @param wrap the function to convert an interior value to an exterior value
  * @param name the name that must be unique among user-defined column expressions
  * @param operands the operand list used in the expression
@@ -73,14 +74,14 @@ fun <T : Any> columnExpression(
  * @return column expression
  */
 fun <EXTERIOR : Any, INTERIOR : Any> columnExpression(
-    exteriorClass: KClass<EXTERIOR>,
-    interiorClass: KClass<INTERIOR>,
+    exteriorType: KType,
+    interiorType: KType,
     wrap: (INTERIOR) -> EXTERIOR,
     name: String,
     operands: List<Operand>,
     build: SqlBuilderScope.() -> Unit,
 ): ColumnExpression<EXTERIOR, INTERIOR> {
-    return UserDefinedExpression(exteriorClass, interiorClass, wrap, name, operands, build)
+    return UserDefinedExpression(exteriorType, interiorType, wrap, name, operands, build)
 }
 
 /**
@@ -93,8 +94,8 @@ inline fun <reified OUT_EXTERIOR : Any, IN_INTERIOR : Any> ColumnExpression<*, I
 ): ColumnExpression<OUT_EXTERIOR, *> {
     return ReadOnlyColumnExpression(
         owner = this.owner,
-        exteriorClass = OUT_EXTERIOR::class,
-        interiorClass = this.interiorClass,
+        exteriorType = typeOf<OUT_EXTERIOR>(),
+        interiorType = this.interiorType,
         wrap = wrap,
         alwaysQuote = this.alwaysQuote,
         columnName = this.columnName,

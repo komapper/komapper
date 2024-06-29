@@ -1,5 +1,6 @@
 package org.komapper.core
 
+import kotlin.reflect.typeOf
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -10,15 +11,15 @@ internal class StatementBufferTest {
     fun appendAndBind() {
         val buffer = StatementBuffer()
         buffer.append("aaa")
-        buffer.bind(Value(1))
+        buffer.bind(Value(1, typeOf<Int>()))
         buffer.append("bbb")
-        buffer.bind(Value(2))
+        buffer.bind(Value(2, typeOf<Int>()))
         assertEquals(
             listOf(
                 StatementPart.Text("aaa"),
-                StatementPart.Value(Value(1)),
+                StatementPart.Value(Value(1, typeOf<Int>())),
                 StatementPart.Text("bbb"),
-                StatementPart.Value(Value(2)),
+                StatementPart.Value(Value(2, typeOf<Int>())),
             ),
             buffer.parts,
         )
@@ -28,12 +29,12 @@ internal class StatementBufferTest {
     fun appendStatement() {
         val buffer = StatementBuffer()
         buffer.append("aaa")
-        buffer.bind(Value(1))
+        buffer.bind(Value(1, typeOf<Int>()))
         buffer.append(
             Statement(
                 listOf(
                     StatementPart.Text("bbb"),
-                    StatementPart.Value(Value(2)),
+                    StatementPart.Value(Value(2, typeOf<Int>())),
                     StatementPart.Text("ccc"),
                 ),
             ),
@@ -41,9 +42,9 @@ internal class StatementBufferTest {
         assertEquals(
             listOf(
                 StatementPart.Text("aaa"),
-                StatementPart.Value(Value(1)),
+                StatementPart.Value(Value(1, typeOf<Int>())),
                 StatementPart.Text("bbb"),
-                StatementPart.Value(Value(2)),
+                StatementPart.Value(Value(2, typeOf<Int>())),
                 StatementPart.Text("ccc"),
             ),
             buffer.parts,
@@ -74,7 +75,7 @@ internal class StatementBufferTest {
     fun cutBack_error_lastElementIsPlaceHolder() {
         val buffer = StatementBuffer()
         buffer.append("abc")
-        buffer.bind(Value(1))
+        buffer.bind(Value(1, typeOf<Int>()))
         assertFailsWith<IllegalStateException> {
             buffer.cutBack(1)
         }

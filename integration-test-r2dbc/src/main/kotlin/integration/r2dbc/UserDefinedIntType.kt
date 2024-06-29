@@ -4,13 +4,14 @@ import integration.core.UserDefinedInt
 import io.r2dbc.spi.Row
 import io.r2dbc.spi.Statement
 import org.komapper.r2dbc.spi.R2dbcUserDefinedDataType
-import kotlin.reflect.KClass
+import kotlin.reflect.KType
+import kotlin.reflect.typeOf
 
 class UserDefinedIntType : R2dbcUserDefinedDataType<UserDefinedInt> {
 
     override val name: String = "integer"
 
-    override val klass: KClass<UserDefinedInt> = UserDefinedInt::class
+    override val type: KType = typeOf<UserDefinedInt>()
 
     override val r2dbcType: Class<*> = Int::class.javaObjectType
 

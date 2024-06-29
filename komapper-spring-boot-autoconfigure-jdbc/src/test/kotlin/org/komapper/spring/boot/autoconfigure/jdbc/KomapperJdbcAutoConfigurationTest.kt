@@ -20,7 +20,8 @@ import java.time.Clock
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
-import kotlin.reflect.KClass
+import kotlin.reflect.KType
+import kotlin.reflect.typeOf
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -61,7 +62,7 @@ class KomapperJdbcAutoConfigurationTest {
 
         val database = context.getBean(JdbcDatabase::class.java)
         assertNotNull(database)
-        val dataType = database.config.dataOperator.getDataType(String::class)
+        val dataType = database.config.dataOperator.getDataType<String>(typeOf<String>())
         assertEquals("abc", dataType.name)
         val clock = database.config.clockProvider.now()
         val timestamp = LocalDateTime.now(clock)
@@ -95,11 +96,11 @@ class KomapperJdbcAutoConfigurationTest {
         @Bean
         open fun dataTypeProvider(): JdbcDataTypeProvider {
             return object : JdbcDataTypeProvider {
-                private val map: Map<KClass<*>, JdbcDataType<*>> =
-                    listOf(JdbcStringType("abc")).associateBy { it.klass }
+                private val map: Map<KType, JdbcDataType<*>> =
+                    listOf(JdbcStringType("abc")).associateBy { it.type }
 
-                override fun <T : Any> get(klass: KClass<out T>): JdbcDataType<T>? {
-                    return map[klass] as JdbcDataType<T>?
+                override fun <T : Any> get(type: KType): JdbcDataType<T>? {
+                    return map[type] as JdbcDataType<T>?
                 }
             }
         }

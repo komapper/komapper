@@ -5,6 +5,7 @@ import org.komapper.core.Statement
 import org.komapper.core.StatementBuffer
 import org.komapper.core.Value
 import org.komapper.core.dsl.builder.OffsetLimitStatementBuilder
+import kotlin.reflect.typeOf
 
 class MariaDbOffsetLimitStatementBuilder(
     private val dialect: BuilderDialect,
@@ -20,11 +21,11 @@ class MariaDbOffsetLimitStatementBuilder(
         if (offsetRequired || limitRequired) {
             buf.append(" limit ")
             if (offsetRequired) {
-                buf.bind(Value(offset, Int::class))
+                buf.bind(Value(offset, typeOf<Int>()))
                 buf.append(", ")
             }
             if (limitRequired) {
-                buf.bind(Value(limit, Int::class))
+                buf.bind(Value(limit, typeOf<Int>()))
             } else {
                 buf.append(Long.MAX_VALUE.toString())
             }

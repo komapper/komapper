@@ -5,12 +5,13 @@ import org.komapper.jdbc.spi.JdbcUserDefinedDataType
 import java.sql.JDBCType
 import java.sql.PreparedStatement
 import java.sql.ResultSet
-import kotlin.reflect.KClass
+import kotlin.reflect.KType
+import kotlin.reflect.typeOf
 
 class MoodType : JdbcUserDefinedDataType<Mood> {
     override val name: String = "mood"
 
-    override val klass: KClass<Mood> = Mood::class
+    override val type: KType = typeOf<Mood>()
 
     override val jdbcType: JDBCType = JDBCType.OTHER
 

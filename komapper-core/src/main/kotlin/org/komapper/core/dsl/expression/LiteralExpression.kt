@@ -1,12 +1,12 @@
 package org.komapper.core.dsl.expression
 
-import kotlin.reflect.KClass
+import kotlin.reflect.KType
 
 internal sealed interface LiteralExpression<EXTERNAL : Any, INTERNAL : Any> : ColumnExpression<EXTERNAL, INTERNAL>
 
 data class NullLiteralExpression<EXTERNAL : Any, INTERNAL : Any>(
-    override val exteriorClass: KClass<EXTERNAL>,
-    override val interiorClass: KClass<INTERNAL>,
+    override val exteriorType: KType,
+    override val interiorType: KType,
 ) :
     LiteralExpression<EXTERNAL, INTERNAL> {
     override val owner: TableExpression<*>
@@ -23,12 +23,12 @@ data class NullLiteralExpression<EXTERNAL : Any, INTERNAL : Any>(
 
 internal data class NonNullLiteralExpression<T : Any>(
     val value: T,
-    private val klass: KClass<T>,
+    private val type: KType,
 ) : LiteralExpression<T, T> {
     override val owner: TableExpression<*>
         get() = throw UnsupportedOperationException()
-    override val exteriorClass: KClass<T> = klass
-    override val interiorClass: KClass<T> = klass
+    override val exteriorType: KType = type
+    override val interiorType: KType = type
     override val wrap: (T) -> T get() = { it }
     override val unwrap: (T) -> T get() = { it }
     override val columnName: String

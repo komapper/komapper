@@ -1,12 +1,12 @@
 package org.komapper.core.spi
 
-import kotlin.reflect.KClass
+import kotlin.reflect.KType
 
 interface DataTypeConverter<EXTERIOR : Any, INTERIOR : Any> {
 
-    val exteriorClass: KClass<EXTERIOR>
+    val exteriorType: KType
 
-    val interiorClass: KClass<INTERIOR>
+    val interiorType: KType
 
     fun wrap(interior: INTERIOR): EXTERIOR
 

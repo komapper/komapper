@@ -3,8 +3,9 @@ package org.komapper.dialect.oracle.r2dbc
 import io.r2dbc.spi.Row
 import org.komapper.r2dbc.AbstractR2dbcDataType
 import java.time.Duration
+import kotlin.reflect.typeOf
 
-object OracleR2dbcDurationType : AbstractR2dbcDataType<Duration>(Duration::class) {
+object OracleR2dbcDurationType : AbstractR2dbcDataType<Duration>(typeOf<Duration>()) {
     override val name: String = "interval day to second"
 
     override fun getValue(row: Row, index: Int): Duration? {

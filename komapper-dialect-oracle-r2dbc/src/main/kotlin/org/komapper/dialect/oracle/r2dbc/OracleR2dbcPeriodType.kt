@@ -3,8 +3,9 @@ package org.komapper.dialect.oracle.r2dbc
 import io.r2dbc.spi.Row
 import org.komapper.r2dbc.AbstractR2dbcDataType
 import java.time.Period
+import kotlin.reflect.typeOf
 
-object OracleR2dbcPeriodType : AbstractR2dbcDataType<Period>(Period::class) {
+object OracleR2dbcPeriodType : AbstractR2dbcDataType<Period>(typeOf<Period>()) {
     override val name: String = "interval year to month"
 
     override fun getValue(row: Row, index: Int): Period? {

@@ -3,8 +3,9 @@ package org.komapper.dialect.postgresql.r2dbc
 import io.r2dbc.postgresql.codec.Path
 import io.r2dbc.spi.Row
 import org.komapper.r2dbc.AbstractR2dbcDataType
+import kotlin.reflect.typeOf
 
-object PostgreSqlR2dbcPathType : AbstractR2dbcDataType<Path>(Path::class) {
+object PostgreSqlR2dbcPathType : AbstractR2dbcDataType<Path>(typeOf<Path>()) {
     override val name: String = "path"
 
     override fun getValue(row: Row, index: Int): Path? {

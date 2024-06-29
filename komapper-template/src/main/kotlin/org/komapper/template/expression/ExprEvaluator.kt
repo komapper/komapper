@@ -4,14 +4,19 @@ import org.komapper.core.Value
 import kotlin.reflect.KClass
 import kotlin.reflect.KFunction
 import kotlin.reflect.KProperty
+import kotlin.reflect.KType
+import kotlin.reflect.full.companionObject
 import kotlin.reflect.full.companionObjectInstance
+import kotlin.reflect.full.createType
 import kotlin.reflect.full.isSubclassOf
 import kotlin.reflect.full.memberExtensionFunctions
 import kotlin.reflect.full.memberFunctions
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.full.staticFunctions
 import kotlin.reflect.full.valueParameters
+import kotlin.reflect.full.withNullability
 import kotlin.reflect.jvm.jvmErasure
+import kotlin.reflect.typeOf
 
 internal interface ExprEvaluator {
     fun eval(expression: String, ctx: ExprContext): Value<*>
@@ -48,20 +53,20 @@ internal class DefaultExprEvaluator(
         is ExprNode.Gt -> compare(node.location, node.left, node.right, ctx) { x, y -> x > y }
         is ExprNode.Le -> compare(node.location, node.left, node.right, ctx) { x, y -> x <= y }
         is ExprNode.Lt -> compare(node.location, node.left, node.right, ctx) { x, y -> x < y }
-        is ExprNode.Literal -> Value(node.value, node.klass)
+        is ExprNode.Literal -> Value(node.value, node.type)
         is ExprNode.Comma -> node.nodeList.map {
             visit(it, ctx)
         }.map { it.any }.toCollection(ArgList()).let {
             Value(
                 it,
-                List::class,
+                typeOf<ArgList>(),
             )
         }
         is ExprNode.ClassRef -> visitClassRef(node, ctx)
         is ExprNode.Value -> visitValue(node, ctx)
         is ExprNode.Property -> visitProperty(node, ctx)
         is ExprNode.Function -> visitFunction(node, ctx)
-        is ExprNode.Empty -> Value(Unit, Unit::class)
+        is ExprNode.Empty -> Value(Unit, typeOf<Unit>())
     }
 
     private fun perform(
@@ -86,7 +91,7 @@ internal class DefaultExprEvaluator(
                 "Cannot perform the logical operator because the operands is not Boolean at $location",
             )
         }
-        return Value(f(value), Boolean::class)
+        return Value(f(value), typeOf<Boolean>())
     }
 
     private fun perform(
@@ -114,7 +119,7 @@ internal class DefaultExprEvaluator(
                 "Cannot perform the logical operator because either operands is not Boolean at $location",
             )
         }
-        return Value(f(left, right), Boolean::class)
+        return Value(f(left, right), typeOf<Boolean>())
     }
 
     @Suppress("UNUSED_PARAMETER")
@@ -127,7 +132,7 @@ internal class DefaultExprEvaluator(
     ): Value<Boolean> {
         val (left) = visit(leftNode, ctx)
         val (right) = visit(rightNode, ctx)
-        return Value(f(left, right), Boolean::class)
+        return Value(f(left, right), typeOf<Boolean>())
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -154,7 +159,7 @@ internal class DefaultExprEvaluator(
         try {
             left as Comparable<Any>
             right as Comparable<Any>
-            return Value(f(left, right), Boolean::class)
+            return Value(f(left, right), typeOf<Boolean>())
         } catch (e: ClassCastException) {
             throw ExprException(
                 "Cannot compare because the operands are not comparable to each other at $location",
@@ -172,9 +177,9 @@ internal class DefaultExprEvaluator(
         val klass = clazz.kotlin
         @Suppress("UNCHECKED_CAST")
         return when {
-            klass.objectInstance != null -> Value(klass.objectInstance!!)
-            klass.companionObjectInstance != null -> Value(klass.companionObjectInstance!!)
-            clazz.isEnum -> Value(ClassRef.EnumRef(clazz as Class<Enum<*>>), klass)
+            klass.objectInstance != null -> Value(klass.objectInstance!!, klass.createType())
+            klass.companionObjectInstance != null -> Value(klass.companionObjectInstance!!, klass.companionObject!!.createType())
+            clazz.isEnum -> Value(ClassRef.EnumRef(clazz as Class<Enum<*>>), klass.createType())
             else -> error("The unsupported class \"${klass.qualifiedName}\" is referenced.")
         }
     }
@@ -188,37 +193,37 @@ internal class DefaultExprEvaluator(
         val (receiver, receiverType) = visit(node.receiver, ctx)
         if (receiver is ClassRef.EnumRef) {
             val enum = receiver.clazz.enumConstants.first { it.name == node.name }
-            return Value(enum)
+            return Value(enum, receiver.clazz.kotlin.createType())
         }
         val property = findProperty(node.name, receiverType)
             ?: throw ExprException("The property \"${node.name}\" is not found at ${node.location}")
         if (receiver == null && node.safeCall) {
-            return Value(null, property.returnType.jvmErasure)
+            return Value(null, property.returnType.withNullability(false))
         }
         try {
             // a const property of an object declaration doesn't accept a receiver
-            val obj = if (property.isConst && !receiverType.isCompanion) {
+            val obj = if (property.isConst && !(receiverType.classifier as KClass<*>).isCompanion) {
                 property.call()
             } else {
                 property.call(receiver)
             }
-            return Value(obj, property.returnType.jvmErasure)
+            return Value(obj, property.returnType.withNullability(false))
         } catch (cause: Exception) {
             throw ExprException("Failed to call the property \"${node.name}\" at ${node.location}. The cause is $cause")
         }
     }
 
-    private fun findProperty(name: String, receiverType: KClass<*>): KProperty<*>? {
+    private fun findProperty(name: String, receiverType: KType): KProperty<*>? {
         fun predicate(property: KProperty<*>) =
             name == property.name && property.valueParameters.isEmpty()
-        return receiverType.memberProperties.find(::predicate)
+        return (receiverType.classifier as KClass<*>).memberProperties.find(::predicate)
             ?: exprEnvironment.topLevelPropertyExtensions.find(::predicate)
     }
 
     private fun visitFunction(node: ExprNode.Function, ctx: ExprContext): Value<*> {
         fun call(function: KFunction<*>, arguments: List<Any?>): Value<*> {
             try {
-                return Value(function.call(*arguments.toTypedArray()), function.returnType.jvmErasure)
+                return Value(function.call(*arguments.toTypedArray()), function.returnType.withNullability(false))
             } catch (cause: Exception) {
                 throw ExprException("Failed to call the function \"${node.name}\" at ${node.location}. The cause is $cause")
             }
@@ -234,7 +239,7 @@ internal class DefaultExprEvaluator(
             findFunction(node.name, receiverType, receiver, args, ctx)
                 ?.let { (function, arguments) ->
                     if (receiver == null && node.safeCall) {
-                        Value(null, function.returnType.jvmErasure)
+                        Value(null, function.returnType.withNullability(false))
                     } else {
                         call(function, arguments)
                     }
@@ -245,7 +250,7 @@ internal class DefaultExprEvaluator(
 
     private fun findStaticFunction(
         name: String,
-        receiverType: KClass<*>,
+        receiverType: KType,
         args: Any?,
     ): Pair<KFunction<*>, List<Any?>>? {
         fun Collection<KFunction<*>>.pick(arguments: List<Any?>): Pair<KFunction<*>, List<Any?>>? {
@@ -265,12 +270,12 @@ internal class DefaultExprEvaluator(
             is ArgList -> args
             else -> listOf(args)
         }
-        return receiverType.staticFunctions.pick(arguments)
+        return (receiverType.classifier as KClass<*>).staticFunctions.pick(arguments)
     }
 
     private fun findFunction(
         name: String,
-        receiverType: KClass<*>,
+        receiverType: KType,
         receiver: Any?,
         args: Any?,
         ctx: ExprContext,
@@ -292,7 +297,7 @@ internal class DefaultExprEvaluator(
             is ArgList -> listOf(receiver) + args
             else -> listOf(receiver, args)
         }
-        return receiverType.memberFunctions.pick(arguments)
+        return (receiverType.classifier as KClass<*>).memberFunctions.pick(arguments)
             ?: exprEnvironment.topLevelFunctionExtensions.pick(arguments)
             ?: ctx.builtinExtensions::class.memberExtensionFunctions.pick(listOf(ctx.builtinExtensions) + arguments)
     }

@@ -5,7 +5,7 @@ import org.komapper.core.spi.DataTypeConverter
 import org.komapper.r2dbc.spi.R2dbcDataTypeProviderFactory
 import org.komapper.r2dbc.spi.R2dbcUserDefinedDataType
 import java.util.ServiceLoader
-import kotlin.reflect.KClass
+import kotlin.reflect.KType
 
 object R2dbcDataTypeProviders {
 
@@ -19,33 +19,33 @@ object R2dbcDataTypeProviders {
         val lastProvider: R2dbcDataTypeProvider = R2dbcEmptyDataTypeProvider
         val chainedProviders = factories.fold(lastProvider) { acc, factory -> factory.create(acc) }
         val secondProvider = R2dbcUserDefinedDataTypeProvider
-        val converters = DataTypeConverters.get().associateBy { it.exteriorClass }
+        val converters = DataTypeConverters.get().associateBy { it.exteriorType }
         return object : R2dbcDataTypeProvider {
 
-            override fun <T : Any> get(klass: KClass<out T>): R2dbcDataType<T>? {
+            override fun <T : Any> get(type: KType): R2dbcDataType<T>? {
                 @Suppress("UNCHECKED_CAST")
-                val converter = converters[klass] as DataTypeConverter<T, Any>?
+                val converter = converters[type] as DataTypeConverter<T, Any>?
                 return if (converter == null) {
-                    find(klass)
+                    find(type)
                 } else {
-                    val dataType = find(converter.interiorClass)
-                        ?: error("The dataType is not found for the type \"${converter.interiorClass.qualifiedName}\".")
+                    val dataType = find<Any>(converter.interiorType)
+                        ?: error("The dataType is not found for the type \"${converter.interiorType}\".")
                     R2dbcDataTypeProxy(converter, dataType)
                 }
             }
 
-            private fun <T : Any> find(klass: KClass<out T>): R2dbcDataType<T>? {
-                return firstProvider?.get(klass) ?: secondProvider.get(klass) ?: chainedProviders.get(klass)
+            private fun <T : Any> find(type: KType): R2dbcDataType<T>? {
+                return firstProvider?.get(type) ?: secondProvider.get(type) ?: chainedProviders.get(type)
             }
         }
     }
 }
 
 private object R2dbcUserDefinedDataTypeProvider : R2dbcDataTypeProvider {
-    val dataTypes = R2dbcUserDefinedDataTypes.get().associateBy { it.klass }
-    override fun <T : Any> get(klass: KClass<out T>): R2dbcDataType<T>? {
+    val dataTypes = R2dbcUserDefinedDataTypes.get().associateBy { it.type }
+    override fun <T : Any> get(type: KType): R2dbcDataType<T>? {
         @Suppress("UNCHECKED_CAST")
-        val dataType = dataTypes[klass] as R2dbcUserDefinedDataType<T>?
+        val dataType = dataTypes[type] as R2dbcUserDefinedDataType<T>?
         return if (dataType == null) null else R2dbcUserDefinedDataTypeAdapter(dataType)
     }
 }

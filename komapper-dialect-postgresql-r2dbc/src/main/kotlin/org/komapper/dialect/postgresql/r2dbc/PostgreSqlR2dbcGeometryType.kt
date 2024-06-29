@@ -3,8 +3,9 @@ package org.komapper.dialect.postgresql.r2dbc
 import io.r2dbc.spi.Row
 import org.komapper.r2dbc.AbstractR2dbcDataType
 import org.locationtech.jts.geom.Geometry
+import kotlin.reflect.typeOf
 
-object PostgreSqlR2dbcGeometryType : AbstractR2dbcDataType<Geometry>(Geometry::class) {
+object PostgreSqlR2dbcGeometryType : AbstractR2dbcDataType<Geometry>(typeOf<Geometry>()) {
     override val name: String = "geometry"
 
     override fun getValue(row: Row, index: Int): Geometry? {

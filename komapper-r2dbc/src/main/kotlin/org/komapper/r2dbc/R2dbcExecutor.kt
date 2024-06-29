@@ -193,7 +193,7 @@ internal class R2dbcExecutor(
 
     private fun bind(r2dbcStmt: io.r2dbc.spi.Statement, statement: Statement) {
         statement.args.forEachIndexed { index, value ->
-            config.dataOperator.setValue(r2dbcStmt, index, value.any, value.klass)
+            config.dataOperator.setValue(r2dbcStmt, index, value.any, value.type)
         }
     }
 

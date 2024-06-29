@@ -1,6 +1,6 @@
 package org.komapper.core
 
-import kotlin.reflect.KClass
+import kotlin.reflect.KType
 
 /**
  * The SQL statement.
@@ -30,7 +30,7 @@ data class Statement(val parts: List<StatementPart>) {
     /**
      * The return parameters of the SQL statement.
      */
-    val returnParamTypes: List<KClass<*>> = parts.filterIsInstance<StatementPart.ReturnParameter>().map { it.dataType }
+    val returnParamTypes: List<KType> = parts.filterIsInstance<StatementPart.ReturnParameter>().map { it.dataType }
 
     /**
      * Converts the SQL statement to an SQL string.
@@ -55,13 +55,13 @@ data class Statement(val parts: List<StatementPart>) {
      *
      * @param format the format function of the bound values
      */
-    fun toSqlWithArgs(format: (Any?, KClass<*>, Boolean) -> CharSequence): String {
+    fun toSqlWithArgs(format: (Any?, KType, Boolean) -> CharSequence): String {
         return parts.joinToString(separator = "") { part ->
             when (part) {
                 is StatementPart.Text -> part.text
                 is StatementPart.Value -> {
                     val value = part.value
-                    format(value.any, value.klass, value.masking)
+                    format(value.any, value.type, value.masking)
                 }
                 is StatementPart.ReturnParameter -> part
             }

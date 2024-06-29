@@ -13,6 +13,7 @@ import org.komapper.core.dsl.operator.literal
 import org.komapper.core.dsl.operator.nullLiteral
 import org.komapper.core.dsl.query.first
 import org.komapper.jdbc.JdbcDatabase
+import kotlin.reflect.typeOf
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -94,7 +95,7 @@ class JdbcLiteralTest(val db: JdbcDatabase) {
         db.runQuery {
             QueryDsl.insert(m).values {
                 m.id eq 1
-                m.value eq nullLiteral(String::class)
+                m.value eq nullLiteral()
             }
         }
         val result = db.runQuery {
@@ -109,7 +110,7 @@ class JdbcLiteralTest(val db: JdbcDatabase) {
         db.runQuery {
             QueryDsl.insert(m).values {
                 m.id eq 1
-                m.value eq nullLiteral(Direction::class, String::class)
+                m.value eq nullLiteral(typeOf<Direction>(), typeOf<String>())
             }
         }
         val result = db.runQuery {
