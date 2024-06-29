@@ -11,7 +11,7 @@ import kotlin.reflect.typeOf
  * Builds a null literal.
  */
 inline fun <reified T : Any> nullLiteral(): ColumnExpression<T, T> {
-    return NullLiteralExpression(typeOf<T>(), typeOf<T>())
+    return NullLiteralExpression(typeOf<T>(), typeOf<String>())
 }
 
 /**
