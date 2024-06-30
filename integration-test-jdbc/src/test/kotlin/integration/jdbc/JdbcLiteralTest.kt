@@ -2,7 +2,6 @@ package integration.jdbc
 
 import integration.core.booleanData
 import integration.core.enumData
-import integration.core.enumclass.Direction
 import integration.core.intData
 import integration.core.longData
 import integration.core.stringData
@@ -13,7 +12,6 @@ import org.komapper.core.dsl.operator.literal
 import org.komapper.core.dsl.operator.nullLiteral
 import org.komapper.core.dsl.query.first
 import org.komapper.jdbc.JdbcDatabase
-import kotlin.reflect.typeOf
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -95,7 +93,7 @@ class JdbcLiteralTest(val db: JdbcDatabase) {
         db.runQuery {
             QueryDsl.insert(m).values {
                 m.id eq 1
-                m.value eq nullLiteral()
+                m.value eq nullLiteral(m.value)
             }
         }
         val result = db.runQuery {
@@ -110,7 +108,7 @@ class JdbcLiteralTest(val db: JdbcDatabase) {
         db.runQuery {
             QueryDsl.insert(m).values {
                 m.id eq 1
-                m.value eq nullLiteral(typeOf<Direction>(), typeOf<String>())
+                m.value eq nullLiteral(m.value)
             }
         }
         val result = db.runQuery {
