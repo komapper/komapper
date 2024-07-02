@@ -33,8 +33,8 @@ class StatementBuffer {
         return this
     }
 
-    fun registerReturnParameter(dataType: KType): StatementBuffer {
-        parts.add(StatementPart.ReturnParameter(dataType))
+    fun registerReturnParameter(type: KType): StatementBuffer {
+        parts.add(StatementPart.ReturnParameter(type))
         return this
     }
 

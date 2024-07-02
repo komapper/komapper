@@ -30,7 +30,7 @@ data class Statement(val parts: List<StatementPart>) {
     /**
      * The return parameters of the SQL statement.
      */
-    val returnParamTypes: List<KType> = parts.filterIsInstance<StatementPart.ReturnParameter>().map { it.dataType }
+    val returnParamTypes: List<KType> = parts.filterIsInstance<StatementPart.ReturnParameter>().map { it.type }
 
     /**
      * Converts the SQL statement to an SQL string.
