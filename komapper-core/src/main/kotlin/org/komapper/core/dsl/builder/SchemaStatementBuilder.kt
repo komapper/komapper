@@ -66,8 +66,8 @@ abstract class AbstractSchemaStatementBuilder(
         return listOf(buf.toStatement())
     }
 
-    protected open fun resolveDataTypeName(property: PropertyMetamodel<*, *, *>): String {
-        return dialect.getDataTypeName(property.interiorClass)
+    protected open fun <INTERIOR : Any> resolveDataTypeName(property: PropertyMetamodel<*, *, INTERIOR>): String {
+        return dialect.getDataTypeName<INTERIOR>(property.interiorType)
     }
 
     protected open fun resolveIdentity(property: PropertyMetamodel<*, *, *>): String {

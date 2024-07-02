@@ -2,7 +2,6 @@ package org.komapper.core.dsl.query
 
 import org.komapper.core.ThreadSafe
 import org.komapper.core.dsl.expression.ColumnExpression
-import kotlin.reflect.cast
 
 /**
  * Represents a single row detached from the result set obtained by query execution.
@@ -62,7 +61,8 @@ class RecordImpl(private val map: Map<ColumnExpression<*, *>, Any?>) : Record {
 
     override fun <T : Any> get(key: ColumnExpression<T, *>): T? {
         val value = map[key]
-        return if (value == null) null else key.exteriorClass.cast(value)
+        @Suppress("UNCHECKED_CAST")
+        return if (value == null) null else value as T
     }
 
     override fun toString(): String {

@@ -1,6 +1,7 @@
 package org.komapper.core.dsl.expression
 
-import kotlin.reflect.KClass
+import kotlin.reflect.KType
+import kotlin.reflect.typeOf
 
 internal sealed class StringFunction<T : Any, S : Any> : ColumnExpression<T, S> {
     internal data class Concat<T : Any>(
@@ -16,8 +17,8 @@ internal sealed class StringFunction<T : Any, S : Any> : ColumnExpression<T, S> 
         val startIndex: Operand?,
     ) : StringFunction<Int, Int>() {
         override val owner: TableExpression<*> get() = throw UnsupportedOperationException()
-        override val exteriorClass: KClass<Int> get() = Int::class
-        override val interiorClass: KClass<Int> get() = Int::class
+        override val exteriorType: KType = typeOf<Int>()
+        override val interiorType: KType = typeOf<Int>()
         override val wrap: (Int) -> Int get() = { it }
         override val unwrap: (Int) -> Int get() = { it }
         override val columnName: String get() = throw UnsupportedOperationException()

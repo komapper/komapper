@@ -20,6 +20,7 @@ import org.komapper.r2dbc.R2dbcDatabase
 import org.locationtech.jts.geom.Coordinate
 import org.locationtech.jts.geom.GeometryFactory
 import java.time.Period
+import kotlin.reflect.typeOf
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -196,7 +197,7 @@ class R2dbcPostgreSqlTypeTest(val db: R2dbcDatabase) {
 
         val result = db.runQuery {
             QueryDsl.fromTemplate("select value->'b' as x from json_data")
-                .select { it.get("x", Json::class)!! }
+                .select { it.get<Json>("x", typeOf<Json>())!! }
                 .first()
         }
         assertEquals("\"Hello\"", result.asString())

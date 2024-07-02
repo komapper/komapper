@@ -49,6 +49,7 @@ import org.komapper.core.dsl.expression.WindowFrameBound
 import org.komapper.core.dsl.expression.WindowFrameExclusion
 import org.komapper.core.dsl.expression.WindowFrameKind
 import org.komapper.core.dsl.expression.WindowFunction
+import kotlin.reflect.typeOf
 
 class BuilderSupport(
     private val dialect: BuilderDialect,
@@ -258,7 +259,7 @@ class BuilderSupport(
     private fun visitLiteralExpression(expression: LiteralExpression<*, *>) {
         val literal = when (expression) {
             is NullLiteralExpression -> "null"
-            is NonNullLiteralExpression -> dialect.formatValue(expression.value, expression.interiorClass, false)
+            is NonNullLiteralExpression -> dialect.formatValue(expression.value, expression.interiorType, false)
         }
         buf.append(literal)
     }
@@ -589,7 +590,7 @@ class BuilderSupport(
             is WindowFrameBound.UnboundedPreceding -> buf.append("unbounded preceding")
             is WindowFrameBound.Following -> {
                 if (dialect.supportsParameterBindingForWindowFrameBoundOffset()) {
-                    buf.bind(Value(bound.offset, Int::class))
+                    buf.bind(Value(bound.offset, typeOf<Int>()))
                 } else {
                     buf.append(bound.offset.toString())
                 }
@@ -598,7 +599,7 @@ class BuilderSupport(
 
             is WindowFrameBound.Preceding -> {
                 if (dialect.supportsParameterBindingForWindowFrameBoundOffset()) {
-                    buf.bind(Value(bound.offset, Int::class))
+                    buf.bind(Value(bound.offset, typeOf<Int>()))
                 } else {
                     buf.append(bound.offset.toString())
                 }
@@ -645,8 +646,8 @@ class BuilderSupport(
             }
         }
         visit(escapeExpression)
-        val first = Value(patternBuf.toString(), String::class, masking)
-        val second = Value(finalEscapeSequence, String::class)
+        val first = Value(patternBuf.toString(), typeOf<String>(), masking)
+        val second = Value(finalEscapeSequence, typeOf<String>())
         return first to second
     }
 

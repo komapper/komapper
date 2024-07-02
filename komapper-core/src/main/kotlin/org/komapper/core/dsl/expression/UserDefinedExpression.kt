@@ -1,10 +1,10 @@
 package org.komapper.core.dsl.expression
 
-import kotlin.reflect.KClass
+import kotlin.reflect.KType
 
 internal class UserDefinedExpression<EXTERIOR : Any, INTERIOR : Any>(
-    override val exteriorClass: KClass<EXTERIOR>,
-    override val interiorClass: KClass<INTERIOR>,
+    override val exteriorType: KType,
+    override val interiorType: KType,
     override val wrap: (INTERIOR) -> EXTERIOR,
     private val name: String,
     private val operands: List<Operand>,
@@ -25,8 +25,8 @@ internal class UserDefinedExpression<EXTERIOR : Any, INTERIOR : Any>(
 
         other as UserDefinedExpression<*, *>
 
-        if (exteriorClass != other.exteriorClass) return false
-        if (interiorClass != other.interiorClass) return false
+        if (exteriorType != other.exteriorType) return false
+        if (interiorType != other.interiorType) return false
         if (name != other.name) return false
         if (operands != other.operands) return false
 
@@ -34,8 +34,8 @@ internal class UserDefinedExpression<EXTERIOR : Any, INTERIOR : Any>(
     }
 
     override fun hashCode(): Int {
-        var result = exteriorClass.hashCode()
-        result = 31 * result + interiorClass.hashCode()
+        var result = exteriorType.hashCode()
+        result = 31 * result + interiorType.hashCode()
         result = 31 * result + name.hashCode()
         result = 31 * result + operands.hashCode()
         return result

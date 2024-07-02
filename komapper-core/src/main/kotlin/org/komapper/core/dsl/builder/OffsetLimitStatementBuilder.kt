@@ -4,6 +4,7 @@ import org.komapper.core.BuilderDialect
 import org.komapper.core.Statement
 import org.komapper.core.StatementBuffer
 import org.komapper.core.Value
+import kotlin.reflect.typeOf
 
 interface OffsetLimitStatementBuilder {
     fun build(): Statement
@@ -20,12 +21,12 @@ class OffsetLimitStatementBuilderImpl(
     override fun build(): Statement {
         if (offset >= 0) {
             buf.append(" offset ")
-            buf.bind(Value(offset, Int::class))
+            buf.bind(Value(offset, typeOf<Int>()))
             buf.append(" rows")
         }
         if (limit > 0) {
             buf.append(" fetch first ")
-            buf.bind(Value(limit, Int::class))
+            buf.bind(Value(limit, typeOf<Int>()))
             buf.append(" rows only")
         }
         return buf.toStatement()

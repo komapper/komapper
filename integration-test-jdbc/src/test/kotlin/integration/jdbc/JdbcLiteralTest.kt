@@ -2,7 +2,6 @@ package integration.jdbc
 
 import integration.core.booleanData
 import integration.core.enumData
-import integration.core.enumclass.Direction
 import integration.core.intData
 import integration.core.longData
 import integration.core.stringData
@@ -94,7 +93,7 @@ class JdbcLiteralTest(val db: JdbcDatabase) {
         db.runQuery {
             QueryDsl.insert(m).values {
                 m.id eq 1
-                m.value eq nullLiteral(String::class)
+                m.value eq nullLiteral(m.value)
             }
         }
         val result = db.runQuery {
@@ -109,7 +108,7 @@ class JdbcLiteralTest(val db: JdbcDatabase) {
         db.runQuery {
             QueryDsl.insert(m).values {
                 m.id eq 1
-                m.value eq nullLiteral(Direction::class, String::class)
+                m.value eq nullLiteral(m.value)
             }
         }
         val result = db.runQuery {

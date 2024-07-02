@@ -1,6 +1,6 @@
 package org.komapper.template.expression
 
-import kotlin.reflect.KClass
+import kotlin.reflect.KType
 import org.komapper.template.expression.ExprLocation as Loc
 
 internal sealed class ExprNode {
@@ -18,7 +18,7 @@ internal sealed class ExprNode {
     data class Comma(override val location: Loc, val nodeList: List<ExprNode>) : ExprNode()
     data class ClassRef(override val location: Loc, val name: String) : ExprNode()
     data class Value(override val location: Loc, val name: String) : ExprNode()
-    data class Literal(override val location: Loc, val value: Any?, val klass: KClass<out Any>) : ExprNode()
+    data class Literal(override val location: Loc, val value: Any?, val type: KType) : ExprNode()
     data class Empty(override val location: Loc) : ExprNode()
 
     data class Property(

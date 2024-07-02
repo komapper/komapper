@@ -1,6 +1,6 @@
 package org.komapper.core
 
-import kotlin.reflect.KClass
+import kotlin.reflect.KType
 
 /**
  * The facade of logger.
@@ -20,7 +20,7 @@ interface LoggerFacade {
      * @param statement the sql statement
      * @param format the format of the sql statement
      */
-    fun sqlWithArgs(statement: Statement, format: (Any?, KClass<*>, Boolean) -> CharSequence)
+    fun sqlWithArgs(statement: Statement, format: (Any?, KType, Boolean) -> CharSequence)
 
     /**
      * Logs the beginning of transaction.
@@ -94,7 +94,7 @@ class DefaultLoggerFacade(private val logger: Logger) : LoggerFacade {
         }
     }
 
-    override fun sqlWithArgs(statement: Statement, format: (Any?, KClass<*>, Boolean) -> CharSequence) {
+    override fun sqlWithArgs(statement: Statement, format: (Any?, KType, Boolean) -> CharSequence) {
         logger.trace(LogCategory.SQL_WITH_ARGS) {
             statement.toSqlWithArgs(format)
         }

@@ -57,8 +57,8 @@ class OracleJdbcExecutor(
 
     private fun register(ps: PreparedStatement, statement: Statement) {
         val base = statement.args.size
-        statement.returnParamTypes.forEachIndexed { index, klass ->
-            config.dataOperator.registerReturnParameter(ps, base + index + 1, klass)
+        statement.returnParamTypes.forEachIndexed { index, type ->
+            config.dataOperator.registerReturnParameter<Any>(ps, base + index + 1, type)
         }
     }
 }

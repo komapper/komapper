@@ -6,11 +6,12 @@ import org.postgresql.util.PGobject
 import java.sql.JDBCType
 import java.sql.PreparedStatement
 import java.sql.ResultSet
-import kotlin.reflect.KClass
+import kotlin.reflect.KType
+import kotlin.reflect.typeOf
 
 class PostgreSqlJsonType : JdbcDataType<Json> {
     private val stringType = JdbcStringType("")
-    override val klass: KClass<Json> = Json::class
+    override val type: KType = typeOf<Json>()
     override val name: String = "jsonb"
     override val jdbcType: JDBCType = stringType.jdbcType
 

@@ -5,12 +5,13 @@ import org.komapper.jdbc.spi.JdbcUserDefinedDataType
 import java.sql.JDBCType
 import java.sql.PreparedStatement
 import java.sql.ResultSet
-import kotlin.reflect.KClass
+import kotlin.reflect.KType
+import kotlin.reflect.typeOf
 
 class UserDefinedIntType : JdbcUserDefinedDataType<UserDefinedInt> {
     override val name: String = "integer"
 
-    override val klass: KClass<UserDefinedInt> = UserDefinedInt::class
+    override val type: KType = typeOf<UserDefinedInt>()
 
     override val jdbcType: JDBCType = JDBCType.INTEGER
 

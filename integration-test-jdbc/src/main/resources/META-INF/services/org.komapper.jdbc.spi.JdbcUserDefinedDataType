@@ -1,3 +1,5 @@
 integration.jdbc.MoodType
+integration.jdbc.PairOfIntType
+integration.jdbc.PairOfStringType
 integration.jdbc.UserDefinedIntType
 integration.jdbc.UserDefinedStringType

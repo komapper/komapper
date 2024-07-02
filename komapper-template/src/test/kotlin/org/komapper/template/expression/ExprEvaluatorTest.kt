@@ -3,6 +3,7 @@ package org.komapper.template.expression
 import org.junit.jupiter.api.Nested
 import org.komapper.core.TemplateBuiltinExtensions
 import org.komapper.core.Value
+import kotlin.reflect.typeOf
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
@@ -14,7 +15,7 @@ class ExprEvaluatorTest {
 
     private val evaluator = DefaultExprEvaluator(
         NoCacheExprNodeFactory(),
-        DefaultExprEnvironment(mapOf("global" to Value("hello"))),
+        DefaultExprEnvironment(mapOf("global" to Value("hello", typeOf<String>()))),
     )
 
     data class Person(val id: Int, val name: String, val age: Int?)
@@ -59,30 +60,30 @@ class ExprEvaluatorTest {
     inner class LiteralTest {
         @Test
         fun nullLiteral() {
-            val ctx = ExprContext(mapOf("a" to Value(null, Any::class)), extensions)
+            val ctx = ExprContext(mapOf("a" to Value(null, typeOf<Any>())), extensions)
             val result = evaluator.eval("a", ctx)
-            assertEquals(Value(null, Any::class), result)
+            assertEquals(Value(null, typeOf<Any>()), result)
         }
 
         @Test
         fun trueLiteral() {
-            val ctx = ExprContext(mapOf("a" to Value(true)), extensions)
+            val ctx = ExprContext(mapOf("a" to Value(true, typeOf<Boolean>())), extensions)
             val result = evaluator.eval("a", ctx)
-            assertEquals(Value(true), result)
+            assertEquals(Value(true, typeOf<Boolean>()), result)
         }
 
         @Test
         fun falseLiteral() {
-            val ctx = ExprContext(mapOf("a" to Value(false)), extensions)
+            val ctx = ExprContext(mapOf("a" to Value(false, typeOf<Boolean>())), extensions)
             val result = evaluator.eval("a", ctx)
-            assertEquals(Value(false), result)
+            assertEquals(Value(false, typeOf<Boolean>()), result)
         }
 
         @Test
         fun stringLiteral() {
-            val ctx = ExprContext(mapOf("a" to Value("abc")), extensions)
+            val ctx = ExprContext(mapOf("a" to Value("abc", typeOf<String>())), extensions)
             val result = evaluator.eval("a", ctx)
-            assertEquals(Value("abc"), result)
+            assertEquals(Value("abc", typeOf<String>()), result)
         }
     }
 
@@ -91,119 +92,119 @@ class ExprEvaluatorTest {
 
         @Test
         fun eq1() {
-            val ctx = ExprContext(mapOf("a" to Value(1)), extensions)
+            val ctx = ExprContext(mapOf("a" to Value(1, typeOf<Int>())), extensions)
             val result = evaluator.eval("a == 1", ctx)
-            assertEquals(Value(true), result)
+            assertEquals(Value(true, typeOf<Boolean>()), result)
         }
 
         @Test
         fun eq2() {
-            val ctx = ExprContext(mapOf("a" to Value(2)), extensions)
+            val ctx = ExprContext(mapOf("a" to Value(2, typeOf<Int>())), extensions)
             val result = evaluator.eval("a == 1", ctx)
-            assertEquals(Value(false), result)
+            assertEquals(Value(false, typeOf<Boolean>()), result)
         }
 
         @Test
         fun ne1() {
-            val ctx = ExprContext(mapOf("a" to Value(0)), extensions)
+            val ctx = ExprContext(mapOf("a" to Value(0, typeOf<Int>())), extensions)
             val result = evaluator.eval("a != 1", ctx)
-            assertEquals(Value(true), result)
+            assertEquals(Value(true, typeOf<Boolean>()), result)
         }
 
         @Test
         fun ne2() {
-            val ctx = ExprContext(mapOf("a" to Value(1)), extensions)
+            val ctx = ExprContext(mapOf("a" to Value(1, typeOf<Int>())), extensions)
             val result = evaluator.eval("a != 1", ctx)
-            assertEquals(Value(false), result)
+            assertEquals(Value(false, typeOf<Boolean>()), result)
         }
 
         @Test
         fun ge1() {
-            val ctx = ExprContext(mapOf("a" to Value(2)), extensions)
+            val ctx = ExprContext(mapOf("a" to Value(2, typeOf<Int>())), extensions)
             val result = evaluator.eval("a >= 1", ctx)
-            assertEquals(Value(true), result)
+            assertEquals(Value(true, typeOf<Boolean>()), result)
         }
 
         @Test
         fun ge2() {
-            val ctx = ExprContext(mapOf("a" to Value(2)), extensions)
+            val ctx = ExprContext(mapOf("a" to Value(2, typeOf<Int>())), extensions)
             val result = evaluator.eval("a >= 1", ctx)
-            assertEquals(Value(true), result)
+            assertEquals(Value(true, typeOf<Boolean>()), result)
         }
 
         @Test
         fun ge3() {
-            val ctx = ExprContext(mapOf("a" to Value(0)), extensions)
+            val ctx = ExprContext(mapOf("a" to Value(0, typeOf<Int>())), extensions)
             val result = evaluator.eval("a >= 1", ctx)
-            assertEquals(Value(false), result)
+            assertEquals(Value(false, typeOf<Boolean>()), result)
         }
 
         @Test
         fun gt1() {
-            val ctx = ExprContext(mapOf("a" to Value(2)), extensions)
+            val ctx = ExprContext(mapOf("a" to Value(2, typeOf<Int>())), extensions)
             val result = evaluator.eval("a > 1", ctx)
-            assertEquals(Value(true), result)
+            assertEquals(Value(true, typeOf<Boolean>()), result)
         }
 
         @Test
         fun gt2() {
-            val ctx = ExprContext(mapOf("a" to Value(1)), extensions)
+            val ctx = ExprContext(mapOf("a" to Value(1, typeOf<Int>())), extensions)
             val result = evaluator.eval("a > 1", ctx)
-            assertEquals(Value(false), result)
+            assertEquals(Value(false, typeOf<Boolean>()), result)
         }
 
         @Test
         fun gt3() {
-            val ctx = ExprContext(mapOf("a" to Value(0)), extensions)
+            val ctx = ExprContext(mapOf("a" to Value(0, typeOf<Int>())), extensions)
             val result = evaluator.eval("a > 1", ctx)
-            assertEquals(Value(false), result)
+            assertEquals(Value(false, typeOf<Boolean>()), result)
         }
 
         @Test
         fun le1() {
-            val ctx = ExprContext(mapOf("a" to Value(2)), extensions)
+            val ctx = ExprContext(mapOf("a" to Value(2, typeOf<Int>())), extensions)
             val result = evaluator.eval("a <= 1", ctx)
-            assertEquals(Value(false), result)
+            assertEquals(Value(false, typeOf<Boolean>()), result)
         }
 
         @Test
         fun le2() {
-            val ctx = ExprContext(mapOf("a" to Value(1)), extensions)
+            val ctx = ExprContext(mapOf("a" to Value(1, typeOf<Int>())), extensions)
             val result = evaluator.eval("a <= 1", ctx)
-            assertEquals(Value(true), result)
+            assertEquals(Value(true, typeOf<Boolean>()), result)
         }
 
         @Test
         fun le3() {
-            val ctx = ExprContext(mapOf("a" to Value(0)), extensions)
+            val ctx = ExprContext(mapOf("a" to Value(0, typeOf<Int>())), extensions)
             val result = evaluator.eval("a <= 1", ctx)
-            assertEquals(Value(true), result)
+            assertEquals(Value(true, typeOf<Boolean>()), result)
         }
 
         @Test
         fun lt1() {
-            val ctx = ExprContext(mapOf("a" to Value(2)), extensions)
+            val ctx = ExprContext(mapOf("a" to Value(2, typeOf<Int>())), extensions)
             val result = evaluator.eval("a < 1", ctx)
-            assertEquals(Value(false), result)
+            assertEquals(Value(false, typeOf<Boolean>()), result)
         }
 
         @Test
         fun lt2() {
-            val ctx = ExprContext(mapOf("a" to Value(1)), extensions)
+            val ctx = ExprContext(mapOf("a" to Value(1, typeOf<Int>())), extensions)
             val result = evaluator.eval("a < 1", ctx)
-            assertEquals(Value(false), result)
+            assertEquals(Value(false, typeOf<Boolean>()), result)
         }
 
         @Test
         fun lt3() {
-            val ctx = ExprContext(mapOf("a" to Value(0)), extensions)
+            val ctx = ExprContext(mapOf("a" to Value(0, typeOf<Int>())), extensions)
             val result = evaluator.eval("a < 1", ctx)
-            assertEquals(Value(true), result)
+            assertEquals(Value(true, typeOf<Boolean>()), result)
         }
 
         @Test
         fun `Cannot compare because the left operand is null`() {
-            val ctx = ExprContext(mapOf("a" to Value(null, Any::class)), extensions)
+            val ctx = ExprContext(mapOf("a" to Value(null, typeOf<Any>())), extensions)
             val exception = assertFailsWith<ExprException> {
                 evaluator
                     .eval("a > 1", ctx)
@@ -214,7 +215,7 @@ class ExprEvaluatorTest {
         @Test
         fun `Cannot compare because the right operand is null`() {
             val ctx = ExprContext(
-                mapOf("a" to Value(null, Any::class)),
+                mapOf("a" to Value(null, typeOf<Any>())),
                 extensions,
             )
             val exception = assertFailsWith<ExprException> {
@@ -226,7 +227,7 @@ class ExprEvaluatorTest {
 
         @Test
         fun `Cannot compare because the operands are not comparable to each other`() {
-            val ctx = ExprContext(mapOf("a" to Value("string")), extensions)
+            val ctx = ExprContext(mapOf("a" to Value("string", typeOf<String>())), extensions)
             val exception = assertFailsWith<ExprException> {
                 evaluator
                     .eval("a > 1", ctx)
@@ -239,49 +240,49 @@ class ExprEvaluatorTest {
     inner class LogicalOperatorTest {
         @Test
         fun not_true() {
-            val ctx = ExprContext(mapOf("a" to Value(false)), extensions)
+            val ctx = ExprContext(mapOf("a" to Value(false, typeOf<Boolean>())), extensions)
             val result = evaluator.eval("!a", ctx)
-            assertEquals(Value(true), result)
+            assertEquals(Value(true, typeOf<Boolean>()), result)
         }
 
         @Test
         fun not_false() {
-            val ctx = ExprContext(mapOf("a" to Value(true)), extensions)
+            val ctx = ExprContext(mapOf("a" to Value(true, typeOf<Boolean>())), extensions)
             val result = evaluator.eval("!a", ctx)
-            assertEquals(Value(false), result)
+            assertEquals(Value(false, typeOf<Boolean>()), result)
         }
 
         @Test
         fun and_true() {
-            val ctx = ExprContext(mapOf("a" to Value(true)), extensions)
+            val ctx = ExprContext(mapOf("a" to Value(true, typeOf<Boolean>())), extensions)
             val result = evaluator.eval("a && true", ctx)
-            assertEquals(Value(true), result)
+            assertEquals(Value(true, typeOf<Boolean>()), result)
         }
 
         @Test
         fun and_false() {
-            val ctx = ExprContext(mapOf("a" to Value(false)), extensions)
+            val ctx = ExprContext(mapOf("a" to Value(false, typeOf<Boolean>())), extensions)
             val result = evaluator.eval("a && true", ctx)
-            assertEquals(Value(false), result)
+            assertEquals(Value(false, typeOf<Boolean>()), result)
         }
 
         @Test
         fun or_true() {
-            val ctx = ExprContext(mapOf("a" to Value(true)), extensions)
+            val ctx = ExprContext(mapOf("a" to Value(true, typeOf<Boolean>())), extensions)
             val result = evaluator.eval("a || false", ctx)
-            assertEquals(Value(true), result)
+            assertEquals(Value(true, typeOf<Boolean>()), result)
         }
 
         @Test
         fun or_false() {
-            val ctx = ExprContext(mapOf("a" to Value(false)), extensions)
+            val ctx = ExprContext(mapOf("a" to Value(false, typeOf<Boolean>())), extensions)
             val result = evaluator.eval("a || false", ctx)
-            assertEquals(Value(false), result)
+            assertEquals(Value(false, typeOf<Boolean>()), result)
         }
 
         @Test
         fun `Cannot perform the logical operator because the left operand is null`() {
-            val ctx = ExprContext(mapOf("a" to Value(null, Any::class)), extensions)
+            val ctx = ExprContext(mapOf("a" to Value(null, typeOf<Any>())), extensions)
             val exception = assertFailsWith<ExprException> {
                 evaluator
                     .eval("a && true", ctx)
@@ -291,7 +292,7 @@ class ExprEvaluatorTest {
 
         @Test
         fun `Cannot perform the logical operator because the right operand is null`() {
-            val ctx = ExprContext(mapOf("a" to Value(null, Any::class)), extensions)
+            val ctx = ExprContext(mapOf("a" to Value(null, typeOf<Any>())), extensions)
             val exception = assertFailsWith<ExprException> {
                 evaluator
                     .eval("true && a", ctx)
@@ -301,7 +302,7 @@ class ExprEvaluatorTest {
 
         @Test
         fun `Cannot perform the logical operator because either operand is not boolean`() {
-            val ctx = ExprContext(mapOf("a" to Value("string")), extensions)
+            val ctx = ExprContext(mapOf("a" to Value("string", typeOf<String>())), extensions)
             val exception = assertFailsWith<ExprException> {
                 evaluator
                     .eval("true && a", ctx)
@@ -311,7 +312,7 @@ class ExprEvaluatorTest {
 
         @Test
         fun `Cannot perform the logical operator because the operand is null`() {
-            val ctx = ExprContext(mapOf("a" to Value(null, Any::class)), extensions)
+            val ctx = ExprContext(mapOf("a" to Value(null, typeOf<Any>())), extensions)
             val exception = assertFailsWith<ExprException> {
                 evaluator
                     .eval("!a", ctx)
@@ -321,7 +322,7 @@ class ExprEvaluatorTest {
 
         @Test
         fun `Cannot perform the logical operator because the operand is not Boolean`() {
-            val ctx = ExprContext(mapOf("a" to Value("string")), extensions)
+            val ctx = ExprContext(mapOf("a" to Value("string", typeOf<String>())), extensions)
             val exception = assertFailsWith<ExprException> {
                 evaluator
                     .eval("!a", ctx)
@@ -336,63 +337,63 @@ class ExprEvaluatorTest {
         fun companionObject() {
             val ctx = ExprContext(emptyMap(), extensions)
             val result = evaluator.eval("@${Hello::class.java.name}@", ctx)
-            assertEquals(Value(Hello), result)
+            assertEquals(Value(Hello, typeOf<Hello.Companion>()), result)
         }
 
         @Test
         fun companionObject_property() {
             val ctx = ExprContext(emptyMap(), extensions)
             val result = evaluator.eval("@${Hello::class.java.name}@.name", ctx)
-            assertEquals(Value(Hello.name), result)
+            assertEquals(Value(Hello.name, typeOf<String>()), result)
         }
 
         @Test
         fun companionObject_constProperty() {
             val ctx = ExprContext(emptyMap(), extensions)
             val result = evaluator.eval("@${Hello::class.java.name}@.constName", ctx)
-            assertEquals(Value(Hello.constName), result)
+            assertEquals(Value(Hello.constName, typeOf<String>()), result)
         }
 
         @Test
         fun companionObject_function() {
             val ctx = ExprContext(emptyMap(), extensions)
             val result = evaluator.eval("@${Hello::class.java.name}@.greet(\"abc\")", ctx)
-            assertEquals(Value("hello abc!"), result)
+            assertEquals(Value("hello abc!", typeOf<String>()), result)
         }
 
         @Test
         fun `object`() {
             val ctx = ExprContext(emptyMap(), extensions)
             val result = evaluator.eval("@${Hi::class.java.name}@", ctx)
-            assertEquals(Value(Hi), result)
+            assertEquals(Value(Hi, typeOf<Hi>()), result)
         }
 
         @Test
         fun object_property() {
             val ctx = ExprContext(emptyMap(), extensions)
             val result = evaluator.eval("@${Hi::class.java.name}@.name", ctx)
-            assertEquals(Value(Hi.name), result)
+            assertEquals(Value(Hi.name, typeOf<String>()), result)
         }
 
         @Test
         fun object_constProperty() {
             val ctx = ExprContext(emptyMap(), extensions)
             val result = evaluator.eval("@${Hi::class.java.name}@.constName", ctx)
-            assertEquals(Value(Hi.constName), result)
+            assertEquals(Value(Hi.constName, typeOf<String>()), result)
         }
 
         @Test
         fun object_function() {
             val ctx = ExprContext(emptyMap(), extensions)
             val result = evaluator.eval("@${Hi::class.java.name}@.greet(\"abc\")", ctx)
-            assertEquals(Value("hi abc!"), result)
+            assertEquals(Value("hi abc!", typeOf<String>()), result)
         }
 
         @Test
         fun enum_element() {
             val ctx = ExprContext(emptyMap(), extensions)
             val result = evaluator.eval("@${Direction::class.java.name}@.WEST", ctx)
-            assertEquals(Value(Direction.WEST), result)
+            assertEquals(Value(Direction.WEST, typeOf<Direction>()), result)
         }
 
         @Suppress("UNCHECKED_CAST")
@@ -410,7 +411,7 @@ class ExprEvaluatorTest {
         fun global() {
             val ctx = ExprContext(emptyMap(), extensions)
             val result = evaluator.eval("global", ctx)
-            assertEquals(Value("hello"), result)
+            assertEquals(Value("hello", typeOf<String>()), result)
         }
 
         @Test
@@ -431,50 +432,54 @@ class ExprEvaluatorTest {
                 mapOf(
                     "p" to Value(
                         Person(1, "aaa", 20),
+                        typeOf<Person>(),
                     ),
                 ),
                 extensions,
             )
             val result = evaluator.eval("p.name", ctx)
-            assertEquals(Value("aaa"), result)
+            assertEquals(Value("aaa", typeOf<String>()), result)
         }
 
         @Test
         fun property_nullable() {
             val ctx = ExprContext(
                 mapOf(
-                    "p" to Value(Person(1, "aaa", null)),
+                    "p" to Value(
+                        Person(1, "aaa", null),
+                        typeOf<Person>(),
+                    ),
                 ),
                 extensions,
             )
             val result = evaluator.eval("p.age", ctx)
-            assertEquals(Value(null, Int::class), result)
+            assertEquals(Value(null, typeOf<Int>()), result)
         }
 
         @Test
         fun safeCall() {
             val ctx = ExprContext(
-                mapOf("a" to Value(null, String::class)),
+                mapOf("a" to Value(null, typeOf<String>())),
                 extensions,
             )
             val result = evaluator.eval("a?.length", ctx)
-            assertEquals(Value(null, Int::class), result)
+            assertEquals(Value(null, typeOf<Int>()), result)
         }
 
         @Test
         fun extensionProperty() {
             val ctx = ExprContext(
-                mapOf("a" to Value("abc")),
+                mapOf("a" to Value("abc", typeOf<String>())),
                 extensions,
             )
             val result = evaluator.eval("a.lastIndex", ctx)
-            assertEquals(Value(2), result)
+            assertEquals(Value(2, typeOf<Int>()), result)
         }
 
         @Test
         fun `Failed to call the property`() {
             val ctx = ExprContext(
-                mapOf("a" to Value(null, String::class)),
+                mapOf("a" to Value(null, typeOf<String>())),
                 extensions,
             )
             val exception = assertFailsWith<ExprException> {
@@ -486,7 +491,7 @@ class ExprEvaluatorTest {
         @Test
         fun `The property is not found`() {
             val ctx = ExprContext(
-                mapOf("a" to Value("string")),
+                mapOf("a" to Value("string", typeOf<String>())),
                 extensions,
             )
             val exception = assertFailsWith<ExprException> {
@@ -501,71 +506,71 @@ class ExprEvaluatorTest {
         @Test
         fun function_1parameter() {
             val ctx = ExprContext(
-                mapOf("h" to Value(Hello()), "w" to Value("world")),
+                mapOf("h" to Value(Hello(), typeOf<Hello>()), "w" to Value("world", typeOf<String>())),
                 extensions,
             )
             val result = evaluator.eval("h.say(w)", ctx)
-            assertEquals(Value("hello world"), result)
+            assertEquals(Value("hello world", typeOf<String>()), result)
         }
 
         @Test
         fun function_2parameter() {
             val ctx = ExprContext(
                 mapOf(
-                    "h" to Value(Hello(), Hello::class),
-                    "w" to Value("world", String::class),
-                    "m" to Value("good luck", String::class),
+                    "h" to Value(Hello(), typeOf<Hello>()),
+                    "w" to Value("world", typeOf<String>()),
+                    "m" to Value("good luck", typeOf<String>()),
                 ),
                 extensions,
             )
             val result = evaluator.eval("h.say(w, m)", ctx)
-            assertEquals(Value("hello world, good luck"), result)
+            assertEquals(Value("hello world, good luck", typeOf<String>()), result)
         }
 
         @Test
         fun safeCall() {
             val ctx = ExprContext(
-                mapOf("a" to Value(null, String::class)),
+                mapOf("a" to Value(null, typeOf<String>())),
                 extensions,
             )
             val result = evaluator.eval("a?.subSequence(0, 1)", ctx)
-            assertEquals(Value(null, CharSequence::class), result)
+            assertEquals(Value(null, typeOf<CharSequence>()), result)
         }
 
         @Test
         fun extensionFunction() {
             val ctx = ExprContext(
-                mapOf("s" to Value("")),
+                mapOf("s" to Value("", typeOf<String>())),
                 extensions,
             )
             val result = evaluator.eval("s.isBlank()", ctx)
-            assertEquals(Value(true), result)
+            assertEquals(Value(true, typeOf<Boolean>()), result)
         }
 
         @Test
         fun memberExtensionFunction() {
             val ctx = ExprContext(
-                mapOf("s" to Value("abc")),
+                mapOf("s" to Value("abc", typeOf<String>())),
                 extensions,
             )
             val result = evaluator.eval("s.asPrefix()", ctx)
-            assertEquals(Value("abc%", String::class), result)
+            assertEquals(Value("abc%", typeOf<String>()), result)
         }
 
         @Test
         fun `Call an extension function when the receiver is null`() {
             val ctx = ExprContext(
-                mapOf("s" to Value(null, Any::class)),
+                mapOf("s" to Value(null, typeOf<Any>())),
                 extensions,
             )
             val result = evaluator.eval("s.isNullOrEmpty()", ctx)
-            assertEquals(Value(true), result)
+            assertEquals(Value(true, typeOf<Boolean>()), result)
         }
 
         @Test
         fun `Failed to call the function`() {
             val ctx = ExprContext(
-                mapOf("a" to Value(null, String::class)),
+                mapOf("a" to Value(null, typeOf<String>())),
                 extensions,
             )
             val exception = assertFailsWith<ExprException> {
@@ -578,7 +583,7 @@ class ExprEvaluatorTest {
         @Test
         fun `The function is not found`() {
             val ctx = ExprContext(
-                mapOf("a" to Value("string")),
+                mapOf("a" to Value("string", typeOf<String>())),
                 extensions,
             )
             val exception = assertFailsWith<ExprException> {
@@ -594,11 +599,11 @@ class ExprEvaluatorTest {
         @Test
         fun test() {
             val ctx = ExprContext(
-                mapOf("uInt" to Value(1u)),
+                mapOf("uInt" to Value(1u, typeOf<UInt>())),
                 extensions,
             )
             val result = evaluator.eval("uInt", ctx)
-            assertEquals(Value(1u), result)
+            assertEquals(Value(1u, typeOf<UInt>()), result)
         }
     }
 }

@@ -14,28 +14,29 @@ import org.komapper.jdbc.JdbcDataType
 import org.komapper.jdbc.JdbcDataTypeProvider
 import java.sql.PreparedStatement
 import java.sql.ResultSet
-import kotlin.reflect.KClass
+import kotlin.reflect.KType
+import kotlin.reflect.typeOf
 
 class JdbcDatetimeTypeProvider(val next: JdbcDataTypeProvider) : JdbcDataTypeProvider {
 
-    override fun <T : Any> get(klass: KClass<out T>): JdbcDataType<T>? {
-        val dataType: JdbcDataType<*>? = when (klass) {
+    override fun <T : Any> get(type: KType): JdbcDataType<T>? {
+        val dataType: JdbcDataType<*>? = when (type.classifier) {
             Instant::class -> {
-                val dataType = next.get(java.time.Instant::class)
+                val dataType = next.get<java.time.Instant>(typeOf<java.time.Instant>())
                     ?: error("The dataType is not found for java.time.Instant.")
                 JdbcKotlinInstantType(dataType)
             }
             LocalDate::class -> {
-                val dataType = next.get(java.time.LocalDate::class)
+                val dataType = next.get<java.time.LocalDate>(typeOf<java.time.LocalDate>())
                     ?: error("The dataType is not found for java.time.LocalDate.")
                 JdbcKotlinLocalDateType(dataType)
             }
             LocalDateTime::class -> {
-                val dataType = next.get(java.time.LocalDateTime::class)
+                val dataType = next.get<java.time.LocalDateTime>(typeOf<java.time.LocalDateTime>())
                     ?: error("The dataType is not found for java.time.LocalDateTime.")
                 JdbcKotlinLocalDateTimeType(dataType)
             }
-            else -> next.get(klass)
+            else -> next.get<T>(type)
         }
         @Suppress("UNCHECKED_CAST")
         return dataType as JdbcDataType<T>?
@@ -43,7 +44,7 @@ class JdbcDatetimeTypeProvider(val next: JdbcDataTypeProvider) : JdbcDataTypePro
 }
 
 internal class JdbcKotlinInstantType(private val dataType: JdbcDataType<java.time.Instant>) :
-    AbstractJdbcDataType<Instant>(Instant::class, dataType.jdbcType) {
+    AbstractJdbcDataType<Instant>(typeOf<Instant>(), dataType.jdbcType) {
     override val name: String = dataType.name
 
     override fun doGetValue(rs: ResultSet, index: Int): Instant? {
@@ -62,7 +63,7 @@ internal class JdbcKotlinInstantType(private val dataType: JdbcDataType<java.tim
 }
 
 internal class JdbcKotlinLocalDateType(private val dataType: JdbcDataType<java.time.LocalDate>) :
-    AbstractJdbcDataType<LocalDate>(LocalDate::class, dataType.jdbcType) {
+    AbstractJdbcDataType<LocalDate>(typeOf<LocalDate>(), dataType.jdbcType) {
     override val name: String = dataType.name
 
     override fun doGetValue(rs: ResultSet, index: Int): LocalDate? {
@@ -81,7 +82,7 @@ internal class JdbcKotlinLocalDateType(private val dataType: JdbcDataType<java.t
 }
 
 internal class JdbcKotlinLocalDateTimeType(private val dataType: JdbcDataType<java.time.LocalDateTime>) :
-    AbstractJdbcDataType<LocalDateTime>(LocalDateTime::class, dataType.jdbcType) {
+    AbstractJdbcDataType<LocalDateTime>(typeOf<LocalDateTime>(), dataType.jdbcType) {
     override val name: String = dataType.name
 
     override fun doGetValue(rs: ResultSet, index: Int): LocalDateTime? {

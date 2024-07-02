@@ -13,7 +13,7 @@ interface EntityMetamodel<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY,
          * The version of the metamodel.
          * This version will be incremented as the specification changes.
          */
-        const val METAMODEL_VERSION: Int = 1
+        const val METAMODEL_VERSION: Int = 2
     }
     fun declaration(): EntityMetamodelDeclaration<META>
     fun idGenerator(): IdGenerator<ENTITY, ID>?

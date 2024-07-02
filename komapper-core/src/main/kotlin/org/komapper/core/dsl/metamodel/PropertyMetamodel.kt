@@ -3,7 +3,7 @@ package org.komapper.core.dsl.metamodel
 import org.komapper.core.ThreadSafe
 import org.komapper.core.Value
 import org.komapper.core.dsl.expression.PropertyExpression
-import kotlin.reflect.KClass
+import kotlin.reflect.KType
 
 @ThreadSafe
 interface PropertyMetamodel<ENTITY : Any, EXTERIOR : Any, INTERIOR : Any> : PropertyExpression<EXTERIOR, INTERIOR> {
@@ -16,7 +16,7 @@ interface PropertyMetamodel<ENTITY : Any, EXTERIOR : Any, INTERIOR : Any> : Prop
     fun toValue(entity: ENTITY): Value<INTERIOR> {
         val exterior = getter(entity)
         val interior = if (exterior == null) null else unwrap(exterior)
-        return Value(interior, interiorClass, masking)
+        return Value(interior, interiorType, masking)
     }
 }
 
@@ -25,8 +25,8 @@ class PropertyMetamodelImpl<ENTITY : Any, EXTERIOR : Any, INTERIOR : Any>(
     override val owner: EntityMetamodel<ENTITY, *, *>,
     private val descriptor: PropertyDescriptor<ENTITY, EXTERIOR, INTERIOR>,
 ) : PropertyMetamodel<ENTITY, EXTERIOR, INTERIOR> {
-    override val exteriorClass: KClass<EXTERIOR> get() = descriptor.exteriorClass
-    override val interiorClass: KClass<INTERIOR> get() = descriptor.interiorClass
+    override val exteriorType: KType = descriptor.exteriorType
+    override val interiorType: KType = descriptor.interiorType
     override val name: String get() = descriptor.name
     override val columnName: String get() = descriptor.columnName
     override val alwaysQuote: Boolean get() = descriptor.alwaysQuote
@@ -42,8 +42,8 @@ class PropertyMetamodelImpl<ENTITY : Any, EXTERIOR : Any, INTERIOR : Any>(
 class PropertyMetamodelStub<ENTITY : Any, EXTERIOR : Any> :
     PropertyMetamodel<ENTITY, EXTERIOR, EXTERIOR> {
     override val owner: EntityMetamodel<ENTITY, *, *> get() = fail()
-    override val exteriorClass: KClass<EXTERIOR> get() = fail()
-    override val interiorClass: KClass<EXTERIOR> get() = fail()
+    override val exteriorType: KType get() = fail()
+    override val interiorType: KType get() = fail()
     override val name: String get() = fail()
     override val columnName: String get() = fail()
     override val alwaysQuote: Boolean get() = fail()

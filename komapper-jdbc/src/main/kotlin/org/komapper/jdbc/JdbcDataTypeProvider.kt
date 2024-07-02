@@ -1,11 +1,11 @@
 package org.komapper.jdbc
 
 import org.komapper.core.ThreadSafe
-import kotlin.reflect.KClass
+import kotlin.reflect.KType
 
 @ThreadSafe
 interface JdbcDataTypeProvider {
-    fun <T : Any> get(klass: KClass<out T>): JdbcDataType<T>?
+    fun <T : Any> get(type: KType): JdbcDataType<T>?
 }
 
 abstract class AbstractJdbcDataTypeProvider(
@@ -13,12 +13,12 @@ abstract class AbstractJdbcDataTypeProvider(
     dataTypes: List<JdbcDataType<*>>,
 ) : JdbcDataTypeProvider {
 
-    private val dataTypeMap: Map<KClass<*>, JdbcDataType<*>> = dataTypes.associateBy { it.klass }
+    private val dataTypeMap: Map<KType, JdbcDataType<*>> = dataTypes.associateBy { it.type }
 
-    override fun <T : Any> get(klass: KClass<out T>): JdbcDataType<T>? {
+    override fun <T : Any> get(type: KType): JdbcDataType<T>? {
         @Suppress("UNCHECKED_CAST")
-        val dataType = dataTypeMap[klass] as JdbcDataType<T>?
-        return dataType ?: next.get(klass)
+        val dataType = dataTypeMap[type] as JdbcDataType<T>?
+        return dataType ?: next.get(type)
     }
 }
 
@@ -32,5 +32,5 @@ fun JdbcDataTypeProvider(vararg dataTypes: JdbcDataType<*>): JdbcDataTypeProvide
 }
 
 internal object EmptyJdbcDataTypeProvider : JdbcDataTypeProvider {
-    override fun <T : Any> get(klass: KClass<out T>): JdbcDataType<T>? = null
+    override fun <T : Any> get(type: KType): JdbcDataType<T>? = null
 }

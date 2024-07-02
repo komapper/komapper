@@ -1,6 +1,7 @@
 package org.komapper.core
 
 import kotlin.reflect.KClass
+import kotlin.reflect.KType
 
 @ThreadSafe
 interface DataOperator {
@@ -8,37 +9,37 @@ interface DataOperator {
      * Formats the value.
      *
      * @param value the value
-     * @param valueClass the class of the value
+     * @param type the type of the value
      * @param masking whether to mask the value
      * @return the formatted value
      */
-    fun <T : Any> formatValue(value: T?, valueClass: KClass<out T>, masking: Boolean): String
+    fun <T : Any> formatValue(value: T?, type: KType, masking: Boolean): String
 
     /**
      * Returns the data type name.
      *
-     * @param klass the class corresponding the data type
+     * @param type the type corresponding the data type
      * @return the data type name
      */
-    fun getDataTypeName(klass: KClass<*>): String
+    fun <T : Any> getDataTypeName(type: KType): String
 }
 
 object DryRunDataOperator : DataOperator {
 
-    override fun <T : Any> formatValue(value: T?, valueClass: KClass<out T>, masking: Boolean): String {
+    override fun <T : Any> formatValue(value: T?, type: KType, masking: Boolean): String {
         return if (masking) {
             "*****"
         } else if (value == null) {
             "null"
         } else {
-            when (valueClass) {
+            when (type.classifier as KClass<*>) {
                 String::class -> "'$value'"
                 else -> value.toString()
             }
         }
     }
 
-    override fun getDataTypeName(klass: KClass<*>): String {
+    override fun <T : Any> getDataTypeName(type: KType): String {
         throw UnsupportedOperationException()
     }
 }

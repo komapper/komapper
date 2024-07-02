@@ -1,13 +1,14 @@
 package org.komapper.core.dsl.expression
 
-import kotlin.reflect.KClass
+import kotlin.reflect.KType
+import kotlin.reflect.typeOf
 
 sealed class AggregateFunction<T : Any, S : Any> : ScalarExpression<T, S>, WindowFunction<T, S> {
     internal data class Avg(val expression: ColumnExpression<*, *>) : ColumnExpression<Double, Double>,
         AggregateFunction<Double, Double>() {
         override val owner: TableExpression<*> get() = expression.owner
-        override val exteriorClass: KClass<Double> get() = Double::class
-        override val interiorClass: KClass<Double> = Double::class
+        override val exteriorType: KType = typeOf<Double>()
+        override val interiorType: KType = typeOf<Double>()
         override val columnName: String get() = expression.columnName
         override val alwaysQuote: Boolean get() = expression.alwaysQuote
         override val masking: Boolean get() = expression.masking
@@ -17,8 +18,8 @@ sealed class AggregateFunction<T : Any, S : Any> : ScalarExpression<T, S>, Windo
 
     internal object CountAsterisk : ColumnExpression<Long, Long>, AggregateFunction<Long, Long>() {
         override val owner: TableExpression<*> get() = throw UnsupportedOperationException()
-        override val exteriorClass: KClass<Long> get() = Long::class
-        override val interiorClass: KClass<Long> get() = Long::class
+        override val exteriorType: KType = typeOf<Long>()
+        override val interiorType: KType = typeOf<Long>()
         override val columnName: String get() = throw UnsupportedOperationException()
         override val alwaysQuote: Boolean get() = throw UnsupportedOperationException()
         override val masking: Boolean get() = throw UnsupportedOperationException()
@@ -29,8 +30,8 @@ sealed class AggregateFunction<T : Any, S : Any> : ScalarExpression<T, S>, Windo
     internal data class Count(val expression: ColumnExpression<*, *>) : ColumnExpression<Long, Long>,
         AggregateFunction<Long, Long>() {
         override val owner: TableExpression<*> get() = expression.owner
-        override val exteriorClass: KClass<Long> get() = Long::class
-        override val interiorClass: KClass<Long> = Long::class
+        override val exteriorType: KType = typeOf<Long>()
+        override val interiorType: KType = typeOf<Long>()
         override val columnName: String get() = expression.columnName
         override val alwaysQuote: Boolean get() = expression.alwaysQuote
         override val masking: Boolean get() = expression.masking

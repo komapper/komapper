@@ -1,6 +1,6 @@
 package org.komapper.core
 
-import kotlin.reflect.KClass
+import kotlin.reflect.KType
 
 /**
  * The part of the SQL Statement.
@@ -9,5 +9,5 @@ import kotlin.reflect.KClass
 sealed class StatementPart : CharSequence {
     data class Text(val text: CharSequence) : StatementPart(), CharSequence by text
     data class Value(val value: org.komapper.core.Value<*>) : StatementPart(), CharSequence by "?"
-    data class ReturnParameter(val dataType: KClass<*>) : StatementPart(), CharSequence by "?"
+    data class ReturnParameter(val type: KType) : StatementPart(), CharSequence by "?"
 }

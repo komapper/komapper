@@ -228,7 +228,7 @@ class DefaultJdbcExecutor(
 
     fun bind(ps: PreparedStatement, statement: Statement) {
         statement.args.forEachIndexed { index, value ->
-            config.dataOperator.setValue(ps, index + 1, value.any, value.klass)
+            config.dataOperator.setValue(ps, index + 1, value.any, value.type)
         }
     }
 

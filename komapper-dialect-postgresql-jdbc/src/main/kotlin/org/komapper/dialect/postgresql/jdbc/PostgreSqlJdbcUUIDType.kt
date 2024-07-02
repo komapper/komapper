@@ -5,8 +5,9 @@ import java.sql.JDBCType
 import java.sql.PreparedStatement
 import java.sql.ResultSet
 import java.util.UUID
+import kotlin.reflect.typeOf
 
-object PostgreSqlJdbcUUIDType : AbstractJdbcDataType<UUID>(UUID::class, JDBCType.OTHER) {
+object PostgreSqlJdbcUUIDType : AbstractJdbcDataType<UUID>(typeOf<UUID>(), JDBCType.OTHER) {
     override val name: String = "uuid"
 
     override fun doGetValue(rs: ResultSet, index: Int): UUID? {

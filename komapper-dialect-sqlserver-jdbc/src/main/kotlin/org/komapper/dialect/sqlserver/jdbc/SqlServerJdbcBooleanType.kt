@@ -4,8 +4,9 @@ import org.komapper.jdbc.AbstractJdbcDataType
 import java.sql.JDBCType
 import java.sql.PreparedStatement
 import java.sql.ResultSet
+import kotlin.reflect.typeOf
 
-object SqlServerJdbcBooleanType : AbstractJdbcDataType<Boolean>(Boolean::class, JDBCType.BOOLEAN) {
+object SqlServerJdbcBooleanType : AbstractJdbcDataType<Boolean>(typeOf<Boolean>(), JDBCType.BOOLEAN) {
     override val name: String = "bit"
 
     override fun doGetValue(rs: ResultSet, index: Int): Boolean {

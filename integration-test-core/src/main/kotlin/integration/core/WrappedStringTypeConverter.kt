@@ -1,11 +1,12 @@
 package integration.core
 
 import org.komapper.core.spi.DataTypeConverter
-import kotlin.reflect.KClass
+import kotlin.reflect.KType
+import kotlin.reflect.typeOf
 
 class WrappedStringTypeConverter : DataTypeConverter<WrappedString, String> {
-    override val exteriorClass: KClass<WrappedString> = WrappedString::class
-    override val interiorClass: KClass<String> = String::class
+    override val exteriorType: KType = typeOf<WrappedString>()
+    override val interiorType: KType = typeOf<String>()
 
     override fun unwrap(exterior: WrappedString): String {
         return exterior.value

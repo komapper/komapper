@@ -6,6 +6,7 @@ import org.komapper.jdbc.JdbcDataType
 import java.sql.JDBCType
 import java.sql.PreparedStatement
 import java.sql.ResultSet
+import kotlin.reflect.typeOf
 
 class OracleJdbcDataType<T : Any>(private val jdbcDataType: JdbcDataType<T>) : JdbcDataType<T> by jdbcDataType {
     override fun registerReturnParameter(ps: PreparedStatement, index: Int) {
@@ -14,7 +15,7 @@ class OracleJdbcDataType<T : Any>(private val jdbcDataType: JdbcDataType<T>) : J
     }
 }
 
-object OracleJdbcBooleanType : AbstractJdbcDataType<Boolean>(Boolean::class, JDBCType.INTEGER) {
+object OracleJdbcBooleanType : AbstractJdbcDataType<Boolean>(typeOf<Boolean>(), JDBCType.INTEGER) {
     override val name: String = "number(1, 0)"
 
     override fun doGetValue(rs: ResultSet, index: Int): Boolean {

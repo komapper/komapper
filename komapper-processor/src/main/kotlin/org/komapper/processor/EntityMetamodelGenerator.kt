@@ -177,15 +177,15 @@ internal class EntityMetamodelGenerator(
         fun leafPropertyDescriptor(p: LeafProperty, getter: String, setter: String, nullability: Nullability): String {
             val exteriorTypeName = p.exteriorTypeName
             val interiorTypeName = p.interiorTypeName
-            val exteriorClass = "$exteriorTypeName::class"
-            val interiorClass = "$interiorTypeName::class"
+            val exteriorType = "kotlin.reflect.typeOf<$exteriorTypeName>()"
+            val interiorType = "kotlin.reflect.typeOf<$interiorTypeName>()"
             val columnName = "\"${p.column.name}\""
             val alwaysQuote = "${p.column.alwaysQuote}"
             val masking = "${p.column.masking}"
             val wrap = when (p.kotlinClass) {
                 is EnumClass -> {
                     fun throwException(value: String, propertyName: String, cause: String) =
-                        "throw $EnumMappingException($exteriorClass, $propertyName, $value, $cause)"
+                        "throw $EnumMappingException($exteriorType, $propertyName, $value, $cause)"
                     when (val strategy = p.kotlinClass.strategy) {
                         is EnumStrategy.Name ->
                             "{ try { $exteriorTypeName.valueOf(it) } catch (e: IllegalArgumentException) { ${
@@ -268,7 +268,7 @@ internal class EntityMetamodelGenerator(
             val nullable = if (nullability == Nullability.NULLABLE) "true" else "false"
             val propertyDescriptor =
                 "$PropertyDescriptor<$entityTypeName, $exteriorTypeName, $interiorTypeName>"
-            return "$propertyDescriptor($exteriorClass, $interiorClass, \"$p\", $columnName, $alwaysQuote, $masking, $getter, $setter, $wrap, $unwrap, $nullable)"
+            return "$propertyDescriptor($exteriorType, $interiorType, \"$p\", $columnName, $alwaysQuote, $masking, $getter, $setter, $wrap, $unwrap, $nullable)"
         }
 
         w.println("    private object $EntityDescriptor {")

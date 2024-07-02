@@ -23,7 +23,7 @@ class OracleStatementBuilderSupport(
                 cutBack(2)
                 append(" into ")
                 for (e in expressions) {
-                    registerReturnParameter(e.interiorClass)
+                    registerReturnParameter(e.interiorType)
                     append(", ")
                 }
                 cutBack(2)

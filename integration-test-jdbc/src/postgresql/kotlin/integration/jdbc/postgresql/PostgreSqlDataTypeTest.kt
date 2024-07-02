@@ -7,6 +7,7 @@ import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
 import org.komapper.core.dsl.query.first
 import org.komapper.jdbc.JdbcDatabase
+import kotlin.reflect.typeOf
 import kotlin.test.assertEquals
 
 @ExtendWith(JdbcEnv::class)
@@ -31,7 +32,7 @@ class PostgreSqlDataTypeTest(private val db: JdbcDatabase) {
 
         val result = db.runQuery {
             QueryDsl.fromTemplate("select value->'b' as x from json_data")
-                .select { it.get("x", Json::class)!! }
+                .select { it.get<Json>("x", typeOf<Json>())!! }
                 .first()
         }
         assertEquals("\"Hello\"", result.data)

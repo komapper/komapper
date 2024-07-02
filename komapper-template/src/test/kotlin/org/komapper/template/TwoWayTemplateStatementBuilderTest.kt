@@ -11,6 +11,7 @@ import org.komapper.template.expression.DefaultExprEvaluator
 import org.komapper.template.expression.NoCacheExprNodeFactory
 import org.komapper.template.sql.NoCacheSqlNodeFactory
 import org.komapper.template.sql.SqlException
+import kotlin.reflect.typeOf
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -40,7 +41,7 @@ class TwoWayTemplateStatementBuilderTest {
     fun complex() {
         val template =
             "select name, age from person where name = /*name*/'test' and age > 1 order by name, age for update"
-        val valueMap = mapOf("name" to Value(""))
+        val valueMap = mapOf("name" to Value("", typeOf<String>()))
         val statement = statementBuilder.build(template, valueMap, extensions)
         assertEquals(
             "select name, age from person where name = ? and age > 1 order by name, age for update",
@@ -64,30 +65,30 @@ class TwoWayTemplateStatementBuilderTest {
         @Test
         fun singleValue() {
             val template = "select name, age from person where name = /*name*/'test' and age > 1"
-            val statement = statementBuilder.build(template, mapOf("name" to Value("aaa")), extensions)
+            val statement = statementBuilder.build(template, mapOf("name" to Value("aaa", typeOf<String>())), extensions)
             assertEquals("select name, age from person where name = ? and age > 1", statement.toSql())
-            assertEquals(listOf(Value("aaa")), statement.args)
+            assertEquals(listOf(Value("aaa", typeOf<String>())), statement.args)
         }
 
         @Test
         fun singleValue_null() {
             val template = "select name, age from person where name = /*name*/'test' and age > 1"
-            val statement = statementBuilder.build(template, mapOf("name" to Value(null, String::class)), extensions)
+            val statement = statementBuilder.build(template, mapOf("name" to Value(null, typeOf<String>())), extensions)
             assertEquals("select name, age from person where name = ? and age > 1", statement.toSql())
-            assertEquals(listOf(Value(null, String::class)), statement.args)
+            assertEquals(listOf(Value(null, typeOf<String>())), statement.args)
         }
 
         @Test
         fun multipleValues() {
             val template = "select name, age from person where name in /*name*/('a', 'b') and age > 1"
             val statement =
-                statementBuilder.build(template, mapOf("name" to Value(listOf("x", "y", "z"))), extensions)
+                statementBuilder.build(template, mapOf("name" to Value(listOf("x", "y", "z"), typeOf<List<String>>())), extensions)
             assertEquals("select name, age from person where name in (?, ?, ?) and age > 1", statement.toSql())
             assertEquals(
                 listOf(
-                    Value("x"),
-                    Value("y"),
-                    Value("z"),
+                    Value("x", typeOf<String>()),
+                    Value("y", typeOf<String>()),
+                    Value("z", typeOf<String>()),
                 ),
                 statement.args,
             )
@@ -96,17 +97,17 @@ class TwoWayTemplateStatementBuilderTest {
         @Test
         fun multipleValues_null() {
             val template = "select name, age from person where name in /*name*/('a', 'b') and age > 1"
-            val valueMap = mapOf("name" to Value(null, Any::class))
+            val valueMap = mapOf("name" to Value(null, typeOf<Any>()))
             val statement = statementBuilder.build(template, valueMap, extensions)
             assertEquals("select name, age from person where name in ? and age > 1", statement.toSql())
-            assertEquals(listOf(Value(null, Any::class)), statement.args)
+            assertEquals(listOf(Value(null, typeOf<Any>())), statement.args)
         }
 
         @Test
         fun multipleValues_empty() {
             val template = "select name, age from person where name in /*name*/('a', 'b') and age > 1"
             val statement =
-                statementBuilder.build(template, mapOf("name" to Value(emptyList<String>())), extensions)
+                statementBuilder.build(template, mapOf("name" to Value(emptyList<String>(), typeOf<List<String>>())), extensions)
             assertEquals("select name, age from person where name in (null) and age > 1", statement.toSql())
             assertTrue(statement.args.isEmpty())
         }
@@ -115,7 +116,7 @@ class TwoWayTemplateStatementBuilderTest {
         fun pairValues() {
             val statement = statementBuilder.build(
                 "select name, age from person where (name, age) in /*pairs*/(('a', 'b'), ('c', 'd'))",
-                mapOf("pairs" to Value(listOf("x" to 1, "y" to 2, "z" to 3))),
+                mapOf("pairs" to Value(listOf("x" to 1, "y" to 2, "z" to 3), typeOf<Pair<String, Int>>())),
                 extensions,
             )
             assertEquals(
@@ -124,12 +125,12 @@ class TwoWayTemplateStatementBuilderTest {
             )
             assertEquals(
                 listOf(
-                    Value("x"),
-                    Value(1),
-                    Value("y"),
-                    Value(2),
-                    Value("z"),
-                    Value(3),
+                    Value("x", typeOf<String>()),
+                    Value(1, typeOf<Int>()),
+                    Value("y", typeOf<String>()),
+                    Value(2, typeOf<Int>()),
+                    Value("z", typeOf<String>()),
+                    Value(3, typeOf<Int>()),
                 ),
                 statement.args,
             )
@@ -146,6 +147,7 @@ class TwoWayTemplateStatementBuilderTest {
                             Triple("y", 2, 20),
                             Triple("z", 3, 30),
                         ),
+                        typeOf<List<Triple<String, Int, Int>>>(),
                     ),
                 ),
                 extensions,
@@ -156,9 +158,9 @@ class TwoWayTemplateStatementBuilderTest {
             )
             assertEquals(
                 listOf(
-                    Value("x"), Value(1), Value(10),
-                    Value("y"), Value(2), Value(20),
-                    Value("z"), Value(3), Value(30),
+                    Value("x", typeOf<String>()), Value(1, typeOf<Int>()), Value(10, typeOf<Int>()),
+                    Value("y", typeOf<String>()), Value(2, typeOf<Int>()), Value(20, typeOf<Int>()),
+                    Value("z", typeOf<String>()), Value(3, typeOf<Int>()), Value(30, typeOf<Int>()),
                 ),
                 statement.args,
             )
@@ -172,7 +174,7 @@ class TwoWayTemplateStatementBuilderTest {
         fun `Include the 'order by' clause into the embedded value`() {
             val template = "select name, age from person where age > 1 /*# orderBy */"
             val statement =
-                statementBuilder.build(template, mapOf("orderBy" to Value("order by name")), extensions)
+                statementBuilder.build(template, mapOf("orderBy" to Value("order by name", typeOf<String>())), extensions)
             assertEquals("select name, age from person where age > 1 order by name", statement.toSql())
         }
 
@@ -180,14 +182,14 @@ class TwoWayTemplateStatementBuilderTest {
         fun `Exclude the 'order by' clause from the embedded value`() {
             val template = "select name, age from person where age > 1 order by /*# orderBy */"
             val statement =
-                statementBuilder.build(template, mapOf("orderBy" to Value("name, age")), extensions)
+                statementBuilder.build(template, mapOf("orderBy" to Value("name, age", typeOf<String>())), extensions)
             assertEquals("select name, age from person where age > 1 order by name, age", statement.toSql())
         }
 
         @Test
         fun `Remove the 'order by' clause automatically`() {
             val template = "select name, age from person where age > 1 order by /*# orderBy */"
-            val statement = statementBuilder.build(template, mapOf("orderBy" to Value("")), extensions)
+            val statement = statementBuilder.build(template, mapOf("orderBy" to Value("", typeOf<String>())), extensions)
             assertEquals("select name, age from person where age > 1 ", statement.toSql())
         }
     }
@@ -198,7 +200,7 @@ class TwoWayTemplateStatementBuilderTest {
         @Test
         fun test() {
             val template = "select name, age from person where name = /*^name*/'test' and age > 1"
-            val statement = statementBuilder.build(template, mapOf("name" to Value("aaa")), extensions)
+            val statement = statementBuilder.build(template, mapOf("name" to Value("aaa", typeOf<String>())), extensions)
             assertEquals("select name, age from person where name = 'aaa' and age > 1", statement.toSql())
         }
     }
@@ -209,16 +211,16 @@ class TwoWayTemplateStatementBuilderTest {
         fun if_true() {
             val template =
                 "select name, age from person where /*%if name != null*/name = /*name*/'test'/*%end*/ and 1 = 1"
-            val statement = statementBuilder.build(template, mapOf("name" to Value("aaa")), extensions)
+            val statement = statementBuilder.build(template, mapOf("name" to Value("aaa", typeOf<String>())), extensions)
             assertEquals("select name, age from person where name = ? and 1 = 1", statement.toSql())
-            assertEquals(listOf(Value("aaa")), statement.args)
+            assertEquals(listOf(Value("aaa", typeOf<String>())), statement.args)
         }
 
         @Test
         fun if_false() {
             val template =
                 "select name, age from person where /*%if name != null*/name = /*name*/'test'/*%end*/ and 1 = 1"
-            val statement = statementBuilder.build(template, mapOf("name" to Value(null, String::class)), extensions)
+            val statement = statementBuilder.build(template, mapOf("name" to Value(null, typeOf<String>())), extensions)
             assertEquals("select name, age from person where   1 = 1", statement.toSql())
         }
 
@@ -226,7 +228,7 @@ class TwoWayTemplateStatementBuilderTest {
         fun `Remove the 'where' clause automatically`() {
             val template =
                 "select name, age from person where /*%if name != null*/name = /*name*/'test'/*%end*/ order by name"
-            val statement = statementBuilder.build(template, mapOf("name" to Value(null, String::class)), extensions)
+            val statement = statementBuilder.build(template, mapOf("name" to Value(null, typeOf<String>())), extensions)
             assertEquals("select name, age from person   order by name", statement.toSql())
         }
 
@@ -234,7 +236,7 @@ class TwoWayTemplateStatementBuilderTest {
         fun `Remove the 'where' and 'order by' clauses automatically`() {
             val template =
                 "select name, age from person where /*%if name != null*/name = /*name*/'test'/*%end*/ order by /*%if false*/name/*%end*/"
-            val statement = statementBuilder.build(template, mapOf("name" to Value(null, String::class)), extensions)
+            val statement = statementBuilder.build(template, mapOf("name" to Value(null, typeOf<String>())), extensions)
             assertEquals("select name, age from person ", statement.toSql())
         }
     }
@@ -246,13 +248,13 @@ class TwoWayTemplateStatementBuilderTest {
             val template =
                 "select name, age from person where /*%for i in list*/age = /*i*/0 /*%if i_has_next *//*# \"or\" */ /*%end*//*%end*/"
             val statement =
-                statementBuilder.build(template, mapOf("list" to Value(listOf(1, 2, 3))), extensions)
+                statementBuilder.build(template, mapOf("list" to Value(listOf(1, 2, 3), typeOf<List<Int>>())), extensions)
             assertEquals("select name, age from person where age = ? or age = ? or age = ? ", statement.toSql())
             assertEquals(
                 listOf(
-                    Value(1),
-                    Value(2),
-                    Value(3),
+                    Value(1, typeOf<Int>()),
+                    Value(2, typeOf<Int>()),
+                    Value(3, typeOf<Int>()),
                 ),
                 statement.args,
             )
@@ -276,7 +278,7 @@ class TwoWayTemplateStatementBuilderTest {
                 Item(Product1(Product2(2)), "Item2"),
                 Item(Product1(Product2(3)), "Item3"),
             )
-            val valueMap = mapOf("items" to Value(items))
+            val valueMap = mapOf("items" to Value(items, typeOf<List<Item>>()))
             val statement = statementBuilder.build(template, valueMap, extensions)
             assertEquals(6, statement.args.size)
             assertEquals(1, statement.args[0].any)

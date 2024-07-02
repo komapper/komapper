@@ -1,12 +1,12 @@
 package org.komapper.core.dsl.metamodel
 
 import org.komapper.core.ThreadSafe
-import kotlin.reflect.KClass
+import kotlin.reflect.KType
 
 @ThreadSafe
 class PropertyDescriptor<ENTITY, EXTERIOR : Any, INTERIOR : Any>(
-    val exteriorClass: KClass<EXTERIOR>,
-    val interiorClass: KClass<INTERIOR>,
+    val exteriorType: KType,
+    val interiorType: KType,
     val name: String,
     val columnName: String,
     val alwaysQuote: Boolean,

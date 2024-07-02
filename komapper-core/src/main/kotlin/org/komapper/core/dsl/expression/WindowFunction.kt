@@ -2,14 +2,15 @@
 
 package org.komapper.core.dsl.expression
 
-import kotlin.reflect.KClass
+import kotlin.reflect.KType
+import kotlin.reflect.typeOf
 
 sealed interface WindowFunction<T : Any, S : Any> : ColumnExpression<T, S>
 
 internal object RowNumber : WindowFunction<Long, Long> {
     override val owner: TableExpression<*> get() = throw UnsupportedOperationException()
-    override val exteriorClass: KClass<Long> = Long::class
-    override val interiorClass: KClass<Long> = Long::class
+    override val exteriorType: KType = typeOf<Long>()
+    override val interiorType: KType = typeOf<Long>()
     override val wrap: (Long) -> Long = { it }
     override val unwrap: (Long) -> Long = { it }
     override val columnName: String get() = throw UnsupportedOperationException()
@@ -19,8 +20,8 @@ internal object RowNumber : WindowFunction<Long, Long> {
 
 internal object Rank : WindowFunction<Long, Long> {
     override val owner: TableExpression<*> get() = throw UnsupportedOperationException()
-    override val exteriorClass: KClass<Long> = Long::class
-    override val interiorClass: KClass<Long> = Long::class
+    override val exteriorType: KType = typeOf<Long>()
+    override val interiorType: KType = typeOf<Long>()
     override val wrap: (Long) -> Long = { it }
     override val unwrap: (Long) -> Long = { it }
     override val columnName: String get() = throw UnsupportedOperationException()
@@ -30,8 +31,8 @@ internal object Rank : WindowFunction<Long, Long> {
 
 internal object DenseRank : WindowFunction<Long, Long> {
     override val owner: TableExpression<*> get() = throw UnsupportedOperationException()
-    override val exteriorClass: KClass<Long> = Long::class
-    override val interiorClass: KClass<Long> = Long::class
+    override val exteriorType: KType = typeOf<Long>()
+    override val interiorType: KType = typeOf<Long>()
     override val wrap: (Long) -> Long = { it }
     override val unwrap: (Long) -> Long = { it }
     override val columnName: String get() = throw UnsupportedOperationException()
@@ -41,8 +42,8 @@ internal object DenseRank : WindowFunction<Long, Long> {
 
 internal object PercentRank : WindowFunction<Double, Double> {
     override val owner: TableExpression<*> get() = throw UnsupportedOperationException()
-    override val exteriorClass: KClass<Double> = Double::class
-    override val interiorClass: KClass<Double> = Double::class
+    override val exteriorType: KType = typeOf<Double>()
+    override val interiorType: KType = typeOf<Double>()
     override val wrap: (Double) -> Double = { it }
     override val unwrap: (Double) -> Double = { it }
     override val columnName: String get() = throw UnsupportedOperationException()
@@ -52,8 +53,8 @@ internal object PercentRank : WindowFunction<Double, Double> {
 
 internal object CumeDist : WindowFunction<Double, Double> {
     override val owner: TableExpression<*> get() = throw UnsupportedOperationException()
-    override val exteriorClass: KClass<Double> = Double::class
-    override val interiorClass: KClass<Double> = Double::class
+    override val exteriorType: KType = typeOf<Double>()
+    override val interiorType: KType = typeOf<Double>()
     override val wrap: (Double) -> Double = { it }
     override val unwrap: (Double) -> Double = { it }
     override val columnName: String get() = throw UnsupportedOperationException()
@@ -63,8 +64,8 @@ internal object CumeDist : WindowFunction<Double, Double> {
 
 internal data class Ntile(val bucketSize: Operand) : WindowFunction<Int, Int> {
     override val owner: TableExpression<*> get() = throw UnsupportedOperationException()
-    override val exteriorClass: KClass<Int> = Int::class
-    override val interiorClass: KClass<Int> = Int::class
+    override val exteriorType: KType = typeOf<Int>()
+    override val interiorType: KType = typeOf<Int>()
     override val wrap: (Int) -> Int = { it }
     override val unwrap: (Int) -> Int = { it }
     override val columnName: String get() = throw UnsupportedOperationException()
@@ -111,8 +112,8 @@ internal data class WindowDefinitionImpl<T : Any, S : Any>(
     override val frame: WindowFrame?,
 ) : WindowDefinition<T, S> {
     override val owner: TableExpression<*> get() = function.owner
-    override val exteriorClass: KClass<T> get() = function.exteriorClass
-    override val interiorClass: KClass<S> get() = function.interiorClass
+    override val exteriorType: KType = function.exteriorType
+    override val interiorType: KType = function.interiorType
     override val wrap: (S) -> T get() = function.wrap
     override val unwrap: (T) -> S get() = function.unwrap
     override val columnName: String get() = function.columnName

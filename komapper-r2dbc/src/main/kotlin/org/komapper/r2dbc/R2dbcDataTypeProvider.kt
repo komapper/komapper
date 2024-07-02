@@ -1,11 +1,11 @@
 package org.komapper.r2dbc
 
 import org.komapper.core.ThreadSafe
-import kotlin.reflect.KClass
+import kotlin.reflect.KType
 
 @ThreadSafe
 interface R2dbcDataTypeProvider {
-    fun <T : Any> get(klass: KClass<out T>): R2dbcDataType<T>?
+    fun <T : Any> get(type: KType): R2dbcDataType<T>?
 }
 
 abstract class AbstractR2dbcDataTypeProvider(
@@ -13,12 +13,12 @@ abstract class AbstractR2dbcDataTypeProvider(
     dataTypes: List<R2dbcDataType<*>>,
 ) : R2dbcDataTypeProvider {
 
-    private val dataTypeMap: Map<KClass<*>, R2dbcDataType<*>> = dataTypes.associateBy { it.klass }
+    private val dataTypeMap: Map<KType, R2dbcDataType<*>> = dataTypes.associateBy { it.type }
 
-    override fun <T : Any> get(klass: KClass<out T>): R2dbcDataType<T>? {
+    override fun <T : Any> get(type: KType): R2dbcDataType<T>? {
         @Suppress("UNCHECKED_CAST")
-        val dataType = dataTypeMap[klass] as R2dbcDataType<T>?
-        return dataType ?: next.get(klass)
+        val dataType = dataTypeMap[type] as R2dbcDataType<T>?
+        return dataType ?: next.get(type)
     }
 }
 
@@ -32,5 +32,5 @@ fun R2dbcDataTypeProvider(vararg dataTypes: R2dbcDataType<*>): R2dbcDataTypeProv
 }
 
 internal object R2dbcEmptyDataTypeProvider : R2dbcDataTypeProvider {
-    override fun <T : Any> get(klass: KClass<out T>): R2dbcDataType<T>? = null
+    override fun <T : Any> get(type: KType): R2dbcDataType<T>? = null
 }

@@ -1,5 +1,6 @@
 package org.komapper.core
 
+import kotlin.reflect.typeOf
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -11,12 +12,12 @@ internal class StatementTest {
             Statement(
                 listOf(
                     StatementPart.Text("select * from employee where name = "),
-                    StatementPart.Value(Value("aaa")),
+                    StatementPart.Value(Value("aaa", typeOf<String>())),
                     StatementPart.Text(" and age = "),
-                    StatementPart.Value(Value(20)),
+                    StatementPart.Value(Value(20, typeOf<Int>())),
                 ),
             )
-        assertEquals(listOf(Value("aaa"), Value(20)), statement.args)
+        assertEquals(listOf(Value("aaa", typeOf<String>()), Value(20, typeOf<Int>())), statement.args)
     }
 
     @Test
@@ -25,9 +26,9 @@ internal class StatementTest {
             Statement(
                 listOf(
                     StatementPart.Text("select * from employee where name = "),
-                    StatementPart.Value(Value("aaa")),
+                    StatementPart.Value(Value("aaa", typeOf<String>())),
                     StatementPart.Text(" and age = "),
-                    StatementPart.Value(Value(20)),
+                    StatementPart.Value(Value(20, typeOf<Int>())),
                 ),
             )
         assertEquals("select * from employee where name = ? and age = ?", statement.toSql())

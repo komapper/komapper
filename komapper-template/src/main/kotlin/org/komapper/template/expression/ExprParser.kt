@@ -35,6 +35,7 @@ import org.komapper.template.expression.ExprTokenType.WHITESPACE
 import java.math.BigDecimal
 import java.util.Deque
 import java.util.LinkedList
+import kotlin.reflect.typeOf
 
 internal class ExprParser(
     private val expression: String,
@@ -119,13 +120,13 @@ internal class ExprParser(
 
     private fun parseStringLiteral() {
         val value = token.substring(1, token.length - 1)
-        val node = ExprNode.Literal(location, value, String::class)
+        val node = ExprNode.Literal(location, value, typeOf<String>())
         nodes.push(node)
     }
 
     private fun parseCharLiteral() {
         val value = token[1]
-        val node = ExprNode.Literal(location, value, Char::class)
+        val node = ExprNode.Literal(location, value, typeOf<Char>())
         nodes.push(node)
     }
 
@@ -133,7 +134,7 @@ internal class ExprParser(
         val start = if (token[0] == '+') 1 else 0
         val end = token.length
         val value = Integer.valueOf(token.substring(start, end))
-        val node = ExprNode.Literal(location, value, Int::class)
+        val node = ExprNode.Literal(location, value, typeOf<Int>())
         nodes.push(node)
     }
 
@@ -141,7 +142,7 @@ internal class ExprParser(
         val start = if (token[0] == '+') 1 else 0
         val end = token.length - 1
         val value = java.lang.Long.valueOf(token.substring(start, end))
-        val node = ExprNode.Literal(location, value, Long::class)
+        val node = ExprNode.Literal(location, value, typeOf<Long>())
         nodes.push(node)
     }
 
@@ -149,7 +150,7 @@ internal class ExprParser(
         val start = if (token[0] == '+') 1 else 0
         val end = token.length - 1
         val value = java.lang.Float.valueOf(token.substring(start, end))
-        val node = ExprNode.Literal(location, value, Float::class)
+        val node = ExprNode.Literal(location, value, typeOf<Float>())
         nodes.push(node)
     }
 
@@ -157,7 +158,7 @@ internal class ExprParser(
         val start = if (token[0] == '+') 1 else 0
         val end = token.length - 1
         val value = java.lang.Double.valueOf(token.substring(start, end))
-        val node = ExprNode.Literal(location, value, Double::class)
+        val node = ExprNode.Literal(location, value, typeOf<Double>())
         nodes.push(node)
     }
 
@@ -165,22 +166,22 @@ internal class ExprParser(
         val start = 0
         val end = token.length - 1
         val value = BigDecimal(token.substring(start, end))
-        val node = ExprNode.Literal(location, value, BigDecimal::class)
+        val node = ExprNode.Literal(location, value, typeOf<BigDecimal>())
         nodes.push(node)
     }
 
     private fun parseTrueLiteral() {
-        val node = ExprNode.Literal(location, true, Boolean::class)
+        val node = ExprNode.Literal(location, true, typeOf<Boolean>())
         nodes.push(node)
     }
 
     private fun parseFalseLiteral() {
-        val node = ExprNode.Literal(location, false, Boolean::class)
+        val node = ExprNode.Literal(location, false, typeOf<Boolean>())
         nodes.push(node)
     }
 
     private fun parseNullLiteral() {
-        val node = ExprNode.Literal(location, null, Any::class)
+        val node = ExprNode.Literal(location, null, typeOf<Any>())
         nodes.push(node)
     }
 

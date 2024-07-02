@@ -319,4 +319,36 @@ class EntityProcessorOkTest : AbstractKspTest(EntityProcessorProvider()) {
         )
         assertEquals(KotlinCompilation.ExitCode.OK, result.exitCode)
     }
+
+    @Test
+    fun `Allow generic property types`() {
+        val result = compile(
+            """
+            package test
+            import org.komapper.annotation.*
+            @KomapperEntity
+            data class Dept(
+                @KomapperId val id: Int,
+                val names: List<String>,
+            )
+            """,
+        )
+        assertEquals(KotlinCompilation.ExitCode.OK, result.exitCode)
+    }
+
+    @Test
+    fun `Allow generic property types, @KomapperEmbedded`() {
+        val result = compile(
+            """
+            package test
+            import org.komapper.annotation.*
+            @KomapperEntity
+            data class Dept(
+                @KomapperId val id: Int,
+                @KomapperEmbedded val info: Pair<String, List<Int>>,
+            )
+            """,
+        )
+        assertEquals(KotlinCompilation.ExitCode.OK, result.exitCode)
+    }
 }
