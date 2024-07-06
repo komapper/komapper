@@ -4,12 +4,13 @@ import integration.core.enumclass.Mood
 import io.r2dbc.spi.Row
 import io.r2dbc.spi.Statement
 import org.komapper.r2dbc.spi.R2dbcUserDefinedDataType
-import kotlin.reflect.KClass
+import kotlin.reflect.KType
+import kotlin.reflect.typeOf
 
 class MoodType : R2dbcUserDefinedDataType<Mood> {
     override val name: String = "mood"
 
-    override val klass: KClass<Mood> = Mood::class
+    override val type: KType = typeOf<Mood>()
 
     override val r2dbcType: Class<Mood> = Mood::class.javaObjectType
 

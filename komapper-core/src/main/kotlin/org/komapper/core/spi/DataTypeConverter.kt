@@ -1,14 +1,31 @@
 package org.komapper.core.spi
 
-import kotlin.reflect.KClass
+import kotlin.reflect.KType
 
+/**
+ * A converter that converts a data type between an exterior type and an interior type.
+ */
 interface DataTypeConverter<EXTERIOR : Any, INTERIOR : Any> {
 
-    val exteriorClass: KClass<EXTERIOR>
+    /**
+     * The exterior type.
+     * [KType.isMarkedNullable] must be false.
+     */
+    val exteriorType: KType
 
-    val interiorClass: KClass<INTERIOR>
+    /**
+     * The interior type.
+     * [KType.isMarkedNullable] must be false.
+     */
+    val interiorType: KType
 
+    /**
+     * Converts the interior type to the exterior type.
+     */
     fun wrap(interior: INTERIOR): EXTERIOR
 
+    /**
+     * Converts the exterior type to the interior type.
+     */
     fun unwrap(exterior: EXTERIOR): INTERIOR
 }

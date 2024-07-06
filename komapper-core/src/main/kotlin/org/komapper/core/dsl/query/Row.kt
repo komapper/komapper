@@ -7,7 +7,8 @@ import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.OffsetDateTime
 import java.util.UUID
-import kotlin.reflect.KClass
+import kotlin.reflect.KType
+import kotlin.reflect.typeOf
 
 /**
  * Represents a single row connected to the result set obtained by query execution.
@@ -16,25 +17,26 @@ import kotlin.reflect.KClass
  * Note that columns are numbered from 0.
  */
 interface Row {
-    fun <T : Any> get(index: Int, klass: KClass<T>): T?
-    fun <T : Any> get(columnLabel: String, klass: KClass<T>): T?
+    fun <T : Any> get(index: Int, type: KType): T?
+
+    fun <T : Any> get(columnLabel: String, type: KType): T?
 }
 
 inline fun <reified T : Any> Row.get(index: Int): T? {
-    return get(index, T::class)
+    return get(index, typeOf<T>())
 }
 
 inline fun <reified T : Any> Row.get(columnLabel: String): T? {
-    return get(columnLabel, T::class)
+    return get(columnLabel, typeOf<T>())
 }
 
 inline fun <reified T : Any> Row.getNotNull(index: Int): T {
-    val nullable = get(index, T::class)
+    val nullable = get<T>(index, typeOf<T>())
     return checkNotNull(nullable) { "The returning value is null. index=$index" }
 }
 
 inline fun <reified T : Any> Row.getNotNull(columnLabel: String): T {
-    val nullable = get(columnLabel, T::class)
+    val nullable = get<T>(columnLabel, typeOf<T>())
     return checkNotNull(nullable) { "The returning value is null. columnLabel=$columnLabel" }
 }
 

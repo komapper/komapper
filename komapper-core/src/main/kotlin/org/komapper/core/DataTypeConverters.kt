@@ -7,6 +7,10 @@ object DataTypeConverters {
 
     fun get(): List<DataTypeConverter<*, *>> {
         val loader = ServiceLoader.load(DataTypeConverter::class.java)
-        return loader.toList()
+        return loader.toList().onEach {
+            val className = it::class.qualifiedName
+            it.exteriorType.mustNotBeMarkedNullable(className, "exteriorType")
+            it.interiorType.mustNotBeMarkedNullable(className, "interiorType")
+        }
     }
 }

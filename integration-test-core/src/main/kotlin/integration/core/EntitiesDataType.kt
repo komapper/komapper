@@ -156,6 +156,14 @@ data class LongData(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true)
 data class OffsetDateTimeData(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true) val value: OffsetDateTime?)
 
 @KomapperEntity
+@KomapperTable("string_data")
+data class PairOfStringData(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true) val value: Pair<String, String>?)
+
+@KomapperEntity
+@KomapperTable("string_data")
+data class PairOfIntData(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true) val value: Pair<Int, Int>?)
+
+@KomapperEntity
 @KomapperTable("period_data")
 data class PeriodData(@KomapperId val id: Int, @KomapperColumn(alwaysQuote = true) val value: Period?)
 

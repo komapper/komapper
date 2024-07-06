@@ -843,40 +843,6 @@ class EntityProcessorErrorTest : AbstractKspTest(EntityProcessorProvider()) {
     }
 
     @Test
-    fun `The property must not be a generic type`() {
-        val result = compile(
-            """
-            package test
-            import org.komapper.annotation.*
-            @KomapperEntity
-            data class Dept(
-                @KomapperId val id: Int,
-                val names: List<String>,
-            )
-            """,
-        )
-        assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
-        assertTrue(result.messages.contains("The property \"names\" must not be a generic type \"List<String>\"."))
-    }
-
-    @Test
-    fun `The property must not be a generic type, @KomapperEmbedded`() {
-        val result = compile(
-            """
-            package test
-            import org.komapper.annotation.*
-            @KomapperEntity
-            data class Dept(
-                @KomapperId val id: Int,
-                @KomapperEmbedded val info: Pair<String, List<Int>>,
-            )
-            """,
-        )
-        assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, result.exitCode)
-        assertTrue(result.messages.contains("The property \"info.second\" must not be a generic type \"List<Int>\"."))
-    }
-
-    @Test
     fun `The property is not found in the class, @KomapperColumnOverride`() {
         val result = compile(
             """

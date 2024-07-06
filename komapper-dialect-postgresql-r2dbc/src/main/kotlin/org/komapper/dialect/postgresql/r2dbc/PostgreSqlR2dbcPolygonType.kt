@@ -3,8 +3,9 @@ package org.komapper.dialect.postgresql.r2dbc
 import io.r2dbc.postgresql.codec.Polygon
 import io.r2dbc.spi.Row
 import org.komapper.r2dbc.AbstractR2dbcDataType
+import kotlin.reflect.typeOf
 
-object PostgreSqlR2dbcPolygonType : AbstractR2dbcDataType<Polygon>(Polygon::class) {
+object PostgreSqlR2dbcPolygonType : AbstractR2dbcDataType<Polygon>(typeOf<Polygon>()) {
     override val name: String = "polygon"
 
     override fun getValue(row: Row, index: Int): Polygon? {

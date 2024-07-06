@@ -23,6 +23,8 @@ import integration.core.LocalDateTimeData
 import integration.core.LocalTimeData
 import integration.core.LongData
 import integration.core.OffsetDateTimeData
+import integration.core.PairOfIntData
+import integration.core.PairOfStringData
 import integration.core.Run
 import integration.core.ShortData
 import integration.core.StringData
@@ -64,6 +66,8 @@ import integration.core.localDateTimeData
 import integration.core.localTimeData
 import integration.core.longData
 import integration.core.offsetDateTimeData
+import integration.core.pairOfIntData
+import integration.core.pairOfStringData
 import integration.core.shortData
 import integration.core.stringData
 import integration.core.uByteData
@@ -862,6 +866,58 @@ class R2dbcDataTypeTest(val db: R2dbcDatabase) {
     fun offsetDateTime_null(info: TestInfo) = inTransaction(db, info) {
         val m = Meta.offsetDateTimeData
         val data = OffsetDateTimeData(1, null)
+        db.runQuery { QueryDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        assertEquals(data, data2)
+    }
+
+    @Test
+    fun pairOfInt(info: TestInfo) = inTransaction(db, info) {
+        val m = Meta.pairOfIntData
+        val data = PairOfIntData(1, 10 to 20)
+        db.runQuery { QueryDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        assertEquals(data, data2)
+        val data3 = db.runQuery {
+            QueryDsl.from(m).where { m.value eq (10 to 20) }.first()
+        }
+        assertEquals(data, data3)
+    }
+
+    @Test
+    fun pairOfInt_null(info: TestInfo) = inTransaction(db, info) {
+        val m = Meta.pairOfIntData
+        val data = PairOfIntData(1, null)
+        db.runQuery { QueryDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        assertEquals(data, data2)
+    }
+
+    @Test
+    fun pairOfString(info: TestInfo) = inTransaction(db, info) {
+        val m = Meta.pairOfStringData
+        val data = PairOfStringData(1, "a" to "b")
+        db.runQuery { QueryDsl.insert(m).single(data) }
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        assertEquals(data, data2)
+        val data3 = db.runQuery {
+            QueryDsl.from(m).where { m.value eq ("a" to "b") }.first()
+        }
+        assertEquals(data, data3)
+    }
+
+    @Test
+    fun pairOfString_null(info: TestInfo) = inTransaction(db, info) {
+        val m = Meta.pairOfStringData
+        val data = PairOfStringData(1, null)
         db.runQuery { QueryDsl.insert(m).single(data) }
         val data2 = db.runQuery {
             QueryDsl.from(m).where { m.id eq 1 }.first()

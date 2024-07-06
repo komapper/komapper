@@ -13,11 +13,13 @@ import org.komapper.template.sql.SqlException
 import org.komapper.template.sql.SqlLocation
 import org.komapper.template.sql.SqlNode
 import org.komapper.template.sql.SqlNodeFactory
+import kotlin.reflect.KClass
 import kotlin.reflect.KProperty1
+import kotlin.reflect.full.createType
 import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.full.primaryConstructor
 import kotlin.reflect.jvm.isAccessible
-import kotlin.reflect.jvm.jvmErasure
+import kotlin.reflect.typeOf
 
 internal class TwoWayTemplateStatementBuilder(
     private val dialect: BuilderDialect,
@@ -204,8 +206,8 @@ internal class TwoWayTemplateStatementBuilder(
             while (it.hasNext()) {
                 val each = it.next()
                 s.valueMap[id] = newValue(each)
-                s.valueMap[idIndex] = Value(index++, Int::class)
-                s.valueMap[idHasNext] = Value(it.hasNext(), Boolean::class)
+                s.valueMap[idIndex] = Value(index++, typeOf<Int>())
+                s.valueMap[idHasNext] = Value(it.hasNext(), typeOf<Boolean>())
                 s = node.forDirective.nodeList.fold(s, ::visit)
             }
             if (preserved != null) {
@@ -224,12 +226,12 @@ internal class TwoWayTemplateStatementBuilder(
     }
 
     private fun newValue(o: Any?): Value<*> {
-        val value = Value(o, o?.let { it::class } ?: Any::class)
+        val value = Value(o, o?.let { it::class.createType() } ?: typeOf<Any>())
         return rebuildValue(value)
     }
 
     private fun rebuildValue(value: Value<*>): Value<*> {
-        val klass = value.klass
+        val klass = value.type.classifier as KClass<*>
         return if (klass.isValue) {
             val parameter = klass.primaryConstructor?.parameters?.firstOrNull()
                 ?: error("The parameter is not found for the primary constructor of ${klass.qualifiedName}.")
@@ -244,7 +246,7 @@ internal class TwoWayTemplateStatementBuilder(
                     property.get(any)
                 }
             }
-            Value(v, property.returnType.jvmErasure, value.masking)
+            Value(v, property.returnType, value.masking)
         } else {
             value
         }

@@ -5,12 +5,13 @@ import org.komapper.jdbc.spi.JdbcUserDefinedDataType
 import java.sql.JDBCType
 import java.sql.PreparedStatement
 import java.sql.ResultSet
-import kotlin.reflect.KClass
+import kotlin.reflect.KType
+import kotlin.reflect.typeOf
 
 class UserDefinedStringType : JdbcUserDefinedDataType<UserDefinedString> {
     override val name: String = "varchar(100)"
 
-    override val klass: KClass<UserDefinedString> = UserDefinedString::class
+    override val type: KType = typeOf<UserDefinedString>()
 
     override val jdbcType: JDBCType = JDBCType.VARCHAR
 

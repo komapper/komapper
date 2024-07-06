@@ -15,27 +15,29 @@ import org.komapper.r2dbc.AbstractR2dbcDataType
 import org.komapper.r2dbc.R2dbcDataType
 import org.komapper.r2dbc.R2dbcDataTypeProvider
 import kotlin.reflect.KClass
+import kotlin.reflect.KType
+import kotlin.reflect.typeOf
 
 class R2dbcDatetimeTypeProvider(val next: R2dbcDataTypeProvider) : R2dbcDataTypeProvider {
 
-    override fun <T : Any> get(klass: KClass<out T>): R2dbcDataType<T>? {
-        val dataType: R2dbcDataType<*>? = when (klass) {
+    override fun <T : Any> get(type: KType): R2dbcDataType<T>? {
+        val dataType: R2dbcDataType<*>? = when (type.classifier as KClass<*>) {
             Instant::class -> {
-                val dataType = next.get(java.time.Instant::class)
+                val dataType = next.get<java.time.Instant>(typeOf<java.time.Instant>())
                     ?: error("The dataType is not found for java.time.Instant.")
                 JdbcKotlinInstantType(dataType)
             }
             LocalDate::class -> {
-                val dataType = next.get(java.time.LocalDate::class)
+                val dataType = next.get<java.time.LocalDate>(typeOf<java.time.LocalDate>())
                     ?: error("The dataType is not found for java.time.LocalDate.")
                 JdbcKotlinLocalDateType(dataType)
             }
             LocalDateTime::class -> {
-                val dataType = next.get(java.time.LocalDateTime::class)
+                val dataType = next.get<java.time.LocalDateTime>(typeOf<java.time.LocalDateTime>())
                     ?: error("The dataType is not found for java.time.LocalDateTime.")
                 JdbcKotlinLocalDateTimeType(dataType)
             }
-            else -> next.get(klass)
+            else -> next.get<T>(type)
         }
         @Suppress("UNCHECKED_CAST")
         return dataType as R2dbcDataType<T>?
@@ -43,7 +45,7 @@ class R2dbcDatetimeTypeProvider(val next: R2dbcDataTypeProvider) : R2dbcDataType
 }
 
 internal class JdbcKotlinInstantType(private val dataType: R2dbcDataType<java.time.Instant>) :
-    AbstractR2dbcDataType<Instant>(Instant::class) {
+    AbstractR2dbcDataType<Instant>(typeOf<Instant>()) {
     override val name: String = dataType.name
 
     override fun getValue(row: Row, index: Int): Instant? {
@@ -66,7 +68,7 @@ internal class JdbcKotlinInstantType(private val dataType: R2dbcDataType<java.ti
 }
 
 internal class JdbcKotlinLocalDateType(private val dataType: R2dbcDataType<java.time.LocalDate>) :
-    AbstractR2dbcDataType<LocalDate>(LocalDate::class) {
+    AbstractR2dbcDataType<LocalDate>(typeOf<LocalDate>()) {
     override val name: String = dataType.name
 
     override fun getValue(row: Row, index: Int): LocalDate? {
@@ -89,7 +91,7 @@ internal class JdbcKotlinLocalDateType(private val dataType: R2dbcDataType<java.
 }
 
 internal class JdbcKotlinLocalDateTimeType(private val dataType: R2dbcDataType<java.time.LocalDateTime>) :
-    AbstractR2dbcDataType<LocalDateTime>(LocalDateTime::class) {
+    AbstractR2dbcDataType<LocalDateTime>(typeOf<LocalDateTime>()) {
     override val name: String = dataType.name
 
     override fun getValue(row: Row, index: Int): LocalDateTime? {

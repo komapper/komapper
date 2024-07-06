@@ -334,12 +334,6 @@ internal class EntityFactory(
     }
 
     private fun validatePlainClassProperty(property: LeafProperty, plainClass: PlainClass) {
-        if (!plainClass.isArray && plainClass.declaration.typeParameters.isNotEmpty()) {
-            report(
-                "The property \"${property.path}\" must not be a generic type \"${plainClass.type}\".",
-                property.node,
-            )
-        }
         if (plainClass.alternateType != null) {
             if (plainClass.declaration != plainClass.alternateType.property.type.declaration) {
                 report(

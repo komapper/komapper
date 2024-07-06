@@ -4,7 +4,7 @@ import org.komapper.core.dsl.context.SubqueryContext
 import org.komapper.core.dsl.expression.ScalarExpression
 import org.komapper.core.dsl.expression.ScalarQueryExpression
 import org.komapper.core.dsl.expression.TableExpression
-import kotlin.reflect.KClass
+import kotlin.reflect.KType
 
 /**
  * Represents a query that returns a scalar.
@@ -30,10 +30,10 @@ internal data class NullableScalarQuery<A, B : Any, C : Any>(
         get() = query.context
     override val owner: TableExpression<*>
         get() = expression.owner
-    override val exteriorClass: KClass<B>
-        get() = expression.exteriorClass
-    override val interiorClass: KClass<C>
-        get() = expression.interiorClass
+    override val exteriorType: KType
+        get() = expression.exteriorType
+    override val interiorType: KType
+        get() = expression.interiorType
     override val wrap: (C) -> B
         get() = expression.wrap
     override val unwrap: (B) -> C
@@ -56,10 +56,10 @@ internal data class NotNullScalarQuery<A, B : Any, C : Any>(
         get() = query.context
     override val owner: TableExpression<*>
         get() = expression.owner
-    override val exteriorClass: KClass<B>
-        get() = expression.exteriorClass
-    override val interiorClass: KClass<C>
-        get() = expression.interiorClass
+    override val exteriorType: KType
+        get() = expression.exteriorType
+    override val interiorType: KType
+        get() = expression.interiorType
     override val wrap: (C) -> B
         get() = expression.wrap
     override val unwrap: (B) -> C

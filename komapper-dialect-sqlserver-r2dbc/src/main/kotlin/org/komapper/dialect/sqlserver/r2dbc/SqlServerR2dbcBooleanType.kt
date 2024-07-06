@@ -1,8 +1,9 @@
 package org.komapper.dialect.sqlserver.r2dbc
 
 import org.komapper.r2dbc.AbstractR2dbcDataType
+import kotlin.reflect.typeOf
 
-object SqlServerR2dbcBooleanType : AbstractR2dbcDataType<Boolean>(Boolean::class) {
+object SqlServerR2dbcBooleanType : AbstractR2dbcDataType<Boolean>(typeOf<Boolean>()) {
     override val name: String = "bit"
 
     override fun convertBeforeGetting(value: Any): Boolean {

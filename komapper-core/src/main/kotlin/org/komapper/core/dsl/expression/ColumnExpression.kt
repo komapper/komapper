@@ -1,6 +1,6 @@
 package org.komapper.core.dsl.expression
 
-import kotlin.reflect.KClass
+import kotlin.reflect.KType
 
 sealed interface InteriorExpression<out INTERIOR>
 
@@ -12,8 +12,8 @@ sealed interface InteriorExpression<out INTERIOR>
  */
 sealed interface ColumnExpression<EXTERIOR : Any, INTERIOR : Any> : SortExpression, InteriorExpression<INTERIOR> {
     val owner: TableExpression<*>
-    val exteriorClass: KClass<EXTERIOR>
-    val interiorClass: KClass<INTERIOR>
+    val exteriorType: KType
+    val interiorType: KType
     val wrap: (INTERIOR) -> EXTERIOR
     val unwrap: (EXTERIOR) -> INTERIOR
     val columnName: String

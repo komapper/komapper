@@ -4,7 +4,7 @@ import org.komapper.core.ThreadSafe
 import java.sql.JDBCType
 import java.sql.PreparedStatement
 import java.sql.ResultSet
-import kotlin.reflect.KClass
+import kotlin.reflect.KType
 
 /**
  * Represents a user-defined data type for JDBC access.
@@ -17,9 +17,10 @@ interface JdbcUserDefinedDataType<T : Any> {
     val name: String
 
     /**
-     * The user-defined class.
+     * The user-defined type.
+     * [KType.isMarkedNullable] must be false.
      */
-    val klass: KClass<T>
+    val type: KType
 
     /**
      * The JDBC type defined in the standard library.

@@ -3,7 +3,7 @@ package org.komapper.r2dbc
 import io.r2dbc.spi.Row
 import io.r2dbc.spi.Statement
 import org.komapper.core.DataOperator
-import kotlin.reflect.KClass
+import kotlin.reflect.KType
 
 interface R2dbcDataOperator : DataOperator {
 
@@ -12,20 +12,20 @@ interface R2dbcDataOperator : DataOperator {
      *
      * @param row the row
      * @param index the index
-     * @param valueClass the value class
+     * @param type the value type
      * @return the value
      */
-    fun <T : Any> getValue(row: Row, index: Int, valueClass: KClass<out T>): T?
+    fun <T : Any> getValue(row: Row, index: Int, type: KType): T?
 
     /**
      * Returns the value.
      *
      * @param row the row
      * @param columnLabel the column label
-     * @param valueClass the value class
+     * @param type the value type
      * @return the value
      */
-    fun <T : Any> getValue(row: Row, columnLabel: String, valueClass: KClass<out T>): T?
+    fun <T : Any> getValue(row: Row, columnLabel: String, type: KType): T?
 
     /**
      * Sets the value.
@@ -33,67 +33,67 @@ interface R2dbcDataOperator : DataOperator {
      * @param statement the statement
      * @param index the index
      * @param value the value
-     * @param valueClass the value class
+     * @param type the value type
      */
-    fun <T : Any> setValue(statement: Statement, index: Int, value: T?, valueClass: KClass<out T>)
+    fun <T : Any> setValue(statement: Statement, index: Int, value: T?, type: KType)
 
     /**
      * Returns the data type.
      *
-     * @param klass the value class
+     * @param type the value type
      * @return the data type
      */
-    fun <T : Any> getDataType(klass: KClass<out T>): R2dbcDataType<T>
+    fun <T : Any> getDataType(type: KType): R2dbcDataType<T>
 
     /**
      * Returns the data type or null.
      *
-     * @param klass the value class
+     * @param type the value type
      * @return the data type or null
      */
-    fun <T : Any> getDataTypeOrNull(klass: KClass<out T>): R2dbcDataType<T>?
+    fun <T : Any> getDataTypeOrNull(type: KType): R2dbcDataType<T>?
 }
 
 class DefaultR2dbcDataOperator(private val dialect: R2dbcDialect, private val dataTypeProvider: R2dbcDataTypeProvider) :
     R2dbcDataOperator {
 
-    override fun <T : Any> getValue(row: Row, index: Int, valueClass: KClass<out T>): T? {
-        val dataType = getDataType(valueClass)
+    override fun <T : Any> getValue(row: Row, index: Int, type: KType): T? {
+        val dataType = getDataType<T>(type)
         return dataType.getValue(row, index)
     }
 
-    override fun <T : Any> getValue(row: Row, columnLabel: String, valueClass: KClass<out T>): T? {
-        val dataType = getDataType(valueClass)
+    override fun <T : Any> getValue(row: Row, columnLabel: String, type: KType): T? {
+        val dataType = getDataType<T>(type)
         return dataType.getValue(row, columnLabel)
     }
 
-    override fun <T : Any> setValue(statement: Statement, index: Int, value: T?, valueClass: KClass<out T>) {
-        val dataType = getDataType(valueClass)
+    override fun <T : Any> setValue(statement: Statement, index: Int, value: T?, type: KType) {
+        val dataType = getDataType<T>(type)
         val bindMarker = dialect.getBinder()
         return bindMarker.bind(statement, index, value, dataType)
     }
 
-    override fun <T : Any> formatValue(value: T?, valueClass: KClass<out T>, masking: Boolean): String {
+    override fun <T : Any> formatValue(value: T?, type: KType, masking: Boolean): String {
         return if (masking) {
             dialect.mask
         } else {
-            val dataType = getDataTypeOrNull(valueClass)
+            val dataType = getDataTypeOrNull<T>(type)
             dataType?.toString(value) ?: value.toString()
         }
     }
 
-    override fun <T : Any> getDataType(klass: KClass<out T>): R2dbcDataType<T> {
-        return getDataTypeOrNull(klass) ?: error(
-            "The dataType is not found for the type \"${klass.qualifiedName}\".",
+    override fun <T : Any> getDataType(type: KType): R2dbcDataType<T> {
+        return getDataTypeOrNull(type) ?: error(
+            "The dataType is not found for the type \"${type}\".",
         )
     }
 
-    override fun <T : Any> getDataTypeOrNull(klass: KClass<out T>): R2dbcDataType<T>? {
-        return dataTypeProvider.get(klass)
+    override fun <T : Any> getDataTypeOrNull(type: KType): R2dbcDataType<T>? {
+        return dataTypeProvider.get(type)
     }
 
-    override fun getDataTypeName(klass: KClass<*>): String {
-        val dataType = getDataType(klass)
+    override fun <T : Any> getDataTypeName(type: KType): String {
+        val dataType = getDataType<T>(type)
         return dataType.name
     }
 }

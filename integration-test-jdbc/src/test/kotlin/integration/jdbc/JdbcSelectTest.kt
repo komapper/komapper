@@ -34,6 +34,7 @@ import org.komapper.core.dsl.query.singleOrNull
 import org.komapper.jdbc.JdbcDatabase
 import java.math.BigDecimal
 import java.time.LocalDateTime
+import kotlin.reflect.typeOf
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -340,8 +341,8 @@ class JdbcSelectTest(private val db: JdbcDatabase) {
 
     private fun fromUnixTime(value: Long): ColumnExpression<LocalDateTime, LocalDateTime> {
         val name = "fromUnixTime"
-        val o1 = Operand.SimpleArgument(Long::class, value)
-        return columnExpression(LocalDateTime::class, name, listOf(o1)) {
+        val o1 = Operand.SimpleArgument(typeOf<Long>(), value)
+        return columnExpression(typeOf<LocalDateTime>(), name, listOf(o1)) {
             append("FROM_UNIXTIME(")
             visit(o1)
             append(")")
