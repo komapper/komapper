@@ -29,7 +29,7 @@ class KomapperKSPLogger(private val logger: KSPLogger) : KSPLogger {
 
     private fun convertMessage(message: String, symbol: KSNode?): String {
         return when (val location = symbol?.location) {
-            is FileLocation -> "$message file:///${location.filePath}:${location.lineNumber}"
+            is FileLocation -> "$message file://${location.filePath}:${location.lineNumber}"
             is NonExistLocation, null -> message
         }
     }
