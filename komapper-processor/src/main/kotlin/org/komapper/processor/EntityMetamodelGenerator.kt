@@ -664,8 +664,6 @@ internal class EntityMetamodelGenerator(
     private fun newMetamodel() {
         val paramList =
             "table: String, catalog: String, schema: String, alwaysQuote: Boolean, disableSequenceAssignment: Boolean, declaration: $EntityMetamodelDeclaration<$simpleName>"
-        w.println("    @Deprecated(\"Use another newMetamodel function.\")")
-        w.println("    override fun newMetamodel($paramList) = $simpleName(table, catalog, schema, alwaysQuote, disableSequenceAssignment, declaration, false)")
         w.println("    override fun newMetamodel($paramList, disableAutoIncrement: Boolean) = $simpleName(table, catalog, schema, alwaysQuote, disableSequenceAssignment, declaration, disableAutoIncrement)")
     }
 

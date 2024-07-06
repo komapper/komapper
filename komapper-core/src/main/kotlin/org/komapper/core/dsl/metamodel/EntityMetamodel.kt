@@ -33,17 +33,6 @@ interface EntityMetamodel<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY,
     fun postUpdate(e: ENTITY): ENTITY
     fun newEntity(m: Map<PropertyMetamodel<*, *, *>, Any?>): ENTITY
 
-    @Deprecated("Use another newMetamodel function.")
-    fun newMetamodel(
-        table: String,
-        catalog: String,
-        schema: String,
-        alwaysQuote: Boolean,
-        disableSequenceAssignment: Boolean,
-        declaration: EntityMetamodelDeclaration<META>,
-    ): META
-
-    @Suppress("DEPRECATION")
     fun newMetamodel(
         table: String,
         catalog: String,
@@ -52,7 +41,7 @@ interface EntityMetamodel<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY,
         disableSequenceAssignment: Boolean,
         declaration: EntityMetamodelDeclaration<META>,
         disableAutoIncrement: Boolean = false,
-    ): META = newMetamodel(table, catalog, schema, alwaysQuote, disableSequenceAssignment, declaration)
+    ): META
 }
 
 @Suppress("unused")
@@ -80,16 +69,6 @@ abstract class EntityMetamodelStub<ENTITY : Any, META : EntityMetamodelStub<ENTI
     override fun preInsert(e: ENTITY, c: Clock): ENTITY = fail()
     override fun preUpdate(e: ENTITY, c: Clock): ENTITY = fail()
     override fun postUpdate(e: ENTITY): ENTITY = fail()
-
-    @Deprecated("Use another newMetamodel function.")
-    override fun newMetamodel(
-        table: String,
-        catalog: String,
-        schema: String,
-        alwaysQuote: Boolean,
-        disableSequenceAssignment: Boolean,
-        declaration: EntityMetamodelDeclaration<META>,
-    ): META = fail()
 
     override fun newMetamodel(
         table: String,
@@ -152,18 +131,6 @@ internal object EmptyMetamodel : EntityMetamodel<Nothing, Nothing, EmptyMetamode
     }
 
     override fun newEntity(m: Map<PropertyMetamodel<*, *, *>, Any?>): Nothing {
-        throw UnsupportedOperationException()
-    }
-
-    @Deprecated("Use another newMetamodel function.")
-    override fun newMetamodel(
-        table: String,
-        catalog: String,
-        schema: String,
-        alwaysQuote: Boolean,
-        disableSequenceAssignment: Boolean,
-        declaration: EntityMetamodelDeclaration<EmptyMetamodel>,
-    ): EmptyMetamodel {
         throw UnsupportedOperationException()
     }
 
