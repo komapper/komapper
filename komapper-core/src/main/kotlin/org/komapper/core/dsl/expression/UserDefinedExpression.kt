@@ -2,20 +2,26 @@ package org.komapper.core.dsl.expression
 
 import kotlin.reflect.KType
 
-internal class UserDefinedExpression<EXTERIOR : Any, INTERIOR : Any>(
+interface UserDefinedExpression<EXTERIOR : Any, INTERIOR : Any> : ColumnExpression<EXTERIOR, INTERIOR> {
+    val name: String
+    val operands: List<Operand>
+    fun build(scope: SqlBuilderScope)
+}
+
+internal class UserDefinedExpressionImpl<EXTERIOR : Any, INTERIOR : Any>(
     override val exteriorType: KType,
     override val interiorType: KType,
     override val wrap: (INTERIOR) -> EXTERIOR,
-    private val name: String,
-    private val operands: List<Operand>,
+    override val name: String,
+    override val operands: List<Operand>,
     private val build: SqlBuilderScope.() -> Unit,
-) : ColumnExpression<EXTERIOR, INTERIOR> {
+) : UserDefinedExpression<EXTERIOR, INTERIOR> {
     override val unwrap: (EXTERIOR) -> INTERIOR get() = throw UnsupportedOperationException()
     override val owner: TableExpression<*> get() = throw UnsupportedOperationException()
     override val columnName: String get() = throw UnsupportedOperationException()
     override val alwaysQuote: Boolean get() = throw UnsupportedOperationException()
     override val masking: Boolean get() = throw UnsupportedOperationException()
-    fun build(scope: SqlBuilderScope) {
+    override fun build(scope: SqlBuilderScope) {
         scope.build()
     }
 
@@ -40,4 +46,15 @@ internal class UserDefinedExpression<EXTERIOR : Any, INTERIOR : Any>(
         result = 31 * result + operands.hashCode()
         return result
     }
+}
+
+fun <EXTERIOR : Any, INTERIOR : Any> UserDefinedExpression(
+    exteriorType: KType,
+    interiorType: KType,
+    wrap: (INTERIOR) -> EXTERIOR,
+    name: String,
+    operands: List<Operand>,
+    build: SqlBuilderScope.() -> Unit,
+): UserDefinedExpression<EXTERIOR, INTERIOR> {
+    return UserDefinedExpressionImpl(exteriorType, interiorType, wrap, name, operands, build)
 }

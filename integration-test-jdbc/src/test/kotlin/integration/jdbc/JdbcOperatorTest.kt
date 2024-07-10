@@ -262,7 +262,7 @@ class JdbcOperatorTest(private val db: JdbcDatabase) {
         assertEquals("St. 1", result)
     }
 
-    private fun <T : Any> replace(
+    private inline fun <reified T : Any> replace(
         expression: ColumnExpression<T, String>,
         from: T,
         to: T,
