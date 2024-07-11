@@ -293,7 +293,7 @@ class JdbcInsertSingleTest(private val db: JdbcDatabase) {
     }
 
     @Test
-    fun identityGenerator_onDuplicateKeyUpdate() {
+    fun identity_onDuplicateKeyUpdate() {
         val m = Meta.identityStrategy
         db.runQuery {
             val strategy = IdentityStrategy(0, "first")

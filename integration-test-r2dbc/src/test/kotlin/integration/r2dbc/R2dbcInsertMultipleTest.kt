@@ -11,6 +11,7 @@ import integration.core.department
 import integration.core.identityStrategy
 import integration.core.person
 import org.junit.jupiter.api.TestInfo
+import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.core.UniqueConstraintException
 import org.komapper.core.dsl.Meta
@@ -246,6 +247,7 @@ class R2dbcInsertMultipleTest(private val db: R2dbcDatabase) {
     }
 
     @Test
+    @Run(onlyIf = [Dbms.ORACLE])
     fun identity_onDuplicateKeyUpdate(info: TestInfo) = inTransaction(db, info) {
         val i = Meta.identityStrategy
         val strategies = listOf(
@@ -256,5 +258,21 @@ class R2dbcInsertMultipleTest(private val db: R2dbcDatabase) {
         val query = QueryDsl.insert(i).onDuplicateKeyUpdate().multiple(strategies)
         val count = db.runQuery { query }
         assertEquals(3, count)
+    }
+
+    @Test
+    @Run(onlyIf = [Dbms.ORACLE])
+    fun identity_onDuplicateKeyUpdate_unsupported(info: TestInfo) = inTransaction(db, info) {
+        val i = Meta.identityStrategy
+        val strategies = listOf(
+            IdentityStrategy(null, "AAA"),
+            IdentityStrategy(null, "BBB"),
+            IdentityStrategy(null, "CCC"),
+        )
+        val query = QueryDsl.insert(i).onDuplicateKeyUpdate().multiple(strategies)
+        assertThrows<UnsupportedOperationException> {
+            db.runQuery { query }
+            Unit
+        }
     }
 }
