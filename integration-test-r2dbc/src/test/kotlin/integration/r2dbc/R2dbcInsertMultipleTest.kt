@@ -247,7 +247,7 @@ class R2dbcInsertMultipleTest(private val db: R2dbcDatabase) {
     }
 
     @Test
-    @Run(onlyIf = [Dbms.ORACLE])
+    @Run(unless = [Dbms.ORACLE])
     fun identity_onDuplicateKeyUpdate(info: TestInfo) = inTransaction(db, info) {
         val i = Meta.identityStrategy
         val strategies = listOf(
