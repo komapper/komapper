@@ -3,6 +3,7 @@ package org.komapper.core.dsl.expression
 import org.komapper.core.ThreadSafe
 import org.komapper.core.Value
 import kotlin.reflect.KType
+import kotlin.reflect.typeOf
 
 /**
  * Represents operands in Komapper Query DSL.
@@ -73,5 +74,15 @@ sealed class Operand {
      */
     data class Subquery(val subqueryExpression: SubqueryExpression<*>) : Operand() {
         override val masking: Boolean = false
+    }
+
+    companion object {
+        /**
+         * Creates an [Operand.SimpleArgument].
+         *
+         * @param S the interior type
+         * @param interior the argument value
+         */
+        inline fun <reified S : Any> simpleArgument(interior: S?) = SimpleArgument(typeOf<S>(), interior)
     }
 }

@@ -5,7 +5,6 @@ import org.komapper.core.dsl.expression.Operand
 import org.komapper.core.dsl.expression.ReadOnlyColumnExpression
 import org.komapper.core.dsl.expression.SqlBuilderScope
 import org.komapper.core.dsl.expression.UserDefinedExpression
-import kotlin.reflect.KType
 import kotlin.reflect.typeOf
 
 /**
@@ -21,15 +20,13 @@ import kotlin.reflect.typeOf
  * @param build the SQL builder
  * @return column expression
  */
-fun <T : Any, S : Any> columnExpression(
+inline fun <reified T : Any, reified S : Any> columnExpression(
     baseExpression: ColumnExpression<T, S>,
     name: String,
     operands: List<Operand>,
-    build: SqlBuilderScope.() -> Unit,
+    noinline build: SqlBuilderScope.() -> Unit,
 ): ColumnExpression<T, S> {
     return columnExpression(
-        baseExpression.exteriorType,
-        baseExpression.interiorType,
         baseExpression.wrap,
         name,
         operands,
@@ -43,19 +40,17 @@ fun <T : Any, S : Any> columnExpression(
  * The [name] and [operands] are used to determine identity of the expression.
  *
  * @param T the exterior type and interior type of expression evaluation
- * @param type the type of [T]
  * @param name the name that must be unique among user-defined column expressions
  * @param operands the operand list used in the expression
  * @param build the SQL builder
  * @return column expression
  */
-fun <T : Any> columnExpression(
-    type: KType,
+inline fun <reified T : Any> columnExpression(
     name: String,
     operands: List<Operand>,
-    build: SqlBuilderScope.() -> Unit,
+    noinline build: SqlBuilderScope.() -> Unit,
 ): ColumnExpression<T, T> {
-    return columnExpression(type, type, { it }, name, operands, build)
+    return columnExpression({ it }, name, operands, build)
 }
 
 /**
@@ -65,23 +60,19 @@ fun <T : Any> columnExpression(
  *
  * @param EXTERIOR the exterior type of expression evaluation
  * @param INTERIOR the interior type of expression evaluation
- * @param exteriorType the type of [EXTERIOR]
- * @param interiorType the type of [INTERIOR]
  * @param wrap the function to convert an interior value to an exterior value
  * @param name the name that must be unique among user-defined column expressions
  * @param operands the operand list used in the expression
  * @param build the SQL builder
  * @return column expression
  */
-fun <EXTERIOR : Any, INTERIOR : Any> columnExpression(
-    exteriorType: KType,
-    interiorType: KType,
-    wrap: (INTERIOR) -> EXTERIOR,
+inline fun <reified EXTERIOR : Any, reified INTERIOR : Any> columnExpression(
+    noinline wrap: (INTERIOR) -> EXTERIOR,
     name: String,
     operands: List<Operand>,
-    build: SqlBuilderScope.() -> Unit,
+    noinline build: SqlBuilderScope.() -> Unit,
 ): ColumnExpression<EXTERIOR, INTERIOR> {
-    return UserDefinedExpression(exteriorType, interiorType, wrap, name, operands, build)
+    return UserDefinedExpression(typeOf<EXTERIOR>(), typeOf<INTERIOR>(), wrap, name, operands, build)
 }
 
 /**
