@@ -16,13 +16,12 @@ import org.komapper.core.dsl.expression.Operand
 import org.komapper.core.dsl.expression.TableExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.metamodel.PropertyMetamodel
-import org.komapper.core.dsl.metamodel.getAutoIncrementProperty
 import org.komapper.core.dsl.metamodel.getNonAutoIncrementProperties
 
 internal class OracleEntityUpsertStatementBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val dialect: BuilderDialect,
     private val context: EntityUpsertContext<ENTITY, ID, META>,
-    private val entities: List<ENTITY>,
+    entities: List<ENTITY>,
 ) : EntityUpsertStatementBuilder<ENTITY> {
 
     private val target = context.target
@@ -34,12 +33,6 @@ internal class OracleEntityUpsertStatementBuilder<ENTITY : Any, ID : Any, META :
 
     override fun build(assignments: List<Pair<PropertyMetamodel<ENTITY, *, *>, Operand>>): Statement {
         val keys = context.keys.ifEmpty { context.target.idProperties() }
-        val autoIncrementProperty = context.target.getAutoIncrementProperty()
-        if (autoIncrementProperty != null && autoIncrementProperty in keys) {
-            // fallback to the insert statement
-            val insertStatementBuilder = dialect.getEntityInsertStatementBuilder(dialect, context.insertContext, entities)
-            return insertStatementBuilder.build()
-        }
 
         @Suppress("NAME_SHADOWING")
         val assignments = assignments.filter { (left, _) -> left !in keys }

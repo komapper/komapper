@@ -5,6 +5,7 @@ import org.komapper.core.Dialect
 import org.komapper.core.LocateFunctionType
 import org.komapper.core.dsl.builder.EntityDeleteStatementBuilder
 import org.komapper.core.dsl.builder.EntityInsertStatementBuilder
+import org.komapper.core.dsl.builder.EntityMergeStatementBuilder
 import org.komapper.core.dsl.builder.EntityUpdateStatementBuilder
 import org.komapper.core.dsl.builder.EntityUpsertStatementBuilder
 import org.komapper.core.dsl.builder.RelationDeleteStatementBuilder
@@ -82,7 +83,9 @@ interface OracleDialect : Dialect {
         context: EntityUpsertContext<ENTITY, ID, META>,
         entities: List<ENTITY>,
     ): EntityUpsertStatementBuilder<ENTITY> {
-        return OracleEntityUpsertStatementBuilder(dialect, context, entities)
+        val insertStatementBuilder = OracleEntityInsertStatementBuilder(dialect, context.insertContext, entities)
+        val upsertStatementBuilder = OracleEntityUpsertStatementBuilder(dialect, context, entities)
+        return EntityMergeStatementBuilder(dialect, context, insertStatementBuilder, upsertStatementBuilder)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> getRelationDeleteStatementBuilder(

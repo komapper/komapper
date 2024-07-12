@@ -4,6 +4,7 @@ import org.komapper.core.BuilderDialect
 import org.komapper.core.Dialect
 import org.komapper.core.dsl.builder.EntityDeleteStatementBuilder
 import org.komapper.core.dsl.builder.EntityInsertStatementBuilder
+import org.komapper.core.dsl.builder.EntityMergeStatementBuilder
 import org.komapper.core.dsl.builder.EntityUpsertStatementBuilder
 import org.komapper.core.dsl.builder.RelationDeleteStatementBuilder
 import org.komapper.core.dsl.builder.RelationInsertValuesStatementBuilder
@@ -56,7 +57,9 @@ interface H2Dialect : Dialect {
         context: EntityUpsertContext<ENTITY, ID, META>,
         entities: List<ENTITY>,
     ): EntityUpsertStatementBuilder<ENTITY> {
-        return H2EntityUpsertStatementBuilder(dialect, context, entities)
+        val insertStatementBuilder = H2EntityInsertStatementBuilder(dialect, context.insertContext, entities)
+        val upsertStatementBuilder = H2EntityUpsertStatementBuilder(dialect, context, entities)
+        return EntityMergeStatementBuilder(dialect, context, insertStatementBuilder, upsertStatementBuilder)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> getRelationDeleteStatementBuilder(

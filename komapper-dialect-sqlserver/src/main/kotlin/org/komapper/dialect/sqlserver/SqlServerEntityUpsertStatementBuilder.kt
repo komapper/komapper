@@ -16,13 +16,12 @@ import org.komapper.core.dsl.expression.Operand
 import org.komapper.core.dsl.expression.TableExpression
 import org.komapper.core.dsl.metamodel.EntityMetamodel
 import org.komapper.core.dsl.metamodel.PropertyMetamodel
-import org.komapper.core.dsl.metamodel.getAutoIncrementProperty
 import org.komapper.core.dsl.metamodel.getNonAutoIncrementProperties
 
 internal class SqlServerEntityUpsertStatementBuilder<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     private val dialect: BuilderDialect,
     private val context: EntityUpsertContext<ENTITY, ID, META>,
-    private val entities: List<ENTITY>,
+    entities: List<ENTITY>,
 ) : EntityUpsertStatementBuilder<ENTITY> {
 
     private val target = context.target
@@ -34,14 +33,6 @@ internal class SqlServerEntityUpsertStatementBuilder<ENTITY : Any, ID : Any, MET
     private val sourceStatementBuilder = SourceStatementBuilder(dialect, context, entities)
 
     override fun build(assignments: List<Pair<PropertyMetamodel<ENTITY, *, *>, Operand>>): Statement {
-        val keys = context.keys.ifEmpty { context.target.idProperties() }
-        val autoIncrementProperty = context.target.getAutoIncrementProperty()
-        if (autoIncrementProperty != null && autoIncrementProperty in keys) {
-            // fallback to the insert statement
-            val insertStatementBuilder = dialect.getEntityInsertStatementBuilder(dialect, context.insertContext, entities)
-            return insertStatementBuilder.build()
-        }
-
         buf.append("merge into ")
         table(target, TableNameType.NAME_AND_ALIAS)
         buf.append(" using (")
@@ -57,7 +48,7 @@ internal class SqlServerEntityUpsertStatementBuilder<ENTITY : Any, ID : Any, MET
         buf.append(")")
         buf.append(" on ")
         val excludedPropertyMap = excluded.properties().associateBy { it.name }
-        for (key in keys) {
+        for (key in context.keys.ifEmpty { context.target.idProperties() }) {
             column(key)
             buf.append(" = ")
             column(excludedPropertyMap[key.name]!!)
