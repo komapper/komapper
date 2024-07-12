@@ -292,6 +292,21 @@ class JdbcInsertSingleTest(private val db: JdbcDatabase) {
         }
     }
 
+    @Test
+    fun identity_onDuplicateKeyUpdate() {
+        val m = Meta.identityStrategy
+        db.runQuery {
+            val strategy = IdentityStrategy(0, "first")
+            QueryDsl.insert(m).onDuplicateKeyUpdate().single(strategy)
+        }
+        db.runQuery {
+            val strategy = IdentityStrategy(1, "second")
+            QueryDsl.insert(m).onDuplicateKeyUpdate().single(strategy)
+        }
+        val list = db.runQuery { QueryDsl.from(m) }
+        assertEquals(2, list.size)
+    }
+
     @Run(unless = [Dbms.MYSQL, Dbms.MYSQL_5])
     @Test
     fun sequenceGenerator() {
