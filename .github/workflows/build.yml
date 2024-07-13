@@ -40,6 +40,7 @@ jobs:
       fail-fast: false
       matrix:
         driver: [h2, mariadb, mysql, mysql5, oracle, postgresql, sqlserver]
+        ksp2: [true, false]
     timeout-minutes: 15
 
     steps:
@@ -55,7 +56,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v3.4.2
 
       - name: Test
-        run: ./gradlew javatoolchain :integration-test-jdbc:${{ matrix.driver }}
+        run: ./gradlew javatoolchain :integration-test-jdbc:${{ matrix.driver }} -Pksp.useKSP2=${{ matrix.ksp2 }}
 
       - name: Upload reports
         if: failure()
