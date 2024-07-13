@@ -25,9 +25,9 @@ kotlin {
 
 tasks {
     withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
-        kotlinOptions.freeCompilerArgs += listOf(
-            "-opt-in=org.komapper.annotation.KomapperExperimentalAssociation",
-            "-Xcontext-receivers",
-        )
+        compilerOptions {
+            freeCompilerArgs.add("-opt-in=org.komapper.annotation.KomapperExperimentalAssociation")
+            freeCompilerArgs.add("-Xcontext-receivers")
+        }
     }
 }
