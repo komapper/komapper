@@ -7,7 +7,7 @@ import org.komapper.annotation.KomapperOneToMany
 
 @KomapperOneToMany(MyTestModel::class, "mymodel")
 @KomapperEntity
-data class AnotherModel(
+public data class AnotherModel(
     @KomapperId
     val id: Long,
     val myModelId: Long,

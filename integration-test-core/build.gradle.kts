@@ -19,6 +19,10 @@ ksp {
     arg("komapper.enableEntityStoreContext", "true")
 }
 
+kotlin {
+    explicitApi()
+}
+
 tasks {
     withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
         kotlinOptions.freeCompilerArgs += listOf(

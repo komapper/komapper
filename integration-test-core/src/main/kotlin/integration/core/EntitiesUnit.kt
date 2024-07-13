@@ -10,11 +10,11 @@ import org.komapper.annotation.KomapperUpdatedAt
 import org.komapper.annotation.KomapperVersion
 import java.time.LocalDateTime
 
-object MyMeta
+public object MyMeta
 
 @KomapperEntity(unit = MyMeta::class)
 @KomapperTable("address")
-data class MyAddress(
+public data class MyAddress(
     @KomapperId
     @KomapperColumn(name = "address_id")
     val addressId: Int,
@@ -22,7 +22,7 @@ data class MyAddress(
     @KomapperVersion val version: Int,
 )
 
-data class MyPerson(
+public data class MyPerson(
     val personId: Int,
     val name: String,
     val createdAt: LocalDateTime? = null,
@@ -31,7 +31,7 @@ data class MyPerson(
 
 @KomapperEntityDef(entity = MyPerson::class, unit = MyMeta::class)
 @KomapperTable("person")
-data class MyPersonDef(
+public data class MyPersonDef(
     @KomapperId
     @KomapperColumn("person_id")
     val personId: Nothing,

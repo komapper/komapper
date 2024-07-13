@@ -2,7 +2,7 @@ package integration.core
 
 import org.komapper.core.Database
 
-interface MariaDbSetting<DATABASE : Database> : Setting<DATABASE> {
+public interface MariaDbSetting<DATABASE : Database> : Setting<DATABASE> {
     override val dbms: Dbms get() = Dbms.MARIADB
     override val createSql: String
         get() = """

@@ -10,7 +10,7 @@ import org.komapper.annotation.KomapperVersion
 import java.time.LocalDateTime
 
 @KomapperEntity
-data class Keywords(
+public data class Keywords(
     @KomapperId val `as`: Int,
     val `break`: String,
     @KomapperCreatedAt
@@ -22,27 +22,27 @@ data class Keywords(
 )
 
 @KomapperEntity
-data class KeywordsSingleId(
+public data class KeywordsSingleId(
     @KomapperId val `fun`: Int,
     val `class`: String,
 )
 
 @KomapperEntity
-data class KeywordsMultipleId(
+public data class KeywordsMultipleId(
     @KomapperId val `fun`: Int,
     @KomapperId val `this`: Int,
     val `class`: String,
 )
 
 @KomapperEntity
-data class KeywordsAutoIncrementId(
+public data class KeywordsAutoIncrementId(
     @KomapperId @KomapperAutoIncrement
     val `fun`: Int,
     val `class`: String,
 )
 
 @KomapperEntity
-data class KeywordsSequenceId(
+public data class KeywordsSequenceId(
     @KomapperId
     @KomapperSequence(name = "SEQ")
     val `fun`: Int,
