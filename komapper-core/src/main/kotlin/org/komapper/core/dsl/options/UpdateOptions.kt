@@ -1,13 +1,13 @@
 package org.komapper.core.dsl.options
 
 data class UpdateOptions(
-    override val allowMissingWhereClause: Boolean,
-    override val batchSize: Int?,
-    override val escapeSequence: String?,
-    override val disableOptimisticLock: Boolean,
-    override val queryTimeoutSeconds: Int?,
-    override val suppressLogging: Boolean,
-    override val suppressOptimisticLockException: Boolean,
+    override val allowMissingWhereClause: Boolean = DEFAULT.allowMissingWhereClause,
+    override val batchSize: Int? = DEFAULT.batchSize,
+    override val escapeSequence: String? = DEFAULT.escapeSequence,
+    override val disableOptimisticLock: Boolean = DEFAULT.disableOptimisticLock,
+    override val queryTimeoutSeconds: Int? = DEFAULT.queryTimeoutSeconds,
+    override val suppressLogging: Boolean = DEFAULT.suppressLogging,
+    override val suppressOptimisticLockException: Boolean = DEFAULT.suppressOptimisticLockException,
 ) : BatchOptions, OptimisticLockOptions, WhereOptions {
 
     companion object {

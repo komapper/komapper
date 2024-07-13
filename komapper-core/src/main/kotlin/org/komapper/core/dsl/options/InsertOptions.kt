@@ -1,16 +1,16 @@
 package org.komapper.core.dsl.options
 
 data class InsertOptions(
-    override val batchSize: Int?,
+    override val batchSize: Int? = DEFAULT.batchSize,
     /**
      * Whether to disable assigning sequence-numbered values to primary keys.
      */
-    val disableSequenceAssignment: Boolean,
-    val returnGeneratedKeys: Boolean,
-    override val queryTimeoutSeconds: Int?,
-    override val suppressLogging: Boolean,
-    override val allowMissingWhereClause: Boolean,
-    override val escapeSequence: String?,
+    val disableSequenceAssignment: Boolean = DEFAULT.disableSequenceAssignment,
+    val returnGeneratedKeys: Boolean = DEFAULT.returnGeneratedKeys,
+    override val queryTimeoutSeconds: Int? = DEFAULT.queryTimeoutSeconds,
+    override val suppressLogging: Boolean = DEFAULT.suppressLogging,
+    override val allowMissingWhereClause: Boolean = DEFAULT.allowMissingWhereClause,
+    override val escapeSequence: String? = DEFAULT.escapeSequence,
 ) : WhereOptions, BatchOptions, QueryOptions {
 
     companion object {

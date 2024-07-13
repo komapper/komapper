@@ -13,7 +13,7 @@ import org.komapper.core.dsl.options.InsertOptions
 data class EntityInsertContext<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     val target: META,
     override val returning: Returning = Returning.Expressions(emptyList()),
-    val options: InsertOptions = InsertOptions.DEFAULT,
+    val options: InsertOptions,
 ) : TablesProvider, ReturningProvider {
 
     override fun getTables(): Set<TableExpression<*>> {

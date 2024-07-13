@@ -119,7 +119,7 @@ internal data class SelectQueryBuilderImpl<ENTITY : Any, ID : Any, META : Entity
         left: SubqueryExpression<ENTITY>,
         right: SubqueryExpression<ENTITY>,
     ): FlowSetOperationQuery<ENTITY> {
-        val setOperatorContext = SetOperationContext(kind, left.context, right.context)
+        val setOperatorContext = SetOperationContext(kind, left.context, right.context, options = left.context.options)
         return RelationSetOperationQueryImpl(setOperatorContext, metamodel = context.target)
     }
 

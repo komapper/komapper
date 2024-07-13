@@ -1,9 +1,9 @@
 package org.komapper.core.dsl.options
 
 data class ScriptOptions(
-    val separator: String,
-    override val queryTimeoutSeconds: Int?,
-    override val suppressLogging: Boolean,
+    val separator: String = DEFAULT.separator,
+    override val queryTimeoutSeconds: Int? = DEFAULT.queryTimeoutSeconds,
+    override val suppressLogging: Boolean = DEFAULT.suppressLogging,
 ) : QueryOptions {
 
     companion object {
