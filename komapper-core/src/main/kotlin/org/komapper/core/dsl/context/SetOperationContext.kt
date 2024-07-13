@@ -12,7 +12,7 @@ data class SetOperationContext(
     val left: SubqueryContext,
     val right: SubqueryContext,
     val orderBy: List<SortItem> = listOf(),
-    val options: SelectOptions = SelectOptions.DEFAULT,
+    override val options: SelectOptions,
 ) : TablesProvider, SubqueryContext {
 
     fun getProjection(): Projection {

@@ -120,6 +120,20 @@ class QueryDslTest {
     }
 
     @Test
+    fun selectOptions_setOperation() {
+        val a = Meta.address
+
+        val expected = SelectOptions(fetchSize = 10, queryTimeoutSeconds = 20, suppressLogging = true)
+        var actual: SelectOptions? = null
+        QueryDsl(selectOptions = expected).from(a).union(QueryDsl.from(a)).options {
+            actual = it
+            it
+        }
+        assertNotNull(actual)
+        assertEquals(expected, actual)
+    }
+
+    @Test
     fun templateSelectOptions() {
         val expected = TemplateSelectOptions(fetchSize = 10, queryTimeoutSeconds = 20, suppressLogging = true)
         var actual: TemplateSelectOptions? = null

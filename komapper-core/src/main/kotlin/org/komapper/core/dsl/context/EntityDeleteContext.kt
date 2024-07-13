@@ -12,7 +12,7 @@ import org.komapper.core.dsl.options.DeleteOptions
 data class EntityDeleteContext<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>>(
     val target: META,
     override val returning: Returning = Returning.Expressions(emptyList()),
-    override val options: DeleteOptions = DeleteOptions.DEFAULT,
+    override val options: DeleteOptions,
 ) : TablesProvider, WhereProvider, ReturningProvider {
 
     override fun getTables(): Set<TableExpression<*>> {
@@ -24,6 +24,6 @@ data class EntityDeleteContext<ENTITY : Any, ID : Any, META : EntityMetamodel<EN
     }
 
     fun asRelationDeleteContext(): RelationDeleteContext<ENTITY, ID, META> {
-        return RelationDeleteContext(target)
+        return RelationDeleteContext(target, options = options)
     }
 }

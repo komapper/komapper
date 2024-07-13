@@ -14,7 +14,7 @@ data class RelationDeleteContext<ENTITY : Any, ID : Any, META : EntityMetamodel<
     val target: META,
     val where: WhereDeclaration = {},
     override val returning: Returning = Returning.Expressions(emptyList()),
-    override val options: DeleteOptions = DeleteOptions.DEFAULT,
+    override val options: DeleteOptions,
 ) : TablesProvider, WhereProvider, ReturningProvider {
 
     override fun getTables(): Set<TableExpression<*>> {
