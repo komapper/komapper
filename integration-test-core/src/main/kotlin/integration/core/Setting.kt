@@ -2,9 +2,9 @@ package integration.core
 
 import org.komapper.core.Database
 
-interface Setting<DATABASE : Database> {
-    val database: DATABASE
-    val dbms: Dbms
-    val createSql: String
-    val resetSql: String?
+public interface Setting<DATABASE : Database> {
+    public val database: DATABASE
+    public val dbms: Dbms
+    public val createSql: String
+    public val resetSql: String?
 }

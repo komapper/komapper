@@ -7,7 +7,7 @@ import ch.qos.logback.classic.LoggerContext
 import ch.qos.logback.classic.spi.Configurator
 import org.komapper.core.LogCategory
 
-class LogConfigurator : BasicConfigurator() {
+public class LogConfigurator : BasicConfigurator() {
     override fun configure(lc: LoggerContext): Configurator.ExecutionStatus {
         val status = super.configure(lc)
         val sqlLogger: Logger = lc.getLogger(LogCategory.SQL_WITH_ARGS)

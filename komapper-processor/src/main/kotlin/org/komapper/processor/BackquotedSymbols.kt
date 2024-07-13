@@ -22,6 +22,7 @@ internal object BackquotedSymbols {
     const val IdContext = "`org.komapper.core.dsl.metamodel`.IdContext"
     const val IdGenerator = "`org.komapper.core.dsl.metamodel`.IdGenerator"
     const val Instant = "`java.time`.Instant"
+    const val KClass = "`kotlin.reflect`.KClass"
     const val KomapperExperimentalAssociation = "`org.komapper.annotation`.KomapperExperimentalAssociation"
     const val LocalDateTime = "`java.time`.LocalDateTime"
     const val Operand = "`org.komapper.core.dsl.expression`.Operand"

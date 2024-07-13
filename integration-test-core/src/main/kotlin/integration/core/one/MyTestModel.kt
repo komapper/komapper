@@ -4,7 +4,7 @@ import org.komapper.annotation.KomapperEntity
 import org.komapper.annotation.KomapperId
 
 @KomapperEntity
-data class MyTestModel(
+public data class MyTestModel(
     @KomapperId
     val id: Long,
 )

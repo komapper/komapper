@@ -1,5 +1,5 @@
 package integration.core.enumclass
 
-enum class Direction {
+public enum class Direction {
     NORTH, SOUTH, EAST, WEST
 }

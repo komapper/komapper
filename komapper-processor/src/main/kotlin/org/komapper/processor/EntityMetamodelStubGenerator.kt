@@ -38,24 +38,24 @@ internal class EntityMetamodelStubGenerator(
         }
         w.println("// generated at ${ZonedDateTime.now()}")
         w.println("@$EntityMetamodelImplementor($entityTypeName::class)")
-        w.println("class $simpleName : $EntityMetamodelStub<$entityTypeName, $simpleName>() {")
+        w.println("public class $simpleName : $EntityMetamodelStub<$entityTypeName, $simpleName>() {")
         val parameters = declaration.primaryConstructor?.parameters
         if (parameters != null) {
             for (p in parameters) {
                 val typeName = p.type.resolve().declaration.qualifiedName?.asString()
-                w.println("    val `$p`: $PropertyMetamodel<$entityTypeName, $typeName, $typeName> = $PropertyMetamodelStub<$entityTypeName, $typeName>()")
+                w.println("    public val `$p`: $PropertyMetamodel<$entityTypeName, $typeName, $typeName> = $PropertyMetamodelStub<$entityTypeName, $typeName>()")
             }
         }
-        w.println("    fun clone($constructorParamList) = $simpleName()")
-        w.println("    companion object {")
+        w.println("    public fun clone($constructorParamList): $simpleName = $simpleName()")
+        w.println("    public companion object {")
         for (alias in aliases) {
-            w.println("        val `$alias` = $simpleName()")
+            w.println("        public val `$alias` = $simpleName()")
         }
         w.println("    }")
         w.println("}")
         w.println("")
         for (alias in aliases) {
-            w.println("val $unitTypeName.`$alias` get() = $simpleName.`$alias`")
+            w.println("val $unitTypeName.`$alias`: $simpleName get() = $simpleName.`$alias`")
         }
     }
 }

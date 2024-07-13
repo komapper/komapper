@@ -12,24 +12,24 @@ import org.komapper.annotation.KomapperVersion
 import java.time.LocalDateTime
 
 @JvmInline
-value class IntId(val value: Int) : Comparable<IntId> {
+public value class IntId(public val value: Int) : Comparable<IntId> {
     override fun compareTo(other: IntId): Int {
         return value.compareTo(other.value)
     }
 }
 
 @JvmInline
-value class Street(val value: String)
+public value class Street(public val value: String)
 
 @JvmInline
-value class Version(val value: Int)
+public value class Version(public val value: Int)
 
 @JvmInline
-value class Timestamp(val value: LocalDateTime)
+public value class Timestamp(public val value: LocalDateTime)
 
 @KomapperEntity
 @KomapperTable("address")
-data class VAddress(
+public data class VAddress(
     @KomapperId val addressId: IntId,
     val street: Street,
     @KomapperVersion val version: Version,
@@ -37,7 +37,7 @@ data class VAddress(
 
 @KomapperEntity
 @KomapperTable("person")
-data class VPerson(
+public data class VPerson(
     @KomapperId
     @KomapperColumn("person_id")
     val personId: IntId,
@@ -52,7 +52,7 @@ data class VPerson(
 
 @KomapperEntity
 @KomapperTable("identity_strategy")
-data class VIdentityStrategy(
+public data class VIdentityStrategy(
     @KomapperId @KomapperAutoIncrement
     val id: IntId?,
     @KomapperColumn(alwaysQuote = true)val value: String,
@@ -60,7 +60,7 @@ data class VIdentityStrategy(
 
 @KomapperEntity
 @KomapperTable("sequence_strategy")
-data class VSequenceStrategy(
+public data class VSequenceStrategy(
     @KomapperId
     @KomapperSequence(name = "sequence_strategy_id", incrementBy = 100)
     val id: IntId,

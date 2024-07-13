@@ -8,7 +8,7 @@ import org.komapper.annotation.KomapperVersion
 
 @KomapperEntity
 @KomapperTable(catalog = "catalog", schema = "schema", alwaysQuote = true)
-data class CatalogAndSchema(
+public data class CatalogAndSchema(
     @KomapperId
     @KomapperColumn(name = "address_id")
     val addressId: Int,
@@ -18,19 +18,19 @@ data class CatalogAndSchema(
 
 @KomapperEntity
 @KomapperTable(catalog = "catalog", alwaysQuote = true)
-data class CatalogOnly(
+public data class CatalogOnly(
     @KomapperId val id: Int,
 )
 
 @KomapperEntity
 @KomapperTable(schema = "schema", alwaysQuote = true)
-data class SchemaOnly(
+public data class SchemaOnly(
     @KomapperId val id: Int,
 )
 
 @KomapperEntity
 @KomapperTable("    ", alwaysQuote = true)
-data class BlankName(
+public data class BlankName(
     @KomapperId
     @KomapperColumn("    ", alwaysQuote = true)
     val id: Int,
@@ -38,7 +38,7 @@ data class BlankName(
 
 @KomapperEntity
 @KomapperTable(alwaysQuote = true)
-data class Order(
+public data class Order(
     @KomapperId
     @KomapperColumn(alwaysQuote = true)
     val orderId: Int,
