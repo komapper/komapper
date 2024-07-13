@@ -15,6 +15,14 @@ import org.komapper.core.dsl.expression.ColumnExpression
 import org.komapper.core.dsl.expression.SubqueryExpression
 import org.komapper.core.dsl.metamodel.EmptyMetamodel
 import org.komapper.core.dsl.metamodel.EntityMetamodel
+import org.komapper.core.dsl.options.DeleteOptions
+import org.komapper.core.dsl.options.InsertOptions
+import org.komapper.core.dsl.options.SchemaOptions
+import org.komapper.core.dsl.options.ScriptOptions
+import org.komapper.core.dsl.options.SelectOptions
+import org.komapper.core.dsl.options.TemplateExecuteOptions
+import org.komapper.core.dsl.options.TemplateSelectOptions
+import org.komapper.core.dsl.options.UpdateOptions
 import org.komapper.core.dsl.query.DeleteQueryBuilder
 import org.komapper.core.dsl.query.DeleteQueryBuilderImpl
 import org.komapper.core.dsl.query.FlowSubquery
@@ -39,37 +47,25 @@ import org.komapper.core.dsl.query.UpdateQueryBuilderImpl
  * The entry point for constructing queries.
  */
 @ThreadSafe
-object QueryDsl {
+interface QueryDsl {
 
     fun with(
         metamodel: EntityMetamodel<*, *, *>,
         subquery: SubqueryExpression<*>,
-    ): WithQueryDsl {
-        val with = With(false, listOf(metamodel to subquery))
-        return WithQueryDslImpl(with)
-    }
+    ): WithQueryDsl
 
     fun with(
         vararg pairs: Pair<EntityMetamodel<*, *, *>, SubqueryExpression<*>>,
-    ): WithQueryDsl {
-        val with = With(false, pairs.toList())
-        return WithQueryDslImpl(with)
-    }
+    ): WithQueryDsl
 
     fun withRecursive(
         metamodel: EntityMetamodel<*, *, *>,
         subquery: SubqueryExpression<*>,
-    ): WithQueryDsl {
-        val with = With(true, listOf(metamodel to subquery))
-        return WithQueryDslImpl(with)
-    }
+    ): WithQueryDsl
 
     fun withRecursive(
         vararg pairs: Pair<EntityMetamodel<*, *, *>, SubqueryExpression<*>>,
-    ): WithQueryDsl {
-        val with = With(true, pairs.toList())
-        return WithQueryDslImpl(with)
-    }
+    ): WithQueryDsl
 
     /**
      * Creates a SELECT query builder.
@@ -82,9 +78,7 @@ object QueryDsl {
      */
     fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> from(
         metamodel: META,
-    ): SelectQueryBuilder<ENTITY, ID, META> {
-        return SelectQueryBuilderImpl(SelectContext(metamodel))
-    }
+    ): SelectQueryBuilder<ENTITY, ID, META>
 
     /**
      * Creates a SELECT query builder which uses a derived table.
@@ -99,28 +93,20 @@ object QueryDsl {
     fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> from(
         metamodel: META,
         subquery: SubqueryExpression<*>,
-    ): SelectQueryBuilder<ENTITY, ID, META> {
-        return SelectQueryBuilderImpl(SelectContext(metamodel, subquery))
-    }
+    ): SelectQueryBuilder<ENTITY, ID, META>
 
-    fun <A : Any> select(expression: ColumnExpression<A, *>): FlowSubquery<A?> {
-        return from(EmptyMetamodel).select(expression)
-    }
+    fun <A : Any> select(expression: ColumnExpression<A, *>): FlowSubquery<A?>
 
     fun <A : Any, B : Any> select(
         expression1: ColumnExpression<A, *>,
         expression2: ColumnExpression<B, *>,
-    ): FlowSubquery<Pair<A?, B?>> {
-        return from(EmptyMetamodel).select(expression1, expression2)
-    }
+    ): FlowSubquery<Pair<A?, B?>>
 
     fun <A : Any, B : Any, C : Any> select(
         expression1: ColumnExpression<A, *>,
         expression2: ColumnExpression<B, *>,
         expression3: ColumnExpression<C, *>,
-    ): FlowSubquery<Triple<A?, B?, C?>> {
-        return from(EmptyMetamodel).select(expression1, expression2, expression3)
-    }
+    ): FlowSubquery<Triple<A?, B?, C?>>
 
     /**
      * Creates a INSERT query builder.
@@ -133,9 +119,7 @@ object QueryDsl {
      */
     fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> insert(
         metamodel: META,
-    ): InsertQueryBuilder<ENTITY, ID, META> {
-        return InsertQueryBuilderImpl(EntityInsertContext(metamodel))
-    }
+    ): InsertQueryBuilder<ENTITY, ID, META>
 
     /**
      * Creates a UPDATE query builder.
@@ -148,9 +132,7 @@ object QueryDsl {
      */
     fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> update(
         metamodel: META,
-    ): UpdateQueryBuilder<ENTITY, ID, META> {
-        return UpdateQueryBuilderImpl(EntityUpdateContext(metamodel))
-    }
+    ): UpdateQueryBuilder<ENTITY, ID, META>
 
     /**
      * Creates a DELETE query builder.
@@ -163,9 +145,7 @@ object QueryDsl {
      */
     fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> delete(
         metamodel: META,
-    ): DeleteQueryBuilder<ENTITY> {
-        return DeleteQueryBuilderImpl(EntityDeleteContext(metamodel))
-    }
+    ): DeleteQueryBuilder<ENTITY>
 
     /**
      * Creates a builder for constructing a SELECT query.
@@ -173,9 +153,7 @@ object QueryDsl {
      * @param sql the sql template
      * @return the builder
      */
-    fun fromTemplate(@Language("sql") sql: String): TemplateSelectQueryBuilder {
-        return TemplateSelectQueryBuilderImpl(TemplateSelectContext(sql))
-    }
+    fun fromTemplate(@Language("sql") sql: String): TemplateSelectQueryBuilder
 
     /**
      * Creates a query for executing an arbitrary command.
@@ -183,52 +161,162 @@ object QueryDsl {
      * @param sql the sql template
      * @return the query
      */
-    fun executeTemplate(@Language("sql") sql: String): TemplateExecuteQuery {
-        return TemplateExecuteQueryImpl(TemplateExecuteContext(sql))
-    }
+    fun executeTemplate(@Language("sql") sql: String): TemplateExecuteQuery
 
     /**
      * Creates a query for executing a script.
      *
      * @param sql the script to execute
      */
-    fun executeScript(@Language("sql") sql: String): ScriptExecuteQuery {
-        return ScriptExecuteQueryImpl(ScriptContext(sql))
-    }
+    fun executeScript(@Language("sql") sql: String): ScriptExecuteQuery
 
     /**
      * Creates a query for creating tables and their associated constraints.
      *
      * @param metamodels the entity metamodels
      */
-    fun create(metamodels: List<EntityMetamodel<*, *, *>>): SchemaCreateQuery {
-        return SchemaCreateQueryImpl(SchemaContext(metamodels))
-    }
+    fun create(metamodels: List<EntityMetamodel<*, *, *>>): SchemaCreateQuery
 
     /**
      * Creates a query for creating tables and their associated constraints.
      *
      * @param metamodels the entity metamodels
      */
-    fun create(vararg metamodels: EntityMetamodel<*, *, *>): SchemaCreateQuery {
+    fun create(vararg metamodels: EntityMetamodel<*, *, *>): SchemaCreateQuery
+
+    /**
+     * Creates a query for dropping tables and their associated constraints.
+     *
+     * @param metamodels the entity metamodels
+     */
+    fun drop(metamodels: List<EntityMetamodel<*, *, *>>): SchemaDropQuery
+
+    /**
+     * Creates a query for dropping tables and their associated constraints.
+     *
+     * @param metamodels the entity metamodels
+     */
+    fun drop(vararg metamodels: EntityMetamodel<*, *, *>): SchemaDropQuery
+
+    companion object : QueryDsl by QueryDsl()
+}
+
+internal class QueryDslImpl(
+    private val deleteOptions: DeleteOptions,
+    private val insertOptions: InsertOptions,
+    private val schemaOptions: SchemaOptions,
+    private val scriptOptions: ScriptOptions,
+    private val selectOptions: SelectOptions,
+    private val templateExecuteOptions: TemplateExecuteOptions,
+    private val templateSelectOptions: TemplateSelectOptions,
+    private val updateOptions: UpdateOptions,
+) : QueryDsl {
+
+    override fun with(
+        metamodel: EntityMetamodel<*, *, *>,
+        subquery: SubqueryExpression<*>,
+    ): WithQueryDsl {
+        val with = With(false, listOf(metamodel to subquery))
+        return WithQueryDslImpl(with, selectOptions)
+    }
+
+    override fun with(
+        vararg pairs: Pair<EntityMetamodel<*, *, *>, SubqueryExpression<*>>,
+    ): WithQueryDsl {
+        val with = With(false, pairs.toList())
+        return WithQueryDslImpl(with, selectOptions)
+    }
+
+    override fun withRecursive(
+        metamodel: EntityMetamodel<*, *, *>,
+        subquery: SubqueryExpression<*>,
+    ): WithQueryDsl {
+        val with = With(true, listOf(metamodel to subquery))
+        return WithQueryDslImpl(with, selectOptions)
+    }
+
+    override fun withRecursive(
+        vararg pairs: Pair<EntityMetamodel<*, *, *>, SubqueryExpression<*>>,
+    ): WithQueryDsl {
+        val with = With(true, pairs.toList())
+        return WithQueryDslImpl(with, selectOptions)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> from(
+        metamodel: META,
+    ): SelectQueryBuilder<ENTITY, ID, META> {
+        return SelectQueryBuilderImpl(SelectContext(metamodel, options = selectOptions))
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> from(
+        metamodel: META,
+        subquery: SubqueryExpression<*>,
+    ): SelectQueryBuilder<ENTITY, ID, META> {
+        return SelectQueryBuilderImpl(SelectContext(metamodel, subquery, options = selectOptions))
+    }
+
+    override fun <A : Any> select(expression: ColumnExpression<A, *>): FlowSubquery<A?> {
+        return from(EmptyMetamodel).select(expression)
+    }
+
+    override fun <A : Any, B : Any> select(
+        expression1: ColumnExpression<A, *>,
+        expression2: ColumnExpression<B, *>,
+    ): FlowSubquery<Pair<A?, B?>> {
+        return from(EmptyMetamodel).select(expression1, expression2)
+    }
+
+    override fun <A : Any, B : Any, C : Any> select(
+        expression1: ColumnExpression<A, *>,
+        expression2: ColumnExpression<B, *>,
+        expression3: ColumnExpression<C, *>,
+    ): FlowSubquery<Triple<A?, B?, C?>> {
+        return from(EmptyMetamodel).select(expression1, expression2, expression3)
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> insert(
+        metamodel: META,
+    ): InsertQueryBuilder<ENTITY, ID, META> {
+        return InsertQueryBuilderImpl(EntityInsertContext(metamodel, options = insertOptions))
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> update(
+        metamodel: META,
+    ): UpdateQueryBuilder<ENTITY, ID, META> {
+        return UpdateQueryBuilderImpl(EntityUpdateContext(metamodel, options = updateOptions))
+    }
+
+    override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> delete(
+        metamodel: META,
+    ): DeleteQueryBuilder<ENTITY> {
+        return DeleteQueryBuilderImpl(EntityDeleteContext(metamodel, options = deleteOptions))
+    }
+
+    override fun fromTemplate(@Language("sql") sql: String): TemplateSelectQueryBuilder {
+        return TemplateSelectQueryBuilderImpl(TemplateSelectContext(sql, options = templateSelectOptions))
+    }
+
+    override fun executeTemplate(@Language("sql") sql: String): TemplateExecuteQuery {
+        return TemplateExecuteQueryImpl(TemplateExecuteContext(sql, options = templateExecuteOptions))
+    }
+
+    override fun executeScript(@Language("sql") sql: String): ScriptExecuteQuery {
+        return ScriptExecuteQueryImpl(ScriptContext(sql, options = scriptOptions))
+    }
+
+    override fun create(metamodels: List<EntityMetamodel<*, *, *>>): SchemaCreateQuery {
+        return SchemaCreateQueryImpl(SchemaContext(metamodels, options = schemaOptions))
+    }
+
+    override fun create(vararg metamodels: EntityMetamodel<*, *, *>): SchemaCreateQuery {
         return create(metamodels.toList())
     }
 
-    /**
-     * Creates a query for dropping tables and their associated constraints.
-     *
-     * @param metamodels the entity metamodels
-     */
-    fun drop(metamodels: List<EntityMetamodel<*, *, *>>): SchemaDropQuery {
-        return SchemaDropQueryImpl(SchemaContext(metamodels))
+    override fun drop(metamodels: List<EntityMetamodel<*, *, *>>): SchemaDropQuery {
+        return SchemaDropQueryImpl(SchemaContext(metamodels, options = schemaOptions))
     }
 
-    /**
-     * Creates a query for dropping tables and their associated constraints.
-     *
-     * @param metamodels the entity metamodels
-     */
-    fun drop(vararg metamodels: EntityMetamodel<*, *, *>): SchemaDropQuery {
+    override fun drop(vararg metamodels: EntityMetamodel<*, *, *>): SchemaDropQuery {
         return drop(metamodels.toList())
     }
 }
@@ -248,10 +336,44 @@ interface WithQueryDsl {
     ): SelectQueryBuilder<ENTITY, ID, META>
 }
 
-internal data class WithQueryDslImpl(private val with: With) : WithQueryDsl {
+internal data class WithQueryDslImpl(private val with: With, private val options: SelectOptions) : WithQueryDsl {
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> from(
         metamodel: META,
     ): SelectQueryBuilder<ENTITY, ID, META> {
-        return SelectQueryBuilderImpl(SelectContext(metamodel, with = with))
+        return SelectQueryBuilderImpl(SelectContext(metamodel, with = with, options = options))
     }
+}
+
+/**
+ * Creates a new instance of [QueryDsl].
+ *
+ * @param deleteOptions the options for DELETE queries
+ * @param insertOptions the options for INSERT queries
+ * @param schemaOptions the options for schema operations
+ * @param scriptOptions the options for script operations
+ * @param selectOptions the options for SELECT queries
+ * @param templateExecuteOptions the options for template execute operations
+ * @param templateSelectOptions the options for template select operations
+ * @param updateOptions the options for UPDATE queries
+ */
+fun QueryDsl(
+    deleteOptions: DeleteOptions = DeleteOptions.DEFAULT,
+    insertOptions: InsertOptions = InsertOptions.DEFAULT,
+    schemaOptions: SchemaOptions = SchemaOptions.DEFAULT,
+    scriptOptions: ScriptOptions = ScriptOptions.DEFAULT,
+    selectOptions: SelectOptions = SelectOptions.DEFAULT,
+    templateExecuteOptions: TemplateExecuteOptions = TemplateExecuteOptions.DEFAULT,
+    templateSelectOptions: TemplateSelectOptions = TemplateSelectOptions.DEFAULT,
+    updateOptions: UpdateOptions = UpdateOptions.DEFAULT,
+): QueryDsl {
+    return QueryDslImpl(
+        deleteOptions,
+        insertOptions,
+        schemaOptions,
+        scriptOptions,
+        selectOptions,
+        templateExecuteOptions,
+        templateSelectOptions,
+        updateOptions,
+    )
 }

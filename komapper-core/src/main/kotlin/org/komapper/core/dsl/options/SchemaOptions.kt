@@ -1,8 +1,8 @@
 package org.komapper.core.dsl.options
 
 data class SchemaOptions(
-    override val queryTimeoutSeconds: Int?,
-    override val suppressLogging: Boolean,
+    override val queryTimeoutSeconds: Int? = DEFAULT.queryTimeoutSeconds,
+    override val suppressLogging: Boolean = DEFAULT.suppressLogging,
 ) : QueryOptions {
 
     companion object {

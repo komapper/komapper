@@ -27,6 +27,7 @@ import org.komapper.core.dsl.operator.columnExpression
 import org.komapper.core.dsl.operator.concat
 import org.komapper.core.dsl.operator.desc
 import org.komapper.core.dsl.operator.literal
+import org.komapper.core.dsl.options.SelectOptions
 import org.komapper.core.dsl.query.first
 import org.komapper.core.dsl.query.firstOrNull
 import org.komapper.core.dsl.query.single
@@ -346,5 +347,17 @@ class JdbcSelectTest(private val db: JdbcDatabase) {
             visit(o1)
             append(")")
         }
+    }
+
+    @Test
+    fun options() {
+        val myDsl = QueryDsl(selectOptions = SelectOptions(allowMissingWhereClause = false))
+        val e = assertThrows<IllegalStateException> {
+            db.runQuery {
+                myDsl.select(literal("hello")).single()
+            }
+            Unit
+        }
+        println(e)
     }
 }
