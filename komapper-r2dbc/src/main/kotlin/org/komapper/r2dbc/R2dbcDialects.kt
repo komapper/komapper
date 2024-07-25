@@ -10,7 +10,7 @@ import java.util.regex.Pattern
  * The provider of [R2dbcDialect]
  */
 object R2dbcDialects {
-    private val r2dbcUrlPattern = Pattern.compile("^r2dbc[s]?:(tc:)?([^:]*):.*")
+    private val r2dbcUrlPattern = Pattern.compile("^r2dbc[s]?:(tc:)?(pool:)?([^:]*):.*")
 
     /**
      * @param driver the R2DBC driver name
@@ -60,7 +60,7 @@ object R2dbcDialects {
     fun extractR2dbcDriver(url: String): String {
         val matcher = r2dbcUrlPattern.matcher(url)
         if (matcher.matches()) {
-            return matcher.group(2).lowercase()
+            return matcher.group(3).lowercase()
         }
         error("The driver is not found in the R2DBC URL. url=$url")
     }
