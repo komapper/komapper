@@ -105,7 +105,7 @@ testing {
                 implementation(project())
                 implementation("org.testcontainers:mssqlserver")
                 implementation(project(":komapper-dialect-sqlserver-r2dbc"))
-                runtimeOnly("com.microsoft.sqlserver:mssql-jdbc:12.6.3.jre11")
+                runtimeOnly("com.microsoft.sqlserver:mssql-jdbc:12.8.0.jre11")
             }
         }
     }
