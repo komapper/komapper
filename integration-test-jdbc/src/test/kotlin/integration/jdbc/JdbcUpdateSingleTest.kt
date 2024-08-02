@@ -144,6 +144,20 @@ class JdbcUpdateSingleTest(private val db: JdbcDatabase) {
         assertTrue(department2.version < department3.version)
     }
 
+    // An updateAt property must be always included.
+    @Test
+    fun include_updatedAt() {
+        val p = Meta.person
+        val person = db.runQuery { QueryDsl.insert(p).single(Person(1, "X")) }
+        val person2 = person.copy(name = "ABC")
+        db.runQuery { QueryDsl.update(p).include(p.name).single(person2) }
+        val person3 = db.runQuery { QueryDsl.from(p).where { p.personId eq 1 }.first() }
+        assertEquals("ABC", person3.name)
+        val time1 = person2.updatedAt!!
+        val time2 = person3.updatedAt!!
+        assertTrue(time1.isBefore(time2))
+    }
+
     @Test
     fun include_emptyTargetProperties() {
         val d = Meta.noVersionDepartment
@@ -166,6 +180,20 @@ class JdbcUpdateSingleTest(private val db: JdbcDatabase) {
         assertEquals("ABC", department3.departmentName)
         assertNotEquals("DEF", department3.location)
         assertTrue(department2.version < department3.version)
+    }
+
+    // An updateAt property must be always included even if it is specified in the exclude function.
+    @Test
+    fun exclude_updatedAt() {
+        val p = Meta.person
+        val person = db.runQuery { QueryDsl.insert(p).single(Person(1, "X")) }
+        val person2 = person.copy(name = "ABC")
+        db.runQuery { QueryDsl.update(p).exclude(p.name, p.updatedAt).single(person2) }
+        val person3 = db.runQuery { QueryDsl.from(p).where { p.personId eq 1 }.first() }
+        assertEquals("X", person3.name)
+        val time1 = person2.updatedAt!!
+        val time2 = person3.updatedAt!!
+        assertTrue(time1.isBefore(time2))
     }
 
     @Test
