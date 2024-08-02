@@ -31,13 +31,11 @@ data class EntityUpdateContext<ENTITY : Any, ID : Any, META : EntityMetamodel<EN
         val idProperties = target.idProperties()
         val versionProperty = target.versionProperty()
         val createdAtProperty = target.createdAtProperty()
-        val properties = includedProperties.ifEmpty { target.properties() } - excludedProperties
-        val versionProperties = if (versionProperty != null && versionProperty !in properties) {
-            listOf(versionProperty)
-        } else {
-            emptyList()
-        }
-        return properties.filter { it != createdAtProperty } - idProperties + versionProperties
+        val updatedAtProperty = target.updatedAtProperty()
+        val base = includedProperties.toSet().ifEmpty { target.properties().toSet() } - excludedProperties.toSet()
+        val subtraction = idProperties.toSet() + setOfNotNull(createdAtProperty)
+        val addition = setOfNotNull(versionProperty, updatedAtProperty)
+        return (base - subtraction + addition).toList()
     }
 
     fun asRelationUpdateContext(declaration: AssignmentDeclaration<ENTITY, META>): RelationUpdateContext<ENTITY, ID, META> {
