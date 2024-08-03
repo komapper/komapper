@@ -31,6 +31,11 @@ interface EntityMetamodel<ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY,
     fun preInsert(e: ENTITY, c: Clock): ENTITY
     fun preUpdate(e: ENTITY, c: Clock): ENTITY
     fun postUpdate(e: ENTITY): ENTITY
+
+    operator fun get(name: String): PropertyMetamodel<ENTITY, *, *>? {
+        return properties().find { it.name == name }
+    }
+
     fun newEntity(m: Map<PropertyMetamodel<*, *, *>, Any?>): ENTITY
 
     fun newMetamodel(

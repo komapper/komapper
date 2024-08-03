@@ -24,6 +24,7 @@ import org.komapper.processor.BackquotedSymbols.Instant
 import org.komapper.processor.BackquotedSymbols.KClass
 import org.komapper.processor.BackquotedSymbols.KomapperExperimentalAssociation
 import org.komapper.processor.BackquotedSymbols.LocalDateTime
+import org.komapper.processor.BackquotedSymbols.Map
 import org.komapper.processor.BackquotedSymbols.Operand
 import org.komapper.processor.BackquotedSymbols.ProjectionType
 import org.komapper.processor.BackquotedSymbols.ProjectionType_INDEX
@@ -134,6 +135,9 @@ internal class EntityMetamodelGenerator(
         w.println("    private val __disableSequenceAssignment = disableSequenceAssignment")
         w.println("    private val __declaration = declaration")
         w.println("    private val __disableAutoIncrement = disableAutoIncrement")
+        w.println("    private val __propertyMap: $Map<String, $PropertyMetamodel<$entityTypeName, *, *>> by lazy { ")
+        w.println("        properties().associateBy { it.name }")
+        w.println("    }")
 
         entityDescriptor()
 
@@ -163,6 +167,8 @@ internal class EntityMetamodelGenerator(
         preInsert()
         preUpdate()
         postUpdate()
+
+        get()
 
         newEntity()
         newMetamodel()
@@ -632,6 +638,10 @@ internal class EntityMetamodelGenerator(
                 }
             }
         }
+    }
+
+    private fun get() {
+        w.println("    override operator fun get(name: String): $PropertyMetamodel<$entityTypeName, *, *>? = __propertyMap[name]")
     }
 
     private fun newEntity() {
