@@ -38,7 +38,7 @@ Komapper is tested with the following databases:
 
 | Database           | version | JDBC support | R2DBC support |
 |--------------------|---------|:------------:|:-------------:|
-| H2 Database        | 2.2.222 |      v       |       v       |
+| H2 Database        | 2.3.230 |      v       |       v       |
 | MariaDB            | 10.6.3  |      v       |       v       |
 | MySQL v5.x         | 5.7.44  |      v       |       v       |
 | MySQL v8.x         | 8.0.25  |      v       |       v       |
@@ -58,7 +58,7 @@ Add the following code to the Gradle build script (gradle.build.kts).
 ```kotlin
 plugins {
     kotlin("jvm") version "2.0.0"
-    id("com.google.devtools.ksp") version "2.0.0-1.0.22"
+    id("com.google.devtools.ksp") version "2.0.0-1.0.24"
 }
 
 val komapperVersion = "2.1.0"
