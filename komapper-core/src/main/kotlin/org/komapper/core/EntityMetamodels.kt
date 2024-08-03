@@ -9,7 +9,7 @@ import java.util.ServiceLoader
  *
  * This class requires the following configuration in build.gradle.kts:
  *
- * ```
+ * ```kotlin
  * ksp {
  *   arg("komapper.enableEntityMetamodelListing", "true")
  * }
