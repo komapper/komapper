@@ -24,6 +24,7 @@ import org.komapper.processor.BackquotedSymbols.Instant
 import org.komapper.processor.BackquotedSymbols.KClass
 import org.komapper.processor.BackquotedSymbols.KomapperExperimentalAssociation
 import org.komapper.processor.BackquotedSymbols.LocalDateTime
+import org.komapper.processor.BackquotedSymbols.Map
 import org.komapper.processor.BackquotedSymbols.Operand
 import org.komapper.processor.BackquotedSymbols.ProjectionType
 import org.komapper.processor.BackquotedSymbols.ProjectionType_INDEX
@@ -35,6 +36,7 @@ import org.komapper.processor.BackquotedSymbols.Sequence
 import org.komapper.processor.BackquotedSymbols.TemplateSelectQuery
 import org.komapper.processor.BackquotedSymbols.TemplateSelectQueryBuilder
 import org.komapper.processor.BackquotedSymbols.UUID
+import org.komapper.processor.BackquotedSymbols.typeOf
 import org.komapper.processor.Symbols.KotlinInstant
 import org.komapper.processor.Symbols.KotlinLocalDateTime
 import org.komapper.processor.Symbols.checkMetamodelVersion
@@ -134,6 +136,9 @@ internal class EntityMetamodelGenerator(
         w.println("    private val __disableSequenceAssignment = disableSequenceAssignment")
         w.println("    private val __declaration = declaration")
         w.println("    private val __disableAutoIncrement = disableAutoIncrement")
+        w.println("    private val __propertyMap: $Map<String, $PropertyMetamodel<$entityTypeName, *, *>> by lazy { ")
+        w.println("        properties().associateBy { it.name }")
+        w.println("    }")
 
         entityDescriptor()
 
@@ -164,6 +169,8 @@ internal class EntityMetamodelGenerator(
         preUpdate()
         postUpdate()
 
+        get()
+
         newEntity()
         newMetamodel()
         clone()
@@ -178,8 +185,8 @@ internal class EntityMetamodelGenerator(
         fun leafPropertyDescriptor(p: LeafProperty, getter: String, setter: String, nullability: Nullability): String {
             val exteriorTypeName = p.exteriorTypeName
             val interiorTypeName = p.interiorTypeName
-            val exteriorType = "kotlin.reflect.typeOf<$exteriorTypeName>()"
-            val interiorType = "kotlin.reflect.typeOf<$interiorTypeName>()"
+            val exteriorType = "$typeOf<$exteriorTypeName>()"
+            val interiorType = "$typeOf<$interiorTypeName>()"
             val columnName = "\"${p.column.name}\""
             val alwaysQuote = "${p.column.alwaysQuote}"
             val masking = "${p.column.masking}"
@@ -632,6 +639,10 @@ internal class EntityMetamodelGenerator(
                 }
             }
         }
+    }
+
+    private fun get() {
+        w.println("    override operator fun get(name: String): $PropertyMetamodel<$entityTypeName, *, *>? = __propertyMap[name]")
     }
 
     private fun newEntity() {

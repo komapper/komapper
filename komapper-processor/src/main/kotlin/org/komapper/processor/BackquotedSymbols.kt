@@ -1,6 +1,7 @@
 package org.komapper.processor
 
 internal object BackquotedSymbols {
+    const val typeOf = "`kotlin.reflect`.typeOf"
     const val Argument = "`org.komapper.core.dsl.expression`.Operand.Argument"
     const val AutoIncrement = "`org.komapper.core.dsl.metamodel`.IdGenerator.AutoIncrement"
     const val Clock = "`java.time`.Clock"
@@ -25,6 +26,7 @@ internal object BackquotedSymbols {
     const val KClass = "`kotlin.reflect`.KClass"
     const val KomapperExperimentalAssociation = "`org.komapper.annotation`.KomapperExperimentalAssociation"
     const val LocalDateTime = "`java.time`.LocalDateTime"
+    const val Map = "`kotlin.collections`.Map"
     const val Operand = "`org.komapper.core.dsl.expression`.Operand"
     const val ProjectionType = "`org.komapper.core.dsl.query`.ProjectionType"
     const val ProjectionType_INDEX = "`org.komapper.core.dsl.query`.ProjectionType.INDEX"

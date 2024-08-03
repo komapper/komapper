@@ -5,14 +5,50 @@ import org.komapper.core.Value
 import org.komapper.core.dsl.expression.PropertyExpression
 import kotlin.reflect.KType
 
+/**
+ * Represents a property metamodel that maps an entity type to exterior and interior types.
+ *
+ * @param ENTITY the entity type
+ * @param EXTERIOR the exterior type
+ * @param INTERIOR the interior type
+ */
 @ThreadSafe
 interface PropertyMetamodel<ENTITY : Any, EXTERIOR : Any, INTERIOR : Any> : PropertyExpression<EXTERIOR, INTERIOR> {
     override val owner: EntityMetamodel<ENTITY, *, *>
+
+    /**
+     * The name of the property.
+     */
     val name: String
+
+    /**
+     * A function that retrieves the exterior type value from the given entity.
+     *
+     * @param ENTITY the entity type
+     * @return the exterior type value or null if not present
+     */
     val getter: (ENTITY) -> EXTERIOR?
+
+    /**
+     * A function that sets the exterior type value to the given entity.
+     *
+     * @param ENTITY the entity type
+     * @param EXTERIOR the exterior type
+     * @return the updated entity
+     */
     val setter: (ENTITY, EXTERIOR) -> ENTITY
+
+    /**
+     * Indicates whether the property is nullable.
+     */
     val nullable: Boolean
 
+    /**
+     * Converts the given entity to a `Value` object containing the interior type.
+     *
+     * @param entity the entity to convert
+     * @return a `Value` object containing the interior type
+     */
     fun toValue(entity: ENTITY): Value<INTERIOR> {
         val exterior = getter(entity)
         val interior = if (exterior == null) null else unwrap(exterior)
