@@ -9,6 +9,20 @@ import org.komapper.core.dsl.metamodel.EntityMetamodel
  */
 @ThreadSafe
 object Meta {
+
+    /**
+     * Retrieves a list of all entity metamodels.
+     *
+     * This method requires the following configuration in build.gradle.kts:
+     *
+     * ```kotlin
+     * ksp {
+     *   arg("komapper.enableEntityMetamodelListing", "true")
+     * }
+     * ```
+     *
+     * @return a list of entity metamodels
+     */
     fun all(): List<EntityMetamodel<*, *, *>> {
         return EntityMetamodels.list(Meta)
     }

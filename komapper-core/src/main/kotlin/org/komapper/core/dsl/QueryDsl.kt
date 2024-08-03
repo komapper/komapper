@@ -49,20 +49,46 @@ import org.komapper.core.dsl.query.UpdateQueryBuilderImpl
 @ThreadSafe
 interface QueryDsl {
 
+    /**
+     * Creates a `WITH` query DSL.
+     *
+     * @param metamodel the entity metamodel
+     * @param subquery the subquery expression
+     * @return the `WITH` query DSL
+     */
     fun with(
         metamodel: EntityMetamodel<*, *, *>,
         subquery: SubqueryExpression<*>,
     ): WithQueryDsl
 
+    /**
+     * Creates a `WITH` query DSL with multiple pairs of entity metamodels and subquery expressions.
+     *
+     * @param pairs the pairs of entity metamodels and subquery expressions
+     * @return the `WITH` query DSL
+     */
     fun with(
         vararg pairs: Pair<EntityMetamodel<*, *, *>, SubqueryExpression<*>>,
     ): WithQueryDsl
 
+    /**
+     * Creates a `WITH RECURSIVE` query DSL.
+     *
+     * @param metamodel the entity metamodel
+     * @param subquery the subquery expression
+     * @return the `WITH RECURSIVE` query DSL
+     */
     fun withRecursive(
         metamodel: EntityMetamodel<*, *, *>,
         subquery: SubqueryExpression<*>,
     ): WithQueryDsl
 
+    /**
+     * Creates a `WITH RECURSIVE` query DSL with multiple pairs of entity metamodels and subquery expressions.
+     *
+     * @param pairs the pairs of entity metamodels and subquery expressions
+     * @return the `WITH RECURSIVE` query DSL
+     */
     fun withRecursive(
         vararg pairs: Pair<EntityMetamodel<*, *, *>, SubqueryExpression<*>>,
     ): WithQueryDsl
@@ -95,13 +121,40 @@ interface QueryDsl {
         subquery: SubqueryExpression<*>,
     ): SelectQueryBuilder<ENTITY, ID, META>
 
+    /**
+     * Creates a SELECT query builder for a single column expression.
+     *
+     * @param A the type of the column expression
+     * @param expression the column expression
+     * @return a flow subquery for the column expression
+     */
     fun <A : Any> select(expression: ColumnExpression<A, *>): FlowSubquery<A?>
 
+    /**
+     * Creates a SELECT query builder for two column expressions.
+     *
+     * @param A the type of the first column expression
+     * @param B the type of the second column expression
+     * @param expression1 the first column expression
+     * @param expression2 the second column expression
+     * @return a flow subquery for the pair of column expressions
+     */
     fun <A : Any, B : Any> select(
         expression1: ColumnExpression<A, *>,
         expression2: ColumnExpression<B, *>,
     ): FlowSubquery<Pair<A?, B?>>
 
+    /**
+     * Creates a SELECT query builder for three column expressions.
+     *
+     * @param A the type of the first column expression
+     * @param B the type of the second column expression
+     * @param C the type of the third column expression
+     * @param expression1 the first column expression
+     * @param expression2 the second column expression
+     * @param expression3 the third column expression
+     * @return a flow subquery for the triple of column expressions
+     */
     fun <A : Any, B : Any, C : Any> select(
         expression1: ColumnExpression<A, *>,
         expression2: ColumnExpression<B, *>,
@@ -198,6 +251,9 @@ interface QueryDsl {
      */
     fun drop(vararg metamodels: EntityMetamodel<*, *, *>): SchemaDropQuery
 
+    /**
+     * The companion object for the `QueryDsl` interface, delegating to a new instance of `QueryDsl`.
+     */
     companion object : QueryDsl by QueryDsl()
 }
 
@@ -321,6 +377,9 @@ internal class QueryDslImpl(
     }
 }
 
+/**
+ * Interface for creating a `WITH` query DSL.
+ */
 interface WithQueryDsl {
     /**
      * Creates a SELECT query builder.
