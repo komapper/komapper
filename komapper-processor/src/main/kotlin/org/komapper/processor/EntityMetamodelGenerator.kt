@@ -36,6 +36,7 @@ import org.komapper.processor.BackquotedSymbols.Sequence
 import org.komapper.processor.BackquotedSymbols.TemplateSelectQuery
 import org.komapper.processor.BackquotedSymbols.TemplateSelectQueryBuilder
 import org.komapper.processor.BackquotedSymbols.UUID
+import org.komapper.processor.BackquotedSymbols.typeOf
 import org.komapper.processor.Symbols.KotlinInstant
 import org.komapper.processor.Symbols.KotlinLocalDateTime
 import org.komapper.processor.Symbols.checkMetamodelVersion
@@ -184,8 +185,8 @@ internal class EntityMetamodelGenerator(
         fun leafPropertyDescriptor(p: LeafProperty, getter: String, setter: String, nullability: Nullability): String {
             val exteriorTypeName = p.exteriorTypeName
             val interiorTypeName = p.interiorTypeName
-            val exteriorType = "kotlin.reflect.typeOf<$exteriorTypeName>()"
-            val interiorType = "kotlin.reflect.typeOf<$interiorTypeName>()"
+            val exteriorType = "$typeOf<$exteriorTypeName>()"
+            val interiorType = "$typeOf<$interiorTypeName>()"
             val columnName = "\"${p.column.name}\""
             val alwaysQuote = "${p.column.alwaysQuote}"
             val masking = "${p.column.masking}"

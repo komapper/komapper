@@ -1,6 +1,7 @@
 package org.komapper.processor
 
 internal object BackquotedSymbols {
+    const val typeOf = "`kotlin.reflect`.typeOf"
     const val Argument = "`org.komapper.core.dsl.expression`.Operand.Argument"
     const val AutoIncrement = "`org.komapper.core.dsl.metamodel`.IdGenerator.AutoIncrement"
     const val Clock = "`java.time`.Clock"
