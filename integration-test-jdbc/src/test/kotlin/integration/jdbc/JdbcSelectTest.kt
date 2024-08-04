@@ -27,6 +27,7 @@ import org.komapper.core.dsl.operator.columnExpression
 import org.komapper.core.dsl.operator.concat
 import org.komapper.core.dsl.operator.desc
 import org.komapper.core.dsl.operator.literal
+import org.komapper.core.dsl.operator.max
 import org.komapper.core.dsl.options.SelectOptions
 import org.komapper.core.dsl.query.first
 import org.komapper.core.dsl.query.firstOrNull
@@ -49,6 +50,14 @@ class JdbcSelectTest(private val db: JdbcDatabase) {
             QueryDsl.select(literal("hello")).single()
         }
         assertEquals("hello", result)
+    }
+
+    @Test
+    fun select_scalar() {
+        val result = db.runQuery {
+            QueryDsl.select(max(literal(1)))
+        }
+        assertEquals(1, result)
     }
 
     @Test

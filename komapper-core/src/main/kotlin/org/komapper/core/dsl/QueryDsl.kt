@@ -12,6 +12,7 @@ import org.komapper.core.dsl.context.TemplateExecuteContext
 import org.komapper.core.dsl.context.TemplateSelectContext
 import org.komapper.core.dsl.element.With
 import org.komapper.core.dsl.expression.ColumnExpression
+import org.komapper.core.dsl.expression.ScalarExpression
 import org.komapper.core.dsl.expression.SubqueryExpression
 import org.komapper.core.dsl.metamodel.EmptyMetamodel
 import org.komapper.core.dsl.metamodel.EntityMetamodel
@@ -28,6 +29,7 @@ import org.komapper.core.dsl.query.DeleteQueryBuilderImpl
 import org.komapper.core.dsl.query.FlowSubquery
 import org.komapper.core.dsl.query.InsertQueryBuilder
 import org.komapper.core.dsl.query.InsertQueryBuilderImpl
+import org.komapper.core.dsl.query.ScalarQuery
 import org.komapper.core.dsl.query.SchemaCreateQuery
 import org.komapper.core.dsl.query.SchemaCreateQueryImpl
 import org.komapper.core.dsl.query.SchemaDropQuery
@@ -122,7 +124,7 @@ interface QueryDsl {
     ): SelectQueryBuilder<ENTITY, ID, META>
 
     /**
-     * Creates a SELECT query builder for a single column expression.
+     * Creates a SELECT query for a single column expression.
      *
      * @param A the type of the column expression
      * @param expression the column expression
@@ -131,7 +133,7 @@ interface QueryDsl {
     fun <A : Any> select(expression: ColumnExpression<A, *>): FlowSubquery<A?>
 
     /**
-     * Creates a SELECT query builder for two column expressions.
+     * Creates a SELECT query for two column expressions.
      *
      * @param A the type of the first column expression
      * @param B the type of the second column expression
@@ -145,7 +147,7 @@ interface QueryDsl {
     ): FlowSubquery<Pair<A?, B?>>
 
     /**
-     * Creates a SELECT query builder for three column expressions.
+     * Creates a SELECT query for three column expressions.
      *
      * @param A the type of the first column expression
      * @param B the type of the second column expression
@@ -160,6 +162,18 @@ interface QueryDsl {
         expression2: ColumnExpression<B, *>,
         expression3: ColumnExpression<C, *>,
     ): FlowSubquery<Triple<A?, B?, C?>>
+
+    /**
+     * Creates a SELECT query for a scalar expression.
+     *
+     * @param T the exterior type of the scalar expression
+     * @param S the interior type of the scalar expression
+     * @param expression the scalar expression
+     * @return a scalar query for the scalar expression
+     */
+    fun <T : Any, S : Any> select(
+        expression: ScalarExpression<T, S>,
+    ): ScalarQuery<T?, T, S>
 
     /**
      * Creates a INSERT query builder.
@@ -328,6 +342,10 @@ internal class QueryDslImpl(
         expression3: ColumnExpression<C, *>,
     ): FlowSubquery<Triple<A?, B?, C?>> {
         return from(EmptyMetamodel).select(expression1, expression2, expression3)
+    }
+
+    override fun <T : Any, S : Any> select(expression: ScalarExpression<T, S>): ScalarQuery<T?, T, S> {
+        return from(EmptyMetamodel).select(expression)
     }
 
     override fun <ENTITY : Any, ID : Any, META : EntityMetamodel<ENTITY, ID, META>> insert(
