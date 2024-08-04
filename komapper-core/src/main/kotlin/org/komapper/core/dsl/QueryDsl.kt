@@ -124,7 +124,7 @@ interface QueryDsl {
     ): SelectQueryBuilder<ENTITY, ID, META>
 
     /**
-     * Creates a SELECT query builder for a single column expression.
+     * Creates a SELECT query for a single column expression.
      *
      * @param A the type of the column expression
      * @param expression the column expression
@@ -133,7 +133,7 @@ interface QueryDsl {
     fun <A : Any> select(expression: ColumnExpression<A, *>): FlowSubquery<A?>
 
     /**
-     * Creates a SELECT query builder for two column expressions.
+     * Creates a SELECT query for two column expressions.
      *
      * @param A the type of the first column expression
      * @param B the type of the second column expression
@@ -147,7 +147,7 @@ interface QueryDsl {
     ): FlowSubquery<Pair<A?, B?>>
 
     /**
-     * Creates a SELECT query builder for three column expressions.
+     * Creates a SELECT query for three column expressions.
      *
      * @param A the type of the first column expression
      * @param B the type of the second column expression
@@ -164,7 +164,7 @@ interface QueryDsl {
     ): FlowSubquery<Triple<A?, B?, C?>>
 
     /**
-     * Creates a SELECT query builder for a scalar expression.
+     * Creates a SELECT query for a scalar expression.
      *
      * @param T the exterior type of the scalar expression
      * @param S the interior type of the scalar expression
