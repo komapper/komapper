@@ -64,8 +64,8 @@ class JdbcSelectWhereTest(private val db: JdbcDatabase) {
     @Test
     fun between_pair() {
         val a = Meta.address
-        val start = QueryDsl.from(a).select(max(literal(5)))
-        val end = QueryDsl.from(a).select(max(literal(10)))
+        val start = QueryDsl.select(max(literal(5)))
+        val end = QueryDsl.select(max(literal(10)))
         val idList = db.runQuery {
             QueryDsl.from(a).where {
                 a.addressId between (start to end)
@@ -89,8 +89,8 @@ class JdbcSelectWhereTest(private val db: JdbcDatabase) {
     @Test
     fun notBetween_pair() {
         val a = Meta.address
-        val start = QueryDsl.from(a).select(max(literal(5)))
-        val end = QueryDsl.from(a).select(max(literal(10)))
+        val start = QueryDsl.select(max(literal(5)))
+        val end = QueryDsl.select(max(literal(10)))
         val idList = db.runQuery {
             QueryDsl.from(a).where {
                 a.addressId notBetween (start to end)
