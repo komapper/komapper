@@ -206,9 +206,19 @@ interface FilterScope<F : FilterScope<F>> {
     infix fun <T : Comparable<T>, S : Any> ColumnExpression<T, S>.between(range: ClosedRange<T>)
 
     /**
+     * Applies the `BETWEEN` predicate.
+     */
+    infix fun <T : Comparable<T>, S : Any> ColumnExpression<T, S>.between(range: Pair<ColumnExpression<T, S>, ColumnExpression<T, S>>)
+
+    /**
      * Applies the `NOT BETWEEN` predicate.
      */
     infix fun <T : Comparable<T>, S : Any> ColumnExpression<T, S>.notBetween(range: ClosedRange<T>)
+
+    /**
+     * Applies the `NOT BETWEEN` predicate.
+     */
+    infix fun <T : Comparable<T>, S : Any> ColumnExpression<T, S>.notBetween(range: Pair<ColumnExpression<T, S>, ColumnExpression<T, S>>)
 
     /**
      * Applies the `IN` predicate.

@@ -13,6 +13,8 @@ import org.komapper.core.dsl.expression.Operand
 import org.komapper.core.dsl.expression.WhereDeclaration
 import org.komapper.core.dsl.operator.CriteriaContext
 import org.komapper.core.dsl.operator.desc
+import org.komapper.core.dsl.operator.literal
+import org.komapper.core.dsl.operator.max
 import org.komapper.core.dsl.operator.plus
 import org.komapper.core.dsl.query.andThen
 import org.komapper.core.dsl.query.firstOrNull
@@ -60,11 +62,38 @@ class JdbcSelectWhereTest(private val db: JdbcDatabase) {
     }
 
     @Test
+    fun between_pair() {
+        val a = Meta.address
+        val start = QueryDsl.from(a).select(max(literal(5)))
+        val end = QueryDsl.from(a).select(max(literal(10)))
+        val idList = db.runQuery {
+            QueryDsl.from(a).where {
+                a.addressId between (start to end)
+            }.orderBy(a.addressId)
+        }
+        assertEquals((5..10).toList(), idList.map { it.addressId })
+    }
+
+    @Test
     fun notBetween() {
         val a = Meta.address
         val idList = db.runQuery {
             QueryDsl.from(a).where {
                 a.addressId notBetween 5..10
+            }.orderBy(a.addressId)
+        }
+        val ids = (1..4) + (11..15)
+        assertEquals(ids.toList(), idList.map { it.addressId })
+    }
+
+    @Test
+    fun notBetween_pair() {
+        val a = Meta.address
+        val start = QueryDsl.from(a).select(max(literal(5)))
+        val end = QueryDsl.from(a).select(max(literal(10)))
+        val idList = db.runQuery {
+            QueryDsl.from(a).where {
+                a.addressId notBetween (start to end)
             }.orderBy(a.addressId)
         }
         val ids = (1..4) + (11..15)

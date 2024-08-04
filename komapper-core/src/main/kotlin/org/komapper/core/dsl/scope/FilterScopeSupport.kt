@@ -9,8 +9,7 @@ import org.komapper.core.dsl.expression.Operand
 import org.komapper.core.dsl.expression.SqlBuilderScope
 import org.komapper.core.dsl.expression.SubqueryExpression
 import org.komapper.core.dsl.operator.CriteriaContext
-import java.util.Deque
-import java.util.LinkedList
+import java.util.*
 
 class FilterScopeSupport<F : FilterScope<F>>(
     private val constructFilterScope: (FilterScopeSupport<F>) -> F,
@@ -238,9 +237,21 @@ class FilterScopeSupport<F : FilterScope<F>>(
         add(Criterion.Between(left, right))
     }
 
+    override fun <T : Comparable<T>, S : Any> ColumnExpression<T, S>.between(range: Pair<ColumnExpression<T, S>, ColumnExpression<T, S>>) {
+        val left = Operand.Column(this)
+        val right = Operand.Column(range.first) to Operand.Column(range.second)
+        add(Criterion.Between(left, right))
+    }
+
     override infix fun <T : Comparable<T>, S : Any> ColumnExpression<T, S>.notBetween(range: ClosedRange<T>) {
         val left = Operand.Column(this)
         val right = Operand.Argument(this, range.start) to Operand.Argument(this, range.endInclusive)
+        add(Criterion.NotBetween(left, right))
+    }
+
+    override infix fun <T : Comparable<T>, S : Any> ColumnExpression<T, S>.notBetween(range: Pair<ColumnExpression<T, S>, ColumnExpression<T, S>>) {
+        val left = Operand.Column(this)
+        val right = Operand.Column(range.first) to Operand.Column(range.second)
         add(Criterion.NotBetween(left, right))
     }
 
