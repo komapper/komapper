@@ -1,6 +1,6 @@
 package org.komapper.template.expression
 
-internal enum class ExprTokenType {
+enum class ExprTokenType {
     WHITESPACE,
     OPEN_PAREN,
     CLOSE_PAREN,

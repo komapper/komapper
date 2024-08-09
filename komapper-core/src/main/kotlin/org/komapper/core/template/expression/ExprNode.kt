@@ -3,7 +3,7 @@ package org.komapper.template.expression
 import kotlin.reflect.KType
 import org.komapper.template.expression.ExprLocation as Loc
 
-internal sealed class ExprNode {
+sealed class ExprNode {
     abstract val location: Loc
 
     data class Not(override val location: Loc, val operand: ExprNode) : ExprNode()

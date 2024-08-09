@@ -4,8 +4,6 @@ import org.komapper.core.BuilderDialect
 import org.komapper.core.TemplateStatementBuilder
 import org.komapper.core.spi.TemplateStatementBuilderFactory
 import org.komapper.template.expression.CacheExprNodeFactory
-import org.komapper.template.expression.DefaultExprEnvironment
-import org.komapper.template.expression.DefaultExprEvaluator
 import org.komapper.template.expression.NoCacheExprNodeFactory
 import org.komapper.template.sql.CacheSqlNodeFactory
 import org.komapper.template.sql.NoCacheSqlNodeFactory

@@ -35,8 +35,6 @@ import org.komapper.template.sql.SqlTokenType.UNION
 import org.komapper.template.sql.SqlTokenType.WHERE
 import org.komapper.template.sql.SqlTokenType.WORD
 import java.util.LinkedList
-import kotlin.reflect.KClass
-import kotlin.reflect.full.isSubclassOf
 
 internal class SqlParser constructor(
     val sql: String,
@@ -140,7 +138,7 @@ internal class SqlParser constructor(
         if (expression.isEmpty()) {
             throw SqlException("The expression is not found in the elseif directive at $location")
         }
-        reduceUntil(IfBlockReducer::class)
+        reduceUntil { it is IfBlockReducer }
         if (reducers.isEmpty()) {
             throw SqlException("The corresponding if directive is not found at $location")
         }
@@ -148,7 +146,7 @@ internal class SqlParser constructor(
     }
 
     private fun parseElseDirective() {
-        reduceUntil(IfBlockReducer::class)
+        reduceUntil { it is IfBlockReducer }
         if (reducers.isEmpty()) {
             throw SqlException("The corresponding if directive is not found at $location")
         }
@@ -156,7 +154,7 @@ internal class SqlParser constructor(
     }
 
     private fun parseEndDirective() {
-        reduceUntil(BlockReducer::class)
+        reduceUntil { it is BlockReducer }
         if (reducers.isEmpty()) {
             throw SqlException("The corresponding if or for directive is not found at $location")
         }
@@ -186,11 +184,11 @@ internal class SqlParser constructor(
         reducers.push(ForDirectiveReducer(location, token, identifier, expression))
     }
 
-    private fun reduceUntil(klass: KClass<out SqlReducer>) {
+    private fun reduceUntil(predicate: (SqlReducer) -> Boolean) {
         val it = reducers.iterator()
         while (it.hasNext()) {
             val reducer = it.next()
-            if (reducer::class.isSubclassOf(klass)) {
+            if (predicate(reducer)) {
                 break
             }
             it.remove()

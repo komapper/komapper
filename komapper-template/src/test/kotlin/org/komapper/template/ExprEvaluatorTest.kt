@@ -1,13 +1,18 @@
-package org.komapper.template.expression
+package org.komapper.template
 
 import org.junit.jupiter.api.Nested
 import org.komapper.core.TemplateBuiltinExtensions
 import org.komapper.core.Value
+import org.komapper.template.expression.ExprContext
+import org.komapper.template.expression.ExprException
+import org.komapper.template.expression.NoCacheExprNodeFactory
+import kotlin.jvm.java
 import kotlin.reflect.typeOf
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import kotlin.to
 
 class ExprEvaluatorTest {
 

@@ -6,8 +6,6 @@ import org.komapper.core.DryRunDataOperator
 import org.komapper.core.DryRunDialect
 import org.komapper.core.TemplateBuiltinExtensions
 import org.komapper.core.Value
-import org.komapper.template.expression.DefaultExprEnvironment
-import org.komapper.template.expression.DefaultExprEvaluator
 import org.komapper.template.expression.NoCacheExprNodeFactory
 import org.komapper.template.sql.NoCacheSqlNodeFactory
 import org.komapper.template.sql.SqlException

@@ -1,9 +1,19 @@
-package org.komapper.template.expression
+package org.komapper.template
 
 import org.komapper.core.Value
+import kotlin.collections.onEach
 import kotlin.reflect.KFunction
 import kotlin.reflect.KProperty
 import kotlin.reflect.jvm.isAccessible
+import kotlin.text.any
+import kotlin.text.isBlank
+import kotlin.text.isEmpty
+import kotlin.text.isNotBlank
+import kotlin.text.isNotEmpty
+import kotlin.text.isNullOrBlank
+import kotlin.text.isNullOrEmpty
+import kotlin.text.lastIndex
+import kotlin.text.none
 
 internal interface ExprEnvironment {
     val ctx: Map<String, Value<*>>

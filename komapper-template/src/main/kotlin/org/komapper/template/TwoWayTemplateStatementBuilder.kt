@@ -7,7 +7,6 @@ import org.komapper.core.TemplateBuiltinExtensions
 import org.komapper.core.TemplateStatementBuilder
 import org.komapper.core.Value
 import org.komapper.template.expression.ExprContext
-import org.komapper.template.expression.ExprEvaluator
 import org.komapper.template.expression.ExprException
 import org.komapper.template.sql.SqlException
 import org.komapper.template.sql.SqlLocation
@@ -179,8 +178,9 @@ internal class TwoWayTemplateStatementBuilder(
                     if (elseIfDirective != null) {
                         return elseIfDirective.nodeList
                     } else {
-                        if (node.elseDirective != null) {
-                            return node.elseDirective.nodeList
+                        val elseDirective = node.elseDirective
+                        if (elseDirective != null) {
+                            return elseDirective.nodeList
                         } else {
                             return emptyList()
                         }
