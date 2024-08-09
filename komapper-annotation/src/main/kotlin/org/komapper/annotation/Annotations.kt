@@ -274,6 +274,14 @@ annotation class KomapperProjectionDef(
     val function: String = "",
 )
 
+// TODO
+@Target(AnnotationTarget.CLASS)
+@Retention(AnnotationRetention.SOURCE)
+annotation class KomapperCommand(
+    val sql: String,
+    val def: KClass<*> = Void::class,
+)
+
 /**
  * Indicates an association link.
  *
