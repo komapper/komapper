@@ -279,7 +279,6 @@ annotation class KomapperProjectionDef(
 @Retention(AnnotationRetention.SOURCE)
 annotation class KomapperCommand(
     val sql: String,
-    val def: KClass<*> = Void::class,
 )
 
 /**

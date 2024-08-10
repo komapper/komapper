@@ -34,9 +34,12 @@ internal object BackquotedSymbols {
     const val PropertyMetamodel = "`org.komapper.core.dsl.metamodel`.PropertyMetamodel"
     const val PropertyMetamodelImpl = "`org.komapper.core.dsl.metamodel`.PropertyMetamodelImpl"
     const val PropertyMetamodelStub = "`org.komapper.core.dsl.metamodel`.PropertyMetamodelStub"
+    const val Query = "`org.komapper.core.dsl.query`.Query"
+    const val QueryDsl = "`org.komapper.core.dsl`.QueryDsl"
     const val SelectQuery = "`org.komapper.core.dsl.query`.SelectQuery"
     const val Sequence = "`org.komapper.core.dsl.metamodel`.IdGenerator.Sequence"
     const val TemplateSelectQuery = "`org.komapper.core.dsl.query`.TemplateSelectQuery"
     const val TemplateSelectQueryBuilder = "`org.komapper.core.dsl.query`.TemplateSelectQueryBuilder"
     const val UUID = "`java.util`.UUID"
+    const val Value = "`org.komapper.core`.Value"
 }
