@@ -10,7 +10,7 @@ import org.komapper.processor.Context
 import org.komapper.processor.ContextFactory
 
 @ThreadSafe
-class CommandProcessorProvider : SymbolProcessorProvider {
+internal class CommandProcessorProvider : SymbolProcessorProvider {
     override fun create(environment: SymbolProcessorEnvironment): SymbolProcessor {
         val config = Config.create(environment.options)
         val factory = object : ContextFactory {

@@ -2,7 +2,7 @@ package org.komapper.processor.command
 
 import com.google.devtools.ksp.symbol.KSFile
 
-class CommandModel(
+internal class CommandModel(
     val command: Command,
 ) {
 

@@ -24,7 +24,7 @@ internal class CommandFactory(
         val result = createCommandResult(classDeclaration)
         // TODO
         val (packageName, fileName) = createFileName(context, classDeclaration)
-        return Command(sql, classDeclaration, parameters, result, packageName, fileName)
+        return Command(sql, annotation, classDeclaration, parameters, result, packageName, fileName)
     }
 
     private fun createCommandResult(classDeclaration: KSClassDeclaration): CommandResult {

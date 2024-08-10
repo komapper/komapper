@@ -1,6 +1,7 @@
 package org.komapper.template
 
 import org.komapper.core.Value
+import org.komapper.core.template.expression.ExprArgList
 import org.komapper.template.expression.ExprContext
 import org.komapper.template.expression.ExprException
 import org.komapper.template.expression.ExprLocation
@@ -47,9 +48,6 @@ internal class DefaultExprEvaluator(
     private val classResolver: (String) -> Class<*> = { Class.forName(it) },
 ) : ExprEvaluator {
 
-    // used to distinguish multiple arguments from a single List
-    class ArgList : ArrayList<Any?>()
-
     sealed class ClassRef {
         abstract val clazz: Class<*>
 
@@ -74,10 +72,10 @@ internal class DefaultExprEvaluator(
         is ExprNode.Literal -> Value(node.value, node.type)
         is ExprNode.Comma -> node.nodeList.map {
             visit(it, ctx)
-        }.map { it.any }.toCollection(ArgList()).let {
+        }.map { it.any }.toCollection(ExprArgList()).let {
             Value(
                 it,
-                typeOf<ArgList>(),
+                typeOf<ExprArgList>(),
             )
         }
         is ExprNode.ClassRef -> visitClassRef(node, ctx)
@@ -285,7 +283,7 @@ internal class DefaultExprEvaluator(
 
         val arguments = when (args) {
             Unit -> emptyList()
-            is ArgList -> args
+            is ExprArgList -> args
             else -> listOf(args)
         }
         return (receiverType.classifier as KClass<*>).staticFunctions.pick(arguments)
@@ -312,7 +310,7 @@ internal class DefaultExprEvaluator(
 
         val arguments = when (args) {
             Unit -> listOf(receiver)
-            is ArgList -> listOf(receiver) + args
+            is ExprArgList -> listOf(receiver) + args
             else -> listOf(receiver, args)
         }
         return (receiverType.classifier as KClass<*>).memberFunctions.pick(arguments)

@@ -23,15 +23,15 @@ internal class CommandProcessor(
             analyzer.analyze(symbol).let { result ->
                 when (result) {
                     is CommandAnalysisResult.Success -> {
-                        val model = result.model
-                        generateMetamodel(context, model)
-                    }
-
-                    is CommandAnalysisResult.Error -> {
-                        log(context, result.exit)
+                        generateMetamodel(context, result.model)
                     }
 
                     is CommandAnalysisResult.Failure -> {
+                        log(context, result.exit)
+                        generateMetamodel(context, result.model)
+                    }
+
+                    is CommandAnalysisResult.Error -> {
                         log(context, result.exit)
                     }
 
