@@ -19,8 +19,7 @@ import org.komapper.template.expression.NoCacheExprNodeFactory
 import kotlin.reflect.KClass
 import kotlin.reflect.typeOf
 
-// TODO rename
-internal class ExpressionValidator(private val context: Context, private val expression: String) {
+internal class ExprValidator(private val context: Context, private val expression: String) {
 
     private val stringType = context.resolver.builtIns.stringType
     private val booleanType = context.resolver.builtIns.booleanType

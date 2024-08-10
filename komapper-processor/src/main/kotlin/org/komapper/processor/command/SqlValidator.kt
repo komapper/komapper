@@ -3,7 +3,7 @@ package org.komapper.processor.command
 import com.google.devtools.ksp.symbol.KSType
 import org.komapper.core.TemplateBuiltinExtensions
 import org.komapper.processor.Context
-import org.komapper.processor.command.ExpressionValidator.ExprContext
+import org.komapper.processor.command.ExprValidator.ExprContext
 import org.komapper.template.expression.ExprException
 import org.komapper.template.sql.NoCacheSqlNodeFactory
 import org.komapper.template.sql.SqlException
@@ -116,7 +116,7 @@ internal class SqlValidator(private val context: Context, private val command: C
 
     private fun validateExpression(location: SqlLocation, expression: String, ctx: ExprContext): KSType {
         return try {
-            ExpressionValidator(context, expression).validate(ctx)
+            ExprValidator(context, expression).validate(ctx)
         } catch (e: ExprException) {
             throw SqlException("The expression evaluation was failed. ${e.message} at $location. ", e)
         }
