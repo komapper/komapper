@@ -5,6 +5,8 @@ import integration.core.AddressDto
 import integration.core.Dbms
 import integration.core.Run
 import integration.core.address
+import integration.core.enumPropertyData
+import integration.core.enumclass.Color
 import integration.core.selectAsAddress
 import integration.core.selectAsAddressDto
 import org.junit.jupiter.api.extension.ExtendWith
@@ -455,5 +457,28 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
             QueryDsl.from(a).where { a.addressId eq 16 }.single()
         }
         assertEquals("REE", address.street)
+    }
+
+    @KomapperCommand(
+        """
+        insert into enum_property_data 
+            (id, "value") 
+        values 
+            (/* id */0, /*%if color == @integration.core.enumclass.Color@.BLUE */20/*%else*/null/*%end*/)
+        """,
+    )
+    class AddEnumPropertyData(val id: Int, val color: Color) : Exec
+
+    @Test
+    @Run(onlyIf = [Dbms.H2])
+    fun enum_property() {
+        db.runQuery {
+            QueryDsl.executeCommand(AddEnumPropertyData(1, Color.BLUE))
+        }
+        val m = Meta.enumPropertyData
+        val data2 = db.runQuery {
+            QueryDsl.from(m).where { m.id eq 1 }.first()
+        }
+        assertEquals(Color.BLUE, data2.value)
     }
 }

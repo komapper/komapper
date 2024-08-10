@@ -1,5 +1,6 @@
 package org.komapper.processor.command
 
+import com.google.devtools.ksp.symbol.ClassKind
 import com.google.devtools.ksp.symbol.KSAnnotation
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSDeclaration
@@ -160,19 +161,19 @@ internal class ExpressionValidator(private val context: Context, private val exp
 
     private fun visitProperty(node: ExprNode.Property, ctx: ExprContext): KSType {
         val receiverType = visit(node.receiver, ctx)
-        // TODO
-//        if (receiver is ClassRef.EnumRef) {
-//            val enum = receiver.clazz.enumConstants.first { it.name == node.name }
-//            return Value(enum, receiver.clazz.kotlin.createType())
-//        }
         return findProperty(node.name, receiverType)
-            ?: throw ExprException("The property \"${node.name}\" is not found at ${node.location}")
+            ?: throw ExprException("The property \"${node.name}\" is not found at ${node.location} ${receiverType.declaration}")
     }
 
     private fun findProperty(name: String, receiverType: KSType): KSType? {
-        val classDeclaration = receiverType.declaration as? KSClassDeclaration
-        val propertyDeclaration = classDeclaration?.getAllProperties()?.firstOrNull { it.simpleName.asString() == name }
-        return propertyDeclaration?.type?.resolve()
+        val classDeclaration = receiverType.declaration as? KSClassDeclaration ?: return null
+        return if (classDeclaration.classKind == ClassKind.ENUM_CLASS) {
+            val entryDeclaration = classDeclaration.declarations.firstOrNull { it.simpleName.asString() == name }
+            (entryDeclaration as? KSClassDeclaration)?.asType(emptyList())
+        } else {
+            classDeclaration.getAllProperties()
+                .firstOrNull { it.simpleName.asString() == name }?.type?.resolve()
+        }
     }
 
     private fun visitFunction(node: ExprNode.Function, ctx: ExprContext): KSType {
