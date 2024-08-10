@@ -1,11 +1,13 @@
 package org.komapper.processor.command
 
+import com.google.devtools.ksp.symbol.KSAnnotation
 import com.google.devtools.ksp.symbol.KSClassDeclaration
+import com.google.devtools.ksp.symbol.KSDeclaration
 import com.google.devtools.ksp.symbol.KSType
+import com.google.devtools.ksp.symbol.KSTypeArgument
 import com.google.devtools.ksp.symbol.KSValueParameter
-import com.google.devtools.ksp.symbol.Variance
+import com.google.devtools.ksp.symbol.Nullability
 import org.komapper.core.TemplateBuiltinExtensions
-import org.komapper.core.template.expression.ExprArgList
 import org.komapper.processor.Context
 import org.komapper.template.expression.ExprException
 import org.komapper.template.expression.ExprLocation
@@ -19,9 +21,9 @@ internal class ExpressionValidator(private val context: Context, private val exp
 
     private val booleanType = context.resolver.builtIns.booleanType
     private val unitType = context.resolver.builtIns.unitType
-    private val comparableType = context.resolver.extensions.comparableType
-    private val exprArgListDeclaration = context.resolver.getKSNameFromString(ExprArgList::class.qualifiedName!!).let {
-        context.resolver.getClassDeclarationByName(it) ?: error("Class not found: ${it.asString()}")
+    private val comparableType = context.resolver.getKSNameFromString("kotlin.Comparable").let {
+        context.resolver.getClassDeclarationByName(it)?.asStarProjectedType()
+            ?: error("Class not found: ${it.asString()}")
     }
 
     private val exprNodeFactory: ExprNodeFactory = NoCacheExprNodeFactory()
@@ -64,14 +66,8 @@ internal class ExpressionValidator(private val context: Context, private val exp
         }
 
         is ExprNode.Comma -> {
-            val typeArguments = node.nodeList
-                .map {
-                    visit(it, ctx)
-                }.map {
-                    val refType = context.resolver.createKSTypeReferenceFromKSType(it)
-                    context.resolver.getTypeArgument(refType, Variance.INVARIANT)
-                }
-            exprArgListDeclaration.asType(typeArguments)
+            val types = node.nodeList.map { visit(it, ctx) }
+            KSTypeList(types)
         }
 
         is ExprNode.ClassRef -> visitClassRef(node, ctx)
@@ -181,7 +177,14 @@ internal class ExpressionValidator(private val context: Context, private val exp
 
     private fun visitFunction(node: ExprNode.Function, ctx: ExprContext): KSType {
         val receiverType = visit(node.receiver, ctx)
-        val args = visit(node.args, ctx)
+        val args = when (val args = visit(node.args, ctx)) {
+            is KSTypeList -> args.ksTypes
+            else -> if (args == unitType) {
+                emptyList()
+            } else {
+                listOf(args)
+            }
+        }
         return findFunction(node.name, receiverType, args, ctx)
             ?: throw ExprException("The function \"${node.name}\" is not found at ${node.location}")
 
@@ -231,35 +234,20 @@ internal class ExpressionValidator(private val context: Context, private val exp
     private fun findFunction(
         name: String,
         receiverType: KSType,
-        args: KSType,
+        args: List<KSType>,
         ctx: ExprContext,
     ): KSType? {
-        val classDeclaration = receiverType.declaration as? KSClassDeclaration // TODO
-        if (classDeclaration == null) {
-            return null
-        }
-
-        val arguments: List<KSType> = when (args) {
-            unitType -> listOf(receiverType)
-            else -> {
-                if (args.declaration == exprArgListDeclaration) {
-                    listOf(receiverType) + args.arguments.map {
-                        it.type?.resolve() ?: context.resolver.builtIns.nothingType
-                    }
-                } else {
-                    listOf(receiverType, args)
-                }
-            }
-        }
+        val classDeclaration = receiverType.declaration as? KSClassDeclaration
+            ?: throw ExprException("The receiver type is not a class: ${receiverType.declaration}")
 
         val function = classDeclaration.getAllFunctions()
             .filter {
                 it.simpleName.asString() == name
             }.filter {
-                it.parameters.size == arguments.size
+                it.parameters.size == args.size
             }.filter {
-                it.parameters.zip(arguments).all { (param, arg) ->
-                    param.type.resolve() == arg
+                it.parameters.zip(args).all { (param, arg) ->
+                    param.type.resolve().isAssignableFrom(arg)
                 }
             }.firstOrNull()
         return function?.returnType?.resolve()
@@ -269,4 +257,53 @@ internal class ExpressionValidator(private val context: Context, private val exp
         val valueMap: Map<String, KSValueParameter>,
         val builtinExtensions: TemplateBuiltinExtensions,
     )
+
+    data class KSTypeList(
+        val ksTypes: List<KSType>,
+    ) : KSType {
+        override val annotations: Sequence<KSAnnotation>
+            get() = throw UnsupportedOperationException()
+        override val arguments: List<KSTypeArgument>
+            get() = throw UnsupportedOperationException()
+        override val declaration: KSDeclaration
+            get() = throw UnsupportedOperationException()
+        override val isError: Boolean
+            get() = throw UnsupportedOperationException()
+        override val isFunctionType: Boolean
+            get() = throw UnsupportedOperationException()
+        override val isMarkedNullable: Boolean
+            get() = throw UnsupportedOperationException()
+        override val isSuspendFunctionType: Boolean
+            get() = throw UnsupportedOperationException()
+        override val nullability: Nullability
+            get() = throw UnsupportedOperationException()
+
+        override fun isAssignableFrom(that: KSType): Boolean {
+            throw UnsupportedOperationException()
+        }
+
+        override fun isCovarianceFlexible(): Boolean {
+            throw UnsupportedOperationException()
+        }
+
+        override fun isMutabilityFlexible(): Boolean {
+            throw UnsupportedOperationException()
+        }
+
+        override fun makeNotNullable(): KSType {
+            throw UnsupportedOperationException()
+        }
+
+        override fun makeNullable(): KSType {
+            throw UnsupportedOperationException()
+        }
+
+        override fun replace(arguments: List<KSTypeArgument>): KSType {
+            throw UnsupportedOperationException()
+        }
+
+        override fun starProjection(): KSType {
+            throw UnsupportedOperationException()
+        }
+    }
 }

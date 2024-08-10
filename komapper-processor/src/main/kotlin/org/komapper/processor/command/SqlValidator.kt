@@ -114,7 +114,7 @@ internal class SqlValidator(private val context: Context, private val command: C
         -> error("unreachable")
     }
 
-    fun validateExpression(location: SqlLocation, expression: String, ctx: ExprContext): KSType {
+    private fun validateExpression(location: SqlLocation, expression: String, ctx: ExprContext): KSType {
         return try {
             ExpressionValidator(context, expression).validate(ctx)
         } catch (e: ExprException) {

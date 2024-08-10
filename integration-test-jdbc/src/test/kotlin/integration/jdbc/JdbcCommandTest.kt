@@ -386,4 +386,74 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
         }
         assertEquals(9, address.version)
     }
+
+    @KomapperCommand(
+        """
+        insert into address 
+            (address_id, street, version) 
+        values 
+            (/* id */0, /* street.toString() */'', /* id */0)
+        """,
+    )
+    class FunctionCall0Arg(val id: Int, val street: String) : Exec
+
+    @Test
+    fun functionCall_0Arg() {
+        val count = db.runQuery {
+            QueryDsl.executeCommand(FunctionCall0Arg(16, "STREET 16"))
+        }
+        assertEquals(1, count)
+        val a = Meta.address
+        val address = db.runQuery {
+            QueryDsl.from(a).where { a.addressId eq 16 }.single()
+        }
+        assertEquals("STREET 16", address.street)
+    }
+
+    @KomapperCommand(
+        """
+        insert into address 
+            (address_id, street, version) 
+        values 
+            (/* id */0, /* street.equals(0) */'', /* id */0)
+        """,
+    )
+    class FunctionCall1Arg(val id: Int, val street: String) : Exec
+
+    @Test
+    @Run(onlyIf = [Dbms.H2])
+    fun functionCall_1Arg() {
+        val count = db.runQuery {
+            QueryDsl.executeCommand(FunctionCall1Arg(16, "STREET 16"))
+        }
+        assertEquals(1, count)
+        val a = Meta.address
+        val address = db.runQuery {
+            QueryDsl.from(a).where { a.addressId eq 16 }.single()
+        }
+        assertEquals("FALSE", address.street)
+    }
+
+    @KomapperCommand(
+        """
+        insert into address 
+            (address_id, street, version) 
+        values 
+            (/* id */0, /* street.subSequence(start, end).toString() */'', /* id */0)
+        """,
+    )
+    class FunctionCall2Arg(val id: Int, val street: String, val start: Int, val end: Int) : Exec
+
+    @Test
+    fun functionCall_2Args() {
+        val count = db.runQuery {
+            QueryDsl.executeCommand(FunctionCall2Arg(16, "STREET 16", 2, 5))
+        }
+        assertEquals(1, count)
+        val a = Meta.address
+        val address = db.runQuery {
+            QueryDsl.from(a).where { a.addressId eq 16 }.single()
+        }
+        assertEquals("REE", address.street)
+    }
 }

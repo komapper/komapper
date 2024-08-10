@@ -1,7 +1,6 @@
 package org.komapper.template
 
 import org.komapper.core.Value
-import org.komapper.core.template.expression.ExprArgList
 import org.komapper.template.expression.ExprContext
 import org.komapper.template.expression.ExprException
 import org.komapper.template.expression.ExprLocation
@@ -47,6 +46,9 @@ internal class DefaultExprEvaluator(
     private val exprEnvironment: ExprEnvironment,
     private val classResolver: (String) -> Class<*> = { Class.forName(it) },
 ) : ExprEvaluator {
+
+    // used to distinguish multiple arguments from a single List argument
+    class ExprArgList : ArrayList<Any?>()
 
     sealed class ClassRef {
         abstract val clazz: Class<*>
