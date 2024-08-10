@@ -15,10 +15,12 @@ internal class CommandAnalyzer(private val context: Context) {
         } catch (e: Exit) {
             return CommandAnalysisResult.Error(e)
         }
-        try {
-            validateCommand(model.command)
-        } catch (e: Exit) {
-            return CommandAnalysisResult.Failure(model, e)
+        if (!model.command.disableValidation) {
+            try {
+                validateCommand(model.command)
+            } catch (e: Exit) {
+                return CommandAnalysisResult.Failure(model, e)
+            }
         }
         return CommandAnalysisResult.Success(model)
     }

@@ -43,14 +43,14 @@ internal class ExpressionValidator(private val context: Context, private val exp
         is ExprNode.Lt -> compare(node.location, node.left, node.right, ctx)
         is ExprNode.Literal -> {
             when (node.type) {
-                typeOf<String>() -> context.resolver.builtIns.byteType
-                typeOf<String>() -> context.resolver.builtIns.shortType
-                typeOf<String>() -> context.resolver.builtIns.intType
-                typeOf<String>() -> context.resolver.builtIns.longType
-                typeOf<String>() -> context.resolver.builtIns.floatType
-                typeOf<String>() -> context.resolver.builtIns.doubleType
-                typeOf<String>() -> context.resolver.builtIns.charType
-                typeOf<String>() -> context.resolver.builtIns.booleanType
+                typeOf<Byte>() -> context.resolver.builtIns.byteType
+                typeOf<Short>() -> context.resolver.builtIns.shortType
+                typeOf<Int>() -> context.resolver.builtIns.intType
+                typeOf<Long>() -> context.resolver.builtIns.longType
+                typeOf<Float>() -> context.resolver.builtIns.floatType
+                typeOf<Double>() -> context.resolver.builtIns.doubleType
+                typeOf<Char>() -> context.resolver.builtIns.charType
+                typeOf<Boolean>() -> context.resolver.builtIns.booleanType
                 typeOf<String>() -> context.resolver.builtIns.stringType
                 else -> {
                     val klass = node.type.classifier as? KClass<*>
@@ -118,13 +118,8 @@ internal class ExpressionValidator(private val context: Context, private val exp
         rightNode: ExprNode,
         ctx: ExprContext,
     ): KSType {
-        val left = visit(leftNode, ctx)
-        val right = visit(rightNode, ctx)
-        if (left != right) {
-            throw ExprException(
-                "Cannot compare because the operands are not the same type at $location",
-            )
-        }
+        visit(leftNode, ctx)
+        visit(rightNode, ctx)
         return booleanType
     }
 
@@ -135,8 +130,8 @@ internal class ExpressionValidator(private val context: Context, private val exp
         rightNode: ExprNode,
         ctx: ExprContext,
     ): KSType {
-        val left = visit(leftNode, ctx)
-        val right = visit(rightNode, ctx)
+        val left = visit(leftNode, ctx).makeNullable()
+        val right = visit(rightNode, ctx).makeNullable()
         if (left != right) {
             throw ExprException(
                 "Cannot compare because the operands are not the same type at $location",
@@ -179,7 +174,7 @@ internal class ExpressionValidator(private val context: Context, private val exp
     }
 
     private fun findProperty(name: String, receiverType: KSType): KSType? {
-        val classDeclaration = receiverType.declaration as? KSClassDeclaration // TODO
+        val classDeclaration = receiverType.declaration as? KSClassDeclaration
         val propertyDeclaration = classDeclaration?.getAllProperties()?.firstOrNull { it.simpleName.asString() == name }
         return propertyDeclaration?.type?.resolve()
     }

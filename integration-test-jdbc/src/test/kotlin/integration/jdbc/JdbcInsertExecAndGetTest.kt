@@ -17,7 +17,7 @@ import kotlin.test.assertNotEquals
 import kotlin.test.assertNull
 
 @ExtendWith(JdbcEnv::class)
-class JdbcInsertExecuteAndGetTest(private val db: JdbcDatabase) {
+class JdbcInsertExecAndGetTest(private val db: JdbcDatabase) {
 
     @Test
     fun onDuplicateKeyUpdate_insert() {

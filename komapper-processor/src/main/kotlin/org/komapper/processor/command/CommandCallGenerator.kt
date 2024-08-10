@@ -7,7 +7,6 @@ import org.komapper.processor.Context
 import org.komapper.processor.name
 import java.io.PrintWriter
 import kotlin.collections.joinToString
-import kotlin.collections.map
 import kotlin.text.isNotEmpty
 
 internal class CommandCallGenerator(
@@ -35,38 +34,18 @@ internal class CommandCallGenerator(
     }
 
     private fun functionDeclaration() {
-        when (command.result.kind) {
-            CommandKind.Execute -> executeCommand()
-            else -> fromCommand()
+        val prefix = command.result.functionPrefix
+        val commandTypeName = command.classDeclaration.asStarProjectedType().name
+        val returnTypeName = command.result.returnType.name
+        val bindCalls = command.parameters.joinToString("\n        ", prefix = "\n        ") {
+            val name = it.name!!.asString()
+            ".bindValue(\"$name\", $Value(command.$name, $typeOf<${it.type.resolve().name}>()))"
         }
-    }
-
-    private fun executeCommand() {
-        val resultType = command.result.type.name
-        val bindCalls = command.parameters.map {
-            val name = it.name!!.asString()
-            ".bindValue(\"$name\", $Value(command.$name, $typeOf<${it.type.resolve().name}>()))"
-        }.joinToString("\n        ", prefix = "\n        ")
-        w.println("public fun $QueryDsl.executeCommand(command: ${command.classDeclaration.asStarProjectedType().name}) : $resultType {")
-        w.println("    val sql = \"\"\"${command.sql}\"\"\"")
-        w.println("    val query = executeTemplate(sql)${ if (command.parameters.isNotEmpty()) bindCalls else ""}")
+        w.println("public fun $QueryDsl.${prefix}Command(command: $commandTypeName) : $returnTypeName {")
+        w.println("    val sql = \"\"\"${command.sql}\"\"\".trimIndent()")
+        w.println("    val binding = ${prefix}Template(sql)${ if (command.parameters.isNotEmpty()) bindCalls else ""}")
         w.println("    return with(command) {")
-        w.println("        query.execute()")
-        w.println("    }")
-        w.println("}")
-    }
-
-    private fun fromCommand() {
-        val resultType = command.result.type.name
-        val bindCalls = command.parameters.map {
-            val name = it.name!!.asString()
-            ".bindValue(\"$name\", $Value(command.$name, $typeOf<${it.type.resolve().name}>()))"
-        }.joinToString("\n        ", prefix = "\n        ")
-        w.println("public fun $QueryDsl.fromCommand(command: ${command.classDeclaration.asStarProjectedType().name}) : $resultType {")
-        w.println("    val sql = \"\"\"${command.sql}\"\"\"")
-        w.println("    val builder = fromTemplate(sql)${ if (command.parameters.isNotEmpty()) bindCalls else ""}")
-        w.println("    return with(command) {")
-        w.println("        builder.select()")
+        w.println("        binding.execute()")
         w.println("    }")
         w.println("}")
     }

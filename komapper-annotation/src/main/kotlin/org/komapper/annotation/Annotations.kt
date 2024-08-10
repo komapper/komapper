@@ -279,7 +279,12 @@ annotation class KomapperProjectionDef(
 @Retention(AnnotationRetention.SOURCE)
 annotation class KomapperCommand(
     val sql: String,
-)
+    val disableValidation: Boolean = DISABLE_VALIDATION,
+) {
+    companion object {
+        const val DISABLE_VALIDATION: Boolean = false
+    }
+}
 
 /**
  * Indicates an association link.

@@ -8,13 +8,13 @@ import org.komapper.core.dsl.query.TemplateSelectQueryBuilder
 sealed interface Command
 
 interface One<T> : Command {
-    fun TemplateSelectQueryBuilder.select(): Query<T>
+    fun TemplateSelectQueryBuilder.execute(): Query<T>
 }
 
 interface Many<T : Any> : Command {
-    fun TemplateSelectQueryBuilder.select(): ListQuery<T>
+    fun TemplateSelectQueryBuilder.execute(): ListQuery<T>
 }
 
-interface Execute : Command {
+interface Exec : Command {
     fun TemplateExecuteQuery.execute(): Query<Long> = this
 }
