@@ -368,6 +368,38 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
 
     @KomapperCommand(
         """
+        select 
+            address_id, street, version 
+        from 
+            address 
+        where
+            /*%for street in streets */
+            street = /*street*/''
+            /*%if street_has_next */
+            /*# "or"*/
+            /*%end*/
+            /*%end*/
+        order by 
+            address_id
+        """,
+    )
+    class ForDirective(val streets: List<String>) : Many<Address> {
+        override fun TemplateSelectQueryBuilder.execute() = selectAsAddress()
+    }
+
+    @Test
+    fun forDirective() {
+        val list = db.runQuery {
+            QueryDsl.fromCommand(ForDirective(listOf("STREET 1", "STREET 3", "STREET 5")))
+        }
+        assertEquals(3, list.size)
+        assertEquals(Address(1, "STREET 1", 1), list[0])
+        assertEquals(Address(3, "STREET 3", 1), list[1])
+        assertEquals(Address(5, "STREET 5", 1), list[2])
+    }
+
+    @KomapperCommand(
+        """
         insert into address 
             (address_id, street, version) 
         values 

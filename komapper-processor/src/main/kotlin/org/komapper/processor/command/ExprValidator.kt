@@ -6,7 +6,6 @@ import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSDeclaration
 import com.google.devtools.ksp.symbol.KSType
 import com.google.devtools.ksp.symbol.KSTypeArgument
-import com.google.devtools.ksp.symbol.KSValueParameter
 import com.google.devtools.ksp.symbol.Nullability
 import com.google.devtools.ksp.symbol.Variance
 import org.komapper.core.TemplateBuiltinExtensions
@@ -36,16 +35,16 @@ internal class ExprValidator(private val context: Context, private val expressio
         return visit(node, ctx)
     }
 
-    private fun visit(node: ExprNode, ctx: ExprContext): KSType = when (node) {
-        is ExprNode.Not -> perform(node.location, node.operand, ctx)
-        is ExprNode.And -> perform(node.location, node.left, node.right, ctx)
-        is ExprNode.Or -> perform(node.location, node.left, node.right, ctx)
-        is ExprNode.Eq -> equal(node.location, node.left, node.right, ctx)
-        is ExprNode.Ne -> equal(node.location, node.left, node.right, ctx)
-        is ExprNode.Ge -> compare(node.location, node.left, node.right, ctx)
-        is ExprNode.Gt -> compare(node.location, node.left, node.right, ctx)
-        is ExprNode.Le -> compare(node.location, node.left, node.right, ctx)
-        is ExprNode.Lt -> compare(node.location, node.left, node.right, ctx)
+    private fun visit(node: ExprNode, exprCtx: ExprContext): KSType = when (node) {
+        is ExprNode.Not -> perform(node.location, node.operand, exprCtx)
+        is ExprNode.And -> perform(node.location, node.left, node.right, exprCtx)
+        is ExprNode.Or -> perform(node.location, node.left, node.right, exprCtx)
+        is ExprNode.Eq -> equal(node.location, node.left, node.right, exprCtx)
+        is ExprNode.Ne -> equal(node.location, node.left, node.right, exprCtx)
+        is ExprNode.Ge -> compare(node.location, node.left, node.right, exprCtx)
+        is ExprNode.Gt -> compare(node.location, node.left, node.right, exprCtx)
+        is ExprNode.Le -> compare(node.location, node.left, node.right, exprCtx)
+        is ExprNode.Lt -> compare(node.location, node.left, node.right, exprCtx)
         is ExprNode.Literal -> {
             when (node.type) {
                 typeOf<Byte>() -> context.resolver.builtIns.byteType
@@ -69,14 +68,14 @@ internal class ExprValidator(private val context: Context, private val expressio
         }
 
         is ExprNode.Comma -> {
-            val types = node.nodeList.map { visit(it, ctx) }
+            val types = node.nodeList.map { visit(it, exprCtx) }
             KSTypeList(types)
         }
 
-        is ExprNode.ClassRef -> visitClassRef(node, ctx)
-        is ExprNode.Value -> visitValue(node, ctx)
-        is ExprNode.Property -> visitProperty(node, ctx)
-        is ExprNode.Function -> visitFunction(node, ctx)
+        is ExprNode.ClassRef -> visitClassRef(node, exprCtx)
+        is ExprNode.Value -> visitValue(node, exprCtx)
+        is ExprNode.Property -> visitProperty(node, exprCtx)
+        is ExprNode.Function -> visitFunction(node, exprCtx)
         is ExprNode.Empty -> context.resolver.builtIns.unitType
     }
 
@@ -156,9 +155,8 @@ internal class ExprValidator(private val context: Context, private val expressio
     }
 
     private fun visitValue(node: ExprNode.Value, ctx: ExprContext): KSType {
-        val param = ctx.valueMap[node.name] // TODO ?: exprEnvironment.ctx[node.name]
+        return ctx.paramMap[node.name] // TODO ?: exprEnvironment.ctx[node.name]
             ?: throw ExprException("The template variable \"${node.name}\" is not bound to a value. Make sure the variable name is correct. expr location: ${node.location}")
-        return param.type.resolve()
     }
 
     private fun visitProperty(node: ExprNode.Property, ctx: ExprContext): KSType {
@@ -273,7 +271,7 @@ internal class ExprValidator(private val context: Context, private val expressio
     }
 
     data class ExprContext(
-        val valueMap: Map<String, KSValueParameter>,
+        val paramMap: Map<String, KSType>,
         val builtinExtensions: TemplateBuiltinExtensions,
     )
 
