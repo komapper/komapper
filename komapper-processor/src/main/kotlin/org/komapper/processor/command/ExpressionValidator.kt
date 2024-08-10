@@ -8,6 +8,7 @@ import com.google.devtools.ksp.symbol.KSType
 import com.google.devtools.ksp.symbol.KSTypeArgument
 import com.google.devtools.ksp.symbol.KSValueParameter
 import com.google.devtools.ksp.symbol.Nullability
+import com.google.devtools.ksp.symbol.Variance
 import org.komapper.core.TemplateBuiltinExtensions
 import org.komapper.processor.Context
 import org.komapper.template.expression.ExprException
@@ -18,8 +19,10 @@ import org.komapper.template.expression.NoCacheExprNodeFactory
 import kotlin.reflect.KClass
 import kotlin.reflect.typeOf
 
+// TODO rename
 internal class ExpressionValidator(private val context: Context, private val expression: String) {
 
+    private val stringType = context.resolver.builtIns.stringType
     private val booleanType = context.resolver.builtIns.booleanType
     private val unitType = context.resolver.builtIns.unitType
     private val comparableType = context.resolver.getKSNameFromString("kotlin.Comparable").let {
@@ -166,7 +169,8 @@ internal class ExpressionValidator(private val context: Context, private val exp
     }
 
     private fun findProperty(name: String, receiverType: KSType): KSType? {
-        val classDeclaration = receiverType.declaration as? KSClassDeclaration ?: return null
+        val classDeclaration = receiverType.declaration as? KSClassDeclaration
+            ?: throw ExprException("The receiver type is not a class: ${receiverType.declaration}")
         return if (classDeclaration.classKind == ClassKind.ENUM_CLASS) {
             val entryDeclaration = classDeclaration.declarations.firstOrNull { it.simpleName.asString() == name }
             (entryDeclaration as? KSClassDeclaration)?.asType(emptyList())
@@ -240,6 +244,21 @@ internal class ExpressionValidator(private val context: Context, private val exp
     ): KSType? {
         val classDeclaration = receiverType.declaration as? KSClassDeclaration
             ?: throw ExprException("The receiver type is not a class: ${receiverType.declaration}")
+
+        // TODO remove this workaround. See https://github.com/google/ksp/issues/829
+        if (classDeclaration.classKind == ClassKind.ENUM_CLASS) {
+            if (name == "valueOf" && args.size == 1 && args[0] == stringType) {
+                return receiverType
+            }
+            if (name == "values" && args.isEmpty()) {
+                val typeRef = context.resolver.createKSTypeReferenceFromKSType(receiverType)
+                val typeArg = context.resolver.getTypeArgument(typeRef, Variance.INVARIANT)
+                return context.resolver.getKSNameFromString("kotlin.Array").let {
+                    context.resolver.getClassDeclarationByName(it)?.asType(listOf(typeArg))
+                        ?: error("Class not found: ${it.asString()}")
+                }
+            }
+        }
 
         val function = classDeclaration.getAllFunctions()
             .filter {

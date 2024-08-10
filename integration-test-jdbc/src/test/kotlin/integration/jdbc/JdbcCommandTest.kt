@@ -467,18 +467,41 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
             (/* id */0, /*%if color == @integration.core.enumclass.Color@.BLUE */20/*%else*/null/*%end*/)
         """,
     )
-    class AddEnumPropertyData(val id: Int, val color: Color) : Exec
+    class EnumProperty(val id: Int, val color: Color) : Exec
 
     @Test
     @Run(onlyIf = [Dbms.H2])
     fun enum_property() {
         db.runQuery {
-            QueryDsl.executeCommand(AddEnumPropertyData(1, Color.BLUE))
+            QueryDsl.executeCommand(EnumProperty(1, Color.BLUE))
         }
         val m = Meta.enumPropertyData
         val data2 = db.runQuery {
             QueryDsl.from(m).where { m.id eq 1 }.first()
         }
         assertEquals(Color.BLUE, data2.value)
+    }
+
+    @KomapperCommand(
+        """
+        insert into enum_property_data 
+            (id, "value") 
+        values 
+            (/*%if @integration.core.enumclass.Color@.values() != null */1/*%else*/0/*%end*/, /*%if color == @integration.core.enumclass.Color@.valueOf("BLUE") */20/*%else*/null/*%end*/)
+        """,
+    )
+    class EnumFunction(val color: Color) : Exec
+
+    @Test
+    fun enum_function() {
+        db.runQuery {
+            QueryDsl.executeCommand(EnumFunction(Color.BLUE))
+        }
+        val m = Meta.enumPropertyData
+        val data = db.runQuery {
+            QueryDsl.from(m).first()
+        }
+        assertEquals(1, data.id)
+        assertEquals(Color.BLUE, data.value)
     }
 }
