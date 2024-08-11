@@ -579,4 +579,71 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
         assertEquals(1, data.id)
         assertEquals(Color.BLUE, data.value)
     }
+
+    @KomapperCommand(
+        """
+        insert into address 
+            (address_id, street, version) 
+        values 
+            (/* id */0, /* @integration.jdbc.Hello@.name */'', /* id */0)
+        """,
+    )
+    class CompanionObjectPropertyCall(val id: Int) : Exec
+
+    @Test
+    fun companionObjectPropertyCall() {
+        val count = db.runQuery {
+            QueryDsl.executeCommand(CompanionObjectPropertyCall(16))
+        }
+        assertEquals(1, count)
+        val a = Meta.address
+        val address = db.runQuery {
+            QueryDsl.from(a).where { a.addressId eq 16 }.single()
+        }
+        assertEquals("hello", address.street)
+    }
+
+    @KomapperCommand(
+        """
+        insert into address 
+            (address_id, street, version) 
+        values 
+            (/* id */0, /* @integration.jdbc.Hello@.greet("world") */'', /* id */0)
+        """,
+    )
+    class CompanionObjectFunctionCall(val id: Int) : Exec
+
+    @Test
+    fun companionObjectFunctionCall() {
+        val count = db.runQuery {
+            QueryDsl.executeCommand(CompanionObjectFunctionCall(16))
+        }
+        assertEquals(1, count)
+        val a = Meta.address
+        val address = db.runQuery {
+            QueryDsl.from(a).where { a.addressId eq 16 }.single()
+        }
+        assertEquals("hello world!", address.street)
+    }
+}
+
+@Suppress("UNUSED")
+class Hello {
+    fun say(name: String): String {
+        return "hello $name"
+    }
+
+    fun say(name: String, message: String): String {
+        return "hello $name, $message"
+    }
+
+    companion object {
+        const val name = "hello"
+
+        const val constName = "hello const"
+
+        fun greet(name: String): String {
+            return "hello $name!"
+        }
+    }
 }

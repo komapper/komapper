@@ -149,9 +149,15 @@ internal class ExprValidator(private val context: Context, private val expressio
     }
 
     private fun visitClassRef(node: ExprNode.ClassRef, @Suppress("UNUSED_PARAMETER") ctx: ExprContext): KSType {
-        return context.resolver.getKSNameFromString(node.name).let {
-            context.resolver.getClassDeclarationByName(it)?.asStarProjectedType()
+        val classDeclaration = context.resolver.getKSNameFromString(node.name).let {
+            context.resolver.getClassDeclarationByName(it)
         } ?: throw ExprException("The class \"${node.name}\" is not found at ${node.location}")
+        val companionObject = classDeclaration.declarations
+            .mapNotNull { it as? KSClassDeclaration }
+            .filter { it.isCompanionObject }
+            .firstOrNull()
+        return companionObject?.asStarProjectedType()
+            ?: classDeclaration.asStarProjectedType()
     }
 
     private fun visitValue(node: ExprNode.Value, ctx: ExprContext): KSType {
@@ -205,50 +211,8 @@ internal class ExprValidator(private val context: Context, private val expressio
         return findFunction(node.name, receiverType, args, ctx)
             ?: findExtensionFunction(node.name, receiverType, args, ctx)
             ?: throw ExprException("The function \"${node.name}\" is not found at ${node.location}")
-
-//        return if (receiver is ClassRef) {
-//            findStaticFunction(node.name, receiverType, args)
-//                ?.let { (function, arguments) -> call(function, arguments) }
-//                ?: throw ExprException("The static function \"${node.name}\" is not found at ${node.location}")
-//        } else {
-//            findFunction(node.name, receiverType, args, ctx)
-//                ?.let { (function, arguments) ->
-//                    if (receiver == null && node.safeCall) {
-//                        Value(null, function.returnType.withNullability(false))
-//                    } else {
-//                        call(function, arguments)
-//                    }
-//                }
-//                ?: throw ExprException("The function \"${node.name}\" is not found at ${node.location}")
-//        }
     }
 
-//    private fun findStaticFunction(
-//        name: String,
-//        receiverType: KType,
-//        args: Any?,
-//    ): Pair<KFunction<*>, List<Any?>>? {
-//        fun Collection<KFunction<*>>.pick(arguments: List<Any?>): Pair<KFunction<*>, List<Any?>>? {
-//            return this.filter { function ->
-//                if (name == function.name && arguments.size == function.parameters.size) {
-//                    arguments.zip(function.parameters).all { (argument, param) ->
-//                        argument == null || argument::class.isSubclassOf(param.type.jvmErasure)
-//                    }
-//                } else {
-//                    false
-//                }
-//            }.map { it to arguments }.firstOrNull()
-//        }
-//
-//        val arguments = when (args) {
-//            Unit -> emptyList()
-//            is ArgList -> args
-//            else -> listOf(args)
-//        }
-//        return (receiverType.classifier as KClass<*>).staticFunctions.pick(arguments)
-//    }
-
-    // TODO
     private fun findFunction(
         name: String,
         receiverType: KSType,
