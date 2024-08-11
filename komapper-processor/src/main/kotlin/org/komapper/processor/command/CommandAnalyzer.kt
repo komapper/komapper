@@ -10,7 +10,6 @@ import kotlin.reflect.KClass
 
 @ThreadSafe
 internal class CommandAnalyzer(private val context: Context, private val annotationClass: KClass<*>) {
-    private val sqlValidator = SqlValidator(context)
 
     fun analyze(symbol: KSAnnotated): CommandAnalysisResult {
         val command = try {
@@ -29,10 +28,14 @@ internal class CommandAnalyzer(private val context: Context, private val annotat
     }
 
     private fun validateCommand(command: Command) {
-        try {
-            sqlValidator.validate(command)
+        val usedParams = try {
+            SqlValidator(context).validate(command)
         } catch (e: SqlException) {
             report("SQL validation error: ${e.message}", command.annotation)
+        }
+        val unusedParams = command.paramMap.keys - usedParams - command.unusedParams
+        if (unusedParams.isNotEmpty()) {
+            context.logger.warn("Unused SQL params: $unusedParams. You can suppress this warning message by specifying @KomapperUnused for the param properties.", command.classDeclaration)
         }
     }
 }

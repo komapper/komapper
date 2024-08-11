@@ -11,6 +11,7 @@ import integration.core.selectAsAddress
 import integration.core.selectAsAddressDto
 import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.annotation.KomapperCommand
+import org.komapper.annotation.KomapperUnused
 import org.komapper.core.Exec
 import org.komapper.core.Many
 import org.komapper.core.One
@@ -42,7 +43,7 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
         select * from address where /*%if street != null*/ street = /*street*/'test' /*%end*/
         """,
     )
-    data class Bind(val street: String, val asAddress: (Row) -> Address) : One<Address> {
+    data class Bind(val street: String, @KomapperUnused val asAddress: (Row) -> Address) : One<Address> {
         override fun TemplateSelectQueryBuilder.execute() = select(asAddress).single()
     }
 
@@ -66,7 +67,7 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
         select * from address where /*%if street != null*/ street = /*street*/'test' /*%end*/
         """,
     )
-    data class BindNull(val street: String?, val asAddress: (Row) -> Address) : Many<Address> {
+    data class BindNull(val street: String?, @KomapperUnused val asAddress: (Row) -> Address) : Many<Address> {
         override fun TemplateSelectQueryBuilder.execute() = select(asAddress)
     }
 
@@ -83,7 +84,7 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
         select * from address where address_id in /*list*/(0)
         """,
     )
-    data class In(val list: List<Int>, val asAddress: (Row) -> Address) : Many<Address> {
+    data class In(val list: List<Int>, @KomapperUnused val asAddress: (Row) -> Address) : Many<Address> {
         override fun TemplateSelectQueryBuilder.execute() = select(asAddress)
     }
 
@@ -116,7 +117,7 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
         select * from address where (address_id, street) in /*pairs*/(0, '')
         """,
     )
-    data class In2(val pairs: List<Pair<Int, String>>, val asAddress: (Row) -> Address) : Many<Address> {
+    data class In2(val pairs: List<Pair<Int, String>>, @KomapperUnused val asAddress: (Row) -> Address) : Many<Address> {
         override fun TemplateSelectQueryBuilder.execute() = select(asAddress)
     }
 
@@ -150,7 +151,7 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
         select * from address where (address_id, street, version) in /*triples*/(0, '', 0)
         """,
     )
-    data class In3(val triples: List<Triple<Int, String, Int>>, val asAddress: (Row) -> Address) : Many<Address> {
+    data class In3(val triples: List<Triple<Int, String, Int>>, @KomapperUnused val asAddress: (Row) -> Address) : Many<Address> {
         override fun TemplateSelectQueryBuilder.execute() = select(asAddress)
     }
 
@@ -194,7 +195,7 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
         order by address_id
         """,
     )
-    data class Escape(val street: String, val asAddress: (Row) -> Address) : Many<Address> {
+    data class Escape(val street: String, @KomapperUnused val asAddress: (Row) -> Address) : Many<Address> {
         override fun TemplateSelectQueryBuilder.execute() = select(asAddress)
     }
 
@@ -213,7 +214,7 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
         order by address_id
         """,
     )
-    data class AsPrefix(val street: String, val asAddress: (Row) -> Address) : Many<Address> {
+    data class AsPrefix(val street: String, @KomapperUnused val asAddress: (Row) -> Address) : Many<Address> {
         override fun TemplateSelectQueryBuilder.execute() = select(asAddress)
     }
 

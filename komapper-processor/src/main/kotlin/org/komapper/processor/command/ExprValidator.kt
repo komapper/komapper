@@ -8,7 +8,6 @@ import com.google.devtools.ksp.symbol.KSType
 import com.google.devtools.ksp.symbol.KSTypeArgument
 import com.google.devtools.ksp.symbol.Nullability
 import com.google.devtools.ksp.symbol.Variance
-import org.komapper.core.ThreadSafe
 import org.komapper.core.template.expression.ExprException
 import org.komapper.core.template.expression.ExprLocation
 import org.komapper.core.template.expression.ExprNode
@@ -18,7 +17,6 @@ import org.komapper.processor.Context
 import kotlin.reflect.KClass
 import kotlin.reflect.typeOf
 
-@ThreadSafe
 internal class ExprValidator(private val context: Context) {
 
     private val stringType = context.resolver.builtIns.stringType
@@ -48,6 +46,10 @@ internal class ExprValidator(private val context: Context) {
     }
 
     private val exprNodeFactory: ExprNodeFactory = NoCacheExprNodeFactory()
+
+    private val referencedParams: MutableSet<String> = mutableSetOf()
+
+    val usedParams: Set<String> get() = referencedParams
 
     fun validate(expression: String, paramMap: Map<String, KSType>): ExprEvalResult {
         val node = exprNodeFactory.get(expression)
@@ -180,6 +182,7 @@ internal class ExprValidator(private val context: Context) {
     }
 
     private fun visitValue(node: ExprNode.Value, paramMap: Map<String, KSType>): KSType {
+        referencedParams.add(node.name)
         return paramMap[node.name]
             ?: throw ExprException("The variable \"${node.name}\" is not found at ${node.location}. Available variables are: ${paramMap.keys}.")
     }

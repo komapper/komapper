@@ -12,6 +12,7 @@ internal data class Command(
     val annotation: KSAnnotation,
     val classDeclaration: KSClassDeclaration,
     val paramMap: Map<String, KSType>,
+    val unusedParams: Set<String>,
     val result: CommandResult,
     val packageName: String,
     val fileName: String,

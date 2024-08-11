@@ -292,6 +292,13 @@ annotation class KomapperCommand(
 }
 
 /**
+ * Indicates that the annotated property is not used within [KomapperCommand.sql].
+ */
+@Target(AnnotationTarget.PROPERTY)
+@Retention(AnnotationRetention.SOURCE)
+annotation class KomapperUnused
+
+/**
  * Indicates an association link.
  *
  * @property source the source name of an entity metamodel instance. The source is inferred from the annotated class.

@@ -6,11 +6,13 @@ import com.google.devtools.ksp.symbol.KSAnnotated
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.Modifier
 import com.google.devtools.ksp.symbol.Variance
+import org.komapper.annotation.KomapperUnused
 import org.komapper.core.dsl.query.ListQuery
 import org.komapper.core.dsl.query.Query
 import org.komapper.processor.Context
 import org.komapper.processor.findAnnotation
 import org.komapper.processor.findValue
+import org.komapper.processor.hasAnnotation
 import org.komapper.processor.report
 import kotlin.reflect.KClass
 
@@ -26,9 +28,11 @@ internal class CommandFactory(
             ClassKind.CLASS, ClassKind.OBJECT, ClassKind.INTERFACE -> Unit
             else -> report("The annotated element must be either a class, an object, or an interface.", symbol)
         }
-        val paramMap = classDeclaration.getAllProperties()
+        val properties = classDeclaration.getAllProperties()
             .filterNot { Modifier.PRIVATE in it.modifiers }
-            .associate { it.simpleName.asString() to it.type.resolve() }
+            .toList()
+        val paramMap = properties.associate { it.simpleName.asString() to it.type.resolve() }
+        val unusedParams = properties.filter { it.hasAnnotation(KomapperUnused::class) }.map { it.simpleName.asString() }.toSet()
         val annotation = classDeclaration.findAnnotation(annotationClass)
             ?: report("The annotation \"${annotationClass.simpleName}\" is not found.", symbol)
         val sql = annotation.findValue("sql")?.toString()?.trimIndent()
@@ -37,7 +41,7 @@ internal class CommandFactory(
             ?: report("The annotation value \"disableValidation\" is not found.", annotation)
         val result = createCommandResult(classDeclaration)
         val (packageName, fileName) = createFileName(context, classDeclaration)
-        return Command(sql, disableValidation, annotation, classDeclaration, paramMap, result, packageName, fileName)
+        return Command(sql, disableValidation, annotation, classDeclaration, paramMap, unusedParams, result, packageName, fileName)
     }
 
     private fun createCommandResult(classDeclaration: KSClassDeclaration): CommandResult {

@@ -3,7 +3,6 @@ package org.komapper.processor.command
 import com.google.devtools.ksp.getAllSuperTypes
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSType
-import org.komapper.core.ThreadSafe
 import org.komapper.core.template.expression.ExprException
 import org.komapper.core.template.sql.NoCacheSqlNodeFactory
 import org.komapper.core.template.sql.SqlException
@@ -11,7 +10,6 @@ import org.komapper.core.template.sql.SqlLocation
 import org.komapper.core.template.sql.SqlNode
 import org.komapper.processor.Context
 
-@ThreadSafe
 internal class SqlValidator(context: Context) {
 
     private val intType = context.resolver.builtIns.intType
@@ -21,9 +19,10 @@ internal class SqlValidator(context: Context) {
     private val nodeFactory = NoCacheSqlNodeFactory()
     private val exprValidator = ExprValidator(context)
 
-    fun validate(command: Command) {
+    fun validate(command: Command): Set<String> {
         val node = nodeFactory.get(command.sql)
         visit(command.paramMap, node)
+        return exprValidator.usedParams
     }
 
     private fun visit(paramMap: Map<String, KSType>, node: SqlNode): Map<String, KSType> = when (node) {
