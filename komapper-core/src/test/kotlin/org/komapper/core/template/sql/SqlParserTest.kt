@@ -1,5 +1,8 @@
 package org.komapper.template.sql
 
+import org.komapper.core.template.sql.SqlException
+import org.komapper.core.template.sql.SqlNode
+import org.komapper.core.template.sql.SqlParser
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith

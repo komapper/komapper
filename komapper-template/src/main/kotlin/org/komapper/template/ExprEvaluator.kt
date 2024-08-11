@@ -2,11 +2,11 @@ package org.komapper.template
 
 import org.komapper.core.TemplateBuiltinExtensions
 import org.komapper.core.Value
-import org.komapper.template.expression.ExprContext
-import org.komapper.template.expression.ExprException
-import org.komapper.template.expression.ExprLocation
-import org.komapper.template.expression.ExprNode
-import org.komapper.template.expression.ExprNodeFactory
+import org.komapper.core.template.expression.ExprContext
+import org.komapper.core.template.expression.ExprException
+import org.komapper.core.template.expression.ExprLocation
+import org.komapper.core.template.expression.ExprNode
+import org.komapper.core.template.expression.ExprNodeFactory
 import kotlin.reflect.KClass
 import kotlin.reflect.KFunction
 import kotlin.reflect.KProperty

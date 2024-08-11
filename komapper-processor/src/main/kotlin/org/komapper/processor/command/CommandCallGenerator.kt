@@ -1,18 +1,17 @@
 package org.komapper.processor.command
 
+import org.komapper.core.ThreadSafe
 import org.komapper.processor.BackquotedSymbols.QueryDsl
 import org.komapper.processor.BackquotedSymbols.Value
 import org.komapper.processor.BackquotedSymbols.typeOf
-import org.komapper.processor.Context
 import org.komapper.processor.name
 import java.io.PrintWriter
 import kotlin.collections.joinToString
 import kotlin.text.isNotEmpty
 
+@ThreadSafe
 internal class CommandCallGenerator(
-    private val context: Context,
     private val command: Command,
-    private val packageName: String,
     private val w: PrintWriter,
 ) : Runnable {
 
@@ -27,8 +26,8 @@ internal class CommandCallGenerator(
     }
 
     private fun packageDeclaration() {
-        if (packageName.isNotEmpty()) {
-            w.println("package $packageName")
+        if (command.packageName.isNotEmpty()) {
+            w.println("package ${command.packageName}")
             w.println()
         }
     }
@@ -37,13 +36,12 @@ internal class CommandCallGenerator(
         val prefix = command.result.functionPrefix
         val commandTypeName = command.classDeclaration.asStarProjectedType().name
         val returnTypeName = command.result.returnType.name
-        val bindCalls = command.parameters.joinToString("\n        ", prefix = "\n        ") {
-            val name = it.name!!.asString()
-            ".bindValue(\"$name\", $Value(command.$name, $typeOf<${it.type.resolve().name}>()))"
+        val bindCalls = command.paramMap.entries.joinToString("\n        ", prefix = "\n        ") {
+            ".bindValue(\"${it.key}\", $Value(command.${it.key}, $typeOf<${it.value.name}>()))"
         }
         w.println("public fun $QueryDsl.${prefix}Command(command: $commandTypeName) : $returnTypeName {")
         w.println("    val sql = \"\"\"${command.sql}\"\"\".trimIndent()")
-        w.println("    val binding = ${prefix}Template(sql)${ if (command.parameters.isNotEmpty()) bindCalls else ""}")
+        w.println("    val binding = ${prefix}Template(sql)${ if (command.paramMap.isNotEmpty()) bindCalls else ""}")
         w.println("    return with(command) {")
         w.println("        binding.execute()")
         w.println("    }")

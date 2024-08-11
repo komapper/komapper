@@ -8,27 +8,30 @@ import com.google.devtools.ksp.symbol.KSType
 import com.google.devtools.ksp.symbol.KSTypeArgument
 import com.google.devtools.ksp.symbol.Nullability
 import com.google.devtools.ksp.symbol.Variance
-import org.komapper.core.TemplateBuiltinExtensions
+import org.komapper.core.ThreadSafe
+import org.komapper.core.template.expression.ExprException
+import org.komapper.core.template.expression.ExprLocation
+import org.komapper.core.template.expression.ExprNode
+import org.komapper.core.template.expression.ExprNodeFactory
+import org.komapper.core.template.expression.NoCacheExprNodeFactory
 import org.komapper.processor.Context
-import org.komapper.template.expression.ExprException
-import org.komapper.template.expression.ExprLocation
-import org.komapper.template.expression.ExprNode
-import org.komapper.template.expression.ExprNodeFactory
-import org.komapper.template.expression.NoCacheExprNodeFactory
 import kotlin.reflect.KClass
 import kotlin.reflect.typeOf
 
-internal class ExprValidator(private val context: Context, private val expression: String) {
+@ThreadSafe
+internal class ExprValidator(private val context: Context) {
 
     private val stringType = context.resolver.builtIns.stringType
     private val booleanType = context.resolver.builtIns.booleanType
     private val unitType = context.resolver.builtIns.unitType
+
     private val comparableType by lazy {
-        context.resolver.getKSNameFromString("kotlin.Comparable").let {
+        context.resolver.getKSNameFromString(Comparable::class.qualifiedName!!).let {
             context.resolver.getClassDeclarationByName(it)?.asStarProjectedType()
                 ?: throw ExprException("Class not found: ${it.asString()}")
         }
     }
+
     private val templateExtensionsDeclaration by lazy {
         val name = context.config.templateExtensions
         context.resolver.getKSNameFromString(name).let {
@@ -37,23 +40,31 @@ internal class ExprValidator(private val context: Context, private val expressio
         }
     }
 
-    private val exprNodeFactory: ExprNodeFactory = NoCacheExprNodeFactory()
-
-    fun validate(ctx: ExprContext): KSType {
-        val node = exprNodeFactory.get(expression)
-        return visit(node, ctx)
+    private val arrayDeclaration by lazy {
+        context.resolver.getKSNameFromString(Array::class.qualifiedName!!).let {
+            context.resolver.getClassDeclarationByName(it)
+                ?: throw ExprException("Class not found: ${it.asString()}")
+        }
     }
 
-    private fun visit(node: ExprNode, exprCtx: ExprContext): KSType = when (node) {
-        is ExprNode.Not -> perform(node.location, node.operand, exprCtx)
-        is ExprNode.And -> perform(node.location, node.left, node.right, exprCtx)
-        is ExprNode.Or -> perform(node.location, node.left, node.right, exprCtx)
-        is ExprNode.Eq -> equal(node.location, node.left, node.right, exprCtx)
-        is ExprNode.Ne -> equal(node.location, node.left, node.right, exprCtx)
-        is ExprNode.Ge -> compare(node.location, node.left, node.right, exprCtx)
-        is ExprNode.Gt -> compare(node.location, node.left, node.right, exprCtx)
-        is ExprNode.Le -> compare(node.location, node.left, node.right, exprCtx)
-        is ExprNode.Lt -> compare(node.location, node.left, node.right, exprCtx)
+    private val exprNodeFactory: ExprNodeFactory = NoCacheExprNodeFactory()
+
+    fun validate(expression: String, paramMap: Map<String, KSType>): ExprEvalResult {
+        val node = exprNodeFactory.get(expression)
+        val type = visit(node, paramMap)
+        return ExprEvalResult(node, type)
+    }
+
+    private fun visit(node: ExprNode, paramMap: Map<String, KSType>): KSType = when (node) {
+        is ExprNode.Not -> perform(node.location, node.operand, paramMap)
+        is ExprNode.And -> perform(node.location, node.left, node.right, paramMap)
+        is ExprNode.Or -> perform(node.location, node.left, node.right, paramMap)
+        is ExprNode.Eq -> equal(node.location, node.left, node.right, paramMap)
+        is ExprNode.Ne -> equal(node.location, node.left, node.right, paramMap)
+        is ExprNode.Ge -> compare(node.location, node.left, node.right, paramMap)
+        is ExprNode.Gt -> compare(node.location, node.left, node.right, paramMap)
+        is ExprNode.Le -> compare(node.location, node.left, node.right, paramMap)
+        is ExprNode.Lt -> compare(node.location, node.left, node.right, paramMap)
         is ExprNode.Literal -> {
             when (node.type) {
                 typeOf<Byte>() -> context.resolver.builtIns.byteType
@@ -77,26 +88,26 @@ internal class ExprValidator(private val context: Context, private val expressio
         }
 
         is ExprNode.Comma -> {
-            val types = node.nodeList.map { visit(it, exprCtx) }
+            val types = node.nodeList.map { visit(it, paramMap) }
             KSTypeList(types)
         }
 
-        is ExprNode.ClassRef -> visitClassRef(node, exprCtx)
-        is ExprNode.Value -> visitValue(node, exprCtx)
-        is ExprNode.Property -> visitProperty(node, exprCtx)
-        is ExprNode.Function -> visitFunction(node, exprCtx)
+        is ExprNode.ClassRef -> visitClassRef(node, paramMap)
+        is ExprNode.Value -> visitValue(node, paramMap)
+        is ExprNode.Property -> visitProperty(node, paramMap)
+        is ExprNode.Function -> visitFunction(node, paramMap)
         is ExprNode.Empty -> context.resolver.builtIns.unitType
     }
 
     private fun perform(
         location: ExprLocation,
         operand: ExprNode,
-        ctx: ExprContext,
+        paramMap: Map<String, KSType>,
     ): KSType {
-        val value = visit(operand, ctx)
-        if (value != booleanType) {
+        val result = visit(operand, paramMap)
+        if (result != booleanType) {
             throw ExprException(
-                "Cannot perform the logical operator because the operands is not Boolean at $location",
+                "Cannot perform the logical operator because the operand is not Boolean at $location",
             )
         }
         return booleanType
@@ -106,10 +117,10 @@ internal class ExprValidator(private val context: Context, private val expressio
         location: ExprLocation,
         leftNode: ExprNode,
         rightNode: ExprNode,
-        ctx: ExprContext,
+        paramMap: Map<String, KSType>,
     ): KSType {
-        val left = visit(leftNode, ctx)
-        val right = visit(rightNode, ctx)
+        val left = visit(leftNode, paramMap)
+        val right = visit(rightNode, paramMap)
         if (left != booleanType || right != booleanType) {
             throw ExprException(
                 "Cannot perform the logical operator because either operands is not Boolean at $location",
@@ -123,10 +134,10 @@ internal class ExprValidator(private val context: Context, private val expressio
         location: ExprLocation,
         leftNode: ExprNode,
         rightNode: ExprNode,
-        ctx: ExprContext,
+        paramMap: Map<String, KSType>,
     ): KSType {
-        visit(leftNode, ctx)
-        visit(rightNode, ctx)
+        visit(leftNode, paramMap)
+        visit(rightNode, paramMap)
         return booleanType
     }
 
@@ -134,10 +145,10 @@ internal class ExprValidator(private val context: Context, private val expressio
         location: ExprLocation,
         leftNode: ExprNode,
         rightNode: ExprNode,
-        ctx: ExprContext,
+        paramMap: Map<String, KSType>,
     ): KSType {
-        val left = visit(leftNode, ctx).makeNullable()
-        val right = visit(rightNode, ctx).makeNullable()
+        val left = visit(leftNode, paramMap).makeNullable()
+        val right = visit(rightNode, paramMap).makeNullable()
         if (left != right) {
             throw ExprException(
                 "Cannot compare because the operands are not the same type at $location",
@@ -156,7 +167,7 @@ internal class ExprValidator(private val context: Context, private val expressio
         return booleanType
     }
 
-    private fun visitClassRef(node: ExprNode.ClassRef, @Suppress("UNUSED_PARAMETER") ctx: ExprContext): KSType {
+    private fun visitClassRef(node: ExprNode.ClassRef, @Suppress("UNUSED_PARAMETER") paramMap: Map<String, KSType>): KSType {
         val classDeclaration = context.resolver.getKSNameFromString(node.name).let {
             context.resolver.getClassDeclarationByName(it)
         } ?: throw ExprException("The class \"${node.name}\" is not found at ${node.location}")
@@ -168,115 +179,102 @@ internal class ExprValidator(private val context: Context, private val expressio
             ?: classDeclaration.asStarProjectedType()
     }
 
-    private fun visitValue(node: ExprNode.Value, ctx: ExprContext): KSType {
-        return ctx.paramMap[node.name]
-            ?: throw ExprException("The template variable \"${node.name}\" is not bound to a value. Make sure the variable name is correct. expr location: ${node.location}")
+    private fun visitValue(node: ExprNode.Value, paramMap: Map<String, KSType>): KSType {
+        return paramMap[node.name]
+            ?: throw ExprException("The variable \"${node.name}\" is not found at ${node.location}. Available variables are: ${paramMap.keys}.")
     }
 
-    private fun visitProperty(node: ExprNode.Property, ctx: ExprContext): KSType {
-        val receiverType = visit(node.receiver, ctx)
-        return findProperty(node.name, receiverType)
-            ?: findExtensionProperty(node.name, receiverType)
-            ?: throw ExprException("The property \"${node.name}\" is not found at ${node.location} ${receiverType.declaration}")
+    private fun visitProperty(node: ExprNode.Property, paramMap: Map<String, KSType>): KSType {
+        val receiver = visit(node.receiver, paramMap)
+        return findProperty(node.name, receiver)
+            ?: findExtensionProperty(node.name, receiver)
+            ?: throw ExprException("The property \"${node.name}\" is not found at ${node.location}")
     }
 
-    private fun findProperty(name: String, receiverType: KSType): KSType? {
-        val classDeclaration = receiverType.declaration as? KSClassDeclaration
-            ?: throw ExprException("The receiver type is not a class: ${receiverType.declaration}")
-        return if (classDeclaration.classKind == ClassKind.ENUM_CLASS) {
-            val entryDeclaration = classDeclaration.declarations.firstOrNull { it.simpleName.asString() == name }
+    private fun findProperty(name: String, receiver: KSType): KSType? {
+        val receiverDeclaration = receiver.declaration as? KSClassDeclaration
+            ?: throw ExprException("The receiver type is not a class: ${receiver.declaration}")
+        return if (receiverDeclaration.classKind == ClassKind.ENUM_CLASS) {
+            val entryDeclaration = receiverDeclaration.declarations.firstOrNull { it.simpleName.asString() == name }
             (entryDeclaration as? KSClassDeclaration)?.asType(emptyList())
         } else {
-            classDeclaration.getAllProperties()
+            receiverDeclaration.getAllProperties()
                 .firstOrNull { it.simpleName.asString() == name }?.type?.resolve()
         }
     }
 
-    private fun findExtensionProperty(name: String, receiverType: KSType): KSType? {
-        val property = templateExtensionsDeclaration.getAllProperties()
+    private fun findExtensionProperty(name: String, receiver: KSType): KSType? {
+        return templateExtensionsDeclaration.getAllProperties()
             .filter { it.simpleName.asString() == name }
-            .filter { it.extensionReceiver?.resolve()?.isAssignableFrom(receiverType) ?: false }
-            .firstOrNull()
-        return property?.type?.resolve()
+            .filter { it.extensionReceiver?.resolve()?.isAssignableFrom(receiver) ?: false }
+            .firstOrNull()?.type?.resolve()
     }
 
-    private fun visitFunction(node: ExprNode.Function, ctx: ExprContext): KSType {
-        val receiverType = visit(node.receiver, ctx)
-        val args = when (val argsType = visit(node.args, ctx)) {
-            is KSTypeList -> argsType.ksTypes
-            else -> if (argsType == unitType) {
+    private fun visitFunction(node: ExprNode.Function, paramMap: Map<String, KSType>): KSType {
+        val receiver = visit(node.receiver, paramMap)
+        val argList = when (val args = visit(node.args, paramMap)) {
+            is KSTypeList -> args.argList
+            else -> if (args == unitType) {
                 emptyList()
             } else {
-                listOf(argsType)
+                listOf(args)
             }
         }
-        return findFunction(node.name, receiverType, args, ctx)
-            ?: findExtensionFunction(node.name, receiverType, args, ctx)
+        return findFunction(node.name, receiver, argList)
+            ?: findExtensionFunction(node.name, receiver, argList)
             ?: throw ExprException("The function \"${node.name}\" is not found at ${node.location}")
     }
 
     private fun findFunction(
         name: String,
-        receiverType: KSType,
-        args: List<KSType>,
-        ctx: ExprContext,
+        receiver: KSType,
+        argList: List<KSType>,
     ): KSType? {
-        val classDeclaration = receiverType.declaration as? KSClassDeclaration
-            ?: throw ExprException("The receiver type is not a class: ${receiverType.declaration}")
+        val receiverDeclaration = receiver.declaration as? KSClassDeclaration
+            ?: throw ExprException("The receiver type is not a class: ${receiver.declaration}")
 
-        // TODO remove this workaround. See https://github.com/google/ksp/issues/829
-        if (classDeclaration.classKind == ClassKind.ENUM_CLASS) {
-            if (name == "valueOf" && args.size == 1 && args[0] == stringType) {
-                return receiverType
+        // TODO remove this workaround in the future. See https://github.com/google/ksp/issues/829
+        if (receiverDeclaration.classKind == ClassKind.ENUM_CLASS) {
+            if (name == "valueOf" && argList.size == 1 && argList[0] == stringType) {
+                return receiver
             }
-            if (name == "values" && args.isEmpty()) {
-                val typeRef = context.resolver.createKSTypeReferenceFromKSType(receiverType)
+            if (name == "values" && argList.isEmpty()) {
+                val typeRef = context.resolver.createKSTypeReferenceFromKSType(receiver)
                 val typeArg = context.resolver.getTypeArgument(typeRef, Variance.INVARIANT)
-                return context.resolver.getKSNameFromString("kotlin.Array").let {
-                    context.resolver.getClassDeclarationByName(it)?.asType(listOf(typeArg))
-                        ?: error("Class not found: ${it.asString()}")
-                }
+                return arrayDeclaration.asType(listOf(typeArg))
             }
         }
 
-        val function = classDeclaration.getAllFunctions()
+        return receiverDeclaration.getAllFunctions()
             .filter {
                 it.simpleName.asString() == name
             }.filter {
-                it.parameters.size == args.size
+                it.parameters.size == argList.size
             }.filter {
-                it.parameters.zip(args).all { (param, arg) ->
+                it.parameters.zip(argList).all { (param, arg) ->
                     param.type.resolve().isAssignableFrom(arg)
                 }
-            }.firstOrNull()
-        return function?.returnType?.resolve()
+            }.firstOrNull()?.returnType?.resolve()
     }
 
     private fun findExtensionFunction(
         name: String,
-        receiverType: KSType,
-        args: List<KSType>,
-        ctx: ExprContext,
+        receiver: KSType,
+        argList: List<KSType>,
     ): KSType? {
-        val function = templateExtensionsDeclaration.getAllFunctions()
+        return templateExtensionsDeclaration.getAllFunctions()
             .filter { it.simpleName.asString() == name }
-            .filter { it.extensionReceiver?.resolve()?.isAssignableFrom(receiverType) ?: false }
-            .filter { it.parameters.size == args.size }
+            .filter { it.extensionReceiver?.resolve()?.isAssignableFrom(receiver) ?: false }
+            .filter { it.parameters.size == argList.size }
             .filter {
-                it.parameters.zip(args).all { (param, arg) ->
+                it.parameters.zip(argList).all { (param, arg) ->
                     param.type.resolve().isAssignableFrom(arg)
                 }
-            }.firstOrNull()
-        return function?.returnType?.resolve()
+            }.firstOrNull()?.returnType?.resolve()
     }
 
-    data class ExprContext(
-        val paramMap: Map<String, KSType>,
-        val builtinExtensions: TemplateBuiltinExtensions,
-    )
-
     data class KSTypeList(
-        val ksTypes: List<KSType>,
+        val argList: List<KSType>,
     ) : KSType {
         override val annotations: Sequence<KSAnnotation>
             get() = throw UnsupportedOperationException()

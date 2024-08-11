@@ -1,4 +1,4 @@
-package org.komapper.template.sql
+package org.komapper.core.template.sql
 
 import java.util.LinkedList
 

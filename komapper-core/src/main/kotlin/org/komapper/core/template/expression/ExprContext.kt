@@ -1,4 +1,4 @@
-package org.komapper.template.expression
+package org.komapper.core.template.expression
 
 import org.komapper.core.TemplateBuiltinExtensions
 import org.komapper.core.Value

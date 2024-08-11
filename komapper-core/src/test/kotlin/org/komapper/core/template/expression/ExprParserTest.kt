@@ -1,5 +1,8 @@
 package org.komapper.template.expression
 
+import org.komapper.core.template.expression.ExprException
+import org.komapper.core.template.expression.ExprNode
+import org.komapper.core.template.expression.ExprParser
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith

@@ -1,7 +1,7 @@
-package org.komapper.template.expression
+package org.komapper.core.template.expression
 
 import kotlin.reflect.KType
-import org.komapper.template.expression.ExprLocation as Loc
+import org.komapper.core.template.expression.ExprLocation as Loc
 
 sealed class ExprNode {
     abstract val location: Loc

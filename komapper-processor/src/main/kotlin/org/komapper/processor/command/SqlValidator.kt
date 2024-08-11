@@ -3,106 +3,105 @@ package org.komapper.processor.command
 import com.google.devtools.ksp.getAllSuperTypes
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSType
-import org.komapper.core.TemplateBuiltinExtensions
+import org.komapper.core.ThreadSafe
+import org.komapper.core.template.expression.ExprException
+import org.komapper.core.template.sql.NoCacheSqlNodeFactory
+import org.komapper.core.template.sql.SqlException
+import org.komapper.core.template.sql.SqlLocation
+import org.komapper.core.template.sql.SqlNode
 import org.komapper.processor.Context
-import org.komapper.processor.command.ExprValidator.ExprContext
-import org.komapper.template.expression.ExprException
-import org.komapper.template.sql.NoCacheSqlNodeFactory
-import org.komapper.template.sql.SqlException
-import org.komapper.template.sql.SqlLocation
-import org.komapper.template.sql.SqlNode
 
-internal class SqlValidator(private val context: Context, private val command: Command) {
+@ThreadSafe
+internal class SqlValidator(context: Context) {
 
     private val intType = context.resolver.builtIns.intType
     private val booleanType = context.resolver.builtIns.booleanType
     private val iterableType = context.resolver.builtIns.iterableType
 
-    fun validate() {
-        val nodeFactory = NoCacheSqlNodeFactory()
+    private val nodeFactory = NoCacheSqlNodeFactory()
+    private val exprValidator = ExprValidator(context)
+
+    fun validate(command: Command) {
         val node = nodeFactory.get(command.sql)
-        val paramMap = command.parameters.asSequence()
-            .filter { it.name != null }
-            .associate { it.name!!.asString() to it.type.resolve() }
-        visit(ExprContext(paramMap, TemplateBuiltinExtensions { it }), node)
+        visit(command.paramMap, node)
     }
 
-    private fun visit(exprCtx: ExprContext, node: SqlNode): ExprContext = when (node) {
-        is SqlNode.Statement -> node.nodeList.fold(exprCtx, ::visit)
+    private fun visit(paramMap: Map<String, KSType>, node: SqlNode): Map<String, KSType> = when (node) {
+        is SqlNode.Statement -> node.nodeList.fold(paramMap, ::visit)
         is SqlNode.Set -> {
-            visit(exprCtx, node.left)
-            visit(exprCtx, node.right)
-            exprCtx
+            visit(paramMap, node.left)
+            visit(paramMap, node.right)
+            paramMap
         }
 
         is SqlNode.Clause.Select -> {
-            node.nodeList.fold(exprCtx, ::visit)
+            node.nodeList.fold(paramMap, ::visit)
         }
 
         is SqlNode.Clause.From -> {
-            node.nodeList.fold(exprCtx, ::visit)
+            node.nodeList.fold(paramMap, ::visit)
         }
 
         is SqlNode.Clause.ForUpdate -> {
-            node.nodeList.fold(exprCtx, ::visit)
+            node.nodeList.fold(paramMap, ::visit)
         }
 
         is SqlNode.Clause -> {
-            node.nodeList.fold(exprCtx, ::visit)
-            exprCtx
+            node.nodeList.fold(paramMap, ::visit)
+            paramMap
         }
 
         is SqlNode.BiLogicalOp -> {
-            node.nodeList.fold(exprCtx, ::visit)
+            node.nodeList.fold(paramMap, ::visit)
         }
 
         is SqlNode.Token -> {
-            exprCtx
+            paramMap
         }
 
         is SqlNode.Paren -> {
-            visit(exprCtx, node.node)
+            visit(paramMap, node.node)
         }
 
         is SqlNode.BindValueDirective -> {
-            val result = validateExpression(node.location, node.expression, exprCtx)
+            val evalResult = validateExpression(node.location, node.expression, paramMap)
             when (node.node) {
                 is SqlNode.Paren -> {
-                    if (!iterableType.isAssignableFrom(result)) {
-                        TODO("The expression must be Iterable at ${node.location}")
+                    if (!iterableType.isAssignableFrom(evalResult.type)) {
+                        throw SqlException("The expression must be Iterable at ${evalResult.location} at ${node.location}")
                     }
                 }
 
                 else -> Unit
             }
-            node.nodeList.fold(exprCtx, ::visit)
+            node.nodeList.fold(paramMap, ::visit)
         }
 
         is SqlNode.EmbeddedValueDirective -> {
-            validateExpression(node.location, node.expression, exprCtx)
-            exprCtx
+            validateExpression(node.location, node.expression, paramMap)
+            paramMap
         }
 
         is SqlNode.LiteralValueDirective -> {
-            validateExpression(node.location, node.expression, exprCtx)
-            node.nodeList.fold(exprCtx, ::visit)
+            validateExpression(node.location, node.expression, paramMap)
+            node.nodeList.fold(paramMap, ::visit)
         }
 
         is SqlNode.IfBlock -> {
-            val result = validateExpression(node.ifDirective.location, node.ifDirective.expression, exprCtx)
-            if (result != booleanType) {
-                throw SqlException("The expression evaluation result must be a Boolean at <${node.ifDirective.expression}> at ${node.ifDirective.location}.")
+            val ifEvalResult = validateExpression(node.ifDirective.location, node.ifDirective.expression, paramMap)
+            if (ifEvalResult.type != booleanType) {
+                throw SqlException("The expression eval result must be a Boolean at ${ifEvalResult.location} at ${node.ifDirective.location}.")
             }
-            node.ifDirective.nodeList.fold(exprCtx, ::visit)
+            node.ifDirective.nodeList.fold(paramMap, ::visit)
             node.elseifDirectives.forEach {
-                val result = validateExpression(it.location, it.expression, exprCtx)
-                if (result != booleanType) {
-                    throw SqlException("The expression evaluation result must be a Boolean at ${it.location}.")
+                val elseifEvalResult = validateExpression(it.location, it.expression, paramMap)
+                if (elseifEvalResult.type != booleanType) {
+                    throw SqlException("The expression eval result must be a Boolean at ${elseifEvalResult.location} at ${it.location}.")
                 }
-                it.nodeList.fold(exprCtx, ::visit)
+                it.nodeList.fold(paramMap, ::visit)
             }
-            node.elseDirective?.nodeList?.fold(exprCtx, ::visit)
-            exprCtx
+            node.elseDirective?.nodeList?.fold(paramMap, ::visit)
+            paramMap
         }
 
         is SqlNode.ForBlock -> {
@@ -110,14 +109,14 @@ internal class SqlValidator(private val context: Context, private val command: C
             val id = forDirective.identifier
             val expression = forDirective.expression
 
-            val resultType = validateExpression(forDirective.location, expression, exprCtx)
-            if (!iterableType.isAssignableFrom(resultType)) {
-                throw SqlException("The expression must be Iterable at ${forDirective.location}.")
+            val evalResult = validateExpression(forDirective.location, expression, paramMap)
+            if (!iterableType.isAssignableFrom(evalResult.type)) {
+                throw SqlException("The expression must be Iterable at ${evalResult.location} at ${forDirective.location}.")
             }
-            val resultDeclaration = resultType.declaration as? KSClassDeclaration
-                ?: throw SqlException("The expression must be a class at ${forDirective.location}.")
+            val resultDeclaration = evalResult.type.declaration as? KSClassDeclaration
+                ?: throw SqlException("The expression must be a class at ${evalResult.location} at ${forDirective.location}.")
             val typeArgs = if (resultDeclaration.qualifiedName?.asString() == Iterable::class.qualifiedName) {
-                resultType.arguments
+                evalResult.type.arguments
             } else {
                 resultDeclaration.getAllSuperTypes().filter {
                     it.declaration.qualifiedName?.asString() == Iterable::class.qualifiedName
@@ -127,22 +126,18 @@ internal class SqlValidator(private val context: Context, private val command: C
             }
 
             if (typeArgs.isEmpty()) {
-                throw SqlException("The Iterable expression must have a type argument at ${forDirective.location}.")
+                throw SqlException("The Iterable expression must have a type argument at ${evalResult.location} at ${forDirective.location}.")
             }
-            val typeArg = typeArgs.first()
+            val typeArg = typeArgs.first().type?.resolve()
+                ?: throw SqlException("The Iterable type argument is illegal at ${evalResult.location} at ${forDirective.location}.")
 
-            val typeArgType = typeArg.type
-                ?: throw SqlException("The Iterable type argument must have a non-null type at ${forDirective.location}.")
-
-            val newExprCtx = exprCtx.copy(
-                paramMap = exprCtx.paramMap + mapOf(
-                    id to typeArgType.resolve(),
-                    id + "_index" to intType,
-                    id + "_has_next" to booleanType,
-                ),
+            val newParamMap = paramMap + mapOf(
+                id to typeArg,
+                id + "_index" to intType,
+                id + "_has_next" to booleanType,
             )
 
-            forDirective.nodeList.fold(newExprCtx, ::visit)
+            forDirective.nodeList.fold(newParamMap, ::visit)
         }
 
         is SqlNode.IfDirective,
@@ -153,9 +148,9 @@ internal class SqlValidator(private val context: Context, private val command: C
         -> error("unreachable")
     }
 
-    private fun validateExpression(location: SqlLocation, expression: String, ctx: ExprContext): KSType {
+    private fun validateExpression(location: SqlLocation, expression: String, paramMap: Map<String, KSType>): ExprEvalResult {
         return try {
-            ExprValidator(context, expression).validate(ctx)
+            exprValidator.validate(expression, paramMap)
         } catch (e: ExprException) {
             throw SqlException("The expression evaluation was failed. ${e.message} at $location. ", e)
         }

@@ -3,10 +3,10 @@ package org.komapper.template
 import org.komapper.core.BuilderDialect
 import org.komapper.core.TemplateStatementBuilder
 import org.komapper.core.spi.TemplateStatementBuilderFactory
-import org.komapper.template.expression.CacheExprNodeFactory
-import org.komapper.template.expression.NoCacheExprNodeFactory
-import org.komapper.template.sql.CacheSqlNodeFactory
-import org.komapper.template.sql.NoCacheSqlNodeFactory
+import org.komapper.core.template.expression.CacheExprNodeFactory
+import org.komapper.core.template.expression.NoCacheExprNodeFactory
+import org.komapper.core.template.sql.CacheSqlNodeFactory
+import org.komapper.core.template.sql.NoCacheSqlNodeFactory
 
 class TwoWayTemplateStatementBuilderFactory : TemplateStatementBuilderFactory {
 

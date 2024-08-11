@@ -274,7 +274,12 @@ annotation class KomapperProjectionDef(
     val function: String = "",
 )
 
-// TODO
+/**
+ * The annotated class is a command that encapsulates an SQL template, SQL parameters, and SQL execution into a single unit.
+ *
+ * @property sql the SQL template
+ * @property disableValidation if `true`, SQL validation at compile time will be disabled
+ */
 @Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.SOURCE)
 annotation class KomapperCommand(

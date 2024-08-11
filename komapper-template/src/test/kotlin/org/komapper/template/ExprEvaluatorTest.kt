@@ -3,9 +3,9 @@ package org.komapper.template
 import org.junit.jupiter.api.Nested
 import org.komapper.core.TemplateBuiltinExtensions
 import org.komapper.core.Value
-import org.komapper.template.expression.ExprContext
-import org.komapper.template.expression.ExprException
-import org.komapper.template.expression.NoCacheExprNodeFactory
+import org.komapper.core.template.expression.ExprContext
+import org.komapper.core.template.expression.ExprException
+import org.komapper.core.template.expression.NoCacheExprNodeFactory
 import kotlin.jvm.java
 import kotlin.reflect.typeOf
 import kotlin.test.Test
