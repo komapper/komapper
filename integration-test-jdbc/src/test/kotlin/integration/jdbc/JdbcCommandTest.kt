@@ -625,6 +625,52 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
         }
         assertEquals("hello world!", address.street)
     }
+
+    @KomapperCommand(
+        """
+        insert into address 
+            (address_id, street, version) 
+        values 
+            (/* id */0, /* @integration.jdbc.Hi@.name */'', /* id */0)
+        """,
+    )
+    class ObjectPropertyCall(val id: Int) : Exec
+
+    @Test
+    fun objectPropertyCall() {
+        val count = db.runQuery {
+            QueryDsl.executeCommand(ObjectPropertyCall(16))
+        }
+        assertEquals(1, count)
+        val a = Meta.address
+        val address = db.runQuery {
+            QueryDsl.from(a).where { a.addressId eq 16 }.single()
+        }
+        assertEquals("hi", address.street)
+    }
+
+    @KomapperCommand(
+        """
+        insert into address 
+            (address_id, street, version) 
+        values 
+            (/* id */0, /* @integration.jdbc.Hi@.greet("world") */'', /* id */0)
+        """,
+    )
+    class ObjectFunctionCall(val id: Int) : Exec
+
+    @Test
+    fun objectFunctionCall() {
+        val count = db.runQuery {
+            QueryDsl.executeCommand(ObjectFunctionCall(16))
+        }
+        assertEquals(1, count)
+        val a = Meta.address
+        val address = db.runQuery {
+            QueryDsl.from(a).where { a.addressId eq 16 }.single()
+        }
+        assertEquals("hi world!", address.street)
+    }
 }
 
 @Suppress("UNUSED")
@@ -645,5 +691,16 @@ class Hello {
         fun greet(name: String): String {
             return "hello $name!"
         }
+    }
+}
+
+object Hi {
+    val name = "hi"
+
+    const val constName = "hi const"
+
+    @Suppress("unused")
+    fun greet(name: String): String {
+        return "hi $name!"
     }
 }
