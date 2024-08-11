@@ -569,6 +569,7 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
     class EnumFunction(val color: Color) : Exec
 
     @Test
+    @Run(onlyIf = [Dbms.H2])
     fun enum_function() {
         db.runQuery {
             QueryDsl.executeCommand(EnumFunction(Color.BLUE))
