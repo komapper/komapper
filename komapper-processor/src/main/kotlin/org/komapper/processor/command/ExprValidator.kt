@@ -162,6 +162,7 @@ internal class ExprValidator(private val context: Context, private val expressio
     private fun visitProperty(node: ExprNode.Property, ctx: ExprContext): KSType {
         val receiverType = visit(node.receiver, ctx)
         return findProperty(node.name, receiverType)
+            ?: findExtensionProperty(node.name, receiverType)
             ?: throw ExprException("The property \"${node.name}\" is not found at ${node.location} ${receiverType.declaration}")
     }
 
@@ -177,6 +178,20 @@ internal class ExprValidator(private val context: Context, private val expressio
         }
     }
 
+    private fun findExtensionProperty(name: String, receiverType: KSType): KSType? {
+        // TODO
+        val extensionClassName = "org.komapper.core.TemplateBuiltinExtensions"
+        val extensionsDeclaration = context.resolver.getKSNameFromString(extensionClassName).let {
+            context.resolver.getClassDeclarationByName(it)
+        } ?: throw ExprException("The extension class \"${extensionClassName}\" is not found.")
+
+        val property = extensionsDeclaration.getAllProperties()
+            .filter { it.simpleName.asString() == name }
+            .filter { it.extensionReceiver?.resolve()?.isAssignableFrom(receiverType) ?: false }
+            .firstOrNull()
+        return property?.type?.resolve()
+    }
+
     private fun visitFunction(node: ExprNode.Function, ctx: ExprContext): KSType {
         val receiverType = visit(node.receiver, ctx)
         val args = when (val args = visit(node.args, ctx)) {
@@ -188,6 +203,7 @@ internal class ExprValidator(private val context: Context, private val expressio
             }
         }
         return findFunction(node.name, receiverType, args, ctx)
+            ?: findExtensionFunction(node.name, receiverType, args, ctx)
             ?: throw ExprException("The function \"${node.name}\" is not found at ${node.location}")
 
 //        return if (receiver is ClassRef) {
@@ -258,11 +274,42 @@ internal class ExprValidator(private val context: Context, private val expressio
         }
 
         val function = classDeclaration.getAllFunctions()
+            .onEach {
+                // TODO
+                // println("function: $it")
+            }
             .filter {
                 it.simpleName.asString() == name
             }.filter {
                 it.parameters.size == args.size
             }.filter {
+                it.parameters.zip(args).all { (param, arg) ->
+                    param.type.resolve().isAssignableFrom(arg)
+                }
+            }.firstOrNull()
+        return function?.returnType?.resolve()
+    }
+
+    private fun findExtensionFunction(
+        name: String,
+        receiverType: KSType,
+        args: List<KSType>,
+        ctx: ExprContext,
+    ): KSType? {
+        // TODO
+        val extensionClassName = "org.komapper.core.TemplateBuiltinExtensions"
+        val extensionsDeclaration = context.resolver.getKSNameFromString(extensionClassName).let {
+            context.resolver.getClassDeclarationByName(it)
+        } ?: throw ExprException("The extension class \"${extensionClassName}\" is not found.")
+
+        val function = extensionsDeclaration.getAllFunctions()
+            .onEach {
+                // println("debug (function): ${it.simpleName} ${it.parameters}")
+            }
+            .filter { it.simpleName.asString() == name }
+            .filter { it.extensionReceiver?.resolve()?.isAssignableFrom(receiverType) ?: false }
+            .filter { it.parameters.size == args.size }
+            .filter {
                 it.parameters.zip(args).all { (param, arg) ->
                     param.type.resolve().isAssignableFrom(arg)
                 }

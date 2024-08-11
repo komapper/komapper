@@ -187,14 +187,12 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
         )
     }
 
-    // TODO
     @KomapperCommand(
         """
         select * from address 
         where street like concat(/* street.escape() */'test', '%')
         order by address_id
         """,
-        disableValidation = true,
     )
     data class Escape(val street: String, val asAddress: (Row) -> Address) : Many<Address> {
         override fun TemplateSelectQueryBuilder.execute() = select(asAddress)
@@ -208,14 +206,12 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
         assertEquals((listOf(1) + (10..15)).toList(), list.map { it.addressId })
     }
 
-    // TODO
     @KomapperCommand(
         """
         select * from address 
-        where street like concat(/* street.escape() */'test', '%')
+        where street like concat(/* street.asPrefix() */'test', '%')
         order by address_id
         """,
-        disableValidation = true,
     )
     data class AsPrefix(val street: String, val asAddress: (Row) -> Address) : Many<Address> {
         override fun TemplateSelectQueryBuilder.execute() = select(asAddress)
@@ -418,7 +414,30 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
         val address = db.runQuery {
             QueryDsl.from(a).where { a.addressId eq 16 }.single()
         }
-        assertEquals(9, address.version)
+        assertEquals("STREET 16".length, address.version)
+    }
+
+    @KomapperCommand(
+        """
+        insert into address 
+            (address_id, street, version) 
+        values 
+            (/* id */0, /* street */'', /* street.lastIndex */0)
+        """,
+    )
+    class ExtensionPropertyCall(val id: Int, val street: String) : Exec
+
+    @Test
+    fun extensionPropertyCall() {
+        val count = db.runQuery {
+            QueryDsl.executeCommand(ExtensionPropertyCall(16, "STREET 16"))
+        }
+        assertEquals(1, count)
+        val a = Meta.address
+        val address = db.runQuery {
+            QueryDsl.from(a).where { a.addressId eq 16 }.single()
+        }
+        assertEquals("STREET 16".lastIndex, address.version)
     }
 
     @KomapperCommand(
@@ -489,6 +508,30 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
             QueryDsl.from(a).where { a.addressId eq 16 }.single()
         }
         assertEquals("REE", address.street)
+    }
+
+    @KomapperCommand(
+        """
+        insert into address 
+            (address_id, street, version) 
+        values 
+            (/* id */0, /* street.isBlank() */'', /* id */0)
+        """,
+    )
+    class ExtensionFunctionCall0Arg(val id: Int, val street: String) : Exec
+
+    @Test
+    @Run(onlyIf = [Dbms.H2])
+    fun extensionFunctionCall_0Arg() {
+        val count = db.runQuery {
+            QueryDsl.executeCommand(ExtensionFunctionCall0Arg(16, "STREET 16"))
+        }
+        assertEquals(1, count)
+        val a = Meta.address
+        val address = db.runQuery {
+            QueryDsl.from(a).where { a.addressId eq 16 }.single()
+        }
+        assertEquals("FALSE", address.street)
     }
 
     @KomapperCommand(
