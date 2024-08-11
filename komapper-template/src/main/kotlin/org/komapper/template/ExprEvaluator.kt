@@ -33,7 +33,7 @@ internal interface ExprEvaluator {
 
 internal class DefaultExprEvaluator(
     private val exprNodeFactory: ExprNodeFactory,
-    private val exprEnvironment: ExprEnvironment,
+    @Suppress("DEPRECATION") private val exprEnvironment: ExprEnvironment,
     private val classResolver: (String) -> Class<*> = { Class.forName(it) },
 ) : ExprEvaluator {
 
@@ -222,6 +222,7 @@ internal class DefaultExprEvaluator(
         }
     }
 
+    @Suppress("UNCHECKED_CAST")
     private fun findProperty(name: String, receiverType: KType, ctx: ExprContext): KProperty<*>? {
         fun predicate(property: KProperty<*>) =
             name == property.name && property.valueParameters.isEmpty()
