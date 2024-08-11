@@ -15,6 +15,7 @@ import kotlin.text.isNullOrEmpty
 import kotlin.text.lastIndex
 import kotlin.text.none
 
+@Deprecated("Use org.komapper.core.TemplateBuiltinExtensions", ReplaceWith("org.komapper.core.TemplateBuiltinExtensions"))
 internal interface ExprEnvironment {
     val ctx: Map<String, Value<*>>
     val topLevelPropertyExtensions: List<KProperty<*>>

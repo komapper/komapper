@@ -4,6 +4,7 @@ import org.komapper.core.CamelToLowerSnakeCase
 import org.komapper.core.CamelToUpperSnakeCase
 import org.komapper.core.Implicit
 import org.komapper.core.NamingStrategy
+import org.komapper.core.TemplateBuiltinExtensions
 
 internal data class Config(
     val prefix: String,
@@ -15,6 +16,7 @@ internal data class Config(
     val enableEntityMetamodelListing: Boolean,
     val enableEntityStoreContext: Boolean,
     val enableEntityProjection: Boolean,
+    val templateExtensions: String,
 ) {
     companion object {
         private const val PREFIX = "komapper.prefix"
@@ -26,6 +28,7 @@ internal data class Config(
         private const val ENABLE_ENTITY_METAMODEL_LISTING = "komapper.enableEntityMetamodelListing"
         private const val ENABLE_ENTITY_STORE_CONTEXT = "komapper.enableEntityStoreContext"
         private const val ENABLE_ENTITY_PROJECTION = "komapper.enableEntityProjection"
+        private const val TEMPLATE_EXTENSIONS = "komapper.templateExtensions"
 
         fun create(options: Map<String, String>): Config {
             val prefix = options.getOrDefault(PREFIX, "_")
@@ -51,6 +54,7 @@ internal data class Config(
             val enableEntityMetamodelListing = options[ENABLE_ENTITY_METAMODEL_LISTING]?.toBooleanStrict() ?: false
             val enableEntityStoreContext = options[ENABLE_ENTITY_STORE_CONTEXT]?.toBooleanStrict() ?: false
             val enableEntityProjection = options[ENABLE_ENTITY_PROJECTION]?.toBooleanStrict() ?: false
+            val templateExtensions = options.getOrDefault(TEMPLATE_EXTENSIONS, TemplateBuiltinExtensions::class.qualifiedName!!)
             return Config(
                 prefix,
                 suffix,
@@ -61,6 +65,7 @@ internal data class Config(
                 enableEntityMetamodelListing,
                 enableEntityStoreContext,
                 enableEntityProjection,
+                templateExtensions,
             )
         }
     }

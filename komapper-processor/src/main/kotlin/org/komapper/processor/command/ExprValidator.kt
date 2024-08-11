@@ -23,9 +23,18 @@ internal class ExprValidator(private val context: Context, private val expressio
     private val stringType = context.resolver.builtIns.stringType
     private val booleanType = context.resolver.builtIns.booleanType
     private val unitType = context.resolver.builtIns.unitType
-    private val comparableType = context.resolver.getKSNameFromString("kotlin.Comparable").let {
-        context.resolver.getClassDeclarationByName(it)?.asStarProjectedType()
-            ?: error("Class not found: ${it.asString()}")
+    private val comparableType by lazy {
+        context.resolver.getKSNameFromString("kotlin.Comparable").let {
+            context.resolver.getClassDeclarationByName(it)?.asStarProjectedType()
+                ?: throw ExprException("Class not found: ${it.asString()}")
+        }
+    }
+    private val templateExtensionsDeclaration by lazy {
+        val name = context.config.templateExtensions
+        context.resolver.getKSNameFromString(name).let {
+            context.resolver.getClassDeclarationByName(it)
+                ?: throw ExprException("Class not found: ${it.asString()}")
+        }
     }
 
     private val exprNodeFactory: ExprNodeFactory = NoCacheExprNodeFactory()
@@ -121,7 +130,6 @@ internal class ExprValidator(private val context: Context, private val expressio
         return booleanType
     }
 
-    @Suppress("UNCHECKED_CAST")
     private fun compare(
         location: ExprLocation,
         leftNode: ExprNode,
@@ -161,7 +169,7 @@ internal class ExprValidator(private val context: Context, private val expressio
     }
 
     private fun visitValue(node: ExprNode.Value, ctx: ExprContext): KSType {
-        return ctx.paramMap[node.name] // TODO ?: exprEnvironment.ctx[node.name]
+        return ctx.paramMap[node.name]
             ?: throw ExprException("The template variable \"${node.name}\" is not bound to a value. Make sure the variable name is correct. expr location: ${node.location}")
     }
 
@@ -185,13 +193,7 @@ internal class ExprValidator(private val context: Context, private val expressio
     }
 
     private fun findExtensionProperty(name: String, receiverType: KSType): KSType? {
-        // TODO
-        val extensionClassName = "org.komapper.core.TemplateBuiltinExtensions"
-        val extensionsDeclaration = context.resolver.getKSNameFromString(extensionClassName).let {
-            context.resolver.getClassDeclarationByName(it)
-        } ?: throw ExprException("The extension class \"${extensionClassName}\" is not found.")
-
-        val property = extensionsDeclaration.getAllProperties()
+        val property = templateExtensionsDeclaration.getAllProperties()
             .filter { it.simpleName.asString() == name }
             .filter { it.extensionReceiver?.resolve()?.isAssignableFrom(receiverType) ?: false }
             .firstOrNull()
@@ -200,12 +202,12 @@ internal class ExprValidator(private val context: Context, private val expressio
 
     private fun visitFunction(node: ExprNode.Function, ctx: ExprContext): KSType {
         val receiverType = visit(node.receiver, ctx)
-        val args = when (val args = visit(node.args, ctx)) {
-            is KSTypeList -> args.ksTypes
-            else -> if (args == unitType) {
+        val args = when (val argsType = visit(node.args, ctx)) {
+            is KSTypeList -> argsType.ksTypes
+            else -> if (argsType == unitType) {
                 emptyList()
             } else {
-                listOf(args)
+                listOf(argsType)
             }
         }
         return findFunction(node.name, receiverType, args, ctx)
@@ -238,10 +240,6 @@ internal class ExprValidator(private val context: Context, private val expressio
         }
 
         val function = classDeclaration.getAllFunctions()
-            .onEach {
-                // TODO
-                // println("function: $it")
-            }
             .filter {
                 it.simpleName.asString() == name
             }.filter {
@@ -260,16 +258,7 @@ internal class ExprValidator(private val context: Context, private val expressio
         args: List<KSType>,
         ctx: ExprContext,
     ): KSType? {
-        // TODO
-        val extensionClassName = "org.komapper.core.TemplateBuiltinExtensions"
-        val extensionsDeclaration = context.resolver.getKSNameFromString(extensionClassName).let {
-            context.resolver.getClassDeclarationByName(it)
-        } ?: throw ExprException("The extension class \"${extensionClassName}\" is not found.")
-
-        val function = extensionsDeclaration.getAllFunctions()
-            .onEach {
-                // println("debug (function): ${it.simpleName} ${it.parameters}")
-            }
+        val function = templateExtensionsDeclaration.getAllFunctions()
             .filter { it.simpleName.asString() == name }
             .filter { it.extensionReceiver?.resolve()?.isAssignableFrom(receiverType) ?: false }
             .filter { it.parameters.size == args.size }

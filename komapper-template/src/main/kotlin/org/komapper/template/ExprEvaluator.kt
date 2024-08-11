@@ -1,32 +1,23 @@
 package org.komapper.template
 
+import org.komapper.core.TemplateBuiltinExtensions
 import org.komapper.core.Value
 import org.komapper.template.expression.ExprContext
 import org.komapper.template.expression.ExprException
 import org.komapper.template.expression.ExprLocation
 import org.komapper.template.expression.ExprNode
 import org.komapper.template.expression.ExprNodeFactory
-import kotlin.collections.all
-import kotlin.collections.filter
-import kotlin.collections.find
-import kotlin.collections.first
-import kotlin.collections.firstOrNull
-import kotlin.collections.map
-import kotlin.collections.plus
-import kotlin.collections.toCollection
-import kotlin.collections.toTypedArray
-import kotlin.collections.zip
-import kotlin.jvm.kotlin
-import kotlin.let
 import kotlin.reflect.KClass
 import kotlin.reflect.KFunction
 import kotlin.reflect.KProperty
+import kotlin.reflect.KProperty2
 import kotlin.reflect.KType
 import kotlin.reflect.full.companionObject
 import kotlin.reflect.full.companionObjectInstance
 import kotlin.reflect.full.createType
 import kotlin.reflect.full.isSubclassOf
 import kotlin.reflect.full.memberExtensionFunctions
+import kotlin.reflect.full.memberExtensionProperties
 import kotlin.reflect.full.memberFunctions
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.full.staticFunctions
@@ -34,7 +25,6 @@ import kotlin.reflect.full.valueParameters
 import kotlin.reflect.full.withNullability
 import kotlin.reflect.jvm.jvmErasure
 import kotlin.reflect.typeOf
-import kotlin.to
 
 internal interface ExprEvaluator {
     fun eval(expression: String, ctx: ExprContext): Value<*>
@@ -80,6 +70,7 @@ internal class DefaultExprEvaluator(
                 typeOf<ExprArgList>(),
             )
         }
+
         is ExprNode.ClassRef -> visitClassRef(node, ctx)
         is ExprNode.Value -> visitValue(node, ctx)
         is ExprNode.Property -> visitProperty(node, ctx)
@@ -213,7 +204,7 @@ internal class DefaultExprEvaluator(
             val enum = receiver.clazz.enumConstants.first { it.name == node.name }
             return Value(enum, receiver.clazz.kotlin.createType())
         }
-        val property = findProperty(node.name, receiverType)
+        val property = findProperty(node.name, receiverType, ctx)
             ?: throw ExprException("The property \"${node.name}\" is not found at ${node.location}")
         if (receiver == null && node.safeCall) {
             return Value(null, property.returnType.withNullability(false))
@@ -231,10 +222,19 @@ internal class DefaultExprEvaluator(
         }
     }
 
-    private fun findProperty(name: String, receiverType: KType): KProperty<*>? {
+    private fun findProperty(name: String, receiverType: KType, ctx: ExprContext): KProperty<*>? {
         fun predicate(property: KProperty<*>) =
             name == property.name && property.valueParameters.isEmpty()
         return (receiverType.classifier as KClass<*>).memberProperties.find(::predicate)
+            ?: ctx.builtinExtensions::class.memberExtensionProperties.find(::predicate)
+                ?.let {
+                    val delegate = it as KProperty2<TemplateBuiltinExtensions, Any?, Any?>
+                    object : KProperty2<TemplateBuiltinExtensions, Any?, Any?> by delegate {
+                        override fun call(vararg args: Any?): Any? {
+                            return delegate.call(ctx.builtinExtensions, args[0])
+                        }
+                    }
+                }
             ?: exprEnvironment.topLevelPropertyExtensions.find(::predicate)
     }
 
@@ -316,8 +316,8 @@ internal class DefaultExprEvaluator(
             else -> listOf(receiver, args)
         }
         return (receiverType.classifier as KClass<*>).memberFunctions.pick(arguments)
-            ?: exprEnvironment.topLevelFunctionExtensions.pick(arguments)
             ?: ctx.builtinExtensions::class.memberExtensionFunctions.pick(listOf(ctx.builtinExtensions) + arguments)
+            ?: exprEnvironment.topLevelFunctionExtensions.pick(arguments)
     }
 
     override fun clearCache() {

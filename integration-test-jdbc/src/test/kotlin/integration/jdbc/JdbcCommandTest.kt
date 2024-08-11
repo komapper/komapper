@@ -671,6 +671,31 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
         }
         assertEquals("hi world!", address.street)
     }
+
+    /* TODO
+    @KomapperCommand(
+        """
+        insert into address
+            (address_id, street, version)
+        values
+            (/* id */0, /* f() */'', /* id */0)
+        """,
+    )
+    class FunctionPassing(val id: Int, val f: () -> String) : Exec
+
+    @Test
+    fun functionPassing() {
+        val count = db.runQuery {
+            QueryDsl.executeCommand(FunctionPassing(16, {"good"}))
+        }
+        assertEquals(1, count)
+        val a = Meta.address
+        val address = db.runQuery {
+            QueryDsl.from(a).where { a.addressId eq 16 }.single()
+        }
+        assertEquals("good", address.street)
+    }
+     */
 }
 
 @Suppress("UNUSED")
