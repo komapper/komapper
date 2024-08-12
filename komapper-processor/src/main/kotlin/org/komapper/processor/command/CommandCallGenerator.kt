@@ -39,7 +39,7 @@ internal class CommandCallGenerator(
         val bindCalls = command.paramMap.entries.joinToString("\n        ", prefix = "\n        ") {
             ".bindValue(\"${it.key}\", $Value(command.${it.key}, $typeOf<${it.value.name}>()))"
         }
-        w.println("public fun $QueryDsl.${prefix}Command(command: $commandTypeName) : $returnTypeName {")
+        w.println("public fun $QueryDsl.`${command.name}`(command: $commandTypeName) : $returnTypeName {")
         w.println("    val sql = \"\"\"${command.sql}\"\"\".trimIndent()")
         w.println("    val binding = ${prefix}Template(sql)${ if (command.paramMap.isNotEmpty()) bindCalls else ""}")
         w.println("    return with(command) {")

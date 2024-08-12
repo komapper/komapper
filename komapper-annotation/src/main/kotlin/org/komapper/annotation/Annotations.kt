@@ -285,9 +285,11 @@ annotation class KomapperProjectionDef(
 @Retention(AnnotationRetention.SOURCE)
 annotation class KomapperCommand(
     @Language("sql") val sql: String,
+    val name: String = NAME,
     val disableValidation: Boolean = DISABLE_VALIDATION,
 ) {
     companion object {
+        const val NAME = ""
         const val DISABLE_VALIDATION: Boolean = false
     }
 }

@@ -11,6 +11,7 @@ internal data class Command(
     val disableValidation: Boolean,
     val annotation: KSAnnotation,
     val classDeclaration: KSClassDeclaration,
+    val name: String,
     val paramMap: Map<String, KSType>,
     val unusedParams: Set<String>,
     val result: CommandResult,

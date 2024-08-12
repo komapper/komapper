@@ -45,7 +45,7 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
     @Test
     fun fetchOneAddress() {
         val address = db.runQuery {
-            QueryDsl.fromCommand(FetchOneAddress("STREET 10"))
+            QueryDsl.execute(FetchOneAddress("STREET 10"))
         }
         assertEquals(
             Address(
@@ -69,7 +69,7 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
     @Test
     fun fetchManyAddress() {
         val list = db.runQuery {
-            QueryDsl.fromCommand(FetchManyAddress(listOf(1, 2)))
+            QueryDsl.execute(FetchManyAddress(listOf(1, 2)))
         }
         assertEquals(2, list.size)
         assertEquals(
@@ -112,7 +112,7 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
     @Test
     fun bind() {
         val address = db.runQuery {
-            QueryDsl.fromCommand(Bind("STREET 10"))
+            QueryDsl.execute(Bind("STREET 10"))
         }
         assertEquals(
             Address(
@@ -134,7 +134,7 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
     @Test
     fun bindNull() {
         val list = db.runQuery {
-            QueryDsl.fromCommand(BindNull(null))
+            QueryDsl.execute(BindNull(null))
         }
         assertEquals(15, list.size)
     }
@@ -149,7 +149,7 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
     @Test
     fun `in`() {
         val list = db.runQuery {
-            QueryDsl.fromCommand(In(listOf(1, 2)))
+            QueryDsl.execute(In(listOf(1, 2)))
         }
         assertEquals(2, list.size)
         assertEquals(
@@ -181,7 +181,7 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
     @Test
     fun in2() {
         val list = db.runQuery {
-            QueryDsl.fromCommand(In2(listOf(1 to "STREET 1", 2 to "STREET 2")))
+            QueryDsl.execute(In2(listOf(1 to "STREET 1", 2 to "STREET 2")))
         }
         assertEquals(2, list.size)
         assertEquals(
@@ -213,7 +213,7 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
     @Test
     fun in3() {
         val list = db.runQuery {
-            QueryDsl.fromCommand(
+            QueryDsl.execute(
                 In3(
                     listOf(
                         Triple(1, "STREET 1", 1),
@@ -255,7 +255,7 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
     @Test
     fun escape() {
         val list = db.runQuery {
-            QueryDsl.fromCommand(Escape("STREET 1", asAddress))
+            QueryDsl.execute(Escape("STREET 1", asAddress))
         }
         assertEquals((listOf(1) + (10..15)).toList(), list.map { it.addressId })
     }
@@ -266,13 +266,14 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
         where street like concat(/* street.asPrefix() */'test', '%')
         order by address_id
         """,
+        name = "fetchUsingAsPrefix",
     )
     data class AsPrefix(val street: String) : Many<Address>({ select(asAddress) })
 
     @Test
     fun asPrefix() {
         val list = db.runQuery {
-            QueryDsl.fromCommand(AsPrefix("STREET 1"))
+            QueryDsl.fetchUsingAsPrefix(AsPrefix("STREET 1"))
         }
         assertEquals((listOf(1) + (10..15)).toList(), list.map { it.addressId })
     }
@@ -287,7 +288,7 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
     @Test
     fun execute() {
         val count = db.runQuery {
-            QueryDsl.executeCommand(Execute(15, "NY street"))
+            QueryDsl.execute(Execute(15, "NY street"))
         }
         assertEquals(1, count)
         val a = Meta.address
@@ -316,7 +317,7 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
     @Test
     fun selectAsEntity_byIndex() {
         val list = db.runQuery {
-            QueryDsl.fromCommand(SelectAsEntityByIndex())
+            QueryDsl.execute(SelectAsEntityByIndex())
         }
         assertEquals(15, list.size)
         assertEquals(Address(1, "STREET 1", 1), list[0])
@@ -332,7 +333,7 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
     @Test
     fun selectAsEntity_byName() {
         val list = db.runQuery {
-            QueryDsl.fromCommand(SelectAsEntityByName())
+            QueryDsl.execute(SelectAsEntityByName())
         }
         assertEquals(15, list.size)
         assertEquals(Address(1, "STREET 1", 1), list[0])
@@ -348,7 +349,7 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
     @Test
     fun selectAsAddress_byIndex() {
         val list = db.runQuery {
-            QueryDsl.fromCommand(SelectAsAddressByIndex())
+            QueryDsl.execute(SelectAsAddressByIndex())
         }
         assertEquals(15, list.size)
         assertEquals(Address(1, "STREET 1", 1), list[0])
@@ -364,7 +365,7 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
     @Test
     fun selectAsAddress_byName() {
         val list = db.runQuery {
-            QueryDsl.fromCommand(SelectAsAddressByName())
+            QueryDsl.execute(SelectAsAddressByName())
         }
         assertEquals(15, list.size)
         assertEquals(Address(1, "STREET 1", 1), list[0])
@@ -380,7 +381,7 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
     @Test
     fun selectAsAddressDto_byIndex() {
         val list = db.runQuery {
-            QueryDsl.fromCommand(SelectAsAddressDtoByIndex())
+            QueryDsl.execute(SelectAsAddressDtoByIndex())
         }
         assertEquals(15, list.size)
         assertEquals(AddressDto(1, "STREET 1"), list[0])
@@ -396,7 +397,7 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
     @Test
     fun selectAsAddressDto_byName() {
         val list = db.runQuery {
-            QueryDsl.fromCommand(SelectAsAddressDtoByName())
+            QueryDsl.execute(SelectAsAddressDtoByName())
         }
         assertEquals(15, list.size)
         assertEquals(AddressDto(1, "STREET 1"), list[0])
@@ -424,7 +425,7 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
     @Test
     fun forDirective() {
         val list = db.runQuery {
-            QueryDsl.fromCommand(ForDirective(listOf("STREET 1", "STREET 3", "STREET 5")))
+            QueryDsl.execute(ForDirective(listOf("STREET 1", "STREET 3", "STREET 5")))
         }
         assertEquals(3, list.size)
         assertEquals(Address(1, "STREET 1", 1), list[0])
@@ -445,7 +446,7 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
     @Test
     fun propertyCall() {
         val count = db.runQuery {
-            QueryDsl.executeCommand(PropertyCall(16, "STREET 16"))
+            QueryDsl.execute(PropertyCall(16, "STREET 16"))
         }
         assertEquals(1, count)
         val a = Meta.address
@@ -468,7 +469,7 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
     @Test
     fun extensionPropertyCall() {
         val count = db.runQuery {
-            QueryDsl.executeCommand(ExtensionPropertyCall(16, "STREET 16"))
+            QueryDsl.execute(ExtensionPropertyCall(16, "STREET 16"))
         }
         assertEquals(1, count)
         val a = Meta.address
@@ -491,7 +492,7 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
     @Test
     fun functionCall_0Arg() {
         val count = db.runQuery {
-            QueryDsl.executeCommand(FunctionCall0Arg(16, "STREET 16"))
+            QueryDsl.execute(FunctionCall0Arg(16, "STREET 16"))
         }
         assertEquals(1, count)
         val a = Meta.address
@@ -515,7 +516,7 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
     @Run(onlyIf = [Dbms.H2])
     fun functionCall_1Arg() {
         val count = db.runQuery {
-            QueryDsl.executeCommand(FunctionCall1Arg(16, "STREET 16"))
+            QueryDsl.execute(FunctionCall1Arg(16, "STREET 16"))
         }
         assertEquals(1, count)
         val a = Meta.address
@@ -538,7 +539,7 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
     @Test
     fun functionCall_2Args() {
         val count = db.runQuery {
-            QueryDsl.executeCommand(FunctionCall2Arg(16, "STREET 16", 2, 5))
+            QueryDsl.execute(FunctionCall2Arg(16, "STREET 16", 2, 5))
         }
         assertEquals(1, count)
         val a = Meta.address
@@ -562,7 +563,7 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
     @Run(onlyIf = [Dbms.H2])
     fun extensionFunctionCall_0Arg() {
         val count = db.runQuery {
-            QueryDsl.executeCommand(ExtensionFunctionCall0Arg(16, "STREET 16"))
+            QueryDsl.execute(ExtensionFunctionCall0Arg(16, "STREET 16"))
         }
         assertEquals(1, count)
         val a = Meta.address
@@ -586,7 +587,7 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
     @Run(onlyIf = [Dbms.H2])
     fun enum_property() {
         db.runQuery {
-            QueryDsl.executeCommand(EnumProperty(1, Color.BLUE))
+            QueryDsl.execute(EnumProperty(1, Color.BLUE))
         }
         val m = Meta.enumPropertyData
         val data2 = db.runQuery {
@@ -609,7 +610,7 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
     @Run(onlyIf = [Dbms.H2])
     fun enum_function() {
         db.runQuery {
-            QueryDsl.executeCommand(EnumFunction(Color.BLUE))
+            QueryDsl.execute(EnumFunction(Color.BLUE))
         }
         val m = Meta.enumPropertyData
         val data = db.runQuery {
@@ -632,7 +633,7 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
     @Test
     fun companionObjectPropertyCall() {
         val count = db.runQuery {
-            QueryDsl.executeCommand(CompanionObjectPropertyCall(16))
+            QueryDsl.execute(CompanionObjectPropertyCall(16))
         }
         assertEquals(1, count)
         val a = Meta.address
@@ -655,7 +656,7 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
     @Test
     fun companionObjectFunctionCall() {
         val count = db.runQuery {
-            QueryDsl.executeCommand(CompanionObjectFunctionCall(16))
+            QueryDsl.execute(CompanionObjectFunctionCall(16))
         }
         assertEquals(1, count)
         val a = Meta.address
@@ -678,7 +679,7 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
     @Test
     fun objectPropertyCall() {
         val count = db.runQuery {
-            QueryDsl.executeCommand(ObjectPropertyCall(16))
+            QueryDsl.execute(ObjectPropertyCall(16))
         }
         assertEquals(1, count)
         val a = Meta.address
@@ -701,7 +702,7 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
     @Test
     fun objectFunctionCall() {
         val count = db.runQuery {
-            QueryDsl.executeCommand(ObjectFunctionCall(16))
+            QueryDsl.execute(ObjectFunctionCall(16))
         }
         assertEquals(1, count)
         val a = Meta.address
@@ -725,7 +726,7 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
     @Test
     fun functionPassing() {
         val count = db.runQuery {
-            QueryDsl.executeCommand(FunctionPassing(16, {"good"}))
+            QueryDsl.execute(FunctionPassing(16, {"good"}))
         }
         assertEquals(1, count)
         val a = Meta.address

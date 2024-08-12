@@ -45,11 +45,14 @@ internal class CommandFactory(
             ?: report("The annotation \"${annotationClass.simpleName}\" is not found.", symbol)
         val sql = annotation.findValue("sql")?.toString()?.trimIndent()
             ?: report("The annotation value \"sql\" is not found.", annotation)
+        val name = annotation.findValue("name")?.toString()?.trim().let {
+            if (it.isNullOrEmpty()) "execute" else it
+        }
         val disableValidation = annotation.findValue("disableValidation")?.toString()?.toBooleanStrict()
             ?: report("The annotation value \"disableValidation\" is not found.", annotation)
         val result = createCommandResult(classDeclaration)
         val (packageName, fileName) = createFileName(context, classDeclaration)
-        return Command(sql, disableValidation, annotation, classDeclaration, paramMap, unusedParams, result, packageName, fileName)
+        return Command(sql, disableValidation, annotation, classDeclaration, name, paramMap, unusedParams, result, packageName, fileName)
     }
 
     // TODO refactor
