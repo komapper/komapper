@@ -17,6 +17,7 @@ import org.komapper.core.dsl.query.bind
 import org.komapper.core.dsl.query.first
 import org.komapper.core.dsl.query.get
 import org.komapper.core.dsl.query.getNotNull
+import org.komapper.core.dsl.query.single
 import org.komapper.jdbc.JdbcDatabase
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -364,5 +365,34 @@ class JdbcTemplateTest(private val db: JdbcDatabase) {
         }
         assertEquals(15, list.size)
         assertEquals(AddressDto(1, "STREET 1"), list[0])
+    }
+
+    @Test
+    @Run(unless = [Dbms.H2, Dbms.MYSQL, Dbms.MYSQL_5, Dbms.SQLSERVER, Dbms.ORACLE])
+    fun insertReturning() {
+        val address = db.runQuery {
+            val sql = """
+                insert into address
+                    (address_id, street, version)
+                values
+                    (/*id*/0, /*street*/'', /*version*/0)
+                returning address_id, street, version
+            """.trimIndent()
+            QueryDsl.executeTemplate(sql)
+                .returning()
+                .bind("id", 16)
+                .bind("street", "NY street")
+                .bind("version", 1)
+                .select(asAddress)
+                .single()
+        }
+        assertEquals(
+            Address(
+                16,
+                "NY street",
+                1,
+            ),
+            address,
+        )
     }
 }

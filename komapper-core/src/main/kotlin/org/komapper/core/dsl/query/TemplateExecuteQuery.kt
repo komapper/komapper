@@ -17,6 +17,11 @@ interface TemplateExecuteQuery : Query<Long>, TemplateBinder<TemplateExecuteQuer
      * @return the query
      */
     fun options(configure: (TemplateExecuteOptions) -> TemplateExecuteOptions): TemplateExecuteQuery
+
+    /**
+     * Enables the returning clause and returns a [TemplateSelectQueryBuilder] to specify the columns to return.
+     */
+    fun returning(): TemplateSelectQueryBuilder
 }
 
 internal data class TemplateExecuteQueryImpl(
@@ -26,6 +31,10 @@ internal data class TemplateExecuteQueryImpl(
     override fun options(configure: (TemplateExecuteOptions) -> TemplateExecuteOptions): TemplateExecuteQuery {
         val newContext = context.copy(options = configure(context.options))
         return copy(context = newContext)
+    }
+
+    override fun returning(): TemplateSelectQueryBuilder {
+        return TemplateSelectQueryBuilderImpl(context.asTemplateSelectContext(returning = true))
     }
 
     override fun bindValue(name: String, value: Value<*>): TemplateExecuteQuery {
