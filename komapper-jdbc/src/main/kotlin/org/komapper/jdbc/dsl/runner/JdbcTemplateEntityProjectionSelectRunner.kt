@@ -24,11 +24,19 @@ internal class JdbcTemplateEntityProjectionSelectRunner<T, R>(
     override fun run(config: JdbcDatabaseConfig): R {
         val statement = runner.buildStatement(config)
         val executor = config.dialect.createExecutor(config, context.options)
-        return executor.executeQuery(
-            statement,
-            transform,
-            collect,
-        )
+        return if (context.returning) {
+            executor.executeReturning(
+                statement,
+                transform,
+                collect,
+            )
+        } else {
+            executor.executeQuery(
+                statement,
+                transform,
+                collect,
+            )
+        }
     }
 
     override fun dryRun(config: DatabaseConfig): DryRunStatement {
