@@ -23,7 +23,7 @@ abstract class One<T> protected constructor(
     private val fetchOne: FetchOne<T>,
 ) : FetchOne<T> by fetchOne
 
-abstract class Many<T : Any> protected constructor(
+abstract class Many<T> protected constructor(
     private val fetchMany: FetchMany<T>,
 ) : FetchMany<T> by fetchMany
 
