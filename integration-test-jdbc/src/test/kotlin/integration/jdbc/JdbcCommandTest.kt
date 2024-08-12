@@ -13,9 +13,8 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.annotation.KomapperCommand
 import org.komapper.annotation.KomapperUnused
 import org.komapper.core.Exec
+import org.komapper.core.ExecReturnMany
 import org.komapper.core.ExecReturnOne
-import org.komapper.core.FetchMany
-import org.komapper.core.FetchOne
 import org.komapper.core.Many
 import org.komapper.core.One
 import org.komapper.core.dsl.Meta
@@ -29,28 +28,33 @@ import org.komapper.core.dsl.query.single
 import org.komapper.jdbc.JdbcDatabase
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 @ExtendWith(JdbcEnv::class)
 class JdbcCommandTest(private val db: JdbcDatabase) {
 
     @KomapperCommand(
         """
-        select * from address where /*%if street != null*/ street = /*street*/'test' /*%end*/
+        insert into address 
+            (address_id, street, version) 
+        values 
+            (/* id */0, /* street */'', /* version */0)
+        returning
+            address_id, street, version
         """,
     )
-    class FetchOneAddress(val street: String) : FetchOne<Address> {
-        override fun TemplateSelectQueryBuilder.execute() = select(asAddress).single()
-    }
+    class AddAddressThenReturn(val id: Int, val street: String, val version: Int) : ExecReturnOne<Address>({ select(asAddress).single() })
 
     @Test
-    fun fetchOneAddress() {
+    @Run(unless = [Dbms.H2, Dbms.MYSQL, Dbms.MYSQL_5, Dbms.SQLSERVER, Dbms.ORACLE])
+    fun addAddressThenReturn() {
         val address = db.runQuery {
-            QueryDsl.execute(FetchOneAddress("STREET 10"))
+            QueryDsl.execute(AddAddressThenReturn(16, "STREET 16", 1))
         }
         assertEquals(
             Address(
-                10,
-                "STREET 10",
+                16,
+                "STREET 16",
                 1,
             ),
             address,
@@ -59,48 +63,23 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
 
     @KomapperCommand(
         """
-        select * from address where address_id in /*list*/(0)
+        update address set 
+            version = version + 1 
+        returning
+            address_id, street, version
         """,
     )
-    data class FetchManyAddress(val list: List<Int>) : FetchMany<Address> {
-        override fun TemplateSelectQueryBuilder.execute() = select(asAddress)
-    }
+    class IncrementAddressVersionThenReturn : ExecReturnMany<Address>({ select(asAddress) })
 
     @Test
-    fun fetchManyAddress() {
-        val list = db.runQuery {
-            QueryDsl.execute(FetchManyAddress(listOf(1, 2)))
+    @Run(unless = [Dbms.H2, Dbms.MYSQL, Dbms.MYSQL_5, Dbms.SQLSERVER, Dbms.ORACLE])
+    fun incrementAddressVersionThenReturn() {
+        val addresses = db.runQuery {
+            QueryDsl.execute(IncrementAddressVersionThenReturn())
         }
-        assertEquals(2, list.size)
-        assertEquals(
-            Address(
-                1,
-                "STREET 1",
-                1,
-            ),
-            list[0],
-        )
-        assertEquals(
-            Address(
-                2,
-                "STREET 2",
-                1,
-            ),
-            list[1],
-        )
+        assertEquals(15, addresses.size)
+        assertTrue(addresses.all { it.version == 2 })
     }
-
-    // TODO add tests for this command
-    @KomapperCommand(
-        """
-        insert into address 
-            (address_id, street, version) 
-        values 
-            (/* id */0, /* street */'', /* version */0)
-        returning address_id, street, version
-        """,
-    )
-    class AddAddressReturning(val id: Int, val street: String, val version: Int) : ExecReturnOne<Address>({ select(asAddress).single() })
 
     @KomapperCommand(
         """

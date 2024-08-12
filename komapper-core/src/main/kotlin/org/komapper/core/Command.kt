@@ -31,12 +31,10 @@ abstract class Exec protected constructor(
     private val execChange: ExecChange = ExecChange { this },
 ) : ExecChange by execChange
 
-// TODO
 abstract class ExecReturnOne<T> protected constructor(
     private val fetchOne: FetchOne<T>,
 ) : FetchOne<T> by fetchOne
 
-// TODO
 abstract class ExecReturnMany<T> protected constructor(
     private val fetchMany: FetchMany<T>,
-) : FetchMany<T>
+) : FetchMany<T> by fetchMany

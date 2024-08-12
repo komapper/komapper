@@ -6,8 +6,6 @@ import org.komapper.processor.BackquotedSymbols.Value
 import org.komapper.processor.BackquotedSymbols.typeOf
 import org.komapper.processor.name
 import java.io.PrintWriter
-import kotlin.collections.joinToString
-import kotlin.text.isNotEmpty
 
 @ThreadSafe
 internal class CommandCallGenerator(
@@ -33,15 +31,26 @@ internal class CommandCallGenerator(
     }
 
     private fun functionDeclaration() {
-        val prefix = command.result.functionPrefix
-        val commandTypeName = command.classDeclaration.asStarProjectedType().name
+        val parameterTypeName = command.classDeclaration.asStarProjectedType().name
         val returnTypeName = command.result.returnType.name
-        val bindCalls = command.paramMap.entries.joinToString("\n        ", prefix = "\n        ") {
-            ".bindValue(\"${it.key}\", $Value(command.${it.key}, $typeOf<${it.value.name}>()))"
+        val templateCall = when (command.result.kind) {
+            CommandKind.ONE -> "fromTemplate"
+            CommandKind.MANY -> "fromTemplate"
+            CommandKind.EXEC -> "executeTemplate"
+            CommandKind.EXEC_RETURN_ONE -> "executeTemplate"
+            CommandKind.EXEC_RETURN_MANY -> "executeTemplate"
+        }.let { "$it(sql)" }
+        val returningCall = if (command.result.kind.returning) "\n        .returning()" else ""
+        val bindCalls = if (command.paramMap.isNotEmpty()) {
+            command.paramMap.entries.joinToString("\n        ", prefix = "\n        ") {
+                ".bindValue(\"${it.key}\", $Value(command.${it.key}, $typeOf<${it.value.name}>()))"
+            }
+        } else {
+            ""
         }
-        w.println("public fun $QueryDsl.`${command.name}`(command: $commandTypeName) : $returnTypeName {")
+        w.println("public fun $QueryDsl.`${command.name}`(command: $parameterTypeName) : $returnTypeName {")
         w.println("    val sql = \"\"\"${command.sql}\"\"\".trimIndent()")
-        w.println("    val binding = ${prefix}Template(sql)${ if (command.paramMap.isNotEmpty()) bindCalls else ""}")
+        w.println("    val binding = $templateCall$returningCall$bindCalls")
         w.println("    return with(command) {")
         w.println("        binding.execute()")
         w.println("    }")

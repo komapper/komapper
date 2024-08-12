@@ -13,6 +13,8 @@ import org.komapper.core.dsl.query.ListQuery
 import org.komapper.core.dsl.query.Query
 import org.komapper.processor.Context
 import org.komapper.processor.command.CommandKind.EXEC
+import org.komapper.processor.command.CommandKind.EXEC_RETURN_MANY
+import org.komapper.processor.command.CommandKind.EXEC_RETURN_ONE
 import org.komapper.processor.command.CommandKind.MANY
 import org.komapper.processor.command.CommandKind.ONE
 import org.komapper.processor.findAnnotation
@@ -26,6 +28,8 @@ internal class CommandFactory(
     private val annotationClass: KClass<*>,
     private val symbol: KSAnnotated,
 ) {
+    val commandKindMap = CommandKind.values().associateBy { it.className }
+
     fun create(): Command {
         val classDeclaration = symbol as? KSClassDeclaration
             ?: report("The annotated element is not a class.", symbol)
@@ -65,12 +69,12 @@ internal class CommandFactory(
         return when (kind) {
             ONE -> {
                 val returnType = createType(Query::class, typeArgs)
-                CommandResult(ONE, returnType, "from")
+                CommandResult(ONE, returnType)
             }
 
             MANY -> {
                 val returnType = createType(ListQuery::class, typeArgs)
-                CommandResult(MANY, returnType, "from")
+                CommandResult(MANY, returnType)
             }
 
             EXEC -> {
@@ -78,7 +82,17 @@ internal class CommandFactory(
                 val typeRef = context.resolver.createKSTypeReferenceFromKSType(longType)
                 val typeArg = context.resolver.getTypeArgument(typeRef, Variance.INVARIANT)
                 val returnType = createType(Query::class, listOf(typeArg))
-                CommandResult(EXEC, returnType, "execute")
+                CommandResult(EXEC, returnType)
+            }
+
+            EXEC_RETURN_ONE -> {
+                val returnType = createType(Query::class, typeArgs)
+                CommandResult(EXEC_RETURN_ONE, returnType)
+            }
+
+            EXEC_RETURN_MANY -> {
+                val returnType = createType(ListQuery::class, typeArgs)
+                CommandResult(EXEC_RETURN_MANY, returnType)
             }
         }
     }
@@ -95,12 +109,7 @@ internal class CommandFactory(
             val type = superType.resolve()
             val declaration = type.declaration as? KSClassDeclaration ?: continue
             val name = declaration.qualifiedName?.asString()
-            val kind = when (name) {
-                ONE.interfaceName, ONE.abstractClasName -> ONE
-                MANY.interfaceName, MANY.abstractClasName -> MANY
-                EXEC.interfaceName, EXEC.abstractClasName -> EXEC
-                else -> null
-            }
+            val kind = commandKindMap[name]
             return if (kind != null) {
                 // resolve type arguments
                 val args = type.arguments.asSequence()

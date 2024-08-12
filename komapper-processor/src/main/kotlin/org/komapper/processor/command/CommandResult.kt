@@ -7,5 +7,4 @@ import org.komapper.core.ThreadSafe
 internal data class CommandResult(
     val kind: CommandKind,
     val returnType: KSType,
-    val functionPrefix: String,
 )
