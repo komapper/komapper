@@ -72,7 +72,7 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
     class IncrementAddressVersionThenReturn : ExecReturnMany<Address>({ select(asAddress) })
 
     @Test
-    @Run(unless = [Dbms.H2, Dbms.MYSQL, Dbms.MYSQL_5, Dbms.SQLSERVER, Dbms.ORACLE])
+    @Run(unless = [Dbms.H2, Dbms.MARIADB, Dbms.MYSQL, Dbms.MYSQL_5, Dbms.SQLSERVER, Dbms.ORACLE])
     fun incrementAddressVersionThenReturn() {
         val addresses = db.runQuery {
             QueryDsl.execute(IncrementAddressVersionThenReturn())
