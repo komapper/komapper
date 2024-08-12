@@ -2,6 +2,7 @@
 
 package org.komapper.annotation
 
+import org.intellij.lang.annotations.Language
 import java.time.LocalDateTime
 import java.time.OffsetDateTime
 import kotlin.reflect.KClass
@@ -283,7 +284,7 @@ annotation class KomapperProjectionDef(
 @Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.SOURCE)
 annotation class KomapperCommand(
-    val sql: String,
+    @Language("sql") val sql: String,
     val disableValidation: Boolean = DISABLE_VALIDATION,
 ) {
     companion object {
