@@ -245,7 +245,7 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
         where street like concat(/* street.asPrefix() */'test', '%')
         order by address_id
         """,
-        name = "fetchUsingAsPrefix",
+        functionName = "fetchUsingAsPrefix",
     )
     data class AsPrefix(val street: String) : Many<Address>({ select(asAddress) })
 

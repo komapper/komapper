@@ -279,17 +279,18 @@ annotation class KomapperProjectionDef(
  * The annotated class is a command that encapsulates an SQL template, SQL parameters, and SQL execution into a single unit.
  *
  * @property sql the SQL template
+ * @property functionName the function name for the command. The default function name is "execute".
  * @property disableValidation if `true`, SQL validation at compile time will be disabled
  */
 @Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.SOURCE)
 annotation class KomapperCommand(
     @Language("sql") val sql: String,
-    val name: String = NAME,
+    val functionName: String = FUNCTION_NAME,
     val disableValidation: Boolean = DISABLE_VALIDATION,
 ) {
     companion object {
-        const val NAME = ""
+        const val FUNCTION_NAME = "execute"
         const val DISABLE_VALIDATION: Boolean = false
     }
 }

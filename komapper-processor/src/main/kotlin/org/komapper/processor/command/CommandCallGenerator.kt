@@ -32,15 +32,15 @@ internal class CommandCallGenerator(
 
     private fun functionDeclaration() {
         val parameterTypeName = command.classDeclaration.asStarProjectedType().name
-        val returnTypeName = command.result.returnType.name
-        val templateCall = when (command.result.kind) {
+        val returnTypeName = command.returnType.name
+        val templateCall = when (command.kind) {
             CommandKind.ONE -> "fromTemplate"
             CommandKind.MANY -> "fromTemplate"
             CommandKind.EXEC -> "executeTemplate"
             CommandKind.EXEC_RETURN_ONE -> "executeTemplate"
             CommandKind.EXEC_RETURN_MANY -> "executeTemplate"
         }.let { "$it(sql)" }
-        val returningCall = if (command.result.kind.returning) "\n        .returning()" else ""
+        val returningCall = if (command.kind.returning) "\n        .returning()" else ""
         val bindCalls = if (command.paramMap.isNotEmpty()) {
             command.paramMap.entries.joinToString("\n        ", prefix = "\n        ") {
                 ".bindValue(\"${it.key}\", $Value(command.${it.key}, $typeOf<${it.value.name}>()))"
@@ -48,7 +48,7 @@ internal class CommandCallGenerator(
         } else {
             ""
         }
-        w.println("public fun $QueryDsl.`${command.name}`(command: $parameterTypeName) : $returnTypeName {")
+        w.println("public fun $QueryDsl.`${command.functionName}`(command: $parameterTypeName) : $returnTypeName {")
         w.println("    val sql = \"\"\"${command.sql}\"\"\".trimIndent()")
         w.println("    val binding = $templateCall$returningCall$bindCalls")
         w.println("    return with(command) {")

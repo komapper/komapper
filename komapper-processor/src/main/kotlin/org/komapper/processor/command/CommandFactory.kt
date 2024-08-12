@@ -28,7 +28,12 @@ internal class CommandFactory(
     private val annotationClass: KClass<*>,
     private val symbol: KSAnnotated,
 ) {
-    val commandKindMap = CommandKind.values().associateBy { it.className }
+    private val commandKindMap = CommandKind.values().associateBy { it.className }
+    private val longTypeArg by lazy {
+        val longType = context.resolver.builtIns.longType
+        val typeRef = context.resolver.createKSTypeReferenceFromKSType(longType)
+        context.resolver.getTypeArgument(typeRef, Variance.INVARIANT)
+    }
 
     fun create(): Command {
         val classDeclaration = symbol as? KSClassDeclaration
@@ -49,62 +54,29 @@ internal class CommandFactory(
             ?: report("The annotation \"${annotationClass.simpleName}\" is not found.", symbol)
         val sql = annotation.findValue("sql")?.toString()?.trimIndent()
             ?: report("The annotation value \"sql\" is not found.", annotation)
-        val name = annotation.findValue("name")?.toString()?.trim().let {
+        val functionName = annotation.findValue("functionName")?.toString()?.trim().let {
             if (it.isNullOrEmpty()) "execute" else it
         }
         val disableValidation = annotation.findValue("disableValidation")?.toString()?.toBooleanStrict()
             ?: report("The annotation value \"disableValidation\" is not found.", annotation)
-        val result = createCommandResult(classDeclaration)
+        val (kind, returnType) = findKindAndReturnType(classDeclaration, emptyMap())
         val (packageName, fileName) = createFileName(context, classDeclaration)
-        return Command(sql, disableValidation, annotation, classDeclaration, name, paramMap, unusedParams, result, packageName, fileName)
-    }
-
-    // TODO refactor
-    private fun createCommandResult(classDeclaration: KSClassDeclaration): CommandResult {
-        val (kind, type, typeArgs) = findCommandKSType(classDeclaration, emptyMap()) ?: report(
-            "${classDeclaration.qualifiedName?.asString()} must extend or implement one of the following classes or interfaces: " +
-                "One, Many, Exec, FetchOne, FetchMany, or ExecChange.",
-            classDeclaration,
+        return Command(
+            kind = kind,
+            sql = sql,
+            disableValidation = disableValidation,
+            annotation = annotation,
+            classDeclaration = classDeclaration,
+            functionName = functionName,
+            paramMap = paramMap,
+            unusedParams = unusedParams,
+            returnType = returnType,
+            packageName = packageName,
+            fileName = fileName,
         )
-        return when (kind) {
-            ONE -> {
-                val returnType = createType(Query::class, typeArgs)
-                CommandResult(ONE, returnType)
-            }
-
-            MANY -> {
-                val returnType = createType(ListQuery::class, typeArgs)
-                CommandResult(MANY, returnType)
-            }
-
-            EXEC -> {
-                val longType = context.resolver.builtIns.longType
-                val typeRef = context.resolver.createKSTypeReferenceFromKSType(longType)
-                val typeArg = context.resolver.getTypeArgument(typeRef, Variance.INVARIANT)
-                val returnType = createType(Query::class, listOf(typeArg))
-                CommandResult(EXEC, returnType)
-            }
-
-            EXEC_RETURN_ONE -> {
-                val returnType = createType(Query::class, typeArgs)
-                CommandResult(EXEC_RETURN_ONE, returnType)
-            }
-
-            EXEC_RETURN_MANY -> {
-                val returnType = createType(ListQuery::class, typeArgs)
-                CommandResult(EXEC_RETURN_MANY, returnType)
-            }
-        }
     }
 
-    private fun createType(klass: KClass<*>, typeArgs: List<KSTypeArgument>): KSType {
-        return context.resolver.getKSNameFromString(klass.qualifiedName!!).let {
-            context.resolver.getClassDeclarationByName(it)?.asType(typeArgs)
-                ?: report("Class not found: ${it.asString()}", symbol)
-        }
-    }
-
-    private fun findCommandKSType(classDeclaration: KSClassDeclaration, map: Map<KSTypeParameter, KSTypeArgument>): Triple<CommandKind, KSType, List<KSTypeArgument>>? {
+    private fun findKindAndReturnType(classDeclaration: KSClassDeclaration, map: Map<KSTypeParameter, KSTypeArgument>): Pair<CommandKind, KSType> {
         for (superType in classDeclaration.superTypes) {
             val type = superType.resolve()
             val declaration = type.declaration as? KSClassDeclaration ?: continue
@@ -112,18 +84,35 @@ internal class CommandFactory(
             val kind = commandKindMap[name]
             return if (kind != null) {
                 // resolve type arguments
-                val args = type.arguments.asSequence()
+                val typeArgs = type.arguments.asSequence()
                     .map { arg -> arg to arg.type?.resolve()?.declaration }
                     .map { (type, decl) -> if (decl == null) type to null else type to map[decl] }
                     .map { (original, resolved) -> resolved ?: original }
                     .toList()
-                Triple(kind, type, args)
+                when (kind) {
+                    ONE -> ONE to createType(Query::class, typeArgs)
+                    MANY -> MANY to createType(ListQuery::class, typeArgs)
+                    EXEC -> EXEC to createType(Query::class, listOf(longTypeArg))
+                    EXEC_RETURN_ONE -> EXEC_RETURN_ONE to createType(Query::class, typeArgs)
+                    EXEC_RETURN_MANY -> EXEC_RETURN_MANY to createType(ListQuery::class, typeArgs)
+                }
             } else {
                 val newMap = map + declaration.typeParameters.zip(type.arguments).toMap()
-                findCommandKSType(declaration, newMap)
+                findKindAndReturnType(declaration, newMap)
             }
         }
-        return null
+        val name = classDeclaration.qualifiedName?.asString()
+        report(
+            "$name must extend one of the following classes: One, Many, Exec, ExecReturnOne, or ExecReturnMany.",
+            symbol,
+        )
+    }
+
+    private fun createType(klass: KClass<*>, typeArgs: List<KSTypeArgument>): KSType {
+        return context.resolver.getKSNameFromString(klass.qualifiedName!!).let {
+            context.resolver.getClassDeclarationByName(it)?.asType(typeArgs)
+                ?: report("Class not found: ${it.asString()}", symbol)
+        }
     }
 
     private fun createFileName(context: Context, classDeclaration: KSClassDeclaration): Pair<String, String> {
