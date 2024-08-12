@@ -13,6 +13,8 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.annotation.KomapperCommand
 import org.komapper.annotation.KomapperUnused
 import org.komapper.core.Exec
+import org.komapper.core.FetchMany
+import org.komapper.core.FetchOne
 import org.komapper.core.Many
 import org.komapper.core.One
 import org.komapper.core.dsl.Meta
@@ -30,11 +32,60 @@ import kotlin.test.assertEquals
 @ExtendWith(JdbcEnv::class)
 class JdbcCommandTest(private val db: JdbcDatabase) {
 
-    private val asAddress: (Row) -> Address = { row ->
-        Address(
-            row.getNotNull("address_id"),
-            row.getNotNull("street"),
-            row.getNotNull("version"),
+    @KomapperCommand(
+        """
+        select * from address where /*%if street != null*/ street = /*street*/'test' /*%end*/
+        """,
+    )
+    class FetchOneAddress(val street: String) : FetchOne<Address> {
+        override fun TemplateSelectQueryBuilder.execute() = select(asAddress).single()
+    }
+
+    @Test
+    fun fetchOneAddress() {
+        val address = db.runQuery {
+            QueryDsl.fromCommand(FetchOneAddress("STREET 10"))
+        }
+        assertEquals(
+            Address(
+                10,
+                "STREET 10",
+                1,
+            ),
+            address,
+        )
+    }
+
+    @KomapperCommand(
+        """
+        select * from address where address_id in /*list*/(0)
+        """,
+    )
+    data class FetchManyAddress(val list: List<Int>) : FetchMany<Address> {
+        override fun TemplateSelectQueryBuilder.execute() = select(asAddress)
+    }
+
+    @Test
+    fun fetchManyAddress() {
+        val list = db.runQuery {
+            QueryDsl.fromCommand(FetchManyAddress(listOf(1, 2)))
+        }
+        assertEquals(2, list.size)
+        assertEquals(
+            Address(
+                1,
+                "STREET 1",
+                1,
+            ),
+            list[0],
+        )
+        assertEquals(
+            Address(
+                2,
+                "STREET 2",
+                1,
+            ),
+            list[1],
         )
     }
 
@@ -43,14 +94,12 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
         select * from address where /*%if street != null*/ street = /*street*/'test' /*%end*/
         """,
     )
-    data class Bind(val street: String, @KomapperUnused val asAddress: (Row) -> Address) : One<Address> {
-        override fun TemplateSelectQueryBuilder.execute() = select(asAddress).single()
-    }
+    class Bind(val street: String) : One<Address>({ select(asAddress).single() })
 
     @Test
     fun bind() {
         val address = db.runQuery {
-            QueryDsl.fromCommand(Bind("STREET 10", asAddress))
+            QueryDsl.fromCommand(Bind("STREET 10"))
         }
         assertEquals(
             Address(
@@ -67,14 +116,12 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
         select * from address where /*%if street != null*/ street = /*street*/'test' /*%end*/
         """,
     )
-    data class BindNull(val street: String?, @KomapperUnused val asAddress: (Row) -> Address) : Many<Address> {
-        override fun TemplateSelectQueryBuilder.execute() = select(asAddress)
-    }
+    data class BindNull(val street: String?) : Many<Address>({ select(asAddress) })
 
     @Test
     fun bindNull() {
         val list = db.runQuery {
-            QueryDsl.fromCommand(BindNull(null, asAddress))
+            QueryDsl.fromCommand(BindNull(null))
         }
         assertEquals(15, list.size)
     }
@@ -84,14 +131,12 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
         select * from address where address_id in /*list*/(0)
         """,
     )
-    data class In(val list: List<Int>, @KomapperUnused val asAddress: (Row) -> Address) : Many<Address> {
-        override fun TemplateSelectQueryBuilder.execute() = select(asAddress)
-    }
+    data class In(val list: List<Int>) : Many<Address>({ select(asAddress) })
 
     @Test
     fun `in`() {
         val list = db.runQuery {
-            QueryDsl.fromCommand(In(listOf(1, 2), asAddress))
+            QueryDsl.fromCommand(In(listOf(1, 2)))
         }
         assertEquals(2, list.size)
         assertEquals(
@@ -117,15 +162,13 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
         select * from address where (address_id, street) in /*pairs*/(0, '')
         """,
     )
-    data class In2(val pairs: List<Pair<Int, String>>, @KomapperUnused val asAddress: (Row) -> Address) : Many<Address> {
-        override fun TemplateSelectQueryBuilder.execute() = select(asAddress)
-    }
+    data class In2(val pairs: List<Pair<Int, String>>) : Many<Address>({ select(asAddress) })
 
     @Run(unless = [Dbms.SQLSERVER])
     @Test
     fun in2() {
         val list = db.runQuery {
-            QueryDsl.fromCommand(In2(listOf(1 to "STREET 1", 2 to "STREET 2"), asAddress))
+            QueryDsl.fromCommand(In2(listOf(1 to "STREET 1", 2 to "STREET 2")))
         }
         assertEquals(2, list.size)
         assertEquals(
@@ -151,9 +194,7 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
         select * from address where (address_id, street, version) in /*triples*/(0, '', 0)
         """,
     )
-    data class In3(val triples: List<Triple<Int, String, Int>>, @KomapperUnused val asAddress: (Row) -> Address) : Many<Address> {
-        override fun TemplateSelectQueryBuilder.execute() = select(asAddress)
-    }
+    data class In3(val triples: List<Triple<Int, String, Int>>) : Many<Address>({ select(asAddress) })
 
     @Run(unless = [Dbms.SQLSERVER])
     @Test
@@ -165,7 +206,6 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
                         Triple(1, "STREET 1", 1),
                         Triple(2, "STREET 2", 1),
                     ),
-                    asAddress,
                 ),
             )
         }
@@ -195,7 +235,7 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
         order by address_id
         """,
     )
-    data class Escape(val street: String, @KomapperUnused val asAddress: (Row) -> Address) : Many<Address> {
+    data class Escape(val street: String, @KomapperUnused val asAddress: (Row) -> Address) : Many<Address>({ select(asAddress) }) {
         override fun TemplateSelectQueryBuilder.execute() = select(asAddress)
     }
 
@@ -214,14 +254,12 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
         order by address_id
         """,
     )
-    data class AsPrefix(val street: String, @KomapperUnused val asAddress: (Row) -> Address) : Many<Address> {
-        override fun TemplateSelectQueryBuilder.execute() = select(asAddress)
-    }
+    data class AsPrefix(val street: String) : Many<Address>({ select(asAddress) })
 
     @Test
     fun asPrefix() {
         val list = db.runQuery {
-            QueryDsl.fromCommand(AsPrefix("STREET 1", asAddress))
+            QueryDsl.fromCommand(AsPrefix("STREET 1"))
         }
         assertEquals((listOf(1) + (10..15)).toList(), list.map { it.addressId })
     }
@@ -231,7 +269,7 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
         update address set street = /*street*/'' where address_id = /*id*/0
         """,
     )
-    data class Execute(val id: Int, val street: String) : Exec
+    data class Execute(val id: Int, val street: String) : Exec()
 
     @Test
     fun execute() {
@@ -260,9 +298,7 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
         select address_id, street, version from address order by address_id
         """,
     )
-    class SelectAsEntityByIndex : Many<Address> {
-        override fun TemplateSelectQueryBuilder.execute() = selectAsEntity(Meta.address)
-    }
+    class SelectAsEntityByIndex : Many<Address>({ selectAsEntity(Meta.address) })
 
     @Test
     fun selectAsEntity_byIndex() {
@@ -278,9 +314,7 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
         select street, version, address_id from address order by address_id
         """,
     )
-    class SelectAsEntityByName : Many<Address> {
-        override fun TemplateSelectQueryBuilder.execute() = selectAsEntity(Meta.address, ProjectionType.NAME)
-    }
+    class SelectAsEntityByName : Many<Address>({ selectAsEntity(Meta.address, ProjectionType.NAME) })
 
     @Test
     fun selectAsEntity_byName() {
@@ -296,9 +330,7 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
         select address_id, street, version from address order by address_id
         """,
     )
-    class SelectAsAddressByIndex : Many<Address> {
-        override fun TemplateSelectQueryBuilder.execute() = selectAsAddress()
-    }
+    class SelectAsAddressByIndex : Many<Address>({ selectAsAddress() })
 
     @Test
     fun selectAsAddress_byIndex() {
@@ -314,9 +346,7 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
         select street, version, address_id from address order by address_id
         """,
     )
-    class SelectAsAddressByName : Many<Address> {
-        override fun TemplateSelectQueryBuilder.execute() = selectAsAddress(ProjectionType.NAME)
-    }
+    class SelectAsAddressByName : Many<Address>({ selectAsAddress(ProjectionType.NAME) })
 
     @Test
     fun selectAsAddress_byName() {
@@ -332,9 +362,7 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
         select address_id, street, version from address order by address_id
         """,
     )
-    class SelectAsAddressDtoByIndex : Many<AddressDto> {
-        override fun TemplateSelectQueryBuilder.execute() = selectAsAddressDto()
-    }
+    class SelectAsAddressDtoByIndex : Many<AddressDto>({ selectAsAddressDto() })
 
     @Test
     fun selectAsAddressDto_byIndex() {
@@ -350,9 +378,7 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
         select street, address_id from address order by address_id
         """,
     )
-    class SelectAsAddressDtoByName : Many<AddressDto> {
-        override fun TemplateSelectQueryBuilder.execute() = selectAsAddressDto(ProjectionType.NAME)
-    }
+    class SelectAsAddressDtoByName : Many<AddressDto>({ selectAsAddressDto(ProjectionType.NAME) })
 
     @Test
     fun selectAsAddressDto_byName() {
@@ -380,9 +406,7 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
             address_id
         """,
     )
-    class ForDirective(val streets: List<String>) : Many<Address> {
-        override fun TemplateSelectQueryBuilder.execute() = selectAsAddress()
-    }
+    class ForDirective(val streets: List<String>) : Many<Address>({ selectAsAddress() })
 
     @Test
     fun forDirective() {
@@ -403,7 +427,7 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
             (/* id */0, /* street */'', /* street.length */0)
         """,
     )
-    class PropertyCall(val id: Int, val street: String) : Exec
+    class PropertyCall(val id: Int, val street: String) : Exec()
 
     @Test
     fun propertyCall() {
@@ -426,7 +450,7 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
             (/* id */0, /* street */'', /* street.lastIndex */0)
         """,
     )
-    class ExtensionPropertyCall(val id: Int, val street: String) : Exec
+    class ExtensionPropertyCall(val id: Int, val street: String) : Exec()
 
     @Test
     fun extensionPropertyCall() {
@@ -449,7 +473,7 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
             (/* id */0, /* street.toString() */'', /* id */0)
         """,
     )
-    class FunctionCall0Arg(val id: Int, val street: String) : Exec
+    class FunctionCall0Arg(val id: Int, val street: String) : Exec()
 
     @Test
     fun functionCall_0Arg() {
@@ -472,7 +496,7 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
             (/* id */0, /* street.equals(0) */'', /* id */0)
         """,
     )
-    class FunctionCall1Arg(val id: Int, val street: String) : Exec
+    class FunctionCall1Arg(val id: Int, val street: String) : Exec()
 
     @Test
     @Run(onlyIf = [Dbms.H2])
@@ -496,7 +520,7 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
             (/* id */0, /* street.subSequence(start, end).toString() */'', /* id */0)
         """,
     )
-    class FunctionCall2Arg(val id: Int, val street: String, val start: Int, val end: Int) : Exec
+    class FunctionCall2Arg(val id: Int, val street: String, val start: Int, val end: Int) : Exec()
 
     @Test
     fun functionCall_2Args() {
@@ -519,7 +543,7 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
             (/* id */0, /* street.isBlank() */'', /* id */0)
         """,
     )
-    class ExtensionFunctionCall0Arg(val id: Int, val street: String) : Exec
+    class ExtensionFunctionCall0Arg(val id: Int, val street: String) : Exec()
 
     @Test
     @Run(onlyIf = [Dbms.H2])
@@ -543,7 +567,7 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
             (/* id */0, /*%if color == @integration.core.enumclass.Color@.BLUE */20/*%else*/null/*%end*/)
         """,
     )
-    class EnumProperty(val id: Int, val color: Color) : Exec
+    class EnumProperty(val id: Int, val color: Color) : Exec()
 
     @Test
     @Run(onlyIf = [Dbms.H2])
@@ -566,7 +590,7 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
             (/*%if @integration.core.enumclass.Color@.values() != null */1/*%else*/0/*%end*/, /*%if color == @integration.core.enumclass.Color@.valueOf("BLUE") */20/*%else*/null/*%end*/)
         """,
     )
-    class EnumFunction(val color: Color) : Exec
+    class EnumFunction(val color: Color) : Exec()
 
     @Test
     @Run(onlyIf = [Dbms.H2])
@@ -590,7 +614,7 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
             (/* id */0, /* @integration.jdbc.Hello@.name */'', /* id */0)
         """,
     )
-    class CompanionObjectPropertyCall(val id: Int) : Exec
+    class CompanionObjectPropertyCall(val id: Int) : Exec()
 
     @Test
     fun companionObjectPropertyCall() {
@@ -613,7 +637,7 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
             (/* id */0, /* @integration.jdbc.Hello@.greet("world") */'', /* id */0)
         """,
     )
-    class CompanionObjectFunctionCall(val id: Int) : Exec
+    class CompanionObjectFunctionCall(val id: Int) : Exec()
 
     @Test
     fun companionObjectFunctionCall() {
@@ -636,7 +660,7 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
             (/* id */0, /* @integration.jdbc.Hi@.name */'', /* id */0)
         """,
     )
-    class ObjectPropertyCall(val id: Int) : Exec
+    class ObjectPropertyCall(val id: Int) : Exec()
 
     @Test
     fun objectPropertyCall() {
@@ -659,7 +683,7 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
             (/* id */0, /* @integration.jdbc.Hi@.greet("world") */'', /* id */0)
         """,
     )
-    class ObjectFunctionCall(val id: Int) : Exec
+    class ObjectFunctionCall(val id: Int) : Exec()
 
     @Test
     fun objectFunctionCall() {
@@ -730,4 +754,12 @@ object Hi {
     fun greet(name: String): String {
         return "hi $name!"
     }
+}
+
+private val asAddress: (Row) -> Address = { row ->
+    Address(
+        row.getNotNull("address_id"),
+        row.getNotNull("street"),
+        row.getNotNull("version"),
+    )
 }

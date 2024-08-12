@@ -7,14 +7,26 @@ import org.komapper.core.dsl.query.TemplateSelectQueryBuilder
 
 sealed interface Command
 
-interface One<T> : Command {
+fun interface FetchOne<T> : Command {
     fun TemplateSelectQueryBuilder.execute(): Query<T>
 }
 
-interface Many<T : Any> : Command {
+fun interface FetchMany<T> : Command {
     fun TemplateSelectQueryBuilder.execute(): ListQuery<T>
 }
 
-interface Exec : Command {
-    fun TemplateExecuteQuery.execute(): Query<Long> = this
+fun interface ExecChange : Command {
+    fun TemplateExecuteQuery.execute(): Query<Long>
 }
+
+abstract class One<T> protected constructor(
+    private val fetchOne: FetchOne<T>,
+) : FetchOne<T> by fetchOne
+
+abstract class Many<T : Any> protected constructor(
+    private val fetchMany: FetchMany<T>,
+) : FetchMany<T> by fetchMany
+
+abstract class Exec protected constructor(
+    private val execChange: ExecChange = ExecChange { this },
+) : ExecChange by execChange

@@ -10,6 +10,9 @@ import org.komapper.annotation.KomapperUnused
 import org.komapper.core.dsl.query.ListQuery
 import org.komapper.core.dsl.query.Query
 import org.komapper.processor.Context
+import org.komapper.processor.command.CommandKind.EXEC
+import org.komapper.processor.command.CommandKind.MANY
+import org.komapper.processor.command.CommandKind.ONE
 import org.komapper.processor.findAnnotation
 import org.komapper.processor.findValue
 import org.komapper.processor.hasAnnotation
@@ -48,23 +51,23 @@ internal class CommandFactory(
         for (type in classDeclaration.getAllSuperTypes()) {
             val markerInterfaceName = type.declaration.qualifiedName?.asString()
             when (markerInterfaceName) {
-                CommandKind.ONE.markerInterfaceName -> {
+                ONE.interfaceName, ONE.abstractClasName -> {
                     val returnType = context.resolver.getKSNameFromString(Query::class.qualifiedName!!).let {
                         context.resolver.getClassDeclarationByName(it)?.asType(type.arguments)
                             ?: report("Class not found: ${it.asString()}", classDeclaration)
                     }
-                    return CommandResult(CommandKind.ONE, returnType, "from")
+                    return CommandResult(ONE, returnType, "from")
                 }
 
-                CommandKind.MANY.markerInterfaceName -> {
+                MANY.interfaceName, MANY.abstractClasName -> {
                     val returnType = context.resolver.getKSNameFromString(ListQuery::class.qualifiedName!!).let {
                         context.resolver.getClassDeclarationByName(it)?.asType(type.arguments)
                             ?: report("Class not found: ${it.asString()}", classDeclaration)
                     }
-                    return CommandResult(CommandKind.MANY, returnType, "from")
+                    return CommandResult(MANY, returnType, "from")
                 }
 
-                CommandKind.EXEC.markerInterfaceName -> {
+                EXEC.interfaceName, EXEC.abstractClasName -> {
                     val returnType = context.resolver.getKSNameFromString(Query::class.qualifiedName!!).let {
                         val longType = context.resolver.builtIns.longType
                         val typeRef = context.resolver.createKSTypeReferenceFromKSType(longType)
@@ -72,14 +75,18 @@ internal class CommandFactory(
                         context.resolver.getClassDeclarationByName(it)?.asType(listOf(typeArg))
                             ?: report("Class not found: ${it.asString()}", classDeclaration)
                     }
-                    return CommandResult(CommandKind.EXEC, returnType, "execute")
+                    return CommandResult(EXEC, returnType, "execute")
                 }
 
                 else -> Unit
             }
         }
         val name = classDeclaration.qualifiedName?.asString()
-        report("$name must implement one of the interfaces: One, Many, or Exec.", classDeclaration)
+        report(
+            "$name must extend or implement one of the following classes or interfaces: " +
+                "One, Many, Exec, FetchOne, FetchMany, or ExecChange.",
+            classDeclaration,
+        )
     }
 
     private fun createFileName(context: Context, classDeclaration: KSClassDeclaration): Pair<String, String> {
