@@ -31,6 +31,9 @@ internal class CommandFactory(
             ClassKind.CLASS, ClassKind.OBJECT, ClassKind.INTERFACE -> Unit
             else -> report("The annotated element must be either a class, an object, or an interface.", symbol)
         }
+        if (classDeclaration.typeParameters.isNotEmpty()) {
+            report("The class with type parameters is not supported.", symbol)
+        }
         val properties = classDeclaration.getAllProperties()
             .filterNot { Modifier.PRIVATE in it.modifiers }
             .toList()
