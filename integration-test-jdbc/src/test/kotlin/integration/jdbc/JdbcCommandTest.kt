@@ -13,6 +13,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.komapper.annotation.KomapperCommand
 import org.komapper.annotation.KomapperUnused
 import org.komapper.core.Exec
+import org.komapper.core.ExecReturnOne
 import org.komapper.core.FetchMany
 import org.komapper.core.FetchOne
 import org.komapper.core.Many
@@ -88,6 +89,18 @@ class JdbcCommandTest(private val db: JdbcDatabase) {
             list[1],
         )
     }
+
+    // TODO add tests for this command
+    @KomapperCommand(
+        """
+        insert into address 
+            (address_id, street, version) 
+        values 
+            (/* id */0, /* street */'', /* version */0)
+        returning address_id, street, version
+        """,
+    )
+    class AddAddressReturning(val id: Int, val street: String, val version: Int) : ExecReturnOne<Address>({ select(asAddress).single() })
 
     @KomapperCommand(
         """
