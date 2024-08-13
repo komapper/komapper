@@ -178,7 +178,7 @@ internal class SqlParser constructor(
         if (identifier.isEmpty()) {
             throw SqlException("The identifier is not found in the statement in the for directive at $location")
         }
-        val expression = statement.substring(pos + 1).trim()
+        val expression = statement.substring(pos + 2).trim()
         if (expression.isEmpty()) {
             throw SqlException("The expression is not found in the statement in the for directive at $location")
         }
